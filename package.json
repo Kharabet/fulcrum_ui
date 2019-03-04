@@ -19,6 +19,7 @@
     "prettier": "^1.16.4"
   },
   "scripts": {
+    "clean": "rm -rf ./node_modules",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
