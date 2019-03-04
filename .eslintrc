@@ -1,0 +1,12 @@
+{
+  "parser": "babel-eslint",
+  "extends": ["airbnb", "prettier"],
+  "plugins": ["prettier", "jest"],
+  "rules": {
+    "no-underscore-dangle": 0,
+    "import/prefer-default-export": 0
+  },
+  "env": {
+    "jest/globals": true
+  }
+}
