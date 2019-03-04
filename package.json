@@ -1,7 +1,19 @@
 {
-  "name": "fulcrum",
+  "name": "@bzxnetwork/fulcrum",
   "version": "0.1.0",
-  "private": true,
+  "description": "Simplified crypto-lending platform",
+  "keywords": [],
+  "author": "",
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/bZxNetwork/fulcrum#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bZxNetwork/fulcrum.git"
+  },
+  "bugs": {
+    "url": "https://github.com/bZxNetwork/fulcrum/issues"
+  },
+  "main": "src/index.jsx",
   "dependencies": {
     "react": "^16.8.3",
     "react-dom": "^16.8.3",
