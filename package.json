@@ -15,10 +15,13 @@
   },
   "main": "src/index.jsx",
   "dependencies": {
+    "bignumber.js": "^7.0.1",
+    "moment": "^2.22.1",
     "react": "^16.8.3",
     "react-dom": "^16.8.3",
     "react-scripts": "2.1.5",
-    "prop-types": "^15.6.2"
+    "prop-types": "^15.6.2",
+    "web3": "1.0.0-beta.36"
   },
   "devDependencies": {
     "eslint-config-airbnb": "^17.1.0",
@@ -38,7 +41,16 @@
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
-    "extends": "react-app"
+    "parser": "babel-eslint",
+    "extends": ["airbnb", "prettier"],
+    "plugins": ["prettier", "jest"],
+    "rules": {
+      "no-underscore-dangle": 0,
+      "import/prefer-default-export": 0
+    },
+    "env": {
+      "jest/globals": true
+    }
   },
   "browserslist": [
     ">0.2%",
