@@ -1,11 +1,11 @@
 import React, { Component } from "react";
 import { TradeTokenGridHeader } from "./TradeTokenGridHeader";
-import { ITradeTokenGridRowParams, TradeTokenGridRow } from "./TradeTokenGridRow";
+import { ITradeTokenGridRowProps, TradeTokenGridRow } from "./TradeTokenGridRow";
 import { PositionType } from "../domain/PositionType";
 import BigNumber from "bignumber.js";
 
 export class TradeTokenGrid extends Component {
-  private _tokens: ITradeTokenGridRowParams[] = [
+  private _tokens: ITradeTokenGridRowProps[] = [
     {
       tokenAddress: "0x1",
       tokenLogoImageSrc: null,

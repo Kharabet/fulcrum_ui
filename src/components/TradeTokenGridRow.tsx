@@ -4,7 +4,7 @@ import { LeverageSelector } from "./LeverageSelector";
 import { PositionTypeMarker } from "./PositionTypeMarker";
 import { PositionType } from "../domain/PositionType";
 
-export interface ITradeTokenGridRowParams {
+export interface ITradeTokenGridRowProps {
   tokenAddress: string;
   tokenLogoImageSrc: any;
   tokenName: string;
@@ -18,8 +18,8 @@ export interface ITradeTokenGridRowState {
   leverage: number;
 }
 
-export class TradeTokenGridRow extends Component<ITradeTokenGridRowParams, ITradeTokenGridRowState> {
-  constructor(props: ITradeTokenGridRowParams, context?: any) {
+export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITradeTokenGridRowState> {
+  constructor(props: ITradeTokenGridRowProps, context?: any) {
     super(props, context);
 
     this.state = { leverage: 1 };

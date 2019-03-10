@@ -1,13 +1,13 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
 
-interface IOpsSelectorItemParams {
+interface IOpsSelectorItemProps {
   operationName: string;
   operationImageSrc: any;
   operationAddress: string;
 }
 
-class OpsSelectorItem extends Component<IOpsSelectorItemParams> {
+class OpsSelectorItem extends Component<IOpsSelectorItemProps> {
   render() {
     return (
       <div className="ops-selector-item">
