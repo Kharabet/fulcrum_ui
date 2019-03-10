@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { ChangeEvent, Component } from "react";
 import BigNumber from "bignumber.js";
 
 export interface ILoanFormParams {
@@ -29,7 +29,7 @@ export class LoanForm extends Component<ILoanFormParams, ILoanFormState> {
           <div className="loan-form__label">Interest rate</div>
           <div className="loan-form__interest-rate">{`${this.props.tokenInterestRate.toFixed(2)} %`}</div>
           <div className="loan-form__label">Amount</div>
-          <input type="number" />
+          <input type="number" onChange={this.onLoanAmountChange} />
 
           <button className="loan-form__cancel-button" onClick={this.onCancelClick}>Cancel</button>
           <button className="loan-form__submit-button" onClick={this.onLoanClick}>Submit</button>
@@ -37,6 +37,10 @@ export class LoanForm extends Component<ILoanFormParams, ILoanFormState> {
       </div>
     );
   }
+
+  onLoanAmountChange = (event: ChangeEvent<HTMLInputElement>) => {
+    this.setState({ ...this.state, loanAmount: new BigNumber(event.target.value)});
+  };
 
   onCancelClick = () => {
     alert(this.props.tokenName);
