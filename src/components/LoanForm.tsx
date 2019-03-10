@@ -13,6 +13,12 @@ export interface ILoanFormState {
 }
 
 export class LoanForm extends Component<ILoanFormParams, ILoanFormState> {
+  constructor(props: ILoanFormParams, context?: any) {
+    super(props, context);
+
+    this.state = { loanAmount: new BigNumber(0) };
+  }
+
   render() {
     return (
       <div className="loan-form">
