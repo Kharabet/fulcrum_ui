@@ -11,10 +11,12 @@ class OpsSelectorItem extends Component<IOpsSelectorItemProps> {
   render() {
     return (
       <div className="ops-selector-item">
-        <Link to={this.props.operationAddress}>
-          <div className="ops-selector-item__image"><img src={this.props.operationImageSrc} alt={this.props.operationName}/></div>
-          <div className="ops-selector-item__name">{this.props.operationName}</div>
-          <div className="ops-selector-item__description">{this.props.children}</div>
+        <Link to={this.props.operationAddress} className="ops-selector-item__link">
+          <div className="ops-selector-item__content">
+            <div className="ops-selector-item__image-container"><img src={this.props.operationImageSrc} alt={this.props.operationName}/></div>
+            <div className="ops-selector-item__name">{this.props.operationName}</div>
+            <div className="ops-selector-item__description">{this.props.children}</div>
+          </div>
         </Link>
       </div>
     );

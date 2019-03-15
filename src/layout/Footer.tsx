@@ -1,12 +1,13 @@
 import React, { Component } from "react";
 import FooterMenu from "./FooterMenu";
+import FooterPoweredBy from "./FooterPoweredBy";
 
 class Footer extends Component {
   render() {
     return (
       <div className="footer">
         <FooterMenu/>
-        <div>Powered by <a href="http://bzx.network/">bZx</a></div>
+        <FooterPoweredBy/>
       </div>
     );
   }

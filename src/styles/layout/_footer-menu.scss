@@ -1,7 +1,17 @@
 .footer-menu {
+  display: inline-block;
 
+  float: left;
 }
 
 .footer-menu__item {
+  display: inline-block;
 
+  &:not(:first-child) {
+    margin-left: 1.5rem;
+  }
+
+  a {
+    color: #758295;
+  }
 }
