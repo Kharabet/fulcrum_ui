@@ -5,10 +5,10 @@ import FooterPoweredBy from "./FooterPoweredBy";
 class Footer extends Component {
   render() {
     return (
-      <div className="footer">
+      <footer className="footer">
         <FooterMenu/>
         <FooterPoweredBy/>
-      </div>
+      </footer>
     );
   }
 }

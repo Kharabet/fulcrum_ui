@@ -8,10 +8,6 @@
   width: 5.5rem;
   height: 2rem;
 
-  border-radius: 20px;
-  border: solid 1px #758295;
-
-
   a {
     text-decoration: none;
     text-align: center;
@@ -25,5 +21,10 @@
     margin-left: auto;
     margin-right: auto;
     display: block;
+  }
+
+  &--rounded {
+    border-radius: 20px;
+    border: solid 1px #758295;
   }
 }
