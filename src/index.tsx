@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { BrowserRouter, Route, Switch } from "react-router-dom";
+import { HashRouter, Route, Switch } from "react-router-dom";
 
 import HomePage from "./pages/HomePage";
 import AboutUsPage from "./pages/AboutUsPage";
@@ -12,7 +12,7 @@ import "./styles/index.scss";
 
 ReactDOM.render(
   (
-    <BrowserRouter>
+    <HashRouter>
       <Switch>
         <Route exact path='/' component={HomePage}/>
         <Route exact path='/about-us' component={AboutUsPage}/>
@@ -20,7 +20,7 @@ ReactDOM.render(
         <Route exact path='/lend' component={LendPage}/>
         <Route exact path='/trade' component={TradePage}/>
       </Switch>
-    </BrowserRouter>
+    </HashRouter>
   ),
   document.getElementById("root")
 );
