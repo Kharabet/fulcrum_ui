@@ -1,0 +1,33 @@
+.on-chain-indicator {
+  display: inline-block;
+  height: 100%;
+}
+
+.on-chain-indicator__container {
+  height: 2rem;
+  margin: .5rem 0;
+
+  cursor: pointer;
+
+  border-radius: 20px;
+  border: solid 1px #758295;
+
+  .on-chain-indicator__dot {
+    margin-right: .5rem;
+
+    color: #f6c343;
+  }
+
+  .on-chain-indicator__title {
+    text-align: center;
+    vertical-align: center;
+
+    line-height: 2rem;
+
+    color: #FFFFFF;
+    font-size: 0.75rem;
+
+    margin: 0 2rem;
+    display: block;
+  }
+}

@@ -5,4 +5,37 @@
 
   margin-top: 1.8rem;
   margin-bottom: 6rem;
+
+  .header__left {
+    display: inline-block;
+
+    height: 3rem;
+    width: 30%;
+  }
+
+  .header__center {
+    display: inline-block;
+
+    height: 3rem;
+    width: 40%;
+
+    .header-menu {
+      position: relative;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+  }
+
+  .header__right {
+    display: inline-block;
+    
+    height: 3rem;
+    width: 30%;
+
+    .on-chain-indicator {
+      position: relative;
+      left: 100%;
+      transform: translateX(-100%);
+    }
+  }
 }

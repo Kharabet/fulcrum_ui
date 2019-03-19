@@ -1,11 +1,38 @@
 .leverage-selector {
+  display: inline-block;
+  vertical-align: middle;
 
+  height: 2.5rem;
+
+  border-radius: 100px;
+  background-color: #54606D;
 }
 
 .leverage-selector__item {
+  display: inline-block;
+  vertical-align: top;
 
-}
+  cursor: pointer;
 
-.leverage-selector__item--selected {
+  height: 2.5rem;
+  width: 2.5rem;
+  line-height: 2.5rem;
 
+  list-style: none;
+
+  border-style: none;
+  border-radius: 100px;
+
+  font-size: .75rem;
+  font-weight: normal;
+  font-style: normal;
+  font-stretch: normal;
+  letter-spacing: -0.3px;
+  text-align: center;
+  color: #ffffff;
+
+  &--selected {
+    border-style: none;
+    background-color: #69bf83;
+  }
 }

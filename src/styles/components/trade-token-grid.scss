@@ -1,75 +1,219 @@
+$font-size-header: 0.75rem;
+$height-row: 4.5rem;
+
+$width-col-token-image: 5rem;
+$width-col-token-name: 3.5rem;
+$width-col-position-type: 6rem;
+$width-col-leverage: 14rem;
+$width-col-price: 6.5rem;
+$width-col-change24h: 7rem;
+$width-col-profit: 5rem;
+$width-col-actions: 14.5rem;
+
+$width-button-action: 40%;
+
+$margin-right-column: 1.5rem;
+
 .trade-token-grid {
 
 }
 
 .trade-token-grid-header {
+  height: $height-row;
+}
 
+@mixin trade-token-grid-header__col {
+  display: inline-block;
+
+  height: 100%;
+  vertical-align: middle;
+  line-height: $height-row;
+
+  font-size: $font-size-header;
+  font-weight: normal;
+  font-style: normal;
+  font-stretch: normal;
+  letter-spacing: normal;
+  color: #a9b5c7;
+
+  &:not(:last-child) {
+    margin-right: $margin-right-column;
+  }
 }
 
 .trade-token-grid-header__col-token-image {
+  @include trade-token-grid-header__col();
 
+  width: $width-col-token-image;
 }
 
 .trade-token-grid-header__col-token-name {
+  @include trade-token-grid-header__col();
 
+  width: $width-col-token-name;
 }
 
 .trade-token-grid-header__col-position-type {
+  @include trade-token-grid-header__col();
 
+  width: $width-col-position-type;
 }
 
 .trade-token-grid-header__col-leverage {
+  @include trade-token-grid-header__col();
 
+  width: $width-col-leverage;
 }
 
 .trade-token-grid-header__col-price {
+  @include trade-token-grid-header__col();
 
+  width: $width-col-price;
 }
 
 .trade-token-grid-header__col-change24h {
+  @include trade-token-grid-header__col();
 
+  width: $width-col-change24h;
 }
 
 .trade-token-grid-header__col-profit {
+  @include trade-token-grid-header__col();
 
+  width: $width-col-profit;
 }
 
 .trade-token-grid-header__col-actions {
+  @include trade-token-grid-header__col();
 
+  width: $width-col-actions;
 }
 
 .trade-token-grid-row {
-
+  height: $height-row;
+  margin-bottom: 1px;
+  background-color: #49545F;
 }
 
-.trade-token-grid-row__token-image {
+@mixin trade-token-grid-row__col {
+  display: inline-block;
 
+  height: 100%;
+  vertical-align: middle;
+  line-height: $height-row;
+
+  font-size: 1rem;
+  font-weight: 600;
+  font-style: normal;
+  font-stretch: normal;
+  letter-spacing: -0.4px;
+  text-align: left;
+
+  &:not(:last-child) {
+    margin-right: $margin-right-column;
+  }
 }
 
-.trade-token-grid-row__token-name {
-
+@mixin trade-token-grid-row__text-normal {
+  color: #ffffff;
 }
 
-.trade-token-grid-row__position-type {
+.trade-token-grid-row__col-token-image {
+  @include trade-token-grid-row__col();
 
+  width: $width-col-token-image;
+
+  img {
+    height: 100%;
+    width: 100%;
+  }
 }
 
-.trade-token-grid-row__leverage {
+.trade-token-grid-row__col-token-name {
+  @include trade-token-grid-row__col();
+  @include trade-token-grid-row__text-normal();
 
+  width: $width-col-token-name;
 }
 
-.trade-token-grid-row__price {
+.trade-token-grid-row__col-position-type {
+  @include trade-token-grid-row__col();
 
+  width: $width-col-position-type;
 }
 
-.trade-token-grid-row__change24h {
+.trade-token-grid-row__col-leverage {
+  @include trade-token-grid-row__col();
 
+  width: $width-col-leverage;
 }
 
-.trade-token-grid-row__profit {
+.trade-token-grid-row__col-price {
+  @include trade-token-grid-row__col();
+  @include trade-token-grid-row__text-normal();
 
+  width: $width-col-price;
 }
 
-.trade-token-grid-row__action {
+.trade-token-grid-row__col-change24h {
+  @include trade-token-grid-row__col();
 
+  width: $width-col-change24h;
+}
+
+.trade-token-grid-row__col-profit {
+  @include trade-token-grid-row__col();
+  @include trade-token-grid-row__text-normal();
+
+  width: $width-col-profit;
+}
+
+.trade-token-grid-row__col-action {
+  @include trade-token-grid-row__col();
+
+  width: $width-col-actions;
+}
+
+.trade-token-grid-row__buy-button {
+  display: inline-block;
+  cursor: pointer;
+
+  border: 0;
+
+  width: $width-button-action;
+  height: 2.5rem;
+  margin: 0 .7rem;
+
+  border-radius: 100px;
+  background-color: #407bf7;
+
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  font-weight: normal;
+  font-style: normal;
+  font-stretch: normal;
+  letter-spacing: -0.3px;
+  color: #ffffff;
+}
+
+.trade-token-grid-row__sell-button {
+  display: inline-block;
+  cursor: pointer;
+
+  border: 0;
+
+  width: $width-button-action;
+  height: 2.5rem;
+  margin: 0 .70rem;
+
+  border-radius: 100px;
+  background-color: #ff5353;
+
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  font-weight: normal;
+  font-style: normal;
+  font-stretch: normal;
+  letter-spacing: -0.3px;
+  color: #ffffff;
 }

@@ -9,10 +9,13 @@
 @import "base/typography";
 @import "base/utilities";
 
+@import "components/change-24-h-marker";
 @import "components/leverage-selector";
 @import "components/loan-token-selector";
+@import "components/on-chain-indicator";
 @import "components/ops-selector";
 @import "components/position-type-marker";
+@import "components/price-graph";
 @import "components/trade-token-grid";
 
 @import "layout/footer";

@@ -1,32 +1,37 @@
 .header-menu {
   display: inline-block;
-
-  float: right;
+  height: 100%;
 }
 
 .header-menu__item {
   display: inline-block;
 
+  height: 100%;
   width: 5.5rem;
-  height: 2rem;
 
   a {
     text-decoration: none;
     text-align: center;
+    text-transform: uppercase;
     vertical-align: center;
 
-    line-height: 2rem;
+    height: 3rem;
+    line-height: 3rem;
 
-    color: #FFFFFF;
-    font-size: 0.75rem;
+    color: #acb5c2;
+
+    font-size: 0.875rem;
+    font-weight: 600;
+    font-style: normal;
+    font-stretch: normal;
+    letter-spacing: normal;
 
     margin-left: auto;
     margin-right: auto;
     display: block;
-  }
 
-  &--rounded {
-    border-radius: 20px;
-    border: solid 1px #758295;
+    &.header-menu__item-link--active {
+      color: #ffffff;
+    }
   }
 }

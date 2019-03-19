@@ -8,9 +8,9 @@ export interface IPositionTypeMarkerProps {
 export class PositionTypeMarker extends Component<IPositionTypeMarkerProps> {
   render() {
     return (
-      <div className="position-type-marker">
+      <span className="position-type-marker">
         {this.props.value}
-      </div>
+      </span>
     );
   }
 }

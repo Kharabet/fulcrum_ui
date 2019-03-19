@@ -3,25 +3,80 @@
 }
 
 .token-selector-item {
+  display: inline-block;
+  box-sizing: border-box;
 
+  height: 17.8rem;
+  width: 17.8rem;
+
+  padding: 2rem;
+  margin: 1px;
+
+  background-color: #4F5B67;
 }
 
 .token-selector-item__image {
+  height: 4rem;
+  margin-top: 0.75rem;
+  margin-bottom: 1rem;
 
+  img {
+    height: 4rem;
+    width: 4rem;
+    display: inline-block;
+  }
+}
+
+.token-selector-item__description {
+  margin-bottom: 1.5rem;
 }
 
 .token-selector-item__name {
+  display: inline-block;
+  width: 50%;
 
+  font-size: 2.25rem;
+  font-weight: 600;
+  font-style: normal;
+  font-stretch: normal;
+  letter-spacing: -0.9px;
+  text-align: left;
+  color: #ffffff;
+}
+
+.token-selector-item__interest-rate-container {
+  display: inline-block;
+  width: 50%;
 }
 
 .token-selector-item__interest-rate-title {
-
+  font-size: .75rem;
+  font-weight: normal;
+  font-style: normal;
+  font-stretch: normal;
+  letter-spacing: normal;
+  text-align: right;
+  color: #acb5c2;
 }
 
 .token-selector-item__interest-rate-value {
-
+  font-size: 1rem;
+  font-weight: 600;
+  font-style: normal;
+  font-stretch: normal;
+  letter-spacing: -0.4px;
+  text-align: right;
+  color: #ffe546;
 }
 
 .token-selector-item__loan-button {
+  display: block;
+  cursor: pointer;
 
+  border: 0;
+  height: 40px;
+  width: 100%;
+  border-radius: 100px;
+  background-color: #69bf83;
+  color: #ffffff;
 }

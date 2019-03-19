@@ -1,16 +1,30 @@
 .ops-selector {
-
+  height: 36rem;
 }
 
 .ops-selector-item {
   display: inline-block;
+  vertical-align: top;
 
-  height: 36rem;
-  width: 36rem;
+  height: 100%;
+  width: 50%;
 
   // background gradient
   background-color: #424C56;
   background-image: linear-gradient(to bottom right, #4F5B67, #424C56);
+
+  // ops-selector-item transition (part 1)
+  -webkit-transition: border-bottom-width .5s, height .5s; /* Safari */
+  transition: border-bottom-width .5s, height .5s;
+  &:hover {
+    height: 95%;
+    border-bottom: .3rem solid #5EBD85;
+
+    .ops-selector-item__image-container img {
+      width: 12rem;
+      height: 12rem;
+    }
+  }
 }
 
 .ops-selector-item__link {
@@ -50,6 +64,10 @@
     margin-left: auto;
     margin-right: auto;
     display: block;
+
+    // ops-selector-item transition (part 2)
+    -webkit-transition: height.5s, width .5s; /* Safari */
+    transition: height.5s, width .5s;
   }
 }
 

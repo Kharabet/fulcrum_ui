@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import HeaderLogo from "./HeaderLogo";
 import { HeaderMenu, IHeaderMenuProps } from "./HeaderMenu";
+import { OnChainIndicator } from "../components/OnChainIndicator";
 
 class Header extends Component {
   private _menu: IHeaderMenuProps = {
@@ -14,8 +15,15 @@ class Header extends Component {
   render() {
     return (
       <header className="header">
-        <HeaderLogo />
-        <HeaderMenu items={this._menu.items} />
+        <div className="header__left">
+          <HeaderLogo />
+        </div>
+        <div className="header__center">
+          <HeaderMenu items={this._menu.items} />
+        </div>
+        <div className="header__right">
+          <OnChainIndicator />
+        </div>
       </header>
     );
   }
