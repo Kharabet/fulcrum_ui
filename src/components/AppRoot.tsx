@@ -39,7 +39,7 @@ export class AppRoot extends Component<any, IAppRootState> {
         </Modal>
         <HashRouter>
           <Switch>
-            <Route exact={true} path="/" render={props => <HomePage />} />
+            <Route exact={true} path="/" component={HomePage} />
             <Route
               exact={true}
               path="/lend"
