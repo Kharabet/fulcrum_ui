@@ -1,15 +1,15 @@
 import React, { Component } from "react";
-import { Provider } from "web3/providers";
+import Web3 from "web3";
 
 export interface IOnChainIndicatorParams {
-  provider: Provider | null;
+  web3: Web3 | null;
   onNetworkConnect: () => void;
 }
 
 export class OnChainIndicator extends Component<IOnChainIndicatorParams> {
   public render() {
-    const dotStyle = this.props.provider ? "on-chain-indicator__dot--online" : "on-chain-indicator__dot--offline";
-    const indicatorText = this.props.provider ? "Online" : "Connect wallet";
+    const dotStyle = this.props.web3 ? "on-chain-indicator__dot--online" : "on-chain-indicator__dot--offline";
+    const indicatorText = this.props.web3 ? "Online" : "Connect wallet";
 
     return (
       <div className="on-chain-indicator" onClick={this.props.onNetworkConnect}>

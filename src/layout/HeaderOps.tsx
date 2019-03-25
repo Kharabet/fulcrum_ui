@@ -24,7 +24,7 @@ class HeaderOps extends Component<IHeaderOpsParams> {
           <HeaderMenu items={this._menu.items} />
         </div>
         <div className="header__right">
-          <OnChainIndicator provider={this.props.provider} onNetworkConnect={this.props.onNetworkConnect} />
+          <OnChainIndicator web3={this.props.web3} onNetworkConnect={this.props.onNetworkConnect} />
         </div>
       </header>
     );

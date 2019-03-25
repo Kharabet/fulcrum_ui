@@ -6,7 +6,7 @@ import Web3 from "web3";
 import { Provider } from "web3/providers";
 import { ProviderType } from "./ProviderType";
 
-import configProviders from "../../config/providers.json";
+import configProviders from "../config/providers.json";
 
 export class Web3ConnectionFactory {
   public static async getWeb3Connection(providerType: ProviderType): Promise<Web3 | null> {

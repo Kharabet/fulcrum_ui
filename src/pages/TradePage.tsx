@@ -1,6 +1,7 @@
 import BigNumber from "bignumber.js";
 import React, { Component } from "react";
 import Modal from "react-modal";
+import Web3 from "web3";
 import { IPriceGraphDataPoint, PriceGraph } from "../components/PriceGraph";
 import { TradeForm } from "../components/TradeForm";
 import { TradeTokenGrid } from "../components/TradeTokenGrid";
@@ -10,6 +11,11 @@ import { TradeRequest } from "../domain/TradeRequest";
 import { TradeType } from "../domain/TradeType";
 import Footer from "../layout/Footer";
 import HeaderOps from "../layout/HeaderOps";
+
+interface ITradePageParams {
+  web3: Web3 | null;
+  onNetworkConnect: () => void;
+}
 
 interface ITradePageState {
   selectedKey: string;
@@ -21,8 +27,8 @@ interface ITradePageState {
   graphData: IPriceGraphDataPoint[];
 }
 
-class TradePage extends Component<any, ITradePageState> {
-  constructor(props: any) {
+export class TradePage extends Component<ITradePageParams, ITradePageState> {
+  constructor(props: ITradePageParams) {
     super(props);
 
     const graphData = TradePage.getGraphData("", 15);
@@ -57,7 +63,7 @@ class TradePage extends Component<any, ITradePageState> {
   public render() {
     return (
       <div className="trade-page">
-        <HeaderOps provider={null} onNetworkConnect={this.onNetworkConnect} />
+        <HeaderOps web3={this.props.web3} onNetworkConnect={this.props.onNetworkConnect} />
         <main>
           <PriceGraph data={this.state.graphData} />
           <TradeTokenGrid
@@ -115,10 +121,6 @@ class TradePage extends Component<any, ITradePageState> {
 
   public onRequestClose = () => {
     this.setState({ isTradeModalOpen: false });
-  };
-
-  public onNetworkConnect = () => {
-    alert("connect to the network");
   };
 }
 

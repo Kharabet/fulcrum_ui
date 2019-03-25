@@ -1,6 +1,7 @@
 import BigNumber from "bignumber.js";
 import React, { Component } from "react";
 import Modal from "react-modal";
+import Web3 from "web3";
 import { LendForm } from "../components/LendForm";
 import { LendTokenSelector } from "../components/LendTokenSelector";
 import { Asset } from "../domain/Asset";
@@ -8,12 +9,17 @@ import { LendRequest } from "../domain/LendRequest";
 import Footer from "../layout/Footer";
 import HeaderOps from "../layout/HeaderOps";
 
+interface ILendPageParams {
+  web3: Web3 | null;
+  onNetworkConnect: () => void;
+}
+
 interface ILendPageState {
   isLendModalOpen: boolean;
   lendAsset: Asset;
 }
 
-class LendPage extends Component<any, ILendPageState> {
+class LendPage extends Component<ILendPageParams, ILendPageState> {
   constructor(props: any) {
     super(props);
 
@@ -23,7 +29,7 @@ class LendPage extends Component<any, ILendPageState> {
   public render() {
     return (
       <div className="lend-page">
-        <HeaderOps provider={null} onNetworkConnect={this.onNetworkConnect} />
+        <HeaderOps web3={this.props.web3} onNetworkConnect={this.props.onNetworkConnect} />
         <main>
           <LendTokenSelector onLoan={this.onLendRequested} />
           <Modal
@@ -59,10 +65,6 @@ class LendPage extends Component<any, ILendPageState> {
 
   public onRequestClose = () => {
     this.setState({ isLendModalOpen: false });
-  };
-
-  public onNetworkConnect = () => {
-    alert("connect to the network");
   };
 }
 
