@@ -101,17 +101,13 @@ export class LendForm extends Component<ILendFormParams, ILendFormState> {
   public onLendAmountChange = (event: ChangeEvent<HTMLInputElement>) => {
     // handling different types of empty values
     let amountText = event.target.value ? event.target.value : "";
-    amountText = amountText === "" ? "0" : amountText;
+    const amountTextForConversion = amountText === "" ? "0" : amountText;
 
-    let amount = new BigNumber(amountText);
+    let amount = new BigNumber(amountTextForConversion);
     // handling negative values (incl. Ctrl+C)
     if (amount.isNegative()) {
-      amountText = "0";
-      amount = new BigNumber(0);
-    }
-
-    if (amountText === "0") {
-      amountText = "";
+      amountText = amount.absoluteValue().toFixed();
+      amount = amount.absoluteValue();
     }
 
     // updating stored value only if the new input value is a valid number
