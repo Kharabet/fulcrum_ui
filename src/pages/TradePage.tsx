@@ -77,7 +77,6 @@ class TradePage extends Component<any, ITradePageState> {
               positionType={this.state.tradePositionType}
               leverage={this.state.tradeLeverage}
               price={new BigNumber("91.68")}
-              change24h={new BigNumber(1.23)}
               onSubmit={this.onTradeConfirmed}
               onCancel={this.onRequestClose}
             />

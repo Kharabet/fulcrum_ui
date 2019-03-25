@@ -6,7 +6,6 @@ import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { PositionType } from "../domain/PositionType";
 import { TradeRequest } from "../domain/TradeRequest";
 import { TradeType } from "../domain/TradeType";
-import { Change24HMarker, Change24HMarkerSize } from "./Change24HMarker";
 import { PositionTypeMarker } from "./PositionTypeMarker";
 
 export interface ITradeFormParams {
@@ -15,7 +14,6 @@ export interface ITradeFormParams {
   positionType: PositionType;
   leverage: number;
   price: BigNumber;
-  change24h: BigNumber;
 
   onSubmit: (tradeType: TradeType, request: TradeRequest) => void;
   onCancel: () => void;
@@ -80,12 +78,6 @@ export class TradeForm extends Component<ITradeFormParams, ITradeFormState> {
             <div className="trade-form__kv-container trade-form__kv-container--w_dots">
               <div className="trade-form__label">Price</div>
               <div className="trade-form__value">{`$${this.props.price.toFixed(2)}`}</div>
-            </div>
-            <div className="trade-form__kv-container trade-form__kv-container--w_dots">
-              <div className="trade-form__label">24 hours</div>
-              <div className="trade-form__value">
-                <Change24HMarker value={this.props.change24h} size={Change24HMarkerSize.SMALL} />
-              </div>
             </div>
             <div className="trade-form__kv-container">
               <div className="trade-form__label">Amount</div>
