@@ -10,8 +10,7 @@
   width: 50%;
 
   // background gradient
-  background-color: #424C56;
-  background-image: linear-gradient(to bottom right, #4F5B67, #424C56);
+  background-color: rgba(169,181,199, 0.15);
 
   // ops-selector-item transition (part 1)
   -webkit-transition: border-bottom-width .5s, height .5s; /* Safari */
@@ -24,6 +23,11 @@
       width: 12rem;
       height: 12rem;
     }
+  }
+
+  &:first-child {
+    margin-left: -1px;
+    margin-right: 1px;
   }
 }
 
@@ -90,6 +94,8 @@
   color: #acb5c2;
   text-decoration: none;
   font-size: 0.75rem;
+
+  padding: 0 3.5rem;
 
   font-weight: normal;
   font-style: normal;

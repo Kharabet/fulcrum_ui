@@ -1,64 +1,82 @@
-import { Component } from "react";
-import React from "react";
-import { LineChart, Line, Tooltip, ResponsiveContainer } from "recharts";
+import BigNumber from "bignumber.js";
+import React, { Component, ReactNode } from "react";
+import { Line, LineChart, ResponsiveContainer, Tooltip, TooltipProps } from "recharts";
+import { Change24HMarker, Change24HMarkerSize } from "./Change24HMarker";
 
-export interface IPriceGraphParams {}
+export interface IPriceGraphParams {
+  data: IPriceGraphDataPoint[];
+}
 
-export interface IPriceGraphState {}
+export interface IPriceGraphState {
+  displayedDataPoint: IPriceGraphDataPoint | null;
+}
 
-const data = [
-  {
-    name: "Page A",
-    pv: 2400
-  },
-  {
-    name: "Page B",
-    pv: 1398
-  },
-  {
-    name: "Page C",
-    pv: 9800
-  },
-  {
-    name: "Page D",
-    pv: 3908
-  },
-  {
-    name: "Page E",
-    pv: 4800
-  },
-  {
-    name: "Page F",
-    pv: 3800
-  },
-  {
-    name: "Page G",
-    pv: 4300
-  }
-];
+export interface IPriceGraphDataPoint {
+  price: number;
+  change24h: number;
+}
 
-export class PriceGraph extends Component<IPriceGraphParams> {
+export class PriceGraph extends Component<IPriceGraphParams, IPriceGraphState> {
+  private _latestDataPoint: IPriceGraphDataPoint | null = null;
+
   constructor(props: IPriceGraphParams, context?: any) {
     super(props, context);
 
-    this.state = {};
+    this.state = { displayedDataPoint: null };
   }
 
-  render() {
+  public componentDidMount(): void {
+    this.setState({ displayedDataPoint: this.props.data[this.props.data.length - 1] });
+  }
+
+  public render() {
+    const price = this.state.displayedDataPoint ? new BigNumber(this.state.displayedDataPoint.price) : new BigNumber(0);
+    const change24h = this.state.displayedDataPoint
+      ? new BigNumber(this.state.displayedDataPoint.change24h)
+      : new BigNumber(0);
+    const priceText = price.toFixed(2);
+
     return (
       <div className="price-graph">
-        <div className="price-graph__hovered-price-marker">$118.31</div>
-        <div className="price-graph__hovered-change-1h-marker">0.17%</div>
+        <div className="price-graph__hovered-price-marker">{`$${priceText}`}</div>
+        <div className="price-graph__hovered-change-1h-marker">
+          <Change24HMarker value={change24h} size={Change24HMarkerSize.LARGE} />
+        </div>
         <div className="price-graph__graph-container">
           <ResponsiveContainer width="100%" height={200}>
-            <LineChart data={data}>
-              <Tooltip content={() => null} />
+            <LineChart data={this.props.data}>
+              <Tooltip content={this.renderTooltip} />
 
-              <Line type="monotone" dataKey="pv" stroke="#8884d8" activeDot={{ r: 8 }} />
+              <Line
+                type="monotone"
+                dataKey="price"
+                animationDuration={500}
+                dot={false}
+                activeDot={false}
+                stroke="#ffffff"
+                strokeWidth={2}
+              />
             </LineChart>
           </ResponsiveContainer>
         </div>
       </div>
     );
   }
+
+  public renderTooltip = (e: TooltipProps): ReactNode => {
+    if (e.active) {
+      if (e.payload) {
+        const value = e.payload[0].payload as IPriceGraphDataPoint;
+        if (this._latestDataPoint) {
+          if (value === this._latestDataPoint) {
+            return;
+          }
+        }
+
+        this._latestDataPoint = value;
+        this.setState({ displayedDataPoint: value });
+      }
+    }
+    return null;
+  };
 }

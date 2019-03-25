@@ -1,9 +1,11 @@
 import React, { Component } from "react";
+import { IOnChainIndicatorParams, OnChainIndicator } from "../components/OnChainIndicator";
 import HeaderLogo from "./HeaderLogo";
 import { HeaderMenu, IHeaderMenuProps } from "./HeaderMenu";
-import { OnChainIndicator } from "../components/OnChainIndicator";
 
-class Header extends Component {
+export interface IHeaderOpsParams extends IOnChainIndicatorParams {}
+
+class HeaderOps extends Component<IHeaderOpsParams> {
   private _menu: IHeaderMenuProps = {
     items: [
       { id: 0, title: "Home", link: "/" },
@@ -12,7 +14,7 @@ class Header extends Component {
     ]
   };
 
-  render() {
+  public render() {
     return (
       <header className="header">
         <div className="header__left">
@@ -22,11 +24,11 @@ class Header extends Component {
           <HeaderMenu items={this._menu.items} />
         </div>
         <div className="header__right">
-          <OnChainIndicator />
+          <OnChainIndicator provider={this.props.provider} onNetworkConnect={this.props.onNetworkConnect} />
         </div>
       </header>
     );
   }
 }
 
-export default Header;
+export default HeaderOps;

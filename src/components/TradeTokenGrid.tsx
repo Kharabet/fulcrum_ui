@@ -1,34 +1,47 @@
+import BigNumber from "bignumber.js";
 import React, { Component } from "react";
+import { Asset } from "../domain/Asset";
+import { PositionType } from "../domain/PositionType";
+import { TradeRequest } from "../domain/TradeRequest";
+import { TradeType } from "../domain/TradeType";
 import { TradeTokenGridHeader } from "./TradeTokenGridHeader";
 import { ITradeTokenGridRowProps, TradeTokenGridRow } from "./TradeTokenGridRow";
-import { PositionType } from "../domain/PositionType";
-import BigNumber from "bignumber.js";
-import { Asset } from "../domain/Asset";
-import { TradeRequest } from "../domain/TradeRequest";
 
-export class TradeTokenGrid extends Component {
-  private _tokens: ITradeTokenGridRowProps[] = [
-    {
-      asset: Asset.wBTC,
-      positionType: PositionType.LONG,
-      price: new BigNumber("21.26"),
-      change24h: new BigNumber("-0.36"),
-      profit: new BigNumber("14.32"),
-      onBuy: e => this.onBuy(e),
-      onSell: e => this.onSell(e)
-    },
-    {
-      asset: Asset.DAI,
-      positionType: PositionType.SHORT,
-      price: new BigNumber("42.71"),
-      change24h: new BigNumber("0.17"),
-      onBuy: e => this.onBuy(e),
-      onSell: e => this.onSell(e)
-    }
-  ];
+export interface ITradeTokenGridProps {
+  selectedKey: string;
 
-  render() {
-    const tokenRows = this._tokens.map(e => <TradeTokenGridRow key={e.asset} {...e} />);
+  onSelect: (key: string) => void;
+  onTrade: (tradeType: TradeType, request: TradeRequest) => void;
+}
+
+export interface ITradeTokenGridState {
+  tokens: ITradeTokenGridRowProps[];
+}
+
+export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenGridState> {
+  constructor(props: ITradeTokenGridProps) {
+    super(props);
+
+    this.state = {
+      tokens: this._getTokens(props)
+    };
+  }
+
+  public componentWillReceiveProps(nextProps: Readonly<ITradeTokenGridProps>, nextContext: any): void {
+    this.setState({
+      ...this.state,
+      tokens: this._getTokens(nextProps)
+    });
+  }
+
+  public componentDidMount(): void {
+    const e = this.state.tokens[0];
+    this.props.onSelect(`${e.asset}_${e.positionType}_${e.defaultLeverage}`);
+  }
+
+  public render() {
+    const tokenRows = this.state.tokens.map(e => <TradeTokenGridRow key={`${e.asset}_${e.positionType}`} {...e} />);
+
     return (
       <div className="trade-token-grid">
         <TradeTokenGridHeader />
@@ -37,13 +50,29 @@ export class TradeTokenGrid extends Component {
     );
   }
 
-  onBuy = (request: TradeRequest) => {
-    if (request)
-      alert(`buy ${request.amount} of ${request.asset} at ${request.leverage}x`);
-  };
-
-  onSell = (request: TradeRequest) => {
-    if (request)
-      alert(`sell ${request.amount} of ${request.asset} at ${request.leverage}x`);
+  private _getTokens = (props: ITradeTokenGridProps) => {
+    return [
+      {
+        selectedKey: props.selectedKey,
+        asset: Asset.wBTC,
+        positionType: PositionType.LONG,
+        defaultLeverage: 2,
+        price: new BigNumber("21.26"),
+        change24h: new BigNumber("-0.36"),
+        profit: new BigNumber("14.32"),
+        onSelect: props.onSelect,
+        onTrade: props.onTrade
+      },
+      {
+        selectedKey: props.selectedKey,
+        asset: Asset.DAI,
+        positionType: PositionType.SHORT,
+        defaultLeverage: 2,
+        price: new BigNumber("42.71"),
+        change24h: new BigNumber("0.17"),
+        onSelect: props.onSelect,
+        onTrade: props.onTrade
+      }
+    ];
   };
 }

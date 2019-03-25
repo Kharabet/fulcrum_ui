@@ -6,11 +6,7 @@ export interface IPositionTypeMarkerProps {
 }
 
 export class PositionTypeMarker extends Component<IPositionTypeMarkerProps> {
-  render() {
-    return (
-      <span className="position-type-marker">
-        {this.props.value}
-      </span>
-    );
+  public render() {
+    return <span className="position-type-marker">{this.props.value}</span>;
   }
 }

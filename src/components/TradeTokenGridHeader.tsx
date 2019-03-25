@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 
 export class TradeTokenGridHeader extends Component {
-  render() {
+  public render() {
     return (
       <div className="trade-token-grid-header">
         <div className="trade-token-grid-header__col-token-image">

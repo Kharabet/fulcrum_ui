@@ -1,19 +1,14 @@
 import React, { Component } from "react";
-import { Link } from "react-router-dom";
 
 class FooterMenu extends Component {
-  render() {
+  public render() {
     return (
       <div className="footer-menu">
         <div className="footer-menu__item">
-          <Link to="/about-us">
-            About us
-          </Link>
+          <a href="//bzx.network/#team">About us</a>
         </div>
         <div className="footer-menu__item">
-          <Link to="/faq">
-            FAQ
-          </Link>
+          <a href="//bzx.network/faq.html">FAQ</a>
         </div>
       </div>
     );

@@ -10,7 +10,7 @@
   width: 17.8rem;
 
   padding: 2rem;
-  margin: 1px;
+  margin: 0 1px 1px 0;
 
   background-color: #4F5B67;
 }
@@ -79,4 +79,7 @@
   border-radius: 100px;
   background-color: #69bf83;
   color: #ffffff;
+
+  text-transform: uppercase;
+  outline: none;
 }

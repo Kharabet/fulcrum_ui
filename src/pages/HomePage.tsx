@@ -1,17 +1,17 @@
 import React, { Component } from "react";
-import HeaderHome from "../layout/HeaderHome";
-import Footer from "../layout/Footer";
 import OpsSelector from "../components/OpsSelector";
+import Footer from "../layout/Footer";
+import HeaderHome from "../layout/HeaderHome";
 
 class HomePage extends Component {
-  render() {
+  public render() {
     return (
       <div className="home-page">
-        <HeaderHome/>
+        <HeaderHome />
         <main>
-          <OpsSelector/>
+          <OpsSelector />
         </main>
-        <Footer/>
+        <Footer />
       </div>
     );
   }

@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Link, NavLink } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
 export interface IHeaderMenuItemProps {
   id: number;
@@ -8,10 +8,12 @@ export interface IHeaderMenuItemProps {
 }
 
 export class HeaderMenuItem extends Component<IHeaderMenuItemProps> {
-  render() {
+  public render() {
     return (
       <div className="header-menu__item">
-        <NavLink to={this.props.link} exact={true} activeClassName="header-menu__item-link--active">{this.props.title}</NavLink>
+        <NavLink to={this.props.link} exact={true} activeClassName="header-menu__item-link--active">
+          {this.props.title}
+        </NavLink>
       </div>
     );
   }

@@ -6,10 +6,9 @@ export interface IHeaderMenuProps {
 }
 
 export class HeaderMenu extends Component<IHeaderMenuProps> {
-  render() {
-    const menuItems = this.props.items.map((e: IHeaderMenuItemProps) => (
-      <HeaderMenuItem key={e.id} {...e} />
-    ));
+  public render() {
+    const menuItems = this.props.items.map((e: IHeaderMenuItemProps) => <HeaderMenuItem key={e.id} {...e} />);
+
     return <div className="header-menu">{menuItems}</div>;
   }
 }

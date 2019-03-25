@@ -12,10 +12,19 @@
   border-radius: 20px;
   border: solid 1px #758295;
 
+  background-color: rgba(0, 0, 0, 0);
+  outline: none;
+
   .on-chain-indicator__dot {
     margin-right: .5rem;
+  }
 
+  .on-chain-indicator__dot--offline {
     color: #f6c343;
+  }
+
+  .on-chain-indicator__dot--online {
+    color: #69bf83;
   }
 
   .on-chain-indicator__title {

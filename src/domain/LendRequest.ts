@@ -1,7 +1,7 @@
-import { Asset } from "./Asset";
 import BigNumber from "bignumber.js";
+import { Asset } from "./Asset";
 
-export class LoanRequest {
+export class LendRequest {
   public asset: Asset;
   public amount: BigNumber;
 

@@ -6,5 +6,6 @@ export enum Asset {
   ZRX = "ZRX",
   BAT = "BAT",
   REP = "REP",
-  KNC = "KNC"
+  KNC = "KNC",
+  UNKNOWN = "UNKNOWN"
 }

@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import HeaderLogo from "./HeaderLogo";
 
-class Header extends Component {
-  render() {
+class HeaderHome extends Component {
+  public render() {
     return (
       <header className="header">
         <HeaderLogo />
@@ -11,4 +11,4 @@ class Header extends Component {
   }
 }
 
-export default Header;
+export default HeaderHome;

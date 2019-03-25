@@ -1,0 +1,23 @@
+.modal-overlay-div {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  z-index: 1000;
+  background-color: rgba(0, 0, 0, .80);
+}
+
+.modal-content-div {
+  display: inline-block;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-60%);
+
+  &:focus {
+    outline: none;
+  }
+}

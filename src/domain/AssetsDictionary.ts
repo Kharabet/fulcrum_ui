@@ -1,5 +1,5 @@
-import { AssetDetails } from "./AssetDetails";
 import { Asset } from "./Asset";
+import { AssetDetails } from "./AssetDetails";
 
 import bat_logo from "../assets/ic_token_bat.svg";
 import btc_logo from "../assets/ic_token_btc.svg";

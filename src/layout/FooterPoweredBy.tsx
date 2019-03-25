@@ -1,9 +1,11 @@
 import React, { Component } from "react";
 
 class FooterPoweredBy extends Component {
-  render() {
+  public render() {
     return (
-      <div className="footer-powered-by">Powered by <a href="http://bzx.network/">bZx</a></div>
+      <div className="footer-powered-by">
+        Powered by <a href="//bzx.network/">bZx</a>
+      </div>
     );
   }
 }

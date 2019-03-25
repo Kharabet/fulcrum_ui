@@ -11,11 +11,13 @@
 
 @import "components/change-24-h-marker";
 @import "components/leverage-selector";
+@import "components/lend-form";
 @import "components/loan-token-selector";
 @import "components/on-chain-indicator";
 @import "components/ops-selector";
 @import "components/position-type-marker";
 @import "components/price-graph";
+@import "components/trade-form";
 @import "components/trade-token-grid";
 
 @import "layout/footer";
@@ -25,8 +27,6 @@
 @import "layout/header-menu";
 @import "layout/footer-powered-by";
 
-@import "pages/about-us-page";
-@import "pages/faq-page";
 @import "pages/home-page";
 @import "pages/lend-page";
 @import "pages/trade-page";

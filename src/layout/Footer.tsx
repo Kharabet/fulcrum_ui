@@ -3,11 +3,11 @@ import FooterMenu from "./FooterMenu";
 import FooterPoweredBy from "./FooterPoweredBy";
 
 class Footer extends Component {
-  render() {
+  public render() {
     return (
       <footer className="footer">
-        <FooterMenu/>
-        <FooterPoweredBy/>
+        <FooterMenu />
+        <FooterPoweredBy />
       </footer>
     );
   }
