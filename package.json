@@ -14,7 +14,9 @@
   },
   "main": "src/index.jsx",
   "dependencies": {
+    "@portis/web3": "^2.0.0-beta.18",
     "bignumber.js": "^7.0.1",
+    "bitski": "^0.4.2",
     "fortmatic": "^0.5.0",
     "moment": "^2.22.1",
     "react": "^16.8.3",
@@ -38,9 +40,9 @@
     "prettier": "^1.16.4",
     "react-scripts": "2.1.8",
     "tslint": "^5.13.1",
-    "tslint-react": "^3.6.0",
     "tslint-config-prettier": "^1.18.0",
     "tslint-config-standard": "^8.0.1",
+    "tslint-react": "^3.6.0",
     "typescript": "^3.3.3333"
   },
   "scripts": {
