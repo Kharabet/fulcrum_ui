@@ -66,6 +66,11 @@ export class AppRoot extends Component<any, IAppRootState> {
 
   public onProviderTypeSelect = async (providerType: ProviderType) => {
     const web3 = await Web3ConnectionFactory.getWeb3Connection(providerType);
-    this.setState({ ...this.state, selectedProviderType: providerType, isTestModalOpen: false, web3: web3 });
+    this.setState({
+      ...this.state,
+      selectedProviderType: web3 ? providerType : ProviderType.None,
+      isTestModalOpen: false,
+      web3: web3
+    });
   };
 }
