@@ -23,7 +23,7 @@ export class Change24HMarker extends Component<IChange24HMarkerProps> {
       <span className={`change-24-h-marker ${trendDirectionStyleName} ${sizeStyleName}`}>
         <span className="change-24-h-marker__trend-pointer">{this.props.value.isNegative() ? "\u25be" : "\u25b4"}</span>
         &nbsp;
-        <span className="change-24-h-marker__value">{` ${this.props.value.toFixed(2)}%`}</span>
+        <span className="change-24-h-marker__value">{` ${this.props.value.absoluteValue().toFixed(2)}%`}</span>
       </span>
     );
   }
