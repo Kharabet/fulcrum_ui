@@ -10,7 +10,7 @@ export interface IProviderMenuListItemParams {
   onSelect: (providerType: ProviderType) => void;
 }
 
-export interface IProviderMenuListItemState {
+interface IProviderMenuListItemState {
   providerTypeDetails: ProviderTypeDetails | null;
 }
 

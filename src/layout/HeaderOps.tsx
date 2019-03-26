@@ -1,9 +1,9 @@
 import React, { Component } from "react";
-import { IOnChainIndicatorParams, OnChainIndicator } from "../components/OnChainIndicator";
+import { IOnChainIndicatorProps, OnChainIndicator } from "../components/OnChainIndicator";
 import HeaderLogo from "./HeaderLogo";
 import { HeaderMenu, IHeaderMenuProps } from "./HeaderMenu";
 
-export interface IHeaderOpsParams extends IOnChainIndicatorParams {}
+export interface IHeaderOpsParams extends IOnChainIndicatorProps {}
 
 class HeaderOps extends Component<IHeaderOpsParams> {
   private _menu: IHeaderMenuProps = {

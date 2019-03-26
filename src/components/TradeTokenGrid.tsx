@@ -14,7 +14,7 @@ export interface ITradeTokenGridProps {
   onTrade: (tradeType: TradeType, request: TradeRequest) => void;
 }
 
-export interface ITradeTokenGridState {
+interface ITradeTokenGridState {
   tokens: ITradeTokenGridRowProps[];
 }
 

@@ -1,9 +1,9 @@
 import React, { Component } from "react";
-import OpsSelector from "../components/OpsSelector";
+import { OpsSelector } from "../components/OpsSelector";
 import Footer from "../layout/Footer";
 import HeaderHome from "../layout/HeaderHome";
 
-class HomePage extends Component {
+export class HomePage extends Component {
   public render() {
     return (
       <div className="home-page">
@@ -16,5 +16,3 @@ class HomePage extends Component {
     );
   }
 }
-
-export default HomePage;

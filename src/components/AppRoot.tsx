@@ -4,9 +4,9 @@ import { HashRouter, Route, Switch } from "react-router-dom";
 import Web3 from "web3";
 import { ProviderType } from "../domain/ProviderType";
 import { Web3ConnectionFactory } from "../domain/Web3ConnectionFactory";
-import HomePage from "../pages/HomePage";
-import LendPage from "../pages/LendPage";
-import TradePage from "../pages/TradePage";
+import { HomePage } from "../pages/HomePage";
+import { LendPage } from "../pages/LendPage";
+import { TradePage } from "../pages/TradePage";
 import { ProviderMenu } from "./ProviderMenu";
 
 interface IAppRootState {

@@ -9,7 +9,7 @@ import { LendRequest } from "../domain/LendRequest";
 import Footer from "../layout/Footer";
 import HeaderOps from "../layout/HeaderOps";
 
-interface ILendPageParams {
+export interface ILendPageParams {
   web3: Web3 | null;
   onNetworkConnect: () => void;
 }
@@ -19,7 +19,7 @@ interface ILendPageState {
   lendAsset: Asset;
 }
 
-class LendPage extends Component<ILendPageParams, ILendPageState> {
+export class LendPage extends Component<ILendPageParams, ILendPageState> {
   constructor(props: any) {
     super(props);
 
@@ -67,5 +67,3 @@ class LendPage extends Component<ILendPageParams, ILendPageState> {
     this.setState({ isLendModalOpen: false });
   };
 }
-
-export default LendPage;

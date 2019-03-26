@@ -1,10 +1,10 @@
 import React, { Component } from "react";
-import OpsSelectorItem from "./OpsSelectorItem";
+import { OpsSelectorItem } from "./OpsSelectorItem";
 
 import lend_svg from "../assets/ic_big___lend_(dark).svg";
 import trade_svg from "../assets/ic_big___trade_(dark).svg";
 
-class OpsSelector extends Component {
+export class OpsSelector extends Component {
   public render() {
     return (
       <div className="ops-selector">
@@ -18,5 +18,3 @@ class OpsSelector extends Component {
     );
   }
 }
-
-export default OpsSelector;

@@ -7,7 +7,7 @@ export interface IPriceGraphParams {
   data: IPriceGraphDataPoint[];
 }
 
-export interface IPriceGraphState {
+interface IPriceGraphState {
   displayedDataPoint: IPriceGraphDataPoint | null;
 }
 

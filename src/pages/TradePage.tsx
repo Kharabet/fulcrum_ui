@@ -12,7 +12,7 @@ import { TradeType } from "../domain/TradeType";
 import Footer from "../layout/Footer";
 import HeaderOps from "../layout/HeaderOps";
 
-interface ITradePageParams {
+export interface ITradePageParams {
   web3: Web3 | null;
   onNetworkConnect: () => void;
 }
@@ -123,5 +123,3 @@ export class TradePage extends Component<ITradePageParams, ITradePageState> {
     this.setState({ isTradeModalOpen: false });
   };
 }
-
-export default TradePage;

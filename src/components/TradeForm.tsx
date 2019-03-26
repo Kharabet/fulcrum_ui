@@ -19,7 +19,7 @@ export interface ITradeFormParams {
   onCancel: () => void;
 }
 
-export interface ITradeFormState {
+interface ITradeFormState {
   assetDetails: AssetDetails | null;
   tradeAmountText: string;
   tradeAmount: BigNumber;

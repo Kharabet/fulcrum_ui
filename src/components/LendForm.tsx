@@ -5,7 +5,7 @@ import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { LendRequest } from "../domain/LendRequest";
 
-export interface ILendFormParams {
+export interface ILendFormProps {
   asset: Asset;
   tokenInterestRate: BigNumber;
 
@@ -13,16 +13,16 @@ export interface ILendFormParams {
   onCancel: () => void;
 }
 
-export interface ILendFormState {
+interface ILendFormState {
   assetDetails: AssetDetails | null;
   lendAmountText: string;
   lendAmount: BigNumber;
 }
 
-export class LendForm extends Component<ILendFormParams, ILendFormState> {
+export class LendForm extends Component<ILendFormProps, ILendFormState> {
   private _input: HTMLInputElement | null = null;
 
-  constructor(props: ILendFormParams, context?: any) {
+  constructor(props: ILendFormProps, context?: any) {
     super(props, context);
 
     const assetDetails = AssetsDictionary.assets.get(props.asset);

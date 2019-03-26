@@ -5,26 +5,26 @@ import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { LendRequest } from "../domain/LendRequest";
 
-export interface ILendTokenSelectorItemParams {
+export interface ILendTokenSelectorItemProps {
   asset: Asset;
   interestRate: BigNumber;
 
   onLoan: (request: LendRequest) => void;
 }
 
-export interface ILendTokenSelectorItemState {
+interface ILendTokenSelectorItemState {
   assetDetails: AssetDetails | null;
 }
 
-export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemParams, ILendTokenSelectorItemState> {
-  constructor(props: ILendTokenSelectorItemParams) {
+export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps, ILendTokenSelectorItemState> {
+  constructor(props: ILendTokenSelectorItemProps) {
     super(props);
 
     const assetDetails = AssetsDictionary.assets.get(props.asset);
     this.state = { ...this.state, assetDetails: assetDetails || null };
   }
 
-  public componentWillReceiveProps(nextProps: Readonly<ILendTokenSelectorItemParams>, nextContext: any): void {
+  public componentWillReceiveProps(nextProps: Readonly<ILendTokenSelectorItemProps>, nextContext: any): void {
     if (nextProps.asset !== this.props.asset) {
       const assetDetails = AssetsDictionary.assets.get(nextProps.asset);
       this.setState({ ...this.state, assetDetails: assetDetails || null });

@@ -24,7 +24,7 @@ export interface ITradeTokenGridRowProps {
   onTrade: (tradeType: TradeType, request: TradeRequest) => void;
 }
 
-export interface ITradeTokenGridRowState {
+interface ITradeTokenGridRowState {
   assetDetails: AssetDetails | null;
   leverage: number;
 }
