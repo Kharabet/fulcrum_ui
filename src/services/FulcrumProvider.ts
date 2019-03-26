@@ -80,7 +80,7 @@ class FulcrumProvider {
   public getPriceLatestDataPoint = (selectedKey: string): IPriceDataPoint => {
     const priceBase = 40;
     const priceDiff = Math.round(Math.random() * 2000) / 100;
-    const change24h = Math.round(Math.random() * 1000) / 100;
+    const change24h = Math.round(Math.random() * 1000) / 100 - 5;
     return {
       price: priceBase + priceDiff,
       change24h: change24h
