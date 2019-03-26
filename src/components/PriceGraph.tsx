@@ -22,7 +22,7 @@ export class PriceGraph extends Component<IPriceGraphProps, IPriceGraphState> {
   }
 
   public componentDidMount(): void {
-    this.setState({ displayedDataPoint: this.props.data[this.props.data.length - 1] });
+    this.setState({ ...this.state, displayedDataPoint: this.props.data[this.props.data.length - 1] });
   }
 
   public render() {
@@ -70,7 +70,7 @@ export class PriceGraph extends Component<IPriceGraphProps, IPriceGraphState> {
         }
 
         this._latestDataPoint = value;
-        this.setState({ displayedDataPoint: value });
+        this.setState({ ...this.state, displayedDataPoint: value });
       }
     }
     return null;
