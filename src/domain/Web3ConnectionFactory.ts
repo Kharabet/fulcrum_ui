@@ -32,6 +32,9 @@ export class Web3ConnectionFactory {
         provider = Web3ConnectionFactory.getProviderPortis();
         break;
       }
+      case ProviderType.Alchemy: {
+        provider = Web3ConnectionFactory.getProviderAlchemy();
+      }
     }
 
     return provider ? new Web3(provider) : null;
@@ -64,5 +67,10 @@ export class Web3ConnectionFactory {
   private static getProviderPortis(): Provider {
     const portis = new Portis(configProviders.Portis_DAppId, configProviders.Portis_Network);
     return portis.provider;
+  }
+
+  private static getProviderAlchemy(): Provider | null {
+    // TODO: add Alchemy implementation (https://alchemyapi.io/)
+    return null;
   }
 }
