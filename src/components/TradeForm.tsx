@@ -3,9 +3,11 @@ import React, { ChangeEvent, Component, FormEvent } from "react";
 import { Asset } from "../domain/Asset";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
+import { IPriceDataPoint } from "../domain/IPriceDataPoint";
 import { PositionType } from "../domain/PositionType";
 import { TradeRequest } from "../domain/TradeRequest";
 import { TradeType } from "../domain/TradeType";
+import FulcrumProvider from "../services/FulcrumProvider";
 import { PositionTypeMarker } from "./PositionTypeMarker";
 
 export interface ITradeFormProps {
@@ -13,7 +15,6 @@ export interface ITradeFormProps {
   asset: Asset;
   positionType: PositionType;
   leverage: number;
-  price: BigNumber;
 
   onSubmit: (request: TradeRequest) => void;
   onCancel: () => void;
@@ -21,6 +22,8 @@ export interface ITradeFormProps {
 
 interface ITradeFormState {
   assetDetails: AssetDetails | null;
+  latestPriceDataPoint: IPriceDataPoint;
+
   tradeAmountText: string;
   tradeAmount: BigNumber;
 }
@@ -31,8 +34,20 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
   constructor(props: ITradeFormProps, context?: any) {
     super(props, context);
 
+    const tradeTokenKey = this.getTradeTokenGridRowSelectionKey(this.props.leverage);
     const assetDetails = AssetsDictionary.assets.get(props.asset);
-    this.state = { tradeAmountText: "", tradeAmount: new BigNumber(0), assetDetails: assetDetails || null };
+    const latestPriceDataPoint = FulcrumProvider.getPriceLatestDataPoint(tradeTokenKey);
+
+    this.state = {
+      tradeAmountText: "",
+      tradeAmount: new BigNumber(0),
+      assetDetails: assetDetails || null,
+      latestPriceDataPoint: latestPriceDataPoint
+    };
+  }
+
+  private getTradeTokenGridRowSelectionKey(leverage: number = this.props.leverage) {
+    return `${this.props.asset}_${this.props.positionType}_${leverage}`;
   }
 
   private _setInputRef = (input: HTMLInputElement) => {
@@ -57,6 +72,9 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     const submitClassName =
       this.props.tradeType === TradeType.BUY ? "trade-form__submit-button--buy" : "trade-form__submit-button--sell";
 
+    const positionTypePrefix = this.props.positionType === PositionType.SHORT ? "s" : "l";
+    const bnPrice = new BigNumber(this.state.latestPriceDataPoint.price);
+
     return (
       <form className="trade-form" onSubmit={this.onSubmitClick}>
         <div className="trade-form__image" style={divStyle}>
@@ -77,7 +95,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
             </div>
             <div className="trade-form__kv-container trade-form__kv-container--w_dots">
               <div className="trade-form__label">Price</div>
-              <div className="trade-form__value">{`$${this.props.price.toFixed(2)}`}</div>
+              <div className="trade-form__value">{`$${bnPrice.toFixed(2)}`}</div>
             </div>
             <div className="trade-form__kv-container">
               <div className="trade-form__label">Amount</div>
@@ -96,7 +114,8 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
               </div>
               <div className="trade-form__value trade-form__value--no-color">
                 <span className="rounded-mark">?</span>
-                &nbsp; 244 i{this.state.assetDetails.displayName}
+                &nbsp; 244 {positionTypePrefix}
+                {this.state.assetDetails.displayName}
               </div>
             </div>
           </div>

@@ -1,4 +1,3 @@
-import BigNumber from "bignumber.js";
 import React, { Component } from "react";
 import Modal from "react-modal";
 import { LendForm } from "../components/LendForm";
@@ -35,7 +34,6 @@ export class LendPage extends Component<any, ILendPageState> {
           >
             <LendForm
               asset={this.state.lendAsset}
-              tokenInterestRate={new BigNumber(1)}
               onSubmit={this.onLendConfirmed}
               onCancel={this.onRequestClose}
             />

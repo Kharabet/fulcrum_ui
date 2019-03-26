@@ -1,4 +1,3 @@
-import BigNumber from "bignumber.js";
 import React, { Component } from "react";
 import Modal from "react-modal";
 import { PriceGraph } from "../components/PriceGraph";
@@ -47,7 +46,7 @@ export class TradePage extends Component<any, ITradePageState> {
           <PriceGraph data={this.state.priceGraphData} />
           <TradeTokenGrid
             selectedKey={this.state.selectedKey}
-            defaultLeverageShort={2}
+            defaultLeverageShort={1}
             defaultLeverageLong={2}
             onSelect={this.onSelect}
             onTrade={this.onTradeRequested}
@@ -63,7 +62,6 @@ export class TradePage extends Component<any, ITradePageState> {
               asset={this.state.tradeAsset}
               positionType={this.state.tradePositionType}
               leverage={this.state.tradeLeverage}
-              price={new BigNumber("91.68")}
               onSubmit={this.onTradeConfirmed}
               onCancel={this.onRequestClose}
             />

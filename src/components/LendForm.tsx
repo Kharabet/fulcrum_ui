@@ -4,10 +4,10 @@ import { Asset } from "../domain/Asset";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { LendRequest } from "../domain/LendRequest";
+import FulcrumProvider from "../services/FulcrumProvider";
 
 export interface ILendFormProps {
   asset: Asset;
-  tokenInterestRate: BigNumber;
 
   onSubmit: (request: LendRequest) => void;
   onCancel: () => void;
@@ -15,6 +15,8 @@ export interface ILendFormProps {
 
 interface ILendFormState {
   assetDetails: AssetDetails | null;
+  interestRate: BigNumber;
+
   lendAmountText: string;
   lendAmount: BigNumber;
 }
@@ -26,7 +28,14 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
     super(props, context);
 
     const assetDetails = AssetsDictionary.assets.get(props.asset);
-    this.state = { lendAmountText: "", lendAmount: new BigNumber(0), assetDetails: assetDetails || null };
+    const interestRate = FulcrumProvider.getTokenInterestRate(props.asset);
+
+    this.state = {
+      lendAmountText: "",
+      lendAmount: new BigNumber(0),
+      assetDetails: assetDetails || null,
+      interestRate: interestRate
+    };
   }
 
   private _setInputRef = (input: HTMLInputElement) => {
@@ -61,7 +70,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
             </div>
             <div className="lend-form__kv-container lend-form__kv-container--w_dots">
               <div className="lend-form__label">Interest rate</div>
-              <div className="lend-form__value">{`${this.props.tokenInterestRate.toFixed()}%`}</div>
+              <div className="lend-form__value">{`${this.state.interestRate.toFixed()}%`}</div>
             </div>
             <div className="lend-form__kv-container">
               <div className="lend-form__label">Amount</div>
