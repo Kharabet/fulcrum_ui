@@ -48,10 +48,8 @@
 
   position: absolute;
   left: 50%;
-  margin-left: -25%;
-
   top: 50%;
-  margin-top: -35%;
+  transform: translateX(-50%) translateY(-55%);
 }
 
 .ops-selector-item a:link {

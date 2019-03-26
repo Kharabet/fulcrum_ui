@@ -24,7 +24,7 @@ export class AppRoot extends Component<any, IAppRootState> {
 
   public render() {
     return (
-      <>
+      <React.Fragment>
         <Modal
           isOpen={this.state.isTestModalOpen}
           onRequestClose={this.onRequestClose}
@@ -52,7 +52,7 @@ export class AppRoot extends Component<any, IAppRootState> {
             />
           </Switch>
         </HashRouter>
-      </>
+      </React.Fragment>
     );
   }
 
