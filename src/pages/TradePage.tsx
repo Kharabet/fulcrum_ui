@@ -7,13 +7,14 @@ import { Asset } from "../domain/Asset";
 import { IPriceDataPoint } from "../domain/IPriceDataPoint";
 import { PositionType } from "../domain/PositionType";
 import { TradeRequest } from "../domain/TradeRequest";
+import { TradeTokenKey } from "../domain/TradeTokenKey";
 import { TradeType } from "../domain/TradeType";
 import { Footer } from "../layout/Footer";
 import { HeaderOps } from "../layout/HeaderOps";
 import FulcrumProvider from "../services/FulcrumProvider";
 
 interface ITradePageState {
-  selectedKey: string;
+  selectedKey: TradeTokenKey;
   isTradeModalOpen: boolean;
   tradeType: TradeType;
   tradeAsset: Asset;
@@ -26,9 +27,9 @@ export class TradePage extends Component<any, ITradePageState> {
   constructor(props: any) {
     super(props);
 
-    const graphData = FulcrumProvider.getPriceDataPoints("", 15);
+    const graphData = FulcrumProvider.getPriceDataPoints(TradeTokenKey.empty(), 15);
     this.state = {
-      selectedKey: "",
+      selectedKey: TradeTokenKey.empty(),
       priceGraphData: graphData,
       isTradeModalOpen: false,
       tradeType: TradeType.BUY,
@@ -72,8 +73,8 @@ export class TradePage extends Component<any, ITradePageState> {
     );
   }
 
-  public onSelect = (key: string) => {
-    const graphData = FulcrumProvider.getPriceDataPoints("", 15);
+  public onSelect = (key: TradeTokenKey) => {
+    const graphData = FulcrumProvider.getPriceDataPoints(TradeTokenKey.empty(), 15);
     this.setState({ ...this.state, selectedKey: key, priceGraphData: graphData });
   };
 

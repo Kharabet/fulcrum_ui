@@ -2,15 +2,16 @@ import React, { Component } from "react";
 import { Asset } from "../domain/Asset";
 import { PositionType } from "../domain/PositionType";
 import { TradeRequest } from "../domain/TradeRequest";
+import { TradeTokenKey } from "../domain/TradeTokenKey";
 import { TradeTokenGridHeader } from "./TradeTokenGridHeader";
 import { ITradeTokenGridRowProps, TradeTokenGridRow } from "./TradeTokenGridRow";
 
 export interface ITradeTokenGridProps {
-  selectedKey: string;
+  selectedKey: TradeTokenKey;
   defaultLeverageShort: number;
   defaultLeverageLong: number;
 
-  onSelect: (key: string) => void;
+  onSelect: (key: TradeTokenKey) => void;
   onTrade: (request: TradeRequest) => void;
 }
 
@@ -38,7 +39,7 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
 
   public componentDidMount(): void {
     const e = this.state.tokens[0];
-    this.props.onSelect(`${e.asset}_${e.positionType}_${e.defaultLeverage}`);
+    this.props.onSelect(new TradeTokenKey(e.asset, e.positionType, e.defaultLeverage));
   }
 
   public render() {
@@ -54,7 +55,7 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
 
   private _getTokens = (props: ITradeTokenGridProps): ITradeTokenGridRowProps[] => {
     const tokens: ITradeTokenGridRowProps[] = [];
-    
+
     this.assets.forEach(e => {
       tokens.push({
         selectedKey: props.selectedKey,

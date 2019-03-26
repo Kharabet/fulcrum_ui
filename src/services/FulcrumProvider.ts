@@ -6,6 +6,7 @@ import { IPriceDataPoint } from "../domain/IPriceDataPoint";
 import { LendRequest } from "../domain/LendRequest";
 import { ProviderType } from "../domain/ProviderType";
 import { TradeRequest } from "../domain/TradeRequest";
+import { TradeTokenKey } from "../domain/TradeTokenKey";
 import { Web3ConnectionFactory } from "../domain/Web3ConnectionFactory";
 import { ProviderChangedEvent } from "./events/ProviderChangedEvent";
 import { FulcrumProviderEvents } from "./FulcrumProviderEvents";
@@ -60,7 +61,7 @@ class FulcrumProvider {
     return new BigNumber(interestRate);
   };
 
-  public getPriceDataPoints = (selectedKey: string, samplesCount: number): IPriceDataPoint[] => {
+  public getPriceDataPoints = (selectedKey: TradeTokenKey, samplesCount: number): IPriceDataPoint[] => {
     const result: IPriceDataPoint[] = [];
 
     const priceBase = 40;
@@ -77,7 +78,7 @@ class FulcrumProvider {
     return result;
   };
 
-  public getPriceLatestDataPoint = (selectedKey: string): IPriceDataPoint => {
+  public getPriceLatestDataPoint = (selectedKey: TradeTokenKey): IPriceDataPoint => {
     const priceBase = 40;
     const priceDiff = Math.round(Math.random() * 2000) / 100;
     const change24h = Math.round(Math.random() * 1000) / 100 - 5;
@@ -87,12 +88,12 @@ class FulcrumProvider {
     };
   };
 
-  public getProfit = (selectedKey: string): BigNumber | null => {
+  public getProfit = (selectedKey: TradeTokenKey): BigNumber | null => {
     // should return null if no data (not traded asset), new BigNumber(0) if no profit
     return new BigNumber(Math.round(Math.random() * 1000) / 100);
   };
 
-  public getMaxTradeValue = (selectedKey: string): BigNumber => {
+  public getMaxTradeValue = (selectedKey: TradeTokenKey): BigNumber => {
     return new BigNumber(10);
   };
 

@@ -6,6 +6,7 @@ import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { IPriceDataPoint } from "../domain/IPriceDataPoint";
 import { PositionType } from "../domain/PositionType";
 import { TradeRequest } from "../domain/TradeRequest";
+import { TradeTokenKey } from "../domain/TradeTokenKey";
 import { TradeType } from "../domain/TradeType";
 import FulcrumProvider from "../services/FulcrumProvider";
 import { PositionTypeMarker } from "./PositionTypeMarker";
@@ -54,7 +55,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
   }
 
   private getTradeTokenGridRowSelectionKey(leverage: number = this.props.leverage) {
-    return `${this.props.asset}_${this.props.positionType}_${leverage}`;
+    return new TradeTokenKey(this.props.asset, this.props.positionType, leverage);
   }
 
   private _setInputRef = (input: HTMLInputElement) => {
