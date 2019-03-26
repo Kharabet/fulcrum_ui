@@ -103,6 +103,6 @@ export class TradePage extends Component<any, ITradePageState> {
   };
 
   public onRequestClose = () => {
-    this.setState({ isTradeModalOpen: false });
+    this.setState({ ...this.state, isTradeModalOpen: false });
   };
 }

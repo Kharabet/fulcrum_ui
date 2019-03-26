@@ -56,6 +56,6 @@ export class LendPage extends Component<any, ILendPageState> {
   };
 
   public onRequestClose = () => {
-    this.setState({ isLendModalOpen: false });
+    this.setState({ ...this.state, isLendModalOpen: false });
   };
 }
