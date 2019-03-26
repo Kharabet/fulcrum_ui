@@ -1,25 +1,20 @@
 import BigNumber from "bignumber.js";
 import React, { Component } from "react";
 import Modal from "react-modal";
-import Web3 from "web3";
 import { LendForm } from "../components/LendForm";
 import { LendTokenSelector } from "../components/LendTokenSelector";
 import { Asset } from "../domain/Asset";
 import { LendRequest } from "../domain/LendRequest";
 import { Footer } from "../layout/Footer";
 import { HeaderOps } from "../layout/HeaderOps";
-
-export interface ILendPageProps {
-  web3: Web3 | null;
-  onNetworkConnect: () => void;
-}
+import FulcrumProvider from "../services/FulcrumProvider";
 
 interface ILendPageState {
   isLendModalOpen: boolean;
   lendAsset: Asset;
 }
 
-export class LendPage extends Component<ILendPageProps, ILendPageState> {
+export class LendPage extends Component<any, ILendPageState> {
   constructor(props: any) {
     super(props);
 
@@ -29,7 +24,7 @@ export class LendPage extends Component<ILendPageProps, ILendPageState> {
   public render() {
     return (
       <div className="lend-page">
-        <HeaderOps web3={this.props.web3} onNetworkConnect={this.props.onNetworkConnect} />
+        <HeaderOps />
         <main>
           <LendTokenSelector onLoan={this.onLendRequested} />
           <Modal
@@ -58,9 +53,8 @@ export class LendPage extends Component<ILendPageProps, ILendPageState> {
   };
 
   public onLendConfirmed = (request: LendRequest) => {
-    if (request) {
-      alert(`loan ${request.amount} of ${request.asset}`);
-    }
+    FulcrumProvider.onLendConfirmed(request);
+    this.setState({ ...this.state, isLendModalOpen: false, lendAsset: Asset.UNKNOWN });
   };
 
   public onRequestClose = () => {

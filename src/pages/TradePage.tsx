@@ -1,7 +1,6 @@
 import BigNumber from "bignumber.js";
 import React, { Component } from "react";
 import Modal from "react-modal";
-import Web3 from "web3";
 import { IPriceGraphDataPoint, PriceGraph } from "../components/PriceGraph";
 import { TradeForm } from "../components/TradeForm";
 import { TradeTokenGrid } from "../components/TradeTokenGrid";
@@ -11,11 +10,7 @@ import { TradeRequest } from "../domain/TradeRequest";
 import { TradeType } from "../domain/TradeType";
 import { Footer } from "../layout/Footer";
 import { HeaderOps } from "../layout/HeaderOps";
-
-export interface ITradePageProps {
-  web3: Web3 | null;
-  onNetworkConnect: () => void;
-}
+import FulcrumProvider from "../services/FulcrumProvider";
 
 interface ITradePageState {
   selectedKey: string;
@@ -24,17 +19,17 @@ interface ITradePageState {
   tradeAsset: Asset;
   tradePositionType: PositionType;
   tradeLeverage: number;
-  graphData: IPriceGraphDataPoint[];
+  priceGraphData: IPriceGraphDataPoint[];
 }
 
-export class TradePage extends Component<ITradePageProps, ITradePageState> {
-  constructor(props: ITradePageProps) {
+export class TradePage extends Component<any, ITradePageState> {
+  constructor(props: any) {
     super(props);
 
-    const graphData = TradePage.getGraphData("", 15);
+    const graphData = FulcrumProvider.getPriceGraphData("", 15);
     this.state = {
       selectedKey: "",
-      graphData: graphData,
+      priceGraphData: graphData,
       isTradeModalOpen: false,
       tradeType: TradeType.BUY,
       tradeAsset: Asset.UNKNOWN,
@@ -43,29 +38,12 @@ export class TradePage extends Component<ITradePageProps, ITradePageState> {
     };
   }
 
-  private static getGraphData(selectedKey: string, samples: number): IPriceGraphDataPoint[] {
-    const result: IPriceGraphDataPoint[] = [];
-
-    const priceBase = 40;
-    let priceDiff = Math.round(Math.random() * 2000) / 100;
-    let change24h = 0;
-    for(let i = 0; i < samples + 1; i++) {
-      const priceDiffNew = Math.round(Math.random() * 2000) / 100;
-      change24h = ((priceDiffNew - priceDiff) / (priceBase + priceDiff)) * 100;
-      priceDiff = priceDiffNew;
-
-      result.push({ price: priceBase + priceDiff, change24h: change24h });
-    }
-
-    return result;
-  }
-
   public render() {
     return (
       <div className="trade-page">
-        <HeaderOps web3={this.props.web3} onNetworkConnect={this.props.onNetworkConnect} />
+        <HeaderOps />
         <main>
-          <PriceGraph data={this.state.graphData} />
+          <PriceGraph data={this.state.priceGraphData} />
           <TradeTokenGrid
             selectedKey={this.state.selectedKey}
             onSelect={this.onSelect}
@@ -94,8 +72,8 @@ export class TradePage extends Component<ITradePageProps, ITradePageState> {
   }
 
   public onSelect = (key: string) => {
-    const graphData = TradePage.getGraphData("", 15);
-    this.setState({ ...this.state, selectedKey: key, graphData: graphData });
+    const graphData = FulcrumProvider.getPriceGraphData("", 15);
+    this.setState({ ...this.state, selectedKey: key, priceGraphData: graphData });
   };
 
   public onTradeRequested = (tradeType: TradeType, request: TradeRequest) => {
@@ -112,11 +90,15 @@ export class TradePage extends Component<ITradePageProps, ITradePageState> {
   };
 
   public onTradeConfirmed = (tradeType: TradeType, request: TradeRequest) => {
-    if (request) {
-      alert(
-        `${tradeType} ${request.positionType} ${request.amount} of ${request.asset} with ${request.leverage}x leverage`
-      );
-    }
+    FulcrumProvider.onTradeConfirmed(tradeType, request);
+    this.setState({
+      ...this.state,
+      isTradeModalOpen: false,
+      tradeType: TradeType.BUY,
+      tradeAsset: Asset.UNKNOWN,
+      tradePositionType: PositionType.SHORT,
+      tradeLeverage: 2
+    });
   };
 
   public onRequestClose = () => {
