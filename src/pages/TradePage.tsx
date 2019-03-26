@@ -9,10 +9,10 @@ import { Asset } from "../domain/Asset";
 import { PositionType } from "../domain/PositionType";
 import { TradeRequest } from "../domain/TradeRequest";
 import { TradeType } from "../domain/TradeType";
-import Footer from "../layout/Footer";
-import HeaderOps from "../layout/HeaderOps";
+import { Footer } from "../layout/Footer";
+import { HeaderOps } from "../layout/HeaderOps";
 
-export interface ITradePageParams {
+export interface ITradePageProps {
   web3: Web3 | null;
   onNetworkConnect: () => void;
 }
@@ -27,8 +27,8 @@ interface ITradePageState {
   graphData: IPriceGraphDataPoint[];
 }
 
-export class TradePage extends Component<ITradePageParams, ITradePageState> {
-  constructor(props: ITradePageParams) {
+export class TradePage extends Component<ITradePageProps, ITradePageState> {
+  constructor(props: ITradePageProps) {
     super(props);
 
     const graphData = TradePage.getGraphData("", 15);

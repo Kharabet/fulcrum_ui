@@ -6,10 +6,10 @@ import { LendForm } from "../components/LendForm";
 import { LendTokenSelector } from "../components/LendTokenSelector";
 import { Asset } from "../domain/Asset";
 import { LendRequest } from "../domain/LendRequest";
-import Footer from "../layout/Footer";
-import HeaderOps from "../layout/HeaderOps";
+import { Footer } from "../layout/Footer";
+import { HeaderOps } from "../layout/HeaderOps";
 
-export interface ILendPageParams {
+export interface ILendPageProps {
   web3: Web3 | null;
   onNetworkConnect: () => void;
 }
@@ -19,7 +19,7 @@ interface ILendPageState {
   lendAsset: Asset;
 }
 
-export class LendPage extends Component<ILendPageParams, ILendPageState> {
+export class LendPage extends Component<ILendPageProps, ILendPageState> {
   constructor(props: any) {
     super(props);
 

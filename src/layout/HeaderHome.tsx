@@ -1,7 +1,7 @@
 import React, { Component } from "react";
-import HeaderLogo from "./HeaderLogo";
+import { HeaderLogo } from "./HeaderLogo";
 
-class HeaderHome extends Component {
+export class HeaderHome extends Component {
   public render() {
     return (
       <header className="header">
@@ -10,5 +10,3 @@ class HeaderHome extends Component {
     );
   }
 }
-
-export default HeaderHome;

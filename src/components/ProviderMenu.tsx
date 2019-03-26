@@ -2,14 +2,14 @@ import React, { Component } from "react";
 import { ProviderType } from "../domain/ProviderType";
 import { ProviderMenuListItem } from "./ProviderMenuListItem";
 
-export interface IProviderMenuParams {
+export interface IProviderMenuProps {
   providerTypes: ProviderType[];
   selectedProviderType: ProviderType;
 
   onSelect: (providerType: ProviderType) => void;
 }
 
-export class ProviderMenu extends Component<IProviderMenuParams> {
+export class ProviderMenu extends Component<IProviderMenuProps> {
   public render() {
     const listItems = this.props.providerTypes.map(e => (
       <ProviderMenuListItem

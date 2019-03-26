@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 
-class FooterPoweredBy extends Component {
+export class FooterPoweredBy extends Component {
   public render() {
     return (
       <div className="footer-powered-by">
@@ -9,5 +9,3 @@ class FooterPoweredBy extends Component {
     );
   }
 }
-
-export default FooterPoweredBy;

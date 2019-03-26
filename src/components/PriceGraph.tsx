@@ -3,7 +3,7 @@ import React, { Component, ReactNode } from "react";
 import { Line, LineChart, ResponsiveContainer, Tooltip, TooltipProps } from "recharts";
 import { Change24HMarker, Change24HMarkerSize } from "./Change24HMarker";
 
-export interface IPriceGraphParams {
+export interface IPriceGraphProps {
   data: IPriceGraphDataPoint[];
 }
 
@@ -16,10 +16,10 @@ export interface IPriceGraphDataPoint {
   change24h: number;
 }
 
-export class PriceGraph extends Component<IPriceGraphParams, IPriceGraphState> {
+export class PriceGraph extends Component<IPriceGraphProps, IPriceGraphState> {
   private _latestDataPoint: IPriceGraphDataPoint | null = null;
 
-  constructor(props: IPriceGraphParams, context?: any) {
+  constructor(props: IPriceGraphProps, context?: any) {
     super(props, context);
 
     this.state = { displayedDataPoint: null };

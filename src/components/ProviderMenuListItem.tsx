@@ -3,7 +3,7 @@ import { ProviderType } from "../domain/ProviderType";
 import { ProviderTypeDetails } from "../domain/ProviderTypeDetails";
 import { ProviderTypeDictionary } from "../domain/ProviderTypeDictionary";
 
-export interface IProviderMenuListItemParams {
+export interface IProviderMenuListItemProps {
   providerType: ProviderType;
   selectedProviderType: ProviderType;
 
@@ -14,14 +14,14 @@ interface IProviderMenuListItemState {
   providerTypeDetails: ProviderTypeDetails | null;
 }
 
-export class ProviderMenuListItem extends Component<IProviderMenuListItemParams, IProviderMenuListItemState> {
-  constructor(props: IProviderMenuListItemParams) {
+export class ProviderMenuListItem extends Component<IProviderMenuListItemProps, IProviderMenuListItemState> {
+  constructor(props: IProviderMenuListItemProps) {
     super(props);
 
     this.state = { providerTypeDetails: ProviderTypeDictionary.providerTypes.get(props.providerType) || null };
   }
 
-  public componentWillReceiveProps(nextProps: Readonly<IProviderMenuListItemParams>, nextContext: any): void {
+  public componentWillReceiveProps(nextProps: Readonly<IProviderMenuListItemProps>, nextContext: any): void {
     this.setState({
       ...this.state,
       providerTypeDetails: ProviderTypeDictionary.providerTypes.get(nextProps.providerType) || null

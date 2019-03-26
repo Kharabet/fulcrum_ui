@@ -1,11 +1,11 @@
 import React, { Component } from "react";
 import { IOnChainIndicatorProps, OnChainIndicator } from "../components/OnChainIndicator";
-import HeaderLogo from "./HeaderLogo";
+import { HeaderLogo } from "./HeaderLogo";
 import { HeaderMenu, IHeaderMenuProps } from "./HeaderMenu";
 
-export interface IHeaderOpsParams extends IOnChainIndicatorProps {}
+export interface IHeaderOpsProps extends IOnChainIndicatorProps {}
 
-class HeaderOps extends Component<IHeaderOpsParams> {
+export class HeaderOps extends Component<IHeaderOpsProps> {
   private _menu: IHeaderMenuProps = {
     items: [
       { id: 0, title: "Home", link: "/" },
@@ -30,5 +30,3 @@ class HeaderOps extends Component<IHeaderOpsParams> {
     );
   }
 }
-
-export default HeaderOps;

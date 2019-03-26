@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 import fulcrum_logo from "../assets/fulcrum_logo.svg";
 
-class HeaderLogo extends Component {
+export class HeaderLogo extends Component {
   public render() {
     return (
       <div className="header-logo">
@@ -14,5 +14,3 @@ class HeaderLogo extends Component {
     );
   }
 }
-
-export default HeaderLogo;

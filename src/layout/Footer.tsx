@@ -1,8 +1,8 @@
 import React, { Component } from "react";
-import FooterMenu from "./FooterMenu";
-import FooterPoweredBy from "./FooterPoweredBy";
+import { FooterMenu } from "./FooterMenu";
+import { FooterPoweredBy } from "./FooterPoweredBy";
 
-class Footer extends Component {
+export class Footer extends Component {
   public render() {
     return (
       <footer className="footer">
@@ -12,5 +12,3 @@ class Footer extends Component {
     );
   }
 }
-
-export default Footer;

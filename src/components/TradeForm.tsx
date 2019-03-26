@@ -8,7 +8,7 @@ import { TradeRequest } from "../domain/TradeRequest";
 import { TradeType } from "../domain/TradeType";
 import { PositionTypeMarker } from "./PositionTypeMarker";
 
-export interface ITradeFormParams {
+export interface ITradeFormProps {
   tradeType: TradeType;
   asset: Asset;
   positionType: PositionType;
@@ -25,10 +25,10 @@ interface ITradeFormState {
   tradeAmount: BigNumber;
 }
 
-export class TradeForm extends Component<ITradeFormParams, ITradeFormState> {
+export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
   private _input: HTMLInputElement | null = null;
 
-  constructor(props: ITradeFormParams, context?: any) {
+  constructor(props: ITradeFormProps, context?: any) {
     super(props, context);
 
     const assetDetails = AssetsDictionary.assets.get(props.asset);

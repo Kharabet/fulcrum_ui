@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 
-class FooterMenu extends Component {
+export class FooterMenu extends Component {
   public render() {
     return (
       <div className="footer-menu">
@@ -14,5 +14,3 @@ class FooterMenu extends Component {
     );
   }
 }
-
-export default FooterMenu;
