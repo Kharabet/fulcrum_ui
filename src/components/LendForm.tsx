@@ -29,10 +29,11 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
 
     const assetDetails = AssetsDictionary.assets.get(props.asset);
     const interestRate = FulcrumProvider.getTokenInterestRate(props.asset);
+    const maxLendValue = FulcrumProvider.getMaxLendValue(props.asset);
 
     this.state = {
-      lendAmountText: "",
-      lendAmount: new BigNumber(0),
+      lendAmountText: maxLendValue.toFixed(),
+      lendAmount: maxLendValue,
       assetDetails: assetDetails || null,
       interestRate: interestRate
     };
@@ -44,6 +45,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
 
   public componentDidMount(): void {
     if (this._input) {
+      this._input.select();
       this._input.focus();
     }
   }
@@ -134,7 +136,11 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
       return null;
     }
 
-    alert(`Insert max value`);
+    const maxLendValue = FulcrumProvider.getMaxLendValue(this.props.asset);
+    this.setState({
+      lendAmountText: maxLendValue.toFixed(),
+      lendAmount: maxLendValue
+    });
   };
 
   public onCancelClick = () => {

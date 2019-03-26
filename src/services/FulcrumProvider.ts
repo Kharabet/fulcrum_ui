@@ -91,6 +91,14 @@ class FulcrumProvider {
     // should return null if no data (not traded asset), new BigNumber(0) if no profit
     return new BigNumber(Math.round(Math.random() * 1000) / 100);
   };
+
+  public getMaxTradeValue = (selectedKey: string): BigNumber => {
+    return new BigNumber(10);
+  };
+
+  public getMaxLendValue = (asset: Asset): BigNumber => {
+    return new BigNumber(15);
+  };
 }
 
 // singleton

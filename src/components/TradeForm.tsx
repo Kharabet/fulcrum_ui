@@ -37,10 +37,11 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     const tradeTokenKey = this.getTradeTokenGridRowSelectionKey(this.props.leverage);
     const assetDetails = AssetsDictionary.assets.get(props.asset);
     const latestPriceDataPoint = FulcrumProvider.getPriceLatestDataPoint(tradeTokenKey);
+    const maxTradeValue = FulcrumProvider.getMaxTradeValue(tradeTokenKey);
 
     this.state = {
-      tradeAmountText: "",
-      tradeAmount: new BigNumber(0),
+      tradeAmountText: maxTradeValue.toFixed(),
+      tradeAmount: maxTradeValue,
       assetDetails: assetDetails || null,
       latestPriceDataPoint: latestPriceDataPoint
     };
@@ -56,6 +57,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
 
   public componentDidMount(): void {
     if (this._input) {
+      this._input.select();
       this._input.focus();
     }
   }
@@ -160,7 +162,13 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       return null;
     }
 
-    alert(`Insert max value`);
+    const tradeTokenKey = this.getTradeTokenGridRowSelectionKey();
+    const maxTradeValue = FulcrumProvider.getMaxTradeValue(tradeTokenKey);
+    this.setState({
+      ...this.state,
+      tradeAmountText: maxTradeValue.toFixed(),
+      tradeAmount: maxTradeValue
+    });
   };
 
   public onCancelClick = () => {
