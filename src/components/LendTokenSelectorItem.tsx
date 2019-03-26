@@ -4,16 +4,17 @@ import { Asset } from "../domain/Asset";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { LendRequest } from "../domain/LendRequest";
+import FulcrumProvider from "../services/FulcrumProvider";
 
 export interface ILendTokenSelectorItemProps {
   asset: Asset;
-  interestRate: BigNumber;
 
   onLoan: (request: LendRequest) => void;
 }
 
 interface ILendTokenSelectorItemState {
   assetDetails: AssetDetails | null;
+  interestRate: BigNumber;
 }
 
 export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps, ILendTokenSelectorItemState> {
@@ -21,7 +22,9 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
     super(props);
 
     const assetDetails = AssetsDictionary.assets.get(props.asset);
-    this.state = { ...this.state, assetDetails: assetDetails || null };
+    const interestRate = FulcrumProvider.getTokenInterestRate(props.asset);
+
+    this.state = { ...this.state, assetDetails: assetDetails || null, interestRate: interestRate };
   }
 
   public componentWillReceiveProps(nextProps: Readonly<ILendTokenSelectorItemProps>, nextContext: any): void {
@@ -45,7 +48,7 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
           <div className="token-selector-item__name">{this.state.assetDetails.displayName}</div>
           <div className="token-selector-item__interest-rate-container">
             <div className="token-selector-item__interest-rate-title">Interest rate:</div>
-            <div className="token-selector-item__interest-rate-value">{`${this.props.interestRate.toFixed(2)}%`}</div>
+            <div className="token-selector-item__interest-rate-value">{`${this.state.interestRate.toFixed(2)}%`}</div>
           </div>
         </div>
         <button className="token-selector-item__loan-button" onClick={this.onLoanClick}>

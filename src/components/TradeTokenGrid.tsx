@@ -1,17 +1,17 @@
-import BigNumber from "bignumber.js";
 import React, { Component } from "react";
 import { Asset } from "../domain/Asset";
 import { PositionType } from "../domain/PositionType";
 import { TradeRequest } from "../domain/TradeRequest";
-import { TradeType } from "../domain/TradeType";
 import { TradeTokenGridHeader } from "./TradeTokenGridHeader";
 import { ITradeTokenGridRowProps, TradeTokenGridRow } from "./TradeTokenGridRow";
 
 export interface ITradeTokenGridProps {
   selectedKey: string;
+  defaultLeverageShort: number;
+  defaultLeverageLong: number;
 
   onSelect: (key: string) => void;
-  onTrade: (tradeType: TradeType, request: TradeRequest) => void;
+  onTrade: (request: TradeRequest) => void;
 }
 
 interface ITradeTokenGridState {
@@ -19,6 +19,8 @@ interface ITradeTokenGridState {
 }
 
 export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenGridState> {
+  private readonly assets: Asset[] = [Asset.wBTC, Asset.ETH, Asset.MKR, Asset.ZRX, Asset.BAT, Asset.REP, Asset.KNC];
+
   constructor(props: ITradeTokenGridProps) {
     super(props);
 
@@ -50,29 +52,29 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
     );
   }
 
-  private _getTokens = (props: ITradeTokenGridProps) => {
-    return [
-      {
+  private _getTokens = (props: ITradeTokenGridProps): ITradeTokenGridRowProps[] => {
+    const tokens: ITradeTokenGridRowProps[] = [];
+    
+    this.assets.forEach(e => {
+      tokens.push({
         selectedKey: props.selectedKey,
-        asset: Asset.wBTC,
-        positionType: PositionType.LONG,
-        defaultLeverage: 2,
-        price: new BigNumber("21.26"),
-        change24h: new BigNumber("-0.36"),
-        profit: new BigNumber("14.32"),
-        onSelect: props.onSelect,
-        onTrade: props.onTrade
-      },
-      {
-        selectedKey: props.selectedKey,
-        asset: Asset.DAI,
+        asset: e,
         positionType: PositionType.SHORT,
-        defaultLeverage: 2,
-        price: new BigNumber("42.71"),
-        change24h: new BigNumber("0.17"),
+        defaultLeverage: props.defaultLeverageShort,
         onSelect: props.onSelect,
         onTrade: props.onTrade
-      }
-    ];
+      });
+
+      tokens.push({
+        selectedKey: props.selectedKey,
+        asset: e,
+        positionType: PositionType.LONG,
+        defaultLeverage: props.defaultLeverageLong,
+        onSelect: props.onSelect,
+        onTrade: props.onTrade
+      });
+    });
+
+    return tokens;
   };
 }

@@ -15,7 +15,7 @@ export interface ITradeFormProps {
   leverage: number;
   price: BigNumber;
 
-  onSubmit: (tradeType: TradeType, request: TradeRequest) => void;
+  onSubmit: (request: TradeRequest) => void;
   onCancel: () => void;
 }
 
@@ -137,7 +137,9 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
   };
 
   public onInsertMaxValue = () => {
-    if (!this.state.assetDetails) return null;
+    if (!this.state.assetDetails) {
+      return null;
+    }
 
     alert(`Insert max value`);
   };
@@ -167,8 +169,13 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     }
 
     this.props.onSubmit(
-      this.props.tradeType,
-      new TradeRequest(this.props.asset, this.props.positionType, this.props.leverage, this.state.tradeAmount)
+      new TradeRequest(
+        this.props.tradeType,
+        this.props.asset,
+        this.props.positionType,
+        this.props.leverage,
+        this.state.tradeAmount
+      )
     );
   };
 }

@@ -121,7 +121,9 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
   };
 
   public onInsertMaxValue = () => {
-    if (!this.state.assetDetails) return null;
+    if (!this.state.assetDetails) {
+      return null;
+    }
 
     alert(`Insert max value`);
   };

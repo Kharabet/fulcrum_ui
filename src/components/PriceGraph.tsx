@@ -1,23 +1,19 @@
 import BigNumber from "bignumber.js";
 import React, { Component, ReactNode } from "react";
 import { Line, LineChart, ResponsiveContainer, Tooltip, TooltipProps } from "recharts";
+import { IPriceDataPoint } from "../domain/IPriceDataPoint";
 import { Change24HMarker, Change24HMarkerSize } from "./Change24HMarker";
 
 export interface IPriceGraphProps {
-  data: IPriceGraphDataPoint[];
+  data: IPriceDataPoint[];
 }
 
 interface IPriceGraphState {
-  displayedDataPoint: IPriceGraphDataPoint | null;
-}
-
-export interface IPriceGraphDataPoint {
-  price: number;
-  change24h: number;
+  displayedDataPoint: IPriceDataPoint | null;
 }
 
 export class PriceGraph extends Component<IPriceGraphProps, IPriceGraphState> {
-  private _latestDataPoint: IPriceGraphDataPoint | null = null;
+  private _latestDataPoint: IPriceDataPoint | null = null;
 
   constructor(props: IPriceGraphProps, context?: any) {
     super(props, context);
@@ -66,7 +62,7 @@ export class PriceGraph extends Component<IPriceGraphProps, IPriceGraphState> {
   public renderTooltip = (e: TooltipProps): ReactNode => {
     if (e.active) {
       if (e.payload) {
-        const value = e.payload[0].payload as IPriceGraphDataPoint;
+        const value = e.payload[0].payload as IPriceDataPoint;
         if (this._latestDataPoint) {
           if (value === this._latestDataPoint) {
             return;

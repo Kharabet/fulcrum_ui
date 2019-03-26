@@ -1,10 +1,11 @@
 import BigNumber from "bignumber.js";
 import React, { Component } from "react";
 import Modal from "react-modal";
-import { IPriceGraphDataPoint, PriceGraph } from "../components/PriceGraph";
+import { PriceGraph } from "../components/PriceGraph";
 import { TradeForm } from "../components/TradeForm";
 import { TradeTokenGrid } from "../components/TradeTokenGrid";
 import { Asset } from "../domain/Asset";
+import { IPriceDataPoint } from "../domain/IPriceDataPoint";
 import { PositionType } from "../domain/PositionType";
 import { TradeRequest } from "../domain/TradeRequest";
 import { TradeType } from "../domain/TradeType";
@@ -19,14 +20,14 @@ interface ITradePageState {
   tradeAsset: Asset;
   tradePositionType: PositionType;
   tradeLeverage: number;
-  priceGraphData: IPriceGraphDataPoint[];
+  priceGraphData: IPriceDataPoint[];
 }
 
 export class TradePage extends Component<any, ITradePageState> {
   constructor(props: any) {
     super(props);
 
-    const graphData = FulcrumProvider.getPriceGraphData("", 15);
+    const graphData = FulcrumProvider.getPriceDataPoints("", 15);
     this.state = {
       selectedKey: "",
       priceGraphData: graphData,
@@ -46,6 +47,8 @@ export class TradePage extends Component<any, ITradePageState> {
           <PriceGraph data={this.state.priceGraphData} />
           <TradeTokenGrid
             selectedKey={this.state.selectedKey}
+            defaultLeverageShort={2}
+            defaultLeverageLong={2}
             onSelect={this.onSelect}
             onTrade={this.onTradeRequested}
           />
@@ -72,16 +75,16 @@ export class TradePage extends Component<any, ITradePageState> {
   }
 
   public onSelect = (key: string) => {
-    const graphData = FulcrumProvider.getPriceGraphData("", 15);
+    const graphData = FulcrumProvider.getPriceDataPoints("", 15);
     this.setState({ ...this.state, selectedKey: key, priceGraphData: graphData });
   };
 
-  public onTradeRequested = (tradeType: TradeType, request: TradeRequest) => {
+  public onTradeRequested = (request: TradeRequest) => {
     if (request) {
       this.setState({
         ...this.state,
         isTradeModalOpen: true,
-        tradeType: tradeType,
+        tradeType: request.tradeType,
         tradeAsset: request.asset,
         tradePositionType: request.positionType,
         tradeLeverage: request.leverage
@@ -89,8 +92,8 @@ export class TradePage extends Component<any, ITradePageState> {
     }
   };
 
-  public onTradeConfirmed = (tradeType: TradeType, request: TradeRequest) => {
-    FulcrumProvider.onTradeConfirmed(tradeType, request);
+  public onTradeConfirmed = (request: TradeRequest) => {
+    FulcrumProvider.onTradeConfirmed(request);
     this.setState({
       ...this.state,
       isTradeModalOpen: false,

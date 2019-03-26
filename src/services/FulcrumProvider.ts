@@ -1,10 +1,11 @@
+import BigNumber from "bignumber.js";
 import { EventEmitter } from "events";
 import Web3 from "web3";
-import { IPriceGraphDataPoint } from "../components/PriceGraph";
+import { Asset } from "../domain/Asset";
+import { IPriceDataPoint } from "../domain/IPriceDataPoint";
 import { LendRequest } from "../domain/LendRequest";
 import { ProviderType } from "../domain/ProviderType";
 import { TradeRequest } from "../domain/TradeRequest";
-import { TradeType } from "../domain/TradeType";
 import { Web3ConnectionFactory } from "../domain/Web3ConnectionFactory";
 import { ProviderChangedEvent } from "./events/ProviderChangedEvent";
 import { FulcrumProviderEvents } from "./FulcrumProviderEvents";
@@ -44,16 +45,23 @@ class FulcrumProvider {
     }
   };
 
-  public onTradeConfirmed = (tradeType: TradeType, request: TradeRequest) => {
+  public onTradeConfirmed = (request: TradeRequest) => {
     if (request) {
       alert(
-        `${tradeType} ${request.positionType} ${request.amount} of ${request.asset} with ${request.leverage}x leverage`
+        `${request.tradeType} ${request.positionType} ${request.amount} of ${request.asset} with ${
+          request.leverage
+        }x leverage`
       );
     }
   };
 
-  public getPriceGraphData = (selectedKey: string, samplesCount: number): IPriceGraphDataPoint[] => {
-    const result: IPriceGraphDataPoint[] = [];
+  public getTokenInterestRate = (asset: Asset): BigNumber => {
+    const interestRate = Math.round(Math.random() * 1000) / 100;
+    return new BigNumber(interestRate);
+  };
+
+  public getPriceDataPoints = (selectedKey: string, samplesCount: number): IPriceDataPoint[] => {
+    const result: IPriceDataPoint[] = [];
 
     const priceBase = 40;
     let priceDiff = Math.round(Math.random() * 2000) / 100;
@@ -67,6 +75,21 @@ class FulcrumProvider {
     }
 
     return result;
+  };
+
+  public getPriceLatestDataPoint = (selectedKey: string): IPriceDataPoint => {
+    const priceBase = 40;
+    const priceDiff = Math.round(Math.random() * 2000) / 100;
+    const change24h = Math.round(Math.random() * 1000) / 100;
+    return {
+      price: priceBase + priceDiff,
+      change24h: change24h
+    };
+  };
+
+  public getProfit = (selectedKey: string): BigNumber | null => {
+    // should return null if no data (not traded asset), new BigNumber(0) if no profit
+    return new BigNumber(Math.round(Math.random() * 1000) / 100);
   };
 }
 
