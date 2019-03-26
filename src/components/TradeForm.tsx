@@ -26,6 +26,8 @@ interface ITradeFormState {
 
   tradeAmountText: string;
   tradeAmount: BigNumber;
+
+  tradedAmountEstimate: BigNumber;
 }
 
 export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
@@ -38,10 +40,14 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     const assetDetails = AssetsDictionary.assets.get(props.asset);
     const latestPriceDataPoint = FulcrumProvider.getPriceLatestDataPoint(tradeTokenKey);
     const maxTradeValue = FulcrumProvider.getMaxTradeValue(tradeTokenKey);
+    const tradedAmountEstimate = FulcrumProvider.getTradedAmountEstimate(
+      new TradeRequest(props.tradeType, props.asset, props.positionType, props.leverage, maxTradeValue)
+    );
 
     this.state = {
       tradeAmountText: maxTradeValue.toFixed(),
       tradeAmount: maxTradeValue,
+      tradedAmountEstimate: tradedAmountEstimate,
       assetDetails: assetDetails || null,
       latestPriceDataPoint: latestPriceDataPoint
     };
@@ -108,7 +114,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
               ref={this._setInputRef}
               className="trade-form__amount"
               value={this.state.tradeAmountText}
-              onChange={this.onLoanAmountChange}
+              onChange={this.onTradeAmountChange}
             />
             <div className="trade-form__kv-container">
               <div className="trade-form__label trade-form__label--action" onClick={this.onInsertMaxValue}>
@@ -116,7 +122,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
               </div>
               <div className="trade-form__value trade-form__value--no-color">
                 <span className="rounded-mark">?</span>
-                &nbsp; 244 {positionTypePrefix}
+                &nbsp; {this.state.tradedAmountEstimate.toFixed(2)} {positionTypePrefix}
                 {this.state.assetDetails.displayName}
               </div>
             </div>
@@ -135,7 +141,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     );
   }
 
-  public onLoanAmountChange = (event: ChangeEvent<HTMLInputElement>) => {
+  public onTradeAmountChange = (event: ChangeEvent<HTMLInputElement>) => {
     // handling different types of empty values
     let amountText = event.target.value ? event.target.value : "";
     const amountTextForConversion = amountText === "" ? "0" : amountText;
@@ -148,11 +154,15 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     }
 
     // updating stored value only if the new input value is a valid number
+    const tradedAmountEstimate = FulcrumProvider.getTradedAmountEstimate(
+      new TradeRequest(this.props.tradeType, this.props.asset, this.props.positionType, this.props.leverage, amount)
+    );
     if (!amount.isNaN()) {
       this.setState({
         ...this.state,
         tradeAmountText: amountText,
-        tradeAmount: amount
+        tradeAmount: amount,
+        tradedAmountEstimate: tradedAmountEstimate
       });
     }
   };
@@ -164,10 +174,14 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
 
     const tradeTokenKey = this.getTradeTokenGridRowSelectionKey();
     const maxTradeValue = FulcrumProvider.getMaxTradeValue(tradeTokenKey);
+    const tradedAmountEstimate = FulcrumProvider.getTradedAmountEstimate(
+      new TradeRequest(this.props.tradeType, this.props.asset, this.props.positionType, this.props.leverage, maxTradeValue)
+    );
     this.setState({
       ...this.state,
       tradeAmountText: maxTradeValue.toFixed(),
-      tradeAmount: maxTradeValue
+      tradeAmount: maxTradeValue,
+      tradedAmountEstimate: tradedAmountEstimate
     });
   };
 

@@ -99,6 +99,14 @@ class FulcrumProvider {
   public getMaxLendValue = (asset: Asset): BigNumber => {
     return new BigNumber(15);
   };
+
+  public getTradedAmountEstimate = (request: TradeRequest): BigNumber => {
+    return request.amount.div(2);
+  };
+
+  public getLendedAmountEstimate = (request: LendRequest): BigNumber => {
+    return request.amount.div(3);
+  };
 }
 
 // singleton

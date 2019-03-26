@@ -19,6 +19,8 @@ interface ILendFormState {
 
   lendAmountText: string;
   lendAmount: BigNumber;
+
+  lendedAmountEstimate: BigNumber;
 }
 
 export class LendForm extends Component<ILendFormProps, ILendFormState> {
@@ -30,10 +32,12 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
     const assetDetails = AssetsDictionary.assets.get(props.asset);
     const interestRate = FulcrumProvider.getTokenInterestRate(props.asset);
     const maxLendValue = FulcrumProvider.getMaxLendValue(props.asset);
+    const lendedAmountEstimate = FulcrumProvider.getLendedAmountEstimate(new LendRequest(props.asset, maxLendValue));
 
     this.state = {
       lendAmountText: maxLendValue.toFixed(),
       lendAmount: maxLendValue,
+      lendedAmountEstimate: lendedAmountEstimate,
       assetDetails: assetDetails || null,
       interestRate: interestRate
     };
@@ -91,7 +95,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
               </div>
               <div className="lend-form__value lend-form__value--no-color">
                 <span className="rounded-mark">?</span>
-                &nbsp; 244 i{this.state.assetDetails.displayName}
+                &nbsp; {this.state.lendedAmountEstimate.toFixed(2)} i{this.state.assetDetails.displayName}
               </div>
             </div>
           </div>
@@ -122,11 +126,13 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
     }
 
     // updating stored value only if the new input value is a valid number
+    const lendedAmountEstimate = FulcrumProvider.getLendedAmountEstimate(new LendRequest(this.props.asset, amount));
     if (!amount.isNaN()) {
       this.setState({
         ...this.state,
         lendAmountText: amountText,
-        lendAmount: amount
+        lendAmount: amount,
+        lendedAmountEstimate: lendedAmountEstimate
       });
     }
   };
@@ -137,9 +143,13 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
     }
 
     const maxLendValue = FulcrumProvider.getMaxLendValue(this.props.asset);
+    const lendedAmountEstimate = FulcrumProvider.getLendedAmountEstimate(
+      new LendRequest(this.props.asset, maxLendValue)
+    );
     this.setState({
       lendAmountText: maxLendValue.toFixed(),
-      lendAmount: maxLendValue
+      lendAmount: maxLendValue,
+      lendedAmountEstimate: lendedAmountEstimate
     });
   };
 
