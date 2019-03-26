@@ -81,7 +81,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     const submitClassName =
       this.props.tradeType === TradeType.BUY ? "trade-form__submit-button--buy" : "trade-form__submit-button--sell";
 
-    const positionTypePrefix = this.props.positionType === PositionType.SHORT ? "s" : "l";
+    const positionTypePrefix = this.props.positionType === PositionType.SHORT ? "ps" : "pL";
     const bnPrice = new BigNumber(this.state.latestPriceDataPoint.price);
 
     return (
@@ -124,7 +124,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
               <div className="trade-form__value trade-form__value--no-color">
                 <span className="rounded-mark">?</span>
                 &nbsp; {this.state.tradedAmountEstimate.toFixed(2)} {positionTypePrefix}
-                {this.state.assetDetails.displayName}
+                {this.state.assetDetails.displayName}{this.props.leverage}x
               </div>
             </div>
           </div>
