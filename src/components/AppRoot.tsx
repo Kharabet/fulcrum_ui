@@ -10,7 +10,7 @@ import { TradePage } from "../pages/TradePage";
 import { ProviderMenu } from "./ProviderMenu";
 
 interface IAppRootState {
-  isTestModalOpen: boolean;
+  isProviderMenuModalOpen: boolean;
   selectedProviderType: ProviderType;
   web3: Web3 | null;
 }
@@ -19,14 +19,14 @@ export class AppRoot extends Component<any, IAppRootState> {
   constructor(props: any) {
     super(props);
 
-    this.state = { isTestModalOpen: false, selectedProviderType: ProviderType.None, web3: null };
+    this.state = { isProviderMenuModalOpen: false, selectedProviderType: ProviderType.None, web3: null };
   }
 
   public render() {
     return (
       <React.Fragment>
         <Modal
-          isOpen={this.state.isTestModalOpen}
+          isOpen={this.state.isProviderMenuModalOpen}
           onRequestClose={this.onRequestClose}
           className="modal-content-div"
           overlayClassName="modal-overlay-div"
@@ -57,11 +57,11 @@ export class AppRoot extends Component<any, IAppRootState> {
   }
 
   public onRequestClose = () => {
-    this.setState({ isTestModalOpen: false });
+    this.setState({ ...this.state, isProviderMenuModalOpen: false });
   };
 
   public onNetworkConnect = () => {
-    this.setState({ ...this.state, isTestModalOpen: true });
+    this.setState({ ...this.state, isProviderMenuModalOpen: true });
   };
 
   public onProviderTypeSelect = async (providerType: ProviderType) => {
@@ -69,7 +69,7 @@ export class AppRoot extends Component<any, IAppRootState> {
     this.setState({
       ...this.state,
       selectedProviderType: web3 ? providerType : ProviderType.None,
-      isTestModalOpen: false,
+      isProviderMenuModalOpen: false,
       web3: web3
     });
   };
