@@ -35,7 +35,7 @@ export class TradePage extends Component<any, ITradePageState> {
       tradeType: TradeType.BUY,
       tradeAsset: Asset.UNKNOWN,
       tradePositionType: PositionType.SHORT,
-      tradeLeverage: 2
+      tradeLeverage: 0
     };
   }
 
@@ -99,7 +99,7 @@ export class TradePage extends Component<any, ITradePageState> {
       tradeType: TradeType.BUY,
       tradeAsset: Asset.UNKNOWN,
       tradePositionType: PositionType.SHORT,
-      tradeLeverage: 2
+      tradeLeverage: 0
     });
   };
 
