@@ -1,8 +1,8 @@
 {
-  "Alchemy_ApiKey": "",
+  "Alchemy_ApiKey": "oWzHvMW3ZZHWtI2nlx0qJvCx3WiIE9FY",
   "Bitski_ClientId": "",
   "Bitski_CallbackUrl": "",
-  "Fortmatic_ApiKey": "",
-  "Portis_DAppId": "",
-  "Portis_Network": "mainnet"
+  "Fortmatic_ApiKey": "pk_test_2F78A9B8697652FA",
+  "Portis_DAppId": "32537ad9-601e-4854-80a2-216dcea0fed6",
+  "Portis_Network": "kovan"
 }
