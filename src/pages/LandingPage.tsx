@@ -10,7 +10,7 @@ export class LandingPage extends Component {
         <HeaderHome />
         <main className="landing-page__main">
           <div className="landing-page__jumbo">
-            <h1><span className="landing-page__jumbo-header">The simplest way to margin trade cryptocurrency</span></h1>
+            <h1><span className="landing-page__jumbo-header">Margin made dead simple</span></h1>
             <div className="landing-page__jumbo-action-container">
               <div className="landing-page__jumbo-action">
                 <div className="landing-page__jumbo-action-description">Earn passive income using tokenized loans</div>
