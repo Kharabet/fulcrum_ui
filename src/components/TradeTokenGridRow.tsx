@@ -3,7 +3,6 @@ import React, { Component } from "react";
 import { Asset } from "../domain/Asset";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
-import { IPriceDataPoint } from "../domain/IPriceDataPoint";
 import { PositionType } from "../domain/PositionType";
 import { TradeRequest } from "../domain/TradeRequest";
 import { TradeTokenKey } from "../domain/TradeTokenKey";
@@ -27,25 +26,17 @@ export interface ITradeTokenGridRowProps {
 interface ITradeTokenGridRowState {
   assetDetails: AssetDetails | null;
   leverage: number;
-
-  latestPriceDataPoint: IPriceDataPoint;
-  profit: BigNumber | null;
 }
 
 export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITradeTokenGridRowState> {
   constructor(props: ITradeTokenGridRowProps, context?: any) {
     super(props, context);
 
-    const tradeTokenKey = this.getTradeTokenGridRowSelectionKey(this.props.defaultLeverage);
     const assetDetails = AssetsDictionary.assets.get(props.asset);
-    const latestPriceDataPoint = FulcrumProvider.getPriceLatestDataPoint(tradeTokenKey);
-    const profit = FulcrumProvider.getProfit(tradeTokenKey);
 
     this.state = {
       leverage: this.props.defaultLeverage,
-      assetDetails: assetDetails || null,
-      latestPriceDataPoint: latestPriceDataPoint,
-      profit: profit
+      assetDetails: assetDetails || null
     };
   }
 
@@ -53,16 +44,34 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
     return new TradeTokenKey(this.props.asset, this.props.positionType, leverage);
   }
 
+  public shouldComponentUpdate(
+    nextProps: Readonly<ITradeTokenGridRowProps>,
+    nextState: Readonly<ITradeTokenGridRowState>,
+    nextContext: any
+  ): boolean {
+    const currentTradeTokenKey = this.getTradeTokenGridRowSelectionKey(this.state.leverage);
+    const nextTradeTokenKey = this.getTradeTokenGridRowSelectionKey(nextState.leverage);
+
+    return (
+      nextState.leverage !== this.state.leverage ||
+      (nextProps.selectedKey.toString() === nextTradeTokenKey.toString()) !==
+        (this.props.selectedKey.toString() === currentTradeTokenKey.toString())
+    );
+  }
+
   public render() {
     if (!this.state.assetDetails) {
       return null;
     }
 
-    const rowSelectionKey = this.getTradeTokenGridRowSelectionKey();
+    const tradeTokenKey = this.getTradeTokenGridRowSelectionKey(this.state.leverage);
+    const latestPriceDataPoint = FulcrumProvider.getPriceLatestDataPoint(tradeTokenKey);
+    const bnPrice = new BigNumber(latestPriceDataPoint.price);
+    const bnChange24h = new BigNumber(latestPriceDataPoint.change24h);
+    const profit = FulcrumProvider.getTradeProfit(tradeTokenKey);
+
     const isActiveClassName =
-      rowSelectionKey.toString() === this.props.selectedKey.toString() ? "trade-token-grid-row--active" : "";
-    const bnPrice = new BigNumber(this.state.latestPriceDataPoint.price);
-    const bnChange24h = new BigNumber(this.state.latestPriceDataPoint.change24h);
+      tradeTokenKey.toString() === this.props.selectedKey.toString() ? "trade-token-grid-row--active" : "";
 
     return (
       <div className={`trade-token-grid-row ${isActiveClassName}`} onClick={this.onSelectClick}>
@@ -88,9 +97,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
         <div className="trade-token-grid-row__col-change24h">
           <Change24HMarker value={bnChange24h} size={Change24HMarkerSize.MEDIUM} />
         </div>
-        <div className="trade-token-grid-row__col-profit">
-          {this.state.profit ? `$${this.state.profit.toFixed(2)}` : "-"}
-        </div>
+        <div className="trade-token-grid-row__col-profit">{profit ? `$${profit.toFixed(2)}` : "-"}</div>
         <div className="trade-token-grid-row__col-action">
           <button className="trade-token-grid-row__buy-button" onClick={this.onBuyClick}>
             {TradeType.BUY}

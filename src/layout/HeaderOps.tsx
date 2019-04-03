@@ -3,7 +3,11 @@ import { OnChainIndicator } from "../components/OnChainIndicator";
 import { HeaderLogo } from "./HeaderLogo";
 import { HeaderMenu, IHeaderMenuProps } from "./HeaderMenu";
 
-export class HeaderOps extends Component {
+export interface IHeaderOpsProps {
+  doNetworkConnect: () => void;
+}
+
+export class HeaderOps extends Component<IHeaderOpsProps> {
   private _menu: IHeaderMenuProps = {
     items: [
       { id: 0, title: "Home", link: "/" },
@@ -22,7 +26,7 @@ export class HeaderOps extends Component {
           <HeaderMenu items={this._menu.items} />
         </div>
         <div className="header__right">
-          <OnChainIndicator />
+          <OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />
         </div>
       </header>
     );

@@ -1,12 +1,15 @@
 import BigNumber from "bignumber.js";
 import { EventEmitter } from "events";
+import moment from "moment";
 import Web3 from "web3";
 import { Asset } from "../domain/Asset";
 import { IPriceDataPoint } from "../domain/IPriceDataPoint";
 import { LendRequest } from "../domain/LendRequest";
+import { LendType } from "../domain/LendType";
 import { ProviderType } from "../domain/ProviderType";
 import { TradeRequest } from "../domain/TradeRequest";
 import { TradeTokenKey } from "../domain/TradeTokenKey";
+import { TradeType } from "../domain/TradeType";
 import { Web3ConnectionFactory } from "../domain/Web3ConnectionFactory";
 import { ProviderChangedEvent } from "./events/ProviderChangedEvent";
 import { FulcrumProviderEvents } from "./FulcrumProviderEvents";
@@ -33,7 +36,18 @@ class FulcrumProvider {
   public async setWeb3Provider(providerType: ProviderType) {
     this.web3 = await Web3ConnectionFactory.getWeb3Connection(providerType);
     this.providerType = this.web3 ? providerType : ProviderType.None;
-
+    if (this.web3) {
+      // MetaMask-only code
+      if (this.providerType === ProviderType.MetaMask) {
+        // @ts-ignore
+        this.web3.currentProvider.publicConfigStore.on("update", result =>
+          this.eventEmitter.emit(
+            FulcrumProviderEvents.ProviderChanged,
+            new ProviderChangedEvent(this.providerType, this.web3)
+          )
+        );
+      }
+    }
     this.eventEmitter.emit(
       FulcrumProviderEvents.ProviderChanged,
       new ProviderChangedEvent(this.providerType, this.web3)
@@ -42,7 +56,7 @@ class FulcrumProvider {
 
   public onLendConfirmed = (request: LendRequest) => {
     if (request) {
-      alert(`loan ${request.amount} of ${request.asset}`);
+      alert(`${request.lendType} ${request.amount} of ${request.asset}`);
     }
   };
 
@@ -68,6 +82,10 @@ class FulcrumProvider {
   public getPriceDataPoints = (selectedKey: TradeTokenKey, samplesCount: number): IPriceDataPoint[] => {
     const result: IPriceDataPoint[] = [];
 
+    const timeUnit = "hour";
+    const beginningTime = moment()
+      .startOf(timeUnit)
+      .subtract(samplesCount, timeUnit);
     const priceBase = 40;
     let priceDiff = Math.round(Math.random() * 2000) / 100;
     let change24h = 0;
@@ -76,7 +94,10 @@ class FulcrumProvider {
       change24h = ((priceDiffNew - priceDiff) / (priceBase + priceDiff)) * 100;
       priceDiff = priceDiffNew;
 
-      result.push({ price: priceBase + priceDiff, change24h: change24h });
+      result.push({ timeStamp: beginningTime.unix(), price: priceBase + priceDiff, change24h: change24h });
+
+      // add mutates beginningTime
+      beginningTime.add(1, timeUnit);
     }
 
     return result;
@@ -98,10 +119,13 @@ class FulcrumProvider {
           pswBTC4x (wBTC Short 4x leverage) -> 10.12 wBTC per pswBTC4x
   */
   public getPriceLatestDataPoint = (selectedKey: TradeTokenKey): IPriceDataPoint => {
+    const timeUnit = "hour";
+    const timeStamp = moment().startOf(timeUnit);
     const priceBase = 40;
     const priceDiff = Math.round(Math.random() * 2000) / 100;
     const change24h = Math.round(Math.random() * 1000) / 100 - 5;
     return {
+      timeStamp: timeStamp.unix(),
       price: priceBase + priceDiff,
       change24h: change24h
     };
@@ -109,9 +133,14 @@ class FulcrumProvider {
 
   // both iTokens and pTokens have tokenPrice() (current price)  and checkpointPrice() (price at last checkpoint)
   // profit = (tokenPrice - checkpointPrice) * tokenBalance / 10**36
-  public getProfit = (selectedKey: TradeTokenKey): BigNumber | null => {
+  public getLendProfit = (asset: Asset): BigNumber | null => {
     // should return null if no data (not traded asset), new BigNumber(0) if no profit
-    return new BigNumber(Math.round(Math.random() * 1000) / 100);
+    return Math.random() >= 0.5 ? new BigNumber(Math.round(Math.random() * 1000) / 100) : null;
+  };
+
+  public getTradeProfit = (selectedKey: TradeTokenKey): BigNumber | null => {
+    // should return null if no data (not traded asset), new BigNumber(0) if no profit
+    return Math.random() >= 0.5 ? new BigNumber(Math.round(Math.random() * 1000) / 100) : null;
   };
 
   // when buying a pToken (trade screen), you need to check "liquidity" to ensure there is enough to buy the pToken
@@ -127,12 +156,12 @@ class FulcrumProvider {
       psMKR in MKR, but for long tokens, plETH in DAI and plMKR in DAI. pTokens have mintWithToken and 
       burnToToken funtions though. So you can buy or cash out with any supported Kyber asset
   */
-  
-  public getMaxTradeValue = (selectedKey: TradeTokenKey): BigNumber => {
+
+  public getMaxTradeValue = (tradeType: TradeType, selectedKey: TradeTokenKey): BigNumber => {
     return new BigNumber(10);
   };
 
-  public getMaxLendValue = (asset: Asset): BigNumber => {
+  public getMaxLendValue = (lendType: LendType, asset: Asset): BigNumber => {
     return new BigNumber(15);
   };
 

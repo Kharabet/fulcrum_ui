@@ -37,10 +37,10 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
   constructor(props: ITradeFormProps, context?: any) {
     super(props, context);
 
-    const tradeTokenKey = this.getTradeTokenGridRowSelectionKey(this.props.leverage);
+    const tradeTokenKey = this.getTradeTokenGridRowSelectionKey(props.leverage);
     const assetDetails = AssetsDictionary.assets.get(props.asset);
     const latestPriceDataPoint = FulcrumProvider.getPriceLatestDataPoint(tradeTokenKey);
-    const maxTradeValue = FulcrumProvider.getMaxTradeValue(tradeTokenKey);
+    const maxTradeValue = FulcrumProvider.getMaxTradeValue(props.tradeType, tradeTokenKey);
     const tradedAmountEstimate = FulcrumProvider.getTradedAmountEstimate(
       new TradeRequest(props.tradeType, props.asset, props.positionType, props.leverage, maxTradeValue)
     );
@@ -82,12 +82,18 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       this.props.tradeType === TradeType.BUY ? "trade-form__submit-button--buy" : "trade-form__submit-button--sell";
 
     const positionTypePrefix = this.props.positionType === PositionType.SHORT ? "ps" : "pL";
+    const tokenNameBase = this.state.assetDetails.displayName;
+    const tokenNamePosition = `${positionTypePrefix}${this.state.assetDetails.displayName}${this.props.leverage}x`;
+
+    const tokenNameSource = this.props.tradeType === TradeType.BUY ? tokenNameBase : tokenNamePosition;
+    const tokenNameDestination = this.props.tradeType === TradeType.BUY ? tokenNamePosition : tokenNameBase;
+
     const bnPrice = new BigNumber(this.state.latestPriceDataPoint.price);
 
     return (
       <form className="trade-form" onSubmit={this.onSubmitClick}>
         <div className="trade-form__image" style={divStyle}>
-          <img src={this.state.assetDetails.logoSvg} alt={this.state.assetDetails.displayName} />
+          <img src={this.state.assetDetails.logoSvg} alt={tokenNameSource} />
         </div>
         <div className="trade-form__form-container">
           <div className="trade-form__form-values-container">
@@ -96,7 +102,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
             </div>
             <div className="trade-form__kv-container trade-form__kv-container--w_dots">
               <div className="trade-form__label">Token</div>
-              <div className="trade-form__value">{this.state.assetDetails.displayName}</div>
+              <div className="trade-form__value">{tokenNameSource}</div>
             </div>
             <div className="trade-form__kv-container trade-form__kv-container--w_dots">
               <div className="trade-form__label">Leverage</div>
@@ -108,7 +114,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
             </div>
             <div className="trade-form__kv-container">
               <div className="trade-form__label">Amount</div>
-              <div className="trade-form__value">{this.state.assetDetails.displayName}</div>
+              <div className="trade-form__value">{tokenNameSource}</div>
             </div>
             <input
               type="text"
@@ -123,8 +129,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
               </div>
               <div className="trade-form__value trade-form__value--no-color">
                 <span className="rounded-mark">?</span>
-                &nbsp; {this.state.tradedAmountEstimate.toFixed(2)} {positionTypePrefix}
-                {this.state.assetDetails.displayName}{this.props.leverage}x
+                &nbsp; {this.state.tradedAmountEstimate.toFixed(2)} {tokenNameDestination}
               </div>
             </div>
           </div>
@@ -174,9 +179,15 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     }
 
     const tradeTokenKey = this.getTradeTokenGridRowSelectionKey();
-    const maxTradeValue = FulcrumProvider.getMaxTradeValue(tradeTokenKey);
+    const maxTradeValue = FulcrumProvider.getMaxTradeValue(this.props.tradeType, tradeTokenKey);
     const tradedAmountEstimate = FulcrumProvider.getTradedAmountEstimate(
-      new TradeRequest(this.props.tradeType, this.props.asset, this.props.positionType, this.props.leverage, maxTradeValue)
+      new TradeRequest(
+        this.props.tradeType,
+        this.props.asset,
+        this.props.positionType,
+        this.props.leverage,
+        maxTradeValue
+      )
     );
     this.setState({
       ...this.state,

@@ -16,14 +16,16 @@
 }
 
 .token-selector-item__image {
+  display: inline-block;
   height: 4rem;
+  width: 50%;
   margin-top: 0.75rem;
   margin-bottom: 1rem;
 
   img {
+    display: inline-block;
     height: 4rem;
     width: 4rem;
-    display: inline-block;
   }
 }
 
@@ -42,6 +44,31 @@
   letter-spacing: -0.9px;
   text-align: left;
   color: #ffffff;
+}
+
+.token-selector-item__profit-container {
+  display: inline-block;
+  width: 50%;
+}
+
+.token-selector-item__profit-title {
+  font-size: .75rem;
+  font-weight: normal;
+  font-style: normal;
+  font-stretch: normal;
+  letter-spacing: normal;
+  text-align: right;
+  color: #acb5c2;
+}
+
+.token-selector-item__profit-value {
+  font-size: 1rem;
+  font-weight: 600;
+  font-style: normal;
+  font-stretch: normal;
+  letter-spacing: -0.4px;
+  text-align: right;
+  color: #ffe546;
 }
 
 .token-selector-item__interest-rate-container {
@@ -69,17 +96,42 @@
   color: #ffe546;
 }
 
-.token-selector-item__loan-button {
-  display: block;
+.token-selector-item__actions {
+  margin-bottom: 1.5rem;
+}
+
+@mixin token-selector-item__button {
+  display: inline-block;
   cursor: pointer;
 
   border: 0;
   height: 40px;
-  width: 100%;
   border-radius: 100px;
-  background-color: #69bf83;
   color: #ffffff;
 
   text-transform: uppercase;
   outline: none;
+}
+
+.token-selector-item__lend-button {
+  @include token-selector-item__button();
+
+  background-color: #69bf83;
+}
+
+.token-selector-item__lend-button--size-full {
+  width: 100%;
+}
+
+.token-selector-item__lend-button--size-half {
+  width: 45%;
+  margin-right: 5%;
+}
+
+.token-selector-item__un-lend-button {
+  @include token-selector-item__button();
+
+  width: 45%;
+  margin-left: 5%;
+  background-color: #ff5353;
 }

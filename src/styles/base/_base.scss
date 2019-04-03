@@ -7,17 +7,18 @@
 }
 
 body {
-  font-family: 'Open Sans', sans-serif;
+  font-family: "Open Sans", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
   height: 100vh;
 
+  background-color: #37414a;
   // background gradient
-  background-color: #282F36;
-  background-image: linear-gradient(to bottom right, #434F5C, #282F36);
+  // background-color: #282F36;
+  // background-image: linear-gradient(to bottom right, #434F5C, #282F36);
 }
 
 input {
-  font-family: 'Open Sans', sans-serif;
+  font-family: "Open Sans", sans-serif;
 }

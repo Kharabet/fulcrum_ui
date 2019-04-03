@@ -47,6 +47,8 @@
 }
 
 .trade-form__actions-container {
+  @include clearfix();
+
 }
 
 .trade-form__position-type-container {
@@ -60,7 +62,7 @@
 }
 
 .trade-form__kv-container--w_dots {
-  background-image: url("../assets/dotted_ line.png");
+  background-image: url("../assets/dotted_line.png");
   background-repeat: repeat-x;
   background-position-y: 1.25rem;
 }
@@ -86,7 +88,7 @@
   &:focus {
     outline: none;
   }
-  //background-image: url("../assets/dotted_ line.png");
+  //background-image: url("../assets/dotted_line.png");
   //background-repeat: repeat-x;
   //background-position-y: 1.25rem;
 }

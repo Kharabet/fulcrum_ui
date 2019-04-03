@@ -1,0 +1,92 @@
+.landing-page {
+  width: $page-max-width;
+
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+}
+
+.landing-page__main {
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: top right;;
+  background-image: url("../assets/home_illustration.png");
+
+  margin-bottom: 8rem;
+}
+
+.landing-page__jumbo {
+  width: 37rem;
+
+  h1 {
+    margin-bottom: 5.75rem;
+  }
+}
+
+.landing-page__jumbo-header {
+  font-size: 4rem;
+  font-weight: 800;
+  font-style: normal;
+  font-stretch: normal;
+  line-height: 1.25;
+  letter-spacing: normal;
+  text-align: left;
+  color: #ffffff;
+}
+
+.landing-page__jumbo-action {
+  display: inline-block;
+  width: 13.5rem;
+
+  &:first-child {
+    padding-right: 2rem;
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  &:last-child {
+    padding-left: 2rem;
+  }
+}
+
+.landing-page__jumbo-action-container {
+
+}
+
+.landing-page__jumbo-action-description {
+  font-size: 1rem;
+  font-weight: 600;
+  font-style: normal;
+  font-stretch: normal;
+  line-height: 1.5;
+  letter-spacing: -0.2px;
+  text-align: center;
+  color: #acb5c2;
+
+  margin-bottom: 1.25rem;
+}
+
+.landing-page__jumbo-action-button {
+  display: block;
+  line-height: 3.5rem;
+  height: 3.5rem;
+  width: 100%;
+  border-width: 0;
+  border-radius: 100px;
+  background-color: #69bf83;
+
+  font-size: 1rem;
+  font-weight: 600;
+  font-style: normal;
+  font-stretch: normal;
+  letter-spacing: -0.4px;
+  text-align: center;
+  color: #ffffff;
+
+  text-decoration: none;
+
+  cursor: pointer;
+
+  &:focus {
+    outline: none;
+  }
+}

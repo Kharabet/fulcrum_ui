@@ -70,7 +70,7 @@ export class Web3ConnectionFactory {
   }
 
   private static getProviderAlchemy(): Provider | null {
-    // TODO: add Alchemy implementation (https://alchemyapi.io/)
-    return null;
+    const url = `https://eth-kovan.alchemyapi.io/jsonrpc/${configProviders.Alchemy_ApiKey}`;
+    return new Web3.providers.HttpProvider(url);
   }
 }

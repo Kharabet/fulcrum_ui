@@ -47,6 +47,8 @@
 }
 
 .lend-form__actions-container {
+  @include clearfix();
+  
 }
 
 .lend-form__kv-container {
@@ -56,7 +58,7 @@
 }
 
 .lend-form__kv-container--w_dots {
-  background-image: url("../assets/dotted_ line.png");
+  background-image: url("../assets/dotted_line.png");
   background-repeat: repeat-x;
   background-position-y: 1.25rem;
 }
@@ -82,7 +84,7 @@
   &:focus {
     outline: none;
   }
-  //background-image: url("../assets/dotted_ line.png");
+  //background-image: url("../assets/dotted_line.png");
   //background-repeat: repeat-x;
   //background-position-y: 1.25rem;
 }
@@ -157,8 +159,15 @@
   height: 2.5rem;
   width: 6.5rem;
   border-radius: 100px;
-  background-color: #69bf83;
   color: #ffffff;
   text-transform: uppercase;
   outline: none;
+
+  &--lend {
+    background-color: #69bf83;
+  }
+
+  &--un-lend {
+    background-color: #ff5353;
+  }
 }

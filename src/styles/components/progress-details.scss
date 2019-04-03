@@ -1,0 +1,36 @@
+.progress-details {
+  width: 22rem;
+  padding: 3rem;
+
+  background-color: #444e5a;
+}
+
+.progress-details__label--action {
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  border: 0 none;
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.progress-details__actions-container {
+  @include clearfix();
+}
+
+.progress-details__close-btn {
+  display: inline-block;
+  float: right;
+
+  margin-top: 2rem;
+
+  cursor: pointer;
+  border: 0;
+  background-color: rgba(0, 0, 0, 0);
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  color: #a9b5c7;
+  outline: none;
+}

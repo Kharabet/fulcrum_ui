@@ -1,83 +1,104 @@
 import React, { Component } from "react";
-import Modal from "react-modal";
 import Web3 from "web3";
 import { ProviderType } from "../domain/ProviderType";
+import { ProviderTypeDetails } from "../domain/ProviderTypeDetails";
+import { ProviderTypeDictionary } from "../domain/ProviderTypeDictionary";
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import FulcrumProvider from "../services/FulcrumProvider";
 import { FulcrumProviderEvents } from "../services/FulcrumProviderEvents";
-import { ProviderMenu } from "./ProviderMenu";
 
-interface IOnChainIndicatorState {
-  isProviderMenuModalOpen: boolean;
-  selectedProviderType: ProviderType;
-  web3: Web3 | null;
+export interface IOnChainIndicatorProps {
+  doNetworkConnect: () => void;
 }
 
-export class OnChainIndicator extends Component<any, IOnChainIndicatorState> {
-  constructor(props: any) {
+interface IOnChainIndicatorState {
+  selectedProviderType: ProviderType;
+  web3: Web3 | null;
+  walletAddress: string | null;
+}
+
+export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChainIndicatorState> {
+  constructor(props: IOnChainIndicatorProps) {
     super(props);
 
     this.state = {
-      isProviderMenuModalOpen: false,
       selectedProviderType: FulcrumProvider.providerType,
-      web3: FulcrumProvider.web3
+      web3: FulcrumProvider.web3,
+      walletAddress: null
     };
 
     FulcrumProvider.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
+  public componentDidMount(): void {
+    if (FulcrumProvider.web3) {
+      FulcrumProvider.web3.eth.getAccounts().then(accounts => {
+        const account = accounts ? accounts[0] : null;
+        this.setState({
+          selectedProviderType: FulcrumProvider.providerType,
+          web3: FulcrumProvider.web3,
+          walletAddress: account
+        });
+      });
+    }
+  }
+
+  public static async getDerivedStateFromProps(
+    props: Readonly<IOnChainIndicatorProps>,
+    state: Readonly<IOnChainIndicatorState>
+  ) {
+    if (FulcrumProvider.web3) {
+      const accounts = await FulcrumProvider.web3.eth.getAccounts();
+      const account = accounts ? accounts[0] : null;
+      return {
+        selectedProviderType: FulcrumProvider.providerType,
+        web3: FulcrumProvider.web3,
+        walletAddress: account
+      };
+    }
+
+    return null;
+  }
+
   public render() {
-    const dotStyle = this.state.web3 ? "on-chain-indicator__dot--online" : "on-chain-indicator__dot--offline";
-    const indicatorText = this.state.web3 ? "Online" : "Connect wallet";
+    const providerTypeDetails = ProviderTypeDictionary.providerTypes.get(this.state.selectedProviderType) || null;
+    const walletAddressText = this.state.walletAddress
+      ? `${this.state.walletAddress.slice(1, 6)}...${this.state.walletAddress.slice(
+          this.state.walletAddress.length - 4,
+          this.state.walletAddress.length
+        )}`
+      : "...";
 
     return (
-      <React.Fragment>
-        <Modal
-          isOpen={this.state.isProviderMenuModalOpen}
-          onRequestClose={this.onRequestClose}
-          className="modal-content-div"
-          overlayClassName="modal-overlay-div"
-        >
-          <ProviderMenu
-            selectedProviderType={this.state.selectedProviderType}
-            providerTypes={[ProviderType.MetaMask, ProviderType.Fortmatic, ProviderType.Portis, ProviderType.None]}
-            onSelect={this.onProviderTypeSelect}
-          />
-        </Modal>
-
-        <div className="on-chain-indicator" onClick={this.onNetworkConnect}>
-          <button className="on-chain-indicator__container">
-            <span className="on-chain-indicator__title">
-              <span className={`on-chain-indicator__dot ${dotStyle}`}>&#x25CF;</span>
-              {indicatorText}
-            </span>
-          </button>
-        </div>
-      </React.Fragment>
+      <div className="on-chain-indicator" onClick={this.props.doNetworkConnect}>
+        <button className="on-chain-indicator__container">
+          {this.renderProviderType(providerTypeDetails)}
+          <span className="on-chain-indicator__wallet-address">{walletAddressText}</span>
+        </button>
+      </div>
     );
   }
 
-  public onRequestClose = () => {
-    this.setState({ ...this.state, isProviderMenuModalOpen: false });
-  };
+  public renderProviderType(providerTypeDetails: ProviderTypeDetails | null) {
+    return providerTypeDetails !== null && providerTypeDetails.logoSvg !== null ? (
+      <img
+        className="on-chain-indicator__provider-img"
+        src={providerTypeDetails.logoSvg}
+        alt={providerTypeDetails.displayName}
+      />
+    ) : (
+      <span className="on-chain-indicator__provider-txt">None</span>
+    );
+  }
 
-  public onNetworkConnect = () => {
-    this.setState({ ...this.state, isProviderMenuModalOpen: true });
-  };
-
-  public onProviderTypeSelect = async (providerType: ProviderType) => {
-    await FulcrumProvider.setWeb3Provider(providerType);
-
+  public onProviderChanged = async (event: ProviderChangedEvent) => {
+    const accounts = event.web3 ? await event.web3.eth.getAccounts() : null;
+    const account = accounts ? accounts[0] : null;
     this.setState({
       ...this.state,
-      isProviderMenuModalOpen: false
-    });
-  };
-
-  public onProviderChanged = (event: ProviderChangedEvent) => {
-    this.setState({
-      ...this.state,
-      web3: event.web3
+      selectedProviderType: event.providerType,
+      web3: event.web3,
+      walletAddress: account
     });
   };
 }

@@ -1,0 +1,49 @@
+$block-height: 5rem;
+$content-height: 2.75rem;
+$spinner-line-width: 0.125rem;
+$spinner-spacing-width: 0.125rem;
+
+.token-spinner {
+  display: inline-block;
+  vertical-align: top;
+
+  border: 0;
+  margin: ($block-height - $content-height - 2 * $spinner-line-width - 0.25rem)/2 0; // why -0.25rem needed? (found on practice)
+}
+
+.token-spinner__spinner {
+  display: inline-block;
+
+  border: solid $spinner-line-width #4e4d50;
+  border-top: solid $spinner-line-width #ffffff;
+  border-radius: 50%;
+
+  width: $content-height;
+  height: $content-height;
+
+  margin-left: -($content-height - 2 * $spinner-spacing-width - 2 * $spinner-line-width);
+
+  animation: token-spinner__spinner--spin 2s linear infinite;
+}
+
+@keyframes token-spinner__spinner--spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.token-spinner__img {
+  display: inline-block;
+
+  height: $content-height - 2 * $spinner-spacing-width - 2 * $spinner-line-width;
+  width: $content-height - 2 * $spinner-spacing-width - 2 * $spinner-line-width;
+
+  margin: $spinner-spacing-width;
+
+  position: relative;
+  top: -2 * $spinner-line-width;
+  left: 2 * $spinner-line-width + 2 * $spinner-spacing-width;
+}

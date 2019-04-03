@@ -2,6 +2,35 @@
   margin-top: -5rem;
 }
 
+.price-graph__hovered-time-container {
+}
+
+.price-graph__hovered-time {
+  color: #acb5c2;
+
+  font-size: 0.875rem;
+  font-weight: 600;
+  font-style: normal;
+  font-stretch: normal;
+  letter-spacing: normal;
+  text-align: center;
+}
+
+.price-graph__hovered-time-delimiter {
+  line-height: 2rem;
+  height: 2rem;
+
+  text-align: center;
+
+  & div {
+    display: inline-block;
+    line-height: 1px;
+    height: 1px;
+    width: 1.5rem;
+    background-color: #acb5c2;
+  }
+}
+
 .price-graph__hovered-price-marker {
   font-size: 3rem;
   font-weight: normal;
@@ -23,5 +52,46 @@
 }
 
 .price-graph__graph-container {
+}
 
+.price-graph__timeline {
+  @include clearfix();
+
+  background-image: url("../assets/margin_cell_border.png");
+  background-repeat: repeat-x;
+  background-position-y: 0.625rem;
+}
+
+.price-graph__timeline-from {
+  display: inline-block;
+  float: left;
+
+  padding-right: 1rem;
+
+  color: #ffffff;
+  background-color: #37414a;
+
+  font-size: 0.875rem;
+  font-weight: 600;
+  font-style: normal;
+  font-stretch: normal;
+  letter-spacing: normal;
+  text-align: center;
+}
+
+.price-graph__timeline-to {
+  display: inline-block;
+  float: right;
+
+  padding-left: 1rem;
+
+  color: #ffffff;
+  background-color: #37414a;
+
+  font-size: 0.875rem;
+  font-weight: 600;
+  font-style: normal;
+  font-stretch: normal;
+  letter-spacing: normal;
+  text-align: center;
 }

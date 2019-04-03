@@ -4,7 +4,7 @@ import { LendRequest } from "../domain/LendRequest";
 import { LendTokenSelectorItem } from "./LendTokenSelectorItem";
 
 export interface ILendTokenSelectorProps {
-  onLoan: (request: LendRequest) => void;
+  onLend: (request: LendRequest) => void;
 }
 
 export class LendTokenSelector extends Component<ILendTokenSelectorProps> {
@@ -20,8 +20,8 @@ export class LendTokenSelector extends Component<ILendTokenSelectorProps> {
   ];
 
   public render() {
-    const tokenItems = this.assets.map(e => <LendTokenSelectorItem key={e} asset={e} onLoan={this.props.onLoan} />);
+    const tokenItems = this.assets.map(e => <LendTokenSelectorItem key={e} asset={e} onLend={this.props.onLend} />);
 
-    return <div className="loan-token-selector">{tokenItems}</div>;
+    return <div className="lend-token-selector">{tokenItems}</div>;
   }
 }

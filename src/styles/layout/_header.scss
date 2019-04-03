@@ -8,16 +8,18 @@
 
   .header__left {
     display: inline-block;
+    vertical-align: top;
 
     height: 3rem;
-    width: 30%;
+    width: 35%;
   }
 
   .header__center {
     display: inline-block;
+    vertical-align: top;
 
     height: 3rem;
-    width: 40%;
+    width: 30%;
 
     .header-menu {
       position: relative;
@@ -28,9 +30,10 @@
 
   .header__right {
     display: inline-block;
+    vertical-align: top;
     
     height: 3rem;
-    width: 30%;
+    width: 35%;
 
     .on-chain-indicator {
       position: relative;

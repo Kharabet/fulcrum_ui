@@ -13,6 +13,10 @@ import { Footer } from "../layout/Footer";
 import { HeaderOps } from "../layout/HeaderOps";
 import FulcrumProvider from "../services/FulcrumProvider";
 
+export interface ITradePageProps {
+  doNetworkConnect: () => void;
+}
+
 interface ITradePageState {
   selectedKey: TradeTokenKey;
   isTradeModalOpen: boolean;
@@ -23,14 +27,13 @@ interface ITradePageState {
   priceGraphData: IPriceDataPoint[];
 }
 
-export class TradePage extends Component<any, ITradePageState> {
+export class TradePage extends Component<ITradePageProps, ITradePageState> {
   constructor(props: any) {
     super(props);
 
-    const graphData = FulcrumProvider.getPriceDataPoints(TradeTokenKey.empty(), 15);
     this.state = {
       selectedKey: TradeTokenKey.empty(),
-      priceGraphData: graphData,
+      priceGraphData: [],
       isTradeModalOpen: false,
       tradeType: TradeType.BUY,
       tradeAsset: Asset.UNKNOWN,
@@ -39,10 +42,16 @@ export class TradePage extends Component<any, ITradePageState> {
     };
   }
 
+  public componentDidMount(): void {
+    if (!FulcrumProvider.web3) {
+      this.props.doNetworkConnect();
+    }
+  }
+
   public render() {
     return (
       <div className="trade-page">
-        <HeaderOps />
+        <HeaderOps doNetworkConnect={this.props.doNetworkConnect} />
         <main>
           <PriceGraph data={this.state.priceGraphData} />
           <TradeTokenGrid

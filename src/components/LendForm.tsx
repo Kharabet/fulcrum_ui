@@ -4,9 +4,11 @@ import { Asset } from "../domain/Asset";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { LendRequest } from "../domain/LendRequest";
+import { LendType } from "../domain/LendType";
 import FulcrumProvider from "../services/FulcrumProvider";
 
 export interface ILendFormProps {
+  lendType: LendType;
   asset: Asset;
 
   onSubmit: (request: LendRequest) => void;
@@ -31,8 +33,10 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
 
     const assetDetails = AssetsDictionary.assets.get(props.asset);
     const interestRate = FulcrumProvider.getTokenInterestRate(props.asset);
-    const maxLendValue = FulcrumProvider.getMaxLendValue(props.asset);
-    const lendedAmountEstimate = FulcrumProvider.getLendedAmountEstimate(new LendRequest(props.asset, maxLendValue));
+    const maxLendValue = FulcrumProvider.getMaxLendValue(props.lendType, props.asset);
+    const lendedAmountEstimate = FulcrumProvider.getLendedAmountEstimate(
+      new LendRequest(props.lendType, props.asset, maxLendValue)
+    );
 
     this.state = {
       lendAmountText: maxLendValue.toFixed(),
@@ -63,16 +67,24 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
       backgroundImage: `url(${this.state.assetDetails.bgSvg})`
     };
 
+    const submitClassName =
+      this.props.lendType === LendType.LEND ? "lend-form__submit-button--lend" : "lend-form__submit-button--un-lend";
+    const tokenNameBase = this.state.assetDetails.displayName;
+    const tokenNamePosition = `i${this.state.assetDetails.displayName}`;
+
+    const tokenNameSource = this.props.lendType === LendType.LEND ? tokenNameBase : tokenNamePosition;
+    const tokenNameDestination = this.props.lendType === LendType.LEND ? tokenNamePosition : tokenNameBase;
+
     return (
       <form className="lend-form" onSubmit={this.onSubmitClick}>
         <div className="lend-form__image" style={divStyle}>
-          <img src={this.state.assetDetails.logoSvg} alt={this.state.assetDetails.displayName} />
+          <img src={this.state.assetDetails.logoSvg} alt={tokenNameSource} />
         </div>
         <div className="lend-form__form-container">
           <div className="lend-form__form-values-container">
             <div className="lend-form__kv-container lend-form__kv-container--w_dots">
               <div className="lend-form__label">Token</div>
-              <div className="lend-form__value">{this.state.assetDetails.displayName}</div>
+              <div className="lend-form__value">{tokenNameSource}</div>
             </div>
             <div className="lend-form__kv-container lend-form__kv-container--w_dots">
               <div className="lend-form__label">Interest rate</div>
@@ -80,7 +92,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
             </div>
             <div className="lend-form__kv-container">
               <div className="lend-form__label">Amount</div>
-              <div className="lend-form__value">{this.state.assetDetails.displayName}</div>
+              <div className="lend-form__value">{tokenNameSource}</div>
             </div>
             <input
               type="text"
@@ -95,14 +107,14 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
               </div>
               <div className="lend-form__value lend-form__value--no-color">
                 <span className="rounded-mark">?</span>
-                &nbsp; {this.state.lendedAmountEstimate.toFixed(2)} i{this.state.assetDetails.displayName}
+                &nbsp; {this.state.lendedAmountEstimate.toFixed(2)} {tokenNameDestination}
               </div>
             </div>
           </div>
 
           <div className="lend-form__actions-container">
-            <button type="submit" className="lend-form__submit-button">
-              Lend
+            <button type="submit" className={`lend-form__submit-button ${submitClassName}`}>
+              {this.props.lendType}
             </button>
             <button className="lend-form__cancel-button" onClick={this.onCancelClick}>
               <span className="lend-form__label--action">Cancel</span>
@@ -126,7 +138,9 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
     }
 
     // updating stored value only if the new input value is a valid number
-    const lendedAmountEstimate = FulcrumProvider.getLendedAmountEstimate(new LendRequest(this.props.asset, amount));
+    const lendedAmountEstimate = FulcrumProvider.getLendedAmountEstimate(
+      new LendRequest(this.props.lendType, this.props.asset, amount)
+    );
     if (!amount.isNaN()) {
       this.setState({
         ...this.state,
@@ -142,9 +156,9 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
       return null;
     }
 
-    const maxLendValue = FulcrumProvider.getMaxLendValue(this.props.asset);
+    const maxLendValue = FulcrumProvider.getMaxLendValue(this.props.lendType, this.props.asset);
     const lendedAmountEstimate = FulcrumProvider.getLendedAmountEstimate(
-      new LendRequest(this.props.asset, maxLendValue)
+      new LendRequest(this.props.lendType, this.props.asset, maxLendValue)
     );
     this.setState({
       lendAmountText: maxLendValue.toFixed(),
@@ -177,6 +191,6 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
       return;
     }
 
-    this.props.onSubmit(new LendRequest(this.props.asset, this.state.lendAmount));
+    this.props.onSubmit(new LendRequest(this.props.lendType, this.props.asset, this.state.lendAmount));
   };
 }
