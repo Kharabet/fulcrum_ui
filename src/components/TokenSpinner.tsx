@@ -8,7 +8,7 @@ export interface ITokenSpinnerProps {
 
 export class TokenSpinner extends Component<ITokenSpinnerProps> {
   public render() {
-    const asset = AssetsDictionary.assets.get(Asset.wBTC);
+    const asset = AssetsDictionary.assets.get(this.props.asset);
     if (!asset) {
       return null;
     }
