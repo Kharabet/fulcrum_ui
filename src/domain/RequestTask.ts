@@ -1,23 +1,51 @@
+import { EventEmitter } from "events";
+import { TasksQueueEvents } from "../services/events/TasksQueueEvents";
 import { LendRequest } from "./LendRequest";
 import { RequestStatus } from "./RequestStatus";
 import { TradeRequest } from "./TradeRequest";
 
 export class RequestTask {
-  public readonly request: LendRequest | TradeRequest;
-  public readonly status: RequestStatus;
-  public readonly steps: string[];
-  public readonly stepCurrent: number;
+  private eventEmitter: EventEmitter | null = null;
 
-  constructor(request: LendRequest | TradeRequest, status: RequestStatus) {
+  public readonly request: LendRequest | TradeRequest;
+  public status: RequestStatus;
+  public steps: string[];
+  public stepCurrent: number;
+
+  constructor(request: LendRequest | TradeRequest) {
     this.request = request;
-    this.status = status;
-    this.steps = [
-      "Initializing loan",
-      "Detecting token allowance",
-      "Prompting token allowance",
-      "Waiting for token allowance",
-      "Submitting loan",
-    ];
+    this.status = RequestStatus.AWAITING;
+    this.steps = ["Preparing processing..."];
     this.stepCurrent = 1;
+  }
+
+  public setEventEmitter(eventEmitter: EventEmitter) {
+    this.eventEmitter = eventEmitter;
+  }
+
+  public processingStart(steps: string[]) {
+    steps.forEach(e => this.steps.push(e));
+    this.status = RequestStatus.IN_PROGRESS;
+    this.stepCurrent = 2;
+
+    if (this.eventEmitter) {
+      this.eventEmitter.emit(TasksQueueEvents.TaskChanged);
+    }
+  }
+
+  public processingStepNext() {
+    this.stepCurrent++;
+
+    if (this.eventEmitter) {
+      this.eventEmitter.emit(TasksQueueEvents.TaskChanged);
+    }
+  }
+
+  public processingEnd(isSuccessfull: boolean) {
+    this.status = isSuccessfull ? RequestStatus.DONE : RequestStatus.FAILED;
+
+    if (this.eventEmitter) {
+      this.eventEmitter.emit(TasksQueueEvents.TaskChanged);
+    }
   }
 }

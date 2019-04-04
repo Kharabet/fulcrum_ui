@@ -6,9 +6,9 @@ import { ProviderType } from "../domain/ProviderType";
 import { LandingPage } from "../pages/LandingPage";
 import { LendPage } from "../pages/LendPage";
 import { TradePage } from "../pages/TradePage";
+import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import FulcrumProvider from "../services/FulcrumProvider";
-import { FulcrumProviderEvents } from "../services/FulcrumProviderEvents";
 import { ProgressFragment } from "./ProgressFragment";
 import { ProviderMenu } from "./ProviderMenu";
 

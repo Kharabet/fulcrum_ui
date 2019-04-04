@@ -1,20 +1,14 @@
-import BigNumber from "bignumber.js";
 import React, { Component } from "react";
 import Modal from "react-modal";
-import { Asset } from "../domain/Asset";
-import { LendRequest } from "../domain/LendRequest";
-import { LendType } from "../domain/LendType";
-import { PositionType } from "../domain/PositionType";
-import { RequestStatus } from "../domain/RequestStatus";
 import { RequestTask } from "../domain/RequestTask";
-import { TradeRequest } from "../domain/TradeRequest";
-import { TradeType } from "../domain/TradeType";
+import { TasksQueueEvents } from "../services/events/TasksQueueEvents";
+import TasksQueue from "../services/TasksQueue";
 import { ProgressBar } from "./ProgressBar";
 import { ProgressDetails } from "./ProgressDetails";
 
 export interface IProgressFragmentState {
-  requestTasks: RequestTask[];
   isProgressDetailsModalOpen: boolean;
+  requestTasks: RequestTask[];
 }
 
 export class ProgressFragment extends Component<any, IProgressFragmentState> {
@@ -23,15 +17,11 @@ export class ProgressFragment extends Component<any, IProgressFragmentState> {
 
     this.state = {
       isProgressDetailsModalOpen: false,
-      requestTasks: [
-        new RequestTask(new LendRequest(LendType.LEND, Asset.wBTC, new BigNumber(5)), RequestStatus.IN_PROGRESS),
-        new RequestTask(new LendRequest(LendType.UNLEND, Asset.ETH, new BigNumber(5)), RequestStatus.AWAITING),
-        new RequestTask(
-          new TradeRequest(TradeType.BUY, Asset.KNC, PositionType.SHORT, 2, new BigNumber(5)),
-          RequestStatus.AWAITING
-        )
-      ]
+      requestTasks: TasksQueue.getTasksList()
     };
+
+    TasksQueue.on(TasksQueueEvents.QueueChanged, this.onTasksQueueChanged);
+    TasksQueue.on(TasksQueueEvents.TaskChanged, this.onTasksQueueChanged);
   }
 
   public render() {
@@ -56,5 +46,9 @@ export class ProgressFragment extends Component<any, IProgressFragmentState> {
 
   public onRequestClose = () => {
     this.setState({ ...this.state, isProgressDetailsModalOpen: false });
+  };
+
+  public onTasksQueueChanged = () => {
+    this.setState({ ...this.state, requestTasks: TasksQueue.getTasksList() });
   };
 }

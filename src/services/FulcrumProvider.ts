@@ -7,23 +7,30 @@ import { IPriceDataPoint } from "../domain/IPriceDataPoint";
 import { LendRequest } from "../domain/LendRequest";
 import { LendType } from "../domain/LendType";
 import { ProviderType } from "../domain/ProviderType";
+import { RequestTask } from "../domain/RequestTask";
 import { TradeRequest } from "../domain/TradeRequest";
 import { TradeTokenKey } from "../domain/TradeTokenKey";
 import { TradeType } from "../domain/TradeType";
 import { Web3ConnectionFactory } from "../domain/Web3ConnectionFactory";
+import TasksQueue from "../services/TasksQueue";
+import { FulcrumProviderEvents } from "./events/FulcrumProviderEvents";
 import { ProviderChangedEvent } from "./events/ProviderChangedEvent";
-import { FulcrumProviderEvents } from "./FulcrumProviderEvents";
+import { TasksQueueEvents } from "./events/TasksQueueEvents";
 
 class FulcrumProvider {
   public static Instance: FulcrumProvider;
 
-  public eventEmitter: EventEmitter;
+  private isProcessing: boolean = false;
+  private isChecking: boolean = false;
+
+  public readonly eventEmitter: EventEmitter;
   public providerType: ProviderType = ProviderType.None;
   public web3: Web3 | null = null;
 
   constructor() {
     // init
     this.eventEmitter = new EventEmitter();
+    TasksQueue.on(TasksQueueEvents.Enqueued, this.onTaskEnqueued);
 
     // singleton
     if (!FulcrumProvider.Instance) {
@@ -56,17 +63,13 @@ class FulcrumProvider {
 
   public onLendConfirmed = (request: LendRequest) => {
     if (request) {
-      alert(`${request.lendType} ${request.amount} of ${request.asset}`);
+      TasksQueue.enqueue(new RequestTask(request));
     }
   };
 
   public onTradeConfirmed = (request: TradeRequest) => {
     if (request) {
-      alert(
-        `${request.tradeType} ${request.positionType} ${request.amount} of ${request.asset} with ${
-          request.leverage
-        }x leverage`
-      );
+      TasksQueue.enqueue(new RequestTask(request));
     }
   };
 
@@ -172,6 +175,97 @@ class FulcrumProvider {
   public getLendedAmountEstimate = (request: LendRequest): BigNumber => {
     return request.amount.div(3);
   };
+
+  private onTaskEnqueued = async (latestTask: RequestTask) => {
+    if (!(this.isProcessing || this.isChecking)) {
+      do {
+        this.isProcessing = true;
+        this.isChecking = false;
+
+        try {
+          const task = TasksQueue.peek();
+
+          if (task) {
+            if (task.request instanceof LendRequest) {
+              await this.processLendRequestTask(task);
+            }
+
+            if (task.request instanceof TradeRequest) {
+              await this.processTradeRequestTask(task);
+            }
+          }
+        } finally {
+          TasksQueue.dequeue();
+        }
+
+        this.isChecking = true;
+        this.isProcessing = false;
+      } while (TasksQueue.any());
+      this.isChecking = false;
+    }
+  };
+
+  private processLendRequestTask = async (task: RequestTask) => {
+    try {
+      task.processingStart([
+        "Initializing loan",
+        "Detecting token allowance",
+        "Prompting token allowance",
+        "Waiting for token allowance",
+        "Submitting loan"
+      ]);
+      await this.sleep(1000);
+
+      task.processingStepNext();
+      await this.sleep(1000);
+
+      task.processingStepNext();
+      await this.sleep(1000);
+
+      task.processingStepNext();
+      await this.sleep(1000);
+
+      task.processingStepNext();
+      await this.sleep(1000);
+
+      task.processingEnd(true);
+    } catch (e) {
+      task.processingEnd(false);
+    }
+  };
+
+  private processTradeRequestTask = async (task: RequestTask) => {
+    try {
+      task.processingStart([
+        "Initializing trade",
+        "Detecting token allowance",
+        "Prompting token allowance",
+        "Waiting for token allowance",
+        "Submitting loan"
+      ]);
+      await this.sleep(1000);
+
+      task.processingStepNext();
+      await this.sleep(1000);
+
+      task.processingStepNext();
+      await this.sleep(1000);
+
+      task.processingStepNext();
+      await this.sleep(1000);
+
+      task.processingStepNext();
+      await this.sleep(1000);
+
+      task.processingEnd(true);
+    } catch (e) {
+      task.processingEnd(false);
+    }
+  };
+
+  private sleep(ms: number) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
 }
 
 // singleton

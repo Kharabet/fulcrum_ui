@@ -3,9 +3,9 @@ import Web3 from "web3";
 import { ProviderType } from "../domain/ProviderType";
 import { ProviderTypeDetails } from "../domain/ProviderTypeDetails";
 import { ProviderTypeDictionary } from "../domain/ProviderTypeDictionary";
+import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import FulcrumProvider from "../services/FulcrumProvider";
-import { FulcrumProviderEvents } from "../services/FulcrumProviderEvents";
 
 export interface IOnChainIndicatorProps {
   doNetworkConnect: () => void;
