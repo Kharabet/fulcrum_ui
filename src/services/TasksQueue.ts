@@ -43,7 +43,7 @@ class TasksQueue {
   }
 
   public peek(): RequestTask | null {
-    return this.any() ? this.requestTasks[this.requestTasks.length - 1] : null;
+    return this.any() ? this.requestTasks[0] : null;
   }
 
   public any(): boolean {
