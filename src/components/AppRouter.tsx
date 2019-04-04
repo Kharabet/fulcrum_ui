@@ -24,7 +24,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
 
     this.state = {
       isProviderMenuModalOpen: false,
-      selectedProviderType: ProviderType.None,
+      selectedProviderType: FulcrumProvider.providerType,
       web3: FulcrumProvider.web3
     };
 
