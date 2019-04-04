@@ -18,7 +18,7 @@ export class TasksListItemDetails extends Component<ITasksListItemDetailsProps> 
     );
   }
 
-  public renderSingleStep = (title: string, index: number, ): ReactNode => {
+  public renderSingleStep = (title: string, index: number): ReactNode => {
     const titleStateClassName = index === this.props.task.stepCurrent
       ? "task-list-item-details__step-title--in-progress"
       : index < this.props.task.stepCurrent
@@ -26,7 +26,7 @@ export class TasksListItemDetails extends Component<ITasksListItemDetailsProps> 
         : "task-list-item-details__step-title--future";
 
     return (
-      <div className="task-list-item-details__step">
+      <div key={index} className="task-list-item-details__step">
         <div className="task-list-item-details__step-img-container">
           { /**/ } &nbsp;
         </div>
