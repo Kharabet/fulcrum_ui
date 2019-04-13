@@ -1,4 +1,4 @@
-import BigNumber from "bignumber.js";
+import { BigNumber } from "@0x/utils";
 import React, { Component } from "react";
 
 export enum Change24HMarkerSize {

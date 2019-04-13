@@ -1,4 +1,4 @@
-import BigNumber from "bignumber.js";
+import { BigNumber } from "@0x/utils";
 import moment from "moment";
 import React, { Component, ReactNode } from "react";
 import { Line, LineChart, ResponsiveContainer, Tooltip, TooltipProps } from "recharts";

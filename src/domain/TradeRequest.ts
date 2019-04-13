@@ -1,4 +1,4 @@
-import BigNumber from "bignumber.js";
+import { BigNumber } from "@0x/utils";
 import moment from "moment";
 import { Asset } from "./Asset";
 import { PositionType } from "./PositionType";

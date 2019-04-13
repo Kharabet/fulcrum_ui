@@ -1,1 +1,556 @@
-{"name":"pToken","address":"","abi":[{"anonymous":false,"inputs":[{"indexed":true,"name":"owner","type":"address"},{"indexed":true,"name":"spender","type":"address"},{"indexed":false,"name":"value","type":"uint256"}],"name":"Approval","type":"event","signature":"0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925"},{"anonymous":false,"inputs":[{"indexed":true,"name":"burner","type":"address"},{"indexed":false,"name":"tokenAmount","type":"uint256"},{"indexed":false,"name":"assetAmount","type":"uint256"},{"indexed":false,"name":"price","type":"uint256"}],"name":"Burn","type":"event","signature":"0x743033787f4738ff4d6a7225ce2bd0977ee5f86b91a902a58f5e4d0b297b4644"},{"anonymous":false,"inputs":[{"indexed":true,"name":"minter","type":"address"},{"indexed":false,"name":"tokenAmount","type":"uint256"},{"indexed":false,"name":"assetAmount","type":"uint256"},{"indexed":false,"name":"price","type":"uint256"}],"name":"Mint","type":"event","signature":"0xb4c03061fb5b7fed76389d5af8f2e0ddb09f8c70d1333abbb62582835e10accb"},{"anonymous":false,"inputs":[{"indexed":true,"name":"previousOwner","type":"address"},{"indexed":true,"name":"newOwner","type":"address"}],"name":"OwnershipTransferred","type":"event","signature":"0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0"},{"anonymous":false,"inputs":[{"indexed":true,"name":"from","type":"address"},{"indexed":true,"name":"to","type":"address"},{"indexed":false,"name":"value","type":"uint256"}],"name":"Transfer","type":"event","signature":"0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"},{"constant":true,"inputs":[{"name":"_owner","type":"address"},{"name":"_spender","type":"address"}],"name":"allowance","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function","signature":"0xdd62ed3e"},{"constant":false,"inputs":[{"name":"_spender","type":"address"},{"name":"_value","type":"uint256"}],"name":"approve","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function","signature":"0x095ea7b3"},{"constant":true,"inputs":[{"name":"_owner","type":"address"}],"name":"assetBalanceOf","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function","signature":"0x06b3efd6"},{"constant":true,"inputs":[],"name":"bZxContract","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function","signature":"0x995363d3"},{"constant":true,"inputs":[],"name":"bZxOracle","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function","signature":"0x96c7871b"},{"constant":true,"inputs":[],"name":"bZxVault","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function","signature":"0x894ca308"},{"constant":true,"inputs":[{"name":"_owner","type":"address"}],"name":"balanceOf","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function","signature":"0x70a08231"},{"constant":false,"inputs":[{"name":"receiver","type":"address"},{"name":"burnAmount","type":"uint256"}],"name":"burnToEther","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"nonpayable","type":"function","signature":"0x81a6b250"},{"constant":false,"inputs":[{"name":"receiver","type":"address"},{"name":"burnTokenAddress","type":"address"},{"name":"burnAmount","type":"uint256"}],"name":"burnToToken","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"nonpayable","type":"function","signature":"0xd01d46e7"},{"constant":true,"inputs":[{"name":"_user","type":"address"}],"name":"checkpointPrice","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function","signature":"0xeebc5081"},{"constant":true,"inputs":[],"name":"decimals","outputs":[{"name":"","type":"uint8"}],"payable":false,"stateMutability":"view","type":"function","signature":"0x313ce567"},{"constant":false,"inputs":[{"name":"_spender","type":"address"},{"name":"_subtractedValue","type":"uint256"}],"name":"decreaseApproval","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function","signature":"0x66188463"},{"constant":false,"inputs":[{"name":"tokenAddress","type":"address"}],"name":"donateAsset","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function","signature":"0x59e239af"},{"constant":false,"inputs":[],"name":"handleSplit","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function","signature":"0x447eed28"},{"constant":false,"inputs":[{"name":"_spender","type":"address"},{"name":"_addedValue","type":"uint256"}],"name":"increaseApproval","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function","signature":"0xd73dd623"},{"constant":true,"inputs":[],"name":"initialPrice","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function","signature":"0x1d0806ae"},{"constant":false,"inputs":[{"name":"_bZxContract","type":"address"},{"name":"_bZxVault","type":"address"},{"name":"_bZxOracle","type":"address"},{"name":"_wethContract","type":"address"},{"name":"_loanTokenAddress","type":"address"},{"name":"_tradeTokenAddress","type":"address"},{"name":"_leverageAmount","type":"uint256"},{"name":"_loanOrderHash","type":"bytes32"},{"name":"_name","type":"string"},{"name":"_symbol","type":"string"}],"name":"initialize","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function","signature":"0xf59516e6"},{"payable":true,"stateMutability":"payable","type":"fallback"},{"constant":true,"inputs":[{"name":"borrowAmount","type":"uint256"}],"name":"interestRate","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function","signature":"0x0dfca697"},{"constant":true,"inputs":[],"name":"leverageAmount","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function","signature":"0xab47c2b3"},{"constant":true,"inputs":[],"name":"liquidationPrice","outputs":[{"name":"price","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function","signature":"0xb6fc2d5f"},{"constant":true,"inputs":[],"name":"loanOrderHash","outputs":[{"name":"","type":"bytes32"}],"payable":false,"stateMutability":"view","type":"function","signature":"0xf41e4e6a"},{"constant":true,"inputs":[],"name":"loanTokenAddress","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function","signature":"0x797bf385"},{"constant":true,"inputs":[],"name":"loanTokenLender","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function","signature":"0x4858064c"},{"constant":true,"inputs":[],"name":"marketLiquidityForAsset","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function","signature":"0xfe854dc1"},{"constant":true,"inputs":[],"name":"marketLiquidityForToken","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function","signature":"0x365b4b60"},{"constant":false,"inputs":[{"name":"receiver","type":"address"}],"name":"mintWithEther","outputs":[{"name":"","type":"uint256"}],"payable":true,"stateMutability":"payable","type":"function","signature":"0x8f6ede1f"},{"constant":false,"inputs":[{"name":"receiver","type":"address"},{"name":"depositTokenAddress","type":"address"},{"name":"depositAmount","type":"uint256"}],"name":"mintWithToken","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"nonpayable","type":"function","signature":"0x03c407a5"},{"constant":true,"inputs":[],"name":"name","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function","signature":"0x06fdde03"},{"constant":true,"inputs":[],"name":"owner","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function","signature":"0x8da5cb5b"},{"constant":false,"inputs":[{"name":"_addr","type":"address"}],"name":"setBZxContract","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function","signature":"0xe54280e7"},{"constant":false,"inputs":[{"name":"_addr","type":"address"}],"name":"setBZxOracle","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function","signature":"0xa0807404"},{"constant":false,"inputs":[{"name":"_addr","type":"address"}],"name":"setBZxVault","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function","signature":"0x2c9e1885"},{"constant":false,"inputs":[{"name":"_value","type":"uint256"}],"name":"setInitialPrice","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function","signature":"0x9f4ba0ee"},{"constant":false,"inputs":[{"name":"_addr","type":"address"}],"name":"setLoanTokenAddress","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function","signature":"0xc190d0d7"},{"constant":false,"inputs":[{"name":"_lender","type":"address"}],"name":"setLoanTokenLender","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function","signature":"0xf84faeea"},{"constant":false,"inputs":[{"name":"_addr","type":"address"}],"name":"setTradeTokenAddress","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function","signature":"0x39fc185f"},{"constant":false,"inputs":[{"name":"_addr","type":"address"}],"name":"setWETHContract","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function","signature":"0x14be4ecc"},{"constant":true,"inputs":[],"name":"splitFactor","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function","signature":"0xa5507b35"},{"constant":true,"inputs":[],"name":"symbol","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function","signature":"0x95d89b41"},{"constant":true,"inputs":[],"name":"tokenPrice","outputs":[{"name":"price","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function","signature":"0x7ff9b596"},{"constant":true,"inputs":[],"name":"totalSupply","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function","signature":"0x18160ddd"},{"constant":true,"inputs":[],"name":"tradeTokenAddress","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function","signature":"0xb2aff0fe"},{"constant":false,"inputs":[{"name":"_to","type":"address"},{"name":"_value","type":"uint256"}],"name":"transfer","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function","signature":"0xa9059cbb"},{"constant":false,"inputs":[{"name":"_from","type":"address"},{"name":"_to","type":"address"},{"name":"_value","type":"uint256"}],"name":"transferFrom","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function","signature":"0x23b872dd"},{"constant":false,"inputs":[{"name":"_newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function","signature":"0xf2fde38b"},{"constant":false,"inputs":[],"name":"triggerPosition","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function","signature":"0xff858bc2"},{"constant":true,"inputs":[],"name":"wethContract","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function","signature":"0x4780eac1"}]}
+{
+  "name": "pToken",
+  "address": "",
+  "abi": [
+    {
+      "anonymous": false,
+      "inputs": [
+        { "indexed": true, "name": "owner", "type": "address" },
+        { "indexed": true, "name": "spender", "type": "address" },
+        { "indexed": false, "name": "value", "type": "uint256" }
+      ],
+      "name": "Approval",
+      "type": "event",
+      "signature": "0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        { "indexed": true, "name": "burner", "type": "address" },
+        { "indexed": false, "name": "tokenAmount", "type": "uint256" },
+        { "indexed": false, "name": "assetAmount", "type": "uint256" },
+        { "indexed": false, "name": "price", "type": "uint256" }
+      ],
+      "name": "Burn",
+      "type": "event",
+      "signature": "0x743033787f4738ff4d6a7225ce2bd0977ee5f86b91a902a58f5e4d0b297b4644"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        { "indexed": true, "name": "minter", "type": "address" },
+        { "indexed": false, "name": "tokenAmount", "type": "uint256" },
+        { "indexed": false, "name": "assetAmount", "type": "uint256" },
+        { "indexed": false, "name": "price", "type": "uint256" }
+      ],
+      "name": "Mint",
+      "type": "event",
+      "signature": "0xb4c03061fb5b7fed76389d5af8f2e0ddb09f8c70d1333abbb62582835e10accb"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        { "indexed": true, "name": "previousOwner", "type": "address" },
+        { "indexed": true, "name": "newOwner", "type": "address" }
+      ],
+      "name": "OwnershipTransferred",
+      "type": "event",
+      "signature": "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        { "indexed": true, "name": "from", "type": "address" },
+        { "indexed": true, "name": "to", "type": "address" },
+        { "indexed": false, "name": "value", "type": "uint256" }
+      ],
+      "name": "Transfer",
+      "type": "event",
+      "signature": "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"
+    },
+    {
+      "constant": true,
+      "inputs": [{ "name": "_owner", "type": "address" }, { "name": "_spender", "type": "address" }],
+      "name": "allowance",
+      "outputs": [{ "name": "", "type": "uint256" }],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function",
+      "signature": "0xdd62ed3e"
+    },
+    {
+      "constant": false,
+      "inputs": [{ "name": "_spender", "type": "address" }, { "name": "_value", "type": "uint256" }],
+      "name": "approve",
+      "outputs": [{ "name": "", "type": "bool" }],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function",
+      "signature": "0x095ea7b3"
+    },
+    {
+      "constant": true,
+      "inputs": [{ "name": "_owner", "type": "address" }],
+      "name": "assetBalanceOf",
+      "outputs": [{ "name": "", "type": "uint256" }],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function",
+      "signature": "0x06b3efd6"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "bZxContract",
+      "outputs": [{ "name": "", "type": "address" }],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function",
+      "signature": "0x995363d3"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "bZxOracle",
+      "outputs": [{ "name": "", "type": "address" }],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function",
+      "signature": "0x96c7871b"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "bZxVault",
+      "outputs": [{ "name": "", "type": "address" }],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function",
+      "signature": "0x894ca308"
+    },
+    {
+      "constant": true,
+      "inputs": [{ "name": "_owner", "type": "address" }],
+      "name": "balanceOf",
+      "outputs": [{ "name": "", "type": "uint256" }],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function",
+      "signature": "0x70a08231"
+    },
+    {
+      "constant": false,
+      "inputs": [{ "name": "receiver", "type": "address" }, { "name": "burnAmount", "type": "uint256" }],
+      "name": "burnToEther",
+      "outputs": [{ "name": "", "type": "uint256" }],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function",
+      "signature": "0x81a6b250"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        { "name": "receiver", "type": "address" },
+        { "name": "burnTokenAddress", "type": "address" },
+        { "name": "burnAmount", "type": "uint256" }
+      ],
+      "name": "burnToToken",
+      "outputs": [{ "name": "", "type": "uint256" }],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function",
+      "signature": "0xd01d46e7"
+    },
+    {
+      "constant": true,
+      "inputs": [{ "name": "_user", "type": "address" }],
+      "name": "checkpointPrice",
+      "outputs": [{ "name": "", "type": "uint256" }],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function",
+      "signature": "0xeebc5081"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "decimals",
+      "outputs": [{ "name": "", "type": "uint8" }],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function",
+      "signature": "0x313ce567"
+    },
+    {
+      "constant": false,
+      "inputs": [{ "name": "_spender", "type": "address" }, { "name": "_subtractedValue", "type": "uint256" }],
+      "name": "decreaseApproval",
+      "outputs": [{ "name": "", "type": "bool" }],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function",
+      "signature": "0x66188463"
+    },
+    {
+      "constant": false,
+      "inputs": [{ "name": "tokenAddress", "type": "address" }],
+      "name": "donateAsset",
+      "outputs": [{ "name": "", "type": "bool" }],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function",
+      "signature": "0x59e239af"
+    },
+    {
+      "constant": false,
+      "inputs": [],
+      "name": "handleSplit",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function",
+      "signature": "0x447eed28"
+    },
+    {
+      "constant": false,
+      "inputs": [{ "name": "_spender", "type": "address" }, { "name": "_addedValue", "type": "uint256" }],
+      "name": "increaseApproval",
+      "outputs": [{ "name": "", "type": "bool" }],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function",
+      "signature": "0xd73dd623"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "initialPrice",
+      "outputs": [{ "name": "", "type": "uint256" }],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function",
+      "signature": "0x1d0806ae"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        { "name": "_bZxContract", "type": "address" },
+        { "name": "_bZxVault", "type": "address" },
+        { "name": "_bZxOracle", "type": "address" },
+        { "name": "_wethContract", "type": "address" },
+        { "name": "_loanTokenAddress", "type": "address" },
+        { "name": "_tradeTokenAddress", "type": "address" },
+        { "name": "_leverageAmount", "type": "uint256" },
+        { "name": "_loanOrderHash", "type": "bytes32" },
+        { "name": "_name", "type": "string" },
+        { "name": "_symbol", "type": "string" }
+      ],
+      "name": "initialize",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function",
+      "signature": "0xf59516e6"
+    },
+    { "payable": true, "stateMutability": "payable", "type": "fallback" },
+    {
+      "constant": true,
+      "inputs": [{ "name": "borrowAmount", "type": "uint256" }],
+      "name": "interestRate",
+      "outputs": [{ "name": "", "type": "uint256" }],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function",
+      "signature": "0x0dfca697"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "leverageAmount",
+      "outputs": [{ "name": "", "type": "uint256" }],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function",
+      "signature": "0xab47c2b3"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "liquidationPrice",
+      "outputs": [{ "name": "price", "type": "uint256" }],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function",
+      "signature": "0xb6fc2d5f"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "loanOrderHash",
+      "outputs": [{ "name": "", "type": "bytes32" }],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function",
+      "signature": "0xf41e4e6a"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "loanTokenAddress",
+      "outputs": [{ "name": "", "type": "address" }],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function",
+      "signature": "0x797bf385"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "loanTokenLender",
+      "outputs": [{ "name": "", "type": "address" }],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function",
+      "signature": "0x4858064c"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "marketLiquidityForAsset",
+      "outputs": [{ "name": "", "type": "uint256" }],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function",
+      "signature": "0xfe854dc1"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "marketLiquidityForToken",
+      "outputs": [{ "name": "", "type": "uint256" }],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function",
+      "signature": "0x365b4b60"
+    },
+    {
+      "constant": false,
+      "inputs": [{ "name": "receiver", "type": "address" }],
+      "name": "mintWithEther",
+      "outputs": [{ "name": "", "type": "uint256" }],
+      "payable": true,
+      "stateMutability": "payable",
+      "type": "function",
+      "signature": "0x8f6ede1f"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        { "name": "receiver", "type": "address" },
+        { "name": "depositTokenAddress", "type": "address" },
+        { "name": "depositAmount", "type": "uint256" }
+      ],
+      "name": "mintWithToken",
+      "outputs": [{ "name": "", "type": "uint256" }],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function",
+      "signature": "0x03c407a5"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "name",
+      "outputs": [{ "name": "", "type": "string" }],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function",
+      "signature": "0x06fdde03"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "owner",
+      "outputs": [{ "name": "", "type": "address" }],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function",
+      "signature": "0x8da5cb5b"
+    },
+    {
+      "constant": false,
+      "inputs": [{ "name": "_addr", "type": "address" }],
+      "name": "setBZxContract",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function",
+      "signature": "0xe54280e7"
+    },
+    {
+      "constant": false,
+      "inputs": [{ "name": "_addr", "type": "address" }],
+      "name": "setBZxOracle",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function",
+      "signature": "0xa0807404"
+    },
+    {
+      "constant": false,
+      "inputs": [{ "name": "_addr", "type": "address" }],
+      "name": "setBZxVault",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function",
+      "signature": "0x2c9e1885"
+    },
+    {
+      "constant": false,
+      "inputs": [{ "name": "_value", "type": "uint256" }],
+      "name": "setInitialPrice",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function",
+      "signature": "0x9f4ba0ee"
+    },
+    {
+      "constant": false,
+      "inputs": [{ "name": "_addr", "type": "address" }],
+      "name": "setLoanTokenAddress",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function",
+      "signature": "0xc190d0d7"
+    },
+    {
+      "constant": false,
+      "inputs": [{ "name": "_lender", "type": "address" }],
+      "name": "setLoanTokenLender",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function",
+      "signature": "0xf84faeea"
+    },
+    {
+      "constant": false,
+      "inputs": [{ "name": "_addr", "type": "address" }],
+      "name": "setTradeTokenAddress",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function",
+      "signature": "0x39fc185f"
+    },
+    {
+      "constant": false,
+      "inputs": [{ "name": "_addr", "type": "address" }],
+      "name": "setWETHContract",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function",
+      "signature": "0x14be4ecc"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "splitFactor",
+      "outputs": [{ "name": "", "type": "uint256" }],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function",
+      "signature": "0xa5507b35"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "symbol",
+      "outputs": [{ "name": "", "type": "string" }],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function",
+      "signature": "0x95d89b41"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "tokenPrice",
+      "outputs": [{ "name": "price", "type": "uint256" }],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function",
+      "signature": "0x7ff9b596"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "totalSupply",
+      "outputs": [{ "name": "", "type": "uint256" }],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function",
+      "signature": "0x18160ddd"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "tradeTokenAddress",
+      "outputs": [{ "name": "", "type": "address" }],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function",
+      "signature": "0xb2aff0fe"
+    },
+    {
+      "constant": false,
+      "inputs": [{ "name": "_to", "type": "address" }, { "name": "_value", "type": "uint256" }],
+      "name": "transfer",
+      "outputs": [{ "name": "", "type": "bool" }],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function",
+      "signature": "0xa9059cbb"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        { "name": "_from", "type": "address" },
+        { "name": "_to", "type": "address" },
+        { "name": "_value", "type": "uint256" }
+      ],
+      "name": "transferFrom",
+      "outputs": [{ "name": "", "type": "bool" }],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function",
+      "signature": "0x23b872dd"
+    },
+    {
+      "constant": false,
+      "inputs": [{ "name": "_newOwner", "type": "address" }],
+      "name": "transferOwnership",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function",
+      "signature": "0xf2fde38b"
+    },
+    {
+      "constant": false,
+      "inputs": [],
+      "name": "triggerPosition",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function",
+      "signature": "0xff858bc2"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "wethContract",
+      "outputs": [{ "name": "", "type": "address" }],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function",
+      "signature": "0x4780eac1"
+    }
+  ]
+}

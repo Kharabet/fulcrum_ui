@@ -1,4 +1,4 @@
-import BigNumber from "bignumber.js";
+import { BigNumber } from "@0x/utils";
 import { EventEmitter } from "events";
 import moment from "moment";
 import Web3 from "web3";
