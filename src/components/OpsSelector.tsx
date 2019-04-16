@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import { OpsSelectorItem } from "./OpsSelectorItem";
 
-import lend_svg from "../assets/ic_big___lend_(dark).svg";
-import trade_svg from "../assets/ic_big___trade_(dark).svg";
+import lend_svg from "../assets/images/ic_big___lend_(dark).svg";
+import trade_svg from "../assets/images/ic_big___trade_(dark).svg";
 
 export class OpsSelector extends Component {
   public render() {

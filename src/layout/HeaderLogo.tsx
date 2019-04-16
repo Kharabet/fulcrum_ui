@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
 
-import fulcrum_logo from "../assets/fulcrum_logo.svg";
+import fulcrum_logo from "../assets/images/fulcrum_logo.svg";
 
 export class HeaderLogo extends Component {
   public render() {
