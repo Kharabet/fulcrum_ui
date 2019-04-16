@@ -73,9 +73,8 @@ class FulcrumProvider {
     }
   };
 
-  // Rates for Lend and Trade are different
-  // For Trade tokens (pTokens), call interestRate()
   // For Lend tokens (iTokens), call supplyInterestRate()
+  // For Trade tokens (pTokens), don't get interest rate and don't display it
   public getTokenInterestRate = (asset: Asset): BigNumber => {
     const interestRate = Math.round(Math.random() * 1000) / 100;
     return new BigNumber(interestRate);
