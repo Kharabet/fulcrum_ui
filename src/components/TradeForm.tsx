@@ -37,19 +37,16 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
   constructor(props: ITradeFormProps, context?: any) {
     super(props, context);
 
-    const tradeTokenKey = this.getTradeTokenGridRowSelectionKey(props.leverage);
     const assetDetails = AssetsDictionary.assets.get(props.asset);
-    const latestPriceDataPoint = FulcrumProvider.getPriceLatestDataPoint(tradeTokenKey);
-    const maxTradeValue = FulcrumProvider.getMaxTradeValue(props.tradeType, tradeTokenKey);
-    const tradedAmountEstimate = FulcrumProvider.getTradedAmountEstimate(
-      new TradeRequest(props.tradeType, props.asset, props.positionType, props.leverage, maxTradeValue)
-    );
+    const latestPriceDataPoint = FulcrumProvider.getPriceDefaultDataPoint();
+    const maxTradeValue = new BigNumber(0);
+    const tradedAmountEstimate = new BigNumber(0);
 
     this.state = {
+      assetDetails: assetDetails || null,
       tradeAmountText: maxTradeValue.toFixed(),
       tradeAmount: maxTradeValue,
       tradedAmountEstimate: tradedAmountEstimate,
-      assetDetails: assetDetails || null,
       latestPriceDataPoint: latestPriceDataPoint
     };
   }
@@ -62,10 +59,52 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     this._input = input;
   };
 
+  private async derivedUpdate() {
+    const assetDetails = AssetsDictionary.assets.get(this.props.asset);
+    const tradeTokenKey = this.getTradeTokenGridRowSelectionKey(this.props.leverage);
+    const latestPriceDataPoint = await FulcrumProvider.getPriceLatestDataPoint(tradeTokenKey);
+    const maxTradeValue = await FulcrumProvider.getMaxTradeValue(this.props.tradeType, tradeTokenKey);
+    const tradedAmountEstimate = await FulcrumProvider.getTradedAmountEstimate(
+      new TradeRequest(
+        this.props.tradeType,
+        this.props.asset,
+        this.props.positionType,
+        this.props.leverage,
+        maxTradeValue
+      )
+    );
+
+    this.setState({
+      ...this.state,
+      assetDetails: assetDetails || null,
+      tradeAmountText: maxTradeValue.toFixed(),
+      tradeAmount: maxTradeValue,
+      tradedAmountEstimate: tradedAmountEstimate,
+      latestPriceDataPoint: latestPriceDataPoint
+    });
+  }
+
   public componentDidMount(): void {
+    this.derivedUpdate();
+
     if (this._input) {
       this._input.select();
       this._input.focus();
+    }
+  }
+
+  public componentDidUpdate(
+    prevProps: Readonly<ITradeFormProps>,
+    prevState: Readonly<ITradeFormState>,
+    snapshot?: any
+  ): void {
+    if (
+      this.props.tradeType !== prevProps.tradeType ||
+      this.props.asset !== prevProps.asset ||
+      this.props.positionType !== prevProps.positionType ||
+      this.props.leverage !== prevProps.leverage
+    ) {
+      this.derivedUpdate();
     }
   }
 
@@ -147,7 +186,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     );
   }
 
-  public onTradeAmountChange = (event: ChangeEvent<HTMLInputElement>) => {
+  public onTradeAmountChange = async (event: ChangeEvent<HTMLInputElement>) => {
     // handling different types of empty values
     let amountText = event.target.value ? event.target.value : "";
     const amountTextForConversion = amountText === "" ? "0" : amountText;
@@ -160,7 +199,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     }
 
     // updating stored value only if the new input value is a valid number
-    const tradedAmountEstimate = FulcrumProvider.getTradedAmountEstimate(
+    const tradedAmountEstimate = await FulcrumProvider.getTradedAmountEstimate(
       new TradeRequest(this.props.tradeType, this.props.asset, this.props.positionType, this.props.leverage, amount)
     );
     if (!amount.isNaN()) {
@@ -173,14 +212,14 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     }
   };
 
-  public onInsertMaxValue = () => {
+  public onInsertMaxValue = async () => {
     if (!this.state.assetDetails) {
       return null;
     }
 
     const tradeTokenKey = this.getTradeTokenGridRowSelectionKey();
-    const maxTradeValue = FulcrumProvider.getMaxTradeValue(this.props.tradeType, tradeTokenKey);
-    const tradedAmountEstimate = FulcrumProvider.getTradedAmountEstimate(
+    const maxTradeValue = await FulcrumProvider.getMaxTradeValue(this.props.tradeType, tradeTokenKey);
+    const tradedAmountEstimate = await FulcrumProvider.getTradedAmountEstimate(
       new TradeRequest(
         this.props.tradeType,
         this.props.asset,

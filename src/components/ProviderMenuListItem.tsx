@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import { ProviderType } from "../domain/ProviderType";
-import { ProviderTypeDetails } from "../domain/ProviderTypeDetails";
 import { ProviderTypeDictionary } from "../domain/ProviderTypeDictionary";
 
 export interface IProviderMenuListItemProps {
@@ -10,33 +9,17 @@ export interface IProviderMenuListItemProps {
   onSelect: (providerType: ProviderType) => void;
 }
 
-interface IProviderMenuListItemState {
-  providerTypeDetails: ProviderTypeDetails | null;
-}
-
-export class ProviderMenuListItem extends Component<IProviderMenuListItemProps, IProviderMenuListItemState> {
-  constructor(props: IProviderMenuListItemProps) {
-    super(props);
-
-    this.state = { providerTypeDetails: ProviderTypeDictionary.providerTypes.get(props.providerType) || null };
-  }
-
-  public componentWillReceiveProps(nextProps: Readonly<IProviderMenuListItemProps>, nextContext: any): void {
-    this.setState({
-      ...this.state,
-      providerTypeDetails: ProviderTypeDictionary.providerTypes.get(nextProps.providerType) || null
-    });
-  }
-
+export class ProviderMenuListItem extends Component<IProviderMenuListItemProps> {
   public render() {
-    if (!this.state.providerTypeDetails) {
+    const providerTypeDetails = ProviderTypeDictionary.providerTypes.get(this.props.providerType) || null;
+    if (!providerTypeDetails) {
       return null;
     }
 
-    const content = this.state.providerTypeDetails.logoSvg ? (
-      <img className="provider-menu__list-item-content-img" src={this.state.providerTypeDetails.logoSvg} alt={this.state.providerTypeDetails.displayName} />
+    const content = providerTypeDetails.logoSvg ? (
+      <img className="provider-menu__list-item-content-img" src={providerTypeDetails.logoSvg} alt={providerTypeDetails.displayName} />
     ) : (
-      <div className="provider-menu__list-item-content-txt">{this.state.providerTypeDetails.displayName}</div>
+      <div className="provider-menu__list-item-content-txt">{providerTypeDetails.displayName}</div>
     );
 
     const isProviderTypeActiveClass =

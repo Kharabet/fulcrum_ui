@@ -25,8 +25,9 @@ export class PriceGraph extends Component<IPriceGraphProps, IPriceGraphState> {
   }
 
   public componentWillReceiveProps(nextProps: Readonly<IPriceGraphProps>, nextContext: any): void {
-    const priceMin = nextProps.data.map(e => e.price).reduce((a, b) => Math.min(a, b));
-    const priceMax = nextProps.data.map(e => e.price).reduce((a, b) => Math.max(a, b));
+    const prices = nextProps.data.map(e => e.price);
+    const priceMin = prices.length > 0 ? prices.reduce((a, b) => Math.min(a, b)) : 0;
+    const priceMax = prices.length > 0 ? prices.reduce((a, b) => Math.max(a, b)) : 0;
     const priceBaseLine = priceMin - (priceMax - priceMin) * 0.3;
     const normalizedData = nextProps.data.map(e => {
       return { ...e, price: e.price - priceBaseLine };

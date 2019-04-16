@@ -32,17 +32,15 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
     super(props, context);
 
     const assetDetails = AssetsDictionary.assets.get(props.asset);
-    const interestRate = FulcrumProvider.getTokenInterestRate(props.asset);
-    const maxLendValue = FulcrumProvider.getMaxLendValue(props.lendType, props.asset);
-    const lendedAmountEstimate = FulcrumProvider.getLendedAmountEstimate(
-      new LendRequest(props.lendType, props.asset, maxLendValue)
-    );
+    const interestRate = new BigNumber(0);
+    const maxLendValue = new BigNumber(0);
+    const lendedAmountEstimate = new BigNumber(0);
 
     this.state = {
+      assetDetails: assetDetails || null,
       lendAmountText: maxLendValue.toFixed(),
       lendAmount: maxLendValue,
       lendedAmountEstimate: lendedAmountEstimate,
-      assetDetails: assetDetails || null,
       interestRate: interestRate
     };
   }
@@ -51,10 +49,38 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
     this._input = input;
   };
 
+  private async derivedUpdate() {
+    const assetDetails = AssetsDictionary.assets.get(this.props.asset);
+    const interestRate = await FulcrumProvider.getTokenInterestRate(this.props.asset);
+    const maxLendValue = await FulcrumProvider.getMaxLendValue(this.props.lendType, this.props.asset);
+    const lendedAmountEstimate = await FulcrumProvider.getLendedAmountEstimate(
+      new LendRequest(this.props.lendType, this.props.asset, maxLendValue)
+    );
+
+    this.state = {
+      assetDetails: assetDetails || null,
+      lendAmountText: maxLendValue.toFixed(),
+      lendAmount: maxLendValue,
+      lendedAmountEstimate: lendedAmountEstimate,
+      interestRate: interestRate
+    };
+  }
+
   public componentDidMount(): void {
+    this.derivedUpdate();
+
     if (this._input) {
       this._input.select();
       this._input.focus();
+    }
+  }
+
+  public componentDidUpdate(prevProps: Readonly<ILendFormProps>, prevState: Readonly<ILendFormState>, snapshot?: any): void {
+    if (
+      this.props.lendType !== prevProps.lendType ||
+      this.props.asset !== prevProps.asset
+    ) {
+      this.derivedUpdate();
     }
   }
 
@@ -125,7 +151,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
     );
   }
 
-  public onLendAmountChange = (event: ChangeEvent<HTMLInputElement>) => {
+  public onLendAmountChange = async (event: ChangeEvent<HTMLInputElement>) => {
     // handling different types of empty values
     let amountText = event.target.value ? event.target.value : "";
     const amountTextForConversion = amountText === "" ? "0" : amountText;
@@ -138,7 +164,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
     }
 
     // updating stored value only if the new input value is a valid number
-    const lendedAmountEstimate = FulcrumProvider.getLendedAmountEstimate(
+    const lendedAmountEstimate = await FulcrumProvider.getLendedAmountEstimate(
       new LendRequest(this.props.lendType, this.props.asset, amount)
     );
     if (!amount.isNaN()) {
@@ -151,13 +177,13 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
     }
   };
 
-  public onInsertMaxValue = () => {
+  public onInsertMaxValue = async () => {
     if (!this.state.assetDetails) {
       return null;
     }
 
-    const maxLendValue = FulcrumProvider.getMaxLendValue(this.props.lendType, this.props.asset);
-    const lendedAmountEstimate = FulcrumProvider.getLendedAmountEstimate(
+    const maxLendValue = await FulcrumProvider.getMaxLendValue(this.props.lendType, this.props.asset);
+    const lendedAmountEstimate = await FulcrumProvider.getLendedAmountEstimate(
       new LendRequest(this.props.lendType, this.props.asset, maxLendValue)
     );
     this.setState({

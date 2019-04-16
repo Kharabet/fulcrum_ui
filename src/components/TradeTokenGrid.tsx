@@ -16,34 +16,34 @@ export interface ITradeTokenGridProps {
 }
 
 interface ITradeTokenGridState {
-  tokens: ITradeTokenGridRowProps[];
+  tokenRowsData: ITradeTokenGridRowProps[];
 }
 
 export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenGridState> {
-  private readonly assets: Asset[] = [Asset.wBTC, Asset.ETH, Asset.MKR, Asset.ZRX, Asset.BAT, Asset.REP, Asset.KNC];
+  private static readonly assets: Asset[] = [Asset.wBTC, Asset.ETH, Asset.MKR, Asset.ZRX, Asset.BAT, Asset.REP, Asset.KNC];
 
   constructor(props: ITradeTokenGridProps) {
     super(props);
 
     this.state = {
-      tokens: this._getTokens(props)
+      tokenRowsData: TradeTokenGrid.getRowsData(props)
     };
   }
 
-  public componentWillReceiveProps(nextProps: Readonly<ITradeTokenGridProps>, nextContext: any): void {
-    this.setState({
-      ...this.state,
-      tokens: this._getTokens(nextProps)
-    });
+  public static getDerivedStateFromProps(
+    nextProps: Readonly<ITradeTokenGridProps>,
+    nextContext: Readonly<ITradeTokenGridState>
+  ): ITradeTokenGridState {
+    return { tokenRowsData: TradeTokenGrid.getRowsData(nextProps) };
   }
 
   public componentDidMount(): void {
-    const e = this.state.tokens[0];
+    const e = this.state.tokenRowsData[0];
     this.props.onSelect(new TradeTokenKey(e.asset, e.positionType, e.defaultLeverage));
   }
 
   public render() {
-    const tokenRows = this.state.tokens.map(e => <TradeTokenGridRow key={`${e.asset}_${e.positionType}`} {...e} />);
+    const tokenRows = this.state.tokenRowsData.map(e => <TradeTokenGridRow key={`${e.asset}_${e.positionType}`} {...e} />);
 
     return (
       <div className="trade-token-grid">
@@ -53,11 +53,11 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
     );
   }
 
-  private _getTokens = (props: ITradeTokenGridProps): ITradeTokenGridRowProps[] => {
-    const tokens: ITradeTokenGridRowProps[] = [];
+  private static getRowsData = (props: ITradeTokenGridProps): ITradeTokenGridRowProps[] => {
+    const rowsData: ITradeTokenGridRowProps[] = [];
 
-    this.assets.forEach(e => {
-      tokens.push({
+    TradeTokenGrid.assets.forEach(e => {
+      rowsData.push({
         selectedKey: props.selectedKey,
         asset: e,
         positionType: PositionType.SHORT,
@@ -66,7 +66,7 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
         onTrade: props.onTrade
       });
 
-      tokens.push({
+      rowsData.push({
         selectedKey: props.selectedKey,
         asset: e,
         positionType: PositionType.LONG,
@@ -76,6 +76,6 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
       });
     });
 
-    return tokens;
+    return rowsData;
   };
 }

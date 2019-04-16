@@ -61,13 +61,13 @@ class FulcrumProvider {
     );
   }
 
-  public onLendConfirmed = (request: LendRequest) => {
+  public onLendConfirmed = async (request: LendRequest) => {
     if (request) {
       TasksQueue.enqueue(new RequestTask(request));
     }
   };
 
-  public onTradeConfirmed = (request: TradeRequest) => {
+  public onTradeConfirmed = async (request: TradeRequest) => {
     if (request) {
       TasksQueue.enqueue(new RequestTask(request));
     }
@@ -75,13 +75,13 @@ class FulcrumProvider {
 
   // For Lend tokens (iTokens), call supplyInterestRate()
   // For Trade tokens (pTokens), don't get interest rate and don't display it
-  public getTokenInterestRate = (asset: Asset): BigNumber => {
+  public getTokenInterestRate = async (asset: Asset): Promise<BigNumber> => {
     const interestRate = Math.round(Math.random() * 1000) / 100;
     return new BigNumber(interestRate);
   };
 
   // will figure this out later
-  public getPriceDataPoints = (selectedKey: TradeTokenKey, samplesCount: number): IPriceDataPoint[] => {
+  public getPriceDataPoints = async (selectedKey: TradeTokenKey, samplesCount: number): Promise<IPriceDataPoint[]> => {
     const result: IPriceDataPoint[] = [];
 
     const timeUnit = "hour";
@@ -120,7 +120,7 @@ class FulcrumProvider {
           plETH2x (ETH Long 2x leverage) -> 10.12 DAI per plETH2x
           pswBTC4x (wBTC Short 4x leverage) -> 10.12 wBTC per pswBTC4x
   */
-  public getPriceLatestDataPoint = (selectedKey: TradeTokenKey): IPriceDataPoint => {
+  public getPriceLatestDataPoint = async (selectedKey: TradeTokenKey): Promise<IPriceDataPoint> => {
     const timeUnit = "hour";
     const timeStamp = moment().startOf(timeUnit);
     const priceBase = 40;
@@ -133,14 +133,22 @@ class FulcrumProvider {
     };
   };
 
+  public getPriceDefaultDataPoint = (): IPriceDataPoint => {
+    return {
+      timeStamp: moment().unix(),
+      price: 0,
+      change24h: 0
+    };
+  };
+
   // both iTokens and pTokens have tokenPrice() (current price)  and checkpointPrice() (price at last checkpoint)
   // profit = (tokenPrice - checkpointPrice) * tokenBalance / 10**36
-  public getLendProfit = (asset: Asset): BigNumber | null => {
+  public getLendProfit = async (asset: Asset): Promise<BigNumber | null> => {
     // should return null if no data (not traded asset), new BigNumber(0) if no profit
     return Math.random() >= 0.5 ? new BigNumber(Math.round(Math.random() * 1000) / 100) : null;
   };
 
-  public getTradeProfit = (selectedKey: TradeTokenKey): BigNumber | null => {
+  public getTradeProfit = async (selectedKey: TradeTokenKey): Promise<BigNumber | null> => {
     // should return null if no data (not traded asset), new BigNumber(0) if no profit
     return Math.random() >= 0.5 ? new BigNumber(Math.round(Math.random() * 1000) / 100) : null;
   };
@@ -159,20 +167,61 @@ class FulcrumProvider {
       burnToToken funtions though. So you can buy or cash out with any supported Kyber asset
   */
 
-  public getMaxTradeValue = (tradeType: TradeType, selectedKey: TradeTokenKey): BigNumber => {
+  public getMaxTradeValue = async (tradeType: TradeType, selectedKey: TradeTokenKey): Promise<BigNumber> => {
     return new BigNumber(10);
   };
 
-  public getMaxLendValue = (lendType: LendType, asset: Asset): BigNumber => {
+  public getMaxLendValue = async (lendType: LendType, asset: Asset): Promise<BigNumber> => {
     return new BigNumber(15);
   };
 
-  public getTradedAmountEstimate = (request: TradeRequest): BigNumber => {
+  public getTradedAmountEstimate = async (request: TradeRequest): Promise<BigNumber> => {
     return request.amount.div(2);
   };
 
-  public getLendedAmountEstimate = (request: LendRequest): BigNumber => {
+  public getLendedAmountEstimate = async (request: LendRequest): Promise<BigNumber> => {
     return request.amount.div(3);
+  };
+
+  public async getWeb3ProviderSettings (web3: Web3 | null) {
+    if (web3) {
+      const networkId = await web3.eth.net.getId();
+      // tslint:disable-next-line:one-variable-per-declaration
+      let networkName, etherscanURL;
+      switch (networkId) {
+        case 1:
+          networkName = "mainnet";
+          etherscanURL = "https://etherscan.io/";
+          break;
+        case 3:
+          networkName = "ropsten";
+          etherscanURL = "https://ropsten.etherscan.io/";
+          break;
+        case 4:
+          networkName = "rinkeby";
+          etherscanURL = "https://rinkeby.etherscan.io/";
+          break;
+        case 42:
+          networkName = "kovan";
+          etherscanURL = "https://kovan.etherscan.io/";
+          break;
+        default:
+          networkName = "local";
+          etherscanURL = "";
+          break;
+      }
+      return {
+        networkId,
+        networkName,
+        etherscanURL
+      };
+    }
+
+    return {
+      networkId: null,
+      networkName: null,
+      etherscanURL: null
+    };
   };
 
   private onTaskEnqueued = async (latestTask: RequestTask) => {

@@ -24,16 +24,31 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
     super(props);
 
     const assetDetails = AssetsDictionary.assets.get(props.asset);
-    const interestRate = FulcrumProvider.getTokenInterestRate(props.asset);
-    const profit = FulcrumProvider.getLendProfit(props.asset);
+    const interestRate = new BigNumber(0);
+    const profit = new BigNumber(0);
 
     this.state = { assetDetails: assetDetails || null, interestRate: interestRate, profit: profit };
   }
 
-  public componentWillReceiveProps(nextProps: Readonly<ILendTokenSelectorItemProps>, nextContext: any): void {
-    if (nextProps.asset !== this.props.asset) {
-      const assetDetails = AssetsDictionary.assets.get(nextProps.asset);
-      this.setState({ ...this.state, assetDetails: assetDetails || null });
+  private async derivedUpdate() {
+    const assetDetails = AssetsDictionary.assets.get(this.props.asset);
+    const interestRate = await FulcrumProvider.getTokenInterestRate(this.props.asset);
+    const profit = await FulcrumProvider.getLendProfit(this.props.asset);
+
+    this.setState({ assetDetails: assetDetails || null, interestRate: interestRate, profit: profit });
+  }
+
+  public componentDidMount(): void {
+    this.derivedUpdate();
+  }
+
+  public componentDidUpdate(
+    prevProps: Readonly<ILendTokenSelectorItemProps>,
+    prevState: Readonly<ILendTokenSelectorItemState>,
+    snapshot?: any
+  ): void {
+    if (this.props.asset !== prevProps.asset) {
+      this.derivedUpdate();
     }
   }
 

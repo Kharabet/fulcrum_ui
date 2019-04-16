@@ -82,9 +82,9 @@ export class TradePage extends Component<ITradePageProps, ITradePageState> {
     );
   }
 
-  public onSelect = (key: TradeTokenKey) => {
-    const graphData = FulcrumProvider.getPriceDataPoints(TradeTokenKey.empty(), 15);
-    this.setState({ ...this.state, selectedKey: key, priceGraphData: graphData });
+  public onSelect = async (key: TradeTokenKey) => {
+    const priceGraphData = await FulcrumProvider.getPriceDataPoints(key, 15);
+    this.setState({ ...this.state, selectedKey: key, priceGraphData: priceGraphData });
   };
 
   public onTradeRequested = (request: TradeRequest) => {

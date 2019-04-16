@@ -1,4 +1,4 @@
-//import styled from "styled-components";
+// import styled from "styled-components";
 import React, { Component } from "react";
 import Web3 from "web3";
 import { ProviderType } from "../domain/ProviderType";
@@ -42,7 +42,7 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
       
       const accounts = await FulcrumProvider.web3.eth.getAccounts();
       const account = accounts ? accounts[0] : null;
-      let providerSettings = await OnChainIndicator.getProviderSettings(FulcrumProvider.web3);
+      const providerSettings = await FulcrumProvider.getWeb3ProviderSettings(FulcrumProvider.web3);
       this.setState({
         selectedProviderType: FulcrumProvider.providerType,
         web3: FulcrumProvider.web3,
@@ -52,27 +52,6 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
         etherscanURL: providerSettings.etherscanURL
       });
     }
-  }
-
-  public static async getDerivedStateFromProps(
-    props: Readonly<IOnChainIndicatorProps>,
-    state: Readonly<IOnChainIndicatorState>
-  ) {
-    if (FulcrumProvider.web3) {
-      const accounts = await FulcrumProvider.web3.eth.getAccounts();
-      const account = accounts ? accounts[0] : null;
-      let providerSettings = await OnChainIndicator.getProviderSettings(FulcrumProvider.web3);
-      return {
-        selectedProviderType: FulcrumProvider.providerType,
-        web3: FulcrumProvider.web3,
-        walletAddress: account,
-        networkId: providerSettings.networkId,
-        networkName: providerSettings.networkName,
-        etherscanURL: providerSettings.etherscanURL
-      };
-    }
-
-    return null;
   }
 
   public render() {
@@ -126,50 +105,10 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
     );
   }
 
-  public static async getProviderSettings (web3: Web3 | null) {
-    if (web3) {
-      const networkId = await web3.eth.net.getId();
-      let networkName, etherscanURL;
-      switch (networkId) {
-        case 1:
-          networkName = "mainnet";
-          etherscanURL = "https://etherscan.io/";
-          break;
-        case 3:
-          networkName = "ropsten";
-          etherscanURL = "https://ropsten.etherscan.io/";
-          break;
-        case 4:
-          networkName = "rinkeby";
-          etherscanURL = "https://rinkeby.etherscan.io/";
-          break;
-        case 42:
-          networkName = "kovan";
-          etherscanURL = "https://kovan.etherscan.io/";
-          break;
-        default:
-          networkName = "local";
-          etherscanURL = "";
-          break;
-      }
-      return {
-        networkId,
-        networkName,
-        etherscanURL
-      };
-    }
-
-    return {
-      networkId: null,
-      networkName: null,
-      etherscanURL: null
-    };
-  };
-
   public onProviderChanged = async (event: ProviderChangedEvent) => {
     const accounts = event.web3 ? await event.web3.eth.getAccounts() : null;
     const account = accounts ? accounts[0] : null;
-    let providerSettings = await OnChainIndicator.getProviderSettings(event.web3);
+    const providerSettings = await FulcrumProvider.getWeb3ProviderSettings(event.web3);
     this.setState({
       ...this.state,
       selectedProviderType: event.providerType,
