@@ -87,11 +87,16 @@ export class FulcrumProvider {
     }
   };
 
-  // For Lend tokens (iTokens), call supplyInterestRate()
-  // For Trade tokens (pTokens), don't get interest rate and don't display it
-  public getTokenInterestRate = async (asset: Asset): Promise<BigNumber> => {
-    const interestRate = Math.round(Math.random() * 1000) / 100;
-    return new BigNumber(interestRate);
+  public getLendTokenInterestRate = async (asset: Asset): Promise<BigNumber> => {
+    let result = new BigNumber(0);
+    if (this.contractsSource) {
+      const assetContract = this.contractsSource.getITokenContract(asset);
+      if (assetContract) {
+        result = await assetContract.supplyInterestRate.callAsync()
+      }
+    }
+
+    return result;
   };
 
   // will figure this out later

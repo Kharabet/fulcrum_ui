@@ -55,7 +55,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
 
   private async derivedUpdate() {
     const assetDetails = AssetsDictionary.assets.get(this.props.asset);
-    const interestRate = await FulcrumProvider.Instance.getTokenInterestRate(this.props.asset);
+    const interestRate = await FulcrumProvider.Instance.getLendTokenInterestRate(this.props.asset);
     const maxLendValue = await FulcrumProvider.Instance.getMaxLendValue(this.props.lendType, this.props.asset);
     const lendedAmountEstimate = await FulcrumProvider.Instance.getLendedAmountEstimate(
       new LendRequest(this.props.lendType, this.props.asset, maxLendValue)
