@@ -43,6 +43,7 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
       const account = accounts ? accounts[0] : null;
       const providerSettings = await FulcrumProvider.getWeb3ProviderSettings(FulcrumProvider.Instance.web3);
       this.setState({
+        ...this.state,
         selectedProviderType: FulcrumProvider.Instance.providerType,
         web3: FulcrumProvider.Instance.web3,
         walletAddress: account,
@@ -52,6 +53,7 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
       });
     } else {
       this.setState({
+        ...this.state,
         selectedProviderType: FulcrumProvider.Instance.providerType,
         web3: FulcrumProvider.Instance.web3,
         walletAddress: null,

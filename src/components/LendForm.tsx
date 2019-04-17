@@ -62,6 +62,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
     );
 
     this.setState({
+      ...this.state,
       assetDetails: assetDetails || null,
       lendAmountText: maxLendValue.toFixed(),
       lendAmount: maxLendValue,
