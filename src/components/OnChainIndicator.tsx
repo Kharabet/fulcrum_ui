@@ -41,7 +41,7 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
     if (FulcrumProvider.Instance.web3) {
       const accounts = await FulcrumProvider.Instance.web3.eth.getAccounts();
       const account = accounts ? accounts[0] : null;
-      const providerSettings = await FulcrumProvider.Instance.getWeb3ProviderSettings(FulcrumProvider.Instance.web3);
+      const providerSettings = await FulcrumProvider.getWeb3ProviderSettings(FulcrumProvider.Instance.web3);
       this.setState({
         selectedProviderType: FulcrumProvider.Instance.providerType,
         web3: FulcrumProvider.Instance.web3,

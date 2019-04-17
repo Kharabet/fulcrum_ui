@@ -48,7 +48,7 @@ export class FulcrumProvider {
     this.web3 = await Web3ConnectionFactory.getWeb3Connection(providerType);
     this.providerType = this.web3 ? providerType : ProviderType.None;
 
-    const web3ProviderSettings = await this.getWeb3ProviderSettings(this.web3);
+    const web3ProviderSettings = await FulcrumProvider.getWeb3ProviderSettings(this.web3);
     this.contractsSource =
       this.web3 && web3ProviderSettings.networkName
         ? new ContractsSource(this.web3.currentProvider, web3ProviderSettings.networkName)
@@ -197,7 +197,7 @@ export class FulcrumProvider {
     return request.amount.div(3);
   };
 
-  public async getWeb3ProviderSettings(web3: Web3 | null) {
+  public static async getWeb3ProviderSettings(web3: Web3 | null) {
     if (web3) {
       const networkId = await web3.eth.net.getId();
       // tslint:disable-next-line:one-variable-per-declaration
