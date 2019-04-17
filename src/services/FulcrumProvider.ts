@@ -236,11 +236,23 @@ export class FulcrumProvider {
   */
 
   public getMaxTradeValue = async (tradeType: TradeType, selectedKey: TradeTokenKey): Promise<BigNumber> => {
-    return new BigNumber(10);
+    let result =
+      tradeType === TradeType.BUY
+        ? await this.getBaseTokenBalance(selectedKey.asset)
+        : await this.getTradeTokenBalance(selectedKey);
+    result = result.dividedBy(10 ** 18);
+
+    return result;
   };
 
   public getMaxLendValue = async (lendType: LendType, asset: Asset): Promise<BigNumber> => {
-    return new BigNumber(15);
+    let result =
+      lendType === LendType.LEND
+        ? await this.getBaseTokenBalance(asset)
+        : await this.getLendTokenBalance(asset);
+    result = result.dividedBy(10 ** 18);
+
+    return result;
   };
 
   public getTradedAmountEstimate = async (request: TradeRequest): Promise<BigNumber> => {
@@ -290,6 +302,23 @@ export class FulcrumProvider {
       networkName: null,
       etherscanURL: null
     };
+  }
+
+  private async getBaseTokenBalance(asset: Asset): Promise<BigNumber> {
+    let result: BigNumber;
+    if (asset === Asset.UNKNOWN) {
+      // always 0
+      result = new BigNumber(0);
+    } else if (asset === Asset.ETH) {
+      // get eth (wallet) balance
+      result = new BigNumber(5);
+    } else {
+      // get erc20 token balance
+      result = new BigNumber(7);
+    }
+    result = result.multipliedBy(10 ** 18);
+
+    return result;
   }
 
   private async getLendTokenBalance(asset: Asset): Promise<BigNumber> {
