@@ -42,7 +42,7 @@ export class ContractsSource {
       next = await this.tokenizedRegistryContract.getTokens.callAsync(
         new BigNumber(pos),
         new BigNumber(step),
-        new BigNumber(0)
+        new BigNumber(1)
       );
       next.forEach(e => {
         this.iTokensContractInfos.set(e.symbol, e);
@@ -56,7 +56,7 @@ export class ContractsSource {
       next = await this.tokenizedRegistryContract.getTokens.callAsync(
         new BigNumber(pos),
         new BigNumber(step),
-        new BigNumber(1)
+        new BigNumber(2)
       );
       next.forEach(e => {
         this.pTokensContractInfos.set(e.symbol, e);
