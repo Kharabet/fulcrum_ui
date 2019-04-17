@@ -92,7 +92,8 @@ export class FulcrumProvider {
     if (this.contractsSource) {
       const assetContract = this.contractsSource.getITokenContract(asset);
       if (assetContract) {
-        result = await assetContract.supplyInterestRate.callAsync()
+        result = await assetContract.supplyInterestRate.callAsync();
+        result = result.dividedBy(10 * 18);
       }
     }
 
@@ -164,7 +165,31 @@ export class FulcrumProvider {
   // profit = (tokenPrice - checkpointPrice) * tokenBalance / 10**36
   public getLendProfit = async (asset: Asset): Promise<BigNumber | null> => {
     // should return null if no data (not traded asset), new BigNumber(0) if no profit
-    return Math.random() >= 0.5 ? new BigNumber(Math.round(Math.random() * 1000) / 100) : null;
+    let result: BigNumber | null = null;
+    let account: string | null = null;
+
+    if (this.web3) {
+      const accounts = await this.web3.eth.getAccounts();
+      account = accounts ? accounts[0] : null;
+    }
+
+    if (account && this.contractsSource) {
+      const balance = await this.getLendTokenBalance(asset);
+      if (balance.gt(0)) {
+        result = new BigNumber(0);
+        const assetContract = this.contractsSource.getITokenContract(asset);
+        if (assetContract) {
+          const tokenPrice = await assetContract.tokenPrice.callAsync();
+          const checkpointPrice = await assetContract.checkpointPrice.callAsync(account);
+          result = tokenPrice
+            .minus(checkpointPrice)
+            .multipliedBy(balance)
+            .dividedBy(10 ** 36);
+        }
+      }
+    }
+
+    return result;
   };
 
   public getTradeProfit = async (selectedKey: TradeTokenKey): Promise<BigNumber | null> => {
@@ -241,6 +266,12 @@ export class FulcrumProvider {
       networkName: null,
       etherscanURL: null
     };
+  }
+
+  private async getLendTokenBalance(asset: Asset): Promise<BigNumber> {
+    return Math.random() >= 0.5
+      ? new BigNumber(Math.round(Math.random() * 1000) / 100).multipliedBy(10 ** 18)
+      : new BigNumber(0);
   }
 
   private onTaskEnqueued = async (latestTask: RequestTask) => {
