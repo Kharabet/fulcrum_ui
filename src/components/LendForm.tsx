@@ -61,13 +61,13 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
       new LendRequest(this.props.lendType, this.props.asset, maxLendValue)
     );
 
-    this.state = {
+    this.setState({
       assetDetails: assetDetails || null,
       lendAmountText: maxLendValue.toFixed(),
       lendAmount: maxLendValue,
       lendedAmountEstimate: lendedAmountEstimate,
       interestRate: interestRate
-    };
+    });
   }
 
   private onProviderChanged = async (event: ProviderChangedEvent) => {
@@ -199,6 +199,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
       new LendRequest(this.props.lendType, this.props.asset, maxLendValue)
     );
     this.setState({
+      ...this.state,
       lendAmountText: maxLendValue.toFixed(),
       lendAmount: maxLendValue,
       lendedAmountEstimate: lendedAmountEstimate
