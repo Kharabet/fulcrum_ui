@@ -236,10 +236,26 @@ export class FulcrumProvider {
   */
 
   public getMaxTradeValue = async (tradeType: TradeType, selectedKey: TradeTokenKey): Promise<BigNumber> => {
-    let result =
+    let result = new BigNumber(0);
+
+    const balance =
       tradeType === TradeType.BUY
         ? await this.getBaseTokenBalance(selectedKey.asset)
         : await this.getTradeTokenBalance(selectedKey);
+
+    if (tradeType === TradeType.BUY) {
+      if (this.contractsSource) {
+        const assetContract = this.contractsSource.getPTokenContract(selectedKey);
+        if (assetContract) {
+          const marketLiquidity = await assetContract.marketLiquidityForAsset.callAsync();
+
+          result = BigNumber.min(marketLiquidity, balance);
+        }
+      }
+    } else {
+      result = balance;
+    }
+
     result = result.dividedBy(10 ** 18);
 
     return result;
@@ -256,11 +272,44 @@ export class FulcrumProvider {
   };
 
   public getTradedAmountEstimate = async (request: TradeRequest): Promise<BigNumber> => {
-    return request.amount.div(2);
+    let result = new BigNumber(0);
+
+    if (this.contractsSource) {
+      const assetContract = this.contractsSource.getPTokenContract(
+        new TradeTokenKey(
+          request.asset,
+          request.positionType,
+          request.leverage
+        ));
+      if (assetContract) {
+        const tokenPrice = await assetContract.tokenPrice.callAsync();
+
+        result =
+          request.tradeType === TradeType.BUY
+            ? request.amount.multipliedBy(tokenPrice)
+            : request.amount.dividedBy(tokenPrice);
+      }
+    }
+
+    return result;
   };
 
   public getLendedAmountEstimate = async (request: LendRequest): Promise<BigNumber> => {
-    return request.amount.div(3);
+    let result = new BigNumber(0);
+
+    if (this.contractsSource) {
+      const assetContract = this.contractsSource.getITokenContract(request.asset);
+      if (assetContract) {
+        const tokenPrice = await assetContract.tokenPrice.callAsync();
+
+        result =
+          request.lendType === LendType.LEND
+            ? request.amount.multipliedBy(tokenPrice)
+            : request.amount.dividedBy(tokenPrice);
+      }
+    }
+
+    return result;
   };
 
   public static async getWeb3ProviderSettings(web3: Web3 | null) {
