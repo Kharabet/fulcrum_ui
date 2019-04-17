@@ -93,7 +93,7 @@ export class FulcrumProvider {
       const assetContract = this.contractsSource.getITokenContract(asset);
       if (assetContract) {
         result = await assetContract.supplyInterestRate.callAsync();
-        result = result.dividedBy(10 * 18);
+        result = result.dividedBy(10 ** 18);
       }
     }
 
