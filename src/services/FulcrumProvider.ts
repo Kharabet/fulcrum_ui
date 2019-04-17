@@ -54,7 +54,7 @@ export class FulcrumProvider {
         ? new ContractsSource(this.web3.currentProvider, web3ProviderSettings.networkName)
         : null;
     if (this.contractsSource) {
-      this.contractsSource.Init();
+      await this.contractsSource.Init();
     }
 
     if (this.web3) {
