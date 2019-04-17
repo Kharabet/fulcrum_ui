@@ -194,7 +194,31 @@ export class FulcrumProvider {
 
   public getTradeProfit = async (selectedKey: TradeTokenKey): Promise<BigNumber | null> => {
     // should return null if no data (not traded asset), new BigNumber(0) if no profit
-    return Math.random() >= 0.5 ? new BigNumber(Math.round(Math.random() * 1000) / 100) : null;
+    let result: BigNumber | null = null;
+    let account: string | null = null;
+
+    if (this.web3) {
+      const accounts = await this.web3.eth.getAccounts();
+      account = accounts ? accounts[0] : null;
+    }
+
+    if (account && this.contractsSource) {
+      const balance = await this.getTradeTokenBalance(selectedKey);
+      if (balance.gt(0)) {
+        result = new BigNumber(0);
+        const assetContract = this.contractsSource.getPTokenContract(selectedKey);
+        if (assetContract) {
+          const tokenPrice = await assetContract.tokenPrice.callAsync();
+          const checkpointPrice = await assetContract.checkpointPrice.callAsync(account);
+          result = tokenPrice
+            .minus(checkpointPrice)
+            .multipliedBy(balance)
+            .dividedBy(10 ** 36);
+        }
+      }
+    }
+
+    return result;
   };
 
   // when buying a pToken (trade screen), you need to check "liquidity" to ensure there is enough to buy the pToken
@@ -269,6 +293,12 @@ export class FulcrumProvider {
   }
 
   private async getLendTokenBalance(asset: Asset): Promise<BigNumber> {
+    return Math.random() >= 0.5
+      ? new BigNumber(Math.round(Math.random() * 1000) / 100).multipliedBy(10 ** 18)
+      : new BigNumber(0);
+  }
+
+  private async getTradeTokenBalance(selectedKey: TradeTokenKey): Promise<BigNumber> {
     return Math.random() >= 0.5
       ? new BigNumber(Math.round(Math.random() * 1000) / 100).multipliedBy(10 ** 18)
       : new BigNumber(0);
