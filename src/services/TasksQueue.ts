@@ -2,7 +2,7 @@ import { EventEmitter } from "events";
 import { RequestTask } from "../domain/RequestTask";
 import { TasksQueueEvents } from "./events/TasksQueueEvents";
 
-class TasksQueue {
+export class TasksQueue {
   public static Instance: TasksQueue;
 
   private readonly requestTasks: RequestTask[];
@@ -55,6 +55,5 @@ class TasksQueue {
   }
 }
 
-// singleton
-const instance = new TasksQueue();
-export default instance;
+// tslint:disable-next-line:no-unused-expression
+new TasksQueue();

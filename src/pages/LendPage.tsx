@@ -7,7 +7,7 @@ import { LendRequest } from "../domain/LendRequest";
 import { LendType } from "../domain/LendType";
 import { Footer } from "../layout/Footer";
 import { HeaderOps } from "../layout/HeaderOps";
-import FulcrumProvider from "../services/FulcrumProvider";
+import { FulcrumProvider } from "../services/FulcrumProvider";
 
 export interface ILendPageProps {
   doNetworkConnect: () => void;
@@ -27,7 +27,7 @@ export class LendPage extends Component<ILendPageProps, ILendPageState> {
   }
 
   public componentDidMount(): void {
-    if (!FulcrumProvider.web3) {
+    if (!FulcrumProvider.Instance.web3) {
       this.props.doNetworkConnect();
     }
   }
@@ -64,7 +64,7 @@ export class LendPage extends Component<ILendPageProps, ILendPageState> {
   };
 
   public onLendConfirmed = (request: LendRequest) => {
-    FulcrumProvider.onLendConfirmed(request);
+    FulcrumProvider.Instance.onLendConfirmed(request);
     this.setState({ ...this.state, isLendModalOpen: false, lendType: LendType.LEND, lendAsset: Asset.UNKNOWN });
   };
 

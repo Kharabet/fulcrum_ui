@@ -11,7 +11,7 @@ import { TradeTokenKey } from "../domain/TradeTokenKey";
 import { TradeType } from "../domain/TradeType";
 import { Footer } from "../layout/Footer";
 import { HeaderOps } from "../layout/HeaderOps";
-import FulcrumProvider from "../services/FulcrumProvider";
+import { FulcrumProvider } from "../services/FulcrumProvider";
 
 export interface ITradePageProps {
   doNetworkConnect: () => void;
@@ -43,7 +43,7 @@ export class TradePage extends Component<ITradePageProps, ITradePageState> {
   }
 
   public componentDidMount(): void {
-    if (!FulcrumProvider.web3) {
+    if (!FulcrumProvider.Instance.web3) {
       this.props.doNetworkConnect();
     }
   }
@@ -83,7 +83,7 @@ export class TradePage extends Component<ITradePageProps, ITradePageState> {
   }
 
   public onSelect = async (key: TradeTokenKey) => {
-    const priceGraphData = await FulcrumProvider.getPriceDataPoints(key, 15);
+    const priceGraphData = await FulcrumProvider.Instance.getPriceDataPoints(key, 15);
     this.setState({ ...this.state, selectedKey: key, priceGraphData: priceGraphData });
   };
 
@@ -101,7 +101,7 @@ export class TradePage extends Component<ITradePageProps, ITradePageState> {
   };
 
   public onTradeConfirmed = (request: TradeRequest) => {
-    FulcrumProvider.onTradeConfirmed(request);
+    FulcrumProvider.Instance.onTradeConfirmed(request);
     this.setState({
       ...this.state,
       isTradeModalOpen: false,

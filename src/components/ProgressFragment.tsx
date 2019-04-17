@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import Modal from "react-modal";
 import { RequestTask } from "../domain/RequestTask";
 import { TasksQueueEvents } from "../services/events/TasksQueueEvents";
-import TasksQueue from "../services/TasksQueue";
+import { TasksQueue } from "../services/TasksQueue";
 import { ProgressBar } from "./ProgressBar";
 import { ProgressDetails } from "./ProgressDetails";
 
@@ -17,11 +17,11 @@ export class ProgressFragment extends Component<any, IProgressFragmentState> {
 
     this.state = {
       isProgressDetailsModalOpen: false,
-      requestTasks: TasksQueue.getTasksList()
+      requestTasks: TasksQueue.Instance.getTasksList()
     };
 
-    TasksQueue.on(TasksQueueEvents.QueueChanged, this.onTasksQueueChanged);
-    TasksQueue.on(TasksQueueEvents.TaskChanged, this.onTasksQueueChanged);
+    TasksQueue.Instance.on(TasksQueueEvents.QueueChanged, this.onTasksQueueChanged);
+    TasksQueue.Instance.on(TasksQueueEvents.TaskChanged, this.onTasksQueueChanged);
   }
 
   public render() {
@@ -49,6 +49,6 @@ export class ProgressFragment extends Component<any, IProgressFragmentState> {
   };
 
   public onTasksQueueChanged = () => {
-    this.setState({ ...this.state, requestTasks: TasksQueue.getTasksList() });
+    this.setState({ ...this.state, requestTasks: TasksQueue.Instance.getTasksList() });
   };
 }

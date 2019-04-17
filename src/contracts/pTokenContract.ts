@@ -2,11 +2,9 @@
 // tslint:disable:no-unbound-method
 // tslint:disable:variable-name
 import { BaseContract } from "@0x/base-contract";
-import { BlockParam, CallData, DecodedLogArgs, TxData, TxDataPayable, SupportedProvider } from "ethereum-types";
+import { BlockParam, CallData, ContractAbi, DecodedLogArgs, TxData, TxDataPayable, SupportedProvider } from "ethereum-types";
 import { BigNumber, classUtils } from "@0x/utils";
 import { Provider } from "web3/providers";
-
-import pTokenJson from "./../assets/artifacts/kovan/iToken.json";
 
 export type pTokenEventArgs =
   | pTokenApprovalEventArgs
@@ -2068,8 +2066,8 @@ export class pTokenContract extends BaseContract {
       return result;
     }
   };
-  constructor(address: string, provider: Provider, txDefaults?: Partial<TxData>) {
-    super("pToken", pTokenJson.abi, address, provider as SupportedProvider, txDefaults);
+  constructor(abi: ContractAbi, address: string, provider: Provider, txDefaults?: Partial<TxData>) {
+    super("pToken", abi, address, provider as SupportedProvider, txDefaults);
     classUtils.bindAll(this, ["_abiEncoderByFunctionSignature", "address", "abi", "_web3Wrapper"]);
   }
 } // tslint:disable:max-file-line-count

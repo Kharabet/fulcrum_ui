@@ -5,7 +5,9 @@ import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { LendRequest } from "../domain/LendRequest";
 import { LendType } from "../domain/LendType";
-import FulcrumProvider from "../services/FulcrumProvider";
+import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
+import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
+import { FulcrumProvider } from "../services/FulcrumProvider";
 
 export interface ILendFormProps {
   lendType: LendType;
@@ -43,6 +45,8 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
       lendedAmountEstimate: lendedAmountEstimate,
       interestRate: interestRate
     };
+
+    FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
   private _setInputRef = (input: HTMLInputElement) => {
@@ -51,9 +55,9 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
 
   private async derivedUpdate() {
     const assetDetails = AssetsDictionary.assets.get(this.props.asset);
-    const interestRate = await FulcrumProvider.getTokenInterestRate(this.props.asset);
-    const maxLendValue = await FulcrumProvider.getMaxLendValue(this.props.lendType, this.props.asset);
-    const lendedAmountEstimate = await FulcrumProvider.getLendedAmountEstimate(
+    const interestRate = await FulcrumProvider.Instance.getTokenInterestRate(this.props.asset);
+    const maxLendValue = await FulcrumProvider.Instance.getMaxLendValue(this.props.lendType, this.props.asset);
+    const lendedAmountEstimate = await FulcrumProvider.Instance.getLendedAmountEstimate(
       new LendRequest(this.props.lendType, this.props.asset, maxLendValue)
     );
 
@@ -64,6 +68,14 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
       lendedAmountEstimate: lendedAmountEstimate,
       interestRate: interestRate
     };
+  }
+
+  private onProviderChanged = async (event: ProviderChangedEvent) => {
+    await this.derivedUpdate();
+  };
+
+  public componentWillUnmount(): void {
+    FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
   public componentDidMount(): void {
@@ -164,7 +176,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
     }
 
     // updating stored value only if the new input value is a valid number
-    const lendedAmountEstimate = await FulcrumProvider.getLendedAmountEstimate(
+    const lendedAmountEstimate = await FulcrumProvider.Instance.getLendedAmountEstimate(
       new LendRequest(this.props.lendType, this.props.asset, amount)
     );
     if (!amount.isNaN()) {
@@ -182,8 +194,8 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
       return null;
     }
 
-    const maxLendValue = await FulcrumProvider.getMaxLendValue(this.props.lendType, this.props.asset);
-    const lendedAmountEstimate = await FulcrumProvider.getLendedAmountEstimate(
+    const maxLendValue = await FulcrumProvider.Instance.getMaxLendValue(this.props.lendType, this.props.asset);
+    const lendedAmountEstimate = await FulcrumProvider.Instance.getLendedAmountEstimate(
       new LendRequest(this.props.lendType, this.props.asset, maxLendValue)
     );
     this.setState({

@@ -5,7 +5,9 @@ import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { LendRequest } from "../domain/LendRequest";
 import { LendType } from "../domain/LendType";
-import FulcrumProvider from "../services/FulcrumProvider";
+import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
+import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
+import { FulcrumProvider } from "../services/FulcrumProvider";
 
 export interface ILendTokenSelectorItemProps {
   asset: Asset;
@@ -28,14 +30,24 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
     const profit = new BigNumber(0);
 
     this.state = { assetDetails: assetDetails || null, interestRate: interestRate, profit: profit };
+
+    FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
   private async derivedUpdate() {
     const assetDetails = AssetsDictionary.assets.get(this.props.asset);
-    const interestRate = await FulcrumProvider.getTokenInterestRate(this.props.asset);
-    const profit = await FulcrumProvider.getLendProfit(this.props.asset);
+    const interestRate = await FulcrumProvider.Instance.getTokenInterestRate(this.props.asset);
+    const profit = await FulcrumProvider.Instance.getLendProfit(this.props.asset);
 
     this.setState({ assetDetails: assetDetails || null, interestRate: interestRate, profit: profit });
+  }
+
+  private onProviderChanged = async (event: ProviderChangedEvent) => {
+    await this.derivedUpdate();
+  };
+
+  public componentWillUnmount(): void {
+    FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
   public componentDidMount(): void {

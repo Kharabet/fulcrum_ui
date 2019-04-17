@@ -17,6 +17,7 @@ export class TradeTokenKey {
   }
 
   public toString(): string {
-    return `${this.asset}_${this.positionType}_${this.leverage}`;
+    const positionTypePrefix = this.positionType === PositionType.SHORT ? "ps" : "pL";
+    return `${positionTypePrefix}${this.asset}${this.leverage}x`;
   }
 }

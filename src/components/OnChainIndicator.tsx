@@ -6,7 +6,7 @@ import { ProviderTypeDetails } from "../domain/ProviderTypeDetails";
 import { ProviderTypeDictionary } from "../domain/ProviderTypeDictionary";
 import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
-import FulcrumProvider from "../services/FulcrumProvider";
+import { FulcrumProvider } from "../services/FulcrumProvider";
 
 export interface IOnChainIndicatorProps {
   doNetworkConnect: () => void;
@@ -26,32 +26,52 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
     super(props);
 
     this.state = {
-      selectedProviderType: FulcrumProvider.providerType,
-      web3: FulcrumProvider.web3,
+      selectedProviderType: FulcrumProvider.Instance.providerType,
+      web3: FulcrumProvider.Instance.web3,
       walletAddress: null,
       networkId: null,
       networkName: null,
       etherscanURL: null
     };
 
-    FulcrumProvider.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
+    FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
-  public async componentDidMount() {
-    if (FulcrumProvider.web3) {
-      
-      const accounts = await FulcrumProvider.web3.eth.getAccounts();
+  private async derivedUpdate() {
+    if (FulcrumProvider.Instance.web3) {
+      const accounts = await FulcrumProvider.Instance.web3.eth.getAccounts();
       const account = accounts ? accounts[0] : null;
-      const providerSettings = await FulcrumProvider.getWeb3ProviderSettings(FulcrumProvider.web3);
+      const providerSettings = await FulcrumProvider.Instance.getWeb3ProviderSettings(FulcrumProvider.Instance.web3);
       this.setState({
-        selectedProviderType: FulcrumProvider.providerType,
-        web3: FulcrumProvider.web3,
+        selectedProviderType: FulcrumProvider.Instance.providerType,
+        web3: FulcrumProvider.Instance.web3,
         walletAddress: account,
         networkId: providerSettings.networkId,
         networkName: providerSettings.networkName,
         etherscanURL: providerSettings.etherscanURL
       });
+    } else {
+      this.setState({
+        selectedProviderType: FulcrumProvider.Instance.providerType,
+        web3: FulcrumProvider.Instance.web3,
+        walletAddress: null,
+        networkId: null,
+        networkName: null,
+        etherscanURL: null
+      });
     }
+  }
+
+  private onProviderChanged = async (event: ProviderChangedEvent) => {
+    this.derivedUpdate();
+  };
+
+  public componentWillUnmount(): void {
+    FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
+  }
+
+  public async componentDidMount() {
+    this.derivedUpdate();
   }
 
   public render() {
@@ -104,19 +124,4 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
       </span>
     );
   }
-
-  public onProviderChanged = async (event: ProviderChangedEvent) => {
-    const accounts = event.web3 ? await event.web3.eth.getAccounts() : null;
-    const account = accounts ? accounts[0] : null;
-    const providerSettings = await FulcrumProvider.getWeb3ProviderSettings(event.web3);
-    this.setState({
-      ...this.state,
-      selectedProviderType: event.providerType,
-      web3: event.web3,
-      walletAddress: account,
-      networkId: providerSettings.networkId,
-      networkName: providerSettings.networkName,
-      etherscanURL: providerSettings.etherscanURL
-    });
-  };
 }

@@ -8,7 +8,9 @@ import { PositionType } from "../domain/PositionType";
 import { TradeRequest } from "../domain/TradeRequest";
 import { TradeTokenKey } from "../domain/TradeTokenKey";
 import { TradeType } from "../domain/TradeType";
-import FulcrumProvider from "../services/FulcrumProvider";
+import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
+import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
+import { FulcrumProvider } from "../services/FulcrumProvider";
 import { Change24HMarker, Change24HMarkerSize } from "./Change24HMarker";
 import { LeverageSelector } from "./LeverageSelector";
 import { PositionTypeMarker } from "./PositionTypeMarker";
@@ -41,9 +43,11 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
     this.state = {
       leverage: this.props.defaultLeverage,
       assetDetails: assetDetails || null,
-      latestPriceDataPoint: FulcrumProvider.getPriceDefaultDataPoint(),
+      latestPriceDataPoint: FulcrumProvider.Instance.getPriceDefaultDataPoint(),
       profit: new BigNumber(0)
     };
+
+    FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
   private getTradeTokenGridRowSelectionKey(leverage: number = this.state.leverage) {
@@ -52,14 +56,22 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
 
   private async derivedUpdate() {
     const tradeTokenKey = new TradeTokenKey(this.props.asset, this.props.positionType, this.state.leverage);
-    const latestPriceDataPoint = await FulcrumProvider.getPriceLatestDataPoint(tradeTokenKey);
-    const profit = await FulcrumProvider.getTradeProfit(tradeTokenKey);
+    const latestPriceDataPoint = await FulcrumProvider.Instance.getPriceLatestDataPoint(tradeTokenKey);
+    const profit = await FulcrumProvider.Instance.getTradeProfit(tradeTokenKey);
 
     this.setState({
       ...this.state,
       latestPriceDataPoint: latestPriceDataPoint,
       profit: profit
     });
+  }
+
+  private onProviderChanged = async (event: ProviderChangedEvent) => {
+    await this.derivedUpdate();
+  };
+
+  public componentWillUnmount(): void {
+    FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
   public componentDidMount(): void {

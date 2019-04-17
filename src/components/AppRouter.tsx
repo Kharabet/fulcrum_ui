@@ -8,7 +8,7 @@ import { LendPage } from "../pages/LendPage";
 import { TradePage } from "../pages/TradePage";
 import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
-import FulcrumProvider from "../services/FulcrumProvider";
+import { FulcrumProvider } from "../services/FulcrumProvider";
 import { ProgressFragment } from "./ProgressFragment";
 import { ProviderMenu } from "./ProviderMenu";
 
@@ -24,11 +24,15 @@ export class AppRouter extends Component<any, IAppRouterState> {
 
     this.state = {
       isProviderMenuModalOpen: false,
-      selectedProviderType: FulcrumProvider.providerType,
-      web3: FulcrumProvider.web3
+      selectedProviderType: FulcrumProvider.Instance.providerType,
+      web3: FulcrumProvider.Instance.web3
     };
 
-    FulcrumProvider.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
+    FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
+  }
+
+  public componentWillUnmount(): void {
+    FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
   public render() {
@@ -63,7 +67,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
   };
 
   public onProviderTypeSelect = async (providerType: ProviderType) => {
-    await FulcrumProvider.setWeb3Provider(providerType);
+    await FulcrumProvider.Instance.setWeb3Provider(providerType);
 
     this.setState({
       ...this.state,

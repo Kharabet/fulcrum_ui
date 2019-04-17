@@ -12,12 +12,13 @@ import { TradeRequest } from "../domain/TradeRequest";
 import { TradeTokenKey } from "../domain/TradeTokenKey";
 import { TradeType } from "../domain/TradeType";
 import { Web3ConnectionFactory } from "../domain/Web3ConnectionFactory";
-import TasksQueue from "../services/TasksQueue";
+import { ContractsSource } from "./ContractsSource";
 import { FulcrumProviderEvents } from "./events/FulcrumProviderEvents";
 import { ProviderChangedEvent } from "./events/ProviderChangedEvent";
 import { TasksQueueEvents } from "./events/TasksQueueEvents";
+import { TasksQueue } from "./TasksQueue";
 
-class FulcrumProvider {
+export class FulcrumProvider {
   public static Instance: FulcrumProvider;
 
   private isProcessing: boolean = false;
@@ -27,10 +28,13 @@ class FulcrumProvider {
   public providerType: ProviderType = ProviderType.None;
   public web3: Web3 | null = null;
 
+  public contractsSource: ContractsSource | null = null;
+
   constructor() {
     // init
     this.eventEmitter = new EventEmitter();
-    TasksQueue.on(TasksQueueEvents.Enqueued, this.onTaskEnqueued);
+    this.eventEmitter.setMaxListeners(1000);
+    TasksQueue.Instance.on(TasksQueueEvents.Enqueued, this.onTaskEnqueued);
 
     // singleton
     if (!FulcrumProvider.Instance) {
@@ -43,6 +47,16 @@ class FulcrumProvider {
   public async setWeb3Provider(providerType: ProviderType) {
     this.web3 = await Web3ConnectionFactory.getWeb3Connection(providerType);
     this.providerType = this.web3 ? providerType : ProviderType.None;
+
+    const web3ProviderSettings = await this.getWeb3ProviderSettings(this.web3);
+    this.contractsSource =
+      this.web3 && web3ProviderSettings.networkName
+        ? new ContractsSource(this.web3.currentProvider, web3ProviderSettings.networkName)
+        : null;
+    if (this.contractsSource) {
+      this.contractsSource.Init();
+    }
+
     if (this.web3) {
       // MetaMask-only code
       if (this.providerType === ProviderType.MetaMask) {
@@ -63,13 +77,13 @@ class FulcrumProvider {
 
   public onLendConfirmed = async (request: LendRequest) => {
     if (request) {
-      TasksQueue.enqueue(new RequestTask(request));
+      TasksQueue.Instance.enqueue(new RequestTask(request));
     }
   };
 
   public onTradeConfirmed = async (request: TradeRequest) => {
     if (request) {
-      TasksQueue.enqueue(new RequestTask(request));
+      TasksQueue.Instance.enqueue(new RequestTask(request));
     }
   };
 
@@ -183,7 +197,7 @@ class FulcrumProvider {
     return request.amount.div(3);
   };
 
-  public async getWeb3ProviderSettings (web3: Web3 | null) {
+  public async getWeb3ProviderSettings(web3: Web3 | null) {
     if (web3) {
       const networkId = await web3.eth.net.getId();
       // tslint:disable-next-line:one-variable-per-declaration
@@ -222,7 +236,7 @@ class FulcrumProvider {
       networkName: null,
       etherscanURL: null
     };
-  };
+  }
 
   private onTaskEnqueued = async (latestTask: RequestTask) => {
     if (!(this.isProcessing || this.isChecking)) {
@@ -231,7 +245,7 @@ class FulcrumProvider {
         this.isChecking = false;
 
         try {
-          const task = TasksQueue.peek();
+          const task = TasksQueue.Instance.peek();
 
           if (task) {
             if (task.request instanceof LendRequest) {
@@ -243,12 +257,12 @@ class FulcrumProvider {
             }
           }
         } finally {
-          TasksQueue.dequeue();
+          TasksQueue.Instance.dequeue();
         }
 
         this.isChecking = true;
         this.isProcessing = false;
-      } while (TasksQueue.any());
+      } while (TasksQueue.Instance.any());
       this.isChecking = false;
     }
   };
@@ -316,6 +330,5 @@ class FulcrumProvider {
   }
 }
 
-// singleton
-const instance = new FulcrumProvider();
-export default instance;
+// tslint:disable-next-line
+new FulcrumProvider();

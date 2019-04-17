@@ -8,7 +8,9 @@ import { PositionType } from "../domain/PositionType";
 import { TradeRequest } from "../domain/TradeRequest";
 import { TradeTokenKey } from "../domain/TradeTokenKey";
 import { TradeType } from "../domain/TradeType";
-import FulcrumProvider from "../services/FulcrumProvider";
+import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
+import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
+import { FulcrumProvider } from "../services/FulcrumProvider";
 import { PositionTypeMarker } from "./PositionTypeMarker";
 
 export interface ITradeFormProps {
@@ -38,7 +40,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     super(props, context);
 
     const assetDetails = AssetsDictionary.assets.get(props.asset);
-    const latestPriceDataPoint = FulcrumProvider.getPriceDefaultDataPoint();
+    const latestPriceDataPoint = FulcrumProvider.Instance.getPriceDefaultDataPoint();
     const maxTradeValue = new BigNumber(0);
     const tradedAmountEstimate = new BigNumber(0);
 
@@ -49,6 +51,8 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       tradedAmountEstimate: tradedAmountEstimate,
       latestPriceDataPoint: latestPriceDataPoint
     };
+
+    FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
   private getTradeTokenGridRowSelectionKey(leverage: number = this.props.leverage) {
@@ -62,9 +66,9 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
   private async derivedUpdate() {
     const assetDetails = AssetsDictionary.assets.get(this.props.asset);
     const tradeTokenKey = this.getTradeTokenGridRowSelectionKey(this.props.leverage);
-    const latestPriceDataPoint = await FulcrumProvider.getPriceLatestDataPoint(tradeTokenKey);
-    const maxTradeValue = await FulcrumProvider.getMaxTradeValue(this.props.tradeType, tradeTokenKey);
-    const tradedAmountEstimate = await FulcrumProvider.getTradedAmountEstimate(
+    const latestPriceDataPoint = await FulcrumProvider.Instance.getPriceLatestDataPoint(tradeTokenKey);
+    const maxTradeValue = await FulcrumProvider.Instance.getMaxTradeValue(this.props.tradeType, tradeTokenKey);
+    const tradedAmountEstimate = await FulcrumProvider.Instance.getTradedAmountEstimate(
       new TradeRequest(
         this.props.tradeType,
         this.props.asset,
@@ -82,6 +86,14 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       tradedAmountEstimate: tradedAmountEstimate,
       latestPriceDataPoint: latestPriceDataPoint
     });
+  }
+
+  private onProviderChanged = async (event: ProviderChangedEvent) => {
+    await this.derivedUpdate();
+  };
+
+  public componentWillUnmount(): void {
+    FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
   public componentDidMount(): void {
@@ -199,7 +211,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     }
 
     // updating stored value only if the new input value is a valid number
-    const tradedAmountEstimate = await FulcrumProvider.getTradedAmountEstimate(
+    const tradedAmountEstimate = await FulcrumProvider.Instance.getTradedAmountEstimate(
       new TradeRequest(this.props.tradeType, this.props.asset, this.props.positionType, this.props.leverage, amount)
     );
     if (!amount.isNaN()) {
@@ -218,8 +230,8 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     }
 
     const tradeTokenKey = this.getTradeTokenGridRowSelectionKey();
-    const maxTradeValue = await FulcrumProvider.getMaxTradeValue(this.props.tradeType, tradeTokenKey);
-    const tradedAmountEstimate = await FulcrumProvider.getTradedAmountEstimate(
+    const maxTradeValue = await FulcrumProvider.Instance.getMaxTradeValue(this.props.tradeType, tradeTokenKey);
+    const tradedAmountEstimate = await FulcrumProvider.Instance.getTradedAmountEstimate(
       new TradeRequest(
         this.props.tradeType,
         this.props.asset,
