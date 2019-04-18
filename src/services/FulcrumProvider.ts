@@ -2,7 +2,11 @@ import { BigNumber } from "@0x/utils";
 import { EventEmitter } from "events";
 import moment from "moment";
 import Web3 from "web3";
+import { erc20Contract } from "../contracts/erc20";
+import { iTokenContract } from "../contracts/iTokenContract";
+import { pTokenContract } from "../contracts/pTokenContract";
 import { Asset } from "../domain/Asset";
+import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { IPriceDataPoint } from "../domain/IPriceDataPoint";
 import { LendRequest } from "../domain/LendRequest";
 import { LendType } from "../domain/LendType";
@@ -170,7 +174,7 @@ export class FulcrumProvider {
 
     if (this.web3) {
       const accounts = await this.web3.eth.getAccounts();
-      account = accounts ? accounts[0] : null;
+      account = accounts ? accounts[0].toLowerCase() : null;
     }
 
     if (account && this.contractsSource) {
@@ -199,7 +203,7 @@ export class FulcrumProvider {
 
     if (this.web3) {
       const accounts = await this.web3.eth.getAccounts();
-      account = accounts ? accounts[0] : null;
+      account = accounts ? accounts[0].toLowerCase() : null;
     }
 
     if (account && this.contractsSource) {
@@ -250,6 +254,8 @@ export class FulcrumProvider {
           const marketLiquidity = await assetContract.marketLiquidityForAsset.callAsync();
 
           result = BigNumber.min(marketLiquidity, balance);
+        } else {
+          result = new BigNumber(0);
         }
       }
     } else {
@@ -354,32 +360,81 @@ export class FulcrumProvider {
   }
 
   private async getBaseTokenBalance(asset: Asset): Promise<BigNumber> {
-    let result: BigNumber;
+    let result: BigNumber = new BigNumber(0);
     if (asset === Asset.UNKNOWN) {
       // always 0
       result = new BigNumber(0);
     } else if (asset === Asset.ETH) {
       // get eth (wallet) balance
-      result = new BigNumber(5);
+      result = await this.getEthBalance()
     } else {
       // get erc20 token balance
-      result = new BigNumber(7);
+      const assetDetails = AssetsDictionary.assets.get(asset);
+      if (assetDetails) {
+        result = await this.getErc20Balance(assetDetails.addressErc20);
+      }
     }
-    result = result.multipliedBy(10 ** 18);
 
     return result;
   }
 
   private async getLendTokenBalance(asset: Asset): Promise<BigNumber> {
-    return Math.random() >= 0.5
-      ? new BigNumber(Math.round(Math.random() * 1000) / 100).multipliedBy(10 ** 18)
-      : new BigNumber(0);
+    let result = new BigNumber(0);
+
+    if (this.contractsSource) {
+      const address = await this.contractsSource.getITokenErc20Address(asset);
+      if (address) {
+        result = await this.getErc20Balance(address);
+      }
+    }
+
+    return result;
   }
 
   private async getTradeTokenBalance(selectedKey: TradeTokenKey): Promise<BigNumber> {
-    return Math.random() >= 0.5
-      ? new BigNumber(Math.round(Math.random() * 1000) / 100).multipliedBy(10 ** 18)
-      : new BigNumber(0);
+    let result = new BigNumber(0);
+
+    if (this.contractsSource) {
+      const address = await this.contractsSource.getPTokenErc20Address(selectedKey);
+      if (address) {
+        result = await this.getErc20Balance(address);
+      }
+    }
+
+    return result;
+  }
+
+  private async getEthBalance(): Promise<BigNumber> {
+    let result: BigNumber = new BigNumber(0);
+
+    if (this.web3) {
+      const accounts = await this.web3.eth.getAccounts();
+      const account = accounts ? accounts[0].toLowerCase() : null;
+      if (account) {
+        const balance = await this.web3.eth.getBalance(account);
+        result = new BigNumber(balance);
+      }
+    }
+
+    return result;
+  }
+
+  private async getErc20Balance(addressErc20: string): Promise<BigNumber> {
+    let result = new BigNumber(0);
+
+    if (this.web3 && this.contractsSource) {
+      const accounts = await this.web3.eth.getAccounts();
+      const account = accounts ? accounts[0].toLowerCase() : null;
+
+      if (account) {
+        const tokenContract = await this.contractsSource.getErc20Contract(addressErc20);
+        if (tokenContract) {
+          result = await tokenContract.balanceOf.callAsync(account);
+        }
+      }
+    }
+
+    return result;
   }
 
   private onTaskEnqueued = async (latestTask: RequestTask) => {
@@ -413,6 +468,16 @@ export class FulcrumProvider {
 
   private processLendRequestTask = async (task: RequestTask) => {
     try {
+      if (!(this.web3 && this.contractsSource)) {
+        throw new Error("No provider available!");
+      }
+
+      const accounts = await this.web3.eth.getAccounts();
+      const account = accounts ? accounts[0].toLowerCase() : null;
+      if (!account) {
+        throw new Error("Unable to get wallet address!");
+      }
+
       task.processingStart([
         "Initializing loan",
         "Detecting token allowance",
@@ -420,51 +485,195 @@ export class FulcrumProvider {
         "Waiting for token allowance",
         "Submitting loan"
       ]);
-      await this.sleep(1000);
 
-      task.processingStepNext();
-      await this.sleep(1000);
+      // Initializing loan
+      const taskRequest: LendRequest = (task.request as LendRequest);
+      const amountInBaseUnits = taskRequest.amount.multipliedBy(10 ** 18);
+      const tokenContract: iTokenContract | null = await this.contractsSource.getITokenContract(taskRequest.asset);
+      if (!tokenContract) {
+        throw new Error("No iToken contract available!");
+      }
 
-      task.processingStepNext();
-      await this.sleep(1000);
+      if (taskRequest.lendType === LendType.LEND) {
 
-      task.processingStepNext();
-      await this.sleep(1000);
+        if (taskRequest.asset !== Asset.ETH) {
+          // init erc20 contract for base token
+          let tokenErc20Contract: erc20Contract | null = null;
+          const assetDetails = AssetsDictionary.assets.get(taskRequest.asset);
+          if (assetDetails) {
+            tokenErc20Contract = await this.contractsSource.getErc20Contract(assetDetails.addressErc20);
+          }
 
-      task.processingStepNext();
-      await this.sleep(1000);
+          if (!tokenErc20Contract) {
+            throw new Error("No ERC20 contract available!");
+          }
+          task.processingStepNext();
+
+          // Detecting token allowance
+          let approvePromise: Promise<string> | null = null;
+          const erc20allowance = await tokenErc20Contract.allowance.callAsync(account, tokenContract.address);
+          task.processingStepNext();
+
+          // Prompting token allowance
+          if (amountInBaseUnits.gt(erc20allowance)) {
+            approvePromise = tokenErc20Contract.approve.sendTransactionAsync(tokenContract.address, amountInBaseUnits, { from: account });
+          }
+          task.processingStepNext();
+
+          // Waiting for token allowance
+          if (approvePromise) {
+            await approvePromise;
+          }
+          task.processingStepNext();
+
+          // Submitting loan
+          await tokenContract.mint.sendTransactionAsync(account, amountInBaseUnits, { from: account });
+        } else {
+          // no additional inits or checks
+          task.processingStepNext();
+          // skip allowance check-prompt-wait for ETH as it's not a token
+          task.processingStepNext();
+          task.processingStepNext();
+          task.processingStepNext();
+
+          // Submitting loan
+          await tokenContract.mintWithEther.sendTransactionAsync(account, { from: account, value: amountInBaseUnits });
+        }
+      } else {
+        // no additional inits or checks
+        task.processingStepNext();
+        // skip allowance check-prompt-wait for ETH as it's not a token
+        task.processingStepNext();
+        task.processingStepNext();
+        task.processingStepNext();
+
+        if (taskRequest.asset !== Asset.ETH) {
+          // Submitting unloan
+          await tokenContract.burn.sendTransactionAsync(account, amountInBaseUnits, { from: account });
+        } else {
+          // Submitting unloan
+          await tokenContract.burnToEther.sendTransactionAsync(account, amountInBaseUnits, { from: account });
+        }
+      }
 
       task.processingEnd(true);
     } catch (e) {
+      // tslint:disable-next-line:no-console
+      console.log(e);
       task.processingEnd(false);
     }
   };
 
   private processTradeRequestTask = async (task: RequestTask) => {
     try {
+      if (!(this.web3 && this.contractsSource)) {
+        throw new Error("No provider available!");
+      }
+
+      const accounts = await this.web3.eth.getAccounts();
+      const account = accounts ? accounts[0].toLowerCase() : null;
+      if (!account) {
+        throw new Error("Unable to get wallet address!");
+      }
+
       task.processingStart([
         "Initializing trade",
         "Detecting token allowance",
         "Prompting token allowance",
         "Waiting for token allowance",
-        "Submitting loan"
+        "Submitting trade"
       ]);
-      await this.sleep(1000);
 
-      task.processingStepNext();
-      await this.sleep(1000);
+      // Initializing loan
+      const taskRequest: TradeRequest = (task.request as TradeRequest);
+      const amountInBaseUnits = taskRequest.amount.multipliedBy(10 ** 18);
+      const tokenContract: pTokenContract | null =
+        await this.contractsSource.getPTokenContract(
+          new TradeTokenKey(taskRequest.asset,
+            taskRequest.positionType,
+            taskRequest.leverage
+          )
+        );
+      if (!tokenContract) {
+        throw new Error("No pToken contract available!");
+      }
 
-      task.processingStepNext();
-      await this.sleep(1000);
+      if (taskRequest.tradeType === TradeType.BUY) {
 
-      task.processingStepNext();
-      await this.sleep(1000);
+        if (taskRequest.asset !== Asset.ETH) {
+          // init erc20 contract for base token
+          let tokenErc20Contract: erc20Contract | null = null;
+          const assetDetails = AssetsDictionary.assets.get(taskRequest.asset);
+          if (assetDetails) {
+            tokenErc20Contract = await this.contractsSource.getErc20Contract(assetDetails.addressErc20);
+          } else {
+            throw new Error("No ERC20 contract available!");
+          }
 
-      task.processingStepNext();
-      await this.sleep(1000);
+          if (!tokenErc20Contract) {
+            throw new Error("No ERC20 contract available!");
+          }
+          task.processingStepNext();
+
+          // Detecting token allowance
+          let approvePromise: Promise<string> | null = null;
+          const erc20allowance = await tokenErc20Contract.allowance.callAsync(account, tokenContract.address);
+          task.processingStepNext();
+
+          // Prompting token allowance
+          if (amountInBaseUnits.gt(erc20allowance)) {
+            approvePromise = tokenErc20Contract.approve.sendTransactionAsync(tokenContract.address, amountInBaseUnits, { from: account });
+          }
+          task.processingStepNext();
+
+          // Waiting for token allowance
+          if (approvePromise) {
+            await approvePromise;
+          }
+          task.processingStepNext();
+
+          // Submitting loan
+          await tokenContract.mintWithToken.sendTransactionAsync(account, assetDetails.addressErc20, amountInBaseUnits, { from: account });
+        } else {
+          // no additional inits or checks
+          task.processingStepNext();
+          // skip allowance check-prompt-wait for ETH as it's not a token
+          task.processingStepNext();
+          task.processingStepNext();
+          task.processingStepNext();
+
+          // Submitting loan
+          await tokenContract.mintWithEther.sendTransactionAsync(account, { from: account, value: amountInBaseUnits });
+        }
+      } else {
+        // no additional inits or checks
+        task.processingStepNext();
+        // skip allowance check-prompt-wait for ETH as it's not a token
+        task.processingStepNext();
+        task.processingStepNext();
+        task.processingStepNext();
+
+        if (taskRequest.asset !== Asset.ETH) {
+          // Submitting unloan
+          const assetDetails = AssetsDictionary.assets.get(taskRequest.asset);
+          if (assetDetails) {
+            await tokenContract.burnToToken.sendTransactionAsync(
+              account,
+              assetDetails.addressErc20,
+              amountInBaseUnits,
+              { from: account }
+            );
+          }
+        } else {
+          // Submitting unloan
+          await tokenContract.burnToEther.sendTransactionAsync(account, amountInBaseUnits, { from: account });
+        }
+      }
 
       task.processingEnd(true);
     } catch (e) {
+      // tslint:disable-next-line:no-console
+      console.log(e);
       task.processingEnd(false);
     }
   };

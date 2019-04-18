@@ -24,9 +24,10 @@ export class RequestTask {
   }
 
   public processingStart(steps: string[]) {
+    this.steps.splice(0, 1);
     steps.forEach(e => this.steps.push(e));
     this.status = RequestStatus.IN_PROGRESS;
-    this.stepCurrent = 2;
+    this.stepCurrent = 1;
 
     if (this.eventEmitter) {
       this.eventEmitter.emit(TasksQueueEvents.TaskChanged);

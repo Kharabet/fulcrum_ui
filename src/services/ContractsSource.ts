@@ -4,10 +4,12 @@ import { Provider } from "web3/providers";
 import { Asset } from "../domain/Asset";
 import { TradeTokenKey } from "../domain/TradeTokenKey";
 
+import { erc20Contract } from "../contracts/erc20";
 import { iTokenContract } from "../contracts/iTokenContract";
 import { pTokenContract } from "../contracts/pTokenContract";
 import { TokenizedRegistryContract } from "../contracts/TokenizedRegistryContract";
 
+import erc20Json from "./../assets/artifacts/kovan/erc20.json";
 import iTokenJson from "./../assets/artifacts/kovan/iToken.json";
 import pTokenJson from "./../assets/artifacts/kovan/pToken.json";
 
@@ -65,6 +67,10 @@ export class ContractsSource {
     } while (next.length > 0);
   }
 
+  private getErc20ContractRaw(addressErc20: string): erc20Contract {
+    return new erc20Contract(erc20Json.abi, addressErc20.toLowerCase(), this.provider);
+  }
+
   private getITokenContractRaw(asset: Asset): iTokenContract | null {
     const tokenContractInfo = this.iTokensContractInfos.get(`i${asset}`) || null;
     return tokenContractInfo ? new iTokenContract(iTokenJson.abi, tokenContractInfo.token, this.provider) : null;
@@ -75,6 +81,17 @@ export class ContractsSource {
     return tokenContractInfo ? new pTokenContract(pTokenJson.abi, tokenContractInfo.token, this.provider) : null;
   }
 
+  public getITokenErc20Address(asset: Asset): string | null {
+    const tokenContractInfo = this.iTokensContractInfos.get(`i${asset}`) || null;
+    return tokenContractInfo ? tokenContractInfo.token : null;
+  }
+
+  public getPTokenErc20Address(key: TradeTokenKey): string | null {
+    const tokenContractInfo = this.pTokensContractInfos.get(key.toString()) || null;
+    return tokenContractInfo ? tokenContractInfo.token : null;
+  }
+
+  public getErc20Contract = _.memoize(this.getErc20ContractRaw);
   public getITokenContract = _.memoize(this.getITokenContractRaw);
   public getPTokenContract = _.memoize(this.getPTokenContractRaw);
 }
