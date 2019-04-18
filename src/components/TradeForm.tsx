@@ -180,7 +180,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
               </div>
               <div className="trade-form__value trade-form__value--no-color">
                 <span className="rounded-mark">?</span>
-                &nbsp; {this.state.tradedAmountEstimate.toFixed(2)} {tokenNameDestination}
+                &nbsp; {this.state.tradedAmountEstimate.toFixed(6)} {tokenNameDestination}
               </div>
             </div>
           </div>
