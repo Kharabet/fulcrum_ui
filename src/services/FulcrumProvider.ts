@@ -292,8 +292,8 @@ export class FulcrumProvider {
 
         result =
           request.tradeType === TradeType.BUY
-            ? request.amount.multipliedBy(tokenPrice).dividedBy(10 ** 18)
-            : request.amount.multipliedBy(10 ** 18).dividedBy(tokenPrice);
+            ? request.amount.multipliedBy(10 ** 18).dividedBy(tokenPrice)
+            : request.amount.multipliedBy(tokenPrice).dividedBy(10 ** 18);
       }
     }
 
@@ -310,8 +310,8 @@ export class FulcrumProvider {
 
         result =
           request.lendType === LendType.LEND
-            ? request.amount.multipliedBy(tokenPrice).dividedBy(10 ** 18)
-            : request.amount.multipliedBy(10 ** 18).dividedBy(tokenPrice);
+            ? request.amount.multipliedBy(10 ** 18).dividedBy(tokenPrice)
+            : request.amount.multipliedBy(tokenPrice).dividedBy(10 ** 18);
       }
     }
 
