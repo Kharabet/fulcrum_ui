@@ -132,7 +132,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
             </div>
             <div className="lend-form__kv-container lend-form__kv-container--w_dots">
               <div className="lend-form__label">Interest rate</div>
-              <div className="lend-form__value">{`${this.state.interestRate.toFixed()}%`}</div>
+              <div className="lend-form__value">{`${this.state.interestRate.toFixed(2)}%`}</div>
             </div>
             <div className="lend-form__kv-container">
               <div className="lend-form__label">Amount</div>
