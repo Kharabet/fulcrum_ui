@@ -144,6 +144,10 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
 
     const bnPrice = new BigNumber(this.state.latestPriceDataPoint.price);
     const isAmountMaxed = this.state.tradeAmount.eq(this.state.maxTradeAmount);
+    const tradedAmountEstimateText =
+      this.state.tradedAmountEstimate.gte(new BigNumber("0.000001"))
+        ? this.state.tradedAmountEstimate.toFixed(6)
+        : this.state.tradedAmountEstimate.toExponential(4);
 
     return (
       <form className="trade-form" onSubmit={this.onSubmitClick}>
@@ -188,7 +192,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
               )}
               <div className="trade-form__value trade-form__value--no-color">
                 <span className="rounded-mark">?</span>
-                &nbsp; {this.state.tradedAmountEstimate.toFixed(6)} {tokenNameDestination}
+                &nbsp; {tradedAmountEstimateText} {tokenNameDestination}
               </div>
             </div>
           </div>

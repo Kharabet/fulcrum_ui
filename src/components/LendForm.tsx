@@ -118,6 +118,10 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
     const tokenNameDestination = this.props.lendType === LendType.LEND ? tokenNamePosition : tokenNameBase;
 
     const isAmountMaxed = this.state.lendAmount.eq(this.state.maxLendAmount);
+    const lendedAmountEstimateText =
+      this.state.lendedAmountEstimate.gte(new BigNumber("0.000001"))
+        ? this.state.lendedAmountEstimate.toFixed(6)
+        : this.state.lendedAmountEstimate.toExponential(4);
 
     return (
       <form className="lend-form" onSubmit={this.onSubmitClick}>
@@ -155,7 +159,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
               )}
               <div className="lend-form__value lend-form__value--no-color">
                 <span className="rounded-mark">?</span>
-                &nbsp; {this.state.lendedAmountEstimate.toFixed(2)} {tokenNameDestination}
+                &nbsp; {lendedAmountEstimateText} {tokenNameDestination}
               </div>
             </div>
           </div>
