@@ -119,9 +119,11 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
 
     const isAmountMaxed = this.state.lendAmount.eq(this.state.maxLendAmount);
     const lendedAmountEstimateText =
-      this.state.lendedAmountEstimate.gte(new BigNumber("0.000001"))
-        ? this.state.lendedAmountEstimate.toFixed(6)
-        : this.state.lendedAmountEstimate.toExponential(4);
+      this.state.lendedAmountEstimate.eq(0)
+        ? "0"
+        : this.state.lendedAmountEstimate.gte(new BigNumber("0.000001"))
+          ? this.state.lendedAmountEstimate.toFixed(6)
+          : this.state.lendedAmountEstimate.toExponential(3);
 
     return (
       <form className="lend-form" onSubmit={this.onSubmitClick}>
