@@ -23,6 +23,7 @@ interface ILendFormState {
 
   lendAmountText: string;
   lendAmount: BigNumber;
+  maxLendAmount: BigNumber;
 
   lendedAmountEstimate: BigNumber;
 }
@@ -42,6 +43,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
       assetDetails: assetDetails || null,
       lendAmountText: maxLendValue.toFixed(),
       lendAmount: maxLendValue,
+      maxLendAmount: maxLendValue,
       lendedAmountEstimate: lendedAmountEstimate,
       interestRate: interestRate
     };
@@ -66,6 +68,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
       assetDetails: assetDetails || null,
       lendAmountText: maxLendValue.toFixed(),
       lendAmount: maxLendValue,
+      maxLendAmount: maxLendValue,
       lendedAmountEstimate: lendedAmountEstimate,
       interestRate: interestRate
     });
@@ -114,6 +117,8 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
     const tokenNameSource = this.props.lendType === LendType.LEND ? tokenNameBase : tokenNamePosition;
     const tokenNameDestination = this.props.lendType === LendType.LEND ? tokenNamePosition : tokenNameBase;
 
+    const isAmountMaxed = this.state.lendAmount.eq(this.state.maxLendAmount);
+
     return (
       <form className="lend-form" onSubmit={this.onSubmitClick}>
         <div className="lend-form__image" style={divStyle}>
@@ -141,9 +146,13 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
               onChange={this.onLendAmountChange}
             />
             <div className="lend-form__kv-container">
-              <div className="lend-form__label lend-form__label--action" onClick={this.onInsertMaxValue}>
-                Insert max value
-              </div>
+              {isAmountMaxed ? (
+                <div className="trade-form__label">Max amount reached!</div>
+              ) : (
+                <div className="trade-form__label trade-form__label--action" onClick={this.onInsertMaxValue}>
+                  Insert max value
+                </div>
+              )}
               <div className="lend-form__value lend-form__value--no-color">
                 <span className="rounded-mark">?</span>
                 &nbsp; {this.state.lendedAmountEstimate.toFixed(2)} {tokenNameDestination}
@@ -175,6 +184,10 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
       amountText = amount.absoluteValue().toFixed();
       amount = amount.absoluteValue();
     }
+    if (amount.gt(this.state.maxLendAmount)) {
+      amount = this.state.maxLendAmount;
+      amountText = this.state.maxLendAmount.toFixed();
+    }
 
     // updating stored value only if the new input value is a valid number
     const lendedAmountEstimate = await FulcrumProvider.Instance.getLendedAmountEstimate(
@@ -203,6 +216,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
       ...this.state,
       lendAmountText: maxLendValue.toFixed(),
       lendAmount: maxLendValue,
+      maxLendAmount: maxLendValue,
       lendedAmountEstimate: lendedAmountEstimate
     });
   };

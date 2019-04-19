@@ -29,6 +29,7 @@ interface ITradeFormState {
 
   tradeAmountText: string;
   tradeAmount: BigNumber;
+  maxTradeAmount: BigNumber;
 
   tradedAmountEstimate: BigNumber;
 }
@@ -48,6 +49,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       assetDetails: assetDetails || null,
       tradeAmountText: maxTradeValue.toFixed(),
       tradeAmount: maxTradeValue,
+      maxTradeAmount: maxTradeValue,
       tradedAmountEstimate: tradedAmountEstimate,
       latestPriceDataPoint: latestPriceDataPoint
     };
@@ -83,6 +85,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       assetDetails: assetDetails || null,
       tradeAmountText: maxTradeValue.toFixed(),
       tradeAmount: maxTradeValue,
+      maxTradeAmount: maxTradeValue,
       tradedAmountEstimate: tradedAmountEstimate,
       latestPriceDataPoint: latestPriceDataPoint
     });
@@ -140,6 +143,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     const tokenNameDestination = this.props.tradeType === TradeType.BUY ? tokenNamePosition : tokenNameBase;
 
     const bnPrice = new BigNumber(this.state.latestPriceDataPoint.price);
+    const isAmountMaxed = this.state.tradeAmount.eq(this.state.maxTradeAmount);
 
     return (
       <form className="trade-form" onSubmit={this.onSubmitClick}>
@@ -175,9 +179,13 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
               onChange={this.onTradeAmountChange}
             />
             <div className="trade-form__kv-container">
-              <div className="trade-form__label trade-form__label--action" onClick={this.onInsertMaxValue}>
-                Insert max value
-              </div>
+              {isAmountMaxed ? (
+                <div className="trade-form__label">Max amount reached!</div>
+              ) : (
+                <div className="trade-form__label trade-form__label--action" onClick={this.onInsertMaxValue}>
+                  Insert max value
+                </div>
+              )}
               <div className="trade-form__value trade-form__value--no-color">
                 <span className="rounded-mark">?</span>
                 &nbsp; {this.state.tradedAmountEstimate.toFixed(6)} {tokenNameDestination}
@@ -208,6 +216,10 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     if (amount.isNegative()) {
       amountText = amount.absoluteValue().toFixed();
       amount = amount.absoluteValue();
+    }
+    if (amount.gt(this.state.maxTradeAmount)) {
+      amount = this.state.maxTradeAmount;
+      amountText = this.state.maxTradeAmount.toFixed();
     }
 
     // updating stored value only if the new input value is a valid number
@@ -244,6 +256,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       ...this.state,
       tradeAmountText: maxTradeValue.toFixed(),
       tradeAmount: maxTradeValue,
+      maxTradeAmount: maxTradeValue,
       tradedAmountEstimate: tradedAmountEstimate
     });
   };
