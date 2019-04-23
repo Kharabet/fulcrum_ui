@@ -113,12 +113,13 @@ export class FulcrumProvider {
       const assetDetails = await AssetsDictionary.assets.get(selectedKey.asset);
       if (assetDetails) {
         const referencePriceFeedContract = this.contractsSource.getReferencePriceFeedContract();
-        const priceFeed = await referencePriceFeedContract.getPricesForAsset.callAsync(
+        let priceFeed = await referencePriceFeedContract.getPricesForAsset.callAsync(
           assetDetails.addressErc20,
           new BigNumber(0),
           new BigNumber(intervalSeconds),
           new BigNumber(samplesCount + 1)
         );
+        priceFeed = priceFeed.reverse();
         if (priceFeed.length > 1) {
           let rate = priceFeed[0].rate;
           priceFeed.forEach((value, index) => {
@@ -126,7 +127,7 @@ export class FulcrumProvider {
               result.push({
                 timeStamp: value.timestamp.toNumber(),
                 price: value.rate.dividedBy(10 ** 18).toNumber(),
-                change24h: rate.isZero() ? 0 : rate.minus(value.rate).dividedBy(rate).toNumber()
+                change24h: rate.isZero() ? value.rate.isZero() ? 0 : 100 : rate.minus(value.rate).dividedBy(rate).toNumber()
               });
               rate = value.rate;
             }
