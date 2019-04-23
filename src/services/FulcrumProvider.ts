@@ -10,7 +10,6 @@ import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { IPriceDataPoint } from "../domain/IPriceDataPoint";
 import { LendRequest } from "../domain/LendRequest";
 import { LendType } from "../domain/LendType";
-import { PositionType } from "../domain/PositionType";
 import { ProviderType } from "../domain/ProviderType";
 import { RequestTask } from "../domain/RequestTask";
 import { TradeRequest } from "../domain/TradeRequest";
@@ -180,7 +179,7 @@ export class FulcrumProvider {
       const assetContract = this.contractsSource.getPTokenContract(selectedKey);
       if (assetContract) {
         const tokenPrice = await assetContract.tokenPrice.callAsync();
-        const swapPrice = selectedKey.positionType === PositionType.LONG ? await this.getSwapToUsdPrice(selectedKey.asset) : new BigNumber(1);
+        const swapPrice = await this.getSwapToUsdPrice(selectedKey.asset);
 
         const timeStamp = moment();
         result.timeStamp = timeStamp.unix();
@@ -249,7 +248,7 @@ export class FulcrumProvider {
         result = new BigNumber(0);
         const assetContract = this.contractsSource.getPTokenContract(selectedKey);
         if (assetContract) {
-          const swapPrice = selectedKey.positionType === PositionType.LONG ? await this.getSwapToUsdPrice(selectedKey.asset) : new BigNumber(1);
+          const swapPrice = await this.getSwapToUsdPrice(selectedKey.asset);
           const tokenPrice = await assetContract.tokenPrice.callAsync();
           const checkpointPrice = await assetContract.checkpointPrice.callAsync(account);
           result = tokenPrice
@@ -488,7 +487,7 @@ export class FulcrumProvider {
         daiAssetDetails.addressErc20,
         new BigNumber(10 ** 18)
       );
-      result = swapPriceData[0];
+      result = swapPriceData[0].dividedBy(10 ** 18);
     }
     return result;
   }
