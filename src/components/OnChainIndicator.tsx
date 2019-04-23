@@ -1,6 +1,7 @@
 // import styled from "styled-components";
 import React, { Component } from "react";
 import Web3 from "web3";
+import { IWeb3ProviderSettings } from "../domain/IWeb3ProviderSettings";
 import { ProviderType } from "../domain/ProviderType";
 import { ProviderTypeDetails } from "../domain/ProviderTypeDetails";
 import { ProviderTypeDictionary } from "../domain/ProviderTypeDictionary";
@@ -16,9 +17,7 @@ interface IOnChainIndicatorState {
   selectedProviderType: ProviderType;
   web3: Web3 | null;
   walletAddress: string | null;
-  networkId: number | null;
-  networkName: string | null;
-  etherscanURL: string | null;
+  providerSettings: IWeb3ProviderSettings | null;
 }
 
 export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChainIndicatorState> {
@@ -29,9 +28,7 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
       selectedProviderType: FulcrumProvider.Instance.providerType,
       web3: FulcrumProvider.Instance.web3,
       walletAddress: null,
-      networkId: null,
-      networkName: null,
-      etherscanURL: null
+      providerSettings: null
     };
 
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
@@ -47,9 +44,7 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
         selectedProviderType: FulcrumProvider.Instance.providerType,
         web3: FulcrumProvider.Instance.web3,
         walletAddress: account,
-        networkId: providerSettings.networkId,
-        networkName: providerSettings.networkName,
-        etherscanURL: providerSettings.etherscanURL
+        providerSettings: providerSettings
       });
     } else {
       this.setState({
@@ -57,9 +52,7 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
         selectedProviderType: FulcrumProvider.Instance.providerType,
         web3: FulcrumProvider.Instance.web3,
         walletAddress: null,
-        networkId: null,
-        networkName: null,
-        etherscanURL: null
+        providerSettings: null
       });
     }
   }
@@ -89,18 +82,17 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
       <div className="on-chain-indicator">
         <button className="on-chain-indicator__container">
           {this.renderProviderType(providerTypeDetails)}
-          {this.state.walletAddress ? (
-            <a className="on-chain-indicator__wallet-address"
-            href={`${this.state.etherscanURL}address/${this.state.walletAddress}`}
-            target="_blank"
-            rel="noopener noreferrer"
+          {this.state.walletAddress && this.state.providerSettings ? (
+            <a
+              className="on-chain-indicator__wallet-address"
+              href={`${this.state.providerSettings.etherscanURL}address/${this.state.walletAddress}`}
+              target="_blank"
+              rel="noopener noreferrer"
             >
               {walletAddressText}
             </a>
           ) : (
-            <span className="on-chain-indicator__wallet-address"
-              onClick={this.props.doNetworkConnect}
-            >
+            <span className="on-chain-indicator__wallet-address" onClick={this.props.doNetworkConnect}>
               {walletAddressText}
             </span>
           )}
@@ -118,10 +110,7 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
         onClick={this.props.doNetworkConnect}
       />
     ) : (
-      <span 
-        className="on-chain-indicator__provider-txt"
-        onClick={this.props.doNetworkConnect}
-      >
+      <span className="on-chain-indicator__provider-txt" onClick={this.props.doNetworkConnect}>
         Click To Connect
       </span>
     );

@@ -8,6 +8,7 @@ import { pTokenContract } from "../contracts/pTokenContract";
 import { Asset } from "../domain/Asset";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { IPriceDataPoint } from "../domain/IPriceDataPoint";
+import { IWeb3ProviderSettings } from "../domain/IWeb3ProviderSettings";
 import { LendRequest } from "../domain/LendRequest";
 import { LendType } from "../domain/LendType";
 import { ProviderType } from "../domain/ProviderType";
@@ -30,6 +31,7 @@ export class FulcrumProvider {
 
   public readonly eventEmitter: EventEmitter;
   public providerType: ProviderType = ProviderType.None;
+  public web3ProviderSettings: IWeb3ProviderSettings | null = null;
   public web3: Web3 | null = null;
 
   public contractsSource: ContractsSource | null = null;
@@ -51,11 +53,11 @@ export class FulcrumProvider {
   public async setWeb3Provider(providerType: ProviderType) {
     this.web3 = await Web3ConnectionFactory.getWeb3Connection(providerType);
     this.providerType = this.web3 ? providerType : ProviderType.None;
+    this.web3ProviderSettings = await FulcrumProvider.getWeb3ProviderSettings(this.web3);
 
-    const web3ProviderSettings = await FulcrumProvider.getWeb3ProviderSettings(this.web3);
     this.contractsSource =
-      this.web3 && web3ProviderSettings.networkName
-        ? new ContractsSource(this.web3.currentProvider, web3ProviderSettings.networkName)
+      this.web3 && this.web3ProviderSettings
+        ? new ContractsSource(this.web3.currentProvider, this.web3ProviderSettings.networkName)
         : null;
     if (this.contractsSource) {
       await this.contractsSource.Init();
@@ -109,11 +111,11 @@ export class FulcrumProvider {
 
     if (this.contractsSource) {
       // getting on-chain data
-      const assetDetails = await AssetsDictionary.assets.get(selectedKey.asset);
-      if (assetDetails) {
+      const assetErc20Address = this.getErc20Address(selectedKey.asset);
+      if (assetErc20Address) {
         const referencePriceFeedContract = this.contractsSource.getReferencePriceFeedContract();
         let priceFeed = await referencePriceFeedContract.getPricesForAsset.callAsync(
-          assetDetails.addressErc20,
+          assetErc20Address,
           new BigNumber(0),
           new BigNumber(intervalSeconds),
           new BigNumber(samplesCount + 1)
@@ -356,7 +358,7 @@ export class FulcrumProvider {
     return result;
   };
 
-  public static async getWeb3ProviderSettings(web3: Web3 | null) {
+  public static async getWeb3ProviderSettings(web3: Web3 | null): Promise<IWeb3ProviderSettings | null> {
     if (web3) {
       const networkId = await web3.eth.net.getId();
       // tslint:disable-next-line:one-variable-per-declaration
@@ -390,11 +392,7 @@ export class FulcrumProvider {
       };
     }
 
-    return {
-      networkId: null,
-      networkName: null,
-      etherscanURL: null
-    };
+    return null;
   }
 
   private async getBaseTokenBalance(asset: Asset): Promise<BigNumber> {
@@ -407,9 +405,9 @@ export class FulcrumProvider {
       result = await this.getEthBalance()
     } else {
       // get erc20 token balance
-      const assetDetails = AssetsDictionary.assets.get(asset);
-      if (assetDetails) {
-        result = await this.getErc20Balance(assetDetails.addressErc20);
+      const assetErc20Address = this.getErc20Address(asset);
+      if (assetErc20Address) {
+        result = await this.getErc20Balance(assetErc20Address);
       }
     }
 
@@ -439,6 +437,16 @@ export class FulcrumProvider {
       }
     }
 
+    return result;
+  }
+
+  private getErc20Address(asset: Asset): string | null {
+    let result: string | null = null;
+
+    const assetDetails = AssetsDictionary.assets.get(asset);
+    if (this.web3ProviderSettings && assetDetails) {
+      result = assetDetails.addressErc20.get(this.web3ProviderSettings.networkId) || "";
+    }
     return result;
   }
 
@@ -478,13 +486,13 @@ export class FulcrumProvider {
   private async getSwapToUsdPrice(asset: Asset): Promise<BigNumber> {
     // we expect 1 dai = 1 usd
     let result: BigNumber = new BigNumber(0);
-    const assetDetails = await AssetsDictionary.assets.get(asset);
-    const daiAssetDetails = await AssetsDictionary.assets.get(Asset.DAI);
-    if (this.contractsSource && assetDetails && daiAssetDetails) {
+    const assetErc20Address = this.getErc20Address(asset);
+    const daiErc20Address = this.getErc20Address(Asset.DAI);
+    if (this.contractsSource && assetErc20Address && daiErc20Address) {
       const referencePriceFeedContract = this.contractsSource.getReferencePriceFeedContract();
       const swapPriceData: BigNumber[] = await referencePriceFeedContract.getSwapPrice.callAsync(
-        assetDetails.addressErc20,
-        daiAssetDetails.addressErc20,
+        assetErc20Address,
+        daiErc20Address,
         new BigNumber(10 ** 18)
       );
       result = swapPriceData[0].dividedBy(10 ** 18);
@@ -554,9 +562,9 @@ export class FulcrumProvider {
         if (taskRequest.asset !== Asset.ETH) {
           // init erc20 contract for base token
           let tokenErc20Contract: erc20Contract | null = null;
-          const assetDetails = AssetsDictionary.assets.get(taskRequest.asset);
-          if (assetDetails) {
-            tokenErc20Contract = await this.contractsSource.getErc20Contract(assetDetails.addressErc20);
+          const assetErc20Address = this.getErc20Address(taskRequest.asset);
+          if (assetErc20Address) {
+            tokenErc20Contract = await this.contractsSource.getErc20Contract(assetErc20Address);
           }
 
           if (!tokenErc20Contract) {
@@ -658,9 +666,9 @@ export class FulcrumProvider {
         if (taskRequest.asset !== Asset.ETH) {
           // init erc20 contract for base token
           let tokenErc20Contract: erc20Contract | null = null;
-          const assetDetails = AssetsDictionary.assets.get(taskRequest.asset);
-          if (assetDetails) {
-            tokenErc20Contract = await this.contractsSource.getErc20Contract(assetDetails.addressErc20);
+          const assetErc20Address = this.getErc20Address(taskRequest.asset);
+          if (assetErc20Address) {
+            tokenErc20Contract = await this.contractsSource.getErc20Contract(assetErc20Address);
           } else {
             throw new Error("No ERC20 contract available!");
           }
@@ -688,7 +696,7 @@ export class FulcrumProvider {
           task.processingStepNext();
 
           // Submitting loan
-          await tokenContract.mintWithToken.sendTransactionAsync(account, assetDetails.addressErc20, amountInBaseUnits, { from: account });
+          await tokenContract.mintWithToken.sendTransactionAsync(account, assetErc20Address, amountInBaseUnits, { from: account });
         } else {
           // no additional inits or checks
           task.processingStepNext();
@@ -710,11 +718,11 @@ export class FulcrumProvider {
 
         if (taskRequest.asset !== Asset.ETH) {
           // Submitting unloan
-          const assetDetails = AssetsDictionary.assets.get(taskRequest.asset);
-          if (assetDetails) {
+          const assetErc20Address = this.getErc20Address(taskRequest.asset);
+          if (assetErc20Address) {
             await tokenContract.burnToToken.sendTransactionAsync(
               account,
-              assetDetails.addressErc20,
+              assetErc20Address,
               amountInBaseUnits,
               { from: account }
             );
