@@ -125,7 +125,7 @@ export class FulcrumProvider {
             if (index !== 0) {
               result.push({
                 timeStamp: value.timestamp.toNumber(),
-                price: value.rate.toNumber(),
+                price: value.rate.dividedBy(10 ** 18).toNumber(),
                 change24h: rate.isZero() ? 0 : rate.minus(value.rate).dividedBy(rate).toNumber()
               });
               rate = value.rate;
