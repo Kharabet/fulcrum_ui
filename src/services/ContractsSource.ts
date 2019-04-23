@@ -7,11 +7,14 @@ import { TradeTokenKey } from "../domain/TradeTokenKey";
 import { erc20Contract } from "../contracts/erc20";
 import { iTokenContract } from "../contracts/iTokenContract";
 import { pTokenContract } from "../contracts/pTokenContract";
+import { ReferencePriceFeedContract } from "../contracts/ReferencePriceFeedContract";
 import { TokenizedRegistryContract } from "../contracts/TokenizedRegistryContract";
 
 import erc20Json from "./../assets/artifacts/kovan/erc20.json";
 import iTokenJson from "./../assets/artifacts/kovan/iToken.json";
 import pTokenJson from "./../assets/artifacts/kovan/pToken.json";
+import ReferencePriceFeedJson from "./../assets/artifacts/kovan/ReferencePriceFeed.json";
+import TokenizedRegistryJson from "./../assets/artifacts/kovan/TokenizedRegistry.json";
 
 interface ITokenContractInfo {
   token: string;
@@ -32,7 +35,7 @@ export class ContractsSource {
 
   public constructor(provider: Provider, networkName: string) {
     this.provider = provider;
-    this.tokenizedRegistryContract = new TokenizedRegistryContract(provider);
+    this.tokenizedRegistryContract = new TokenizedRegistryContract(TokenizedRegistryJson.abi, TokenizedRegistryJson.address, provider);
     this.networkName = networkName;
   }
 
@@ -81,6 +84,10 @@ export class ContractsSource {
     return tokenContractInfo ? new pTokenContract(pTokenJson.abi, tokenContractInfo.token, this.provider) : null;
   }
 
+  private getReferencePriceFeedContractRaw(): ReferencePriceFeedContract {
+    return new ReferencePriceFeedContract(ReferencePriceFeedJson.abi, ReferencePriceFeedJson.address, this.provider);
+  }
+
   public getITokenErc20Address(asset: Asset): string | null {
     const tokenContractInfo = this.iTokensContractInfos.get(`i${asset}`) || null;
     return tokenContractInfo ? tokenContractInfo.token : null;
@@ -94,4 +101,5 @@ export class ContractsSource {
   public getErc20Contract = _.memoize(this.getErc20ContractRaw);
   public getITokenContract = _.memoize(this.getITokenContractRaw);
   public getPTokenContract = _.memoize(this.getPTokenContractRaw);
+  public getReferencePriceFeedContract = _.memoize(this.getReferencePriceFeedContractRaw);
 }

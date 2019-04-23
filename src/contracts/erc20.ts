@@ -359,7 +359,7 @@ export class erc20Contract extends BaseContract {
     }
   };
   constructor(abi: ContractAbi, address: string, provider: Provider, txDefaults?: Partial<TxData>) {
-    super("erc20", abi, address, provider as SupportedProvider, txDefaults);
+    super("erc20", abi, address.toLowerCase(), provider as SupportedProvider, txDefaults);
     classUtils.bindAll(this, ["_abiEncoderByFunctionSignature", "address", "abi", "_web3Wrapper"]);
   }
 } // tslint:disable:max-file-line-count

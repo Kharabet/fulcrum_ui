@@ -10,6 +10,7 @@ import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { IPriceDataPoint } from "../domain/IPriceDataPoint";
 import { LendRequest } from "../domain/LendRequest";
 import { LendType } from "../domain/LendType";
+import { PositionType } from "../domain/PositionType";
 import { ProviderType } from "../domain/ProviderType";
 import { RequestTask } from "../domain/RequestTask";
 import { TradeRequest } from "../domain/TradeRequest";
@@ -104,26 +105,45 @@ export class FulcrumProvider {
     return result;
   };
 
-  // will figure this out later
-  public getPriceDataPoints = async (selectedKey: TradeTokenKey, samplesCount: number): Promise<IPriceDataPoint[]> => {
+  public getPriceDataPoints = async (selectedKey: TradeTokenKey, samplesCount: number, intervalSeconds: number = 21600): Promise<IPriceDataPoint[]> => {
     const result: IPriceDataPoint[] = [];
 
-    const timeUnit = "hour";
-    const beginningTime = moment()
-      .startOf(timeUnit)
-      .subtract(samplesCount, timeUnit);
-    const priceBase = 40;
-    let priceDiff = Math.round(Math.random() * 2000) / 100;
-    let change24h = 0;
-    for (let i = 0; i < samplesCount + 1; i++) {
-      const priceDiffNew = Math.round(Math.random() * 2000) / 100;
-      change24h = ((priceDiffNew - priceDiff) / (priceBase + priceDiff)) * 100;
-      priceDiff = priceDiffNew;
+    if (this.contractsSource) {
+      // getting on-chain data
+      const assetDetails = await AssetsDictionary.assets.get(selectedKey.asset);
+      if (assetDetails) {
+        const referencePriceFeedContract = this.contractsSource.getReferencePriceFeedContract();
+        const priceFeed = await referencePriceFeedContract.getPricesForAsset.callAsync(
+          assetDetails.addressErc20,
+          new BigNumber(0),
+          new BigNumber(intervalSeconds),
+          new BigNumber(samplesCount + 1)
+        );
+        if (priceFeed.length > 1) {
+          let rate = priceFeed[0].rate;
+          priceFeed.forEach((value, index) => {
+            if (index !== 0) {
+              result.push({
+                timeStamp: value.timestamp.toNumber(),
+                price: value.rate.toNumber(),
+                change24h: rate.isZero() ? 0 : rate.minus(value.rate).dividedBy(rate).toNumber()
+              });
+              rate = value.rate;
+            }
+          });
+        }
+      }
+    } else {
+      // getting empty data
+      const beginningTime = moment()
+        .startOf("hour")
+        .subtract(intervalSeconds, "second");
+      for (let i = 0; i < samplesCount + 1; i++) {
+        result.push({ timeStamp: beginningTime.unix(), price: 1, change24h: 0 });
 
-      result.push({ timeStamp: beginningTime.unix(), price: priceBase + priceDiff, change24h: change24h });
-
-      // add mutates beginningTime
-      beginningTime.add(1, timeUnit);
+        // add mutates beginningTime
+        beginningTime.add(intervalSeconds, "second");
+      }
     }
 
     return result;
@@ -145,16 +165,23 @@ export class FulcrumProvider {
           pswBTC4x (wBTC Short 4x leverage) -> 10.12 wBTC per pswBTC4x
   */
   public getPriceLatestDataPoint = async (selectedKey: TradeTokenKey): Promise<IPriceDataPoint> => {
-    const timeUnit = "hour";
-    const timeStamp = moment().startOf(timeUnit);
-    const priceBase = 40;
-    const priceDiff = Math.round(Math.random() * 2000) / 100;
-    const change24h = Math.round(Math.random() * 1000) / 100 - 5;
-    return {
-      timeStamp: timeStamp.unix(),
-      price: priceBase + priceDiff,
-      change24h: change24h
-    };
+    const result = this.getPriceDefaultDataPoint();
+
+    // we are using this function only for trade prices
+    if (this.contractsSource) {
+      const assetContract = this.contractsSource.getPTokenContract(selectedKey);
+      if (assetContract) {
+        const tokenPrice = await assetContract.tokenPrice.callAsync();
+        const swapPrice = selectedKey.positionType === PositionType.LONG ? await this.getSwapToUsdPrice(selectedKey.asset) : new BigNumber(1);
+
+        const timeStamp = moment();
+        result.timeStamp = timeStamp.unix();
+        result.price = tokenPrice.multipliedBy(swapPrice).dividedBy(10 ** 18).toNumber();
+        result.change24h = 0;
+      }
+    }
+
+    return result;
   };
 
   public getPriceDefaultDataPoint = (): IPriceDataPoint => {
@@ -183,11 +210,13 @@ export class FulcrumProvider {
         result = new BigNumber(0);
         const assetContract = this.contractsSource.getITokenContract(asset);
         if (assetContract) {
+          const swapPrice = await this.getSwapToUsdPrice(asset);
           const tokenPrice = await assetContract.tokenPrice.callAsync();
           const checkpointPrice = await assetContract.checkpointPrice.callAsync(account);
           result = tokenPrice
             .minus(checkpointPrice)
             .multipliedBy(balance)
+            .multipliedBy(swapPrice)
             .dividedBy(10 ** 36);
         }
       }
@@ -212,11 +241,13 @@ export class FulcrumProvider {
         result = new BigNumber(0);
         const assetContract = this.contractsSource.getPTokenContract(selectedKey);
         if (assetContract) {
+          const swapPrice = selectedKey.positionType === PositionType.LONG ? await this.getSwapToUsdPrice(selectedKey.asset) : new BigNumber(1);
           const tokenPrice = await assetContract.tokenPrice.callAsync();
           const checkpointPrice = await assetContract.checkpointPrice.callAsync(account);
           result = tokenPrice
             .minus(checkpointPrice)
             .multipliedBy(balance)
+            .multipliedBy(swapPrice)
             .dividedBy(10 ** 36);
         }
       }
@@ -434,6 +465,23 @@ export class FulcrumProvider {
       }
     }
 
+    return result;
+  }
+
+  private async getSwapToUsdPrice(asset: Asset): Promise<BigNumber> {
+    // we expect 1 dai = 1 usd
+    let result: BigNumber = new BigNumber(0);
+    const assetDetails = await AssetsDictionary.assets.get(asset);
+    const daiAssetDetails = await AssetsDictionary.assets.get(Asset.DAI);
+    if (this.contractsSource && assetDetails && daiAssetDetails) {
+      const referencePriceFeedContract = this.contractsSource.getReferencePriceFeedContract();
+      const swapPriceData: BigNumber[] = await referencePriceFeedContract.getSwapPrice.callAsync(
+        assetDetails.addressErc20,
+        daiAssetDetails.addressErc20,
+        new BigNumber(10 ** 18)
+      );
+      result = swapPriceData[0];
+    }
     return result;
   }
 

@@ -2067,7 +2067,7 @@ export class pTokenContract extends BaseContract {
     }
   };
   constructor(abi: ContractAbi, address: string, provider: Provider, txDefaults?: Partial<TxData>) {
-    super("pToken", abi, address, provider as SupportedProvider, txDefaults);
+    super("pToken", abi, address.toLowerCase(), provider as SupportedProvider, txDefaults);
     classUtils.bindAll(this, ["_abiEncoderByFunctionSignature", "address", "abi", "_web3Wrapper"]);
   }
 } // tslint:disable:max-file-line-count

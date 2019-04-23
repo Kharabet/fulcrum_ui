@@ -2,11 +2,9 @@
 // tslint:disable:no-unbound-method
 // tslint:disable:variable-name
 import { BaseContract } from "@0x/base-contract";
-import { BlockParam, CallData, DecodedLogArgs, TxData, SupportedProvider } from "ethereum-types";
+import { BlockParam, CallData, ContractAbi, DecodedLogArgs, TxData, SupportedProvider } from "ethereum-types";
 import { BigNumber, classUtils } from "@0x/utils";
 import { Provider } from "web3/providers";
-
-import TokenizedRegistryJson from "./../assets/artifacts/kovan/TokenizedRegistry.json";
 
 export type TokenizedRegistryEventArgs = TokenizedRegistryOwnershipTransferredEventArgs;
 
@@ -838,8 +836,8 @@ export class TokenizedRegistryContract extends BaseContract {
       return result;
     }
   };
-  constructor(provider: Provider, txDefaults?: Partial<TxData>) {
-    super("TokenizedRegistry", TokenizedRegistryJson.abi, TokenizedRegistryJson.address, provider as SupportedProvider, txDefaults);
+  constructor(abi: ContractAbi, address: string, provider: Provider, txDefaults?: Partial<TxData>) {
+    super("TokenizedRegistry", abi, address.toLowerCase(), provider as SupportedProvider, txDefaults);
     classUtils.bindAll(this, ["_abiEncoderByFunctionSignature", "address", "abi", "_web3Wrapper"]);
   }
 } // tslint:disable:max-file-line-count

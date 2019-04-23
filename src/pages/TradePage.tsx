@@ -11,6 +11,8 @@ import { TradeTokenKey } from "../domain/TradeTokenKey";
 import { TradeType } from "../domain/TradeType";
 import { Footer } from "../layout/Footer";
 import { HeaderOps } from "../layout/HeaderOps";
+import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
+import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
 
 export interface ITradePageProps {
@@ -40,6 +42,8 @@ export class TradePage extends Component<ITradePageProps, ITradePageState> {
       tradePositionType: PositionType.SHORT,
       tradeLeverage: 0
     };
+
+    FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
   public componentDidMount(): void {
@@ -85,6 +89,11 @@ export class TradePage extends Component<ITradePageProps, ITradePageState> {
   public onSelect = async (key: TradeTokenKey) => {
     const priceGraphData = await FulcrumProvider.Instance.getPriceDataPoints(key, 15);
     this.setState({ ...this.state, selectedKey: key, priceGraphData: priceGraphData });
+  };
+
+  private onProviderChanged = async (event: ProviderChangedEvent) => {
+    const priceGraphData = await FulcrumProvider.Instance.getPriceDataPoints(this.state.selectedKey, 15);
+    this.setState({ ...this.state, selectedKey: this.state.selectedKey, priceGraphData: priceGraphData });
   };
 
   public onTradeRequested = (request: TradeRequest) => {
