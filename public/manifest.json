@@ -13,9 +13,9 @@
       "type": "image/png"
     },
     {
-      "src": "favicon_32x32.svg",
-      "sizes": "48x48 64x64 72x72 96x96 128x128 256x256",
-      "type": "image/svg"
+      "src": "favicon_96x96.png",
+      "sizes": "48x48 96x96",
+      "type": "image/png"
     }
   ],
   "start_url": ".",
