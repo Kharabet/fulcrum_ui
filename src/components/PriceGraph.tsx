@@ -48,10 +48,10 @@ export class PriceGraph extends Component<IPriceGraphProps, IPriceGraphState> {
   }
 
   public render() {
-    const timeStampFromText = this.state.displayedDataPoint
+    const timeStampFromText = this.props.data.length > 0
       ? moment.unix(this.props.data.map(e => e.timeStamp).reduce((a, b) => Math.min(a, b))).format("MMM DD, hh:mm A")
       : "-";
-    const timeStampToText = this.state.displayedDataPoint
+    const timeStampToText = this.props.data.length > 0
       ? moment.unix(this.props.data.map(e => e.timeStamp).reduce((a, b) => Math.max(a, b))).format("MMM DD, hh:mm A")
       : "-";
 
