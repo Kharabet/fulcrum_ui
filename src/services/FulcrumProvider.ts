@@ -26,6 +26,8 @@ import { TasksQueue } from "./TasksQueue";
 export class FulcrumProvider {
   public static Instance: FulcrumProvider;
 
+  private readonly gasLimit = 3000000;
+
   private isProcessing: boolean = false;
   private isChecking: boolean = false;
 
@@ -579,7 +581,7 @@ export class FulcrumProvider {
 
           // Prompting token allowance
           if (amountInBaseUnits.gt(erc20allowance)) {
-            approvePromise = tokenErc20Contract.approve.sendTransactionAsync(tokenContract.address, amountInBaseUnits, { from: account });
+            approvePromise = tokenErc20Contract.approve.sendTransactionAsync(tokenContract.address, amountInBaseUnits, { from: account, gas: this.gasLimit });
           }
           task.processingStepNext();
 
@@ -590,7 +592,7 @@ export class FulcrumProvider {
           task.processingStepNext();
 
           // Submitting loan
-          await tokenContract.mint.sendTransactionAsync(account, amountInBaseUnits, { from: account });
+          await tokenContract.mint.sendTransactionAsync(account, amountInBaseUnits, { from: account, gas: this.gasLimit });
         } else {
           // no additional inits or checks
           task.processingStepNext();
@@ -600,7 +602,7 @@ export class FulcrumProvider {
           task.processingStepNext();
 
           // Submitting loan
-          await tokenContract.mintWithEther.sendTransactionAsync(account, { from: account, value: amountInBaseUnits });
+          await tokenContract.mintWithEther.sendTransactionAsync(account, { from: account, value: amountInBaseUnits, gas: this.gasLimit });
         }
       } else {
         // no additional inits or checks
@@ -612,10 +614,10 @@ export class FulcrumProvider {
 
         if (taskRequest.asset !== Asset.ETH) {
           // Submitting unloan
-          await tokenContract.burn.sendTransactionAsync(account, amountInBaseUnits, { from: account });
+          await tokenContract.burn.sendTransactionAsync(account, amountInBaseUnits, { from: account, gas: this.gasLimit });
         } else {
           // Submitting unloan
-          await tokenContract.burnToEther.sendTransactionAsync(account, amountInBaseUnits, { from: account });
+          await tokenContract.burnToEther.sendTransactionAsync(account, amountInBaseUnits, { from: account, gas: this.gasLimit });
         }
       }
 
@@ -685,7 +687,7 @@ export class FulcrumProvider {
 
           // Prompting token allowance
           if (amountInBaseUnits.gt(erc20allowance)) {
-            approvePromise = tokenErc20Contract.approve.sendTransactionAsync(tokenContract.address, amountInBaseUnits, { from: account });
+            approvePromise = tokenErc20Contract.approve.sendTransactionAsync(tokenContract.address, amountInBaseUnits, { from: account, gas: this.gasLimit });
           }
           task.processingStepNext();
 
@@ -696,7 +698,7 @@ export class FulcrumProvider {
           task.processingStepNext();
 
           // Submitting loan
-          await tokenContract.mintWithToken.sendTransactionAsync(account, assetErc20Address, amountInBaseUnits, { from: account });
+          await tokenContract.mintWithToken.sendTransactionAsync(account, assetErc20Address, amountInBaseUnits, { from: account, gas: this.gasLimit });
         } else {
           // no additional inits or checks
           task.processingStepNext();
@@ -706,7 +708,7 @@ export class FulcrumProvider {
           task.processingStepNext();
 
           // Submitting loan
-          await tokenContract.mintWithEther.sendTransactionAsync(account, { from: account, value: amountInBaseUnits });
+          await tokenContract.mintWithEther.sendTransactionAsync(account, { from: account, value: amountInBaseUnits, gas: this.gasLimit });
         }
       } else {
         // no additional inits or checks
@@ -724,12 +726,12 @@ export class FulcrumProvider {
               account,
               assetErc20Address,
               amountInBaseUnits,
-              { from: account }
+              { from: account, gas: this.gasLimit }
             );
           }
         } else {
           // Submitting unloan
-          await tokenContract.burnToEther.sendTransactionAsync(account, amountInBaseUnits, { from: account });
+          await tokenContract.burnToEther.sendTransactionAsync(account, amountInBaseUnits, { from: account, gas: this.gasLimit });
         }
       }
 
