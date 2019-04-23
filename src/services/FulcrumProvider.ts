@@ -127,7 +127,14 @@ export class FulcrumProvider {
               result.push({
                 timeStamp: value.timestamp.toNumber(),
                 price: value.rate.dividedBy(10 ** 18).toNumber(),
-                change24h: rate.isZero() ? value.rate.isZero() ? 0 : 100 : rate.minus(value.rate).dividedBy(rate).toNumber()
+                change24h:
+                  rate.isZero()
+                    ? value.rate.isZero()
+                      ? 0
+                      : rate.gte(0)
+                        ? 100
+                        : -100
+                    : rate.minus(value.rate).dividedBy(rate).toNumber()
               });
               rate = value.rate;
             }
