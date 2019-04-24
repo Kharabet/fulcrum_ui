@@ -120,9 +120,11 @@ export class FulcrumProvider {
           assetErc20Address,
           new BigNumber(0),
           new BigNumber(intervalSeconds),
-          new BigNumber(samplesCount + 1)
+          new BigNumber(samplesCount)
         );
         priceFeed = priceFeed.reverse();
+        const latestSwapPrice = await this.getSwapToUsdPrice(selectedKey.asset);
+        priceFeed.push({rate: latestSwapPrice.multipliedBy(10 ** 18), timestamp: new BigNumber(moment().unix()) });
         if (priceFeed.length > 1) {
           let rate = priceFeed[0].rate;
           priceFeed.forEach((value, index) => {
