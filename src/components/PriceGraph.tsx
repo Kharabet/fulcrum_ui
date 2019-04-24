@@ -31,7 +31,7 @@ export class PriceGraph extends Component<IPriceGraphProps, IPriceGraphState> {
       ...this.state,
       priceBaseLine: normalizedData.priceBaseLine,
       data: normalizedData.points,
-      displayedDataPoint: this.props.data[this.props.data.length - 1]
+      displayedDataPoint: normalizedData.points[normalizedData.points.length - 1]
     });
   }
 
@@ -125,10 +125,14 @@ export class PriceGraph extends Component<IPriceGraphProps, IPriceGraphState> {
     const priceMin = prices.length > 0 ? prices.reduce((a, b) => Math.min(a, b)) : 0;
     const priceMax = prices.length > 0 ? prices.reduce((a, b) => Math.max(a, b)) : 0;
     const priceBaseLine = priceMin - (priceMax - priceMin) * 0.3;
-    const normalizedData = priceDataPoints.map(e => {
-      return { ...e, price: e.price - priceBaseLine };
-    });
-
-    return { points: normalizedData, priceBaseLine: priceBaseLine };
+    if (priceBaseLine > 0) {
+      const normalizedData = priceDataPoints.map(e => {
+        return { ...e, price: e.price - priceBaseLine };
+      });
+      return { points: normalizedData, priceBaseLine: priceBaseLine };
+    } else {
+      // tslint:disable-next-line:arrow-return-shorthand
+      return { points: priceDataPoints.map(e => { return { ...e }; }), priceBaseLine: 0 };
+    }
   }
 }
