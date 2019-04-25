@@ -6,17 +6,17 @@
   box-sizing: inherit;
 }
 
-body {
+html {
   font-family: "Open Sans", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  height: 100vh;
+  min-height: 100%;
+  min-width: 100%;
 
-  background-color: #37414a;
-  // background gradient
-  // background-color: #282F36;
-  // background-image: linear-gradient(to bottom right, #434F5C, #282F36);
+  //background-color: #37414a;
+  background-color: rgb(40, 47, 54);
+  background-image: linear-gradient(to right bottom, rgb(67, 79, 92), rgb(40, 47, 54));
 }
 
 input {
