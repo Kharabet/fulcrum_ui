@@ -12,9 +12,14 @@ export class TasksListItemDetails extends Component<ITasksListItemDetailsProps> 
     }
 
     return (
-      <div className="task-list-item-details">
-        {this.props.task.steps.map((e, i) => this.renderSingleStep(e, i))}
-      </div>
+      <React.Fragment>
+        <div className="task-list-item-delimiter-container">
+          <hr className="task-list-item-delimiter" />
+        </div>
+        <div className="task-list-item-details">
+          {this.props.task.steps.map((e, i) => this.renderSingleStep(e, i))}
+        </div>
+      </React.Fragment>
     );
   }
 
@@ -29,10 +34,21 @@ export class TasksListItemDetails extends Component<ITasksListItemDetailsProps> 
     return (
       <div key={index} className="task-list-item-details__step">
         <div className="task-list-item-details__step-img-container">
-          { /**/ } &nbsp;
+          {this.renderStepProgressIndicator(index)}
         </div>
         <div className={`task-list-item-details__step-title ${titleStateClassName}`}>{title}</div>
       </div>
     );
+  };
+
+  public renderStepProgressIndicator = (index: number): ReactNode => {
+    const titleStateClassName =
+      index + 1 === this.props.task.stepCurrent
+        ? "task-list-item-details__step-img--in-progress"
+        : index < this.props.task.stepCurrent
+          ? "task-list-item-details__step-img--done"
+          : "task-list-item-details__step-img--future";
+
+    return <div className={`task-list-item-details__step-img ${titleStateClassName}`} />;
   }
 }

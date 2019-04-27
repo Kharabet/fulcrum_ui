@@ -1,0 +1,62 @@
+$font-size-check-box: 0.75rem;
+$checkmark-size: 1rem;
+$checkmark-border-radius: 0.1875rem;
+$checkmark-spacing: 0.25rem;
+$checkmark-bg-color: #ffffff;
+$checkmark-bg-color__checked: #ffffff;
+$checkmark-symbol-color: #000000;
+
+.cb-container {
+  display: inline;
+  position: relative;
+
+  cursor: pointer;
+  user-select: none;
+
+  .cb-label {
+    font-size: $font-size-check-box;
+    padding-right: $checkmark-size + $checkmark-spacing;
+  }
+
+  .cb-checkmark {
+    position: absolute;
+    height: $checkmark-size;
+    width: $checkmark-size;
+
+    top: 0;
+    left: 100%;
+    transform: translateX(-100%);
+
+    background-color: $checkmark-bg-color;
+    border-radius: $checkmark-border-radius;
+
+    &:after {
+      content: "";
+      position: absolute;
+      display: none;
+
+      left: $checkmark-size / 3;
+      top: $checkmark-size / 6;
+      width: $checkmark-size / 4;
+      height: $checkmark-size / 2;
+      border: solid $checkmark-symbol-color;
+      border-width: 0 1px 1px 0;
+
+      -webkit-transform: rotate(45deg);
+      -ms-transform: rotate(45deg);
+      transform: rotate(45deg);
+    }
+  }
+
+  input[type="checkbox"] {
+    display: none;
+
+    &:checked + .cb-checkmark {
+      background-color: $checkmark-bg-color__checked;
+    }
+
+    &:checked + .cb-checkmark:after {
+      display: block;
+    }
+  }
+}

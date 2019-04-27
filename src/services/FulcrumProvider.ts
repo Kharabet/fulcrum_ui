@@ -431,7 +431,7 @@ export class FulcrumProvider {
     return result;
   }
 
-  private async getTradeTokenBalance(selectedKey: TradeTokenKey): Promise<BigNumber> {
+  public async getTradeTokenBalance(selectedKey: TradeTokenKey): Promise<BigNumber> {
     let result = new BigNumber(0);
 
     if (this.contractsSource) {
@@ -442,6 +442,18 @@ export class FulcrumProvider {
     }
 
     return result;
+  }
+
+  public getPTokensAvailable(): TradeTokenKey[] {
+    return this.contractsSource
+        ? this.contractsSource.getPTokensAvailable()
+        : [];
+  }
+
+  public getPTokenErc20Address(key: TradeTokenKey): string | null {
+    return this.contractsSource
+      ? this.contractsSource.getPTokenErc20Address(key)
+      : null;
   }
 
   private getErc20Address(asset: Asset): string | null {

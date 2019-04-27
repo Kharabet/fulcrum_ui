@@ -124,6 +124,18 @@ export class ContractsSource {
     );
   }
 
+  public getPTokensAvailable(): TradeTokenKey[] {
+    const result = new Array<TradeTokenKey>();
+    this.pTokensContractInfos.forEach(e => {
+      const tradeTokenKey = TradeTokenKey.fromString(e.symbol);
+      if (tradeTokenKey) {
+        result.push(tradeTokenKey);
+      }
+    });
+
+    return result;
+  }
+
   public getITokenErc20Address(asset: Asset): string | null {
     const tokenContractInfo = this.iTokensContractInfos.get(`i${asset}`) || null;
     return tokenContractInfo ? tokenContractInfo.token : null;

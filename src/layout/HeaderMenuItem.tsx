@@ -12,7 +12,10 @@ export class HeaderMenuItem extends Component<IHeaderMenuItemProps> {
     return (
       <div className="header-menu__item">
         <NavLink to={this.props.link} exact={true} activeClassName="header-menu__item-link--active">
-          {this.props.title}
+          <div>{this.props.title}</div>
+          <div className="header-menu__item-link__accent-container">
+            <div className="header-menu__item-link__accent" />
+          </div>
         </NavLink>
       </div>
     );

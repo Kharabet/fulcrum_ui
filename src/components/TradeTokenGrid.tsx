@@ -7,10 +7,12 @@ import { TradeTokenGridHeader } from "./TradeTokenGridHeader";
 import { ITradeTokenGridRowProps, TradeTokenGridRow } from "./TradeTokenGridRow";
 
 export interface ITradeTokenGridProps {
+  showMyTokensOnly: boolean;
   selectedKey: TradeTokenKey;
   defaultLeverageShort: number;
   defaultLeverageLong: number;
 
+  onShowMyTokensOnlyChange: (value: boolean) => void;
   onSelect: (key: TradeTokenKey) => void;
   onTrade: (request: TradeRequest) => void;
 }
@@ -30,16 +32,21 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
     };
   }
 
-  public static getDerivedStateFromProps(
-    nextProps: Readonly<ITradeTokenGridProps>,
-    nextContext: Readonly<ITradeTokenGridState>
-  ): ITradeTokenGridState {
-    return { tokenRowsData: TradeTokenGrid.getRowsData(nextProps) };
+  public async derivedUpdate() {
+    this.setState({ ...this.state, tokenRowsData: TradeTokenGrid.getRowsData(this.props) }) ;
   }
 
   public componentDidMount(): void {
     const e = this.state.tokenRowsData[0];
     this.props.onSelect(new TradeTokenKey(e.asset, e.positionType, e.defaultLeverage));
+
+    this.derivedUpdate();
+  }
+
+  public componentDidUpdate(prevProps: Readonly<ITradeTokenGridProps>, prevState: Readonly<ITradeTokenGridState>, snapshot?: any): void {
+    if (this.props.selectedKey !== prevProps.selectedKey || this.props.showMyTokensOnly !== prevProps.showMyTokensOnly) {
+      this.derivedUpdate();
+    }
   }
 
   public render() {
@@ -47,7 +54,7 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
 
     return (
       <div className="trade-token-grid">
-        <TradeTokenGridHeader />
+        <TradeTokenGridHeader showMyTokensOnly={this.props.showMyTokensOnly} onShowMyTokensOnlyChange={this.props.onShowMyTokensOnlyChange} />
         {tokenRows}
       </div>
     );

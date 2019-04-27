@@ -3,8 +3,10 @@ $height-row: 4.5rem;
 
 $width-col-token-image: 5rem;
 $width-col-token-name: 3.5rem;
+$width-col-token-name-full: 11rem;
 $width-col-position-type: 6rem;
 $width-col-leverage: 13rem;
+$width-col-amount: 13rem;
 $width-col-price: 6.5rem;
 $width-col-change24h: 7rem;
 $width-col-profit: 5rem;
@@ -55,6 +57,12 @@ $margin-right-column: 1.5rem;
   width: $width-col-token-name;
 }
 
+.trade-token-grid-header__col-token-name-full {
+  @include trade-token-grid-header__col();
+
+  width: $width-col-token-name-full;
+}
+
 .trade-token-grid-header__col-position-type {
   @include trade-token-grid-header__col();
 
@@ -65,6 +73,12 @@ $margin-right-column: 1.5rem;
   @include trade-token-grid-header__col();
 
   width: $width-col-leverage;
+}
+
+.trade-token-grid-header__col-amount {
+  @include trade-token-grid-header__col();
+
+  width: $width-col-amount;
 }
 
 .trade-token-grid-header__col-price {
@@ -89,6 +103,7 @@ $margin-right-column: 1.5rem;
   @include trade-token-grid-header__col();
 
   width: $width-col-actions;
+  text-align: right;
 }
 
 .trade-token-grid-row {
@@ -163,6 +178,13 @@ $margin-right-column: 1.5rem;
   width: $width-col-token-name;
 }
 
+.trade-token-grid-row__col-token-name-full {
+  @include trade-token-grid-row__col();
+  @include trade-token-grid-row__text-normal();
+
+  width: $width-col-token-name-full;
+}
+
 .trade-token-grid-row__col-position-type {
   @include trade-token-grid-row__col();
 
@@ -173,6 +195,13 @@ $margin-right-column: 1.5rem;
   @include trade-token-grid-row__col();
 
   width: $width-col-leverage;
+}
+
+.trade-token-grid-row__col-amount {
+  @include trade-token-grid-row__col();
+  @include trade-token-grid-row__text-normal();
+
+  width: $width-col-amount;
 }
 
 .trade-token-grid-row__col-price {
@@ -250,4 +279,40 @@ $margin-right-column: 1.5rem;
   color: #ffffff;
 
   outline: none;
+}
+
+.trade-token-grid-row__details-button {
+  display: inline-block;
+  cursor: pointer;
+  position: relative;
+
+  border: solid 1px #758295;
+
+  width: 2.5rem;
+  height: 2.5rem;
+  margin: 0 0.7rem 0 calc(40% - 1.9rem);
+
+  border-radius: 100px;
+  background-color: rgba(0, 0, 0, 0);
+
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  font-weight: normal;
+  font-style: normal;
+  font-stretch: normal;
+  letter-spacing: -0.3px;
+  color: #ffffff;
+
+  outline: none;
+}
+
+.trade-token-grid-row__details-button::after {
+  position: absolute;
+  content: "•••";
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(90deg);
+  font-size: 0.5rem;
+  letter-spacing: 0.125rem;
+  margin-top: 0.125rem;
 }

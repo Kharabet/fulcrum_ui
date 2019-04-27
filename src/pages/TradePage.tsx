@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import Modal from "react-modal";
+import { OwnTokenGrid } from "../components/OwnTokenGrid";
 import { PriceGraph } from "../components/PriceGraph";
 import { TradeForm } from "../components/TradeForm";
 import { TradeTokenGrid } from "../components/TradeTokenGrid";
@@ -20,6 +21,7 @@ export interface ITradePageProps {
 }
 
 interface ITradePageState {
+  showMyTokensOnly: boolean;
   selectedKey: TradeTokenKey;
   isTradeModalOpen: boolean;
   tradeType: TradeType;
@@ -34,6 +36,7 @@ export class TradePage extends Component<ITradePageProps, ITradePageState> {
     super(props);
 
     this.state = {
+      showMyTokensOnly: false,
       selectedKey: TradeTokenKey.empty(),
       priceGraphData: [],
       isTradeModalOpen: false,
@@ -58,13 +61,26 @@ export class TradePage extends Component<ITradePageProps, ITradePageState> {
         <HeaderOps doNetworkConnect={this.props.doNetworkConnect} />
         <main>
           <PriceGraph data={this.state.priceGraphData} />
-          <TradeTokenGrid
-            selectedKey={this.state.selectedKey}
-            defaultLeverageShort={1}
-            defaultLeverageLong={2}
-            onSelect={this.onSelect}
-            onTrade={this.onTradeRequested}
-          />
+          {this.state.showMyTokensOnly ? (
+            <OwnTokenGrid
+              showMyTokensOnly={this.state.showMyTokensOnly}
+              selectedKey={this.state.selectedKey}
+              onShowMyTokensOnlyChange={this.onShowMyTokensOnlyChange}
+              onSelect={this.onSelect}
+              onDetails={this.onDetails}
+              onTrade={this.onTradeRequested}
+            />
+          ) : (
+            <TradeTokenGrid
+              showMyTokensOnly={this.state.showMyTokensOnly}
+              selectedKey={this.state.selectedKey}
+              defaultLeverageShort={1}
+              defaultLeverageLong={2}
+              onShowMyTokensOnlyChange={this.onShowMyTokensOnlyChange}
+              onSelect={this.onSelect}
+              onTrade={this.onTradeRequested}
+            />
+          )}
           <Modal
             isOpen={this.state.isTradeModalOpen}
             onRequestClose={this.onRequestClose}
@@ -89,6 +105,10 @@ export class TradePage extends Component<ITradePageProps, ITradePageState> {
   public onSelect = async (key: TradeTokenKey) => {
     const priceGraphData = await FulcrumProvider.Instance.getPriceDataPoints(key, 15);
     this.setState({ ...this.state, selectedKey: key, priceGraphData: priceGraphData });
+  };
+
+  public onDetails = async (key: TradeTokenKey) => {
+    alert(await FulcrumProvider.Instance.getPTokenErc20Address(key));
   };
 
   private onProviderChanged = async (event: ProviderChangedEvent) => {
@@ -123,5 +143,9 @@ export class TradePage extends Component<ITradePageProps, ITradePageState> {
 
   public onRequestClose = () => {
     this.setState({ ...this.state, isTradeModalOpen: false });
+  };
+
+  public onShowMyTokensOnlyChange = (value: boolean) => {
+    this.setState({ ...this.state, showMyTokensOnly: value });
   };
 }

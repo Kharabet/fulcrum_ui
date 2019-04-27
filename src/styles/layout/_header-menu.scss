@@ -32,6 +32,28 @@
 
     &.header-menu__item-link--active {
       color: #ffffff;
+
+      .header-menu__item-link__accent-container {
+        .header-menu__item-link__accent {
+          background-color: #69bf83;
+          transform: translateY(-0.5rem);
+        }
+      }
+    }
+
+    .header-menu__item-link__accent-container {
+      height: 0.125rem;
+
+      .header-menu__item-link__accent {
+        width: 0.5rem;
+        height: 0.125rem;
+        margin: 0 2.5rem;
+        border-radius: 0.75rem;
+
+        &--active {
+          background-color: #69bf83;
+        }
+      }
     }
   }
 }
