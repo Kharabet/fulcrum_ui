@@ -23,7 +23,7 @@ export class TradeTokenKey {
 
   public static fromString(value: string): TradeTokenKey | null {
     let result: TradeTokenKey | null = null;
-    const matches: RegExpMatchArray | null = value.match("p(s|L)([a-zA-Z]*)(\\d)x");
+    const matches: RegExpMatchArray | null = value.match("p(S|L)([a-zA-Z]*)(\\d)x");
     if (matches && matches.length > 0) {
       if (matches[0] === value) {
         const positionType = matches[1].toString() === "l" ? PositionType.LONG : PositionType.SHORT;
