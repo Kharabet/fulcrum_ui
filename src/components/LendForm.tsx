@@ -182,7 +182,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
   public onLendAmountChange = async (event: ChangeEvent<HTMLInputElement>) => {
     // handling different types of empty values
     let amountText = event.target.value ? event.target.value : "";
-    const amountTextForConversion = amountText === "" ? "0" : amountText;
+    const amountTextForConversion = amountText === "" ? "0" : amountText[0] === "." ? `0${amountText}` : amountText;
 
     let amount = new BigNumber(amountTextForConversion);
     // handling negative values (incl. Ctrl+C)
