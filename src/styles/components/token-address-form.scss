@@ -1,0 +1,76 @@
+.token-address-form {
+  height: 24rem;
+  width: 22rem;
+
+
+  background-color: #444e5a;
+}
+
+.token-address-form__container {
+  padding: 3rem;
+}
+
+.token-address-form__img-container {
+  margin-bottom: 3rem;
+}
+
+.token-address-form__kv-container {
+  @include clearfix();
+
+  padding: 0.22rem 0;
+}
+
+.token-address-form__label {
+  float: left;
+  line-height: 2;
+  font-size: 0.75rem;
+  font-weight: normal;
+  font-style: normal;
+  font-stretch: normal;
+  letter-spacing: normal;
+  color: #a9b5c7;
+  background-color: #444e5a;
+}
+
+.token-address-form__value {
+  float: right;
+  line-height: 2;
+  font-size: 0.75rem;
+  font-weight: normal;
+  font-style: normal;
+  font-stretch: normal;
+  letter-spacing: normal;
+  color: #a9b5c7;
+  background-color: #444e5a;
+
+  &--no-color {
+    color: #a9b5c7;
+  }
+}
+
+.token-address-form__value-action {
+  color: #ffffff;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.token-address-form__value-close {
+  color: #a9b5c7;
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  border: 0 none;
+}
+
+.token-address-form__address-container {
+  word-wrap: break-word;;
+
+  font-size: 1.5rem;
+  font-weight: 600;
+  font-style: normal;
+  font-stretch: normal;
+  line-height: 1.33;
+  letter-spacing: normal;
+  text-align: left;
+  color: #ffffff;
+}

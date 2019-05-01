@@ -10,15 +10,15 @@ export class LandingPage extends Component {
         <HeaderHome />
         <main className="landing-page__main">
           <div className="landing-page__jumbo">
-            <h1><span className="landing-page__jumbo-header">Margin made dead simple</span></h1>
+            <h1><span className="landing-page__jumbo-header">Margin made simple</span></h1>
             <div className="landing-page__jumbo-action-container">
               <div className="landing-page__jumbo-action">
-                <div className="landing-page__jumbo-action-description">Earn passive income using tokenized loans</div>
                 <Link className="landing-page__jumbo-action-button" to="/lend">Lend</Link>
+                <div className="landing-page__jumbo-action-description">TO EARN INTEREST</div>
               </div>
               <div className="landing-page__jumbo-action">
-                <div className="landing-page__jumbo-action-description">Trade with up to 4x leverage by just buying a token</div>
                 <Link className="landing-page__jumbo-action-button" to="/trade">Trade</Link>
+                <div className="landing-page__jumbo-action-description">WITH UP TO 4X LEVERAGE</div>
               </div>
             </div>
           </div>
@@ -27,4 +27,30 @@ export class LandingPage extends Component {
       </div>
     );
   }
+
+  public componentDidMount(): void {
+    const htmls = document.getElementsByTagName("html");
+    this.addClass(htmls[0], "html-landing-page-active");
+  }
+
+  public componentWillUnmount(): void {
+    const htmls = document.getElementsByTagName("html");
+    this.removeClass(htmls[0], "html-landing-page-active");
+  }
+
+  private hasClass = (ele: Element, cls: string) => {
+    return !!ele.className.match(new RegExp('(\\s|^)'+cls+'(\\s|$)'));
+  };
+
+  private addClass = (ele: Element, cls: string) => {
+    if (!this.hasClass(ele,cls)) ele.className += " "+cls;
+  };
+
+  private removeClass = (ele: Element, cls: string) => {
+    if (this.hasClass(ele,cls)) {
+      const reg = new RegExp('(\\s|^)'+cls+'(\\s|$)');
+      ele.className=ele.className.replace(reg,' ');
+    }
+  };
+
 }

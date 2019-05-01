@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import Modal from "react-modal";
 import { OwnTokenGrid } from "../components/OwnTokenGrid";
 import { PriceGraph } from "../components/PriceGraph";
+import { TokenAddressForm } from "../components/TokenAddressForm";
 import { TradeForm } from "../components/TradeForm";
 import { TradeTokenGrid } from "../components/TradeTokenGrid";
 import { Asset } from "../domain/Asset";
@@ -23,11 +24,16 @@ export interface ITradePageProps {
 interface ITradePageState {
   showMyTokensOnly: boolean;
   selectedKey: TradeTokenKey;
+
   isTradeModalOpen: boolean;
   tradeType: TradeType;
   tradeAsset: Asset;
   tradePositionType: PositionType;
   tradeLeverage: number;
+
+  isTokenAddressFormOpen: boolean;
+  tradeTokenKey: TradeTokenKey;
+
   priceGraphData: IPriceDataPoint[];
 }
 
@@ -43,7 +49,9 @@ export class TradePage extends Component<ITradePageProps, ITradePageState> {
       tradeType: TradeType.BUY,
       tradeAsset: Asset.UNKNOWN,
       tradePositionType: PositionType.SHORT,
-      tradeLeverage: 0
+      tradeLeverage: 0,
+      isTokenAddressFormOpen: false,
+      tradeTokenKey: TradeTokenKey.empty()
     };
 
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
@@ -96,6 +104,17 @@ export class TradePage extends Component<ITradePageProps, ITradePageState> {
               onCancel={this.onRequestClose}
             />
           </Modal>
+          <Modal
+            isOpen={this.state.isTokenAddressFormOpen}
+            onRequestClose={this.onTokenAddressFormRequestClose}
+            className="modal-content-div"
+            overlayClassName="modal-overlay-div"
+          >
+            <TokenAddressForm
+              tradeTokenKey={this.state.tradeTokenKey}
+              onCancel={this.onTokenAddressFormRequestClose}
+            />
+          </Modal>
         </main>
         <Footer />
       </div>
@@ -108,7 +127,11 @@ export class TradePage extends Component<ITradePageProps, ITradePageState> {
   };
 
   public onDetails = async (key: TradeTokenKey) => {
-    alert(await FulcrumProvider.Instance.getPTokenErc20Address(key));
+    this.setState({ ...this.state, tradeTokenKey: key, isTokenAddressFormOpen: true });
+  };
+
+  private onTokenAddressFormRequestClose = () => {
+    this.setState({ ...this.state, isTokenAddressFormOpen: false });
   };
 
   private onProviderChanged = async (event: ProviderChangedEvent) => {
