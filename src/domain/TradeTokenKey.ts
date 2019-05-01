@@ -17,13 +17,13 @@ export class TradeTokenKey {
   }
 
   public toString(): string {
-    const positionTypePrefix = this.positionType === PositionType.SHORT ? "ps" : "pL";
+    const positionTypePrefix = this.positionType === PositionType.SHORT ? "pa" : "pl";
     return `${positionTypePrefix}${this.asset}${this.leverage}x`;
   }
 
   public static fromString(value: string): TradeTokenKey | null {
     let result: TradeTokenKey | null = null;
-    const matches: RegExpMatchArray | null = value.match("p(S|L)([a-zA-Z]*)(\\d)x");
+    const matches: RegExpMatchArray | null = value.match("p(s|l)([a-zA-Z]*)(\\d)x");
     if (matches && matches.length > 0) {
       if (matches[0] === value) {
         const positionType = matches[1].toString() === "l" ? PositionType.LONG : PositionType.SHORT;
