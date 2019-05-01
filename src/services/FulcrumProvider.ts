@@ -557,14 +557,6 @@ export class FulcrumProvider {
         throw new Error("Unable to get wallet address!");
       }
 
-      task.processingStart([
-        "Initializing loan",
-        "Detecting token allowance",
-        "Prompting token allowance",
-        "Waiting for token allowance",
-        "Submitting loan"
-      ]);
-
       // Initializing loan
       const taskRequest: LendRequest = (task.request as LendRequest);
       const amountInBaseUnits = taskRequest.amount.multipliedBy(10 ** 18);
@@ -574,6 +566,13 @@ export class FulcrumProvider {
       }
 
       if (taskRequest.lendType === LendType.LEND) {
+        task.processingStart([
+          "Initializing loan",
+          "Detecting token allowance",
+          "Prompting token allowance",
+          "Waiting for token allowance",
+          "Submitting loan"
+        ]);
 
         if (taskRequest.asset !== Asset.ETH) {
           // init erc20 contract for base token
@@ -619,6 +618,14 @@ export class FulcrumProvider {
           await tokenContract.mintWithEther.sendTransactionAsync(account, { from: account, value: amountInBaseUnits, gas: this.gasLimit });
         }
       } else {
+        task.processingStart([
+          "Initializing loan",
+          "Detecting token allowance",
+          "Prompting token allowance",
+          "Waiting for token allowance",
+          "Closing loan"
+        ]);
+
         // no additional inits or checks
         task.processingStepNext();
         // skip allowance check-prompt-wait for ETH as it's not a token
@@ -655,14 +662,6 @@ export class FulcrumProvider {
         throw new Error("Unable to get wallet address!");
       }
 
-      task.processingStart([
-        "Initializing trade",
-        "Detecting token allowance",
-        "Prompting token allowance",
-        "Waiting for token allowance",
-        "Submitting trade"
-      ]);
-
       // Initializing loan
       const taskRequest: TradeRequest = (task.request as TradeRequest);
       const amountInBaseUnits = taskRequest.amount.multipliedBy(10 ** 18);
@@ -678,6 +677,13 @@ export class FulcrumProvider {
       }
 
       if (taskRequest.tradeType === TradeType.BUY) {
+        task.processingStart([
+          "Initializing trade",
+          "Detecting token allowance",
+          "Prompting token allowance",
+          "Waiting for token allowance",
+          "Submitting trade"
+        ]);
 
         if (taskRequest.asset !== Asset.ETH) {
           // init erc20 contract for base token
@@ -725,6 +731,14 @@ export class FulcrumProvider {
           await tokenContract.mintWithEther.sendTransactionAsync(account, { from: account, value: amountInBaseUnits, gas: this.gasLimit });
         }
       } else {
+        task.processingStart([
+          "Initializing trade",
+          "Detecting token allowance",
+          "Prompting token allowance",
+          "Waiting for token allowance",
+          "Closing trade"
+        ]);
+
         // no additional inits or checks
         task.processingStepNext();
         // skip allowance check-prompt-wait for ETH as it's not a token
