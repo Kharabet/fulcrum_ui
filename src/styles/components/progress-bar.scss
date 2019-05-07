@@ -38,14 +38,11 @@
   color: #a9b5c7;
 }
 
-.progress-bar__btn-more {
+.progress-bar__btn {
   float:right;
   display: inline-block;
   vertical-align: top;
-  margin: 1.5rem 0;
-
   cursor: pointer;
-  background-color: rgba(0, 0, 0, 0);
   outline: none;
 
   font-size: 0.75rem;
@@ -61,5 +58,20 @@
   width: 96px;
   height: 32px;
   border-radius: 20px;
-  border: solid 1px #758295;
+  margin: 1.5rem 0 1.5rem 1rem;
+
+  &--more {
+    background-color: rgba(0, 0, 0, 0);
+    border: solid 1px #758295;
+  }
+
+  &--try-again {
+    background-color: #5EBE85;
+    border: none;
+  }
+
+  &--cancel {
+    background-color: #FF5358;
+    border: none;
+  }
 }

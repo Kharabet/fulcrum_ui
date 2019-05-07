@@ -103,7 +103,14 @@
 }
 
 .task-list-item-details__step {
+  &--normal {
 
+  }
+
+  &--failed {
+    background-color: #3E4851;
+    padding: 1rem 0;
+  }
 }
 
 .task-list-item-details__step-img-container {
@@ -143,6 +150,16 @@
     color: #ffffff;
   }
 
+  &--failed {
+    font-size: 0.75rem;
+    font-weight: normal;
+    font-style: normal;
+    font-stretch: normal;
+    letter-spacing: normal;
+    text-align: left;
+    color: #ffffff;
+  }
+
   &--future {
     font-size: 0.75rem;
     font-weight: normal;
@@ -164,6 +181,17 @@
     margin: 0 0.5rem 1rem 0.5rem;
 
     background-image: url("../assets/images/ic_progress_passed.svg");
+    background-repeat: no-repeat;
+  }
+
+  &--failed {
+    height: 1rem;
+    width: 1rem;
+    margin: 0 0.5rem 1rem 0.5rem;
+
+    background-color: #3E4851;
+    background-image: url("../assets/images/ic_progress_failed.svg");
+    background-repeat: no-repeat;
   }
 
   &--in-progress {
@@ -184,6 +212,46 @@
 
     border: solid 0.0625rem rgba(255, 255, 255, 0.2);
     border-radius: 50%;
+  }
+}
+
+.task-list-item-details__step-actions {
+  @include clearfix();
+
+  margin: 0 1rem;
+}
+
+.task-list-item-details__step-action-btn {
+  float:right;
+  display: inline-block;
+  vertical-align: top;
+  cursor: pointer;
+  outline: none;
+
+  font-size: 0.75rem;
+  font-weight: normal;
+  font-style: normal;
+  font-stretch: normal;
+  letter-spacing: normal;
+  text-align: center;
+  color: #ffffff;
+
+  width: 96px;
+  height: 32px;
+  border-radius: 20px;
+  margin: 0 0 0 1rem;
+
+  &--try-again {
+    text-transform: uppercase;
+    background-color: #5EBE85;
+    border: none;
+  }
+
+  &--cancel {
+    background-color: rgba(0, 0, 0, 0);
+    border: none;
+    text-decoration: underline;
+    text-decoration-style: dotted;
   }
 }
 

@@ -2,6 +2,7 @@ import { BigNumber } from "@0x/utils";
 import { EventEmitter } from "events";
 import moment from "moment";
 import Web3 from "web3";
+import { TransactionReceipt } from "web3/types";
 import { erc20Contract } from "../contracts/erc20";
 import { iTokenContract } from "../contracts/iTokenContract";
 import { pTokenContract } from "../contracts/pTokenContract";
@@ -12,6 +13,7 @@ import { IWeb3ProviderSettings } from "../domain/IWeb3ProviderSettings";
 import { LendRequest } from "../domain/LendRequest";
 import { LendType } from "../domain/LendType";
 import { ProviderType } from "../domain/ProviderType";
+import { RequestStatus } from "../domain/RequestStatus";
 import { RequestTask } from "../domain/RequestTask";
 import { TradeRequest } from "../domain/TradeRequest";
 import { TradeTokenKey } from "../domain/TradeTokenKey";
@@ -27,6 +29,8 @@ export class FulcrumProvider {
   public static Instance: FulcrumProvider;
 
   private readonly gasLimit = 3000000;
+  // gasPrice equal to 6 gwei
+  private readonly gasPrice = new BigNumber(6).multipliedBy(10 ** 9);
 
   private isProcessing: boolean = false;
   private isChecking: boolean = false;
@@ -516,8 +520,40 @@ export class FulcrumProvider {
     return result;
   }
 
-  private onTaskEnqueued = async (latestTask: RequestTask) => {
+  private onTaskEnqueued = async (requestTask: RequestTask) => {
+    await this.processQueue(false);
+  };
+
+  public onTaskRetry = async (requestTask: RequestTask) => {
+    await this.processQueue(true);
+  };
+
+  public onTaskCancel = async (requestTask: RequestTask)  => {
+    await this.cancelRequestTask(requestTask);
+    await this.processQueue(false);
+  };
+
+  private cancelRequestTask = async (requestTask: RequestTask) => {
     if (!(this.isProcessing || this.isChecking)) {
+      this.isProcessing = true;
+
+      try {
+        const task = TasksQueue.Instance.peek();
+
+        if (task) {
+          if (task.request.id === requestTask.request.id) {
+            TasksQueue.Instance.dequeue();
+          }
+        }
+      } finally {
+        this.isProcessing = false;
+      }
+    }
+  };
+
+  private processQueue = async (force: boolean) => {
+    if (!(this.isProcessing || this.isChecking)) {
+      let forceOnce = force;
       do {
         this.isProcessing = true;
         this.isChecking = false;
@@ -526,23 +562,40 @@ export class FulcrumProvider {
           const task = TasksQueue.Instance.peek();
 
           if (task) {
-            if (task.request instanceof LendRequest) {
-              await this.processLendRequestTask(task);
-            }
-
-            if (task.request instanceof TradeRequest) {
-              await this.processTradeRequestTask(task);
+            if (task.status === RequestStatus.AWAITING || (task.status === RequestStatus.FAILED && forceOnce)) {
+              await this.processRequestTask(task);
+              // @ts-ignore
+              if (task.status === RequestStatus.DONE) {
+                TasksQueue.Instance.dequeue();
+              }
+            } else {
+              if (task.status === RequestStatus.FAILED && !forceOnce) {
+                this.isProcessing = false;
+                this.isChecking = false;
+                break;
+              }
             }
           }
         } finally {
-          TasksQueue.Instance.dequeue();
+          forceOnce = false;
+          this.isChecking = true;
+          this.isProcessing = false;
         }
-
-        this.isChecking = true;
-        this.isProcessing = false;
       } while (TasksQueue.Instance.any());
       this.isChecking = false;
     }
+  };
+
+  private processRequestTask = async (task: RequestTask) => {
+    if (task.request instanceof LendRequest) {
+      await this.processLendRequestTask(task);
+    }
+
+    if (task.request instanceof TradeRequest) {
+      await this.processTradeRequestTask(task);
+    }
+
+    return false;
   };
 
   private processLendRequestTask = async (task: RequestTask) => {
@@ -594,7 +647,7 @@ export class FulcrumProvider {
 
           // Prompting token allowance
           if (amountInBaseUnits.gt(erc20allowance)) {
-            approvePromise = tokenErc20Contract.approve.sendTransactionAsync(tokenContract.address, amountInBaseUnits, { from: account, gas: this.gasLimit });
+            approvePromise = tokenErc20Contract.approve.sendTransactionAsync(tokenContract.address, amountInBaseUnits, { from: account });
           }
           task.processingStepNext();
 
@@ -604,8 +657,15 @@ export class FulcrumProvider {
           }
           task.processingStepNext();
 
+          // estimating gas amount
+          const gasAmount = await tokenContract.mint.estimateGasAsync(account, amountInBaseUnits, { from: account, gas: this.gasLimit });
           // Submitting loan
-          await tokenContract.mint.sendTransactionAsync(account, amountInBaseUnits, { from: account, gas: this.gasLimit });
+          const txHash = await tokenContract.mint.sendTransactionAsync(account, amountInBaseUnits, { from: account, gas: gasAmount });
+          task.setTxHash(txHash);
+          const txReceipt = await this.waitForTransactionMined(txHash);
+          if (!txReceipt.status) {
+            throw new Error("Reverted by EVM");
+          }
         } else {
           // no additional inits or checks
           task.processingStepNext();
@@ -614,8 +674,18 @@ export class FulcrumProvider {
           task.processingStepNext();
           task.processingStepNext();
 
+          // estimating gas amount
+          const gasAmount = await tokenContract.mintWithEther.estimateGasAsync(account, { from: account, value: amountInBaseUnits, gas: this.gasLimit });
+          // calculating gas cost
+          const gasAmountBN = new BigNumber(gasAmount);
+          const gasCost = gasAmountBN.multipliedBy(this.gasPrice).integerValue(BigNumber.ROUND_UP);
           // Submitting loan
-          await tokenContract.mintWithEther.sendTransactionAsync(account, { from: account, value: amountInBaseUnits, gas: this.gasLimit });
+          const txHash = await tokenContract.mintWithEther.sendTransactionAsync(account, { from: account, value: amountInBaseUnits.minus(gasCost), gas: gasAmount });
+          task.setTxHash(txHash);
+          const txReceipt = await this.waitForTransactionMined(txHash);
+          if (!txReceipt.status) {
+            throw new Error("Reverted by EVM");
+          }
         }
       } else {
         task.processingStart([
@@ -634,19 +704,33 @@ export class FulcrumProvider {
         task.processingStepNext();
 
         if (taskRequest.asset !== Asset.ETH) {
+          // estimating gas amount
+          const gasAmount = await tokenContract.burn.estimateGasAsync(account, amountInBaseUnits, { from: account, gas: this.gasLimit });
           // Submitting unloan
-          await tokenContract.burn.sendTransactionAsync(account, amountInBaseUnits, { from: account, gas: this.gasLimit });
+          const txHash = await tokenContract.burn.sendTransactionAsync(account, amountInBaseUnits, { from: account, gas: gasAmount });
+          task.setTxHash(txHash);
+          const txReceipt = await this.waitForTransactionMined(txHash);
+          if (!txReceipt.status) {
+            throw new Error("Reverted by EVM");
+          }
         } else {
+          // estimating gas amount
+          const gasAmount = await tokenContract.burnToEther.estimateGasAsync(account, amountInBaseUnits, { from: account, gas: this.gasLimit });
           // Submitting unloan
-          await tokenContract.burnToEther.sendTransactionAsync(account, amountInBaseUnits, { from: account, gas: this.gasLimit });
+          const txHash = await tokenContract.burnToEther.sendTransactionAsync(account, amountInBaseUnits, { from: account, gas: gasAmount });
+          task.setTxHash(txHash);
+          const txReceipt = await this.waitForTransactionMined(txHash);
+          if (!txReceipt.status) {
+            throw new Error("Reverted by EVM");
+          }
         }
       }
 
-      task.processingEnd(true);
+      task.processingEnd(true, null);
     } catch (e) {
       // tslint:disable-next-line:no-console
       console.log(e);
-      task.processingEnd(false);
+      task.processingEnd(false, e);
     }
   };
 
@@ -707,7 +791,7 @@ export class FulcrumProvider {
 
           // Prompting token allowance
           if (amountInBaseUnits.gt(erc20allowance)) {
-            approvePromise = tokenErc20Contract.approve.sendTransactionAsync(tokenContract.address, amountInBaseUnits, { from: account, gas: this.gasLimit });
+            approvePromise = tokenErc20Contract.approve.sendTransactionAsync(tokenContract.address, amountInBaseUnits, { from: account });
           }
           task.processingStepNext();
 
@@ -717,8 +801,15 @@ export class FulcrumProvider {
           }
           task.processingStepNext();
 
-          // Submitting loan
-          await tokenContract.mintWithToken.sendTransactionAsync(account, assetErc20Address, amountInBaseUnits, { from: account, gas: this.gasLimit });
+          // estimating gas amount
+          const gasAmount = await tokenContract.mintWithToken.estimateGasAsync(account, assetErc20Address, amountInBaseUnits, { from: account, value: amountInBaseUnits, gas: this.gasLimit });
+          // Submitting trade
+          const txHash = await tokenContract.mintWithToken.sendTransactionAsync(account, assetErc20Address, amountInBaseUnits, { from: account, gas: gasAmount });
+          task.setTxHash(txHash);
+          const txReceipt = await this.waitForTransactionMined(txHash);
+          if (!txReceipt.status) {
+            throw new Error("Reverted by EVM");
+          }
         } else {
           // no additional inits or checks
           task.processingStepNext();
@@ -727,8 +818,18 @@ export class FulcrumProvider {
           task.processingStepNext();
           task.processingStepNext();
 
-          // Submitting loan
-          await tokenContract.mintWithEther.sendTransactionAsync(account, { from: account, value: amountInBaseUnits, gas: this.gasLimit });
+          // estimating gas amount
+          const gasAmount = await tokenContract.mintWithEther.estimateGasAsync(account, { from: account, value: amountInBaseUnits, gas: this.gasLimit });
+          // calculating gas cost
+          const gasAmountBN = new BigNumber(gasAmount);
+          const gasCost = gasAmountBN.multipliedBy(this.gasPrice).integerValue(BigNumber.ROUND_UP);
+          // Submitting trade
+          const txHash = await tokenContract.mintWithEther.sendTransactionAsync(account, { from: account, value: amountInBaseUnits.minus(gasCost), gas: gasAmount });
+          task.setTxHash(txHash);
+          const txReceipt = await this.waitForTransactionMined(txHash);
+          if (!txReceipt.status) {
+            throw new Error("Reverted by EVM");
+          }
         }
       } else {
         task.processingStart([
@@ -750,24 +851,84 @@ export class FulcrumProvider {
           // Submitting unloan
           const assetErc20Address = this.getErc20Address(taskRequest.asset);
           if (assetErc20Address) {
-            await tokenContract.burnToToken.sendTransactionAsync(
+            // estimating gas amount
+            const gasAmount = await tokenContract.burnToToken.estimateGasAsync(
               account,
               assetErc20Address,
               amountInBaseUnits,
               { from: account, gas: this.gasLimit }
             );
+            // Closing trade
+            const txHash = await tokenContract.burnToToken.sendTransactionAsync(
+              account,
+              assetErc20Address,
+              amountInBaseUnits,
+              { from: account, gas: gasAmount }
+            );
+            task.setTxHash(txHash);
+            const txReceipt = await this.waitForTransactionMined(txHash);
+            if (!txReceipt.status) {
+              throw new Error("Reverted by EVM");
+            }
           }
         } else {
-          // Submitting unloan
-          await tokenContract.burnToEther.sendTransactionAsync(account, amountInBaseUnits, { from: account, gas: this.gasLimit });
+          // estimating gas amount
+          const gasAmount = await tokenContract.burnToEther.estimateGasAsync(account, amountInBaseUnits, { from: account, gas: this.gasLimit });
+          // Closing trade
+          const txHash = await tokenContract.burnToEther.sendTransactionAsync(account, amountInBaseUnits, { from: account, gas: gasAmount });
+          task.setTxHash(txHash);
+          const txReceipt = await this.waitForTransactionMined(txHash);
+          if (!txReceipt.status) {
+            throw new Error("Reverted by EVM");
+          }
         }
       }
 
-      task.processingEnd(true);
+      task.processingEnd(true, null);
     } catch (e) {
       // tslint:disable-next-line:no-console
       console.log(e);
-      task.processingEnd(false);
+      task.processingEnd(false, e);
+    }
+  };
+
+  private waitForTransactionMined = async (txHash: string): Promise<TransactionReceipt> => {
+    return new Promise((resolve, reject) => {
+      try {
+        if (!this.web3) {
+          throw new Error("web3 is not available");
+        }
+
+        this.waitForTransactionMinedRecursive(txHash, this.web3, resolve, reject);
+      } catch (e) {
+        throw e;
+      }
+    });
+  };
+
+  private waitForTransactionMinedRecursive = async (
+    txHash: string,
+    web3: Web3,
+    resolve: (value: any) => void,
+    reject: (value: any) => void) => {
+
+    try {
+      web3.eth.getTransactionReceipt(txHash, (error: Error, receipt: TransactionReceipt) => {
+        if (error) {
+          throw error;
+        }
+
+        if (receipt) {
+          resolve(receipt);
+        } else {
+          window.setTimeout(() => {
+            this.waitForTransactionMinedRecursive(txHash, web3, resolve, reject);
+          }, 5000);
+        }
+      });
+    }
+    catch (e) {
+      reject(e);
     }
   };
 

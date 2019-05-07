@@ -1,5 +1,7 @@
 import React, { Component, ReactNode } from "react";
+import { RequestStatus } from "../domain/RequestStatus";
 import { RequestTask } from "../domain/RequestTask";
+import { FulcrumProvider} from "../services/FulcrumProvider";
 
 export interface ITasksListItemDetailsProps {
   task: RequestTask;
@@ -16,9 +18,7 @@ export class TasksListItemDetails extends Component<ITasksListItemDetailsProps> 
         <div className="task-list-item-delimiter-container">
           <hr className="task-list-item-delimiter" />
         </div>
-        <div className="task-list-item-details">
-          {this.props.task.steps.map((e, i) => this.renderSingleStep(e, i))}
-        </div>
+        <div className="task-list-item-details">{this.props.task.steps.map((e, i) => this.renderSingleStep(e, i))}</div>
       </React.Fragment>
     );
   }
@@ -26,17 +26,25 @@ export class TasksListItemDetails extends Component<ITasksListItemDetailsProps> 
   public renderSingleStep = (title: string, index: number): ReactNode => {
     const titleStateClassName =
       index + 1 === this.props.task.stepCurrent
-        ? "task-list-item-details__step-title--in-progress"
+        ? this.props.task.status === RequestStatus.IN_PROGRESS
+          ? "task-list-item-details__step-title--in-progress"
+          : "task-list-item-details__step-title--failed"
         : index < this.props.task.stepCurrent
-          ? "task-list-item-details__step-title--done"
-          : "task-list-item-details__step-title--future";
+        ? "task-list-item-details__step-title--done"
+        : "task-list-item-details__step-title--future";
+
+    const stepStateClassName =
+      index + 1 === this.props.task.stepCurrent
+        ? this.props.task.status === RequestStatus.FAILED
+          ? "task-list-item-details__step--failed"
+          : "task-list-item-details__step--normal"
+        : "task-list-item-details__step--normal";
 
     return (
-      <div key={index} className="task-list-item-details__step">
-        <div className="task-list-item-details__step-img-container">
-          {this.renderStepProgressIndicator(index)}
-        </div>
+      <div key={index} className={`task-list-item-details__step ${stepStateClassName}`}>
+        <div className="task-list-item-details__step-img-container">{this.renderStepProgressIndicator(index)}</div>
         <div className={`task-list-item-details__step-title ${titleStateClassName}`}>{title}</div>
+        {this.renderTaskFailedStateActions(index)}
       </div>
     );
   };
@@ -44,11 +52,40 @@ export class TasksListItemDetails extends Component<ITasksListItemDetailsProps> 
   public renderStepProgressIndicator = (index: number): ReactNode => {
     const titleStateClassName =
       index + 1 === this.props.task.stepCurrent
-        ? "task-list-item-details__step-img--in-progress"
+        ? this.props.task.status === RequestStatus.IN_PROGRESS
+          ? "task-list-item-details__step-img--in-progress"
+          : "task-list-item-details__step-img--failed"
         : index < this.props.task.stepCurrent
-          ? "task-list-item-details__step-img--done"
-          : "task-list-item-details__step-img--future";
+        ? "task-list-item-details__step-img--done"
+        : "task-list-item-details__step-img--future";
 
     return <div className={`task-list-item-details__step-img ${titleStateClassName}`} />;
-  }
+  };
+
+  public renderTaskFailedStateActions = (index: number): ReactNode => {
+    return this.props.task.status === RequestStatus.FAILED && index + 1 === this.props.task.stepCurrent ? (
+      <div className="task-list-item-details__step-actions">
+        <button
+          className="task-list-item-details__step-action-btn task-list-item-details__step-action-btn--try-again"
+          onClick={this.onTaskRetry}
+        >
+          Try again
+        </button>
+        <button
+          className="task-list-item-details__step-action-btn task-list-item-details__step-action-btn--cancel"
+          onClick={this.onTaskCancel}
+        >
+          Cancel
+        </button>
+      </div>
+    ) : null;
+  };
+
+  private onTaskRetry = async () => {
+    await FulcrumProvider.Instance.onTaskRetry(this.props.task);
+  };
+
+  private onTaskCancel = async () => {
+    await FulcrumProvider.Instance.onTaskCancel(this.props.task);
+  };
 }

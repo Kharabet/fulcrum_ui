@@ -49,6 +49,11 @@ export class ProgressFragment extends Component<any, IProgressFragmentState> {
   };
 
   public onTasksQueueChanged = () => {
-    this.setState({ ...this.state, requestTasks: TasksQueue.Instance.getTasksList() });
+    const isProgressDetailsModalOpen = TasksQueue.Instance.any();
+    this.setState({
+      ...this.state,
+      requestTasks: TasksQueue.Instance.getTasksList(),
+      isProgressDetailsModalOpen: isProgressDetailsModalOpen
+    });
   };
 }
