@@ -19,6 +19,7 @@ import { FulcrumProvider } from "../services/FulcrumProvider";
 
 export interface ITradePageProps {
   doNetworkConnect: () => void;
+  isLoading: boolean | false;
 }
 
 interface ITradePageState {
@@ -66,7 +67,7 @@ export class TradePage extends Component<ITradePageProps, ITradePageState> {
   public render() {
     return (
       <div className="trade-page">
-        <HeaderOps doNetworkConnect={this.props.doNetworkConnect} />
+        <HeaderOps isLoading={this.props.isLoading} doNetworkConnect={this.props.doNetworkConnect} />
         <main>
           <PriceGraph data={this.state.priceGraphData} />
           {this.state.showMyTokensOnly ? (
@@ -156,7 +157,7 @@ export class TradePage extends Component<ITradePageProps, ITradePageState> {
     FulcrumProvider.Instance.onTradeConfirmed(request);
     this.setState({
       ...this.state,
-      isTradeModalOpen: false,
+      isTradeModalOpen: true,
       tradeType: TradeType.BUY,
       tradeAsset: Asset.UNKNOWN,
       tradePositionType: PositionType.SHORT,

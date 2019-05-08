@@ -78,7 +78,7 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
           {this.state.profit !== null ? (
             <div className="token-selector-item__profit-container">
               <div className="token-selector-item__profit-title">Profit:</div>
-              <div className="token-selector-item__profit-value">{`$${this.state.profit.toFixed(2)}`}</div>
+              <div className="token-selector-item__profit-value">{`$${this.state.profit.toFixed(4)}`}</div>
             </div>
           ) : null}
         </div>
@@ -86,7 +86,7 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
           <div className="token-selector-item__name">{this.state.assetDetails.displayName}</div>
           <div className="token-selector-item__interest-rate-container">
             <div className="token-selector-item__interest-rate-title">Interest rate:</div>
-            <div className="token-selector-item__interest-rate-value">{`${this.state.interestRate.toFixed(2)}%`}</div>
+            <div className="token-selector-item__interest-rate-value">{`${this.state.interestRate.toFixed(4)}%`}</div>
           </div>
         </div>
         {this.renderActions(this.state.profit === null)}

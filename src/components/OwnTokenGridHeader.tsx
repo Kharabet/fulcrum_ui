@@ -20,11 +20,14 @@ export class OwnTokenGridHeader extends Component<IOwnTokenGridHeaderProps> {
           <span className="trade-token-grid-header__text">Amount</span>
         </div>
         <div className="trade-token-grid-header__col-price">
-          <span className="trade-token-grid-header__text">Price</span>
+          <span className="trade-token-grid-header__text">Position Price</span>
         </div>
-        <div className="trade-token-grid-header__col-change24h">
+        <div className="trade-token-grid-header__col-price">
+          <span className="trade-token-grid-header__text">Liquidation Price</span>
+        </div>
+        {/*<div className="trade-token-grid-header__col-change24h">
           <span className="trade-token-grid-header__text">24 hours</span>
-        </div>
+        </div>*/}
         <div className="trade-token-grid-header__col-profit">
           <span className="trade-token-grid-header__text">Profit</span>
         </div>

@@ -1,7 +1,7 @@
 import React, { Component, ReactNode } from "react";
 import { RequestStatus } from "../domain/RequestStatus";
 import { RequestTask } from "../domain/RequestTask";
-import { FulcrumProvider} from "../services/FulcrumProvider";
+import { FulcrumProvider } from "../services/FulcrumProvider";
 
 export interface ITasksListItemDetailsProps {
   task: RequestTask;
@@ -63,8 +63,20 @@ export class TasksListItemDetails extends Component<ITasksListItemDetailsProps> 
   };
 
   public renderTaskFailedStateActions = (index: number): ReactNode => {
+    const tx = this.props.task.txHash || ``;
     return this.props.task.status === RequestStatus.FAILED && index + 1 === this.props.task.stepCurrent ? (
       <div className="task-list-item-details__step-actions">
+        {this.props.task.txHash && FulcrumProvider.Instance.web3ProviderSettings ? 
+          (
+            <a
+              className="task-list-item-details__step-title--failed-txn"
+              href={`${FulcrumProvider.Instance.web3ProviderSettings.etherscanURL}tx/${tx}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {tx.slice(0, 20)}...{tx.slice(tx.length - 18, tx.length)}
+            </a>
+          ) : ``}
         <button
           className="task-list-item-details__step-action-btn task-list-item-details__step-action-btn--try-again"
           onClick={this.onTaskRetry}

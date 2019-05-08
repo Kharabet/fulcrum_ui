@@ -1,3 +1,5 @@
+import 'react-tippy/dist/tippy.css'
+import { Tooltip } from "react-tippy";
 import { BigNumber } from "@0x/utils";
 import React, { ChangeEvent, Component, FormEvent } from "react";
 import { Asset } from "../domain/Asset";
@@ -58,7 +60,9 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
   private async derivedUpdate() {
     const assetDetails = AssetsDictionary.assets.get(this.props.asset);
     const interestRate = await FulcrumProvider.Instance.getLendTokenInterestRate(this.props.asset);
-    const maxLendValue = await FulcrumProvider.Instance.getMaxLendValue(this.props.lendType, this.props.asset);
+    const maxLendValue = await FulcrumProvider.Instance.getMaxLendValue(
+      new LendRequest(this.props.lendType, this.props.asset, new BigNumber(0))
+    );
     const lendedAmountEstimate = await FulcrumProvider.Instance.getLendedAmountEstimate(
       new LendRequest(this.props.lendType, this.props.asset, maxLendValue)
     );
@@ -114,8 +118,11 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
     const tokenNameBase = this.state.assetDetails.displayName;
     const tokenNamePosition = `i${this.state.assetDetails.displayName}`;
 
-    const tokenNameSource = this.props.lendType === LendType.LEND ? tokenNameBase : tokenNamePosition;
-    const tokenNameDestination = this.props.lendType === LendType.LEND ? tokenNamePosition : tokenNameBase;
+    //const tokenNameSource = this.props.lendType === LendType.LEND ? tokenNameBase : tokenNamePosition;
+    //const tokenNameDestination = this.props.lendType === LendType.LEND ? tokenNamePosition : tokenNameBase;
+    const tokenNameSource = tokenNameBase;
+    const tokenNameDestination = tokenNamePosition;
+
 
     const isAmountMaxed = this.state.lendAmount.eq(this.state.maxLendAmount);
     const lendedAmountEstimateText =
@@ -141,7 +148,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
               <div className="lend-form__value">{`${this.state.interestRate.toFixed(2)}%`}</div>
             </div>
             <div className="lend-form__kv-container">
-              <div className="lend-form__label">Amount</div>
+              <div className="lend-form__label">{this.props.lendType === LendType.LEND ? `Lend Amount` : `Unlend Amount`}</div>
               <div className="lend-form__value">{tokenNameSource}</div>
             </div>
             <input
@@ -152,15 +159,27 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
               onChange={this.onLendAmountChange}
             />
             <div className="lend-form__kv-container">
-              {isAmountMaxed ? (
-                <div className="trade-form__label">Max amount reached!</div>
-              ) : (
+              {isAmountMaxed ? 
+                  this.state.maxLendAmount.eq(0) ? (
+                    <div className="trade-form__label">Your wallet is empty &#9785;</div>
+                  ) : (
+                    <div className="trade-form__label">Max amount entered.</div>
+                  )
+                : (
                 <div className="trade-form__label trade-form__label--action" onClick={this.onInsertMaxValue}>
                   Insert max value
                 </div>
               )}
               <div className="lend-form__value lend-form__value--no-color">
-                <span className="rounded-mark">?</span>
+                <Tooltip
+                  html={
+                    <div style={{ /*maxWidth: `300px`*/ }}>
+                      ... Info ...
+                    </div>
+                  }
+                >
+                  <span className="rounded-mark">?</span>
+                </Tooltip>
                 &nbsp; {lendedAmountEstimateText} {tokenNameDestination}
               </div>
             </div>
@@ -214,7 +233,9 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
       return null;
     }
 
-    const maxLendValue = await FulcrumProvider.Instance.getMaxLendValue(this.props.lendType, this.props.asset);
+    const maxLendValue = await FulcrumProvider.Instance.getMaxLendValue(
+      new LendRequest(this.props.lendType, this.props.asset, new BigNumber(0))
+    );
     const lendedAmountEstimate = await FulcrumProvider.Instance.getLendedAmountEstimate(
       new LendRequest(this.props.lendType, this.props.asset, maxLendValue)
     );

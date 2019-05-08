@@ -11,7 +11,7 @@ import { TradeType } from "../domain/TradeType";
 import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
-import { Change24HMarker, Change24HMarkerSize } from "./Change24HMarker";
+//import { Change24HMarker, Change24HMarkerSize } from "./Change24HMarker";
 import { LeverageSelector } from "./LeverageSelector";
 import { PositionTypeMarker } from "./PositionTypeMarker";
 
@@ -106,7 +106,8 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
 
     const tradeTokenKey = this.getTradeTokenGridRowSelectionKey(this.state.leverage);
     const bnPrice = new BigNumber(this.state.latestPriceDataPoint.price);
-    const bnChange24h = new BigNumber(this.state.latestPriceDataPoint.change24h);
+    const bnLiquidationPrice = new BigNumber(this.state.latestPriceDataPoint.liquidationPrice);
+    //const bnChange24h = new BigNumber(this.state.latestPriceDataPoint.change24h);
     const isActiveClassName =
       tradeTokenKey.toString() === this.props.selectedKey.toString() ? "trade-token-grid-row--active" : "";
 
@@ -130,12 +131,13 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
             onChange={this.onLeverageSelect}
           />
         </div>
-        <div className="trade-token-grid-row__col-price">{`$${bnPrice.toFixed(2)}`}</div>
-        <div className="trade-token-grid-row__col-change24h">
+        <div className="trade-token-grid-row__col-price">{`$${bnPrice.div(1000).toFixed(2)}`}</div>
+        <div className="trade-token-grid-row__col-price">{`$${bnLiquidationPrice.div(1000).toFixed(2)}`}</div>
+        {/*<div className="trade-token-grid-row__col-change24h">
           <Change24HMarker value={bnChange24h} size={Change24HMarkerSize.MEDIUM} />
-        </div>
+        </div>*/}
         <div className="trade-token-grid-row__col-profit">
-          {this.state.profit ? `$${this.state.profit.toFixed(2)}` : "-"}
+          {this.state.profit ? `$${this.state.profit.toFixed(4)}` : "-"}
         </div>
         <div className="trade-token-grid-row__col-action">
           <button className="trade-token-grid-row__buy-button" onClick={this.onBuyClick}>

@@ -11,6 +11,7 @@ import { FulcrumProvider } from "../services/FulcrumProvider";
 
 export interface IOnChainIndicatorProps {
   doNetworkConnect: () => void;
+  isLoading: boolean | false;
 }
 
 interface IOnChainIndicatorState {
@@ -72,7 +73,7 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
   public render() {
     const providerTypeDetails = ProviderTypeDictionary.providerTypes.get(this.state.selectedProviderType) || null;
     const walletAddressText = this.state.walletAddress
-      ? `${this.state.walletAddress.slice(1, 6)}...${this.state.walletAddress.slice(
+      ? `${this.state.walletAddress.slice(0, 6)}...${this.state.walletAddress.slice(
           this.state.walletAddress.length - 4,
           this.state.walletAddress.length
         )}`
@@ -102,17 +103,30 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
   }
 
   public renderProviderType(providerTypeDetails: ProviderTypeDetails | null) {
-    return providerTypeDetails !== null && providerTypeDetails.logoSvg !== null ? (
-      <img
-        className="on-chain-indicator__provider-img"
-        src={providerTypeDetails.logoSvg}
-        alt={providerTypeDetails.displayName}
-        onClick={this.props.doNetworkConnect}
-      />
-    ) : (
-      <span className="on-chain-indicator__provider-txt" onClick={this.props.doNetworkConnect}>
-        Click To Connect
-      </span>
-    );
+    if (providerTypeDetails !== null && providerTypeDetails.logoSvg !== null) {
+      return (
+        <img
+          className="on-chain-indicator__provider-img"
+          src={providerTypeDetails.logoSvg}
+          alt={providerTypeDetails.displayName}
+          onClick={this.props.doNetworkConnect}
+        />
+      );
+    }
+    else {
+      if (this.props.isLoading) {
+        return (
+          <span className="on-chain-indicator__provider-txt" onClick={this.props.doNetworkConnect}>
+            Loading...
+          </span>
+        );
+      } else {
+        return (
+          <span className="on-chain-indicator__provider-txt" onClick={this.props.doNetworkConnect}>
+            Click To Connect
+          </span>
+        );
+      }
+    }
   }
 }

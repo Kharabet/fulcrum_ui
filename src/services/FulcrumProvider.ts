@@ -136,6 +136,7 @@ export class FulcrumProvider {
               result.push({
                 timeStamp: value.timestamp.toNumber(),
                 price: value.rate.dividedBy(10 ** 18).toNumber(),
+                liquidationPrice: 0,
                 change24h:
                   rate.isZero()
                     ? value.rate.isZero()
@@ -156,7 +157,7 @@ export class FulcrumProvider {
         .startOf("hour")
         .subtract(intervalSeconds, "second");
       for (let i = 0; i < samplesCount + 1; i++) {
-        result.push({ timeStamp: beginningTime.unix(), price: 1, change24h: 0 });
+        result.push({ timeStamp: beginningTime.unix(), price: 1, liquidationPrice: 0, change24h: 0 });
 
         // add mutates beginningTime
         beginningTime.add(intervalSeconds, "second");
@@ -183,18 +184,22 @@ export class FulcrumProvider {
   */
   public getPriceLatestDataPoint = async (selectedKey: TradeTokenKey): Promise<IPriceDataPoint> => {
     const result = this.getPriceDefaultDataPoint();
-
     // we are using this function only for trade prices
     if (this.contractsSource) {
       const assetContract = this.contractsSource.getPTokenContract(selectedKey);
       if (assetContract) {
         const tokenPrice = await assetContract.tokenPrice.callAsync();
+        console.log(tokenPrice.toString());
+        const liquidationPrice = await assetContract.liquidationPrice.callAsync();
         const swapPrice = await this.getSwapToUsdPrice(selectedKey.asset);
+        console.log(selectedKey.asset);
 
         const timeStamp = moment();
         result.timeStamp = timeStamp.unix();
         result.price = tokenPrice.multipliedBy(swapPrice).dividedBy(10 ** 18).toNumber();
+        result.liquidationPrice = liquidationPrice.multipliedBy(swapPrice).dividedBy(10 ** 18).toNumber();
         result.change24h = 0;
+        console.log(result);
       }
     }
 
@@ -205,6 +210,7 @@ export class FulcrumProvider {
     return {
       timeStamp: moment().unix(),
       price: 0,
+      liquidationPrice: 0,
       change24h: 0
     };
   };
@@ -315,11 +321,22 @@ export class FulcrumProvider {
     return result;
   };
 
-  public getMaxLendValue = async (lendType: LendType, asset: Asset): Promise<BigNumber> => {
-    let result =
-      lendType === LendType.LEND
-        ? await this.getBaseTokenBalance(asset)
-        : await this.getLendTokenBalance(asset);
+  public getMaxLendValue = async (request: LendRequest): Promise<BigNumber> => {
+    let result = new BigNumber(0);
+
+    if (request.lendType === LendType.LEND) {
+      result = await this.getBaseTokenBalance(request.asset);
+    } else {
+      if (this.contractsSource) {
+        const assetContract = this.contractsSource.getITokenContract(request.asset);
+        if (assetContract) {
+          const tokenPrice = await assetContract.tokenPrice.callAsync();
+          const amount = await this.getLendTokenBalance(request.asset);
+          result = amount.multipliedBy(tokenPrice).dividedBy(10 ** 18);
+        }
+      }
+    }
+
     result = result.dividedBy(10 ** 18);
 
     return result;
@@ -356,10 +373,11 @@ export class FulcrumProvider {
       if (assetContract) {
         const tokenPrice = await assetContract.tokenPrice.callAsync();
 
-        result =
+        /*result =
           request.lendType === LendType.LEND
             ? request.amount.multipliedBy(10 ** 18).dividedBy(tokenPrice)
-            : request.amount.multipliedBy(tokenPrice).dividedBy(10 ** 18);
+            : request.amount.multipliedBy(tokenPrice).dividedBy(10 ** 18);*/
+        result = request.amount.multipliedBy(10 ** 18).dividedBy(tokenPrice);
       }
     }
 
@@ -505,6 +523,9 @@ export class FulcrumProvider {
 
   private async getSwapToUsdPrice(asset: Asset): Promise<BigNumber> {
     // we expect 1 dai = 1 usd
+    if (asset === Asset.DAI)
+      return new BigNumber(1);
+    
     let result: BigNumber = new BigNumber(0);
     const assetErc20Address = this.getErc20Address(asset);
     const daiErc20Address = this.getErc20Address(Asset.DAI);

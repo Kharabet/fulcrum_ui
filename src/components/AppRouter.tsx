@@ -15,6 +15,7 @@ import { ProviderMenu } from "./ProviderMenu";
 interface IAppRouterState {
   isProviderMenuModalOpen: boolean;
   selectedProviderType: ProviderType;
+  isLoading: boolean;
   web3: Web3 | null;
 }
 
@@ -24,6 +25,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
 
     this.state = {
       isProviderMenuModalOpen: false,
+      isLoading: false,
       selectedProviderType: FulcrumProvider.Instance.providerType,
       web3: FulcrumProvider.Instance.web3
     };
@@ -54,8 +56,8 @@ export class AppRouter extends Component<any, IAppRouterState> {
         <HashRouter>
           <Switch>
             <Route exact={true} path="/" render={() => <LandingPage />} />
-            <Route exact={true} path="/lend" render={() => <LendPage doNetworkConnect={this.doNetworkConnect} />} />
-            <Route exact={true} path="/trade" render={() => <TradePage doNetworkConnect={this.doNetworkConnect} />} />
+            <Route exact={true} path="/lend" render={() => <LendPage isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} />} />
+            <Route exact={true} path="/trade" render={() => <TradePage isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} />} />
           </Switch>
         </HashRouter>
       </React.Fragment>
@@ -67,12 +69,16 @@ export class AppRouter extends Component<any, IAppRouterState> {
   };
 
   public onProviderTypeSelect = async (providerType: ProviderType) => {
-    await FulcrumProvider.Instance.setWeb3Provider(providerType);
-
-    this.setState({
+    FulcrumProvider.Instance.setWeb3Provider(ProviderType.None);
+    
+    await this.setState({
       ...this.state,
+      isLoading: providerType !== ProviderType.None ? true : false,
       isProviderMenuModalOpen: false
     });
+
+    if (providerType !== ProviderType.None)
+      await FulcrumProvider.Instance.setWeb3Provider(providerType);
   };
 
   public onRequestClose = () => {

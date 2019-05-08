@@ -160,6 +160,20 @@
     color: #ffffff;
   }
 
+  &--failed-txn {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: normal;
+    font-style: normal;
+    font-stretch: normal;
+    letter-spacing: normal;
+    text-align: left;
+    color: #ffffff;
+    margin-left: 10px;
+    margin-bottom: 10px;
+    text-decoration: none;
+  }
+
   &--future {
     font-size: 0.75rem;
     font-weight: normal;

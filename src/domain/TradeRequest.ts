@@ -22,6 +22,6 @@ export class TradeRequest {
   }
 
   public getRequestTypeName(): string {
-    return (this.tradeType === TradeType.BUY ? "Buy" : "Sell") + " request";
+    return (this.tradeType === TradeType.BUY ? "Open" : "Close") + " request";
   }
 }

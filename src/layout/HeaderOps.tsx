@@ -5,6 +5,7 @@ import { HeaderMenu, IHeaderMenuProps } from "./HeaderMenu";
 
 export interface IHeaderOpsProps {
   doNetworkConnect: () => void;
+  isLoading: boolean | false;
 }
 
 export class HeaderOps extends Component<IHeaderOpsProps> {
@@ -26,7 +27,7 @@ export class HeaderOps extends Component<IHeaderOpsProps> {
           <HeaderMenu items={this._menu.items} />
         </div>
         <div className="header__right">
-          <OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />
+          <OnChainIndicator isLoading={this.props.isLoading} doNetworkConnect={this.props.doNetworkConnect} />
         </div>
       </header>
     );

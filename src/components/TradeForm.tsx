@@ -1,3 +1,5 @@
+import 'react-tippy/dist/tippy.css'
+import { Tooltip } from "react-tippy";
 import { BigNumber } from "@0x/utils";
 import React, { ChangeEvent, Component, FormEvent } from "react";
 import { Asset } from "../domain/Asset";
@@ -135,14 +137,15 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     const submitClassName =
       this.props.tradeType === TradeType.BUY ? "trade-form__submit-button--buy" : "trade-form__submit-button--sell";
 
-    const positionTypePrefix = this.props.positionType === PositionType.SHORT ? "ps" : "pL";
+    const positionTypePrefix = this.props.positionType === PositionType.SHORT ? "pS" : "pL";
     const tokenNameBase = this.state.assetDetails.displayName;
-    const tokenNamePosition = `${positionTypePrefix}${this.state.assetDetails.displayName}${this.props.leverage}x`;
+    const tokenNamePosition = `${positionTypePrefix}${this.state.assetDetails.displayName}` +
+      (this.props.leverage > 1 ? `${this.props.leverage}x` : ``);
 
     const tokenNameSource = this.props.tradeType === TradeType.BUY ? tokenNameBase : tokenNamePosition;
     const tokenNameDestination = this.props.tradeType === TradeType.BUY ? tokenNamePosition : tokenNameBase;
 
-    const bnPrice = new BigNumber(this.state.latestPriceDataPoint.price);
+    const bnPrice = new BigNumber(this.state.latestPriceDataPoint.price).div(1000);
     const isAmountMaxed = this.state.tradeAmount.eq(this.state.maxTradeAmount);
     const tradedAmountEstimateText =
       this.state.tradedAmountEstimate.eq(0)
@@ -185,15 +188,27 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
               onChange={this.onTradeAmountChange}
             />
             <div className="trade-form__kv-container">
-              {isAmountMaxed ? (
-                <div className="trade-form__label">Max amount reached!</div>
-              ) : (
+              {isAmountMaxed ? 
+                  this.state.maxTradeAmount.eq(0) ? (
+                    <div className="trade-form__label">Your wallet is empty &#9785;</div>
+                  ) : (
+                    <div className="trade-form__label">Max amount entered.</div>
+                  )
+              : (
                 <div className="trade-form__label trade-form__label--action" onClick={this.onInsertMaxValue}>
                   Insert max value
                 </div>
               )}
               <div className="trade-form__value trade-form__value--no-color">
-                <span className="rounded-mark">?</span>
+                <Tooltip
+                  html={
+                    <div style={{ /*maxWidth: `300px`*/ }}>
+                      ... Info ...
+                    </div>
+                  }
+                >
+                  <span className="rounded-mark">?</span>
+                </Tooltip>
                 &nbsp; {tradedAmountEstimateText} {tokenNameDestination}
               </div>
             </div>

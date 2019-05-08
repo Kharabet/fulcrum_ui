@@ -11,6 +11,7 @@ import { FulcrumProvider } from "../services/FulcrumProvider";
 
 export interface ILendPageProps {
   doNetworkConnect: () => void;
+  isLoading: boolean | false;
 }
 
 interface ILendPageState {
@@ -35,7 +36,7 @@ export class LendPage extends Component<ILendPageProps, ILendPageState> {
   public render() {
     return (
       <div className="lend-page">
-        <HeaderOps doNetworkConnect={this.props.doNetworkConnect} />
+        <HeaderOps isLoading={this.props.isLoading} doNetworkConnect={this.props.doNetworkConnect} />
         <main>
           <LendTokenSelector onLend={this.onLendRequested} />
           <Modal
@@ -65,7 +66,7 @@ export class LendPage extends Component<ILendPageProps, ILendPageState> {
 
   public onLendConfirmed = (request: LendRequest) => {
     FulcrumProvider.Instance.onLendConfirmed(request);
-    this.setState({ ...this.state, isLendModalOpen: false, lendType: LendType.LEND, lendAsset: Asset.UNKNOWN });
+    this.setState({ ...this.state, isLendModalOpen: true, lendType: LendType.LEND, lendAsset: Asset.UNKNOWN });
   };
 
   public onRequestClose = () => {

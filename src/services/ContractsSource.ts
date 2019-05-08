@@ -10,11 +10,11 @@ import { pTokenContract } from "../contracts/pTokenContract";
 import { ReferencePriceFeedContract } from "../contracts/ReferencePriceFeedContract";
 import { TokenizedRegistryContract } from "../contracts/TokenizedRegistryContract";
 
-import erc20Json from "./../assets/artifacts/kovan/erc20.json";
-import iTokenJson from "./../assets/artifacts/kovan/iToken.json";
-import pTokenJson from "./../assets/artifacts/kovan/pToken.json";
-import ReferencePriceFeedJson from "./../assets/artifacts/kovan/ReferencePriceFeed.json";
-import TokenizedRegistryJson from "./../assets/artifacts/kovan/TokenizedRegistry.json";
+import erc20Json from "./../assets/artifacts/ropsten/erc20.json";
+import iTokenJson from "./../assets/artifacts/ropsten/iToken.json";
+import pTokenJson from "./../assets/artifacts/ropsten/pToken.json";
+import ReferencePriceFeedJson from "./../assets/artifacts/ropsten/ReferencePriceFeed.json";
+import TokenizedRegistryJson from "./../assets/artifacts/ropsten/TokenizedRegistry.json";
 
 interface ITokenContractInfo {
   token: string;
