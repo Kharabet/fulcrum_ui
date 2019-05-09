@@ -1,8 +1,10 @@
 import { BigNumber } from "@0x/utils";
 import React, { Component } from "react";
+import { Asset } from "../domain/Asset";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { IPriceDataPoint } from "../domain/IPriceDataPoint";
+import { PositionType } from "../domain/PositionType";
 import { TradeRequest } from "../domain/TradeRequest";
 import { TradeTokenKey } from "../domain/TradeTokenKey";
 import { TradeType } from "../domain/TradeType";
@@ -91,8 +93,13 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
     }
 
     const balanceString = this.props.balance.dividedBy(10 ** 18).toFixed();
-    const bnPrice = new BigNumber(this.state.latestPriceDataPoint.price);
-    const bnLiquidationPrice = new BigNumber(this.state.latestPriceDataPoint.liquidationPrice);
+    let bnPrice = new BigNumber(this.state.latestPriceDataPoint.price);
+    let bnLiquidationPrice = new BigNumber(this.state.latestPriceDataPoint.liquidationPrice);
+    if (this.props.currentKey.positionType === PositionType.SHORT) {
+      bnPrice = bnPrice.div(1000);
+      bnLiquidationPrice = bnLiquidationPrice.div(1000);
+    }
+    
     //const bnChange24h = new BigNumber(this.state.latestPriceDataPoint.change24h);
     const isActiveClassName =
       this.props.currentKey.toString() === this.props.selectedKey.toString() ? "trade-token-grid-row--active" : "";
@@ -107,8 +114,8 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
         </div>
         <div className="trade-token-grid-row__col-token-name-full">{this.props.currentKey.toString()}</div>
         <div className="trade-token-grid-row__col-amount">{`${balanceString}`}</div>
-        <div className="trade-token-grid-row__col-price">{`$${bnPrice.div(1000).toFixed(2)}`}</div>
-        <div className="trade-token-grid-row__col-price">{`$${bnLiquidationPrice.div(1000).toFixed(2)}`}</div>
+        <div className="trade-token-grid-row__col-price">{`${bnPrice.toFixed(2)}`}</div>
+        <div className="trade-token-grid-row__col-price">{`${bnLiquidationPrice.toFixed(2)}`}</div>
         {/*<div className="trade-token-grid-row__col-change24h">
           <Change24HMarker value={bnChange24h} size={Change24HMarkerSize.MEDIUM} />
         </div>*/}
@@ -143,7 +150,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
     event.stopPropagation();
 
     this.props.onTrade(
-      new TradeRequest(TradeType.SELL, this.props.currentKey.asset, this.props.currentKey.positionType, this.props.currentKey.leverage, new BigNumber(0))
+      new TradeRequest(TradeType.SELL, this.props.currentKey.asset, Asset.ETH, this.props.currentKey.positionType, this.props.currentKey.leverage, new BigNumber(0))
     );
   };
 }

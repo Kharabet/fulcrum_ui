@@ -8,14 +8,16 @@ export class TradeRequest {
   public id: number;
   public tradeType: TradeType;
   public asset: Asset;
+  public collateral: Asset;
   public positionType: PositionType;
   public leverage: number;
   public amount: BigNumber;
 
-  constructor(tradeType: TradeType, asset: Asset, positionType: PositionType, leverage: number, amount: BigNumber) {
+  constructor(tradeType: TradeType, asset: Asset, collateral: Asset, positionType: PositionType, leverage: number, amount: BigNumber) {
     this.id = moment().unix();
     this.tradeType = tradeType;
     this.asset = asset;
+    this.collateral = collateral;
     this.positionType = positionType;
     this.leverage = leverage;
     this.amount = amount;

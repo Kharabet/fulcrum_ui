@@ -2,6 +2,8 @@ import 'react-tippy/dist/tippy.css'
 import { Tooltip } from "react-tippy";
 import { BigNumber } from "@0x/utils";
 import React, { ChangeEvent, Component, FormEvent } from "react";
+import Modal from "react-modal";
+import { CollateralTokenSelector } from "../components/CollateralTokenSelector";
 import { Asset } from "../domain/Asset";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
@@ -20,9 +22,11 @@ export interface ITradeFormProps {
   asset: Asset;
   positionType: PositionType;
   leverage: number;
+  collateral: Asset;
 
   onSubmit: (request: TradeRequest) => void;
   onCancel: () => void;
+  setCollateralToken: (asset: Asset) => void;
 }
 
 interface ITradeFormState {
@@ -33,6 +37,8 @@ interface ITradeFormState {
   tradeAmount: BigNumber;
   maxTradeAmount: BigNumber;
 
+  isChangeCollateralOpen: boolean;
+
   tradedAmountEstimate: BigNumber;
 }
 
@@ -41,7 +47,6 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
 
   constructor(props: ITradeFormProps, context?: any) {
     super(props, context);
-
     const assetDetails = AssetsDictionary.assets.get(props.asset);
     const latestPriceDataPoint = FulcrumProvider.Instance.getPriceDefaultDataPoint();
     const maxTradeValue = new BigNumber(0);
@@ -52,6 +57,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       tradeAmountText: maxTradeValue.toFixed(),
       tradeAmount: maxTradeValue,
       maxTradeAmount: maxTradeValue,
+      isChangeCollateralOpen: false,
       tradedAmountEstimate: tradedAmountEstimate,
       latestPriceDataPoint: latestPriceDataPoint
     };
@@ -71,11 +77,12 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     const assetDetails = AssetsDictionary.assets.get(this.props.asset);
     const tradeTokenKey = this.getTradeTokenGridRowSelectionKey(this.props.leverage);
     const latestPriceDataPoint = await FulcrumProvider.Instance.getPriceLatestDataPoint(tradeTokenKey);
-    const maxTradeValue = await FulcrumProvider.Instance.getMaxTradeValue(this.props.tradeType, tradeTokenKey);
+    const maxTradeValue = await FulcrumProvider.Instance.getMaxTradeValue(this.props.tradeType, tradeTokenKey, this.props.collateral);
     const tradedAmountEstimate = await FulcrumProvider.Instance.getTradedAmountEstimate(
       new TradeRequest(
         this.props.tradeType,
         this.props.asset,
+        this.props.collateral,
         this.props.positionType,
         this.props.leverage,
         maxTradeValue
@@ -142,10 +149,13 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     const tokenNamePosition = `${positionTypePrefix}${this.state.assetDetails.displayName}` +
       (this.props.leverage > 1 ? `${this.props.leverage}x` : ``);
 
-    const tokenNameSource = this.props.tradeType === TradeType.BUY ? tokenNameBase : tokenNamePosition;
-    const tokenNameDestination = this.props.tradeType === TradeType.BUY ? tokenNamePosition : tokenNameBase;
+    const tokenNameSource = this.props.tradeType === TradeType.BUY ? this.props.collateral : tokenNamePosition;
+    const tokenNameDestination = this.props.tradeType === TradeType.BUY ? tokenNamePosition : this.props.collateral;
 
-    const bnPrice = new BigNumber(this.state.latestPriceDataPoint.price).div(1000);
+    let bnPrice = new BigNumber(this.state.latestPriceDataPoint.price);
+    if (this.props.positionType === PositionType.SHORT)
+    	bnPrice = bnPrice.div(1000);
+
     const isAmountMaxed = this.state.tradeAmount.eq(this.state.maxTradeAmount);
     const tradedAmountEstimateText =
       this.state.tradedAmountEstimate.eq(0)
@@ -155,9 +165,9 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
           : this.state.tradedAmountEstimate.toExponential(3);
 
     return (
-      <form className="trade-form" onSubmit={this.onSubmitClick}>
+      <form className="trade-form" onSubmit={this.onSubmitClick} style={this.props.collateral !== Asset.ETH ? { height: `32rem`} : { height: `28rem`}}>
         <div className="trade-form__image" style={divStyle}>
-          <img src={this.state.assetDetails.logoSvg} alt={tokenNameSource} />
+          <img src={this.state.assetDetails.logoSvg} alt={tokenNameBase} />
         </div>
         <div className="trade-form__form-container">
           <div className="trade-form__form-values-container">
@@ -165,16 +175,26 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
               <PositionTypeMarker value={this.props.positionType} />
             </div>
             <div className="trade-form__kv-container trade-form__kv-container--w_dots">
-              <div className="trade-form__label">Token</div>
-              <div className="trade-form__value">{tokenNameSource}</div>
+              <div className="trade-form__label">Position Token</div>
+              <div className="trade-form__value">{tokenNameBase}</div>
+            </div>
+            <div className="trade-form__kv-container trade-form__kv-container--w_dots">
+              <div className="trade-form__label">
+                {this.props.tradeType === TradeType.BUY ? `Deposit Token` : `Withdrawal Token`}
+                {` `}
+                <button className="trade-form__change-button" onClick={this.onChangeCollateralOpen}>
+                  <span className="trade-form__label--action">Change</span>
+                </button>
+              </div>
+              <div className="trade-form__value">{this.props.collateral}</div>
+            </div>
+            <div className="trade-form__kv-container trade-form__kv-container--w_dots">
+              <div className="trade-form__label">Position Price</div>
+              <div className="trade-form__value">{`$${bnPrice.toFixed(2)}`}</div>
             </div>
             <div className="trade-form__kv-container trade-form__kv-container--w_dots">
               <div className="trade-form__label">Leverage</div>
               <div className="trade-form__value">{`${this.props.leverage.toString()}x`}</div>
-            </div>
-            <div className="trade-form__kv-container trade-form__kv-container--w_dots">
-              <div className="trade-form__label">Price</div>
-              <div className="trade-form__value">{`$${bnPrice.toFixed(2)}`}</div>
             </div>
             <div className="trade-form__kv-container">
               <div className="trade-form__label">Amount</div>
@@ -212,6 +232,14 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
                 &nbsp; {tradedAmountEstimateText} {tokenNameDestination}
               </div>
             </div>
+
+            {this.props.collateral !== Asset.ETH ? (
+              <div className="trade-form__token-message-container">
+                <div className="trade-form__token-message-container--message">
+                  Selected deposit token ({this.props.collateral}) may need approval, which can take up to 5 minutes.
+                </div>
+              </div>
+            ) : `` }
           </div>
 
           <div className="trade-form__actions-container">
@@ -223,6 +251,14 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
             </button>
           </div>
         </div>
+        <Modal
+          isOpen={this.state.isChangeCollateralOpen}
+          onRequestClose={this.onChangeCollateralClose}
+          className="modal-content-div"
+          overlayClassName="modal-overlay-div"
+        >
+          <CollateralTokenSelector onCollateralChange={this.onChangeCollateralClicked} />
+        </Modal>
       </form>
     );
   }
@@ -245,7 +281,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
 
     // updating stored value only if the new input value is a valid number
     const tradedAmountEstimate = await FulcrumProvider.Instance.getTradedAmountEstimate(
-      new TradeRequest(this.props.tradeType, this.props.asset, this.props.positionType, this.props.leverage, amount)
+      new TradeRequest(this.props.tradeType, this.props.asset, this.props.collateral, this.props.positionType, this.props.leverage, amount)
     );
     if (!amount.isNaN()) {
       this.setState({
@@ -263,16 +299,18 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     }
 
     const tradeTokenKey = this.getTradeTokenGridRowSelectionKey();
-    const maxTradeValue = await FulcrumProvider.Instance.getMaxTradeValue(this.props.tradeType, tradeTokenKey);
+    const maxTradeValue = await FulcrumProvider.Instance.getMaxTradeValue(this.props.tradeType, tradeTokenKey, this.props.collateral);
     const tradedAmountEstimate = await FulcrumProvider.Instance.getTradedAmountEstimate(
       new TradeRequest(
         this.props.tradeType,
         this.props.asset,
+        this.props.collateral,
         this.props.positionType,
         this.props.leverage,
         maxTradeValue
       )
     );
+
     this.setState({
       ...this.state,
       tradeAmountText: maxTradeValue.toFixed(),
@@ -284,6 +322,22 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
 
   public onCancelClick = () => {
     this.props.onCancel();
+  };
+
+  public onChangeCollateralOpen = (event: React.MouseEvent<HTMLElement>) => {
+    event.preventDefault();
+    
+    this.setState({ ...this.state, isChangeCollateralOpen: true });
+  };
+
+  private onChangeCollateralClose = () => {
+    this.setState({ ...this.state, isChangeCollateralOpen: false });
+  };
+
+  public onChangeCollateralClicked = async (asset: Asset) => {
+    await this.setState({ ...this.state, isChangeCollateralOpen: false });
+    await this.props.setCollateralToken(asset);
+    await this.derivedUpdate();
   };
 
   public onSubmitClick = (event: FormEvent<HTMLFormElement>) => {
@@ -310,6 +364,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       new TradeRequest(
         this.props.tradeType,
         this.props.asset,
+        this.props.collateral,
         this.props.positionType,
         this.props.leverage,
         this.state.tradeAmount

@@ -189,17 +189,14 @@ export class FulcrumProvider {
       const assetContract = this.contractsSource.getPTokenContract(selectedKey);
       if (assetContract) {
         const tokenPrice = await assetContract.tokenPrice.callAsync();
-        console.log(tokenPrice.toString());
         const liquidationPrice = await assetContract.liquidationPrice.callAsync();
-        const swapPrice = await this.getSwapToUsdPrice(selectedKey.asset);
-        console.log(selectedKey.asset);
+        const swapPrice = await this.getSwapToUsdPrice(selectedKey.loanAsset);
 
         const timeStamp = moment();
         result.timeStamp = timeStamp.unix();
         result.price = tokenPrice.multipliedBy(swapPrice).dividedBy(10 ** 18).toNumber();
         result.liquidationPrice = liquidationPrice.multipliedBy(swapPrice).dividedBy(10 ** 18).toNumber();
         result.change24h = 0;
-        console.log(result);
       }
     }
 
@@ -264,7 +261,7 @@ export class FulcrumProvider {
         result = new BigNumber(0);
         const assetContract = this.contractsSource.getPTokenContract(selectedKey);
         if (assetContract) {
-          const swapPrice = await this.getSwapToUsdPrice(selectedKey.asset);
+          const swapPrice = await this.getSwapToUsdPrice(selectedKey.loanAsset);
           const tokenPrice = await assetContract.tokenPrice.callAsync();
           const checkpointPrice = await assetContract.checkpointPrice.callAsync(account);
           result = tokenPrice
@@ -293,19 +290,24 @@ export class FulcrumProvider {
       burnToToken funtions though. So you can buy or cash out with any supported Kyber asset
   */
 
-  public getMaxTradeValue = async (tradeType: TradeType, selectedKey: TradeTokenKey): Promise<BigNumber> => {
+  public getMaxTradeValue = async (tradeType: TradeType, selectedKey: TradeTokenKey, collateral: Asset): Promise<BigNumber> => {
     let result = new BigNumber(0);
 
     const balance =
       tradeType === TradeType.BUY
-        ? await this.getBaseTokenBalance(selectedKey.asset)
+        ? await this.getBaseTokenBalance(collateral)
         : await this.getTradeTokenBalance(selectedKey);
 
     if (tradeType === TradeType.BUY) {
       if (this.contractsSource) {
         const assetContract = this.contractsSource.getPTokenContract(selectedKey);
         if (assetContract) {
-          const marketLiquidity = await assetContract.marketLiquidityForAsset.callAsync();
+          let marketLiquidity = await assetContract.marketLiquidityForAsset.callAsync();
+
+          if (collateral !== selectedKey.loanAsset) {
+            const swapPrice = await this.getSwapPrice(selectedKey.loanAsset, collateral);
+            marketLiquidity = marketLiquidity.multipliedBy(swapPrice);
+          }
 
           result = BigNumber.min(marketLiquidity, balance);
         } else {
@@ -346,19 +348,27 @@ export class FulcrumProvider {
     let result = new BigNumber(0);
 
     if (this.contractsSource) {
-      const assetContract = this.contractsSource.getPTokenContract(
-        new TradeTokenKey(
-          request.asset,
-          request.positionType,
-          request.leverage
-        ));
+      const key = new TradeTokenKey(
+        request.asset,
+        request.positionType,
+        request.leverage
+      );
+      const assetContract = this.contractsSource.getPTokenContract(key);
       if (assetContract) {
         const tokenPrice = await assetContract.tokenPrice.callAsync();
+        let amount = request.amount;
+
+        if (request.collateral !== key.loanAsset) {
+          const swapPrice = await this.getSwapPrice(request.collateral, key.loanAsset);
+          amount = request.tradeType === TradeType.BUY
+            ? amount.multipliedBy(swapPrice)
+            : amount.dividedBy(swapPrice);
+        }
 
         result =
           request.tradeType === TradeType.BUY
-            ? request.amount.multipliedBy(10 ** 18).dividedBy(tokenPrice)
-            : request.amount.multipliedBy(tokenPrice).dividedBy(10 ** 18);
+            ? amount.multipliedBy(10 ** 18).dividedBy(tokenPrice)
+            : amount.multipliedBy(tokenPrice).dividedBy(10 ** 18);
       }
     }
 
@@ -440,7 +450,7 @@ export class FulcrumProvider {
     return result;
   }
 
-  private async getLendTokenBalance(asset: Asset): Promise<BigNumber> {
+  public async getLendTokenBalance(asset: Asset): Promise<BigNumber> {
     let result = new BigNumber(0);
 
     if (this.contractsSource) {
@@ -522,18 +532,24 @@ export class FulcrumProvider {
   }
 
   private async getSwapToUsdPrice(asset: Asset): Promise<BigNumber> {
-    // we expect 1 dai = 1 usd
-    if (asset === Asset.DAI)
+    return this.getSwapPrice(
+      asset,
+      Asset.DAI
+    );
+  }
+
+  private async getSwapPrice(srcAsset: Asset, destAsset: Asset): Promise<BigNumber> {
+    if (srcAsset === destAsset)
       return new BigNumber(1);
     
     let result: BigNumber = new BigNumber(0);
-    const assetErc20Address = this.getErc20Address(asset);
-    const daiErc20Address = this.getErc20Address(Asset.DAI);
-    if (this.contractsSource && assetErc20Address && daiErc20Address) {
+    const srcAssetErc20Address = this.getErc20Address(srcAsset);
+    const destAssetErc20Address = this.getErc20Address(destAsset);
+    if (this.contractsSource && srcAssetErc20Address && destAssetErc20Address) {
       const referencePriceFeedContract = this.contractsSource.getReferencePriceFeedContract();
       const swapPriceData: BigNumber[] = await referencePriceFeedContract.getSwapPrice.callAsync(
-        assetErc20Address,
-        daiErc20Address,
+        srcAssetErc20Address,
+        destAssetErc20Address,
         new BigNumber(10 ** 18)
       );
       result = swapPriceData[0].dividedBy(10 ** 18);
@@ -711,9 +727,9 @@ export class FulcrumProvider {
       } else {
         task.processingStart([
           "Initializing loan",
-          "Detecting token allowance",
+          /*"Detecting token allowance",
           "Prompting token allowance",
-          "Waiting for token allowance",
+          "Waiting for token allowance",*/
           "Closing loan"
         ]);
 
@@ -790,10 +806,10 @@ export class FulcrumProvider {
           "Submitting trade"
         ]);
 
-        if (taskRequest.asset !== Asset.ETH) {
+        if (taskRequest.collateral !== Asset.ETH) {
           // init erc20 contract for base token
           let tokenErc20Contract: erc20Contract | null = null;
-          const assetErc20Address = this.getErc20Address(taskRequest.asset);
+          const assetErc20Address = this.getErc20Address(taskRequest.collateral);
           if (assetErc20Address) {
             tokenErc20Contract = await this.contractsSource.getErc20Contract(assetErc20Address);
           } else {
@@ -855,9 +871,9 @@ export class FulcrumProvider {
       } else {
         task.processingStart([
           "Initializing trade",
-          "Detecting token allowance",
+          /*"Detecting token allowance",
           "Prompting token allowance",
-          "Waiting for token allowance",
+          "Waiting for token allowance",*/
           "Closing trade"
         ]);
 
@@ -868,9 +884,9 @@ export class FulcrumProvider {
         task.processingStepNext();
         task.processingStepNext();
 
-        if (taskRequest.asset !== Asset.ETH) {
+        if (taskRequest.collateral !== Asset.ETH) {
           // Submitting unloan
-          const assetErc20Address = this.getErc20Address(taskRequest.asset);
+          const assetErc20Address = this.getErc20Address(taskRequest.collateral);
           if (assetErc20Address) {
             // estimating gas amount
             const gasAmount = await tokenContract.burnToToken.estimateGasAsync(

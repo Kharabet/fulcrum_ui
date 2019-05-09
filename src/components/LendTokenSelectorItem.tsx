@@ -19,6 +19,7 @@ interface ILendTokenSelectorItemState {
   assetDetails: AssetDetails | null;
   interestRate: BigNumber;
   profit: BigNumber | null;
+  balance: BigNumber;
 }
 
 export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps, ILendTokenSelectorItemState> {
@@ -28,8 +29,9 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
     const assetDetails = AssetsDictionary.assets.get(props.asset);
     const interestRate = new BigNumber(0);
     const profit = new BigNumber(0);
+    const balance = new BigNumber(0);
 
-    this.state = { assetDetails: assetDetails || null, interestRate: interestRate, profit: profit };
+    this.state = { assetDetails: assetDetails || null, interestRate: interestRate, profit: profit, balance: balance };
 
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
   }
@@ -38,8 +40,9 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
     const assetDetails = AssetsDictionary.assets.get(this.props.asset);
     const interestRate = await FulcrumProvider.Instance.getLendTokenInterestRate(this.props.asset);
     const profit = await FulcrumProvider.Instance.getLendProfit(this.props.asset);
+    const balance = await FulcrumProvider.Instance.getLendTokenBalance(this.props.asset);
 
-    this.setState({ ...this.state, assetDetails: assetDetails || null, interestRate: interestRate, profit: profit });
+    this.setState({ ...this.state, assetDetails: assetDetails || null, interestRate: interestRate, profit: profit, balance: balance });
   }
 
   private onProviderChanged = async (event: ProviderChangedEvent) => {
@@ -89,7 +92,7 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
             <div className="token-selector-item__interest-rate-value">{`${this.state.interestRate.toFixed(4)}%`}</div>
           </div>
         </div>
-        {this.renderActions(this.state.profit === null)}
+        {this.renderActions(this.state.balance.eq(0))}
       </div>
     );
   }

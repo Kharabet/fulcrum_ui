@@ -32,6 +32,8 @@ interface ITradePageState {
   tradePositionType: PositionType;
   tradeLeverage: number;
 
+  collateralToken: Asset;
+
   isTokenAddressFormOpen: boolean;
   tradeTokenKey: TradeTokenKey;
 
@@ -51,6 +53,7 @@ export class TradePage extends Component<ITradePageProps, ITradePageState> {
       tradeAsset: Asset.UNKNOWN,
       tradePositionType: PositionType.SHORT,
       tradeLeverage: 0,
+      collateralToken: Asset.UNKNOWN,
       isTokenAddressFormOpen: false,
       tradeTokenKey: TradeTokenKey.empty()
     };
@@ -101,6 +104,8 @@ export class TradePage extends Component<ITradePageProps, ITradePageState> {
               asset={this.state.tradeAsset}
               positionType={this.state.tradePositionType}
               leverage={this.state.tradeLeverage}
+              collateral={this.state.collateralToken}
+              setCollateralToken={this.setCollateralToken}
               onSubmit={this.onTradeConfirmed}
               onCancel={this.onRequestClose}
             />
@@ -121,6 +126,10 @@ export class TradePage extends Component<ITradePageProps, ITradePageState> {
       </div>
     );
   }
+
+  public setCollateralToken = async (asset: Asset) => {
+    this.setState({ ...this.state, collateralToken: asset });
+  };
 
   public onSelect = async (key: TradeTokenKey) => {
     const priceGraphData = await FulcrumProvider.Instance.getPriceDataPoints(key, 15);
@@ -145,6 +154,7 @@ export class TradePage extends Component<ITradePageProps, ITradePageState> {
       this.setState({
         ...this.state,
         isTradeModalOpen: true,
+        collateralToken: request.positionType === PositionType.SHORT ? request.asset : Asset.DAI,
         tradeType: request.tradeType,
         tradeAsset: request.asset,
         tradePositionType: request.positionType,
@@ -157,7 +167,7 @@ export class TradePage extends Component<ITradePageProps, ITradePageState> {
     FulcrumProvider.Instance.onTradeConfirmed(request);
     this.setState({
       ...this.state,
-      isTradeModalOpen: true,
+      isTradeModalOpen: false,
       tradeType: TradeType.BUY,
       tradeAsset: Asset.UNKNOWN,
       tradePositionType: PositionType.SHORT,
@@ -166,10 +176,16 @@ export class TradePage extends Component<ITradePageProps, ITradePageState> {
   };
 
   public onRequestClose = () => {
-    this.setState({ ...this.state, isTradeModalOpen: false });
+    this.setState({ 
+      ...this.state,
+      isTradeModalOpen: false
+    });
   };
 
   public onShowMyTokensOnlyChange = (value: boolean) => {
-    this.setState({ ...this.state, showMyTokensOnly: value });
+    this.setState({ 
+      ...this.state,
+      showMyTokensOnly: value
+    });
   };
 }

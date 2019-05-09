@@ -1,5 +1,4 @@
 .trade-form {
-  height: 27rem;
   width: 36rem;
 
   background-color: #444e5a;
@@ -65,6 +64,29 @@
   background-image: url("../assets/images/dotted_line.png");
   background-repeat: repeat-x;
   background-position-y: 1.25rem;
+}
+
+.trade-form__token-message-container {
+  width: 256px;
+  height: 70px;
+  border-radius: 4px;
+  background-color: #0000001a;
+}
+
+.trade-form__token-message-container--message {
+  width: 224px;
+  height: 40px;
+  padding: 12px 10px 0px 0px;
+  margin-top: 5px;
+  margin-left: 22px;
+  font-size: 0.75rem;
+  font-weight: normal;
+  font-style: normal;
+  font-stretch: normal;
+  line-height: 1.33;
+  letter-spacing: normal;
+  text-align: left;
+  color: #acb5c2;
 }
 
 .trade-form__label {
@@ -137,6 +159,19 @@
   border-style: solid;
   border-radius: 100px;
   padding: 0.0625rem 0.3125rem;
+}
+
+.trade-form__change-button {
+  cursor: pointer;
+  outline: none;
+  border: 0;
+  background-color: rgba(0, 0, 0, 0);
+  text-decoration: underline;
+  -webkit-text-decoration-style: dotted;
+  /* text-decoration-style: dotted; */
+  color: #ffffff;
+  font-size: 0.75rem;
+  padding-left: 4px;
 }
 
 .trade-form__cancel-button {

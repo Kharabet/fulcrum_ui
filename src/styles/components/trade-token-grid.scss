@@ -257,6 +257,14 @@ $margin-right-column: 1.5rem;
   outline: none;
 }
 
+.trade-token-grid-row__buy-button--size-full {
+  width: 90%;
+}
+
+.trade-token-grid-row__buy-button--size-half {
+  width: $width-button-action;
+}
+
 .trade-token-grid-row__sell-button {
   display: inline-block;
   cursor: pointer;

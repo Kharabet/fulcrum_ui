@@ -32,6 +32,7 @@ interface ITradeTokenGridRowState {
 
   latestPriceDataPoint: IPriceDataPoint;
   profit: BigNumber | null;
+  balance: BigNumber;
 }
 
 export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITradeTokenGridRowState> {
@@ -44,7 +45,8 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
       leverage: this.props.defaultLeverage,
       assetDetails: assetDetails || null,
       latestPriceDataPoint: FulcrumProvider.Instance.getPriceDefaultDataPoint(),
-      profit: new BigNumber(0)
+      profit: new BigNumber(0),
+      balance: new BigNumber(0)
     };
 
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
@@ -62,11 +64,13 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
     const tradeTokenKey = new TradeTokenKey(this.props.asset, this.props.positionType, this.state.leverage);
     const latestPriceDataPoint = await FulcrumProvider.Instance.getPriceLatestDataPoint(tradeTokenKey);
     const profit = await FulcrumProvider.Instance.getTradeProfit(tradeTokenKey);
+    const balance = await FulcrumProvider.Instance.getTradeTokenBalance(tradeTokenKey);
 
     this.setState({
       ...this.state,
       latestPriceDataPoint: latestPriceDataPoint,
-      profit: profit
+      profit: profit,
+      balance: balance
     });
   }
 
@@ -105,8 +109,13 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
     }
 
     const tradeTokenKey = this.getTradeTokenGridRowSelectionKey(this.state.leverage);
-    const bnPrice = new BigNumber(this.state.latestPriceDataPoint.price);
-    const bnLiquidationPrice = new BigNumber(this.state.latestPriceDataPoint.liquidationPrice);
+    let bnPrice = new BigNumber(this.state.latestPriceDataPoint.price);
+    let bnLiquidationPrice = new BigNumber(this.state.latestPriceDataPoint.liquidationPrice);
+    if (this.props.positionType === PositionType.SHORT) {
+      bnPrice = bnPrice.div(1000);
+      bnLiquidationPrice = bnLiquidationPrice.div(1000);
+    }
+
     //const bnChange24h = new BigNumber(this.state.latestPriceDataPoint.change24h);
     const isActiveClassName =
       tradeTokenKey.toString() === this.props.selectedKey.toString() ? "trade-token-grid-row--active" : "";
@@ -131,25 +140,37 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
             onChange={this.onLeverageSelect}
           />
         </div>
-        <div className="trade-token-grid-row__col-price">{`$${bnPrice.div(1000).toFixed(2)}`}</div>
-        <div className="trade-token-grid-row__col-price">{`$${bnLiquidationPrice.div(1000).toFixed(2)}`}</div>
+        <div className="trade-token-grid-row__col-price">{`${bnPrice.toFixed(2)}`}</div>
+        <div className="trade-token-grid-row__col-price">{`${bnLiquidationPrice.toFixed(2)}`}</div>
         {/*<div className="trade-token-grid-row__col-change24h">
           <Change24HMarker value={bnChange24h} size={Change24HMarkerSize.MEDIUM} />
         </div>*/}
         <div className="trade-token-grid-row__col-profit">
           {this.state.profit ? `$${this.state.profit.toFixed(4)}` : "-"}
         </div>
-        <div className="trade-token-grid-row__col-action">
-          <button className="trade-token-grid-row__buy-button" onClick={this.onBuyClick}>
-            {TradeType.BUY}
-          </button>
-          <button className="trade-token-grid-row__sell-button" onClick={this.onSellClick}>
-            {TradeType.SELL}
-          </button>
-        </div>
+        {this.renderActions(this.state.balance.eq(0))}
       </div>
     );
   }
+
+  private renderActions = (isOpenOnly: boolean) => {
+    return isOpenOnly ? (
+      <div className="trade-token-grid-row__col-action">
+        <button className="trade-token-grid-row__buy-button trade-token-grid-row__buy-button--size-full" onClick={this.onBuyClick}>
+          {TradeType.BUY}
+        </button>
+      </div>
+    ) : (
+      <div className="trade-token-grid-row__col-action">
+        <button className="trade-token-grid-row__buy-button trade-token-grid-row__buy-button--size-half" onClick={this.onBuyClick}>
+          {TradeType.BUY}
+        </button>
+        <button className="trade-token-grid-row__sell-button" onClick={this.onSellClick}>
+          {TradeType.SELL}
+        </button>
+      </div>
+    );
+  };
 
   public onLeverageSelect = (value: number) => {
     this.setState({ ...this.state, leverage: value });
@@ -167,7 +188,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
     event.stopPropagation();
 
     this.props.onTrade(
-      new TradeRequest(TradeType.BUY, this.props.asset, this.props.positionType, this.state.leverage, new BigNumber(0))
+      new TradeRequest(TradeType.BUY, this.props.asset, Asset.ETH, this.props.positionType, this.state.leverage, new BigNumber(0))
     );
   };
 
@@ -175,7 +196,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
     event.stopPropagation();
 
     this.props.onTrade(
-      new TradeRequest(TradeType.SELL, this.props.asset, this.props.positionType, this.state.leverage, new BigNumber(0))
+      new TradeRequest(TradeType.SELL, this.props.asset, Asset.ETH, this.props.positionType, this.state.leverage, new BigNumber(0))
     );
   };
 }

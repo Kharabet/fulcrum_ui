@@ -118,11 +118,8 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
     const tokenNameBase = this.state.assetDetails.displayName;
     const tokenNamePosition = `i${this.state.assetDetails.displayName}`;
 
-    //const tokenNameSource = this.props.lendType === LendType.LEND ? tokenNameBase : tokenNamePosition;
-    //const tokenNameDestination = this.props.lendType === LendType.LEND ? tokenNamePosition : tokenNameBase;
-    const tokenNameSource = tokenNameBase;
-    const tokenNameDestination = tokenNamePosition;
-
+    const tokenNameSource = this.props.lendType === LendType.LEND ? tokenNameBase : tokenNamePosition;
+    const tokenNameDestination = this.props.lendType === LendType.LEND ? tokenNamePosition : tokenNameBase;
 
     const isAmountMaxed = this.state.lendAmount.eq(this.state.maxLendAmount);
     const lendedAmountEstimateText =
@@ -272,6 +269,12 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
       return;
     }
 
-    this.props.onSubmit(new LendRequest(this.props.lendType, this.props.asset, this.state.lendAmount));
+    this.props.onSubmit(
+      new LendRequest(
+        this.props.lendType, 
+        this.props.asset, 
+        this.state.lendAmount
+      )
+    );
   };
 }

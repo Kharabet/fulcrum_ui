@@ -60,16 +60,29 @@ export class LendPage extends Component<ILendPageProps, ILendPageState> {
 
   public onLendRequested = (request: LendRequest) => {
     if (request) {
-      this.setState({ ...this.state, isLendModalOpen: true, lendType: request.lendType, lendAsset: request.asset });
+      this.setState({ 
+        ...this.state,
+        isLendModalOpen: true,
+        lendType: request.lendType,
+        lendAsset: request.asset
+      });
     }
   };
 
   public onLendConfirmed = (request: LendRequest) => {
     FulcrumProvider.Instance.onLendConfirmed(request);
-    this.setState({ ...this.state, isLendModalOpen: true, lendType: LendType.LEND, lendAsset: Asset.UNKNOWN });
+    this.setState({ 
+      ...this.state,
+      isLendModalOpen: false,
+      lendType: LendType.LEND,
+      lendAsset: Asset.UNKNOWN
+    });
   };
 
   public onRequestClose = () => {
-    this.setState({ ...this.state, isLendModalOpen: false });
+    this.setState({ 
+      ...this.state,
+      isLendModalOpen: false 
+    });
   };
 }

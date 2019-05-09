@@ -1,0 +1,50 @@
+.collateral-token-selector {
+  /*width: 352px;
+  height: 640px;
+  background-color: #444e5a;*/
+}
+
+.collateral-token-selector-item {
+  display: inline-block;
+  box-sizing: border-box;
+
+  height: 12rem;
+  width: 12rem;
+
+  padding: 2rem;
+  margin: 0 1px 1px 0;
+
+  background-color: #4F5B67;
+  text-align: center;
+}
+
+.collateral-token-selector-item__image {
+  display: inline-block;
+  height: 4rem;
+  width: 50%;
+  margin-top: 0.75rem;
+  margin-bottom: 1rem;
+
+  img {
+    display: inline-block;
+    height: 4rem;
+    width: 4rem;
+  }
+}
+
+.collateral-token-selector-item__description {
+  margin-bottom: 1.5rem;
+}
+
+.collateral-token-selector-item__name {
+  display: inline-block;
+  width: 50%;
+
+  font-size: 2.25rem;
+  font-weight: 600;
+  font-style: normal;
+  font-stretch: normal;
+  letter-spacing: -0.9px;
+  text-align: left;
+  color: #ffffff;
+}
