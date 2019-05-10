@@ -11,7 +11,7 @@ import { FulcrumProvider } from "../services/FulcrumProvider";
 
 export interface ILendPageProps {
   doNetworkConnect: () => void;
-  isLoading: boolean | false;
+  isLoading: boolean;
 }
 
 interface ILendPageState {

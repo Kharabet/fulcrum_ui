@@ -11,7 +11,7 @@ import { TradeType } from "../domain/TradeType";
 import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
-//import { Change24HMarker, Change24HMarkerSize } from "./Change24HMarker";
+// import { Change24HMarker, Change24HMarkerSize } from "./Change24HMarker";
 import { LeverageSelector } from "./LeverageSelector";
 import { PositionTypeMarker } from "./PositionTypeMarker";
 
@@ -116,7 +116,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
       bnLiquidationPrice = bnLiquidationPrice.div(1000);
     }
 
-    //const bnChange24h = new BigNumber(this.state.latestPriceDataPoint.change24h);
+    // const bnChange24h = new BigNumber(this.state.latestPriceDataPoint.change24h);
     const isActiveClassName =
       tradeTokenKey.toString() === this.props.selectedKey.toString() ? "trade-token-grid-row--active" : "";
 
@@ -140,8 +140,8 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
             onChange={this.onLeverageSelect}
           />
         </div>
-        <div className="trade-token-grid-row__col-price">{`${bnPrice.toFixed(2)}`}</div>
-        <div className="trade-token-grid-row__col-price">{`${bnLiquidationPrice.toFixed(2)}`}</div>
+        <div className="trade-token-grid-row__col-price">{`$${bnPrice.toFixed(2)}`}</div>
+        <div className="trade-token-grid-row__col-price">{`$${bnLiquidationPrice.toFixed(2)}`}</div>
         {/*<div className="trade-token-grid-row__col-change24h">
           <Change24HMarker value={bnChange24h} size={Change24HMarkerSize.MEDIUM} />
         </div>*/}
@@ -188,7 +188,14 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
     event.stopPropagation();
 
     this.props.onTrade(
-      new TradeRequest(TradeType.BUY, this.props.asset, Asset.ETH, this.props.positionType, this.state.leverage, new BigNumber(0))
+      new TradeRequest(
+        TradeType.BUY,
+        this.props.asset,
+        Asset.ETH,
+        this.props.positionType,
+        this.state.leverage,
+        new BigNumber(0)
+      )
     );
   };
 
@@ -196,7 +203,14 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
     event.stopPropagation();
 
     this.props.onTrade(
-      new TradeRequest(TradeType.SELL, this.props.asset, Asset.ETH, this.props.positionType, this.state.leverage, new BigNumber(0))
+      new TradeRequest(
+        TradeType.SELL,
+        this.props.asset,
+        this.props.selectedKey.positionType === PositionType.SHORT ? this.props.selectedKey.asset : Asset.DAI,
+        this.props.positionType,
+        this.state.leverage,
+        new BigNumber(0)
+      )
     );
   };
 }

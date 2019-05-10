@@ -69,16 +69,17 @@ export class AppRouter extends Component<any, IAppRouterState> {
   };
 
   public onProviderTypeSelect = async (providerType: ProviderType) => {
-    FulcrumProvider.Instance.setWeb3Provider(ProviderType.None);
+    await FulcrumProvider.Instance.setWeb3Provider(ProviderType.None);
     
     await this.setState({
       ...this.state,
-      isLoading: providerType !== ProviderType.None ? true : false,
+      isLoading: providerType !== ProviderType.None,
       isProviderMenuModalOpen: false
     });
 
-    if (providerType !== ProviderType.None)
+    if (providerType !== ProviderType.None) {
       await FulcrumProvider.Instance.setWeb3Provider(providerType);
+    }
   };
 
   public onRequestClose = () => {

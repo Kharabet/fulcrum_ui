@@ -1,7 +1,6 @@
-import 'react-tippy/dist/tippy.css'
-import { Tooltip } from "react-tippy";
 import { BigNumber } from "@0x/utils";
 import React, { ChangeEvent, Component, FormEvent } from "react";
+import { Tooltip } from "react-tippy";
 import { Asset } from "../domain/Asset";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
@@ -23,8 +22,10 @@ interface ILendFormState {
   assetDetails: AssetDetails | null;
   interestRate: BigNumber;
 
+  isLendAmountTouched: boolean;
   lendAmountText: string;
   lendAmount: BigNumber;
+  balance: BigNumber;
   maxLendAmount: BigNumber;
 
   lendedAmountEstimate: BigNumber;
@@ -38,13 +39,16 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
 
     const assetDetails = AssetsDictionary.assets.get(props.asset);
     const interestRate = new BigNumber(0);
+    const balance = new BigNumber(0);
     const maxLendValue = new BigNumber(0);
     const lendedAmountEstimate = new BigNumber(0);
 
     this.state = {
       assetDetails: assetDetails || null,
+      isLendAmountTouched: false,
       lendAmountText: maxLendValue.toFixed(),
       lendAmount: maxLendValue,
+      balance: balance,
       maxLendAmount: maxLendValue,
       lendedAmountEstimate: lendedAmountEstimate,
       interestRate: interestRate
@@ -60,6 +64,10 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
   private async derivedUpdate() {
     const assetDetails = AssetsDictionary.assets.get(this.props.asset);
     const interestRate = await FulcrumProvider.Instance.getLendTokenInterestRate(this.props.asset);
+    const balance =
+      this.props.lendType === LendType.LEND
+        ? await FulcrumProvider.Instance.getBaseTokenBalance(this.props.asset)
+        : await FulcrumProvider.Instance.getLendTokenBalance(this.props.asset);
     const maxLendValue = await FulcrumProvider.Instance.getMaxLendValue(
       new LendRequest(this.props.lendType, this.props.asset, new BigNumber(0))
     );
@@ -72,6 +80,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
       assetDetails: assetDetails || null,
       lendAmountText: maxLendValue.toFixed(),
       lendAmount: maxLendValue,
+      balance: balance,
       maxLendAmount: maxLendValue,
       lendedAmountEstimate: lendedAmountEstimate,
       interestRate: interestRate
@@ -122,6 +131,15 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
     const tokenNameDestination = this.props.lendType === LendType.LEND ? tokenNamePosition : tokenNameBase;
 
     const isAmountMaxed = this.state.lendAmount.eq(this.state.maxLendAmount);
+    const amountMaxedMsg =
+      isAmountMaxed
+        ? this.state.balance.eq(0)
+          ? "Your wallet is empty \u2639"
+          : this.state.isLendAmountTouched
+            ? "Max amount entered."
+            : ""
+        : "";
+
     const lendedAmountEstimateText =
       this.state.lendedAmountEstimate.eq(0)
         ? "0"
@@ -145,7 +163,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
               <div className="lend-form__value">{`${this.state.interestRate.toFixed(2)}%`}</div>
             </div>
             <div className="lend-form__kv-container">
-              <div className="lend-form__label">{this.props.lendType === LendType.LEND ? `Lend Amount` : `Unlend Amount`}</div>
+              <div className="lend-form__label">{this.props.lendType === LendType.LEND ? `Lend Amount` : `UnLend Amount`}</div>
               <div className="lend-form__value">{tokenNameSource}</div>
             </div>
             <input
@@ -156,13 +174,9 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
               onChange={this.onLendAmountChange}
             />
             <div className="lend-form__kv-container">
-              {isAmountMaxed ? 
-                  this.state.maxLendAmount.eq(0) ? (
-                    <div className="trade-form__label">Your wallet is empty &#9785;</div>
-                  ) : (
-                    <div className="trade-form__label">Max amount entered.</div>
-                  )
-                : (
+              {isAmountMaxed ? (
+                <div className="trade-form__label">{amountMaxedMsg}</div>
+              ) : (
                 <div className="trade-form__label trade-form__label--action" onClick={this.onInsertMaxValue}>
                   Insert max value
                 </div>
@@ -218,6 +232,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
     if (!amount.isNaN()) {
       this.setState({
         ...this.state,
+        isLendAmountTouched: true,
         lendAmountText: amountText,
         lendAmount: amount,
         lendedAmountEstimate: lendedAmountEstimate
@@ -271,8 +286,8 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
 
     this.props.onSubmit(
       new LendRequest(
-        this.props.lendType, 
-        this.props.asset, 
+        this.props.lendType,
+        this.props.asset,
         this.state.lendAmount
       )
     );

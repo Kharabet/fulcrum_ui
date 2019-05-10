@@ -31,6 +31,8 @@ export class FulcrumProvider {
   private readonly gasLimit = 3000000;
   // gasPrice equal to 6 gwei
   private readonly gasPrice = new BigNumber(6).multipliedBy(10 ** 9);
+  // gasBufferCoeff equal 110% gas reserve
+  private readonly gasBufferCoeff = new BigNumber("1.1");
 
   private isProcessing: boolean = false;
   private isChecking: boolean = false;
@@ -431,7 +433,7 @@ export class FulcrumProvider {
     return null;
   }
 
-  private async getBaseTokenBalance(asset: Asset): Promise<BigNumber> {
+  public async getBaseTokenBalance(asset: Asset): Promise<BigNumber> {
     let result: BigNumber = new BigNumber(0);
     if (asset === Asset.UNKNOWN) {
       // always 0
@@ -539,8 +541,9 @@ export class FulcrumProvider {
   }
 
   private async getSwapPrice(srcAsset: Asset, destAsset: Asset): Promise<BigNumber> {
-    if (srcAsset === destAsset)
+    if (srcAsset === destAsset) {
       return new BigNumber(1);
+    }
     
     let result: BigNumber = new BigNumber(0);
     const srcAssetErc20Address = this.getErc20Address(srcAsset);
@@ -696,8 +699,10 @@ export class FulcrumProvider {
 
           // estimating gas amount
           const gasAmount = await tokenContract.mint.estimateGasAsync(account, amountInBaseUnits, { from: account, gas: this.gasLimit });
+          let gasAmountBN = new BigNumber(gasAmount);
+          gasAmountBN = gasAmountBN.multipliedBy(this.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
           // Submitting loan
-          const txHash = await tokenContract.mint.sendTransactionAsync(account, amountInBaseUnits, { from: account, gas: gasAmount });
+          const txHash = await tokenContract.mint.sendTransactionAsync(account, amountInBaseUnits, { from: account, gas: gasAmountBN });
           task.setTxHash(txHash);
           const txReceipt = await this.waitForTransactionMined(txHash);
           if (!txReceipt.status) {
@@ -714,10 +719,11 @@ export class FulcrumProvider {
           // estimating gas amount
           const gasAmount = await tokenContract.mintWithEther.estimateGasAsync(account, { from: account, value: amountInBaseUnits, gas: this.gasLimit });
           // calculating gas cost
-          const gasAmountBN = new BigNumber(gasAmount);
+          let gasAmountBN = new BigNumber(gasAmount);
+          gasAmountBN = gasAmountBN.multipliedBy(this.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
           const gasCost = gasAmountBN.multipliedBy(this.gasPrice).integerValue(BigNumber.ROUND_UP);
           // Submitting loan
-          const txHash = await tokenContract.mintWithEther.sendTransactionAsync(account, { from: account, value: amountInBaseUnits.minus(gasCost), gas: gasAmount });
+          const txHash = await tokenContract.mintWithEther.sendTransactionAsync(account, { from: account, value: amountInBaseUnits.minus(gasCost), gas: gasAmountBN });
           task.setTxHash(txHash);
           const txReceipt = await this.waitForTransactionMined(txHash);
           if (!txReceipt.status) {
@@ -743,8 +749,10 @@ export class FulcrumProvider {
         if (taskRequest.asset !== Asset.ETH) {
           // estimating gas amount
           const gasAmount = await tokenContract.burn.estimateGasAsync(account, amountInBaseUnits, { from: account, gas: this.gasLimit });
+          let gasAmountBN = new BigNumber(gasAmount);
+          gasAmountBN = gasAmountBN.multipliedBy(this.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
           // Submitting unloan
-          const txHash = await tokenContract.burn.sendTransactionAsync(account, amountInBaseUnits, { from: account, gas: gasAmount });
+          const txHash = await tokenContract.burn.sendTransactionAsync(account, amountInBaseUnits, { from: account, gas: gasAmountBN });
           task.setTxHash(txHash);
           const txReceipt = await this.waitForTransactionMined(txHash);
           if (!txReceipt.status) {
@@ -753,8 +761,10 @@ export class FulcrumProvider {
         } else {
           // estimating gas amount
           const gasAmount = await tokenContract.burnToEther.estimateGasAsync(account, amountInBaseUnits, { from: account, gas: this.gasLimit });
+          let gasAmountBN = new BigNumber(gasAmount);
+          gasAmountBN = gasAmountBN.multipliedBy(this.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
           // Submitting unloan
-          const txHash = await tokenContract.burnToEther.sendTransactionAsync(account, amountInBaseUnits, { from: account, gas: gasAmount });
+          const txHash = await tokenContract.burnToEther.sendTransactionAsync(account, amountInBaseUnits, { from: account, gas: gasAmountBN });
           task.setTxHash(txHash);
           const txReceipt = await this.waitForTransactionMined(txHash);
           if (!txReceipt.status) {
@@ -840,8 +850,10 @@ export class FulcrumProvider {
 
           // estimating gas amount
           const gasAmount = await tokenContract.mintWithToken.estimateGasAsync(account, assetErc20Address, amountInBaseUnits, { from: account, value: amountInBaseUnits, gas: this.gasLimit });
+          let gasAmountBN = new BigNumber(gasAmount);
+          gasAmountBN = gasAmountBN.multipliedBy(this.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
           // Submitting trade
-          const txHash = await tokenContract.mintWithToken.sendTransactionAsync(account, assetErc20Address, amountInBaseUnits, { from: account, gas: gasAmount });
+          const txHash = await tokenContract.mintWithToken.sendTransactionAsync(account, assetErc20Address, amountInBaseUnits, { from: account, gas: gasAmountBN });
           task.setTxHash(txHash);
           const txReceipt = await this.waitForTransactionMined(txHash);
           if (!txReceipt.status) {
@@ -858,10 +870,11 @@ export class FulcrumProvider {
           // estimating gas amount
           const gasAmount = await tokenContract.mintWithEther.estimateGasAsync(account, { from: account, value: amountInBaseUnits, gas: this.gasLimit });
           // calculating gas cost
-          const gasAmountBN = new BigNumber(gasAmount);
+          let gasAmountBN = new BigNumber(gasAmount);
+          gasAmountBN = gasAmountBN.multipliedBy(this.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
           const gasCost = gasAmountBN.multipliedBy(this.gasPrice).integerValue(BigNumber.ROUND_UP);
           // Submitting trade
-          const txHash = await tokenContract.mintWithEther.sendTransactionAsync(account, { from: account, value: amountInBaseUnits.minus(gasCost), gas: gasAmount });
+          const txHash = await tokenContract.mintWithEther.sendTransactionAsync(account, { from: account, value: amountInBaseUnits.minus(gasCost), gas: gasAmountBN });
           task.setTxHash(txHash);
           const txReceipt = await this.waitForTransactionMined(txHash);
           if (!txReceipt.status) {
@@ -895,12 +908,14 @@ export class FulcrumProvider {
               amountInBaseUnits,
               { from: account, gas: this.gasLimit }
             );
+            let gasAmountBN = new BigNumber(gasAmount);
+            gasAmountBN = gasAmountBN.multipliedBy(this.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
             // Closing trade
             const txHash = await tokenContract.burnToToken.sendTransactionAsync(
               account,
               assetErc20Address,
               amountInBaseUnits,
-              { from: account, gas: gasAmount }
+              { from: account, gas: gasAmountBN }
             );
             task.setTxHash(txHash);
             const txReceipt = await this.waitForTransactionMined(txHash);
@@ -911,8 +926,10 @@ export class FulcrumProvider {
         } else {
           // estimating gas amount
           const gasAmount = await tokenContract.burnToEther.estimateGasAsync(account, amountInBaseUnits, { from: account, gas: this.gasLimit });
+          let gasAmountBN = new BigNumber(gasAmount);
+          gasAmountBN = gasAmountBN.multipliedBy(this.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
           // Closing trade
-          const txHash = await tokenContract.burnToEther.sendTransactionAsync(account, amountInBaseUnits, { from: account, gas: gasAmount });
+          const txHash = await tokenContract.burnToEther.sendTransactionAsync(account, amountInBaseUnits, { from: account, gas: gasAmountBN });
           task.setTxHash(txHash);
           const txReceipt = await this.waitForTransactionMined(txHash);
           if (!txReceipt.status) {

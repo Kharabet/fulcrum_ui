@@ -20,7 +20,8 @@ export class TradeTokenKey {
 
   public toString(): string {
     const positionTypePrefix = this.positionType === PositionType.SHORT ? "pS" : "pL";
-    return `${positionTypePrefix}${this.asset}${this.leverage}x`;
+    const positionLeveragePostfix = this.leverage > 1 ? `${this.leverage}x` : "";
+    return `${positionTypePrefix}${this.asset}${positionLeveragePostfix}`;
   }
 
   public static fromString(value: string): TradeTokenKey | null {
@@ -28,7 +29,7 @@ export class TradeTokenKey {
     const matches: RegExpMatchArray | null = value.match("p(s|l|S|L)([a-zA-Z]*)(\\d)x");
     if (matches && matches.length > 0) {
       if (matches[0] === value) {
-        const positionType = matches[1].toString() === "L" ? PositionType.LONG : PositionType.SHORT;
+        const positionType = matches[1].toString().toUpperCase() === "L" ? PositionType.LONG : PositionType.SHORT;
         let asset = Asset.UNKNOWN;
         const assetName = matches[2].toString();
         if (assetName in Asset) {

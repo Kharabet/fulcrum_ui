@@ -5,7 +5,7 @@ import { HeaderMenu, IHeaderMenuProps } from "./HeaderMenu";
 
 export interface IHeaderOpsProps {
   doNetworkConnect: () => void;
-  isLoading: boolean | false;
+  isLoading: boolean;
 }
 
 export class HeaderOps extends Component<IHeaderOpsProps> {

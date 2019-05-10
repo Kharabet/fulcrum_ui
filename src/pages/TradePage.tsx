@@ -19,7 +19,7 @@ import { FulcrumProvider } from "../services/FulcrumProvider";
 
 export interface ITradePageProps {
   doNetworkConnect: () => void;
-  isLoading: boolean | false;
+  isLoading: boolean;
 }
 
 interface ITradePageState {
@@ -104,8 +104,7 @@ export class TradePage extends Component<ITradePageProps, ITradePageState> {
               asset={this.state.tradeAsset}
               positionType={this.state.tradePositionType}
               leverage={this.state.tradeLeverage}
-              collateral={this.state.collateralToken}
-              setCollateralToken={this.setCollateralToken}
+              defaultCollateral={this.state.collateralToken}
               onSubmit={this.onTradeConfirmed}
               onCancel={this.onRequestClose}
             />
@@ -126,10 +125,6 @@ export class TradePage extends Component<ITradePageProps, ITradePageState> {
       </div>
     );
   }
-
-  public setCollateralToken = async (asset: Asset) => {
-    this.setState({ ...this.state, collateralToken: asset });
-  };
 
   public onSelect = async (key: TradeTokenKey) => {
     const priceGraphData = await FulcrumProvider.Instance.getPriceDataPoints(key, 15);
@@ -154,7 +149,7 @@ export class TradePage extends Component<ITradePageProps, ITradePageState> {
       this.setState({
         ...this.state,
         isTradeModalOpen: true,
-        collateralToken: request.positionType === PositionType.SHORT ? request.asset : Asset.DAI,
+        collateralToken: request.collateral,
         tradeType: request.tradeType,
         tradeAsset: request.asset,
         tradePositionType: request.positionType,
@@ -168,6 +163,7 @@ export class TradePage extends Component<ITradePageProps, ITradePageState> {
     this.setState({
       ...this.state,
       isTradeModalOpen: false,
+      collateralToken: Asset.UNKNOWN,
       tradeType: TradeType.BUY,
       tradeAsset: Asset.UNKNOWN,
       tradePositionType: PositionType.SHORT,
