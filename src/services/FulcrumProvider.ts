@@ -742,9 +742,9 @@ export class FulcrumProvider {
         // no additional inits or checks
         task.processingStepNext();
         // skip allowance check-prompt-wait for ETH as it's not a token
-        task.processingStepNext();
-        task.processingStepNext();
-        task.processingStepNext();
+        // task.processingStepNext();
+        // task.processingStepNext();
+        // task.processingStepNext();
 
         if (taskRequest.asset !== Asset.ETH) {
           // estimating gas amount
@@ -893,9 +893,9 @@ export class FulcrumProvider {
         // no additional inits or checks
         task.processingStepNext();
         // skip allowance check-prompt-wait for ETH as it's not a token
-        task.processingStepNext();
-        task.processingStepNext();
-        task.processingStepNext();
+        // task.processingStepNext();
+        // task.processingStepNext();
+        // task.processingStepNext();
 
         if (taskRequest.collateral !== Asset.ETH) {
           // Submitting unloan
