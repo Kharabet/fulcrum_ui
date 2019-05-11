@@ -1,6 +1,6 @@
 {
   "name": "@bzxnetwork/fulcrum",
-  "version": "0.1.0",
+  "version": "0.8.1",
   "description": "Simplified crypto-lending platform",
   "keywords": [],
   "author": "",
@@ -22,6 +22,7 @@
     "fortmatic": "^0.7.0",
     "lodash": "^4.17.11",
     "moment": "^2.22.1",
+    "node-fetch": "^2.5.0",
     "react": "^16.8.3",
     "react-dom": "^16.8.3",
     "react-modal": "^3.8.1",

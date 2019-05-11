@@ -9,14 +9,14 @@ export interface ILendTokenSelectorProps {
 
 export class LendTokenSelector extends Component<ILendTokenSelectorProps> {
   private readonly assets: Asset[] = [
-    Asset.wBTC,
+    //Asset.wBTC,
     Asset.ETH,
     Asset.DAI,
-    Asset.MKR,
+    /*Asset.MKR,
     Asset.ZRX,
     Asset.BAT,
     Asset.REP,
-    Asset.KNC
+    Asset.KNC*/
   ];
 
   public render() {

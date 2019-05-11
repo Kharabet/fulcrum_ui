@@ -127,7 +127,7 @@ export class TradePage extends Component<ITradePageProps, ITradePageState> {
   }
 
   public onSelect = async (key: TradeTokenKey) => {
-    const priceGraphData = await FulcrumProvider.Instance.getPriceDataPoints(key, 15);
+    const priceGraphData = await FulcrumProvider.Instance.getPriceDataPoints(key);
     this.setState({ ...this.state, selectedKey: key, priceGraphData: priceGraphData });
   };
 
@@ -140,7 +140,7 @@ export class TradePage extends Component<ITradePageProps, ITradePageState> {
   };
 
   private onProviderChanged = async (event: ProviderChangedEvent) => {
-    const priceGraphData = await FulcrumProvider.Instance.getPriceDataPoints(this.state.selectedKey, 15);
+    const priceGraphData = await FulcrumProvider.Instance.getPriceDataPoints(this.state.selectedKey);
     this.setState({ ...this.state, selectedKey: this.state.selectedKey, priceGraphData: priceGraphData });
   };
 

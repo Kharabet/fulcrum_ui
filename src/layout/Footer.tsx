@@ -1,13 +1,13 @@
 import React, { Component } from "react";
 import { FooterMenu } from "./FooterMenu";
-import { FooterPoweredBy } from "./FooterPoweredBy";
+import { FooterVersion } from "./FooterVersion";
 
 export class Footer extends Component {
   public render() {
     return (
       <footer className="footer">
+        <FooterVersion />
         <FooterMenu />
-        <FooterPoweredBy />
       </footer>
     );
   }

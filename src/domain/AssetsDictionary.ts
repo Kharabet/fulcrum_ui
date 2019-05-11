@@ -30,7 +30,7 @@ export class AssetsDictionary {
         "#CC3D84",
         new Map<number, string | null>([
           [1, "0x0d8775f648430679a709e98d2b0cb6250d2887ef"],
-          [3, null] // 0xfc67a5421156b29ac073f62861c097b56225a4f8
+          [3, "0xdb0040451f373949a4be60dcd7b6b8d6e42658b6"]
         ])
       )
     ],
@@ -43,7 +43,7 @@ export class AssetsDictionary {
         "#F9B134",
         new Map<number, string | null>([
           [1, "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599"],
-          [3, "0xc55f20a1bb0fdaf619226317ad870c5931c99ae8"]
+          [3, "0xb47f1a9b121ba114d5e98722a8948e274d0f4042"] // using SALT token instead
         ])
       )
     ],
@@ -97,7 +97,7 @@ export class AssetsDictionary {
         "#00BB99",
         new Map<number, string | null>([
           [1, "0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2"],
-          [3, "0x06732516acd125b6e83c127752ed5f027e1b276e"]
+          [3, "0x4bfba4a8f28755cb2061c413459ee562c6b9c51b"] // using OMG token instead
         ])
       )
     ],
@@ -108,7 +108,10 @@ export class AssetsDictionary {
         rep_logo,
         rep_bg,
         "#8D3F76",
-        new Map<number, string | null>([[1, "0x1985365e9f78359a9b6ad760e32412f4a445e862"], [3, null]])
+        new Map<number, string | null>([
+          [1, "0x1985365e9f78359a9b6ad760e32412f4a445e862"],
+          [3, "0xbf5d8683b9be6c43fca607eb2a6f2626a18837a6"] // using SNT token instead
+        ])
       )
     ],
     [
@@ -118,7 +121,10 @@ export class AssetsDictionary {
         zrx_logo,
         zrx_bg,
         "#7368D0",
-        new Map<number, string | null>([[1, "0xe41d2489571d322189246dafa5ebde1f4699f498"], [3, null]])
+        new Map<number, string | null>([
+          [1, "0xe41d2489571d322189246dafa5ebde1f4699f498"],
+          [3, "0xb4f7332ed719eb4839f091eddb2a3ba309739521"] // using LINK token instead
+        ])
       )
     ]
   ]);

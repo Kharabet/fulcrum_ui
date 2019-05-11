@@ -24,8 +24,20 @@ import { FulcrumProviderEvents } from "./events/FulcrumProviderEvents";
 import { ProviderChangedEvent } from "./events/ProviderChangedEvent";
 import { TasksQueueEvents } from "./events/TasksQueueEvents";
 import { TasksQueue } from "./TasksQueue";
+import fetch from "node-fetch";
+
 
 export class FulcrumProvider {
+  private static readonly priceGraphQueryFunction = new Map<Asset, string>([
+    [Asset.wBTC, "kyber-eth-dai"],
+    [Asset.ETH, "kyber-eth-dai"],
+    [Asset.MKR, "kyber-mkr-dai"],
+    [Asset.ZRX, "kyber-zrx-dai"],
+    [Asset.BAT, "kyber-bat-dai"],
+    [Asset.REP, "kyber-rep-dai"],
+    [Asset.KNC, "kyber-knc-dai"]
+  ]);
+
   public static Instance: FulcrumProvider;
 
   private readonly gasLimit = 3000000;
@@ -114,59 +126,117 @@ export class FulcrumProvider {
     return result;
   };
 
-  public getPriceDataPoints = async (selectedKey: TradeTokenKey, samplesCount: number, intervalSeconds: number = 21600): Promise<IPriceDataPoint[]> => {
-    const result: IPriceDataPoint[] = [];
+  public getPriceDataPoints = async (selectedKey: TradeTokenKey): Promise<IPriceDataPoint[]> => {
+    let priceDataObj: IPriceDataPoint[] = [];
+    //localStorage.removeItem(`priceData${selectedKey.asset}`);
 
-    if (this.contractsSource) {
-      // getting on-chain data
-      const assetErc20Address = this.getErc20Address(selectedKey.asset);
-      if (assetErc20Address) {
-        const referencePriceFeedContract = this.contractsSource.getReferencePriceFeedContract();
-        let priceFeed = await referencePriceFeedContract.getPricesForAsset.callAsync(
-          assetErc20Address,
-          new BigNumber(0),
-          new BigNumber(intervalSeconds),
-          new BigNumber(samplesCount)
-        );
-        priceFeed = priceFeed.reverse();
-        const latestSwapPrice = await this.getSwapToUsdPrice(selectedKey.asset);
-        priceFeed.push({rate: latestSwapPrice.multipliedBy(10 ** 18), timestamp: new BigNumber(moment().unix()) });
-        if (priceFeed.length > 1) {
-          let rate = priceFeed[0].rate;
-          priceFeed.forEach((value, index) => {
-            if (index !== 0) {
-              result.push({
-                timeStamp: value.timestamp.toNumber(),
-                price: value.rate.dividedBy(10 ** 18).toNumber(),
-                liquidationPrice: 0,
-                change24h:
-                  rate.isZero()
-                    ? value.rate.isZero()
-                      ? 0
-                      : rate.gte(0)
-                        ? 100
-                        : -100
-                    : rate.minus(value.rate).dividedBy(rate).toNumber()
-              });
-              rate = value.rate;
+    if (this.web3 && this.web3ProviderSettings) {
+      let queriedBlocks = 0;
+      let currentBlock = await this.web3.eth.getBlockNumber();
+      let earliestBlock = currentBlock-5760; // ~5760 blocks per day
+      let fetchFromBlock = earliestBlock;
+      const nearestHour = new Date().setMinutes(0,0,0)/1000;
+  
+      const priceData = localStorage.getItem(`priceData${selectedKey.asset}`);
+      if (priceData) {
+        //console.log(`priceData`,priceData);
+        priceDataObj = JSON.parse(priceData);
+        if (priceDataObj.length > 0) {
+          //console.log(`priceDataObj`,priceDataObj);
+          const lastItem = priceDataObj[priceDataObj.length-1];
+          //console.log(`lastItem`,lastItem);
+          //console.log(`nearestHour`,nearestHour);
+          if (lastItem && lastItem.timeStamp) {
+            //console.log(`lastItem.timeStamp`,lastItem.timeStamp);
+            if (lastItem.timeStamp < nearestHour) {
+              fetchFromBlock = currentBlock - (nearestHour-lastItem.timeStamp)/15 - 240; // ~240 blocks per hour; 15 second blocks
+            } else {
+              fetchFromBlock = currentBlock;
             }
-          });
+          }
         }
       }
+
+      fetchFromBlock = Math.max(fetchFromBlock, earliestBlock);
+      if (fetchFromBlock < currentBlock) {
+        let jsonData: any = {};
+        if (this.web3 && this.web3ProviderSettings) {
+          const functionName = `${this.web3ProviderSettings.networkName}-${FulcrumProvider.priceGraphQueryFunction.get(selectedKey.asset)}`;
+          const url = `https://api.covalenthq.com/v1/function/${functionName}/?aggregate[Avg]&group_by[block_signed_at__hour]&starting-block=${fetchFromBlock}&key=ckey_c3bf7f3f22fd465b9afa7650d08`;
+          try {
+            const response = await fetch(url);
+            jsonData = await response.json();
+
+            queriedBlocks = currentBlock-fetchFromBlock;
+            //console.log(jsonData);
+          } catch (error) {
+            console.log(error);
+          }
+        }
+
+        if (jsonData && jsonData.data) {
+          const dataArray = jsonData.data;
+          dataArray.map((value: any) => {
+            if (value && value.block_signed_at__hour && value.avg_value_0)
+              priceDataObj.push({
+                timeStamp: Math.round(new Date(value.block_signed_at__hour).getTime()/1000),
+                price: Math.round(value.avg_value_0) / (10 ** 18),
+                liquidationPrice: 0,
+                change24h: 0
+              });
+          });
+          //console.log(result);
+
+          // remove duplicates
+          priceDataObj = priceDataObj.filter((thing, index, self) => self.findIndex(
+            t => t.timeStamp === thing.timeStamp 
+            && t.timeStamp === thing.timeStamp) === index);
+
+            // add nearestHour is not yet available from API
+            if (priceDataObj[priceDataObj.length-1].timeStamp !== nearestHour) {
+              priceDataObj.push({
+                timeStamp: nearestHour,
+                price: priceDataObj[priceDataObj.length-1].price,
+                liquidationPrice: 0,
+                change24h: 0
+              });
+            }
+
+          // keep no more than 24
+          if (priceDataObj.length > 24)
+            priceDataObj = priceDataObj.slice(priceDataObj.length-24);
+
+          localStorage.setItem(`priceData${selectedKey.asset}`, JSON.stringify(priceDataObj));
+        }
+      }
+
+      const latestSwapPrice = await this.getSwapToUsdPrice(selectedKey.asset);
+      priceDataObj.push({
+        timeStamp: moment().unix(),
+        price: latestSwapPrice.toNumber(),
+        liquidationPrice: 0,
+        change24h: 0
+      });
+
+      console.log(`queriedBlocks`,queriedBlocks);
     } else {
       // getting empty data
+      const samplesCount = 24;
+      const intervalSeconds = 3600;
+
       const beginningTime = moment()
         .startOf("hour")
         .subtract(intervalSeconds, "second");
-      for (let i = 0; i < samplesCount + 1; i++) {
-        result.push({ timeStamp: beginningTime.unix(), price: 1, liquidationPrice: 0, change24h: 0 });
+      for (let i = 0; i < samplesCount; i++) {
+        priceDataObj.push({ timeStamp: beginningTime.unix(), price: 1, liquidationPrice: 0, change24h: 0 });
 
         // add mutates beginningTime
         beginningTime.add(intervalSeconds, "second");
       }
     }
+    //console.log(priceDataObj);
 
-    return result;
+    return priceDataObj;
   };
 
   /*

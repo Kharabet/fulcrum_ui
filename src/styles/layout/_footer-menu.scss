@@ -1,11 +1,13 @@
 .footer-menu {
   display: inline-block;
 
-  float: left;
+  float: right;
 }
 
 .footer-menu__item {
   display: inline-block;
+
+  color: #758295;
 
   &:not(:first-child) {
     margin-left: 1.5rem;
