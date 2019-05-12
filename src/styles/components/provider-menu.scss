@@ -1,5 +1,5 @@
 .provider-menu {
-  height: 30.5rem;
+  //height: 30.5rem;
   width: 22rem;
 
   padding: 3rem;
@@ -8,7 +8,7 @@
 }
 
 .provider-menu__title {
-  margin-bottom: 3rem;
+  margin-bottom: 2rem;
 
   font-size: 0.875rem;
   font-weight: 600;
@@ -41,6 +41,10 @@
   &--selected {
     background-color: rgba(169, 181, 199, 0.45);
   }
+}
+
+.provider-menu__list-item:last-child {
+  margin-top: 2rem;
 }
 
 .provider-menu__list-item-content-img {

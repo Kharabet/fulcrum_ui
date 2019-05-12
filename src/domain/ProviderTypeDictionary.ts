@@ -10,7 +10,7 @@ export class ProviderTypeDictionary {
   public static providerTypes: Map<ProviderType, ProviderTypeDetails> = new Map<ProviderType, ProviderTypeDetails>([
     [ProviderType.MetaMask, new ProviderTypeDetails("MetaMask", metamask_logo)],
     // [ProviderType.Bitski, new ProviderTypeDetails("Bitski", bitski_logo)],
-    [ProviderType.Fortmatic, new ProviderTypeDetails("Fortmatic", fortmatic_logo)],
+    // [ProviderType.Fortmatic, new ProviderTypeDetails("Fortmatic", fortmatic_logo)],
     [ProviderType.Portis, new ProviderTypeDetails("Portis", portis_logo)],
     [ProviderType.None, new ProviderTypeDetails("None", null)]
   ]);

@@ -134,7 +134,7 @@ export class FulcrumProvider {
     if (this.web3 && this.web3ProviderSettings) {
       let queriedBlocks = 0;
       let currentBlock = await this.web3.eth.getBlockNumber();
-      let earliestBlock = currentBlock-5760; // ~5760 blocks per day
+      let earliestBlock = currentBlock-17280; // ~5760 blocks per day
       let fetchFromBlock = earliestBlock;
       const nearestHour = new Date().setMinutes(0,0,0)/1000;
   
@@ -162,7 +162,7 @@ export class FulcrumProvider {
       if (fetchFromBlock < currentBlock) {
         let jsonData: any = {};
         if (this.web3 && this.web3ProviderSettings) {
-          const functionName = `${this.web3ProviderSettings.networkName}-${FulcrumProvider.priceGraphQueryFunction.get(selectedKey.asset)}`;
+          const functionName = `mainnet-kyber-eth-dai`; //`${this.web3ProviderSettings.networkName}-${FulcrumProvider.priceGraphQueryFunction.get(selectedKey.asset)}`;
           const url = `https://api.covalenthq.com/v1/function/${functionName}/?aggregate[Avg]&group_by[block_signed_at__hour]&starting-block=${fetchFromBlock}&key=${configProviders.Covalent_ApiKey}`;
           try {
             const response = await fetch(url);
@@ -193,36 +193,36 @@ export class FulcrumProvider {
             t => t.timeStamp === thing.timeStamp 
             && t.timeStamp === thing.timeStamp) === index);
 
-            // add nearestHour is not yet available from API
-            if (priceDataObj[priceDataObj.length-1].timeStamp !== nearestHour) {
-              priceDataObj.push({
-                timeStamp: nearestHour,
-                price: priceDataObj[priceDataObj.length-1].price,
-                liquidationPrice: 0,
-                change24h: 0
-              });
-            }
+          // add nearestHour is not yet available from API
+          if (priceData && priceDataObj[priceDataObj.length-1].timeStamp !== nearestHour) {
+            priceDataObj.push({
+              timeStamp: nearestHour,
+              price: priceDataObj[priceDataObj.length-1].price,
+              liquidationPrice: 0,
+              change24h: 0
+            });
+          }
 
-          // keep no more than 24
-          if (priceDataObj.length > 24)
-            priceDataObj = priceDataObj.slice(priceDataObj.length-24);
+          // keep no more than 72
+          if (priceDataObj.length > 72)
+            priceDataObj = priceDataObj.slice(priceDataObj.length-72);
 
           localStorage.setItem(`priceData${selectedKey.asset}`, JSON.stringify(priceDataObj));
         }
       }
 
-      const latestSwapPrice = await this.getSwapToUsdPrice(selectedKey.asset);
+      /*const latestSwapPrice = await this.getSwapToUsdPrice(selectedKey.asset);
       priceDataObj.push({
         timeStamp: moment().unix(),
         price: latestSwapPrice.toNumber(),
         liquidationPrice: 0,
         change24h: 0
-      });
+      });*/
 
       console.log(`queriedBlocks`,queriedBlocks);
     } else {
       // getting empty data
-      const samplesCount = 24;
+      const samplesCount = 72;
       const intervalSeconds = 3600;
 
       const beginningTime = moment()
