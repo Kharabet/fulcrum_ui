@@ -26,6 +26,7 @@ import { TasksQueueEvents } from "./events/TasksQueueEvents";
 import { TasksQueue } from "./TasksQueue";
 import fetch from "node-fetch";
 
+import configProviders from "../config/providers.json";
 
 export class FulcrumProvider {
   private static readonly priceGraphQueryFunction = new Map<Asset, string>([
@@ -162,7 +163,7 @@ export class FulcrumProvider {
         let jsonData: any = {};
         if (this.web3 && this.web3ProviderSettings) {
           const functionName = `${this.web3ProviderSettings.networkName}-${FulcrumProvider.priceGraphQueryFunction.get(selectedKey.asset)}`;
-          const url = `https://api.covalenthq.com/v1/function/${functionName}/?aggregate[Avg]&group_by[block_signed_at__hour]&starting-block=${fetchFromBlock}&key=ckey_c3bf7f3f22fd465b9afa7650d08`;
+          const url = `https://api.covalenthq.com/v1/function/${functionName}/?aggregate[Avg]&group_by[block_signed_at__hour]&starting-block=${fetchFromBlock}&key=${configProviders.Covalent_ApiKey}`;
           try {
             const response = await fetch(url);
             jsonData = await response.json();
