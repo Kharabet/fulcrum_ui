@@ -4,6 +4,7 @@ import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 
 export interface ICollateralTokenSelectorItemProps {
+  selectedCollateral: Asset;
   asset: Asset;
 
   onCollateralChange: (asset: Asset) => void;
@@ -27,17 +28,17 @@ export class CollateralTokenSelectorItem extends Component<ICollateralTokenSelec
       return null;
     }
 
+    const selectedStyle = this.props.asset === this.props.selectedCollateral ? "collateral-token-selector-item--selected" : "";
+
     return (
       <div 
-        className="collateral-token-selector-item"
+        className={`collateral-token-selector-item ${selectedStyle}`}
         onClick={this.onTokenClick}
       >
-        <div>
-          <div className="collateral-token-selector-item__image">
-            <img src={this.state.assetDetails.logoSvg} alt={this.state.assetDetails.displayName} />
-          </div>
+        <div className="collateral-token-selector-item__image-container">
+          <img className="collateral-token-selector-item__image" src={this.state.assetDetails.logoSvg} alt={this.state.assetDetails.displayName} />
         </div>
-        <div className="collateral-token-selector-item__description">
+        <div className="collateral-token-selector-item__description-container">
           <div className="collateral-token-selector-item__name">{this.state.assetDetails.displayName}</div>
         </div>
       </div>

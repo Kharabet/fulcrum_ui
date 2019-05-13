@@ -274,7 +274,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
           className="modal-content-div"
           overlayClassName="modal-overlay-div"
         >
-          <CollateralTokenSelector onCollateralChange={this.onChangeCollateralClicked} />
+          <CollateralTokenSelector selectedCollateral={this.state.collateral} onCollateralChange={this.onChangeCollateralClicked} onClose={this.onChangeCollateralClose} />
         </Modal>
       </form>
     );
