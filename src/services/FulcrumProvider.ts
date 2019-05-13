@@ -30,7 +30,7 @@ import configProviders from "../config/providers.json";
 
 export class FulcrumProvider {
   private static readonly priceGraphQueryFunction = new Map<Asset, string>([
-    [Asset.wBTC, "kyber-eth-dai"],
+    [Asset.wBTC, "kyber-wbtc-dai"],
     [Asset.ETH, "kyber-eth-dai"],
     [Asset.MKR, "kyber-mkr-dai"],
     [Asset.ZRX, "kyber-zrx-dai"],
@@ -73,8 +73,27 @@ export class FulcrumProvider {
 
   public async setWeb3Provider(providerType: ProviderType) {
     this.web3 = await Web3ConnectionFactory.getWeb3Connection(providerType);
-    this.providerType = this.web3 ? providerType : ProviderType.None;
+
+    if (this.web3) {
+      const networkId = await this.web3.eth.net.getId();
+      if (networkId === 3) { // ropsten only
+        this.providerType = providerType;
+      } else {
+        this.web3 = null;
+        this.providerType = ProviderType.None;
+      }
+    } else {
+      this.providerType = ProviderType.None;
+    }
+
     this.web3ProviderSettings = await FulcrumProvider.getWeb3ProviderSettings(this.web3);
+
+    if (this.web3) {
+      const networkId = await this.web3.eth.net.getId();
+      if (networkId !== 3) {
+
+      }
+    }
 
     this.contractsSource =
       this.web3 && this.web3ProviderSettings
@@ -136,6 +155,7 @@ export class FulcrumProvider {
       let currentBlock = await this.web3.eth.getBlockNumber();
       let earliestBlock = currentBlock-17280; // ~5760 blocks per day
       let fetchFromBlock = earliestBlock;
+      let lastItem: IPriceDataPoint | null;
       const nearestHour = new Date().setMinutes(0,0,0)/1000;
   
       const priceData = localStorage.getItem(`priceData${selectedKey.asset}`);
@@ -144,7 +164,7 @@ export class FulcrumProvider {
         priceDataObj = JSON.parse(priceData);
         if (priceDataObj.length > 0) {
           //console.log(`priceDataObj`,priceDataObj);
-          const lastItem = priceDataObj[priceDataObj.length-1];
+          lastItem = priceDataObj[priceDataObj.length-1];
           //console.log(`lastItem`,lastItem);
           //console.log(`nearestHour`,nearestHour);
           if (lastItem && lastItem.timeStamp) {
@@ -162,7 +182,8 @@ export class FulcrumProvider {
       if (fetchFromBlock < currentBlock) {
         let jsonData: any = {};
         if (this.web3 && this.web3ProviderSettings) {
-          const functionName = `mainnet-kyber-eth-dai`; //`${this.web3ProviderSettings.networkName}-${FulcrumProvider.priceGraphQueryFunction.get(selectedKey.asset)}`;
+          //const functionName = `${this.web3ProviderSettings.networkName}-${FulcrumProvider.priceGraphQueryFunction.get(selectedKey.asset)}`;
+          const functionName = `mainnet-${FulcrumProvider.priceGraphQueryFunction.get(selectedKey.asset)}`;
           const url = `https://api.covalenthq.com/v1/function/${functionName}/?aggregate[Avg]&group_by[block_signed_at__hour]&starting-block=${fetchFromBlock}&key=${configProviders.Covalent_ApiKey}`;
           try {
             const response = await fetch(url);
@@ -205,19 +226,38 @@ export class FulcrumProvider {
 
           // keep no more than 72
           if (priceDataObj.length > 72)
-            priceDataObj = priceDataObj.slice(priceDataObj.length-72);
+            priceDataObj = priceDataObj.splice(-72);
 
+          //console.log(priceDataObj.length);
           localStorage.setItem(`priceData${selectedKey.asset}`, JSON.stringify(priceDataObj));
         }
       }
 
-      /*const latestSwapPrice = await this.getSwapToUsdPrice(selectedKey.asset);
-      priceDataObj.push({
-        timeStamp: moment().unix(),
-        price: latestSwapPrice.toNumber(),
-        liquidationPrice: 0,
-        change24h: 0
-      });*/
+      const timeNow = moment().unix();
+      const latestSwapPrice = await this.getSwapToUsdPrice(selectedKey.asset);
+
+      if (priceDataObj.length > 0) {
+        lastItem = priceDataObj[priceDataObj.length-1];
+      } else {
+        lastItem = null;
+      }
+      /*
+        // uncomment once on mainnet
+        if (!lastItem || lastItem.timeStamp < timeNow) {
+        priceDataObj.push({
+          timeStamp: moment().unix(),
+          price: latestSwapPrice.toNumber(),
+          liquidationPrice: 0,
+          change24h: 0
+        });
+      }*/
+
+      // TEMP FIX: normalize mainnet prices to ropsten
+      if (lastItem && !latestSwapPrice.eq(0)) {
+        Object.keys(priceDataObj).map(function(obj, index) {
+          priceDataObj[index].price = new BigNumber(priceDataObj[index].price).multipliedBy(latestSwapPrice).dividedBy(lastItem!.price).toNumber();
+        });
+      }
 
       console.log(`queriedBlocks`,queriedBlocks);
     } else {
