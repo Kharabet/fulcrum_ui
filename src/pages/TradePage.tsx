@@ -72,7 +72,10 @@ export class TradePage extends Component<ITradePageProps, ITradePageState> {
       <div className="trade-page">
         <HeaderOps isLoading={this.props.isLoading} doNetworkConnect={this.props.doNetworkConnect} />
         <main>
-          <PriceGraph data={this.state.priceGraphData} />
+          <PriceGraph 
+            data={this.state.priceGraphData}
+            selectedKey={this.state.selectedKey}
+          />
           {this.state.showMyTokensOnly ? (
             <OwnTokenGrid
               showMyTokensOnly={this.state.showMyTokensOnly}

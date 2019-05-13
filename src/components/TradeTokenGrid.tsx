@@ -23,8 +23,8 @@ interface ITradeTokenGridState {
 
 export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenGridState> {
   private static readonly assets: Asset[] = [
-    Asset.wBTC,
     Asset.ETH,
+    Asset.wBTC,
     //Asset.DAI,
     Asset.MKR,
     Asset.ZRX,

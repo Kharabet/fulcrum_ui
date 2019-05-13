@@ -30,8 +30,8 @@ import configProviders from "../config/providers.json";
 
 export class FulcrumProvider {
   private static readonly priceGraphQueryFunction = new Map<Asset, string>([
-    [Asset.wBTC, "kyber-wbtc-dai"],
     [Asset.ETH, "kyber-eth-dai"],
+    [Asset.wBTC, "kyber-wbtc-dai"],
     [Asset.MKR, "kyber-mkr-dai"],
     [Asset.ZRX, "kyber-zrx-dai"],
     [Asset.BAT, "kyber-bat-dai"],
@@ -155,7 +155,6 @@ export class FulcrumProvider {
       let currentBlock = await this.web3.eth.getBlockNumber();
       let earliestBlock = currentBlock-17280; // ~5760 blocks per day
       let fetchFromBlock = earliestBlock;
-      let lastItem: IPriceDataPoint | null;
       const nearestHour = new Date().setMinutes(0,0,0)/1000;
   
       const priceData = localStorage.getItem(`priceData${selectedKey.asset}`);
@@ -164,7 +163,7 @@ export class FulcrumProvider {
         priceDataObj = JSON.parse(priceData);
         if (priceDataObj.length > 0) {
           //console.log(`priceDataObj`,priceDataObj);
-          lastItem = priceDataObj[priceDataObj.length-1];
+          let lastItem = priceDataObj[priceDataObj.length-1];
           //console.log(`lastItem`,lastItem);
           //console.log(`nearestHour`,nearestHour);
           if (lastItem && lastItem.timeStamp) {
@@ -210,9 +209,10 @@ export class FulcrumProvider {
           //console.log(result);
 
           // remove duplicates
-          priceDataObj = priceDataObj.filter((thing, index, self) => self.findIndex(
-            t => t.timeStamp === thing.timeStamp 
-            && t.timeStamp === thing.timeStamp) === index);
+          priceDataObj = priceDataObj
+            .map(e => e['timeStamp'])
+            .map((e, i, final) => final.indexOf(e) === i && i)
+            .filter((e, index) => priceDataObj[index]).map((e, i) => priceDataObj[i]);
 
           // add nearestHour is not yet available from API
           if (priceData && priceDataObj[priceDataObj.length-1].timeStamp !== nearestHour) {
@@ -231,32 +231,6 @@ export class FulcrumProvider {
           //console.log(priceDataObj.length);
           localStorage.setItem(`priceData${selectedKey.asset}`, JSON.stringify(priceDataObj));
         }
-      }
-
-      const timeNow = moment().unix();
-      const latestSwapPrice = await this.getSwapToUsdPrice(selectedKey.asset);
-
-      if (priceDataObj.length > 0) {
-        lastItem = priceDataObj[priceDataObj.length-1];
-      } else {
-        lastItem = null;
-      }
-      /*
-        // uncomment once on mainnet
-        if (!lastItem || lastItem.timeStamp < timeNow) {
-        priceDataObj.push({
-          timeStamp: moment().unix(),
-          price: latestSwapPrice.toNumber(),
-          liquidationPrice: 0,
-          change24h: 0
-        });
-      }*/
-
-      // TEMP FIX: normalize mainnet prices to ropsten
-      if (lastItem && !latestSwapPrice.eq(0)) {
-        Object.keys(priceDataObj).map(function(obj, index) {
-          priceDataObj[index].price = new BigNumber(priceDataObj[index].price).multipliedBy(latestSwapPrice).dividedBy(lastItem!.price).toNumber();
-        });
       }
 
       console.log(`queriedBlocks`,queriedBlocks);
@@ -279,6 +253,18 @@ export class FulcrumProvider {
 
     return priceDataObj;
   };
+
+  public getChartLatestDataPoint = async (selectedKey: TradeTokenKey): Promise<IPriceDataPoint> => {
+    const latestSwapPrice = await this.getSwapToUsdPrice(selectedKey.asset);
+    let priceLatestDataPoint = await this.getPriceLatestDataPoint(selectedKey);
+    priceLatestDataPoint.liquidationPrice = latestSwapPrice
+      .multipliedBy(priceLatestDataPoint.liquidationPrice)
+      .div(priceLatestDataPoint.price)
+      .toNumber();
+    priceLatestDataPoint.price = latestSwapPrice.toNumber();
+    
+    return priceLatestDataPoint;
+  }
 
   /*
     both iTokens and pTokens, call tokenPrice()

@@ -1,18 +1,23 @@
 import { BigNumber } from "@0x/utils";
 import moment from "moment";
 import React, { Component, ReactNode } from "react";
-import { Line, LineChart, ResponsiveContainer, Tooltip, TooltipProps } from "recharts";
+import { Line, LineChart, ResponsiveContainer, Tooltip, TooltipProps, ReferenceLine } from "recharts";
 import { IPriceDataPoint } from "../domain/IPriceDataPoint";
-import { Change24HMarker, Change24HMarkerSize } from "./Change24HMarker";
+//import { Change24HMarker, Change24HMarkerSize } from "./Change24HMarker";
+import { TradeTokenKey } from "../domain/TradeTokenKey";
+import { FulcrumProvider } from "../services/FulcrumProvider";
 
 export interface IPriceGraphProps {
   data: IPriceDataPoint[];
+  selectedKey: TradeTokenKey;
 }
 
 interface IPriceGraphState {
   priceBaseLine: number;
   data: IPriceDataPoint[];
   displayedDataPoint: IPriceDataPoint | null;
+  liquidationPrice: number | null;
+  liquidationPriceNormed: number | null;
 }
 
 export class PriceGraph extends Component<IPriceGraphProps, IPriceGraphState> {
@@ -21,29 +26,32 @@ export class PriceGraph extends Component<IPriceGraphProps, IPriceGraphState> {
   constructor(props: IPriceGraphProps, context?: any) {
     super(props, context);
 
-    this.state = { priceBaseLine: 0, data: [], displayedDataPoint: null };
+    this.state = { priceBaseLine: 0, data: [], displayedDataPoint: null, liquidationPrice: null, liquidationPriceNormed: null };
   }
 
-  public derivedUpdate() {
-    const normalizedData = this.normalizePrices(this.props.data);
+  public async derivedUpdate() {
+    const latestPriceData = await FulcrumProvider.Instance.getChartLatestDataPoint(this.props.selectedKey);
+    const normalizedData = await this.normalizePrices(this.props.data, latestPriceData);
 
-    this.setState({
+    await this.setState({
       ...this.state,
       priceBaseLine: normalizedData.priceBaseLine,
       data: normalizedData.points,
-      displayedDataPoint: normalizedData.points[normalizedData.points.length - 1]
+      displayedDataPoint: normalizedData.points[normalizedData.points.length - 1],
+      liquidationPrice: latestPriceData.liquidationPrice !== 0 ? latestPriceData.liquidationPrice : null,
+      liquidationPriceNormed: 0
     });
   }
 
-  public componentDidMount(): void {
-    this.derivedUpdate();
+  public async componentDidMount() {
+    await this.derivedUpdate();
   }
 
-  public componentDidUpdate(prevProps: Readonly<IPriceGraphProps>, prevState: Readonly<IPriceGraphState>, snapshot?: any): void {
+  public async componentDidUpdate(prevProps: Readonly<IPriceGraphProps>, prevState: Readonly<IPriceGraphState>, snapshot?: any) {
     if (
       this.props.data !== prevProps.data
     ) {
-      this.derivedUpdate();
+      await this.derivedUpdate();
     }
   }
 
@@ -62,10 +70,14 @@ export class PriceGraph extends Component<IPriceGraphProps, IPriceGraphState> {
       ? new BigNumber(this.state.priceBaseLine + this.state.displayedDataPoint.price)
       : new BigNumber(0);
     const priceText = price.toFixed(4);
-    const change24h = this.state.displayedDataPoint
+    /*const change24h = this.state.displayedDataPoint
       ? new BigNumber(this.state.displayedDataPoint.change24h)
-      : new BigNumber(0);
+      : new BigNumber(0);*/
 
+    /*let liq
+      const liquidationPrice = this.props.data.length > 0 && this.props.data
+      ? */
+    
     return (
       <div className="price-graph">
         <div className="price-graph__hovered-time-container">
@@ -75,9 +87,9 @@ export class PriceGraph extends Component<IPriceGraphProps, IPriceGraphState> {
           </div>
         </div>
         <div className="price-graph__hovered-price-marker">{`$${priceText}`}</div>
-        <div className="price-graph__hovered-change-1h-marker">
+        {/*<div className="price-graph__hovered-change-1h-marker">
           <Change24HMarker value={change24h} size={Change24HMarkerSize.LARGE} />
-        </div>
+        </div>*/}
         <div className="price-graph__graph-container">
           <ResponsiveContainer width="100%" height={160}>
             <LineChart data={this.state.data}>
@@ -92,6 +104,10 @@ export class PriceGraph extends Component<IPriceGraphProps, IPriceGraphState> {
                 stroke="#ffffff"
                 strokeWidth={2}
               />
+
+              {this.state.liquidationPriceNormed ? (
+                <ReferenceLine y={this.state.liquidationPriceNormed} stroke="#ff0000" strokeDasharray="5 5" />
+              ): ``}
             </LineChart>
           </ResponsiveContainer>
         </div>
@@ -120,7 +136,33 @@ export class PriceGraph extends Component<IPriceGraphProps, IPriceGraphState> {
     return null;
   };
 
-  private normalizePrices(priceDataPoints: IPriceDataPoint[]): { priceBaseLine: number, points: IPriceDataPoint[] } {
+  private normalizePrices(priceDataPoints: IPriceDataPoint[], latestPriceData: IPriceDataPoint): { priceBaseLine: number, points: IPriceDataPoint[] } {
+
+    let lastItem: IPriceDataPoint | null;
+    if (priceDataPoints.length > 0) {
+      lastItem = priceDataPoints[priceDataPoints.length-1];
+    } else {
+      lastItem = null;
+    }
+
+    /*
+      // uncomment once on mainnet
+      if (!lastItem || lastItem.timeStamp < moment().unix()) {
+      priceDataObj.push({
+        timeStamp: moment().unix(),
+        price: latestSwapPrice.toNumber(),
+        liquidationPrice: 0,
+        change24h: 0
+      });
+    }*/
+
+    // TEMP FIX: normalize mainnet prices to ropsten
+    if (lastItem && latestPriceData.price !== 0) {
+      Object.keys(priceDataPoints).map(function(obj, index) {
+        priceDataPoints[index].price = new BigNumber(priceDataPoints[index].price).multipliedBy(latestPriceData.price).dividedBy(lastItem!.price).toNumber();
+      });
+    }
+    
     const prices = priceDataPoints.map(e => e.price);
     const priceMin = prices.length > 0 ? prices.reduce((a, b) => Math.min(a, b)) : 0;
     const priceMax = prices.length > 0 ? prices.reduce((a, b) => Math.max(a, b)) : 0;
