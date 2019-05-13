@@ -56,9 +56,10 @@ export class RequestTask {
     }
   }
 
-  public processingEnd(isSuccessful: boolean, error: Error | null) {
+  public processingEnd(isSuccessful: boolean, skipGas: boolean, error: Error | null) {
     this.error = error;
-    this.status = isSuccessful ? RequestStatus.DONE : RequestStatus.FAILED;
+    this.status = isSuccessful ? RequestStatus.DONE : 
+      skipGas ? RequestStatus.FAILED_SKIPGAS : RequestStatus.FAILED;
 
     if (this.eventEmitter) {
       this.eventEmitter.emit(TasksQueueEvents.TaskChanged);

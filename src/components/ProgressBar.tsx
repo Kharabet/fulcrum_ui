@@ -32,7 +32,7 @@ export class ProgressBar extends Component<IProgressBarProps> {
   }
 
   public renderTaskFailedStateActions = (): ReactNode => {
-    return this.props.requestTask.status === RequestStatus.FAILED ? (
+    return this.props.requestTask.status === RequestStatus.FAILED || this.props.requestTask.status === RequestStatus.FAILED_SKIPGAS ? (
       <React.Fragment>
         <button className="progress-bar__btn progress-bar__btn--cancel" onClick={this.onTaskCancel}>
           Cancel
@@ -45,7 +45,7 @@ export class ProgressBar extends Component<IProgressBarProps> {
   };
 
   private onTaskRetry = async () => {
-    await FulcrumProvider.Instance.onTaskRetry(this.props.requestTask);
+    await FulcrumProvider.Instance.onTaskRetry(this.props.requestTask, false);
   };
 
   private onTaskCancel = async () => {

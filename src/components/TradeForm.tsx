@@ -186,7 +186,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
           : this.state.tradedAmountEstimate.toExponential(3);
 
     return (
-      <form className="trade-form" onSubmit={this.onSubmitClick} style={this.state.collateral !== Asset.ETH ? { height: `32rem`} : { height: `28rem`}}>
+      <form className="trade-form" onSubmit={this.onSubmitClick} style={this.state.collateral !== Asset.ETH && this.props.tradeType === TradeType.BUY ? { height: `32rem`} : { height: `28rem`}}>
         <div className="trade-form__image" style={divStyle}>
           <img src={this.state.assetDetails.logoSvg} alt={tokenNameBase} />
         </div>
@@ -250,7 +250,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
               </div>
             </div>
 
-            {this.state.collateral !== Asset.ETH ? (
+            {this.state.collateral !== Asset.ETH && this.props.tradeType === TradeType.BUY ? (
               <div className="trade-form__token-message-container">
                 <div className="trade-form__token-message-container--message">
                   Selected deposit token ({this.state.collateral}) may need approval, which can take up to 5 minutes.
@@ -274,7 +274,12 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
           className="modal-content-div"
           overlayClassName="modal-overlay-div"
         >
-          <CollateralTokenSelector selectedCollateral={this.state.collateral} onCollateralChange={this.onChangeCollateralClicked} onClose={this.onChangeCollateralClose} />
+          <CollateralTokenSelector 
+            selectedCollateral={this.state.collateral} 
+            collateralType={this.props.tradeType === TradeType.BUY ? `Deposit` : `Withdrawal`}
+            onCollateralChange={this.onChangeCollateralClicked} 
+            onClose={this.onChangeCollateralClose} 
+          />
         </Modal>
       </form>
     );

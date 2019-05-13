@@ -35,7 +35,7 @@ export class TasksListItemDetails extends Component<ITasksListItemDetailsProps> 
 
     const stepStateClassName =
       index + 1 === this.props.task.stepCurrent
-        ? this.props.task.status === RequestStatus.FAILED
+        ? this.props.task.status === RequestStatus.FAILED || this.props.task.status === RequestStatus.FAILED_SKIPGAS
           ? "task-list-item-details__step--failed"
           : "task-list-item-details__step--normal"
         : "task-list-item-details__step--normal";
@@ -64,7 +64,7 @@ export class TasksListItemDetails extends Component<ITasksListItemDetailsProps> 
 
   public renderTaskFailedStateActions = (index: number): ReactNode => {
     const tx = this.props.task.txHash || ``;
-    return this.props.task.status === RequestStatus.FAILED && index + 1 === this.props.task.stepCurrent ? (
+    return (this.props.task.status === RequestStatus.FAILED || this.props.task.status === RequestStatus.FAILED_SKIPGAS) && index + 1 === this.props.task.stepCurrent ? (
       <div className="task-list-item-details__step-actions">
         {this.props.task.txHash && FulcrumProvider.Instance.web3ProviderSettings ? 
           (
@@ -77,12 +77,27 @@ export class TasksListItemDetails extends Component<ITasksListItemDetailsProps> 
               {tx.slice(0, 20)}...{tx.slice(tx.length - 18, tx.length)}
             </a>
           ) : ``}
-        <button
-          className="task-list-item-details__step-action-btn task-list-item-details__step-action-btn--try-again"
-          onClick={this.onTaskRetry}
-        >
-          Try again
-        </button>
+          {this.props.task.error && this.props.task.error!.message.includes("gas required exceeds allowance") ? 
+          (
+            <React.Fragment>
+              <div className="task-list-item-details__step-title--failed-txn">
+                The transaction seems to fail. You can submit the transaction anyway, or cancel.
+              </div>
+              <button
+                className="task-list-item-details__step-action-btn task-list-item-details__step-action-btn--try-again"
+                onClick={this.onForceRetry}
+              >
+                Submit anyway
+              </button>
+            </React.Fragment>
+          ) : (
+            <button
+              className="task-list-item-details__step-action-btn task-list-item-details__step-action-btn--try-again"
+              onClick={this.onTaskRetry}
+            >
+              Try again
+            </button>
+          )}
         <button
           className="task-list-item-details__step-action-btn task-list-item-details__step-action-btn--cancel"
           onClick={this.onTaskCancel}
@@ -94,7 +109,11 @@ export class TasksListItemDetails extends Component<ITasksListItemDetailsProps> 
   };
 
   private onTaskRetry = async () => {
-    await FulcrumProvider.Instance.onTaskRetry(this.props.task);
+    await FulcrumProvider.Instance.onTaskRetry(this.props.task, false);
+  };
+
+  private onForceRetry = async () => {
+    await FulcrumProvider.Instance.onTaskRetry(this.props.task, true);
   };
 
   private onTaskCancel = async () => {
