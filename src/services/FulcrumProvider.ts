@@ -272,21 +272,6 @@ export class FulcrumProvider {
     return priceLatestDataPoint;
   }
 
-  /*
-    both iTokens and pTokens, call tokenPrice()
-    prices are returned as a BigNumber -> 10120000000000000000 = 10.12
-    prices are in the underlying (borrowed) asset
-    Long pTokens borrow the asset in the name (psETH borrows ETH)
-    Short pTokens borrow DAI (plETH borrows DAI):
-      ex: 
-          iTokens:
-          iETH price -> 10.12 ETH per iETH
-          iDAI price -> 12.12 DAI per iDAI
-
-          pTokens:
-          plETH2x (ETH Long 2x leverage) -> 10.12 DAI per plETH2x
-          pswBTC4x (wBTC Short 4x leverage) -> 10.12 wBTC per pswBTC4x
-  */
   public getPriceLatestDataPoint = async (selectedKey: TradeTokenKey): Promise<IPriceDataPoint> => {
     const result = this.getPriceDefaultDataPoint();
     // we are using this function only for trade prices
@@ -317,8 +302,6 @@ export class FulcrumProvider {
     };
   };
 
-  // both iTokens and pTokens have tokenPrice() (current price)  and checkpointPrice() (price at last checkpoint)
-  // profit = (tokenPrice - checkpointPrice) * tokenBalance / 10**36
   public getLendProfit = async (asset: Asset): Promise<BigNumber | null> => {
     // should return null if no data (not traded asset), new BigNumber(0) if no profit
     let result: BigNumber | null = null;
@@ -380,20 +363,6 @@ export class FulcrumProvider {
 
     return result;
   };
-
-  // when buying a pToken (trade screen), you need to check "liquidity" to ensure there is enough to buy the pToken
-  /*  some notes:
-      "Short" tokens borrow from the iToken for the underlying asset (ex: psETH2x borrows from iETH) 
-      "Long" tokens all borrow from the iDAI token (ex: plETH4x borrows from iDAI)
-  
-      You need to check the associated iToken liquidity when the user wants to buy to ensure there is enough:
-        marketLiquidityForAsset(): max amount of asset (ETH, DAI, etc) that can be deposited to buy marketLiquidityForToken()
-        marketLiquidityForToken(): max amount of pToken that can be bought
-
-      pTokens pay interest and earn profits in the "borrowed" asset, so psETH in ETH, 
-      psMKR in MKR, but for long tokens, plETH in DAI and plMKR in DAI. pTokens have mintWithToken and 
-      burnToToken funtions though. So you can buy or cash out with any supported Kyber asset
-  */
 
   public getMaxTradeValue = async (tradeType: TradeType, selectedKey: TradeTokenKey, collateral: Asset): Promise<BigNumber> => {
     let result = new BigNumber(0);
@@ -794,6 +763,7 @@ export class FulcrumProvider {
             approvePromise = tokenErc20Contract.approve.sendTransactionAsync(tokenContract.address, FulcrumProvider.UNLIMITED_ALLOWANCE_IN_BASE_UNITS, { from: account });
           }
           task.processingStepNext();
+          task.processingStepNext();
 
           let gasAmountBN;
           
@@ -806,7 +776,6 @@ export class FulcrumProvider {
             const gasAmount = await tokenContract.mint.estimateGasAsync(account, amountInBaseUnits, { from: account, gas: this.gasLimit });
             gasAmountBN = new BigNumber(gasAmount).multipliedBy(this.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
           }
-          task.processingStepNext();
 
           // Submitting loan
           const txHash = await tokenContract.mint.sendTransactionAsync(account, amountInBaseUnits, { from: account, gas: gasAmountBN });
@@ -959,6 +928,7 @@ export class FulcrumProvider {
             approvePromise = tokenErc20Contract.approve.sendTransactionAsync(tokenContract.address, FulcrumProvider.UNLIMITED_ALLOWANCE_IN_BASE_UNITS, { from: account });
           }
           task.processingStepNext();
+          task.processingStepNext();
 
           let gasAmountBN;
 
@@ -968,10 +938,9 @@ export class FulcrumProvider {
             gasAmountBN = new BigNumber(2300000);
           } else {
             // estimating gas amount
-            const gasAmount = await tokenContract.mintWithToken.estimateGasAsync(account, assetErc20Address, amountInBaseUnits, { from: account, value: amountInBaseUnits, gas: this.gasLimit });
+            const gasAmount = await tokenContract.mintWithToken.estimateGasAsync(account, assetErc20Address, amountInBaseUnits, { from: account, gas: this.gasLimit });
             gasAmountBN = new BigNumber(gasAmount).multipliedBy(this.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
           }
-          task.processingStepNext();
 
           // Submitting trade
           const txHash = await tokenContract.mintWithToken.sendTransactionAsync(account, assetErc20Address, amountInBaseUnits, { from: account, gas: gasAmountBN });
