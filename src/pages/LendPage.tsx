@@ -74,8 +74,6 @@ export class LendPage extends Component<ILendPageProps, ILendPageState> {
     this.setState({ 
       ...this.state,
       isLendModalOpen: false,
-      lendType: LendType.LEND,
-      lendAsset: Asset.UNKNOWN
     });
   };
 

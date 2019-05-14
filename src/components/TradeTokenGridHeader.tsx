@@ -36,7 +36,7 @@ export class TradeTokenGridHeader extends Component<ITradeTokenGridHeaderProps> 
         </div>
         <div className="trade-token-grid-header__col-actions">
           <span className="trade-token-grid-header__text-right">
-            <CheckBox checked={this.props.showMyTokensOnly} onChange={this.showMyTokensOnlyChange}>Show my tokens only</CheckBox>
+            <CheckBox checked={this.props.showMyTokensOnly} onChange={this.showMyTokensOnlyChange}>Show my positions only</CheckBox>
           </span>
         </div>
       </div>

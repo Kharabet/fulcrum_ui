@@ -7,6 +7,7 @@ import { LendRequest } from "../domain/LendRequest";
 import { LendType } from "../domain/LendType";
 import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
+import { LendTransactionMinedEvent } from "../services/events/LendTransactionMinedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
 
 export interface ILendTokenSelectorItemProps {
@@ -34,6 +35,7 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
     this.state = { assetDetails: assetDetails || null, interestRate: interestRate, profit: profit, balance: balance };
 
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
+    FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.LendTransactionMined, this.onLendTransactionMined);
   }
 
   private async derivedUpdate() {
@@ -49,8 +51,15 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
     await this.derivedUpdate();
   };
 
+  private onLendTransactionMined = async (event: LendTransactionMinedEvent) => {
+    if (event.asset === this.props.asset) {
+      await this.derivedUpdate();
+    }
+  };
+
   public componentWillUnmount(): void {
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
+    FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.LendTransactionMined, this.onLendTransactionMined);
   }
 
   public componentDidMount(): void {

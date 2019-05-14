@@ -32,20 +32,59 @@ export class ProgressBar extends Component<IProgressBarProps> {
   }
 
   public renderTaskFailedStateActions = (): ReactNode => {
+    
+    let forceRetry = false;
+    let errorMsg;
+    if (this.props.requestTask.error) {
+      if (this.props.requestTask.error.message) {
+        errorMsg = this.props.requestTask.error.message;
+      } else if (typeof this.props.requestTask.error === "string") {
+        errorMsg = this.props.requestTask.error;
+      }
+      
+      if (errorMsg) {
+        if (errorMsg.includes("gas required exceeds allowance")) {
+          errorMsg = "The transaction seems like it will fail. You can submit the transaction anyway, or cancel.";
+          forceRetry = true;
+        } else if (errorMsg.includes("Reverted by EVM")) {
+          errorMsg = "The transaction failed. Click View More for details.";
+        } else {
+          errorMsg = "";
+        }
+      }
+    }
+    
     return this.props.requestTask.status === RequestStatus.FAILED || this.props.requestTask.status === RequestStatus.FAILED_SKIPGAS ? (
       <React.Fragment>
         <button className="progress-bar__btn progress-bar__btn--cancel" onClick={this.onTaskCancel}>
           Cancel
         </button>
-        <button className="progress-bar__btn progress-bar__btn--try-again" onClick={this.onTaskRetry}>
-          Try again
-        </button>
+        {forceRetry ? (
+          <button className="progress-bar__btn progress-bar__btn--try-again" onClick={this.onForceRetry}>
+            Submit
+          </button>
+        ) : (
+          <button className="progress-bar__btn progress-bar__btn--try-again" onClick={this.onTaskRetry}>
+            Try again
+          </button>
+        )}
+        {errorMsg ? (
+          <React.Fragment>
+            <div className="progress-bar__error-message">
+              {errorMsg}
+            </div>>
+          </React.Fragment>
+        ) : ``}
       </React.Fragment>
     ) : null;
   };
 
   private onTaskRetry = async () => {
     await FulcrumProvider.Instance.onTaskRetry(this.props.requestTask, false);
+  };
+
+  private onForceRetry = async () => {
+    await FulcrumProvider.Instance.onTaskRetry(this.props.requestTask, true);
   };
 
   private onTaskCancel = async () => {

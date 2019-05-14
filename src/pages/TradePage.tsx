@@ -165,12 +165,7 @@ export class TradePage extends Component<ITradePageProps, ITradePageState> {
     FulcrumProvider.Instance.onTradeConfirmed(request);
     this.setState({
       ...this.state,
-      isTradeModalOpen: false,
-      collateralToken: Asset.UNKNOWN,
-      tradeType: TradeType.BUY,
-      tradeAsset: Asset.UNKNOWN,
-      tradePositionType: PositionType.SHORT,
-      tradeLeverage: 0
+      isTradeModalOpen: false
     });
   };
 

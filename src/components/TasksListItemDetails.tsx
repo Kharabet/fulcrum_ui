@@ -63,41 +63,63 @@ export class TasksListItemDetails extends Component<ITasksListItemDetailsProps> 
   };
 
   public renderTaskFailedStateActions = (index: number): ReactNode => {
-    const tx = this.props.task.txHash || ``;
+    let tx = this.props.task.txHash || ``;
+
+    let forceRetry = false;
+    let errorMsg;
+    if (this.props.task.error) {
+      if (this.props.task.error.message) {
+        errorMsg = this.props.task.error.message;
+      } else if (typeof this.props.task.error === "string") {
+        errorMsg = this.props.task.error;
+      }
+      
+      if (errorMsg) {
+        if (errorMsg.includes("gas required exceeds allowance")) {
+          errorMsg = "The transaction seems like it will fail. You can submit the transaction anyway, or cancel.";
+          forceRetry = true;
+        } else if (errorMsg.includes("Reverted by EVM")) {
+          errorMsg = "The transaction failed. Etherscan link:";
+        } else {
+          errorMsg = "";
+        }
+      }
+    }
+
     return (this.props.task.status === RequestStatus.FAILED || this.props.task.status === RequestStatus.FAILED_SKIPGAS) && index + 1 === this.props.task.stepCurrent ? (
       <div className="task-list-item-details__step-actions">
-        {this.props.task.txHash && FulcrumProvider.Instance.web3ProviderSettings ? 
-          (
-            <a
-              className="task-list-item-details__step-title--failed-txn"
-              href={`${FulcrumProvider.Instance.web3ProviderSettings.etherscanURL}tx/${tx}`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {tx.slice(0, 20)}...{tx.slice(tx.length - 18, tx.length)}
-            </a>
-          ) : ``}
-          {this.props.task.error && this.props.task.error!.message.includes("gas required exceeds allowance") ? 
-          (
-            <React.Fragment>
-              <div className="task-list-item-details__step-title--failed-txn">
-                The transaction seems to fail. You can submit the transaction anyway, or cancel.
-              </div>
-              <button
-                className="task-list-item-details__step-action-btn task-list-item-details__step-action-btn--try-again"
-                onClick={this.onForceRetry}
+        {errorMsg ? (
+          <React.Fragment>
+            <div className="task-list-item-details__step-title--failed-txn">
+              {errorMsg}
+            </div>
+            {tx && FulcrumProvider.Instance.web3ProviderSettings ? (
+              <a
+                className="task-list-item-details__step-title--failed-txn"
+                href={`${FulcrumProvider.Instance.web3ProviderSettings.etherscanURL}tx/${tx}`}
+                target="_blank"
+                rel="noopener noreferrer"
               >
-                Submit anyway
-              </button>
-            </React.Fragment>
-          ) : (
-            <button
-              className="task-list-item-details__step-action-btn task-list-item-details__step-action-btn--try-again"
-              onClick={this.onTaskRetry}
-            >
-              Try again
-            </button>
-          )}
+                {tx.slice(0, 20)}...{tx.slice(tx.length - 18, tx.length)}
+              </a>
+            ) : ``}
+          </React.Fragment>
+        ) : ``}
+        {forceRetry ? (
+          <button
+            className="task-list-item-details__step-action-btn task-list-item-details__step-action-btn--try-again"
+            onClick={this.onForceRetry}
+          >
+            Submit
+          </button>
+        ) : (
+          <button
+            className="task-list-item-details__step-action-btn task-list-item-details__step-action-btn--try-again"
+            onClick={this.onTaskRetry}
+          >
+            Try again
+          </button>
+        )}
         <button
           className="task-list-item-details__step-action-btn task-list-item-details__step-action-btn--cancel"
           onClick={this.onTaskCancel}

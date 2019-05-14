@@ -10,6 +10,7 @@ import { TradeTokenKey } from "../domain/TradeTokenKey";
 import { TradeType } from "../domain/TradeType";
 import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
+import { TradeTransactionMinedEvent } from "../services/events/TradeTransactionMinedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
 // import { Change24HMarker, Change24HMarkerSize } from "./Change24HMarker";
 import { LeverageSelector } from "./LeverageSelector";
@@ -50,6 +51,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
     };
 
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
+    FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.TradeTransactionMined, this.onTradeTransactionMined);
   }
 
   private getTradeTokenGridRowSelectionKeyRaw(props: ITradeTokenGridRowProps, leverage: number = this.state.leverage) {
@@ -78,8 +80,15 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
     await this.derivedUpdate();
   };
 
+  private onTradeTransactionMined = async (event: TradeTransactionMinedEvent) => {
+    if (event.key === this.props.selectedKey) {
+      await this.derivedUpdate();
+    }
+  };
+
   public componentWillUnmount(): void {
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
+    FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.TradeTransactionMined, this.onTradeTransactionMined);
   }
 
   public componentDidMount(): void {
@@ -153,8 +162,8 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
     );
   }
 
-  private renderActions = (isOpenOnly: boolean) => {
-    return isOpenOnly ? (
+  private renderActions = (isBuyOnly: boolean) => {
+    return isBuyOnly ? (
       <div className="trade-token-grid-row__col-action">
         <button className="trade-token-grid-row__buy-button trade-token-grid-row__buy-button--size-full" onClick={this.onBuyClick}>
           {TradeType.BUY}

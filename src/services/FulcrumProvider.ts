@@ -22,6 +22,8 @@ import { Web3ConnectionFactory } from "../domain/Web3ConnectionFactory";
 import { ContractsSource } from "./ContractsSource";
 import { FulcrumProviderEvents } from "./events/FulcrumProviderEvents";
 import { ProviderChangedEvent } from "./events/ProviderChangedEvent";
+import { LendTransactionMinedEvent } from "./events/LendTransactionMinedEvent";
+import { TradeTransactionMinedEvent } from "./events/TradeTransactionMinedEvent";
 import { TasksQueueEvents } from "./events/TasksQueueEvents";
 import { TasksQueue } from "./TasksQueue";
 import fetch from "node-fetch";
@@ -46,6 +48,10 @@ export class FulcrumProvider {
   private readonly gasPrice = new BigNumber(6).multipliedBy(10 ** 9);
   // gasBufferCoeff equal 110% gas reserve
   private readonly gasBufferCoeff = new BigNumber("1.1");
+
+  private static readonly UNLIMITED_ALLOWANCE_IN_BASE_UNITS = new BigNumber(2)
+    .pow(256)
+    .minus(1);
 
   private isProcessing: boolean = false;
   private isChecking: boolean = false;
@@ -482,11 +488,10 @@ export class FulcrumProvider {
       if (assetContract) {
         const tokenPrice = await assetContract.tokenPrice.callAsync();
 
-        /*result =
+        result =
           request.lendType === LendType.LEND
             ? request.amount.multipliedBy(10 ** 18).dividedBy(tokenPrice)
-            : request.amount.multipliedBy(tokenPrice).dividedBy(10 ** 18);*/
-        result = request.amount.multipliedBy(10 ** 18).dividedBy(tokenPrice);
+            : request.amount.multipliedBy(tokenPrice).dividedBy(10 ** 18);
       }
     }
 
@@ -786,7 +791,7 @@ export class FulcrumProvider {
 
           // Prompting token allowance
           if (amountInBaseUnits.gt(erc20allowance)) {
-            approvePromise = tokenErc20Contract.approve.sendTransactionAsync(tokenContract.address, amountInBaseUnits, { from: account });
+            approvePromise = tokenErc20Contract.approve.sendTransactionAsync(tokenContract.address, FulcrumProvider.UNLIMITED_ALLOWANCE_IN_BASE_UNITS, { from: account });
           }
           task.processingStepNext();
 
@@ -806,7 +811,7 @@ export class FulcrumProvider {
           // Submitting loan
           const txHash = await tokenContract.mint.sendTransactionAsync(account, amountInBaseUnits, { from: account, gas: gasAmountBN });
           task.setTxHash(txHash);
-          const txReceipt = await this.waitForTransactionMined(txHash);
+          const txReceipt = await this.waitForTransactionMined(txHash, task.request);
           if (!txReceipt.status) {
             throw new Error("Reverted by EVM");
           }
@@ -834,7 +839,7 @@ export class FulcrumProvider {
           // Submitting loan
           const txHash = await tokenContract.mintWithEther.sendTransactionAsync(account, { from: account, value: amountInBaseUnits.minus(gasCost), gas: gasAmountBN });
           task.setTxHash(txHash);
-          const txReceipt = await this.waitForTransactionMined(txHash);
+          const txReceipt = await this.waitForTransactionMined(txHash, task.request);
           if (!txReceipt.status) {
             throw new Error("Reverted by EVM");
           }
@@ -862,7 +867,7 @@ export class FulcrumProvider {
           // Submitting unloan
           const txHash = await tokenContract.burn.sendTransactionAsync(account, amountInBaseUnits, { from: account, gas: gasAmountBN });
           task.setTxHash(txHash);
-          const txReceipt = await this.waitForTransactionMined(txHash);
+          const txReceipt = await this.waitForTransactionMined(txHash, task.request);
           if (!txReceipt.status) {
             throw new Error("Reverted by EVM");
           }
@@ -879,7 +884,7 @@ export class FulcrumProvider {
           // Submitting unloan
           const txHash = await tokenContract.burnToEther.sendTransactionAsync(account, amountInBaseUnits, { from: account, gas: gasAmountBN });
           task.setTxHash(txHash);
-          const txReceipt = await this.waitForTransactionMined(txHash);
+          const txReceipt = await this.waitForTransactionMined(txHash, task.request);
           if (!txReceipt.status) {
             throw new Error("Reverted by EVM");
           }
@@ -951,7 +956,7 @@ export class FulcrumProvider {
 
           // Prompting token allowance
           if (amountInBaseUnits.gt(erc20allowance)) {
-            approvePromise = tokenErc20Contract.approve.sendTransactionAsync(tokenContract.address, amountInBaseUnits, { from: account });
+            approvePromise = tokenErc20Contract.approve.sendTransactionAsync(tokenContract.address, FulcrumProvider.UNLIMITED_ALLOWANCE_IN_BASE_UNITS, { from: account });
           }
           task.processingStepNext();
 
@@ -971,7 +976,7 @@ export class FulcrumProvider {
           // Submitting trade
           const txHash = await tokenContract.mintWithToken.sendTransactionAsync(account, assetErc20Address, amountInBaseUnits, { from: account, gas: gasAmountBN });
           task.setTxHash(txHash);
-          const txReceipt = await this.waitForTransactionMined(txHash);
+          const txReceipt = await this.waitForTransactionMined(txHash, task.request);
           if (!txReceipt.status) {
             throw new Error("Reverted by EVM");
           }
@@ -999,7 +1004,7 @@ export class FulcrumProvider {
           // Submitting trade
           const txHash = await tokenContract.mintWithEther.sendTransactionAsync(account, { from: account, value: amountInBaseUnits.minus(gasCost), gas: gasAmountBN });
           task.setTxHash(txHash);
-          const txReceipt = await this.waitForTransactionMined(txHash);
+          const txReceipt = await this.waitForTransactionMined(txHash, task.request);
           if (!txReceipt.status) {
             throw new Error("Reverted by EVM");
           }
@@ -1040,7 +1045,7 @@ export class FulcrumProvider {
               { from: account, gas: gasAmountBN }
             );
             task.setTxHash(txHash);
-            const txReceipt = await this.waitForTransactionMined(txHash);
+            const txReceipt = await this.waitForTransactionMined(txHash, task.request);
             if (!txReceipt.status) {
               throw new Error("Reverted by EVM");
             }
@@ -1057,7 +1062,7 @@ export class FulcrumProvider {
           // Closing trade
           const txHash = await tokenContract.burnToEther.sendTransactionAsync(account, amountInBaseUnits, { from: account, gas: gasAmountBN });
           task.setTxHash(txHash);
-          const txReceipt = await this.waitForTransactionMined(txHash);
+          const txReceipt = await this.waitForTransactionMined(txHash, task.request);
           if (!txReceipt.status) {
             throw new Error("Reverted by EVM");
           }
@@ -1072,14 +1077,17 @@ export class FulcrumProvider {
     }
   };
 
-  private waitForTransactionMined = async (txHash: string): Promise<TransactionReceipt> => {
+  private waitForTransactionMined = async (
+    txHash: string, 
+    request: LendRequest | TradeRequest): Promise<TransactionReceipt> => {
+
     return new Promise((resolve, reject) => {
       try {
         if (!this.web3) {
           throw new Error("web3 is not available");
         }
 
-        this.waitForTransactionMinedRecursive(txHash, this.web3, resolve, reject);
+        this.waitForTransactionMinedRecursive(txHash, this.web3, request, resolve, reject);
       } catch (e) {
         throw e;
       }
@@ -1089,6 +1097,7 @@ export class FulcrumProvider {
   private waitForTransactionMinedRecursive = async (
     txHash: string,
     web3: Web3,
+    request: LendRequest | TradeRequest,
     resolve: (value: any) => void,
     reject: (value: any) => void) => {
 
@@ -1100,9 +1109,24 @@ export class FulcrumProvider {
 
         if (receipt) {
           resolve(receipt);
+          if (request instanceof LendRequest) {
+            this.eventEmitter.emit(
+              FulcrumProviderEvents.LendTransactionMined,
+              new LendTransactionMinedEvent(request.asset, txHash)
+            );
+          } else {
+            this.eventEmitter.emit(
+              FulcrumProviderEvents.TradeTransactionMined,
+              new TradeTransactionMinedEvent(new TradeTokenKey(
+                request.asset,
+                request.positionType,
+                request.leverage
+              ), txHash)
+            );
+          }
         } else {
           window.setTimeout(() => {
-            this.waitForTransactionMinedRecursive(txHash, web3, resolve, reject);
+            this.waitForTransactionMinedRecursive(txHash, web3, request, resolve, reject);
           }, 5000);
         }
       });
