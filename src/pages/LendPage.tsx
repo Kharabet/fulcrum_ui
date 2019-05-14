@@ -59,6 +59,11 @@ export class LendPage extends Component<ILendPageProps, ILendPageState> {
   }
 
   public onLendRequested = (request: LendRequest) => {
+    if (!FulcrumProvider.Instance.web3) {
+      this.props.doNetworkConnect();
+      return;
+    }
+
     if (request) {
       this.setState({ 
         ...this.state,

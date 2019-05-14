@@ -148,6 +148,11 @@ export class TradePage extends Component<ITradePageProps, ITradePageState> {
   };
 
   public onTradeRequested = (request: TradeRequest) => {
+    if (!FulcrumProvider.Instance.web3) {
+      this.props.doNetworkConnect();
+      return;
+    }
+
     if (request) {
       this.setState({
         ...this.state,
