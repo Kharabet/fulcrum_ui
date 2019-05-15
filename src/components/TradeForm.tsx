@@ -358,7 +358,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
   };
 
   public onChangeCollateralClicked = async (asset: Asset) => {
-    await this.setState({ ...this.state, isChangeCollateralOpen: false, collateral: asset });
+    this.setState({ ...this.state, isChangeCollateralOpen: false, collateral: asset });
   };
 
   public onSubmitClick = (event: FormEvent<HTMLFormElement>) => {

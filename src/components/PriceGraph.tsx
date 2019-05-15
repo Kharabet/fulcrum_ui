@@ -33,7 +33,7 @@ export class PriceGraph extends Component<IPriceGraphProps, IPriceGraphState> {
     const latestPriceData = await FulcrumProvider.Instance.getChartLatestDataPoint(this.props.selectedKey);
     const normalizedData = await this.normalizePrices(this.props.data, latestPriceData);
 
-    await this.setState({
+    this.setState({
       ...this.state,
       priceBaseLine: normalizedData.priceBaseLine,
       data: normalizedData.points,
