@@ -1,9 +1,9 @@
 import { BigNumber } from "@0x/utils";
 import moment from "moment";
 import React, { Component, ReactNode } from "react";
-import { Line, LineChart, ResponsiveContainer, Tooltip, TooltipProps, ReferenceLine } from "recharts";
+import { Line, LineChart, ReferenceLine, ResponsiveContainer, Tooltip, TooltipProps } from "recharts";
 import { IPriceDataPoint } from "../domain/IPriceDataPoint";
-//import { Change24HMarker, Change24HMarkerSize } from "./Change24HMarker";
+// import { Change24HMarker, Change24HMarkerSize } from "./Change24HMarker";
 import { TradeTokenKey } from "../domain/TradeTokenKey";
 import { FulcrumProvider } from "../services/FulcrumProvider";
 
@@ -158,7 +158,7 @@ export class PriceGraph extends Component<IPriceGraphProps, IPriceGraphState> {
 
     // TEMP FIX: normalize mainnet prices to ropsten
     if (lastItem && latestPriceData.price !== 0) {
-      Object.keys(priceDataPoints).map(function(obj, index) {
+      Object.keys(priceDataPoints).map((obj, index) => {
         priceDataPoints[index].price = new BigNumber(priceDataPoints[index].price).multipliedBy(latestPriceData.price).dividedBy(lastItem!.price).toNumber();
       });
     }

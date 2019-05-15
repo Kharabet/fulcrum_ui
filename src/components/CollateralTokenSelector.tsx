@@ -4,7 +4,7 @@ import { CollateralTokenSelectorItem } from "./CollateralTokenSelectorItem";
 
 export interface ICollateralTokenSelectorProps {
   selectedCollateral: Asset;
-  collateralType: String;
+  collateralType: string;
 
   onCollateralChange: (asset: Asset) => void;
   onClose: () => void;

@@ -25,7 +25,7 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
   private static readonly assets: Asset[] = [
     Asset.ETH,
     Asset.wBTC,
-    //Asset.DAI,
+    // Asset.DAI,
     Asset.MKR,
     Asset.ZRX,
     Asset.BAT,

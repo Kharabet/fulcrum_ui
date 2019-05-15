@@ -63,7 +63,7 @@ export class TasksListItemDetails extends Component<ITasksListItemDetailsProps> 
   };
 
   public renderTaskFailedStateActions = (index: number): ReactNode => {
-    let tx = this.props.task.txHash || ``;
+    const tx = this.props.task.txHash || ``;
 
     let forceRetry = false;
     let errorMsg;

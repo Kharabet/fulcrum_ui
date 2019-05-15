@@ -1,6 +1,7 @@
 import { BigNumber } from "@0x/utils";
 import { EventEmitter } from "events";
 import moment from "moment";
+import fetch from "node-fetch";
 import Web3 from "web3";
 import { TransactionReceipt } from "web3/types";
 import { erc20Contract } from "../contracts/erc20";
@@ -21,12 +22,11 @@ import { TradeType } from "../domain/TradeType";
 import { Web3ConnectionFactory } from "../domain/Web3ConnectionFactory";
 import { ContractsSource } from "./ContractsSource";
 import { FulcrumProviderEvents } from "./events/FulcrumProviderEvents";
-import { ProviderChangedEvent } from "./events/ProviderChangedEvent";
 import { LendTransactionMinedEvent } from "./events/LendTransactionMinedEvent";
-import { TradeTransactionMinedEvent } from "./events/TradeTransactionMinedEvent";
+import { ProviderChangedEvent } from "./events/ProviderChangedEvent";
 import { TasksQueueEvents } from "./events/TasksQueueEvents";
+import { TradeTransactionMinedEvent } from "./events/TradeTransactionMinedEvent";
 import { TasksQueue } from "./TasksQueue";
-import fetch from "node-fetch";
 
 import configProviders from "../config/providers.json";
 
@@ -97,7 +97,7 @@ export class FulcrumProvider {
     if (this.web3) {
       const networkId = await this.web3.eth.net.getId();
       if (networkId !== 3) {
-
+        //
       }
     }
 
@@ -154,26 +154,26 @@ export class FulcrumProvider {
 
   public getPriceDataPoints = async (selectedKey: TradeTokenKey): Promise<IPriceDataPoint[]> => {
     let priceDataObj: IPriceDataPoint[] = [];
-    //localStorage.removeItem(`priceData${selectedKey.asset}`);
+    // localStorage.removeItem(`priceData${selectedKey.asset}`);
 
     if (this.web3 && this.web3ProviderSettings) {
       let queriedBlocks = 0;
-      let currentBlock = await this.web3.eth.getBlockNumber();
-      let earliestBlock = currentBlock-17280; // ~5760 blocks per day
+      const currentBlock = await this.web3.eth.getBlockNumber();
+      const earliestBlock = currentBlock-17280; // ~5760 blocks per day
       let fetchFromBlock = earliestBlock;
       const nearestHour = new Date().setMinutes(0,0,0)/1000;
   
       const priceData = localStorage.getItem(`priceData${selectedKey.asset}`);
       if (priceData) {
-        //console.log(`priceData`,priceData);
+        // console.log(`priceData`,priceData);
         priceDataObj = JSON.parse(priceData);
         if (priceDataObj.length > 0) {
-          //console.log(`priceDataObj`,priceDataObj);
-          let lastItem = priceDataObj[priceDataObj.length-1];
-          //console.log(`lastItem`,lastItem);
-          //console.log(`nearestHour`,nearestHour);
+          // console.log(`priceDataObj`,priceDataObj);
+          const lastItem = priceDataObj[priceDataObj.length-1];
+          // console.log(`lastItem`,lastItem);
+          // console.log(`nearestHour`,nearestHour);
           if (lastItem && lastItem.timeStamp) {
-            //console.log(`lastItem.timeStamp`,lastItem.timeStamp);
+            // console.log(`lastItem.timeStamp`,lastItem.timeStamp);
             if (lastItem.timeStamp < nearestHour) {
               fetchFromBlock = currentBlock - (nearestHour-lastItem.timeStamp)/15 - 240; // ~240 blocks per hour; 15 second blocks
             } else {
@@ -187,7 +187,7 @@ export class FulcrumProvider {
       if (fetchFromBlock < currentBlock) {
         let jsonData: any = {};
         if (this.web3 && this.web3ProviderSettings) {
-          //const functionName = `${this.web3ProviderSettings.networkName}-${FulcrumProvider.priceGraphQueryFunction.get(selectedKey.asset)}`;
+          // const functionName = `${this.web3ProviderSettings.networkName}-${FulcrumProvider.priceGraphQueryFunction.get(selectedKey.asset)}`;
           const functionName = `mainnet-${FulcrumProvider.priceGraphQueryFunction.get(selectedKey.asset)}`;
           const url = `https://api.covalenthq.com/v1/function/${functionName}/?aggregate[Avg]&group_by[block_signed_at__hour]&starting-block=${fetchFromBlock}&key=${configProviders.Covalent_ApiKey}`;
           try {
@@ -195,8 +195,9 @@ export class FulcrumProvider {
             jsonData = await response.json();
 
             queriedBlocks = currentBlock-fetchFromBlock;
-            //console.log(jsonData);
+            // console.log(jsonData);
           } catch (error) {
+            // tslint:disable-next-line
             console.log(error);
           }
         }
@@ -204,19 +205,20 @@ export class FulcrumProvider {
         if (jsonData && jsonData.data) {
           const dataArray = jsonData.data;
           dataArray.map((value: any) => {
-            if (value && value.block_signed_at__hour && value.avg_value_0)
+            if (value && value.block_signed_at__hour && value.avg_value_0) {
               priceDataObj.push({
-                timeStamp: Math.round(new Date(value.block_signed_at__hour).getTime()/1000),
+                timeStamp: Math.round(new Date(value.block_signed_at__hour).getTime() / 1000),
                 price: Math.round(value.avg_value_0) / (10 ** 18),
                 liquidationPrice: 0,
                 change24h: 0
               });
+            }
           });
-          //console.log(result);
+          // console.log(result);
 
           // remove duplicates
           priceDataObj = priceDataObj
-            .map(e => e['timeStamp'])
+            .map(e => e.timeStamp)
             .map((e, i, final) => final.indexOf(e) === i && i)
             .filter((e, index) => priceDataObj[index]).map((e, i) => priceDataObj[i]);
 
@@ -231,15 +233,16 @@ export class FulcrumProvider {
           }
 
           // keep no more than 72
-          if (priceDataObj.length > 72)
+          if (priceDataObj.length > 72) {
             priceDataObj = priceDataObj.splice(-72);
+          }
 
-          //console.log(priceDataObj.length);
+          // console.log(priceDataObj.length);
           localStorage.setItem(`priceData${selectedKey.asset}`, JSON.stringify(priceDataObj));
         }
       }
 
-      console.log(`queriedBlocks`,queriedBlocks);
+      // console.log(`queriedBlocks`, queriedBlocks);
     } else {
       // getting empty data
       const samplesCount = 72;
@@ -255,14 +258,14 @@ export class FulcrumProvider {
         beginningTime.add(intervalSeconds, "second");
       }
     }
-    //console.log(priceDataObj);
+    // console.log(priceDataObj);
 
     return priceDataObj;
   };
 
   public getChartLatestDataPoint = async (selectedKey: TradeTokenKey): Promise<IPriceDataPoint> => {
     const latestSwapPrice = await this.getSwapToUsdPrice(selectedKey.asset);
-    let priceLatestDataPoint = await this.getPriceLatestDataPoint(selectedKey);
+    const priceLatestDataPoint = await this.getPriceLatestDataPoint(selectedKey);
     priceLatestDataPoint.liquidationPrice = latestSwapPrice
       .multipliedBy(priceLatestDataPoint.liquidationPrice)
       .div(priceLatestDataPoint.price)
@@ -270,7 +273,7 @@ export class FulcrumProvider {
     priceLatestDataPoint.price = latestSwapPrice.toNumber();
     
     return priceLatestDataPoint;
-  }
+  };
 
   public getPriceLatestDataPoint = async (selectedKey: TradeTokenKey): Promise<IPriceDataPoint> => {
     const result = this.getPriceDefaultDataPoint();
@@ -673,8 +676,9 @@ export class FulcrumProvider {
           const task = TasksQueue.Instance.peek();
 
           if (task) {
-            if (task.status === RequestStatus.FAILED_SKIPGAS)
+            if (task.status === RequestStatus.FAILED_SKIPGAS) {
               task.status = RequestStatus.FAILED;
+            }
             if (task.status === RequestStatus.AWAITING || (task.status === RequestStatus.FAILED && forceOnce)) {
               await this.processRequestTask(task, skipGas);
               // @ts-ignore
