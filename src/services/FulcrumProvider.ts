@@ -58,16 +58,34 @@ export class FulcrumProvider {
 
   public readonly eventEmitter: EventEmitter;
   public providerType: ProviderType = ProviderType.None;
-  public web3ProviderSettings: IWeb3ProviderSettings | null = null;
   public web3: Web3 | null = null;
-
+  public web3ProviderSettings: IWeb3ProviderSettings | null = null;
   public contractsSource: ContractsSource | null = null;
+
+  public web3ro: Web3 | null = null;
+  public web3roProviderSettings: IWeb3ProviderSettings | null = null;
+  public contractsSourceRO: ContractsSource | null = null;
 
   constructor() {
     // init
     this.eventEmitter = new EventEmitter();
     this.eventEmitter.setMaxListeners(1000);
     TasksQueue.Instance.on(TasksQueueEvents.Enqueued, this.onTaskEnqueued);
+
+    // setting up readonly provider
+    Web3ConnectionFactory.getWeb3Connection(ProviderType.Alchemy).then((web3ro) => {
+      FulcrumProvider.getWeb3ProviderSettings(web3ro).then((web3roProviderSettings) => {
+        if (web3ro && web3roProviderSettings) {
+          const contractsSourceRO = new ContractsSource(web3ro.currentProvider, web3roProviderSettings.networkId);
+          contractsSourceRO.Init().then(() => {
+            this.web3ro = web3ro;
+            this.web3roProviderSettings = web3roProviderSettings;
+            this.contractsSourceRO = contractsSourceRO;
+            this.eventEmitter.emit(FulcrumProviderEvents.ProviderAvailableRO);
+          });
+        }
+      });
+    });
 
     // singleton
     if (!FulcrumProvider.Instance) {
@@ -141,8 +159,8 @@ export class FulcrumProvider {
 
   public getLendTokenInterestRate = async (asset: Asset): Promise<BigNumber> => {
     let result = new BigNumber(0);
-    if (this.contractsSource) {
-      const assetContract = this.contractsSource.getITokenContract(asset);
+    if (this.contractsSourceRO) {
+      const assetContract = this.contractsSourceRO.getITokenContract(asset);
       if (assetContract) {
         result = await assetContract.supplyInterestRate.callAsync();
         result = result.dividedBy(10 ** 18);
@@ -156,9 +174,9 @@ export class FulcrumProvider {
     let priceDataObj: IPriceDataPoint[] = [];
     // localStorage.removeItem(`priceData${selectedKey.asset}`);
 
-    if (this.web3 && this.web3ProviderSettings) {
+    if (this.web3ro) {
       let queriedBlocks = 0;
-      const currentBlock = await this.web3.eth.getBlockNumber();
+      const currentBlock = await this.web3ro.eth.getBlockNumber();
       const earliestBlock = currentBlock-17280; // ~5760 blocks per day
       let fetchFromBlock = earliestBlock;
       const nearestHour = new Date().setMinutes(0,0,0)/1000;
@@ -186,20 +204,18 @@ export class FulcrumProvider {
       fetchFromBlock = Math.max(fetchFromBlock, earliestBlock);
       if (fetchFromBlock < currentBlock) {
         let jsonData: any = {};
-        if (this.web3 && this.web3ProviderSettings) {
-          // const functionName = `${this.web3ProviderSettings.networkName}-${FulcrumProvider.priceGraphQueryFunction.get(selectedKey.asset)}`;
-          const functionName = `mainnet-${FulcrumProvider.priceGraphQueryFunction.get(selectedKey.asset)}`;
-          const url = `https://api.covalenthq.com/v1/function/${functionName}/?aggregate[Avg]&group_by[block_signed_at__hour]&starting-block=${fetchFromBlock}&key=${configProviders.Covalent_ApiKey}`;
-          try {
-            const response = await fetch(url);
-            jsonData = await response.json();
+        // const functionName = `${this.web3ProviderSettings.networkName}-${FulcrumProvider.priceGraphQueryFunction.get(selectedKey.asset)}`;
+        const functionName = `mainnet-${FulcrumProvider.priceGraphQueryFunction.get(selectedKey.asset)}`;
+        const url = `https://api.covalenthq.com/v1/function/${functionName}/?aggregate[Avg]&group_by[block_signed_at__hour]&starting-block=${fetchFromBlock}&key=${configProviders.Covalent_ApiKey}`;
+        try {
+          const response = await fetch(url);
+          jsonData = await response.json();
 
-            queriedBlocks = currentBlock-fetchFromBlock;
-            // console.log(jsonData);
-          } catch (error) {
-            // tslint:disable-next-line
-            console.log(error);
-          }
+          queriedBlocks = currentBlock-fetchFromBlock;
+          // console.log(jsonData);
+        } catch (error) {
+          // tslint:disable-next-line
+          console.log(error);
         }
 
         if (jsonData && jsonData.data) {
@@ -278,8 +294,8 @@ export class FulcrumProvider {
   public getPriceLatestDataPoint = async (selectedKey: TradeTokenKey): Promise<IPriceDataPoint> => {
     const result = this.getPriceDefaultDataPoint();
     // we are using this function only for trade prices
-    if (this.contractsSource) {
-      const assetContract = this.contractsSource.getPTokenContract(selectedKey);
+    if (this.contractsSourceRO) {
+      const assetContract = this.contractsSourceRO.getPTokenContract(selectedKey);
       if (assetContract) {
         const tokenPrice = await assetContract.tokenPrice.callAsync();
         const liquidationPrice = await assetContract.liquidationPrice.callAsync();
@@ -424,13 +440,13 @@ export class FulcrumProvider {
   public getTradedAmountEstimate = async (request: TradeRequest): Promise<BigNumber> => {
     let result = new BigNumber(0);
 
-    if (this.contractsSource) {
+    if (this.contractsSourceRO) {
       const key = new TradeTokenKey(
         request.asset,
         request.positionType,
         request.leverage
       );
-      const assetContract = this.contractsSource.getPTokenContract(key);
+      const assetContract = this.contractsSourceRO.getPTokenContract(key);
       if (assetContract) {
         const tokenPrice = await assetContract.tokenPrice.callAsync();
         let amount = request.amount;
@@ -455,8 +471,8 @@ export class FulcrumProvider {
   public getLendedAmountEstimate = async (request: LendRequest): Promise<BigNumber> => {
     let result = new BigNumber(0);
 
-    if (this.contractsSource) {
-      const assetContract = this.contractsSource.getITokenContract(request.asset);
+    if (this.contractsSourceRO) {
+      const assetContract = this.contractsSourceRO.getITokenContract(request.asset);
       if (assetContract) {
         const tokenPrice = await assetContract.tokenPrice.callAsync();
 
@@ -553,14 +569,14 @@ export class FulcrumProvider {
   }
 
   public getPTokensAvailable(): TradeTokenKey[] {
-    return this.contractsSource
-        ? this.contractsSource.getPTokensAvailable()
+    return this.contractsSourceRO
+        ? this.contractsSourceRO.getPTokensAvailable()
         : [];
   }
 
   public getPTokenErc20Address(key: TradeTokenKey): string | null {
-    return this.contractsSource
-      ? this.contractsSource.getPTokenErc20Address(key)
+    return this.contractsSourceRO
+      ? this.contractsSourceRO.getPTokenErc20Address(key)
       : null;
   }
 
@@ -568,8 +584,8 @@ export class FulcrumProvider {
     let result: string | null = null;
 
     const assetDetails = AssetsDictionary.assets.get(asset);
-    if (this.web3ProviderSettings && assetDetails) {
-      result = assetDetails.addressErc20.get(this.web3ProviderSettings.networkId) || "";
+    if (this.web3roProviderSettings && assetDetails) {
+      result = assetDetails.addressErc20.get(this.web3roProviderSettings.networkId) || "";
     }
     return result;
   }
@@ -622,8 +638,8 @@ export class FulcrumProvider {
     let result: BigNumber = new BigNumber(0);
     const srcAssetErc20Address = this.getErc20Address(srcAsset);
     const destAssetErc20Address = this.getErc20Address(destAsset);
-    if (this.contractsSource && srcAssetErc20Address && destAssetErc20Address) {
-      const referencePriceFeedContract = this.contractsSource.getReferencePriceFeedContract();
+    if (this.contractsSourceRO && srcAssetErc20Address && destAssetErc20Address) {
+      const referencePriceFeedContract = this.contractsSourceRO.getReferencePriceFeedContract();
       const swapPriceData: BigNumber[] = await referencePriceFeedContract.getSwapPrice.callAsync(
         srcAssetErc20Address,
         destAssetErc20Address,
@@ -1056,11 +1072,11 @@ export class FulcrumProvider {
 
     return new Promise((resolve, reject) => {
       try {
-        if (!this.web3) {
+        if (!this.web3ro) {
           throw new Error("web3 is not available");
         }
 
-        this.waitForTransactionMinedRecursive(txHash, this.web3, request, resolve, reject);
+        this.waitForTransactionMinedRecursive(txHash, this.web3ro, request, resolve, reject);
       } catch (e) {
         throw e;
       }

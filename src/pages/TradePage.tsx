@@ -58,13 +58,30 @@ export class TradePage extends Component<ITradePageProps, ITradePageState> {
       tradeTokenKey: TradeTokenKey.empty()
     };
 
+    FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderAvailableRO, this.onProviderAvailableRO);
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
+  }
+
+  public componentWillUnmount(): void {
+    FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderAvailableRO, this.onProviderAvailableRO);
+    FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
   public componentDidMount(): void {
     if (!FulcrumProvider.Instance.web3) {
       this.props.doNetworkConnect();
     }
+  }
+
+  public componentDidUpdate(prevProps: Readonly<ITradePageProps>, prevState: Readonly<ITradePageState>, snapshot?: any): void {
+    if (prevState.selectedKey !== this.state.selectedKey) {
+      this.derivedUpdate();
+    }
+  }
+
+  private async derivedUpdate() {
+    const priceGraphData = await FulcrumProvider.Instance.getPriceDataPoints(this.state.selectedKey);
+    this.setState({ ...this.state, selectedKey: this.state.selectedKey, priceGraphData: priceGraphData });
   }
 
   public render() {
@@ -130,8 +147,7 @@ export class TradePage extends Component<ITradePageProps, ITradePageState> {
   }
 
   public onSelect = async (key: TradeTokenKey) => {
-    const priceGraphData = await FulcrumProvider.Instance.getPriceDataPoints(key);
-    this.setState({ ...this.state, selectedKey: key, priceGraphData: priceGraphData });
+    this.setState({ ...this.state, selectedKey: key });
   };
 
   public onDetails = async (key: TradeTokenKey) => {
@@ -142,9 +158,12 @@ export class TradePage extends Component<ITradePageProps, ITradePageState> {
     this.setState({ ...this.state, isTokenAddressFormOpen: false });
   };
 
+  private onProviderAvailableRO = async () => {
+    await this.derivedUpdate();
+  };
+
   private onProviderChanged = async (event: ProviderChangedEvent) => {
-    const priceGraphData = await FulcrumProvider.Instance.getPriceDataPoints(this.state.selectedKey);
-    this.setState({ ...this.state, selectedKey: this.state.selectedKey, priceGraphData: priceGraphData });
+    await this.derivedUpdate();
   };
 
   public onTradeRequested = (request: TradeRequest) => {
