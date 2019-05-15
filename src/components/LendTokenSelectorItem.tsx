@@ -87,10 +87,12 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
       return null;
     }
 
+    const noProfitInfoImageCss = this.state.profit === null ? "token-selector-item__image--full-width" : "";
+
     return (
       <div className="token-selector-item">
         <div>
-          <div className="token-selector-item__image">
+          <div className={`token-selector-item__image ${noProfitInfoImageCss}`}>
             <img src={this.state.assetDetails.logoSvg} alt={this.state.assetDetails.displayName} />
           </div>
           {this.state.profit !== null ? (

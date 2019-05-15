@@ -1,5 +1,5 @@
 .lend-token-selector {
-  text-align: center;
+
 }
 
 .token-selector-item {
@@ -21,6 +21,12 @@
   width: 50%;
   margin-top: 0.75rem;
   margin-bottom: 1rem;
+  text-align: left;
+
+  &--full-width {
+    width: 100%;
+    text-align: center;
+  }
 
   img {
     display: inline-block;
