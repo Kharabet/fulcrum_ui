@@ -106,15 +106,15 @@
     ethers "~4.0.4"
     lodash "^4.17.11"
 
-"@alch/alchemy-web3@0.0.5":
-  version "0.0.5"
-  resolved "https://registry.yarnpkg.com/@alch/alchemy-web3/-/alchemy-web3-0.0.5.tgz#2f44d12ac834d87453d0397cb096164d920b5594"
-  integrity sha512-jNSeH2BrXoQEeRIdyLDYtqSxyHerUHaKyctUm+z+Q0CGWLlXDfBAITNpsnQOeudZtJJQcyE7LOWT0BvTRuTsdg==
+"@alch/alchemy-web3@^0.0.6":
+  version "0.0.6"
+  resolved "https://registry.yarnpkg.com/@alch/alchemy-web3/-/alchemy-web3-0.0.6.tgz#f505427497841988aa957fb4148c72180cf90b9a"
+  integrity sha512-4kzDOmKa0O62U7zFh6o5LP4xNDUgQ1GaGS6S90iNOwj6AmVEoSXT535WlqQEZql78vrHWmoJFBUWymTecL9nlw==
   dependencies:
     "@types/web3" "^1.0.18"
     fetch-ponyfill "^6.0.2"
-    web3 "^1.0.0-beta.52"
-    web3-providers "^1.0.0-beta.52"
+    web3 "^1.0.0-beta.55"
+    web3-providers "^1.0.0-beta.55"
 
 "@babel/code-frame@7.0.0", "@babel/code-frame@^7.0.0", "@babel/code-frame@^7.0.0-beta.35":
   version "7.0.0"
@@ -8531,10 +8531,15 @@ nan@2.10.0:
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.10.0.tgz#96d0cd610ebd58d4b4de9cc0c6828cda99c7548f"
   integrity sha512-bAdJv7fBLhWC+/Bls0Oza+mvTaNQtP+1RyhhhvD95pgUJz6XM5IzgmxOkItJ9tkoCiplvAnXI1tNmmUD/eScyA==
 
-nan@>=2.12.1, nan@^2.0.8, nan@^2.11.0, nan@^2.2.1:
+nan@>=2.12.1, nan@^2.2.1:
   version "2.13.2"
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.13.2.tgz#f51dc7ae66ba7d5d55e1e6d4d8092e802c9aefe7"
   integrity sha512-TghvYc72wlMGMVMluVo9WRJc0mB8KxxF/gZ4YYFy7V2ZQX9l7rgbPg7vjS9mt6U5HXODVFVI2bOduCzwOMv/lw==
+
+nan@^2.0.8, nan@^2.11.0:
+  version "2.14.0"
+  resolved "https://registry.yarnpkg.com/nan/-/nan-2.14.0.tgz#7818f722027b2459a86f0295d434d1fc2336c52c"
+  integrity sha512-INOFj37C7k3AfaNTtX8RhsTw7qRy7eLET14cROi9+5HAVbbHuIWUHEauBv5qT4Av2tWasiTY1Jw6puUNqRJXQg==
 
 nan@^2.10.0, nan@^2.9.2:
   version "2.12.1"
@@ -12906,7 +12911,7 @@ web3-provider-engine@^14.1.0:
     xhr "^2.2.0"
     xtend "^4.0.1"
 
-web3-providers@1.0.0-beta.55, web3-providers@^1.0.0-beta.52:
+web3-providers@1.0.0-beta.55, web3-providers@^1.0.0-beta.55:
   version "1.0.0-beta.55"
   resolved "https://registry.yarnpkg.com/web3-providers/-/web3-providers-1.0.0-beta.55.tgz#639503517741b69baaa82f1f940630df6a25992b"
   integrity sha512-MNifc7W+iF6rykpbDR1MuX152jshWdZXHAU9Dk0Ja2/23elhIs4nCWs7wOX9FHrKgdrQbscPoq0uy+0aGzyWVQ==
@@ -12953,7 +12958,7 @@ web3-utils@1.0.0-beta.55:
     randombytes "^2.1.0"
     utf8 "2.1.1"
 
-web3@^1.0.0-beta.52:
+web3@^1.0.0-beta.55:
   version "1.0.0-beta.55"
   resolved "https://registry.yarnpkg.com/web3/-/web3-1.0.0-beta.55.tgz#8845075129299da172c2eb41a748c8a87c2a2b5a"
   integrity sha512-yJpwy4IUA3T/F9hWzYQVn0GbJCrAaZ0KTIO3iuqkhaYH0Y09KV7k4GzFi4hN7hT4cFTj4yIKaeVCwQ5kzvi2Vg==
