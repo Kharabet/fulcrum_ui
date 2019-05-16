@@ -34,7 +34,7 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
 
     this.state = { assetDetails: assetDetails || null, interestRate: interestRate, profit: profit, balance: balance };
 
-    FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderAvailableRO, this.onProviderAvailableRO);
+    FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.LendTransactionMined, this.onLendTransactionMined);
   }
@@ -48,7 +48,7 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
     this.setState({ ...this.state, assetDetails: assetDetails || null, interestRate: interestRate, profit: profit, balance: balance });
   }
 
-  private onProviderAvailableRO = async () => {
+  private onProviderAvailable = async () => {
     await this.derivedUpdate();
   };
 
@@ -63,7 +63,7 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
   };
 
   public componentWillUnmount(): void {
-    FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderAvailableRO, this.onProviderAvailableRO);
+    FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.LendTransactionMined, this.onLendTransactionMined);
   }

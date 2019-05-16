@@ -58,12 +58,12 @@ export class TradePage extends Component<ITradePageProps, ITradePageState> {
       tradeTokenKey: TradeTokenKey.empty()
     };
 
-    FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderAvailableRO, this.onProviderAvailableRO);
+    FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
   public componentWillUnmount(): void {
-    FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderAvailableRO, this.onProviderAvailableRO);
+    FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
@@ -158,7 +158,7 @@ export class TradePage extends Component<ITradePageProps, ITradePageState> {
     this.setState({ ...this.state, isTokenAddressFormOpen: false });
   };
 
-  private onProviderAvailableRO = async () => {
+  private onProviderAvailable = async () => {
     await this.derivedUpdate();
   };
 
@@ -167,7 +167,7 @@ export class TradePage extends Component<ITradePageProps, ITradePageState> {
   };
 
   public onTradeRequested = (request: TradeRequest) => {
-    if (!FulcrumProvider.Instance.web3) {
+    if (!FulcrumProvider.Instance.contractsSource || !FulcrumProvider.Instance.contractsSource.canWrite) {
       this.props.doNetworkConnect();
       return;
     }

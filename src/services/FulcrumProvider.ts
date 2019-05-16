@@ -2,8 +2,7 @@ import { BigNumber } from "@0x/utils";
 import { EventEmitter } from "events";
 import moment from "moment";
 import fetch from "node-fetch";
-import Web3 from "web3";
-import { TransactionReceipt } from "web3/types";
+import { AlchemyWeb3 } from "@alch/alchemy-web3";
 import { erc20Contract } from "../contracts/erc20";
 import { iTokenContract } from "../contracts/iTokenContract";
 import { pTokenContract } from "../contracts/pTokenContract";
@@ -58,13 +57,9 @@ export class FulcrumProvider {
 
   public readonly eventEmitter: EventEmitter;
   public providerType: ProviderType = ProviderType.None;
-  public web3: Web3 | null = null;
+  public web3: AlchemyWeb3 | null = null;
   public web3ProviderSettings: IWeb3ProviderSettings | null = null;
   public contractsSource: ContractsSource | null = null;
-
-  public web3ro: Web3 | null = null;
-  public web3roProviderSettings: IWeb3ProviderSettings | null = null;
-  public contractsSourceRO: ContractsSource | null = null;
 
   constructor() {
     // init
@@ -73,15 +68,15 @@ export class FulcrumProvider {
     TasksQueue.Instance.on(TasksQueueEvents.Enqueued, this.onTaskEnqueued);
 
     // setting up readonly provider
-    Web3ConnectionFactory.getWeb3Connection(ProviderType.Alchemy).then((web3ro) => {
-      FulcrumProvider.getWeb3ProviderSettings(web3ro).then((web3roProviderSettings) => {
-        if (web3ro && web3roProviderSettings) {
-          const contractsSourceRO = new ContractsSource(web3ro.currentProvider, web3roProviderSettings.networkId);
-          contractsSourceRO.Init().then(() => {
-            this.web3ro = web3ro;
-            this.web3roProviderSettings = web3roProviderSettings;
-            this.contractsSourceRO = contractsSourceRO;
-            this.eventEmitter.emit(FulcrumProviderEvents.ProviderAvailableRO);
+    Web3ConnectionFactory.getWeb3Connection(null).then((web3) => {
+      FulcrumProvider.getWeb3ProviderSettings(web3).then((web3ProviderSettings) => {
+        if (web3 && web3ProviderSettings) {
+          const contractsSource = new ContractsSource(web3.givenProvider, web3ProviderSettings.networkId, false);
+          contractsSource.Init().then(() => {
+            this.web3 = web3;
+            this.web3ProviderSettings = web3ProviderSettings;
+            this.contractsSource = contractsSource;
+            this.eventEmitter.emit(FulcrumProviderEvents.ProviderAvailable);
           });
         }
       });
@@ -121,7 +116,7 @@ export class FulcrumProvider {
 
     this.contractsSource =
       this.web3 && this.web3ProviderSettings
-        ? new ContractsSource(this.web3.currentProvider, this.web3ProviderSettings.networkId)
+        ? new ContractsSource(this.web3.givenProvider, this.web3ProviderSettings.networkId, this.providerType !== ProviderType.None)
         : null;
     if (this.contractsSource) {
       await this.contractsSource.Init();
@@ -131,7 +126,7 @@ export class FulcrumProvider {
       // MetaMask-only code
       if (this.providerType === ProviderType.MetaMask) {
         // @ts-ignore
-        this.web3.currentProvider.publicConfigStore.on("update", result =>
+        this.web3.givenProvider.publicConfigStore.on("update", result =>
           this.eventEmitter.emit(
             FulcrumProviderEvents.ProviderChanged,
             new ProviderChangedEvent(this.providerType, this.web3)
@@ -159,8 +154,8 @@ export class FulcrumProvider {
 
   public getLendTokenInterestRate = async (asset: Asset): Promise<BigNumber> => {
     let result = new BigNumber(0);
-    if (this.contractsSourceRO) {
-      const assetContract = this.contractsSourceRO.getITokenContract(asset);
+    if (this.contractsSource) {
+      const assetContract = this.contractsSource.getITokenContract(asset);
       if (assetContract) {
         result = await assetContract.supplyInterestRate.callAsync();
         result = result.dividedBy(10 ** 18);
@@ -174,9 +169,9 @@ export class FulcrumProvider {
     let priceDataObj: IPriceDataPoint[] = [];
     // localStorage.removeItem(`priceData${selectedKey.asset}`);
 
-    if (this.web3ro) {
+    if (this.web3) {
       let queriedBlocks = 0;
-      const currentBlock = await this.web3ro.eth.getBlockNumber();
+      const currentBlock = await this.web3.eth.getBlockNumber();
       const earliestBlock = currentBlock-17280; // ~5760 blocks per day
       let fetchFromBlock = earliestBlock;
       const nearestHour = new Date().setMinutes(0,0,0)/1000;
@@ -294,8 +289,8 @@ export class FulcrumProvider {
   public getPriceLatestDataPoint = async (selectedKey: TradeTokenKey): Promise<IPriceDataPoint> => {
     const result = this.getPriceDefaultDataPoint();
     // we are using this function only for trade prices
-    if (this.contractsSourceRO) {
-      const assetContract = this.contractsSourceRO.getPTokenContract(selectedKey);
+    if (this.contractsSource) {
+      const assetContract = this.contractsSource.getPTokenContract(selectedKey);
       if (assetContract) {
         const tokenPrice = await assetContract.tokenPrice.callAsync();
         const liquidationPrice = await assetContract.liquidationPrice.callAsync();
@@ -326,12 +321,12 @@ export class FulcrumProvider {
     let result: BigNumber | null = null;
     let account: string | null = null;
 
-    if (this.web3) {
+    if (this.web3 && this.contractsSource && this.contractsSource.canWrite) {
       const accounts = await this.web3.eth.getAccounts();
       account = accounts ? accounts[0].toLowerCase() : null;
     }
 
-    if (account && this.contractsSource) {
+    if (account && this.contractsSource && this.contractsSource.canWrite) {
       const balance = await this.getLendTokenBalance(asset);
       if (balance.gt(0)) {
         result = new BigNumber(0);
@@ -357,12 +352,12 @@ export class FulcrumProvider {
     let result: BigNumber | null = null;
     let account: string | null = null;
 
-    if (this.web3) {
+    if (this.web3 && this.contractsSource && this.contractsSource.canWrite) {
       const accounts = await this.web3.eth.getAccounts();
       account = accounts ? accounts[0].toLowerCase() : null;
     }
 
-    if (account && this.contractsSource) {
+    if (account && this.contractsSource && this.contractsSource.canWrite) {
       const balance = await this.getTradeTokenBalance(selectedKey);
       if (balance.gt(0)) {
         result = new BigNumber(0);
@@ -440,13 +435,13 @@ export class FulcrumProvider {
   public getTradedAmountEstimate = async (request: TradeRequest): Promise<BigNumber> => {
     let result = new BigNumber(0);
 
-    if (this.contractsSourceRO) {
+    if (this.contractsSource) {
       const key = new TradeTokenKey(
         request.asset,
         request.positionType,
         request.leverage
       );
-      const assetContract = this.contractsSourceRO.getPTokenContract(key);
+      const assetContract = this.contractsSource.getPTokenContract(key);
       if (assetContract) {
         const tokenPrice = await assetContract.tokenPrice.callAsync();
         let amount = request.amount;
@@ -471,8 +466,8 @@ export class FulcrumProvider {
   public getLendedAmountEstimate = async (request: LendRequest): Promise<BigNumber> => {
     let result = new BigNumber(0);
 
-    if (this.contractsSourceRO) {
-      const assetContract = this.contractsSourceRO.getITokenContract(request.asset);
+    if (this.contractsSource) {
+      const assetContract = this.contractsSource.getITokenContract(request.asset);
       if (assetContract) {
         const tokenPrice = await assetContract.tokenPrice.callAsync();
 
@@ -486,7 +481,7 @@ export class FulcrumProvider {
     return result;
   };
 
-  public static async getWeb3ProviderSettings(web3: Web3 | null): Promise<IWeb3ProviderSettings | null> {
+  public static async getWeb3ProviderSettings(web3: AlchemyWeb3 | null): Promise<IWeb3ProviderSettings | null> {
     if (web3) {
       const networkId = await web3.eth.net.getId();
       // tslint:disable-next-line:one-variable-per-declaration
@@ -569,14 +564,14 @@ export class FulcrumProvider {
   }
 
   public getPTokensAvailable(): TradeTokenKey[] {
-    return this.contractsSourceRO
-        ? this.contractsSourceRO.getPTokensAvailable()
+    return this.contractsSource
+        ? this.contractsSource.getPTokensAvailable()
         : [];
   }
 
   public getPTokenErc20Address(key: TradeTokenKey): string | null {
-    return this.contractsSourceRO
-      ? this.contractsSourceRO.getPTokenErc20Address(key)
+    return this.contractsSource
+      ? this.contractsSource.getPTokenErc20Address(key)
       : null;
   }
 
@@ -584,8 +579,8 @@ export class FulcrumProvider {
     let result: string | null = null;
 
     const assetDetails = AssetsDictionary.assets.get(asset);
-    if (this.web3roProviderSettings && assetDetails) {
-      result = assetDetails.addressErc20.get(this.web3roProviderSettings.networkId) || "";
+    if (this.web3ProviderSettings && assetDetails) {
+      result = assetDetails.addressErc20.get(this.web3ProviderSettings.networkId) || "";
     }
     return result;
   }
@@ -593,7 +588,7 @@ export class FulcrumProvider {
   private async getEthBalance(): Promise<BigNumber> {
     let result: BigNumber = new BigNumber(0);
 
-    if (this.web3) {
+    if (this.web3 && this.contractsSource && this.contractsSource.canWrite) {
       const accounts = await this.web3.eth.getAccounts();
       const account = accounts ? accounts[0].toLowerCase() : null;
       if (account) {
@@ -608,7 +603,7 @@ export class FulcrumProvider {
   private async getErc20Balance(addressErc20: string): Promise<BigNumber> {
     let result = new BigNumber(0);
 
-    if (this.web3 && this.contractsSource) {
+    if (this.web3 && this.contractsSource && this.contractsSource.canWrite) {
       const accounts = await this.web3.eth.getAccounts();
       const account = accounts ? accounts[0].toLowerCase() : null;
 
@@ -638,8 +633,8 @@ export class FulcrumProvider {
     let result: BigNumber = new BigNumber(0);
     const srcAssetErc20Address = this.getErc20Address(srcAsset);
     const destAssetErc20Address = this.getErc20Address(destAsset);
-    if (this.contractsSourceRO && srcAssetErc20Address && destAssetErc20Address) {
-      const referencePriceFeedContract = this.contractsSourceRO.getReferencePriceFeedContract();
+    if (this.contractsSource && srcAssetErc20Address && destAssetErc20Address) {
+      const referencePriceFeedContract = this.contractsSource.getReferencePriceFeedContract();
       const swapPriceData: BigNumber[] = await referencePriceFeedContract.getSwapPrice.callAsync(
         srcAssetErc20Address,
         destAssetErc20Address,
@@ -733,7 +728,7 @@ export class FulcrumProvider {
 
   private processLendRequestTask = async (task: RequestTask, skipGas: boolean) => {
     try {
-      if (!(this.web3 && this.contractsSource)) {
+      if (!(this.web3 && this.contractsSource && this.contractsSource.canWrite)) {
         throw new Error("No provider available!");
       }
 
@@ -890,7 +885,7 @@ export class FulcrumProvider {
 
   private processTradeRequestTask = async (task: RequestTask, skipGas: boolean) => {
     try {
-      if (!(this.web3 && this.contractsSource)) {
+      if (!(this.web3 && this.contractsSource && this.contractsSource.canWrite)) {
         throw new Error("No provider available!");
       }
 
@@ -1068,15 +1063,15 @@ export class FulcrumProvider {
 
   private waitForTransactionMined = async (
     txHash: string, 
-    request: LendRequest | TradeRequest): Promise<TransactionReceipt> => {
+    request: LendRequest | TradeRequest): Promise<any> => {
 
     return new Promise((resolve, reject) => {
       try {
-        if (!this.web3ro) {
+        if (!this.web3) {
           throw new Error("web3 is not available");
         }
 
-        this.waitForTransactionMinedRecursive(txHash, this.web3ro, request, resolve, reject);
+        this.waitForTransactionMinedRecursive(txHash, this.web3, request, resolve, reject);
       } catch (e) {
         throw e;
       }
@@ -1085,13 +1080,13 @@ export class FulcrumProvider {
 
   private waitForTransactionMinedRecursive = async (
     txHash: string,
-    web3: Web3,
+    web3: AlchemyWeb3,
     request: LendRequest | TradeRequest,
     resolve: (value: any) => void,
     reject: (value: any) => void) => {
 
     try {
-      web3.eth.getTransactionReceipt(txHash, (error: Error, receipt: TransactionReceipt) => {
+      web3.eth.getTransactionReceipt(txHash, (error: Error, receipt: any) => {
         if (error) {
           throw error;
         }

@@ -5,6 +5,7 @@
   "keywords": [],
   "author": "",
   "license": "Apache-2.0",
+  "homepage": ".",
   "repository": {
     "type": "git",
     "url": "https://github.com/bZxNetwork/fulcrum.git"
@@ -16,6 +17,7 @@
   "dependencies": {
     "@0x/base-contract": "^5.0.5",
     "@0x/utils": "^4.3.1",
+    "@alch/alchemy-web3": "0.0.5",
     "@portis/web3": "^2.0.0-beta.26",
     "bitski": "^0.5.5",
     "events": "^3.0.0",
@@ -29,8 +31,7 @@
     "react-router": "^4.3.1",
     "react-router-dom": "^4.3.1",
     "react-tippy": "^1.2.3",
-    "recharts": "^1.5.0",
-    "web3": "1.0.0-beta.36"
+    "recharts": "^1.5.0"
   },
   "devDependencies": {
     "@0x/abi-gen": "^2.0.9",

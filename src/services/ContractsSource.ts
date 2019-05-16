@@ -1,6 +1,5 @@
 import { BigNumber } from "@0x/utils";
 import * as _ from "lodash";
-import { Provider } from "web3/providers";
 import { Asset } from "../domain/Asset";
 import { TradeTokenKey } from "../domain/TradeTokenKey";
 
@@ -26,16 +25,19 @@ interface ITokenContractInfo {
 }
 
 export class ContractsSource {
-  private readonly provider: Provider;
+  private readonly provider: any;
   private readonly tokenizedRegistryContract: TokenizedRegistryContract;
   private readonly networkId: number;
 
   private iTokensContractInfos: Map<string, ITokenContractInfo> = new Map<string, ITokenContractInfo>();
   private pTokensContractInfos: Map<string, ITokenContractInfo> = new Map<string, ITokenContractInfo>();
 
-  public constructor(provider: Provider, networkId: number) {
+  public canWrite: boolean;
+
+  public constructor(provider: any, networkId: number, canWrite: boolean) {
     this.provider = provider;
     this.networkId = networkId;
+    this.canWrite = canWrite;
     this.tokenizedRegistryContract = new TokenizedRegistryContract(
       TokenizedRegistryJson.abi,
       this.getTokenizedRegistryAddress().toLowerCase(),

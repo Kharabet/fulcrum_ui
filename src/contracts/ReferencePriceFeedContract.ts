@@ -12,7 +12,6 @@ import {
   SupportedProvider
 } from "ethereum-types";
 import { BigNumber, classUtils } from "@0x/utils";
-import { Provider } from "web3/providers";
 // tslint:enable:no-unused-variable
 
 export type ReferencePriceFeedEventArgs = ReferencePriceFeedOwnershipTransferredEventArgs;
@@ -576,7 +575,7 @@ export class ReferencePriceFeedContract extends BaseContract {
       return result;
     }
   };
-  constructor(abi: ContractAbi, address: string, provider: Provider, txDefaults?: Partial<TxData>) {
+  constructor(abi: ContractAbi, address: string, provider: any, txDefaults?: Partial<TxData>) {
     super("ReferencePriceFeed", abi, address.toLowerCase(), provider as SupportedProvider, txDefaults);
     classUtils.bindAll(this, ["_abiEncoderByFunctionSignature", "address", "abi", "_web3Wrapper"]);
   }

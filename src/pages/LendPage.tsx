@@ -59,7 +59,7 @@ export class LendPage extends Component<ILendPageProps, ILendPageState> {
   }
 
   public onLendRequested = (request: LendRequest) => {
-    if (!FulcrumProvider.Instance.web3) {
+    if (!FulcrumProvider.Instance.contractsSource || !FulcrumProvider.Instance.contractsSource.canWrite) {
       this.props.doNetworkConnect();
       return;
     }
@@ -75,11 +75,11 @@ export class LendPage extends Component<ILendPageProps, ILendPageState> {
   };
 
   public onLendConfirmed = (request: LendRequest) => {
-    FulcrumProvider.Instance.onLendConfirmed(request);
     this.setState({ 
       ...this.state,
       isLendModalOpen: false,
     });
+    FulcrumProvider.Instance.onLendConfirmed(request);
   };
 
   public onRequestClose = () => {

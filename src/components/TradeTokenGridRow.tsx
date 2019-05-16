@@ -50,7 +50,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
       balance: new BigNumber(0)
     };
 
-    FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderAvailableRO, this.onProviderAvailableRO);
+    FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.TradeTransactionMined, this.onTradeTransactionMined);
   }
@@ -77,7 +77,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
     });
   }
 
-  private onProviderAvailableRO = async () => {
+  private onProviderAvailable = async () => {
     await this.derivedUpdate();
   };
 
@@ -92,7 +92,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
   };
 
   public componentWillUnmount(): void {
-    FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderAvailableRO, this.onProviderAvailableRO);
+    FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.TradeTransactionMined, this.onTradeTransactionMined);
   }

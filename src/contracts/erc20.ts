@@ -4,7 +4,6 @@
 import { BaseContract } from "@0x/base-contract";
 import { BlockParam, CallData, ContractAbi, DecodedLogArgs, TxData, TxDataPayable, SupportedProvider } from "ethereum-types";
 import { BigNumber, classUtils } from "@0x/utils";
-import { Provider } from "web3/providers";
 // tslint:enable:no-unused-variable
 
 export type erc20EventArgs = erc20ApprovalEventArgs | erc20TransferEventArgs;
@@ -358,7 +357,7 @@ export class erc20Contract extends BaseContract {
       return result;
     }
   };
-  constructor(abi: ContractAbi, address: string, provider: Provider, txDefaults?: Partial<TxData>) {
+  constructor(abi: ContractAbi, address: string, provider: any, txDefaults?: Partial<TxData>) {
     super("erc20", abi, address.toLowerCase(), provider as SupportedProvider, txDefaults);
     classUtils.bindAll(this, ["_abiEncoderByFunctionSignature", "address", "abi", "_web3Wrapper"]);
   }

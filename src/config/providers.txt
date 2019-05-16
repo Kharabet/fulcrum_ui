@@ -1,5 +1,5 @@
 Alchemy:
-const url = "https://eth-kovan.alchemyapi.io/jsonrpc/"+Alchemy_ApiKey;
+const url = "https://eth-ropsten.alchemyapi.io/jsonrpc/"+Alchemy_ApiKey;
 
 // Using web3js
 const web3 =
@@ -17,7 +17,7 @@ import Portis from '@portis/web3';
 import Web3 from 'web3';
 
 // ref: https://docs.portis.io/#/configuration
-const portis = new Portis('32537ad9-601e-4854-80a2-216dcea0fed6', 'kovan');
+const portis = new Portis('32537ad9-601e-4854-80a2-216dcea0fed6', 'ropsten');
 const web3 = new Web3(portis.provider);
 
 

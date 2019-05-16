@@ -4,7 +4,6 @@
 import { BaseContract } from "@0x/base-contract";
 import { BlockParam, CallData, ContractAbi, DecodedLogArgs, TxData, TxDataPayable, SupportedProvider } from "ethereum-types";
 import { BigNumber, classUtils } from "@0x/utils";
-import { Provider } from "web3/providers";
 // tslint:enable:no-unused-variable
 
 {{#if events}}
@@ -37,7 +36,7 @@ export class {{contractName}}Contract extends BaseContract {
     {{> tx contractName=../contractName}}
     {{/this.constant}}
 {{/each}}
-    constructor(abi: ContractAbi, address: string, provider: Provider, txDefaults?: Partial<TxData>) {
+    constructor(abi: ContractAbi, address: string, provider: any, txDefaults?: Partial<TxData>) {
         super('{{contractName}}', abi, address.toLowerCase(), provider as SupportedProvider, txDefaults);
         classUtils.bindAll(this, ['_abiEncoderByFunctionSignature', 'address', 'abi', '_web3Wrapper']);
     }

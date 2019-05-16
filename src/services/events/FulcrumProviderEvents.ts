@@ -1,5 +1,5 @@
 export enum FulcrumProviderEvents {
-  ProviderAvailableRO = "ProviderAvailableRO",
+  ProviderAvailable = "ProviderAvailable",
   ProviderChanged = "ProviderChanged",
   LendTransactionMined = "LendTransactionMined",
   TradeTransactionMined = "TradeTransactionMined"

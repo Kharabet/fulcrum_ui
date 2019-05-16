@@ -4,7 +4,6 @@
 import { BaseContract } from "@0x/base-contract";
 import { BlockParam, CallData, ContractAbi, DecodedLogArgs, TxData, SupportedProvider } from "ethereum-types";
 import { BigNumber, classUtils } from "@0x/utils";
-import { Provider } from "web3/providers";
 
 export type TokenizedRegistryEventArgs = TokenizedRegistryOwnershipTransferredEventArgs;
 
@@ -836,7 +835,7 @@ export class TokenizedRegistryContract extends BaseContract {
       return result;
     }
   };
-  constructor(abi: ContractAbi, address: string, provider: Provider, txDefaults?: Partial<TxData>) {
+  constructor(abi: ContractAbi, address: string, provider: any, txDefaults?: Partial<TxData>) {
     super("TokenizedRegistry", abi, address.toLowerCase(), provider as SupportedProvider, txDefaults);
     classUtils.bindAll(this, ["_abiEncoderByFunctionSignature", "address", "abi", "_web3Wrapper"]);
   }

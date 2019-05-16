@@ -42,7 +42,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
       profit: new BigNumber(0)
     };
 
-    FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderAvailableRO, this.onProviderAvailableRO);
+    FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
@@ -62,7 +62,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
     });
   }
 
-  private onProviderAvailableRO = async () => {
+  private onProviderAvailable = async () => {
     await this.derivedUpdate();
   };
 
@@ -71,7 +71,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
   };
 
   public componentWillUnmount(): void {
-    FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderAvailableRO, this.onProviderAvailableRO);
+    FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
