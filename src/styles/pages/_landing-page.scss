@@ -1,3 +1,5 @@
+$size-divider: 1.2;
+
 .html-landing-page-active {
   background-size: 1920px 1440px;
   background-repeat: no-repeat;
@@ -12,7 +14,7 @@
 }
 
 .landing-page {
-  min-width: 810px;
+  min-width: 810px/$size-divider;
   max-width: $page-max-width;
 
   margin-left: auto;
@@ -21,7 +23,7 @@
 }
 
 .landing-page__main {
-  margin-bottom: 8rem;
+  margin-bottom: 8rem/$size-divider;
 }
 
 .landing-page__jumbo {
@@ -29,16 +31,16 @@
   position: relative;
   left: 50%;
   transform: translateX(-50%);
-  width: 50.5rem;
+  width: 50.5rem/$size-divider;
   text-align: center;
 
   h1 {
-    margin-bottom: 5.75rem;
+    margin-bottom: 5.75rem/$size-divider;
   }
 }
 
 .landing-page__jumbo-header {
-  font-size: 6.75rem;
+  font-size: 6.75rem/$size-divider;
   font-weight: 300;
   font-style: normal;
   font-stretch: normal;
@@ -49,14 +51,14 @@
 
 .landing-page__jumbo-action {
   display: inline-block;
-  width: 16rem;
+  width: 16rem/$size-divider;
 
   &:first-child {
-    padding-right: 2rem;
+    padding-right: 2rem/$size-divider;
   }
 
   &:last-child {
-    padding-left: 2rem;
+    padding-left: 2rem/$size-divider;
   }
 }
 
@@ -65,11 +67,11 @@
 }
 
 .landing-page__jumbo-action-description {
-  font-size: 1.25rem;
+  font-size: 1.25rem/$size-divider;
   font-weight: 600;
   font-style: normal;
   font-stretch: normal;
-  line-height: 1.5;
+  line-height: 1.5/$size-divider;
   letter-spacing: -0.2px;
   text-align: center;
   color: #ffffff;
@@ -78,10 +80,10 @@
 .landing-page__jumbo-action-button {
   display: inline-block;
   position: relative;
-  line-height: 4.5rem;
-  height: 4.5rem;
-  width: 12.5rem;
-  margin-bottom: 2rem;
+  line-height: 4.5rem/$size-divider;
+  height: 4.5rem/$size-divider;
+  width: 12.5rem/$size-divider;
+  margin-bottom: 2rem/$size-divider;
 
   border-width: 0;
   border-radius: 100px;
@@ -99,7 +101,7 @@
     background: linear-gradient(to right, #00b4af, #2c69b2);
   }
 
-  font-size: 1rem;
+  font-size: 1rem/$size-divider;
   font-weight: 600;
   font-style: normal;
   font-stretch: normal;
