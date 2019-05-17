@@ -125,6 +125,8 @@ export class TradePage extends Component<ITradePageProps, ITradePageState> {
               positionType={this.state.tradePositionType}
               leverage={this.state.tradeLeverage}
               defaultCollateral={this.state.collateralToken}
+              defaultUnitOfAccount={Asset.DAI}
+              defaultTokenizeNeeded={true}
               onSubmit={this.onTradeConfirmed}
               onCancel={this.onRequestClose}
             />

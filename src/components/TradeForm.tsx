@@ -13,9 +13,11 @@ import { TradeType } from "../domain/TradeType";
 import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
+import { CheckBox } from "./CheckBox";
 import { CollapsibleContainer } from "./CollapsibleContainer";
 import { CollateralTokenSelector } from "./CollateralTokenSelector";
 import { PositionTypeMarker } from "./PositionTypeMarker";
+import { UnitOfAccountSelector } from "./UnitOfAccountSelector";
 
 export interface ITradeFormProps {
   tradeType: TradeType;
@@ -23,6 +25,8 @@ export interface ITradeFormProps {
   positionType: PositionType;
   leverage: number;
   defaultCollateral: Asset;
+  defaultUnitOfAccount: Asset;
+  defaultTokenizeNeeded: boolean;
 
   onSubmit: (request: TradeRequest) => void;
   onCancel: () => void;
@@ -31,6 +35,8 @@ export interface ITradeFormProps {
 interface ITradeFormState {
   assetDetails: AssetDetails | null;
   collateral: Asset;
+  unitOfAccount: Asset;
+  tokenizeNeeded: boolean;
   latestPriceDataPoint: IPriceDataPoint;
 
   isTradeAmountTouched: boolean;
@@ -58,6 +64,8 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     this.state = {
       assetDetails: assetDetails || null,
       collateral: props.defaultCollateral,
+      unitOfAccount: props.defaultUnitOfAccount,
+      tokenizeNeeded: props.defaultTokenizeNeeded,
       isTradeAmountTouched: false,
       tradeAmountText: maxTradeValue.toFixed(),
       tradeAmount: maxTradeValue,
@@ -259,7 +267,17 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
             </div>
 
             <CollapsibleContainer title="Advanced">
-              Options
+              <div className="trade-form__kv-container">
+                <div className="trade-form__label trade-form__label--no-bg">
+                  Unit of Account &nbsp;
+                  <UnitOfAccountSelector items={[Asset.USDC, Asset.DAI]} value={this.state.unitOfAccount} onChange={this.onChangeUnitOfAccount} />
+                </div>
+              </div>
+              <div className="trade-form__kv-container">
+                <div className="trade-form__label trade-form__label--no-bg">
+                  <CheckBox checked={this.state.tokenizeNeeded} onChange={this.onChangeTokenizeNeeded}>Tokenize it &nbsp;</CheckBox>
+                </div>
+              </div>
             </CollapsibleContainer>
           </div>
 
@@ -363,6 +381,14 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
 
   public onChangeCollateralClicked = async (asset: Asset) => {
     this.setState({ ...this.state, isChangeCollateralOpen: false, collateral: asset });
+  };
+
+  public onChangeUnitOfAccount = async (asset: Asset) => {
+    this.setState({ ...this.state, unitOfAccount: asset });
+  };
+
+  public onChangeTokenizeNeeded = async (event: ChangeEvent<HTMLInputElement>) => {
+    this.setState({ ...this.state, tokenizeNeeded: event.target.checked });
   };
 
   public onSubmitClick = (event: FormEvent<HTMLFormElement>) => {

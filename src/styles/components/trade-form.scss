@@ -98,6 +98,10 @@
   letter-spacing: normal;
   color: #a9b5c7;
   background-color: #444e5a;
+
+  &--no-bg {
+    background-color: transparent;
+  }
 }
 
 .trade-form__label--action {
@@ -127,6 +131,10 @@
 
   &--no-color {
     color: #a9b5c7;
+  }
+
+  &--no-bg {
+    background-color: transparent;
   }
 }
 
