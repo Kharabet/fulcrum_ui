@@ -9,6 +9,7 @@ import knc_logo from "../assets/images/ic_token_knc.svg";
 import mkr_logo from "../assets/images/ic_token_mkr.svg";
 import rep_logo from "../assets/images/ic_token_rep.svg";
 import zrx_logo from "../assets/images/ic_token_zrx.svg";
+import usdc_logo from "../assets/images/ic_token_usdc.svg";
 
 import bat_bg from "../assets/images/popup_left_token_bat.svg";
 import btc_bg from "../assets/images/popup_left_token_btc.svg";
@@ -18,6 +19,7 @@ import knc_bg from "../assets/images/popup_left_token_knc.svg";
 import mkr_bg from "../assets/images/popup_left_token_mkr.svg";
 import rep_bg from "../assets/images/popup_left_token_rep.svg";
 import zrx_bg from "../assets/images/popup_left_token_zrx.svg";
+import usdc_bg from "../assets/images/popup_left_token_usdc.svg";
 
 export class AssetsDictionary {
   public static assets: Map<Asset, AssetDetails> = new Map<Asset, AssetDetails>([
@@ -57,6 +59,19 @@ export class AssetsDictionary {
         new Map<number, string | null>([
           [1, "0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359"],
           [3, "0xad6d458402f60fd3bd25163575031acdce07538d"]
+        ])
+      )
+    ],
+    [
+      Asset.USDC,
+      new AssetDetails(
+        "USDC",
+        usdc_logo,
+        usdc_bg,
+        "#00000000",
+        new Map<number, string | null>([
+          [1, "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"],
+          [3, "0xa577731515303f0c0d00e236041855a5c4f114dc"] // using POWR
         ])
       )
     ],
