@@ -8,6 +8,7 @@ import { iTokenContract } from "../contracts/iTokenContract";
 import { pTokenContract } from "../contracts/pTokenContract";
 import { Asset } from "../domain/Asset";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
+import { ReserveDetails } from "../domain/ReserveDetails";
 import { IPriceDataPoint } from "../domain/IPriceDataPoint";
 import { IWeb3ProviderSettings } from "../domain/IWeb3ProviderSettings";
 import { LendRequest } from "../domain/LendRequest";
@@ -314,6 +315,56 @@ export class FulcrumProvider {
       liquidationPrice: 0,
       change24h: 0
     };
+  };
+
+  public getReserveDetails = async (asset: Asset): Promise<ReserveDetails | null> => {
+    let result: ReserveDetails | null = null;
+
+    if (this.contractsSource) {
+      const assetContract = this.contractsSource.getITokenContract(asset);
+      if (assetContract) {
+
+        let symbol: string = "";
+        let name: string = "";
+        //let tokenPrice: BigNumber | null;
+        let marketLiquidity: BigNumber | null;
+        let liquidityReserved: BigNumber | null;
+        let totalAssetSupply: BigNumber | null;
+        let totalAssetBorrow: BigNumber | null;
+        let supplyInterestRate: BigNumber | null;
+        let borrowInterestRate: BigNumber | null;
+        let nextInterestRate: BigNumber | null;
+
+        await Promise.all([
+          (symbol = await assetContract.symbol.callAsync()),
+          //(name = await assetContract.name.callAsync()),
+          //(tokenPrice = await assetContract.tokenPrice.callAsync()),
+          (marketLiquidity = await assetContract.marketLiquidity.callAsync()),
+          (liquidityReserved = await assetContract.totalReservedSupply.callAsync()),
+          (totalAssetSupply = await assetContract.totalAssetSupply.callAsync()),
+          (totalAssetBorrow = await assetContract.totalAssetBorrow.callAsync()),
+          (supplyInterestRate = await assetContract.supplyInterestRate.callAsync()),
+          (borrowInterestRate = await assetContract.borrowInterestRate.callAsync()),
+          (nextInterestRate = await assetContract.nextLoanInterestRate.callAsync(new BigNumber("0")))
+        ]);
+
+        result = new ReserveDetails(
+          assetContract.address,
+          symbol,
+          name,
+          null,//tokenPrice.dividedBy(10 ** 18),
+          marketLiquidity.dividedBy(10 ** 18),
+          liquidityReserved.dividedBy(10 ** 18),
+          totalAssetSupply.dividedBy(10 ** 18),
+          totalAssetBorrow.dividedBy(10 ** 18),
+          supplyInterestRate.dividedBy(10 ** 18),
+          borrowInterestRate.dividedBy(10 ** 18),
+          nextInterestRate.dividedBy(10 ** 18)
+        );
+      }
+    }
+
+    return result;
   };
 
   public getLendProfit = async (asset: Asset): Promise<BigNumber | null> => {

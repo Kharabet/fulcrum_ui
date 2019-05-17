@@ -10,8 +10,9 @@ export interface ILendTokenSelectorProps {
 export class LendTokenSelector extends Component<ILendTokenSelectorProps> {
   private readonly assets: Asset[] = [
     Asset.ETH,
-    Asset.wBTC,
     Asset.DAI,
+    Asset.USDC,
+    Asset.wBTC,
     Asset.MKR,
     Asset.ZRX,
     Asset.BAT,

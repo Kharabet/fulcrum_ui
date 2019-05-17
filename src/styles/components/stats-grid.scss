@@ -1,0 +1,186 @@
+$font-size-header: 0.75rem;
+$height-row: 4.5rem;
+
+$width-col-name: 6.5rem;
+$width-col-liquidity: 8rem;
+$width-col-liquidity-reserved: 8rem;
+$width-col-total-supply: 7.2rem;
+$width-col-total-borrow: 7.2rem;
+$width-col-supply-rate: 7.2rem;
+$width-col-borrow-rate: 7.2rem;
+$width-col-next-rate: 7.2rem;
+
+$margin-left-column: 1.5rem;
+$margin-right-column: 1.5rem;
+
+.stats-grid {
+}
+
+.stats-grid-header {
+  height: $height-row;
+
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+}
+
+@mixin stats-grid-header__col {
+  display: inline-block;
+
+  height: 100%;
+  vertical-align: middle;
+  line-height: $height-row;
+
+  font-size: $font-size-header;
+  font-weight: normal;
+  font-style: normal;
+  font-stretch: normal;
+  letter-spacing: normal;
+  color: #a9b5c7;
+
+  &:not(:last-child) {
+    margin-right: $margin-right-column;
+  }
+}
+
+.stats-grid-header__col-name {
+  @include stats-grid-header__col();
+
+  margin-left: $margin-left-column;
+  width: $width-col-name;
+}
+
+.stats-grid-header__col-liquidity {
+  @include stats-grid-header__col();
+
+  width: $width-col-liquidity;
+}
+
+.stats-grid-header__col-liquidity-reserved {
+  @include stats-grid-header__col();
+
+  width: $width-col-liquidity-reserved;
+}
+
+.stats-grid-header__col-total-supply {
+  @include stats-grid-header__col();
+
+  width: $width-col-total-supply;
+}
+
+.stats-grid-header__col-total-borrow {
+  @include stats-grid-header__col();
+
+  width: $width-col-total-borrow;
+}
+
+.stats-grid-header__col-supply-rate {
+  @include stats-grid-header__col();
+
+  width: $width-col-supply-rate;
+}
+
+.stats-grid-header__col-borrow-rate {
+  @include stats-grid-header__col();
+
+  width: $width-col-borrow-rate;
+}
+
+.stats-grid-header__col-next-rate {
+  @include stats-grid-header__col();
+
+  width: $width-col-next-rate;
+}
+
+.stats-grid-row {
+  height: $height-row;
+  margin-bottom: 1px;
+
+  background-color: rgba(169, 181, 199, 0.15);
+
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+
+  -webkit-transition: margin-left 0.5s, margin-right 0.5s; /* Safari */
+  transition: margin-left 0.5s, margin-right 0.5s;
+}
+
+@mixin stats-grid-row__col {
+  display: inline-block;
+
+  height: 100%;
+  vertical-align: middle;
+  line-height: $height-row;
+
+  font-size: 1rem;
+  font-weight: 600;
+  font-style: normal;
+  font-stretch: normal;
+  letter-spacing: -0.4px;
+  text-align: left;
+
+  &:not(:last-child) {
+    margin-right: $margin-right-column;
+  }
+}
+
+@mixin stats-grid-row__text-normal {
+  color: #ffffff;
+}
+
+.stats-grid-row__col-name {
+  @include stats-grid-row__col();
+  @include stats-grid-row__text-normal();
+
+  margin-left: $margin-left-column;
+  width: $width-col-name;
+}
+
+.stats-grid-row__col-liquidity {
+  @include stats-grid-row__col();
+  @include stats-grid-row__text-normal();
+
+  width: $width-col-liquidity;
+}
+
+.stats-grid-row__col-liquidity-reserved {
+  @include stats-grid-row__col();
+  @include stats-grid-row__text-normal();
+
+  width: $width-col-liquidity-reserved;
+}
+
+.stats-grid-row__col-total-supply {
+  @include stats-grid-row__col();
+  @include stats-grid-row__text-normal();
+
+  width: $width-col-total-supply;
+}
+
+.stats-grid-row__col-total-borrow {
+  @include stats-grid-row__col();
+  @include stats-grid-row__text-normal();
+
+  width: $width-col-total-borrow;
+}
+
+.stats-grid-row__col-supply-rate {
+  @include stats-grid-row__col();
+  @include stats-grid-row__text-normal();
+
+  width: $width-col-supply-rate;
+}
+
+.stats-grid-row__col-borrow-rate {
+  @include stats-grid-row__col();
+  @include stats-grid-row__text-normal();
+
+  width: $width-col-borrow-rate;
+}
+
+.stats-grid-row__col-next-rate {
+  @include stats-grid-row__col();
+  @include stats-grid-row__text-normal();
+
+  width: $width-col-next-rate;
+}
+
