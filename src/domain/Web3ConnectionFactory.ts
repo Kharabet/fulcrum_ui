@@ -1,7 +1,10 @@
 import Portis from "@portis/web3";
-// import { Bitski } from "bitski";
+import { Bitski } from "bitski";
 // @ts-ignore
 import Fortmatic from "fortmatic";
+// @ts-ignore
+import WalletConnectProvider from "@walletconnect/web3-provider";
+// @ts-ignore
 import { createAlchemyWeb3, AlchemyWeb3 } from "@alch/alchemy-web3";
 import { ProviderType } from "./ProviderType";
 
@@ -16,16 +19,20 @@ export class Web3ConnectionFactory {
           provider = null;
           break;
         }
-        // case ProviderType.Bitski: {
-        //   provider = await Web3ConnectionFactory.getProviderBitski();
-        //   break;
-        // }
-        case ProviderType.Fortmatic: {
-          provider = Web3ConnectionFactory.getProviderFortmatic();
+        case ProviderType.Bitski: {
+          provider = await Web3ConnectionFactory.getProviderBitski();
           break;
         }
         case ProviderType.MetaMask: {
           provider = await Web3ConnectionFactory.getProviderMetaMask();
+          break;
+        }
+        case ProviderType.Fortmatic: {
+          provider = Web3ConnectionFactory.getProviderFortmatic();
+          break;
+        }
+        case ProviderType.WalletConnect: {
+          provider = Web3ConnectionFactory.getProviderWalletConnect();
           break;
         }
         case ProviderType.Portis: {
@@ -50,16 +57,24 @@ export class Web3ConnectionFactory {
     }
   }
 
-  // private static async getProviderBitski(): Promise<any> {
-  //   TODO: https://bitskico.github.io/bitski-js/ (Implementing the callback)
-  //   const bitski = new Bitski(configProviders.Bitski_ClientId, configProviders.Bitski_CallbackUrl);
-  //   await bitski.signIn();
-  //   return bitski.getProvider();
-  // }
+  private static async getProviderBitski(): Promise<any> {
+    const bitski = new Bitski(configProviders.Bitski_ClientId, `https://ropsten.fulcrum.trade`);//configProviders.Bitski_CallbackUrl);
+    await bitski.signIn();
+    return bitski.getProvider();
+  }
 
   private static getProviderFortmatic(): any {
     const fortmatic = new Fortmatic(configProviders.Fortmatic_ApiKey);
     return fortmatic.getProvider();
+  }
+
+  private static getProviderWalletConnect(): any {
+    const walletConnector = new WalletConnectProvider({
+      bridge: "https://bridge.walletconnect.org"
+    });
+ 
+    console.log(walletConnector);
+    return walletConnector;
   }
 
   private static getProviderPortis(): any {

@@ -49,7 +49,13 @@ export class AppRouter extends Component<any, IAppRouterState> {
         >
           <ProviderMenu
             selectedProviderType={this.state.selectedProviderType}
-            providerTypes={[ProviderType.MetaMask, ProviderType.Fortmatic, ProviderType.Portis, ProviderType.None]}
+            providerTypes={[
+              ProviderType.MetaMask,
+              //ProviderType.Fortmatic,
+              ProviderType.Bitski,
+              ProviderType.WalletConnect,
+              ProviderType.Portis,
+              ProviderType.None]}
             onSelect={this.onProviderTypeSelect}
           />
         </Modal>
