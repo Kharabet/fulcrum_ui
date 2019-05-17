@@ -13,6 +13,7 @@ import { TradeType } from "../domain/TradeType";
 import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
+import { CollapsibleContainer } from "./CollapsibleContainer";
 import { CollateralTokenSelector } from "./CollateralTokenSelector";
 import { PositionTypeMarker } from "./PositionTypeMarker";
 
@@ -186,7 +187,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
           : this.state.tradedAmountEstimate.toExponential(3);
 
     return (
-      <form className="trade-form" onSubmit={this.onSubmitClick} style={this.state.collateral !== Asset.ETH && this.props.tradeType === TradeType.BUY ? { height: `32rem`} : { height: `28rem`}}>
+      <form className="trade-form" onSubmit={this.onSubmitClick}>
         <div className="trade-form__image" style={divStyle}>
           <img src={this.state.assetDetails.logoSvg} alt={tokenNameBase} />
         </div>
@@ -209,6 +210,13 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
               </div>
               <div className="trade-form__value">{this.state.collateral}</div>
             </div>
+            {this.state.collateral !== Asset.ETH && this.props.tradeType === TradeType.BUY ? (
+              <div className="trade-form__token-message-container">
+                <div className="trade-form__token-message-container--message">
+                  Selected deposit token ({this.state.collateral}) may need approval, which can take up to 5 minutes.
+                </div>
+              </div>
+            ) : `` }
             <div className="trade-form__kv-container trade-form__kv-container--w_dots">
               <div className="trade-form__label">Position Price</div>
               <div className="trade-form__value">{`$${bnPrice.toFixed(2)}`}</div>
@@ -250,13 +258,9 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
               </div>
             </div>
 
-            {this.state.collateral !== Asset.ETH && this.props.tradeType === TradeType.BUY ? (
-              <div className="trade-form__token-message-container">
-                <div className="trade-form__token-message-container--message">
-                  Selected deposit token ({this.state.collateral}) may need approval, which can take up to 5 minutes.
-                </div>
-              </div>
-            ) : `` }
+            <CollapsibleContainer title="Advanced">
+              Options
+            </CollapsibleContainer>
           </div>
 
           <div className="trade-form__actions-container">

@@ -1,5 +1,6 @@
 .lend-form {
-  height: 23rem;
+  @include clearfix();
+
   width: 36rem;
 
   background-color: #444e5a;
@@ -8,6 +9,7 @@
 .lend-form__image {
   float: left;
 
+  position:absolute;
   height: 100%;
   width: 16rem;
 
@@ -30,7 +32,7 @@
 }
 
 .lend-form__form-container {
-  float: left;
+  float: right;
   box-sizing: border-box;
 
   height: 100%;
