@@ -20,6 +20,7 @@ export interface ITradeTokenGridRowProps {
   selectedKey: TradeTokenKey;
 
   asset: Asset;
+  defaultUnitOfAccount: Asset;
   positionType: PositionType;
   defaultLeverage: number;
 
@@ -56,7 +57,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
   }
 
   private getTradeTokenGridRowSelectionKeyRaw(props: ITradeTokenGridRowProps, leverage: number = this.state.leverage) {
-    return new TradeTokenKey(props.asset, props.positionType, leverage);
+    return new TradeTokenKey(props.asset, props.defaultUnitOfAccount, props.positionType, leverage);
   }
 
   private getTradeTokenGridRowSelectionKey(leverage: number = this.state.leverage) {
@@ -64,10 +65,10 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
   }
 
   private async derivedUpdate() {
-    const tradeTokenKey = new TradeTokenKey(this.props.asset, this.props.positionType, this.state.leverage);
+    const tradeTokenKey = new TradeTokenKey(this.props.asset, this.props.defaultUnitOfAccount, this.props.positionType, this.state.leverage);
     const latestPriceDataPoint = await FulcrumProvider.Instance.getPriceLatestDataPoint(tradeTokenKey);
     const profit = await FulcrumProvider.Instance.getTradeProfit(tradeTokenKey);
-    const balance = await FulcrumProvider.Instance.getTradeTokenBalance(tradeTokenKey);
+    const balance = await FulcrumProvider.Instance.getPositionTokenBalance(tradeTokenKey);
 
     this.setState({
       ...this.state,
@@ -206,6 +207,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
       new TradeRequest(
         TradeType.BUY,
         this.props.asset,
+        this.props.defaultUnitOfAccount, // TODO: demands on which one they own
         Asset.ETH,
         this.props.positionType,
         this.state.leverage,
@@ -221,6 +223,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
       new TradeRequest(
         TradeType.SELL,
         this.props.asset,
+        this.props.defaultUnitOfAccount, // TODO: demands on which one they own
         this.props.selectedKey.positionType === PositionType.SHORT ? this.props.selectedKey.asset : Asset.DAI,
         this.props.positionType,
         this.state.leverage,

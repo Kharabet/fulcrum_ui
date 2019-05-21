@@ -68,7 +68,7 @@ export class TradePage extends Component<ITradePageProps, ITradePageState> {
   }
 
   public componentDidMount(): void {
-    if (!FulcrumProvider.Instance.web3) {
+    if (!FulcrumProvider.Instance.web3Wrapper) {
       this.props.doNetworkConnect();
     }
   }

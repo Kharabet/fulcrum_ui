@@ -1,48 +1,99 @@
+import { EventEmitter } from "events";
+import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
+import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
+
+import { Web3Wrapper } from '@0x/web3-wrapper';
+
 import Portis from "@portis/web3";
 import { Bitski } from "bitski";
 // @ts-ignore
 import Fortmatic from "fortmatic";
 // @ts-ignore
 import WalletConnectProvider from "@walletconnect/web3-provider";
-// @ts-ignore
-import { createAlchemyWeb3, AlchemyWeb3 } from "@alch/alchemy-web3";
 import { ProviderType } from "./ProviderType";
+
+import { Web3ProviderEngine, MetamaskSubprovider, SignerSubprovider } from "@0x/subproviders";
+// @ts-ignore
+import { AlchemySubprovider } from "@alch/alchemy-web3";
 
 import configProviders from "../config/providers.json";
 
 export class Web3ConnectionFactory {
-  public static async getWeb3Connection(providerType: ProviderType | null): Promise<AlchemyWeb3 | null> {
-    let provider: any | null = null;
+  public static async getWeb3Provider(providerType: ProviderType | null, eventEmitter: EventEmitter): Promise<[Web3Wrapper | null, Web3ProviderEngine | null, boolean]> {
+    let canWrite = false;
+    let subProvider: any | null = null;
     if (providerType) {
       switch (providerType) {
         case ProviderType.None: {
-          provider = null;
+          subProvider = null;
           break;
         }
         case ProviderType.Bitski: {
-          provider = await Web3ConnectionFactory.getProviderBitski();
+          subProvider = await Web3ConnectionFactory.getProviderBitski();
           break;
         }
         case ProviderType.MetaMask: {
-          provider = await Web3ConnectionFactory.getProviderMetaMask();
+          subProvider = await Web3ConnectionFactory.getProviderMetaMask();
           break;
         }
         case ProviderType.Fortmatic: {
-          provider = Web3ConnectionFactory.getProviderFortmatic();
+          subProvider = Web3ConnectionFactory.getProviderFortmatic();
           break;
         }
         case ProviderType.WalletConnect: {
-          provider = Web3ConnectionFactory.getProviderWalletConnect();
+          subProvider = Web3ConnectionFactory.getProviderWalletConnect();
           break;
         }
         case ProviderType.Portis: {
-          provider = Web3ConnectionFactory.getProviderPortis();
+          subProvider = Web3ConnectionFactory.getProviderPortis();
           break;
         }
       }
     }
 
-    return createAlchemyWeb3(`https://eth-ropsten.alchemyapi.io/jsonrpc/${configProviders.Alchemy_ApiKey}`, { writeProvider: provider });
+    if (!subProvider) {
+      subProvider = null;
+    }
+
+    /*
+      TODO: 
+      Set pollingInterval to 8000. Use https://github.com/MetaMask/eth-block-tracker with Web3ProviderEngine
+      to poll for new blocks and use events to update the UI.
+
+      interface Web3ProviderEngineOptions {
+          pollingInterval?: number;
+          blockTracker?: any;
+          blockTrackerProvider?: any;
+      }
+    */
+    
+    const providerEngine: Web3ProviderEngine = new Web3ProviderEngine({ pollingInterval: 3600000 }); // 1 hour polling
+
+    providerEngine.addProvider(new AlchemySubprovider(`https://eth-ropsten.alchemyapi.io/jsonrpc/${configProviders.Alchemy_ApiKey}`, { writeProvider: null }));
+    if (subProvider) {
+      if (providerType === ProviderType.MetaMask) {
+        providerEngine.addProvider(new MetamaskSubprovider(subProvider));
+      } else {
+        providerEngine.addProvider(new SignerSubprovider(subProvider));
+      }
+      canWrite = true;
+    }
+
+    await providerEngine.start();
+
+    const web3Wrapper = new Web3Wrapper(providerEngine);
+
+    if (subProvider && providerType === ProviderType.MetaMask) {
+      // @ts-ignore
+      subProvider.publicConfigStore.on("update", result =>
+        eventEmitter.emit(
+          FulcrumProviderEvents.ProviderChanged,
+          new ProviderChangedEvent(providerType, web3Wrapper)
+        )
+      );
+    }
+
+    return [web3Wrapper, providerEngine, canWrite];
   }
 
   private static async getProviderMetaMask(): Promise<any | null> {

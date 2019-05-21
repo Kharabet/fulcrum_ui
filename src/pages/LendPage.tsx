@@ -28,7 +28,7 @@ export class LendPage extends Component<ILendPageProps, ILendPageState> {
   }
 
   public componentDidMount(): void {
-    if (!FulcrumProvider.Instance.web3) {
+    if (!FulcrumProvider.Instance.web3Wrapper) {
       this.props.doNetworkConnect();
     }
   }

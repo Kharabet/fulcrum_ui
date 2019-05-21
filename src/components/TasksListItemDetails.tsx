@@ -75,7 +75,7 @@ export class TasksListItemDetails extends Component<ITasksListItemDetailsProps> 
       }
       
       if (errorMsg) {
-        if (errorMsg.includes("gas required exceeds allowance")) {
+        if (errorMsg.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)) {
           errorMsg = "The transaction seems like it will fail. You can submit the transaction anyway, or cancel.";
           forceRetry = true;
         } else if (errorMsg.includes("Reverted by EVM")) {

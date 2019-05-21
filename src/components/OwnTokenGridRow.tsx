@@ -49,6 +49,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
   private async derivedUpdate() {
     const tradeTokenKey = new TradeTokenKey(
       this.props.currentKey.asset,
+      this.props.currentKey.unitOfAccount,
       this.props.currentKey.positionType,
       this.props.currentKey.leverage
     );
@@ -159,6 +160,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
       new TradeRequest(
         TradeType.SELL,
         this.props.currentKey.asset,
+        this.props.currentKey.unitOfAccount,
         this.props.currentKey.positionType === PositionType.SHORT ? this.props.currentKey.asset : Asset.DAI,
         this.props.currentKey.positionType,
         this.props.currentKey.leverage,

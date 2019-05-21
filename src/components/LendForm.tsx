@@ -67,7 +67,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
     const balance =
       this.props.lendType === LendType.LEND
         ? await FulcrumProvider.Instance.getBaseTokenBalance(this.props.asset)
-        : await FulcrumProvider.Instance.getLendTokenBalance(this.props.asset);
+        : await FulcrumProvider.Instance.getLoanTokenBalance(this.props.asset);
     const maxLendValue = await FulcrumProvider.Instance.getMaxLendValue(
       new LendRequest(this.props.lendType, this.props.asset, new BigNumber(0))
     );

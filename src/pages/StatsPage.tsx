@@ -22,7 +22,7 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
   }*/
 
   public componentDidMount(): void {
-    if (!FulcrumProvider.Instance.web3) {
+    if (!FulcrumProvider.Instance.web3Wrapper) {
       this.props.doNetworkConnect();
     }
   }

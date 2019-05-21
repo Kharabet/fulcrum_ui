@@ -43,7 +43,7 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
     const assetDetails = AssetsDictionary.assets.get(this.props.asset);
     const interestRate = await FulcrumProvider.Instance.getLendTokenInterestRate(this.props.asset);
     const profit = await FulcrumProvider.Instance.getLendProfit(this.props.asset);
-    const balance = await FulcrumProvider.Instance.getLendTokenBalance(this.props.asset);
+    const balance = await FulcrumProvider.Instance.getLoanTokenBalance(this.props.asset);
 
     this.setState({ ...this.state, assetDetails: assetDetails || null, interestRate: interestRate, profit: profit, balance: balance });
   }

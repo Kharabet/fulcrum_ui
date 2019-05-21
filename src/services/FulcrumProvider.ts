@@ -2,7 +2,8 @@ import { BigNumber } from "@0x/utils";
 import { EventEmitter } from "events";
 import moment from "moment";
 import fetch from "node-fetch";
-import { AlchemyWeb3 } from "@alch/alchemy-web3";
+import { Web3Wrapper } from '@0x/web3-wrapper';
+import { Web3ProviderEngine } from "@0x/subproviders";
 import { erc20Contract } from "../contracts/erc20";
 import { iTokenContract } from "../contracts/iTokenContract";
 import { pTokenContract } from "../contracts/pTokenContract";
@@ -43,7 +44,7 @@ export class FulcrumProvider {
 
   public static Instance: FulcrumProvider;
 
-  private readonly gasLimit = 3000000;
+  private readonly gasLimit = "3000000";
   // gasPrice equal to 6 gwei
   private readonly gasPrice = new BigNumber(6).multipliedBy(10 ** 9);
   // gasBufferCoeff equal 110% gas reserve
@@ -58,7 +59,8 @@ export class FulcrumProvider {
 
   public readonly eventEmitter: EventEmitter;
   public providerType: ProviderType = ProviderType.None;
-  public web3: AlchemyWeb3 | null = null;
+  public providerEngine: Web3ProviderEngine | null = null;
+  public web3Wrapper: Web3Wrapper | null = null;
   public web3ProviderSettings: IWeb3ProviderSettings | null = null;
   public contractsSource: ContractsSource | null = null;
 
@@ -69,12 +71,15 @@ export class FulcrumProvider {
     TasksQueue.Instance.on(TasksQueueEvents.Enqueued, this.onTaskEnqueued);
 
     // setting up readonly provider
-    Web3ConnectionFactory.getWeb3Connection(null).then((web3) => {
-      FulcrumProvider.getWeb3ProviderSettings(web3).then((web3ProviderSettings) => {
-        if (web3 && web3ProviderSettings) {
-          const contractsSource = new ContractsSource(web3.givenProvider, web3ProviderSettings.networkId, false);
+    Web3ConnectionFactory.getWeb3Provider(null, this.eventEmitter).then((providerEngine) => {
+      // @ts-ignore
+      const web3Wrapper = providerEngine[0];
+      FulcrumProvider.getWeb3ProviderSettings(web3Wrapper).then((web3ProviderSettings) => {
+        if (web3Wrapper && web3ProviderSettings) {
+          const contractsSource = new ContractsSource(providerEngine[1], web3ProviderSettings.networkId, providerEngine[2]);
           contractsSource.Init().then(() => {
-            this.web3 = web3;
+            this.web3Wrapper = web3Wrapper;
+            this.providerEngine = providerEngine[1];
             this.web3ProviderSettings = web3ProviderSettings;
             this.contractsSource = contractsSource;
             this.eventEmitter.emit(FulcrumProviderEvents.ProviderAvailable);
@@ -92,52 +97,43 @@ export class FulcrumProvider {
   }
 
   public async setWeb3Provider(providerType: ProviderType) {
-    this.web3 = await Web3ConnectionFactory.getWeb3Connection(providerType);
+    const providerData = await Web3ConnectionFactory.getWeb3Provider(providerType, this.eventEmitter);
+    this.web3Wrapper = providerData[0];
+    this.providerEngine = providerData[1];
+    const canWrite = providerData[2];
 
-    if (this.web3) {
-      const networkId = await this.web3.eth.net.getId();
+    if (this.web3Wrapper) {
+      const networkId = await this.web3Wrapper.getNetworkIdAsync();
       if (networkId === 3) { // ropsten only
         this.providerType = providerType;
       } else {
-        this.web3 = null;
+        this.web3Wrapper = null;
         this.providerType = ProviderType.None;
       }
     } else {
       this.providerType = ProviderType.None;
     }
 
-    this.web3ProviderSettings = await FulcrumProvider.getWeb3ProviderSettings(this.web3);
+    this.web3ProviderSettings = await FulcrumProvider.getWeb3ProviderSettings(this.web3Wrapper);
 
-    if (this.web3) {
-      const networkId = await this.web3.eth.net.getId();
+    if (this.web3Wrapper) {
+      const networkId = await this.web3Wrapper.getNetworkIdAsync();
       if (networkId !== 3) {
         //
       }
     }
 
     this.contractsSource =
-      this.web3 && this.web3ProviderSettings
-        ? new ContractsSource(this.web3.givenProvider, this.web3ProviderSettings.networkId, this.providerType !== ProviderType.None)
+      this.web3Wrapper && this.web3ProviderSettings
+        ? new ContractsSource(this.providerEngine, this.web3ProviderSettings.networkId, canWrite)
         : null;
     if (this.contractsSource) {
       await this.contractsSource.Init();
     }
 
-    if (this.web3) {
-      // MetaMask-only code
-      if (this.providerType === ProviderType.MetaMask) {
-        // @ts-ignore
-        this.web3.givenProvider.publicConfigStore.on("update", result =>
-          this.eventEmitter.emit(
-            FulcrumProviderEvents.ProviderChanged,
-            new ProviderChangedEvent(this.providerType, this.web3)
-          )
-        );
-      }
-    }
     this.eventEmitter.emit(
       FulcrumProviderEvents.ProviderChanged,
-      new ProviderChangedEvent(this.providerType, this.web3)
+      new ProviderChangedEvent(this.providerType, this.web3Wrapper)
     );
   }
 
@@ -170,9 +166,9 @@ export class FulcrumProvider {
     let priceDataObj: IPriceDataPoint[] = [];
     // localStorage.removeItem(`priceData${selectedKey.asset}`);
 
-    if (this.web3) {
+    if (this.web3Wrapper) {
       let queriedBlocks = 0;
-      const currentBlock = await this.web3.eth.getBlockNumber();
+      const currentBlock = await this.web3Wrapper.getBlockNumberAsync();
       const earliestBlock = currentBlock-17280; // ~5760 blocks per day
       let fetchFromBlock = earliestBlock;
       const nearestHour = new Date().setMinutes(0,0,0)/1000;
@@ -372,13 +368,13 @@ export class FulcrumProvider {
     let result: BigNumber | null = null;
     let account: string | null = null;
 
-    if (this.web3 && this.contractsSource && this.contractsSource.canWrite) {
-      const accounts = await this.web3.eth.getAccounts();
+    if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
+      const accounts = await this.web3Wrapper.getAvailableAddressesAsync();
       account = accounts ? accounts[0].toLowerCase() : null;
     }
 
     if (account && this.contractsSource && this.contractsSource.canWrite) {
-      const balance = await this.getLendTokenBalance(asset);
+      const balance = await this.getLoanTokenBalance(asset);
       if (balance.gt(0)) {
         result = new BigNumber(0);
         const assetContract = this.contractsSource.getITokenContract(asset);
@@ -403,13 +399,13 @@ export class FulcrumProvider {
     let result: BigNumber | null = null;
     let account: string | null = null;
 
-    if (this.web3 && this.contractsSource && this.contractsSource.canWrite) {
-      const accounts = await this.web3.eth.getAccounts();
+    if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
+      const accounts = await this.web3Wrapper.getAvailableAddressesAsync();
       account = accounts ? accounts[0].toLowerCase() : null;
     }
 
     if (account && this.contractsSource && this.contractsSource.canWrite) {
-      const balance = await this.getTradeTokenBalance(selectedKey);
+      const balance = await this.getPositionTokenBalance(selectedKey);
       if (balance.gt(0)) {
         result = new BigNumber(0);
         const assetContract = this.contractsSource.getPTokenContract(selectedKey);
@@ -435,7 +431,7 @@ export class FulcrumProvider {
     const balance =
       tradeType === TradeType.BUY
         ? await this.getBaseTokenBalance(collateral)
-        : await this.getTradeTokenBalance(selectedKey);
+        : await this.getPositionTokenBalance(selectedKey);
 
     if (tradeType === TradeType.BUY) {
       if (this.contractsSource) {
@@ -472,7 +468,7 @@ export class FulcrumProvider {
         const assetContract = this.contractsSource.getITokenContract(request.asset);
         if (assetContract) {
           const tokenPrice = await assetContract.tokenPrice.callAsync();
-          const amount = await this.getLendTokenBalance(request.asset);
+          const amount = await this.getLoanTokenBalance(request.asset);
           result = amount.multipliedBy(tokenPrice).dividedBy(10 ** 18);
         }
       }
@@ -489,6 +485,7 @@ export class FulcrumProvider {
     if (this.contractsSource) {
       const key = new TradeTokenKey(
         request.asset,
+        request.unitOfAccount,
         request.positionType,
         request.leverage
       );
@@ -532,9 +529,9 @@ export class FulcrumProvider {
     return result;
   };
 
-  public static async getWeb3ProviderSettings(web3: AlchemyWeb3 | null): Promise<IWeb3ProviderSettings | null> {
+  public static async getWeb3ProviderSettings(web3: Web3Wrapper| null): Promise<IWeb3ProviderSettings | null> {
     if (web3) {
-      const networkId = await web3.eth.net.getId();
+      const networkId = await web3.getNetworkIdAsync();
       // tslint:disable-next-line:one-variable-per-declaration
       let networkName, etherscanURL;
       switch (networkId) {
@@ -588,7 +585,7 @@ export class FulcrumProvider {
     return result;
   }
 
-  public async getLendTokenBalance(asset: Asset): Promise<BigNumber> {
+  public async getLoanTokenBalance(asset: Asset): Promise<BigNumber> {
     let result = new BigNumber(0);
 
     if (this.contractsSource) {
@@ -601,7 +598,7 @@ export class FulcrumProvider {
     return result;
   }
 
-  public async getTradeTokenBalance(selectedKey: TradeTokenKey): Promise<BigNumber> {
+  public async getPositionTokenBalance(selectedKey: TradeTokenKey): Promise<BigNumber> {
     let result = new BigNumber(0);
 
     if (this.contractsSource) {
@@ -639,11 +636,11 @@ export class FulcrumProvider {
   private async getEthBalance(): Promise<BigNumber> {
     let result: BigNumber = new BigNumber(0);
 
-    if (this.web3 && this.contractsSource && this.contractsSource.canWrite) {
-      const accounts = await this.web3.eth.getAccounts();
+    if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
+      const accounts = await this.web3Wrapper.getAvailableAddressesAsync();
       const account = accounts ? accounts[0].toLowerCase() : null;
       if (account) {
-        const balance = await this.web3.eth.getBalance(account);
+        const balance = await this.web3Wrapper.getBalanceInWeiAsync(account);
         result = new BigNumber(balance);
       }
     }
@@ -654,8 +651,8 @@ export class FulcrumProvider {
   private async getErc20Balance(addressErc20: string): Promise<BigNumber> {
     let result = new BigNumber(0);
 
-    if (this.web3 && this.contractsSource && this.contractsSource.canWrite) {
-      const accounts = await this.web3.eth.getAccounts();
+    if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
+      const accounts = await this.web3Wrapper.getAvailableAddressesAsync();
       const account = accounts ? accounts[0].toLowerCase() : null;
 
       if (account) {
@@ -779,11 +776,11 @@ export class FulcrumProvider {
 
   private processLendRequestTask = async (task: RequestTask, skipGas: boolean) => {
     try {
-      if (!(this.web3 && this.contractsSource && this.contractsSource.canWrite)) {
+      if (!(this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite)) {
         throw new Error("No provider available!");
       }
 
-      const accounts = await this.web3.eth.getAccounts();
+      const accounts = await this.web3Wrapper.getAvailableAddressesAsync();
       const account = accounts ? accounts[0].toLowerCase() : null;
       if (!account) {
         throw new Error("Unable to get wallet address!");
@@ -844,7 +841,7 @@ export class FulcrumProvider {
           }
 
           // Submitting loan
-          const txHash = await tokenContract.mint.sendTransactionAsync(account, amountInBaseUnits, { from: account, gas: gasAmountBN });
+          const txHash = await tokenContract.mint.sendTransactionAsync(account, amountInBaseUnits, { from: account, gas: gasAmountBN.toString() });
           task.setTxHash(txHash);
           const txReceipt = await this.waitForTransactionMined(txHash, task.request);
           if (!txReceipt.status) {
@@ -872,7 +869,7 @@ export class FulcrumProvider {
 
           const gasCost = gasAmountBN.multipliedBy(this.gasPrice).integerValue(BigNumber.ROUND_UP);
           // Submitting loan
-          const txHash = await tokenContract.mintWithEther.sendTransactionAsync(account, { from: account, value: amountInBaseUnits.minus(gasCost), gas: gasAmountBN });
+          const txHash = await tokenContract.mintWithEther.sendTransactionAsync(account, { from: account, value: amountInBaseUnits.minus(gasCost), gas: gasAmountBN.toString() });
           task.setTxHash(txHash);
           const txReceipt = await this.waitForTransactionMined(txHash, task.request);
           if (!txReceipt.status) {
@@ -900,7 +897,7 @@ export class FulcrumProvider {
           }
 
           // Submitting unloan
-          const txHash = await tokenContract.burn.sendTransactionAsync(account, amountInBaseUnits, { from: account, gas: gasAmountBN });
+          const txHash = await tokenContract.burn.sendTransactionAsync(account, amountInBaseUnits, { from: account, gas: gasAmountBN.toString() });
           task.setTxHash(txHash);
           const txReceipt = await this.waitForTransactionMined(txHash, task.request);
           if (!txReceipt.status) {
@@ -917,7 +914,7 @@ export class FulcrumProvider {
           }
           
           // Submitting unloan
-          const txHash = await tokenContract.burnToEther.sendTransactionAsync(account, amountInBaseUnits, { from: account, gas: gasAmountBN });
+          const txHash = await tokenContract.burnToEther.sendTransactionAsync(account, amountInBaseUnits, { from: account, gas: gasAmountBN.toString() });
           task.setTxHash(txHash);
           const txReceipt = await this.waitForTransactionMined(txHash, task.request);
           if (!txReceipt.status) {
@@ -928,19 +925,21 @@ export class FulcrumProvider {
 
       task.processingEnd(true, false, null);
     } catch (e) {
-      // tslint:disable-next-line:no-console
-      console.log(e);
+      if (!e.message.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)) {
+        // tslint:disable-next-line:no-console
+        console.log(e);
+      }
       task.processingEnd(false, false, e);
     }
   };
 
   private processTradeRequestTask = async (task: RequestTask, skipGas: boolean) => {
     try {
-      if (!(this.web3 && this.contractsSource && this.contractsSource.canWrite)) {
+      if (!(this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite)) {
         throw new Error("No provider available!");
       }
 
-      const accounts = await this.web3.eth.getAccounts();
+      const accounts = await this.web3Wrapper.getAvailableAddressesAsync();
       const account = accounts ? accounts[0].toLowerCase() : null;
       if (!account) {
         throw new Error("Unable to get wallet address!");
@@ -951,7 +950,9 @@ export class FulcrumProvider {
       const amountInBaseUnits = new BigNumber(taskRequest.amount.multipliedBy(10 ** 18).toFixed(0, 1));
       const tokenContract: pTokenContract | null =
         await this.contractsSource.getPTokenContract(
-          new TradeTokenKey(taskRequest.asset,
+          new TradeTokenKey(
+            taskRequest.asset,
+            taskRequest.unitOfAccount,
             taskRequest.positionType,
             taskRequest.leverage
           )
@@ -1009,7 +1010,7 @@ export class FulcrumProvider {
           }
 
           // Submitting trade
-          const txHash = await tokenContract.mintWithToken.sendTransactionAsync(account, assetErc20Address, amountInBaseUnits, { from: account, gas: gasAmountBN });
+          const txHash = await tokenContract.mintWithToken.sendTransactionAsync(account, assetErc20Address, amountInBaseUnits, { from: account, gas: gasAmountBN.toString() });
           task.setTxHash(txHash);
           const txReceipt = await this.waitForTransactionMined(txHash, task.request);
           if (!txReceipt.status) {
@@ -1037,7 +1038,7 @@ export class FulcrumProvider {
 
           const gasCost = gasAmountBN.multipliedBy(this.gasPrice).integerValue(BigNumber.ROUND_UP);
           // Submitting trade
-          const txHash = await tokenContract.mintWithEther.sendTransactionAsync(account, { from: account, value: amountInBaseUnits.minus(gasCost), gas: gasAmountBN });
+          const txHash = await tokenContract.mintWithEther.sendTransactionAsync(account, { from: account, value: amountInBaseUnits.minus(gasCost), gas: gasAmountBN.toString() });
           task.setTxHash(txHash);
           const txReceipt = await this.waitForTransactionMined(txHash, task.request);
           if (!txReceipt.status) {
@@ -1077,7 +1078,7 @@ export class FulcrumProvider {
               account,
               assetErc20Address,
               amountInBaseUnits,
-              { from: account, gas: gasAmountBN }
+              { from: account, gas: gasAmountBN.toString() }
             );
             task.setTxHash(txHash);
             const txReceipt = await this.waitForTransactionMined(txHash, task.request);
@@ -1095,7 +1096,7 @@ export class FulcrumProvider {
           }
 
           // Closing trade
-          const txHash = await tokenContract.burnToEther.sendTransactionAsync(account, amountInBaseUnits, { from: account, gas: gasAmountBN });
+          const txHash = await tokenContract.burnToEther.sendTransactionAsync(account, amountInBaseUnits, { from: account, gas: gasAmountBN.toString() });
           task.setTxHash(txHash);
           const txReceipt = await this.waitForTransactionMined(txHash, task.request);
           if (!txReceipt.status) {
@@ -1106,8 +1107,10 @@ export class FulcrumProvider {
 
       task.processingEnd(true, false, null);
     } catch (e) {
-      // tslint:disable-next-line:no-console
-      console.log(e);
+      if (!e.message.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)) {
+        // tslint:disable-next-line:no-console
+        console.log(e);
+      }
       task.processingEnd(false, false, e);
     }
   };
@@ -1118,11 +1121,11 @@ export class FulcrumProvider {
 
     return new Promise((resolve, reject) => {
       try {
-        if (!this.web3) {
+        if (!this.web3Wrapper) {
           throw new Error("web3 is not available");
         }
 
-        this.waitForTransactionMinedRecursive(txHash, this.web3, request, resolve, reject);
+        this.waitForTransactionMinedRecursive(txHash, this.web3Wrapper, request, resolve, reject);
       } catch (e) {
         throw e;
       }
@@ -1131,40 +1134,36 @@ export class FulcrumProvider {
 
   private waitForTransactionMinedRecursive = async (
     txHash: string,
-    web3: AlchemyWeb3,
+    web3Wrapper: Web3Wrapper,
     request: LendRequest | TradeRequest,
     resolve: (value: any) => void,
     reject: (value: any) => void) => {
 
     try {
-      web3.eth.getTransactionReceipt(txHash, (error: Error, receipt: any) => {
-        if (error) {
-          throw error;
-        }
-
-        if (receipt) {
-          resolve(receipt);
-          if (request instanceof LendRequest) {
-            this.eventEmitter.emit(
-              FulcrumProviderEvents.LendTransactionMined,
-              new LendTransactionMinedEvent(request.asset, txHash)
-            );
-          } else {
-            this.eventEmitter.emit(
-              FulcrumProviderEvents.TradeTransactionMined,
-              new TradeTransactionMinedEvent(new TradeTokenKey(
-                request.asset,
-                request.positionType,
-                request.leverage
-              ), txHash)
-            );
-          }
+      let receipt = await web3Wrapper.getTransactionReceiptIfExistsAsync(txHash);
+      if (receipt) {
+        resolve(receipt);
+        if (request instanceof LendRequest) {
+          this.eventEmitter.emit(
+            FulcrumProviderEvents.LendTransactionMined,
+            new LendTransactionMinedEvent(request.asset, txHash)
+          );
         } else {
-          window.setTimeout(() => {
-            this.waitForTransactionMinedRecursive(txHash, web3, request, resolve, reject);
-          }, 5000);
+          this.eventEmitter.emit(
+            FulcrumProviderEvents.TradeTransactionMined,
+            new TradeTransactionMinedEvent(new TradeTokenKey(
+              request.asset,
+              request.unitOfAccount,
+              request.positionType,
+              request.leverage
+            ), txHash)
+          );
         }
-      });
+      } else {
+        window.setTimeout(() => {
+          this.waitForTransactionMinedRecursive(txHash, web3Wrapper, request, resolve, reject);
+        }, 5000);
+      }
     }
     catch (e) {
       reject(e);

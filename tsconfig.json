@@ -17,7 +17,8 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "preserve"
+    "jsx": "preserve",
+    "typeRoots": ["node_modules/@0x/typescript-typings/types", "node_modules/@types"],
   },
   "include": [
     "src"

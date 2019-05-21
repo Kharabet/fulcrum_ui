@@ -14,7 +14,7 @@ Portis:
 npm install web3 @portis/web3
 
 import Portis from '@portis/web3';
-import Web3 from 'web3';
+import Web3Wrapperfrom 'web3';
 
 // ref: https://docs.portis.io/#/configuration
 const portis = new Portis('32537ad9-601e-4854-80a2-216dcea0fed6', 'ropsten');

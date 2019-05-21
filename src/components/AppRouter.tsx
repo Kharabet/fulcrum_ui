@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import Modal from "react-modal";
 import { HashRouter, Route, Switch, Redirect } from "react-router-dom";
-import { AlchemyWeb3 } from "@alch/alchemy-web3";
+import { Web3Wrapper } from '@0x/web3-wrapper';
 import { ProviderType } from "../domain/ProviderType";
 import { LandingPage } from "../pages/LandingPage";
 import { LendPage } from "../pages/LendPage";
@@ -17,7 +17,7 @@ interface IAppRouterState {
   isProviderMenuModalOpen: boolean;
   selectedProviderType: ProviderType;
   isLoading: boolean;
-  web3: AlchemyWeb3 | null;
+  web3: Web3Wrapper| null;
 }
 
 export class AppRouter extends Component<any, IAppRouterState> {
@@ -28,7 +28,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
       isProviderMenuModalOpen: false,
       isLoading: false,
       selectedProviderType: FulcrumProvider.Instance.providerType,
-      web3: FulcrumProvider.Instance.web3
+      web3: FulcrumProvider.Instance.web3Wrapper
     };
 
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);

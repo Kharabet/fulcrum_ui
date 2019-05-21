@@ -4,18 +4,25 @@ import { PositionType } from "./PositionType";
 export class TradeTokenKey {
   public asset: Asset;
   public loanAsset: Asset;
+  public unitOfAccount: Asset;
   public positionType: PositionType;
   public leverage: number;
 
-  constructor(asset: Asset, positionType: PositionType, leverage: number) {
+  constructor(
+    asset: Asset,
+    unitOfAccount: Asset,
+    positionType: PositionType,
+    leverage: number
+  ) {
     this.asset = asset;
     this.loanAsset = positionType === PositionType.SHORT ? asset : Asset.DAI;
+    this.unitOfAccount = unitOfAccount;
     this.positionType = positionType;
     this.leverage = leverage;
   }
 
   public static empty(): TradeTokenKey {
-    return new TradeTokenKey(Asset.UNKNOWN, PositionType.SHORT, 0);
+    return new TradeTokenKey(Asset.UNKNOWN, Asset.DAI, PositionType.SHORT, 0);
   }
 
   public toString(): string {
@@ -37,7 +44,8 @@ export class TradeTokenKey {
         }
         const leverage = parseInt(matches[3].toString(), 10);
 
-        const recoveredResult = new TradeTokenKey(asset, positionType, leverage);
+        // TODO: need to distinguish unit of account from the pToken symbol or name
+        const recoveredResult = new TradeTokenKey(asset, Asset.DAI, positionType, leverage);
         if (recoveredResult.toString() === value) {
           result = recoveredResult;
         }

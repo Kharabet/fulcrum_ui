@@ -41,8 +41,8 @@ export class StatsTokenGridRow extends Component<IStatsTokenGridRowProps, IStats
     });
   }
 
-  private onProviderAvailable = async () => {
-    await this.derivedUpdate();
+  private onProviderAvailable = () => {
+    this.derivedUpdate();
   };
 
   public componentWillUnmount(): void {
