@@ -20,7 +20,7 @@
   "license": "MIT",
   "scripts": {
     "build": "yarn run clean && tsc -p tsconfig.build-esm.json && tsc -p tsconfig.build-cjs.json",
-    "clean": "rm -rf dist/*",
+    "clean": "rimraf ./dist/*",
     "format-file": "prettier --write",
     "format": "git ls-files | egrep '\\.(js(on)?|md|scss|tsx?)?$' | xargs yarn run format-file",
     "jest": "jest",
@@ -55,13 +55,16 @@
     "jest": "^24.8.0",
     "lint-staged": "^8.1.6",
     "prettier": "^1.17.0",
+    "rimraf": "^2.6.3",
     "ts-jest": "^24.0.2",
     "tslint": "^5.16.0",
     "tslint-config-prettier": "^1.18.0",
     "typescript": "^3.4.5"
   },
   "dependencies": {
+    "@0x/subproviders": "^4.0.6",
     "@types/web3": "^1.0.18",
+    "ethereum-types": "^2.1.2",
     "fetch-ponyfill": "^6.0.2",
     "web3": "^1.0.0-beta.55",
     "web3-providers": "^1.0.0-beta.55"

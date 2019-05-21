@@ -2,6 +2,9 @@ import fetchPonyfill from "fetch-ponyfill";
 import Web3 from "web3";
 import { JsonRpcPayload } from "web3-providers";
 import { JsonRPCRequest, JsonRPCResponse } from "web3/providers";
+import { Subprovider } from "@0x/subproviders";
+import { JSONRPCRequestPayload } from "ethereum-types";
+
 import { VERSION } from "./version";
 
 const { fetch, Headers } = fetchPonyfill();
@@ -10,6 +13,9 @@ const RATE_LIMIT_STATUS = 429;
 const DEFAULT_MAX_RETRIES = 3;
 const DEFAULT_RETRY_INTERVAL = 1000;
 const DEFAULT_RETRY_JITTER = 250;
+
+export type ErrorCallback = (err: Error | null, data?: any) => void;
+export type Callback = () => void;
 
 export interface AlchemyWeb3Config {
   writeProvider?: Provider | null;
@@ -159,6 +165,57 @@ export function createAlchemyWeb3(
       }),
   };
   return alchemyWeb3;
+}
+
+export class AlchemySubprovider extends Subprovider {
+  private readonly alchemyRpcUrl: string;
+  private readonly config: AlchemyWeb3Config;
+
+  /**
+   * Instantiates a new AlchemySubprovider
+   */
+  constructor(alchemyRpcUrl: string, config: AlchemyWeb3Config) {
+    super();
+
+    this.alchemyRpcUrl = alchemyRpcUrl;
+    this.config = fillInConfigDefaults(config);
+  }
+
+  /**
+   * This method conforms to the web3-provider-engine interface.
+   * It is called internally by the ProviderEngine when it is this subproviders
+   * turn to handle a JSON RPC request.
+   * @param payload JSON RPC payload
+   * @param next Callback to call if this subprovider decides not to handle the request
+   * @param end Callback to call if subprovider handled the request and wants to pass back the request.
+   */
+  public async handleRequest(
+    payload: JSONRPCRequestPayload,
+    next: Callback,
+    end: ErrorCallback,
+  ): Promise<void> {
+    if (ALCHEMY_DISALLOWED_METHODS.indexOf(payload.method) === -1) {
+      try {
+        const data = await sendToAlchemyWithRetries(
+          payload,
+          this.alchemyRpcUrl,
+          this.config as FullConfig,
+        );
+        if (data.error) {
+          next();
+          return;
+        }
+        end(null, data.result);
+        return;
+      } catch (alchemyError) {
+        next();
+        return;
+      }
+    } else {
+      next();
+      return;
+    }
+  }
 }
 
 function fillInConfigDefaults({

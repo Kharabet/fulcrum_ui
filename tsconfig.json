@@ -10,7 +10,11 @@
     "noUnusedParameters": true,
     "skipLibCheck": true,
     "strict": true,
-    "target": "es5"
+    "target": "es5",
+    "typeRoots": [
+      "node_modules/@0x/typescript-typings/types",
+      "node_modules/@types"
+    ]
   },
   "include": ["src/**/*", "__tests__/**/*"]
 }
