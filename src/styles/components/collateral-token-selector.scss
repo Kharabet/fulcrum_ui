@@ -73,13 +73,13 @@
 }
 
 .collateral-token-selector__actions {
-  @include clearfix();
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
 
   margin-top: 3rem;
 
   .collateral-token-selector__action--close {
-    float: right;
-
     cursor: pointer;
     text-decoration: underline;
     text-decoration-style: dotted;

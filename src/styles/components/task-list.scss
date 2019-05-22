@@ -230,13 +230,14 @@
 }
 
 .task-list-item-details__step-actions {
-  @include clearfix();
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
 
   margin: 0 1rem;
 }
 
 .task-list-item-details__step-action-btn {
-  float:right;
   display: inline-block;
   vertical-align: top;
   cursor: pointer;

@@ -17,12 +17,13 @@
 }
 
 .progress-details__actions-container {
-  @include clearfix();
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
 }
 
 .progress-details__close-btn {
   display: inline-block;
-  float: right;
 
   margin-top: 2rem;
 

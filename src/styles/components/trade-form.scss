@@ -49,8 +49,9 @@
 }
 
 .trade-form__actions-container {
-  @include clearfix();
-
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
 }
 
 .trade-form__position-type-container {
@@ -58,7 +59,9 @@
 }
 
 .trade-form__kv-container {
-  @include clearfix();
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 
   padding: 0.22rem 0;
 }
@@ -89,7 +92,6 @@
 }
 
 .trade-form__label {
-  float: left;
   line-height: 2;
   font-size: 0.75rem;
   font-weight: normal;
@@ -119,7 +121,6 @@
 }
 
 .trade-form__value {
-  float: right;
   line-height: 2;
   font-size: 0.75rem;
   font-weight: 600;
@@ -183,7 +184,6 @@
 
 .trade-form__cancel-button {
   display: inline-block;
-  float: right;
 
   cursor: pointer;
   border: 0;
@@ -198,7 +198,6 @@
 
 .trade-form__submit-button {
   display: inline-block;
-  float: right;
 
   cursor: pointer;
   border: 0;
