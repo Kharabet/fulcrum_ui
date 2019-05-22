@@ -1,7 +1,10 @@
 .trade-page {
-  width: $page-max-width;
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+  justify-content: flex-start;
 
-  margin-left: auto;
-  margin-right: auto;
-  display: block;
+  height: 100%;
+  width: $page-max-width;
+  flex-shrink: 0;
 }

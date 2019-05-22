@@ -15,17 +15,21 @@ export class ProgressBar extends Component<IProgressBarProps> {
     return (
       <div className="progress-bar-container">
         <div className="progress-bar">
-          <TokenSpinner asset={this.props.requestTask.request.asset} />
-          <div className="progress-bar__info">
-            <div className="progress-bar__title">Submitting request</div>
-            <div className="progress-bar__step">
-              Step {this.props.requestTask.stepCurrent} of {this.props.requestTask.steps.length}
+          <div className="progress-bar__info-container">
+            <TokenSpinner asset={this.props.requestTask.request.asset} />
+            <div className="progress-bar__info">
+              <div className="progress-bar__title">Submitting request</div>
+              <div className="progress-bar__step">
+                Step {this.props.requestTask.stepCurrent} of {this.props.requestTask.steps.length}
+              </div>
             </div>
           </div>
-          <button className="progress-bar__btn progress-bar__btn--more" onClick={this.props.onViewMore}>
-            View more
-          </button>
-          {this.renderTaskFailedStateActions()}
+          <div className="progress-bar__actions-container">
+            <button className="progress-bar__btn progress-bar__btn--more" onClick={this.props.onViewMore}>
+              View more
+            </button>
+            {this.renderTaskFailedStateActions()}
+          </div>
         </div>
       </div>
     );

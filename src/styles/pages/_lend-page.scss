@@ -6,9 +6,7 @@
 
   height: 100%;
   width: $page-max-width;
-
-  margin-left: auto;
-  margin-right: auto;
+  flex-shrink: 0;
 
   .lend-page-main {
     margin-top: 5rem;
