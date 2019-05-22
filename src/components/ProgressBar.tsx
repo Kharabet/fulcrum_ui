@@ -13,8 +13,8 @@ export interface IProgressBarProps {
 export class ProgressBar extends Component<IProgressBarProps> {
   public render() {
     return (
-      <div className="progress-bar">
-        <div className="progress-bar__container">
+      <div className="progress-bar-container">
+        <div className="progress-bar">
           <TokenSpinner asset={this.props.requestTask.request.asset} />
           <div className="progress-bar__info">
             <div className="progress-bar__title">Submitting request</div>

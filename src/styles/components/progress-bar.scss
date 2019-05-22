@@ -1,28 +1,27 @@
-.progress-bar {
+.progress-bar-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+
   height: 5rem;
+  padding: 0 2rem;
+
   background-color: #201f23;
 }
 
-.progress-bar__container {
-  @include clearfix();
+.progress-bar {
+  display: flex;
+  flex-direction: row;
+  justify-content: left;
 
   width: $page-max-width;
-  margin-left: auto;
-  margin-right: auto;
 }
 
 .progress-bar__info {
-  display: inline-block;
-  vertical-align: top;
-
   margin: 1.5rem 0 1.5rem 0.625rem;
 }
 
 .progress-bar__error-message {
-  float:right;
-  display: inline-block;
-  vertical-align: top;
-
   margin: 1.5rem 0 1.5rem 0.625rem;
 
   font-size: 0.75rem;
@@ -74,7 +73,7 @@
   width: 96px;
   height: 32px;
   border-radius: 20px;
-  margin: 1.5rem 0 1.5rem 1rem;
+  margin: 1.5rem 0 1.5rem auto;
 
   &--more {
     background-color: rgba(0, 0, 0, 0);

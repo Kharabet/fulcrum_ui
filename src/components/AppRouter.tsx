@@ -61,15 +61,17 @@ export class AppRouter extends Component<any, IAppRouterState> {
           />
         </Modal>
         <ProgressFragment />
-        <HashRouter hashType="slash">
-          <Switch>
-            <Route exact={true} path="/" render={() => <LandingPage />} />
-            <Route exact={true} path="/lend" render={() => <LendPage isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} />} />
-            <Route exact={true} path="/trade" render={() => <TradePage isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} />} />
-            <Route exact={true} path="/stats" render={() => <StatsPage isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} />} />
-            <Route path="*" render={() => <Redirect to="/"/> } />
-          </Switch>
-        </HashRouter>
+        <div className="pages-container">
+          <HashRouter hashType="slash">
+            <Switch>
+              <Route exact={true} path="/" render={() => <LandingPage />} />
+              <Route exact={true} path="/lend" render={() => <LendPage isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} />} />
+              <Route exact={true} path="/trade" render={() => <TradePage isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} />} />
+              <Route exact={true} path="/stats" render={() => <StatsPage isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} />} />
+              <Route path="*" render={() => <Redirect to="/"/> } />
+            </Switch>
+          </HashRouter>
+        </div>
       </React.Fragment>
     );
   }
