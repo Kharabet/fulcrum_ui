@@ -1,12 +1,12 @@
+import { Web3Wrapper } from '@0x/web3-wrapper';
 import React, { Component } from "react";
 import Modal from "react-modal";
-import { HashRouter, Route, Switch, Redirect } from "react-router-dom";
-import { Web3Wrapper } from '@0x/web3-wrapper';
+import { HashRouter, Redirect, Route, Switch } from "react-router-dom";
 import { ProviderType } from "../domain/ProviderType";
 import { LandingPage } from "../pages/LandingPage";
 import { LendPage } from "../pages/LendPage";
-import { TradePage } from "../pages/TradePage";
 import { StatsPage } from "../pages/StatsPage";
+import { TradePage } from "../pages/TradePage";
 import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
@@ -51,11 +51,12 @@ export class AppRouter extends Component<any, IAppRouterState> {
             selectedProviderType={this.state.selectedProviderType}
             providerTypes={[
               ProviderType.MetaMask,
-              //ProviderType.Fortmatic,
+              ProviderType.Fortmatic,
+              ProviderType.Portis,
               ProviderType.Bitski,
               ProviderType.WalletConnect,
-              ProviderType.Portis,
-              ProviderType.None]}
+              ProviderType.None
+            ]}
             onSelect={this.onProviderTypeSelect}
           />
         </Modal>
@@ -78,17 +79,12 @@ export class AppRouter extends Component<any, IAppRouterState> {
   };
 
   public onProviderTypeSelect = async (providerType: ProviderType) => {
-    //await FulcrumProvider.Instance.setWeb3Provider(ProviderType.None);
-    
-    this.setState({
+    await this.setState({
       ...this.state,
-      isLoading: providerType !== ProviderType.None,
+      isLoading: true,
       isProviderMenuModalOpen: false
-    }, () => {
-      //if (providerType !== ProviderType.None) {
-        FulcrumProvider.Instance.setWeb3Provider(providerType);
-      //}
     });
+    await FulcrumProvider.Instance.setWeb3Provider(providerType);
   };
 
   public onRequestClose = () => {
@@ -99,6 +95,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
     this.setState({
       ...this.state,
       selectedProviderType: event.providerType,
+      isLoading: false,
       web3: event.web3
     });
   };

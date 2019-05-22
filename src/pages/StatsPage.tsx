@@ -2,9 +2,9 @@ import React, { Component } from "react";
 import { StatsTokenGrid } from "../components/StatsTokenGrid";
 import { Footer } from "../layout/Footer";
 import { HeaderOps } from "../layout/HeaderOps";
-//import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
-//import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
-import { FulcrumProvider } from "../services/FulcrumProvider";
+// import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
+// import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
+// import { FulcrumProvider } from "../services/FulcrumProvider";
 
 export interface IStatsPageProps {
   doNetworkConnect: () => void;
@@ -21,11 +21,11 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
     //FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
   }*/
 
-  public componentDidMount(): void {
+  /*public componentDidMount(): void {
     if (!FulcrumProvider.Instance.web3Wrapper) {
       this.props.doNetworkConnect();
     }
-  }
+  }*/
 
   public render() {
     return (

@@ -1,15 +1,14 @@
+import { Web3ProviderEngine } from "@0x/subproviders";
 import { BigNumber } from "@0x/utils";
+import { Web3Wrapper } from '@0x/web3-wrapper';
 import { EventEmitter } from "events";
 import moment from "moment";
 import fetch from "node-fetch";
-import { Web3Wrapper } from '@0x/web3-wrapper';
-import { Web3ProviderEngine } from "@0x/subproviders";
 import { erc20Contract } from "../contracts/erc20";
 import { iTokenContract } from "../contracts/iTokenContract";
 import { pTokenContract } from "../contracts/pTokenContract";
 import { Asset } from "../domain/Asset";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
-import { ReserveDetails } from "../domain/ReserveDetails";
 import { IPriceDataPoint } from "../domain/IPriceDataPoint";
 import { IWeb3ProviderSettings } from "../domain/IWeb3ProviderSettings";
 import { LendRequest } from "../domain/LendRequest";
@@ -17,6 +16,7 @@ import { LendType } from "../domain/LendType";
 import { ProviderType } from "../domain/ProviderType";
 import { RequestStatus } from "../domain/RequestStatus";
 import { RequestTask } from "../domain/RequestTask";
+import { ReserveDetails } from "../domain/ReserveDetails";
 import { TradeRequest } from "../domain/TradeRequest";
 import { TradeTokenKey } from "../domain/TradeTokenKey";
 import { TradeType } from "../domain/TradeType";
@@ -125,13 +125,13 @@ export class FulcrumProvider {
 
     this.contractsSource =
       this.web3Wrapper && this.web3ProviderSettings
-        ? new ContractsSource(this.providerEngine, this.web3ProviderSettings.networkId, canWrite)
+        ? await new ContractsSource(this.providerEngine, this.web3ProviderSettings.networkId, canWrite)
         : null;
     if (this.contractsSource) {
       await this.contractsSource.Init();
     }
 
-    this.eventEmitter.emit(
+    await this.eventEmitter.emit(
       FulcrumProviderEvents.ProviderChanged,
       new ProviderChangedEvent(this.providerType, this.web3Wrapper)
     );
@@ -321,8 +321,8 @@ export class FulcrumProvider {
       if (assetContract) {
 
         let symbol: string = "";
-        let name: string = "";
-        //let tokenPrice: BigNumber | null;
+        const name: string = "";
+        // let tokenPrice: BigNumber | null;
         let marketLiquidity: BigNumber | null;
         let liquidityReserved: BigNumber | null;
         let totalAssetSupply: BigNumber | null;
@@ -333,8 +333,8 @@ export class FulcrumProvider {
 
         await Promise.all([
           (symbol = await assetContract.symbol.callAsync()),
-          //(name = await assetContract.name.callAsync()),
-          //(tokenPrice = await assetContract.tokenPrice.callAsync()),
+          // (name = await assetContract.name.callAsync()),
+          // (tokenPrice = await assetContract.tokenPrice.callAsync()),
           (marketLiquidity = await assetContract.marketLiquidity.callAsync()),
           (liquidityReserved = await assetContract.totalReservedSupply.callAsync()),
           (totalAssetSupply = await assetContract.totalAssetSupply.callAsync()),
@@ -348,7 +348,7 @@ export class FulcrumProvider {
           assetContract.address,
           symbol,
           name,
-          null,//tokenPrice.dividedBy(10 ** 18),
+          null,// tokenPrice.dividedBy(10 ** 18),
           marketLiquidity.dividedBy(10 ** 18),
           liquidityReserved.dividedBy(10 ** 18),
           totalAssetSupply.dividedBy(10 ** 18),
@@ -1140,7 +1140,7 @@ export class FulcrumProvider {
     reject: (value: any) => void) => {
 
     try {
-      let receipt = await web3Wrapper.getTransactionReceiptIfExistsAsync(txHash);
+      const receipt = await web3Wrapper.getTransactionReceiptIfExistsAsync(txHash);
       if (receipt) {
         resolve(receipt);
         if (request instanceof LendRequest) {

@@ -18,7 +18,6 @@ export interface IOwnTokenGridRowProps {
   currentKey: TradeTokenKey;
   balance: BigNumber;
 
-  onSelect: (key: TradeTokenKey) => void;
   onDetails: (key: TradeTokenKey) => void;
   onTrade: (request: TradeRequest) => void;
 }
@@ -106,13 +105,9 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
       bnPrice = bnPrice.div(1000);
       bnLiquidationPrice = bnLiquidationPrice.div(1000);
     }
-    
-    // const bnChange24h = new BigNumber(this.state.latestPriceDataPoint.change24h);
-    const isActiveClassName =
-      this.props.currentKey.toString() === this.props.selectedKey.toString() ? "trade-token-grid-row--active" : "";
 
     return (
-      <div className={`trade-token-grid-row ${isActiveClassName}`} onClick={this.onSelectClick}>
+      <div className="trade-token-grid-row">
         <div
           className="trade-token-grid-row__col-token-image"
           style={{ backgroundColor: this.state.assetDetails.bgColor, borderLeftColor: this.state.assetDetails.bgColor }}
@@ -140,12 +135,6 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
       </div>
     );
   }
-
-  public onSelectClick = (event: React.MouseEvent<HTMLElement>) => {
-    event.stopPropagation();
-
-    this.props.onSelect(this.props.currentKey);
-  };
 
   public onDetailsClick = (event: React.MouseEvent<HTMLElement>) => {
     event.stopPropagation();

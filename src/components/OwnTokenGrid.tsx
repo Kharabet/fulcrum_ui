@@ -10,7 +10,6 @@ export interface IOwnTokenGridProps {
   selectedKey: TradeTokenKey;
 
   onShowMyTokensOnlyChange: (value: boolean) => void;
-  onSelect: (key: TradeTokenKey) => void;
   onDetails: (key: TradeTokenKey) => void;
   onTrade: (request: TradeRequest) => void;
 }
@@ -34,12 +33,7 @@ export class OwnTokenGrid extends Component<IOwnTokenGridProps, IOwnTokenGridSta
   }
 
   public componentDidMount(): void {
-    this.derivedUpdate().then(() => {
-      if (this.state.tokenRowsData.length > 0) {
-        const e = this.state.tokenRowsData[0];
-        this.props.onSelect(e.currentKey);
-      }
-    });
+    this.derivedUpdate();
   }
 
   public componentDidUpdate(
@@ -81,7 +75,6 @@ export class OwnTokenGrid extends Component<IOwnTokenGridProps, IOwnTokenGridSta
           selectedKey: props.selectedKey,
           currentKey: pToken,
           balance: balance,
-          onSelect: props.onSelect,
           onDetails: props.onDetails,
           onTrade: props.onTrade
         });

@@ -29,6 +29,7 @@ interface ITradePageState {
   isTradeModalOpen: boolean;
   tradeType: TradeType;
   tradeAsset: Asset;
+  tradeUnitOfAccount: Asset;
   tradePositionType: PositionType;
   tradeLeverage: number;
 
@@ -51,6 +52,7 @@ export class TradePage extends Component<ITradePageProps, ITradePageState> {
       isTradeModalOpen: false,
       tradeType: TradeType.BUY,
       tradeAsset: Asset.UNKNOWN,
+      tradeUnitOfAccount: Asset.UNKNOWN,
       tradePositionType: PositionType.SHORT,
       tradeLeverage: 0,
       collateralToken: Asset.UNKNOWN,
@@ -98,7 +100,6 @@ export class TradePage extends Component<ITradePageProps, ITradePageState> {
               showMyTokensOnly={this.state.showMyTokensOnly}
               selectedKey={this.state.selectedKey}
               onShowMyTokensOnlyChange={this.onShowMyTokensOnlyChange}
-              onSelect={this.onSelect}
               onDetails={this.onDetails}
               onTrade={this.onTradeRequested}
             />
@@ -125,10 +126,11 @@ export class TradePage extends Component<ITradePageProps, ITradePageState> {
               positionType={this.state.tradePositionType}
               leverage={this.state.tradeLeverage}
               defaultCollateral={this.state.collateralToken}
-              defaultUnitOfAccount={Asset.DAI}
+              defaultUnitOfAccount={this.state.tradeUnitOfAccount}
               defaultTokenizeNeeded={true}
               onSubmit={this.onTradeConfirmed}
               onCancel={this.onRequestClose}
+              onTrade={this.onTradeRequested}
             />
           </Modal>
           <Modal
@@ -181,6 +183,7 @@ export class TradePage extends Component<ITradePageProps, ITradePageState> {
         collateralToken: request.collateral,
         tradeType: request.tradeType,
         tradeAsset: request.asset,
+        tradeUnitOfAccount: request.unitOfAccount,
         tradePositionType: request.positionType,
         tradeLeverage: request.leverage
       });

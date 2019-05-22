@@ -207,7 +207,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
       new TradeRequest(
         TradeType.BUY,
         this.props.asset,
-        this.props.defaultUnitOfAccount, // TODO: demands on which one they own
+        this.props.defaultUnitOfAccount, // TODO: depends on which one they own
         Asset.ETH,
         this.props.positionType,
         this.state.leverage,
@@ -223,7 +223,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
       new TradeRequest(
         TradeType.SELL,
         this.props.asset,
-        this.props.defaultUnitOfAccount, // TODO: demands on which one they own
+        this.props.defaultUnitOfAccount, // TODO: depends on which one they own
         this.props.selectedKey.positionType === PositionType.SHORT ? this.props.selectedKey.asset : Asset.DAI,
         this.props.positionType,
         this.state.leverage,

@@ -30,6 +30,7 @@ export interface ITradeFormProps {
 
   onSubmit: (request: TradeRequest) => void;
   onCancel: () => void;
+  onTrade: (request: TradeRequest) => void;
 }
 
 interface ITradeFormState {
@@ -157,6 +158,8 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       this.props.asset !== prevProps.asset ||
       this.props.positionType !== prevProps.positionType ||
       this.props.leverage !== prevProps.leverage ||
+      this.props.defaultUnitOfAccount !== prevProps.defaultUnitOfAccount ||
+      this.props.defaultTokenizeNeeded !== prevProps.defaultTokenizeNeeded ||
       this.state.collateral !== prevState.collateral
     ) {
       this.derivedUpdate();
@@ -405,7 +408,19 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
   };
 
   public onChangeUnitOfAccount = async (asset: Asset) => {
-    this.setState({ ...this.state, unitOfAccount: asset });
+    await this.setState({ ...this.state, unitOfAccount: asset });
+
+    await this.props.onTrade(
+      new TradeRequest(
+        this.props.tradeType,
+        this.props.asset,
+        asset,
+        this.state.collateral,
+        this.props.positionType,
+        this.props.leverage,
+        this.state.tradeAmount
+      )
+    );
   };
 
   public onChangeTokenizeNeeded = async (event: ChangeEvent<HTMLInputElement>) => {

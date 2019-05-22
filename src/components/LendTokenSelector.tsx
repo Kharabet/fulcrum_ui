@@ -13,7 +13,7 @@ export class LendTokenSelector extends Component<ILendTokenSelectorProps> {
     Asset.DAI,
     Asset.USDC,
     Asset.wBTC,
-    //Asset.MKR,
+    // Asset.MKR,
     Asset.ZRX,
     Asset.BAT,
     Asset.REP,

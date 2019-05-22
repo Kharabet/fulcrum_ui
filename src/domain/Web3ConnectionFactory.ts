@@ -5,20 +5,23 @@ import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { Web3Wrapper } from '@0x/web3-wrapper';
 
 import Portis from "@portis/web3";
+// @ts-ignore
+import WalletConnectProvider from "@walletconnect/web3-provider";
 import { Bitski } from "bitski";
 // @ts-ignore
 import Fortmatic from "fortmatic";
-// @ts-ignore
-import WalletConnectProvider from "@walletconnect/web3-provider";
 import { ProviderType } from "./ProviderType";
 
-import { Web3ProviderEngine, MetamaskSubprovider, SignerSubprovider } from "@0x/subproviders";
+import { MetamaskSubprovider, SignerSubprovider, Web3ProviderEngine } from "@0x/subproviders";
 // @ts-ignore
 import { AlchemySubprovider } from "@alch/alchemy-web3";
 
 import configProviders from "../config/providers.json";
 
 export class Web3ConnectionFactory {
+  private static alchemyProvider: AlchemySubprovider | null;
+  private static fortmaticProvider: Fortmatic | null;
+
   public static async getWeb3Provider(providerType: ProviderType | null, eventEmitter: EventEmitter): Promise<[Web3Wrapper | null, Web3ProviderEngine | null, boolean]> {
     let canWrite = false;
     let subProvider: any | null = null;
@@ -37,15 +40,16 @@ export class Web3ConnectionFactory {
           break;
         }
         case ProviderType.Fortmatic: {
-          subProvider = Web3ConnectionFactory.getProviderFortmatic();
+          subProvider = await Web3ConnectionFactory.getProviderFortmatic();
+          Web3ConnectionFactory.fortmaticProvider = subProvider ? subProvider : null;
           break;
         }
         case ProviderType.WalletConnect: {
-          subProvider = Web3ConnectionFactory.getProviderWalletConnect();
+          subProvider = await Web3ConnectionFactory.getProviderWalletConnect();
           break;
         }
         case ProviderType.Portis: {
-          subProvider = Web3ConnectionFactory.getProviderPortis();
+          subProvider = await Web3ConnectionFactory.getProviderPortis();
           break;
         }
       }
@@ -69,7 +73,10 @@ export class Web3ConnectionFactory {
     
     const providerEngine: Web3ProviderEngine = new Web3ProviderEngine({ pollingInterval: 3600000 }); // 1 hour polling
 
-    providerEngine.addProvider(new AlchemySubprovider(`https://eth-ropsten.alchemyapi.io/jsonrpc/${configProviders.Alchemy_ApiKey}`, { writeProvider: null }));
+    if (!Web3ConnectionFactory.alchemyProvider) {
+      Web3ConnectionFactory.alchemyProvider = new AlchemySubprovider(`https://eth-ropsten.alchemyapi.io/jsonrpc/${configProviders.Alchemy_ApiKey}`, { writeProvider: null });
+    }
+    providerEngine.addProvider(Web3ConnectionFactory.alchemyProvider);
     if (subProvider) {
       if (providerType === ProviderType.MetaMask) {
         providerEngine.addProvider(new MetamaskSubprovider(subProvider));
@@ -109,27 +116,38 @@ export class Web3ConnectionFactory {
   }
 
   private static async getProviderBitski(): Promise<any> {
-    const bitski = new Bitski(configProviders.Bitski_ClientId, `https://ropsten.fulcrum.trade`);//configProviders.Bitski_CallbackUrl);
+    const bitski = new Bitski(configProviders.Bitski_ClientId, `https://ropsten.fulcrum.trade`);// configProviders.Bitski_CallbackUrl);
     await bitski.signIn();
     return bitski.getProvider();
   }
 
-  private static getProviderFortmatic(): any {
-    const fortmatic = new Fortmatic(configProviders.Fortmatic_ApiKey);
-    return fortmatic.getProvider();
+  private static async getProviderFortmatic(): Promise<any> {
+    if (Web3ConnectionFactory.fortmaticProvider) {
+      // console.log(Web3ConnectionFactory.fortmaticProvider, Web3ConnectionFactory.fortmaticProvider.user);
+      if (!Web3ConnectionFactory.fortmaticProvider.isLoggedIn) {
+        await Web3ConnectionFactory.fortmaticProvider.user.login(); 
+      }
+      return Web3ConnectionFactory.fortmaticProvider;
+    } else {
+      const fortmatic = await new Fortmatic(configProviders.Fortmatic_ApiKey, "ropsten");
+      const provider = await fortmatic.getProvider();
+      // console.log(`provider`,provider);
+      await fortmatic.user.login();
+      return provider;
+    }
   }
 
-  private static getProviderWalletConnect(): any {
-    const walletConnector = new WalletConnectProvider({
+  private static async getProviderWalletConnect(): Promise<any> {
+    const walletConnector = await new WalletConnectProvider({
       bridge: "https://bridge.walletconnect.org"
     });
  
-    console.log(walletConnector);
+    // console.log(walletConnector);
     return walletConnector;
   }
 
-  private static getProviderPortis(): any {
-    const portis = new Portis(configProviders.Portis_DAppId, configProviders.Portis_Network);
+  private static async getProviderPortis(): Promise<any> {
+    const portis = await new Portis(configProviders.Portis_DAppId, configProviders.Portis_Network);
     return portis.provider;
   }
 }

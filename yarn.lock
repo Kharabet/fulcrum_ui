@@ -1449,14 +1449,14 @@
   integrity sha512-shAmDyaQC4H92APFoIaVDHCx5bStIocgvbwQyxPRrbUY20V1EYTbSDchWbuwlMG3V17cprZhA6+78JfB+3DTPw==
 
 "@openid/appauth@^1.2.0":
-  version "1.2.2"
-  resolved "https://registry.yarnpkg.com/@openid/appauth/-/appauth-1.2.2.tgz#c890e34d9626e40740b23de8f37a3fd140df470a"
-  integrity sha512-Vd7Nj8X6HE2vnL/pJXTLugigICIiiwqCOchKtLgUHMVCr5l9yBMChrULJrVwPfDnFwW0af0tuSQwSdhyf+RKuw==
+  version "1.2.3"
+  resolved "https://registry.yarnpkg.com/@openid/appauth/-/appauth-1.2.3.tgz#512099531a0852e828f4e93c7b06accd72407e30"
+  integrity sha512-vzGvIfpuU8zlFj7OF968NMMOxRp20uTa1V/ueqzpoe2d7MJdS1mRDL/sr1hH8l8ZF2HlL+Znz5oy0VuhT//Gfw==
   dependencies:
     "@types/base64-js" "^1.2.5"
     "@types/jquery" "^3.3.29"
     base64-js "^1.3.0"
-    follow-redirects "^1.6.1"
+    follow-redirects "^1.7.0"
     form-data "^2.3.3"
     opener "^1.5.1"
 
@@ -2456,6 +2456,11 @@ async@^2.0.1, async@^2.1.2, async@^2.4.0:
   dependencies:
     lodash "^4.17.11"
 
+async@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/async/-/async-3.0.0.tgz#4c959b37d8c477dc189f2efb9340847f7ad7f785"
+  integrity sha512-LNZ6JSpKraIia6VZKKbKxmX6nWIdfsG7WqrOvKpCuDjH7BnGyQRFMTSXEe8to2WF/rqoAKgZvj+L5nnxe0suAg==
+
 asynckit@^0.4.0:
   version "0.4.0"
   resolved "https://registry.yarnpkg.com/asynckit/-/asynckit-0.4.0.tgz#c79ed97f7f34cb8f2ba1bc9790bcc366474b4b79"
@@ -2999,6 +3004,13 @@ babel-plugin-transform-regenerator@^6.22.0:
   integrity sha1-4HA2lvveJ/Cj78rPi03KL3s6jy8=
   dependencies:
     regenerator-transform "^0.10.0"
+
+babel-plugin-transform-runtime@^6.23.0:
+  version "6.23.0"
+  resolved "https://registry.yarnpkg.com/babel-plugin-transform-runtime/-/babel-plugin-transform-runtime-6.23.0.tgz#88490d446502ea9b8e7efb0fe09ec4d99479b1ee"
+  integrity sha1-iEkNRGUC6puOfvsP4J7E2ZR5se4=
+  dependencies:
+    babel-runtime "^6.22.0"
 
 babel-plugin-transform-strict-mode@^6.24.1:
   version "6.24.1"
@@ -5638,6 +5650,17 @@ eth-block-tracker@^4.2.0:
     pify "^3.0.0"
     safe-event-emitter "^1.0.1"
 
+eth-block-tracker@^4.4.1:
+  version "4.4.1"
+  resolved "https://registry.yarnpkg.com/eth-block-tracker/-/eth-block-tracker-4.4.1.tgz#805931fdff240e950c5ea68198a2fdc61b4482d2"
+  integrity sha512-QSz9bizoV4JRRkdvSfQ/z6VimU90wXaGmFEZyRhbOwotVZSMTtI720UM+dr6byDNj+axtZ0DMX0jpj5Kkzx6WQ==
+  dependencies:
+    babel-plugin-transform-runtime "^6.23.0"
+    eth-query "^2.1.0"
+    json-rpc-random-id "^1.0.1"
+    pify "^3.0.0"
+    safe-event-emitter "^1.0.1"
+
 eth-ens-namehash@2.0.8:
   version "2.0.8"
   resolved "https://registry.yarnpkg.com/eth-ens-namehash/-/eth-ens-namehash-2.0.8.tgz#229ac46eca86d52e0c991e7cb2aef83ff0f68bcf"
@@ -6032,7 +6055,7 @@ ethjs-unit@0.1.6, ethjs-unit@^0.1.6:
     bn.js "4.11.6"
     number-to-bn "1.7.0"
 
-ethjs-util@0.1.6, ethjs-util@^0.1.3:
+ethjs-util@0.1.6, ethjs-util@^0.1.3, ethjs-util@^0.1.6:
   version "0.1.6"
   resolved "https://registry.yarnpkg.com/ethjs-util/-/ethjs-util-0.1.6.tgz#f308b62f185f9fe6237132fb2a9818866a5cd536"
   integrity sha512-CUnVOQq7gSpDHZVVrQW8ExxUETWrnrvXYvYz55wOU8Uj4VCgw56XC2B/fVqQN+f7gmrnRHSLVnFAwsCuNwji8w==
@@ -6571,7 +6594,7 @@ follow-redirects@^1.0.0:
   dependencies:
     debug "=3.1.0"
 
-follow-redirects@^1.6.1:
+follow-redirects@^1.7.0:
   version "1.7.0"
   resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.7.0.tgz#489ebc198dc0e7f64167bd23b03c4c19b5784c76"
   integrity sha512-m/pZQy4Gj287eNy94nivy5wchN3Kp+Q5WgUPNy5lJSZ3sgkVKSYV/ZChMAQVIgx1SqfZ2zBZtPA2YlXIWxxJOQ==
@@ -6636,10 +6659,10 @@ form-data@^2.3.3, form-data@~2.3.2:
     combined-stream "^1.0.6"
     mime-types "^2.1.12"
 
-fortmatic@^0.7.0:
-  version "0.7.0"
-  resolved "https://registry.yarnpkg.com/fortmatic/-/fortmatic-0.7.0.tgz#978fa01e56a0fb1e5fb167c8fb366e8f100b57cd"
-  integrity sha512-ZLHy7g3z9jKkfba7Ow8H7ZR0IbKAG7wUy062BKBMGrDFqtM2ii7n4eMRYNWcqvsZXZ3E26CxXEqIFI81ibTdLw==
+fortmatic@^0.7.2:
+  version "0.7.2"
+  resolved "https://registry.yarnpkg.com/fortmatic/-/fortmatic-0.7.2.tgz#3be3dece90ad29e797840b4568b36828a39d71dd"
+  integrity sha512-4AvwTm2AMAcUl4nQQboVX56fpJQKHWtGDDE5Em25aP9q9lLRdov5sQxbMmIgN1wxoELi/qEUVJhqFgKIYPPMKQ==
   dependencies:
     "@babel/runtime" "7.3.4"
 
@@ -8635,7 +8658,7 @@ json-rpc-error@2.0.0, json-rpc-error@^2.0.0:
   dependencies:
     inherits "^2.0.1"
 
-json-rpc-random-id@^1.0.0:
+json-rpc-random-id@^1.0.0, json-rpc-random-id@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/json-rpc-random-id/-/json-rpc-random-id-1.0.1.tgz#ba49d96aded1444dbb8da3d203748acbbcdec8c8"
   integrity sha1-uknZat7RRE27jaPSA3SKy7zeyMg=
@@ -14619,7 +14642,7 @@ web3-provider-engine@14.0.6:
     xhr "^2.2.0"
     xtend "^4.0.1"
 
-web3-provider-engine@14.1.0, "web3-provider-engine@github:BitskiCo/provider-engine#master":
+web3-provider-engine@14.1.0:
   version "14.1.0"
   resolved "https://codeload.github.com/BitskiCo/provider-engine/tar.gz/f64e5defd8f98174a438da3f337f97eb867a8115"
   dependencies:
@@ -14668,6 +14691,21 @@ web3-provider-engine@^14.1.0:
     semaphore "^1.0.3"
     ws "^5.1.1"
     xhr "^2.2.0"
+    xtend "^4.0.1"
+
+"web3-provider-engine@github:BitskiCo/provider-engine#master":
+  version "0.2.0"
+  resolved "https://codeload.github.com/BitskiCo/provider-engine/tar.gz/1684600fb94873af63b1724fe9ce460746d7aee8"
+  dependencies:
+    async "^3.0.0"
+    bn.js "^4.11.8"
+    clone "^2.0.0"
+    cross-fetch "^2.1.0"
+    eth-block-tracker "^4.4.1"
+    ethjs-util "^0.1.6"
+    json-rpc-error "^2.0.0"
+    json-stable-stringify "^1.0.1"
+    promise-to-callback "^1.0.0"
     xtend "^4.0.1"
 
 "web3-provider-engine@github:walletconnect/web3-provider-engine":

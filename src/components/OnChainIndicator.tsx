@@ -1,6 +1,6 @@
 // import styled from "styled-components";
-import React, { Component } from "react";
 import { Web3Wrapper } from '@0x/web3-wrapper';
+import React, { Component } from "react";
 import { IWeb3ProviderSettings } from "../domain/IWeb3ProviderSettings";
 import { ProviderType } from "../domain/ProviderType";
 import { ProviderTypeDetails } from "../domain/ProviderTypeDetails";
@@ -71,8 +71,10 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
   }
 
   public render() {
-    const providerTypeDetails = ProviderTypeDictionary.providerTypes.get(this.state.selectedProviderType) || null;
-    const walletAddressText = this.state.walletAddress
+    const providerTypeDetails = this.state.selectedProviderType !== ProviderType.None ? 
+    ProviderTypeDictionary.providerTypes.get(this.state.selectedProviderType) || null :
+      null;
+    const walletAddressText = !this.props.isLoading && this.state.walletAddress
       ? `${this.state.walletAddress.slice(0, 6)}...${this.state.walletAddress.slice(
           this.state.walletAddress.length - 4,
           this.state.walletAddress.length
@@ -103,29 +105,37 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
   }
 
   public renderProviderType(providerTypeDetails: ProviderTypeDetails | null) {
-    if (providerTypeDetails !== null && providerTypeDetails.logoSvg !== null) {
+    if (this.props.isLoading) {
       return (
-        <img
-          className="on-chain-indicator__provider-img"
-          src={providerTypeDetails.logoSvg}
-          alt={providerTypeDetails.displayName}
-          onClick={this.props.doNetworkConnect}
-        />
+        <span className="on-chain-indicator__provider-txt" onClick={this.props.doNetworkConnect}>
+          Loading...
+        </span>
       );
     }
     else {
-      if (this.props.isLoading) {
+      if (this.state.selectedProviderType !== ProviderType.None && providerTypeDetails !== null && providerTypeDetails.logoSvg !== null) {
         return (
-          <span className="on-chain-indicator__provider-txt" onClick={this.props.doNetworkConnect}>
-            Loading...
-          </span>
+          <img
+            className="on-chain-indicator__provider-img"
+            src={providerTypeDetails.logoSvg}
+            alt={providerTypeDetails.displayName}
+            onClick={this.props.doNetworkConnect}
+          />
         );
       } else {
-        return (
-          <span className="on-chain-indicator__provider-txt" onClick={this.props.doNetworkConnect}>
-            Click To Connect
-          </span>
-        );
+        if (this.state.selectedProviderType !== ProviderType.None) {
+          return (
+            <span className="on-chain-indicator__provider-txt" onClick={this.props.doNetworkConnect}>
+              Loading...
+            </span>
+          );
+        } else {
+          return (
+            <span className="on-chain-indicator__provider-txt" onClick={this.props.doNetworkConnect}>
+              Click To Connect
+            </span>
+          );
+        }
       }
     }
   }
