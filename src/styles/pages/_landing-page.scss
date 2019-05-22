@@ -1,5 +1,3 @@
-$downscaling-factor: 1.0;
-
 .html-landing-page-active {
   background-size: 1920px 1440px;
   background-repeat: no-repeat;
@@ -14,16 +12,20 @@ $downscaling-factor: 1.0;
 }
 
 .landing-page {
-  min-width: 810px/$downscaling-factor;
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+  justify-content: space-between;
+
+  height: 100%;
   max-width: $page-max-width;
 
   margin-left: auto;
   margin-right: auto;
-  display: block;
 }
 
 .landing-page__main {
-  margin-bottom: 8rem/$downscaling-factor;
+
 }
 
 .landing-page__jumbo {
@@ -31,16 +33,16 @@ $downscaling-factor: 1.0;
   position: relative;
   left: 50%;
   transform: translateX(-50%);
-  width: 50.5rem/$downscaling-factor;
+  width: 50.5rem;
   text-align: center;
 
   h1 {
-    margin-bottom: 5.75rem/$downscaling-factor;
+    margin-bottom: 5.75rem;
   }
 }
 
 .landing-page__jumbo-header {
-  font-size: 6.75rem/$downscaling-factor;
+  font-size: 6.75rem;
   font-weight: 300;
   font-style: normal;
   font-stretch: normal;
@@ -51,14 +53,14 @@ $downscaling-factor: 1.0;
 
 .landing-page__jumbo-action {
   display: inline-block;
-  width: 16rem/$downscaling-factor;
+  width: 16rem;
 
   &:first-child {
-    padding-right: 2rem/$downscaling-factor;
+    padding-right: 2rem;
   }
 
   &:last-child {
-    padding-left: 2rem/$downscaling-factor;
+    padding-left: 2rem;
   }
 }
 
@@ -67,11 +69,11 @@ $downscaling-factor: 1.0;
 }
 
 .landing-page__jumbo-action-description {
-  font-size: 1.25rem/$downscaling-factor;
+  font-size: 1.25rem;
   font-weight: 600;
   font-style: normal;
   font-stretch: normal;
-  line-height: 1.5/$downscaling-factor;
+  line-height: 1.5;
   letter-spacing: -0.2px;
   text-align: center;
   color: #ffffff;
@@ -80,10 +82,10 @@ $downscaling-factor: 1.0;
 .landing-page__jumbo-action-button {
   display: inline-block;
   position: relative;
-  line-height: 4.5rem/$downscaling-factor;
-  height: 4.5rem/$downscaling-factor;
-  width: 12.5rem/$downscaling-factor;
-  margin-bottom: 2rem/$downscaling-factor;
+  line-height: 4.5rem;
+  height: 4.5rem;
+  width: 12.5rem;
+  margin-bottom: 2rem;
 
   border-width: 0;
   border-radius: 100px;
@@ -101,7 +103,7 @@ $downscaling-factor: 1.0;
     background: linear-gradient(to right, #00b4af, #2c69b2);
   }
 
-  font-size: 1rem/$downscaling-factor;
+  font-size: 1rem;
   font-weight: 600;
   font-style: normal;
   font-stretch: normal;
