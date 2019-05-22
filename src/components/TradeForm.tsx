@@ -408,19 +408,19 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
   };
 
   public onChangeUnitOfAccount = async (asset: Asset) => {
-    await this.setState({ ...this.state, unitOfAccount: asset });
-
-    await this.props.onTrade(
-      new TradeRequest(
-        this.props.tradeType,
-        this.props.asset,
-        asset,
-        this.state.collateral,
-        this.props.positionType,
-        this.props.leverage,
-        this.state.tradeAmount
-      )
-    );
+    this.setState({ ...this.state, unitOfAccount: asset }, () => {
+      this.props.onTrade(
+        new TradeRequest(
+          this.props.tradeType,
+          this.props.asset,
+          asset,
+          this.state.collateral,
+          this.props.positionType,
+          this.props.leverage,
+          this.state.tradeAmount
+        )
+      );
+    });
   };
 
   public onChangeTokenizeNeeded = async (event: ChangeEvent<HTMLInputElement>) => {
