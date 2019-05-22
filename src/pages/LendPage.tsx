@@ -37,7 +37,7 @@ export class LendPage extends Component<ILendPageProps, ILendPageState> {
     return (
       <div className="lend-page">
         <HeaderOps isLoading={this.props.isLoading} doNetworkConnect={this.props.doNetworkConnect} />
-        <main>
+        <main className="lend-page-main">
           <LendTokenSelector onLend={this.onLendRequested} />
           <Modal
             isOpen={this.state.isLendModalOpen}

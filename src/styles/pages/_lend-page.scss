@@ -1,7 +1,16 @@
 .lend-page {
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+  justify-content: flex-start;
+
+  height: 100%;
   width: $page-max-width;
 
   margin-left: auto;
   margin-right: auto;
-  display: block;
+
+  .lend-page-main {
+    margin-top: 5rem;
+  }
 }
