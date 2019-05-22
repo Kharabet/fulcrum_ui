@@ -105,6 +105,12 @@ export class TasksListItemDetails extends Component<ITasksListItemDetailsProps> 
             ) : ``}
           </React.Fragment>
         ) : ``}
+        <button
+          className="task-list-item-details__step-action-btn task-list-item-details__step-action-btn--cancel"
+          onClick={this.onTaskCancel}
+        >
+          Cancel
+        </button>
         {forceRetry ? (
           <button
             className="task-list-item-details__step-action-btn task-list-item-details__step-action-btn--try-again"
@@ -120,12 +126,6 @@ export class TasksListItemDetails extends Component<ITasksListItemDetailsProps> 
             Try again
           </button>
         )}
-        <button
-          className="task-list-item-details__step-action-btn task-list-item-details__step-action-btn--cancel"
-          onClick={this.onTaskCancel}
-        >
-          Cancel
-        </button>
       </div>
     ) : null;
   };

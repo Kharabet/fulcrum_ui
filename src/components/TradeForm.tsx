@@ -298,11 +298,11 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
           </div>
 
           <div className="trade-form__actions-container">
-            <button type="submit" className={`trade-form__submit-button ${submitClassName}`}>
-              {this.props.tradeType}
-            </button>
             <button className="trade-form__cancel-button" onClick={this.onCancelClick}>
               <span className="trade-form__label--action">Cancel</span>
+            </button>
+            <button type="submit" className={`trade-form__submit-button ${submitClassName}`}>
+              {this.props.tradeType}
             </button>
           </div>
         </div>

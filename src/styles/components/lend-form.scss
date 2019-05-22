@@ -49,12 +49,15 @@
 }
 
 .lend-form__actions-container {
-  @include clearfix();
-  
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
 }
 
 .lend-form__kv-container {
-  @include clearfix();
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 
   padding: 0.22rem 0;
 }
@@ -66,7 +69,6 @@
 }
 
 .lend-form__label {
-  float: left;
   line-height: 2;
   font-size: 0.75rem;
   font-weight: normal;
@@ -92,7 +94,6 @@
 }
 
 .lend-form__value {
-  float: right;
   line-height: 2;
   font-size: 0.75rem;
   font-weight: 600;
@@ -139,7 +140,6 @@
 
 .lend-form__cancel-button {
   display: inline-block;
-  float: right;
 
   cursor: pointer;
   border: 0;
@@ -154,7 +154,6 @@
 
 .lend-form__submit-button {
   display: inline-block;
-  float: right;
 
   cursor: pointer;
   border: 0;

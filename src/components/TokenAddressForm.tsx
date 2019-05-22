@@ -56,6 +56,7 @@ export class TokenAddressForm extends Component<ITokenAddressFormProps, ITokenAd
             {this.state.tokenAddress}
           </div>
           <div className="token-address-form__kv-container">
+            <div className="token-address-form__label" />
             <div className="token-address-form__value">
               <span className="token-address-form__value-close" onClick={this.props.onCancel}>Close</span>
             </div>

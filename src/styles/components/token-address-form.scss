@@ -15,13 +15,14 @@
 }
 
 .token-address-form__kv-container {
-  @include clearfix();
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 
   padding: 0.22rem 0;
 }
 
 .token-address-form__label {
-  float: left;
   line-height: 2;
   font-size: 0.75rem;
   font-weight: normal;
@@ -33,7 +34,6 @@
 }
 
 .token-address-form__value {
-  float: right;
   line-height: 2;
   font-size: 0.75rem;
   font-weight: normal;

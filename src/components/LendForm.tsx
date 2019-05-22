@@ -197,11 +197,11 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
           </div>
 
           <div className="lend-form__actions-container">
-            <button type="submit" className={`lend-form__submit-button ${submitClassName}`}>
-              {this.props.lendType}
-            </button>
             <button className="lend-form__cancel-button" onClick={this.onCancelClick}>
               <span className="lend-form__label--action">Cancel</span>
+            </button>
+            <button type="submit" className={`lend-form__submit-button ${submitClassName}`}>
+              {this.props.lendType}
             </button>
           </div>
         </div>

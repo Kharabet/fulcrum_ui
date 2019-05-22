@@ -25,10 +25,10 @@ export class ProgressBar extends Component<IProgressBarProps> {
             </div>
           </div>
           <div className="progress-bar__actions-container">
+            {this.renderTaskFailedStateActions()}
             <button className="progress-bar__btn progress-bar__btn--more" onClick={this.props.onViewMore}>
               View more
             </button>
-            {this.renderTaskFailedStateActions()}
           </div>
         </div>
       </div>
@@ -57,12 +57,16 @@ export class ProgressBar extends Component<IProgressBarProps> {
         }
       }
     }
-    
+
     return this.props.requestTask.status === RequestStatus.FAILED || this.props.requestTask.status === RequestStatus.FAILED_SKIPGAS ? (
       <React.Fragment>
-        <button className="progress-bar__btn progress-bar__btn--cancel" onClick={this.onTaskCancel}>
-          Cancel
-        </button>
+        {errorMsg ? (
+          <React.Fragment>
+            <div className="progress-bar__error-message">
+              {errorMsg}
+            </div>
+          </React.Fragment>
+        ) : ``}
         {forceRetry ? (
           <button className="progress-bar__btn progress-bar__btn--try-again" onClick={this.onForceRetry}>
             Submit
@@ -72,13 +76,9 @@ export class ProgressBar extends Component<IProgressBarProps> {
             Try again
           </button>
         )}
-        {errorMsg ? (
-          <React.Fragment>
-            <div className="progress-bar__error-message">
-              {errorMsg}
-            </div>>
-          </React.Fragment>
-        ) : ``}
+        <button className="progress-bar__btn progress-bar__btn--cancel" onClick={this.onTaskCancel}>
+          Cancel
+        </button>
       </React.Fragment>
     ) : null;
   };
