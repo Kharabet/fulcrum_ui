@@ -133,11 +133,6 @@ export class FulcrumProvider {
     if (this.contractsSource) {
       await this.contractsSource.Init();
     }
-
-    await this.eventEmitter.emit(
-      FulcrumProviderEvents.ProviderChanged,
-      new ProviderChangedEvent(this.providerType, this.web3Wrapper)
-    );
   }
 
   public onLendConfirmed = async (request: LendRequest) => {
