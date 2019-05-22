@@ -24,6 +24,10 @@ body, #root {
   height: 100%;
 }
 
+#root {
+  padding: 0 2rem;
+}
+
 input {
   font-family: "Open Sans", sans-serif;
 }

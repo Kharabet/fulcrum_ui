@@ -14,9 +14,6 @@ export class FooterMenu extends Component {
         <Link className="footer-menu__item" to="/stats">
           Stats
         </Link>
-        <div className="footer-menu__item">
-          Powered by <a href="//bzx.network">bZx</a>
-        </div>
       </div>
     );
   }
