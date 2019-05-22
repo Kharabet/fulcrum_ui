@@ -63,6 +63,8 @@ export class FulcrumProvider {
   public web3Wrapper: Web3Wrapper | null = null;
   public web3ProviderSettings: IWeb3ProviderSettings | null = null;
   public contractsSource: ContractsSource | null = null;
+  public accounts: string[] = [];
+  public isLoading: boolean = false;
 
   constructor() {
     // init
@@ -71,15 +73,15 @@ export class FulcrumProvider {
     TasksQueue.Instance.on(TasksQueueEvents.Enqueued, this.onTaskEnqueued);
 
     // setting up readonly provider
-    Web3ConnectionFactory.getWeb3Provider(null, this.eventEmitter).then((providerEngine) => {
+    Web3ConnectionFactory.getWeb3Provider(null, this.eventEmitter).then((providerData) => {
       // @ts-ignore
-      const web3Wrapper = providerEngine[0];
-      FulcrumProvider.getWeb3ProviderSettings(web3Wrapper).then((web3ProviderSettings) => {
+      const web3Wrapper = providerData[0];
+      FulcrumProvider.getWeb3ProviderSettings(web3Wrapper, providerData[3]).then((web3ProviderSettings) => {
         if (web3Wrapper && web3ProviderSettings) {
-          const contractsSource = new ContractsSource(providerEngine[1], web3ProviderSettings.networkId, providerEngine[2]);
+          const contractsSource = new ContractsSource(providerData[1], web3ProviderSettings.networkId, providerData[2]);
           contractsSource.Init().then(() => {
             this.web3Wrapper = web3Wrapper;
-            this.providerEngine = providerEngine[1];
+            this.providerEngine = providerData[1];
             this.web3ProviderSettings = web3ProviderSettings;
             this.contractsSource = contractsSource;
             this.eventEmitter.emit(FulcrumProviderEvents.ProviderAvailable);
@@ -100,33 +102,34 @@ export class FulcrumProvider {
     const providerData = await Web3ConnectionFactory.getWeb3Provider(providerType, this.eventEmitter);
     this.web3Wrapper = providerData[0];
     this.providerEngine = providerData[1];
-    const canWrite = providerData[2];
+    let canWrite = providerData[2];
+    let networkId = providerData[3];
 
     if (this.web3Wrapper) {
-      const networkId = await this.web3Wrapper.getNetworkIdAsync();
-      if (networkId === 3) { // ropsten only
-        this.providerType = providerType;
-      } else {
-        this.web3Wrapper = null;
-        this.providerType = ProviderType.None;
+      if (networkId !== 3) { // ropsten only
+        // TODO: inform the user they are on the wrong network. Make it provider specific (MetaMask, etc)
+
+        canWrite = false; // revert back to read-only
+        networkId = await this.web3Wrapper.getNetworkIdAsync();
       }
+    }
+
+    if (this.web3Wrapper && canWrite) {
+      this.accounts = await this.web3Wrapper.getAvailableAddressesAsync();
     } else {
-      this.providerType = ProviderType.None;
+      this.accounts = [];
     }
 
-    this.web3ProviderSettings = await FulcrumProvider.getWeb3ProviderSettings(this.web3Wrapper);
+    this.web3ProviderSettings = await FulcrumProvider.getWeb3ProviderSettings(this.web3Wrapper, networkId);
 
-    if (this.web3Wrapper) {
-      const networkId = await this.web3Wrapper.getNetworkIdAsync();
-      if (networkId !== 3) {
-        //
-      }
+    if (this.web3Wrapper && this.web3ProviderSettings) {
+      this.contractsSource = await new ContractsSource(this.providerEngine, this.web3ProviderSettings.networkId, canWrite);
+      this.providerType = providerType;
+    } else {
+      this.contractsSource = null;
+      // this.providerType = ProviderType.None;
     }
 
-    this.contractsSource =
-      this.web3Wrapper && this.web3ProviderSettings
-        ? await new ContractsSource(this.providerEngine, this.web3ProviderSettings.networkId, canWrite)
-        : null;
     if (this.contractsSource) {
       await this.contractsSource.Init();
     }
@@ -369,8 +372,7 @@ export class FulcrumProvider {
     let account: string | null = null;
 
     if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
-      const accounts = await this.web3Wrapper.getAvailableAddressesAsync();
-      account = accounts ? accounts[0].toLowerCase() : null;
+      account = this.accounts.length > 0 ? this.accounts[0].toLowerCase() : null;
     }
 
     if (account && this.contractsSource && this.contractsSource.canWrite) {
@@ -400,8 +402,7 @@ export class FulcrumProvider {
     let account: string | null = null;
 
     if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
-      const accounts = await this.web3Wrapper.getAvailableAddressesAsync();
-      account = accounts ? accounts[0].toLowerCase() : null;
+      account = this.accounts.length > 0 ? this.accounts[0].toLowerCase() : null;
     }
 
     if (account && this.contractsSource && this.contractsSource.canWrite) {
@@ -529,9 +530,8 @@ export class FulcrumProvider {
     return result;
   };
 
-  public static async getWeb3ProviderSettings(web3: Web3Wrapper| null): Promise<IWeb3ProviderSettings | null> {
+  public static async getWeb3ProviderSettings(web3: Web3Wrapper| null, networkId: number| null): Promise<IWeb3ProviderSettings | null> {
     if (web3) {
-      const networkId = await web3.getNetworkIdAsync();
       // tslint:disable-next-line:one-variable-per-declaration
       let networkName, etherscanURL;
       switch (networkId) {
@@ -557,7 +557,7 @@ export class FulcrumProvider {
           break;
       }
       return {
-        networkId,
+        networkId: networkId ? networkId : 0,
         networkName,
         etherscanURL
       };
@@ -637,8 +637,7 @@ export class FulcrumProvider {
     let result: BigNumber = new BigNumber(0);
 
     if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
-      const accounts = await this.web3Wrapper.getAvailableAddressesAsync();
-      const account = accounts ? accounts[0].toLowerCase() : null;
+      const account = this.accounts.length > 0 ? this.accounts[0].toLowerCase() : null;
       if (account) {
         const balance = await this.web3Wrapper.getBalanceInWeiAsync(account);
         result = new BigNumber(balance);
@@ -652,8 +651,7 @@ export class FulcrumProvider {
     let result = new BigNumber(0);
 
     if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
-      const accounts = await this.web3Wrapper.getAvailableAddressesAsync();
-      const account = accounts ? accounts[0].toLowerCase() : null;
+      const account = this.accounts.length > 0 ? this.accounts[0].toLowerCase() : null;
 
       if (account) {
         const tokenContract = await this.contractsSource.getErc20Contract(addressErc20);
@@ -780,8 +778,7 @@ export class FulcrumProvider {
         throw new Error("No provider available!");
       }
 
-      const accounts = await this.web3Wrapper.getAvailableAddressesAsync();
-      const account = accounts ? accounts[0].toLowerCase() : null;
+      const account = this.accounts.length > 0 ? this.accounts[0].toLowerCase() : null;
       if (!account) {
         throw new Error("Unable to get wallet address!");
       }
@@ -939,8 +936,7 @@ export class FulcrumProvider {
         throw new Error("No provider available!");
       }
 
-      const accounts = await this.web3Wrapper.getAvailableAddressesAsync();
-      const account = accounts ? accounts[0].toLowerCase() : null;
+      const account = this.accounts.length > 0 ? this.accounts[0].toLowerCase() : null;
       if (!account) {
         throw new Error("Unable to get wallet address!");
       }

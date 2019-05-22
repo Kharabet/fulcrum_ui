@@ -19,12 +19,13 @@ import { AlchemySubprovider } from "@alch/alchemy-web3";
 import configProviders from "../config/providers.json";
 
 export class Web3ConnectionFactory {
-  private static alchemyProvider: AlchemySubprovider | null;
-  private static fortmaticProvider: Fortmatic | null;
+  public static alchemyProvider: AlchemySubprovider | null;
+  public static fortmaticProvider: Fortmatic | null;
 
-  public static async getWeb3Provider(providerType: ProviderType | null, eventEmitter: EventEmitter): Promise<[Web3Wrapper | null, Web3ProviderEngine | null, boolean]> {
+  public static async getWeb3Provider(providerType: ProviderType | null, eventEmitter: EventEmitter): Promise<[Web3Wrapper | null, Web3ProviderEngine | null, boolean, number]> {
     let canWrite = false;
     let subProvider: any | null = null;
+    let networkId: number;
     if (providerType) {
       switch (providerType) {
         case ProviderType.None: {
@@ -98,9 +99,13 @@ export class Web3ConnectionFactory {
           new ProviderChangedEvent(providerType, web3Wrapper)
         )
       );
+      
+      networkId = parseInt(subProvider.networkVersion, 10);
+    } else {
+      networkId = await web3Wrapper.getNetworkIdAsync();
     }
 
-    return [web3Wrapper, providerEngine, canWrite];
+    return [web3Wrapper, providerEngine, canWrite, networkId];
   }
 
   private static async getProviderMetaMask(): Promise<any | null> {

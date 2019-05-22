@@ -5,8 +5,8 @@ import { IWeb3ProviderSettings } from "../domain/IWeb3ProviderSettings";
 import { ProviderType } from "../domain/ProviderType";
 import { ProviderTypeDetails } from "../domain/ProviderTypeDetails";
 import { ProviderTypeDictionary } from "../domain/ProviderTypeDictionary";
-import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
-import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
+// import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
+// import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
 
 export interface IOnChainIndicatorProps {
@@ -32,34 +32,17 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
       providerSettings: null
     };
 
-    FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
+    // FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
-  private async derivedUpdate() {
-    if (FulcrumProvider.Instance.web3Wrapper && FulcrumProvider.Instance.contractsSource && FulcrumProvider.Instance.contractsSource.canWrite) {
-      const accounts = await FulcrumProvider.Instance.web3Wrapper.getAvailableAddressesAsync();
-      const account = accounts ? accounts[0].toLowerCase() : null;
-      const providerSettings = await FulcrumProvider.getWeb3ProviderSettings(FulcrumProvider.Instance.web3Wrapper);
-      this.setState({
-        ...this.state,
-        selectedProviderType: FulcrumProvider.Instance.providerType,
-        web3: FulcrumProvider.Instance.web3Wrapper,
-        walletAddress: account,
-        providerSettings: providerSettings
-      });
-    } else {
-      this.setState({
-        ...this.state,
-        selectedProviderType: FulcrumProvider.Instance.providerType,
-        web3: FulcrumProvider.Instance.web3Wrapper,
-        walletAddress: null,
-        providerSettings: null
-      });
+  /*private async derivedUpdate() {
+  }*/
+
+  /*private onProviderChanged = async (event: ProviderChangedEvent) => {
+    if (event.providerType !== FulcrumProvider.Instance.providerType) {
+      this.derivedUpdate();
+      console.log(`onProviderChanged`, event);
     }
-  }
-
-  private onProviderChanged = async (event: ProviderChangedEvent) => {
-    this.derivedUpdate();
   };
 
   public componentWillUnmount(): void {
@@ -68,74 +51,90 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
 
   public async componentDidMount() {
     this.derivedUpdate();
-  }
+  }*/
 
   public render() {
-    const providerTypeDetails = this.state.selectedProviderType !== ProviderType.None ? 
-    ProviderTypeDictionary.providerTypes.get(this.state.selectedProviderType) || null :
-      null;
-    const walletAddressText = !this.props.isLoading && this.state.walletAddress
-      ? `${this.state.walletAddress.slice(0, 6)}...${this.state.walletAddress.slice(
-          this.state.walletAddress.length - 4,
-          this.state.walletAddress.length
-        )}`
-      : "...";
+    const providerTypeDetails = FulcrumProvider.Instance.providerType !== ProviderType.None ? 
+    ProviderTypeDictionary.providerTypes.get(FulcrumProvider.Instance.providerType) || null : null;
+
+    const account = FulcrumProvider.Instance.accounts.length > 0 ? FulcrumProvider.Instance.accounts[0].toLowerCase() : null;
+
+    let walletAddressText: string;
+    if (account) {
+        walletAddressText = `${account.slice(0, 6)}...${account.slice(
+          account.length - 4,
+          account.length
+        )}`;
+    } else {
+      if (FulcrumProvider.Instance.providerType !== ProviderType.None
+        && FulcrumProvider.Instance.contractsSource
+        && !FulcrumProvider.Instance.contractsSource.canWrite) {
+          walletAddressText = "Wrong Network!";
+      } else {
+        walletAddressText = "...";
+      }
+    }
 
     return (
       <div className="on-chain-indicator">
         <button className="on-chain-indicator__container">
-          {this.renderProviderType(providerTypeDetails)}
-          {this.state.walletAddress && this.state.providerSettings ? (
-            <a
-              className="on-chain-indicator__wallet-address"
-              href={`${this.state.providerSettings.etherscanURL}address/${this.state.walletAddress}`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {walletAddressText}
-            </a>
-          ) : (
-            <span className="on-chain-indicator__wallet-address" onClick={this.props.doNetworkConnect}>
-              {walletAddressText}
-            </span>
+          {this.renderProviderType(providerTypeDetails,
+            account && this.state.providerSettings ? (
+              <a
+                className="on-chain-indicator__wallet-address"
+                href={`${this.state.providerSettings.etherscanURL}address/${account}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {walletAddressText}
+              </a>
+            ) : (
+              <span className="on-chain-indicator__wallet-address" onClick={this.props.doNetworkConnect}>
+                {walletAddressText}
+              </span>
+            )
           )}
         </button>
       </div>
     );
   }
 
-  public renderProviderType(providerTypeDetails: ProviderTypeDetails | null) {
-    if (this.props.isLoading) {
+  public renderProviderType(providerTypeDetails: ProviderTypeDetails | null, addressRender: JSX.Element) {
+    if (FulcrumProvider.Instance.isLoading) {
       return (
-        <span className="on-chain-indicator__provider-txt" onClick={this.props.doNetworkConnect}>
-          Loading...
-        </span>
+        <React.Fragment>
+          <span className="on-chain-indicator__provider-txt" onClick={this.props.doNetworkConnect}>
+            Loading...
+          </span>
+          <span className="on-chain-indicator__wallet-address" onClick={this.props.doNetworkConnect}>
+            ...
+          </span>
+        </React.Fragment>
       );
-    }
-    else {
-      if (this.state.selectedProviderType !== ProviderType.None && providerTypeDetails !== null && providerTypeDetails.logoSvg !== null) {
+    } else {
+      if (providerTypeDetails !== null && providerTypeDetails.logoSvg !== null) {
         return (
-          <img
-            className="on-chain-indicator__provider-img"
-            src={providerTypeDetails.logoSvg}
-            alt={providerTypeDetails.displayName}
-            onClick={this.props.doNetworkConnect}
-          />
+          <React.Fragment>
+            <img
+              className="on-chain-indicator__provider-img"
+              src={providerTypeDetails.logoSvg}
+              alt={providerTypeDetails.displayName}
+              onClick={this.props.doNetworkConnect}
+            />
+            {addressRender}
+          </React.Fragment>
         );
       } else {
-        if (this.state.selectedProviderType !== ProviderType.None) {
-          return (
-            <span className="on-chain-indicator__provider-txt" onClick={this.props.doNetworkConnect}>
-              Loading...
-            </span>
-          );
-        } else {
-          return (
+        return (
+          <React.Fragment>
             <span className="on-chain-indicator__provider-txt" onClick={this.props.doNetworkConnect}>
               Click To Connect
             </span>
-          );
-        }
+            <span className="on-chain-indicator__wallet-address" onClick={this.props.doNetworkConnect}>
+              ...
+            </span>
+          </React.Fragment>
+        );
       }
     }
   }

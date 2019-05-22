@@ -47,21 +47,32 @@ export class ContractsSource {
 
   public async Init() {
     const step = 100;
-    let pos = 0;
+    const pos = 0;
     let next: ITokenContractInfo[] = [];
-    do {
+    // do {
       next = await this.tokenizedRegistryContract.getTokens.callAsync(
         new BigNumber(pos),
         new BigNumber(step),
-        new BigNumber(1)
+        new BigNumber(0)
       );
-      next.forEach(e => {
-        this.iTokensContractInfos.set(e.symbol, e);
-      });
-      pos += step;
-    } while (next.length > 0);
 
-    pos = 0;
+      // tslint:disable:no-console
+      console.log(`--- start of token list ---`);
+      next.forEach(e => {
+        // tslint:disable:no-console
+        console.log(e);
+      	if (e.tokenType.eq(1)) {
+          this.iTokensContractInfos.set(e.symbol, e);
+        } else if (e.tokenType.eq(2)) {
+          this.pTokensContractInfos.set(e.symbol, e);
+        }
+      });
+      // tslint:disable:no-console
+      console.log(`--- end of token list ---`);
+    //  pos += step;
+    // } while (next.length > 0);
+
+    /*pos = 0;
     next = [];
     do {
       next = await this.tokenizedRegistryContract.getTokens.callAsync(
@@ -73,7 +84,7 @@ export class ContractsSource {
         this.pTokensContractInfos.set(e.symbol, e);
       });
       pos += step;
-    } while (next.length > 0);
+    } while (next.length > 0);*/
   }
 
   private getTokenizedRegistryAddress(): string {
