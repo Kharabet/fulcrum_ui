@@ -1,44 +1,19 @@
 .header {
-  @include clearfix;
-
-  height: 3rem;
-
   padding-top: 1.8rem;
-  margin-bottom: 6rem;
+  margin-bottom: 1rem;
+
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  flex-shrink: 0;
 
   .header__left {
-    display: inline-block;
-    vertical-align: top;
-
-    height: 3rem;
+    text-align: left;
     width: 35%;
-  }
-
-  .header__center {
-    display: inline-block;
-    vertical-align: top;
-
-    height: 3rem;
-    width: 30%;
-
-    .header-menu {
-      position: relative;
-      left: 50%;
-      transform: translateX(-50%);
-    }
   }
 
   .header__right {
-    display: inline-block;
-    vertical-align: top;
-    
-    height: 3rem;
+    text-align: right;
     width: 35%;
-
-    .on-chain-indicator {
-      position: relative;
-      left: 100%;
-      transform: translateX(-100%);
-    }
   }
 }

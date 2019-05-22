@@ -1,5 +1,10 @@
 .footer {
-  @include clearfix;
+  justify-self: flex-end;
+
+  display: flex;
+  flex-shrink: 0;
+  flex-direction: row;
+  justify-content: space-between;
 
   margin-top: 1.5rem;
   padding-bottom: 1.75rem;
