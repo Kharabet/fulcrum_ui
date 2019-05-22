@@ -1,5 +1,5 @@
 .price-graph {
-  margin-top: -5rem;
+
 }
 
 .price-graph__hovered-time-container {
@@ -54,33 +54,17 @@
 .price-graph__graph-container {
 }
 
-.price-graph__liquidation-above {
-  @include clearfix();
-
-  background-image: url("../assets/images/margin_cell_border.png");
-  background-repeat: repeat-x;
-  background-position-y: 0.625rem;
-}
-
 .price-graph__timeline {
-  @include clearfix();
-
-  background-image: url("../assets/images/margin_cell_border.png");
-  background-repeat: repeat-x;
-  background-position-y: 0.625rem;
-
-  margin-right: 8.125rem;
-  margin-left: 8.125rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 }
 
 .price-graph__timeline-from {
-  display: inline-block;
-  float: left;
-
+  flex-grow: 0;
   padding-right: 1rem;
 
   color: #ffffff;
-  //background-color: #37414a;
 
   font-size: 0.875rem;
   font-weight: 600;
@@ -88,18 +72,21 @@
   font-stretch: normal;
   letter-spacing: normal;
   text-align: center;
+}
 
-  margin-left: -8.125rem;
+.price-graph__timeline-dots {
+  flex-grow: 1;
+
+  background-image: url("../assets/images/margin_cell_border.png");
+  background-repeat: repeat-x;
+  background-position-y: 0.625rem;
 }
 
 .price-graph__timeline-to {
-  display: inline-block;
-  float: right;
-
+  flex-grow: 0;
   padding-left: 1rem;
 
   color: #ffffff;
-  //background-color: #37414a;
 
   font-size: 0.875rem;
   font-weight: 600;
@@ -107,6 +94,4 @@
   font-stretch: normal;
   letter-spacing: normal;
   text-align: center;
-  
-  margin-right: -8.125rem;
 }

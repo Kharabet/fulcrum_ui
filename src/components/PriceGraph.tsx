@@ -113,6 +113,7 @@ export class PriceGraph extends Component<IPriceGraphProps, IPriceGraphState> {
         </div>
         <div className="price-graph__timeline">
           <div className="price-graph__timeline-from">{timeStampFromText}</div>
+          <div className="price-graph__timeline-dots" />
           <div className="price-graph__timeline-to">{timeStampToText}</div>
         </div>
       </div>
