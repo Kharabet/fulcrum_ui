@@ -27,7 +27,7 @@ export class HeaderOps extends Component<IHeaderOpsProps> {
           <HeaderMenu items={this._menu.items} />
         </div>
         <div className="header__right">
-          <OnChainIndicator isLoading={this.props.isLoading} doNetworkConnect={this.props.doNetworkConnect} />
+          <OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />
         </div>
       </header>
     );
