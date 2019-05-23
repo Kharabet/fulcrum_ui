@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "noEmit": false,
+    "outDir": "dist/cjs"
+  },
+  "exclude": ["__tests__/**/*"],
+  "extends": "./tsconfig.json"
+}
