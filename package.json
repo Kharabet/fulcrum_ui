@@ -11,7 +11,7 @@
     "shx": "^0.3.2"
   },
   "scripts": {
-    "clean-all": "shx rm -rf ./node_modules && shx rm -rf ./packages/**/node_modules",
+    "clean-all": "shx rm -rf ./packages/**/node_modules ./node_modules",
     "build-all": "yarn run build-fulcrum && yarn run build-torque",
     "build-fulcrum": "",
     "build-torque": ""
