@@ -88,14 +88,15 @@ export class AppRouter extends Component<any, IAppRouterState> {
         ...this.state,
         isLoading: true,
         isProviderMenuModalOpen: false
-      }, () => {
-        FulcrumProvider.Instance.setWeb3Provider(providerType).then(() => {
-          FulcrumProvider.Instance.isLoading = false;
-          FulcrumProvider.Instance.eventEmitter.emit(
-            FulcrumProviderEvents.ProviderChanged,
-            new ProviderChangedEvent(FulcrumProvider.Instance.providerType, FulcrumProvider.Instance.web3Wrapper)
-          );
-        });
+      }, async () => {
+        await FulcrumProvider.Instance.setWeb3Provider(providerType);	
+
+        FulcrumProvider.Instance.isLoading = false;	
+
+        await FulcrumProvider.Instance.eventEmitter.emit(	
+          FulcrumProviderEvents.ProviderChanged,	
+          new ProviderChangedEvent(FulcrumProvider.Instance.providerType, FulcrumProvider.Instance.web3Wrapper)	
+        );
       });
     } else {
       this.setState({
