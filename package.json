@@ -11,7 +11,7 @@
   },
   "scripts": {
     "clean-all": "rm -rf ./packages/**/node_modules ./node_modules",
-    "build-all": "yarn run build-fulcrum && yarn run build-torque",
+    "build-all": "yarn run build-alchemy-web3 && yarn run build-fulcrum-ropsten",
     "build-alchemy-web3": "cross-env-shell REACT_APP_ETH_NETWORK=ropsten \"./scripts/alchemy-web3.sh\"",
     "build-fulcrum-ropsten": "cross-env-shell REACT_APP_ETH_NETWORK=ropsten \"./scripts/build-fulcrum.sh\"",
     "build-fulcrum-mainnet": "cross-env-shell REACT_APP_ETH_NETWORK=mainnet \"./scripts/build-fulcrum.sh\"",
