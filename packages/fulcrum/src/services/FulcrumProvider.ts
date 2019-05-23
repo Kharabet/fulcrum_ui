@@ -150,7 +150,7 @@ export class FulcrumProvider {
   public getLendTokenInterestRate = async (asset: Asset): Promise<BigNumber> => {
     let result = new BigNumber(0);
     if (this.contractsSource) {
-      const assetContract = this.contractsSource.getITokenContract(asset);
+      const assetContract = await this.contractsSource.getITokenContract(asset);
       if (assetContract) {
         result = await assetContract.supplyInterestRate.callAsync();
         result = result.dividedBy(10 ** 18);
@@ -285,7 +285,7 @@ export class FulcrumProvider {
     const result = this.getPriceDefaultDataPoint();
     // we are using this function only for trade prices
     if (this.contractsSource) {
-      const assetContract = this.contractsSource.getPTokenContract(selectedKey);
+      const assetContract = await this.contractsSource.getPTokenContract(selectedKey);
       if (assetContract) {
         const tokenPrice = await assetContract.tokenPrice.callAsync();
         const liquidationPrice = await assetContract.liquidationPrice.callAsync();
@@ -315,7 +315,7 @@ export class FulcrumProvider {
     let result: ReserveDetails | null = null;
 
     if (this.contractsSource) {
-      const assetContract = this.contractsSource.getITokenContract(asset);
+      const assetContract = await this.contractsSource.getITokenContract(asset);
       if (assetContract) {
 
         let symbol: string = "";
@@ -374,7 +374,7 @@ export class FulcrumProvider {
       const balance = await this.getLoanTokenBalance(asset);
       if (balance.gt(0)) {
         result = new BigNumber(0);
-        const assetContract = this.contractsSource.getITokenContract(asset);
+        const assetContract = await this.contractsSource.getITokenContract(asset);
         if (assetContract) {
           const swapPrice = await this.getSwapToUsdPrice(asset);
           const tokenPrice = await assetContract.tokenPrice.callAsync();
@@ -404,7 +404,7 @@ export class FulcrumProvider {
       const balance = await this.getPositionTokenBalance(selectedKey);
       if (balance.gt(0)) {
         result = new BigNumber(0);
-        const assetContract = this.contractsSource.getPTokenContract(selectedKey);
+        const assetContract = await this.contractsSource.getPTokenContract(selectedKey);
         if (assetContract) {
           const swapPrice = await this.getSwapToUsdPrice(selectedKey.loanAsset);
           const tokenPrice = await assetContract.tokenPrice.callAsync();
@@ -431,7 +431,7 @@ export class FulcrumProvider {
 
     if (tradeType === TradeType.BUY) {
       if (this.contractsSource) {
-        const assetContract = this.contractsSource.getPTokenContract(selectedKey);
+        const assetContract = await this.contractsSource.getPTokenContract(selectedKey);
         if (assetContract) {
           let marketLiquidity = await assetContract.marketLiquidityForAsset.callAsync();
 
@@ -461,7 +461,7 @@ export class FulcrumProvider {
       result = await this.getBaseTokenBalance(request.asset);
     } else {
       if (this.contractsSource) {
-        const assetContract = this.contractsSource.getITokenContract(request.asset);
+        const assetContract = await this.contractsSource.getITokenContract(request.asset);
         if (assetContract) {
           const tokenPrice = await assetContract.tokenPrice.callAsync();
           const amount = await this.getLoanTokenBalance(request.asset);
@@ -485,7 +485,7 @@ export class FulcrumProvider {
         request.positionType,
         request.leverage
       );
-      const assetContract = this.contractsSource.getPTokenContract(key);
+      const assetContract = await this.contractsSource.getPTokenContract(key);
       if (assetContract) {
         const tokenPrice = await assetContract.tokenPrice.callAsync();
         let amount = request.amount;
@@ -511,7 +511,7 @@ export class FulcrumProvider {
     let result = new BigNumber(0);
 
     if (this.contractsSource) {
-      const assetContract = this.contractsSource.getITokenContract(request.asset);
+      const assetContract = await this.contractsSource.getITokenContract(request.asset);
       if (assetContract) {
         const tokenPrice = await assetContract.tokenPrice.callAsync();
 
@@ -675,7 +675,7 @@ export class FulcrumProvider {
     const srcAssetErc20Address = this.getErc20Address(srcAsset);
     const destAssetErc20Address = this.getErc20Address(destAsset);
     if (this.contractsSource && srcAssetErc20Address && destAssetErc20Address) {
-      const referencePriceFeedContract = this.contractsSource.getReferencePriceFeedContract();
+      const referencePriceFeedContract = await this.contractsSource.getReferencePriceFeedContract();
       const swapPriceData: BigNumber[] = await referencePriceFeedContract.getSwapPrice.callAsync(
         srcAssetErc20Address,
         destAssetErc20Address,

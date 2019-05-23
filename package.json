@@ -12,7 +12,8 @@
   "scripts": {
     "clean-all": "rm -rf ./packages/**/node_modules ./node_modules",
     "build-all": "yarn run build-fulcrum && yarn run build-torque",
-    "build-fulcrum": "./scripts/build-fulcrum.sh",
-    "build-torque": "./scripts/build-torque.sh"
+    "build-fulcrum-ropsten": "cross-env-shell REACT_APP_ETH_NETWORK=ropsten \"./scripts/build-fulcrum.sh\"",
+    "build-fulcrum-mainnet": "cross-env-shell REACT_APP_ETH_NETWORK=mainnet \"./scripts/build-fulcrum.sh\"",
+    "build-torque": "cross-env-shell REACT_APP_ETH_NETWORK=ropsten \"./scripts/build-torque.sh\""
   }
 }

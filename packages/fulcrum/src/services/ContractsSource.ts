@@ -9,11 +9,7 @@ import { pTokenContract } from "../contracts/pTokenContract";
 import { ReferencePriceFeedContract } from "../contracts/ReferencePriceFeedContract";
 import { TokenizedRegistryContract } from "../contracts/TokenizedRegistryContract";
 
-import erc20Json from "./../assets/artifacts/ropsten/erc20.json";
-import iTokenJson from "./../assets/artifacts/ropsten/iToken.json";
-import pTokenJson from "./../assets/artifacts/ropsten/pToken.json";
-import ReferencePriceFeedJson from "./../assets/artifacts/ropsten/ReferencePriceFeed.json";
-import TokenizedRegistryJson from "./../assets/artifacts/ropsten/TokenizedRegistry.json";
+const ethNetwork = process.env.REACT_APP_ETH_NETWORK;
 
 interface ITokenContractInfo {
   token: string;
@@ -26,11 +22,17 @@ interface ITokenContractInfo {
 
 export class ContractsSource {
   private readonly provider: any;
-  private readonly tokenizedRegistryContract: TokenizedRegistryContract;
+  private tokenizedRegistryContract: TokenizedRegistryContract | null;
   private readonly networkId: number;
 
   private iTokensContractInfos: Map<string, ITokenContractInfo> = new Map<string, ITokenContractInfo>();
   private pTokensContractInfos: Map<string, ITokenContractInfo> = new Map<string, ITokenContractInfo>();
+
+  private erc20Json: any;
+  private iTokenJson: any;
+  private pTokenJson: any;
+  private ReferencePriceFeedJson: any;
+  private TokenizedRegistryJson: any;
 
   public canWrite: boolean;
 
@@ -38,37 +40,45 @@ export class ContractsSource {
     this.provider = provider;
     this.networkId = networkId;
     this.canWrite = canWrite;
-    this.tokenizedRegistryContract = new TokenizedRegistryContract(
-      TokenizedRegistryJson.abi,
-      this.getTokenizedRegistryAddress().toLowerCase(),
-      provider
-    );
+    this.tokenizedRegistryContract = null;
   }
 
   public async Init() {
+    this.erc20Json = await import(`./../assets/artifacts/${ethNetwork}/erc20.json`);
+    this.iTokenJson = await import(`./../assets/artifacts/${ethNetwork}/iToken.json`);
+    this.pTokenJson = await import(`./../assets/artifacts/${ethNetwork}/pToken.json`);
+    this.ReferencePriceFeedJson = await import(`./../assets/artifacts/${ethNetwork}/ReferencePriceFeed.json`);
+    this.TokenizedRegistryJson = await import(`./../assets/artifacts/${ethNetwork}/TokenizedRegistry.json`);
+
+    this.tokenizedRegistryContract = new TokenizedRegistryContract(
+      this.TokenizedRegistryJson.abi,
+      this.getTokenizedRegistryAddress().toLowerCase(),
+      this.provider
+    );
+
     const step = 100;
     const pos = 0;
     let next: ITokenContractInfo[] = [];
     // do {
-      next = await this.tokenizedRegistryContract.getTokens.callAsync(
-        new BigNumber(pos),
-        new BigNumber(step),
-        new BigNumber(0)
-      );
+    next = await this.tokenizedRegistryContract.getTokens.callAsync(
+      new BigNumber(pos),
+      new BigNumber(step),
+      new BigNumber(0)
+    );
 
+    // tslint:disable:no-console
+    console.log(`--- start of token list ---`);
+    next.forEach(e => {
       // tslint:disable:no-console
-      console.log(`--- start of token list ---`);
-      next.forEach(e => {
-        // tslint:disable:no-console
-        console.log(e);
-      	if (e.tokenType.eq(1)) {
-          this.iTokensContractInfos.set(e.symbol, e);
-        } else if (e.tokenType.eq(2)) {
-          this.pTokensContractInfos.set(e.symbol, e);
-        }
-      });
-      // tslint:disable:no-console
-      console.log(`--- end of token list ---`);
+      console.log(e);
+      if (e.tokenType.eq(1)) {
+        this.iTokensContractInfos.set(e.symbol, e);
+      } else if (e.tokenType.eq(2)) {
+        this.pTokensContractInfos.set(e.symbol, e);
+      }
+    });
+    // tslint:disable:no-console
+    console.log(`--- end of token list ---`);
     //  pos += step;
     // } while (next.length > 0);
 
@@ -115,23 +125,23 @@ export class ContractsSource {
     return address;
   }
 
-  private getErc20ContractRaw(addressErc20: string): erc20Contract {
-    return new erc20Contract(erc20Json.abi, addressErc20.toLowerCase(), this.provider);
+  private async getErc20ContractRaw(addressErc20: string): Promise<erc20Contract> {
+    return new erc20Contract(this.erc20Json.abi, addressErc20.toLowerCase(), this.provider);
   }
 
-  private getITokenContractRaw(asset: Asset): iTokenContract | null {
+  private async getITokenContractRaw(asset: Asset): Promise<iTokenContract | null> {
     const tokenContractInfo = this.iTokensContractInfos.get(`i${asset}`) || null;
-    return tokenContractInfo ? new iTokenContract(iTokenJson.abi, tokenContractInfo.token, this.provider) : null;
+    return tokenContractInfo ? new iTokenContract(this.iTokenJson.abi, tokenContractInfo.token, this.provider) : null;
   }
 
-  private getPTokenContractRaw(key: TradeTokenKey): pTokenContract | null {
+  private async getPTokenContractRaw(key: TradeTokenKey): Promise<pTokenContract | null> {
     const tokenContractInfo = this.pTokensContractInfos.get(key.toString()) || null;
-    return tokenContractInfo ? new pTokenContract(pTokenJson.abi, tokenContractInfo.token, this.provider) : null;
+    return tokenContractInfo ? new pTokenContract(this.pTokenJson.abi, tokenContractInfo.token, this.provider) : null;
   }
 
-  private getReferencePriceFeedContractRaw(): ReferencePriceFeedContract {
+  private async getReferencePriceFeedContractRaw(): Promise<ReferencePriceFeedContract> {
     return new ReferencePriceFeedContract(
-      ReferencePriceFeedJson.abi,
+      this.ReferencePriceFeedJson.abi,
       this.getReferencePriceFeedAddress().toLowerCase(),
       this.provider
     );

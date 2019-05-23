@@ -18,6 +18,8 @@ import { AlchemySubprovider } from "@alch/alchemy-web3";
 
 import configProviders from "../config/providers.json";
 
+const ethNetwork = process.env.REACT_APP_ETH_NETWORK;
+
 export class Web3ConnectionFactory {
   public static alchemyProvider: AlchemySubprovider | null;
   public static fortmaticProvider: Fortmatic | null;
@@ -75,7 +77,7 @@ export class Web3ConnectionFactory {
     const providerEngine: Web3ProviderEngine = new Web3ProviderEngine({ pollingInterval: 3600000 }); // 1 hour polling
 
     if (!Web3ConnectionFactory.alchemyProvider) {
-      Web3ConnectionFactory.alchemyProvider = new AlchemySubprovider(`https://eth-ropsten.alchemyapi.io/jsonrpc/${configProviders.Alchemy_ApiKey}`, { writeProvider: null });
+      Web3ConnectionFactory.alchemyProvider = new AlchemySubprovider(`https://eth-${ethNetwork}.alchemyapi.io/jsonrpc/${configProviders.Alchemy_ApiKey}`, { writeProvider: null });
     }
     providerEngine.addProvider(Web3ConnectionFactory.alchemyProvider);
     if (subProvider) {
@@ -121,7 +123,7 @@ export class Web3ConnectionFactory {
   }
 
   private static async getProviderBitski(): Promise<any> {
-    const bitski = new Bitski(configProviders.Bitski_ClientId, `https://ropsten.fulcrum.trade`);// configProviders.Bitski_CallbackUrl);
+    const bitski = new Bitski(configProviders.Bitski_ClientId, `https://${ethNetwork}.fulcrum.trade`);// configProviders.Bitski_CallbackUrl);
     await bitski.signIn();
     return bitski.getProvider();
   }
@@ -134,7 +136,7 @@ export class Web3ConnectionFactory {
       }
       return Web3ConnectionFactory.fortmaticProvider;
     } else {
-      const fortmatic = await new Fortmatic(configProviders.Fortmatic_ApiKey, "ropsten");
+      const fortmatic = await new Fortmatic(configProviders.Fortmatic_ApiKey, ethNetwork);
       const provider = await fortmatic.getProvider();
       // console.log(`provider`,provider);
       await fortmatic.user.login();
@@ -152,7 +154,7 @@ export class Web3ConnectionFactory {
   }
 
   private static async getProviderPortis(): Promise<any> {
-    const portis = await new Portis(configProviders.Portis_DAppId, configProviders.Portis_Network);
+    const portis = await new Portis(configProviders.Portis_DAppId, ethNetwork || "");
     return portis.provider;
   }
 }

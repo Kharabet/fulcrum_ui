@@ -38,6 +38,7 @@
   "devDependencies": {
     "@0x/abi-gen": "^2.0.9",
     "@babel/core": "^7.0.0-0",
+    "cross-env": "^5.2.0",
     "@types/events": "^3.0.0",
     "@types/jest": "24.0.11",
     "@types/lodash": "^4.14.123",
@@ -62,9 +63,15 @@
   "scripts": {
     "clean": "rm -rf ./node_modules",
     "start": "react-scripts start",
+    "start-mainnet": "cross-env-shell REACT_APP_ETH_NETWORK=mainnet \"react-scripts start\"",
+    "start-ropsten": "cross-env-shell REACT_APP_ETH_NETWORK=ropsten \"react-scripts start\"",
     "lint": "tslint 'src/**/*.{ts,tsx}'",
     "build": "react-scripts build",
+    "build-mainnet": "cross-env-shell REACT_APP_ETH_NETWORK=mainnet \"react-scripts build\"",
+    "build-ropsten": "cross-env-shell REACT_APP_ETH_NETWORK=ropsten \"react-scripts build\"",
     "test": "react-scripts test",
+    "test-mainnet": "cross-env-shell REACT_APP_ETH_NETWORK=mainnet \"react-scripts build\"",
+    "test-ropsten": "cross-env-shell REACT_APP_ETH_NETWORK=ropsten \"react-scripts build\"",
     "eject": "react-scripts eject"
   },
   "browserslist": [
