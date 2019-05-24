@@ -64,7 +64,7 @@
             border-radius: 100px;
             background-image: linear-gradient(to right, #00b4af, #2c69b2);
 
-            $border: 8px;
+            $border: 0.5rem;
             &:before {
               content: "";
               position: absolute;
