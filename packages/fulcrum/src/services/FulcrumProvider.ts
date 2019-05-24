@@ -866,7 +866,7 @@ export class FulcrumProvider {
 
           const gasCost = gasAmountBN.multipliedBy(this.gasPrice).integerValue(BigNumber.ROUND_UP);
           // Submitting loan
-          const txHash = await tokenContract.mintWithEther.sendTransactionAsync(account, { from: account, value: amountInBaseUnits.minus(gasCost), gas: gasAmountBN.toString() });
+          const txHash = await tokenContract.mintWithEther.sendTransactionAsync(account, { from: account, value: amountInBaseUnits, gas: gasAmountBN.toString() });
           task.setTxHash(txHash);
           const txReceipt = await this.waitForTransactionMined(txHash, task.request);
           if (!txReceipt.status) {
@@ -1034,7 +1034,7 @@ export class FulcrumProvider {
 
           const gasCost = gasAmountBN.multipliedBy(this.gasPrice).integerValue(BigNumber.ROUND_UP);
           // Submitting trade
-          const txHash = await tokenContract.mintWithEther.sendTransactionAsync(account, { from: account, value: amountInBaseUnits.minus(gasCost), gas: gasAmountBN.toString() });
+          const txHash = await tokenContract.mintWithEther.sendTransactionAsync(account, { from: account, value: amountInBaseUnits, gas: gasAmountBN.toString() });
           task.setTxHash(txHash);
           const txReceipt = await this.waitForTransactionMined(txHash, task.request);
           if (!txReceipt.status) {

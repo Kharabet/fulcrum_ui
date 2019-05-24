@@ -70,7 +70,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       unitOfAccount: props.defaultUnitOfAccount,
       tokenizeNeeded: props.defaultTokenizeNeeded,
       isTradeAmountTouched: false,
-      tradeAmountText: maxTradeValue.toFixed(),
+      tradeAmountText: "",
       tradeAmount: maxTradeValue,
       balance: balance,
       positionTokenBalance: positionTokenBalance,
@@ -105,7 +105,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       this.props.tradeType === TradeType.BUY
         ? await FulcrumProvider.Instance.getBaseTokenBalance(this.state.collateral)
         : positionTokenBalance;
-    const maxTradeValue = await FulcrumProvider.Instance.getMaxTradeValue(this.props.tradeType, tradeTokenKey, this.state.collateral);
+    const maxTradeValue = (await FulcrumProvider.Instance.getMaxTradeValue(this.props.tradeType, tradeTokenKey, this.state.collateral)).decimalPlaces(6);
     const tradedAmountEstimate = await FulcrumProvider.Instance.getTradedAmountEstimate(
       new TradeRequest(
         this.props.tradeType,
@@ -114,15 +114,15 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
         this.state.collateral,
         this.props.positionType,
         this.props.leverage,
-        maxTradeValue
+        new BigNumber(0)
       )
     );
 
     this.setState({
       ...this.state,
       assetDetails: assetDetails || null,
-      tradeAmountText: maxTradeValue.toFixed(),
-      tradeAmount: maxTradeValue,
+      tradeAmountText: "",
+      tradeAmount: new BigNumber(0),
       balance: balance,
       positionTokenBalance: positionTokenBalance,
       maxTradeAmount: maxTradeValue,
@@ -257,6 +257,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
               className="trade-form__amount"
               value={this.state.tradeAmountText}
               onChange={this.onTradeAmountChange}
+              placeholder={`${this.props.tradeType === TradeType.BUY ? `Buy` : `Sell`} Amount`}
             />
             <div className="trade-form__kv-container">
               {isAmountMaxed ? (
