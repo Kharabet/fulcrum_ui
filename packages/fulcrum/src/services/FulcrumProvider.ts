@@ -237,7 +237,7 @@ export class FulcrumProvider {
             .map((e, i, final) => final.indexOf(e) === i && i)
             .filter((e, index) => priceDataObj[index]).map((e, i) => priceDataObj[i]);
 
-          // add nearestHour is not yet available from API
+          // add nearestHour if not yet available from API
           if (priceData && priceDataObj[priceDataObj.length-1].timeStamp !== nearestHour) {
             priceDataObj.push({
               timeStamp: nearestHour,
@@ -279,15 +279,18 @@ export class FulcrumProvider {
   };
 
   public getChartLatestDataPoint = async (selectedKey: TradeTokenKey): Promise<IPriceDataPoint> => {
-    const latestSwapPrice = await this.getSwapToUsdPrice(selectedKey.asset);
-    const priceLatestDataPoint = await this.getPriceLatestDataPoint(selectedKey);
-    priceLatestDataPoint.liquidationPrice = latestSwapPrice
-      .multipliedBy(priceLatestDataPoint.liquidationPrice)
-      .div(priceLatestDataPoint.price)
-      .toNumber();
-    priceLatestDataPoint.price = latestSwapPrice.toNumber();
-    
-    return priceLatestDataPoint;
+    try {
+      const latestSwapPrice = await this.getSwapToUsdPrice(selectedKey.asset);
+      const priceLatestDataPoint = await this.getPriceLatestDataPoint(selectedKey);
+      priceLatestDataPoint.liquidationPrice = latestSwapPrice
+        .multipliedBy(priceLatestDataPoint.liquidationPrice)
+        .div(priceLatestDataPoint.price)
+        .toNumber();
+      priceLatestDataPoint.price = latestSwapPrice.toNumber();
+      return priceLatestDataPoint;
+    } catch(e) {
+      return this.getPriceDefaultDataPoint();
+    }
   };
 
   public getPriceLatestDataPoint = async (selectedKey: TradeTokenKey): Promise<IPriceDataPoint> => {

@@ -146,22 +146,17 @@ export class PriceGraph extends Component<IPriceGraphProps, IPriceGraphState> {
       lastItem = null;
     }
 
-    /*
-      // uncomment once on mainnet
-      if (!lastItem || lastItem.timeStamp < moment().unix()) {
-      priceDataObj.push({
-        timeStamp: moment().unix(),
-        price: latestSwapPrice.toNumber(),
-        liquidationPrice: 0,
-        change24h: 0
-      });
-    }*/
-
-    // TEMP FIX: normalize mainnet prices to ropsten
-    if (lastItem && latestPriceData.price !== 0) {
-      Object.keys(priceDataPoints).map((obj, index) => {
-        priceDataPoints[index].price = new BigNumber(priceDataPoints[index].price).multipliedBy(latestPriceData.price).dividedBy(lastItem!.price).toNumber();
-      });
+    if (process.env.REACT_APP_ETH_NETWORK === "mainnet") {
+      if (latestPriceData.price !== 0 && (!lastItem || lastItem.timeStamp < latestPriceData.timeStamp)) {
+        priceDataPoints.push(latestPriceData);
+      }
+    } else {
+      // TEMP FIX: normalize mainnet prices to ropsten
+      if (lastItem && latestPriceData.price !== 0) {
+        Object.keys(priceDataPoints).map((obj, index) => {
+          priceDataPoints[index].price = new BigNumber(priceDataPoints[index].price).multipliedBy(latestPriceData.price).dividedBy(lastItem!.price).toNumber();
+        });
+      }
     }
     
     const prices = priceDataPoints.map(e => e.price);

@@ -63,7 +63,7 @@ export class ContractsSource {
     next = await this.tokenizedRegistryContract.getTokens.callAsync(
       new BigNumber(pos),
       new BigNumber(step),
-      new BigNumber(0)
+      new BigNumber(0) // this loads all the tokens at once
     );
 
     // tslint:disable:no-console
