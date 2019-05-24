@@ -12,6 +12,7 @@
 .progress-bar {
   display: flex;
   flex-direction: row;
+  flex-shrink: 0;
   justify-content: space-between;
 
   width: $page-max-width;
