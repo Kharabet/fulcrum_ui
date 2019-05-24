@@ -4,6 +4,8 @@ import { TradeTokenKey } from "../domain/TradeTokenKey";
 import { FulcrumProvider } from "../services/FulcrumProvider";
 import { OwnTokenGridHeader } from "./OwnTokenGridHeader";
 import { IOwnTokenGridRowProps, OwnTokenGridRow } from "./OwnTokenGridRow";
+import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
+import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 
 export interface IOwnTokenGridProps {
   showMyTokensOnly: boolean;
@@ -25,11 +27,21 @@ export class OwnTokenGrid extends Component<IOwnTokenGridProps, IOwnTokenGridSta
     this.state = {
       tokenRowsData: []
     };
+
+    FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
   public async derivedUpdate() {
     const tokenRowsData = await OwnTokenGrid.getRowsData(this.props);
     this.setState({ ...this.state, tokenRowsData: tokenRowsData });
+  }
+
+  private onProviderChanged = async (event: ProviderChangedEvent) => {
+    await this.derivedUpdate();
+  };
+
+  public componentWillUnmount(): void {
+    FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
   public componentDidMount(): void {

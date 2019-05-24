@@ -54,7 +54,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
               ProviderType.Fortmatic,
               ProviderType.Portis,
               ProviderType.Bitski,
-              ProviderType.WalletConnect,
+              //ProviderType.WalletConnect,
               ProviderType.None
             ]}
             onSelect={this.onProviderTypeSelect}

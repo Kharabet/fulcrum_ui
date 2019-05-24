@@ -26,19 +26,15 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
       null;
 
     let walletAddressText: string;
-    if (accountText) {
+    if (FulcrumProvider.Instance.unsupportedNetwork) {
+      walletAddressText = "Unsupported Network!";
+    } else if (accountText) {
         walletAddressText = `${accountText.slice(0, 6)}...${accountText.slice(
           accountText.length - 4,
           accountText.length
         )}`;
     } else {
-      if (FulcrumProvider.Instance.providerType !== ProviderType.None
-        && FulcrumProvider.Instance.contractsSource
-        && !FulcrumProvider.Instance.contractsSource.canWrite) {
-          walletAddressText = "Wrong Network!";
-      } else {
-        walletAddressText = "...";
-      }
+      walletAddressText = "...";
     }
 
     return (
@@ -72,7 +68,7 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
               alt={providerTypeDetails.displayName}
               onClick={this.props.doNetworkConnect}
             />
-            {accountText && FulcrumProvider.Instance.web3ProviderSettings ? (
+            {!FulcrumProvider.Instance.unsupportedNetwork && accountText && FulcrumProvider.Instance.web3ProviderSettings ? (
               <a
                 className="on-chain-indicator__wallet-address"
                 href={`${FulcrumProvider.Instance.web3ProviderSettings.etherscanURL}address/${accountText}`}

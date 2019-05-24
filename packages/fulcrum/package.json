@@ -19,7 +19,6 @@
     "@0x/utils": "^4.3.1",
     "@alch/alchemy-web3": "0.0.5-bzx",
     "@portis/web3": "^2.0.0-beta.26",
-    "@walletconnect/web3-provider": "^1.0.0-beta.22",
     "bitski": "^0.5.6",
     "events": "^3.0.0",
     "fortmatic": "^0.7.2",
@@ -38,7 +37,6 @@
   "devDependencies": {
     "@0x/abi-gen": "^2.0.9",
     "@babel/core": "^7.0.0-0",
-    "cross-env": "^5.2.0",
     "@types/events": "^3.0.0",
     "@types/jest": "24.0.11",
     "@types/lodash": "^4.14.123",
@@ -51,6 +49,7 @@
     "@types/styled-components": "^4.1.14",
     "@types/web3": "^1.0.18",
     "@walletconnect/types": "^1.0.0-beta.22",
+    "cross-env": "^5.2.0",
     "node-sass": "^4.11.0",
     "prettier": "^1.16.4",
     "react-scripts": "2.1.8",
@@ -70,8 +69,8 @@
     "build-mainnet": "cross-env-shell REACT_APP_ETH_NETWORK=mainnet \"react-scripts build\"",
     "build-ropsten": "cross-env-shell REACT_APP_ETH_NETWORK=ropsten \"react-scripts build\"",
     "test": "react-scripts test",
-    "test-mainnet": "cross-env-shell REACT_APP_ETH_NETWORK=mainnet \"react-scripts build\"",
-    "test-ropsten": "cross-env-shell REACT_APP_ETH_NETWORK=ropsten \"react-scripts build\"",
+    "test-mainnet": "cross-env-shell REACT_APP_ETH_NETWORK=mainnet \"react-scripts test\"",
+    "test-ropsten": "cross-env-shell REACT_APP_ETH_NETWORK=ropsten \"react-scripts test\"",
     "eject": "react-scripts eject"
   },
   "browserslist": [

@@ -1,4 +1,5 @@
 import { EventEmitter } from "events";
+import { FulcrumProvider } from "../services/FulcrumProvider";
 import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 
@@ -6,8 +7,8 @@ import { Web3Wrapper } from '@0x/web3-wrapper';
 
 import Portis from "@portis/web3";
 // @ts-ignore
-import WalletConnectProvider from "@walletconnect/web3-provider";
-import { Bitski } from "bitski";
+//import WalletConnectProvider from "@walletconnect/web3-provider";
+import { Bitski, AuthenticationStatus } from "bitski";
 // @ts-ignore
 import Fortmatic from "fortmatic";
 import { ProviderType } from "./ProviderType";
@@ -23,11 +24,12 @@ const ethNetwork = process.env.REACT_APP_ETH_NETWORK;
 export class Web3ConnectionFactory {
   public static alchemyProvider: AlchemySubprovider | null;
   public static fortmaticProvider: Fortmatic | null;
+  public static bitski: Bitski | null;
+  public static networkId: number;
 
   public static async getWeb3Provider(providerType: ProviderType | null, eventEmitter: EventEmitter): Promise<[Web3Wrapper | null, Web3ProviderEngine | null, boolean, number]> {
     let canWrite = false;
     let subProvider: any | null = null;
-    let networkId: number;
     if (providerType) {
       switch (providerType) {
         case ProviderType.None: {
@@ -47,10 +49,10 @@ export class Web3ConnectionFactory {
           Web3ConnectionFactory.fortmaticProvider = subProvider ? subProvider : null;
           break;
         }
-        case ProviderType.WalletConnect: {
+        /*case ProviderType.WalletConnect: {
           subProvider = await Web3ConnectionFactory.getProviderWalletConnect();
           break;
-        }
+        }*/
         case ProviderType.Portis: {
           subProvider = await Web3ConnectionFactory.getProviderPortis();
           break;
@@ -80,13 +82,22 @@ export class Web3ConnectionFactory {
       Web3ConnectionFactory.alchemyProvider = new AlchemySubprovider(`https://eth-${ethNetwork}.alchemyapi.io/jsonrpc/${configProviders.Alchemy_ApiKey}`, { writeProvider: null });
     }
     providerEngine.addProvider(Web3ConnectionFactory.alchemyProvider);
+
     if (subProvider) {
       if (providerType === ProviderType.MetaMask) {
         providerEngine.addProvider(new MetamaskSubprovider(subProvider));
+        canWrite = true;
+      } else if (providerType === ProviderType.Bitski) {
+        try {
+          subProvider = await subProvider.getProvider({ networkName: process.env.REACT_APP_ETH_NETWORK ? process.env.REACT_APP_ETH_NETWORK : undefined });
+          canWrite = true;
+        } catch(e) {
+          //console.log(e);
+        }
       } else {
         providerEngine.addProvider(new SignerSubprovider(subProvider));
+        canWrite = true;
       }
-      canWrite = true;
     }
 
     await providerEngine.start();
@@ -95,19 +106,53 @@ export class Web3ConnectionFactory {
 
     if (subProvider && providerType === ProviderType.MetaMask) {
       // @ts-ignore
-      subProvider.publicConfigStore.on("update", result =>
-        eventEmitter.emit(
-          FulcrumProviderEvents.ProviderChanged,
-          new ProviderChangedEvent(providerType, web3Wrapper)
-        )
-      );
+      subProvider.publicConfigStore.on("update", async result => {
+        const networkIdInt = parseInt(subProvider.networkVersion, 10);
+        if (FulcrumProvider.Instance.providerType === ProviderType.MetaMask &&
+          Web3ConnectionFactory.networkId !== networkIdInt) {
+          
+          Web3ConnectionFactory.networkId = networkIdInt;
+
+          FulcrumProvider.Instance.unsupportedNetwork = false;
+          await await FulcrumProvider.Instance.setWeb3ProviderFinalize(
+            providerType,
+            [
+              web3Wrapper,
+              providerEngine,
+              true,
+              networkIdInt
+            ]);
+          
+          await eventEmitter.emit(
+            FulcrumProviderEvents.ProviderChanged,
+            new ProviderChangedEvent(providerType, web3Wrapper)
+          );
+
+          return;
+        }
+
+        if (result.selectedAddress !== FulcrumProvider.Instance.accounts[0]) {
+          if (FulcrumProvider.Instance.accounts.length == 0) {
+            FulcrumProvider.Instance.accounts.push(result.selectedAddress);
+          } else {
+            FulcrumProvider.Instance.accounts[0] = result.selectedAddress;
+          }
+
+          eventEmitter.emit(
+            FulcrumProviderEvents.ProviderChanged,
+            new ProviderChangedEvent(providerType, web3Wrapper)
+          );
+
+          return;
+        }
+      });
       
-      networkId = parseInt(subProvider.networkVersion, 10);
+      Web3ConnectionFactory.networkId = parseInt(subProvider.networkVersion, 10);
     } else {
-      networkId = await web3Wrapper.getNetworkIdAsync();
+      Web3ConnectionFactory.networkId = await web3Wrapper.getNetworkIdAsync();
     }
 
-    return [web3Wrapper, providerEngine, canWrite, networkId];
+    return [web3Wrapper, providerEngine, canWrite, Web3ConnectionFactory.networkId];
   }
 
   private static async getProviderMetaMask(): Promise<any | null> {
@@ -123,9 +168,15 @@ export class Web3ConnectionFactory {
   }
 
   private static async getProviderBitski(): Promise<any> {
-    const bitski = new Bitski(configProviders.Bitski_ClientId, `https://${ethNetwork}.fulcrum.trade`);// configProviders.Bitski_CallbackUrl);
-    await bitski.signIn();
-    return bitski.getProvider();
+    if (Web3ConnectionFactory.bitski) {
+      if (Web3ConnectionFactory.bitski.authStatus === AuthenticationStatus.NotConnected) {
+        await Web3ConnectionFactory.bitski.signIn();
+      }
+    } else {
+      Web3ConnectionFactory.bitski = new Bitski(configProviders.Bitski_ClientId, `${location.origin}/callback.html`);
+      await Web3ConnectionFactory.bitski.signIn();
+    }
+    return Web3ConnectionFactory.bitski;
   }
 
   private static async getProviderFortmatic(): Promise<any> {
@@ -144,14 +195,14 @@ export class Web3ConnectionFactory {
     }
   }
 
-  private static async getProviderWalletConnect(): Promise<any> {
+  /*private static async getProviderWalletConnect(): Promise<any> {
     const walletConnector = await new WalletConnectProvider({
       bridge: "https://bridge.walletconnect.org"
     });
  
     // console.log(walletConnector);
     return walletConnector;
-  }
+  }*/
 
   private static async getProviderPortis(): Promise<any> {
     const portis = await new Portis(configProviders.Portis_DAppId, ethNetwork || "");

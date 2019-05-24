@@ -65,6 +65,7 @@ export class FulcrumProvider {
   public contractsSource: ContractsSource | null = null;
   public accounts: string[] = [];
   public isLoading: boolean = false;
+  public unsupportedNetwork: boolean = false;
 
   constructor() {
     // init
@@ -76,7 +77,7 @@ export class FulcrumProvider {
     Web3ConnectionFactory.getWeb3Provider(null, this.eventEmitter).then((providerData) => {
       // @ts-ignore
       const web3Wrapper = providerData[0];
-      FulcrumProvider.getWeb3ProviderSettings(web3Wrapper, providerData[3]).then((web3ProviderSettings) => {
+      FulcrumProvider.getWeb3ProviderSettings(providerData[3]).then((web3ProviderSettings) => {
         if (web3Wrapper && web3ProviderSettings) {
           const contractsSource = new ContractsSource(providerData[1], web3ProviderSettings.networkId, providerData[2]);
           contractsSource.Init().then(() => {
@@ -99,30 +100,38 @@ export class FulcrumProvider {
   }
 
   public async setWeb3Provider(providerType: ProviderType) {
-    const providerData = await Web3ConnectionFactory.getWeb3Provider(providerType, this.eventEmitter);
+    this.unsupportedNetwork = false;
+    await this.setWeb3ProviderFinalize(providerType, await Web3ConnectionFactory.getWeb3Provider(providerType, this.eventEmitter));
+  }
+
+  public async setWeb3ProviderFinalize(providerType: ProviderType, providerData: [Web3Wrapper | null, Web3ProviderEngine | null, boolean, number]) {
     this.web3Wrapper = providerData[0];
     this.providerEngine = providerData[1];
     let canWrite = providerData[2];
     let networkId = providerData[3];
 
+    this.web3ProviderSettings = await FulcrumProvider.getWeb3ProviderSettings(networkId);
     if (this.web3Wrapper) {
-      if (networkId !== 3) { // ropsten only
+      if (this.web3ProviderSettings.networkName !== process.env.REACT_APP_ETH_NETWORK) {
         // TODO: inform the user they are on the wrong network. Make it provider specific (MetaMask, etc)
 
+        this.unsupportedNetwork = true;
         canWrite = false; // revert back to read-only
         networkId = await this.web3Wrapper.getNetworkIdAsync();
+        this.web3ProviderSettings = await FulcrumProvider.getWeb3ProviderSettings(networkId);
       }
     }
 
     if (this.web3Wrapper && canWrite) {
       this.accounts = await this.web3Wrapper.getAvailableAddressesAsync();
     } else {
-      this.accounts = [];
+      //this.accounts = [];
+      if (providerType === ProviderType.Bitski) {
+        this.unsupportedNetwork = true;
+      }
     }
 
-    this.web3ProviderSettings = await FulcrumProvider.getWeb3ProviderSettings(this.web3Wrapper, networkId);
-
-    if (this.web3Wrapper && this.web3ProviderSettings) {
+    if (this.web3Wrapper && this.web3ProviderSettings.networkId > 0) {
       this.contractsSource = await new ContractsSource(this.providerEngine, this.web3ProviderSettings.networkId, canWrite);
       this.providerType = providerType;
     } else {
@@ -525,40 +534,36 @@ export class FulcrumProvider {
     return result;
   };
 
-  public static async getWeb3ProviderSettings(web3: Web3Wrapper| null, networkId: number| null): Promise<IWeb3ProviderSettings | null> {
-    if (web3) {
-      // tslint:disable-next-line:one-variable-per-declaration
-      let networkName, etherscanURL;
-      switch (networkId) {
-        case 1:
-          networkName = "mainnet";
-          etherscanURL = "https://etherscan.io/";
-          break;
-        case 3:
-          networkName = "ropsten";
-          etherscanURL = "https://ropsten.etherscan.io/";
-          break;
-        case 4:
-          networkName = "rinkeby";
-          etherscanURL = "https://rinkeby.etherscan.io/";
-          break;
-        case 42:
-          networkName = "kovan";
-          etherscanURL = "https://kovan.etherscan.io/";
-          break;
-        default:
-          networkName = "local";
-          etherscanURL = "";
-          break;
-      }
-      return {
-        networkId: networkId ? networkId : 0,
-        networkName,
-        etherscanURL
-      };
+  public static async getWeb3ProviderSettings(networkId: number| null): Promise<IWeb3ProviderSettings> {
+    let networkName, etherscanURL;
+    switch (networkId) {
+      case 1:
+        networkName = "mainnet";
+        etherscanURL = "https://etherscan.io/";
+        break;
+      case 3:
+        networkName = "ropsten";
+        etherscanURL = "https://ropsten.etherscan.io/";
+        break;
+      case 4:
+        networkName = "rinkeby";
+        etherscanURL = "https://rinkeby.etherscan.io/";
+        break;
+      case 42:
+        networkName = "kovan";
+        etherscanURL = "https://kovan.etherscan.io/";
+        break;
+      default:
+        networkId = 0;
+        networkName = "local";
+        etherscanURL = "";
+        break;
     }
-
-    return null;
+    return {
+      networkId,
+      networkName,
+      etherscanURL
+    };
   }
 
   public async getBaseTokenBalance(asset: Asset): Promise<BigNumber> {

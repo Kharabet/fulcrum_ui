@@ -23,7 +23,6 @@ interface ITokenContractInfo {
 export class ContractsSource {
   private readonly provider: any;
   private tokenizedRegistryContract: TokenizedRegistryContract | null;
-  private readonly networkId: number;
 
   private iTokensContractInfos: Map<string, ITokenContractInfo> = new Map<string, ITokenContractInfo>();
   private pTokensContractInfos: Map<string, ITokenContractInfo> = new Map<string, ITokenContractInfo>();
@@ -34,13 +33,14 @@ export class ContractsSource {
   private ReferencePriceFeedJson: any;
   private TokenizedRegistryJson: any;
 
+  public networkId: number;
   public canWrite: boolean;
 
   public constructor(provider: any, networkId: number, canWrite: boolean) {
     this.provider = provider;
+    this.tokenizedRegistryContract = null;
     this.networkId = networkId;
     this.canWrite = canWrite;
-    this.tokenizedRegistryContract = null;
   }
 
   public async Init() {

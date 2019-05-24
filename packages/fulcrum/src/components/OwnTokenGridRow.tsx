@@ -9,7 +9,6 @@ import { TradeRequest } from "../domain/TradeRequest";
 import { TradeTokenKey } from "../domain/TradeTokenKey";
 import { TradeType } from "../domain/TradeType";
 import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
-import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
 // import { Change24HMarker, Change24HMarkerSize } from "./Change24HMarker";
 
@@ -42,7 +41,6 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
     };
 
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
-    FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
   private async derivedUpdate() {
@@ -66,13 +64,8 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
     await this.derivedUpdate();
   };
 
-  private onProviderChanged = async (event: ProviderChangedEvent) => {
-    await this.derivedUpdate();
-  };
-
   public componentWillUnmount(): void {
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
-    FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
   public componentDidMount(): void {
