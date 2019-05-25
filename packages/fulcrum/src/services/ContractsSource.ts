@@ -5,8 +5,8 @@ import { TradeTokenKey } from "../domain/TradeTokenKey";
 
 import { erc20Contract } from "../contracts/erc20";
 import { iTokenContract } from "../contracts/iTokenContract";
+import { kyberContract } from "../contracts/kyber";
 import { pTokenContract } from "../contracts/pTokenContract";
-import { ReferencePriceFeedContract } from "../contracts/ReferencePriceFeedContract";
 import { TokenizedRegistryContract } from "../contracts/TokenizedRegistryContract";
 
 const ethNetwork = process.env.REACT_APP_ETH_NETWORK;
@@ -30,7 +30,7 @@ export class ContractsSource {
   private erc20Json: any;
   private iTokenJson: any;
   private pTokenJson: any;
-  private ReferencePriceFeedJson: any;
+  private kyberJson: any;
   private TokenizedRegistryJson: any;
 
   public networkId: number;
@@ -47,7 +47,7 @@ export class ContractsSource {
     this.erc20Json = await import(`./../assets/artifacts/${ethNetwork}/erc20.json`);
     this.iTokenJson = await import(`./../assets/artifacts/${ethNetwork}/iToken.json`);
     this.pTokenJson = await import(`./../assets/artifacts/${ethNetwork}/pToken.json`);
-    this.ReferencePriceFeedJson = await import(`./../assets/artifacts/${ethNetwork}/ReferencePriceFeed.json`);
+    this.kyberJson = await import(`./../assets/artifacts/${ethNetwork}/kyber.json`);
     this.TokenizedRegistryJson = await import(`./../assets/artifacts/${ethNetwork}/TokenizedRegistry.json`);
 
     this.tokenizedRegistryContract = new TokenizedRegistryContract(
@@ -111,14 +111,17 @@ export class ContractsSource {
     return address;
   }
 
-  private getReferencePriceFeedAddress(): string {
+  private getKyberAddress(): string {
     let address: string = "";
     switch (this.networkId) {
+      case 1:
+        address = "0x818e6fecd516ecc3849daf6845e3ec868087b755";
+        break;
       case 3:
-        address = "0x207056a6acB2727F834C9Bc987722B08628e5943";
+        address = "0x818e6fecd516ecc3849daf6845e3ec868087b755";
         break;
       case 42:
-        address = "0x325946B0ed8c5993E36BfCA1f218E22c2b10adf9";
+        address = "";
         break;
     }
 
@@ -139,10 +142,10 @@ export class ContractsSource {
     return tokenContractInfo ? new pTokenContract(this.pTokenJson.abi, tokenContractInfo.token, this.provider) : null;
   }
 
-  private async getReferencePriceFeedContractRaw(): Promise<ReferencePriceFeedContract> {
-    return new ReferencePriceFeedContract(
-      this.ReferencePriceFeedJson.abi,
-      this.getReferencePriceFeedAddress().toLowerCase(),
+  private async getKyberContractRaw(): Promise<kyberContract> {
+    return new kyberContract(
+      this.kyberJson.abi,
+      this.getKyberAddress().toLowerCase(),
       this.provider
     );
   }
@@ -172,5 +175,5 @@ export class ContractsSource {
   public getErc20Contract = _.memoize(this.getErc20ContractRaw);
   public getITokenContract = _.memoize(this.getITokenContractRaw);
   public getPTokenContract = _.memoize(this.getPTokenContractRaw);
-  public getReferencePriceFeedContract = _.memoize(this.getReferencePriceFeedContractRaw);
+  public getKyberContract = _.memoize(this.getKyberContractRaw);
 }

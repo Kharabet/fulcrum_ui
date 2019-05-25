@@ -690,8 +690,8 @@ export class FulcrumProvider {
     const srcAssetErc20Address = this.getErc20Address(srcAsset);
     const destAssetErc20Address = this.getErc20Address(destAsset);
     if (this.contractsSource && srcAssetErc20Address && destAssetErc20Address) {
-      const referencePriceFeedContract = await this.contractsSource.getReferencePriceFeedContract();
-      const swapPriceData: BigNumber[] = await referencePriceFeedContract.getSwapPrice.callAsync(
+      const kyberContract = await this.contractsSource.getKyberContract();
+      const swapPriceData: BigNumber[] = await kyberContract.getExpectedRate.callAsync(
         srcAssetErc20Address,
         destAssetErc20Address,
         new BigNumber(10 ** 18)
