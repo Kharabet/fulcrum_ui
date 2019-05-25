@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import Modal from "react-modal";
+import { ManageCollateralForm } from "../components/ManageCollateralForm";
 import { OwnTokenGrid } from "../components/OwnTokenGrid";
 import { PriceGraph } from "../components/PriceGraph";
 import { TokenAddressForm } from "../components/TokenAddressForm";
@@ -7,6 +8,7 @@ import { TradeForm } from "../components/TradeForm";
 import { TradeTokenGrid } from "../components/TradeTokenGrid";
 import { Asset } from "../domain/Asset";
 import { IPriceDataPoint } from "../domain/IPriceDataPoint";
+import { ManageCollateralRequest } from "../domain/ManageCollateralRequest";
 import { PositionType } from "../domain/PositionType";
 import { TradeRequest } from "../domain/TradeRequest";
 import { TradeTokenKey } from "../domain/TradeTokenKey";
@@ -38,6 +40,8 @@ interface ITradePageState {
   isTokenAddressFormOpen: boolean;
   tradeTokenKey: TradeTokenKey;
 
+  isManageCollateralModalOpen: boolean;
+
   priceGraphData: IPriceDataPoint[];
 }
 
@@ -57,7 +61,8 @@ export class TradePage extends Component<ITradePageProps, ITradePageState> {
       tradeLeverage: 0,
       collateralToken: Asset.UNKNOWN,
       isTokenAddressFormOpen: false,
-      tradeTokenKey: TradeTokenKey.empty()
+      tradeTokenKey: TradeTokenKey.empty(),
+      isManageCollateralModalOpen: false
     };
 
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
@@ -91,7 +96,7 @@ export class TradePage extends Component<ITradePageProps, ITradePageState> {
       <div className="trade-page">
         <HeaderOps isLoading={this.props.isLoading} doNetworkConnect={this.props.doNetworkConnect} />
         <main>
-          <PriceGraph 
+          <PriceGraph
             data={this.state.priceGraphData}
             selectedKey={this.state.selectedKey}
           />
@@ -101,6 +106,7 @@ export class TradePage extends Component<ITradePageProps, ITradePageState> {
               selectedKey={this.state.selectedKey}
               onShowMyTokensOnlyChange={this.onShowMyTokensOnlyChange}
               onDetails={this.onDetails}
+              onManageCollateral={this.onManageCollateralRequested}
               onTrade={this.onTradeRequested}
             />
           ) : (
@@ -116,7 +122,7 @@ export class TradePage extends Component<ITradePageProps, ITradePageState> {
           )}
           <Modal
             isOpen={this.state.isTradeModalOpen}
-            onRequestClose={this.onRequestClose}
+            onRequestClose={this.onTradeRequestClose}
             className="modal-content-div"
             overlayClassName="modal-overlay-div"
           >
@@ -129,7 +135,7 @@ export class TradePage extends Component<ITradePageProps, ITradePageState> {
               defaultUnitOfAccount={this.state.tradeUnitOfAccount}
               defaultTokenizeNeeded={true}
               onSubmit={this.onTradeConfirmed}
-              onCancel={this.onRequestClose}
+              onCancel={this.onTradeRequestClose}
               onTrade={this.onTradeRequested}
             />
           </Modal>
@@ -142,6 +148,18 @@ export class TradePage extends Component<ITradePageProps, ITradePageState> {
             <TokenAddressForm
               tradeTokenKey={this.state.tradeTokenKey}
               onCancel={this.onTokenAddressFormRequestClose}
+            />
+          </Modal>
+          <Modal
+            isOpen={this.state.isManageCollateralModalOpen}
+            onRequestClose={this.onManageCollateralRequestClose}
+            className="modal-content-div"
+            overlayClassName="modal-overlay-div"
+          >
+            <ManageCollateralForm
+              asset={Asset.ETH}
+              onSubmit={this.onManageCollateralConfirmed}
+              onCancel={this.onManageCollateralRequestClose}
             />
           </Modal>
         </main>
@@ -168,6 +186,32 @@ export class TradePage extends Component<ITradePageProps, ITradePageState> {
 
   private onProviderChanged = async (event: ProviderChangedEvent) => {
     await this.derivedUpdate();
+  };
+
+  public onManageCollateralRequested = (request: ManageCollateralRequest) => {
+    if (!FulcrumProvider.Instance.contractsSource || !FulcrumProvider.Instance.contractsSource.canWrite) {
+      this.props.doNetworkConnect();
+      return;
+    }
+
+    if (request) {
+      this.setState({...this.state, isManageCollateralModalOpen: true});
+    }
+  };
+
+  public onManageCollateralConfirmed = (request: ManageCollateralRequest) => {
+    FulcrumProvider.Instance.onManageCollateralConfirmed(request);
+    this.setState({
+      ...this.state,
+      isManageCollateralModalOpen: false
+    });
+  };
+
+  public onManageCollateralRequestClose = () => {
+    this.setState({
+      ...this.state,
+      isManageCollateralModalOpen: false
+    });
   };
 
   public onTradeRequested = (request: TradeRequest) => {
@@ -198,15 +242,15 @@ export class TradePage extends Component<ITradePageProps, ITradePageState> {
     });
   };
 
-  public onRequestClose = () => {
-    this.setState({ 
+  public onTradeRequestClose = () => {
+    this.setState({
       ...this.state,
       isTradeModalOpen: false
     });
   };
 
   public onShowMyTokensOnlyChange = (value: boolean) => {
-    this.setState({ 
+    this.setState({
       ...this.state,
       showMyTokensOnly: value
     });

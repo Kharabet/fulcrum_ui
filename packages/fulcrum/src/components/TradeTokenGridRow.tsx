@@ -172,16 +172,16 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
   private renderActions = (isBuyOnly: boolean) => {
     return isBuyOnly ? (
       <div className="trade-token-grid-row__col-action">
-        <button className="trade-token-grid-row__buy-button trade-token-grid-row__buy-button--size-full" onClick={this.onBuyClick}>
+        <button className="trade-token-grid-row__buy-button trade-token-grid-row__button--size-full" onClick={this.onBuyClick}>
           {TradeType.BUY}
         </button>
       </div>
     ) : (
       <div className="trade-token-grid-row__col-action">
-        <button className="trade-token-grid-row__buy-button trade-token-grid-row__buy-button--size-half" onClick={this.onBuyClick}>
+        <button className="trade-token-grid-row__buy-button trade-token-grid-row__button--size-half" onClick={this.onBuyClick}>
           {TradeType.BUY}
         </button>
-        <button className="trade-token-grid-row__sell-button" onClick={this.onSellClick}>
+        <button className="trade-token-grid-row__sell-button trade-token-grid-row__button--size-half" onClick={this.onSellClick}>
           {TradeType.SELL}
         </button>
       </div>

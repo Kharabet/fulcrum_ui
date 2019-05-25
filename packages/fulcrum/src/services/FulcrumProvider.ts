@@ -13,6 +13,7 @@ import { IPriceDataPoint } from "../domain/IPriceDataPoint";
 import { IWeb3ProviderSettings } from "../domain/IWeb3ProviderSettings";
 import { LendRequest } from "../domain/LendRequest";
 import { LendType } from "../domain/LendType";
+import { ManageCollateralRequest } from "../domain/ManageCollateralRequest";
 import { ProviderType } from "../domain/ProviderType";
 import { RequestStatus } from "../domain/RequestStatus";
 import { RequestTask } from "../domain/RequestTask";
@@ -153,6 +154,12 @@ export class FulcrumProvider {
   public onTradeConfirmed = async (request: TradeRequest) => {
     if (request) {
       TasksQueue.Instance.enqueue(new RequestTask(request));
+    }
+  };
+
+  public onManageCollateralConfirmed = async (request: ManageCollateralRequest) => {
+    if (request) {
+      console.dir(request);
     }
   };
 

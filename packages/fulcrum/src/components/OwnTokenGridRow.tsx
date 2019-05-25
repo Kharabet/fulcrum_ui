@@ -4,6 +4,7 @@ import { Asset } from "../domain/Asset";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { IPriceDataPoint } from "../domain/IPriceDataPoint";
+import { ManageCollateralRequest } from "../domain/ManageCollateralRequest";
 import { PositionType } from "../domain/PositionType";
 import { TradeRequest } from "../domain/TradeRequest";
 import { TradeTokenKey } from "../domain/TradeTokenKey";
@@ -18,6 +19,7 @@ export interface IOwnTokenGridRowProps {
   balance: BigNumber;
 
   onDetails: (key: TradeTokenKey) => void;
+  onManageCollateral: (request: ManageCollateralRequest) => void;
   onTrade: (request: TradeRequest) => void;
 }
 
@@ -118,10 +120,13 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
           {this.state.profit ? `$${this.state.profit.toFixed(4)}` : "-"}
         </div>
         <div className="trade-token-grid-row__col-action">
-          <button className="trade-token-grid-row__details-button" onClick={this.onDetailsClick}>
+          <button className="own-token-grid-row__details-button" onClick={this.onDetailsClick}>
             &nbsp;
           </button>
-          <button className="trade-token-grid-row__sell-button" onClick={this.onSellClick}>
+          <button className="own-token-grid-row__manage-button own-token-grid-row__button--size-half" onClick={this.onManageClick}>
+            Manage
+          </button>
+          <button className="own-token-grid-row__sell-button own-token-grid-row__button--size-half" onClick={this.onSellClick}>
             {TradeType.SELL}
           </button>
         </div>
@@ -133,6 +138,12 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
     event.stopPropagation();
 
     this.props.onDetails(this.props.currentKey);
+  };
+
+  public onManageClick = (event: React.MouseEvent<HTMLElement>) => {
+    event.stopPropagation();
+
+    this.props.onManageCollateral(new ManageCollateralRequest(new BigNumber(0)));
   };
 
   public onSellClick = (event: React.MouseEvent<HTMLElement>) => {

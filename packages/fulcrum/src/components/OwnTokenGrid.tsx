@@ -1,11 +1,12 @@
 import React, { Component } from "react";
+import { ManageCollateralRequest } from "../domain/ManageCollateralRequest";
 import { TradeRequest } from "../domain/TradeRequest";
 import { TradeTokenKey } from "../domain/TradeTokenKey";
+import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
+import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
 import { OwnTokenGridHeader } from "./OwnTokenGridHeader";
 import { IOwnTokenGridRowProps, OwnTokenGridRow } from "./OwnTokenGridRow";
-import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
-import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 
 export interface IOwnTokenGridProps {
   showMyTokensOnly: boolean;
@@ -13,6 +14,7 @@ export interface IOwnTokenGridProps {
 
   onShowMyTokensOnlyChange: (value: boolean) => void;
   onDetails: (key: TradeTokenKey) => void;
+  onManageCollateral: (request: ManageCollateralRequest) => void;
   onTrade: (request: TradeRequest) => void;
 }
 
@@ -88,6 +90,7 @@ export class OwnTokenGrid extends Component<IOwnTokenGridProps, IOwnTokenGridSta
           currentKey: pToken,
           balance: balance,
           onDetails: props.onDetails,
+          onManageCollateral: props.onManageCollateral,
           onTrade: props.onTrade
         });
       }
