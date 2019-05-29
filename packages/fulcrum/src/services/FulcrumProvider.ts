@@ -815,8 +815,8 @@ export class FulcrumProvider {
             "Prompting token allowance",
             "Waiting for token allowance",
             "Submitting loan",
-            "Loan accepted! Updating the blockchain.",
-            "Success! Transaction completed."
+            "Updating the blockchain",
+            "Transaction completed"
           ]);
 
           // init erc20 contract for base token
@@ -871,8 +871,8 @@ export class FulcrumProvider {
           task.processingStart([
             "Initializing loan",
             "Submitting loan",
-            "Loan accepted! Updating the blockchain.",
-            "Success! Transaction completed."
+            "Updating the blockchain",
+            "Transaction completed"
           ]);
 
           // no additional inits or checks
@@ -907,8 +907,8 @@ export class FulcrumProvider {
         task.processingStart([
           "Initializing loan",
           "Closing loan",
-          "Action successful! Updating the blockchain.",
-          "Success! Transaction completed."
+          "Updating the blockchain",
+          "Transaction completed"
         ]);
 
         // no additional inits or checks
@@ -1007,8 +1007,8 @@ export class FulcrumProvider {
             "Prompting token allowance",
             "Waiting for token allowance",
             "Submitting trade",
-            "Trade accepted! Updating the blockchain.",
-            "Success! Transaction completed."
+            "Updating the blockchain",
+            "Transaction completed"
           ]);
 
           // init erc20 contract for base token
@@ -1065,8 +1065,8 @@ export class FulcrumProvider {
           task.processingStart([
             "Initializing trade",
             "Submitting trade",
-            "Trade accepted! Updating the blockchain.",
-            "Success! Transaction completed."
+            "Updating the blockchain",
+            "Transaction completed"
           ]);
 
           // no additional inits or checks
@@ -1101,8 +1101,8 @@ export class FulcrumProvider {
         task.processingStart([
           "Initializing trade",
           "Closing trade",
-          "Action successful! Updating the blockchain.",
-          "Success! Transaction completed."
+          "Updating the blockchain",
+          "Transaction completed"
         ]);
 
         // no additional inits or checks
