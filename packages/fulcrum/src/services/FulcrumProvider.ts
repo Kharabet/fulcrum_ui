@@ -907,7 +907,7 @@ export class FulcrumProvider {
         task.processingStart([
           "Initializing loan",
           "Closing loan",
-          "Close loan request accepted! Updating the blockchain.",
+          "Action successful! Updating the blockchain.",
           "Success! Transaction completed."
         ]);
 
@@ -1101,7 +1101,7 @@ export class FulcrumProvider {
         task.processingStart([
           "Initializing trade",
           "Closing trade",
-          "Close trade request accepted! Updating the blockchain.",
+          "Action successful! Updating the blockchain.",
           "Success! Transaction completed."
         ]);
 
