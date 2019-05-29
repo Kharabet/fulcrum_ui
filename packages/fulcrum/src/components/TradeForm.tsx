@@ -54,6 +54,7 @@ interface ITradeFormState {
 }
 
 export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
+  private readonly _inputPrecision = 6;
   private _input: HTMLInputElement | null = null;
 
   constructor(props: ITradeFormProps, context?: any) {
@@ -108,7 +109,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       this.props.tradeType === TradeType.BUY
         ? await FulcrumProvider.Instance.getBaseTokenBalance(this.state.collateral)
         : positionTokenBalance;
-    const maxTradeValue = (await FulcrumProvider.Instance.getMaxTradeValue(this.props.tradeType, tradeTokenKey, this.state.collateral)).decimalPlaces(6);
+    const maxTradeValue = await FulcrumProvider.Instance.getMaxTradeValue(this.props.tradeType, tradeTokenKey, this.state.collateral);
     const tradeRequest = new TradeRequest(
       this.props.tradeType,
       this.props.asset,
@@ -320,11 +321,11 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
           className="modal-content-div"
           overlayClassName="modal-overlay-div"
         >
-          <CollateralTokenSelector 
-            selectedCollateral={this.state.collateral} 
+          <CollateralTokenSelector
+            selectedCollateral={this.state.collateral}
             collateralType={this.props.tradeType === TradeType.BUY ? `Deposit` : `Withdrawal`}
-            onCollateralChange={this.onChangeCollateralClicked} 
-            onClose={this.onChangeCollateralClose} 
+            onCollateralChange={this.onChangeCollateralClicked}
+            onClose={this.onChangeCollateralClose}
           />
         </Modal>
       </form>
@@ -339,12 +340,12 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     let amount = new BigNumber(amountTextForConversion);
     // handling negative values (incl. Ctrl+C)
     if (amount.isNegative()) {
-      amountText = amount.absoluteValue().toFixed();
       amount = amount.absoluteValue();
+      amountText = amount.decimalPlaces(this._inputPrecision).toFixed();
     }
     if (amount.gt(this.state.maxTradeAmount)) {
       amount = this.state.maxTradeAmount;
-      amountText = this.state.maxTradeAmount.toFixed();
+      amountText = this.state.maxTradeAmount.decimalPlaces(this._inputPrecision).toFixed();
     }
 
     // updating stored value only if the new input value is a valid number
@@ -354,7 +355,8 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       this.state.unitOfAccount,
       this.state.collateral,
       this.props.positionType,
-      this.props.leverage, amount
+      this.props.leverage,
+      amount
     );
     const tradedAmountEstimate = await FulcrumProvider.Instance.getTradedAmountEstimate(tradeRequest);
     const slippageRate = await FulcrumProvider.Instance.getSlippageRate(tradeRequest);
@@ -376,7 +378,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     }
 
     const tradeTokenKey = this.getTradeTokenGridRowSelectionKey();
-    const maxTradeValue = (await FulcrumProvider.Instance.getMaxTradeValue(this.props.tradeType, tradeTokenKey, this.state.collateral)).decimalPlaces(6);
+    const maxTradeValue = await FulcrumProvider.Instance.getMaxTradeValue(this.props.tradeType, tradeTokenKey, this.state.collateral);
     const tradeRequest = new TradeRequest(
       this.props.tradeType,
       this.props.asset,
@@ -391,7 +393,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
 
     this.setState({
       ...this.state,
-      tradeAmountText: maxTradeValue.toFixed(),
+      tradeAmountText: maxTradeValue.decimalPlaces(this._inputPrecision).toFixed(),
       tradeAmount: maxTradeValue,
       maxTradeAmount: maxTradeValue,
       tradedAmountEstimate: tradedAmountEstimate,
@@ -405,7 +407,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
 
   public onChangeCollateralOpen = (event: React.MouseEvent<HTMLElement>) => {
     event.preventDefault();
-    
+
     this.setState({ ...this.state, isChangeCollateralOpen: true });
   };
 
