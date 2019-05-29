@@ -198,13 +198,11 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
 
     const isAmountMaxed = this.state.tradeAmount.eq(this.state.maxTradeAmount);
     const amountMsg =
-      isAmountMaxed
-        ? this.state.balance && this.state.balance.eq(0)
-          ? "Your wallet is empty \u2639"
-          : this.state.tradeAmount.gt(0)
-            ? `Slippage: ${this.state.slippageRate.toFixed(2)}%`
-            : ""
-        : "";
+      this.state.balance && this.state.balance.eq(0)
+        ? "Your wallet is empty \u2639"
+        : this.state.tradeAmount.gt(0)
+          ? `Slippage: ${this.state.slippageRate.toFixed(2)}%`
+          : "";
 
     const tradedAmountEstimateText =
       this.state.tradedAmountEstimate.eq(0)
