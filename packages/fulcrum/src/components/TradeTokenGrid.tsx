@@ -3,6 +3,10 @@ import { Asset } from "../domain/Asset";
 import { PositionType } from "../domain/PositionType";
 import { TradeRequest } from "../domain/TradeRequest";
 import { TradeTokenKey } from "../domain/TradeTokenKey";
+import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
+import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
+import { TradeTransactionMinedEvent } from "../services/events/TradeTransactionMinedEvent";
+import { FulcrumProvider } from "../services/FulcrumProvider";
 import { TradeTokenGridHeader } from "./TradeTokenGridHeader";
 import { ITradeTokenGridRowProps, TradeTokenGridRow } from "./TradeTokenGridRow";
 
@@ -40,10 +44,18 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
     this.state = {
       tokenRowsData: TradeTokenGrid.getRowsData(props)
     };
+
+    FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
+    FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.TradeTransactionMined, this.onTradeTransactionMined);
   }
 
   public async derivedUpdate() {
     this.setState({ ...this.state, tokenRowsData: TradeTokenGrid.getRowsData(this.props) }) ;
+  }
+
+  public componentWillUnmount(): void {
+    FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
+    FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.TradeTransactionMined, this.onTradeTransactionMined);
   }
 
   public componentDidMount(): void {
@@ -96,5 +108,13 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
     });
 
     return rowsData;
+  };
+
+  private onProviderChanged = async (event: ProviderChangedEvent) => {
+    await this.derivedUpdate();
+  };
+
+  private onTradeTransactionMined = async (event: TradeTransactionMinedEvent) => {
+    await this.derivedUpdate();
   };
 }
