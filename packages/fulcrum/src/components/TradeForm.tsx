@@ -2,6 +2,8 @@ import { BigNumber } from "@0x/utils";
 import React, { ChangeEvent, Component, FormEvent } from "react";
 import Modal from "react-modal";
 import { Tooltip } from "react-tippy";
+import { merge, Observable, Subject } from "rxjs";
+import { debounceTime, distinctUntilChanged, switchMap } from "rxjs/operators";
 import { Asset } from "../domain/Asset";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
@@ -33,6 +35,15 @@ export interface ITradeFormProps {
   onTrade: (request: TradeRequest) => void;
 }
 
+interface ITextChangeEvent {
+  isTradeAmountTouched: boolean;
+  tradeAmountText: string;
+  tradeAmount: BigNumber;
+  tradedAmountEstimate: BigNumber;
+  maxTradeAmount: BigNumber;
+  slippageRate: BigNumber;
+}
+
 interface ITradeFormState {
   assetDetails: AssetDetails | null;
   collateral: Asset;
@@ -56,6 +67,9 @@ interface ITradeFormState {
 export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
   private readonly _inputPrecision = 6;
   private _input: HTMLInputElement | null = null;
+
+  private readonly _inputChange: Subject<string>;
+  private readonly _inputSetMax: Subject<void>;
 
   constructor(props: ITradeFormProps, context?: any) {
     super(props, context);
@@ -83,6 +97,22 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       slippageRate: slippageRate,
       latestPriceDataPoint: latestPriceDataPoint
     };
+
+    this._inputChange = new Subject();
+    this._inputSetMax = new Subject();
+
+    merge(
+      this._inputChange.pipe(
+        debounceTime(500),
+        distinctUntilChanged(),
+        switchMap((value) => this.operatorCurrentAmount(value))
+      ),
+      this._inputSetMax.pipe(switchMap(() => this.operatorMaxAmount()))
+    ).pipe(
+      switchMap((value) => new Observable<ITextChangeEvent | null>((observer) => observer.next(value)))
+    ).subscribe(next => {
+      this.setState({ ...this.state, ...next });
+    });
 
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
   }
@@ -332,42 +362,13 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
 
   public onTradeAmountChange = async (event: ChangeEvent<HTMLInputElement>) => {
     // handling different types of empty values
-    let amountText = event.target.value ? event.target.value : "";
-    const amountTextForConversion = amountText === "" ? "0" : amountText[0] === "." ? `0${amountText}` : amountText;
+    const amountText = event.target.value ? event.target.value : "";
 
-    let amount = new BigNumber(amountTextForConversion);
-    // handling negative values (incl. Ctrl+C)
-    if (amount.isNegative()) {
-      amount = amount.absoluteValue();
-      amountText = amount.decimalPlaces(this._inputPrecision).toFixed();
-    }
-    if (amount.gt(this.state.maxTradeAmount)) {
-      amount = this.state.maxTradeAmount;
-      amountText = this.state.maxTradeAmount.decimalPlaces(this._inputPrecision).toFixed();
-    }
-
-    // updating stored value only if the new input value is a valid number
-    const tradeRequest = new TradeRequest(
-      this.props.tradeType,
-      this.props.asset,
-      this.state.unitOfAccount,
-      this.state.collateral,
-      this.props.positionType,
-      this.props.leverage,
-      amount
-    );
-    const tradedAmountEstimate = await FulcrumProvider.Instance.getTradedAmountEstimate(tradeRequest);
-    const slippageRate = await FulcrumProvider.Instance.getSlippageRate(tradeRequest);
-    if (!amount.isNaN()) {
-      this.setState({
-        ...this.state,
-        isTradeAmountTouched: true,
-        tradeAmountText: amountText,
-        tradeAmount: amount,
-        tradedAmountEstimate: tradedAmountEstimate,
-        slippageRate: slippageRate
-      });
-    }
+    // setting tradeAmountText to update display at the same time
+    this.setState({...this.state, tradeAmountText: amountText}, () => {
+      // emitting next event for processing with rx.js
+      this._inputChange.next(this.state.tradeAmountText);
+    });
   };
 
   public onInsertMaxValue = async () => {
@@ -375,28 +376,8 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       return null;
     }
 
-    const tradeTokenKey = this.getTradeTokenGridRowSelectionKey();
-    const maxTradeValue = await FulcrumProvider.Instance.getMaxTradeValue(this.props.tradeType, tradeTokenKey, this.state.collateral);
-    const tradeRequest = new TradeRequest(
-      this.props.tradeType,
-      this.props.asset,
-      this.state.unitOfAccount,
-      this.state.collateral,
-      this.props.positionType,
-      this.props.leverage,
-      maxTradeValue
-    );
-    const tradedAmountEstimate = await FulcrumProvider.Instance.getTradedAmountEstimate(tradeRequest);
-    const slippageRate = await FulcrumProvider.Instance.getSlippageRate(tradeRequest);
-
-    this.setState({
-      ...this.state,
-      tradeAmountText: maxTradeValue.decimalPlaces(this._inputPrecision).toFixed(),
-      tradeAmount: maxTradeValue,
-      maxTradeAmount: maxTradeValue,
-      tradedAmountEstimate: tradedAmountEstimate,
-      slippageRate: slippageRate
-    });
+    // emitting next event for processing with rx.js
+    this._inputSetMax.next();
   };
 
   public onCancelClick = () => {
@@ -468,5 +449,85 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
         this.state.tradeAmount
       )
     );
+  };
+
+  private operatorMaxAmount = (): Observable<ITextChangeEvent | null> => {
+    return new Observable<ITextChangeEvent | null>(observer => {
+      const tradeTokenKey = this.getTradeTokenGridRowSelectionKey();
+      FulcrumProvider.Instance.getMaxTradeValue(
+        this.props.tradeType,
+        tradeTokenKey,
+        this.state.collateral
+      ).then(maxTradeValue => {
+        const tradeRequest = new TradeRequest(
+          this.props.tradeType,
+          this.props.asset,
+          this.state.unitOfAccount,
+          this.state.collateral,
+          this.props.positionType,
+          this.props.leverage,
+          maxTradeValue
+        );
+
+        FulcrumProvider.Instance.getTradedAmountEstimate(tradeRequest).then(tradedAmountEstimate => {
+          FulcrumProvider.Instance.getSlippageRate(tradeRequest).then(slippageRate => {
+            observer.next({
+              isTradeAmountTouched: this.state.isTradeAmountTouched,
+              tradeAmountText: maxTradeValue.decimalPlaces(this._inputPrecision).toFixed(),
+              tradeAmount: maxTradeValue,
+              maxTradeAmount: this.state.maxTradeAmount,
+              tradedAmountEstimate: tradedAmountEstimate,
+              slippageRate: slippageRate
+            });
+          });
+        });
+      });
+    });
+  };
+
+  private operatorCurrentAmount = (value: string): Observable<ITextChangeEvent | null> => {
+    return new Observable<ITextChangeEvent | null>(observer => {
+      let amountText = value;
+      const amountTextForConversion = amountText === "" ? "0" : amountText[0] === "." ? `0${amountText}` : amountText;
+
+      let amount = new BigNumber(amountTextForConversion);
+      // handling negative values (incl. Ctrl+C)
+      if (amount.isNegative()) {
+        amount = amount.absoluteValue();
+        amountText = amount.decimalPlaces(this._inputPrecision).toFixed();
+      }
+      if (amount.gt(this.state.maxTradeAmount)) {
+        amount = this.state.maxTradeAmount;
+        amountText = this.state.maxTradeAmount.decimalPlaces(this._inputPrecision).toFixed();
+      }
+
+      // updating stored value only if the new input value is a valid number
+      const tradeRequest = new TradeRequest(
+        this.props.tradeType,
+        this.props.asset,
+        this.state.unitOfAccount,
+        this.state.collateral,
+        this.props.positionType,
+        this.props.leverage,
+        amount
+      );
+
+      if (!amount.isNaN()) {
+        FulcrumProvider.Instance.getTradedAmountEstimate(tradeRequest).then(tradedAmountEstimate => {
+          FulcrumProvider.Instance.getSlippageRate(tradeRequest).then(slippageRate => {
+            observer.next({
+              isTradeAmountTouched: true,
+              tradeAmountText: amountText,
+              tradeAmount: amount,
+              maxTradeAmount: this.state.maxTradeAmount,
+              tradedAmountEstimate: tradedAmountEstimate,
+              slippageRate: slippageRate
+            });
+          });
+        });
+      } else {
+        observer.next(null);
+      }
+    });
   };
 }
