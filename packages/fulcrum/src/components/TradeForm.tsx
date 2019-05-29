@@ -257,11 +257,6 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
               <div className="trade-form__value">{tokenNameSource}</div>
             </div>
             <div className="trade-form__amount-container">
-              {isAmountMaxed ? (
-                <div className="trade-form__amount-maxed">MAX</div>
-              ) : (
-                <div className="trade-form__amount-max" onClick={this.onInsertMaxValue}>SET MAX</div>
-              )}
               <input
                 type="text"
                 ref={this._setInputRef}
@@ -270,6 +265,11 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
                 onChange={this.onTradeAmountChange}
                 placeholder={`${this.props.tradeType === TradeType.BUY ? `Buy` : `Sell`} Amount`}
               />
+              {isAmountMaxed ? (
+                <div className="trade-form__amount-maxed">MAX</div>
+              ) : (
+                <div className="trade-form__amount-max" onClick={this.onInsertMaxValue}>&#65087;<br/>MAX</div>
+              )}
             </div>
             <div className="trade-form__kv-container">
               <div className="trade-form__label">{amountMsg}</div>
