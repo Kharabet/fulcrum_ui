@@ -50,6 +50,7 @@ interface ITradeFormState {
   isChangeCollateralOpen: boolean;
 
   tradedAmountEstimate: BigNumber;
+  slippageRate: BigNumber;
 }
 
 export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
@@ -62,6 +63,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     const balance = null;
     const positionTokenBalance = null;
     const maxTradeValue = new BigNumber(0);
+    const slippageRate = new BigNumber(0);
     const tradedAmountEstimate = new BigNumber(0);
 
     this.state = {
@@ -77,6 +79,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       maxTradeAmount: maxTradeValue,
       isChangeCollateralOpen: false,
       tradedAmountEstimate: tradedAmountEstimate,
+      slippageRate: slippageRate,
       latestPriceDataPoint: latestPriceDataPoint
     };
 
@@ -106,17 +109,17 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
         ? await FulcrumProvider.Instance.getBaseTokenBalance(this.state.collateral)
         : positionTokenBalance;
     const maxTradeValue = (await FulcrumProvider.Instance.getMaxTradeValue(this.props.tradeType, tradeTokenKey, this.state.collateral)).decimalPlaces(6);
-    const tradedAmountEstimate = await FulcrumProvider.Instance.getTradedAmountEstimate(
-      new TradeRequest(
-        this.props.tradeType,
-        this.props.asset,
-        this.state.unitOfAccount,
-        this.state.collateral,
-        this.props.positionType,
-        this.props.leverage,
-        new BigNumber(0)
-      )
+    const tradeRequest = new TradeRequest(
+      this.props.tradeType,
+      this.props.asset,
+      this.state.unitOfAccount,
+      this.state.collateral,
+      this.props.positionType,
+      this.props.leverage,
+      new BigNumber(0)
     );
+    const tradedAmountEstimate = await FulcrumProvider.Instance.getTradedAmountEstimate(tradeRequest);
+    const slippageRate = await FulcrumProvider.Instance.getSlippageRate(tradeRequest);
 
     this.setState({
       ...this.state,
@@ -127,6 +130,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       positionTokenBalance: positionTokenBalance,
       maxTradeAmount: maxTradeValue,
       tradedAmountEstimate: tradedAmountEstimate,
+      slippageRate: slippageRate,
       latestPriceDataPoint: latestPriceDataPoint
     });
   }
@@ -192,12 +196,12 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     }
 
     const isAmountMaxed = this.state.tradeAmount.eq(this.state.maxTradeAmount);
-    const amountMaxedMsg =
+    const amountMsg =
       isAmountMaxed
         ? this.state.balance && this.state.balance.eq(0)
           ? "Your wallet is empty \u2639"
-          : this.state.isTradeAmountTouched
-            ? "Max amount entered."
+          : this.state.tradeAmount.gt(0)
+            ? `Slippage: ${this.state.slippageRate.toFixed(2)}%`
             : ""
         : "";
 
@@ -251,22 +255,23 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
               <div className="trade-form__label">Amount</div>
               <div className="trade-form__value">{tokenNameSource}</div>
             </div>
-            <input
-              type="text"
-              ref={this._setInputRef}
-              className="trade-form__amount"
-              value={this.state.tradeAmountText}
-              onChange={this.onTradeAmountChange}
-              placeholder={`${this.props.tradeType === TradeType.BUY ? `Buy` : `Sell`} Amount`}
-            />
-            <div className="trade-form__kv-container">
+            <div className="trade-form__amount-container">
               {isAmountMaxed ? (
-                <div className="trade-form__label">{amountMaxedMsg}</div>
+                <div className="trade-form__amount-maxed">MAX</div>
               ) : (
-                <div className="trade-form__label trade-form__label--action" onClick={this.onInsertMaxValue}>
-                  Insert max value
-                </div>
+                <div className="trade-form__amount-max" onClick={this.onInsertMaxValue}>SET MAX</div>
               )}
+              <input
+                type="text"
+                ref={this._setInputRef}
+                className="trade-form__amount-input"
+                value={this.state.tradeAmountText}
+                onChange={this.onTradeAmountChange}
+                placeholder={`${this.props.tradeType === TradeType.BUY ? `Buy` : `Sell`} Amount`}
+              />
+            </div>
+            <div className="trade-form__kv-container">
+              <div className="trade-form__label">{amountMsg}</div>
               <div className="trade-form__value trade-form__value--no-color">
                 <Tooltip
                   html={
@@ -282,19 +287,21 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
             </div>
 
             {this.state.positionTokenBalance && this.props.tradeType === TradeType.BUY && this.state.positionTokenBalance.eq(0) ? (
-              <CollapsibleContainer title="Advanced">
-                <div className="trade-form__kv-container">
-                  <div className="trade-form__label trade-form__label--no-bg">
-                    Unit of Account &nbsp;
-                    <UnitOfAccountSelector items={[Asset.USDC, Asset.DAI]} value={this.state.unitOfAccount} onChange={this.onChangeUnitOfAccount} />
+              <div className="collapsible-container--margin-top">
+                <CollapsibleContainer title="Advanced">
+                  <div className="trade-form__kv-container">
+                    <div className="trade-form__label trade-form__label--no-bg">
+                      Unit of Account &nbsp;
+                      <UnitOfAccountSelector items={[Asset.USDC, Asset.DAI]} value={this.state.unitOfAccount} onChange={this.onChangeUnitOfAccount} />
+                    </div>
                   </div>
-                </div>
-                <div className="trade-form__kv-container">
-                  <div className="trade-form__label trade-form__label--no-bg">
-                    <CheckBox checked={this.state.tokenizeNeeded} onChange={this.onChangeTokenizeNeeded}>Tokenize it &nbsp;</CheckBox>
+                  <div className="trade-form__kv-container">
+                    <div className="trade-form__label trade-form__label--no-bg">
+                      <CheckBox checked={this.state.tokenizeNeeded} onChange={this.onChangeTokenizeNeeded}>Tokenize it &nbsp;</CheckBox>
+                    </div>
                   </div>
-                </div>
-              </CollapsibleContainer>
+                </CollapsibleContainer>
+              </div>
             ) : ``}
           </div>
 
@@ -341,23 +348,24 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     }
 
     // updating stored value only if the new input value is a valid number
-    const tradedAmountEstimate = await FulcrumProvider.Instance.getTradedAmountEstimate(
-      new TradeRequest(
-        this.props.tradeType,
-        this.props.asset,
-        this.state.unitOfAccount,
-        this.state.collateral,
-        this.props.positionType,
-        this.props.leverage, amount
-      )
+    const tradeRequest = new TradeRequest(
+      this.props.tradeType,
+      this.props.asset,
+      this.state.unitOfAccount,
+      this.state.collateral,
+      this.props.positionType,
+      this.props.leverage, amount
     );
+    const tradedAmountEstimate = await FulcrumProvider.Instance.getTradedAmountEstimate(tradeRequest);
+    const slippageRate = await FulcrumProvider.Instance.getSlippageRate(tradeRequest);
     if (!amount.isNaN()) {
       this.setState({
         ...this.state,
         isTradeAmountTouched: true,
         tradeAmountText: amountText,
         tradeAmount: amount,
-        tradedAmountEstimate: tradedAmountEstimate
+        tradedAmountEstimate: tradedAmountEstimate,
+        slippageRate: slippageRate
       });
     }
   };
@@ -368,25 +376,26 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     }
 
     const tradeTokenKey = this.getTradeTokenGridRowSelectionKey();
-    const maxTradeValue = await FulcrumProvider.Instance.getMaxTradeValue(this.props.tradeType, tradeTokenKey, this.state.collateral);
-    const tradedAmountEstimate = await FulcrumProvider.Instance.getTradedAmountEstimate(
-      new TradeRequest(
-        this.props.tradeType,
-        this.props.asset,
-        this.state.unitOfAccount,
-        this.state.collateral,
-        this.props.positionType,
-        this.props.leverage,
-        maxTradeValue
-      )
+    const maxTradeValue = (await FulcrumProvider.Instance.getMaxTradeValue(this.props.tradeType, tradeTokenKey, this.state.collateral)).decimalPlaces(6);
+    const tradeRequest = new TradeRequest(
+      this.props.tradeType,
+      this.props.asset,
+      this.state.unitOfAccount,
+      this.state.collateral,
+      this.props.positionType,
+      this.props.leverage,
+      maxTradeValue
     );
+    const tradedAmountEstimate = await FulcrumProvider.Instance.getTradedAmountEstimate(tradeRequest);
+    const slippageRate = await FulcrumProvider.Instance.getSlippageRate(tradeRequest);
 
     this.setState({
       ...this.state,
       tradeAmountText: maxTradeValue.toFixed(),
       tradeAmount: maxTradeValue,
       maxTradeAmount: maxTradeValue,
-      tradedAmountEstimate: tradedAmountEstimate
+      tradedAmountEstimate: tradedAmountEstimate,
+      slippageRate: slippageRate
     });
   };
 

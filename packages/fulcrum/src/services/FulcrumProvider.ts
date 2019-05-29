@@ -544,6 +544,10 @@ export class FulcrumProvider {
     return result;
   };
 
+  public getSlippageRate = async (request: TradeRequest): Promise<BigNumber> => {
+    return new BigNumber(5);
+  };
+
   public static async getWeb3ProviderSettings(networkId: number| null): Promise<IWeb3ProviderSettings> {
     let networkName, etherscanURL;
     switch (networkId) {
