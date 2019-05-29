@@ -50,6 +50,8 @@ export class FulcrumProvider {
   private readonly gasPrice = new BigNumber(6).multipliedBy(10 ** 9);
   // gasBufferCoeff equal 110% gas reserve
   private readonly gasBufferCoeff = new BigNumber("1.1");
+  // 5000ms
+  private readonly successDisplayTimeout = 5000;
 
   private static readonly UNLIMITED_ALLOWANCE_IN_BASE_UNITS = new BigNumber(2)
     .pow(256)
@@ -812,7 +814,9 @@ export class FulcrumProvider {
             "Detecting token allowance",
             "Prompting token allowance",
             "Waiting for token allowance",
-            "Submitting loan"
+            "Submitting loan",
+            "Loan accepted! Updating the blockchain.",
+            "Success! Transaction completed."
           ]);
 
           // init erc20 contract for base token
@@ -854,14 +858,21 @@ export class FulcrumProvider {
           // Submitting loan
           const txHash = await tokenContract.mint.sendTransactionAsync(account, amountInBaseUnits, { from: account, gas: gasAmountBN.toString() });
           task.setTxHash(txHash);
+
+          task.processingStepNext();
           const txReceipt = await this.waitForTransactionMined(txHash, task.request);
           if (!txReceipt.status) {
             throw new Error("Reverted by EVM");
           }
+
+          task.processingStepNext();
+          await this.sleep(this.successDisplayTimeout);
         } else {
           task.processingStart([
             "Initializing loan",
-            "Submitting loan"
+            "Submitting loan",
+            "Loan accepted! Updating the blockchain.",
+            "Success! Transaction completed."
           ]);
 
           // no additional inits or checks
@@ -882,15 +893,22 @@ export class FulcrumProvider {
           // Submitting loan
           const txHash = await tokenContract.mintWithEther.sendTransactionAsync(account, { from: account, value: amountInBaseUnits, gas: gasAmountBN.toString() });
           task.setTxHash(txHash);
+
+          task.processingStepNext();
           const txReceipt = await this.waitForTransactionMined(txHash, task.request);
           if (!txReceipt.status) {
             throw new Error("Reverted by EVM");
           }
+
+          task.processingStepNext();
+          await this.sleep(this.successDisplayTimeout);
         }
       } else {
         task.processingStart([
           "Initializing loan",
-          "Closing loan"
+          "Closing loan",
+          "Close loan request accepted! Updating the blockchain.",
+          "Success! Transaction completed."
         ]);
 
         // no additional inits or checks
@@ -910,10 +928,15 @@ export class FulcrumProvider {
           // Submitting unloan
           const txHash = await tokenContract.burn.sendTransactionAsync(account, amountInBaseUnits, { from: account, gas: gasAmountBN.toString() });
           task.setTxHash(txHash);
+
+          task.processingStepNext();
           const txReceipt = await this.waitForTransactionMined(txHash, task.request);
           if (!txReceipt.status) {
             throw new Error("Reverted by EVM");
           }
+
+          task.processingStepNext();
+          await this.sleep(this.successDisplayTimeout);
         } else {
           // Waiting for token allowance
           if (skipGas) {
@@ -927,10 +950,15 @@ export class FulcrumProvider {
           // Submitting unloan
           const txHash = await tokenContract.burnToEther.sendTransactionAsync(account, amountInBaseUnits, { from: account, gas: gasAmountBN.toString() });
           task.setTxHash(txHash);
+
+          task.processingStepNext();
           const txReceipt = await this.waitForTransactionMined(txHash, task.request);
           if (!txReceipt.status) {
             throw new Error("Reverted by EVM");
           }
+
+          task.processingStepNext();
+          await this.sleep(this.successDisplayTimeout);
         }
       }
 
@@ -978,7 +1006,9 @@ export class FulcrumProvider {
             "Detecting token allowance",
             "Prompting token allowance",
             "Waiting for token allowance",
-            "Submitting trade"
+            "Submitting trade",
+            "Trade accepted! Updating the blockchain.",
+            "Success! Transaction completed."
           ]);
 
           // init erc20 contract for base token
@@ -1022,14 +1052,21 @@ export class FulcrumProvider {
           // Submitting trade
           const txHash = await tokenContract.mintWithToken.sendTransactionAsync(account, assetErc20Address, amountInBaseUnits, { from: account, gas: gasAmountBN.toString() });
           task.setTxHash(txHash);
+
+          task.processingStepNext();
           const txReceipt = await this.waitForTransactionMined(txHash, task.request);
           if (!txReceipt.status) {
             throw new Error("Reverted by EVM");
           }
+
+          task.processingStepNext();
+          await this.sleep(this.successDisplayTimeout);
         } else {
           task.processingStart([
             "Initializing trade",
-            "Submitting trade"
+            "Submitting trade",
+            "Trade accepted! Updating the blockchain.",
+            "Success! Transaction completed."
           ]);
 
           // no additional inits or checks
@@ -1050,15 +1087,22 @@ export class FulcrumProvider {
           // Submitting trade
           const txHash = await tokenContract.mintWithEther.sendTransactionAsync(account, { from: account, value: amountInBaseUnits, gas: gasAmountBN.toString() });
           task.setTxHash(txHash);
+
+          task.processingStepNext();
           const txReceipt = await this.waitForTransactionMined(txHash, task.request);
           if (!txReceipt.status) {
             throw new Error("Reverted by EVM");
           }
+
+          task.processingStepNext();
+          await this.sleep(this.successDisplayTimeout);
         }
       } else {
         task.processingStart([
           "Initializing trade",
-          "Closing trade"
+          "Closing trade",
+          "Close trade request accepted! Updating the blockchain.",
+          "Success! Transaction completed."
         ]);
 
         // no additional inits or checks
@@ -1091,10 +1135,15 @@ export class FulcrumProvider {
               { from: account, gas: gasAmountBN.toString() }
             );
             task.setTxHash(txHash);
+
+            task.processingStepNext();
             const txReceipt = await this.waitForTransactionMined(txHash, task.request);
             if (!txReceipt.status) {
               throw new Error("Reverted by EVM");
             }
+
+            task.processingStepNext();
+            await this.sleep(this.successDisplayTimeout);
           }
         } else {
           if (skipGas) {
@@ -1108,10 +1157,15 @@ export class FulcrumProvider {
           // Closing trade
           const txHash = await tokenContract.burnToEther.sendTransactionAsync(account, amountInBaseUnits, { from: account, gas: gasAmountBN.toString() });
           task.setTxHash(txHash);
+
+          task.processingStepNext();
           const txReceipt = await this.waitForTransactionMined(txHash, task.request);
           if (!txReceipt.status) {
             throw new Error("Reverted by EVM");
           }
+
+          task.processingStepNext();
+          await this.sleep(this.successDisplayTimeout);
         }
       }
 

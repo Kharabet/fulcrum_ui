@@ -18,7 +18,7 @@ export class ProgressBar extends Component<IProgressBarProps> {
           <div className="progress-bar__info-container">
             <TokenSpinner asset={this.props.requestTask.request.asset} />
             <div className="progress-bar__info">
-              <div className="progress-bar__title">Submitting request</div>
+              <div className="progress-bar__title">{this.props.requestTask.steps[this.props.requestTask.stepCurrent-1]}</div>
               <div className="progress-bar__step">
                 Step {this.props.requestTask.stepCurrent} of {this.props.requestTask.steps.length}
               </div>
