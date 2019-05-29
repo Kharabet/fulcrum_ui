@@ -103,15 +103,26 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
 
     merge(
       this._inputChange.pipe(
-        debounceTime(500),
         distinctUntilChanged(),
+        debounceTime(500),
         switchMap((value) => this.operatorCurrentAmount(value))
       ),
       this._inputSetMax.pipe(switchMap(() => this.operatorMaxAmount()))
     ).pipe(
       switchMap((value) => new Observable<ITextChangeEvent | null>((observer) => observer.next(value)))
     ).subscribe(next => {
-      this.setState({ ...this.state, ...next });
+      if (next) {
+        this.setState({ ...this.state, ...next });
+      } else {
+        this.setState({
+          ...this.state,
+          isTradeAmountTouched: false,
+          tradeAmountText: "",
+          tradeAmount: new BigNumber(0),
+          tradedAmountEstimate: new BigNumber(0),
+          slippageRate: new BigNumber(0)
+        })
+      }
     });
 
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
