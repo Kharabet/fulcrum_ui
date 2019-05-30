@@ -19,7 +19,7 @@ export class UnlendErcProcessor {
     }
 
     task.processingStart([
-      "Initializing loan",
+      "Initializing",
       "Closing loan",
       "Updating the blockchain",
       "Transaction completed"

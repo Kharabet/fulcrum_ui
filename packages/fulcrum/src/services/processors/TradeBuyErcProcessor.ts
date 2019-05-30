@@ -29,7 +29,7 @@ export class TradeBuyErcProcessor {
     }
 
     task.processingStart([
-      "Initializing trade",
+      "Initializing",
       "Detecting token allowance",
       "Prompting token allowance",
       "Waiting for token allowance",

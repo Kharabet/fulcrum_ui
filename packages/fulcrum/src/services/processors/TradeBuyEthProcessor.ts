@@ -28,7 +28,7 @@ export class TradeBuyEthProcessor {
     }
 
     task.processingStart([
-      "Initializing trade",
+      "Initializing",
       "Submitting trade",
       "Updating the blockchain",
       "Transaction completed"

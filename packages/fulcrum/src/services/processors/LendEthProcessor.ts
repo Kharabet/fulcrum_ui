@@ -19,7 +19,7 @@ export class LendEthProcessor {
     }
 
     task.processingStart([
-      "Initializing loan",
+      "Initializing",
       "Submitting loan",
       "Updating the blockchain",
       "Transaction completed"

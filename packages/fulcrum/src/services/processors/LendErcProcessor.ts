@@ -20,7 +20,7 @@ export class LendErcProcessor {
     }
 
     task.processingStart([
-      "Initializing loan",
+      "Initializing",
       "Detecting token allowance",
       "Prompting token allowance",
       "Waiting for token allowance",
