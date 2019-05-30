@@ -1,6 +1,8 @@
 import { BigNumber } from "@0x/utils";
 import React, { ChangeEvent, Component, FormEvent } from "react";
 import { Tooltip } from "react-tippy";
+import { merge, Observable, Subject } from "rxjs";
+import { debounceTime, distinctUntilChanged, switchMap } from "rxjs/operators";
 import { Asset } from "../domain/Asset";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
@@ -9,6 +11,15 @@ import { LendType } from "../domain/LendType";
 import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
+
+interface ILendAmountChangeEvent {
+  isLendAmountTouched: boolean;
+  lendAmountText: string;
+  lendAmount: BigNumber;
+  maxLendAmount: BigNumber;
+
+  lendedAmountEstimate: BigNumber;
+}
 
 export interface ILendFormProps {
   lendType: LendType;
@@ -34,6 +45,9 @@ interface ILendFormState {
 export class LendForm extends Component<ILendFormProps, ILendFormState> {
   private _input: HTMLInputElement | null = null;
 
+  private readonly _inputChange: Subject<string>;
+  private readonly _inputSetMax: Subject<void>;
+
   constructor(props: ILendFormProps, context?: any) {
     super(props, context);
 
@@ -53,6 +67,34 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
       lendedAmountEstimate: lendedAmountEstimate,
       interestRate: interestRate
     };
+
+    this._inputChange = new Subject();
+    this._inputSetMax = new Subject();
+
+    merge(
+      this._inputChange.pipe(
+        distinctUntilChanged(),
+        debounceTime(500),
+        switchMap((value) => this.rxFromCurrentAmount(value))
+      ),
+      this._inputSetMax.pipe(
+        switchMap(() => this.rxFromMaxAmount())
+      )
+    ).pipe(
+      switchMap((value) => new Observable<ILendAmountChangeEvent | null>((observer) => observer.next(value)))
+    ).subscribe(next => {
+      if (next) {
+        this.setState({ ...this.state, ...next });
+      } else {
+        this.setState({
+          ...this.state,
+          isLendAmountTouched: false,
+          lendAmountText: "",
+          lendAmount: new BigNumber(0),
+          lendedAmountEstimate: new BigNumber(0)
+        })
+      }
+    });
 
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
   }
@@ -211,33 +253,13 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
 
   public onLendAmountChange = async (event: ChangeEvent<HTMLInputElement>) => {
     // handling different types of empty values
-    let amountText = event.target.value ? event.target.value : "";
-    const amountTextForConversion = amountText === "" ? "0" : amountText[0] === "." ? `0${amountText}` : amountText;
+    const amountText = event.target.value ? event.target.value : "";
 
-    let amount = new BigNumber(amountTextForConversion);
-    // handling negative values (incl. Ctrl+C)
-    if (amount.isNegative()) {
-      amountText = amount.absoluteValue().toFixed();
-      amount = amount.absoluteValue();
-    }
-    if (amount.gt(this.state.maxLendAmount)) {
-      amount = this.state.maxLendAmount;
-      amountText = this.state.maxLendAmount.toFixed();
-    }
-
-    // updating stored value only if the new input value is a valid number
-    const lendedAmountEstimate = await FulcrumProvider.Instance.getLendedAmountEstimate(
-      new LendRequest(this.props.lendType, this.props.asset, amount)
-    );
-    if (!amount.isNaN()) {
-      this.setState({
-        ...this.state,
-        isLendAmountTouched: true,
-        lendAmountText: amountText,
-        lendAmount: amount,
-        lendedAmountEstimate: lendedAmountEstimate
-      });
-    }
+    // setting tradeAmountText to update display at the same time
+    this.setState({...this.state, lendAmountText: amountText}, () => {
+      // emitting next event for processing with rx.js
+      this._inputChange.next(this.state.lendAmountText);
+    });
   };
 
   public onInsertMaxValue = async () => {
@@ -245,19 +267,8 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
       return null;
     }
 
-    const maxLendValue = await FulcrumProvider.Instance.getMaxLendValue(
-      new LendRequest(this.props.lendType, this.props.asset, new BigNumber(0))
-    );
-    const lendedAmountEstimate = await FulcrumProvider.Instance.getLendedAmountEstimate(
-      new LendRequest(this.props.lendType, this.props.asset, maxLendValue)
-    );
-    this.setState({
-      ...this.state,
-      lendAmountText: maxLendValue.toFixed(),
-      lendAmount: maxLendValue,
-      maxLendAmount: maxLendValue,
-      lendedAmountEstimate: lendedAmountEstimate
-    });
+    // emitting next event for processing with rx.js
+    this._inputSetMax.next();
   };
 
   public onCancelClick = () => {
@@ -291,5 +302,60 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
         this.state.lendAmount
       )
     );
+  };
+
+  private rxFromMaxAmount = (): Observable<ILendAmountChangeEvent | null> => {
+    return new Observable<ILendAmountChangeEvent | null>(observer => {
+      FulcrumProvider.Instance.getMaxLendValue(
+        new LendRequest(this.props.lendType, this.props.asset, new BigNumber(0))
+      ).then(maxLendValue => {
+        FulcrumProvider.Instance.getLendedAmountEstimate(
+          new LendRequest(this.props.lendType, this.props.asset, maxLendValue)
+        ).then(lendedAmountEstimate => {
+          observer.next({
+            isLendAmountTouched: this.state.isLendAmountTouched,
+            lendAmountText: maxLendValue.toFixed(),
+            lendAmount: maxLendValue,
+            maxLendAmount: maxLendValue,
+            lendedAmountEstimate: lendedAmountEstimate
+          });
+        });
+      });
+    });
+  };
+
+  private rxFromCurrentAmount = (value: string): Observable<ILendAmountChangeEvent | null> => {
+    return new Observable<ILendAmountChangeEvent | null>(observer => {
+      let amountText = value;
+      const amountTextForConversion = amountText === "" ? "0" : amountText[0] === "." ? `0${amountText}` : amountText;
+
+      let amount = new BigNumber(amountTextForConversion);
+      // handling negative values (incl. Ctrl+C)
+      if (amount.isNegative()) {
+        amountText = amount.absoluteValue().toFixed();
+        amount = amount.absoluteValue();
+      }
+      if (amount.gt(this.state.maxLendAmount)) {
+        amount = this.state.maxLendAmount;
+        amountText = this.state.maxLendAmount.toFixed();
+      }
+
+      // updating stored value only if the new input value is a valid number
+      FulcrumProvider.Instance.getLendedAmountEstimate(
+        new LendRequest(this.props.lendType, this.props.asset, amount)
+      ).then(lendedAmountEstimate => {
+        if (!amount.isNaN()) {
+          observer.next({
+            isLendAmountTouched: true,
+            lendAmountText: amountText,
+            lendAmount: amount,
+            maxLendAmount: this.state.maxLendAmount,
+            lendedAmountEstimate: lendedAmountEstimate
+          });
+        } else {
+          observer.next(null);
+        }
+      });
+    });
   };
 }
