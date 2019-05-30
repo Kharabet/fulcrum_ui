@@ -4,9 +4,6 @@ import { Web3Wrapper } from '@0x/web3-wrapper';
 import { EventEmitter } from "events";
 import moment from "moment";
 import fetch from "node-fetch";
-import { erc20Contract } from "../contracts/erc20";
-import { iTokenContract } from "../contracts/iTokenContract";
-import { pTokenContract } from "../contracts/pTokenContract";
 import { Asset } from "../domain/Asset";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { IPriceDataPoint } from "../domain/IPriceDataPoint";
@@ -25,7 +22,6 @@ import { Web3ConnectionFactory } from "../domain/Web3ConnectionFactory";
 import { ContractsSource } from "./ContractsSource";
 import { FulcrumProviderEvents } from "./events/FulcrumProviderEvents";
 import { LendTransactionMinedEvent } from "./events/LendTransactionMinedEvent";
-import { ProviderChangedEvent } from "./events/ProviderChangedEvent";
 import { TasksQueueEvents } from "./events/TasksQueueEvents";
 import { TradeTransactionMinedEvent } from "./events/TradeTransactionMinedEvent";
 import { TasksQueue } from "./TasksQueue";
@@ -33,6 +29,10 @@ import { TasksQueue } from "./TasksQueue";
 import configProviders from "../config/providers.json";
 import { LendErcProcessor } from "./processors/LendErcProcessor";
 import { LendEthProcessor } from "./processors/LendEthProcessor";
+import { TradeBuyErcProcessor } from "./processors/TradeBuyErcProcessor";
+import { TradeBuyEthProcessor } from "./processors/TradeBuyEthProcessor";
+import { TradeSellErcProcessor } from "./processors/TradeSellErcProcessor";
+import { TradeSellEthProcessor } from "./processors/TradeSellEthProcessor";
 import { UnlendErcProcessor } from "./processors/UnlendErcProcessor";
 import { UnlendEthProcessor } from "./processors/UnlendEthProcessor";
 
@@ -851,187 +851,21 @@ export class FulcrumProvider {
 
       // Initializing loan
       const taskRequest: TradeRequest = (task.request as TradeRequest);
-      const amountInBaseUnits = new BigNumber(taskRequest.amount.multipliedBy(10 ** 18).toFixed(0, 1));
-      const tokenContract: pTokenContract | null =
-        await this.contractsSource.getPTokenContract(
-          new TradeTokenKey(
-            taskRequest.asset,
-            taskRequest.unitOfAccount,
-            taskRequest.positionType,
-            taskRequest.leverage
-          )
-        );
-      if (!tokenContract) {
-        throw new Error("No pToken contract available!");
-      }
-
       if (taskRequest.tradeType === TradeType.BUY) {
         if (taskRequest.collateral !== Asset.ETH) {
-          task.processingStart([
-            "Initializing trade",
-            "Detecting token allowance",
-            "Prompting token allowance",
-            "Waiting for token allowance",
-            "Submitting trade",
-            "Updating the blockchain",
-            "Transaction completed"
-          ]);
-
-          // init erc20 contract for base token
-          let tokenErc20Contract: erc20Contract | null = null;
-          const assetErc20Address = this.getErc20Address(taskRequest.collateral);
-          if (assetErc20Address) {
-            tokenErc20Contract = await this.contractsSource.getErc20Contract(assetErc20Address);
-          } else {
-            throw new Error("No ERC20 contract available!");
-          }
-
-          if (!tokenErc20Contract) {
-            throw new Error("No ERC20 contract available!");
-          }
-          task.processingStepNext();
-
-          // Detecting token allowance
-          let approvePromise: Promise<string> | null = null;
-          const erc20allowance = await tokenErc20Contract.allowance.callAsync(account, tokenContract.address);
-          task.processingStepNext();
-
-          // Prompting token allowance
-          if (amountInBaseUnits.gt(erc20allowance)) {
-            approvePromise = tokenErc20Contract.approve.sendTransactionAsync(tokenContract.address, FulcrumProvider.UNLIMITED_ALLOWANCE_IN_BASE_UNITS, { from: account });
-          }
-          task.processingStepNext();
-          task.processingStepNext();
-
-          let gasAmountBN;
-
-          // Waiting for token allowance
-          if (approvePromise || skipGas) {
-            await approvePromise;
-            gasAmountBN = new BigNumber(2300000);
-          } else {
-            // estimating gas amount
-            const gasAmount = await tokenContract.mintWithToken.estimateGasAsync(account, assetErc20Address, amountInBaseUnits, { from: account, gas: this.gasLimit });
-            gasAmountBN = new BigNumber(gasAmount).multipliedBy(this.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
-          }
-
-          // Submitting trade
-          const txHash = await tokenContract.mintWithToken.sendTransactionAsync(account, assetErc20Address, amountInBaseUnits, { from: account, gas: gasAmountBN.toString() });
-          task.setTxHash(txHash);
-
-          task.processingStepNext();
-          const txReceipt = await this.waitForTransactionMined(txHash, task.request);
-          if (!txReceipt.status) {
-            throw new Error("Reverted by EVM");
-          }
-
-          task.processingStepNext();
-          await this.sleep(this.successDisplayTimeout);
+          const processor = new TradeBuyErcProcessor();
+          await processor.run(task, account, skipGas);
         } else {
-          task.processingStart([
-            "Initializing trade",
-            "Submitting trade",
-            "Updating the blockchain",
-            "Transaction completed"
-          ]);
-
-          // no additional inits or checks
-          task.processingStepNext();
-
-          let gasAmountBN;
-
-          // Waiting for token allowance
-          if (skipGas) {
-            gasAmountBN = new BigNumber(2300000);
-          } else {
-            // estimating gas amount
-            const gasAmount = await tokenContract.mintWithEther.estimateGasAsync(account, { from: account, value: amountInBaseUnits, gas: this.gasLimit });
-            gasAmountBN = new BigNumber(gasAmount).multipliedBy(this.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
-          }
-
-          const gasCost = gasAmountBN.multipliedBy(this.gasPrice).integerValue(BigNumber.ROUND_UP);
-          // Submitting trade
-          const txHash = await tokenContract.mintWithEther.sendTransactionAsync(account, { from: account, value: amountInBaseUnits, gas: gasAmountBN.toString() });
-          task.setTxHash(txHash);
-
-          task.processingStepNext();
-          const txReceipt = await this.waitForTransactionMined(txHash, task.request);
-          if (!txReceipt.status) {
-            throw new Error("Reverted by EVM");
-          }
-
-          task.processingStepNext();
-          await this.sleep(this.successDisplayTimeout);
+          const processor = new TradeBuyEthProcessor();
+          await processor.run(task, account, skipGas);
         }
       } else {
-        task.processingStart([
-          "Initializing trade",
-          "Closing trade",
-          "Updating the blockchain",
-          "Transaction completed"
-        ]);
-
-        // no additional inits or checks
-        task.processingStepNext();
-
-        let gasAmountBN;
         if (taskRequest.collateral !== Asset.ETH) {
-          // Submitting unloan
-          const assetErc20Address = this.getErc20Address(taskRequest.collateral);
-          if (assetErc20Address) {
-            // Waiting for token allowance
-            if (skipGas) {
-              gasAmountBN = new BigNumber(2300000);
-            } else {
-              // estimating gas amount
-              const gasAmount = await tokenContract.burnToToken.estimateGasAsync(
-                account,
-                assetErc20Address,
-                amountInBaseUnits,
-                { from: account, gas: this.gasLimit }
-              );
-              gasAmountBN = new BigNumber(gasAmount).multipliedBy(this.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
-            }
-            
-            // Closing trade
-            const txHash = await tokenContract.burnToToken.sendTransactionAsync(
-              account,
-              assetErc20Address,
-              amountInBaseUnits,
-              { from: account, gas: gasAmountBN.toString() }
-            );
-            task.setTxHash(txHash);
-
-            task.processingStepNext();
-            const txReceipt = await this.waitForTransactionMined(txHash, task.request);
-            if (!txReceipt.status) {
-              throw new Error("Reverted by EVM");
-            }
-
-            task.processingStepNext();
-            await this.sleep(this.successDisplayTimeout);
-          }
+          const processor = new TradeSellErcProcessor();
+          await processor.run(task, account, skipGas);
         } else {
-          if (skipGas) {
-            gasAmountBN = new BigNumber(2300000);
-          } else {
-            // estimating gas amount
-            const gasAmount = await tokenContract.burnToEther.estimateGasAsync(account, amountInBaseUnits, { from: account, gas: this.gasLimit });
-            gasAmountBN = new BigNumber(gasAmount).multipliedBy(this.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
-          }
-
-          // Closing trade
-          const txHash = await tokenContract.burnToEther.sendTransactionAsync(account, amountInBaseUnits, { from: account, gas: gasAmountBN.toString() });
-          task.setTxHash(txHash);
-
-          task.processingStepNext();
-          const txReceipt = await this.waitForTransactionMined(txHash, task.request);
-          if (!txReceipt.status) {
-            throw new Error("Reverted by EVM");
-          }
-
-          task.processingStepNext();
-          await this.sleep(this.successDisplayTimeout);
+          const processor = new TradeSellEthProcessor();
+          await processor.run(task, account, skipGas);
         }
       }
 
