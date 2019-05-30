@@ -51,7 +51,7 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
     if (
       prevProps.asset !== this.props.asset ||
       prevState.positionValue !== this.state.positionValue ||
-      prevState.selectedValue != this.state.selectedValue
+      prevState.selectedValue !== this.state.selectedValue
     ) {
       this.derivedUpdate();
     }

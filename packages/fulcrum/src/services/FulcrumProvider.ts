@@ -128,7 +128,7 @@ export class FulcrumProvider {
     if (this.web3Wrapper && canWrite) {
       this.accounts = await this.web3Wrapper.getAvailableAddressesAsync();
     } else {
-      //this.accounts = [];
+      // this.accounts = [];
       if (providerType === ProviderType.Bitski) {
         this.unsupportedNetwork = true;
       }
@@ -161,7 +161,7 @@ export class FulcrumProvider {
 
   public onManageCollateralConfirmed = async (request: ManageCollateralRequest) => {
     if (request) {
-      console.dir(request);
+      // console.dir(request);
     }
   };
 
@@ -555,6 +555,7 @@ export class FulcrumProvider {
   };
 
   public static async getWeb3ProviderSettings(networkId: number| null): Promise<IWeb3ProviderSettings> {
+    // tslint:disable-next-line:one-variable-per-declaration
     let networkName, etherscanURL;
     switch (networkId) {
       case 1:

@@ -1,14 +1,14 @@
 import { EventEmitter } from "events";
-import { FulcrumProvider } from "../services/FulcrumProvider";
 import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
+import { FulcrumProvider } from "../services/FulcrumProvider";
 
 import { Web3Wrapper } from '@0x/web3-wrapper';
 
 import Portis from "@portis/web3";
 // @ts-ignore
-//import WalletConnectProvider from "@walletconnect/web3-provider";
-import { Bitski, AuthenticationStatus } from "bitski";
+// import WalletConnectProvider from "@walletconnect/web3-provider";
+import { AuthenticationStatus, Bitski } from "bitski";
 // @ts-ignore
 import Fortmatic from "fortmatic";
 import { ProviderType } from "./ProviderType";
@@ -92,7 +92,7 @@ export class Web3ConnectionFactory {
           subProvider = await subProvider.getProvider({ networkName: process.env.REACT_APP_ETH_NETWORK ? process.env.REACT_APP_ETH_NETWORK : undefined });
           canWrite = true;
         } catch(e) {
-          //console.log(e);
+          // console.log(e);
         }
       } else {
         providerEngine.addProvider(new SignerSubprovider(subProvider));
@@ -132,7 +132,7 @@ export class Web3ConnectionFactory {
         }
 
         if (result.selectedAddress !== FulcrumProvider.Instance.accounts[0]) {
-          if (FulcrumProvider.Instance.accounts.length == 0) {
+          if (FulcrumProvider.Instance.accounts.length === 0) {
             FulcrumProvider.Instance.accounts.push(result.selectedAddress);
           } else {
             FulcrumProvider.Instance.accounts[0] = result.selectedAddress;
