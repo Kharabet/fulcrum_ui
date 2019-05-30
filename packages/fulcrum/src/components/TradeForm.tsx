@@ -163,7 +163,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       new BigNumber(0)
     );
     const tradedAmountEstimate = await FulcrumProvider.Instance.getTradedAmountEstimate(tradeRequest);
-    const slippageRate = await FulcrumProvider.Instance.getSlippageRate(tradeRequest);
+    const slippageRate = await FulcrumProvider.Instance.getTradeSlippageRate(tradeRequest);
 
     this.setState({
       ...this.state,
@@ -483,7 +483,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
         );
 
         FulcrumProvider.Instance.getTradedAmountEstimate(tradeRequest).then(tradedAmountEstimate => {
-          FulcrumProvider.Instance.getSlippageRate(tradeRequest).then(slippageRate => {
+          FulcrumProvider.Instance.getTradeSlippageRate(tradeRequest).then(slippageRate => {
             observer.next({
               isTradeAmountTouched: this.state.isTradeAmountTouched,
               tradeAmountText: maxTradeValue.decimalPlaces(this._inputPrecision).toFixed(),
@@ -515,19 +515,19 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       }
 
       // updating stored value only if the new input value is a valid number
-      const tradeRequest = new TradeRequest(
-        this.props.tradeType,
-        this.props.asset,
-        this.state.unitOfAccount,
-        this.state.collateral,
-        this.props.positionType,
-        this.props.leverage,
-        amount
-      );
-
       if (!amount.isNaN()) {
+        const tradeRequest = new TradeRequest(
+          this.props.tradeType,
+          this.props.asset,
+          this.state.unitOfAccount,
+          this.state.collateral,
+          this.props.positionType,
+          this.props.leverage,
+          amount
+        );
+
         FulcrumProvider.Instance.getTradedAmountEstimate(tradeRequest).then(tradedAmountEstimate => {
-          FulcrumProvider.Instance.getSlippageRate(tradeRequest).then(slippageRate => {
+          FulcrumProvider.Instance.getTradeSlippageRate(tradeRequest).then(slippageRate => {
             observer.next({
               isTradeAmountTouched: true,
               tradeAmountText: amountText,

@@ -17,8 +17,8 @@ interface ILendAmountChangeEvent {
   lendAmountText: string;
   lendAmount: BigNumber;
   maxLendAmount: BigNumber;
-
   lendedAmountEstimate: BigNumber;
+  slippageRate: BigNumber;
 }
 
 export interface ILendFormProps {
@@ -40,6 +40,7 @@ interface ILendFormState {
   maxLendAmount: BigNumber;
 
   lendedAmountEstimate: BigNumber;
+  slippageRate: BigNumber;
 }
 
 export class LendForm extends Component<ILendFormProps, ILendFormState> {
@@ -55,6 +56,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
     const interestRate = new BigNumber(0);
     const balance = new BigNumber(0);
     const maxLendValue = new BigNumber(0);
+    const slippageRate = new BigNumber(0);
     const lendedAmountEstimate = new BigNumber(0);
 
     this.state = {
@@ -65,7 +67,8 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
       balance: balance,
       maxLendAmount: maxLendValue,
       lendedAmountEstimate: lendedAmountEstimate,
-      interestRate: interestRate
+      interestRate: interestRate,
+      slippageRate: slippageRate
     };
 
     this._inputChange = new Subject();
@@ -91,7 +94,8 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
           isLendAmountTouched: false,
           lendAmountText: "",
           lendAmount: new BigNumber(0),
-          lendedAmountEstimate: new BigNumber(0)
+          lendedAmountEstimate: new BigNumber(0),
+          slippageRate: new BigNumber(0)
         })
       }
     });
@@ -113,9 +117,9 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
     const maxLendValue = (await FulcrumProvider.Instance.getMaxLendValue(
       new LendRequest(this.props.lendType, this.props.asset, new BigNumber(0))
     )).decimalPlaces(6);
-    const lendedAmountEstimate = await FulcrumProvider.Instance.getLendedAmountEstimate(
-      new LendRequest(this.props.lendType, this.props.asset, maxLendValue)
-    );
+    const lendRequest = new LendRequest(this.props.lendType, this.props.asset, maxLendValue);
+    const lendedAmountEstimate = await FulcrumProvider.Instance.getLendedAmountEstimate(lendRequest);
+    const slippageRate = await FulcrumProvider.Instance.getLendSlippageRate(lendRequest);
 
     this.setState({
       ...this.state,
@@ -125,7 +129,8 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
       balance: balance,
       maxLendAmount: maxLendValue,
       lendedAmountEstimate: lendedAmountEstimate,
-      interestRate: interestRate
+      interestRate: interestRate,
+      slippageRate: slippageRate
     });
   }
 
@@ -173,14 +178,12 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
     const tokenNameDestination = this.props.lendType === LendType.LEND ? tokenNamePosition : tokenNameBase;
 
     const isAmountMaxed = this.state.lendAmount.eq(this.state.maxLendAmount);
-    const amountMaxedMsg =
-      isAmountMaxed
-        ? this.state.balance.eq(0)
-          ? "Your wallet is empty \u2639"
-          : this.state.isLendAmountTouched
-            ? "Max amount entered."
-            : ""
-        : "";
+    const amountMsg =
+      this.state.balance.eq(0)
+        ? "Your wallet is empty \u2639"
+        : this.state.lendAmount.gt(0)
+          ? `Slippage: ${this.state.slippageRate.toFixed(2)}%`
+          : "";
 
     const lendedAmountEstimateText =
       this.state.lendedAmountEstimate.eq(0)
@@ -208,21 +211,22 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
               <div className="lend-form__label">{this.props.lendType === LendType.LEND ? `Lend Amount` : `UnLend Amount`}</div>
               <div className="lend-form__value">{tokenNameSource}</div>
             </div>
-            <input
-              type="text"
-              ref={this._setInputRef}
-              className="lend-form__amount"
-              value={this.state.lendAmountText}
-              onChange={this.onLendAmountChange}
-            />
-            <div className="lend-form__kv-container">
+            <div className="lend-form__amount-container">
+              <input
+                type="text"
+                ref={this._setInputRef}
+                className="lend-form__amount-input"
+                value={this.state.lendAmountText}
+                onChange={this.onLendAmountChange}
+              />
               {isAmountMaxed ? (
-                <div className="trade-form__label">{amountMaxedMsg}</div>
+                <div className="lend-form__amount-maxed">MAX</div>
               ) : (
-                <div className="trade-form__label trade-form__label--action" onClick={this.onInsertMaxValue}>
-                  Insert max value
-                </div>
+                <div className="lend-form__amount-max" onClick={this.onInsertMaxValue}>&#65087;<br/>MAX</div>
               )}
+            </div>
+            <div className="lend-form__kv-container">
+              <div className="trade-form__label">{amountMsg}</div>
               <div className="lend-form__value lend-form__value--no-color">
                 <Tooltip
                   html={
@@ -309,15 +313,22 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
       FulcrumProvider.Instance.getMaxLendValue(
         new LendRequest(this.props.lendType, this.props.asset, new BigNumber(0))
       ).then(maxLendValue => {
-        FulcrumProvider.Instance.getLendedAmountEstimate(
-          new LendRequest(this.props.lendType, this.props.asset, maxLendValue)
-        ).then(lendedAmountEstimate => {
-          observer.next({
-            isLendAmountTouched: this.state.isLendAmountTouched,
-            lendAmountText: maxLendValue.toFixed(),
-            lendAmount: maxLendValue,
-            maxLendAmount: maxLendValue,
-            lendedAmountEstimate: lendedAmountEstimate
+        const lendRequest = new LendRequest(
+          this.props.lendType,
+          this.props.asset,
+          maxLendValue
+        );
+
+        FulcrumProvider.Instance.getLendedAmountEstimate(lendRequest).then(lendedAmountEstimate => {
+          FulcrumProvider.Instance.getLendSlippageRate(lendRequest).then(slippageRate => {
+            observer.next({
+              isLendAmountTouched: this.state.isLendAmountTouched,
+              lendAmountText: maxLendValue.toFixed(),
+              lendAmount: maxLendValue,
+              maxLendAmount: maxLendValue,
+              lendedAmountEstimate: lendedAmountEstimate,
+              slippageRate: slippageRate
+            });
           });
         });
       });
@@ -340,22 +351,29 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
         amountText = this.state.maxLendAmount.toFixed();
       }
 
-      // updating stored value only if the new input value is a valid number
-      FulcrumProvider.Instance.getLendedAmountEstimate(
-        new LendRequest(this.props.lendType, this.props.asset, amount)
-      ).then(lendedAmountEstimate => {
-        if (!amount.isNaN()) {
-          observer.next({
-            isLendAmountTouched: true,
-            lendAmountText: amountText,
-            lendAmount: amount,
-            maxLendAmount: this.state.maxLendAmount,
-            lendedAmountEstimate: lendedAmountEstimate
+      if (!amount.isNaN()) {
+        const lendRequest = new LendRequest(
+          this.props.lendType,
+          this.props.asset,
+          amount
+        );
+
+        // updating stored value only if the new input value is a valid number
+        FulcrumProvider.Instance.getLendedAmountEstimate(lendRequest).then(lendedAmountEstimate => {
+          FulcrumProvider.Instance.getLendSlippageRate(lendRequest).then(slippageRate => {
+            observer.next({
+              isLendAmountTouched: true,
+              lendAmountText: amountText,
+              lendAmount: amount,
+              maxLendAmount: this.state.maxLendAmount,
+              lendedAmountEstimate: lendedAmountEstimate,
+              slippageRate: slippageRate
+            });
           });
-        } else {
-          observer.next(null);
-        }
-      });
+        });
+      } else {
+        observer.next(null);
+      }
     });
   };
 }

@@ -546,8 +546,12 @@ export class FulcrumProvider {
     return result;
   };
 
-  public getSlippageRate = async (request: TradeRequest): Promise<BigNumber> => {
-    return new BigNumber(5);
+  public getTradeSlippageRate = async (request: TradeRequest): Promise<BigNumber> => {
+    return new BigNumber(2);
+  };
+
+  public getLendSlippageRate = async (request: LendRequest): Promise<BigNumber> => {
+    return new BigNumber(3);
   };
 
   public static async getWeb3ProviderSettings(networkId: number| null): Promise<IWeb3ProviderSettings> {
