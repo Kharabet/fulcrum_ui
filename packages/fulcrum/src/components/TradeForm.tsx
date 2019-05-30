@@ -21,6 +21,15 @@ import { CollateralTokenSelector } from "./CollateralTokenSelector";
 import { PositionTypeMarker } from "./PositionTypeMarker";
 import { UnitOfAccountSelector } from "./UnitOfAccountSelector";
 
+interface ITradeAmountChangeEvent {
+  isTradeAmountTouched: boolean;
+  tradeAmountText: string;
+  tradeAmount: BigNumber;
+  tradedAmountEstimate: BigNumber;
+  maxTradeAmount: BigNumber;
+  slippageRate: BigNumber;
+}
+
 export interface ITradeFormProps {
   tradeType: TradeType;
   asset: Asset;
@@ -33,15 +42,6 @@ export interface ITradeFormProps {
   onSubmit: (request: TradeRequest) => void;
   onCancel: () => void;
   onTrade: (request: TradeRequest) => void;
-}
-
-interface ITextChangeEvent {
-  isTradeAmountTouched: boolean;
-  tradeAmountText: string;
-  tradeAmount: BigNumber;
-  tradedAmountEstimate: BigNumber;
-  maxTradeAmount: BigNumber;
-  slippageRate: BigNumber;
 }
 
 interface ITradeFormState {
@@ -105,11 +105,13 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       this._inputChange.pipe(
         distinctUntilChanged(),
         debounceTime(500),
-        switchMap((value) => this.operatorCurrentAmount(value))
+        switchMap((value) => this.rxFromCurrentAmount(value))
       ),
-      this._inputSetMax.pipe(switchMap(() => this.operatorMaxAmount()))
+      this._inputSetMax.pipe(
+        switchMap(() => this.rxFromMaxAmount())
+      )
     ).pipe(
-      switchMap((value) => new Observable<ITextChangeEvent | null>((observer) => observer.next(value)))
+      switchMap((value) => new Observable<ITradeAmountChangeEvent | null>((observer) => observer.next(value)))
     ).subscribe(next => {
       if (next) {
         this.setState({ ...this.state, ...next });
@@ -462,8 +464,8 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     );
   };
 
-  private operatorMaxAmount = (): Observable<ITextChangeEvent | null> => {
-    return new Observable<ITextChangeEvent | null>(observer => {
+  private rxFromMaxAmount = (): Observable<ITradeAmountChangeEvent | null> => {
+    return new Observable<ITradeAmountChangeEvent | null>(observer => {
       const tradeTokenKey = this.getTradeTokenGridRowSelectionKey();
       FulcrumProvider.Instance.getMaxTradeValue(
         this.props.tradeType,
@@ -496,8 +498,8 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     });
   };
 
-  private operatorCurrentAmount = (value: string): Observable<ITextChangeEvent | null> => {
-    return new Observable<ITextChangeEvent | null>(observer => {
+  private rxFromCurrentAmount = (value: string): Observable<ITradeAmountChangeEvent | null> => {
+    return new Observable<ITradeAmountChangeEvent | null>(observer => {
       let amountText = value;
       const amountTextForConversion = amountText === "" ? "0" : amountText[0] === "." ? `0${amountText}` : amountText;
 
