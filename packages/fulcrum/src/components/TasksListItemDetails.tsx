@@ -87,46 +87,48 @@ export class TasksListItemDetails extends Component<ITasksListItemDetailsProps> 
     }
 
     return (this.props.task.status === RequestStatus.FAILED || this.props.task.status === RequestStatus.FAILED_SKIPGAS) && index + 1 === this.props.task.stepCurrent ? (
-      <div className="task-list-item-details__step-actions">
+      <React.Fragment>
         {errorMsg ? (
-          <React.Fragment>
-            <div className="task-list-item-details__step-title--failed-txn">
-              {errorMsg}
-            </div>
-            {tx && FulcrumProvider.Instance.web3ProviderSettings ? (
-              <a
-                className="task-list-item-details__step-title--failed-txn"
-                href={`${FulcrumProvider.Instance.web3ProviderSettings.etherscanURL}tx/${tx}`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {tx.slice(0, 20)}...{tx.slice(tx.length - 18, tx.length)}
-              </a>
-            ) : ``}
-          </React.Fragment>
-        ) : ``}
-        <button
-          className="task-list-item-details__step-action-btn task-list-item-details__step-action-btn--cancel"
-          onClick={this.onTaskCancel}
-        >
-          Cancel
-        </button>
-        {forceRetry ? (
+            <React.Fragment>
+              <div className="task-list-item-details__step-title--failed-txn">
+                {errorMsg}
+              </div>
+              {tx && FulcrumProvider.Instance.web3ProviderSettings ? (
+                <a
+                  className="task-list-item-details__step-title--failed-txn"
+                  href={`${FulcrumProvider.Instance.web3ProviderSettings.etherscanURL}tx/${tx}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {tx.slice(0, 20)}...{tx.slice(tx.length - 18, tx.length)}
+                </a>
+              ) : ``}
+            </React.Fragment>
+          ) : ``}
+        <div className="task-list-item-details__step-actions">
           <button
-            className="task-list-item-details__step-action-btn task-list-item-details__step-action-btn--try-again"
-            onClick={this.onForceRetry}
+            className="task-list-item-details__step-action-btn task-list-item-details__step-action-btn--cancel"
+            onClick={this.onTaskCancel}
           >
-            Submit
+            Cancel
           </button>
-        ) : (
-          <button
-            className="task-list-item-details__step-action-btn task-list-item-details__step-action-btn--try-again"
-            onClick={this.onTaskRetry}
-          >
-            Try again
-          </button>
-        )}
-      </div>
+          {forceRetry ? (
+            <button
+              className="task-list-item-details__step-action-btn task-list-item-details__step-action-btn--try-again"
+              onClick={this.onForceRetry}
+            >
+              Submit
+            </button>
+          ) : (
+            <button
+              className="task-list-item-details__step-action-btn task-list-item-details__step-action-btn--try-again"
+              onClick={this.onTaskRetry}
+            >
+              Try again
+            </button>
+          )}
+        </div>
+      </React.Fragment>
     ) : null;
   };
 
