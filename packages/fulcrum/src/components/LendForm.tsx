@@ -44,6 +44,7 @@ interface ILendFormState {
 }
 
 export class LendForm extends Component<ILendFormProps, ILendFormState> {
+  private readonly _inputPrecision = 6;
   private _input: HTMLInputElement | null = null;
 
   private readonly _inputChange: Subject<string>;
@@ -323,7 +324,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
           FulcrumProvider.Instance.getLendSlippageRate(lendRequest).then(slippageRate => {
             observer.next({
               isLendAmountTouched: this.state.isLendAmountTouched,
-              lendAmountText: maxLendValue.toFixed(),
+              lendAmountText: maxLendValue.decimalPlaces(this._inputPrecision).toFixed(),
               lendAmount: maxLendValue,
               maxLendAmount: maxLendValue,
               lendedAmountEstimate: lendedAmountEstimate,
@@ -343,12 +344,12 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
       let amount = new BigNumber(amountTextForConversion);
       // handling negative values (incl. Ctrl+C)
       if (amount.isNegative()) {
-        amountText = amount.absoluteValue().toFixed();
         amount = amount.absoluteValue();
+        amountText = amount.decimalPlaces(this._inputPrecision).toFixed();
       }
       if (amount.gt(this.state.maxLendAmount)) {
         amount = this.state.maxLendAmount;
-        amountText = this.state.maxLendAmount.toFixed();
+        amountText = this.state.maxLendAmount.decimalPlaces(this._inputPrecision).toFixed();
       }
 
       if (!amount.isNaN()) {
