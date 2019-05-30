@@ -75,7 +75,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
   };
 
   private onTradeTransactionMined = async (event: TradeTransactionMinedEvent) => {
-    if (event.key === this.props.selectedKey) {
+    if (event.key.toString() === this.props.currentKey.toString()) {
       await this.derivedUpdate();
     }
   };

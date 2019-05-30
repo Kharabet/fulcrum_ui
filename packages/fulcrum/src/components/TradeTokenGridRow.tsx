@@ -87,7 +87,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
   };
 
   private onTradeTransactionMined = async (event: TradeTransactionMinedEvent) => {
-    if (event.key === this.props.selectedKey) {
+    if (event.key.toString() === this.getTradeTokenGridRowSelectionKey().toString()) {
       await this.derivedUpdate();
     }
   };
