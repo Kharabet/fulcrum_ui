@@ -31,6 +31,10 @@ import { TradeTransactionMinedEvent } from "./events/TradeTransactionMinedEvent"
 import { TasksQueue } from "./TasksQueue";
 
 import configProviders from "../config/providers.json";
+import { LendErcProcessor } from "./processors/LendErcProcessor";
+import { LendEthProcessor } from "./processors/LendEthProcessor";
+import { UnlendErcProcessor } from "./processors/UnlendErcProcessor";
+import { UnlendEthProcessor } from "./processors/UnlendEthProcessor";
 
 export class FulcrumProvider {
   private static readonly priceGraphQueryFunction = new Map<Asset, string>([
@@ -45,15 +49,15 @@ export class FulcrumProvider {
 
   public static Instance: FulcrumProvider;
 
-  private readonly gasLimit = "3000000";
+  public readonly gasLimit = "3000000";
   // gasPrice equal to 6 gwei
-  private readonly gasPrice = new BigNumber(6).multipliedBy(10 ** 9);
+  public readonly gasPrice = new BigNumber(6).multipliedBy(10 ** 9);
   // gasBufferCoeff equal 110% gas reserve
-  private readonly gasBufferCoeff = new BigNumber("1.1");
+  public readonly gasBufferCoeff = new BigNumber("1.1");
   // 5000ms
-  private readonly successDisplayTimeout = 5000;
+  public readonly successDisplayTimeout = 5000;
 
-  private static readonly UNLIMITED_ALLOWANCE_IN_BASE_UNITS = new BigNumber(2)
+  public static readonly UNLIMITED_ALLOWANCE_IN_BASE_UNITS = new BigNumber(2)
     .pow(256)
     .minus(1);
 
@@ -644,7 +648,7 @@ export class FulcrumProvider {
       : null;
   }
 
-  private getErc20Address(asset: Asset): string | null {
+  public getErc20Address(asset: Asset): string | null {
     let result: string | null = null;
 
     const assetDetails = AssetsDictionary.assets.get(asset);
@@ -806,164 +810,21 @@ export class FulcrumProvider {
 
       // Initializing loan
       const taskRequest: LendRequest = (task.request as LendRequest);
-      const amountInBaseUnits = new BigNumber(taskRequest.amount.multipliedBy(10 ** 18).toFixed(0, 1));
-      const tokenContract: iTokenContract | null = await this.contractsSource.getITokenContract(taskRequest.asset);
-      if (!tokenContract) {
-        throw new Error("No iToken contract available!");
-      }
-
       if (taskRequest.lendType === LendType.LEND) {
         if (taskRequest.asset !== Asset.ETH) {
-          task.processingStart([
-            "Initializing loan",
-            "Detecting token allowance",
-            "Prompting token allowance",
-            "Waiting for token allowance",
-            "Submitting loan",
-            "Updating the blockchain",
-            "Transaction completed"
-          ]);
-
-          // init erc20 contract for base token
-          let tokenErc20Contract: erc20Contract | null = null;
-          const assetErc20Address = this.getErc20Address(taskRequest.asset);
-          if (assetErc20Address) {
-            tokenErc20Contract = await this.contractsSource.getErc20Contract(assetErc20Address);
-          }
-
-          if (!tokenErc20Contract) {
-            throw new Error("No ERC20 contract available!");
-          }
-          task.processingStepNext();
-
-          // Detecting token allowance
-          let approvePromise: Promise<string> | null = null;
-          const erc20allowance = await tokenErc20Contract.allowance.callAsync(account, tokenContract.address);
-          task.processingStepNext();
-
-          // Prompting token allowance
-          if (amountInBaseUnits.gt(erc20allowance)) {
-            approvePromise = tokenErc20Contract.approve.sendTransactionAsync(tokenContract.address, FulcrumProvider.UNLIMITED_ALLOWANCE_IN_BASE_UNITS, { from: account });
-          }
-          task.processingStepNext();
-          task.processingStepNext();
-
-          let gasAmountBN;
-          
-          // Waiting for token allowance
-          if (approvePromise || skipGas) {
-            await approvePromise;
-            gasAmountBN = new BigNumber(2300000);
-          } else {
-            // estimating gas amount
-            const gasAmount = await tokenContract.mint.estimateGasAsync(account, amountInBaseUnits, { from: account, gas: this.gasLimit });
-            gasAmountBN = new BigNumber(gasAmount).multipliedBy(this.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
-          }
-
-          // Submitting loan
-          const txHash = await tokenContract.mint.sendTransactionAsync(account, amountInBaseUnits, { from: account, gas: gasAmountBN.toString() });
-          task.setTxHash(txHash);
-
-          task.processingStepNext();
-          const txReceipt = await this.waitForTransactionMined(txHash, task.request);
-          if (!txReceipt.status) {
-            throw new Error("Reverted by EVM");
-          }
-
-          task.processingStepNext();
-          await this.sleep(this.successDisplayTimeout);
+          const processor = new LendErcProcessor();
+          await processor.run(task, account, skipGas);
         } else {
-          task.processingStart([
-            "Initializing loan",
-            "Submitting loan",
-            "Updating the blockchain",
-            "Transaction completed"
-          ]);
-
-          // no additional inits or checks
-          task.processingStepNext();
-
-          let gasAmountBN;
-          
-          // Waiting for token allowance
-          if (skipGas) {
-            gasAmountBN = new BigNumber(2300000);
-          } else {
-            // estimating gas amount
-            const gasAmount = await tokenContract.mintWithEther.estimateGasAsync(account, { from: account, value: amountInBaseUnits, gas: this.gasLimit });
-            gasAmountBN = new BigNumber(gasAmount).multipliedBy(this.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
-          }
-
-          const gasCost = gasAmountBN.multipliedBy(this.gasPrice).integerValue(BigNumber.ROUND_UP);
-          // Submitting loan
-          const txHash = await tokenContract.mintWithEther.sendTransactionAsync(account, { from: account, value: amountInBaseUnits, gas: gasAmountBN.toString() });
-          task.setTxHash(txHash);
-
-          task.processingStepNext();
-          const txReceipt = await this.waitForTransactionMined(txHash, task.request);
-          if (!txReceipt.status) {
-            throw new Error("Reverted by EVM");
-          }
-
-          task.processingStepNext();
-          await this.sleep(this.successDisplayTimeout);
+          const processor = new LendEthProcessor();
+          await processor.run(task, account, skipGas);
         }
       } else {
-        task.processingStart([
-          "Initializing loan",
-          "Closing loan",
-          "Updating the blockchain",
-          "Transaction completed"
-        ]);
-
-        // no additional inits or checks
-        task.processingStepNext();
-
-        let gasAmountBN;
         if (taskRequest.asset !== Asset.ETH) {
-          // Waiting for token allowance
-          if (skipGas) {
-            gasAmountBN = new BigNumber(2300000);
-          } else {
-            // estimating gas amount
-            const gasAmount = await tokenContract.burn.estimateGasAsync(account, amountInBaseUnits, { from: account, gas: this.gasLimit });
-            gasAmountBN = new BigNumber(gasAmount).multipliedBy(this.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
-          }
-
-          // Submitting unloan
-          const txHash = await tokenContract.burn.sendTransactionAsync(account, amountInBaseUnits, { from: account, gas: gasAmountBN.toString() });
-          task.setTxHash(txHash);
-
-          task.processingStepNext();
-          const txReceipt = await this.waitForTransactionMined(txHash, task.request);
-          if (!txReceipt.status) {
-            throw new Error("Reverted by EVM");
-          }
-
-          task.processingStepNext();
-          await this.sleep(this.successDisplayTimeout);
+          const processor = new UnlendErcProcessor();
+          await processor.run(task, account, skipGas);
         } else {
-          // Waiting for token allowance
-          if (skipGas) {
-            gasAmountBN = new BigNumber(2300000);
-          } else {
-            // estimating gas amount
-            const gasAmount = await tokenContract.burnToEther.estimateGasAsync(account, amountInBaseUnits, { from: account, gas: this.gasLimit });
-            gasAmountBN = new BigNumber(gasAmount).multipliedBy(this.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
-          }
-          
-          // Submitting unloan
-          const txHash = await tokenContract.burnToEther.sendTransactionAsync(account, amountInBaseUnits, { from: account, gas: gasAmountBN.toString() });
-          task.setTxHash(txHash);
-
-          task.processingStepNext();
-          const txReceipt = await this.waitForTransactionMined(txHash, task.request);
-          if (!txReceipt.status) {
-            throw new Error("Reverted by EVM");
-          }
-
-          task.processingStepNext();
-          await this.sleep(this.successDisplayTimeout);
+          const processor = new UnlendEthProcessor();
+          await processor.run(task, account, skipGas);
         }
       }
 
@@ -1184,7 +1045,7 @@ export class FulcrumProvider {
     }
   };
 
-  private waitForTransactionMined = async (
+  public waitForTransactionMined = async (
     txHash: string, 
     request: LendRequest | TradeRequest): Promise<any> => {
 
@@ -1239,7 +1100,7 @@ export class FulcrumProvider {
     }
   };
 
-  private sleep(ms: number) {
+  public sleep(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 }
