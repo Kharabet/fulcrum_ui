@@ -71,7 +71,7 @@ export class AssetsDictionary {
         "#00000000",
         new Map<number, string | null>([
           [1, "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"],
-          [3, "0xa577731515303f0c0d00e236041855a5c4f114dc"] // using POWR
+          [3, "0x95cc8d8f29d0f7fcc425e8708893e759d1599c97"] // using ENG
         ])
       )
     ],
