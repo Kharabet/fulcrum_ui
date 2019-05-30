@@ -26,8 +26,8 @@ export class TradeTokenKey {
   }
 
   public toString(): string {
-    const unitOfAccountPrefix = `p`;// this.unitOfAccount === Asset.DAI ? "d" : "u"; // DAI and USDC
-    const positionTypePrefix = this.positionType === PositionType.SHORT ? "S" : "L"; // this.positionType === PositionType.SHORT ? "s" : "L";
+    const unitOfAccountPrefix = this.unitOfAccount === Asset.DAI ? "d" : "u"; // DAI and USDC
+    const positionTypePrefix = this.positionType === PositionType.SHORT ? "s" : "L";
     const positionLeveragePostfix = this.leverage > 1 ? `${this.leverage}x` : "";
     return `${unitOfAccountPrefix}${positionTypePrefix}${this.asset}${positionLeveragePostfix}`;
   }
