@@ -1,5 +1,6 @@
 import { BigNumber } from "bignumber.js";
 import { pTokenContract } from "../../contracts/pTokenContract";
+import { AssetsDictionary } from "../../domain/AssetsDictionary";
 import { RequestTask } from "../../domain/RequestTask";
 import { TradeRequest } from "../../domain/TradeRequest";
 import { TradeTokenKey } from "../../domain/TradeTokenKey";
@@ -13,7 +14,8 @@ export class TradeSellErcProcessor {
 
     // Initializing loan
     const taskRequest: TradeRequest = (task.request as TradeRequest);
-    const amountInBaseUnits = new BigNumber(taskRequest.amount.multipliedBy(10 ** 18).toFixed(0, 1));
+    const decimals: number = AssetsDictionary.assets.get(taskRequest.asset)!.decimals || 18;
+    const amountInBaseUnits = new BigNumber(taskRequest.amount.multipliedBy(10 ** decimals).toFixed(0, 1));
     const tokenContract: pTokenContract | null =
       await FulcrumProvider.Instance.contractsSource.getPTokenContract(
         new TradeTokenKey(

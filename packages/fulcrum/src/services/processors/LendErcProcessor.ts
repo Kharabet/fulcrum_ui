@@ -1,11 +1,10 @@
 import { BigNumber } from "bignumber.js";
 import { erc20Contract } from "../../contracts/erc20";
 import { iTokenContract } from "../../contracts/iTokenContract";
+import { AssetsDictionary } from "../../domain/AssetsDictionary";
 import { LendRequest } from "../../domain/LendRequest";
 import { RequestTask } from "../../domain/RequestTask";
 import { FulcrumProvider } from "../FulcrumProvider";
-import { AssetDetails } from "../../domain/AssetDetails";
-import { AssetsDictionary } from "../../domain/AssetsDictionary";
 
 export class LendErcProcessor {
   public run = async (task: RequestTask, account: string, skipGas: boolean) => {
