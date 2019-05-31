@@ -38,9 +38,9 @@ export class AssetsDictionary {
       )
     ],
     [
-      Asset.wBTC,
+      Asset.WBTC,
       new AssetDetails(
-        "wBTC",
+        "WBTC",
         8,
         btc_logo,
         btc_bg,

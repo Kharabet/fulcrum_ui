@@ -39,7 +39,7 @@ import { UnlendEthProcessor } from "./processors/UnlendEthProcessor";
 export class FulcrumProvider {
   private static readonly priceGraphQueryFunction = new Map<Asset, string>([
     [Asset.ETH, "kyber-eth-dai"],
-    [Asset.wBTC, "kyber-wbtc-dai"],
+    [Asset.WBTC, "kyber-wbtc-dai"],
     [Asset.MKR, "kyber-mkr-dai"],
     [Asset.ZRX, "kyber-zrx-dai"],
     [Asset.BAT, "kyber-bat-dai"],

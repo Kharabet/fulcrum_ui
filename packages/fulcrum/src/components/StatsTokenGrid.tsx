@@ -15,7 +15,7 @@ export class StatsTokenGrid extends Component<IStatsTokenGridProps, IStatsTokenG
     Asset.ETH,
     Asset.DAI,
     Asset.USDC,
-    Asset.wBTC,
+    Asset.WBTC,
     // Asset.MKR,
     Asset.ZRX,
     Asset.BAT,
