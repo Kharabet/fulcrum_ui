@@ -56,17 +56,17 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
     const assetDetails = AssetsDictionary.assets.get(props.asset);
     const interestRate = new BigNumber(0);
     const balance = new BigNumber(0);
-    const maxLendValue = new BigNumber(0);
+    const maxLendAmount = new BigNumber(0);
     const slippageRate = new BigNumber(0);
     const lendedAmountEstimate = new BigNumber(0);
 
     this.state = {
       assetDetails: assetDetails || null,
       isLendAmountTouched: false,
-      lendAmountText: maxLendValue.toFixed(),
-      lendAmount: maxLendValue,
+      lendAmountText: maxLendAmount.toFixed(),
+      lendAmount: maxLendAmount,
       balance: balance,
-      maxLendAmount: maxLendValue,
+      maxLendAmount: maxLendAmount,
       lendedAmountEstimate: lendedAmountEstimate,
       interestRate: interestRate,
       slippageRate: slippageRate
@@ -115,20 +115,20 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
       this.props.lendType === LendType.LEND
         ? await FulcrumProvider.Instance.getBaseTokenBalance(this.props.asset)
         : await FulcrumProvider.Instance.getLoanTokenBalance(this.props.asset);
-    const maxLendValue = (await FulcrumProvider.Instance.getMaxLendValue(
+    const maxLendAmount = (await FulcrumProvider.Instance.getMaxLendValue(
       new LendRequest(this.props.lendType, this.props.asset, new BigNumber(0))
-    )).decimalPlaces(6+(18-assetDetails!.decimals));
-    const lendRequest = new LendRequest(this.props.lendType, this.props.asset, maxLendValue);
+    ));
+    const lendRequest = new LendRequest(this.props.lendType, this.props.asset, maxLendAmount);
     const lendedAmountEstimate = await FulcrumProvider.Instance.getLendedAmountEstimate(lendRequest);
     const slippageRate = await FulcrumProvider.Instance.getLendSlippageRate(lendRequest);
 
     this.setState({
       ...this.state,
       assetDetails: assetDetails || null,
-      lendAmountText: maxLendValue.toFixed(),
-      lendAmount: maxLendValue,
+      lendAmountText: maxLendAmount.decimalPlaces(this._inputPrecision).toFixed(),
+      lendAmount: maxLendAmount,
       balance: balance,
-      maxLendAmount: maxLendValue,
+      maxLendAmount: maxLendAmount,
       lendedAmountEstimate: lendedAmountEstimate,
       interestRate: interestRate,
       slippageRate: slippageRate
