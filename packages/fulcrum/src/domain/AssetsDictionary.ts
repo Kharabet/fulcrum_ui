@@ -27,6 +27,7 @@ export class AssetsDictionary {
       Asset.BAT,
       new AssetDetails(
         "BAT",
+        18,
         bat_logo,
         bat_bg,
         "#CC3D84",
@@ -40,6 +41,7 @@ export class AssetsDictionary {
       Asset.wBTC,
       new AssetDetails(
         "wBTC",
+        8,
         btc_logo,
         btc_bg,
         "#F9B134",
@@ -53,6 +55,7 @@ export class AssetsDictionary {
       Asset.DAI,
       new AssetDetails(
         "DAI",
+        18,
         dai_logo,
         dai_bg,
         "#8777B1",
@@ -66,6 +69,7 @@ export class AssetsDictionary {
       Asset.USDC,
       new AssetDetails(
         "USDC",
+        6,
         usdc_logo,
         usdc_bg,
         "#00000000",
@@ -79,6 +83,7 @@ export class AssetsDictionary {
       Asset.ETH,
       new AssetDetails(
         "ETH",
+        18,
         eth_logo,
         eth_bg,
         "#FFFFFF",
@@ -93,6 +98,7 @@ export class AssetsDictionary {
       Asset.KNC,
       new AssetDetails(
         "KNC",
+        18,
         knc_logo,
         knc_bg,
         "#31766E",
@@ -107,6 +113,7 @@ export class AssetsDictionary {
       Asset.MKR,
       new AssetDetails(
         "MKR",
+        18,
         mkr_logo,
         mkr_bg,
         "#00BB99",
@@ -120,6 +127,7 @@ export class AssetsDictionary {
       Asset.REP,
       new AssetDetails(
         "REP",
+        18,
         rep_logo,
         rep_bg,
         "#8D3F76",
@@ -133,6 +141,7 @@ export class AssetsDictionary {
       Asset.ZRX,
       new AssetDetails(
         "ZRX",
+        18,
         zrx_logo,
         zrx_bg,
         "#7368D0",

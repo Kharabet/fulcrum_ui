@@ -4,6 +4,8 @@ import { iTokenContract } from "../../contracts/iTokenContract";
 import { LendRequest } from "../../domain/LendRequest";
 import { RequestTask } from "../../domain/RequestTask";
 import { FulcrumProvider } from "../FulcrumProvider";
+import { AssetDetails } from "../../domain/AssetDetails";
+import { AssetsDictionary } from "../../domain/AssetsDictionary";
 
 export class LendErcProcessor {
   public run = async (task: RequestTask, account: string, skipGas: boolean) => {
@@ -13,7 +15,8 @@ export class LendErcProcessor {
 
     // Initializing loan
     const taskRequest: LendRequest = (task.request as LendRequest);
-    const amountInBaseUnits = new BigNumber(taskRequest.amount.multipliedBy(10 ** 18).toFixed(0, 1));
+    const decimals: number = AssetsDictionary.assets.get(taskRequest.asset)!.decimals || 18;
+    const amountInBaseUnits = new BigNumber(taskRequest.amount.multipliedBy(10 ** decimals).toFixed(0, 1));
     const tokenContract: iTokenContract | null = await FulcrumProvider.Instance.contractsSource.getITokenContract(taskRequest.asset);
     if (!tokenContract) {
       throw new Error("No iToken contract available!");

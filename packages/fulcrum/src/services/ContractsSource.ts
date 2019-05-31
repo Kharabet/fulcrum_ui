@@ -100,6 +100,9 @@ export class ContractsSource {
   private getTokenizedRegistryAddress(): string {
     let address: string = "";
     switch (this.networkId) {
+      case 1:
+        address = "0xd8dc30d298ccf40042991cb4b96a540d8affe73a";
+        break;
       case 3:
         address = "0xAA5C713387972841995553c9690459596336800b";
         break;
