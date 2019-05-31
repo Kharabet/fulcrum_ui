@@ -69,7 +69,18 @@ export class StatsTokenGridRow extends Component<IStatsTokenGridRowProps, IStats
       return null;
     }
 
-    const details: ReserveDetails = this.state.reserveDetails ?  this.state.reserveDetails : ReserveDetails.getEmpty();
+    const decmials = this.state.assetDetails.decimals;
+    let details: ReserveDetails;
+    if (this.state.reserveDetails) {
+      details = this.state.reserveDetails;
+      const precision = new BigNumber(10**(18-decmials));
+      details.liquidity = details.liquidity!.times(precision);
+      details.liquidityReserved = details.liquidityReserved!.times(precision);
+      details.totalSupply = details.totalSupply!.times(precision);
+      details.totalBorrow = details.totalBorrow!.times(precision);
+    } else {
+      details = ReserveDetails.getEmpty();
+    }
 
     return (
       <div className="stats-grid-row">
@@ -89,13 +100,13 @@ export class StatsTokenGridRow extends Component<IStatsTokenGridRowProps, IStats
         ) : (
           <div className="stats-grid-row__col-name">{this.props.asset}</div>
         )}
-        <div title={details.liquidity ? `${details.liquidity.toFixed(18)}` : ``} className="stats-grid-row__col-liquidity">{details.liquidity ? `${details.liquidity.toFixed(4)}` : `-`}</div>
-        <div title={details.liquidityReserved ? `${details.liquidityReserved.toFixed(18)}` : ``} className="stats-grid-row__col-liquidity-reserved">{details.liquidityReserved ? `${details.liquidityReserved.toFixed(4)}` : `-`}</div>        
-        <div title={details.totalSupply ? `${details.totalSupply.toFixed(18)}` : ``} className="stats-grid-row__col-total-supply">{details.totalSupply ? `${details.totalSupply.toFixed(4)}` : `-`}</div>
-        <div title={details.totalBorrow ? `${details.totalBorrow.toFixed(18)}` : ``} className="stats-grid-row__col-total-borrow">{details.totalBorrow ? `${details.totalBorrow.toFixed(4)}` : `-`}</div>
-        <div title={details.supplyInterestRate ? `${details.supplyInterestRate.toFixed(18)}` : ``} className="stats-grid-row__col-supply-rate">{details.supplyInterestRate ? `${details.supplyInterestRate.toFixed(4)}%` : `-`}</div>
-        <div title={details.borrowInterestRate ? `${details.borrowInterestRate.toFixed(18)}` : ``} className="stats-grid-row__col-borrow-rate">{details.borrowInterestRate ? `${details.borrowInterestRate.toFixed(4)}%` : `-`}</div>
-        <div title={details.nextInterestRate ? `${details.nextInterestRate.toFixed(18)}` : ``} className="stats-grid-row__col-next-rate">{details.nextInterestRate ? `${details.nextInterestRate.toFixed(4)}%` : `-`}</div>
+        <div title={details.liquidity ? `${details.liquidity.toFixed(decmials)}` : ``} className="stats-grid-row__col-liquidity">{details.liquidity ? `${details.liquidity.toFixed(4)}` : `-`}</div>
+        <div title={details.liquidityReserved ? `${details.liquidityReserved.toFixed(decmials)}` : ``} className="stats-grid-row__col-liquidity-reserved">{details.liquidityReserved ? `${details.liquidityReserved.toFixed(4)}` : `-`}</div>        
+        <div title={details.totalSupply ? `${details.totalSupply.toFixed(decmials)}` : ``} className="stats-grid-row__col-total-supply">{details.totalSupply ? `${details.totalSupply.toFixed(4)}` : `-`}</div>
+        <div title={details.totalBorrow ? `${details.totalBorrow.toFixed(decmials)}` : ``} className="stats-grid-row__col-total-borrow">{details.totalBorrow ? `${details.totalBorrow.toFixed(4)}` : `-`}</div>
+        <div title={details.supplyInterestRate ? `${details.supplyInterestRate.toFixed(decmials)}` : ``} className="stats-grid-row__col-supply-rate">{details.supplyInterestRate ? `${details.supplyInterestRate.toFixed(4)}%` : `-`}</div>
+        <div title={details.borrowInterestRate ? `${details.borrowInterestRate.toFixed(decmials)}` : ``} className="stats-grid-row__col-borrow-rate">{details.borrowInterestRate ? `${details.borrowInterestRate.toFixed(4)}%` : `-`}</div>
+        <div title={details.nextInterestRate ? `${details.nextInterestRate.toFixed(decmials)}` : ``} className="stats-grid-row__col-next-rate">{details.nextInterestRate ? `${details.nextInterestRate.toFixed(4)}%` : `-`}</div>
       </div>
     );
   }
