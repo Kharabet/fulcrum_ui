@@ -401,6 +401,7 @@ export class FulcrumProvider {
         result = new BigNumber(0);
         const assetContract = await this.contractsSource.getITokenContract(asset);
         if (assetContract) {
+          const precision = AssetsDictionary.assets.get(asset)!.decimals || 18;
           const swapPrice = await this.getSwapToUsdPrice(asset);
           const tokenPrice = await assetContract.tokenPrice.callAsync();
           const checkpointPrice = await assetContract.checkpointPrice.callAsync(account);
@@ -408,7 +409,8 @@ export class FulcrumProvider {
             .minus(checkpointPrice)
             .multipliedBy(balance)
             .multipliedBy(swapPrice)
-            .dividedBy(10 ** 36);
+            .dividedBy(10 ** 18)
+            .dividedBy(precision);
         }
       }
     }
@@ -431,6 +433,7 @@ export class FulcrumProvider {
         result = new BigNumber(0);
         const assetContract = await this.contractsSource.getPTokenContract(selectedKey);
         if (assetContract) {
+          const precision = AssetsDictionary.assets.get(selectedKey.asset)!.decimals || 18;
           const swapPrice = await this.getSwapToUsdPrice(selectedKey.loanAsset);
           const tokenPrice = await assetContract.tokenPrice.callAsync();
           const checkpointPrice = await assetContract.checkpointPrice.callAsync(account);
@@ -438,7 +441,8 @@ export class FulcrumProvider {
             .minus(checkpointPrice)
             .multipliedBy(balance)
             .multipliedBy(swapPrice)
-            .dividedBy(10 ** 36);
+            .dividedBy(10 ** 18)
+            .dividedBy(precision);
         }
       }
     }
@@ -458,7 +462,9 @@ export class FulcrumProvider {
       if (this.contractsSource) {
         const assetContract = await this.contractsSource.getPTokenContract(selectedKey);
         if (assetContract) {
+          const precision = AssetsDictionary.assets.get(selectedKey.asset)!.decimals || 18;
           let marketLiquidity = await assetContract.marketLiquidityForAsset.callAsync();
+          marketLiquidity = marketLiquidity.multipliedBy(10 ** (18 - precision));
 
           if (collateral !== selectedKey.loanAsset) {
             const swapPrice = await this.getSwapPrice(selectedKey.loanAsset, collateral);
@@ -601,9 +607,11 @@ export class FulcrumProvider {
       result = await this.getEthBalance()
     } else {
       // get erc20 token balance
+      const precision = AssetsDictionary.assets.get(asset)!.decimals || 18;
       const assetErc20Address = this.getErc20Address(asset);
       if (assetErc20Address) {
         result = await this.getErc20Balance(assetErc20Address);
+        result = result.multipliedBy(10 ** (18 - precision));
       }
     }
 
@@ -614,9 +622,11 @@ export class FulcrumProvider {
     let result = new BigNumber(0);
 
     if (this.contractsSource) {
+      const precision = AssetsDictionary.assets.get(asset)!.decimals || 18;
       const address = await this.contractsSource.getITokenErc20Address(asset);
       if (address) {
         result = await this.getErc20Balance(address);
+        result = result.multipliedBy(10 ** (18 - precision));
       }
     }
 
@@ -627,9 +637,11 @@ export class FulcrumProvider {
     let result = new BigNumber(0);
 
     if (this.contractsSource) {
+      const precision = AssetsDictionary.assets.get(selectedKey.asset)!.decimals || 18;
       const address = await this.contractsSource.getPTokenErc20Address(selectedKey);
       if (address) {
         result = await this.getErc20Balance(address);
+        result = result.multipliedBy(10 ** (18 - precision));
       }
     }
 
@@ -697,20 +709,20 @@ export class FulcrumProvider {
   }
 
   public async getSwapPrice(srcAsset: Asset, destAsset: Asset): Promise<BigNumber> {
-    if (srcAsset === destAsset || srcAsset === Asset.USDC || srcAsset === Asset.DAI) {
+    if (srcAsset === destAsset || ((srcAsset === Asset.USDC || srcAsset === Asset.DAI) && (destAsset === Asset.USDC || destAsset === Asset.DAI))) {
       return new BigNumber(1);
     }
     
     let result: BigNumber = new BigNumber(0);
-    const assetDetails = await AssetsDictionary.assets.get(srcAsset);
     const srcAssetErc20Address = this.getErc20Address(srcAsset);
     const destAssetErc20Address = this.getErc20Address(destAsset);
     if (this.contractsSource && srcAssetErc20Address && destAssetErc20Address) {
       const kyberContract = await this.contractsSource.getKyberContract();
+      // result is always base 18, looks like srcQty too, see https://developer.kyber.network/docs/KyberNetworkProxy/#getexpectedrate
       const swapPriceData: BigNumber[] = await kyberContract.getExpectedRate.callAsync(
         srcAssetErc20Address,
         destAssetErc20Address,
-        new BigNumber(10 ** assetDetails!.decimals)
+        new BigNumber(10 ** 18)
       );
       result = swapPriceData[0].dividedBy(10 ** 18);
     }
