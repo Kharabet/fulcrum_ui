@@ -364,7 +364,7 @@ export class FulcrumProvider {
           (totalAssetBorrow = await assetContract.totalAssetBorrow.callAsync()),
           (supplyInterestRate = await assetContract.supplyInterestRate.callAsync()),
           (borrowInterestRate = await assetContract.borrowInterestRate.callAsync()),
-          (nextInterestRate = await assetContract.nextLoanInterestRate.callAsync(new BigNumber("0")))
+          (nextInterestRate = await assetContract.nextLoanInterestRate.callAsync(new BigNumber("100000")))
         ]);
 
         result = new ReserveDetails(
@@ -689,19 +689,20 @@ export class FulcrumProvider {
     return result;
   }
 
-  private async getSwapToUsdPrice(asset: Asset): Promise<BigNumber> {
+  public async getSwapToUsdPrice(asset: Asset): Promise<BigNumber> {
     return this.getSwapPrice(
       asset,
       Asset.DAI
     );
   }
 
-  private async getSwapPrice(srcAsset: Asset, destAsset: Asset): Promise<BigNumber> {
-    if (srcAsset === destAsset) {
+  public async getSwapPrice(srcAsset: Asset, destAsset: Asset): Promise<BigNumber> {
+    if (srcAsset === destAsset || srcAsset === Asset.USDC || srcAsset === Asset.DAI) {
       return new BigNumber(1);
     }
     
     let result: BigNumber = new BigNumber(0);
+    const assetDetails = await AssetsDictionary.assets.get(srcAsset);
     const srcAssetErc20Address = this.getErc20Address(srcAsset);
     const destAssetErc20Address = this.getErc20Address(destAsset);
     if (this.contractsSource && srcAssetErc20Address && destAssetErc20Address) {
@@ -709,7 +710,7 @@ export class FulcrumProvider {
       const swapPriceData: BigNumber[] = await kyberContract.getExpectedRate.callAsync(
         srcAssetErc20Address,
         destAssetErc20Address,
-        new BigNumber(10 ** 18)
+        new BigNumber(10 ** assetDetails!.decimals)
       );
       result = swapPriceData[0].dividedBy(10 ** 18);
     }

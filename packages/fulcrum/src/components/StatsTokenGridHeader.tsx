@@ -10,17 +10,20 @@ export class StatsTokenGridHeader extends Component<IStatsTokenGridHeaderProps> 
         <div className="stats-grid-header__col-name">
           <span className="stats-grid-header__text">Reserve</span>
         </div>
-        <div className="stats-grid-header__col-liquidity">
-          <span className="stats-grid-header__text">Free Liquidity</span>
-        </div>
-        <div className="stats-grid-header__col-liquidity-reserved">
-          <span className="stats-grid-header__text">Reserved Liquidity</span>
+        <div className="stats-grid-header__col-total-supply-usd">
+          <span className="stats-grid-header__text">Total Supply (USD)</span>
         </div>
         <div className="stats-grid-header__col-total-supply">
           <span className="stats-grid-header__text">Total Supply</span>
         </div>
         <div className="stats-grid-header__col-total-borrow">
           <span className="stats-grid-header__text">Total Borrow</span>
+        </div>
+        <div className="stats-grid-header__col-liquidity">
+          <span className="stats-grid-header__text">Free Liquidity</span>
+        </div>
+        <div className="stats-grid-header__col-liquidity-reserved">
+          <span className="stats-grid-header__text">Reserved Liquidity</span>
         </div>
         <div className="stats-grid-header__col-supply-rate">
           <span className="stats-grid-header__text">Supply Rate</span>

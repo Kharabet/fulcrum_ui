@@ -2,13 +2,14 @@ $font-size-header: 0.75rem;
 $height-row: 4.5rem;
 
 $width-col-name: 6.5rem;
-$width-col-liquidity: 8rem;
-$width-col-liquidity-reserved: 8rem;
-$width-col-total-supply: 7.2rem;
-$width-col-total-borrow: 7.2rem;
-$width-col-supply-rate: 7.2rem;
-$width-col-borrow-rate: 7.2rem;
-$width-col-next-rate: 7.2rem;
+$width-col-total-supply-usd: 7.0rem;
+$width-col-total-supply: 7.0rem;
+$width-col-total-borrow: 7.0rem;
+$width-col-supply-rate: 7.0rem;
+$width-col-liquidity: 7.0rem;
+$width-col-liquidity-reserved: 7.0rem;
+$width-col-borrow-rate: 6rem;
+$width-col-next-rate: 5rem;
 
 $margin-left-column: 1.5rem;
 $margin-right-column: 1.5rem;
@@ -59,6 +60,12 @@ $margin-right-column: 1.5rem;
   @include stats-grid-header__col();
 
   width: $width-col-liquidity-reserved;
+}
+
+.stats-grid-header__col-total-supply-usd {
+  @include stats-grid-header__col();
+
+  width: $width-col-total-supply-usd;
 }
 
 .stats-grid-header__col-total-supply {
@@ -147,6 +154,13 @@ $margin-right-column: 1.5rem;
   @include stats-grid-row__text-normal();
 
   width: $width-col-liquidity-reserved;
+}
+
+.stats-grid-row__col-total-supply-usd {
+  @include stats-grid-row__col();
+  @include stats-grid-row__text-normal();
+
+  width: $width-col-total-supply-usd;
 }
 
 .stats-grid-row__col-total-supply {
