@@ -61,6 +61,7 @@ export class FulcrumProvider {
     .pow(256)
     .minus(1);
 
+  private isProcessing: boolean = false;
   private isChecking: boolean = false;
 
   public readonly eventEmitter: EventEmitter;
@@ -391,7 +392,7 @@ export class FulcrumProvider {
     let account: string | null = null;
 
     if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
-      account = this.accounts.length > 0 ? this.accounts[0].toLowerCase() : null;
+      account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
     }
 
     if (account && this.contractsSource && this.contractsSource.canWrite) {
@@ -422,7 +423,7 @@ export class FulcrumProvider {
     let account: string | null = null;
 
     if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
-      account = this.accounts.length > 0 ? this.accounts[0].toLowerCase() : null;
+      account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
     }
 
     if (account && this.contractsSource && this.contractsSource.canWrite) {
@@ -675,7 +676,7 @@ export class FulcrumProvider {
     let result: BigNumber = new BigNumber(0);
 
     if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
-      const account = this.accounts.length > 0 ? this.accounts[0].toLowerCase() : null;
+      const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
       if (account) {
         const balance = await this.web3Wrapper.getBalanceInWeiAsync(account);
         result = new BigNumber(balance);
@@ -689,7 +690,7 @@ export class FulcrumProvider {
     let result = new BigNumber(0);
 
     if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
-      const account = this.accounts.length > 0 ? this.accounts[0].toLowerCase() : null;
+      const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
 
       if (account) {
         const tokenContract = await this.contractsSource.getErc20Contract(addressErc20);
@@ -748,17 +749,28 @@ export class FulcrumProvider {
   };
 
   private cancelRequestTask = async (requestTask: RequestTask) => {
-    if (!(requestTask.isProcessing || this.isChecking)) {
+    if (!(this.isProcessing || this.isChecking)) {
+      this.isProcessing = true;
+
       try {
-        TasksQueue.Instance.dequeue(requestTask);
-      } finally {}
+        const task = TasksQueue.Instance.peek();
+
+        if (task) {
+          if (task.request.id === requestTask.request.id) {
+            TasksQueue.Instance.dequeue();
+          }
+        }
+      } finally {
+        this.isProcessing = false;
+      }
     }
   };
 
   private processQueue = async (force: boolean, skipGas: boolean) => {
-    if (!(this.isChecking || TasksQueue.Instance.allProcessing())) {
+    if (!(this.isProcessing || this.isChecking)) {
       let forceOnce = force;
       do {
+        this.isProcessing = true;
         this.isChecking = false;
 
         try {
@@ -772,10 +784,11 @@ export class FulcrumProvider {
               await this.processRequestTask(task, skipGas);
               // @ts-ignore
               if (task.status === RequestStatus.DONE) {
-                TasksQueue.Instance.dequeue(task);
+                TasksQueue.Instance.dequeue();
               }
             } else {
               if (task.status === RequestStatus.FAILED && !forceOnce) {
+                this.isProcessing = false;
                 this.isChecking = false;
                 break;
               }
@@ -784,6 +797,7 @@ export class FulcrumProvider {
         } finally {
           forceOnce = false;
           this.isChecking = true;
+          this.isProcessing = false;
         }
       } while (TasksQueue.Instance.any());
       this.isChecking = false;
@@ -808,7 +822,7 @@ export class FulcrumProvider {
         throw new Error("No provider available!");
       }
 
-      const account = this.accounts.length > 0 ? this.accounts[0].toLowerCase() : null;
+      const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
       if (!account) {
         throw new Error("Unable to get wallet address!");
       }
@@ -849,7 +863,7 @@ export class FulcrumProvider {
         throw new Error("No provider available!");
       }
 
-      const account = this.accounts.length > 0 ? this.accounts[0].toLowerCase() : null;
+      const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
       if (!account) {
         throw new Error("Unable to get wallet address!");
       }

@@ -21,7 +21,7 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
       ProviderTypeDictionary.providerTypes.get(FulcrumProvider.Instance.providerType) || null :
       null;
 
-    const accountText = FulcrumProvider.Instance.accounts.length > 0 ? 
+    const accountText = FulcrumProvider.Instance.accounts.length > 0 && FulcrumProvider.Instance.accounts[0] ? 
       FulcrumProvider.Instance.accounts[0].toLowerCase() :
       null;
 

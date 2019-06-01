@@ -324,7 +324,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
                     </div>
                   }
                 >
-                  <span className="rounded-mark">?</span>
+                  {/*<span className="rounded-mark">?</span>*/}
                 </Tooltip>
                 &nbsp; {tradedAmountEstimateText} {tokenNameDestination}
               </div>

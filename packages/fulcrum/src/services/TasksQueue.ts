@@ -37,27 +37,21 @@ export class TasksQueue {
     this.eventEmitter.emit(TasksQueueEvents.QueueChanged);
   }
 
-  public dequeue(task: RequestTask): void {
-    for(let i = 0; i < this.requestTasks.length; i++) {
-      if (this.requestTasks[i].request.id === task.request.id) {
-        this.requestTasks.splice(i, 1);
-        this.eventEmitter.emit(TasksQueueEvents.Dequeued, this.requestTasks);
-        this.eventEmitter.emit(TasksQueueEvents.QueueChanged);
-        break;
-      }
-    }
+  public dequeue(): RequestTask | null {
+    const result = this.requestTasks.shift() || null;
+
+    this.eventEmitter.emit(TasksQueueEvents.Dequeued, result);
+    this.eventEmitter.emit(TasksQueueEvents.QueueChanged);
+
+    return result;
   }
 
   public peek(): RequestTask | null {
-    return this.any() ? this.requestTasks[this.requestTasks.length-1] : null;
+    return this.any() ? this.requestTasks[0] : null;
   }
 
   public any(): boolean {
     return this.requestTasks.length > 0;
-  }
-
-  public allProcessing(): boolean {
-    return this.requestTasks.length > 0 && this.requestTasks.filter(t => t.isProcessing).length == this.requestTasks.length;
   }
 
   public getTasksList() {

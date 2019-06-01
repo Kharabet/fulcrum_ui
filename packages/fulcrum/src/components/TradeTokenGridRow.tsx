@@ -145,7 +145,10 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
         >
           <img src={this.state.assetDetails.logoSvg} alt={this.state.assetDetails.displayName} />
         </div>
-        <div className="trade-token-grid-row__col-token-name">{this.state.assetDetails.displayName}</div>
+        <div className="trade-token-grid-row__col-token-name">
+          {/*<span className="rounded-mark">?</span>*/}
+          {this.state.assetDetails.displayName}
+        </div>
         <div className="trade-token-grid-row__col-position-type">
           <PositionTypeMarker value={this.props.positionType} />
         </div>

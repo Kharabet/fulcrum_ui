@@ -19,6 +19,17 @@ $margin-right-column: 1.5rem;
 .trade-token-grid {
 }
 
+.rounded-mark {
+  font-size: 0.5rem;
+  border-width: 1px;
+  border-style: solid;
+  border-radius: 100px;
+  padding: 0.0625rem 0.3125rem;
+  vertical-align: middle;
+  margin-left: -7px;
+  margin-right: 7px;
+}
+
 .trade-token-grid-header {
   height: $height-row;
 

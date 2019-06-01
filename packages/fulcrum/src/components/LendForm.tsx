@@ -236,7 +236,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
                     </div>
                   }
                 >
-                  <span className="rounded-mark">?</span>
+                  {/*<span className="rounded-mark">?</span>*/}
                 </Tooltip>
                 &nbsp; {lendedAmountEstimateText} {tokenNameDestination}
               </div>
