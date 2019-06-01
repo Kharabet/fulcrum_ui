@@ -60,7 +60,7 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
 
   public componentDidMount(): void {
     const e = this.state.tokenRowsData[0];
-    this.props.onSelect(new TradeTokenKey(e.asset, e.defaultUnitOfAccount, e.positionType, e.defaultLeverage));
+    this.props.onSelect(new TradeTokenKey(e.asset, e.defaultUnitOfAccount, e.positionType, e.defaultLeverage, e.defaultTokenizeNeeded));
 
     this.derivedUpdate();
   }
@@ -89,7 +89,8 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
       rowsData.push({
         selectedKey: props.selectedKey,
         asset: e,
-        defaultUnitOfAccount: Asset.DAI,
+        defaultUnitOfAccount: FulcrumProvider.Instance.web3ProviderSettings && FulcrumProvider.Instance.web3ProviderSettings.networkId === 1 ? Asset.USDC : Asset.DAI,
+        defaultTokenizeNeeded: true,
         positionType: PositionType.SHORT,
         defaultLeverage: props.defaultLeverageShort,
         onSelect: props.onSelect,
@@ -99,7 +100,8 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
       rowsData.push({
         selectedKey: props.selectedKey,
         asset: e,
-        defaultUnitOfAccount: Asset.DAI,
+        defaultUnitOfAccount: FulcrumProvider.Instance.web3ProviderSettings && FulcrumProvider.Instance.web3ProviderSettings.networkId === 1 ? Asset.USDC : Asset.DAI,
+        defaultTokenizeNeeded: true,
         positionType: PositionType.LONG,
         defaultLeverage: props.defaultLeverageLong,
         onSelect: props.onSelect,

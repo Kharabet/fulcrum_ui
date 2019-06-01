@@ -54,7 +54,8 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
       this.props.currentKey.asset,
       this.props.currentKey.unitOfAccount,
       this.props.currentKey.positionType,
-      this.props.currentKey.leverage
+      this.props.currentKey.leverage,
+      this.props.currentKey.isTokenized
     );
     const latestPriceDataPoint = await FulcrumProvider.Instance.getPriceLatestDataPoint(tradeTokenKey);
     const profit = await FulcrumProvider.Instance.getTradeProfit(tradeTokenKey);
@@ -173,7 +174,8 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
         this.props.currentKey.positionType === PositionType.SHORT ? this.props.currentKey.asset : Asset.DAI,
         this.props.currentKey.positionType,
         this.props.currentKey.leverage,
-        new BigNumber(0)
+        new BigNumber(0),
+        this.props.currentKey.isTokenized
       )
     );
   };

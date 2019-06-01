@@ -13,6 +13,7 @@ export class TradeRequest {
   public positionType: PositionType;
   public leverage: number;
   public amount: BigNumber;
+  public isTokenized: boolean;
 
   constructor(
     tradeType: TradeType,
@@ -21,7 +22,8 @@ export class TradeRequest {
     collateral: Asset,
     positionType: PositionType,
     leverage: number,
-    amount: BigNumber
+    amount: BigNumber,
+    isTokenized: boolean
     ) {
     this.id = moment().unix();
     this.tradeType = tradeType;
@@ -31,6 +33,7 @@ export class TradeRequest {
     this.positionType = positionType;
     this.leverage = leverage;
     this.amount = amount;
+    this.isTokenized = isTokenized;
   }
 
   public getRequestTypeName(): string {

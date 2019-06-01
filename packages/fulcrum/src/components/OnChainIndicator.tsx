@@ -27,7 +27,7 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
 
     let walletAddressText: string;
     if (FulcrumProvider.Instance.unsupportedNetwork) {
-      walletAddressText = "Unsupported Network!";
+      walletAddressText = "Wrong Network!";
     } else if (accountText) {
         walletAddressText = `${accountText.slice(0, 6)}...${accountText.slice(
           accountText.length - 4,

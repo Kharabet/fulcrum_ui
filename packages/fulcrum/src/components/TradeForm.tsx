@@ -135,7 +135,8 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       this.props.asset,
       this.state.unitOfAccount,
       this.props.positionType,
-      leverage
+      leverage,
+      this.state.tokenizeNeeded
     );
   }
 
@@ -147,10 +148,10 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     const assetDetails = AssetsDictionary.assets.get(this.props.asset);
     const tradeTokenKey = this.getTradeTokenGridRowSelectionKey(this.props.leverage);
     const latestPriceDataPoint = await FulcrumProvider.Instance.getPriceLatestDataPoint(tradeTokenKey);
-    const positionTokenBalance = await FulcrumProvider.Instance.getPositionTokenBalance(tradeTokenKey);
+    const positionTokenBalance = await FulcrumProvider.Instance.getPTokenBalance(tradeTokenKey);
     const balance =
       this.props.tradeType === TradeType.BUY
-        ? await FulcrumProvider.Instance.getBaseTokenBalance(this.state.collateral)
+        ? await FulcrumProvider.Instance.getAssetTokenBalance(this.state.collateral)
         : positionTokenBalance;
     const maxTradeValue = await FulcrumProvider.Instance.getMaxTradeValue(this.props.tradeType, tradeTokenKey, this.state.collateral);
     const tradeRequest = new TradeRequest(
@@ -160,7 +161,8 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       this.state.collateral,
       this.props.positionType,
       this.props.leverage,
-      new BigNumber(0)
+      new BigNumber(0),
+      this.state.tokenizeNeeded
     );
     const tradedAmountEstimate = await FulcrumProvider.Instance.getTradedAmountEstimate(tradeRequest);
     const slippageRate = await FulcrumProvider.Instance.getTradeSlippageRate(tradeRequest);
@@ -421,7 +423,8 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
           this.state.collateral,
           this.props.positionType,
           this.props.leverage,
-          this.state.tradeAmount
+          this.state.tradeAmount,
+          this.state.tokenizeNeeded
         )
       );
     });
@@ -459,7 +462,8 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
         this.state.collateral,
         this.props.positionType,
         this.props.leverage,
-        this.state.tradeAmount
+        this.state.tradeAmount,
+        this.state.tokenizeNeeded
       )
     );
   };
@@ -479,7 +483,8 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
           this.state.collateral,
           this.props.positionType,
           this.props.leverage,
-          maxTradeValue
+          maxTradeValue,
+          this.state.tokenizeNeeded
         );
 
         FulcrumProvider.Instance.getTradedAmountEstimate(tradeRequest).then(tradedAmountEstimate => {
@@ -523,7 +528,8 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
           this.state.collateral,
           this.props.positionType,
           this.props.leverage,
-          amount
+          amount,
+          this.state.tokenizeNeeded
         );
 
         FulcrumProvider.Instance.getTradedAmountEstimate(tradeRequest).then(tradedAmountEstimate => {

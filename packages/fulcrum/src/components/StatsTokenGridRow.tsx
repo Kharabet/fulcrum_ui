@@ -35,7 +35,7 @@ export class StatsTokenGridRow extends Component<IStatsTokenGridRowProps, IStats
   private async derivedUpdate() {
     const assetDetails = await AssetsDictionary.assets.get(this.props.asset);
     const reserveDetails = await FulcrumProvider.Instance.getReserveDetails(this.props.asset);
-    const swapPrice = await FulcrumProvider.Instance.getSwapToUsdPrice(this.props.asset);
+    const swapPrice = await FulcrumProvider.Instance.getSwapToUsdRate(this.props.asset);
 
     this.setState({
       ...this.state,

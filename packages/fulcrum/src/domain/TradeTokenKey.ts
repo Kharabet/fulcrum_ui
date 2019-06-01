@@ -7,33 +7,40 @@ export class TradeTokenKey {
   public unitOfAccount: Asset;
   public positionType: PositionType;
   public leverage: number;
+  public isTokenized: boolean;
 
   constructor(
     asset: Asset,
     unitOfAccount: Asset,
     positionType: PositionType,
-    leverage: number
+    leverage: number,
+    isTokenized: boolean
   ) {
     this.asset = asset;
-    this.loanAsset = positionType === PositionType.SHORT ? asset : Asset.DAI;
+    this.loanAsset = positionType === PositionType.SHORT ? asset : unitOfAccount;
     this.unitOfAccount = unitOfAccount;
     this.positionType = positionType;
     this.leverage = leverage;
+    this.isTokenized = isTokenized;
   }
 
   public static empty(): TradeTokenKey {
-    return new TradeTokenKey(Asset.UNKNOWN, Asset.DAI, PositionType.SHORT, 0);
+    return new TradeTokenKey(Asset.UNKNOWN, Asset.DAI, PositionType.SHORT, 0, true);
   }
 
   public toString(): string {
     const unitOfAccountPrefix = this.unitOfAccount === Asset.DAI ? "d" : "u"; // DAI and USDC
     const positionTypePrefix = this.positionType === PositionType.SHORT ? "s" : "L";
     const positionLeveragePostfix = this.leverage > 1 ? `${this.leverage}x` : "";
-    return `${unitOfAccountPrefix}${positionTypePrefix}${this.asset}${positionLeveragePostfix}`;
+    return `${unitOfAccountPrefix}${positionTypePrefix}${this.asset}${positionLeveragePostfix}${this.isTokenized ? `` : `(protocol)`}`;
   }
 
   public static fromString(value: string): TradeTokenKey | null {
     let result: TradeTokenKey | null = null;
+
+    const isTokenized = !value.endsWith("(protocol)");
+    value = value.replace("(protocol)", "");
+
     const matches: RegExpMatchArray | null = value.match("(d|u|p)(s|l|S|L)([a-zA-Z]*)(\\d*)x*");
     if (matches && matches.length > 0) {
       if (matches[0] === value) {
@@ -46,7 +53,13 @@ export class TradeTokenKey {
         }
         const leverage = parseInt(matches[4].toString(), 10);
 
-        const recoveredResult = new TradeTokenKey(asset, unitOfAccount, positionType, leverage);
+        const recoveredResult = new TradeTokenKey(
+          asset,
+          unitOfAccount,
+          positionType,
+          leverage,
+          isTokenized
+        );
         if (recoveredResult.toString() === value) {
           result = recoveredResult;
         }

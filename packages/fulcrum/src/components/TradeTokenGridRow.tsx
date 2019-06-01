@@ -23,6 +23,7 @@ export interface ITradeTokenGridRowProps {
   defaultUnitOfAccount: Asset;
   positionType: PositionType;
   defaultLeverage: number;
+  defaultTokenizeNeeded: boolean;
 
   onSelect: (key: TradeTokenKey) => void;
   onTrade: (request: TradeRequest) => void;
@@ -57,7 +58,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
   }
 
   private getTradeTokenGridRowSelectionKeyRaw(props: ITradeTokenGridRowProps, leverage: number = this.state.leverage) {
-    return new TradeTokenKey(props.asset, props.defaultUnitOfAccount, props.positionType, leverage);
+    return new TradeTokenKey(props.asset, props.defaultUnitOfAccount, props.positionType, leverage, props.defaultTokenizeNeeded);
   }
 
   private getTradeTokenGridRowSelectionKey(leverage: number = this.state.leverage) {
@@ -65,10 +66,10 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
   }
 
   private async derivedUpdate() {
-    const tradeTokenKey = new TradeTokenKey(this.props.asset, this.props.defaultUnitOfAccount, this.props.positionType, this.state.leverage);
+    const tradeTokenKey = new TradeTokenKey(this.props.asset, this.props.defaultUnitOfAccount, this.props.positionType, this.state.leverage, this.props.defaultTokenizeNeeded);
     const latestPriceDataPoint = await FulcrumProvider.Instance.getPriceLatestDataPoint(tradeTokenKey);
     const profit = await FulcrumProvider.Instance.getTradeProfit(tradeTokenKey);
-    const balance = await FulcrumProvider.Instance.getPositionTokenBalance(tradeTokenKey);
+    const balance = await FulcrumProvider.Instance.getPTokenBalance(tradeTokenKey);
 
     this.setState({
       ...this.state,
@@ -211,7 +212,8 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
         Asset.ETH,
         this.props.positionType,
         this.state.leverage,
-        new BigNumber(0)
+        new BigNumber(0),
+        this.props.defaultTokenizeNeeded // TODO: depends on which one they own
       )
     );
   };
@@ -227,7 +229,8 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
         this.props.selectedKey.positionType === PositionType.SHORT ? this.props.selectedKey.asset : Asset.DAI,
         this.props.positionType,
         this.state.leverage,
-        new BigNumber(0)
+        new BigNumber(0),
+        this.props.defaultTokenizeNeeded // TODO: depends on which one they own
       )
     );
   };
