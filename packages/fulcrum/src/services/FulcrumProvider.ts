@@ -409,7 +409,7 @@ export class FulcrumProvider {
             .minus(checkpointPrice)
             .multipliedBy(balance)
             .multipliedBy(swapPrice)
-            .dividedBy(10 ** (18 + precision));
+            .dividedBy(10 ** (18 + 18));
         }
       }
     }
@@ -454,16 +454,11 @@ export class FulcrumProvider {
   public getMaxTradeValue = async (tradeType: TradeType, selectedKey: TradeTokenKey, collateral: Asset): Promise<BigNumber> => {
     let result = new BigNumber(0);
 
-    const balance =
-      tradeType === TradeType.BUY
-        ? await this.getAssetTokenBalance(collateral)
-        : await this.getPTokenBalance(selectedKey);
-
     if (tradeType === TradeType.BUY) {
       if (this.contractsSource) {
         const assetContract = await this.contractsSource.getPTokenContract(selectedKey);
         if (assetContract) {
-          const precision = AssetsDictionary.assets.get(selectedKey.asset)!.decimals || 18;
+          const precision = AssetsDictionary.assets.get(selectedKey.loanAsset)!.decimals || 18;
           let marketLiquidity = await assetContract.marketLiquidityForAsset.callAsync();
           marketLiquidity = marketLiquidity.multipliedBy(10 ** (18 - precision));
 
@@ -472,13 +467,15 @@ export class FulcrumProvider {
             marketLiquidity = marketLiquidity.multipliedBy(swapPrice);
           }
 
+          const balance = await this.getAssetTokenBalance(collateral);
+
           result = BigNumber.min(marketLiquidity, balance);
         } else {
           result = new BigNumber(0);
         }
       }
     } else {
-      result = balance;
+      result = await this.getPTokenBalance(selectedKey);
     }
 
     result = result.dividedBy(10 ** 18);
@@ -728,7 +725,7 @@ export class FulcrumProvider {
       const swapPriceData: BigNumber[] = await kyberContract.getExpectedRate.callAsync(
         srcAssetErc20Address,
         destAssetErc20Address,
-        new BigNumber(10 ** 18)
+        srcAsset === Asset.WBTC ? new BigNumber(10 ** 4) : new BigNumber(10 ** 18)
       );
       result = swapPriceData[0].dividedBy(10 ** 18);
     }

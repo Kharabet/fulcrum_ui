@@ -246,7 +246,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       this.state.balance && this.state.balance.eq(0)
         ? "Your wallet is empty \u2639"
         : this.state.tradeAmount.gt(0)
-          ? `Slippage: ${this.state.slippageRate.toFixed(2)}%`
+          ? ""//`Slippage: ${this.state.slippageRate.toFixed(2)}%`
           : "";
 
     const tradedAmountEstimateText =
@@ -339,11 +339,11 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
                       <UnitOfAccountSelector items={[Asset.USDC, Asset.DAI]} value={this.state.unitOfAccount} onChange={this.onChangeUnitOfAccount} />
                     </div>
                   </div>
-                  <div className="trade-form__kv-container">
+                  {/*<div className="trade-form__kv-container">
                     <div className="trade-form__label trade-form__label--no-bg">
                       <CheckBox checked={this.state.tokenizeNeeded} onChange={this.onChangeTokenizeNeeded}>Tokenize it &nbsp;</CheckBox>
                     </div>
-                  </div>
+                  </div>*/}
                 </CollapsibleContainer>
               </div>
             ) : ``}

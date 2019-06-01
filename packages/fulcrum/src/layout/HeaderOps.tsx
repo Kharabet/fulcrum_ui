@@ -11,9 +11,10 @@ export interface IHeaderOpsProps {
 export class HeaderOps extends Component<IHeaderOpsProps> {
   private _menu: IHeaderMenuProps = {
     items: [
-      { id: 0, title: "Home", link: "/" },
-      { id: 1, title: "Lend", link: "/lend" },
-      { id: 2, title: "Trade", link: "/trade" }
+      { id: 0, title: "Home", link: "/", external: false },
+      { id: 1, title: "Lend", link: "/lend", external: false },
+      { id: 2, title: "Trade", link: "/trade", external: false },
+      { id: 3, title: "Faq", link: "https://bzx.network/faq-fulcrum.html", external: true }
     ]
   };
 
