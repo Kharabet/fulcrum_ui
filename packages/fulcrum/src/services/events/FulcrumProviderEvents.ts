@@ -2,5 +2,7 @@ export enum FulcrumProviderEvents {
   ProviderAvailable = "ProviderAvailable",
   ProviderChanged = "ProviderChanged",
   LendTransactionMined = "LendTransactionMined",
-  TradeTransactionMined = "TradeTransactionMined"
+  TradeTransactionMined = "TradeTransactionMined",
+  AskToOpenProgressDlg = "AskToOpenProgressDlg",
+  AskToCloseProgressDlg = "AskToCloseProgressDlg",
 }

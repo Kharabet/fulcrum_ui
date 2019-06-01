@@ -4,6 +4,7 @@ import { AssetsDictionary } from "../../domain/AssetsDictionary";
 import { RequestTask } from "../../domain/RequestTask";
 import { TradeRequest } from "../../domain/TradeRequest";
 import { TradeTokenKey } from "../../domain/TradeTokenKey";
+import { FulcrumProviderEvents } from "../events/FulcrumProviderEvents";
 import { FulcrumProvider } from "../FulcrumProvider";
 
 export class TradeSellErcProcessor {
@@ -58,6 +59,8 @@ export class TradeSellErcProcessor {
         gasAmountBN = new BigNumber(gasAmount).multipliedBy(FulcrumProvider.Instance.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
       }
 
+      FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.AskToOpenProgressDlg);
+
       // Closing trade
       const txHash = await tokenContract.burnToToken.sendTransactionAsync(
         account,
@@ -66,6 +69,8 @@ export class TradeSellErcProcessor {
         { from: account, gas: gasAmountBN.toString() }
       );
       task.setTxHash(txHash);
+
+      FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.AskToCloseProgressDlg);
 
       task.processingStepNext();
       const txReceipt = await FulcrumProvider.Instance.waitForTransactionMined(txHash, task.request);

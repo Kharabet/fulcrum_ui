@@ -25,6 +25,10 @@ export class TasksQueue {
     this.eventEmitter.on(event, listener);
   };
 
+  public off(event: TasksQueueEvents, listener: (...args: any[]) => void) {
+    this.eventEmitter.off(event, listener);
+  };
+
   public enqueue(task: RequestTask): void {
     task.setEventEmitter(this.eventEmitter);
     this.requestTasks.push(task);

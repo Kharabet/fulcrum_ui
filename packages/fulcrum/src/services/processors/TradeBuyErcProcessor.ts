@@ -5,6 +5,7 @@ import { AssetsDictionary } from "../../domain/AssetsDictionary";
 import { RequestTask } from "../../domain/RequestTask";
 import { TradeRequest } from "../../domain/TradeRequest";
 import { TradeTokenKey } from "../../domain/TradeTokenKey";
+import { FulcrumProviderEvents } from "../events/FulcrumProviderEvents";
 import { FulcrumProvider } from "../FulcrumProvider";
 
 export class TradeBuyErcProcessor {
@@ -59,6 +60,8 @@ export class TradeBuyErcProcessor {
     const erc20allowance = await tokenErc20Contract.allowance.callAsync(account, tokenContract.address);
     task.processingStepNext();
 
+    FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.AskToOpenProgressDlg);
+
     // Prompting token allowance
     if (amountInBaseUnits.gt(erc20allowance)) {
       approvePromise = tokenErc20Contract.approve.sendTransactionAsync(tokenContract.address, FulcrumProvider.UNLIMITED_ALLOWANCE_IN_BASE_UNITS, { from: account });
@@ -81,6 +84,8 @@ export class TradeBuyErcProcessor {
     // Submitting trade
     const txHash = await tokenContract.mintWithToken.sendTransactionAsync(account, assetErc20Address, amountInBaseUnits, { from: account, gas: gasAmountBN.toString() });
     task.setTxHash(txHash);
+
+    FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.AskToCloseProgressDlg);
 
     task.processingStepNext();
     const txReceipt = await FulcrumProvider.Instance.waitForTransactionMined(txHash, task.request);

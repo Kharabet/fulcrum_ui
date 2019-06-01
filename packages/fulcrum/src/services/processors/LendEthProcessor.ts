@@ -3,6 +3,7 @@ import { iTokenContract } from "../../contracts/iTokenContract";
 import { AssetsDictionary } from "../../domain/AssetsDictionary";
 import { LendRequest } from "../../domain/LendRequest";
 import { RequestTask } from "../../domain/RequestTask";
+import { FulcrumProviderEvents } from "../events/FulcrumProviderEvents";
 import { FulcrumProvider } from "../FulcrumProvider";
 
 export class LendEthProcessor {
@@ -42,9 +43,14 @@ export class LendEthProcessor {
     }
 
     const gasCost = gasAmountBN.multipliedBy(FulcrumProvider.Instance.gasPrice).integerValue(BigNumber.ROUND_UP);
+
+    FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.AskToOpenProgressDlg);
+
     // Submitting loan
     const txHash = await tokenContract.mintWithEther.sendTransactionAsync(account, { from: account, value: amountInBaseUnits, gas: gasAmountBN.toString() });
     task.setTxHash(txHash);
+
+    FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.AskToCloseProgressDlg);
 
     task.processingStepNext();
     const txReceipt = await FulcrumProvider.Instance.waitForTransactionMined(txHash, task.request);

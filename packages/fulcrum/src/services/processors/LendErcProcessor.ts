@@ -4,6 +4,7 @@ import { iTokenContract } from "../../contracts/iTokenContract";
 import { AssetsDictionary } from "../../domain/AssetsDictionary";
 import { LendRequest } from "../../domain/LendRequest";
 import { RequestTask } from "../../domain/RequestTask";
+import { FulcrumProviderEvents } from "../events/FulcrumProviderEvents";
 import { FulcrumProvider } from "../FulcrumProvider";
 
 export class LendErcProcessor {
@@ -48,6 +49,8 @@ export class LendErcProcessor {
     const erc20allowance = await tokenErc20Contract.allowance.callAsync(account, tokenContract.address);
     task.processingStepNext();
 
+    FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.AskToOpenProgressDlg);
+
     // Prompting token allowance
     if (amountInBaseUnits.gt(erc20allowance)) {
       approvePromise = tokenErc20Contract.approve.sendTransactionAsync(tokenContract.address, FulcrumProvider.UNLIMITED_ALLOWANCE_IN_BASE_UNITS, { from: account });
@@ -70,6 +73,8 @@ export class LendErcProcessor {
     // Submitting loan
     const txHash = await tokenContract.mint.sendTransactionAsync(account, amountInBaseUnits, { from: account, gas: gasAmountBN.toString() });
     task.setTxHash(txHash);
+
+    FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.AskToCloseProgressDlg);
 
     task.processingStepNext();
     const txReceipt = await FulcrumProvider.Instance.waitForTransactionMined(txHash, task.request);
