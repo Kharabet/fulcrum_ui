@@ -60,18 +60,22 @@ export class TradeSellErcProcessor {
         gasAmountBN = new BigNumber(gasAmount).multipliedBy(FulcrumProvider.Instance.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
       }
 
-      FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.AskToOpenProgressDlg);
+      let txHash: string = "";
+      try {
+        FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.AskToOpenProgressDlg);
 
-      // Closing trade
-      const txHash = await tokenContract.burnToToken.sendTransactionAsync(
-        account,
-        assetErc20Address,
-        amountInBaseUnits,
-        { from: account, gas: gasAmountBN.toString() }
-      );
-      task.setTxHash(txHash);
-
-      FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.AskToCloseProgressDlg);
+        // Closing trade
+        txHash = await tokenContract.burnToToken.sendTransactionAsync(
+          account,
+          assetErc20Address,
+          amountInBaseUnits,
+          { from: account, gas: gasAmountBN.toString() }
+        );
+        task.setTxHash(txHash);
+      }
+      finally {
+        FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.AskToCloseProgressDlg);
+      }
 
       task.processingStepNext();
       const txReceipt = await FulcrumProvider.Instance.waitForTransactionMined(txHash, task.request);

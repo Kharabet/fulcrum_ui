@@ -42,13 +42,20 @@ export class UnlendEthProcessor {
       gasAmountBN = new BigNumber(gasAmount).multipliedBy(FulcrumProvider.Instance.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
     }
 
-    FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.AskToOpenProgressDlg);
+    let txHash: string = "";
+    try {
+      FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.AskToOpenProgressDlg);
 
-    // Submitting unloan
-    const txHash = await tokenContract.burnToEther.sendTransactionAsync(account, amountInBaseUnits, { from: account, gas: gasAmountBN.toString() });
-    task.setTxHash(txHash);
-
-    FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.AskToCloseProgressDlg);
+      // Submitting unloan
+      txHash = await tokenContract.burnToEther.sendTransactionAsync(account, amountInBaseUnits, {
+        from: account,
+        gas: gasAmountBN.toString()
+      });
+      task.setTxHash(txHash);
+    }
+    finally {
+      FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.AskToCloseProgressDlg);
+    }
 
     task.processingStepNext();
     const txReceipt = await FulcrumProvider.Instance.waitForTransactionMined(txHash, task.request);

@@ -49,32 +49,36 @@ export class LendErcProcessor {
     const erc20allowance = await tokenErc20Contract.allowance.callAsync(account, tokenContract.address);
     task.processingStepNext();
 
-    FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.AskToOpenProgressDlg);
+    let txHash: string = "";
+    try {
+      FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.AskToOpenProgressDlg);
 
-    // Prompting token allowance
-    if (amountInBaseUnits.gt(erc20allowance)) {
-      approvePromise = tokenErc20Contract.approve.sendTransactionAsync(tokenContract.address, FulcrumProvider.UNLIMITED_ALLOWANCE_IN_BASE_UNITS, { from: account });
+      // Prompting token allowance
+      if (amountInBaseUnits.gt(erc20allowance)) {
+        approvePromise = tokenErc20Contract.approve.sendTransactionAsync(tokenContract.address, FulcrumProvider.UNLIMITED_ALLOWANCE_IN_BASE_UNITS, { from: account });
+      }
+      task.processingStepNext();
+      task.processingStepNext();
+
+      let gasAmountBN;
+
+      // Waiting for token allowance
+      if (approvePromise || skipGas) {
+        await approvePromise;
+        gasAmountBN = new BigNumber(2300000);
+      } else {
+        // estimating gas amount
+        const gasAmount = await tokenContract.mint.estimateGasAsync(account, amountInBaseUnits, { from: account, gas: FulcrumProvider.Instance.gasLimit });
+        gasAmountBN = new BigNumber(gasAmount).multipliedBy(FulcrumProvider.Instance.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
+      }
+
+      // Submitting loan
+      txHash = await tokenContract.mint.sendTransactionAsync(account, amountInBaseUnits, { from: account, gas: gasAmountBN.toString() });
+      task.setTxHash(txHash);
     }
-    task.processingStepNext();
-    task.processingStepNext();
-
-    let gasAmountBN;
-
-    // Waiting for token allowance
-    if (approvePromise || skipGas) {
-      await approvePromise;
-      gasAmountBN = new BigNumber(2300000);
-    } else {
-      // estimating gas amount
-      const gasAmount = await tokenContract.mint.estimateGasAsync(account, amountInBaseUnits, { from: account, gas: FulcrumProvider.Instance.gasLimit });
-      gasAmountBN = new BigNumber(gasAmount).multipliedBy(FulcrumProvider.Instance.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
+    finally {
+      FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.AskToCloseProgressDlg);
     }
-
-    // Submitting loan
-    const txHash = await tokenContract.mint.sendTransactionAsync(account, amountInBaseUnits, { from: account, gas: gasAmountBN.toString() });
-    task.setTxHash(txHash);
-
-    FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.AskToCloseProgressDlg);
 
     task.processingStepNext();
     const txReceipt = await FulcrumProvider.Instance.waitForTransactionMined(txHash, task.request);

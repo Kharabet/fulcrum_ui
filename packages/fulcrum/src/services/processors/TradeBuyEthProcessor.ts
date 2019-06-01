@@ -54,13 +54,21 @@ export class TradeBuyEthProcessor {
 
     const gasCost = gasAmountBN.multipliedBy(FulcrumProvider.Instance.gasPrice).integerValue(BigNumber.ROUND_UP);
 
-    FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.AskToOpenProgressDlg);
+    let txHash: string = "";
+    try {
+      FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.AskToOpenProgressDlg);
 
-    // Submitting trade
-    const txHash = await tokenContract.mintWithEther.sendTransactionAsync(account, { from: account, value: amountInBaseUnits, gas: gasAmountBN.toString() });
-    task.setTxHash(txHash);
-
-    FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.AskToCloseProgressDlg);
+      // Submitting trade
+      txHash = await tokenContract.mintWithEther.sendTransactionAsync(account, {
+        from: account,
+        value: amountInBaseUnits,
+        gas: gasAmountBN.toString()
+      });
+      task.setTxHash(txHash);
+    }
+    finally {
+      FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.AskToCloseProgressDlg);
+    }
 
     task.processingStepNext();
     const txReceipt = await FulcrumProvider.Instance.waitForTransactionMined(txHash, task.request);
