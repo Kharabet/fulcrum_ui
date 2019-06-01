@@ -409,8 +409,7 @@ export class FulcrumProvider {
             .minus(checkpointPrice)
             .multipliedBy(balance)
             .multipliedBy(swapPrice)
-            .dividedBy(10 ** 18)
-            .dividedBy(precision);
+            .dividedBy(10 ** (18 + precision));
         }
       }
     }
@@ -441,8 +440,7 @@ export class FulcrumProvider {
             .minus(checkpointPrice)
             .multipliedBy(balance)
             .multipliedBy(swapPrice)
-            .dividedBy(10 ** 18)
-            .dividedBy(precision);
+            .dividedBy(10 ** (18 + precision));
         }
       }
     }
