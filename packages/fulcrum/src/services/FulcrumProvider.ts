@@ -61,7 +61,6 @@ export class FulcrumProvider {
     .pow(256)
     .minus(1);
 
-  private isProcessing: boolean = false;
   private isChecking: boolean = false;
 
   public readonly eventEmitter: EventEmitter;
@@ -293,7 +292,7 @@ export class FulcrumProvider {
 
   public getChartLatestDataPoint = async (selectedKey: TradeTokenKey): Promise<IPriceDataPoint> => {
     try {
-      const latestSwapPrice = await this.getSwapToUsdPrice(selectedKey.asset);
+      const latestSwapPrice = await this.getSwapToUsdRate(selectedKey.asset);
       const priceLatestDataPoint = await this.getPriceLatestDataPoint(selectedKey);
       priceLatestDataPoint.liquidationPrice = latestSwapPrice
         .multipliedBy(priceLatestDataPoint.liquidationPrice)
@@ -314,7 +313,7 @@ export class FulcrumProvider {
       if (assetContract) {
         const tokenPrice = await assetContract.tokenPrice.callAsync();
         const liquidationPrice = await assetContract.liquidationPrice.callAsync();
-        const swapPrice = await this.getSwapToUsdPrice(selectedKey.loanAsset);
+        const swapPrice = await this.getSwapToUsdRate(selectedKey.loanAsset);
 
         const timeStamp = moment();
         result.timeStamp = timeStamp.unix();
@@ -396,13 +395,13 @@ export class FulcrumProvider {
     }
 
     if (account && this.contractsSource && this.contractsSource.canWrite) {
-      const balance = await this.getLoanTokenBalance(asset);
+      const balance = await this.getITokenBalance(asset);
       if (balance.gt(0)) {
         result = new BigNumber(0);
         const assetContract = await this.contractsSource.getITokenContract(asset);
         if (assetContract) {
           const precision = AssetsDictionary.assets.get(asset)!.decimals || 18;
-          const swapPrice = await this.getSwapToUsdPrice(asset);
+          const swapPrice = await this.getSwapToUsdRate(asset);
           const tokenPrice = await assetContract.tokenPrice.callAsync();
           const checkpointPrice = await assetContract.checkpointPrice.callAsync(account);
           result = tokenPrice
@@ -427,15 +426,18 @@ export class FulcrumProvider {
     }
 
     if (account && this.contractsSource && this.contractsSource.canWrite) {
-      const balance = await this.getPositionTokenBalance(selectedKey);
+      const balance = await this.getPTokenBalance(selectedKey);
       if (balance.gt(0)) {
+        //console.log(selectedKey);
         result = new BigNumber(0);
         const assetContract = await this.contractsSource.getPTokenContract(selectedKey);
         if (assetContract) {
           const precision = AssetsDictionary.assets.get(selectedKey.asset)!.decimals || 18;
-          const swapPrice = await this.getSwapToUsdPrice(selectedKey.loanAsset);
+          const swapPrice = await this.getSwapToUsdRate(selectedKey.loanAsset);
           const tokenPrice = await assetContract.tokenPrice.callAsync();
           const checkpointPrice = await assetContract.checkpointPrice.callAsync(account);
+          //console.log(precision.toString(),swapPrice.toString(),tokenPrice.toString(),checkpointPrice.toString(),balance.toString());
+
           result = tokenPrice
             .minus(checkpointPrice)
             .multipliedBy(balance)
@@ -453,8 +455,8 @@ export class FulcrumProvider {
 
     const balance =
       tradeType === TradeType.BUY
-        ? await this.getBaseTokenBalance(collateral)
-        : await this.getPositionTokenBalance(selectedKey);
+        ? await this.getAssetTokenBalance(collateral)
+        : await this.getPTokenBalance(selectedKey);
 
     if (tradeType === TradeType.BUY) {
       if (this.contractsSource) {
@@ -465,7 +467,7 @@ export class FulcrumProvider {
           marketLiquidity = marketLiquidity.multipliedBy(10 ** (18 - precision));
 
           if (collateral !== selectedKey.loanAsset) {
-            const swapPrice = await this.getSwapPrice(selectedKey.loanAsset, collateral);
+            const swapPrice = await this.getSwapRate(selectedKey.loanAsset, collateral);
             marketLiquidity = marketLiquidity.multipliedBy(swapPrice);
           }
 
@@ -487,13 +489,13 @@ export class FulcrumProvider {
     let result = new BigNumber(0);
 
     if (request.lendType === LendType.LEND) {
-      result = await this.getBaseTokenBalance(request.asset);
+      result = await this.getAssetTokenBalance(request.asset);
     } else {
       if (this.contractsSource) {
         const assetContract = await this.contractsSource.getITokenContract(request.asset);
         if (assetContract) {
           const tokenPrice = await assetContract.tokenPrice.callAsync();
-          const amount = await this.getLoanTokenBalance(request.asset);
+          const amount = await this.getITokenBalance(request.asset);
           result = amount.multipliedBy(tokenPrice).dividedBy(10 ** 18);
         }
       }
@@ -512,7 +514,8 @@ export class FulcrumProvider {
         request.asset,
         request.unitOfAccount,
         request.positionType,
-        request.leverage
+        request.leverage,
+        request.isTokenized
       );
       const assetContract = await this.contractsSource.getPTokenContract(key);
       if (assetContract) {
@@ -520,7 +523,7 @@ export class FulcrumProvider {
         let amount = request.amount;
 
         if (request.collateral !== key.loanAsset) {
-          const swapPrice = await this.getSwapPrice(request.collateral, key.loanAsset);
+          const swapPrice = await this.getSwapRate(request.collateral, key.loanAsset);
           amount = request.tradeType === TradeType.BUY
             ? amount.multipliedBy(swapPrice)
             : amount.dividedBy(swapPrice);
@@ -595,7 +598,7 @@ export class FulcrumProvider {
     };
   }
 
-  public async getBaseTokenBalance(asset: Asset): Promise<BigNumber> {
+  public async getAssetTokenBalance(asset: Asset): Promise<BigNumber> {
     let result: BigNumber = new BigNumber(0);
     if (asset === Asset.UNKNOWN) {
       // always 0
@@ -616,7 +619,7 @@ export class FulcrumProvider {
     return result;
   }
 
-  public async getLoanTokenBalance(asset: Asset): Promise<BigNumber> {
+  public async getITokenBalance(asset: Asset): Promise<BigNumber> {
     let result = new BigNumber(0);
 
     if (this.contractsSource) {
@@ -631,11 +634,11 @@ export class FulcrumProvider {
     return result;
   }
 
-  public async getPositionTokenBalance(selectedKey: TradeTokenKey): Promise<BigNumber> {
+  public async getPTokenBalance(selectedKey: TradeTokenKey): Promise<BigNumber> {
     let result = new BigNumber(0);
 
     if (this.contractsSource) {
-      const precision = AssetsDictionary.assets.get(selectedKey.asset)!.decimals || 18;
+      const precision = AssetsDictionary.assets.get(selectedKey.loanAsset)!.decimals || 18;
       const address = await this.contractsSource.getPTokenErc20Address(selectedKey);
       if (address) {
         result = await this.getErc20Balance(address);
@@ -699,15 +702,19 @@ export class FulcrumProvider {
     return result;
   }
 
-  public async getSwapToUsdPrice(asset: Asset): Promise<BigNumber> {
-    return this.getSwapPrice(
+  public async getSwapToUsdRate(asset: Asset): Promise<BigNumber> {
+    if (asset === Asset.DAI || asset === Asset.USDC) {
+      return new BigNumber(1);
+    }
+
+    return this.getSwapRate(
       asset,
       Asset.DAI
     );
   }
 
-  public async getSwapPrice(srcAsset: Asset, destAsset: Asset): Promise<BigNumber> {
-    if (srcAsset === destAsset || ((srcAsset === Asset.USDC || srcAsset === Asset.DAI) && (destAsset === Asset.USDC || destAsset === Asset.DAI))) {
+  public async getSwapRate(srcAsset: Asset, destAsset: Asset): Promise<BigNumber> {
+    if (srcAsset === destAsset) {
       return new BigNumber(1);
     }
     
@@ -741,28 +748,17 @@ export class FulcrumProvider {
   };
 
   private cancelRequestTask = async (requestTask: RequestTask) => {
-    if (!(this.isProcessing || this.isChecking)) {
-      this.isProcessing = true;
-
+    if (!(requestTask.isProcessing || this.isChecking)) {
       try {
-        const task = TasksQueue.Instance.peek();
-
-        if (task) {
-          if (task.request.id === requestTask.request.id) {
-            TasksQueue.Instance.dequeue();
-          }
-        }
-      } finally {
-        this.isProcessing = false;
-      }
+        TasksQueue.Instance.dequeue(requestTask);
+      } finally {}
     }
   };
 
   private processQueue = async (force: boolean, skipGas: boolean) => {
-    if (!(this.isProcessing || this.isChecking)) {
+    if (!(this.isChecking || TasksQueue.Instance.allProcessing())) {
       let forceOnce = force;
       do {
-        this.isProcessing = true;
         this.isChecking = false;
 
         try {
@@ -776,11 +772,10 @@ export class FulcrumProvider {
               await this.processRequestTask(task, skipGas);
               // @ts-ignore
               if (task.status === RequestStatus.DONE) {
-                TasksQueue.Instance.dequeue();
+                TasksQueue.Instance.dequeue(task);
               }
             } else {
               if (task.status === RequestStatus.FAILED && !forceOnce) {
-                this.isProcessing = false;
                 this.isChecking = false;
                 break;
               }
@@ -789,7 +784,6 @@ export class FulcrumProvider {
         } finally {
           forceOnce = false;
           this.isChecking = true;
-          this.isProcessing = false;
         }
       } while (TasksQueue.Instance.any());
       this.isChecking = false;
@@ -930,7 +924,8 @@ export class FulcrumProvider {
               request.asset,
               request.unitOfAccount,
               request.positionType,
-              request.leverage
+              request.leverage,
+              request.isTokenized
             ), txHash)
           );
         }

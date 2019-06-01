@@ -50,6 +50,8 @@ export class TasksListItemDetails extends Component<ITasksListItemDetailsProps> 
   };
 
   public renderStepProgressIndicator = (index: number): ReactNode => {
+    const tx = this.props.task.txHash || ``;
+
     const titleStateClassName =
       index + 1 === this.props.task.stepCurrent
         ? this.props.task.status === RequestStatus.IN_PROGRESS
@@ -59,7 +61,15 @@ export class TasksListItemDetails extends Component<ITasksListItemDetailsProps> 
         ? "task-list-item-details__step-img--done"
         : "task-list-item-details__step-img--future";
 
-    return <div className={`task-list-item-details__step-img ${titleStateClassName}`} />;
+    return tx && FulcrumProvider.Instance.web3ProviderSettings ?
+      (
+        <a
+          className={`task-list-item-details__step-img ${titleStateClassName}`}
+          href={`${FulcrumProvider.Instance.web3ProviderSettings!.etherscanURL}tx/${tx}`}
+          target="_blank"
+          rel="noopener noreferrer"
+        />
+      ) : <div className={`task-list-item-details__step-img ${titleStateClassName}`} />;
   };
 
   public renderTaskFailedStateActions = (index: number): ReactNode => {

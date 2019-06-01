@@ -19,7 +19,7 @@ export class ProgressFragment extends Component<any, IProgressFragmentState> {
     super(props);
 
     this.state = {
-      isProgressDetailsModalOpen: true,
+      isProgressDetailsModalOpen: false,
       counterProgressDetails: 0,
       requestTasks: TasksQueue.Instance.getTasksList()
     };
@@ -44,7 +44,7 @@ export class ProgressFragment extends Component<any, IProgressFragmentState> {
       <React.Fragment>
         <ProgressBar requestTask={this.state.requestTasks[0]} onViewMore={this.onViewMore} />
         <Modal
-          isOpen={this.state.isProgressDetailsModalOpen && this.state.counterProgressDetails > 0}
+          isOpen={this.state.isProgressDetailsModalOpen}
           onRequestClose={this.onRequestClose}
           className="modal-content-div"
           overlayClassName="modal-overlay-div"
@@ -64,11 +64,11 @@ export class ProgressFragment extends Component<any, IProgressFragmentState> {
   };
 
   public onAskToOpenProgressDlg = () => {
-    this.setState({ ...this.state, counterProgressDetails: this.state.counterProgressDetails + 1 });
+    this.setState(p => ({ ...this.state, counterProgressDetails: this.state.counterProgressDetails + 1, isProgressDetailsModalOpen: true }));
   };
 
   public onAskToCloseProgressDlg = () => {
-    this.setState({ ...this.state, counterProgressDetails: this.state.counterProgressDetails - 1 });
+    this.setState(p => ({ ...this.state, counterProgressDetails: this.state.counterProgressDetails - 1, isProgressDetailsModalOpen: p.counterProgressDetails == 1 ? false : p.isProgressDetailsModalOpen }));
   };
 
   public onTasksQueueChanged = () => {

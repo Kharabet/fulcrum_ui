@@ -13,6 +13,7 @@ export class RequestTask {
   public stepCurrent: number;
   public txHash: string | null;
   public error: Error | null;
+  public isProcessing: boolean = false;
 
   constructor(request: LendRequest | TradeRequest) {
     this.request = request;
@@ -40,6 +41,7 @@ export class RequestTask {
       this.steps.splice(0, 1);
     }
     steps.forEach(e => this.steps.push(e));
+    this.isProcessing = true;
     this.status = RequestStatus.IN_PROGRESS;
     this.stepCurrent = 1;
 
@@ -57,9 +59,19 @@ export class RequestTask {
   }
 
   public processingEnd(isSuccessful: boolean, skipGas: boolean, error: Error | null) {
+
     this.error = error;
-    this.status = isSuccessful ? RequestStatus.DONE : 
-      skipGas ? RequestStatus.FAILED_SKIPGAS : RequestStatus.FAILED;
+    if (isSuccessful) {
+      this.isProcessing = false;
+      this.status = RequestStatus.DONE;
+    } else {
+      if (skipGas) {
+        this.status = RequestStatus.FAILED_SKIPGAS;
+      } else {
+        this.isProcessing = false;
+        this.status = RequestStatus.FAILED;
+      }
+    }
 
     if (this.eventEmitter) {
       this.eventEmitter.emit(TasksQueueEvents.TaskChanged);
