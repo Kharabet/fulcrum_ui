@@ -15,18 +15,17 @@ export class TradeSellErcProcessor {
 
     // Initializing loan
     const taskRequest: TradeRequest = (task.request as TradeRequest);
-    const decimals: number = AssetsDictionary.assets.get(taskRequest.asset)!.decimals || 18;
+    const key = new TradeTokenKey(
+      taskRequest.asset,
+      taskRequest.unitOfAccount,
+      taskRequest.positionType,
+      taskRequest.leverage,
+      taskRequest.isTokenized
+    );
+    const decimals: number = AssetsDictionary.assets.get(key.loanAsset)!.decimals || 18;
     const amountInBaseUnits = new BigNumber(taskRequest.amount.multipliedBy(10 ** decimals).toFixed(0, 1));
-    const tokenContract: pTokenContract | null =
-      await FulcrumProvider.Instance.contractsSource.getPTokenContract(
-        new TradeTokenKey(
-          taskRequest.asset,
-          taskRequest.unitOfAccount,
-          taskRequest.positionType,
-          taskRequest.leverage,
-          taskRequest.isTokenized
-        )
-      );
+    const tokenContract: pTokenContract | null = await FulcrumProvider.Instance.contractsSource.getPTokenContract(key);
+
     if (!tokenContract) {
       throw new Error("No pToken contract available!");
     }

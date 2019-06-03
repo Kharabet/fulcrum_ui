@@ -16,7 +16,7 @@ export class TradeBuyErcProcessor {
 
     // Initializing loan
     const taskRequest: TradeRequest = (task.request as TradeRequest);
-    const decimals: number = AssetsDictionary.assets.get(taskRequest.asset)!.decimals || 18;
+    const decimals: number = AssetsDictionary.assets.get(taskRequest.collateral)!.decimals || 18;
     const amountInBaseUnits = new BigNumber(taskRequest.amount.multipliedBy(10 ** decimals).toFixed(0, 1));
     const tokenContract: pTokenContract | null =
       await FulcrumProvider.Instance.contractsSource.getPTokenContract(

@@ -57,7 +57,7 @@ export class ContractsSource {
     // console.log(TokenList);
     
     // tslint:disable:no-console
-    console.log(`--- start of token list ---`);
+    //console.log(`--- start of token list ---`);
     TokenList.forEach((val, index) => {
       // tslint:disable:no-console
       // console.log(e);
@@ -70,7 +70,7 @@ export class ContractsSource {
         index: new BigNumber(index)
       };
       // tslint:disable:no-console
-      console.log(t);
+      //console.log(t);
       
       if (val[0] === "1") {
         this.iTokensContractInfos.set(val[4], t);
@@ -79,7 +79,10 @@ export class ContractsSource {
       }
     });
     // tslint:disable:no-console
-    console.log(`--- end of token list --- Count: ${TokenList.length}`);
+    //console.log(`--- end of token list --- Count: ${TokenList.length}`);
+
+    // tslint:disable:no-console
+    console.log(`Loaded ${TokenList.length} Fulcrum tokens.`)
 
 /* 
     this.TokenizedRegistryJson = await import(`./../assets/artifacts/${ethNetwork}/TokenizedRegistry.json`);
