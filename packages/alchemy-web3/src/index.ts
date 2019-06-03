@@ -170,7 +170,7 @@ export function createAlchemyWeb3(
 export class AlchemySubprovider extends Subprovider {
   private readonly alchemyRpcUrl: string;
   private readonly config: AlchemyWeb3Config;
-  public readonly alchemy: AlchemyMethods;
+  //public readonly alchemy: AlchemyMethods;
 
   /**
    * Instantiates a new AlchemySubprovider
@@ -180,7 +180,7 @@ export class AlchemySubprovider extends Subprovider {
 
     this.alchemyRpcUrl = alchemyRpcUrl;
     this.config = fillInConfigDefaults(config);
-    this.alchemy = {
+    /*this.alchemy = {
       getTokenAllowance: (params: TokenAllowanceParams, callback) =>
         callAlchemyMethod({
           "123",
@@ -206,7 +206,7 @@ export class AlchemySubprovider extends Subprovider {
           method: "alchemy_getTokenMetadata",
           config: this.config as FullConfig,
         }),
-    };
+    };*/
   }
 
   /**
