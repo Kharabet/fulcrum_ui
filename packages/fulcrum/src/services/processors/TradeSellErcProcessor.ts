@@ -44,7 +44,7 @@ export class TradeSellErcProcessor {
     let gasAmountBN;
 
     // Submitting unloan
-    const assetErc20Address = FulcrumProvider.Instance.getErc20Address(taskRequest.collateral);
+    const assetErc20Address = FulcrumProvider.Instance.getErc20AddressOfAsset(taskRequest.collateral);
     if (assetErc20Address) {
       // Waiting for token allowance
       if (skipGas) {

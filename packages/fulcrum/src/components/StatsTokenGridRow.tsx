@@ -15,8 +15,10 @@ export interface IStatsTokenGridRowProps {
 
 interface IStatsTokenGridRowState {
   assetDetails: AssetDetails | null;
-  reserveDetails: ReserveDetails | null;
+  reserveDetails: ReserveDetails;
   swapPrice: BigNumber | null;
+  usdSupply: BigNumber | null;
+  decimals: number;
 }
 
 export class StatsTokenGridRow extends Component<IStatsTokenGridRowProps, IStatsTokenGridRowState> {
@@ -25,8 +27,10 @@ export class StatsTokenGridRow extends Component<IStatsTokenGridRowProps, IStats
 
     this.state = {
       assetDetails: null,
-      reserveDetails: null,
-      swapPrice: null
+      reserveDetails: ReserveDetails.getEmpty(),
+      swapPrice: null,
+      usdSupply: null,
+      decimals: 18
     };
 
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
@@ -34,14 +38,33 @@ export class StatsTokenGridRow extends Component<IStatsTokenGridRowProps, IStats
 
   private async derivedUpdate() {
     const assetDetails = await AssetsDictionary.assets.get(this.props.asset);
-    const reserveDetails = await FulcrumProvider.Instance.getReserveDetails(this.props.asset);
     const swapPrice = await FulcrumProvider.Instance.getSwapToUsdRate(this.props.asset);
+    const reserveDetails = await FulcrumProvider.Instance.getReserveDetails(this.props.asset);
+
+    let decimals = 18;
+    let usdSupply: BigNumber | null = null;
+    if (assetDetails) {
+      decimals = assetDetails.decimals;
+      if (reserveDetails && reserveDetails.totalSupply) {
+        const precision = new BigNumber(10**(18-decimals));
+        reserveDetails.totalSupply = reserveDetails.totalSupply!.times(precision);
+        if (swapPrice) {
+          usdSupply = reserveDetails.totalSupply!.times(swapPrice);// .div(10**(18-decimals));
+        }
+
+        reserveDetails.totalBorrow = reserveDetails.totalBorrow!.times(precision);
+        reserveDetails.liquidity = reserveDetails.liquidity!.times(precision);
+        reserveDetails.liquidityReserved = reserveDetails.liquidityReserved!.times(precision);
+      }
+    }
 
     this.setState({
       ...this.state,
       assetDetails: assetDetails || null,
-      reserveDetails: reserveDetails,
-      swapPrice: swapPrice
+      reserveDetails: reserveDetails || ReserveDetails.getEmpty(),
+      usdSupply: usdSupply,
+      swapPrice: swapPrice,
+      decimals
     });
   }
 
@@ -73,24 +96,7 @@ export class StatsTokenGridRow extends Component<IStatsTokenGridRowProps, IStats
       return null;
     }
 
-    let usdSupply: BigNumber = new BigNumber(0);
-    const decmials = this.state.assetDetails.decimals;
-    let details: ReserveDetails;
-    if (this.state.reserveDetails) {
-      details = this.state.reserveDetails;
-      const precision = new BigNumber(10**(18-decmials));
-      details.totalSupply = details.totalSupply!.times(precision);
-      if (this.state.swapPrice) {
-        usdSupply = details.totalSupply!.times(this.state.swapPrice);//.div(10**(18-decmials));
-      }
-
-      details.totalBorrow = details.totalBorrow!.times(precision);
-      details.liquidity = details.liquidity!.times(precision);
-      details.liquidityReserved = details.liquidityReserved!.times(precision);
-
-    } else {
-      details = ReserveDetails.getEmpty();
-    }
+    const details = this.state.reserveDetails;
 
     return (
       <div className="stats-grid-row">
@@ -110,11 +116,11 @@ export class StatsTokenGridRow extends Component<IStatsTokenGridRowProps, IStats
         ) : (
           <div className="stats-grid-row__col-name">{this.props.asset}</div>
         )}
-        <div title={usdSupply ? `${usdSupply.toFixed(18)}` : ``} className="stats-grid-row__col-total-supply-usd">{usdSupply ? `${usdSupply.toFixed(4)}` : `-`}</div>
-        <div title={details.totalSupply ? `${details.totalSupply.toFixed(decmials)}` : ``} className="stats-grid-row__col-total-supply">{details.totalSupply ? `${details.totalSupply.toFixed(4)}` : `-`}</div>
-        <div title={details.totalBorrow ? `${details.totalBorrow.toFixed(decmials)}` : ``} className="stats-grid-row__col-total-borrow">{details.totalBorrow ? `${details.totalBorrow.toFixed(4)}` : `-`}</div>
-        <div title={details.liquidity ? `${details.liquidity.toFixed(decmials)}` : ``} className="stats-grid-row__col-liquidity">{details.liquidity ? `${details.liquidity.toFixed(4)}` : `-`}</div>
-        <div title={details.liquidityReserved ? `${details.liquidityReserved.toFixed(decmials)}` : ``} className="stats-grid-row__col-liquidity-reserved">{details.liquidityReserved ? `${details.liquidityReserved.toFixed(4)}` : `-`}</div>        
+        <div title={this.state.usdSupply ? `${this.state.usdSupply.toFixed(18)}` : ``} className="stats-grid-row__col-total-supply-usd">{this.state.usdSupply ? `${this.state.usdSupply.toFixed(4)}` : `-`}</div>
+        <div title={details.totalSupply ? `${details.totalSupply.toFixed(this.state.decimals)}` : ``} className="stats-grid-row__col-total-supply">{details.totalSupply ? `${details.totalSupply.toFixed(4)}` : `-`}</div>
+        <div title={details.totalBorrow ? `${details.totalBorrow.toFixed(this.state.decimals)}` : ``} className="stats-grid-row__col-total-borrow">{details.totalBorrow ? `${details.totalBorrow.toFixed(4)}` : `-`}</div>
+        <div title={details.liquidity ? `${details.liquidity.toFixed(this.state.decimals)}` : ``} className="stats-grid-row__col-liquidity">{details.liquidity ? `${details.liquidity.toFixed(4)}` : `-`}</div>
+        <div title={details.liquidityReserved ? `${details.liquidityReserved.toFixed(this.state.decimals)}` : ``} className="stats-grid-row__col-liquidity-reserved">{details.liquidityReserved ? `${details.liquidityReserved.toFixed(4)}` : `-`}</div>        
         <div title={details.supplyInterestRate ? `${details.supplyInterestRate.toFixed(18)}` : ``} className="stats-grid-row__col-supply-rate">{details.supplyInterestRate ? `${details.supplyInterestRate.toFixed(4)}%` : `-`}</div>
         <div title={details.borrowInterestRate ? `${details.borrowInterestRate.toFixed(18)}` : ``} className="stats-grid-row__col-borrow-rate">{details.borrowInterestRate ? `${details.borrowInterestRate.toFixed(4)}%` : `-`}</div>
         <div title={details.nextInterestRate ? `${details.nextInterestRate.toFixed(18)}` : ``} className="stats-grid-row__col-next-rate">{details.nextInterestRate ? `${details.nextInterestRate.toFixed(4)}%` : `-`}</div>

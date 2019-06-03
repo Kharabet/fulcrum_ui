@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { PureComponent } from "react";
 import Modal from "react-modal";
 import { LendForm } from "../components/LendForm";
 import { LendTokenSelector } from "../components/LendTokenSelector";
@@ -20,7 +20,7 @@ interface ILendPageState {
   lendAsset: Asset;
 }
 
-export class LendPage extends Component<ILendPageProps, ILendPageState> {
+export class LendPage extends PureComponent<ILendPageProps, ILendPageState> {
   constructor(props: any) {
     super(props);
 

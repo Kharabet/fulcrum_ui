@@ -1,9 +1,9 @@
-import React, { Component } from "react";
+import React, { PureComponent } from "react";
 import { Link } from "react-router-dom";
 import { Footer } from "../layout/Footer";
 import { HeaderHome } from "../layout/HeaderHome";
 
-export class LandingPage extends Component {
+export class LandingPage extends PureComponent {
   public render() {
     return (
       <div className="landing-page">

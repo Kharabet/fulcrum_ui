@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { PureComponent } from "react";
 import Modal from "react-modal";
 import { ManageCollateralForm } from "../components/ManageCollateralForm";
 import { OwnTokenGrid } from "../components/OwnTokenGrid";
@@ -45,7 +45,7 @@ interface ITradePageState {
   priceGraphData: IPriceDataPoint[];
 }
 
-export class TradePage extends Component<ITradePageProps, ITradePageState> {
+export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
   constructor(props: any) {
     super(props);
 

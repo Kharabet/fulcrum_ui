@@ -20,7 +20,7 @@ interface ILendTokenSelectorItemState {
   assetDetails: AssetDetails | null;
   interestRate: BigNumber;
   profit: BigNumber | null;
-  balance: BigNumber;
+  balanceOfUser: BigNumber;
 }
 
 export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps, ILendTokenSelectorItemState> {
@@ -30,9 +30,9 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
     const assetDetails = AssetsDictionary.assets.get(props.asset);
     const interestRate = new BigNumber(0);
     const profit = new BigNumber(0);
-    const balance = new BigNumber(0);
+    const balanceOfUser = new BigNumber(0);
 
-    this.state = { assetDetails: assetDetails || null, interestRate: interestRate, profit: profit, balance: balance };
+    this.state = { assetDetails: assetDetails || null, interestRate: interestRate, profit: profit, balanceOfUser: balanceOfUser };
 
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
@@ -43,9 +43,9 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
     const assetDetails = AssetsDictionary.assets.get(this.props.asset);
     const interestRate = await FulcrumProvider.Instance.getLendTokenInterestRate(this.props.asset);
     const profit = await FulcrumProvider.Instance.getLendProfit(this.props.asset);
-    const balance = await FulcrumProvider.Instance.getITokenBalance(this.props.asset);
+    const balanceOfUser = await FulcrumProvider.Instance.getITokenBalanceOfUser(this.props.asset);
 
-    this.setState({ ...this.state, assetDetails: assetDetails || null, interestRate: interestRate, profit: profit, balance: balance });
+    this.setState({ ...this.state, assetDetails: assetDetails || null, interestRate: interestRate, profit: profit, balanceOfUser: balanceOfUser });
   }
 
   private onProviderAvailable = async () => {
@@ -98,7 +98,7 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
           {this.state.profit !== null ? (
             <div className="token-selector-item__profit-container">
               <div className="token-selector-item__profit-title">Profit:</div>
-              <div className="token-selector-item__profit-value">{`$${this.state.profit.toFixed(4)}`}</div>
+              <div title={`$${this.state.profit.toFixed(18)}`} className="token-selector-item__profit-value">{`$${this.state.profit.toFixed(4)}`}</div>
             </div>
           ) : null}
         </div>
@@ -106,10 +106,10 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
           <div className="token-selector-item__name">{this.state.assetDetails.displayName}</div>
           <div className="token-selector-item__interest-rate-container">
             <div className="token-selector-item__interest-rate-title">Interest rate:</div>
-            <div className="token-selector-item__interest-rate-value">{`${this.state.interestRate.toFixed(4)}%`}</div>
+            <div title={`$${this.state.interestRate.toFixed(18)}%`} className="token-selector-item__interest-rate-value">{`${this.state.interestRate.toFixed(4)}%`}</div>
           </div>
         </div>
-        {this.renderActions(this.state.balance.eq(0))}
+        {this.renderActions(this.state.balanceOfUser.eq(0))}
       </div>
     );
   }

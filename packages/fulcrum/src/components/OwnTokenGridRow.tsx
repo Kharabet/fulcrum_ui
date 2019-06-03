@@ -136,13 +136,13 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
         <div className="trade-token-grid-row__col-profit">
           {this.state.profit ? `$${this.state.profit.toFixed(4)}` : "-"}
         </div>
-        <div className="trade-token-grid-row__col-action">
+        <div className="trade-token-grid-row__col-action" style={{ textAlign: `right`}}>
           <button className="own-token-grid-row__details-button" onClick={this.onDetailsClick}>
             &nbsp;
           </button>
-          <button className="own-token-grid-row__manage-button own-token-grid-row__button--size-half" onClick={this.onManageClick}>
+          {/*<button className="own-token-grid-row__manage-button own-token-grid-row__button--size-half" onClick={this.onManageClick}>
             Manage
-          </button>
+          </button>*/}
           <button className="own-token-grid-row__sell-button own-token-grid-row__button--size-half" onClick={this.onSellClick}>
             {TradeType.SELL}
           </button>

@@ -44,7 +44,7 @@ export class TradeBuyErcProcessor {
 
     // init erc20 contract for base token
     let tokenErc20Contract: erc20Contract | null = null;
-    const assetErc20Address = FulcrumProvider.Instance.getErc20Address(taskRequest.collateral);
+    const assetErc20Address = FulcrumProvider.Instance.getErc20AddressOfAsset(taskRequest.collateral);
     if (assetErc20Address) {
       tokenErc20Contract = await FulcrumProvider.Instance.contractsSource.getErc20Contract(assetErc20Address);
     } else {

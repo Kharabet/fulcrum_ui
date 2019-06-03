@@ -37,17 +37,33 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
       walletAddressText = "...";
     }
 
+    const isLoading = FulcrumProvider.Instance.isLoading;
+    const isSupportedNetwork = !FulcrumProvider.Instance.unsupportedNetwork;
+    const etherscanURL = FulcrumProvider.Instance.web3ProviderSettings? FulcrumProvider.Instance.web3ProviderSettings.etherscanURL : null;
+
     return (
       <div className="on-chain-indicator">
         <button className="on-chain-indicator__container">
-          {this.renderProviderDisplay(providerTypeDetails, accountText, walletAddressText)}
+          {this.renderProviderDisplay(
+            isLoading,
+            isSupportedNetwork,
+            etherscanURL,
+            providerTypeDetails,
+            accountText,
+            walletAddressText)}
         </button>
       </div>
     );
   }
 
-  public renderProviderDisplay(providerTypeDetails: ProviderTypeDetails | null, accountText: string | null, walletAddressText: string) {
-    if (FulcrumProvider.Instance.isLoading) {
+  public renderProviderDisplay(
+    isLoading: boolean,
+    isSupportedNetwork: boolean,
+    etherscanURL: string | null,
+    providerTypeDetails: ProviderTypeDetails | null,
+    accountText: string | null,
+    walletAddressText: string) {
+    if (isLoading) {
       return (
         <React.Fragment>
           <span className="on-chain-indicator__provider-txt" onClick={this.props.doNetworkConnect}>
@@ -68,10 +84,10 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
               alt={providerTypeDetails.displayName}
               onClick={this.props.doNetworkConnect}
             />
-            {!FulcrumProvider.Instance.unsupportedNetwork && accountText && FulcrumProvider.Instance.web3ProviderSettings ? (
+            {isSupportedNetwork && accountText && etherscanURL ? (
               <a
                 className="on-chain-indicator__wallet-address"
-                href={`${FulcrumProvider.Instance.web3ProviderSettings.etherscanURL}address/${accountText}`}
+                href={`${etherscanURL}address/${accountText}`}
                 target="_blank"
                 rel="noopener noreferrer"
               >

@@ -47,7 +47,6 @@ export interface ITradeFormProps {
 interface ITradeFormState {
   assetDetails: AssetDetails | null;
   collateral: Asset;
-  unitOfAccount: Asset;
   tokenizeNeeded: boolean;
   latestPriceDataPoint: IPriceDataPoint;
 
@@ -84,7 +83,6 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     this.state = {
       assetDetails: assetDetails || null,
       collateral: props.defaultCollateral,
-      unitOfAccount: props.defaultUnitOfAccount,
       tokenizeNeeded: props.defaultTokenizeNeeded,
       isTradeAmountTouched: false,
       tradeAmountText: "",
@@ -133,7 +131,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
   private getTradeTokenGridRowSelectionKey(leverage: number = this.props.leverage) {
     return new TradeTokenKey(
       this.props.asset,
-      this.state.unitOfAccount,
+      this.props.defaultUnitOfAccount,
       this.props.positionType,
       leverage,
       this.state.tokenizeNeeded
@@ -148,16 +146,16 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     const assetDetails = AssetsDictionary.assets.get(this.props.asset);
     const tradeTokenKey = this.getTradeTokenGridRowSelectionKey(this.props.leverage);
     const latestPriceDataPoint = await FulcrumProvider.Instance.getPriceLatestDataPoint(tradeTokenKey);
-    const positionTokenBalance = await FulcrumProvider.Instance.getPTokenBalance(tradeTokenKey);
+    const positionTokenBalance = await FulcrumProvider.Instance.getPTokenBalanceOfUser(tradeTokenKey);
     const balance =
       this.props.tradeType === TradeType.BUY
-        ? await FulcrumProvider.Instance.getAssetTokenBalance(this.state.collateral)
+        ? await FulcrumProvider.Instance.getAssetTokenBalanceOfUser(this.state.collateral)
         : positionTokenBalance;
     const maxTradeValue = await FulcrumProvider.Instance.getMaxTradeValue(this.props.tradeType, tradeTokenKey, this.state.collateral);
     const tradeRequest = new TradeRequest(
       this.props.tradeType,
       this.props.asset,
-      this.state.unitOfAccount,
+      this.props.defaultUnitOfAccount,
       this.state.collateral,
       this.props.positionType,
       this.props.leverage,
@@ -228,10 +226,11 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     const submitClassName =
       this.props.tradeType === TradeType.BUY ? "trade-form__submit-button--buy" : "trade-form__submit-button--sell";
 
-    const positionTypePrefix = this.props.positionType === PositionType.SHORT ? "pS" : "pL";
+    const positionTypePrefix = this.props.defaultUnitOfAccount === Asset.DAI ? "d" : "u";
+    const positionTypePrefix2 = this.props.positionType === PositionType.SHORT ? "s" : "L";
     const positionLeveragePostfix = this.props.leverage > 1 ? `${this.props.leverage}x` : "";
     const tokenNameBase = this.state.assetDetails.displayName;
-    const tokenNamePosition = `${positionTypePrefix}${this.state.assetDetails.displayName}${positionLeveragePostfix}`;
+    const tokenNamePosition = `${positionTypePrefix}${positionTypePrefix2}${this.state.assetDetails.displayName}${positionLeveragePostfix}`;
 
     const tokenNameSource = this.props.tradeType === TradeType.BUY ? this.state.collateral : tokenNamePosition;
     const tokenNameDestination = this.props.tradeType === TradeType.BUY ? tokenNamePosition : this.state.collateral;
@@ -245,8 +244,8 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     const amountMsg =
       this.state.balance && this.state.balance.eq(0)
         ? "Your wallet is empty \u2639"
-        : this.state.tradeAmount.gt(0)
-          ? ""//`Slippage: ${this.state.slippageRate.toFixed(2)}%`
+        : this.state.slippageRate.gte(0.2)
+          ? `Slippage: ${this.state.slippageRate.toFixed(1)}%`
           : "";
 
     const tradedAmountEstimateText =
@@ -315,12 +314,12 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
               )}
             </div>
             <div className="trade-form__kv-container">
-              <div className="trade-form__label">{amountMsg}</div>
+              <div title={amountMsg.includes("Slippage:") ? `${this.state.slippageRate.toFixed(18)}%` : ``} className="trade-form__label">{amountMsg}</div>
               <div className="trade-form__value trade-form__value--no-color">
                 <Tooltip
                   html={
                     <div style={{ /*maxWidth: `300px`*/ }}>
-                      ... Info ...
+                      {/*... Info ...*/}
                     </div>
                   }
                 >
@@ -336,7 +335,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
                   <div className="trade-form__kv-container">
                     <div className="trade-form__label trade-form__label--no-bg">
                       Unit of Account &nbsp;
-                      <UnitOfAccountSelector items={[Asset.USDC, Asset.DAI]} value={this.state.unitOfAccount} onChange={this.onChangeUnitOfAccount} />
+                      <UnitOfAccountSelector items={[Asset.USDC, Asset.DAI]} value={this.props.defaultUnitOfAccount} onChange={this.onChangeUnitOfAccount} />
                     </div>
                   </div>
                   {/*<div className="trade-form__kv-container">
@@ -413,21 +412,19 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     this.setState({ ...this.state, isChangeCollateralOpen: false, collateral: asset });
   };
 
-  public onChangeUnitOfAccount = async (asset: Asset) => {
-    this.setState({ ...this.state, unitOfAccount: asset }, () => {
-      this.props.onTrade(
-        new TradeRequest(
-          this.props.tradeType,
-          this.props.asset,
-          asset,
-          this.state.collateral,
-          this.props.positionType,
-          this.props.leverage,
-          this.state.tradeAmount,
-          this.state.tokenizeNeeded
-        )
-      );
-    });
+  public onChangeUnitOfAccount = (asset: Asset) => {
+    this.props.onTrade(
+      new TradeRequest(
+        this.props.tradeType,
+        this.props.asset,
+        asset,
+        this.state.collateral,
+        this.props.positionType,
+        this.props.leverage,
+        this.state.tradeAmount,
+        this.state.tokenizeNeeded
+      )
+    );
   };
 
   public onChangeTokenizeNeeded = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -458,7 +455,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       new TradeRequest(
         this.props.tradeType,
         this.props.asset,
-        this.state.unitOfAccount,
+        this.props.defaultUnitOfAccount,
         this.state.collateral,
         this.props.positionType,
         this.props.leverage,
@@ -479,7 +476,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
         const tradeRequest = new TradeRequest(
           this.props.tradeType,
           this.props.asset,
-          this.state.unitOfAccount,
+          this.props.defaultUnitOfAccount,
           this.state.collateral,
           this.props.positionType,
           this.props.leverage,
@@ -524,7 +521,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
         const tradeRequest = new TradeRequest(
           this.props.tradeType,
           this.props.asset,
-          this.state.unitOfAccount,
+          this.props.defaultUnitOfAccount,
           this.state.collateral,
           this.props.positionType,
           this.props.leverage,

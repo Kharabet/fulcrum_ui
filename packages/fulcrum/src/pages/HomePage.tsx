@@ -1,9 +1,9 @@
-import React, { Component } from "react";
+import React, { PureComponent } from "react";
 import { OpsSelector } from "../components/OpsSelector";
 import { Footer } from "../layout/Footer";
 import { HeaderHome } from "../layout/HeaderHome";
 
-export class HomePage extends Component {
+export class HomePage extends PureComponent {
   public render() {
     return (
       <div className="home-page">

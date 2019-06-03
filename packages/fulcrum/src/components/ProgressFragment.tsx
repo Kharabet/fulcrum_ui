@@ -31,6 +31,16 @@ export class ProgressFragment extends Component<any, IProgressFragmentState> {
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.AskToCloseProgressDlg, this.onAskToCloseProgressDlg);
   }
 
+  public scrollDownAndShift = () => {
+    document.querySelector(".pages-container")!.setAttribute("style", "padding-top: 5rem;");
+    window.scrollBy(0, 5 * parseFloat(getComputedStyle(document.documentElement).fontSize!));
+  }
+
+  public scrollUpAndShift = () => {
+    document.querySelector(".pages-container")!.setAttribute("style", "padding-top: initial;");
+    window.scrollBy(0, -5 * parseFloat(getComputedStyle(document.documentElement).fontSize!));
+  }
+
   public componentWillUnmount(): void {
     TasksQueue.Instance.off(TasksQueueEvents.QueueChanged, this.onTasksQueueChanged);
     TasksQueue.Instance.off(TasksQueueEvents.TaskChanged, this.onTasksQueueChanged);
@@ -73,6 +83,13 @@ export class ProgressFragment extends Component<any, IProgressFragmentState> {
 
   public onTasksQueueChanged = () => {
     const tasks = TasksQueue.Instance.getTasksList();
+
+    if (this.state.requestTasks.length == 0 && tasks.length > 0) {
+      this.scrollDownAndShift();
+    } else if (this.state.requestTasks.length > 0 && tasks.length == 0) {
+      this.scrollUpAndShift();
+    }
+
     this.setState({
       ...this.state,
       requestTasks: tasks

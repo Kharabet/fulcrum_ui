@@ -89,7 +89,7 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
       rowsData.push({
         selectedKey: props.selectedKey,
         asset: e,
-        defaultUnitOfAccount: FulcrumProvider.Instance.web3ProviderSettings && FulcrumProvider.Instance.web3ProviderSettings.networkId === 1 ? Asset.USDC : Asset.DAI,
+        defaultUnitOfAccount: Asset.USDC,
         defaultTokenizeNeeded: true,
         positionType: PositionType.SHORT,
         defaultLeverage: props.defaultLeverageShort,
@@ -100,7 +100,7 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
       rowsData.push({
         selectedKey: props.selectedKey,
         asset: e,
-        defaultUnitOfAccount: FulcrumProvider.Instance.web3ProviderSettings && FulcrumProvider.Instance.web3ProviderSettings.networkId === 1 ? Asset.USDC : Asset.DAI,
+        defaultUnitOfAccount: Asset.USDC,
         defaultTokenizeNeeded: true,
         positionType: PositionType.LONG,
         defaultLeverage: props.defaultLeverageLong,

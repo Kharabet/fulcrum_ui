@@ -69,7 +69,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
     const tradeTokenKey = new TradeTokenKey(this.props.asset, this.props.defaultUnitOfAccount, this.props.positionType, this.state.leverage, this.props.defaultTokenizeNeeded);
     const latestPriceDataPoint = await FulcrumProvider.Instance.getPriceLatestDataPoint(tradeTokenKey);
     const profit = await FulcrumProvider.Instance.getTradeProfit(tradeTokenKey);
-    const balance = await FulcrumProvider.Instance.getPTokenBalance(tradeTokenKey);
+    const balance = await FulcrumProvider.Instance.getPTokenBalanceOfUser(tradeTokenKey);
 
     this.setState({
       ...this.state,
@@ -128,10 +128,12 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
     const tradeTokenKey = this.getTradeTokenGridRowSelectionKey(this.state.leverage);
     let bnPrice = new BigNumber(this.state.latestPriceDataPoint.price);
     let bnLiquidationPrice = new BigNumber(this.state.latestPriceDataPoint.liquidationPrice);
-    if (this.props.positionType === PositionType.SHORT) {
+    /*if (this.props.positionType === PositionType.SHORT) {
       bnPrice = bnPrice.div(1000);
       bnLiquidationPrice = bnLiquidationPrice.div(1000);
-    }
+    }*/
+    bnPrice = bnPrice.div(1000);
+    bnLiquidationPrice = bnLiquidationPrice.div(1000);
 
     // const bnChange24h = new BigNumber(this.state.latestPriceDataPoint.change24h);
     const isActiveClassName =
@@ -160,12 +162,12 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
             onChange={this.onLeverageSelect}
           />
         </div>
-        <div className="trade-token-grid-row__col-price">{`$${bnPrice.toFixed(2)}`}</div>
-        <div className="trade-token-grid-row__col-price">{`$${bnLiquidationPrice.toFixed(2)}`}</div>
+        <div title={`$${bnPrice.toFixed(18)}`} className="trade-token-grid-row__col-price">{`$${bnPrice.toFixed(2)}`}</div>
+        <div title={`$${bnLiquidationPrice.toFixed(18)}`} className="trade-token-grid-row__col-price">{`$${bnLiquidationPrice.toFixed(2)}`}</div>
         {/*<div className="trade-token-grid-row__col-change24h">
           <Change24HMarker value={bnChange24h} size={Change24HMarkerSize.MEDIUM} />
         </div>*/}
-        <div className="trade-token-grid-row__col-profit">
+        <div title={this.state.profit ? `$${this.state.profit.toFixed(18)}` : ""} className="trade-token-grid-row__col-profit">
           {this.state.profit ? `$${this.state.profit.toFixed(4)}` : "-"}
         </div>
         {this.renderActions(this.state.balance.eq(0))}

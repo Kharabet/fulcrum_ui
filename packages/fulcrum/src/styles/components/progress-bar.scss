@@ -1,4 +1,11 @@
 .progress-bar-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 999;
+  opacity: 0.9;
+  
   display: flex;
   flex-direction: row;
   justify-content: center;

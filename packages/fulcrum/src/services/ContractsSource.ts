@@ -9,6 +9,9 @@ import { kyberContract } from "../contracts/kyber";
 import { pTokenContract } from "../contracts/pTokenContract";
 import { TokenizedRegistryContract } from "../contracts/TokenizedRegistryContract";
 
+// TEMPORARY WORKAROUND: Not issuing TokenizedTegistry yet
+import { TokenList } from "../assets/artifacts/mainnet/tokenList.js";
+
 const ethNetwork = process.env.REACT_APP_ETH_NETWORK;
 
 interface ITokenContractInfo {
@@ -31,7 +34,8 @@ export class ContractsSource {
   private iTokenJson: any;
   private pTokenJson: any;
   private kyberJson: any;
-  private TokenizedRegistryJson: any;
+  // private TokenizedRegistryJson: any;
+  // private tokenList: any;
 
   public networkId: number;
   public canWrite: boolean;
@@ -48,6 +52,36 @@ export class ContractsSource {
     this.iTokenJson = await import(`./../assets/artifacts/${ethNetwork}/iToken.json`);
     this.pTokenJson = await import(`./../assets/artifacts/${ethNetwork}/pToken.json`);
     this.kyberJson = await import(`./../assets/artifacts/${ethNetwork}/kyber.json`);
+    
+
+    // console.log(TokenList);
+    
+    // tslint:disable:no-console
+    console.log(`--- start of token list ---`);
+    TokenList.forEach((val, index) => {
+      // tslint:disable:no-console
+      // console.log(e);
+      const t = {
+        token: val[1],
+        asset: val[2],
+        name: val[3],
+        symbol: val[4],
+        tokenType: new BigNumber(val[0]),
+        index: new BigNumber(index)
+      };
+      // tslint:disable:no-console
+      console.log(t);
+      
+      if (val[0] === "1") {
+        this.iTokensContractInfos.set(val[4], t);
+      } else if (val[0] === "2") {
+        this.pTokensContractInfos.set(val[4], t);
+      }
+    });
+    // tslint:disable:no-console
+    console.log(`--- end of token list --- Count: ${TokenList.length}`);
+
+/* 
     this.TokenizedRegistryJson = await import(`./../assets/artifacts/${ethNetwork}/TokenizedRegistry.json`);
 
     this.tokenizedRegistryContract = new TokenizedRegistryContract(
@@ -81,6 +115,8 @@ export class ContractsSource {
     console.log(`--- end of token list ---`);
     //  pos += step;
     // } while (next.length > 0);
+*/
+    
 
     /*pos = 0;
     next = [];

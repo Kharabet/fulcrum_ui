@@ -10,6 +10,7 @@ import { TradePage } from "../pages/TradePage";
 import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
+import { LocationListener } from "./LocationListener";
 import { ProgressFragment } from "./ProgressFragment";
 import { ProviderMenu } from "./ProviderMenu";
 
@@ -63,13 +64,15 @@ export class AppRouter extends Component<any, IAppRouterState> {
         <ProgressFragment />
         <div className="pages-container">
           <HashRouter hashType="slash">
-            <Switch>
-              <Route exact={true} path="/" render={() => <LandingPage />} />
-              <Route exact={true} path="/lend" render={() => <LendPage isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} />} />
-              <Route exact={true} path="/trade" render={() => <TradePage isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} />} />
-              <Route exact={true} path="/stats" render={() => <StatsPage isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} />} />
-              <Route path="*" render={() => <Redirect to="/"/> } />
-            </Switch>
+            <LocationListener doNetworkConnect={this.doNetworkConnect}>
+              <Switch>
+                <Route exact={true} path="/" render={() => <LandingPage />} />
+                <Route exact={true} path="/lend" render={() => <LendPage isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} />} />
+                <Route exact={true} path="/trade" render={() => <TradePage isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} />} />
+                <Route exact={true} path="/stats" render={() => <StatsPage isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} />} />
+                <Route path="*" render={() => <Redirect to="/"/> } />
+              </Switch>
+            </LocationListener>
           </HashRouter>
         </div>
       </React.Fragment>

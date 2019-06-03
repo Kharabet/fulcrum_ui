@@ -81,7 +81,7 @@ export class OwnTokenGrid extends Component<IOwnTokenGridProps, IOwnTokenGridSta
 
     const pTokens = await FulcrumProvider.Instance.getPTokensAvailable();
     for (const pToken of pTokens) {
-      const balance = await FulcrumProvider.Instance.getPTokenBalance(pToken);
+      const balance = await FulcrumProvider.Instance.getPTokenBalanceOfUser(pToken);
 
       if (balance.gt(0)) {
         rowsData.push({
