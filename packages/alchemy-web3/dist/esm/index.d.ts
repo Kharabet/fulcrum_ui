@@ -54,12 +54,13 @@ export interface TokenMetadataResponse {
 export declare type Web3Callback<T> = (error: Error | null, result?: T) => void;
 export declare function createAlchemyWeb3(alchemyUrl: string, config: AlchemyWeb3Config): AlchemyWeb3;
 export declare class AlchemySubprovider extends Subprovider {
-    private readonly alchemyRpcUrl;
+    private readonly alchemyUrl;
     private readonly config;
+    readonly alchemy: AlchemyMethods;
     /**
      * Instantiates a new AlchemySubprovider
      */
-    constructor(alchemyRpcUrl: string, config: AlchemyWeb3Config);
+    constructor(alchemyUrl: string, config: AlchemyWeb3Config);
     /**
      * This method conforms to the web3-provider-engine interface.
      * It is called internally by the ProviderEngine when it is this subproviders

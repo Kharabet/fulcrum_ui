@@ -168,22 +168,22 @@ export function createAlchemyWeb3(
 }
 
 export class AlchemySubprovider extends Subprovider {
-  private readonly alchemyRpcUrl: string;
+  private readonly alchemyUrl: string;
   private readonly config: AlchemyWeb3Config;
-  //public readonly alchemy: AlchemyMethods;
+  public readonly alchemy: AlchemyMethods;
 
   /**
    * Instantiates a new AlchemySubprovider
    */
-  constructor(alchemyRpcUrl: string, config: AlchemyWeb3Config) {
+  constructor(alchemyUrl: string, config: AlchemyWeb3Config) {
     super();
 
-    this.alchemyRpcUrl = alchemyRpcUrl;
+    this.alchemyUrl = alchemyUrl;
     this.config = fillInConfigDefaults(config);
-    /*this.alchemy = {
+    this.alchemy = {
       getTokenAllowance: (params: TokenAllowanceParams, callback) =>
         callAlchemyMethod({
-          "123",
+          alchemyUrl,
           callback,
           params: [params],
           method: "alchemy_getTokenAllowance",
@@ -191,7 +191,7 @@ export class AlchemySubprovider extends Subprovider {
         }),
       getTokenBalances: (address, contractAddresses, callback) =>
         callAlchemyMethod({
-          alchemyRpcUrl,
+          alchemyUrl,
           callback,
           method: "alchemy_getTokenBalances",
           params: [address, contractAddresses],
@@ -200,13 +200,13 @@ export class AlchemySubprovider extends Subprovider {
         }),
       getTokenMetadata: (address, callback) =>
         callAlchemyMethod({
-          alchemyRpcUrl,
+          alchemyUrl,
           callback,
           params: [address],
           method: "alchemy_getTokenMetadata",
           config: this.config as FullConfig,
         }),
-    };*/
+    };
   }
 
   /**
@@ -226,7 +226,7 @@ export class AlchemySubprovider extends Subprovider {
       try {
         const data = await sendToAlchemyWithRetries(
           payload,
-          this.alchemyRpcUrl,
+          this.alchemyUrl,
           this.config as FullConfig,
         );
         if (data.error) {

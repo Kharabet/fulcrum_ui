@@ -134,10 +134,40 @@ var AlchemySubprovider = /** @class */ (function (_super) {
     /**
      * Instantiates a new AlchemySubprovider
      */
-    function AlchemySubprovider(alchemyRpcUrl, config) {
+    function AlchemySubprovider(alchemyUrl, config) {
         var _this = _super.call(this) || this;
-        _this.alchemyRpcUrl = alchemyRpcUrl;
+        _this.alchemyUrl = alchemyUrl;
         _this.config = fillInConfigDefaults(config);
+        _this.alchemy = {
+            getTokenAllowance: function (params, callback) {
+                return callAlchemyMethod({
+                    alchemyUrl: alchemyUrl,
+                    callback: callback,
+                    params: [params],
+                    method: "alchemy_getTokenAllowance",
+                    config: _this.config,
+                });
+            },
+            getTokenBalances: function (address, contractAddresses, callback) {
+                return callAlchemyMethod({
+                    alchemyUrl: alchemyUrl,
+                    callback: callback,
+                    method: "alchemy_getTokenBalances",
+                    params: [address, contractAddresses],
+                    processResponse: processTokenBalanceResponse,
+                    config: _this.config,
+                });
+            },
+            getTokenMetadata: function (address, callback) {
+                return callAlchemyMethod({
+                    alchemyUrl: alchemyUrl,
+                    callback: callback,
+                    params: [address],
+                    method: "alchemy_getTokenMetadata",
+                    config: _this.config,
+                });
+            },
+        };
         return _this;
     }
     /**
@@ -158,7 +188,7 @@ var AlchemySubprovider = /** @class */ (function (_super) {
                         _a.label = 1;
                     case 1:
                         _a.trys.push([1, 3, , 4]);
-                        return [4 /*yield*/, sendToAlchemyWithRetries(payload, this.alchemyRpcUrl, this.config)];
+                        return [4 /*yield*/, sendToAlchemyWithRetries(payload, this.alchemyUrl, this.config)];
                     case 2:
                         data = _a.sent();
                         if (data.error) {
