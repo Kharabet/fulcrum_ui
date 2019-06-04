@@ -13,6 +13,16 @@ import { FulcrumProvider } from "../services/FulcrumProvider";
 import { LocationListener } from "./LocationListener";
 import { ProgressFragment } from "./ProgressFragment";
 import { ProviderMenu } from "./ProviderMenu";
+import ReactGA from "react-ga";
+import configProviders from "../config/providers.json";
+
+const isMainnetProd = 
+  process.env.NODE_ENV && process.env.NODE_ENV !== "development"
+  && process.env.REACT_APP_ETH_NETWORK === "mainnet";
+
+if (isMainnetProd) {
+  ReactGA.initialize(configProviders.Google_TrackingID);
+}
 
 interface IAppRouterState {
   isProviderMenuModalOpen: boolean;
@@ -72,6 +82,13 @@ export class AppRouter extends Component<any, IAppRouterState> {
                 <Route exact={true} path="/stats" render={() => <StatsPage isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} />} />
                 <Route path="*" render={() => <Redirect to="/"/> } />
               </Switch>
+              {isMainnetProd ? (
+                <Route path="/" render={({location}) => {
+                  ReactGA.ga('set', 'page', location.pathname + location.search);
+                  ReactGA.ga('send', 'pageview');
+                  return null;
+                }} />
+              ) : ``}
             </LocationListener>
           </HashRouter>
         </div>

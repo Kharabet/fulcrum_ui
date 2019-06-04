@@ -28,6 +28,7 @@
     "react": "^16.8.3",
     "react-compound-slider": "^2.0.0",
     "react-dom": "^16.8.3",
+    "react-ga": "^2.5.7",
     "react-modal": "^3.8.1",
     "react-router": "^4.3.1",
     "react-router-dom": "^4.3.1",
