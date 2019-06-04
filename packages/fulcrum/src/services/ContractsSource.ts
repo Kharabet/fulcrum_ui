@@ -55,7 +55,7 @@ export class ContractsSource {
       const TokenList = (await import("../assets/artifacts/mainnet/tokenList.js")).TokenList;
 
       // tslint:disable:no-console
-      //console.log(`--- start of token list ---`);
+      // console.log(`--- start of token list ---`);
       TokenList.forEach((val: any, index: any) => {
         // tslint:disable:no-console
         // console.log(e);
@@ -68,7 +68,7 @@ export class ContractsSource {
           index: new BigNumber(index)
         };
         // tslint:disable:no-console
-        //console.log(t);
+        // console.log(t);
 
         if (val[0] === "1") {
           this.iTokensContractInfos.set(val[4], t);
@@ -102,7 +102,7 @@ export class ContractsSource {
       // tslint:disable:no-console
       next.forEach(e => {
         // tslint:disable:no-console
-        //console.log(e);
+        // console.log(e);
         if (e.tokenType.eq(1)) {
           this.iTokensContractInfos.set(e.symbol, e);
         } else if (e.tokenType.eq(2)) {
@@ -201,7 +201,7 @@ export class ContractsSource {
   }
 
   public getPTokenAddresses(): string[] {
-    let result: string[] = [];
+    const result: string[] = [];
     this.pTokensContractInfos.forEach(e => {
       result.push(e.token);
     });

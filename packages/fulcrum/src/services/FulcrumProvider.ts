@@ -352,7 +352,7 @@ export class FulcrumProvider {
         let totalAssetSupply: BigNumber | null;
         let totalAssetBorrow: BigNumber | null;
         let supplyInterestRate: BigNumber | null;
-        let borrowInterestRate: BigNumber | null;
+        // let borrowInterestRate: BigNumber | null;
         let nextInterestRate: BigNumber | null;
 
         await Promise.all([
@@ -364,7 +364,7 @@ export class FulcrumProvider {
           (totalAssetSupply = await assetContract.totalAssetSupply.callAsync()),
           (totalAssetBorrow = await assetContract.totalAssetBorrow.callAsync()),
           (supplyInterestRate = await assetContract.supplyInterestRate.callAsync()),
-          //(borrowInterestRate = await assetContract.borrowInterestRate.callAsync()),
+          // (borrowInterestRate = await assetContract.borrowInterestRate.callAsync()),
           (nextInterestRate = await assetContract.nextLoanInterestRate.callAsync(new BigNumber("100000")))
         ]);
 
@@ -378,7 +378,7 @@ export class FulcrumProvider {
           totalAssetSupply.dividedBy(10 ** 18),
           totalAssetBorrow.dividedBy(10 ** 18),
           supplyInterestRate.dividedBy(10 ** 18),
-          new BigNumber(1),//borrowInterestRate.dividedBy(10 ** 18),
+          new BigNumber(1),// borrowInterestRate.dividedBy(10 ** 18),
           nextInterestRate.dividedBy(10 ** 18)
         );
       }
@@ -517,24 +517,24 @@ export class FulcrumProvider {
       const assetContract = await this.contractsSource.getPTokenContract(key);
       if (assetContract) {
         const tokenPrice = await assetContract.tokenPrice.callAsync();
-        //console.log(assetContract);
+        // console.log(assetContract);
         let amount = request.amount;
-        //console.log(amount.toString());
+        // console.log(amount.toString());
         if (request.tradeType === TradeType.SELL) {
           amount = amount.multipliedBy(tokenPrice).dividedBy(10 ** 18);
         }
-        //console.log(amount.toString());
+        // console.log(amount.toString());
         if (request.collateral !== key.loanAsset) {
           const swapPrice = await this.getSwapRate(request.collateral, key.loanAsset);
           amount = request.tradeType === TradeType.BUY
             ? amount.multipliedBy(swapPrice)
             : amount.dividedBy(swapPrice);
         }
-        //console.log(amount.toString());
+        // console.log(amount.toString());
         if (request.tradeType === TradeType.BUY) {
           amount = amount.multipliedBy(10 ** 18).dividedBy(tokenPrice);
         }
-        //console.log(amount.toString(), tokenPrice.toString());
+        // console.log(amount.toString(), tokenPrice.toString());
         result = amount;
       }
     }
@@ -628,6 +628,28 @@ export class FulcrumProvider {
       if (address) {
         result = await this.getErc20BalanceOfUser(address);
         result = result.multipliedBy(10 ** (18 - precision));
+      }
+    }
+
+    return result;
+  }
+
+  public async getITokenAssetBalanceOfUser(asset: Asset): Promise<BigNumber> {
+    let result = new BigNumber(0);
+
+    if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
+      const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+
+      if (account) {
+        const assetContract = await this.contractsSource.getITokenContract(asset);
+        if (assetContract) {
+          const precision = AssetsDictionary.assets.get(asset)!.decimals || 18;
+          const swapPrice = await this.getSwapToUsdRate(asset);
+          result = await assetContract.assetBalanceOf.callAsync(account);
+          result = result
+            .multipliedBy(swapPrice)
+            .div(10 ** precision);
+        }
       }
     }
 

@@ -86,8 +86,9 @@ export class OwnTokenGrid extends Component<IOwnTokenGridProps, IOwnTokenGridSta
       const pTokenBalances = await FulcrumProvider.Instance.getErc20BalancesOfUser(pTokenAddreses);
       for (const pToken of pTokens) {
         const balance = pTokenBalances.get(pToken.erc20Address);
-        if (!balance)
+        if (!balance) {
           continue;
+        }
 
         rowsData.push({
           selectedKey: props.selectedKey,

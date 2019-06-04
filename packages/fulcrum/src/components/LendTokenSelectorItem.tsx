@@ -43,7 +43,7 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
     const assetDetails = AssetsDictionary.assets.get(this.props.asset);
     const interestRate = await FulcrumProvider.Instance.getLendTokenInterestRate(this.props.asset);
     const profit = await FulcrumProvider.Instance.getLendProfit(this.props.asset);
-    const balanceOfUser = await FulcrumProvider.Instance.getITokenBalanceOfUser(this.props.asset);
+    const balanceOfUser = await FulcrumProvider.Instance.getITokenAssetBalanceOfUser(this.props.asset);
 
     this.setState({ ...this.state, assetDetails: assetDetails || null, interestRate: interestRate, profit: profit, balanceOfUser: balanceOfUser });
   }
@@ -96,7 +96,9 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
             <img src={this.state.assetDetails.logoSvg} alt={this.state.assetDetails.displayName} />
           </div>
           {this.state.profit !== null ? (
-            <div className="token-selector-item__profit-container">
+            <div className="token-selector-item__profit-container" style={{ float: `right` }}>
+              <div className="token-selector-item__profit-title">Balance:</div>
+              <div title={`$${this.state.balanceOfUser.toFixed(18)}`} className="token-selector-item__profit-value" style={{ paddingBottom: `0.5625rem` }}>{`$${this.state.balanceOfUser.toFixed(2)}`}</div>
               <div className="token-selector-item__profit-title">Profit:</div>
               <div title={`$${this.state.profit.toFixed(18)}`} className="token-selector-item__profit-value">{`$${this.state.profit.toFixed(4)}`}</div>
             </div>

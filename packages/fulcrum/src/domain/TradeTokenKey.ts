@@ -1,6 +1,6 @@
+import { FulcrumProvider } from "../services/FulcrumProvider";
 import { Asset } from "./Asset";
 import { PositionType } from "./PositionType";
-import { FulcrumProvider } from "../services/FulcrumProvider";
 
 export class TradeTokenKey {
   public asset: Asset;

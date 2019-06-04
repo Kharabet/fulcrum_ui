@@ -78,15 +78,15 @@ export class ProgressFragment extends Component<any, IProgressFragmentState> {
   };
 
   public onAskToCloseProgressDlg = () => {
-    this.setState(p => ({ ...this.state, counterProgressDetails: this.state.counterProgressDetails - 1, isProgressDetailsModalOpen: p.counterProgressDetails == 1 ? false : p.isProgressDetailsModalOpen }));
+    this.setState(p => ({ ...this.state, counterProgressDetails: this.state.counterProgressDetails - 1, isProgressDetailsModalOpen: p.counterProgressDetails === 1 ? false : p.isProgressDetailsModalOpen }));
   };
 
   public onTasksQueueChanged = () => {
     const tasks = TasksQueue.Instance.getTasksList();
 
-    if (this.state.requestTasks.length == 0 && tasks.length > 0) {
+    if (this.state.requestTasks.length === 0 && tasks.length > 0) {
       this.scrollDownAndShift();
-    } else if (this.state.requestTasks.length > 0 && tasks.length == 0) {
+    } else if (this.state.requestTasks.length > 0 && tasks.length === 0) {
       this.scrollUpAndShift();
     }
 
