@@ -364,7 +364,7 @@ export class FulcrumProvider {
           (totalAssetSupply = await assetContract.totalAssetSupply.callAsync()),
           (totalAssetBorrow = await assetContract.totalAssetBorrow.callAsync()),
           (supplyInterestRate = await assetContract.supplyInterestRate.callAsync()),
-          (borrowInterestRate = await assetContract.borrowInterestRate.callAsync()),
+          //(borrowInterestRate = await assetContract.borrowInterestRate.callAsync()),
           (nextInterestRate = await assetContract.nextLoanInterestRate.callAsync(new BigNumber("100000")))
         ]);
 
@@ -378,7 +378,7 @@ export class FulcrumProvider {
           totalAssetSupply.dividedBy(10 ** 18),
           totalAssetBorrow.dividedBy(10 ** 18),
           supplyInterestRate.dividedBy(10 ** 18),
-          borrowInterestRate.dividedBy(10 ** 18),
+          new BigNumber(1),//borrowInterestRate.dividedBy(10 ** 18),
           nextInterestRate.dividedBy(10 ** 18)
         );
       }
@@ -517,20 +517,25 @@ export class FulcrumProvider {
       const assetContract = await this.contractsSource.getPTokenContract(key);
       if (assetContract) {
         const tokenPrice = await assetContract.tokenPrice.callAsync();
+        //console.log(assetContract);
         let amount = request.amount;
-
+        //console.log(amount.toString());
+        if (request.tradeType === TradeType.SELL) {
+          amount = amount.multipliedBy(tokenPrice).dividedBy(10 ** 18);
+        }
+        //console.log(amount.toString());
         if (request.collateral !== key.loanAsset) {
-          const precision = AssetsDictionary.assets.get(key.loanAsset)!.decimals || 18;
           const swapPrice = await this.getSwapRate(request.collateral, key.loanAsset);
           amount = request.tradeType === TradeType.BUY
             ? amount.multipliedBy(swapPrice)
             : amount.dividedBy(swapPrice);
         }
-
-        result =
-          request.tradeType === TradeType.BUY
-            ? amount.multipliedBy(10 ** 18).dividedBy(tokenPrice)
-            : amount.multipliedBy(tokenPrice).dividedBy(10 ** 18);
+        //console.log(amount.toString());
+        if (request.tradeType === TradeType.BUY) {
+          amount = amount.multipliedBy(10 ** 18).dividedBy(tokenPrice);
+        }
+        //console.log(amount.toString(), tokenPrice.toString());
+        result = amount;
       }
     }
 
@@ -556,61 +561,9 @@ export class FulcrumProvider {
   };
 
   public getTradeSlippageRate = async (request: TradeRequest): Promise<BigNumber> => {
-    const srcAsset = request.positionType === PositionType.SHORT ? request.asset : request.unitOfAccount;
-    const destAsset = request.positionType === PositionType.SHORT ? request.unitOfAccount : request.asset;
-    let srcAmount = request.amount;
-
-    let goodSrcAmount: BigNumber;
-    let srcDecimals: number;
-    let destDecimals: number;
-    let goodDestRate: BigNumber = new BigNumber(10**18);
-    let actualDestRate: BigNumber = new BigNumber(10**18);
-
-    if (0 && request.collateral !== srcAsset) {
-      srcDecimals = AssetsDictionary.assets.get(request.collateral)!.decimals || 18;
-      destDecimals = AssetsDictionary.assets.get(srcAsset)!.decimals || 18;
-      srcAmount = srcAmount.multipliedBy(10 ** srcDecimals);
-
-      goodSrcAmount = this.getGoodSourceAmountOfAsset(request.collateral);
-      actualDestRate = await this.getSwapRate(request.collateral, srcAsset, srcAmount);
-      if (goodSrcAmount <= srcAmount) {
-        goodDestRate = await this.getSwapRate(request.collateral, srcAsset, goodSrcAmount);
-      } else {
-        goodDestRate = actualDestRate;
-      }
-
-      srcAmount = srcAmount.multipliedBy(actualDestRate).div(10**(18-srcDecimals+destDecimals));
-    } else {
-      srcDecimals = AssetsDictionary.assets.get(srcAsset)!.decimals || 18;
-      srcAmount = srcAmount.multipliedBy(10 ** srcDecimals);
-    }
-
-    goodSrcAmount = this.getGoodSourceAmountOfAsset(srcAsset);
-    actualDestRate = actualDestRate.multipliedBy(await this.getSwapRate(srcAsset, destAsset, srcAmount));
-    // console.log(srcAsset.toString(), destAsset.toString(), srcAmount.toString(), goodSrcAmount.toString());
-    // console.log(`actualDestRate`,actualDestRate.toString());
-    if (goodSrcAmount <= srcAmount) {
-      goodDestRate = goodDestRate.multipliedBy(await this.getSwapRate(srcAsset, destAsset, goodSrcAmount));
-      // console.log(`goodDestRate 1`,goodDestRate.toString());
-    } else {
-      goodDestRate = goodDestRate.multipliedBy(actualDestRate).div(10**18);
-      // console.log(`goodDestRate 2`,goodDestRate.toString());
-    }
-    // console.log(actualDestRate.minus(goodDestRate).div(goodDestRate).toString());
-
-    return actualDestRate.minus(goodDestRate).div(goodDestRate).multipliedBy(100);
-
-/*
-    public id: number;
-    public tradeType: TradeType;
-    public asset: Asset;
-    public unitOfAccount: Asset;
-    public collateral: Asset;
-    public positionType: PositionType;
-    public leverage: number;
-    public amount: BigNumber;
-    public isTokenized: boolean;*/
-  };
+    const result = new BigNumber(0);
+    return result;
+  }
 
   public static async getWeb3ProviderSettings(networkId: number| null): Promise<IWeb3ProviderSettings> {
     // tslint:disable-next-line:one-variable-per-declaration
@@ -702,6 +655,12 @@ export class FulcrumProvider {
         : [];
   }
 
+  public getPTokenErc20AddressList(): string[] {
+    return this.contractsSource
+        ? this.contractsSource.getPTokenAddresses()
+        : [];
+  }
+
   public getPTokenErc20Address(key: TradeTokenKey): string | null {
     return this.contractsSource
       ? this.contractsSource.getPTokenErc20Address(key)
@@ -746,6 +705,22 @@ export class FulcrumProvider {
       }
     }
 
+    return result;
+  }
+
+  public async getErc20BalancesOfUser(addressesErc20: string[]): Promise<Map<string, BigNumber>> {
+    let result: Map<string, BigNumber> = new Map<string, BigNumber>();
+    if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
+      const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+      if (account) {
+        // @ts-ignore
+        const resp = await Web3ConnectionFactory.alchemyProvider!.alchemy!.getTokenBalances(account, addressesErc20);
+        if (resp) {
+          // @ts-ignore
+          result = resp.tokenBalances.filter(t => !t.error && t.tokenBalance !== "0").reduce((map, obj) => (map.set(obj.contractAddress, new BigNumber(obj.tokenBalance!)), map), new Map<string, BigNumber>());
+        }
+      }
+    }
     return result;
   }
 

@@ -1,5 +1,6 @@
 import { Asset } from "./Asset";
 import { PositionType } from "./PositionType";
+import { FulcrumProvider } from "../services/FulcrumProvider";
 
 export class TradeTokenKey {
   public asset: Asset;
@@ -8,6 +9,7 @@ export class TradeTokenKey {
   public positionType: PositionType;
   public leverage: number;
   public isTokenized: boolean;
+  public erc20Address: string = "";
 
   constructor(
     asset: Asset,
@@ -22,6 +24,8 @@ export class TradeTokenKey {
     this.positionType = positionType;
     this.leverage = leverage;
     this.isTokenized = isTokenized;
+
+    this.erc20Address = FulcrumProvider.Instance.contractsSource ? FulcrumProvider.Instance.contractsSource.getPTokenErc20Address(this) || "" : "";
   }
 
   public static empty(): TradeTokenKey {

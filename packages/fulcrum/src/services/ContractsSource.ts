@@ -9,9 +9,6 @@ import { kyberContract } from "../contracts/kyber";
 import { pTokenContract } from "../contracts/pTokenContract";
 import { TokenizedRegistryContract } from "../contracts/TokenizedRegistryContract";
 
-// TEMPORARY WORKAROUND: Not issuing TokenizedTegistry yet
-import { TokenList } from "../assets/artifacts/mainnet/tokenList.js";
-
 const ethNetwork = process.env.REACT_APP_ETH_NETWORK;
 
 interface ITokenContractInfo {
@@ -34,8 +31,7 @@ export class ContractsSource {
   private iTokenJson: any;
   private pTokenJson: any;
   private kyberJson: any;
-  // private TokenizedRegistryJson: any;
-  // private tokenList: any;
+  private TokenizedRegistryJson: any;
 
   public networkId: number;
   public canWrite: boolean;
@@ -53,87 +49,87 @@ export class ContractsSource {
     this.pTokenJson = await import(`./../assets/artifacts/${ethNetwork}/pToken.json`);
     this.kyberJson = await import(`./../assets/artifacts/${ethNetwork}/kyber.json`);
     
-
-    // console.log(TokenList);
     
-    // tslint:disable:no-console
-    //console.log(`--- start of token list ---`);
-    TokenList.forEach((val, index) => {
+    if (process.env.REACT_APP_ETH_NETWORK === "mainnet") {
+      // TEMPORARY WORKAROUND: Not using TokenizedRegistry yet
+      const TokenList = (await import("../assets/artifacts/mainnet/tokenList.js")).TokenList;
+
       // tslint:disable:no-console
-      // console.log(e);
-      const t = {
-        token: val[1],
-        asset: val[2],
-        name: val[3],
-        symbol: val[4],
-        tokenType: new BigNumber(val[0]),
-        index: new BigNumber(index)
-      };
+      //console.log(`--- start of token list ---`);
+      TokenList.forEach((val: any, index: any) => {
+        // tslint:disable:no-console
+        // console.log(e);
+        const t = {
+          token: val[1],
+          asset: val[2],
+          name: val[3],
+          symbol: val[4],
+          tokenType: new BigNumber(val[0]),
+          index: new BigNumber(index)
+        };
+        // tslint:disable:no-console
+        //console.log(t);
+
+        if (val[0] === "1") {
+          this.iTokensContractInfos.set(val[4], t);
+        } else if (val[0] === "2") {
+          this.pTokensContractInfos.set(val[4], t);
+        }
+      });
       // tslint:disable:no-console
-      //console.log(t);
-      
-      if (val[0] === "1") {
-        this.iTokensContractInfos.set(val[4], t);
-      } else if (val[0] === "2") {
-        this.pTokensContractInfos.set(val[4], t);
-      }
-    });
-    // tslint:disable:no-console
-    //console.log(`--- end of token list --- Count: ${TokenList.length}`);
+      console.log(`Loaded ${TokenList.length} Fulcrum tokens.`);
 
-    // tslint:disable:no-console
-    console.log(`Loaded ${TokenList.length} Fulcrum tokens.`)
+    } else {
+      this.TokenizedRegistryJson = await import(`./../assets/artifacts/${ethNetwork}/TokenizedRegistry.json`);
 
-/* 
-    this.TokenizedRegistryJson = await import(`./../assets/artifacts/${ethNetwork}/TokenizedRegistry.json`);
+      this.tokenizedRegistryContract = new TokenizedRegistryContract(
+        this.TokenizedRegistryJson.abi,
+        this.getTokenizedRegistryAddress().toLowerCase(),
+        this.provider
+      );
 
-    this.tokenizedRegistryContract = new TokenizedRegistryContract(
-      this.TokenizedRegistryJson.abi,
-      this.getTokenizedRegistryAddress().toLowerCase(),
-      this.provider
-    );
-
-    const step = 100;
-    const pos = 0;
-    let next: ITokenContractInfo[] = [];
-    // do {
-    next = await this.tokenizedRegistryContract.getTokens.callAsync(
-      new BigNumber(pos),
-      new BigNumber(step),
-      new BigNumber(0) // this loads all the tokens at once
-    );
-
-    // tslint:disable:no-console
-    console.log(`--- start of token list ---`);
-    next.forEach(e => {
-      // tslint:disable:no-console
-      console.log(e);
-      if (e.tokenType.eq(1)) {
-        this.iTokensContractInfos.set(e.symbol, e);
-      } else if (e.tokenType.eq(2)) {
-        this.pTokensContractInfos.set(e.symbol, e);
-      }
-    });
-    // tslint:disable:no-console
-    console.log(`--- end of token list ---`);
-    //  pos += step;
-    // } while (next.length > 0);
-*/
-    
-
-    /*pos = 0;
-    next = [];
-    do {
+      const step = 100;
+      const pos = 0;
+      let next: ITokenContractInfo[] = [];
+      // do {
+      let count = 0;
       next = await this.tokenizedRegistryContract.getTokens.callAsync(
         new BigNumber(pos),
         new BigNumber(step),
-        new BigNumber(2)
+        new BigNumber(0) // this loads all the tokens at once
       );
+
+      // tslint:disable:no-console
       next.forEach(e => {
-        this.pTokensContractInfos.set(e.symbol, e);
+        // tslint:disable:no-console
+        //console.log(e);
+        if (e.tokenType.eq(1)) {
+          this.iTokensContractInfos.set(e.symbol, e);
+        } else if (e.tokenType.eq(2)) {
+          this.pTokensContractInfos.set(e.symbol, e);
+        }
+        count++;
       });
-      pos += step;
-    } while (next.length > 0);*/
+      // tslint:disable:no-console
+      console.log(`Loaded ${count} Fulcrum tokens.`);
+
+      //  pos += step;
+      // } while (next.length > 0);
+
+      /*pos = 0;
+      next = [];
+      do {
+        next = await this.tokenizedRegistryContract.getTokens.callAsync(
+          new BigNumber(pos),
+          new BigNumber(step),
+          new BigNumber(2)
+        );
+        next.forEach(e => {
+          this.pTokensContractInfos.set(e.symbol, e);
+        });
+        pos += step;
+      } while (next.length > 0);*/
+    }
   }
 
   private getTokenizedRegistryAddress(): string {
@@ -201,6 +197,14 @@ export class ContractsSource {
       }
     });
 
+    return result;
+  }
+
+  public getPTokenAddresses(): string[] {
+    let result: string[] = [];
+    this.pTokensContractInfos.forEach(e => {
+      result.push(e.token);
+    });
     return result;
   }
 

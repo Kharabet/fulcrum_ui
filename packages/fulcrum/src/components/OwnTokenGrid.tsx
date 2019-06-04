@@ -79,11 +79,16 @@ export class OwnTokenGrid extends Component<IOwnTokenGridProps, IOwnTokenGridSta
   private static getRowsData = async (props: IOwnTokenGridProps): Promise<IOwnTokenGridRowProps[]> => {
     const rowsData: IOwnTokenGridRowProps[] = [];
 
-    const pTokens = await FulcrumProvider.Instance.getPTokensAvailable();
-    for (const pToken of pTokens) {
-      const balance = await FulcrumProvider.Instance.getPTokenBalanceOfUser(pToken);
+    if (FulcrumProvider.Instance.web3Wrapper && FulcrumProvider.Instance.contractsSource && FulcrumProvider.Instance.contractsSource.canWrite) {
+      const pTokens = FulcrumProvider.Instance.getPTokensAvailable();
 
-      if (balance.gt(0)) {
+      const pTokenAddreses: string[] = FulcrumProvider.Instance.getPTokenErc20AddressList();
+      const pTokenBalances = await FulcrumProvider.Instance.getErc20BalancesOfUser(pTokenAddreses);
+      for (const pToken of pTokens) {
+        const balance = pTokenBalances.get(pToken.erc20Address);
+        if (!balance)
+          continue;
+
         rowsData.push({
           selectedKey: props.selectedKey,
           currentKey: pToken,
