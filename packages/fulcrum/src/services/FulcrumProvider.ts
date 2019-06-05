@@ -52,7 +52,7 @@ export class FulcrumProvider {
 
   public readonly gasLimit = "3000000";
   // gasPrice equal to 6 gwei
-  public readonly gasPrice = new BigNumber(6).multipliedBy(10 ** 9);
+  public readonly gasPrice = new BigNumber(8).multipliedBy(10 ** 9);
   // gasBufferCoeff equal 110% gas reserve
   public readonly gasBufferCoeff = new BigNumber("1.1");
   // 5000ms

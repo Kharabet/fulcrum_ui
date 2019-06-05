@@ -41,8 +41,6 @@ export class LendEthProcessor {
       gasAmountBN = new BigNumber(gasAmount).multipliedBy(FulcrumProvider.Instance.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
     }
 
-    const gasCost = gasAmountBN.multipliedBy(FulcrumProvider.Instance.gasPrice).integerValue(BigNumber.ROUND_UP);
-
     let txHash: string = "";
     try {
       FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.AskToOpenProgressDlg);
@@ -51,7 +49,8 @@ export class LendEthProcessor {
       txHash = await tokenContract.mintWithEther.sendTransactionAsync(account, {
         from: account,
         value: amountInBaseUnits,
-        gas: gasAmountBN.toString()
+        gas: gasAmountBN.toString(),
+        gasPrice: FulcrumProvider.Instance.gasPrice
       });
       task.setTxHash(txHash);
     }

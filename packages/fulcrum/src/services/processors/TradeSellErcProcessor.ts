@@ -68,7 +68,11 @@ export class TradeSellErcProcessor {
           account,
           assetErc20Address,
           amountInBaseUnits,
-          { from: account, gas: gasAmountBN.toString() }
+          { 
+            from: account,
+            gas: gasAmountBN.toString(),
+            gasPrice: FulcrumProvider.Instance.gasPrice
+          }
         );
         task.setTxHash(txHash);
       }

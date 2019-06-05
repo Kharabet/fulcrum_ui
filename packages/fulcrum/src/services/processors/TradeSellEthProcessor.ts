@@ -57,7 +57,8 @@ export class TradeSellEthProcessor {
       // Closing trade
       txHash = await tokenContract.burnToEther.sendTransactionAsync(account, amountInBaseUnits, {
         from: account,
-        gas: gasAmountBN.toString()
+        gas: gasAmountBN.toString(),
+        gasPrice: FulcrumProvider.Instance.gasPrice
       });
       task.setTxHash(txHash);
     }

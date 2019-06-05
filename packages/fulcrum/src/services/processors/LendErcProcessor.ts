@@ -73,7 +73,11 @@ export class LendErcProcessor {
       }
 
       // Submitting loan
-      txHash = await tokenContract.mint.sendTransactionAsync(account, amountInBaseUnits, { from: account, gas: gasAmountBN.toString() });
+      txHash = await tokenContract.mint.sendTransactionAsync(account, amountInBaseUnits, { 
+        from: account,
+        gas: gasAmountBN.toString(),
+        gasPrice: FulcrumProvider.Instance.gasPrice
+      });
       task.setTxHash(txHash);
     }
     finally {
