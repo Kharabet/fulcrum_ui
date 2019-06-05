@@ -47,7 +47,7 @@ export class AssetsDictionary {
         "#F9B134",
         new Map<number, string | null>([
           [1, "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599"],
-          [3, "0xb47f1a9b121ba114d5e98722a8948e274d0f4042"] // using SALT token instead
+          [3, "0x95cc8d8f29d0f7fcc425e8708893e759d1599c97"] // using ENG token instead
         ])
       )
     ],

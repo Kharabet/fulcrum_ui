@@ -162,6 +162,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       new BigNumber(0),
       this.state.tokenizeNeeded
     );
+
     const tradedAmountEstimate = await FulcrumProvider.Instance.getTradedAmountEstimate(tradeRequest);
     const slippageRate = await FulcrumProvider.Instance.getTradeSlippageRate(tradeRequest);
 

@@ -468,6 +468,11 @@ export class FulcrumProvider {
           const balance = await this.getAssetTokenBalanceOfUser(collateral);
 
           result = BigNumber.min(marketLiquidity, balance);
+
+          if (collateral === Asset.ETH) {
+            const gasBuffer = new BigNumber(5 * 10 ** 16); // 0.05 ETH
+            result = result.gt(gasBuffer) ? result.minus(gasBuffer) : new BigNumber(0);
+          }
         } else {
           result = new BigNumber(0);
         }
@@ -486,6 +491,11 @@ export class FulcrumProvider {
 
     if (request.lendType === LendType.LEND) {
       result = await this.getAssetTokenBalanceOfUser(request.asset);
+      if (request.asset === Asset.ETH) {
+        const gasBuffer = new BigNumber(10 ** 16); // 0.01 ETH
+
+        result = result.gt(gasBuffer) ? result.minus(gasBuffer) : new BigNumber(0);
+      }
     } else {
       result = await this.getITokenBalanceOfUser(request.asset);
       /*if (this.contractsSource) {
