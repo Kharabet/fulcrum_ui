@@ -1,7 +1,9 @@
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import React, { Component } from "react";
+import ReactGA from "react-ga";
 import Modal from "react-modal";
 import { HashRouter, Redirect, Route, Switch } from "react-router-dom";
+import configProviders from "../config/providers.json";
 import { ProviderType } from "../domain/ProviderType";
 import { LandingPage } from "../pages/LandingPage";
 import { LendPage } from "../pages/LendPage";
@@ -13,8 +15,6 @@ import { FulcrumProvider } from "../services/FulcrumProvider";
 import { LocationListener } from "./LocationListener";
 import { ProgressFragment } from "./ProgressFragment";
 import { ProviderMenu } from "./ProviderMenu";
-import ReactGA from "react-ga";
-import configProviders from "../config/providers.json";
 
 const isMainnetProd = 
   process.env.NODE_ENV && process.env.NODE_ENV !== "development"
