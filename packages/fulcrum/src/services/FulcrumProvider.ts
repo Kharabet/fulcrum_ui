@@ -20,6 +20,7 @@ import { TradeRequest } from "../domain/TradeRequest";
 import { TradeTokenKey } from "../domain/TradeTokenKey";
 import { TradeType } from "../domain/TradeType";
 import { Web3ConnectionFactory } from "../domain/Web3ConnectionFactory";
+import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { ContractsSource } from "./ContractsSource";
 import { FulcrumProviderEvents } from "./events/FulcrumProviderEvents";
 import { LendTransactionMinedEvent } from "./events/LendTransactionMinedEvent";
@@ -81,27 +82,40 @@ export class FulcrumProvider {
     this.eventEmitter.setMaxListeners(1000);
     TasksQueue.Instance.on(TasksQueueEvents.Enqueued, this.onTaskEnqueued);
 
-    // setting up readonly provider
-    Web3ConnectionFactory.getWeb3Provider(null, this.eventEmitter).then((providerData) => {
-      // @ts-ignore
-      const web3Wrapper = providerData[0];
-      FulcrumProvider.getWeb3ProviderSettings(providerData[3]).then((web3ProviderSettings) => {
-        if (web3Wrapper && web3ProviderSettings) {
-          const contractsSource = new ContractsSource(providerData[1], web3ProviderSettings.networkId, providerData[2]);
-          contractsSource.Init().then(() => {
-            this.web3Wrapper = web3Wrapper;
-            this.providerEngine = providerData[1];
-            this.web3ProviderSettings = web3ProviderSettings;
-            this.contractsSource = contractsSource;
-            this.eventEmitter.emit(FulcrumProviderEvents.ProviderAvailable);
-          });
-        }
-      });
-    });
+    const storedProvider: any = localStorage.getItem('providerType') || "";
+    const providerType: ProviderType | null = ProviderType[storedProvider] as ProviderType || null;
 
     // singleton
     if (!FulcrumProvider.Instance) {
       FulcrumProvider.Instance = this;
+    }
+
+    if (providerType) {
+      FulcrumProvider.Instance.setWeb3Provider(providerType).then(() => {
+        this.eventEmitter.emit(FulcrumProviderEvents.ProviderAvailable);
+        FulcrumProvider.Instance.eventEmitter.emit(
+          FulcrumProviderEvents.ProviderChanged,
+          new ProviderChangedEvent(FulcrumProvider.Instance.providerType, FulcrumProvider.Instance.web3Wrapper)
+        );
+      });
+    } else {
+      // setting up readonly provider
+      Web3ConnectionFactory.getWeb3Provider(null, this.eventEmitter).then((providerData) => {
+        // @ts-ignore
+        const web3Wrapper = providerData[0];
+        FulcrumProvider.getWeb3ProviderSettings(providerData[3]).then((web3ProviderSettings) => {
+          if (web3Wrapper && web3ProviderSettings) {
+            const contractsSource = new ContractsSource(providerData[1], web3ProviderSettings.networkId, providerData[2]);
+            contractsSource.Init().then(() => {
+              this.web3Wrapper = web3Wrapper;
+              this.providerEngine = providerData[1];
+              this.web3ProviderSettings = web3ProviderSettings;
+              this.contractsSource = contractsSource;
+              this.eventEmitter.emit(FulcrumProviderEvents.ProviderAvailable);
+            });
+          }
+        });
+      });
     }
 
     return FulcrumProvider.Instance;
@@ -112,7 +126,7 @@ export class FulcrumProvider {
     await this.setWeb3ProviderFinalize(providerType, await Web3ConnectionFactory.getWeb3Provider(providerType, this.eventEmitter));
   }
 
-  public async setWeb3ProviderFinalize(providerType: ProviderType, providerData: [Web3Wrapper | null, Web3ProviderEngine | null, boolean, number]) {
+  public async setWeb3ProviderFinalize(providerType: ProviderType, providerData: [Web3Wrapper | null, Web3ProviderEngine | null, boolean, number]) { // : Promise<boolean> {
     this.web3Wrapper = providerData[0];
     this.providerEngine = providerData[1];
     let canWrite = providerData[2];
@@ -134,17 +148,21 @@ export class FulcrumProvider {
       this.accounts = await this.web3Wrapper.getAvailableAddressesAsync();
     } else {
       // this.accounts = [];
-      if (providerType === ProviderType.Bitski) {
+      if (providerType === ProviderType.Bitski && networkId !== 1) {
         this.unsupportedNetwork = true;
       }
     }
 
     if (this.web3Wrapper && this.web3ProviderSettings.networkId > 0) {
       this.contractsSource = await new ContractsSource(this.providerEngine, this.web3ProviderSettings.networkId, canWrite);
-      this.providerType = providerType;
+      if (canWrite) {
+        this.providerType = providerType;
+      } else {
+        this.providerType = ProviderType.None;
+      }
+      localStorage.setItem('providerType', providerType);
     } else {
       this.contractsSource = null;
-      // this.providerType = ProviderType.None;
     }
 
     if (this.contractsSource) {

@@ -90,6 +90,10 @@ export class TasksListItemDetails extends Component<ITasksListItemDetailsProps> 
           forceRetry = true;
         } else if (errorMsg.includes("Reverted by EVM")) {
           errorMsg = "The transaction failed. Etherscan link:";
+        } else if (errorMsg.includes("MetaMask Tx Signature: User denied transaction signature.")) {
+          errorMsg = "You didn't confirm in MetaMask. Please try again.";
+        } else if (errorMsg.includes("User denied account authorization.")) {
+          errorMsg = "You didn't authorize MetaMask. Please try again.";
         } else {
           errorMsg = "";
         }

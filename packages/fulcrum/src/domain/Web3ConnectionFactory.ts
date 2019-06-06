@@ -159,7 +159,10 @@ export class Web3ConnectionFactory {
     // @ts-ignore
     if (window.ethereum) {
       // @ts-ignore
-      await window.ethereum.enable();
+      const account = await window.ethereum.enable();
+      if (!account) {
+        return null;
+      }
       // @ts-ignore
       return window.ethereum;
     } else {

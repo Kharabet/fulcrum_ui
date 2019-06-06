@@ -22,7 +22,7 @@ export class ProviderMenu extends Component<IProviderMenuProps> {
 
     return (
       <div className="provider-menu">
-        <div className="provider-menu__title">Select provider</div>
+        <div className="provider-menu__title">Select Wallet Provider</div>
         <ul className="provider-menu__list">{listItems}</ul>
       </div>
     );

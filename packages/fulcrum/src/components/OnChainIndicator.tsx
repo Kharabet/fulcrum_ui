@@ -2,6 +2,8 @@ import React, { Component } from "react";
 import { ProviderType } from "../domain/ProviderType";
 import { ProviderTypeDetails } from "../domain/ProviderTypeDetails";
 import { ProviderTypeDictionary } from "../domain/ProviderTypeDictionary";
+import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
+import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
 
 export interface IOnChainIndicatorProps {
@@ -9,21 +11,77 @@ export interface IOnChainIndicatorProps {
 }
 
 interface IOnChainIndicatorState {
+  isLoading: boolean
+  isSupportedNetwork: boolean
+  etherscanURL: string
+  accountText: string
+  providerTypeDetails: ProviderTypeDetails | null
 }
 
 export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChainIndicatorState> {
   constructor(props: IOnChainIndicatorProps) {
     super(props);
+
+    this.state = {
+      isLoading: false,
+      isSupportedNetwork: true,
+      etherscanURL: "",
+      accountText: "",
+      providerTypeDetails: null
+    };
+
+    FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderIsChanging, this.onProviderIsChanging);
+    FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
+  }
+
+  private onProviderIsChanging = async () => {
+    await this.derivedUpdate();
+  };
+
+  private onProviderChanged = async (event: ProviderChangedEvent) => {
+    await this.derivedUpdate();
+  };
+
+  public async componentDidMount() {
+    await this.derivedUpdate();
+  }
+
+  public componentWillUnmount(): void {
+    FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderIsChanging, this.onProviderIsChanging);
+    FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
+  }
+
+  private async derivedUpdate() {
+    const accountText = FulcrumProvider.Instance.accounts.length > 0 && FulcrumProvider.Instance.accounts[0] ? 
+      FulcrumProvider.Instance.accounts[0].toLowerCase() :
+      "";
+
+    let providerTypeDetails = null;
+    if (accountText && FulcrumProvider.Instance.providerType !== ProviderType.None) {
+      providerTypeDetails = ProviderTypeDictionary.providerTypes.get(FulcrumProvider.Instance.providerType);
+    }
+
+    const isLoading = FulcrumProvider.Instance.isLoading;
+    const isSupportedNetwork = !FulcrumProvider.Instance.unsupportedNetwork;
+    const etherscanURL = FulcrumProvider.Instance.web3ProviderSettings? FulcrumProvider.Instance.web3ProviderSettings.etherscanURL : "";
+
+    this.setState({
+      ...this.state,
+      isLoading,
+      isSupportedNetwork,
+      etherscanURL,
+      accountText,
+      providerTypeDetails: providerTypeDetails || null,
+    });
   }
 
   public render() {
-    const providerTypeDetails = FulcrumProvider.Instance.providerType !== ProviderType.None ? 
-      ProviderTypeDictionary.providerTypes.get(FulcrumProvider.Instance.providerType) || null :
-      null;
-
-    const accountText = FulcrumProvider.Instance.accounts.length > 0 && FulcrumProvider.Instance.accounts[0] ? 
-      FulcrumProvider.Instance.accounts[0].toLowerCase() :
-      null;
+    const { 
+      isLoading,
+      isSupportedNetwork,
+      etherscanURL,
+      providerTypeDetails,
+      accountText } = this.state;
 
     let walletAddressText: string;
     if (FulcrumProvider.Instance.unsupportedNetwork) {
@@ -34,12 +92,8 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
           accountText.length
         )}`;
     } else {
-      walletAddressText = "...";
+      walletAddressText = "";// "...";
     }
-
-    const isLoading = FulcrumProvider.Instance.isLoading;
-    const isSupportedNetwork = !FulcrumProvider.Instance.unsupportedNetwork;
-    const etherscanURL = FulcrumProvider.Instance.web3ProviderSettings? FulcrumProvider.Instance.web3ProviderSettings.etherscanURL : null;
 
     return (
       <div className="on-chain-indicator">
@@ -67,11 +121,11 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
       return (
         <React.Fragment>
           <span className="on-chain-indicator__provider-txt" onClick={this.props.doNetworkConnect}>
-            Loading...
+            Loading Provider...
           </span>
-          <span className="on-chain-indicator__wallet-address" onClick={this.props.doNetworkConnect}>
+          {/*<span className="on-chain-indicator__wallet-address" onClick={this.props.doNetworkConnect}>
             ...
-          </span>
+          </span>*/}
         </React.Fragment>
       );
     } else {
@@ -84,7 +138,7 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
               alt={providerTypeDetails.displayName}
               onClick={this.props.doNetworkConnect}
             />
-            {isSupportedNetwork && accountText && etherscanURL ? (
+            {walletAddressText ? isSupportedNetwork && accountText && etherscanURL ? (
               <a
                 className="on-chain-indicator__wallet-address"
                 href={`${etherscanURL}address/${accountText}`}
@@ -97,18 +151,18 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
               <span className="on-chain-indicator__wallet-address" onClick={this.props.doNetworkConnect}>
                 {walletAddressText}
               </span>
-            )}
+            ) : ``}
           </React.Fragment>
         );
       } else {
         return (
           <React.Fragment>
             <span className="on-chain-indicator__provider-txt" onClick={this.props.doNetworkConnect}>
-              Click To Connect
+              Click To Connect Wallet
             </span>
-            <span className="on-chain-indicator__wallet-address" onClick={this.props.doNetworkConnect}>
+            {/*<span className="on-chain-indicator__wallet-address" onClick={this.props.doNetworkConnect}>
               ...
-            </span>
+            </span>*/}
           </React.Fragment>
         );
       }

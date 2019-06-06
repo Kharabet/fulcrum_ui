@@ -52,6 +52,10 @@ export class ProgressBar extends Component<IProgressBarProps> {
           forceRetry = true;
         } else if (errorMsg.includes("Reverted by EVM")) {
           errorMsg = "The transaction failed. Click View More for details.";
+        } else if (errorMsg.includes("MetaMask Tx Signature: User denied transaction signature.")) {
+          errorMsg = "You didn't confirm in MetaMask. Please try again.";
+        } else if (errorMsg.includes("User denied account authorization.")) {
+          errorMsg = "You didn't authorize MetaMask. Please try again.";
         } else {
           errorMsg = "";
         }

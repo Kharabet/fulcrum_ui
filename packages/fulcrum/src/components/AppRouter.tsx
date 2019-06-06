@@ -101,8 +101,11 @@ export class AppRouter extends Component<any, IAppRouterState> {
   };
 
   public onProviderTypeSelect = async (providerType: ProviderType) => {
-    if (providerType !== FulcrumProvider.Instance.providerType) {
+    if (providerType !== FulcrumProvider.Instance.providerType ||
+      providerType !== ProviderType.None && FulcrumProvider.Instance.accounts.length === 0 || !FulcrumProvider.Instance.accounts[0]) {
       FulcrumProvider.Instance.isLoading = true;
+
+      await FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.ProviderIsChanging);
 
       this.setState({
         ...this.state,

@@ -75,7 +75,7 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
   }
 
   public componentDidMount(): void {
-    if (!FulcrumProvider.Instance.web3Wrapper) {
+    if (!FulcrumProvider.Instance.web3Wrapper && (!localStorage.getItem('providerType') || localStorage.getItem('providerType') === "None")) {
       this.props.doNetworkConnect();
     }
   }
