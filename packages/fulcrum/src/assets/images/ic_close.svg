@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <defs>
+        <style>
+            .cls-1{fill:#fff}.cls-2{fill:none}
+        </style>
+    </defs>
+    <g id="ic_close" transform="translate(-304 -32)">
+        <g id="Group_361" data-name="Group 361" transform="translate(0 -8)">
+            <path id="Rectangle_380" d="M0 0h20v2H0z" class="cls-1" data-name="Rectangle 380" transform="rotate(45 101.437 395.875)"/>
+            <path id="Rectangle_383" d="M0 0h20v2H0z" class="cls-1" data-name="Rectangle 383" transform="rotate(-45 224.563 -342.875)"/>
+        </g>
+        <path id="Rectangle_423" d="M0 0h24v24H0z" class="cls-2" data-name="Rectangle 423" transform="translate(304 32)"/>
+    </g>
+</svg>

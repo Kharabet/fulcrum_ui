@@ -1,12 +1,21 @@
-.header-menu {
-  display: inline-block;
+.header-menu-toggle {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+
   height: 100%;
+  width: 1.75rem;
+  line-height: 3rem;
+
+  cursor: pointer;
+}
+
+.header-menu {
+  display: flex;
+  flex-direction: row;
 }
 
 .header-menu__item {
-  display: inline-block;
-
-  height: 100%;
   width: 5.5rem;
 
   a {

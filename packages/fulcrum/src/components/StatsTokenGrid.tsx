@@ -78,7 +78,7 @@ export class StatsTokenGrid extends Component<IStatsTokenGridProps, IStatsTokenG
   };
 
   private onMediaQueryListChange = (event: MediaQueryListEvent) => {
-    const matches = this.mediaQueryList.matches;
+    const matches = event.matches;
 
     if (matches !== this.state.isMobileMedia) {
       this.setState({ ...this.state, isMobileMedia: matches });

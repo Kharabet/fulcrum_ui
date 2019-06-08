@@ -11,11 +11,11 @@ export interface IOnChainIndicatorProps {
 }
 
 interface IOnChainIndicatorState {
-  isLoading: boolean
-  isSupportedNetwork: boolean
-  etherscanURL: string
-  accountText: string
-  providerTypeDetails: ProviderTypeDetails | null
+  isLoading: boolean;
+  isSupportedNetwork: boolean;
+  etherscanURL: string;
+  accountText: string;
+  providerTypeDetails: ProviderTypeDetails | null;
 }
 
 export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChainIndicatorState> {
@@ -52,9 +52,10 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
   }
 
   private async derivedUpdate() {
-    const accountText = FulcrumProvider.Instance.accounts.length > 0 && FulcrumProvider.Instance.accounts[0] ? 
-      FulcrumProvider.Instance.accounts[0].toLowerCase() :
-      "";
+    const accountText =
+      FulcrumProvider.Instance.accounts.length > 0 && FulcrumProvider.Instance.accounts[0]
+        ? FulcrumProvider.Instance.accounts[0].toLowerCase()
+        : "";
 
     let providerTypeDetails = null;
     if (accountText && FulcrumProvider.Instance.providerType !== ProviderType.None) {
@@ -63,7 +64,9 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
 
     const isLoading = FulcrumProvider.Instance.isLoading;
     const isSupportedNetwork = !FulcrumProvider.Instance.unsupportedNetwork;
-    const etherscanURL = FulcrumProvider.Instance.web3ProviderSettings? FulcrumProvider.Instance.web3ProviderSettings.etherscanURL : "";
+    const etherscanURL = FulcrumProvider.Instance.web3ProviderSettings
+      ? FulcrumProvider.Instance.web3ProviderSettings.etherscanURL
+      : "";
 
     this.setState({
       ...this.state,
@@ -71,12 +74,12 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
       isSupportedNetwork,
       etherscanURL,
       accountText,
-      providerTypeDetails: providerTypeDetails || null,
+      providerTypeDetails: providerTypeDetails || null
     });
   }
 
   public render() {
-    const { 
+    const {
       isLoading,
       isSupportedNetwork,
       etherscanURL,
@@ -87,12 +90,12 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
     if (FulcrumProvider.Instance.unsupportedNetwork) {
       walletAddressText = "Wrong Network!";
     } else if (accountText) {
-        walletAddressText = `${accountText.slice(0, 6)}...${accountText.slice(
-          accountText.length - 4,
-          accountText.length
-        )}`;
+      walletAddressText = `${accountText.slice(0, 6)}...${accountText.slice(
+        accountText.length - 4,
+        accountText.length
+      )}`;
     } else {
-      walletAddressText = "";// "...";
+      walletAddressText = ""; // "...";
     }
 
     return (
@@ -104,7 +107,8 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
             etherscanURL,
             providerTypeDetails,
             accountText,
-            walletAddressText)}
+            walletAddressText
+          )}
         </button>
       </div>
     );
@@ -116,7 +120,8 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
     etherscanURL: string | null,
     providerTypeDetails: ProviderTypeDetails | null,
     accountText: string | null,
-    walletAddressText: string) {
+    walletAddressText: string
+  ) {
     if (isLoading) {
       return (
         <React.Fragment>
@@ -138,20 +143,24 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
               alt={providerTypeDetails.displayName}
               onClick={this.props.doNetworkConnect}
             />
-            {walletAddressText ? isSupportedNetwork && accountText && etherscanURL ? (
-              <a
-                className="on-chain-indicator__wallet-address"
-                href={`${etherscanURL}address/${accountText}`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {walletAddressText}
-              </a>
+            {walletAddressText ? (
+              isSupportedNetwork && accountText && etherscanURL ? (
+                <a
+                  className="on-chain-indicator__wallet-address"
+                  href={`${etherscanURL}address/${accountText}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {walletAddressText}
+                </a>
+              ) : (
+                <span className="on-chain-indicator__wallet-address" onClick={this.props.doNetworkConnect}>
+                  {walletAddressText}
+                </span>
+              )
             ) : (
-              <span className="on-chain-indicator__wallet-address" onClick={this.props.doNetworkConnect}>
-                {walletAddressText}
-              </span>
-            ) : ``}
+              ``
+            )}
           </React.Fragment>
         );
       } else {

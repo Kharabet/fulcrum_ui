@@ -1,0 +1,27 @@
+@media screen and (max-width: $mobile-version-max-width) {
+
+  .header-menu {
+    flex-direction: column;
+    padding: 1.25rem 0 1.25rem 0;
+  }
+
+  .header-menu__item {
+    width: 100%;
+
+    a {
+      text-transform: none;
+
+      font-size: 1.5rem;
+      font-weight: 300;
+      font-style: normal;
+      font-stretch: normal;
+      line-height: 1;
+      letter-spacing: normal;
+      text-align: center;
+
+      .header-menu__item-link__accent-container {
+        display: none;
+      }
+    }
+  }
+}

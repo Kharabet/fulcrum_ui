@@ -21,6 +21,7 @@
 @import "components/leverage-selector";
 @import "components/manage-collateral-form";
 @import "components/on-chain-indicator";
+@import "components/on-chain-indicator.mobile";
 @import "components/ops-selector";
 @import "components/own-token-grid";
 @import "components/position-type-marker";
@@ -40,6 +41,7 @@
 @import "layout/header";
 @import "layout/header-logo";
 @import "layout/header-menu";
+@import "layout/header-menu.mobile";
 
 @import "pages/home-page";
 @import "pages/landing-page";
