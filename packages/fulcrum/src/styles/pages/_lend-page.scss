@@ -5,9 +5,9 @@
   justify-content: flex-start;
 
   height: 100%;
-  width: $page-max-width;
+  width: 100%;
+  max-width: $page-max-width;
   padding: $page-padding;
-  flex-shrink: 0;
 
   .lend-page-main {
     margin-top: 5rem;

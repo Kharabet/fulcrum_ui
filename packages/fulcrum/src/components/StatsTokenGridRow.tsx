@@ -7,8 +7,6 @@ import { ReserveDetails } from "../domain/ReserveDetails";
 import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
 import { FulcrumProvider } from "../services/FulcrumProvider";
 
-
-
 export interface IStatsTokenGridRowProps {
   asset: Asset;
 }
@@ -80,12 +78,6 @@ export class StatsTokenGridRow extends Component<IStatsTokenGridRowProps, IStats
     this.derivedUpdate();
   }
 
-  private numberWithCommas(numberStr: string): string {
-    var parts = numberStr.split(".");
-    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    return parts.join(".");
-  }
-
   /*public componentDidUpdate(
     prevProps: Readonly<IStatsTokenGridRowProps>,
     prevState: Readonly<IStatsTokenGridRowState>,
@@ -106,8 +98,8 @@ export class StatsTokenGridRow extends Component<IStatsTokenGridRowProps, IStats
 
     return (
       <div className="stats-grid-row">
-        {details.addressErc20 && 
-          FulcrumProvider.Instance.web3ProviderSettings && 
+        {details.addressErc20 &&
+          FulcrumProvider.Instance.web3ProviderSettings &&
           FulcrumProvider.Instance.web3ProviderSettings.etherscanURL ? (
           <a
             className="stats-grid-row__col-name"
@@ -122,14 +114,14 @@ export class StatsTokenGridRow extends Component<IStatsTokenGridRowProps, IStats
         ) : (
           <div className="stats-grid-row__col-name">{this.props.asset}</div>
         )}
-        <div title={this.state.usdSupply ? `${this.state.usdSupply.toFixed(18)}` : ``} className="stats-grid-row__col-total-supply-usd">{this.state.usdSupply ? `$${this.numberWithCommas(this.state.usdSupply.toFixed(4))}` : `-`}</div>
-        <div title={details.totalSupply ? `${details.totalSupply.toFixed(this.state.decimals)}` : ``} className="stats-grid-row__col-total-supply">{details.totalSupply ? `${this.numberWithCommas(details.totalSupply.toFixed(4))}` : `-`}</div>
-        <div title={details.totalBorrow ? `${details.totalBorrow.toFixed(this.state.decimals)}` : ``} className="stats-grid-row__col-total-borrow">{details.totalBorrow ? `${this.numberWithCommas(details.totalBorrow.toFixed(4))}` : `-`}</div>
-        <div title={details.liquidity ? `${details.liquidity.toFixed(this.state.decimals)}` : ``} className="stats-grid-row__col-liquidity">{details.liquidity ? `${this.numberWithCommas(details.liquidity.toFixed(4))}` : `-`}</div>
-        <div title={details.liquidityReserved ? `${details.liquidityReserved.toFixed(this.state.decimals)}` : ``} className="stats-grid-row__col-liquidity-reserved">{details.liquidityReserved ? `${this.numberWithCommas(details.liquidityReserved.toFixed(4))}` : `-`}</div>        
-        <div title={details.supplyInterestRate ? `${details.supplyInterestRate.toFixed(18)}` : ``} className="stats-grid-row__col-supply-rate">{details.supplyInterestRate ? `${details.supplyInterestRate.toFixed(4)}%` : `-`}</div>
-        <div title={details.borrowInterestRate ? `${details.borrowInterestRate.toFixed(18)}` : ``} className="stats-grid-row__col-borrow-rate">{details.borrowInterestRate ? `${details.borrowInterestRate.toFixed(4)}%` : `-`}</div>
-        {/*<div title={details.nextInterestRate ? `${details.nextInterestRate.toFixed(18)}` : ``} className="stats-grid-row__col-next-rate">{details.nextInterestRate ? `${details.nextInterestRate.toFixed(4)}%` : `-`}</div>*/}
+        <div title={this.state.usdSupply ? `$${this.state.usdSupply.toFixed(18)}` : ``} className="stats-grid-row__col-total-supply-usd">{this.state.usdSupply ? `$${this.state.usdSupply.toFixed(4)}` : `-`}</div>
+        <div title={details.totalSupply ? `${details.totalSupply.toFixed(this.state.decimals)}` : ``} className="stats-grid-row__col-total-supply">{details.totalSupply ? `${details.totalSupply.toFixed(4)}` : `-`}</div>
+        <div title={details.totalBorrow ? `${details.totalBorrow.toFixed(this.state.decimals)}` : ``} className="stats-grid-row__col-total-borrow">{details.totalBorrow ? `${details.totalBorrow.toFixed(4)}` : `-`}</div>
+        <div title={details.liquidity ? `${details.liquidity.toFixed(this.state.decimals)}` : ``} className="stats-grid-row__col-liquidity">{details.liquidity ? `${details.liquidity.toFixed(4)}` : `-`}</div>
+        <div title={details.liquidityReserved ? `${details.liquidityReserved.toFixed(this.state.decimals)}` : ``} className="stats-grid-row__col-liquidity-reserved">{details.liquidityReserved ? `${details.liquidityReserved.toFixed(4)}` : `-`}</div>
+        <div title={details.supplyInterestRate ? `${details.supplyInterestRate.toFixed(18)}%` : ``} className="stats-grid-row__col-supply-rate">{details.supplyInterestRate ? `${details.supplyInterestRate.toFixed(4)}%` : `-`}</div>
+        {/*<div title={details.borrowInterestRate ? `${details.borrowInterestRate.toFixed(18)}` : ``} className="stats-grid-row__col-borrow-rate">{details.borrowInterestRate ? `${details.borrowInterestRate.toFixed(4)}%` : `-`}</div>*/}
+        <div title={details.nextInterestRate ? `${details.nextInterestRate.toFixed(18)}%` : ``} className="stats-grid-row__col-next-rate">{details.nextInterestRate ? `${details.nextInterestRate.toFixed(4)}%` : `-`}</div>
       </div>
     );
   }

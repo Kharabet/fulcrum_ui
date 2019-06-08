@@ -87,29 +87,40 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
       return null;
     }
 
-    const noProfitInfoImageCss = this.state.profit === null ? "token-selector-item__image--full-width" : "";
-
     return (
       <div className="token-selector-item">
-        <div>
-          <div className={`token-selector-item__image ${noProfitInfoImageCss}`}>
-            <img src={this.state.assetDetails.logoSvg} alt={this.state.assetDetails.displayName} />
+        <div className={"token-selector-item__image"}>
+          <img src={this.state.assetDetails.logoSvg} alt={this.state.assetDetails.displayName} />
+        </div>
+        <div className="token-selector-item__descriptions">
+          <div className="token-selector-item__description">
+            <div className="token-selector-item__name">{this.state.assetDetails.displayName}</div>
+            <div className="token-selector-item__interest-rate-container">
+              <div className="token-selector-item__interest-rate-title">Interest rate:</div>
+              <div
+                title={`$${this.state.interestRate.toFixed(18)}%`}
+                className="token-selector-item__interest-rate-value"
+              >{`${this.state.interestRate.toFixed(4)}%`}</div>
+            </div>
           </div>
           {this.state.profit !== null ? (
-            <div className="token-selector-item__profit-container" style={{ float: `right` }}>
-              <div className="token-selector-item__profit-title">Balance:</div>
-              <div title={`$${this.state.balanceOfUser.toFixed(18)}`} className="token-selector-item__profit-value" style={{ paddingBottom: `0.5625rem` }}>{`$${this.state.balanceOfUser.toFixed(2)}`}</div>
-              <div className="token-selector-item__profit-title">Profit:</div>
-              <div title={`$${this.state.profit.toFixed(18)}`} className="token-selector-item__profit-value">{`$${this.state.profit.toFixed(4)}`}</div>
+            <div className="token-selector-item__description">
+              <div className="token-selector-item__profit-container">
+                <div className="token-selector-item__profit-title">Balance:</div>
+                <div
+                  title={`$${this.state.balanceOfUser.toFixed(18)}`}
+                  className="token-selector-item__profit-value"
+                >{`$${this.state.balanceOfUser.toFixed(2)}`}</div>
+              </div>
+              <div className="token-selector-item__profit-container">
+                <div className="token-selector-item__profit-title">Profit:</div>
+                <div
+                  title={`$${this.state.profit.toFixed(18)}`}
+                  className="token-selector-item__profit-value"
+                >{`$${this.state.profit.toFixed(4)}`}</div>
+              </div>
             </div>
           ) : null}
-        </div>
-        <div className="token-selector-item__description">
-          <div className="token-selector-item__name">{this.state.assetDetails.displayName}</div>
-          <div className="token-selector-item__interest-rate-container">
-            <div className="token-selector-item__interest-rate-title">Interest rate (APR):</div>
-            <div title={`${this.state.interestRate.toFixed(18)}%`} className="token-selector-item__interest-rate-value">{`${this.state.interestRate.toFixed(4)}%`}</div>
-          </div>
         </div>
         {this.renderActions(this.state.balanceOfUser.eq(0))}
       </div>
@@ -134,7 +145,10 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
         >
           Lend
         </button>
-        <button className="token-selector-item__un-lend-button" onClick={this.onUnLendClick}>
+        <button
+          className="token-selector-item__un-lend-button token-selector-item__lend-button--size-half"
+          onClick={this.onUnLendClick}
+        >
           UnLend
         </button>
       </div>

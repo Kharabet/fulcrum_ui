@@ -1,143 +1,155 @@
 .lend-token-selector {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
 
-}
+  justify-content: flex-start;
 
-.token-selector-item {
-  display: inline-block;
-  box-sizing: border-box;
+  .token-selector-item {
+    box-sizing: border-box;
 
-  height: 18.9375rem;
-  width: 18.9375rem;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
 
-  padding: 2.9rem;
-  margin: 0 1px 1px 0;
+    min-width: 18.9375rem;
 
-  background-color: #4F5B67;
-}
+    padding: 2rem;
+    margin: 0 1px 1px 0;
 
-.token-selector-item__image {
-  display: inline-block;
-  height: 4rem;
-  width: 50%;
-  margin-top: 0.75rem;
-  margin-bottom: 1rem;
-  text-align: left;
+    background-color: #4f5b67;
 
-  &--full-width {
-    width: 100%;
-    text-align: center;
+    .token-selector-item__image {
+      margin-top: 0.75rem;
+      margin-bottom: 1rem;
+
+      text-align: center;
+
+      img {
+        display: inline-block;
+        height: 4rem;
+        width: 4rem;
+      }
+    }
+
+    .token-selector-item__descriptions {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+
+      margin-bottom: 1.5rem;
+
+      .token-selector-item__name {
+        font-size: 2.25rem;
+        line-height: 2.5rem;
+        font-weight: 600;
+        font-style: normal;
+        font-stretch: normal;
+        letter-spacing: -0.9px;
+        text-align: left;
+        color: #ffffff;
+      }
+
+      .token-selector-item__profit-container {
+        display: flex;
+        flex-direction: column;
+
+        height: 2.5rem;
+
+        .token-selector-item__profit-title {
+          font-size: 0.75rem;
+          font-weight: normal;
+          font-style: normal;
+          font-stretch: normal;
+          letter-spacing: normal;
+          text-align: right;
+          color: #acb5c2;
+        }
+
+        .token-selector-item__profit-value {
+          font-size: 1rem;
+          font-weight: 600;
+          font-style: normal;
+          font-stretch: normal;
+          letter-spacing: -0.4px;
+          text-align: right;
+          color: #ffe546;
+        }
+      }
+
+      .token-selector-item__interest-rate-container {
+        display: flex;
+        flex-direction: column;
+
+        align-items: flex-start;
+
+        height: 2.5rem;
+
+        .token-selector-item__interest-rate-title {
+          font-size: 0.75rem;
+          font-weight: normal;
+          font-style: normal;
+          font-stretch: normal;
+          letter-spacing: normal;
+          text-align: right;
+          color: #acb5c2;
+        }
+
+        .token-selector-item__interest-rate-value {
+          font-size: 1rem;
+          font-weight: 600;
+          font-style: normal;
+          font-stretch: normal;
+          letter-spacing: -0.4px;
+          text-align: right;
+          color: #ffe546;
+        }
+      }
+    }
+
+    .token-selector-item__actions {
+      display: flex;
+      flex-direction: row;
+
+      margin-bottom: 1.5rem;
+
+      button {
+        display: block;
+        cursor: pointer;
+
+        border: 0;
+        height: 2.5rem;
+        border-radius: 100px;
+        color: #ffffff;
+
+        text-transform: uppercase;
+        outline: none;
+
+        &.token-selector-item__lend-button--size-full {
+          width: 100%;
+        }
+
+        &.token-selector-item__lend-button--size-half {
+          width: 45%;
+          margin: 0 5%;
+
+          &:first-child {
+            margin-left: 0;
+          }
+
+          &:last-child {
+            margin-right: 0;
+          }
+        }
+
+        &.token-selector-item__lend-button {
+          background-color: #69bf83;
+        }
+
+        &.token-selector-item__un-lend-button {
+          background-color: #ff5353;
+        }
+      }
+    }
   }
-
-  img {
-    display: inline-block;
-    height: 4rem;
-    width: 4rem;
-  }
-}
-
-.token-selector-item__description {
-  margin-bottom: 1.5rem;
-}
-
-.token-selector-item__name {
-  display: inline-block;
-  width: 50%;
-
-  font-size: 2.25rem;
-  font-weight: 600;
-  font-style: normal;
-  font-stretch: normal;
-  letter-spacing: -0.9px;
-  text-align: left;
-  color: #ffffff;
-}
-
-.token-selector-item__profit-container {
-  display: inline-block;
-  width: 50%;
-}
-
-.token-selector-item__profit-title {
-  font-size: .75rem;
-  font-weight: normal;
-  font-style: normal;
-  font-stretch: normal;
-  letter-spacing: normal;
-  text-align: right;
-  color: #acb5c2;
-}
-
-.token-selector-item__profit-value {
-  font-size: 1rem;
-  font-weight: 600;
-  font-style: normal;
-  font-stretch: normal;
-  letter-spacing: -0.4px;
-  text-align: right;
-  color: #ffe546;
-}
-
-.token-selector-item__interest-rate-container {
-  display: inline-block;
-  width: 50%;
-}
-
-.token-selector-item__interest-rate-title {
-  font-size: .75rem;
-  font-weight: normal;
-  font-style: normal;
-  font-stretch: normal;
-  letter-spacing: normal;
-  text-align: right;
-  color: #acb5c2;
-}
-
-.token-selector-item__interest-rate-value {
-  font-size: 1rem;
-  font-weight: 600;
-  font-style: normal;
-  font-stretch: normal;
-  letter-spacing: -0.4px;
-  text-align: right;
-  color: #ffe546;
-}
-
-.token-selector-item__actions {
-  margin-bottom: 1.5rem;
-}
-
-@mixin token-selector-item__button {
-  display: inline-block;
-  cursor: pointer;
-
-  border: 0;
-  height: 2.5rem;
-  border-radius: 100px;
-  color: #ffffff;
-
-  text-transform: uppercase;
-  outline: none;
-}
-
-.token-selector-item__lend-button {
-  @include token-selector-item__button();
-
-  background-color: #69bf83;
-}
-
-.token-selector-item__lend-button--size-full {
-  width: 100%;
-}
-
-.token-selector-item__lend-button--size-half {
-  width: 45%;
-  margin-right: 5%;
-}
-
-.token-selector-item__un-lend-button {
-  @include token-selector-item__button();
-
-  width: 45%;
-  margin-left: 5%;
-  background-color: #ff5353;
 }
