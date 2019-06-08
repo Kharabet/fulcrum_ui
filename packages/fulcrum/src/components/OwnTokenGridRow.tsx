@@ -22,6 +22,7 @@ export interface IOwnTokenGridRowProps {
 
   onDetails: (key: TradeTokenKey) => void;
   onManageCollateral: (request: ManageCollateralRequest) => void;
+  onSelect: (key: TradeTokenKey) => void;
   onTrade: (request: TradeRequest) => void;
 }
 
@@ -47,6 +48,14 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.TradeTransactionMined, this.onTradeTransactionMined);
+  }
+
+  private getTradeTokenGridRowSelectionKeyRaw(props: IOwnTokenGridRowProps, leverage: number = this.props.currentKey.leverage) {
+    return new TradeTokenKey(this.props.currentKey.asset, this.props.currentKey.unitOfAccount, this.props.currentKey.positionType, leverage, this.props.currentKey.isTokenized);
+  }
+
+  private getTradeTokenGridRowSelectionKey(leverage: number = this.props.currentKey.leverage) {
+    return this.getTradeTokenGridRowSelectionKeyRaw(this.props, leverage);
   }
 
   private async derivedUpdate() {
@@ -119,8 +128,11 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
       bnLiquidationPrice = bnLiquidationPrice.div(1000);
     }
 
+    const isActiveClassName =
+      this.props.currentKey.toString() === this.props.selectedKey.toString() ? "trade-token-grid-row--active" : "";
+
     return (
-      <div className="trade-token-grid-row">
+      <div className={`trade-token-grid-row ${isActiveClassName}`} onClick={this.onSelectClick}>
         <div
           className="trade-token-grid-row__col-token-image"
           style={{ backgroundColor: this.state.assetDetails.bgColor, borderLeftColor: this.state.assetDetails.bgColor }}
@@ -151,6 +163,12 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
       </div>
     );
   }
+
+  public onSelectClick = (event: React.MouseEvent<HTMLElement>) => {
+    event.stopPropagation();
+
+    this.props.onSelect(this.getTradeTokenGridRowSelectionKey());
+  };
 
   public onDetailsClick = (event: React.MouseEvent<HTMLElement>) => {
     event.stopPropagation();

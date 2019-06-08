@@ -16,6 +16,7 @@ export interface IOwnTokenGridProps {
   onShowMyTokensOnlyChange: (value: boolean) => void;
   onDetails: (key: TradeTokenKey) => void;
   onManageCollateral: (request: ManageCollateralRequest) => void;
+  onSelect: (key: TradeTokenKey) => void;
   onTrade: (request: TradeRequest) => void;
 }
 
@@ -96,6 +97,7 @@ export class OwnTokenGrid extends Component<IOwnTokenGridProps, IOwnTokenGridSta
           balance: balance,
           onDetails: props.onDetails,
           onManageCollateral: props.onManageCollateral,
+          onSelect: props.onSelect,
           onTrade: props.onTrade
         });
       }

@@ -108,6 +108,7 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
               onShowMyTokensOnlyChange={this.onShowMyTokensOnlyChange}
               onDetails={this.onDetails}
               onManageCollateral={this.onManageCollateralRequested}
+              onSelect={this.onSelect}
               onTrade={this.onTradeRequested}
             />
           ) : (
