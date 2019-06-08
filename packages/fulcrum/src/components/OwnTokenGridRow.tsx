@@ -110,7 +110,8 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
       return null;
     }
 
-    const balanceString = this.props.balance.dividedBy(10 ** 18).toFixed();
+    const precision = AssetsDictionary.assets.get(this.props.selectedKey.loanAsset)!.decimals || 18;
+    const balanceString = this.props.balance.dividedBy(10 ** precision).toFixed();
     let bnPrice = new BigNumber(this.state.latestPriceDataPoint.price);
     let bnLiquidationPrice = new BigNumber(this.state.latestPriceDataPoint.liquidationPrice);
     if (this.props.currentKey.positionType === PositionType.SHORT) {

@@ -97,6 +97,12 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
         onTrade: props.onTrade
       });
 
+      
+      /*let unit = Asset.USDC;
+      if (props.selectedKey.asset === Asset.ETH && props.defaultLeverageLong === 2) {
+        unit = Asset.DAI;
+      }*/
+      
       rowsData.push({
         selectedKey: props.selectedKey,
         asset: e,

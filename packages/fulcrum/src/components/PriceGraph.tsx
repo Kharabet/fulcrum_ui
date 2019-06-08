@@ -3,6 +3,8 @@ import moment from "moment";
 import React, { Component, ReactNode } from "react";
 import { Line, LineChart, ReferenceLine, ResponsiveContainer, Tooltip, TooltipProps } from "recharts";
 import { IPriceDataPoint } from "../domain/IPriceDataPoint";
+import { AssetDetails } from "../domain/AssetDetails";
+import { AssetsDictionary } from "../domain/AssetsDictionary";
 // import { Change24HMarker, Change24HMarkerSize } from "./Change24HMarker";
 import { TradeTokenKey } from "../domain/TradeTokenKey";
 import { FulcrumProvider } from "../services/FulcrumProvider";
@@ -18,6 +20,7 @@ interface IPriceGraphState {
   displayedDataPoint: IPriceDataPoint | null;
   liquidationPrice: number | null;
   liquidationPriceNormed: number | null;
+  assetDetails: AssetDetails | null;
 }
 
 export class PriceGraph extends Component<IPriceGraphProps, IPriceGraphState> {
@@ -26,12 +29,14 @@ export class PriceGraph extends Component<IPriceGraphProps, IPriceGraphState> {
   constructor(props: IPriceGraphProps, context?: any) {
     super(props, context);
 
-    this.state = { priceBaseLine: 0, data: [], displayedDataPoint: null, liquidationPrice: null, liquidationPriceNormed: null };
+    this.state = { priceBaseLine: 0, data: [], displayedDataPoint: null, liquidationPrice: null, liquidationPriceNormed: null, assetDetails: null };
   }
 
   public async derivedUpdate() {
     const latestPriceData = await FulcrumProvider.Instance.getChartLatestDataPoint(this.props.selectedKey);
     const normalizedData = await this.normalizePrices(this.props.data, latestPriceData);
+
+    const assetDetails = AssetsDictionary.assets.get(this.props.selectedKey.asset) || null;
 
     this.setState({
       ...this.state,
@@ -39,7 +44,8 @@ export class PriceGraph extends Component<IPriceGraphProps, IPriceGraphState> {
       data: normalizedData.points,
       displayedDataPoint: normalizedData.points[normalizedData.points.length - 1],
       liquidationPrice: latestPriceData.liquidationPrice !== 0 ? latestPriceData.liquidationPrice : null,
-      liquidationPriceNormed: 0
+      liquidationPriceNormed: 0,
+      assetDetails
     });
   }
 
@@ -81,10 +87,11 @@ export class PriceGraph extends Component<IPriceGraphProps, IPriceGraphState> {
     return (
       <div className="price-graph">
         <div className="price-graph__hovered-time-container">
-          <div className="price-graph__hovered-time">{`${timeStampText}`}</div>
+          <div className="price-graph__hovered-price-marker" style={{ fontSize: `2rem` }}>{this.state.assetDetails ? this.state.assetDetails.labelName : ``}</div>
           <div className="price-graph__hovered-time-delimiter">
             <div />
           </div>
+          <div className="price-graph__hovered-time">{`${timeStampText}`}</div>
         </div>
         <div className="price-graph__hovered-price-marker">{`$${priceText}`}</div>
         {/*<div className="price-graph__hovered-change-1h-marker">
@@ -101,7 +108,7 @@ export class PriceGraph extends Component<IPriceGraphProps, IPriceGraphState> {
                 animationDuration={500}
                 dot={false}
                 activeDot={false}
-                stroke="#ffffff"
+                stroke={this.state.assetDetails ? this.state.assetDetails.bgColor : `#ffffff`}
                 strokeWidth={2}
               />
 
@@ -159,6 +166,14 @@ export class PriceGraph extends Component<IPriceGraphProps, IPriceGraphState> {
       }
     }
     
+    let prev: number;
+    priceDataPoints = priceDataPoints.map(e => {
+      if (prev && e.price === 0) {
+        e.price = prev;
+      }
+      prev = e.price;
+      return e;
+    });
     const prices = priceDataPoints.map(e => e.price);
     const priceMin = prices.length > 0 ? prices.reduce((a, b) => Math.min(a, b)) : 0;
     const priceMax = prices.length > 0 ? prices.reduce((a, b) => Math.max(a, b)) : 0;

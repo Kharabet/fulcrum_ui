@@ -27,6 +27,7 @@ export class AssetsDictionary {
       Asset.BAT,
       new AssetDetails(
         "BAT",
+        "Basic Attention Token (BAT)",
         18,
         bat_logo,
         bat_bg,
@@ -41,6 +42,7 @@ export class AssetsDictionary {
       Asset.WBTC,
       new AssetDetails(
         "WBTC",
+        "Bitcoin (BTC)",
         8,
         btc_logo,
         btc_bg,
@@ -55,6 +57,7 @@ export class AssetsDictionary {
       Asset.DAI,
       new AssetDetails(
         "DAI",
+        "Dai Stablecoin (DAI)",
         18,
         dai_logo,
         dai_bg,
@@ -69,6 +72,7 @@ export class AssetsDictionary {
       Asset.USDC,
       new AssetDetails(
         "USDC",
+        "USD Coin (USDC)",
         6,
         usdc_logo,
         usdc_bg,
@@ -83,6 +87,7 @@ export class AssetsDictionary {
       Asset.ETH,
       new AssetDetails(
         "ETH",
+        "Ethereum (ETH)",
         18,
         eth_logo,
         eth_bg,
@@ -98,6 +103,7 @@ export class AssetsDictionary {
       Asset.KNC,
       new AssetDetails(
         "KNC",
+        "Kyber Network (KNC)",
         18,
         knc_logo,
         knc_bg,
@@ -113,6 +119,7 @@ export class AssetsDictionary {
       Asset.MKR,
       new AssetDetails(
         "MKR",
+        "Maker (MKR)",
         18,
         mkr_logo,
         mkr_bg,
@@ -127,6 +134,7 @@ export class AssetsDictionary {
       Asset.REP,
       new AssetDetails(
         "REP",
+        "Augur (REP)",
         18,
         rep_logo,
         rep_bg,
@@ -141,6 +149,7 @@ export class AssetsDictionary {
       Asset.ZRX,
       new AssetDetails(
         "ZRX",
+        "0x (ZRX)",
         18,
         zrx_logo,
         zrx_bg,

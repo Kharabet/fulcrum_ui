@@ -32,7 +32,7 @@ export class StatsTokenGridHeader extends Component<IStatsTokenGridHeaderProps> 
           <span className="stats-grid-header__text">Borrow Rate</span>
         </div>*/}
         <div className="stats-grid-header__col-next-rate">
-          <span className="stats-grid-header__text">Next Rate (variable)</span>
+          <span className="stats-grid-header__text">Borrow Rate</span>
         </div>
       </div>
     );

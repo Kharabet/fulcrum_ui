@@ -82,7 +82,7 @@ export class FulcrumProvider {
     this.eventEmitter.setMaxListeners(1000);
     TasksQueue.Instance.on(TasksQueueEvents.Enqueued, this.onTaskEnqueued);
 
-    const storedProvider: any = localStorage.getItem('providerType') || "";
+    const storedProvider: any = FulcrumProvider.getLocalstorageItem('providerType');
     const providerType: ProviderType | null = ProviderType[storedProvider] as ProviderType || null;
 
     // singleton
@@ -119,6 +119,24 @@ export class FulcrumProvider {
     }
 
     return FulcrumProvider.Instance;
+  }
+
+  public static getLocalstorageItem(item: string): string {
+    let response = ""
+    try {
+      response = localStorage.getItem(item) || "";
+    } catch(e) {
+      // console.log(e);
+    }
+    return response;
+  }
+
+  public static setLocalstorageItem(item: string, val: string) {
+    try {
+      localStorage.setItem(item, val);
+    } catch(e) {
+      // console.log(e);
+    }
   }
 
   public async setWeb3Provider(providerType: ProviderType) {
@@ -160,7 +178,7 @@ export class FulcrumProvider {
       } else {
         this.providerType = ProviderType.None;
       }
-      localStorage.setItem('providerType', providerType);
+      FulcrumProvider.setLocalstorageItem('providerType', providerType);
     } else {
       this.contractsSource = null;
     }
@@ -212,7 +230,7 @@ export class FulcrumProvider {
       let fetchFromBlock = earliestBlock;
       const nearestHour = new Date().setMinutes(0,0,0)/1000;
   
-      const priceData = localStorage.getItem(`priceData${selectedKey.asset}`);
+      const priceData = FulcrumProvider.getLocalstorageItem(`priceData${selectedKey.asset}`);
       if (priceData) {
         // console.log(`priceData`,priceData);
         priceDataObj = JSON.parse(priceData);
@@ -285,7 +303,7 @@ export class FulcrumProvider {
           }
 
           // console.log(priceDataObj.length);
-          localStorage.setItem(`priceData${selectedKey.asset}`, JSON.stringify(priceDataObj));
+          FulcrumProvider.setLocalstorageItem(`priceData${selectedKey.asset}`, JSON.stringify(priceDataObj));
         }
       }
 
@@ -370,8 +388,8 @@ export class FulcrumProvider {
         let totalAssetSupply: BigNumber | null;
         let totalAssetBorrow: BigNumber | null;
         let supplyInterestRate: BigNumber | null;
-        // let borrowInterestRate: BigNumber | null;
-        let nextInterestRate: BigNumber | null;
+        let borrowInterestRate: BigNumber | null;
+        //let nextInterestRate: BigNumber | null;
 
         await Promise.all([
           (symbol = await assetContract.symbol.callAsync()),
@@ -382,8 +400,8 @@ export class FulcrumProvider {
           (totalAssetSupply = await assetContract.totalAssetSupply.callAsync()),
           (totalAssetBorrow = await assetContract.totalAssetBorrow.callAsync()),
           (supplyInterestRate = await assetContract.supplyInterestRate.callAsync()),
-          // (borrowInterestRate = await assetContract.borrowInterestRate.callAsync()),
-          (nextInterestRate = await assetContract.nextLoanInterestRate.callAsync(new BigNumber("100000")))
+          (borrowInterestRate = await assetContract.borrowInterestRate.callAsync()),
+          //(nextInterestRate = await assetContract.nextLoanInterestRate.callAsync(new BigNumber("100000")))
         ]);
 
         result = new ReserveDetails(
@@ -396,8 +414,8 @@ export class FulcrumProvider {
           totalAssetSupply.dividedBy(10 ** 18),
           totalAssetBorrow.dividedBy(10 ** 18),
           supplyInterestRate.dividedBy(10 ** 18),
-          new BigNumber(1),// borrowInterestRate.dividedBy(10 ** 18),
-          nextInterestRate.dividedBy(10 ** 18)
+          borrowInterestRate.dividedBy(10 ** 18),
+          new BigNumber(1)//nextInterestRate.dividedBy(10 ** 18)
         );
       }
     }

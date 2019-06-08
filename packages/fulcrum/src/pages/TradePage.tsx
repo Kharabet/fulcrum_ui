@@ -75,7 +75,8 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
   }
 
   public componentDidMount(): void {
-    if (!FulcrumProvider.Instance.web3Wrapper && (!localStorage.getItem('providerType') || localStorage.getItem('providerType') === "None")) {
+    const provider = FulcrumProvider.getLocalstorageItem('providerType');
+    if (!FulcrumProvider.Instance.web3Wrapper && (!provider || provider === "None")) {
       this.props.doNetworkConnect();
     }
   }
@@ -219,6 +220,11 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
       this.props.doNetworkConnect();
       return;
     }
+
+    /*let unit = request.unitOfAccount;
+    if (request.asset === Asset.ETH && request.positionType === PositionType.LONG && request.leverage === 2) {
+      unit = Asset.DAI;
+    }*/
 
     if (request) {
       this.setState({

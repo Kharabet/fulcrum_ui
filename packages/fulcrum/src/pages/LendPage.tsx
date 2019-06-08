@@ -28,7 +28,8 @@ export class LendPage extends PureComponent<ILendPageProps, ILendPageState> {
   }
 
   public componentDidMount(): void {
-    if (!FulcrumProvider.Instance.web3Wrapper && (!localStorage.getItem('providerType') || localStorage.getItem('providerType') === "None")) {
+    const provider = FulcrumProvider.getLocalstorageItem('providerType');
+    if (!FulcrumProvider.Instance.web3Wrapper && (!provider || provider === "None")) {
       this.props.doNetworkConnect();
     }
   }
