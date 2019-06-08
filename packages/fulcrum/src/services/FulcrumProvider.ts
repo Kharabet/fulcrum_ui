@@ -219,6 +219,19 @@ export class FulcrumProvider {
     return result;
   };
 
+  public getTradeTokenInterestRate = async (selectedKey: TradeTokenKey): Promise<BigNumber> => {
+    let result = new BigNumber(0);
+    if (this.contractsSource) {
+      const assetContract = await this.contractsSource.getITokenContract(selectedKey.loanAsset);
+      if (assetContract) {
+        result = await assetContract.borrowInterestRate.callAsync();
+        result = result.dividedBy(10 ** 18);
+      }
+    }
+
+    return result;
+  };
+
   public getPriceDataPoints = async (selectedKey: TradeTokenKey): Promise<IPriceDataPoint[]> => {
     let priceDataObj: IPriceDataPoint[] = [];
     // localStorage.removeItem(`priceData${selectedKey.asset}`);

@@ -48,7 +48,7 @@ interface ITradeFormState {
   assetDetails: AssetDetails | null;
   collateral: Asset;
   tokenizeNeeded: boolean;
-  latestPriceDataPoint: IPriceDataPoint;
+  interestRate: BigNumber | null;
 
   isTradeAmountTouched: boolean;
   tradeAmountText: string;
@@ -73,7 +73,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
   constructor(props: ITradeFormProps, context?: any) {
     super(props, context);
     const assetDetails = AssetsDictionary.assets.get(props.asset);
-    const latestPriceDataPoint = FulcrumProvider.Instance.getPriceDefaultDataPoint();
+    const interestRate = null;
     const balance = null;
     const positionTokenBalance = null;
     const maxTradeValue = new BigNumber(0);
@@ -93,7 +93,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       isChangeCollateralOpen: false,
       tradedAmountEstimate: tradedAmountEstimate,
       slippageRate: slippageRate,
-      latestPriceDataPoint: latestPriceDataPoint
+      interestRate: interestRate
     };
 
     this._inputChange = new Subject();
@@ -145,7 +145,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
   private async derivedUpdate() {
     const assetDetails = AssetsDictionary.assets.get(this.props.asset);
     const tradeTokenKey = this.getTradeTokenGridRowSelectionKey(this.props.leverage);
-    const latestPriceDataPoint = await FulcrumProvider.Instance.getPriceLatestDataPoint(tradeTokenKey);
+    const interestRate = await FulcrumProvider.Instance.getTradeTokenInterestRate(tradeTokenKey);
     const positionTokenBalance = await FulcrumProvider.Instance.getPTokenBalanceOfUser(tradeTokenKey);
     const balance =
       this.props.tradeType === TradeType.BUY
@@ -176,7 +176,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       maxTradeAmount: maxTradeValue,
       tradedAmountEstimate: tradedAmountEstimate,
       slippageRate: slippageRate,
-      latestPriceDataPoint: latestPriceDataPoint
+      interestRate: interestRate
     });
   }
 
@@ -236,11 +236,6 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     const tokenNameSource = this.props.tradeType === TradeType.BUY ? this.state.collateral : tokenNamePosition;
     const tokenNameDestination = this.props.tradeType === TradeType.BUY ? tokenNamePosition : this.state.collateral;
 
-    let bnPrice = new BigNumber(this.state.latestPriceDataPoint.price);
-    if (this.props.positionType === PositionType.SHORT) {
-      bnPrice = bnPrice.div(1000);
-    }
-
     const isAmountMaxed = this.state.tradeAmount.eq(this.state.maxTradeAmount);
     const amountMsg =
       this.state.balance && this.state.balance.eq(0)
@@ -272,7 +267,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
             </div>
             <div className="trade-form__kv-container trade-form__kv-container--w_dots">
               <div className="trade-form__label">
-                {this.props.tradeType === TradeType.BUY ? `Deposit Token` : `Withdrawal Token`}
+                {this.props.tradeType === TradeType.BUY ? `Purchase Token` : `Withdrawal Token`}
                 {` `}
                 <button className="trade-form__change-button" onClick={this.onChangeCollateralOpen}>
                   <span className="trade-form__label--action">Change</span>
@@ -283,17 +278,17 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
             {this.state.collateral !== Asset.ETH && this.props.tradeType === TradeType.BUY ? (
               <div className="trade-form__token-message-container">
                 <div className="trade-form__token-message-container--message">
-                  Selected deposit token ({this.state.collateral}) may need approval, which can take up to 5 minutes.
+                  Selected purchase token ({this.state.collateral}) may need approval, which can take up to 5 minutes.
                 </div>
               </div>
             ) : `` }
             <div className="trade-form__kv-container trade-form__kv-container--w_dots">
-              <div className="trade-form__label">Position Price</div>
-              <div className="trade-form__value">{`$${bnPrice.toFixed(2)}`}</div>
-            </div>
-            <div className="trade-form__kv-container trade-form__kv-container--w_dots">
               <div className="trade-form__label">Leverage</div>
               <div className="trade-form__value">{`${this.props.leverage.toString()}x`}</div>
+            </div>
+            <div className="trade-form__kv-container trade-form__kv-container--w_dots">
+              <div className="trade-form__label">Interest rate (APR)</div>
+              <div title={this.state.interestRate ? `${this.state.interestRate.toFixed(18)}%` : ``} className="trade-form__value">{this.state.interestRate ? `${this.state.interestRate.toFixed(4)}%` : `0.0000%`}</div>
             </div>
             <div className="trade-form__kv-container">
               <div className="trade-form__label">Amount</div>
@@ -366,7 +361,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
         >
           <CollateralTokenSelector
             selectedCollateral={this.state.collateral}
-            collateralType={this.props.tradeType === TradeType.BUY ? `Deposit` : `Withdrawal`}
+            collateralType={this.props.tradeType === TradeType.BUY ? `Purchase` : `Withdrawal`}
             onCollateralChange={this.onChangeCollateralClicked}
             onClose={this.onChangeCollateralClose}
           />
