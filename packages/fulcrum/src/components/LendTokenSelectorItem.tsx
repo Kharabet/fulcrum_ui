@@ -107,7 +107,7 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
         <div className="token-selector-item__description">
           <div className="token-selector-item__name">{this.state.assetDetails.displayName}</div>
           <div className="token-selector-item__interest-rate-container">
-            <div className="token-selector-item__interest-rate-title">Interest rate:</div>
+            <div className="token-selector-item__interest-rate-title">Interest rate (APR):</div>
             <div title={`${this.state.interestRate.toFixed(18)}%`} className="token-selector-item__interest-rate-value">{`${this.state.interestRate.toFixed(4)}%`}</div>
           </div>
         </div>

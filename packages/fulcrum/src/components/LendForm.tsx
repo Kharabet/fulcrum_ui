@@ -185,8 +185,8 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
               <div className="lend-form__value">{tokenNameSource}</div>
             </div>
             <div className="lend-form__kv-container lend-form__kv-container--w_dots">
-              <div className="lend-form__label">Interest rate</div>
-              <div title={this.state.interestRate ? `$${this.state.interestRate.toFixed(18)}%` : ``} className="lend-form__value">{this.state.interestRate ? `${this.state.interestRate.toFixed(2)}%` : `0.00%`}</div>
+              <div className="lend-form__label">Interest rate (APR)</div>
+              <div title={this.state.interestRate ? `${this.state.interestRate.toFixed(18)}%` : ``} className="lend-form__value">{this.state.interestRate ? `${this.state.interestRate.toFixed(4)}%` : `0.00%`}</div>
             </div>
             <div className="lend-form__kv-container">
               <div className="lend-form__label">{this.props.lendType === LendType.LEND ? `Lend Amount` : `UnLend Amount`}</div>
