@@ -37,6 +37,10 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
     this.mediaQueryList.addEventListener("change", this.onMediaQueryListChange);
   }
 
+  public componentWillUnmount(): void {
+    this.mediaQueryList.removeEventListener("change", this.onMediaQueryListChange);
+  }
+
   public render() {
     return !this.state.isMobileMedia ? this.renderDesktop() : this.renderMobile();
   }
