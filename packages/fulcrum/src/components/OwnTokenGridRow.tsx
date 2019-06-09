@@ -109,7 +109,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
     this.derivedUpdate();
   }
 
-  public componentDidUpdate(
+  /*public componentDidUpdate(
     prevProps: Readonly<IOwnTokenGridRowProps>,
     prevState: Readonly<IOwnTokenGridRowState>,
     snapshot?: any
@@ -121,7 +121,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
     ) {
       this.derivedUpdate();
     }
-  }
+  }*/
 
   public render() {
     if (!this.state.assetDetails) {
@@ -144,11 +144,11 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
           className="own-token-grid-row__col-token-image"
           style={{ backgroundColor: this.state.assetDetails.bgColor, borderLeftColor: this.state.assetDetails.bgColor }}
         >
-          <img src={this.state.assetDetails.logoSvg} alt={`${this.state.assetDetails.displayName} ${this.props.selectedKey.leverage}x`} />
+          <img src={this.state.assetDetails.logoSvg} alt={`${this.state.assetDetails.displayName} ${this.props.currentKey.leverage}x`} />
         </div>
-        <div className="own-token-grid-row__col-token-name-full">{`${this.state.assetDetails.displayName} ${this.props.selectedKey.leverage}x`}</div>
+        <div className="own-token-grid-row__col-token-name-full">{`${this.state.assetDetails.displayName} ${this.props.currentKey.leverage}x`}</div>
         <div className="own-token-grid-row__col-position-type">
-          <PositionTypeMarker value={this.props.selectedKey.positionType} />
+          <PositionTypeMarker value={this.props.currentKey.positionType} />
         </div>
 
         <div title={`$${bnPrice.toFixed(18)}`} className="own-token-grid-row__col-asset-price">{`$${bnPrice.toFixed(2)}`}</div>
@@ -197,7 +197,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
         TradeType.SELL,
         this.props.currentKey.asset,
         this.props.currentKey.unitOfAccount,
-        this.props.currentKey.positionType === PositionType.SHORT ? this.props.currentKey.asset : Asset.DAI,
+        this.props.currentKey.positionType === PositionType.SHORT ? this.props.currentKey.asset : Asset.USDC,
         this.props.currentKey.positionType,
         this.props.currentKey.leverage,
         new BigNumber(0),

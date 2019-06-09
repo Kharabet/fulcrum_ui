@@ -344,6 +344,48 @@ export class FulcrumProvider {
   public getTradeTokenAssetLatestDataPoint = async (selectedKey: TradeTokenKey): Promise<IPriceDataPoint> => {
     try {
       const swapPrice = await this.getSwapToUsdRate(selectedKey.asset);
+      const priceLatestDataPoint = await this.getPriceDefaultDataPoint();
+
+      priceLatestDataPoint.price = swapPrice.toNumber();
+
+      if (this.contractsSource) {
+        const assetContract = await this.contractsSource.getPTokenContract(selectedKey);
+        if (assetContract) {
+          const currentLeverage = await assetContract.currentLeverage.callAsync();
+          const currentMargin = currentLeverage.gt(0) ?
+            new BigNumber(10**38).div(currentLeverage) :
+            new BigNumber(10**38).div(selectedKey.leverage * 10**18);
+          const maintenanceMargin = new BigNumber(15 * 10**18);
+
+          if (currentMargin.lte(maintenanceMargin)) {
+            priceLatestDataPoint.liquidationPrice = priceLatestDataPoint.price;
+          } else {
+            let multiplier = currentMargin
+              .minus(maintenanceMargin)
+              .dividedBy(10**20)
+
+              if (selectedKey.positionType === PositionType.SHORT) {
+              priceLatestDataPoint.liquidationPrice = swapPrice
+                .plus(swapPrice.multipliedBy(multiplier))
+                .toNumber();
+            } else {
+              priceLatestDataPoint.liquidationPrice = swapPrice
+                .minus(swapPrice.multipliedBy(multiplier))
+                .toNumber();
+            }
+          }
+        }
+      }
+      return priceLatestDataPoint;
+    } catch(e) {
+      return this.getPriceDefaultDataPoint();
+    }
+  };
+
+  /*
+  public getTradeTokenAssetLatestDataPoint = async (selectedKey: TradeTokenKey): Promise<IPriceDataPoint> => {
+    try {
+      const swapPrice = await this.getSwapToUsdRate(selectedKey.asset);
       const priceLatestDataPoint = await this.getPriceLatestDataPoint(selectedKey);
       
       if (priceLatestDataPoint.price > 0 && priceLatestDataPoint.liquidationPrice > 0) {
@@ -386,7 +428,7 @@ export class FulcrumProvider {
     }
 
     return result;
-  };
+  };*/
 
   public getPriceDefaultDataPoint = (): IPriceDataPoint => {
     return {

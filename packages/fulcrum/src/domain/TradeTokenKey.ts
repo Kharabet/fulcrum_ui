@@ -55,7 +55,7 @@ export class TradeTokenKey {
         if (assetName in Asset) {
           asset = assetName as Asset;
         }
-        const leverage = parseInt(matches[4].toString(), 10);
+        const leverage = parseInt(matches[4].toString(), 10) || 1;
 
         const recoveredResult = new TradeTokenKey(
           asset,
