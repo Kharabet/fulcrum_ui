@@ -81,6 +81,12 @@ export class StatsTokenGridCard extends Component<IStatsTokenGridCardProps, ISta
     this.derivedUpdate();
   }
 
+  private numberWithCommas(numberStr: string): string {
+    var parts = numberStr.split(".");
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return parts.join(".");
+  }
+
   /*public componentDidUpdate(
     prevProps: Readonly<IStatsTokenGridCardProps>,
     prevState: Readonly<IStatsTokenGridCardState>,
@@ -113,7 +119,7 @@ export class StatsTokenGridCard extends Component<IStatsTokenGridCardProps, ISta
               title={this.state.usdSupply ? `$${this.state.usdSupply.toFixed(18)}` : ``}
               className="stats-grid-card__kv-value"
             >
-              {this.state.usdSupply ? `$${this.state.usdSupply.toFixed(4)}` : `-`}
+              {this.state.usdSupply ? `$${this.numberWithCommas(this.state.usdSupply.toFixed(4))}` : `-`}
             </div>
           </div>
           <div className="stats-grid-card__kv-container">
@@ -125,7 +131,7 @@ export class StatsTokenGridCard extends Component<IStatsTokenGridCardProps, ISta
               title={details.totalSupply ? `${details.totalSupply.toFixed(this.state.decimals)}` : ``}
               className="stats-grid-card__kv-value"
             >
-              {details.totalSupply ? `${details.totalSupply.toFixed(4)}` : `-`}
+              {details.totalSupply ? `${this.numberWithCommas(details.totalSupply.toFixed(4))}` : `-`}
             </div>
           </div>
           <div className="stats-grid-card__kv-container">
@@ -137,7 +143,7 @@ export class StatsTokenGridCard extends Component<IStatsTokenGridCardProps, ISta
               title={details.totalBorrow ? `${details.totalBorrow.toFixed(this.state.decimals)}` : ``}
               className="stats-grid-card__kv-value"
             >
-              {details.totalBorrow ? `${details.totalBorrow.toFixed(4)}` : `-`}
+              {details.totalBorrow ? `${this.numberWithCommas(details.totalBorrow.toFixed(4))}` : `-`}
             </div>
           </div>
           <div className="stats-grid-card__kv-container">
@@ -149,7 +155,7 @@ export class StatsTokenGridCard extends Component<IStatsTokenGridCardProps, ISta
               title={details.liquidity ? `${details.liquidity.toFixed(this.state.decimals)}` : ``}
               className="stats-grid-card__kv-value"
             >
-              {details.liquidity ? `${details.liquidity.toFixed(4)}` : `-`}
+              {details.liquidity ? `${this.numberWithCommas(details.liquidity.toFixed(4))}` : `-`}
             </div>
           </div>
           <div className="stats-grid-card__kv-container">
@@ -161,12 +167,12 @@ export class StatsTokenGridCard extends Component<IStatsTokenGridCardProps, ISta
               title={details.liquidityReserved ? `${details.liquidityReserved.toFixed(this.state.decimals)}` : ``}
               className="stats-grid-card__kv-value"
             >
-              {details.liquidityReserved ? `${details.liquidityReserved.toFixed(4)}` : `-`}
+              {details.liquidityReserved ? `${this.numberWithCommas(details.liquidityReserved.toFixed(4))}` : `-`}
             </div>
           </div>
           <div className="stats-grid-card__kv-container">
             <div className="stats-grid-card__kv-title">
-              <span className="">Current Rate</span>
+              <span className="">Supply Rate (APR)</span>
             </div>
             <div className="stats-grid-card__kv-dots" />
             <div
@@ -178,14 +184,14 @@ export class StatsTokenGridCard extends Component<IStatsTokenGridCardProps, ISta
           </div>
           <div className="stats-grid-card__kv-container">
             <div className="stats-grid-card__kv-title">
-              <span className="">Next Rate (variable)</span>
+              <span className="">Borrow Rate (APR)</span>
             </div>
             <div className="stats-grid-card__kv-dots" />
             <div
-              title={details.nextInterestRate ? `${details.nextInterestRate.toFixed(18)}%` : ``}
+              title={details.borrowInterestRate ? `${details.borrowInterestRate.toFixed(18)}%` : ``}
               className="stats-grid-card__kv-value"
             >
-              {details.nextInterestRate ? `${details.nextInterestRate.toFixed(4)}%` : `-`}
+              {details.borrowInterestRate ? `${details.borrowInterestRate.toFixed(4)}%` : `-`}
             </div>
           </div>
         </div>
