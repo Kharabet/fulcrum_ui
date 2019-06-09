@@ -2,9 +2,9 @@ import { BigNumber } from "@0x/utils";
 import moment from "moment";
 import React, { Component, ReactNode } from "react";
 import { Line, LineChart, ReferenceLine, ResponsiveContainer, Tooltip, TooltipProps } from "recharts";
-import { IPriceDataPoint } from "../domain/IPriceDataPoint";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
+import { IPriceDataPoint } from "../domain/IPriceDataPoint";
 // import { Change24HMarker, Change24HMarkerSize } from "./Change24HMarker";
 import { TradeTokenKey } from "../domain/TradeTokenKey";
 import { FulcrumProvider } from "../services/FulcrumProvider";
@@ -33,7 +33,7 @@ export class PriceGraph extends Component<IPriceGraphProps, IPriceGraphState> {
   }
 
   public async derivedUpdate() {
-    const latestPriceData = await FulcrumProvider.Instance.getChartLatestDataPoint(this.props.selectedKey);
+    const latestPriceData = await FulcrumProvider.Instance.getTradeTokenAssetLatestDataPoint(this.props.selectedKey);
     const normalizedData = await this.normalizePrices(this.props.data, latestPriceData);
 
     const assetDetails = AssetsDictionary.assets.get(this.props.selectedKey.asset) || null;

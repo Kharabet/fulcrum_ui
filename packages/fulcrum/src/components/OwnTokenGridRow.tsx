@@ -13,12 +13,12 @@ import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents"
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { TradeTransactionMinedEvent } from "../services/events/TradeTransactionMinedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
+import { PositionTypeMarker } from "./PositionTypeMarker";
 // import { Change24HMarker, Change24HMarkerSize } from "./Change24HMarker";
 
 export interface IOwnTokenGridRowProps {
   selectedKey: TradeTokenKey;
   currentKey: TradeTokenKey;
-  balance: BigNumber;
 
   onDetails: (key: TradeTokenKey) => void;
   onManageCollateral: (request: ManageCollateralRequest) => void;
@@ -29,7 +29,8 @@ export interface IOwnTokenGridRowProps {
 interface IOwnTokenGridRowState {
   assetDetails: AssetDetails | null;
 
-  latestPriceDataPoint: IPriceDataPoint;
+  latestAssetPriceDataPoint: IPriceDataPoint;
+  assetBalance: BigNumber | null;
   profit: BigNumber | null;
 }
 
@@ -41,7 +42,8 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
 
     this.state = {
       assetDetails: assetDetails || null,
-      latestPriceDataPoint: FulcrumProvider.Instance.getPriceDefaultDataPoint(),
+      latestAssetPriceDataPoint: FulcrumProvider.Instance.getPriceDefaultDataPoint(),
+      assetBalance: new BigNumber(0),
       profit: new BigNumber(0)
     };
 
@@ -66,12 +68,19 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
       this.props.currentKey.leverage,
       this.props.currentKey.isTokenized
     );
-    const latestPriceDataPoint = await FulcrumProvider.Instance.getPriceLatestDataPoint(tradeTokenKey);
-    const profit = await FulcrumProvider.Instance.getTradeProfit(tradeTokenKey);
+    const latestAssetPriceDataPoint = await FulcrumProvider.Instance.getTradeTokenAssetLatestDataPoint(tradeTokenKey);
+    
+    const data: [BigNumber | null, BigNumber | null] = await FulcrumProvider.Instance.getTradeBalanceAndProfit(tradeTokenKey);
+    const assetBalance = data[0];
+    const profit = data[1];
+
+    // const precision = AssetsDictionary.assets.get(this.props.selectedKey.loanAsset)!.decimals || 18;
+    // const balanceString = this.props.balance.dividedBy(10 ** precision).toFixed();
 
     this.setState({
       ...this.state,
-      latestPriceDataPoint: latestPriceDataPoint,
+      latestAssetPriceDataPoint: latestAssetPriceDataPoint,
+      assetBalance: assetBalance,
       profit: profit
     });
   }
@@ -119,37 +128,35 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
       return null;
     }
 
-    const precision = AssetsDictionary.assets.get(this.props.selectedKey.loanAsset)!.decimals || 18;
-    const balanceString = this.props.balance.dividedBy(10 ** precision).toFixed();
-    let bnPrice = new BigNumber(this.state.latestPriceDataPoint.price);
-    let bnLiquidationPrice = new BigNumber(this.state.latestPriceDataPoint.liquidationPrice);
-    if (this.props.currentKey.positionType === PositionType.SHORT) {
+    const bnPrice = new BigNumber(this.state.latestAssetPriceDataPoint.price);
+    const bnLiquidationPrice = new BigNumber(this.state.latestAssetPriceDataPoint.liquidationPrice);
+    /*if (this.props.currentKey.positionType === PositionType.SHORT) {
       bnPrice = bnPrice.div(1000);
       bnLiquidationPrice = bnLiquidationPrice.div(1000);
-    }
+    }*/
 
     const isActiveClassName =
-      this.props.currentKey.toString() === this.props.selectedKey.toString() ? "trade-token-grid-row--active" : "";
+      this.props.currentKey.toString() === this.props.selectedKey.toString() ? "own-token-grid-row--active" : "";
 
     return (
-      <div className={`trade-token-grid-row ${isActiveClassName}`} onClick={this.onSelectClick}>
+      <div className={`own-token-grid-row ${isActiveClassName}`} onClick={this.onSelectClick}>
         <div
-          className="trade-token-grid-row__col-token-image"
+          className="own-token-grid-row__col-token-image"
           style={{ backgroundColor: this.state.assetDetails.bgColor, borderLeftColor: this.state.assetDetails.bgColor }}
         >
-          <img src={this.state.assetDetails.logoSvg} alt={this.state.assetDetails.displayName} />
+          <img src={this.state.assetDetails.logoSvg} alt={`${this.state.assetDetails.displayName} ${this.props.selectedKey.leverage}x`} />
         </div>
-        <div className="trade-token-grid-row__col-token-name-full">{this.props.currentKey.toString()}</div>
-        <div className="trade-token-grid-row__col-amount">{`${balanceString}`}</div>
-        <div className="trade-token-grid-row__col-price">{`$${bnPrice.toFixed(2)}`}</div>
-        <div className="trade-token-grid-row__col-price">{`$${bnLiquidationPrice.toFixed(2)}`}</div>
-        {/*<div className="trade-token-grid-row__col-change24h">
-          <Change24HMarker value={bnChange24h} size={Change24HMarkerSize.MEDIUM} />
-        </div>*/}
-        <div className="trade-token-grid-row__col-profit">
-          {this.state.profit ? `$${this.state.profit.toFixed(4)}` : "-"}
+        <div className="own-token-grid-row__col-token-name-full">{`${this.state.assetDetails.displayName} ${this.props.selectedKey.leverage}x`}</div>
+        <div className="own-token-grid-row__col-position-type">
+          <PositionTypeMarker value={this.props.selectedKey.positionType} />
         </div>
-        <div className="trade-token-grid-row__col-action" style={{ textAlign: `right`}}>
+
+        <div title={`$${bnPrice.toFixed(18)}`} className="own-token-grid-row__col-asset-price">{`$${bnPrice.toFixed(2)}`}</div>
+        <div title={`$${bnLiquidationPrice.toFixed(18)}`} className="own-token-grid-row__col-liquidation-price">{`$${bnLiquidationPrice.toFixed(2)}`}</div>
+        <div title={this.state.assetBalance ? `$${this.state.assetBalance.toFixed(18)}` : ``} className="own-token-grid-row__col-position-value">{this.state.assetBalance ? `$${this.state.assetBalance.toFixed(2)}` : `$0.00`}</div>
+        <div title={this.state.profit ? `$${this.state.profit.toFixed(18)}` : ``} className="own-token-grid-row__col-profit">{this.state.profit ? `$${this.state.profit.toFixed(4)}` : `$0.0000`}</div>
+
+        <div className="own-token-grid-row__col-action" style={{ textAlign: `right`}}>
           <button className="own-token-grid-row__details-button" onClick={this.onDetailsClick}>
             &nbsp;
           </button>

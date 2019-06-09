@@ -67,8 +67,9 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
 
   private async derivedUpdate() {
     const tradeTokenKey = new TradeTokenKey(this.props.asset, this.props.defaultUnitOfAccount, this.props.positionType, this.state.leverage, this.props.defaultTokenizeNeeded);
-    const latestPriceDataPoint = await FulcrumProvider.Instance.getPriceLatestDataPoint(tradeTokenKey);
-    const profit = await FulcrumProvider.Instance.getTradeProfit(tradeTokenKey);
+    const latestPriceDataPoint = await FulcrumProvider.Instance.getTradeTokenAssetLatestDataPoint(tradeTokenKey);
+    const data: [BigNumber | null, BigNumber | null] = await FulcrumProvider.Instance.getTradeBalanceAndProfit(tradeTokenKey);
+    const profit = data[1];
     const balance = await FulcrumProvider.Instance.getPTokenBalanceOfUser(tradeTokenKey);
 
     this.setState({
@@ -126,14 +127,14 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
     }
 
     const tradeTokenKey = this.getTradeTokenGridRowSelectionKey(this.state.leverage);
-    let bnPrice = new BigNumber(this.state.latestPriceDataPoint.price);
-    let bnLiquidationPrice = new BigNumber(this.state.latestPriceDataPoint.liquidationPrice);
+    const bnPrice = new BigNumber(this.state.latestPriceDataPoint.price);
+    const bnLiquidationPrice = new BigNumber(this.state.latestPriceDataPoint.liquidationPrice);
     /*if (this.props.positionType === PositionType.SHORT) {
       bnPrice = bnPrice.div(1000);
       bnLiquidationPrice = bnLiquidationPrice.div(1000);
     }*/
-    bnPrice = bnPrice.div(1000);
-    bnLiquidationPrice = bnLiquidationPrice.div(1000);
+    // bnPrice = bnPrice.div(1000);
+    // bnLiquidationPrice = bnLiquidationPrice.div(1000);
 
     // const bnChange24h = new BigNumber(this.state.latestPriceDataPoint.change24h);
     const isActiveClassName =

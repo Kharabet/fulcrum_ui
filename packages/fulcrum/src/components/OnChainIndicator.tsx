@@ -169,9 +169,11 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
             <span className="on-chain-indicator__provider-txt" onClick={this.props.doNetworkConnect}>
               Click To Connect Wallet
             </span>
-            {/*<span className="on-chain-indicator__wallet-address" onClick={this.props.doNetworkConnect}>
-              ...
-            </span>*/}
+            {FulcrumProvider.Instance.unsupportedNetwork ? (
+              <span className="on-chain-indicator__wallet-address" onClick={this.props.doNetworkConnect}>
+                {walletAddressText}
+              </span>
+            ) : ``}
           </React.Fragment>
         );
       }

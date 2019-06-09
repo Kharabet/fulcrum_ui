@@ -47,7 +47,7 @@ export class TokenAddressForm extends Component<ITokenAddressFormProps, ITokenAd
             <img src={this.state.baseTokenImg} />
           </div>
           <div className="token-address-form__kv-container">
-            <div className="token-address-form__label">Token</div>
+            <div className="token-address-form__label">{this.props.tradeTokenKey.toString()}</div>
             <div className="token-address-form__value">
               <span className="token-address-form__value-action" onClick={this.onCopyToClipboard}>Copy to clipboard</span>
             </div>

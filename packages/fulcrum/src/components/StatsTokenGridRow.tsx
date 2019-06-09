@@ -79,7 +79,7 @@ export class StatsTokenGridRow extends Component<IStatsTokenGridRowProps, IStats
   }
 
   private numberWithCommas(numberStr: string): string {
-    var parts = numberStr.split(".");
+    const parts = numberStr.split(".");
     parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     return parts.join(".");
   }

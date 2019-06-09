@@ -341,14 +341,25 @@ export class FulcrumProvider {
     return priceDataObj;
   };
 
-  public getChartLatestDataPoint = async (selectedKey: TradeTokenKey): Promise<IPriceDataPoint> => {
+  public getTradeTokenAssetLatestDataPoint = async (selectedKey: TradeTokenKey): Promise<IPriceDataPoint> => {
     try {
       const swapPrice = await this.getSwapToUsdRate(selectedKey.asset);
       const priceLatestDataPoint = await this.getPriceLatestDataPoint(selectedKey);
-      priceLatestDataPoint.liquidationPrice = swapPrice
-        .multipliedBy(priceLatestDataPoint.liquidationPrice)
-        .div(priceLatestDataPoint.price)
-        .toNumber();
+      
+      if (priceLatestDataPoint.price > 0 && priceLatestDataPoint.liquidationPrice > 0) {
+        let multiplier = new BigNumber(1);
+        if (selectedKey.positionType === PositionType.SHORT) {
+          multiplier = multiplier.multipliedBy(priceLatestDataPoint.price).div(priceLatestDataPoint.liquidationPrice);
+        } else {
+          multiplier = multiplier.multipliedBy(priceLatestDataPoint.liquidationPrice).div(priceLatestDataPoint.price);
+        }
+        priceLatestDataPoint.liquidationPrice = swapPrice
+          .multipliedBy(multiplier)
+          .toNumber();
+      } else {
+        priceLatestDataPoint.liquidationPrice = 0;
+      }
+      
       priceLatestDataPoint.price = swapPrice.toNumber();
       return priceLatestDataPoint;
     } catch(e) {
@@ -402,7 +413,7 @@ export class FulcrumProvider {
         let totalAssetBorrow: BigNumber | null;
         let supplyInterestRate: BigNumber | null;
         let borrowInterestRate: BigNumber | null;
-        //let nextInterestRate: BigNumber | null;
+        // let nextInterestRate: BigNumber | null;
 
         await Promise.all([
           (symbol = await assetContract.symbol.callAsync()),
@@ -414,7 +425,7 @@ export class FulcrumProvider {
           (totalAssetBorrow = await assetContract.totalAssetBorrow.callAsync()),
           (supplyInterestRate = await assetContract.supplyInterestRate.callAsync()),
           (borrowInterestRate = await assetContract.borrowInterestRate.callAsync()),
-          //(nextInterestRate = await assetContract.nextLoanInterestRate.callAsync(new BigNumber("100000")))
+          // (nextInterestRate = await assetContract.nextLoanInterestRate.callAsync(new BigNumber("100000")))
         ]);
 
         result = new ReserveDetails(
@@ -428,7 +439,7 @@ export class FulcrumProvider {
           totalAssetBorrow.dividedBy(10 ** 18),
           supplyInterestRate.dividedBy(10 ** 18),
           borrowInterestRate.dividedBy(10 ** 18),
-          new BigNumber(1)//nextInterestRate.dividedBy(10 ** 18)
+          new BigNumber(1)// nextInterestRate.dividedBy(10 ** 18)
         );
       }
     }
@@ -467,9 +478,10 @@ export class FulcrumProvider {
     return result;
   };
 
-  public getTradeProfit = async (selectedKey: TradeTokenKey): Promise<BigNumber | null> => {
+  public getTradeBalanceAndProfit = async (selectedKey: TradeTokenKey): Promise<[BigNumber | null, BigNumber | null]> => {
     // should return null if no data (not traded asset), new BigNumber(0) if no profit
-    let result: BigNumber | null = null;
+    let assetBalance: BigNumber | null = new BigNumber(0);
+    let profit: BigNumber | null = new BigNumber(0);
     let account: string | null = null;
 
     if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
@@ -479,14 +491,18 @@ export class FulcrumProvider {
     if (account && this.contractsSource && this.contractsSource.canWrite) {
       const balance = await this.getPTokenBalanceOfUser(selectedKey);
       if (balance.gt(0)) {
-        result = new BigNumber(0);
         const assetContract = await this.contractsSource.getPTokenContract(selectedKey);
         if (assetContract) {
           const swapPrice = await this.getSwapToUsdRate(selectedKey.loanAsset);
           const tokenPrice = await assetContract.tokenPrice.callAsync();
           const checkpointPrice = await assetContract.checkpointPrice.callAsync(account);
 
-          result = tokenPrice
+          assetBalance = tokenPrice
+            .multipliedBy(balance)
+            .multipliedBy(swapPrice)
+            .dividedBy(10**36);
+
+          profit = tokenPrice
             .minus(checkpointPrice)
             .multipliedBy(balance)
             .multipliedBy(swapPrice)
@@ -495,7 +511,7 @@ export class FulcrumProvider {
       }
     }
 
-    return result;
+    return [assetBalance, profit];
   };
 
   public getMaxTradeValue = async (tradeType: TradeType, selectedKey: TradeTokenKey, collateral: Asset): Promise<BigNumber> => {

@@ -262,12 +262,12 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
               <PositionTypeMarker value={this.props.positionType} />
             </div>
             <div className="trade-form__kv-container trade-form__kv-container--w_dots">
-              <div className="trade-form__label">Position Token</div>
+              <div className="trade-form__label">Position Asset</div>
               <div className="trade-form__value">{tokenNameBase}</div>
             </div>
             <div className="trade-form__kv-container trade-form__kv-container--w_dots">
               <div className="trade-form__label">
-                {this.props.tradeType === TradeType.BUY ? `Purchase Token` : `Withdrawal Token`}
+                {this.props.tradeType === TradeType.BUY ? `Purchase Asset` : `Withdrawal Asset`}
                 {` `}
                 <button className="trade-form__change-button" onClick={this.onChangeCollateralOpen}>
                   <span className="trade-form__label--action">Change</span>
@@ -278,7 +278,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
             {this.state.collateral !== Asset.ETH && this.props.tradeType === TradeType.BUY ? (
               <div className="trade-form__token-message-container">
                 <div className="trade-form__token-message-container--message">
-                  Selected purchase token ({this.state.collateral}) may need approval, which can take up to 5 minutes.
+                  Selected purchase asset ({this.state.collateral}) may need approval, which can take up to 5 minutes.
                 </div>
               </div>
             ) : `` }

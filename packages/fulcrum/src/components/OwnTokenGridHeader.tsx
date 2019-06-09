@@ -9,30 +9,30 @@ export interface IOwnTokenGridHeaderProps {
 export class OwnTokenGridHeader extends Component<IOwnTokenGridHeaderProps> {
   public render() {
     return (
-      <div className="trade-token-grid-header">
-        <div className="trade-token-grid-header__col-token-image">
-          <span className="trade-token-grid-header__text">Token</span>
+      <div className="own-token-grid-header">
+        <div className="own-token-grid-header__col-token-image">
+          <span className="own-token-grid-header__text">Asset</span>
         </div>
-        <div className="trade-token-grid-header__col-token-name-full">
-          <span className="trade-token-grid-header__text">&nbsp;</span>
+        <div className="own-token-grid-header__col-token-name">
+          <span className="own-token-grid-header__text">&nbsp;</span>
         </div>
-        <div className="trade-token-grid-header__col-amount">
-          <span className="trade-token-grid-header__text">Amount</span>
+        <div className="own-token-grid-header__col-position-type">
+          <span className="own-token-grid-header__text">&nbsp;</span>
         </div>
-        <div className="trade-token-grid-header__col-price">
-          <span className="trade-token-grid-header__text">Position Price</span>
+        <div className="own-token-grid-header__col-asset-price">
+          <span className="own-token-grid-header__text">Asset Price</span>
         </div>
-        <div className="trade-token-grid-header__col-price">
-          <span className="trade-token-grid-header__text">Liquidation Price</span>
+        <div className="own-token-grid-header__col-liquidation-price">
+          <span className="own-token-grid-header__text">Liquidation Price</span>
         </div>
-        {/*<div className="trade-token-grid-header__col-change24h">
-          <span className="trade-token-grid-header__text">24 hours</span>
-        </div>*/}
-        <div className="trade-token-grid-header__col-profit">
-          <span className="trade-token-grid-header__text">Profit</span>
+        <div className="own-token-grid-header__col-position-value">
+          <span className="own-token-grid-header__text">Position Value</span>
         </div>
-        <div className="trade-token-grid-header__col-actions">
-          <span className="trade-token-grid-header__text-right">
+        <div className="own-token-grid-header__col-profit">
+          <span className="own-token-grid-header__text">Profit</span>
+        </div>
+        <div className="own-token-grid-header__col-actions">
+          <span className="own-token-grid-header__text-right">
             <CheckBox checked={this.props.showMyTokensOnly} onChange={this.showMyTokensOnlyChange}>Show my positions only</CheckBox>
           </span>
         </div>

@@ -181,7 +181,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
         <div className="lend-form__form-container">
           <div className="lend-form__form-values-container">
             <div className="lend-form__kv-container lend-form__kv-container--w_dots">
-              <div className="lend-form__label">Token</div>
+              <div className="lend-form__label">Asset</div>
               <div className="lend-form__value">{tokenNameSource}</div>
             </div>
             <div className="lend-form__kv-container lend-form__kv-container--w_dots">

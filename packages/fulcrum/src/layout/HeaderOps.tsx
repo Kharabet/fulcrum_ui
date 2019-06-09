@@ -15,7 +15,6 @@ interface IHeaderOpsState {
 }
 
 export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
-  private readonly mediaQueryList: MediaQueryList;
   private _menu: IHeaderMenuProps = {
     items: [
       { id: 0, title: "Home", link: "/", external: false },
@@ -28,17 +27,19 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
   constructor(props: IHeaderOpsProps) {
     super(props);
 
-    this.mediaQueryList = window.matchMedia("(max-width: 959px)");
     this.state = {
-      isMobileMedia: this.mediaQueryList.matches,
+      isMobileMedia: false,
       isMenuOpen: false
     };
+  }
 
-    this.mediaQueryList.addEventListener("change", this.onMediaQueryListChange);
+  public componentDidMount(): void {
+    window.addEventListener("resize", this.didResize.bind(this));
+    this.didResize();
   }
 
   public componentWillUnmount(): void {
-    this.mediaQueryList.removeEventListener("change", this.onMediaQueryListChange);
+    window.removeEventListener("resize", this.didResize.bind(this));
   }
 
   public render() {
@@ -84,13 +85,12 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
     );
   };
 
-  private onMediaQueryListChange = (event: MediaQueryListEvent) => {
-    const matches = event.matches;
-
-    if (matches !== this.state.isMobileMedia) {
-      this.setState({ ...this.state, isMobileMedia: matches });
+  private didResize = () => {
+    const isMobileMedia = (window.innerWidth <= 959);
+    if (isMobileMedia !== this.state.isMobileMedia) {
+      this.setState({ isMobileMedia });
     }
-  };
+  }
 
   private onMenuToggle = (value: boolean) => {
     this.setState({ ...this.state, isMenuOpen: value });

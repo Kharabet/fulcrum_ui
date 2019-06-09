@@ -11,7 +11,7 @@ export class TradeTokenGridHeader extends Component<ITradeTokenGridHeaderProps> 
     return (
       <div className="trade-token-grid-header">
         <div className="trade-token-grid-header__col-token-image">
-          <span className="trade-token-grid-header__text">Token</span>
+          <span className="trade-token-grid-header__text">Asset</span>
         </div>
         <div className="trade-token-grid-header__col-token-name">
           <span className="trade-token-grid-header__text">&nbsp;</span>

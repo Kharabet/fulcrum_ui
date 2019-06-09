@@ -67,7 +67,7 @@ export class OwnTokenGrid extends Component<IOwnTokenGridProps, IOwnTokenGridSta
     const tokenRows = this.state.tokenRowsData.map(e => <OwnTokenGridRow key={`${e.currentKey.toString()}`} {...e} />);
 
     return (
-      <div className="trade-token-grid">
+      <div className="own-token-grid">
         <OwnTokenGridHeader
           showMyTokensOnly={this.props.showMyTokensOnly}
           onShowMyTokensOnlyChange={this.props.onShowMyTokensOnlyChange}
@@ -94,7 +94,7 @@ export class OwnTokenGrid extends Component<IOwnTokenGridProps, IOwnTokenGridSta
         rowsData.push({
           selectedKey: props.selectedKey,
           currentKey: pToken,
-          balance: balance,
+          // balance: balance,
           onDetails: props.onDetails,
           onManageCollateral: props.onManageCollateral,
           onSelect: props.onSelect,
