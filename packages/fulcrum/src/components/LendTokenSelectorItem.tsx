@@ -96,23 +96,23 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
           <div className="token-selector-item__description">
             <div className="token-selector-item__name">{this.state.assetDetails.displayName}</div>
             {this.state.profit !== null ? (
-              <div className="token-selector-item__interest-rate-container">
-                <div className="token-selector-item__interest-rate-title">Interest rate (APR):</div>
-                <div
-                  title={`${this.state.interestRate.toFixed(18)}%`}
-                  className="token-selector-item__interest-rate-value"
-                >{`${this.state.interestRate.toFixed(4)}%`}</div>
-              </div>
-            ) : ``}
-          </div>
-          {this.state.profit !== null ? (
-            <div className="token-selector-item__description">
               <div className="token-selector-item__profit-container">
                 <div className="token-selector-item__profit-title">Balance:</div>
                 <div
                   title={`$${this.state.balanceOfUser.toFixed(18)}`}
                   className="token-selector-item__profit-value"
                 >{`$${this.state.balanceOfUser.toFixed(2)}`}</div>
+              </div>
+            ) : ``}
+          </div>
+          {this.state.profit !== null ? (
+            <div className="token-selector-item__description">
+              <div className="token-selector-item__interest-rate-container">
+                <div className="token-selector-item__interest-rate-title">Interest rate (APR):</div>
+                <div
+                  title={`${this.state.interestRate.toFixed(18)}%`}
+                  className="token-selector-item__interest-rate-value"
+                >{`${this.state.interestRate.toFixed(4)}%`}</div>
               </div>
               <div className="token-selector-item__profit-container">
                 <div className="token-selector-item__profit-title">Profit:</div>
