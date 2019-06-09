@@ -360,7 +360,7 @@ export class FulcrumProvider {
           if (currentMargin.lte(maintenanceMargin)) {
             priceLatestDataPoint.liquidationPrice = priceLatestDataPoint.price;
           } else {
-            let multiplier = currentMargin
+            const multiplier = currentMargin
               .minus(maintenanceMargin)
               .dividedBy(10**20)
 

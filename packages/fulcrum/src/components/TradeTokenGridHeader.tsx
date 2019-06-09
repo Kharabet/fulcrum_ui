@@ -23,7 +23,7 @@ export class TradeTokenGridHeader extends Component<ITradeTokenGridHeaderProps> 
           <span className="trade-token-grid-header__text">Leverage</span>
         </div>
         <div className="trade-token-grid-header__col-price">
-          <span className="trade-token-grid-header__text">Position Price</span>
+          <span className="trade-token-grid-header__text">Asset Price</span>
         </div>
         <div className="trade-token-grid-header__col-price">
           <span className="trade-token-grid-header__text">Liquidation Price</span>
