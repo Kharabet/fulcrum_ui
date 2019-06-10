@@ -65,7 +65,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var fetch_ponyfill_1 = __importDefault(require("fetch-ponyfill"));
 var web3_1 = __importDefault(require("web3"));
 var subproviders_1 = require("@0x/subproviders");
-var version_1 = require("./version");
+//import { VERSION } from "./version";
 var _a = fetch_ponyfill_1.default(), fetch = _a.fetch, Headers = _a.Headers;
 var RATE_LIMIT_STATUS = 429;
 var DEFAULT_MAX_RETRIES = 3;
@@ -81,9 +81,8 @@ var ALCHEMY_DISALLOWED_METHODS = [
     "personal_sign",
 ];
 var ALCHEMY_HEADERS = new Headers({
-    Accept: "application/json",
+    "Accept": "application/json",
     "Content-Type": "application/json",
-    "Alchemy-Web3-Version": version_1.VERSION,
 });
 function createAlchemyWeb3(alchemyUrl, config) {
     var fullConfig = fillInConfigDefaults(config);

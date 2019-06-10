@@ -5,7 +5,7 @@ import { JsonRPCRequest, JsonRPCResponse } from "web3/providers";
 import { Subprovider } from "@0x/subproviders";
 import { JSONRPCRequestPayload } from "ethereum-types";
 
-import { VERSION } from "./version";
+//import { VERSION } from "./version";
 
 const { fetch, Headers } = fetchPonyfill();
 
@@ -110,9 +110,9 @@ const ALCHEMY_DISALLOWED_METHODS: string[] = [
 ];
 
 const ALCHEMY_HEADERS = new Headers({
-  Accept: "application/json",
+  "Accept": "application/json",
   "Content-Type": "application/json",
-  "Alchemy-Web3-Version": VERSION,
+  //"Alchemy-Web3-Version": VERSION, // causes excessive OPTIONS requests
 });
 
 export function createAlchemyWeb3(

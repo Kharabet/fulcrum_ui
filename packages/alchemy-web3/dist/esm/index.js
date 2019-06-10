@@ -60,7 +60,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 import fetchPonyfill from "fetch-ponyfill";
 import Web3 from "web3";
 import { Subprovider } from "@0x/subproviders";
-import { VERSION } from "./version";
+//import { VERSION } from "./version";
 var _a = fetchPonyfill(), fetch = _a.fetch, Headers = _a.Headers;
 var RATE_LIMIT_STATUS = 429;
 var DEFAULT_MAX_RETRIES = 3;
@@ -76,9 +76,8 @@ var ALCHEMY_DISALLOWED_METHODS = [
     "personal_sign",
 ];
 var ALCHEMY_HEADERS = new Headers({
-    Accept: "application/json",
+    "Accept": "application/json",
     "Content-Type": "application/json",
-    "Alchemy-Web3-Version": VERSION,
 });
 export function createAlchemyWeb3(alchemyUrl, config) {
     var fullConfig = fillInConfigDefaults(config);
