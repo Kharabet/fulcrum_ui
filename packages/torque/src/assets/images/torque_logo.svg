@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="136" height="48" viewBox="0 0 136 48">
+    <defs>
+        <style>
+            .cls-1{fill:none}.cls-2{fill:url(#linear-gradient)}
+        </style>
+        <linearGradient id="linear-gradient" x1=".294" x2=".829" y1=".76" y2=".203" gradientUnits="objectBoundingBox">
+            <stop offset="0" stop-color="#354e9e"/>
+            <stop offset="1" stop-color="#40b991"/>
+        </linearGradient>
+    </defs>
+    <g id="torque_logo" transform="translate(-32 -10)">
+        <path id="Rectangle_420" d="M0 0h136v48H0z" class="cls-1" data-name="Rectangle 420" transform="translate(32 10)"/>
+        <g id="Group_1053" data-name="Group 1053" transform="translate(2.122 -273.189)">
+            <path id="Path_533" d="M57.028 298.405a14.182 14.182 0 0 0-8.085-7.284v-.007a14.379 14.379 0 0 0-13.207 1.924L46.3 313.6a9.284 9.284 0 0 1-10.9-12.116l-4.7-1.665a14.264 14.264 0 0 0 17.937 18.3l2.2 4.274h1.9l-2.013-5.152a14.262 14.262 0 0 0 6.315-18.833zm-4.122 9.25a9.237 9.237 0 0 1-4.024 4.9l-6.674-17.083a9.9 9.9 0 0 1 5.032.341 9.284 9.284 0 0 1 5.668 11.843z" class="cls-2" data-name="Path 533" transform="translate(0 -.103)"/>
+            <path id="Path_534" d="M529.627 290.19h-3.688v7.5h-1.5v3.9h1.5v14.992h3.688v-14.998h3.208v-3.9h-3.208z" data-name="Path 534" transform="translate(-458.408)"/>
+            <path id="Path_535" d="M679.761 392.73h-5.994q-5.7 0-5.7 5.7v7.5q0 5.7 5.7 5.7h5.994q5.7 0 5.7-5.637v-7.556q-.006-5.707-5.7-5.707zm1.8 13.251a1.565 1.565 0 0 1-1.8 1.739h-5.994a1.591 1.591 0 0 1-1.8-1.8v-7.494a1.59 1.59 0 0 1 1.8-1.8h5.994a1.59 1.59 0 0 1 1.8 1.8z" data-name="Path 535" transform="translate(-591.538 -95.044)"/>
+            <path id="Path_536" d="M946.9 398.427v13.193h3.9v-13.193a1.59 1.59 0 0 1 1.8-1.8h2.7v-3.9h-2.7q-5.7.003-5.7 5.7z" data-name="Path 536" transform="translate(-849.985 -95.044)"/>
+            <path id="Path_537" d="M1386.941 405.981a1.565 1.565 0 0 1-1.8 1.739h-5.995a1.591 1.591 0 0 1-1.8-1.8v-13.19h-3.9v13.193q0 5.7 5.7 5.7h5.995q5.7 0 5.7-5.637V392.73h-3.9z" data-name="Path 537" transform="translate(-1245.353 -95.044)"/>
+            <path id="Path_538" d="M1664.092 392.73h-5.992q-5.7 0-5.7 5.7v7.5q0 5.7 5.7 5.7h10.195v-3.9h-10.2a1.59 1.59 0 0 1-1.8-1.8v-7.5a1.59 1.59 0 0 1 1.8-1.8h5.994a1.59 1.59 0 0 1 1.8 1.8v.06a1.564 1.564 0 0 1-1.8 1.739h-6.589v3.9h6.6q5.7 0 5.7-5.637v-.06q-.011-5.702-5.708-5.702z" data-name="Path 538" transform="translate(-1503.911 -95.044)"/>
+            <path id="Path_539" d="M1114.983 413.125l-3.023 3.757v-18.5q0-5.7-5.7-5.7h-5.994q-5.7 0-5.7 5.7v7.5q0 5.7 5.7 5.7h6.6v-3.9h-6.6a1.59 1.59 0 0 1-1.8-1.8v-7.5a1.59 1.59 0 0 1 1.8-1.8h5.994a1.59 1.59 0 0 1 1.8 1.8v23.32h3.847l.012.013.01-.013h.028v-.034l6.877-8.549z" data-name="Path 539" transform="translate(-986.86 -95.007)"/>
+        </g>
+    </g>
+</svg>

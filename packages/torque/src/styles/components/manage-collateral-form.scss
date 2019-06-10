@@ -1,0 +1,157 @@
+.manage-collateral-form {
+  width: 16rem;
+  padding: 2.5rem 3rem 3rem;
+
+  background-color: #444e5a;
+
+  .manage-collateral-form__title {
+    margin-bottom: 4.75rem;
+
+    font-size: 1.5rem;
+    font-weight: 600;
+    font-style: normal;
+    font-stretch: normal;
+    line-height: 1.33;
+    letter-spacing: normal;
+    text-align: center;
+    color: #ffffff;
+  }
+
+  .manage-collateral-form__tips {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+
+    // hack around slider
+    padding-top: 1rem;
+
+    margin-bottom: 0.875rem;
+  }
+
+  .manage-collateral-form__tip {
+    font-size: 0.75rem;
+    font-weight: normal;
+    font-style: normal;
+    font-stretch: normal;
+    line-height: 2;
+    letter-spacing: normal;
+    color: #a9b5c7;
+  }
+
+  .manage-collateral-form__delimiter {
+    margin-bottom: 1rem;
+
+    border: 0;
+    border-top: solid 0.0625rem rgba(255, 255, 255, 0.2);
+  }
+
+  .manage-collateral-form__info-liquidated-at-container {
+    .manage-collateral-form__info-liquidated-at-msg {
+      margin-bottom: 0.25rem;
+
+      font-size: 0.75rem;
+      font-weight: normal;
+      font-style: normal;
+      font-stretch: normal;
+      line-height: 1.33;
+      letter-spacing: normal;
+      text-align: center;
+      color: #a9b5c7;
+    }
+
+    .manage-collateral-form__info-liquidated-at-price {
+      font-size: 1rem;
+      font-weight: 600;
+      font-style: normal;
+      font-stretch: normal;
+      line-height: 1.5;
+      letter-spacing: normal;
+      text-align: center;
+      color: #ffffff;
+    }
+  }
+
+  .manage-collateral-form__operation-result-container {
+    position: relative;
+
+    padding: 1.75rem 1rem;
+    margin-top: 3.5rem;
+
+    border-radius: 4px;
+    background-color: rgba(0, 0, 0, 0.1);
+
+    .manage-collateral-form__operation-result-img {
+      height: 2rem;
+      width: 2rem;
+
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%) translateY(-50%);
+    }
+
+    .manage-collateral-form__operation-result-msg {
+      font-size: 0.75rem;
+      font-weight: normal;
+      font-style: normal;
+      font-stretch: normal;
+      line-height: 2;
+      letter-spacing: normal;
+      text-align: center;
+      color: #a9b5c7;
+    }
+
+    .manage-collateral-form__operation-result-amount {
+      font-size: 1rem;
+      font-weight: 600;
+      font-style: normal;
+      font-stretch: normal;
+      line-height: 1.5;
+      letter-spacing: normal;
+      text-align: center;
+      color: #ffffff;
+    }
+  }
+
+  .manage-collateral-form__actions-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+
+    margin-top: 3rem;
+
+    .manage-collateral-form__action-cancel,
+    .manage-collateral-form__action-close {
+      display: inline-block;
+
+      cursor: pointer;
+      border: 0;
+      height: 2.5rem;
+      width: 6.5rem;
+      background-color: rgba(0, 0, 0, 0);
+      text-decoration: underline;
+      text-decoration-style: dotted;
+      color: #a9b5c7;
+      outline: none;
+    }
+
+    .manage-collateral-form__action-close {
+      width: auto;
+    }
+
+    .manage-collateral-form__action-withdraw,
+    .manage-collateral-form__action-top-up {
+      display: inline-block;
+
+      cursor: pointer;
+      border: 0;
+      height: 2.5rem;
+      width: 6.5rem;
+      border-radius: 100px;
+      color: #ffffff;
+      background-color: #69bf83;
+      text-transform: uppercase;
+      outline: none;
+    }
+  }
+}

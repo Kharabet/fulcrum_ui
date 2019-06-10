@@ -1,0 +1,30 @@
+Alchemy:
+const url = "https://eth-ropsten.alchemyapi.io/jsonrpc/"+Alchemy_ApiKey;
+
+// Using web3js
+const web3 =
+  new Web3(new Web3.providers.HttpProvider(url));
+
+// Using ethers.js
+const provider =
+  new ethers.providers.JsonRpcProvider(url);
+
+
+Portis:
+npm install web3 @portis/web3
+
+import Portis from '@portis/web3';
+import Web3Wrapperfrom 'web3';
+
+// ref: https://docs.portis.io/#/configuration
+const portis = new Portis('32537ad9-601e-4854-80a2-216dcea0fed6', 'ropsten');
+const web3 = new Web3(portis.provider);
+
+
+Fortmatic:
+//ref: https://developers.fortmatic.com/docs
+//note: only on Rinkeby and Mainnet right now
+
+
+Bitski:
+// will do later

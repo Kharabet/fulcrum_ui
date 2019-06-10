@@ -1,0 +1,47 @@
+@media screen and (max-width: $mobile-version-max-width) {
+  .html-landing-page-active {
+    background-size: 960px 960px;
+    background-image: url("../assets/images/bg_mobile.png");
+  }
+
+  .landing-page {
+    .landing-page__main {
+      .landing-page__jumbo {
+        width: 20.5rem;
+        h1 {
+          margin-bottom: 2.5rem;
+
+          .landing-page__jumbo-header {
+            font-size: 3.7rem;
+          }
+        }
+
+        .landing-page__jumbo-action-container {
+          .landing-page__jumbo-action {
+            width: 9rem;
+
+            &:first-child {
+              margin-right: 0.75rem;
+            }
+
+            &:last-child {
+              margin-left: 0.75rem;
+            }
+
+            .landing-page__jumbo-action-button {
+              line-height: 3.5rem;
+              height: 3.5rem;
+              width: 8rem;
+              margin-bottom: 1rem;
+            }
+
+            .landing-page__jumbo-action-description {
+              padding: 0 0.5rem;
+              font-size: 1rem;
+            }
+          }
+        }
+      }
+    }
+  }
+}

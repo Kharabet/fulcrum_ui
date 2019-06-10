@@ -1,0 +1,15 @@
+.header-logo {
+  display: inline-block;
+  height: 100%;
+
+  a {
+    display: block;
+    height: 100%;
+  }
+}
+
+.header-logo__image {
+  height: 2rem;
+  margin: .5rem 0;
+  vertical-align: middle;
+}
