@@ -76,8 +76,10 @@ var ALCHEMY_DISALLOWED_METHODS = [
     "personal_sign",
 ];
 var ALCHEMY_HEADERS = new Headers({
-    "Accept": "application/json",
-    "Content-Type": "application/json",
+//"Accept": "application/json",
+//"Content-Type": "text/plain,"
+//"Content-Type": "application/json",
+//"Alchemy-Web3-Version": VERSION, // causes excessive OPTIONS requests
 });
 export function createAlchemyWeb3(alchemyUrl, config) {
     var fullConfig = fillInConfigDefaults(config);
