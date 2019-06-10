@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+  <defs>
+    <style>
+      .cls-1{fill:#fff}
+    </style>
+  </defs>
+  <g id="ic_menu">
+    <rect x="2" y="4" class="cls-1" width="20" height="2"/>
+    <rect x="2" y="10" class="cls-1" width="20" height="2"/>
+    <rect x="2" y="16" class="cls-1" width="20" height="2"/>
+  </g>
+</svg>

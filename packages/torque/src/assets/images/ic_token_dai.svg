@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+    <defs>
+        <style>
+            .cls-1{fill:#8878b5}.cls-2{fill:#ffce45}.cls-3{fill:#febe44}.cls-4{fill:#fff}.cls-5{fill:#d9a547;opacity:.42}
+        </style>
+    </defs>
+    <g id="ic_token_dai" transform="translate(-32 -280)">
+        <rect id="Rectangle_411" width="64" height="64" class="cls-1" data-name="Rectangle 411" rx="32" transform="translate(32 280)"/>
+        <g id="Group_399" data-name="Group 399" transform="translate(35.383 283.896)">
+            <path id="Path_327" d="M93.435 72.307l15.987 15.987-15.987 15.987-15.987-15.987z" class="cls-2" data-name="Path 327" transform="translate(-64.818 -60.202)"/>
+            <path id="Path_328" d="M93.25 93.5l-16-5.217 16-15.987 16 15.987z" class="cls-3" data-name="Path 328" transform="translate(-64.633 -60.196)"/>
+            <path id="Path_329" d="M159.65 132.682h7.3l3.13-3.478 3.478 3.478h7.3l-10.773-11.652z" class="cls-4" data-name="Path 329" transform="translate(-141.468 -105.635)"/>
+            <path id="Path_330" d="M314.15 104.273V72.3l15.986 15.987z" class="cls-5" data-name="Path 330" transform="translate(-285.533 -60.196)"/>
+        </g>
+    </g>
+</svg>

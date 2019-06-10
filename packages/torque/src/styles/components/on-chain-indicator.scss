@@ -1,0 +1,66 @@
+.on-chain-indicator {
+  display: inline-block;
+  height: 100%;
+}
+
+.on-chain-indicator__container {
+  height: 2rem;
+  margin: 0.5rem 0;
+
+  cursor: pointer;
+
+  border-radius: 100px;
+  border: solid 1px #758295;
+
+  background-color: rgba(0, 0, 0, 0);
+  outline: none;
+
+  .on-chain-indicator__provider-img {
+    display: inline-block;
+    text-align: center;
+    vertical-align: top;
+
+    height: 1rem;
+    line-height: 2rem;
+
+    margin: 0.5rem 1rem;
+  }
+
+  .on-chain-indicator__provider-txt {
+    display: inline-block;
+    text-align: center;
+    vertical-align: top;
+
+    line-height: 2rem;
+
+    color: #ffffff;
+    font-size: 0.75rem;
+    font-weight: normal;
+    font-style: normal;
+    font-stretch: normal;
+    letter-spacing: normal;
+
+    padding: 0 1rem;
+  }
+
+  .on-chain-indicator__wallet-address {
+    display: inline-block;
+    text-align: center;
+    vertical-align: top;
+
+    border-left: solid 1px #758295;
+
+    line-height: 2rem;
+
+    color: #758295;
+    font-size: 0.75rem;
+    font-weight: normal;
+    font-style: normal;
+    font-stretch: normal;
+    letter-spacing: normal;
+
+    padding: 0 1rem;
+    
+    text-decoration: none;
+  }
+}

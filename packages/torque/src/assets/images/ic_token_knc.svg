@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+    <defs>
+        <style>
+            .cls-1{fill:#38776f}.cls-2{fill:url(#linear-gradient)}.cls-3{fill:#e5f4f1}.cls-4{fill:#a7d8d2}.cls-5{fill:url(#linear-gradient-2)}.cls-6,.cls-7{stroke:#fff}.cls-6{stroke-linejoin:bevel}
+        </style>
+        <linearGradient id="linear-gradient" x1="-2.72" x2="-2.764" y1=".855" y2="-.241" gradientUnits="objectBoundingBox">
+            <stop offset="0" stop-color="#54d29f"/>
+            <stop offset="1" stop-color="#249eac"/>
+        </linearGradient>
+        <linearGradient id="linear-gradient-2" x1="-2.44" x2="-2.548" y1=".139" y2="1.254" gradientUnits="objectBoundingBox">
+            <stop offset="0" stop-color="#008597"/>
+            <stop offset="1" stop-color="#00aa8f"/>
+        </linearGradient>
+    </defs>
+    <g id="ic_token_knc" transform="translate(-181 -472)">
+        <rect id="Rectangle_414" width="64" height="64" class="cls-1" data-name="Rectangle 414" rx="32" transform="translate(181 472)"/>
+        <g id="layer1" transform="translate(200.859 485.555)">
+            <g id="g4228" transform="translate(.141 -2.555)">
+                <path id="rect4147" d="M-639.1 435.9l8.7-9.6.4 40.364-6.909-9.677z" class="cls-2" transform="translate(640.215 -424.985)"/>
+                <path id="path4150" d="M-462.164 438.323l-.188-15.871 13.066 9.564z" class="cls-3" transform="translate(472.971 -421.342)"/>
+                <path id="path4153" d="M-440.108 635.072l-12.444-13.386 12.727-6.382z" class="cls-4" transform="translate(463.698 -603.819)"/>
+                <path id="path4155" d="M-458.051 776.038l-.449-23.538 12.426 13.4z" class="cls-5" transform="translate(469.328 -733.64)"/>
+                <circle id="path4157-3" cx=".791" cy=".791" r=".791" class="cls-6" transform="translate(0 10.223)"/>
+                <circle id="path4157-6" cx=".791" cy=".791" r=".791" class="cls-6" transform="translate(9.15)"/>
+                <circle id="path4157-7" cx="2.767" cy="2.767" r="2.767" class="cls-6" transform="rotate(-.699 698.433 -1727.607)"/>
+                <circle id="path4157-5" cx=".791" cy=".791" r=".791" class="cls-6" transform="translate(9.357 17.113)"/>
+                <path id="path4157-35" d="M.791 0A.791.791 0 1 1 0 .791.791.791 0 0 1 .791 0z" class="cls-7" transform="translate(2.052 30.989)"/>
+                <circle id="path4157-62" cx=".791" cy=".791" r=".791" class="cls-6" transform="translate(9.903 41.419)"/>
+                <circle id="path4157-9" cx="2.767" cy="2.767" r="2.767" class="cls-6" transform="rotate(-89.31 27.762 7.051)"/>
+            </g>
+        </g>
+    </g>
+</svg>
