@@ -10,7 +10,7 @@ export class LandingPage extends PureComponent {
         <main className="landing-page__main">
           <div className="landing-page__jumbo">
             <h1>
-              <span className="landing-page__jumbo-header">Torque</span>
+              <span className="landing-page__jumbo-header">Borrowing Made Simple</span>
             </h1>
           </div>
         </main>

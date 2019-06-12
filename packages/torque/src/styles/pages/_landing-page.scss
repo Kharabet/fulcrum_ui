@@ -1,8 +1,4 @@
 .html-landing-page-active {
-  background-size: 1920px 1440px;
-  background-repeat: no-repeat;
-  background-position: center;
-  background-image: url("../assets/images/bg.png");
   height: 100%;
 }
 
@@ -21,22 +17,22 @@
     .landing-page__jumbo {
       display: inline-block;
       position: relative;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 50.5rem;
-      text-align: center;
+      text-align: left;
 
       h1 {
-        margin-bottom: 5.75rem;
+        width: 51rem;
+        height: 19.6875rem;
+
 
         .landing-page__jumbo-header {
-          font-size: 6.75rem;
-          font-weight: 300;
+          font-size: 8rem;
+          font-weight: bold;
           font-style: normal;
           font-stretch: normal;
-          line-height: 1.25;
-          letter-spacing: normal;
-          color: #ffffff;
+          line-height: 1.06;
+          letter-spacing: -3.2px;
+          text-align: left;
+          color: #3b364b;
         }
       }
     }

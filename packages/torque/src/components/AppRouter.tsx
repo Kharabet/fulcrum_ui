@@ -5,7 +5,10 @@ import Modal from "react-modal";
 import { HashRouter, Redirect, Route, Switch } from "react-router-dom";
 import configProviders from "../config/providers.json";
 import { ProviderType } from "../domain/ProviderType";
+import { BorrowPage } from "../pages/BorrowPage";
+import { DashboardPage } from "../pages/DashboardPage";
 import { LandingPage } from "../pages/LandingPage";
+import { WalletSelectionPage } from "../pages/WalletSelectionPage";
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { TorqueProviderEvents } from "../services/events/TorqueProviderEvents";
 import { TorqueProvider } from "../services/TorqueProvider";
@@ -72,6 +75,9 @@ export class AppRouter extends Component<any, IAppRouterState> {
             <LocationListener doNetworkConnect={this.doNetworkConnect}>
               <Switch>
                 <Route exact={true} path="/" render={() => <LandingPage />} />
+                <Route exact={true} path="/wallet/" render={() => <WalletSelectionPage />} />
+                <Route exact={true} path="/borrow/" render={() => <BorrowPage />} />
+                <Route exact={true} path="/dashboard/" render={() => <DashboardPage />} />
                 <Route path="*" render={() => <Redirect to="/"/> } />
               </Switch>
               {isMainnetProd ? (

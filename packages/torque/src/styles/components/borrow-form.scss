@@ -1,0 +1,64 @@
+.borrow-form {
+  display: flex;
+  flex-direction: column;
+
+  width: 31rem;
+  padding: 2.625rem 3rem 3rem;
+
+  border-radius: 1rem;
+  box-shadow: 0 16px 80px 0 rgba(59, 54, 75, 0.2);
+  background-color: #ffffff;
+
+  .borrow-form__title-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+
+    width: 100%;
+
+    .borrow-form__title {
+      height: 2rem;
+      line-height: 2rem;
+
+      font-size: 1.25rem;
+      font-weight: bold;
+      font-style: normal;
+      font-stretch: normal;
+      letter-spacing: -0.2px;
+      text-align: left;
+      color: #3b364b;
+    }
+
+    .borrow-form__title-close {
+      line-height: 2rem;
+
+      width: 1.25rem;
+
+    }
+  }
+
+  .borrow-form__transfer-details {
+
+
+    .borrow-form__transfer-details-msg {
+
+
+    }
+  }
+
+  .borrow-form__input-container {
+    & input {
+      display: block;
+      height: 112px;
+      border-radius: 4px;
+      border: solid 2px rgba(169, 181, 199, 0.2);
+      background-color: #f5f7f9;
+    }
+  }
+
+  .borrow-form__actions-container {
+    display: flex;
+    flex-direction: row;
+
+  }
+}

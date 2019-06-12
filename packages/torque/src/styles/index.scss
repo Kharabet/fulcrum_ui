@@ -11,6 +11,9 @@
 @import "base/typography";
 @import "base/utilities";
 
+@import "components/borrow-form";
+@import "components/borrow-via-transfer-details";
+@import "components/borrowed-funds-list";
 @import "components/collateral-token-selector";
 @import "components/manage-collateral-form";
 @import "components/on-chain-indicator";
@@ -26,5 +29,8 @@
 @import "layout/header-menu";
 @import "layout/header-menu.mobile";
 
+@import "pages/borrow-page";
+@import "pages/dashboard-page";
 @import "pages/landing-page";
 @import "pages/landing-page.mobile";
+@import "pages/wallet-selection-page";

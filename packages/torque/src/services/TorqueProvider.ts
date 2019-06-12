@@ -300,13 +300,13 @@ export class TorqueProvider {
   //       if (request instanceof LendRequest) {
   //         this.eventEmitter.emit(
   //           TorqueProviderEvents.LendTransactionMined,
-  //           new LendTransactionMinedEvent(request.asset, txHash)
+  //           new LendTransactionMinedEvent(request.borrowAsset, txHash)
   //         );
   //       } else {
   //         this.eventEmitter.emit(
   //           TorqueProviderEvents.TradeTransactionMined,
   //           new TradeTransactionMinedEvent(new TradeTokenKey(
-  //             request.asset,
+  //             request.borrowAsset,
   //             request.unitOfAccount,
   //             request.positionType,
   //             request.leverage,
