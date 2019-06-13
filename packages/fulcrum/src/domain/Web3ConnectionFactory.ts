@@ -90,6 +90,7 @@ export class Web3ConnectionFactory {
       } else if (providerType === ProviderType.Bitski) {
         try {
           subProvider = await subProvider.getProvider({ networkName: process.env.REACT_APP_ETH_NETWORK ? process.env.REACT_APP_ETH_NETWORK : undefined });
+          providerEngine.addProvider(new SignerSubprovider(subProvider));
           canWrite = true;
         } catch(e) {
           // console.log(e);
