@@ -107,7 +107,8 @@ export class Web3ConnectionFactory {
     if (subProvider && providerType === ProviderType.MetaMask) {
       // @ts-ignore
       subProvider.publicConfigStore.on("update", async result => {
-        const networkIdInt = parseInt(subProvider.networkVersion, 10);
+        //console.log(subProvider.publicConfigStore._state);
+        const networkIdInt = parseInt(subProvider.publicConfigStore._state.networkVersion, 10);
         if (FulcrumProvider.Instance.providerType === ProviderType.MetaMask &&
           Web3ConnectionFactory.networkId !== networkIdInt) {
           
@@ -147,7 +148,8 @@ export class Web3ConnectionFactory {
         }
       });
       
-      Web3ConnectionFactory.networkId = parseInt(subProvider.networkVersion, 10);
+      //console.log(subProvider.publicConfigStore._state);
+      Web3ConnectionFactory.networkId = parseInt(subProvider.publicConfigStore._state.networkVersion, 10);
     } else {
       Web3ConnectionFactory.networkId = await web3Wrapper.getNetworkIdAsync();
     }
