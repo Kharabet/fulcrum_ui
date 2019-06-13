@@ -54,6 +54,7 @@ interface ITradeFormState {
   tradeAmountText: string;
   tradeAmount: BigNumber;
   balance: BigNumber | null;
+  ethBalance: BigNumber | null;
   positionTokenBalance: BigNumber | null;
   maxTradeAmount: BigNumber;
 
@@ -75,6 +76,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     const assetDetails = AssetsDictionary.assets.get(props.asset);
     const interestRate = null;
     const balance = null;
+    const ethBalance = null;
     const positionTokenBalance = null;
     const maxTradeValue = new BigNumber(0);
     const slippageRate = new BigNumber(0);
@@ -88,6 +90,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       tradeAmountText: "",
       tradeAmount: maxTradeValue,
       balance: balance,
+      ethBalance: ethBalance,
       positionTokenBalance: positionTokenBalance,
       maxTradeAmount: maxTradeValue,
       isChangeCollateralOpen: false,
@@ -151,6 +154,8 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       this.props.tradeType === TradeType.BUY
         ? await FulcrumProvider.Instance.getAssetTokenBalanceOfUser(this.state.collateral)
         : positionTokenBalance;
+    const ethBalance = await FulcrumProvider.Instance.getEthBalance();
+
     const maxTradeValue = await FulcrumProvider.Instance.getMaxTradeValue(this.props.tradeType, tradeTokenKey, this.state.collateral);
     const tradeRequest = new TradeRequest(
       this.props.tradeType,
@@ -172,6 +177,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       tradeAmountText: "",
       tradeAmount: new BigNumber(0),
       balance: balance,
+      ethBalance: ethBalance,
       positionTokenBalance: positionTokenBalance,
       maxTradeAmount: maxTradeValue,
       tradedAmountEstimate: tradedAmountEstimate,
@@ -238,11 +244,13 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
 
     const isAmountMaxed = this.state.tradeAmount.eq(this.state.maxTradeAmount);
     const amountMsg =
-      this.state.balance && this.state.balance.eq(0)
-        ? "Your wallet is empty \u2639"
-        : this.state.slippageRate.gte(0.2)
-          ? `Slippage: ${this.state.slippageRate.toFixed(1)}%`
-          : "";
+      this.state.ethBalance && this.state.ethBalance.lte(FulcrumProvider.Instance.gasBufferForTrade)
+        ? "Please add Ether to wallet."
+        : this.state.balance && this.state.balance.eq(0)
+          ? "Your wallet is empty \u2639"
+          : this.state.slippageRate.gte(0.2)
+            ? `Slippage: ${this.state.slippageRate.toFixed(1)}%`
+            : "";
 
     const tradedAmountEstimateText =
       this.state.tradedAmountEstimate.eq(0)

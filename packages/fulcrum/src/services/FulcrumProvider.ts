@@ -59,6 +59,9 @@ export class FulcrumProvider {
   // 5000ms
   public readonly successDisplayTimeout = 5000;
 
+  public readonly gasBufferForLend = new BigNumber(10 ** 16); // 0.01 ETH
+  public readonly gasBufferForTrade = new BigNumber(5 * 10 ** 16); // 0.05 ETH
+
   public static readonly UNLIMITED_ALLOWANCE_IN_BASE_UNITS = new BigNumber(2)
     .pow(256)
     .minus(1);
@@ -163,7 +166,14 @@ export class FulcrumProvider {
     }
 
     if (this.web3Wrapper && canWrite) {
-      this.accounts = await this.web3Wrapper.getAvailableAddressesAsync();
+      try {
+        this.accounts = await this.web3Wrapper.getAvailableAddressesAsync() || [];
+      } catch(e) {
+        this.accounts = [];
+      }
+      if (this.accounts.length === 0) {
+        canWrite = false; // revert back to read-only  
+      }
     } else {
       // this.accounts = [];
       if (providerType === ProviderType.Bitski && networkId !== 1) {
@@ -577,8 +587,7 @@ export class FulcrumProvider {
           result = BigNumber.min(marketLiquidity, balance);
 
           if (collateral === Asset.ETH) {
-            const gasBuffer = new BigNumber(5 * 10 ** 16); // 0.05 ETH
-            result = result.gt(gasBuffer) ? result.minus(gasBuffer) : new BigNumber(0);
+            result = result.gt(this.gasBufferForTrade) ? result.minus(this.gasBufferForTrade) : new BigNumber(0);
           }
         } else {
           result = new BigNumber(0);
@@ -599,9 +608,7 @@ export class FulcrumProvider {
     if (request.lendType === LendType.LEND) {
       result = await this.getAssetTokenBalanceOfUser(request.asset);
       if (request.asset === Asset.ETH) {
-        const gasBuffer = new BigNumber(10 ** 16); // 0.01 ETH
-
-        result = result.gt(gasBuffer) ? result.minus(gasBuffer) : new BigNumber(0);
+        result = result.gt(this.gasBufferForLend) ? result.minus(this.gasBufferForLend) : new BigNumber(0);
       }
     } else {
       result = await this.getITokenBalanceOfUser(request.asset);
@@ -816,7 +823,7 @@ export class FulcrumProvider {
     return result;
   }
 
-  private async getEthBalance(): Promise<BigNumber> {
+  public async getEthBalance(): Promise<BigNumber> {
     let result: BigNumber = new BigNumber(0);
 
     if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {

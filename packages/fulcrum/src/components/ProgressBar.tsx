@@ -56,6 +56,8 @@ export class ProgressBar extends Component<IProgressBarProps> {
           errorMsg = "You didn't confirm in MetaMask. Please try again.";
         } else if (errorMsg.includes("User denied account authorization.")) {
           errorMsg = "You didn't authorize MetaMask. Please try again.";
+        } else if (errorMsg.includes("Transaction rejected")) {
+          errorMsg = "You didn't confirm in Gnosis Safe. Please try again.";
         } else {
           errorMsg = "";
         }

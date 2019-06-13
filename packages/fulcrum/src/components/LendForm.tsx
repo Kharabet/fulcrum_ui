@@ -38,6 +38,7 @@ interface ILendFormState {
   lendAmount: BigNumber | null;
   maxLendAmount: BigNumber | null;
   lendedAmountEstimate: BigNumber | null;
+  ethBalance: BigNumber | null;
 }
 
 export class LendForm extends Component<ILendFormProps, ILendFormState> {
@@ -59,7 +60,8 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
       lendAmount: null,
       maxLendAmount: null,
       lendedAmountEstimate: null,
-      interestRate: null
+      interestRate: null,
+      ethBalance: null
     };
 
     this._inputChange = new Subject();
@@ -105,6 +107,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
     ));
     const lendRequest = new LendRequest(this.props.lendType, this.props.asset, maxLendAmount);
     const lendedAmountEstimate = await FulcrumProvider.Instance.getLendedAmountEstimate(lendRequest);
+    const ethBalance = await FulcrumProvider.Instance.getEthBalance();
 
     this.setState({
       ...this.state,
@@ -113,7 +116,8 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
       lendAmount: maxLendAmount,
       maxLendAmount: maxLendAmount,
       lendedAmountEstimate: lendedAmountEstimate,
-      interestRate: interestRate
+      interestRate: interestRate,
+      ethBalance: ethBalance
     });
   }
 
@@ -161,9 +165,12 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
     const tokenNameDestination = this.props.lendType === LendType.LEND ? tokenNamePosition : tokenNameBase;
 
     const isAmountMaxed = this.state.lendAmount ? this.state.lendAmount.eq(this.state.maxLendAmount!) : false;
+
     const amountMsg =
-      this.state.maxLendAmount && this.state.maxLendAmount.eq(0) ?
-          "Your wallet is empty \u2639"
+      this.state.ethBalance && this.state.ethBalance.lte(FulcrumProvider.Instance.gasBufferForLend)
+        ? "Please add Ether to wallet."
+        : this.state.maxLendAmount && this.state.maxLendAmount.eq(0)
+          ? "Your wallet is empty \u2639"
           : "";
 
     const lendedAmountEstimateText =
