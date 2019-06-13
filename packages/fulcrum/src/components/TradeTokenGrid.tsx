@@ -89,7 +89,7 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
       rowsData.push({
         selectedKey: props.selectedKey,
         asset: e,
-        defaultUnitOfAccount: Asset.USDC,
+        defaultUnitOfAccount: Asset.DAI,
         defaultTokenizeNeeded: true,
         positionType: PositionType.SHORT,
         defaultLeverage: props.defaultLeverageShort,
@@ -105,7 +105,7 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
       rowsData.push({
         selectedKey: props.selectedKey,
         asset: e,
-        defaultUnitOfAccount: Asset.USDC,
+        defaultUnitOfAccount: Asset.DAI,
         defaultTokenizeNeeded: true,
         positionType: PositionType.LONG,
         defaultLeverage: props.defaultLeverageLong,
