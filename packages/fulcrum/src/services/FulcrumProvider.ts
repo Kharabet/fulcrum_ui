@@ -59,8 +59,8 @@ export class FulcrumProvider {
   // 5000ms
   public readonly successDisplayTimeout = 5000;
 
-  public readonly gasBufferForLend = new BigNumber(10 ** 16); // 0.01 ETH
-  public readonly gasBufferForTrade = new BigNumber(5 * 10 ** 16); // 0.05 ETH
+  public readonly gasBufferForLend = new BigNumber(0);//new BigNumber(10 ** 16); // 0.01 ETH
+  public readonly gasBufferForTrade = new BigNumber(0);//new BigNumber(5 * 10 ** 16); // 0.05 ETH
 
   public static readonly UNLIMITED_ALLOWANCE_IN_BASE_UNITS = new BigNumber(2)
     .pow(256)
