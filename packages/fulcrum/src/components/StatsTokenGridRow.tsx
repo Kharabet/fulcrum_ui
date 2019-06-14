@@ -111,7 +111,7 @@ export class StatsTokenGridRow extends Component<IStatsTokenGridRowProps, IStats
             className="stats-grid-row__col-name"
             style={{cursor: `pointer`, textDecoration: `underline`}}
             title={details.addressErc20}
-            href={`${FulcrumProvider.Instance.web3ProviderSettings.etherscanURL}token/${details.addressErc20}`}
+            href={`${FulcrumProvider.Instance.web3ProviderSettings.etherscanURL}address/${details.addressErc20}#readContract`}
             target="_blank"
             rel="noopener noreferrer"
           >

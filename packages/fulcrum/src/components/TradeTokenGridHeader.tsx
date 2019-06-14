@@ -32,7 +32,7 @@ export class TradeTokenGridHeader extends Component<ITradeTokenGridHeaderProps> 
           <span className="trade-token-grid-header__text">24 hours</span>
         </div>*/}
         <div className="trade-token-grid-header__col-profit">
-          <span className="trade-token-grid-header__text">Profit</span>
+          <span className="trade-token-grid-header__text">Interest APR</span>
         </div>
         <div className="trade-token-grid-header__col-actions">
           <span className="trade-token-grid-header__text-right">

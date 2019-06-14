@@ -27,6 +27,7 @@ export interface ITradeTokenGridRowProps {
 
   onSelect: (key: TradeTokenKey) => void;
   onTrade: (request: TradeRequest) => void;
+  onShowMyTokensOnlyChange: (value: boolean) => void;
 }
 
 interface ITradeTokenGridRowState {
@@ -34,7 +35,7 @@ interface ITradeTokenGridRowState {
   leverage: number;
 
   latestPriceDataPoint: IPriceDataPoint;
-  profit: BigNumber | null;
+  interestRate: BigNumber;
   balance: BigNumber;
 }
 
@@ -48,7 +49,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
       leverage: this.props.defaultLeverage,
       assetDetails: assetDetails || null,
       latestPriceDataPoint: FulcrumProvider.Instance.getPriceDefaultDataPoint(),
-      profit: new BigNumber(0),
+      interestRate: new BigNumber(0),
       balance: new BigNumber(0)
     };
 
@@ -68,14 +69,13 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
   private async derivedUpdate() {
     const tradeTokenKey = new TradeTokenKey(this.props.asset, this.props.defaultUnitOfAccount, this.props.positionType, this.state.leverage, this.props.defaultTokenizeNeeded);
     const latestPriceDataPoint = await FulcrumProvider.Instance.getTradeTokenAssetLatestDataPoint(tradeTokenKey);
-    const data: [BigNumber | null, BigNumber | null] = await FulcrumProvider.Instance.getTradeBalanceAndProfit(tradeTokenKey);
-    const profit = data[1];
+    const interestRate = await FulcrumProvider.Instance.getTradeTokenInterestRate(tradeTokenKey);
     const balance = await FulcrumProvider.Instance.getPTokenBalanceOfUser(tradeTokenKey);
 
     this.setState({
       ...this.state,
       latestPriceDataPoint: latestPriceDataPoint,
-      profit: profit,
+      interestRate: interestRate,
       balance: balance
     });
   }
@@ -168,8 +168,8 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
         {/*<div className="trade-token-grid-row__col-change24h">
           <Change24HMarker value={bnChange24h} size={Change24HMarkerSize.MEDIUM} />
         </div>*/}
-        <div title={this.state.profit ? `$${this.state.profit.toFixed(18)}` : ""} className="trade-token-grid-row__col-profit">
-          {this.state.profit ? `$${this.state.profit.toFixed(4)}` : "-"}
+        <div title={this.state.interestRate.gt(0) ? `${this.state.interestRate.toFixed(18)}%` : ``} className="trade-token-grid-row__col-profit">
+          {this.state.interestRate.gt(0) ? `${this.state.interestRate.toFixed(4)}%` : "0.000%"}
         </div>
         {this.renderActions(this.state.balance.eq(0))}
       </div>

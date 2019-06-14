@@ -32,6 +32,7 @@ interface IOwnTokenGridRowState {
   latestAssetPriceDataPoint: IPriceDataPoint;
   assetBalance: BigNumber | null;
   profit: BigNumber | null;
+  pTokenAddress: string;
 }
 
 export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenGridRowState> {
@@ -44,7 +45,8 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
       assetDetails: assetDetails || null,
       latestAssetPriceDataPoint: FulcrumProvider.Instance.getPriceDefaultDataPoint(),
       assetBalance: new BigNumber(0),
-      profit: new BigNumber(0)
+      profit: new BigNumber(0),
+      pTokenAddress: ""
     };
 
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
@@ -74,6 +76,10 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
     const assetBalance = data[0];
     const profit = data[1];
 
+    const address = FulcrumProvider.Instance.contractsSource ? 
+      await FulcrumProvider.Instance.contractsSource.getPTokenErc20Address(tradeTokenKey) || "" :
+      "";
+
     // const precision = AssetsDictionary.assets.get(this.props.selectedKey.loanAsset)!.decimals || 18;
     // const balanceString = this.props.balance.dividedBy(10 ** precision).toFixed();
 
@@ -81,7 +87,8 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
       ...this.state,
       latestAssetPriceDataPoint: latestAssetPriceDataPoint,
       assetBalance: assetBalance,
-      profit: profit
+      profit: profit,
+      pTokenAddress: address
     });
   }
 
@@ -146,20 +153,38 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
         >
           <img src={this.state.assetDetails.logoSvg} alt={`${this.state.assetDetails.displayName} ${this.props.currentKey.leverage}x`} />
         </div>
-        <div className="own-token-grid-row__col-token-name-full">{`${this.state.assetDetails.displayName} ${this.props.currentKey.leverage}x`}</div>
+        {this.state.pTokenAddress &&
+          FulcrumProvider.Instance.web3ProviderSettings &&
+          FulcrumProvider.Instance.web3ProviderSettings.etherscanURL ? (
+          <a
+            className="own-token-grid-row__col-token-name-full"
+            style={{cursor: `pointer`, textDecoration: `none`}}
+            title={this.state.pTokenAddress}
+            href={`${FulcrumProvider.Instance.web3ProviderSettings.etherscanURL}address/${this.state.pTokenAddress}#readContract`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {`${this.state.assetDetails.displayName} ${this.props.currentKey.leverage}x`}
+          </a>
+        ) : (
+          <div className="own-token-grid-row__col-token-name-full">{`${this.state.assetDetails.displayName} ${this.props.currentKey.leverage}x`}</div>
+        )}
         <div className="own-token-grid-row__col-position-type">
           <PositionTypeMarker value={this.props.currentKey.positionType} />
         </div>
 
+        <div title={this.props.currentKey.unitOfAccount} className="own-token-grid-row__col-asset-price">{this.props.currentKey.unitOfAccount}</div>
         <div title={`$${bnPrice.toFixed(18)}`} className="own-token-grid-row__col-asset-price">{`$${bnPrice.toFixed(2)}`}</div>
         <div title={`$${bnLiquidationPrice.toFixed(18)}`} className="own-token-grid-row__col-liquidation-price">{`$${bnLiquidationPrice.toFixed(2)}`}</div>
         <div title={this.state.assetBalance ? `$${this.state.assetBalance.toFixed(18)}` : ``} className="own-token-grid-row__col-position-value">{this.state.assetBalance ? `$${this.state.assetBalance.toFixed(2)}` : `$0.00`}</div>
         <div title={this.state.profit ? `$${this.state.profit.toFixed(18)}` : ``} className="own-token-grid-row__col-profit">{this.state.profit ? `$${this.state.profit.toFixed(4)}` : `$0.0000`}</div>
 
+        
+
         <div className="own-token-grid-row__col-action" style={{ textAlign: `right`}}>
-          <button className="own-token-grid-row__details-button" onClick={this.onDetailsClick}>
+          {/*<button className="own-token-grid-row__details-button" onClick={this.onDetailsClick}>
             &nbsp;
-          </button>
+            </button>*/}
           {/*<button className="own-token-grid-row__manage-button own-token-grid-row__button--size-half" onClick={this.onManageClick}>
             Manage
           </button>*/}

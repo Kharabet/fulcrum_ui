@@ -8,9 +8,9 @@ $width-col-position-type: 5rem;
 $width-col-asset-price: 8rem;
 $width-col-liquidation-price: 8rem;
 $width-col-position-value: 8rem;
-$width-col-profit: 8rem;
+$width-col-profit: 3rem;
 
-$width-col-actions: 18.5rem;
+$width-col-actions: 14rem;
 
 $width-button-action: 8rem;
 
@@ -292,13 +292,13 @@ $margin-right-column: 1.5rem;
   width: $width-button-action;
   margin: 0 1rem;
 
-  &:first-child {
+  /*&:first-child {
     margin-right: 0.5rem;
   }
 
   &:last-child {
     margin-left: 0.5rem;
-  }
+  }*/
 }
 
 $width-button-action: 7rem;

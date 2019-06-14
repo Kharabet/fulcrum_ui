@@ -39,6 +39,7 @@ interface ILendFormState {
   maxLendAmount: BigNumber | null;
   lendedAmountEstimate: BigNumber | null;
   ethBalance: BigNumber | null;
+  iTokenAddress: string
 }
 
 export class LendForm extends Component<ILendFormProps, ILendFormState> {
@@ -61,7 +62,8 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
       maxLendAmount: null,
       lendedAmountEstimate: null,
       interestRate: null,
-      ethBalance: null
+      ethBalance: null,
+      iTokenAddress: ""
     };
 
     this._inputChange = new Subject();
@@ -108,6 +110,10 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
     const lendRequest = new LendRequest(this.props.lendType, this.props.asset, maxLendAmount);
     const lendedAmountEstimate = await FulcrumProvider.Instance.getLendedAmountEstimate(lendRequest);
     const ethBalance = await FulcrumProvider.Instance.getEthBalance();
+    const address = FulcrumProvider.Instance.contractsSource ? 
+      await FulcrumProvider.Instance.contractsSource.getITokenErc20Address(this.props.asset) || "" :
+      "";
+
 
     this.setState({
       ...this.state,
@@ -117,7 +123,8 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
       maxLendAmount: maxLendAmount,
       lendedAmountEstimate: lendedAmountEstimate,
       interestRate: interestRate,
-      ethBalance: ethBalance
+      ethBalance: ethBalance,
+      iTokenAddress: address
     });
   }
 
@@ -192,12 +199,30 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
               <div className="lend-form__value">{tokenNameSource}</div>
             </div>
             <div className="lend-form__kv-container lend-form__kv-container--w_dots">
-              <div className="lend-form__label">Interest rate (APR)</div>
+              <div className="lend-form__label">Interest APR</div>
               <div title={this.state.interestRate ? `${this.state.interestRate.toFixed(18)}%` : ``} className="lend-form__value">{this.state.interestRate ? `${this.state.interestRate.toFixed(4)}%` : `0.0000%`}</div>
             </div>
             <div className="lend-form__kv-container">
               <div className="lend-form__label">{this.props.lendType === LendType.LEND ? `Lend Amount` : `UnLend Amount`}</div>
-              <div className="lend-form__value">{tokenNameSource}</div>
+              {this.props.lendType !== LendType.LEND &&
+                this.state.iTokenAddress &&
+                FulcrumProvider.Instance.web3ProviderSettings &&
+                FulcrumProvider.Instance.web3ProviderSettings.etherscanURL ? (
+                <div className="lend-form__value">
+                  <a
+                    className="lend-form__value"
+                    style={{cursor: `pointer`, textDecoration: `none`}}
+                    title={this.state.iTokenAddress}
+                    href={`${FulcrumProvider.Instance.web3ProviderSettings.etherscanURL}address/${this.state.iTokenAddress}#readContract`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {tokenNameSource}
+                  </a>
+                </div>
+              ) : (
+                <div className="lend-form__value">{tokenNameSource}</div>
+              )}
             </div>
             <div className="lend-form__amount-container">
               <input
@@ -225,7 +250,23 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
                 >
                   {/*<span className="rounded-mark">?</span>*/}
                 </Tooltip>
-                &nbsp; {lendedAmountEstimateText} {tokenNameDestination}
+                {this.props.lendType === LendType.LEND &&
+                  this.state.iTokenAddress &&
+                  FulcrumProvider.Instance.web3ProviderSettings &&
+                  FulcrumProvider.Instance.web3ProviderSettings.etherscanURL ? (
+                  <a
+                    className="lend-form__value--no-color"
+                    style={{cursor: `pointer`, textDecoration: `none`}}
+                    title={this.state.iTokenAddress}
+                    href={`${FulcrumProvider.Instance.web3ProviderSettings.etherscanURL}address/${this.state.iTokenAddress}#readContract`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    &nbsp; {lendedAmountEstimateText} {tokenNameDestination}
+                  </a>
+                ) : (
+                  <React.Fragment>&nbsp; {lendedAmountEstimateText} {tokenNameDestination}</React.Fragment>
+                )}
               </div>
             </div>
           </div>

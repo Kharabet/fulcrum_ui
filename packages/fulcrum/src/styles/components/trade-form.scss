@@ -58,6 +58,25 @@
   margin-bottom: 1rem;
 }
 
+.trade-form__slippage-amount {
+  background-color: #fff3f3;
+  color: #ee344e;
+  width: 49px;
+  height: 25px;
+  border-radius: 23px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 5px;
+  font-weight: 600;
+}
+
+.trade-form__slippage-amount img {
+  width: 10px;
+  height: auto;
+  margin-left: 2px;
+}
+
 .trade-form__kv-container {
   display: flex;
   flex-direction: row;

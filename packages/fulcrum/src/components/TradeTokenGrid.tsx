@@ -94,7 +94,8 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
         positionType: PositionType.SHORT,
         defaultLeverage: props.defaultLeverageShort,
         onSelect: props.onSelect,
-        onTrade: props.onTrade
+        onTrade: props.onTrade,
+        onShowMyTokensOnlyChange: props.onShowMyTokensOnlyChange
       });
 
       /*let unit = Asset.USDC;
@@ -110,7 +111,8 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
         positionType: PositionType.LONG,
         defaultLeverage: props.defaultLeverageLong,
         onSelect: props.onSelect,
-        onTrade: props.onTrade
+        onTrade: props.onTrade,
+        onShowMyTokensOnlyChange: props.onShowMyTokensOnlyChange
       });
     });
 

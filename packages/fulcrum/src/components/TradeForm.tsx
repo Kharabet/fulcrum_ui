@@ -62,6 +62,7 @@ interface ITradeFormState {
 
   tradedAmountEstimate: BigNumber;
   slippageRate: BigNumber;
+  pTokenAddress: string;
 }
 
 export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
@@ -96,7 +97,8 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       isChangeCollateralOpen: false,
       tradedAmountEstimate: tradedAmountEstimate,
       slippageRate: slippageRate,
-      interestRate: interestRate
+      interestRate: interestRate,
+      pTokenAddress: ""
     };
 
     this._inputChange = new Subject();
@@ -169,7 +171,11 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     );
 
     const tradedAmountEstimate = await FulcrumProvider.Instance.getTradedAmountEstimate(tradeRequest);
-    const slippageRate = await FulcrumProvider.Instance.getTradeSlippageRate(tradeRequest);
+    const slippageRate = await FulcrumProvider.Instance.getTradeSlippageRate(tradeRequest, tradedAmountEstimate);
+
+    const address = FulcrumProvider.Instance.contractsSource ? 
+      await FulcrumProvider.Instance.contractsSource.getPTokenErc20Address(tradeTokenKey) || "" :
+      "";
 
     this.setState({
       ...this.state,
@@ -182,7 +188,8 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       maxTradeAmount: maxTradeValue,
       tradedAmountEstimate: tradedAmountEstimate,
       slippageRate: slippageRate,
-      interestRate: interestRate
+      interestRate: interestRate,
+      pTokenAddress: address
     });
   }
 
@@ -295,12 +302,30 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
               <div className="trade-form__value">{`${this.props.leverage.toString()}x`}</div>
             </div>
             <div className="trade-form__kv-container trade-form__kv-container--w_dots">
-              <div className="trade-form__label">Interest rate (APR)</div>
+              <div className="trade-form__label">Interest APR</div>
               <div title={this.state.interestRate ? `${this.state.interestRate.toFixed(18)}%` : ``} className="trade-form__value">{this.state.interestRate ? `${this.state.interestRate.toFixed(4)}%` : `0.0000%`}</div>
             </div>
             <div className="trade-form__kv-container">
               <div className="trade-form__label">Amount</div>
-              <div className="trade-form__value">{tokenNameSource}</div>
+              {this.props.tradeType !== TradeType.BUY &&
+                this.state.pTokenAddress &&
+                FulcrumProvider.Instance.web3ProviderSettings &&
+                FulcrumProvider.Instance.web3ProviderSettings.etherscanURL ? (
+                <div className="trade-form__value">
+                  <a
+                    className="trade-form__value"
+                    style={{cursor: `pointer`, textDecoration: `none`}}
+                    title={this.state.pTokenAddress}
+                    href={`${FulcrumProvider.Instance.web3ProviderSettings.etherscanURL}address/${this.state.pTokenAddress}#readContract`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {tokenNameSource}
+                  </a>
+                </div>
+              ) : (
+                <div className="trade-form__value">{tokenNameSource}</div>
+              )}
             </div>
             <div className="trade-form__amount-container">
               <input
@@ -318,7 +343,17 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
               )}
             </div>
             <div className="trade-form__kv-container">
-              <div title={amountMsg.includes("Slippage:") ? `${this.state.slippageRate.toFixed(18)}%` : ``} className="trade-form__label">{amountMsg}</div>
+              {amountMsg.includes("Slippage:") ? (
+                <div title={`${this.state.slippageRate.toFixed(18)}%`} className="trade-form__label" style={{ display: `flex` }}>
+                  {amountMsg}
+                  <span className="trade-form__slippage-amount">
+                    {`${this.state.slippageRate.toFixed(1)}%`}
+                    <img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iMTZweCIgaGVpZ2h0PSIxNnB4IiB2aWV3Qm94PSIwIDAgMTYgMTYiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8IS0tIEdlbmVyYXRvcjogU2tldGNoIDUyLjQgKDY3Mzc4KSAtIGh0dHA6Ly93d3cuYm9oZW1pYW5jb2RpbmcuY29tL3NrZXRjaCAtLT4KICAgIDx0aXRsZT5TaGFwZTwvdGl0bGU+CiAgICA8ZGVzYz5DcmVhdGVkIHdpdGggU2tldGNoLjwvZGVzYz4KICAgIDxnIGlkPSJLeWJlclN3YXAuY29tLSIgc3Ryb2tlPSJub25lIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPGcgaWQ9ImxhbmRpbmctcGFnZS0tMSIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoLTEwMDQuMDAwMDAwLCAtODI5LjAwMDAwMCkiIGZpbGw9IiNGOTYzNjMiPgogICAgICAgICAgICA8ZyBpZD0iR3JvdXAtMTEiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDI1Mi4wMDAwMDAsIDgwOC4wMDAwMDApIj4KICAgICAgICAgICAgICAgIDxnIGlkPSJpY19hcnJvd19kb3dud2FyZC1jb3B5LTMiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDc1Mi4wMDAwMDAsIDIxLjAwMDAwMCkiPgogICAgICAgICAgICAgICAgICAgIDxnIGlkPSJJY29uLTI0cHgiPgogICAgICAgICAgICAgICAgICAgICAgICA8cG9seWdvbiBpZD0iU2hhcGUiIHBvaW50cz0iMTQuNTkgNi41OSA5IDEyLjE3IDkgMCA3IDAgNyAxMi4xNyAxLjQyIDYuNTggMCA4IDggMTYgMTYgOCI+PC9wb2x5Z29uPgogICAgICAgICAgICAgICAgICAgIDwvZz4KICAgICAgICAgICAgICAgIDwvZz4KICAgICAgICAgICAgPC9nPgogICAgICAgIDwvZz4KICAgIDwvZz4KPC9zdmc+" />
+                  </span>
+                </div>
+              ) : (
+                <div className="trade-form__label">{amountMsg}</div>  
+              )}
               <div className="trade-form__value trade-form__value--no-color">
                 <Tooltip
                   html={
@@ -329,7 +364,23 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
                 >
                   {/*<span className="rounded-mark">?</span>*/}
                 </Tooltip>
-                &nbsp; {tradedAmountEstimateText} {tokenNameDestination}
+                {this.props.tradeType === TradeType.BUY &&
+                this.state.pTokenAddress &&
+                FulcrumProvider.Instance.web3ProviderSettings &&
+                FulcrumProvider.Instance.web3ProviderSettings.etherscanURL ? (
+                <a
+                  className="trade-form__value--no-color"
+                  style={{cursor: `pointer`, textDecoration: `none`}}
+                  title={this.state.pTokenAddress}
+                  href={`${FulcrumProvider.Instance.web3ProviderSettings.etherscanURL}address/${this.state.pTokenAddress}#readContract`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  &nbsp; {tradedAmountEstimateText} {tokenNameDestination}
+                </a>
+              ) : (
+                <React.Fragment>&nbsp; {tradedAmountEstimateText} {tokenNameDestination}</React.Fragment>
+              )}
               </div>
             </div>
 
@@ -489,7 +540,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
         );
 
         FulcrumProvider.Instance.getTradedAmountEstimate(tradeRequest).then(tradedAmountEstimate => {
-          FulcrumProvider.Instance.getTradeSlippageRate(tradeRequest).then(slippageRate => {
+          FulcrumProvider.Instance.getTradeSlippageRate(tradeRequest, tradedAmountEstimate).then(slippageRate => {
             observer.next({
               isTradeAmountTouched: this.state.isTradeAmountTouched,
               tradeAmountText: maxTradeValue.decimalPlaces(this._inputPrecision).toFixed(),
@@ -534,7 +585,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
         );
 
         FulcrumProvider.Instance.getTradedAmountEstimate(tradeRequest).then(tradedAmountEstimate => {
-          FulcrumProvider.Instance.getTradeSlippageRate(tradeRequest).then(slippageRate => {
+          FulcrumProvider.Instance.getTradeSlippageRate(tradeRequest, tradedAmountEstimate).then(slippageRate => {
             observer.next({
               isTradeAmountTouched: true,
               tradeAmountText: amountText,

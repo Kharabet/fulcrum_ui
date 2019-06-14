@@ -51,7 +51,7 @@ export class FulcrumProvider {
 
   public static Instance: FulcrumProvider;
 
-  public readonly gasLimit = "3000000";
+  public readonly gasLimit = "4000000";
   // gasPrice equal to 6 gwei
   public readonly gasPrice = new BigNumber(8).multipliedBy(10 ** 9);
   // gasBufferCoeff equal 110% gas reserve
@@ -630,6 +630,10 @@ export class FulcrumProvider {
   public getTradedAmountEstimate = async (request: TradeRequest): Promise<BigNumber> => {
     let result = new BigNumber(0);
 
+    if (request.amount.eq(0)) {
+      return result;
+    }
+
     if (this.contractsSource) {
       const key = new TradeTokenKey(
         request.asset,
@@ -684,7 +688,7 @@ export class FulcrumProvider {
     return result;
   };
 
-  public getTradeSlippageRate = async (request: TradeRequest): Promise<BigNumber> => {
+  public getTradeSlippageRate = async (request: TradeRequest, tradedAmountEstimate: BigNumber): Promise<BigNumber> => {
     const result = new BigNumber(0);
     return result;
   }
@@ -854,10 +858,12 @@ export class FulcrumProvider {
     return result;
   }
 
-  public async getErc20BalancesOfUser(addressesErc20: string[]): Promise<Map<string, BigNumber>> {
+  public async getErc20BalancesOfUser(addressesErc20: string[], account?: string): Promise<Map<string, BigNumber>> {
     let result: Map<string, BigNumber> = new Map<string, BigNumber>();
     if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
-      const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+      if (!account) {
+        account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : undefined;
+      }
       if (account) {
         // @ts-ignore
         const resp = await Web3ConnectionFactory.alchemyProvider!.alchemy!.getTokenBalances(account, addressesErc20);

@@ -20,6 +20,9 @@ export class OwnTokenGridHeader extends Component<IOwnTokenGridHeaderProps> {
           <span className="own-token-grid-header__text">&nbsp;</span>
         </div>
         <div className="own-token-grid-header__col-asset-price">
+          <span className="own-token-grid-header__text">Unit of Account</span>
+        </div>
+        <div className="own-token-grid-header__col-asset-price">
           <span className="own-token-grid-header__text">Asset Price</span>
         </div>
         <div className="own-token-grid-header__col-liquidation-price">

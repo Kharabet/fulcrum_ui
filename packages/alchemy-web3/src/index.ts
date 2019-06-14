@@ -111,7 +111,7 @@ const ALCHEMY_DISALLOWED_METHODS: string[] = [
 
 const ALCHEMY_HEADERS = new Headers({
   //"Accept": "application/json",
-  //"Content-Type": "text/plain,"
+  //"Content-Type": "text/plain"
   //"Content-Type": "application/json",
   //"Alchemy-Web3-Version": VERSION, // causes excessive OPTIONS requests
 });
