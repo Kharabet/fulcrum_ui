@@ -19,6 +19,9 @@ export class StatsTokenGridHeader extends Component<IStatsTokenGridHeaderProps> 
         <div className="stats-grid-header__col-total-borrow">
           <span className="stats-grid-header__text">Total Borrow</span>
         </div>
+        <div className="stats-grid-header__col-total-borrow">
+          <span className="stats-grid-header__text">Vault Locked</span>
+        </div>
         <div className="stats-grid-header__col-liquidity">
           <span className="stats-grid-header__text">Free Liquidity</span>
         </div>

@@ -53,6 +53,7 @@ export class StatsTokenGridCard extends Component<IStatsTokenGridCardProps, ISta
         reserveDetails.totalBorrow = reserveDetails.totalBorrow!.times(precision);
         reserveDetails.liquidity = reserveDetails.liquidity!.times(precision);
         reserveDetails.liquidityReserved = reserveDetails.liquidityReserved!.times(precision);
+        reserveDetails.lockedAssets = reserveDetails.lockedAssets!.times(precision);
       }
     }
 
@@ -144,6 +145,18 @@ export class StatsTokenGridCard extends Component<IStatsTokenGridCardProps, ISta
               className="stats-grid-card__kv-value"
             >
               {details.totalBorrow ? `${this.numberWithCommas(details.totalBorrow.toFixed(4))}` : `-`}
+            </div>
+          </div>
+          <div className="stats-grid-card__kv-container">
+            <div className="stats-grid-card__kv-title">
+              <span className="">Vault Locked</span>
+            </div>
+            <div className="stats-grid-card__kv-dots" />
+            <div
+              title={details.lockedAssets ? `${details.lockedAssets.toFixed(this.state.decimals)}` : ``}
+              className="stats-grid-card__kv-value"
+            >
+              {details.lockedAssets ? `${this.numberWithCommas(details.lockedAssets.toFixed(4))}` : `-`}
             </div>
           </div>
           <div className="stats-grid-card__kv-container">

@@ -465,6 +465,7 @@ export class FulcrumProvider {
         let totalAssetBorrow: BigNumber | null;
         let supplyInterestRate: BigNumber | null;
         let borrowInterestRate: BigNumber | null;
+        let lockedAssets: BigNumber | null = new BigNumber(0);
         // let nextInterestRate: BigNumber | null;
 
         await Promise.all([
@@ -480,6 +481,11 @@ export class FulcrumProvider {
           // (nextInterestRate = await assetContract.nextLoanInterestRate.callAsync(new BigNumber("100000")))
         ]);
 
+        const assetErc20Address = this.getErc20AddressOfAsset(asset);
+        if (assetErc20Address) {
+          lockedAssets = await this.getErc20BalanceOfUser(assetErc20Address, this.contractsSource.getBZxVaultAddress());
+        }
+
         result = new ReserveDetails(
           assetContract.address,
           symbol,
@@ -491,7 +497,8 @@ export class FulcrumProvider {
           totalAssetBorrow.dividedBy(10 ** 18),
           supplyInterestRate.dividedBy(10 ** 18),
           borrowInterestRate.dividedBy(10 ** 18),
-          new BigNumber(1)// nextInterestRate.dividedBy(10 ** 18)
+          new BigNumber(1),// nextInterestRate.dividedBy(10 ** 18)
+          lockedAssets.dividedBy(10 ** 18)
         );
       }
     }
@@ -841,11 +848,13 @@ export class FulcrumProvider {
     return result;
   }
 
-  private async getErc20BalanceOfUser(addressErc20: string): Promise<BigNumber> {
+  private async getErc20BalanceOfUser(addressErc20: string, account?: string): Promise<BigNumber> {
     let result = new BigNumber(0);
 
     if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
-      const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+      if (!account) {
+        account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : undefined;
+      }
 
       if (account) {
         const tokenContract = await this.contractsSource.getErc20Contract(addressErc20);

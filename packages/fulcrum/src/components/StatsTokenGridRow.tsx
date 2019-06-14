@@ -53,6 +53,7 @@ export class StatsTokenGridRow extends Component<IStatsTokenGridRowProps, IStats
         reserveDetails.totalBorrow = reserveDetails.totalBorrow!.times(precision);
         reserveDetails.liquidity = reserveDetails.liquidity!.times(precision);
         reserveDetails.liquidityReserved = reserveDetails.liquidityReserved!.times(precision);
+        reserveDetails.lockedAssets = reserveDetails.lockedAssets!.times(precision);
       }
     }
 
@@ -123,6 +124,7 @@ export class StatsTokenGridRow extends Component<IStatsTokenGridRowProps, IStats
         <div title={this.state.usdSupply ? `$${this.state.usdSupply.toFixed(18)}` : ``} className="stats-grid-row__col-total-supply-usd">{this.state.usdSupply ? `$${this.numberWithCommas(this.state.usdSupply.toFixed(4))}` : `-`}</div>
         <div title={details.totalSupply ? `${details.totalSupply.toFixed(this.state.decimals)}` : ``} className="stats-grid-row__col-total-supply">{details.totalSupply ? `${this.numberWithCommas(details.totalSupply.toFixed(4))}` : `-`}</div>
         <div title={details.totalBorrow ? `${details.totalBorrow.toFixed(this.state.decimals)}` : ``} className="stats-grid-row__col-total-borrow">{details.totalBorrow ? `${this.numberWithCommas(details.totalBorrow.toFixed(4))}` : `-`}</div>
+        <div title={details.lockedAssets ? `${details.lockedAssets.toFixed(this.state.decimals)}` : ``} className="stats-grid-row__col-total-borrow">{details.lockedAssets ? `${this.numberWithCommas(details.lockedAssets.toFixed(4))}` : `-`}</div>
         <div title={details.liquidity ? `${details.liquidity.toFixed(this.state.decimals)}` : ``} className="stats-grid-row__col-liquidity">{details.liquidity ? `${this.numberWithCommas(details.liquidity.toFixed(4))}` : `-`}</div>
         <div title={details.liquidityReserved ? `${details.liquidityReserved.toFixed(this.state.decimals)}` : ``} className="stats-grid-row__col-liquidity-reserved">{details.liquidityReserved ? `${this.numberWithCommas(details.liquidityReserved.toFixed(4))}` : `-`}</div>
         <div title={details.supplyInterestRate ? `${details.supplyInterestRate.toFixed(18)}%` : ``} className="stats-grid-row__col-supply-rate">{details.supplyInterestRate ? `${details.supplyInterestRate.toFixed(4)}%` : `-`}</div>

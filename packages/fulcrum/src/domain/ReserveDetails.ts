@@ -12,6 +12,8 @@ export class ReserveDetails {
   public supplyInterestRate: BigNumber | null;
   public borrowInterestRate: BigNumber | null;
   public nextInterestRate: BigNumber | null;
+  public lockedAssets: BigNumber | null;
+
 
   constructor(
     addressErc20: string = "",
@@ -24,7 +26,8 @@ export class ReserveDetails {
     totalBorrow: BigNumber | null,
     supplyInterestRate: BigNumber | null,
     borrowInterestRate: BigNumber | null,
-    nextInterestRate: BigNumber | null
+    nextInterestRate: BigNumber | null,
+    lockedAssets: BigNumber | null
   ) {
     this.addressErc20 = addressErc20;
     this.symbol = symbol;
@@ -37,6 +40,7 @@ export class ReserveDetails {
     this.supplyInterestRate = supplyInterestRate;
     this.borrowInterestRate = borrowInterestRate;
     this.nextInterestRate = nextInterestRate;
+    this.lockedAssets = lockedAssets;
   }
 
   public static getEmpty(): ReserveDetails {
@@ -44,6 +48,7 @@ export class ReserveDetails {
       "",
       "",
       "",
+      null,
       null,
       null,
       null,

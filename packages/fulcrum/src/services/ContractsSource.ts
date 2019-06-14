@@ -149,6 +149,23 @@ export class ContractsSource {
     return address;
   }
 
+  public getBZxVaultAddress(): string {
+    let address: string = "";
+    switch (this.networkId) {
+      case 1:
+        address = "0x8b3d70d628ebd30d4a2ea82db95ba2e906c71633";
+        break;
+      case 3:
+        address = "";
+        break;
+      case 42:
+        address = "";
+        break;
+    }
+
+    return address;
+  }
+
   private getKyberAddress(): string {
     let address: string = "";
     switch (this.networkId) {
