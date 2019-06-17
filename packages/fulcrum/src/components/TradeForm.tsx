@@ -311,7 +311,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
             ) : (
               <div className="trade-form__token-message-container">
                 <div className="trade-form__token-message-container--message">
-                  The withdrawal asset ({this.state.collateral}) is what you will received after selling this position.{this.props.bestCollateral !== this.state.collateral ? ` To minimize slippage and trade fees on Kyber, please select ${this.props.bestCollateral} instead.` : ``}
+                  The withdrawal asset ({this.state.collateral}) is what you will receive after selling this position.{this.props.bestCollateral !== this.state.collateral ? ` To minimize slippage and trading fees on Kyber, please select ${this.props.bestCollateral} instead.` : ``}
                 </div>
               </div>
             ) }
