@@ -50,7 +50,7 @@ export class UnlendEthProcessor {
       txHash = await tokenContract.burnToEther.sendTransactionAsync(account, amountInBaseUnits, {
         from: account,
         gas: gasAmountBN.toString(),
-        gasPrice: FulcrumProvider.Instance.gasPrice
+        gasPrice: await FulcrumProvider.Instance.gasPrice()
       });
       task.setTxHash(txHash);
     }

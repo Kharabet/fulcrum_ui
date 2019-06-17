@@ -91,7 +91,7 @@ export class TradeBuyErcProcessor {
       txHash = await tokenContract.mintWithToken.sendTransactionAsync(account, assetErc20Address, amountInBaseUnits, {
         from: account,
         gas: gasAmountBN.toString(),
-        gasPrice: FulcrumProvider.Instance.gasPrice
+        gasPrice: await FulcrumProvider.Instance.gasPrice()
       });
       task.setTxHash(txHash);
     }

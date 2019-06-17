@@ -52,15 +52,14 @@ export class FulcrumProvider {
   public static Instance: FulcrumProvider;
 
   public readonly gasLimit = "4000000";
-  // gasPrice equal to 6 gwei
-  public readonly gasPrice = new BigNumber(8).multipliedBy(10 ** 9);
+
   // gasBufferCoeff equal 110% gas reserve
-  public readonly gasBufferCoeff = new BigNumber("1.1");
+  public readonly gasBufferCoeff = new BigNumber("1.03");
   // 5000ms
   public readonly successDisplayTimeout = 5000;
 
-  public readonly gasBufferForLend = new BigNumber(0);//new BigNumber(10 ** 16); // 0.01 ETH
-  public readonly gasBufferForTrade = new BigNumber(0);//new BigNumber(5 * 10 ** 16); // 0.05 ETH
+  public readonly gasBufferForLend = new BigNumber(0);// new BigNumber(10 ** 16); // 0.01 ETH
+  public readonly gasBufferForTrade = new BigNumber(0);// new BigNumber(5 * 10 ** 16); // 0.05 ETH
 
   public static readonly UNLIMITED_ALLOWANCE_IN_BASE_UNITS = new BigNumber(2)
     .pow(256)
@@ -596,6 +595,14 @@ export class FulcrumProvider {
           if (collateral === Asset.ETH) {
             result = result.gt(this.gasBufferForTrade) ? result.minus(this.gasBufferForTrade) : new BigNumber(0);
           }
+
+          /*if (collateral === Asset.ETH && selectedKey.asset === Asset.ETH && selectedKey.positionType === PositionType.LONG) {
+            const tempLongCap = new BigNumber(7 * 10**18);
+            if (result.gt(tempLongCap)) {
+              result = tempLongCap;
+            }
+          }*/
+
         } else {
           result = new BigNumber(0);
         }
@@ -694,6 +701,64 @@ export class FulcrumProvider {
 
     return result;
   };
+
+  public gasPrice = async (): Promise<BigNumber> => {
+    let result = new BigNumber(20).multipliedBy(10 ** 9); // upper limit 20 gwei
+
+    const url = `https://ethgasstation.info/json/ethgasAPI.json`;
+    try {
+      const response = await fetch(url);
+      const jsonData = await response.json();
+      // console.log(jsonData);
+      if (jsonData.average) {
+        // ethgasstation values need divide by 10 to get gwei
+        const gasPriceAvg = new BigNumber(jsonData.average).multipliedBy(10**8);
+        const gasPriceSafeLow = new BigNumber(jsonData.safeLow).multipliedBy(10**8);
+        if (gasPriceAvg.lt(result)) {
+          result = gasPriceAvg;
+        } else if (gasPriceSafeLow.lt(result)) {
+          result = gasPriceSafeLow;
+        }
+      }
+    } catch (error) {
+      // console.log(error);
+      result = new BigNumber(8).multipliedBy(10 ** 9); // error default 8 gwei
+    }
+
+    return result;
+  }
+
+  public checkCollateralApproval = async (request: TradeRequest): Promise<boolean> => {
+    let maybeNeedsApproval = false;
+    let account: string | null = null;
+
+    if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
+      if (!account) {
+        account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+      }
+
+      if (account) {
+        const collateralErc20Address = this.getErc20AddressOfAsset(request.collateral);
+        if (collateralErc20Address) {
+          const key = new TradeTokenKey(
+            request.asset,
+            request.unitOfAccount,
+            request.positionType,
+            request.leverage,
+            request.isTokenized
+          );
+          const pTokenAddress = await this.contractsSource.getPTokenErc20Address(key);
+          const tokenContract = await this.contractsSource.getErc20Contract(collateralErc20Address);
+          if (pTokenAddress && tokenContract) {
+            const allowance = await tokenContract.allowance.callAsync(account, pTokenAddress)
+            maybeNeedsApproval = allowance.lt(10**50)
+          }
+        }
+      }
+    }
+
+    return maybeNeedsApproval;
+  }
 
   public getTradeSlippageRate = async (request: TradeRequest, tradedAmountEstimate: BigNumber): Promise<BigNumber> => {
     const result = new BigNumber(0);

@@ -57,6 +57,7 @@ interface ITradeFormState {
   ethBalance: BigNumber | null;
   positionTokenBalance: BigNumber | null;
   maxTradeAmount: BigNumber;
+  maybeNeedsApproval: boolean;
 
   isChangeCollateralOpen: boolean;
 
@@ -98,7 +99,8 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       tradedAmountEstimate: tradedAmountEstimate,
       slippageRate: slippageRate,
       interestRate: interestRate,
-      pTokenAddress: ""
+      pTokenAddress: "",
+      maybeNeedsApproval: false
     };
 
     this._inputChange = new Subject();
@@ -177,6 +179,8 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       await FulcrumProvider.Instance.contractsSource.getPTokenErc20Address(tradeTokenKey) || "" :
       "";
 
+    const maybeNeedsApproval = await FulcrumProvider.Instance.checkCollateralApproval(tradeRequest);
+
     this.setState({
       ...this.state,
       assetDetails: assetDetails || null,
@@ -189,7 +193,9 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       tradedAmountEstimate: tradedAmountEstimate,
       slippageRate: slippageRate,
       interestRate: interestRate,
-      pTokenAddress: address
+      pTokenAddress: address,
+      collateral: this.props.defaultCollateral,
+      maybeNeedsApproval: maybeNeedsApproval
     });
   }
 
@@ -283,20 +289,27 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
             <div className="trade-form__kv-container trade-form__kv-container--w_dots">
               <div className="trade-form__label">
                 {this.props.tradeType === TradeType.BUY ? `Purchase Asset` : `Withdrawal Asset`}
-                {` `}
-                <button className="trade-form__change-button" onClick={this.onChangeCollateralOpen}>
+                {/*` `*/}
+                {/*<button className="trade-form__change-button" onClick={this.onChangeCollateralOpen}>
                   <span className="trade-form__label--action">Change</span>
-                </button>
+                </button>*/}
               </div>
               <div className="trade-form__value">{this.state.collateral}</div>
             </div>
-            {this.state.collateral !== Asset.ETH && this.props.tradeType === TradeType.BUY ? (
+            {this.props.tradeType === TradeType.BUY ? (
               <div className="trade-form__token-message-container">
+                {/* Selected purchase asset ({this.state.collateral}) may need approval, which can take up to 5 minutes. */}
                 <div className="trade-form__token-message-container--message">
-                  Selected purchase asset ({this.state.collateral}) may need approval, which can take up to 5 minutes.
+                  The purchase asset ({this.state.collateral}) is what you are using for collateral in the position.{this.state.maybeNeedsApproval && this.state.collateral !== Asset.ETH ? ` You may be prompted to approve it before buying.` : ``}
                 </div>
               </div>
-            ) : `` }
+            ) : (
+              <div className="trade-form__token-message-container">
+                <div className="trade-form__token-message-container--message">
+                  The withdrawal asset ({this.state.collateral}) is what you will received after selling this position.
+                </div>
+              </div>
+            ) }
             <div className="trade-form__kv-container trade-form__kv-container--w_dots">
               <div className="trade-form__label">Leverage</div>
               <div className="trade-form__value">{`${this.props.leverage.toString()}x`}</div>

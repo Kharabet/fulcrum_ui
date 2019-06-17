@@ -60,7 +60,7 @@ export class TradeBuyEthProcessor {
         from: account,
         value: amountInBaseUnits,
         gas: gasAmountBN.toString(),
-        gasPrice: FulcrumProvider.Instance.gasPrice
+        gasPrice: await FulcrumProvider.Instance.gasPrice()
       });
       task.setTxHash(txHash);
     }

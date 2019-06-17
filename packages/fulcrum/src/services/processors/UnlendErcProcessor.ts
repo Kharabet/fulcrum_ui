@@ -50,7 +50,7 @@ export class UnlendErcProcessor {
       txHash = await tokenContract.burn.sendTransactionAsync(account, amountInBaseUnits, {
         from: account,
         gas: gasAmountBN.toString(),
-        gasPrice: FulcrumProvider.Instance.gasPrice
+        gasPrice: await FulcrumProvider.Instance.gasPrice()
       });
       task.setTxHash(txHash);
     }
