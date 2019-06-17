@@ -38,6 +38,7 @@ export interface ITradeFormProps {
   defaultCollateral: Asset;
   defaultUnitOfAccount: Asset;
   defaultTokenizeNeeded: boolean;
+  bestCollateral: Asset;
 
   onSubmit: (request: TradeRequest) => void;
   onCancel: () => void;
@@ -86,7 +87,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
 
     this.state = {
       assetDetails: assetDetails || null,
-      collateral: props.defaultCollateral,
+      collateral: props.bestCollateral,
       tokenizeNeeded: props.defaultTokenizeNeeded,
       isTradeAmountTouched: false,
       tradeAmountText: "",
@@ -194,7 +195,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       slippageRate: slippageRate,
       interestRate: interestRate,
       pTokenAddress: address,
-      collateral: this.props.defaultCollateral,
+      // collateral: this.props.defaultCollateral,
       maybeNeedsApproval: maybeNeedsApproval
     });
   }
@@ -289,10 +290,14 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
             <div className="trade-form__kv-container trade-form__kv-container--w_dots">
               <div className="trade-form__label">
                 {this.props.tradeType === TradeType.BUY ? `Purchase Asset` : `Withdrawal Asset`}
-                {/*` `*/}
-                {/*<button className="trade-form__change-button" onClick={this.onChangeCollateralOpen}>
-                  <span className="trade-form__label--action">Change</span>
-                </button>*/}
+                {this.props.tradeType === TradeType.SELL ? (
+                  <React.Fragment>
+                    {` `}
+                    {<button className="trade-form__change-button" onClick={this.onChangeCollateralOpen}>
+                      <span className="trade-form__label--action">Change</span>
+                    </button>}
+                  </React.Fragment>
+                ) : ``}
               </div>
               <div className="trade-form__value">{this.state.collateral}</div>
             </div>
@@ -306,7 +311,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
             ) : (
               <div className="trade-form__token-message-container">
                 <div className="trade-form__token-message-container--message">
-                  The withdrawal asset ({this.state.collateral}) is what you will received after selling this position.
+                  The withdrawal asset ({this.state.collateral}) is what you will received after selling this position.{this.props.bestCollateral !== this.state.collateral ? ` To minimize slippage and trade fees on Kyber, please select ${this.props.bestCollateral} instead.` : ``}
                 </div>
               </div>
             ) }
