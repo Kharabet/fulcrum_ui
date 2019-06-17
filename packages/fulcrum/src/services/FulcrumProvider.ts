@@ -728,9 +728,42 @@ export class FulcrumProvider {
     return result;
   }
 
-  public checkCollateralApproval = async (request: TradeRequest): Promise<boolean> => {
+  public checkCollateralApprovalForLend = async (asset: Asset): Promise<boolean> => {
     let maybeNeedsApproval = false;
     let account: string | null = null;
+
+    if (asset === Asset.ETH) {
+      return false;
+    }
+
+    if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
+      if (!account) {
+        account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+      }
+
+      if (account) {
+        const assetAddress = this.getErc20AddressOfAsset(asset);
+        if (assetAddress) {
+          const iTokenAddress = await this.contractsSource.getITokenErc20Address(asset);
+          const tokenContract = await this.contractsSource.getErc20Contract(assetAddress);
+          if (iTokenAddress && tokenContract) {
+            const allowance = await tokenContract.allowance.callAsync(account, iTokenAddress)
+            maybeNeedsApproval = allowance.lt(10**50)
+          }
+        }
+      }
+    }
+
+    return maybeNeedsApproval;
+  }
+
+  public checkCollateralApprovalForTrade = async (request: TradeRequest): Promise<boolean> => {
+    let maybeNeedsApproval = false;
+    let account: string | null = null;
+
+    if (request.collateral === Asset.ETH) {
+      return false;
+    }
 
     if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
       if (!account) {

@@ -11,6 +11,7 @@ import { LendType } from "../domain/LendType";
 import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
+import { EthOrWethSelector } from "./EthOrWethSelector";
 
 interface ILendAmountChangeEvent {
   isLendAmountTouched: boolean;
@@ -39,7 +40,9 @@ interface ILendFormState {
   maxLendAmount: BigNumber | null;
   lendedAmountEstimate: BigNumber | null;
   ethBalance: BigNumber | null;
-  iTokenAddress: string
+  iTokenAddress: string;
+  maybeNeedsApproval: boolean;
+  useWrapped: boolean;
 }
 
 export class LendForm extends Component<ILendFormProps, ILendFormState> {
@@ -63,7 +66,9 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
       lendedAmountEstimate: null,
       interestRate: null,
       ethBalance: null,
-      iTokenAddress: ""
+      iTokenAddress: "",
+      maybeNeedsApproval: false,
+      useWrapped: false
     };
 
     this._inputChange = new Subject();
@@ -105,15 +110,16 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
     const assetDetails = AssetsDictionary.assets.get(this.props.asset);
     const interestRate = await FulcrumProvider.Instance.getLendTokenInterestRate(this.props.asset);
     const maxLendAmount = (await FulcrumProvider.Instance.getMaxLendValue(
-      new LendRequest(this.props.lendType, this.props.asset, new BigNumber(0))
+      new LendRequest(this.props.lendType, this.state.useWrapped ? Asset.WETH : this.props.asset, new BigNumber(0))
     ));
-    const lendRequest = new LendRequest(this.props.lendType, this.props.asset, maxLendAmount);
+    const lendRequest = new LendRequest(this.props.lendType, this.state.useWrapped ? Asset.WETH : this.props.asset, maxLendAmount);
     const lendedAmountEstimate = await FulcrumProvider.Instance.getLendedAmountEstimate(lendRequest);
     const ethBalance = await FulcrumProvider.Instance.getEthBalance();
     const address = FulcrumProvider.Instance.contractsSource ? 
       await FulcrumProvider.Instance.contractsSource.getITokenErc20Address(this.props.asset) || "" :
       "";
 
+    const maybeNeedsApproval = await FulcrumProvider.Instance.checkCollateralApprovalForLend(this.state.useWrapped ? Asset.WETH : this.props.asset);
 
     this.setState({
       ...this.state,
@@ -124,7 +130,8 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
       lendedAmountEstimate: lendedAmountEstimate,
       interestRate: interestRate,
       ethBalance: ethBalance,
-      iTokenAddress: address
+      iTokenAddress: address,
+      maybeNeedsApproval: maybeNeedsApproval
     });
   }
 
@@ -148,7 +155,8 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
   public componentDidUpdate(prevProps: Readonly<ILendFormProps>, prevState: Readonly<ILendFormState>, snapshot?: any): void {
     if (
       this.props.lendType !== prevProps.lendType ||
-      this.props.asset !== prevProps.asset
+      this.props.asset !== prevProps.asset ||
+      this.state.useWrapped !== prevState.useWrapped
     ) {
       this.derivedUpdate();
     }
@@ -220,9 +228,13 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
                     {tokenNameSource}
                   </a>
                 </div>
-              ) : (
-                <div className="lend-form__value">{tokenNameSource}</div>
-              )}
+              ) : 
+                this.props.asset === Asset.ETH ? (
+                  <EthOrWethSelector items={[Asset.ETH, Asset.WETH]} value={this.state.useWrapped ? Asset.WETH : Asset.ETH} onChange={this.onChangeUseWrapped} />
+                ) : (
+                  <div className="lend-form__value">{tokenNameSource}</div>
+                )
+              }
             </div>
             <div className="lend-form__amount-container">
               <input
@@ -269,6 +281,14 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
                 )}
               </div>
             </div>
+
+            {(!this.state.maxLendAmount || this.state.maxLendAmount.gt(0)) && this.props.lendType === LendType.LEND && this.state.maybeNeedsApproval && this.props.asset !== Asset.ETH ? (
+              <div className="lend-form__token-message-container">
+                <div className="lend-form__token-message-container--message">
+                  You may be prompted to approve the asset after clicking LEND.
+                </div>
+              </div>
+            ) : ``}
           </div>
 
           <div className="lend-form__actions-container">
@@ -293,6 +313,14 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
       // emitting next event for processing with rx.js
       this._inputChange.next(this.state.lendAmountText);
     });
+  };
+
+  public onChangeUseWrapped = async (asset: Asset) => {
+    if (this.state.useWrapped && asset === Asset.ETH) {
+      this.setState({ ...this.state, useWrapped: false });
+    } else if (!this.state.useWrapped && asset === Asset.WETH) {
+      this.setState({ ...this.state, useWrapped: true });
+    }
   };
 
   public onInsertMaxValue = async () => {
@@ -331,7 +359,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
     this.props.onSubmit(
       new LendRequest(
         this.props.lendType,
-        this.props.asset,
+        this.state.useWrapped ? Asset.WETH : this.props.asset,
         this.state.lendAmount
       )
     );
@@ -341,7 +369,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
     return new Observable<ILendAmountChangeEvent | null>(observer => {
       const lendRequest = new LendRequest(
         this.props.lendType,
-        this.props.asset,
+        this.state.useWrapped ? Asset.WETH : this.props.asset,
         this.state.maxLendAmount || new BigNumber(0)
       );
 
@@ -396,7 +424,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
       if (!amount.isNaN()) {
         const lendRequest = new LendRequest(
           this.props.lendType,
-          this.props.asset,
+          this.state.useWrapped ? Asset.WETH : this.props.asset,
           amount
         );
 

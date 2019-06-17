@@ -180,7 +180,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       await FulcrumProvider.Instance.contractsSource.getPTokenErc20Address(tradeTokenKey) || "" :
       "";
 
-    const maybeNeedsApproval = await FulcrumProvider.Instance.checkCollateralApproval(tradeRequest);
+    const maybeNeedsApproval = await FulcrumProvider.Instance.checkCollateralApprovalForTrade(tradeRequest);
 
     this.setState({
       ...this.state,
@@ -290,14 +290,18 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
             <div className="trade-form__kv-container trade-form__kv-container--w_dots">
               <div className="trade-form__label">
                 {this.props.tradeType === TradeType.BUY ? `Purchase Asset` : `Withdrawal Asset`}
-                {this.props.tradeType === TradeType.SELL ? (
+                {/*this.props.tradeType === TradeType.SELL ? (
                   <React.Fragment>
                     {` `}
                     {<button className="trade-form__change-button" onClick={this.onChangeCollateralOpen}>
                       <span className="trade-form__label--action">Change</span>
                     </button>}
                   </React.Fragment>
-                ) : ``}
+                ) : ``*/}
+                {` `}
+                {<button className="trade-form__change-button" onClick={this.onChangeCollateralOpen}>
+                  <span className="trade-form__label--action">Change</span>
+                </button>}
               </div>
               <div className="trade-form__value">{this.state.collateral}</div>
             </div>
@@ -305,7 +309,13 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
               <div className="trade-form__token-message-container">
                 {/* Selected purchase asset ({this.state.collateral}) may need approval, which can take up to 5 minutes. */}
                 <div className="trade-form__token-message-container--message">
-                  The purchase asset ({this.state.collateral}) is what you are using for collateral in the position.{this.state.maybeNeedsApproval && this.state.collateral !== Asset.ETH ? ` You may be prompted to approve it before buying.` : ``}
+                  The purchase asset ({this.state.collateral}) is what you are sending to buy into this this position.{this.props.bestCollateral !== this.state.collateral ? ` To minimize slippage and trading fees on Kyber, please select ${this.props.bestCollateral} instead.` : ``}
+                  {(!this.state.balance || this.state.balance.gt(0)) && this.state.maybeNeedsApproval && this.state.collateral !== Asset.ETH ? (
+                    <React.Fragment>
+                      <br/><br/>
+                      You may be prompted to approve the asset after clicking BUY.
+                    </React.Fragment>
+                   ) : ``}
                 </div>
               </div>
             ) : (

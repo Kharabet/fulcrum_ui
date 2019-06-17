@@ -1,0 +1,38 @@
+.eth-or-weth {
+  display: inline-block;
+  vertical-align: middle;
+
+  height: 1.25rem;
+
+  border-radius: 0.25rem;
+  background-color: rgba(169, 181, 199, 0.15);
+}
+
+.eth-or-weth__item {
+  display: inline-block;
+  vertical-align: top;
+
+  cursor: pointer;
+
+  height: 1.25rem;
+  width: 2.5rem;
+  line-height: 1.25rem;
+
+  list-style: none;
+
+  border-style: none;
+  border-radius: 0.25rem;
+
+  font-size: 0.75rem;
+  font-weight: normal;
+  font-style: normal;
+  font-stretch: normal;
+  letter-spacing: -0.3px;
+  text-align: center;
+  color: #ffffff;
+
+  &--selected {
+    border-style: none;
+    background-color: #69bf83;
+  }
+}

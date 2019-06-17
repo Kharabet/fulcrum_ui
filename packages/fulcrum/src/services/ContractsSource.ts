@@ -188,7 +188,8 @@ export class ContractsSource {
   }
 
   private async getITokenContractRaw(asset: Asset): Promise<iTokenContract | null> {
-    const tokenContractInfo = this.iTokensContractInfos.get(`i${asset}`) || null;
+    const symbol = asset === Asset.WETH ? `iETH` : `i${asset}`
+    const tokenContractInfo = this.iTokensContractInfos.get(symbol) || null;
     return tokenContractInfo ? new iTokenContract(this.iTokenJson.abi, tokenContractInfo.token, this.provider) : null;
   }
 
