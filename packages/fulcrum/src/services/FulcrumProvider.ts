@@ -168,6 +168,7 @@ export class FulcrumProvider {
       try {
         this.accounts = await this.web3Wrapper.getAvailableAddressesAsync() || [];
       } catch(e) {
+        // console.log(e);
         this.accounts = [];
       }
       if (this.accounts.length === 0) {
@@ -187,7 +188,7 @@ export class FulcrumProvider {
       } else {
         this.providerType = ProviderType.None;
       }
-      FulcrumProvider.setLocalstorageItem('providerType', providerType);
+      FulcrumProvider.setLocalstorageItem('providerType', this.providerType);
     } else {
       this.contractsSource = null;
     }

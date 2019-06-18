@@ -11,6 +11,10 @@ import Portis from "@portis/web3";
 import { AuthenticationStatus, Bitski } from "bitski";
 // @ts-ignore
 import Fortmatic from "fortmatic";
+
+// @ts-ignore
+import Squarelink from "squarelink";
+
 import { ProviderType } from "./ProviderType";
 
 import { MetamaskSubprovider, SignerSubprovider, Web3ProviderEngine } from "@0x/subproviders";
@@ -57,6 +61,10 @@ export class Web3ConnectionFactory {
           subProvider = await Web3ConnectionFactory.getProviderPortis();
           break;
         }
+        case ProviderType.Squarelink: {
+          subProvider = await Web3ConnectionFactory.getProviderSquarelink();
+          break;
+        }
       }
     }
 
@@ -76,7 +84,8 @@ export class Web3ConnectionFactory {
       }
     */
     
-    const providerEngine: Web3ProviderEngine = new Web3ProviderEngine({ pollingInterval: 3600000 }); // 1 hour polling
+    let web3Wrapper: Web3Wrapper;
+    let providerEngine: Web3ProviderEngine = new Web3ProviderEngine({ pollingInterval: 3600000 }); // 1 hour polling
 
     if (!Web3ConnectionFactory.alchemyProvider) {
       Web3ConnectionFactory.alchemyProvider = new AlchemySubprovider(`https://eth-${ethNetwork}.alchemyapi.io/jsonrpc/${configProviders.Alchemy_ApiKey}`, { writeProvider: null });
@@ -95,18 +104,43 @@ export class Web3ConnectionFactory {
         } catch(e) {
           // console.log(e);
         }
+      } else if (providerType === ProviderType.Squarelink) {
+        try {
+          providerEngine.addProvider(new SignerSubprovider(subProvider));
+          
+          // test for non-error
+          await providerEngine.start();
+          web3Wrapper = new Web3Wrapper(providerEngine);
+          await web3Wrapper.getAvailableAddressesAsync();
+          // console.log(accounts);
+
+          canWrite = true;
+        } catch(e) {
+          // console.log(e);
+          
+          subProvider = null;
+          await providerEngine.stop();
+          
+          // rebuild providerEngine
+          providerEngine = new Web3ProviderEngine({ pollingInterval: 3600000 }); // 1 hour polling
+          providerEngine.addProvider(Web3ConnectionFactory.alchemyProvider);
+          
+          // @ts-ignore
+          web3Wrapper = undefined;
+        }
       } else {
         providerEngine.addProvider(new SignerSubprovider(subProvider));
         canWrite = true;
       }
     }
 
-    await providerEngine.start();
-
-    const web3Wrapper = new Web3Wrapper(providerEngine);
+    // @ts-ignore
+    if (typeof web3Wrapper === "undefined") {
+      await providerEngine.start();
+      web3Wrapper = new Web3Wrapper(providerEngine);
+    }
 
     if (subProvider && providerType === ProviderType.MetaMask) {
-      // console.log(subProvider);
       // TODO: How do we detect network or account change in Gnosis Safe and EQL Wallet?
       if (!((subProvider.isSafe && subProvider.currentSafe) || subProvider.isEQLWallet)) {
         // @ts-ignore
@@ -230,4 +264,10 @@ export class Web3ConnectionFactory {
     const portis = await new Portis(configProviders.Portis_DAppId, ethNetwork || "");
     return portis.provider;
   }
+
+  private static async getProviderSquarelink(): Promise<any> {
+    const sqlk = await new Squarelink(configProviders.Squarelink_ClientId, ethNetwork || undefined);
+    return sqlk.getProvider();
+  }
+
 }

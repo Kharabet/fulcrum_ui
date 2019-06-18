@@ -35,7 +35,8 @@
     "react-router-dom": "^4.3.1",
     "react-tippy": "^1.2.3",
     "recharts": "^1.5.0",
-    "rxjs": "^6.5.2"
+    "rxjs": "^6.5.2",
+    "squarelink": "^0.1.9"
   },
   "devDependencies": {
     "@0x/abi-gen": "^2.0.9",
