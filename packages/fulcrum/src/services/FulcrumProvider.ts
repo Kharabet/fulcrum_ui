@@ -950,8 +950,8 @@ export class FulcrumProvider {
   private async getErc20BalanceOfUser(addressErc20: string, account?: string): Promise<BigNumber> {
     let result = new BigNumber(0);
 
-    if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
-      if (!account) {
+    if (this.web3Wrapper && this.contractsSource) {
+      if (!account && this.contractsSource.canWrite) {
         account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : undefined;
       }
 
@@ -969,7 +969,7 @@ export class FulcrumProvider {
   public async getErc20BalancesOfUser(addressesErc20: string[], account?: string): Promise<Map<string, BigNumber>> {
     let result: Map<string, BigNumber> = new Map<string, BigNumber>();
     if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
-      if (!account) {
+      if (!account && this.contractsSource.canWrite) {
         account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : undefined;
       }
       if (account) {
