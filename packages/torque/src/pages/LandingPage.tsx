@@ -1,4 +1,5 @@
 import React, { PureComponent } from "react";
+import { ButtonLanding, ButtonLandingColor } from "../components/ButtonLanding";
 import { Footer } from "../layout/Footer";
 import { HeaderHome } from "../layout/HeaderHome";
 
@@ -12,6 +13,10 @@ export class LandingPage extends PureComponent {
             <h1>
               <span className="landing-page__jumbo-header">Borrowing Made Simple</span>
             </h1>
+            <div className="landing-page__jumbo-action-container">
+              <ButtonLanding color={ButtonLandingColor.Blue} subtitle={"New user?"} title={"Borrow"} />
+              <ButtonLanding color={ButtonLandingColor.Green} subtitle={"Existing user?"} title={"Select Wallet"} />
+            </div>
           </div>
         </main>
         <Footer />

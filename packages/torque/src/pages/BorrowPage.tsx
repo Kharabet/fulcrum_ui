@@ -1,4 +1,5 @@
 import React, { PureComponent, RefObject } from "react";
+import { AssetSelector } from "../components/AssetSelector";
 import { BorrowDlg } from "../components/BorrowDlg";
 import { Asset } from "../domain/Asset";
 import { Footer } from "../layout/Footer";
@@ -20,14 +21,7 @@ export class BorrowPage extends PureComponent {
         <div className="borrow-page">
           <HeaderHome />
           <div className="borrow-page__main">
-            <div className="borrow-page__borrow-asset-selector">
-              <div className="borrow-page__borrow-asset-selector-item" onClick={this.onBorrowDAIClick}>
-                DAI
-              </div>
-              <div className="borrow-page__wallet-type-selector-item" onClick={this.onBorrowETHClick}>
-                ETH
-              </div>
-            </div>
+            <AssetSelector onSelectAsset={this.onSelectAsset} />
           </div>
           <Footer />
         </div>
@@ -35,20 +29,10 @@ export class BorrowPage extends PureComponent {
     );
   }
 
-  private onBorrowETHClick = async () => {
+  private onSelectAsset = async (asset: Asset) => {
     if (this.borrowDlgRef.current) {
       try {
-        const borrowRequest = await this.borrowDlgRef.current.getValue(Asset.ETH);
-      } finally {
-        await this.borrowDlgRef.current.hide();
-      }
-    }
-  };
-
-  private onBorrowDAIClick = async () => {
-    if (this.borrowDlgRef.current) {
-      try {
-        const borrowRequest = await this.borrowDlgRef.current.getValue(Asset.DAI);
+        const borrowRequest = await this.borrowDlgRef.current.getValue(asset);
       } finally {
         await this.borrowDlgRef.current.hide();
       }

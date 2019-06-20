@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" id="ic_arrow_right" width="40" height="40" viewBox="0 0 40 40">
+    <defs>
+        <style>
+            .cls-1{fill:none}.cls-2,.cls-4{fill:#fff}.cls-3,.cls-4{stroke:none}
+        </style>
+    </defs>
+    <g id="Path_569" class="cls-1" data-name="Path 569">
+        <path d="M20 0A20 20 0 1 1 0 20 20 20 0 0 1 20 0z" class="cls-3"/>
+        <path d="M20 2A17.882 17.882 0 0 0 7.272 7.272C3.872 10.672 2 15.192 2 20s1.872 9.328 5.272 12.728C10.672 36.128 15.192 38 20 38s9.328-1.872 12.728-5.272C36.128 29.328 38 24.808 38 20s-1.872-9.328-5.272-12.728C29.328 3.872 24.808 2 20 2m0-2c11.046 0 20 8.954 20 20s-8.954 20-20 20S0 31.046 0 20 8.954 0 20 0z" class="cls-4"/>
+    </g>
+    <rect id="Rectangle_552" width="12" height="2" class="cls-2" data-name="Rectangle 552" rx="1" transform="rotate(45 -3.9 29.9)"/>
+    <rect id="Rectangle_553" width="12" height="2" class="cls-2" data-name="Rectangle 553" rx="1" transform="rotate(-45 41.97 -8.9)"/>
+    <rect id="Rectangle_551" width="15" height="2" class="cls-2" data-name="Rectangle 551" rx="1" transform="translate(12 19)"/>
+</svg>

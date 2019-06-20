@@ -76,6 +76,7 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
         <div className="manage-collateral-form__title">Manage your collateral</div>
 
         <CollateralSlider
+          readonly={false}
           minValue={this.minValue}
           maxValue={this.maxValue}
           value={this.state.currentValue}

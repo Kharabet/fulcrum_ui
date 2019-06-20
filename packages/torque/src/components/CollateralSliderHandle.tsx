@@ -1,5 +1,4 @@
 import React, { Fragment } from "react";
-import { Tooltip } from "react-tippy";
 
 export function CollateralSliderHandle({
   domain: [min, max],
@@ -26,9 +25,7 @@ export function CollateralSliderHandle({
         }}
         {...getHandleProps(id)}
       >
-        <Tooltip title={`${value}%`} position="top" open={true} arrow={true} trigger="manual" arrowSize="small">
-          <div style={{ lineHeight: "2.25rem" }}>&nbsp;</div>
-        </Tooltip>
+        <div style={{ lineHeight: "2.25rem" }}>&nbsp;</div>
       </div>
 
       <div
@@ -41,11 +38,11 @@ export function CollateralSliderHandle({
           position: "absolute",
           transform: "translate(-50%, -50%)",
           zIndex: 2,
-          width: "1.75rem",
-          height: "1.75rem",
-          border: "0.25rem solid #444e5a",
+          width: "1.625rem",
+          height: "1.625rem",
+          border: "0.25rem solid #fff",
           borderRadius: "50%",
-          backgroundColor: "#ffffff"
+          backgroundColor: "#6488ff"
         }}
       />
     </Fragment>

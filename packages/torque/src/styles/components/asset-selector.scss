@@ -1,0 +1,70 @@
+.asset-selector {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+
+  margin-bottom: 2rem;
+
+  .asset-selector-item {
+    cursor: pointer;
+
+    display: flex;
+    flex-direction: column;
+
+    height: 27rem;
+    width: 100%;
+    margin: 0 1rem;
+    padding: 4rem;
+
+    border-radius: 1rem;
+    background-color: $color-gray-light;
+
+    &:hover {
+      background-color: $color-gray-darker;
+    }
+
+    &:active {
+      background-color: $color-gray-darker-2;
+    }
+
+    &:first-child {
+      margin-left: 0;
+    }
+
+    &:last-child {
+      margin-right: 0;
+    }
+
+    .asset-selector__title {
+      width: 16.5rem;
+      margin: 2rem 0;
+
+      font-size: 3rem;
+      font-weight: bold;
+      line-height: 1.17;
+      letter-spacing: -0.48px;
+      text-align: left;
+      color: $color-gray-dark;
+    }
+
+    .asset-selector__interest-rate {
+      width: 100%;
+      font-size: 1rem;
+      font-weight: normal;
+      line-height: 1.5;
+      letter-spacing: -0.16px;
+      text-align: left;
+      color: $color-gray;
+    }
+  }
+
+  .asset-selector-item--dai {
+    background-image: url("../assets/images/bg_tile_dai.svg");
+    background-repeat: no-repeat;
+  }
+
+  .asset-selector-item--eth {
+    background-image: url("../assets/images/bg_tile_eth.svg");
+    background-repeat: no-repeat;
+  }
+}

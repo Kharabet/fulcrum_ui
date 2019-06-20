@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import ReactModal from "react-modal";
 import { Asset } from "../domain/Asset";
 import { CollateralTokenSelector } from "./CollateralTokenSelector";
+import { DialogHeader } from "./DialogHeader";
 
 interface ICollateralTokenSelectorDlgState {
   isOpen: boolean;
@@ -25,6 +26,7 @@ export class CollateralTokenSelectorDlg extends Component<any, ICollateralTokenS
         overlayClassName="modal-overlay-div"
         onRequestClose={this.onFormDecline}
       >
+        <DialogHeader title={`Select collateral token`} onDecline={this.onFormDecline} />
         <CollateralTokenSelector selectedCollateral={this.state.collateralAsset} onCollateralChange={this.onFormSubmit} onClose={this.onFormDecline} />
       </ReactModal>
     );

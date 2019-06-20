@@ -14,16 +14,5 @@
     flex-direction: column;
     align-content: center;
     justify-content: space-between;
-
-    .borrow-page__borrow-asset-selector {
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
-
-      .borrow-page__borrow-asset-selector-item {
-        width: 45%;
-
-      }
-    }
   }
 }

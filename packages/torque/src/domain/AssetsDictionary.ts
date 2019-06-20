@@ -1,10 +1,12 @@
 import { Asset } from "./Asset";
 import { AssetDetails } from "./AssetDetails";
 
+// non-consistent with token bg-color etc, but required for white bg
+import eth_logo from "../assets/images/ic_small_eth.svg";
 import bat_logo from "../assets/images/ic_token_bat.svg";
 import btc_logo from "../assets/images/ic_token_btc.svg";
 import dai_logo from "../assets/images/ic_token_dai.svg";
-import eth_logo from "../assets/images/ic_token_eth.svg";
+// import eth_logo from "../assets/images/ic_token_eth.svg";
 import knc_logo from "../assets/images/ic_token_knc.svg";
 import mkr_logo from "../assets/images/ic_token_mkr.svg";
 import rep_logo from "../assets/images/ic_token_rep.svg";

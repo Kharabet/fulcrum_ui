@@ -1,0 +1,15 @@
+<svg id="ic_close_popup" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: none;
+      }
+
+      .cls-2 {
+        fill: #a9b5c7;
+      }
+    </style>
+  </defs>
+  <rect id="Rectangle_587" data-name="Rectangle 587" class="cls-1" width="16" height="16"/>
+  <path id="Union_22" data-name="Union 22" class="cls-2" d="M7.777,9.191,1.412,15.555,0,14.14,6.363,7.777,0,1.415,1.416,0,7.778,6.362,14.141,0l1.415,1.415L9.192,7.776l6.363,6.363-1.415,1.415Z" transform="translate(0.279 0.279)"/>
+</svg>

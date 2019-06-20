@@ -1,5 +1,9 @@
 .html-landing-page-active {
   height: 100%;
+  background-image: url("../assets/images/bg_landing.svg");
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-position: right center;
 }
 
 .landing-page {
@@ -23,7 +27,6 @@
         width: 51rem;
         height: 19.6875rem;
 
-
         .landing-page__jumbo-header {
           font-size: 8rem;
           font-weight: bold;
@@ -32,7 +35,24 @@
           line-height: 1.06;
           letter-spacing: -3.2px;
           text-align: left;
-          color: #3b364b;
+          color: $color-gray-dark;
+        }
+      }
+
+      .landing-page__jumbo-action-container {
+        display: flex;
+        flex-direction: row;
+
+        .button-landing {
+          margin: 0 0.75rem;
+
+          &:first-child {
+            margin-left: 0;
+          }
+
+          &:last-child {
+            margin-right: 0;
+          }
         }
       }
     }

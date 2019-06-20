@@ -3,7 +3,7 @@
 *::before {
   margin: 0;
   padding: 0;
-  box-sizing: inherit;
+  box-sizing: border-box;
 }
 
 html {
@@ -30,4 +30,28 @@ body, #root {
 
 input {
   font-family: "Poppins", sans-serif;
+  border: solid 2px rgba(169, 181, 199, 0.2);
+
+  color: $color-gray;
+  background-color: $color-gray-light;
+
+  &:hover {
+    color: $color-gray;
+    background-color: $color-gray-darker;
+  }
+
+  &:active {
+    color: $color-gray-dark;
+    background-color: $color-white;
+  }
+
+  &:focus {
+    outline: none;
+    color: $color-gray-dark;
+    background-color: $color-white;
+  }
+}
+
+input::placeholder {
+  color: $color-gray;
 }

@@ -1,3 +1,18 @@
 .dashboard-page {
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+  justify-content: space-between;
 
+  height: 100%;
+  width: 100%;
+  max-width: $page-max-width;
+  padding: $page-padding;
+
+  .dashboard-page__main {
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+    justify-content: space-between;
+  }
 }

@@ -1,0 +1,73 @@
+.button-landing {
+  cursor: pointer;
+  outline: none;
+
+  display: flex;
+  flex-direction: row;
+  width: 17.5rem;
+  padding: 1rem 2rem 1rem 2.5rem;
+  border: 0;
+  border-radius: 100px;
+  color: $color-white;
+
+  .button-landing__titles {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+
+    .button-landing__subtitle {
+      font-size: 1rem;
+      font-weight: normal;
+      font-style: normal;
+      font-stretch: normal;
+      line-height: 1.5;
+      letter-spacing: normal;
+      text-align: left;
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .button-landing__title {
+      font-size: 1.5rem;
+      font-weight: normal;
+      font-style: normal;
+      font-stretch: normal;
+      line-height: 1;
+      letter-spacing: normal;
+      text-align: left;
+      color: #ffffff;
+    }
+  }
+
+  .button-landing__icon {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex-grow: 0;
+
+    height: 3rem;
+  }
+}
+
+.button-landing--blue {
+  background-color: $color-blue;
+
+  &:hover {
+    background-color: $color-blue--hover;
+  }
+
+  &:active {
+    background-color: $color-blue--pressed;
+  }
+}
+
+.button-landing--green {
+  background-color: $color-green;
+
+  &:hover {
+    background-color: $color-green--hover;
+  }
+
+  &:active {
+    background-color: $color-green--pressed;
+  }
+}

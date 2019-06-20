@@ -7,8 +7,8 @@ import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { IWeb3ProviderSettings } from "../domain/IWeb3ProviderSettings";
 import { ProviderType } from "../domain/ProviderType";
 import { Web3ConnectionFactory } from "../domain/Web3ConnectionFactory";
-import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { ContractsSource } from "./ContractsSource";
+import { ProviderChangedEvent } from "./events/ProviderChangedEvent";
 import { TorqueProviderEvents } from "./events/TorqueProviderEvents";
 
 export class TorqueProvider {
@@ -200,6 +200,10 @@ export class TorqueProvider {
 
     return result;
   }
+
+  public getAssetInterestRate = async (asset: Asset): Promise<BigNumber> => {
+    return BigNumber.random();
+  };
 
   public getErc20AddressOfAsset(asset: Asset): string | null {
     let result: string | null = null;

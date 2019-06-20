@@ -5,6 +5,7 @@ import { CollateralSliderHandle } from "./CollateralSliderHandle";
 import { CollateralSliderRail } from "./CollateralSliderRail";
 
 export interface ICollateralSliderProps {
+  readonly: boolean;
   minValue: number;
   maxValue: number;
   value: number;
@@ -17,6 +18,7 @@ export class CollateralSlider extends Component<ICollateralSliderProps> {
   public render() {
     return (
       <Slider
+        disabled={this.props.readonly}
         mode={1}
         step={1}
         domain={[this.props.minValue, this.props.maxValue]}

@@ -3,6 +3,7 @@ import ReactModal from "react-modal";
 import { Asset } from "../domain/Asset";
 import { BorrowRequest } from "../domain/BorrowRequest";
 import { BorrowForm } from "./BorrowForm";
+import { DialogHeader } from "./DialogHeader";
 
 interface IBorrowDlgState {
   isOpen: boolean;
@@ -26,6 +27,7 @@ export class BorrowDlg extends Component<any, IBorrowDlgState> {
         overlayClassName="modal-overlay-div"
         onRequestClose={this.onFormDecline}
       >
+        <DialogHeader title={`Borrow how much ${this.state.borrowAsset}?`} onDecline={this.onFormDecline} />
         <BorrowForm borrowAsset={this.state.borrowAsset} onSubmit={this.onFormSubmit} onDecline={this.onFormDecline} />
       </ReactModal>
     );
