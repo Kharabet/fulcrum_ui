@@ -660,24 +660,24 @@ export class FulcrumProvider {
       const assetContract = await this.contractsSource.getPTokenContract(key);
       if (assetContract) {
         const tokenPrice = await assetContract.tokenPrice.callAsync();
-        // console.log(assetContract);
         let amount = request.amount;
-        // console.log(amount.toString());
         if (request.tradeType === TradeType.SELL) {
           amount = amount.multipliedBy(tokenPrice).dividedBy(10 ** 18);
         }
-        // console.log(amount.toString());
         if (request.collateral !== key.loanAsset) {
-          const swapPrice = await this.getSwapRate(request.collateral, key.loanAsset);
-          amount = request.tradeType === TradeType.BUY
-            ? amount.multipliedBy(swapPrice)
-            : amount.dividedBy(swapPrice);
-        }
-        // console.log(amount.toString());
+          const srcToken = request.tradeType === TradeType.BUY ? request.collateral : key.loanAsset;
+          const destToken = request.tradeType === TradeType.BUY ? key.loanAsset: request.collateral;
+          const srcDecimals: number = AssetsDictionary.assets.get(srcToken)!.decimals || 18;
+          const swapPrice = await this.getSwapRate(
+            srcToken,
+            destToken,
+            amount.multipliedBy(10 ** srcDecimals)
+          );
+          amount = amount.multipliedBy(swapPrice);
+       }
         if (request.tradeType === TradeType.BUY) {
           amount = amount.multipliedBy(10 ** 18).dividedBy(tokenPrice);
         }
-        // console.log(amount.toString(), tokenPrice.toString());
         result = amount;
       }
     }
@@ -794,9 +794,126 @@ export class FulcrumProvider {
     return maybeNeedsApproval;
   }
 
-  public getTradeSlippageRate = async (request: TradeRequest, tradedAmountEstimate: BigNumber): Promise<BigNumber> => {
-    const result = new BigNumber(0);
-    return result;
+  public getTradeSlippageRate = async (request: TradeRequest, tradedAmountEstimate: BigNumber): Promise<BigNumber | null> => {
+   
+    if (request.amount.eq(0) || tradedAmountEstimate.eq(0)) {
+      return new BigNumber(0);
+    }
+
+    let tradeAmountActual = new BigNumber(0);
+    if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
+      const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+
+      if (account) {
+        const key = new TradeTokenKey(
+          request.asset,
+          request.unitOfAccount,
+          request.positionType,
+          request.leverage,
+          request.isTokenized
+        );
+        const assetContract = await this.contractsSource.getPTokenContract(key);
+        if (assetContract) {
+          if (request.tradeType === TradeType.BUY) {
+            if (request.collateral !== Asset.ETH) {
+              try {
+                const assetErc20Address = FulcrumProvider.Instance.getErc20AddressOfAsset(request.collateral);
+                if (assetErc20Address) {
+                  const srcDecimals: number = AssetsDictionary.assets.get(request.collateral)!.decimals || 18;
+                  tradeAmountActual = await assetContract.mintWithToken.callAsync(
+                    account,
+                    assetErc20Address,
+                    new BigNumber(request.amount.multipliedBy(10 ** srcDecimals).toFixed(0, 1)),
+                    {
+                      from: account,
+                      gas: "5000000",
+                      gasPrice: new BigNumber(0)
+                    }
+                  );
+                  const destDecimals: number = AssetsDictionary.assets.get(key.loanAsset)!.decimals || 18;
+                  tradeAmountActual = tradeAmountActual.multipliedBy(10 ** (18 - destDecimals));
+                } else {
+                  return null;
+                }
+              } catch(e) {
+                // console.log(e);
+                return null;
+              }
+            } else {
+              try {
+                tradeAmountActual = await assetContract.mintWithEther.callAsync(
+                  account,
+                  {
+                    from: account,
+                    value: new BigNumber(request.amount.multipliedBy(10 ** 18).toFixed(0, 1)), // ETH -> 18 decimals,
+                    gas: "5000000",
+                    gasPrice: new BigNumber(0)
+                  }
+                );
+                const destDecimals: number = AssetsDictionary.assets.get(key.loanAsset)!.decimals || 18;
+                tradeAmountActual = tradeAmountActual.multipliedBy(10 ** (18 - destDecimals));
+              } catch(e) {
+                // console.log(e);
+                return null;
+              }
+            }
+          } else {
+            if (request.collateral !== Asset.ETH) {
+              try {
+                const assetErc20Address = FulcrumProvider.Instance.getErc20AddressOfAsset(request.collateral);
+                if (assetErc20Address) {
+                  const srcDecimals: number = AssetsDictionary.assets.get(key.loanAsset)!.decimals || 18;
+                  tradeAmountActual = await assetContract.burnToToken.callAsync(
+                    account,
+                    assetErc20Address,
+                    new BigNumber(request.amount.multipliedBy(10 ** srcDecimals).toFixed(0, 1)),
+                    {
+                      from: account,
+                      gas: "5000000",
+                      gasPrice: new BigNumber(0)
+                    }
+                  );
+                  const destDecimals: number = AssetsDictionary.assets.get(request.collateral)!.decimals || 18;
+                  tradeAmountActual = tradeAmountActual.multipliedBy(10 ** (18 - destDecimals));
+                } else {
+                  return null;
+                }
+              } catch(e) {
+                // console.log(e);
+                return null;
+              }
+            } else {
+              try {
+                const srcDecimals: number = AssetsDictionary.assets.get(key.loanAsset)!.decimals || 18;
+                tradeAmountActual = await assetContract.burnToEther.callAsync(
+                  account,
+                  new BigNumber(request.amount.multipliedBy(10 ** srcDecimals).toFixed(0, 1)),
+                  {
+                    from: account,
+                    gas: "5000000",
+                    gasPrice: new BigNumber(0)
+                  }
+                );
+              } catch(e) {
+                // console.log(e);
+                return null;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    tradeAmountActual = tradeAmountActual.dividedBy(10**18);
+
+    // console.log(`---------`);
+    // console.log(`tradedAmountEstimate`,tradedAmountEstimate.toString());
+    // console.log(`tradeAmountActual`,tradeAmountActual.toString());
+
+    const slippage = tradeAmountActual.minus(tradedAmountEstimate).div(tradedAmountEstimate).multipliedBy(-100);
+    // console.log(`slippage`,slippage.toString());
+
+    return slippage;
   }
 
   public static async getWeb3ProviderSettings(networkId: number| null): Promise<IWeb3ProviderSettings> {
@@ -998,11 +1115,11 @@ export class FulcrumProvider {
   private getGoodSourceAmountOfAsset(asset: Asset): BigNumber {
     switch (asset) {
       case Asset.WBTC:
-        return new BigNumber(10**4);
+        return new BigNumber(10**6);
       case Asset.USDC:
-        return new BigNumber(10**8);
+        return new BigNumber(10**4);
       default:
-        return new BigNumber(10**18);
+        return new BigNumber(10**16);
     }
   }
 
@@ -1021,12 +1138,17 @@ export class FulcrumProvider {
     if (this.contractsSource && srcAssetErc20Address && destAssetErc20Address) {
       const kyberContract = await this.contractsSource.getKyberContract();
       // result is always base 18, looks like srcQty too, see https://developer.kyber.network/docs/KyberNetworkProxy/#getexpectedrate
-      const swapPriceData: BigNumber[] = await kyberContract.getExpectedRate.callAsync(
-        srcAssetErc20Address,
-        destAssetErc20Address,
-        srcAmount
-      );
-      result = swapPriceData[0].dividedBy(10 ** 18);
+      try {
+        const swapPriceData: BigNumber[] = await kyberContract.getExpectedRate.callAsync(
+          srcAssetErc20Address,
+          destAssetErc20Address,
+          new BigNumber(srcAmount.toFixed(0, 1))
+        );
+        result = swapPriceData[0].dividedBy(10 ** 18);
+      } catch(e) {
+        // console.log(e);
+        result = new BigNumber(0);
+      }
     }
     return result;
   }

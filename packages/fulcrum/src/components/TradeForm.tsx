@@ -192,7 +192,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       positionTokenBalance: positionTokenBalance,
       maxTradeAmount: maxTradeValue,
       tradedAmountEstimate: tradedAmountEstimate,
-      slippageRate: slippageRate,
+      slippageRate: slippageRate ? slippageRate : new BigNumber(0),
       interestRate: interestRate,
       pTokenAddress: address,
       // collateral: this.props.defaultCollateral,
@@ -262,9 +262,12 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
         ? "Please add Ether to wallet."
         : this.state.balance && this.state.balance.eq(0)
           ? "Your wallet is empty \u2639"
-          : this.state.slippageRate.gte(0.2)
-            ? `Slippage: ${this.state.slippageRate.toFixed(1)}%`
-            : "";
+          : (this.state.tradeAmount.gt(0) && this.state.slippageRate.eq(0))
+            && !((!this.state.balance || this.state.balance.gt(0)) && this.state.maybeNeedsApproval && this.state.collateral !== Asset.ETH)
+            ? `Your trade is too small.`
+            : this.state.slippageRate.gt(0) // gte(0.2)
+              ? `Slippage:`
+              : "";
 
     const tradedAmountEstimateText =
       this.state.tradedAmountEstimate.eq(0)
@@ -375,7 +378,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
                 <div title={`${this.state.slippageRate.toFixed(18)}%`} className="trade-form__label" style={{ display: `flex` }}>
                   {amountMsg}
                   <span className="trade-form__slippage-amount">
-                    {`${this.state.slippageRate.toFixed(1)}%`}
+                    {`${this.state.slippageRate.toFixed(2)}%`}
                     <img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iMTZweCIgaGVpZ2h0PSIxNnB4IiB2aWV3Qm94PSIwIDAgMTYgMTYiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8IS0tIEdlbmVyYXRvcjogU2tldGNoIDUyLjQgKDY3Mzc4KSAtIGh0dHA6Ly93d3cuYm9oZW1pYW5jb2RpbmcuY29tL3NrZXRjaCAtLT4KICAgIDx0aXRsZT5TaGFwZTwvdGl0bGU+CiAgICA8ZGVzYz5DcmVhdGVkIHdpdGggU2tldGNoLjwvZGVzYz4KICAgIDxnIGlkPSJLeWJlclN3YXAuY29tLSIgc3Ryb2tlPSJub25lIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPGcgaWQ9ImxhbmRpbmctcGFnZS0tMSIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoLTEwMDQuMDAwMDAwLCAtODI5LjAwMDAwMCkiIGZpbGw9IiNGOTYzNjMiPgogICAgICAgICAgICA8ZyBpZD0iR3JvdXAtMTEiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDI1Mi4wMDAwMDAsIDgwOC4wMDAwMDApIj4KICAgICAgICAgICAgICAgIDxnIGlkPSJpY19hcnJvd19kb3dud2FyZC1jb3B5LTMiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDc1Mi4wMDAwMDAsIDIxLjAwMDAwMCkiPgogICAgICAgICAgICAgICAgICAgIDxnIGlkPSJJY29uLTI0cHgiPgogICAgICAgICAgICAgICAgICAgICAgICA8cG9seWdvbiBpZD0iU2hhcGUiIHBvaW50cz0iMTQuNTkgNi41OSA5IDEyLjE3IDkgMCA3IDAgNyAxMi4xNyAxLjQyIDYuNTggMCA4IDggMTYgMTYgOCI+PC9wb2x5Z29uPgogICAgICAgICAgICAgICAgICAgIDwvZz4KICAgICAgICAgICAgICAgIDwvZz4KICAgICAgICAgICAgPC9nPgogICAgICAgIDwvZz4KICAgIDwvZz4KPC9zdmc+" />
                   </span>
                 </div>
@@ -575,7 +578,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
               tradeAmount: maxTradeValue,
               maxTradeAmount: this.state.maxTradeAmount,
               tradedAmountEstimate: tradedAmountEstimate,
-              slippageRate: slippageRate
+              slippageRate: slippageRate ? slippageRate : new BigNumber(0)
             });
           });
         });
@@ -620,7 +623,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
               tradeAmount: amount,
               maxTradeAmount: this.state.maxTradeAmount,
               tradedAmountEstimate: tradedAmountEstimate,
-              slippageRate: slippageRate
+              slippageRate: slippageRate ? slippageRate : new BigNumber(0)
             });
           });
         });

@@ -15085,10 +15085,10 @@ squarelink-provider-engine@^15.0.2:
     xhr "^2.2.0"
     xtend "^4.0.1"
 
-squarelink@^0.1.9:
-  version "0.1.9"
-  resolved "https://registry.yarnpkg.com/squarelink/-/squarelink-0.1.9.tgz#e36d5e4556b683b5ce15225ea765ae537d3f3a74"
-  integrity sha512-Fh34jotncd3NeAKVkG+nSkihhmB/B5VM5g7pB1shYAjWI+A91fPSHY/6GHQbbAQvml2RmP6k/Hk+ErAUcTtr8w==
+squarelink@^0.3.2:
+  version "0.3.2"
+  resolved "https://registry.yarnpkg.com/squarelink/-/squarelink-0.3.2.tgz#7b447bfd3f7eacf99f6f0013a06fb5681f02012f"
+  integrity sha512-y+fxLTes3oHTQiYv1Gn98Tmsq3M7nh4je9AR3xlGrH+HxA6kyuN+b/Pg230O5EuaOcEEuTz6m2mAT/scG3wT0w==
   dependencies:
     squarelink-provider-engine "^15.0.2"
 

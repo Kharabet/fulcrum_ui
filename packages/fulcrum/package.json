@@ -1,6 +1,6 @@
 {
   "name": "@bzxnetwork/fulcrum",
-  "version": "0.8.8",
+  "version": "0.8.9",
   "description": "Simplified crypto-lending platform",
   "keywords": [],
   "author": "",
@@ -36,7 +36,7 @@
     "react-tippy": "^1.2.3",
     "recharts": "^1.5.0",
     "rxjs": "^6.5.2",
-    "squarelink": "^0.1.9"
+    "squarelink": "^0.3.2"
   },
   "devDependencies": {
     "@0x/abi-gen": "^2.0.9",
