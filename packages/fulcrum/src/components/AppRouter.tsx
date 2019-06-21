@@ -3,10 +3,11 @@ import React, { Component } from "react";
 import ReactGA from "react-ga";
 import Modal from "react-modal";
 import { HashRouter, Redirect, Route, Switch } from "react-router-dom";
-import configProviders from "../config/providers.json";
+import configProviders from "./../config/providers.json";
 import { ProviderType } from "../domain/ProviderType";
 import { LandingPage } from "../pages/LandingPage";
 import { LendPage } from "../pages/LendPage";
+import { MaintainancePage } from "../pages/MaintainancePage";
 import { StatsPage } from "../pages/StatsPage";
 import { TradePage } from "../pages/TradePage";
 import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
@@ -16,7 +17,9 @@ import { LocationListener } from "./LocationListener";
 import { ProgressFragment } from "./ProgressFragment";
 import { ProviderMenu } from "./ProviderMenu";
 
-const isMainnetProd = 
+import maintainanceConfig from "./../config/maintainance.json";
+
+const isMainnetProd =
   process.env.NODE_ENV && process.env.NODE_ENV !== "development"
   && process.env.REACT_APP_ETH_NETWORK === "mainnet";
 
@@ -74,24 +77,29 @@ export class AppRouter extends Component<any, IAppRouterState> {
         </Modal>
         <ProgressFragment />
         <div className="pages-container">
-          <HashRouter hashType="slash">
-            <LocationListener doNetworkConnect={this.doNetworkConnect}>
-              <Switch>
-                <Route exact={true} path="/" render={() => <LandingPage />} />
-                <Route exact={true} path="/lend" render={() => <LendPage isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} />} />
-                <Route exact={true} path="/trade" render={() => <TradePage isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} />} />
-                <Route exact={true} path="/stats" render={() => <StatsPage isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} />} />
-                <Route path="*" render={() => <Redirect to="/"/> } />
-              </Switch>
-              {isMainnetProd ? (
-                <Route path="/" render={({location}) => {
-                  ReactGA.ga('set', 'page', location.pathname + location.search);
-                  ReactGA.ga('send', 'pageview');
-                  return null;
-                }} />
-              ) : ``}
-            </LocationListener>
-          </HashRouter>
+          {
+            maintainanceConfig.MaintainanceMode
+              ? <MaintainancePage />
+              :
+                <HashRouter hashType="slash">
+                  <LocationListener doNetworkConnect={this.doNetworkConnect}>
+                    <Switch>
+                      <Route exact={true} path="/" render={() => <LandingPage />} />
+                      <Route exact={true} path="/lend" render={() => <LendPage isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} />} />
+                      <Route exact={true} path="/trade" render={() => <TradePage isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} />} />
+                      <Route exact={true} path="/stats" render={() => <StatsPage isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} />} />
+                      <Route path="*" render={() => <Redirect to="/"/> } />
+                    </Switch>
+                    {isMainnetProd ? (
+                      <Route path="/" render={({location}) => {
+                        ReactGA.ga('set', 'page', location.pathname + location.search);
+                        ReactGA.ga('send', 'pageview');
+                        return null;
+                      }} />
+                    ) : ``}
+                  </LocationListener>
+                </HashRouter>
+          }
         </div>
       </React.Fragment>
     );
@@ -113,13 +121,13 @@ export class AppRouter extends Component<any, IAppRouterState> {
         isLoading: true,
         isProviderMenuModalOpen: false
       }, async () => {
-        await FulcrumProvider.Instance.setWeb3Provider(providerType);	
+        await FulcrumProvider.Instance.setWeb3Provider(providerType);
 
-        FulcrumProvider.Instance.isLoading = false;	
+        FulcrumProvider.Instance.isLoading = false;
 
-        await FulcrumProvider.Instance.eventEmitter.emit(	
-          FulcrumProviderEvents.ProviderChanged,	
-          new ProviderChangedEvent(FulcrumProvider.Instance.providerType, FulcrumProvider.Instance.web3Wrapper)	
+        await FulcrumProvider.Instance.eventEmitter.emit(
+          FulcrumProviderEvents.ProviderChanged,
+          new ProviderChangedEvent(FulcrumProvider.Instance.providerType, FulcrumProvider.Instance.web3Wrapper)
         );
       });
     } else {
