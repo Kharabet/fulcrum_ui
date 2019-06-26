@@ -58,8 +58,8 @@ export class FulcrumProvider {
   // 5000ms
   public readonly successDisplayTimeout = 5000;
 
-  public readonly gasBufferForLend = new BigNumber(0);// new BigNumber(10 ** 16); // 0.01 ETH
-  public readonly gasBufferForTrade = new BigNumber(0);// new BigNumber(5 * 10 ** 16); // 0.05 ETH
+  public readonly gasBufferForLend = new BigNumber(10 ** 16); // 0.01 ETH
+  public readonly gasBufferForTrade = new BigNumber(5 * 10 ** 16); // 0.05 ETH
 
   public static readonly UNLIMITED_ALLOWANCE_IN_BASE_UNITS = new BigNumber(2)
     .pow(256)
@@ -361,28 +361,56 @@ export class FulcrumProvider {
       if (this.contractsSource) {
         const assetContract = await this.contractsSource.getPTokenContract(selectedKey);
         if (assetContract) {
+         
           const currentLeverage = await assetContract.currentLeverage.callAsync();
           const currentMargin = currentLeverage.gt(0) ?
             new BigNumber(10**38).div(currentLeverage) :
             new BigNumber(10**38).div(selectedKey.leverage * 10**18);
+          
           const maintenanceMargin = new BigNumber(15 * 10**18);
 
           if (currentMargin.lte(maintenanceMargin)) {
             priceLatestDataPoint.liquidationPrice = priceLatestDataPoint.price;
           } else {
-            const multiplier = currentMargin
-              .minus(maintenanceMargin)
-              .dividedBy(10**20)
+            
+            const initialLeverage = new BigNumber(selectedKey.leverage).multipliedBy(10**18);
+            const initialMargin = new BigNumber(10**38).div(initialLeverage);
+  
+            const initialCollateral = swapPrice
+              .multipliedBy(initialMargin)
+              .div(currentMargin)
+              .multipliedBy(10**18);
+            
+            const borrowAmount = initialCollateral
+              .div(initialMargin)
+              .multipliedBy(10**20);
 
-              if (selectedKey.positionType === PositionType.SHORT) {
-              priceLatestDataPoint.liquidationPrice = swapPrice
-                .plus(swapPrice.multipliedBy(multiplier))
-                .toNumber();
-            } else {
-              priceLatestDataPoint.liquidationPrice = swapPrice
-                .minus(swapPrice.multipliedBy(multiplier))
-                .toNumber();
+            // console.log(currentMargin.toString(), initialLeverage.toString(), borrowAmount.toString(),initialCollateral.toString(),maintenanceMargin.toString());
+            // console.log(initialCollateral.toString(), currentMargin.toString(), initialMargin.toString(), selectedKey);
+
+            // 2x long example: 100, liquidation at 100 - 100/2 + 100/2 * .15 = 57.5
+            let liquidationPrice = initialCollateral
+              .minus(initialCollateral.div(initialLeverage).times(10**18))
+              .plus(initialCollateral.div(initialLeverage).multipliedBy(maintenanceMargin).div(100));
+/*
+            // TODO: enable this code when the collateralizations are updated
+            // and disable above code
+            //(Borrow + Collateral*Margin Maintenance*Leverage)/(Leverage+1) = Liquidation Price
+            
+            let liquidationPrice = borrowAmount
+              .plus(initialCollateral.multipliedBy(maintenanceMargin).div(initialMargin))  
+              .div(initialLeverage.plus(10**18))
+              .times(10**18);
+*/
+
+            if (selectedKey.positionType === PositionType.SHORT) {
+              liquidationPrice = initialCollateral
+                .plus(initialCollateral)
+                .minus(liquidationPrice);
             }
+
+            priceLatestDataPoint.liquidationPrice = liquidationPrice
+              .div(10**18).toNumber();
           }
         }
       }

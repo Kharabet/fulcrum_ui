@@ -183,7 +183,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
 
     const amountMsg =
       this.state.ethBalance && this.state.ethBalance.lte(FulcrumProvider.Instance.gasBufferForLend)
-        ? "Please add Ether to wallet."
+        ? "Insufficient funds for gas \u2639"
         : this.state.maxLendAmount && this.state.maxLendAmount.eq(0)
           ? "Your wallet is empty \u2639"
           : "";

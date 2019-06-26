@@ -162,6 +162,20 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     const ethBalance = await FulcrumProvider.Instance.getEthBalance();
 
     const maxTradeValue = await FulcrumProvider.Instance.getMaxTradeValue(this.props.tradeType, tradeTokenKey, this.state.collateral);
+    
+    // check if entered amount is not above max
+    let amountText = this.state.tradeAmountText;
+    let amount = this.state.tradeAmount;
+    // handling negative values (incl. Ctrl+C)
+    if (amount.isNegative()) {
+      amount = amount.absoluteValue();
+      amountText = amount.decimalPlaces(this._inputPrecision).toFixed();
+    }
+    if (amount.gt(maxTradeValue)) {
+      amount = maxTradeValue;
+      amountText = maxTradeValue.decimalPlaces(this._inputPrecision).toFixed();
+    }
+    
     const tradeRequest = new TradeRequest(
       this.props.tradeType,
       this.props.asset,
@@ -169,7 +183,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       this.state.collateral,
       this.props.positionType,
       this.props.leverage,
-      new BigNumber(0),
+      amount,// new BigNumber(0),
       this.state.tokenizeNeeded
     );
 
@@ -185,8 +199,8 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     this.setState({
       ...this.state,
       assetDetails: assetDetails || null,
-      tradeAmountText: "",
-      tradeAmount: new BigNumber(0),
+      tradeAmountText: amountText,// "",
+      tradeAmount: amount,// new BigNumber(0),
       balance: balance,
       ethBalance: ethBalance,
       positionTokenBalance: positionTokenBalance,
@@ -231,6 +245,14 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       this.props.defaultTokenizeNeeded !== prevProps.defaultTokenizeNeeded ||
       this.state.collateral !== prevState.collateral
     ) {
+      if (this.state.collateral !== prevState.collateral) {
+        this.setState({
+          ...this.state,
+          tradeAmountText: "",
+          tradeAmount: new BigNumber(0)
+        });
+      }
+      
       this.derivedUpdate();
     }
   }
@@ -259,15 +281,15 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     const isAmountMaxed = this.state.tradeAmount.eq(this.state.maxTradeAmount);
     const amountMsg =
       this.state.ethBalance && this.state.ethBalance.lte(FulcrumProvider.Instance.gasBufferForTrade)
-        ? "Please add Ether to wallet."
+        ? "Insufficient funds for gas \u2639"
         : this.state.balance && this.state.balance.eq(0)
           ? "Your wallet is empty \u2639"
           : (this.state.tradeAmount.gt(0) && this.state.slippageRate.eq(0))
-            && !((!this.state.balance || this.state.balance.gt(0)) && this.state.maybeNeedsApproval && this.state.collateral !== Asset.ETH)
-            ? `Your trade is too small.`
+            && (this.state.collateral === Asset.ETH || !this.state.maybeNeedsApproval)
+            ? ``// `Your trade is too small.`
             : this.state.slippageRate.gt(0) // gte(0.2)
-              ? `Slippage:`
-              : "";
+            ? `Slippage:`
+            : "";
 
     const tradedAmountEstimateText =
       this.state.tradedAmountEstimate.eq(0)
@@ -275,6 +297,9 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
         : this.state.tradedAmountEstimate.gte(new BigNumber("0.000001"))
           ? this.state.tradedAmountEstimate.toFixed(6)
           : this.state.tradedAmountEstimate.toExponential(3);
+
+    const needsCollateralMsg = this.props.bestCollateral !== this.state.collateral;
+    const needsApprovalMsg = (!this.state.balance || this.state.balance.gt(0)) && this.state.maybeNeedsApproval && this.state.collateral !== Asset.ETH;
 
     return (
       <form className="trade-form" onSubmit={this.onSubmitClick}>
@@ -308,26 +333,28 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
               </div>
               <div className="trade-form__value">{this.state.collateral}</div>
             </div>
-            {this.props.tradeType === TradeType.BUY ? (
+            {this.props.tradeType === TradeType.BUY ?
+              needsCollateralMsg || needsApprovalMsg ? (
               <div className="trade-form__token-message-container">
-                {/* Selected purchase asset ({this.state.collateral}) may need approval, which can take up to 5 minutes. */}
                 <div className="trade-form__token-message-container--message">
-                  The purchase asset ({this.state.collateral}) is what you are sending to buy into this this position.{this.props.bestCollateral !== this.state.collateral ? ` To minimize slippage and trading fees on Kyber, please select ${this.props.bestCollateral} instead.` : ``}
-                  {(!this.state.balance || this.state.balance.gt(0)) && this.state.maybeNeedsApproval && this.state.collateral !== Asset.ETH ? (
+                  {needsCollateralMsg ? `Using ${this.props.bestCollateral} will have the least slippage.` : ``}
+                  {needsCollateralMsg && needsApprovalMsg ? (
                     <React.Fragment>
                       <br/><br/>
-                      You may be prompted to approve the asset after clicking BUY.
                     </React.Fragment>
-                   ) : ``}
+                  ) : ``}
+                  {needsApprovalMsg ? `You may be prompted to approve ${this.state.collateral} after clicking BUY.` : ``}
                 </div>
               </div>
-            ) : (
+              ) : ``
+            : needsCollateralMsg ? (
               <div className="trade-form__token-message-container">
                 <div className="trade-form__token-message-container--message">
-                  The withdrawal asset ({this.state.collateral}) is what you will receive after selling this position.{this.props.bestCollateral !== this.state.collateral ? ` To minimize slippage and trading fees on Kyber, please select ${this.props.bestCollateral} instead.` : ``}
+                  Using {this.props.bestCollateral} will have the least slippage.
                 </div>
               </div>
-            ) }
+              ) : `` 
+            }
             <div className="trade-form__kv-container trade-form__kv-container--w_dots">
               <div className="trade-form__label">Leverage</div>
               <div className="trade-form__value">{`${this.props.leverage.toString()}x`}</div>
