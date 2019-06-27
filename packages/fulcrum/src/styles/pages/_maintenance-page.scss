@@ -1,4 +1,4 @@
-.maintainance-page {
+.maintenance-page {
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -6,7 +6,7 @@
   max-width: $page-max-width;
   padding: $page-padding;
 
-  .maintainance-page-main {
+  .maintenance-page-main {
     display: flex;
     flex-direction: column;
     width: 18.625rem;
@@ -15,7 +15,7 @@
     left: 50%;
     transform: translateX(-50%) translateY(-50%);
 
-    .maintainance-page__symbol {
+    .maintenance-page__symbol {
       text-align: center;
       margin-bottom: 4.5rem;
 
@@ -25,7 +25,7 @@
       }
     }
 
-    .maintainance-page__title {
+    .maintenance-page__title {
       display: block;
       text-align: center;
       margin-bottom: 1rem;
@@ -39,7 +39,7 @@
       color: #ffffff;
     }
 
-    .maintainance-page__title-2 {
+    .maintenance-page__title-2 {
       text-align: center;
       padding-bottom: 2.625rem;
       border-bottom: 1px solid rgba(255, 255, 255, 0.2);
@@ -54,7 +54,7 @@
       color: #acb5c2;
     }
 
-    .maintainance-page__logo {
+    .maintenance-page__logo {
       height: 2rem;
 
       text-align: center;

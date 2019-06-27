@@ -6,7 +6,7 @@ import { HashRouter, Redirect, Route, Switch } from "react-router-dom";
 import { ProviderType } from "../domain/ProviderType";
 import { LandingPage } from "../pages/LandingPage";
 import { LendPage } from "../pages/LendPage";
-import { MaintainancePage } from "../pages/MaintainancePage";
+import { MaintenancePage } from "../pages/MaintenancePage";
 import { StatsPage } from "../pages/StatsPage";
 import { TradePage } from "../pages/TradePage";
 import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
@@ -17,7 +17,7 @@ import { LocationListener } from "./LocationListener";
 import { ProgressFragment } from "./ProgressFragment";
 import { ProviderMenu } from "./ProviderMenu";
 
-import maintainanceConfig from "./../config/maintainance.json";
+import siteConfig from "./../config/SiteConfig.json";
 
 const isMainnetProd =
   process.env.NODE_ENV && process.env.NODE_ENV !== "development"
@@ -78,8 +78,8 @@ export class AppRouter extends Component<any, IAppRouterState> {
         <ProgressFragment />
         <div className="pages-container">
           {
-            maintainanceConfig.MaintainanceMode
-              ? <MaintainancePage />
+            siteConfig.MaintenanceMode
+              ? <MaintenancePage />
               :
                 <HashRouter hashType="slash">
                   <LocationListener doNetworkConnect={this.doNetworkConnect}>

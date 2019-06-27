@@ -10,6 +10,8 @@ import { FulcrumProvider } from "../services/FulcrumProvider";
 import { TradeTokenGridHeader } from "./TradeTokenGridHeader";
 import { ITradeTokenGridRowProps, TradeTokenGridRow } from "./TradeTokenGridRow";
 
+import siteConfig from "./../config/SiteConfig.json";
+
 export interface ITradeTokenGridProps {
   showMyTokensOnly: boolean;
   selectedKey: TradeTokenKey;
@@ -84,6 +86,14 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
 
   private static getRowsData = (props: ITradeTokenGridProps): ITradeTokenGridRowProps[] => {
     const rowsData: ITradeTokenGridRowProps[] = [];
+
+    /*let defaultUnitOfAccount: Asset;
+    if (Object.values(Asset).includes(siteConfig.Trade_defaultUnitOfAccount)) {
+      defaultUnitOfAccount = Asset.[siteConfig.Trade_defaultUnitOfAccount];
+    } else {
+      defaultUnitOfAccount = Asset.DAI;
+    }*/
+    
 
     TradeTokenGrid.assets.forEach(e => {
       rowsData.push({

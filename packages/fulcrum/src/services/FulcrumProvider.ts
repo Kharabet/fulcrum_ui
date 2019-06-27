@@ -372,19 +372,15 @@ export class FulcrumProvider {
           if (currentMargin.lte(maintenanceMargin)) {
             priceLatestDataPoint.liquidationPrice = priceLatestDataPoint.price;
           } else {
-            
+            const swapInBaseUnits = swapPrice.multipliedBy(10**18);
             const initialLeverage = new BigNumber(selectedKey.leverage).multipliedBy(10**18);
             const initialMargin = new BigNumber(10**38).div(initialLeverage);
-  
-            const initialCollateral = swapPrice
-              .multipliedBy(initialMargin)
-              .div(currentMargin)
-              .multipliedBy(10**18);
-            
-            const borrowAmount = initialCollateral
-              .div(initialMargin)
-              .multipliedBy(10**20);
 
+            // normalize to initial price for calculation
+            const initialCollateral = swapInBaseUnits
+              .multipliedBy(initialMargin)
+              .div(currentMargin);
+            
             // console.log(currentMargin.toString(), initialLeverage.toString(), borrowAmount.toString(),initialCollateral.toString(),maintenanceMargin.toString());
             // console.log(initialCollateral.toString(), currentMargin.toString(), initialMargin.toString(), selectedKey);
 
@@ -396,16 +392,25 @@ export class FulcrumProvider {
             // TODO: enable this code when the collateralizations are updated
             // and disable above code
             //(Borrow + Collateral*Margin Maintenance*Leverage)/(Leverage+1) = Liquidation Price
-            
+
+            const borrowAmount = initialCollateral
+              .div(initialMargin)
+              .multipliedBy(10**20);
+
             let liquidationPrice = borrowAmount
               .plus(initialCollateral.multipliedBy(maintenanceMargin).div(initialMargin))  
               .div(initialLeverage.plus(10**18))
               .times(10**18);
 */
 
+            // denormalize back to reflect correct price
+            liquidationPrice = liquidationPrice
+              .multipliedBy(currentMargin)
+              .div(initialMargin);
+
             if (selectedKey.positionType === PositionType.SHORT) {
-              liquidationPrice = initialCollateral
-                .plus(initialCollateral)
+              liquidationPrice = swapInBaseUnits
+                .plus(swapInBaseUnits)
                 .minus(liquidationPrice);
             }
 
