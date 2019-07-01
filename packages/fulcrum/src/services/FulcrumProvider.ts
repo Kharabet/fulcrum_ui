@@ -353,10 +353,10 @@ export class FulcrumProvider {
 
   public getTradeTokenAssetLatestDataPoint = async (selectedKey: TradeTokenKey): Promise<IPriceDataPoint> => {
     try {
-      const swapPrice = await this.getSwapToUsdRate(selectedKey.asset);
+      let currentPrice = await this.getSwapToUsdRate(selectedKey.asset);
       const priceLatestDataPoint = await this.getPriceDefaultDataPoint();
 
-      priceLatestDataPoint.price = swapPrice.toNumber();
+      priceLatestDataPoint.price = currentPrice.toNumber();
 
       if (this.contractsSource) {
         const assetContract = await this.contractsSource.getPTokenContract(selectedKey);
@@ -372,45 +372,30 @@ export class FulcrumProvider {
           if (currentMargin.lte(maintenanceMargin)) {
             priceLatestDataPoint.liquidationPrice = priceLatestDataPoint.price;
           } else {
-            const swapInBaseUnits = swapPrice.multipliedBy(10**18);
             const initialLeverage = new BigNumber(selectedKey.leverage).multipliedBy(10**18);
             const initialMargin = new BigNumber(10**38).div(initialLeverage);
+            currentPrice = currentPrice.multipliedBy(10**18)
 
-            // normalize to initial price for calculation
-            const initialCollateral = swapInBaseUnits
-              .multipliedBy(initialMargin)
-              .div(currentMargin);
-            
-            // console.log(currentMargin.toString(), initialLeverage.toString(), borrowAmount.toString(),initialCollateral.toString(),maintenanceMargin.toString());
-            // console.log(initialCollateral.toString(), currentMargin.toString(), initialMargin.toString(), selectedKey);
+            // initial_price = current_price - (current_price/leverage *(current_margin - initial_margin))
+            const initialPrice = currentPrice
+              .minus(
+                currentPrice
+                .dividedBy(initialLeverage)
+                .multipliedBy(
+                  currentMargin
+                  .minus(initialMargin)
+                  .div(100)
+                )
+              );
 
             // 2x long example: 100, liquidation at 100 - 100/2 + 100/2 * .15 = 57.5
-            let liquidationPrice = initialCollateral
-              .minus(initialCollateral.div(initialLeverage).times(10**18))
-              .plus(initialCollateral.div(initialLeverage).multipliedBy(maintenanceMargin).div(100));
-/*
-            // TODO: enable this code when the collateralizations are updated
-            // and disable above code
-            //(Borrow + Collateral*Margin Maintenance*Leverage)/(Leverage+1) = Liquidation Price
-
-            const borrowAmount = initialCollateral
-              .div(initialMargin)
-              .multipliedBy(10**20);
-
-            let liquidationPrice = borrowAmount
-              .plus(initialCollateral.multipliedBy(maintenanceMargin).div(initialMargin))  
-              .div(initialLeverage.plus(10**18))
-              .times(10**18);
-*/
-
-            // denormalize back to reflect correct price
-            liquidationPrice = liquidationPrice
-              .multipliedBy(currentMargin)
-              .div(initialMargin);
+            let liquidationPrice = initialPrice
+              .minus(initialPrice.div(initialLeverage).times(10**18))
+              .plus(initialPrice.div(initialLeverage).multipliedBy(maintenanceMargin).div(100));
 
             if (selectedKey.positionType === PositionType.SHORT) {
-              liquidationPrice = swapInBaseUnits
-                .plus(swapInBaseUnits)
+              liquidationPrice = initialPrice
+                .plus(initialPrice)
                 .minus(liquidationPrice);
             }
 
