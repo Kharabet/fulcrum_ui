@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+  <defs>
+    <style>
+      .cls-1{fill:#6488ff}
+      .cls-2 {
+        fill: none;
+      }
+
+      .cls-2 {
+        stroke: #fff;
+        stroke-width: 2px;
+      }
+
+      .cls-3 {
+        stroke: none;
+      }
+    </style>
+  </defs>
+  <g id="ic_qr_code" transform="translate(-300 -12)">
+    <rect id="Rectangle_585" data-name="Rectangle 585" class="cls-1" width="24" height="24" rx="2" transform="translate(300 12)"/>
+    <g id="Rectangle_588" data-name="Rectangle 588" class="cls-2" transform="translate(303 15)">
+      <rect class="cls-3" width="8" height="8" rx="2"/>
+      <rect class="cls-1" x="1" y="1" width="6" height="6" rx="1"/>
+    </g>
+    <g id="Rectangle_590" data-name="Rectangle 590" class="cls-2" transform="translate(313 15)">
+      <rect class="cls-3" width="8" height="8" rx="2"/>
+      <rect class="cls-1" x="1" y="1" width="6" height="6" rx="1"/>
+    </g>
+    <g id="Rectangle_591" data-name="Rectangle 591" class="cls-2" transform="translate(315 27)">
+      <rect class="cls-3" width="2" height="2"/>
+      <rect class="cls-1" x="1" y="1"/>
+    </g>
+    <g id="Rectangle_592" data-name="Rectangle 592" class="cls-2" transform="translate(317 29)">
+      <rect class="cls-3" width="2" height="2"/>
+      <rect class="cls-1" x="1" y="1"/>
+    </g>
+    <g id="Rectangle_593" data-name="Rectangle 593" class="cls-2" transform="translate(315 31)">
+      <rect class="cls-3" width="2" height="2"/>
+      <rect class="cls-1" x="1" y="1"/>
+    </g>
+    <g id="Rectangle_594" data-name="Rectangle 594" class="cls-2" transform="translate(313 31)">
+      <rect class="cls-3" width="2" height="2"/>
+      <rect class="cls-1" x="1" y="1"/>
+    </g>
+    <g id="Rectangle_595" data-name="Rectangle 595" class="cls-2" transform="translate(319 31)">
+      <rect class="cls-3" width="2" height="2"/>
+      <rect class="cls-1" x="1" y="1"/>
+    </g>
+    <g id="Rectangle_596" data-name="Rectangle 596" class="cls-2" transform="translate(319 29)">
+      <rect class="cls-3" width="2" height="2"/>
+      <rect class="cls-1" x="1" y="1"/>
+    </g>
+    <g id="Rectangle_597" data-name="Rectangle 597" class="cls-2" transform="translate(319 25)">
+      <rect class="cls-3" width="2" height="2"/>
+      <rect class="cls-1" x="1" y="1"/>
+    </g>
+    <g id="Rectangle_598" data-name="Rectangle 598" class="cls-2" transform="translate(315 25)">
+      <rect class="cls-3" width="2" height="2"/>
+      <rect class="cls-1" x="1" y="1"/>
+    </g>
+    <g id="Rectangle_599" data-name="Rectangle 599" class="cls-2" transform="translate(313 25)">
+      <rect class="cls-3" width="2" height="2"/>
+      <rect class="cls-1" x="1" y="1"/>
+    </g>
+    <g id="Rectangle_602" data-name="Rectangle 602" class="cls-2" transform="translate(313 29)">
+      <rect class="cls-3" width="2" height="2"/>
+      <rect class="cls-1" x="1" y="1"/>
+    </g>
+    <g id="Rectangle_589" data-name="Rectangle 589" class="cls-2" transform="translate(303 25)">
+      <rect class="cls-3" width="8" height="8" rx="2"/>
+      <rect class="cls-1" x="1" y="1" width="6" height="6" rx="1"/>
+    </g>
+  </g>
+</svg>

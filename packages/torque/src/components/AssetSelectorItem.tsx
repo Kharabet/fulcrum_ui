@@ -3,6 +3,7 @@ import React, { Component } from "react";
 import { Asset } from "../domain/Asset";
 import { TorqueProvider } from "../services/TorqueProvider";
 import { DotsBar } from "./DotsBar";
+import { SelectorIconsBar } from "./SelectorIconsBar";
 
 export interface IAssetSelectorItemProps {
   asset: Asset;
@@ -53,6 +54,7 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
         <DotsBar />
         <div className="asset-selector__title">{this.props.asset}</div>
         <div className="asset-selector__interest-rate">{this.state.interestRate.toFixed(2)}% APR</div>
+        <SelectorIconsBar />
       </div>
     );
   }

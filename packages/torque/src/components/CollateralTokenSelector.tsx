@@ -34,7 +34,9 @@ export class CollateralTokenSelector extends Component<ICollateralTokenSelectorP
 
     return (
       <div className="collateral-token-selector">
-        <div className="collateral-token-selector__items">{tokenItems}</div>
+        <section className="dialog-content">
+          <div className="collateral-token-selector__items">{tokenItems}</div>
+        </section>
       </div>
     );
   }

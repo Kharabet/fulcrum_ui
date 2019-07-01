@@ -27,30 +27,34 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
   public render() {
     return (
       <form className="borrow-form" onSubmit={this.onSubmit}>
-        <section className="borrow-form__input-container">
-          <input
-            className="borrow-form__input-container__input-amount"
-            type="text"
-            placeholder={`Enter amount`}
-          />
-        </section>
-        <section className="borrow-form__transfer-details">
-          <BorrowViaTransferDetails contractAddress={"dai.tokenloan.eth"} ethAmount={new BigNumber(157)} />
-          <div className="borrow-form__transfer-details-msg">
-            That's it! Once you've sent the funds, click Track to view the progress of the loan.
-          </div>
-        </section>
-        <section className="borrow-form__actions-container">
-          <div className="borrow-form__action-change">
-            <CollateralTokenSelectorToggle
-              collateralAsset={this.state.collateralAsset}
-              readonly={false}
-              onChange={this.onCollateralChange}
+        <section className="dialog-content">
+          <div className="borrow-form__input-container">
+            <input
+              className="borrow-form__input-container__input-amount"
+              type="text"
+              placeholder={`Enter amount`}
             />
           </div>
-          <button className="btn btn-size--small" type="submit">
-            Track
-          </button>
+          <div className="borrow-form__transfer-details">
+            <BorrowViaTransferDetails contractAddress={"dai.tokenloan.eth"} ethAmount={new BigNumber(157)} />
+            <div className="borrow-form__transfer-details-msg">
+              That's it! Once you've sent the funds, click Track to view the progress of the loan.
+            </div>
+          </div>
+        </section>
+        <section className="dialog-actions">
+          <div className="borrow-form__actions-container">
+            <div className="borrow-form__action-change">
+              <CollateralTokenSelectorToggle
+                collateralAsset={this.state.collateralAsset}
+                readonly={false}
+                onChange={this.onCollateralChange}
+              />
+            </div>
+            <button className="btn btn-size--small" type="submit">
+              Track
+            </button>
+          </div>
         </section>
       </form>
     );

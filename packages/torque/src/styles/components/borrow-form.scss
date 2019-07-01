@@ -2,16 +2,18 @@
   display: flex;
   flex-direction: column;
 
-  width: 30rem;
+  width: 31rem;
 
   .borrow-form__input-container {
-    padding: 3rem 0;
+    padding-bottom: 3rem;
 
     .borrow-form__input-container__input-amount {
       display: block;
 
       height: 7rem;
       width: 100%;
+
+      border-radius: 0.25rem;
 
       font-size: 3rem;
       font-weight: bold;
@@ -40,7 +42,6 @@
     display: flex;
     flex-direction: row;
 
-    padding-top: 3rem;
     border-top: $color-gray-darker;
 
     .borrow-form__action-change {

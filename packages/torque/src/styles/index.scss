@@ -13,12 +13,14 @@
 
 @import "components/asset-selector";
 @import "components/borrow-form";
+@import "components/borrow-via-transfer-address-qr-form";
 @import "components/borrow-via-transfer-details";
 @import "components/borrowed-funds-list";
 @import "components/button";
 @import "components/button-landing";
 @import "components/collateral-token-selector-toggle";
 @import "components/collateral-token-selector";
+@import "components/dialog";
 @import "components/dialog-header";
 @import "components/dots-bar";
 @import "components/manage-collateral-form";
@@ -28,6 +30,11 @@
 @import "components/own-token-grid";
 @import "components/provider-menu";
 @import "components/provider-selector";
+@import "components/repay-loan-form";
+@import "components/selector-icons-bar";
+@import "components/wallet-address-form";
+@import "components/wallet-address-hint";
+@import "components/wallet-address-large-form";
 @import "components/wallet-type-selector";
 
 @import "layout/footer";
@@ -41,4 +48,5 @@
 @import "pages/dashboard-page";
 @import "pages/landing-page";
 @import "pages/landing-page.mobile";
+@import "pages/maintenance-page";
 @import "pages/wallet-selection-page";

@@ -42,21 +42,37 @@
       color: #a9b5c7;
     }
 
-    .borrow-via-transfer-details__input-btn {
-      cursor: pointer;
+    .borrow-via-transfer-details__input-actions {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
 
-      position: absolute;
+      height: 100%;
       flex-grow: 0;
 
-      height: 2.375rem;
-      width: 2.375rem;
-      margin: 0.325rem;
-
+      position: absolute;
       left: 100%;
       top: 0;
-      transform: translateX(-135%);
+      transform: translateX(-100%);
 
-      border: none;
+      .borrow-via-transfer-details__input-btn {
+        cursor: pointer;
+
+        height: 2.375rem;
+        width: 2.375rem;
+
+        margin: 0.325rem;
+
+        border: none;
+
+        &:first-child {
+          margin-right: 0.5px;
+        }
+
+        &:last-child {
+          margin-left: 0.5px;
+        }
+      }
     }
   }
 }

@@ -1,4 +1,4 @@
-import BigNumber from "bignumber.js";
+import { BigNumber } from "@0x/utils";
 import React, { Component, FormEvent } from "react";
 import { Asset } from "../domain/Asset";
 import { AssetDetails } from "../domain/AssetDetails";
@@ -10,7 +10,6 @@ export interface IManageCollateralFormProps {
   asset: Asset;
 
   onSubmit: (request: ManageCollateralRequest) => void;
-  onCancel: () => void;
 }
 
 interface IManageCollateralFormState {
@@ -73,67 +72,57 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
 
     return (
       <form className="manage-collateral-form" onSubmit={this.onSubmitClick}>
-        <div className="manage-collateral-form__title">Manage your collateral</div>
+        <section className="dialog-content">
+          <CollateralSlider
+            readonly={false}
+            minValue={this.minValue}
+            maxValue={this.maxValue}
+            value={this.state.currentValue}
+            onUpdate={this.onUpdate}
+            onChange={this.onChange}
+          />
 
-        <CollateralSlider
-          readonly={false}
-          minValue={this.minValue}
-          maxValue={this.maxValue}
-          value={this.state.currentValue}
-          onUpdate={this.onUpdate}
-          onChange={this.onChange}
-        />
-
-        <div className="manage-collateral-form__tips">
-          <div className="manage-collateral-form__tip">Withdraw</div>
-          <div className="manage-collateral-form__tip">Top Up</div>
-        </div>
-
-        <hr className="manage-collateral-form__delimiter" />
-
-        <div className="manage-collateral-form__info-liquidated-at-container">
-          <div className="manage-collateral-form__info-liquidated-at-msg">
-            Your loan will be liquidated if the price of
+          <div className="manage-collateral-form__tips">
+            <div className="manage-collateral-form__tip">Withdraw</div>
+            <div className="manage-collateral-form__tip">Top Up</div>
           </div>
-          <div className="manage-collateral-form__info-liquidated-at-price">
-            {this.state.assetDetails.displayName} falls below ${this.state.liquidationPrice.toFixed(2)}
-          </div>
-        </div>
 
-        {this.state.positionValue !== this.state.selectedValue ? (
-          <div className="manage-collateral-form__operation-result-container">
-            <img className="manage-collateral-form__operation-result-img" src={this.state.assetDetails.logoSvg} />
-            <div className="manage-collateral-form__operation-result-msg">
-              You will {this.state.positionValue > this.state.selectedValue ? "withdraw" : "top up"}
+          <hr className="manage-collateral-form__delimiter" />
+
+          <div className="manage-collateral-form__info-liquidated-at-container">
+            <div className="manage-collateral-form__info-liquidated-at-msg">
+              Your loan will be liquidated if the price of
             </div>
-            <div className="manage-collateral-form__operation-result-amount">
-              {this.state.diffAmount.toFixed(6)} {this.state.assetDetails.displayName}
+            <div className="manage-collateral-form__info-liquidated-at-price">
+              {this.state.assetDetails.displayName} falls below ${this.state.liquidationPrice.toFixed(2)}
             </div>
           </div>
-        ) : null}
 
-        {this.state.positionValue !== this.state.selectedValue ? (
-          <div className="manage-collateral-form__actions-container">
-            <button className="manage-collateral-form__action-cancel" onClick={this.props.onCancel}>
-              Cancel
-            </button>
-            {this.state.positionValue > this.state.selectedValue ? (
-              <button type="submit" className="manage-collateral-form__action-withdraw">
-                Withdraw
-              </button>
-            ) : (
-              <button type="submit" className="manage-collateral-form__action-top-up">
-                Top Up
-              </button>
-            )}
-          </div>
-        ) : (
-          <div className="manage-collateral-form__actions-container">
-            <button className="manage-collateral-form__action-close" onClick={this.props.onCancel}>
-              Close
-            </button>
-          </div>
-        )}
+          {this.state.positionValue !== this.state.selectedValue ? (
+            <div className="manage-collateral-form__operation-result-container">
+              <img className="manage-collateral-form__operation-result-img" src={this.state.assetDetails.logoSvg} />
+              <div className="manage-collateral-form__operation-result-msg">
+                You will {this.state.positionValue > this.state.selectedValue ? "withdraw" : "top up"}
+              </div>
+              <div className="manage-collateral-form__operation-result-amount">
+                {this.state.diffAmount.toFixed(6)} {this.state.assetDetails.displayName}
+              </div>
+              {this.state.positionValue !== this.state.selectedValue ? (
+                <div className="manage-collateral-form__actions-container">
+                  {this.state.positionValue > this.state.selectedValue ? (
+                    <button type="submit" className="btn btn-size--small">
+                      Withdraw
+                    </button>
+                  ) : (
+                    <button type="submit" className="btn btn-size--small">
+                      Top Up
+                    </button>
+                  )}
+                </div>
+              ) : null}
+            </div>
+          ) : null}
+        </section>
       </form>
     );
   }
@@ -147,6 +136,6 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
   };
 
   public onSubmitClick = (event: FormEvent<HTMLFormElement>) => {
-    this.props.onSubmit(new ManageCollateralRequest(new BigNumber(this.state.currentValue)));
+    this.props.onSubmit(new ManageCollateralRequest(this.props.asset, new BigNumber(this.state.currentValue)));
   };
 }

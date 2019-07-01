@@ -8,12 +8,15 @@ import { ProviderType } from "../domain/ProviderType";
 import { BorrowPage } from "../pages/BorrowPage";
 import { DashboardPage } from "../pages/DashboardPage";
 import { LandingPage } from "../pages/LandingPage";
+import { MaintenancePage } from "../pages/MaintenancePage";
 import { WalletSelectionPage } from "../pages/WalletSelectionPage";
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { TorqueProviderEvents } from "../services/events/TorqueProviderEvents";
 import { TorqueProvider } from "../services/TorqueProvider";
 import { LocationListener } from "./LocationListener";
 import { ProviderMenu } from "./ProviderMenu";
+
+import siteConfig from "./../config/SiteConfig.json";
 
 const isMainnetProd = 
   process.env.NODE_ENV && process.env.NODE_ENV !== "development"
@@ -71,24 +74,29 @@ export class AppRouter extends Component<any, IAppRouterState> {
           />
         </Modal>
         <div className="pages-container">
-          <HashRouter hashType="slash">
-            <LocationListener doNetworkConnect={this.doNetworkConnect}>
-              <Switch>
-                <Route exact={true} path="/" render={() => <LandingPage />} />
-                <Route exact={true} path="/wallet/" render={() => <WalletSelectionPage />} />
-                <Route exact={true} path="/borrow/" render={() => <BorrowPage />} />
-                <Route exact={true} path="/dashboard/" render={() => <DashboardPage />} />
-                <Route path="*" render={() => <Redirect to="/"/> } />
-              </Switch>
-              {isMainnetProd ? (
-                <Route path="/" render={({location}) => {
-                  ReactGA.ga('set', 'page', location.pathname + location.search);
-                  ReactGA.ga('send', 'pageview');
-                  return null;
-                }} />
-              ) : ``}
-            </LocationListener>
-          </HashRouter>
+          {
+            siteConfig.MaintenanceMode
+              ? <MaintenancePage />
+              :
+                <HashRouter hashType="slash">
+                  <LocationListener doNetworkConnect={this.doNetworkConnect}>
+                    <Switch>
+                      <Route exact={true} path="/" render={() => <LandingPage />} />
+                      <Route exact={true} path="/wallet/" render={() => <WalletSelectionPage />} />
+                      <Route exact={true} path="/borrow/" render={() => <BorrowPage />} />
+                      <Route exact={true} path="/dashboard/" render={() => <DashboardPage />} />
+                      <Route path="*" render={() => <Redirect to="/"/> } />
+                    </Switch>
+                    {isMainnetProd ? (
+                      <Route path="/" render={({location}) => {
+                        ReactGA.ga('set', 'page', location.pathname + location.search);
+                        ReactGA.ga('send', 'pageview');
+                        return null;
+                      }} />
+                    ) : ``}
+                  </LocationListener>
+                </HashRouter>
+          }
         </div>
       </React.Fragment>
     );
