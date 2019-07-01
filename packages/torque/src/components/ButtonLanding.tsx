@@ -1,4 +1,5 @@
 import React, { Component, MouseEventHandler } from "react";
+import { Link } from "react-router-dom";
 
 import ic_arrow_right from "../assets/images/ic_arrow_right.svg";
 
@@ -11,8 +12,7 @@ export interface IButtonLandingProps {
   title: string;
   subtitle: string;
   color: ButtonLandingColor;
-
-  onClick?: MouseEventHandler<HTMLDivElement>;
+  url: string;
 }
 
 export class ButtonLanding extends Component<IButtonLandingProps> {
@@ -29,15 +29,17 @@ export class ButtonLanding extends Component<IButtonLandingProps> {
 
     return (
       <div className={`button-landing-container ${buttonLandingContainerColorStyle}`}>
-        <div className={`btn button-landing ${buttonLandingColorStyle}`} onClick={this.props.onClick}>
-          <div className="button-landing__titles">
-            <div className="button-landing__subtitle">{this.props.subtitle}</div>
-            <div className="button-landing__title">{this.props.title}</div>
+        <Link className={`button-landing__link`} to={this.props.url}>
+          <div className={`btn button-landing ${buttonLandingColorStyle}`}>
+            <div className="button-landing__titles">
+              <div className="button-landing__subtitle">{this.props.subtitle}</div>
+              <div className="button-landing__title">{this.props.title}</div>
+            </div>
+            <div className="button-landing__icon">
+              <img src={ic_arrow_right} alt="" />
+            </div>
           </div>
-          <div className="button-landing__icon">
-            <img src={ic_arrow_right} alt="" />
-          </div>
-        </div>
+        </Link>
       </div>
     );
   }

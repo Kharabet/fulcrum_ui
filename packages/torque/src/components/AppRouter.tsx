@@ -82,9 +82,9 @@ export class AppRouter extends Component<any, IAppRouterState> {
                   <LocationListener doNetworkConnect={this.doNetworkConnect}>
                     <Switch>
                       <Route exact={true} path="/" render={() => <LandingPage />} />
-                      <Route exact={true} path="/wallet/" render={() => <WalletSelectionPage />} />
-                      <Route exact={true} path="/borrow/" render={() => <BorrowPage />} />
-                      <Route exact={true} path="/dashboard/" render={() => <DashboardPage />} />
+                      <Route exact={true} path="/wallet" render={() => <WalletSelectionPage />} />
+                      <Route exact={true} path="/borrow" render={() => <BorrowPage />} />
+                      <Route exact={true} path="/dashboard" render={() => <DashboardPage />} />
                       <Route path="*" render={() => <Redirect to="/"/> } />
                     </Switch>
                     {isMainnetProd ? (
