@@ -2,19 +2,19 @@ $font-size-header: 0.75rem;
 $height-row: 4.5rem;
 
 $width-col-token-image: 5rem;
-$width-col-token-name: 5rem;
-$width-col-token-name-full: 11rem;
+$width-col-token-name-full: 6rem;
 $width-col-position-type: 5rem;
 $width-col-asset-price: 8rem;
 $width-col-liquidation-price: 8rem;
 $width-col-position-value: 8rem;
-$width-col-profit: 3rem;
+$width-col-profit: 4rem;
 
 $width-col-actions: 14rem;
 
 $width-button-action: 8rem;
 
 $margin-right-column: 1.5rem;
+$margin-right-small-column: 0.5rem;
 
 .own-token-grid {
 }
@@ -52,60 +52,53 @@ $margin-right-column: 1.5rem;
   color: #a9b5c7;
 
   &:not(:last-child) {
-    margin-right: 0.5rem;
+    margin-right: $margin-right-column;
   }
 }
 
 .own-token-grid-header__col-token-image {
   @include own-token-grid-header__col();
 
-  width: 7rem;
-}
-
-.own-token-grid-header__col-token-name {
-  @include own-token-grid-header__col();
-
-  width: $width-col-token-name;
+  width: $width-col-token-image;
 }
 
 .own-token-grid-header__col-token-name-full {
   @include own-token-grid-header__col();
 
-  width: 0.5rem;
+  width: $width-col-token-name-full;
+  margin-right: $margin-right-small-column !important;
 }
 
 .own-token-grid-header__col-position-type {
   @include own-token-grid-header__col();
 
   width: $width-col-position-type;
+  margin-right: $margin-right-small-column !important;
 }
 
 .own-token-grid-header__col-asset-price {
   @include own-token-grid-header__col();
 
-  margin-right: 1.5rem !important;
   width: $width-col-asset-price;
 }
 
 .own-token-grid-header__col-liquidation-price {
   @include own-token-grid-header__col();
 
-  margin-right: 1.5rem !important;
   width: $width-col-liquidation-price;
 }
 
 .own-token-grid-header__col-position-value {
   @include own-token-grid-header__col();
 
-  margin-right: 1.5rem !important;
   width: $width-col-position-value;
 }
 
 .own-token-grid-header__col-profit {
   @include own-token-grid-header__col();
 
-  margin-right: 1.5rem !important;
   width: $width-col-profit;
+  margin-right: $margin-right-small-column !important;
 }
 
 .own-token-grid-header__col-actions {
@@ -180,24 +173,19 @@ $margin-right-column: 1.5rem;
   }
 }
 
-.own-token-grid-row__col-token-name {
-  @include own-token-grid-row__col();
-  @include own-token-grid-row__text-normal();
-
-  width: $width-col-token-name;
-}
-
 .own-token-grid-row__col-token-name-full {
   @include own-token-grid-row__col();
   @include own-token-grid-row__text-normal();
 
-  width: 4rem;
+  width: $width-col-token-name-full;
+  margin-right: $margin-right-small-column !important;
 }
 
 .own-token-grid-row__col-position-type {
   @include own-token-grid-row__col();
 
   width: $width-col-position-type;
+  margin-right: $margin-right-small-column !important;
 }
 
 .own-token-grid-row__col-asset-price {
@@ -226,6 +214,7 @@ $margin-right-column: 1.5rem;
   @include own-token-grid-row__text-normal();
 
   width: $width-col-profit;
+  margin-right: $margin-right-small-column !important;
 }
 
 .own-token-grid-row__col-action {

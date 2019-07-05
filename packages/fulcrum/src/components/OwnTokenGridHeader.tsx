@@ -13,7 +13,7 @@ export class OwnTokenGridHeader extends Component<IOwnTokenGridHeaderProps> {
         <div className="own-token-grid-header__col-token-image">
           <span className="own-token-grid-header__text">Asset</span>
         </div>
-        <div className="own-token-grid-header__col-token-name">
+        <div className="own-token-grid-header__col-token-name-full">
           <span className="own-token-grid-header__text">&nbsp;</span>
         </div>
         <div className="own-token-grid-header__col-position-type">
