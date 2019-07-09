@@ -15077,10 +15077,10 @@ sprintf-js@~1.0.2:
   resolved "https://registry.yarnpkg.com/sprintf-js/-/sprintf-js-1.0.3.tgz#04e6926f662895354f3dd015203633b857297e2c"
   integrity sha1-BOaSb2YolTVPPdAVIDYzuFcpfiw=
 
-squarelink-provider-engine@^15.0.2:
-  version "15.0.2"
-  resolved "https://registry.yarnpkg.com/squarelink-provider-engine/-/squarelink-provider-engine-15.0.2.tgz#d0e0dc64504b873b34e3d311fdb0fa35c473d5be"
-  integrity sha512-vp0PWs+5CpLgyIGgZLX7Xc5iFHyFq7pYsUny/KjZ4apIP/3A+wQxUCqRBlihMX7sCTAhXGVMXVTx57tWO0yxqA==
+squarelink-provider-engine@^15.0.3:
+  version "15.0.3"
+  resolved "https://registry.yarnpkg.com/squarelink-provider-engine/-/squarelink-provider-engine-15.0.3.tgz#745ec9434f00a8dd95a1ae48378845ea29d2bb7a"
+  integrity sha512-S40l1IVIjWJO///336w0thMGKgPrIl1ffKV1V2P+5UIS+Xxa/mkal0n3D4SsLfOGKxdPO6cpijz+fF2ApIpzmQ==
   dependencies:
     async "^2.5.0"
     backoff "^2.5.0"
@@ -15105,12 +15105,13 @@ squarelink-provider-engine@^15.0.2:
     xhr "^2.2.0"
     xtend "^4.0.1"
 
-squarelink@^0.3.2:
-  version "0.3.2"
-  resolved "https://registry.yarnpkg.com/squarelink/-/squarelink-0.3.2.tgz#7b447bfd3f7eacf99f6f0013a06fb5681f02012f"
-  integrity sha512-y+fxLTes3oHTQiYv1Gn98Tmsq3M7nh4je9AR3xlGrH+HxA6kyuN+b/Pg230O5EuaOcEEuTz6m2mAT/scG3wT0w==
+squarelink@^0.4.1:
+  version "0.4.1"
+  resolved "https://registry.yarnpkg.com/squarelink/-/squarelink-0.4.1.tgz#43cad2a4c3c395fd6e7d4a1a0cbb3310a7a24781"
+  integrity sha512-LiDm1hooigrIBAfF3rEYSgtdOvxqQz0pXq7BrquhHiSb/5rVoTHLnxTDY+/7yojqebsBzPfZUXZDNrt/26HOvw==
   dependencies:
-    squarelink-provider-engine "^15.0.2"
+    babel-runtime "^6.26.0"
+    squarelink-provider-engine "^15.0.3"
 
 sshpk@^1.7.0:
   version "1.16.1"
