@@ -333,7 +333,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
               </div>
               <div className="trade-form__value">{this.state.collateral}</div>
             </div>
-            {this.props.tradeType === TradeType.BUY ?
+            {/*this.props.tradeType === TradeType.BUY ?
               needsCollateralMsg || needsApprovalMsg ? (
               <div className="trade-form__token-message-container">
                 <div className="trade-form__token-message-container--message">
@@ -354,7 +354,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
                 </div>
               </div>
               ) : `` 
-            }
+            */}
             <div className="trade-form__kv-container trade-form__kv-container--w_dots">
               <div className="trade-form__label">Leverage</div>
               <div className="trade-form__value">{`${this.props.leverage.toString()}x`}</div>

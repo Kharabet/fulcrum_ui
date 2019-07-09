@@ -139,7 +139,7 @@ export class ContractsSource {
         address = "0xd8dc30d298ccf40042991cb4b96a540d8affe73a";
         break;
       case 3:
-        address = "0xAA5C713387972841995553c9690459596336800b";
+        address = "0xd03eea21041a19672e451bcbb413ce8be72d0381";
         break;
       case 42:
         address = "0x730df5c1e0a4b6ba7a982a585c1ec55187fbb3ca";
