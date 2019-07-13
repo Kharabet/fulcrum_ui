@@ -319,9 +319,13 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
               {tokenNameBase}
             </div>
             <div className="trade-form__info_block__stats"  style={{color: this.state.assetDetails.textColor2}}>
-              {this.state.interestRate ? `${this.state.interestRate.toFixed(1)}%` : `0.0%`} APR
-              <span className="trade-form__info_block__stats__splitter">|</span>
-              {`${this.props.leverage.toString()}x`}
+              <div className="trade-form__info_block__stats__data">
+                {this.state.interestRate ? `${this.state.interestRate.toFixed(1)}%` : `0.0%`} APR
+              </div>
+              <div className="trade-form__info_block__stats__splitter" style={{borderLeftColor: this.state.assetDetails.textColor2}}>|</div>
+              <div className="trade-form__info_block__stats__data">
+                {`${this.props.leverage.toString()}x`}
+              </div>
             </div>
           </div>
         </div>
