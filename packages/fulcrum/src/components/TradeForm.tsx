@@ -1,13 +1,12 @@
 import { BigNumber } from "@0x/utils";
 import React, { ChangeEvent, Component, FormEvent } from "react";
 import Modal from "react-modal";
-import { Tooltip } from "react-tippy";
 import { merge, Observable, Subject } from "rxjs";
 import { debounceTime, distinctUntilChanged, switchMap } from "rxjs/operators";
+import ic_arrow_max from "../assets/images/ic_arrow_max.svg";
 import { Asset } from "../domain/Asset";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
-import { IPriceDataPoint } from "../domain/IPriceDataPoint";
 import { PositionType } from "../domain/PositionType";
 import { TradeRequest } from "../domain/TradeRequest";
 import { TradeTokenKey } from "../domain/TradeTokenKey";
@@ -15,10 +14,11 @@ import { TradeType } from "../domain/TradeType";
 import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
-import { CheckBox } from "./CheckBox";
 import { CollapsibleContainer } from "./CollapsibleContainer";
+import { CollateralTokenButton } from "./CollateralTokenButton";
 import { CollateralTokenSelector } from "./CollateralTokenSelector";
-import { PositionTypeMarker } from "./PositionTypeMarker";
+import { PositionTypeMarkerAlt } from "./PositionTypeMarkerAlt";
+import { TradeExpectedResult } from "./TradeExpectedResult";
 import { UnitOfAccountSelector } from "./UnitOfAccountSelector";
 
 interface ITradeAmountChangeEvent {
@@ -300,91 +300,33 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
 
     const needsCollateralMsg = this.props.bestCollateral !== this.state.collateral;
     const needsApprovalMsg = (!this.state.balance || this.state.balance.gt(0)) && this.state.maybeNeedsApproval && this.state.collateral !== Asset.ETH;
+    const tradeExpectedResultValue = {
+      exposureValue: this.state.tradedAmountEstimate,
+      exposureAsset: this.props.tradeType === TradeType.BUY ? this.props.asset : this.state.collateral,
+      exposureType: this.props.positionType,
+      liquidationPrice: new BigNumber("4.37")
+    };
 
     return (
       <form className="trade-form" onSubmit={this.onSubmitClick}>
-        <div className="trade-form__image" style={divStyle}>
-          <img src={this.state.assetDetails.logoSvg} alt={tokenNameBase} />
+        <div className="trade-form__left_block" style={divStyle}>
+          <div className="trade-form__info_block">
+            <div className="trade-form__info_block__logo">
+              <img className="asset-logo" src={this.state.assetDetails.logoSvg} alt={tokenNameBase} />
+              <PositionTypeMarkerAlt assetDetails={this.state.assetDetails} value={this.props.positionType} />
+            </div>
+            <div className="trade-form__info_block__asset" style={{color: this.state.assetDetails.textColor}}>
+              {tokenNameBase}
+            </div>
+            <div className="trade-form__info_block__stats"  style={{color: this.state.assetDetails.textColor2}}>
+              {this.state.interestRate ? `${this.state.interestRate.toFixed(1)}%` : `0.0%`} APR
+              <span className="trade-form__info_block__stats__splitter">|</span>
+              {`${this.props.leverage.toString()}x`}
+            </div>
+          </div>
         </div>
         <div className="trade-form__form-container">
           <div className="trade-form__form-values-container">
-            <div className="trade-form__position-type-container">
-              <PositionTypeMarker value={this.props.positionType} />
-            </div>
-            <div className="trade-form__kv-container trade-form__kv-container--w_dots">
-              <div className="trade-form__label">Position Asset</div>
-              <div className="trade-form__value">{tokenNameBase}</div>
-            </div>
-            <div className="trade-form__kv-container trade-form__kv-container--w_dots">
-              <div className="trade-form__label">
-                {this.props.tradeType === TradeType.BUY ? `Purchase Asset` : `Withdrawal Asset`}
-                {/*this.props.tradeType === TradeType.SELL ? (
-                  <React.Fragment>
-                    {` `}
-                    {<button className="trade-form__change-button" onClick={this.onChangeCollateralOpen}>
-                      <span className="trade-form__label--action">Change</span>
-                    </button>}
-                  </React.Fragment>
-                ) : ``*/}
-                {` `}
-                {<button className="trade-form__change-button" onClick={this.onChangeCollateralOpen}>
-                  <span className="trade-form__label--action">Change</span>
-                </button>}
-              </div>
-              <div className="trade-form__value">{this.state.collateral}</div>
-            </div>
-            {/*this.props.tradeType === TradeType.BUY ?
-              needsCollateralMsg || needsApprovalMsg ? (
-              <div className="trade-form__token-message-container">
-                <div className="trade-form__token-message-container--message">
-                  {needsCollateralMsg ? `Using ${this.props.bestCollateral} will have the least slippage.` : ``}
-                  {needsCollateralMsg && needsApprovalMsg ? (
-                    <React.Fragment>
-                      <br/><br/>
-                    </React.Fragment>
-                  ) : ``}
-                  {needsApprovalMsg ? `You may be prompted to approve ${this.state.collateral} after clicking BUY.` : ``}
-                </div>
-              </div>
-              ) : ``
-            : needsCollateralMsg ? (
-              <div className="trade-form__token-message-container">
-                <div className="trade-form__token-message-container--message">
-                  Using {this.props.bestCollateral} will have the least slippage.
-                </div>
-              </div>
-              ) : `` 
-            */}
-            <div className="trade-form__kv-container trade-form__kv-container--w_dots">
-              <div className="trade-form__label">Leverage</div>
-              <div className="trade-form__value">{`${this.props.leverage.toString()}x`}</div>
-            </div>
-            <div className="trade-form__kv-container trade-form__kv-container--w_dots">
-              <div className="trade-form__label">Interest APR</div>
-              <div title={this.state.interestRate ? `${this.state.interestRate.toFixed(18)}%` : ``} className="trade-form__value">{this.state.interestRate ? `${this.state.interestRate.toFixed(4)}%` : `0.0000%`}</div>
-            </div>
-            <div className="trade-form__kv-container">
-              <div className="trade-form__label">Amount</div>
-              {this.props.tradeType !== TradeType.BUY &&
-                this.state.pTokenAddress &&
-                FulcrumProvider.Instance.web3ProviderSettings &&
-                FulcrumProvider.Instance.web3ProviderSettings.etherscanURL ? (
-                <div className="trade-form__value">
-                  <a
-                    className="trade-form__value"
-                    style={{cursor: `pointer`, textDecoration: `none`}}
-                    title={this.state.pTokenAddress}
-                    href={`${FulcrumProvider.Instance.web3ProviderSettings.etherscanURL}address/${this.state.pTokenAddress}#readContract`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {tokenNameSource}
-                  </a>
-                </div>
-              ) : (
-                <div className="trade-form__value">{tokenNameSource}</div>
-              )}
-            </div>
             <div className="trade-form__amount-container">
               <input
                 type="text"
@@ -394,71 +336,28 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
                 onChange={this.onTradeAmountChange}
                 placeholder={`${this.props.tradeType === TradeType.BUY ? `Buy` : `Sell`} Amount`}
               />
+              <div className="trade-form__collateral-button-container">
+                <CollateralTokenButton asset={this.state.collateral} onClick={this.onChangeCollateralOpen} />
+              </div>
               {isAmountMaxed ? (
                 <div className="trade-form__amount-maxed">MAX</div>
               ) : (
-                <div className="trade-form__amount-max" onClick={this.onInsertMaxValue}>&#65087;<br/>MAX</div>
+                <div className="trade-form__amount-max" onClick={this.onInsertMaxValue}><img src={ic_arrow_max} />MAX</div>
               )}
             </div>
-            <div className="trade-form__kv-container">
-              {amountMsg.includes("Slippage:") ? (
-                <div title={`${this.state.slippageRate.toFixed(18)}%`} className="trade-form__label" style={{ display: `flex` }}>
-                  {amountMsg}
-                  <span className="trade-form__slippage-amount">
-                    {`${this.state.slippageRate.toFixed(2)}%`}
-                    <img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iMTZweCIgaGVpZ2h0PSIxNnB4IiB2aWV3Qm94PSIwIDAgMTYgMTYiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8IS0tIEdlbmVyYXRvcjogU2tldGNoIDUyLjQgKDY3Mzc4KSAtIGh0dHA6Ly93d3cuYm9oZW1pYW5jb2RpbmcuY29tL3NrZXRjaCAtLT4KICAgIDx0aXRsZT5TaGFwZTwvdGl0bGU+CiAgICA8ZGVzYz5DcmVhdGVkIHdpdGggU2tldGNoLjwvZGVzYz4KICAgIDxnIGlkPSJLeWJlclN3YXAuY29tLSIgc3Ryb2tlPSJub25lIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPGcgaWQ9ImxhbmRpbmctcGFnZS0tMSIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoLTEwMDQuMDAwMDAwLCAtODI5LjAwMDAwMCkiIGZpbGw9IiNGOTYzNjMiPgogICAgICAgICAgICA8ZyBpZD0iR3JvdXAtMTEiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDI1Mi4wMDAwMDAsIDgwOC4wMDAwMDApIj4KICAgICAgICAgICAgICAgIDxnIGlkPSJpY19hcnJvd19kb3dud2FyZC1jb3B5LTMiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDc1Mi4wMDAwMDAsIDIxLjAwMDAwMCkiPgogICAgICAgICAgICAgICAgICAgIDxnIGlkPSJJY29uLTI0cHgiPgogICAgICAgICAgICAgICAgICAgICAgICA8cG9seWdvbiBpZD0iU2hhcGUiIHBvaW50cz0iMTQuNTkgNi41OSA5IDEyLjE3IDkgMCA3IDAgNyAxMi4xNyAxLjQyIDYuNTggMCA4IDggMTYgMTYgOCI+PC9wb2x5Z29uPgogICAgICAgICAgICAgICAgICAgIDwvZz4KICAgICAgICAgICAgICAgIDwvZz4KICAgICAgICAgICAgPC9nPgogICAgICAgIDwvZz4KICAgIDwvZz4KPC9zdmc+" />
-                  </span>
-                </div>
-              ) : (
-                <div className="trade-form__label">{amountMsg}</div>  
-              )}
-              <div className="trade-form__value trade-form__value--no-color">
-                <Tooltip
-                  html={
-                    <div style={{ /*maxWidth: `300px`*/ }}>
-                      {/*... Info ...*/}
-                    </div>
-                  }
-                >
-                  {/*<span className="rounded-mark">?</span>*/}
-                </Tooltip>
-                {this.props.tradeType === TradeType.BUY &&
-                this.state.pTokenAddress &&
-                FulcrumProvider.Instance.web3ProviderSettings &&
-                FulcrumProvider.Instance.web3ProviderSettings.etherscanURL ? (
-                <a
-                  className="trade-form__value--no-color"
-                  style={{cursor: `pointer`, textDecoration: `none`}}
-                  title={this.state.pTokenAddress}
-                  href={`${FulcrumProvider.Instance.web3ProviderSettings.etherscanURL}address/${this.state.pTokenAddress}#readContract`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  &nbsp; {tradedAmountEstimateText} {tokenNameDestination}
-                </a>
-              ) : (
-                <React.Fragment>&nbsp; {tradedAmountEstimateText} {tokenNameDestination}</React.Fragment>
-              )}
-              </div>
-            </div>
-
             {this.state.positionTokenBalance && this.props.tradeType === TradeType.BUY && this.state.positionTokenBalance.eq(0) ? (
-              <div className="collapsible-container--margin-top">
-                <CollapsibleContainer title="Advanced">
-                  <div className="trade-form__kv-container">
-                    <div className="trade-form__label trade-form__label--no-bg">
-                      Unit of Account &nbsp;
-                      <UnitOfAccountSelector items={[Asset.USDC, Asset.DAI]} value={this.props.defaultUnitOfAccount} onChange={this.onChangeUnitOfAccount} />
-                    </div>
+              <CollapsibleContainer titleOpen="View advanced options" titleClose="Hide advanced options">
+                <div className="trade-form__kv-container">
+                  <div className="trade-form__label trade-form__label--no-bg">
+                    Unit of Account &nbsp;
+                    <UnitOfAccountSelector items={[Asset.USDC, Asset.DAI]} value={this.props.defaultUnitOfAccount} onChange={this.onChangeUnitOfAccount} />
                   </div>
-                  {/*<div className="trade-form__kv-container">
-                    <div className="trade-form__label trade-form__label--no-bg">
-                      <CheckBox checked={this.state.tokenizeNeeded} onChange={this.onChangeTokenizeNeeded}>Tokenize it &nbsp;</CheckBox>
-                    </div>
-                  </div>*/}
-                </CollapsibleContainer>
-              </div>
-            ) : ``}
+                </div>
+              </CollapsibleContainer>
+            ) : null}
+            {this.state.positionTokenBalance && this.props.tradeType === TradeType.BUY ? (
+              <TradeExpectedResult value={tradeExpectedResultValue} />
+            ) : null}
           </div>
 
           <div className="trade-form__actions-container">

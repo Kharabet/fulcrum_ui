@@ -1,18 +1,29 @@
-import React, { Component } from "react";
+import React, { ChangeEvent, Component } from "react";
 
 export interface ICollapsibleContainerProps {
-  title: string;
+  titleOpen: string;
+  titleClose: string;
 }
 
-export class CollapsibleContainer extends Component<ICollapsibleContainerProps> {
+interface ICollapsibleContainerState {
+  isOpen: boolean;
+}
+
+export class CollapsibleContainer extends Component<ICollapsibleContainerProps, ICollapsibleContainerState> {
+  constructor(props: ICollapsibleContainerProps) {
+    super(props);
+
+    this.state = { isOpen: false };
+  }
+
   public render() {
     const uuid = this.uuidv4();
 
     return (
       <div className="collapsible-container">
-        <input id={uuid} className="collapsible-container__toggle-cb" type="checkbox" />
-        <label htmlFor={uuid} className="collapsible-container__toggle-label">
-          {this.props.title}
+        <input id={uuid} className="collapsible-container__toggle-cb" type="checkbox" value={(this.state.isOpen as any)} />
+        <label htmlFor={uuid} className="collapsible-container__toggle-label" onClick={this.onCheckedChange}>
+          {this.state.isOpen ? this.props.titleClose : this.props.titleOpen}
         </label>
         <div className="collapsible-container__content">
           <div className="collapsible-container__content-inner">{this.props.children}</div>
@@ -20,6 +31,10 @@ export class CollapsibleContainer extends Component<ICollapsibleContainerProps> 
       </div>
     );
   }
+
+  private onCheckedChange = () => {
+    this.setState({...this.state, isOpen: !this.state.isOpen});
+  };
 
   // https://gist.github.com/jed/982883
   private uuidv4 = () => {
