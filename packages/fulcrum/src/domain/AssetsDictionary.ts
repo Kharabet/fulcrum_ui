@@ -28,7 +28,7 @@ import eth_ts from "../assets/images/ic___token_selector___eth.svg";
 import knc_ts from "../assets/images/ic___token_selector___knc.svg";
 import mkr_ts from "../assets/images/ic___token_selector___mkr.svg";
 import rep_ts from "../assets/images/ic___token_selector___rep.svg";
-import usdc_ts from "../assets/images/ic___token_selector___dai.svg";
+import usdc_ts from "../assets/images/ic___token_selector___usdc.svg";
 import zrx_ts from "../assets/images/ic___token_selector___zrx.svg";
 
 export class AssetsDictionary {
