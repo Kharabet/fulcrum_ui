@@ -54,7 +54,7 @@ export class FulcrumProvider {
   public readonly gasLimit = "4000000";
 
   // gasBufferCoeff equal 110% gas reserve
-  public readonly gasBufferCoeff = new BigNumber("1.03");
+  public readonly gasBufferCoeff = new BigNumber("1.06");
   // 5000ms
   public readonly successDisplayTimeout = 5000;
 
@@ -813,7 +813,7 @@ export class FulcrumProvider {
   }
 
   public getTradeSlippageRate = async (request: TradeRequest, tradedAmountEstimate: BigNumber): Promise<BigNumber | null> => {
-   
+
     if (request.amount.eq(0) || tradedAmountEstimate.eq(0)) {
       return new BigNumber(0);
     }
@@ -848,7 +848,10 @@ export class FulcrumProvider {
                       gasPrice: new BigNumber(0)
                     }
                   );
-                  const destDecimals: number = AssetsDictionary.assets.get(key.loanAsset)!.decimals || 18;
+                  let destDecimals: number = AssetsDictionary.assets.get(key.loanAsset)!.decimals || 18;
+                  if (key.loanAsset === Asset.WBTC && key.positionType === PositionType.SHORT) {
+                    destDecimals = destDecimals + 10;
+                  }
                   tradeAmountActual = tradeAmountActual.multipliedBy(10 ** (18 - destDecimals));
                 } else {
                   return null;
@@ -868,7 +871,10 @@ export class FulcrumProvider {
                     gasPrice: new BigNumber(0)
                   }
                 );
-                const destDecimals: number = AssetsDictionary.assets.get(key.loanAsset)!.decimals || 18;
+                let destDecimals: number = AssetsDictionary.assets.get(key.loanAsset)!.decimals || 18;
+                if (key.loanAsset === Asset.WBTC && key.positionType === PositionType.SHORT) {
+                  destDecimals = destDecimals + 10;
+                }
                 tradeAmountActual = tradeAmountActual.multipliedBy(10 ** (18 - destDecimals));
               } catch(e) {
                 // console.log(e);
@@ -880,7 +886,10 @@ export class FulcrumProvider {
               try {
                 const assetErc20Address = FulcrumProvider.Instance.getErc20AddressOfAsset(request.collateral);
                 if (assetErc20Address) {
-                  const srcDecimals: number = AssetsDictionary.assets.get(key.loanAsset)!.decimals || 18;
+                  let srcDecimals: number = AssetsDictionary.assets.get(key.loanAsset)!.decimals || 18;
+                  if (key.loanAsset === Asset.WBTC && key.positionType === PositionType.SHORT) {
+                    srcDecimals = srcDecimals + 10;
+                  }
                   tradeAmountActual = await assetContract.burnToToken.callAsync(
                     account,
                     assetErc20Address,
@@ -902,7 +911,10 @@ export class FulcrumProvider {
               }
             } else {
               try {
-                const srcDecimals: number = AssetsDictionary.assets.get(key.loanAsset)!.decimals || 18;
+                let srcDecimals: number = AssetsDictionary.assets.get(key.loanAsset)!.decimals || 18;
+                if (key.loanAsset === Asset.WBTC && key.positionType === PositionType.SHORT) {
+                  srcDecimals = srcDecimals + 10;
+                }
                 tradeAmountActual = await assetContract.burnToEther.callAsync(
                   account,
                   new BigNumber(request.amount.multipliedBy(10 ** srcDecimals).toFixed(0, 1)),
@@ -1034,6 +1046,9 @@ export class FulcrumProvider {
       if (address) {
         result = await this.getErc20BalanceOfUser(address);
         result = result.multipliedBy(10 ** (18 - precision));
+        if (selectedKey.loanAsset === Asset.WBTC && selectedKey.positionType === PositionType.SHORT) {
+          result = result.div(10 ** 10);
+        }
       }
     }
 

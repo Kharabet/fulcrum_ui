@@ -7,6 +7,9 @@ import { TradeTokenKey } from "../../domain/TradeTokenKey";
 import { FulcrumProviderEvents } from "../events/FulcrumProviderEvents";
 import { FulcrumProvider } from "../FulcrumProvider";
 
+import { Asset } from "../../domain/Asset";
+import { PositionType } from "../../domain/PositionType";
+
 export class TradeSellEthProcessor {
   public run = async (task: RequestTask, account: string, skipGas: boolean) => {
     if (!(FulcrumProvider.Instance.contractsSource && FulcrumProvider.Instance.contractsSource.canWrite)) {
@@ -22,7 +25,11 @@ export class TradeSellEthProcessor {
       taskRequest.leverage,
       taskRequest.isTokenized
     );
-    const decimals: number = AssetsDictionary.assets.get(key.loanAsset)!.decimals || 18;
+    let decimals: number = AssetsDictionary.assets.get(key.loanAsset)!.decimals || 18;
+    if (key.loanAsset === Asset.WBTC && key.positionType === PositionType.SHORT) {
+      decimals = decimals + 10;
+    }
+
     const amountInBaseUnits = new BigNumber(taskRequest.amount.multipliedBy(10 ** decimals).toFixed(0, 1));
     const tokenContract: pTokenContract | null = await FulcrumProvider.Instance.contractsSource.getPTokenContract(key);
 
