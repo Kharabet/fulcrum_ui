@@ -13,7 +13,7 @@
 .collapsible-container__toggle-label {
   cursor: pointer;
   display: block;
-  padding: 0.5rem 0;
+  padding: 0 0 0.5rem 0;
 
   text-align: right;
   text-decoration: underline dotted;
@@ -21,6 +21,13 @@
   font-size: 0.75rem;
 
   transition: all 0.25s ease-out;
+
+  &.collapsible-container__toggle-label--transparent {
+    position: relative;
+    transform: translateY(-100%);
+    padding-bottom: 0;
+    background-color: rgba(255, 255, 255, 0);
+  }
 }
 
 .collapsible-container__content {
