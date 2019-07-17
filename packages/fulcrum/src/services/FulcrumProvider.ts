@@ -353,7 +353,7 @@ export class FulcrumProvider {
 
   public getTradeTokenAssetLatestDataPoint = async (selectedKey: TradeTokenKey): Promise<IPriceDataPoint> => {
     try {
-      let currentPrice = await this.getSwapToUsdRate(selectedKey.asset);
+      const currentPrice = await this.getSwapToUsdRate(selectedKey.asset);
       const priceLatestDataPoint = await this.getPriceDefaultDataPoint();
 
       priceLatestDataPoint.price = currentPrice.toNumber();
@@ -362,36 +362,35 @@ export class FulcrumProvider {
         const assetContract = await this.contractsSource.getPTokenContract(selectedKey);
         if (assetContract) {
          
-          const currentLeverage = await assetContract.currentLeverage.callAsync();
+          const currentLeverage = (await assetContract.currentLeverage.callAsync()).div(10**18);
           const currentMargin = currentLeverage.gt(0) ?
-            new BigNumber(10**38).div(currentLeverage) :
-            new BigNumber(10**38).div(selectedKey.leverage * 10**18);
+            new BigNumber(1).div(currentLeverage) :
+            new BigNumber(1).div(selectedKey.leverage);
           
-          const maintenanceMargin = new BigNumber(15 * 10**18);
+          const maintenanceMargin = new BigNumber(0.15);
 
           if (currentMargin.lte(maintenanceMargin)) {
             priceLatestDataPoint.liquidationPrice = priceLatestDataPoint.price;
           } else {
-            const initialLeverage = new BigNumber(selectedKey.leverage).multipliedBy(10**18);
-            const initialMargin = new BigNumber(10**38).div(initialLeverage);
-            currentPrice = currentPrice.multipliedBy(10**18)
+            const initialLeverage = new BigNumber(selectedKey.leverage);
+            const initialMargin = new BigNumber(1).div(initialLeverage);
 
-            // initial_price = current_price - (current_price/leverage *(current_margin - initial_margin))
-            const initialPrice = currentPrice
-              .minus(
-                currentPrice
-                .dividedBy(initialLeverage)
-                .multipliedBy(
-                  currentMargin
-                  .minus(initialMargin)
-                  .div(100)
-                )
+            // initial_price = current_price - (current_price / initial_leverage * (current_margin - initial_margin))
+            const offset = currentPrice
+              .dividedBy(initialLeverage)
+              .multipliedBy(
+                currentMargin
+                .minus(initialMargin)
               );
 
-            // 2x long example: 100, liquidation at 100 - 100/2 + 100/2 * .15 = 57.5
+            const initialPrice = selectedKey.positionType === PositionType.SHORT ?
+              currentPrice.plus(offset) :
+              currentPrice.minus(offset);
+
+            // liquidation_price = initial_price * (maintenance_margin * current_leverage + initial_leverage) / (initial_leverage + 1)
             let liquidationPrice = initialPrice
-              .minus(initialPrice.div(initialLeverage).times(10**18))
-              .plus(initialPrice.div(initialLeverage).multipliedBy(maintenanceMargin).div(100));
+              .multipliedBy(maintenanceMargin.times(currentLeverage).plus(initialLeverage))
+              .div(initialLeverage.plus(1));
 
             if (selectedKey.positionType === PositionType.SHORT) {
               liquidationPrice = initialPrice
@@ -399,8 +398,17 @@ export class FulcrumProvider {
                 .minus(liquidationPrice);
             }
 
+            /*console.log(`maintenanceMargin`,maintenanceMargin.toString());
+            console.log(`initialLeverage`,initialLeverage.toString());
+            console.log(`initialMargin`,initialMargin.toString())
+            console.log(`currentPrice`,currentPrice.toString());
+            console.log(`currentLeverage`,currentLeverage.toString());
+            console.log(`currentMargin`,currentMargin.toString());
+            console.log(`initialPrice`,initialPrice.toString());
+            console.log(`liquidationPrice`,liquidationPrice.toString());*/
+
             priceLatestDataPoint.liquidationPrice = liquidationPrice
-              .div(10**18).toNumber();
+              .toNumber();
           }
         }
       }
@@ -944,6 +952,28 @@ export class FulcrumProvider {
     // console.log(`slippage`,slippage.toString());
 
     return slippage;
+  }
+
+  public getTradeFormExposure = async (request: TradeRequest): Promise<BigNumber> => {
+
+    if (request.amount.eq(0)) {
+      return new BigNumber(0);
+    }
+
+    let requestAmount;
+    if (request.collateral !== request.asset) {
+      const decimals: number = AssetsDictionary.assets.get(request.collateral)!.decimals || 18;
+      const swapPrice = await this.getSwapRate(
+        request.collateral,
+        request.asset,
+        request.amount.multipliedBy(10 ** decimals)
+      );
+      requestAmount = request.amount.multipliedBy(swapPrice);
+    } else {
+      requestAmount = request.amount;
+    }
+
+    return requestAmount.multipliedBy(request.leverage);
   }
 
   public static async getWeb3ProviderSettings(networkId: number| null): Promise<IWeb3ProviderSettings> {

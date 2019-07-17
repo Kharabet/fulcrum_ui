@@ -1,6 +1,7 @@
 import { BigNumber } from "@0x/utils";
 import React, { ChangeEvent, Component, FormEvent } from "react";
 import Modal from "react-modal";
+// import { Tooltip } from "react-tippy";
 import { merge, Observable, Subject } from "rxjs";
 import { debounceTime, distinctUntilChanged, switchMap } from "rxjs/operators";
 import ic_arrow_max from "../assets/images/ic_arrow_max.svg";
@@ -14,6 +15,7 @@ import { TradeType } from "../domain/TradeType";
 import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
+// import { CheckBox } from "./CheckBox";
 import { CollapsibleContainer } from "./CollapsibleContainer";
 import { CollateralTokenButton } from "./CollateralTokenButton";
 import { CollateralTokenSelector } from "./CollateralTokenSelector";
@@ -28,6 +30,7 @@ interface ITradeAmountChangeEvent {
   tradedAmountEstimate: BigNumber;
   maxTradeAmount: BigNumber;
   slippageRate: BigNumber;
+  exposureValue: BigNumber;
 }
 
 export interface ITradeFormProps {
@@ -65,6 +68,9 @@ interface ITradeFormState {
   tradedAmountEstimate: BigNumber;
   slippageRate: BigNumber;
   pTokenAddress: string;
+
+  liquidationPrice: BigNumber;
+  exposureValue: BigNumber;
 }
 
 export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
@@ -84,6 +90,8 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     const maxTradeValue = new BigNumber(0);
     const slippageRate = new BigNumber(0);
     const tradedAmountEstimate = new BigNumber(0);
+    const liquidationPrice = new BigNumber(0);
+    const exposureValue = new BigNumber(0);
 
     this.state = {
       assetDetails: assetDetails || null,
@@ -101,7 +109,9 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       slippageRate: slippageRate,
       interestRate: interestRate,
       pTokenAddress: "",
-      maybeNeedsApproval: false
+      maybeNeedsApproval: false,
+      liquidationPrice: liquidationPrice,
+      exposureValue: exposureValue
     };
 
     this._inputChange = new Subject();
@@ -128,7 +138,8 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
           tradeAmountText: "",
           tradeAmount: new BigNumber(0),
           tradedAmountEstimate: new BigNumber(0),
-          slippageRate: new BigNumber(0)
+          slippageRate: new BigNumber(0),
+          exposureValue: new BigNumber(0)
         })
       }
     });
@@ -196,6 +207,12 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
 
     const maybeNeedsApproval = await FulcrumProvider.Instance.checkCollateralApprovalForTrade(tradeRequest);
 
+
+    const latestPriceDataPoint = await FulcrumProvider.Instance.getTradeTokenAssetLatestDataPoint(tradeTokenKey);
+    const liquidationPrice = new BigNumber(latestPriceDataPoint.liquidationPrice);
+
+    const exposureValue = await FulcrumProvider.Instance.getTradeFormExposure(tradeRequest);
+
     this.setState({
       ...this.state,
       assetDetails: assetDetails || null,
@@ -210,7 +227,9 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       interestRate: interestRate,
       pTokenAddress: address,
       // collateral: this.props.defaultCollateral,
-      maybeNeedsApproval: maybeNeedsApproval
+      maybeNeedsApproval: maybeNeedsApproval,
+      liquidationPrice: liquidationPrice,
+      exposureValue: exposureValue
     });
   }
 
@@ -269,14 +288,14 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     const submitClassName =
       this.props.tradeType === TradeType.BUY ? "trade-form__submit-button--buy" : "trade-form__submit-button--sell";
 
-    const positionTypePrefix = this.props.defaultUnitOfAccount === Asset.DAI ? "d" : "u";
-    const positionTypePrefix2 = this.props.positionType === PositionType.SHORT ? "s" : "L";
-    const positionLeveragePostfix = this.props.leverage > 1 ? `${this.props.leverage}x` : "";
+    // const positionTypePrefix = this.props.defaultUnitOfAccount === Asset.DAI ? "d" : "u";
+    // const positionTypePrefix2 = this.props.positionType === PositionType.SHORT ? "s" : "L";
+    // const positionLeveragePostfix = this.props.leverage > 1 ? `${this.props.leverage}x` : "";
     const tokenNameBase = this.state.assetDetails.displayName;
-    const tokenNamePosition = `${positionTypePrefix}${positionTypePrefix2}${this.state.assetDetails.displayName}${positionLeveragePostfix}`;
+    // const tokenNamePosition = `${positionTypePrefix}${positionTypePrefix2}${this.state.assetDetails.displayName}${positionLeveragePostfix}`;
 
-    const tokenNameSource = this.props.tradeType === TradeType.BUY ? this.state.collateral : tokenNamePosition;
-    const tokenNameDestination = this.props.tradeType === TradeType.BUY ? tokenNamePosition : this.state.collateral;
+    // const tokenNameSource = this.props.tradeType === TradeType.BUY ? this.state.collateral : tokenNamePosition;
+    // const tokenNameDestination = this.props.tradeType === TradeType.BUY ? tokenNamePosition : this.state.collateral;
 
     const isAmountMaxed = this.state.tradeAmount.eq(this.state.maxTradeAmount);
     const amountMsg =
@@ -291,24 +310,24 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
             ? `Slippage:`
             : "";
 
-    const tradedAmountEstimateText =
+    /*const tradedAmountEstimateText =
       this.state.tradedAmountEstimate.eq(0)
         ? "0"
         : this.state.tradedAmountEstimate.gte(new BigNumber("0.000001"))
           ? this.state.tradedAmountEstimate.toFixed(6)
-          : this.state.tradedAmountEstimate.toExponential(3);
+          : this.state.tradedAmountEstimate.toExponential(3);*/
 
-    const needsCollateralMsg = this.props.bestCollateral !== this.state.collateral;
-    const needsApprovalMsg = (!this.state.balance || this.state.balance.gt(0)) && this.state.maybeNeedsApproval && this.state.collateral !== Asset.ETH;
+    // const needsCollateralMsg = this.props.bestCollateral !== this.state.collateral;
+    // const needsApprovalMsg = (!this.state.balance || this.state.balance.gt(0)) && this.state.maybeNeedsApproval && this.state.collateral !== Asset.ETH;
     const tradeExpectedResultValue = {
-      exposureValue: this.state.tradedAmountEstimate,
-      exposureAsset: this.props.tradeType === TradeType.BUY ? this.props.asset : this.state.collateral,
+      exposureValue: this.state.exposureValue,
+      exposureAsset: this.props.asset,
       exposureType: this.props.positionType,
-      liquidationPrice: new BigNumber("4.37")
+      liquidationPrice: this.state.liquidationPrice
     };
 
     return (
-      <form className="trade-form" onSubmit={this.onSubmitClick}>
+      <form className="trade-form" onSubmit={this.onSubmitClick} style={this.props.tradeType === TradeType.SELL ? { minHeight: `16.5625rem` } : undefined}>
         <div className="trade-form__left_block" style={divStyle}>
           <div className="trade-form__info_block">
             <div className="trade-form__info_block__logo">
@@ -329,7 +348,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
             </div>
           </div>
         </div>
-        <div className="trade-form__form-container">
+        <div className="trade-form__form-container" style={this.props.tradeType === TradeType.SELL ? { minHeight: `16.5625rem` } : undefined}>
           <div className="trade-form__form-values-container">
             <div className="trade-form__amount-container">
               <input
@@ -349,6 +368,21 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
                 <div className="trade-form__amount-max" onClick={this.onInsertMaxValue}><img src={ic_arrow_max} />MAX</div>
               )}
             </div>
+            <div className="trade-form__kv-container" style={{ padding: `initial` }}>
+              {amountMsg.includes("Slippage:") ? (
+                <div title={`${this.state.slippageRate.toFixed(18)}%`} className="trade-form__label" style={{ display: `flex` }}>
+                  {amountMsg}
+                  <span className="trade-form__slippage-amount">
+                    {`${this.state.slippageRate.toFixed(2)}%`}
+                    <img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iMTZweCIgaGVpZ2h0PSIxNnB4IiB2aWV3Qm94PSIwIDAgMTYgMTYiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8IS0tIEdlbmVyYXRvcjogU2tldGNoIDUyLjQgKDY3Mzc4KSAtIGh0dHA6Ly93d3cuYm9oZW1pYW5jb2RpbmcuY29tL3NrZXRjaCAtLT4KICAgIDx0aXRsZT5TaGFwZTwvdGl0bGU+CiAgICA8ZGVzYz5DcmVhdGVkIHdpdGggU2tldGNoLjwvZGVzYz4KICAgIDxnIGlkPSJLeWJlclN3YXAuY29tLSIgc3Ryb2tlPSJub25lIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPGcgaWQ9ImxhbmRpbmctcGFnZS0tMSIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoLTEwMDQuMDAwMDAwLCAtODI5LjAwMDAwMCkiIGZpbGw9IiNGOTYzNjMiPgogICAgICAgICAgICA8ZyBpZD0iR3JvdXAtMTEiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDI1Mi4wMDAwMDAsIDgwOC4wMDAwMDApIj4KICAgICAgICAgICAgICAgIDxnIGlkPSJpY19hcnJvd19kb3dud2FyZC1jb3B5LTMiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDc1Mi4wMDAwMDAsIDIxLjAwMDAwMCkiPgogICAgICAgICAgICAgICAgICAgIDxnIGlkPSJJY29uLTI0cHgiPgogICAgICAgICAgICAgICAgICAgICAgICA8cG9seWdvbiBpZD0iU2hhcGUiIHBvaW50cz0iMTQuNTkgNi41OSA5IDEyLjE3IDkgMCA3IDAgNyAxMi4xNyAxLjQyIDYuNTggMCA4IDggMTYgMTYgOCI+PC9wb2x5Z29uPgogICAgICAgICAgICAgICAgICAgIDwvZz4KICAgICAgICAgICAgICAgIDwvZz4KICAgICAgICAgICAgPC9nPgogICAgICAgIDwvZz4KICAgIDwvZz4KPC9zdmc+" />
+                  </span>
+                </div>
+              ) : (
+                <div className="trade-form__label">{amountMsg}</div>  
+              )}
+
+            </div>
+
             {this.state.positionTokenBalance && this.props.tradeType === TradeType.BUY && this.state.positionTokenBalance.eq(0) ? (
               <CollapsibleContainer titleOpen="View advanced options" titleClose="Hide advanced options">
                 <div className="trade-form__kv-container">
@@ -502,13 +536,16 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
 
         FulcrumProvider.Instance.getTradedAmountEstimate(tradeRequest).then(tradedAmountEstimate => {
           FulcrumProvider.Instance.getTradeSlippageRate(tradeRequest, tradedAmountEstimate).then(slippageRate => {
-            observer.next({
-              isTradeAmountTouched: this.state.isTradeAmountTouched,
-              tradeAmountText: maxTradeValue.decimalPlaces(this._inputPrecision).toFixed(),
-              tradeAmount: maxTradeValue,
-              maxTradeAmount: this.state.maxTradeAmount,
-              tradedAmountEstimate: tradedAmountEstimate,
-              slippageRate: slippageRate ? slippageRate : new BigNumber(0)
+            FulcrumProvider.Instance.getTradeFormExposure(tradeRequest).then(exposureValue => {
+              observer.next({
+                isTradeAmountTouched: this.state.isTradeAmountTouched,
+                tradeAmountText: maxTradeValue.decimalPlaces(this._inputPrecision).toFixed(),
+                tradeAmount: maxTradeValue,
+                maxTradeAmount: this.state.maxTradeAmount,
+                tradedAmountEstimate: tradedAmountEstimate,
+                slippageRate: slippageRate ? slippageRate : new BigNumber(0),
+                exposureValue: exposureValue
+              });
             });
           });
         });
@@ -547,13 +584,16 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
 
         FulcrumProvider.Instance.getTradedAmountEstimate(tradeRequest).then(tradedAmountEstimate => {
           FulcrumProvider.Instance.getTradeSlippageRate(tradeRequest, tradedAmountEstimate).then(slippageRate => {
-            observer.next({
-              isTradeAmountTouched: true,
-              tradeAmountText: amountText,
-              tradeAmount: amount,
-              maxTradeAmount: this.state.maxTradeAmount,
-              tradedAmountEstimate: tradedAmountEstimate,
-              slippageRate: slippageRate ? slippageRate : new BigNumber(0)
+            FulcrumProvider.Instance.getTradeFormExposure(tradeRequest).then(exposureValue => {            
+              observer.next({
+                isTradeAmountTouched: true,
+                tradeAmountText: amountText,
+                tradeAmount: amount,
+                maxTradeAmount: this.state.maxTradeAmount,
+                tradedAmountEstimate: tradedAmountEstimate,
+                slippageRate: slippageRate ? slippageRate : new BigNumber(0),
+                exposureValue: exposureValue
+              });
             });
           });
         });

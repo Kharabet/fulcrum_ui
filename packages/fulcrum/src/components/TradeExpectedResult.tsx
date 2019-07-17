@@ -21,7 +21,7 @@ export class TradeExpectedResult extends Component<ITradeExpectedResultProps> {
     return (
       <div className="trade-expected-result">
         <div className="trade-expected-result__column">
-          <div className="trade-expected-result__column-value">
+          <div title={`${this.props.value.exposureValue.toFixed(18)}`} className="trade-expected-result__column-value">
             {`${this.props.value.exposureValue.toFixed(2)} ${this.props.value.exposureAsset}`}
           </div>
           <div className="trade-expected-result__column-title">
@@ -32,7 +32,7 @@ export class TradeExpectedResult extends Component<ITradeExpectedResultProps> {
         <div className="trade-expected-result__delimiter" />
 
         <div className="trade-expected-result__column">
-          <div className="trade-expected-result__column-value">
+          <div title={`${this.props.value.liquidationPrice.toFixed(18)}`} className="trade-expected-result__column-value">
             {`${this.props.value.liquidationPrice.toFixed(2)} USD`}
           </div>
           <div className="trade-expected-result__column-title">
