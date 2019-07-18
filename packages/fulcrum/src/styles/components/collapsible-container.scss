@@ -20,13 +20,14 @@
   line-height: 2;
   font-size: 0.75rem;
 
-  transition: all 0.25s ease-out;
+  //transition: all 0.25s ease-out;
 
   &.collapsible-container__toggle-label--transparent {
-    position: relative;
-    transform: translateY(-100%);
-    padding-bottom: 0;
-    background-color: rgba(255, 255, 255, 0);
+    margin-top: -1.5625rem;
+    //position: relative;
+    //transform: translateY(-100%);
+    //padding-bottom: 0;
+    //background-color: rgba(255, 255, 255, 0);
   }
 }
 
