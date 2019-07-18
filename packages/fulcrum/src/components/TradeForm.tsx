@@ -322,7 +322,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     const tradeExpectedResultValue = {
       exposureValue: this.state.exposureValue,
       exposureAsset: this.props.asset,
-      exposureType: this.props.positionType,
+      positionType: this.props.positionType,
       liquidationPrice: this.state.liquidationPrice
     };
 

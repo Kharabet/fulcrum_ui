@@ -21,7 +21,11 @@
       text-align: center;
       line-height: 1.83;
       letter-spacing: normal;
-      color: #00b4af;
+      //color: #00b4af;
+      background: linear-gradient(to right, #00b4af, #2c69b2);
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
 
     .trade-expected-result__column-title {

@@ -95,12 +95,14 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
   };
 
   public componentWillUnmount(): void {
+    console.log(`componentWillUnmount`);
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.TradeTransactionMined, this.onTradeTransactionMined);
   }
 
   public componentDidMount(): void {
+    console.log(`componentDidMount`);
     this.derivedUpdate();
   }
 
