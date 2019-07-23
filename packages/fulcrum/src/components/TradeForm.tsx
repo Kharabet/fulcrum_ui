@@ -329,15 +329,20 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       liquidationPrice: this.state.liquidationPrice
     };
 
-    let submitButtonText;
+    let submitButtonText = ``;
     if (this.props.tradeType === TradeType.BUY) {
-      if (this.state.exposureValue.gt(0)) {
-        submitButtonText = `${this.props.positionType} ${this.state.exposureValue.toFixed(2)} ${this.props.asset}`;
+      if (this.props.positionType === PositionType.SHORT) {
+        submitButtonText = `SHORT`;
       } else {
-        submitButtonText = `${this.props.positionType} ${this.props.asset}`;
+        submitButtonText = `LEVERAGE`;
       }
     } else {
-      submitButtonText = `EXIT POSITION`;
+      submitButtonText = `CLOSE`;
+    }
+    if (this.state.exposureValue.gt(0)) {
+      submitButtonText += ` ${this.state.exposureValue.toFixed(2)} ${this.props.asset}`;
+    } else {
+      submitButtonText += ` ${this.props.asset}`;
     }
 
     return (
