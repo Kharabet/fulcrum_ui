@@ -69,6 +69,7 @@ interface ITradeFormState {
   slippageRate: BigNumber;
   pTokenAddress: string;
 
+  currentPrice: BigNumber;
   liquidationPrice: BigNumber;
   exposureValue: BigNumber;
 }
@@ -90,6 +91,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     const maxTradeValue = new BigNumber(0);
     const slippageRate = new BigNumber(0);
     const tradedAmountEstimate = new BigNumber(0);
+    const currentPrice = new BigNumber(0);
     const liquidationPrice = new BigNumber(0);
     const exposureValue = new BigNumber(0);
 
@@ -110,6 +112,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       interestRate: interestRate,
       pTokenAddress: "",
       maybeNeedsApproval: false,
+      currentPrice: currentPrice,
       liquidationPrice: liquidationPrice,
       exposureValue: exposureValue
     };
@@ -228,6 +231,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       pTokenAddress: address,
       // collateral: this.props.defaultCollateral,
       maybeNeedsApproval: maybeNeedsApproval,
+      currentPrice: new BigNumber(latestPriceDataPoint.price),
       liquidationPrice: liquidationPrice,
       exposureValue: exposureValue
     });
@@ -320,11 +324,21 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     // const needsCollateralMsg = this.props.bestCollateral !== this.state.collateral;
     // const needsApprovalMsg = (!this.state.balance || this.state.balance.gt(0)) && this.state.maybeNeedsApproval && this.state.collateral !== Asset.ETH;
     const tradeExpectedResultValue = {
-      exposureValue: this.state.exposureValue,
-      exposureAsset: this.props.asset,
-      positionType: this.props.positionType,
+      tradeType: this.props.tradeType,
+      currentPrice: this.state.currentPrice,
       liquidationPrice: this.state.liquidationPrice
     };
+
+    let submitButtonText;
+    if (this.props.tradeType === TradeType.BUY) {
+      if (this.state.exposureValue.gt(0)) {
+        submitButtonText = `${this.props.positionType} ${this.state.exposureValue.toFixed(2)} ${this.props.asset}`;
+      } else {
+        submitButtonText = `${this.props.positionType} ${this.props.asset}`;
+      }
+    } else {
+      submitButtonText = `EXIT POSITION`;
+    }
 
     return (
       <form className="trade-form" onSubmit={this.onSubmitClick} style={this.props.tradeType === TradeType.SELL ? { minHeight: `16.5625rem` } : undefined}>
@@ -404,8 +418,8 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
             <button className="trade-form__cancel-button" onClick={this.onCancelClick}>
               <span className="trade-form__label--action">Cancel</span>
             </button>
-            <button type="submit" className={`trade-form__submit-button ${submitClassName}`}>
-              {this.props.tradeType}
+            <button title={this.state.exposureValue.gt(0) ? `${this.state.exposureValue.toFixed(18)} ${this.props.asset}` : ``} type="submit" className={`trade-form__submit-button ${submitClassName}`}>
+              {submitButtonText}
             </button>
           </div>
         </div>

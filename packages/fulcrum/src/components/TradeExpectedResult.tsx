@@ -1,12 +1,10 @@
 import { BigNumber } from "@0x/utils";
 import React, { Component } from "react";
-import { Asset } from "../domain/Asset";
-import { PositionType } from "../domain/PositionType";
+import { TradeType } from "../domain/TradeType";
 
 export interface ITradeExpectedResult {
-  exposureValue: BigNumber;
-  exposureAsset: Asset;
-  positionType: PositionType;
+  tradeType: TradeType;
+  currentPrice: BigNumber;
   liquidationPrice: BigNumber;
 }
 
@@ -21,10 +19,10 @@ export class TradeExpectedResult extends Component<ITradeExpectedResultProps> {
       <div className="trade-expected-result">
         <div className="trade-expected-result__column">
           <div className="trade-expected-result__column-title">
-            You are {this.props.value.positionType === PositionType.SHORT ? `shorting` : `getting`}
+            {this.props.value.tradeType === TradeType.SELL ? `Exit Price` : `Entry Price`}
           </div>
-          <div title={`${this.props.value.exposureValue.toFixed(18)}`} className="trade-expected-result__column-value">
-            {`${this.props.value.exposureValue.toFixed(2)} ${this.props.value.exposureAsset}`}
+          <div title={`${this.props.value.currentPrice.toFixed(18)}`} className="trade-expected-result__column-value">
+            {`${this.props.value.currentPrice.toFixed(2)} USD`}
           </div>
         </div>
 
@@ -32,7 +30,7 @@ export class TradeExpectedResult extends Component<ITradeExpectedResultProps> {
 
         <div className="trade-expected-result__column">
           <div className="trade-expected-result__column-title">
-            It will liquidate at
+            Liquidation Price
           </div>
           <div title={`${this.props.value.liquidationPrice.toFixed(18)}`} className="trade-expected-result__column-value">
             {`${this.props.value.liquidationPrice.toFixed(2)} USD`}
