@@ -668,6 +668,19 @@ export class FulcrumProvider {
     return result;
   };
 
+  public getPTokenPrice = async (selectedKey: TradeTokenKey): Promise<BigNumber> => {
+    let result = new BigNumber(0);
+
+    if (this.contractsSource) {
+      const assetContract = await this.contractsSource.getPTokenContract(selectedKey);
+      if (assetContract) {
+        result = await assetContract.tokenPrice.callAsync();
+      }
+    }
+
+    return result.dividedBy(10 ** 18);
+  };
+
   public getTradedAmountEstimate = async (request: TradeRequest): Promise<BigNumber> => {
     let result = new BigNumber(0);
 
