@@ -198,7 +198,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
 
     // maxTradeValue is raw here, so we should not use it directly
     const maxTradeValue = await FulcrumProvider.Instance.getMaxTradeValue(this.props.tradeType, tradeTokenKey, this.state.collateral);
-    const limitedAmount = await this.getInputAmountLimited(this.state.inputAmountText, this.state.inputAmountValue, tradeTokenKey, maxTradeValue);
+    const limitedAmount = await this.getInputAmountLimited(this.state.inputAmountText, this.state.inputAmountValue, tradeTokenKey, maxTradeValue, false);
     const tradeRequest = new TradeRequest(
       this.props.tradeType,
       this.props.asset,
@@ -552,7 +552,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       FulcrumProvider.Instance.getMaxTradeValue(this.props.tradeType, tradeTokenKey, this.state.collateral)
         .then(maxTradeValue => {
           // maxTradeValue is raw here, so we should not use it directly
-          this.getInputAmountLimitedFromBigNumber(maxTradeValue, tradeTokenKey, maxTradeValue).then(limitedAmount => {
+          this.getInputAmountLimitedFromBigNumber(maxTradeValue, tradeTokenKey, maxTradeValue, true).then(limitedAmount => {
             if (!limitedAmount.tradeAmountValue.isNaN()) {
               const tradeRequest = new TradeRequest(
                 this.props.tradeType,
@@ -591,7 +591,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
 
       const tradeTokenKey = this.getTradeTokenGridRowSelectionKey();
       const maxTradeValue = this.state.maxTradeValue;
-      this.getInputAmountLimitedFromText(value, tradeTokenKey, maxTradeValue).then(limitedAmount => {
+      this.getInputAmountLimitedFromText(value, tradeTokenKey, maxTradeValue, false).then(limitedAmount => {
         // updating stored value only if the new input value is a valid number
         if (!limitedAmount.tradeAmountValue.isNaN()) {
           const tradeRequest = new TradeRequest(
@@ -637,22 +637,22 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     };
   };
 
-  private getInputAmountLimitedFromText = async (textValue: string, tradeTokenKey: TradeTokenKey, maxTradeValue: BigNumber): Promise<IInputAmountLimited> => {
+  private getInputAmountLimitedFromText = async (textValue: string, tradeTokenKey: TradeTokenKey, maxTradeValue: BigNumber, skipLimitCheck: boolean): Promise<IInputAmountLimited> => {
     const inputAmountText = textValue;
     const amountTextForConversion = inputAmountText === "" ? "0" : inputAmountText[0] === "." ? `0${inputAmountText}` : inputAmountText;
     const inputAmountValue = new BigNumber(amountTextForConversion);
 
-    return this.getInputAmountLimited(inputAmountText, inputAmountValue, tradeTokenKey, maxTradeValue);
+    return this.getInputAmountLimited(inputAmountText, inputAmountValue, tradeTokenKey, maxTradeValue, skipLimitCheck);
   };
 
-  private getInputAmountLimitedFromBigNumber = async (bnValue: BigNumber, tradeTokenKey: TradeTokenKey, maxTradeValue: BigNumber): Promise<IInputAmountLimited> => {
+  private getInputAmountLimitedFromBigNumber = async (bnValue: BigNumber, tradeTokenKey: TradeTokenKey, maxTradeValue: BigNumber, skipLimitCheck: boolean): Promise<IInputAmountLimited> => {
     const inputAmountValue = bnValue;
     const inputAmountText = bnValue.decimalPlaces(this._inputPrecision).toFixed();
 
-    return this.getInputAmountLimited(inputAmountText, inputAmountValue, tradeTokenKey, maxTradeValue);
+    return this.getInputAmountLimited(inputAmountText, inputAmountValue, tradeTokenKey, maxTradeValue, skipLimitCheck);
   };
 
-  private getInputAmountLimited = async (textValue: string, bnValue: BigNumber, tradeTokenKey: TradeTokenKey, maxTradeValue: BigNumber): Promise<IInputAmountLimited> => {
+  private getInputAmountLimited = async (textValue: string, bnValue: BigNumber, tradeTokenKey: TradeTokenKey, maxTradeValue: BigNumber, skipLimitCheck: boolean): Promise<IInputAmountLimited> => {
     let inputAmountText = textValue;
     let inputAmountValue = bnValue;
 
@@ -679,7 +679,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       const destinationAssetAmountMax = pTokenBaseAssetAmountMax.multipliedBy(swapRate);
       console.log(`destinationAssetAmountMax: ${destinationAssetAmountMax.toFixed()}`);
 
-      const destinationAssetAmountLimited = BigNumber.min(destinationAssetAmountMax, inputAmountValue);
+      const destinationAssetAmountLimited = skipLimitCheck ? destinationAssetAmountMax : BigNumber.min(destinationAssetAmountMax, inputAmountValue);
       console.log(`destinationAmountLimited: ${destinationAssetAmountLimited.toFixed()}`);
 
       const pTokenBaseAssetAmountLimited = destinationAssetAmountLimited.dividedBy(swapRate);
@@ -706,14 +706,4 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       maxTradeValue
     };
   };
-
-  // private inputAmountToTradeAmount = async (inputAmount: BigNumber, tradeType: TradeType, tradeTokenKey: TradeTokenKey): Promise<BigNumber> => {
-  //   const maxTradeValueDivider = tradeType === TradeType.BUY ? 1 : 10;
-  //   return inputAmount.dividedBy(maxTradeValueDivider);
-  // };
-  //
-  // private tradeAmountToInputAmount = async (tradeAmount: BigNumber, tradeType: TradeType, tradeTokenKey: TradeTokenKey): Promise<BigNumber> => {
-  //   const maxTradeValueMultiplier = tradeType === TradeType.BUY ? 1 : 10;
-  //   return tradeAmount.multipliedBy(maxTradeValueMultiplier);
-  // };
 }
