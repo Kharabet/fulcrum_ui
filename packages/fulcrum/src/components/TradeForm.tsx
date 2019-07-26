@@ -664,28 +664,28 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
 
     let tradeAmountValue = new BigNumber(0);
     // we should normalize maxTradeValue for sell
-    const pTokenBaseAsset = this.props.asset;
+    const pTokenBaseAsset = tradeTokenKey.loanAsset;
     const destinationAsset = this.state.collateral;
     if (this.props.tradeType === TradeType.SELL) {
       const pTokenPrice = await FulcrumProvider.Instance.getPTokenPrice(tradeTokenKey);
-      console.log(`pTokenPrice: ${pTokenPrice.toFixed()}`);
+      // console.log(`pTokenPrice: ${pTokenPrice.toFixed()}`);
       const swapRate = await FulcrumProvider.Instance.getSwapRate(pTokenBaseAsset, destinationAsset);
-      console.log(`swapRate: ${swapRate.toFixed()}`);
+      // console.log(`swapRate: ${swapRate.toFixed()}`);
 
       const pTokenAmountMax = maxTradeValue;
-      console.log(`pTokenAmountMax: ${pTokenAmountMax.toFixed()}`);
+      // console.log(`pTokenAmountMax: ${pTokenAmountMax.toFixed()}`);
       const pTokenBaseAssetAmountMax = pTokenAmountMax.multipliedBy(pTokenPrice);
-      console.log(`pTokenBaseAssetAmountMax: ${pTokenBaseAssetAmountMax.toFixed()}`);
+      // console.log(`pTokenBaseAssetAmountMax: ${pTokenBaseAssetAmountMax.toFixed()}`);
       const destinationAssetAmountMax = pTokenBaseAssetAmountMax.multipliedBy(swapRate);
-      console.log(`destinationAssetAmountMax: ${destinationAssetAmountMax.toFixed()}`);
+      // console.log(`destinationAssetAmountMax: ${destinationAssetAmountMax.toFixed()}`);
 
       const destinationAssetAmountLimited = skipLimitCheck ? destinationAssetAmountMax : BigNumber.min(destinationAssetAmountMax, inputAmountValue);
-      console.log(`destinationAmountLimited: ${destinationAssetAmountLimited.toFixed()}`);
+      // console.log(`destinationAmountLimited: ${destinationAssetAmountLimited.toFixed()}`);
 
       const pTokenBaseAssetAmountLimited = destinationAssetAmountLimited.dividedBy(swapRate);
-      console.log(`pTokenBaseAssetAmountLimited: ${pTokenBaseAssetAmountLimited.toFixed()}`);
+      // console.log(`pTokenBaseAssetAmountLimited: ${pTokenBaseAssetAmountLimited.toFixed()}`);
       const pTokenAmountLimited = pTokenBaseAssetAmountLimited.dividedBy(pTokenPrice);
-      console.log(`pTokenAmountLimited: ${pTokenAmountLimited.toFixed()}`);
+      // console.log(`pTokenAmountLimited: ${pTokenAmountLimited.toFixed()}`);
 
       inputAmountValue = destinationAssetAmountLimited;
       inputAmountText = destinationAssetAmountLimited.decimalPlaces(this._inputPrecision).toFixed();

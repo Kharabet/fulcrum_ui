@@ -974,16 +974,32 @@ export class FulcrumProvider {
     }
 
     let requestAmount;
-    if (request.collateral !== request.asset) {
-      const decimals: number = AssetsDictionary.assets.get(request.collateral)!.decimals || 18;
-      const swapPrice = await this.getSwapRate(
-        request.collateral,
-        request.asset,
-        request.amount.multipliedBy(10 ** decimals)
-      );
-      requestAmount = request.amount.multipliedBy(swapPrice);
+    if (request.tradeType === TradeType.BUY) {
+      if (request.collateral !== request.asset) {
+        const decimals: number = AssetsDictionary.assets.get(request.collateral)!.decimals || 18;
+        const swapPrice = await this.getSwapRate(
+          request.collateral,
+          request.asset,
+          request.amount.multipliedBy(10 ** decimals)
+        );
+        requestAmount = request.amount.multipliedBy(swapPrice);
+      } else {
+        requestAmount = request.amount;
+      }
     } else {
-      requestAmount = request.amount;
+      const tradeTokenKey = new TradeTokenKey(
+        request.asset,
+        request.unitOfAccount,
+        request.positionType,
+        request.leverage,
+        request.isTokenized
+      );
+      const pTokenBaseAsset = tradeTokenKey.loanAsset;
+      const pTokenPrice = await this.getPTokenPrice(tradeTokenKey);
+      const pTokenBaseAssetAmount = request.amount.multipliedBy(pTokenPrice);
+      const swapRate = await this.getSwapRate(pTokenBaseAsset, request.asset);
+
+      requestAmount = pTokenBaseAssetAmount.multipliedBy(swapRate);
     }
 
     return requestAmount.multipliedBy(request.leverage);
