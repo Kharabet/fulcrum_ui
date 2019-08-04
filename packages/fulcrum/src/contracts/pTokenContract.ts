@@ -1054,10 +1054,10 @@ export class pTokenContract extends BaseContract {
       return result;
     }
   };
-  public marketLiquidityForAsset = {
+  public marketLiquidityForLoan = {
     async callAsync(callData: Partial<CallData> = {}, defaultBlock?: BlockParam): Promise<BigNumber> {
       const self = (this as any) as pTokenContract;
-      const encodedData = self._strictEncodeArguments("marketLiquidityForAsset()", []);
+      const encodedData = self._strictEncodeArguments("marketLiquidityForLoan()", []);
       const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
         {
           to: self.address,
@@ -1068,28 +1068,7 @@ export class pTokenContract extends BaseContract {
       );
       const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
       BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
-      const abiEncoder = self._lookupAbiEncoder("marketLiquidityForAsset()");
-      // tslint:disable boolean-naming
-      const result = abiEncoder.strictDecodeReturnValue<BigNumber>(rawCallResult);
-      // tslint:enable boolean-naming
-      return result;
-    }
-  };
-  public marketLiquidityForToken = {
-    async callAsync(callData: Partial<CallData> = {}, defaultBlock?: BlockParam): Promise<BigNumber> {
-      const self = (this as any) as pTokenContract;
-      const encodedData = self._strictEncodeArguments("marketLiquidityForToken()", []);
-      const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
-        {
-          to: self.address,
-          ...callData,
-          data: encodedData
-        },
-        self._web3Wrapper.getContractDefaults()
-      );
-      const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-      BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
-      const abiEncoder = self._lookupAbiEncoder("marketLiquidityForToken()");
+      const abiEncoder = self._lookupAbiEncoder("marketLiquidityForLoan()");
       // tslint:disable boolean-naming
       const result = abiEncoder.strictDecodeReturnValue<BigNumber>(rawCallResult);
       // tslint:enable boolean-naming

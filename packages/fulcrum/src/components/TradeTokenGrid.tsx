@@ -10,7 +10,7 @@ import { FulcrumProvider } from "../services/FulcrumProvider";
 import { TradeTokenGridHeader } from "./TradeTokenGridHeader";
 import { ITradeTokenGridRowProps, TradeTokenGridRow } from "./TradeTokenGridRow";
 
-import siteConfig from "./../config/SiteConfig.json";
+// import siteConfig from "./../config/SiteConfig.json";
 
 export interface ITradeTokenGridProps {
   showMyTokensOnly: boolean;
@@ -33,6 +33,7 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
     // Asset.DAI,
     // Asset.USDC,
     Asset.WBTC,
+    // Asset.LINK,
     // Asset.MKR,
     Asset.ZRX,
     Asset.BAT,

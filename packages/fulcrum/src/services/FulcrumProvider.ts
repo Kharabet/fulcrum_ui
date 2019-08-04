@@ -42,6 +42,7 @@ export class FulcrumProvider {
   private static readonly priceGraphQueryFunction = new Map<Asset, string>([
     [Asset.ETH, "kyber-eth-dai"],
     [Asset.WBTC, "kyber-wbtc-dai"],
+    [Asset.LINK, "kyber-link-dai"],
     [Asset.MKR, "kyber-mkr-dai"],
     [Asset.ZRX, "kyber-zrx-dai"],
     [Asset.BAT, "kyber-bat-dai"],
@@ -607,7 +608,7 @@ export class FulcrumProvider {
         const assetContract = await this.contractsSource.getPTokenContract(selectedKey);
         if (assetContract) {
           const precision = AssetsDictionary.assets.get(selectedKey.loanAsset)!.decimals || 18;
-          let marketLiquidity = await assetContract.marketLiquidityForAsset.callAsync();
+          let marketLiquidity = await assetContract.marketLiquidityForLoan.callAsync();
           marketLiquidity = marketLiquidity.multipliedBy(10 ** (18 - precision));
 
           if (collateral !== selectedKey.loanAsset) {

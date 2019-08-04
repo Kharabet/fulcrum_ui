@@ -4,6 +4,7 @@ export enum Asset {
   DAI = "DAI",
   USDC = "USDC",
   WBTC = "WBTC",
+  LINK = "LINK",
   MKR = "MKR",
   ZRX = "ZRX",
   BAT = "BAT",

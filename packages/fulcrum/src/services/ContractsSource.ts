@@ -18,6 +18,7 @@ interface ITokenContractInfo {
   symbol: string;
   tokenType: BigNumber;
   index: BigNumber;
+  // version?: number;
 }
 
 export class ContractsSource {
@@ -65,7 +66,8 @@ export class ContractsSource {
           name: val[3],
           symbol: val[4],
           tokenType: new BigNumber(val[0]),
-          index: new BigNumber(index)
+          index: new BigNumber(index),
+          // version: parseInt(val[5], 10)
         };
         // tslint:disable:no-console
         // console.log(t);
@@ -100,9 +102,19 @@ export class ContractsSource {
       );
 
       // tslint:disable:no-console
+      // let i;
       next.forEach(e => {
         // tslint:disable:no-console
         // console.log(e);
+        /*i = e.symbol.indexOf("_v2");
+        if (i !== -1) {
+          e.version = 2;
+          e.symbol = e.symbol.substr(0, i);
+        } else {
+          e.version = 1;
+        }
+        console.log(e);*/
+
         if (e.tokenType.eq(1)) {
           this.iTokensContractInfos.set(e.symbol, e);
         } else if (e.tokenType.eq(2)) {

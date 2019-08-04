@@ -3,6 +3,7 @@ import { AssetDetails } from "./AssetDetails";
 
 import bat_logo from "../assets/images/ic_token_bat.svg";
 import btc_logo from "../assets/images/ic_token_btc.svg";
+import link_logo from "../assets/images/ic_token_btc.svg";
 import dai_logo from "../assets/images/ic_token_dai.svg";
 import eth_logo from "../assets/images/ic_token_eth.svg";
 import knc_logo from "../assets/images/ic_token_knc.svg";
@@ -13,6 +14,7 @@ import zrx_logo from "../assets/images/ic_token_zrx.svg";
 
 import bat_bg from "../assets/images/popup_left_token_bat.svg";
 import btc_bg from "../assets/images/popup_left_token_btc.svg";
+import link_bg from "../assets/images/popup_left_token_btc.svg";
 import dai_bg from "../assets/images/popup_left_token_dai.svg";
 import eth_bg from "../assets/images/popup_left_token_eth.svg";
 import knc_bg from "../assets/images/popup_left_token_knc.svg";
@@ -29,6 +31,7 @@ import mkr_ts from "../assets/images/ic___token_selector___mkr.svg";
 import rep_ts from "../assets/images/ic___token_selector___rep.svg";
 import usdc_ts from "../assets/images/ic___token_selector___usdc.svg";
 import btc_ts from "../assets/images/ic___token_selector___wbtc.svg";
+import link_ts from "../assets/images/ic___token_selector___wbtc.svg";
 import zrx_ts from "../assets/images/ic___token_selector___zrx.svg";
 
 export class AssetsDictionary {
@@ -69,6 +72,26 @@ export class AssetsDictionary {
         ])
       )
     ],
+
+    [
+      Asset.LINK,
+      new AssetDetails(
+        "LINK",
+        "ChainLink Token (LINK)",
+        18,
+        link_logo,
+        link_bg,
+        link_ts,
+        "#F9B134",
+        "#FFFFFF",
+        "#FFFFFF",
+        new Map<number, string | null>([
+          [1, "0x514910771af9ca656af840dff83e8264ecf986ca"],
+          [3, ""]
+        ])
+      )
+    ],
+
     [
       Asset.DAI,
       new AssetDetails(
