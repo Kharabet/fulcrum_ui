@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+<style type="text/css">
+	.st0{fill:#FFFFFF;}
+	.st1{fill:#2A5ADA;}
+</style>
+<circle class="st0" cx="31.9" cy="32.1" r="31.9"/>
+<path class="st1" d="M31.9,15l-3.1,1.8l-8.6,5L17,23.5v17.2l3.1,1.8l8.7,5l3.1,1.8l3.1-1.8l8.5-5l3.1-1.8V23.5l-3.1-1.8l-8.6-5
+	C35,16.8,31.9,15,31.9,15z M23.3,37.1v-9.9l8.6-5l8.6,5v9.9l-8.6,5L23.3,37.1z"/>
+</svg>
