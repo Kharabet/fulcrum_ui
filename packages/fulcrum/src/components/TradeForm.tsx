@@ -58,6 +58,7 @@ export interface ITradeFormProps {
   defaultUnitOfAccount: Asset;
   defaultTokenizeNeeded: boolean;
   bestCollateral: Asset;
+  version: number;
 
   onSubmit: (request: TradeRequest) => void;
   onCancel: () => void;
@@ -177,7 +178,8 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       this.props.defaultUnitOfAccount,
       this.props.positionType,
       leverage,
-      this.state.tokenizeNeeded
+      this.state.tokenizeNeeded,
+      this.props.version
     );
   }
 
@@ -207,7 +209,8 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       this.props.positionType,
       this.props.leverage,
       limitedAmount.tradeAmountValue,// new BigNumber(0),
-      this.state.tokenizeNeeded
+      this.state.tokenizeNeeded,
+      this.props.version
     );
 
     const tradeExpectedResults = await this.getTradeExpectedResults(tradeRequest);
@@ -272,6 +275,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       this.props.leverage !== prevProps.leverage ||
       this.props.defaultUnitOfAccount !== prevProps.defaultUnitOfAccount ||
       this.props.defaultTokenizeNeeded !== prevProps.defaultTokenizeNeeded ||
+      this.props.version !== prevProps.version ||
       this.state.collateral !== prevState.collateral
     ) {
       if (this.state.collateral !== prevState.collateral) {
@@ -493,6 +497,12 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
   };
 
   public onChangeUnitOfAccount = (asset: Asset) => {
+    let version = 2;
+    const key = new TradeTokenKey(this.props.asset, asset, this.props.positionType, this.props.leverage, this.state.tokenizeNeeded, version);
+    if (key.erc20Address === "") {
+      version = 1;
+    }
+    
     this.props.onTrade(
       new TradeRequest(
         this.props.tradeType,
@@ -502,7 +512,8 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
         this.props.positionType,
         this.props.leverage,
         this.state.tradeAmountValue,
-        this.state.tokenizeNeeded
+        this.state.tokenizeNeeded,
+        version
       )
     );
   };
@@ -540,7 +551,8 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
         this.props.positionType,
         this.props.leverage,
         this.state.tradeAmountValue,
-        this.state.tokenizeNeeded
+        this.state.tokenizeNeeded,
+        this.props.version
       )
     );
   };
@@ -562,7 +574,8 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
                 this.props.positionType,
                 this.props.leverage,
                 limitedAmount.tradeAmountValue,
-                this.state.tokenizeNeeded
+                this.state.tokenizeNeeded,
+                this.props.version
               );
 
               this.getTradeExpectedResults(tradeRequest).then(tradeExpectedResults => {
@@ -602,7 +615,8 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
             this.props.positionType,
             this.props.leverage,
             limitedAmount.tradeAmountValue,
-            this.state.tokenizeNeeded
+            this.state.tokenizeNeeded,
+            this.props.version
           );
 
           this.getTradeExpectedResults(tradeRequest).then(tradeExpectedResults => {
@@ -664,7 +678,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
 
     let tradeAmountValue = new BigNumber(0);
     // we should normalize maxTradeValue for sell
-    const pTokenBaseAsset = tradeTokenKey.loanAsset;
+    const pTokenBaseAsset = FulcrumProvider.Instance.getBaseAsset(tradeTokenKey);
     const destinationAsset = this.state.collateral;
     if (this.props.tradeType === TradeType.SELL) {
       const pTokenPrice = await FulcrumProvider.Instance.getPTokenPrice(tradeTokenKey);

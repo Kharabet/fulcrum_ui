@@ -33,10 +33,10 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
     // Asset.DAI,
     // Asset.USDC,
     Asset.WBTC,
-    // Asset.LINK,
+    Asset.LINK,
     // Asset.MKR,
     Asset.ZRX,
-    Asset.BAT,
+    // Asset.BAT,
     Asset.REP,
     Asset.KNC
   ];
@@ -63,6 +63,7 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
 
   public componentDidMount(): void {
     const e = this.state.tokenRowsData[0];
+
     this.props.onSelect(new TradeTokenKey(e.asset, e.defaultUnitOfAccount, e.positionType, e.defaultLeverage, e.defaultTokenizeNeeded));
 
     this.derivedUpdate();

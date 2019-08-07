@@ -3,10 +3,10 @@ import { AssetDetails } from "./AssetDetails";
 
 import bat_logo from "../assets/images/ic_token_bat.svg";
 import btc_logo from "../assets/images/ic_token_btc.svg";
-import link_logo from "../assets/images/ic_token_link.svg";
 import dai_logo from "../assets/images/ic_token_dai.svg";
 import eth_logo from "../assets/images/ic_token_eth.svg";
 import knc_logo from "../assets/images/ic_token_knc.svg";
+import link_logo from "../assets/images/ic_token_link.svg";
 import mkr_logo from "../assets/images/ic_token_mkr.svg";
 import rep_logo from "../assets/images/ic_token_rep.svg";
 import usdc_logo from "../assets/images/ic_token_usdc.svg";
@@ -14,10 +14,10 @@ import zrx_logo from "../assets/images/ic_token_zrx.svg";
 
 import bat_bg from "../assets/images/popup_left_token_bat.svg";
 import btc_bg from "../assets/images/popup_left_token_btc.svg";
-import link_bg from "../assets/images/popup_left_token_link.svg";
 import dai_bg from "../assets/images/popup_left_token_dai.svg";
 import eth_bg from "../assets/images/popup_left_token_eth.svg";
 import knc_bg from "../assets/images/popup_left_token_knc.svg";
+import link_bg from "../assets/images/popup_left_token_link.svg";
 import mkr_bg from "../assets/images/popup_left_token_mkr.svg";
 import rep_bg from "../assets/images/popup_left_token_rep.svg";
 import usdc_bg from "../assets/images/popup_left_token_usdc.svg";
@@ -27,11 +27,11 @@ import bat_ts from "../assets/images/ic___token_selector___bat.svg";
 import dai_ts from "../assets/images/ic___token_selector___dai.svg";
 import eth_ts from "../assets/images/ic___token_selector___eth.svg";
 import knc_ts from "../assets/images/ic___token_selector___knc.svg";
+import link_ts from "../assets/images/ic___token_selector___link.svg";
 import mkr_ts from "../assets/images/ic___token_selector___mkr.svg";
 import rep_ts from "../assets/images/ic___token_selector___rep.svg";
 import usdc_ts from "../assets/images/ic___token_selector___usdc.svg";
 import btc_ts from "../assets/images/ic___token_selector___wbtc.svg";
-import link_ts from "../assets/images/ic___token_selector___link.svg";
 import zrx_ts from "../assets/images/ic___token_selector___zrx.svg";
 
 export class AssetsDictionary {

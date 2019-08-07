@@ -25,7 +25,8 @@ export class TradeBuyErcProcessor {
           taskRequest.unitOfAccount,
           taskRequest.positionType,
           taskRequest.leverage,
-          taskRequest.isTokenized
+          taskRequest.isTokenized,
+          taskRequest.version
         )
       );
     if (!tokenContract) {

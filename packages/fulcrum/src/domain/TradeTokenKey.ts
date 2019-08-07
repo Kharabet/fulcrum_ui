@@ -26,13 +26,18 @@ export class TradeTokenKey {
     this.positionType = positionType;
     this.leverage = leverage;
     this.isTokenized = isTokenized;
-    this.version = version ? version : 1
+    this.version = version ? version : 2
 
     this.erc20Address = FulcrumProvider.Instance.contractsSource ? FulcrumProvider.Instance.contractsSource.getPTokenErc20Address(this) || "" : "";
   }
 
   public static empty(): TradeTokenKey {
     return new TradeTokenKey(Asset.UNKNOWN, Asset.DAI, PositionType.SHORT, 0, true);
+  }
+
+  public setVersion(version: number) {
+    this.version = version;
+    this.erc20Address = FulcrumProvider.Instance.contractsSource ? FulcrumProvider.Instance.contractsSource.getPTokenErc20Address(this) || "" : "";
   }
 
   public toString(): string {
@@ -63,8 +68,6 @@ export class TradeTokenKey {
         }
         const leverage = parseInt(matches[4].toString(), 10) || 1;
 
-        const version = parseInt(matches[5].toString(), 10) || 1;
-
         const recoveredResult = new TradeTokenKey(
           asset,
           unitOfAccount,
@@ -73,6 +76,10 @@ export class TradeTokenKey {
           isTokenized,
           isV2 ? 2 : 1
         );
+
+        if (isV2) {
+          value = value + "_v2";
+        }
 
         if (recoveredResult.toString() === value) {
           result = recoveredResult;

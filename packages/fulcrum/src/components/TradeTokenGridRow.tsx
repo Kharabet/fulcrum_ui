@@ -33,6 +33,7 @@ export interface ITradeTokenGridRowProps {
 interface ITradeTokenGridRowState {
   assetDetails: AssetDetails | null;
   leverage: number;
+  version: number;
 
   latestPriceDataPoint: IPriceDataPoint;
   interestRate: BigNumber;
@@ -50,7 +51,8 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
       assetDetails: assetDetails || null,
       latestPriceDataPoint: FulcrumProvider.Instance.getPriceDefaultDataPoint(),
       interestRate: new BigNumber(0),
-      balance: new BigNumber(0)
+      balance: new BigNumber(0),
+      version: 2
     };
 
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
@@ -59,7 +61,14 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
   }
 
   private getTradeTokenGridRowSelectionKeyRaw(props: ITradeTokenGridRowProps, leverage: number = this.state.leverage) {
-    return new TradeTokenKey(props.asset, props.defaultUnitOfAccount, props.positionType, leverage, props.defaultTokenizeNeeded);
+    const key = new TradeTokenKey(props.asset, props.defaultUnitOfAccount, props.positionType, leverage, props.defaultTokenizeNeeded, 2);
+
+    // check for version 2, and revert back to version if not found
+    if (key.erc20Address === "") {
+      key.setVersion(1);
+    }
+
+    return key;
   }
 
   private getTradeTokenGridRowSelectionKey(leverage: number = this.state.leverage) {
@@ -67,7 +76,13 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
   }
 
   private async derivedUpdate() {
-    const tradeTokenKey = new TradeTokenKey(this.props.asset, this.props.defaultUnitOfAccount, this.props.positionType, this.state.leverage, this.props.defaultTokenizeNeeded);
+    let version = 2;
+    const tradeTokenKey = new TradeTokenKey(this.props.asset, this.props.defaultUnitOfAccount, this.props.positionType, this.state.leverage, this.props.defaultTokenizeNeeded, version);
+    if (tradeTokenKey.erc20Address === "") {
+      tradeTokenKey.setVersion(1);
+      version = 1;
+    }
+    
     const latestPriceDataPoint = await FulcrumProvider.Instance.getTradeTokenAssetLatestDataPoint(tradeTokenKey);
     const interestRate = await FulcrumProvider.Instance.getTradeTokenInterestRate(tradeTokenKey);
     const balance = await FulcrumProvider.Instance.getPTokenBalanceOfUser(tradeTokenKey);
@@ -76,7 +91,8 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
       ...this.state,
       latestPriceDataPoint: latestPriceDataPoint,
       interestRate: interestRate,
-      balance: balance
+      balance: balance,
+      version: version
     });
   }
 
@@ -196,7 +212,9 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
   };
 
   public onLeverageSelect = (value: number) => {
-    this.setState({ ...this.state, leverage: value });
+    const key = this.getTradeTokenGridRowSelectionKey(value);
+    
+    this.setState({ ...this.state, leverage: value, version: key.version });
 
     this.props.onSelect(this.getTradeTokenGridRowSelectionKey(value));
   };
@@ -219,7 +237,8 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
         this.props.positionType,
         this.state.leverage,
         new BigNumber(0),
-        this.props.defaultTokenizeNeeded // TODO: depends on which one they own
+        this.props.defaultTokenizeNeeded, // TODO: depends on which one they own
+        this.state.version
       )
     );
   };
@@ -236,7 +255,8 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
         this.props.positionType,
         this.state.leverage,
         new BigNumber(0),
-        this.props.defaultTokenizeNeeded // TODO: depends on which one they own
+        this.props.defaultTokenizeNeeded, // TODO: depends on which one they own
+        this.state.version
       )
     );
   };

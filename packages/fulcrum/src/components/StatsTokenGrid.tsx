@@ -20,7 +20,7 @@ export class StatsTokenGrid extends Component<IStatsTokenGridProps, IStatsTokenG
     Asset.LINK,
     // Asset.MKR,
     Asset.ZRX,
-    Asset.BAT,
+    // Asset.BAT,
     Asset.REP,
     Asset.KNC
   ];

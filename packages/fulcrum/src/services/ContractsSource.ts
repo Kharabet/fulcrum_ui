@@ -18,7 +18,7 @@ interface ITokenContractInfo {
   symbol: string;
   tokenType: BigNumber;
   index: BigNumber;
-  // version?: number;
+  version?: number;
 }
 
 export class ContractsSource {
@@ -59,7 +59,7 @@ export class ContractsSource {
       // console.log(`--- start of token list ---`);
       TokenList.forEach((val: any, index: any) => {
         // tslint:disable:no-console
-        // console.log(e);
+        // console.log(val);
         const t = {
           token: val[1],
           asset: val[2],
@@ -67,7 +67,7 @@ export class ContractsSource {
           symbol: val[4],
           tokenType: new BigNumber(val[0]),
           index: new BigNumber(index),
-          // version: parseInt(val[5], 10)
+          version: parseInt(val[5], 10)
         };
         // tslint:disable:no-console
         // console.log(t);
@@ -102,18 +102,18 @@ export class ContractsSource {
       );
 
       // tslint:disable:no-console
-      // let i;
+      let i;
       next.forEach(e => {
         // tslint:disable:no-console
         // console.log(e);
-        /*i = e.symbol.indexOf("_v2");
+        i = e.symbol.indexOf("_v2");
         if (i !== -1) {
           e.version = 2;
-          e.symbol = e.symbol.substr(0, i);
+          // e.symbol = e.symbol.substr(0, i);
         } else {
           e.version = 1;
         }
-        console.log(e);*/
+        // console.log(e);
 
         if (e.tokenType.eq(1)) {
           this.iTokensContractInfos.set(e.symbol, e);
@@ -142,6 +142,7 @@ export class ContractsSource {
         pos += step;
       } while (next.length > 0);*/
     }
+    // console.log(this.pTokensContractInfos);
   }
 
   private getTokenizedRegistryAddress(): string {

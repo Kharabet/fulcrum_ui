@@ -564,6 +564,14 @@ export class FulcrumProvider {
     return result;
   };
 
+  public getBaseAsset = (key: TradeTokenKey): Asset => {
+    if (key.positionType === PositionType.SHORT) {
+      return key.version === 2 ? key.unitOfAccount : key.loanAsset;
+    } else {
+      return key.version === 2 ? key.asset : key.loanAsset;
+    }
+  }
+
   public getTradeBalanceAndProfit = async (selectedKey: TradeTokenKey): Promise<[BigNumber | null, BigNumber | null]> => {
     // should return null if no data (not traded asset), new BigNumber(0) if no profit
     let assetBalance: BigNumber | null = new BigNumber(0);
@@ -579,7 +587,7 @@ export class FulcrumProvider {
       if (balance.gt(0)) {
         const assetContract = await this.contractsSource.getPTokenContract(selectedKey);
         if (assetContract) {
-          const swapPrice = await this.getSwapToUsdRate(selectedKey.loanAsset);
+          const swapPrice = await this.getSwapToUsdRate(this.getBaseAsset(selectedKey));
           const tokenPrice = await assetContract.tokenPrice.callAsync();
           const checkpointPrice = await assetContract.checkpointPrice.callAsync(account);
 
@@ -607,12 +615,13 @@ export class FulcrumProvider {
       if (this.contractsSource) {
         const assetContract = await this.contractsSource.getPTokenContract(selectedKey);
         if (assetContract) {
-          const precision = AssetsDictionary.assets.get(selectedKey.loanAsset)!.decimals || 18;
+          const baseAsset = this.getBaseAsset(selectedKey);
+          const precision = AssetsDictionary.assets.get(baseAsset)!.decimals || 18;
           let marketLiquidity = await assetContract.marketLiquidityForLoan.callAsync();
           marketLiquidity = marketLiquidity.multipliedBy(10 ** (18 - precision));
 
-          if (collateral !== selectedKey.loanAsset) {
-            const swapPrice = await this.getSwapRate(selectedKey.loanAsset, collateral);
+          if (collateral !== baseAsset) {
+            const swapPrice = await this.getSwapRate(baseAsset, collateral);
             marketLiquidity = marketLiquidity.multipliedBy(swapPrice);
           }
 
@@ -695,7 +704,8 @@ export class FulcrumProvider {
         request.unitOfAccount,
         request.positionType,
         request.leverage,
-        request.isTokenized
+        request.isTokenized,
+        request.version
       );
       const assetContract = await this.contractsSource.getPTokenContract(key);
       if (assetContract) {
@@ -704,9 +714,10 @@ export class FulcrumProvider {
         if (request.tradeType === TradeType.SELL) {
           amount = amount.multipliedBy(tokenPrice).dividedBy(10 ** 18);
         }
-        if (request.collateral !== key.loanAsset) {
-          const srcToken = request.tradeType === TradeType.BUY ? request.collateral : key.loanAsset;
-          const destToken = request.tradeType === TradeType.BUY ? key.loanAsset: request.collateral;
+        const baseAsset = this.getBaseAsset(key);
+        if (request.collateral !== baseAsset) {
+          const srcToken = request.tradeType === TradeType.BUY ? request.collateral : baseAsset;
+          const destToken = request.tradeType === TradeType.BUY ? baseAsset: request.collateral;
           const srcDecimals: number = AssetsDictionary.assets.get(srcToken)!.decimals || 18;
           const swapPrice = await this.getSwapRate(
             srcToken,
@@ -819,7 +830,8 @@ export class FulcrumProvider {
             request.unitOfAccount,
             request.positionType,
             request.leverage,
-            request.isTokenized
+            request.isTokenized,
+            request.version
           );
           const pTokenAddress = await this.contractsSource.getPTokenErc20Address(key);
           const tokenContract = await this.contractsSource.getErc20Contract(collateralErc20Address);
@@ -850,10 +862,12 @@ export class FulcrumProvider {
           request.unitOfAccount,
           request.positionType,
           request.leverage,
-          request.isTokenized
+          request.isTokenized,
+          request.version
         );
         const assetContract = await this.contractsSource.getPTokenContract(key);
         if (assetContract) {
+          const baseAsset = this.getBaseAsset(key);
           if (request.tradeType === TradeType.BUY) {
             if (request.collateral !== Asset.ETH) {
               try {
@@ -870,8 +884,8 @@ export class FulcrumProvider {
                       gasPrice: new BigNumber(0)
                     }
                   );
-                  let destDecimals: number = AssetsDictionary.assets.get(key.loanAsset)!.decimals || 18;
-                  if (key.loanAsset === Asset.WBTC && key.positionType === PositionType.SHORT) {
+                  let destDecimals: number = AssetsDictionary.assets.get(baseAsset)!.decimals || 18;
+                  if (baseAsset === Asset.WBTC && key.positionType === PositionType.SHORT) {
                     destDecimals = destDecimals + 10;
                   }
                   tradeAmountActual = tradeAmountActual.multipliedBy(10 ** (18 - destDecimals));
@@ -893,8 +907,8 @@ export class FulcrumProvider {
                     gasPrice: new BigNumber(0)
                   }
                 );
-                let destDecimals: number = AssetsDictionary.assets.get(key.loanAsset)!.decimals || 18;
-                if (key.loanAsset === Asset.WBTC && key.positionType === PositionType.SHORT) {
+                let destDecimals: number = AssetsDictionary.assets.get(baseAsset)!.decimals || 18;
+                if (baseAsset === Asset.WBTC && key.positionType === PositionType.SHORT) {
                   destDecimals = destDecimals + 10;
                 }
                 tradeAmountActual = tradeAmountActual.multipliedBy(10 ** (18 - destDecimals));
@@ -908,8 +922,8 @@ export class FulcrumProvider {
               try {
                 const assetErc20Address = FulcrumProvider.Instance.getErc20AddressOfAsset(request.collateral);
                 if (assetErc20Address) {
-                  let srcDecimals: number = AssetsDictionary.assets.get(key.loanAsset)!.decimals || 18;
-                  if (key.loanAsset === Asset.WBTC && key.positionType === PositionType.SHORT) {
+                  let srcDecimals: number = AssetsDictionary.assets.get(baseAsset)!.decimals || 18;
+                  if (baseAsset === Asset.WBTC && key.positionType === PositionType.SHORT) {
                     srcDecimals = srcDecimals + 10;
                   }
                   tradeAmountActual = await assetContract.burnToToken.callAsync(
@@ -933,8 +947,8 @@ export class FulcrumProvider {
               }
             } else {
               try {
-                let srcDecimals: number = AssetsDictionary.assets.get(key.loanAsset)!.decimals || 18;
-                if (key.loanAsset === Asset.WBTC && key.positionType === PositionType.SHORT) {
+                let srcDecimals: number = AssetsDictionary.assets.get(baseAsset)!.decimals || 18;
+                if (baseAsset === Asset.WBTC && key.positionType === PositionType.SHORT) {
                   srcDecimals = srcDecimals + 10;
                 }
                 tradeAmountActual = await assetContract.burnToEther.callAsync(
@@ -958,12 +972,12 @@ export class FulcrumProvider {
 
     tradeAmountActual = tradeAmountActual.dividedBy(10**18);
 
-    // console.log(`---------`);
-    // console.log(`tradedAmountEstimate`,tradedAmountEstimate.toString());
-    // console.log(`tradeAmountActual`,tradeAmountActual.toString());
-
     const slippage = tradeAmountActual.minus(tradedAmountEstimate).div(tradedAmountEstimate).multipliedBy(-100);
-    // console.log(`slippage`,slippage.toString());
+
+    /*console.log(`---------`);
+    console.log(`tradedAmountEstimate`,tradedAmountEstimate.toString());
+    console.log(`tradeAmountActual`,tradeAmountActual.toString());
+    console.log(`slippage`,slippage.toString());*/
 
     return slippage;
   }
@@ -993,9 +1007,10 @@ export class FulcrumProvider {
         request.unitOfAccount,
         request.positionType,
         request.leverage,
-        request.isTokenized
+        request.isTokenized,
+        request.version
       );
-      const pTokenBaseAsset = tradeTokenKey.loanAsset;
+      const pTokenBaseAsset = this.getBaseAsset(tradeTokenKey);
       const pTokenPrice = await this.getPTokenPrice(tradeTokenKey);
       const pTokenBaseAssetAmount = request.amount.multipliedBy(pTokenPrice);
       const swapRate = await this.getSwapRate(pTokenBaseAsset, request.asset);
@@ -1101,12 +1116,13 @@ export class FulcrumProvider {
     let result = new BigNumber(0);
 
     if (this.contractsSource) {
-      const precision = AssetsDictionary.assets.get(selectedKey.loanAsset)!.decimals || 18;
+      const baseAsset = this.getBaseAsset(selectedKey);
+      const precision = AssetsDictionary.assets.get(baseAsset)!.decimals || 18;
       const address = await this.contractsSource.getPTokenErc20Address(selectedKey);
       if (address) {
         result = await this.getErc20BalanceOfUser(address);
         result = result.multipliedBy(10 ** (18 - precision));
-        if (selectedKey.loanAsset === Asset.WBTC && selectedKey.positionType === PositionType.SHORT) {
+        if (baseAsset === Asset.WBTC && selectedKey.positionType === PositionType.SHORT) {
           result = result.div(10 ** 10);
         }
       }
@@ -1450,7 +1466,8 @@ export class FulcrumProvider {
               request.unitOfAccount,
               request.positionType,
               request.leverage,
-              request.isTokenized
+              request.isTokenized,
+              request.version
             ), txHash)
           );
         }

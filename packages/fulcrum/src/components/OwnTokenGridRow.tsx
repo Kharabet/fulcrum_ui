@@ -55,7 +55,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
   }
 
   private getTradeTokenGridRowSelectionKeyRaw(props: IOwnTokenGridRowProps, leverage: number = this.props.currentKey.leverage) {
-    return new TradeTokenKey(this.props.currentKey.asset, this.props.currentKey.unitOfAccount, this.props.currentKey.positionType, leverage, this.props.currentKey.isTokenized);
+    return new TradeTokenKey(this.props.currentKey.asset, this.props.currentKey.unitOfAccount, this.props.currentKey.positionType, leverage, this.props.currentKey.isTokenized, this.props.currentKey.version);
   }
 
   private getTradeTokenGridRowSelectionKey(leverage: number = this.props.currentKey.leverage) {
@@ -68,7 +68,8 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
       this.props.currentKey.unitOfAccount,
       this.props.currentKey.positionType,
       this.props.currentKey.leverage,
-      this.props.currentKey.isTokenized
+      this.props.currentKey.isTokenized,
+      this.props.currentKey.version
     );
     const latestAssetPriceDataPoint = await FulcrumProvider.Instance.getTradeTokenAssetLatestDataPoint(tradeTokenKey);
     
@@ -164,10 +165,10 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
             target="_blank"
             rel="noopener noreferrer"
           >
-            {`${this.state.assetDetails.displayName} ${this.props.currentKey.leverage}x`}
+            {`${this.state.assetDetails.displayName} ${this.props.currentKey.leverage}x (v${this.props.currentKey.version})`}
           </a>
         ) : (
-          <div className="own-token-grid-row__col-token-name-full">{`${this.state.assetDetails.displayName} ${this.props.currentKey.leverage}x`}</div>
+          <div className="own-token-grid-row__col-token-name-full">{`${this.state.assetDetails.displayName} ${this.props.currentKey.leverage}x (v${this.props.currentKey.version})`}</div>
         )}
         <div className="own-token-grid-row__col-position-type">
           <PositionTypeMarker value={this.props.currentKey.positionType} />
@@ -226,7 +227,8 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
         this.props.currentKey.positionType,
         this.props.currentKey.leverage,
         new BigNumber(0),
-        this.props.currentKey.isTokenized
+        this.props.currentKey.isTokenized,
+        this.props.currentKey.version
       )
     );
   };

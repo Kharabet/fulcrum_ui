@@ -34,6 +34,7 @@ interface ITradePageState {
   tradeUnitOfAccount: Asset;
   tradePositionType: PositionType;
   tradeLeverage: number;
+  tradeVersion: number;
 
   collateralToken: Asset;
 
@@ -59,6 +60,7 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
       tradeUnitOfAccount: Asset.UNKNOWN,
       tradePositionType: PositionType.SHORT,
       tradeLeverage: 0,
+      tradeVersion: 1,
       collateralToken: Asset.UNKNOWN,
       isTokenAddressFormOpen: false,
       tradeTokenKey: TradeTokenKey.empty(),
@@ -143,6 +145,7 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
               onSubmit={this.onTradeConfirmed}
               onCancel={this.onTradeRequestClose}
               onTrade={this.onTradeRequested}
+              version={this.state.tradeVersion}
             />
           </Modal>
           <Modal
@@ -240,7 +243,8 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
         tradeAsset: request.asset,
         tradeUnitOfAccount: request.unitOfAccount,
         tradePositionType: request.positionType,
-        tradeLeverage: request.leverage
+        tradeLeverage: request.leverage,
+        tradeVersion: request.version
       });
     }
   };

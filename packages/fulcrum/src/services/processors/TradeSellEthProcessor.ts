@@ -23,7 +23,8 @@ export class TradeSellEthProcessor {
       taskRequest.unitOfAccount,
       taskRequest.positionType,
       taskRequest.leverage,
-      taskRequest.isTokenized
+      taskRequest.isTokenized,
+      taskRequest.version
     );
     let decimals: number = AssetsDictionary.assets.get(key.loanAsset)!.decimals || 18;
     if (key.loanAsset === Asset.WBTC && key.positionType === PositionType.SHORT) {
