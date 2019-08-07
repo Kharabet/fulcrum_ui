@@ -165,10 +165,10 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
             target="_blank"
             rel="noopener noreferrer"
           >
-            {`${this.state.assetDetails.displayName} ${this.props.currentKey.leverage}x (v${this.props.currentKey.version})`}
+            {`${this.state.assetDetails.displayName} ${this.props.currentKey.leverage}x`}
           </a>
         ) : (
-          <div className="own-token-grid-row__col-token-name-full">{`${this.state.assetDetails.displayName} ${this.props.currentKey.leverage}x (v${this.props.currentKey.version})`}</div>
+          <div className="own-token-grid-row__col-token-name-full">{`${this.state.assetDetails.displayName} ${this.props.currentKey.leverage}x`}</div>
         )}
         <div className="own-token-grid-row__col-position-type">
           <PositionTypeMarker value={this.props.currentKey.positionType} />
