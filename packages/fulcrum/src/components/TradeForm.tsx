@@ -361,24 +361,54 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     return (
       <form className="trade-form" onSubmit={this.onSubmitClick} style={this.props.tradeType === TradeType.SELL ? { minHeight: `16.5625rem` } : undefined}>
         <div className="trade-form__left_block" style={divStyle}>
-          <div className="trade-form__info_block">
-            <div className="trade-form__info_block__logo">
-              <img className="asset-logo" src={this.state.assetDetails.logoSvg} alt={tokenNameBase} />
-              <PositionTypeMarkerAlt assetDetails={this.state.assetDetails} value={this.props.positionType} />
-            </div>
-            <div className="trade-form__info_block__asset" style={{color: this.state.assetDetails.textColor}}>
-              {tokenNameBase}
-            </div>
-            <div className="trade-form__info_block__stats"  style={{color: this.state.assetDetails.textColor2}}>
-              <div className="trade-form__info_block__stats__data">
-                {this.state.interestRate ? `${this.state.interestRate.toFixed(1)}%` : `0.0%`} APR
+          {this.state.pTokenAddress &&
+            FulcrumProvider.Instance.web3ProviderSettings &&
+            FulcrumProvider.Instance.web3ProviderSettings.etherscanURL ? (
+              <a
+                className="trade-form__info_block"
+                style={{cursor: `pointer`, textDecoration: `none`}}
+                title={this.state.pTokenAddress}
+                href={`${FulcrumProvider.Instance.web3ProviderSettings.etherscanURL}address/${this.state.pTokenAddress}#readContract`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <div className="trade-form__info_block__logo">
+                  <img className="asset-logo" src={this.state.assetDetails.logoSvg} alt={tokenNameBase} />
+                  <PositionTypeMarkerAlt assetDetails={this.state.assetDetails} value={this.props.positionType} />
+                </div>
+                <div className="trade-form__info_block__asset" style={{color: this.state.assetDetails.textColor}}>
+                  {tokenNameBase}
+                </div>
+                <div className="trade-form__info_block__stats"  style={{color: this.state.assetDetails.textColor2}}>
+                  <div className="trade-form__info_block__stats__data">
+                    {this.state.interestRate ? `${this.state.interestRate.toFixed(1)}%` : `0.0%`} APR
+                  </div>
+                  <div className="trade-form__info_block__stats__splitter" style={{borderLeftColor: this.state.assetDetails.textColor2}}>|</div>
+                  <div className="trade-form__info_block__stats__data">
+                    {`${this.props.leverage.toString()}x`}
+                  </div>
+                </div>
+              </a>
+            ) : (
+              <div className="trade-form__info_block">
+                <div className="trade-form__info_block__logo">
+                  <img className="asset-logo" src={this.state.assetDetails.logoSvg} alt={tokenNameBase} />
+                  <PositionTypeMarkerAlt assetDetails={this.state.assetDetails} value={this.props.positionType} />
+                </div>
+                <div className="trade-form__info_block__asset" style={{color: this.state.assetDetails.textColor}}>
+                  {tokenNameBase}
+                </div>
+                <div className="trade-form__info_block__stats"  style={{color: this.state.assetDetails.textColor2}}>
+                  <div className="trade-form__info_block__stats__data">
+                    {this.state.interestRate ? `${this.state.interestRate.toFixed(1)}%` : `0.0%`} APR
+                  </div>
+                  <div className="trade-form__info_block__stats__splitter" style={{borderLeftColor: this.state.assetDetails.textColor2}}>|</div>
+                  <div className="trade-form__info_block__stats__data">
+                    {`${this.props.leverage.toString()}x`}
+                  </div>
+                </div>
               </div>
-              <div className="trade-form__info_block__stats__splitter" style={{borderLeftColor: this.state.assetDetails.textColor2}}>|</div>
-              <div className="trade-form__info_block__stats__data">
-                {`${this.props.leverage.toString()}x`}
-              </div>
-            </div>
-          </div>
+            )}
         </div>
         <div className="trade-form__form-container" style={this.props.tradeType === TradeType.SELL ? { minHeight: `16.5625rem` } : undefined}>
           <div className="trade-form__form-values-container">
