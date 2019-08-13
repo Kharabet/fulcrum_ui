@@ -615,13 +615,13 @@ export class FulcrumProvider {
       if (this.contractsSource) {
         const assetContract = await this.contractsSource.getPTokenContract(selectedKey);
         if (assetContract) {
-          const baseAsset = this.getBaseAsset(selectedKey);
-          const precision = AssetsDictionary.assets.get(baseAsset)!.decimals || 18;
+
+          const precision = AssetsDictionary.assets.get(selectedKey.loanAsset)!.decimals || 18;
           let marketLiquidity = await assetContract.marketLiquidityForLoan.callAsync();
           marketLiquidity = marketLiquidity.multipliedBy(10 ** (18 - precision));
 
-          if (collateral !== baseAsset) {
-            const swapPrice = await this.getSwapRate(baseAsset, collateral);
+          if (collateral !== selectedKey.loanAsset) {
+            const swapPrice = await this.getSwapRate(selectedKey.loanAsset, collateral);
             marketLiquidity = marketLiquidity.multipliedBy(swapPrice);
           }
 
