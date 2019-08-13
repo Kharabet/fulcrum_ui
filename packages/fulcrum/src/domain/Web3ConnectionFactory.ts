@@ -88,6 +88,12 @@ export class Web3ConnectionFactory {
     let providerEngine: Web3ProviderEngine = new Web3ProviderEngine({ pollingInterval: 3600000 }); // 1 hour polling
 
     if (!Web3ConnectionFactory.alchemyProvider) {
+      let key;
+      if (ethNetwork === "kovan") {
+        key = configProviders.Alchemy_ApiKey_kovan;
+      } else {
+        key = configProviders.Alchemy_ApiKey
+      }
       Web3ConnectionFactory.alchemyProvider = new AlchemySubprovider(`https://eth-${ethNetwork}.alchemyapi.io/jsonrpc/${configProviders.Alchemy_ApiKey}`, { writeProvider: null });
     }
     providerEngine.addProvider(Web3ConnectionFactory.alchemyProvider);

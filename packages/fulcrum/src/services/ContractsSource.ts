@@ -116,6 +116,7 @@ export class ContractsSource {
         // console.log(e);
 
         if (e.tokenType.eq(1)) {
+          e.symbol = e.symbol.substr(0, i);
           this.iTokensContractInfos.set(e.symbol, e);
         } else if (e.tokenType.eq(2)) {
           this.pTokensContractInfos.set(e.symbol, e);
