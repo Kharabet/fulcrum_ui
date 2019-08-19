@@ -16,7 +16,7 @@ export class LendTokenSelector extends Component<ILendTokenSelectorProps> {
     Asset.LINK,
     // Asset.MKR,
     Asset.ZRX,
-    //  Asset.BAT,
+    // Asset.BAT,
     Asset.REP,
     Asset.KNC
   ];
