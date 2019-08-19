@@ -4,6 +4,7 @@ import { ProviderType } from "../domain/ProviderType";
 import ic_bitski from "./../assets/images/ic_bitski.svg";
 import ic_fortmatic from "./../assets/images/ic_formatic.svg";
 import ic_portis from "./../assets/images/ic_portis.svg";
+import ic_walletconnect from "./../assets/images/ic_walletconnect.svg";
 
 export interface IProviderSelectorItemProps {
   providerType: ProviderType;
@@ -20,6 +21,8 @@ export class ProviderSelectorItem extends Component<IProviderSelectorItemProps> 
         ? "provider-selector-item--formatic"
         : this.props.providerType === ProviderType.Portis
         ? "provider-selector-item--portis"
+        : this.props.providerType === ProviderType.WalletConnect
+        ? "provider-selector-item--wallet-connect"
         : "";
 
     const providerIcon =
@@ -29,6 +32,8 @@ export class ProviderSelectorItem extends Component<IProviderSelectorItemProps> 
         ? ic_fortmatic
         : this.props.providerType === ProviderType.Portis
         ? ic_portis
+        : this.props.providerType === ProviderType.WalletConnect
+        ? ic_walletconnect
         : "";
 
     return (

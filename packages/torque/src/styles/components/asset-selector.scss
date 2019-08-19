@@ -61,10 +61,12 @@
   .asset-selector-item--dai {
     background-image: url("../assets/images/bg_tile_dai.svg");
     background-repeat: no-repeat;
+    background-position: right;
   }
 
   .asset-selector-item--eth {
     background-image: url("../assets/images/bg_tile_eth.svg");
     background-repeat: no-repeat;
+    background-position: right;
   }
 }

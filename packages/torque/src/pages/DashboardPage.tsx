@@ -1,5 +1,6 @@
 import { BigNumber } from "@0x/utils";
 import React, { PureComponent, RefObject } from "react";
+import { RouteComponentProps } from "react-router";
 import { BorrowedFundsList } from "../components/BorrowedFundsList";
 import { ManageCollateralDlg } from "../components/ManageCollateralDlg";
 import { RepayLoanDlg } from "../components/RepayLoanDlg";
@@ -10,12 +11,13 @@ import { Asset } from "../domain/Asset";
 import { BorrowedFundsState } from "../domain/BorrowedFundsState";
 import { Footer } from "../layout/Footer";
 import { HeaderHome } from "../layout/HeaderHome";
+import { NavService } from "../services/NavService";
 
-interface IDashboardPageState {
-  walletAddress: string | null;
+export interface IDashboardPageParams {
+  walletAddress: string | undefined;
 }
 
-export class DashboardPage extends PureComponent<any, IDashboardPageState> {
+export class DashboardPage extends PureComponent<RouteComponentProps<IDashboardPageParams>> {
   private manageCollateralDlgRef: RefObject<ManageCollateralDlg>;
   private repayLoanDlgRef: RefObject<RepayLoanDlg>;
   private walletAddressDlgRef: RefObject<WalletAddressDlg>;
@@ -27,7 +29,7 @@ export class DashboardPage extends PureComponent<any, IDashboardPageState> {
     this.repayLoanDlgRef = React.createRef();
     this.walletAddressDlgRef = React.createRef();
 
-    this.state = { walletAddress: null };
+    this.state = { walletAddress: this.props.match.params.walletAddress };
   }
 
   public render() {
@@ -84,10 +86,10 @@ export class DashboardPage extends PureComponent<any, IDashboardPageState> {
         <div className="dashboard-page">
           <HeaderHome />
           <div className="dashboard-page__main">
-            {this.state.walletAddress ? (
+            {this.props.match.params.walletAddress ? (
               <React.Fragment>
                 <WalletAddressHint
-                  walletAddress={this.state.walletAddress}
+                  walletAddress={this.props.match.params.walletAddress}
                   onSelectNewWalletAddress={this.onSelectNewWalletAddress}
                   onClearWalletAddress={this.onClearWalletAddress}
                 />
@@ -121,11 +123,11 @@ export class DashboardPage extends PureComponent<any, IDashboardPageState> {
   };
 
   private onClearWalletAddress = () => {
-    this.setState({ ...this.state, walletAddress: null });
+    NavService.Instance.History.push("/dashboard");
   };
 
   private onWalletAddressChange = (walletAddress: string) => {
-    this.setState({ ...this.state, walletAddress: walletAddress });
+    NavService.Instance.History.push(`/dashboard/${walletAddress}`);
   };
 
   private onRepayLoan = async (item: BorrowedFundsState) => {

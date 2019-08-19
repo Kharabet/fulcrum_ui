@@ -11,6 +11,10 @@ import Portis from "@portis/web3";
 import { AuthenticationStatus, Bitski } from "bitski";
 // @ts-ignore
 import Fortmatic from "fortmatic";
+
+// @ts-ignore
+import Squarelink from "squarelink";
+
 import { ProviderType } from "./ProviderType";
 
 import { MetamaskSubprovider, SignerSubprovider, Web3ProviderEngine } from "@0x/subproviders";
@@ -57,6 +61,10 @@ export class Web3ConnectionFactory {
           subProvider = await Web3ConnectionFactory.getProviderPortis();
           break;
         }
+        case ProviderType.Squarelink: {
+          subProvider = await Web3ConnectionFactory.getProviderSquarelink();
+          break;
+        }
       }
     }
 
@@ -76,9 +84,16 @@ export class Web3ConnectionFactory {
       }
     */
     
-    const providerEngine: Web3ProviderEngine = new Web3ProviderEngine({ pollingInterval: 3600000 }); // 1 hour polling
+    let web3Wrapper: Web3Wrapper;
+    let providerEngine: Web3ProviderEngine = new Web3ProviderEngine({ pollingInterval: 3600000 }); // 1 hour polling
 
     if (!Web3ConnectionFactory.alchemyProvider) {
+      let key;
+      if (ethNetwork === "kovan") {
+        key = configProviders.Alchemy_ApiKey_kovan;
+      } else {
+        key = configProviders.Alchemy_ApiKey
+      }
       Web3ConnectionFactory.alchemyProvider = new AlchemySubprovider(`https://eth-${ethNetwork}.alchemyapi.io/jsonrpc/${configProviders.Alchemy_ApiKey}`, { writeProvider: null });
     }
     providerEngine.addProvider(Web3ConnectionFactory.alchemyProvider);
@@ -90,9 +105,34 @@ export class Web3ConnectionFactory {
       } else if (providerType === ProviderType.Bitski) {
         try {
           subProvider = await subProvider.getProvider({ networkName: process.env.REACT_APP_ETH_NETWORK ? process.env.REACT_APP_ETH_NETWORK : undefined });
+          providerEngine.addProvider(new SignerSubprovider(subProvider));
           canWrite = true;
         } catch(e) {
           // console.log(e);
+        }
+      } else if (providerType === ProviderType.Squarelink) {
+        try {
+          providerEngine.addProvider(new SignerSubprovider(subProvider));
+          
+          // test for non-error
+          await providerEngine.start();
+          web3Wrapper = new Web3Wrapper(providerEngine);
+          await web3Wrapper.getAvailableAddressesAsync();
+          // console.log(accounts);
+
+          canWrite = true;
+        } catch(e) {
+          // console.log(e);
+          
+          subProvider = null;
+          await providerEngine.stop();
+          
+          // rebuild providerEngine
+          providerEngine = new Web3ProviderEngine({ pollingInterval: 3600000 }); // 1 hour polling
+          providerEngine.addProvider(Web3ConnectionFactory.alchemyProvider);
+          
+          // @ts-ignore
+          web3Wrapper = undefined;
         }
       } else {
         providerEngine.addProvider(new SignerSubprovider(subProvider));
@@ -100,54 +140,73 @@ export class Web3ConnectionFactory {
       }
     }
 
-    await providerEngine.start();
-
-    const web3Wrapper = new Web3Wrapper(providerEngine);
+    // @ts-ignore
+    if (typeof web3Wrapper === "undefined") {
+      await providerEngine.start();
+      web3Wrapper = new Web3Wrapper(providerEngine);
+    }
 
     if (subProvider && providerType === ProviderType.MetaMask) {
-      // @ts-ignore
-      subProvider.publicConfigStore.on("update", async result => {
-        const networkIdInt = parseInt(subProvider.networkVersion, 10);
-        if (TorqueProvider.Instance.providerType === ProviderType.MetaMask &&
-          Web3ConnectionFactory.networkId !== networkIdInt) {
-          
-          Web3ConnectionFactory.networkId = networkIdInt;
+      // TODO: How do we detect network or account change in Gnosis Safe and EQL Wallet?
+      if (!((subProvider.isSafe && subProvider.currentSafe) || subProvider.isEQLWallet)) {
+        // @ts-ignore
+        subProvider.publicConfigStore.on("update", async result => {
+          // console.log(subProvider.publicConfigStore._state);
 
-          TorqueProvider.Instance.unsupportedNetwork = false;
-          await await TorqueProvider.Instance.setWeb3ProviderFinalize(
-            providerType,
-            [
-              web3Wrapper,
-              providerEngine,
-              true,
-              networkIdInt
-            ]);
-          
-          await eventEmitter.emit(
-            TorqueProviderEvents.ProviderChanged,
-            new ProviderChangedEvent(providerType, web3Wrapper)
-          );
-
-          return;
-        }
-
-        if (result.selectedAddress !== TorqueProvider.Instance.accounts[0]) {
-          if (TorqueProvider.Instance.accounts.length === 0) {
-            TorqueProvider.Instance.accounts.push(result.selectedAddress);
+          let networkIdInt;
+          if (subProvider.isSafe && subProvider.currentSafe) {
+            networkIdInt = 1;
           } else {
-            TorqueProvider.Instance.accounts[0] = result.selectedAddress;
+            // console.log(subProvider.publicConfigStore._state);
+            networkIdInt = parseInt(subProvider.publicConfigStore._state.networkVersion, 10);
           }
 
-          eventEmitter.emit(
-            TorqueProviderEvents.ProviderChanged,
-            new ProviderChangedEvent(providerType, web3Wrapper)
-          );
+          if (TorqueProvider.Instance.providerType === ProviderType.MetaMask &&
+            Web3ConnectionFactory.networkId !== networkIdInt) {
 
-          return;
-        }
-      });
-      
-      Web3ConnectionFactory.networkId = parseInt(subProvider.networkVersion, 10);
+            Web3ConnectionFactory.networkId = networkIdInt;
+
+            TorqueProvider.Instance.unsupportedNetwork = false;
+            await await TorqueProvider.Instance.setWeb3ProviderFinalize(
+              providerType,
+              [
+                web3Wrapper,
+                providerEngine,
+                true,
+                networkIdInt
+              ]);
+
+            await eventEmitter.emit(
+              TorqueProviderEvents.ProviderChanged,
+              new ProviderChangedEvent(providerType, web3Wrapper)
+            );
+
+            return;
+          }
+
+          if (result.selectedAddress !== TorqueProvider.Instance.accounts[0]) {
+            if (TorqueProvider.Instance.accounts.length === 0) {
+              TorqueProvider.Instance.accounts.push(result.selectedAddress);
+            } else {
+              TorqueProvider.Instance.accounts[0] = result.selectedAddress;
+            }
+
+            eventEmitter.emit(
+              TorqueProviderEvents.ProviderChanged,
+              new ProviderChangedEvent(providerType, web3Wrapper)
+            );
+
+            return;
+          }
+        });
+      }
+
+      if (!((subProvider.isSafe && subProvider.currentSafe) || subProvider.isEQLWallet)) {
+        // console.log(subProvider.publicConfigStore._state);
+        Web3ConnectionFactory.networkId = parseInt(subProvider.publicConfigStore._state.networkVersion, 10);
+      } else {
+        Web3ConnectionFactory.networkId = 1;
+      }
     } else {
       Web3ConnectionFactory.networkId = await web3Wrapper.getNetworkIdAsync();
     }
@@ -165,6 +224,10 @@ export class Web3ConnectionFactory {
       }
       // @ts-ignore
       return window.ethereum;
+      // @ts-ignore
+    } else if (window.web3) {
+      // @ts-ignore
+      return window.web3.currentProvider;
     } else {
       return null;
     }
@@ -186,7 +249,7 @@ export class Web3ConnectionFactory {
     if (Web3ConnectionFactory.fortmaticProvider) {
       // console.log(Web3ConnectionFactory.fortmaticProvider, Web3ConnectionFactory.fortmaticProvider.user);
       if (!Web3ConnectionFactory.fortmaticProvider.isLoggedIn) {
-        await Web3ConnectionFactory.fortmaticProvider.user.login(); 
+        await Web3ConnectionFactory.fortmaticProvider.user.login();
       }
       return Web3ConnectionFactory.fortmaticProvider;
     } else {
@@ -202,7 +265,7 @@ export class Web3ConnectionFactory {
     const walletConnector = await new WalletConnectProvider({
       bridge: "https://bridge.walletconnect.org"
     });
- 
+
     // console.log(walletConnector);
     return walletConnector;
   }*/
@@ -211,4 +274,10 @@ export class Web3ConnectionFactory {
     const portis = await new Portis(configProviders.Portis_DAppId, ethNetwork || "");
     return portis.provider;
   }
+
+  private static async getProviderSquarelink(): Promise<any> {
+    const sqlk = await new Squarelink(configProviders.Squarelink_ClientId, ethNetwork || undefined);
+    return sqlk.getProvider();
+  }
+
 }

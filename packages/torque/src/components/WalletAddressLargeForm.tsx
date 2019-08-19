@@ -1,4 +1,4 @@
-import React, { ChangeEvent, Component } from "react";
+import React, { ChangeEvent, Component, FormEvent } from "react";
 import ic_copy from "../assets/images/ic_copy.svg";
 
 export interface IWalletAddressLargeFormProps {
@@ -20,7 +20,7 @@ export class WalletAddressLargeForm extends Component<IWalletAddressLargeFormPro
     return (
       <div className="wallet-address-large-form">
         <div className="wallet-address-large-form__title">Enter wallet address to display your loans</div>
-        <form className="wallet-address-large-form__form">
+        <form className="wallet-address-large-form__form" onSubmit={this.onSubmitClick}>
           <div className="wallet-address-large-form__input-container">
             <input
               type="text"
@@ -30,7 +30,7 @@ export class WalletAddressLargeForm extends Component<IWalletAddressLargeFormPro
               onChange={this.onChange}
             />
             <div className="wallet-address-large-form__input-actions">
-              <img className="wallet-address-large-form__input-btn" src={ic_copy} onClick={this.onSubmit} />
+              <img className="wallet-address-large-form__input-btn" src={ic_copy} onClick={this.onSubmitClick} />
             </div>
           </div>
         </form>
@@ -41,10 +41,10 @@ export class WalletAddressLargeForm extends Component<IWalletAddressLargeFormPro
   private onChange = (event: ChangeEvent<HTMLInputElement>) => {
     event.preventDefault();
 
-    this.setState({ ...this.state, walletAddress: event.target.value });;
+    this.setState({ ...this.state, walletAddress: event.target.value });
   };
 
-  private onSubmit = () => {
+  private onSubmitClick = () => {
     if (this.props.onSubmit) {
       if (this.state.walletAddress.trim() !== "") {
         this.props.onSubmit(this.state.walletAddress);

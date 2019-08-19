@@ -8,8 +8,6 @@ import { BorrowViaTransferAddressQRDlg } from "./BorrowViaTransferAddressQRDlg";
 export interface IBorrowViaTransferDetailsProps {
   ethAmount: BigNumber;
   contractAddress: string;
-
-  onCopyAddressClick?: () => void;
 }
 
 export class BorrowViaTransferDetails extends Component<IBorrowViaTransferDetailsProps> {
@@ -34,7 +32,7 @@ export class BorrowViaTransferDetails extends Component<IBorrowViaTransferDetail
             <input type="text" className="borrow-via-transfer-details__input" value={this.props.contractAddress} />
             <div className="borrow-via-transfer-details__input-actions">
               <img className="borrow-via-transfer-details__input-btn" src={ic_qr_code} onClick={this.onShowAddressQRClick} />
-              <img className="borrow-via-transfer-details__input-btn" src={ic_copy} onClick={this.props.onCopyAddressClick} />
+              <img className="borrow-via-transfer-details__input-btn" src={ic_copy} onClick={this.onCopyAddressClick} />
             </div>
           </div>
         </div>
@@ -46,5 +44,9 @@ export class BorrowViaTransferDetails extends Component<IBorrowViaTransferDetail
     if (this.borrowViaTransferAddressQRDlg.current) {
       this.borrowViaTransferAddressQRDlg.current.open();
     }
+  };
+
+  private onCopyAddressClick = async () => {
+    await navigator.clipboard.writeText(this.props.contractAddress);
   };
 }

@@ -125,7 +125,7 @@ export class FulcrumProvider {
   }
 
   public static getLocalstorageItem(item: string): string {
-    let response = ""
+    let response = "";
     try {
       response = localStorage.getItem(item) || "";
     } catch(e) {

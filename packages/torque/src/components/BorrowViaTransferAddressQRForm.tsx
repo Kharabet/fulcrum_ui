@@ -20,6 +20,9 @@ export class BorrowViaTransferAddressQRForm extends Component<IBorrowViaTransfer
               renderAs={"svg"}
             />
           </div>
+          <div className="borrow-via-transfer-address-qr-form__address-container">
+            {this.props.address}
+          </div>
         </section>
         <section className="dialog-actions">
           <div className="borrow-via-transfer-address-qr-form__actions-container">

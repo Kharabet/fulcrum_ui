@@ -2,11 +2,13 @@ import { BigNumber } from "@0x/utils";
 import React, { Component, FormEvent } from "react";
 import { Asset } from "../domain/Asset";
 import { BorrowRequest } from "../domain/BorrowRequest";
+import { WalletType } from "../domain/WalletType";
 import { BorrowViaTransferDetails } from "./BorrowViaTransferDetails";
 import { CollateralTokenSelectorToggle } from "./CollateralTokenSelectorToggle";
 
 export interface IBorrowFormProps {
   borrowAsset: Asset;
+  walletType: WalletType;
 
   onSubmit?: (value: BorrowRequest) => void;
   onDecline: () => void;
@@ -29,30 +31,31 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
       <form className="borrow-form" onSubmit={this.onSubmit}>
         <section className="dialog-content">
           <div className="borrow-form__input-container">
-            <input
-              className="borrow-form__input-container__input-amount"
-              type="text"
-              placeholder={`Enter amount`}
-            />
+            <input className="borrow-form__input-container__input-amount" type="text" placeholder={`Enter amount`} />
           </div>
-          <div className="borrow-form__transfer-details">
-            <BorrowViaTransferDetails contractAddress={"dai.tokenloan.eth"} ethAmount={new BigNumber(157)} />
-            <div className="borrow-form__transfer-details-msg">
-              That's it! Once you've sent the funds, click Track to view the progress of the loan.
+          {this.props.walletType === WalletType.NonWeb3 ? (
+            <div className="borrow-form__transfer-details">
+              <BorrowViaTransferDetails contractAddress={"dai.tokenloan.eth"} ethAmount={new BigNumber(157)} />
+              <div className="borrow-form__transfer-details-msg borrow-form__transfer-details-msg--warning">
+                Note: you should send funds ONLY from the wallet you control!
+              </div>
+              <div className="borrow-form__transfer-details-msg">
+                That's it! Once you've sent the funds, click Track to view the progress of the loan.
+              </div>
             </div>
-          </div>
+          ) : null}
         </section>
         <section className="dialog-actions">
           <div className="borrow-form__actions-container">
             <div className="borrow-form__action-change">
               <CollateralTokenSelectorToggle
                 collateralAsset={this.state.collateralAsset}
-                readonly={false}
+                readonly={this.props.walletType === WalletType.NonWeb3}
                 onChange={this.onCollateralChange}
               />
             </div>
             <button className="btn btn-size--small" type="submit">
-              Track
+              {this.props.walletType === WalletType.NonWeb3 ? "Track" : "Submit"}
             </button>
           </div>
         </section>
@@ -65,7 +68,12 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
 
     if (this.props.onSubmit) {
       this.props.onSubmit(
-        new BorrowRequest(this.props.borrowAsset, this.state.borrowAmount, this.state.collateralAsset)
+        new BorrowRequest(
+          this.props.walletType,
+          this.props.borrowAsset,
+          this.state.borrowAmount,
+          this.state.collateralAsset
+        )
       );
     }
   };

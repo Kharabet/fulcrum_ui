@@ -80,4 +80,16 @@
       background-color: $color-bg-portis--pressed;
     }
   }
+
+  .provider-selector-item--wallet-connect {
+    background-color: $color-bg-wallet-connect;
+
+    &:hover {
+      background-color: $color-bg-wallet-connect--hover;
+    }
+
+    &:active {
+      background-color: $color-bg-wallet-connect--pressed;
+    }
+  }
 }

@@ -14,11 +14,10 @@ import { TorqueProviderEvents } from "./events/TorqueProviderEvents";
 export class TorqueProvider {
   public static Instance: TorqueProvider;
 
-  public readonly gasLimit = "3000000";
-  // gasPrice equal to 6 gwei
-  public readonly gasPrice = new BigNumber(8).multipliedBy(10 ** 9);
+  public readonly gasLimit = "4000000";
+
   // gasBufferCoeff equal 110% gas reserve
-  public readonly gasBufferCoeff = new BigNumber("1.1");
+  public readonly gasBufferCoeff = new BigNumber("1.06");
   // 5000ms
   public readonly successDisplayTimeout = 5000;
 
@@ -122,7 +121,15 @@ export class TorqueProvider {
     }
 
     if (this.web3Wrapper && canWrite) {
-      this.accounts = await this.web3Wrapper.getAvailableAddressesAsync();
+      try {
+        this.accounts = await this.web3Wrapper.getAvailableAddressesAsync() || [];
+      } catch(e) {
+        // console.log(e);
+        this.accounts = [];
+      }
+      if (this.accounts.length === 0) {
+        canWrite = false; // revert back to read-only  
+      }
     } else {
       // this.accounts = [];
       if (providerType === ProviderType.Bitski && networkId !== 1) {
@@ -215,7 +222,7 @@ export class TorqueProvider {
     return result;
   }
 
-  private async getEthBalance(): Promise<BigNumber> {
+  public async getEthBalance(): Promise<BigNumber> {
     let result: BigNumber = new BigNumber(0);
 
     if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
@@ -229,11 +236,13 @@ export class TorqueProvider {
     return result;
   }
 
-  private async getErc20BalanceOfUser(addressErc20: string): Promise<BigNumber> {
+  private async getErc20BalanceOfUser(addressErc20: string, account?: string): Promise<BigNumber> {
     let result = new BigNumber(0);
 
-    if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
-      const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+    if (this.web3Wrapper && this.contractsSource) {
+      if (!account && this.contractsSource.canWrite) {
+        account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : undefined;
+      }
 
       if (account) {
         const tokenContract = await this.contractsSource.getErc20Contract(addressErc20);
@@ -246,10 +255,12 @@ export class TorqueProvider {
     return result;
   }
 
-  public async getErc20BalancesOfUser(addressesErc20: string[]): Promise<Map<string, BigNumber>> {
+  public async getErc20BalancesOfUser(addressesErc20: string[], account?: string): Promise<Map<string, BigNumber>> {
     let result: Map<string, BigNumber> = new Map<string, BigNumber>();
     if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
-      const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+      if (!account && this.contractsSource.canWrite) {
+        account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : undefined;
+      }
       if (account) {
         // @ts-ignore
         const resp = await Web3ConnectionFactory.alchemyProvider!.alchemy!.getTokenBalances(account, addressesErc20);
@@ -265,11 +276,11 @@ export class TorqueProvider {
   private getGoodSourceAmountOfAsset(asset: Asset): BigNumber {
     switch (asset) {
       case Asset.WBTC:
-        return new BigNumber(10**4);
+        return new BigNumber(10**6);
       case Asset.USDC:
-        return new BigNumber(10**8);
+        return new BigNumber(10**4);
       default:
-        return new BigNumber(10**18);
+        return new BigNumber(10**16);
     }
   }
 
@@ -304,17 +315,18 @@ export class TorqueProvider {
   //       if (request instanceof LendRequest) {
   //         this.eventEmitter.emit(
   //           TorqueProviderEvents.LendTransactionMined,
-  //           new LendTransactionMinedEvent(request.borrowAsset, txHash)
+  //           new LendTransactionMinedEvent(request.asset, txHash)
   //         );
   //       } else {
   //         this.eventEmitter.emit(
   //           TorqueProviderEvents.TradeTransactionMined,
   //           new TradeTransactionMinedEvent(new TradeTokenKey(
-  //             request.borrowAsset,
+  //             request.asset,
   //             request.unitOfAccount,
   //             request.positionType,
   //             request.leverage,
-  //             request.isTokenized
+  //             request.isTokenized,
+  //             request.version
   //           ), txHash)
   //         );
   //       }

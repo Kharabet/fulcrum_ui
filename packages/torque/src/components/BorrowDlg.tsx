@@ -2,12 +2,14 @@ import React, { Component } from "react";
 import ReactModal from "react-modal";
 import { Asset } from "../domain/Asset";
 import { BorrowRequest } from "../domain/BorrowRequest";
+import { WalletType } from "../domain/WalletType";
 import { BorrowForm } from "./BorrowForm";
 import { DialogHeader } from "./DialogHeader";
 
 interface IBorrowDlgState {
   isOpen: boolean;
   borrowAsset: Asset;
+  walletType: WalletType;
 
   executorParams: { resolve: (value?: BorrowRequest) => void; reject: (reason?: any) => void } | null;
 }
@@ -16,7 +18,7 @@ export class BorrowDlg extends Component<any, IBorrowDlgState> {
   public constructor(props: any, context?: any) {
     super(props, context);
 
-    this.state = { isOpen: false, borrowAsset: Asset.UNKNOWN, executorParams: null };
+    this.state = { isOpen: false, borrowAsset: Asset.UNKNOWN, walletType: WalletType.Unknown, executorParams: null };
   }
 
   public render() {
@@ -28,12 +30,12 @@ export class BorrowDlg extends Component<any, IBorrowDlgState> {
         onRequestClose={this.onFormDecline}
       >
         <DialogHeader title={`Borrow how much ${this.state.borrowAsset}?`} onDecline={this.onFormDecline} />
-        <BorrowForm borrowAsset={this.state.borrowAsset} onSubmit={this.onFormSubmit} onDecline={this.onFormDecline} />
+        <BorrowForm borrowAsset={this.state.borrowAsset} walletType={this.state.walletType} onSubmit={this.onFormSubmit} onDecline={this.onFormDecline} />
       </ReactModal>
     );
   }
 
-  public getValue = async (asset: Asset): Promise<BorrowRequest> => {
+  public getValue = async (walletType: WalletType, borrowAsset: Asset): Promise<BorrowRequest> => {
     if (this.state.isOpen) {
       return new Promise<BorrowRequest>((resolve, reject) => reject());
     }
@@ -43,7 +45,8 @@ export class BorrowDlg extends Component<any, IBorrowDlgState> {
         ...this.state,
         isOpen: true,
         executorParams: { resolve: resolve, reject: reject },
-        borrowAsset: asset
+        walletType: walletType,
+        borrowAsset: borrowAsset
       });
     });
   };

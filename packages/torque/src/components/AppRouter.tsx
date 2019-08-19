@@ -81,10 +81,11 @@ export class AppRouter extends Component<any, IAppRouterState> {
                 <HashRouter hashType="slash">
                   <LocationListener doNetworkConnect={this.doNetworkConnect}>
                     <Switch>
-                      <Route exact={true} path="/" render={() => <LandingPage />} />
-                      <Route exact={true} path="/wallet" render={() => <WalletSelectionPage />} />
-                      <Route exact={true} path="/borrow" render={() => <BorrowPage />} />
-                      <Route exact={true} path="/dashboard" render={() => <DashboardPage />} />
+                      <Route exact={true} path="/" component={LandingPage} />
+                      <Route exact={true} path="/wallet" component={WalletSelectionPage} />
+                      <Route exact={true} path="/borrow" component={BorrowPage} />
+                      <Route exact={true} path="/dashboard" component={DashboardPage} />
+                      <Route exact={true} path="/dashboard/:walletAddress" component={DashboardPage} />
                       <Route path="*" render={() => <Redirect to="/"/> } />
                     </Switch>
                     {isMainnetProd ? (
