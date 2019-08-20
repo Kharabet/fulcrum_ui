@@ -1,10 +1,24 @@
 import React, { PureComponent } from "react";
 import { ButtonLanding, ButtonLandingColor } from "../components/ButtonLanding";
+import { WalletType } from "../domain/WalletType";
 import { Footer } from "../layout/Footer";
 import { HeaderHome } from "../layout/HeaderHome";
+import { NavService } from "../services/NavService";
+import { TorqueProvider } from "../services/TorqueProvider";
 
 export class LandingPage extends PureComponent {
   public render() {
+    const accountAddress =
+      TorqueProvider.Instance.accounts.length > 0 && TorqueProvider.Instance.accounts[0]
+        ? TorqueProvider.Instance.accounts[0].toLowerCase()
+        : null;
+
+    const walletUrl = NavService.Instance.getWalletAddress("b");
+    const trackLoansUrl =
+      accountAddress
+        ? NavService.Instance.getDashboardAddress(WalletType.Web3, accountAddress)
+        : NavService.Instance.getWalletAddress("t");
+
     return (
       <div className="landing-page">
         <HeaderHome />
@@ -14,8 +28,8 @@ export class LandingPage extends PureComponent {
               <span className="landing-page__jumbo-header">Borrowing Made Simple</span>
             </h1>
             <div className="landing-page__jumbo-action-container">
-              <ButtonLanding color={ButtonLandingColor.Blue} subtitle={"New user?"} title={"Borrow"} url={"/wallet"} />
-              <ButtonLanding color={ButtonLandingColor.Green} subtitle={"Existing user?"} title={"Track your loans"} url={"/dashboard"} />
+              <ButtonLanding color={ButtonLandingColor.Blue} subtitle={"New user?"} title={"Borrow"} url={walletUrl} />
+              <ButtonLanding color={ButtonLandingColor.Green} subtitle={"Existing user?"} title={"Track your loans"} url={trackLoansUrl} />
             </div>
           </div>
         </main>

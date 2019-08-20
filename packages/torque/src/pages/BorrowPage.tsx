@@ -3,12 +3,13 @@ import { RouteComponentProps } from "react-router";
 import { AssetSelector } from "../components/AssetSelector";
 import { BorrowDlg } from "../components/BorrowDlg";
 import { Asset } from "../domain/Asset";
-import { WalletType } from "../domain/WalletType";
+import { WalletType, walletTypeAbbrToWalletType } from "../domain/WalletType";
 import { Footer } from "../layout/Footer";
 import { HeaderHome } from "../layout/HeaderHome";
+import { NavService } from "../services/NavService";
 
 export interface IBorrowPageParams {
-
+  walletTypeAbbr: string;
 }
 
 export class BorrowPage extends PureComponent<RouteComponentProps<IBorrowPageParams>> {
@@ -21,13 +22,15 @@ export class BorrowPage extends PureComponent<RouteComponentProps<IBorrowPagePar
   }
 
   public render() {
+    const walletType = walletTypeAbbrToWalletType(this.props.match.params.walletTypeAbbr);
+
     return (
       <React.Fragment>
         <BorrowDlg ref={this.borrowDlgRef} />
         <div className="borrow-page">
           <HeaderHome />
           <div className="borrow-page__main">
-            <AssetSelector walletType={WalletType.NonWeb3} onSelectAsset={this.onSelectAsset} />
+            <AssetSelector walletType={walletType} onSelectAsset={this.onSelectAsset} />
           </div>
           <Footer />
         </div>
@@ -36,12 +39,14 @@ export class BorrowPage extends PureComponent<RouteComponentProps<IBorrowPagePar
   }
 
   private onSelectAsset = async (asset: Asset) => {
+    const walletType = walletTypeAbbrToWalletType(this.props.match.params.walletTypeAbbr);
+
     if (this.borrowDlgRef.current) {
       try {
-        const borrowRequest = await this.borrowDlgRef.current.getValue(WalletType.NonWeb3, asset);
+        const borrowRequest = await this.borrowDlgRef.current.getValue(walletType, asset);
 
         if (borrowRequest.walletType === WalletType.NonWeb3) {
-          // go to dashboard to track loans
+          NavService.Instance.History.push(NavService.Instance.getDashboardAddress(walletType, ""));
         }
 
         if (borrowRequest.walletType === WalletType.Web3) {

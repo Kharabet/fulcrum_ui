@@ -8,8 +8,8 @@ import { IWeb3ProviderSettings } from "../domain/IWeb3ProviderSettings";
 import { ProviderType } from "../domain/ProviderType";
 import { Web3ConnectionFactory } from "../domain/Web3ConnectionFactory";
 import { ContractsSource } from "./ContractsSource";
-import { ProviderChangedEvent } from "./events/ProviderChangedEvent";
-import { TorqueProviderEvents } from "./events/TorqueProviderEvents";
+// import { ProviderChangedEvent } from "./events/ProviderChangedEvent";
+// import { TorqueProviderEvents } from "./events/TorqueProviderEvents";
 
 export class TorqueProvider {
   public static Instance: TorqueProvider;
@@ -40,41 +40,41 @@ export class TorqueProvider {
     this.eventEmitter = new EventEmitter();
     this.eventEmitter.setMaxListeners(1000);
 
-    const storedProvider: any = TorqueProvider.getLocalstorageItem('providerType');
-    const providerType: ProviderType | null = ProviderType[storedProvider] as ProviderType || null;
-
     // singleton
     if (!TorqueProvider.Instance) {
       TorqueProvider.Instance = this;
     }
 
-    if (providerType) {
-      TorqueProvider.Instance.setWeb3Provider(providerType).then(() => {
-        this.eventEmitter.emit(TorqueProviderEvents.ProviderAvailable);
-        TorqueProvider.Instance.eventEmitter.emit(
-          TorqueProviderEvents.ProviderChanged,
-          new ProviderChangedEvent(TorqueProvider.Instance.providerType, TorqueProvider.Instance.web3Wrapper)
-        );
-      });
-    } else {
-      // setting up readonly provider
-      Web3ConnectionFactory.getWeb3Provider(null, this.eventEmitter).then((providerData) => {
-        // @ts-ignore
-        const web3Wrapper = providerData[0];
-        TorqueProvider.getWeb3ProviderSettings(providerData[3]).then((web3ProviderSettings) => {
-          if (web3Wrapper && web3ProviderSettings) {
-            const contractsSource = new ContractsSource(providerData[1], web3ProviderSettings.networkId, providerData[2]);
-            contractsSource.Init().then(() => {
-              this.web3Wrapper = web3Wrapper;
-              this.providerEngine = providerData[1];
-              this.web3ProviderSettings = web3ProviderSettings;
-              this.contractsSource = contractsSource;
-              this.eventEmitter.emit(TorqueProviderEvents.ProviderAvailable);
-            });
-          }
-        });
-      });
-    }
+    const storedProvider: any = TorqueProvider.getLocalstorageItem('providerType');
+    const providerType: ProviderType | null = ProviderType[storedProvider] as ProviderType || null;
+
+    // if (providerType) {
+    //   TorqueProvider.Instance.setWeb3Provider(providerType).then(() => {
+    //     this.eventEmitter.emit(TorqueProviderEvents.ProviderAvailable);
+    //     TorqueProvider.Instance.eventEmitter.emit(
+    //       TorqueProviderEvents.ProviderChanged,
+    //       new ProviderChangedEvent(TorqueProvider.Instance.providerType, TorqueProvider.Instance.web3Wrapper)
+    //     );
+    //   });
+    // } else {
+    //   // setting up readonly provider
+    //   Web3ConnectionFactory.getWeb3Provider(null, this.eventEmitter).then((providerData) => {
+    //     // @ts-ignore
+    //     const web3Wrapper = providerData[0];
+    //     TorqueProvider.getWeb3ProviderSettings(providerData[3]).then((web3ProviderSettings) => {
+    //       if (web3Wrapper && web3ProviderSettings) {
+    //         const contractsSource = new ContractsSource(providerData[1], web3ProviderSettings.networkId, providerData[2]);
+    //         contractsSource.Init().then(() => {
+    //           this.web3Wrapper = web3Wrapper;
+    //           this.providerEngine = providerData[1];
+    //           this.web3ProviderSettings = web3ProviderSettings;
+    //           this.contractsSource = contractsSource;
+    //           this.eventEmitter.emit(TorqueProviderEvents.ProviderAvailable);
+    //         });
+    //       }
+    //     });
+    //   });
+    // }
 
     return TorqueProvider.Instance;
   }

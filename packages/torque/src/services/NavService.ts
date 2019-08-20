@@ -1,4 +1,5 @@
 import { createHashHistory, History } from "history";
+import { WalletType, walletTypeToWalletTypeAbbr } from "../domain/WalletType";
 
 export class NavService {
   public static Instance: NavService;
@@ -15,6 +16,22 @@ export class NavService {
 
     return NavService.Instance;
   }
+
+  public getWalletAddress = (
+    destinationAbbr: string // "b" - borrow, "t" - track, dashboard
+  ) => {
+    return `/wallet/${destinationAbbr}`;
+  };
+
+  public getBorrowAddress = (walletType: WalletType) => {
+    const walletTypeAbbr = walletTypeToWalletTypeAbbr(walletType);
+    return `/borrow/${walletTypeAbbr}`;
+  };
+
+  public getDashboardAddress = (walletType: WalletType, walletAddress: string | undefined) => {
+    const walletTypeAbbr = walletTypeToWalletTypeAbbr(walletType);
+    return `/dashboard/${walletTypeAbbr}/${walletAddress}`;
+  };
 }
 
 // tslint:disable-next-line:no-unused-expression

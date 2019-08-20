@@ -9,11 +9,13 @@ import { WalletAddressHint } from "../components/WalletAddressHint";
 import { WalletAddressLargeForm } from "../components/WalletAddressLargeForm";
 import { Asset } from "../domain/Asset";
 import { BorrowedFundsState } from "../domain/BorrowedFundsState";
+import { WalletType, walletTypeAbbrToWalletType } from "../domain/WalletType";
 import { Footer } from "../layout/Footer";
 import { HeaderHome } from "../layout/HeaderHome";
 import { NavService } from "../services/NavService";
 
 export interface IDashboardPageParams {
+  walletTypeAbbr: string;
   walletAddress: string | undefined;
 }
 
@@ -78,6 +80,7 @@ export class DashboardPage extends PureComponent<RouteComponentProps<IDashboardP
       }
     ];
 
+    const walletType = walletTypeAbbrToWalletType(this.props.match.params.walletTypeAbbr);
     return (
       <React.Fragment>
         <ManageCollateralDlg ref={this.manageCollateralDlgRef} />
@@ -88,11 +91,15 @@ export class DashboardPage extends PureComponent<RouteComponentProps<IDashboardP
           <div className="dashboard-page__main">
             {this.props.match.params.walletAddress ? (
               <React.Fragment>
-                <WalletAddressHint
-                  walletAddress={this.props.match.params.walletAddress}
-                  onSelectNewWalletAddress={this.onSelectNewWalletAddress}
-                  onClearWalletAddress={this.onClearWalletAddress}
-                />
+                {
+                  walletType === WalletType.NonWeb3 ? (
+                    <WalletAddressHint
+                      walletAddress={this.props.match.params.walletAddress}
+                      onSelectNewWalletAddress={this.onSelectNewWalletAddress}
+                      onClearWalletAddress={this.onClearWalletAddress}
+                    />
+                  ) : null
+                }
                 <BorrowedFundsList
                   items={items}
                   onRepayLoan={this.onRepayLoan}
@@ -100,9 +107,15 @@ export class DashboardPage extends PureComponent<RouteComponentProps<IDashboardP
                 />
               </React.Fragment>
             ) : (
-              <div className="dashboard-page__form">
-                <WalletAddressLargeForm onSubmit={this.onWalletAddressChange} />
-              </div>
+              <React.Fragment>
+                {
+                  walletType === WalletType.NonWeb3 ? (
+                    <div className="dashboard-page__form">
+                      <WalletAddressLargeForm onSubmit={this.onWalletAddressChange} />
+                    </div>
+                  ) : null
+                }
+              </React.Fragment>
             )}
           </div>
           <Footer />
@@ -123,11 +136,15 @@ export class DashboardPage extends PureComponent<RouteComponentProps<IDashboardP
   };
 
   private onClearWalletAddress = () => {
-    NavService.Instance.History.push("/dashboard");
+    NavService.Instance.History.push(
+      NavService.Instance.getDashboardAddress(WalletType.NonWeb3, "")
+    );
   };
 
   private onWalletAddressChange = (walletAddress: string) => {
-    NavService.Instance.History.push(`/dashboard/${walletAddress}`);
+    NavService.Instance.History.push(
+      NavService.Instance.getDashboardAddress(WalletType.NonWeb3, walletAddress)
+    );
   };
 
   private onRepayLoan = async (item: BorrowedFundsState) => {

@@ -1,7 +1,6 @@
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import React, { Component } from "react";
 import ReactGA from "react-ga";
-import Modal from "react-modal";
 import { HashRouter, Redirect, Route, Switch } from "react-router-dom";
 import configProviders from "../config/providers.json";
 import { ProviderType } from "../domain/ProviderType";
@@ -14,7 +13,6 @@ import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { TorqueProviderEvents } from "../services/events/TorqueProviderEvents";
 import { TorqueProvider } from "../services/TorqueProvider";
 import { LocationListener } from "./LocationListener";
-import { ProviderMenu } from "./ProviderMenu";
 
 import siteConfig from "./../config/SiteConfig.json";
 
@@ -54,25 +52,6 @@ export class AppRouter extends Component<any, IAppRouterState> {
   public render() {
     return (
       <React.Fragment>
-        <Modal
-          isOpen={this.state.isProviderMenuModalOpen}
-          onRequestClose={this.onRequestClose}
-          className="modal-content-div"
-          overlayClassName="modal-overlay-div"
-        >
-          <ProviderMenu
-            selectedProviderType={this.state.selectedProviderType}
-            providerTypes={[
-              ProviderType.MetaMask,
-              ProviderType.Fortmatic,
-              ProviderType.Portis,
-              ProviderType.Bitski,
-              // ProviderType.WalletConnect,
-              ProviderType.None
-            ]}
-            onSelect={this.onProviderTypeSelect}
-          />
-        </Modal>
         <div className="pages-container">
           {
             siteConfig.MaintenanceMode
@@ -82,10 +61,10 @@ export class AppRouter extends Component<any, IAppRouterState> {
                   <LocationListener doNetworkConnect={this.doNetworkConnect}>
                     <Switch>
                       <Route exact={true} path="/" component={LandingPage} />
-                      <Route exact={true} path="/wallet" component={WalletSelectionPage} />
-                      <Route exact={true} path="/borrow" component={BorrowPage} />
-                      <Route exact={true} path="/dashboard" component={DashboardPage} />
-                      <Route exact={true} path="/dashboard/:walletAddress" component={DashboardPage} />
+                      <Route exact={true} path="/wallet/:destinationAbbr" render={props => <WalletSelectionPage {...props} onSelectProvider={this.onProviderTypeSelect} />} />
+                      <Route exact={true} path="/borrow/:walletTypeAbbr" render={props => <BorrowPage {...props} />} />
+                      <Route exact={true} path="/dashboard/:walletTypeAbbr" render={props => <DashboardPage {...props} />} />
+                      <Route exact={true} path="/dashboard/:walletTypeAbbr/:walletAddress" render={props => <DashboardPage {...props} />} />
                       <Route path="*" render={() => <Redirect to="/"/> } />
                     </Switch>
                     {isMainnetProd ? (
@@ -107,7 +86,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
     this.setState({ ...this.state, isProviderMenuModalOpen: true });
   };
 
-  public onProviderTypeSelect = async (providerType: ProviderType) => {
+  private onProviderTypeSelect = async (providerType: ProviderType) => {
     if (providerType !== TorqueProvider.Instance.providerType ||
       providerType !== ProviderType.None && TorqueProvider.Instance.accounts.length === 0 || !TorqueProvider.Instance.accounts[0]) {
       TorqueProvider.Instance.isLoading = true;
@@ -119,13 +98,13 @@ export class AppRouter extends Component<any, IAppRouterState> {
         isLoading: true,
         isProviderMenuModalOpen: false
       }, async () => {
-        await TorqueProvider.Instance.setWeb3Provider(providerType);	
+        await TorqueProvider.Instance.setWeb3Provider(providerType);
 
-        TorqueProvider.Instance.isLoading = false;	
+        TorqueProvider.Instance.isLoading = false;
 
-        await TorqueProvider.Instance.eventEmitter.emit(	
-          TorqueProviderEvents.ProviderChanged,	
-          new ProviderChangedEvent(TorqueProvider.Instance.providerType, TorqueProvider.Instance.web3Wrapper)	
+        await TorqueProvider.Instance.eventEmitter.emit(
+          TorqueProviderEvents.ProviderChanged,
+          new ProviderChangedEvent(TorqueProvider.Instance.providerType, TorqueProvider.Instance.web3Wrapper)
         );
       });
     } else {
