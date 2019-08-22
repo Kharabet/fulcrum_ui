@@ -61,10 +61,10 @@ export class AppRouter extends Component<any, IAppRouterState> {
                   <LocationListener doNetworkConnect={this.doNetworkConnect}>
                     <Switch>
                       <Route exact={true} path="/" component={LandingPage} />
-                      <Route exact={true} path="/wallet/:destinationAbbr" render={props => <WalletSelectionPage {...props} onSelectProvider={this.onProviderTypeSelect} />} />
-                      <Route exact={true} path="/borrow/:walletTypeAbbr" render={props => <BorrowPage {...props} />} />
-                      <Route exact={true} path="/dashboard/:walletTypeAbbr" render={props => <DashboardPage {...props} />} />
-                      <Route exact={true} path="/dashboard/:walletTypeAbbr/:walletAddress" render={props => <DashboardPage {...props} />} />
+                      <Route exact={true} path="/wallet/:destinationAbbr" render={props => <WalletSelectionPage {...props} onSelectProvider={this.onProviderTypeSelect} isLoading={this.state.isLoading} doNetworkConnect={undefined} />} />
+                      <Route exact={true} path="/borrow/:walletTypeAbbr" render={props => <BorrowPage {...props} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} />} />
+                      <Route exact={true} path="/dashboard/:walletTypeAbbr" render={props => <DashboardPage {...props} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} />} />
+                      <Route exact={true} path="/dashboard/:walletTypeAbbr/:walletAddress" render={props => <DashboardPage {...props} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} />} />
                       <Route path="*" render={() => <Redirect to="/"/> } />
                     </Switch>
                     {isMainnetProd ? (

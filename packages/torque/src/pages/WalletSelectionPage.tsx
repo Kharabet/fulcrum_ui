@@ -15,13 +15,15 @@ export interface IWalletSelectionPageParams {
 
 export interface IWalletSelectionPageProps {
   onSelectProvider?: (providerType: ProviderType) => void;
+  doNetworkConnect?: () => void;
+  isLoading: boolean;
 }
 
 export class WalletSelectionPage extends PureComponent<IWalletSelectionPageProps & RouteComponentProps<IWalletSelectionPageParams>> {
   public render() {
     return (
       <div className="wallet-selection-page">
-        <HeaderHome />
+        <HeaderHome isLoading={this.props.isLoading} doNetworkConnect={this.props.doNetworkConnect} />
         <div className="wallet-selection-page__main">
           <WalletTypeSelector onSelectWalletType={this.onSelectWalletType} />
           <ProviderSelector onSelectProvider={this.props.onSelectProvider} />

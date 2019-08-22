@@ -4,7 +4,7 @@
 }
 
 .on-chain-indicator__container {
-  height: 2rem;
+  height: 3rem;
   margin: 0.5rem 0;
 
   cursor: pointer;
@@ -19,6 +19,7 @@
     display: inline-block;
     text-align: center;
     vertical-align: top;
+    background-color: #3b364b;
 
     height: 1rem;
     line-height: 2rem;
@@ -33,7 +34,7 @@
 
     line-height: 2rem;
 
-    color: #ffffff;
+    color: #3b364b;
     font-size: 0.75rem;
     font-weight: normal;
     font-style: normal;

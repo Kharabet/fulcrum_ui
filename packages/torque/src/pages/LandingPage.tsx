@@ -21,7 +21,7 @@ export class LandingPage extends PureComponent {
 
     return (
       <div className="landing-page">
-        <HeaderHome />
+        <HeaderHome isLoading={false} />
         <main className="landing-page__main">
           <div className="landing-page__jumbo">
             <h1>

@@ -8,11 +8,16 @@ import { Footer } from "../layout/Footer";
 import { HeaderHome } from "../layout/HeaderHome";
 import { NavService } from "../services/NavService";
 
-export interface IBorrowPageParams {
+export interface IBorrowPageRouteParams {
   walletTypeAbbr: string;
 }
 
-export class BorrowPage extends PureComponent<RouteComponentProps<IBorrowPageParams>> {
+export interface IBorrowPageParams {
+  doNetworkConnect?: () => void;
+  isLoading: boolean;
+}
+
+export class BorrowPage extends PureComponent<IBorrowPageParams & RouteComponentProps<IBorrowPageRouteParams>> {
   private borrowDlgRef: RefObject<BorrowDlg>;
 
   public constructor(props: any, context?: any) {
@@ -28,7 +33,7 @@ export class BorrowPage extends PureComponent<RouteComponentProps<IBorrowPagePar
       <React.Fragment>
         <BorrowDlg ref={this.borrowDlgRef} />
         <div className="borrow-page">
-          <HeaderHome />
+          <HeaderHome isLoading={this.props.isLoading} doNetworkConnect={this.props.doNetworkConnect} />
           <div className="borrow-page__main">
             <AssetSelector walletType={walletType} onSelectAsset={this.onSelectAsset} />
           </div>

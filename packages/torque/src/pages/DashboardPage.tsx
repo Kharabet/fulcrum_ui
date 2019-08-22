@@ -14,12 +14,17 @@ import { Footer } from "../layout/Footer";
 import { HeaderHome } from "../layout/HeaderHome";
 import { NavService } from "../services/NavService";
 
-export interface IDashboardPageParams {
+export interface IDashboardPageRouteParams {
   walletTypeAbbr: string;
   walletAddress: string | undefined;
 }
 
-export class DashboardPage extends PureComponent<RouteComponentProps<IDashboardPageParams>> {
+export interface IDashboardPageParams {
+  doNetworkConnect?: () => void;
+  isLoading: boolean;
+}
+
+export class DashboardPage extends PureComponent<IDashboardPageParams & RouteComponentProps<IDashboardPageRouteParams>> {
   private manageCollateralDlgRef: RefObject<ManageCollateralDlg>;
   private repayLoanDlgRef: RefObject<RepayLoanDlg>;
   private walletAddressDlgRef: RefObject<WalletAddressDlg>;
@@ -87,7 +92,7 @@ export class DashboardPage extends PureComponent<RouteComponentProps<IDashboardP
         <RepayLoanDlg ref={this.repayLoanDlgRef} />
         <WalletAddressDlg ref={this.walletAddressDlgRef} />
         <div className="dashboard-page">
-          <HeaderHome />
+          <HeaderHome isLoading={this.props.isLoading} doNetworkConnect={this.props.doNetworkConnect} />
           <div className="dashboard-page__main">
             {this.props.match.params.walletAddress ? (
               <React.Fragment>
