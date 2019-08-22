@@ -493,7 +493,7 @@ export class FulcrumProvider {
         let supplyInterestRate: BigNumber | null;
         let borrowInterestRate: BigNumber | null;
         let lockedAssets: BigNumber | null = new BigNumber(0);
-        // let nextInterestRate: BigNumber | null;
+        let nextInterestRate: BigNumber | null;
 
         await Promise.all([
           (symbol = await assetContract.symbol.callAsync()),
@@ -505,7 +505,7 @@ export class FulcrumProvider {
           (totalAssetBorrow = await assetContract.totalAssetBorrow.callAsync()),
           (supplyInterestRate = await assetContract.supplyInterestRate.callAsync()),
           (borrowInterestRate = await assetContract.borrowInterestRate.callAsync()),
-          // (nextInterestRate = await assetContract.nextLoanInterestRate.callAsync(new BigNumber("100000")))
+          (nextInterestRate = await assetContract.nextLoanInterestRate.callAsync(new BigNumber("0")))
         ]);
 
         const assetErc20Address = this.getErc20AddressOfAsset(asset);
@@ -524,7 +524,7 @@ export class FulcrumProvider {
           totalAssetBorrow.dividedBy(10 ** 18),
           supplyInterestRate.dividedBy(10 ** 18),
           borrowInterestRate.dividedBy(10 ** 18),
-          new BigNumber(1),// nextInterestRate.dividedBy(10 ** 18)
+          nextInterestRate.dividedBy(10 ** 18),
           lockedAssets.dividedBy(10 ** 18)
         );
       }
