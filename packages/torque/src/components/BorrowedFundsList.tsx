@@ -1,12 +1,12 @@
 import React, { Component, RefObject } from "react";
-import { BorrowedFundsState } from "../domain/BorrowedFundsState";
+import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
 import { BorrowedFundsListItem } from "./BorrowedFundsListItem";
 
 export interface IBorrowedFundsListProps {
-  items: BorrowedFundsState[];
+  items: IBorrowedFundsState[];
 
-  onManageCollateral: (item: BorrowedFundsState) => void;
-  onRepayLoan: (item: BorrowedFundsState) => void;
+  onManageCollateral: (item: IBorrowedFundsState) => void;
+  onRepayLoan: (item: IBorrowedFundsState) => void;
 }
 
 interface IBorrowedFundsListState {

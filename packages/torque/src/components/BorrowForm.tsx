@@ -1,5 +1,6 @@
 import { BigNumber } from "@0x/utils";
-import React, { Component, FormEvent } from "react";
+import React, { ChangeEvent, Component, FormEvent } from "react";
+import { Subject } from "rxjs";
 import { Asset } from "../domain/Asset";
 import { BorrowRequest } from "../domain/BorrowRequest";
 import { WalletType } from "../domain/WalletType";
@@ -17,21 +18,46 @@ export interface IBorrowFormProps {
 interface IBorrowFormState {
   borrowAmount: BigNumber;
   collateralAsset: Asset;
+
+  inputAmountText: string;
+  inputAmountValue: BigNumber;
 }
 
 export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
+  private readonly _inputPrecision = 6;
+  private _input: HTMLInputElement | null = null;
+
+  private readonly _inputChange: Subject<string>;
+
   public constructor(props: IBorrowFormProps, context?: any) {
     super(props, context);
 
-    this.state = { borrowAmount: new BigNumber(0), collateralAsset: Asset.ETH };
+    this.state = {
+      borrowAmount: new BigNumber(0),
+      collateralAsset: Asset.ETH,
+      inputAmountText: "",
+      inputAmountValue: new BigNumber(0),
+    };
+
+    this._inputChange = new Subject();
   }
+
+  private _setInputRef = (input: HTMLInputElement) => {
+    this._input = input;
+  };
 
   public render() {
     return (
       <form className="borrow-form" onSubmit={this.onSubmit}>
         <section className="dialog-content">
           <div className="borrow-form__input-container">
-            <input className="borrow-form__input-container__input-amount" type="text" placeholder={`Enter amount`} />
+            <input
+              ref={this._setInputRef}
+              className="borrow-form__input-container__input-amount"
+              type="text"
+              onChange={this.onTradeAmountChange}
+              placeholder={`Enter amount`}
+            />
           </div>
           {this.props.walletType === WalletType.NonWeb3 ? (
             <div className="borrow-form__transfer-details">
@@ -80,5 +106,20 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
 
   private onCollateralChange = (value: Asset) => {
     this.setState({ ...this.state, collateralAsset: value });
+  };
+
+  public onTradeAmountChange = async (event: ChangeEvent<HTMLInputElement>) => {
+    // handling different types of empty values
+    const amountText = event.target.value ? event.target.value : "";
+
+    // setting inputAmountText to update display at the same time
+    this.setState({
+      ...this.state,
+      inputAmountText: amountText,
+      borrowAmount: new BigNumber(amountText)
+    }, () => {
+      // emitting next event for processing with rx.js
+      this._inputChange.next(this.state.inputAmountText);
+    });
   };
 }

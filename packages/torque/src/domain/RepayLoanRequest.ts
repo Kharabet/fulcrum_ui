@@ -1,12 +1,11 @@
 import { BigNumber } from "@0x/utils";
-import { Asset } from "./Asset";
 
 export class RepayLoanRequest {
-  public asset: Asset;
+  public loanOrderHash: string;
   public repayPercent: BigNumber;
 
-  constructor(asset: Asset, repayPercent: BigNumber) {
-    this.asset = asset;
+  constructor(loanOrderHash: string, repayPercent: BigNumber) {
+    this.loanOrderHash = loanOrderHash;
     this.repayPercent = repayPercent;
   }
 }

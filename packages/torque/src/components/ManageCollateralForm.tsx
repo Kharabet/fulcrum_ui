@@ -1,45 +1,67 @@
 import { BigNumber } from "@0x/utils";
 import React, { Component, FormEvent } from "react";
-import { Asset } from "../domain/Asset";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
+import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
 import { ManageCollateralRequest } from "../domain/ManageCollateralRequest";
+import { TorqueProvider } from "../services/TorqueProvider";
 import { CollateralSlider } from "./CollateralSlider";
 
 export interface IManageCollateralFormProps {
-  asset: Asset;
+  loanOrderState: IBorrowedFundsState;
 
   onSubmit: (request: ManageCollateralRequest) => void;
 }
 
 interface IManageCollateralFormState {
   assetDetails: AssetDetails | null;
-  positionValue: number;
+
+  minValue: number;
+  maxValue: number;
+  loanValue: number;
+
   currentValue: number;
   selectedValue: number;
+
   diffAmount: BigNumber;
   liquidationPrice: BigNumber;
 }
 
 export class ManageCollateralForm extends Component<IManageCollateralFormProps, IManageCollateralFormState> {
-  private minValue: number = 0;
-  private maxValue: number = 100;
-
   constructor(props: IManageCollateralFormProps, context?: any) {
     super(props, context);
 
     this.state = {
-      assetDetails: AssetsDictionary.assets.get(this.props.asset) || null,
-      positionValue: 66,
-      currentValue: 66,
-      selectedValue: 66,
+      minValue: 0,
+      maxValue: 100,
+      assetDetails: null,
+      loanValue: 100,
+      currentValue: 100,
+      selectedValue: 100,
       diffAmount: new BigNumber(0),
-      liquidationPrice: new BigNumber(700)
+      liquidationPrice: new BigNumber(0)
     };
   }
 
   public componentDidMount(): void {
-    this.derivedUpdate();
+    TorqueProvider.Instance.getLoanCollateralManagementParams(this.props.loanOrderState.loanOrderHash).then(
+      collateralState => {
+        this.setState(
+          {
+            ...this.state,
+            minValue: collateralState.minValue,
+            maxValue: collateralState.maxValue,
+            assetDetails: AssetsDictionary.assets.get(this.props.loanOrderState.asset) || null,
+            loanValue: collateralState.currentValue,
+            currentValue: collateralState.currentValue,
+            selectedValue: collateralState.currentValue
+          },
+          () => {
+            this.derivedUpdate();
+          }
+        );
+      }
+    );
   }
 
   public componentDidUpdate(
@@ -48,8 +70,8 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
     snapshot?: any
   ): void {
     if (
-      prevProps.asset !== this.props.asset ||
-      prevState.positionValue !== this.state.positionValue ||
+      prevProps.loanOrderState.loanOrderHash !== this.props.loanOrderState.loanOrderHash ||
+      prevState.loanValue !== this.state.loanValue ||
       prevState.selectedValue !== this.state.selectedValue
     ) {
       this.derivedUpdate();
@@ -57,11 +79,16 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
   }
 
   private derivedUpdate = async () => {
-    // TODO: calculate and update this.state.diffAmount and this.state.liquidationPrice
+    const collateralChangeEstimate = await TorqueProvider.Instance.getLoanCollateralChangeEstimate(
+      this.props.loanOrderState.asset,
+      this.state.loanValue,
+      this.state.currentValue
+    );
+
     this.setState({
       ...this.state,
-      diffAmount: new BigNumber(this.state.selectedValue * 3),
-      liquidationPrice: new BigNumber(700 - this.state.selectedValue)
+      diffAmount: collateralChangeEstimate.diffAmount,
+      liquidationPrice: collateralChangeEstimate.liquidationPrice
     });
   };
 
@@ -75,8 +102,8 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
         <section className="dialog-content">
           <CollateralSlider
             readonly={false}
-            minValue={this.minValue}
-            maxValue={this.maxValue}
+            minValue={this.state.minValue}
+            maxValue={this.state.maxValue}
             value={this.state.currentValue}
             onUpdate={this.onUpdate}
             onChange={this.onChange}
@@ -98,18 +125,18 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
             </div>
           </div>
 
-          {this.state.positionValue !== this.state.selectedValue ? (
+          {this.state.loanValue !== this.state.selectedValue ? (
             <div className="manage-collateral-form__operation-result-container">
               <img className="manage-collateral-form__operation-result-img" src={this.state.assetDetails.logoSvg} />
               <div className="manage-collateral-form__operation-result-msg">
-                You will {this.state.positionValue > this.state.selectedValue ? "withdraw" : "top up"}
+                You will {this.state.loanValue > this.state.selectedValue ? "withdraw" : "top up"}
               </div>
               <div className="manage-collateral-form__operation-result-amount">
                 {this.state.diffAmount.toFixed(6)} {this.state.assetDetails.displayName}
               </div>
-              {this.state.positionValue !== this.state.selectedValue ? (
+              {this.state.loanValue !== this.state.selectedValue ? (
                 <div className="manage-collateral-form__actions-container">
-                  {this.state.positionValue > this.state.selectedValue ? (
+                  {this.state.loanValue > this.state.selectedValue ? (
                     <button type="submit" className="btn btn-size--small">
                       Withdraw
                     </button>
@@ -128,7 +155,7 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
   }
 
   private onChange = (value: number) => {
-    this.setState({ ...this.state, currentValue: value });
+    this.setState({ ...this.state, selectedValue: value, currentValue: value });
   };
 
   private onUpdate = (value: number) => {
@@ -136,6 +163,8 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
   };
 
   public onSubmitClick = (event: FormEvent<HTMLFormElement>) => {
-    this.props.onSubmit(new ManageCollateralRequest(this.props.asset, new BigNumber(this.state.currentValue)));
+    this.props.onSubmit(
+      new ManageCollateralRequest(this.props.loanOrderState.loanOrderHash, new BigNumber(this.state.currentValue))
+    );
   };
 }

@@ -1,13 +1,13 @@
 import React, { Component } from "react";
 import ReactModal from "react-modal";
-import { Asset } from "../domain/Asset";
+import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
 import { RepayLoanRequest } from "../domain/RepayLoanRequest";
 import { DialogHeader } from "./DialogHeader";
 import { RepayLoanForm } from "./RepayLoanForm";
 
 interface IRepayLoanDlgState {
   isOpen: boolean;
-  asset: Asset;
+  loanOrderState: IBorrowedFundsState | null;
 
   executorParams: { resolve: (value?: RepayLoanRequest) => void; reject: (reason?: any) => void } | null;
 }
@@ -16,10 +16,14 @@ export class RepayLoanDlg extends Component<any, IRepayLoanDlgState> {
   public constructor(props: any, context?: any) {
     super(props, context);
 
-    this.state = { isOpen: false, asset: Asset.UNKNOWN, executorParams: null };
+    this.state = { isOpen: false, loanOrderState: null, executorParams: null };
   }
 
   public render() {
+    if (this.state.loanOrderState === null) {
+      return null;
+    }
+
     return (
       <ReactModal
         isOpen={this.state.isOpen}
@@ -29,14 +33,14 @@ export class RepayLoanDlg extends Component<any, IRepayLoanDlgState> {
       >
         <DialogHeader title="Repay Loan" onDecline={this.onFormDecline} />
         <RepayLoanForm
-          asset={this.state.asset}
+          loanOrderState={this.state.loanOrderState}
           onSubmit={this.onFormSubmit}
         />
       </ReactModal>
     );
   }
 
-  public getValue = async (asset: Asset): Promise<RepayLoanRequest> => {
+  public getValue = async (item: IBorrowedFundsState): Promise<RepayLoanRequest> => {
     if (this.state.isOpen) {
       return new Promise<RepayLoanRequest>((resolve, reject) => reject());
     }
@@ -46,7 +50,7 @@ export class RepayLoanDlg extends Component<any, IRepayLoanDlgState> {
         ...this.state,
         isOpen: true,
         executorParams: { resolve: resolve, reject: reject },
-        asset: asset
+        loanOrderState: item
       });
     });
   };

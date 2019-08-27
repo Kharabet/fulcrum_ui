@@ -1,27 +1,29 @@
 import React, { Component } from "react";
 import ReactModal from "react-modal";
-import { Asset } from "../domain/Asset";
+import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
 import { ManageCollateralRequest } from "../domain/ManageCollateralRequest";
 import { DialogHeader } from "./DialogHeader";
 import { ManageCollateralForm } from "./ManageCollateralForm";
 
 interface IManageCollateralDlgState {
   isOpen: boolean;
-  asset: Asset;
+  loanOrderState: IBorrowedFundsState | null;
 
   executorParams: { resolve: (value?: ManageCollateralRequest) => void; reject: (reason?: any) => void } | null;
 }
 
 export class ManageCollateralDlg extends Component<any, IManageCollateralDlgState> {
-
-
   public constructor(props: any, context?: any) {
     super(props, context);
 
-    this.state = { isOpen: false, asset: Asset.UNKNOWN, executorParams: null };
+    this.state = { isOpen: false, loanOrderState: null, executorParams: null };
   }
 
   public render() {
+    if (this.state.loanOrderState === null) {
+      return null;
+    }
+
     return (
       <ReactModal
         isOpen={this.state.isOpen}
@@ -31,14 +33,14 @@ export class ManageCollateralDlg extends Component<any, IManageCollateralDlgStat
       >
         <DialogHeader title="Manage Collateral" onDecline={this.onFormDecline} />
         <ManageCollateralForm
-          asset={this.state.asset}
+          loanOrderState={this.state.loanOrderState}
           onSubmit={this.onFormSubmit}
         />
       </ReactModal>
     );
   }
 
-  public getValue = async (asset: Asset): Promise<ManageCollateralRequest> => {
+  public getValue = async (item: IBorrowedFundsState): Promise<ManageCollateralRequest> => {
     if (this.state.isOpen) {
       return new Promise<ManageCollateralRequest>((resolve, reject) => reject());
     }
@@ -48,7 +50,7 @@ export class ManageCollateralDlg extends Component<any, IManageCollateralDlgStat
         ...this.state,
         isOpen: true,
         executorParams: { resolve: resolve, reject: reject },
-        asset: asset
+        loanOrderState: item
       });
     });
   };

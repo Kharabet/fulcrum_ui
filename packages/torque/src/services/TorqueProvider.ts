@@ -4,8 +4,17 @@ import { Web3Wrapper } from '@0x/web3-wrapper';
 import { EventEmitter } from "events";
 import { Asset } from "../domain/Asset";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
+import { BorrowRequest } from "../domain/BorrowRequest";
+import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
+import { ICollateralChangeEstimate } from "../domain/ICollateralChangeEstimate";
+import { ICollateralManagementParams } from "../domain/ICollateralManagementParams";
+import { IRepayEstimate } from "../domain/IRepayEstimate";
+import { IRepayState } from "../domain/IRepayState";
 import { IWeb3ProviderSettings } from "../domain/IWeb3ProviderSettings";
+import { ManageCollateralRequest } from "../domain/ManageCollateralRequest";
 import { ProviderType } from "../domain/ProviderType";
+import { RepayLoanRequest } from "../domain/RepayLoanRequest";
+import { WalletType } from "../domain/WalletType";
 import { Web3ConnectionFactory } from "../domain/Web3ConnectionFactory";
 import { ContractsSource } from "./ContractsSource";
 // import { ProviderChangedEvent } from "./events/ProviderChangedEvent";
@@ -128,7 +137,7 @@ export class TorqueProvider {
         this.accounts = [];
       }
       if (this.accounts.length === 0) {
-        canWrite = false; // revert back to read-only  
+        canWrite = false; // revert back to read-only
       }
     } else {
       // this.accounts = [];
@@ -208,6 +217,92 @@ export class TorqueProvider {
     return result;
   }
 
+  public submitBorrowRequest = async (borrowRequest: BorrowRequest) => {
+    return ;
+  };
+
+  public getLoansList = async (walletType: WalletType, walletAddress: string | undefined): Promise<IBorrowedFundsState[]> => {
+    return [
+      {
+        // TEST ORDER 01
+        loanOrderHash: "0x0061583F7764A09B35F5594B5AC5062E090614B7FE2B5EF96ACF16496E8B914C",
+        asset: Asset.ETH,
+        amount: BigNumber.random(),
+        collateralizedPercent: BigNumber.random(),
+        interestRate: BigNumber.random()
+      },
+      {
+        loanOrderHash: "0x2F099560938A4831006D674082201DC31762F2C3926640D4DB3748BDB1A813BF",
+        asset: Asset.WBTC,
+        amount: BigNumber.random(),
+        collateralizedPercent: BigNumber.random(),
+        interestRate: BigNumber.random()
+      },
+      {
+        loanOrderHash: "0x0A708B339C4472EF9A348269FACAD686E18345EC1342E8C171CCB0DF7DB13A28",
+        asset: Asset.DAI,
+        amount: BigNumber.random(),
+        collateralizedPercent: BigNumber.random(),
+        interestRate: BigNumber.random()
+      },
+      {
+        loanOrderHash: "0xAA81E9EA1EABE0EBB47A6557716839A7C149864220F10EB628E4DEA6249262DE",
+        asset: Asset.BAT,
+        amount: BigNumber.random(),
+        collateralizedPercent: BigNumber.random(),
+        interestRate: BigNumber.random()
+      },
+      {
+        loanOrderHash: "0xD826732AC58AB77E4EE0EB80B95D8BC9053EDAB328E5E4DDEAF6DA9BF1A6FCEB",
+        asset: Asset.MKR,
+        amount: BigNumber.random(),
+        collateralizedPercent: BigNumber.random(),
+        interestRate: BigNumber.random()
+      },
+      {
+        loanOrderHash: "0xE6F8A9C8CDF06CA7C73ACD0B1F414EDB4CE23AD8F9144D22463686A11DD53561",
+        asset: Asset.KNC,
+        amount: BigNumber.random(),
+        collateralizedPercent: BigNumber.random(),
+        interestRate: BigNumber.random()
+      },
+      {
+        loanOrderHash: "0xA4B2E54FDA03335C1EF63A939A06E2192E0661F923E7C048CDB94B842016CA61",
+        asset: Asset.USDC,
+        amount: BigNumber.random(),
+        collateralizedPercent: BigNumber.random(),
+        interestRate: BigNumber.random()
+      }
+    ];
+  };
+
+  public getLoanCollateralManagementParams = async (loanOrderHash: string): Promise<ICollateralManagementParams> => {
+    return { minValue: 0, maxValue: 100, currentValue: 66 };
+  };
+
+  public getLoanCollateralChangeEstimate = async (loanOrderHash: string, loanValue: number, newValue: number): Promise<ICollateralChangeEstimate> => {
+    return {
+      diffAmount: new BigNumber(Math.abs(newValue - loanValue) * 2 ),
+      liquidationPrice: new BigNumber(250 - (newValue - loanValue))
+    };
+  };
+
+  public setLoanCollateral = async (manageCollateralRequest: ManageCollateralRequest) => {
+    return ;
+  };
+
+  public getLoanRepayParams = async (loanOrderHash: string): Promise<IRepayState> => {
+    return { minValue: 0, maxValue: 100, currentValue: 66 };
+  };
+
+  public getLoanRepayEstimate = async (loanOrderHash: string, loanValue: number, newValue: number): Promise<IRepayEstimate> => {
+    return { repayAmount: new BigNumber(newValue - loanValue) };
+  };
+
+  public doRepayLoan = async (repayLoanRequest: RepayLoanRequest) => {
+    return ;
+  };
+
   public getAssetInterestRate = async (asset: Asset): Promise<BigNumber> => {
     return BigNumber.random();
   };
@@ -284,62 +379,42 @@ export class TorqueProvider {
     }
   }
 
-  // public waitForTransactionMined = async (
-  //   txHash: string,
-  //   request: LendRequest | TradeRequest): Promise<any> => {
-  //
-  //   return new Promise((resolve, reject) => {
-  //     try {
-  //       if (!this.web3Wrapper) {
-  //         throw new Error("web3 is not available");
-  //       }
-  //
-  //       this.waitForTransactionMinedRecursive(txHash, this.web3Wrapper, request, resolve, reject);
-  //     } catch (e) {
-  //       throw e;
-  //     }
-  //   });
-  // };
-  //
-  // private waitForTransactionMinedRecursive = async (
-  //   txHash: string,
-  //   web3Wrapper: Web3Wrapper,
-  //   request: LendRequest | TradeRequest,
-  //   resolve: (value: any) => void,
-  //   reject: (value: any) => void) => {
-  //
-  //   try {
-  //     const receipt = await web3Wrapper.getTransactionReceiptIfExistsAsync(txHash);
-  //     if (receipt) {
-  //       resolve(receipt);
-  //       if (request instanceof LendRequest) {
-  //         this.eventEmitter.emit(
-  //           TorqueProviderEvents.LendTransactionMined,
-  //           new LendTransactionMinedEvent(request.asset, txHash)
-  //         );
-  //       } else {
-  //         this.eventEmitter.emit(
-  //           TorqueProviderEvents.TradeTransactionMined,
-  //           new TradeTransactionMinedEvent(new TradeTokenKey(
-  //             request.asset,
-  //             request.unitOfAccount,
-  //             request.positionType,
-  //             request.leverage,
-  //             request.isTokenized,
-  //             request.version
-  //           ), txHash)
-  //         );
-  //       }
-  //     } else {
-  //       window.setTimeout(() => {
-  //         this.waitForTransactionMinedRecursive(txHash, web3Wrapper, request, resolve, reject);
-  //       }, 5000);
-  //     }
-  //   }
-  //   catch (e) {
-  //     reject(e);
-  //   }
-  // };
+  public waitForTransactionMined = async (
+    txHash: string): Promise<any> => {
+
+    return new Promise((resolve, reject) => {
+      try {
+        if (!this.web3Wrapper) {
+          throw new Error("web3 is not available");
+        }
+
+        this.waitForTransactionMinedRecursive(txHash, this.web3Wrapper, resolve, reject);
+      } catch (e) {
+        throw e;
+      }
+    });
+  };
+
+  private waitForTransactionMinedRecursive = async (
+    txHash: string,
+    web3Wrapper: Web3Wrapper,
+    resolve: (value: any) => void,
+    reject: (value: any) => void) => {
+
+    try {
+      const receipt = await web3Wrapper.getTransactionReceiptIfExistsAsync(txHash);
+      if (receipt) {
+        resolve(receipt);
+      } else {
+        window.setTimeout(() => {
+          this.waitForTransactionMinedRecursive(txHash, web3Wrapper, resolve, reject);
+        }, 5000);
+      }
+    }
+    catch (e) {
+      reject(e);
+    }
+  };
 
   public sleep(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));

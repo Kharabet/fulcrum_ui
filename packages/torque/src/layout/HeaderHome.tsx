@@ -1,6 +1,6 @@
 import React, { Component } from "react";
-import { HeaderLogo } from "./HeaderLogo";
 import { OnChainIndicator } from "../components/OnChainIndicator";
+import { HeaderLogo } from "./HeaderLogo";
 
 export interface IHeaderHomeProps {
   doNetworkConnect?: () => void;

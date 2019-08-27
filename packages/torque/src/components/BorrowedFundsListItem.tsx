@@ -2,7 +2,7 @@ import { BigNumber } from "@0x/utils";
 import React, { Component } from "react";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
-import { BorrowedFundsState } from "../domain/BorrowedFundsState";
+import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
 import { TorqueProvider } from "../services/TorqueProvider";
 import { CollateralSlider } from "./CollateralSlider";
 
@@ -11,10 +11,10 @@ import ic_unsafe from "./../assets/images/ic_unsafe.svg";
 export interface IBorrowedFundsListItemProps {
   // firstInTheRow: boolean;
   // lastInTheRow: boolean;
-  item: BorrowedFundsState;
+  item: IBorrowedFundsState;
 
-  onManageCollateral: (item: BorrowedFundsState) => void;
-  onRepayLoan: (item: BorrowedFundsState) => void;
+  onManageCollateral: (item: IBorrowedFundsState) => void;
+  onRepayLoan: (item: IBorrowedFundsState) => void;
 }
 
 interface IBorrowedFundsListItemState {

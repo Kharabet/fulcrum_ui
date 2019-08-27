@@ -1,38 +1,92 @@
 import { BigNumber } from "bignumber.js";
 import React, { Component, FormEvent } from "react";
-import { Asset } from "../domain/Asset";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
+import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
 import { RepayLoanRequest } from "../domain/RepayLoanRequest";
+import { TorqueProvider } from "../services/TorqueProvider";
 import { RepayLoanSlider } from "./RepayLoanSlider";
 
 export interface IRepayLoanFormProps {
-  asset: Asset;
+  loanOrderState: IBorrowedFundsState;
 
   onSubmit: (request: RepayLoanRequest) => void;
 }
 
 interface IRepayLoanFormState {
   assetDetails: AssetDetails | null;
-  positionValue: number;
+
+  minValue: number;
+  maxValue: number;
+  loanValue: number;
+
   currentValue: number;
   selectedValue: number;
+  repayAmount: BigNumber;
 }
 
 export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanFormState> {
-  private minValue: number = 0;
-  private maxValue: number = 100;
-
   constructor(props: IRepayLoanFormProps, context?: any) {
     super(props, context);
 
     this.state = {
-      assetDetails: AssetsDictionary.assets.get(this.props.asset) || null,
-      positionValue: 66,
-      currentValue: 66,
-      selectedValue: 66
+      minValue: 0,
+      maxValue: 100,
+      assetDetails: null,
+      loanValue: 100,
+      currentValue: 100,
+      selectedValue: 100,
+      repayAmount: new BigNumber(0)
     };
   }
+
+  public componentDidMount(): void {
+    TorqueProvider.Instance.getLoanRepayParams(this.props.loanOrderState.loanOrderHash).then(
+      collateralState => {
+        this.setState(
+          {
+            ...this.state,
+            minValue: collateralState.minValue,
+            maxValue: collateralState.maxValue,
+            assetDetails: AssetsDictionary.assets.get(this.props.loanOrderState.asset) || null,
+            loanValue: collateralState.currentValue,
+            currentValue: collateralState.currentValue,
+            selectedValue: collateralState.currentValue
+          },
+          () => {
+            this.derivedUpdate();
+          }
+        );
+      }
+    );
+  }
+
+  public componentDidUpdate(
+    prevProps: Readonly<IRepayLoanFormProps>,
+    prevState: Readonly<IRepayLoanFormState>,
+    snapshot?: any
+  ): void {
+    if (
+      prevProps.loanOrderState.loanOrderHash !== this.props.loanOrderState.loanOrderHash ||
+      prevState.loanValue !== this.state.loanValue ||
+      prevState.selectedValue !== this.state.selectedValue
+    ) {
+      this.derivedUpdate();
+    }
+  }
+
+  private derivedUpdate = async () => {
+    const repayEstimate = await TorqueProvider.Instance.getLoanRepayEstimate(
+      this.props.loanOrderState.asset,
+      this.state.loanValue,
+      this.state.currentValue
+    );
+
+    this.setState({
+      ...this.state,
+      repayAmount: repayEstimate.repayAmount,
+    });
+  };
 
   public render() {
     if (this.state.assetDetails === null) {
@@ -44,8 +98,8 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
         <section className="dialog-content">
           <RepayLoanSlider
             readonly={false}
-            minValue={this.minValue}
-            maxValue={this.maxValue}
+            minValue={this.state.minValue}
+            maxValue={this.state.maxValue}
             value={this.state.currentValue}
             onUpdate={this.onUpdate}
             onChange={this.onChange}
@@ -68,7 +122,7 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
   }
 
   private onChange = (value: number) => {
-    this.setState({ ...this.state, currentValue: value });
+    this.setState({ ...this.state, selectedValue: value, currentValue: value });
   };
 
   private onUpdate = (value: number) => {
@@ -76,6 +130,8 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
   };
 
   public onSubmitClick = (event: FormEvent<HTMLFormElement>) => {
-    this.props.onSubmit(new RepayLoanRequest(this.props.asset, new BigNumber(this.state.currentValue)));
+    this.props.onSubmit(
+      new RepayLoanRequest(this.props.loanOrderState.loanOrderHash, new BigNumber(this.state.currentValue))
+    );
   };
 }

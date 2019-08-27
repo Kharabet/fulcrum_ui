@@ -7,6 +7,7 @@ import { WalletType, walletTypeAbbrToWalletType } from "../domain/WalletType";
 import { Footer } from "../layout/Footer";
 import { HeaderHome } from "../layout/HeaderHome";
 import { NavService } from "../services/NavService";
+import { TorqueProvider } from "../services/TorqueProvider";
 
 export interface IBorrowPageRouteParams {
   walletTypeAbbr: string;
@@ -55,7 +56,15 @@ export class BorrowPage extends PureComponent<IBorrowPageParams & RouteComponent
         }
 
         if (borrowRequest.walletType === WalletType.Web3) {
-          // submit loan
+          const accountAddress =
+            TorqueProvider.Instance.accounts.length > 0 && TorqueProvider.Instance.accounts[0]
+              ? TorqueProvider.Instance.accounts[0].toLowerCase()
+              : null;
+
+          if (accountAddress) {
+            await TorqueProvider.Instance.submitBorrowRequest(borrowRequest);
+            NavService.Instance.History.push(NavService.Instance.getDashboardAddress(walletType, accountAddress));
+          }
         }
       } finally {
         await this.borrowDlgRef.current.hide();
