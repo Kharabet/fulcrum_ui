@@ -111,7 +111,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
   public onTradeAmountChange = async (event: ChangeEvent<HTMLInputElement>) => {
     // handling different types of empty values
     const amountText = event.target.value ? event.target.value : "";
-
+    // console.log(amountText);
     // setting inputAmountText to update display at the same time
     this.setState({
       ...this.state,

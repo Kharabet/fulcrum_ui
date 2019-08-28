@@ -7,6 +7,7 @@ import { ProviderType } from "../domain/ProviderType";
 import { BorrowPage } from "../pages/BorrowPage";
 import { DashboardPage } from "../pages/DashboardPage";
 import { LandingPage } from "../pages/LandingPage";
+import { LandingPageStatic } from "../pages/LandingPageStatic";
 import { MaintenancePage } from "../pages/MaintenancePage";
 import { WalletSelectionPage } from "../pages/WalletSelectionPage";
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
@@ -56,26 +57,42 @@ export class AppRouter extends Component<any, IAppRouterState> {
           {
             siteConfig.MaintenanceMode
               ? <MaintenancePage />
-              :
-                <HashRouter hashType="slash">
-                  <LocationListener doNetworkConnect={this.doNetworkConnect}>
-                    <Switch>
-                      <Route exact={true} path="/" component={LandingPage} />
-                      <Route exact={true} path="/wallet/:destinationAbbr" render={props => <WalletSelectionPage {...props} onSelectProvider={this.onProviderTypeSelect} isLoading={this.state.isLoading} doNetworkConnect={undefined} />} />
-                      <Route exact={true} path="/borrow/:walletTypeAbbr" render={props => <BorrowPage {...props} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} />} />
-                      <Route exact={true} path="/dashboard/:walletTypeAbbr" render={props => <DashboardPage {...props} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} />} />
-                      <Route exact={true} path="/dashboard/:walletTypeAbbr/:walletAddress" render={props => <DashboardPage {...props} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} />} />
-                      <Route path="*" render={() => <Redirect to="/"/> } />
-                    </Switch>
-                    {isMainnetProd ? (
-                      <Route path="/" render={({location}) => {
-                        ReactGA.ga('set', 'page', location.pathname + location.search);
-                        ReactGA.ga('send', 'pageview');
-                        return null;
-                      }} />
-                    ) : ``}
-                  </LocationListener>
-                </HashRouter>
+                : siteConfig.LandingPage
+                ? <HashRouter hashType="slash">
+                    <LocationListener doNetworkConnect={this.doNetworkConnect}>
+                      <Switch>
+                        <Route exact={true} path="/" component={LandingPageStatic} />
+                        <Route path="*" render={() => <Redirect to="/"/> } />
+                      </Switch>
+                      {isMainnetProd ? (
+                        <Route path="/" render={({location}) => {
+                          ReactGA.ga('set', 'page', location.pathname + location.search);
+                          ReactGA.ga('send', 'pageview');
+                          return null;
+                        }} />
+                      ) : ``}
+                    </LocationListener>
+                  </HashRouter>
+                :
+                  <HashRouter hashType="slash">
+                    <LocationListener doNetworkConnect={this.doNetworkConnect}>
+                      <Switch>
+                        <Route exact={true} path="/" component={LandingPage} />
+                        <Route exact={true} path="/wallet/:destinationAbbr" render={props => <WalletSelectionPage {...props} onSelectProvider={this.onProviderTypeSelect} isLoading={this.state.isLoading} doNetworkConnect={undefined} />} />
+                        <Route exact={true} path="/borrow/:walletTypeAbbr" render={props => <BorrowPage {...props} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} />} />
+                        <Route exact={true} path="/dashboard/:walletTypeAbbr" render={props => <DashboardPage {...props} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} />} />
+                        <Route exact={true} path="/dashboard/:walletTypeAbbr/:walletAddress" render={props => <DashboardPage {...props} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} />} />
+                        <Route path="*" render={() => <Redirect to="/"/> } />
+                      </Switch>
+                      {isMainnetProd ? (
+                        <Route path="/" render={({location}) => {
+                          ReactGA.ga('set', 'page', location.pathname + location.search);
+                          ReactGA.ga('send', 'pageview');
+                          return null;
+                        }} />
+                      ) : ``}
+                    </LocationListener>
+                  </HashRouter>
           }
         </div>
       </React.Fragment>

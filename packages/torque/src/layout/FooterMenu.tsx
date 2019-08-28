@@ -5,13 +5,13 @@ export class FooterMenu extends Component {
     return (
       <div className="footer-menu">
         <div className="footer-menu__item">
-          <a href="https://fulcrum.trade/tos/">Terms of use</a>
+          <a href="https://torque.loans/tos/">Terms of use</a>
         </div>
         <div className="footer-menu__item">
-          <a href="https://fulcrum.trade/privacy/">Privacy policy</a>
+          <a href="https://torque.loans/privacy/">Privacy policy</a>
         </div>
         <div className="footer-menu__item">
-          <a href="https://bzx.network/faq-fulcrum.html">FAQ</a>
+          <a href="https://fulcrum.trade">Lending &amp; Trading</a>
         </div>
       </div>
     );
