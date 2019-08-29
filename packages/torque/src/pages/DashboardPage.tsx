@@ -1,6 +1,7 @@
 import React, { PureComponent, RefObject } from "react";
 import { RouteComponentProps } from "react-router";
 import { BorrowedFundsList } from "../components/BorrowedFundsList";
+import { ExtendLoanDlg } from "../components/ExtendLoanDlg";
 import { ManageCollateralDlg } from "../components/ManageCollateralDlg";
 import { RepayLoanDlg } from "../components/RepayLoanDlg";
 import { WalletAddressDlg } from "../components/WalletAddressDlg";
@@ -32,6 +33,7 @@ interface IDashboardPageState {
 export class DashboardPage extends PureComponent<IDashboardPageParams & RouteComponentProps<IDashboardPageRouteParams>, IDashboardPageState> {
   private manageCollateralDlgRef: RefObject<ManageCollateralDlg>;
   private repayLoanDlgRef: RefObject<RepayLoanDlg>;
+  private extendLoanDlgRef: RefObject<ExtendLoanDlg>;
   private walletAddressDlgRef: RefObject<WalletAddressDlg>;
 
   constructor(props: any) {
@@ -39,6 +41,7 @@ export class DashboardPage extends PureComponent<IDashboardPageParams & RouteCom
 
     this.manageCollateralDlgRef = React.createRef();
     this.repayLoanDlgRef = React.createRef();
+    this.extendLoanDlgRef = React.createRef();
     this.walletAddressDlgRef = React.createRef();
 
     this.state = { walletAddress: "", walletType: WalletType.Unknown, items: [] };
@@ -71,6 +74,7 @@ export class DashboardPage extends PureComponent<IDashboardPageParams & RouteCom
       <React.Fragment>
         <ManageCollateralDlg ref={this.manageCollateralDlgRef} />
         <RepayLoanDlg ref={this.repayLoanDlgRef} />
+        <ExtendLoanDlg ref={this.extendLoanDlgRef} />
         <WalletAddressDlg ref={this.walletAddressDlgRef} />
         <div className="dashboard-page">
           <HeaderHome isLoading={this.props.isLoading} doNetworkConnect={this.props.doNetworkConnect} />
@@ -88,8 +92,9 @@ export class DashboardPage extends PureComponent<IDashboardPageParams & RouteCom
                 }
                 <BorrowedFundsList
                   items={this.state.items}
-                  onRepayLoan={this.onRepayLoan}
                   onManageCollateral={this.onManageCollateral}
+                  onRepayLoan={this.onRepayLoan}
+                  onExtendLoan={this.onExtendLoan}
                 />
               </React.Fragment>
             ) : (
@@ -140,6 +145,17 @@ export class DashboardPage extends PureComponent<IDashboardPageParams & RouteCom
         await TorqueProvider.Instance.doRepayLoan(repayLoanRequest);
       } finally {
         this.repayLoanDlgRef.current.hide();
+      }
+    }
+  };
+
+  private onExtendLoan = async (item: IBorrowedFundsState) => {
+    if (this.extendLoanDlgRef.current) {
+      try {
+        const extendLoanRequest = await this.extendLoanDlgRef.current.getValue(item);
+        await TorqueProvider.Instance.doExtendLoan(extendLoanRequest);
+      } finally {
+        this.extendLoanDlgRef.current.hide();
       }
     }
   };

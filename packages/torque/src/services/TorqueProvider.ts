@@ -5,9 +5,12 @@ import { EventEmitter } from "events";
 import { Asset } from "../domain/Asset";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { BorrowRequest } from "../domain/BorrowRequest";
+import { ExtendLoanRequest } from "../domain/ExtendLoanRequest";
 import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
 import { ICollateralChangeEstimate } from "../domain/ICollateralChangeEstimate";
 import { ICollateralManagementParams } from "../domain/ICollateralManagementParams";
+import { IExtendEstimate } from "../domain/IExtendEstimate";
+import { IExtendState } from "../domain/IExtendState";
 import { IRepayEstimate } from "../domain/IRepayEstimate";
 import { IRepayState } from "../domain/IRepayState";
 import { IWeb3ProviderSettings } from "../domain/IWeb3ProviderSettings";
@@ -295,11 +298,23 @@ export class TorqueProvider {
     return { minValue: 0, maxValue: 100, currentValue: 66 };
   };
 
-  public getLoanRepayEstimate = async (loanOrderHash: string, loanValue: number, newValue: number): Promise<IRepayEstimate> => {
-    return { repayAmount: new BigNumber(newValue - loanValue) };
+  public getLoanRepayEstimate = async (loanOrderHash: string, repayPercent: number): Promise<IRepayEstimate> => {
+    return { repayAmount: new BigNumber(repayPercent * 3) };
   };
 
   public doRepayLoan = async (repayLoanRequest: RepayLoanRequest) => {
+    return ;
+  };
+
+  public getLoanExtendParams = async (loanOrderHash: string): Promise<IExtendState> => {
+    return { minValue: 1, maxValue: 365, currentValue: 1 };
+  };
+
+  public getLoanExtendEstimate = async (loanOrderHash: string, daysToAdd: number): Promise<IExtendEstimate> => {
+    return { depositAmount: new BigNumber(daysToAdd * 2) };
+  };
+
+  public doExtendLoan = async (extendLoanRequest: ExtendLoanRequest) => {
     return ;
   };
 

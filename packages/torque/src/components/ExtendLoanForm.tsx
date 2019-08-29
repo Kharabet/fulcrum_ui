@@ -4,19 +4,19 @@ import { Observable, Subject } from "rxjs";
 import { debounceTime, switchMap } from "rxjs/operators";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
+import { ExtendLoanRequest } from "../domain/ExtendLoanRequest";
 import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
-import { IRepayEstimate } from "../domain/IRepayEstimate";
-import { RepayLoanRequest } from "../domain/RepayLoanRequest";
+import { IExtendEstimate } from "../domain/IExtendEstimate";
 import { TorqueProvider } from "../services/TorqueProvider";
-import { RepayLoanSlider } from "./RepayLoanSlider";
+import { ExtendLoanSlider } from "./ExtendLoanSlider";
 
-export interface IRepayLoanFormProps {
+export interface IExtendLoanFormProps {
   loanOrderState: IBorrowedFundsState;
 
-  onSubmit: (request: RepayLoanRequest) => void;
+  onSubmit: (request: ExtendLoanRequest) => void;
 }
 
-interface IRepayLoanFormState {
+interface IExtendLoanFormState {
   assetDetails: AssetDetails | null;
 
   minValue: number;
@@ -24,22 +24,22 @@ interface IRepayLoanFormState {
 
   currentValue: number;
   selectedValue: number;
-  repayAmount: BigNumber;
+  depositAmount: BigNumber;
 }
 
-export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanFormState> {
+export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanFormState> {
   private readonly selectedValueUpdate: Subject<number>;
 
-  constructor(props: IRepayLoanFormProps, context?: any) {
+  constructor(props: IExtendLoanFormProps, context?: any) {
     super(props, context);
 
     this.state = {
-      minValue: 0,
-      maxValue: 100,
+      minValue: 1,
+      maxValue: 365,
       assetDetails: null,
       currentValue: 100,
       selectedValue: 100,
-      repayAmount: new BigNumber(0)
+      depositAmount: new BigNumber(0)
     };
 
     this.selectedValueUpdate = new Subject<number>();
@@ -48,16 +48,16 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
         debounceTime(100),
         switchMap(value => this.rxGetEstimate(value))
       )
-      .subscribe((value: IRepayEstimate) => {
+      .subscribe((value: IExtendEstimate) => {
         this.setState({
           ...this.state,
-          repayAmount: value.repayAmount
+          depositAmount: value.depositAmount
         });
       });
   }
 
   public componentDidMount(): void {
-    TorqueProvider.Instance.getLoanRepayParams(this.props.loanOrderState.loanOrderHash).then(
+    TorqueProvider.Instance.getLoanExtendParams(this.props.loanOrderState.loanOrderHash).then(
       collateralState => {
         this.setState(
           {
@@ -77,8 +77,8 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
   }
 
   public componentDidUpdate(
-    prevProps: Readonly<IRepayLoanFormProps>,
-    prevState: Readonly<IRepayLoanFormState>,
+    prevProps: Readonly<IExtendLoanFormProps>,
+    prevState: Readonly<IExtendLoanFormState>,
     snapshot?: any
   ): void {
     if (
@@ -95,9 +95,9 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
     }
 
     return (
-      <form className="repay-loan-form" onSubmit={this.onSubmitClick}>
+      <form className="extend-loan-form" onSubmit={this.onSubmitClick}>
         <section className="dialog-content">
-          <RepayLoanSlider
+          <ExtendLoanSlider
             readonly={false}
             minValue={this.state.minValue}
             maxValue={this.state.maxValue}
@@ -106,27 +106,36 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
             onChange={this.onChange}
           />
 
-          <div className="repay-loan-form__tips">
-            <div className="repay-loan-form__tip">Current state</div>
-            <div className="repay-loan-form__tip">Full repayment</div>
+          <div className="extend-loan-form__tips">
+            <div className="extend-loan-form__tip">Min</div>
+            <div className="extend-loan-form__tip">Max</div>
           </div>
 
-          <hr className="repay-loan-form__delimiter" />
+          <hr className="extend-loan-form__delimiter" />
 
-          <div className="repay-loan-form__operation-result-container">
-            <img className="repay-loan-form__operation-result-img" src={this.state.assetDetails.logoSvg} />
-            <div className="repay-loan-form__operation-result-msg">
-              You will repay
+          <div className="extend-loan-form__info-liquidated-at-container">
+            <div className="extend-loan-form__info-liquidated-at-msg">
+              Your loan will be extended by
             </div>
-            <div className="repay-loan-form__operation-result-amount">
-              {this.state.repayAmount.toFixed(6)} {this.state.assetDetails.displayName}
+            <div className="extend-loan-form__info-liquidated-at-price">
+              {this.state.selectedValue} {this.pluralize("day", "days", this.state.selectedValue)}
+            </div>
+          </div>
+
+          <div className="extend-loan-form__operation-result-container">
+            <img className="extend-loan-form__operation-result-img" src={this.state.assetDetails.logoSvg} />
+            <div className="extend-loan-form__operation-result-msg">
+              You will top up
+            </div>
+            <div className="extend-loan-form__operation-result-amount">
+              {this.state.depositAmount.toFixed(6)} {this.state.assetDetails.displayName}
             </div>
           </div>
         </section>
         <section className="dialog-actions">
-          <div className="repay-loan-form__actions-container">
+          <div className="extend-loan-form__actions-container">
             <button type="submit" className="btn btn-size--small">
-              Repay
+              Extend
             </button>
           </div>
         </section>
@@ -134,9 +143,14 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
     );
   }
 
-  private rxGetEstimate = (selectedValue: number): Observable<IRepayEstimate> => {
-    return new Observable<IRepayEstimate>(observer => {
-      TorqueProvider.Instance.getLoanRepayEstimate(
+  private pluralize = (singular: string, plural: string, value: number) => {
+    const isPlural = value !== 1;
+    return isPlural ? plural : singular;
+  };
+
+  private rxGetEstimate = (selectedValue: number): Observable<IExtendEstimate> => {
+    return new Observable<IExtendEstimate>(observer => {
+      TorqueProvider.Instance.getLoanExtendEstimate(
         this.props.loanOrderState.asset,
         selectedValue
       ).then(value => {
@@ -155,7 +169,7 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
 
   public onSubmitClick = (event: FormEvent<HTMLFormElement>) => {
     this.props.onSubmit(
-      new RepayLoanRequest(this.props.loanOrderState.loanOrderHash, new BigNumber(this.state.currentValue))
+      new ExtendLoanRequest(this.props.loanOrderState.loanOrderHash, this.state.currentValue)
     );
   };
 }

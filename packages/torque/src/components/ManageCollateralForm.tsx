@@ -1,8 +1,11 @@
 import { BigNumber } from "@0x/utils";
 import React, { Component, FormEvent } from "react";
+import { Observable, Subject } from "rxjs";
+import { debounceTime, switchMap } from "rxjs/operators";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
+import { ICollateralChangeEstimate } from "../domain/ICollateralChangeEstimate";
 import { ManageCollateralRequest } from "../domain/ManageCollateralRequest";
 import { TorqueProvider } from "../services/TorqueProvider";
 import { CollateralSlider } from "./CollateralSlider";
@@ -28,6 +31,8 @@ interface IManageCollateralFormState {
 }
 
 export class ManageCollateralForm extends Component<IManageCollateralFormProps, IManageCollateralFormState> {
+  private readonly selectedValueUpdate: Subject<number>;
+
   constructor(props: IManageCollateralFormProps, context?: any) {
     super(props, context);
 
@@ -41,6 +46,20 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
       diffAmount: new BigNumber(0),
       liquidationPrice: new BigNumber(0)
     };
+
+    this.selectedValueUpdate = new Subject<number>();
+    this.selectedValueUpdate
+      .pipe(
+        debounceTime(100),
+        switchMap(value => this.rxGetEstimate(value))
+      )
+      .subscribe((value: ICollateralChangeEstimate) => {
+        this.setState({
+          ...this.state,
+          diffAmount: value.diffAmount,
+          liquidationPrice: value.liquidationPrice
+        });
+      });
   }
 
   public componentDidMount(): void {
@@ -57,7 +76,7 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
             selectedValue: collateralState.currentValue
           },
           () => {
-            this.derivedUpdate();
+            this.selectedValueUpdate.next(this.state.selectedValue);
           }
         );
       }
@@ -74,23 +93,9 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
       prevState.loanValue !== this.state.loanValue ||
       prevState.selectedValue !== this.state.selectedValue
     ) {
-      this.derivedUpdate();
+      this.selectedValueUpdate.next(this.state.selectedValue);
     }
   }
-
-  private derivedUpdate = async () => {
-    const collateralChangeEstimate = await TorqueProvider.Instance.getLoanCollateralChangeEstimate(
-      this.props.loanOrderState.asset,
-      this.state.loanValue,
-      this.state.currentValue
-    );
-
-    this.setState({
-      ...this.state,
-      diffAmount: collateralChangeEstimate.diffAmount,
-      liquidationPrice: collateralChangeEstimate.liquidationPrice
-    });
-  };
 
   public render() {
     if (this.state.assetDetails === null) {
@@ -153,6 +158,18 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
       </form>
     );
   }
+
+  private rxGetEstimate = (selectedValue: number): Observable<ICollateralChangeEstimate> => {
+    return new Observable<ICollateralChangeEstimate>(observer => {
+      TorqueProvider.Instance.getLoanCollateralChangeEstimate(
+        this.props.loanOrderState.asset,
+        this.state.loanValue,
+        selectedValue
+      ).then(value => {
+        observer.next(value);
+      });
+    });
+  };
 
   private onChange = (value: number) => {
     this.setState({ ...this.state, selectedValue: value, currentValue: value });
