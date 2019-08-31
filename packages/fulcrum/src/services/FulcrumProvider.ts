@@ -235,7 +235,7 @@ export class FulcrumProvider {
     if (this.contractsSource) {
       const assetContract = await this.contractsSource.getITokenContract(selectedKey.loanAsset);
       if (assetContract) {
-        //result = await assetContract.borrowInterestRate.callAsync();
+        // result = await assetContract.borrowInterestRate.callAsync();
         result = await assetContract.nextLoanInterestRate.callAsync(new BigNumber("0"));
         result = result.dividedBy(10 ** 18);
       }
@@ -493,8 +493,8 @@ export class FulcrumProvider {
         let totalAssetBorrow: BigNumber | null;
         let supplyInterestRate: BigNumber | null;
         let borrowInterestRate: BigNumber | null;
+        let avgBorrowInterestRate: BigNumber | null;
         let lockedAssets: BigNumber | null = new BigNumber(0);
-        let nextInterestRate: BigNumber | null;
 
         await Promise.all([
           (symbol = await assetContract.symbol.callAsync()),
@@ -505,8 +505,8 @@ export class FulcrumProvider {
           (totalAssetSupply = await assetContract.totalAssetSupply.callAsync()),
           (totalAssetBorrow = await assetContract.totalAssetBorrow.callAsync()),
           (supplyInterestRate = await assetContract.supplyInterestRate.callAsync()),
-          (borrowInterestRate = await assetContract.borrowInterestRate.callAsync()),
-          (nextInterestRate = await assetContract.nextLoanInterestRate.callAsync(new BigNumber("0")))
+          (avgBorrowInterestRate = await assetContract.avgBorrowInterestRate.callAsync()),
+          (borrowInterestRate = await assetContract.borrowInterestRate.callAsync())
         ]);
 
         const assetErc20Address = this.getErc20AddressOfAsset(asset);
@@ -525,7 +525,7 @@ export class FulcrumProvider {
           totalAssetBorrow.dividedBy(10 ** 18),
           supplyInterestRate.dividedBy(10 ** 18),
           borrowInterestRate.dividedBy(10 ** 18),
-          nextInterestRate.dividedBy(10 ** 18),
+          avgBorrowInterestRate.dividedBy(10 ** 18),
           lockedAssets.dividedBy(10 ** 18)
         );
       }

@@ -103,10 +103,11 @@ export class StatsTokenGridRow extends Component<IStatsTokenGridRowProps, IStats
 
     const details = this.state.reserveDetails;
 
-    let customBorrowTitle, customBorrowText;
-    if (details.borrowInterestRate && details.nextInterestRate) {
-      customBorrowTitle = `${details.borrowInterestRate.toFixed(18)}% / ${details.nextInterestRate.toFixed(18)}%`;
-      customBorrowText = `${details.borrowInterestRate.toFixed(2)}% / ${details.nextInterestRate.toFixed(2)}%`;
+    let customBorrowTitle;
+    let customBorrowText;
+    if (details.avgBorrowInterestRate && details.borrowInterestRate) {
+      customBorrowTitle = `${details.avgBorrowInterestRate.toFixed(18)}% / ${details.borrowInterestRate.toFixed(18)}%`;
+      customBorrowText = `${details.avgBorrowInterestRate.toFixed(2)}% / ${details.borrowInterestRate.toFixed(2)}%`;
     } else {
       customBorrowTitle = ``;
       customBorrowText = `-`;
