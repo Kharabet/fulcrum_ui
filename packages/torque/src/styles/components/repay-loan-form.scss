@@ -33,30 +33,10 @@
     border-top: solid 0.0625rem rgba(255, 255, 255, 0.2);
   }
 
-  .repay-loan-form__operation-result-container {
-    position: relative;
+  .repay-loan-form__transfer-details {
+    .repay-loan-form__transfer-details-msg {
+      margin-top: 1.5rem;
 
-    padding: 2.5rem 2rem 3rem;
-    margin-top: 3rem;
-
-    border-radius: 1rem;
-    background-color: #3b364b;
-
-    .repay-loan-form__operation-result-img {
-      height: 2.5rem;
-      width: 2.5rem;
-      box-sizing: content-box;
-
-      position: absolute;
-      top: 0;
-      left: 50%;
-      transform: translateX(-50%) translateY(-50%);
-
-      border: solid 1rem #3b364b;
-      border-radius: 100px;
-    }
-
-    .repay-loan-form__operation-result-msg {
       font-size: 1rem;
       font-weight: normal;
       font-style: normal;
@@ -65,25 +45,10 @@
       letter-spacing: -0.16px;
       text-align: center;
       color: #a9b5c7;
-    }
 
-    .repay-loan-form__operation-result-amount {
-      font-size: 24px;
-      font-weight: 600;
-      font-style: normal;
-      font-stretch: normal;
-      line-height: 1.67;
-      letter-spacing: -0.24px;
-      text-align: center;
-      color: #ffffff;
-    }
-
-    .repay-loan-form__actions-container {
-      display: flex;
-      flex-direction: row;
-      justify-content: center;
-
-      margin-top: 2rem;
+      &--warning {
+        color: #801515;
+      }
     }
   }
 

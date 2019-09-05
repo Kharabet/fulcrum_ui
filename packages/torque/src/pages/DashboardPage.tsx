@@ -98,6 +98,7 @@ export class DashboardPage extends PureComponent<
                   />
                 ) : null}
                 <BorrowedFundsList
+                  walletDetails={this.state.walletDetails}
                   items={this.state.items}
                   onManageCollateral={this.onManageCollateral}
                   onRepayLoan={this.onRepayLoan}

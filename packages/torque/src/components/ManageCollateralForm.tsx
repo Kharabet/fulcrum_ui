@@ -10,6 +10,7 @@ import { IWalletDetails } from "../domain/IWalletDetails";
 import { ManageCollateralRequest } from "../domain/ManageCollateralRequest";
 import { TorqueProvider } from "../services/TorqueProvider";
 import { CollateralSlider } from "./CollateralSlider";
+import { OpsEstimatedResult } from "./OpsEstimatedResult";
 
 export interface IManageCollateralFormProps {
   walletDetails: IWalletDetails;
@@ -135,28 +136,24 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
           </div>
 
           {this.state.loanValue !== this.state.selectedValue ? (
-            <div className="manage-collateral-form__operation-result-container">
-              <img className="manage-collateral-form__operation-result-img" src={this.state.assetDetails.logoSvg} />
-              <div className="manage-collateral-form__operation-result-msg">
-                You will {this.state.loanValue > this.state.selectedValue ? "withdraw" : "top up"}
+            <OpsEstimatedResult
+              assetDetails={this.state.assetDetails}
+              actionTitle={`You will ${this.state.loanValue > this.state.selectedValue ? "withdraw" : "top up"}`}
+              amount={this.state.diffAmount}
+              precision={6}
+            >
+              <div className="manage-collateral-form__actions-container">
+                {this.state.loanValue > this.state.selectedValue ? (
+                  <button type="submit" className="btn btn-size--small">
+                    Withdraw
+                  </button>
+                ) : (
+                  <button type="submit" className="btn btn-size--small">
+                    Top Up
+                  </button>
+                )}
               </div>
-              <div className="manage-collateral-form__operation-result-amount">
-                {this.state.diffAmount.toFixed(6)} {this.state.assetDetails.displayName}
-              </div>
-              {this.state.loanValue !== this.state.selectedValue ? (
-                <div className="manage-collateral-form__actions-container">
-                  {this.state.loanValue > this.state.selectedValue ? (
-                    <button type="submit" className="btn btn-size--small">
-                      Withdraw
-                    </button>
-                  ) : (
-                    <button type="submit" className="btn btn-size--small">
-                      Top Up
-                    </button>
-                  )}
-                </div>
-              ) : null}
-            </div>
+            </OpsEstimatedResult>
           ) : null}
         </section>
       </form>

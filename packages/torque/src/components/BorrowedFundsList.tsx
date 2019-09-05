@@ -1,8 +1,10 @@
 import React, { Component, RefObject } from "react";
 import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
+import { IWalletDetails } from "../domain/IWalletDetails";
 import { BorrowedFundsListItem } from "./BorrowedFundsListItem";
 
 export interface IBorrowedFundsListProps {
+  walletDetails: IWalletDetails;
   items: IBorrowedFundsState[];
 
   onManageCollateral: (item: IBorrowedFundsState) => void;
@@ -41,6 +43,7 @@ export class BorrowedFundsList extends Component<IBorrowedFundsListProps, IBorro
           key={index}
           // firstInTheRow={rest === 0}
           // lastInTheRow={rest === (this.state.colsCount - 1)}
+          walletDetails={this.props.walletDetails}
           item={e}
           onManageCollateral={this.props.onManageCollateral}
           onRepayLoan={this.props.onRepayLoan}

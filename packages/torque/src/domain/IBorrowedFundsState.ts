@@ -9,4 +9,5 @@ export interface IBorrowedFundsState {
   interestRate: BigNumber;
   collateralizedPercent: BigNumber;
   hasManagementContract: boolean;
+  isInProgress: boolean;
 }

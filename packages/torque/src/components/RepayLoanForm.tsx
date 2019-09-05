@@ -8,7 +8,10 @@ import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
 import { IRepayEstimate } from "../domain/IRepayEstimate";
 import { IWalletDetails } from "../domain/IWalletDetails";
 import { RepayLoanRequest } from "../domain/RepayLoanRequest";
+import { WalletType } from "../domain/WalletType";
 import { TorqueProvider } from "../services/TorqueProvider";
+import { ActionViaTransferDetails } from "./ActionViaTransferDetails";
+import { OpsEstimatedResult } from "./OpsEstimatedResult";
 import { RepayLoanSlider } from "./RepayLoanSlider";
 
 export interface IRepayLoanFormProps {
@@ -16,6 +19,7 @@ export interface IRepayLoanFormProps {
   loanOrderState: IBorrowedFundsState;
 
   onSubmit: (request: RepayLoanRequest) => void;
+  onCLose: () => void;
 }
 
 interface IRepayLoanFormState {
@@ -27,6 +31,7 @@ interface IRepayLoanFormState {
   currentValue: number;
   selectedValue: number;
   repayAmount: BigNumber;
+  repayManagementAddress: string | null;
 }
 
 export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanFormState> {
@@ -41,7 +46,8 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
       assetDetails: null,
       currentValue: 100,
       selectedValue: 100,
-      repayAmount: new BigNumber(0)
+      repayAmount: new BigNumber(0),
+      repayManagementAddress: null
     };
 
     this.selectedValueUpdate = new Subject<number>();
@@ -64,19 +70,26 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
       this.props.loanOrderState.accountAddress,
       this.props.loanOrderState.loanOrderHash
     ).then(collateralState => {
-      this.setState(
-        {
-          ...this.state,
-          minValue: collateralState.minValue,
-          maxValue: collateralState.maxValue,
-          assetDetails: AssetsDictionary.assets.get(this.props.loanOrderState.asset) || null,
-          currentValue: collateralState.currentValue,
-          selectedValue: collateralState.currentValue
-        },
-        () => {
-          this.selectedValueUpdate.next(this.state.selectedValue);
-        }
-      );
+      TorqueProvider.Instance.getLoanRepayManagementAddress(
+        this.props.walletDetails,
+        this.props.loanOrderState.accountAddress,
+        this.props.loanOrderState.loanOrderHash
+      ).then(repayManagementAddress => {
+        this.setState(
+          {
+            ...this.state,
+            minValue: collateralState.minValue,
+            maxValue: collateralState.maxValue,
+            assetDetails: AssetsDictionary.assets.get(this.props.loanOrderState.asset) || null,
+            currentValue: collateralState.currentValue,
+            selectedValue: collateralState.currentValue,
+            repayManagementAddress: repayManagementAddress
+          },
+          () => {
+            this.selectedValueUpdate.next(this.state.selectedValue);
+          }
+        );
+      });
     });
   }
 
@@ -86,10 +99,25 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
     snapshot?: any
   ): void {
     if (
+      prevProps.loanOrderState.accountAddress !== this.props.loanOrderState.accountAddress ||
       prevProps.loanOrderState.loanOrderHash !== this.props.loanOrderState.loanOrderHash ||
       prevState.selectedValue !== this.state.selectedValue
     ) {
-      this.selectedValueUpdate.next(this.state.selectedValue);
+      TorqueProvider.Instance.getLoanRepayManagementAddress(
+        this.props.walletDetails,
+        this.props.loanOrderState.accountAddress,
+        this.props.loanOrderState.loanOrderHash
+      ).then(repayManagementAddress => {
+        this.setState(
+          {
+            ...this.state,
+            repayManagementAddress: repayManagementAddress
+          },
+          () => {
+            this.selectedValueUpdate.next(this.state.selectedValue);
+          }
+        );
+      });
     }
   }
 
@@ -117,19 +145,44 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
 
           <hr className="repay-loan-form__delimiter" />
 
-          <div className="repay-loan-form__operation-result-container">
-            <img className="repay-loan-form__operation-result-img" src={this.state.assetDetails.logoSvg} />
-            <div className="repay-loan-form__operation-result-msg">You will repay</div>
-            <div className="repay-loan-form__operation-result-amount">
-              {this.state.repayAmount.toFixed(6)} {this.state.assetDetails.displayName}
+          {this.props.walletDetails.walletType === WalletType.NonWeb3 ? (
+            <div className="repay-loan-form__transfer-details">
+              <ActionViaTransferDetails
+                contractAddress={this.state.repayManagementAddress || ""}
+                ethAmount={new BigNumber(0)}
+              />
+              <div className="repay-loan-form__transfer-details-msg repay-loan-form__transfer-details-msg--warning">
+                Note: you should send funds ONLY from the wallet you control!
+              </div>
+              <div className="repay-loan-form__transfer-details-msg repay-loan-form__transfer-details-msg--warning">
+                If you want to partially repay loan use web3 wallet!
+              </div>
+              <div className="repay-loan-form__transfer-details-msg">
+                That's it! Once you've sent the funds, click Close to return to the dashboard.
+              </div>
             </div>
-          </div>
+          ) : (
+            <OpsEstimatedResult
+              assetDetails={this.state.assetDetails}
+              actionTitle="You will repay"
+              amount={this.state.repayAmount}
+              precision={6}
+            />
+          )}
         </section>
         <section className="dialog-actions">
           <div className="repay-loan-form__actions-container">
-            <button type="submit" className="btn btn-size--small">
-              Repay
-            </button>
+            {this.props.walletDetails.walletType === WalletType.NonWeb3 ? (
+              <button type="button" className="btn btn-size--small" onClick={this.props.onCLose}>
+                Close
+              </button>
+            ) : null}
+
+            {this.props.walletDetails.walletType !== WalletType.NonWeb3 ? (
+              <button type="submit" className="btn btn-size--small">
+                Repay
+              </button>
+            ) : null}
           </div>
         </section>
       </form>

@@ -3,6 +3,8 @@ import React, { Component } from "react";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
+import { IWalletDetails } from "../domain/IWalletDetails";
+import { WalletType } from "../domain/WalletType";
 import { TorqueProvider } from "../services/TorqueProvider";
 import { CollateralSlider } from "./CollateralSlider";
 
@@ -11,6 +13,7 @@ import ic_unsafe from "./../assets/images/ic_unsafe.svg";
 export interface IBorrowedFundsListItemProps {
   // firstInTheRow: boolean;
   // lastInTheRow: boolean;
+  walletDetails: IWalletDetails;
   item: IBorrowedFundsState;
 
   onManageCollateral: (item: IBorrowedFundsState) => void;
@@ -28,7 +31,7 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
   constructor(props: IBorrowedFundsListItemProps) {
     super(props);
 
-    this.state = { assetDetails: null, interestRate: new BigNumber(0), isInProgress: false };
+    this.state = { assetDetails: null, interestRate: new BigNumber(0), isInProgress: props.item.isInProgress };
   }
 
   public componentDidMount(): void {
@@ -56,7 +59,7 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
       return null;
     }
 
-    const isPositionSafe = this.props.item.collateralizedPercent.gt(new BigNumber(0.25));
+    const isPositionSafe = TorqueProvider.Instance.isPositionSafe(this.props.item);
     const isPositionSafeText = isPositionSafe ? "Safe" : "Unsafe";
     const collaterizedStateSelector = isPositionSafe
       ? "borrowed-funds-list-item__collateralized-state--safe"
@@ -142,7 +145,9 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
   }
 
   private onManageCollateral = () => {
-    this.props.onManageCollateral({ ...this.props.item });
+    if (this.props.walletDetails.walletType === WalletType.Web3) {
+      this.props.onManageCollateral({ ...this.props.item });
+    }
   };
 
   private onRepayLoan = () => {

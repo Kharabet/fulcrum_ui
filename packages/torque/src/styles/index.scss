@@ -14,7 +14,7 @@
 @import "components/asset-selector";
 @import "components/borrow-form";
 @import "components/borrow-via-transfer-address-qr-form";
-@import "components/borrow-via-transfer-details";
+@import "components/action-via-transfer-details";
 @import "components/borrowed-funds-list";
 @import "components/button";
 @import "components/button-landing";
@@ -27,6 +27,7 @@
 @import "components/manage-collateral-form";
 @import "components/on-chain-indicator";
 @import "components/on-chain-indicator.mobile";
+@import "components/ops-estimated-result";
 @import "components/ops-selector";
 @import "components/own-token-grid";
 @import "components/provider-menu";

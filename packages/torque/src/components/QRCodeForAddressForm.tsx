@@ -1,13 +1,13 @@
 import QRCode from "qrcode.react";
 import React, { Component } from "react";
 
-export interface IBorrowViaTransferAddressQRFormProps {
+export interface IQRCodeForAddressFormProps {
   address: string;
 
   onDecline: () => void;
 }
 
-export class BorrowViaTransferAddressQRForm extends Component<IBorrowViaTransferAddressQRFormProps> {
+export class QRCodeForAddressForm extends Component<IQRCodeForAddressFormProps> {
   public render() {
     return (
       <div className="borrow-via-transfer-address-qr-form">

@@ -1,21 +1,21 @@
 import React, { Component } from "react";
 import ReactModal from "react-modal";
-import { BorrowViaTransferAddressQRForm } from "./BorrowViaTransferAddressQRForm";
 import { DialogHeader } from "./DialogHeader";
+import { QRCodeForAddressForm } from "./QRCodeForAddressForm";
 
-export interface IBorrowViaTransferAddressQRDlgProps {
+export interface IQRCodeForAddressDlgProps {
   address: string;
 }
 
-interface IBorrowViaTransferAddressQRDlgState {
+interface IQRCodeForAddressDlgState {
   isOpen: boolean;
 }
 
-export class BorrowViaTransferAddressQRDlg extends Component<
-  IBorrowViaTransferAddressQRDlgProps,
-  IBorrowViaTransferAddressQRDlgState
+export class QRCodeForAddressDlg extends Component<
+  IQRCodeForAddressDlgProps,
+  IQRCodeForAddressDlgState
 > {
-  constructor(props: IBorrowViaTransferAddressQRDlgProps) {
+  constructor(props: IQRCodeForAddressDlgProps) {
     super(props);
 
     this.state = { isOpen: false };
@@ -30,7 +30,7 @@ export class BorrowViaTransferAddressQRDlg extends Component<
         onRequestClose={this.onFormDecline}
       >
         <DialogHeader title="QR code" onDecline={this.onFormDecline} />
-        <BorrowViaTransferAddressQRForm address={this.props.address} onDecline={this.onFormDecline} />
+        <QRCodeForAddressForm address={this.props.address} onDecline={this.onFormDecline} />
       </ReactModal>
     );
   }

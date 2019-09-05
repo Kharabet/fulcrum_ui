@@ -4,7 +4,7 @@ import { Subject } from "rxjs";
 import { Asset } from "../domain/Asset";
 import { BorrowRequest } from "../domain/BorrowRequest";
 import { WalletType } from "../domain/WalletType";
-import { BorrowViaTransferDetails } from "./BorrowViaTransferDetails";
+import { ActionViaTransferDetails } from "./ActionViaTransferDetails";
 import { CollateralTokenSelectorToggle } from "./CollateralTokenSelectorToggle";
 
 export interface IBorrowFormProps {
@@ -61,7 +61,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
           </div>
           {this.props.walletType === WalletType.NonWeb3 ? (
             <div className="borrow-form__transfer-details">
-              <BorrowViaTransferDetails contractAddress={"dai.tokenloan.eth"} ethAmount={new BigNumber(157)} />
+              <ActionViaTransferDetails contractAddress={"dai.tokenloan.eth"} ethAmount={this.state.inputAmountValue} />
               <div className="borrow-form__transfer-details-msg borrow-form__transfer-details-msg--warning">
                 Note: you should send funds ONLY from the wallet you control!
               </div>

@@ -1,9 +1,9 @@
-.borrow-via-transfer-details {
+.action-via-transfer-details {
   background-color: $color-gray-dark;
   border-radius: 16px;
   padding: 2rem;
 
-  .borrow-via-transfer-details__title {
+  .action-via-transfer-details__title {
     font-size: 1.5rem;
     font-weight: 600;
     font-style: normal;
@@ -14,18 +14,18 @@
 
     margin-bottom: 1.25rem;
 
-    .borrow-via-transfer-details__title-amount {
+    .action-via-transfer-details__title-amount {
       color: $color-white;
     }
   }
 
-  .borrow-via-transfer-details__input-container {
+  .action-via-transfer-details__input-container {
     display: block;
     position: relative;
 
     height: 3rem;
 
-    .borrow-via-transfer-details__input {
+    .action-via-transfer-details__input {
       width: 100%;
       height: 3rem;
 
@@ -42,7 +42,7 @@
       color: #a9b5c7;
     }
 
-    .borrow-via-transfer-details__input-actions {
+    .action-via-transfer-details__input-actions {
       display: flex;
       flex-direction: row;
       flex-wrap: nowrap;
@@ -55,7 +55,7 @@
       top: 0;
       transform: translateX(-100%);
 
-      .borrow-via-transfer-details__input-btn {
+      .action-via-transfer-details__input-btn {
         cursor: pointer;
 
         height: 2.375rem;

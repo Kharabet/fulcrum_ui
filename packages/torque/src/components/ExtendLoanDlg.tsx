@@ -42,6 +42,7 @@ export class ExtendLoanDlg extends Component<any, IExtendLoanDlgState> {
           walletDetails={this.state.walletDetails}
           loanOrderState={this.state.loanOrderState}
           onSubmit={this.onFormSubmit}
+          onCLose={this.onFormDecline}
         />
       </ReactModal>
     );

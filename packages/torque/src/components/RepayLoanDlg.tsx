@@ -42,6 +42,7 @@ export class RepayLoanDlg extends Component<any, IRepayLoanDlgState> {
           walletDetails={this.state.walletDetails}
           loanOrderState={this.state.loanOrderState}
           onSubmit={this.onFormSubmit}
+          onCLose={this.onFormDecline}
         />
       </ReactModal>
     );

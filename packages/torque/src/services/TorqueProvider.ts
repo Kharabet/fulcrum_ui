@@ -242,7 +242,8 @@ export class TorqueProvider {
         amount: BigNumber.random(),
         collateralizedPercent: BigNumber.random(),
         interestRate: BigNumber.random(),
-        hasManagementContract: true
+        hasManagementContract: true,
+        isInProgress: false
       },
       {
         accountAddress: walletDetails.walletAddress || "0x1a9f2F3697EbFB35ab0bf337fd7f847637931D4C",
@@ -251,7 +252,8 @@ export class TorqueProvider {
         amount: BigNumber.random(),
         collateralizedPercent: BigNumber.random(),
         interestRate: BigNumber.random(),
-        hasManagementContract: true
+        hasManagementContract: true,
+        isInProgress: false
       },
       {
         accountAddress: walletDetails.walletAddress || "0x1a9f2F3697EbFB35ab0bf337fd7f847637931D4C",
@@ -260,7 +262,8 @@ export class TorqueProvider {
         amount: BigNumber.random(),
         collateralizedPercent: BigNumber.random(),
         interestRate: BigNumber.random(),
-        hasManagementContract: true
+        hasManagementContract: true,
+        isInProgress: false
       },
       {
         accountAddress: walletDetails.walletAddress || "0x1a9f2F3697EbFB35ab0bf337fd7f847637931D4C",
@@ -269,7 +272,8 @@ export class TorqueProvider {
         amount: BigNumber.random(),
         collateralizedPercent: BigNumber.random(),
         interestRate: BigNumber.random(),
-        hasManagementContract: true
+        hasManagementContract: true,
+        isInProgress: false
       },
       {
         accountAddress: walletDetails.walletAddress || "0x1a9f2F3697EbFB35ab0bf337fd7f847637931D4C",
@@ -278,7 +282,8 @@ export class TorqueProvider {
         amount: BigNumber.random(),
         collateralizedPercent: BigNumber.random(),
         interestRate: BigNumber.random(),
-        hasManagementContract: true
+        hasManagementContract: true,
+        isInProgress: false
       },
       {
         accountAddress: walletDetails.walletAddress || "0x1a9f2F3697EbFB35ab0bf337fd7f847637931D4C",
@@ -287,7 +292,8 @@ export class TorqueProvider {
         amount: BigNumber.random(),
         collateralizedPercent: BigNumber.random(),
         interestRate: BigNumber.random(),
-        hasManagementContract: true
+        hasManagementContract: true,
+        isInProgress: false
       },
       {
         accountAddress: walletDetails.walletAddress || "0x1a9f2F3697EbFB35ab0bf337fd7f847637931D4C",
@@ -296,13 +302,18 @@ export class TorqueProvider {
         amount: BigNumber.random(),
         collateralizedPercent: BigNumber.random(),
         interestRate: BigNumber.random(),
-        hasManagementContract: true
+        hasManagementContract: true,
+        isInProgress: false
       }
     ];
   };
 
   public getLoanCollateralManagementManagementAddress = async (walletDetails: IWalletDetails, accountAddress: string, loanOrderHash: string): Promise<string | null> => {
     return "";
+  };
+
+  public isPositionSafe = (borrowedFundsState: IBorrowedFundsState): boolean => {
+    return BigNumber.random().gte(0.5);
   };
 
   public getLoanCollateralManagementParams = async (walletDetails: IWalletDetails, accountAddress: string, loanOrderHash: string): Promise<ICollateralManagementParams> => {
@@ -321,7 +332,7 @@ export class TorqueProvider {
   };
 
   public getLoanRepayManagementAddress = async (walletDetails: IWalletDetails, accountAddress: string, loanOrderHash: string): Promise<string | null> => {
-    return "";
+    return "repay1.nnn.tokenloan.eth";
   };
 
   public getLoanRepayParams = async (walletDetails: IWalletDetails, accountAddress: string, loanOrderHash: string): Promise<IRepayState> => {
@@ -337,7 +348,7 @@ export class TorqueProvider {
   };
 
   public getLoanExtendManagementAddress = async (walletDetails: IWalletDetails, accountAddress: string, loanOrderHash: string): Promise<string | null> => {
-    return "";
+    return "extend1.nnn.tokenloan.eth";
   };
 
   public getLoanExtendParams = async (walletDetails: IWalletDetails, accountAddress: string, loanOrderHash: string): Promise<IExtendState> => {
