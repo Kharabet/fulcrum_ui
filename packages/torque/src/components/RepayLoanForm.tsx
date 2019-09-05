@@ -6,11 +6,13 @@ import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
 import { IRepayEstimate } from "../domain/IRepayEstimate";
+import { IWalletDetails } from "../domain/IWalletDetails";
 import { RepayLoanRequest } from "../domain/RepayLoanRequest";
 import { TorqueProvider } from "../services/TorqueProvider";
 import { RepayLoanSlider } from "./RepayLoanSlider";
 
 export interface IRepayLoanFormProps {
+  walletDetails: IWalletDetails;
   loanOrderState: IBorrowedFundsState;
 
   onSubmit: (request: RepayLoanRequest) => void;
@@ -57,23 +59,25 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
   }
 
   public componentDidMount(): void {
-    TorqueProvider.Instance.getLoanRepayParams(this.props.loanOrderState.loanOrderHash).then(
-      collateralState => {
-        this.setState(
-          {
-            ...this.state,
-            minValue: collateralState.minValue,
-            maxValue: collateralState.maxValue,
-            assetDetails: AssetsDictionary.assets.get(this.props.loanOrderState.asset) || null,
-            currentValue: collateralState.currentValue,
-            selectedValue: collateralState.currentValue
-          },
-          () => {
-            this.selectedValueUpdate.next(this.state.selectedValue);
-          }
-        );
-      }
-    );
+    TorqueProvider.Instance.getLoanRepayParams(
+      this.props.walletDetails,
+      this.props.loanOrderState.accountAddress,
+      this.props.loanOrderState.loanOrderHash
+    ).then(collateralState => {
+      this.setState(
+        {
+          ...this.state,
+          minValue: collateralState.minValue,
+          maxValue: collateralState.maxValue,
+          assetDetails: AssetsDictionary.assets.get(this.props.loanOrderState.asset) || null,
+          currentValue: collateralState.currentValue,
+          selectedValue: collateralState.currentValue
+        },
+        () => {
+          this.selectedValueUpdate.next(this.state.selectedValue);
+        }
+      );
+    });
   }
 
   public componentDidUpdate(
@@ -115,9 +119,7 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
 
           <div className="repay-loan-form__operation-result-container">
             <img className="repay-loan-form__operation-result-img" src={this.state.assetDetails.logoSvg} />
-            <div className="repay-loan-form__operation-result-msg">
-              You will repay
-            </div>
+            <div className="repay-loan-form__operation-result-msg">You will repay</div>
             <div className="repay-loan-form__operation-result-amount">
               {this.state.repayAmount.toFixed(6)} {this.state.assetDetails.displayName}
             </div>
@@ -137,7 +139,9 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
   private rxGetEstimate = (selectedValue: number): Observable<IRepayEstimate> => {
     return new Observable<IRepayEstimate>(observer => {
       TorqueProvider.Instance.getLoanRepayEstimate(
-        this.props.loanOrderState.asset,
+        this.props.walletDetails,
+        this.props.loanOrderState.accountAddress,
+        this.props.loanOrderState.loanOrderHash,
         selectedValue
       ).then(value => {
         observer.next(value);
@@ -155,7 +159,12 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
 
   public onSubmitClick = (event: FormEvent<HTMLFormElement>) => {
     this.props.onSubmit(
-      new RepayLoanRequest(this.props.loanOrderState.loanOrderHash, new BigNumber(this.state.currentValue))
+      new RepayLoanRequest(
+        this.props.walletDetails,
+        this.props.loanOrderState.accountAddress,
+        this.props.loanOrderState.loanOrderHash,
+        new BigNumber(this.state.currentValue)
+      )
     );
   };
 }

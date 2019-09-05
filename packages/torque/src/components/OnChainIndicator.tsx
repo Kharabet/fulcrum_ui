@@ -143,24 +143,30 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
               alt={providerTypeDetails.displayName}
               onClick={this.props.doNetworkConnect}
             />
-            {walletAddressText ? (
-              isSupportedNetwork && accountText && etherscanURL ? (
-                <a
-                  className="on-chain-indicator__wallet-address"
-                  href={`${etherscanURL}address/${accountText}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {walletAddressText}
-                </a>
-              ) : (
-                <span className="on-chain-indicator__wallet-address" onClick={this.props.doNetworkConnect}>
-                  {walletAddressText}
-                </span>
-              )
-            ) : (
-              ``
-            )}
+            <div className="on-chain-indicator__description">
+              <div>{providerTypeDetails.displayName}</div>
+              <div>
+                {walletAddressText ? (
+                  isSupportedNetwork && accountText && etherscanURL ? (
+                    <a
+                      className="on-chain-indicator__wallet-address"
+                      href={`${etherscanURL}address/${accountText}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {walletAddressText}
+                    </a>
+                  ) : (
+                    <span className="on-chain-indicator__wallet-address" onClick={this.props.doNetworkConnect}>
+                      {walletAddressText}
+                    </span>
+                  )
+                ) : (
+                  ``
+                )}
+              </div>
+            </div>
+
           </React.Fragment>
         );
       } else {

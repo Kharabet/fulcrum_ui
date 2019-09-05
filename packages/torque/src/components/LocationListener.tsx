@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { TorqueProvider } from "../services/TorqueProvider";
 
 export interface ILocationListenerProps {
-  doNetworkConnect: () => void;
+  doNetworkConnect: (destinationAbbr: string) => void;
 }
 
 export class LocationListener extends Component<ILocationListenerProps> {
@@ -19,14 +19,21 @@ export class LocationListener extends Component<ILocationListenerProps> {
     this.context.router.history.unlisten();
   }
 
-  public handleLocationChange = (doNetworkConnect: () => void) => (location: any) => {
-    if (location.pathname === "/lend" || location.pathname === "/trade") {
-      if (!TorqueProvider.Instance.contractsSource || !TorqueProvider.Instance.contractsSource.canWrite) {
-        doNetworkConnect();
-      }
-    }
+  public handleLocationChange = (doNetworkConnect: (destinationAbbr: string) => void) => (location: any) => {
+    // if (location.pathname.startsWith("/borrow/")) {
+    //   if (!TorqueProvider.Instance.contractsSource || !TorqueProvider.Instance.contractsSource.canWrite) {
+    //     doNetworkConnect("b");
+    //   }
+    // }
+    //
+    // if (location.pathname.startsWith("/dashboard/")) {
+    //   if (!TorqueProvider.Instance.contractsSource || !TorqueProvider.Instance.contractsSource.canWrite) {
+    //     doNetworkConnect("t");
+    //   }
+    // }
+
     // console.log(`location`, location.pathname);
-  }
+  };
 
   public render() {
     return this.props.children;

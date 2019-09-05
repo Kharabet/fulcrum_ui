@@ -12,6 +12,7 @@ import { MaintenancePage } from "../pages/MaintenancePage";
 import { WalletSelectionPage } from "../pages/WalletSelectionPage";
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { TorqueProviderEvents } from "../services/events/TorqueProviderEvents";
+import { NavService } from "../services/NavService";
 import { TorqueProvider } from "../services/TorqueProvider";
 import { LocationListener } from "./LocationListener";
 
@@ -26,7 +27,7 @@ if (isMainnetProd) {
 }
 
 interface IAppRouterState {
-  isProviderMenuModalOpen: boolean;
+//  isProviderMenuModalOpen: boolean;
   selectedProviderType: ProviderType;
   isLoading: boolean;
   web3: Web3Wrapper| null;
@@ -37,7 +38,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
     super(props);
 
     this.state = {
-      isProviderMenuModalOpen: false,
+//      isProviderMenuModalOpen: false,
       isLoading: false,
       selectedProviderType: TorqueProvider.Instance.providerType,
       web3: TorqueProvider.Instance.web3Wrapper
@@ -78,7 +79,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
                     <LocationListener doNetworkConnect={this.doNetworkConnect}>
                       <Switch>
                         <Route exact={true} path="/" component={LandingPage} />
-                        <Route exact={true} path="/wallet/:destinationAbbr" render={props => <WalletSelectionPage {...props} onSelectProvider={this.onProviderTypeSelect} isLoading={this.state.isLoading} doNetworkConnect={undefined} />} />
+                        <Route exact={true} path="/wallet/:destinationAbbr" render={props => <WalletSelectionPage {...props} onSelectProvider={this.onProviderTypeSelect} isLoading={this.state.isLoading} />} />
                         <Route exact={true} path="/borrow/:walletTypeAbbr" render={props => <BorrowPage {...props} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} />} />
                         <Route exact={true} path="/dashboard/:walletTypeAbbr" render={props => <DashboardPage {...props} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} />} />
                         <Route exact={true} path="/dashboard/:walletTypeAbbr/:walletAddress" render={props => <DashboardPage {...props} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} />} />
@@ -99,8 +100,9 @@ export class AppRouter extends Component<any, IAppRouterState> {
     );
   }
 
-  public doNetworkConnect = () => {
-    this.setState({ ...this.state, isProviderMenuModalOpen: true });
+  public doNetworkConnect = (destinationAbbr: string) => {
+    NavService.Instance.History.push(NavService.Instance.getWalletAddress(destinationAbbr));
+    // this.setState({ ...this.state, isProviderMenuModalOpen: true });
   };
 
   private onProviderTypeSelect = async (providerType: ProviderType) => {
@@ -113,7 +115,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
       this.setState({
         ...this.state,
         isLoading: true,
-        isProviderMenuModalOpen: false
+//        isProviderMenuModalOpen: false
       }, async () => {
         await TorqueProvider.Instance.setWeb3Provider(providerType);
 
@@ -127,14 +129,14 @@ export class AppRouter extends Component<any, IAppRouterState> {
     } else {
       this.setState({
         ...this.state,
-        isProviderMenuModalOpen: false
+//        isProviderMenuModalOpen: false
       });
     }
   };
 
-  public onRequestClose = () => {
-    this.setState({ ...this.state, isProviderMenuModalOpen: false });
-  };
+  // public onRequestClose = () => {
+  //   this.setState({ ...this.state, isProviderMenuModalOpen: false });
+  // };
 
   public onProviderChanged = async (event: ProviderChangedEvent) => {
     this.setState({

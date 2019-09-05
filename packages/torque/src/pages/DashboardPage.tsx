@@ -8,6 +8,7 @@ import { WalletAddressDlg } from "../components/WalletAddressDlg";
 import { WalletAddressHint } from "../components/WalletAddressHint";
 import { WalletAddressLargeForm } from "../components/WalletAddressLargeForm";
 import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
+import { IWalletDetails } from "../domain/IWalletDetails";
 import { WalletType, walletTypeAbbrToWalletType } from "../domain/WalletType";
 import { Footer } from "../layout/Footer";
 import { HeaderHome } from "../layout/HeaderHome";
@@ -20,17 +21,19 @@ export interface IDashboardPageRouteParams {
 }
 
 export interface IDashboardPageParams {
-  doNetworkConnect?: () => void;
+  doNetworkConnect?: (destinationAbbr: string) => void;
   isLoading: boolean;
 }
 
 interface IDashboardPageState {
-  walletAddress: string | undefined;
-  walletType: WalletType;
+  walletDetails: IWalletDetails;
   items: IBorrowedFundsState[];
 }
 
-export class DashboardPage extends PureComponent<IDashboardPageParams & RouteComponentProps<IDashboardPageRouteParams>, IDashboardPageState> {
+export class DashboardPage extends PureComponent<
+  IDashboardPageParams & RouteComponentProps<IDashboardPageRouteParams>,
+  IDashboardPageState
+> {
   private manageCollateralDlgRef: RefObject<ManageCollateralDlg>;
   private repayLoanDlgRef: RefObject<RepayLoanDlg>;
   private extendLoanDlgRef: RefObject<ExtendLoanDlg>;
@@ -44,17 +47,19 @@ export class DashboardPage extends PureComponent<IDashboardPageParams & RouteCom
     this.extendLoanDlgRef = React.createRef();
     this.walletAddressDlgRef = React.createRef();
 
-    this.state = { walletAddress: "", walletType: WalletType.Unknown, items: [] };
+    this.state = { walletDetails: { walletType: WalletType.Unknown, walletAddress: "" }, items: [] };
   }
 
   private async derivedUpdate() {
-    const walletType = walletTypeAbbrToWalletType(this.props.match.params.walletTypeAbbr);
-    const items = await TorqueProvider.Instance.getLoansList(walletType, this.state.walletAddress);
+    const walletDetails = {
+      walletType: walletTypeAbbrToWalletType(this.props.match.params.walletTypeAbbr),
+      walletAddress: this.props.match.params.walletAddress
+    };
+    const items = await TorqueProvider.Instance.getLoansList(walletDetails);
 
     this.setState({
       ...this.state,
-      walletAddress: this.props.match.params.walletAddress,
-      walletType: walletType,
+      walletDetails: walletDetails,
       items: items
     });
   }
@@ -63,8 +68,12 @@ export class DashboardPage extends PureComponent<IDashboardPageParams & RouteCom
     this.derivedUpdate();
   }
 
-  public componentDidUpdate(prevProps: Readonly<IDashboardPageParams & RouteComponentProps<IDashboardPageRouteParams>>, prevState: Readonly<IDashboardPageState>, snapshot?: any): void {
-    if (this.state.walletAddress !== prevState.walletAddress) {
+  public componentDidUpdate(
+    prevProps: Readonly<IDashboardPageParams & RouteComponentProps<IDashboardPageRouteParams>>,
+    prevState: Readonly<IDashboardPageState>,
+    snapshot?: any
+  ): void {
+    if (this.state.walletDetails.walletAddress !== prevState.walletDetails.walletAddress) {
       this.derivedUpdate();
     }
   }
@@ -77,19 +86,17 @@ export class DashboardPage extends PureComponent<IDashboardPageParams & RouteCom
         <ExtendLoanDlg ref={this.extendLoanDlgRef} />
         <WalletAddressDlg ref={this.walletAddressDlgRef} />
         <div className="dashboard-page">
-          <HeaderHome isLoading={this.props.isLoading} doNetworkConnect={this.props.doNetworkConnect} />
+          <HeaderHome isLoading={this.props.isLoading} doNetworkConnect={this.doNetworkConnect} />
           <div className="dashboard-page__main">
-            {this.props.match.params.walletAddress ? (
+            {this.state.walletDetails.walletAddress ? (
               <React.Fragment>
-                {
-                  this.state.walletType === WalletType.NonWeb3 ? (
-                    <WalletAddressHint
-                      walletAddress={this.props.match.params.walletAddress}
-                      onSelectNewWalletAddress={this.onSelectNewWalletAddress}
-                      onClearWalletAddress={this.onClearWalletAddress}
-                    />
-                  ) : null
-                }
+                {this.state.walletDetails.walletType === WalletType.NonWeb3 ? (
+                  <WalletAddressHint
+                    walletAddress={this.state.walletDetails.walletAddress || ""}
+                    onSelectNewWalletAddress={this.onSelectNewWalletAddress}
+                    onClearWalletAddress={this.onClearWalletAddress}
+                  />
+                ) : null}
                 <BorrowedFundsList
                   items={this.state.items}
                   onManageCollateral={this.onManageCollateral}
@@ -99,13 +106,11 @@ export class DashboardPage extends PureComponent<IDashboardPageParams & RouteCom
               </React.Fragment>
             ) : (
               <React.Fragment>
-                {
-                  this.state.walletType === WalletType.NonWeb3 ? (
-                    <div className="dashboard-page__form">
-                      <WalletAddressLargeForm onSubmit={this.onWalletAddressChange} />
-                    </div>
-                  ) : null
-                }
+                {this.state.walletDetails.walletType === WalletType.NonWeb3 ? (
+                  <div className="dashboard-page__form">
+                    <WalletAddressLargeForm onSubmit={this.onWalletAddressChange} />
+                  </div>
+                ) : null}
               </React.Fragment>
             )}
           </div>
@@ -127,21 +132,17 @@ export class DashboardPage extends PureComponent<IDashboardPageParams & RouteCom
   };
 
   private onClearWalletAddress = () => {
-    NavService.Instance.History.push(
-      NavService.Instance.getDashboardAddress(WalletType.NonWeb3, "")
-    );
+    NavService.Instance.History.push(NavService.Instance.getDashboardAddress(WalletType.NonWeb3, ""));
   };
 
   private onWalletAddressChange = (walletAddress: string) => {
-    NavService.Instance.History.push(
-      NavService.Instance.getDashboardAddress(WalletType.NonWeb3, walletAddress)
-    );
+    NavService.Instance.History.push(NavService.Instance.getDashboardAddress(WalletType.NonWeb3, walletAddress));
   };
 
   private onRepayLoan = async (item: IBorrowedFundsState) => {
     if (this.repayLoanDlgRef.current) {
       try {
-        const repayLoanRequest = await this.repayLoanDlgRef.current.getValue(item);
+        const repayLoanRequest = await this.repayLoanDlgRef.current.getValue(this.state.walletDetails, item);
         await TorqueProvider.Instance.doRepayLoan(repayLoanRequest);
       } finally {
         this.repayLoanDlgRef.current.hide();
@@ -152,7 +153,7 @@ export class DashboardPage extends PureComponent<IDashboardPageParams & RouteCom
   private onExtendLoan = async (item: IBorrowedFundsState) => {
     if (this.extendLoanDlgRef.current) {
       try {
-        const extendLoanRequest = await this.extendLoanDlgRef.current.getValue(item);
+        const extendLoanRequest = await this.extendLoanDlgRef.current.getValue(this.state.walletDetails, item);
         await TorqueProvider.Instance.doExtendLoan(extendLoanRequest);
       } finally {
         this.extendLoanDlgRef.current.hide();
@@ -163,11 +164,20 @@ export class DashboardPage extends PureComponent<IDashboardPageParams & RouteCom
   private onManageCollateral = async (item: IBorrowedFundsState) => {
     if (this.manageCollateralDlgRef.current) {
       try {
-        const manageCollateralRequest = await this.manageCollateralDlgRef.current.getValue(item);
+        const manageCollateralRequest = await this.manageCollateralDlgRef.current.getValue(
+          this.state.walletDetails,
+          item
+        );
         await TorqueProvider.Instance.setLoanCollateral(manageCollateralRequest);
       } finally {
         this.manageCollateralDlgRef.current.hide();
       }
+    }
+  };
+
+  private doNetworkConnect = () => {
+    if (this.props.doNetworkConnect) {
+      this.props.doNetworkConnect("b");
     }
   };
 }

@@ -13,11 +13,11 @@ import { IExtendEstimate } from "../domain/IExtendEstimate";
 import { IExtendState } from "../domain/IExtendState";
 import { IRepayEstimate } from "../domain/IRepayEstimate";
 import { IRepayState } from "../domain/IRepayState";
+import { IWalletDetails } from "../domain/IWalletDetails";
 import { IWeb3ProviderSettings } from "../domain/IWeb3ProviderSettings";
 import { ManageCollateralRequest } from "../domain/ManageCollateralRequest";
 import { ProviderType } from "../domain/ProviderType";
 import { RepayLoanRequest } from "../domain/RepayLoanRequest";
-import { WalletType } from "../domain/WalletType";
 import { Web3ConnectionFactory } from "../domain/Web3ConnectionFactory";
 import { ContractsSource } from "./ContractsSource";
 // import { ProviderChangedEvent } from "./events/ProviderChangedEvent";
@@ -220,70 +220,96 @@ export class TorqueProvider {
     return result;
   }
 
-  public submitBorrowRequest = async (borrowRequest: BorrowRequest) => {
+  public getLimitedBorrowAmount = async (borrowRequest: BorrowRequest): Promise<BigNumber> => {
+    return borrowRequest.borrowAmount.minus(new BigNumber(-1));
+  };
+
+  public doBorrow = async (borrowRequest: BorrowRequest) => {
     return ;
   };
 
-  public getLoansList = async (walletType: WalletType, walletAddress: string | undefined): Promise<IBorrowedFundsState[]> => {
+  public doDeployManagementContract = async (walletDetails: IWalletDetails) => {
+    return ;
+  };
+
+  public getLoansList = async (walletDetails: IWalletDetails): Promise<IBorrowedFundsState[]> => {
     return [
       {
         // TEST ORDER 01
+        accountAddress: walletDetails.walletAddress || "0x1a9f2F3697EbFB35ab0bf337fd7f847637931D4C",
         loanOrderHash: "0x0061583F7764A09B35F5594B5AC5062E090614B7FE2B5EF96ACF16496E8B914C",
         asset: Asset.ETH,
         amount: BigNumber.random(),
         collateralizedPercent: BigNumber.random(),
-        interestRate: BigNumber.random()
+        interestRate: BigNumber.random(),
+        hasManagementContract: true
       },
       {
+        accountAddress: walletDetails.walletAddress || "0x1a9f2F3697EbFB35ab0bf337fd7f847637931D4C",
         loanOrderHash: "0x2F099560938A4831006D674082201DC31762F2C3926640D4DB3748BDB1A813BF",
         asset: Asset.WBTC,
         amount: BigNumber.random(),
         collateralizedPercent: BigNumber.random(),
-        interestRate: BigNumber.random()
+        interestRate: BigNumber.random(),
+        hasManagementContract: true
       },
       {
+        accountAddress: walletDetails.walletAddress || "0x1a9f2F3697EbFB35ab0bf337fd7f847637931D4C",
         loanOrderHash: "0x0A708B339C4472EF9A348269FACAD686E18345EC1342E8C171CCB0DF7DB13A28",
         asset: Asset.DAI,
         amount: BigNumber.random(),
         collateralizedPercent: BigNumber.random(),
-        interestRate: BigNumber.random()
+        interestRate: BigNumber.random(),
+        hasManagementContract: true
       },
       {
+        accountAddress: walletDetails.walletAddress || "0x1a9f2F3697EbFB35ab0bf337fd7f847637931D4C",
         loanOrderHash: "0xAA81E9EA1EABE0EBB47A6557716839A7C149864220F10EB628E4DEA6249262DE",
         asset: Asset.BAT,
         amount: BigNumber.random(),
         collateralizedPercent: BigNumber.random(),
-        interestRate: BigNumber.random()
+        interestRate: BigNumber.random(),
+        hasManagementContract: true
       },
       {
+        accountAddress: walletDetails.walletAddress || "0x1a9f2F3697EbFB35ab0bf337fd7f847637931D4C",
         loanOrderHash: "0xD826732AC58AB77E4EE0EB80B95D8BC9053EDAB328E5E4DDEAF6DA9BF1A6FCEB",
         asset: Asset.MKR,
         amount: BigNumber.random(),
         collateralizedPercent: BigNumber.random(),
-        interestRate: BigNumber.random()
+        interestRate: BigNumber.random(),
+        hasManagementContract: true
       },
       {
+        accountAddress: walletDetails.walletAddress || "0x1a9f2F3697EbFB35ab0bf337fd7f847637931D4C",
         loanOrderHash: "0xE6F8A9C8CDF06CA7C73ACD0B1F414EDB4CE23AD8F9144D22463686A11DD53561",
         asset: Asset.KNC,
         amount: BigNumber.random(),
         collateralizedPercent: BigNumber.random(),
-        interestRate: BigNumber.random()
+        interestRate: BigNumber.random(),
+        hasManagementContract: true
       },
       {
+        accountAddress: walletDetails.walletAddress || "0x1a9f2F3697EbFB35ab0bf337fd7f847637931D4C",
         loanOrderHash: "0xA4B2E54FDA03335C1EF63A939A06E2192E0661F923E7C048CDB94B842016CA61",
         asset: Asset.USDC,
         amount: BigNumber.random(),
         collateralizedPercent: BigNumber.random(),
-        interestRate: BigNumber.random()
+        interestRate: BigNumber.random(),
+        hasManagementContract: true
       }
     ];
   };
 
-  public getLoanCollateralManagementParams = async (loanOrderHash: string): Promise<ICollateralManagementParams> => {
+  public getLoanCollateralManagementManagementAddress = async (walletDetails: IWalletDetails, accountAddress: string, loanOrderHash: string): Promise<string | null> => {
+    return "";
+  };
+
+  public getLoanCollateralManagementParams = async (walletDetails: IWalletDetails, accountAddress: string, loanOrderHash: string): Promise<ICollateralManagementParams> => {
     return { minValue: 0, maxValue: 100, currentValue: 66 };
   };
 
-  public getLoanCollateralChangeEstimate = async (loanOrderHash: string, loanValue: number, newValue: number): Promise<ICollateralChangeEstimate> => {
+  public getLoanCollateralChangeEstimate = async (walletDetails: IWalletDetails, accountAddress: string, loanOrderHash: string, loanValue: number, newValue: number): Promise<ICollateralChangeEstimate> => {
     return {
       diffAmount: new BigNumber(Math.abs(newValue - loanValue) * 2 ),
       liquidationPrice: new BigNumber(250 - (newValue - loanValue))
@@ -294,11 +320,15 @@ export class TorqueProvider {
     return ;
   };
 
-  public getLoanRepayParams = async (loanOrderHash: string): Promise<IRepayState> => {
+  public getLoanRepayManagementAddress = async (walletDetails: IWalletDetails, accountAddress: string, loanOrderHash: string): Promise<string | null> => {
+    return "";
+  };
+
+  public getLoanRepayParams = async (walletDetails: IWalletDetails, accountAddress: string, loanOrderHash: string): Promise<IRepayState> => {
     return { minValue: 0, maxValue: 100, currentValue: 66 };
   };
 
-  public getLoanRepayEstimate = async (loanOrderHash: string, repayPercent: number): Promise<IRepayEstimate> => {
+  public getLoanRepayEstimate = async (walletDetails: IWalletDetails, accountAddress: string, loanOrderHash: string, repayPercent: number): Promise<IRepayEstimate> => {
     return { repayAmount: new BigNumber(repayPercent * 3) };
   };
 
@@ -306,11 +336,15 @@ export class TorqueProvider {
     return ;
   };
 
-  public getLoanExtendParams = async (loanOrderHash: string): Promise<IExtendState> => {
+  public getLoanExtendManagementAddress = async (walletDetails: IWalletDetails, accountAddress: string, loanOrderHash: string): Promise<string | null> => {
+    return "";
+  };
+
+  public getLoanExtendParams = async (walletDetails: IWalletDetails, accountAddress: string, loanOrderHash: string): Promise<IExtendState> => {
     return { minValue: 1, maxValue: 365, currentValue: 1 };
   };
 
-  public getLoanExtendEstimate = async (loanOrderHash: string, daysToAdd: number): Promise<IExtendEstimate> => {
+  public getLoanExtendEstimate = async (walletDetails: IWalletDetails, accountAddress: string, loanOrderHash: string, daysToAdd: number): Promise<IExtendEstimate> => {
     return { depositAmount: new BigNumber(daysToAdd * 2) };
   };
 

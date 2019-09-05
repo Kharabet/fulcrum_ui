@@ -1,12 +1,14 @@
 import React, { Component } from "react";
 import ReactModal from "react-modal";
 import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
+import { IWalletDetails } from "../domain/IWalletDetails";
 import { RepayLoanRequest } from "../domain/RepayLoanRequest";
 import { DialogHeader } from "./DialogHeader";
 import { RepayLoanForm } from "./RepayLoanForm";
 
 interface IRepayLoanDlgState {
   isOpen: boolean;
+  walletDetails: IWalletDetails | null;
   loanOrderState: IBorrowedFundsState | null;
 
   executorParams: { resolve: (value?: RepayLoanRequest) => void; reject: (reason?: any) => void } | null;
@@ -16,10 +18,14 @@ export class RepayLoanDlg extends Component<any, IRepayLoanDlgState> {
   public constructor(props: any, context?: any) {
     super(props, context);
 
-    this.state = { isOpen: false, loanOrderState: null, executorParams: null };
+    this.state = { isOpen: false, walletDetails: null, loanOrderState: null, executorParams: null };
   }
 
   public render() {
+    if (this.state.walletDetails === null) {
+      return null;
+    }
+
     if (this.state.loanOrderState === null) {
       return null;
     }
@@ -33,6 +39,7 @@ export class RepayLoanDlg extends Component<any, IRepayLoanDlgState> {
       >
         <DialogHeader title="Repay Loan" onDecline={this.onFormDecline} />
         <RepayLoanForm
+          walletDetails={this.state.walletDetails}
           loanOrderState={this.state.loanOrderState}
           onSubmit={this.onFormSubmit}
         />
@@ -40,7 +47,7 @@ export class RepayLoanDlg extends Component<any, IRepayLoanDlgState> {
     );
   }
 
-  public getValue = async (item: IBorrowedFundsState): Promise<RepayLoanRequest> => {
+  public getValue = async (walletDetails: IWalletDetails, item: IBorrowedFundsState): Promise<RepayLoanRequest> => {
     if (this.state.isOpen) {
       return new Promise<RepayLoanRequest>((resolve, reject) => reject());
     }
@@ -50,6 +57,7 @@ export class RepayLoanDlg extends Component<any, IRepayLoanDlgState> {
         ...this.state,
         isOpen: true,
         executorParams: { resolve: resolve, reject: reject },
+        walletDetails: walletDetails,
         loanOrderState: item
       });
     });

@@ -6,11 +6,13 @@ import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
 import { ICollateralChangeEstimate } from "../domain/ICollateralChangeEstimate";
+import { IWalletDetails } from "../domain/IWalletDetails";
 import { ManageCollateralRequest } from "../domain/ManageCollateralRequest";
 import { TorqueProvider } from "../services/TorqueProvider";
 import { CollateralSlider } from "./CollateralSlider";
 
 export interface IManageCollateralFormProps {
+  walletDetails: IWalletDetails;
   loanOrderState: IBorrowedFundsState;
 
   onSubmit: (request: ManageCollateralRequest) => void;
@@ -63,24 +65,26 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
   }
 
   public componentDidMount(): void {
-    TorqueProvider.Instance.getLoanCollateralManagementParams(this.props.loanOrderState.loanOrderHash).then(
-      collateralState => {
-        this.setState(
-          {
-            ...this.state,
-            minValue: collateralState.minValue,
-            maxValue: collateralState.maxValue,
-            assetDetails: AssetsDictionary.assets.get(this.props.loanOrderState.asset) || null,
-            loanValue: collateralState.currentValue,
-            currentValue: collateralState.currentValue,
-            selectedValue: collateralState.currentValue
-          },
-          () => {
-            this.selectedValueUpdate.next(this.state.selectedValue);
-          }
-        );
-      }
-    );
+    TorqueProvider.Instance.getLoanCollateralManagementParams(
+      this.props.walletDetails,
+      this.props.loanOrderState.accountAddress,
+      this.props.loanOrderState.loanOrderHash
+    ).then(collateralState => {
+      this.setState(
+        {
+          ...this.state,
+          minValue: collateralState.minValue,
+          maxValue: collateralState.maxValue,
+          assetDetails: AssetsDictionary.assets.get(this.props.loanOrderState.asset) || null,
+          loanValue: collateralState.currentValue,
+          currentValue: collateralState.currentValue,
+          selectedValue: collateralState.currentValue
+        },
+        () => {
+          this.selectedValueUpdate.next(this.state.selectedValue);
+        }
+      );
+    });
   }
 
   public componentDidUpdate(
@@ -162,7 +166,9 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
   private rxGetEstimate = (selectedValue: number): Observable<ICollateralChangeEstimate> => {
     return new Observable<ICollateralChangeEstimate>(observer => {
       TorqueProvider.Instance.getLoanCollateralChangeEstimate(
-        this.props.loanOrderState.asset,
+        this.props.walletDetails,
+        this.props.loanOrderState.accountAddress,
+        this.props.loanOrderState.loanOrderHash,
         this.state.loanValue,
         selectedValue
       ).then(value => {
@@ -181,7 +187,12 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
 
   public onSubmitClick = (event: FormEvent<HTMLFormElement>) => {
     this.props.onSubmit(
-      new ManageCollateralRequest(this.props.loanOrderState.loanOrderHash, new BigNumber(this.state.currentValue))
+      new ManageCollateralRequest(
+        this.props.walletDetails,
+        this.props.loanOrderState.accountAddress,
+        this.props.loanOrderState.loanOrderHash,
+        new BigNumber(this.state.currentValue)
+      )
     );
   };
 }

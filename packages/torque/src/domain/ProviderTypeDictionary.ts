@@ -1,12 +1,12 @@
 import { ProviderType } from "./ProviderType";
 import { ProviderTypeDetails } from "./ProviderTypeDetails";
 
-import bitski_logo from "../assets/images/logo_big___bitski.svg";
-import fortmatic_logo from "../assets/images/logo_big___fortmatic.svg";
-import metamask_logo from "../assets/images/logo_big___metamask.svg";
-import portis_logo from "../assets/images/logo_big___portis.svg";
-import squarelink_logo from "../assets/images/logo_big___squarelink.svg";
-import walletconnect_logo from "../assets/images/logo_big___wallectconnect.svg";
+import bitski_logo from "../assets/images/ic_bitski.svg";
+import fortmatic_logo from "../assets/images/ic_formatic.svg";
+import metamask_logo from "../assets/images/ic_metamask.svg";
+import portis_logo from "../assets/images/ic_portis.svg";
+import squarelink_logo from "../assets/images/ic_squarelink.svg";
+import walletconnect_logo from "../assets/images/ic_walletconnect.svg";
 
 export class ProviderTypeDictionary {
   public static providerTypes: Map<ProviderType, ProviderTypeDetails> = new Map<ProviderType, ProviderTypeDetails>([

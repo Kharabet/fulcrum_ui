@@ -4,6 +4,9 @@
 }
 
 .on-chain-indicator__container {
+  display: flex;
+  flex-direction: row;
+
   height: 3rem;
   margin: 0.5rem 0;
 
@@ -19,12 +22,20 @@
     display: inline-block;
     text-align: center;
     vertical-align: top;
-    background-color: #3b364b;
 
-    height: 1rem;
+    height: 2rem;
     line-height: 2rem;
 
     margin: 0.5rem 1rem;
+  }
+
+  .on-chain-indicator__description {
+    display: flex;
+    flex-direction: column;
+
+    padding: 0.5rem 1rem 0.5rem 0;
+
+    text-align: left;
   }
 
   .on-chain-indicator__provider-txt {
@@ -49,9 +60,7 @@
     text-align: center;
     vertical-align: top;
 
-    border-left: solid 1px #758295;
-
-    line-height: 2rem;
+    line-height: 1rem;
 
     color: #758295;
     font-size: 0.75rem;
@@ -59,8 +68,6 @@
     font-style: normal;
     font-stretch: normal;
     letter-spacing: normal;
-
-    padding: 0 1rem;
     
     text-decoration: none;
   }

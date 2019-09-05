@@ -14,7 +14,7 @@ export interface IBorrowPageRouteParams {
 }
 
 export interface IBorrowPageParams {
-  doNetworkConnect?: () => void;
+  doNetworkConnect?: (destinationAbbr: string) => void;
   isLoading: boolean;
 }
 
@@ -34,7 +34,7 @@ export class BorrowPage extends PureComponent<IBorrowPageParams & RouteComponent
       <React.Fragment>
         <BorrowDlg ref={this.borrowDlgRef} />
         <div className="borrow-page">
-          <HeaderHome isLoading={this.props.isLoading} doNetworkConnect={this.props.doNetworkConnect} />
+          <HeaderHome isLoading={this.props.isLoading} doNetworkConnect={this.doNetworkConnect} />
           <div className="borrow-page__main">
             <AssetSelector walletType={walletType} onSelectAsset={this.onSelectAsset} />
           </div>
@@ -62,13 +62,19 @@ export class BorrowPage extends PureComponent<IBorrowPageParams & RouteComponent
               : null;
 
           if (accountAddress) {
-            await TorqueProvider.Instance.submitBorrowRequest(borrowRequest);
+            await TorqueProvider.Instance.doBorrow(borrowRequest);
             NavService.Instance.History.push(NavService.Instance.getDashboardAddress(walletType, accountAddress));
           }
         }
       } finally {
         await this.borrowDlgRef.current.hide();
       }
+    }
+  };
+
+  private doNetworkConnect = () => {
+    if (this.props.doNetworkConnect) {
+      this.props.doNetworkConnect("b");
     }
   };
 }

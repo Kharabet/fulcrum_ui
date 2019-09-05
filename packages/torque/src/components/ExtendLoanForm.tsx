@@ -7,10 +7,12 @@ import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { ExtendLoanRequest } from "../domain/ExtendLoanRequest";
 import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
 import { IExtendEstimate } from "../domain/IExtendEstimate";
+import { IWalletDetails } from "../domain/IWalletDetails";
 import { TorqueProvider } from "../services/TorqueProvider";
 import { ExtendLoanSlider } from "./ExtendLoanSlider";
 
 export interface IExtendLoanFormProps {
+  walletDetails: IWalletDetails;
   loanOrderState: IBorrowedFundsState;
 
   onSubmit: (request: ExtendLoanRequest) => void;
@@ -57,23 +59,25 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
   }
 
   public componentDidMount(): void {
-    TorqueProvider.Instance.getLoanExtendParams(this.props.loanOrderState.loanOrderHash).then(
-      collateralState => {
-        this.setState(
-          {
-            ...this.state,
-            minValue: collateralState.minValue,
-            maxValue: collateralState.maxValue,
-            assetDetails: AssetsDictionary.assets.get(this.props.loanOrderState.asset) || null,
-            currentValue: collateralState.currentValue,
-            selectedValue: collateralState.currentValue
-          },
-          () => {
-            this.selectedValueUpdate.next(this.state.selectedValue);
-          }
-        );
-      }
-    );
+    TorqueProvider.Instance.getLoanExtendParams(
+      this.props.walletDetails,
+      this.props.loanOrderState.accountAddress,
+      this.props.loanOrderState.loanOrderHash
+    ).then(collateralState => {
+      this.setState(
+        {
+          ...this.state,
+          minValue: collateralState.minValue,
+          maxValue: collateralState.maxValue,
+          assetDetails: AssetsDictionary.assets.get(this.props.loanOrderState.asset) || null,
+          currentValue: collateralState.currentValue,
+          selectedValue: collateralState.currentValue
+        },
+        () => {
+          this.selectedValueUpdate.next(this.state.selectedValue);
+        }
+      );
+    });
   }
 
   public componentDidUpdate(
@@ -114,9 +118,7 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
           <hr className="extend-loan-form__delimiter" />
 
           <div className="extend-loan-form__info-liquidated-at-container">
-            <div className="extend-loan-form__info-liquidated-at-msg">
-              Your loan will be extended by
-            </div>
+            <div className="extend-loan-form__info-liquidated-at-msg">Your loan will be extended by</div>
             <div className="extend-loan-form__info-liquidated-at-price">
               {this.state.selectedValue} {this.pluralize("day", "days", this.state.selectedValue)}
             </div>
@@ -124,9 +126,7 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
 
           <div className="extend-loan-form__operation-result-container">
             <img className="extend-loan-form__operation-result-img" src={this.state.assetDetails.logoSvg} />
-            <div className="extend-loan-form__operation-result-msg">
-              You will top up
-            </div>
+            <div className="extend-loan-form__operation-result-msg">You will top up</div>
             <div className="extend-loan-form__operation-result-amount">
               {this.state.depositAmount.toFixed(6)} {this.state.assetDetails.displayName}
             </div>
@@ -151,7 +151,9 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
   private rxGetEstimate = (selectedValue: number): Observable<IExtendEstimate> => {
     return new Observable<IExtendEstimate>(observer => {
       TorqueProvider.Instance.getLoanExtendEstimate(
-        this.props.loanOrderState.asset,
+        this.props.walletDetails,
+        this.props.loanOrderState.accountAddress,
+        this.props.loanOrderState.loanOrderHash,
         selectedValue
       ).then(value => {
         observer.next(value);
@@ -169,7 +171,12 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
 
   public onSubmitClick = (event: FormEvent<HTMLFormElement>) => {
     this.props.onSubmit(
-      new ExtendLoanRequest(this.props.loanOrderState.loanOrderHash, this.state.currentValue)
+      new ExtendLoanRequest(
+        this.props.walletDetails,
+        this.props.loanOrderState.accountAddress,
+        this.props.loanOrderState.loanOrderHash,
+        this.state.currentValue
+      )
     );
   };
 }
