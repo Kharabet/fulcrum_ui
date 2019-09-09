@@ -136,9 +136,11 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
               positionType={this.state.tradePositionType}
               leverage={this.state.tradeLeverage}
               bestCollateral={
-                this.state.tradePositionType === PositionType.SHORT ?
-                  this.state.tradeAsset :
-                  this.state.tradeUnitOfAccount}
+                this.state.tradeAsset == Asset.ETH ?
+                  Asset.ETH :
+                  this.state.tradePositionType === PositionType.SHORT ?
+                    this.state.tradeAsset :
+                    this.state.tradeUnitOfAccount}
               defaultCollateral={this.state.collateralToken}
               defaultUnitOfAccount={this.state.tradeUnitOfAccount}
               defaultTokenizeNeeded={true}

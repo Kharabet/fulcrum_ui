@@ -400,7 +400,8 @@ export class FulcrumProvider {
                 .minus(liquidationPrice);
             }
 
-            /*console.log(`maintenanceMargin`,maintenanceMargin.toString());
+            /*console.log(`offset`,offset.toString());
+            console.log(`maintenanceMargin`,maintenanceMargin.toString());
             console.log(`initialLeverage`,initialLeverage.toString());
             console.log(`initialMargin`,initialMargin.toString())
             console.log(`currentPrice`,currentPrice.toString());
