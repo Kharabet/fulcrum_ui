@@ -359,7 +359,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     }
 
     return (
-      <form className="trade-form" onSubmit={this.onSubmitClick} style={this.props.tradeType === TradeType.SELL ? { minHeight: `16.5625rem` } : undefined}>
+      <form className="trade-form" onSubmit={this.props.asset !== Asset.LINK ? this.onSubmitClick : undefined} style={this.props.tradeType === TradeType.SELL ? { minHeight: `16.5625rem` } : undefined}>
         <div className="trade-form__left_block" style={divStyle}>
           {this.state.pTokenAddress &&
             FulcrumProvider.Instance.web3ProviderSettings &&
@@ -466,9 +466,15 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
             <button className="trade-form__cancel-button" onClick={this.onCancelClick}>
               <span className="trade-form__label--action">Cancel</span>
             </button>
-            <button title={this.state.exposureValue.gt(0) ? `${this.state.exposureValue.toFixed(18)} ${this.props.asset}` : ``} type="submit" className={`trade-form__submit-button ${submitClassName}`}>
-              {submitButtonText}
-            </button>
+            {this.props.asset !== Asset.LINK ? (
+              <button title={this.state.exposureValue.gt(0) ? `${this.state.exposureValue.toFixed(18)} ${this.props.asset}` : ``} type="submit" className={`trade-form__submit-button ${submitClassName}`}>
+                {submitButtonText}
+              </button>
+            ) : (
+              <button style={{backgroundColor: `#3a3f4a`, color: `#758295`}} title={`BUY DISABLED`} disabled={true} className={`trade-form__submit-button ${submitClassName}`}>
+                BUY DISABLED
+              </button>
+            )}
           </div>
         </div>
         <Modal
