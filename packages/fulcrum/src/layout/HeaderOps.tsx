@@ -7,46 +7,44 @@ import { HeaderMenuToggle } from "./HeaderMenuToggle";
 export interface IHeaderOpsProps {
   doNetworkConnect: () => void;
   isLoading: boolean;
+  isMobileMedia: boolean;
 }
 
 interface IHeaderOpsState {
-  isMobileMedia: boolean;
   isMenuOpen: boolean;
 }
 
 export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
-  private _menu: IHeaderMenuProps = {
-    items: [
-      { id: 0, title: "Home", link: "/", external: false },
-      { id: 1, title: "Lend", link: "/lend", external: false },
-      { id: 2, title: "Trade", link: "/trade", external: false },
-      { id: 3, title: "Faq", link: "https://bzx.network/faq-fulcrum.html", external: true }
-    ]
-  };
-
+  
   constructor(props: IHeaderOpsProps) {
     super(props);
 
     this.state = {
-      isMobileMedia: false,
       isMenuOpen: false
     };
   }
 
-  public componentDidMount(): void {
-    window.addEventListener("resize", this.didResize.bind(this));
-    this.didResize();
-  }
+  /*public componentDidMount(): void {
+  }*/
 
-  public componentWillUnmount(): void {
-    window.removeEventListener("resize", this.didResize.bind(this));
-  }
+  /*public componentWillUnmount(): void {
+  }*/
 
   public render() {
-    return !this.state.isMobileMedia ? this.renderDesktop() : this.renderMobile();
+    return !this.props.isMobileMedia ? this.renderDesktop() : this.renderMobile();
   }
 
   private renderDesktop = () => {
+    
+    const menu: IHeaderMenuProps = {
+      items: [
+        { id: 0, title: "Home", link: "/", external: false },
+        { id: 1, title: "Lend", link: "/lend", external: false },
+        { id: 2, title: "Trade", link: "/trade", external: false },
+        { id: 3, title: "Faq", link: "https://bzx.network/faq-fulcrum.html", external: true }
+      ]
+    };
+    
     return (
       <header className="header">
         <div className="header__row">
@@ -54,7 +52,7 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
             <HeaderLogo />
           </div>
           <div className="header__center">
-            <HeaderMenu items={this._menu.items} />
+            <HeaderMenu items={menu.items} />
           </div>
           <div className="header__right">
             <OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />
@@ -65,6 +63,15 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
   };
 
   private renderMobile = () => {
+    
+    const menu: IHeaderMenuProps = {
+      items: [
+        { id: 0, title: "Home", link: "/", external: false },
+        { id: 1, title: "Lend", link: "/lend", external: false },
+        { id: 3, title: "Faq", link: "https://bzx.network/faq-fulcrum.html", external: true }
+      ]
+    };
+    
     return (
       <header className="header">
         <div className="header__row">
@@ -77,20 +84,13 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
         </div>
         {this.state.isMenuOpen ? (
           <div className="header__popup-container">
-            <HeaderMenu items={this._menu.items} />
+            <HeaderMenu items={menu.items} />
             <OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />
           </div>
         ) : null}
       </header>
     );
   };
-
-  private didResize = () => {
-    const isMobileMedia = (window.innerWidth <= 959);
-    if (isMobileMedia !== this.state.isMobileMedia) {
-      this.setState({ isMobileMedia });
-    }
-  }
 
   private onMenuToggle = (value: boolean) => {
     this.setState({ ...this.state, isMenuOpen: value });

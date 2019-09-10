@@ -494,7 +494,7 @@ export class FulcrumProvider {
         let totalAssetBorrow: BigNumber | null;
         let supplyInterestRate: BigNumber | null;
         let borrowInterestRate: BigNumber | null;
-        let avgBorrowInterestRate: BigNumber | null;
+        // let avgBorrowInterestRate: BigNumber | null;
         let lockedAssets: BigNumber | null = new BigNumber(0);
 
         await Promise.all([
@@ -506,7 +506,7 @@ export class FulcrumProvider {
           (totalAssetSupply = await assetContract.totalAssetSupply.callAsync()),
           (totalAssetBorrow = await assetContract.totalAssetBorrow.callAsync()),
           (supplyInterestRate = await assetContract.supplyInterestRate.callAsync()),
-          (avgBorrowInterestRate = await assetContract.avgBorrowInterestRate.callAsync()),
+          // avgBorrowInterestRate = await assetContract.avgBorrowInterestRate.callAsync()),
           (borrowInterestRate = await assetContract.borrowInterestRate.callAsync())
         ]);
 
@@ -526,7 +526,8 @@ export class FulcrumProvider {
           totalAssetBorrow.dividedBy(10 ** 18),
           supplyInterestRate.dividedBy(10 ** 18),
           borrowInterestRate.dividedBy(10 ** 18),
-          avgBorrowInterestRate.dividedBy(10 ** 18),
+          // avgBorrowInterestRate.dividedBy(10 ** 18),
+          new BigNumber(0),
           lockedAssets.dividedBy(10 ** 18)
         );
       }

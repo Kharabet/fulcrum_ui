@@ -22,6 +22,7 @@ import { FulcrumProvider } from "../services/FulcrumProvider";
 export interface ITradePageProps {
   doNetworkConnect: () => void;
   isLoading: boolean;
+  isMobileMedia: boolean;
 }
 
 interface ITradePageState {
@@ -97,7 +98,7 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
   public render() {
     return (
       <div className="trade-page">
-        <HeaderOps isLoading={this.props.isLoading} doNetworkConnect={this.props.doNetworkConnect} />
+        <HeaderOps isMobileMedia={this.props.isMobileMedia} isLoading={this.props.isLoading} doNetworkConnect={this.props.doNetworkConnect} />
         <main>
           <PriceGraph
             data={this.state.priceGraphData}
@@ -136,7 +137,7 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
               positionType={this.state.tradePositionType}
               leverage={this.state.tradeLeverage}
               bestCollateral={
-                this.state.tradeAsset == Asset.ETH ?
+                this.state.tradeAsset === Asset.ETH ?
                   Asset.ETH :
                   this.state.tradePositionType === PositionType.SHORT ?
                     this.state.tradeAsset :

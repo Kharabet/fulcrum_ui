@@ -12,6 +12,7 @@ import { FulcrumProvider } from "../services/FulcrumProvider";
 export interface ILendPageProps {
   doNetworkConnect: () => void;
   isLoading: boolean;
+  isMobileMedia: boolean;
 }
 
 interface ILendPageState {
@@ -37,7 +38,7 @@ export class LendPage extends PureComponent<ILendPageProps, ILendPageState> {
   public render() {
     return (
       <div className="lend-page">
-        <HeaderOps isLoading={this.props.isLoading} doNetworkConnect={this.props.doNetworkConnect} />
+        <HeaderOps isMobileMedia={this.props.isMobileMedia} isLoading={this.props.isLoading} doNetworkConnect={this.props.doNetworkConnect} />
         <main className="lend-page-main">
           <LendTokenSelector onLend={this.onLendRequested} />
           <Modal

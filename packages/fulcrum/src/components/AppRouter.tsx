@@ -32,6 +32,7 @@ interface IAppRouterState {
   selectedProviderType: ProviderType;
   isLoading: boolean;
   web3: Web3Wrapper| null;
+  isMobileMedia: boolean;
 }
 
 export class AppRouter extends Component<any, IAppRouterState> {
@@ -42,14 +43,21 @@ export class AppRouter extends Component<any, IAppRouterState> {
       isProviderMenuModalOpen: false,
       isLoading: false,
       selectedProviderType: FulcrumProvider.Instance.providerType,
-      web3: FulcrumProvider.Instance.web3Wrapper
+      web3: FulcrumProvider.Instance.web3Wrapper,
+      isMobileMedia: false
     };
 
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
+  public componentDidMount(): void {
+    window.addEventListener("resize", this.didResize.bind(this));
+    this.didResize();
+  }
+
   public componentWillUnmount(): void {
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
+    // window.removeEventListener("resize", this.didResize.bind(this));
   }
 
   public render() {
@@ -84,10 +92,12 @@ export class AppRouter extends Component<any, IAppRouterState> {
                 <HashRouter hashType="slash">
                   <LocationListener doNetworkConnect={this.doNetworkConnect}>
                     <Switch>
-                      <Route exact={true} path="/" render={() => <LandingPage />} />
-                      <Route exact={true} path="/lend" render={() => <LendPage isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} />} />
-                      <Route exact={true} path="/trade" render={() => <TradePage isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} />} />
-                      <Route exact={true} path="/stats" render={() => <StatsPage isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} />} />
+                      <Route exact={true} path="/" render={() => <LandingPage isMobileMedia={this.state.isMobileMedia} />} />
+                      <Route exact={true} path="/lend" render={() => <LendPage isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} />} />
+                      {!this.state.isMobileMedia ? (
+                        <Route exact={true} path="/trade" render={() => <TradePage isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} />} />
+                      ) : ``}
+                      <Route exact={true} path="/stats" render={() => <StatsPage isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} />} />
                       <Route path="*" render={() => <Redirect to="/"/> } />
                     </Switch>
                     {isMainnetProd ? (
@@ -103,6 +113,13 @@ export class AppRouter extends Component<any, IAppRouterState> {
         </div>
       </React.Fragment>
     );
+  }
+
+  private didResize = () => {
+    const isMobileMedia = (window.innerWidth <= 959);
+    if (isMobileMedia !== this.state.isMobileMedia) {
+      this.setState({ isMobileMedia });
+    }
   }
 
   public doNetworkConnect = () => {

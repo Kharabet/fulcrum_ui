@@ -3,7 +3,11 @@ import { Link } from "react-router-dom";
 import { Footer } from "../layout/Footer";
 import { HeaderHome } from "../layout/HeaderHome";
 
-export class LandingPage extends PureComponent {
+export interface ILandingPageProps {
+  isMobileMedia: boolean;
+}
+
+export class LandingPage extends PureComponent<ILandingPageProps> {
   public render() {
     return (
       <div className="landing-page">
@@ -16,10 +20,12 @@ export class LandingPage extends PureComponent {
                 <Link className="landing-page__jumbo-action-button" to="/lend">Lend</Link>
                 <div className="landing-page__jumbo-action-description">TO EARN INTEREST</div>
               </div>
-              <div className="landing-page__jumbo-action">
-                <Link className="landing-page__jumbo-action-button" to="/trade">Trade</Link>
-                <div className="landing-page__jumbo-action-description">WITH UP TO 4X LEVERAGE</div>
-              </div>
+              { !this.props.isMobileMedia ? (
+                <div className="landing-page__jumbo-action">
+                  <Link className="landing-page__jumbo-action-button" to="/trade">Trade</Link>
+                  <div className="landing-page__jumbo-action-description">WITH UP TO 4X LEVERAGE</div>
+                </div>
+              ) : ``}
             </div>
           </div>
         </main>

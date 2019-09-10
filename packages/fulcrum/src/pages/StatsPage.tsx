@@ -9,6 +9,7 @@ import { HeaderOps } from "../layout/HeaderOps";
 export interface IStatsPageProps {
   doNetworkConnect: () => void;
   isLoading: boolean;
+  isMobileMedia: boolean;
 }
 
 interface IStatsPageState {
@@ -30,10 +31,9 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
   public render() {
     return (
       <div className="stats-page">
-        <HeaderOps isLoading={this.props.isLoading} doNetworkConnect={this.props.doNetworkConnect} />
+        <HeaderOps isMobileMedia={this.props.isMobileMedia} isLoading={this.props.isLoading} doNetworkConnect={this.props.doNetworkConnect} />
         <main>
-          <StatsTokenGrid
-          />
+          <StatsTokenGrid isMobileMedia={this.props.isMobileMedia} />
         </main>
         <Footer />
       </div>

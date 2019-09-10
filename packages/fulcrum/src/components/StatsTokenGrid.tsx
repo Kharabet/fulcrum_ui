@@ -4,10 +4,11 @@ import { StatsTokenGridCard } from "./StatsTokenGridCard";
 import { StatsTokenGridHeader } from "./StatsTokenGridHeader";
 import { IStatsTokenGridRowProps, StatsTokenGridRow } from "./StatsTokenGridRow";
 
-export interface IStatsTokenGridProps {}
+export interface IStatsTokenGridProps {
+  isMobileMedia: boolean;
+}
 
 interface IStatsTokenGridState {
-  isMobileMedia: boolean;
   tokenRowsData: IStatsTokenGridRowProps[];
 }
 
@@ -29,7 +30,6 @@ export class StatsTokenGrid extends Component<IStatsTokenGridProps, IStatsTokenG
     super(props);
 
     this.state = {
-      isMobileMedia: false,
       tokenRowsData: StatsTokenGrid.getRowsData(props)
     };
   }
@@ -40,20 +40,17 @@ export class StatsTokenGrid extends Component<IStatsTokenGridProps, IStatsTokenG
 
   public componentDidMount(): void {
     this.derivedUpdate();
-    window.addEventListener("resize", this.didResize.bind(this));
-    this.didResize();
   }
 
-  public componentWillUnmount(): void {
-    window.removeEventListener("resize", this.didResize.bind(this));
-  }
+  /*public componentWillUnmount(): void {
+  }*/
 
   public render() {
-    const tokenRows = !this.state.isMobileMedia
+    const tokenRows = !this.props.isMobileMedia
       ? this.state.tokenRowsData.map(e => <StatsTokenGridRow key={e.asset} {...e} />)
       : this.state.tokenRowsData.map(e => <StatsTokenGridCard key={e.asset} {...e} />);
 
-    return !this.state.isMobileMedia ? (
+    return !this.props.isMobileMedia ? (
       <div className="stats-grid">
         <StatsTokenGridHeader />
         {tokenRows}
@@ -75,10 +72,4 @@ export class StatsTokenGrid extends Component<IStatsTokenGridProps, IStatsTokenG
     return rowsData;
   };
 
-  private didResize = () => {
-    const isMobileMedia = (window.innerWidth <= 959);
-    if (isMobileMedia !== this.state.isMobileMedia) {
-      this.setState({ isMobileMedia });
-    }
-  }
 }
