@@ -57,7 +57,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
 
   public componentWillUnmount(): void {
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
-    // window.removeEventListener("resize", this.didResize.bind(this));
+    window.removeEventListener("resize", this.didResize.bind(this));
   }
 
   public render() {

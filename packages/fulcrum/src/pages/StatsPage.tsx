@@ -16,11 +16,11 @@ interface IStatsPageState {
 }
 
 export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
-  /*constructor(props: any) {
+  constructor(props: any) {
     super(props);
 
-    //FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
-  }*/
+    // FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
+  }
 
   /*public componentDidMount(): void {
     if (!FulcrumProvider.Instance.web3Wrapper) {
