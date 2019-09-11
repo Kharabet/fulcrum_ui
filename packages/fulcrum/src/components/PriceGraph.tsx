@@ -154,9 +154,9 @@ export class PriceGraph extends Component<IPriceGraphProps, IPriceGraphState> {
     }
 
     if (process.env.REACT_APP_ETH_NETWORK === "mainnet") {
-      if (latestPriceData.price !== 0 && (!lastItem || lastItem.timeStamp < latestPriceData.timeStamp)) {
+      /*if (latestPriceData.price !== 0 && (!lastItem || lastItem.timeStamp < latestPriceData.timeStamp)) {
         priceDataPoints.push(latestPriceData);
-      }
+      }*/
     } else {
       // TEMP FIX: normalize mainnet prices to ropsten
       if (lastItem && latestPriceData.price !== 0) {

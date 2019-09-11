@@ -10,7 +10,41 @@ import { BigNumber, classUtils } from "@0x/utils";
 /* istanbul ignore next */
 // tslint:disable:no-parameter-reassignment
 // tslint:disable-next-line:class-name
-export class kyberContract extends BaseContract {
+export class oracleContract extends BaseContract {
+    public getTradeData = {
+        async callAsync(
+            src: string,
+            dest: string,
+            srcQty: BigNumber,
+            callData: Partial<CallData> = {},
+            defaultBlock?: BlockParam,
+        ): Promise<[BigNumber, BigNumber, BigNumber]
+        > {
+            const self = this as any as oracleContract;
+            const encodedData = self._strictEncodeArguments('getTradeData(address,address,uint256)', [src,
+        dest,
+        srcQty
+        ]);
+            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+                {
+                    to: self.address,
+                    ...callData,
+                    data: encodedData,
+                },
+                self._web3Wrapper.getContractDefaults(),
+            );
+            const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
+            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            const abiEncoder = self._lookupAbiEncoder('getTradeData(address,address,uint256)');
+            // tslint:disable boolean-naming
+            const result = abiEncoder.strictDecodeReturnValue<[BigNumber, BigNumber, BigNumber]
+        >(rawCallResult);
+            // tslint:enable boolean-naming
+            return result;
+        },
+    };
+
+    // for test networks not using not using BZxOraclePriceFeed
     public getExpectedRate = {
         async callAsync(
             src: string,
@@ -20,7 +54,7 @@ export class kyberContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<[BigNumber, BigNumber]
         > {
-            const self = this as any as kyberContract;
+            const self = this as any as oracleContract;
             const encodedData = self._strictEncodeArguments('getExpectedRate(address,address,uint256)', [src,
         dest,
         srcQty
@@ -43,8 +77,9 @@ export class kyberContract extends BaseContract {
             return result;
         },
     };
+
     constructor(abi: ContractAbi, address: string, provider: any, txDefaults?: Partial<TxData>) {
-        super('kyber', abi, address.toLowerCase(), provider as SupportedProvider, txDefaults);
+        super('oracle', abi, address.toLowerCase(), provider as SupportedProvider, txDefaults);
         classUtils.bindAll(this, ['_abiEncoderByFunctionSignature', 'address', 'abi', '_web3Wrapper']);
     }
 } // tslint:disable:max-file-line-count

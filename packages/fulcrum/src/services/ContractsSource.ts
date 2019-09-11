@@ -5,7 +5,7 @@ import { TradeTokenKey } from "../domain/TradeTokenKey";
 
 import { erc20Contract } from "../contracts/erc20";
 import { iTokenContract } from "../contracts/iTokenContract";
-import { kyberContract } from "../contracts/kyber";
+import { oracleContract } from "../contracts/oracle";
 import { pTokenContract } from "../contracts/pTokenContract";
 import { TokenizedRegistryContract } from "../contracts/TokenizedRegistryContract";
 
@@ -31,7 +31,7 @@ export class ContractsSource {
   private erc20Json: any;
   private iTokenJson: any;
   private pTokenJson: any;
-  private kyberJson: any;
+  private oracleJson: any;
   private TokenizedRegistryJson: any;
 
   public networkId: number;
@@ -48,7 +48,7 @@ export class ContractsSource {
     this.erc20Json = await import(`./../assets/artifacts/${ethNetwork}/erc20.json`);
     this.iTokenJson = await import(`./../assets/artifacts/${ethNetwork}/iToken.json`);
     this.pTokenJson = await import(`./../assets/artifacts/${ethNetwork}/pToken.json`);
-    this.kyberJson = await import(`./../assets/artifacts/${ethNetwork}/kyber.json`);
+    this.oracleJson = await import(`./../assets/artifacts/${ethNetwork}/oracle.json`);
     
     
     if (process.env.REACT_APP_ETH_NETWORK === "mainnet") {
@@ -180,11 +180,11 @@ export class ContractsSource {
     return address;
   }
 
-  private getKyberAddress(): string {
+  private getOracleAddress(): string {
     let address: string = "";
     switch (this.networkId) {
       case 1:
-        address = "0x818e6fecd516ecc3849daf6845e3ec868087b755";
+        address = "0x61bd75708f516fb682ff1350390316268ddd5781";
         break;
       case 3:
         address = "0x818e6fecd516ecc3849daf6845e3ec868087b755";
@@ -212,10 +212,10 @@ export class ContractsSource {
     return tokenContractInfo ? new pTokenContract(this.pTokenJson.abi, tokenContractInfo.token, this.provider) : null;
   }
 
-  private async getKyberContractRaw(): Promise<kyberContract> {
-    return new kyberContract(
-      this.kyberJson.abi,
-      this.getKyberAddress().toLowerCase(),
+  private async getOracleContractRaw(): Promise<oracleContract> {
+    return new oracleContract(
+      this.oracleJson.abi,
+      this.getOracleAddress().toLowerCase(),
       this.provider
     );
   }
@@ -253,5 +253,5 @@ export class ContractsSource {
   public getErc20Contract = _.memoize(this.getErc20ContractRaw);
   public getITokenContract = _.memoize(this.getITokenContractRaw);
   public getPTokenContract = _.memoize(this.getPTokenContractRaw);
-  public getKyberContract = _.memoize(this.getKyberContractRaw);
+  public getOracleContract = _.memoize(this.getOracleContractRaw);
 }
