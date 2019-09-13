@@ -507,7 +507,7 @@ export class FulcrumProvider {
           (totalAssetBorrow = await assetContract.totalAssetBorrow.callAsync()),
           (supplyInterestRate = await assetContract.supplyInterestRate.callAsync()),
           // avgBorrowInterestRate = await assetContract.avgBorrowInterestRate.callAsync()),
-          (borrowInterestRate = await assetContract.borrowInterestRate.callAsync())
+          (borrowInterestRate = await assetContract.avgBorrowInterestRate.callAsync()) // borrowInterestRate
         ]);
 
         const assetErc20Address = this.getErc20AddressOfAsset(asset);
