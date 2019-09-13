@@ -1,0 +1,118 @@
+[
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "name": "loanOrderHash",
+        "type": "bytes32"
+      },
+      {
+        "name": "borrower",
+        "type": "address"
+      },
+      {
+        "name": "payer",
+        "type": "address"
+      },
+      {
+        "name": "closeAmount",
+        "type": "uint256"
+      }
+    ],
+    "name": "paybackLoanAndClose",
+    "outputs": [
+      {
+        "name": "actualCloseAmount",
+        "type": "uint256"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "name": "loanOrderHash",
+        "type": "bytes32"
+      },
+      {
+        "name": "borrower",
+        "type": "address"
+      },
+      {
+        "name": "payer",
+        "type": "address"
+      },
+      {
+        "name": "depositAmount",
+        "type": "uint256"
+      },
+      {
+        "name": "useCollateral",
+        "type": "bool"
+      }
+    ],
+    "name": "extendLoanByInterest",
+    "outputs": [
+      {
+        "name": "secondsExtended",
+        "type": "uint256"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "name": "loanOrderHash",
+        "type": "bytes32"
+      },
+      {
+        "name": "depositTokenAddress",
+        "type": "address"
+      },
+      {
+        "name": "depositAmount",
+        "type": "uint256"
+      }
+    ],
+    "name": "depositCollateral",
+    "outputs": [
+      {
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "name": "loanOrderHash",
+        "type": "bytes32"
+      },
+      {
+        "name": "withdrawAmount",
+        "type": "uint256"
+      }
+    ],
+    "name": "withdrawCollateral",
+    "outputs": [
+      {
+        "name": "amountWithdrawn",
+        "type": "uint256"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]
