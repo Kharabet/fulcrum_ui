@@ -101,7 +101,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
   }
 
   public doNetworkConnect = (destinationAbbr: string) => {
-    NavService.Instance.History.push(NavService.Instance.getWalletAddress(destinationAbbr));
+    NavService.Instance.History.replace(NavService.Instance.getWalletAddress(destinationAbbr));
     // this.setState({ ...this.state, isProviderMenuModalOpen: true });
   };
 

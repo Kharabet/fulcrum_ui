@@ -133,11 +133,13 @@ export class DashboardPage extends PureComponent<
   };
 
   private onClearWalletAddress = () => {
-    NavService.Instance.History.push(NavService.Instance.getDashboardAddress(WalletType.NonWeb3, ""));
+    NavService.Instance.History.replace(NavService.Instance.getDashboardAddress(WalletType.NonWeb3, ""));
+    window.location.reload();
   };
 
   private onWalletAddressChange = (walletAddress: string) => {
-    NavService.Instance.History.push(NavService.Instance.getDashboardAddress(WalletType.NonWeb3, walletAddress));
+    NavService.Instance.History.replace(NavService.Instance.getDashboardAddress(WalletType.NonWeb3, walletAddress));
+    window.location.reload();
   };
 
   private onRepayLoan = async (item: IBorrowedFundsState) => {

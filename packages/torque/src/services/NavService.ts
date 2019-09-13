@@ -20,7 +20,11 @@ export class NavService {
   public getWalletAddress = (
     destinationAbbr: string // "b" - borrow, "t" - track, dashboard
   ) => {
-    return `/wallet/${destinationAbbr}`;
+    // return `/wallet/${destinationAbbr}`;
+    // return `/dashboard/n`;
+    return destinationAbbr === "t" ?
+      `/dashboard/n` :
+      `/borrow/n`;
   };
 
   public getBorrowAddress = (walletType: WalletType) => {

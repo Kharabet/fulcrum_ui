@@ -20,7 +20,7 @@ export class HeaderHome extends Component<IHeaderHomeProps> {
           </div>*/}
           {this.props.doNetworkConnect ? (
             <div className="header__right">
-              <OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />
+              {/*<OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />*/}
             </div>
           ): ``}
         </div>

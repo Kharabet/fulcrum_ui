@@ -52,7 +52,7 @@ export class BorrowPage extends PureComponent<IBorrowPageParams & RouteComponent
         const borrowRequest = await this.borrowDlgRef.current.getValue(walletType, asset);
 
         if (borrowRequest.walletType === WalletType.NonWeb3) {
-          NavService.Instance.History.push(NavService.Instance.getDashboardAddress(walletType, ""));
+          NavService.Instance.History.replace(NavService.Instance.getDashboardAddress(walletType, ""));
         }
 
         if (borrowRequest.walletType === WalletType.Web3) {
@@ -63,7 +63,7 @@ export class BorrowPage extends PureComponent<IBorrowPageParams & RouteComponent
 
           if (accountAddress) {
             await TorqueProvider.Instance.doBorrow(borrowRequest);
-            NavService.Instance.History.push(NavService.Instance.getDashboardAddress(walletType, accountAddress));
+            NavService.Instance.History.replace(NavService.Instance.getDashboardAddress(walletType, accountAddress));
           }
         }
       } finally {

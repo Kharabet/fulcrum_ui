@@ -44,12 +44,12 @@ export class WalletSelectionPage extends PureComponent<IWalletSelectionPageProps
             : null;
 
         if (this.props.match.params.destinationAbbr === "b") {
-          NavService.Instance.History.push(
+          NavService.Instance.History.replace(
             NavService.Instance.getBorrowAddress(walletType)
           );
         } if (this.props.match.params.destinationAbbr === "t") {
           if (accountAddress) {
-            NavService.Instance.History.push(
+            NavService.Instance.History.replace(
               NavService.Instance.getDashboardAddress(walletType, accountAddress)
             );
           }
@@ -59,11 +59,11 @@ export class WalletSelectionPage extends PureComponent<IWalletSelectionPageProps
       }
     } if (walletType === WalletType.NonWeb3) {
       if (this.props.match.params.destinationAbbr === "b") {
-        NavService.Instance.History.push(
+        NavService.Instance.History.replace(
           NavService.Instance.getBorrowAddress(walletType)
         );
       } if (this.props.match.params.destinationAbbr === "t") {
-        NavService.Instance.History.push(
+        NavService.Instance.History.replace(
           NavService.Instance.getDashboardAddress(walletType, "")
         );
       } else {
