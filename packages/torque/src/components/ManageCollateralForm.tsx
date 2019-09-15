@@ -8,7 +8,9 @@ import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
 import { ICollateralChangeEstimate } from "../domain/ICollateralChangeEstimate";
 import { IWalletDetails } from "../domain/IWalletDetails";
 import { ManageCollateralRequest } from "../domain/ManageCollateralRequest";
+import { WalletType } from "../domain/WalletType";
 import { TorqueProvider } from "../services/TorqueProvider";
+import { ActionViaTransferDetails } from "./ActionViaTransferDetails";
 import { CollateralSlider } from "./CollateralSlider";
 import { OpsEstimatedResult } from "./OpsEstimatedResult";
 
@@ -17,6 +19,7 @@ export interface IManageCollateralFormProps {
   loanOrderState: IBorrowedFundsState;
 
   onSubmit: (request: ManageCollateralRequest) => void;
+  onCLose: () => void;
 }
 
 interface IManageCollateralFormState {
@@ -31,6 +34,8 @@ interface IManageCollateralFormState {
 
   diffAmount: BigNumber;
   liquidationPrice: BigNumber;
+  loanCollateralManagementAddress: string | null;
+  gasAmountNeeded: BigNumber;
 }
 
 export class ManageCollateralForm extends Component<IManageCollateralFormProps, IManageCollateralFormState> {
@@ -47,7 +52,9 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
       currentValue: 100,
       selectedValue: 100,
       diffAmount: new BigNumber(0),
-      liquidationPrice: new BigNumber(0)
+      liquidationPrice: new BigNumber(0),
+      loanCollateralManagementAddress: null,
+      gasAmountNeeded: new BigNumber(0)
     };
 
     this.selectedValueUpdate = new Subject<number>();
@@ -71,20 +78,32 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
       this.props.loanOrderState.accountAddress,
       this.props.loanOrderState.loanOrderHash
     ).then(collateralState => {
-      this.setState(
-        {
-          ...this.state,
-          minValue: collateralState.minValue,
-          maxValue: collateralState.maxValue,
-          assetDetails: AssetsDictionary.assets.get(this.props.loanOrderState.asset) || null,
-          loanValue: collateralState.currentValue,
-          currentValue: collateralState.currentValue,
-          selectedValue: collateralState.currentValue
-        },
-        () => {
-          this.selectedValueUpdate.next(this.state.selectedValue);
-        }
-      );
+      TorqueProvider.Instance.getLoanCollateralManagementManagementAddress(
+        this.props.walletDetails,
+        this.props.loanOrderState.accountAddress,
+        this.props.loanOrderState.loanOrderHash,
+        this.state.loanValue,
+        this.state.selectedValue
+      ).then(loanCollateralManagementAddress => {
+        TorqueProvider.Instance.getLoanCollateralManagementGasAmount().then(gasAmountNeeded => {
+          this.setState(
+            {
+              ...this.state,
+              minValue: collateralState.minValue,
+              maxValue: collateralState.maxValue,
+              assetDetails: AssetsDictionary.assets.get(this.props.loanOrderState.asset) || null,
+              loanValue: collateralState.currentValue,
+              currentValue: collateralState.currentValue,
+              selectedValue: collateralState.currentValue,
+              loanCollateralManagementAddress: loanCollateralManagementAddress,
+              gasAmountNeeded: gasAmountNeeded
+            },
+            () => {
+              this.selectedValueUpdate.next(this.state.selectedValue);
+            }
+          );
+        });
+      });
     });
   }
 
@@ -98,7 +117,26 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
       prevState.loanValue !== this.state.loanValue ||
       prevState.selectedValue !== this.state.selectedValue
     ) {
-      this.selectedValueUpdate.next(this.state.selectedValue);
+      TorqueProvider.Instance.getLoanCollateralManagementManagementAddress(
+        this.props.walletDetails,
+        this.props.loanOrderState.accountAddress,
+        this.props.loanOrderState.loanOrderHash,
+        this.state.loanValue,
+        this.state.selectedValue
+      ).then(loanCollateralManagementAddress => {
+        TorqueProvider.Instance.getLoanCollateralManagementGasAmount().then(gasAmountNeeded => {
+          this.setState(
+            {
+              ...this.state,
+              loanCollateralManagementAddress: loanCollateralManagementAddress,
+              gasAmountNeeded: gasAmountNeeded
+            },
+            () => {
+              this.selectedValueUpdate.next(this.state.selectedValue);
+            }
+          );
+        });
+      });
     }
   }
 
@@ -136,25 +174,56 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
           </div>
 
           {this.state.loanValue !== this.state.selectedValue ? (
-            <OpsEstimatedResult
-              assetDetails={this.state.assetDetails}
-              actionTitle={`You will ${this.state.loanValue > this.state.selectedValue ? "withdraw" : "top up"}`}
-              amount={this.state.diffAmount}
-              precision={6}
-            >
-              <div className="manage-collateral-form__actions-container">
+            this.props.walletDetails.walletType === WalletType.NonWeb3 ? (
+              <div className="manage-collateral-form__transfer-details">
+                <ActionViaTransferDetails
+                  contractAddress={this.state.loanCollateralManagementAddress || ""}
+                  ethAmount={this.state.diffAmount}
+                />
+                <div className="manage-collateral-form__transfer-details-msg manage-collateral-form__transfer-details-msg--warning">
+                  Note 1: you should send funds ONLY from the wallet you control!
+                </div>
+                <div className="manage-collateral-form__transfer-details-msg manage-collateral-form__transfer-details-msg--warning">
+                  Note 2: please, set high amount of the gas (> {this.state.gasAmountNeeded.toFixed()})!
+                </div>
+                <div className="manage-collateral-form__transfer-details-msg">
+                  That's it! Once you've sent the funds, click Close to return to the dashboard.
+                </div>
+              </div>
+            ) : (
+              <OpsEstimatedResult
+                assetDetails={this.state.assetDetails}
+                actionTitle={`You will ${this.state.loanValue > this.state.selectedValue ? "withdraw" : "top up"}`}
+                amount={this.state.diffAmount}
+                precision={6}
+              />
+            )
+          ) : null}
+        </section>
+        <section className="dialog-actions">
+          <div className="manage-collateral-form__actions-container">
+            {this.props.walletDetails.walletType === WalletType.NonWeb3 ? (
+              <button type="button" className="btn btn-size--small" onClick={this.props.onCLose}>
+                Close
+              </button>
+            ) : null}
+
+            {this.props.walletDetails.walletType === WalletType.Web3 ? (
+              <React.Fragment>
                 {this.state.loanValue > this.state.selectedValue ? (
                   <button type="submit" className="btn btn-size--small">
                     Withdraw
                   </button>
-                ) : (
+                ) : null}
+
+                {this.state.loanValue < this.state.selectedValue ? (
                   <button type="submit" className="btn btn-size--small">
                     Top Up
                   </button>
-                )}
-              </div>
-            </OpsEstimatedResult>
-          ) : null}
+                ) : null}
+              </React.Fragment>
+            ) : null}
+          </div>
         </section>
       </form>
     );

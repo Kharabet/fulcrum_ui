@@ -18,6 +18,61 @@ import { BigNumber, classUtils } from "@0x/utils";
 // tslint:disable:no-parameter-reassignment
 // tslint:disable-next-line:class-name
 export class iBZxContract extends BaseContract {
+  public initialize = {
+    async sendTransactionAsync(_target: string, txData: Partial<TxData> = {}): Promise<string> {
+      const self = (this as any) as iBZxContract;
+      const encodedData = self._strictEncodeArguments("initialize(address)", [_target]);
+      const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+        {
+          to: self.address,
+          ...txData,
+          data: encodedData
+        },
+        self._web3Wrapper.getContractDefaults(),
+        (self as any).initialize.estimateGasAsync.bind(self, _target)
+      );
+      const txHash = await self._web3Wrapper.sendTransactionAsync(txDataWithDefaults);
+      return txHash;
+    },
+    async estimateGasAsync(_target: string, txData: Partial<TxData> = {}): Promise<number> {
+      const self = (this as any) as iBZxContract;
+      const encodedData = self._strictEncodeArguments("initialize(address)", [_target]);
+      const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+        {
+          to: self.address,
+          ...txData,
+          data: encodedData
+        },
+        self._web3Wrapper.getContractDefaults()
+      );
+      const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
+      return gas;
+    },
+    getABIEncodedTransactionData(_target: string): string {
+      const self = (this as any) as iBZxContract;
+      const abiEncodedTransactionData = self._strictEncodeArguments("initialize(address)", [_target]);
+      return abiEncodedTransactionData;
+    },
+    async callAsync(_target: string, callData: Partial<CallData> = {}, defaultBlock?: BlockParam): Promise<void> {
+      const self = (this as any) as iBZxContract;
+      const encodedData = self._strictEncodeArguments("initialize(address)", [_target]);
+      const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+        {
+          to: self.address,
+          ...callData,
+          data: encodedData
+        },
+        self._web3Wrapper.getContractDefaults()
+      );
+      const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
+      BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+      const abiEncoder = self._lookupAbiEncoder("initialize(address)");
+      // tslint:disable boolean-naming
+      const result = abiEncoder.strictDecodeReturnValue<void>(rawCallResult);
+      // tslint:enable boolean-naming
+      return result;
+    }
+  };
   public paybackLoanAndClose = {
     async sendTransactionAsync(
       loanOrderHash: string,
@@ -222,6 +277,60 @@ export class iBZxContract extends BaseContract {
       const abiEncoder = self._lookupAbiEncoder("extendLoanByInterest(bytes32,address,address,uint256,bool)");
       // tslint:disable boolean-naming
       const result = abiEncoder.strictDecodeReturnValue<BigNumber>(rawCallResult);
+      // tslint:enable boolean-naming
+      return result;
+    }
+  };
+  public getBasicLoansData = {
+    async callAsync(
+      borrower: string,
+      count: BigNumber,
+      callData: Partial<CallData> = {},
+      defaultBlock?: BlockParam
+    ): Promise<
+      Array<{
+        loanTokenAddress: string;
+        collateralTokenAddress: string;
+        loanTokenAmountFilled: BigNumber;
+        positionTokenAmountFilled: BigNumber;
+        collateralTokenAmountFilled: BigNumber;
+        interestOwedPerDay: BigNumber;
+        initialMarginAmount: BigNumber;
+        maintenanceMarginAmount: BigNumber;
+        currentMarginAmount: BigNumber;
+        maxDurationUnixTimestampSec: BigNumber;
+        loanEndUnixTimestampSec: BigNumber;
+      }>
+    > {
+      const self = (this as any) as iBZxContract;
+      const encodedData = self._strictEncodeArguments("getBasicLoansData(address,uint256)", [borrower, count]);
+      const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+        {
+          to: self.address,
+          ...callData,
+          data: encodedData
+        },
+        self._web3Wrapper.getContractDefaults()
+      );
+      const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
+      BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+      const abiEncoder = self._lookupAbiEncoder("getBasicLoansData(address,uint256)");
+      // tslint:disable boolean-naming
+      const result = abiEncoder.strictDecodeReturnValue<
+        Array<{
+          loanTokenAddress: string;
+          collateralTokenAddress: string;
+          loanTokenAmountFilled: BigNumber;
+          positionTokenAmountFilled: BigNumber;
+          collateralTokenAmountFilled: BigNumber;
+          interestOwedPerDay: BigNumber;
+          initialMarginAmount: BigNumber;
+          maintenanceMarginAmount: BigNumber;
+          currentMarginAmount: BigNumber;
+          maxDurationUnixTimestampSec: BigNumber;
+          loanEndUnixTimestampSec: BigNumber;
+        }>
+      >(rawCallResult);
       // tslint:enable boolean-naming
       return result;
     }

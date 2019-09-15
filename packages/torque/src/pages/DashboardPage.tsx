@@ -55,7 +55,7 @@ export class DashboardPage extends PureComponent<
       walletType: walletTypeAbbrToWalletType(this.props.match.params.walletTypeAbbr),
       walletAddress: this.props.match.params.walletAddress
     };
-    const items = await TorqueProvider.Instance.getLoansList(walletDetails);
+    const items = await TorqueProvider.Instance.getLoansListTest(walletDetails);
 
     this.setState({
       ...this.state,

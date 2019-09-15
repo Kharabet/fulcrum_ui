@@ -64,11 +64,28 @@
     }
   }
 
+  .manage-collateral-form__transfer-details {
+    .manage-collateral-form__transfer-details-msg {
+      margin-top: 1.5rem;
+
+      font-size: 1rem;
+      font-weight: normal;
+      font-style: normal;
+      font-stretch: normal;
+      line-height: 1.5;
+      letter-spacing: -0.16px;
+      text-align: center;
+      color: #a9b5c7;
+
+      &--warning {
+        color: #801515;
+      }
+    }
+  }
+
   .manage-collateral-form__actions-container {
     display: flex;
     flex-direction: row;
     justify-content: center;
-
-    margin-top: 2rem;
   }
 }

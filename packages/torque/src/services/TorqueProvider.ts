@@ -1,12 +1,13 @@
 import { Web3ProviderEngine } from "@0x/subproviders";
 import { BigNumber } from "@0x/utils";
-import { Web3Wrapper } from '@0x/web3-wrapper';
+import { Web3Wrapper } from "@0x/web3-wrapper";
 import { EventEmitter } from "events";
 import { Asset } from "../domain/Asset";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { BorrowRequest } from "../domain/BorrowRequest";
 import { ExtendLoanRequest } from "../domain/ExtendLoanRequest";
 import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
+import { IBorrowEstimate } from "../domain/IBorrowEstimate";
 import { ICollateralChangeEstimate } from "../domain/ICollateralChangeEstimate";
 import { ICollateralManagementParams } from "../domain/ICollateralManagementParams";
 import { IExtendEstimate } from "../domain/IExtendEstimate";
@@ -18,10 +19,12 @@ import { IWeb3ProviderSettings } from "../domain/IWeb3ProviderSettings";
 import { ManageCollateralRequest } from "../domain/ManageCollateralRequest";
 import { ProviderType } from "../domain/ProviderType";
 import { RepayLoanRequest } from "../domain/RepayLoanRequest";
+import { WalletType } from "../domain/WalletType";
 import { Web3ConnectionFactory } from "../domain/Web3ConnectionFactory";
 import { ContractsSource } from "./ContractsSource";
+import { TorqueProviderEvents } from "./events/TorqueProviderEvents";
+
 // import { ProviderChangedEvent } from "./events/ProviderChangedEvent";
-// import { TorqueProviderEvents } from "./events/TorqueProviderEvents";
 
 export class TorqueProvider {
   public static Instance: TorqueProvider;
@@ -69,23 +72,25 @@ export class TorqueProvider {
     //     );
     //   });
     // } else {
-    //   // setting up readonly provider
-    //   Web3ConnectionFactory.getWeb3Provider(null, this.eventEmitter).then((providerData) => {
-    //     // @ts-ignore
-    //     const web3Wrapper = providerData[0];
-    //     TorqueProvider.getWeb3ProviderSettings(providerData[3]).then((web3ProviderSettings) => {
-    //       if (web3Wrapper && web3ProviderSettings) {
-    //         const contractsSource = new ContractsSource(providerData[1], web3ProviderSettings.networkId, providerData[2]);
-    //         contractsSource.Init().then(() => {
-    //           this.web3Wrapper = web3Wrapper;
-    //           this.providerEngine = providerData[1];
-    //           this.web3ProviderSettings = web3ProviderSettings;
-    //           this.contractsSource = contractsSource;
-    //           this.eventEmitter.emit(TorqueProviderEvents.ProviderAvailable);
-    //         });
-    //       }
-    //     });
-    //   });
+
+      // setting up readonly provider
+      Web3ConnectionFactory.getWeb3Provider(null, this.eventEmitter).then((providerData) => {
+        // @ts-ignore
+        const web3Wrapper = providerData[0];
+        TorqueProvider.getWeb3ProviderSettings(providerData[3]).then((web3ProviderSettings) => {
+          if (web3Wrapper && web3ProviderSettings) {
+            const contractsSource = new ContractsSource(providerData[1], web3ProviderSettings.networkId, providerData[2]);
+            contractsSource.Init().then(() => {
+              this.web3Wrapper = web3Wrapper;
+              this.providerEngine = providerData[1];
+              this.web3ProviderSettings = web3ProviderSettings;
+              this.contractsSource = contractsSource;
+              this.eventEmitter.emit(TorqueProviderEvents.ProviderAvailable);
+            });
+          }
+        });
+      });
+
     // }
 
     return TorqueProvider.Instance;
@@ -224,6 +229,14 @@ export class TorqueProvider {
     return borrowRequest.borrowAmount.minus(new BigNumber(-1));
   };
 
+  public getBorrowGasAmount = async (): Promise<BigNumber> => {
+    return new BigNumber(1500000);
+  };
+
+  public getBorrowDepositEstimate = async (walletType: WalletType, amount: BigNumber): Promise<IBorrowEstimate> => {
+    return ! amount.isNaN() ? { depositAmount: amount.multipliedBy(1.2) } : { depositAmount: new BigNumber(0) };
+  };
+
   public doBorrow = async (borrowRequest: BorrowRequest) => {
     return ;
   };
@@ -233,6 +246,28 @@ export class TorqueProvider {
   };
 
   public getLoansList = async (walletDetails: IWalletDetails): Promise<IBorrowedFundsState[]> => {
+    let result: IBorrowedFundsState[] = [];
+    if (this.contractsSource) {
+      const iBZxContract = await this.contractsSource.getiBZxContract();
+      const loansData = await iBZxContract.getBasicLoansData.callAsync(walletDetails.walletAddress || "", new BigNumber(6));
+      const zero = new BigNumber(0);
+      result = loansData.filter(e => e.loanEndUnixTimestampSec.eq(zero)).map(e => {
+        return {
+          accountAddress: walletDetails.walletAddress || "",
+          loanOrderHash: e.loanTokenAddress, // TODO: should be loanOrderHash, safe for now
+          asset: Asset.DAI,                  // TODO: should do lookup by e.loanTokenAddress, safe for now
+          amount: e.loanTokenAmountFilled,
+          collateralizedPercent: e.currentMarginAmount.dividedBy(e.loanTokenAmountFilled).multipliedBy(100),
+          interestRate: e.interestOwedPerDay.dividedBy(e.loanTokenAmountFilled).multipliedBy(365),
+          hasManagementContract: true,
+          isInProgress: false
+        }
+      });
+    }
+    return result;
+  };
+
+  public getLoansListTest = async (walletDetails: IWalletDetails): Promise<IBorrowedFundsState[]> => {
     return [
       {
         // TEST ORDER 01
@@ -308,12 +343,22 @@ export class TorqueProvider {
     ];
   };
 
-  public getLoanCollateralManagementManagementAddress = async (walletDetails: IWalletDetails, accountAddress: string, loanOrderHash: string): Promise<string | null> => {
-    return "";
+  public getLoanCollateralManagementManagementAddress = async (
+    walletDetails: IWalletDetails,
+    accountAddress: string,
+    loanOrderHash: string,
+    loanValue: number,
+    selectedValue: number
+  ): Promise<string | null> => {
+    return `${loanValue > selectedValue ? "withdraw.dai.tokenloan.eth" : "topup.dai.tokenloan.eth"}`;
   };
 
   public isPositionSafe = (borrowedFundsState: IBorrowedFundsState): boolean => {
     return BigNumber.random().gte(0.5);
+  };
+
+  public getLoanCollateralManagementGasAmount = async (): Promise<BigNumber> => {
+    return new BigNumber(1000000);
   };
 
   public getLoanCollateralManagementParams = async (walletDetails: IWalletDetails, accountAddress: string, loanOrderHash: string): Promise<ICollateralManagementParams> => {
@@ -331,24 +376,36 @@ export class TorqueProvider {
     return ;
   };
 
-  public getLoanRepayManagementAddress = async (walletDetails: IWalletDetails, accountAddress: string, loanOrderHash: string): Promise<string | null> => {
-    return "repay1.nnn.tokenloan.eth";
+  public getLoanRepayGasAmount = async (): Promise<BigNumber> => {
+    return new BigNumber(1500000);
+  };
+
+  public getLoanRepayAddress = async (walletDetails: IWalletDetails, accountAddress: string, loanOrderHash: string): Promise<string | null> => {
+    return "repay.dai.tokenloan.eth";
   };
 
   public getLoanRepayParams = async (walletDetails: IWalletDetails, accountAddress: string, loanOrderHash: string): Promise<IRepayState> => {
-    return { minValue: 0, maxValue: 100, currentValue: 66 };
+    return (walletDetails.walletType === WalletType.Web3)
+        ? { minValue: 0, maxValue: 100, currentValue: 66 }
+        : { minValue: 0, maxValue: 100, currentValue: 100 };
   };
 
   public getLoanRepayEstimate = async (walletDetails: IWalletDetails, accountAddress: string, loanOrderHash: string, repayPercent: number): Promise<IRepayEstimate> => {
-    return { repayAmount: new BigNumber(repayPercent * 3) };
+    return (walletDetails.walletType === WalletType.NonWeb3)
+      ? { repayAmount: new BigNumber(0) }
+      : { repayAmount: new BigNumber(repayPercent * 3) };
   };
 
   public doRepayLoan = async (repayLoanRequest: RepayLoanRequest) => {
     return ;
   };
 
+  public getLoanExtendGasAmount = async (): Promise<BigNumber> => {
+    return new BigNumber(1000000);
+  };
+
   public getLoanExtendManagementAddress = async (walletDetails: IWalletDetails, accountAddress: string, loanOrderHash: string): Promise<string | null> => {
-    return "extend1.nnn.tokenloan.eth";
+    return "extend.dai.tokenloan.eth";
   };
 
   public getLoanExtendParams = async (walletDetails: IWalletDetails, accountAddress: string, loanOrderHash: string): Promise<IExtendState> => {

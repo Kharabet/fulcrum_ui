@@ -32,6 +32,7 @@ interface IRepayLoanFormState {
   selectedValue: number;
   repayAmount: BigNumber;
   repayManagementAddress: string | null;
+  gasAmountNeeded: BigNumber;
 }
 
 export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanFormState> {
@@ -47,7 +48,8 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
       currentValue: 100,
       selectedValue: 100,
       repayAmount: new BigNumber(0),
-      repayManagementAddress: null
+      repayManagementAddress: null,
+      gasAmountNeeded: new BigNumber(0)
     };
 
     this.selectedValueUpdate = new Subject<number>();
@@ -70,25 +72,28 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
       this.props.loanOrderState.accountAddress,
       this.props.loanOrderState.loanOrderHash
     ).then(collateralState => {
-      TorqueProvider.Instance.getLoanRepayManagementAddress(
+      TorqueProvider.Instance.getLoanRepayAddress(
         this.props.walletDetails,
         this.props.loanOrderState.accountAddress,
         this.props.loanOrderState.loanOrderHash
       ).then(repayManagementAddress => {
-        this.setState(
-          {
-            ...this.state,
-            minValue: collateralState.minValue,
-            maxValue: collateralState.maxValue,
-            assetDetails: AssetsDictionary.assets.get(this.props.loanOrderState.asset) || null,
-            currentValue: collateralState.currentValue,
-            selectedValue: collateralState.currentValue,
-            repayManagementAddress: repayManagementAddress
-          },
-          () => {
-            this.selectedValueUpdate.next(this.state.selectedValue);
-          }
-        );
+        TorqueProvider.Instance.getLoanRepayGasAmount().then(gasAmountNeeded => {
+          this.setState(
+            {
+              ...this.state,
+              minValue: collateralState.minValue,
+              maxValue: collateralState.maxValue,
+              assetDetails: AssetsDictionary.assets.get(this.props.loanOrderState.asset) || null,
+              currentValue: collateralState.currentValue,
+              selectedValue: collateralState.currentValue,
+              repayManagementAddress: repayManagementAddress,
+              gasAmountNeeded: gasAmountNeeded
+            },
+            () => {
+              this.selectedValueUpdate.next(this.state.selectedValue);
+            }
+          );
+        });
       });
     });
   }
@@ -103,20 +108,23 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
       prevProps.loanOrderState.loanOrderHash !== this.props.loanOrderState.loanOrderHash ||
       prevState.selectedValue !== this.state.selectedValue
     ) {
-      TorqueProvider.Instance.getLoanRepayManagementAddress(
+      TorqueProvider.Instance.getLoanRepayAddress(
         this.props.walletDetails,
         this.props.loanOrderState.accountAddress,
         this.props.loanOrderState.loanOrderHash
       ).then(repayManagementAddress => {
-        this.setState(
-          {
-            ...this.state,
-            repayManagementAddress: repayManagementAddress
-          },
-          () => {
-            this.selectedValueUpdate.next(this.state.selectedValue);
-          }
-        );
+        TorqueProvider.Instance.getLoanRepayGasAmount().then(gasAmountNeeded => {
+          this.setState(
+            {
+              ...this.state,
+              repayManagementAddress: repayManagementAddress,
+              gasAmountNeeded: gasAmountNeeded
+            },
+            () => {
+              this.selectedValueUpdate.next(this.state.selectedValue);
+            }
+          );
+        });
       });
     }
   }
@@ -129,30 +137,36 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
     return (
       <form className="repay-loan-form" onSubmit={this.onSubmitClick}>
         <section className="dialog-content">
-          <RepayLoanSlider
-            readonly={false}
-            minValue={this.state.minValue}
-            maxValue={this.state.maxValue}
-            value={this.state.currentValue}
-            onUpdate={this.onUpdate}
-            onChange={this.onChange}
-          />
+          {this.props.walletDetails.walletType === WalletType.Web3 ? (
+            <React.Fragment>
+              <RepayLoanSlider
+                readonly={false}
+                minValue={this.state.minValue}
+                maxValue={this.state.maxValue}
+                value={this.state.currentValue}
+                onUpdate={this.onUpdate}
+                onChange={this.onChange}
+              />
 
-          <div className="repay-loan-form__tips">
-            <div className="repay-loan-form__tip">Current state</div>
-            <div className="repay-loan-form__tip">Full repayment</div>
-          </div>
+              <div className="repay-loan-form__tips">
+                <div className="repay-loan-form__tip">Current state</div>
+                <div className="repay-loan-form__tip">Full repayment</div>
+              </div>
 
-          <hr className="repay-loan-form__delimiter" />
-
+              <hr className="repay-loan-form__delimiter" />
+            </React.Fragment>
+          ) : null}
           {this.props.walletDetails.walletType === WalletType.NonWeb3 ? (
             <div className="repay-loan-form__transfer-details">
               <ActionViaTransferDetails
                 contractAddress={this.state.repayManagementAddress || ""}
-                ethAmount={new BigNumber(0)}
+                ethAmount={this.state.repayAmount}
               />
               <div className="repay-loan-form__transfer-details-msg repay-loan-form__transfer-details-msg--warning">
-                Note: you should send funds ONLY from the wallet you control!
+                Note 1: you should send funds ONLY from the wallet you control!
+              </div>
+              <div className="repay-loan-form__transfer-details-msg repay-loan-form__transfer-details-msg--warning">
+                Note 2: please, set high amount of the gas (> {this.state.gasAmountNeeded.toFixed()})!
               </div>
               <div className="repay-loan-form__transfer-details-msg repay-loan-form__transfer-details-msg--warning">
                 If you want to partially repay loan use web3 wallet!

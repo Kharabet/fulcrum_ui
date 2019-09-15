@@ -1,9 +1,12 @@
 import { BigNumber } from "@0x/utils";
 import React, { ChangeEvent, Component, FormEvent } from "react";
-import { Subject } from "rxjs";
+import { Observable, Subject } from "rxjs";
+import { debounceTime, switchMap } from "rxjs/operators";
 import { Asset } from "../domain/Asset";
 import { BorrowRequest } from "../domain/BorrowRequest";
+import { IBorrowEstimate } from "../domain/IBorrowEstimate";
 import { WalletType } from "../domain/WalletType";
+import { TorqueProvider } from "../services/TorqueProvider";
 import { ActionViaTransferDetails } from "./ActionViaTransferDetails";
 import { CollateralTokenSelectorToggle } from "./CollateralTokenSelectorToggle";
 
@@ -20,14 +23,15 @@ interface IBorrowFormState {
   collateralAsset: Asset;
 
   inputAmountText: string;
-  inputAmountValue: BigNumber;
+  depositAmount: BigNumber;
+  gasAmountNeeded: BigNumber;
 }
 
 export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
   private readonly _inputPrecision = 6;
   private _input: HTMLInputElement | null = null;
 
-  private readonly _inputChange: Subject<string>;
+  private readonly _inputTextChange: Subject<string>;
 
   public constructor(props: IBorrowFormProps, context?: any) {
     super(props, context);
@@ -36,10 +40,23 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
       borrowAmount: new BigNumber(0),
       collateralAsset: Asset.ETH,
       inputAmountText: "",
-      inputAmountValue: new BigNumber(0),
+      depositAmount: new BigNumber(0),
+      gasAmountNeeded: new BigNumber(1500000)
     };
 
-    this._inputChange = new Subject();
+    this._inputTextChange = new Subject<string>();
+    this._inputTextChange
+      .pipe(
+        debounceTime(100),
+        switchMap(value => this.rxConvertToBigNumber(value)),
+        switchMap(value => this.rxGetEstimate(value))
+      )
+      .subscribe((value: IBorrowEstimate) => {
+        this.setState({
+          ...this.state,
+          depositAmount: value.depositAmount
+        });
+      });
   }
 
   private _setInputRef = (input: HTMLInputElement) => {
@@ -61,9 +78,12 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
           </div>
           {this.props.walletType === WalletType.NonWeb3 ? (
             <div className="borrow-form__transfer-details">
-              <ActionViaTransferDetails contractAddress={"dai.tokenloan.eth"} ethAmount={this.state.inputAmountValue} />
+              <ActionViaTransferDetails contractAddress={"dai.tokenloan.eth"} ethAmount={this.state.depositAmount} />
               <div className="borrow-form__transfer-details-msg borrow-form__transfer-details-msg--warning">
-                Note: you should send funds ONLY from the wallet you control!
+                Note 1: you should send funds ONLY from the wallet you control!
+              </div>
+              <div className="borrow-form__transfer-details-msg borrow-form__transfer-details-msg--warning">
+                Note 2: please, set high amount of the gas (> {this.state.gasAmountNeeded.toFixed()})!
               </div>
               <div className="borrow-form__transfer-details-msg">
                 That's it! Once you've sent the funds, click Track to view the progress of the loan.
@@ -88,6 +108,23 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
       </form>
     );
   }
+
+  private rxConvertToBigNumber = (textValue: string): Observable<BigNumber> => {
+    return new Observable<BigNumber>(observer => {
+      observer.next(new BigNumber(textValue));
+    });
+  };
+
+  private rxGetEstimate = (selectedValue: BigNumber): Observable<IBorrowEstimate> => {
+    return new Observable<IBorrowEstimate>(observer => {
+      TorqueProvider.Instance.getBorrowDepositEstimate(
+        this.props.walletType,
+        selectedValue
+      ).then(value => {
+        observer.next(value);
+      });
+    });
+  };
 
   private onSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -119,7 +156,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
       borrowAmount: new BigNumber(amountText)
     }, () => {
       // emitting next event for processing with rx.js
-      this._inputChange.next(this.state.inputAmountText);
+      this._inputTextChange.next(this.state.inputAmountText);
     });
   };
 }

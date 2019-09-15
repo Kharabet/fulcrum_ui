@@ -32,6 +32,7 @@ interface IExtendLoanFormState {
   selectedValue: number;
   depositAmount: BigNumber;
   extendManagementAddress: string | null;
+  gasAmountNeeded: BigNumber;
 }
 
 export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanFormState> {
@@ -47,7 +48,8 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
       currentValue: 100,
       selectedValue: 100,
       depositAmount: new BigNumber(0),
-      extendManagementAddress: null
+      extendManagementAddress: null,
+      gasAmountNeeded: new BigNumber(0)
     };
 
     this.selectedValueUpdate = new Subject<number>();
@@ -108,15 +110,18 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
         this.props.loanOrderState.accountAddress,
         this.props.loanOrderState.loanOrderHash
       ).then(extendManagementAddress => {
-        this.setState(
-          {
-            ...this.state,
-            extendManagementAddress: extendManagementAddress
-          },
-          () => {
-            this.selectedValueUpdate.next(this.state.selectedValue);
-          }
-        );
+        TorqueProvider.Instance.getLoanExtendGasAmount().then(gasAmountNeeded => {
+          this.setState(
+            {
+              ...this.state,
+              extendManagementAddress: extendManagementAddress,
+              gasAmountNeeded: gasAmountNeeded
+            },
+            () => {
+              this.selectedValueUpdate.next(this.state.selectedValue);
+            }
+          );
+        });
       });
     }
   }
@@ -159,7 +164,10 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
                 ethAmount={this.state.depositAmount}
               />
               <div className="extend-loan-form__transfer-details-msg extend-loan-form__transfer-details-msg--warning">
-                Note: you should send funds ONLY from the wallet you control!
+                Note 1: you should send funds ONLY from the wallet you control!
+              </div>
+              <div className="extend-loan-form__transfer-details-msg extend-loan-form__transfer-details-msg--warning">
+                Note 2: please, set high amount of the gas (> {this.state.gasAmountNeeded.toFixed()})!
               </div>
               <div className="extend-loan-form__transfer-details-msg">
                 That's it! Once you've sent the funds, click Close to return to the dashboard.

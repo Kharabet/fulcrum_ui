@@ -4,7 +4,6 @@ import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
 import { IWalletDetails } from "../domain/IWalletDetails";
-import { WalletType } from "../domain/WalletType";
 import { TorqueProvider } from "../services/TorqueProvider";
 import { CollateralSlider } from "./CollateralSlider";
 
@@ -145,9 +144,7 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
   }
 
   private onManageCollateral = () => {
-    if (this.props.walletDetails.walletType === WalletType.Web3) {
-      this.props.onManageCollateral({ ...this.props.item });
-    }
+    this.props.onManageCollateral({ ...this.props.item });
   };
 
   private onRepayLoan = () => {
