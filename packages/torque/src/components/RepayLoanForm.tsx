@@ -169,7 +169,7 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
                 Note 2: please, set high amount of the gas (> {this.state.gasAmountNeeded.toFixed()})!
               </div>
               <div className="repay-loan-form__transfer-details-msg repay-loan-form__transfer-details-msg--warning">
-                If you want to partially repay loan use web3 wallet!
+                Note 3: If you want to partially repay loan use web3 wallet!
               </div>
               <div className="repay-loan-form__transfer-details-msg">
                 That's it! Once you've sent the funds, click Close to return to the dashboard.
