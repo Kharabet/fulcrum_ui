@@ -30,16 +30,23 @@
       height: 3rem;
 
       background-color: rgba(255, 255, 255, 0);
-      padding: 0.75rem 3rem 0.75rem 1rem;
-
+      
       font-size: 1rem;
       font-weight: normal;
       font-style: normal;
       font-stretch: normal;
       line-height: 1.5;
       letter-spacing: -0.16px;
-      text-align: left;
       color: #a9b5c7;
+    }
+
+    .action-via-transfer-details__input-left {
+      padding: 0.75rem 3rem 0.75rem 1rem;
+      text-align: left;
+    }
+
+    .action-via-transfer-details__input-center {
+      text-align: center;
     }
 
     .action-via-transfer-details__input-actions {

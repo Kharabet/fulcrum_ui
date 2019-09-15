@@ -2,6 +2,7 @@ import { BigNumber } from "bignumber.js";
 import React, { Component, FormEvent } from "react";
 import { Observable, Subject } from "rxjs";
 import { debounceTime, switchMap } from "rxjs/operators";
+import { ActionType } from "../domain/ActionType";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { ExtendLoanRequest } from "../domain/ExtendLoanRequest";
@@ -161,14 +162,19 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
             <div className="extend-loan-form__transfer-details">
               <ActionViaTransferDetails
                 contractAddress={this.state.extendManagementAddress || ""}
-                ethAmount={this.state.depositAmount}
+                assetAmount={this.state.depositAmount}
+                account={this.props.loanOrderState.accountAddress}
+                action={ActionType.ExtendLoan}
               />
               <div className="extend-loan-form__transfer-details-msg extend-loan-form__transfer-details-msg--warning">
-                Note 1: you should send funds ONLY from the wallet you control!
+                Please set your gas amount to {this.state.gasAmountNeeded.toFixed()}.
               </div>
               <div className="extend-loan-form__transfer-details-msg extend-loan-form__transfer-details-msg--warning">
-                Note 2: please, set the high amount of the gas (> {this.state.gasAmountNeeded.toFixed()})!
+                Always send funds from a wallet you control!
               </div>
+              {/*<div className="extend-loan-form__transfer-details-msg extend-loan-form__transfer-details-msg--warning">
+                Note 3: If you want to partially repay loan use a web3 wallet!
+              </div>*/}
               <div className="extend-loan-form__transfer-details-msg">
                 That's it! Once you've sent the funds, click Close to return to the dashboard.
               </div>

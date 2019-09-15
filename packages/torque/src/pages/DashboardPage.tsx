@@ -12,6 +12,7 @@ import { IWalletDetails } from "../domain/IWalletDetails";
 import { WalletType, walletTypeAbbrToWalletType } from "../domain/WalletType";
 import { Footer } from "../layout/Footer";
 import { HeaderHome } from "../layout/HeaderHome";
+import { TorqueProviderEvents } from "../services/events/TorqueProviderEvents";
 import { NavService } from "../services/NavService";
 import { TorqueProvider } from "../services/TorqueProvider";
 
@@ -48,6 +49,8 @@ export class DashboardPage extends PureComponent<
     this.walletAddressDlgRef = React.createRef();
 
     this.state = { walletDetails: { walletType: WalletType.Unknown, walletAddress: "" }, items: [] };
+
+    TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
   }
 
   private async derivedUpdate() {
@@ -55,13 +58,21 @@ export class DashboardPage extends PureComponent<
       walletType: walletTypeAbbrToWalletType(this.props.match.params.walletTypeAbbr),
       walletAddress: this.props.match.params.walletAddress
     };
-    const items = await TorqueProvider.Instance.getLoansListTest(walletDetails);
+    const items = await TorqueProvider.Instance.getLoansList(walletDetails);
 
     this.setState({
       ...this.state,
       walletDetails: walletDetails,
       items: items
     });
+  }
+
+  private onProviderAvailable = () => {
+    this.derivedUpdate();
+  };
+
+  public componentWillUnmount(): void {
+    TorqueProvider.Instance.eventEmitter.removeListener(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
   }
 
   public componentDidMount(): void {

@@ -2,6 +2,7 @@ import { BigNumber } from "@0x/utils";
 import React, { Component, FormEvent } from "react";
 import { Observable, Subject } from "rxjs";
 import { debounceTime, switchMap } from "rxjs/operators";
+import { ActionType } from "../domain/ActionType";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
@@ -178,14 +179,19 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
               <div className="manage-collateral-form__transfer-details">
                 <ActionViaTransferDetails
                   contractAddress={this.state.loanCollateralManagementAddress || ""}
-                  ethAmount={this.state.diffAmount}
+                  assetAmount={this.state.diffAmount}
+                  account={this.props.loanOrderState.accountAddress}
+                  action={ActionType.ManageCollateral}
                 />
                 <div className="manage-collateral-form__transfer-details-msg manage-collateral-form__transfer-details-msg--warning">
-                  Note 1: you should send funds ONLY from the wallet you control!
+                  Please set your gas amount to {this.state.gasAmountNeeded.toFixed()}.
                 </div>
                 <div className="manage-collateral-form__transfer-details-msg manage-collateral-form__transfer-details-msg--warning">
-                  Note 2: please, set the high amount of the gas (> {this.state.gasAmountNeeded.toFixed()})!
+                  Always send funds from a wallet you control!
                 </div>
+                {/*<div className="manage-collateral-form__transfer-details-msg manage-collateral-form__transfer-details-msg--warning">
+                  Note 3: If you want to partially repay loan use a web3 wallet!
+                </div>*/}
                 <div className="manage-collateral-form__transfer-details-msg">
                   That's it! Once you've sent the funds, click Close to return to the dashboard.
                 </div>

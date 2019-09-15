@@ -2,8 +2,8 @@
   display: flex;
   flex-direction: column;
 
-  width: 31rem;
-  padding-top: 3.25rem;
+  width: 47rem;
+  padding-top: 1rem;
 
   .extend-loan-form__tips {
     display: flex;
@@ -13,7 +13,7 @@
     // hack around slider
     padding-top: 1rem;
     // spacing
-    padding-bottom: 3rem;
+    //padding-bottom: 3rem;
 
     .extend-loan-form__tip {
       font-size: 0.75rem;
@@ -36,10 +36,11 @@
   .extend-loan-form__info-extended-by-container {
     border-radius: 1rem;
     background-color: #f5f7f9;
-    padding: 2.5rem;
-    margin-bottom: 1rem;
+    //padding: 2.5rem;
+    //margin-bottom: 1rem;
 
     .extend-loan-form__info-extended-by-msg {
+      padding-top: 1rem;
       font-size: 1rem;
       font-weight: normal;
       font-style: normal;

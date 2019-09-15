@@ -289,6 +289,7 @@ export class iBZxContract extends BaseContract {
       defaultBlock?: BlockParam
     ): Promise<
       Array<{
+        loanOrderHash: string;
         loanTokenAddress: string;
         collateralTokenAddress: string;
         loanTokenAmountFilled: BigNumber;
@@ -318,6 +319,7 @@ export class iBZxContract extends BaseContract {
       // tslint:disable boolean-naming
       const result = abiEncoder.strictDecodeReturnValue<
         Array<{
+          loanOrderHash: string;
           loanTokenAddress: string;
           collateralTokenAddress: string;
           loanTokenAmountFilled: BigNumber;

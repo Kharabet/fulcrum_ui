@@ -2,8 +2,8 @@
   display: flex;
   flex-direction: column;
 
-  width: 31rem;
-  padding-top: 3.25rem;
+  width: 47rem;
+  padding-top: 1rem;
 
   .manage-collateral-form__tips {
     display: flex;
@@ -13,7 +13,7 @@
     // hack around slider
     padding-top: 1rem;
     // spacing
-    padding-bottom: 2.5rem;
+    //padding-bottom: 2.5rem;
 
     margin-bottom: 0.875rem;
 
@@ -38,7 +38,10 @@
   .manage-collateral-form__info-liquidated-at-container {
     border-radius: 1rem;
     background-color: #f5f7f9;
-    padding: 2.5rem;
+    padding-top: 1rem;
+    padding-right: 2.5rem;
+    padding-bottom: 1rem;
+    padding-left: 2.5rem;
 
 
     .manage-collateral-form__info-liquidated-at-msg {

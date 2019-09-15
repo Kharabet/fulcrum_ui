@@ -2,6 +2,7 @@ import { BigNumber } from "bignumber.js";
 import React, { Component, FormEvent } from "react";
 import { Observable, Subject } from "rxjs";
 import { debounceTime, switchMap } from "rxjs/operators";
+import { ActionType } from "../domain/ActionType";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
@@ -47,13 +48,13 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
       assetDetails: null,
       currentValue: 100,
       selectedValue: 100,
-      repayAmount: new BigNumber(0),
+      repayAmount: props.loanOrderState.amount,
       repayManagementAddress: null,
       gasAmountNeeded: new BigNumber(0)
     };
 
     this.selectedValueUpdate = new Subject<number>();
-    this.selectedValueUpdate
+    /*this.selectedValueUpdate
       .pipe(
         debounceTime(100),
         switchMap(value => this.rxGetEstimate(value))
@@ -63,7 +64,7 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
           ...this.state,
           repayAmount: value.repayAmount
         });
-      });
+      });*/
   }
 
   public componentDidMount(): void {
@@ -160,17 +161,19 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
             <div className="repay-loan-form__transfer-details">
               <ActionViaTransferDetails
                 contractAddress={this.state.repayManagementAddress || ""}
-                ethAmount={this.state.repayAmount}
+                assetAmount={this.state.repayAmount}
+                account={this.props.loanOrderState.accountAddress}
+                action={ActionType.RepayLoan}
               />
               <div className="repay-loan-form__transfer-details-msg repay-loan-form__transfer-details-msg--warning">
-                Note 1: you should send funds ONLY from the wallet you control!
+                Please set your gas amount to {this.state.gasAmountNeeded.toFixed()}.
               </div>
               <div className="repay-loan-form__transfer-details-msg repay-loan-form__transfer-details-msg--warning">
-                Note 2: please, set the high amount of the gas (> {this.state.gasAmountNeeded.toFixed()})!
+                Always send funds from a wallet you control!
               </div>
-              <div className="repay-loan-form__transfer-details-msg repay-loan-form__transfer-details-msg--warning">
-                Note 3: If you want to partially repay loan use web3 wallet!
-              </div>
+              {/*<div className="repay-loan-form__transfer-details-msg repay-loan-form__transfer-details-msg--warning">
+                Note 3: If you want to partially repay loan use a web3 wallet!
+              </div>*/}
               <div className="repay-loan-form__transfer-details-msg">
                 That's it! Once you've sent the funds, click Close to return to the dashboard.
               </div>

@@ -49,8 +49,8 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
 
   private derivedUpdate = async () => {
     const assetDetails = AssetsDictionary.assets.get(this.props.item.asset) || null;
-    const interestRate = await TorqueProvider.Instance.getAssetInterestRate(this.props.item.asset);
-    this.setState({ ...this.state, assetDetails: assetDetails, interestRate: interestRate });
+    // const interestRate = await TorqueProvider.Instance.getAssetInterestRate(this.props.item.asset);
+    this.setState({ ...this.state, assetDetails: assetDetails, interestRate: this.props.item.interestRate });
   };
 
   public render() {
@@ -74,7 +74,7 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
             <div className="borrowed-funds-list-item__general-container-values">
               <div className="borrowed-funds-list-item__amount">{this.props.item.amount.toFixed(5)}</div>
               <div className="borrowed-funds-list-item__interest-rate">
-                {this.state.interestRate.multipliedBy(100).toFixed(5)} % APR
+                {this.state.interestRate.multipliedBy(100).toFixed(2)} % APR
               </div>
             </div>
             <div className="borrowed-funds-list-item__general-container-asset">

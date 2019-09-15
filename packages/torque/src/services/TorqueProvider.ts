@@ -249,20 +249,23 @@ export class TorqueProvider {
     let result: IBorrowedFundsState[] = [];
     if (this.contractsSource) {
       const iBZxContract = await this.contractsSource.getiBZxContract();
-      const loansData = await iBZxContract.getBasicLoansData.callAsync(walletDetails.walletAddress || "", new BigNumber(6));
-      const zero = new BigNumber(0);
-      result = loansData.filter(e => e.loanEndUnixTimestampSec.eq(zero)).map(e => {
-        return {
-          accountAddress: walletDetails.walletAddress || "",
-          loanOrderHash: e.loanTokenAddress, // TODO: should be loanOrderHash, safe for now
-          asset: Asset.DAI,                  // TODO: should do lookup by e.loanTokenAddress, safe for now
-          amount: e.loanTokenAmountFilled,
-          collateralizedPercent: e.currentMarginAmount.dividedBy(e.loanTokenAmountFilled).multipliedBy(100),
-          interestRate: e.interestOwedPerDay.dividedBy(e.loanTokenAmountFilled).multipliedBy(365),
-          hasManagementContract: true,
-          isInProgress: false
-        }
-      });
+      if (iBZxContract && walletDetails.walletAddress) {
+        const loansData = await iBZxContract.getBasicLoansData.callAsync(walletDetails.walletAddress, new BigNumber(6));
+        const zero = new BigNumber(0);
+        result = loansData.filter(e => !e.loanTokenAmountFilled.eq(zero)).map(e => {
+          return {
+            accountAddress: walletDetails.walletAddress || "",
+            loanOrderHash: e.loanOrderHash,
+            asset: Asset.DAI,                  // TODO: should do lookup by e.loanTokenAddress, safe for now
+            amount: e.loanTokenAmountFilled.dividedBy(10**18).dp(5, BigNumber.ROUND_CEIL),
+            collateralizedPercent: e.currentMarginAmount.dividedBy(10**20),
+            interestRate: e.interestOwedPerDay.dividedBy(e.loanTokenAmountFilled).multipliedBy(365),
+            hasManagementContract: true,
+            isInProgress: false
+          }
+        });
+        // console.log(result);
+      }
     }
     return result;
   };
@@ -377,7 +380,7 @@ export class TorqueProvider {
   };
 
   public getLoanRepayGasAmount = async (): Promise<BigNumber> => {
-    return new BigNumber(1500000);
+    return new BigNumber(2000000);
   };
 
   public getLoanRepayAddress = async (walletDetails: IWalletDetails, accountAddress: string, loanOrderHash: string): Promise<string | null> => {

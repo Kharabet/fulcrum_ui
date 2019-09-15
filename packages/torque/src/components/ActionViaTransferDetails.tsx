@@ -1,13 +1,16 @@
 import { BigNumber } from "@0x/utils";
 import React, { Component, RefObject } from "react";
 
+import { ActionType } from "../domain/ActionType";
 import ic_copy from "./../assets/images/ic_copy.svg"
 import ic_qr_code from "./../assets/images/ic_qr_code.svg"
 import { QRCodeForAddressDlg } from "./QRCodeForAddressDlg";
 
 export interface IActionViaTransferDetailsProps {
-  ethAmount: BigNumber;
+  assetAmount: BigNumber;
   contractAddress: string;
+  account: string;
+  action: ActionType;
 }
 
 export class ActionViaTransferDetails extends Component<IActionViaTransferDetailsProps> {
@@ -20,21 +23,73 @@ export class ActionViaTransferDetails extends Component<IActionViaTransferDetail
   }
 
   public render() {
+
+    const userENS = `${this.props.account.toLowerCase()}.tokenloan.eth`;
+
+    let actionAsset: string = "";
+    let actionContract1: string = "";
+    let actionContract2: string = "";
+    let classes1: string = "";
+    let classes2: string = "";
+    switch (this.props.action) {
+      case ActionType.Borrow:
+        actionAsset = "ETH";
+        actionContract1 = this.props.contractAddress;
+        classes1 = "action-via-transfer-details__input-center";
+        break;
+      case ActionType.ManageCollateral:
+        actionAsset = "ETH";
+        actionContract1 = userENS;
+        actionContract2 = this.props.contractAddress;
+        classes1 = "action-via-transfer-details__input-left";
+        classes2 = "action-via-transfer-details__input-center";
+        break;
+      case ActionType.ExtendLoan:
+        actionAsset = "DAI";
+        actionContract1 = userENS;
+        actionContract2 = this.props.contractAddress;
+        classes1 = "action-via-transfer-details__input-left";
+        classes2 = "action-via-transfer-details__input-center";
+        break;
+      case ActionType.RepayLoan:
+        actionAsset = "DAI";
+        actionContract1 = userENS;
+        actionContract2 = this.props.contractAddress;
+        classes1 = "action-via-transfer-details__input-left";
+        classes2 = "action-via-transfer-details__input-center";
+        break;
+    }
+    
     return (
       <React.Fragment>
         <QRCodeForAddressDlg ref={this.borrowViaTransferAddressQRDlg} address={this.props.contractAddress} />
         <div className="action-via-transfer-details">
-          <div className="action-via-transfer-details__title">
-            Send <span className="action-via-transfer-details__title-amount">{this.props.ethAmount.toFixed(3)} ETH</span>{" "}
+          <div className="action-via-transfer-details__title" style={{ marginBottom: this.props.action !== ActionType.Borrow ? `0.5rem` : undefined }}>
+            Send <span className="action-via-transfer-details__title-amount">{this.props.assetAmount.dp(5, BigNumber.ROUND_CEIL).toString()} {actionAsset}</span>{" "}
             to
           </div>
           <div className="action-via-transfer-details__input-container">
-            <input type="text" className="action-via-transfer-details__input" value={this.props.contractAddress} readOnly={true} />
+            <input type="text" className={`action-via-transfer-details__input ${classes1}`} value={actionContract1} readOnly={true} />
             <div className="action-via-transfer-details__input-actions">
               <img className="action-via-transfer-details__input-btn" src={ic_qr_code} onClick={this.onShowAddressQRClick} />
               <img className="action-via-transfer-details__input-btn" src={ic_copy} onClick={this.onCopyAddressClick} />
             </div>
           </div>
+          {this.props.action !== ActionType.Borrow ? (
+            <React.Fragment>
+              <div className="action-via-transfer-details__title" style={{ paddingTop: `16px`, marginBottom: `0.5rem` }}>
+                then send <span className="action-via-transfer-details__title-amount">0 ETH</span>{" "}
+                to
+              </div>
+              <div className="action-via-transfer-details__input-container">
+                <input type="text" className={`action-via-transfer-details__input ${classes2}`} value={actionContract2} readOnly={true} />
+                <div className="action-via-transfer-details__input-actions">
+                  <img className="action-via-transfer-details__input-btn" src={ic_qr_code} onClick={this.onShowAddressQRClick} />
+                  <img className="action-via-transfer-details__input-btn" src={ic_copy} onClick={this.onCopyAddressClick} />
+                </div>
+              </div>
+            </React.Fragment>
+          ) : ``}
         </div>
       </React.Fragment>
     );

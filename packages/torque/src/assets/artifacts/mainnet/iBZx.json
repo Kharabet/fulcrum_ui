@@ -1,4 +1,4 @@
-[
+{"name":"erc20","address":"","abi":[
   {
     "constant": false,
     "inputs": [
@@ -200,4 +200,4 @@
     "stateMutability": "nonpayable",
     "type": "function"
   }
-]
+]}

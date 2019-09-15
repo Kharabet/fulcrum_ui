@@ -2,6 +2,7 @@ import { BigNumber } from "@0x/utils";
 import React, { ChangeEvent, Component, FormEvent } from "react";
 import { Observable, Subject } from "rxjs";
 import { debounceTime, switchMap } from "rxjs/operators";
+import { ActionType } from "../domain/ActionType";
 import { Asset } from "../domain/Asset";
 import { BorrowRequest } from "../domain/BorrowRequest";
 import { IBorrowEstimate } from "../domain/IBorrowEstimate";
@@ -78,15 +79,23 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
           </div>
           {this.props.walletType === WalletType.NonWeb3 ? (
             <div className="borrow-form__transfer-details">
-              <ActionViaTransferDetails contractAddress={"dai.tokenloan.eth"} ethAmount={this.state.depositAmount} />
+              <ActionViaTransferDetails
+                contractAddress={"dai.tokenloan.eth"}
+                assetAmount={this.state.depositAmount}
+                account={""}
+                action={ActionType.Borrow}
+              />
               <div className="borrow-form__transfer-details-msg borrow-form__transfer-details-msg--warning">
-                Note 1: you should send funds ONLY from the wallet you control!
+                Please set your gas amount to {this.state.gasAmountNeeded.toFixed()}.
               </div>
               <div className="borrow-form__transfer-details-msg borrow-form__transfer-details-msg--warning">
-                Note 2: please, set the high amount of the gas (> {this.state.gasAmountNeeded.toFixed()})!
+                Always send funds from a wallet you control!
               </div>
+              {/*<div className="borrow-form__transfer-details-msg borrow-form__transfer-details-msg--warning">
+                Note 3: If you want to partially repay loan use a web3 wallet!
+              </div>*/}
               <div className="borrow-form__transfer-details-msg">
-                That's it! Once you've sent the funds, click Track to view the progress of the loan.
+                That's it! Once you've sent the funds, click Close to return to the dashboard.
               </div>
             </div>
           ) : null}
