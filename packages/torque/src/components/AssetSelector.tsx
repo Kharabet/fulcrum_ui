@@ -11,7 +11,7 @@ export interface IAssetSelectorProps {
 
 export class AssetSelector extends Component<IAssetSelectorProps> {
   private readonly assetsAvailableForWeb3: Asset[] = [Asset.DAI, Asset.ETH];
-  private readonly assetsAvailableForNonWeb3: Asset[] = [Asset.DAI];
+  private readonly assetsAvailableForNonWeb3: Asset[] = [Asset.DAI, Asset.WBTC];
 
   public render() {
     const assets =

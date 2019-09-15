@@ -80,6 +80,7 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
       this.props.loanOrderState.loanOrderHash
     ).then(collateralState => {
       TorqueProvider.Instance.getLoanCollateralManagementManagementAddress(
+        this.props.loanOrderState.asset,
         this.props.walletDetails,
         this.props.loanOrderState.accountAddress,
         this.props.loanOrderState.loanOrderHash,
@@ -119,6 +120,7 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
       prevState.selectedValue !== this.state.selectedValue
     ) {
       TorqueProvider.Instance.getLoanCollateralManagementManagementAddress(
+        this.props.loanOrderState.asset,
         this.props.walletDetails,
         this.props.loanOrderState.accountAddress,
         this.props.loanOrderState.loanOrderHash,

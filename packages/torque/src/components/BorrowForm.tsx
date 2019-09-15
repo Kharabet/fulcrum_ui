@@ -80,7 +80,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
           {this.props.walletType === WalletType.NonWeb3 ? (
             <div className="borrow-form__transfer-details">
               <ActionViaTransferDetails
-                contractAddress={"dai.tokenloan.eth"}
+                contractAddress={`${this.props.borrowAsset.toLowerCase()}.tokenloan.eth`}
                 assetAmount={this.state.depositAmount}
                 account={""}
                 action={ActionType.Borrow}
@@ -128,6 +128,8 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
     return new Observable<IBorrowEstimate>(observer => {
       TorqueProvider.Instance.getBorrowDepositEstimate(
         this.props.walletType,
+        this.props.borrowAsset,
+        this.state.collateralAsset,
         selectedValue
       ).then(value => {
         observer.next(value);

@@ -233,7 +233,33 @@ export class TorqueProvider {
     return new BigNumber(1500000);
   };
 
-  public getBorrowDepositEstimate = async (walletType: WalletType, amount: BigNumber): Promise<IBorrowEstimate> => {
+  public getBorrowDepositEstimate = async (
+    walletType: WalletType,
+    borrowAsset: Asset,
+    collateralAsset: Asset,
+    amount: BigNumber
+  ): Promise<IBorrowEstimate> => {
+    /*if (this.contractsSource) {
+      const iTokenContract = await this.contractsSource.getiTokenContract();
+      if (iBZxContract && walletDetails.walletAddress) {
+        const loansData = await iBZxContract.getBasicLoansData.callAsync(walletDetails.walletAddress, new BigNumber(6));
+        const zero = new BigNumber(0);
+        result = loansData.filter(e => !e.loanTokenAmountFilled.eq(zero)).map(e => {
+          return {
+            accountAddress: walletDetails.walletAddress || "",
+            loanOrderHash: e.loanOrderHash,
+            asset: Asset.DAI,
+            amount: e.loanTokenAmountFilled.dividedBy(10**18).dp(5, BigNumber.ROUND_CEIL),
+            collateralizedPercent: e.currentMarginAmount.dividedBy(10**20),
+            interestRate: e.interestOwedPerDay.dividedBy(e.loanTokenAmountFilled).multipliedBy(365),
+            hasManagementContract: true,
+            isInProgress: false
+          }
+        });
+        // console.log(result);
+      }
+    }*/
+
     return ! amount.isNaN() ? { depositAmount: amount.multipliedBy(1.2) } : { depositAmount: new BigNumber(0) };
   };
 
@@ -347,13 +373,14 @@ export class TorqueProvider {
   };
 
   public getLoanCollateralManagementManagementAddress = async (
+    asset: Asset,
     walletDetails: IWalletDetails,
     accountAddress: string,
     loanOrderHash: string,
     loanValue: number,
     selectedValue: number
   ): Promise<string | null> => {
-    return `${loanValue > selectedValue ? "withdraw.dai.tokenloan.eth" : "topup.dai.tokenloan.eth"}`;
+    return `${loanValue > selectedValue ? `withdraw.${asset.toLowerCase()}.tokenloan.eth` : `topup.${asset.toLowerCase()}.tokenloan.eth`}`;
   };
 
   public isPositionSafe = (borrowedFundsState: IBorrowedFundsState): boolean => {
@@ -424,7 +451,8 @@ export class TorqueProvider {
   };
 
   public getAssetInterestRate = async (asset: Asset): Promise<BigNumber> => {
-    return BigNumber.random();
+    return new BigNumber(16);
+    // return BigNumber.random();
   };
 
   public getErc20AddressOfAsset(asset: Asset): string | null {
