@@ -167,7 +167,7 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
                 Note 1: you should send funds ONLY from the wallet you control!
               </div>
               <div className="extend-loan-form__transfer-details-msg extend-loan-form__transfer-details-msg--warning">
-                Note 2: please, set high amount of the gas (> {this.state.gasAmountNeeded.toFixed()})!
+                Note 2: please, set the high amount of the gas (> {this.state.gasAmountNeeded.toFixed()})!
               </div>
               <div className="extend-loan-form__transfer-details-msg">
                 That's it! Once you've sent the funds, click Close to return to the dashboard.
