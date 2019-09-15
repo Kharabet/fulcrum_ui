@@ -29,7 +29,7 @@ export class ActionViaTransferDetails extends Component<IActionViaTransferDetail
             to
           </div>
           <div className="action-via-transfer-details__input-container">
-            <input type="text" className="action-via-transfer-details__input" value={this.props.contractAddress} />
+            <input type="text" className="action-via-transfer-details__input" value={this.props.contractAddress} readOnly={true} />
             <div className="action-via-transfer-details__input-actions">
               <img className="action-via-transfer-details__input-btn" src={ic_qr_code} onClick={this.onShowAddressQRClick} />
               <img className="action-via-transfer-details__input-btn" src={ic_copy} onClick={this.onCopyAddressClick} />
