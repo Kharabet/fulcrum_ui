@@ -239,29 +239,28 @@ export class TorqueProvider {
     collateralAsset: Asset,
     amount: BigNumber
   ): Promise<IBorrowEstimate> => {
-    /*if (this.contractsSource) {
-      const iTokenContract = await this.contractsSource.getiTokenContract();
-      if (iBZxContract && walletDetails.walletAddress) {
-        const loansData = await iBZxContract.getBasicLoansData.callAsync(walletDetails.walletAddress, new BigNumber(6));
-        const zero = new BigNumber(0);
-        result = loansData.filter(e => !e.loanTokenAmountFilled.eq(zero)).map(e => {
-          return {
-            accountAddress: walletDetails.walletAddress || "",
-            loanOrderHash: e.loanOrderHash,
-            asset: Asset.DAI,
-            amount: e.loanTokenAmountFilled.dividedBy(10**18).dp(5, BigNumber.ROUND_CEIL),
-            collateralizedPercent: e.currentMarginAmount.dividedBy(10**20),
-            interestRate: e.interestOwedPerDay.dividedBy(e.loanTokenAmountFilled).multipliedBy(365),
-            hasManagementContract: true,
-            isInProgress: false
-          }
-        });
-        // console.log(result);
+    const result = { depositAmount: new BigNumber(0) };
+    
+    if (this.contractsSource) {
+      const iTokenContract = await this.contractsSource.getiTokenContract(borrowAsset);
+      const collateralAssetErc20Address = this.getErc20AddressOfAsset(collateralAsset) || "";
+      if (amount.gt(0) && iTokenContract && collateralAssetErc20Address) {
+        const borrowEstimate = await iTokenContract.getDepositAmountForBorrow.callAsync(
+          amount.multipliedBy(10**18),
+          new BigNumber(4 * 10**18),
+          new BigNumber(7884000), // approximately 3 months
+          collateralAssetErc20Address,
+          true
+        );
+        result.depositAmount = borrowEstimate
+          .multipliedBy(150)
+          .dividedBy(125)
+          .dividedBy(10**18);
       }
-    }*/
+    }
 
-    return ! amount.isNaN() ? { depositAmount: amount.multipliedBy(1.2) } : { depositAmount: new BigNumber(0) };
-  };
+    return result;
+  }
 
   public doBorrow = async (borrowRequest: BorrowRequest) => {
     return ;
