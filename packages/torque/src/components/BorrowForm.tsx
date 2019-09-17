@@ -95,7 +95,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
                 Note 3: If you want to partially repay loan use a web3 wallet!
               </div>*/}
               <div className="borrow-form__transfer-details-msg">
-                That's it! Once you've sent the funds, click Close to return to the dashboard.
+                That's it! Once you've sent the funds, click Track and enter your wallet address.
               </div>
             </div>
           ) : null}
