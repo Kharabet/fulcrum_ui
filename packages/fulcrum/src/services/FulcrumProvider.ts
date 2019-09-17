@@ -235,8 +235,7 @@ export class FulcrumProvider {
     if (this.contractsSource) {
       const assetContract = await this.contractsSource.getITokenContract(selectedKey.loanAsset);
       if (assetContract) {
-        // result = await assetContract.borrowInterestRate.callAsync();
-        result = await assetContract.nextLoanInterestRate.callAsync(new BigNumber("0"));
+        result = await assetContract.avgBorrowInterestRate.callAsync();
         result = result.dividedBy(10 ** 18);
       }
     }
