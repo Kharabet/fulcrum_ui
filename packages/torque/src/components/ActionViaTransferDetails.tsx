@@ -59,7 +59,7 @@ export class ActionViaTransferDetails extends Component<IActionViaTransferDetail
         classes2 = "action-via-transfer-details__input-center";
         break;
     }
-    
+
     return (
       <React.Fragment>
         <QRCodeForAddressDlg ref={this.borrowViaTransferAddressQRDlg} address={this.props.contractAddress} />

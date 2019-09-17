@@ -25,6 +25,7 @@ export class WalletAddressDlg extends Component<any, IWalletAddressDlgState> {
         className="modal-content-div"
         overlayClassName="modal-overlay-div"
         onRequestClose={this.onFormDecline}
+        shouldCloseOnOverlayClick={false}
       >
         <DialogHeader title="Enter wallet address" onDecline={this.onFormDecline} />
         <WalletAddressForm onSubmit={this.onFormSubmit} />

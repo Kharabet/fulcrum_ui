@@ -42,7 +42,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
       collateralAsset: Asset.ETH,
       inputAmountText: "",
       depositAmount: new BigNumber(0),
-      gasAmountNeeded: new BigNumber(1500000)
+      gasAmountNeeded: new BigNumber(2000000)
     };
 
     this._inputTextChange = new Subject<string>();

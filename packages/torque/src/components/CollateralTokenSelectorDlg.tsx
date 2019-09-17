@@ -25,6 +25,7 @@ export class CollateralTokenSelectorDlg extends Component<any, ICollateralTokenS
         className="modal-content-div"
         overlayClassName="modal-overlay-div"
         onRequestClose={this.onFormDecline}
+        shouldCloseOnOverlayClick={false}
       >
         <DialogHeader title={`Select collateral token`} onDecline={this.onFormDecline} />
         <CollateralTokenSelector selectedCollateral={this.state.collateralAsset} onCollateralChange={this.onFormSubmit} onClose={this.onFormDecline} />

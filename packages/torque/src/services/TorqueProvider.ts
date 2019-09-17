@@ -239,9 +239,9 @@ export class TorqueProvider {
     collateralAsset: Asset,
     amount: BigNumber
   ): Promise<IBorrowEstimate> => {
-    const result = { depositAmount: new BigNumber(0) };
+    const result = { depositAmount: new BigNumber(0), gasEstimate: new BigNumber(0) };
     
-    if (this.contractsSource) {
+    if (this.contractsSource && this.web3Wrapper) {
       const iTokenContract = await this.contractsSource.getiTokenContract(borrowAsset);
       const collateralAssetErc20Address = this.getErc20AddressOfAsset(collateralAsset) || "";
       if (amount.gt(0) && iTokenContract && collateralAssetErc20Address) {
@@ -249,13 +249,16 @@ export class TorqueProvider {
           amount.multipliedBy(10**18),
           new BigNumber(4 * 10**18),
           new BigNumber(7884000), // approximately 3 months
-          collateralAssetErc20Address,
-          true
+          collateralAssetErc20Address
         );
         result.depositAmount = borrowEstimate
           .multipliedBy(150)
           .dividedBy(125)
           .dividedBy(10**18);
+        
+        /*result.gasEstimate = await this.web3Wrapper.estimateGasAsync({
+          ...
+        }));*/
       }
     }
 

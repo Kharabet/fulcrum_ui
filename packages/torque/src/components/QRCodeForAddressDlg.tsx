@@ -28,6 +28,7 @@ export class QRCodeForAddressDlg extends Component<
         className="modal-content-div"
         overlayClassName="modal-overlay-div"
         onRequestClose={this.onFormDecline}
+        shouldCloseOnOverlayClick={false}
       >
         <DialogHeader title="QR code" onDecline={this.onFormDecline} />
         <QRCodeForAddressForm address={this.props.address} onDecline={this.onFormDecline} />

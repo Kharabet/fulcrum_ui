@@ -36,6 +36,7 @@ export class ManageCollateralDlg extends Component<any, IManageCollateralDlgStat
         className="modal-content-div"
         overlayClassName="modal-overlay-div"
         onRequestClose={this.onFormDecline}
+        shouldCloseOnOverlayClick={false}
       >
         <DialogHeader title="Manage Collateral" onDecline={this.onFormDecline} />
         <ManageCollateralForm

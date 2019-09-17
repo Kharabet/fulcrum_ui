@@ -36,6 +36,7 @@ export class RepayLoanDlg extends Component<any, IRepayLoanDlgState> {
         className="modal-content-div"
         overlayClassName="modal-overlay-div"
         onRequestClose={this.onFormDecline}
+        shouldCloseOnOverlayClick={false}
       >
         <DialogHeader title="Repay Loan" onDecline={this.onFormDecline} />
         <RepayLoanForm

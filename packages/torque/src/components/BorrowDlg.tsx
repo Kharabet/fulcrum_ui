@@ -28,6 +28,7 @@ export class BorrowDlg extends Component<any, IBorrowDlgState> {
         className="modal-content-div"
         overlayClassName="modal-overlay-div"
         onRequestClose={this.onFormDecline}
+        shouldCloseOnOverlayClick={false}
       >
         <DialogHeader title={`Borrow how much ${this.state.borrowAsset}?`} onDecline={this.onFormDecline} />
         <BorrowForm borrowAsset={this.state.borrowAsset} walletType={this.state.walletType} onSubmit={this.onFormSubmit} onDecline={this.onFormDecline} />

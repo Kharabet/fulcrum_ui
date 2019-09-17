@@ -98,6 +98,10 @@
       {
         "components": [
           {
+            "name": "loanOrderHash",
+            "type": "bytes32"
+          },
+          {
             "name": "loanTokenAddress",
             "type": "address"
           },
