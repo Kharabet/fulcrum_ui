@@ -26,7 +26,7 @@ export class ContractsSource {
   private getiBZxAddress(): string {
     let address: string = "";
     switch (this.networkId) {
-      case 42:
+      case 1:
         address = "0x1cf226e9413addaf22412a2e182f9c0de44af002";
         break;
       case 42:
