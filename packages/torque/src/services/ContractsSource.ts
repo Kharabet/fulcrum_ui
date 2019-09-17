@@ -142,6 +142,38 @@ export class ContractsSource {
     return address;
   }
 
+  private getAssetFromAddressRaw(addressErc20: string): Asset {
+    let asset: Asset = Asset.UNKNOWN;
+
+    switch (this.networkId) {
+      case 1:
+        switch (addressErc20) {
+          case "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2":
+            asset = Asset.WETH;
+            break;
+          case "0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359":
+            asset = Asset.DAI;
+            break;
+          case "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48":
+            asset = Asset.USDC;
+            break;
+        }
+        break;
+      case 42:
+        switch (addressErc20) {
+          case "0xd0a1e359811322d97991e03f863a0c30c2cf029c":
+            asset = Asset.WETH;
+            break;
+          case "0xc4375b7de8af5a38a93548eb8453a498222c4ff2":
+            asset = Asset.DAI;
+            break;
+        }
+        break;
+    }
+
+    return asset;
+  }
+
   private async getiTokenContractRaw(asset: Asset): Promise<iTokenContract> {
     return new iTokenContract(
       this.iTokenJson.abi,
@@ -163,4 +195,5 @@ export class ContractsSource {
   public getErc20Contract = _.memoize(this.getErc20ContractRaw);
   public getiBZxContract = _.memoize(this.getiBZxContractRaw);
   public getiTokenContract = _.memoize(this.getiTokenContractRaw);
+  public getAssetFromAddress = _.memoize(this.getAssetFromAddressRaw);
 }

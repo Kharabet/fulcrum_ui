@@ -53,6 +53,9 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
       <div className={`asset-selector-item ${assetTypeModifier}`} onClick={this.onClick}>
         <DotsBar />
         <div className="asset-selector__title">{this.props.asset}</div>
+        {!this.props.onSelectAsset ? (
+          <div className="asset-selector__title--coming-soon">Coming Soon</div>
+        ) : ``}
         <div className="asset-selector__interest-rate">{this.state.interestRate.toFixed(2)}% APR</div>
         <SelectorIconsBar />
       </div>

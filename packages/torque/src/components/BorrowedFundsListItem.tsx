@@ -58,11 +58,12 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
       return null;
     }
 
-    const isPositionSafe = TorqueProvider.Instance.isPositionSafe(this.props.item);
-    const isPositionSafeText = isPositionSafe ? "Safe" : "Unsafe";
-    const collaterizedStateSelector = isPositionSafe
-      ? "borrowed-funds-list-item__collateralized-state--safe"
-      : "borrowed-funds-list-item__collateralized-state--unsafe";
+    const positionSafetyText = TorqueProvider.Instance.getPositionSafetyText(this.props.item);
+    const collaterizedStateSelector = positionSafetyText === "Safe" ?
+      "borrowed-funds-list-item__collateralized-state--safe" :
+      positionSafetyText === "Danger" ?
+        "borrowed-funds-list-item__collateralized-state--safe" :
+        "borrowed-funds-list-item__collateralized-state--unsafe";
 
     // const firstInRowModifier = this.props.firstInTheRow ? "borrowed-funds-list-item--first-in-row" : "";
     // const lastInRowModifier = this.props.lastInTheRow ? "borrowed-funds-list-item--last-in-row" : "";
@@ -98,10 +99,10 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
               </div>
               <div className="borrowed-funds-list-item__collateralized-state-container">
                 <div className="borrowed-funds-list-item__collateralized-state-icon">
-                  {!isPositionSafe ? <img src={ic_unsafe} alt="unsafe" /> : null}
+                  {positionSafetyText === "Liquidation Pending" ? <img src={ic_unsafe} alt="unsafe" /> : null}
                 </div>
                 <div className={`borrowed-funds-list-item__collateralized-state ${collaterizedStateSelector}`}>
-                  {isPositionSafeText}
+                  {positionSafetyText}
                 </div>
               </div>
             </div>
@@ -122,21 +123,21 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
           </div>
         ) : (
           <div className="borrowed-funds-list-item__actions-container">
-            <div className="borrowed-funds-list-item__action" onClick={this.onManageCollateral}>
+            {/*<div className="borrowed-funds-list-item__action" onClick={this.onManageCollateral}>
               <div className="borrowed-funds-list-item__action-title">
                 <div>Manage Collateral</div>
               </div>
-            </div>
-            <div className="borrowed-funds-list-item__action" onClick={this.onRepayLoan}>
+            </div>*/}
+            <div className="borrowed-funds-list-item__action" onClick={this.onRepayLoan} style={{ width: `100%` }}>
               <div className="borrowed-funds-list-item__action-title">
                 <div>Repay Loan</div>
               </div>
             </div>
-            <div className="borrowed-funds-list-item__action" onClick={this.onExtendLoan}>
+            {/*<div className="borrowed-funds-list-item__action" onClick={this.onExtendLoan}>
               <div className="borrowed-funds-list-item__action-title">
                 <div>Extend Loan</div>
               </div>
-            </div>
+            </div>*/}
           </div>
         )}
       </div>

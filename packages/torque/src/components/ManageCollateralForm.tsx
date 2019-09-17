@@ -186,7 +186,7 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
                   action={ActionType.ManageCollateral}
                 />
                 <div className="manage-collateral-form__transfer-details-msg manage-collateral-form__transfer-details-msg--warning">
-                  Please set your gas amount to {this.state.gasAmountNeeded.toFixed()}.
+                  Please make sure you send enough gas with your transaction.
                 </div>
                 <div className="manage-collateral-form__transfer-details-msg manage-collateral-form__transfer-details-msg--warning">
                   Always send funds from a wallet you control!

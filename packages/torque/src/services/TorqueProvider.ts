@@ -281,11 +281,16 @@ export class TorqueProvider {
         const loansData = await iBZxContract.getBasicLoansData.callAsync(walletDetails.walletAddress, new BigNumber(6));
         const zero = new BigNumber(0);
         result = loansData.filter(e => !e.loanTokenAmountFilled.eq(zero)).map(e => {
+          const loanAsset = this.contractsSource!.getAssetFromAddress(e.loanTokenAddress);
+          const loanPrecision = AssetsDictionary.assets.get(loanAsset)!.decimals || 18;
+          // const collateralAsset = this.contractsSource!.getAssetFromAddress(e.loanTokenAddress);
+          // const collateralPrecision = AssetsDictionary.assets.get(collateralAsset)!.decimals || 18;
+
           return {
             accountAddress: walletDetails.walletAddress || "",
             loanOrderHash: e.loanOrderHash,
-            asset: Asset.DAI,                  // TODO: should do lookup by e.loanTokenAddress, safe for now
-            amount: e.loanTokenAmountFilled.dividedBy(10**18).dp(5, BigNumber.ROUND_CEIL),
+            asset: this.contractsSource!.getAssetFromAddress(e.loanTokenAddress),
+            amount: e.loanTokenAmountFilled.dividedBy(10**loanPrecision).dp(5, BigNumber.ROUND_CEIL),
             collateralizedPercent: e.currentMarginAmount.dividedBy(10**20),
             interestRate: e.interestOwedPerDay.dividedBy(e.loanTokenAmountFilled).multipliedBy(365),
             hasManagementContract: true,
@@ -385,8 +390,14 @@ export class TorqueProvider {
     return `${loanValue > selectedValue ? `withdraw.${asset.toLowerCase()}.tokenloan.eth` : `topup.${asset.toLowerCase()}.tokenloan.eth`}`;
   };
 
-  public isPositionSafe = (borrowedFundsState: IBorrowedFundsState): boolean => {
-    return BigNumber.random().gte(0.5);
+  public getPositionSafetyText = (borrowedFundsState: IBorrowedFundsState): string => {
+    if (borrowedFundsState.collateralizedPercent.gt(0.25)) {
+      return "Safe";
+    } else if (borrowedFundsState.collateralizedPercent.gt(0.15)) {
+      return "Danger";
+    } else {
+      return "Liquidation Pending";
+    }
   };
 
   public getLoanCollateralManagementGasAmount = async (): Promise<BigNumber> => {

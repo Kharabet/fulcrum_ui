@@ -45,6 +45,15 @@
       letter-spacing: -0.48px;
       text-align: left;
       color: $color-gray-dark;
+
+      &--coming-soon {
+        font-size: 1rem;
+        color: #a9b5c7;
+        margin: unset;
+        letter-spacing: unset;
+        margin-top: -1.875rem;
+        margin-bottom: 0.8125rem;
+      }
     }
 
     .asset-selector__interest-rate {

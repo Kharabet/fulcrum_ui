@@ -24,6 +24,9 @@
   }
 
   .borrow-form__transfer-details {
+
+    padding-bottom: 1rem;
+
     .borrow-form__transfer-details-msg {
       margin-top: 1.5rem;
 
@@ -37,7 +40,7 @@
       color: #a9b5c7;
 
       &--warning {
-        text-align: left;
+        text-align: center;
         color: #801515;
       }
     }

@@ -167,7 +167,7 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
                 action={ActionType.ExtendLoan}
               />
               <div className="extend-loan-form__transfer-details-msg extend-loan-form__transfer-details-msg--warning">
-                Please set your gas amount to {this.state.gasAmountNeeded.toFixed()}.
+                Please make sure you send enough gas with your transaction.
               </div>
               <div className="extend-loan-form__transfer-details-msg extend-loan-form__transfer-details-msg--warning">
                 Always send funds from a wallet you control!
