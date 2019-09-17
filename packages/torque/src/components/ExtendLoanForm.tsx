@@ -76,7 +76,8 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
       TorqueProvider.Instance.getLoanExtendManagementAddress(
         this.props.walletDetails,
         this.props.loanOrderState.accountAddress,
-        this.props.loanOrderState.loanOrderHash
+        this.props.loanOrderState.loanOrderHash,
+        this.props.loanOrderState.asset
       ).then(extendManagementAddress => {
         this.setState(
           {
@@ -109,7 +110,8 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
       TorqueProvider.Instance.getLoanExtendManagementAddress(
         this.props.walletDetails,
         this.props.loanOrderState.accountAddress,
-        this.props.loanOrderState.loanOrderHash
+        this.props.loanOrderState.loanOrderHash,
+        this.props.loanOrderState.asset
       ).then(extendManagementAddress => {
         TorqueProvider.Instance.getLoanExtendGasAmount().then(gasAmountNeeded => {
           this.setState(

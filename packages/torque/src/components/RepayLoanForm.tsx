@@ -76,7 +76,8 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
       TorqueProvider.Instance.getLoanRepayAddress(
         this.props.walletDetails,
         this.props.loanOrderState.accountAddress,
-        this.props.loanOrderState.loanOrderHash
+        this.props.loanOrderState.loanOrderHash,
+        this.props.loanOrderState.asset
       ).then(repayManagementAddress => {
         TorqueProvider.Instance.getLoanRepayGasAmount().then(gasAmountNeeded => {
           this.setState(
@@ -112,7 +113,8 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
       TorqueProvider.Instance.getLoanRepayAddress(
         this.props.walletDetails,
         this.props.loanOrderState.accountAddress,
-        this.props.loanOrderState.loanOrderHash
+        this.props.loanOrderState.loanOrderHash,
+        this.props.loanOrderState.asset
       ).then(repayManagementAddress => {
         TorqueProvider.Instance.getLoanRepayGasAmount().then(gasAmountNeeded => {
           this.setState(

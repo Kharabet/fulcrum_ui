@@ -423,8 +423,8 @@ export class TorqueProvider {
     return new BigNumber(2000000);
   };
 
-  public getLoanRepayAddress = async (walletDetails: IWalletDetails, accountAddress: string, loanOrderHash: string): Promise<string | null> => {
-    return "repay.dai.tokenloan.eth";
+  public getLoanRepayAddress = async (walletDetails: IWalletDetails, accountAddress: string, loanOrderHash: string, asset: Asset): Promise<string | null> => {
+    return `repay.${asset.toLowerCase()}.tokenloan.eth`;
   };
 
   public getLoanRepayParams = async (walletDetails: IWalletDetails, accountAddress: string, loanOrderHash: string): Promise<IRepayState> => {
@@ -447,8 +447,8 @@ export class TorqueProvider {
     return new BigNumber(1000000);
   };
 
-  public getLoanExtendManagementAddress = async (walletDetails: IWalletDetails, accountAddress: string, loanOrderHash: string): Promise<string | null> => {
-    return "extend.dai.tokenloan.eth";
+  public getLoanExtendManagementAddress = async (walletDetails: IWalletDetails, accountAddress: string, loanOrderHash: string, asset: Asset): Promise<string | null> => {
+    return `extend.${asset.toLowerCase()}.tokenloan.eth`;
   };
 
   public getLoanExtendParams = async (walletDetails: IWalletDetails, accountAddress: string, loanOrderHash: string): Promise<IExtendState> => {
