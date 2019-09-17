@@ -1,0 +1,18 @@
+@media screen and (max-width: $mobile-version-max-width) {
+  .asset-selector {
+    flex-direction: column;
+    justify-content: flex-start;
+
+    .asset-selector-item {
+      margin: 1rem 0;
+
+      &:first-child {
+        margin-top: 0;
+      }
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+}
