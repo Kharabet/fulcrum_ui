@@ -126,6 +126,10 @@
             "type": "uint256"
           },
           {
+            "name": "interestDepositRemaining",
+            "type": "uint256"
+          },
+          {
             "name": "initialMarginAmount",
             "type": "uint256"
           },

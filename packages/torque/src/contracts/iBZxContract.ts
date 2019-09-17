@@ -296,6 +296,7 @@ export class iBZxContract extends BaseContract {
         positionTokenAmountFilled: BigNumber;
         collateralTokenAmountFilled: BigNumber;
         interestOwedPerDay: BigNumber;
+        interestDepositRemaining: BigNumber;
         initialMarginAmount: BigNumber;
         maintenanceMarginAmount: BigNumber;
         currentMarginAmount: BigNumber;
@@ -326,6 +327,7 @@ export class iBZxContract extends BaseContract {
           positionTokenAmountFilled: BigNumber;
           collateralTokenAmountFilled: BigNumber;
           interestOwedPerDay: BigNumber;
+          interestDepositRemaining: BigNumber;
           initialMarginAmount: BigNumber;
           maintenanceMarginAmount: BigNumber;
           currentMarginAmount: BigNumber;

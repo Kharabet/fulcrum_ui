@@ -93,7 +93,7 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
             <div className="borrowed-funds-list-item__collateral-info-container">
               <div className="borrowed-funds-list-item__collateralized-value-container">
                 <div className="borrowed-funds-list-item__collateralized">
-                  {this.props.item.collateralizedPercent.multipliedBy(100).toFixed(2)}%
+                  {this.props.item.collateralizedPercent.multipliedBy(100).plus(100).toFixed(2)}%
                 </div>
                 <div className="borrowed-funds-list-item__collateralized-label">Collateralized</div>
               </div>
