@@ -81,6 +81,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
             <div className="borrow-form__transfer-details">
               <ActionViaTransferDetails
                 contractAddress={`${this.props.borrowAsset.toLowerCase()}.tokenloan.eth`}
+                borrowAsset={this.props.borrowAsset}
                 assetAmount={this.state.depositAmount}
                 account={""}
                 action={ActionType.Borrow}

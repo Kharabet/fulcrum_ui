@@ -245,8 +245,10 @@ export class TorqueProvider {
       const iTokenContract = await this.contractsSource.getiTokenContract(borrowAsset);
       const collateralAssetErc20Address = this.getErc20AddressOfAsset(collateralAsset) || "";
       if (amount.gt(0) && iTokenContract && collateralAssetErc20Address) {
+        const loanPrecision = AssetsDictionary.assets.get(borrowAsset)!.decimals || 18;
+        const collateralPrecision = AssetsDictionary.assets.get(collateralAsset)!.decimals || 18;
         const borrowEstimate = await iTokenContract.getDepositAmountForBorrow.callAsync(
-          amount.multipliedBy(10**18),
+          amount.multipliedBy(10**loanPrecision),
           new BigNumber(4 * 10**18),
           new BigNumber(7884000), // approximately 3 months
           collateralAssetErc20Address
@@ -254,7 +256,7 @@ export class TorqueProvider {
         result.depositAmount = borrowEstimate
           .multipliedBy(150)
           .dividedBy(125)
-          .dividedBy(10**18);
+          .dividedBy(10**collateralPrecision);
         
         /*result.gasEstimate = await this.web3Wrapper.estimateGasAsync({
           ...
@@ -285,12 +287,12 @@ export class TorqueProvider {
           const loanPrecision = AssetsDictionary.assets.get(loanAsset)!.decimals || 18;
           // const collateralAsset = this.contractsSource!.getAssetFromAddress(e.loanTokenAddress);
           // const collateralPrecision = AssetsDictionary.assets.get(collateralAsset)!.decimals || 18;
-
           return {
             accountAddress: walletDetails.walletAddress || "",
             loanOrderHash: e.loanOrderHash,
             asset: this.contractsSource!.getAssetFromAddress(e.loanTokenAddress),
             amount: e.loanTokenAmountFilled.dividedBy(10**loanPrecision).dp(5, BigNumber.ROUND_CEIL),
+            amountOwed: e.loanTokenAmountFilled.minus(e.interestDepositRemaining).dividedBy(10**loanPrecision).dp(6, BigNumber.ROUND_CEIL),
             collateralizedPercent: e.currentMarginAmount.dividedBy(10**20),
             interestRate: e.interestOwedPerDay.dividedBy(e.loanTokenAmountFilled).multipliedBy(365),
             hasManagementContract: true,
@@ -311,6 +313,7 @@ export class TorqueProvider {
         loanOrderHash: "0x0061583F7764A09B35F5594B5AC5062E090614B7FE2B5EF96ACF16496E8B914C",
         asset: Asset.ETH,
         amount: BigNumber.random(),
+        amountOwed: BigNumber.random(),
         collateralizedPercent: BigNumber.random(),
         interestRate: BigNumber.random(),
         hasManagementContract: true,
@@ -321,6 +324,7 @@ export class TorqueProvider {
         loanOrderHash: "0x2F099560938A4831006D674082201DC31762F2C3926640D4DB3748BDB1A813BF",
         asset: Asset.WBTC,
         amount: BigNumber.random(),
+        amountOwed: BigNumber.random(),
         collateralizedPercent: BigNumber.random(),
         interestRate: BigNumber.random(),
         hasManagementContract: true,
@@ -331,6 +335,7 @@ export class TorqueProvider {
         loanOrderHash: "0x0A708B339C4472EF9A348269FACAD686E18345EC1342E8C171CCB0DF7DB13A28",
         asset: Asset.DAI,
         amount: BigNumber.random(),
+        amountOwed: BigNumber.random(),
         collateralizedPercent: BigNumber.random(),
         interestRate: BigNumber.random(),
         hasManagementContract: true,
@@ -341,6 +346,7 @@ export class TorqueProvider {
         loanOrderHash: "0xAA81E9EA1EABE0EBB47A6557716839A7C149864220F10EB628E4DEA6249262DE",
         asset: Asset.BAT,
         amount: BigNumber.random(),
+        amountOwed: BigNumber.random(),
         collateralizedPercent: BigNumber.random(),
         interestRate: BigNumber.random(),
         hasManagementContract: true,
@@ -351,6 +357,7 @@ export class TorqueProvider {
         loanOrderHash: "0xD826732AC58AB77E4EE0EB80B95D8BC9053EDAB328E5E4DDEAF6DA9BF1A6FCEB",
         asset: Asset.MKR,
         amount: BigNumber.random(),
+        amountOwed: BigNumber.random(),
         collateralizedPercent: BigNumber.random(),
         interestRate: BigNumber.random(),
         hasManagementContract: true,
@@ -361,6 +368,7 @@ export class TorqueProvider {
         loanOrderHash: "0xE6F8A9C8CDF06CA7C73ACD0B1F414EDB4CE23AD8F9144D22463686A11DD53561",
         asset: Asset.KNC,
         amount: BigNumber.random(),
+        amountOwed: BigNumber.random(),
         collateralizedPercent: BigNumber.random(),
         interestRate: BigNumber.random(),
         hasManagementContract: true,
@@ -371,6 +379,7 @@ export class TorqueProvider {
         loanOrderHash: "0xA4B2E54FDA03335C1EF63A939A06E2192E0661F923E7C048CDB94B842016CA61",
         asset: Asset.USDC,
         amount: BigNumber.random(),
+        amountOwed: BigNumber.random(),
         collateralizedPercent: BigNumber.random(),
         interestRate: BigNumber.random(),
         hasManagementContract: true,

@@ -48,7 +48,7 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
       assetDetails: null,
       currentValue: 100,
       selectedValue: 100,
-      repayAmount: props.loanOrderState.amount,
+      repayAmount: props.loanOrderState.amountOwed,
       repayManagementAddress: null,
       gasAmountNeeded: new BigNumber(0)
     };
@@ -163,6 +163,7 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
             <div className="repay-loan-form__transfer-details">
               <ActionViaTransferDetails
                 contractAddress={this.state.repayManagementAddress || ""}
+                borrowAsset={this.props.loanOrderState.asset}
                 assetAmount={this.state.repayAmount}
                 account={this.props.loanOrderState.accountAddress}
                 action={ActionType.RepayLoan}

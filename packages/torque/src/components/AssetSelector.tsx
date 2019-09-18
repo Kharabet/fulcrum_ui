@@ -22,7 +22,7 @@ export class AssetSelector extends Component<IAssetSelectorProps> {
         : [];
 
     const items = assets.map(e => {
-      if (e === "DAI") {
+      if (e === "DAI" || e === "USDC") {
         return (
           <AssetSelectorItem key={e} asset={e} onSelectAsset={this.props.onSelectAsset} />
         );

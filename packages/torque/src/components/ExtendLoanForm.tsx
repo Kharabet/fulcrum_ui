@@ -164,6 +164,7 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
             <div className="extend-loan-form__transfer-details">
               <ActionViaTransferDetails
                 contractAddress={this.state.extendManagementAddress || ""}
+                borrowAsset={this.props.loanOrderState.asset}
                 assetAmount={this.state.depositAmount}
                 account={this.props.loanOrderState.accountAddress}
                 action={ActionType.ExtendLoan}

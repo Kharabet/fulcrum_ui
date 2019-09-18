@@ -2,6 +2,7 @@ import { BigNumber } from "@0x/utils";
 import React, { Component, RefObject } from "react";
 
 import { ActionType } from "../domain/ActionType";
+import { Asset } from "../domain/Asset";
 import ic_copy from "./../assets/images/ic_copy.svg"
 import ic_qr_code from "./../assets/images/ic_qr_code.svg"
 import { QRCodeForAddressDlg } from "./QRCodeForAddressDlg";
@@ -9,6 +10,7 @@ import { QRCodeForAddressDlg } from "./QRCodeForAddressDlg";
 export interface IActionViaTransferDetailsProps {
   assetAmount: BigNumber;
   contractAddress: string;
+  borrowAsset: Asset;
   account: string;
   action: ActionType;
 }
@@ -45,14 +47,14 @@ export class ActionViaTransferDetails extends Component<IActionViaTransferDetail
         classes2 = "action-via-transfer-details__input-center";
         break;
       case ActionType.ExtendLoan:
-        actionAsset = "DAI";
+        actionAsset = this.props.borrowAsset;
         actionContract1 = userENS;
         actionContract2 = this.props.contractAddress;
         classes1 = "action-via-transfer-details__input-left";
         classes2 = "action-via-transfer-details__input-center";
         break;
       case ActionType.RepayLoan:
-        actionAsset = "DAI";
+        actionAsset = this.props.borrowAsset;
         actionContract1 = userENS;
         actionContract2 = this.props.contractAddress;
         classes1 = "action-via-transfer-details__input-left";
@@ -71,8 +73,8 @@ export class ActionViaTransferDetails extends Component<IActionViaTransferDetail
           <div className="action-via-transfer-details__input-container">
             <input type="text" className={`action-via-transfer-details__input ${classes1}`} value={actionContract1} readOnly={true} />
             <div className="action-via-transfer-details__input-actions">
-              <img className="action-via-transfer-details__input-btn" src={ic_qr_code} onClick={this.onShowAddressQRClick} />
-              <img className="action-via-transfer-details__input-btn" src={ic_copy} onClick={this.onCopyAddressClick} />
+              {/*<img className="action-via-transfer-details__input-btn" src={ic_qr_code} onClick={this.onShowAddressQRClick} />*/}
+              <img className="action-via-transfer-details__input-btn" src={ic_copy} onClick={() => this.onCopyAddressClick(actionContract1)} style={{ marginRight: `4px` }} />
             </div>
           </div>
           {this.props.action !== ActionType.Borrow ? (
@@ -84,8 +86,8 @@ export class ActionViaTransferDetails extends Component<IActionViaTransferDetail
               <div className="action-via-transfer-details__input-container">
                 <input type="text" className={`action-via-transfer-details__input ${classes2}`} value={actionContract2} readOnly={true} />
                 <div className="action-via-transfer-details__input-actions">
-                  <img className="action-via-transfer-details__input-btn" src={ic_qr_code} onClick={this.onShowAddressQRClick} />
-                  <img className="action-via-transfer-details__input-btn" src={ic_copy} onClick={this.onCopyAddressClick} />
+                  {/*<img className="action-via-transfer-details__input-btn" src={ic_qr_code} onClick={this.onShowAddressQRClick} />*/}
+                  <img className="action-via-transfer-details__input-btn" src={ic_copy} onClick={() => this.onCopyAddressClick(actionContract2)} style={{ marginRight: `4px` }} />
                 </div>
               </div>
             </React.Fragment>
@@ -101,7 +103,7 @@ export class ActionViaTransferDetails extends Component<IActionViaTransferDetail
     }
   };
 
-  private onCopyAddressClick = async () => {
-    await navigator.clipboard.writeText(this.props.contractAddress);
+  private onCopyAddressClick = async (address: string) => {
+    await navigator.clipboard.writeText(address);
   };
 }

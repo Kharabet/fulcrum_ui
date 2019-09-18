@@ -119,7 +119,7 @@ export class ContractsSource {
       case Asset.USDC:
         switch (this.networkId) {
           case 1:
-            address = "";
+            address = "0xf013406a0b1d544238083df0b93ad0d2cbe0f65f";
             break;
         }
         break;

@@ -181,6 +181,7 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
               <div className="manage-collateral-form__transfer-details">
                 <ActionViaTransferDetails
                   contractAddress={this.state.loanCollateralManagementAddress || ""}
+                  borrowAsset={this.props.loanOrderState.asset}
                   assetAmount={this.state.diffAmount}
                   account={this.props.loanOrderState.accountAddress}
                   action={ActionType.ManageCollateral}

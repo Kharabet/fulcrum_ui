@@ -6,6 +6,7 @@ export interface IBorrowedFundsState {
   loanOrderHash: string;
   asset: Asset;
   amount: BigNumber;
+  amountOwed: BigNumber;
   interestRate: BigNumber;
   collateralizedPercent: BigNumber;
   hasManagementContract: boolean;
