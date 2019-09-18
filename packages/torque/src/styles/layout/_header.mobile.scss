@@ -1,11 +1,16 @@
-.header {
-  .header__row {
-    .header__left {
-      width: 50%;
-    }
+@media screen and (max-width: $mobile-version-max-width) {
+  .header {
+    .header__row {
+      display: flex;
+      flex-direction: column;
 
-    .header__right {
-      width: 50%;
+      .header__left {
+        width: 100%;
+      }
+
+      .header__right {
+        width: 100%;
+      }
     }
   }
 }
