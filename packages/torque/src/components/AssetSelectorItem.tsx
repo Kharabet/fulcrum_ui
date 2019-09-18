@@ -47,6 +47,8 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
         ? "asset-selector-item--eth"
         : this.props.asset === Asset.DAI
         ? "asset-selector-item--dai"
+        : this.props.asset === Asset.USDC
+        ? "asset-selector-item--usdc"
         : "";
 
     return (
