@@ -5,7 +5,7 @@ import { BorrowDlg } from "../components/BorrowDlg";
 import { Asset } from "../domain/Asset";
 import { WalletType, walletTypeAbbrToWalletType } from "../domain/WalletType";
 import { Footer } from "../layout/Footer";
-import { HeaderHome } from "../layout/HeaderHome";
+import { HeaderOps } from "../layout/HeaderOps";
 import { NavService } from "../services/NavService";
 import { TorqueProvider } from "../services/TorqueProvider";
 
@@ -34,7 +34,7 @@ export class BorrowPage extends PureComponent<IBorrowPageParams & RouteComponent
       <React.Fragment>
         <BorrowDlg ref={this.borrowDlgRef} />
         <div className="borrow-page">
-          <HeaderHome isLoading={this.props.isLoading} doNetworkConnect={this.doNetworkConnect} />
+          <HeaderOps isLoading={this.props.isLoading} doNetworkConnect={this.doNetworkConnect} />
           <div className="borrow-page__main">
             <AssetSelector walletType={walletType} onSelectAsset={this.onSelectAsset} />
           </div>

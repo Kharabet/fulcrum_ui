@@ -16,7 +16,7 @@
 }
 
 .header-menu__item {
-  width: 5.5rem;
+  width: 8rem;
 
   a {
     text-decoration: none;
@@ -40,7 +40,7 @@
     display: block;
 
     &.header-menu__item-link--active {
-      color: #ffffff;
+      color: black;
 
       .header-menu__item-link__accent-container {
         .header-menu__item-link__accent {
@@ -54,7 +54,7 @@
       height: 0.125rem;
 
       .header-menu__item-link__accent {
-        width: 0.5rem;
+        //width: 0.5rem;
         height: 0.125rem;
         margin: 0 2.5rem;
         border-radius: 0.75rem;

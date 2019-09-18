@@ -11,7 +11,7 @@ import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
 import { IWalletDetails } from "../domain/IWalletDetails";
 import { WalletType, walletTypeAbbrToWalletType } from "../domain/WalletType";
 import { Footer } from "../layout/Footer";
-import { HeaderHome } from "../layout/HeaderHome";
+import { HeaderOps } from "../layout/HeaderOps";
 import { TorqueProviderEvents } from "../services/events/TorqueProviderEvents";
 import { NavService } from "../services/NavService";
 import { TorqueProvider } from "../services/TorqueProvider";
@@ -97,7 +97,7 @@ export class DashboardPage extends PureComponent<
         <ExtendLoanDlg ref={this.extendLoanDlgRef} />
         <WalletAddressDlg ref={this.walletAddressDlgRef} />
         <div className="dashboard-page">
-          <HeaderHome isLoading={this.props.isLoading} doNetworkConnect={this.doNetworkConnect} />
+          <HeaderOps isLoading={this.props.isLoading} doNetworkConnect={this.doNetworkConnect} />
           <div className="dashboard-page__main">
             {this.state.walletDetails.walletAddress ? (
               <React.Fragment>
