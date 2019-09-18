@@ -1,0 +1,16 @@
+@media screen and (max-width: $mobile-version-max-width) {
+  .dialog-content {
+    padding-top: 0rem;
+    padding-right: 1rem;
+    padding-bottom: 0rem;
+    padding-left: 1rem;
+  }
+
+  .dialog-actions {
+    padding-top: 0.5rem;
+    padding-right: 1rem;
+    padding-bottom: 0.5rem;
+    padding-left: 1rem;
+    border-top: solid 1px rgba(169, 181, 199, 0.2);
+  }
+}
