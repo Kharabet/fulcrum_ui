@@ -39,7 +39,6 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
     
     const menu: IHeaderMenuProps = {
       items: [
-        { id: 0, title: "Home", link: "/", external: false },
         { id: 1, title: "Borrow", link: "/borrow/n", external: false },
         { id: 2, title: "Dashboard", link: "/dashboard/n", external: false },
       ]
