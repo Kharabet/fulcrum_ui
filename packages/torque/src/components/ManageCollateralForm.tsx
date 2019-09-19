@@ -187,10 +187,10 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
                   action={ActionType.ManageCollateral}
                 />
                 <div className="manage-collateral-form__transfer-details-msg manage-collateral-form__transfer-details-msg--warning">
-                  Please make sure you send enough gas with your transaction.
+                  Please send at least 2,500,000 gas with your transaction.
                 </div>
                 <div className="manage-collateral-form__transfer-details-msg manage-collateral-form__transfer-details-msg--warning">
-                  Always send funds from a wallet you control!
+                  Always send funds from a private wallet to which you hold the private key!
                 </div>
                 {/*<div className="manage-collateral-form__transfer-details-msg manage-collateral-form__transfer-details-msg--warning">
                   Note 3: If you want to partially repay loan use a web3 wallet!
