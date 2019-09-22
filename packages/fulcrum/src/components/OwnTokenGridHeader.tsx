@@ -36,7 +36,7 @@ export class OwnTokenGridHeader extends Component<IOwnTokenGridHeaderProps> {
         </div>
         <div className="own-token-grid-header__col-actions">
           <span className="own-token-grid-header__text-right">
-            <CheckBox checked={this.props.showMyTokensOnly} onChange={this.showMyTokensOnlyChange}>Show my positions only</CheckBox>
+            <CheckBox checked={this.props.showMyTokensOnly} onChange={this.showMyTokensOnlyChange}>Manage Positions</CheckBox>
           </span>
         </div>
       </div>
