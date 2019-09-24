@@ -1,5 +1,5 @@
 import React, { ChangeEvent, Component, FormEvent } from "react";
-import ic_copy from "../assets/images/ic_copy.svg";
+import ic_arrow_right_square from "../assets/images/ic_arrow_right_square.svg";
 
 export interface IWalletAddressLargeFormProps {
   onSubmit?: (walletAddress: string) => void;
@@ -30,7 +30,7 @@ export class WalletAddressLargeForm extends Component<IWalletAddressLargeFormPro
               onChange={this.onChange}
             />
             <div className="wallet-address-large-form__input-actions">
-              <img className="wallet-address-large-form__input-btn" src={ic_copy} onClick={this.onSubmitClick} />
+              <img className="wallet-address-large-form__input-btn" src={ic_arrow_right_square} onClick={this.onSubmitClick} />
             </div>
           </div>
         </form>

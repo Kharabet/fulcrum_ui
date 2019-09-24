@@ -1,6 +1,7 @@
 import { BigNumber } from "@0x/utils";
 import React, { Component } from "react";
 import { Asset } from "../domain/Asset";
+import { TorqueProviderEvents } from "../services/events/TorqueProviderEvents";
 import { TorqueProvider } from "../services/TorqueProvider";
 import { DotsBar } from "./DotsBar";
 import { SelectorIconsBar } from "./SelectorIconsBar";
@@ -20,6 +21,16 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
     super(props);
 
     this.state = { interestRate: new BigNumber(0) };
+
+    TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
+  }
+
+  private onProviderAvailable = () => {
+    this.derivedUpdate();
+  };
+
+  public componentWillUnmount(): void {
+    TorqueProvider.Instance.eventEmitter.removeListener(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
   }
 
   public componentDidMount(): void {
@@ -58,7 +69,7 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
         {!this.props.onSelectAsset ? (
           <div className="asset-selector__title--coming-soon">Coming Soon</div>
         ) : ``}
-        <div className="asset-selector__interest-rate">{this.state.interestRate.toFixed(2)}% APR</div>
+        <div className="asset-selector__interest-rate">{this.state.interestRate.gt(0) ? `${this.state.interestRate.toFixed(2)}% APR` : ``}</div>
         <SelectorIconsBar />
       </div>
     );

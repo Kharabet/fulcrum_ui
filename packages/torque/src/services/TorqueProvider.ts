@@ -469,7 +469,7 @@ export class TorqueProvider {
   };
 
   public getLoanExtendParams = async (walletDetails: IWalletDetails, accountAddress: string, loanOrderHash: string): Promise<IExtendState> => {
-    return { minValue: 1, maxValue: 365, currentValue: 1 };
+    return { minValue: 1, maxValue: 365, currentValue: 90 };
   };
 
   public getLoanExtendEstimate = async (interestOwedPerDay: BigNumber, daysToAdd: number): Promise<IExtendEstimate> => {
@@ -481,8 +481,23 @@ export class TorqueProvider {
   };
 
   public getAssetInterestRate = async (asset: Asset): Promise<BigNumber> => {
-    return new BigNumber(16);
-    // return BigNumber.random();
+    let result = new BigNumber(0);
+    
+    if (this.contractsSource && this.web3Wrapper) {
+      const iTokenContract = await this.contractsSource.getiTokenContract(asset);
+      if (iTokenContract) {
+        let borrowRate = await iTokenContract.nextBorrowInterestRate.callAsync(new BigNumber("0"));
+        borrowRate = borrowRate.dividedBy(10**18);
+
+        if (borrowRate.gt(new BigNumber(16))) {
+          result = borrowRate;
+        } else {
+          result = new BigNumber(16);
+        }
+      }
+    }
+
+    return result;
   };
 
   public getErc20AddressOfAsset(asset: Asset): string | null {
