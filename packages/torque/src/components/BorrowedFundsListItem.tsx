@@ -128,16 +128,16 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
                 <div>Manage Collateral</div>
               </div>
             </div>*/}
-            <div className="borrowed-funds-list-item__action" onClick={this.onRepayLoan} style={{ width: `100%` }}>
+            <div className="borrowed-funds-list-item__action" onClick={this.onRepayLoan} style={{ width: `50%` }}>
               <div className="borrowed-funds-list-item__action-title">
-                <div>Repay Loan</div>
+                <div>Repay<br/>Loan</div>
               </div>
             </div>
-            {/*<div className="borrowed-funds-list-item__action" onClick={this.onExtendLoan}>
+            <div className="borrowed-funds-list-item__action" onClick={this.onExtendLoan} style={{ width: `50%` }}>
               <div className="borrowed-funds-list-item__action-title">
-                <div>Extend Loan</div>
+                <div>Extend<br/>Loan</div>
               </div>
-            </div>*/}
+            </div>
           </div>
         )}
       </div>

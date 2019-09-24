@@ -295,6 +295,7 @@ export class TorqueProvider {
             amountOwed: e.loanTokenAmountFilled.minus(e.interestDepositRemaining).dividedBy(10**loanPrecision).dp(6, BigNumber.ROUND_CEIL),
             collateralizedPercent: e.currentMarginAmount.dividedBy(10**20),
             interestRate: e.interestOwedPerDay.dividedBy(e.loanTokenAmountFilled).multipliedBy(365),
+            interestOwedPerDay: e.interestOwedPerDay.dividedBy(10**loanPrecision),
             hasManagementContract: true,
             isInProgress: false
           }
@@ -316,6 +317,7 @@ export class TorqueProvider {
         amountOwed: BigNumber.random(),
         collateralizedPercent: BigNumber.random(),
         interestRate: BigNumber.random(),
+        interestOwedPerDay: BigNumber.random(),
         hasManagementContract: true,
         isInProgress: false
       },
@@ -327,6 +329,7 @@ export class TorqueProvider {
         amountOwed: BigNumber.random(),
         collateralizedPercent: BigNumber.random(),
         interestRate: BigNumber.random(),
+        interestOwedPerDay: BigNumber.random(),
         hasManagementContract: true,
         isInProgress: false
       },
@@ -338,6 +341,7 @@ export class TorqueProvider {
         amountOwed: BigNumber.random(),
         collateralizedPercent: BigNumber.random(),
         interestRate: BigNumber.random(),
+        interestOwedPerDay: BigNumber.random(),
         hasManagementContract: true,
         isInProgress: false
       },
@@ -349,6 +353,7 @@ export class TorqueProvider {
         amountOwed: BigNumber.random(),
         collateralizedPercent: BigNumber.random(),
         interestRate: BigNumber.random(),
+        interestOwedPerDay: BigNumber.random(),
         hasManagementContract: true,
         isInProgress: false
       },
@@ -360,6 +365,7 @@ export class TorqueProvider {
         amountOwed: BigNumber.random(),
         collateralizedPercent: BigNumber.random(),
         interestRate: BigNumber.random(),
+        interestOwedPerDay: BigNumber.random(),
         hasManagementContract: true,
         isInProgress: false
       },
@@ -371,6 +377,7 @@ export class TorqueProvider {
         amountOwed: BigNumber.random(),
         collateralizedPercent: BigNumber.random(),
         interestRate: BigNumber.random(),
+        interestOwedPerDay: BigNumber.random(),
         hasManagementContract: true,
         isInProgress: false
       },
@@ -382,6 +389,7 @@ export class TorqueProvider {
         amountOwed: BigNumber.random(),
         collateralizedPercent: BigNumber.random(),
         interestRate: BigNumber.random(),
+        interestOwedPerDay: BigNumber.random(),
         hasManagementContract: true,
         isInProgress: false
       }
@@ -464,8 +472,8 @@ export class TorqueProvider {
     return { minValue: 1, maxValue: 365, currentValue: 1 };
   };
 
-  public getLoanExtendEstimate = async (walletDetails: IWalletDetails, accountAddress: string, loanOrderHash: string, daysToAdd: number): Promise<IExtendEstimate> => {
-    return { depositAmount: new BigNumber(daysToAdd * 2) };
+  public getLoanExtendEstimate = async (interestOwedPerDay: BigNumber, daysToAdd: number): Promise<IExtendEstimate> => {
+    return { depositAmount: interestOwedPerDay.multipliedBy(daysToAdd) };
   };
 
   public doExtendLoan = async (extendLoanRequest: ExtendLoanRequest) => {

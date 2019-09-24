@@ -218,9 +218,7 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
   private rxGetEstimate = (selectedValue: number): Observable<IExtendEstimate> => {
     return new Observable<IExtendEstimate>(observer => {
       TorqueProvider.Instance.getLoanExtendEstimate(
-        this.props.walletDetails,
-        this.props.loanOrderState.accountAddress,
-        this.props.loanOrderState.loanOrderHash,
+        this.props.loanOrderState.interestOwedPerDay,
         selectedValue
       ).then(value => {
         observer.next(value);
