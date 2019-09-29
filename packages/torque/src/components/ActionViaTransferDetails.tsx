@@ -41,10 +41,8 @@ export class ActionViaTransferDetails extends Component<IActionViaTransferDetail
         break;
       case ActionType.ManageCollateral:
         actionAsset = "ETH";
-        actionContract1 = userENS;
-        actionContract2 = this.props.contractAddress;
-        classes1 = "action-via-transfer-details__input-left";
-        classes2 = "action-via-transfer-details__input-center";
+        actionContract1 = this.props.contractAddress;
+        classes1 = "action-via-transfer-details__input-center";
         break;
       case ActionType.ExtendLoan:
         actionAsset = this.props.borrowAsset;
@@ -77,7 +75,7 @@ export class ActionViaTransferDetails extends Component<IActionViaTransferDetail
               <img className="action-via-transfer-details__input-btn" src={ic_copy} onClick={() => this.onCopyAddressClick(actionContract1)} style={{ marginRight: `4px` }} />
             </div>
           </div>
-          {this.props.action !== ActionType.Borrow ? (
+          {this.props.action !== ActionType.Borrow && this.props.action !== ActionType.ManageCollateral ? (
             <React.Fragment>
               <div className="action-via-transfer-details__title" style={{ paddingTop: `16px`, marginBottom: `0.5rem` }}>
                 then send <span className="action-via-transfer-details__title-amount">0 ETH</span>{" "}

@@ -23,6 +23,38 @@
     }
   }
 
+  .borrow-form-form__info-liquidated-at-container {
+    border-radius: 1rem;
+    background-color: #f5f7f9;
+    padding-top: 1rem;
+    padding-right: 2.5rem;
+    padding-bottom: 1rem;
+    padding-left: 2.5rem;
+
+
+    .borrow-form-form__info-liquidated-at-msg {
+      font-size: 1rem;
+      font-weight: normal;
+      font-style: normal;
+      font-stretch: normal;
+      line-height: 1.5;
+      letter-spacing: -0.16px;
+      text-align: center;
+      color: #a9b5c7;
+    }
+
+    .borrow-form-form__info-liquidated-at-price {
+      font-size: 1.5rem;
+      font-weight: 600;
+      font-style: normal;
+      font-stretch: normal;
+      line-height: 1.67;
+      letter-spacing: -0.24px;
+      text-align: center;
+      color: #3b364b;
+    }
+  }
+
   .borrow-form__transfer-details {
 
     padding-bottom: 1rem;

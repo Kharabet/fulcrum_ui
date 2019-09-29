@@ -4,6 +4,7 @@ import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
 import { IWalletDetails } from "../domain/IWalletDetails";
+import { WalletType } from "../domain/WalletType";
 import { TorqueProvider } from "../services/TorqueProvider";
 import { CollateralSlider } from "./CollateralSlider";
 
@@ -123,17 +124,21 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
           </div>
         ) : (
           <div className="borrowed-funds-list-item__actions-container">
-            {/*<div className="borrowed-funds-list-item__action" onClick={this.onManageCollateral}>
+            <div className="borrowed-funds-list-item__action" onClick={this.onManageCollateral}>
               <div className="borrowed-funds-list-item__action-title">
-                <div>Manage Collateral</div>
+                {this.props.walletDetails.walletType === WalletType.NonWeb3 ? (
+                  <div>Top Up<br/>Collateral</div>
+                ) : (
+                  <div>Manage<br/>Collateral</div>
+                )}
               </div>
-            </div>*/}
-            <div className="borrowed-funds-list-item__action" onClick={this.onRepayLoan} style={{ width: `50%` }}>
+            </div>
+            <div className="borrowed-funds-list-item__action" onClick={this.onRepayLoan}>
               <div className="borrowed-funds-list-item__action-title">
                 <div>Repay<br/>Loan</div>
               </div>
             </div>
-            <div className="borrowed-funds-list-item__action" onClick={this.onExtendLoan} style={{ width: `50%` }}>
+            <div className="borrowed-funds-list-item__action" onClick={this.onExtendLoan}>
               <div className="borrowed-funds-list-item__action-title">
                 <div>Extend<br/>Loan</div>
               </div>

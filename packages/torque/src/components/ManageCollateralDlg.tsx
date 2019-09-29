@@ -3,8 +3,10 @@ import ReactModal from "react-modal";
 import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
 import { IWalletDetails } from "../domain/IWalletDetails";
 import { ManageCollateralRequest } from "../domain/ManageCollateralRequest";
+import { WalletType } from "../domain/WalletType";
 import { DialogHeader } from "./DialogHeader";
-import { ManageCollateralForm } from "./ManageCollateralForm";
+// import { ManageCollateralForm } from "./ManageCollateralForm";
+import { ManageCollateralFormNonWeb3 } from "./ManageCollateralFormNonWeb3";
 
 interface IManageCollateralDlgState {
   isOpen: boolean;
@@ -38,13 +40,27 @@ export class ManageCollateralDlg extends Component<any, IManageCollateralDlgStat
         onRequestClose={this.onFormDecline}
         shouldCloseOnOverlayClick={false}
       >
-        <DialogHeader title="Manage Collateral" onDecline={this.onFormDecline} />
-        <ManageCollateralForm
-          walletDetails={this.state.walletDetails}
-          loanOrderState={this.state.loanOrderState}
-          onSubmit={this.onFormSubmit}
-          onCLose={this.onFormDecline}
-        />
+        {this.state.walletDetails.walletType === WalletType.NonWeb3 ? (
+          <React.Fragment>
+            <DialogHeader title="Top up how much collateral?" onDecline={this.onFormDecline} />
+            <ManageCollateralFormNonWeb3
+              walletDetails={this.state.walletDetails}
+              loanOrderState={this.state.loanOrderState}
+              onSubmit={this.onFormSubmit}
+              onCLose={this.onFormDecline}
+            />
+          </React.Fragment>
+        ) : (
+          <React.Fragment>
+            <DialogHeader title="Manage Collateral" onDecline={this.onFormDecline} />
+            <ManageCollateralFormNonWeb3
+              walletDetails={this.state.walletDetails}
+              loanOrderState={this.state.loanOrderState}
+              onSubmit={this.onFormSubmit}
+              onCLose={this.onFormDecline}
+            />
+          </React.Fragment>
+        )}
       </ReactModal>
     );
   }

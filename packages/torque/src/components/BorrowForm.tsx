@@ -86,6 +86,19 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
                 account={""}
                 action={ActionType.Borrow}
               />
+
+              {/*<div className="borrow-form-form__info-liquidated-at-container">
+                <div className="borrow-form-form__info-liquidated-at-msg">
+                  Your loan will be liquidated if the price of
+                </div>
+                <div className="borrow-form-form__info-liquidated-at-price">
+                  {`ETH`} falls below ${
+                    //this.state.liquidationPrice.toFixed(2)
+                    `100.02`
+                    }
+                </div>
+              </div>*/}
+
               <div className="borrow-form__transfer-details-msg borrow-form__transfer-details-msg--warning">
                 Please send at least 2,500,000 gas with your transaction.
               </div>

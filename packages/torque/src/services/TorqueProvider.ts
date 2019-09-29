@@ -399,12 +399,15 @@ export class TorqueProvider {
   public getLoanCollateralManagementManagementAddress = async (
     asset: Asset,
     walletDetails: IWalletDetails,
-    accountAddress: string,
-    loanOrderHash: string,
-    loanValue: number,
-    selectedValue: number
+    borrowedFundsState: IBorrowedFundsState,
+    loanValue: BigNumber,
+    selectedValue: BigNumber
   ): Promise<string | null> => {
-    return `${loanValue > selectedValue ? `withdraw.${asset.toLowerCase()}.tokenloan.eth` : `topup.${asset.toLowerCase()}.tokenloan.eth`}`;
+    if (walletDetails.walletType === WalletType.NonWeb3) {
+      return `topup.${asset.toLowerCase()}.tokenloan.eth`;
+    } else {
+      return `${loanValue > selectedValue ? `withdraw.${asset.toLowerCase()}.tokenloan.eth` : `topup.${asset.toLowerCase()}.tokenloan.eth`}`;
+    }
   };
 
   public getPositionSafetyText = (borrowedFundsState: IBorrowedFundsState): string => {
@@ -421,15 +424,19 @@ export class TorqueProvider {
     return new BigNumber(1000000);
   };
 
-  public getLoanCollateralManagementParams = async (walletDetails: IWalletDetails, accountAddress: string, loanOrderHash: string): Promise<ICollateralManagementParams> => {
-    return { minValue: 0, maxValue: 100, currentValue: 66 };
+  public getLoanCollateralManagementParams = async (walletDetails: IWalletDetails, borrowedFundsState: IBorrowedFundsState): Promise<ICollateralManagementParams> => {
+    return { minValue: 0, maxValue: 100, currentValue: borrowedFundsState.collateralizedPercent.multipliedBy(100).toNumber() };
   };
 
-  public getLoanCollateralChangeEstimate = async (walletDetails: IWalletDetails, accountAddress: string, loanOrderHash: string, loanValue: number, newValue: number): Promise<ICollateralChangeEstimate> => {
-    return {
-      diffAmount: new BigNumber(Math.abs(newValue - loanValue) * 2 ),
-      liquidationPrice: new BigNumber(250 - (newValue - loanValue))
+  public getLoanCollateralChangeEstimate = async (walletDetails: IWalletDetails, accountAddress: string, loanOrderHash: string, loanValue: BigNumber, newValue: BigNumber): Promise<ICollateralChangeEstimate> => {
+    
+    const result = {
+      diffAmount: 0, // new BigNumber(Math.abs(newValue - loanValue) * 2 ),
+      liquidationPrice: new BigNumber(100),
+      gasEstimate: new BigNumber(0)
     };
+
+    return result;
   };
 
   public setLoanCollateral = async (manageCollateralRequest: ManageCollateralRequest) => {

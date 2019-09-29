@@ -15,7 +15,7 @@ import { ActionViaTransferDetails } from "./ActionViaTransferDetails";
 import { CollateralSlider } from "./CollateralSlider";
 import { OpsEstimatedResult } from "./OpsEstimatedResult";
 
-export interface IManageCollateralFormProps {
+export interface IManageCollateralFormNonWeb3Props {
   walletDetails: IWalletDetails;
   loanOrderState: IBorrowedFundsState;
 
@@ -23,7 +23,7 @@ export interface IManageCollateralFormProps {
   onCLose: () => void;
 }
 
-interface IManageCollateralFormState {
+interface IManageCollateralFormNonWeb3State {
   assetDetails: AssetDetails | null;
 
   minValue: number;
@@ -39,19 +39,21 @@ interface IManageCollateralFormState {
   gasAmountNeeded: BigNumber;
 }
 
-export class ManageCollateralForm extends Component<IManageCollateralFormProps, IManageCollateralFormState> {
+export class ManageCollateralFormNonWeb3 extends Component<IManageCollateralFormNonWeb3Props, IManageCollateralFormNonWeb3State> {
   private readonly selectedValueUpdate: Subject<number>;
 
-  constructor(props: IManageCollateralFormProps, context?: any) {
+  constructor(props: IManageCollateralFormNonWeb3Props, context?: any) {
     super(props, context);
+    
+    //console.log(props.loanOrderState);
 
     this.state = {
       minValue: 0,
       maxValue: 100,
       assetDetails: null,
-      loanValue: 100,
-      currentValue: 100,
-      selectedValue: 100,
+      loanValue: props.loanOrderState.collateralizedPercent.multipliedBy(100).toNumber(),
+      currentValue: props.loanOrderState.collateralizedPercent.multipliedBy(100).toNumber(),
+      selectedValue: props.loanOrderState.collateralizedPercent.multipliedBy(100).toNumber(),
       diffAmount: new BigNumber(0),
       liquidationPrice: new BigNumber(0),
       loanCollateralManagementAddress: null,
@@ -76,14 +78,12 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
   public componentDidMount(): void {
     TorqueProvider.Instance.getLoanCollateralManagementParams(
       this.props.walletDetails,
-      this.props.loanOrderState.accountAddress,
-      this.props.loanOrderState.loanOrderHash
+      this.props.loanOrderState
     ).then(collateralState => {
       TorqueProvider.Instance.getLoanCollateralManagementManagementAddress(
         this.props.loanOrderState.asset,
         this.props.walletDetails,
-        this.props.loanOrderState.accountAddress,
-        this.props.loanOrderState.loanOrderHash,
+        this.props.loanOrderState,
         this.state.loanValue,
         this.state.selectedValue
       ).then(loanCollateralManagementAddress => {
@@ -110,8 +110,8 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
   }
 
   public componentDidUpdate(
-    prevProps: Readonly<IManageCollateralFormProps>,
-    prevState: Readonly<IManageCollateralFormState>,
+    prevProps: Readonly<IManageCollateralFormNonWeb3Props>,
+    prevState: Readonly<IManageCollateralFormNonWeb3State>,
     snapshot?: any
   ): void {
     if (
@@ -122,8 +122,7 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
       TorqueProvider.Instance.getLoanCollateralManagementManagementAddress(
         this.props.loanOrderState.asset,
         this.props.walletDetails,
-        this.props.loanOrderState.accountAddress,
-        this.props.loanOrderState.loanOrderHash,
+        this.props.loanOrderState,
         this.state.loanValue,
         this.state.selectedValue
       ).then(loanCollateralManagementAddress => {

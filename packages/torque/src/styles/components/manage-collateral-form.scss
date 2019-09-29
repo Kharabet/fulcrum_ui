@@ -5,6 +5,25 @@
   width: 47rem;
   padding-top: 1rem;
 
+  .manage-collateral__input-container {
+    padding-bottom: 3rem;
+
+    .manage-collateral__input-container__input-amount {
+      display: block;
+
+      height: 7rem;
+      width: 100%;
+
+      border-radius: 0.25rem;
+
+      font-size: 3rem;
+      font-weight: bold;
+      line-height: 1.17;
+      letter-spacing: -0.48px;
+      text-align: center;
+    }
+  }
+
   .manage-collateral-form__tips {
     display: flex;
     flex-direction: row;
