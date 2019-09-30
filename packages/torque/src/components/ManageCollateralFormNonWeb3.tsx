@@ -32,6 +32,7 @@ interface IManageCollateralFormNonWeb3State {
   diffAmount: number;
 
   liquidationPrice: BigNumber;
+  collateralizedPercent: BigNumber;
   loanCollateralManagementAddress: string | null;
   gasAmountNeeded: BigNumber;
 }
@@ -55,6 +56,7 @@ export class ManageCollateralFormNonWeb3 extends Component<IManageCollateralForm
 
       diffAmount: 0,
 
+      collateralizedPercent: new BigNumber(0),
       liquidationPrice: new BigNumber(0),
       loanCollateralManagementAddress: null,
       gasAmountNeeded: new BigNumber(0)
@@ -71,6 +73,7 @@ export class ManageCollateralFormNonWeb3 extends Component<IManageCollateralForm
         this.setState({
           ...this.state,
           diffAmount: value.diffAmount,
+          collateralizedPercent: value.collateralizedPercent,
           liquidationPrice: value.liquidationPrice
         });
       });
@@ -164,6 +167,14 @@ export class ManageCollateralFormNonWeb3 extends Component<IManageCollateralForm
               {`ETH`} falls below ${this.state.liquidationPrice.toFixed(2)}
             </div>
           </div>*/}
+          <div className="manage-collateral-form__info-liquidated-at-container">
+            <div className="manage-collateral-form__info-liquidated-at-msg">
+              This will make your loan
+            </div>
+            <div className="manage-collateral-form__info-liquidated-at-price">
+              {this.state.collateralizedPercent.toFixed(2)}% collateralized
+            </div>
+          </div>
 
           <div className="manage-collateral-form__transfer-details">
             <ActionViaTransferDetails
@@ -209,8 +220,7 @@ export class ManageCollateralFormNonWeb3 extends Component<IManageCollateralForm
     return new Observable<ICollateralChangeEstimate>(observer => {
       TorqueProvider.Instance.getLoanCollateralChangeEstimate(
         this.props.walletDetails,
-        this.props.loanOrderState.accountAddress,
-        this.props.loanOrderState.loanOrderHash,
+        this.props.loanOrderState,
         this.state.currentValue,
         selectedValue
       ).then(value => {
@@ -221,7 +231,7 @@ export class ManageCollateralFormNonWeb3 extends Component<IManageCollateralForm
 
   public onCollateralAmountChange = async (event: ChangeEvent<HTMLInputElement>) => {
     // handling different types of empty values
-    const amountText = event.target.value ? event.target.value : "";
+    const amountText = event.target.value ? event.target.value : "0";
     // console.log(amountText);
     // setting inputAmountText to update display at the same time
     this.setState({

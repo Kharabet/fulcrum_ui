@@ -42,7 +42,7 @@ export class ManageCollateralDlg extends Component<any, IManageCollateralDlgStat
       >
         {this.state.walletDetails.walletType === WalletType.NonWeb3 ? (
           <React.Fragment>
-            <DialogHeader title="Top up how much collateral?" onDecline={this.onFormDecline} />
+            <DialogHeader title={`Top up how much ${`ETH`} collateral?`} onDecline={this.onFormDecline} />
             <ManageCollateralFormNonWeb3
               walletDetails={this.state.walletDetails}
               loanOrderState={this.state.loanOrderState}

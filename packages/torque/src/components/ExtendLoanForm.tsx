@@ -134,9 +134,23 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
       return null;
     }
 
+    let daysLeft;
+    if (this.props.loanOrderState.loanData) {
+      daysLeft = this.props.loanOrderState.loanData.loanEndUnixTimestampSec.minus(Date.now()/1000).dividedBy(86400).toFixed(1);
+    }
+
     return (
       <form className="extend-loan-form" onSubmit={this.onSubmitClick}>
-        <section className="dialog-content">
+        <section className="dialog-content" style={{ marginTop: `-2rem` }}>
+
+          {daysLeft ? (
+            <div className="extend-loan-form__info-extended-by-container">
+              <div className="extend-loan-form__info-extended-by-msg" style={{ fontSize: `0.9rem`, paddingBottom: `1rem` }}>There are {daysLeft} days until collateral will be partially liquidated to fund interest payments.</div>
+            </div>
+          ) : ``}
+
+          <hr className="extend-loan-form__delimiter" />
+
           <ExtendLoanSlider
             readonly={false}
             minValue={this.state.minValue}
@@ -154,7 +168,7 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
           <hr className="extend-loan-form__delimiter" />
 
           <div className="extend-loan-form__info-extended-by-container">
-            <div className="extend-loan-form__info-extended-by-msg">Your loan will be extended by</div>
+            <div className="extend-loan-form__info-extended-by-msg">This date will be extended by</div>
             <div className="extend-loan-form__info-extended-by-price">
               {this.state.selectedValue} {this.pluralize("day", "days", this.state.selectedValue)}
             </div>

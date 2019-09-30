@@ -133,14 +133,14 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
                 )}
               </div>
             </div>
+            <div className="borrowed-funds-list-item__action" onClick={this.onExtendLoan}>
+              <div className="borrowed-funds-list-item__action-title">
+                <div>Front<br/>Interest</div>
+              </div>
+            </div>
             <div className="borrowed-funds-list-item__action" onClick={this.onRepayLoan}>
               <div className="borrowed-funds-list-item__action-title">
                 <div>Repay<br/>Loan</div>
-              </div>
-            </div>
-            <div className="borrowed-funds-list-item__action" onClick={this.onExtendLoan}>
-              <div className="borrowed-funds-list-item__action-title">
-                <div>Extend<br/>Loan</div>
               </div>
             </div>
           </div>

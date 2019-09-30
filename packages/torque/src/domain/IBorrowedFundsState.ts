@@ -12,4 +12,19 @@ export interface IBorrowedFundsState {
   collateralizedPercent: BigNumber;
   hasManagementContract: boolean;
   isInProgress: boolean;
+  loanData?: {
+    loanOrderHash: string;
+    loanTokenAddress: string;
+    collateralTokenAddress: string;
+    loanTokenAmountFilled: BigNumber;
+    positionTokenAmountFilled: BigNumber;
+    collateralTokenAmountFilled: BigNumber;
+    interestOwedPerDay: BigNumber;
+    interestDepositRemaining: BigNumber;
+    initialMarginAmount: BigNumber;
+    maintenanceMarginAmount: BigNumber;
+    currentMarginAmount: BigNumber;
+    maxDurationUnixTimestampSec: BigNumber;
+    loanEndUnixTimestampSec: BigNumber;
+  };
 }

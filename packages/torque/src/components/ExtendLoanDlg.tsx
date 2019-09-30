@@ -38,7 +38,7 @@ export class ExtendLoanDlg extends Component<any, IExtendLoanDlgState> {
         onRequestClose={this.onFormDecline}
         shouldCloseOnOverlayClick={false}
       >
-        <DialogHeader title="Extend Loan" onDecline={this.onFormDecline} />
+        <DialogHeader title="Front Interest" onDecline={this.onFormDecline} />
         <ExtendLoanForm
           walletDetails={this.state.walletDetails}
           loanOrderState={this.state.loanOrderState}

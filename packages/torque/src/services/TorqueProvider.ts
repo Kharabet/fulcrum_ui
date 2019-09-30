@@ -297,7 +297,8 @@ export class TorqueProvider {
             interestRate: e.interestOwedPerDay.dividedBy(e.loanTokenAmountFilled).multipliedBy(365),
             interestOwedPerDay: e.interestOwedPerDay.dividedBy(10**loanPrecision),
             hasManagementContract: true,
-            isInProgress: false
+            isInProgress: false,
+            loanData: e
           }
         });
         // console.log(result);
@@ -428,13 +429,38 @@ export class TorqueProvider {
     return { minValue: 0, maxValue: 100, currentValue: borrowedFundsState.collateralizedPercent.multipliedBy(100).toNumber() };
   };
 
-  public getLoanCollateralChangeEstimate = async (walletDetails: IWalletDetails, accountAddress: string, loanOrderHash: string, loanValue: BigNumber, newValue: BigNumber): Promise<ICollateralChangeEstimate> => {
-    
+  public getLoanCollateralChangeEstimate = async (walletDetails: IWalletDetails, borrowedFundsState: IBorrowedFundsState, loanValue: BigNumber, newValue: BigNumber): Promise<ICollateralChangeEstimate> => {
+
     const result = {
       diffAmount: 0, // new BigNumber(Math.abs(newValue - loanValue) * 2 ),
-      liquidationPrice: new BigNumber(100),
+      collateralizedPercent: new BigNumber(0),
+      liquidationPrice: new BigNumber(0),
       gasEstimate: new BigNumber(0)
     };
+
+    if (this.contractsSource && this.web3Wrapper && borrowedFundsState.loanData) {
+      const oracleContract = await this.contractsSource.getOracleContract();
+      const collateralAsset = this.contractsSource!.getAssetFromAddress(borrowedFundsState.loanData.collateralTokenAddress);
+      const collateralPrecision = AssetsDictionary.assets.get(collateralAsset)!.decimals || 18;
+      let newAmount = new BigNumber(0);
+      if (newValue && newValue.gt(0)) {
+        newAmount = newValue.multipliedBy(10**collateralPrecision);
+      }
+      try {
+        const newCurrentMargin: BigNumber = await oracleContract.getCurrentMarginAmount.callAsync(
+          borrowedFundsState.loanData.loanTokenAddress,
+          borrowedFundsState.loanData.loanTokenAddress, // positionTokenAddress
+          borrowedFundsState.loanData.collateralTokenAddress,
+          borrowedFundsState.loanData.loanTokenAmountFilled,
+          borrowedFundsState.loanData.positionTokenAmountFilled,
+          borrowedFundsState.loanData.collateralTokenAmountFilled.plus(newAmount)
+        );
+        result.collateralizedPercent = newCurrentMargin.dividedBy(10**18).plus(100);
+      } catch(e) {
+        // console.log(e);
+        result.collateralizedPercent = borrowedFundsState.collateralizedPercent.times(100).plus(100);
+      }
+    }
 
     return result;
   };

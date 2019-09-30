@@ -3,6 +3,7 @@ import * as _ from "lodash";
 import { erc20Contract } from "../contracts/erc20";
 import { iBZxContract } from "../contracts/iBZxContract";
 import { iTokenContract } from "../contracts/iTokenContract";
+import { oracleContract } from "../contracts/oracle";
 import { Asset } from "../domain/Asset";
 
 const ethNetwork = process.env.REACT_APP_ETH_NETWORK;
@@ -13,6 +14,7 @@ export class ContractsSource {
   private erc20Json: any;
   private iBZxJson: any;
   private iTokenJson: any;
+  private oracleJson: any;
 
   public networkId: number;
   public canWrite: boolean;
@@ -142,6 +144,23 @@ export class ContractsSource {
     return address;
   }
 
+  private getOracleAddress(): string {
+    let address: string = "";
+    switch (this.networkId) {
+      case 1:
+        address = "0xee14de2e67e1ec23c8561a6fad2635ff1b618db6";
+        break;
+      case 3:
+        address = "0x818e6fecd516ecc3849daf6845e3ec868087b755";
+        break;
+      case 42:
+        address = "0x692f391bCc85cefCe8C237C01e1f636BbD70EA4D";
+        break;
+    }
+
+    return address;
+  }
+
   private getAssetFromAddressRaw(addressErc20: string): Asset {
     let asset: Asset = Asset.UNKNOWN;
 
@@ -182,10 +201,19 @@ export class ContractsSource {
     );
   }
 
+  private async getOracleContractRaw(): Promise<oracleContract> {
+    return new oracleContract(
+      this.oracleJson.abi,
+      this.getOracleAddress().toLowerCase(),
+      this.provider
+    );
+  }
+
   public async Init() {
     this.erc20Json = await import(`./../assets/artifacts/${ethNetwork}/erc20.json`);
     this.iBZxJson = await import(`./../assets/artifacts/${ethNetwork}/iBZx.json`);
     this.iTokenJson = await import(`./../assets/artifacts/${ethNetwork}/iToken.json`);
+    this.oracleJson = await import(`./../assets/artifacts/${ethNetwork}/oracle.json`);
   }
 
   private async getErc20ContractRaw(addressErc20: string): Promise<erc20Contract> {
@@ -196,4 +224,5 @@ export class ContractsSource {
   public getiBZxContract = _.memoize(this.getiBZxContractRaw);
   public getiTokenContract = _.memoize(this.getiTokenContractRaw);
   public getAssetFromAddress = _.memoize(this.getAssetFromAddressRaw);
+  public getOracleContract = _.memoize(this.getOracleContractRaw);
 }
