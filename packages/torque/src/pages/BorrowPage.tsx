@@ -45,7 +45,15 @@ export class BorrowPage extends PureComponent<IBorrowPageParams & RouteComponent
   }
 
   private onSelectAsset = async (asset: Asset) => {
+
     const walletType = walletTypeAbbrToWalletType(this.props.match.params.walletTypeAbbr);
+
+    if (walletType === WalletType.Web3) {
+      if (!TorqueProvider.Instance.contractsSource || !TorqueProvider.Instance.contractsSource.canWrite) {
+        NavService.Instance.History.replace(NavService.Instance.getWalletAddress("b"));
+        return;
+      }
+    }
 
     if (this.borrowDlgRef.current) {
       try {
@@ -53,18 +61,19 @@ export class BorrowPage extends PureComponent<IBorrowPageParams & RouteComponent
 
         if (borrowRequest.walletType === WalletType.NonWeb3) {
           NavService.Instance.History.replace(NavService.Instance.getDashboardAddress(walletType, ""));
-        }
-
-        if (borrowRequest.walletType === WalletType.Web3) {
+        } else if (borrowRequest.walletType === WalletType.Web3) {
           const accountAddress =
             TorqueProvider.Instance.accounts.length > 0 && TorqueProvider.Instance.accounts[0]
               ? TorqueProvider.Instance.accounts[0].toLowerCase()
               : null;
 
-          if (accountAddress) {
-            await TorqueProvider.Instance.doBorrow(borrowRequest);
-            NavService.Instance.History.replace(NavService.Instance.getDashboardAddress(walletType, accountAddress));
+          if (!accountAddress || !TorqueProvider.Instance.contractsSource || !TorqueProvider.Instance.contractsSource.canWrite) {
+            NavService.Instance.History.replace(NavService.Instance.getWalletAddress("b"));
+            return;
           }
+
+          await TorqueProvider.Instance.doBorrow(borrowRequest);
+          NavService.Instance.History.replace(NavService.Instance.getDashboardAddress(walletType, accountAddress));
         }
       } finally {
         await this.borrowDlgRef.current.hide();

@@ -14,7 +14,7 @@ export class WalletTypeSelector extends Component<IWalletTypeSelectorProps> {
           Browser wallets
         </WalletTypeSelectorItem>
         <WalletTypeSelectorItem walletType={WalletType.NonWeb3} onSelectWalletType={this.props.onSelectWalletType}>
-          Non Web 3 wallets
+          External wallets
         </WalletTypeSelectorItem>
       </div>
     );

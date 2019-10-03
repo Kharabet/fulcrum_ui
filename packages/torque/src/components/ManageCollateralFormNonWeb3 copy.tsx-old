@@ -20,7 +20,7 @@ export interface IManageCollateralFormNonWeb3Props {
   loanOrderState: IBorrowedFundsState;
 
   onSubmit: (request: ManageCollateralRequest) => void;
-  onCLose: () => void;
+  onClose: () => void;
 }
 
 interface IManageCollateralFormNonWeb3State {
@@ -81,7 +81,7 @@ export class ManageCollateralFormNonWeb3 extends Component<IManageCollateralForm
       this.props.loanOrderState
     ).then(collateralState => {
       TorqueProvider.Instance.getLoanCollateralManagementManagementAddress(
-        this.props.loanOrderState.asset,
+        this.props.loanOrderState.loanAsset,
         this.props.walletDetails,
         this.props.loanOrderState,
         this.state.loanValue,
@@ -93,7 +93,7 @@ export class ManageCollateralFormNonWeb3 extends Component<IManageCollateralForm
               ...this.state,
               minValue: collateralState.minValue,
               maxValue: collateralState.maxValue,
-              assetDetails: AssetsDictionary.assets.get(this.props.loanOrderState.asset) || null,
+              assetDetails: AssetsDictionary.assets.get(this.props.loanOrderState.loanAsset) || null,
               loanValue: collateralState.currentValue,
               currentValue: collateralState.currentValue,
               selectedValue: collateralState.currentValue,
@@ -120,7 +120,7 @@ export class ManageCollateralFormNonWeb3 extends Component<IManageCollateralForm
       prevState.selectedValue !== this.state.selectedValue
     ) {
       TorqueProvider.Instance.getLoanCollateralManagementManagementAddress(
-        this.props.loanOrderState.asset,
+        this.props.loanOrderState.loanAsset,
         this.props.walletDetails,
         this.props.loanOrderState,
         this.state.loanValue,
@@ -180,7 +180,7 @@ export class ManageCollateralFormNonWeb3 extends Component<IManageCollateralForm
               <div className="manage-collateral-form__transfer-details">
                 <ActionViaTransferDetails
                   contractAddress={this.state.loanCollateralManagementAddress || ""}
-                  borrowAsset={this.props.loanOrderState.asset}
+                  borrowAsset={this.props.loanOrderState.loanAsset}
                   assetAmount={this.state.diffAmount}
                   account={this.props.loanOrderState.accountAddress}
                   action={ActionType.ManageCollateral}
@@ -211,7 +211,7 @@ export class ManageCollateralFormNonWeb3 extends Component<IManageCollateralForm
         <section className="dialog-actions">
           <div className="manage-collateral-form__actions-container">
             {this.props.walletDetails.walletType === WalletType.NonWeb3 ? (
-              <button type="button" className="btn btn-size--small" onClick={this.props.onCLose}>
+              <button type="button" className="btn btn-size--small" onClick={this.props.onClose}>
                 Close
               </button>
             ) : null}

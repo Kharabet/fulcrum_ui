@@ -3,6 +3,7 @@ import { Asset } from "../domain/Asset";
 import { CollateralTokenSelectorItem } from "./CollateralTokenSelectorItem";
 
 export interface ICollateralTokenSelectorProps {
+  borrowAsset: Asset;
   selectedCollateral: Asset;
 
   onCollateralChange: (asset: Asset) => void;
@@ -14,6 +15,7 @@ export class CollateralTokenSelector extends Component<ICollateralTokenSelectorP
     Asset.ETH,
     Asset.DAI,
     Asset.USDC,
+    // Asset.LINK,
     Asset.WBTC,
     // Asset.MKR,
     Asset.ZRX,
@@ -23,7 +25,7 @@ export class CollateralTokenSelector extends Component<ICollateralTokenSelectorP
   ];
 
   public render() {
-    const tokenItems = this.assets.map(e => (
+    const tokenItems = this.assets.filter(e => e !== this.props.borrowAsset).map(e => (
       <CollateralTokenSelectorItem
         key={e}
         asset={e}

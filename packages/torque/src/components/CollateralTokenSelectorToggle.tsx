@@ -5,6 +5,7 @@ import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { CollateralTokenSelectorDlg } from "./CollateralTokenSelectorDlg";
 
 export interface ICollateralTokenSelectorToggleProps {
+  borrowAsset: Asset;
   collateralAsset: Asset;
   readonly: boolean;
 
@@ -69,7 +70,7 @@ export class CollateralTokenSelectorToggle extends Component<ICollateralTokenSel
   private onChangeClick = async () => {
     if (this.collateralTokenSelectorDlgRef.current) {
       try {
-        const collateralAsset = await this.collateralTokenSelectorDlgRef.current.getValue(this.props.collateralAsset);
+        const collateralAsset = await this.collateralTokenSelectorDlgRef.current.getValue(this.props.borrowAsset, this.props.collateralAsset);
         this.props.onChange(collateralAsset);
       } finally {
         await this.collateralTokenSelectorDlgRef.current.hide();

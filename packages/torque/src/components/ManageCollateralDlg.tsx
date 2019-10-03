@@ -47,7 +47,7 @@ export class ManageCollateralDlg extends Component<any, IManageCollateralDlgStat
               walletDetails={this.state.walletDetails}
               loanOrderState={this.state.loanOrderState}
               onSubmit={this.onFormSubmit}
-              onCLose={this.onFormDecline}
+              onClose={this.onFormDecline}
             />
           </React.Fragment>
         ) : (
@@ -57,7 +57,7 @@ export class ManageCollateralDlg extends Component<any, IManageCollateralDlgStat
               walletDetails={this.state.walletDetails}
               loanOrderState={this.state.loanOrderState}
               onSubmit={this.onFormSubmit}
-              onCLose={this.onFormDecline}
+              onClose={this.onFormDecline}
             />
           </React.Fragment>
         )}

@@ -4,7 +4,8 @@ import { Asset } from "./Asset";
 export interface IBorrowedFundsState {
   accountAddress: string;
   loanOrderHash: string;
-  asset: Asset;
+  loanAsset: Asset;
+  collateralAsset: Asset;
   amount: BigNumber;
   amountOwed: BigNumber;
   interestRate: BigNumber;

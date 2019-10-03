@@ -2,6 +2,7 @@ import * as _ from "lodash";
 
 import { erc20Contract } from "../contracts/erc20";
 import { iBZxContract } from "../contracts/iBZxContract";
+import { iENSOwnerContract } from "../contracts/iENSOwnerContract";
 import { iTokenContract } from "../contracts/iTokenContract";
 import { oracleContract } from "../contracts/oracle";
 import { Asset } from "../domain/Asset";
@@ -15,6 +16,7 @@ export class ContractsSource {
   private iBZxJson: any;
   private iTokenJson: any;
   private oracleJson: any;
+  private iENSJson: any;
 
   public networkId: number;
   public canWrite: boolean;
@@ -33,6 +35,23 @@ export class ContractsSource {
         break;
       case 42:
         address = "0x9009e85a687b55b5d6C314363C228803fAd32d01";
+        break;
+    }
+
+    return address;
+  }
+
+  public getVaultAddress(): string {
+    let address: string = "";
+    switch (this.networkId) {
+      case 1:
+        address = "0x8b3d70d628ebd30d4a2ea82db95ba2e906c71633";
+        break;
+      case 3:
+        address = "";
+        break;
+      case 42:
+        address = "";
         break;
     }
 
@@ -74,7 +93,7 @@ export class ContractsSource {
       case Asset.BAT:
         switch (this.networkId) {
           case 1:
-            address = "";
+            address = "0xA8b65249DE7f85494BC1fe75F525f568aa7dfa39";
             break;
           case 42:
             address = "";
@@ -84,7 +103,7 @@ export class ContractsSource {
       case Asset.KNC:
         switch (this.networkId) {
           case 1:
-            address = "";
+            address = "0x1cC9567EA2eB740824a45F8026cCF8e46973234D";
             break;
           case 42:
             address = "";
@@ -94,7 +113,7 @@ export class ContractsSource {
       case Asset.LINK:
         switch (this.networkId) {
           case 1:
-            address = "";
+            address = "0x1D496da96caf6b518b133736beca85D5C4F9cBc5";
             break;
           case 42:
             address = "";
@@ -114,7 +133,7 @@ export class ContractsSource {
       case Asset.REP:
         switch (this.networkId) {
           case 1:
-            address = "";
+            address = "0xBd56E9477Fc6997609Cf45F84795eFbDAC642Ff1";
             break;
         }
         break;
@@ -128,14 +147,14 @@ export class ContractsSource {
       case Asset.WBTC:
         switch (this.networkId) {
           case 1:
-            address = "";
+            address = "0xBA9262578EFef8b3aFf7F60Cd629d6CC8859C8b5";
             break;
         }
         break;        
       case Asset.ZRX:
         switch (this.networkId) {
           case 1:
-            address = "";
+            address = "0xA7Eb2bc82df18013ecC2A6C533fc29446442EDEe";
             break;
         }
         break;
@@ -155,6 +174,17 @@ export class ContractsSource {
         break;
       case 42:
         address = "0x692f391bCc85cefCe8C237C01e1f636BbD70EA4D";
+        break;
+    }
+
+    return address;
+  }
+
+  private getiENSOwnerAddress(): string {
+    let address: string = "";
+    switch (this.networkId) {
+      case 1:
+        address = "0x100157a893503b3b27112ab602f8d80e6d0df9a8";
         break;
     }
 
@@ -209,11 +239,20 @@ export class ContractsSource {
     );
   }
 
+  private async getiENSOwnerContractRaw(): Promise<iENSOwnerContract> {
+    return new iENSOwnerContract(
+      this.iENSJson.abi,
+      this.getiENSOwnerAddress().toLowerCase(),
+      this.provider
+    );
+  }
+
   public async Init() {
     this.erc20Json = await import(`./../assets/artifacts/${ethNetwork}/erc20.json`);
     this.iBZxJson = await import(`./../assets/artifacts/${ethNetwork}/iBZx.json`);
     this.iTokenJson = await import(`./../assets/artifacts/${ethNetwork}/iToken.json`);
     this.oracleJson = await import(`./../assets/artifacts/${ethNetwork}/oracle.json`);
+    this.iENSJson = await import(`./../assets/artifacts/${ethNetwork}/iENSOwner.json`);
   }
 
   private async getErc20ContractRaw(addressErc20: string): Promise<erc20Contract> {
@@ -225,4 +264,5 @@ export class ContractsSource {
   public getiTokenContract = _.memoize(this.getiTokenContractRaw);
   public getAssetFromAddress = _.memoize(this.getAssetFromAddressRaw);
   public getOracleContract = _.memoize(this.getOracleContractRaw);
+  public getiENSOwnerContract = _.memoize(this.getiENSOwnerContractRaw);
 }

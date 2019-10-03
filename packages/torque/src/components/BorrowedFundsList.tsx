@@ -1,6 +1,8 @@
 import React, { Component, RefObject } from "react";
 import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
 import { IWalletDetails } from "../domain/IWalletDetails";
+import { WalletType } from "../domain/WalletType";
+import { TorqueProvider } from "../services/TorqueProvider";
 import { BorrowedFundsListItem } from "./BorrowedFundsListItem";
 
 export interface IBorrowedFundsListProps {
@@ -36,7 +38,8 @@ export class BorrowedFundsList extends Component<IBorrowedFundsListProps, IBorro
   // }
 
   public render() {
-    const items = this.props.items.map((e, index) => {
+    const items = this.props.items.filter(e => this.props.walletDetails.walletType === WalletType.Web3 || TorqueProvider.Instance.isETHAsset(e.collateralAsset))
+      .map((e, index) => {
       // const rest = index % this.state.colsCount;
       return (
         <BorrowedFundsListItem

@@ -3,11 +3,13 @@ import React, { Component, RefObject } from "react";
 
 import { ActionType } from "../domain/ActionType";
 import { Asset } from "../domain/Asset";
+import { WalletType } from "../domain/WalletType";
 import ic_copy from "./../assets/images/ic_copy.svg"
 import ic_qr_code from "./../assets/images/ic_qr_code.svg"
 import { QRCodeForAddressDlg } from "./QRCodeForAddressDlg";
 
 export interface IActionViaTransferDetailsProps {
+  walletType?: WalletType;
   assetAmount: BigNumber;
   contractAddress: string;
   borrowAsset: Asset;
@@ -34,6 +36,11 @@ export class ActionViaTransferDetails extends Component<IActionViaTransferDetail
     let classes1: string = "";
     let classes2: string = "";
     switch (this.props.action) {
+      case ActionType.SetupENS:
+          actionAsset = "ETH";
+          actionContract1 = this.props.contractAddress;
+          classes1 = "action-via-transfer-details__input-center";
+        break;
       case ActionType.Borrow:
         actionAsset = "ETH";
         actionContract1 = this.props.contractAddress;
@@ -75,7 +82,7 @@ export class ActionViaTransferDetails extends Component<IActionViaTransferDetail
               <img className="action-via-transfer-details__input-btn" src={ic_copy} onClick={() => this.onCopyAddressClick(actionContract1)} style={{ marginRight: `4px` }} />
             </div>
           </div>
-          {this.props.action !== ActionType.Borrow && this.props.action !== ActionType.ManageCollateral ? (
+          {classes2 ? (
             <React.Fragment>
               <div className="action-via-transfer-details__title" style={{ paddingTop: `16px`, marginBottom: `0.5rem` }}>
                 then send <span className="action-via-transfer-details__title-amount">0 ETH</span>{" "}

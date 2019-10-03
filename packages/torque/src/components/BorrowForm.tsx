@@ -9,6 +9,7 @@ import { IBorrowEstimate } from "../domain/IBorrowEstimate";
 import { WalletType } from "../domain/WalletType";
 import { TorqueProvider } from "../services/TorqueProvider";
 import { ActionViaTransferDetails } from "./ActionViaTransferDetails";
+import { ActionViaWeb3Details } from "./ActionViaWeb3Details";
 import { CollateralTokenSelectorToggle } from "./CollateralTokenSelectorToggle";
 
 export interface IBorrowFormProps {
@@ -68,7 +69,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
     return (
       <form className="borrow-form" onSubmit={this.onSubmit}>
         <section className="dialog-content">
-          <div className="borrow-form__input-container">
+          <div className="borrow-form__input-container" style={this.props.walletType === WalletType.Web3 ? { paddingBottom: `1rem` } : undefined}>
             <input
               ref={this._setInputRef}
               className="borrow-form__input-container__input-amount"
@@ -112,12 +113,24 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
                 That's it! Once you've sent the funds, click Track and enter your wallet address.
               </div>
             </div>
-          ) : null}
+          ) : (
+            <React.Fragment>
+          <div className="borrow-form__info-collateral-by-container" style={this.state.borrowAmount.gt(0) && this.state.depositAmount.eq(0) ? { visibility: `hidden` } : undefined}>
+            <div className="borrow-form__info-collateral-by-msg">To open the loan, you will deposit</div>
+            <div className="borrow-form__info-collateral-by-amount">
+              {this.state.depositAmount.multipliedBy(1.005).dp(5, BigNumber.ROUND_CEIL).toString()} {this.state.collateralAsset}
+            </div>
+          </div>
+    
+              <hr className="borrow-form__delimiter" />
+            </React.Fragment>
+          )}
         </section>
         <section className="dialog-actions">
           <div className="borrow-form__actions-container">
             <div className="borrow-form__action-change">
               <CollateralTokenSelectorToggle
+                borrowAsset={this.props.borrowAsset}
                 collateralAsset={this.state.collateralAsset}
                 readonly={this.props.walletType === WalletType.NonWeb3}
                 onChange={this.onCollateralChange}
@@ -160,14 +173,28 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
           this.props.walletType,
           this.props.borrowAsset,
           this.state.borrowAmount,
-          this.state.collateralAsset
+          this.state.collateralAsset,
+          this.state.depositAmount
         )
       );
     }
   };
 
-  private onCollateralChange = (value: Asset) => {
-    this.setState({ ...this.state, collateralAsset: value });
+  private onCollateralChange = (asset: Asset) => {
+    TorqueProvider.Instance.getBorrowDepositEstimate(
+      this.props.walletType,
+      this.props.borrowAsset,
+      asset,
+      this.state.borrowAmount
+    ).then(value => {
+      this.setState({
+        ...this.state,
+        collateralAsset: asset,
+        depositAmount: value.depositAmount
+      });
+    });
+    
+    
   };
 
   public onTradeAmountChange = async (event: ChangeEvent<HTMLInputElement>) => {

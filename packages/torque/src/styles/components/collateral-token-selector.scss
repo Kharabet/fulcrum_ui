@@ -1,6 +1,7 @@
 .collateral-token-selector {
   box-sizing: border-box;
-  width: 31rem;
+  width: 46.5rem;
+  border-radius: 1rem;
 
   background-color: $color-white;
 
@@ -32,13 +33,13 @@
       text-align: center;
       color: #758295;
 
-      &:nth-child(even) {
-        margin-right: 0;
-      }
+      //&:nth-child(even) {
+      //  margin-right: 0;
+      //}
 
-      &:nth-child(odd) {
-        margin-left: 0;
-      }
+      //&:nth-child(odd) {
+      //  margin-left: 0;
+      //}
 
       &--selected {
         border: solid 2px $color-blue;

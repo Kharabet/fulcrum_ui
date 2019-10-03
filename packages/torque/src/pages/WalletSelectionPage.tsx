@@ -58,6 +58,10 @@ export class WalletSelectionPage extends PureComponent<IWalletSelectionPageProps
         }
       }
     } if (walletType === WalletType.NonWeb3) {
+      if (this.props.onSelectProvider) {
+        await this.props.onSelectProvider(ProviderType.None);
+      }
+      
       if (this.props.match.params.destinationAbbr === "b") {
         NavService.Instance.History.replace(
           NavService.Instance.getBorrowAddress(walletType)

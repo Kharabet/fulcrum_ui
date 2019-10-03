@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 import { OnChainIndicator } from "../components/OnChainIndicator";
+import { ProviderType } from "../domain/ProviderType";
+import { TorqueProvider } from "../services/TorqueProvider";
 import { HeaderLogo } from "./HeaderLogo";
 import { HeaderMenu, IHeaderMenuProps } from "./HeaderMenu";
 import { HeaderMenuToggle } from "./HeaderMenuToggle";
@@ -37,12 +39,24 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
 
   private renderDesktop = () => {
     
-    const menu: IHeaderMenuProps = {
-      items: [
-        { id: 1, title: "Borrow", link: "/borrow/n", external: false },
-        { id: 2, title: "Dashboard", link: "/dashboard/n", external: false },
-      ]
-    };
+    let menu: IHeaderMenuProps;
+    if (TorqueProvider.Instance.providerType !== ProviderType.None) {
+      menu = {
+        items: [
+          { id: 1, title: "Wallets", link: "/wallet/b", external: false },
+          { id: 2, title: "Borrow", link: "/borrow/w", external: false },
+          { id: 3, title: "Dashboard", link: "/dashboard/w", external: false },
+        ]
+      };
+    } else {
+      menu = {
+        items: [
+          { id: 1, title: "Wallets", link: "/wallet/b", external: false },
+          { id: 2, title: "Borrow", link: "/borrow/n", external: false },
+          { id: 3, title: "Dashboard", link: "/dashboard/n", external: false },
+        ]
+      };
+    }
     
     return (
       <header className="header">
@@ -54,7 +68,9 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
             <HeaderMenu items={menu.items} />
           </div>
           <div className="header__right">
-            {/*<OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />*/}
+            {TorqueProvider.Instance.providerType !== ProviderType.None ? (
+              <OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />
+            ) : ``}
           </div>
         </div>
       </header>

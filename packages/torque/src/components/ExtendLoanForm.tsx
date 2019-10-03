@@ -20,7 +20,7 @@ export interface IExtendLoanFormProps {
   loanOrderState: IBorrowedFundsState;
 
   onSubmit: (request: ExtendLoanRequest) => void;
-  onCLose: () => void;
+  onClose: () => void;
 }
 
 interface IExtendLoanFormState {
@@ -70,21 +70,18 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
   public componentDidMount(): void {
     TorqueProvider.Instance.getLoanExtendParams(
       this.props.walletDetails,
-      this.props.loanOrderState.accountAddress,
-      this.props.loanOrderState.loanOrderHash
+      this.props.loanOrderState
     ).then(collateralState => {
       TorqueProvider.Instance.getLoanExtendManagementAddress(
         this.props.walletDetails,
-        this.props.loanOrderState.accountAddress,
-        this.props.loanOrderState.loanOrderHash,
-        this.props.loanOrderState.asset
+        this.props.loanOrderState
       ).then(extendManagementAddress => {
         this.setState(
           {
             ...this.state,
             minValue: collateralState.minValue,
             maxValue: collateralState.maxValue,
-            assetDetails: AssetsDictionary.assets.get(this.props.loanOrderState.asset) || null,
+            assetDetails: AssetsDictionary.assets.get(this.props.loanOrderState.loanAsset) || null,
             currentValue: collateralState.currentValue,
             selectedValue: collateralState.currentValue,
             extendManagementAddress: extendManagementAddress
@@ -109,9 +106,7 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
     ) {
       TorqueProvider.Instance.getLoanExtendManagementAddress(
         this.props.walletDetails,
-        this.props.loanOrderState.accountAddress,
-        this.props.loanOrderState.loanOrderHash,
-        this.props.loanOrderState.asset
+        this.props.loanOrderState
       ).then(extendManagementAddress => {
         TorqueProvider.Instance.getLoanExtendGasAmount().then(gasAmountNeeded => {
           this.setState(
@@ -178,7 +173,7 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
             <div className="extend-loan-form__transfer-details">
               <ActionViaTransferDetails
                 contractAddress={this.state.extendManagementAddress || ""}
-                borrowAsset={this.props.loanOrderState.asset}
+                borrowAsset={this.props.loanOrderState.loanAsset}
                 assetAmount={this.state.depositAmount}
                 account={this.props.loanOrderState.accountAddress}
                 action={ActionType.ExtendLoan}
@@ -208,7 +203,7 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
         <section className="dialog-actions">
           <div className="extend-loan-form__actions-container">
             {this.props.walletDetails.walletType === WalletType.NonWeb3 ? (
-              <button type="button" className="btn btn-size--small" onClick={this.props.onCLose}>
+              <button type="button" className="btn btn-size--small" onClick={this.props.onClose}>
                 Close
               </button>
             ) : null}

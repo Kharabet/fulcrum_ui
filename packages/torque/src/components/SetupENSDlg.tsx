@@ -2,19 +2,19 @@ import React, { Component } from "react";
 import ReactModal from "react-modal";
 import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
 import { IWalletDetails } from "../domain/IWalletDetails";
-import { RepayLoanRequest } from "../domain/RepayLoanRequest";
+import { SetupENSRequest } from "../domain/SetupENSRequest";
 import { DialogHeader } from "./DialogHeader";
-import { RepayLoanForm } from "./RepayLoanForm";
+import { SetupENSForm } from "./SetupENSForm";
 
-interface IRepayLoanDlgState {
+interface ISetupENSDlgState {
   isOpen: boolean;
   walletDetails: IWalletDetails | null;
   loanOrderState: IBorrowedFundsState | null;
 
-  executorParams: { resolve: (value?: RepayLoanRequest) => void; reject: (reason?: any) => void } | null;
+  executorParams: { resolve: (value?: SetupENSRequest) => void; reject: (reason?: any) => void } | null;
 }
 
-export class RepayLoanDlg extends Component<any, IRepayLoanDlgState> {
+export class SetupENSDlg extends Component<any, ISetupENSDlgState> {
   public constructor(props: any, context?: any) {
     super(props, context);
 
@@ -26,10 +26,6 @@ export class RepayLoanDlg extends Component<any, IRepayLoanDlgState> {
       return null;
     }
 
-    if (this.state.loanOrderState === null) {
-      return null;
-    }
-
     return (
       <ReactModal
         isOpen={this.state.isOpen}
@@ -38,29 +34,29 @@ export class RepayLoanDlg extends Component<any, IRepayLoanDlgState> {
         onRequestClose={this.onFormDecline}
         shouldCloseOnOverlayClick={false}
       >
-        <DialogHeader title="Repay Loan" onDecline={this.onFormDecline} />
-        <RepayLoanForm
-          walletDetails={this.state.walletDetails}
-          loanOrderState={this.state.loanOrderState}
-          onSubmit={this.onFormSubmit}
-          onClose={this.onFormDecline}
-        />
+        <React.Fragment>
+          <DialogHeader title="Setup ENS" onDecline={this.onFormDecline} />
+          <SetupENSForm
+            walletDetails={this.state.walletDetails}
+            onSubmit={this.onFormSubmit}
+            onClose={this.onFormDecline}
+          />
+        </React.Fragment>
       </ReactModal>
     );
   }
 
-  public getValue = async (walletDetails: IWalletDetails, item: IBorrowedFundsState): Promise<RepayLoanRequest> => {
+  public getValue = async (walletDetails: IWalletDetails): Promise<SetupENSRequest> => {
     if (this.state.isOpen) {
-      return new Promise<RepayLoanRequest>((resolve, reject) => reject());
+      return new Promise<SetupENSRequest>((resolve, reject) => reject());
     }
 
-    return new Promise<RepayLoanRequest>((resolve, reject) => {
+    return new Promise<SetupENSRequest>((resolve, reject) => {
       this.setState({
         ...this.state,
         isOpen: true,
         executorParams: { resolve: resolve, reject: reject },
-        walletDetails: walletDetails,
-        loanOrderState: item
+        walletDetails: walletDetails
       });
     });
   };
@@ -69,7 +65,7 @@ export class RepayLoanDlg extends Component<any, IRepayLoanDlgState> {
     this.setState({ ...this.state, isOpen: false, executorParams: null });
   };
 
-  private onFormSubmit = (value: RepayLoanRequest) => {
+  private onFormSubmit = (value: SetupENSRequest) => {
     if (this.state.executorParams) {
       this.state.executorParams.resolve(value);
     }

@@ -4,6 +4,7 @@ import { BorrowedFundsList } from "../components/BorrowedFundsList";
 import { ExtendLoanDlg } from "../components/ExtendLoanDlg";
 import { ManageCollateralDlg } from "../components/ManageCollateralDlg";
 import { RepayLoanDlg } from "../components/RepayLoanDlg";
+import { SetupENSDlg } from "../components/SetupENSDlg";
 import { WalletAddressDlg } from "../components/WalletAddressDlg";
 import { WalletAddressHint } from "../components/WalletAddressHint";
 import { WalletAddressLargeForm } from "../components/WalletAddressLargeForm";
@@ -28,6 +29,7 @@ export interface IDashboardPageParams {
 
 interface IDashboardPageState {
   walletDetails: IWalletDetails;
+  isENSSetup?: boolean;
   items: IBorrowedFundsState[];
 }
 
@@ -35,6 +37,7 @@ export class DashboardPage extends PureComponent<
   IDashboardPageParams & RouteComponentProps<IDashboardPageRouteParams>,
   IDashboardPageState
 > {
+  private setupENSDlgRef: RefObject<SetupENSDlg>;
   private manageCollateralDlgRef: RefObject<ManageCollateralDlg>;
   private repayLoanDlgRef: RefObject<RepayLoanDlg>;
   private extendLoanDlgRef: RefObject<ExtendLoanDlg>;
@@ -43,27 +46,57 @@ export class DashboardPage extends PureComponent<
   constructor(props: any) {
     super(props);
 
+    this.setupENSDlgRef = React.createRef();
     this.manageCollateralDlgRef = React.createRef();
     this.repayLoanDlgRef = React.createRef();
     this.extendLoanDlgRef = React.createRef();
     this.walletAddressDlgRef = React.createRef();
 
-    this.state = { walletDetails: { walletType: WalletType.Unknown, walletAddress: "" }, items: [] };
+    this.state = { walletDetails: { walletType: WalletType.Unknown, walletAddress: "" }, items: [], isENSSetup: undefined };
 
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
   }
 
   private async derivedUpdate() {
+    const walletType = walletTypeAbbrToWalletType(this.props.match.params.walletTypeAbbr);
+    if (walletType === WalletType.Web3) {
+      const account = TorqueProvider.Instance.accounts.length !== 0 ?
+        TorqueProvider.Instance.accounts[0].toLowerCase() :
+        "";
+      if (!account || !TorqueProvider.Instance.contractsSource || !TorqueProvider.Instance.contractsSource.canWrite) {
+        return;
+      } else {
+        if (!this.props.match.params.walletAddress || this.props.match.params.walletAddress.toLowerCase() !== account) {
+          NavService.Instance.History.replace(NavService.Instance.getDashboardAddress(WalletType.Web3, account));
+          return;
+        }
+      }
+    }
+    
     const walletDetails = {
       walletType: walletTypeAbbrToWalletType(this.props.match.params.walletTypeAbbr),
       walletAddress: this.props.match.params.walletAddress
     };
-    const items = await TorqueProvider.Instance.getLoansList(walletDetails);
+
+    let isENSSetup;
+    if (this.state.walletDetails.walletType === WalletType.NonWeb3) {
+      if (this.props.match.params.walletAddress) {
+        isENSSetup = await TorqueProvider.Instance.checkENSSetup(this.props.match.params.walletAddress);
+      }
+    } else {
+      isENSSetup = true;
+    }
+
+    let items: IBorrowedFundsState[] = [];
+    if (isENSSetup) {
+      items = await TorqueProvider.Instance.getLoansList(walletDetails);
+    }
 
     this.setState({
       ...this.state,
       walletDetails: walletDetails,
-      items: items
+      items: items,
+      isENSSetup: isENSSetup
     });
   }
 
@@ -92,6 +125,7 @@ export class DashboardPage extends PureComponent<
   public render() {
     return (
       <React.Fragment>
+        <SetupENSDlg ref={this.setupENSDlgRef} />
         <ManageCollateralDlg ref={this.manageCollateralDlgRef} />
         <RepayLoanDlg ref={this.repayLoanDlgRef} />
         <ExtendLoanDlg ref={this.extendLoanDlgRef} />
@@ -108,13 +142,30 @@ export class DashboardPage extends PureComponent<
                     onClearWalletAddress={this.onClearWalletAddress}
                   />
                 ) : null}
-                <BorrowedFundsList
-                  walletDetails={this.state.walletDetails}
-                  items={this.state.items}
-                  onManageCollateral={this.onManageCollateral}
-                  onRepayLoan={this.onRepayLoan}
-                  onExtendLoan={this.onExtendLoan}
-                />
+                { this.state.isENSSetup ? (
+                  <React.Fragment>
+                    <div style={{ textAlign: `center`, fontSize: `2rem`, paddingBottom: `1.5rem` }}>
+                      <div onClick={this.refreshPage} style={{ cursor: `pointer` }}>
+                        Click to refresh and see recent loan activity.
+                      </div>
+                    </div>
+                    <BorrowedFundsList
+                      walletDetails={this.state.walletDetails}
+                      items={this.state.items}
+                      onManageCollateral={this.onManageCollateral}
+                      onRepayLoan={this.onRepayLoan}
+                      onExtendLoan={this.onExtendLoan}
+                    />
+                  </React.Fragment>
+                ) : 
+                  this.state.isENSSetup !== undefined ? (
+                    <div style={{ textAlign: `center`, fontSize: `2rem`, paddingBottom: `1.5rem` }}>
+                      <div onClick={this.onSetupENS} style={{ cursor: `pointer` }}>
+                        Click to enable this wallet for ENS Loans.
+                      </div>
+                    </div>
+                  ) : ``
+                }
               </React.Fragment>
             ) : (
               <React.Fragment>
@@ -131,6 +182,10 @@ export class DashboardPage extends PureComponent<
       </React.Fragment>
     );
   }
+  
+  private refreshPage = () => {
+    window.location.reload();
+  };
 
   private onSelectNewWalletAddress = async () => {
     if (this.walletAddressDlgRef.current) {
@@ -185,6 +240,19 @@ export class DashboardPage extends PureComponent<
         await TorqueProvider.Instance.setLoanCollateral(manageCollateralRequest);
       } finally {
         this.manageCollateralDlgRef.current.hide();
+      }
+    }
+  };
+
+  private onSetupENS = async () => {
+    if (this.setupENSDlgRef.current) {
+      try {
+        const setupENSRequest = await this.setupENSDlgRef.current.getValue(
+          this.state.walletDetails
+        );
+        await TorqueProvider.Instance.setupENS(setupENSRequest);
+      } finally {
+        this.setupENSDlgRef.current.hide();
       }
     }
   };

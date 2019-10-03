@@ -7,11 +7,13 @@ export class BorrowRequest {
   public borrowAsset: Asset;
   public borrowAmount: BigNumber;
   public collateralAsset: Asset;
+  public depositAmount: BigNumber;
 
-  constructor(walletType: WalletType, borrowAsset: Asset, borrowAmount: BigNumber, collateralAsset: Asset) {
+  constructor(walletType: WalletType, borrowAsset: Asset, borrowAmount: BigNumber, collateralAsset: Asset, depositAmount: BigNumber) {
     this.walletType = walletType;
     this.borrowAsset = borrowAsset;
     this.borrowAmount = borrowAmount;
     this.collateralAsset = collateralAsset;
+    this.depositAmount = depositAmount;
   }
 }

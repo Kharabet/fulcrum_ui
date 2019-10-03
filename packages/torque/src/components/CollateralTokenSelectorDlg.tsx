@@ -6,6 +6,7 @@ import { DialogHeader } from "./DialogHeader";
 
 interface ICollateralTokenSelectorDlgState {
   isOpen: boolean;
+  borrowAsset: Asset;
   collateralAsset: Asset;
 
   executorParams: { resolve: (value?: Asset) => void; reject: (reason?: any) => void } | null;
@@ -15,7 +16,7 @@ export class CollateralTokenSelectorDlg extends Component<any, ICollateralTokenS
   public constructor(props: any, context?: any) {
     super(props, context);
 
-    this.state = { isOpen: false, collateralAsset: Asset.UNKNOWN, executorParams: null };
+    this.state = { isOpen: false, borrowAsset: Asset.UNKNOWN, collateralAsset: Asset.UNKNOWN, executorParams: null };
   }
 
   public render() {
@@ -28,12 +29,12 @@ export class CollateralTokenSelectorDlg extends Component<any, ICollateralTokenS
         shouldCloseOnOverlayClick={false}
       >
         <DialogHeader title={`Select collateral token`} onDecline={this.onFormDecline} />
-        <CollateralTokenSelector selectedCollateral={this.state.collateralAsset} onCollateralChange={this.onFormSubmit} onClose={this.onFormDecline} />
+        <CollateralTokenSelector borrowAsset={this.state.borrowAsset} selectedCollateral={this.state.collateralAsset} onCollateralChange={this.onFormSubmit} onClose={this.onFormDecline} />
       </ReactModal>
     );
   }
 
-  public getValue = async (asset: Asset): Promise<Asset> => {
+  public getValue = async (borrowAsset: Asset, collateralAsset: Asset): Promise<Asset> => {
     if (this.state.isOpen) {
       return new Promise<Asset>((resolve, reject) => reject());
     }
@@ -43,7 +44,8 @@ export class CollateralTokenSelectorDlg extends Component<any, ICollateralTokenS
         ...this.state,
         isOpen: true,
         executorParams: { resolve: resolve, reject: reject },
-        collateralAsset: asset
+        borrowAsset: borrowAsset,
+        collateralAsset: collateralAsset
       });
     });
   };
