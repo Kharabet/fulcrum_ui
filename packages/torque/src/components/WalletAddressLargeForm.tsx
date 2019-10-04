@@ -41,13 +41,13 @@ export class WalletAddressLargeForm extends Component<IWalletAddressLargeFormPro
   private onChange = (event: ChangeEvent<HTMLInputElement>) => {
     event.preventDefault();
 
-    this.setState({ ...this.state, walletAddress: event.target.value });
+    this.setState({ ...this.state, walletAddress: event.target.value.toLowerCase() });
   };
 
   private onSubmitClick = () => {
     if (this.props.onSubmit) {
       if (this.state.walletAddress.trim() !== "") {
-        this.props.onSubmit(this.state.walletAddress);
+        this.props.onSubmit(this.state.walletAddress.toLowerCase());
       }
     }
   };

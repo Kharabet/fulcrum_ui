@@ -213,7 +213,7 @@ export class TorqueProvider {
     if (asset === Asset.UNKNOWN) {
       // always 0
       result = new BigNumber(0);
-    } else if (asset === Asset.ETH) {
+    } else if (this.isETHAsset(asset)) {
       // get eth (wallet) balance
       result = await this.getEthBalance()
     } else {
@@ -324,7 +324,7 @@ export class TorqueProvider {
         const depositAmountInBaseUnits = new BigNumber(borrowRequest.depositAmount.multipliedBy(10**collateralPrecision).toFixed(0, 1));
 
         let gasAmountBN;
-        if (borrowRequest.collateralAsset === Asset.ETH) {
+        if (this.isETHAsset(borrowRequest.collateralAsset)) {
           try {
             const gasAmount = await iTokenContract.borrowTokenFromDeposit.estimateGasAsync(
               borrowAmountInBaseUnits,
@@ -698,8 +698,7 @@ export class TorqueProvider {
           await this.checkAndSetApproval(
             repayLoanRequest.borrowAsset,
             this.contractsSource.getVaultAddress().toLowerCase(),
-            closeAmountInBaseUnits,
-            
+            closeAmountInBaseUnits
           );
         }
 
@@ -715,7 +714,7 @@ export class TorqueProvider {
             closeAmountInBaseUnits,
             { 
               from: account,
-              value: repayLoanRequest.borrowAsset === Asset.ETH ?
+              value: this.isETHAsset(repayLoanRequest.borrowAsset) ?
                 closeAmountInBaseUnits :
                 undefined,
               gas: this.gasLimit
@@ -736,7 +735,7 @@ export class TorqueProvider {
           closeAmountInBaseUnits,                               // closeAmount
           { 
             from: account,
-            value: repayLoanRequest.borrowAsset === Asset.ETH ?
+            value: this.isETHAsset(repayLoanRequest.borrowAsset) ?
               closeAmountInBaseUnits :
               undefined,
             gas: gasAmountBN ? gasAmountBN.toString() : "2000000",
@@ -771,7 +770,68 @@ export class TorqueProvider {
   };
 
   public doExtendLoan = async (extendLoanRequest: ExtendLoanRequest) => {
-    return ;
+    // console.log(extendLoanRequest);
+
+    if (extendLoanRequest.depositAmount.lte(0)) {
+      return;
+    }
+
+    if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
+      const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+      const bZxContract = await this.contractsSource.getiBZxContract();
+      if (account && bZxContract) {
+        const loanPrecision = AssetsDictionary.assets.get(extendLoanRequest.borrowAsset)!.decimals || 18;
+        const depositAmountInBaseUnits = new BigNumber(extendLoanRequest.depositAmount.multipliedBy(10**loanPrecision).toFixed(0, 1));
+
+        if (extendLoanRequest.borrowAsset !== Asset.ETH) {
+          await this.checkAndSetApproval(
+            extendLoanRequest.borrowAsset,
+            this.contractsSource.getVaultAddress().toLowerCase(),
+            depositAmountInBaseUnits,
+          );
+        }
+
+        let gasAmountBN;
+        try {
+          const gasAmount = await bZxContract.extendLoanByInterest.estimateGasAsync(
+            extendLoanRequest.loanOrderHash,
+            account,
+            account,
+            depositAmountInBaseUnits,
+            false,
+            { 
+              from: account,
+              value: this.isETHAsset(extendLoanRequest.borrowAsset) ?
+                depositAmountInBaseUnits :
+                undefined,
+              gas: this.gasLimit
+            }
+          );
+          gasAmountBN = new BigNumber(gasAmount).multipliedBy(this.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
+        } catch(e) {
+          // console.log(e);
+        }
+
+        const txHash = await bZxContract.extendLoanByInterest.sendTransactionAsync(
+          extendLoanRequest.loanOrderHash,                      // loanOrderHash
+          account,                                              // borrower
+          account,                                              // payer
+          depositAmountInBaseUnits,                             // depositAmount
+          false,                                                // useCollateral
+          { 
+            from: account,
+            value: this.isETHAsset(extendLoanRequest.borrowAsset) ?
+              depositAmountInBaseUnits :
+              undefined,
+            gas: gasAmountBN ? gasAmountBN.toString() : "2000000",
+            gasPrice: await this.gasPrice()
+          }
+        );
+        // console.log(txHash);
+      }
+    }
+
+    return;
   };
 
   public getAssetInterestRate = async (asset: Asset): Promise<BigNumber> => {

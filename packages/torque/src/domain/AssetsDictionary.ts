@@ -152,8 +152,8 @@ export class AssetsDictionary {
     [
       Asset.WETH,
       new AssetDetails(
-        "WETH",
-        "Wrapped Ether (WETH)",
+        "ETH",// "WETH",
+        "Ethereum (ETH)",// "Wrapped Ether (WETH)",
         18,
         eth_logo,
         eth_bg,

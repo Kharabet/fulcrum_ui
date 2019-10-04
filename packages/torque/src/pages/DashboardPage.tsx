@@ -31,6 +31,7 @@ interface IDashboardPageState {
   walletDetails: IWalletDetails;
   isENSSetup?: boolean;
   items: IBorrowedFundsState[];
+  isDataLoading: boolean;
 }
 
 export class DashboardPage extends PureComponent<
@@ -52,7 +53,7 @@ export class DashboardPage extends PureComponent<
     this.extendLoanDlgRef = React.createRef();
     this.walletAddressDlgRef = React.createRef();
 
-    this.state = { walletDetails: { walletType: WalletType.Unknown, walletAddress: "" }, items: [], isENSSetup: undefined };
+    this.state = { walletDetails: { walletType: WalletType.Unknown, walletAddress: "" }, items: [], isENSSetup: undefined, isDataLoading: true };
 
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
   }
@@ -99,7 +100,8 @@ export class DashboardPage extends PureComponent<
       ...this.state,
       walletDetails: walletDetails,
       items: items,
-      isENSSetup: isENSSetup
+      isENSSetup: isENSSetup,
+      isDataLoading: false
     });
   }
 
@@ -148,9 +150,15 @@ export class DashboardPage extends PureComponent<
                 { this.state.isENSSetup ? (
                   <React.Fragment>
                     <div style={{ textAlign: `center`, fontSize: `2rem`, paddingBottom: `1.5rem` }}>
-                      <div onClick={this.refreshPage} style={{ cursor: `pointer` }}>
-                        Click to refresh and see recent loan activity.
-                      </div>
+                      {this.state.isDataLoading ? (
+                        <div>
+                          Loading...
+                        </div>
+                      ) : (
+                        <div onClick={this.refreshPage} style={{ cursor: `pointer` }}>
+                          Click to refresh and see recent loan activity.
+                        </div>
+                      )}
                     </div>
                     <BorrowedFundsList
                       walletDetails={this.state.walletDetails}
@@ -187,7 +195,24 @@ export class DashboardPage extends PureComponent<
   }
   
   private refreshPage = () => {
-    window.location.reload();
+    // window.location.reload();
+    // this.derivedUpdate();
+    this.setState({
+      ...this.state,
+      isDataLoading: true,
+      items: []
+    },
+    () => {
+      setTimeout(() => {
+        this.setState({
+          ...this.state,
+          isDataLoading: true
+        },
+        () => {
+          this.derivedUpdate();
+        });
+      }, 1000);
+    });
   };
 
   private onSelectNewWalletAddress = async () => {
@@ -203,12 +228,14 @@ export class DashboardPage extends PureComponent<
 
   private onClearWalletAddress = () => {
     NavService.Instance.History.replace(NavService.Instance.getDashboardAddress(WalletType.NonWeb3, ""));
-    window.location.reload();
+    this.props.match.params.walletAddress = "";
+    this.derivedUpdate();
   };
 
   private onWalletAddressChange = (walletAddress: string) => {
     NavService.Instance.History.replace(NavService.Instance.getDashboardAddress(WalletType.NonWeb3, walletAddress));
-    window.location.reload();
+    this.props.match.params.walletAddress = walletAddress;
+    this.derivedUpdate();
   };
 
   private onRepayLoan = async (item: IBorrowedFundsState) => {

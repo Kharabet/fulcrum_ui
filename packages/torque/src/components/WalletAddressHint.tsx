@@ -19,9 +19,9 @@ export class WalletAddressHint extends Component<IWalletAddressHintProps> {
           <div className="wallet-address-hint__action" onClick={this.props.onSelectNewWalletAddress}>
             Enter another address
           </div>
-          <div className="wallet-address-hint__action" onClick={this.props.onClearWalletAddress}>
+          {/*<div className="wallet-address-hint__action" onClick={this.props.onClearWalletAddress}>
             Clear wallet address
-          </div>
+          </div>*/}
         </div>
       </div>
     );

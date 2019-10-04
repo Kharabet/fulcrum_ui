@@ -194,6 +194,8 @@ export class ContractsSource {
   private getAssetFromAddressRaw(addressErc20: string): Asset {
     let asset: Asset = Asset.UNKNOWN;
 
+    addressErc20 = addressErc20.toLowerCase();
+
     switch (this.networkId) {
       case 1:
         switch (addressErc20) {
@@ -205,6 +207,27 @@ export class ContractsSource {
             break;
           case "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48":
             asset = Asset.USDC;
+            break;
+          case "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599":
+            asset = Asset.WBTC;
+            break;
+          case "0x514910771af9ca656af840dff83e8264ecf986ca":
+            asset = Asset.LINK;
+            break;
+          case "0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2":
+            asset = Asset.MKR;
+            break;
+          case "0xe41d2489571d322189246dafa5ebde1f4699f498":
+            asset = Asset.ZRX;
+            break;
+          case "0x0d8775f648430679a709e98d2b0cb6250d2887ef":
+            asset = Asset.BAT;
+            break;
+          case "0x1985365e9f78359a9b6ad760e32412f4a445e862":
+            asset = Asset.REP;
+            break;
+          case "0xdd974d5c2e2928dea5f71b9825b8b646686bd200":
+            asset = Asset.KNC;
             break;
         }
         break;

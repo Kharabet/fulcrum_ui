@@ -194,7 +194,7 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
           ) : (
             <OpsEstimatedResult
               assetDetails={this.state.assetDetails}
-              actionTitle="You will top up"
+              actionTitle="You will send"
               amount={this.state.depositAmount}
               precision={6}
             />
@@ -247,9 +247,10 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
     this.props.onSubmit(
       new ExtendLoanRequest(
         this.props.walletDetails,
+        this.props.loanOrderState.loanAsset,
         this.props.loanOrderState.accountAddress,
         this.props.loanOrderState.loanOrderHash,
-        this.state.currentValue
+        this.state.depositAmount
       )
     );
   };

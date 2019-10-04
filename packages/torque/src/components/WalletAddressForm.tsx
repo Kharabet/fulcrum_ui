@@ -47,9 +47,7 @@ export class WalletAddressForm extends Component<IWalletAddressFormProps, IWalle
 
   public onSubmitClick = (event: FormEvent<HTMLFormElement>) => {
     if (this.props.onSubmit) {
-      if (this.state.walletAddress.trim() !== "") {
-        this.props.onSubmit(this.state.walletAddress);
-      }
+      this.props.onSubmit(this.state.walletAddress);
     }
   };
 }

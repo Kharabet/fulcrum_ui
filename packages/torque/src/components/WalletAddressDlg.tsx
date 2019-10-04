@@ -53,7 +53,11 @@ export class WalletAddressDlg extends Component<any, IWalletAddressDlgState> {
 
   private onFormSubmit = (value: string) => {
     if (this.state.executorParams) {
-      this.state.executorParams.resolve(value);
+      if (value.trim() !== "") {
+        this.state.executorParams.resolve(value);
+      } else {
+        this.state.executorParams.reject();  
+      }
     }
   };
 
