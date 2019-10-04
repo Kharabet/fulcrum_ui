@@ -15,7 +15,7 @@ export class CollateralTokenSelector extends Component<ICollateralTokenSelectorP
     Asset.ETH,
     Asset.DAI,
     Asset.USDC,
-    // Asset.LINK,
+    Asset.LINK,
     Asset.WBTC,
     // Asset.MKR,
     Asset.ZRX,

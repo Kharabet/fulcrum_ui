@@ -245,6 +245,18 @@ export class TorqueProvider {
   ): Promise<IBorrowEstimate> => {
     const result = { depositAmount: new BigNumber(0), gasEstimate: new BigNumber(0) };
     
+    let initialLevel;
+    switch (collateralAsset) {
+      case Asset.ETH:
+      case Asset.WETH:
+      case Asset.DAI:
+      case Asset.USDC:
+        initialLevel = 150;
+        break;
+      default:
+        initialLevel = 250;
+    }
+
     if (this.contractsSource && this.web3Wrapper) {
       const iTokenContract = await this.contractsSource.getiTokenContract(borrowAsset);
       const collateralAssetErc20Address = this.getErc20AddressOfAsset(collateralAsset) || "";
@@ -258,7 +270,7 @@ export class TorqueProvider {
           collateralAssetErc20Address
         );
         result.depositAmount = borrowEstimate
-          .multipliedBy(150)
+          .multipliedBy(initialLevel)
           .dividedBy(125)
           .dividedBy(10**collateralPrecision);
         
