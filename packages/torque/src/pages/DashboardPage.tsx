@@ -59,6 +59,9 @@ export class DashboardPage extends PureComponent<
 
   private async derivedUpdate() {
     const walletType = walletTypeAbbrToWalletType(this.props.match.params.walletTypeAbbr);
+    let walletAddress = this.props.match.params.walletAddress ?
+      this.props.match.params.walletAddress.toLowerCase() :
+      "";
     if (walletType === WalletType.Web3) {
       const account = TorqueProvider.Instance.accounts.length !== 0 ?
         TorqueProvider.Instance.accounts[0].toLowerCase() :
@@ -66,22 +69,22 @@ export class DashboardPage extends PureComponent<
       if (!account || !TorqueProvider.Instance.contractsSource || !TorqueProvider.Instance.contractsSource.canWrite) {
         return;
       } else {
-        if (!this.props.match.params.walletAddress || this.props.match.params.walletAddress.toLowerCase() !== account) {
+        if (walletAddress.toLowerCase() !== account) {
           NavService.Instance.History.replace(NavService.Instance.getDashboardAddress(WalletType.Web3, account));
-          return;
+          walletAddress = account;
         }
       }
     }
-    
+
     const walletDetails = {
       walletType: walletTypeAbbrToWalletType(this.props.match.params.walletTypeAbbr),
-      walletAddress: this.props.match.params.walletAddress
+      walletAddress: walletAddress
     };
 
     let isENSSetup;
     if (this.state.walletDetails.walletType === WalletType.NonWeb3) {
-      if (this.props.match.params.walletAddress) {
-        isENSSetup = await TorqueProvider.Instance.checkENSSetup(this.props.match.params.walletAddress);
+      if (walletAddress) {
+        isENSSetup = await TorqueProvider.Instance.checkENSSetup(walletAddress);
       }
     } else {
       isENSSetup = true;

@@ -758,6 +758,7 @@ export class FulcrumProvider {
 
   public gasPrice = async (): Promise<BigNumber> => {
     let result = new BigNumber(30).multipliedBy(10 ** 9); // upper limit 30 gwei
+    const lowerLimit = new BigNumber(3).multipliedBy(10 ** 9); // lower limit 3 gwei
 
     const url = `https://ethgasstation.info/json/ethgasAPI.json`;
     try {
@@ -776,7 +777,11 @@ export class FulcrumProvider {
       }
     } catch (error) {
       // console.log(error);
-      result = new BigNumber(20).multipliedBy(10 ** 9); // error default 8 gwei
+      result = new BigNumber(12).multipliedBy(10 ** 9); // error default 8 gwei
+    }
+
+    if (result.lt(lowerLimit)) {
+      result = lowerLimit;
     }
 
     return result;

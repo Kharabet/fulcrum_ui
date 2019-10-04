@@ -128,11 +128,7 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
               <React.Fragment>
                 <div className="borrowed-funds-list-item__action" onClick={this.onManageCollateral}>
                   <div className="borrowed-funds-list-item__action-title">
-                    {this.props.walletDetails.walletType === WalletType.NonWeb3 ? (
-                      <div>Top Up<br/>Collateral</div>
-                    ) : (
-                      <div>Manage<br/>Collateral</div>
-                    )}
+                    <div>Top Up<br/>Collateral</div>
                   </div>
                 </div>
                 <div className="borrowed-funds-list-item__action" onClick={this.onExtendLoan}>
@@ -147,11 +143,23 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
                 </div>
               </React.Fragment>
             ) : (
-              <div className="borrowed-funds-list-item__action" onClick={this.onRepayLoan} style={{ width: `100%` }}>
-                <div className="borrowed-funds-list-item__action-title">
-                  <div>Repay<br/>Loan</div>
+              <React.Fragment>
+                <div className="borrowed-funds-list-item__action" onClick={this.onManageCollateral}>
+                  <div className="borrowed-funds-list-item__action-title">
+                    <div>Manage<br/>Collateral</div>
+                  </div>
                 </div>
-              </div>
+                <div className="borrowed-funds-list-item__action" onClick={this.onExtendLoan}>
+                  <div className="borrowed-funds-list-item__action-title">
+                    <div>Front<br/>Interest</div>
+                  </div>
+                </div>
+                <div className="borrowed-funds-list-item__action" onClick={this.onRepayLoan}>
+                  <div className="borrowed-funds-list-item__action-title">
+                    <div>Repay<br/>Loan</div>
+                  </div>
+                </div>
+              </React.Fragment>
             )}
           </div>
         )}
