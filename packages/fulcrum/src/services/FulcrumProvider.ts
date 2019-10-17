@@ -758,6 +758,7 @@ export class FulcrumProvider {
 
   public gasPrice = async (): Promise<BigNumber> => {
     let result = new BigNumber(30).multipliedBy(10 ** 9); // upper limit 30 gwei
+    const lowerLimit = new BigNumber(3).multipliedBy(10 ** 9); // lower limit 3 gwei
 
     const url = `https://ethgasstation.info/json/ethgasAPI.json`;
     try {
@@ -776,7 +777,11 @@ export class FulcrumProvider {
       }
     } catch (error) {
       // console.log(error);
-      result = new BigNumber(20).multipliedBy(10 ** 9); // error default 8 gwei
+      result = new BigNumber(12).multipliedBy(10 ** 9); // error default 8 gwei
+    }
+
+    if (result.lt(lowerLimit)) {
+      result = lowerLimit;
     }
 
     return result;
@@ -1371,6 +1376,44 @@ export class FulcrumProvider {
     return false;
   };
 
+  private addTokenToMetaMask = async (task: RequestTask) => {
+    if (this.providerType === ProviderType.MetaMask && this.contractsSource) {
+      try {
+        // @ts-ignore
+        if (window.web3) {
+          const assetContract = await this.contractsSource.getITokenContract(task.request.asset);
+          if (assetContract) {
+            const details = AssetsDictionary.assets.get(task.request.asset);
+            if (details) {
+              // @ts-ignore
+              const provider = window.web3.currentProvider;
+              provider.sendAsync({
+                method: 'metamask_watchAsset',
+                params: {
+                  "type":"ERC20",
+                  "options":{
+                    "address": assetContract.address,
+                    "symbol": details.iTokenSymbol,
+                    "decimals": details.decimals,
+                    "image": details.iTokenLogoSvg,
+                  },
+                },
+                id: Math.round(Math.random() * 100000),
+              }/*, (err: any, added: any) => {
+                // console.log('provider returned', err, added)
+                if (err || 'error' in added) {
+                  console.log(err, added);
+                }
+              }*/);
+            }
+          }
+        }
+      } catch(e) {
+        // console.log(e);
+      }
+    }
+  }
+
   private processLendRequestTask = async (task: RequestTask, skipGas: boolean) => {
     try {
       if (!(this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite)) {
@@ -1385,6 +1428,8 @@ export class FulcrumProvider {
       // Initializing loan
       const taskRequest: LendRequest = (task.request as LendRequest);
       if (taskRequest.lendType === LendType.LEND) {
+        await this.addTokenToMetaMask(task);
+        
         if (taskRequest.asset !== Asset.ETH) {
           const processor = new LendErcProcessor();
           await processor.run(task, account, skipGas);

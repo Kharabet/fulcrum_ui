@@ -34,6 +34,17 @@ import usdc_ts from "../assets/images/ic___token_selector___usdc.svg";
 import btc_ts from "../assets/images/ic___token_selector___wbtc.svg";
 import zrx_ts from "../assets/images/ic___token_selector___zrx.svg";
 
+import ibat_itoken from "../assets/images/iBAT.svg";
+import idai_itoken from "../assets/images/iDAI.svg";
+import ieth_itoken from "../assets/images/iETH.svg";
+import iknc_itoken from "../assets/images/iKNC.svg";
+import ilink_itoken from "../assets/images/iLINK.svg";
+// import imkr_itoken from "../assets/images/iMKR.svg";
+import irep_itoken from "../assets/images/iREP.svg";
+import iusdc_itoken from "../assets/images/iUSDC.svg";
+import iwbtc_itoken from "../assets/images/iWBTC.svg";
+import izrx_itoken from "../assets/images/iZRX.svg";
+
 export class AssetsDictionary {
   public static assets: Map<Asset, AssetDetails> = new Map<Asset, AssetDetails>([
     [
@@ -41,6 +52,8 @@ export class AssetsDictionary {
       new AssetDetails(
         "BAT",
         "Basic Attention Token (BAT)",
+        "iBAT",
+        ibat_itoken,
         18,
         bat_logo,
         bat_bg,
@@ -59,6 +72,8 @@ export class AssetsDictionary {
       new AssetDetails(
         "WBTC",
         "Bitcoin (BTC)",
+        "iWBTC",
+        iwbtc_itoken,
         8,
         btc_logo,
         btc_bg,
@@ -78,6 +93,8 @@ export class AssetsDictionary {
       new AssetDetails(
         "LINK",
         "ChainLink Token (LINK)",
+        "iLINK",
+        ilink_itoken,
         18,
         link_logo,
         link_bg,
@@ -97,6 +114,8 @@ export class AssetsDictionary {
       new AssetDetails(
         "DAI",
         "Dai Stablecoin (DAI)",
+        "iDAI",
+        idai_itoken,
         18,
         dai_logo,
         dai_bg,
@@ -116,6 +135,8 @@ export class AssetsDictionary {
       new AssetDetails(
         "USDC",
         "USD Coin (USDC)",
+        "iUSDC",
+        iusdc_itoken,
         6,
         usdc_logo,
         usdc_bg,
@@ -134,6 +155,8 @@ export class AssetsDictionary {
       new AssetDetails(
         "ETH",
         "Ethereum (ETH)",
+        "iETH",
+        ieth_itoken,
         18,
         eth_logo,
         eth_bg,
@@ -153,6 +176,8 @@ export class AssetsDictionary {
       new AssetDetails(
         "WETH",
         "Wrapped Ether (WETH)",
+        "iETH",
+        ieth_itoken,
         18,
         eth_logo,
         eth_bg,
@@ -172,6 +197,8 @@ export class AssetsDictionary {
       new AssetDetails(
         "KNC",
         "Kyber Network (KNC)",
+        "iKNC",
+        iknc_itoken,
         18,
         knc_logo,
         knc_bg,
@@ -191,6 +218,8 @@ export class AssetsDictionary {
       new AssetDetails(
         "MKR",
         "Maker (MKR)",
+        "iMKR",
+        null,
         18,
         mkr_logo,
         mkr_bg,
@@ -209,6 +238,8 @@ export class AssetsDictionary {
       new AssetDetails(
         "REP",
         "Augur (REP)",
+        "iREP",
+        irep_itoken,
         18,
         rep_logo,
         rep_bg,
@@ -227,6 +258,8 @@ export class AssetsDictionary {
       new AssetDetails(
         "ZRX",
         "0x (ZRX)",
+        "iZRX",
+        izrx_itoken,
         18,
         zrx_logo,
         zrx_bg,
