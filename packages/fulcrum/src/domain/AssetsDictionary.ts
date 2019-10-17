@@ -41,6 +41,8 @@ export class AssetsDictionary {
       new AssetDetails(
         "BAT",
         "Basic Attention Token (BAT)",
+        "iBAT",
+        "https://fulcrum.trade/images/iBAT.svg",
         18,
         bat_logo,
         bat_bg,
@@ -59,6 +61,8 @@ export class AssetsDictionary {
       new AssetDetails(
         "WBTC",
         "Bitcoin (BTC)",
+        "iWBTC",
+        "https://fulcrum.trade/images/iWBTC.svg",
         8,
         btc_logo,
         btc_bg,
@@ -78,6 +82,8 @@ export class AssetsDictionary {
       new AssetDetails(
         "LINK",
         "ChainLink Token (LINK)",
+        "iLINK",
+        "https://fulcrum.trade/images/iLINK.svg",
         18,
         link_logo,
         link_bg,
@@ -97,6 +103,8 @@ export class AssetsDictionary {
       new AssetDetails(
         "DAI",
         "Dai Stablecoin (DAI)",
+        "iDAI",
+        "https://fulcrum.trade/images/iDAI.svg",
         18,
         dai_logo,
         dai_bg,
@@ -116,6 +124,8 @@ export class AssetsDictionary {
       new AssetDetails(
         "USDC",
         "USD Coin (USDC)",
+        "iUSDC",
+        "https://fulcrum.trade/images/iUSDC.svg",
         6,
         usdc_logo,
         usdc_bg,
@@ -134,6 +144,8 @@ export class AssetsDictionary {
       new AssetDetails(
         "ETH",
         "Ethereum (ETH)",
+        "iETH",
+        "https://fulcrum.trade/images/iETH.svg",
         18,
         eth_logo,
         eth_bg,
@@ -153,6 +165,8 @@ export class AssetsDictionary {
       new AssetDetails(
         "WETH",
         "Wrapped Ether (WETH)",
+        "iETH",
+        "https://fulcrum.trade/images/iETH.svg",
         18,
         eth_logo,
         eth_bg,
@@ -172,6 +186,8 @@ export class AssetsDictionary {
       new AssetDetails(
         "KNC",
         "Kyber Network (KNC)",
+        "iKNC",
+        "https://fulcrum.trade/images/iKNC.svg",
         18,
         knc_logo,
         knc_bg,
@@ -191,6 +207,8 @@ export class AssetsDictionary {
       new AssetDetails(
         "MKR",
         "Maker (MKR)",
+        "iMKR",
+        "",
         18,
         mkr_logo,
         mkr_bg,
@@ -209,6 +227,8 @@ export class AssetsDictionary {
       new AssetDetails(
         "REP",
         "Augur (REP)",
+        "iREP",
+        "https://fulcrum.trade/images/iREP.svg",
         18,
         rep_logo,
         rep_bg,
@@ -227,6 +247,8 @@ export class AssetsDictionary {
       new AssetDetails(
         "ZRX",
         "0x (ZRX)",
+        "iZRX",
+        "https://fulcrum.trade/images/iZRX.svg",
         18,
         zrx_logo,
         zrx_bg,

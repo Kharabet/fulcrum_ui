@@ -1376,6 +1376,45 @@ export class FulcrumProvider {
     return false;
   };
 
+  public addTokenToMetaMask = async (task: RequestTask) => {
+    if (this.providerType === ProviderType.MetaMask && this.contractsSource) {
+      try {
+        // @ts-ignore
+        if (window.web3) {
+          const assetContract = await this.contractsSource.getITokenContract(task.request.asset);
+          if (assetContract) {
+            const details = AssetsDictionary.assets.get(task.request.asset);
+            if (details) {
+              // @ts-ignore
+              const provider = window.web3.currentProvider;
+              const id = new BigNumber(new BigNumber(assetContract.address).toString().substr(0, 5)).toNumber();
+              provider.sendAsync({
+                method: 'metamask_watchAsset',
+                params: {
+                  "type":"ERC20",
+                  "options":{
+                    "address": assetContract.address,
+                    "symbol": details.iTokenSymbol,
+                    "decimals": details.decimals,
+                    "image": details.iTokenLogoUrl,
+                  },
+                },
+                id: id,
+              }/*, (err: any, added: any) => {
+                // console.log('provider returned', err, added)
+                if (err || 'error' in added) {
+                  console.log(err, added);
+                }
+              }*/);
+            }
+          }
+        }
+      } catch(e) {
+        // console.log(e);
+      }
+    }
+  }
+
   private processLendRequestTask = async (task: RequestTask, skipGas: boolean) => {
     try {
       if (!(this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite)) {
