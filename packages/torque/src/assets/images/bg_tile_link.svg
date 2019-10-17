@@ -6,11 +6,7 @@
 	.st3{fill:url(#Ellipse_127_1_);}
 	.st4{fill:url(#Ellipse_126_1_);}
 	.st5{fill:url(#Intersection_3_1_);}
-	.st6{fill:#7E5DA7;}
-	.st7{fill:#FFCE45;}
-	.st8{fill:#FDBC43;}
-	.st9{fill:#FFFFFF;}
-	.st10{opacity:0.42;fill:#D8A448;enable-background:new    ;}
+	.st6{fill:#1E69B3;}
 </style>
 <g>
 	<g id="bg_tile_dai" transform="translate(-104 -640)">
@@ -61,14 +57,14 @@
 		</g>
 		
 			<linearGradient id="Ellipse_125_1_" gradientUnits="userSpaceOnUse" x1="202.3672" y1="1271.0851" x2="202.3672" y2="1272.0851" gradientTransform="matrix(128 0 0 -128 -25423 163602.8906)">
-			<stop  offset="0" style="stop-color:#AC629D"/>
-			<stop  offset="1" style="stop-color:#E4D3E7"/>
+			<stop  offset="0" style="stop-color:#F5C464"/>
+			<stop  offset="1" style="stop-color:#FDF7BF"/>
 		</linearGradient>
 		<circle id="Ellipse_125" class="st2" cx="480" cy="840" r="64"/>
 		
 			<linearGradient id="Ellipse_127_1_" gradientUnits="userSpaceOnUse" x1="201.9531" y1="1272.6871" x2="201.9531" y2="1273.6866" gradientTransform="matrix(192 0 0 -192 -38223 245259.8281)">
-			<stop  offset="0" style="stop-color:#557EBF"/>
-			<stop  offset="1" style="stop-color:#E7E9F5"/>
+			<stop  offset="0" style="stop-color:#00AC71"/>
+			<stop  offset="1" style="stop-color:#DFF1EC"/>
 		</linearGradient>
 		<path id="Ellipse_127" class="st3" d="M576,712c17.5,0,33.9,4.7,48,12.8l0,0v166.3l0,0c-14.1,8.2-30.5,12.8-48,12.8
 			c-53,0-96-43-96-96S523,712,576,712z"/>
@@ -80,21 +76,13 @@
 		<circle id="Ellipse_126" class="st4" cx="452" cy="740" r="12"/>
 		
 			<linearGradient id="Intersection_3_1_" gradientUnits="userSpaceOnUse" x1="203.2344" y1="1270.3766" x2="203.2344" y2="1271.377" gradientTransform="matrix(64.0001 0 0 -111.555 -12495.0205 142604.6563)">
-			<stop  offset="0" style="stop-color:#75C061"/>
-			<stop  offset="1" style="stop-color:#C2E2C7"/>
+			<stop  offset="0" style="stop-color:#8E6FB0"/>
+			<stop  offset="1" style="stop-color:#E7E9F5"/>
 		</linearGradient>
 		<path id="Intersection_3" class="st5" d="M480,808c0-10.8,1.8-21.6,5.4-31.8C518.5,779,544,806.7,544,840
 			c0,18.3-7.8,35.6-21.4,47.8C496,870,480,840,480,808z"/>
 	</g>
 </g>
-<g id="ic_token_dai" transform="translate(-32 -280)">
-	<path id="Rectangle_411" class="st6" d="M504.1,415.9L504.1,415.9c17.7,0,32,14.3,32,32l0,0c0,17.7-14.3,32-32,32l0,0
-		c-17.7,0-32-14.3-32-32l0,0C472.1,430.3,486.4,415.9,504.1,415.9z"/>
-	<g id="Group_399" transform="translate(35.383 283.896)">
-		<path id="Path_327" class="st7" d="M468.7,148.1l16,16l-16,16l-16-16L468.7,148.1z"/>
-		<path id="Path_328" class="st8" d="M468.7,169.3l-16-5.2l16-16l16,16L468.7,169.3z"/>
-		<path id="Path_329" class="st9" d="M458.3,163h7.3l3.1-3.5l3.5,3.5h7.3l-10.8-11.7L458.3,163z"/>
-		<path id="Path_330" class="st10" d="M468.7,180v-32l16,16L468.7,180z"/>
-	</g>
-</g>
+<path class="st6" d="M472.2,135.9l-5.8,3.4l-16,9.3l-6,3.2v32.1l5.8,3.4l16.2,9.3l5.8,3.4l5.8-3.4l15.9-9.3l5.8-3.4v-32.1l-5.8-3.4
+	l-16-9.3C478,139.3,472.2,135.9,472.2,135.9z M456.1,177.2v-18.5l16-9.3l16,9.3v18.5l-16,9.3L456.1,177.2z"/>
 </svg>
