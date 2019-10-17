@@ -1,0 +1,44 @@
+{
+  "name": "@bzxnetwork/mmaker",
+  "version": "0.0.1",
+  "description": "Market maker solution",
+  "keywords": [],
+  "author": "",
+  "license": "Apache-2.0",
+  "homepage": ".",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bZxNetwork/fulcrum.git"
+  },
+  "bugs": {
+    "url": "https://github.com/bZxNetwork/fulcrum/issues"
+  },
+  "main": "src/index.jsx",
+  "dependencies": {
+    "async": "^3.1.0",
+    "crc-32": "^1.2.0",
+    "efx-api-node": "^2.0.2",
+    "ethereumjs-util": "^5.2.0",
+    "lodash": "^4.17.15",
+    "moment": "^2.24.0",
+    "node-fetch": "^2.5.0",
+    "truffle-hdwallet-provider": "^1.0.0-web3one.1",
+    "ws": "^7.1.2",
+    "web3": "^1.0.0-beta.33"
+  },
+  "devDependencies": {
+    "@types/async": "^3.0.1",
+    "@types/node": "^8.10.43",
+    "@types/ws": "^6.0.3",
+    "babel-eslint": "9.0.0",
+    "eslint": "5.12.0",
+    "eslint-config-prettier": "^6.4.0",
+    "eslint-plugin-prettier": "^3.1.1",
+    "prettier": "^1.16.4"
+  },
+  "scripts": {
+    "build": "webpack --mode production --config config/webpack.config.js",
+    "watch": "webpack --watch --mode development --config config/webpack.config.js",
+    "serve": "NODE_ENV=development nodemon build/index.js"
+  }
+}
