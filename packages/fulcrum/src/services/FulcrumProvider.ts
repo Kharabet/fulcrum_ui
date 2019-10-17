@@ -1376,7 +1376,7 @@ export class FulcrumProvider {
     return false;
   };
 
-  private addTokenToMetaMask = async (task: RequestTask) => {
+  public addTokenToMetaMask = async (task: RequestTask) => {
     if (this.providerType === ProviderType.MetaMask && this.contractsSource) {
       try {
         // @ts-ignore
@@ -1387,6 +1387,7 @@ export class FulcrumProvider {
             if (details) {
               // @ts-ignore
               const provider = window.web3.currentProvider;
+              const id = new BigNumber(new BigNumber(assetContract.address).toString().substr(0, 5)).toNumber();
               provider.sendAsync({
                 method: 'metamask_watchAsset',
                 params: {
@@ -1395,10 +1396,10 @@ export class FulcrumProvider {
                     "address": assetContract.address,
                     "symbol": details.iTokenSymbol,
                     "decimals": details.decimals,
-                    "image": details.iTokenLogoSvg,
+                    "image": details.iTokenLogoUrl,
                   },
                 },
-                id: Math.round(Math.random() * 100000),
+                id: id,
               }/*, (err: any, added: any) => {
                 // console.log('provider returned', err, added)
                 if (err || 'error' in added) {
@@ -1428,8 +1429,6 @@ export class FulcrumProvider {
       // Initializing loan
       const taskRequest: LendRequest = (task.request as LendRequest);
       if (taskRequest.lendType === LendType.LEND) {
-        await this.addTokenToMetaMask(task);
-        
         if (taskRequest.asset !== Asset.ETH) {
           const processor = new LendErcProcessor();
           await processor.run(task, account, skipGas);

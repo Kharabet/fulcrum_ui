@@ -34,17 +34,6 @@ import usdc_ts from "../assets/images/ic___token_selector___usdc.svg";
 import btc_ts from "../assets/images/ic___token_selector___wbtc.svg";
 import zrx_ts from "../assets/images/ic___token_selector___zrx.svg";
 
-import ibat_itoken from "../assets/images/iBAT.svg";
-import idai_itoken from "../assets/images/iDAI.svg";
-import ieth_itoken from "../assets/images/iETH.svg";
-import iknc_itoken from "../assets/images/iKNC.svg";
-import ilink_itoken from "../assets/images/iLINK.svg";
-// import imkr_itoken from "../assets/images/iMKR.svg";
-import irep_itoken from "../assets/images/iREP.svg";
-import iusdc_itoken from "../assets/images/iUSDC.svg";
-import iwbtc_itoken from "../assets/images/iWBTC.svg";
-import izrx_itoken from "../assets/images/iZRX.svg";
-
 export class AssetsDictionary {
   public static assets: Map<Asset, AssetDetails> = new Map<Asset, AssetDetails>([
     [
@@ -53,7 +42,7 @@ export class AssetsDictionary {
         "BAT",
         "Basic Attention Token (BAT)",
         "iBAT",
-        ibat_itoken,
+        "https://fulcrum.trade/images/iBAT.svg",
         18,
         bat_logo,
         bat_bg,
@@ -73,7 +62,7 @@ export class AssetsDictionary {
         "WBTC",
         "Bitcoin (BTC)",
         "iWBTC",
-        iwbtc_itoken,
+        "https://fulcrum.trade/images/iWBTC.svg",
         8,
         btc_logo,
         btc_bg,
@@ -94,7 +83,7 @@ export class AssetsDictionary {
         "LINK",
         "ChainLink Token (LINK)",
         "iLINK",
-        ilink_itoken,
+        "https://fulcrum.trade/images/iLINK.svg",
         18,
         link_logo,
         link_bg,
@@ -115,7 +104,7 @@ export class AssetsDictionary {
         "DAI",
         "Dai Stablecoin (DAI)",
         "iDAI",
-        idai_itoken,
+        "https://fulcrum.trade/images/iDAI.svg",
         18,
         dai_logo,
         dai_bg,
@@ -136,7 +125,7 @@ export class AssetsDictionary {
         "USDC",
         "USD Coin (USDC)",
         "iUSDC",
-        iusdc_itoken,
+        "https://fulcrum.trade/images/iUSDC.svg",
         6,
         usdc_logo,
         usdc_bg,
@@ -156,7 +145,7 @@ export class AssetsDictionary {
         "ETH",
         "Ethereum (ETH)",
         "iETH",
-        ieth_itoken,
+        "https://fulcrum.trade/images/iETH.svg",
         18,
         eth_logo,
         eth_bg,
@@ -177,7 +166,7 @@ export class AssetsDictionary {
         "WETH",
         "Wrapped Ether (WETH)",
         "iETH",
-        ieth_itoken,
+        "https://fulcrum.trade/images/iETH.svg",
         18,
         eth_logo,
         eth_bg,
@@ -198,7 +187,7 @@ export class AssetsDictionary {
         "KNC",
         "Kyber Network (KNC)",
         "iKNC",
-        iknc_itoken,
+        "https://fulcrum.trade/images/iKNC.svg",
         18,
         knc_logo,
         knc_bg,
@@ -219,7 +208,7 @@ export class AssetsDictionary {
         "MKR",
         "Maker (MKR)",
         "iMKR",
-        null,
+        "",
         18,
         mkr_logo,
         mkr_bg,
@@ -239,7 +228,7 @@ export class AssetsDictionary {
         "REP",
         "Augur (REP)",
         "iREP",
-        irep_itoken,
+        "https://fulcrum.trade/images/iREP.svg",
         18,
         rep_logo,
         rep_bg,
@@ -259,7 +248,7 @@ export class AssetsDictionary {
         "ZRX",
         "0x (ZRX)",
         "iZRX",
-        izrx_itoken,
+        "https://fulcrum.trade/images/iZRX.svg",
         18,
         zrx_logo,
         zrx_bg,

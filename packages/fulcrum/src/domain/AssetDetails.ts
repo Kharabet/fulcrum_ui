@@ -3,7 +3,7 @@ export class AssetDetails {
   public displayName: string = "";
   public labelName: string = "";
   public iTokenSymbol: string = "";
-  public iTokenLogoSvg: any = null;
+  public iTokenLogoUrl: string = "";
   public decimals: number = 18;
   public logoSvg: any = null;
   public bgColor: string = "#000000";
@@ -16,7 +16,7 @@ export class AssetDetails {
     displayName: string,
     labelName: string,
     iTokenSymbol: string,
-    iTokenLogoSvg: any,
+    iTokenLogoUrl: string,
     decimals: number,
     logoSvg: any,
     bgSvg: any,
@@ -30,7 +30,7 @@ export class AssetDetails {
     this.displayName = displayName;
     this.labelName = labelName;
     this.iTokenSymbol = iTokenSymbol;
-    this.iTokenLogoSvg = iTokenLogoSvg;
+    this.iTokenLogoUrl = iTokenLogoUrl;
     this.decimals = decimals;
     this.logoSvg = logoSvg;
     this.bgSvg = bgSvg;

@@ -222,9 +222,13 @@ export class Web3ConnectionFactory {
       if (!account) {
         return null;
       }
+
+      // @ts-ignore
+      window.ethereum.autoRefreshOnNetworkChangee = false;
+
       // @ts-ignore
       return window.ethereum;
-      // @ts-ignore
+    // @ts-ignore
     } else if (window.web3) {
       // @ts-ignore
       return window.web3.currentProvider;

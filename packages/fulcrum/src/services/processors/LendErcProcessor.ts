@@ -79,6 +79,8 @@ export class LendErcProcessor {
         gasPrice: await FulcrumProvider.Instance.gasPrice()
       });
       task.setTxHash(txHash);
+
+      await FulcrumProvider.Instance.addTokenToMetaMask(task);
     }
     finally {
       FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.AskToCloseProgressDlg);
