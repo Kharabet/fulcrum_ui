@@ -1,4 +1,4 @@
-import React, { ChangeEvent, Component, FormEvent } from "react";
+import React, { ChangeEvent, Component, FormEvent, MouseEvent } from "react";
 import ic_arrow_right_square from "../assets/images/ic_arrow_right_square.svg";
 
 export interface IWalletAddressLargeFormProps {
@@ -44,7 +44,9 @@ export class WalletAddressLargeForm extends Component<IWalletAddressLargeFormPro
     this.setState({ ...this.state, walletAddress: event.target.value.toLowerCase() });
   };
 
-  private onSubmitClick = () => {
+  private onSubmitClick = (event: any) => {
+    event.preventDefault();
+
     if (this.props.onSubmit) {
       if (this.state.walletAddress.trim() !== "") {
         this.props.onSubmit(this.state.walletAddress.toLowerCase());

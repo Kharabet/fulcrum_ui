@@ -53,14 +53,14 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
   };
 
   public render() {
-    const assetTypeModifier =
-      this.props.asset === Asset.ETH
+    const assetTypeModifier = "asset-selector-item--"+this.props.asset.toLowerCase();
+/*      this.props.asset === Asset.ETH
         ? "asset-selector-item--eth"
         : this.props.asset === Asset.DAI
         ? "asset-selector-item--dai"
         : this.props.asset === Asset.USDC
         ? "asset-selector-item--usdc"
-        : "";
+        : "";*/
 
     return (
       <div className={`asset-selector-item ${assetTypeModifier}`} onClick={this.onClick}>

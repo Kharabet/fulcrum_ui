@@ -10,6 +10,7 @@ import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
 import { IExtendEstimate } from "../domain/IExtendEstimate";
 import { IWalletDetails } from "../domain/IWalletDetails";
 import { WalletType } from "../domain/WalletType";
+import { Asset } from "../domain/Asset";
 import { TorqueProvider } from "../services/TorqueProvider";
 import { ActionViaTransferDetails } from "./ActionViaTransferDetails";
 import { ExtendLoanSlider } from "./ExtendLoanSlider";
@@ -19,6 +20,8 @@ export interface IExtendLoanFormProps {
   walletDetails: IWalletDetails;
   loanOrderState: IBorrowedFundsState;
 
+  didSubmit: boolean;
+  toggleDidSubmit: (submit: boolean) => void;
   onSubmit: (request: ExtendLoanRequest) => void;
   onClose: () => void;
 }
@@ -34,6 +37,7 @@ interface IExtendLoanFormState {
   depositAmount: BigNumber;
   extendManagementAddress: string | null;
   gasAmountNeeded: BigNumber;
+  balanceTooLow: boolean;
 }
 
 export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanFormState> {
@@ -50,7 +54,8 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
       selectedValue: 100,
       depositAmount: new BigNumber(0),
       extendManagementAddress: null,
-      gasAmountNeeded: new BigNumber(0)
+      gasAmountNeeded: new BigNumber(0),
+      balanceTooLow: false
     };
 
     this.selectedValueUpdate = new Subject<number>();
@@ -192,12 +197,17 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
               </div>
             </div>
           ) : (
-            <OpsEstimatedResult
-              assetDetails={this.state.assetDetails}
-              actionTitle="You will send"
-              amount={this.state.depositAmount}
-              precision={6}
-            />
+            <React.Fragment>
+              <OpsEstimatedResult
+                assetDetails={this.state.assetDetails}
+                actionTitle="You will send"
+                amount={this.state.depositAmount}
+                precision={6}
+              />
+              <div className={`extend-loan-form-insufficient-balance ${!this.state.balanceTooLow ? `extend-loan-form-insufficient-balance--hidden` : ``}`}>
+                Insufficient {this.state.assetDetails.displayName} balance!
+              </div>
+            </React.Fragment>
           )}
         </section>
         <section className="dialog-actions">
@@ -206,13 +216,11 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
               <button type="button" className="btn btn-size--small" onClick={this.props.onClose}>
                 Close
               </button>
-            ) : null}
-
-            {this.props.walletDetails.walletType !== WalletType.NonWeb3 ? (
-              <button type="submit" className="btn btn-size--small">
-                Extend
+            ) : (
+              <button type="submit" className={`btn btn-size--small ${this.props.didSubmit ? `btn-disabled` : ``}`}>
+                {this.props.didSubmit ? "Submitting..." : "Extend"}
               </button>
-            ) : null}
+            )}
           </div>
         </section>
       </form>
@@ -243,15 +251,44 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
     this.setState({ ...this.state, selectedValue: value });
   };
 
-  public onSubmitClick = (event: FormEvent<HTMLFormElement>) => {
-    this.props.onSubmit(
-      new ExtendLoanRequest(
-        this.props.walletDetails,
-        this.props.loanOrderState.loanAsset,
-        this.props.loanOrderState.accountAddress,
-        this.props.loanOrderState.loanOrderHash,
-        this.state.depositAmount
-      )
-    );
+  public onSubmitClick = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (!this.props.didSubmit) {
+      this.props.toggleDidSubmit(true);
+
+      let assetBalance = await TorqueProvider.Instance.getAssetTokenBalanceOfUser(this.props.loanOrderState.loanAsset);
+      if (this.props.loanOrderState.loanAsset === Asset.ETH) {
+        assetBalance = assetBalance.gt(TorqueProvider.Instance.gasBufferForTxn) ? assetBalance.minus(TorqueProvider.Instance.gasBufferForTxn) : new BigNumber(0);
+      }
+      const precision = AssetsDictionary.assets.get(this.props.loanOrderState.loanAsset)!.decimals || 18;
+      const amountInBaseUnits = new BigNumber(this.state.depositAmount.multipliedBy(10**precision).toFixed(0, 1));
+      if (assetBalance.lt(amountInBaseUnits)) {
+        this.props.toggleDidSubmit(false);
+
+        this.setState({
+          ...this.state,
+          balanceTooLow: true
+        });
+
+        return;
+
+      } else {
+        this.setState({
+          ...this.state,
+          balanceTooLow: false
+        });
+      }
+
+      this.props.onSubmit(
+        new ExtendLoanRequest(
+          this.props.walletDetails,
+          this.props.loanOrderState.loanAsset,
+          this.props.loanOrderState.accountAddress,
+          this.props.loanOrderState.loanOrderHash,
+          this.state.depositAmount
+        )
+      );
+    }
   };
 }

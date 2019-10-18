@@ -7,6 +7,7 @@ import { Asset } from "../domain/Asset";
 import { BorrowRequest } from "../domain/BorrowRequest";
 import { IBorrowEstimate } from "../domain/IBorrowEstimate";
 import { WalletType } from "../domain/WalletType";
+import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { TorqueProvider } from "../services/TorqueProvider";
 import { ActionViaTransferDetails } from "./ActionViaTransferDetails";
 import { ActionViaWeb3Details } from "./ActionViaWeb3Details";
@@ -16,6 +17,8 @@ export interface IBorrowFormProps {
   borrowAsset: Asset;
   walletType: WalletType;
 
+  didSubmit: boolean;
+  toggleDidSubmit: (submit: boolean) => void;
   onSubmit?: (value: BorrowRequest) => void;
   onDecline: () => void;
 }
@@ -27,6 +30,7 @@ interface IBorrowFormState {
   inputAmountText: string;
   depositAmount: BigNumber;
   gasAmountNeeded: BigNumber;
+  balanceTooLow: boolean;
 }
 
 export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
@@ -43,7 +47,8 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
       collateralAsset: TorqueProvider.Instance.isETHAsset(props.borrowAsset) ? Asset.DAI : Asset.ETH,
       inputAmountText: "",
       depositAmount: new BigNumber(0),
-      gasAmountNeeded: new BigNumber(2000000)
+      gasAmountNeeded: new BigNumber(2000000),
+      balanceTooLow: false
     };
 
     this._inputTextChange = new Subject<string>();
@@ -115,12 +120,16 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
             </div>
           ) : (
             <React.Fragment>
-          <div className="borrow-form__info-collateral-by-container" style={this.state.borrowAmount.gt(0) && this.state.depositAmount.eq(0) ? { visibility: `hidden` } : undefined}>
-            <div className="borrow-form__info-collateral-by-msg">To open the loan, you will deposit</div>
-            <div className="borrow-form__info-collateral-by-amount">
-              {this.state.depositAmount.multipliedBy(1.005).dp(5, BigNumber.ROUND_CEIL).toString()} {this.state.collateralAsset}
-            </div>
-          </div>
+              <div className="borrow-form__info-collateral-by-container" style={this.state.borrowAmount.gt(0) && this.state.depositAmount.eq(0) ? { visibility: `hidden` } : undefined}>
+                <div className="borrow-form__info-collateral-by-msg">To open the loan, you will deposit</div>
+                <div className="borrow-form__info-collateral-by-amount">
+                  {this.state.depositAmount.multipliedBy(1.005).dp(5, BigNumber.ROUND_CEIL).toString()} {this.state.collateralAsset}
+                </div>
+              </div>
+
+              <div className={`borrow-form-insufficient-balance ${!this.state.balanceTooLow ? `borrow-form-insufficient-balance--hidden` : ``}`}>
+                Insufficient {this.state.collateralAsset} balance!
+              </div>
     
               <hr className="borrow-form__delimiter" />
             </React.Fragment>
@@ -132,13 +141,19 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
               <CollateralTokenSelectorToggle
                 borrowAsset={this.props.borrowAsset}
                 collateralAsset={this.state.collateralAsset}
-                readonly={this.props.walletType === WalletType.NonWeb3}
+                readonly={this.props.walletType === WalletType.NonWeb3 || this.props.didSubmit}
                 onChange={this.onCollateralChange}
               />
             </div>
-            <button className="btn btn-size--small" type="submit">
-              {this.props.walletType === WalletType.NonWeb3 ? "Track" : "Submit"}
-            </button>
+            {this.props.walletType === WalletType.NonWeb3 ? (
+              <button className="btn btn-size--small" type="submit">
+                Track
+              </button>
+            ) : (
+              <button className={`btn btn-size--small ${this.props.didSubmit ? `btn-disabled` : ``}`} type="submit">
+                {this.props.didSubmit ? "Submitting..." : "Submit"}
+              </button>
+            )}
           </div>
         </section>
       </form>
@@ -164,10 +179,35 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
     });
   };
 
-  private onSubmit = (event: FormEvent<HTMLFormElement>) => {
+  private onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (this.props.onSubmit) {
+    if (this.props.onSubmit && !this.props.didSubmit) {
+      this.props.toggleDidSubmit(true);
+      
+      let assetBalance = await TorqueProvider.Instance.getAssetTokenBalanceOfUser(this.state.collateralAsset);
+      if (this.state.collateralAsset === Asset.ETH) {
+        assetBalance = assetBalance.gt(TorqueProvider.Instance.gasBufferForTxn) ? assetBalance.minus(TorqueProvider.Instance.gasBufferForTxn) : new BigNumber(0);
+      }
+      const precision = AssetsDictionary.assets.get(this.state.collateralAsset)!.decimals || 18;
+      const amountInBaseUnits = new BigNumber(this.state.depositAmount.multipliedBy(10**precision).toFixed(0, 1));
+      if (assetBalance.lt(amountInBaseUnits)) {
+        this.props.toggleDidSubmit(false);
+
+        this.setState({
+          ...this.state,
+          balanceTooLow: true
+        });
+
+        return;
+
+      } else {
+        this.setState({
+          ...this.state,
+          balanceTooLow: false
+        });
+      }
+
       this.props.onSubmit(
         new BorrowRequest(
           this.props.walletType,

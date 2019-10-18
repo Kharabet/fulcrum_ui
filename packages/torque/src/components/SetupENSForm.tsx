@@ -88,6 +88,8 @@ export class SetupENSForm extends Component<ISetupENSFormProps, ISetupENSFormSta
   }
 
   public onSubmitClick = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
     this.props.onSubmit(
       new SetupENSRequest(
         this.props.walletDetails,

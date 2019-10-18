@@ -10,6 +10,7 @@ interface IBorrowDlgState {
   isOpen: boolean;
   borrowAsset: Asset;
   walletType: WalletType;
+  didSubmit: boolean;
 
   executorParams: { resolve: (value?: BorrowRequest) => void; reject: (reason?: any) => void } | null;
 }
@@ -18,7 +19,7 @@ export class BorrowDlg extends Component<any, IBorrowDlgState> {
   public constructor(props: any, context?: any) {
     super(props, context);
 
-    this.state = { isOpen: false, borrowAsset: Asset.UNKNOWN, walletType: WalletType.Unknown, executorParams: null };
+    this.state = { isOpen: false, borrowAsset: Asset.UNKNOWN, walletType: WalletType.Unknown, didSubmit: false, executorParams: null };
   }
 
   public render() {
@@ -27,13 +28,20 @@ export class BorrowDlg extends Component<any, IBorrowDlgState> {
         isOpen={this.state.isOpen}
         className="modal-content-div"
         overlayClassName="modal-overlay-div"
-        onRequestClose={this.onFormDecline}
+        onRequestClose={this.hide}
         shouldCloseOnOverlayClick={false}
       >
         <DialogHeader title={`Borrow how much ${this.state.borrowAsset}?`} onDecline={this.onFormDecline} />
-        <BorrowForm borrowAsset={this.state.borrowAsset} walletType={this.state.walletType} onSubmit={this.onFormSubmit} onDecline={this.onFormDecline} />
+        <BorrowForm borrowAsset={this.state.borrowAsset} walletType={this.state.walletType} didSubmit={this.state.didSubmit} toggleDidSubmit={this.toggleDidSubmit} onSubmit={this.onFormSubmit} onDecline={this.onFormDecline} />
       </ReactModal>
     );
+  }
+
+  public toggleDidSubmit = (submit: boolean) => {
+    this.setState({
+      ...this.state,
+      didSubmit: submit
+    });
   }
 
   public getValue = async (walletType: WalletType, borrowAsset: Asset): Promise<BorrowRequest> => {
@@ -53,7 +61,7 @@ export class BorrowDlg extends Component<any, IBorrowDlgState> {
   };
 
   public hide = () => {
-    this.setState({ ...this.state, isOpen: false, executorParams: null });
+    this.setState({ ...this.state, isOpen: false, executorParams: null, didSubmit: false });
   };
 
   private onFormSubmit = (value: BorrowRequest) => {
@@ -63,6 +71,7 @@ export class BorrowDlg extends Component<any, IBorrowDlgState> {
   };
 
   private onFormDecline = () => {
+    this.hide();
     if (this.state.executorParams) {
       this.state.executorParams.reject();
     }

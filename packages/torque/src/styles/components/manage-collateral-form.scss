@@ -24,6 +24,16 @@
     }
   }
 
+  .manage-collateral-form-insufficient-balance {
+    color: red;
+    padding: .25rem;
+    text-align: center;
+
+    &--hidden {
+      visibility: hidden;
+    }
+  }
+
   .manage-collateral-form__tips {
     display: flex;
     flex-direction: row;

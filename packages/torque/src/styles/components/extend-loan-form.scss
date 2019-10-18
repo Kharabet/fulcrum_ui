@@ -26,6 +26,16 @@
     }
   }
 
+  .extend-loan-form-insufficient-balance {
+    color: red;
+    padding: .25rem;
+    text-align: center;
+
+    &--hidden {
+      visibility: hidden;
+    }
+  }
+
   .extend-loan-form__delimiter {
     margin-bottom: 1rem;
 

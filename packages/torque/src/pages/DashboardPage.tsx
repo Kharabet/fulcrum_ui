@@ -93,7 +93,9 @@ export class DashboardPage extends PureComponent<
 
     let items: IBorrowedFundsState[] = [];
     if (isENSSetup) {
+      // console.log(walletDetails);
       items = await TorqueProvider.Instance.getLoansList(walletDetails);
+      // console.log(items);
     }
 
     this.setState({
@@ -140,7 +142,7 @@ export class DashboardPage extends PureComponent<
           <div className="dashboard-page__main">
             {this.state.walletDetails.walletAddress ? (
               <React.Fragment>
-                {this.state.walletDetails.walletType === WalletType.NonWeb3 ? (
+                {this.state.walletDetails.walletType === WalletType.NonWeb3 || this.state.walletDetails.walletType === WalletType.ViewOnly ? (
                   <WalletAddressHint
                     walletAddress={this.state.walletDetails.walletAddress || ""}
                     onSelectNewWalletAddress={this.onSelectNewWalletAddress}
@@ -180,7 +182,7 @@ export class DashboardPage extends PureComponent<
               </React.Fragment>
             ) : (
               <React.Fragment>
-                {this.state.walletDetails.walletType === WalletType.NonWeb3 ? (
+                {this.state.walletDetails.walletType === WalletType.NonWeb3 || this.state.walletDetails.walletType === WalletType.ViewOnly ? (
                   <div className="dashboard-page__form">
                     <WalletAddressLargeForm onSubmit={this.onWalletAddressChange} />
                   </div>
@@ -243,8 +245,36 @@ export class DashboardPage extends PureComponent<
       try {
         const repayLoanRequest = await this.repayLoanDlgRef.current.getValue(this.state.walletDetails, item);
         await TorqueProvider.Instance.doRepayLoan(repayLoanRequest);
-      } finally {
-        this.repayLoanDlgRef.current.hide();
+
+        this.repayLoanDlgRef.current.toggleDidSubmit(false);
+        await this.repayLoanDlgRef.current.hide();
+      } catch(error) {
+        /*let errorMsg;
+        if (error.message) {
+          errorMsg = error.message;
+        } else if (typeof error === "string") {
+          errorMsg = error;
+        }
+
+        if (errorMsg) {
+          if (errorMsg.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)) {
+            errorMsg = "The transaction seems like it will fail. You can submit the transaction anyway, or cancel.";
+          } else if (errorMsg.includes("Reverted by EVM")) {
+            errorMsg = "The transaction failed. Click View More for details.";
+          } else if (errorMsg.includes("MetaMask Tx Signature: User denied transaction signature.")) {
+            errorMsg = "You didn't confirm in MetaMask. Please try again.";
+            await this.repayLoanDlgRef.current.hide();
+          } else if (errorMsg.includes("User denied account authorization.")) {
+            errorMsg = "You didn't authorize MetaMask. Please try again.";
+          } else if (errorMsg.includes("Transaction rejected")) {
+            errorMsg = "You didn't confirm in Gnosis Safe. Please try again.";
+          } else {
+            errorMsg = "";
+          }
+        }*/
+        
+        this.repayLoanDlgRef.current.toggleDidSubmit(false);
+        await this.repayLoanDlgRef.current.hide();
       }
     }
   };
@@ -254,8 +284,36 @@ export class DashboardPage extends PureComponent<
       try {
         const extendLoanRequest = await this.extendLoanDlgRef.current.getValue(this.state.walletDetails, item);
         await TorqueProvider.Instance.doExtendLoan(extendLoanRequest);
-      } finally {
-        this.extendLoanDlgRef.current.hide();
+
+        this.extendLoanDlgRef.current.toggleDidSubmit(false);
+        await this.extendLoanDlgRef.current.hide();
+      } catch(error) {
+        /*let errorMsg;
+        if (error.message) {
+          errorMsg = error.message;
+        } else if (typeof error === "string") {
+          errorMsg = error;
+        }
+
+        if (errorMsg) {
+          if (errorMsg.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)) {
+            errorMsg = "The transaction seems like it will fail. You can submit the transaction anyway, or cancel.";
+          } else if (errorMsg.includes("Reverted by EVM")) {
+            errorMsg = "The transaction failed. Click View More for details.";
+          } else if (errorMsg.includes("MetaMask Tx Signature: User denied transaction signature.")) {
+            errorMsg = "You didn't confirm in MetaMask. Please try again.";
+            await this.extendLoanDlgRef.current.hide();
+          } else if (errorMsg.includes("User denied account authorization.")) {
+            errorMsg = "You didn't authorize MetaMask. Please try again.";
+          } else if (errorMsg.includes("Transaction rejected")) {
+            errorMsg = "You didn't confirm in Gnosis Safe. Please try again.";
+          } else {
+            errorMsg = "";
+          }
+        }*/
+
+        this.extendLoanDlgRef.current.toggleDidSubmit(false);
+        await this.extendLoanDlgRef.current.hide();
       }
     }
   };
@@ -268,8 +326,36 @@ export class DashboardPage extends PureComponent<
           item
         );
         await TorqueProvider.Instance.setLoanCollateral(manageCollateralRequest);
-      } finally {
-        this.manageCollateralDlgRef.current.hide();
+
+        this.manageCollateralDlgRef.current.toggleDidSubmit(false);
+        await this.manageCollateralDlgRef.current.hide();
+      } catch(error) {
+        /*let errorMsg;
+        if (error.message) {
+          errorMsg = error.message;
+        } else if (typeof error === "string") {
+          errorMsg = error;
+        }
+
+        if (errorMsg) {
+          if (errorMsg.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)) {
+            errorMsg = "The transaction seems like it will fail. You can submit the transaction anyway, or cancel.";
+          } else if (errorMsg.includes("Reverted by EVM")) {
+            errorMsg = "The transaction failed. Click View More for details.";
+          } else if (errorMsg.includes("MetaMask Tx Signature: User denied transaction signature.")) {
+            errorMsg = "You didn't confirm in MetaMask. Please try again.";
+            await this.manageCollateralDlgRef.current.hide();
+          } else if (errorMsg.includes("User denied account authorization.")) {
+            errorMsg = "You didn't authorize MetaMask. Please try again.";
+          } else if (errorMsg.includes("Transaction rejected")) {
+            errorMsg = "You didn't confirm in Gnosis Safe. Please try again.";
+          } else {
+            errorMsg = "";
+          }
+        }*/
+        
+        this.manageCollateralDlgRef.current.toggleDidSubmit(false);
+        await this.manageCollateralDlgRef.current.hide();
       }
     }
   };
@@ -281,8 +367,35 @@ export class DashboardPage extends PureComponent<
           this.state.walletDetails
         );
         await TorqueProvider.Instance.setupENS(setupENSRequest);
-      } finally {
-        this.setupENSDlgRef.current.hide();
+
+        await this.setupENSDlgRef.current.hide();
+      } catch(error) {
+        /*let errorMsg;
+        if (error.message) {
+          errorMsg = error.message;
+        } else if (typeof error === "string") {
+          errorMsg = error;
+        }
+
+        if (errorMsg) {
+          if (errorMsg.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)) {
+            errorMsg = "The transaction seems like it will fail. You can submit the transaction anyway, or cancel.";
+          } else if (errorMsg.includes("Reverted by EVM")) {
+            errorMsg = "The transaction failed. Click View More for details.";
+          } else if (errorMsg.includes("MetaMask Tx Signature: User denied transaction signature.")) {
+            errorMsg = "You didn't confirm in MetaMask. Please try again.";
+            await this.setupENSDlgRef.current.hide();
+          } else if (errorMsg.includes("User denied account authorization.")) {
+            errorMsg = "You didn't authorize MetaMask. Please try again.";
+          } else if (errorMsg.includes("Transaction rejected")) {
+            errorMsg = "You didn't confirm in Gnosis Safe. Please try again.";
+          } else {
+            errorMsg = "";
+          }
+        }*/
+        
+        await this.setupENSDlgRef.current.hide();
+        //this.setupENSDlgRef.current.toggleDidSubmit(false);
       }
     }
   };

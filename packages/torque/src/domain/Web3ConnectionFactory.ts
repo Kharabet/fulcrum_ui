@@ -224,7 +224,7 @@ export class Web3ConnectionFactory {
       }
 
       // @ts-ignore
-      window.ethereum.autoRefreshOnNetworkChangee = false;
+      window.ethereum.autoRefreshOnNetworkChange = false;
 
       // @ts-ignore
       return window.ethereum;

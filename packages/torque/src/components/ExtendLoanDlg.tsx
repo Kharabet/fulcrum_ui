@@ -10,6 +10,7 @@ interface IExtendLoanDlgState {
   isOpen: boolean;
   walletDetails: IWalletDetails | null;
   loanOrderState: IBorrowedFundsState | null;
+  didSubmit: boolean;
 
   executorParams: { resolve: (value?: ExtendLoanRequest) => void; reject: (reason?: any) => void } | null;
 }
@@ -18,7 +19,7 @@ export class ExtendLoanDlg extends Component<any, IExtendLoanDlgState> {
   public constructor(props: any, context?: any) {
     super(props, context);
 
-    this.state = { isOpen: false, walletDetails: null, loanOrderState: null, executorParams: null };
+    this.state = { isOpen: false, walletDetails: null, loanOrderState: null, didSubmit: false, executorParams: null };
   }
 
   public render() {
@@ -35,7 +36,7 @@ export class ExtendLoanDlg extends Component<any, IExtendLoanDlgState> {
         isOpen={this.state.isOpen}
         className="modal-content-div"
         overlayClassName="modal-overlay-div"
-        onRequestClose={this.onFormDecline}
+        onRequestClose={this.hide}
         shouldCloseOnOverlayClick={false}
       >
         <DialogHeader title="Front Interest" onDecline={this.onFormDecline} />
@@ -44,9 +45,18 @@ export class ExtendLoanDlg extends Component<any, IExtendLoanDlgState> {
           loanOrderState={this.state.loanOrderState}
           onSubmit={this.onFormSubmit}
           onClose={this.onFormDecline}
+          didSubmit={this.state.didSubmit}
+          toggleDidSubmit={this.toggleDidSubmit}
         />
       </ReactModal>
     );
+  }
+
+  public toggleDidSubmit = (submit: boolean) => {
+    this.setState({
+      ...this.state,
+      didSubmit: submit
+    });
   }
 
   public getValue = async (walletDetails: IWalletDetails, item: IBorrowedFundsState): Promise<ExtendLoanRequest> => {
@@ -66,7 +76,7 @@ export class ExtendLoanDlg extends Component<any, IExtendLoanDlgState> {
   };
 
   public hide = () => {
-    this.setState({ ...this.state, isOpen: false, executorParams: null });
+    this.setState({ ...this.state, isOpen: false, executorParams: null, didSubmit: false });
   };
 
   private onFormSubmit = (value: ExtendLoanRequest) => {
@@ -76,6 +86,7 @@ export class ExtendLoanDlg extends Component<any, IExtendLoanDlgState> {
   };
 
   private onFormDecline = () => {
+    this.hide();
     if (this.state.executorParams) {
       this.state.executorParams.reject();
     }

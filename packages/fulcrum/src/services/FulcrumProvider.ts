@@ -1429,6 +1429,8 @@ export class FulcrumProvider {
       // Initializing loan
       const taskRequest: LendRequest = (task.request as LendRequest);
       if (taskRequest.lendType === LendType.LEND) {
+        await this.addTokenToMetaMask(task);
+        
         if (taskRequest.asset !== Asset.ETH) {
           const processor = new LendErcProcessor();
           await processor.run(task, account, skipGas);

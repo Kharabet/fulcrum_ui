@@ -1,6 +1,8 @@
 .asset-selector {
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
+  max-height: 30rem;
   justify-content: space-between;
 
   margin-bottom: 2rem;
@@ -10,6 +12,7 @@
 
     display: flex;
     flex-direction: column;
+    flex: 0 47%;
 
     height: 27rem;
     width: 100%;
@@ -27,13 +30,25 @@
       background-color: $color-gray-darker-2;
     }
 
-    &:first-child {
+    &:nth-child(2) {
       margin-left: 0;
+      margin-top: 2.5rem;
     }
 
-    &:last-child {
-      margin-right: 0;
+    &:first-child {
+      margin-top: unset;
     }
+
+    &:first-child + div {
+      margin-top: unset;
+    }
+
+    //&:last-child {
+    //  margin-right: 0;
+    //}
+
+    margin-left: 0;
+    margin-top: 2.5rem;
 
     .asset-selector__title {
       width: 16.5rem;
@@ -73,7 +88,13 @@
     background-position: right;
   }
 
-  .asset-selector-item--btc {
+  .asset-selector-item--zrx {
+    background-image: url("../assets/images/bg_tile_zrx.svg");
+    background-repeat: no-repeat;
+    background-position: right;
+  }
+
+  .asset-selector-item--wbtc {
     background-image: url("../assets/images/bg_tile_btc.svg");
     background-repeat: no-repeat;
     background-position: right;

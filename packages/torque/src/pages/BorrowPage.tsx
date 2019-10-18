@@ -74,8 +74,36 @@ export class BorrowPage extends PureComponent<IBorrowPageParams & RouteComponent
 
           await TorqueProvider.Instance.doBorrow(borrowRequest);
           NavService.Instance.History.replace(NavService.Instance.getDashboardAddress(walletType, accountAddress));
+
+          this.borrowDlgRef.current.toggleDidSubmit(false);
+          await this.borrowDlgRef.current.hide();
         }
-      } finally {
+      } catch(error) {
+        /*let errorMsg;
+        if (error.message) {
+          errorMsg = error.message;
+        } else if (typeof error === "string") {
+          errorMsg = error;
+        }
+  
+        if (errorMsg) {
+          if (errorMsg.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)) {
+            errorMsg = "The transaction seems like it will fail. You can submit the transaction anyway, or cancel.";
+          } else if (errorMsg.includes("Reverted by EVM")) {
+            errorMsg = "The transaction failed. Click View More for details.";
+          } else if (errorMsg.includes("MetaMask Tx Signature: User denied transaction signature.")) {
+            errorMsg = "You didn't confirm in MetaMask. Please try again.";
+            await this.borrowDlgRef.current.hide();
+          } else if (errorMsg.includes("User denied account authorization.")) {
+            errorMsg = "You didn't authorize MetaMask. Please try again.";
+          } else if (errorMsg.includes("Transaction rejected")) {
+            errorMsg = "You didn't confirm in Gnosis Safe. Please try again.";
+          } else {
+            errorMsg = "";
+          }
+        }*/
+        
+        this.borrowDlgRef.current.toggleDidSubmit(false);
         await this.borrowDlgRef.current.hide();
       }
     }

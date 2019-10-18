@@ -11,12 +11,17 @@ export interface IOpsEstimateResultProps {
 
 export class OpsEstimatedResult extends Component<IOpsEstimateResultProps> {
   public render() {
+    let amount = this.props.amount;
+    if (amount.isNaN()) {
+      amount = new BigNumber(0);
+    }
+
     return (
       <div className="ops-estimated-result__operation-result-container">
         <img className="ops-estimated-result__operation-result-img" src={this.props.assetDetails.logoSvg} />
         <div className="ops-estimated-result__operation-result-msg">{this.props.actionTitle}</div>
         <div className="ops-estimated-result__operation-result-amount">
-          {this.props.amount.toFixed(this.props.precision)} {this.props.assetDetails.displayName}
+          {amount.toFixed(this.props.precision)} {this.props.assetDetails.displayName}
         </div>
 
         {this.props.children}

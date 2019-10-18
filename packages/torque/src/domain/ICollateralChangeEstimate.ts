@@ -1,8 +1,9 @@
 import { BigNumber } from "@0x/utils";
 
 export interface ICollateralChangeEstimate {
-  diffAmount: number;
+  collateralAmount: BigNumber;
   collateralizedPercent: BigNumber;
   liquidationPrice: BigNumber;
   gasEstimate: BigNumber;
+  isWithdrawl: boolean
 }

@@ -38,7 +38,7 @@ export class BorrowedFundsList extends Component<IBorrowedFundsListProps, IBorro
   // }
 
   public render() {
-    const items = this.props.items.filter(e => this.props.walletDetails.walletType === WalletType.Web3 || TorqueProvider.Instance.isETHAsset(e.collateralAsset))
+    const items = this.props.items.filter(e => this.props.walletDetails.walletType === WalletType.Web3 || this.props.walletDetails.walletType === WalletType.ViewOnly || TorqueProvider.Instance.isETHAsset(e.collateralAsset))
       .map((e, index) => {
       // const rest = index % this.state.colsCount;
       return (

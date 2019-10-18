@@ -9,11 +9,8 @@ import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
 import { ICollateralChangeEstimate } from "../domain/ICollateralChangeEstimate";
 import { IWalletDetails } from "../domain/IWalletDetails";
 import { ManageCollateralRequest } from "../domain/ManageCollateralRequest";
-import { WalletType } from "../domain/WalletType";
 import { TorqueProvider } from "../services/TorqueProvider";
 import { ActionViaTransferDetails } from "./ActionViaTransferDetails";
-import { CollateralSlider } from "./CollateralSlider";
-import { OpsEstimatedResult } from "./OpsEstimatedResult";
 
 export interface IManageCollateralFormNonWeb3Props {
   walletDetails: IWalletDetails;
@@ -28,8 +25,6 @@ interface IManageCollateralFormNonWeb3State {
 
   currentValue: BigNumber;
   inputAmountText: string;
-
-  diffAmount: number;
 
   liquidationPrice: BigNumber;
   collateralizedPercent: BigNumber;
@@ -54,8 +49,6 @@ export class ManageCollateralFormNonWeb3 extends Component<IManageCollateralForm
       currentValue: new BigNumber(0),
       inputAmountText: "",
 
-      diffAmount: 0,
-
       collateralizedPercent: new BigNumber(0),
       liquidationPrice: new BigNumber(0),
       loanCollateralManagementAddress: null,
@@ -72,7 +65,7 @@ export class ManageCollateralFormNonWeb3 extends Component<IManageCollateralForm
       .subscribe((value: ICollateralChangeEstimate) => {
         this.setState({
           ...this.state,
-          diffAmount: value.diffAmount,
+          currentValue: value.collateralAmount,
           collateralizedPercent: value.collateralizedPercent,
           liquidationPrice: value.liquidationPrice
         });
@@ -221,8 +214,8 @@ export class ManageCollateralFormNonWeb3 extends Component<IManageCollateralForm
       TorqueProvider.Instance.getLoanCollateralChangeEstimate(
         this.props.walletDetails,
         this.props.loanOrderState,
-        this.state.currentValue,
-        selectedValue
+        selectedValue,
+        false
       ).then(value => {
         observer.next(value);
       });
@@ -245,12 +238,14 @@ export class ManageCollateralFormNonWeb3 extends Component<IManageCollateralForm
   };
 
   public onSubmitClick = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
     this.props.onSubmit(
       new ManageCollateralRequest(
         this.props.walletDetails,
-        this.props.loanOrderState.accountAddress,
-        this.props.loanOrderState.loanOrderHash,
-        new BigNumber(this.state.currentValue)
+        this.props.loanOrderState,
+        new BigNumber(this.state.currentValue),
+        false
       )
     );
   };

@@ -23,8 +23,18 @@
     }
   }
 
+  .borrow-form-insufficient-balance {
+    color: red;
+    padding: .25rem;
+    text-align: center;
+
+    &--hidden {
+      visibility: hidden;
+    }
+  }
+
   .borrow-form__delimiter {
-    margin-bottom: 1rem;
+    //margin-bottom: 1rem;
 
     border: 0;
     border-top: solid 0.0625rem rgba(255, 255, 255, 0.2);

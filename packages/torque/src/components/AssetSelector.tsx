@@ -39,7 +39,7 @@ export class AssetSelector extends Component<IAssetSelectorProps> {
         );
       } else {
         return (
-          <AssetSelectorItem key={e} asset={e} onSelectAsset={undefined} />
+          <AssetSelectorItem key={e} asset={e} onSelectAsset={this.props.onSelectAsset} />
         );
       }
     });

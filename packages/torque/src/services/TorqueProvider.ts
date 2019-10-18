@@ -38,6 +38,8 @@ export class TorqueProvider {
   // 5000ms
   public readonly successDisplayTimeout = 5000;
 
+  public readonly gasBufferForTxn = new BigNumber(5 * 10 ** 16); // 0.05 ETH
+
   public static readonly UNLIMITED_ALLOWANCE_IN_BASE_UNITS = new BigNumber(2)
     .pow(256)
     .minus(1);
@@ -452,8 +454,14 @@ export class TorqueProvider {
     return result;
   }
 
-  public doDeployManagementContract = async (walletDetails: IWalletDetails) => {
-    return ;
+  public doDeployManagementContract = async (manageCollateralRequest: ManageCollateralRequest) => {
+    console.log(manageCollateralRequest);
+
+    if (manageCollateralRequest.collateralAmount.lte(0)) {
+      return;
+    }
+
+    return;
   };
 
   public getLoansList = async (walletDetails: IWalletDetails): Promise<IBorrowedFundsState[]> => {
@@ -474,7 +482,7 @@ export class TorqueProvider {
             loanAsset: loanAsset,
             collateralAsset: collateralAsset,
             amount: e.loanTokenAmountFilled.dividedBy(10**loanPrecision).dp(5, BigNumber.ROUND_CEIL),
-            amountOwed: e.loanTokenAmountFilled.minus(e.interestDepositRemaining).dividedBy(10**loanPrecision).dp(6, BigNumber.ROUND_CEIL),
+            amountOwed: e.loanTokenAmountFilled.minus(e.interestDepositRemaining).dividedBy(10**loanPrecision).dp(5, BigNumber.ROUND_CEIL),
             collateralizedPercent: e.currentMarginAmount.dividedBy(10**20),
             interestRate: e.interestOwedPerDay.dividedBy(e.loanTokenAmountFilled).multipliedBy(365),
             interestOwedPerDay: e.interestOwedPerDay.dividedBy(10**loanPrecision),
@@ -622,13 +630,19 @@ export class TorqueProvider {
     return { minValue: 0, maxValue: 100, currentValue: borrowedFundsState.collateralizedPercent.multipliedBy(100).toNumber() };
   };
 
-  public getLoanCollateralChangeEstimate = async (walletDetails: IWalletDetails, borrowedFundsState: IBorrowedFundsState, loanValue: BigNumber, newValue: BigNumber): Promise<ICollateralChangeEstimate> => {
+  public getLoanCollateralChangeEstimate = async (
+    walletDetails: IWalletDetails,
+    borrowedFundsState: IBorrowedFundsState,
+    collateralAmount: BigNumber,
+    isWithdrawl: boolean
+  ): Promise<ICollateralChangeEstimate> => {
 
     const result = {
-      diffAmount: 0, // new BigNumber(Math.abs(newValue - loanValue) * 2 ),
+      collateralAmount: collateralAmount,
       collateralizedPercent: new BigNumber(0),
       liquidationPrice: new BigNumber(0),
-      gasEstimate: new BigNumber(0)
+      gasEstimate: new BigNumber(0),
+      isWithdrawl: isWithdrawl
     };
 
     if (this.contractsSource && this.web3Wrapper && borrowedFundsState.loanData) {
@@ -636,8 +650,8 @@ export class TorqueProvider {
       const collateralAsset = this.contractsSource!.getAssetFromAddress(borrowedFundsState.loanData.collateralTokenAddress);
       const collateralPrecision = AssetsDictionary.assets.get(collateralAsset)!.decimals || 18;
       let newAmount = new BigNumber(0);
-      if (newValue && newValue.gt(0)) {
-        newAmount = newValue.multipliedBy(10**collateralPrecision);
+      if (collateralAmount && collateralAmount.gt(0)) {
+        newAmount = collateralAmount.multipliedBy(10**collateralPrecision);
       }
       try {
         const newCurrentMargin: BigNumber = await oracleContract.getCurrentMarginAmount.callAsync(
@@ -646,7 +660,9 @@ export class TorqueProvider {
           borrowedFundsState.loanData.collateralTokenAddress,
           borrowedFundsState.loanData.loanTokenAmountFilled,
           borrowedFundsState.loanData.positionTokenAmountFilled,
-          borrowedFundsState.loanData.collateralTokenAmountFilled.plus(newAmount)
+          isWithdrawl ?
+            borrowedFundsState.loanData.collateralTokenAmountFilled.minus(newAmount) :
+            borrowedFundsState.loanData.collateralTokenAmountFilled.plus(newAmount)
         );
         result.collateralizedPercent = newCurrentMargin.dividedBy(10**18).plus(100);
       } catch(e) {
@@ -686,6 +702,12 @@ export class TorqueProvider {
       : { repayAmount: borrowedFundsState.amountOwed.multipliedBy(repayPercent).dividedBy(100) };
   };
 
+  public getLoanRepayPercent = async (walletDetails: IWalletDetails, borrowedFundsState: IBorrowedFundsState, repayAmount: BigNumber): Promise<IRepayEstimate> => {
+    return (walletDetails.walletType === WalletType.NonWeb3)
+      ? { repayAmount: new BigNumber(0) }
+      : { repayAmount: repayAmount, repayPercent: Math.round(repayAmount.multipliedBy(100).dividedBy(borrowedFundsState.amountOwed).toNumber()) };
+  };
+
   public doRepayLoan = async (repayLoanRequest: RepayLoanRequest) => {
     // console.log(repayLoanRequest);
 
@@ -698,13 +720,13 @@ export class TorqueProvider {
       const bZxContract = await this.contractsSource.getiBZxContract();
       if (account && bZxContract) {
         const loanPrecision = AssetsDictionary.assets.get(repayLoanRequest.borrowAsset)!.decimals || 18;
-        let closeAmountInBaseUnits;
+        let closeAmountInBaseUnits = repayLoanRequest.repayAmount.multipliedBy(10**loanPrecision);
+        let closeAmountInBaseUnitsValue = new BigNumber(closeAmountInBaseUnits.toFixed(0, 1));
         if (repayLoanRequest.repayPercent.gte(100)) {
           // send a large amount to close entire loan
-          closeAmountInBaseUnits = new BigNumber(repayLoanRequest.repayAmount.multipliedBy(10000**loanPrecision).toFixed(0, 1))
-        } else {
-          closeAmountInBaseUnits = new BigNumber(repayLoanRequest.repayAmount.multipliedBy(10**loanPrecision).toFixed(0, 1));
+          closeAmountInBaseUnits = closeAmountInBaseUnits.multipliedBy(10**50);
         }
+        closeAmountInBaseUnits = new BigNumber(closeAmountInBaseUnits.toFixed(0, 1));
 
         if (repayLoanRequest.borrowAsset !== Asset.ETH) {
           await this.checkAndSetApproval(
@@ -727,7 +749,7 @@ export class TorqueProvider {
             { 
               from: account,
               value: this.isETHAsset(repayLoanRequest.borrowAsset) ?
-                closeAmountInBaseUnits :
+              closeAmountInBaseUnitsValue :
                 undefined,
               gas: this.gasLimit
             }
@@ -748,7 +770,7 @@ export class TorqueProvider {
           { 
             from: account,
             value: this.isETHAsset(repayLoanRequest.borrowAsset) ?
-              closeAmountInBaseUnits :
+            closeAmountInBaseUnitsValue :
               undefined,
             gas: gasAmountBN ? gasAmountBN.toString() : "2000000",
             gasPrice: await this.gasPrice()

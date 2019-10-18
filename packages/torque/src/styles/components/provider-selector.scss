@@ -81,6 +81,18 @@
     }
   }
 
+  .provider-selector-item--squarelink {
+    background-color: $color-bg-squarelink;
+
+    &:hover {
+      background-color: $color-bg-squarelink--hover;
+    }
+
+    &:active {
+      background-color: $color-bg-squarelink--pressed;
+    }
+  }
+
   .provider-selector-item--wallet-connect {
     background-color: $color-bg-wallet-connect;
 

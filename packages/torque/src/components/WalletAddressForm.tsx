@@ -46,6 +46,8 @@ export class WalletAddressForm extends Component<IWalletAddressFormProps, IWalle
   };
 
   public onSubmitClick = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
     if (this.props.onSubmit) {
       this.props.onSubmit(this.state.walletAddress);
     }

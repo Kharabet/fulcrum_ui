@@ -10,6 +10,7 @@ interface IRepayLoanDlgState {
   isOpen: boolean;
   walletDetails: IWalletDetails | null;
   loanOrderState: IBorrowedFundsState | null;
+  didSubmit: boolean;
 
   executorParams: { resolve: (value?: RepayLoanRequest) => void; reject: (reason?: any) => void } | null;
 }
@@ -18,7 +19,7 @@ export class RepayLoanDlg extends Component<any, IRepayLoanDlgState> {
   public constructor(props: any, context?: any) {
     super(props, context);
 
-    this.state = { isOpen: false, walletDetails: null, loanOrderState: null, executorParams: null };
+    this.state = { isOpen: false, walletDetails: null, loanOrderState: null, didSubmit: false, executorParams: null };
   }
 
   public render() {
@@ -44,9 +45,18 @@ export class RepayLoanDlg extends Component<any, IRepayLoanDlgState> {
           loanOrderState={this.state.loanOrderState}
           onSubmit={this.onFormSubmit}
           onClose={this.onFormDecline}
+          didSubmit={this.state.didSubmit}
+          toggleDidSubmit={this.toggleDidSubmit} 
         />
       </ReactModal>
     );
+  }
+
+  public toggleDidSubmit = (submit: boolean) => {
+    this.setState({
+      ...this.state,
+      didSubmit: submit
+    });
   }
 
   public getValue = async (walletDetails: IWalletDetails, item: IBorrowedFundsState): Promise<RepayLoanRequest> => {
@@ -66,7 +76,7 @@ export class RepayLoanDlg extends Component<any, IRepayLoanDlgState> {
   };
 
   public hide = () => {
-    this.setState({ ...this.state, isOpen: false, executorParams: null });
+    this.setState({ ...this.state, isOpen: false, executorParams: null, didSubmit: false });
   };
 
   private onFormSubmit = (value: RepayLoanRequest) => {
@@ -76,6 +86,7 @@ export class RepayLoanDlg extends Component<any, IRepayLoanDlgState> {
   };
 
   private onFormDecline = () => {
+    this.hide();
     if (this.state.executorParams) {
       this.state.executorParams.reject();
     }

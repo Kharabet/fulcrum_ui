@@ -27,3 +27,16 @@
   width: 10rem;
   height: 4rem;
 }
+
+.btn-disabled {
+  opacity: 0.4;
+  background-color: $color-blue !important;
+
+  &:hover {
+    background-color: $color-blue !important;
+  }
+
+  &:active {
+    background-color: $color-blue !important;
+  }
+}

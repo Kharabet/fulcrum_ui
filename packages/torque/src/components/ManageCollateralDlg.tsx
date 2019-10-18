@@ -5,13 +5,14 @@ import { IWalletDetails } from "../domain/IWalletDetails";
 import { ManageCollateralRequest } from "../domain/ManageCollateralRequest";
 import { WalletType } from "../domain/WalletType";
 import { DialogHeader } from "./DialogHeader";
-// import { ManageCollateralForm } from "./ManageCollateralForm";
+import { ManageCollateralFormWeb3 } from "./ManageCollateralFormWeb3";
 import { ManageCollateralFormNonWeb3 } from "./ManageCollateralFormNonWeb3";
 
 interface IManageCollateralDlgState {
   isOpen: boolean;
   walletDetails: IWalletDetails | null;
   loanOrderState: IBorrowedFundsState | null;
+  didSubmit: boolean;
 
   executorParams: { resolve: (value?: ManageCollateralRequest) => void; reject: (reason?: any) => void } | null;
 }
@@ -20,7 +21,7 @@ export class ManageCollateralDlg extends Component<any, IManageCollateralDlgStat
   public constructor(props: any, context?: any) {
     super(props, context);
 
-    this.state = { isOpen: false, walletDetails: null, loanOrderState: null, executorParams: null };
+    this.state = { isOpen: false, walletDetails: null, loanOrderState: null, didSubmit: false, executorParams: null };
   }
 
   public render() {
@@ -53,16 +54,25 @@ export class ManageCollateralDlg extends Component<any, IManageCollateralDlgStat
         ) : (
           <React.Fragment>
             <DialogHeader title="Manage Collateral" onDecline={this.onFormDecline} />
-            <ManageCollateralFormNonWeb3
+            <ManageCollateralFormWeb3
               walletDetails={this.state.walletDetails}
               loanOrderState={this.state.loanOrderState}
               onSubmit={this.onFormSubmit}
               onClose={this.onFormDecline}
+              didSubmit={this.state.didSubmit}
+              toggleDidSubmit={this.toggleDidSubmit} 
             />
           </React.Fragment>
         )}
       </ReactModal>
     );
+  }
+
+  public toggleDidSubmit = (submit: boolean) => {
+    this.setState({
+      ...this.state,
+      didSubmit: submit
+    });
   }
 
   public getValue = async (walletDetails: IWalletDetails, item: IBorrowedFundsState): Promise<ManageCollateralRequest> => {
@@ -82,7 +92,7 @@ export class ManageCollateralDlg extends Component<any, IManageCollateralDlgStat
   };
 
   public hide = () => {
-    this.setState({ ...this.state, isOpen: false, executorParams: null });
+    this.setState({ ...this.state, isOpen: false, executorParams: null, didSubmit: false });
   };
 
   private onFormSubmit = (value: ManageCollateralRequest) => {
@@ -92,6 +102,7 @@ export class ManageCollateralDlg extends Component<any, IManageCollateralDlgStat
   };
 
   private onFormDecline = () => {
+    this.hide();
     if (this.state.executorParams) {
       this.state.executorParams.reject();
     }
