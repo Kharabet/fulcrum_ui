@@ -5,8 +5,8 @@ import { IWalletDetails } from "../domain/IWalletDetails";
 import { ManageCollateralRequest } from "../domain/ManageCollateralRequest";
 import { WalletType } from "../domain/WalletType";
 import { DialogHeader } from "./DialogHeader";
-import { ManageCollateralFormWeb3 } from "./ManageCollateralFormWeb3";
 import { ManageCollateralFormNonWeb3 } from "./ManageCollateralFormNonWeb3";
+import { ManageCollateralFormWeb3 } from "./ManageCollateralFormWeb3";
 
 interface IManageCollateralDlgState {
   isOpen: boolean;

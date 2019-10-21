@@ -1,6 +1,6 @@
 import { BigNumber } from "@0x/utils";
-import { IWalletDetails } from "./IWalletDetails";
 import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
+import { IWalletDetails } from "./IWalletDetails";
 
 export class ManageCollateralRequest {
   public walletDetails: IWalletDetails;

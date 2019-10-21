@@ -144,17 +144,17 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
               </React.Fragment>
             ) : this.props.walletDetails.walletType === WalletType.Web3 ? (
               <React.Fragment>
-                {/*<div className="borrowed-funds-list-item__action" onClick={this.onManageCollateral}>
+                <div className="borrowed-funds-list-item__action" onClick={this.onManageCollateral}>
                   <div className="borrowed-funds-list-item__action-title">
                     <div>Manage<br/>Collateral</div>
                   </div>
-                </div>*/}
-                <div className="borrowed-funds-list-item__action" onClick={this.onExtendLoan} style={{ width: `50%` }}>
+                </div>
+                <div className="borrowed-funds-list-item__action" onClick={this.onExtendLoan}>
                   <div className="borrowed-funds-list-item__action-title">
                     <div>Front<br/>Interest</div>
                   </div>
                 </div>
-                <div className="borrowed-funds-list-item__action" onClick={this.onRepayLoan} style={{ width: `50%` }}>
+                <div className="borrowed-funds-list-item__action" onClick={this.onRepayLoan}>
                   <div className="borrowed-funds-list-item__action-title">
                     <div>Repay<br/>Loan</div>
                   </div>

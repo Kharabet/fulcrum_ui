@@ -30,13 +30,13 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
       providerTypeDetails: null
     };
 
-    TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderIsChanging, this.onProviderIsChanging);
+    // TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderIsChanging, this.onProviderIsChanging);
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
-  private onProviderIsChanging = async () => {
+  /*private onProviderIsChanging = async () => {
     await this.derivedUpdate();
-  };
+  };*/
 
   private onProviderChanged = async (event: ProviderChangedEvent) => {
     await this.derivedUpdate();
@@ -47,7 +47,7 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
   }
 
   public componentWillUnmount(): void {
-    TorqueProvider.Instance.eventEmitter.removeListener(TorqueProviderEvents.ProviderIsChanging, this.onProviderIsChanging);
+    // TorqueProvider.Instance.eventEmitter.removeListener(TorqueProviderEvents.ProviderIsChanging, this.onProviderIsChanging);
     TorqueProvider.Instance.eventEmitter.removeListener(TorqueProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 

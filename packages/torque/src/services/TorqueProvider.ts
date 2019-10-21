@@ -10,6 +10,7 @@ import { ExtendLoanRequest } from "../domain/ExtendLoanRequest";
 import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
 import { IBorrowEstimate } from "../domain/IBorrowEstimate";
 import { ICollateralChangeEstimate } from "../domain/ICollateralChangeEstimate";
+import { ICollateralExcess } from "../domain/ICollateralExcess";
 import { ICollateralManagementParams } from "../domain/ICollateralManagementParams";
 import { IExtendEstimate } from "../domain/IExtendEstimate";
 import { IExtendState } from "../domain/IExtendState";
@@ -40,7 +41,7 @@ export class TorqueProvider {
 
   public readonly gasBufferForTxn = new BigNumber(5 * 10 ** 16); // 0.05 ETH
 
-  public static readonly UNLIMITED_ALLOWANCE_IN_BASE_UNITS = new BigNumber(2)
+  public static readonly MAX_UINT = new BigNumber(2)
     .pow(256)
     .minus(1);
 
@@ -239,16 +240,9 @@ export class TorqueProvider {
     return new BigNumber(1500000);
   };
 
-  public getBorrowDepositEstimate = async (
-    walletType: WalletType,
-    borrowAsset: Asset,
-    collateralAsset: Asset,
-    amount: BigNumber
-  ): Promise<IBorrowEstimate> => {
-    const result = { depositAmount: new BigNumber(0), gasEstimate: new BigNumber(0) };
-    
+  public getInitialCollateralLevel = (asset: Asset): number => {
     let initialLevel;
-    switch (collateralAsset) {
+    switch (asset) {
       case Asset.ETH:
       case Asset.WETH:
       case Asset.DAI:
@@ -258,6 +252,19 @@ export class TorqueProvider {
       default:
         initialLevel = 250;
     }
+
+    return initialLevel;
+  }
+
+  public getBorrowDepositEstimate = async (
+    walletType: WalletType,
+    borrowAsset: Asset,
+    collateralAsset: Asset,
+    amount: BigNumber
+  ): Promise<IBorrowEstimate> => {
+    const result = { depositAmount: new BigNumber(0), gasEstimate: new BigNumber(0) };
+    
+    const initialLevel = this.getInitialCollateralLevel(collateralAsset);
 
     if (this.contractsSource && this.web3Wrapper) {
       const iTokenContract = await this.contractsSource.getiTokenContract(borrowAsset);
@@ -311,7 +318,7 @@ export class TorqueProvider {
       if (account && tokenErc20Contract) {
         const erc20allowance = await tokenErc20Contract.allowance.callAsync(account, spender);
         if (amountInBaseUnits.gt(erc20allowance)) {
-          await tokenErc20Contract.approve.sendTransactionAsync(spender, TorqueProvider.UNLIMITED_ALLOWANCE_IN_BASE_UNITS, { from: account });
+          await tokenErc20Contract.approve.sendTransactionAsync(spender, TorqueProvider.MAX_UINT, { from: account });
         }
         result = true;
       }
@@ -455,7 +462,7 @@ export class TorqueProvider {
   }
 
   public doDeployManagementContract = async (manageCollateralRequest: ManageCollateralRequest) => {
-    console.log(manageCollateralRequest);
+    // console.log(manageCollateralRequest);
 
     if (manageCollateralRequest.collateralAmount.lte(0)) {
       return;
@@ -627,7 +634,7 @@ export class TorqueProvider {
   };
 
   public getLoanCollateralManagementParams = async (walletDetails: IWalletDetails, borrowedFundsState: IBorrowedFundsState): Promise<ICollateralManagementParams> => {
-    return { minValue: 0, maxValue: 100, currentValue: borrowedFundsState.collateralizedPercent.multipliedBy(100).toNumber() };
+    return { minValue: 0, maxValue: 300, currentValue: 0 };
   };
 
   public getLoanCollateralChangeEstimate = async (
@@ -721,7 +728,7 @@ export class TorqueProvider {
       if (account && bZxContract) {
         const loanPrecision = AssetsDictionary.assets.get(repayLoanRequest.borrowAsset)!.decimals || 18;
         let closeAmountInBaseUnits = repayLoanRequest.repayAmount.multipliedBy(10**loanPrecision);
-        let closeAmountInBaseUnitsValue = new BigNumber(closeAmountInBaseUnits.toFixed(0, 1));
+        const closeAmountInBaseUnitsValue = new BigNumber(closeAmountInBaseUnits.toFixed(0, 1));
         if (repayLoanRequest.repayPercent.gte(100)) {
           // send a large amount to close entire loan
           closeAmountInBaseUnits = closeAmountInBaseUnits.multipliedBy(10**50);
@@ -867,6 +874,39 @@ export class TorqueProvider {
 
     return;
   };
+
+  public getCollateralExcessAmount = async (borrowedFundsState: IBorrowedFundsState): Promise<ICollateralExcess> => {
+
+    const precision = AssetsDictionary.assets.get(borrowedFundsState.collateralAsset)!.decimals || 18;
+
+    const result = {
+      collateralExcess: new BigNumber(0),
+      currentCollateral: borrowedFundsState.loanData!.collateralTokenAmountFilled
+        .dividedBy(10**precision)
+    };
+
+    if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
+      const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+      const bZxContract = await this.contractsSource.getiBZxContract();
+      if (account && bZxContract) {
+        // console.log(bZxContract.address, borrowedFundsState.loanOrderHash, account);
+        result.collateralExcess = await bZxContract.withdrawCollateral.callAsync(
+          borrowedFundsState.loanOrderHash,
+          TorqueProvider.MAX_UINT,
+          { 
+            from: account,
+            gas: this.gasLimit
+          }
+        );
+        result.collateralExcess = result.collateralExcess
+          .dividedBy(10**precision);
+
+        // console.log(result.toString());
+      }
+    }
+    return result;
+  };
+
 
   public getAssetInterestRate = async (asset: Asset): Promise<BigNumber> => {
     let result = new BigNumber(0);

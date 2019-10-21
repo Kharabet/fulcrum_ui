@@ -56,6 +56,7 @@ export class DashboardPage extends PureComponent<
     this.state = { walletDetails: { walletType: WalletType.Unknown, walletAddress: "" }, items: [], isENSSetup: undefined, isDataLoading: true };
 
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
+    TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
   private async derivedUpdate() {
@@ -108,15 +109,20 @@ export class DashboardPage extends PureComponent<
   }
 
   private onProviderAvailable = () => {
-    this.derivedUpdate();
+    this.refreshPage();
+  };
+
+  private onProviderChanged = () => {
+    this.refreshPage();
   };
 
   public componentWillUnmount(): void {
     TorqueProvider.Instance.eventEmitter.removeListener(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
+    TorqueProvider.Instance.eventEmitter.removeListener(TorqueProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
   public componentDidMount(): void {
-    this.derivedUpdate();
+    this.refreshPage();
   }
 
   public componentDidUpdate(
@@ -125,7 +131,7 @@ export class DashboardPage extends PureComponent<
     snapshot?: any
   ): void {
     if (this.state.walletDetails.walletAddress !== prevState.walletDetails.walletAddress) {
-      this.derivedUpdate();
+      this.refreshPage();
     }
   }
 
@@ -231,13 +237,13 @@ export class DashboardPage extends PureComponent<
   private onClearWalletAddress = () => {
     NavService.Instance.History.replace(NavService.Instance.getDashboardAddress(WalletType.NonWeb3, ""));
     this.props.match.params.walletAddress = "";
-    this.derivedUpdate();
+    this.refreshPage();
   };
 
   private onWalletAddressChange = (walletAddress: string) => {
     NavService.Instance.History.replace(NavService.Instance.getDashboardAddress(WalletType.NonWeb3, walletAddress));
     this.props.match.params.walletAddress = walletAddress;
-    this.derivedUpdate();
+    this.refreshPage();
   };
 
   private onRepayLoan = async (item: IBorrowedFundsState) => {
@@ -395,7 +401,7 @@ export class DashboardPage extends PureComponent<
         }*/
         
         await this.setupENSDlgRef.current.hide();
-        //this.setupENSDlgRef.current.toggleDidSubmit(false);
+        // this.setupENSDlgRef.current.toggleDidSubmit(false);
       }
     }
   };

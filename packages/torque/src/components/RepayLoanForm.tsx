@@ -3,6 +3,7 @@ import React, { ChangeEvent, Component, FormEvent } from "react";
 import { Observable, Subject } from "rxjs";
 import { debounceTime, switchMap } from "rxjs/operators";
 import { ActionType } from "../domain/ActionType";
+import { Asset } from "../domain/Asset";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
@@ -10,7 +11,6 @@ import { IRepayEstimate } from "../domain/IRepayEstimate";
 import { IWalletDetails } from "../domain/IWalletDetails";
 import { RepayLoanRequest } from "../domain/RepayLoanRequest";
 import { WalletType } from "../domain/WalletType";
-import { Asset } from "../domain/Asset";
 import { TorqueProvider } from "../services/TorqueProvider";
 import { ActionViaTransferDetails } from "./ActionViaTransferDetails";
 import { OpsEstimatedResult } from "./OpsEstimatedResult";
@@ -118,7 +118,7 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
             },
             () => {
               this.selectedValueUpdate.next(this.state.selectedValue);
-              //this._inputTextChange.next(this.state.inputAmountText);
+              // this._inputTextChange.next(this.state.inputAmountText);
             }
           );
         });
@@ -149,7 +149,7 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
             },
             () => {
               this.selectedValueUpdate.next(this.state.selectedValue);
-              //this._inputTextChange.next(this.state.inputAmountText);
+              // this._inputTextChange.next(this.state.inputAmountText);
             }
           );
         });
@@ -265,7 +265,7 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
   };
 
   private rxConvertToBigNumber = (textValue: string): Observable<BigNumber> => {
-    let repayAmount = new BigNumber(textValue);
+    const repayAmount = new BigNumber(textValue);
 
     return new Observable<BigNumber>(observer => {
       observer.next(repayAmount);
