@@ -6,6 +6,7 @@ import { erc20Contract } from "../contracts/erc20";
 import { Asset } from "../domain/Asset";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { BorrowRequest } from "../domain/BorrowRequest";
+import { BorrowRequestAwaiting } from "../domain/BorrowRequestAwaiting";
 import { ExtendLoanRequest } from "../domain/ExtendLoanRequest";
 import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
 import { IBorrowEstimate } from "../domain/IBorrowEstimate";
@@ -24,10 +25,11 @@ import { RepayLoanRequest } from "../domain/RepayLoanRequest";
 import { SetupENSRequest } from "../domain/SetupENSRequest";
 import { WalletType } from "../domain/WalletType";
 import { Web3ConnectionFactory } from "../domain/Web3ConnectionFactory";
+import { BorrowRequestAwaitingStore } from "./BorrowRequestAwaitingStore";
 import { ContractsSource } from "./ContractsSource";
-import { TorqueProviderEvents } from "./events/TorqueProviderEvents";
 
 import { ProviderChangedEvent } from "./events/ProviderChangedEvent";
+import { TorqueProviderEvents } from "./events/TorqueProviderEvents";
 
 export class TorqueProvider {
   public static Instance: TorqueProvider;
@@ -53,6 +55,7 @@ export class TorqueProvider {
   public web3Wrapper: Web3Wrapper | null = null;
   public web3ProviderSettings: IWeb3ProviderSettings | null = null;
   public contractsSource: ContractsSource | null = null;
+  public borrowRequestAwaitingStore: BorrowRequestAwaitingStore | null = null;
   public accounts: string[] = [];
   public isLoading: boolean = false;
   public unsupportedNetwork: boolean = false;
@@ -69,7 +72,6 @@ export class TorqueProvider {
 
     const storedProvider: any = TorqueProvider.getLocalstorageItem('providerType');
     const providerType: ProviderType | null = ProviderType[storedProvider] as ProviderType || null;
-
     if (providerType) {
       TorqueProvider.Instance.setWeb3Provider(providerType).then(() => {
         this.eventEmitter.emit(TorqueProviderEvents.ProviderAvailable);
@@ -92,6 +94,7 @@ export class TorqueProvider {
               this.providerEngine = providerData[1];
               this.web3ProviderSettings = web3ProviderSettings;
               this.contractsSource = contractsSource;
+              this.borrowRequestAwaitingStore = new BorrowRequestAwaitingStore(web3ProviderSettings.networkId, web3Wrapper);
               this.eventEmitter.emit(TorqueProviderEvents.ProviderAvailable);
             });
           }
@@ -163,6 +166,7 @@ export class TorqueProvider {
 
     if (this.web3Wrapper && this.web3ProviderSettings.networkId > 0) {
       this.contractsSource = await new ContractsSource(this.providerEngine, this.web3ProviderSettings.networkId, canWrite);
+      this.borrowRequestAwaitingStore = new BorrowRequestAwaitingStore(this.web3ProviderSettings.networkId, this.web3Wrapper);
       if (canWrite) {
         this.providerType = providerType;
       } else {
@@ -327,6 +331,16 @@ export class TorqueProvider {
     return result;
   }
 
+  public createAwaitingLoan = () => {
+    if (this.borrowRequestAwaitingStore) {
+      this.borrowRequestAwaitingStore.add(
+        new BorrowRequestAwaiting(
+          new BorrowRequest(WalletType.Web3, Asset.MKR, BigNumber.min(1), Asset.USDC, BigNumber.min(0.15)), 1, "0x1a9f2F3697EbFB35ab0bf337fd7f847637931D4C", ""
+        )
+      )
+    }
+  };
+
   public doBorrow = async (borrowRequest: BorrowRequest) => {
     // console.log(borrowRequest);
     
@@ -381,6 +395,16 @@ export class TorqueProvider {
               gasPrice: await this.gasPrice()
             }
           );
+          if (this.borrowRequestAwaitingStore && this.web3ProviderSettings) {
+            this.borrowRequestAwaitingStore.add(
+              new BorrowRequestAwaiting(
+                borrowRequest,
+                this.web3ProviderSettings.networkId,
+                account,
+                txHash
+              )
+            )
+          }
           // console.log(txHash);
         } else {
           await this.checkAndSetApproval(
@@ -422,6 +446,16 @@ export class TorqueProvider {
               gasPrice: await this.gasPrice()
             }
           );
+          if (this.borrowRequestAwaitingStore && this.web3ProviderSettings) {
+            this.borrowRequestAwaitingStore.add(
+              new BorrowRequestAwaiting(
+                borrowRequest,
+                this.web3ProviderSettings.networkId,
+                account,
+                txHash
+              )
+            )
+          }
           // console.log(txHash);
         }
       }
@@ -501,6 +535,16 @@ export class TorqueProvider {
         // console.log(result);
       }
     }
+    return result;
+  };
+
+  public getLoansAwaitingList = async (walletDetails: IWalletDetails): Promise<ReadonlyArray<BorrowRequestAwaiting>> => {
+    let result: ReadonlyArray<BorrowRequestAwaiting> = [];
+    if (this.borrowRequestAwaitingStore) {
+      await this.borrowRequestAwaitingStore.cleanUp(walletDetails);
+      result = await this.borrowRequestAwaitingStore.list(walletDetails);
+    }
+
     return result;
   };
 

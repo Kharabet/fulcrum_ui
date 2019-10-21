@@ -8,6 +8,7 @@ import { SetupENSDlg } from "../components/SetupENSDlg";
 import { WalletAddressDlg } from "../components/WalletAddressDlg";
 import { WalletAddressHint } from "../components/WalletAddressHint";
 import { WalletAddressLargeForm } from "../components/WalletAddressLargeForm";
+import { BorrowRequestAwaiting } from "../domain/BorrowRequestAwaiting";
 import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
 import { IWalletDetails } from "../domain/IWalletDetails";
 import { WalletType, walletTypeAbbrToWalletType } from "../domain/WalletType";
@@ -31,6 +32,7 @@ interface IDashboardPageState {
   walletDetails: IWalletDetails;
   isENSSetup?: boolean;
   items: IBorrowedFundsState[];
+  itemsAwaiting: ReadonlyArray<BorrowRequestAwaiting>;
   isDataLoading: boolean;
 }
 
@@ -53,7 +55,7 @@ export class DashboardPage extends PureComponent<
     this.extendLoanDlgRef = React.createRef();
     this.walletAddressDlgRef = React.createRef();
 
-    this.state = { walletDetails: { walletType: WalletType.Unknown, walletAddress: "" }, items: [], isENSSetup: undefined, isDataLoading: true };
+    this.state = { walletDetails: { walletType: WalletType.Unknown, walletAddress: "" }, items: [], itemsAwaiting: [], isENSSetup: undefined, isDataLoading: true };
 
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderChanged, this.onProviderChanged);
@@ -93,9 +95,11 @@ export class DashboardPage extends PureComponent<
     }
 
     let items: IBorrowedFundsState[] = [];
+    let itemsAwaiting: ReadonlyArray<BorrowRequestAwaiting> = [];
     if (isENSSetup) {
       // console.log(walletDetails);
       items = await TorqueProvider.Instance.getLoansList(walletDetails);
+      itemsAwaiting = await TorqueProvider.Instance.getLoansAwaitingList(walletDetails);
       // console.log(items);
     }
 
@@ -103,6 +107,7 @@ export class DashboardPage extends PureComponent<
       ...this.state,
       walletDetails: walletDetails,
       items: items,
+      itemsAwaiting: itemsAwaiting,
       isENSSetup: isENSSetup,
       isDataLoading: false
     });
@@ -171,6 +176,7 @@ export class DashboardPage extends PureComponent<
                     <BorrowedFundsList
                       walletDetails={this.state.walletDetails}
                       items={this.state.items}
+                      itemsAwaiting={this.state.itemsAwaiting}
                       onManageCollateral={this.onManageCollateral}
                       onRepayLoan={this.onRepayLoan}
                       onExtendLoan={this.onExtendLoan}
@@ -208,7 +214,8 @@ export class DashboardPage extends PureComponent<
     this.setState({
       ...this.state,
       isDataLoading: true,
-      items: []
+      items: [],
+      itemsAwaiting: []
     },
     () => {
       setTimeout(() => {
