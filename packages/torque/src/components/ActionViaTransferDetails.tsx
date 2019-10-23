@@ -67,12 +67,17 @@ export class ActionViaTransferDetails extends Component<IActionViaTransferDetail
         break;
     }
 
+    let assetAmount = this.props.assetAmount;
+    if (assetAmount.isNaN()) {
+      assetAmount = new BigNumber(0);
+    }
+
     return (
       <React.Fragment>
         <QRCodeForAddressDlg ref={this.borrowViaTransferAddressQRDlg} address={this.props.contractAddress} />
         <div className="action-via-transfer-details">
           <div className="action-via-transfer-details__title" style={{ marginBottom: this.props.action !== ActionType.Borrow ? `0.5rem` : undefined }}>
-            Send <span className="action-via-transfer-details__title-amount">{this.props.assetAmount.dp(5, BigNumber.ROUND_CEIL).toString()} {actionAsset}</span>{" "}
+            Send <span className="action-via-transfer-details__title-amount">{assetAmount.dp(5, BigNumber.ROUND_CEIL).toString()} {actionAsset}</span>{" "}
             to
           </div>
           <div className="action-via-transfer-details__input-container">

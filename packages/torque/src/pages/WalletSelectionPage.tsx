@@ -20,11 +20,19 @@ export interface IWalletSelectionPageProps {
 }
 
 export class WalletSelectionPage extends PureComponent<IWalletSelectionPageProps & RouteComponentProps<IWalletSelectionPageParams>> {
+  
+  public componentDidMount(): void {
+    TorqueProvider.Instance.destinationAbbr = this.props.match.params.destinationAbbr;
+  }
+
   public render() {
     return (
       <div className="wallet-selection-page">
         <HeaderHome isLoading={this.props.isLoading} doNetworkConnect={this.props.doNetworkConnect} />
         <div className="wallet-selection-page__main">
+          <div className="wallet-selection-page__main-centeredOverlay" style={!TorqueProvider.Instance.isLoading ? { display: `none`} : undefined}>
+              <span>Loading...</span>
+          </div>
           <WalletTypeSelector onSelectWalletType={this.onSelectWalletType} />
           <ProviderSelector onSelectProvider={this.props.onSelectProvider} />
         </div>
@@ -34,6 +42,8 @@ export class WalletSelectionPage extends PureComponent<IWalletSelectionPageProps
   }
 
   private onSelectWalletType = async (walletType: WalletType) => {
+    TorqueProvider.Instance.isLoading = true;
+    
     if (walletType === WalletType.Web3) {
       if (this.props.onSelectProvider) {
         await this.props.onSelectProvider(ProviderType.MetaMask);
@@ -45,12 +55,12 @@ export class WalletSelectionPage extends PureComponent<IWalletSelectionPageProps
 
         if (this.props.match.params.destinationAbbr === "b") {
           NavService.Instance.History.replace(
-            NavService.Instance.getBorrowAddress(walletType)
+            NavService.Instance.getBorrowAddress(WalletType.Web3)
           );
         } if (this.props.match.params.destinationAbbr === "t") {
           if (accountAddress) {
             NavService.Instance.History.replace(
-              NavService.Instance.getDashboardAddress(walletType, accountAddress)
+              NavService.Instance.getDashboardAddress(WalletType.Web3, accountAddress)
             );
           }
         } else {
@@ -62,13 +72,15 @@ export class WalletSelectionPage extends PureComponent<IWalletSelectionPageProps
         await this.props.onSelectProvider(ProviderType.None);
       }
       
+      TorqueProvider.Instance.providerType = ProviderType.None;
+
       if (this.props.match.params.destinationAbbr === "b") {
         NavService.Instance.History.replace(
-          NavService.Instance.getBorrowAddress(walletType)
+          NavService.Instance.getBorrowAddress(WalletType.NonWeb3)
         );
       } if (this.props.match.params.destinationAbbr === "t") {
         NavService.Instance.History.replace(
-          NavService.Instance.getDashboardAddress(walletType, "")
+          NavService.Instance.getDashboardAddress(WalletType.NonWeb3, "")
         );
       } else {
         // do nothing
@@ -76,5 +88,7 @@ export class WalletSelectionPage extends PureComponent<IWalletSelectionPageProps
     } else {
       // do nothing
     }
+
+    TorqueProvider.Instance.isLoading = false;
   };
 }

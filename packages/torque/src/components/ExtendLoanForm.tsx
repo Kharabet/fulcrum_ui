@@ -254,7 +254,7 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
   public onSubmitClick = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (!this.props.didSubmit) {
+    if (!this.props.didSubmit && this.state.depositAmount.gt(0)) {
       this.props.toggleDidSubmit(true);
 
       let assetBalance = await TorqueProvider.Instance.getAssetTokenBalanceOfUser(this.props.loanOrderState.loanAsset);

@@ -182,7 +182,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
   private onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (this.props.onSubmit && !this.props.didSubmit) {
+    if (this.props.onSubmit && !this.props.didSubmit && this.state.depositAmount.gt(0)) {
       this.props.toggleDidSubmit(true);
       
       let assetBalance = await TorqueProvider.Instance.getAssetTokenBalanceOfUser(this.state.collateralAsset);
@@ -220,21 +220,35 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
     }
   };
 
-  private onCollateralChange = (asset: Asset) => {
-    TorqueProvider.Instance.getBorrowDepositEstimate(
+  private onCollateralChange = async (asset: Asset) => {
+    const borrowEstimate = await TorqueProvider.Instance.getBorrowDepositEstimate(
       this.props.walletType,
       this.props.borrowAsset,
       asset,
       this.state.borrowAmount
-    ).then(value => {
+    );
+    
+    let assetBalance = await TorqueProvider.Instance.getAssetTokenBalanceOfUser(asset);
+    if (asset === Asset.ETH) {
+      assetBalance = assetBalance.gt(TorqueProvider.Instance.gasBufferForTxn) ? assetBalance.minus(TorqueProvider.Instance.gasBufferForTxn) : new BigNumber(0);
+    }
+    const precision = AssetsDictionary.assets.get(asset)!.decimals || 18;
+    const amountInBaseUnits = new BigNumber(borrowEstimate.depositAmount.multipliedBy(10**precision).toFixed(0, 1));
+    if (assetBalance.lt(amountInBaseUnits)) {
       this.setState({
         ...this.state,
         collateralAsset: asset,
-        depositAmount: value.depositAmount
+        depositAmount: borrowEstimate.depositAmount,
+        balanceTooLow: true
       });
-    });
-    
-    
+    } else {
+      this.setState({
+        ...this.state,
+        collateralAsset: asset,
+        depositAmount: borrowEstimate.depositAmount,
+        balanceTooLow: false
+      });
+    }
   };
 
   public onTradeAmountChange = async (event: ChangeEvent<HTMLInputElement>) => {

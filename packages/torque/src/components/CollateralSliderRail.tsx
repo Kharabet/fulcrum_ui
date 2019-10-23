@@ -1,13 +1,14 @@
 import React, { CSSProperties } from "react";
 import { GetRailProps } from "react-compound-slider";
 
-const railOuterStyle: CSSProperties = {
+let railOuterStyle: CSSProperties;
+/*const railOuterStyle: CSSProperties = {
   position: "absolute",
   width: "100%",
   height: "2.5rem",
   transform: "translate(0%, -50%)",
   cursor: "pointer"
-};
+};*/
 
 const railInnerStyle: CSSProperties = {
   position: "absolute",
@@ -19,7 +20,24 @@ const railInnerStyle: CSSProperties = {
   backgroundImage: "linear-gradient(to right, #ff5353, #d9c53e 50%, #69bf83)"
 };
 
-export function CollateralSliderRail(param: { getRailProps: GetRailProps }) {
+export function CollateralSliderRail(param: { getRailProps: GetRailProps, readonly: boolean }) {
+  if (param.readonly) {
+    railOuterStyle = {
+      position: "absolute",
+      width: "100%",
+      height: "2.5rem",
+      transform: "translate(0%, -50%)"
+    };
+  } else {
+    railOuterStyle = {
+      position: "absolute",
+      width: "100%",
+      height: "2.5rem",
+      transform: "translate(0%, -50%)",
+      cursor: "pointer"
+    };
+  }
+
   return (
     <React.Fragment>
       <div style={railOuterStyle} {...param.getRailProps()} />

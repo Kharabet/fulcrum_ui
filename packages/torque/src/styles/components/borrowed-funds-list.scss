@@ -123,6 +123,16 @@
             color: #3b364b;
           }
 
+          .borrowed-funds-list-item__collateralized-value {
+            font-size: 1rem;
+            font-weight: 600;
+            font-style: normal;
+            font-stretch: normal;
+            line-height: 1.5;
+            text-align: left;
+            color: #3b364b;
+          }
+
           .borrowed-funds-list-item__collateralized-label {
             font-size: 0.75rem;
             font-weight: normal;
@@ -173,7 +183,10 @@
       }
 
       .borrowed-funds-list-item__collateralized-slider-container {
-        padding: 1.5rem 0 3rem;
+        padding-top: 1.5rem;
+        padding-right: 0px;
+        padding-bottom: 1rem;
+        padding-left: 0px;
       }
     }
 

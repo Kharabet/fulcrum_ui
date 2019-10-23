@@ -1,5 +1,6 @@
 import { BigNumber } from "@0x/utils";
 import React, { Component } from "react";
+import { Asset } from "../domain/Asset";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
@@ -114,6 +115,13 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
                 maxValue={100}
                 value={this.props.item.collateralizedPercent.multipliedBy(100).toNumber()}
               />
+            </div>
+            <div className="borrowed-funds-list-item__collateral-info-container">
+              <div className="borrowed-funds-list-item__collateralized-value-container">
+                <div title={`${this.props.item.collateralAmount.toFixed(18)} ${this.props.item.collateralAsset}`} className="borrowed-funds-list-item__collateralized-value">
+                  {this.props.item.collateralAmount.toFixed(4)} {this.props.item.collateralAsset === Asset.WETH ? Asset.ETH : this.props.item.collateralAsset}
+                </div>
+              </div>
             </div>
           </div>
         </div>

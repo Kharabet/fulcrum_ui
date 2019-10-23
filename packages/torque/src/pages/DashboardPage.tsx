@@ -338,7 +338,7 @@ export class DashboardPage extends PureComponent<
           this.state.walletDetails,
           item
         );
-        await TorqueProvider.Instance.setLoanCollateral(manageCollateralRequest);
+        await TorqueProvider.Instance.doManageCollateral(manageCollateralRequest);
 
         this.manageCollateralDlgRef.current.toggleDidSubmit(false);
         await this.manageCollateralDlgRef.current.hide();

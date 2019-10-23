@@ -38,7 +38,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
     super(props);
 
     this.state = {
-//      isProviderMenuModalOpen: false,
+      // isProviderMenuModalOpen: false,
       isLoading: false,
       selectedProviderType: TorqueProvider.Instance.providerType,
       web3: TorqueProvider.Instance.web3Wrapper
@@ -54,6 +54,9 @@ export class AppRouter extends Component<any, IAppRouterState> {
   public render() {
     return (
       <React.Fragment>
+        { isMainnetProd ? (
+          <div dangerouslySetInnerHTML={{__html: '<script>  window.intercomSettings = {  	app_id: "dfk4n5ut"  };</script><script>(function(){var w=window;var ic=w.Intercom;if(typeof ic==="function"){ic("reattach_activator");ic("update",w.intercomSettings);}else{var d=document;var i=function(){i.c(arguments);};i.q=[];i.c=function(args){i.q.push(args);};w.Intercom=i;var l=function(){var s=d.createElement("script");s.type="text/javascript";s.async=true;s.src="https://widget.intercom.io/widget/dfk4n5ut";var x=d.getElementsByTagName("script")[0];x.parentNode.insertBefore(s,x);};if(w.attachEvent){w.attachEvent("onload",l);}else{w.addEventListener("load",l,false);}}})();</script>'}} />
+        ) : null }
         <div className="pages-container">
           {
             siteConfig.MaintenanceMode

@@ -32,12 +32,13 @@ export class CollateralSlider extends Component<ICollateralSliderProps> {
         onChange={this.onChange}
         values={[this.props.value]}
       >
-        <Rail>{(railObject: RailObject) => <CollateralSliderRail getRailProps={railObject.getRailProps} />}</Rail>
+        <Rail>{(railObject: RailObject) => <CollateralSliderRail readonly={this.props.readonly} getRailProps={railObject.getRailProps} />}</Rail>
         <Handles>
           {(handlesObject: HandlesObject) => (
             <div className="slider-handles">
               {handlesObject.handles.map(handle => (
                 <CollateralSliderHandle
+                  readonly={this.props.readonly} 
                   key={handle.id}
                   handle={handle}
                   domain={[this.props.minValue, this.props.maxValue]}

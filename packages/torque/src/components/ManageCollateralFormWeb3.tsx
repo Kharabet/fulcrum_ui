@@ -8,7 +8,6 @@ import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
 import { ICollateralChangeEstimate } from "../domain/ICollateralChangeEstimate";
-import { ICollateralExcess } from "../domain/ICollateralExcess";
 import { IWalletDetails } from "../domain/IWalletDetails";
 import { ManageCollateralRequest } from "../domain/ManageCollateralRequest";
 import { WalletType } from "../domain/WalletType";
@@ -36,7 +35,6 @@ interface IManageCollateralFormWeb3State {
 
   collateralAmount: BigNumber;
   collateralExcess: BigNumber;
-  currentCollateral: BigNumber;
   liquidationPrice: BigNumber;
   gasAmountNeeded: BigNumber;
   collateralizedPercent: BigNumber;
@@ -61,7 +59,6 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
       gasAmountNeeded: new BigNumber(0),
       collateralAmount: new BigNumber(0),
       collateralExcess: new BigNumber(0),
-      currentCollateral: new BigNumber(0),
       collateralizedPercent: new BigNumber(0),
       balanceTooLow: false
     };
@@ -77,6 +74,7 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
           ...this.state,
           liquidationPrice: value.liquidationPrice,
           collateralAmount: value.collateralAmount,
+          collateralizedPercent: value.collateralizedPercent
         });
       });
   }
@@ -87,35 +85,69 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
       this.props.loanOrderState
     ).then(collateralState => {
       TorqueProvider.Instance.getLoanCollateralManagementGasAmount().then(gasAmountNeeded => {
-        TorqueProvider.Instance.getCollateralExcessAmount(this.props.loanOrderState).then(collateralExcessData => {
-          
+        TorqueProvider.Instance.getCollateralExcessAmount(this.props.loanOrderState).then(collateralExcess => {
+
           const collateralizedPercent = this.props.loanOrderState.collateralizedPercent
             .multipliedBy(100)
             .plus(100);
+
           const initialLevel = TorqueProvider.Instance.getInitialCollateralLevel(this.props.loanOrderState.collateralAsset);
 
-          let loanValue;
-          if (collateralizedPercent.lte(initialLevel)) {
-            collateralExcessData.collateralExcess = new BigNumber(0);
-            loanValue = 0;
-          } else {
-            loanValue = collateralExcessData.collateralExcess
-              .dividedBy(collateralExcessData.currentCollateral)
-              .multipliedBy(100).toNumber();
+          const expectedMinCollateral = this.props.loanOrderState.collateralAmount
+            .multipliedBy(initialLevel)
+            .dividedBy(collateralizedPercent);
+
+          let minCollateral;
+          let maxCollateral;
+          
+          minCollateral = this.props.loanOrderState.collateralAmount
+            .minus(collateralExcess);
+
+          if (minCollateral.lt(expectedMinCollateral)) {
+            collateralExcess = this.props.loanOrderState.collateralAmount > expectedMinCollateral ?
+              this.props.loanOrderState.collateralAmount
+                .minus(expectedMinCollateral) :
+                new BigNumber(0);
+            minCollateral = expectedMinCollateral;
           }
+
+          minCollateral = minCollateral
+            .times(10**18);
+          
+          maxCollateral = minCollateral
+            .times(collateralState.maxValue - collateralState.minValue)
+            .dividedBy(10**20);
+
+          const currentCollateral = this.props.loanOrderState.collateralAmount
+            .times(10**18);
+          
+          if (maxCollateral.lt(currentCollateral)) {
+            maxCollateral = currentCollateral;
+          }
+
+          // new_v = (new_max - new_min) / (old_max - old_min) * (v - old_min) + new_min
+          let currentCollateralNormalizedBN = new BigNumber(collateralState.maxValue - collateralState.minValue)
+            .dividedBy(maxCollateral.minus(minCollateral))
+            .times(currentCollateral.minus(minCollateral))
+            .plus(collateralState.minValue);
+
+          if (currentCollateralNormalizedBN.dividedBy(collateralState.maxValue - collateralState.minValue).lte(0.01)) {
+            currentCollateralNormalizedBN = new BigNumber(collateralState.minValue);
+          }
+
+          // console.log(currentCollateralNormalizedBN.toString());
 
           this.setState(
             {
               ...this.state,
               minValue: collateralState.minValue,
               maxValue: collateralState.maxValue,
-              assetDetails: AssetsDictionary.assets.get(this.props.loanOrderState.loanAsset) || null,
-              loanValue: loanValue,
-              selectedValue: loanValue,
+              assetDetails: AssetsDictionary.assets.get(this.props.loanOrderState.collateralAsset) || null,
+              loanValue: currentCollateralNormalizedBN.toNumber(),
+              selectedValue: currentCollateralNormalizedBN.toNumber(),
               gasAmountNeeded: gasAmountNeeded,
               collateralizedPercent: collateralizedPercent,
-              collateralExcess: collateralExcessData.collateralExcess,
-              currentCollateral: collateralExcessData.currentCollateral
+              collateralExcess: collateralExcess
             },
             () => {
               this.selectedValueUpdate.next(this.state.selectedValue);
@@ -174,32 +206,40 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
 
           <hr className="manage-collateral-form__delimiter" />
 
-          <div className="manage-collateral-form__info-liquidated-at-container">
-            <div className="manage-collateral-form__info-liquidated-at-msg">
-              This will make your loan
-            </div>
-            <div className="manage-collateral-form__info-liquidated-at-price">
-              {this.state.collateralizedPercent.toFixed(2)}% collateralized
-            </div>
-          </div>
-
           {this.state.loanValue !== this.state.selectedValue ? (
             <React.Fragment>
+              <div className="manage-collateral-form__info-liquidated-at-container">
+                <div className="manage-collateral-form__info-liquidated-at-msg">
+                  This will make your loan
+                </div>
+                <div className="manage-collateral-form__info-liquidated-at-price">
+                  {this.state.collateralizedPercent.toFixed(2)}% collateralized
+                </div>
+              </div>
               <OpsEstimatedResult
                 assetDetails={this.state.assetDetails}
                 actionTitle={`You will ${this.state.loanValue > this.state.selectedValue ? "withdraw" : "top up"}`}
-                amount={this.state.collateralAmount.dividedBy(10**18)}
+                amount={this.state.collateralAmount}
                 precision={6}
               />
               <div className={`manage-collateral-form-insufficient-balance ${!this.state.balanceTooLow ? `manage-collateral-form-insufficient-balance--hidden` : ``}`}>
                 Insufficient {this.state.assetDetails.displayName} balance!
               </div>
             </React.Fragment>
-          ) : null}
+          ) : (
+            <div className="manage-collateral-form__info-liquidated-at-container">
+              <div className="manage-collateral-form__info-liquidated-at-msg">
+                Your loan is
+              </div>
+              <div className="manage-collateral-form__info-liquidated-at-price">
+                {this.state.collateralizedPercent.toFixed(2)}% collateralized
+              </div>
+            </div>
+          )}
         </section>
         <section className="dialog-actions">
           <div className="manage-collateral-form__actions-container">
-            {this.props.walletDetails.walletType === WalletType.NonWeb3 ? (
+            {this.props.walletDetails.walletType === WalletType.NonWeb3 || this.state.loanValue === this.state.selectedValue ? (
               <button type="button" className="btn btn-size--small" onClick={this.props.onClose}>
                 Close
               </button>
@@ -219,22 +259,24 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
 
   private rxGetEstimate = (selectedValue: number): Observable<ICollateralChangeEstimate> => {
 
+    // console.log(this.state.loanValue, selectedValue);
+
     let collateralAmount = new BigNumber(0);
     if (this.state.loanValue !== selectedValue && this.props.loanOrderState.loanData) {
-
-      if (this.state.loanValue !== selectedValue && this.props.loanOrderState.loanData) {
-        collateralAmount = this.state.currentCollateral
-          .multipliedBy(selectedValue).dividedBy(this.state.loanValue);
-          
-        if (this.state.loanValue > selectedValue) {
-          collateralAmount = this.state.currentCollateral
-            .minus(collateralAmount);
-        } else {
-          collateralAmount = this.state.currentCollateral
-            .plus(collateralAmount);
-        }
-        // console.log(collateralAmount.toString());
+      if (selectedValue < this.state.loanValue) {
+        collateralAmount = new BigNumber(this.state.loanValue)
+          .minus(selectedValue)
+          .dividedBy(this.state.loanValue)
+          .multipliedBy(this.state.collateralExcess);
+      } else {
+        collateralAmount = new BigNumber(selectedValue)
+          .minus(this.state.loanValue)
+          .dividedBy(this.state.maxValue - this.state.loanValue)
+          .multipliedBy(this.props.loanOrderState.collateralAmount);
+          // .multipliedBy(this.state.maxValue)
+          // .dividedBy(this.state.maxValue - this.state.loanValue);
       }
+      // console.log(collateralAmount.toString(), this.state.maxValue, this.props.loanOrderState.collateralAmount.toString());
     }
 
     return new Observable<ICollateralChangeEstimate>(observer => {
@@ -242,7 +284,7 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
         this.props.walletDetails,
         this.props.loanOrderState,
         collateralAmount,
-        this.state.loanValue > selectedValue
+        selectedValue < this.state.loanValue
       ).then(value => {
         observer.next(value);
       });
@@ -260,7 +302,8 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
   public onSubmitClick = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (!this.props.didSubmit) {
+    // console.log(this.state.collateralAmount.toString(), new BigNumber(this.state.loanValue).dividedBy(10**18).toString(), new BigNumber(this.state.selectedValue).dividedBy(10**18).toString());
+    if (!this.props.didSubmit && this.state.collateralAmount.gt(0)) {
       this.props.toggleDidSubmit(true);
 
       if (this.state.loanValue < this.state.selectedValue) {
