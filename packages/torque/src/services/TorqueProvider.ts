@@ -188,6 +188,8 @@ export class TorqueProvider {
         canWrite = false; // revert back to read-only
         networkId = await this.web3Wrapper.getNetworkIdAsync();
         this.web3ProviderSettings = await TorqueProvider.getWeb3ProviderSettings(networkId);
+      } else {
+        this.unsupportedNetwork = false;
       }
     }
 
@@ -945,22 +947,30 @@ export class TorqueProvider {
 
           let gasAmountBN;
           try {
-            const gasAmount = await bZxContract.withdrawCollateral.estimateGasAsync(
+            const gasAmount = await bZxContract.withdrawCollateralForBorrower.estimateGasAsync(
               manageCollateralRequest.loanOrderState.loanData!.loanOrderHash,
               collateralAmountInBaseUnits,
+              account,
+              this.isETHAsset(manageCollateralRequest.loanOrderState.collateralAsset) ?
+                TorqueProvider.ZERO_ADDRESS :
+                account,
               { 
                 from: account,
                 gas: this.gasLimit
               }
             );
-            gasAmountBN = new BigNumber(gasAmount).multipliedBy(this.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
+            gasAmountBN = new BigNumber(gasAmount).multipliedBy(2).integerValue(BigNumber.ROUND_UP);
           } catch(e) {
             // console.log(e);
           }
 
-          const txHash = await bZxContract.withdrawCollateral.sendTransactionAsync(
-            manageCollateralRequest.loanOrderState.loanData!.loanOrderHash,           // loanOrderHash
-            collateralAmountInBaseUnits,                                              // depositAmount
+          const txHash = await bZxContract.withdrawCollateralForBorrower.sendTransactionAsync(
+            manageCollateralRequest.loanOrderState.loanData!.loanOrderHash,             // loanOrderHash
+            collateralAmountInBaseUnits,                                                // depositAmount
+            account,                                                                    // trader
+            this.isETHAsset(manageCollateralRequest.loanOrderState.collateralAsset) ?   // receiver
+              TorqueProvider.ZERO_ADDRESS :                                             // will receive ETH back
+              account,                                                                  // will receive ERC20 back
             { 
               from: account,
               gas: gasAmountBN ? gasAmountBN.toString() : "2000000",
@@ -1069,14 +1079,16 @@ export class TorqueProvider {
       const bZxContract = await this.contractsSource.getiBZxContract();
       if (account && bZxContract) {
         // console.log(bZxContract.address, borrowedFundsState.loanOrderHash, account);
-        result = await bZxContract.withdrawCollateral.callAsync(
+        result = (await bZxContract.withdrawCollateralForBorrower.callAsync(
           borrowedFundsState.loanOrderHash,
           TorqueProvider.MAX_UINT,
+          account,
+          account,
           { 
             from: account,
             gas: this.gasLimit
           }
-        );
+        ))[0];
         const precision = AssetsDictionary.assets.get(borrowedFundsState.collateralAsset)!.decimals || 18;
         result = result
           .dividedBy(10**precision);
