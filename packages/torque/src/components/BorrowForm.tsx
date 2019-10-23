@@ -183,29 +183,31 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
     event.preventDefault();
 
     if (this.props.onSubmit && !this.props.didSubmit && this.state.depositAmount.gt(0)) {
-      this.props.toggleDidSubmit(true);
-      
-      let assetBalance = await TorqueProvider.Instance.getAssetTokenBalanceOfUser(this.state.collateralAsset);
-      if (this.state.collateralAsset === Asset.ETH) {
-        assetBalance = assetBalance.gt(TorqueProvider.Instance.gasBufferForTxn) ? assetBalance.minus(TorqueProvider.Instance.gasBufferForTxn) : new BigNumber(0);
-      }
-      const precision = AssetsDictionary.assets.get(this.state.collateralAsset)!.decimals || 18;
-      const amountInBaseUnits = new BigNumber(this.state.depositAmount.multipliedBy(10**precision).toFixed(0, 1));
-      if (assetBalance.lt(amountInBaseUnits)) {
-        this.props.toggleDidSubmit(false);
+      if (this.props.walletType === WalletType.Web3) {
+        this.props.toggleDidSubmit(true);
+        
+        let assetBalance = await TorqueProvider.Instance.getAssetTokenBalanceOfUser(this.state.collateralAsset);
+        if (this.state.collateralAsset === Asset.ETH) {
+          assetBalance = assetBalance.gt(TorqueProvider.Instance.gasBufferForTxn) ? assetBalance.minus(TorqueProvider.Instance.gasBufferForTxn) : new BigNumber(0);
+        }
+        const precision = AssetsDictionary.assets.get(this.state.collateralAsset)!.decimals || 18;
+        const amountInBaseUnits = new BigNumber(this.state.depositAmount.multipliedBy(10**precision).toFixed(0, 1));
+        if (assetBalance.lt(amountInBaseUnits)) {
+          this.props.toggleDidSubmit(false);
 
-        this.setState({
-          ...this.state,
-          balanceTooLow: true
-        });
+          this.setState({
+            ...this.state,
+            balanceTooLow: true
+          });
 
-        return;
+          return;
 
-      } else {
-        this.setState({
-          ...this.state,
-          balanceTooLow: false
-        });
+        } else {
+          this.setState({
+            ...this.state,
+            balanceTooLow: false
+          });
+        }
       }
 
       this.props.onSubmit(

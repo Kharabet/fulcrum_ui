@@ -80,6 +80,8 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
   }
 
   public componentDidMount(): void {
+    TorqueProvider.Instance.isLoading = true;
+    
     TorqueProvider.Instance.getLoanCollateralManagementParams(
       this.props.walletDetails,
       this.props.loanOrderState
@@ -151,6 +153,8 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
             },
             () => {
               this.selectedValueUpdate.next(this.state.selectedValue);
+
+              TorqueProvider.Instance.isLoading = false;
             }
           );
         });
@@ -189,70 +193,78 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
 
     return (
       <form className="manage-collateral-form" onSubmit={this.onSubmitClick}>
-        <section className="dialog-content">
-          <CollateralSlider
-            readonly={false}
-            minValue={this.state.minValue}
-            maxValue={this.state.maxValue}
-            value={this.state.selectedValue}
-            onUpdate={this.onUpdate}
-            onChange={this.onChange}
-          />
+        {TorqueProvider.Instance.isLoading ? (
+        <div className="manage-collatera-loading">
+          Loading...
+        </div>
+        ) : (
+          <React.Fragment>
+            <section className="dialog-content">
+            <CollateralSlider
+              readonly={false}
+              minValue={this.state.minValue}
+              maxValue={this.state.maxValue}
+              value={this.state.selectedValue}
+              onUpdate={this.onUpdate}
+              onChange={this.onChange}
+            />
 
-          <div className="manage-collateral-form__tips">
-            <div className="manage-collateral-form__tip">Withdraw</div>
-            <div className="manage-collateral-form__tip">Top Up</div>
-          </div>
+            <div className="manage-collateral-form__tips">
+              <div className="manage-collateral-form__tip">Withdraw</div>
+              <div className="manage-collateral-form__tip">Top Up</div>
+            </div>
 
-          <hr className="manage-collateral-form__delimiter" />
+            <hr className="manage-collateral-form__delimiter" />
 
-          {this.state.loanValue !== this.state.selectedValue ? (
-            <React.Fragment>
+            {this.state.loanValue !== this.state.selectedValue ? (
+              <React.Fragment>
+                <div className="manage-collateral-form__info-liquidated-at-container">
+                  <div className="manage-collateral-form__info-liquidated-at-msg">
+                    This will make your loan
+                  </div>
+                  <div className="manage-collateral-form__info-liquidated-at-price">
+                    {this.state.collateralizedPercent.toFixed(2)}% collateralized
+                  </div>
+                </div>
+                <OpsEstimatedResult
+                  assetDetails={this.state.assetDetails}
+                  actionTitle={`You will ${this.state.loanValue > this.state.selectedValue ? "withdraw" : "top up"}`}
+                  amount={this.state.collateralAmount}
+                  precision={6}
+                />
+                <div className={`manage-collateral-form-insufficient-balance ${!this.state.balanceTooLow ? `manage-collateral-form-insufficient-balance--hidden` : ``}`}>
+                  Insufficient {this.state.assetDetails.displayName} balance!
+                </div>
+              </React.Fragment>
+            ) : (
               <div className="manage-collateral-form__info-liquidated-at-container">
                 <div className="manage-collateral-form__info-liquidated-at-msg">
-                  This will make your loan
+                  Your loan is
                 </div>
                 <div className="manage-collateral-form__info-liquidated-at-price">
                   {this.state.collateralizedPercent.toFixed(2)}% collateralized
                 </div>
               </div>
-              <OpsEstimatedResult
-                assetDetails={this.state.assetDetails}
-                actionTitle={`You will ${this.state.loanValue > this.state.selectedValue ? "withdraw" : "top up"}`}
-                amount={this.state.collateralAmount}
-                precision={6}
-              />
-              <div className={`manage-collateral-form-insufficient-balance ${!this.state.balanceTooLow ? `manage-collateral-form-insufficient-balance--hidden` : ``}`}>
-                Insufficient {this.state.assetDetails.displayName} balance!
+              )}
+            </section>
+            <section className="dialog-actions">
+              <div className="manage-collateral-form__actions-container">
+                {this.props.walletDetails.walletType === WalletType.NonWeb3 || this.state.loanValue === this.state.selectedValue ? (
+                  <button type="button" className="btn btn-size--small" onClick={this.props.onClose}>
+                    Close
+                  </button>
+                ) : (
+                  <button type="submit" className={`btn btn-size--small ${this.props.didSubmit ? `btn-disabled` : ``}`}>
+                    {this.props.didSubmit ? "Submitting..." : this.state.loanValue > this.state.selectedValue ?
+                      "Withdraw" :
+                      "Top Up"
+                    }
+                  </button>
+                )}
               </div>
-            </React.Fragment>
-          ) : (
-            <div className="manage-collateral-form__info-liquidated-at-container">
-              <div className="manage-collateral-form__info-liquidated-at-msg">
-                Your loan is
-              </div>
-              <div className="manage-collateral-form__info-liquidated-at-price">
-                {this.state.collateralizedPercent.toFixed(2)}% collateralized
-              </div>
-            </div>
-          )}
-        </section>
-        <section className="dialog-actions">
-          <div className="manage-collateral-form__actions-container">
-            {this.props.walletDetails.walletType === WalletType.NonWeb3 || this.state.loanValue === this.state.selectedValue ? (
-              <button type="button" className="btn btn-size--small" onClick={this.props.onClose}>
-                Close
-              </button>
-            ) : (
-              <button type="submit" className={`btn btn-size--small ${this.props.didSubmit ? `btn-disabled` : ``}`}>
-                {this.props.didSubmit ? "Submitting..." : this.state.loanValue > this.state.selectedValue ?
-                  "Withdraw" :
-                  "Top Up"
-                }
-              </button>
-            )}
-          </div>
-        </section>
+            </section>
+          </React.Fragment>
+        )}
       </form>
     );
   }

@@ -30,6 +30,11 @@ export class ActionViaTransferDetails extends Component<IActionViaTransferDetail
 
     const userENS = `${this.props.account.toLowerCase()}.tokenloan.eth`;
 
+    let assetAmount = this.props.assetAmount;
+    if (assetAmount.isNaN()) {
+      assetAmount = new BigNumber(0);
+    }
+
     let actionAsset: string = "";
     let actionContract1: string = "";
     let actionContract2: string = "";
@@ -63,13 +68,10 @@ export class ActionViaTransferDetails extends Component<IActionViaTransferDetail
         actionContract1 = userENS;
         actionContract2 = this.props.contractAddress;
         classes1 = "action-via-transfer-details__input-left";
-        classes2 = "action-via-transfer-details__input-center";
+        classes2 = assetAmount.gt(0) ?
+          "action-via-transfer-details__input-center" :
+          "";
         break;
-    }
-
-    let assetAmount = this.props.assetAmount;
-    if (assetAmount.isNaN()) {
-      assetAmount = new BigNumber(0);
     }
 
     return (
