@@ -197,7 +197,7 @@ export class StatsTokenGridCard extends Component<IStatsTokenGridCardProps, ISta
           </div>
           <div className="stats-grid-card__kv-container">
             <div className="stats-grid-card__kv-title">
-              <span className="">Borrow Rate (APR)</span>
+              <span className="">Fulcrum Borrow Rate (APR)</span>
             </div>
             <div className="stats-grid-card__kv-dots" />
             <div
@@ -205,6 +205,18 @@ export class StatsTokenGridCard extends Component<IStatsTokenGridCardProps, ISta
               className="stats-grid-card__kv-value"
             >
               {details.borrowInterestRate ? `${details.borrowInterestRate.toFixed(4)}%` : `-`}
+            </div>
+          </div>
+          <div className="stats-grid-card__kv-container">
+            <div className="stats-grid-card__kv-title">
+              <span className="">Torque Borrow Rate (APR)</span>
+            </div>
+            <div className="stats-grid-card__kv-dots" />
+            <div
+              title={details.torqueBorrowInterestRate ? `${details.torqueBorrowInterestRate.toFixed(18)}%` : ``}
+              className="stats-grid-card__kv-value"
+            >
+              {details.torqueBorrowInterestRate ? `${details.torqueBorrowInterestRate.toFixed(4)}%` : `-`}
             </div>
           </div>
         </div>

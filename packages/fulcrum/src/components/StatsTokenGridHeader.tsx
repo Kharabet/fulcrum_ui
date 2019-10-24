@@ -33,7 +33,8 @@ export class StatsTokenGridHeader extends Component<IStatsTokenGridHeaderProps> 
         </div>
         <div className="stats-grid-header__col-borrow-rate">
           {/*<span className="stats-grid-header__text">Avg/Next Borrow Rate (APR)</span>*/}
-          <span className="stats-grid-header__text">Borrow Rate (APR)</span>
+          <span className="stats-grid-header__text" style={{ marginBottom: `-3.2rem` }}>Borrow Rate (APR)</span>
+          <span className="stats-grid-header__text">Fulcrum / Torque</span>
         </div>
         {/*<div className="stats-grid-header__col-next-rate">
           <span className="stats-grid-header__text">Next Rate (variable)</span>

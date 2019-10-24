@@ -103,15 +103,15 @@ export class StatsTokenGridRow extends Component<IStatsTokenGridRowProps, IStats
 
     const details = this.state.reserveDetails;
 
-    /*let customBorrowTitle;
+    let customBorrowTitle;
     let customBorrowText;
-    if (details.avgBorrowInterestRate && details.borrowInterestRate) {
-      customBorrowTitle = `${details.avgBorrowInterestRate.toFixed(18)}% / ${details.borrowInterestRate.toFixed(18)}%`;
-      customBorrowText = `${details.avgBorrowInterestRate.toFixed(2)}% / ${details.borrowInterestRate.toFixed(2)}%`;
+    if (details.borrowInterestRate && details.torqueBorrowInterestRate) {
+      customBorrowTitle = `${details.borrowInterestRate.toFixed(18)}% / ${details.torqueBorrowInterestRate.toFixed(18)}%`;
+      customBorrowText = `${details.borrowInterestRate.toFixed(2)}% / ${details.torqueBorrowInterestRate.toFixed(2)}%`;
     } else {
       customBorrowTitle = ``;
       customBorrowText = `-`;
-    }*/
+    }
 
 
     return (
@@ -139,8 +139,8 @@ export class StatsTokenGridRow extends Component<IStatsTokenGridRowProps, IStats
         <div title={details.liquidity ? `${details.liquidity.toFixed(this.state.decimals)}` : ``} className="stats-grid-row__col-liquidity">{details.liquidity ? `${this.numberWithCommas(details.liquidity.toFixed(4))}` : `-`}</div>
         <div title={details.liquidityReserved ? `${details.liquidityReserved.toFixed(this.state.decimals)}` : ``} className="stats-grid-row__col-liquidity-reserved">{details.liquidityReserved ? `${this.numberWithCommas(details.liquidityReserved.toFixed(4))}` : `-`}</div>
         <div title={details.supplyInterestRate ? `${details.supplyInterestRate.toFixed(18)}%` : ``} className="stats-grid-row__col-supply-rate">{details.supplyInterestRate ? `${details.supplyInterestRate.toFixed(4)}%` : `-`}</div>
-        {/*<div title={customBorrowTitle} className="stats-grid-row__col-borrow-rate">{customBorrowText}</div>*/}
-        <div title={details.borrowInterestRate ? `${details.borrowInterestRate.toFixed(18)}%` : ``} className="stats-grid-row__col-next-rate">{details.borrowInterestRate ? `${details.borrowInterestRate.toFixed(4)}%` : `-`}</div>
+        <div title={customBorrowTitle} className="stats-grid-row__col-borrow-rate">{customBorrowText}</div>
+        {/*<div title={details.borrowInterestRate ? `${details.borrowInterestRate.toFixed(18)}%` : ``} className="stats-grid-row__col-borrow-rate">{details.borrowInterestRate ? `${details.borrowInterestRate.toFixed(4)}%` : `-`}</div>*/}
       </div>
     );
   }

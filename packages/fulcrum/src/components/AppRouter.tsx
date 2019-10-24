@@ -1,9 +1,9 @@
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import React, { Component } from "react";
 import ReactGA from "react-ga";
+import Intercom from "react-intercom";
 import Modal from "react-modal";
 import { HashRouter, Redirect, Route, Switch } from "react-router-dom";
-import Intercom from "react-intercom";
 import { ProviderType } from "../domain/ProviderType";
 import { LandingPage } from "../pages/LandingPage";
 import { LendPage } from "../pages/LendPage";

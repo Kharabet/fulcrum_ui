@@ -493,6 +493,7 @@ export class FulcrumProvider {
         let totalAssetBorrow: BigNumber | null;
         let supplyInterestRate: BigNumber | null;
         let borrowInterestRate: BigNumber | null;
+        let torqueBorrowInterestRate: BigNumber | null;
         // let avgBorrowInterestRate: BigNumber | null;
         let lockedAssets: BigNumber | null = new BigNumber(0);
 
@@ -506,7 +507,8 @@ export class FulcrumProvider {
           (totalAssetBorrow = await assetContract.totalAssetBorrow.callAsync()),
           (supplyInterestRate = await assetContract.supplyInterestRate.callAsync()),
           // avgBorrowInterestRate = await assetContract.avgBorrowInterestRate.callAsync()),
-          (borrowInterestRate = await assetContract.avgBorrowInterestRate.callAsync()) // borrowInterestRate
+          (borrowInterestRate = await assetContract.avgBorrowInterestRate.callAsync()), // borrowInterestRate
+          (torqueBorrowInterestRate = await assetContract.nextBorrowInterestRateWithOption.callAsync(new BigNumber(0), true)), // nextBorrowInterestRateWithOption
         ]);
 
         const assetErc20Address = this.getErc20AddressOfAsset(asset);
@@ -525,6 +527,7 @@ export class FulcrumProvider {
           totalAssetBorrow.dividedBy(10 ** 18),
           supplyInterestRate.dividedBy(10 ** 18),
           borrowInterestRate.dividedBy(10 ** 18),
+          torqueBorrowInterestRate.dividedBy(10 ** 18),
           // avgBorrowInterestRate.dividedBy(10 ** 18),
           new BigNumber(0),
           lockedAssets.dividedBy(10 ** 18)
