@@ -51,7 +51,6 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
 
   private derivedUpdate = async () => {
     const assetDetails = AssetsDictionary.assets.get(this.props.item.loanAsset) || null;
-    // const interestRate = await TorqueProvider.Instance.getAssetInterestRate(this.props.item.loanAsset);
     this.setState({ ...this.state, assetDetails: assetDetails, interestRate: this.props.item.interestRate });
   };
 
