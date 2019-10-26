@@ -3,6 +3,7 @@ import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { BorrowRequestAwaiting } from "../domain/BorrowRequestAwaiting";
 import { IWalletDetails } from "../domain/IWalletDetails";
+import { TorqueProvider } from "../services/TorqueProvider";
 
 export interface IBorrowedFundsAwaitingListItemProps {
   walletDetails: IWalletDetails;
@@ -11,13 +12,17 @@ export interface IBorrowedFundsAwaitingListItemProps {
 
 interface IBorrowedFundsAwaitingListItemState {
   assetDetails: AssetDetails | null;
+  etherscanURL: string;
 }
 
 export class BorrowedFundsAwaitingListItem extends Component<IBorrowedFundsAwaitingListItemProps, IBorrowedFundsAwaitingListItemState> {
   constructor(props: IBorrowedFundsAwaitingListItemProps) {
     super(props);
 
-    this.state = { assetDetails: null };
+    this.state = {
+      assetDetails: null,
+      etherscanURL: ""
+    };
   }
 
   public componentDidMount(): void {
@@ -36,7 +41,16 @@ export class BorrowedFundsAwaitingListItem extends Component<IBorrowedFundsAwait
 
   private derivedUpdate = async () => {
     const assetDetails = AssetsDictionary.assets.get(this.props.itemAwaiting.borrowAsset) || null;
-    this.setState({ ...this.state, assetDetails: assetDetails });
+
+    const etherscanURL = TorqueProvider.Instance.web3ProviderSettings
+      ? TorqueProvider.Instance.web3ProviderSettings.etherscanURL
+      : "";
+
+    this.setState({
+      ...this.state,
+      assetDetails: assetDetails,
+      etherscanURL
+    });
   };
 
   public render() {
@@ -67,7 +81,16 @@ export class BorrowedFundsAwaitingListItem extends Component<IBorrowedFundsAwait
           </div>
         </div>
         <div className="borrowed-funds-list-item__in-progress-container">
-          <div className="borrowed-funds-list-item__in-progress-title">Pending</div>
+          <div className="borrowed-funds-list-item__in-progress-title" style={{ marginTop: `2rem` }}>Transaction Pending...</div>
+          <a
+            className="borrowed-funds-list-item__in-progress-title"
+            style={{ fontSize: `1.25rem`, cursor: `pointer`, textDecoration: `none` }}
+            href={`${this.state.etherscanURL}tx/${this.props.itemAwaiting.txHash}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Click to view
+          </a>
           <div className="borrowed-funds-list-item__in-progress-animation">{/**/}</div>
         </div>
       </div>

@@ -290,20 +290,18 @@ export class TorqueProvider {
     return new BigNumber(1500000);
   };
 
-  public getInitialCollateralLevel = (asset: Asset): number => {
-    let initialLevel;
+  public getMarginPremiumAmount = (asset: Asset): number => {
+    let marginPremium;
     switch (asset) {
-      case Asset.ETH:
-      case Asset.WETH:
       case Asset.DAI:
       case Asset.USDC:
-        initialLevel = 150;
+        marginPremium = 0;
         break;
       default:
-        initialLevel = 250;
+        marginPremium = 100;
     }
 
-    return initialLevel;
+    return marginPremium;
   }
 
   public getBorrowDepositEstimate = async (
@@ -314,7 +312,7 @@ export class TorqueProvider {
   ): Promise<IBorrowEstimate> => {
     const result = { depositAmount: new BigNumber(0), gasEstimate: new BigNumber(0) };
     
-    const initialLevel = this.getInitialCollateralLevel(collateralAsset);
+    const marginPremium = this.getMarginPremiumAmount(collateralAsset);
 
     if (this.contractsSource && this.web3Wrapper) {
       const iTokenContract = await this.contractsSource.getiTokenContract(borrowAsset);
@@ -329,8 +327,8 @@ export class TorqueProvider {
           collateralAssetErc20Address
         );
         result.depositAmount = borrowEstimate
-          .multipliedBy(initialLevel)
-          .dividedBy(125)
+          .multipliedBy(150 + marginPremium)
+          .dividedBy(125 + marginPremium)
           .dividedBy(10**collateralPrecision);
         
         /*result.gasEstimate = await this.web3Wrapper.estimateGasAsync({
@@ -466,7 +464,7 @@ export class TorqueProvider {
               new BigNumber(7884000), // approximately 3 months
               depositAmountInBaseUnits,
               account,
-              TorqueProvider.ZERO_ADDRESS,
+              collateralAssetErc20Address,
               "0x",
               { 
                 from: account,

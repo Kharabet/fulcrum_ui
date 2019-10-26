@@ -88,75 +88,96 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
     ).then(collateralState => {
       TorqueProvider.Instance.getLoanCollateralManagementGasAmount().then(gasAmountNeeded => {
         TorqueProvider.Instance.getCollateralExcessAmount(this.props.loanOrderState).then(collateralExcess => {
+          TorqueProvider.Instance.getAssetTokenBalanceOfUser(this.props.loanOrderState.collateralAsset).then(assetBalance => {
 
-          const collateralizedPercent = this.props.loanOrderState.collateralizedPercent
-            .multipliedBy(100)
-            .plus(100);
+            const collateralizedPercent = this.props.loanOrderState.collateralizedPercent
+              .multipliedBy(100)
+              .plus(100);
 
-          const initialLevel = TorqueProvider.Instance.getInitialCollateralLevel(this.props.loanOrderState.collateralAsset);
+            const marginPremium = TorqueProvider.Instance.getMarginPremiumAmount(this.props.loanOrderState.collateralAsset);
 
-          const expectedMinCollateral = this.props.loanOrderState.collateralAmount
-            .multipliedBy(initialLevel)
-            .dividedBy(collateralizedPercent);
+            const expectedMinCollateral = this.props.loanOrderState.collateralAmount
+              .multipliedBy(150 + marginPremium)
+              .dividedBy(collateralizedPercent);
 
-          let minCollateral;
-          let maxCollateral;
-          
-          minCollateral = this.props.loanOrderState.collateralAmount
-            .minus(collateralExcess);
+            let minCollateral;
+            let maxCollateral;
+            
+            minCollateral = this.props.loanOrderState.collateralAmount
+              .minus(collateralExcess);
 
-          if (minCollateral.lt(expectedMinCollateral)) {
-            collateralExcess = this.props.loanOrderState.collateralAmount > expectedMinCollateral ?
-              this.props.loanOrderState.collateralAmount
-                .minus(expectedMinCollateral) :
-                new BigNumber(0);
-            minCollateral = expectedMinCollateral;
-          }
-
-          minCollateral = minCollateral
-            .times(10**18);
-          
-          maxCollateral = minCollateral
-            .times(collateralState.maxValue - collateralState.minValue)
-            .dividedBy(10**20);
-
-          const currentCollateral = this.props.loanOrderState.collateralAmount
-            .times(10**18);
-          
-          if (maxCollateral.lt(currentCollateral)) {
-            maxCollateral = currentCollateral;
-          }
-
-          // new_v = (new_max - new_min) / (old_max - old_min) * (v - old_min) + new_min
-          let currentCollateralNormalizedBN = new BigNumber(collateralState.maxValue - collateralState.minValue)
-            .dividedBy(maxCollateral.minus(minCollateral))
-            .times(currentCollateral.minus(minCollateral))
-            .plus(collateralState.minValue);
-
-          if (currentCollateralNormalizedBN.dividedBy(collateralState.maxValue - collateralState.minValue).lte(0.01)) {
-            currentCollateralNormalizedBN = new BigNumber(collateralState.minValue);
-          }
-
-          // console.log(currentCollateralNormalizedBN.toString());
-
-          this.setState(
-            {
-              ...this.state,
-              minValue: collateralState.minValue,
-              maxValue: collateralState.maxValue,
-              assetDetails: AssetsDictionary.assets.get(this.props.loanOrderState.collateralAsset) || null,
-              loanValue: currentCollateralNormalizedBN.toNumber(),
-              selectedValue: currentCollateralNormalizedBN.toNumber(),
-              gasAmountNeeded: gasAmountNeeded,
-              collateralizedPercent: collateralizedPercent,
-              collateralExcess: collateralExcess
-            },
-            () => {
-              this.selectedValueUpdate.next(this.state.selectedValue);
-
-              TorqueProvider.Instance.isLoading = false;
+            if (minCollateral.lt(expectedMinCollateral)) {
+              collateralExcess = this.props.loanOrderState.collateralAmount > expectedMinCollateral ?
+                this.props.loanOrderState.collateralAmount
+                  .minus(expectedMinCollateral) :
+                  new BigNumber(0);
+              minCollateral = expectedMinCollateral;
             }
-          );
+
+            minCollateral = minCollateral
+              .times(10**18);
+            
+            maxCollateral = minCollateral
+              .times(collateralState.maxValue - collateralState.minValue)
+              .dividedBy(10**20);
+
+            const currentCollateral = this.props.loanOrderState.collateralAmount
+              .times(10**18);
+            
+            if (maxCollateral.lt(currentCollateral)) {
+              maxCollateral = currentCollateral;
+            }
+/*
+            // check balance
+            if (this.props.loanOrderState.collateralAsset === Asset.ETH) {
+              assetBalance = assetBalance.gt(TorqueProvider.Instance.gasBufferForTxn) ? assetBalance.minus(TorqueProvider.Instance.gasBufferForTxn) : new BigNumber(0);
+            }
+            const precision = AssetsDictionary.assets.get(this.props.loanOrderState.collateralAsset)!.decimals || 18;
+            const amountInBaseUnits = new BigNumber(this.state.collateralAmount.multipliedBy(10**precision).toFixed(0, 1));
+            if (assetBalance.lt(amountInBaseUnits)) {
+              this.props.toggleDidSubmit(false);
+    
+              this.setState({
+                ...this.state,
+                balanceTooLow: true
+              });
+    
+              return;
+    
+            }
+            */
+
+            // new_v = (new_max - new_min) / (old_max - old_min) * (v - old_min) + new_min
+            let currentCollateralNormalizedBN = new BigNumber(collateralState.maxValue - collateralState.minValue)
+              .dividedBy(maxCollateral.minus(minCollateral))
+              .times(currentCollateral.minus(minCollateral))
+              .plus(collateralState.minValue);
+
+            if (currentCollateralNormalizedBN.dividedBy(collateralState.maxValue - collateralState.minValue).lte(0.01)) {
+              currentCollateralNormalizedBN = new BigNumber(collateralState.minValue);
+            }
+
+            // console.log(currentCollateralNormalizedBN.toString());
+
+            this.setState(
+              {
+                ...this.state,
+                minValue: collateralState.minValue,
+                maxValue: collateralState.maxValue,
+                assetDetails: AssetsDictionary.assets.get(this.props.loanOrderState.collateralAsset) || null,
+                loanValue: currentCollateralNormalizedBN.toNumber(),
+                selectedValue: currentCollateralNormalizedBN.toNumber(),
+                gasAmountNeeded: gasAmountNeeded,
+                collateralizedPercent: collateralizedPercent,
+                collateralExcess: collateralExcess
+              },
+              () => {
+                this.selectedValueUpdate.next(this.state.selectedValue);
+
+                TorqueProvider.Instance.isLoading = false;
+              }
+            );
+          });
         });
       });
     });
