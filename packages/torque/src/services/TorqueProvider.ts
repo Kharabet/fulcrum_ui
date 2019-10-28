@@ -290,8 +290,8 @@ export class TorqueProvider {
     return new BigNumber(1500000);
   };
 
-  public getMarginPremiumAmount = (asset: Asset): number => {
-    let marginPremium;
+  /*public getMarginPremiumAmount = (asset: Asset): number => {
+    let marginPremium = 0;
     switch (asset) {
       case Asset.DAI:
       case Asset.USDC:
@@ -302,7 +302,7 @@ export class TorqueProvider {
     }
 
     return marginPremium;
-  }
+  }*/
 
   public getBorrowDepositEstimate = async (
     walletType: WalletType,
@@ -312,7 +312,7 @@ export class TorqueProvider {
   ): Promise<IBorrowEstimate> => {
     const result = { depositAmount: new BigNumber(0), gasEstimate: new BigNumber(0) };
     
-    const marginPremium = this.getMarginPremiumAmount(collateralAsset);
+    // const marginPremium = this.getMarginPremiumAmount(collateralAsset);
 
     if (this.contractsSource && this.web3Wrapper) {
       const iTokenContract = await this.contractsSource.getiTokenContract(borrowAsset);
@@ -322,13 +322,13 @@ export class TorqueProvider {
         const collateralPrecision = AssetsDictionary.assets.get(collateralAsset)!.decimals || 18;
         const borrowEstimate = await iTokenContract.getDepositAmountForBorrow.callAsync(
           amount.multipliedBy(10**loanPrecision),
-          new BigNumber(4 * 10**18),
+          new BigNumber(2 * 10**18),
           new BigNumber(7884000), // approximately 3 months
           collateralAssetErc20Address
         );
         result.depositAmount = borrowEstimate
-          .multipliedBy(150 + marginPremium)
-          .dividedBy(125 + marginPremium)
+          // .multipliedBy(150 + marginPremium)
+          // .dividedBy(125 + marginPremium)
           .dividedBy(10**collateralPrecision);
         
         /*result.gasEstimate = await this.web3Wrapper.estimateGasAsync({
@@ -407,7 +407,7 @@ export class TorqueProvider {
           try {
             const gasAmount = await iTokenContract.borrowTokenFromDeposit.estimateGasAsync(
               borrowAmountInBaseUnits,
-              new BigNumber(4 * 10**18),
+              new BigNumber(2 * 10**18),
               new BigNumber(7884000), // approximately 3 months
               new BigNumber(0),
               account,
@@ -426,7 +426,7 @@ export class TorqueProvider {
 
           const txHash = await iTokenContract.borrowTokenFromDeposit.sendTransactionAsync(
             borrowAmountInBaseUnits,      // borrowAmount
-            new BigNumber(4 * 10**18),    // leverageAmount
+            new BigNumber(2 * 10**18),    // leverageAmount
             new BigNumber(7884000),       // initialLoanDuration (approximately 3 months)
             new BigNumber(0),             // collateralTokenSent
             account,                      // borrower
@@ -460,7 +460,7 @@ export class TorqueProvider {
           try {
             const gasAmount = await iTokenContract.borrowTokenFromDeposit.estimateGasAsync(
               borrowAmountInBaseUnits,
-              new BigNumber(4 * 10**18),
+              new BigNumber(2 * 10**18),
               new BigNumber(7884000), // approximately 3 months
               depositAmountInBaseUnits,
               account,
@@ -478,7 +478,7 @@ export class TorqueProvider {
 
           const txHash = await iTokenContract.borrowTokenFromDeposit.sendTransactionAsync(
             borrowAmountInBaseUnits,      // borrowAmount
-            new BigNumber(4 * 10**18),    // leverageAmount
+            new BigNumber(2 * 10**18),    // leverageAmount
             new BigNumber(7884000),       // initialLoanDuration (approximately 3 months)
             depositAmountInBaseUnits,     // collateralTokenSent
             account,                      // borrower

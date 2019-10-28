@@ -94,11 +94,12 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
               .multipliedBy(100)
               .plus(100);
 
-            const marginPremium = TorqueProvider.Instance.getMarginPremiumAmount(this.props.loanOrderState.collateralAsset);
+            // const marginPremium = TorqueProvider.Instance.getMarginPremiumAmount(this.props.loanOrderState.collateralAsset);
 
-            const expectedMinCollateral = this.props.loanOrderState.collateralAmount
-              .multipliedBy(150 + marginPremium)
-              .dividedBy(collateralizedPercent);
+            /*const expectedMinCollateral = this.props.loanOrderState.collateralAmount
+              //.multipliedBy(150 + marginPremium)
+              .multipliedBy(150)
+              .dividedBy(collateralizedPercent);*/
 
             let minCollateral;
             let maxCollateral;
@@ -106,13 +107,13 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
             minCollateral = this.props.loanOrderState.collateralAmount
               .minus(collateralExcess);
 
-            if (minCollateral.lt(expectedMinCollateral)) {
+            /*if (minCollateral.lt(expectedMinCollateral)) {
               collateralExcess = this.props.loanOrderState.collateralAmount > expectedMinCollateral ?
                 this.props.loanOrderState.collateralAmount
                   .minus(expectedMinCollateral) :
                   new BigNumber(0);
               minCollateral = expectedMinCollateral;
-            }
+            }*/
 
             minCollateral = minCollateral
               .times(10**18);
