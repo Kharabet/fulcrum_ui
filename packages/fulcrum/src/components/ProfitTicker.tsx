@@ -20,8 +20,10 @@ export class ProfitTicker extends Component<IProfitTickerProps> {
     const diff = this.props.secondDiff / (1000 / ms);
     let value = this.props.profit ? this.props.profit.toNumber() : 0;
     setInterval(() => {
-      value = value + diff;
-      this.container.current.innerHTML = "$" + value.toFixed(8);
+      if (this.container.current) {
+        value = value + diff;
+        this.container.current.innerHTML = "$" + value.toFixed(8);
+      }
     }, ms);
   }
 
