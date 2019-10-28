@@ -797,7 +797,7 @@ export class TorqueProvider {
 
   public getLoanRepayEstimate = async (walletDetails: IWalletDetails, borrowedFundsState: IBorrowedFundsState, repayPercent: number): Promise<IRepayEstimate> => {
     return (walletDetails.walletType === WalletType.NonWeb3)
-      ? { repayAmount: new BigNumber(0) }
+      ? { repayAmount: borrowedFundsState.amountOwed }
       : { repayAmount: borrowedFundsState.amountOwed.multipliedBy(repayPercent).dividedBy(100) };
   };
 

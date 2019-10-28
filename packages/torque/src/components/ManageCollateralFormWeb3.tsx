@@ -32,6 +32,7 @@ interface IManageCollateralFormWeb3State {
   maxValue: number;
   loanValue: number;
   selectedValue: number;
+  assetBalanceValue: number;
 
   collateralAmount: BigNumber;
   collateralExcess: BigNumber;
@@ -55,6 +56,7 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
       assetDetails: null,
       selectedValue: 0,
       loanValue: 0,
+      assetBalanceValue: 0,
       liquidationPrice: new BigNumber(0),
       gasAmountNeeded: new BigNumber(0),
       collateralAmount: new BigNumber(0),
@@ -128,25 +130,6 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
             if (maxCollateral.lt(currentCollateral)) {
               maxCollateral = currentCollateral;
             }
-/*
-            // check balance
-            if (this.props.loanOrderState.collateralAsset === Asset.ETH) {
-              assetBalance = assetBalance.gt(TorqueProvider.Instance.gasBufferForTxn) ? assetBalance.minus(TorqueProvider.Instance.gasBufferForTxn) : new BigNumber(0);
-            }
-            const precision = AssetsDictionary.assets.get(this.props.loanOrderState.collateralAsset)!.decimals || 18;
-            const amountInBaseUnits = new BigNumber(this.state.collateralAmount.multipliedBy(10**precision).toFixed(0, 1));
-            if (assetBalance.lt(amountInBaseUnits)) {
-              this.props.toggleDidSubmit(false);
-    
-              this.setState({
-                ...this.state,
-                balanceTooLow: true
-              });
-    
-              return;
-    
-            }
-            */
 
             // new_v = (new_max - new_min) / (old_max - old_min) * (v - old_min) + new_min
             let currentCollateralNormalizedBN = new BigNumber(collateralState.maxValue - collateralState.minValue)
@@ -160,6 +143,19 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
 
             // console.log(currentCollateralNormalizedBN.toString());
 
+            // check balance
+            if (this.props.loanOrderState.collateralAsset === Asset.ETH) {
+              assetBalance = assetBalance.gt(TorqueProvider.Instance.gasBufferForTxn) ? assetBalance.minus(TorqueProvider.Instance.gasBufferForTxn) : new BigNumber(0);
+            }
+            let assetBalanceNormalizedBN = new BigNumber(collateralState.maxValue - collateralState.minValue)
+              .dividedBy(maxCollateral.minus(minCollateral))
+              .times(assetBalance.minus(minCollateral))
+              .plus(collateralState.minValue);
+
+            if (assetBalanceNormalizedBN.dividedBy(collateralState.maxValue - collateralState.minValue).lte(0.01)) {
+              assetBalanceNormalizedBN = new BigNumber(collateralState.minValue);
+            }
+
             this.setState(
               {
                 ...this.state,
@@ -170,7 +166,8 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
                 selectedValue: currentCollateralNormalizedBN.toNumber(),
                 gasAmountNeeded: gasAmountNeeded,
                 collateralizedPercent: collateralizedPercent,
-                collateralExcess: collateralExcess
+                collateralExcess: collateralExcess,
+                assetBalanceValue: assetBalanceNormalizedBN.toNumber()
               },
               () => {
                 this.selectedValueUpdate.next(this.state.selectedValue);
