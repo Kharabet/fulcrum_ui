@@ -5,6 +5,7 @@ import Intercom from "react-intercom";
 import { HashRouter, Redirect, Route, Switch } from "react-router-dom";
 import configProviders from "../config/providers.json";
 import { ProviderType } from "../domain/ProviderType";
+import { WalletType } from "../domain/WalletType";
 import { BorrowPage } from "../pages/BorrowPage";
 import { DashboardPage } from "../pages/DashboardPage";
 import { LandingPage } from "../pages/LandingPage";
@@ -110,32 +111,49 @@ export class AppRouter extends Component<any, IAppRouterState> {
   };
 
   private onProviderTypeSelect = async (providerType: ProviderType) => {
-    if (providerType !== TorqueProvider.Instance.providerType ||
-      providerType !== ProviderType.None && TorqueProvider.Instance.accounts.length === 0 || !TorqueProvider.Instance.accounts[0]) {
-      TorqueProvider.Instance.isLoading = true;
 
-      await TorqueProvider.Instance.eventEmitter.emit(TorqueProviderEvents.ProviderIsChanging);
+    if (providerType === TorqueProvider.Instance.providerType && TorqueProvider.Instance.accounts.length !== 0) {
+      const accountAddress = TorqueProvider.Instance.accounts[0];
 
-      this.setState({
-        ...this.state,
-        isLoading: true,
-//        isProviderMenuModalOpen: false
-      }, async () => {
-        await TorqueProvider.Instance.setWeb3Provider(providerType);
+      const walletType = TorqueProvider.Instance.providerType !== ProviderType.None ?
+        WalletType.Web3 :
+        WalletType.NonWeb3;
 
-        TorqueProvider.Instance.isLoading = false;
-
-        await TorqueProvider.Instance.eventEmitter.emit(
-          TorqueProviderEvents.ProviderChanged,
-          new ProviderChangedEvent(TorqueProvider.Instance.providerType, TorqueProvider.Instance.web3Wrapper)
+      if (TorqueProvider.Instance.destinationAbbr === "b") {
+        NavService.Instance.History.replace(
+          NavService.Instance.getBorrowAddress(walletType)
         );
-      });
-    } else {
-      this.setState({
-        ...this.state,
-//        isProviderMenuModalOpen: false
-      });
+      } if (TorqueProvider.Instance.destinationAbbr === "t") {
+        if (accountAddress) {
+          NavService.Instance.History.replace(
+            NavService.Instance.getDashboardAddress(walletType, accountAddress)
+          );
+        }
+      } else {
+        // do nothing
+      }
+
+      return;
     }
+    
+    TorqueProvider.Instance.isLoading = true;
+
+    await TorqueProvider.Instance.eventEmitter.emit(TorqueProviderEvents.ProviderIsChanging);
+
+    this.setState({
+      ...this.state,
+      isLoading: true,
+//        isProviderMenuModalOpen: false
+    }, async () => {
+      await TorqueProvider.Instance.setWeb3Provider(providerType);
+
+      TorqueProvider.Instance.isLoading = false;
+
+      await TorqueProvider.Instance.eventEmitter.emit(
+        TorqueProviderEvents.ProviderChanged,
+        new ProviderChangedEvent(TorqueProvider.Instance.providerType, TorqueProvider.Instance.web3Wrapper)
+      );
+    });
   };
 
   // public onRequestClose = () => {

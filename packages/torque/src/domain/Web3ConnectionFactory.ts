@@ -15,6 +15,8 @@ import Fortmatic from "fortmatic";
 // @ts-ignore
 import Squarelink from "squarelink";
 
+import Torus from "@toruslabs/torus-embed";
+
 import { ProviderType } from "./ProviderType";
 
 import { MetamaskSubprovider, SignerSubprovider, Web3ProviderEngine } from "@0x/subproviders";
@@ -27,9 +29,13 @@ const ethNetwork = process.env.REACT_APP_ETH_NETWORK;
 
 export class Web3ConnectionFactory {
   public static alchemyProvider: AlchemySubprovider | null;
+  public static metamaskProvider: any | null;
   public static fortmaticProvider: Fortmatic | null;
   public static bitski: Bitski | null;
+  public static torus: Torus | null;
   public static networkId: number;
+
+  private static publicStoreUpdate: any | null;
 
   public static async getWeb3Provider(providerType: ProviderType | null, eventEmitter: EventEmitter): Promise<[Web3Wrapper | null, Web3ProviderEngine | null, boolean, number]> {
     let canWrite = false;
@@ -46,6 +52,7 @@ export class Web3ConnectionFactory {
         }
         case ProviderType.MetaMask: {
           subProvider = await Web3ConnectionFactory.getProviderMetaMask();
+          Web3ConnectionFactory.metamaskProvider = subProvider ? subProvider : null;
           break;
         }
         case ProviderType.Fortmatic: {
@@ -63,6 +70,10 @@ export class Web3ConnectionFactory {
         }
         case ProviderType.Squarelink: {
           subProvider = await Web3ConnectionFactory.getProviderSquarelink();
+          break;
+        }
+        case ProviderType.Torus: {
+          subProvider = await Web3ConnectionFactory.getProviderTorus();
           break;
         }
       }
@@ -149,16 +160,18 @@ export class Web3ConnectionFactory {
     if (subProvider && providerType === ProviderType.MetaMask) {
       // TODO: How do we detect network or account change in Gnosis Safe and EQL Wallet?
       if (!((subProvider.isSafe && subProvider.currentSafe) || subProvider.isEQLWallet)) {
-        // @ts-ignore
-        subProvider.publicConfigStore.on("update", async result => {
-          // console.log(subProvider.publicConfigStore._state);
+        
+        Web3ConnectionFactory.metamaskProvider = subProvider;
+
+        Web3ConnectionFactory.publicStoreUpdate = async (result: any) => {
+          // console.log(Web3ConnectionFactory.metamaskProvider.publicConfigStore._state);
 
           let networkIdInt;
-          if (subProvider.isSafe && subProvider.currentSafe) {
+          if (Web3ConnectionFactory.metamaskProvider.isSafe && Web3ConnectionFactory.metamaskProvider.currentSafe) {
             networkIdInt = 1;
           } else {
-            // console.log(subProvider.publicConfigStore._state);
-            networkIdInt = parseInt(subProvider.publicConfigStore._state.networkVersion, 10);
+            // console.log(Web3ConnectionFactory.metamaskProvider.publicConfigStore._state);
+            networkIdInt = parseInt(Web3ConnectionFactory.metamaskProvider.publicConfigStore._state.networkVersion, 10);
           }
 
           if (TorqueProvider.Instance.providerType === ProviderType.MetaMask &&
@@ -198,7 +211,10 @@ export class Web3ConnectionFactory {
 
             return;
           }
-        });
+        }
+        
+        // @ts-ignore
+        Web3ConnectionFactory.metamaskProvider.publicConfigStore.on("update", Web3ConnectionFactory.publicStoreUpdate);
       }
 
       if (!((subProvider.isSafe && subProvider.currentSafe) || subProvider.isEQLWallet)) {
@@ -215,6 +231,8 @@ export class Web3ConnectionFactory {
   }
 
   private static async getProviderMetaMask(): Promise<any | null> {
+    await this.cleanupProviders();
+    
     // @ts-ignore
     if (window.ethereum) {
       // @ts-ignore
@@ -238,6 +256,8 @@ export class Web3ConnectionFactory {
   }
 
   private static async getProviderBitski(): Promise<any> {
+    await this.cleanupProviders();
+    
     if (Web3ConnectionFactory.bitski) {
       if (Web3ConnectionFactory.bitski.authStatus === AuthenticationStatus.NotConnected) {
         await Web3ConnectionFactory.bitski.signIn();
@@ -250,6 +270,8 @@ export class Web3ConnectionFactory {
   }
 
   private static async getProviderFortmatic(): Promise<any> {
+    await this.cleanupProviders();
+    
     if (Web3ConnectionFactory.fortmaticProvider) {
       // console.log(Web3ConnectionFactory.fortmaticProvider, Web3ConnectionFactory.fortmaticProvider.user);
       if (!Web3ConnectionFactory.fortmaticProvider.isLoggedIn) {
@@ -266,6 +288,8 @@ export class Web3ConnectionFactory {
   }
 
   /*private static async getProviderWalletConnect(): Promise<any> {
+    await this.cleanupProviders();
+    
     const walletConnector = await new WalletConnectProvider({
       bridge: "https://bridge.walletconnect.org"
     });
@@ -275,13 +299,51 @@ export class Web3ConnectionFactory {
   }*/
 
   private static async getProviderPortis(): Promise<any> {
+    await this.cleanupProviders();
+    
     const portis = await new Portis(configProviders.Portis_DAppId, ethNetwork || "");
     return portis.provider;
   }
 
   private static async getProviderSquarelink(): Promise<any> {
+    await this.cleanupProviders();
+    
     const sqlk = await new Squarelink(configProviders.Squarelink_ClientId, ethNetwork || undefined);
     return sqlk.getProvider();
+  }
+
+  private static async getProviderTorus(): Promise<any> {
+    await this.cleanupProviders();
+    
+    Web3ConnectionFactory.torus = new Torus({
+      buttonPosition: 'top-left' // default: bottom-left
+    });
+
+    await Web3ConnectionFactory.torus.init({
+          buildEnv: 'production',
+          enableLogging: false,
+          network: {
+            host: ethNetwork || "mainnet",
+            chainId: 1,
+            networkName: "Main Ethereum Network"
+          },
+          showTorusButton: true
+        });
+
+    // @ts-ignore
+    await Web3ConnectionFactory.torus.login(); // await torus.ethereum.enable()
+
+    return Web3ConnectionFactory.torus.provider;
+  }
+
+  private static async cleanupProviders(): Promise<any> {
+    if (Web3ConnectionFactory.torus) {
+      await Web3ConnectionFactory.torus.hideTorusButton();
+    }
+
+    if (Web3ConnectionFactory.publicStoreUpdate && Web3ConnectionFactory.metamaskProvider) {
+      Web3ConnectionFactory.metamaskProvider.publicConfigStore.off("update", Web3ConnectionFactory.publicStoreUpdate);
+    }
   }
 
 }
