@@ -6,6 +6,7 @@ import { ProviderType } from "../domain/ProviderType";
 import { WalletType } from "../domain/WalletType";
 import { Footer } from "../layout/Footer";
 import { HeaderHome } from "../layout/HeaderHome";
+import { TorqueProviderEvents } from "../services/events/TorqueProviderEvents";
 import { NavService } from "../services/NavService";
 import { TorqueProvider } from "../services/TorqueProvider";
 
@@ -20,9 +21,22 @@ export interface IWalletSelectionPageProps {
 }
 
 export class WalletSelectionPage extends PureComponent<IWalletSelectionPageProps & RouteComponentProps<IWalletSelectionPageParams>> {
-  
+  public constructor(props: any, context?: any) {
+    super(props, context);
+
+    TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
+  }
+
   public componentDidMount(): void {
     TorqueProvider.Instance.destinationAbbr = this.props.match.params.destinationAbbr;
+  }
+
+  private onProviderAvailable = () => {
+    this.forceUpdate();
+  };
+
+  public componentWillUnmount(): void {
+    TorqueProvider.Instance.eventEmitter.removeListener(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
   }
 
   public render() {

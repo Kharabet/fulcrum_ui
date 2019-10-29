@@ -84,7 +84,7 @@ export class TorqueProvider {
       });
     } else {
       try {
-        this.isLoading = true;
+        TorqueProvider.Instance.isLoading = true;
         
         // setting up readonly provider
         Web3ConnectionFactory.getWeb3Provider(null, this.eventEmitter).then((providerData) => {
@@ -99,15 +99,15 @@ export class TorqueProvider {
                 this.web3ProviderSettings = web3ProviderSettings;
                 this.contractsSource = contractsSource;
                 this.borrowRequestAwaitingStore = new BorrowRequestAwaitingStore(web3ProviderSettings.networkId, web3Wrapper);
+                TorqueProvider.Instance.isLoading = false;
                 this.eventEmitter.emit(TorqueProviderEvents.ProviderAvailable);
-                this.isLoading = false;
               });
             }
           });
         });
       } catch(e) {
         // console.log(e);
-        this.isLoading = false;
+        TorqueProvider.Instance.isLoading = false;
       }
 
     }
