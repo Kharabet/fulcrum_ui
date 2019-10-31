@@ -90,6 +90,9 @@ export class BorrowedFundsAwaitingListItem extends Component<IBorrowedFundsAwait
           </div>
         </div>
         <div className="borrowed-funds-list-item__in-progress-container">
+          <div className="loading-dots">
+            <h1 className="dot one">.</h1><h1 className="dot two">.</h1><h1 className="dot three">.</h1>
+          </div>
           <div className="borrowed-funds-list-item__in-progress-title"
                style={{ marginTop: `2rem` }}>Transaction Pending...</div>
           <a
