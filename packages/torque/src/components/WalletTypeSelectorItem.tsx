@@ -32,7 +32,7 @@ export class WalletTypeSelectorItem extends Component<IWalletTypeSelectorItemPro
         <SelectorIconsBar>
           {this.props.walletType === WalletType.Web3 ? this.renderWeb3Icons() : this.renderNonWeb3Icons()}
           <div className="selector-icons-bar__item selector-icons-bar__button">
-            and others ...
+            and others...
           </div>
         </SelectorIconsBar>
       </div>

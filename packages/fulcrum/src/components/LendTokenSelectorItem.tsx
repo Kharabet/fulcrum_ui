@@ -23,6 +23,7 @@ interface ILendTokenSelectorItemState {
   balanceOfUser: BigNumber;
   iTokenAddress: string,
   tickerSecondDiff: number;
+  isLoading: boolean;
 }
 
 export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps, ILendTokenSelectorItemState> {
@@ -36,11 +37,12 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
 
     this.state = {
       assetDetails: assetDetails || null,
-      interestRate: interestRate,
-      profit: profit,
-      balanceOfUser: balanceOfUser,
+      interestRate,
+      profit,
+      balanceOfUser,
       iTokenAddress: "",
       tickerSecondDiff: 0,
+      isLoading: true,
     };
 
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
@@ -78,6 +80,9 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
   // noinspection JSUnusedLocalSymbols TODO
   private onProviderChanged = async (event: ProviderChangedEvent) => {
     await this.derivedUpdate();
+    this.setState({
+      isLoading: false,
+    });
   };
 
   private onLendTransactionMined = async (event: LendTransactionMinedEvent) => {
@@ -163,10 +168,14 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
             <div className="token-selector-item__description">
               <div className="token-selector-item__interest-rate-container">
                 <div className="token-selector-item__interest-rate-title">Interest APR:</div>
-                <div
-                  title={`${this.state.interestRate.toFixed(18)}%`}
-                  className="token-selector-item__interest-rate-value"
-                >{`${this.state.interestRate.toFixed(4)}%`}</div>
+                {!this.state.isLoading ? (
+                  <div
+                    title={`${this.state.interestRate.toFixed(18)}%`}
+                    className="token-selector-item__interest-rate-value"
+                  >{`${this.state.interestRate.toFixed(4)}%`}</div>
+                ) : (
+                  <div className="token-selector-item__interest-rate-value">Loading...</div>
+                )}
               </div>
               <div className="token-selector-item__interest-rate-container">
                 <div className="token-selector-item__interest-rate-title" />

@@ -69,7 +69,9 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
         {!this.props.onSelectAsset ? (
           <div className="asset-selector__title--coming-soon">Coming Soon</div>
         ) : ``}
-        <div className="asset-selector__interest-rate">{this.state.interestRate.gt(0) ? `${this.state.interestRate.toFixed(2)}% APR` : ``}</div>
+        <div className="asset-selector__interest-rate">
+          {this.state.interestRate.gt(0) ? `${this.state.interestRate.toFixed(2)}% APR` : ``}
+        </div>
         <SelectorIconsBar />
       </div>
     );
