@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { Asset } from "../domain/Asset";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { BorrowRequestAwaiting } from "../domain/BorrowRequestAwaiting";
@@ -57,35 +58,44 @@ export class BorrowedFundsAwaitingListItem extends Component<IBorrowedFundsAwait
     if (!this.state.assetDetails) {
       return null;
     }
-
+    const { itemAwaiting } = this.props;
+    const { assetDetails } = this.state;
     return (
       <div className={`borrowed-funds-list-item`}>
         <div className="borrowed-funds-list-item__padding-container">
           <div className="borrowed-funds-list-item__general-container">
             <div className="borrowed-funds-list-item__general-container-values">
-              <div title={`${this.props.itemAwaiting.borrowAmount.toFixed(18)} ${this.state.assetDetails.displayName}`} className="borrowed-funds-list-item__amount">{this.props.itemAwaiting.borrowAmount.toFixed(5)}</div>
+              <div title={`${itemAwaiting.borrowAmount.toFixed(18)} ${assetDetails.displayName}`}
+                   className="borrowed-funds-list-item__amount">{itemAwaiting.borrowAmount.toFixed(5)}</div>
             </div>
             <div className="borrowed-funds-list-item__general-container-asset">
               <div className="borrowed-funds-list-item__general-container-asset-img">
-                <img src={this.state.assetDetails.logoSvg} alt={this.state.assetDetails.displayName} />
-              </div>
-              <div className="borrowed-funds-list-item__general-container-asset-name">
-                {this.state.assetDetails.displayName}
+                <img src={assetDetails.logoSvg} alt={assetDetails.displayName} />
               </div>
             </div>
           </div>
         </div>
         <div className="borrowed-funds-list-item__padding-container">
           <div className="borrowed-funds-list-item__collateral-container">
-            <div className="borrowed-funds-list-item__collateral-info-container"/>
+            <div className="borrowed-funds-list-item__collateral-info-container">
+              <div className="borrowed-funds-list-item__collateralized-value-container">
+                <div className="borrowed-funds-list-item__collateralized-label">Collateralized</div>
+                <div title={`${itemAwaiting.depositAmount.toFixed(18)} ${itemAwaiting.collateralAsset}`}
+                     className="borrowed-funds-list-item__collateralized-value">
+                  {itemAwaiting.depositAmount.toFixed(4)}&nbsp;
+                  {itemAwaiting.collateralAsset === Asset.WETH ? Asset.ETH : itemAwaiting.collateralAsset}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
         <div className="borrowed-funds-list-item__in-progress-container">
-          <div className="borrowed-funds-list-item__in-progress-title" style={{ marginTop: `2rem` }}>Transaction Pending...</div>
+          <div className="borrowed-funds-list-item__in-progress-title"
+               style={{ marginTop: `2rem` }}>Transaction Pending...</div>
           <a
             className="borrowed-funds-list-item__in-progress-title"
             style={{ fontSize: `1.25rem`, cursor: `pointer`, textDecoration: `none` }}
-            href={`${this.state.etherscanURL}tx/${this.props.itemAwaiting.txHash}`}
+            href={`${this.state.etherscanURL}tx/${itemAwaiting.txHash}`}
             target="_blank"
             rel="noopener noreferrer"
           >

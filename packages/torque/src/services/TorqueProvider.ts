@@ -537,7 +537,7 @@ export class TorqueProvider {
     }
 
     return result;
-  }
+  };
 
   public doDeployManagementContract = async (manageCollateralRequest: ManageCollateralRequest) => {
     // console.log(manageCollateralRequest);
