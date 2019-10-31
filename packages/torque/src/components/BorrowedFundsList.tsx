@@ -22,7 +22,7 @@ interface IBorrowedFundsListState {
 }
 
 export class BorrowedFundsList extends Component<IBorrowedFundsListProps, IBorrowedFundsListState> {
-  private outerRef: RefObject<HTMLDivElement>;
+  private readonly outerRef: RefObject<HTMLDivElement>;
 
   constructor(props: IBorrowedFundsListProps) {
     super(props);
@@ -41,7 +41,11 @@ export class BorrowedFundsList extends Component<IBorrowedFundsListProps, IBorro
   // }
 
   public render() {
-    const itemsAwaiting = this.props.itemsAwaiting.filter(e => this.props.walletDetails.walletType === WalletType.Web3 || this.props.walletDetails.walletType === WalletType.ViewOnly || TorqueProvider.Instance.isETHAsset(e.collateralAsset))
+    const itemsAwaiting = this.props.itemsAwaiting.filter(e =>
+      this.props.walletDetails.walletType === WalletType.Web3
+      || this.props.walletDetails.walletType === WalletType.ViewOnly
+      || TorqueProvider.Instance.isETHAsset(e.collateralAsset)
+    )
       .map((e, index) => {
         // const rest = index % this.state.colsCount;
         return (
@@ -54,7 +58,11 @@ export class BorrowedFundsList extends Component<IBorrowedFundsListProps, IBorro
           />
         );
       });
-    const items = this.props.items.filter(e => this.props.walletDetails.walletType === WalletType.Web3 || this.props.walletDetails.walletType === WalletType.ViewOnly || TorqueProvider.Instance.isETHAsset(e.collateralAsset))
+    const items = this.props.items.filter(e =>
+      this.props.walletDetails.walletType === WalletType.Web3
+      || this.props.walletDetails.walletType === WalletType.ViewOnly
+      || TorqueProvider.Instance.isETHAsset(e.collateralAsset)
+    )
       .map((e, index) => {
       // const rest = index % this.state.colsCount;
       return (
@@ -71,7 +79,10 @@ export class BorrowedFundsList extends Component<IBorrowedFundsListProps, IBorro
       );
     });
 
-    return <div className="borrowed-funds-list" ref={this.outerRef}>{itemsAwaiting}{items}</div>;
+    return <div className="borrowed-funds-list" ref={this.outerRef}>
+      {itemsAwaiting}
+      {items}
+    </div>;
   }
 
   // private didResize = () => {

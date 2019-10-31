@@ -266,6 +266,33 @@
       .borrowed-funds-list-item__in-progress-animation {
 
       }
+
+      .loading-dots {
+        text-align: center;
+
+        .dot {
+          font-family: "Open Sans", sans-serif;
+          display: inline;
+          margin-left: 0.05em;
+          margin-right: 0.05em;
+          position: relative;
+          font-size: 6em;
+          line-height: 1rem;
+          opacity: 0;
+          animation: showHideDot 2.5s ease-in-out infinite;
+
+          &.one { animation-delay: 0.2s; color: #92a7ea; }
+          &.two { animation-delay: 0.4s;color: #6cd6b2; }
+          &.three { animation-delay: 0.6s;color: #ecc75c; }
+        }
+      }
+
+      @keyframes showHideDot {
+        0% { opacity: 0; }
+        50% { opacity: 1; }
+        60% { opacity: 1; }
+        100% { opacity: 0; }
+      }
     }
   }
 }
