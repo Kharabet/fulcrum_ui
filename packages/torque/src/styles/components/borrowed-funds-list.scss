@@ -233,11 +233,13 @@
         &:first-child {
           border-left: none 0;
           border-right: none 0;
+          border-bottom-left-radius: 1rem;
         }
 
         &:last-child {
           border-left: none 0;
           border-right: none 0;
+          border-bottom-right-radius: 1rem;
           padding: 1.625rem;
         }
       }
