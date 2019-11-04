@@ -1,7 +1,8 @@
 $font-size-header: 0.75rem;
 $height-row: 4.5rem;
 
-$width-col-name: 6.5rem;
+$width-col-name: 4.5rem;
+$width-col-total-tlv-usd: 8.0rem;
 $width-col-total-supply-usd: 8.0rem;
 $width-col-total-supply: 8.0rem;
 $width-col-total-borrow: 8.0rem;
@@ -10,7 +11,8 @@ $width-col-liquidity-reserved: 8.0rem;
 $width-col-supply-rate: 8.0rem;
 $width-col-borrow-rate: 10rem;
 
-$flex-col-name: 6.5;
+$flex-col-name: 4.5;
+$flex-col-total-tlv-usd: 8.0;
 $flex-col-total-supply-usd: 8.0;
 $flex-col-total-supply: 8.0;
 $flex-col-total-borrow: 8.0;
@@ -84,6 +86,14 @@ $margin-right-column: 1.5rem;
   width: $width-col-liquidity-reserved;
   flex-grow: $flex-col-liquidity-reserved;
   flex-shrink: $flex-col-liquidity-reserved;
+}
+
+.stats-grid-header__col-total-tlv-usd {
+  @include stats-grid-header__col();
+
+  width: $width-col-total-tlv-usd;
+  flex-grow: $flex-col-total-tlv-usd;
+  flex-shrink: $flex-col-total-tlv-usd;
 }
 
 .stats-grid-header__col-total-supply-usd {
@@ -185,6 +195,15 @@ $margin-right-column: 1.5rem;
   width: $width-col-liquidity-reserved;
   flex-grow: $flex-col-liquidity-reserved;
   flex-shrink: $flex-col-liquidity-reserved;
+}
+
+.stats-grid-row__col-total-tlv-usd {
+  @include stats-grid-row__col();
+  @include stats-grid-row__text-normal();
+
+  width: $width-col-total-tlv-usd;
+  flex-grow: $flex-col-total-tlv-usd;
+  flex-shrink: $flex-col-total-tlv-usd;
 }
 
 .stats-grid-row__col-total-supply-usd {

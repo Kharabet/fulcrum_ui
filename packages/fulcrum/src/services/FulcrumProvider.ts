@@ -488,7 +488,7 @@ export class FulcrumProvider {
         const name: string = "";
         // let tokenPrice: BigNumber | null;
         let marketLiquidity: BigNumber | null;
-        let liquidityReserved: BigNumber | null;
+        // let liquidityReserved: BigNumber | null;
         let totalAssetSupply: BigNumber | null;
         let totalAssetBorrow: BigNumber | null;
         let supplyInterestRate: BigNumber | null;
@@ -502,7 +502,7 @@ export class FulcrumProvider {
           // (name = await assetContract.name.callAsync()),
           // (tokenPrice = await assetContract.tokenPrice.callAsync()),
           (marketLiquidity = await assetContract.marketLiquidity.callAsync()),
-          (liquidityReserved = await assetContract.totalReservedSupply.callAsync()),
+          // (liquidityReserved = await assetContract.totalReservedSupply.callAsync()),
           (totalAssetSupply = await assetContract.totalAssetSupply.callAsync()),
           (totalAssetBorrow = await assetContract.totalAssetBorrow.callAsync()),
           (supplyInterestRate = await assetContract.supplyInterestRate.callAsync()),
@@ -522,7 +522,8 @@ export class FulcrumProvider {
           name,
           null,// tokenPrice.dividedBy(10 ** 18),
           marketLiquidity.dividedBy(10 ** 18),
-          liquidityReserved.dividedBy(10 ** 18),
+          // liquidityReserved.dividedBy(10 ** 18),
+          new BigNumber(0),
           totalAssetSupply.dividedBy(10 ** 18),
           totalAssetBorrow.dividedBy(10 ** 18),
           supplyInterestRate.dividedBy(10 ** 18),
