@@ -65,7 +65,7 @@ export class DashboardPage extends PureComponent<
     if (TorqueProvider.Instance.unsupportedNetwork) {
       return;
     }
-    
+
     const walletType = walletTypeAbbrToWalletType(this.props.match.params.walletTypeAbbr);
     let walletAddress = this.props.match.params.walletAddress ?
       this.props.match.params.walletAddress.toLowerCase() :
@@ -191,7 +191,7 @@ export class DashboardPage extends PureComponent<
                       onExtendLoan={this.onExtendLoan}
                     />
                   </React.Fragment>
-                ) : 
+                ) :
                   TorqueProvider.Instance.unsupportedNetwork ? (
                     <div style={{ textAlign: `center`, fontSize: `2rem`, paddingBottom: `1.5rem` }}>
                       <div style={{ cursor: `pointer` }}>
@@ -214,7 +214,11 @@ export class DashboardPage extends PureComponent<
                   <div className="dashboard-page__form">
                     <WalletAddressLargeForm onSubmit={this.onWalletAddressChange} />
                   </div>
-                ) : null}
+                ) : <div style={{ textAlign: `center`, fontSize: `2rem`, paddingBottom: `1.5rem` }}>
+                      <div>
+                          Loading...
+                        </div>
+                </div>}
               </React.Fragment>
             )}
           </div>
@@ -223,10 +227,8 @@ export class DashboardPage extends PureComponent<
       </React.Fragment>
     );
   }
-  
+
   private refreshPage = () => {
-    // console.log("refresh");
-    // window.location.reload();
     // this.derivedUpdate();
     this.setState({
       ...this.state,
@@ -305,7 +307,7 @@ export class DashboardPage extends PureComponent<
             errorMsg = "";
           }
         }*/
-        
+
         this.repayLoanDlgRef.current.toggleDidSubmit(false);
         await this.repayLoanDlgRef.current.hide();
       }
@@ -386,7 +388,7 @@ export class DashboardPage extends PureComponent<
             errorMsg = "";
           }
         }*/
-        
+
         this.manageCollateralDlgRef.current.toggleDidSubmit(false);
         await this.manageCollateralDlgRef.current.hide();
       }
@@ -426,7 +428,7 @@ export class DashboardPage extends PureComponent<
             errorMsg = "";
           }
         }*/
-        
+
         await this.setupENSDlgRef.current.hide();
         // this.setupENSDlgRef.current.toggleDidSubmit(false);
       }
