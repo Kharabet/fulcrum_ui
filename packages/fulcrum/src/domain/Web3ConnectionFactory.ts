@@ -3,8 +3,8 @@ import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents"
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
 
+import { TerminalHttpProvider, SourceType, Web3Versions, EnvironmentTypes } from '@terminal-packages/sdk';
 import { Web3Wrapper } from '@0x/web3-wrapper';
-import { SourceType, TerminalHttpProvider, Web3Versions } from '@terminal-packages/sdk';
 
 import Portis from "@portis/web3";
 // @ts-ignore
@@ -18,7 +18,7 @@ import Squarelink from "squarelink";
 
 import { ProviderType } from "./ProviderType";
 
-import { MetamaskSubprovider, RPCSubprovider, SignerSubprovider, Web3ProviderEngine } from "@0x/subproviders";
+import { MetamaskSubprovider, SignerSubprovider, RPCSubprovider, Web3ProviderEngine } from "@0x/subproviders";
 // @ts-ignore
 import { AlchemySubprovider } from "@alch/alchemy-web3";
 
@@ -219,20 +219,21 @@ export class Web3ConnectionFactory {
       && process.env.REACT_APP_ETH_NETWORK === "mainnet";
     
     if (isMainnetProd) {
-      providerEngine.addProvider(
-        new RPCSubprovider("https://terminal.co/networks/ethereum_main/04cbb3423e")
+      await providerEngine.addProvider(
+        await new RPCSubprovider("https://terminal.co/networks/ethereum_main/04cbb3423e")
       ); 
       await providerEngine.start();
       // @ts-ignore
-      return (new TerminalHttpProvider({
-          apiKey: "GjNDQd8pdZ9WQEWdgVKxJg==",
-          source: "Web3ProviderEngine", // sdk.SourceType.Web3ProviderEngine 
-          projectId: "mZPnrEjxeqoRyxqb",
-          environment: undefined,
-          logLevel: 1,
-          web3Version: Web3Versions.one,
-          customHttpProvider: providerEngine
-      }));
+      const term = await new TerminalHttpProvider({
+        apiKey: "GjNDQd8pdZ9WQEWdgVKxJg==",
+        source: SourceType.Web3ProviderEngine,
+        projectId: "mZPnrEjxeqoRyxqb",
+        environment: EnvironmentTypes.live,
+        logLevel: 1,
+        web3Version: Web3Versions.one,
+        customHttpProvider: providerEngine
+      });
+      return term;
     } else {
       await providerEngine.start();
       return providerEngine;
