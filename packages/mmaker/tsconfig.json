@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig",
+  "compilerOptions": {
+    "allowJs": false,
+    "module": "esnext",
+    "isolatedModules": false,
+    "noEmit": false,
+    "jsx": "react",
+    "outDir": "./build/",
+    "sourceMap": true,
+    "declaration": true
+  },
+  "include": [
+    "src"
+  ]
+}
