@@ -1381,7 +1381,8 @@ export class FulcrumProvider {
   };
 
   public addTokenToMetaMask = async (task: RequestTask) => {
-    if (this.providerType === ProviderType.MetaMask && this.contractsSource) {
+    return;
+    /*if (this.providerType === ProviderType.MetaMask && this.contractsSource) {
       try {
         // @ts-ignore
         if (window.web3) {
@@ -1404,19 +1405,19 @@ export class FulcrumProvider {
                   },
                 },
                 id: id,
-              }/*, (err: any, added: any) => {
+              }*//*, (err: any, added: any) => {
                 // console.log('provider returned', err, added)
                 if (err || 'error' in added) {
                   console.log(err, added);
                 }
-              }*/);
+              }*//*);
             }
           }
         }
       } catch(e) {
         // console.log(e);
       }
-    }
+    }*/
   }
 
   private processLendRequestTask = async (task: RequestTask, skipGas: boolean) => {

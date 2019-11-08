@@ -3,8 +3,8 @@ import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents"
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
 
-import { TerminalHttpProvider, SourceType, Web3Versions, EnvironmentTypes } from '@terminal-packages/sdk';
 import { Web3Wrapper } from '@0x/web3-wrapper';
+import { EnvironmentTypes, SourceType, TerminalHttpProvider, Web3Versions } from '@terminal-packages/sdk';
 
 import Portis from "@portis/web3";
 // @ts-ignore
@@ -18,7 +18,7 @@ import Squarelink from "squarelink";
 
 import { ProviderType } from "./ProviderType";
 
-import { MetamaskSubprovider, SignerSubprovider, RPCSubprovider, Web3ProviderEngine } from "@0x/subproviders";
+import { MetamaskSubprovider, RPCSubprovider, SignerSubprovider, Web3ProviderEngine } from "@0x/subproviders";
 // @ts-ignore
 import { AlchemySubprovider } from "@alch/alchemy-web3";
 
