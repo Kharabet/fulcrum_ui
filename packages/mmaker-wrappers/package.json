@@ -1,0 +1,43 @@
+{
+  "name": "@bzxnetwork/mmaker-wrappers",
+  "version": "0.1.0",
+  "private": true,
+  "main": "build/index.js",
+  "module": "build/index.js",
+  "typings": "build/src/index.d.ts",
+  "dependencies": {
+    "@0x/base-contract": "^5.0.5",
+    "@0x/utils": "^4.3.1",
+    "lodash": "^4.17.11"
+  },
+  "devDependencies": {
+    "@0x/abi-gen": "^2.0.9",
+    "@babel/core": "7.6.0",
+    "@babel/preset-env": "7.6.0",
+    "@babel/preset-react": "7.0.0",
+    "@svgr/webpack": "4.3.2",
+    "babel-loader": "8.0.6",
+    "babel-plugin-named-asset-import": "^0.3.4",
+    "cross-env": "^5.2.0",
+    "tslib": "^1.10.0",
+    "tslint": "^5.20.0",
+    "tslint-config-prettier": "^1.18.0",
+    "tslint-config-standard": "^8.0.1",
+    "tslint-react": "^4.1.0",
+    "ts-loader": "^6.0.4",
+    "typescript": "3.6.3",
+    "webpack": "4.41.0",
+    "webpack-cli": "^3.3.9",
+    "webpack-node-externals": "^1.7.2"
+  },
+  "scripts": {
+    "build": "webpack --mode production --config config/webpack.config.js",
+    "watch": "webpack --watch --mode development --config config/webpack.config.js"
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
+}
