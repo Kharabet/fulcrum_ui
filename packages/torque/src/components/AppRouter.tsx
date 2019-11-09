@@ -1,9 +1,11 @@
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import React, { Component } from "react";
 import ReactGA from "react-ga";
+import Intercom from "react-intercom";
 import { HashRouter, Redirect, Route, Switch } from "react-router-dom";
 import configProviders from "../config/providers.json";
 import { ProviderType } from "../domain/ProviderType";
+import { WalletType } from "../domain/WalletType";
 import { BorrowPage } from "../pages/BorrowPage";
 import { DashboardPage } from "../pages/DashboardPage";
 import { LandingPage } from "../pages/LandingPage";
@@ -55,7 +57,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
     return (
       <React.Fragment>
         { isMainnetProd ? (
-          <div dangerouslySetInnerHTML={{__html: '<script>  window.intercomSettings = {  	app_id: "dfk4n5ut"  };</script><script>(function(){var w=window;var ic=w.Intercom;if(typeof ic==="function"){ic("reattach_activator");ic("update",w.intercomSettings);}else{var d=document;var i=function(){i.c(arguments);};i.q=[];i.c=function(args){i.q.push(args);};w.Intercom=i;var l=function(){var s=d.createElement("script");s.type="text/javascript";s.async=true;s.src="https://widget.intercom.io/widget/dfk4n5ut";var x=d.getElementsByTagName("script")[0];x.parentNode.insertBefore(s,x);};if(w.attachEvent){w.attachEvent("onload",l);}else{w.addEventListener("load",l,false);}}})();</script>'}} />
+          <Intercom appID="dfk4n5ut" />
         ) : null }
         <div className="pages-container">
           {
@@ -109,32 +111,49 @@ export class AppRouter extends Component<any, IAppRouterState> {
   };
 
   private onProviderTypeSelect = async (providerType: ProviderType) => {
-    if (providerType !== TorqueProvider.Instance.providerType ||
-      providerType !== ProviderType.None && TorqueProvider.Instance.accounts.length === 0 || !TorqueProvider.Instance.accounts[0]) {
-      TorqueProvider.Instance.isLoading = true;
 
-      await TorqueProvider.Instance.eventEmitter.emit(TorqueProviderEvents.ProviderIsChanging);
+    if (providerType === TorqueProvider.Instance.providerType && TorqueProvider.Instance.accounts.length !== 0) {
+      const accountAddress = TorqueProvider.Instance.accounts[0];
 
-      this.setState({
-        ...this.state,
-        isLoading: true,
-//        isProviderMenuModalOpen: false
-      }, async () => {
-        await TorqueProvider.Instance.setWeb3Provider(providerType);
+      const walletType = TorqueProvider.Instance.providerType !== ProviderType.None ?
+        WalletType.Web3 :
+        WalletType.NonWeb3;
 
-        TorqueProvider.Instance.isLoading = false;
-
-        await TorqueProvider.Instance.eventEmitter.emit(
-          TorqueProviderEvents.ProviderChanged,
-          new ProviderChangedEvent(TorqueProvider.Instance.providerType, TorqueProvider.Instance.web3Wrapper)
+      if (TorqueProvider.Instance.destinationAbbr === "b") {
+        NavService.Instance.History.replace(
+          NavService.Instance.getBorrowAddress(walletType)
         );
-      });
-    } else {
-      this.setState({
-        ...this.state,
-//        isProviderMenuModalOpen: false
-      });
+      } if (TorqueProvider.Instance.destinationAbbr === "t") {
+        if (accountAddress) {
+          NavService.Instance.History.replace(
+            NavService.Instance.getDashboardAddress(walletType, accountAddress)
+          );
+        }
+      } else {
+        // do nothing
+      }
+
+      return;
     }
+    
+    TorqueProvider.Instance.isLoading = true;
+
+    await TorqueProvider.Instance.eventEmitter.emit(TorqueProviderEvents.ProviderIsChanging);
+
+    this.setState({
+      ...this.state,
+      isLoading: true,
+//        isProviderMenuModalOpen: false
+    }, async () => {
+      await TorqueProvider.Instance.setWeb3Provider(providerType);
+
+      TorqueProvider.Instance.isLoading = false;
+
+      await TorqueProvider.Instance.eventEmitter.emit(
+        TorqueProviderEvents.ProviderChanged,
+        new ProviderChangedEvent(TorqueProvider.Instance.providerType, TorqueProvider.Instance.web3Wrapper)
+      );
+    });
   };
 
   // public onRequestClose = () => {

@@ -57,11 +57,15 @@ export class DashboardPage extends PureComponent<
 
     this.state = { walletDetails: { walletType: WalletType.Unknown, walletAddress: "" }, items: [], itemsAwaiting: [], isENSSetup: undefined, isDataLoading: true };
 
-    TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
+    // TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
   private async derivedUpdate() {
+    if (TorqueProvider.Instance.unsupportedNetwork) {
+      return;
+    }
+
     const walletType = walletTypeAbbrToWalletType(this.props.match.params.walletTypeAbbr);
     let walletAddress = this.props.match.params.walletAddress ?
       this.props.match.params.walletAddress.toLowerCase() :
@@ -101,6 +105,7 @@ export class DashboardPage extends PureComponent<
       items = await TorqueProvider.Instance.getLoansList(walletDetails);
       itemsAwaiting = await TorqueProvider.Instance.getLoansAwaitingList(walletDetails);
       // console.log(items);
+      // console.log(itemsAwaiting);
     }
 
     this.setState({
@@ -113,20 +118,23 @@ export class DashboardPage extends PureComponent<
     });
   }
 
-  private onProviderAvailable = () => {
+  /*private onProviderAvailable = () => {
+    //console.log("onProviderAvailable");
     this.refreshPage();
-  };
+  };*/
 
   private onProviderChanged = () => {
+    // console.log("onProviderChanged");
     this.refreshPage();
   };
 
   public componentWillUnmount(): void {
-    TorqueProvider.Instance.eventEmitter.removeListener(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
+    // TorqueProvider.Instance.eventEmitter.removeListener(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
     TorqueProvider.Instance.eventEmitter.removeListener(TorqueProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
   public componentDidMount(): void {
+    // console.log("componentDidMount");
     this.refreshPage();
   }
 
@@ -136,6 +144,7 @@ export class DashboardPage extends PureComponent<
     snapshot?: any
   ): void {
     if (this.state.walletDetails.walletAddress !== prevState.walletDetails.walletAddress) {
+      // console.log("componentDidUpdate", this.state.walletDetails.walletAddress, prevState.walletDetails.walletAddress);
       this.refreshPage();
     }
   }
@@ -160,7 +169,7 @@ export class DashboardPage extends PureComponent<
                     onClearWalletAddress={this.onClearWalletAddress}
                   />
                 ) : null}
-                { this.state.isENSSetup ? (
+                { !TorqueProvider.Instance.unsupportedNetwork && this.state.isENSSetup ? (
                   <React.Fragment>
                     <div style={{ textAlign: `center`, fontSize: `2rem`, paddingBottom: `1.5rem` }}>
                       {this.state.isDataLoading ? (
@@ -182,14 +191,21 @@ export class DashboardPage extends PureComponent<
                       onExtendLoan={this.onExtendLoan}
                     />
                   </React.Fragment>
-                ) : 
-                  this.state.isENSSetup !== undefined ? (
+                ) :
+                  TorqueProvider.Instance.unsupportedNetwork ? (
                     <div style={{ textAlign: `center`, fontSize: `2rem`, paddingBottom: `1.5rem` }}>
-                      <div onClick={this.onSetupENS} style={{ cursor: `pointer` }}>
-                        Click to enable this wallet for ENS Loans.
+                      <div style={{ cursor: `pointer` }}>
+                        You are connected to the wrong network.
                       </div>
                     </div>
-                  ) : ``
+                  ) :
+                    this.state.isENSSetup !== undefined ? (
+                      <div style={{ textAlign: `center`, fontSize: `2rem`, paddingBottom: `1.5rem` }}>
+                        <div onClick={this.onSetupENS} style={{ cursor: `pointer` }}>
+                          Click to enable this wallet for ENS Loans.
+                        </div>
+                      </div>
+                    ) : ``
                 }
               </React.Fragment>
             ) : (
@@ -198,7 +214,11 @@ export class DashboardPage extends PureComponent<
                   <div className="dashboard-page__form">
                     <WalletAddressLargeForm onSubmit={this.onWalletAddressChange} />
                   </div>
-                ) : null}
+                ) : <div style={{ textAlign: `center`, fontSize: `2rem`, paddingBottom: `1.5rem` }}>
+                      <div>
+                          Loading...
+                        </div>
+                </div>}
               </React.Fragment>
             )}
           </div>
@@ -207,9 +227,8 @@ export class DashboardPage extends PureComponent<
       </React.Fragment>
     );
   }
-  
+
   private refreshPage = () => {
-    // window.location.reload();
     // this.derivedUpdate();
     this.setState({
       ...this.state,
@@ -219,13 +238,14 @@ export class DashboardPage extends PureComponent<
     },
     () => {
       setTimeout(() => {
-        this.setState({
+        this.derivedUpdate();
+        /*this.setState({
           ...this.state,
           isDataLoading: true
         },
         () => {
           this.derivedUpdate();
-        });
+        });*/
       }, 1000);
     });
   };
@@ -242,12 +262,14 @@ export class DashboardPage extends PureComponent<
   };
 
   private onClearWalletAddress = () => {
+    // console.log("onClearWalletAddress");
     NavService.Instance.History.replace(NavService.Instance.getDashboardAddress(WalletType.NonWeb3, ""));
     this.props.match.params.walletAddress = "";
     this.refreshPage();
   };
 
   private onWalletAddressChange = (walletAddress: string) => {
+    // console.log("onWalletAddressChange", walletAddress);
     NavService.Instance.History.replace(NavService.Instance.getDashboardAddress(WalletType.NonWeb3, walletAddress));
     this.props.match.params.walletAddress = walletAddress;
     this.refreshPage();
@@ -285,7 +307,7 @@ export class DashboardPage extends PureComponent<
             errorMsg = "";
           }
         }*/
-        
+
         this.repayLoanDlgRef.current.toggleDidSubmit(false);
         await this.repayLoanDlgRef.current.hide();
       }
@@ -366,7 +388,7 @@ export class DashboardPage extends PureComponent<
             errorMsg = "";
           }
         }*/
-        
+
         this.manageCollateralDlgRef.current.toggleDidSubmit(false);
         await this.manageCollateralDlgRef.current.hide();
       }
@@ -406,7 +428,7 @@ export class DashboardPage extends PureComponent<
             errorMsg = "";
           }
         }*/
-        
+
         await this.setupENSDlgRef.current.hide();
         // this.setupENSDlgRef.current.toggleDidSubmit(false);
       }

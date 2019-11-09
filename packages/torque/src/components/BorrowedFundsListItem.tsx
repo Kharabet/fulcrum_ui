@@ -51,7 +51,6 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
 
   private derivedUpdate = async () => {
     const assetDetails = AssetsDictionary.assets.get(this.props.item.loanAsset) || null;
-    // const interestRate = await TorqueProvider.Instance.getAssetInterestRate(this.props.item.loanAsset);
     this.setState({ ...this.state, assetDetails: assetDetails, interestRate: this.props.item.interestRate });
   };
 
@@ -59,9 +58,12 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
     if (!this.state.assetDetails) {
       return null;
     }
+    
+    const { item } = this.props;
+    const { interestRate, assetDetails } = this.state;
 
-    const positionSafetyText = TorqueProvider.Instance.getPositionSafetyText(this.props.item);
-    const collaterizedStateSelector = positionSafetyText === "Safe" ?
+    const positionSafetyText = TorqueProvider.Instance.getPositionSafetyText(item);
+    const collateralizedStateSelector = positionSafetyText === "Safe" ?
       "borrowed-funds-list-item__collateralized-state--safe" :
       positionSafetyText === "Danger" ?
         "borrowed-funds-list-item__collateralized-state--safe" :
@@ -75,17 +77,17 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
         <div className="borrowed-funds-list-item__padding-container">
           <div className="borrowed-funds-list-item__general-container">
             <div className="borrowed-funds-list-item__general-container-values">
-              <div title={`${this.props.item.amountOwed.toFixed(18)} ${this.state.assetDetails.displayName}`} className="borrowed-funds-list-item__amount">{this.props.item.amountOwed.toFixed(5)}</div>
-              <div  title={`${this.state.interestRate.multipliedBy(100).toFixed(18)}% APR`} className="borrowed-funds-list-item__interest-rate">
-                {this.state.interestRate.multipliedBy(100).toFixed(2)} % APR
+              <div title={`${item.amountOwed.toFixed(18)} ${assetDetails.displayName}`} className="borrowed-funds-list-item__amount">{item.amountOwed.toFixed(5)}</div>
+              <div  title={`${interestRate.multipliedBy(100).toFixed(18)}% APR`} className="borrowed-funds-list-item__interest-rate">
+                {interestRate.multipliedBy(100).toFixed(2)} % APR
               </div>
             </div>
             <div className="borrowed-funds-list-item__general-container-asset">
               <div className="borrowed-funds-list-item__general-container-asset-img">
-                <img src={this.state.assetDetails.logoSvg} alt={this.state.assetDetails.displayName} />
+                <img src={assetDetails.logoSvg} alt={assetDetails.displayName} />
               </div>
               <div className="borrowed-funds-list-item__general-container-asset-name">
-                {this.state.assetDetails.displayName}
+                {assetDetails.displayName}
               </div>
             </div>
           </div>
@@ -94,8 +96,8 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
           <div className="borrowed-funds-list-item__collateral-container">
             <div className="borrowed-funds-list-item__collateral-info-container">
               <div className="borrowed-funds-list-item__collateralized-value-container">
-                <div title={`${this.props.item.collateralizedPercent.multipliedBy(100).plus(100).toFixed(18)}%`} className="borrowed-funds-list-item__collateralized">
-                  {this.props.item.collateralizedPercent.multipliedBy(100).plus(100).toFixed(2)}%
+                <div title={`${item.collateralizedPercent.multipliedBy(100).plus(100).toFixed(18)}%`} className="borrowed-funds-list-item__collateralized">
+                  {item.collateralizedPercent.multipliedBy(100).plus(100).toFixed(2)}%
                 </div>
                 <div className="borrowed-funds-list-item__collateralized-label">Collateralized</div>
               </div>
@@ -103,7 +105,7 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
                 <div className="borrowed-funds-list-item__collateralized-state-icon">
                   {positionSafetyText === "Liquidation Pending" ? <img src={ic_unsafe} alt="unsafe" /> : null}
                 </div>
-                <div className={`borrowed-funds-list-item__collateralized-state ${collaterizedStateSelector}`}>
+                <div className={`borrowed-funds-list-item__collateralized-state ${collateralizedStateSelector}`}>
                   {positionSafetyText}
                 </div>
               </div>
@@ -113,13 +115,15 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
                 readonly={true}
                 minValue={0}
                 maxValue={100}
-                value={this.props.item.collateralizedPercent.multipliedBy(100).toNumber()}
+                value={item.collateralizedPercent.multipliedBy(100).toNumber()}
               />
             </div>
             <div className="borrowed-funds-list-item__collateral-info-container">
               <div className="borrowed-funds-list-item__collateralized-value-container">
-                <div title={`${this.props.item.collateralAmount.toFixed(18)} ${this.props.item.collateralAsset}`} className="borrowed-funds-list-item__collateralized-value">
-                  {this.props.item.collateralAmount.toFixed(4)} {this.props.item.collateralAsset === Asset.WETH ? Asset.ETH : this.props.item.collateralAsset}
+                <div title={`${item.collateralAmount.toFixed(18)} ${item.collateralAsset}`}
+                     className="borrowed-funds-list-item__collateralized-value">
+                  {item.collateralAmount.toFixed(4)}&nbsp;
+                  {item.collateralAsset === Asset.WETH ? Asset.ETH : item.collateralAsset}
                 </div>
               </div>
             </div>

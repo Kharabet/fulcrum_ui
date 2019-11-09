@@ -74,11 +74,13 @@
     .asset-selector__interest-rate {
       width: 100%;
       font-size: 1rem;
-      font-weight: normal;
+      font-weight: bold;
       line-height: 1.5;
       letter-spacing: -0.16px;
       text-align: left;
-      color: $color-gray;
+      background: -webkit-linear-gradient(left, #ecc75c, #6cd6b2 15%, #92a7ea 30%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
   }
 

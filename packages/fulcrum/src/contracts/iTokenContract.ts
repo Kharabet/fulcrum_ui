@@ -337,6 +337,39 @@ export class iTokenContract extends BaseContract {
       return result;
     }
   };
+
+  public nextBorrowInterestRateWithOption = {
+    async callAsync(
+      borrowAmount: BigNumber,
+      useFixedInterestModel: boolean,
+      callData: Partial<CallData> = {},
+      defaultBlock?: BlockParam,
+    ): Promise<BigNumber
+    > {
+      const self = this as any as iTokenContract;
+      const encodedData = self._strictEncodeArguments('nextBorrowInterestRateWithOption(uint256,bool)', [
+        borrowAmount,
+        useFixedInterestModel
+      ]);
+      const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+        {
+          to: self.address,
+          ...callData,
+          data: encodedData,
+        },
+        self._web3Wrapper.getContractDefaults(),
+      );
+      const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
+      BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+      const abiEncoder = self._lookupAbiEncoder('nextBorrowInterestRateWithOption(uint256,bool)');
+      // tslint:disable boolean-naming
+      const result = abiEncoder.strictDecodeReturnValue<BigNumber
+      >(rawCallResult);
+      // tslint:enable boolean-naming
+      return result;
+    },
+  };
+
   public borrowToken = {
     async sendTransactionAsync(
       borrowAmount: BigNumber,

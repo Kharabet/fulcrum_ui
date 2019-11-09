@@ -16,6 +16,7 @@ interface IStatsTokenGridCardState {
   reserveDetails: ReserveDetails;
   swapPrice: BigNumber | null;
   usdSupply: BigNumber | null;
+  usdTotalLocked: BigNumber | null;
   decimals: number;
 }
 
@@ -28,6 +29,7 @@ export class StatsTokenGridCard extends Component<IStatsTokenGridCardProps, ISta
       reserveDetails: ReserveDetails.getEmpty(),
       swapPrice: null,
       usdSupply: null,
+      usdTotalLocked: null,
       decimals: 18
     };
 
@@ -41,19 +43,20 @@ export class StatsTokenGridCard extends Component<IStatsTokenGridCardProps, ISta
 
     let decimals = 18;
     let usdSupply: BigNumber | null = null;
+    let usdTotalLocked: BigNumber | null = null;
     if (assetDetails) {
       decimals = assetDetails.decimals;
       if (reserveDetails && reserveDetails.totalSupply) {
         const precision = new BigNumber(10 ** (18 - decimals));
         reserveDetails.totalSupply = reserveDetails.totalSupply!.times(precision);
-        if (swapPrice) {
-          usdSupply = reserveDetails.totalSupply!.times(swapPrice); // .div(10**(18-decimals));
-        }
-
         reserveDetails.totalBorrow = reserveDetails.totalBorrow!.times(precision);
         reserveDetails.liquidity = reserveDetails.liquidity!.times(precision);
         reserveDetails.liquidityReserved = reserveDetails.liquidityReserved!.times(precision);
         reserveDetails.lockedAssets = reserveDetails.lockedAssets!.times(precision);
+        if (swapPrice) {
+          usdSupply = reserveDetails.totalSupply!.times(swapPrice); // .div(10**(18-decimals));
+          usdTotalLocked = reserveDetails.liquidity!.plus(reserveDetails.lockedAssets!).times(swapPrice);
+        }
       }
     }
 
@@ -62,6 +65,7 @@ export class StatsTokenGridCard extends Component<IStatsTokenGridCardProps, ISta
       assetDetails: assetDetails || null,
       reserveDetails: reserveDetails || ReserveDetails.getEmpty(),
       usdSupply: usdSupply,
+      usdTotalLocked: usdTotalLocked,
       swapPrice: swapPrice,
       decimals
     });
@@ -111,6 +115,18 @@ export class StatsTokenGridCard extends Component<IStatsTokenGridCardProps, ISta
         {this.renderAssetInfo(details)}
 
         <div className="stats-grid-card__details-container">
+          <div className="stats-grid-card__kv-container">
+            <div className="stats-grid-card__kv-title">
+              <span className="">TLV (USD)</span>
+            </div>
+            <div className="stats-grid-card__kv-dots" />
+            <div
+              title={this.state.usdTotalLocked ? `$${this.state.usdTotalLocked.toFixed(18)}` : ``}
+              className="stats-grid-card__kv-value"
+            >
+              {this.state.usdTotalLocked ? `$${this.numberWithCommas(this.state.usdTotalLocked.toFixed(4))}` : `-`}
+            </div>
+          </div>
           <div className="stats-grid-card__kv-container">
             <div className="stats-grid-card__kv-title">
               <span className="">Total Supply (USD)</span>
@@ -171,7 +187,7 @@ export class StatsTokenGridCard extends Component<IStatsTokenGridCardProps, ISta
               {details.liquidity ? `${this.numberWithCommas(details.liquidity.toFixed(4))}` : `-`}
             </div>
           </div>
-          <div className="stats-grid-card__kv-container">
+          {/*<div className="stats-grid-card__kv-container">
             <div className="stats-grid-card__kv-title">
               <span className="">Reserved Liquidity</span>
             </div>
@@ -182,7 +198,7 @@ export class StatsTokenGridCard extends Component<IStatsTokenGridCardProps, ISta
             >
               {details.liquidityReserved ? `${this.numberWithCommas(details.liquidityReserved.toFixed(4))}` : `-`}
             </div>
-          </div>
+          </div>*/}
           <div className="stats-grid-card__kv-container">
             <div className="stats-grid-card__kv-title">
               <span className="">Supply Rate (APR)</span>
@@ -197,7 +213,7 @@ export class StatsTokenGridCard extends Component<IStatsTokenGridCardProps, ISta
           </div>
           <div className="stats-grid-card__kv-container">
             <div className="stats-grid-card__kv-title">
-              <span className="">Borrow Rate (APR)</span>
+              <span className="">Fulcrum Borrow Rate (APR)</span>
             </div>
             <div className="stats-grid-card__kv-dots" />
             <div
@@ -205,6 +221,18 @@ export class StatsTokenGridCard extends Component<IStatsTokenGridCardProps, ISta
               className="stats-grid-card__kv-value"
             >
               {details.borrowInterestRate ? `${details.borrowInterestRate.toFixed(4)}%` : `-`}
+            </div>
+          </div>
+          <div className="stats-grid-card__kv-container">
+            <div className="stats-grid-card__kv-title">
+              <span className="">Torque Borrow Rate (APR)</span>
+            </div>
+            <div className="stats-grid-card__kv-dots" />
+            <div
+              title={details.torqueBorrowInterestRate ? `${details.torqueBorrowInterestRate.toFixed(18)}%` : ``}
+              className="stats-grid-card__kv-value"
+            >
+              {details.torqueBorrowInterestRate ? `${details.torqueBorrowInterestRate.toFixed(4)}%` : `-`}
             </div>
           </div>
         </div>

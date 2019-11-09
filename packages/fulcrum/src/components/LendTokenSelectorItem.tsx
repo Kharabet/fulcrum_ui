@@ -9,10 +9,10 @@ import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents"
 import { LendTransactionMinedEvent } from "../services/events/LendTransactionMinedEvent";
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
+import { ProfitTicker } from "./ProfitTicker";
 
 export interface ILendTokenSelectorItemProps {
   asset: Asset;
-
   onLend: (request: LendRequest) => void;
 }
 
@@ -21,7 +21,9 @@ interface ILendTokenSelectorItemState {
   interestRate: BigNumber;
   profit: BigNumber | null;
   balanceOfUser: BigNumber;
-  iTokenAddress: string
+  iTokenAddress: string,
+  tickerSecondDiff: number;
+  isLoading: boolean;
 }
 
 export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps, ILendTokenSelectorItemState> {
@@ -33,7 +35,15 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
     const profit = null;
     const balanceOfUser = new BigNumber(0);
 
-    this.state = { assetDetails: assetDetails || null, interestRate: interestRate, profit: profit, balanceOfUser: balanceOfUser, iTokenAddress: "" };
+    this.state = {
+      assetDetails: assetDetails || null,
+      interestRate,
+      profit,
+      balanceOfUser,
+      iTokenAddress: "",
+      tickerSecondDiff: 0,
+      isLoading: true,
+    };
 
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
@@ -48,19 +58,31 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
       profit = new BigNumber(0);
     }
     const balanceOfUser = await FulcrumProvider.Instance.getITokenAssetBalanceOfUser(this.props.asset);
-    const address = FulcrumProvider.Instance.contractsSource ? 
+    const address = FulcrumProvider.Instance.contractsSource ?
       await FulcrumProvider.Instance.contractsSource.getITokenErc20Address(this.props.asset) || "" :
       "";
 
-    this.setState({ ...this.state, assetDetails: assetDetails || null, interestRate: interestRate, profit: profit, balanceOfUser: balanceOfUser, iTokenAddress: address });
+    this.setState({
+      ...this.state,
+      assetDetails: assetDetails || null,
+      interestRate,
+      profit,
+      balanceOfUser,
+      iTokenAddress: address,
+      tickerSecondDiff: balanceOfUser.toNumber() * (interestRate.toNumber() / 100) / 365 / 24 / 60 / 60,
+    });
   }
 
   private onProviderAvailable = async () => {
     await this.derivedUpdate();
   };
 
+  // noinspection JSUnusedLocalSymbols TODO
   private onProviderChanged = async (event: ProviderChangedEvent) => {
     await this.derivedUpdate();
+    this.setState({
+      isLoading: false,
+    });
   };
 
   private onLendTransactionMined = async (event: LendTransactionMinedEvent) => {
@@ -93,7 +115,6 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
     if (!this.state.assetDetails) {
       return null;
     }
-
     return (
       <div className="token-selector-item">
         <div className={"token-selector-item__image"}>
@@ -129,7 +150,7 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
               </div>
             ) : ``}
           </div>
-          {this.state.profit !== null ? (
+          {this.state.balanceOfUser.gt(0) ? (
             <div className="token-selector-item__description">
               <div className="token-selector-item__interest-rate-container">
                 <div className="token-selector-item__interest-rate-title">Interest APR:</div>
@@ -140,20 +161,21 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
               </div>
               <div className="token-selector-item__profit-container">
                 <div className="token-selector-item__profit-title">Profit:</div>
-                <div
-                  title={`$${this.state.profit.toFixed(18)}`}
-                  className="token-selector-item__profit-value"
-                >{`$${this.state.profit.toFixed(4)}`}</div>
+                <ProfitTicker secondDiff={this.state.tickerSecondDiff} profit={this.state.profit} />
               </div>
             </div>
           ) : (
             <div className="token-selector-item__description">
               <div className="token-selector-item__interest-rate-container">
                 <div className="token-selector-item__interest-rate-title">Interest APR:</div>
-                <div
-                  title={`${this.state.interestRate.toFixed(18)}%`}
-                  className="token-selector-item__interest-rate-value"
-                >{`${this.state.interestRate.toFixed(4)}%`}</div>
+                {!this.state.isLoading ? (
+                  <div
+                    title={`${this.state.interestRate.toFixed(18)}%`}
+                    className="token-selector-item__interest-rate-value"
+                  >{`${this.state.interestRate.toFixed(4)}%`}</div>
+                ) : (
+                  <div className="token-selector-item__interest-rate-value">Loading...</div>
+                )}
               </div>
               <div className="token-selector-item__interest-rate-container">
                 <div className="token-selector-item__interest-rate-title" />

@@ -1,6 +1,7 @@
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import React, { Component } from "react";
 import ReactGA from "react-ga";
+import Intercom from "react-intercom";
 import Modal from "react-modal";
 import { HashRouter, Redirect, Route, Switch } from "react-router-dom";
 import { ProviderType } from "../domain/ProviderType";
@@ -64,7 +65,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
     return (
       <React.Fragment>
         { isMainnetProd ? (
-          <div dangerouslySetInnerHTML={{__html: '<script>  window.intercomSettings = {  	app_id: "dfk4n5ut"  };</script><script>(function(){var w=window;var ic=w.Intercom;if(typeof ic==="function"){ic("reattach_activator");ic("update",w.intercomSettings);}else{var d=document;var i=function(){i.c(arguments);};i.q=[];i.c=function(args){i.q.push(args);};w.Intercom=i;var l=function(){var s=d.createElement("script");s.type="text/javascript";s.async=true;s.src="https://widget.intercom.io/widget/dfk4n5ut";var x=d.getElementsByTagName("script")[0];x.parentNode.insertBefore(s,x);};if(w.attachEvent){w.attachEvent("onload",l);}else{w.addEventListener("load",l,false);}}})();</script>'}} />
+          <Intercom appID="dfk4n5ut" />
         ) : null }
         <Modal
           isOpen={this.state.isProviderMenuModalOpen}

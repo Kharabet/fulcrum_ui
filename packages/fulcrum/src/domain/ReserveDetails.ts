@@ -11,6 +11,7 @@ export class ReserveDetails {
   public totalBorrow: BigNumber | null;
   public supplyInterestRate: BigNumber | null;
   public borrowInterestRate: BigNumber | null;
+  public torqueBorrowInterestRate: BigNumber | null;
   public avgBorrowInterestRate: BigNumber | null;
   public lockedAssets: BigNumber | null;
 
@@ -26,6 +27,7 @@ export class ReserveDetails {
     totalBorrow: BigNumber | null,
     supplyInterestRate: BigNumber | null,
     borrowInterestRate: BigNumber | null,
+    torqueBorrowInterestRate: BigNumber | null,
     avgBorrowInterestRate: BigNumber | null,
     lockedAssets: BigNumber | null
   ) {
@@ -39,6 +41,7 @@ export class ReserveDetails {
     this.totalBorrow = totalBorrow;
     this.supplyInterestRate = supplyInterestRate;
     this.borrowInterestRate = borrowInterestRate;
+    this.torqueBorrowInterestRate = torqueBorrowInterestRate;
     this.avgBorrowInterestRate = avgBorrowInterestRate;
     this.lockedAssets = lockedAssets;
   }
@@ -48,6 +51,7 @@ export class ReserveDetails {
       "",
       "",
       "",
+      null,
       null,
       null,
       null,

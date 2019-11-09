@@ -488,11 +488,12 @@ export class FulcrumProvider {
         const name: string = "";
         // let tokenPrice: BigNumber | null;
         let marketLiquidity: BigNumber | null;
-        let liquidityReserved: BigNumber | null;
+        // let liquidityReserved: BigNumber | null;
         let totalAssetSupply: BigNumber | null;
         let totalAssetBorrow: BigNumber | null;
         let supplyInterestRate: BigNumber | null;
         let borrowInterestRate: BigNumber | null;
+        let torqueBorrowInterestRate: BigNumber | null;
         // let avgBorrowInterestRate: BigNumber | null;
         let lockedAssets: BigNumber | null = new BigNumber(0);
 
@@ -501,12 +502,13 @@ export class FulcrumProvider {
           // (name = await assetContract.name.callAsync()),
           // (tokenPrice = await assetContract.tokenPrice.callAsync()),
           (marketLiquidity = await assetContract.marketLiquidity.callAsync()),
-          (liquidityReserved = await assetContract.totalReservedSupply.callAsync()),
+          // (liquidityReserved = await assetContract.totalReservedSupply.callAsync()),
           (totalAssetSupply = await assetContract.totalAssetSupply.callAsync()),
           (totalAssetBorrow = await assetContract.totalAssetBorrow.callAsync()),
           (supplyInterestRate = await assetContract.supplyInterestRate.callAsync()),
           // avgBorrowInterestRate = await assetContract.avgBorrowInterestRate.callAsync()),
-          (borrowInterestRate = await assetContract.avgBorrowInterestRate.callAsync()) // borrowInterestRate
+          (borrowInterestRate = await assetContract.avgBorrowInterestRate.callAsync()), // borrowInterestRate
+          (torqueBorrowInterestRate = await assetContract.nextBorrowInterestRateWithOption.callAsync(new BigNumber(0), true)), // nextBorrowInterestRateWithOption
         ]);
 
         const assetErc20Address = this.getErc20AddressOfAsset(asset);
@@ -520,11 +522,13 @@ export class FulcrumProvider {
           name,
           null,// tokenPrice.dividedBy(10 ** 18),
           marketLiquidity.dividedBy(10 ** 18),
-          liquidityReserved.dividedBy(10 ** 18),
+          // liquidityReserved.dividedBy(10 ** 18),
+          new BigNumber(0),
           totalAssetSupply.dividedBy(10 ** 18),
           totalAssetBorrow.dividedBy(10 ** 18),
           supplyInterestRate.dividedBy(10 ** 18),
           borrowInterestRate.dividedBy(10 ** 18),
+          torqueBorrowInterestRate.dividedBy(10 ** 18),
           // avgBorrowInterestRate.dividedBy(10 ** 18),
           new BigNumber(0),
           lockedAssets.dividedBy(10 ** 18)
@@ -1377,7 +1381,8 @@ export class FulcrumProvider {
   };
 
   public addTokenToMetaMask = async (task: RequestTask) => {
-    if (this.providerType === ProviderType.MetaMask && this.contractsSource) {
+    return;
+    /*if (this.providerType === ProviderType.MetaMask && this.contractsSource) {
       try {
         // @ts-ignore
         if (window.web3) {
@@ -1400,19 +1405,19 @@ export class FulcrumProvider {
                   },
                 },
                 id: id,
-              }/*, (err: any, added: any) => {
+              }*//*, (err: any, added: any) => {
                 // console.log('provider returned', err, added)
                 if (err || 'error' in added) {
                   console.log(err, added);
                 }
-              }*/);
+              }*//*);
             }
           }
         }
       } catch(e) {
         // console.log(e);
       }
-    }
+    }*/
   }
 
   private processLendRequestTask = async (task: RequestTask, skipGas: boolean) => {

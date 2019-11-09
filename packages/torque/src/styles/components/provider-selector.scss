@@ -91,6 +91,19 @@
     &:active {
       background-color: $color-bg-squarelink--pressed;
     }
+
+    .provider-selector-item__logo {
+      text-align: center;
+      display: block !important;
+    }
+
+    .provider-selector-item__title {
+      padding-top: 6px;
+    }
+
+    img {
+      width: 55px;
+    }
   }
 
   .provider-selector-item--wallet-connect {
@@ -102,6 +115,31 @@
 
     &:active {
       background-color: $color-bg-wallet-connect--pressed;
+    }
+  }
+
+  .provider-selector-item--torus {
+    background-color: $color-bg-torus;
+
+    &:hover {
+      background-color: $color-bg-torus--hover;
+    }
+
+    &:active {
+      background-color: $color-bg-torus--pressed;
+    }
+
+    .provider-selector-item__logo {
+      text-align: center;
+      display: block !important;
+    }
+
+    .provider-selector-item__title {
+      padding-top: 6px;
+    }
+
+    img {
+      width: 48px;
     }
   }
 }
