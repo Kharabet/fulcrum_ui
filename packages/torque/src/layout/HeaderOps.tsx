@@ -21,7 +21,6 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
 
   constructor(props: IHeaderOpsProps) {
     super(props);
-
     this.state = {
       isMenuOpen: false
     };
@@ -37,6 +36,8 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
     // return !this.props.isMobileMedia ? this.renderDesktop() : this.renderMobile();
     return this.renderDesktop();
   }
+
+
 
   private renderDesktop = () => {
 
@@ -71,25 +72,37 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
             <HeaderMenu items={menu.items} />
           </div>
           <div className="header__right">
-            {TorqueProvider.Instance.providerType !== ProviderType.None ? (
-              <OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />
-            ) : ``}
+            <div className="header__provider">
+              {TorqueProvider.Instance.providerType !== ProviderType.None ? (
+                <OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />
+              ) : ``}
+            </div>
             <div className="header_icon" onClick={this.onMenuToggle}>
               <img className="header__menu" src={toggleImg} />
             </div>
           </div>
+
         </div>
 
           <div className={sidebar_class}>
-
+            <div className="header_btn">
+              {TorqueProvider.Instance.providerType !== ProviderType.None ? (
+              <OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />
+            ) : ``}
+            </div>
+            <div className="heade_nav_menu">
               <HeaderMenu items={menu.items} />
+            </div>
           </div>
+
+
       </header>
     );
   };
   private onMenuToggle = () => {
     this.setState({ ...this.state, isMenuOpen: !this.state.isMenuOpen });
   };
+
 
   /*private renderMobile = () => {
 
