@@ -1,5 +1,6 @@
 @media screen and (max-width: $mobile-version-max-width) {
   .header {
+    margin-bottom: 1rem;
     .header__row {
       display: flex;
       flex-direction: row;
@@ -30,7 +31,18 @@
       .header_icon{
         width: 20%;
       }
+
     }
+    .header_btn{
+        position: absolute;
+        top:0;
+      }
+      .heade_nav_menu{
+        margin-top: 3rem;
+      }
+     .header__provider{
+       display: none;
+     }
     .sidebar_n{
       width:300px
     }
