@@ -104,3 +104,32 @@
     background-color: $color-green--pressed;
   }
 }
+
+
+@media only screen and (max-width: $mobile-version-max-width) {
+  .button-landing-container {
+    padding: 3.5rem 0;
+    margin: 0 1rem;
+
+    &.button-landing-container--green {
+      background-image: url("../assets/images/img_dots_pattern_blue.svg");
+      background-repeat: no-repeat;
+      background-position: bottom center;
+    }
+
+    &.button-landing-container--blue {
+      background-image: url("../assets/images/img_dots_pattern_blue.svg");
+      background-repeat: no-repeat;
+      background-position: top center;
+    }
+
+    &:first-child {
+      margin-left: 0;
+    }
+
+    &:last-child {
+      margin-left: 0;
+      margin-right: 1rem;
+    }
+  }
+}

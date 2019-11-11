@@ -1,3 +1,4 @@
+
 .asset-selector {
   display: flex;
   flex-direction: row;
@@ -35,13 +36,13 @@
       margin-top: 2.5rem;
     }
 
-    &:first-child {
-      margin-top: unset;
-    }
-
-    &:first-child + div {
-      margin-top: unset;
-    }
+    //&:first-child {
+    //  margin-top: unset;
+    //}
+    //
+    //&:first-child + div {
+    //  margin-top: unset;
+    //}
 
     //&:last-child {
     //  margin-right: 0;
@@ -142,5 +143,163 @@
     background-image: url("../assets/images/bg_tile_usdc.svg");
     background-repeat: no-repeat;
     background-position: right;
+  }
+}
+
+@media only screen and (max-width: $mobile-version-width) {
+  .asset-selector {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: inherit;
+    max-height: 30rem;
+    justify-content: space-between;
+
+    margin-bottom: 2rem;
+
+    .asset-selector-item {
+      cursor: pointer;
+
+      display: flex;
+      flex-direction: column;
+      flex: 0 47%;
+
+      height: 27rem;
+      width: 100%;
+      margin: 0 1rem;
+      padding: 4rem;
+
+      border-radius: 1rem;
+      background-color: $color-gray-light;
+
+      &:hover {
+        background-color: $color-gray-darker;
+      }
+
+      &:active {
+        background-color: $color-gray-darker-2;
+      }
+
+      &:nth-child(2) {
+        margin-left: 0;
+        margin-top: 2.5rem;
+      }
+
+      //&:first-child {
+      //  margin-top: unset;
+      //}
+      //
+      //&:first-child + div {
+      //  margin-top: unset;
+      //}
+
+      &:last-child {
+        margin-bottom: 2rem;
+      }
+
+      margin-left: 0;
+      margin-top: 2.5rem;
+
+      .asset-selector__title {
+        width: 16.5rem;
+        margin: 2rem 0;
+
+        font-size: 3rem;
+        font-weight: bold;
+        line-height: 1.17;
+        letter-spacing: -0.48px;
+        text-align: left;
+        color: $color-gray-dark;
+
+        &--coming-soon {
+          font-size: 1rem;
+          color: #a9b5c7;
+          margin: unset;
+          letter-spacing: unset;
+          margin-top: -1.875rem;
+          margin-bottom: 0.8125rem;
+        }
+      }
+
+      .asset-selector__interest-rate {
+        width: 100%;
+        font-size: 1rem;
+        font-weight: bold;
+        line-height: 1.5;
+        letter-spacing: -0.16px;
+        text-align: left;
+        background: -webkit-linear-gradient(left, #ecc75c, #6cd6b2 15%, #92a7ea 30%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+    }
+
+    .asset-selector-item--bat {
+      background-image: url("../assets/images/bg_tile_bat.svg");
+      background-repeat: no-repeat;
+      background-position: right;
+    }
+
+    .asset-selector-item--zrx {
+      background-image: url("../assets/images/bg_tile_zrx.svg");
+      background-repeat: no-repeat;
+      background-position: right;
+    }
+
+    .asset-selector-item--wbtc {
+      background-image: url("../assets/images/bg_tile_btc.svg");
+      background-repeat: no-repeat;
+      background-position: right;
+    }
+
+    .asset-selector-item--dai {
+      background-image: url("../assets/images/bg_tile_dai.svg");
+      background-repeat: no-repeat;
+      background-position: right;
+    }
+
+    .asset-selector-item--eth {
+      background-image: url("../assets/images/bg_tile_eth.svg");
+      background-repeat: no-repeat;
+      background-position: right;
+    }
+
+    .asset-selector-item--knc {
+      background-image: url("../assets/images/bg_tile_knc.svg");
+      background-repeat: no-repeat;
+      background-position: right;
+    }
+
+    .asset-selector-item--link {
+      background-image: url("../assets/images/bg_tile_link.svg");
+      background-repeat: no-repeat;
+      background-position: right;
+    }
+
+    .asset-selector-item--mkr {
+      background-image: url("../assets/images/bg_tile_mkr.svg");
+      background-repeat: no-repeat;
+      background-position: right;
+    }
+
+    .asset-selector-item--rep {
+      background-image: url("../assets/images/bg_tile_rep.svg");
+      background-repeat: no-repeat;
+      background-position: right;
+    }
+
+    .asset-selector-item--usdc {
+      background-image: url("../assets/images/bg_tile_usdc.svg");
+      background-repeat: no-repeat;
+      background-position: right;
+      margin-top: 2.5rem;
+    }
+  }
+  .modal-container {
+    width:100% !important;
+    padding: 15px !important;
+
+    .modal-content {
+      padding: 0 16px !important;
+    }
   }
 }

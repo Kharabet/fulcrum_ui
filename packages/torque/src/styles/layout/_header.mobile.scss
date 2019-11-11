@@ -2,15 +2,100 @@
   .header {
     .header__row {
       display: flex;
-      flex-direction: column;
+      flex-direction: row;
+
+
 
       .header__left {
-        width: 100%;
+        //width: 100%;
+        float: left;
+      }
+      .header__center {
+        display: none;
       }
 
       .header__right {
-        width: 100%;
+        width: 65%;
+        float: left;
+      }
+      .header__menu{
+        width: 45px;
+        display: block;
+        padding-top: 1.15rem;
+        height: 35px;
+        z-index: 1;
+        position:relative;
+
+      }
+      .header_icon{
+        width: 20%;
       }
     }
+    .sidebar_n{
+      width:300px
+    }
+
+
+
+    .sidebar_h {
+        position: relative;
+        display: none;
+        animation: animateright 0.4s
+    }
+
+    @keyframes animateright {
+        from {
+            right: 300px;
+            opacity: 0
+        }
+        to {
+            right: 0;
+            opacity: 1
+        }
+    }
+    .sidebar_v {
+        position: fixed;
+        display: block;
+        width: 300px;
+        height: 100%;
+        right: 0px;
+        padding: 20px;
+        background-color: white;
+        animation: animateright 0.4s
+    }
+
+    @keyframes animateright {
+        from {
+            right: -500px;
+            opacity: 0
+        }
+        to {
+            right: 0;
+            opacity: 1
+        }
+    }
+
+
+    //.sidebar{
+    //  z-index: 2;
+    //  position: absolute;
+    //  top: 0px;
+    //  bottom: 0px;
+    //  transition: -webkit-transform 0.5s ease-out 0.5s;
+    //   -webkit-animation-delay: 2s;
+    //  animation: slide 0.5s forwards;
+    //  animation-delay: 2s;
+    //  will-change: transform;
+    //  overflow-y: auto;
+    //  left: 0px;
+    //  transform: translateX(0%);
+    //  box-shadow: rgba(0, 0, 0, 0.15) 2px 2px 4px;
+    //}
+    //.sidebar_v{
+    //  z-index: 1; position: fixed; top: 0px; left: 0px; right: 0px; bottom: 0px; opacity: 1; visibility: visible; transition: opacity 0.3s ease-out 0s, visibility 0.3s ease-out 0s; background-color: rgba(0, 0, 0, 0.3);
+    //}
+    //.sidebar_h{
+    //  z-index: 1; position: fixed; top: 0px; left: 0px; right: 0px; bottom: 0px; opacity: 0; visibility: hidden; transition: opacity 0.3s ease-out 0s, visibility 0.3s ease-out 0s; background-color: rgba(0, 0, 0, 0.3);
+    //}
   }
 }

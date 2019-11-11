@@ -5,7 +5,8 @@ import { TorqueProvider } from "../services/TorqueProvider";
 import { HeaderLogo } from "./HeaderLogo";
 import { HeaderMenu, IHeaderMenuProps } from "./HeaderMenu";
 import { HeaderMenuToggle } from "./HeaderMenuToggle";
-
+import menu_icon from "../assets/images/menu-icon.svg";
+import ic_close from "../assets/images/close.svg";
 export interface IHeaderOpsProps {
   doNetworkConnect: () => void;
   isLoading: boolean;
@@ -17,7 +18,7 @@ interface IHeaderOpsState {
 }
 
 export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
-  
+
   constructor(props: IHeaderOpsProps) {
     super(props);
 
@@ -38,7 +39,7 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
   }
 
   private renderDesktop = () => {
-    
+
     let menu: IHeaderMenuProps;
     if (TorqueProvider.Instance.providerType !== ProviderType.None) {
       menu = {
@@ -57,7 +58,9 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
         ]
       };
     }
-    
+
+    const toggleImg = !this.state.isMenuOpen ? menu_icon : ic_close;
+    const sidebar_class = !this.state.isMenuOpen ? 'sidebar_h' : 'sidebar_v'
     return (
       <header className="header">
         <div className="header__row">
@@ -71,14 +74,25 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
             {TorqueProvider.Instance.providerType !== ProviderType.None ? (
               <OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />
             ) : ``}
+            <div className="header_icon" onClick={this.onMenuToggle}>
+              <img className="header__menu" src={toggleImg} />
+            </div>
           </div>
         </div>
+
+          <div className={sidebar_class}>
+
+              <HeaderMenu items={menu.items} />
+          </div>
       </header>
     );
   };
+  private onMenuToggle = () => {
+    this.setState({ ...this.state, isMenuOpen: !this.state.isMenuOpen });
+  };
 
   /*private renderMobile = () => {
-    
+
     const menu: IHeaderMenuProps = {
       items: [
         { id: 0, title: "Home", link: "/", external: false },
@@ -86,7 +100,7 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
         { id: 3, title: "Faq", link: "https://bzx.network/faq-fulcrum.html", external: true }
       ]
     };
-    
+
     return (
       <header className="header">
         <div className="header__row">
