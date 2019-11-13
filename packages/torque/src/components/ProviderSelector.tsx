@@ -15,6 +15,7 @@ export class ProviderSelector extends Component<IProviderSelectorProps> {
         <ProviderSelectorItem providerType={ProviderType.Portis} onSelectProvider={this.props.onSelectProvider} />
         <ProviderSelectorItem providerType={ProviderType.Squarelink} onSelectProvider={this.props.onSelectProvider} />
         <ProviderSelectorItem providerType={ProviderType.Torus} onSelectProvider={this.props.onSelectProvider} />
+        <ProviderSelectorItem providerType={ProviderType.WalletLink} onSelectProvider={this.props.onSelectProvider} />
       </div>
     );
   }

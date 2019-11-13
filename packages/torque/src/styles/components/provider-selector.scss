@@ -142,6 +142,30 @@
       width: 48px;
     }
   }
+  .provider-selector-item--walletlink {
+    background-color: $color-bg-torus;
+
+    &:hover {
+      background-color: $color-bg-torus--hover;
+    }
+
+    &:active {
+      background-color: $color-bg-torus--pressed;
+    }
+
+    .provider-selector-item__logo {
+      text-align: center;
+      display: block !important;
+    }
+
+    .provider-selector-item__title {
+      padding-top: 6px;
+    }
+
+    img {
+      width: 48px;
+    }
+  }
 }
 
 

@@ -14,6 +14,8 @@ import Fortmatic from "fortmatic";
 
 // @ts-ignore
 import Squarelink from "squarelink";
+import WalletLink from "walletlink"
+import Web3 from "web3"
 
 import Torus from "@toruslabs/torus-embed";
 
@@ -33,6 +35,7 @@ export class Web3ConnectionFactory {
   public static fortmaticProvider: Fortmatic | null;
   public static bitski: Bitski | null;
   public static torus: Torus | null;
+  public static walletLink: WalletLink | null;
   public static networkId: number;
 
   private static publicStoreUpdate: any | null;
@@ -76,15 +79,19 @@ export class Web3ConnectionFactory {
           subProvider = await Web3ConnectionFactory.getProviderTorus();
           break;
         }
+        case ProviderType.WalletLink: {
+          subProvider = await Web3ConnectionFactory.getProviderWalletLint();
+          break;
+        }
       }
     }
-
+  
     if (!subProvider) {
       subProvider = null;
     }
 
     /*
-      TODO: 
+      TODO:
       Set pollingInterval to 8000. Use https://github.com/MetaMask/eth-block-tracker with Web3ProviderEngine
       to poll for new blocks and use events to update the UI.
 
@@ -94,7 +101,7 @@ export class Web3ConnectionFactory {
           blockTrackerProvider?: any;
       }
     */
-    
+
     let web3Wrapper: Web3Wrapper;
     let providerEngine: Web3ProviderEngine = new Web3ProviderEngine({ pollingInterval: 3600000 }); // 1 hour polling
 
@@ -124,28 +131,29 @@ export class Web3ConnectionFactory {
       } else if (providerType === ProviderType.Squarelink) {
         try {
           providerEngine.addProvider(new SignerSubprovider(subProvider));
-          
+
           // test for non-error
           await providerEngine.start();
           web3Wrapper = new Web3Wrapper(providerEngine);
           await web3Wrapper.getAvailableAddressesAsync();
-          // console.log(accounts);
-
           canWrite = true;
         } catch(e) {
-          // console.log(e);
-          
+
           subProvider = null;
           await providerEngine.stop();
-          
+
           // rebuild providerEngine
           providerEngine = new Web3ProviderEngine({ pollingInterval: 3600000 }); // 1 hour polling
           providerEngine.addProvider(Web3ConnectionFactory.alchemyProvider);
-          
+
           // @ts-ignore
           web3Wrapper = undefined;
         }
-      } else {
+      } else if (providerType === ProviderType.WalletLink) {
+        providerEngine.addProvider(new Web3(subProvider));
+        canWrite = true;
+      }
+      else {
         providerEngine.addProvider(new SignerSubprovider(subProvider));
         canWrite = true;
       }
@@ -160,7 +168,7 @@ export class Web3ConnectionFactory {
     if (subProvider && providerType === ProviderType.MetaMask) {
       // TODO: How do we detect network or account change in Gnosis Safe and EQL Wallet?
       if (!((subProvider.isSafe && subProvider.currentSafe) || subProvider.isEQLWallet)) {
-        
+
         Web3ConnectionFactory.metamaskProvider = subProvider;
 
         Web3ConnectionFactory.publicStoreUpdate = async (result: any) => {
@@ -212,7 +220,7 @@ export class Web3ConnectionFactory {
             return;
           }
         }
-        
+
         // @ts-ignore
         Web3ConnectionFactory.metamaskProvider.publicConfigStore.on("update", Web3ConnectionFactory.publicStoreUpdate);
       }
@@ -232,7 +240,7 @@ export class Web3ConnectionFactory {
 
   private static async getProviderMetaMask(): Promise<any | null> {
     await this.cleanupProviders();
-    
+
     // @ts-ignore
     if (window.ethereum) {
       // @ts-ignore
@@ -257,7 +265,7 @@ export class Web3ConnectionFactory {
 
   private static async getProviderBitski(): Promise<any> {
     await this.cleanupProviders();
-    
+
     if (Web3ConnectionFactory.bitski) {
       if (Web3ConnectionFactory.bitski.authStatus === AuthenticationStatus.NotConnected) {
         await Web3ConnectionFactory.bitski.signIn();
@@ -271,7 +279,7 @@ export class Web3ConnectionFactory {
 
   private static async getProviderFortmatic(): Promise<any> {
     await this.cleanupProviders();
-    
+
     if (Web3ConnectionFactory.fortmaticProvider) {
       // console.log(Web3ConnectionFactory.fortmaticProvider, Web3ConnectionFactory.fortmaticProvider.user);
       if (!Web3ConnectionFactory.fortmaticProvider.isLoggedIn) {
@@ -289,7 +297,7 @@ export class Web3ConnectionFactory {
 
   /*private static async getProviderWalletConnect(): Promise<any> {
     await this.cleanupProviders();
-    
+
     const walletConnector = await new WalletConnectProvider({
       bridge: "https://bridge.walletconnect.org"
     });
@@ -300,21 +308,21 @@ export class Web3ConnectionFactory {
 
   private static async getProviderPortis(): Promise<any> {
     await this.cleanupProviders();
-    
+
     const portis = await new Portis(configProviders.Portis_DAppId, ethNetwork || "");
     return portis.provider;
   }
 
   private static async getProviderSquarelink(): Promise<any> {
     await this.cleanupProviders();
-    
+
     const sqlk = await new Squarelink(configProviders.Squarelink_ClientId, ethNetwork || undefined);
     return sqlk.getProvider();
   }
 
   private static async getProviderTorus(): Promise<any> {
     await this.cleanupProviders();
-    
+
     Web3ConnectionFactory.torus = new Torus({
       buttonPosition: 'top-left' // default: bottom-left
     });
@@ -335,6 +343,21 @@ export class Web3ConnectionFactory {
 
     return Web3ConnectionFactory.torus.provider;
   }
+
+  private static async getProviderWalletLint(): Promise<any> {
+    await this.cleanupProviders();
+    //
+    Web3ConnectionFactory.walletLink = new WalletLink({
+      appName: "Torque",
+      appLogoUrl: "https://torque.loans/static/media/torque_logo.a96c591f.svg"
+    })
+    const wallet_link = Web3ConnectionFactory.walletLink.makeWeb3Provider("https://mainnet.infura.io/v3/7989ee6b11324cc49f18b8ab7be5a7c4", 1)
+    wallet_link.enable().then((accounts: string[]) => {
+      console.log(`User's address is ${accounts[0]}`)
+    })
+    return wallet_link;
+  }
+
 
   private static async cleanupProviders(): Promise<any> {
     if (Web3ConnectionFactory.torus) {
