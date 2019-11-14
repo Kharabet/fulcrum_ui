@@ -12,12 +12,10 @@ import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
 import { ProfitTicker } from "./ProfitTicker";
 
-
 export interface ILendTokenSelectorItemProps {
   asset: Asset;
   onLend: (request: LendRequest) => void;
 }
-
 
 interface ILendTokenSelectorItemState {
   assetDetails: AssetDetails | null;
