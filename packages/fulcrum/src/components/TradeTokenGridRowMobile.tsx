@@ -15,10 +15,9 @@ import { FulcrumProvider } from "../services/FulcrumProvider";
 // import { Change24HMarker, Change24HMarkerSize } from "./Change24HMarker";
 import { LeverageSelector } from "./LeverageSelector";
 import { PositionTypeMarker } from "./PositionTypeMarker";
-import {LendType} from "../domain/LendType";
 import TagManager from "react-gtm-module";
 
-export interface ITradeTokenGridRowProps {
+export interface ITradeTokenGridRowMBProps {
   selectedKey: TradeTokenKey;
 
   asset: Asset;
@@ -42,8 +41,8 @@ interface ITradeTokenGridRowState {
   balance: BigNumber;
 }
 
-export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITradeTokenGridRowState> {
-  constructor(props: ITradeTokenGridRowProps, context?: any) {
+export class TradeTokenGridRowMobile extends Component<ITradeTokenGridRowMBProps, ITradeTokenGridRowState> {
+  constructor(props: ITradeTokenGridRowMBProps, context?: any) {
     super(props, context);
 
     const assetDetails = AssetsDictionary.assets.get(props.asset);
@@ -62,7 +61,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.TradeTransactionMined, this.onTradeTransactionMined);
   }
 
-  private getTradeTokenGridRowSelectionKeyRaw(props: ITradeTokenGridRowProps, leverage: number = this.state.leverage) {
+  private getTradeTokenGridRowSelectionKeyRaw(props: ITradeTokenGridRowMBProps, leverage: number = this.state.leverage) {
     const key = new TradeTokenKey(props.asset, props.defaultUnitOfAccount, props.positionType, leverage, props.defaultTokenizeNeeded, 2);
 
     // check for version 2, and revert back to version if not found
@@ -123,7 +122,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
   }
 
   public componentDidUpdate(
-    prevProps: Readonly<ITradeTokenGridRowProps>,
+    prevProps: Readonly<ITradeTokenGridRowMBProps>,
     prevState: Readonly<ITradeTokenGridRowState>,
     snapshot?: any
   ): void {
@@ -160,35 +159,37 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
 
     return (
       <div className={`trade-token-grid-row ${isActiveClassName}`} onClick={this.onSelectClick}>
-        <div
-          className="trade-token-grid-row__col-token-image"
-          style={{ backgroundColor: this.state.assetDetails.bgColor, borderLeftColor: this.state.assetDetails.bgColor }}
-        >
-          <img src={this.state.assetDetails.logoSvg} alt={this.state.assetDetails.displayName} />
-        </div>
-        <div className="trade-token-grid-row__col-token-name">
-          {/*<span className="rounded-mark">?</span>*/}
-          {this.state.assetDetails.displayName}
-        </div>
-        <div className="trade-token-grid-row__col-position-type">
-          <PositionTypeMarker value={this.props.positionType} />
-        </div>
+        {/*<div*/}
+          {/*className="trade-token-grid-row__col-token-image"*/}
+          {/*style={{ backgroundColor: this.state.assetDetails.bgColor, borderLeftColor: this.state.assetDetails.bgColor }}*/}
+        {/*>*/}
+          {/*<img src={this.state.assetDetails.logoSvg} alt={this.state.assetDetails.displayName} />*/}
+        {/*</div>*/}
+        {/*<div className="trade-token-grid-row__col-token-name">*/}
+          {/*/!*<span className="rounded-mark">?</span>*!/*/}
+          {/*{this.state.assetDetails.displayName}*/}
+        {/*</div>*/}
+        {/*<div className="trade-token-grid-row__col-position-type">*/}
+          {/*<PositionTypeMarker value={this.props.positionType} />*/}
+        {/*</div>*/}
         <div className="trade-token-grid-row__col-leverage">
-          <LeverageSelector
-            value={this.state.leverage}
-            minValue={this.props.positionType === PositionType.SHORT ? 1 : 2}
-            maxValue={4}
-            onChange={this.onLeverageSelect}
-          />
+          {this.state.leverage+'x'}
+          {/*<LeverageSelector*/}
+            {/*value={this.state.leverage}*/}
+            {/*minValue={this.props.positionType === PositionType.SHORT ? 1 : 2}*/}
+            {/*maxValue={4}*/}
+            {/*onChange={this.onLeverageSelect}*/}
+          {/*/>*/}
         </div>
         <div title={`$${bnPrice.toFixed(18)}`} className="trade-token-grid-row__col-price">{`$${bnPrice.toFixed(2)}`}</div>
+        <div title={this.state.interestRate.gt(0) ? `${this.state.interestRate.toFixed(18)}%` : ``} className="trade-token-grid-row__col-profit">
+          {this.state.interestRate.gt(0) ? `${this.state.interestRate.toFixed(4)}%` : "0.000%"}
+        </div>
         <div title={`$${bnLiquidationPrice.toFixed(18)}`} className="trade-token-grid-row__col-price">{`$${bnLiquidationPrice.toFixed(2)}`}</div>
         {/*<div className="trade-token-grid-row__col-change24h">
           <Change24HMarker value={bnChange24h} size={Change24HMarkerSize.MEDIUM} />
         </div>*/}
-        <div title={this.state.interestRate.gt(0) ? `${this.state.interestRate.toFixed(18)}%` : ``} className="trade-token-grid-row__col-profit">
-          {this.state.interestRate.gt(0) ? `${this.state.interestRate.toFixed(4)}%` : "0.000%"}
-        </div>
+
         {this.renderActions(this.state.balance.eq(0))}
       </div>
     );
@@ -239,9 +240,8 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
                             },
                             dataLayerName: 'PageDataLayer'
                         }
-        console.log("tagManagerArgs = ",tagManagerArgs)
     TagManager.dataLayer(tagManagerArgs)
-    console.log("TagManager = ",TagManager)
+
     this.props.onTrade(
       new TradeRequest(
         TradeType.BUY,
