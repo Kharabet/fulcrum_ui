@@ -720,6 +720,8 @@ export class TorqueProvider {
       return "Safe";
     } else if (borrowedFundsState.collateralizedPercent.gt(0.15)) {
       return "Danger";
+    } else if (borrowedFundsState.collateralizedPercent.eq(0)) {
+      return "Display Error";
     } else {
       return "Liquidation Pending";
     }
