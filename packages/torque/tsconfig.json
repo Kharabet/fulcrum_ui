@@ -2,5 +2,9 @@
   "extends": "../../tsconfig",
   "include": [
     "src"
+  ],
+  "exclude": [
+      "node_modules",
+      "**/*.spec.ts"
   ]
 }
