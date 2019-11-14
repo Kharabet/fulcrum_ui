@@ -1,6 +1,6 @@
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import React, { Component } from "react";
-import ReactGA from "react-ga";
+import TagManager from "react-gtm-module";
 import Intercom from "react-intercom";
 import Modal from "react-modal";
 import { HashRouter, Redirect, Route, Switch } from "react-router-dom";
@@ -25,7 +25,9 @@ const isMainnetProd =
   && process.env.REACT_APP_ETH_NETWORK === "mainnet";
 
 if (isMainnetProd) {
-  ReactGA.initialize(configProviders.Google_TrackingID);
+  TagManager.initialize({
+    gtmId: configProviders.Google_TagManagerID
+  });
 }
 
 interface IAppRouterState {
@@ -104,13 +106,6 @@ export class AppRouter extends Component<any, IAppRouterState> {
                       <Route exact={true} path="/stats" render={() => <StatsPage isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} />} />
                       <Route path="*" render={() => <Redirect to="/"/> } />
                     </Switch>
-                    {isMainnetProd ? (
-                      <Route path="/" render={({location}) => {
-                        ReactGA.ga('set', 'page', location.pathname + location.search);
-                        ReactGA.ga('send', 'pageview');
-                        return null;
-                      }} />
-                    ) : ``}
                   </LocationListener>
                 </HashRouter>
           }
@@ -124,7 +119,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
     if (isMobileMedia !== this.state.isMobileMedia) {
       this.setState({ isMobileMedia });
     }
-  }
+  };
 
   public doNetworkConnect = () => {
     this.setState({ ...this.state, isProviderMenuModalOpen: true });
