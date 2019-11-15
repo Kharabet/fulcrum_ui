@@ -1,5 +1,6 @@
 import { BigNumber } from "@0x/utils";
 import React, { Component } from "react";
+import TagManager from 'react-gtm-module';
 import { Asset } from "../domain/Asset";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
@@ -218,6 +219,19 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
   };
 
   public onLendClick = () => {
+    const tagManagerArgs = {
+                            dataLayer: {
+                                name:LendType.LEND + '-' + this.props.asset,
+                                sku:this.props.asset,
+                                category:LendType.LEND,
+                                price:'0',
+                                status:"In-progress"
+                            },
+                            dataLayerName: 'PageDataLayer'
+                        }
+    console.log("tagManagerArgs = ",tagManagerArgs)
+    TagManager.dataLayer(tagManagerArgs)
+    console.log("TagManager = ",TagManager)
     this.props.onLend(new LendRequest(LendType.LEND, this.props.asset, new BigNumber(0)));
   };
 
