@@ -19,5 +19,9 @@
     "noEmit": true,
     "jsx": "preserve",
     "typeRoots": ["node_modules/@0x/typescript-typings/types", "node_modules/@types"]
-  }
+  },
+  "exclude": [
+      "node_modules",
+      "**/*.spec.ts"
+  ]
 }
