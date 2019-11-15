@@ -25,12 +25,14 @@ const isMainnetProd =
   process.env.NODE_ENV && process.env.NODE_ENV !== "development"
   && process.env.REACT_APP_ETH_NETWORK === "mainnet";
 console.log("isMainnetProd = ",isMainnetProd)
-if (!isMainnetProd) {
+if (isMainnetProd) {
   // ReactGA.initialize(configProviders.Google_TrackingID);
   const tagManagerArgs = {
       gtmId: configProviders.Google_TrackingID
   }
+  console.log("tagManagerArgs = ",tagManagerArgs)
   TagManager.initialize(tagManagerArgs)
+  console.log("TagManager home init = ",TagManager)
 }
 
 interface IAppRouterState {
