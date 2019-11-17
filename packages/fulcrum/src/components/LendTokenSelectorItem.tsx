@@ -1,6 +1,6 @@
 import { BigNumber } from "@0x/utils";
 import React, { Component } from "react";
-import TagManager from 'react-gtm-module';
+import TagManager from "react-gtm-module";
 import { Asset } from "../domain/Asset";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
@@ -12,10 +12,12 @@ import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
 import { ProfitTicker } from "./ProfitTicker";
 
+
 export interface ILendTokenSelectorItemProps {
   asset: Asset;
   onLend: (request: LendRequest) => void;
 }
+
 
 interface ILendTokenSelectorItemState {
   assetDetails: AssetDetails | null;
@@ -59,6 +61,7 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
       profit = new BigNumber(0);
     }
     const balanceOfUser = await FulcrumProvider.Instance.getITokenAssetBalanceOfUser(this.props.asset);
+
     const address = FulcrumProvider.Instance.contractsSource ?
       await FulcrumProvider.Instance.contractsSource.getITokenErc20Address(this.props.asset) || "" :
       "";
@@ -72,6 +75,13 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
       iTokenAddress: address,
       tickerSecondDiff: balanceOfUser.toNumber() * (interestRate.toNumber() / 100) / 365 / 24 / 60 / 60,
     });
+
+    if(address!=''){
+      this.setState({
+        isLoading: false,
+      });
+    }
+
   }
 
   private onProviderAvailable = async () => {
@@ -81,9 +91,9 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
   // noinspection JSUnusedLocalSymbols TODO
   private onProviderChanged = async (event: ProviderChangedEvent) => {
     await this.derivedUpdate();
-    this.setState({
-      isLoading: false,
-    });
+    // this.setState({
+    //   isLoading: false,
+    // });
   };
 
   private onLendTransactionMined = async (event: LendTransactionMinedEvent) => {
@@ -168,7 +178,8 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
           ) : (
             <div className="token-selector-item__description">
               <div className="token-selector-item__interest-rate-container">
-                <div className="token-selector-item__interest-rate-title">Interest APR:</div>
+                <div className="token-selector-item__interest-rate-title">Interest APR :</div>
+
                 {!this.state.isLoading ? (
                   <div
                     title={`${this.state.interestRate.toFixed(18)}%`}
@@ -229,9 +240,7 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
                             },
                             dataLayerName: 'PageDataLayer'
                         }
-    console.log("tagManagerArgs = ",tagManagerArgs)
     TagManager.dataLayer(tagManagerArgs)
-    console.log("TagManager = ",TagManager)
     this.props.onLend(new LendRequest(LendType.LEND, this.props.asset, new BigNumber(0)));
   };
 
