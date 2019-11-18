@@ -1,4 +1,4 @@
-import { BigNumber } from "bignumber.js";
+import { BigNumber } from "@0x/utils";
 import { pTokenContract } from "../../contracts/pTokenContract";
 import { AssetsDictionary } from "../../domain/AssetsDictionary";
 import { RequestTask } from "../../domain/RequestTask";
