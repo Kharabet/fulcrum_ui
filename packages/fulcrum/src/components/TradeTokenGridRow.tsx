@@ -40,6 +40,7 @@ interface ITradeTokenGridRowState {
   latestPriceDataPoint: IPriceDataPoint;
   interestRate: BigNumber;
   balance: BigNumber;
+  isLoading: boolean;
 }
 
 export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITradeTokenGridRowState> {
@@ -54,7 +55,8 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
       latestPriceDataPoint: FulcrumProvider.Instance.getPriceDefaultDataPoint(),
       interestRate: new BigNumber(0),
       balance: new BigNumber(0),
-      version: 2
+      version: 2,
+      isLoading:true
     };
 
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
@@ -89,13 +91,20 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
     const interestRate = await FulcrumProvider.Instance.getTradeTokenInterestRate(tradeTokenKey);
     const balance = await FulcrumProvider.Instance.getPTokenBalanceOfUser(tradeTokenKey);
 
+
     this.setState({
       ...this.state,
       latestPriceDataPoint: latestPriceDataPoint,
       interestRate: interestRate,
       balance: balance,
-      version: version
+      version: version,
+
     });
+    if(latestPriceDataPoint.price !=0){
+      this.setState({
+        isLoading: false,
+      });
+    }
   }
 
   private onProviderAvailable = async () => {
@@ -181,13 +190,19 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
             onChange={this.onLeverageSelect}
           />
         </div>
-        <div title={`$${bnPrice.toFixed(18)}`} className="trade-token-grid-row__col-price">{`$${bnPrice.toFixed(2)}`}</div>
-        <div title={`$${bnLiquidationPrice.toFixed(18)}`} className="trade-token-grid-row__col-price">{`$${bnLiquidationPrice.toFixed(2)}`}</div>
+        <div title={`$${bnPrice.toFixed(18)}`} className="trade-token-grid-row__col-price">
+          {!this.state.isLoading ?
+          `$${bnPrice.toFixed(2)}` : 'Loading...'}
+        </div>
+        <div title={`$${bnLiquidationPrice.toFixed(18)}`} className="trade-token-grid-row__col-price">
+          {!this.state.isLoading ?
+            `$${bnLiquidationPrice.toFixed(2)}` : 'Loading...'}
+        </div>
         {/*<div className="trade-token-grid-row__col-change24h">
           <Change24HMarker value={bnChange24h} size={Change24HMarkerSize.MEDIUM} />
         </div>*/}
         <div title={this.state.interestRate.gt(0) ? `${this.state.interestRate.toFixed(18)}%` : ``} className="trade-token-grid-row__col-profit">
-          {this.state.interestRate.gt(0) ? `${this.state.interestRate.toFixed(4)}%` : "0.000%"}
+          {this.state.interestRate.gt(0) ? `${this.state.interestRate.toFixed(4)}%` : "Loading..."}
         </div>
         {this.renderActions(this.state.balance.eq(0))}
       </div>
