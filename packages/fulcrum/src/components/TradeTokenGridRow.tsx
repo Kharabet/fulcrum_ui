@@ -1,9 +1,11 @@
 import { BigNumber } from "@0x/utils";
 import React, { Component } from "react";
+import TagManager from "react-gtm-module";
 import { Asset } from "../domain/Asset";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { IPriceDataPoint } from "../domain/IPriceDataPoint";
+import {LendType} from "../domain/LendType";
 import { PositionType } from "../domain/PositionType";
 import { TradeRequest } from "../domain/TradeRequest";
 import { TradeTokenKey } from "../domain/TradeTokenKey";
@@ -15,8 +17,6 @@ import { FulcrumProvider } from "../services/FulcrumProvider";
 // import { Change24HMarker, Change24HMarkerSize } from "./Change24HMarker";
 import { LeverageSelector } from "./LeverageSelector";
 import { PositionTypeMarker } from "./PositionTypeMarker";
-import {LendType} from "../domain/LendType";
-import TagManager from "react-gtm-module";
 
 export interface ITradeTokenGridRowProps {
   selectedKey: TradeTokenKey;
@@ -91,20 +91,14 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
     const interestRate = await FulcrumProvider.Instance.getTradeTokenInterestRate(tradeTokenKey);
     const balance = await FulcrumProvider.Instance.getPTokenBalanceOfUser(tradeTokenKey);
 
-
-    this.setState({
+    this.setState(p => ({
       ...this.state,
       latestPriceDataPoint: latestPriceDataPoint,
       interestRate: interestRate,
       balance: balance,
       version: version,
-
-    });
-    if(latestPriceDataPoint.price !=0){
-      this.setState({
-        isLoading: false,
-      });
-    }
+      isLoading: latestPriceDataPoint.price !== 0 ? false : p.isLoading
+    }));
   }
 
   private onProviderAvailable = async () => {
@@ -246,17 +240,17 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
     event.stopPropagation();
     const tagManagerArgs = {
                             dataLayer: {
-                                name:this.state.leverage + 'x' + this.props.asset +'-'+ this.props.positionType +'-'+ this.props.defaultUnitOfAccount,
-                                sku:this.state.leverage + 'x' + this.props.asset +'-'+ this.props.positionType,
-                                category:this.props.positionType,
-                                price:'0',
-                                status:"In-progress"
+                                name: this.state.leverage + 'x' + this.props.asset +'-'+ this.props.positionType +'-'+ this.props.defaultUnitOfAccount,
+                                sku: this.state.leverage + 'x' + this.props.asset +'-'+ this.props.positionType,
+                                category: this.props.positionType,
+                                price: "0",
+                                status: "In-progress"
                             },
                             dataLayerName: 'PageDataLayer'
                         }
-        console.log("tagManagerArgs = ",tagManagerArgs)
+    // console.log("tagManagerArgs = ",tagManagerArgs)
     TagManager.dataLayer(tagManagerArgs)
-    console.log("TagManager = ",TagManager)
+    // console.log("TagManager = ",TagManager)
     this.props.onTrade(
       new TradeRequest(
         TradeType.BUY,

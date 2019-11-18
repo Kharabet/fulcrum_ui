@@ -32,6 +32,7 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
     Asset.ETH,
     // Asset.DAI,
     // Asset.USDC,
+    // Asset.SUSD,
     Asset.WBTC,
     Asset.LINK,
     // Asset.MKR,

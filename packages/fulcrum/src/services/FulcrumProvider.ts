@@ -28,6 +28,7 @@ import { TasksQueueEvents } from "./events/TasksQueueEvents";
 import { TradeTransactionMinedEvent } from "./events/TradeTransactionMinedEvent";
 import { TasksQueue } from "./TasksQueue";
 
+import TagManager from "react-gtm-module";
 import configProviders from "../config/providers.json";
 import { LendErcProcessor } from "./processors/LendErcProcessor";
 import { LendEthProcessor } from "./processors/LendEthProcessor";
@@ -37,7 +38,6 @@ import { TradeSellErcProcessor } from "./processors/TradeSellErcProcessor";
 import { TradeSellEthProcessor } from "./processors/TradeSellEthProcessor";
 import { UnlendErcProcessor } from "./processors/UnlendErcProcessor";
 import { UnlendEthProcessor } from "./processors/UnlendEthProcessor";
-import TagManager from "react-gtm-module";
 
 export class FulcrumProvider {
   private static readonly priceGraphQueryFunction = new Map<Asset, string>([
@@ -877,6 +877,7 @@ export class FulcrumProvider {
           request.isTokenized,
           request.version
         );
+
         const assetContract = await this.contractsSource.getPTokenContract(key);
         if (assetContract) {
           const baseAsset = this.getBaseAsset(key);
@@ -1223,7 +1224,7 @@ export class FulcrumProvider {
   }
 
   public async getSwapToUsdRate(asset: Asset): Promise<BigNumber> {
-    if (asset === Asset.DAI || asset === Asset.USDC) {
+    if (asset === Asset.DAI || asset === Asset.USDC || asset === Asset.SUSD) {
       return new BigNumber(1);
     }
 
@@ -1536,10 +1537,10 @@ export class FulcrumProvider {
         if (request instanceof LendRequest) {
           const tagManagerArgs = {
                             dataLayer: {
-                                name:"Transaction-Lend-"+request.asset,
-                                status:"Mined completed"
+                                name: "Transaction-Lend-"+request.asset,
+                                status: "Mined completed"
                             },
-                            dataLayerName: 'PageDataLayer'
+                            dataLayerName: "PageDataLayer"
                         }
           TagManager.dataLayer(tagManagerArgs)
           this.eventEmitter.emit(
@@ -1549,10 +1550,10 @@ export class FulcrumProvider {
         } else {
           const tagManagerArgs = {
                             dataLayer: {
-                                name:"Transaction-Trade"+request.asset,
-                                status:"Mined completed"
+                                name: "Transaction-Trade"+request.asset,
+                                status: "Mined completed"
                             },
-                            dataLayerName: 'PageDataLayer'
+                            dataLayerName: "PageDataLayer"
                         }
           TagManager.dataLayer(tagManagerArgs)
           this.eventEmitter.emit(

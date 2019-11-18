@@ -9,6 +9,7 @@ import knc_logo from "../assets/images/ic_token_knc.svg";
 import link_logo from "../assets/images/ic_token_link.svg";
 import mkr_logo from "../assets/images/ic_token_mkr.svg";
 import rep_logo from "../assets/images/ic_token_rep.svg";
+import susd_logo from "../assets/images/ic_token_susd.svg";
 import usdc_logo from "../assets/images/ic_token_usdc.svg";
 import zrx_logo from "../assets/images/ic_token_zrx.svg";
 
@@ -20,6 +21,7 @@ import knc_bg from "../assets/images/popup_left_token_knc.svg";
 import link_bg from "../assets/images/popup_left_token_link.svg";
 import mkr_bg from "../assets/images/popup_left_token_mkr.svg";
 import rep_bg from "../assets/images/popup_left_token_rep.svg";
+import susd_bg from "../assets/images/popup_left_token_susd.svg";
 import usdc_bg from "../assets/images/popup_left_token_usdc.svg";
 import zrx_bg from "../assets/images/popup_left_token_zrx.svg";
 
@@ -30,6 +32,7 @@ import knc_ts from "../assets/images/ic___token_selector___knc.svg";
 import link_ts from "../assets/images/ic___token_selector___link.svg";
 import mkr_ts from "../assets/images/ic___token_selector___mkr.svg";
 import rep_ts from "../assets/images/ic___token_selector___rep.svg";
+import susd_ts from "../assets/images/ic___token_selector___susd.svg";
 import usdc_ts from "../assets/images/ic___token_selector___usdc.svg";
 import btc_ts from "../assets/images/ic___token_selector___wbtc.svg";
 import zrx_ts from "../assets/images/ic___token_selector___zrx.svg";
@@ -136,6 +139,26 @@ export class AssetsDictionary {
         new Map<number, string | null>([
           [1, "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"],
           [3, "0x95cc8d8f29d0f7fcc425e8708893e759d1599c97"] // using ENG
+        ])
+      )
+    ],
+    [
+      Asset.SUSD,
+      new AssetDetails(
+        "SUSD",
+        "Synth sUSD (sUSD)",
+        "iSUSD",
+        "https://fulcrum.trade/images/iSUSD.svg",
+        18,
+        susd_logo,
+        susd_bg,
+        susd_ts,
+        "#00000000",
+        "#444e5a",
+        "#acb5c2",
+        new Map<number, string | null>([
+          [1, "0x57ab1ec28d129707052df4df418d58a2d46d5f51"],
+          [3, ""]
         ])
       )
     ],

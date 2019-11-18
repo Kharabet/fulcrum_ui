@@ -76,9 +76,10 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
       tickerSecondDiff: balanceOfUser.toNumber() * (interestRate.toNumber() / 100) / 365 / 24 / 60 / 60,
     });
 
-    if(address!=''){
+    if(address !== "") {
       this.setState({
-        isLoading: false,
+        ...this.state,
+        isLoading: false
       });
     }
 
@@ -232,11 +233,11 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
   public onLendClick = () => {
     const tagManagerArgs = {
                             dataLayer: {
-                                name:LendType.LEND + '-' + this.props.asset,
-                                sku:this.props.asset,
-                                category:LendType.LEND,
-                                price:'0',
-                                status:"In-progress"
+                                name: LendType.LEND + '-' + this.props.asset,
+                                sku: this.props.asset,
+                                category: LendType.LEND,
+                                price: "0",
+                                status: "In-progress"
                             },
                             dataLayerName: 'PageDataLayer'
                         }

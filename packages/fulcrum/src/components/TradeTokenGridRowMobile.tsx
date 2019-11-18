@@ -1,5 +1,6 @@
 import { BigNumber } from "@0x/utils";
 import React, { Component } from "react";
+import TagManager from "react-gtm-module";
 import { Asset } from "../domain/Asset";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
@@ -15,7 +16,6 @@ import { FulcrumProvider } from "../services/FulcrumProvider";
 // import { Change24HMarker, Change24HMarkerSize } from "./Change24HMarker";
 import { LeverageSelector } from "./LeverageSelector";
 import { PositionTypeMarker } from "./PositionTypeMarker";
-import TagManager from "react-gtm-module";
 
 export interface ITradeTokenGridRowMBProps {
   selectedKey: TradeTokenKey;
@@ -90,18 +90,14 @@ export class TradeTokenGridRowMobile extends Component<ITradeTokenGridRowMBProps
     const interestRate = await FulcrumProvider.Instance.getTradeTokenInterestRate(tradeTokenKey);
     const balance = await FulcrumProvider.Instance.getPTokenBalanceOfUser(tradeTokenKey);
 
-    this.setState({
+    this.setState(p => ({
       ...this.state,
       latestPriceDataPoint: latestPriceDataPoint,
       interestRate: interestRate,
       balance: balance,
-      version: version
-    });
-    if(latestPriceDataPoint.price !=0){
-      this.setState({
-        isLoading: false,
-      });
-    }
+      version: version,
+      isLoading: latestPriceDataPoint.price !== 0 ? false : p.isLoading
+    }));
   }
 
   private onProviderAvailable = async () => {
@@ -243,11 +239,11 @@ export class TradeTokenGridRowMobile extends Component<ITradeTokenGridRowMBProps
     event.stopPropagation();
     const tagManagerArgs = {
                             dataLayer: {
-                                name:this.state.leverage + 'x' + this.props.asset +'-'+ this.props.positionType +'-'+ this.props.defaultUnitOfAccount,
-                                sku:this.state.leverage + 'x' + this.props.asset +'-'+ this.props.positionType,
-                                category:this.props.positionType,
-                                price:'0',
-                                status:"In-progress"
+                                name: this.state.leverage + 'x' + this.props.asset +'-'+ this.props.positionType +'-'+ this.props.defaultUnitOfAccount,
+                                sku: this.state.leverage + 'x' + this.props.asset +'-'+ this.props.positionType,
+                                category: this.props.positionType,
+                                price: "0",
+                                status: "In-progress"
                             },
                             dataLayerName: 'PageDataLayer'
                         }

@@ -1,5 +1,6 @@
 import { BigNumber } from "@0x/utils";
 import React, { ChangeEvent, Component, FormEvent } from "react";
+import TagManager from "react-gtm-module";
 import { Tooltip } from "react-tippy";
 import { merge, Observable, Subject } from "rxjs";
 import { debounceTime, distinctUntilChanged, switchMap } from "rxjs/operators";
@@ -12,7 +13,6 @@ import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents"
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
 import { EthOrWethSelector } from "./EthOrWethSelector";
-import TagManager from "react-gtm-module";
 
 interface ILendAmountChangeEvent {
   isLendAmountTouched: boolean;
@@ -171,6 +171,11 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
     const divStyle = {
       backgroundImage: `url(${this.state.assetDetails.bgSvg})`
     };
+
+    if (this.props.asset === Asset.SUSD) {
+      // @ts-ignore
+      divStyle.backgroundSize = `unset`;
+    }
 
     const submitClassName =
       this.props.lendType === LendType.LEND ? "lend-form__submit-button--lend" : "lend-form__submit-button--un-lend";
@@ -336,11 +341,11 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
   public onCancelClick = () => {
     const tagManagerArgs = {
                             dataLayer: {
-                                name:this.props.lendType + '-' + this.props.asset,
-                                sku:this.props.asset,
-                                category:this.props.lendType,
-                                price:this.state.lendAmount,
-                                status:"Canceled"
+                                name: this.props.lendType + '-' + this.props.asset,
+                                sku: this.props.asset,
+                                category: this.props.lendType,
+                                price: this.state.lendAmount,
+                                status: "Canceled"
                             },
                             dataLayerName: 'PageDataLayer'
                         }
@@ -371,15 +376,15 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
 
     const tagManagerArgs = {
                             dataLayer: {
-                                name:this.props.lendType + '-' + this.props.asset,
-                                sku:this.props.asset,
-                                category:this.props.lendType,
-                                price:this.state.lendAmount,
-                                status:"Completed"
+                                name: this.props.lendType + '-' + this.props.asset,
+                                sku: this.props.asset,
+                                category: this.props.lendType,
+                                price: this.state.lendAmount,
+                                status: "Completed"
                             },
                             dataLayerName: 'PageDataLayer'
                         }
-    console.log("tagManagerArgs  = ",tagManagerArgs)
+    // console.log("tagManagerArgs  = ",tagManagerArgs)
     TagManager.dataLayer(tagManagerArgs)
     this.props.onSubmit(
 

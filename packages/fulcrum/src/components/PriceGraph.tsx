@@ -75,7 +75,7 @@ export class PriceGraph extends Component<IPriceGraphProps, IPriceGraphState> {
     const price = this.state.displayedDataPoint
       ? new BigNumber(this.state.priceBaseLine + this.state.displayedDataPoint.price)
       : new BigNumber(0);
-    console.log("price = = ",price)
+    // console.log("price = = ",price)
     const priceText = price.toFixed(4);
 
     /*const change24h = this.state.displayedDataPoint

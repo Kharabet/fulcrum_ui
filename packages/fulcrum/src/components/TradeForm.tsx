@@ -1,5 +1,6 @@
 import { BigNumber } from "@0x/utils";
 import React, { ChangeEvent, Component, FormEvent } from "react";
+import TagManager from "react-gtm-module";
 import Modal from "react-modal";
 // import { Tooltip } from "react-tippy";
 import { merge, Observable, Subject } from "rxjs";
@@ -22,7 +23,6 @@ import { CollateralTokenSelector } from "./CollateralTokenSelector";
 import { PositionTypeMarkerAlt } from "./PositionTypeMarkerAlt";
 import { TradeExpectedResult } from "./TradeExpectedResult";
 import { UnitOfAccountSelector } from "./UnitOfAccountSelector";
-import TagManager from "react-gtm-module";
 
 interface IInputAmountLimited {
   inputAmountValue: BigNumber;
@@ -520,11 +520,11 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     this.props.onCancel();
     const tagManagerArgs = {
                             dataLayer: {
-                                name:this.props.leverage + 'x' + this.props.asset +'-'+ this.props.positionType +'-'+ this.props.defaultUnitOfAccount,
-                                sku:this.props.leverage + 'x' + this.props.asset +'-'+ this.props.positionType,
-                                category:this.props.positionType,
-                                price:this.state.tradeAmountValue,
-                                status:"Canceled"
+                                name: this.props.leverage + 'x' + this.props.asset +'-'+ this.props.positionType +'-'+ this.props.defaultUnitOfAccount,
+                                sku: this.props.leverage + 'x' + this.props.asset +'-'+ this.props.positionType,
+                                category: this.props.positionType,
+                                price: this.state.tradeAmountValue,
+                                status: "Canceled"
                             },
                             dataLayerName: 'PageDataLayer'
                         }
@@ -592,15 +592,15 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     }
     const tagManagerArgs = {
                             dataLayer: {
-                                name:this.props.leverage + 'x' + this.props.asset +'-'+ this.props.positionType +'-'+ this.props.defaultUnitOfAccount,
-                                sku:this.props.leverage + 'x' + this.props.asset +'-'+ this.props.positionType,
-                                category:this.props.positionType,
-                                price:this.state.tradeAmountValue,
-                                status:"Completed"
+                                name: this.props.leverage + 'x' + this.props.asset +'-'+ this.props.positionType +'-'+ this.props.defaultUnitOfAccount,
+                                sku: this.props.leverage + 'x' + this.props.asset +'-'+ this.props.positionType,
+                                category: this.props.positionType,
+                                price: this.state.tradeAmountValue,
+                                status: "Completed"
                             },
                             dataLayerName: 'PageDataLayer'
                         }
-    console.log("tagManagerArgs= ",tagManagerArgs)
+    // console.log("tagManagerArgs= ",tagManagerArgs)
     TagManager.dataLayer(tagManagerArgs)
     this.props.onSubmit(
       new TradeRequest(
