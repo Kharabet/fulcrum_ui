@@ -12,6 +12,7 @@ import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents"
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
 import { EthOrWethSelector } from "./EthOrWethSelector";
+import TagManager from "react-gtm-module";
 
 interface ILendAmountChangeEvent {
   isLendAmountTouched: boolean;
@@ -115,7 +116,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
     const lendRequest = new LendRequest(this.props.lendType, this.state.useWrapped ? Asset.WETH : this.props.asset, maxLendAmount);
     const lendedAmountEstimate = await FulcrumProvider.Instance.getLendedAmountEstimate(lendRequest);
     const ethBalance = await FulcrumProvider.Instance.getEthBalance();
-    const address = FulcrumProvider.Instance.contractsSource ? 
+    const address = FulcrumProvider.Instance.contractsSource ?
       await FulcrumProvider.Instance.contractsSource.getITokenErc20Address(this.props.asset) || "" :
       "";
 
@@ -228,7 +229,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
                     {tokenNameSource}
                   </a>
                 </div>
-              ) : 
+              ) :
                 this.props.asset === Asset.ETH ? (
                   <EthOrWethSelector items={[Asset.ETH, Asset.WETH]} value={this.state.useWrapped ? Asset.WETH : Asset.ETH} onChange={this.onChangeUseWrapped} />
                 ) : (
@@ -333,6 +334,17 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
   };
 
   public onCancelClick = () => {
+    const tagManagerArgs = {
+                            dataLayer: {
+                                name:this.props.lendType + '-' + this.props.asset,
+                                sku:this.props.asset,
+                                category:this.props.lendType,
+                                price:this.state.lendAmount,
+                                status:"Canceled"
+                            },
+                            dataLayerName: 'PageDataLayer'
+                        }
+    TagManager.dataLayer(tagManagerArgs)
     this.props.onCancel();
   };
 
@@ -356,7 +368,21 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
       return;
     }
 
+
+    const tagManagerArgs = {
+                            dataLayer: {
+                                name:this.props.lendType + '-' + this.props.asset,
+                                sku:this.props.asset,
+                                category:this.props.lendType,
+                                price:this.state.lendAmount,
+                                status:"Completed"
+                            },
+                            dataLayerName: 'PageDataLayer'
+                        }
+    console.log("tagManagerArgs  = ",tagManagerArgs)
+    TagManager.dataLayer(tagManagerArgs)
     this.props.onSubmit(
+
       new LendRequest(
         this.props.lendType,
         this.state.useWrapped ? Asset.WETH : this.props.asset,
@@ -382,7 +408,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
           lendedAmountEstimate: lendedAmountEstimate || new BigNumber(0)
         });
       });
-      
+
       /*FulcrumProvider.Instance.getMaxLendValue(
         new LendRequest(this.props.lendType, this.props.asset, new BigNumber(0))
       ).then(maxLendValue => {

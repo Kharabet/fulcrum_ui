@@ -256,7 +256,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
                         }
         console.log("tagManagerArgs = ",tagManagerArgs)
     TagManager.dataLayer(tagManagerArgs)
-    console.log("TagManager = ",)
+    console.log("TagManager = ",TagManager)
     this.props.onTrade(
       new TradeRequest(
         TradeType.BUY,
