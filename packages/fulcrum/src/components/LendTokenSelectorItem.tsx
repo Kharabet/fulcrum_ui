@@ -4,6 +4,7 @@ import TagManager from "react-gtm-module";
 import { Asset } from "../domain/Asset";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
+import { DAIConvertRequest } from "../domain/DAIConvertRequest";
 import { LendRequest } from "../domain/LendRequest";
 import { LendType } from "../domain/LendType";
 import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
@@ -16,6 +17,7 @@ import { ProfitTicker } from "./ProfitTicker";
 export interface ILendTokenSelectorItemProps {
   asset: Asset;
   onLend: (request: LendRequest) => void;
+  onDAIConvert: (request: DAIConvertRequest) => void;
 }
 
 
@@ -129,6 +131,22 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
     }
     return (
       <div className="token-selector-item">
+        {/* 
+        {this.props.asset === Asset.SAI ? (
+          <div className="token-select-item-dai-convert" onClick={this.onDAIConvertClick}>
+            <div className="token-select-item-dai-convert__text">
+              upgrade to dai
+            </div>
+          </div>
+        ) : null }
+        {this.props.asset === Asset.DAI ? (
+          <div className="token-select-item-dai-convert" onClick={this.onDAIConvertClick}>
+            <div className="token-select-item-dai-convert__text">
+              downgrade to sai
+            </div>
+          </div>
+        ) : null }
+        */ }
         <div className={"token-selector-item__image"}>
           <img src={this.state.assetDetails.logoSvg} alt={this.state.assetDetails.displayName} />
         </div>
@@ -228,6 +246,10 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
         </button>
       </div>
     );
+  };
+
+  public onDAIConvertClick = () => {
+    this.props.onDAIConvert(new DAIConvertRequest(this.props.asset, new BigNumber(0)));
   };
 
   public onLendClick = () => {

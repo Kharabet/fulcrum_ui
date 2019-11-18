@@ -32,7 +32,7 @@ export class TradeTokenKey {
   }
 
   public static empty(): TradeTokenKey {
-    return new TradeTokenKey(Asset.UNKNOWN, Asset.DAI, PositionType.SHORT, 0, true);
+    return new TradeTokenKey(Asset.UNKNOWN, Asset.SAI, PositionType.SHORT, 0, true);
   }
 
   public setVersion(version: number) {
@@ -41,7 +41,7 @@ export class TradeTokenKey {
   }
 
   public toString(): string {
-    const unitOfAccountPrefix = this.unitOfAccount === Asset.DAI ? "d" : "u"; // DAI and USDC
+    const unitOfAccountPrefix = this.unitOfAccount === Asset.SAI ? "d" : "u"; // SAI and USDC
     const positionTypePrefix = this.positionType === PositionType.SHORT ? "s" : "L";
     const positionLeveragePostfix = this.leverage > 1 ? `${this.leverage}x` : "";
     return `${unitOfAccountPrefix}${positionTypePrefix}${this.asset}${positionLeveragePostfix}${this.version === 2 ? `_v2` : ``}${this.isTokenized ? `` : `(protocol)`}`;
@@ -59,7 +59,7 @@ export class TradeTokenKey {
     const matches: RegExpMatchArray | null = value.match("(d|u|p)(s|l|S|L)([a-zA-Z]*)(\\d*)x*");
     if (matches && matches.length > 0) {
       if (matches[0] === value) {
-        const unitOfAccount = matches[1].toString().toLowerCase() === "u" ? Asset.USDC : Asset.DAI;
+        const unitOfAccount = matches[1].toString().toLowerCase() === "u" ? Asset.USDC : Asset.SAI;
         const positionType = matches[2].toString().toUpperCase() === "L" ? PositionType.LONG : PositionType.SHORT;
         let asset = Asset.UNKNOWN;
         const assetName = matches[3].toString();

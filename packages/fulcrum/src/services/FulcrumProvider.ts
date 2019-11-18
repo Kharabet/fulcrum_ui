@@ -6,6 +6,7 @@ import moment from "moment";
 import fetch from "node-fetch";
 import { Asset } from "../domain/Asset";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
+import { DAIConvertRequest } from "../domain/DAIConvertRequest";
 import { IPriceDataPoint } from "../domain/IPriceDataPoint";
 import { IWeb3ProviderSettings } from "../domain/IWeb3ProviderSettings";
 import { LendRequest } from "../domain/LendRequest";
@@ -30,6 +31,7 @@ import { TasksQueue } from "./TasksQueue";
 
 import TagManager from "react-gtm-module";
 import configProviders from "../config/providers.json";
+// import { ConvertDAIProcessor } from "./processors/ConvertDAIProcessor";
 import { LendErcProcessor } from "./processors/LendErcProcessor";
 import { LendEthProcessor } from "./processors/LendEthProcessor";
 import { TradeBuyErcProcessor } from "./processors/TradeBuyErcProcessor";
@@ -199,6 +201,12 @@ export class FulcrumProvider {
       await this.contractsSource.Init();
     }
   }
+
+  public onDAIConvertConfirmed = async (request: DAIConvertRequest) => {
+    if (request) {
+      TasksQueue.Instance.enqueue(new RequestTask(request));
+    }
+  };
 
   public onLendConfirmed = async (request: LendRequest) => {
     if (request) {
@@ -1224,13 +1232,13 @@ export class FulcrumProvider {
   }
 
   public async getSwapToUsdRate(asset: Asset): Promise<BigNumber> {
-    if (asset === Asset.DAI || asset === Asset.USDC || asset === Asset.SUSD) {
+    if (asset === Asset.SAI || asset === Asset.DAI || asset === Asset.USDC || asset === Asset.SUSD) {
       return new BigNumber(1);
     }
 
     return this.getSwapRate(
       asset,
-      Asset.DAI
+      Asset.SAI
     );
   }
 
@@ -1375,6 +1383,10 @@ export class FulcrumProvider {
       await this.processLendRequestTask(task, skipGas);
     }
 
+    if (task.request instanceof DAIConvertRequest) {
+      await this.processDAIConvertRequestTask(task, skipGas);
+    }
+
     if (task.request instanceof TradeRequest) {
       await this.processTradeRequestTask(task, skipGas);
     }
@@ -1465,6 +1477,33 @@ export class FulcrumProvider {
     }
   };
 
+  private processDAIConvertRequestTask = async (task: RequestTask, skipGas: boolean) => {
+    return;
+    /*
+    try {
+      if (!(this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite)) {
+        throw new Error("No provider available!");
+      }
+
+      const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+      if (!account) {
+        throw new Error("Unable to get wallet address!");
+      }
+
+      // Initializing conversion
+      const processor = new ConvertDAIProcessor();
+      await processor.run(task, account, skipGas);
+      task.processingEnd(true, false, null);
+    } catch (e) {
+      if (!e.message.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)) {
+        // tslint:disable-next-line:no-console
+        console.log(e);
+      }
+      task.processingEnd(false, false, e);
+    }
+    */
+  };
+
   private processTradeRequestTask = async (task: RequestTask, skipGas: boolean) => {
     try {
       if (!(this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite)) {
@@ -1507,8 +1546,8 @@ export class FulcrumProvider {
   };
 
   public waitForTransactionMined = async (
-    txHash: string,
-    request: LendRequest | TradeRequest): Promise<any> => {
+    txHash: string, 
+    request: LendRequest | TradeRequest | DAIConvertRequest): Promise<any> => {
 
     return new Promise((resolve, reject) => {
       try {
@@ -1526,7 +1565,7 @@ export class FulcrumProvider {
   private waitForTransactionMinedRecursive = async (
     txHash: string,
     web3Wrapper: Web3Wrapper,
-    request: LendRequest | TradeRequest,
+    request: LendRequest | TradeRequest | DAIConvertRequest,
     resolve: (value: any) => void,
     reject: (value: any) => void) => {
 
@@ -1542,6 +1581,19 @@ export class FulcrumProvider {
                             },
                             dataLayerName: "PageDataLayer"
                         }
+          TagManager.dataLayer(tagManagerArgs)
+          this.eventEmitter.emit(
+            FulcrumProviderEvents.LendTransactionMined,
+            new LendTransactionMinedEvent(request.asset, txHash)
+          );
+        } else if (request instanceof DAIConvertRequest) {
+          const tagManagerArgs = {
+            dataLayer: {
+                name: "Transaction-DAIConvert-"+request.asset,
+                status: "Mined completed"
+            },
+            dataLayerName: "PageDataLayer"
+          }
           TagManager.dataLayer(tagManagerArgs)
           this.eventEmitter.emit(
             FulcrumProviderEvents.LendTransactionMined,
