@@ -133,3 +133,9 @@
     }
   }
 }
+
+@media only screen and (max-width: $mobile-version-max-width) {
+  .manage-collateral-form {
+    width:100%
+  }
+}

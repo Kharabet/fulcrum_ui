@@ -91,3 +91,10 @@
     justify-content: center;
   }
 }
+
+
+@media screen and (max-width: $mobile-version-max-width) {
+  .repay-loan-form {
+    width: 100%;
+  }
+}
