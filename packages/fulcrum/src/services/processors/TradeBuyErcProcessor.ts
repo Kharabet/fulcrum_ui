@@ -78,7 +78,7 @@ export class TradeBuyErcProcessor {
       // Waiting for token allowance
       if (approvePromise || skipGas) {
         await approvePromise;
-        gasAmountBN = new BigNumber(2300000);
+        gasAmountBN = new BigNumber(3000000);
       } else {
         // estimating gas amount
         const gasAmount = await tokenContract.mintWithToken.estimateGasAsync(account, assetErc20Address, amountInBaseUnits, {

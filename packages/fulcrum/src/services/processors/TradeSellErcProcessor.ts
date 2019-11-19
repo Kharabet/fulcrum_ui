@@ -55,7 +55,7 @@ export class TradeSellErcProcessor {
     if (assetErc20Address) {
       // Waiting for token allowance
       if (skipGas) {
-        gasAmountBN = new BigNumber(2300000);
+        gasAmountBN = new BigNumber(3000000);
       } else {
         // estimating gas amount
         const gasAmount = await tokenContract.burnToToken.estimateGasAsync(
