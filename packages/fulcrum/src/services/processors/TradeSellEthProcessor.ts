@@ -51,7 +51,7 @@ export class TradeSellEthProcessor {
     let gasAmountBN;
 
     if (skipGas) {
-      gasAmountBN = new BigNumber(2300000);
+      gasAmountBN = new BigNumber(3000000);
     } else {
       // estimating gas amount
       const gasAmount = await tokenContract.burnToEther.estimateGasAsync(account, amountInBaseUnits, { from: account, gas: FulcrumProvider.Instance.gasLimit });

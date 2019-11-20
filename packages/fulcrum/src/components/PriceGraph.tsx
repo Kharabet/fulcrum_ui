@@ -75,7 +75,9 @@ export class PriceGraph extends Component<IPriceGraphProps, IPriceGraphState> {
     const price = this.state.displayedDataPoint
       ? new BigNumber(this.state.priceBaseLine + this.state.displayedDataPoint.price)
       : new BigNumber(0);
+    // console.log("price = = ",price)
     const priceText = price.toFixed(4);
+
     /*const change24h = this.state.displayedDataPoint
       ? new BigNumber(this.state.displayedDataPoint.change24h)
       : new BigNumber(0);*/
@@ -83,7 +85,7 @@ export class PriceGraph extends Component<IPriceGraphProps, IPriceGraphState> {
     /*let liq
       const liquidationPrice = this.props.data.length > 0 && this.props.data
       ? */
-    
+
     return (
       <div className="price-graph">
         <div className="price-graph__hovered-time-container">
@@ -93,7 +95,7 @@ export class PriceGraph extends Component<IPriceGraphProps, IPriceGraphState> {
           </div>
           <div className="price-graph__hovered-time">{`${timeStampText}`}</div>
         </div>
-        <div className="price-graph__hovered-price-marker">{`$${priceText}`}</div>
+        <div className="price-graph__hovered-price-marker">{ priceText ==='1.0000' || priceText ==='0.0000' ? 'Loading...' : `$${priceText}`}</div>
         {/*<div className="price-graph__hovered-change-1h-marker">
           <Change24HMarker value={change24h} size={Change24HMarkerSize.LARGE} />
         </div>*/}
@@ -165,7 +167,7 @@ export class PriceGraph extends Component<IPriceGraphProps, IPriceGraphState> {
         });
       }
     }
-    
+
     let prev: number;
     priceDataPoints = priceDataPoints.map(e => {
       if (prev && e.price === 0) {

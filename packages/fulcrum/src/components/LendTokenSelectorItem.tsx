@@ -1,9 +1,10 @@
 import { BigNumber } from "@0x/utils";
 import React, { Component } from "react";
-import TagManager from 'react-gtm-module';
+import TagManager from "react-gtm-module";
 import { Asset } from "../domain/Asset";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
+import { DAIConvertRequest } from "../domain/DAIConvertRequest";
 import { LendRequest } from "../domain/LendRequest";
 import { LendType } from "../domain/LendType";
 import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
@@ -17,10 +18,13 @@ const tagManagerArgs = {
 }
 TagManager.initialize(tagManagerArgs)
 
+
 export interface ILendTokenSelectorItemProps {
   asset: Asset;
   onLend: (request: LendRequest) => void;
+  onDAIConvert: (request: DAIConvertRequest) => void;
 }
+
 
 interface ILendTokenSelectorItemState {
   assetDetails: AssetDetails | null;
@@ -64,6 +68,7 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
       profit = new BigNumber(0);
     }
     const balanceOfUser = await FulcrumProvider.Instance.getITokenAssetBalanceOfUser(this.props.asset);
+
     const address = FulcrumProvider.Instance.contractsSource ?
       await FulcrumProvider.Instance.contractsSource.getITokenErc20Address(this.props.asset) || "" :
       "";
@@ -77,6 +82,14 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
       iTokenAddress: address,
       tickerSecondDiff: balanceOfUser.toNumber() * (interestRate.toNumber() / 100) / 365 / 24 / 60 / 60,
     });
+
+    if(address !== "") {
+      this.setState({
+        ...this.state,
+        isLoading: false
+      });
+    }
+
   }
 
   private onProviderAvailable = async () => {
@@ -86,9 +99,9 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
   // noinspection JSUnusedLocalSymbols TODO
   private onProviderChanged = async (event: ProviderChangedEvent) => {
     await this.derivedUpdate();
-    this.setState({
-      isLoading: false,
-    });
+    // this.setState({
+    //   isLoading: false,
+    // });
   };
 
   private onLendTransactionMined = async (event: LendTransactionMinedEvent) => {
@@ -123,6 +136,22 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
     }
     return (
       <div className="token-selector-item">
+        {/* 
+        {this.props.asset === Asset.SAI ? (
+          <div className="token-select-item-dai-convert" onClick={this.onDAIConvertClick}>
+            <div className="token-select-item-dai-convert__text">
+              upgrade to dai
+            </div>
+          </div>
+        ) : null }
+        {this.props.asset === Asset.DAI ? (
+          <div className="token-select-item-dai-convert" onClick={this.onDAIConvertClick}>
+            <div className="token-select-item-dai-convert__text">
+              downgrade to sai
+            </div>
+          </div>
+        ) : null }
+        */ }
         <div className={"token-selector-item__image"}>
           <img src={this.state.assetDetails.logoSvg} alt={this.state.assetDetails.displayName} />
         </div>
@@ -173,7 +202,8 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
           ) : (
             <div className="token-selector-item__description">
               <div className="token-selector-item__interest-rate-container">
-                <div className="token-selector-item__interest-rate-title">Interest APR:</div>
+                <div className="token-selector-item__interest-rate-title">Interest APR :</div>
+
                 {!this.state.isLoading ? (
                   <div
                     title={`${this.state.interestRate.toFixed(18)}%`}
@@ -223,20 +253,22 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
     );
   };
 
+  public onDAIConvertClick = () => {
+    this.props.onDAIConvert(new DAIConvertRequest(this.props.asset, new BigNumber(0)));
+  };
+
   public onLendClick = () => {
     const tagManagerArgs = {
                             dataLayer: {
-                                name:LendType.LEND + '-' + this.props.asset,
-                                sku:this.props.asset,
-                                category:LendType.LEND,
-                                price:'0',
-                                status:"In-progress"
+                                name: LendType.LEND + '-' + this.props.asset,
+                                sku: this.props.asset,
+                                category: LendType.LEND,
+                                price: "0",
+                                status: "In-progress"
                             },
                             dataLayerName: 'PageDataLayer'
                         }
-    console.log("tagManagerArgs = ",tagManagerArgs)
     TagManager.dataLayer(tagManagerArgs)
-    console.log("TagManager = ",TagManager)
     this.props.onLend(new LendRequest(LendType.LEND, this.props.asset, new BigNumber(0)));
   };
 

@@ -9,6 +9,8 @@ import knc_logo from "../assets/images/ic_token_knc.svg";
 import link_logo from "../assets/images/ic_token_link.svg";
 import mkr_logo from "../assets/images/ic_token_mkr.svg";
 import rep_logo from "../assets/images/ic_token_rep.svg";
+import sai_logo from "../assets/images/ic_token_sai.svg";
+import susd_logo from "../assets/images/ic_token_susd.svg";
 import usdc_logo from "../assets/images/ic_token_usdc.svg";
 import zrx_logo from "../assets/images/ic_token_zrx.svg";
 
@@ -20,6 +22,8 @@ import knc_bg from "../assets/images/popup_left_token_knc.svg";
 import link_bg from "../assets/images/popup_left_token_link.svg";
 import mkr_bg from "../assets/images/popup_left_token_mkr.svg";
 import rep_bg from "../assets/images/popup_left_token_rep.svg";
+import sai_bg from "../assets/images/popup_left_token_sai.svg";
+import susd_bg from "../assets/images/popup_left_token_susd.svg";
 import usdc_bg from "../assets/images/popup_left_token_usdc.svg";
 import zrx_bg from "../assets/images/popup_left_token_zrx.svg";
 
@@ -30,6 +34,8 @@ import knc_ts from "../assets/images/ic___token_selector___knc.svg";
 import link_ts from "../assets/images/ic___token_selector___link.svg";
 import mkr_ts from "../assets/images/ic___token_selector___mkr.svg";
 import rep_ts from "../assets/images/ic___token_selector___rep.svg";
+import sai_ts from "../assets/images/ic___token_selector___sai.svg";
+import susd_ts from "../assets/images/ic___token_selector___susd.svg";
 import usdc_ts from "../assets/images/ic___token_selector___usdc.svg";
 import btc_ts from "../assets/images/ic___token_selector___wbtc.svg";
 import zrx_ts from "../assets/images/ic___token_selector___zrx.svg";
@@ -99,6 +105,27 @@ export class AssetsDictionary {
     ],
 
     [
+      Asset.SAI,
+      new AssetDetails(
+        "SAI",
+        "Sai Stablecoin (SAI)",
+        "iSAI",
+        "https://fulcrum.trade/images/iSAI.svg",
+        18,
+        sai_logo,
+        sai_bg,
+        sai_ts,
+        "#8777B1",
+        "#FFFFFF",
+        "#FFFFFF",
+        new Map<number, string | null>([
+          [1, "0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359"],
+          [3, "0xad6d458402f60fd3bd25163575031acdce07538d"],
+          [42, "0xC4375B7De8af5a38a93548eb8453a498222C4fF2"]
+        ])
+      )
+    ],
+    [
       Asset.DAI,
       new AssetDetails(
         "DAI",
@@ -113,9 +140,9 @@ export class AssetsDictionary {
         "#FFFFFF",
         "#FFFFFF",
         new Map<number, string | null>([
-          [1, "0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359"],
-          [3, "0xad6d458402f60fd3bd25163575031acdce07538d"],
-          [42, "0xC4375B7De8af5a38a93548eb8453a498222C4fF2"]
+          [1, "0x6b175474e89094c44da98b954eedeac495271d0f"],
+          [3, ""],
+          [42, "0x4f96fe3b7a6cf9725f59d353f723c1bdb64ca6aa"]
         ])
       )
     ],
@@ -136,6 +163,26 @@ export class AssetsDictionary {
         new Map<number, string | null>([
           [1, "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"],
           [3, "0x95cc8d8f29d0f7fcc425e8708893e759d1599c97"] // using ENG
+        ])
+      )
+    ],
+    [
+      Asset.SUSD,
+      new AssetDetails(
+        "SUSD",
+        "Synth sUSD (sUSD)",
+        "iSUSD",
+        "https://fulcrum.trade/images/iSUSD.svg",
+        18,
+        susd_logo,
+        susd_bg,
+        susd_ts,
+        "#00000000",
+        "#444e5a",
+        "#acb5c2",
+        new Map<number, string | null>([
+          [1, "0x57ab1ec28d129707052df4df418d58a2d46d5f51"],
+          [3, ""]
         ])
       )
     ],

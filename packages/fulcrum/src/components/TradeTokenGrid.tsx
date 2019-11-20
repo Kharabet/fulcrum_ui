@@ -30,8 +30,10 @@ interface ITradeTokenGridState {
 export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenGridState> {
   private static readonly assets: Asset[] = [
     Asset.ETH,
+    // Asset.SAI,
     // Asset.DAI,
     // Asset.USDC,
+    // Asset.SUSD,
     Asset.WBTC,
     Asset.LINK,
     // Asset.MKR,
@@ -93,7 +95,7 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
     if (Object.values(Asset).includes(siteConfig.Trade_defaultUnitOfAccount)) {
       defaultUnitOfAccount = Asset.[siteConfig.Trade_defaultUnitOfAccount];
     } else {
-      defaultUnitOfAccount = Asset.DAI;
+      defaultUnitOfAccount = Asset.SAI;
     }*/
     
 
@@ -101,7 +103,7 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
       rowsData.push({
         selectedKey: props.selectedKey,
         asset: e,
-        defaultUnitOfAccount: Asset.DAI,
+        defaultUnitOfAccount: Asset.SAI,
         defaultTokenizeNeeded: true,
         positionType: PositionType.SHORT,
         defaultLeverage: props.defaultLeverageShort,
@@ -112,13 +114,13 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
 
       /*let unit = Asset.USDC;
       if (props.selectedKey.asset === Asset.ETH && props.defaultLeverageLong === 2) {
-        unit = Asset.DAI;
+        unit = Asset.SAI;
       }*/
 
       rowsData.push({
         selectedKey: props.selectedKey,
         asset: e,
-        defaultUnitOfAccount: Asset.DAI,
+        defaultUnitOfAccount: Asset.SAI,
         defaultTokenizeNeeded: true,
         positionType: PositionType.LONG,
         defaultLeverage: props.defaultLeverageLong,

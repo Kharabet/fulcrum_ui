@@ -1,5 +1,6 @@
 import { BigNumber } from "@0x/utils";
 import React, { Component } from "react";
+import TagManager from "react-gtm-module";
 import { Asset } from "../domain/Asset";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
@@ -21,6 +22,7 @@ const tagManagerArgs = {
   gtmId: configProviders.Google_TrackingID
 }
 TagManager.initialize(tagManagerArgs)
+
 export interface ITradeTokenGridRowMBProps {
   selectedKey: TradeTokenKey;
 
@@ -43,6 +45,7 @@ interface ITradeTokenGridRowState {
   latestPriceDataPoint: IPriceDataPoint;
   interestRate: BigNumber;
   balance: BigNumber;
+  isLoading: boolean;
 }
 
 export class TradeTokenGridRowMobile extends Component<ITradeTokenGridRowMBProps, ITradeTokenGridRowState> {
@@ -57,7 +60,8 @@ export class TradeTokenGridRowMobile extends Component<ITradeTokenGridRowMBProps
       latestPriceDataPoint: FulcrumProvider.Instance.getPriceDefaultDataPoint(),
       interestRate: new BigNumber(0),
       balance: new BigNumber(0),
-      version: 2
+      version: 2,
+      isLoading:true
     };
 
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
@@ -92,13 +96,14 @@ export class TradeTokenGridRowMobile extends Component<ITradeTokenGridRowMBProps
     const interestRate = await FulcrumProvider.Instance.getTradeTokenInterestRate(tradeTokenKey);
     const balance = await FulcrumProvider.Instance.getPTokenBalanceOfUser(tradeTokenKey);
 
-    this.setState({
+    this.setState(p => ({
       ...this.state,
       latestPriceDataPoint: latestPriceDataPoint,
       interestRate: interestRate,
       balance: balance,
-      version: version
-    });
+      version: version,
+      isLoading: latestPriceDataPoint.price !== 0 ? false : p.isLoading
+    }));
   }
 
   private onProviderAvailable = async () => {
@@ -185,11 +190,15 @@ export class TradeTokenGridRowMobile extends Component<ITradeTokenGridRowMBProps
             {/*onChange={this.onLeverageSelect}*/}
           {/*/>*/}
         </div>
-        <div title={`$${bnPrice.toFixed(18)}`} className="trade-token-grid-row__col-price">{`$${bnPrice.toFixed(2)}`}</div>
+        <div title={`$${bnPrice.toFixed(18)}`} className="trade-token-grid-row__col-price">
+          {!this.state.isLoading ?`$${bnPrice.toFixed(2)}` : 'Loading...'}
+          </div>
         <div title={this.state.interestRate.gt(0) ? `${this.state.interestRate.toFixed(18)}%` : ``} className="trade-token-grid-row__col-profit">
-          {this.state.interestRate.gt(0) ? `${this.state.interestRate.toFixed(4)}%` : "0.000%"}
+          {this.state.interestRate.gt(0) ? `${this.state.interestRate.toFixed(4)}%` : "Loading..."}
         </div>
-        <div title={`$${bnLiquidationPrice.toFixed(18)}`} className="trade-token-grid-row__col-price">{`$${bnLiquidationPrice.toFixed(2)}`}</div>
+        <div title={`$${bnLiquidationPrice.toFixed(18)}`} className="trade-token-grid-row__col-price">
+          {!this.state.isLoading ? `$${bnLiquidationPrice.toFixed(2)}` : 'Loading...' }
+          </div>
         {/*<div className="trade-token-grid-row__col-change24h">
           <Change24HMarker value={bnChange24h} size={Change24HMarkerSize.MEDIUM} />
         </div>*/}
@@ -236,11 +245,11 @@ export class TradeTokenGridRowMobile extends Component<ITradeTokenGridRowMBProps
     event.stopPropagation();
     const tagManagerArgs = {
                             dataLayer: {
-                                name:this.state.leverage + 'x' + this.props.asset +'-'+ this.props.positionType +'-'+ this.props.defaultUnitOfAccount,
-                                sku:this.state.leverage + 'x' + this.props.asset +'-'+ this.props.positionType,
-                                category:this.props.positionType,
-                                price:'0',
-                                status:"In-progress"
+                                name: this.state.leverage + 'x' + this.props.asset +'-'+ this.props.positionType +'-'+ this.props.defaultUnitOfAccount,
+                                sku: this.state.leverage + 'x' + this.props.asset +'-'+ this.props.positionType,
+                                category: this.props.positionType,
+                                price: "0",
+                                status: "In-progress"
                             },
                             dataLayerName: 'PageDataLayer'
                         }

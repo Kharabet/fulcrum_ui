@@ -10,9 +10,9 @@ export interface IAssetSelectorProps {
 }
 
 export class AssetSelector extends Component<IAssetSelectorProps> {
-  private readonly assetsAvailableForNonWeb3: Asset[] = [Asset.DAI, Asset.USDC];
+  private readonly assetsAvailableForNonWeb3: Asset[] = [Asset.SAI, Asset.USDC];
   private readonly assetsAvailableForWeb3: Asset[] = [
-    Asset.DAI,
+    Asset.SAI,
     Asset.USDC,
     Asset.ETH,
     Asset.WBTC,
@@ -31,7 +31,7 @@ export class AssetSelector extends Component<IAssetSelectorProps> {
         : [];
 
     const items = assets.map(e => {
-      if (e === Asset.DAI ||
+      if (e === Asset.SAI ||
           e === Asset.USDC ||
           e === Asset.ETH) {
         return (
