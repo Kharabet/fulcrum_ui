@@ -17,7 +17,11 @@ import { LeverageSelector } from "./LeverageSelector";
 import { PositionTypeMarker } from "./PositionTypeMarker";
 import {LendType} from "../domain/LendType";
 import TagManager from "react-gtm-module";
-
+import configProviders from "./../config/providers.json";
+const tagManagerArgs = {
+  gtmId: configProviders.Google_TrackingID
+}
+TagManager.initialize(tagManagerArgs)
 export interface ITradeTokenGridRowProps {
   selectedKey: TradeTokenKey;
 

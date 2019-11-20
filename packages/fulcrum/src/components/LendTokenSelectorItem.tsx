@@ -11,6 +11,11 @@ import { LendTransactionMinedEvent } from "../services/events/LendTransactionMin
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
 import { ProfitTicker } from "./ProfitTicker";
+import configProviders from "./../config/providers.json";
+const tagManagerArgs = {
+  gtmId: configProviders.Google_TrackingID
+}
+TagManager.initialize(tagManagerArgs)
 
 export interface ILendTokenSelectorItemProps {
   asset: Asset;

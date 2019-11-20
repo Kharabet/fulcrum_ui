@@ -39,6 +39,11 @@ import { UnlendErcProcessor } from "./processors/UnlendErcProcessor";
 import { UnlendEthProcessor } from "./processors/UnlendEthProcessor";
 import TagManager from "react-gtm-module";
 
+const tagManagerArgs = {
+  gtmId: configProviders.Google_TrackingID
+}
+TagManager.initialize(tagManagerArgs)
+
 export class FulcrumProvider {
   private static readonly priceGraphQueryFunction = new Map<Asset, string>([
     [Asset.ETH, "kyber-eth-dai"],
