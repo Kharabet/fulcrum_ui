@@ -60,8 +60,8 @@ export const checkPass = async (
     console.log(`fulcrumExchangeRate: ${fulcrumExchangeRate.toFixed()}`);
 
     // getting on exchange balances
-    const token1DFiLockedBalance = await getOnExchangeBalance(efx, token1);
-    const token2DFiLockedBalance = await getOnExchangeBalance(efx, token2);
+    let token1DFiLockedBalance = await getOnExchangeBalance(efx, token1);
+    let token2DFiLockedBalance = await getOnExchangeBalance(efx, token2);
     console.log(`token1DFiLockedBalance: ${token1DFiLockedBalance.toFixed()}`);
     console.log(`token2DFiLockedBalance: ${token2DFiLockedBalance.toFixed()}`);
 
@@ -283,7 +283,7 @@ export const checkPass = async (
         bidPrice = fulcrumExchangeRate.minus(spreadSizeOneSided);
       }
       const bidTargetExposure = orderBookMMExposures.bidExposure.plus(lockedBalanceExposureDiffSumAfterBidOperations.times(-1));
-      let bidTargetAmount = bidTargetExposure.dividedBy(token1PriceInDai);
+      let bidTargetAmount = bidTargetExposure.dividedBy(token2PriceInDai);
 
       // recreate bid order at bidPrice with bidTargetAmount
       // cancelling existing bid orders
@@ -299,11 +299,11 @@ export const checkPass = async (
 
 
       // creating new order
-      const token1DFiLockedBalance = await getOnExchangeBalance(efx, token1);
-      bidTargetAmount = BigNumber.min(token1DFiLockedBalance, bidTargetAmount);
+      token2DFiLockedBalance = await getOnExchangeBalance(efx, token2);
+      bidTargetAmount = BigNumber.min(bidTargetAmount, token2DFiLockedBalance);
 
       console.log("submitOrder: bid");
-      console.log(`token1DFiLockedBalance: ${token1DFiLockedBalance.toFixed()}`);
+      console.log(`token2DFiLockedBalance: ${token2DFiLockedBalance.toFixed()}`);
       console.log(`tradingPairName: ${tradingPairName}`);
       console.log(`bidPrice: ${bidPrice.toPrecision(8)}`);
       console.log(`bidTargetAmount: ${bidTargetAmount.toPrecision(8)}`);
@@ -323,7 +323,7 @@ export const checkPass = async (
         askPrice = fulcrumExchangeRate.plus(spreadSizeOneSided);
       }
       const askTargetExposure = orderBookMMExposures.askExposure.plus(lockedBalanceExposureDiffSumAfterAskOperations.times(-1));
-      let askTargetAmount = askTargetExposure.dividedBy(token2PriceInDai);
+      let askTargetAmount = askTargetExposure.dividedBy(token1PriceInDai);
 
       // recreate ask order at askPrice with askTargetAmount
       // cancelling existing ask orders
@@ -338,11 +338,11 @@ export const checkPass = async (
       console.log(`ask orders: were cancelled`);
 
       // creating new order
-      const token2DFiLockedBalance = await getOnExchangeBalance(efx, token2);
-      askTargetAmount = BigNumber.min(token2DFiLockedBalance, askTargetAmount);
+      token1DFiLockedBalance = await getOnExchangeBalance(efx, token1);
+      askTargetAmount = BigNumber.min(askTargetAmount, token1DFiLockedBalance);
 
       console.log("submitOrder: ask");
-      console.log(`token2DFiLockedBalance: ${token2DFiLockedBalance.toFixed()}`);
+      console.log(`token1DFiLockedBalance: ${token1DFiLockedBalance.toFixed()}`);
       console.log(`tradingPairName: ${tradingPairName}`);
       console.log(`askPrice: ${askPrice.toPrecision(8)}`);
       console.log(`askTargetAmount: ${askTargetAmount.multipliedBy(-1).toPrecision(8)}`);
