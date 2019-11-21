@@ -322,6 +322,12 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
         });
       }
 
+      const percentData = await TorqueProvider.Instance.getLoanRepayPercent(
+        this.props.walletDetails,
+        this.props.loanOrderState,
+        this.state.repayAmount
+      );
+
       this.props.onSubmit(
         new RepayLoanRequest(
           this.props.walletDetails,
@@ -330,7 +336,7 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
           this.props.loanOrderState.accountAddress,
           this.props.loanOrderState.loanOrderHash,
           this.state.repayAmount,
-          new BigNumber(this.state.selectedValue) // repayPercent
+          percentData.repayPercent ? new BigNumber(percentData.repayPercent) : new BigNumber(0)
         )
       );
     }
