@@ -1,4 +1,4 @@
-import { BigNumber } from "bignumber.js";
+import { BigNumber } from "@0x/utils";
 
 export const getOnExchangeBalance = async (efx: any, tokenName: string): Promise<BigNumber> => {
   // https://docs.ethfinex.com/?version=latest#get-locked-balance

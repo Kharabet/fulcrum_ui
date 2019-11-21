@@ -9,11 +9,10 @@
         { "name": "dest", "type": "address" },
         { "name": "srcQty", "type": "uint256" }
       ],
-      "name": "getTradeData",
+      "name": "getExpectedRate",
       "outputs": [
-        { "name": "sourceToDestRate", "type": "uint256" },
-        { "name": "sourceToDestPrecision", "type": "uint256" },
-        { "name": "destTokenAmount", "type": "uint256" }
+        { "name": "expectedRate", "type": "uint256" },
+        { "name": "slippageRate", "type": "uint256" }
       ],
       "payable": false,
       "stateMutability": "view",

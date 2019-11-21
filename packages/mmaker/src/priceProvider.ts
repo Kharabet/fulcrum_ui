@@ -8,9 +8,11 @@ export const getEthPriceInDAI = async (contractsSource: ContractsSource, network
   const daiAssetDetails = AssetsDictionary.assets.get(Asset.DAI);
   if (ethAssetDetails && daiAssetDetails) {
     const oracleContract = await contractsSource.getOracleContract();
-    const swapPriceData: BigNumber[] = await oracleContract.getTradeData.callAsync(
-      ethAssetDetails.addressErc20.get(networkId) || "",
-      daiAssetDetails.addressErc20.get(networkId) || "",
+    const ethErc20ContractAddress = ethAssetDetails.addressErc20.get(networkId) || "";
+    const daiErc20ContractAddress = daiAssetDetails.addressErc20.get(networkId) || "";
+    const swapPriceData: BigNumber[] = await oracleContract.getExpectedRate.callAsync(
+      ethErc20ContractAddress,
+      daiErc20ContractAddress,
       new BigNumber(10 ** 18)
     );
     result = swapPriceData[0].dividedBy(10 ** 18);

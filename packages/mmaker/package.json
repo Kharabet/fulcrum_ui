@@ -55,7 +55,6 @@
     "webpack": "4.28.3",
     "webpack-cli": "^3.3.9",
     "webpack-node-externals": "^1.7.2"
-
   },
   "scripts": {
     "build": "webpack --mode production --config config/webpack.config.js",
