@@ -303,15 +303,17 @@ export const checkPass = async (
       bidTargetAmount = BigNumber.min(token1DFiLockedBalance, bidTargetAmount);
 
       console.log("submitOrder: bid");
+      console.log(`token1DFiLockedBalance: ${token1DFiLockedBalance.toFixed()}`);
       console.log(`tradingPairName: ${tradingPairName}`);
-      console.log(`bidPrice: ${bidPrice.multipliedBy(-1).toPrecision(8)}`);
+      console.log(`bidPrice: ${bidPrice.toPrecision(8)}`);
       console.log(`bidTargetAmount: ${bidTargetAmount.toPrecision(8)}`);
-      // .multipliedBy(-1) indicates that this is a `sell` order
-      await efx.submitOrder(
-        tradingPairName,
-        bidTargetAmount.precision(8).toNumber(),
-        bidPrice.multipliedBy(-1).precision(8).toNumber()
-      );
+      const submitResult =
+        await efx.submitOrder(
+          tradingPairName,
+          bidTargetAmount.precision(8).toNumber(),
+          bidPrice.precision(8).toNumber()
+        );
+      console.log(submitResult);
     }
 
     const cancelAskPromises: Array<Promise<void>> = [];
@@ -340,14 +342,18 @@ export const checkPass = async (
       askTargetAmount = BigNumber.min(token2DFiLockedBalance, askTargetAmount);
 
       console.log("submitOrder: ask");
+      console.log(`token2DFiLockedBalance: ${token2DFiLockedBalance.toFixed()}`);
       console.log(`tradingPairName: ${tradingPairName}`);
       console.log(`askPrice: ${askPrice.toPrecision(8)}`);
-      console.log(`askTargetAmount: ${askTargetAmount.toPrecision(8)}`);
-      await efx.submitOrder(
-        tradingPairName,
-        askTargetAmount.precision(8).toNumber(),
-        askPrice.precision(8).toNumber()
-      );
+      console.log(`askTargetAmount: ${askTargetAmount.multipliedBy(-1).toPrecision(8)}`);
+      // askTargetAmount.multipliedBy(-1) is negative. this indicates a `sell` order
+      const submitResult =
+        await efx.submitOrder(
+          tradingPairName,
+          askTargetAmount.multipliedBy(-1).precision(8).toNumber(),
+          askPrice.precision(8).toNumber()
+        );
+      console.log(submitResult);
     }
 
     // 7. withdraw funds we don't need anymore
