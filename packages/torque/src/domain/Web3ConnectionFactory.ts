@@ -351,11 +351,12 @@ export class Web3ConnectionFactory {
       appName: "Torque",
       appLogoUrl: "https://torque.loans/static/media/torque_logo.a96c591f.svg"
     })
-    const wallet_link = Web3ConnectionFactory.walletLink.makeWeb3Provider("https://mainnet.infura.io/v3/7989ee6b11324cc49f18b8ab7be5a7c4", 1)
-    wallet_link.enable().then((accounts: string[]) => {
+    const walletLink = Web3ConnectionFactory.walletLink.makeWeb3Provider("https://mainnet.infura.io/v3/7989ee6b11324cc49f18b8ab7be5a7c4", 1)
+    await walletLink.enable();
+    /*walletLink.enable().then((accounts: string[]) => {
       console.log(`User's address is ${accounts[0]}`)
-    })
-    return wallet_link;
+    });*/
+    return walletLink;
   }
 
 

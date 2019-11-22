@@ -1,12 +1,12 @@
 import React, { Component } from "react";
+import ic_close from "../assets/images/close.svg";
+import menu_icon from "../assets/images/menu-icon.svg";
 import { OnChainIndicator } from "../components/OnChainIndicator";
 import { ProviderType } from "../domain/ProviderType";
 import { TorqueProvider } from "../services/TorqueProvider";
 import { HeaderLogo } from "./HeaderLogo";
 import { HeaderMenu, IHeaderMenuProps } from "./HeaderMenu";
 import { HeaderMenuToggle } from "./HeaderMenuToggle";
-import menu_icon from "../assets/images/menu-icon.svg";
-import ic_close from "../assets/images/close.svg";
 export interface IHeaderOpsProps {
   doNetworkConnect: () => void;
   isLoading: boolean;
@@ -61,7 +61,7 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
     }
 
     const toggleImg = !this.state.isMenuOpen ? menu_icon : ic_close;
-    const sidebar_class = !this.state.isMenuOpen ? 'sidebar_h' : 'sidebar_v'
+    const sidebarClass = !this.state.isMenuOpen ? 'sidebar_h' : 'sidebar_v'
     return (
       <header className="header">
         <div className="header__row">
@@ -84,7 +84,7 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
 
         </div>
 
-          <div className={sidebar_class}>
+          <div className={sidebarClass}>
             <div className="header_btn">
               {TorqueProvider.Instance.providerType !== ProviderType.None ? (
               <OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />
