@@ -128,7 +128,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
               </div>
 
               <div className={`borrow-form-insufficient-balance ${!this.state.balanceTooLow ? `borrow-form-insufficient-balance--hidden` : ``}`}>
-                Insufficient {this.state.collateralAsset} balance!
+                Insufficient {this.state.collateralAsset} balance in your wallet!
               </div>
     
               <hr className="borrow-form__delimiter" />

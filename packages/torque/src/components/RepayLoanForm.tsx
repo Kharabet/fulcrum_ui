@@ -230,7 +230,7 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
                 precision={6}
               />
               <div className={`repay-loan-form-insufficient-balance ${!this.state.balanceTooLow ? `repay-loan-form-insufficient-balance--hidden` : ``}`}>
-                Insufficient {this.state.assetDetails.displayName} balance!
+                Insufficient {this.state.assetDetails.displayName} balance in your wallet!
               </div>
             </React.Fragment>
           )}
