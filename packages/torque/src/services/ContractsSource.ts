@@ -80,7 +80,7 @@ export class ContractsSource {
             break;
         }
         break;
-      case Asset.DAI:
+      case Asset.SAI:
         switch (this.networkId) {
           case 1:
             address = "0x14094949152eddbfcd073717200da82fed8dc960";
@@ -203,7 +203,7 @@ export class ContractsSource {
             asset = Asset.WETH;
             break;
           case "0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359":
-            asset = Asset.DAI;
+            asset = Asset.SAI;
             break;
           case "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48":
             asset = Asset.USDC;
@@ -237,7 +237,7 @@ export class ContractsSource {
             asset = Asset.WETH;
             break;
           case "0xc4375b7de8af5a38a93548eb8453a498222c4ff2":
-            asset = Asset.DAI;
+            asset = Asset.SAI;
             break;
         }
         break;

@@ -1,5 +1,6 @@
 import { BigNumber } from "@0x/utils";
 import React, { ChangeEvent, Component, FormEvent } from "react";
+import TagManager from "react-gtm-module";
 import Modal from "react-modal";
 // import { Tooltip } from "react-tippy";
 import { merge, Observable, Subject } from "rxjs";
@@ -22,6 +23,12 @@ import { CollateralTokenSelector } from "./CollateralTokenSelector";
 import { PositionTypeMarkerAlt } from "./PositionTypeMarkerAlt";
 import { TradeExpectedResult } from "./TradeExpectedResult";
 import { UnitOfAccountSelector } from "./UnitOfAccountSelector";
+import TagManager from "react-gtm-module";
+import configProviders from "./../config/providers.json";
+const tagManagerArgs = {
+  gtmId: configProviders.Google_TrackingID
+}
+TagManager.initialize(tagManagerArgs)
 
 interface IInputAmountLimited {
   inputAmountValue: BigNumber;
@@ -305,7 +312,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     const submitClassName =
       this.props.tradeType === TradeType.BUY ? "trade-form__submit-button--buy" : "trade-form__submit-button--sell";
 
-    // const positionTypePrefix = this.props.defaultUnitOfAccount === Asset.DAI ? "d" : "u";
+    // const positionTypePrefix = this.props.defaultUnitOfAccount === Asset.SAI ? "d" : "u";
     // const positionTypePrefix2 = this.props.positionType === PositionType.SHORT ? "s" : "L";
     // const positionLeveragePostfix = this.props.leverage > 1 ? `${this.props.leverage}x` : "";
     const tokenNameBase = this.state.assetDetails.displayName;
@@ -443,7 +450,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
                   </span>
                 </div>
               ) : (
-                <div className="trade-form__label">{amountMsg}</div>  
+                <div className="trade-form__label">{amountMsg}</div>
               )}
 
             </div>
@@ -453,7 +460,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
                 <div className="trade-form__kv-container">
                   <div className="trade-form__label trade-form__label--no-bg">
                     Unit of Account &nbsp;
-                    <UnitOfAccountSelector items={[Asset.USDC, Asset.DAI]} value={this.props.defaultUnitOfAccount} onChange={this.onChangeUnitOfAccount} />
+                    <UnitOfAccountSelector items={[Asset.USDC, Asset.SAI]} value={this.props.defaultUnitOfAccount} onChange={this.onChangeUnitOfAccount} />
                   </div>
                 </div>
               </CollapsibleContainer>
@@ -517,6 +524,17 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
 
   public onCancelClick = () => {
     this.props.onCancel();
+    const tagManagerArgs = {
+                            dataLayer: {
+                                name: this.props.leverage + 'x' + this.props.asset +'-'+ this.props.positionType +'-'+ this.props.defaultUnitOfAccount,
+                                sku: this.props.leverage + 'x' + this.props.asset +'-'+ this.props.positionType,
+                                category: this.props.positionType,
+                                price: this.state.tradeAmountValue,
+                                status: "Canceled"
+                            },
+                            dataLayerName: 'PageDataLayer'
+                        }
+    TagManager.dataLayer(tagManagerArgs)
   };
 
   public onChangeCollateralOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -539,7 +557,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     if (key.erc20Address === "") {
       version = 1;
     }
-    
+
     this.props.onTrade(
       new TradeRequest(
         this.props.tradeType,
@@ -578,7 +596,18 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       this.props.onCancel();
       return;
     }
-
+    const tagManagerArgs = {
+                            dataLayer: {
+                                name: this.props.leverage + 'x' + this.props.asset +'-'+ this.props.positionType +'-'+ this.props.defaultUnitOfAccount,
+                                sku: this.props.leverage + 'x' + this.props.asset +'-'+ this.props.positionType,
+                                category: this.props.positionType,
+                                price: this.state.tradeAmountValue,
+                                status: "Completed"
+                            },
+                            dataLayerName: 'PageDataLayer'
+                        }
+    // console.log("tagManagerArgs= ",tagManagerArgs)
+    TagManager.dataLayer(tagManagerArgs)
     this.props.onSubmit(
       new TradeRequest(
         this.props.tradeType,

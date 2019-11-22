@@ -2498,10 +2498,10 @@
   dependencies:
     defer-to-connect "^1.0.1"
 
-"@terminal-packages/sdk@^1.0.26":
-  version "1.0.26"
-  resolved "https://registry.yarnpkg.com/@terminal-packages/sdk/-/sdk-1.0.26.tgz#bf87be268e420ecd77f8e03a0b757a0a2f9dd44b"
-  integrity sha512-h+w/Fd0oOXkGfazizRhigPZ+YRMSlPVfLLPKI6D/sN3kb+yqe1bA+IBAXfzNIHGVEDp+b83IzXG18eu6eDqoYQ==
+"@terminal-packages/sdk@^1.0.27":
+  version "1.0.27"
+  resolved "https://registry.yarnpkg.com/@terminal-packages/sdk/-/sdk-1.0.27.tgz#f6e2a5916e629bd2ea4fe2ed2056fb734d8aa870"
+  integrity sha512-Eg5g1cHg5/dtZPR8fcdXiJx3Ac377UgyeblI7CnwjxwiPTGhJc7wB2+JByE648MEWfZXUraCsJbF4jzzb47xiw==
   dependencies:
     cross-fetch "^3.0.4"
     web3-providers "^1.0.0-beta.55"
@@ -2667,6 +2667,11 @@
   integrity sha512-MX7n1wq3G/De15RGAAqnmidzhr2Y9O/ClxPxyqaNg96pGyeXUYPSvujgzEVpLo9oIP4Wn1UETl+rxTN02KEpBw==
   dependencies:
     "@types/react" "*"
+
+"@types/react-gtm-module@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@types/react-gtm-module/-/react-gtm-module-2.0.0.tgz#25a118bbcadd518f376ee52626ab0829cb824874"
+  integrity sha512-2d7TUhOQBG6cSVSSSWaoSu+Ds84VQFTuVKLeGNc2GtfA7JDr+z3ujl4n/rezaRRNEhjn+9SllwHy1iNxxP8jDg==
 
 "@types/react-modal@^3.8.1":
   version "3.8.1"
@@ -14826,6 +14831,11 @@ react-ga@^2.5.7:
   version "2.5.7"
   resolved "https://registry.yarnpkg.com/react-ga/-/react-ga-2.5.7.tgz#1c80a289004bf84f84c26d46f3a6a6513081bf2e"
   integrity sha512-UmATFaZpEQDO96KFjB5FRLcT6hFcwaxOmAJZnjrSiFN/msTqylq9G+z5Z8TYzN/dbamDTiWf92m6MnXXJkAivQ==
+
+react-gtm-module@^2.0.8:
+  version "2.0.8"
+  resolved "https://registry.yarnpkg.com/react-gtm-module/-/react-gtm-module-2.0.8.tgz#0d37c4f2a4e3a8efa40c76c8b2aa1b7cacc16c6f"
+  integrity sha512-OU5FwAHC3gWnnxJ+MLwBMLZO1Pmn1DiVCGHqptwDnNojE3QRrNxjqozkW5cNS4Zp+C6HZ8a4ZIt0QPNlpzua4Q==
 
 react-intercom@^1.0.15:
   version "1.0.15"

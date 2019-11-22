@@ -84,7 +84,7 @@ export class TorqueProvider {
       });
     } else {
       try {
-        TorqueProvider.Instance.isLoading = true;
+        // TorqueProvider.Instance.isLoading = true;
         
         // setting up readonly provider
         Web3ConnectionFactory.getWeb3Provider(null, this.eventEmitter).then((providerData) => {
@@ -99,7 +99,7 @@ export class TorqueProvider {
                 this.web3ProviderSettings = web3ProviderSettings;
                 this.contractsSource = contractsSource;
                 this.borrowRequestAwaitingStore = new BorrowRequestAwaitingStore(web3ProviderSettings.networkId, web3Wrapper);
-                TorqueProvider.Instance.isLoading = false;
+                // TorqueProvider.Instance.isLoading = false;
                 this.eventEmitter.emit(TorqueProviderEvents.ProviderAvailable);
               });
             }
@@ -107,7 +107,7 @@ export class TorqueProvider {
         });
       } catch(e) {
         // console.log(e);
-        TorqueProvider.Instance.isLoading = false;
+        // TorqueProvider.Instance.isLoading = false;
       }
 
     }
@@ -293,7 +293,7 @@ export class TorqueProvider {
   /*public getMarginPremiumAmount = (asset: Asset): number => {
     let marginPremium = 0;
     switch (asset) {
-      case Asset.DAI:
+      case Asset.SAI:
       case Asset.USDC:
         marginPremium = 0;
         break;
@@ -627,7 +627,7 @@ export class TorqueProvider {
       {
         accountAddress: walletDetails.walletAddress || "0x1a9f2F3697EbFB35ab0bf337fd7f847637931D4C",
         loanOrderHash: "0x0A708B339C4472EF9A348269FACAD686E18345EC1342E8C171CCB0DF7DB13A28",
-        loanAsset: Asset.DAI,
+        loanAsset: Asset.SAI,
         collateralAsset: Asset.ETH,
         amount: BigNumber.random(),
         amountOwed: BigNumber.random(),
@@ -720,6 +720,8 @@ export class TorqueProvider {
       return "Safe";
     } else if (borrowedFundsState.collateralizedPercent.gt(0.15)) {
       return "Danger";
+    } else if (borrowedFundsState.collateralizedPercent.eq(0)) {
+      return "Display Error";
     } else {
       return "Liquidation Pending";
     }

@@ -1,6 +1,7 @@
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import React, { Component } from "react";
-import ReactGA from "react-ga";
+
+import TagManager from 'react-gtm-module';
 import Intercom from "react-intercom";
 import Modal from "react-modal";
 import { HashRouter, Redirect, Route, Switch } from "react-router-dom";
@@ -25,7 +26,13 @@ const isMainnetProd =
   && process.env.REACT_APP_ETH_NETWORK === "mainnet";
 
 if (isMainnetProd) {
-  ReactGA.initialize(configProviders.Google_TrackingID);
+  // ReactGA.initialize(configProviders.Google_TrackingID);
+  const tagManagerArgs = {
+      gtmId: configProviders.Google_TrackingID
+  }
+  // console.log("tagManagerArgs = ",tagManagerArgs)
+  TagManager.initialize(tagManagerArgs)
+  // console.log("TagManager home init = ",TagManager)
 }
 
 interface IAppRouterState {
@@ -98,16 +105,25 @@ export class AppRouter extends Component<any, IAppRouterState> {
                     <Switch>
                       <Route exact={true} path="/" render={() => <LandingPage isMobileMedia={this.state.isMobileMedia} />} />
                       <Route exact={true} path="/lend" render={() => <LendPage isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} />} />
-                      {!this.state.isMobileMedia ? (
+                      {/*{!this.state.isMobileMedia ? (*/}
                         <Route exact={true} path="/trade" render={() => <TradePage isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} />} />
-                      ) : ``}
+                      // ) : ``}
                       <Route exact={true} path="/stats" render={() => <StatsPage isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} />} />
                       <Route path="*" render={() => <Redirect to="/"/> } />
                     </Switch>
                     {isMainnetProd ? (
                       <Route path="/" render={({location}) => {
-                        ReactGA.ga('set', 'page', location.pathname + location.search);
-                        ReactGA.ga('send', 'pageview');
+                        const tagManagerArgs = {
+                            dataLayer: {
+                                // userId: '001',
+                                userProject: 'fulcrum',
+                                page: location.pathname + location.search
+                            },
+                            dataLayerName: 'PageDataLayer'
+                        }
+                        // ReactGA.ga('set', 'page', location.pathname + location.search);
+                        // ReactGA.ga('send', 'pageview');
+                        TagManager.dataLayer(tagManagerArgs)
                         return null;
                       }} />
                     ) : ``}

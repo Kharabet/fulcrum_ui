@@ -6,6 +6,7 @@ import moment from "moment";
 import fetch from "node-fetch";
 import { Asset } from "../domain/Asset";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
+import { DAIConvertRequest } from "../domain/DAIConvertRequest";
 import { IPriceDataPoint } from "../domain/IPriceDataPoint";
 import { IWeb3ProviderSettings } from "../domain/IWeb3ProviderSettings";
 import { LendRequest } from "../domain/LendRequest";
@@ -28,7 +29,9 @@ import { TasksQueueEvents } from "./events/TasksQueueEvents";
 import { TradeTransactionMinedEvent } from "./events/TradeTransactionMinedEvent";
 import { TasksQueue } from "./TasksQueue";
 
+import TagManager from "react-gtm-module";
 import configProviders from "../config/providers.json";
+// import { ConvertDAIProcessor } from "./processors/ConvertDAIProcessor";
 import { LendErcProcessor } from "./processors/LendErcProcessor";
 import { LendEthProcessor } from "./processors/LendEthProcessor";
 import { TradeBuyErcProcessor } from "./processors/TradeBuyErcProcessor";
@@ -37,6 +40,11 @@ import { TradeSellErcProcessor } from "./processors/TradeSellErcProcessor";
 import { TradeSellEthProcessor } from "./processors/TradeSellEthProcessor";
 import { UnlendErcProcessor } from "./processors/UnlendErcProcessor";
 import { UnlendEthProcessor } from "./processors/UnlendEthProcessor";
+
+const tagManagerArgs = {
+  gtmId: configProviders.Google_TrackingID
+}
+TagManager.initialize(tagManagerArgs)
 
 export class FulcrumProvider {
   private static readonly priceGraphQueryFunction = new Map<Asset, string>([
@@ -173,7 +181,7 @@ export class FulcrumProvider {
         this.accounts = [];
       }
       if (this.accounts.length === 0) {
-        canWrite = false; // revert back to read-only  
+        canWrite = false; // revert back to read-only
       }
     } else {
       // this.accounts = [];
@@ -198,6 +206,12 @@ export class FulcrumProvider {
       await this.contractsSource.Init();
     }
   }
+
+  public onDAIConvertConfirmed = async (request: DAIConvertRequest) => {
+    if (request) {
+      TasksQueue.Instance.enqueue(new RequestTask(request));
+    }
+  };
 
   public onLendConfirmed = async (request: LendRequest) => {
     if (request) {
@@ -253,7 +267,7 @@ export class FulcrumProvider {
       const earliestBlock = currentBlock-17280; // ~5760 blocks per day
       let fetchFromBlock = earliestBlock;
       const nearestHour = new Date().setMinutes(0,0,0)/1000;
-  
+
       const priceData = FulcrumProvider.getLocalstorageItem(`priceData${selectedKey.asset}`);
       if (priceData) {
         // console.log(`priceData`,priceData);
@@ -362,12 +376,12 @@ export class FulcrumProvider {
       if (this.contractsSource) {
         const assetContract = await this.contractsSource.getPTokenContract(selectedKey);
         if (assetContract) {
-         
+
           const currentLeverage = (await assetContract.currentLeverage.callAsync()).div(10**18);
           const currentMargin = currentLeverage.gt(0) ?
             new BigNumber(1).div(currentLeverage) :
             new BigNumber(1).div(selectedKey.leverage);
-          
+
           const maintenanceMargin = new BigNumber(0.15);
 
           if (currentMargin.lte(maintenanceMargin)) {
@@ -425,7 +439,7 @@ export class FulcrumProvider {
     try {
       const swapPrice = await this.getSwapToUsdRate(selectedKey.asset);
       const priceLatestDataPoint = await this.getPriceLatestDataPoint(selectedKey);
-      
+
       if (priceLatestDataPoint.price > 0 && priceLatestDataPoint.liquidationPrice > 0) {
         let multiplier = new BigNumber(1);
         if (selectedKey.positionType === PositionType.SHORT) {
@@ -439,7 +453,7 @@ export class FulcrumProvider {
       } else {
         priceLatestDataPoint.liquidationPrice = 0;
       }
-      
+
       priceLatestDataPoint.price = swapPrice.toNumber();
       return priceLatestDataPoint;
     } catch(e) {
@@ -658,7 +672,7 @@ export class FulcrumProvider {
 
     return result;
   };
-  
+
   public getMaxLendValue = async (request: LendRequest): Promise<BigNumber> => {
     let result = new BigNumber(0);
 
@@ -876,6 +890,7 @@ export class FulcrumProvider {
           request.isTokenized,
           request.version
         );
+
         const assetContract = await this.contractsSource.getPTokenContract(key);
         if (assetContract) {
           const baseAsset = this.getBaseAsset(key);
@@ -1222,13 +1237,13 @@ export class FulcrumProvider {
   }
 
   public async getSwapToUsdRate(asset: Asset): Promise<BigNumber> {
-    if (asset === Asset.DAI || asset === Asset.USDC) {
+    if (asset === Asset.SAI || asset === Asset.DAI || asset === Asset.USDC || asset === Asset.SUSD) {
       return new BigNumber(1);
     }
 
     return this.getSwapRate(
       asset,
-      Asset.DAI
+      Asset.SAI
     );
   }
 
@@ -1256,7 +1271,7 @@ export class FulcrumProvider {
       } else {
         srcAmount = new BigNumber(srcAmount.toFixed(0, 1));
       }
-      
+
       const srcAssetErc20Address = this.getErc20AddressOfAsset(srcAsset);
       const destAssetErc20Address = this.getErc20AddressOfAsset(destAsset);
       if (this.contractsSource && srcAssetErc20Address && destAssetErc20Address) {
@@ -1373,6 +1388,10 @@ export class FulcrumProvider {
       await this.processLendRequestTask(task, skipGas);
     }
 
+    if (task.request instanceof DAIConvertRequest) {
+      await this.processDAIConvertRequestTask(task, skipGas);
+    }
+
     if (task.request instanceof TradeRequest) {
       await this.processTradeRequestTask(task, skipGas);
     }
@@ -1435,7 +1454,7 @@ export class FulcrumProvider {
       const taskRequest: LendRequest = (task.request as LendRequest);
       if (taskRequest.lendType === LendType.LEND) {
         await this.addTokenToMetaMask(task);
-        
+
         if (taskRequest.asset !== Asset.ETH) {
           const processor = new LendErcProcessor();
           await processor.run(task, account, skipGas);
@@ -1461,6 +1480,33 @@ export class FulcrumProvider {
       }
       task.processingEnd(false, false, e);
     }
+  };
+
+  private processDAIConvertRequestTask = async (task: RequestTask, skipGas: boolean) => {
+    return;
+    /*
+    try {
+      if (!(this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite)) {
+        throw new Error("No provider available!");
+      }
+
+      const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+      if (!account) {
+        throw new Error("Unable to get wallet address!");
+      }
+
+      // Initializing conversion
+      const processor = new ConvertDAIProcessor();
+      await processor.run(task, account, skipGas);
+      task.processingEnd(true, false, null);
+    } catch (e) {
+      if (!e.message.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)) {
+        // tslint:disable-next-line:no-console
+        console.log(e);
+      }
+      task.processingEnd(false, false, e);
+    }
+    */
   };
 
   private processTradeRequestTask = async (task: RequestTask, skipGas: boolean) => {
@@ -1506,7 +1552,7 @@ export class FulcrumProvider {
 
   public waitForTransactionMined = async (
     txHash: string, 
-    request: LendRequest | TradeRequest): Promise<any> => {
+    request: LendRequest | TradeRequest | DAIConvertRequest): Promise<any> => {
 
     return new Promise((resolve, reject) => {
       try {
@@ -1524,7 +1570,7 @@ export class FulcrumProvider {
   private waitForTransactionMinedRecursive = async (
     txHash: string,
     web3Wrapper: Web3Wrapper,
-    request: LendRequest | TradeRequest,
+    request: LendRequest | TradeRequest | DAIConvertRequest,
     resolve: (value: any) => void,
     reject: (value: any) => void) => {
 
@@ -1533,11 +1579,40 @@ export class FulcrumProvider {
       if (receipt) {
         resolve(receipt);
         if (request instanceof LendRequest) {
+          const tagManagerArgs = {
+                            dataLayer: {
+                                name: "Transaction-Lend-"+request.asset,
+                                status: "Mined completed"
+                            },
+                            dataLayerName: "PageDataLayer"
+                        }
+          TagManager.dataLayer(tagManagerArgs)
+          this.eventEmitter.emit(
+            FulcrumProviderEvents.LendTransactionMined,
+            new LendTransactionMinedEvent(request.asset, txHash)
+          );
+        } else if (request instanceof DAIConvertRequest) {
+          const tagManagerArgs = {
+            dataLayer: {
+                name: "Transaction-DAIConvert-"+request.asset,
+                status: "Mined completed"
+            },
+            dataLayerName: "PageDataLayer"
+          }
+          TagManager.dataLayer(tagManagerArgs)
           this.eventEmitter.emit(
             FulcrumProviderEvents.LendTransactionMined,
             new LendTransactionMinedEvent(request.asset, txHash)
           );
         } else {
+          const tagManagerArgs = {
+                            dataLayer: {
+                                name: "Transaction-Trade"+request.asset,
+                                status: "Mined completed"
+                            },
+                            dataLayerName: "PageDataLayer"
+                        }
+          TagManager.dataLayer(tagManagerArgs)
           this.eventEmitter.emit(
             FulcrumProviderEvents.TradeTransactionMined,
             new TradeTransactionMinedEvent(new TradeTokenKey(

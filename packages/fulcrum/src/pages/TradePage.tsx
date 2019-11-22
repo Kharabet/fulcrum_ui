@@ -234,7 +234,7 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
 
     /*let unit = request.unitOfAccount;
     if (request.asset === Asset.ETH && request.positionType === PositionType.LONG && request.leverage === 2) {
-      unit = Asset.DAI;
+      unit = Asset.SAI;
     }*/
 
     if (request) {

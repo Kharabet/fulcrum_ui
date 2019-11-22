@@ -13,7 +13,7 @@ export interface ICollateralTokenSelectorProps {
 export class CollateralTokenSelector extends Component<ICollateralTokenSelectorProps> {
   private readonly assets: Asset[] = [
     Asset.ETH,
-    Asset.DAI,
+    Asset.SAI,
     Asset.USDC,
     Asset.LINK,
     Asset.WBTC,

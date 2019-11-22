@@ -230,7 +230,7 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
                 precision={6}
               />
               <div className={`repay-loan-form-insufficient-balance ${!this.state.balanceTooLow ? `repay-loan-form-insufficient-balance--hidden` : ``}`}>
-                Insufficient {this.state.assetDetails.displayName} balance!
+                Insufficient {this.state.assetDetails.displayName} balance in your wallet!
               </div>
             </React.Fragment>
           )}
@@ -322,6 +322,12 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
         });
       }
 
+      const percentData = await TorqueProvider.Instance.getLoanRepayPercent(
+        this.props.walletDetails,
+        this.props.loanOrderState,
+        this.state.repayAmount
+      );
+
       this.props.onSubmit(
         new RepayLoanRequest(
           this.props.walletDetails,
@@ -330,7 +336,7 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
           this.props.loanOrderState.accountAddress,
           this.props.loanOrderState.loanOrderHash,
           this.state.repayAmount,
-          new BigNumber(this.state.selectedValue) // repayPercent
+          percentData.repayPercent ? new BigNumber(percentData.repayPercent) : new BigNumber(0)
         )
       );
     }

@@ -51,9 +51,9 @@ export class ContractsSource {
     this.oracleJson = await import(`./../assets/artifacts/${ethNetwork}/oracle.json`);
     
     
-    if (process.env.REACT_APP_ETH_NETWORK === "mainnet") {
+    if (process.env.REACT_APP_ETH_NETWORK === "mainnet" || process.env.REACT_APP_ETH_NETWORK === "kovan") {
       // TEMPORARY WORKAROUND: Not using TokenizedRegistry yet
-      const TokenList = (await import("../assets/artifacts/mainnet/tokenList.js")).TokenList;
+      const TokenList = (await import(`../assets/artifacts/${ethNetwork}/tokenList.js`)).TokenList;
 
       // tslint:disable:no-console
       // console.log(`--- start of token list ---`);
@@ -200,6 +200,12 @@ export class ContractsSource {
   private async getErc20ContractRaw(addressErc20: string): Promise<erc20Contract> {
     return new erc20Contract(this.erc20Json.abi, addressErc20.toLowerCase(), this.provider);
   }
+
+  /*private async getDAIConverterContractRaw(): Promise<iTokenContract | null> {
+    const symbol = asset === Asset.WETH ? `iETH` : `i${asset}`
+    const tokenContractInfo = this.iTokensContractInfos.get(symbol) || null;
+    return tokenContractInfo ? new iTokenContract(this.iTokenJson.abi, tokenContractInfo.token, this.provider) : null;
+  }*/
 
   private async getITokenContractRaw(asset: Asset): Promise<iTokenContract | null> {
     const symbol = asset === Asset.WETH ? `iETH` : `i${asset}`
