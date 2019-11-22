@@ -13,6 +13,12 @@ import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents"
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
 import { EthOrWethSelector } from "./EthOrWethSelector";
+import TagManager from "react-gtm-module";
+import configProviders from "./../config/providers.json";
+const tagManagerArgs = {
+  gtmId: configProviders.Google_TrackingID
+}
+TagManager.initialize(tagManagerArgs)
 
 interface ILendAmountChangeEvent {
   isLendAmountTouched: boolean;
