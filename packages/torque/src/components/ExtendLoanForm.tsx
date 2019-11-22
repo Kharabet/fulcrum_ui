@@ -205,7 +205,7 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
                 precision={6}
               />
               <div className={`extend-loan-form-insufficient-balance ${!this.state.balanceTooLow ? `extend-loan-form-insufficient-balance--hidden` : ``}`}>
-                Insufficient {this.state.assetDetails.displayName} balance!
+                Insufficient {this.state.assetDetails.displayName} balance in your wallet!
               </div>
             </React.Fragment>
           )}
