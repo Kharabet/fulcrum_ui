@@ -715,10 +715,26 @@ export class TorqueProvider {
     }
   };
 
+  //
+
   public getPositionSafetyText = (borrowedFundsState: IBorrowedFundsState): string => {
-    if (borrowedFundsState.collateralizedPercent.gt(0.25)) {
+    const liquidationZone = borrowedFundsState.loanData!.maintenanceMarginAmount.div(10**20).toNumber();
+    const dangerZone = liquidationZone + 0.1;
+    /*if ((this.isStableAsset(borrowedFundsState.loanAsset) && this.isETHAsset(borrowedFundsState.collateralAsset)) ||
+      (this.isStableAsset(borrowedFundsState.collateralAsset) && this.isETHAsset(borrowedFundsState.loanAsset))) {
+      dangerZone = 0.25;
+      liquidationZone = 0.15;
+    } else if (this.isStableAsset(borrowedFundsState.collateralAsset) && this.isStableAsset(borrowedFundsState.loanAsset)) {
+      dangerZone = 0.15;
+      liquidationZone = 0.05;
+    } else {
+      dangerZone = 0.50;
+      liquidationZone = 0.40;
+    }*/
+    
+    if (borrowedFundsState.collateralizedPercent.gt(dangerZone)) {
       return "Safe";
-    } else if (borrowedFundsState.collateralizedPercent.gt(0.15)) {
+    } else if (borrowedFundsState.collateralizedPercent.gt(liquidationZone)) {
       return "Danger";
     } else if (borrowedFundsState.collateralizedPercent.eq(0)) {
       return "Display Error";
@@ -987,6 +1003,17 @@ export class TorqueProvider {
 
   public isETHAsset = (asset: Asset): boolean => {
     return asset === Asset.ETH || asset === Asset.WETH;
+  }
+
+  public isStableAsset = (asset: Asset): boolean => {
+    if (asset === Asset.SAI ||
+      asset === Asset.DAI ||
+      asset === Asset.USDC ||
+      asset === Asset.SUSD) {
+        return true;
+      } else {
+        return false;
+      }
   }
 
   public getLoanExtendGasAmount = async (): Promise<BigNumber> => {

@@ -58,7 +58,7 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
     if (!this.state.assetDetails) {
       return null;
     }
-    
+
     const { item } = this.props;
     const { interestRate, assetDetails } = this.state;
 
@@ -66,11 +66,21 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
     const collateralizedStateSelector = positionSafetyText === "Safe" ?
       "borrowed-funds-list-item__collateralized-state--safe" :
       positionSafetyText === "Danger" ?
-        "borrowed-funds-list-item__collateralized-state--safe" :
+        "borrowed-funds-list-item__collateralized-state--danger" :
         "borrowed-funds-list-item__collateralized-state--unsafe";
 
     // const firstInRowModifier = this.props.firstInTheRow ? "borrowed-funds-list-item--first-in-row" : "";
     // const lastInRowModifier = this.props.lastInTheRow ? "borrowed-funds-list-item--last-in-row" : "";
+
+    const sliderMin = item.loanData!.maintenanceMarginAmount.div(10**18).toNumber();
+    const sliderMax = sliderMin + 100;
+
+    let sliderValue = item.collateralizedPercent.multipliedBy(100).toNumber();
+    if (sliderValue > sliderMax) {
+      sliderValue = sliderMax;
+    } else if (sliderValue < sliderMin) {
+      sliderValue = sliderMin;
+    }
 
     return (
       <div className={`borrowed-funds-list-item`}>
@@ -107,15 +117,18 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
                 </div>
                 <div className={`borrowed-funds-list-item__collateralized-state ${collateralizedStateSelector}`}>
                   {positionSafetyText}
+                  {positionSafetyText === "Danger" ? (
+                    <React.Fragment><br/>Add Collateral</React.Fragment>
+                  ) : null}
                 </div>
               </div>
             </div>
             <div className="borrowed-funds-list-item__collateralized-slider-container">
               <CollateralSlider
                 readonly={true}
-                minValue={0}
-                maxValue={100}
-                value={item.collateralizedPercent.multipliedBy(100).toNumber()}
+                minValue={sliderMin}
+                maxValue={sliderMax}
+                value={sliderValue}
               />
             </div>
             <div className="borrowed-funds-list-item__collateral-info-container">

@@ -150,7 +150,9 @@
           flex-direction: column;
           flex-grow: 0;
           justify-content: space-between;
-          width: 2.5rem;
+          //width: 2.5rem;
+          width: 50%;
+          align-items: flex-end;
 
           .borrowed-funds-list-item__collateralized-state-icon {
             width: 2.5rem;
@@ -173,6 +175,11 @@
 
             &--safe {
               color: #4ecea3;
+            }
+
+            &--danger {
+              color: #de4a4a;
+              margin-top: -1.2rem;
             }
 
             &--unsafe {
