@@ -1,36 +1,41 @@
 import { Asset } from "./Asset";
 import { AssetDetails } from "./AssetDetails";
 
-// non-consistent with token bg-color etc, but required for white bg
-import eth_logo from "../assets/images/ic_small_eth.svg";
 import bat_logo from "../assets/images/ic_token_bat.svg";
 import btc_logo from "../assets/images/ic_token_btc.svg";
+import dai_logo from "../assets/images/ic_token_dai.svg";
+import eth_logo from "../assets/images/ic_token_eth.svg";
 import knc_logo from "../assets/images/ic_token_knc.svg";
 import link_logo from "../assets/images/ic_token_link.svg";
 import mkr_logo from "../assets/images/ic_token_mkr.svg";
 import rep_logo from "../assets/images/ic_token_rep.svg";
 import sai_logo from "../assets/images/ic_token_sai.svg";
+import susd_logo from "../assets/images/ic_token_susd.svg";
 import usdc_logo from "../assets/images/ic_token_usdc.svg";
 import zrx_logo from "../assets/images/ic_token_zrx.svg";
 
 import bat_bg from "../assets/images/popup_left_token_bat.svg";
 import btc_bg from "../assets/images/popup_left_token_btc.svg";
+import dai_bg from "../assets/images/popup_left_token_dai.svg";
 import eth_bg from "../assets/images/popup_left_token_eth.svg";
 import knc_bg from "../assets/images/popup_left_token_knc.svg";
 import link_bg from "../assets/images/popup_left_token_link.svg";
 import mkr_bg from "../assets/images/popup_left_token_mkr.svg";
 import rep_bg from "../assets/images/popup_left_token_rep.svg";
 import sai_bg from "../assets/images/popup_left_token_sai.svg";
+import susd_bg from "../assets/images/popup_left_token_susd.svg";
 import usdc_bg from "../assets/images/popup_left_token_usdc.svg";
 import zrx_bg from "../assets/images/popup_left_token_zrx.svg";
 
 import bat_ts from "../assets/images/ic___token_selector___bat.svg";
+import dai_ts from "../assets/images/ic___token_selector___dai.svg";
 import eth_ts from "../assets/images/ic___token_selector___eth.svg";
 import knc_ts from "../assets/images/ic___token_selector___knc.svg";
 import link_ts from "../assets/images/ic___token_selector___link.svg";
 import mkr_ts from "../assets/images/ic___token_selector___mkr.svg";
 import rep_ts from "../assets/images/ic___token_selector___rep.svg";
 import sai_ts from "../assets/images/ic___token_selector___sai.svg";
+import susd_ts from "../assets/images/ic___token_selector___susd.svg";
 import usdc_ts from "../assets/images/ic___token_selector___usdc.svg";
 import btc_ts from "../assets/images/ic___token_selector___wbtc.svg";
 import zrx_ts from "../assets/images/ic___token_selector___zrx.svg";
@@ -113,6 +118,25 @@ export class AssetsDictionary {
       )
     ],
     [
+      Asset.DAI,
+      new AssetDetails(
+        "DAI",
+        "Dai Stablecoin (DAI)",
+        18,
+        dai_logo,
+        dai_bg,
+        dai_ts,
+        "#8777B1",
+        "#FFFFFF",
+        "#FFFFFF",
+        new Map<number, string | null>([
+          [1, "0x6b175474e89094c44da98b954eedeac495271d0f"],
+          [3, ""],
+          [42, "0x4f96fe3b7a6cf9725f59d353f723c1bdb64ca6aa"]
+        ])
+      )
+    ],
+    [
       Asset.USDC,
       new AssetDetails(
         "USDC",
@@ -127,6 +151,24 @@ export class AssetsDictionary {
         new Map<number, string | null>([
           [1, "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"],
           [3, "0x95cc8d8f29d0f7fcc425e8708893e759d1599c97"] // using ENG
+        ])
+      )
+    ],
+    [
+      Asset.SUSD,
+      new AssetDetails(
+        "SUSD",
+        "Synth sUSD (sUSD)",
+        18,
+        susd_logo,
+        susd_bg,
+        susd_ts,
+        "#00000000",
+        "#444e5a",
+        "#acb5c2",
+        new Map<number, string | null>([
+          [1, "0x57ab1ec28d129707052df4df418d58a2d46d5f51"],
+          [3, ""]
         ])
       )
     ],
@@ -152,8 +194,8 @@ export class AssetsDictionary {
     [
       Asset.WETH,
       new AssetDetails(
-        "ETH",// "WETH",
-        "Ethereum (ETH)",// "Wrapped Ether (WETH)",
+        "WETH",
+        "Wrapped Ether (WETH)",
         18,
         eth_logo,
         eth_bg,

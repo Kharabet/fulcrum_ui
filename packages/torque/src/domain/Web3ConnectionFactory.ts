@@ -85,7 +85,7 @@ export class Web3ConnectionFactory {
         }
       }
     }
-
+  
     if (!subProvider) {
       subProvider = null;
     }
@@ -264,7 +264,7 @@ export class Web3ConnectionFactory {
   }
 
   private static async getProviderMetaMask(): Promise<any | null> {
-     await this.cleanupProviders();
+    await this.cleanupProviders();
 
     // @ts-ignore
     if (window.ethereum) {

@@ -24,7 +24,13 @@
       justify-content: flex-end;
       width: 35%;
     }
+    .header__menu{
+      display: none;
+    }
   }
+  .header__provider{
+     display: block;
+   }
 
   .header__popup-container {
     display: flex;
@@ -36,4 +42,14 @@
     border-top: solid 1px #393f49;
     border-bottom: solid 1px #393f49;
   }
+  .sidebar_h{
+    display: none;
+  }
+  .sidebar_v{
+    display: none;
+  }
+
+
+
+
 }

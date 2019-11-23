@@ -102,3 +102,10 @@
     justify-content: center;
   }
 }
+
+
+@media screen and (max-width: $mobile-version-max-width) {
+  .extend-loan-form {
+    width: 100%;
+  }
+}

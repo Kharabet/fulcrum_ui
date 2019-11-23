@@ -13,3 +13,9 @@
   margin: .5rem 0;
   vertical-align: middle;
 }
+
+@media screen and (max-width: $mobile-version-max-width) {
+  .header-logo__image {
+    height: 2.2rem;
+  }
+}

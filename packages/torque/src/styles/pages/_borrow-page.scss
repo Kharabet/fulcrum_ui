@@ -11,10 +11,30 @@
   padding: $page-padding;
 
   .borrow-page__main {
+    padding-bottom: 90rem;
     display: flex;
     flex-direction: column;
     align-content: center;
     justify-content: space-between;
     //overflow-y: scroll;
   }
+  .borrow-page__main_p {
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+    justify-content: space-between;
+    //overflow-y: scroll;
+  }
+}
+
+@media only screen and (max-width: $mobile-version-width) {
+  .borrow-page {
+
+    padding: $page-padding-xs;
+
+    .borrow-page__main {
+      padding-bottom: 200rem;
+    }
+  }
+
 }

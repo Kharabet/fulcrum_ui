@@ -6,6 +6,7 @@ import ic_fortmatic from "./../assets/images/ic_formatic.svg";
 import ic_portis from "./../assets/images/ic_portis.svg";
 import ic_squarelink from "./../assets/images/ic_squarelink.svg";
 import ic_torus from "./../assets/images/ic_torus.svg";
+import ic_wallet from "./../assets/images/wallet.svg";
 
 export interface IProviderSelectorItemProps {
   providerType: ProviderType;
@@ -26,6 +27,8 @@ export class ProviderSelectorItem extends Component<IProviderSelectorItemProps> 
         ? "provider-selector-item--squarelink"
         : this.props.providerType === ProviderType.Torus
         ? "provider-selector-item--torus"
+        : this.props.providerType === ProviderType.WalletLink
+        ? "provider-selector-item--walletlink"
         : "";
 
     const providerIcon =
@@ -39,6 +42,8 @@ export class ProviderSelectorItem extends Component<IProviderSelectorItemProps> 
         ? ic_squarelink
         : this.props.providerType === ProviderType.Torus
         ? ic_torus
+        : this.props.providerType === ProviderType.WalletLink
+        ? ic_wallet
         : "";
 
     return (
