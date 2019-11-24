@@ -271,11 +271,11 @@ export class TorqueProvider {
       result = await this.getEthBalance()
     } else {
       // get erc20 token balance
-      const precision = AssetsDictionary.assets.get(asset)!.decimals || 18;
+      // const precision = AssetsDictionary.assets.get(asset)!.decimals || 18;
       const assetErc20Address = this.getErc20AddressOfAsset(asset);
       if (assetErc20Address) {
         result = await this.getErc20BalanceOfUser(assetErc20Address);
-        result = result.multipliedBy(10 ** (18 - precision));
+        // result = result.multipliedBy(10 ** (18 - precision));
       }
     }
 
