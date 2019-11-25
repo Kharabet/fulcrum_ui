@@ -11,12 +11,12 @@ import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents"
 import { LendTransactionMinedEvent } from "../services/events/LendTransactionMinedEvent";
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
-import { ProfitTicker } from "./ProfitTicker";
 import configProviders from "./../config/providers.json";
-  const tagManagerArgs = {
-      gtmId: configProviders.Google_TrackingID
-  }
-  TagManager.initialize(tagManagerArgs)
+import { ProfitTicker } from "./ProfitTicker";
+
+TagManager.initialize({
+  gtmId: configProviders.Google_TrackingID
+});
 
 
 export interface ILendTokenSelectorItemProps {

@@ -35,7 +35,8 @@ export class BorrowPage extends PureComponent<IBorrowPageParams & RouteComponent
         <BorrowDlg ref={this.borrowDlgRef} />
         <div className="borrow-page">
           <HeaderOps isLoading={this.props.isLoading} doNetworkConnect={this.doNetworkConnect} />
-          <div className="borrow-page__main" style={walletType === WalletType.Web3 ? { paddingBottom: `90rem`} : undefined}>
+          {/*<div className="borrow-page__main" style={walletType === WalletType.Web3 ? { paddingBottom: `90rem`} : undefined}>*/}
+          <div className="borrow-page__main">
             <AssetSelector walletType={walletType} onSelectAsset={this.onSelectAsset} />
           </div>
           <Footer />

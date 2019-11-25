@@ -54,20 +54,13 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
 
   public render() {
     const assetTypeModifier = "asset-selector-item--"+this.props.asset.toLowerCase();
-/*      this.props.asset === Asset.ETH
-        ? "asset-selector-item--eth"
-        : this.props.asset === Asset.SAI
-        ? "asset-selector-item--sai"
-        : this.props.asset === Asset.USDC
-        ? "asset-selector-item--usdc"
-        : "";*/
 
     return (
       <div className={`asset-selector-item ${assetTypeModifier}`} onClick={this.onClick}>
         <DotsBar />
         <div className="asset-selector__title">{this.props.asset}</div>
         {!this.props.onSelectAsset ? (
-          <div className="asset-selector__title--coming-soon">Coming Soon</div>
+          <div className="asset-selector__title--coming-soon">Browser wallets only</div>
         ) : ``}
         <div className="asset-selector__interest-rate">
           {this.state.interestRate.gt(0) ? `${this.state.interestRate.toFixed(2)}% APR` : ``}

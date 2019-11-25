@@ -13,15 +13,14 @@ import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents"
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { TradeTransactionMinedEvent } from "../services/events/TradeTransactionMinedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
+import configProviders from "./../config/providers.json";
 // import { Change24HMarker, Change24HMarkerSize } from "./Change24HMarker";
 import { LeverageSelector } from "./LeverageSelector";
 import { PositionTypeMarker } from "./PositionTypeMarker";
-import TagManager from "react-gtm-module";
-import configProviders from "./../config/providers.json";
-const tagManagerArgs = {
+
+TagManager.initialize({
   gtmId: configProviders.Google_TrackingID
-}
-TagManager.initialize(tagManagerArgs)
+});
 
 export interface ITradeTokenGridRowMBProps {
   selectedKey: TradeTokenKey;

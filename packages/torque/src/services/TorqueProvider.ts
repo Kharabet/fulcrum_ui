@@ -232,7 +232,7 @@ export class TorqueProvider {
     this.providerEngine = providerData[1];
     let canWrite = providerData[2];
     let networkId = providerData[3];
-    let sellectedAccount = providerData[4];
+    const sellectedAccount = providerData[4];
 
     this.web3ProviderSettings = await TorqueProvider.getWeb3ProviderSettings(networkId);
     if (this.web3Wrapper) {
@@ -250,7 +250,7 @@ export class TorqueProvider {
 
     if (this.web3Wrapper && canWrite) {
       try {
-        this.accounts = [sellectedAccount] //await this.web3Wrapper.getAvailableAddressesAsync() || [];
+        this.accounts = [sellectedAccount] // await this.web3Wrapper.getAvailableAddressesAsync() || [];
 
       } catch(e) {
         this.accounts = [];
