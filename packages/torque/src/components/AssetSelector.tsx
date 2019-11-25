@@ -25,10 +25,10 @@ export class AssetSelector extends Component<IAssetSelectorProps> {
       Asset.USDC,
       true
     ],
-    [
+    /*[
       Asset.SUSD,
       false
-    ],
+    ],*/
     [
       Asset.ETH,
       false
