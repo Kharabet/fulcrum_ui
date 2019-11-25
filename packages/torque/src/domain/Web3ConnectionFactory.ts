@@ -3,7 +3,6 @@ import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { TorqueProviderEvents } from "../services/events/TorqueProviderEvents";
 import { TorqueProvider } from "../services/TorqueProvider";
 
-import { BigNumber } from "@0x/utils";
 import { Web3Wrapper } from '@0x/web3-wrapper';
 
 import Portis from "@portis/web3";
@@ -229,7 +228,7 @@ export class Web3ConnectionFactory {
         if (isMobileMedia) {
 
 
-          Web3ConnectionFactory.networkId = new BigNumber(ethNetwork || "1").toNumber();
+          Web3ConnectionFactory.networkId = 1;
           TorqueProvider.Instance.unsupportedNetwork = false;
           await TorqueProvider.Instance.setWeb3ProviderMobileFinalize(
             providerType,
@@ -376,7 +375,7 @@ export class Web3ConnectionFactory {
       appName: "Torque",
       appLogoUrl: "https://torque.loans/static/media/torque_logo.a96c591f.svg"
     })
-    const walletLink = await Web3ConnectionFactory.walletLink.makeWeb3Provider("https://mainnet.infura.io/v3/7989ee6b11324cc49f18b8ab7be5a7c4", new BigNumber(ethNetwork || "1").toNumber())
+    const walletLink = await Web3ConnectionFactory.walletLink.makeWeb3Provider("https://mainnet.infura.io/v3/7989ee6b11324cc49f18b8ab7be5a7c4", 1)
     await walletLink.enable();
     return walletLink;
   }
