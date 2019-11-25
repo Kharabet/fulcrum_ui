@@ -606,7 +606,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
                             },
                             dataLayerName: 'PageDataLayer'
                         }
-    // console.log("tagManagerArgs= ",tagManagerArgs)
+    console.log("tagManagerArgs= ",tagManagerArgs)
     TagManager.dataLayer(tagManagerArgs)
     this.props.onSubmit(
       new TradeRequest(

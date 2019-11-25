@@ -13,10 +13,10 @@ import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
 import { ProfitTicker } from "./ProfitTicker";
 import configProviders from "./../config/providers.json";
-const tagManagerArgs = {
-  gtmId: configProviders.Google_TrackingID
-}
-TagManager.initialize(tagManagerArgs)
+  const tagManagerArgs = {
+      gtmId: configProviders.Google_TrackingID
+  }
+  TagManager.initialize(tagManagerArgs)
 
 
 export interface ILendTokenSelectorItemProps {
@@ -136,22 +136,6 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
     }
     return (
       <div className="token-selector-item">
-        {/* 
-        {this.props.asset === Asset.SAI ? (
-          <div className="token-select-item-dai-convert" onClick={this.onDAIConvertClick}>
-            <div className="token-select-item-dai-convert__text">
-              upgrade to dai
-            </div>
-          </div>
-        ) : null }
-        {this.props.asset === Asset.DAI ? (
-          <div className="token-select-item-dai-convert" onClick={this.onDAIConvertClick}>
-            <div className="token-select-item-dai-convert__text">
-              downgrade to sai
-            </div>
-          </div>
-        ) : null }
-        */ }
         <div className={"token-selector-item__image"}>
           <img src={this.state.assetDetails.logoSvg} alt={this.state.assetDetails.displayName} />
         </div>
@@ -268,7 +252,9 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
                             },
                             dataLayerName: 'PageDataLayer'
                         }
+    console.log(tagManagerArgs)
     TagManager.dataLayer(tagManagerArgs)
+    console.log("TagManager = ",TagManager)
     this.props.onLend(new LendRequest(LendType.LEND, this.props.asset, new BigNumber(0)));
   };
 
