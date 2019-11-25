@@ -839,7 +839,7 @@ export class TorqueProvider {
         const loanPrecision = AssetsDictionary.assets.get(repayLoanRequest.borrowAsset)!.decimals || 18;
         let closeAmountInBaseUnits = repayLoanRequest.repayAmount.multipliedBy(10**loanPrecision);
         const closeAmountInBaseUnitsValue = new BigNumber(closeAmountInBaseUnits.toFixed(0, 1));
-        if (repayLoanRequest.repayPercent.gte(100)) {
+        if (closeAmountInBaseUnits.gte(repayLoanRequest.actualAmountOwed)) {
           // send a large amount to close entire loan
           closeAmountInBaseUnits = closeAmountInBaseUnits.multipliedBy(10**50);
         }
@@ -1002,7 +1002,7 @@ export class TorqueProvider {
   };
 
   public isETHAsset = (asset: Asset): boolean => {
-    return asset === Asset.ETH || asset === Asset.WETH;
+    return asset === Asset.ETH;// || asset === Asset.WETH;
   }
 
   public isStableAsset = (asset: Asset): boolean => {
