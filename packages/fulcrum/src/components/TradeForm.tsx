@@ -23,7 +23,6 @@ import { CollateralTokenSelector } from "./CollateralTokenSelector";
 import { PositionTypeMarkerAlt } from "./PositionTypeMarkerAlt";
 import { TradeExpectedResult } from "./TradeExpectedResult";
 import { UnitOfAccountSelector } from "./UnitOfAccountSelector";
-import TagManager from "react-gtm-module";
 import configProviders from "./../config/providers.json";
 const tagManagerArgs = {
   gtmId: configProviders.Google_TrackingID
@@ -606,7 +605,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
                             },
                             dataLayerName: 'PageDataLayer'
                         }
-    // console.log("tagManagerArgs= ",tagManagerArgs)
+    console.log("tagManagerArgs= ",tagManagerArgs)
     TagManager.dataLayer(tagManagerArgs)
     this.props.onSubmit(
       new TradeRequest(

@@ -1,6 +1,5 @@
 import { BigNumber } from "@0x/utils";
 import React, { ChangeEvent, Component, FormEvent } from "react";
-import TagManager from "react-gtm-module";
 import { Tooltip } from "react-tippy";
 import { merge, Observable, Subject } from "rxjs";
 import { debounceTime, distinctUntilChanged, switchMap } from "rxjs/operators";
@@ -16,7 +15,13 @@ import { EthOrWethSelector } from "./EthOrWethSelector";
 import TagManager from "react-gtm-module";
 import configProviders from "./../config/providers.json";
 const tagManagerArgs = {
-  gtmId: configProviders.Google_TrackingID
+  gtmId: configProviders.Google_TrackingID,
+                dataLayer: {
+                                name: "Lend form",
+                                status: "Initialized"
+                            },
+                            dataLayerName: 'PageDataLayer'
+
 }
 TagManager.initialize(tagManagerArgs)
 
@@ -390,7 +395,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
                             },
                             dataLayerName: 'PageDataLayer'
                         }
-    // console.log("tagManagerArgs  = ",tagManagerArgs)
+    console.log("tagManagerArgs  = ",tagManagerArgs)
     TagManager.dataLayer(tagManagerArgs)
     this.props.onSubmit(
 

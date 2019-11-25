@@ -3,7 +3,7 @@
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  max-height: 30rem;
+  min-height: 30rem;
   justify-content: space-between;
 
   margin-bottom: 2rem;
@@ -164,7 +164,7 @@
     display: flex;
     flex-direction: column;
     flex-wrap: inherit;
-    max-height: 30rem;
+    min-height: 30rem;
     justify-content: space-between;
 
     margin-bottom: 2rem;

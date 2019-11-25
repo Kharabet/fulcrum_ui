@@ -117,6 +117,7 @@ export class Web3ConnectionFactory {
     providerEngine.addProvider(Web3ConnectionFactory.alchemyProvider);
 
     if (subProvider) {
+      //TorqueProvider.Instance.isLoading = true;
       if (providerType === ProviderType.MetaMask) {
         providerEngine.addProvider(new MetamaskSubprovider(subProvider));
         canWrite = true;
@@ -188,7 +189,7 @@ export class Web3ConnectionFactory {
             Web3ConnectionFactory.networkId = networkIdInt;
 
             TorqueProvider.Instance.unsupportedNetwork = false;
-            await await TorqueProvider.Instance.setWeb3ProviderFinalize(
+            await TorqueProvider.Instance.setWeb3ProviderFinalize(
               providerType,
               [
                 web3Wrapper,
@@ -222,9 +223,33 @@ export class Web3ConnectionFactory {
         }
 
         // @ts-ignore
-        Web3ConnectionFactory.metamaskProvider.publicConfigStore.on("update", Web3ConnectionFactory.publicStoreUpdate);
-      }
+        let networkIdInt=1
+        const isMobileMedia = (window.innerWidth <= 959);
 
+        if(isMobileMedia){
+
+
+        Web3ConnectionFactory.networkId = networkIdInt;
+            TorqueProvider.Instance.unsupportedNetwork = false;
+            await TorqueProvider.Instance.setWeb3ProviderMobileFinalize(
+              providerType,
+              [
+                web3Wrapper,
+                providerEngine,
+                true,
+                networkIdInt,
+                Web3ConnectionFactory.metamaskProvider.selectedAddress,
+              ]);
+
+            await eventEmitter.emit(
+              TorqueProviderEvents.ProviderChanged,
+              new ProviderChangedEvent(providerType, web3Wrapper)
+            );
+
+          }else{
+          Web3ConnectionFactory.metamaskProvider.publicConfigStore.on("update", Web3ConnectionFactory.publicStoreUpdate);
+        }
+      }
       if (!((subProvider.isSafe && subProvider.currentSafe) || subProvider.isEQLWallet)) {
         // console.log(subProvider.publicConfigStore._state);
         Web3ConnectionFactory.networkId = parseInt(subProvider.publicConfigStore._state.networkVersion, 10);
@@ -351,12 +376,11 @@ export class Web3ConnectionFactory {
       appName: "Torque",
       appLogoUrl: "https://torque.loans/static/media/torque_logo.a96c591f.svg"
     })
-    const walletLink = Web3ConnectionFactory.walletLink.makeWeb3Provider("https://mainnet.infura.io/v3/7989ee6b11324cc49f18b8ab7be5a7c4", 1)
-    await walletLink.enable();
-    /*walletLink.enable().then((accounts: string[]) => {
+    const wallet_link = Web3ConnectionFactory.walletLink.makeWeb3Provider("https://mainnet.infura.io/v3/7989ee6b11324cc49f18b8ab7be5a7c4", 1)
+    wallet_link.enable().then((accounts: string[]) => {
       console.log(`User's address is ${accounts[0]}`)
-    });*/
-    return walletLink;
+    })
+    return wallet_link;
   }
 
 

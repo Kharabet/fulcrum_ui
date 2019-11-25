@@ -73,7 +73,7 @@ export class TorqueProvider {
     }
 
     const storedProvider: any = TorqueProvider.getLocalstorageItem('providerType');
-    const providerType: ProviderType | null = ProviderType[storedProvider] as ProviderType || null;
+    const providerType: ProviderType | null = storedProvider as ProviderType || null;
     if (providerType) {
       TorqueProvider.Instance.setWeb3Provider(providerType).then(() => {
         this.eventEmitter.emit(TorqueProviderEvents.ProviderAvailable);
@@ -85,7 +85,7 @@ export class TorqueProvider {
     } else {
       try {
         // TorqueProvider.Instance.isLoading = true;
-        
+
         // setting up readonly provider
         Web3ConnectionFactory.getWeb3Provider(null, this.eventEmitter).then((providerData) => {
           // @ts-ignore
@@ -107,7 +107,7 @@ export class TorqueProvider {
         });
       } catch(e) {
         // console.log(e);
-        // TorqueProvider.Instance.isLoading = false;
+        TorqueProvider.Instance.isLoading = false;
       }
 
     }
@@ -197,7 +197,6 @@ export class TorqueProvider {
       try {
         this.accounts = await this.web3Wrapper.getAvailableAddressesAsync() || [];
       } catch(e) {
-        // console.log(e);
         this.accounts = [];
       }
       if (this.accounts.length === 0) {
@@ -226,6 +225,63 @@ export class TorqueProvider {
     if (this.contractsSource) {
       await this.contractsSource.Init();
     }
+  }
+
+  public async setWeb3ProviderMobileFinalize(providerType: ProviderType, providerData: [Web3Wrapper | null, Web3ProviderEngine | null, boolean, number, string]) { // : Promise<boolean> {
+    this.web3Wrapper = providerData[0];
+    this.providerEngine = providerData[1];
+    let canWrite = providerData[2];
+    let networkId = providerData[3];
+    let sellectedAccount = providerData[4];
+
+    this.web3ProviderSettings = await TorqueProvider.getWeb3ProviderSettings(networkId);
+    if (this.web3Wrapper) {
+      if (this.web3ProviderSettings.networkName !== process.env.REACT_APP_ETH_NETWORK) {
+        // TODO: inform the user they are on the wrong network. Make it provider specific (MetaMask, etc)
+
+        this.unsupportedNetwork = true;
+        canWrite = false; // revert back to read-only
+        networkId = await this.web3Wrapper.getNetworkIdAsync();
+        this.web3ProviderSettings = await TorqueProvider.getWeb3ProviderSettings(networkId);
+      } else {
+        this.unsupportedNetwork = false;
+      }
+    }
+
+    if (this.web3Wrapper && canWrite) {
+      try {
+        this.accounts = [sellectedAccount] //await this.web3Wrapper.getAvailableAddressesAsync() || [];
+
+      } catch(e) {
+        this.accounts = [];
+      }
+      if (this.accounts.length === 0) {
+        canWrite = false; // revert back to read-only
+      }
+    } else {
+      // this.accounts = [];
+      if (providerType === ProviderType.Bitski && networkId !== 1) {
+        this.unsupportedNetwork = true;
+      }
+    }
+    if (this.web3Wrapper && this.web3ProviderSettings.networkId > 0) {
+      this.contractsSource = await new ContractsSource(this.providerEngine, this.web3ProviderSettings.networkId, canWrite);
+      this.borrowRequestAwaitingStore = new BorrowRequestAwaitingStore(this.web3ProviderSettings.networkId, this.web3Wrapper);
+      if (canWrite) {
+        this.providerType = providerType;
+      } else {
+        this.providerType = ProviderType.None;
+      }
+
+      TorqueProvider.setLocalstorageItem('providerType', providerType);
+    } else {
+      this.contractsSource = null;
+    }
+
+    if (this.contractsSource) {
+      await this.contractsSource.Init();
+    }
+    TorqueProvider.Instance.isLoading = false;
   }
 
   public static async getWeb3ProviderSettings(networkId: number| null): Promise<IWeb3ProviderSettings> {
@@ -311,7 +367,7 @@ export class TorqueProvider {
     amount: BigNumber
   ): Promise<IBorrowEstimate> => {
     const result = { depositAmount: new BigNumber(0), gasEstimate: new BigNumber(0) };
-    
+
     // const marginPremium = this.getMarginPremiumAmount(collateralAsset);
 
     if (this.contractsSource && this.web3Wrapper) {
@@ -330,7 +386,7 @@ export class TorqueProvider {
           // .multipliedBy(150 + marginPremium)
           // .dividedBy(125 + marginPremium)
           .dividedBy(10**collateralPrecision);
-        
+
         /*result.gasEstimate = await this.web3Wrapper.estimateGasAsync({
           ...
         }));*/
@@ -387,7 +443,7 @@ export class TorqueProvider {
 
   public doBorrow = async (borrowRequest: BorrowRequest) => {
     // console.log(borrowRequest);
-    
+
     if (borrowRequest.borrowAmount.lte(0) || borrowRequest.depositAmount.lte(0)) {
       return;
     }
@@ -413,7 +469,7 @@ export class TorqueProvider {
               account,
               TorqueProvider.ZERO_ADDRESS,
               "0x",
-              { 
+              {
                 from: account,
                 value: depositAmountInBaseUnits,
                 gas: this.gasLimit
@@ -432,7 +488,7 @@ export class TorqueProvider {
             account,                      // borrower
             TorqueProvider.ZERO_ADDRESS,  // collateralTokenAddress
             "0x",                         // loanData
-            { 
+            {
               from: account,
               value: depositAmountInBaseUnits,
               gas: gasAmountBN ? gasAmountBN.toString() : "2000000",
@@ -466,7 +522,7 @@ export class TorqueProvider {
               account,
               collateralAssetErc20Address,
               "0x",
-              { 
+              {
                 from: account,
                 gas: this.gasLimit
               }
@@ -484,7 +540,7 @@ export class TorqueProvider {
             account,                      // borrower
             collateralAssetErc20Address,  // collateralTokenAddress
             "0x",                         // loanData
-            { 
+            {
               from: account,
               gas: gasAmountBN ? gasAmountBN.toString() : "2000000",
               gasPrice: await this.gasPrice()
@@ -504,7 +560,7 @@ export class TorqueProvider {
         }
       }
     }
-  
+
     return;
   };
 
@@ -859,11 +915,11 @@ export class TorqueProvider {
             repayLoanRequest.loanOrderHash,
             account,
             account,
-            this.isETHAsset(repayLoanRequest.collateralAsset) ? 
-              TorqueProvider.ZERO_ADDRESS: // will refund with ETH  
+            this.isETHAsset(repayLoanRequest.collateralAsset) ?
+              TorqueProvider.ZERO_ADDRESS: // will refund with ETH
               account,
             closeAmountInBaseUnits,
-            { 
+            {
               from: account,
               value: this.isETHAsset(repayLoanRequest.borrowAsset) ?
               closeAmountInBaseUnitsValue :
@@ -881,10 +937,10 @@ export class TorqueProvider {
           account,                                              // borrower
           account,                                              // payer
           this.isETHAsset(repayLoanRequest.collateralAsset) ?   // receiver
-            TorqueProvider.ZERO_ADDRESS:                        // will refund with ETH  
+            TorqueProvider.ZERO_ADDRESS:                        // will refund with ETH
             account,
           closeAmountInBaseUnits,                               // closeAmount
-          { 
+          {
             from: account,
             value: this.isETHAsset(repayLoanRequest.borrowAsset) ?
             closeAmountInBaseUnitsValue :
@@ -899,7 +955,7 @@ export class TorqueProvider {
 
     return;
   };
-  
+
   public doManageCollateral = async (manageCollateralRequest: ManageCollateralRequest) => {
     // console.log(manageCollateralRequest);
 
@@ -932,7 +988,7 @@ export class TorqueProvider {
               manageCollateralRequest.loanOrderState.loanData!.loanOrderHash,
               manageCollateralRequest.loanOrderState.loanData!.collateralTokenAddress,
               collateralAmountInBaseUnits,
-              { 
+              {
                 from: account,
                 value: this.isETHAsset(manageCollateralRequest.loanOrderState.collateralAsset) ?
                   collateralAmountInBaseUnitsValue :
@@ -949,7 +1005,7 @@ export class TorqueProvider {
             manageCollateralRequest.loanOrderState.loanData!.loanOrderHash,           // loanOrderHash
             manageCollateralRequest.loanOrderState.loanData!.collateralTokenAddress,  // depositTokenAddress
             collateralAmountInBaseUnits,                                              // depositAmount
-            { 
+            {
               from: account,
               value: this.isETHAsset(manageCollateralRequest.loanOrderState.collateralAsset) ?
               collateralAmountInBaseUnitsValue :
@@ -970,7 +1026,7 @@ export class TorqueProvider {
               this.isETHAsset(manageCollateralRequest.loanOrderState.collateralAsset) ?
                 TorqueProvider.ZERO_ADDRESS :
                 account,
-              { 
+              {
                 from: account,
                 gas: this.gasLimit
               }
@@ -987,7 +1043,7 @@ export class TorqueProvider {
             this.isETHAsset(manageCollateralRequest.loanOrderState.collateralAsset) ?   // receiver
               TorqueProvider.ZERO_ADDRESS :                                             // will receive ETH back
               account,                                                                  // will receive ERC20 back
-            { 
+            {
               from: account,
               gas: gasAmountBN ? gasAmountBN.toString() : "2000000",
               gasPrice: await this.gasPrice()
@@ -1062,7 +1118,7 @@ export class TorqueProvider {
             account,
             depositAmountInBaseUnits,
             false,
-            { 
+            {
               from: account,
               value: this.isETHAsset(extendLoanRequest.borrowAsset) ?
                 depositAmountInBaseUnits :
@@ -1081,7 +1137,7 @@ export class TorqueProvider {
           account,                                              // payer
           depositAmountInBaseUnits,                             // depositAmount
           false,                                                // useCollateral
-          { 
+          {
             from: account,
             value: this.isETHAsset(extendLoanRequest.borrowAsset) ?
               depositAmountInBaseUnits :
@@ -1111,7 +1167,7 @@ export class TorqueProvider {
           TorqueProvider.MAX_UINT,
           account,
           account,
-          { 
+          {
             from: account,
             gas: this.gasLimit
           }
@@ -1129,12 +1185,13 @@ export class TorqueProvider {
 
   public getAssetInterestRate = async (asset: Asset): Promise<BigNumber> => {
     let result = new BigNumber(0);
-    
+
     if (this.contractsSource && this.web3Wrapper) {
       const iTokenContract = await this.contractsSource.getiTokenContract(asset);
       if (iTokenContract) {
         let borrowRate = await iTokenContract.nextBorrowInterestRateWithOption.callAsync(new BigNumber("0"), true);
         borrowRate = borrowRate.dividedBy(10**18);
+
         /*if (borrowRate.gt(new BigNumber(16))) {
           result = borrowRate;
         } else {
