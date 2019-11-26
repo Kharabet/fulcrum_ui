@@ -117,7 +117,7 @@ export class Web3ConnectionFactory {
     providerEngine.addProvider(Web3ConnectionFactory.alchemyProvider);
 
     if (subProvider) {
-      //TorqueProvider.Instance.isLoading = true;
+      // TorqueProvider.Instance.isLoading = true;
       if (providerType === ProviderType.MetaMask) {
         providerEngine.addProvider(new MetamaskSubprovider(subProvider));
         canWrite = true;
@@ -223,28 +223,27 @@ export class Web3ConnectionFactory {
         }
 
         // @ts-ignore
-        let networkIdInt=1
         const isMobileMedia = (window.innerWidth <= 959);
+        if (isMobileMedia) {
+          Web3ConnectionFactory.networkId = 1;
+          TorqueProvider.Instance.unsupportedNetwork = false;
+          await TorqueProvider.Instance.setWeb3ProviderMobileFinalize(
+            providerType,
+            [
+              web3Wrapper,
+              providerEngine,
+              true,
+              Web3ConnectionFactory.networkId,
+              Web3ConnectionFactory.metamaskProvider.selectedAddress,
+            ]);
 
-        if(isMobileMedia){
-        Web3ConnectionFactory.networkId = networkIdInt;
-            TorqueProvider.Instance.unsupportedNetwork = false;
-            await TorqueProvider.Instance.setWeb3ProviderMobileFinalize(
-              providerType,
-              [
-                web3Wrapper,
-                providerEngine,
-                true,
-                networkIdInt,
-                Web3ConnectionFactory.metamaskProvider.selectedAddress,
-              ]);
 
-            await eventEmitter.emit(
-              TorqueProviderEvents.ProviderChanged,
-              new ProviderChangedEvent(providerType, web3Wrapper)
-            );
+          await eventEmitter.emit(
+            TorqueProviderEvents.ProviderChanged,
+            new ProviderChangedEvent(providerType, web3Wrapper)
+          );
 
-          }else{
+        } else {
           Web3ConnectionFactory.metamaskProvider.publicConfigStore.on("update", Web3ConnectionFactory.publicStoreUpdate);
         }
       }
@@ -374,15 +373,13 @@ export class Web3ConnectionFactory {
   private static async getProviderWalletLint(): Promise<any> {
     await this.cleanupProviders();
     //
-    Web3ConnectionFactory.walletLink = new WalletLink({
+    Web3ConnectionFactory.walletLink = await new WalletLink({
       appName: "Torque",
       appLogoUrl: "https://torque.loans/static/media/torque_logo.a96c591f.svg"
     })
-    const wallet_link = Web3ConnectionFactory.walletLink.makeWeb3Provider("https://mainnet.infura.io/v3/7989ee6b11324cc49f18b8ab7be5a7c4", 1)
-    wallet_link.enable().then((accounts: string[]) => {
-      console.log(`User's address is ${accounts[0]}`)
-    })
-    return wallet_link;
+    const walletLink = await Web3ConnectionFactory.walletLink.makeWeb3Provider("https://mainnet.infura.io/v3/7989ee6b11324cc49f18b8ab7be5a7c4", 1)
+    await walletLink.enable();
+    return walletLink;
   }
 
 

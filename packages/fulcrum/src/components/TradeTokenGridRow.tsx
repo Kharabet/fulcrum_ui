@@ -5,7 +5,6 @@ import { Asset } from "../domain/Asset";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { IPriceDataPoint } from "../domain/IPriceDataPoint";
-import {LendType} from "../domain/LendType";
 import { PositionType } from "../domain/PositionType";
 import { TradeRequest } from "../domain/TradeRequest";
 import { TradeTokenKey } from "../domain/TradeTokenKey";
@@ -14,16 +13,14 @@ import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents"
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { TradeTransactionMinedEvent } from "../services/events/TradeTransactionMinedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
+import configProviders from "./../config/providers.json";
 // import { Change24HMarker, Change24HMarkerSize } from "./Change24HMarker";
 import { LeverageSelector } from "./LeverageSelector";
 import { PositionTypeMarker } from "./PositionTypeMarker";
-import {LendType} from "../domain/LendType";
-import TagManager from "react-gtm-module";
-import configProviders from "./../config/providers.json";
-const tagManagerArgs = {
+
+TagManager.initialize({
   gtmId: configProviders.Google_TrackingID
-}
-TagManager.initialize(tagManagerArgs)
+});
 
 export interface ITradeTokenGridRowProps {
   selectedKey: TradeTokenKey;

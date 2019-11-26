@@ -14,7 +14,9 @@ export class CollateralTokenSelector extends Component<ICollateralTokenSelectorP
   private readonly assets: Asset[] = [
     Asset.ETH,
     Asset.SAI,
+    Asset.DAI,
     Asset.USDC,
+    Asset.SUSD,
     Asset.LINK,
     Asset.WBTC,
     Asset.MKR,

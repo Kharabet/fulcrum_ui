@@ -90,6 +90,30 @@ export class ContractsSource {
             break;
         }
         break;
+      case Asset.DAI:
+        switch (this.networkId) {
+          case 1:
+            address = "0x493c57c4763932315a328269e1adad09653b9081";
+            break;
+          case 42:
+            address = "0x6c1e2b0f67e00c06c8e2be7dc681ab785163ff4d";
+            break;
+        }
+        break;
+      case Asset.USDC:
+        switch (this.networkId) {
+          case 1:
+            address = "0xf013406a0b1d544238083df0b93ad0d2cbe0f65f";
+            break;
+        }
+        break;
+      case Asset.SUSD:
+        switch (this.networkId) {
+          case 1:
+            address = "0x49f4592e641820e928f9919ef4abd92a719b4b49";
+            break;
+        }
+        break;
       case Asset.BAT:
         switch (this.networkId) {
           case 1:
@@ -134,13 +158,6 @@ export class ContractsSource {
         switch (this.networkId) {
           case 1:
             address = "0xBd56E9477Fc6997609Cf45F84795eFbDAC642Ff1";
-            break;
-        }
-        break;
-      case Asset.USDC:
-        switch (this.networkId) {
-          case 1:
-            address = "0xf013406a0b1d544238083df0b93ad0d2cbe0f65f";
             break;
         }
         break;
@@ -205,8 +222,14 @@ export class ContractsSource {
           case "0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359":
             asset = Asset.SAI;
             break;
+          case "0x6b175474e89094c44da98b954eedeac495271d0f":
+            asset = Asset.DAI;
+            break;
           case "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48":
             asset = Asset.USDC;
+            break;
+          case "0x57ab1ec28d129707052df4df418d58a2d46d5f51":
+            asset = Asset.SUSD;
             break;
           case "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599":
             asset = Asset.WBTC;
