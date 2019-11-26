@@ -41,10 +41,9 @@ import { TradeSellEthProcessor } from "./processors/TradeSellEthProcessor";
 import { UnlendErcProcessor } from "./processors/UnlendErcProcessor";
 import { UnlendEthProcessor } from "./processors/UnlendEthProcessor";
 
-const tagManagerArgs = {
+TagManager.initialize({
   gtmId: configProviders.Google_TrackingID
-}
-TagManager.initialize(tagManagerArgs)
+});
 
 export class FulcrumProvider {
   private static readonly priceGraphQueryFunction = new Map<Asset, string>([

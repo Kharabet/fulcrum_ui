@@ -26,13 +26,9 @@ const isMainnetProd =
   && process.env.REACT_APP_ETH_NETWORK === "mainnet";
 
 if (isMainnetProd) {
-  // ReactGA.initialize(configProviders.Google_TrackingID);
-  const tagManagerArgs = {
+  TagManager.initialize({
       gtmId: configProviders.Google_TrackingID
-  }
-  // console.log("tagManagerArgs = ",tagManagerArgs)
-  TagManager.initialize(tagManagerArgs)
-  // console.log("TagManager home init = ",TagManager)
+  });
 }
 
 interface IAppRouterState {

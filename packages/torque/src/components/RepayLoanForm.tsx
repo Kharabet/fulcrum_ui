@@ -336,7 +336,8 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
           this.props.loanOrderState.accountAddress,
           this.props.loanOrderState.loanOrderHash,
           this.state.repayAmount,
-          percentData.repayPercent ? new BigNumber(percentData.repayPercent) : new BigNumber(0)
+          percentData.repayPercent ? new BigNumber(percentData.repayPercent) : new BigNumber(0),
+          this.props.loanOrderState.loanData!.loanTokenAmountFilled.minus(this.props.loanOrderState.loanData!.interestDepositRemaining)
         )
       );
     }

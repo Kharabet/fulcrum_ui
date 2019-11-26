@@ -105,17 +105,19 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
         <div className="borrowed-funds-list-item__padding-container">
           <div className="borrowed-funds-list-item__collateral-container">
             <div className="borrowed-funds-list-item__collateral-info-container">
+              {positionSafetyText !== "Display Error" ? (
               <div className="borrowed-funds-list-item__collateralized-value-container">
                 <div title={`${item.collateralizedPercent.multipliedBy(100).plus(100).toFixed(18)}%`} className="borrowed-funds-list-item__collateralized">
                   {item.collateralizedPercent.multipliedBy(100).plus(100).toFixed(2)}%
                 </div>
                 <div className="borrowed-funds-list-item__collateralized-label">Collateralized</div>
               </div>
-              <div className="borrowed-funds-list-item__collateralized-state-container">
+              ) : ``}
+              <div className="borrowed-funds-list-item__collateralized-state-container" style={positionSafetyText === "Display Error" ? { width: `100%`, alignItems: `unset` } : undefined}>
                 <div className="borrowed-funds-list-item__collateralized-state-icon">
                   {positionSafetyText === "Liquidation Pending" ? <img src={ic_unsafe} alt="unsafe" /> : null}
                 </div>
-                <div className={`borrowed-funds-list-item__collateralized-state ${collateralizedStateSelector}`}>
+                <div className={`borrowed-funds-list-item__collateralized-state ${collateralizedStateSelector}`} style={positionSafetyText === "Display Error" ? { fontSize: `1rem` } : undefined}>
                   {positionSafetyText}
                   {positionSafetyText === "Danger" ? (
                     <React.Fragment><br/>Add Collateral</React.Fragment>

@@ -1,6 +1,6 @@
 export enum Asset {
   ETH = "ETH",
-  WETH = "WETH",
+  WETH = "ETH",
   SAI = "SAI",
   DAI = "DAI",
   USDC = "USDC",

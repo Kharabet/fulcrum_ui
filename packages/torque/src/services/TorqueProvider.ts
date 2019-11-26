@@ -232,7 +232,7 @@ export class TorqueProvider {
     this.providerEngine = providerData[1];
     let canWrite = providerData[2];
     let networkId = providerData[3];
-    let sellectedAccount = providerData[4];
+    const sellectedAccount = providerData[4];
 
     this.web3ProviderSettings = await TorqueProvider.getWeb3ProviderSettings(networkId);
     if (this.web3Wrapper) {
@@ -250,7 +250,7 @@ export class TorqueProvider {
 
     if (this.web3Wrapper && canWrite) {
       try {
-        this.accounts = [sellectedAccount] //await this.web3Wrapper.getAvailableAddressesAsync() || [];
+        this.accounts = [sellectedAccount] // await this.web3Wrapper.getAvailableAddressesAsync() || [];
 
       } catch(e) {
         this.accounts = [];
@@ -327,11 +327,11 @@ export class TorqueProvider {
       result = await this.getEthBalance()
     } else {
       // get erc20 token balance
-      const precision = AssetsDictionary.assets.get(asset)!.decimals || 18;
+      // const precision = AssetsDictionary.assets.get(asset)!.decimals || 18;
       const assetErc20Address = this.getErc20AddressOfAsset(asset);
       if (assetErc20Address) {
         result = await this.getErc20BalanceOfUser(assetErc20Address);
-        result = result.multipliedBy(10 ** (18 - precision));
+        // result = result.multipliedBy(10 ** (18 - precision));
       }
     }
 
@@ -895,7 +895,7 @@ export class TorqueProvider {
         const loanPrecision = AssetsDictionary.assets.get(repayLoanRequest.borrowAsset)!.decimals || 18;
         let closeAmountInBaseUnits = repayLoanRequest.repayAmount.multipliedBy(10**loanPrecision);
         const closeAmountInBaseUnitsValue = new BigNumber(closeAmountInBaseUnits.toFixed(0, 1));
-        if (repayLoanRequest.repayPercent.gte(100)) {
+        if (closeAmountInBaseUnits.gte(repayLoanRequest.actualAmountOwed)) {
           // send a large amount to close entire loan
           closeAmountInBaseUnits = closeAmountInBaseUnits.multipliedBy(10**50);
         }
@@ -1058,7 +1058,7 @@ export class TorqueProvider {
   };
 
   public isETHAsset = (asset: Asset): boolean => {
-    return asset === Asset.ETH || asset === Asset.WETH;
+    return asset === Asset.ETH;// || asset === Asset.WETH;
   }
 
   public isStableAsset = (asset: Asset): boolean => {

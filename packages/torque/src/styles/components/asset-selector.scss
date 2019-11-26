@@ -109,6 +109,25 @@
     background-position: right;
   }
 
+  .asset-selector-item--dai {
+    background-image: url("../assets/images/bg_tile_dai.svg");
+    background-repeat: no-repeat;
+    background-position: right;
+  }
+
+  .asset-selector-item--usdc {
+    background-image: url("../assets/images/bg_tile_usdc.svg");
+    background-repeat: no-repeat;
+    background-position: right;
+    margin-top: 2.5rem;
+  }
+
+  .asset-selector-item--susd {
+    background-image: url("../assets/images/bg_tile_susd.svg");
+    background-repeat: no-repeat;
+    background-position: right;
+  }
+
   .asset-selector-item--eth {
     background-image: url("../assets/images/bg_tile_eth.svg");
     background-repeat: no-repeat;
@@ -135,12 +154,6 @@
 
   .asset-selector-item--rep {
     background-image: url("../assets/images/bg_tile_rep.svg");
-    background-repeat: no-repeat;
-    background-position: right;
-  }
-
-  .asset-selector-item--usdc {
-    background-image: url("../assets/images/bg_tile_usdc.svg");
     background-repeat: no-repeat;
     background-position: right;
   }
@@ -251,8 +264,27 @@
       background-position: right;
     }
 
+    .asset-selector-item--sai {
+      background-image: url("../assets/images/bg_tile_sai.svg");
+      background-repeat: no-repeat;
+      background-position: right;
+    }
+
     .asset-selector-item--dai {
       background-image: url("../assets/images/bg_tile_dai.svg");
+      background-repeat: no-repeat;
+      background-position: right;
+    }
+
+    .asset-selector-item--usdc {
+      background-image: url("../assets/images/bg_tile_usdc.svg");
+      background-repeat: no-repeat;
+      background-position: right;
+      margin-top: 2.5rem;
+    }
+
+    .asset-selector-item--susd {
+      background-image: url("../assets/images/bg_tile_susd.svg");
       background-repeat: no-repeat;
       background-position: right;
     }
@@ -285,13 +317,6 @@
       background-image: url("../assets/images/bg_tile_rep.svg");
       background-repeat: no-repeat;
       background-position: right;
-    }
-
-    .asset-selector-item--usdc {
-      background-image: url("../assets/images/bg_tile_usdc.svg");
-      background-repeat: no-repeat;
-      background-position: right;
-      margin-top: 2.5rem;
     }
   }
   .modal-container {

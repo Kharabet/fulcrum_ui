@@ -1,5 +1,6 @@
 import { BigNumber } from "@0x/utils";
 import React, { ChangeEvent, Component, FormEvent } from "react";
+import TagManager from "react-gtm-module";
 import { Tooltip } from "react-tippy";
 import { merge, Observable, Subject } from "rxjs";
 import { debounceTime, distinctUntilChanged, switchMap } from "rxjs/operators";
@@ -11,19 +12,17 @@ import { LendType } from "../domain/LendType";
 import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
-import { EthOrWethSelector } from "./EthOrWethSelector";
-import TagManager from "react-gtm-module";
 import configProviders from "./../config/providers.json";
-const tagManagerArgs = {
-  gtmId: configProviders.Google_TrackingID,
-                dataLayer: {
-                                name: "Lend form",
-                                status: "Initialized"
-                            },
-                            dataLayerName: 'PageDataLayer'
+import { EthOrWethSelector } from "./EthOrWethSelector";
 
-}
-TagManager.initialize(tagManagerArgs)
+TagManager.initialize({
+  gtmId: configProviders.Google_TrackingID,
+  dataLayer: {
+    name: "Lend form",
+    status: "Initialized"
+  },
+  dataLayerName: 'PageDataLayer'
+});
 
 interface ILendAmountChangeEvent {
   isLendAmountTouched: boolean;
