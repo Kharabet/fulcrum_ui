@@ -8,6 +8,8 @@
   .collateral-token-selector__items {
     display: flex;
     flex-direction: row;
+    height: 600px;
+    overflow-y: scroll;
     flex-wrap: wrap;
 
     .collateral-token-selector-item {
