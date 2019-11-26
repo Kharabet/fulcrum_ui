@@ -37,7 +37,7 @@ export class Web3ConnectionFactory {
   public static torus: Torus | null;
   public static walletLink: WalletLink | null;
   public static networkId: number;
-
+  public static userAccount: any | null;
   private static publicStoreUpdate: any | null;
 
   public static async getWeb3Provider(providerType: ProviderType | null, eventEmitter: EventEmitter): Promise<[Web3Wrapper | null, Web3ProviderEngine | null, boolean, number]> {
@@ -55,6 +55,7 @@ export class Web3ConnectionFactory {
         }
         case ProviderType.MetaMask: {
           subProvider = await Web3ConnectionFactory.getProviderMetaMask();
+          console.log("subProvider  = ",subProvider)
           Web3ConnectionFactory.metamaskProvider = subProvider ? subProvider : null;
           break;
         }
@@ -85,7 +86,7 @@ export class Web3ConnectionFactory {
         }
       }
     }
-  
+    
     if (!subProvider) {
       subProvider = null;
     }
@@ -115,7 +116,7 @@ export class Web3ConnectionFactory {
       Web3ConnectionFactory.alchemyProvider = new AlchemySubprovider(`https://eth-${ethNetwork}.alchemyapi.io/jsonrpc/${configProviders.Alchemy_ApiKey}`, { writeProvider: null });
     }
     providerEngine.addProvider(Web3ConnectionFactory.alchemyProvider);
-
+    
     if (subProvider) {
       // TorqueProvider.Instance.isLoading = true;
       if (providerType === ProviderType.MetaMask) {
@@ -171,10 +172,10 @@ export class Web3ConnectionFactory {
       if (!((subProvider.isSafe && subProvider.currentSafe) || subProvider.isEQLWallet)) {
 
         Web3ConnectionFactory.metamaskProvider = subProvider;
-
+        
         Web3ConnectionFactory.publicStoreUpdate = async (result: any) => {
           // console.log(Web3ConnectionFactory.metamaskProvider.publicConfigStore._state);
-
+          
           let networkIdInt;
           if (Web3ConnectionFactory.metamaskProvider.isSafe && Web3ConnectionFactory.metamaskProvider.currentSafe) {
             networkIdInt = 1;
@@ -223,29 +224,33 @@ export class Web3ConnectionFactory {
         }
 
         // @ts-ignore
+        let networkIdInt=1
         const isMobileMedia = (window.innerWidth <= 959);
-
         if (isMobileMedia) {
+        Web3ConnectionFactory.networkId = networkIdInt;
+            TorqueProvider.Instance.unsupportedNetwork = false;
+            let metaAccount = Web3ConnectionFactory.metamaskProvider.selectedAddress
+            if(metaAccount ==undefined){
+              metaAccount =   Web3ConnectionFactory.userAccount.toString();
+            }
+
+            await TorqueProvider.Instance.setWeb3ProviderMobileFinalize(
+              providerType,
+              [
+                web3Wrapper,
+                providerEngine,
+                true,
+                networkIdInt,
+                metaAccount,
+              ]);
 
 
-          Web3ConnectionFactory.networkId = 1;
-          TorqueProvider.Instance.unsupportedNetwork = false;
-          await TorqueProvider.Instance.setWeb3ProviderMobileFinalize(
-            providerType,
-            [
-              web3Wrapper,
-              providerEngine,
-              true,
-              Web3ConnectionFactory.networkId,
-              Web3ConnectionFactory.metamaskProvider.selectedAddress,
-            ]);
+            await eventEmitter.emit(
+              TorqueProviderEvents.ProviderChanged,
+              new ProviderChangedEvent(providerType, web3Wrapper)
+            );
 
-          await eventEmitter.emit(
-            TorqueProviderEvents.ProviderChanged,
-            new ProviderChangedEvent(providerType, web3Wrapper)
-          );
-
-        } else {
+          } else {
           Web3ConnectionFactory.metamaskProvider.publicConfigStore.on("update", Web3ConnectionFactory.publicStoreUpdate);
         }
       }
@@ -263,7 +268,11 @@ export class Web3ConnectionFactory {
   }
 
   private static async getProviderMetaMask(): Promise<any | null> {
-    await this.cleanupProviders();
+    const isMobileRefresh = (window.innerWidth <= 959);
+
+    if(!isMobileRefresh) {
+      await this.cleanupProviders();
+    }
 
     // @ts-ignore
     if (window.ethereum) {
@@ -277,6 +286,10 @@ export class Web3ConnectionFactory {
       window.ethereum.autoRefreshOnNetworkChange = false;
 
       // @ts-ignore
+
+      if(window.ethereum.selectedAddress === undefined){
+        Web3ConnectionFactory.userAccount=account
+      }
       return window.ethereum;
     // @ts-ignore
     } else if (window.web3) {
