@@ -85,7 +85,7 @@ export class Web3ConnectionFactory {
         }
       }
     }
-  
+
     if (!subProvider) {
       subProvider = null;
     }
@@ -227,8 +227,6 @@ export class Web3ConnectionFactory {
         const isMobileMedia = (window.innerWidth <= 959);
 
         if(isMobileMedia){
-
-
         Web3ConnectionFactory.networkId = networkIdInt;
             TorqueProvider.Instance.unsupportedNetwork = false;
             await TorqueProvider.Instance.setWeb3ProviderMobileFinalize(
@@ -264,7 +262,11 @@ export class Web3ConnectionFactory {
   }
 
   private static async getProviderMetaMask(): Promise<any | null> {
-    await this.cleanupProviders();
+    const isMobileRefresh = (window.innerWidth <= 959);
+
+    if(!isMobileRefresh) {
+      await this.cleanupProviders();
+    }
 
     // @ts-ignore
     if (window.ethereum) {
