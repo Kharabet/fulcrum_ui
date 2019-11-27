@@ -27,7 +27,12 @@ export class CollateralTokenSelector extends Component<ICollateralTokenSelectorP
   ];
 
   public render() {
-    const tokenItems = this.assets.filter(e => e !== this.props.borrowAsset).map(e => (
+    const tokenItems = this.assets.filter(e => 
+        !(e === this.props.borrowAsset
+          || (e === Asset.SAI && this.props.borrowAsset === Asset.DAI)
+          || (e === Asset.DAI && this.props.borrowAsset === Asset.SAI)
+        )
+      ).map(e => (
       <CollateralTokenSelectorItem
         key={e}
         asset={e}
