@@ -1,15 +1,14 @@
 .collateral-token-selector {
   box-sizing: border-box;
-  width: 46.5rem;
+  width: 47rem;
   border-radius: 1rem;
 
   background-color: $color-white;
 
   .collateral-token-selector__items {
     display: flex;
-    flex-direction: row;
     height: 500px;
-    width: 500px;
+    width: 100%;
     overflow-y: scroll;
     flex-wrap: wrap;
 
