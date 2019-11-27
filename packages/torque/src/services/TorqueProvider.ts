@@ -491,7 +491,7 @@ export class TorqueProvider {
             {
               from: account,
               value: depositAmountInBaseUnits,
-              gas: gasAmountBN ? gasAmountBN.toString() : "2000000",
+              gas: gasAmountBN ? gasAmountBN.toString() : "3000000",
               gasPrice: await this.gasPrice()
             }
           );
@@ -542,7 +542,7 @@ export class TorqueProvider {
             "0x",                         // loanData
             {
               from: account,
-              gas: gasAmountBN ? gasAmountBN.toString() : "2000000",
+              gas: gasAmountBN ? gasAmountBN.toString() : "3000000",
               gasPrice: await this.gasPrice()
             }
           );
@@ -856,7 +856,7 @@ export class TorqueProvider {
   };
 
   public getLoanRepayGasAmount = async (): Promise<BigNumber> => {
-    return new BigNumber(2000000);
+    return new BigNumber(3000000);
   };
 
   public getLoanRepayAddress = async (walletDetails: IWalletDetails, borrowedFundsState: IBorrowedFundsState): Promise<string | null> => {
@@ -945,7 +945,7 @@ export class TorqueProvider {
             value: this.isETHAsset(repayLoanRequest.borrowAsset) ?
             closeAmountInBaseUnitsValue :
               undefined,
-            gas: gasAmountBN ? gasAmountBN.toString() : "2000000",
+            gas: gasAmountBN ? gasAmountBN.toString() : "3000000",
             gasPrice: await this.gasPrice()
           }
         );
@@ -1010,7 +1010,7 @@ export class TorqueProvider {
               value: this.isETHAsset(manageCollateralRequest.loanOrderState.collateralAsset) ?
               collateralAmountInBaseUnitsValue :
                 undefined,
-              gas: gasAmountBN ? gasAmountBN.toString() : "2000000",
+              gas: gasAmountBN ? gasAmountBN.toString() : "3000000",
               gasPrice: await this.gasPrice()
             }
           );
@@ -1045,7 +1045,7 @@ export class TorqueProvider {
               account,                                                                  // will receive ERC20 back
             {
               from: account,
-              gas: gasAmountBN ? gasAmountBN.toString() : "2000000",
+              gas: gasAmountBN ? gasAmountBN.toString() : "3000000",
               gasPrice: await this.gasPrice()
             }
           );
@@ -1142,7 +1142,7 @@ export class TorqueProvider {
             value: this.isETHAsset(extendLoanRequest.borrowAsset) ?
               depositAmountInBaseUnits :
               undefined,
-            gas: gasAmountBN ? gasAmountBN.toString() : "2000000",
+            gas: gasAmountBN ? gasAmountBN.toString() : "3000000",
             gasPrice: await this.gasPrice()
           }
         );

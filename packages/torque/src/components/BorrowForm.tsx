@@ -47,7 +47,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
       collateralAsset: TorqueProvider.Instance.isETHAsset(props.borrowAsset) ? Asset.DAI : Asset.ETH,
       inputAmountText: "",
       depositAmount: new BigNumber(0),
-      gasAmountNeeded: new BigNumber(2000000),
+      gasAmountNeeded: new BigNumber(3000000),
       balanceTooLow: false
     };
 
