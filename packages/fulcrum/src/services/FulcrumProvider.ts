@@ -6,7 +6,7 @@ import moment from "moment";
 import fetch from "node-fetch";
 import { Asset } from "../domain/Asset";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
-import { DAIConvertRequest } from "../domain/DAIConvertRequest";
+import { FulcrumMcdBridgeRequest } from "../domain/FulcrumMcdBridgeRequest";
 import { IPriceDataPoint } from "../domain/IPriceDataPoint";
 import { IWeb3ProviderSettings } from "../domain/IWeb3ProviderSettings";
 import { LendRequest } from "../domain/LendRequest";
@@ -31,7 +31,7 @@ import { TasksQueue } from "./TasksQueue";
 
 import TagManager from "react-gtm-module";
 import configProviders from "../config/providers.json";
-// import { ConvertDAIProcessor } from "./processors/ConvertDAIProcessor";
+import { FulcrumMcdBridgeProcessor } from "./processors/FulcrumMcdBridgeProcessor";
 import { LendErcProcessor } from "./processors/LendErcProcessor";
 import { LendEthProcessor } from "./processors/LendEthProcessor";
 import { TradeBuyErcProcessor } from "./processors/TradeBuyErcProcessor";
@@ -206,7 +206,7 @@ export class FulcrumProvider {
     }
   }
 
-  public onDAIConvertConfirmed = async (request: DAIConvertRequest) => {
+  public onFulcrumMcdBridgeConfirmed = async (request: FulcrumMcdBridgeRequest) => {
     if (request) {
       TasksQueue.Instance.enqueue(new RequestTask(request));
     }
@@ -672,6 +672,27 @@ export class FulcrumProvider {
     return result;
   };
 
+  
+  public getMaxMCDBridgeValue = async (request: FulcrumMcdBridgeRequest): Promise<BigNumber> => {
+    let result = new BigNumber(0);
+
+    if (this.contractsSource) {
+      const assetContract = await this.contractsSource.getITokenContract(request.asset);
+      if (assetContract) {
+        const balanceOfUser = await this.getITokenBalanceOfUser(request.asset);
+        const marketLiquidity = await assetContract.marketLiquidity.callAsync();
+
+        result = marketLiquidity.lt(balanceOfUser) ?
+          marketLiquidity :
+          balanceOfUser;
+      }
+    }
+
+    result = result.dividedBy(10 ** 18);
+
+    return result;
+  };
+
   public getMaxLendValue = async (request: LendRequest): Promise<BigNumber> => {
     let result = new BigNumber(0);
 
@@ -754,6 +775,42 @@ export class FulcrumProvider {
 
     return result;
   };
+
+  public getMCDBridgeAmountEstimate = async (request: FulcrumMcdBridgeRequest): Promise<BigNumber> => {
+    let result = new BigNumber(0);
+
+    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+    if (account && this.contractsSource) {
+      const bridgeContract = await this.contractsSource.getFulcrumMcdBridgeContract();
+      if (bridgeContract) {
+        try {
+          if (request.isSAIUpgrade()) {
+            result = await bridgeContract.bridgeISaiToIDai.callAsync(
+              new BigNumber(request.amount.times(10**18).toFixed(0)),
+              {
+                from: account,
+                gas: "5000000",
+                gasPrice: new BigNumber(0)
+              }
+            );
+          } else {
+            result = await bridgeContract.bridgeIDaiToISai.callAsync(
+              new BigNumber(request.amount.times(10**18).toFixed(0)),
+              {
+                from: account,
+                gas: "5000000",
+                gasPrice: new BigNumber(0)
+              }
+            );
+          }
+        } catch(e) {
+          // console.log(e);
+        }
+      }
+    }
+
+    return result.dividedBy(10**18);
+  }
 
   public getLendedAmountEstimate = async (request: LendRequest): Promise<BigNumber> => {
     let result = new BigNumber(0);
@@ -1387,8 +1444,8 @@ export class FulcrumProvider {
       await this.processLendRequestTask(task, skipGas);
     }
 
-    if (task.request instanceof DAIConvertRequest) {
-      await this.processDAIConvertRequestTask(task, skipGas);
+    if (task.request instanceof FulcrumMcdBridgeRequest) {
+      await this.processFulcrumMcdBridgeRequestTask(task, skipGas);
     }
 
     if (task.request instanceof TradeRequest) {
@@ -1481,9 +1538,7 @@ export class FulcrumProvider {
     }
   };
 
-  private processDAIConvertRequestTask = async (task: RequestTask, skipGas: boolean) => {
-    return;
-    /*
+  private processFulcrumMcdBridgeRequestTask = async (task: RequestTask, skipGas: boolean) => {
     try {
       if (!(this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite)) {
         throw new Error("No provider available!");
@@ -1495,7 +1550,7 @@ export class FulcrumProvider {
       }
 
       // Initializing conversion
-      const processor = new ConvertDAIProcessor();
+      const processor = new FulcrumMcdBridgeProcessor();
       await processor.run(task, account, skipGas);
       task.processingEnd(true, false, null);
     } catch (e) {
@@ -1505,7 +1560,6 @@ export class FulcrumProvider {
       }
       task.processingEnd(false, false, e);
     }
-    */
   };
 
   private processTradeRequestTask = async (task: RequestTask, skipGas: boolean) => {
@@ -1551,7 +1605,7 @@ export class FulcrumProvider {
 
   public waitForTransactionMined = async (
     txHash: string, 
-    request: LendRequest | TradeRequest | DAIConvertRequest): Promise<any> => {
+    request: LendRequest | TradeRequest | FulcrumMcdBridgeRequest): Promise<any> => {
 
     return new Promise((resolve, reject) => {
       try {
@@ -1569,7 +1623,7 @@ export class FulcrumProvider {
   private waitForTransactionMinedRecursive = async (
     txHash: string,
     web3Wrapper: Web3Wrapper,
-    request: LendRequest | TradeRequest | DAIConvertRequest,
+    request: LendRequest | TradeRequest | FulcrumMcdBridgeRequest,
     resolve: (value: any) => void,
     reject: (value: any) => void) => {
 
@@ -1590,10 +1644,10 @@ export class FulcrumProvider {
             FulcrumProviderEvents.LendTransactionMined,
             new LendTransactionMinedEvent(request.asset, txHash)
           );
-        } else if (request instanceof DAIConvertRequest) {
+        } else if (request instanceof FulcrumMcdBridgeRequest) {
           const tagManagerArgs = {
             dataLayer: {
-                name: "Transaction-DAIConvert-"+request.asset,
+                name: "Transaction-FulcrumMcdBridge-"+request.asset,
                 status: "Mined completed"
             },
             dataLayerName: "PageDataLayer"

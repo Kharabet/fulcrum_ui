@@ -21,7 +21,7 @@
 
     background-color: #4f5b67;
 
-    .token-select-item-dai-convert {
+    .token-select-item-mcd-bridge {
       cursor: pointer;
       position: absolute;
       background: #29323D;
@@ -31,10 +31,8 @@
       right: 0px;
       border-bottom-left-radius: 1.5625rem;
 
-      .token-select-item-dai-convert__text {
+      .token-select-item-mcd-bridge__text {
         position: absolute;
-        left: 5.06%;
-        right: 5.06%;
         top: 0%;
         bottom: 0%;
         font-family: Muli;
@@ -48,6 +46,16 @@
         letter-spacing: 0.05em;
         text-transform: uppercase;
         color: #FFFFFF;
+
+        &--upgrade {
+          left: 1.4rem;
+          //right: 5.06%;
+        }
+
+        &--downgrade {
+          left: 0.8rem;
+          //right: 5.06%;
+        }
       }
     }
 

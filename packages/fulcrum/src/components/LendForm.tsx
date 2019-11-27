@@ -394,7 +394,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
                             },
                             dataLayerName: 'PageDataLayer'
                         }
-    console.log("tagManagerArgs  = ",tagManagerArgs)
+    // console.log("tagManagerArgs  = ",tagManagerArgs)
     TagManager.dataLayer(tagManagerArgs)
     this.props.onSubmit(
 

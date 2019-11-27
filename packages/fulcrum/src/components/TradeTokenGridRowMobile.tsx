@@ -252,7 +252,7 @@ export class TradeTokenGridRowMobile extends Component<ITradeTokenGridRowMBProps
                             },
                             dataLayerName: 'PageDataLayer'
                         }
-    console.log("tagManagerArgs = "+tagManagerArgs)
+    // console.log("tagManagerArgs = "+tagManagerArgs)
     TagManager.dataLayer(tagManagerArgs)
 
     this.props.onTrade(

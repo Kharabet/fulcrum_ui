@@ -4,7 +4,7 @@ import TagManager from "react-gtm-module";
 import { Asset } from "../domain/Asset";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
-import { DAIConvertRequest } from "../domain/DAIConvertRequest";
+import { FulcrumMcdBridgeRequest } from "../domain/FulcrumMcdBridgeRequest";
 import { LendRequest } from "../domain/LendRequest";
 import { LendType } from "../domain/LendType";
 import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
@@ -22,7 +22,7 @@ TagManager.initialize({
 export interface ILendTokenSelectorItemProps {
   asset: Asset;
   onLend: (request: LendRequest) => void;
-  onDAIConvert: (request: DAIConvertRequest) => void;
+  onFulcrumMcdBridge: (request: FulcrumMcdBridgeRequest) => void;
 }
 
 
@@ -136,7 +136,21 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
     }
     return (
       <div className="token-selector-item">
-        <div className={"token-selector-item__image"}>
+        {this.props.asset === Asset.SAI ? (
+          <div className="token-select-item-mcd-bridge" onClick={this.onFulcrumMcdBridgeClick}>
+            <div className="token-select-item-mcd-bridge__text token-select-item-mcd-bridge__text--upgrade">
+              Upgrade<br/>to DAI
+            </div>
+          </div>
+        ) : null}
+        {this.props.asset === Asset.DAI ? (
+          <div className="token-select-item-mcd-bridge" onClick={this.onFulcrumMcdBridgeClick}>
+            <div className="token-select-item-mcd-bridge__text token-select-item-mcd-bridge__text--downgrade">
+              Downgrade<br/>to SAI
+            </div>
+          </div>
+        ) : null}
+        <div className="token-selector-item__image">
           <img src={this.state.assetDetails.logoSvg} alt={this.state.assetDetails.displayName} />
         </div>
         <div className="token-selector-item__descriptions" style={{ marginTop: this.state.profit === null ? `1.5rem` : undefined }}>
@@ -237,8 +251,8 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
     );
   };
 
-  public onDAIConvertClick = () => {
-    this.props.onDAIConvert(new DAIConvertRequest(this.props.asset, new BigNumber(0)));
+  public onFulcrumMcdBridgeClick = () => {
+    this.props.onFulcrumMcdBridge(new FulcrumMcdBridgeRequest(this.props.asset, new BigNumber(0)));
   };
 
   public onLendClick = () => {
@@ -252,9 +266,9 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
                             },
                             dataLayerName: 'PageDataLayer'
                         }
-    console.log(tagManagerArgs)
+    // console.log(tagManagerArgs)
     TagManager.dataLayer(tagManagerArgs)
-    console.log("TagManager = ",TagManager)
+    // console.log("TagManager = ",TagManager)
     this.props.onLend(new LendRequest(LendType.LEND, this.props.asset, new BigNumber(0)));
   };
 

@@ -4,6 +4,7 @@ import { Asset } from "../domain/Asset";
 import { TradeTokenKey } from "../domain/TradeTokenKey";
 
 import { erc20Contract } from "../contracts/erc20";
+import { FulcrumMcdBridgeContract } from "../contracts/FulcrumMcdBridgeContract";
 import { iTokenContract } from "../contracts/iTokenContract";
 import { oracleContract } from "../contracts/oracle";
 import { pTokenContract } from "../contracts/pTokenContract";
@@ -33,6 +34,7 @@ export class ContractsSource {
   private pTokenJson: any;
   private oracleJson: any;
   private TokenizedRegistryJson: any;
+  private mcdBridgeJson: any;
 
   public networkId: number;
   public canWrite: boolean;
@@ -49,6 +51,7 @@ export class ContractsSource {
     this.iTokenJson = await import(`./../assets/artifacts/${ethNetwork}/iToken.json`);
     this.pTokenJson = await import(`./../assets/artifacts/${ethNetwork}/pToken.json`);
     this.oracleJson = await import(`./../assets/artifacts/${ethNetwork}/oracle.json`);
+    this.mcdBridgeJson = await import(`./../assets/artifacts/${ethNetwork}/FulcrumMcdBridge.json`);
     
     
     if (process.env.REACT_APP_ETH_NETWORK === "mainnet" || process.env.REACT_APP_ETH_NETWORK === "kovan") {
@@ -197,15 +200,28 @@ export class ContractsSource {
     return address;
   }
 
+  private getFulcrumMcdBridgeAddress(): string {
+    let address: string = "";
+    switch (this.networkId) {
+      case 1:
+        address = "0x512b9ad4764cc18f6ce414d0df2ecc00fe9481ee";
+        break;
+      case 3:
+        address = "";
+        break;
+      case 42:
+        address = "0xe6d0007423D5085D37306BA4657123989E9E2880";
+        break;
+    }
+
+    return address;
+  }
+  
+
   private async getErc20ContractRaw(addressErc20: string): Promise<erc20Contract> {
     return new erc20Contract(this.erc20Json.abi, addressErc20.toLowerCase(), this.provider);
   }
 
-  /*private async getDAIConverterContractRaw(): Promise<iTokenContract | null> {
-    const symbol = asset === Asset.WETH ? `iETH` : `i${asset}`
-    const tokenContractInfo = this.iTokensContractInfos.get(symbol) || null;
-    return tokenContractInfo ? new iTokenContract(this.iTokenJson.abi, tokenContractInfo.token, this.provider) : null;
-  }*/
 
   private async getITokenContractRaw(asset: Asset): Promise<iTokenContract | null> {
     const symbol = asset === Asset.WETH ? `iETH` : `i${asset}`
@@ -222,6 +238,14 @@ export class ContractsSource {
     return new oracleContract(
       this.oracleJson.abi,
       this.getOracleAddress().toLowerCase(),
+      this.provider
+    );
+  }
+
+  private async getFulcrumMcdBridgeContractRaw(): Promise<FulcrumMcdBridgeContract> {
+    return new FulcrumMcdBridgeContract(
+      this.mcdBridgeJson.abi,
+      this.getFulcrumMcdBridgeAddress().toLowerCase(),
       this.provider
     );
   }
@@ -260,4 +284,5 @@ export class ContractsSource {
   public getITokenContract = _.memoize(this.getITokenContractRaw);
   public getPTokenContract = _.memoize(this.getPTokenContractRaw);
   public getOracleContract = _.memoize(this.getOracleContractRaw);
+  public getFulcrumMcdBridgeContract = _.memoize(this.getFulcrumMcdBridgeContractRaw);
 }

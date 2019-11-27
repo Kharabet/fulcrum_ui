@@ -1,9 +1,10 @@
 import React, { PureComponent } from "react";
 import Modal from "react-modal";
+import { FulcrumMcdBridgeForm } from "../components/FulcrumMcdBridgeForm";
 import { LendForm } from "../components/LendForm";
 import { LendTokenSelector } from "../components/LendTokenSelector";
 import { Asset } from "../domain/Asset";
-import { DAIConvertRequest } from "../domain/DAIConvertRequest";
+import { FulcrumMcdBridgeRequest } from "../domain/FulcrumMcdBridgeRequest";
 import { LendRequest } from "../domain/LendRequest";
 import { LendType } from "../domain/LendType";
 import { Footer } from "../layout/Footer";
@@ -17,7 +18,7 @@ export interface ILendPageProps {
 }
 
 interface ILendPageState {
-  isDAIConvertModalOpen: boolean;
+  isFulcrumMcdBridgeModalOpen: boolean;
   isLendModalOpen: boolean;
   lendType: LendType;
   lendAsset: Asset;
@@ -27,7 +28,7 @@ export class LendPage extends PureComponent<ILendPageProps, ILendPageState> {
   constructor(props: any) {
     super(props);
 
-    this.state = { isLendModalOpen: false, isDAIConvertModalOpen: false, lendType: LendType.LEND, lendAsset: Asset.UNKNOWN };
+    this.state = { isLendModalOpen: false, isFulcrumMcdBridgeModalOpen: false, lendType: LendType.LEND, lendAsset: Asset.UNKNOWN };
   }
 
   public componentDidMount(): void {
@@ -42,7 +43,7 @@ export class LendPage extends PureComponent<ILendPageProps, ILendPageState> {
       <div className="lend-page">
         <HeaderOps isMobileMedia={this.props.isMobileMedia} isLoading={this.props.isLoading} doNetworkConnect={this.props.doNetworkConnect} />
         <main className="lend-page-main">
-          <LendTokenSelector onLend={this.onLendRequested} onDAIConvert={this.onDAIConvertRequested} />
+          <LendTokenSelector onLend={this.onLendRequested} onFulcrumMcdBridge={this.onFulcrumMcdBridgeRequested} />
           <Modal
             isOpen={this.state.isLendModalOpen}
             onRequestClose={this.onRequestClose}
@@ -57,15 +58,14 @@ export class LendPage extends PureComponent<ILendPageProps, ILendPageState> {
             />
           </Modal>
           <Modal
-            isOpen={this.state.isDAIConvertModalOpen}
+            isOpen={this.state.isFulcrumMcdBridgeModalOpen}
             onRequestClose={this.onRequestClose}
             className="modal-content-div"
             overlayClassName="modal-overlay-div"
           >
-            <LendForm
-              lendType={this.state.lendType}
+            <FulcrumMcdBridgeForm
               asset={this.state.lendAsset}
-              onSubmit={this.onLendConfirmed}
+              onSubmit={this.onFulcrumMcdBridgeConfirmed}
               onCancel={this.onRequestClose}
             />
           </Modal>
@@ -76,7 +76,7 @@ export class LendPage extends PureComponent<ILendPageProps, ILendPageState> {
   }
 
   
-  public onDAIConvertRequested = (request: DAIConvertRequest) => {
+  public onFulcrumMcdBridgeRequested = (request: FulcrumMcdBridgeRequest) => {
     if (!FulcrumProvider.Instance.contractsSource || !FulcrumProvider.Instance.contractsSource.canWrite) {
       this.props.doNetworkConnect();
       return;
@@ -85,18 +85,18 @@ export class LendPage extends PureComponent<ILendPageProps, ILendPageState> {
     if (request) {
       this.setState({ 
         ...this.state,
-        isDAIConvertModalOpen: true,
+        isFulcrumMcdBridgeModalOpen: true,
         lendAsset: request.asset
       });
     }
   };
 
-  public onDAIConvertConfirmed = (request: DAIConvertRequest) => {
+  public onFulcrumMcdBridgeConfirmed = (request: FulcrumMcdBridgeRequest) => {
     this.setState({ 
       ...this.state,
-      isDAIConvertModalOpen: false,
+      isFulcrumMcdBridgeModalOpen: false,
     });
-    FulcrumProvider.Instance.onDAIConvertConfirmed(request);
+    FulcrumProvider.Instance.onFulcrumMcdBridgeConfirmed(request);
   };
 
   public onLendRequested = (request: LendRequest) => {
@@ -126,7 +126,7 @@ export class LendPage extends PureComponent<ILendPageProps, ILendPageState> {
   public onRequestClose = () => {
     this.setState({ 
       ...this.state,
-      isDAIConvertModalOpen: false,
+      isFulcrumMcdBridgeModalOpen: false,
       isLendModalOpen: false
     });
   };
