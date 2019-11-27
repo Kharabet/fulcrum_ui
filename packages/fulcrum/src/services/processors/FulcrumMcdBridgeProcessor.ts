@@ -28,7 +28,7 @@ export class FulcrumMcdBridgeProcessor {
       "Detecting token allowance",
       "Prompting token allowance",
       "Waiting for token allowance",
-      "Starting conversion",
+      "Starting migration",
       "Updating the blockchain",
       "Transaction completed"
     ]);

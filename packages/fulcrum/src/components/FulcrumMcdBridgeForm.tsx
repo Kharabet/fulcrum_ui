@@ -224,7 +224,7 @@ export class FulcrumMcdBridgeForm extends Component<IFulcrumMcdBridgeFormProps, 
               <div className="lend-form__value">{tokenNameDestination}</div>
             </div>
             <div className="lend-form__kv-container">
-              <div className="lend-form__label">Convert Amount</div>
+              <div className="lend-form__label">Migrate Amount</div>
               {this.state.iTokenSrcAddress &&
                 FulcrumProvider.Instance.web3ProviderSettings &&
                 FulcrumProvider.Instance.web3ProviderSettings.etherscanURL ? (

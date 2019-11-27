@@ -44,17 +44,14 @@
         align-items: center;
         text-align: center;
         letter-spacing: 0.05em;
-        text-transform: uppercase;
         color: #FFFFFF;
 
         &--upgrade {
-          left: 1.4rem;
-          //right: 5.06%;
+          left: 0.9rem;
         }
 
         &--downgrade {
-          left: 0.8rem;
-          //right: 5.06%;
+          left: 0.9rem;
         }
       }
     }

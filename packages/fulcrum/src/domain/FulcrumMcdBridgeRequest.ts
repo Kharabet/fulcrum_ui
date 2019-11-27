@@ -18,6 +18,6 @@ export class FulcrumMcdBridgeRequest {
   }
 
   public getRequestTypeName(): string {
-    return (this.asset === Asset.SAI ? "Upgrade to DAI" : "Downgrade to SAI") + " request";
+    return (this.asset === Asset.SAI ? "Migrate iSAI" : "Migrate iDAI") + " request";
   }
 }
