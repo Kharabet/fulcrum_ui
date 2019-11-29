@@ -612,7 +612,10 @@ export class TorqueProvider {
       if (iBZxContract && walletDetails.walletAddress) {
         const loansData = await iBZxContract.getBasicLoansData.callAsync(walletDetails.walletAddress, new BigNumber(6));
         const zero = new BigNumber(0);
-        result = loansData.filter(e => !e.loanTokenAmountFilled.eq(zero)).map(e => {
+        result = loansData
+          .filter(e => !e.loanTokenAmountFilled.eq(zero))
+          .filter(e => !e.collateralTokenAmountFilled.eq(zero))
+          .map(e => {
           const loanAsset = this.contractsSource!.getAssetFromAddress(e.loanTokenAddress);
           const loanPrecision = AssetsDictionary.assets.get(loanAsset)!.decimals || 18;
           const collateralAsset = this.contractsSource!.getAssetFromAddress(e.collateralTokenAddress);

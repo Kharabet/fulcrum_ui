@@ -359,7 +359,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
                             },
                             dataLayerName: 'PageDataLayer'
                         }
-    TagManager.dataLayer(tagManagerArgs)
+    TagManager.dataLayer(tagManagerArgs);
     this.props.onCancel();
   };
 
@@ -395,7 +395,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
                             dataLayerName: 'PageDataLayer'
                         }
     // console.log("tagManagerArgs  = ",tagManagerArgs)
-    TagManager.dataLayer(tagManagerArgs)
+    TagManager.dataLayer(tagManagerArgs);
     this.props.onSubmit(
 
       new LendRequest(

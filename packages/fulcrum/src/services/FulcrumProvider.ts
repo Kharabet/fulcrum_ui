@@ -41,16 +41,14 @@ import { TradeSellEthProcessor } from "./processors/TradeSellEthProcessor";
 import { UnlendErcProcessor } from "./processors/UnlendErcProcessor";
 import { UnlendEthProcessor } from "./processors/UnlendEthProcessor";
 
-const tagManagerArgs = {
-       gtmId : configProviders.Google_TrackingID,
-       'dataLayer' : {
-                'name' : "Provider",
-                'status' : "Intailized"
-            },
-            'dataLayerName' : 'PageDataLayer'
-    }
-
-TagManager.initialize(tagManagerArgs)
+TagManager.initialize({
+  gtmId : configProviders.Google_TrackingID,
+  'dataLayer' : {
+           'name' : "Provider",
+           'status' : "Intailized"
+       },
+       'dataLayerName' : 'PageDataLayer'
+});
 
 export class FulcrumProvider {
   private static readonly priceGraphQueryFunction = new Map<Asset, string>([
@@ -1638,41 +1636,42 @@ export class FulcrumProvider {
       const receipt = await web3Wrapper.getTransactionReceiptIfExistsAsync(txHash);
       if (receipt) {
         resolve(receipt);
+        let tagManagerArgs;
         if (request instanceof LendRequest) {
-          const tagManagerArgs = {
+          tagManagerArgs = {
                             dataLayer: {
                                 name: "Transaction-Lend-"+request.asset,
                                 status: "Mined completed"
                             },
                             dataLayerName: "PageDataLayer"
                         }
-          TagManager.dataLayer(tagManagerArgs)
+          TagManager.dataLayer(tagManagerArgs);
           this.eventEmitter.emit(
             FulcrumProviderEvents.LendTransactionMined,
             new LendTransactionMinedEvent(request.asset, txHash)
           );
         } else if (request instanceof FulcrumMcdBridgeRequest) {
-          const tagManagerArgs = {
+          tagManagerArgs = {
             dataLayer: {
                 name: "Transaction-FulcrumMcdBridge-"+request.asset,
                 status: "Mined completed"
             },
             dataLayerName: "PageDataLayer"
           }
-          TagManager.dataLayer(tagManagerArgs)
+          TagManager.dataLayer(tagManagerArgs);
           this.eventEmitter.emit(
             FulcrumProviderEvents.LendTransactionMined,
             new LendTransactionMinedEvent(request.asset, txHash)
           );
         } else {
-          const tagManagerArgs = {
+          tagManagerArgs = {
                             dataLayer: {
                                 name: "Transaction-Trade"+request.asset,
                                 status: "Mined completed"
                             },
                             dataLayerName: "PageDataLayer"
                         }
-          TagManager.dataLayer(tagManagerArgs)
+          TagManager.dataLayer(tagManagerArgs);
           this.eventEmitter.emit(
             FulcrumProviderEvents.TradeTransactionMined,
             new TradeTransactionMinedEvent(new TradeTokenKey(

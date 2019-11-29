@@ -530,7 +530,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
                             },
                             dataLayerName: 'PageDataLayer'
                         }
-    TagManager.dataLayer(tagManagerArgs)
+    TagManager.dataLayer(tagManagerArgs);
   };
 
   public onChangeCollateralOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -603,7 +603,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
                             dataLayerName: 'PageDataLayer'
                         }
     // console.log("tagManagerArgs= ",tagManagerArgs)
-    TagManager.dataLayer(tagManagerArgs)
+    TagManager.dataLayer(tagManagerArgs);
     this.props.onSubmit(
       new TradeRequest(
         this.props.tradeType,

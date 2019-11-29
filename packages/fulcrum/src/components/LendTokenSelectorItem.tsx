@@ -264,7 +264,7 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
                             dataLayerName: 'PageDataLayer'
                         }
     // console.log(tagManagerArgs)
-    TagManager.dataLayer(tagManagerArgs)
+    TagManager.dataLayer(tagManagerArgs);
     // console.log("TagManager = ",TagManager)
     this.props.onLend(new LendRequest(LendType.LEND, this.props.asset, new BigNumber(0)));
   };

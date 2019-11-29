@@ -346,7 +346,7 @@ export class FulcrumMcdBridgeForm extends Component<IFulcrumMcdBridgeFormProps, 
                             },
                             dataLayerName: 'PageDataLayer'
                         }
-    TagManager.dataLayer(tagManagerArgs)
+    TagManager.dataLayer(tagManagerArgs);
     this.props.onCancel();
   };
 
@@ -381,7 +381,7 @@ export class FulcrumMcdBridgeForm extends Component<IFulcrumMcdBridgeFormProps, 
                             dataLayerName: 'PageDataLayer'
                         }
     // console.log("tagManagerArgs  = ",tagManagerArgs)
-    TagManager.dataLayer(tagManagerArgs)
+    TagManager.dataLayer(tagManagerArgs);
     this.props.onSubmit(
 
       new FulcrumMcdBridgeRequest(
