@@ -26,9 +26,15 @@ const isMainnetProd =
   && process.env.REACT_APP_ETH_NETWORK === "mainnet";
 
 if (isMainnetProd) {
-  TagManager.initialize({
-      gtmId: configProviders.Google_TrackingID
-  });
+  const tagManagerArgs = {
+       gtmId : configProviders.Google_TrackingID,
+       'dataLayer' : {
+                'name' : "Home",
+                'status' : "Intailized"
+            },
+            'dataLayerName' : 'PageDataLayer'
+    }
+    TagManager.initialize(tagManagerArgs)
 }
 
 interface IAppRouterState {

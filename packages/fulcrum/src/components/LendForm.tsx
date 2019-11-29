@@ -15,14 +15,14 @@ import { FulcrumProvider } from "../services/FulcrumProvider";
 import configProviders from "./../config/providers.json";
 import { EthOrWethSelector } from "./EthOrWethSelector";
 
-TagManager.initialize({
-  gtmId: configProviders.Google_TrackingID,
-  dataLayer: {
-    name: "Lend form",
-    status: "Initialized"
-  },
-  dataLayerName: 'PageDataLayer'
-});
+// TagManager.initialize({
+//   gtmId: configProviders.Google_TrackingID,
+//   dataLayer: {
+//     name: "Lend form",
+//     status: "Initialized"
+//   },
+//   dataLayerName: 'PageDataLayer'
+// });
 
 interface ILendAmountChangeEvent {
   isLendAmountTouched: boolean;
