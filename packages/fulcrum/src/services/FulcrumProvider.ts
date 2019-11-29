@@ -41,9 +41,16 @@ import { TradeSellEthProcessor } from "./processors/TradeSellEthProcessor";
 import { UnlendErcProcessor } from "./processors/UnlendErcProcessor";
 import { UnlendEthProcessor } from "./processors/UnlendEthProcessor";
 
-TagManager.initialize({
-  gtmId: configProviders.Google_TrackingID
-});
+const tagManagerArgs = {
+       gtmId : configProviders.Google_TrackingID,
+       'dataLayer' : {
+                'name' : "Provider",
+                'status' : "Intailized"
+            },
+            'dataLayerName' : 'PageDataLayer'
+    }
+
+TagManager.initialize(tagManagerArgs)
 
 export class FulcrumProvider {
   private static readonly priceGraphQueryFunction = new Map<Asset, string>([
@@ -672,7 +679,7 @@ export class FulcrumProvider {
     return result;
   };
 
-  
+
   public getMaxMCDBridgeValue = async (request: FulcrumMcdBridgeRequest): Promise<BigNumber> => {
     let result = new BigNumber(0);
 
@@ -1604,7 +1611,7 @@ export class FulcrumProvider {
   };
 
   public waitForTransactionMined = async (
-    txHash: string, 
+    txHash: string,
     request: LendRequest | TradeRequest | FulcrumMcdBridgeRequest): Promise<any> => {
 
     return new Promise((resolve, reject) => {

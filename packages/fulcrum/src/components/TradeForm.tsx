@@ -16,7 +16,7 @@ import { TradeType } from "../domain/TradeType";
 import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
-import configProviders from "./../config/providers.json";
+
 // import { CheckBox } from "./CheckBox";
 import { CollapsibleContainer } from "./CollapsibleContainer";
 import { CollateralTokenButton } from "./CollateralTokenButton";
@@ -25,9 +25,6 @@ import { PositionTypeMarkerAlt } from "./PositionTypeMarkerAlt";
 import { TradeExpectedResult } from "./TradeExpectedResult";
 import { UnitOfAccountSelector } from "./UnitOfAccountSelector";
 
-TagManager.initialize({
-  gtmId: configProviders.Google_TrackingID
-});
 
 interface IInputAmountLimited {
   inputAmountValue: BigNumber;
