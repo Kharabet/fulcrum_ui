@@ -211,6 +211,8 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
           ? this.state.lendedAmountEstimate.toFixed(6)
           : this.state.lendedAmountEstimate.toExponential(3);
 
+    const needsApprovalMessage = (!this.state.maxLendAmount || this.state.maxLendAmount.gt(0)) && this.props.lendType === LendType.LEND && this.state.maybeNeedsApproval && this.props.asset !== Asset.ETH;
+
     return (
       <form className="lend-form" onSubmit={this.onSubmitClick}>
         <div className="lend-form__image" style={divStyle}>
@@ -298,7 +300,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
               </div>
             </div>
 
-            {(!this.state.maxLendAmount || this.state.maxLendAmount.gt(0)) && this.props.lendType === LendType.LEND && this.state.maybeNeedsApproval && this.props.asset !== Asset.ETH ? (
+            {needsApprovalMessage ? (
               <div className="lend-form__token-message-container">
                 <div className="lend-form__token-message-container--message">
                   You may be prompted to approve the asset after clicking LEND.
@@ -307,7 +309,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
             ) : ``}
           </div>
 
-          <div className="lend-form__actions-container">
+          <div className="lend-form__actions-container" style={needsApprovalMessage ? { marginBottom: `-1.875rem`, marginTop: `-1.3125rem`} : undefined}>
             <button className="lend-form__cancel-button" onClick={this.onCancelClick}>
               <span className="lend-form__label--action">Cancel</span>
             </button>
@@ -364,7 +366,6 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
       dataLayerName: 'PageDataLayer'
     }
     TagManager.dataLayer(tagManagerArgs)
-
     this.props.onCancel();
   };
 

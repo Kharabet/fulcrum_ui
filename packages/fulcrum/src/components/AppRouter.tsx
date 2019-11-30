@@ -125,7 +125,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
                         }
                         // ReactGA.ga('set', 'page', location.pathname + location.search);
                         // ReactGA.ga('send', 'pageview');
-                        TagManager.dataLayer(tagManagerArgs)
+                        TagManager.dataLayer(tagManagerArgs);
                         return null;
                       }} />
                     ) : ``}

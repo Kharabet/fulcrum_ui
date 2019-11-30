@@ -41,16 +41,14 @@ import { TradeSellEthProcessor } from "./processors/TradeSellEthProcessor";
 import { UnlendErcProcessor } from "./processors/UnlendErcProcessor";
 import { UnlendEthProcessor } from "./processors/UnlendEthProcessor";
 
-const tagManagerArgs = {
-       gtmId : configProviders.Google_TrackingID,
-       'dataLayer' : {
-                'name' : "Provider",
-                'status' : "Intailized"
-            },
-            'dataLayerName' : 'PageDataLayer'
-    }
-
-TagManager.initialize(tagManagerArgs)
+TagManager.initialize({
+  gtmId : configProviders.Google_TrackingID,
+  'dataLayer' : {
+           'name' : "Provider",
+           'status' : "Intailized"
+       },
+       'dataLayerName' : 'PageDataLayer'
+});
 
 export class FulcrumProvider {
   private static readonly priceGraphQueryFunction = new Map<Asset, string>([
@@ -1638,6 +1636,7 @@ export class FulcrumProvider {
       const receipt = await web3Wrapper.getTransactionReceiptIfExistsAsync(txHash);
       if (receipt) {
         resolve(receipt);
+        let tagManagerArgs;
         if (request instanceof LendRequest) {
           let randomNumber = Math.floor(Math.random() * 100000) + 1;
           const tagManagerArgs = {
@@ -1673,7 +1672,7 @@ export class FulcrumProvider {
             },
             dataLayerName: 'PageDataLayer'
           }
-          TagManager.dataLayer(tagManagerArgs)
+          TagManager.dataLayer(tagManagerArgs);
           this.eventEmitter.emit(
             FulcrumProviderEvents.LendTransactionMined,
             new LendTransactionMinedEvent(request.asset, txHash)
