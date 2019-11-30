@@ -523,6 +523,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     let randomNumber = Math.floor(Math.random() * 100000) + 1;
     const tagManagerArgs = {
       dataLayer: {
+          event: 'purchase',
           transactionId: randomNumber,
           transactionTotal: this.state.tradeAmountValue,
           transactionProducts: [{
@@ -598,13 +599,14 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     let randomNumber = Math.floor(Math.random() * 100000) + 1;
     const tagManagerArgs = {
       dataLayer: {
+          event: 'purchase',
           transactionId: randomNumber,
           transactionTotal: this.state.tradeAmountValue,
           transactionProducts: [{
           name: this.props.leverage + 'x' + this.props.asset +'-'+ this.props.positionType +'-'+ this.props.defaultUnitOfAccount,
           sku: this.props.leverage + 'x' + this.props.asset +'-'+ this.props.positionType,
           category: this.props.positionType,
-          status: "Completed"
+          quantity: 1
         }],
       }
     }
