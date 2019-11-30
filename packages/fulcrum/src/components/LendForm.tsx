@@ -351,17 +351,21 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
   };
 
   public onCancelClick = () => {
+    let randomNumber = Math.floor(Math.random() * 100000) + 1;
     const tagManagerArgs = {
-                            dataLayer: {
-                                name: this.props.lendType + '-' + this.props.asset,
-                                sku: this.props.asset,
-                                category: this.props.lendType,
-                                price: this.state.lendAmount,
-                                status: "Canceled"
-                            },
-                            dataLayerName: 'PageDataLayer'
-                        }
-    TagManager.dataLayer(tagManagerArgs);
+      dataLayer: {
+        transactionId: randomNumber,
+        transactionTotal: this.state.lendAmount,
+        transactionProducts: [{
+          name: this.props.lendType + '-' + this.props.asset,
+          sku: this.props.asset,
+          category:this.props.lendType,
+          status: "Canceled"
+        }],
+      },
+      dataLayerName: 'PageDataLayer'
+    }
+    TagManager.dataLayer(tagManagerArgs)
     this.props.onCancel();
   };
 
@@ -385,19 +389,21 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
       return;
     }
 
-
+    let randomNumber = Math.floor(Math.random() * 100000) + 1;
     const tagManagerArgs = {
-                            dataLayer: {
-                                name: this.props.lendType + '-' + this.props.asset,
-                                sku: this.props.asset,
-                                category: this.props.lendType,
-                                price: this.state.lendAmount,
-                                status: "Completed"
-                            },
-                            dataLayerName: 'PageDataLayer'
-                        }
-    // console.log("tagManagerArgs  = ",tagManagerArgs)
-    TagManager.dataLayer(tagManagerArgs);
+      dataLayer: {
+        transactionId: randomNumber,
+        transactionTotal: this.state.lendAmount,
+        transactionProducts: [{
+          name: this.props.lendType + '-' + this.props.asset,
+          sku: this.props.asset,
+          category:this.props.lendType,
+          status: "Completed"
+        }],
+      },
+      dataLayerName: 'PageDataLayer'
+    }
+    TagManager.dataLayer(tagManagerArgs)
     this.props.onSubmit(
 
       new LendRequest(

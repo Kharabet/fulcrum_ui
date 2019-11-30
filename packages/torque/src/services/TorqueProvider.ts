@@ -613,20 +613,25 @@ export class TorqueProvider {
         const loansData = await iBZxContract.getBasicLoansData.callAsync(walletDetails.walletAddress, new BigNumber(6));
         const zero = new BigNumber(0);
         result = loansData
-          .filter(e => !e.loanTokenAmountFilled.eq(zero))
-          .filter(e => !e.collateralTokenAmountFilled.eq(zero))
+          .filter(e => !e.loanTokenAmountFilled.eq(zero) && !e.collateralTokenAmountFilled.eq(zero))
           .map(e => {
           const loanAsset = this.contractsSource!.getAssetFromAddress(e.loanTokenAddress);
           const loanPrecision = AssetsDictionary.assets.get(loanAsset)!.decimals || 18;
           const collateralAsset = this.contractsSource!.getAssetFromAddress(e.collateralTokenAddress);
           const collateralPrecision = AssetsDictionary.assets.get(collateralAsset)!.decimals || 18;
+          let amountOwned = e.loanTokenAmountFilled.minus(e.positionTokenAmountFilled).minus(e.interestDepositRemaining)
+          if (amountOwned.lte(0)) {
+            amountOwned = new BigNumber(0);
+          } else {
+            amountOwned = amountOwned.dividedBy(10**loanPrecision).dp(5, BigNumber.ROUND_CEIL);
+          }
           return {
             accountAddress: walletDetails.walletAddress || "",
             loanOrderHash: e.loanOrderHash,
             loanAsset: loanAsset,
             collateralAsset: collateralAsset,
             amount: e.loanTokenAmountFilled.dividedBy(10**loanPrecision).dp(5, BigNumber.ROUND_CEIL),
-            amountOwed: e.loanTokenAmountFilled.minus(e.interestDepositRemaining).dividedBy(10**loanPrecision).dp(5, BigNumber.ROUND_CEIL),
+            amountOwed: amountOwned,
             collateralAmount: e.collateralTokenAmountFilled.dividedBy(10**collateralPrecision),
             collateralizedPercent: e.currentMarginAmount.dividedBy(10**20),
             interestRate: e.interestOwedPerDay.dividedBy(e.loanTokenAmountFilled).multipliedBy(365),
@@ -887,9 +892,9 @@ export class TorqueProvider {
   public doRepayLoan = async (repayLoanRequest: RepayLoanRequest) => {
     // console.log(repayLoanRequest);
 
-    if (repayLoanRequest.repayAmount.lte(0)) {
+    /*if (repayLoanRequest.repayAmount.lte(0)) {
       return;
-    }
+    }*/
 
     if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
       const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
@@ -898,9 +903,17 @@ export class TorqueProvider {
         const loanPrecision = AssetsDictionary.assets.get(repayLoanRequest.borrowAsset)!.decimals || 18;
         let closeAmountInBaseUnits = repayLoanRequest.repayAmount.multipliedBy(10**loanPrecision);
         const closeAmountInBaseUnitsValue = new BigNumber(closeAmountInBaseUnits.toFixed(0, 1));
-        if (closeAmountInBaseUnits.gte(repayLoanRequest.actualAmountOwed)) {
+        if (repayLoanRequest.repayAmount.gte(repayLoanRequest.amountOwed)) {
           // send a large amount to close entire loan
           closeAmountInBaseUnits = closeAmountInBaseUnits.multipliedBy(10**50);
+          if (closeAmountInBaseUnits.eq(0)) {
+            closeAmountInBaseUnits = new BigNumber(10**50);
+          }
+        } else {
+          // don't allow 0 payback if more is owed
+          if (closeAmountInBaseUnits.eq(0)) {
+            return;
+          }
         }
         closeAmountInBaseUnits = new BigNumber(closeAmountInBaseUnits.toFixed(0, 1));
 

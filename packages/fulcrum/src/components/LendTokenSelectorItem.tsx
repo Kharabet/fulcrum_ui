@@ -253,19 +253,21 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
   };
 
   public onLendClick = () => {
+    let randomNumber = Math.floor(Math.random() * 100000) + 1;
     const tagManagerArgs = {
-                            dataLayer: {
-                                name: LendType.LEND + '-' + this.props.asset,
-                                sku: this.props.asset,
-                                category: LendType.LEND,
-                                price: "0",
-                                status: "In-progress"
-                            },
-                            dataLayerName: 'PageDataLayer'
-                        }
-    // console.log(tagManagerArgs)
-    TagManager.dataLayer(tagManagerArgs);
-    // console.log("TagManager = ",TagManager)
+      dataLayer: {
+        transactionId: randomNumber,
+        transactionTotal: '0',
+        transactionProducts: [{
+          name: LendType.LEND + '-' + this.props.asset,
+          sku: this.props.asset,
+          category: LendType.LEND,
+          status: "In-progress"
+        }],
+      },
+      dataLayerName: 'PageDataLayer'
+    }
+    TagManager.dataLayer(tagManagerArgs)
     this.props.onLend(new LendRequest(LendType.LEND, this.props.asset, new BigNumber(0)));
   };
 
