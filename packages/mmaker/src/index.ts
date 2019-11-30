@@ -3,8 +3,6 @@ import EFX from "efx-api-node";
 import HDWalletProvider from "truffle-hdwallet-provider";
 import Web3 from "web3";
 
-import contract from "./marketMakerProvision.json";
-
 // @ts-ignore
 import { ContractsSource } from "@bzxnetwork/mmaker-wrappers";
 import { checkPass } from "./watcher";
