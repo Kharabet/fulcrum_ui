@@ -1639,25 +1639,39 @@ export class FulcrumProvider {
       if (receipt) {
         resolve(receipt);
         if (request instanceof LendRequest) {
+          let randomNumber = Math.floor(Math.random() * 100000) + 1;
           const tagManagerArgs = {
-                            dataLayer: {
-                                name: "Transaction-Lend-"+request.asset,
-                                status: "Mined completed"
-                            },
-                            dataLayerName: "PageDataLayer"
-                        }
+            dataLayer: {
+                transactionId: randomNumber,
+                transactionTotal: '0',
+                transactionProducts: [{
+                name: "Transaction-Lend-"+request.asset,
+                sku: request.asset,
+                category: 'Lend',
+                status: "Mined completed"
+              }],
+            },
+            dataLayerName: 'PageDataLayer'
+          }
           TagManager.dataLayer(tagManagerArgs)
           this.eventEmitter.emit(
             FulcrumProviderEvents.LendTransactionMined,
             new LendTransactionMinedEvent(request.asset, txHash)
           );
         } else if (request instanceof FulcrumMcdBridgeRequest) {
+          let randomNumber = Math.floor(Math.random() * 100000) + 1;
           const tagManagerArgs = {
             dataLayer: {
+                transactionId: randomNumber,
+                transactionTotal: '0',
+                transactionProducts: [{
                 name: "Transaction-FulcrumMcdBridge-"+request.asset,
+                sku: request.asset,
+                category: 'FulcrumMcdBridge',
                 status: "Mined completed"
+              }],
             },
-            dataLayerName: "PageDataLayer"
+            dataLayerName: 'PageDataLayer'
           }
           TagManager.dataLayer(tagManagerArgs)
           this.eventEmitter.emit(
@@ -1665,13 +1679,20 @@ export class FulcrumProvider {
             new LendTransactionMinedEvent(request.asset, txHash)
           );
         } else {
+          let randomNumber = Math.floor(Math.random() * 100000) + 1;
           const tagManagerArgs = {
-                            dataLayer: {
-                                name: "Transaction-Trade"+request.asset,
-                                status: "Mined completed"
-                            },
-                            dataLayerName: "PageDataLayer"
-                        }
+            dataLayer: {
+                transactionId: randomNumber,
+                transactionTotal: '0',
+                transactionProducts: [{
+                name: "Transaction-Trade"+request.asset,
+                sku: request.asset,
+                category: 'Trade',
+                status: "Mined completed"
+              }],
+            },
+            dataLayerName: 'PageDataLayer'
+          }
           TagManager.dataLayer(tagManagerArgs)
           this.eventEmitter.emit(
             FulcrumProviderEvents.TradeTransactionMined,
