@@ -296,7 +296,12 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
   public onSubmitClick = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (!this.props.didSubmit && this.state.repayAmount.gt(0)) {
+    let repayAmount = this.state.repayAmount;
+    if (this.state.repayAmount.lt(0)) {
+      repayAmount = new BigNumber(0);
+    }
+
+    if (!this.props.didSubmit) {
       this.props.toggleDidSubmit(true);
 
       let assetBalance = await TorqueProvider.Instance.getAssetTokenBalanceOfUser(this.props.loanOrderState.loanAsset);
@@ -304,7 +309,7 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
         assetBalance = assetBalance.gt(TorqueProvider.Instance.gasBufferForTxn) ? assetBalance.minus(TorqueProvider.Instance.gasBufferForTxn) : new BigNumber(0);
       }
       const precision = AssetsDictionary.assets.get(this.props.loanOrderState.loanAsset)!.decimals || 18;
-      const amountInBaseUnits = new BigNumber(this.state.repayAmount.multipliedBy(10**precision).toFixed(0, 1));
+      const amountInBaseUnits = new BigNumber(repayAmount.multipliedBy(10**precision).toFixed(0, 1));
       if (assetBalance.lt(amountInBaseUnits)) {
         this.props.toggleDidSubmit(false);
 
@@ -325,7 +330,7 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
       const percentData = await TorqueProvider.Instance.getLoanRepayPercent(
         this.props.walletDetails,
         this.props.loanOrderState,
-        this.state.repayAmount
+        repayAmount
       );
 
       this.props.onSubmit(
@@ -335,9 +340,9 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
           this.props.loanOrderState.collateralAsset,
           this.props.loanOrderState.accountAddress,
           this.props.loanOrderState.loanOrderHash,
-          this.state.repayAmount,
+          repayAmount,
           percentData.repayPercent ? new BigNumber(percentData.repayPercent) : new BigNumber(0),
-          this.props.loanOrderState.loanData!.loanTokenAmountFilled
+          this.props.loanOrderState.amountOwed
         )
       );
     }

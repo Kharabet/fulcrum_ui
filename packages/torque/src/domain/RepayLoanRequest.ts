@@ -10,9 +10,9 @@ export class RepayLoanRequest {
   public loanOrderHash: string;
   public repayAmount: BigNumber;
   public repayPercent: BigNumber;
-  public actualAmountOwed: BigNumber;
+  public amountOwed: BigNumber;
 
-  constructor(walletDetails: IWalletDetails, borrowAsset: Asset, collateralAsset: Asset, accountAddress: string, loanOrderHash: string, repayAmount: BigNumber, repayPercent: BigNumber, actualAmountOwed: BigNumber) {
+  constructor(walletDetails: IWalletDetails, borrowAsset: Asset, collateralAsset: Asset, accountAddress: string, loanOrderHash: string, repayAmount: BigNumber, repayPercent: BigNumber, amountOwed: BigNumber) {
     this.walletDetails = walletDetails;
     this.borrowAsset = borrowAsset;
     this.collateralAsset = collateralAsset;
@@ -20,6 +20,6 @@ export class RepayLoanRequest {
     this.loanOrderHash = loanOrderHash;
     this.repayAmount = repayAmount;
     this.repayPercent = repayPercent;
-    this.actualAmountOwed = actualAmountOwed;
+    this.amountOwed = amountOwed;
   }
 }
