@@ -1645,7 +1645,8 @@ export class FulcrumProvider {
                 transactionProducts: [{
                 name: "Transaction-Lend-"+request.asset,
                 sku: request.asset,
-                category: 'Lend'
+                category: 'Lend',
+                status: "Mined completed"
               }],
             }
           }
@@ -1663,7 +1664,8 @@ export class FulcrumProvider {
                 transactionProducts: [{
                 name: "Transaction-FulcrumMcdBridge-"+request.asset,
                 sku: request.asset,
-                category: 'FulcrumMcdBridge' 
+                category: 'FulcrumMcdBridge',
+                status: "Mined completed"
               }],
             }
           }
@@ -1681,7 +1683,8 @@ export class FulcrumProvider {
                 transactionProducts: [{
                 name: "Transaction-Trade"+request.asset,
                 sku: request.asset,
-                category: 'Trade'
+                category: 'Trade',
+                status: "Mined completed"
               }],
             }
           }

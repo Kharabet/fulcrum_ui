@@ -359,7 +359,8 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
         transactionProducts: [{
           name: this.props.lendType + '-' + this.props.asset,
           sku: this.props.asset,
-          category:this.props.lendType
+          category:this.props.lendType,
+          status: "Canceled"
         }],
       }
     }
@@ -389,13 +390,14 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
 
     let randomNumber = Math.floor(Math.random() * 100000) + 1;
     const tagManagerArgs = {
-      dataLayer.push: {
+      dataLayer: {
         transactionId: randomNumber,
         transactionTotal: this.state.lendAmount,
         transactionProducts: [{
           name: this.props.lendType + '-' + this.props.asset,
           sku: this.props.asset,
-          category:this.props.lendType
+          category:this.props.lendType,
+          status: "Completed"
         }],
       }
     }
