@@ -46,8 +46,7 @@ TagManager.initialize({
   'dataLayer' : {
            'name' : "Provider",
            'status' : "Intailized"
-       },
-       'dataLayerName' : 'PageDataLayer'
+       }
 });
 
 export class FulcrumProvider {
@@ -1649,8 +1648,7 @@ export class FulcrumProvider {
                 category: 'Lend',
                 status: "Mined completed"
               }],
-            },
-            dataLayerName: 'PageDataLayer'
+            }
           }
           TagManager.dataLayer(tagManagerArgs)
           this.eventEmitter.emit(
@@ -1669,8 +1667,7 @@ export class FulcrumProvider {
                 category: 'FulcrumMcdBridge',
                 status: "Mined completed"
               }],
-            },
-            dataLayerName: 'PageDataLayer'
+            }
           }
           TagManager.dataLayer(tagManagerArgs);
           this.eventEmitter.emit(
@@ -1689,8 +1686,7 @@ export class FulcrumProvider {
                 category: 'Trade',
                 status: "Mined completed"
               }],
-            },
-            dataLayerName: 'PageDataLayer'
+            }
           }
           TagManager.dataLayer(tagManagerArgs)
           this.eventEmitter.emit(

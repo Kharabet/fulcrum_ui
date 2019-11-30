@@ -531,8 +531,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
           category: this.props.positionType,
           status: "Canceled"
         }],
-      },
-      dataLayerName: 'PageDataLayer'
+      }
     }
     TagManager.dataLayer(tagManagerArgs)
   };
@@ -607,8 +606,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
           category: this.props.positionType,
           status: "Completed"
         }],
-      },
-      dataLayerName: 'PageDataLayer'
+      }
     }
     TagManager.dataLayer(tagManagerArgs)
     this.props.onSubmit(

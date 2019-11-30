@@ -362,8 +362,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
           category:this.props.lendType,
           status: "Canceled"
         }],
-      },
-      dataLayerName: 'PageDataLayer'
+      }
     }
     TagManager.dataLayer(tagManagerArgs)
     this.props.onCancel();
@@ -400,8 +399,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
           category:this.props.lendType,
           status: "Completed"
         }],
-      },
-      dataLayerName: 'PageDataLayer'
+      }
     }
     TagManager.dataLayer(tagManagerArgs)
     this.props.onSubmit(

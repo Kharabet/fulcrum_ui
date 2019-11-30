@@ -264,8 +264,7 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
           category: LendType.LEND,
           status: "In-progress"
         }],
-      },
-      dataLayerName: 'PageDataLayer'
+      }
     }
     TagManager.dataLayer(tagManagerArgs)
     this.props.onLend(new LendRequest(LendType.LEND, this.props.asset, new BigNumber(0)));
