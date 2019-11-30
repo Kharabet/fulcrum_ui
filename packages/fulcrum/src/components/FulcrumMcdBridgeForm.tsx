@@ -336,17 +336,21 @@ export class FulcrumMcdBridgeForm extends Component<IFulcrumMcdBridgeFormProps, 
   };
 
   public onCancelClick = () => {
+    let randomNumber = Math.floor(Math.random() * 100000) + 1;
     const tagManagerArgs = {
-                            dataLayer: {
-                                name: this.props.asset === Asset.SAI ? "Upgrade SAI" : "Downgrade DAI",
-                                sku: this.props.asset,
-                                category: "MCDMigration",
-                                price: this.state.mcdBridgeAmount,
-                                status: "Canceled"
-                            },
-                            dataLayerName: 'PageDataLayer'
-                        }
-    TagManager.dataLayer(tagManagerArgs);
+      dataLayer: {
+          transactionId: randomNumber,
+          transactionTotal: this.state.mcdBridgeAmount,
+          transactionProducts: [{
+            name: this.props.asset === Asset.SAI ? "Upgrade SAI" : "Downgrade DAI",
+            sku: this.props.asset,
+            category: "MCDMigration",
+            status: "Canceled"
+          }],
+      },
+      dataLayerName: 'PageDataLayer'
+    }
+    TagManager.dataLayer(tagManagerArgs)
     this.props.onCancel();
   };
 
@@ -370,18 +374,21 @@ export class FulcrumMcdBridgeForm extends Component<IFulcrumMcdBridgeFormProps, 
       return;
     }
 
+    let randomNumber = Math.floor(Math.random() * 100000) + 1;
     const tagManagerArgs = {
-                            dataLayer: {
-                                name: this.props.asset === Asset.SAI ? "Upgrade SAI" : "Downgrade DAI",
-                                sku: this.props.asset,
-                                category: "MCDMigration",
-                                price: this.state.mcdBridgeAmount,
-                                status: "Completed"
-                            },
-                            dataLayerName: 'PageDataLayer'
-                        }
-    // console.log("tagManagerArgs  = ",tagManagerArgs)
-    TagManager.dataLayer(tagManagerArgs);
+      dataLayer: {
+          transactionId: randomNumber,
+          transactionTotal: this.state.mcdBridgeAmount,
+          transactionProducts: [{
+            name: this.props.asset === Asset.SAI ? "Upgrade SAI" : "Downgrade DAI",
+            sku: this.props.asset,
+            category: "MCDMigration",
+            status: "Completed"
+          }],
+      },
+      dataLayerName: 'PageDataLayer'
+    }
+    TagManager.dataLayer(tagManagerArgs)
     this.props.onSubmit(
 
       new FulcrumMcdBridgeRequest(

@@ -520,17 +520,21 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
 
   public onCancelClick = () => {
     this.props.onCancel();
+    let randomNumber = Math.floor(Math.random() * 100000) + 1;
     const tagManagerArgs = {
-                            dataLayer: {
-                                name: this.props.leverage + 'x' + this.props.asset +'-'+ this.props.positionType +'-'+ this.props.defaultUnitOfAccount,
-                                sku: this.props.leverage + 'x' + this.props.asset +'-'+ this.props.positionType,
-                                category: this.props.positionType,
-                                price: this.state.tradeAmountValue,
-                                status: "Canceled"
-                            },
-                            dataLayerName: 'PageDataLayer'
-                        }
-    TagManager.dataLayer(tagManagerArgs);
+      dataLayer: {
+          transactionId: randomNumber,
+          transactionTotal: this.state.tradeAmountValue,
+          transactionProducts: [{
+          name: this.props.leverage + 'x' + this.props.asset +'-'+ this.props.positionType +'-'+ this.props.defaultUnitOfAccount,
+          sku: this.props.leverage + 'x' + this.props.asset +'-'+ this.props.positionType,
+          category: this.props.positionType,
+          status: "Canceled"
+        }],
+      },
+      dataLayerName: 'PageDataLayer'
+    }
+    TagManager.dataLayer(tagManagerArgs)
   };
 
   public onChangeCollateralOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -592,18 +596,21 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       this.props.onCancel();
       return;
     }
+    let randomNumber = Math.floor(Math.random() * 100000) + 1;
     const tagManagerArgs = {
-                            dataLayer: {
-                                name: this.props.leverage + 'x' + this.props.asset +'-'+ this.props.positionType +'-'+ this.props.defaultUnitOfAccount,
-                                sku: this.props.leverage + 'x' + this.props.asset +'-'+ this.props.positionType,
-                                category: this.props.positionType,
-                                price: this.state.tradeAmountValue,
-                                status: "Completed"
-                            },
-                            dataLayerName: 'PageDataLayer'
-                        }
-    // console.log("tagManagerArgs= ",tagManagerArgs)
-    TagManager.dataLayer(tagManagerArgs);
+      dataLayer: {
+          transactionId: randomNumber,
+          transactionTotal: this.state.tradeAmountValue,
+          transactionProducts: [{
+          name: this.props.leverage + 'x' + this.props.asset +'-'+ this.props.positionType +'-'+ this.props.defaultUnitOfAccount,
+          sku: this.props.leverage + 'x' + this.props.asset +'-'+ this.props.positionType,
+          category: this.props.positionType,
+          status: "Completed"
+        }],
+      },
+      dataLayerName: 'PageDataLayer'
+    }
+    TagManager.dataLayer(tagManagerArgs)
     this.props.onSubmit(
       new TradeRequest(
         this.props.tradeType,
