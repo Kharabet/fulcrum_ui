@@ -12,6 +12,8 @@ const ethNetwork = process.env.REACT_APP_ETH_NETWORK;
 export class ContractsSource {
   private readonly provider: any;
 
+  private isInit = false;
+
   private erc20Json: any;
   private iBZxJson: any;
   private iTokenJson: any;
@@ -59,6 +61,7 @@ export class ContractsSource {
   }
 
   private async getiBZxContractRaw(): Promise<iBZxContract> {
+    await this.Init();
     return new iBZxContract(
       this.iBZxJson.abi,
       this.getiBZxAddress().toLowerCase(),
@@ -270,6 +273,7 @@ export class ContractsSource {
   }
 
   private async getiTokenContractRaw(asset: Asset): Promise<iTokenContract> {
+    await this.Init();
     return new iTokenContract(
       this.iTokenJson.abi,
       this.getiTokenAddress(asset).toLowerCase(),
@@ -278,6 +282,7 @@ export class ContractsSource {
   }
 
   private async getOracleContractRaw(): Promise<oracleContract> {
+    await this.Init();
     return new oracleContract(
       this.oracleJson.abi,
       this.getOracleAddress().toLowerCase(),
@@ -286,6 +291,7 @@ export class ContractsSource {
   }
 
   private async getiENSOwnerContractRaw(): Promise<iENSOwnerContract> {
+    await this.Init();
     return new iENSOwnerContract(
       this.iENSJson.abi,
       this.getiENSOwnerAddress().toLowerCase(),
@@ -294,14 +300,20 @@ export class ContractsSource {
   }
 
   public async Init() {
-    this.erc20Json = await import(`./../assets/artifacts/${ethNetwork}/erc20.json`);
-    this.iBZxJson = await import(`./../assets/artifacts/${ethNetwork}/iBZx.json`);
-    this.iTokenJson = await import(`./../assets/artifacts/${ethNetwork}/iToken.json`);
-    this.oracleJson = await import(`./../assets/artifacts/${ethNetwork}/oracle.json`);
-    this.iENSJson = await import(`./../assets/artifacts/${ethNetwork}/iENSOwner.json`);
+    if (this.isInit) {
+      return;
+    }
+    const network = ethNetwork || "1";
+    this.erc20Json = await import(`./../assets/artifacts/${network}/erc20.json`);
+    this.iBZxJson = await import(`./../assets/artifacts/${network}/iBZx.json`);
+    this.iTokenJson = await import(`./../assets/artifacts/${network}/iToken.json`);
+    this.oracleJson = await import(`./../assets/artifacts/${network}/oracle.json`);
+    this.iENSJson = await import(`./../assets/artifacts/${network}/iENSOwner.json`);
+    this.isInit = true;
   }
 
   private async getErc20ContractRaw(addressErc20: string): Promise<erc20Contract> {
+    await this.Init();
     return new erc20Contract(this.erc20Json.abi, addressErc20.toLowerCase(), this.provider);
   }
 
