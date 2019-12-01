@@ -354,16 +354,15 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
     let randomNumber = Math.floor(Math.random() * 100000) + 1;
     const tagManagerArgs = {
       dataLayer: {
+        event: 'purchase',
         transactionId: randomNumber,
         transactionTotal: this.state.lendAmount,
         transactionProducts: [{
           name: this.props.lendType + '-' + this.props.asset,
           sku: this.props.asset,
           category:this.props.lendType,
-          status: "Canceled"
         }],
-      },
-      dataLayerName: 'PageDataLayer'
+      }
     }
     TagManager.dataLayer(tagManagerArgs)
     this.props.onCancel();
@@ -392,16 +391,16 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
     let randomNumber = Math.floor(Math.random() * 100000) + 1;
     const tagManagerArgs = {
       dataLayer: {
+        event: 'purchase',
         transactionId: randomNumber,
         transactionTotal: this.state.lendAmount,
         transactionProducts: [{
           name: this.props.lendType + '-' + this.props.asset,
           sku: this.props.asset,
           category:this.props.lendType,
-          status: "Completed"
+          quantity: 1
         }],
-      },
-      dataLayerName: 'PageDataLayer'
+      }
     }
     TagManager.dataLayer(tagManagerArgs)
     this.props.onSubmit(
