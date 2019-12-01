@@ -19,7 +19,7 @@ TagManager.initialize({
     name: "MCD Bridge form",
     status: "Initialized"
   },
-  dataLayerName: 'PageDataLayer'
+  dataLayerName: ' '
 });
 
 interface IMCDBridgeAmountChangeEvent {
@@ -347,8 +347,7 @@ export class FulcrumMcdBridgeForm extends Component<IFulcrumMcdBridgeFormProps, 
             category: "MCDMigration",
             status: "Canceled"
           }],
-      },
-      dataLayerName: 'PageDataLayer'
+      }
     }
     TagManager.dataLayer(tagManagerArgs)
     this.props.onCancel();
@@ -385,8 +384,7 @@ export class FulcrumMcdBridgeForm extends Component<IFulcrumMcdBridgeFormProps, 
             category: "MCDMigration",
             status: "Completed"
           }],
-      },
-      dataLayerName: 'PageDataLayer'
+      }
     }
     TagManager.dataLayer(tagManagerArgs)
     this.props.onSubmit(

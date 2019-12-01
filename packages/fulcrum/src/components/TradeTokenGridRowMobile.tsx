@@ -250,8 +250,7 @@ export class TradeTokenGridRowMobile extends Component<ITradeTokenGridRowMBProps
           category:this.props.positionType,
           status: "In-progress"
         }],
-      },
-      dataLayerName: 'PageDataLayer'
+      }
     }
     // console.log("tagManagerArgs = "+tagManagerArgs)
     TagManager.dataLayer(tagManagerArgs);
