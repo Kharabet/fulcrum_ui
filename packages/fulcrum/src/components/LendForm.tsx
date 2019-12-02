@@ -351,20 +351,6 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
   };
 
   public onCancelClick = () => {
-    let randomNumber = Math.floor(Math.random() * 100000) + 1;
-    const tagManagerArgs = {
-      dataLayer: {
-        event: 'purchase',
-        transactionId: randomNumber,
-        transactionTotal: this.state.lendAmount,
-        transactionProducts: [{
-          name: this.props.lendType + '-' + this.props.asset,
-          sku: this.props.asset,
-          category:this.props.lendType,
-        }],
-      }
-    }
-    TagManager.dataLayer(tagManagerArgs)
     this.props.onCancel();
   };
 
@@ -398,6 +384,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
           name: this.props.lendType + '-' + this.props.asset,
           sku: this.props.asset,
           category:this.props.lendType,
+          price: this.state.lendAmount,
           quantity: 1
         }],
       }

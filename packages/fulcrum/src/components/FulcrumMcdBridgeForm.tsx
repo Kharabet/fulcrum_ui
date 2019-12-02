@@ -13,14 +13,6 @@ import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents"
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
 
-TagManager.initialize({
-  gtmId: configProviders.Google_TrackingID,
-  dataLayer: {
-    name: "MCD Bridge form",
-    status: "Initialized"
-  },
-  dataLayerName: ' '
-});
 
 interface IMCDBridgeAmountChangeEvent {
   isMCDBridgeAmountTouched: boolean;
@@ -336,20 +328,6 @@ export class FulcrumMcdBridgeForm extends Component<IFulcrumMcdBridgeFormProps, 
   };
 
   public onCancelClick = () => {
-    let randomNumber = Math.floor(Math.random() * 100000) + 1;
-    const tagManagerArgs = {
-      dataLayer: {
-          transactionId: randomNumber,
-          transactionTotal: this.state.mcdBridgeAmount,
-          transactionProducts: [{
-            name: this.props.asset === Asset.SAI ? "Upgrade SAI" : "Downgrade DAI",
-            sku: this.props.asset,
-            category: "MCDMigration",
-            status: "Canceled"
-          }],
-      }
-    }
-    TagManager.dataLayer(tagManagerArgs)
     this.props.onCancel();
   };
 
@@ -382,7 +360,8 @@ export class FulcrumMcdBridgeForm extends Component<IFulcrumMcdBridgeFormProps, 
             name: this.props.asset === Asset.SAI ? "Upgrade SAI" : "Downgrade DAI",
             sku: this.props.asset,
             category: "MCDMigration",
-            status: "Completed"
+            price: this.state.mcdBridgeAmount,
+            quantity: 1
           }],
       }
     }

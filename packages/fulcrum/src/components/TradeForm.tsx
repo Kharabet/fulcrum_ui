@@ -521,20 +521,6 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
   public onCancelClick = () => {
     this.props.onCancel();
     let randomNumber = Math.floor(Math.random() * 100000) + 1;
-    const tagManagerArgs = {
-      dataLayer: {
-          event: 'purchase',
-          transactionId: randomNumber,
-          transactionTotal: this.state.tradeAmountValue,
-          transactionProducts: [{
-          name: this.props.leverage + 'x' + this.props.asset +'-'+ this.props.positionType +'-'+ this.props.defaultUnitOfAccount,
-          sku: this.props.leverage + 'x' + this.props.asset +'-'+ this.props.positionType,
-          category: this.props.positionType,
-          status: "Canceled"
-        }],
-      }
-    }
-    TagManager.dataLayer(tagManagerArgs)
   };
 
   public onChangeCollateralOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -606,6 +592,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
           name: this.props.leverage + 'x' + this.props.asset +'-'+ this.props.positionType +'-'+ this.props.defaultUnitOfAccount,
           sku: this.props.leverage + 'x' + this.props.asset +'-'+ this.props.positionType,
           category: this.props.positionType,
+          price: this.state.tradeAmountValue,
           quantity: 1
         }],
       }
