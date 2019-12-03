@@ -35,6 +35,9 @@ export class ContractsSource {
       case 1:
         address = "0x1cf226e9413addaf22412a2e182f9c0de44af002";
         break;
+      case 4:
+        address = "0xc45755a7cfc9385290e6fece1f040c0453e7b0e5";
+        break;
       case 42:
         address = "0x9009e85a687b55b5d6C314363C228803fAd32d01";
         break;
@@ -50,10 +53,13 @@ export class ContractsSource {
         address = "0x8b3d70d628ebd30d4a2ea82db95ba2e906c71633";
         break;
       case 3:
-        address = "";
+        address = "0xbab325bc2e78ea080f46c1a2bf9bf25f8a3c4d69";
+        break;
+      case 4:
+        address = "0xef52dd2d03d7a44f9dda8d450f806fa84571cf84";
         break;
       case 42:
-        address = "";
+        address = "0xce069b35ae99762bee444c81dec1728aa99afd4b";
         break;
     }
 
@@ -78,6 +84,9 @@ export class ContractsSource {
           case 1:
             address = "0x77f973fcaf871459aa58cd81881ce453759281bc";
             break;
+          case 4:
+            address = "0x1885a748d7393f5d23db8df01ea3a33f4d85eac5";
+            break;
           case 42:
             address = "0x54be07007c680ba087b3fcd8e675d1c929b6aaf5";
             break;
@@ -97,6 +106,9 @@ export class ContractsSource {
         switch (this.networkId) {
           case 1:
             address = "0x493c57c4763932315a328269e1adad09653b9081";
+            break;
+          case 4:
+            address = "0xb530f422ff1520cbb76a8300e39bd4f55bc03bbc";
             break;
           case 42:
             address = "0x6c1e2b0f67e00c06c8e2be7dc681ab785163ff4d";
@@ -192,6 +204,9 @@ export class ContractsSource {
       case 3:
         address = "0x818e6fecd516ecc3849daf6845e3ec868087b755";
         break;
+      case 4:
+        address = "0x76de3d406fee6c3316558406b17ff785c978e98c";
+        break;
       case 42:
         address = "0x692f391bCc85cefCe8C237C01e1f636BbD70EA4D";
         break;
@@ -254,6 +269,19 @@ export class ContractsSource {
             break;
           case "0xdd974d5c2e2928dea5f71b9825b8b646686bd200":
             asset = Asset.KNC;
+            break;
+        }
+        break;
+      case 4:
+        switch (addressErc20) {
+          case "0xc778417e063141139fce010982780140aa0cd5ab":
+            asset = Asset.WETH;
+            break;
+          case "0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea":
+            asset = Asset.DAI;
+            break;
+          case "0x6e894660985207feb7cf89faf048998c71e8ee89":
+            asset = Asset.REP;
             break;
         }
         break;

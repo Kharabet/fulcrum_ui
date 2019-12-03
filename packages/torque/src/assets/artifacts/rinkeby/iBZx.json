@@ -1,0 +1,211 @@
+{"name":"erc20","address":"","abi":[
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "name": "_target",
+        "type": "address"
+      }
+    ],
+    "name": "initialize",
+    "outputs": [
+
+    ],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "name": "loanOrderHash",
+        "type": "bytes32"
+      },
+      {
+        "name": "borrower",
+        "type": "address"
+      },
+      {
+        "name": "payer",
+        "type": "address"
+      },
+      {
+        "name": "closeAmount",
+        "type": "uint256"
+      }
+    ],
+    "name": "paybackLoanAndClose",
+    "outputs": [
+      {
+        "name": "actualCloseAmount",
+        "type": "uint256"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "name": "loanOrderHash",
+        "type": "bytes32"
+      },
+      {
+        "name": "borrower",
+        "type": "address"
+      },
+      {
+        "name": "payer",
+        "type": "address"
+      },
+      {
+        "name": "depositAmount",
+        "type": "uint256"
+      },
+      {
+        "name": "useCollateral",
+        "type": "bool"
+      }
+    ],
+    "name": "extendLoanByInterest",
+    "outputs": [
+      {
+        "name": "secondsExtended",
+        "type": "uint256"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      {
+        "name": "borrower",
+        "type": "address"
+      },
+      {
+        "name": "count",
+        "type": "uint256"
+      }
+    ],
+    "name": "getBasicLoansData",
+    "outputs": [
+      {
+        "components": [
+          {
+            "name": "loanOrderHash",
+            "type": "bytes32"
+          },
+          {
+            "name": "loanTokenAddress",
+            "type": "address"
+          },
+          {
+            "name": "collateralTokenAddress",
+            "type": "address"
+          },
+          {
+            "name": "loanTokenAmountFilled",
+            "type": "uint256"
+          },
+          {
+            "name": "positionTokenAmountFilled",
+            "type": "uint256"
+          },
+          {
+            "name": "collateralTokenAmountFilled",
+            "type": "uint256"
+          },
+          {
+            "name": "interestOwedPerDay",
+            "type": "uint256"
+          },
+          {
+            "name": "interestDepositRemaining",
+            "type": "uint256"
+          },
+          {
+            "name": "initialMarginAmount",
+            "type": "uint256"
+          },
+          {
+            "name": "maintenanceMarginAmount",
+            "type": "uint256"
+          },
+          {
+            "name": "currentMarginAmount",
+            "type": "uint256"
+          },
+          {
+            "name": "maxDurationUnixTimestampSec",
+            "type": "uint256"
+          },
+          {
+            "name": "loanEndUnixTimestampSec",
+            "type": "uint256"
+          }
+        ],
+        "name": "loans",
+        "type": "tuple[]"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "name": "loanOrderHash",
+        "type": "bytes32"
+      },
+      {
+        "name": "depositTokenAddress",
+        "type": "address"
+      },
+      {
+        "name": "depositAmount",
+        "type": "uint256"
+      }
+    ],
+    "name": "depositCollateral",
+    "outputs": [
+      {
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "name": "loanOrderHash",
+        "type": "bytes32"
+      },
+      {
+        "name": "withdrawAmount",
+        "type": "uint256"
+      }
+    ],
+    "name": "withdrawCollateral",
+    "outputs": [
+      {
+        "name": "amountWithdrawn",
+        "type": "uint256"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]}

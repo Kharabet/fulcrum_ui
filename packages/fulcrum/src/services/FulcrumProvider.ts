@@ -1304,7 +1304,9 @@ export class FulcrumProvider {
 
     return this.getSwapRate(
       asset,
-      Asset.SAI
+      process.env.REACT_APP_ETH_NETWORK !== "rinkeby" ? 
+        Asset.SAI :
+        Asset.DAI
     );
   }
 
@@ -1355,6 +1357,7 @@ export class FulcrumProvider {
 
       const srcAssetErc20Address = this.getErc20AddressOfAsset(srcAsset);
       const destAssetErc20Address = this.getErc20AddressOfAsset(destAsset);
+      console.log(srcAsset, destAsset, srcAssetErc20Address, destAssetErc20Address);
       if (this.contractsSource && srcAssetErc20Address && destAssetErc20Address) {
         const oracleContract = await this.contractsSource.getOracleContract();
         // result is always base 18, looks like srcQty too, see https://developer.kyber.network/docs/KyberNetworkProxy/#getexpectedrate
