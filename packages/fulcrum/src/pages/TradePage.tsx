@@ -116,6 +116,7 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
             />
           ) : (
             <TradeTokenGrid
+              isMobileMedia={this.props.isMobileMedia}
               showMyTokensOnly={this.state.showMyTokensOnly}
               selectedKey={this.state.selectedKey}
               defaultLeverageShort={1}

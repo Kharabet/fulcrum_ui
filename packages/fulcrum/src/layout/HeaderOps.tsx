@@ -15,7 +15,7 @@ interface IHeaderOpsState {
 }
 
 export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
-  
+
   constructor(props: IHeaderOpsProps) {
     super(props);
 
@@ -35,7 +35,7 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
   }
 
   private renderDesktop = () => {
-    
+
     const menu: IHeaderMenuProps = {
       items: [
         { id: 0, title: "Home", link: "/", external: false },
@@ -44,7 +44,7 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
         { id: 3, title: "Faq", link: "https://bzx.network/faq-fulcrum.html", external: true }
       ]
     };
-    
+
     return (
       <header className="header">
         <div className="header__row">
@@ -63,15 +63,16 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
   };
 
   private renderMobile = () => {
-    
+
     const menu: IHeaderMenuProps = {
       items: [
         { id: 0, title: "Home", link: "/", external: false },
         { id: 1, title: "Lend", link: "/lend", external: false },
+        { id: 2, title: "Trade", link: "/trade", external: false },
         { id: 3, title: "Faq", link: "https://bzx.network/faq-fulcrum.html", external: true }
       ]
     };
-    
+
     return (
       <header className="header">
         <div className="header__row">

@@ -92,14 +92,18 @@ export class TradeTokenGridRowMobile extends Component<ITradeTokenGridRowMBProps
     const interestRate = await FulcrumProvider.Instance.getTradeTokenInterestRate(tradeTokenKey);
     const balance = await FulcrumProvider.Instance.getPTokenBalanceOfUser(tradeTokenKey);
 
-    this.setState(p => ({
+    this.setState({
       ...this.state,
       latestPriceDataPoint: latestPriceDataPoint,
       interestRate: interestRate,
       balance: balance,
-      version: version,
-      isLoading: latestPriceDataPoint.price !== 0 ? false : p.isLoading
-    }));
+      version: version
+    });
+    if(latestPriceDataPoint.price !=0){
+      this.setState({
+        isLoading: false,
+      });
+    }
   }
 
   private onProviderAvailable = async () => {
@@ -199,7 +203,7 @@ export class TradeTokenGridRowMobile extends Component<ITradeTokenGridRowMBProps
           <Change24HMarker value={bnChange24h} size={Change24HMarkerSize.MEDIUM} />
         </div>*/}
 
-        {this.renderActions(this.state.balance.eq(0))}
+        {/*{this.renderActions(this.state.balance.eq(0))}*/}
       </div>
     );
   }
