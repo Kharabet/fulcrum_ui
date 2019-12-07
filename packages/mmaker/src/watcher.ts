@@ -34,7 +34,7 @@ export const checkPass = async (
     await approve(efx, token1);
     await approve(efx, token2);
 
-    // generating trading pair name
+    // generating trading pair names
     const tradingPairName = `${token1}${token2}`;
     const bfxTradingPairName = `t${token1}${token2}`;
     console.log(`tradingPairName: ${tradingPairName}`);
@@ -72,13 +72,15 @@ export const checkPass = async (
     console.log(`token2DFiLockedExposure: ${token2DFiLockedExposure.toFixed()}`);
 
     // getting our orders, our exposure and our spread (out spread is represented in "token2 per token1")
-    const orderBookMMData = await getMMOrdersData(efx, tradingPairName);
+    const orderBookMMData = await getMMOrdersData(efx, bfxTradingPairName);
     const orderBookMMExposures = await calculateOrderBookExposures(orderBookMMData, token2PriceInDai);
     const orderBookMMSpread = await calculateOrderBookSpread(orderBookMMData);
     const orderBookMMMidpoint =
       (orderBookMMSpread.maxBidPrice && orderBookMMSpread.minAskPrice)
         ? orderBookMMSpread.maxBidPrice.plus(orderBookMMSpread.minAskPrice).dividedBy(2)
         : null;
+    console.log(`bidExposure: ${orderBookMMExposures.bidExposure.toFixed()}`);
+    console.log(`askExposure: ${orderBookMMExposures.askExposure.toFixed()}`);
 
     // getting orders except ours, calculating exposure and spread for them
     const orderBookData = await getOrderBookData(bfxTradingPairName);
@@ -135,22 +137,22 @@ export const checkPass = async (
     console.log(`isAskOrderRecreateNeeded: ${isAskOrderRecreateNeeded}`);
 
     // 3. calculating locked funds exposure balance diff after bid/ask exposure fix operations
-    const lockedBalanceExposureDiffSumAfterBidOperations = excessiveBidExposureSum.minus(scarceBidExposureSum);
-    const lockedBalanceExposureDiffSumAfterAskOperations = excessiveAskExposureSum.minus(scarceAskExposureSum);
-    console.log(`lockedBalanceExposureDiffSumAfterBidOperations: ${lockedBalanceExposureDiffSumAfterBidOperations.toFixed()}`);
-    console.log(`lockedBalanceExposureDiffSumAfterAskOperations: ${lockedBalanceExposureDiffSumAfterAskOperations.toFixed()}`);
+    const spareBalanceExposureDiffSumAfterBidOperations = excessiveBidExposureSum.minus(scarceBidExposureSum);
+    const spareBalanceExposureDiffSumAfterAskOperations = excessiveAskExposureSum.minus(scarceAskExposureSum);
+    console.log(`spareBalanceExposureDiffSumAfterBidOperations: ${spareBalanceExposureDiffSumAfterBidOperations.toFixed()}`);
+    console.log(`spareBalanceExposureDiffSumAfterAskOperations: ${spareBalanceExposureDiffSumAfterAskOperations.toFixed()}`);
 
-    // 4. calculating locked funds balance after provisioning will happen
-    // token1 + Ask (amount of token1 proposed)
-    const nextToken1DFiLockedExposure = token1DFiLockedExposure.plus(lockedBalanceExposureDiffSumAfterAskOperations);
-    const isToken1DepositNeeded = nextToken1DFiLockedExposure.isLessThan(tradeConfig.onExchangeMinBufferBalance);
-    const isToken1WithdrawalNeeded = nextToken1DFiLockedExposure.isGreaterThan(tradeConfig.onExchangeMaxBufferBalance);
-    console.log(`nextToken1DFiLockedExposure: ${nextToken1DFiLockedExposure.toFixed()}`);
+    // 4. calculating spare funds balance after provisioning will happen
+    // token1 - Ask current exposure + Ask (amount of token1 proposed)
+    const nextToken1DFiSpareExposure = token1DFiLockedExposure.minus(orderBookMMExposures.askExposure).plus(spareBalanceExposureDiffSumAfterAskOperations);
+    const isToken1DepositNeeded = nextToken1DFiSpareExposure.isLessThan(tradeConfig.onExchangeMinBufferBalance);
+    const isToken1WithdrawalNeeded = nextToken1DFiSpareExposure.isGreaterThan(tradeConfig.onExchangeMaxBufferBalance);
+    console.log(`nextToken1DFiLockedExposure: ${nextToken1DFiSpareExposure.toFixed()}`);
     console.log(`isToken1DepositNeeded: ${isToken1DepositNeeded}`);
     console.log(`isToken1WithdrawalNeeded: ${isToken1WithdrawalNeeded}`);
 
-    // token2 + Bid (amount of token2 proposed)
-    const nextToken2DFiLockedExposure = token2DFiLockedExposure.plus(lockedBalanceExposureDiffSumAfterBidOperations);
+    // token2 - Bid current exposure + Bid (amount of token2 proposed)
+    const nextToken2DFiLockedExposure = token2DFiLockedExposure.minus(orderBookMMExposures.bidExposure).plus(spareBalanceExposureDiffSumAfterBidOperations);
     const isToken2DepositNeeded = nextToken2DFiLockedExposure.isLessThan(tradeConfig.onExchangeMinBufferBalance);
     const isToken2WithdrawalNeeded = nextToken2DFiLockedExposure.isGreaterThan(tradeConfig.onExchangeMaxBufferBalance);
     console.log(`nextToken2DFiLockedExposure: ${nextToken2DFiLockedExposure.toFixed()}`);
@@ -163,7 +165,7 @@ export const checkPass = async (
     console.log(`onExchangeTargetBufferBalance: ${onExchangeTargetBufferBalance.toFixed()}`);
     const depositPromises = new Array<Promise<void>>();
     if (isToken1DepositNeeded) {
-      const token1DepositSumInDai = onExchangeTargetBufferBalance.minus(nextToken1DFiLockedExposure);
+      const token1DepositSumInDai = onExchangeTargetBufferBalance.minus(nextToken1DFiSpareExposure);
       console.log(`token1DepositSumInDai: ${token1DepositSumInDai.toFixed()}`);
       // we don't want to deposit micro-amount of tokens, so checking for lower operation limit
       // this should not happen (only if exposureSumDiffMax < minDepositWithdrawOperationAmount)
@@ -209,13 +211,13 @@ export const checkPass = async (
       const spreadSizeOneSided = fulcrumExchangeRate.multipliedBy(tradeConfig.spreadPercentTarget).dividedBy(100).dividedBy(2);
       const midpointDiffPercent = midpointDiff.dividedBy(spreadSizeOneSided).multipliedBy(100);
       if ((midpointDiffPercent || new BigNumber(0)).isGreaterThan(tradeConfig.midpointDiffMaxPercent)) {
-        console.log("midpointDiffMaxPercent exceeded");
+        console.log("midpointDiffMaxPercent has been exceeded");
         bidPrice = fulcrumExchangeRate.minus(spreadSizeOneSided);
         askPrice = fulcrumExchangeRate.plus(spreadSizeOneSided);
         isBidOrderRecreateNeeded = true;
         isAskOrderRecreateNeeded = true;
       } else {
-        console.log("midpointDiffMaxPercent don't exceeded");
+        console.log("midpointDiffMaxPercent hasn't been exceeded");
       }
     } else {
       console.log("mm orders (one ore both) don't exist");
@@ -282,15 +284,15 @@ export const checkPass = async (
         const spreadSizeOneSided = fulcrumExchangeRate.multipliedBy(tradeConfig.spreadPercentTarget).dividedBy(100).dividedBy(2);
         bidPrice = fulcrumExchangeRate.minus(spreadSizeOneSided);
       }
-      const bidTargetExposure = orderBookMMExposures.bidExposure.plus(lockedBalanceExposureDiffSumAfterBidOperations.times(-1));
-      let bidTargetAmount = bidTargetExposure.dividedBy(token2PriceInDai);
+      const bidTargetExposure = orderBookMMExposures.bidExposure.plus(spareBalanceExposureDiffSumAfterBidOperations.times(-1));
+      let bidTargetAmount = bidTargetExposure.dividedBy(token1PriceInDai);
 
       // recreate bid order at bidPrice with bidTargetAmount
       // cancelling existing bid orders
       for (const bid of orderBookMMData.bids) {
         console.log(`cancelling bid order: ${bid.id}`);
         cancelBidPromises.push(
-          efx.contract.cancel(bid.id)
+          efx.cancelOrder(bid.id)
         );
       }
       console.log(`bid orders: await cancelling`);
@@ -303,14 +305,17 @@ export const checkPass = async (
       bidTargetAmount = BigNumber.min(bidTargetAmount, token2DFiLockedBalance);
 
       console.log("submitOrder: bid");
-      console.log(`token2DFiLockedBalance: ${token2DFiLockedBalance.toFixed()}`);
       console.log(`tradingPairName: ${tradingPairName}`);
       console.log(`bidPrice: ${bidPrice.toPrecision(8)}`);
       console.log(`bidTargetAmount: ${bidTargetAmount.toPrecision(8)}`);
+      console.log(`token2BidTargetAmount: ${bidPrice.multipliedBy(bidTargetAmount).toFixed()}`);
+      console.log(`token2DFiLockedBalance: ${token2DFiLockedBalance.toFixed()}`);
       const submitResult =
         await efx.submitOrder(
           tradingPairName,
+          // always nominated in token1
           bidTargetAmount.precision(8).toNumber(),
+          // always nominated in token2
           bidPrice.precision(8).toNumber()
         );
       console.log(submitResult);
@@ -322,7 +327,7 @@ export const checkPass = async (
         const spreadSizeOneSided = fulcrumExchangeRate.multipliedBy(tradeConfig.spreadPercentTarget).dividedBy(100).dividedBy(2);
         askPrice = fulcrumExchangeRate.plus(spreadSizeOneSided);
       }
-      const askTargetExposure = orderBookMMExposures.askExposure.plus(lockedBalanceExposureDiffSumAfterAskOperations.times(-1));
+      const askTargetExposure = orderBookMMExposures.askExposure.plus(spareBalanceExposureDiffSumAfterAskOperations.times(-1));
       let askTargetAmount = askTargetExposure.dividedBy(token1PriceInDai);
 
       // recreate ask order at askPrice with askTargetAmount
@@ -330,7 +335,7 @@ export const checkPass = async (
       for (const ask of orderBookMMData.asks) {
         console.log(`cancelling ask order: ${ask.id}`);
         cancelAskPromises.push(
-          efx.contract.cancel(ask.id)
+          efx.cancelOrder(ask.id)
         );
       }
       console.log(`ask orders: await cancelling`);
@@ -342,15 +347,18 @@ export const checkPass = async (
       askTargetAmount = BigNumber.min(askTargetAmount, token1DFiLockedBalance);
 
       console.log("submitOrder: ask");
-      console.log(`token1DFiLockedBalance: ${token1DFiLockedBalance.toFixed()}`);
       console.log(`tradingPairName: ${tradingPairName}`);
       console.log(`askPrice: ${askPrice.toPrecision(8)}`);
       console.log(`askTargetAmount: ${askTargetAmount.multipliedBy(-1).toPrecision(8)}`);
+      console.log(`token1AskTargetAmount: ${askTargetAmount.toFixed()}`);
+      console.log(`token1DFiLockedBalance: ${token1DFiLockedBalance.toFixed()}`);
       // askTargetAmount.multipliedBy(-1) is negative. this indicates a `sell` order
       const submitResult =
         await efx.submitOrder(
           tradingPairName,
+          // always nominated in token1
           askTargetAmount.multipliedBy(-1).precision(8).toNumber(),
+          // always nominated in token2
           askPrice.precision(8).toNumber()
         );
       console.log(submitResult);
@@ -360,8 +368,10 @@ export const checkPass = async (
     const withdrawPromises = new Array<Promise<void>>();
     if (isToken1WithdrawalNeeded) {
       const token1DFiLockedBalance = await getOnExchangeBalance(efx, token1);
-      if (token1DFiLockedBalance.isGreaterThan(tradeConfig.onExchangeMaxBufferBalance)) {
-        const token1WithdrawSumInDai = token1DFiLockedBalance.minus(onExchangeTargetBufferBalance);
+      const token1DFiLockedExposure = token1DFiLockedBalance.multipliedBy(token1PriceInDai);
+      console.log(`token1DFiLockedExposure: ${token1DFiLockedExposure.toFixed()}`);
+      if (token1DFiLockedExposure.isGreaterThan(tradeConfig.onExchangeMaxBufferBalance)) {
+        const token1WithdrawSumInDai = token1DFiLockedExposure.minus(onExchangeTargetBufferBalance);
         console.log(`token1WithdrawSumInDai: ${token1WithdrawSumInDai.toFixed()}`);
         if (token1WithdrawSumInDai.gte(tradeConfig.minDepositWithdrawOperationAmount)) {
           const token1WithdrawAmount = token1WithdrawSumInDai.dividedBy(token1PriceInDai);
@@ -377,9 +387,11 @@ export const checkPass = async (
 
     if (isToken2WithdrawalNeeded) {
       const token2DFiLockedBalance = await getOnExchangeBalance(efx, token2);
-      if (token2DFiLockedBalance.isGreaterThan(tradeConfig.onExchangeMaxBufferBalance)) {
-        const token2WithdrawSumInDai = token2DFiLockedBalance.minus(onExchangeTargetBufferBalance);
-        console.log(`token1DepositSumInDai: ${token2WithdrawSumInDai.toFixed()}`);
+      const token2DFiLockedExposure = token2DFiLockedBalance.multipliedBy(token2PriceInDai);
+      console.log(`token2DFiLockedExposure: ${token2DFiLockedExposure.toFixed()}`);
+      if (token2DFiLockedExposure.isGreaterThan(tradeConfig.onExchangeMaxBufferBalance)) {
+        const token2WithdrawSumInDai = token2DFiLockedExposure.minus(onExchangeTargetBufferBalance);
+        console.log(`token2WithdrawSumInDai: ${token2WithdrawSumInDai.toFixed()}`);
         if (token2WithdrawSumInDai.gte(tradeConfig.minDepositWithdrawOperationAmount)) {
           const token2WithdrawAmount = token2WithdrawSumInDai.dividedBy(token2PriceInDai);
           console.log(`token2WithdrawAmount: ${token2WithdrawAmount.toFixed()}`);

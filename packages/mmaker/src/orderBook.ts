@@ -49,20 +49,23 @@ export const getMMOrdersData = async (efx: any, symbol: string): Promise<IOrderB
   const orders = await efx.getOrders();
 
   for (const order of orders) {
+    if (order.symbol !== symbol) {
+      continue;
+    }
     const orderId = order.id.toString();
     const price = new BigNumber(order.price);
     const amount = new BigNumber(order.amount);
 
-    if (order.amount > 0) {
+    if (amount.lte(0)) {
       result.asks.push({
         id: orderId,
-        amount: amount,
+        amount: amount.multipliedBy(-1),
         price: price
       });
     } else {
       result.bids.push({
         id: order.id.toString(),
-        amount: amount.multipliedBy(-1),
+        amount: amount,
         price: price
       });
     }

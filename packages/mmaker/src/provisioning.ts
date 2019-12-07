@@ -2,7 +2,7 @@ import { BigNumber } from "@0x/utils";
 import { Asset, ContractsSource, TradeTokenKey } from "@bzxnetwork/mmaker-wrappers";
 import { waitForTransactionMined } from "./utils";
 
-const gasAmount = 3500000;
+const gasAmount = 10000000;
 
 export const approve = async (efx: any, assetName: string) => {
   // we need approve only for DAI,
