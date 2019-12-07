@@ -366,12 +366,18 @@ export const checkPass = async (
 
     // 7. withdraw funds we don't need anymore
     const withdrawPromises = new Array<Promise<void>>();
+
+    const orderBookMMDataAfter = await getMMOrdersData(efx, bfxTradingPairName);
+    const orderBookMMExposuresAfter = await calculateOrderBookExposures(orderBookMMDataAfter, token2PriceInDai);
+
     if (isToken1WithdrawalNeeded) {
       const token1DFiLockedBalance = await getOnExchangeBalance(efx, token1);
       const token1DFiLockedExposure = token1DFiLockedBalance.multipliedBy(token1PriceInDai);
-      console.log(`token1DFiLockedExposure: ${token1DFiLockedExposure.toFixed()}`);
-      if (token1DFiLockedExposure.isGreaterThan(tradeConfig.onExchangeMaxBufferBalance)) {
-        const token1WithdrawSumInDai = token1DFiLockedExposure.minus(onExchangeTargetBufferBalance);
+      const token1SpareExposure = token1DFiLockedExposure.minus(orderBookMMExposuresAfter.askExposure);
+
+      console.log(`token1SpareExposure: ${token1SpareExposure.toFixed()}`);
+      if (token1SpareExposure.isGreaterThan(tradeConfig.onExchangeMaxBufferBalance)) {
+        const token1WithdrawSumInDai = token1SpareExposure.minus(onExchangeTargetBufferBalance);
         console.log(`token1WithdrawSumInDai: ${token1WithdrawSumInDai.toFixed()}`);
         if (token1WithdrawSumInDai.gte(tradeConfig.minDepositWithdrawOperationAmount)) {
           const token1WithdrawAmount = token1WithdrawSumInDai.dividedBy(token1PriceInDai);
@@ -388,9 +394,11 @@ export const checkPass = async (
     if (isToken2WithdrawalNeeded) {
       const token2DFiLockedBalance = await getOnExchangeBalance(efx, token2);
       const token2DFiLockedExposure = token2DFiLockedBalance.multipliedBy(token2PriceInDai);
-      console.log(`token2DFiLockedExposure: ${token2DFiLockedExposure.toFixed()}`);
-      if (token2DFiLockedExposure.isGreaterThan(tradeConfig.onExchangeMaxBufferBalance)) {
-        const token2WithdrawSumInDai = token2DFiLockedExposure.minus(onExchangeTargetBufferBalance);
+      const token2SpareExposure = token2DFiLockedExposure.minus(orderBookMMExposuresAfter.bidExposure);
+
+      console.log(`token2SpareExposure: ${token2SpareExposure.toFixed()}`);
+      if (token2SpareExposure.isGreaterThan(tradeConfig.onExchangeMaxBufferBalance)) {
+        const token2WithdrawSumInDai = token2SpareExposure.minus(onExchangeTargetBufferBalance);
         console.log(`token2WithdrawSumInDai: ${token2WithdrawSumInDai.toFixed()}`);
         if (token2WithdrawSumInDai.gte(tradeConfig.minDepositWithdrawOperationAmount)) {
           const token2WithdrawAmount = token2WithdrawSumInDai.dividedBy(token2PriceInDai);
