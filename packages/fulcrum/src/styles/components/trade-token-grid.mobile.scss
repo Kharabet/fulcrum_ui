@@ -96,6 +96,30 @@
     display:block;
     margin: auto;
   }
+  .trade-token-grid-row__long-button{
+    display:block;
+    margin: auto;
+  }
+  .button-lg{
+    //position: relative;
+    //background-color: #FFFFFF;
+    //color: black;
+    z-index: 2;
+    //left: 36px;
+  }
+  .button-sh{
+    z-index: 2;
+    position: relative;
+    //background-color: #FFFFFF;
+    //color: black;
+    left: -35px;
+  }
+  .btn-active{
+    z-index: 1;
+    background-color: #FFFFFF;
+    color: black;
+  }
+
   .trade-token-grid-row__col-action-mb {
   @include trade-token-grid-row__col();
 
@@ -107,6 +131,14 @@
     margin-top: 15px;
   }
   .trade-token-grid-row__buy-button{
+    display: inline;
+    width: 40%;
+  }
+  .trade-token-grid-row__group-button{
+    display: inline;
+    width: 40%;
+  }
+  .trade-token-grid-row__long-button{
     display: inline;
     width: 40%;
   }

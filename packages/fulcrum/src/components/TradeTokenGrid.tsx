@@ -29,6 +29,8 @@ export interface ITradeTokenGridProps {
   onShowMyTokensOnlyChange: (value: boolean) => void;
   onSelect: (key: TradeTokenKey) => void;
   onTrade: (request: TradeRequest) => void;
+  isLong: boolean;
+  isShort: boolean;
 }
 
 interface ITradeTokenGridState {
@@ -258,23 +260,37 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
 
 
     TradeTokenGrid.assets.forEach(e => {
-      singleRowData.push({
-        selectedKey: props.selectedKey,
-        asset: e,
-        defaultUnitOfAccount: Asset.DAI,
-        defaultTokenizeNeeded: true,
-        positionType: PositionType.SHORT,
-        defaultLeverage: props.defaultLeverageShort,
-        onSelect: props.onSelect,
-        onTrade: props.onTrade,
-        onShowMyTokensOnlyChange: props.onShowMyTokensOnlyChange
-      });
-
+      if(props.isLong){
+        singleRowData.push({
+          selectedKey: props.selectedKey,
+          asset: e,
+          defaultUnitOfAccount: Asset.SAI,
+          defaultTokenizeNeeded: true,
+          positionType: PositionType.LONG,
+          defaultLeverage: props.defaultLeverageShort,
+          onSelect: props.onSelect,
+          onTrade: props.onTrade,
+          onShowMyTokensOnlyChange: props.onShowMyTokensOnlyChange
+        });
+      }
       /*let unit = Asset.USDC;
       if (props.selectedKey.asset === Asset.ETH && props.defaultLeverageLong === 2) {
         unit = Asset.DAI;
       }*/
 
+      if(props.isShort){
+        singleRowData.push({
+          selectedKey: props.selectedKey,
+          asset: e,
+          defaultUnitOfAccount: Asset.SAI,
+          defaultTokenizeNeeded: true,
+          positionType: PositionType.SHORT,
+          defaultLeverage: props.defaultLeverageLong,
+          onSelect: props.onSelect,
+          onTrade: props.onTrade,
+          onShowMyTokensOnlyChange: props.onShowMyTokensOnlyChange
+        });
+      }
 
     });
 

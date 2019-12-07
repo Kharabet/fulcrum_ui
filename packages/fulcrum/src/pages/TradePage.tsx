@@ -30,6 +30,7 @@ interface ITradePageState {
   selectedKey: TradeTokenKey;
 
   isTradeModalOpen: boolean;
+  tradeDataType: string,
   tradeType: TradeType;
   tradeAsset: Asset;
   tradeUnitOfAccount: Asset;
@@ -45,6 +46,8 @@ interface ITradePageState {
   isManageCollateralModalOpen: boolean;
 
   priceGraphData: IPriceDataPoint[];
+  isLong: boolean;
+  isShort: boolean;
 }
 
 export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
@@ -56,6 +59,7 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
       selectedKey: TradeTokenKey.empty(),
       priceGraphData: [],
       isTradeModalOpen: false,
+      tradeDataType: 'long',
       tradeType: TradeType.BUY,
       tradeAsset: Asset.UNKNOWN,
       tradeUnitOfAccount: Asset.UNKNOWN,
@@ -65,8 +69,11 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
       collateralToken: Asset.UNKNOWN,
       isTokenAddressFormOpen: false,
       tradeTokenKey: TradeTokenKey.empty(),
-      isManageCollateralModalOpen: false
+      isManageCollateralModalOpen: false,
+      isLong:true,
+      isShort:false
     };
+    let changeActiveBtn  = this.changeActiveBtn.bind(this);
 
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
@@ -94,6 +101,13 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
     const priceGraphData = await FulcrumProvider.Instance.getPriceDataPoints(this.state.selectedKey);
     this.setState({ ...this.state, selectedKey: this.state.selectedKey, priceGraphData: priceGraphData });
   }
+  changeActiveBtn(activeType:string) {
+    if(activeType=='long'){
+      this.setState({ ...this.state, isLong: true, isShort:false });
+    }else{
+      this.setState({ ...this.state, isLong: false, isShort:true });
+    }
+  }
 
   public render() {
     return (
@@ -103,6 +117,9 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
           <PriceGraph
             data={this.state.priceGraphData}
             selectedKey={this.state.selectedKey}
+            isLong={this.state.isLong}
+            isShort={this.state.isShort}
+            changeActiveBtn={this.changeActiveBtn.bind(this)}
           />
           {this.state.showMyTokensOnly ? (
             <OwnTokenGrid
@@ -124,6 +141,8 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
               onShowMyTokensOnlyChange={this.onShowMyTokensOnlyChange}
               onSelect={this.onSelect}
               onTrade={this.onTradeRequested}
+              isLong={this.state.isLong}
+              isShort={this.state.isShort}
             />
           )}
           <Modal
