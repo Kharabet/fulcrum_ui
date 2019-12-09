@@ -239,23 +239,6 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
 
   public onBuyClick = (event: React.MouseEvent<HTMLElement>) => {
     event.stopPropagation();
-    let randomNumber = Math.floor(Math.random() * 100000) + 1;
-    const tagManagerArgs = {
-      dataLayer: {
-        transactionId: randomNumber,
-        transactionTotal: '0',
-        transactionProducts: [{
-          name: this.state.leverage + 'x' + this.props.asset +'-'+ this.props.positionType +'-'+ this.props.defaultUnitOfAccount,
-          sku: this.state.leverage + 'x' + this.props.asset +'-'+ this.props.positionType,
-          category:this.props.positionType,
-          status: "In-progress"
-        }],
-      },
-      dataLayerName: 'PageDataLayer'
-    }
-    // console.log("tagManagerArgs = ",tagManagerArgs)
-    TagManager.dataLayer(tagManagerArgs);
-    // console.log("TagManager = ",TagManager)
     this.props.onTrade(
       new TradeRequest(
         TradeType.BUY,

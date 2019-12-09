@@ -351,27 +351,30 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
   };
 
   public onCancelClick = () => {
-    let randomNumber = Math.floor(Math.random() * 100000) + 1;
-    const tagManagerArgs = {
-      dataLayer: {
-        transactionId: randomNumber,
-        transactionTotal: this.state.lendAmount,
-        transactionProducts: [{
-          name: this.props.lendType + '-' + this.props.asset,
-          sku: this.props.asset,
-          category:this.props.lendType,
-          status: "Canceled"
-        }],
-      },
-      dataLayerName: 'PageDataLayer'
-    }
-    TagManager.dataLayer(tagManagerArgs)
+
+
+    // let tmpNum = parseInt(this.state.lendAmount) +150
+    // alert(tmpNum)
+    // let randomNumber = Math.floor(Math.random() * 100000) + 1;
+    // const tagManagerArgs = {
+    //   dataLayer: {
+    //     event: 'purchase',
+    //     transactionId: randomNumber,
+    //     transactionTotal: this.state.lendAmount,
+    //     transactionProducts: [{
+    //       name: this.props.lendType + '-' + this.props.asset,
+    //       sku: this.props.asset,
+    //       category:this.props.lendType,
+    //     }],
+    //   }
+    // }
+    // TagManager.dataLayer(tagManagerArgs)
     this.props.onCancel();
   };
 
-  public onSubmitClick = (event: FormEvent<HTMLFormElement>) => {
+  public onSubmitClick = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
+    const usdAmount = await FulcrumProvider.Instance.getSwapToUsdRate(this.props.asset)
     if (!this.state.lendAmount || this.state.lendAmount.isZero()) {
       if (this._input) {
         this._input.focus();
@@ -389,19 +392,25 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
       return;
     }
 
+    let usdPrice = this.state.lendAmount
+    if(usdPrice != null){
+        usdPrice = usdPrice.multipliedBy(usdAmount)
+    }
+
     let randomNumber = Math.floor(Math.random() * 100000) + 1;
     const tagManagerArgs = {
       dataLayer: {
+        event: 'purchase',
         transactionId: randomNumber,
-        transactionTotal: this.state.lendAmount,
+        transactionTotal: usdPrice,
         transactionProducts: [{
           name: this.props.lendType + '-' + this.props.asset,
           sku: this.props.asset,
           category:this.props.lendType,
-          status: "Completed"
+          price: usdPrice,
+          quantity: 1
         }],
-      },
-      dataLayerName: 'PageDataLayer'
+      }
     }
     TagManager.dataLayer(tagManagerArgs)
     this.props.onSubmit(

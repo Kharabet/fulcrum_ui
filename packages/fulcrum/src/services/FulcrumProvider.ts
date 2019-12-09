@@ -41,14 +41,6 @@ import { TradeSellEthProcessor } from "./processors/TradeSellEthProcessor";
 import { UnlendErcProcessor } from "./processors/UnlendErcProcessor";
 import { UnlendEthProcessor } from "./processors/UnlendEthProcessor";
 
-TagManager.initialize({
-  gtmId : configProviders.Google_TrackingID,
-  'dataLayer' : {
-           'name' : "Provider",
-           'status' : "Intailized"
-       },
-       'dataLayerName' : 'PageDataLayer'
-});
 
 export class FulcrumProvider {
   private static readonly priceGraphQueryFunction = new Map<Asset, string>([
@@ -1645,15 +1637,12 @@ export class FulcrumProvider {
           const tagManagerArgs = {
             dataLayer: {
                 transactionId: randomNumber,
-                transactionTotal: '0',
                 transactionProducts: [{
                 name: "Transaction-Lend-"+request.asset,
                 sku: request.asset,
-                category: 'Lend',
-                status: "Mined completed"
+                category: 'Lend'
               }],
-            },
-            dataLayerName: 'PageDataLayer'
+            }
           }
           TagManager.dataLayer(tagManagerArgs)
           this.eventEmitter.emit(
@@ -1665,15 +1654,12 @@ export class FulcrumProvider {
           const tagManagerArgs = {
             dataLayer: {
                 transactionId: randomNumber,
-                transactionTotal: '0',
                 transactionProducts: [{
                 name: "Transaction-FulcrumMcdBridge-"+request.asset,
                 sku: request.asset,
-                category: 'FulcrumMcdBridge',
-                status: "Mined completed"
+                category: 'FulcrumMcdBridge'
               }],
-            },
-            dataLayerName: 'PageDataLayer'
+            }
           }
           TagManager.dataLayer(tagManagerArgs);
           this.eventEmitter.emit(
@@ -1685,15 +1671,12 @@ export class FulcrumProvider {
           const tagManagerArgs = {
             dataLayer: {
                 transactionId: randomNumber,
-                transactionTotal: '0',
                 transactionProducts: [{
                 name: "Transaction-Trade"+request.asset,
                 sku: request.asset,
-                category: 'Trade',
-                status: "Mined completed"
+                category: 'Trade'
               }],
-            },
-            dataLayerName: 'PageDataLayer'
+            }
           }
           TagManager.dataLayer(tagManagerArgs)
           this.eventEmitter.emit(

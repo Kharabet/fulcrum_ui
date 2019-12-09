@@ -521,20 +521,20 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
   public onCancelClick = () => {
     this.props.onCancel();
     let randomNumber = Math.floor(Math.random() * 100000) + 1;
-    const tagManagerArgs = {
-      dataLayer: {
-          transactionId: randomNumber,
-          transactionTotal: this.state.tradeAmountValue,
-          transactionProducts: [{
-          name: this.props.leverage + 'x' + this.props.asset +'-'+ this.props.positionType +'-'+ this.props.defaultUnitOfAccount,
-          sku: this.props.leverage + 'x' + this.props.asset +'-'+ this.props.positionType,
-          category: this.props.positionType,
-          status: "Canceled"
-        }],
-      },
-      dataLayerName: 'PageDataLayer'
-    }
-    TagManager.dataLayer(tagManagerArgs)
+    // const tagManagerArgs = {
+    //   dataLayer: {
+    //       event: 'purchase',
+    //       transactionId: randomNumber,
+    //       transactionTotal: this.state.tradeAmountValue,
+    //       transactionProducts: [{
+    //       name: this.props.leverage + 'x' + this.props.asset +'-'+ this.props.positionType +'-'+ this.props.defaultUnitOfAccount,
+    //       sku: this.props.leverage + 'x' + this.props.asset +'-'+ this.props.positionType,
+    //       category: this.props.positionType,
+    //       status: "Canceled"
+    //     }],
+    //   }
+    // }
+    // TagManager.dataLayer(tagManagerArgs)
   };
 
   public onChangeCollateralOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -577,8 +577,11 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     this.setState({ ...this.state, tokenizeNeeded: event.target.checked });
   };
 
-  public onSubmitClick = (event: FormEvent<HTMLFormElement>) => {
+  public onSubmitClick = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+
+    const usdAmount = await FulcrumProvider.Instance.getSwapToUsdRate(this.props.asset)
 
     if (this.state.tradeAmountValue.isZero()) {
       if (this._input) {
@@ -596,19 +599,24 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       this.props.onCancel();
       return;
     }
+    let usdPrice = this.state.tradeAmountValue
+    if(usdPrice != null){
+        usdPrice = usdPrice.multipliedBy(usdAmount)
+    }
     let randomNumber = Math.floor(Math.random() * 100000) + 1;
     const tagManagerArgs = {
       dataLayer: {
+          event: 'purchase',
           transactionId: randomNumber,
-          transactionTotal: this.state.tradeAmountValue,
+          transactionTotal: usdPrice,
           transactionProducts: [{
           name: this.props.leverage + 'x' + this.props.asset +'-'+ this.props.positionType +'-'+ this.props.defaultUnitOfAccount,
           sku: this.props.leverage + 'x' + this.props.asset +'-'+ this.props.positionType,
           category: this.props.positionType,
-          status: "Completed"
+          price: usdPrice,
+          quantity: 1
         }],
-      },
-      dataLayerName: 'PageDataLayer'
+      }
     }
     TagManager.dataLayer(tagManagerArgs)
     this.props.onSubmit(
