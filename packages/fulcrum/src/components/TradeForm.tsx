@@ -423,7 +423,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
                 className="trade-form__amount-input"
                 value={this.state.inputAmountText}
                 onChange={this.onTradeAmountChange}
-                placeholder={`${this.props.tradeType === TradeType.BUY ? `Buy` : `Sell`} Amount`}
+                placeholder={`Amount`}
               />
               <div className="trade-form__collateral-button-container">
                 <CollateralTokenButton asset={this.state.collateral} onClick={this.onChangeCollateralOpen} />
