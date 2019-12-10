@@ -55,6 +55,7 @@ export class LendPage extends PureComponent<ILendPageProps, ILendPageState> {
               asset={this.state.lendAsset}
               onSubmit={this.onLendConfirmed}
               onCancel={this.onRequestClose}
+              isMobileMedia={this.props.isMobileMedia}
             />
           </Modal>
           <Modal
@@ -75,7 +76,7 @@ export class LendPage extends PureComponent<ILendPageProps, ILendPageState> {
     );
   }
 
-  
+
   public onFulcrumMcdBridgeRequested = (request: FulcrumMcdBridgeRequest) => {
     if (!FulcrumProvider.Instance.contractsSource || !FulcrumProvider.Instance.contractsSource.canWrite) {
       this.props.doNetworkConnect();
@@ -83,7 +84,7 @@ export class LendPage extends PureComponent<ILendPageProps, ILendPageState> {
     }
 
     if (request) {
-      this.setState({ 
+      this.setState({
         ...this.state,
         isFulcrumMcdBridgeModalOpen: true,
         lendAsset: request.asset
@@ -92,7 +93,7 @@ export class LendPage extends PureComponent<ILendPageProps, ILendPageState> {
   };
 
   public onFulcrumMcdBridgeConfirmed = (request: FulcrumMcdBridgeRequest) => {
-    this.setState({ 
+    this.setState({
       ...this.state,
       isFulcrumMcdBridgeModalOpen: false,
     });
@@ -106,7 +107,7 @@ export class LendPage extends PureComponent<ILendPageProps, ILendPageState> {
     }
 
     if (request) {
-      this.setState({ 
+      this.setState({
         ...this.state,
         isLendModalOpen: true,
         lendType: request.lendType,
@@ -116,7 +117,7 @@ export class LendPage extends PureComponent<ILendPageProps, ILendPageState> {
   };
 
   public onLendConfirmed = (request: LendRequest) => {
-    this.setState({ 
+    this.setState({
       ...this.state,
       isLendModalOpen: false,
     });
@@ -124,7 +125,7 @@ export class LendPage extends PureComponent<ILendPageProps, ILendPageState> {
   };
 
   public onRequestClose = () => {
-    this.setState({ 
+    this.setState({
       ...this.state,
       isFulcrumMcdBridgeModalOpen: false,
       isLendModalOpen: false
