@@ -41,15 +41,6 @@ import { TradeSellEthProcessor } from "./processors/TradeSellEthProcessor";
 import { UnlendErcProcessor } from "./processors/UnlendErcProcessor";
 import { UnlendEthProcessor } from "./processors/UnlendEthProcessor";
 
- TagManager.initialize({
-   gtmId : configProviders.Google_TrackingID,
-   'dataLayer' : {
-            'name' : "Provider",
-            'status' : "Intailized"
-        },
-        'dataLayerName' : 'PageDataLayer'
- });
-
 export class FulcrumProvider {
   private static readonly priceGraphQueryFunction = new Map<Asset, string>([
     [Asset.ETH, "kyber-eth-dai"],

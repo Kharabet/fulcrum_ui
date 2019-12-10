@@ -358,7 +358,9 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
     this._inputSetMax.next();
   };
 
-  public onCancelClick = async () => {
+  public onCancelClick = () => {
+
+
     // let tmpNum = parseInt(this.state.lendAmount) +150
     // alert(tmpNum)
     // let randomNumber = Math.floor(Math.random() * 100000) + 1;
