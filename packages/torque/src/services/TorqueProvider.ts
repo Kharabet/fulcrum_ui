@@ -610,7 +610,7 @@ export class TorqueProvider {
     if (this.contractsSource) {
       const iBZxContract = await this.contractsSource.getiBZxContract();
       if (iBZxContract && walletDetails.walletAddress) {
-        const loansData = await iBZxContract.getBasicLoansData.callAsync(walletDetails.walletAddress, new BigNumber(6));
+        const loansData = await iBZxContract.getBasicLoansData.callAsync(walletDetails.walletAddress, new BigNumber(50));
         const zero = new BigNumber(0);
         result = loansData
           .filter(e => !e.loanTokenAmountFilled.eq(zero) && !e.collateralTokenAmountFilled.eq(zero))
