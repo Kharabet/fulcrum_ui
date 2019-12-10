@@ -608,12 +608,12 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       dataLayer: {
           event: 'purchase',
           transactionId: randomNumber,
-          transactionTotal: usdPrice,
+          transactionTotal: new BigNumber(usdPrice),
           transactionProducts: [{
           name: this.props.leverage + 'x' + this.props.asset +'-'+ this.props.positionType +'-'+ this.props.defaultUnitOfAccount,
           sku: this.props.leverage + 'x' + this.props.asset +'-'+ this.props.positionType,
           category: this.props.positionType,
-          price: usdPrice,
+          price: new BigNumber(usdPrice),
           quantity: 1
         }],
       }

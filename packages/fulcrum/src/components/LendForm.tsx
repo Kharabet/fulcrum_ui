@@ -352,7 +352,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
 
   public onCancelClick = () => {
 
-
+    
     // let tmpNum = parseInt(this.state.lendAmount) +150
     // alert(tmpNum)
     // let randomNumber = Math.floor(Math.random() * 100000) + 1;
@@ -402,12 +402,12 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
       dataLayer: {
         event: 'purchase',
         transactionId: randomNumber,
-        transactionTotal: usdPrice,
+        transactionTotal: new BigNumber(usdPrice),
         transactionProducts: [{
           name: this.props.lendType + '-' + this.props.asset,
           sku: this.props.asset,
           category:this.props.lendType,
-          price: usdPrice,
+          price: new BigNumber(usdPrice),
           quantity: 1
         }],
       }
