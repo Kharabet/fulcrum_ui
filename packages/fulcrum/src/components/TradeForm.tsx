@@ -8,7 +8,7 @@ import { debounceTime, distinctUntilChanged, switchMap } from "rxjs/operators";
 import ic_arrow_max from "../assets/images/ic_arrow_max.svg";
 import { Asset } from "../domain/Asset";
 import { AssetDetails } from "../domain/AssetDetails";
-import { AssetsDictionary } from "../domain/AssetsDictionary";
+import {AssetsDictionary, AssetsDictionaryMobile} from "../domain/AssetsDictionary";
 import { PositionType } from "../domain/PositionType";
 import { TradeRequest } from "../domain/TradeRequest";
 import { TradeTokenKey } from "../domain/TradeTokenKey";
@@ -66,6 +66,7 @@ export interface ITradeFormProps {
   onSubmit: (request: TradeRequest) => void;
   onCancel: () => void;
   onTrade: (request: TradeRequest) => void;
+  isMobileMedia: boolean;
 }
 
 interface ITradeFormState {
@@ -106,7 +107,10 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
 
   constructor(props: ITradeFormProps, context?: any) {
     super(props, context);
-    const assetDetails = AssetsDictionary.assets.get(props.asset);
+    let assetDetails = AssetsDictionary.assets.get(props.asset);
+    if(this.props.isMobileMedia){
+      assetDetails = AssetsDictionaryMobile.assets.get(this.props.asset);
+    }
     const interestRate = null;
     const balance = null;
     const ethBalance = null;
@@ -191,7 +195,10 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
   };
 
   private async derivedUpdate() {
-    const assetDetails = AssetsDictionary.assets.get(this.props.asset);
+    let assetDetails = AssetsDictionary.assets.get(this.props.asset);
+    if(this.props.isMobileMedia){
+      assetDetails = AssetsDictionaryMobile.assets.get(this.props.asset);
+    }
     const tradeTokenKey = this.getTradeTokenGridRowSelectionKey(this.props.leverage);
     const interestRate = await FulcrumProvider.Instance.getTradeTokenInterestRate(tradeTokenKey);
     const positionTokenBalance = await FulcrumProvider.Instance.getPTokenBalanceOfUser(tradeTokenKey);
