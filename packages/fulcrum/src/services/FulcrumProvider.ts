@@ -1353,7 +1353,7 @@ export class FulcrumProvider {
 
     return this.getSwapRate(
       asset,
-      Asset.SAI
+      Asset.DAI
     );
   }
 

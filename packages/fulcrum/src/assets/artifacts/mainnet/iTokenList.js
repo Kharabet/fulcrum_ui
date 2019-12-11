@@ -1,4 +1,4 @@
-export const TokenList = [
+export const iTokenList = [
   ["1","0x14094949152EDDBFcd073717200DA82fEd8dC960","0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359","Fulcrum SAI iToken","iSAI","1"  ],
   ["1","0x493c57c4763932315a328269e1adad09653b9081","0x6b175474e89094c44da98b954eedeac495271d0f","Fulcrum DAI iToken","iDAI","1"  ],
   ["1","0x77f973FCaF871459aa58cd81881Ce453759281bC","0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2","Fulcrum ETH iToken","iETH","1"  ],
@@ -10,7 +10,7 @@ export const TokenList = [
   ["1","0xA7Eb2bc82df18013ecC2A6C533fc29446442EDEe","0xe41d2489571d322189246dafa5ebde1f4699f498","Fulcrum ZRX iToken","iZRX","1"  ],
   ["1","0x1D496da96caf6b518b133736beca85D5C4F9cBc5","0x514910771AF9Ca656af840dff83E8264EcF986CA","Fulcrum LINK iToken","iLINK","1"  ],
   ["1","0x49f4592e641820e928f9919ef4abd92a719b4b49","0x57ab1ec28d129707052df4df418d58a2d46d5f51","Fulcrum sUSD iToken","iSUSD","1"  ],
-
+/*
   ["2","0x29B9723A3D88fe4a0B78134FD209433443A36b23","0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48","bZx Perpetual Short ETH","usETH","1"  ],
   ["2","0x3263B85A9E52CDae86E9B1560e2e04fB357c42AC","0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48","bZx Perpetual Short ETH 2x","usETH2x","1"  ],
   ["2","0x6368b095a4F4702BF1373A0a2aD029696A2e7695","0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2","bZx Perpetual Long ETH 2x","uLETH2x","1"  ],
@@ -110,4 +110,5 @@ export const TokenList = [
   ["2","0x92bA756169aA6Ff82a3d6ae8e4456A5883182Fa3","0x514910771af9ca656af840dff83e8264ecf986ca","bZx Perpetual Long LINK-SAI 3x v2","dLLINK3x_v2","2"  ],
   ["2","0x937EFce07594d14f878650d5B637f022952FAe86","0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359","bZx Perpetual Short LINK-SAI 4x v2","dsLINK4x_v2","2"  ],
   ["2","0x3789A8cAc9D2Eb3Cb87c09CA3422b928c768b362","0x514910771af9ca656af840dff83e8264ecf986ca","bZx Perpetual Long LINK-SAI 4x v2","dLLINK4x_v2","2"  ],
+*/
 ];

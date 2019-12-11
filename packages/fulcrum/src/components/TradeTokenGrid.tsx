@@ -51,7 +51,7 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
     // Asset.MKR,
     Asset.ZRX,
     // Asset.BAT,
-    Asset.REP,
+    // Asset.REP,
     Asset.KNC
   ];
 
@@ -210,7 +210,7 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
     if (Object.values(Asset).includes(siteConfig.Trade_defaultUnitOfAccount)) {
       defaultUnitOfAccount = Asset.[siteConfig.Trade_defaultUnitOfAccount];
     } else {
-      defaultUnitOfAccount = Asset.SAI;
+      defaultUnitOfAccount = Asset.DAI;
     }*/
 
 
@@ -218,7 +218,7 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
       rowsData.push({
         selectedKey: props.selectedKey,
         asset: e,
-        defaultUnitOfAccount: Asset.SAI,
+        defaultUnitOfAccount: Asset.DAI,
         defaultTokenizeNeeded: true,
         positionType: PositionType.SHORT,
         defaultLeverage: props.defaultLeverageShort,
@@ -229,13 +229,13 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
 
       /*let unit = Asset.USDC;
       if (props.selectedKey.asset === Asset.ETH && props.defaultLeverageLong === 2) {
-        unit = Asset.SAI;
+        unit = Asset.DAI;
       }*/
 
       rowsData.push({
         selectedKey: props.selectedKey,
         asset: e,
-        defaultUnitOfAccount: Asset.SAI,
+        defaultUnitOfAccount: Asset.DAI,
         defaultTokenizeNeeded: true,
         positionType: PositionType.LONG,
         defaultLeverage: props.defaultLeverageLong,
@@ -264,7 +264,7 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
         singleRowData.push({
           selectedKey: props.selectedKey,
           asset: e,
-          defaultUnitOfAccount: Asset.SAI,
+          defaultUnitOfAccount: Asset.DAI,
           defaultTokenizeNeeded: true,
           positionType: PositionType.LONG,
           defaultLeverage: props.defaultLeverageShort,
@@ -282,7 +282,7 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
         singleRowData.push({
           selectedKey: props.selectedKey,
           asset: e,
-          defaultUnitOfAccount: Asset.SAI,
+          defaultUnitOfAccount: Asset.DAI,
           defaultTokenizeNeeded: true,
           positionType: PositionType.SHORT,
           defaultLeverage: props.defaultLeverageLong,

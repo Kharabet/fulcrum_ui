@@ -33,6 +33,7 @@ interface IOwnTokenGridRowState {
   assetBalance: BigNumber | null;
   profit: BigNumber | null;
   pTokenAddress: string;
+  isLoading: boolean;
 }
 
 export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenGridRowState> {
@@ -46,7 +47,8 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
       latestAssetPriceDataPoint: FulcrumProvider.Instance.getPriceDefaultDataPoint(),
       assetBalance: new BigNumber(0),
       profit: new BigNumber(0),
-      pTokenAddress: ""
+      pTokenAddress: "",
+      isLoading: true
     };
 
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
@@ -84,13 +86,14 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
     // const precision = AssetsDictionary.assets.get(this.props.selectedKey.loanAsset)!.decimals || 18;
     // const balanceString = this.props.balance.dividedBy(10 ** precision).toFixed();
 
-    this.setState({
+    this.setState(p => ({
       ...this.state,
       latestAssetPriceDataPoint: latestAssetPriceDataPoint,
       assetBalance: assetBalance,
       profit: profit,
-      pTokenAddress: address
-    });
+      pTokenAddress: address,
+      isLoading: latestAssetPriceDataPoint.price !== 0 ? false : p.isLoading
+    }));
   }
 
   private onProviderAvailable = async () => {
@@ -175,10 +178,24 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
         </div>
 
         <div title={this.props.currentKey.unitOfAccount} className="own-token-grid-row__col-asset-price">{this.props.currentKey.unitOfAccount}</div>
-        <div title={`$${bnPrice.toFixed(18)}`} className="own-token-grid-row__col-asset-price">{`$${bnPrice.toFixed(2)}`}</div>
-        <div title={`$${bnLiquidationPrice.toFixed(18)}`} className="own-token-grid-row__col-liquidation-price">{`$${bnLiquidationPrice.toFixed(2)}`}</div>
-        <div title={this.state.assetBalance ? `$${this.state.assetBalance.toFixed(18)}` : ``} className="own-token-grid-row__col-position-value">{this.state.assetBalance ? `$${this.state.assetBalance.toFixed(2)}` : `$0.00`}</div>
-        <div title={this.state.profit ? `$${this.state.profit.toFixed(18)}` : ``} className="own-token-grid-row__col-profit">{this.state.profit ? `$${this.state.profit.toFixed(4)}` : `$0.0000`}</div>
+        <div title={`$${bnPrice.toFixed(18)}`} className="own-token-grid-row__col-asset-price">
+          {!this.state.isLoading ?
+          `$${bnPrice.toFixed(2)}` : 'Loading...'}
+        </div>
+        <div title={`$${bnLiquidationPrice.toFixed(18)}`} className="own-token-grid-row__col-liquidation-price">
+          {!this.state.isLoading ?
+          `$${bnLiquidationPrice.toFixed(2)}` : 'Loading...'}
+        </div>
+        <div title={this.state.assetBalance ? `$${this.state.assetBalance.toFixed(18)}` : ``} className="own-token-grid-row__col-position-value">
+          {!this.state.isLoading ? 
+            this.state.assetBalance ?
+            `$${this.state.assetBalance.toFixed(2)}` : '$0.00' : 'Loading...'}
+        </div>
+        <div title={this.state.profit ? `$${this.state.profit.toFixed(18)}` : ``} className="own-token-grid-row__col-profit">
+          {!this.state.isLoading ? 
+            this.state.profit ?
+            `$${this.state.profit.toFixed(2)}` : '$0.0000' : 'Loading...'}
+        </div>
 
         
 

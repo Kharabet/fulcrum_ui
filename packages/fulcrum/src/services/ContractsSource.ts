@@ -1,6 +1,7 @@
 import { BigNumber } from "@0x/utils";
 import * as _ from "lodash";
 import { Asset } from "../domain/Asset";
+import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { TradeTokenKey } from "../domain/TradeTokenKey";
 
 import { erc20Contract } from "../contracts/erc20";
@@ -8,7 +9,6 @@ import { FulcrumMcdBridgeContract } from "../contracts/FulcrumMcdBridgeContract"
 import { iTokenContract } from "../contracts/iTokenContract";
 import { oracleContract } from "../contracts/oracle";
 import { pTokenContract } from "../contracts/pTokenContract";
-import { TokenizedRegistryContract } from "../contracts/TokenizedRegistryContract";
 
 const ethNetwork = process.env.REACT_APP_ETH_NETWORK;
 
@@ -17,25 +17,23 @@ interface ITokenContractInfo {
   asset: string;
   name: string;
   symbol: string;
-  tokenType: BigNumber;
   index: BigNumber;
   version?: number;
 }
 
 export class ContractsSource {
   private readonly provider: any;
-  private tokenizedRegistryContract: TokenizedRegistryContract | null;
 
   private static isInit = false;
 
   private iTokensContractInfos: Map<string, ITokenContractInfo> = new Map<string, ITokenContractInfo>();
   private pTokensContractInfos: Map<string, ITokenContractInfo> = new Map<string, ITokenContractInfo>();
+  private pTokensContractInfosBurnOnly: Map<string, ITokenContractInfo> = new Map<string, ITokenContractInfo>();
 
   private erc20Json: any;
   private iTokenJson: any;
   private pTokenJson: any;
   private oracleJson: any;
-  private TokenizedRegistryJson: any;
   private mcdBridgeJson: any;
 
   public networkId: number;
@@ -43,7 +41,6 @@ export class ContractsSource {
 
   public constructor(provider: any, networkId: number, canWrite: boolean) {
     this.provider = provider;
-    this.tokenizedRegistryContract = null;
     this.networkId = networkId;
     this.canWrite = canWrite;
   }
@@ -58,105 +55,98 @@ export class ContractsSource {
     this.oracleJson = await import(`./../assets/artifacts/${ethNetwork}/oracle.json`);
     this.mcdBridgeJson = await import(`./../assets/artifacts/${ethNetwork}/FulcrumMcdBridge.json`);
     
-    
-    if (process.env.REACT_APP_ETH_NETWORK === "mainnet" || process.env.REACT_APP_ETH_NETWORK === "kovan" || process.env.REACT_APP_ETH_NETWORK === "rinkeby") {
-      // TEMPORARY WORKAROUND: Not using TokenizedRegistry yet
-      const TokenList = (await import(`../assets/artifacts/${ethNetwork}/tokenList.js`)).TokenList;
+    const iTokenList = (await import(`../assets/artifacts/${ethNetwork}/iTokenList.js`)).iTokenList;
+    const pTokenList = (await import(`../assets/artifacts/${ethNetwork}/pTokenList.js`)).pTokenList;
+    const pTokenListBurnOnly = (await import(`../assets/artifacts/${ethNetwork}/pTokenListBurnOnly.js`)).pTokenListBurnOnly;
 
+
+    iTokenList.forEach((val: any, index: any) => {
       // tslint:disable:no-console
-      // console.log(`--- start of token list ---`);
-      TokenList.forEach((val: any, index: any) => {
-        // tslint:disable:no-console
-        // console.log(val);
-        const t = {
-          token: val[1],
-          asset: val[2],
-          name: val[3],
-          symbol: val[4],
-          tokenType: new BigNumber(val[0]),
-          index: new BigNumber(index),
-          version: parseInt(val[5], 10)
-        };
-        // tslint:disable:no-console
-        // console.log(t);
-
-        if (val[0] === "1") {
-          this.iTokensContractInfos.set(val[4], t);
-        } else if (val[0] === "2") {
-          this.pTokensContractInfos.set(val[4], t);
-        }
-      });
+      // console.log(val);
+      const t = {
+        token: val[1],
+        asset: val[2],
+        name: val[3],
+        symbol: val[4],
+        index: new BigNumber(index),
+        version: parseInt(val[5], 10)
+      };
       // tslint:disable:no-console
-      console.log(`Loaded ${TokenList.length} Fulcrum tokens.`);
+      // console.log(t);
 
-    } else {
-      this.TokenizedRegistryJson = await import(`./../assets/artifacts/${ethNetwork}/TokenizedRegistry.json`);
+      this.iTokensContractInfos.set(val[4], t);
+    });
 
-      this.tokenizedRegistryContract = new TokenizedRegistryContract(
-        this.TokenizedRegistryJson.abi,
-        this.getTokenizedRegistryAddress().toLowerCase(),
-        this.provider
-      );
-
-      const step = 100;
-      const pos = 0;
-      let next: ITokenContractInfo[] = [];
-      // do {
-      let count = 0;
-      next = await this.tokenizedRegistryContract.getTokens.callAsync(
-        new BigNumber(pos),
-        new BigNumber(step),
-        new BigNumber(0) // this loads all the tokens at once
-      );
-
+    // tslint:disable:no-console
+    // console.log(`--- start of token list ---`);
+    pTokenList.forEach((val: any, index: any) => {
       // tslint:disable:no-console
-      let i;
-      next.forEach(e => {
-        // tslint:disable:no-console
-        // console.log(e);
-        i = e.symbol.indexOf("_v2");
-        if (i !== -1) {
-          e.version = 2;
-          // e.symbol = e.symbol.substr(0, i);
-        } else {
-          e.version = 1;
-        }
-        // console.log(e);
+      // console.log(val);
 
-        if (e.tokenType.eq(1)) {
-          e.symbol = e.symbol.substr(0, i);
-          this.iTokensContractInfos.set(e.symbol, e);
-        } else if (e.tokenType.eq(2)) {
-          this.pTokensContractInfos.set(e.symbol, e);
-        }
-        count++;
-      });
+      const version = parseInt(val["version"], 10);
+
+      let baseAsset;      
+      if (val["direction"] === "SHORT") {
+        baseAsset = version === 2 ? val["unit"] : val["asset"];
+      } else {
+        baseAsset = version === 2 ? val["asset"] : val["unit"];
+      }
+
+      const t = {
+        token: val["address"],
+        asset: AssetsDictionary.assets.get(baseAsset)!.addressErc20.get(this.networkId)!,
+        name: val["symbol"],
+        symbol: val["symbol"],
+        index: new BigNumber(index),
+        version: version
+      };
       // tslint:disable:no-console
-      console.log(`Loaded ${count} Fulcrum tokens.`);
+      // console.log(t);
 
-      //  pos += step;
-      // } while (next.length > 0);
-
-      /*pos = 0;
-      next = [];
-      do {
-        next = await this.tokenizedRegistryContract.getTokens.callAsync(
-          new BigNumber(pos),
-          new BigNumber(step),
-          new BigNumber(2)
-        );
-        next.forEach(e => {
-          this.pTokensContractInfos.set(e.symbol, e);
-        });
-        pos += step;
-      } while (next.length > 0);*/
-    }
+      this.pTokensContractInfos.set(val["symbol"], t);
+    });
     // console.log(this.pTokensContractInfos);
+
+    // tslint:disable:no-console
+    // console.log(`--- start of token list ---`);
+    pTokenListBurnOnly.forEach((val: any, index: any) => {
+      // tslint:disable:no-console
+      // console.log(val);
+
+      const version = parseInt(val["version"], 10);
+
+      let baseAsset;      
+      if (val["direction"] === "SHORT") {
+        baseAsset = version === 2 ? val["unit"] : val["asset"];
+      } else {
+        baseAsset = version === 2 ? val["asset"] : val["unit"];
+      }
+
+      const t = {
+        token: val["address"],
+        asset: AssetsDictionary.assets.get(baseAsset)!.addressErc20.get(this.networkId)!,
+        name: val["symbol"],
+        symbol: val["symbol"],
+        index: new BigNumber(index),
+        version: version
+      };
+      // tslint:disable:no-console
+      // console.log(t);
+
+      this.pTokensContractInfosBurnOnly.set(val["symbol"], t);
+    });
+    // console.log(this.pTokensContractInfosBurnOnly);
+
+    // tslint:disable:no-console
+    console.log(`Loaded ${iTokenList.length} Fulcrum iTokens.`);
+
+    // tslint:disable:no-console
+    console.log(`Loaded ${pTokenList.length + pTokenListBurnOnly.length} Fulcrum pTokens.`);
 
     ContractsSource.isInit = true;
   }
 
-  private getTokenizedRegistryAddress(): string {
+  /*private getTokenizedRegistryAddress(): string {
     let address: string = "";
     switch (this.networkId) {
       case 1:
@@ -174,7 +164,7 @@ export class ContractsSource {
     }
 
     return address;
-  }
+  }*/
 
   public getBZxVaultAddress(): string {
     let address: string = "";
@@ -252,7 +242,10 @@ export class ContractsSource {
 
   private async getPTokenContractRaw(key: TradeTokenKey): Promise<pTokenContract | null> {
     await this.Init();
-    const tokenContractInfo = this.pTokensContractInfos.get(key.toString()) || null;
+    let tokenContractInfo = this.pTokensContractInfos.get(key.toString()) || null;
+    if (tokenContractInfo === null) {
+      tokenContractInfo = this.pTokensContractInfosBurnOnly.get(key.toString()) || null;
+    }
     return tokenContractInfo ? new pTokenContract(this.pTokenJson.abi, tokenContractInfo.token, this.provider) : null;
   }
 
@@ -282,6 +275,12 @@ export class ContractsSource {
         result.push(tradeTokenKey);
       }
     });
+    this.pTokensContractInfosBurnOnly.forEach(e => {
+      const tradeTokenKey = TradeTokenKey.fromString(e.symbol);
+      if (tradeTokenKey) {
+        result.push(tradeTokenKey);
+      }
+    });
 
     return result;
   }
@@ -291,6 +290,10 @@ export class ContractsSource {
     this.pTokensContractInfos.forEach(e => {
       result.push(e.token);
     });
+    this.pTokensContractInfosBurnOnly.forEach(e => {
+      result.push(e.token);
+    });
+
     return result;
   }
 
@@ -300,7 +303,10 @@ export class ContractsSource {
   }
 
   public getPTokenErc20Address(key: TradeTokenKey): string | null {
-    const tokenContractInfo = this.pTokensContractInfos.get(key.toString()) || null;
+    let tokenContractInfo = this.pTokensContractInfos.get(key.toString()) || null;
+    if (tokenContractInfo === null) {
+      tokenContractInfo = this.pTokensContractInfosBurnOnly.get(key.toString()) || null;
+    }
     return tokenContractInfo ? tokenContractInfo.token : null;
   }
 

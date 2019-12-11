@@ -73,7 +73,7 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
       isLong:true,
       isShort:false
     };
-    let changeActiveBtn  = this.changeActiveBtn.bind(this);
+    // let changeActiveBtn  = this.changeActiveBtn.bind(this);
 
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
@@ -152,6 +152,7 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
             overlayClassName="modal-overlay-div"
           >
             <TradeForm
+              isMobileMedia={this.props.isMobileMedia}
               tradeType={this.state.tradeType}
               asset={this.state.tradeAsset}
               positionType={this.state.tradePositionType}
