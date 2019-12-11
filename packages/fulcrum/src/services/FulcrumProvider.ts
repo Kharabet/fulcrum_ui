@@ -41,7 +41,6 @@ import { TradeSellEthProcessor } from "./processors/TradeSellEthProcessor";
 import { UnlendErcProcessor } from "./processors/UnlendErcProcessor";
 import { UnlendEthProcessor } from "./processors/UnlendEthProcessor";
 
-
 export class FulcrumProvider {
   private static readonly priceGraphQueryFunction = new Map<Asset, string>([
     [Asset.ETH, "kyber-eth-dai"],
@@ -172,6 +171,59 @@ export class FulcrumProvider {
     if (this.web3Wrapper && canWrite) {
       try {
         this.accounts = await this.web3Wrapper.getAvailableAddressesAsync() || [];
+      } catch(e) {
+        // console.log(e);
+        this.accounts = [];
+      }
+      if (this.accounts.length === 0) {
+        canWrite = false; // revert back to read-only
+      }
+    } else {
+      // this.accounts = [];
+      if (providerType === ProviderType.Bitski && networkId !== 1) {
+        this.unsupportedNetwork = true;
+      }
+    }
+
+    if (this.web3Wrapper && this.web3ProviderSettings.networkId > 0) {
+      this.contractsSource = await new ContractsSource(this.providerEngine, this.web3ProviderSettings.networkId, canWrite);
+      if (canWrite) {
+        this.providerType = providerType;
+      } else {
+        this.providerType = ProviderType.None;
+      }
+      FulcrumProvider.setLocalstorageItem('providerType', this.providerType);
+    } else {
+      this.contractsSource = null;
+    }
+
+    if (this.contractsSource) {
+      await this.contractsSource.Init();
+    }
+  }
+
+  public async setWeb3ProviderMobileFinalize(providerType: ProviderType, providerData: [Web3Wrapper | null, Web3ProviderEngine | null, boolean, number, string]) { // : Promise<boolean> {
+    this.web3Wrapper = providerData[0];
+    this.providerEngine = providerData[1];
+    let canWrite = providerData[2];
+    let networkId = providerData[3];
+    let sellectedAccount = providerData[4];
+
+    this.web3ProviderSettings = await FulcrumProvider.getWeb3ProviderSettings(networkId);
+    if (this.web3Wrapper) {
+      if (this.web3ProviderSettings.networkName !== process.env.REACT_APP_ETH_NETWORK) {
+        // TODO: inform the user they are on the wrong network. Make it provider specific (MetaMask, etc)
+
+        this.unsupportedNetwork = true;
+        canWrite = false; // revert back to read-only
+        networkId = await this.web3Wrapper.getNetworkIdAsync();
+        this.web3ProviderSettings = await FulcrumProvider.getWeb3ProviderSettings(networkId);
+      }
+    }
+
+    if (this.web3Wrapper && canWrite) {
+      try {
+        this.accounts = [sellectedAccount] //await this.web3Wrapper.getAvailableAddressesAsync() || [];
       } catch(e) {
         // console.log(e);
         this.accounts = [];
@@ -1301,9 +1353,7 @@ export class FulcrumProvider {
 
     return this.getSwapRate(
       asset,
-      process.env.REACT_APP_ETH_NETWORK !== "rinkeby" ? 
-        Asset.SAI :
-        Asset.DAI
+      Asset.SAI
     );
   }
 

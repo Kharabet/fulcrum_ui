@@ -6,7 +6,7 @@ import { merge, Observable, Subject } from "rxjs";
 import { debounceTime, distinctUntilChanged, switchMap } from "rxjs/operators";
 import { Asset } from "../domain/Asset";
 import { AssetDetails } from "../domain/AssetDetails";
-import { AssetsDictionary } from "../domain/AssetsDictionary";
+import {AssetsDictionary, AssetsDictionaryMobile} from "../domain/AssetsDictionary";
 import { LendRequest } from "../domain/LendRequest";
 import { LendType } from "../domain/LendType";
 import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
@@ -38,6 +38,7 @@ export interface ILendFormProps {
 
   onSubmit: (request: LendRequest) => void;
   onCancel: () => void;
+  isMobileMedia: boolean;
 }
 
 interface ILendFormState {
@@ -66,7 +67,11 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
   constructor(props: ILendFormProps, context?: any) {
     super(props, context);
 
-    const assetDetails = AssetsDictionary.assets.get(props.asset);
+
+    let assetDetails = AssetsDictionary.assets.get(this.props.asset);
+    if(this.props.isMobileMedia){
+      assetDetails = AssetsDictionaryMobile.assets.get(this.props.asset);
+    }
 
     this.state = {
       assetDetails: assetDetails || null,
@@ -118,7 +123,10 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
   };
 
   private async derivedUpdate() {
-    const assetDetails = AssetsDictionary.assets.get(this.props.asset);
+    let assetDetails = AssetsDictionary.assets.get(this.props.asset);
+    if(this.props.isMobileMedia){
+      assetDetails = AssetsDictionaryMobile.assets.get(this.props.asset);
+    }
     const interestRate = await FulcrumProvider.Instance.getLendTokenInterestRate(this.props.asset);
     const maxLendAmount = (await FulcrumProvider.Instance.getMaxLendValue(
       new LendRequest(this.props.lendType, this.state.useWrapped ? Asset.WETH : this.props.asset, new BigNumber(0))

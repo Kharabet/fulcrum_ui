@@ -1,6 +1,5 @@
 import { BigNumber } from "@0x/utils";
 import React, { Component } from "react";
-import TagManager from "react-gtm-module";
 import { Asset } from "../domain/Asset";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
@@ -13,13 +12,18 @@ import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents"
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { TradeTransactionMinedEvent } from "../services/events/TradeTransactionMinedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
-
 // import { Change24HMarker, Change24HMarkerSize } from "./Change24HMarker";
 import { LeverageSelector } from "./LeverageSelector";
 import { PositionTypeMarker } from "./PositionTypeMarker";
+import TagManager from "react-gtm-module";
+import configProviders from "./../config/providers.json";
+// const tagManagerArgs = {
+//     gtmId: configProviders.Google_TrackingID
+// }
+// TagManager.initialize(tagManagerArgs)
 
 
-export interface ITradeTokenGridRowMBProps {
+export interface ITradeTokenGridRowFooterMBProps {
   selectedKey: TradeTokenKey;
 
   asset: Asset;
@@ -44,8 +48,8 @@ interface ITradeTokenGridRowState {
   isLoading: boolean;
 }
 
-export class TradeTokenGridRowMobile extends Component<ITradeTokenGridRowMBProps, ITradeTokenGridRowState> {
-  constructor(props: ITradeTokenGridRowMBProps, context?: any) {
+export class TradeTokenGridRowMobileFooter extends Component<ITradeTokenGridRowFooterMBProps, ITradeTokenGridRowState> {
+  constructor(props: ITradeTokenGridRowFooterMBProps, context?: any) {
     super(props, context);
 
     const assetDetails = AssetsDictionary.assets.get(props.asset);
@@ -65,7 +69,7 @@ export class TradeTokenGridRowMobile extends Component<ITradeTokenGridRowMBProps
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.TradeTransactionMined, this.onTradeTransactionMined);
   }
 
-  private getTradeTokenGridRowSelectionKeyRaw(props: ITradeTokenGridRowMBProps, leverage: number = this.state.leverage) {
+  private getTradeTokenGridRowSelectionKeyRaw(props: ITradeTokenGridRowFooterMBProps, leverage: number = this.state.leverage) {
     const key = new TradeTokenKey(props.asset, props.defaultUnitOfAccount, props.positionType, leverage, props.defaultTokenizeNeeded, 2);
 
     // check for version 2, and revert back to version if not found
@@ -131,7 +135,7 @@ export class TradeTokenGridRowMobile extends Component<ITradeTokenGridRowMBProps
   }
 
   public componentDidUpdate(
-    prevProps: Readonly<ITradeTokenGridRowMBProps>,
+    prevProps: Readonly<ITradeTokenGridRowFooterMBProps>,
     prevState: Readonly<ITradeTokenGridRowState>,
     snapshot?: any
   ): void {
@@ -167,13 +171,9 @@ export class TradeTokenGridRowMobile extends Component<ITradeTokenGridRowMBProps
       tradeTokenKey.toString() === this.props.selectedKey.toString() ? "trade-token-grid-row--active" : "";
 
     return (
-      <div className={`trade-token-grid-row ${isActiveClassName}`} onClick={this.onSelectClick}>
-        {/*<div*/}
-          {/*className="trade-token-grid-row__col-token-image"*/}
-          {/*style={{ backgroundColor: this.state.assetDetails.bgColor, borderLeftColor: this.state.assetDetails.bgColor }}*/}
-        {/*>*/}
-          {/*<img src={this.state.assetDetails.logoSvg} alt={this.state.assetDetails.displayName} />*/}
-        {/*</div>*/}
+
+      <div className={`trade-footer-grid`} onClick={this.onSelectClick}>
+
         {/*<div className="trade-token-grid-row__col-token-name">*/}
           {/*/!*<span className="rounded-mark">?</span>*!/*/}
           {/*{this.state.assetDetails.displayName}*/}
@@ -181,24 +181,30 @@ export class TradeTokenGridRowMobile extends Component<ITradeTokenGridRowMBProps
         {/*<div className="trade-token-grid-row__col-position-type">*/}
           {/*<PositionTypeMarker value={this.props.positionType} />*/}
         {/*</div>*/}
-        <div className="trade-token-grid-row__col-leverage">
-          {this.state.leverage+'x'}
+        <div
+            className="trade-token-grid-row__col-token-image"
+            style={{backgroundColor: this.state.assetDetails.bgColor, borderLeftColor: this.state.assetDetails.bgColor}}
+          >
+            <img src={this.state.assetDetails.logoSvg} alt={this.state.assetDetails.displayName}/>
+          </div>
+        {/*<div className="trade-token-grid-row__col-leverage">*/}
+          {/*{this.state.leverage+'x'}*/}
           {/*<LeverageSelector*/}
             {/*value={this.state.leverage}*/}
             {/*minValue={this.props.positionType === PositionType.SHORT ? 1 : 2}*/}
             {/*maxValue={4}*/}
             {/*onChange={this.onLeverageSelect}*/}
           {/*/>*/}
-        </div>
-        <div title={`$${bnPrice.toFixed(18)}`} className="trade-token-grid-row__col-price">
-          {!this.state.isLoading ?`$${bnPrice.toFixed(2)}` : 'Loading...'}
-          </div>
-        <div title={this.state.interestRate.gt(0) ? `${this.state.interestRate.toFixed(18)}%` : ``} className="trade-token-grid-row__col-profit">
-          {this.state.interestRate.gt(0) ? `${this.state.interestRate.toFixed(4)}%` : "Loading..."}
-        </div>
-        <div title={`$${bnLiquidationPrice.toFixed(18)}`} className="trade-token-grid-row__col-price">
-          {!this.state.isLoading ? `$${bnLiquidationPrice.toFixed(2)}` : 'Loading...' }
-          </div>
+        {/*</div>*/}
+        {/*<div title={`$${bnPrice.toFixed(18)}`} className="trade-token-grid-row__col-price">*/}
+          {/*{!this.state.isLoading ?`$${bnPrice.toFixed(2)}` : 'Loading...'}*/}
+          {/*</div>*/}
+        {/*<div title={this.state.interestRate.gt(0) ? `${this.state.interestRate.toFixed(18)}%` : ``} className="trade-token-grid-row__col-profit">*/}
+          {/*{this.state.interestRate.gt(0) ? `${this.state.interestRate.toFixed(4)}%` : "Loading..."}*/}
+        {/*</div>*/}
+        {/*<div title={`$${bnLiquidationPrice.toFixed(18)}`} className="trade-token-grid-row__col-price">*/}
+          {/*{!this.state.isLoading ? `$${bnLiquidationPrice.toFixed(2)}` : 'Loading...' }*/}
+          {/*</div>*/}
         {/*<div className="trade-token-grid-row__col-change24h">
           <Change24HMarker value={bnChange24h} size={Change24HMarkerSize.MEDIUM} />
         </div>*/}
@@ -243,6 +249,18 @@ export class TradeTokenGridRowMobile extends Component<ITradeTokenGridRowMBProps
 
   public onBuyClick = (event: React.MouseEvent<HTMLElement>) => {
     event.stopPropagation();
+    const tagManagerArgs = {
+                            dataLayer: {
+                                name:this.state.leverage + 'x' + this.props.asset +'-'+ this.props.positionType +'-'+ this.props.defaultUnitOfAccount,
+                                sku:this.state.leverage + 'x' + this.props.asset +'-'+ this.props.positionType,
+                                category:this.props.positionType,
+                                price:'0',
+                                status:"In-progress"
+                            },
+                            dataLayerName: 'PageDataLayer'
+                        }
+    console.log("tagManagerArgs = "+tagManagerArgs)
+    TagManager.dataLayer(tagManagerArgs)
 
     this.props.onTrade(
       new TradeRequest(

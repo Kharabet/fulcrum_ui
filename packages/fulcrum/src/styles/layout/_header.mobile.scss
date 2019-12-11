@@ -1,11 +1,22 @@
-.header {
-  .header__row {
-    .header__left {
-      width: 50%;
+@media only screen and (max-width: $mobile-version-max-width) {
+  .header {
+    padding-left: 2rem;
+    padding-right: 2rem;
+    .header__row {
+      .header__left {
+        width: 50%;
+      }
+
+      .header__right {
+        width: 50%;
+      }
+    }
+    .header-menu__item {
+      margin-bottom: 12px;
     }
 
-    .header__right {
-      width: 50%;
+    .header__popup-container {
+      height: 625px;
     }
   }
 }
