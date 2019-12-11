@@ -351,7 +351,7 @@ export class FulcrumMcdBridgeForm extends Component<IFulcrumMcdBridgeFormProps, 
       return;
     }
 
-    let randomNumber = Math.floor(Math.random() * 100000) + 1;
+    const randomNumber = Math.floor(Math.random() * 100000) + 1;
     const tagManagerArgs = {
       dataLayer: {
           transactionId: randomNumber,

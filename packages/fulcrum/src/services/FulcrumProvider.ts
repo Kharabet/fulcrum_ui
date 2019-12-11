@@ -603,20 +603,26 @@ export class FulcrumProvider {
       if (balance.gt(0)) {
         const assetContract = await this.contractsSource.getPTokenContract(selectedKey);
         if (assetContract) {
-          const swapPrice = await this.getSwapToUsdRate(this.getBaseAsset(selectedKey));
+          const baseAsset = this.getBaseAsset(selectedKey);
+          const swapPrice = await this.getSwapToUsdRate(baseAsset);
           const tokenPrice = await assetContract.tokenPrice.callAsync();
           const checkpointPrice = await assetContract.checkpointPrice.callAsync(account);
+
+          let decimalOffset = 0;
+          if (baseAsset === Asset.WBTC && selectedKey.positionType === PositionType.SHORT) {
+            decimalOffset = 10;
+          }
 
           assetBalance = tokenPrice
             .multipliedBy(balance)
             .multipliedBy(swapPrice)
-            .dividedBy(10**36);
+            .dividedBy(10**(36-decimalOffset));
 
           profit = tokenPrice
             .minus(checkpointPrice)
             .multipliedBy(balance)
             .multipliedBy(swapPrice)
-            .dividedBy(10**36);
+            .dividedBy(10**(36-decimalOffset));
         }
       }
     }
@@ -664,7 +670,13 @@ export class FulcrumProvider {
       result = await this.getPTokenBalanceOfUser(selectedKey);
     }
 
-    result = result.dividedBy(10 ** 18);
+    const baseAsset = this.getBaseAsset(selectedKey);
+    let decimalOffset = 0;
+    if (baseAsset === Asset.WBTC && selectedKey.positionType === PositionType.SHORT) {
+      decimalOffset = 10;
+    }
+
+    result = result.dividedBy(10 ** (18-decimalOffset));
 
     return result;
   };
@@ -963,10 +975,7 @@ export class FulcrumProvider {
                       gasPrice: new BigNumber(0)
                     }
                   );
-                  let destDecimals: number = AssetsDictionary.assets.get(baseAsset)!.decimals || 18;
-                  if (baseAsset === Asset.WBTC && key.positionType === PositionType.SHORT) {
-                    destDecimals = destDecimals + 10;
-                  }
+                  const destDecimals: number = AssetsDictionary.assets.get(baseAsset)!.decimals || 18;
                   tradeAmountActual = tradeAmountActual.multipliedBy(10 ** (18 - destDecimals));
                 } else {
                   return null;
@@ -986,10 +995,7 @@ export class FulcrumProvider {
                     gasPrice: new BigNumber(0)
                   }
                 );
-                let destDecimals: number = AssetsDictionary.assets.get(baseAsset)!.decimals || 18;
-                if (baseAsset === Asset.WBTC && key.positionType === PositionType.SHORT) {
-                  destDecimals = destDecimals + 10;
-                }
+                const destDecimals: number = AssetsDictionary.assets.get(baseAsset)!.decimals || 18;
                 tradeAmountActual = tradeAmountActual.multipliedBy(10 ** (18 - destDecimals));
               } catch(e) {
                 // console.log(e);
@@ -1001,9 +1007,9 @@ export class FulcrumProvider {
               try {
                 const assetErc20Address = FulcrumProvider.Instance.getErc20AddressOfAsset(request.collateral);
                 if (assetErc20Address) {
-                  let srcDecimals: number = AssetsDictionary.assets.get(baseAsset)!.decimals || 18;
+                  const srcDecimals: number = AssetsDictionary.assets.get(baseAsset)!.decimals || 18;
                   if (baseAsset === Asset.WBTC && key.positionType === PositionType.SHORT) {
-                    srcDecimals = srcDecimals + 10;
+                    // srcDecimals = srcDecimals + 10;
                   }
                   tradeAmountActual = await assetContract.burnToToken.callAsync(
                     account,
@@ -1026,9 +1032,9 @@ export class FulcrumProvider {
               }
             } else {
               try {
-                let srcDecimals: number = AssetsDictionary.assets.get(baseAsset)!.decimals || 18;
+                const srcDecimals: number = AssetsDictionary.assets.get(baseAsset)!.decimals || 18;
                 if (baseAsset === Asset.WBTC && key.positionType === PositionType.SHORT) {
-                  srcDecimals = srcDecimals + 10;
+                  // srcDecimals = srcDecimals + 10;
                 }
                 tradeAmountActual = await assetContract.burnToEther.callAsync(
                   account,
@@ -1050,7 +1056,6 @@ export class FulcrumProvider {
     }
 
     tradeAmountActual = tradeAmountActual.dividedBy(10**18);
-
     const slippage = tradeAmountActual.minus(tradedAmountEstimate).div(tradedAmountEstimate).multipliedBy(-100);
 
     /*console.log(`---------`);
@@ -1349,7 +1354,6 @@ export class FulcrumProvider {
 
       const srcAssetErc20Address = this.getErc20AddressOfAsset(srcAsset);
       const destAssetErc20Address = this.getErc20AddressOfAsset(destAsset);
-      console.log(srcAsset, destAsset, srcAssetErc20Address, destAssetErc20Address);
       if (this.contractsSource && srcAssetErc20Address && destAssetErc20Address) {
         const oracleContract = await this.contractsSource.getOracleContract();
         // result is always base 18, looks like srcQty too, see https://developer.kyber.network/docs/KyberNetworkProxy/#getexpectedrate
@@ -1631,9 +1635,8 @@ export class FulcrumProvider {
       const receipt = await web3Wrapper.getTransactionReceiptIfExistsAsync(txHash);
       if (receipt) {
         resolve(receipt);
-        let tagManagerArgs;
         if (request instanceof LendRequest) {
-          let randomNumber = Math.floor(Math.random() * 100000) + 1;
+          const randomNumber = Math.floor(Math.random() * 100000) + 1;
           const tagManagerArgs = {
             dataLayer: {
                 transactionId: randomNumber,
@@ -1650,7 +1653,7 @@ export class FulcrumProvider {
             new LendTransactionMinedEvent(request.asset, txHash)
           );
         } else if (request instanceof FulcrumMcdBridgeRequest) {
-          let randomNumber = Math.floor(Math.random() * 100000) + 1;
+          const randomNumber = Math.floor(Math.random() * 100000) + 1;
           const tagManagerArgs = {
             dataLayer: {
                 transactionId: randomNumber,
@@ -1667,7 +1670,7 @@ export class FulcrumProvider {
             new LendTransactionMinedEvent(request.asset, txHash)
           );
         } else {
-          let randomNumber = Math.floor(Math.random() * 100000) + 1;
+          const randomNumber = Math.floor(Math.random() * 100000) + 1;
           const tagManagerArgs = {
             dataLayer: {
                 transactionId: randomNumber,

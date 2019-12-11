@@ -397,7 +397,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
         usdPrice = usdPrice.multipliedBy(usdAmount)
     }
 
-    let randomNumber = Math.floor(Math.random() * 100000) + 1;
+    const randomNumber = Math.floor(Math.random() * 100000) + 1;
     const tagManagerArgs = {
       dataLayer: {
         event: 'purchase',

@@ -520,7 +520,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
 
   public onCancelClick = () => {
     this.props.onCancel();
-    let randomNumber = Math.floor(Math.random() * 100000) + 1;
+    const randomNumber = Math.floor(Math.random() * 100000) + 1;
     // const tagManagerArgs = {
     //   dataLayer: {
     //       event: 'purchase',
@@ -603,7 +603,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     if(usdPrice != null){
         usdPrice = usdPrice.multipliedBy(usdAmount)
     }
-    let randomNumber = Math.floor(Math.random() * 100000) + 1;
+    const randomNumber = Math.floor(Math.random() * 100000) + 1;
     const tagManagerArgs = {
       dataLayer: {
           event: 'purchase',

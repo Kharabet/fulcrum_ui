@@ -12,7 +12,7 @@ const ethNetwork = process.env.REACT_APP_ETH_NETWORK;
 export class ContractsSource {
   private readonly provider: any;
 
-  private isInit = false;
+  private static isInit = false;
 
   private erc20Json: any;
   private iBZxJson: any;
@@ -328,7 +328,7 @@ export class ContractsSource {
   }
 
   public async Init() {
-    if (this.isInit) {
+    if (ContractsSource.isInit) {
       return;
     }
     const network = ethNetwork || "1";
@@ -337,7 +337,7 @@ export class ContractsSource {
     this.iTokenJson = await import(`./../assets/artifacts/${network}/iToken.json`);
     this.oracleJson = await import(`./../assets/artifacts/${network}/oracle.json`);
     this.iENSJson = await import(`./../assets/artifacts/${network}/iENSOwner.json`);
-    this.isInit = true;
+    ContractsSource.isInit = true;
   }
 
   private async getErc20ContractRaw(addressErc20: string): Promise<erc20Contract> {

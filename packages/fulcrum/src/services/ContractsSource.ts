@@ -26,6 +26,8 @@ export class ContractsSource {
   private readonly provider: any;
   private tokenizedRegistryContract: TokenizedRegistryContract | null;
 
+  private static isInit = false;
+
   private iTokensContractInfos: Map<string, ITokenContractInfo> = new Map<string, ITokenContractInfo>();
   private pTokensContractInfos: Map<string, ITokenContractInfo> = new Map<string, ITokenContractInfo>();
 
@@ -47,6 +49,9 @@ export class ContractsSource {
   }
 
   public async Init() {
+    if (ContractsSource.isInit) {
+      return;
+    }
     this.erc20Json = await import(`./../assets/artifacts/${ethNetwork}/erc20.json`);
     this.iTokenJson = await import(`./../assets/artifacts/${ethNetwork}/iToken.json`);
     this.pTokenJson = await import(`./../assets/artifacts/${ethNetwork}/pToken.json`);
@@ -147,6 +152,8 @@ export class ContractsSource {
       } while (next.length > 0);*/
     }
     // console.log(this.pTokensContractInfos);
+
+    ContractsSource.isInit = true;
   }
 
   private getTokenizedRegistryAddress(): string {
@@ -231,22 +238,26 @@ export class ContractsSource {
   
 
   private async getErc20ContractRaw(addressErc20: string): Promise<erc20Contract> {
+    await this.Init();
     return new erc20Contract(this.erc20Json.abi, addressErc20.toLowerCase(), this.provider);
   }
 
 
   private async getITokenContractRaw(asset: Asset): Promise<iTokenContract | null> {
+    await this.Init();
     const symbol = asset === Asset.WETH ? `iETH` : `i${asset}`
     const tokenContractInfo = this.iTokensContractInfos.get(symbol) || null;
     return tokenContractInfo ? new iTokenContract(this.iTokenJson.abi, tokenContractInfo.token, this.provider) : null;
   }
 
   private async getPTokenContractRaw(key: TradeTokenKey): Promise<pTokenContract | null> {
+    await this.Init();
     const tokenContractInfo = this.pTokensContractInfos.get(key.toString()) || null;
     return tokenContractInfo ? new pTokenContract(this.pTokenJson.abi, tokenContractInfo.token, this.provider) : null;
   }
 
   private async getOracleContractRaw(): Promise<oracleContract> {
+    await this.Init();
     return new oracleContract(
       this.oracleJson.abi,
       this.getOracleAddress().toLowerCase(),
@@ -255,6 +266,7 @@ export class ContractsSource {
   }
 
   private async getFulcrumMcdBridgeContractRaw(): Promise<FulcrumMcdBridgeContract> {
+    await this.Init();
     return new FulcrumMcdBridgeContract(
       this.mcdBridgeJson.abi,
       this.getFulcrumMcdBridgeAddress().toLowerCase(),
