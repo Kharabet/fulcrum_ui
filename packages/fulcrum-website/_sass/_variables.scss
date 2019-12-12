@@ -1,0 +1,43 @@
+:root {
+  --primary-color: #283049;
+  --secondary-color: #283049;
+  --light-gray-color: #828282;
+  --dark-gray-color: #283049;
+  --primary-bg: #e9f4ff;
+  --secondary-bg: #ffffff;
+  --switch-bg: #283049;
+  --switch-button: #ffffff;
+  --primary-svg-icon: #51AAFF;
+  --secondary-svg-icon: #BFE9FF;
+  --tertiary-svg-icon: #95E6FF;
+  --safe-svg-icon: #95E6FF;
+  --accordion-bg: #ffffff;
+  --accordion-border: #ffffff;
+  --btn-white-bg: #ffffff;
+  --btn-green-bg: #ffffff;
+  --btn-green-color: #00c0ab;
+  --btn-blue-border: #276bfb;
+  --btn-blue-bg: #276bfb;
+}
+
+[data-theme="dark"] {
+  --primary-color: #ffffff;
+  --secondary-color: #B9C7D6;
+  --light-gray-color: #939FAC;
+  --dark-gray-color: #939FAC;
+  --primary-bg: #283038;
+  --secondary-bg: #495460;
+  --switch-bg: #ffffff;
+  --switch-button: #283038;
+  --primary-svg-icon: #001760;
+  --secondary-svg-icon: #001760;
+  --tertiary-svg-icon: #001760;
+  --safe-svg-icon: #003CDA;
+  --accordion-bg: #202830;
+  --accordion-border: #38424B; 
+  --btn-white-bg: #283038;
+  --btn-green-bg: #00c0ab;
+  --btn-green-color: #ffffff;
+  --btn-blue-border: #b9c7d6;
+  --btn-blue-bg: #323b44;
+}

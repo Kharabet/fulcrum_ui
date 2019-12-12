@@ -1,0 +1,15 @@
+<svg width="120" height="120" viewBox="0 0 120 120" fill="none" 
+    xmlns="http://www.w3.org/2000/svg">
+    <g>
+        <rect x="120" y="120" width="64" height="120" transform="rotate(-180 120 120)" class="icon-step-secondary" />
+        <rect x="95" y="91" width="95" height="62" rx="6" transform="rotate(-180 95 91)" fill="#51AAFF"/>
+        <path d="M100 85C100 88.3137 97.3137 91 94 91L56 91L56 29L94 29C97.3137 29 100 31.6863 100 35L100 85Z" fill="#176EFC"/>
+        <circle cx="28" cy="51" r="7" fill="white"/>
+        <path d="M43 76C43 68.8203 36.2843 63 28 63C19.7157 63 13 68.8203 13 76H43Z" fill="white"/>
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M70 88C70 83.5817 73.5817 80 78 80C82.4183 80 86 83.5817 86 88V95H70V88ZM78 84C75.7909 84 74 85.7909 74 88V91H82V88C82 85.7909 80.2091 84 78 84Z" fill="white"/>
+        <rect x="66" y="91" width="24" height="15" fill="#13D8C4"/>
+        <rect x="66" y="45" width="24" height="4" fill="#BFE9FF"/>
+        <rect x="66" y="55" width="24" height="4" fill="#BFE9FF"/>
+        <rect x="66" y="65" width="12" height="4" fill="#BFE9FF"/>
+    </g>
+</svg>

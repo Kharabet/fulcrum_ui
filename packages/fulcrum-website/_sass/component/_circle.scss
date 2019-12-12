@@ -1,0 +1,31 @@
+.circle {
+  position: relative;
+  display: inline-flex;
+  span {
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    background: radial-gradient(87.57% 87.57% at 62.32% 26.67%, #33dfcc 0%, #003cda 100%);
+    border-radius: 50%;
+  }
+  .left-30 {
+    left: -30px;
+  }
+  .left-50 {
+    left: -50px;
+  }
+  .right-50 {
+    right: -50px;
+  }
+  .center {
+    left: 0;
+    right: 0;
+    margin: auto;
+  }
+  .top-10 {
+    top: -10px;
+  }
+  .top-60 {
+    top: -60px;
+  }
+}
