@@ -1,0 +1,24 @@
+.svg-primary {
+  fill: var(--primary-color);
+}
+.icon-step-primary {
+  fill: var(--primary-svg-icon);
+}
+.icon-step-secondary {
+  fill: var(--secondary-svg-icon);
+}
+.icon-step-tertiary {
+  fill: var(--tertiary-svg-icon);
+}
+.icon-safe-switch {
+  fill: var(--safe-svg-icon);
+}
+.svg-border {
+  stroke: var(--secondary-bg);
+}
+.svg-bg-primary{
+  fill: var(--svg-bg-primary);
+}
+.svg-bg-secondary{
+  fill: var(--svg-bg-secondary);
+}

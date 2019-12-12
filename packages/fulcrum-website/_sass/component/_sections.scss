@@ -1,0 +1,67 @@
+.item-advantager {
+  width: calc(100% / 3 - 20px);
+  margin-bottom: 60px;
+  h2 {
+    margin-bottom: 50px;
+  }
+  h3 {
+    margin: 27px 0 20px 0;
+  }
+  p {
+    color: var(--secondary-color);
+    line-height: 1.8;
+  }
+}
+.item-coin {
+  .border-coin{
+    border: 4px solid var(--secondary-bg);
+    border-radius: 50%;
+  }
+  svg{
+    width: 66px;
+    height: 66px;
+  }
+  span {
+    display: flex;
+    justify-content: center;
+    line-height: 1.8;
+    color: #276bfb;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: 15px;
+  }
+}
+
+.item-safe {
+  width: calc(100% / 3 - 20px);
+  margin-bottom: 60px;
+  text-align: center;
+  p {
+    line-height: 1.8;
+    margin-bottom: 10px;
+    color: var(--primary-color);
+    text-align: left;
+  }
+}
+.item-blog {
+  width: calc(100% / 3 - 20px);
+  background-color: var(--secondary-bg);
+  border-radius: 16px;
+  text-align: left;
+  .item-blog-header {
+    img {
+      border-radius: 16px 16px 0 0;
+    }
+  }
+  .item-blog-body {
+    padding: 0 20px 25px 20px;
+  }
+}
+.item-trading{
+  position: relative;
+  z-index: 2;
+  background-color: #5b88ff;
+  color: #ffffff;
+  padding: 37px 52px;
+  border-radius: 16px;
+}
