@@ -247,14 +247,14 @@ title: Crypto Margin Trading with Fulcrum | bZx
     <div class="container pt-75 ">
         <div class="col col-10 flex jc-sb">
             <div>
-                <a href="#" class="button button-primary button-lg mb-20">Trade</a>
+                <a href="https://fulcrum.trade/trade" class="button button-primary button-lg mb-20">Trade</a>
                 <p class="fs-13 lh-150 text-center c-gray">Up to 5x Leverage, zero trading fees, <br />and perfect liquidity</p>
             </div>
             <div>
                 <p class="fs-44 fw-900 lh-140 c-primary">Start Now</p>
             </div>
             <div>
-                <a href="#" class="button button-secondary button-lg mb-20">Lend</a>
+                <a href="https://fulcrum.trade/lend" class="button button-secondary button-lg mb-20">Lend</a>
                 <p class="fs-13 lh-150 text-center c-gray">To Earn interest</p>
             </div>
         </div>
