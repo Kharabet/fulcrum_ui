@@ -11,12 +11,12 @@ title: Crypto Margin Trading with Fulcrum | bZx
             {% include svg/logo.svg %}
         </div>
         <div class="flex">
-            <a href="#" class="fs-18 fw-600 c-green mr-45">How Margin Trading Works</a>
-            <a href="#" class="fs-18 fw-600 c-green">How Lending Works</a>
+            <a href="/" class="fs-18 fw-600 c-green mr-45">How Margin Trading Works</a>
+            <a href="/lending" class="fs-18 fw-600 c-green">How Lending Works</a>
         </div>
         <div class="flex ai-c">
-            <a href="#" class="fs-18 fw-600 c-primary-blue mr-25">Help Center</a>
-            <a href="#" class="button button-xs button-blue mr-40">APP</a>
+            <a href="https://help.bzx.network/en/" class="fs-18 fw-600 c-primary-blue mr-25">Help Center</a>
+            <a href="https://app.fulcrum.trade/" class="button button-xs button-blue mr-40">APP</a>
             <div class="theme-switch-wrapper">
                 <label class="theme-switch" for="checkbox">
                     <input type="checkbox" id="checkbox" />
@@ -34,11 +34,11 @@ title: Crypto Margin Trading with Fulcrum | bZx
                 accounts.</p>
             <div class="flex">
                 <div class="mr-30">
-                    <a href="#" class="button button-primary button-lg mb-25">Trade</a>
+                    <a href="https://fulcrum.trade/trade" class="button button-primary button-lg mb-25">Trade</a>
                     <p class="fs-13 lh-150 text-center c-gray">Up to 5x Leverage, zero platform <br /> fees, and perfect liquidity</p>
                 </div>
                 <div>
-                    <a href="#" class="button button-secondary button-lg mb-25">Lend</a>
+                    <a href="https://fulcrum.trade/lend" class="button button-secondary button-lg mb-25">Lend</a>
                     <p class="fs-13 lh-150 text-center c-gray">To Earn interest</p>
                 </div>
             </div>
@@ -166,7 +166,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
     </div>
 </section>
 
-<section class="bg-secondary mt-r-37 pt-175 text-center"> 
+<section class="bg-secondary mt-r-37 pt-175 text-center">
     <div class="container">
         <h2 class="circle mb-65"><span class="right-50 top-10"></span>How safe it is</h2>
         <div class="flex jc-sb">
