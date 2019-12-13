@@ -35,4 +35,16 @@ window.onload = function () {
             this.parentElement.classList.add("active");
         };
     }
+    //change active button-coin
+    var coins = document.querySelectorAll('#calculator-earn .coin-calc');
+    for (var i = 0; i < coins.length; i++) {
+        coins[i].onclick = function () {
+            var items = document.querySelectorAll('.coin-calc');
+            for (var i = 0; i < items.length; i++) {
+                items[i].classList.remove("active");
+            }
+            this.classList.add("active");
+        };
+    }
+
 };

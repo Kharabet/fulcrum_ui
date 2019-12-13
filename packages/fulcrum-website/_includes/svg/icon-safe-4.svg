@@ -1,0 +1,24 @@
+<svg width="120" height="120" viewBox="0 0 120 120" fill="none" 
+    xmlns="http://www.w3.org/2000/svg">
+    <g>
+        <rect x="16" y="25" width="88" height="70" fill="#51AAFF"/>
+        <rect y="74" width="120" height="9.99998" class="icon-safe-switch" />
+        <rect x="36" y="11" width="98" height="10" transform="rotate(90 36 11)" class="icon-safe-switch" />
+        <rect x="36" y="25" width="70" height="10" transform="rotate(90 36 25)" fill="#176EFC"/>
+        <rect x="55" y="11" width="98" height="10" transform="rotate(90 55 11)" class="icon-safe-switch" />
+        <rect x="55" y="25" width="70" height="10" transform="rotate(90 55 25)" fill="#176EFC"/>
+        <rect x="75" y="11" width="98" height="10" transform="rotate(90 75 11)" class="icon-safe-switch" />
+        <rect x="75" y="25" width="70" height="10" transform="rotate(90 75 25)" fill="#176EFC"/>
+        <rect x="94" y="11" width="98" height="10" transform="rotate(90 94 11)" class="icon-safe-switch" />
+        <rect x="94" y="25" width="70" height="10" transform="rotate(90 94 25)" fill="#176EFC"/>
+        <rect x="16" y="74" width="88" height="9.99998" fill="#176EFC"/>
+        <rect y="55" width="120" height="9.99998" class="icon-safe-switch" />
+        <rect x="16" y="55" width="88" height="9.99998" fill="#176EFC"/>
+        <rect y="36" width="120" height="9.99998" class="icon-safe-switch" />
+        <rect x="16" y="36" width="88" height="9.99998" fill="#176EFC"/>
+        <rect x="35" y="45" width="50" height="30" fill="#176EFC"/>
+        <path d="M43.7929 72.7928V48.2072H39.1635L34 52.558V57.3923L39.1635 53.0414V72.7928H43.7929Z" fill="white"/>
+        <path d="M64.8782 64.5055C64.8782 62.192 64.5933 59.8785 62.5991 57.9448C61.5664 56.9434 59.964 56.2873 57.8629 56.2873C56.1536 56.2873 54.7292 56.9088 54.0526 57.5304V52.2472H64.3085V48.2072H49.8506V62.0884H54.0882C54.4087 61.1215 55.2634 60.0856 57.1507 60.0856C59.3942 60.0856 60.2488 61.674 60.2488 64.5055C60.2488 66.0594 60.0708 67.3715 59.2518 68.1657C58.682 68.7182 57.9342 68.9599 57.0439 68.9599C55.1209 68.9599 54.195 67.855 53.9458 65.9213H49.3164C49.4588 67.7169 49.8149 69.5124 51.3818 71.0318C52.4857 72.1022 54.4087 73 57.0439 73C59.6791 73 61.4952 72.1022 62.6348 70.9972C64.4865 69.2017 64.8782 67.268 64.8782 64.5055Z" fill="white"/>
+        <path d="M84 65.6796V55.3204C84 50.6243 80.4389 48 76.3081 48C72.1773 48 68.5806 50.6243 68.5806 55.3204V65.6796C68.5806 70.3757 72.1773 73 76.3081 73C80.4389 73 84 70.3757 84 65.6796ZM79.3706 65.645C79.3706 67.7169 78.1242 68.9599 76.3081 68.9599C74.492 68.9599 73.21 67.7169 73.21 65.645V55.3895C73.21 53.3177 74.492 52.0401 76.3081 52.0401C78.1242 52.0401 79.3706 53.3177 79.3706 55.3895V65.645Z" fill="white"/>
+    </g>
+</svg>

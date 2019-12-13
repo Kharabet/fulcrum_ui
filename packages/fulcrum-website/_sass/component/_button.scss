@@ -5,6 +5,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  &:hover{
+    box-shadow: 0px 4px 18px rgba(64, 123, 247, 0.5);
+  }
 }
 
 .button-primary {

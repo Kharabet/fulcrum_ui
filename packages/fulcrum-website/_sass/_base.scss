@@ -2,15 +2,19 @@ body {
   font-family: "Muli", sans-serif;
   font-size: 14px;
   font-weight: 400;
-  p{
+  p {
     margin-bottom: 0;
+    line-height: 1.8;
   }
 }
-.mw-870 {
-  max-width: 870px;
-}
-.mw-330{
+.mw-330 {
   max-width: 330px;
+}
+.mw-390 {
+  max-width: 390px;
+}
+.mw-400 {
+  max-width: 400px;
 }
 .text-center {
   text-align: center;
@@ -18,17 +22,18 @@ body {
 .text-left {
   text-align: left;
 }
-
-.bg-image {
-  padding-top: 50px;
+.text-right{
+  text-align: right;
+}
+.bg-primary-image {
   background-repeat: no-repeat;
-  [data-theme="dark"] &{
+  [data-theme="dark"] & {
     background-image: url(/images/bg-dark.svg);
   }
-  [data-theme="light"] &{
+  [data-theme="light"] & {
     background-image: url(/images/bg-light.svg);
   }
-  @media(min-width: 1441px){
+  @media (min-width: 1441px) {
     background-size: cover;
   }
 }
@@ -37,4 +42,7 @@ body {
 }
 .bg-secondary {
   background-color: var(--secondary-bg);
+}
+.bg-blue {
+  background-color: #56a9ff;
 }
