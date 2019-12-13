@@ -1,9 +1,12 @@
-import React, { Component } from "react";
 import { BigNumber } from "@0x/utils";
+import React, { Component } from "react";
+import TagManager from "react-gtm-module";
 import { Asset } from "../domain/Asset";
+import {AssetsDictionary} from "../domain/AssetsDictionary";
 import { PositionType } from "../domain/PositionType";
 import { TradeRequest } from "../domain/TradeRequest";
 import { TradeTokenKey } from "../domain/TradeTokenKey";
+import {TradeType} from "../domain/TradeType";
 import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { TradeTransactionMinedEvent } from "../services/events/TradeTransactionMinedEvent";
@@ -11,11 +14,8 @@ import { FulcrumProvider } from "../services/FulcrumProvider";
 import { TradeTokenGridHeader } from "./TradeTokenGridHeader";
 import { TradeTokenGridHeaderMobile } from "./TradeTokenGridHeaderMobile";
 import { ITradeTokenGridRowProps, TradeTokenGridRow } from "./TradeTokenGridRow";
-import { ITradeTokenGridRowMBProps, TradeTokenGridRowMobile } from "./TradeTokenGridRowMobile";
 import { ITradeTokenGridRowFooterMBProps, TradeTokenGridRowMobileFooter } from "./TradeTokenGridRowFooterMobile";
-import {TradeType} from "../domain/TradeType";
-import {AssetsDictionary} from "../domain/AssetsDictionary";
-import TagManager from "react-gtm-module";
+import { ITradeTokenGridRowMBProps, TradeTokenGridRowMobile } from "./TradeTokenGridRowMobile";
 
 
 // import siteConfig from "./../config/SiteConfig.json";
@@ -150,8 +150,8 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
   public onBuyClick = (event: React.MouseEvent<HTMLElement>) => {
     event.stopPropagation();
     const e = this.state.tokenRowsData[0];
-    console.log("e = ",e)
-    console.log("e = ",e.selectedKey.leverage)
+    // console.log("e = ",e)
+    // console.log("e = ",e.selectedKey.leverage)
     // console.log("this.props.defaultTokenizeNeeded = ",this.props.defaultTokenizeNeeded)
     // console.log("this.props.defaultUnitOfAccount = ",this.props.defaultUnitOfAccount)
 
@@ -167,7 +167,7 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
                             dataLayerName: 'PageDataLayer'
                         }
 
-    console.log("tagManagerArgs = "+tagManagerArgs)
+    // console.log("tagManagerArgs = "+tagManagerArgs)
     TagManager.dataLayer(tagManagerArgs)
     //
     this.props.onTrade(

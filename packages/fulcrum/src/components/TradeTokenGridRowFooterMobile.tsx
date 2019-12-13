@@ -1,5 +1,6 @@
 import { BigNumber } from "@0x/utils";
 import React, { Component } from "react";
+import TagManager from "react-gtm-module";
 import { Asset } from "../domain/Asset";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
@@ -12,11 +13,10 @@ import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents"
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { TradeTransactionMinedEvent } from "../services/events/TradeTransactionMinedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
+import configProviders from "./../config/providers.json";
 // import { Change24HMarker, Change24HMarkerSize } from "./Change24HMarker";
 import { LeverageSelector } from "./LeverageSelector";
 import { PositionTypeMarker } from "./PositionTypeMarker";
-import TagManager from "react-gtm-module";
-import configProviders from "./../config/providers.json";
 // const tagManagerArgs = {
 //     gtmId: configProviders.Google_TrackingID
 // }
@@ -259,7 +259,7 @@ export class TradeTokenGridRowMobileFooter extends Component<ITradeTokenGridRowF
                             },
                             dataLayerName: 'PageDataLayer'
                         }
-    console.log("tagManagerArgs = "+tagManagerArgs)
+    // console.log("tagManagerArgs = "+tagManagerArgs)
     TagManager.dataLayer(tagManagerArgs)
 
     this.props.onTrade(

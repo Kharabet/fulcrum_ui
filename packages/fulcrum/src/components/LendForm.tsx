@@ -55,6 +55,7 @@ interface ILendFormState {
   iTokenAddress: string;
   maybeNeedsApproval: boolean;
   useWrapped: boolean;
+  tokenPrice: BigNumber | null;
 }
 
 export class LendForm extends Component<ILendFormProps, ILendFormState> {
@@ -84,7 +85,8 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
       ethBalance: null,
       iTokenAddress: "",
       maybeNeedsApproval: false,
-      useWrapped: false
+      useWrapped: false,
+      tokenPrice: null
     };
 
     this._inputChange = new Subject();
@@ -128,9 +130,12 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
       assetDetails = AssetsDictionaryMobile.assets.get(this.props.asset);
     }
     const interestRate = await FulcrumProvider.Instance.getLendTokenInterestRate(this.props.asset);
-    const maxLendAmount = (await FulcrumProvider.Instance.getMaxLendValue(
+    const maxLendAmountArr = (await FulcrumProvider.Instance.getMaxLendValue(
       new LendRequest(this.props.lendType, this.state.useWrapped ? Asset.WETH : this.props.asset, new BigNumber(0))
     ));
+    const maxLendAmount: BigNumber = maxLendAmountArr[0];
+    const tokenPrice: BigNumber = maxLendAmountArr[1];
+
     const lendRequest = new LendRequest(this.props.lendType, this.state.useWrapped ? Asset.WETH : this.props.asset, maxLendAmount);
     const lendedAmountEstimate = await FulcrumProvider.Instance.getLendedAmountEstimate(lendRequest);
     const ethBalance = await FulcrumProvider.Instance.getEthBalance();
@@ -138,7 +143,9 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
       await FulcrumProvider.Instance.contractsSource.getITokenErc20Address(this.props.asset) || "" :
       "";
 
-    const maybeNeedsApproval = await FulcrumProvider.Instance.checkCollateralApprovalForLend(this.state.useWrapped ? Asset.WETH : this.props.asset);
+    const maybeNeedsApproval = this.props.lendType === LendType.LEND ?
+      await FulcrumProvider.Instance.checkCollateralApprovalForLend(this.state.useWrapped ? Asset.WETH : this.props.asset) :
+      false;
 
     this.setState({
       ...this.state,
@@ -150,7 +157,8 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
       interestRate: interestRate,
       ethBalance: ethBalance,
       iTokenAddress: address,
-      maybeNeedsApproval: maybeNeedsApproval
+      maybeNeedsApproval: maybeNeedsApproval,
+      tokenPrice: tokenPrice
     });
   }
 
@@ -200,8 +208,10 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
     const tokenNameBase = this.state.assetDetails.displayName;
     const tokenNamePosition = `i${this.state.assetDetails.displayName}`;
 
-    const tokenNameSource = this.props.lendType === LendType.LEND ? tokenNameBase : tokenNamePosition;
-    const tokenNameDestination = this.props.lendType === LendType.LEND ? tokenNamePosition : tokenNameBase;
+    // const tokenNameSource = this.props.lendType === LendType.LEND ? tokenNameBase : tokenNamePosition;
+    // const tokenNameDestination = this.props.lendType === LendType.LEND ? tokenNamePosition : tokenNameBase;
+    const tokenNameSource = tokenNameBase;
+    const tokenNameDestination = tokenNamePosition;
 
     const isAmountMaxed = this.state.lendAmount ? this.state.lendAmount.eq(this.state.maxLendAmount!) : false;
 
@@ -238,7 +248,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
             </div>
             <div className="lend-form__kv-container">
               <div className="lend-form__label">{this.props.lendType === LendType.LEND ? `Lend Amount` : `UnLend Amount`}</div>
-              {this.props.lendType !== LendType.LEND &&
+              {/*this.props.lendType !== LendType.LEND &&
                 this.state.iTokenAddress &&
                 FulcrumProvider.Instance.web3ProviderSettings &&
                 FulcrumProvider.Instance.web3ProviderSettings.etherscanURL ? (
@@ -255,6 +265,13 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
                   </a>
                 </div>
               ) :
+                this.props.asset === Asset.ETH ? (
+                  <EthOrWethSelector items={[Asset.ETH, Asset.WETH]} value={this.state.useWrapped ? Asset.WETH : Asset.ETH} onChange={this.onChangeUseWrapped} />
+                ) : (
+                  <div className="lend-form__value">{tokenNameSource}</div>
+                )
+              */}
+              {
                 this.props.asset === Asset.ETH ? (
                   <EthOrWethSelector items={[Asset.ETH, Asset.WETH]} value={this.state.useWrapped ? Asset.WETH : Asset.ETH} onChange={this.onChangeUseWrapped} />
                 ) : (
@@ -288,7 +305,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
                 >
                   {/*<span className="rounded-mark">?</span>*/}
                 </Tooltip>
-                {this.props.lendType === LendType.LEND &&
+                {
                   this.state.iTokenAddress &&
                   FulcrumProvider.Instance.web3ProviderSettings &&
                   FulcrumProvider.Instance.web3ProviderSettings.etherscanURL ? (
@@ -395,12 +412,16 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
       return;
     }
 
-    if (!this.state.lendAmount.isPositive()) {
+    if (!this.state.lendAmount.isPositive() || !this.state.tokenPrice) {
       this.props.onCancel();
       return;
     }
 
-    let usdPrice = this.state.lendAmount
+    const sendAmount = this.props.lendType === LendType.LEND ?
+      this.state.lendAmount :
+      this.state.lendAmount.multipliedBy(10 ** 18).dividedBy(this.state.tokenPrice);
+
+    let usdPrice = sendAmount
     if(usdPrice != null){
         usdPrice = usdPrice.multipliedBy(usdAmount)
     }
@@ -426,7 +447,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
       new LendRequest(
         this.props.lendType,
         this.state.useWrapped ? Asset.WETH : this.props.asset,
-        this.state.lendAmount
+        sendAmount
       )
     );
   };

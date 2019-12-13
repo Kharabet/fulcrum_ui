@@ -207,7 +207,7 @@ export class FulcrumProvider {
     this.providerEngine = providerData[1];
     let canWrite = providerData[2];
     let networkId = providerData[3];
-    let sellectedAccount = providerData[4];
+    const sellectedAccount = providerData[4];
 
     this.web3ProviderSettings = await FulcrumProvider.getWeb3ProviderSettings(networkId);
     if (this.web3Wrapper) {
@@ -223,7 +223,7 @@ export class FulcrumProvider {
 
     if (this.web3Wrapper && canWrite) {
       try {
-        this.accounts = [sellectedAccount] //await this.web3Wrapper.getAvailableAddressesAsync() || [];
+        this.accounts = [sellectedAccount] // await this.web3Wrapper.getAvailableAddressesAsync() || [];
       } catch(e) {
         // console.log(e);
         this.accounts = [];
@@ -754,8 +754,9 @@ export class FulcrumProvider {
     return result;
   };
 
-  public getMaxLendValue = async (request: LendRequest): Promise<BigNumber> => {
+  public getMaxLendValue = async (request: LendRequest): Promise<[BigNumber, BigNumber]> => {
     let result = new BigNumber(0);
+    let tokenPrice = new BigNumber(0);
 
     if (request.lendType === LendType.LEND) {
       result = await this.getAssetTokenBalanceOfUser(request.asset);
@@ -763,20 +764,27 @@ export class FulcrumProvider {
         result = result.gt(this.gasBufferForLend) ? result.minus(this.gasBufferForLend) : new BigNumber(0);
       }
     } else {
-      result = await this.getITokenBalanceOfUser(request.asset);
-      /*if (this.contractsSource) {
+      /*result =
+        request.lendType === LendType.LEND
+          ? request.amount.multipliedBy(10 ** 18).dividedBy(tokenPrice)
+          : request.amount.multipliedBy(tokenPrice).dividedBy(10 ** 18);*/
+      if (this.contractsSource) {
         const assetContract = await this.contractsSource.getITokenContract(request.asset);
         if (assetContract) {
-          const tokenPrice = await assetContract.tokenPrice.callAsync();
-          const amount = await this.getITokenBalanceOfUser(request.asset);
-          result = amount.multipliedBy(tokenPrice).dividedBy(10 ** 18);
+          tokenPrice = await assetContract.tokenPrice.callAsync();
+          const freeSupply = (await assetContract.marketLiquidity.callAsync()).multipliedBy(0.95); 
+          const userBalance = (await this.getITokenBalanceOfUser(request.asset)).multipliedBy(tokenPrice).dividedBy(10 ** 18);
+
+          result = freeSupply.lt(userBalance) ?
+            freeSupply :
+            userBalance;
         }
-      }*/
+      }
     }
 
     result = result.dividedBy(10 ** 18);
 
-    return result;
+    return [result, tokenPrice];
   };
 
   public getPTokenPrice = async (selectedKey: TradeTokenKey): Promise<BigNumber> => {
@@ -881,10 +889,11 @@ export class FulcrumProvider {
       if (assetContract) {
         const tokenPrice = await assetContract.tokenPrice.callAsync();
 
-        result =
+        /*result =
           request.lendType === LendType.LEND
             ? request.amount.multipliedBy(10 ** 18).dividedBy(tokenPrice)
-            : request.amount.multipliedBy(tokenPrice).dividedBy(10 ** 18);
+            : request.amount.multipliedBy(tokenPrice).dividedBy(10 ** 18);*/
+          result = request.amount.multipliedBy(10 ** 18).dividedBy(tokenPrice);
       }
     }
 

@@ -101,7 +101,7 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
     const priceGraphData = await FulcrumProvider.Instance.getPriceDataPoints(this.state.selectedKey);
     this.setState({ ...this.state, selectedKey: this.state.selectedKey, priceGraphData: priceGraphData });
   }
-  changeActiveBtn(activeType:string) {
+  public changeActiveBtn(activeType:string) {
     if(activeType=='long'){
       this.setState({ ...this.state, isLong: true, isShort:false });
     }else{

@@ -229,7 +229,9 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       ? await FulcrumProvider.Instance.contractsSource.getPTokenErc20Address(tradeTokenKey) || ""
       : "";
 
-    const maybeNeedsApproval = await FulcrumProvider.Instance.checkCollateralApprovalForTrade(tradeRequest);
+    const maybeNeedsApproval = this.props.tradeType === TradeType.BUY ?
+      await FulcrumProvider.Instance.checkCollateralApprovalForTrade(tradeRequest) :
+      false;
 
     const latestPriceDataPoint = await FulcrumProvider.Instance.getTradeTokenAssetLatestDataPoint(tradeTokenKey);
     const liquidationPrice = new BigNumber(latestPriceDataPoint.liquidationPrice);

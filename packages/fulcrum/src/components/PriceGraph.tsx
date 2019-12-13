@@ -7,8 +7,8 @@ import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { IPriceDataPoint } from "../domain/IPriceDataPoint";
 // import { Change24HMarker, Change24HMarkerSize } from "./Change24HMarker";
 import { TradeTokenKey } from "../domain/TradeTokenKey";
-import { FulcrumProvider } from "../services/FulcrumProvider";
 import {TradeType} from "../domain/TradeType";
+import { FulcrumProvider } from "../services/FulcrumProvider";
 
 export interface IPriceGraphProps {
   data: IPriceDataPoint[];
@@ -89,8 +89,8 @@ export class PriceGraph extends Component<IPriceGraphProps, IPriceGraphState> {
     /*let liq
       const liquidationPrice = this.props.data.length > 0 && this.props.data
       ? */
-    let changeActiveBtn  =   this.props.changeActiveBtn;
-    let isMobileMedia = (window.innerWidth <= 959);
+    const changeActiveBtn  =   this.props.changeActiveBtn;
+    const isMobileMedia = (window.innerWidth <= 959);
     return (
       <div className="price-graph">
         {(isMobileMedia ?
