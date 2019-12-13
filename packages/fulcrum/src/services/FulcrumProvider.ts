@@ -771,16 +771,19 @@ export class FulcrumProvider {
       if (this.contractsSource) {
         const assetContract = await this.contractsSource.getITokenContract(request.asset);
         if (assetContract) {
+          const precision = AssetsDictionary.assets.get(request.asset)!.decimals || 18;
           tokenPrice = await assetContract.tokenPrice.callAsync();
-          const freeSupply = (await assetContract.marketLiquidity.callAsync()).multipliedBy(0.95); 
-          const userBalance = (await this.getITokenBalanceOfUser(request.asset)).multipliedBy(tokenPrice).dividedBy(10 ** 18);
+          const freeSupply = (await assetContract.marketLiquidity.callAsync()).multipliedBy(0.95);
+          const userBalance = (await this.getITokenBalanceOfUser(request.asset)).multipliedBy(tokenPrice).dividedBy(10 ** (36 - precision));
 
           result = freeSupply.lt(userBalance) ?
             freeSupply :
             userBalance;
+          result = result.multipliedBy(10 ** (18 - precision));
         }
       }
     }
+
 
     result = result.dividedBy(10 ** 18);
 
