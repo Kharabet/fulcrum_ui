@@ -19,6 +19,9 @@ body {
 .mw-400 {
   max-width: 400px;
 }
+.w-100{
+  width: 100%;
+}
 .text-center {
   text-align: center;
 }
@@ -60,11 +63,22 @@ body {
     text-align: center;
   }
 }
+@media(max-width: 767px){
+  .text-sm-left{
+    text-align: left;
+  }
+  .mw-sm-440{
+    max-width: 440px;
+  }
+}
 @media(max-width: 579px){
   .hidden-xs{
     display: none;
   }
   .text-xs-center{
     text-align: center;
+  }
+  .mx-xs-345{
+    max-width: 345px;
   }
 }

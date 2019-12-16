@@ -41,6 +41,9 @@
   .jc-md-c{
       justify-content: center;
   }
+  .order-md-1{
+    order: 1;
+  }
 }
 @media (max-width: 767px) {
   .fw-sm-w {
@@ -57,6 +60,9 @@
   }
   .jc-sm-fs {
     justify-content: flex-start;
+  }
+  .as-sm-a{
+    align-self: auto;
   }
   /*.fd-sm-c{
         flex-direction: column;

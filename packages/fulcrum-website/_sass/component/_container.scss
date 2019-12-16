@@ -65,6 +65,9 @@
     padding-left: 15px;
     padding-right: 15px;
   }
+  .col-md-10{
+    width: calc(100% / 12 * 10);
+  }
   .col-md-12{
     width: calc(100% / 12 * 12);
   }
@@ -72,6 +75,9 @@
 @media(max-width: 767px){
   .col-sm-4{
     width: calc(100% / 12 * 4);
+  }
+  .col-sm-6{
+    width: calc(100% / 12 * 6);
   }
   .col-sm-12{
     width: calc(100% / 12 * 12);

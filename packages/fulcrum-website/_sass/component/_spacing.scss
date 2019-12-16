@@ -95,6 +95,10 @@
   .mb-sm-60 {
     margin-bottom: 60px;
   }
+  .mx-sm-auto{
+    margin-left: auto;
+    margin-right: auto;
+  }
   .py-sm-30 {
     padding-top: 30px;
     padding-bottom: 30px;
@@ -106,6 +110,9 @@
 @media (max-width: 579px) {
   .pt-xs-30{
     padding-top: 30px;
+  }
+  .pt-xs-60{
+    padding-top: 60px;
   }
   .pt-xs-90 {
     padding-top: 90px;
@@ -122,11 +129,33 @@
   .pb-xs-75{
     padding-bottom: 75px;
   }
+  .py-xs-25{
+    padding-top: 25px;
+    padding-bottom: 25px;
+  }
+  .py-xs-45{
+    padding-top: 45px;
+    padding-bottom: 45px;
+  }
+  .py-xs-75{
+    padding-top: 75px;
+    padding-bottom: 75px;
+  }
+  .px-xs-40{
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+  .mb-xs-0{
+    margin-bottom: 0;
+  }
   .mb-xs-15 {
     margin-bottom: 15px;
   }
   .mb-xs-30 {
     margin-bottom: 30px;
+  }
+  .mb-xs-40{
+    margin-bottom: 40px;
   }
   .mb-xs-50{
     margin-bottom: 50px;
