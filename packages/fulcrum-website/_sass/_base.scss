@@ -5,6 +5,9 @@ body {
   p {
     margin-bottom: 0;
     line-height: 1.8;
+    @media(max-width: 579px){
+      font-size: 12px;
+    }
   }
 }
 .mw-330 {
@@ -25,7 +28,7 @@ body {
 .text-right{
   text-align: right;
 }
-.bg-primary-image {
+/*.bg-primary-image {
   background-repeat: no-repeat;
   [data-theme="dark"] & {
     background-image: url(/images/bg-dark.svg);
@@ -36,7 +39,7 @@ body {
   @media (min-width: 1441px) {
     background-size: cover;
   }
-}
+}*/
 .bg-primary {
   background-color: var(--primary-bg);
 }
@@ -45,4 +48,23 @@ body {
 }
 .bg-blue {
   background-color: #56a9ff;
+}
+@media(max-width: 991px){
+  .w-md-50{
+    width: 50%;
+  }
+  .w-md-100{
+    width: 100%;
+  }
+  .text-md-center{
+    text-align: center;
+  }
+}
+@media(max-width: 579px){
+  .hidden-xs{
+    display: none;
+  }
+  .text-xs-center{
+    text-align: center;
+  }
 }

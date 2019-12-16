@@ -1,13 +1,14 @@
-<svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M28 10H75L100 35V110H28V10Z" fill="#56A9FF"/>
-<path d="M75 10L100 35L75 35L75 10Z" fill="#276BFB"/>
-<rect x="4" y="61" width="47" height="38" rx="4" fill="#276BFB"/>
-<path fill-rule="evenodd" clip-rule="evenodd" d="M28 44C22.4772 44 18 48.4772 18 54V61H12V54C12 45.1634 19.1634 38 28 38V44Z" fill="#33DFCC"/>
-<path fill-rule="evenodd" clip-rule="evenodd" d="M28 44C33.5228 44 38 48.4772 38 54V61H44V54C44 45.1634 36.8366 38 28 38V44Z" fill="#95E6FF"/>
-<rect x="59" y="60" width="32" height="4" fill="white"/>
-<rect x="59" y="71" width="19" height="4" fill="white"/>
-<rect x="54" y="49" width="37" height="4" fill="white"/>
-<rect x="59" y="94" width="10" height="4" fill="white"/>
-<rect x="78" y="94" width="10" height="4" fill="white"/>
-<path fill-rule="evenodd" clip-rule="evenodd" d="M41.1213 72.1213L25 88.2426L14.8787 78.1213L19.1213 73.8787L25 79.7574L36.8787 67.8787L41.1213 72.1213Z" fill="white"/>
+<svg viewBox="0 0 120 120" fill="none" 
+    xmlns="http://www.w3.org/2000/svg">
+    <path d="M28 10H75L100 35V110H28V10Z" fill="#56A9FF"/>
+    <path d="M75 10L100 35L75 35L75 10Z" fill="#276BFB"/>
+    <rect x="4" y="61" width="47" height="38" rx="4" fill="#276BFB"/>
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M28 44C22.4772 44 18 48.4772 18 54V61H12V54C12 45.1634 19.1634 38 28 38V44Z" fill="#33DFCC"/>
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M28 44C33.5228 44 38 48.4772 38 54V61H44V54C44 45.1634 36.8366 38 28 38V44Z" fill="#95E6FF"/>
+    <rect x="59" y="60" width="32" height="4" fill="white"/>
+    <rect x="59" y="71" width="19" height="4" fill="white"/>
+    <rect x="54" y="49" width="37" height="4" fill="white"/>
+    <rect x="59" y="94" width="10" height="4" fill="white"/>
+    <rect x="78" y="94" width="10" height="4" fill="white"/>
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M41.1213 72.1213L25 88.2426L14.8787 78.1213L19.1213 73.8787L25 79.7574L36.8787 67.8787L41.1213 72.1213Z" fill="white"/>
 </svg>

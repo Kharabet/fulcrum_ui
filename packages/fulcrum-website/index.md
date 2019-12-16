@@ -11,7 +11,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
     <div class="container pt-90 pb-60">
         <div class="row">
             <div class="col col-10">
-                <div class="pl-55">
+                <div class="pl-55 pl-lg-0">
                     <h1 class="mb-40">Margin made simple</h1>
                     <p class="fs-16 lh-160 mb-50 c-secondary"><span class="fw-600">Fulcrum</span> is the most simple and
                         powerful way to lend and margin trade. It is
@@ -41,7 +41,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
         <div class="row fw-w">
             <div class="col col-4">
                 <div class="item-advantager">
-                    <h2 class="circle mb-50"><span class="blue left-r-50 top-10"></span>Why <br /> DeFi Margin Trading
+                    <h2 class="circle mb-50"><span class="blue left-r-50 top-r-10"></span>Why <br /> DeFi Margin Trading
                         <br />
                         Better?
                     </h2>
@@ -215,7 +215,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
     <div class="container">
         <div class="row">
             <div class="col-12">
-                <h2 class="circle mb-65"><span class="blue right-r-50 top-10"></span>How safe it is</h2>
+                <h2 class="circle mb-65"><span class="blue right-r-50 top-r-10"></span>How safe it is</h2>
             </div>
         </div>
         <div class="row jc-sb">

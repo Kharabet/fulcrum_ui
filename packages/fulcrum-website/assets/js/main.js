@@ -47,4 +47,16 @@ window.onload = function () {
         };
     }
 
+    var qualityInput = document.querySelector('.input-quality');
+    var qualityRange = document.querySelector('.range-quality');
+
+
+    qualityRange.onchange = function () {
+        var newVal = this.value;
+        qualityInput.value = newVal;
+    }
+    qualityInput.onchange = function () {
+        var newVal = this.value;
+        qualityRange.value = newVal;
+    }
 };

@@ -35,16 +35,29 @@
   
 }
 .button-lg {
-  width: 250px;
-  height: 80px;
-  font-size: 26px;
-  font-weight: 700;
+  width: 250px;  
+  font-weight: 700;  
+  @media(min-width: 768px){
+    height: 80px;
+    font-size: 26px;
+  }
+  @media(max-width: 767px){
+    height: 65px;
+    font-size: 20px;
+  }
 }
 .button-md {
-  width: 250px;
-  height: 70px;
-  font-size: 22px;
   font-weight: 600;
+  @media(min-width: 768px){
+    width: 250px;
+    height: 70px;
+    font-size: 22px;
+  }
+  @media(max-width: 767px){
+    width: 145px;
+    height: 55px;
+    font-size: 16px;
+  }
 }
 .button-sm {
   width: 180px;
