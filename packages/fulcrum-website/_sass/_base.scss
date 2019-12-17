@@ -65,7 +65,7 @@ body {
 }
 @media(min-width: 768px){
   .hidden-md{
-    display: none;
+    display: none !important;
   }
 }
 @media(max-width: 767px){
