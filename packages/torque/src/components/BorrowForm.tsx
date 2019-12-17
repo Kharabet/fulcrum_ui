@@ -13,6 +13,7 @@ import { ActionViaTransferDetails } from "./ActionViaTransferDetails";
 import { ActionViaWeb3Details } from "./ActionViaWeb3Details";
 import { CollateralTokenSelectorToggle } from "./CollateralTokenSelectorToggle";
 import TagManager from 'react-gtm-module';
+import {FulcrumProvider} from "../../../fulcrum/src/services/FulcrumProvider";
 
 export interface IBorrowFormProps {
   borrowAsset: Asset;
@@ -209,26 +210,29 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
             balanceTooLow: false
           });
         }
-
-        let randomNumber = Math.floor(Math.random() * 100000) + 1;
-        const tagManagerArgs = {
-          dataLayer: {
-              event: 'purchase',
-              transactionId: randomNumber,
-              transactionTotal: this.state.borrowAmount,
-              transactionProducts: [{
-              name: this.state.collateralAsset +'-'+ this.props.walletType ,
-              sku: this.state.collateralAsset +'-'+ this.props.walletType,
-              category: this.props.walletType,
-              price: this.state.borrowAmount,
-              quantity: 1
-            }],
-          }
-        }
-        console.log("tagManagerArgs = ",tagManagerArgs)
-        TagManager.dataLayer(tagManagerArgs)
       }
-
+      let randomNumber = Math.floor(Math.random() * 100000) + 1;
+      const usdAmount = await TorqueProvider.Instance.getSwapToUsdRate(this.props.borrowAsset)
+      let usdPrice = this.state.borrowAmount
+      if(usdPrice != null){
+          usdPrice = usdPrice.multipliedBy(usdAmount)
+      }
+      const tagManagerArgs = {
+        dataLayer: {
+            event: 'purchase',
+            transactionId: randomNumber,
+            transactionTotal: new BigNumber(usdPrice),
+            transactionProducts: [{
+            name: "Borrow-"+this.props.borrowAsset,
+            sku: "Borrow-"+this.props.borrowAsset +'-'+ this.state.collateralAsset ,
+            category: "Borrow",
+            price: new BigNumber(usdPrice),
+            quantity: 1
+          }],
+        }
+      }
+      console.log("tagManagerArgs = ",tagManagerArgs)
+      TagManager.dataLayer(tagManagerArgs)
 
       this.props.onSubmit(
         new BorrowRequest(
