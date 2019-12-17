@@ -50,13 +50,30 @@ window.onload = function () {
     var qualityInput = document.querySelector('.input-quality');
     var qualityRange = document.querySelector('.range-quality');
 
-
-    qualityRange.onchange = function () {
-        var newVal = this.value;
-        qualityInput.value = newVal;
+    if (qualityInput) {
+        qualityRange.oninput = function () {
+            var newVal = this.value;
+            qualityInput.value = newVal;
+        }
     }
-    qualityInput.onchange = function () {
-        var newVal = this.value;
-        qualityRange.value = newVal;
+    if (qualityRange) {
+        qualityInput.oninput = function () {
+            var newVal = this.value;
+            qualityRange.value = newVal;
+        }
+    }
+
+    let openMenu = document.querySelector("#hamburger-menu-open");
+    let closeMenu = document.querySelector("#hamburger-menu-close");
+    let body = document.querySelector('body');
+    openMenu.onclick = function () {
+        openMenu.style.display = 'none';
+        closeMenu.style.display = 'block';
+        body.classList.toggle("open-menu");
+    }
+    closeMenu.onclick = function () {
+        openMenu.style.display = 'block';
+        closeMenu.style.display = 'none';
+        body.classList.toggle("open-menu");
     }
 };

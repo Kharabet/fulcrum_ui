@@ -6,14 +6,14 @@ up to 4x without open fees. ETH and wBTC are available."
 title: Crypto Margin Trading with Fulcrum | bZx
 ---
 
-<section class="bg-primary bg-secondary-image pt-60 pt-xs-30 pb-90 pb-xs-45">
+<section class="bg-primary bg-secondary-image pb-90 pb-xs-45">
     {% include header.html %}
     <div class="container pt-90 pb-60 pb-xs-0 text-xs-center">
         <div class="row">
             <div class="col col-10 col-xs-12">
                 <div class="pl-55 pl-lg-0">
                     <h1 class="mb-40">Earn Interest on Crypto</h1>
-                    <p class="fs-16 lh-160 mb-50 mb-xs-30 c-secondary mw-390">Flexible High-Yield Returns – No Minimum Deposit,
+                    <p class="fs-16 lh-160 mb-50 mx-auto mb-xs-30 c-secondary mw-390">Flexible High-Yield Returns – No Minimum Deposit,
                         no lock
                         up period, withdraw anytime.</p>
                     <div class="flex fd-xs-c">

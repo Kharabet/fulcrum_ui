@@ -63,6 +63,11 @@ body {
     text-align: center;
   }
 }
+@media(min-width: 768px){
+  .hidden-md{
+    display: none;
+  }
+}
 @media(max-width: 767px){
   .text-sm-left{
     text-align: left;

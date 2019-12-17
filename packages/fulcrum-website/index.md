@@ -6,7 +6,7 @@ up to 4x without open fees. ETH and wBTC are available."
 title: Crypto Margin Trading with Fulcrum | bZx
 ---
 
-<section class="bg-primary bg-primary-image pt-60 pb-75 pb-xs-45">
+<section class="bg-primary bg-primary-image pb-75 pb-xs-45">
     {% include header.html %}
     <div class="container pt-90 pb-60">
         <div class="row">

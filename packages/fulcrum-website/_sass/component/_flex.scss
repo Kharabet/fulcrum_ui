@@ -64,9 +64,9 @@
   .as-sm-a{
     align-self: auto;
   }
-  /*.fd-sm-c{
-        flex-direction: column;
-    }*/
+  .ai-sm-ih{
+    align-items: inherit;
+  }
 }
 @media (max-width: 579px) {
   .flex-xs {
