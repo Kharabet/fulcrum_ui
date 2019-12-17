@@ -388,7 +388,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
                     <span>0:50</span>
                 </div>
                 <p class="fs-56 fs-xs-44 fw-400 c-primary-blue mb-40 mb-xs-30 lh-140">$<span class="fw-900">45,459,300</span></p>
-                <a href="#" class="button button-blue button-lg mb-15 mx-auto order-sm-1">Lend</a>
+                <a href="https://fulcrum.trade/lend" class="button button-blue button-lg mb-15 mx-auto order-sm-1">Lend</a>
                 <p class="fs-13 lh-150 text-center c-gray mb-10 mb-sm-25">To Earn interest</p>
             </div>
         </div>

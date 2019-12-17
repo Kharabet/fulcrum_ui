@@ -345,7 +345,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
         </div>
         <div class="row">
             <div class="col col-12">
-                <a href="#" class="button button-sm button-white mx-auto">
+                <a href="https://help.bzx.network/en/" class="button button-sm button-white mx-auto">
                     <span class="mr-15">Help center</span>
                     <span class="icon-arrow">
                         {% include svg/arrow.svg %}
