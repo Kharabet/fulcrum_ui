@@ -377,7 +377,8 @@
   border: 4px solid #ffffff;
   border-radius: 10px;
   display: inline-flex;
-  width: 125px;
+  min-width: 125px;
+  padding: 0 10px;
   justify-content: center;
   position: relative;
   @media (min-width: 580px) {
@@ -445,4 +446,7 @@
     top: -28px;
     font-size: 16px;
   }
+}
+.wrap-hours{
+  display: none;
 }
