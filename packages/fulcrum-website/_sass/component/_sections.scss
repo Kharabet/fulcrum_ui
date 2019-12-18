@@ -1,20 +1,20 @@
 .item-advantager {
-  @media(min-width: 580px){
+  @media (min-width: 580px) {
     margin-bottom: 60px;
   }
-  @media(max-width: 579px){
+  @media (max-width: 579px) {
     margin-bottom: 30px;
   }
   p {
     color: var(--secondary-color);
   }
-  .icon-advantager{
-    svg{
-      @media(min-width: 580px){
+  .icon-advantager {
+    svg {
+      @media (min-width: 580px) {
         width: 120px;
         height: 120px;
       }
-      @media(max-width: 579px){
+      @media (max-width: 579px) {
         width: 80px;
         height: 80px;
       }
@@ -31,10 +31,10 @@
     height: 37px;
     left: 0;
     bottom: 0;
-    @media(max-width: 767px){
+    @media (max-width: 767px) {
       height: 159px;
     }
-    @media(max-width: 579px){
+    @media (max-width: 579px) {
       height: 135px;
     }
   }
@@ -44,11 +44,11 @@
   }
   .item-coin {
     svg {
-      @media(min-width: 580px){
+      @media (min-width: 580px) {
         width: 66px;
         height: 66px;
       }
-      @media(max-width: 579px){
+      @media (max-width: 579px) {
         width: 50px;
         height: 50px;
       }
@@ -90,7 +90,7 @@
 .item-blog {
   background-color: var(--secondary-bg);
   border-radius: 16px;
-  @media(max-width: 767px){
+  @media (max-width: 767px) {
     max-width: 350px;
     margin: 0 auto 20px auto;
   }
@@ -264,32 +264,6 @@
     outline: none;
     margin-top: 8px;
   }
-  input[type="range"] {
-    -webkit-appearance: none;
-    outline: none;
-    width: 225px;
-    margin-left: 5px;
-  }
-  input[type="range"]::-webkit-slider-runnable-track {
-    -webkit-appearance: none;
-    background-color: #cbe2ff;
-    width: 210px;
-    height: 4px;
-    border-radius: 10px;
-    cursor: pointer;
-    margin-top: -4px;
-  }
-  input[type="range"]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    background-color: #276bfb;
-    border: 3px solid transparent;
-    width: 16px;
-    height: 16px;
-    border-radius: 10px;
-    margin-top: -6px;
-    cursor: pointer;
-    box-shadow: 0px 2px 8px rgba(64, 123, 247, 0.8);
-  }
   .coins-calc {
     padding: 30px 30px 0 30px;
     @media (min-width: 992px) {
@@ -447,6 +421,6 @@
     font-size: 16px;
   }
 }
-.wrap-hours{
+.wrap-hours {
   display: none;
 }
