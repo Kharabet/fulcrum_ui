@@ -76,7 +76,8 @@ window.onload = function () {
         closeMenu.style.display = 'none';
         body.classList.toggle("open-menu");
     }
-    timer();
+    if (document.querySelector(".seconds") && document.querySelector(".minutes") && document.querySelector(".hours"))
+        timer();
 };
 
 function timer() {
