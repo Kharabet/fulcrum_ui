@@ -22,6 +22,7 @@
   }
   p {
     margin-bottom: 10px;
+    color: var(--primary-color);
     &:first-of-type {
       font-size: 16px;
       font-weight: 600;
@@ -45,6 +46,7 @@
   ol {
     padding-left: 22px;
     counter-reset: list;
+    color: var(--primary-color);
     li {
       font-weight: 900;
       @media (min-width: 580px) {
@@ -126,6 +128,7 @@
     }
     ul,
     a {
+      color: var(--primary-color);
       padding-left: 30px;
       @media (min-width: 768px) {
         font-size: 18px;
