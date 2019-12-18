@@ -1,0 +1,138 @@
+.privacy {
+  font-size: 14px;
+  line-height: 1.8;
+  h1 {
+    font-size: 56px;
+    margin-bottom: 50px;
+    @media (max-width: 991px) {
+      font-size: 44px;
+    }
+    @media (max-width: 579px) {
+      font-size: 28px;
+      margin-bottom: 15px;
+    }
+  }
+  h2 {
+    font-size: 22px;
+    margin-bottom: 30px;
+    @media (max-width: 579px) {
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+  }
+  p {
+    margin-bottom: 10px;
+    &:first-of-type {
+      font-size: 16px;
+      font-weight: 600;
+      color: #276bfb;
+      margin-bottom: 30px;
+    }
+  }
+  a {
+    color: #276bfb;
+    &:hover {
+      color: #5b88ff;
+    }
+  }
+  #please-read-carefully {
+    color: #ff4f4f;
+    margin-bottom: 15px;
+    @media (min-width: 580px) {
+      margin-bottom: 30px;
+    }
+  }
+  ol {
+    padding-left: 22px;
+    counter-reset: list;
+    li {
+      font-weight: 900;
+      @media (min-width: 580px) {
+        font-size: 20px;
+        margin-bottom: 40px;
+      }
+      @media (max-width: 579px) {
+        font-size: 16px;
+        margin-bottom: 20px;
+      }
+    }
+    > li {
+      counter-increment: list;
+    }
+    ol {
+      list-style: none;
+
+      position: relative;
+      padding-left: 22px;
+      @media (min-width: 768px) {
+        margin-top: 25px;
+        padding-left: 65px;
+      }
+      @media (max-width: 579px) {
+        margin-top: 10px;
+      }
+
+      li {
+        font-weight: 400;
+        margin-bottom: 0;
+        @media (min-width: 580px) {
+          font-size: 14px;
+        }
+        @media (max-width: 579px) {
+          font-size: 12px;
+        }
+      }
+      > li:before {
+        content: counters(list, ".");
+        position: absolute;
+        font-size: 14px;
+        font-weight: 800;
+
+        @media (min-width: 768px) {
+          left: 25px;
+        }
+        @media (max-width: 767px) {
+          left: -6px;
+        }
+      }
+    }
+    ul {
+      counter-reset: listStyle;
+      list-style: none;
+      position: relative;
+      margin-top: 10px;
+      > li {
+        counter-increment: listStyle;
+        padding-left: 30px;
+        &:before {
+          content: counter(listStyle, lower-alpha) ".";
+          position: absolute;
+          font-size: 14px;
+          font-weight: 800;
+          left: 0;
+        }
+        margin-bottom: 10px;
+      }
+    }
+  }
+  .contact {
+    @media (min-width: 768px) {
+      padding-left: 102px;
+    }
+    p {
+      font-size: 14px;
+      color: #8992a4;
+      margin-bottom: 15px;
+    }
+    ul,
+    a {
+      padding-left: 30px;
+      @media (min-width: 768px) {
+        font-size: 18px;
+      }
+    }
+    ul {
+      list-style: none;
+    }
+  }
+}
