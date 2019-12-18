@@ -36,6 +36,16 @@ export class NavService {
     const walletTypeAbbr = walletTypeToWalletTypeAbbr(walletType);
     return `/dashboard/${walletTypeAbbr}/${walletAddress}`;
   };
+
+   public getRefinanceAddress = (
+    destinationAbbr: string // "b" - borrow, "t" - track, dashboard
+  ) => {
+    return `/refinance/${destinationAbbr}`;
+    /*// return `/dashboard/n`;
+    return destinationAbbr === "t" ?
+      `/dashboard/n` :
+      `/borrow/n`;*/
+  };
 }
 
 // tslint:disable-next-line:no-unused-expression

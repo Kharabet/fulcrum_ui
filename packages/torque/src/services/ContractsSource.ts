@@ -1,6 +1,7 @@
 import * as _ from "lodash";
 
 import { erc20Contract } from "../contracts/erc20";
+import { GetCdpsContract } from "../contracts/getCdps";
 import { iBZxContract } from "../contracts/iBZxContract";
 import { iENSOwnerContract } from "../contracts/iENSOwnerContract";
 import { iTokenContract } from "../contracts/iTokenContract";
@@ -15,6 +16,7 @@ export class ContractsSource {
   private static isInit = false;
 
   private erc20Json: any;
+  private cdpsJson: any;
   private iBZxJson: any;
   private iTokenJson: any;
   private oracleJson: any;
@@ -182,7 +184,7 @@ export class ContractsSource {
             address = "0xBA9262578EFef8b3aFf7F60Cd629d6CC8859C8b5";
             break;
         }
-        break;        
+        break;
       case Asset.ZRX:
         switch (this.networkId) {
           case 1:
@@ -333,6 +335,7 @@ export class ContractsSource {
     }
     const network = ethNetwork || "1";
     this.erc20Json = await import(`./../assets/artifacts/${network}/erc20.json`);
+    this.cdpsJson = await import(`./../assets/artifacts/${network}/GetCdps.json`);
     this.iBZxJson = await import(`./../assets/artifacts/${network}/iBZx.json`);
     this.iTokenJson = await import(`./../assets/artifacts/${network}/iToken.json`);
     this.oracleJson = await import(`./../assets/artifacts/${network}/oracle.json`);
@@ -344,7 +347,12 @@ export class ContractsSource {
     await this.Init();
     return new erc20Contract(this.erc20Json.abi, addressErc20.toLowerCase(), this.provider);
   }
+  private async getCdpContractRaw(addresscdp: string): Promise<GetCdpsContract> {
+    await this.Init();
+    return new GetCdpsContract(this.cdpsJson.abi, addresscdp.toLowerCase(), this.provider);
+  }
 
+  public getCdpContract = _.memoize(this.getCdpContractRaw);
   public getErc20Contract = _.memoize(this.getErc20ContractRaw);
   public getiBZxContract = _.memoize(this.getiBZxContractRaw);
   public getiTokenContract = _.memoize(this.getiTokenContractRaw);

@@ -12,20 +12,30 @@ import { LandingPage } from "../pages/LandingPage";
 import { LandingPageStatic } from "../pages/LandingPageStatic";
 import { MaintenancePage } from "../pages/MaintenancePage";
 import { WalletSelectionPage } from "../pages/WalletSelectionPage";
+import { RefinancePage } from "../pages/RefinancePage";
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { TorqueProviderEvents } from "../services/events/TorqueProviderEvents";
 import { NavService } from "../services/NavService";
 import { TorqueProvider } from "../services/TorqueProvider";
 import { LocationListener } from "./LocationListener";
+import TagManager from 'react-gtm-module';
 
 import siteConfig from "./../config/SiteConfig.json";
 
-const isMainnetProd = 
+const isMainnetProd =
   process.env.NODE_ENV && process.env.NODE_ENV !== "development"
   && process.env.REACT_APP_ETH_NETWORK === "mainnet";
 
 if (isMainnetProd) {
-  ReactGA.initialize(configProviders.Google_TrackingID);
+  const tagManagerArgs = {
+     gtmId : configProviders.Google_TrackingID,
+     'dataLayer' : {
+              'name' : "Home",
+              'status' : "Intailized"
+          }
+  }
+  TagManager.initialize(tagManagerArgs)
+  // ReactGA.initialize(configProviders.Google_TrackingID);
 }
 
 interface IAppRouterState {
@@ -72,8 +82,8 @@ export class AppRouter extends Component<any, IAppRouterState> {
                       </Switch>
                       {isMainnetProd ? (
                         <Route path="/" render={({location}) => {
-                          ReactGA.ga('set', 'page', location.pathname + location.search);
-                          ReactGA.ga('send', 'pageview');
+                           ReactGA.ga('set', 'page', location.pathname + location.search);
+                           ReactGA.ga('send', 'pageview');
                           return null;
                         }} />
                       ) : ``}
@@ -88,12 +98,13 @@ export class AppRouter extends Component<any, IAppRouterState> {
                         <Route exact={true} path="/borrow/:walletTypeAbbr" render={props => <BorrowPage {...props} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} />} />
                         <Route exact={true} path="/dashboard/:walletTypeAbbr" render={props => <DashboardPage {...props} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} />} />
                         <Route exact={true} path="/dashboard/:walletTypeAbbr/:walletAddress" render={props => <DashboardPage {...props} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} />} />
+                        <Route exact={true} path="/refinance/:walletTypeAbbr" render={props => <RefinancePage {...props} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} />} />
                         <Route path="*" render={() => <Redirect to="/"/> } />
                       </Switch>
                       {isMainnetProd ? (
                         <Route path="/" render={({location}) => {
-                          ReactGA.ga('set', 'page', location.pathname + location.search);
-                          ReactGA.ga('send', 'pageview');
+                           ReactGA.ga('set', 'page', location.pathname + location.search);
+                           ReactGA.ga('send', 'pageview');
                           return null;
                         }} />
                       ) : ``}
@@ -135,7 +146,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
 
       return;
     }
-    
+
     TorqueProvider.Instance.isLoading = true;
 
     await TorqueProvider.Instance.eventEmitter.emit(TorqueProviderEvents.ProviderIsChanging);

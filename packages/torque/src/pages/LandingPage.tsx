@@ -18,7 +18,7 @@ export class LandingPage extends PureComponent {
       accountAddress
         ? NavService.Instance.getDashboardAddress(WalletType.Web3, accountAddress)
         : NavService.Instance.getWalletAddress("t");
-
+    const refinanceLoanUrl = NavService.Instance.getRefinanceAddress("b");
     return (
       <div className="landing-page">
         <HeaderHome isLoading={false} />
@@ -30,6 +30,7 @@ export class LandingPage extends PureComponent {
             <div className="landing-page__jumbo-action-container">
               <ButtonLanding color={ButtonLandingColor.Blue} subtitle={"New user?"} title={"Borrow"} url={walletUrl} />
               <ButtonLanding color={ButtonLandingColor.Green} subtitle={"Existing user?"} title={"Track your loans"} url={trackLoansUrl} />
+              <ButtonLanding color={ButtonLandingColor.Purple} subtitle={"Already have a loan?"} title={"Refinance"} url={refinanceLoanUrl} />
             </div>
           </div>
         </main>

@@ -14,6 +14,7 @@
 
 @import "components/asset-selector";
 @import "components/asset-selector.mobile";
+@import "components/refinance-asset-selector";
 @import "components/borrow-form";
 @import "components/borrow-form.mobile";
 @import "components/borrow-via-transfer-address-qr-form";
@@ -55,6 +56,7 @@
 @import "layout/header-menu.mobile";
 
 @import "pages/borrow-page";
+@import "pages/refinance-page";
 @import "pages/dashboard-page";
 @import "pages/landing-page";
 @import "pages/landing-page.mobile";

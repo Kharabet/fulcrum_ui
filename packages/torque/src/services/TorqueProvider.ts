@@ -3,6 +3,7 @@ import { BigNumber } from "@0x/utils";
 import { Web3Wrapper } from "@0x/web3-wrapper";
 import { EventEmitter } from "events";
 import { erc20Contract } from "../contracts/erc20";
+import { GetCdpsContract } from "../contracts/getCdps";
 import { Asset } from "../domain/Asset";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { BorrowRequest } from "../domain/BorrowRequest";
@@ -59,6 +60,9 @@ export class TorqueProvider {
   public accounts: string[] = [];
   public isLoading: boolean = false;
   public unsupportedNetwork: boolean = false;
+  public static readonly UNLIMITED_ALLOWANCE_IN_BASE_UNITS = new BigNumber(2)
+    .pow(256)
+    .minus(1);
 
   public destinationAbbr: string = "";
 
@@ -396,6 +400,74 @@ export class TorqueProvider {
     return result;
   }
 
+  public async getSwapToUsdRate(asset: Asset): Promise<BigNumber> {
+    if (asset === Asset.SAI || asset === Asset.DAI || asset === Asset.USDC || asset === Asset.SUSD) {
+      return new BigNumber(1);
+    }
+
+    return this.getSwapRate(
+      asset,
+      Asset.SAI
+    );
+  }
+
+  public async getSwapRate(srcAsset: Asset, destAsset: Asset, srcAmount?: BigNumber): Promise<BigNumber> {
+    if (srcAsset === destAsset) {
+      return new BigNumber(1);
+    }
+
+    let result: BigNumber = new BigNumber(0);
+
+    if (process.env.REACT_APP_ETH_NETWORK === "mainnet") {
+      if (!srcAmount) {
+        srcAmount = TorqueProvider.UNLIMITED_ALLOWANCE_IN_BASE_UNITS;
+      } else {
+        srcAmount = new BigNumber(srcAmount.toFixed(0, 1));
+      }
+
+      const srcAssetErc20Address = this.getErc20AddressOfAsset(srcAsset);
+      const destAssetErc20Address = this.getErc20AddressOfAsset(destAsset);
+      if (this.contractsSource && srcAssetErc20Address && destAssetErc20Address) {
+        const oracleContract = await this.contractsSource.getOracleContract();
+        try {
+          const swapPriceData: BigNumber[] = await oracleContract.getTradeData.callAsync(
+            srcAssetErc20Address,
+            destAssetErc20Address,
+            srcAmount
+          );
+          result = swapPriceData[0].dividedBy(10 ** 18);
+        } catch(e) {
+          result = new BigNumber(0);
+        }
+      }
+    } else {
+      if (!srcAmount) {
+        srcAmount = this.getGoodSourceAmountOfAsset(srcAsset);
+      }
+
+      const srcAssetErc20Address = this.getErc20AddressOfAsset(srcAsset);
+      const destAssetErc20Address = this.getErc20AddressOfAsset(destAsset);
+      if (this.contractsSource && srcAssetErc20Address && destAssetErc20Address) {
+        const oracleContract = await this.contractsSource.getOracleContract();
+        // result is always base 18, looks like srcQty too, see https://developer.kyber.network/docs/KyberNetworkProxy/#getexpectedrate
+        try {
+          const swapPriceData: BigNumber[] = await oracleContract.getExpectedRate.callAsync(
+            srcAssetErc20Address,
+            destAssetErc20Address,
+            new BigNumber(srcAmount.toFixed(0, 1))
+          );
+          result = swapPriceData[0].dividedBy(10 ** 18);
+        } catch(e) {
+          // console.log(e);
+          result = new BigNumber(0);
+        }
+      }
+    }
+
+    return result;
+  }
+
+
   public checkENSSetup = async (user: string): Promise<boolean | undefined> => {
     let result;
     if (this.contractsSource && this.web3Wrapper) {
@@ -425,6 +497,33 @@ export class TorqueProvider {
           await tokenErc20Contract.approve.sendTransactionAsync(spender, TorqueProvider.MAX_UINT, { from: account });
         }
         result = true;
+      }
+    }
+
+    return result;
+  }
+  public checkCdp = async (asset: Asset): Promise<boolean> => {
+    let result = false;
+    console.log("this.web3Wrapper =",this.web3Wrapper)
+    console.log("this.contractsSource =",this.contractsSource)
+    // console.log("this.contractsSource.canWrite =",this.contractsSource.canWrite)
+    if (this.web3Wrapper && this.contractsSource) {
+      const iTokenContract = await this.contractsSource.getiTokenContract(asset);
+      let tokencdpContract: GetCdpsContract | null = null;
+
+      console.log("iTokenContract.address = ",iTokenContract.address)
+      tokencdpContract = await this.contractsSource.getCdpContract("0x592301a23d37c591c5856f28726af820af8e7014");
+
+      const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+      console.log("account = ",account)
+      console.log("tokencdpContract = ",tokencdpContract)
+      if (account && tokencdpContract) {
+        const cdpsresult = await tokencdpContract.getCdpsAsc.callAsync("0x1476483dd8c35f25e568113c5f70249d3976ba21", "0x10ee10ed82d7f97db0b83853ee68efe9235efb63");
+        console.log("cdpsresult = ",cdpsresult)
+        // if (amountInBaseUnits.gt(cdpsallowance)) {
+        //   await tokencdpContract.getCdpsDesc.callAsync(spender, TorqueProvider.MAX_UINT, { from: account });
+        // }
+        // result = true;
       }
     }
 
@@ -795,7 +894,7 @@ export class TorqueProvider {
       dangerZone = 0.50;
       liquidationZone = 0.40;
     }*/
-    
+
     if (borrowedFundsState.collateralizedPercent.gt(dangerZone)) {
       return "Safe";
     } else if (borrowedFundsState.collateralizedPercent.gt(liquidationZone)) {
