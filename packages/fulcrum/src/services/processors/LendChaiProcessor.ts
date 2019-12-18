@@ -1,4 +1,5 @@
 import { BigNumber } from "bignumber.js";
+import { erc20Contract } from "../../contracts/erc20";
 import { iTokenContract } from "../../contracts/iTokenContract";
 import { AssetsDictionary } from "../../domain/AssetsDictionary";
 import { LendRequest } from "../../domain/LendRequest";
@@ -6,7 +7,7 @@ import { RequestTask } from "../../domain/RequestTask";
 import { FulcrumProviderEvents } from "../events/FulcrumProviderEvents";
 import { FulcrumProvider } from "../FulcrumProvider";
 
-export class UnlendEthProcessor {
+export class LendChaiProcessor {
   public run = async (task: RequestTask, account: string, skipGas: boolean) => {
     if (!(FulcrumProvider.Instance.contractsSource && FulcrumProvider.Instance.contractsSource.canWrite)) {
       throw new Error("No provider available!");
@@ -23,36 +24,63 @@ export class UnlendEthProcessor {
 
     task.processingStart([
       "Initializing",
-      "Closing loan",
+      "Detecting token allowance",
+      "Prompting token allowance",
+      "Waiting for token allowance",
+      "Submitting loan",
       "Updating the blockchain",
       "Transaction completed"
     ]);
 
-    // no additional inits or checks
+    // init erc20 contract for base token
+    let tokenErc20Contract: erc20Contract | null = null;
+    const assetErc20Address = FulcrumProvider.Instance.getErc20AddressOfAsset(taskRequest.asset);
+    if (assetErc20Address) {
+      tokenErc20Contract = await FulcrumProvider.Instance.contractsSource.getErc20Contract(assetErc20Address);
+    }
+
+    if (!tokenErc20Contract) {
+      throw new Error("No ERC20 contract available!");
+    }
     task.processingStepNext();
 
-    let gasAmountBN;
-
-    // Waiting for token allowance
-    if (skipGas) {
-      gasAmountBN = new BigNumber(600000);
-    } else {
-      // estimating gas amount
-      const gasAmount = await tokenContract.burnToChai.estimateGasAsync(account, amountInBaseUnits, { from: account, gas: FulcrumProvider.Instance.gasLimit });
-      gasAmountBN = new BigNumber(gasAmount).multipliedBy(FulcrumProvider.Instance.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
-    }
+    // Detecting token allowance
+    let approvePromise: Promise<string> | null = null;
+    const erc20allowance = await tokenErc20Contract.allowance.callAsync(account, tokenContract.address);
+    task.processingStepNext();
 
     let txHash: string = "";
     try {
       FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.AskToOpenProgressDlg);
 
-      // Submitting unloan
-      txHash = await tokenContract.burnToChai.sendTransactionAsync(account, amountInBaseUnits, {
+      // Prompting token allowance
+      if (amountInBaseUnits.gt(erc20allowance)) {
+        approvePromise = tokenErc20Contract.approve.sendTransactionAsync(tokenContract.address, FulcrumProvider.UNLIMITED_ALLOWANCE_IN_BASE_UNITS, { from: account });
+      }
+      task.processingStepNext();
+      task.processingStepNext();
+
+      let gasAmountBN;
+
+      // Waiting for token allowance
+      if (approvePromise || skipGas) {
+        await approvePromise;
+        gasAmountBN = new BigNumber(600000);
+      } else {
+        // estimating gas amount
+        const gasAmount = await tokenContract.mintWithChai.estimateGasAsync(account, amountInBaseUnits, { from: account, gas: FulcrumProvider.Instance.gasLimit });
+        gasAmountBN = new BigNumber(gasAmount).multipliedBy(FulcrumProvider.Instance.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
+      }
+
+      // Submitting loan
+      txHash = await tokenContract.mintWithChai.sendTransactionAsync(account, amountInBaseUnits, { 
         from: account,
         gas: gasAmountBN.toString(),
         gasPrice: await FulcrumProvider.Instance.gasPrice()
       });
       task.setTxHash(txHash);
+
+      await FulcrumProvider.Instance.addTokenToMetaMask(task);
     }
     finally {
       FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.AskToCloseProgressDlg);

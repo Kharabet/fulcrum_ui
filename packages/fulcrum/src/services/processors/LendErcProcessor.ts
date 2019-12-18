@@ -65,7 +65,7 @@ export class LendErcProcessor {
       // Waiting for token allowance
       if (approvePromise || skipGas) {
         await approvePromise;
-        gasAmountBN = new BigNumber(3000000);
+        gasAmountBN = new BigNumber(600000);
       } else {
         // estimating gas amount
         const gasAmount = await tokenContract.mint.estimateGasAsync(account, amountInBaseUnits, { from: account, gas: FulcrumProvider.Instance.gasLimit });

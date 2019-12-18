@@ -178,7 +178,7 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
                   className="token-selector-item__profit-value"
                 >{`$${this.state.balanceOfUser.toFixed(2)}`}</div>
               </div>
-            ) : ``}
+            ) : null}
           </div>
           {this.state.balanceOfUser.gt(0) ? (
             <div className="token-selector-item__description">

@@ -441,9 +441,11 @@ export class TorqueProvider {
     }
   };
 
+  
+
   public doBorrow = async (borrowRequest: BorrowRequest) => {
     // console.log(borrowRequest);
-
+    
     if (borrowRequest.borrowAmount.lte(0) || borrowRequest.depositAmount.lte(0)) {
       return;
     }
@@ -467,6 +469,7 @@ export class TorqueProvider {
               new BigNumber(7884000), // approximately 3 months
               new BigNumber(0),
               account,
+              account,
               TorqueProvider.ZERO_ADDRESS,
               "0x",
               {
@@ -486,6 +489,7 @@ export class TorqueProvider {
             new BigNumber(7884000),       // initialLoanDuration (approximately 3 months)
             new BigNumber(0),             // collateralTokenSent
             account,                      // borrower
+            account,                      // receiver
             TorqueProvider.ZERO_ADDRESS,  // collateralTokenAddress
             "0x",                         // loanData
             {
@@ -520,6 +524,7 @@ export class TorqueProvider {
               new BigNumber(7884000), // approximately 3 months
               depositAmountInBaseUnits,
               account,
+              account,
               collateralAssetErc20Address,
               "0x",
               {
@@ -538,6 +543,7 @@ export class TorqueProvider {
             new BigNumber(7884000),       // initialLoanDuration (approximately 3 months)
             depositAmountInBaseUnits,     // collateralTokenSent
             account,                      // borrower
+            account,                      // receiver
             collateralAssetErc20Address,  // collateralTokenAddress
             "0x",                         // loanData
             {
@@ -562,7 +568,7 @@ export class TorqueProvider {
     }
 
     return;
-  };
+  }
 
   public gasPrice = async (): Promise<BigNumber> => {
     let result = new BigNumber(30).multipliedBy(10 ** 9); // upper limit 30 gwei
@@ -890,7 +896,7 @@ export class TorqueProvider {
   };
 
   public doRepayLoan = async (repayLoanRequest: RepayLoanRequest) => {
-    // console.log(repayLoanRequest);
+    console.log(repayLoanRequest);
 
     /*if (repayLoanRequest.repayAmount.lte(0)) {
       return;
@@ -918,15 +924,20 @@ export class TorqueProvider {
         closeAmountInBaseUnits = new BigNumber(closeAmountInBaseUnits.toFixed(0, 1));
 
         if (repayLoanRequest.borrowAsset !== Asset.ETH) {
-          await this.checkAndSetApproval(
-            repayLoanRequest.borrowAsset,
-            this.contractsSource.getVaultAddress().toLowerCase(),
-            closeAmountInBaseUnits
-          );
+          try {
+            await this.checkAndSetApproval(
+              repayLoanRequest.borrowAsset,
+              this.contractsSource.getVaultAddress().toLowerCase(),
+              closeAmountInBaseUnits
+            );
+          } catch(e) {
+            console.log(e);
+          }
         }
 
         let gasAmountBN;
         try {
+          console.log(bZxContract.address);
           const gasAmount = await bZxContract.paybackLoanAndClose.estimateGasAsync(
             repayLoanRequest.loanOrderHash,
             account,
@@ -945,7 +956,7 @@ export class TorqueProvider {
           );
           gasAmountBN = new BigNumber(gasAmount).multipliedBy(this.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
         } catch(e) {
-          // console.log(e);
+          console.log(e);
         }
 
         const txHash = await bZxContract.paybackLoanAndClose.sendTransactionAsync(

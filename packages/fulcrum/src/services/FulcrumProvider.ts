@@ -32,12 +32,14 @@ import { TasksQueue } from "./TasksQueue";
 import TagManager from "react-gtm-module";
 import configProviders from "../config/providers.json";
 import { FulcrumMcdBridgeProcessor } from "./processors/FulcrumMcdBridgeProcessor";
+import { LendChaiProcessor } from "./processors/LendChaiProcessor";
 import { LendErcProcessor } from "./processors/LendErcProcessor";
 import { LendEthProcessor } from "./processors/LendEthProcessor";
 import { TradeBuyErcProcessor } from "./processors/TradeBuyErcProcessor";
 import { TradeBuyEthProcessor } from "./processors/TradeBuyEthProcessor";
 import { TradeSellErcProcessor } from "./processors/TradeSellErcProcessor";
 import { TradeSellEthProcessor } from "./processors/TradeSellEthProcessor";
+import { UnlendChaiProcessor } from "./processors/UnlendChaiProcessor";
 import { UnlendErcProcessor } from "./processors/UnlendErcProcessor";
 import { UnlendEthProcessor } from "./processors/UnlendEthProcessor";
 
@@ -754,17 +756,19 @@ export class FulcrumProvider {
     return result;
   };
 
-  public getMaxLendValue = async (request: LendRequest): Promise<[BigNumber, BigNumber]> => {
-    let result = new BigNumber(0);
+  public getMaxLendValue = async (request: LendRequest): Promise<[BigNumber, BigNumber, BigNumber, BigNumber]> => {
+    let maxLendAmount = new BigNumber(0);
+    let maxTokenAmount = new BigNumber(0);
     let tokenPrice = new BigNumber(0);
+    let chaiPrice = new BigNumber(0);
 
     if (request.lendType === LendType.LEND) {
-      result = await this.getAssetTokenBalanceOfUser(request.asset);
+      maxLendAmount = await this.getAssetTokenBalanceOfUser(request.asset);
       if (request.asset === Asset.ETH) {
-        result = result.gt(this.gasBufferForLend) ? result.minus(this.gasBufferForLend) : new BigNumber(0);
+        maxLendAmount = maxLendAmount.gt(this.gasBufferForLend) ? maxLendAmount.minus(this.gasBufferForLend) : new BigNumber(0);
       }
     } else {
-      /*result =
+      /*maxLendAmount =
         request.lendType === LendType.LEND
           ? request.amount.multipliedBy(10 ** 18).dividedBy(tokenPrice)
           : request.amount.multipliedBy(tokenPrice).dividedBy(10 ** 18);*/
@@ -772,22 +776,36 @@ export class FulcrumProvider {
         const assetContract = await this.contractsSource.getITokenContract(request.asset);
         if (assetContract) {
           const precision = AssetsDictionary.assets.get(request.asset)!.decimals || 18;
+          if (request.asset === Asset.CHAI) {
+            chaiPrice = await assetContract.chaiPrice.callAsync();
+          }
           tokenPrice = await assetContract.tokenPrice.callAsync();
-          const freeSupply = (await assetContract.marketLiquidity.callAsync()).multipliedBy(0.95);
-          const userBalance = (await this.getITokenBalanceOfUser(request.asset)).multipliedBy(tokenPrice).dividedBy(10 ** (36 - precision));
+          maxTokenAmount = await this.getITokenBalanceOfUser(request.asset);
+          let freeSupply = (await assetContract.marketLiquidity.callAsync());// .multipliedBy(0.95);
+          let userBalance = maxTokenAmount.multipliedBy(tokenPrice).dividedBy(10 ** (36 - precision));
+          
+          if (request.asset === Asset.CHAI) {
+            freeSupply = freeSupply.multipliedBy(10 ** 18).dividedBy(chaiPrice);
+            userBalance = userBalance.multipliedBy(10 ** 18).dividedBy(chaiPrice);
+          }
 
-          result = freeSupply.lt(userBalance) ?
-            freeSupply :
-            userBalance;
-          result = result.multipliedBy(10 ** (18 - precision));
+          if (freeSupply.lt(userBalance)) {
+            maxLendAmount = freeSupply;
+            maxTokenAmount = maxTokenAmount.multipliedBy(freeSupply).dividedBy(userBalance);
+          } else {
+            maxLendAmount = userBalance;
+          }
+
+          maxLendAmount = maxLendAmount.multipliedBy(10 ** (18 - precision));
+
         }
       }
     }
 
+    maxLendAmount = maxLendAmount.dividedBy(10 ** 18);
+    maxTokenAmount = maxTokenAmount.dividedBy(10 ** 18);
 
-    result = result.dividedBy(10 ** 18);
-
-    return [result, tokenPrice];
+    return [maxLendAmount, maxTokenAmount, tokenPrice, chaiPrice];
   };
 
   public getPTokenPrice = async (selectedKey: TradeTokenKey): Promise<BigNumber> => {
@@ -1365,7 +1383,9 @@ export class FulcrumProvider {
 
     return this.getSwapRate(
       asset,
-      Asset.DAI
+      process.env.REACT_APP_ETH_NETWORK === "mainnet" ?
+        Asset.DAI :
+        Asset.SAI
     );
   }
 
@@ -1418,7 +1438,6 @@ export class FulcrumProvider {
       const destAssetErc20Address = this.getErc20AddressOfAsset(destAsset);
       if (this.contractsSource && srcAssetErc20Address && destAssetErc20Address) {
         const oracleContract = await this.contractsSource.getOracleContract();
-        // result is always base 18, looks like srcQty too, see https://developer.kyber.network/docs/KyberNetworkProxy/#getexpectedrate
         try {
           const swapPriceData: BigNumber[] = await oracleContract.getExpectedRate.callAsync(
             srcAssetErc20Address,
@@ -1577,19 +1596,25 @@ export class FulcrumProvider {
       if (taskRequest.lendType === LendType.LEND) {
         await this.addTokenToMetaMask(task);
 
-        if (taskRequest.asset !== Asset.ETH) {
-          const processor = new LendErcProcessor();
+        if (taskRequest.asset === Asset.ETH) {
+          const processor = new LendEthProcessor();
+          await processor.run(task, account, skipGas);
+        } else if (taskRequest.asset === Asset.CHAI) {
+          const processor = new LendChaiProcessor();
           await processor.run(task, account, skipGas);
         } else {
-          const processor = new LendEthProcessor();
+          const processor = new LendErcProcessor();
           await processor.run(task, account, skipGas);
         }
       } else {
-        if (taskRequest.asset !== Asset.ETH) {
-          const processor = new UnlendErcProcessor();
+        if (taskRequest.asset === Asset.ETH) {
+          const processor = new UnlendEthProcessor();
+          await processor.run(task, account, skipGas);
+        } else if (taskRequest.asset === Asset.CHAI) {
+          const processor = new UnlendChaiProcessor();
           await processor.run(task, account, skipGas);
         } else {
-          const processor = new UnlendEthProcessor();
+          const processor = new UnlendErcProcessor();
           await processor.run(task, account, skipGas);
         }
       }

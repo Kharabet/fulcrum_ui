@@ -6,7 +6,7 @@ import { RequestTask } from "../../domain/RequestTask";
 import { FulcrumProviderEvents } from "../events/FulcrumProviderEvents";
 import { FulcrumProvider } from "../FulcrumProvider";
 
-export class UnlendEthProcessor {
+export class UnlendChaiProcessor {
   public run = async (task: RequestTask, account: string, skipGas: boolean) => {
     if (!(FulcrumProvider.Instance.contractsSource && FulcrumProvider.Instance.contractsSource.canWrite)) {
       throw new Error("No provider available!");

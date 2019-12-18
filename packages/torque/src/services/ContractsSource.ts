@@ -39,7 +39,7 @@ export class ContractsSource {
         address = "0xc45755a7cfc9385290e6fece1f040c0453e7b0e5";
         break;
       case 42:
-        address = "0x9009e85a687b55b5d6C314363C228803fAd32d01";
+        address = "0x9009e85a687b55b5d6c314363c228803fad32d01";
         break;
     }
 
@@ -111,7 +111,7 @@ export class ContractsSource {
             address = "0xb530f422ff1520cbb76a8300e39bd4f55bc03bbc";
             break;
           case 42:
-            address = "0x6c1e2b0f67e00c06c8e2be7dc681ab785163ff4d";
+            address = "0x6c1e2b0f67e00c06c8e2be7dc681ab785163ff4d";//"0x3e37e3f4c3b0b0b5944cc1f366152dea22ef63f9"
             break;
         }
         break;
@@ -292,6 +292,9 @@ export class ContractsSource {
             break;
           case "0xc4375b7de8af5a38a93548eb8453a498222c4ff2":
             asset = Asset.SAI;
+            break;
+          case "0x4f96fe3b7a6cf9725f59d353f723c1bdb64ca6aa":
+            asset = Asset.DAI;
             break;
         }
         break;

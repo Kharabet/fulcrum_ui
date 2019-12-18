@@ -162,6 +162,28 @@ export class AssetsDictionary {
       )
     ],
     [
+      Asset.CHAI,
+      new AssetDetails(
+        "CHAI",
+        "CHai",
+        "iDAI",
+        "https://fulcrum.trade/images/iDAI.svg",
+        18,
+        dai_logo,
+        dai_bg,
+        dai_ts,
+        "#8777B1",
+        "#FFFFFF",
+        "#FFFFFF",
+        new Map<number, string | null>([
+          [1, "0x06af07097c9eeb7fd685c692751d5c66db49c215"],
+          [3, ""],
+          [4, ""],
+          [42, "0x71dd45d9579a499b58aa85f50e5e3b241ca2d10d"]
+        ])
+      )
+    ],
+    [
       Asset.USDC,
       new AssetDetails(
         "USDC",
@@ -434,6 +456,28 @@ export class AssetsDictionaryMobile {
           [3, ""],
           [4, "0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea"],
           [42, "0x4f96fe3b7a6cf9725f59d353f723c1bdb64ca6aa"]
+        ])
+      )
+    ],
+    [
+      Asset.CHAI,
+      new AssetDetails(
+        "CHAI",
+        "CHai",
+        "iDAI",
+        "https://fulcrum.trade/images/iDAI.svg",
+        18,
+        dai_logo,
+        dai_bg,
+        dai_ts,
+        "#8777B1",
+        "#FFFFFF",
+        "#FFFFFF",
+        new Map<number, string | null>([
+          [1, "0x06af07097c9eeb7fd685c692751d5c66db49c215"],
+          [3, ""],
+          [4, ""],
+          [42, "0x71dd45d9579a499b58aa85f50e5e3b241ca2d10d"]
         ])
       )
     ],
