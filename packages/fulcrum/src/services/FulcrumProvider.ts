@@ -663,8 +663,8 @@ export class FulcrumProvider {
           const checkpointPrice = await assetContract.checkpointPrice.callAsync(account);
 
           let decimalOffset = 0;
-          if (baseAsset === Asset.WBTC && selectedKey.positionType === PositionType.SHORT) {
-            decimalOffset = 10;
+          if (baseAsset === Asset.WBTC && selectedKey.positionType === PositionType.LONG) {
+            decimalOffset = -10;
           }
 
           assetBalance = tokenPrice
@@ -726,9 +726,15 @@ export class FulcrumProvider {
 
     const baseAsset = this.getBaseAsset(selectedKey);
     let decimalOffset = 0;
-    if (baseAsset === Asset.WBTC && selectedKey.positionType === PositionType.SHORT) {
-      decimalOffset = 10;
-    }
+    if (baseAsset === Asset.WBTC) {
+      if (selectedKey.positionType === PositionType.SHORT) {
+        if (selectedKey.unitOfAccount !== Asset.USDC) {
+          decimalOffset = 10;
+        }
+      } else {
+        decimalOffset = -10;
+      }
+    } 
 
     result = result.dividedBy(10 ** (18-decimalOffset));
 
