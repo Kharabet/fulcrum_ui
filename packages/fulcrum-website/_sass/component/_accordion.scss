@@ -1,6 +1,11 @@
 #accordion {
   text-align: left;
-  margin-bottom: 60px;
+  @media(min-width: 580px){
+    margin-bottom: 60px;
+  }
+  @media(max-width: 579px){
+    margin-bottom: 45px;
+  }
   .accordion-item {
     border-bottom: 1px solid var(--accordion-border);
     &:first-child {
@@ -8,8 +13,9 @@
     }
     .accordion-toggle {
       position: relative;
+      padding-right: 60px;
       &:before {
-        content: '';
+        content: "";
         background-image: url(/images/accordion-close.svg);
         background-position: 50%;
         background-repeat: no-repeat;
@@ -38,7 +44,6 @@
         &:before {
           background-image: url(/images/accordion-open.svg);
           background-color: var(--accordion-bg);
-
         }
       }
     }
@@ -50,12 +55,17 @@
     line-height: 1.5;
     padding: 15px 0;
     font-weight: 700;
+    @media (max-width: 579px) {
+      font-size: 16px;
+    }
   }
   .accordion-content {
     padding-left: 30px;
     margin-bottom: 45px;
-    p{
-      line-height: 1.8;
+    @media (max-width: 579px) {
+      padding-right: 15px;
+    }
+    p {
       color: var(--secondary-color);
     }
   }

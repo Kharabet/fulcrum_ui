@@ -1,4 +1,4 @@
-<svg width="120" height="120" viewBox="0 0 120 120" fill="none" 
+<svg viewBox="0 0 120 120" fill="none" 
     xmlns="http://www.w3.org/2000/svg">
     <circle cx="60" cy="60" r="35" class="icon-step-tertiary" />
     <path d="M60 0C67.8793 9.39599e-08 75.6815 1.55195 82.961 4.56723C90.2405 7.58251 96.8549 12.0021 102.426 17.5736C107.998 23.1451 112.417 29.7595 115.433 37.039C118.448 44.3185 120 52.1207 120 60L60 60V0Z" fill="#56A9FF"/>
