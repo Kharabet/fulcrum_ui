@@ -508,17 +508,15 @@ export class TorqueProvider {
     console.log("this.contractsSource =",this.contractsSource)
     // console.log("this.contractsSource.canWrite =",this.contractsSource.canWrite)
     if (this.web3Wrapper && this.contractsSource) {
-      const iTokenContract = await this.contractsSource.getiTokenContract(asset);
-      let tokencdpContract: GetCdpsContract | null = null;
 
-      console.log("iTokenContract.address = ",iTokenContract.address)
+      let tokencdpContract: GetCdpsContract | null = null;
       tokencdpContract = await this.contractsSource.getCdpContract("0x592301a23d37c591c5856f28726af820af8e7014");
 
       const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
       console.log("account = ",account)
       console.log("tokencdpContract = ",tokencdpContract)
       if (account && tokencdpContract) {
-        const cdpsresult = await tokencdpContract.getCdpsAsc.callAsync("0x1476483dd8c35f25e568113c5f70249d3976ba21", "0x10ee10ed82d7f97db0b83853ee68efe9235efb63");
+        const cdpsresult = await tokencdpContract.getCdpsAsc.callAsync("0x1476483dd8c35f25e568113c5f70249d3976ba21", "0x2252d3b2c12455d564abc21e328a1122679f8352");
         console.log("cdpsresult = ",cdpsresult)
         // if (amountInBaseUnits.gt(cdpsallowance)) {
         //   await tokencdpContract.getCdpsDesc.callAsync(spender, TorqueProvider.MAX_UINT, { from: account });
