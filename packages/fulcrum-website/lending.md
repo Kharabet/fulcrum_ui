@@ -299,7 +299,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
         <div class="row">
             <div class="col col-12">
                 <div class="flex jc-sb fd-md-c mx-md-auto">
-                    <div class="item-earn">
+                    <div class="item-earn active">
                         <div class="head-earn">
                             {% include svg/fulcrum.svg %}
                         </div>
