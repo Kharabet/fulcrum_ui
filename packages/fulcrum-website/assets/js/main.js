@@ -1,4 +1,4 @@
-window.onload = function () {
+window.addEventListener('load', function () {
     //switch theme
     const toggleSwitch = document.querySelector('.theme-switch input[type="checkbox"]');
     const currentTheme = localStorage.getItem('theme');
@@ -78,7 +78,7 @@ window.onload = function () {
     }
     if (document.querySelector(".seconds") && document.querySelector(".minutes") && document.querySelector(".hours"))
         timer();
-};
+});
 
 function timer() {
     let itemSecond = document.querySelector(".seconds");
