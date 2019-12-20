@@ -1,11 +1,12 @@
 .button {
+  font-family: "Muli", sans-serif;
   line-height: 1.5;
   text-decoration: none;
   border-radius: 60px;
   display: flex;
   align-items: center;
   justify-content: center;
-  &:hover{
+  &:hover {
     box-shadow: 0px 4px 18px rgba(64, 123, 247, 0.5);
   }
 }
@@ -20,40 +21,39 @@
 }
 .button-white {
   border: 3px solid #b9c7d6;
-  background-color: var(--btn-white-bg);  
+  background-color: var(--btn-white-bg);
   color: #b9c7d6;
 }
 .button-green {
   border: 2px solid #00c0ab;
-  background-color: var(--btn-green-bg);  
+  background-color: var(--btn-green-bg);
   color: var(--btn-green-color);
 }
-.button-blue{
+.button-blue {
   border: 2px solid var(--btn-blue-border);
   background-color: var(--btn-blue-bg);
-  color: #ffffff; 
-  
+  color: #ffffff;
 }
 .button-lg {
-  width: 250px;  
-  font-weight: 700;  
-  @media(min-width: 768px){
+  width: 250px;
+  font-weight: 700;
+  @media (min-width: 768px) {
     height: 80px;
     font-size: 26px;
   }
-  @media(max-width: 767px){
+  @media (max-width: 767px) {
     height: 65px;
     font-size: 20px;
   }
 }
 .button-md {
   font-weight: 600;
-  @media(min-width: 768px){
+  @media (min-width: 768px) {
     width: 250px;
     height: 70px;
     font-size: 22px;
   }
-  @media(max-width: 767px){
+  @media (max-width: 767px) {
     width: 145px;
     height: 55px;
     font-size: 16px;
@@ -69,4 +69,36 @@
   width: 66px;
   height: 36px;
   font-weight: 600;
+}
+.button-group-gains {
+  background-color: var(--secondary-bg);
+  border-radius: 29px;
+  display: flex;
+  padding: 1px;
+  margin: auto auto 30px auto;
+
+  @media (min-width: 992px) {
+    margin: auto auto 100px auto;
+  }
+  .button-gains {
+    color: var(--earn-color-hover);
+
+    font-size: 15px;
+    line-height: 1.5;
+    font-weight: 700;
+    cursor: pointer;
+    @media(min-width: 768px){
+      width: 46px;
+      height: 46px;
+    }
+    @media(max-width: 767px){
+      width: 38px;
+      height: 38px;
+    }
+    &.active {
+      background-color: #276bfb;
+      color: #ffffff;
+      border-radius: 50%;
+    }
+  }
 }

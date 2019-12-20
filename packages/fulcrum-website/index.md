@@ -109,7 +109,45 @@ title: Crypto Margin Trading with Fulcrum | bZx
             </div>
         </div>
     </div>
-    <div class="container pt-75 text-center">
+</section>
+<section class="bg-primary pb-45">
+    <div class="row fw-w">
+        <div class="col col-12">
+            <h2  class="circle jc-c mb-50 mx-auto mb-xs-0"><span class="blue left-r-50 top-r-10"></span>Maximize your potential gains</h2>
+        </div>
+        <div class="col col-12">            
+            <div class="button-group-gains" role="group" aria-label="Buttons gains">
+                <button type="button" class="button-gains active">1x</button>
+                <button type="button" class="button-gains">2x</button>
+                <button type="button" class="button-gains">3x</button>
+                <button type="button" class="button-gains">4x</button>
+            </div>        
+        </div>
+        <div class="flex mx-auto p-relative fd-md-c">
+        <div class="input-gain">
+            <div class="before-gain">
+                {% include svg/arrow-gain.svg %}
+                <span class="before-data-gain">25</span>%
+            </div>
+            <input class="gain-range" type="range" value="25" min="-100" max="100"/>
+        </div>
+        <div class="wrapper-result-gain">
+            <div class="flex fd-r"><p>If ETH price goes <span class="result-gain"><span class="fw-800 eth-price">25</span>%</span></p></div>
+            <div class="flex fd-r"><p>You Gain <span class="result-gain"><span class="fw-800">80</span>%</span></p></div>
+        </div>
+        </div>
+        <div class="w-100 mb-30 p-relative">   
+            <div class="wrapper-chart">     
+                <canvas id="myChart"></canvas>
+            </div>
+            <span class="chart-mark past ">past</span>
+            <span class="chart-mark today">today</span>
+            <span class="chart-mark future">future</span>
+        </div>
+    </div>
+</section>
+<section class="bg-primary pt-75 pb-75">
+    <div class="container text-center">
         <div class="row">
             <div class="col col-12 fd-c">
                 <h2 class="circle jc-c mb-15"><span class="blue center top-r-60"></span>How to open leveraged position?</h2>
