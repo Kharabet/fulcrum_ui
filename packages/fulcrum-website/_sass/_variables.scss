@@ -7,10 +7,10 @@
   --secondary-bg: #ffffff;
   --switch-bg: #283049;
   --switch-button: #ffffff;
-  --primary-svg-icon: #51AAFF;
-  --secondary-svg-icon: #BFE9FF;
-  --tertiary-svg-icon: #95E6FF;
-  --safe-svg-icon: #95E6FF;
+  --primary-svg-icon: #51aaff;
+  --secondary-svg-icon: #bfe9ff;
+  --tertiary-svg-icon: #95e6ff;
+  --safe-svg-icon: #95e6ff;
   --accordion-bg: #ffffff;
   --accordion-border: #ffffff;
   --btn-white-bg: #ffffff;
@@ -19,15 +19,16 @@
   --btn-blue-border: #276bfb;
   --btn-blue-bg: #276bfb;
   --earn-bg: #ffffff;
-  --earn-color-hover: #276BFB;
-  --coin-bg: #B9C7D6;
+  --earn-color-hover: #276bfb;
+  --coin-bg: #b9c7d6;
+  --gain-color: #ffffff;
 }
 
 [data-theme="dark"] {
   --primary-color: #ffffff;
-  --secondary-color: #B9C7D6;
-  --light-gray-color: #939FAC;
-  --dark-gray-color: #939FAC;
+  --secondary-color: #b9c7d6;
+  --light-gray-color: #939fac;
+  --dark-gray-color: #939fac;
   --primary-bg: #283038;
   --secondary-bg: #495460;
   --switch-bg: #ffffff;
@@ -35,15 +36,16 @@
   --primary-svg-icon: #001760;
   --secondary-svg-icon: #001760;
   --tertiary-svg-icon: #001760;
-  --safe-svg-icon: #003CDA;
+  --safe-svg-icon: #003cda;
   --accordion-bg: #202830;
-  --accordion-border: #38424B; 
+  --accordion-border: #38424b;
   --btn-white-bg: #283038;
   --btn-green-bg: #00c0ab;
   --btn-green-color: #ffffff;
   --btn-blue-border: #b9c7d6;
   --btn-blue-bg: #323b44;
-  --earn-bg: #00C0AB;
+  --earn-bg: #00c0ab;
   --earn-color-hover: #ffffff;
   --coin-bg: #495460;
+  --gain-color: #283049;
 }
