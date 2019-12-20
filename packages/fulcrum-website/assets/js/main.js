@@ -54,8 +54,7 @@ function timer() {
     setInterval(visibleTimer, 1000);
 }
 
-
-window.onload = function () {
+window.addEventListener('load', function () {
     //switch theme
     const toggleSwitch = document.querySelector('.theme-switch input[type="checkbox"]');
     const currentTheme = localStorage.getItem('theme');
@@ -230,4 +229,4 @@ window.onload = function () {
             this.classList.add("active");
         };
     }
-};
+});

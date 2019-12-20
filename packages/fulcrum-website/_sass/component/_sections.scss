@@ -232,8 +232,8 @@
       }
     }
   }
-  &:hover {
-    cursor: pointer;
+  &.active {
+    // cursor: pointer;
     background-color: var(--earn-bg);
     @media (min-width: 992px) {
       box-shadow: 0px 4px 12px rgba(64, 123, 247, 0.2);

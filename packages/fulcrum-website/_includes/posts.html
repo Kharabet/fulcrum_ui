@@ -5,7 +5,7 @@
                 <h2 class="mb-50 mb-sm-25 text-xs-center">Latest from bZx Blog</h2>
             </div>
         </div>
-        <div class="row jc-sb fw-sm-w">
+        <div id="articles-container" class="row jc-sb fw-sm-w">
             <div class="col col-4 col-sm-12">
                 <div class="item-blog">
                     <a href="#" target="_blank">
@@ -63,3 +63,62 @@
         </div>
     </div>
 </section>
+
+
+<script>
+
+    window.addEventListener('load', function () {
+        renderArticles("https://bzx.network/feed.xml");
+    });
+
+    function renderArticles(url) {
+        get(url).then(res => {
+            var feedHtml = new window.DOMParser().parseFromString(res, "text/xml" );
+            var articleItems = Array.prototype.slice.call(feedHtml.querySelectorAll("rss item"));
+            var articleHTML = articleItems.slice(0, 3).map(item => {
+                var title = item.querySelector("title").textContent;
+                var info = item.querySelector("summary").textContent;
+                var date = new Date(item.querySelector("pubDate").textContent).toLocaleString('en-us', { day: "2-digit", month: "short" });
+                var link = item.querySelector("link").textContent;
+                var cover = item.querySelector("logo").textContent;
+                return `<div class="col col-4 col-sm-12">
+                    <div class="item-blog">
+                        <a href="${link}" target="_blank">
+                            <div class="item-blog-header">
+                                <img src="${cover}"
+                                    alt="${title}"
+                                    title="${title}" />
+                            </div>
+                            <div class="item-blog-body">
+                                <h4 class="title my-20">${title}</h4>
+                                <p class="c-dark-gray mb-25">${info}</p>
+                                <div class="fs-12 lh-180 c-secondary-blue">${date}</div>
+                            </div>
+                        </a>
+                    </div>
+                </div>`;
+            })
+            document.getElementById('articles-container').innerHTML = articleHTML.join('');
+        })
+    }
+
+
+    function get(url) {
+        return new Promise(function (resolve, reject) {
+            var req = new XMLHttpRequest();
+            req.open('GET', url);
+            req.onload = function () {
+                if (req.status == 200) {
+                    resolve(req.response);
+                }
+                else {
+                    reject(Error(req.statusText));
+                }
+            };
+            req.onerror = function () {
+                reject(Error("Network Error"));
+            };
+            req.send();
+        });
+    }
+</script>
