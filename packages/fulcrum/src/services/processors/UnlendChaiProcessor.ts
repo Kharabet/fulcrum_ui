@@ -15,7 +15,7 @@ export class UnlendChaiProcessor {
     // Initializing loan
     const taskRequest: LendRequest = (task.request as LendRequest);
     const decimals: number = AssetsDictionary.assets.get(taskRequest.asset)!.decimals || 18;
-    const amountInBaseUnits = new BigNumber(taskRequest.amount.multipliedBy(10 ** decimals).toFixed(0, 1));
+    const amountInBaseUnits = new BigNumber(taskRequest.amount.multipliedBy(10 ** decimals).toFixed(0, 1)).plus(1);
     const tokenContract: iTokenContract | null = await FulcrumProvider.Instance.contractsSource.getITokenContract(taskRequest.asset);
     if (!tokenContract) {
       throw new Error("No iToken contract available!");

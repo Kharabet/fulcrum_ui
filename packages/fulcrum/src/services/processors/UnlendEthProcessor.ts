@@ -15,7 +15,7 @@ export class UnlendEthProcessor {
     // Initializing loan
     const taskRequest: LendRequest = (task.request as LendRequest);
     const decimals: number = AssetsDictionary.assets.get(taskRequest.asset)!.decimals || 18;
-    const amountInBaseUnits = new BigNumber(taskRequest.amount.multipliedBy(10 ** decimals).toFixed(0, 1));
+    const amountInBaseUnits = new BigNumber(taskRequest.amount.multipliedBy(10 ** decimals).toFixed(0, 1)).plus(1);
     const tokenContract: iTokenContract | null = await FulcrumProvider.Instance.contractsSource.getITokenContract(taskRequest.asset);
     if (!tokenContract) {
       throw new Error("No iToken contract available!");
@@ -38,7 +38,7 @@ export class UnlendEthProcessor {
       gasAmountBN = new BigNumber(600000);
     } else {
       // estimating gas amount
-      const gasAmount = await tokenContract.burnToChai.estimateGasAsync(account, amountInBaseUnits, { from: account, gas: FulcrumProvider.Instance.gasLimit });
+      const gasAmount = await tokenContract.burnToEther.estimateGasAsync(account, amountInBaseUnits, { from: account, gas: FulcrumProvider.Instance.gasLimit });
       gasAmountBN = new BigNumber(gasAmount).multipliedBy(FulcrumProvider.Instance.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
     }
 
@@ -47,7 +47,7 @@ export class UnlendEthProcessor {
       FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.AskToOpenProgressDlg);
 
       // Submitting unloan
-      txHash = await tokenContract.burnToChai.sendTransactionAsync(account, amountInBaseUnits, {
+      txHash = await tokenContract.burnToEther.sendTransactionAsync(account, amountInBaseUnits, {
         from: account,
         gas: gasAmountBN.toString(),
         gasPrice: await FulcrumProvider.Instance.gasPrice()

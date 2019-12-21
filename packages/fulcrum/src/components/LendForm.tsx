@@ -457,9 +457,9 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
         this.state.maxTokenAmount :
         this.state.lendAmount.multipliedBy(10 ** 18).dividedBy(this.state.tokenPrice);
 
-        if (this.props.asset === Asset.CHAI && this.state.chaiPrice) {
-          sendAmount = sendAmount.multipliedBy(this.state.chaiPrice).dividedBy(10 ** 18);
-        }
+      if (this.props.asset === Asset.CHAI && this.state.chaiPrice) {
+        sendAmount = sendAmount.multipliedBy(this.state.chaiPrice).dividedBy(10 ** 18);
+      }
 
       if (sendAmount.gt(this.state.maxTokenAmount)) {
         sendAmount = this.state.maxTokenAmount;
