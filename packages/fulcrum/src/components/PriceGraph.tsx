@@ -7,11 +7,15 @@ import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { IPriceDataPoint } from "../domain/IPriceDataPoint";
 // import { Change24HMarker, Change24HMarkerSize } from "./Change24HMarker";
 import { TradeTokenKey } from "../domain/TradeTokenKey";
+import {TradeType} from "../domain/TradeType";
 import { FulcrumProvider } from "../services/FulcrumProvider";
 
 export interface IPriceGraphProps {
   data: IPriceDataPoint[];
   selectedKey: TradeTokenKey;
+  isLong: boolean;
+  isShort: boolean;
+  changeActiveBtn:  (activeType:string) => void;
 }
 
 interface IPriceGraphState {
@@ -29,7 +33,7 @@ export class PriceGraph extends Component<IPriceGraphProps, IPriceGraphState> {
   constructor(props: IPriceGraphProps, context?: any) {
     super(props, context);
 
-    this.state = { priceBaseLine: 0, data: [], displayedDataPoint: null, liquidationPrice: null, liquidationPriceNormed: null, assetDetails: null };
+    this.state = {  priceBaseLine: 0, data: [], displayedDataPoint: null, liquidationPrice: null, liquidationPriceNormed: null, assetDetails: null };
   }
 
   public async derivedUpdate() {
@@ -85,9 +89,19 @@ export class PriceGraph extends Component<IPriceGraphProps, IPriceGraphState> {
     /*let liq
       const liquidationPrice = this.props.data.length > 0 && this.props.data
       ? */
-
+    const changeActiveBtn  =   this.props.changeActiveBtn;
+    const isMobileMedia = (window.innerWidth <= 959);
     return (
       <div className="price-graph">
+        {(isMobileMedia ?
+        <div className="trade-token-grid-row__col-action-mb">
+          <button className={"trade-token-grid-row__group-button button-lg " + (this.props.isLong ? 'btn-active': '' )} onClick={() => changeActiveBtn('long')}>
+            Long
+          </button>
+          <button className={"trade-token-grid-row__group-button button-sh "+ (this.props.isShort ? 'btn-active': '' )} onClick={() => changeActiveBtn('short')}>
+            Short
+          </button>
+        </div> : '')}
         <div className="price-graph__hovered-time-container">
           <div className="price-graph__hovered-price-marker" style={{ fontSize: `2rem` }}>{this.state.assetDetails ? this.state.assetDetails.labelName : ``}</div>
           <div className="price-graph__hovered-time-delimiter">

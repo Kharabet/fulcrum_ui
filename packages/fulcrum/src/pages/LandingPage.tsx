@@ -20,12 +20,12 @@ export class LandingPage extends PureComponent<ILandingPageProps> {
                 <Link className="landing-page__jumbo-action-button" to="/lend">Lend</Link>
                 <div className="landing-page__jumbo-action-description">TO EARN INTEREST</div>
               </div>
-              { !this.props.isMobileMedia ? (
-                <div className="landing-page__jumbo-action">
-                  <Link className="landing-page__jumbo-action-button" to="/trade">Trade</Link>
-                  <div className="landing-page__jumbo-action-description">WITH UP TO 4X LEVERAGE</div>
-                </div>
-              ) : ``}
+
+              <div className="landing-page__jumbo-action">
+                <Link className="landing-page__jumbo-action-button" to="/trade">Trade</Link>
+                <div className="landing-page__jumbo-action-description">WITH UP TO 4X LEVERAGE</div>
+              </div>
+
             </div>
           </div>
         </main>

@@ -1,6 +1,6 @@
 {
   "name": "@bzxnetwork/fulcrum",
-  "version": "0.9.0",
+  "version": "0.9.4",
   "description": "Simplified crypto-lending platform",
   "keywords": [],
   "author": "",
@@ -73,16 +73,19 @@
     "start-mainnet": "cross-env-shell REACT_APP_ETH_NETWORK=mainnet \"react-scripts start\"",
     "start-ropsten": "cross-env-shell REACT_APP_ETH_NETWORK=ropsten \"react-scripts start\"",
     "start-kovan": "cross-env-shell REACT_APP_ETH_NETWORK=kovan \"react-scripts start\"",
+    "start-rinkeby": "cross-env-shell REACT_APP_ETH_NETWORK=rinkeby \"react-scripts start\"",
     "lint": "tslint 'src/**/*.{ts,tsx}'",
     "lint:fix": "tslint 'src/**/*.{ts,tsx}' --fix",
     "build": "react-scripts build",
     "build-mainnet": "cross-env-shell REACT_APP_ETH_NETWORK=mainnet \"react-scripts build\"",
     "build-ropsten": "cross-env-shell REACT_APP_ETH_NETWORK=ropsten \"react-scripts build\"",
     "build-kovan": "cross-env-shell REACT_APP_ETH_NETWORK=kovan \"react-scripts build\"",
+    "build-rinkeby": "cross-env-shell REACT_APP_ETH_NETWORK=rinkeby \"react-scripts build\"",
     "test": "react-scripts test",
     "test-mainnet": "cross-env-shell REACT_APP_ETH_NETWORK=mainnet \"react-scripts test\"",
     "test-ropsten": "cross-env-shell REACT_APP_ETH_NETWORK=ropsten \"react-scripts test\"",
     "test-kovan": "cross-env-shell REACT_APP_ETH_NETWORK=kovan \"react-scripts test\"",
+    "test-rinkeby": "cross-env-shell REACT_APP_ETH_NETWORK=rinkeby \"react-scripts test\"",
     "eject": "react-scripts eject"
   },
   "browserslist": [

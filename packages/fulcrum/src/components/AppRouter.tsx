@@ -31,8 +31,7 @@ if (isMainnetProd) {
        'dataLayer' : {
                 'name' : "Home",
                 'status' : "Intailized"
-            },
-            'dataLayerName' : 'PageDataLayer'
+            }
     }
     TagManager.initialize(tagManagerArgs)
 }
@@ -120,8 +119,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
                                 // userId: '001',
                                 userProject: 'fulcrum',
                                 page: location.pathname + location.search
-                            },
-                            dataLayerName: 'PageDataLayer'
+                            }
                         }
                         // ReactGA.ga('set', 'page', location.pathname + location.search);
                         // ReactGA.ga('send', 'pageview');

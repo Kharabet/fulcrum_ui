@@ -67,3 +67,26 @@
 
   color: #acb5c2;
 }
+
+
+
+@media only screen and (max-width: $mobile-version-max-width) {
+
+  .provider-menu__list-item:last-child {
+      margin-top: 0rem;
+    }
+  .provider-menu__list-item {
+    height: 4.5rem;
+  }
+  .provider-menu__title {
+    margin-bottom: 1rem;
+  }
+  .provider-menu {
+    width: 200px;
+    margin: auto;
+    margin-bottom: 38px;
+  }
+  //.modal-content-div {
+  //  left: 41%;
+  //}
+}

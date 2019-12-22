@@ -8,7 +8,7 @@ import { debounceTime, distinctUntilChanged, switchMap } from "rxjs/operators";
 import ic_arrow_max from "../assets/images/ic_arrow_max.svg";
 import { Asset } from "../domain/Asset";
 import { AssetDetails } from "../domain/AssetDetails";
-import { AssetsDictionary } from "../domain/AssetsDictionary";
+import {AssetsDictionary, AssetsDictionaryMobile} from "../domain/AssetsDictionary";
 import { PositionType } from "../domain/PositionType";
 import { TradeRequest } from "../domain/TradeRequest";
 import { TradeTokenKey } from "../domain/TradeTokenKey";
@@ -66,6 +66,7 @@ export interface ITradeFormProps {
   onSubmit: (request: TradeRequest) => void;
   onCancel: () => void;
   onTrade: (request: TradeRequest) => void;
+  isMobileMedia: boolean;
 }
 
 interface ITradeFormState {
@@ -106,7 +107,10 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
 
   constructor(props: ITradeFormProps, context?: any) {
     super(props, context);
-    const assetDetails = AssetsDictionary.assets.get(props.asset);
+    let assetDetails = AssetsDictionary.assets.get(props.asset);
+    if(this.props.isMobileMedia){
+      assetDetails = AssetsDictionaryMobile.assets.get(this.props.asset);
+    }
     const interestRate = null;
     const balance = null;
     const ethBalance = null;
@@ -191,7 +195,10 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
   };
 
   private async derivedUpdate() {
-    const assetDetails = AssetsDictionary.assets.get(this.props.asset);
+    let assetDetails = AssetsDictionary.assets.get(this.props.asset);
+    if(this.props.isMobileMedia){
+      assetDetails = AssetsDictionaryMobile.assets.get(this.props.asset);
+    }
     const tradeTokenKey = this.getTradeTokenGridRowSelectionKey(this.props.leverage);
     const interestRate = await FulcrumProvider.Instance.getTradeTokenInterestRate(tradeTokenKey);
     const positionTokenBalance = await FulcrumProvider.Instance.getPTokenBalanceOfUser(tradeTokenKey);
@@ -222,7 +229,9 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       ? await FulcrumProvider.Instance.contractsSource.getPTokenErc20Address(tradeTokenKey) || ""
       : "";
 
-    const maybeNeedsApproval = await FulcrumProvider.Instance.checkCollateralApprovalForTrade(tradeRequest);
+    const maybeNeedsApproval = this.props.tradeType === TradeType.BUY ?
+      await FulcrumProvider.Instance.checkCollateralApprovalForTrade(tradeRequest) :
+      false;
 
     const latestPriceDataPoint = await FulcrumProvider.Instance.getTradeTokenAssetLatestDataPoint(tradeTokenKey);
     const liquidationPrice = new BigNumber(latestPriceDataPoint.liquidationPrice);
@@ -308,7 +317,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     const submitClassName =
       this.props.tradeType === TradeType.BUY ? "trade-form__submit-button--buy" : "trade-form__submit-button--sell";
 
-    // const positionTypePrefix = this.props.defaultUnitOfAccount === Asset.SAI ? "d" : "u";
+    // const positionTypePrefix = this.props.defaultUnitOfAccount === Asset.DAI ? "d" : this.props.defaultUnitOfAccount === Asset.SAI ? "s" : "u";
     // const positionTypePrefix2 = this.props.positionType === PositionType.SHORT ? "s" : "L";
     // const positionLeveragePostfix = this.props.leverage > 1 ? `${this.props.leverage}x` : "";
     const tokenNameBase = this.state.assetDetails.displayName;
@@ -423,7 +432,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
                 className="trade-form__amount-input"
                 value={this.state.inputAmountText}
                 onChange={this.onTradeAmountChange}
-                placeholder={`${this.props.tradeType === TradeType.BUY ? `Buy` : `Sell`} Amount`}
+                placeholder={`Amount`}
               />
               <div className="trade-form__collateral-button-container">
                 <CollateralTokenButton asset={this.state.collateral} onClick={this.onChangeCollateralOpen} />
@@ -456,7 +465,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
                 <div className="trade-form__kv-container">
                   <div className="trade-form__label trade-form__label--no-bg">
                     Unit of Account &nbsp;
-                    <UnitOfAccountSelector items={[Asset.USDC, Asset.SAI]} value={this.props.defaultUnitOfAccount} onChange={this.onChangeUnitOfAccount} />
+                    <UnitOfAccountSelector items={[Asset.USDC, Asset.DAI]} value={this.props.defaultUnitOfAccount} onChange={this.onChangeUnitOfAccount} />
                   </div>
                 </div>
               </CollapsibleContainer>
@@ -520,21 +529,21 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
 
   public onCancelClick = () => {
     this.props.onCancel();
-    let randomNumber = Math.floor(Math.random() * 100000) + 1;
-    const tagManagerArgs = {
-      dataLayer: {
-          transactionId: randomNumber,
-          transactionTotal: this.state.tradeAmountValue,
-          transactionProducts: [{
-          name: this.props.leverage + 'x' + this.props.asset +'-'+ this.props.positionType +'-'+ this.props.defaultUnitOfAccount,
-          sku: this.props.leverage + 'x' + this.props.asset +'-'+ this.props.positionType,
-          category: this.props.positionType,
-          status: "Canceled"
-        }],
-      },
-      dataLayerName: 'PageDataLayer'
-    }
-    TagManager.dataLayer(tagManagerArgs)
+    const randomNumber = Math.floor(Math.random() * 100000) + 1;
+    // const tagManagerArgs = {
+    //   dataLayer: {
+    //       event: 'purchase',
+    //       transactionId: randomNumber,
+    //       transactionTotal: this.state.tradeAmountValue,
+    //       transactionProducts: [{
+    //       name: this.props.leverage + 'x' + this.props.asset +'-'+ this.props.positionType +'-'+ this.props.defaultUnitOfAccount,
+    //       sku: this.props.leverage + 'x' + this.props.asset +'-'+ this.props.positionType,
+    //       category: this.props.positionType,
+    //       status: "Canceled"
+    //     }],
+    //   }
+    // }
+    // TagManager.dataLayer(tagManagerArgs)
   };
 
   public onChangeCollateralOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -577,8 +586,11 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     this.setState({ ...this.state, tokenizeNeeded: event.target.checked });
   };
 
-  public onSubmitClick = (event: FormEvent<HTMLFormElement>) => {
+  public onSubmitClick = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+
+    const usdAmount = await FulcrumProvider.Instance.getSwapToUsdRate(this.props.asset)
 
     if (this.state.tradeAmountValue.isZero()) {
       if (this._input) {
@@ -596,19 +608,24 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       this.props.onCancel();
       return;
     }
-    let randomNumber = Math.floor(Math.random() * 100000) + 1;
+    let usdPrice = this.state.tradeAmountValue
+    if(usdPrice != null){
+        usdPrice = usdPrice.multipliedBy(usdAmount)
+    }
+    const randomNumber = Math.floor(Math.random() * 100000) + 1;
     const tagManagerArgs = {
       dataLayer: {
+          event: 'purchase',
           transactionId: randomNumber,
-          transactionTotal: this.state.tradeAmountValue,
+          transactionTotal: new BigNumber(usdPrice),
           transactionProducts: [{
           name: this.props.leverage + 'x' + this.props.asset +'-'+ this.props.positionType +'-'+ this.props.defaultUnitOfAccount,
           sku: this.props.leverage + 'x' + this.props.asset +'-'+ this.props.positionType,
           category: this.props.positionType,
-          status: "Completed"
+          price: new BigNumber(usdPrice),
+          quantity: 1
         }],
-      },
-      dataLayerName: 'PageDataLayer'
+      }
     }
     TagManager.dataLayer(tagManagerArgs)
     this.props.onSubmit(

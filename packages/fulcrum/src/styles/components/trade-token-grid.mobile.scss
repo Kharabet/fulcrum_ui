@@ -1,0 +1,186 @@
+@media screen and (max-width: $mobile-version-max-width) {
+  .trade-token-grid-header {
+    text-align: center;
+  }
+  @mixin trade-token-grid-header__col {
+    &:not(:last-child) {
+    margin-right: 0px;
+  }
+  }
+
+  .trade-token-grid-header__col-leverage {
+  @include trade-token-grid-header__col();
+
+  width: 25%;
+}
+
+.trade-token-grid-header__col-amount {
+  @include trade-token-grid-header__col();
+
+  width: 25%;
+}
+
+.trade-token-grid-header__col-price {
+  @include trade-token-grid-header__col();
+
+  width: 25%;
+}
+
+.trade-token-grid-header__col-change24h {
+  @include trade-token-grid-header__col();
+
+  width: 25%;
+}
+
+.trade-token-grid-header__col-profit {
+  @include trade-token-grid-header__col();
+
+  width: 25%;
+}
+
+@mixin trade-token-grid-row__col {
+  display: inline-block;
+  &:not(:last-child) {
+    margin-right: 0px;
+    text-align: center;
+
+  }
+}
+
+.trade-token-grid-row__col-leverage {
+  @include trade-token-grid-row__col();
+  color: #ffffff;
+  width: 25%;
+}
+
+.trade-token-grid-row {
+  text-align: center;
+  &--active {
+    .trade-token-grid-row__col-action {
+      padding-right: 0px;
+    }
+  }
+}
+.trade-token-grid-row__col-price {
+  @include trade-token-grid-row__col();
+  width: 25%;
+  text-align: center;
+}
+.trade-token-grid-row__col-profit {
+  @include trade-token-grid-row__col();
+  width: 25%;
+}
+
+.trade-token-grid-row__button--size-full {
+  width: 100%;
+  margin: 0 0rem;
+}
+
+.trade-token-grid-row__col-action {
+  @include trade-token-grid-row__col();
+
+    //-webkit-transition: padding-left 0.5s, padding-right 0.5s; /* Safari */
+    //transition: padding-left 0.5s, padding-right 0.5s;
+
+    width: 25%;
+    margin: auto;
+  }
+  .trade-token-grid-row__col-action:not(:last-child) {
+    margin: auto;
+  }
+  .trade-new-grid{
+    width:100%;
+  }
+
+  .trade-token-grid-row__buy-button{
+    display:block;
+    margin: auto;
+  }
+  .trade-token-grid-row__long-button{
+    display:block;
+    margin: auto;
+  }
+  .button-lg{
+    //position: relative;
+    //background-color: #FFFFFF;
+    //color: black;
+    z-index: 2;
+    //left: 36px;
+  }
+  .button-sh{
+    z-index: 2;
+    position: relative;
+    //background-color: #FFFFFF;
+    //color: black;
+    left: -35px;
+  }
+  .btn-active{
+    z-index: 1;
+    background-color: #FFFFFF;
+    color: black;
+  }
+
+  .trade-token-grid-row__col-action-mb {
+  @include trade-token-grid-row__col();
+
+    //-webkit-transition: padding-left 0.5s, padding-right 0.5s; /* Safari */
+    //transition: padding-left 0.5s, padding-right 0.5s;
+    display: flex;
+    width: 80%;
+    margin: auto;
+    margin-top: 15px;
+  }
+  .trade-token-grid-row__buy-button{
+    display: inline;
+    width: 40%;
+  }
+  .trade-token-grid-row__group-button{
+    display: inline;
+    width: 40%;
+  }
+  .trade-token-grid-row__long-button{
+    display: inline;
+    width: 40%;
+  }
+
+  .trade-footer-mb{
+    width:100%;
+    position: fixed;
+    bottom: 0px;
+    overflow-y: scroll;
+
+  }
+  .trade-footer-grid{
+    float: left;
+    width: 80px;
+  }
+
+  .trade-foot-item{
+    width: 480px;
+  }
+
+  .trade-token-grid-row__sell-button {
+    width: 40%;
+  }
+
+
+  .trade-token-grid-row__col-token-image {
+    line-height: 0.5rem;
+  }
+
+
+
+
+}
+
+@media screen and (max-width: $mobile-version-width-sm) {
+  .trade-token-grid-row__col-action {
+    width: 6rem;
+  }
+  .trade-token-grid-row__button--size-full {
+    width: 100%;
+  }
+  .cb-container {
+    display: none;
+  }
+}

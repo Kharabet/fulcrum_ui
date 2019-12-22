@@ -132,6 +132,7 @@ export class AssetsDictionary {
         new Map<number, string | null>([
           [1, "0x6b175474e89094c44da98b954eedeac495271d0f"],
           [3, ""],
+          [4, "0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea"],
           [42, "0x4f96fe3b7a6cf9725f59d353f723c1bdb64ca6aa"]
         ])
       )
@@ -187,6 +188,7 @@ export class AssetsDictionary {
         new Map<number, string | null>([
           [1, "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"],
           [3, "0xc778417e063141139fce010982780140aa0cd5ab"],
+          [4, "0xc778417e063141139fce010982780140aa0cd5ab"],
           [42, "0xd0a1e359811322d97991e03f863a0c30c2cf029c"]
         ])
       )
@@ -206,6 +208,7 @@ export class AssetsDictionary {
         new Map<number, string | null>([
           [1, "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"],
           [3, "0xc778417e063141139fce010982780140aa0cd5ab"],
+          [4, "0xc778417e063141139fce010982780140aa0cd5ab"],
           [42, "0xd0a1e359811322d97991e03f863a0c30c2cf029c"]
         ])
       )
@@ -261,7 +264,8 @@ export class AssetsDictionary {
         "#FFFFFF",
         new Map<number, string | null>([
           [1, "0x1985365e9f78359a9b6ad760e32412f4a445e862"],
-          [3, "0xbf5d8683b9be6c43fca607eb2a6f2626a18837a6"] // using SNT token instead
+          [3, "0xbf5d8683b9be6c43fca607eb2a6f2626a18837a6"], // using SNT token instead
+          [4, "0x6e894660985207feb7cf89faf048998c71e8ee89"]
         ])
       )
     ],

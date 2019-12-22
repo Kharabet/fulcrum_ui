@@ -1,0 +1,360 @@
+@media screen and (max-width: $mobile-version-max-width) {
+  .trade-form {
+    @include clearfix();
+
+    width: 100%;
+    min-height: 25.625rem;
+
+    background-color: #444e5a;
+  }
+
+  .trade-form__left_block {
+    float: left;
+
+    position: inherit;
+    height: 210px;
+    width: 100%;
+
+    top: 0;
+    left: 0;
+
+    background-size: 100% 100%;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    .trade-form__info_block {
+      position: relative;
+
+      display: flex;
+      flex-direction: column;
+
+      width: 13rem;
+      margin: auto;
+      .trade-form__info_block__logo {
+        img.asset-logo {
+          height: 8rem;
+          width: 100%;
+
+          margin: -1.75rem 0;
+        }
+
+        img.position-type-marker-alt {
+          position: absolute;
+
+          left: 7.25rem;
+          top: 2.25rem;
+
+          transform: translateY(-50%);
+        }
+      }
+
+      .trade-form__info_block__asset {
+        font-size: 1.5rem;
+        font-weight: 600;
+        letter-spacing: -0.6px;
+        text-align: center;
+      }
+
+      .trade-form__info_block__stats {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+
+        font-size: 0.75rem;
+        line-height: 2;
+        letter-spacing: normal;
+        text-align: center;
+
+        .trade-form__info_block__stats__data {
+
+        }
+
+        .trade-form__info_block__stats__splitter {
+          padding: 0 0.25rem;
+          font-size: 0.5rem;
+          line-height: 3;
+        }
+      }
+    }
+  }
+
+  .trade-form__form-container {
+    float: right;
+    box-sizing: border-box;
+
+    height: 100%;
+    width: 20rem;
+    min-height: 25.625rem;
+
+    top: 0;
+    left: 0;
+
+    padding: 2rem 2rem 2rem 2rem;
+
+    display: flex;
+    flex-direction: column;
+
+    .trade-form__form-values-container {
+      margin-bottom: 2.5rem;
+    }
+
+    .trade-form__actions-container {
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-end;
+
+      margin-top: auto;
+    }
+  }
+
+  .trade-form__position-type-container {
+    margin-bottom: 1rem;
+  }
+
+  .trade-form__slippage-amount {
+    //background-color: #fff3f3;
+    color: #ee344e;
+    width: 49px;
+    height: 25px;
+    border-radius: 23px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 5px;
+    font-weight: 600;
+  }
+
+  .trade-form__slippage-amount img {
+    width: 10px;
+    height: auto;
+    margin-left: 2px;
+  }
+
+  .trade-form__kv-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+
+    padding: 0.22rem 0;
+  }
+
+  .trade-form__kv-container--w_dots {
+    background-image: url("../assets/images/dotted_line.png");
+    background-repeat: repeat-x;
+    background-position-y: 1.25rem;
+  }
+
+  .trade-form__token-message-container {
+    margin: 0.25rem 0 0.5rem;
+    padding: 0.75rem 1.375rem;
+
+    border-radius: 0.25rem;
+    background-color: #0000001a;
+  }
+
+  .trade-form__token-message-container--message {
+    font-size: 0.75rem;
+    font-weight: normal;
+    font-style: normal;
+    font-stretch: normal;
+    line-height: 1.33;
+    letter-spacing: normal;
+    text-align: left;
+    color: #a9b5c7;
+  }
+
+  .trade-form__label {
+    line-height: 2;
+    font-size: 0.6rem;
+    font-weight: normal;
+    font-style: normal;
+    font-stretch: normal;
+    letter-spacing: normal;
+    color: #a9b5c7;
+    background-color: #444e5a;
+
+    &--no-bg {
+      background-color: transparent;
+    }
+  }
+
+  .trade-form__label--action {
+    cursor: pointer;
+    text-decoration: underline;
+    text-decoration-style: dotted;
+    border: 0 none;
+
+    &:focus {
+      outline: none;
+    }
+    //background-image: url("../assets/images/dotted_line.png");
+    //background-repeat: repeat-x;
+    //background-position-y: 1.25rem;
+  }
+
+  .trade-form__value {
+    line-height: 2;
+    font-size: 0.75rem;
+    font-weight: 600;
+    font-style: normal;
+    font-stretch: normal;
+    letter-spacing: normal;
+    color: #ffe546;
+    background-color: #444e5a;
+
+    &--no-color {
+      color: #a9b5c7;
+    }
+
+    &--no-bg {
+      background-color: transparent;
+    }
+  }
+
+  .trade-form__amount-container {
+    display: flex;
+
+    .trade-form__amount-input {
+      height: 4rem;
+      width: calc(100% - 9rem);
+
+      background-color: rgba(32, 31, 35, 0.3);
+      padding: 0.8125rem 1rem 0.9375rem;
+      border: 0 none;
+
+      font-size: 1rem;
+      font-weight: 600;
+      font-style: normal;
+      font-stretch: normal;
+      letter-spacing: normal;
+      text-align: left;
+      color: #ffffff;
+
+      &:focus {
+        outline: none;
+      }
+    }
+
+    .trade-form__collateral-button-container {
+      width: 6rem;
+      border: 0;
+      background-color: rgba(32, 31, 35, 0.3);
+
+      display: flex;
+    }
+
+    .trade-form__amount-max {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-content: center;
+
+      width: 3rem;
+      padding: 0.5rem;
+
+      border: 0;
+      border-left: 1px solid #444e5a;
+
+      background-color: rgba(32, 31, 35, 0.3);
+
+      font-size: 0.75rem;
+      font-weight: 600;
+      font-style: normal;
+      font-stretch: normal;
+      letter-spacing: normal;
+      text-align: center;
+      color: #acb5c2;
+
+      cursor: pointer;
+
+      img {
+        padding-bottom: 0.25rem;
+      }
+    }
+
+    .trade-form__amount-maxed {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-content: center;
+
+      width: 3rem;
+      padding: 0.5rem;
+
+      border: 0;
+      border-left: 1px solid #444e5a;
+
+      background-color: rgba(32, 31, 35, 0.3);
+
+      font-size: 0.75rem;
+      font-weight: 600;
+      font-style: normal;
+      font-stretch: normal;
+      letter-spacing: normal;
+      text-align: center;
+      color: #00ff00;
+
+      cursor: pointer;
+    }
+  }
+
+  .rounded-mark {
+    font-size: 0.5rem;
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 100px;
+    padding: 0.0625rem 0.3125rem;
+  }
+
+  .trade-form__change-button {
+    cursor: pointer;
+    outline: none;
+    border: 0;
+    background-color: rgba(0, 0, 0, 0);
+    text-decoration: underline;
+    -webkit-text-decoration-style: dotted;
+    /* text-decoration-style: dotted; */
+    color: #ffffff;
+    font-size: 0.75rem;
+    padding-left: 0.25rem;
+  }
+
+  .trade-form__cancel-button {
+    display: inline-block;
+
+    cursor: pointer;
+    border: 0;
+    height: 2.5rem;
+    width: 6.5rem;
+    background-color: rgba(0, 0, 0, 0);
+    text-decoration: underline;
+    text-decoration-style: dotted;
+    color: #a9b5c7;
+    outline: none;
+  }
+
+  .trade-form__submit-button {
+    display: inline-block;
+
+    cursor: pointer;
+    border: 0;
+    height: 2.5rem;
+    //width: 6.5rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    border-radius: 100px;
+    color: #ffffff;
+    text-transform: uppercase;
+    outline: none;
+
+    &--buy {
+      background-color: #407bf7;
+    }
+
+    &--sell {
+      background-color: #ff5353;
+    }
+  }
+}

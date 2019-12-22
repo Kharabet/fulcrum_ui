@@ -1,4 +1,4 @@
-import BigNumber from "bignumber.js";
+import { BigNumber } from "@0x/utils";
 
 export class ManageCollateralRequest {
   public collateralPercent: BigNumber;

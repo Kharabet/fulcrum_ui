@@ -178,7 +178,7 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
                   className="token-selector-item__profit-value"
                 >{`$${this.state.balanceOfUser.toFixed(2)}`}</div>
               </div>
-            ) : ``}
+            ) : null}
           </div>
           {this.state.balanceOfUser.gt(0) ? (
             <div className="token-selector-item__description">
@@ -253,21 +253,6 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
   };
 
   public onLendClick = () => {
-    let randomNumber = Math.floor(Math.random() * 100000) + 1;
-    const tagManagerArgs = {
-      dataLayer: {
-        transactionId: randomNumber,
-        transactionTotal: '0',
-        transactionProducts: [{
-          name: LendType.LEND + '-' + this.props.asset,
-          sku: this.props.asset,
-          category: LendType.LEND,
-          status: "In-progress"
-        }],
-      },
-      dataLayerName: 'PageDataLayer'
-    }
-    TagManager.dataLayer(tagManagerArgs)
     this.props.onLend(new LendRequest(LendType.LEND, this.props.asset, new BigNumber(0)));
   };
 

@@ -59,6 +59,9 @@ export class TorqueProvider {
   public accounts: string[] = [];
   public isLoading: boolean = false;
   public unsupportedNetwork: boolean = false;
+  public static readonly UNLIMITED_ALLOWANCE_IN_BASE_UNITS = new BigNumber(2)
+    .pow(256)
+    .minus(1);
 
   public destinationAbbr: string = "";
 
@@ -396,6 +399,74 @@ export class TorqueProvider {
     return result;
   }
 
+  public async getSwapToUsdRate(asset: Asset): Promise<BigNumber> {
+    if (asset === Asset.SAI || asset === Asset.DAI || asset === Asset.USDC || asset === Asset.SUSD) {
+      return new BigNumber(1);
+    }
+
+    return this.getSwapRate(
+      asset,
+      Asset.SAI
+    );
+  }
+
+  public async getSwapRate(srcAsset: Asset, destAsset: Asset, srcAmount?: BigNumber): Promise<BigNumber> {
+    if (srcAsset === destAsset) {
+      return new BigNumber(1);
+    }
+
+    let result: BigNumber = new BigNumber(0);
+
+    if (process.env.REACT_APP_ETH_NETWORK === "mainnet") {
+      if (!srcAmount) {
+        srcAmount = TorqueProvider.UNLIMITED_ALLOWANCE_IN_BASE_UNITS;
+      } else {
+        srcAmount = new BigNumber(srcAmount.toFixed(0, 1));
+      }
+
+      const srcAssetErc20Address = this.getErc20AddressOfAsset(srcAsset);
+      const destAssetErc20Address = this.getErc20AddressOfAsset(destAsset);
+      if (this.contractsSource && srcAssetErc20Address && destAssetErc20Address) {
+        const oracleContract = await this.contractsSource.getOracleContract();
+        try {
+          const swapPriceData: BigNumber[] = await oracleContract.getTradeData.callAsync(
+            srcAssetErc20Address,
+            destAssetErc20Address,
+            srcAmount
+          );
+          result = swapPriceData[0].dividedBy(10 ** 18);
+        } catch(e) {
+          result = new BigNumber(0);
+        }
+      }
+    } else {
+      if (!srcAmount) {
+        srcAmount = this.getGoodSourceAmountOfAsset(srcAsset);
+      }
+
+      const srcAssetErc20Address = this.getErc20AddressOfAsset(srcAsset);
+      const destAssetErc20Address = this.getErc20AddressOfAsset(destAsset);
+      if (this.contractsSource && srcAssetErc20Address && destAssetErc20Address) {
+        const oracleContract = await this.contractsSource.getOracleContract();
+        // result is always base 18, looks like srcQty too, see https://developer.kyber.network/docs/KyberNetworkProxy/#getexpectedrate
+        try {
+          const swapPriceData: BigNumber[] = await oracleContract.getExpectedRate.callAsync(
+            srcAssetErc20Address,
+            destAssetErc20Address,
+            new BigNumber(srcAmount.toFixed(0, 1))
+          );
+          result = swapPriceData[0].dividedBy(10 ** 18);
+        } catch(e) {
+          // console.log(e);
+          result = new BigNumber(0);
+        }
+      }
+    }
+
+    return result;
+  }
+
+
   public checkENSSetup = async (user: string): Promise<boolean | undefined> => {
     let result;
     if (this.contractsSource && this.web3Wrapper) {
@@ -441,9 +512,11 @@ export class TorqueProvider {
     }
   };
 
+  
+
   public doBorrow = async (borrowRequest: BorrowRequest) => {
     // console.log(borrowRequest);
-
+    
     if (borrowRequest.borrowAmount.lte(0) || borrowRequest.depositAmount.lte(0)) {
       return;
     }
@@ -467,6 +540,7 @@ export class TorqueProvider {
               new BigNumber(7884000), // approximately 3 months
               new BigNumber(0),
               account,
+              account,
               TorqueProvider.ZERO_ADDRESS,
               "0x",
               {
@@ -486,6 +560,7 @@ export class TorqueProvider {
             new BigNumber(7884000),       // initialLoanDuration (approximately 3 months)
             new BigNumber(0),             // collateralTokenSent
             account,                      // borrower
+            account,                      // receiver
             TorqueProvider.ZERO_ADDRESS,  // collateralTokenAddress
             "0x",                         // loanData
             {
@@ -520,6 +595,7 @@ export class TorqueProvider {
               new BigNumber(7884000), // approximately 3 months
               depositAmountInBaseUnits,
               account,
+              account,
               collateralAssetErc20Address,
               "0x",
               {
@@ -538,6 +614,7 @@ export class TorqueProvider {
             new BigNumber(7884000),       // initialLoanDuration (approximately 3 months)
             depositAmountInBaseUnits,     // collateralTokenSent
             account,                      // borrower
+            account,                      // receiver
             collateralAssetErc20Address,  // collateralTokenAddress
             "0x",                         // loanData
             {
@@ -562,7 +639,7 @@ export class TorqueProvider {
     }
 
     return;
-  };
+  }
 
   public gasPrice = async (): Promise<BigNumber> => {
     let result = new BigNumber(30).multipliedBy(10 ** 9); // upper limit 30 gwei
@@ -610,7 +687,7 @@ export class TorqueProvider {
     if (this.contractsSource) {
       const iBZxContract = await this.contractsSource.getiBZxContract();
       if (iBZxContract && walletDetails.walletAddress) {
-        const loansData = await iBZxContract.getBasicLoansData.callAsync(walletDetails.walletAddress, new BigNumber(6));
+        const loansData = await iBZxContract.getBasicLoansData.callAsync(walletDetails.walletAddress, new BigNumber(50));
         const zero = new BigNumber(0);
         result = loansData
           .filter(e => !e.loanTokenAmountFilled.eq(zero) && !e.collateralTokenAmountFilled.eq(zero))
@@ -795,7 +872,7 @@ export class TorqueProvider {
       dangerZone = 0.50;
       liquidationZone = 0.40;
     }*/
-    
+
     if (borrowedFundsState.collateralizedPercent.gt(dangerZone)) {
       return "Safe";
     } else if (borrowedFundsState.collateralizedPercent.gt(liquidationZone)) {
@@ -890,7 +967,7 @@ export class TorqueProvider {
   };
 
   public doRepayLoan = async (repayLoanRequest: RepayLoanRequest) => {
-    // console.log(repayLoanRequest);
+    console.log(repayLoanRequest);
 
     /*if (repayLoanRequest.repayAmount.lte(0)) {
       return;
@@ -918,15 +995,20 @@ export class TorqueProvider {
         closeAmountInBaseUnits = new BigNumber(closeAmountInBaseUnits.toFixed(0, 1));
 
         if (repayLoanRequest.borrowAsset !== Asset.ETH) {
-          await this.checkAndSetApproval(
-            repayLoanRequest.borrowAsset,
-            this.contractsSource.getVaultAddress().toLowerCase(),
-            closeAmountInBaseUnits
-          );
+          try {
+            await this.checkAndSetApproval(
+              repayLoanRequest.borrowAsset,
+              this.contractsSource.getVaultAddress().toLowerCase(),
+              closeAmountInBaseUnits
+            );
+          } catch(e) {
+            console.log(e);
+          }
         }
 
         let gasAmountBN;
         try {
+          console.log(bZxContract.address);
           const gasAmount = await bZxContract.paybackLoanAndClose.estimateGasAsync(
             repayLoanRequest.loanOrderHash,
             account,
@@ -945,7 +1027,7 @@ export class TorqueProvider {
           );
           gasAmountBN = new BigNumber(gasAmount).multipliedBy(this.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
         } catch(e) {
-          // console.log(e);
+          console.log(e);
         }
 
         const txHash = await bZxContract.paybackLoanAndClose.sendTransactionAsync(

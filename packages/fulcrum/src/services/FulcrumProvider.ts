@@ -32,23 +32,16 @@ import { TasksQueue } from "./TasksQueue";
 import TagManager from "react-gtm-module";
 import configProviders from "../config/providers.json";
 import { FulcrumMcdBridgeProcessor } from "./processors/FulcrumMcdBridgeProcessor";
+import { LendChaiProcessor } from "./processors/LendChaiProcessor";
 import { LendErcProcessor } from "./processors/LendErcProcessor";
 import { LendEthProcessor } from "./processors/LendEthProcessor";
 import { TradeBuyErcProcessor } from "./processors/TradeBuyErcProcessor";
 import { TradeBuyEthProcessor } from "./processors/TradeBuyEthProcessor";
 import { TradeSellErcProcessor } from "./processors/TradeSellErcProcessor";
 import { TradeSellEthProcessor } from "./processors/TradeSellEthProcessor";
+import { UnlendChaiProcessor } from "./processors/UnlendChaiProcessor";
 import { UnlendErcProcessor } from "./processors/UnlendErcProcessor";
 import { UnlendEthProcessor } from "./processors/UnlendEthProcessor";
-
-TagManager.initialize({
-  gtmId : configProviders.Google_TrackingID,
-  'dataLayer' : {
-           'name' : "Provider",
-           'status' : "Intailized"
-       },
-       'dataLayerName' : 'PageDataLayer'
-});
 
 export class FulcrumProvider {
   private static readonly priceGraphQueryFunction = new Map<Asset, string>([
@@ -180,6 +173,59 @@ export class FulcrumProvider {
     if (this.web3Wrapper && canWrite) {
       try {
         this.accounts = await this.web3Wrapper.getAvailableAddressesAsync() || [];
+      } catch(e) {
+        // console.log(e);
+        this.accounts = [];
+      }
+      if (this.accounts.length === 0) {
+        canWrite = false; // revert back to read-only
+      }
+    } else {
+      // this.accounts = [];
+      if (providerType === ProviderType.Bitski && networkId !== 1) {
+        this.unsupportedNetwork = true;
+      }
+    }
+
+    if (this.web3Wrapper && this.web3ProviderSettings.networkId > 0) {
+      this.contractsSource = await new ContractsSource(this.providerEngine, this.web3ProviderSettings.networkId, canWrite);
+      if (canWrite) {
+        this.providerType = providerType;
+      } else {
+        this.providerType = ProviderType.None;
+      }
+      FulcrumProvider.setLocalstorageItem('providerType', this.providerType);
+    } else {
+      this.contractsSource = null;
+    }
+
+    if (this.contractsSource) {
+      await this.contractsSource.Init();
+    }
+  }
+
+  public async setWeb3ProviderMobileFinalize(providerType: ProviderType, providerData: [Web3Wrapper | null, Web3ProviderEngine | null, boolean, number, string]) { // : Promise<boolean> {
+    this.web3Wrapper = providerData[0];
+    this.providerEngine = providerData[1];
+    let canWrite = providerData[2];
+    let networkId = providerData[3];
+    const sellectedAccount = providerData[4];
+
+    this.web3ProviderSettings = await FulcrumProvider.getWeb3ProviderSettings(networkId);
+    if (this.web3Wrapper) {
+      if (this.web3ProviderSettings.networkName !== process.env.REACT_APP_ETH_NETWORK) {
+        // TODO: inform the user they are on the wrong network. Make it provider specific (MetaMask, etc)
+
+        this.unsupportedNetwork = true;
+        canWrite = false; // revert back to read-only
+        networkId = await this.web3Wrapper.getNetworkIdAsync();
+        this.web3ProviderSettings = await FulcrumProvider.getWeb3ProviderSettings(networkId);
+      }
+    }
+
+    if (this.web3Wrapper && canWrite) {
+      try {
+        this.accounts = [sellectedAccount] // await this.web3Wrapper.getAvailableAddressesAsync() || [];
       } catch(e) {
         // console.log(e);
         this.accounts = [];
@@ -611,20 +657,26 @@ export class FulcrumProvider {
       if (balance.gt(0)) {
         const assetContract = await this.contractsSource.getPTokenContract(selectedKey);
         if (assetContract) {
-          const swapPrice = await this.getSwapToUsdRate(this.getBaseAsset(selectedKey));
+          const baseAsset = this.getBaseAsset(selectedKey);
+          const swapPrice = await this.getSwapToUsdRate(baseAsset);
           const tokenPrice = await assetContract.tokenPrice.callAsync();
           const checkpointPrice = await assetContract.checkpointPrice.callAsync(account);
+
+          let decimalOffset = 0;
+          if (baseAsset === Asset.WBTC && selectedKey.positionType === PositionType.LONG) {
+            decimalOffset = -10;
+          }
 
           assetBalance = tokenPrice
             .multipliedBy(balance)
             .multipliedBy(swapPrice)
-            .dividedBy(10**36);
+            .dividedBy(10**(36-decimalOffset));
 
           profit = tokenPrice
             .minus(checkpointPrice)
             .multipliedBy(balance)
             .multipliedBy(swapPrice)
-            .dividedBy(10**36);
+            .dividedBy(10**(36-decimalOffset));
         }
       }
     }
@@ -672,7 +724,19 @@ export class FulcrumProvider {
       result = await this.getPTokenBalanceOfUser(selectedKey);
     }
 
-    result = result.dividedBy(10 ** 18);
+    const baseAsset = this.getBaseAsset(selectedKey);
+    let decimalOffset = 0;
+    if (baseAsset === Asset.WBTC) {
+      if (selectedKey.positionType === PositionType.SHORT) {
+        if (selectedKey.unitOfAccount !== Asset.USDC) {
+          decimalOffset = 10;
+        }
+      } else {
+        decimalOffset = -10;
+      }
+    } 
+
+    result = result.dividedBy(10 ** (18-decimalOffset));
 
     return result;
   };
@@ -698,29 +762,56 @@ export class FulcrumProvider {
     return result;
   };
 
-  public getMaxLendValue = async (request: LendRequest): Promise<BigNumber> => {
-    let result = new BigNumber(0);
+  public getMaxLendValue = async (request: LendRequest): Promise<[BigNumber, BigNumber, BigNumber, BigNumber]> => {
+    let maxLendAmount = new BigNumber(0);
+    let maxTokenAmount = new BigNumber(0);
+    let tokenPrice = new BigNumber(0);
+    let chaiPrice = new BigNumber(0);
 
     if (request.lendType === LendType.LEND) {
-      result = await this.getAssetTokenBalanceOfUser(request.asset);
+      maxLendAmount = await this.getAssetTokenBalanceOfUser(request.asset);
       if (request.asset === Asset.ETH) {
-        result = result.gt(this.gasBufferForLend) ? result.minus(this.gasBufferForLend) : new BigNumber(0);
+        maxLendAmount = maxLendAmount.gt(this.gasBufferForLend) ? maxLendAmount.minus(this.gasBufferForLend) : new BigNumber(0);
       }
     } else {
-      result = await this.getITokenBalanceOfUser(request.asset);
-      /*if (this.contractsSource) {
+      /*maxLendAmount =
+        request.lendType === LendType.LEND
+          ? request.amount.multipliedBy(10 ** 18).dividedBy(tokenPrice)
+          : request.amount.multipliedBy(tokenPrice).dividedBy(10 ** 18);*/
+      if (this.contractsSource) {
         const assetContract = await this.contractsSource.getITokenContract(request.asset);
         if (assetContract) {
-          const tokenPrice = await assetContract.tokenPrice.callAsync();
-          const amount = await this.getITokenBalanceOfUser(request.asset);
-          result = amount.multipliedBy(tokenPrice).dividedBy(10 ** 18);
+          const precision = AssetsDictionary.assets.get(request.asset)!.decimals || 18;
+          if (request.asset === Asset.CHAI) {
+            chaiPrice = await assetContract.chaiPrice.callAsync();
+          }
+          tokenPrice = await assetContract.tokenPrice.callAsync();
+          maxTokenAmount = await this.getITokenBalanceOfUser(request.asset);
+          let freeSupply = (await assetContract.marketLiquidity.callAsync());// .multipliedBy(0.95);
+          let userBalance = maxTokenAmount.multipliedBy(tokenPrice).dividedBy(10 ** (36 - precision));
+          
+          if (request.asset === Asset.CHAI) {
+            freeSupply = freeSupply.multipliedBy(10 ** 18).dividedBy(chaiPrice);
+            userBalance = userBalance.multipliedBy(10 ** 18).dividedBy(chaiPrice);
+          }
+
+          if (freeSupply.lt(userBalance)) {
+            maxLendAmount = freeSupply;
+            maxTokenAmount = maxTokenAmount.multipliedBy(freeSupply).dividedBy(userBalance);
+          } else {
+            maxLendAmount = userBalance;
+          }
+
+          maxLendAmount = maxLendAmount.multipliedBy(10 ** (18 - precision));
+
         }
-      }*/
+      }
     }
 
-    result = result.dividedBy(10 ** 18);
+    maxLendAmount = maxLendAmount.dividedBy(10 ** 18);
+    maxTokenAmount = maxTokenAmount.dividedBy(10 ** 18);
 
-    return result;
+    return [maxLendAmount, maxTokenAmount, tokenPrice, chaiPrice];
   };
 
   public getPTokenPrice = async (selectedKey: TradeTokenKey): Promise<BigNumber> => {
@@ -825,10 +916,11 @@ export class FulcrumProvider {
       if (assetContract) {
         const tokenPrice = await assetContract.tokenPrice.callAsync();
 
-        result =
+        /*result =
           request.lendType === LendType.LEND
             ? request.amount.multipliedBy(10 ** 18).dividedBy(tokenPrice)
-            : request.amount.multipliedBy(tokenPrice).dividedBy(10 ** 18);
+            : request.amount.multipliedBy(tokenPrice).dividedBy(10 ** 18);*/
+          result = request.amount.multipliedBy(10 ** 18).dividedBy(tokenPrice);
       }
     }
 
@@ -971,10 +1063,7 @@ export class FulcrumProvider {
                       gasPrice: new BigNumber(0)
                     }
                   );
-                  let destDecimals: number = AssetsDictionary.assets.get(baseAsset)!.decimals || 18;
-                  if (baseAsset === Asset.WBTC && key.positionType === PositionType.SHORT) {
-                    destDecimals = destDecimals + 10;
-                  }
+                  const destDecimals: number = AssetsDictionary.assets.get(baseAsset)!.decimals || 18;
                   tradeAmountActual = tradeAmountActual.multipliedBy(10 ** (18 - destDecimals));
                 } else {
                   return null;
@@ -994,10 +1083,7 @@ export class FulcrumProvider {
                     gasPrice: new BigNumber(0)
                   }
                 );
-                let destDecimals: number = AssetsDictionary.assets.get(baseAsset)!.decimals || 18;
-                if (baseAsset === Asset.WBTC && key.positionType === PositionType.SHORT) {
-                  destDecimals = destDecimals + 10;
-                }
+                const destDecimals: number = AssetsDictionary.assets.get(baseAsset)!.decimals || 18;
                 tradeAmountActual = tradeAmountActual.multipliedBy(10 ** (18 - destDecimals));
               } catch(e) {
                 // console.log(e);
@@ -1009,9 +1095,9 @@ export class FulcrumProvider {
               try {
                 const assetErc20Address = FulcrumProvider.Instance.getErc20AddressOfAsset(request.collateral);
                 if (assetErc20Address) {
-                  let srcDecimals: number = AssetsDictionary.assets.get(baseAsset)!.decimals || 18;
+                  const srcDecimals: number = AssetsDictionary.assets.get(baseAsset)!.decimals || 18;
                   if (baseAsset === Asset.WBTC && key.positionType === PositionType.SHORT) {
-                    srcDecimals = srcDecimals + 10;
+                    // srcDecimals = srcDecimals + 10;
                   }
                   tradeAmountActual = await assetContract.burnToToken.callAsync(
                     account,
@@ -1034,9 +1120,9 @@ export class FulcrumProvider {
               }
             } else {
               try {
-                let srcDecimals: number = AssetsDictionary.assets.get(baseAsset)!.decimals || 18;
+                const srcDecimals: number = AssetsDictionary.assets.get(baseAsset)!.decimals || 18;
                 if (baseAsset === Asset.WBTC && key.positionType === PositionType.SHORT) {
-                  srcDecimals = srcDecimals + 10;
+                  // srcDecimals = srcDecimals + 10;
                 }
                 tradeAmountActual = await assetContract.burnToEther.callAsync(
                   account,
@@ -1058,7 +1144,6 @@ export class FulcrumProvider {
     }
 
     tradeAmountActual = tradeAmountActual.dividedBy(10**18);
-
     const slippage = tradeAmountActual.minus(tradedAmountEstimate).div(tradedAmountEstimate).multipliedBy(-100);
 
     /*console.log(`---------`);
@@ -1304,7 +1389,9 @@ export class FulcrumProvider {
 
     return this.getSwapRate(
       asset,
-      Asset.SAI
+      process.env.REACT_APP_ETH_NETWORK === "mainnet" ?
+        Asset.DAI :
+        Asset.SAI
     );
   }
 
@@ -1357,7 +1444,6 @@ export class FulcrumProvider {
       const destAssetErc20Address = this.getErc20AddressOfAsset(destAsset);
       if (this.contractsSource && srcAssetErc20Address && destAssetErc20Address) {
         const oracleContract = await this.contractsSource.getOracleContract();
-        // result is always base 18, looks like srcQty too, see https://developer.kyber.network/docs/KyberNetworkProxy/#getexpectedrate
         try {
           const swapPriceData: BigNumber[] = await oracleContract.getExpectedRate.callAsync(
             srcAssetErc20Address,
@@ -1516,19 +1602,25 @@ export class FulcrumProvider {
       if (taskRequest.lendType === LendType.LEND) {
         await this.addTokenToMetaMask(task);
 
-        if (taskRequest.asset !== Asset.ETH) {
-          const processor = new LendErcProcessor();
+        if (taskRequest.asset === Asset.ETH) {
+          const processor = new LendEthProcessor();
+          await processor.run(task, account, skipGas);
+        } else if (taskRequest.asset === Asset.CHAI) {
+          const processor = new LendChaiProcessor();
           await processor.run(task, account, skipGas);
         } else {
-          const processor = new LendEthProcessor();
+          const processor = new LendErcProcessor();
           await processor.run(task, account, skipGas);
         }
       } else {
-        if (taskRequest.asset !== Asset.ETH) {
-          const processor = new UnlendErcProcessor();
+        if (taskRequest.asset === Asset.ETH) {
+          const processor = new UnlendEthProcessor();
+          await processor.run(task, account, skipGas);
+        } else if (taskRequest.asset === Asset.CHAI) {
+          const processor = new UnlendChaiProcessor();
           await processor.run(task, account, skipGas);
         } else {
-          const processor = new UnlendEthProcessor();
+          const processor = new UnlendErcProcessor();
           await processor.run(task, account, skipGas);
         }
       }
@@ -1636,21 +1728,17 @@ export class FulcrumProvider {
       const receipt = await web3Wrapper.getTransactionReceiptIfExistsAsync(txHash);
       if (receipt) {
         resolve(receipt);
-        let tagManagerArgs;
         if (request instanceof LendRequest) {
-          let randomNumber = Math.floor(Math.random() * 100000) + 1;
+          const randomNumber = Math.floor(Math.random() * 100000) + 1;
           const tagManagerArgs = {
             dataLayer: {
                 transactionId: randomNumber,
-                transactionTotal: '0',
                 transactionProducts: [{
                 name: "Transaction-Lend-"+request.asset,
                 sku: request.asset,
-                category: 'Lend',
-                status: "Mined completed"
+                category: 'Lend'
               }],
-            },
-            dataLayerName: 'PageDataLayer'
+            }
           }
           TagManager.dataLayer(tagManagerArgs)
           this.eventEmitter.emit(
@@ -1658,19 +1746,16 @@ export class FulcrumProvider {
             new LendTransactionMinedEvent(request.asset, txHash)
           );
         } else if (request instanceof FulcrumMcdBridgeRequest) {
-          let randomNumber = Math.floor(Math.random() * 100000) + 1;
+          const randomNumber = Math.floor(Math.random() * 100000) + 1;
           const tagManagerArgs = {
             dataLayer: {
                 transactionId: randomNumber,
-                transactionTotal: '0',
                 transactionProducts: [{
                 name: "Transaction-FulcrumMcdBridge-"+request.asset,
                 sku: request.asset,
-                category: 'FulcrumMcdBridge',
-                status: "Mined completed"
+                category: 'FulcrumMcdBridge'
               }],
-            },
-            dataLayerName: 'PageDataLayer'
+            }
           }
           TagManager.dataLayer(tagManagerArgs);
           this.eventEmitter.emit(
@@ -1678,19 +1763,16 @@ export class FulcrumProvider {
             new LendTransactionMinedEvent(request.asset, txHash)
           );
         } else {
-          let randomNumber = Math.floor(Math.random() * 100000) + 1;
+          const randomNumber = Math.floor(Math.random() * 100000) + 1;
           const tagManagerArgs = {
             dataLayer: {
                 transactionId: randomNumber,
-                transactionTotal: '0',
                 transactionProducts: [{
                 name: "Transaction-Trade"+request.asset,
                 sku: request.asset,
-                category: 'Trade',
-                status: "Mined completed"
+                category: 'Trade'
               }],
-            },
-            dataLayerName: 'PageDataLayer'
+            }
           }
           TagManager.dataLayer(tagManagerArgs)
           this.eventEmitter.emit(
