@@ -142,6 +142,10 @@ window.addEventListener('load', function () {
                     fontColor: ['green', 'white', 'red'],
                     precision: 2
                 },
+                animation: {
+                    easing: "easeOutExpo",
+                    duration: 500
+                },
                 annotation: {
                     annotations: [
                         {
