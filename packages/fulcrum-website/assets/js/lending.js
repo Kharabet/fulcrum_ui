@@ -1,0 +1,69 @@
+function timer() {
+    let itemSecond = document.querySelector(".seconds");
+    let itemMinute = document.querySelector(".minutes");
+    let itemHour = document.querySelector(".hours");
+    let wrapHours = document.querySelector('.wrap-hours');
+    let seconds = 0;
+    let minutes = 0;
+    let hours = 0;
+    function visibleTimer() {
+        if (seconds === 59) {
+            minutes += 1;
+            seconds = -1;
+        }
+        if (minutes === 60) {
+            hours += 1;
+            minutes = 0;
+            wrapHours.style.display = 'inline-block';
+        }
+        if (hours === 24) {
+            seconds = -1;
+            minutes = 0;
+            hours = 0;
+        }
+        itemSecond.innerHTML = seconds < 9 ? '0' + ++seconds : ++seconds;
+        itemMinute.innerHTML = hours > 0 ? minutes < 9 ? '0' + minutes : minutes : minutes;
+        itemHour.innerHTML = hours;
+    }
+    setInterval(visibleTimer, 1000);
+}
+
+window.addEventListener('load', function () {
+    //change active button-coin
+    var coins = document.querySelectorAll('#calculator-earn .coin-calc');
+    var wrapperFinance = document.querySelector('.wrapper-finance');
+    for (var i = 0; i < coins.length; i++) {
+        coins[i].onclick = function () {
+            var items = document.querySelectorAll('.coin-calc');
+            for (var i = 0; i < items.length; i++) {
+                items[i].classList.remove('active');
+            }
+            let getToken = this.getAttribute('data-token');
+            getToken === 'dai' || getToken === 'susd' || getToken === 'usdc'
+                ?
+                wrapperFinance.style.display = 'block'
+                :
+                wrapperFinance.style.display = 'none';
+            this.classList.add("active");
+        };
+    }
+
+    var qualityInput = document.querySelector('.input-quality');
+    var qualityRange = document.querySelector('.range-quality');
+
+    if (qualityInput) {
+        qualityRange.oninput = function () {
+            var newVal = this.value;
+            qualityInput.value = newVal;
+        }
+    }
+    if (qualityRange) {
+        qualityInput.oninput = function () {
+            var newVal = this.value;
+            qualityRange.value = newVal;
+        }
+    }
+
+    if (document.querySelector(".seconds") && document.querySelector(".minutes") && document.querySelector(".hours"))
+        timer();
+});
