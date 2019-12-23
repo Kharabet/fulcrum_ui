@@ -150,12 +150,19 @@ window.addEventListener('load', function () {
     }
     //change active button-coin
     var coins = document.querySelectorAll('#calculator-earn .coin-calc');
+    var wrapperFinance = document.querySelector('.wrapper-finance');
     for (var i = 0; i < coins.length; i++) {
         coins[i].onclick = function () {
             var items = document.querySelectorAll('.coin-calc');
             for (var i = 0; i < items.length; i++) {
-                items[i].classList.remove("active");
+                items[i].classList.remove('active');
             }
+            let getToken = this.getAttribute('data-token');
+            getToken === 'dai' || getToken === 'susd' || getToken === 'usdc'
+                ?
+                wrapperFinance.style.display = 'block'
+                :
+                wrapperFinance.style.display = 'none';
             this.classList.add("active");
         };
     }

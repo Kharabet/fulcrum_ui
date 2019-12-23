@@ -236,7 +236,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
     <div class="container">
         <div class="row">
         <div class="col col-12 text-center">
-            <h2 class="mb-40">How much can I earn?</h2>
+            <h2 class="mb-40 mx-auto">How much can I earn?</h2>
         </div>
         </div>
         <div class="row jc-c mb-40">
@@ -245,34 +245,34 @@ title: Crypto Margin Trading with Fulcrum | bZx
                     <div class="coins-calc">
                         <p class="fs-18 mb-15 mb-md-0 c-dark-gray text-md-center">Asset</p>
                         <div class="flex fw-w jc-md-c">
-                            <button class="coin-calc">
+                            <button class="coin-calc" data-token="bat">
                                 {% include svg/bat.svg %}
                             </button>
-                            <button class="coin-calc active">
+                            <button class="coin-calc active" data-token="dai">
                                 {% include svg/dai.svg %}
                             </button>
-                            <button class="coin-calc">
+                            <button class="coin-calc" data-token="eth">
                                 {% include svg/eth.svg %}
                             </button>
-                            <button class="coin-calc">
+                            <button class="coin-calc" data-token="link">
                                 {% include svg/link.svg %}
                             </button>
-                            <button class="coin-calc">
+                            <button class="coin-calc" data-token="knc">
                                 {% include svg/knc.svg %}
                             </button>
-                            <button class="coin-calc">
+                            <button class="coin-calc" data-token="rep">
                                 {% include svg/rep.svg %}
                             </button>
-                            <button class="coin-calc">
+                            <button class="coin-calc" data-token="susd">
                                 {% include svg/susd.svg %}
                             </button>
-                            <button class="coin-calc">
+                            <button class="coin-calc" data-token="usdc">
                                 {% include svg/usdc.svg %}
                             </button>
-                            <button class="coin-calc">
+                            <button class="coin-calc" data-token="wbtc">
                                 {% include svg/wbtc.svg %}
                             </button>
-                            <button class="coin-calc">
+                            <button class="coin-calc" data-token="zrx">
                                 {% include svg/zrx.svg %}
                             </button>
                         </div>
@@ -291,84 +291,86 @@ title: Crypto Margin Trading with Fulcrum | bZx
                 </div>
             </div>
         </div>
-        <div class="row">
-            <div class="col col-12 jc-c">
-                <h5 class="fw-900 mb-35">Compare vs. traditional finance</h5>
+        <div class="wrapper-finance">        
+            <div class="row">
+                <div class="col col-12 jc-c">
+                    <h5 class="fw-900 mb-35">Compare vs. traditional finance</h5>
+                </div>
             </div>
-        </div>
-        <div class="row">
-            <div class="col col-12">
-                <div class="flex jc-sb fd-md-c mx-md-auto">
-                    <div class="item-earn active">
-                        <div class="head-earn">
-                            {% include svg/fulcrum.svg %}
+            <div class="row">
+                <div class="col col-12">
+                    <div class="flex jc-sb fd-md-c mx-md-auto">
+                        <div class="item-earn active">
+                            <div class="head-earn">
+                                {% include svg/fulcrum.svg %}
+                            </div>
+                            <div class="body-earn">
+                                <p class="fs-13">Lending stablecoins <br /> with Fulcrum</p>
+                            </div>
+                            <div class="footer-earn">
+                                <p class="fs-32 fs-md-20 mb-5 mb-md-0">$<span class="fw-800">301</span></p>
+                                <p class="fs-18 fs-md-20"><span class="fw-800">6</span>%</p>
+                            </div>
                         </div>
-                        <div class="body-earn">
-                            <p class="fs-13">Lending stablecoins <br /> with Fulcrum</p>
+                        <div class="item-earn">
+                            <div class="head-earn">
+                                {% include svg/td-bank.svg %}
+                            </div>
+                            <div class="body-earn">
+                                <p class="fs-20 fs-md-13">TD Bank</p>
+                            </div>
+                            <div class="footer-earn">
+                                <p class="fs-32 fs-md-20 mb-5 mb-md-0">$<span class="fw-800">109</span></p>
+                                <p class="fs-18 fs-md-20"><span class="fw-800">2,2</span>%</p>
+                            </div>
                         </div>
-                        <div class="footer-earn">
-                            <p class="fs-32 fs-md-20 mb-5 mb-md-0">$<span class="fw-800">301</span></p>
-                            <p class="fs-18 fs-md-20"><span class="fw-800">6</span>%</p>
+                        <div class="item-earn">
+                            <div class="head-earn">
+                                {% include svg/sofi.svg %}
+                            </div>
+                            <div class="body-earn">
+                                <p class="fs-20 fs-md-13">SoFi</p>
+                            </div>
+                            <div class="footer-earn">
+                                <p class="fs-32 fs-md-20 mb-5 mb-md-0">$<span class="fw-800">103</span></p>
+                                <p class="fs-18 fs-md-20"><span class="fw-800">2,06</span>%</p>
+                            </div>
                         </div>
-                    </div>
-                    <div class="item-earn">
-                        <div class="head-earn">
-                            {% include svg/td-bank.svg %}
+                        <div class="item-earn">
+                            <div class="head-earn">
+                                {% include svg/wealthfront.svg %}
+                            </div>
+                            <div class="body-earn">
+                                <p class="fs-20 fs-md-13">Wealthfront</p>
+                            </div>
+                            <div class="footer-earn">
+                                <p class="fs-32 fs-md-20 mb-5 mb-md-0">$<span class="fw-800">90</span></p>
+                                <p class="fs-18 fs-md-20"><span class="fw-800">1,09</span>%</p>
+                            </div>
                         </div>
-                        <div class="body-earn">
-                            <p class="fs-20 fs-md-13">TD Bank</p>
+                        <div class="item-earn">
+                            <div class="head-earn">
+                                {% include svg/betterment.svg %}
+                            </div>
+                            <div class="body-earn">
+                                <p class="fs-20 fs-md-13">Betterment</p>
+                            </div>
+                            <div class="footer-earn">
+                                <p class="fs-32 fs-md-20 mb-5 mb-md-0">$<span class="fw-800">2,50</span></p>
+                                <p class="fs-18 fs-md-20"><span class="fw-800">0,05</span>%</p>
+                            </div>
                         </div>
-                        <div class="footer-earn">
-                            <p class="fs-32 fs-md-20 mb-5 mb-md-0">$<span class="fw-800">109</span></p>
-                            <p class="fs-18 fs-md-20"><span class="fw-800">2,2</span>%</p>
-                        </div>
-                    </div>
-                    <div class="item-earn">
-                        <div class="head-earn">
-                            {% include svg/sofi.svg %}
-                        </div>
-                        <div class="body-earn">
-                            <p class="fs-20 fs-md-13">SoFi</p>
-                        </div>
-                        <div class="footer-earn">
-                            <p class="fs-32 fs-md-20 mb-5 mb-md-0">$<span class="fw-800">103</span></p>
-                            <p class="fs-18 fs-md-20"><span class="fw-800">2,06</span>%</p>
-                        </div>
-                    </div>
-                    <div class="item-earn">
-                        <div class="head-earn">
-                            {% include svg/wealthfront.svg %}
-                        </div>
-                        <div class="body-earn">
-                            <p class="fs-20 fs-md-13">Wealthfront</p>
-                        </div>
-                        <div class="footer-earn">
-                            <p class="fs-32 fs-md-20 mb-5 mb-md-0">$<span class="fw-800">90</span></p>
-                            <p class="fs-18 fs-md-20"><span class="fw-800">1,09</span>%</p>
-                        </div>
-                    </div>
-                    <div class="item-earn">
-                        <div class="head-earn">
-                            {% include svg/betterment.svg %}
-                        </div>
-                        <div class="body-earn">
-                            <p class="fs-20 fs-md-13">Betterment</p>
-                        </div>
-                        <div class="footer-earn">
-                            <p class="fs-32 fs-md-20 mb-5 mb-md-0">$<span class="fw-800">2,50</span></p>
-                            <p class="fs-18 fs-md-20"><span class="fw-800">0,05</span>%</p>
-                        </div>
-                    </div>
-                    <div class="item-earn">
-                        <div class="head-earn">
-                            {% include svg/industry-average.svg %}
-                        </div>
-                        <div class="body-earn">
-                            <p class="fs-20 fs-md-13">Industry Average</p>
-                        </div>
-                        <div class="footer-earn">
-                            <p class="fs-32 fs-md-20 mb-5 mb-md-0">$<span class="fw-800">2,45</span></p>
-                            <p class="fs-18 fs-md-20"><span class="fw-800">0,04</span>%</p>
+                        <div class="item-earn">
+                            <div class="head-earn">
+                                {% include svg/industry-average.svg %}
+                            </div>
+                            <div class="body-earn">
+                                <p class="fs-20 fs-md-13">Industry Average</p>
+                            </div>
+                            <div class="footer-earn">
+                                <p class="fs-32 fs-md-20 mb-5 mb-md-0">$<span class="fw-800">2,45</span></p>
+                                <p class="fs-18 fs-md-20"><span class="fw-800">0,04</span>%</p>
+                            </div>
                         </div>
                     </div>
                 </div>
