@@ -117,10 +117,10 @@ title: Crypto Margin Trading with Fulcrum | bZx
         </div>
         <div class="col col-12">            
             <div class="button-group-gains" role="group" aria-label="Buttons gains">
-                <button type="button" class="button-gains active">1x</button>
-                <button type="button" class="button-gains">2x</button>
-                <button type="button" class="button-gains">3x</button>
-                <button type="button" class="button-gains">4x</button>
+                <button type="button" class="button-gains active" data-leverage="1">1x</button>
+                <button type="button" class="button-gains" data-leverage="2">2x</button>
+                <button type="button" class="button-gains" data-leverage="3">3x</button>
+                <button type="button" class="button-gains" data-leverage="4">4x</button>
             </div>        
         </div>
         <div class="flex mx-auto p-relative fd-md-c">
@@ -129,11 +129,11 @@ title: Crypto Margin Trading with Fulcrum | bZx
                 {% include svg/arrow-gain.svg %}
                 <span class="before-data-gain">25</span>%
             </div>
-            <input class="gain-range" type="range" value="25" min="-100" max="100"/>
+            <input class="gain-range" type="range" value="25" min="-99" max="100"/>
         </div>
         <div class="wrapper-result-gain">
             <div class="flex fd-r"><p>If ETH price goes <span class="result-gain"><span class="fw-800 eth-price">25</span>%</span></p></div>
-            <div class="flex fd-r"><p>You Gain <span class="result-gain"><span class="fw-800">80</span>%</span></p></div>
+            <div class="flex fd-r"><p><span class="gain-text">You Gain</span> <span class="result-gain"><span class="fw-800 your-gain">25</span>%</span></p></div>
         </div>
         </div>
         <div class="w-100 mb-30 p-relative">   
@@ -166,7 +166,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
                 <div class="flex fd-c">
                     <div class="svg-blur mb-45">
                         <span class="lend-count">2</span>
-                        {% include svg/enter-quality.svg %}
+                        {% include svg/enter-quantity.svg %}
                     </div>
                     <p class="c-dark-gray mt-25">Enter the quantity and confirm</p>
                 </div>
