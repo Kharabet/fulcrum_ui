@@ -98,7 +98,7 @@ window.addEventListener('load', function () {
             },
             animation: {
                 easing: "easeOutExpo",
-                duration: 500
+                duration: 0
             },
             annotation: {
                 annotations: [
