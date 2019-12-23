@@ -1,17 +1,45 @@
 const baseData = [
-    { x: 1, y: 30 },
-    { x: 2, y: 45 },
-    { x: 3, y: 34 },
-    { x: 4, y: 44 },
-    { x: 5, y: 54 },
-    { x: 6, y: 34 },
-    { x: 7, y: 34 },
-    { x: 8, y: 32 },
-    { x: 9, y: 38 },
-    { x: 10, y: 46 },
-    { x: 11, y: 48 },
-    { x: 12, y: 38 },
-    { x: 13, y: 44 }
+    { x: 1, y: 80 },
+    { x: 2, y: 60 },
+    { x: 3, y: 30 },
+    { x: 4, y: 20 },
+    { x: 5, y: 35 },
+    { x: 6, y: 25 },
+    { x: 7, y: 40 },
+    { x: 8, y: 36 },
+    { x: 9, y: 34 },
+    { x: 10, y: 50 },
+    { x: 11, y: 33 },
+    { x: 12, y: 37 },
+    { x: 13, y: 45 },
+    { x: 14, y: 35 },
+    { x: 15, y: 37 },
+    { x: 16, y: 50 },
+    { x: 17, y: 43 },
+    { x: 18, y: 50 },
+    { x: 19, y: 45 },
+    { x: 20, y: 55 },
+    { x: 21, y: 50 },
+    { x: 22, y: 45 },
+    { x: 23, y: 40 },
+    { x: 24, y: 30 },
+    { x: 25, y: 25 },
+    { x: 26, y: 35 },
+    { x: 27, y: 40 },
+    { x: 28, y: 37 },
+    { x: 29, y: 45 },
+    { x: 30, y: 50 },
+    { x: 31, y: 60 },
+    { x: 32, y: 55 },
+    { x: 33, y: 50 },
+    { x: 34, y: 53 },
+    { x: 35, y: 55 },
+    { x: 36, y: 50 },
+    { x: 37, y: 45 },
+    { x: 38, y: 40 },
+    { x: 39, y: 45 },
+    { x: 40, y: 50 },
+    { x: 41, y: 55 },
 ]
 
 var gainRange = document.querySelector('.gain-range');
@@ -125,7 +153,7 @@ window.addEventListener('load', function () {
 });
 
 
-function updateButtonGains (e) {
+function updateButtonGains(e) {
     var itemGains = document.querySelectorAll('.button-gains');
     for (var i = 0; i < itemGains.length; i++) {
         itemGains[i].classList.remove("active");
@@ -134,7 +162,7 @@ function updateButtonGains (e) {
     updateChartData();
 }
 
-function updateAccordion (e) {
+function updateAccordion(e) {
     var items = document.querySelectorAll('.accordion-item');
     for (var i = 0; i < items.length; i++) {
         items[i].classList.remove("active");
@@ -142,7 +170,7 @@ function updateAccordion (e) {
     e.currentTarget.parentElement.classList.add("active");
 }
 
-function getChartData () {
+function getChartData() {
     //the only way to create an immutable copy of array with objects inside.
     var baseDashed = JSON.parse(JSON.stringify(baseData.slice(parseInt(baseData.length / 2))));
     var baseSolid = JSON.parse(JSON.stringify(baseData.slice(0, parseInt(baseData.length / 2 + 1))));
