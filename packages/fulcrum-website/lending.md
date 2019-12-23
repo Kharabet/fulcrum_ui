@@ -279,8 +279,8 @@ title: Crypto Margin Trading with Fulcrum | bZx
                     </div>
                     <div class="flex fd-c input-calc">
                         <p class="fs-18 mb-15 mb-md-0 c-dark-gray text-md-center">Quantity</p>
-                        <input  class="input-quality" value="12"  />
-                        <input class="range-quality" type="range" value="20" step="5" min="0" max="10000"/>
+                        <input  class="input-quantity" value="12"  />
+                        <input class="range-quantity" type="range" value="20" step="5" min="0" max="10000"/>
                         <span id="valBox"></span>
                     </div>
                     <div class="result-calc">

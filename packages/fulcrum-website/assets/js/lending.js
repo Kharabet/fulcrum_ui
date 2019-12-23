@@ -48,19 +48,19 @@ window.addEventListener('load', function () {
         };
     }
 
-    var qualityInput = document.querySelector('.input-quality');
-    var qualityRange = document.querySelector('.range-quality');
+    var quantityInput = document.querySelector('.input-quantity');
+    var quantityRange = document.querySelector('.range-quantity');
 
-    if (qualityInput) {
-        qualityRange.oninput = function () {
+    if (quantityInput) {
+        quantityRange.oninput = function () {
             var newVal = this.value;
-            qualityInput.value = newVal;
+            quantityInput.value = newVal;
         }
     }
-    if (qualityRange) {
-        qualityInput.oninput = function () {
+    if (quantityRange) {
+        quantityInput.oninput = function () {
             var newVal = this.value;
-            qualityRange.value = newVal;
+            quantityRange.value = newVal;
         }
     }
 

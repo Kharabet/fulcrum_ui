@@ -166,7 +166,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
                 <div class="flex fd-c">
                     <div class="svg-blur mb-45">
                         <span class="lend-count">2</span>
-                        {% include svg/enter-quality.svg %}
+                        {% include svg/enter-quantity.svg %}
                     </div>
                     <p class="c-dark-gray mt-25">Enter the quantity and confirm</p>
                 </div>
