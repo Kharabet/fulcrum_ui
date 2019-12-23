@@ -1,15 +1,18 @@
 import { Web3ProviderEngine } from "@0x/subproviders";
 import { BigNumber } from "@0x/utils";
 import { Web3Wrapper } from "@0x/web3-wrapper";
+// import Web3 from 'web3';
 import { EventEmitter } from "events";
 import { erc20Contract } from "../contracts/erc20";
 import { GetCdpsContract } from "../contracts/getCdps";
+import { cdpManagerContract } from "../contracts/cdpManager";
 import { Asset } from "../domain/Asset";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { BorrowRequest } from "../domain/BorrowRequest";
 import { BorrowRequestAwaiting } from "../domain/BorrowRequestAwaiting";
 import { ExtendLoanRequest } from "../domain/ExtendLoanRequest";
 import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
+import { RefinanceData } from "../domain/RefinanceData";
 import { IBorrowEstimate } from "../domain/IBorrowEstimate";
 import { ICollateralChangeEstimate } from "../domain/ICollateralChangeEstimate";
 import { ICollateralManagementParams } from "../domain/ICollateralManagementParams";
@@ -31,6 +34,8 @@ import { NavService } from "./NavService";
 
 import { ProviderChangedEvent } from "./events/ProviderChangedEvent";
 import { TorqueProviderEvents } from "./events/TorqueProviderEvents";
+import {vatContract} from "../contracts/vat";
+
 
 export class TorqueProvider {
   public static Instance: TorqueProvider;
@@ -502,10 +507,26 @@ export class TorqueProvider {
 
     return result;
   }
-  public checkCdp = async (asset: Asset): Promise<boolean> => {
-    let result = false;
-    console.log("this.web3Wrapper =",this.web3Wrapper)
-    console.log("this.contractsSource =",this.contractsSource)
+  public hex2a = async (hexx: string): Promise<string> =>{
+    var hex = hexx.toString();//force conversion
+    var str = '';
+    for (var i = 0; (i < hex.length && hex.substr(i, 2) !== '00'); i += 2)
+        str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+    return str;
+  }
+
+  public checkCdp = async (asset: Asset): Promise<RefinanceData[]> => {
+    let result: RefinanceData[]=[{
+        collateralType: '',
+        collateralAmount: new BigNumber(0),
+        debt: new BigNumber(0),
+        cdpId: new BigNumber(0)
+      }];
+    // this.web3ProviderSettings = await TorqueProvider.getWeb3ProviderSettings(1);
+    // const vat = new Web3.eth.Contract("0x1476483dd8c35f25e568113c5f70249d3976ba21", "0x2252d3b2c12455d564abc21e328a1122679f8352")
+    // console.log("vat")
+
+
     // console.log("this.contractsSource.canWrite =",this.contractsSource.canWrite)
     if (this.web3Wrapper && this.contractsSource) {
 
@@ -515,17 +536,62 @@ export class TorqueProvider {
       const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
       console.log("account = ",account)
       console.log("tokencdpContract = ",tokencdpContract)
-      if (account && tokencdpContract) {
+      if (account && tokencdpContract) {                                                                              //metamask account 0x2252d3b2c12455d564abc21e328a1122679f8352
         const cdpsresult = await tokencdpContract.getCdpsAsc.callAsync("0x1476483dd8c35f25e568113c5f70249d3976ba21", "0x2252d3b2c12455d564abc21e328a1122679f8352");
         console.log("cdpsresult = ",cdpsresult)
+        let cdpId = cdpsresult[0][0]
+        let urn = cdpsresult[1][0]
+        let ilk = cdpsresult[2][0]
+        console.log("ilk = ",ilk)
+        console.log("urn = ",urn)
+        let vatContract: vatContract | null = null;
+        vatContract = await this.contractsSource.getVatContract("0xba987bdb501d131f766fee8180da5d81b34b69d9")
+        // vat.methods.urns(ilk, urn).call().then(...
+        let resp = await vatContract.urns.callAsync(ilk,urn)
+        console.log("resp = ",resp)
+        console.log("Resp Val = ",resp[0].dividedBy(10 ** 18))
+        console.log("Resp Val 1= ",resp[1].dividedBy(10 ** 18))
+        // var web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
+
+        console.log("urn val = ",await this.hex2a(ilk))
+        result =  [{
+          collateralAmount: resp[0].dividedBy(10 ** 18),
+          debt: resp[1].dividedBy(10 ** 18),
+          collateralType: await this.hex2a(ilk),
+          cdpId: cdpId,
+        }]
+        // return result;
+        // console.log("Resp Val 0= ",resp[0].dividedBy(10 ** 18))
         // if (amountInBaseUnits.gt(cdpsallowance)) {
         //   await tokencdpContract.getCdpsDesc.callAsync(spender, TorqueProvider.MAX_UINT, { from: account });
         // }
         // result = true;
       }
     }
-
     return result;
+
+  }
+
+  public checkCdpManager = async (refRequest:RefinanceData) => {
+
+    console.log("refRequest- = ",refRequest)
+    console.log('refRequest.cdpId = ',refRequest.cdpId)
+    if (this.web3Wrapper && this.contractsSource) {
+      let tokenCdpManagerContract: cdpManagerContract | null = null;
+      tokenCdpManagerContract = await this.contractsSource.getCdpManager("0x1476483dd8c35f25e568113c5f70249d3976ba21")
+      //        index 0 = 0x1476483dd8c35f25e568113c5f70249d3976ba21
+      const cdpsresult = await tokenCdpManagerContract.cdpCan.callAsync("0x2252d3b2c12455d564abc21e328a1122679f8352", refRequest.cdpId, "0x816bFbB372355C0E2Da138165196a967C9c40aeA");
+      console.log("checkCdpManager = ",cdpsresult)
+      if(!cdpsresult.gt(0)){
+        console.log("console.loe allllowwwww = ",refRequest.cdpId)
+
+        let isalow = new BigNumber(1)
+        const cdpsResp = await tokenCdpManagerContract.cdpAllow.sendTransactionAsync(refRequest.cdpId, "0x816bFbB372355C0E2Da138165196a967C9c40aeA", isalow, {from:"0x2252d3b2c12455d564abc21e328a1122679f8352"});
+        console.log("cdpsResp =- ",cdpsResp)
+      }
+
+
+    }
   }
 
   public createAwaitingLoan = () => {

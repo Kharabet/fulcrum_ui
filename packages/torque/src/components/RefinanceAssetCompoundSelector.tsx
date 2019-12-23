@@ -1,35 +1,35 @@
 import React, { Component } from "react";
 import { Asset } from "../domain/Asset";
 import { WalletType } from "../domain/WalletType";
-import { RefinanceAssetSelectorItem } from "./RefinanceAssetSelectorItem";
 import { RefinanceAssetCompoundSelectorItem } from "./RefinanceAssetCompoundSelectorItem";
 
-export interface IRefinanceAssetSelectorProps {
+export interface IRefinanceAssetCompoundSelectorProps {
   walletType: WalletType
 
   onSelectAsset?: (asset: Asset) => void;
 }
 
-export class RefinanceAssetSelector extends Component<IRefinanceAssetSelectorProps> {
+export class RefinanceAssetCompoundSelector extends Component<IRefinanceAssetCompoundSelectorProps> {
 
   // true includes ENS support
   private readonly assetsShown: Map<Asset, boolean> = new Map<Asset, boolean>([
-    [
-      Asset.DAI,
-      true
-    ],
     // [
     //   Asset.DAI,
-    //   false
-    // ],
-    // [
-    //   Asset.USDC,
     //   true
     // ],
-    // /*[
-    //   Asset.SUSD,
-    //   false
-    // ],*/
+
+    [
+      Asset.USDC,
+      true
+    ],
+    [
+      Asset.SAI,
+      false
+    ],
+    /*[
+      Asset.SUSD,
+      false
+    ],*/
     // [
     //   Asset.ETH,
     //   false
@@ -65,14 +65,14 @@ export class RefinanceAssetSelector extends Component<IRefinanceAssetSelectorPro
       items = assetList.map(e => {
         return (
 
-          <RefinanceAssetSelectorItem key={e} asset={e} onSelectAsset={this.props.onSelectAsset} />
+          <RefinanceAssetCompoundSelectorItem key={e} asset={e}  />
         );
       });
     } else {
       assetList = assetList.sort(e => this.assetsShown.get(e) ? -1 : 1);
       items = assetList.map(e => {
         return (
-          <RefinanceAssetSelectorItem key={e} asset={e} onSelectAsset={this.assetsShown.get(e) ? this.props.onSelectAsset : undefined} />
+          <RefinanceAssetCompoundSelectorItem key={e} asset={e} onSelectAsset={this.assetsShown.get(e) ? this.props.onSelectAsset : undefined} />
         );
       });
     }

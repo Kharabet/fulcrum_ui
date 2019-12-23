@@ -72,6 +72,7 @@ export class GetCdpsContract extends BaseContract {
         },
     };
     constructor(abi: ContractAbi, address: string, provider: any, txDefaults?: Partial<TxData>) {
+
         super('GetCdps', abi, address.toLowerCase(), provider as SupportedProvider, txDefaults);
         classUtils.bindAll(this, ['_abiEncoderByFunctionSignature', 'address', 'abi', '_web3Wrapper']);
     }

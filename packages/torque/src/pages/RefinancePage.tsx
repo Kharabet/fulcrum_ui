@@ -1,6 +1,7 @@
 import React, { PureComponent, RefObject } from "react";
 import { RouteComponentProps } from "react-router";
 import { RefinanceAssetSelector } from "../components/RefinanceAssetSelector";
+import { RefinanceAssetCompoundSelector } from "../components/RefinanceAssetCompoundSelector";
 import { BorrowDlg } from "../components/BorrowDlg";
 import { Asset } from "../domain/Asset";
 import { WalletType, walletTypeAbbrToWalletType } from "../domain/WalletType";
@@ -37,6 +38,7 @@ export class RefinancePage extends PureComponent<IRefinancePageParams & RouteCom
           <HeaderOps isLoading={this.props.isLoading} doNetworkConnect={this.doNetworkConnect} />
           {/*<div className="borrow-page__main" style={walletType === WalletType.Web3 ? { paddingBottom: `90rem`} : undefined}>*/}
           <div className="borrow-page__main">
+            <RefinanceAssetCompoundSelector walletType={walletType}  />
             <RefinanceAssetSelector walletType={walletType} onSelectAsset={this.onSelectAsset} />
           </div>
           <Footer />
