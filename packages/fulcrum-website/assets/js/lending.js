@@ -1,11 +1,11 @@
 function timer() {
-    let itemSecond = document.querySelector(".seconds");
-    let itemMinute = document.querySelector(".minutes");
-    let itemHour = document.querySelector(".hours");
-    let wrapHours = document.querySelector('.wrap-hours');
-    let seconds = 0;
-    let minutes = 0;
-    let hours = 0;
+    var itemSecond = document.querySelector(".seconds");
+    var itemMinute = document.querySelector(".minutes");
+    var itemHour = document.querySelector(".hours");
+    var wrapHours = document.querySelector('.wrap-hours');
+    var seconds = 0;
+    var minutes = 0;
+    var hours = 0;
     function visibleTimer() {
         if (seconds === 59) {
             minutes += 1;
@@ -38,7 +38,7 @@ window.addEventListener('load', function () {
             for (var i = 0; i < items.length; i++) {
                 items[i].classList.remove('active');
             }
-            let getToken = this.getAttribute('data-token');
+            var getToken = this.getAttribute('data-token');
             getToken === 'dai' || getToken === 'susd' || getToken === 'usdc'
                 ?
                 wrapperFinance.style.display = 'block'

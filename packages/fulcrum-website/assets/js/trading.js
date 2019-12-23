@@ -13,17 +13,148 @@ const baseData = [
     { x: 12, y: 38 },
     { x: 13, y: 44 }
 ]
-const getChartData = () => {
+
+var gainRange = document.querySelector('.gain-range');
+var ethPrice = document.querySelector('.eth-price');
+var resultGain = document.querySelectorAll('.result-gain');
+var beforeGain = document.querySelector('.before-gain');
+var beforeDataGain = document.querySelector('.before-data-gain');
+var leverageButton = () => document.querySelector(".button-group-gains .button-gains.active");
+var yourGain = document.querySelector(".your-gain");
+
+window.addEventListener('load', function () {
+    var ctx = document.getElementById("myChart");
+    var data = getChartData();
+    ctx.getContext("2d");
+
+    var chart = new Chart(ctx, {
+        type: "line",
+        data: data,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scaleShowLabels: false,
+            layout: {
+                padding: {
+                    top: 5,
+                    bottom: 5
+                }
+            },
+            labels: {
+                render: 'title',
+                fontColor: ['green', 'white', 'red'],
+                precision: 2
+            },
+            animation: {
+                easing: "easeOutExpo",
+                duration: 500
+            },
+            annotation: {
+                annotations: [
+                    {
+                        drawTime: "afterDatasetsDraw",
+                        type: "line",
+                        mode: "vertical",
+                        scaleID: "x-axis-0",
+                        value: parseInt(baseData.length / 2) + 1,
+                        borderWidth: 3,
+                        borderColor: (localStorage.getItem('theme') === 'light') ? '#ffffff' : '#495460'
+                    }
+                ]
+            },
+            scales: {
+                xAxes: [{
+                    display: false,
+                    gridLines: {
+                        display: false
+                    },
+                    type: 'linear',
+                    position: 'bottom'
+                }],
+                yAxes: [{
+                    display: false,
+                    gridLines: {
+                        display: false
+                    }
+                }]
+            },
+            legend: {
+                display: false
+            }
+        }
+    });
+
+    function updateChartData() {
+        var data = getChartData();
+        chart.data = data;
+        chart.update();
+    }
+
+
+    //accordion
+    var accordions = document.querySelectorAll('#accordion .accordion-toggle');
+    for (var i = 0; i < accordions.length; i++) {
+        accordions[i].addEventListener("click", updateAccordion, false);
+    }
+
+
+
+    gainRange.addEventListener("input", function () {
+        updateChartData();
+        ethPrice.innerHTML = this.value;
+        beforeDataGain.innerHTML = Math.abs(this.value);
+        beforeGain.style.display = 'flex';
+        beforeGain.style.left = 'calc(50% + ' + this.value / 2 + '% - 33px - (12px *' + this.value / 100 + '))';
+        if (this.value < 0) {
+            for (var i = 0; i < resultGain.length; i++) {
+                resultGain[i].classList.add("negative");
+            }
+        } else {
+            for (var i = 0; i < resultGain.length; i++) {
+                resultGain[i].classList.remove("negative");
+            }
+        }
+
+    });
+
+    gainRange.addEventListener("change", function () {
+        beforeGain.style.display = 'none';
+    })
+
+    var buttonsGains = document.querySelectorAll('.button-gains');
+    for (var i = 0; i < buttonsGains.length; i++) {
+        buttonsGains[i].addEventListener("click", updateButtonGains, false);
+    }
+});
+
+
+function updateButtonGains (e) {
+    var itemGains = document.querySelectorAll('.button-gains');
+    for (var i = 0; i < itemGains.length; i++) {
+        itemGains[i].classList.remove("active");
+    }
+    e.currentTarget.classList.add("active");
+    updateChartData();
+}
+
+function updateAccordion (e) {
+    var items = document.querySelectorAll('.accordion-item');
+    for (var i = 0; i < items.length; i++) {
+        items[i].classList.remove("active");
+    }
+    e.currentTarget.parentElement.classList.add("active");
+}
+
+function getChartData () {
     //the only way to create an immutable copy of array with objects inside.
     var baseDashed = JSON.parse(JSON.stringify(baseData.slice(parseInt(baseData.length / 2))));
     var baseSolid = JSON.parse(JSON.stringify(baseData.slice(0, parseInt(baseData.length / 2 + 1))));
 
 
-    var leverage = parseInt(document.querySelector(".button-group-gains .button-gains.active").dataset.leverage);
-    var priceChange = parseInt(document.querySelector(".gain-range").value);
-    var youGain = document.querySelector(".your-gain");
+    var leverage = parseInt(leverageButton().dataset.leverage);
+    var priceChange = parseInt(gainRange.value);
     var gain = leverage * priceChange;
-    youGain.innerHTML = gain < -100 ? "-100" : gain;
+    yourGain.innerHTML = gain < -100 ? "-100" : gain;
 
     baseDashed.forEach((item, index) => {
         if (index !== 0)
@@ -62,131 +193,3 @@ const getChartData = () => {
         ]
     }
 }
-
-
-
-window.addEventListener('load', function () {
-    var ctx = document.getElementById("myChart");
-    var data = getChartData();
-    if (ctx) {
-        ctx.getContext("2d");
-
-        var chart = new Chart(ctx, {
-            type: "line",
-            data: data,
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scaleShowLabels: false,
-                layout: {
-                    padding: {
-                        top: 5,
-                        bottom: 5
-                    }
-                },
-                labels: {
-                    render: 'title',
-                    fontColor: ['green', 'white', 'red'],
-                    precision: 2
-                },
-                animation: {
-                    easing: "easeOutExpo",
-                    duration: 500
-                },
-                annotation: {
-                    annotations: [
-                        {
-                            drawTime: "afterDatasetsDraw",
-                            type: "line",
-                            mode: "vertical",
-                            scaleID: "x-axis-0",
-                            value: parseInt(baseData.length / 2) + 1,
-                            borderWidth: 3,
-                            borderColor: (localStorage.getItem('theme') === 'light') ? '#ffffff' : '#495460'
-                        }
-                    ]
-                },
-                scales: {
-                    xAxes: [{
-                        display: false,
-                        gridLines: {
-                            display: false
-                        },
-                        type: 'linear',
-                        position: 'bottom'
-                    }],
-                    yAxes: [{
-                        display: false,
-                        gridLines: {
-                            display: false
-                        }
-                    }]
-                },
-                legend: {
-                    display: false
-                }
-            }
-        });
-    }
-
-    function updateChartData() {
-        var data = getChartData();
-        chart.data = data;
-        chart.update();
-    }
-
-
-    //accordion
-    var accordions = document.querySelectorAll('#accordion .accordion-toggle');
-    for (var i = 0; i < accordions.length; i++) {
-        accordions[i].onclick = function () {
-            var items = document.querySelectorAll('.accordion-item');
-            for (var i = 0; i < items.length; i++) {
-                items[i].classList.remove("active");
-            }
-            this.parentElement.classList.add("active");
-        };
-    }
-
-    var gainRange = document.querySelector('.gain-range');
-    var ethPrice = document.querySelector('.eth-price');
-    var resultGain = document.querySelectorAll('.result-gain');
-    var beforeGain = document.querySelector('.before-gain');
-    var beforeDataGain = document.querySelector('.before-data-gain');
-
-    if (gainRange) {
-        gainRange.oninput = function () {
-            updateChartData();
-
-            ethPrice.innerHTML = this.value;
-            beforeDataGain.innerHTML = Math.abs(this.value);
-            beforeGain.style.display = 'flex';
-            beforeGain.style.left = 'calc(50% + ' + this.value / 2 + '% - 33px - (12px *' + this.value / 100 + '))';
-            if (this.value < 0) {
-                for (var i = 0; i < resultGain.length; i++) {
-                    resultGain[i].classList.add("negative");
-                }
-            } else {
-                for (var i = 0; i < resultGain.length; i++) {
-                    resultGain[i].classList.remove("negative");
-                }
-            }
-
-        }
-        gainRange.onchange = function () {
-            beforeGain.style.display = 'none';
-        }
-    }
-
-    var buttonsGains = document.querySelectorAll('.button-gains');
-    for (var i = 0; i < buttonsGains.length; i++) {
-        buttonsGains[i].onclick = function () {
-            var itemGains = document.querySelectorAll('.button-gains');
-            for (var i = 0; i < itemGains.length; i++) {
-                itemGains[i].classList.remove("active");
-            }
-            this.classList.add("active");
-            updateChartData();
-        };
-    }
-});

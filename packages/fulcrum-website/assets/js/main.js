@@ -1,7 +1,7 @@
 window.addEventListener('load', function () {
     //switch theme
-    const toggleSwitch = document.querySelector('.theme-switch input[type="checkbox"]');
-    const currentTheme = localStorage.getItem('theme');
+    var toggleSwitch = document.querySelector('.theme-switch input[type="checkbox"]');
+    var currentTheme = localStorage.getItem('theme');
 
     if (currentTheme) {
         document.documentElement.setAttribute('data-theme', currentTheme);
@@ -11,6 +11,10 @@ window.addEventListener('load', function () {
     }
 
     function switchTheme(e) {
+        var chart
+        Chart.helpers.each(Chart.instances, function(instance){
+            chart = instance;
+          })
         if (e.target.checked) {
             document.documentElement.setAttribute('data-theme', 'light');
             localStorage.setItem('theme', 'light');
@@ -28,9 +32,9 @@ window.addEventListener('load', function () {
 
 
     //mobile menu
-    let openMenu = document.querySelector("#hamburger-menu-open");
-    let closeMenu = document.querySelector("#hamburger-menu-close");
-    let body = document.querySelector('body');
+    var openMenu = document.querySelector("#hamburger-menu-open");
+    var closeMenu = document.querySelector("#hamburger-menu-close");
+    var body = document.querySelector('body');
     openMenu.onclick = function () {
         openMenu.style.display = 'none';
         closeMenu.style.display = 'block';
