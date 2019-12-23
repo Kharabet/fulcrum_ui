@@ -1,4 +1,5 @@
 const baseData = [
+    { x: 0, y: 65 },
     { x: 1, y: 80 },
     { x: 2, y: 60 },
     { x: 3, y: 30 },
@@ -23,7 +24,7 @@ const baseData = [
     { x: 22, y: 45 },
     { x: 23, y: 40 },
     { x: 24, y: 30 },
-    { x: 25, y: 25 },
+    { x: 25, y: 40 },
     { x: 26, y: 35 },
     { x: 27, y: 40 },
     { x: 28, y: 37 },
@@ -40,6 +41,15 @@ const baseData = [
     { x: 39, y: 45 },
     { x: 40, y: 50 },
     { x: 41, y: 55 },
+    { x: 42, y: 65 },
+    { x: 43, y: 62 },
+    { x: 44, y: 54 },
+    { x: 45, y: 65 },
+    { x: 46, y: 48 },
+    { x: 47, y: 55 },
+    { x: 48, y: 60 },
+    { x: 49, y: 63 },
+    { x: 50, y: 65 },
 ]
 
 var gainRange = document.querySelector('.gain-range');
@@ -85,7 +95,7 @@ window.addEventListener('load', function () {
                         type: "line",
                         mode: "vertical",
                         scaleID: "x-axis-0",
-                        value: parseInt(baseData.length / 2) + 1,
+                        value: parseInt(baseData.length / 2),
                         borderWidth: 3,
                         borderColor: (localStorage.getItem('theme') === 'light') ? '#ffffff' : '#495460'
                     }
@@ -223,5 +233,7 @@ function getChartData() {
 function updateChartData() {
     var data = getChartData();
     chart.data = data;
+    chart.canvas.parentNode.style.width = '100%';
+    chart.canvas.parentNode.style.height = 'auto';
     chart.update();
 }

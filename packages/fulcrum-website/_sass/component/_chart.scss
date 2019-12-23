@@ -1,6 +1,11 @@
 .wrapper-chart {
-  height: 280px;
+  height: auto;
+  max-height: 300px;
   position: relative;
+  width: 100%;
+  > canvas {
+    width: 100% !important;
+  }
 }
 .input-gain {
   margin: auto;
