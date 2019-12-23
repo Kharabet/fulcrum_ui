@@ -4,6 +4,9 @@ var itemHour = document.querySelector(".hours");
 var quantityInput = document.querySelector('.input-quantity');
 var quantityRange = document.querySelector('.range-quantity');
 
+var coins = document.querySelectorAll('#calculator-earn .coin-calc');
+var wrapperFinance = document.querySelector('.wrapper-finance');
+
 function timer() {
     var wrapHours = document.querySelector('.wrap-hours');
     var seconds = 0;
@@ -33,32 +36,26 @@ function timer() {
 
 window.addEventListener('load', function () {
     //change active button-coin
-    var coins = document.querySelectorAll('#calculator-earn .coin-calc');
-    var wrapperFinance = document.querySelector('.wrapper-finance');
     for (var i = 0; i < coins.length; i++) {
         coins[i].onclick = function () {
             var items = document.querySelectorAll('.coin-calc');
             for (var i = 0; i < items.length; i++) {
                 items[i].classList.remove('active');
             }
-            var getToken = this.getAttribute('data-token');
-            getToken === 'dai' || getToken === 'susd' || getToken === 'usdc'
-                ?
-                wrapperFinance.style.display = 'block'
-                :
-                wrapperFinance.style.display = 'none';
+            var token = this.getAttribute('data-token');
+            wrapperFinance.style.display = ['dai', 'susd', 'usdc'].includes(token)
+                ? 'block'
+                : 'none';
             this.classList.add("active");
         };
     }
 
     quantityRange.oninput = function () {
-        var newVal = this.value;
-        quantityInput.value = newVal;
+        quantityInput.value = this.value;
     }
 
     quantityInput.oninput = function () {
-        var newVal = this.value;
-        quantityRange.value = newVal;
+        quantityRange.value = this.value;
     }
 
     timer();
