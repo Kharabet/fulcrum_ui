@@ -21,6 +21,7 @@ var beforeGain = document.querySelector('.before-gain');
 var beforeDataGain = document.querySelector('.before-data-gain');
 var leverageButton = () => document.querySelector(".button-group-gains .button-gains.active");
 var yourGain = document.querySelector(".your-gain");
+var gainText = document.querySelector(".gain-text");
 
 window.addEventListener('load', function () {
     var ctx = document.getElementById("myChart");
@@ -150,7 +151,8 @@ function getChartData () {
     var leverage = parseInt(leverageButton().dataset.leverage);
     var priceChange = parseInt(gainRange.value);
     var gain = leverage * priceChange;
-    yourGain.innerHTML = gain < -100 ? "-100" : gain;
+    yourGain.innerHTML = gain < -100 ? "100" : Math.abs(gain);
+    gainText.innerHTML = gain < 0 ? "You Lose" : "You Gain"
 
     baseDashed.forEach((item, index) => {
         if (index !== 0)
@@ -172,7 +174,7 @@ function getChartData () {
         },
         {
             backgroundColor: 'transparent',
-            borderColor: 'rgb(51, 223, 204)',
+            borderColor: priceChange >= 0 ? 'rgb(51, 223, 204)' : 'rgb(255,79,79)',
             borderWidth: 4,
             radius: 0,
             data: leverageData,

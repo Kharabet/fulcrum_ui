@@ -133,7 +133,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
         </div>
         <div class="wrapper-result-gain">
             <div class="flex fd-r"><p>If ETH price goes <span class="result-gain"><span class="fw-800 eth-price">25</span>%</span></p></div>
-            <div class="flex fd-r"><p>You Gain <span class="result-gain"><span class="fw-800 your-gain">25</span>%</span></p></div>
+            <div class="flex fd-r"><p><span class="gain-text">You Gain</span> <span class="result-gain"><span class="fw-800 your-gain">25</span>%</span></p></div>
         </div>
         </div>
         <div class="w-100 mb-30 p-relative">   
