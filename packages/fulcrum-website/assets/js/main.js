@@ -24,6 +24,22 @@ var chartData = {
     }
     ]
 }
+
+const baseData = [
+    { x: 1, y: 30 },
+    { x: 2, y: 45 },
+    { x: 3, y: 34 },
+    { x: 4, y: 44 },
+    { x: 5, y: 54 },
+    { x: 6, y: 34 },
+    { x: 7, y: 34 },
+    { x: 8, y: 32 },
+    { x: 9, y: 38 },
+    { x: 10, y: 46 },
+    { x: 11, y: 48 },
+    { x: 12, y: 38 },
+    { x: 13, y: 44 }
+]
 function timer() {
     let itemSecond = document.querySelector(".seconds");
     let itemMinute = document.querySelector(".minutes");
@@ -54,16 +70,63 @@ function timer() {
     setInterval(visibleTimer, 1000);
 }
 
+const getChartData = () => {
+    //the only way to create an immutable copy of array with objects inside.
+    var baseDashed = JSON.parse(JSON.stringify(baseData.slice(parseInt(baseData.length / 2))));
+    var baseSolid = JSON.parse(JSON.stringify(baseData.slice(0, parseInt(baseData.length / 2 + 1))));
+
+
+    var leverage = parseInt(document.querySelector(".button-group-gains .button-gains.active").dataset.leverage);
+    var priceChange = parseInt(document.querySelector(".gain-range").value);
+    baseDashed.forEach((item, index) => {
+        if (index !== 0)
+            item.y += item.y * priceChange / 100;
+    })
+    var leverageData = baseDashed.map((item, index) => {
+        if (index === 0) { return { x: item.x, y: item.y } }
+        return { x: item.x, y: item.y * (1 + priceChange * leverage / 100) }
+    });
+
+    return {
+        datasets: [{
+            backgroundColor: 'transparent',
+            borderColor: 'rgb(39, 107, 251)',
+            borderWidth: 4,
+            radius: 0,
+            data: baseSolid
+        },
+        {
+            backgroundColor: 'transparent',
+            borderColor: 'rgb(51, 223, 204)',
+            borderWidth: 4,
+            radius: 0,
+            data: leverageData,
+            borderDash: [15, 3]
+        },
+        {
+            backgroundColor: 'transparent',
+            borderColor: 'rgb(86, 169, 255)',
+            borderWidth: 2,
+            radius: 0,
+            data: baseDashed,
+            borderDash: [8, 4]
+        }
+        ]
+    }
+}
+
 window.addEventListener('load', function () {
     //switch theme
     const toggleSwitch = document.querySelector('.theme-switch input[type="checkbox"]');
     const currentTheme = localStorage.getItem('theme');
     var ctx = document.getElementById("myChart");
+    var data = getChartData();
     if (ctx) {
         ctx.getContext("2d");
-        let chart = new Chart(ctx, {
+
+        var chart = new Chart(ctx, {
             type: "line",
-            data: chartData,
+            data: data,
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
@@ -86,7 +149,7 @@ window.addEventListener('load', function () {
                             type: "line",
                             mode: "vertical",
                             scaleID: "x-axis-0",
-                            value: 4,
+                            value: parseInt(baseData.length / 2) + 1,
                             borderWidth: 3,
                             borderColor: (localStorage.getItem('theme') === 'light') ? '#ffffff' : '#495460'
                         }
@@ -119,6 +182,12 @@ window.addEventListener('load', function () {
         if (currentTheme === 'light') {
             toggleSwitch.checked = true;
         }
+    }
+
+    function updateChartData() {
+        var data = getChartData();
+        chart.data = data;
+        chart.update();
     }
 
     function switchTheme(e) {
@@ -180,9 +249,12 @@ window.addEventListener('load', function () {
     var resultGain = document.querySelectorAll('.result-gain');
     var beforeGain = document.querySelector('.before-gain');
     var beforeDataGain = document.querySelector('.before-data-gain');
+    var youGain = document.querySelector(".your-gain");
 
     if (gainRange) {
         gainRange.oninput = function () {
+            updateChartData();
+            youGain.innerHTML = parseInt(document.querySelector(".button-group-gains .button-gains.active").dataset.leverage) * this.value;
             ethPrice.innerHTML = this.value;
             beforeDataGain.innerHTML = Math.abs(this.value);
             beforeGain.style.display = 'flex';
@@ -227,6 +299,7 @@ window.addEventListener('load', function () {
                 itemGains[i].classList.remove("active");
             }
             this.classList.add("active");
+            updateChartData();
         };
     }
 });
