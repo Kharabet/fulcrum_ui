@@ -61,10 +61,22 @@ var leverageButton = () => document.querySelector(".button-group-gains .button-g
 var yourGain = document.querySelector(".your-gain");
 var gainText = document.querySelector(".gain-text");
 
+
+
+
 window.addEventListener('load', function () {
+    var originalController = Chart.controllers.line;
+
+
     var ctx = document.getElementById("myChart");
     var data = getChartData();
     ctx.getContext("2d");
+    Chart.controllers.line = Chart.controllers.line.extend({
+        draw: function () {
+            originalController.prototype.draw.call(this, arguments);
+            drawLabels(this, ctx.getContext("2d"));
+        }
+    });
 
     window.chart = new Chart(ctx, {
         type: "line",
@@ -216,7 +228,8 @@ function getChartData() {
             borderWidth: 4,
             radius: 0,
             data: leverageData,
-            borderDash: [15, 3]
+            borderDash: [15, 3],
+            label: "LEVERAGE"
         },
         {
             backgroundColor: 'transparent',
@@ -224,7 +237,8 @@ function getChartData() {
             borderWidth: 2,
             radius: 0,
             data: baseDashed,
-            borderDash: [8, 4]
+            borderDash: [8, 4],
+            label: "HOLD"
         }
         ]
     }
@@ -237,3 +251,42 @@ function updateChartData() {
     chart.canvas.parentNode.style.height = 'auto';
     chart.update();
 }
+
+function drawLabels(t, ctx) {
+    ctx.save();
+    var leverage = parseInt(leverageButton().dataset.leverage);
+    var priceChange = parseInt(gainRange.value);
+    ctx.font = "normal normal bold 15px /1.5 Muli";
+    ctx.textBaseline = 'bottom';
+
+    var chartInstance = t.chart;
+    var datasets = chartInstance.config.data.datasets;
+    datasets.forEach(function (ds, index) {
+        var label = ds.label;
+        ctx.fillStyle = ds.borderColor;
+
+        var meta = chartInstance.controller.getDatasetMeta(index);
+        var len = meta.data.length - 1;
+        var pointPostition = parseInt(len / 2) - parseInt(0.2 * len);
+        x = meta.data[pointPostition]._model.x;
+        var xOffset = x;
+        y = meta.data[pointPostition]._model.y;
+        var yOffset;
+        if (label === "HOLD") {
+            yOffset = leverage * priceChange > 0
+                ? 1.3 * y
+                : 0.8 * y
+        } else {
+            yOffset = leverage * priceChange > 0
+                ? 0.8 * y
+                : 1.3 * y
+        };
+
+        if (yOffset > 300) yOffset = 295;
+        if (yOffset < 0) yOffset = 5;
+        if (label)
+            ctx.fillText(label, xOffset, yOffset);
+    });
+    ctx.restore();
+}
+
