@@ -11,21 +11,24 @@ window.addEventListener('load', function () {
     }
 
     function switchTheme(e) {
-        var chart
-        Chart.helpers.each(Chart.instances, function(instance){
-            chart = instance;
-          })
+
         if (e.target.checked) {
             document.documentElement.setAttribute('data-theme', 'light');
             localStorage.setItem('theme', 'light');
-            chart.options.annotation.annotations[0].borderColor = '#ffffff';
+
+            if (window.chart)
+                chart.options.annotation.annotations[0].borderColor = '#ffffff';
         }
         else {
             document.documentElement.setAttribute('data-theme', 'dark');
             localStorage.setItem('theme', 'dark');
-            chart.options.annotation.annotations[0].borderColor = '#495460';
+
+            if (window.chart)
+                chart.options.annotation.annotations[0].borderColor = '#495460';
         }
-        chart.update();
+
+        if (window.chart)
+            chart.update();
     }
 
     toggleSwitch.addEventListener('change', switchTheme, false);

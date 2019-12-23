@@ -27,7 +27,7 @@ window.addEventListener('load', function () {
     var data = getChartData();
     ctx.getContext("2d");
 
-    var chart = new Chart(ctx, {
+    window.chart = new Chart(ctx, {
         type: "line",
         data: data,
         options: {
@@ -84,11 +84,7 @@ window.addEventListener('load', function () {
         }
     });
 
-    function updateChartData() {
-        var data = getChartData();
-        chart.data = data;
-        chart.update();
-    }
+
 
 
     //accordion
@@ -192,4 +188,10 @@ function getChartData () {
         }
         ]
     }
+}
+
+function updateChartData() {
+    var data = getChartData();
+    chart.data = data;
+    chart.update();
 }
