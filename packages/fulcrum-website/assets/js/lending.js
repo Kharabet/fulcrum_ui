@@ -1,7 +1,10 @@
+var itemSecond = document.querySelector(".seconds");
+var itemMinute = document.querySelector(".minutes");
+var itemHour = document.querySelector(".hours");
+var quantityInput = document.querySelector('.input-quantity');
+var quantityRange = document.querySelector('.range-quantity');
+
 function timer() {
-    var itemSecond = document.querySelector(".seconds");
-    var itemMinute = document.querySelector(".minutes");
-    var itemHour = document.querySelector(".hours");
     var wrapHours = document.querySelector('.wrap-hours');
     var seconds = 0;
     var minutes = 0;
@@ -48,22 +51,15 @@ window.addEventListener('load', function () {
         };
     }
 
-    var quantityInput = document.querySelector('.input-quantity');
-    var quantityRange = document.querySelector('.range-quantity');
-
-    if (quantityInput) {
-        quantityRange.oninput = function () {
-            var newVal = this.value;
-            quantityInput.value = newVal;
-        }
-    }
-    if (quantityRange) {
-        quantityInput.oninput = function () {
-            var newVal = this.value;
-            quantityRange.value = newVal;
-        }
+    quantityRange.oninput = function () {
+        var newVal = this.value;
+        quantityInput.value = newVal;
     }
 
-    if (document.querySelector(".seconds") && document.querySelector(".minutes") && document.querySelector(".hours"))
-        timer();
+    quantityInput.oninput = function () {
+        var newVal = this.value;
+        quantityRange.value = newVal;
+    }
+
+    timer();
 });
