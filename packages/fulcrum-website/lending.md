@@ -245,11 +245,14 @@ title: Crypto Margin Trading with Fulcrum | bZx
                     <div class="coins-calc">
                         <p class="fs-18 mb-15 mb-md-0 c-dark-gray text-md-center">Asset</p>
                         <div class="flex fw-w jc-md-c">
-                            <button class="coin-calc" data-token="bat">
-                                {% include svg/bat.svg %}
-                            </button>
                             <button class="coin-calc active" data-token="dai">
                                 {% include svg/dai.svg %}
+                            </button>
+                            <button class="coin-calc" data-token="usdc">
+                                {% include svg/usdc.svg %}
+                            </button>
+                            <button class="coin-calc" data-token="bat">
+                                {% include svg/bat.svg %}
                             </button>
                             <button class="coin-calc" data-token="eth">
                                 {% include svg/eth.svg %}
@@ -265,9 +268,6 @@ title: Crypto Margin Trading with Fulcrum | bZx
                             </button>
                             <button class="coin-calc" data-token="susd">
                                 {% include svg/susd.svg %}
-                            </button>
-                            <button class="coin-calc" data-token="usdc">
-                                {% include svg/usdc.svg %}
                             </button>
                             <button class="coin-calc" data-token="wbtc">
                                 {% include svg/wbtc.svg %}
