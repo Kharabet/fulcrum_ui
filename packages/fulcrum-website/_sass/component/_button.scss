@@ -16,12 +16,14 @@
     color: #ffffff;
     &:hover {
         background-color: #33dfcc;
+        box-shadow: 0px 13px 36px rgba(15, 204, 183, 0.4);
     }
 }
 .button-secondary {
     background-color: #003cda;
     &:hover {
         background-color: #5b88ff;
+        box-shadow: 0px 13px 36px rgba(0, 82, 255, 0.4);
     }
     color: #ffffff;
 }
