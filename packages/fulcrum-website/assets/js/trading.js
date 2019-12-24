@@ -98,7 +98,7 @@ window.addEventListener('load', function () {
             },
             animation: {
                 easing: "easeOutExpo",
-                duration: 0
+                duration: 500
             },
             annotation: {
                 annotations: [
@@ -146,7 +146,7 @@ window.addEventListener('load', function () {
 
 
 
-    gainRange.addEventListener("input", function () {
+    gainRange.addEventListener("change", function () {
         updateChartData();
         ethPrice.innerHTML = this.value;
         beforeDataGain.innerHTML = Math.abs(this.value);
