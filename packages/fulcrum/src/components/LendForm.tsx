@@ -138,9 +138,9 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
     }
 
     let assetOrWrapped: Asset;
-    if (this.props.asset == Asset.ETH) {
+    if (this.props.asset === Asset.ETH) {
       assetOrWrapped = this.state.useWrapped ? Asset.WETH : Asset.ETH;
-    } else if (this.props.asset == Asset.DAI) {
+    } else if (this.props.asset === Asset.DAI) {
       assetOrWrapped = this.state.useWrappedDai ? Asset.CHAI : Asset.DAI;
     } else {
       assetOrWrapped = this.props.asset;
@@ -467,7 +467,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
     }
 
     let usdPrice = sendAmount
-    if(usdPrice != null){
+    if (usdPrice !== null) {
         usdPrice = usdPrice.multipliedBy(usdAmount)
     }
 
@@ -489,9 +489,9 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
     TagManager.dataLayer(tagManagerArgs);
 
     let assetOrWrapped: Asset;
-    if (this.props.asset == Asset.ETH) {
+    if (this.props.asset === Asset.ETH) {
       assetOrWrapped = this.state.useWrapped ? Asset.WETH : Asset.ETH;
-    } else if (this.props.asset == Asset.DAI) {
+    } else if (this.props.asset === Asset.DAI) {
       assetOrWrapped = this.state.useWrappedDai ? Asset.CHAI : Asset.DAI;
     } else {
       assetOrWrapped = this.props.asset;
@@ -511,9 +511,9 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
   private rxFromMaxAmount = (): Observable<ILendAmountChangeEvent | null> => {
     
     let assetOrWrapped: Asset;
-    if (this.props.asset == Asset.ETH) {
+    if (this.props.asset === Asset.ETH) {
       assetOrWrapped = this.state.useWrapped ? Asset.WETH : Asset.ETH;
-    } else if (this.props.asset == Asset.DAI) {
+    } else if (this.props.asset === Asset.DAI) {
       assetOrWrapped = this.state.useWrappedDai ? Asset.CHAI : Asset.DAI;
     } else {
       assetOrWrapped = this.props.asset;
@@ -576,9 +576,9 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
 
       if (!amount.isNaN()) {
         let assetOrWrapped: Asset;
-        if (this.props.asset == Asset.ETH) {
+        if (this.props.asset === Asset.ETH) {
           assetOrWrapped = this.state.useWrapped ? Asset.WETH : Asset.ETH;
-        } else if (this.props.asset == Asset.DAI) {
+        } else if (this.props.asset === Asset.DAI) {
           assetOrWrapped = this.state.useWrappedDai ? Asset.CHAI : Asset.DAI;
         } else {
           assetOrWrapped = this.props.asset;

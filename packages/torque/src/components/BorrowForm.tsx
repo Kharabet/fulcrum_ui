@@ -214,7 +214,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
       let randomNumber = Math.floor(Math.random() * 100000) + 1;
       const usdAmount = await TorqueProvider.Instance.getSwapToUsdRate(this.props.borrowAsset)
       let usdPrice = this.state.borrowAmount
-      if(usdPrice != null){
+      if (usdPrice !== null){
           usdPrice = usdPrice.multipliedBy(usdAmount)
       }
       const tagManagerArgs = {

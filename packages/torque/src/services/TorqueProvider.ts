@@ -1113,7 +1113,7 @@ export class TorqueProvider {
             }
           );
           // console.log(txHash);
-        } else { // manageCollateralRequest.isWithdrawal == true
+        } else { // manageCollateralRequest.isWithdrawal === true
 
           let gasAmountBN;
           try {

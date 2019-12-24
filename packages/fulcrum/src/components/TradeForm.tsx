@@ -609,7 +609,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       return;
     }
     let usdPrice = this.state.tradeAmountValue
-    if(usdPrice != null){
+    if (usdPrice !== null){
         usdPrice = usdPrice.multipliedBy(usdAmount)
     }
     const randomNumber = Math.floor(Math.random() * 100000) + 1;
