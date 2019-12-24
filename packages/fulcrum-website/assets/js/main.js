@@ -15,20 +15,11 @@ window.addEventListener('load', function () {
         if (e.target.checked) {
             document.documentElement.setAttribute('data-theme', 'dark');
             localStorage.setItem('theme', 'dark');
-
-            if (window.chart)
-                chart.options.annotation.annotations[0].borderColor = '#ffffff';
         }
         else {
             document.documentElement.setAttribute('data-theme', 'light');
             localStorage.setItem('theme', 'light');
-
-            if (window.chart)
-                chart.options.annotation.annotations[0].borderColor = '#495460';
         }
-
-        if (window.chart)
-            chart.update();
     }
 
     toggleSwitch.addEventListener('change', switchTheme, false);
