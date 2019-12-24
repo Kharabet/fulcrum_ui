@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 
 <head>
     <title>{% if page.title %}{{ page.title | escape }}{% else %}{{ site.title | escape }}{% endif %}</title>
@@ -26,5 +26,10 @@
     <meta property="og:image:height" content="630" />
     <link rel="canonical" href="{% if page.canonical %}{{ page.canonical }}{% else %}{{ page.url | prepend: site.url }}{% endif %}" />
     <link rel="stylesheet" href="{{ "/assets/css/main.css" | prepend: site.baseurl }}">
+    <script>
+        var currentTheme = localStorage.getItem('theme');
+        if (currentTheme) 
+            document.documentElement.setAttribute('data-theme', currentTheme);
+    </script>
 </head>
 <body>
