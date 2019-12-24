@@ -117,8 +117,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
         </div>
         <div class="col col-12">            
             <div class="button-group-gains" role="group" aria-label="Buttons gains">
-                <button type="button" class="button-gains active" data-leverage="1">1x</button>
-                <button type="button" class="button-gains" data-leverage="2">2x</button>
+                <button type="button" class="button-gains active" data-leverage="2">2x</button>
                 <button type="button" class="button-gains" data-leverage="3">3x</button>
                 <button type="button" class="button-gains" data-leverage="4">4x</button>
             </div>        
