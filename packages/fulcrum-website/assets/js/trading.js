@@ -87,7 +87,7 @@ window.addEventListener('load', function () {
             scaleShowLabels: false,
             layout: {
                 padding: {
-                    top: 50,
+                    top: 30,
                     bottom: 80
                 }
             },
@@ -100,19 +100,19 @@ window.addEventListener('load', function () {
                 easing: "easeOutExpo",
                 duration: 500
             },
-            annotation: {
-                annotations: [
-                    {
-                        drawTime: "afterDatasetsDraw",
-                        type: "line",
-                        mode: "vertical",
-                        scaleID: "x-axis-0",
-                        value: parseInt(baseData.length / 2),
-                        borderWidth: 3,
-                        borderColor: (localStorage.getItem('theme') === 'light') ? '#ffffff' : '#495460'
-                    }
-                ]
-            },
+            // annotation: {
+            //     annotations: [
+            //         {
+            //             drawTime: "afterDatasetsDraw",
+            //             type: "line",
+            //             mode: "vertical",
+            //             scaleID: "x-axis-0",
+            //             value: parseInt(baseData.length / 2),
+            //             borderWidth: 3,
+            //             borderColor: (localStorage.getItem('theme') === 'light') ? '#ffffff' : '#495460'
+            //         }
+            //     ]
+            // },
             scales: {
                 xAxes: [{
                     display: false,
@@ -274,12 +274,12 @@ function drawLabels(t, ctx) {
         var yOffset;
         if (label === "HOLD") {
             yOffset = leverage * priceChange > 0
-                ? y + 50
-                : y - 50
+                ? y * 1.2
+                : y * 0.8
         } else {
             yOffset = leverage * priceChange > 0
-                ? y - 50
-                : y + 50
+                ? y * 0.8
+                : y * 1.2
         };
 
         if (yOffset > chartInstance.canvas.parentNode.offsetHeight) {

@@ -25,12 +25,14 @@
     position: absolute;
     content: "";
     width: 3px;
-    height: 7px;
-    bottom: -5px;
+
+    height: 380px;
+    bottom: -377px;
     background-color: var(--secondary-bg);
     left: 0;
     right: 0;
     margin: auto;
+    z-index: 100;
   }
 }
 .chart-mark {
