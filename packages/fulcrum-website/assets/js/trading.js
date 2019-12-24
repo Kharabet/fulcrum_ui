@@ -87,8 +87,8 @@ window.addEventListener('load', function () {
             scaleShowLabels: false,
             layout: {
                 padding: {
-                    top: 5,
-                    bottom: 5
+                    top: 50,
+                    bottom: 80
                 }
             },
             labels: {
@@ -274,15 +274,18 @@ function drawLabels(t, ctx) {
         var yOffset;
         if (label === "HOLD") {
             yOffset = leverage * priceChange > 0
-                ? 1.3 * y
-                : 0.8 * y
+                ? y + 50
+                : y - 50
         } else {
             yOffset = leverage * priceChange > 0
-                ? 0.8 * y
-                : 1.3 * y
+                ? y - 50
+                : y + 50
         };
 
-        if (yOffset > 300) yOffset = 295;
+        if (yOffset > chartInstance.canvas.parentNode.offsetHeight) {
+            // yOffset = 295;
+            chartInstance.canvas.parentNode.style.height = `${yOffset*1.3}px`;
+        }
         if (yOffset < 0) yOffset = 5;
         if (label)
             ctx.fillText(label, xOffset, yOffset);
