@@ -6,9 +6,6 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    &:hover {
-        box-shadow: 0px 4px 18px rgba(64, 123, 247, 0.5);
-    }
 }
 
 .button-primary {
@@ -31,16 +28,23 @@
     border: 3px solid #b9c7d6;
     background-color: var(--btn-white-bg);
     color: #b9c7d6;
+    &:hover {
+        background-color: #b9c7d6;
+        color: #ffffff;
+        path{
+            stroke: #ffffff;
+        }
+    }
 }
 .button-green {
     border: 2px solid #00c0ab;
     background-color: var(--btn-green-bg);
     color: var(--btn-green-color);
-}
-.button-blue {
-    border: 2px solid var(--btn-blue-border);
-    background-color: var(--btn-blue-bg);
-    color: #ffffff;
+    &:hover {
+        background-color: #33dfcc;
+        border-color: #33dfcc;
+        color: #ffffff;
+    }
 }
 .button-lg {
     width: 250px;
