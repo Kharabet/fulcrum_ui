@@ -19,6 +19,9 @@ footer {
       font-weight: 600;
       color: #276bfb;
       line-height: 1.25;
+      &:hover {
+        color: #5b88ff;
+      }
 
       @media (min-width: 992px) {
         font-size: 16px;

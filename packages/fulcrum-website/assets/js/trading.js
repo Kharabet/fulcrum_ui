@@ -61,10 +61,34 @@ var leverageButton = () => document.querySelector(".button-group-gains .button-g
 var yourGain = document.querySelector(".your-gain");
 var gainText = document.querySelector(".gain-text");
 
+var coins = document.querySelectorAll('.chart-tokens .coin-calc');
+
+
+
 window.addEventListener('load', function () {
+    //change active button-coin
+    for (var i = 0; i < coins.length; i++) {
+        coins[i].onclick = function () {
+            var items = document.querySelectorAll('.coin-calc');
+            for (var i = 0; i < items.length; i++) {
+                items[i].classList.remove('active');
+            }
+            var token = this.getAttribute('data-token');
+            document.querySelector(".token-name").innerHTML = token.toUpperCase();
+            this.classList.add("active");
+        };
+    }
+
+    var originalController = Chart.controllers.line;
     var ctx = document.getElementById("myChart");
     var data = getChartData();
     ctx.getContext("2d");
+    Chart.controllers.line = Chart.controllers.line.extend({
+        draw: function () {
+            originalController.prototype.draw.call(this, arguments);
+            drawLabels(this, ctx.getContext("2d"));
+        }
+    });
 
     window.chart = new Chart(ctx, {
         type: "line",
@@ -75,8 +99,8 @@ window.addEventListener('load', function () {
             scaleShowLabels: false,
             layout: {
                 padding: {
-                    top: 5,
-                    bottom: 5
+                    top: 30,
+                    bottom: 80
                 }
             },
             labels: {
@@ -88,19 +112,19 @@ window.addEventListener('load', function () {
                 easing: "easeOutExpo",
                 duration: 500
             },
-            annotation: {
-                annotations: [
-                    {
-                        drawTime: "afterDatasetsDraw",
-                        type: "line",
-                        mode: "vertical",
-                        scaleID: "x-axis-0",
-                        value: parseInt(baseData.length / 2),
-                        borderWidth: 3,
-                        borderColor: (localStorage.getItem('theme') === 'light') ? '#ffffff' : '#495460'
-                    }
-                ]
-            },
+            // annotation: {
+            //     annotations: [
+            //         {
+            //             drawTime: "afterDatasetsDraw",
+            //             type: "line",
+            //             mode: "vertical",
+            //             scaleID: "x-axis-0",
+            //             value: parseInt(baseData.length / 2),
+            //             borderWidth: 3,
+            //             borderColor: (localStorage.getItem('theme') === 'light') ? '#ffffff' : '#495460'
+            //         }
+            //     ]
+            // },
             scales: {
                 xAxes: [{
                     display: false,
@@ -134,9 +158,12 @@ window.addEventListener('load', function () {
 
 
 
-    gainRange.addEventListener("input", function () {
+    gainRange.addEventListener("change", function () {
         updateChartData();
         ethPrice.innerHTML = this.value;
+    });
+
+    gainRange.addEventListener("input", function () {
         beforeDataGain.innerHTML = Math.abs(this.value);
         beforeGain.style.display = 'flex';
         beforeGain.style.left = 'calc(50% + ' + this.value / 2 + '% - 33px - (12px *' + this.value / 100 + '))';
@@ -149,9 +176,7 @@ window.addEventListener('load', function () {
                 resultGain[i].classList.remove("negative");
             }
         }
-
     });
-
     gainRange.addEventListener("change", function () {
         beforeGain.style.display = 'none';
     })
@@ -216,7 +241,8 @@ function getChartData() {
             borderWidth: 4,
             radius: 0,
             data: leverageData,
-            borderDash: [15, 3]
+            borderDash: [15, 3],
+            label: "LEVERAGE"
         },
         {
             backgroundColor: 'transparent',
@@ -224,7 +250,8 @@ function getChartData() {
             borderWidth: 2,
             radius: 0,
             data: baseDashed,
-            borderDash: [8, 4]
+            borderDash: [8, 4],
+            label: "HOLD"
         }
         ]
     }
@@ -237,3 +264,45 @@ function updateChartData() {
     chart.canvas.parentNode.style.height = 'auto';
     chart.update();
 }
+
+function drawLabels(t, ctx) {
+    ctx.save();
+    var leverage = parseInt(leverageButton().dataset.leverage);
+    var priceChange = parseInt(gainRange.value);
+    ctx.font = "normal normal bold 15px /1.5 Muli";
+    ctx.textBaseline = 'bottom';
+
+    var chartInstance = t.chart;
+    var datasets = chartInstance.config.data.datasets;
+    datasets.forEach(function (ds, index) {
+        var label = ds.label;
+        ctx.fillStyle = ds.borderColor;
+
+        var meta = chartInstance.controller.getDatasetMeta(index);
+        var len = meta.data.length - 1;
+        var pointPostition = parseInt(len / 2) - parseInt(0.2 * len);
+        x = meta.data[pointPostition]._model.x;
+        var xOffset = x;
+        y = meta.data[pointPostition]._model.y;
+        var yOffset;
+        if (label === "HOLD") {
+            yOffset = leverage * priceChange > 0
+                ? y * 1.2
+                : y * 0.8
+        } else {
+            yOffset = leverage * priceChange > 0
+                ? y * 0.8
+                : y * 1.2
+        };
+
+        if (yOffset > chartInstance.canvas.parentNode.offsetHeight) {
+            // yOffset = 295;
+            chartInstance.canvas.parentNode.style.height = `${yOffset * 1.3}px`;
+        }
+        if (yOffset < 0) yOffset = 5;
+        if (label)
+            ctx.fillText(label, xOffset, yOffset);
+    });
+    ctx.restore();
+}
+

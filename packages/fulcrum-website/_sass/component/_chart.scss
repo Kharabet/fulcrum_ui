@@ -1,36 +1,38 @@
 .wrapper-chart {
   height: auto;
-  max-height: 300px;
+  max-height: 400px;
   position: relative;
   width: 100%;
   > canvas {
     width: 100% !important;
   }
 }
+
 .input-gain {
   margin: auto;
   position: relative;
   &:before {
     position: absolute;
     content: "";
-    width: 3px;
-    height: 55px;
-    top: -61px;
-    background-color: var(--secondary-bg);
-    left: 0;
-    right: 0;
-    margin: auto;
+    background: radial-gradient(ellipse 100% 110% at 0% 50%, var(--chart-shadow-color) 0%, transparent 50%);
+    height: 380px;
+    width: 35px;
+    left: 50%;
+    bottom: -380px;
+    z-index: 100;
   }
   &:after {
     position: absolute;
     content: "";
     width: 3px;
-    height: 7px;
-    bottom: -5px;
+
+    height: 380px;
+    bottom: -377px;
     background-color: var(--secondary-bg);
     left: 0;
     right: 0;
     margin: auto;
+    z-index: 100;
   }
 }
 .chart-mark {
@@ -69,15 +71,11 @@
   font-weight: 600;
   color: var(--primary-color);
   @media (min-width: 992px) {
-    position: absolute;
-    left: 440px;
-    top: -45px;
-    width: 63%;
     font-size: 20px;
   }
   @media (max-width: 991px) {
-    order: -1;
-    margin-bottom: 75px;
+    // order: -1;
+    // margin-bottom: 75px;
     font-size: 16px;
   }
   .result-gain {
