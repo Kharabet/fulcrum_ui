@@ -14,8 +14,7 @@
   &:before {
     position: absolute;
     content: "";
-    background: radial-gradient(0% 50%, 100% 110%, var(--chart-shadow-color) 0%, transparent 50%);
-    background: -webkit-radial-gradient(0% 50%, 100% 110%, var(--chart-shadow-color) 0%, transparent 50%);
+    background: radial-gradient(ellipse 100% 110% at 0% 50%, var(--chart-shadow-color) 0%, transparent 50%);
     height: 380px;
     width: 35px;
     left: 50%;
