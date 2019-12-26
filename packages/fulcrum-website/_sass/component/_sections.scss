@@ -476,3 +476,17 @@
     }
   }
 }
+
+.input-gain-wrapper{
+  &:before{
+    position: absolute;
+    content: "";
+    width: 3px;
+    height: 55px;
+    top: -61px;
+    background-color: var(--secondary-bg);
+    left: 0;
+    right: 0;
+    margin: auto;
+  }
+}

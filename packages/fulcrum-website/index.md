@@ -148,7 +148,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
             </div>
         </div>
     </div>
-    <div class="flex mx-auto p-relative fd-md-c">
+    <div class="flex mx-auto p-relative fd-md-c input-gain-wrapper">
         <div class="input-gain">
             <div class="before-gain">
                 {% include svg/arrow-gain.svg %}

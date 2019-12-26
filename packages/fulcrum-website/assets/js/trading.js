@@ -161,6 +161,9 @@ window.addEventListener('load', function () {
     gainRange.addEventListener("change", function () {
         updateChartData();
         ethPrice.innerHTML = this.value;
+    });
+
+    gainRange.addEventListener("input", function () {
         beforeDataGain.innerHTML = Math.abs(this.value);
         beforeGain.style.display = 'flex';
         beforeGain.style.left = 'calc(50% + ' + this.value / 2 + '% - 33px - (12px *' + this.value / 100 + '))';
@@ -173,9 +176,7 @@ window.addEventListener('load', function () {
                 resultGain[i].classList.remove("negative");
             }
         }
-
     });
-
     gainRange.addEventListener("change", function () {
         beforeGain.style.display = 'none';
     })
@@ -296,7 +297,7 @@ function drawLabels(t, ctx) {
 
         if (yOffset > chartInstance.canvas.parentNode.offsetHeight) {
             // yOffset = 295;
-            chartInstance.canvas.parentNode.style.height = `${yOffset*1.3}px`;
+            chartInstance.canvas.parentNode.style.height = `${yOffset * 1.3}px`;
         }
         if (yOffset < 0) yOffset = 5;
         if (label)
