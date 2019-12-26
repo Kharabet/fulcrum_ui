@@ -128,10 +128,10 @@
   background-color: #00c0ab;
   color: #ffffff;
   border-radius: 16px;
-  @media (min-width: 580px) {
+  @media (min-width: 768px) {
     text-align: center;
   }
-  @media (min-width: 579px) {
+  @media (max-width: 767px) {
     text-align: left;
   }
 }
