@@ -24,10 +24,10 @@ export class TradeTokenGridHeaderMobile extends Component<ITradeTokenGridHeaderP
             {/*<span className="trade-token-grid-header__text">Liquidation Price</span>*/}
           {/*</div>*/}
           <div className="trade-token-grid-header__col-change24h">
-            <span className="trade-token-grid-header__text">24 hours</span>
+            <span className="trade-token-grid-header__text">Liquidation</span>
           </div>
           <div className="trade-token-grid-header__col-profit">
-            <span className="trade-token-grid-header__text">Profit</span>
+            <span className="trade-token-grid-header__text">APR</span>
           </div>
           <div className="trade-token-grid-header__col-profit">
             <span className="trade-token-grid-header__text"></span>

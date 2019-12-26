@@ -130,6 +130,24 @@
     margin: auto;
     margin-top: 15px;
   }
+  .trade-token-grid-row__help{
+    display: inline;
+    width: 12%;
+    float: left;
+    position: absolute;
+    left: 8px;
+    height: 44px;
+    font-size: x-large;
+    cursor: pointer;
+  }
+  .button-help{
+      background-color: rgba(27, 99, 255, 0.69);
+      border:rgba(27, 99, 255, 0.69);
+      border-radius: 25px;
+      color:#FFFFFF;
+      float: left;
+      cursor: pointer;
+    }
   .trade-token-grid-row__buy-button{
     display: inline;
     width: 40%;
@@ -147,13 +165,16 @@
     width:100%;
     position: fixed;
     bottom: 0px;
+    height:90px;
     overflow-y: scroll;
 
   }
   .trade-footer-grid{
     float: left;
     width: 80px;
+    margin-top: 10px;
   }
+
 
   .trade-foot-item{
     width: 480px;
@@ -165,7 +186,11 @@
 
 
   .trade-token-grid-row__col-token-image {
-    line-height: 0.5rem;
+    line-height: 0.4rem;
+  }
+  .trade-footer-grid--active{
+    margin-top: 0px;
+    line-height: 2rem;
   }
 
 

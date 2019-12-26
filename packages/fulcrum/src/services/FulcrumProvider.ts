@@ -91,7 +91,8 @@ export class FulcrumProvider {
     TasksQueue.Instance.on(TasksQueueEvents.Enqueued, this.onTaskEnqueued);
 
     const storedProvider: any = FulcrumProvider.getLocalstorageItem('providerType');
-    const providerType: ProviderType | null = ProviderType[storedProvider] as ProviderType || null;
+    // const providerType: ProviderType | null = ProviderType[storedProvider] as ProviderType || null;
+    const providerType: ProviderType | null = storedProvider as ProviderType || null;
 
     // singleton
     if (!FulcrumProvider.Instance) {
@@ -687,8 +688,6 @@ export class FulcrumProvider {
   public getMaxTradeValue = async (tradeType: TradeType, selectedKey: TradeTokenKey, collateral: Asset): Promise<BigNumber> => {
     let result = new BigNumber(0);
 
-    let decimalOffset = 0;
-
     if (tradeType === TradeType.BUY) {
       if (this.contractsSource) {
         const assetContract = await this.contractsSource.getPTokenContract(selectedKey);
@@ -724,9 +723,16 @@ export class FulcrumProvider {
       }
     } else {
       result = await this.getPTokenBalanceOfUser(selectedKey);
+    }
 
-      const baseAsset = this.getBaseAsset(selectedKey);
-      if (baseAsset === Asset.WBTC && selectedKey.positionType === PositionType.LONG) {
+    const baseAsset = this.getBaseAsset(selectedKey);
+    let decimalOffset = 0;
+    if (baseAsset === Asset.WBTC) {
+      if (selectedKey.positionType === PositionType.SHORT) {
+        if (selectedKey.unitOfAccount !== Asset.USDC) {
+          decimalOffset = 10;
+        }
+      } else {
         decimalOffset = -10;
       }
     }
@@ -784,7 +790,7 @@ export class FulcrumProvider {
           maxTokenAmount = await this.getITokenBalanceOfUser(request.asset);
           let freeSupply = (await assetContract.marketLiquidity.callAsync());// .multipliedBy(0.95);
           let userBalance = maxTokenAmount.multipliedBy(tokenPrice).dividedBy(10 ** (36 - precision));
-          
+
           if (request.asset === Asset.CHAI) {
             freeSupply = freeSupply.multipliedBy(10 ** 18).dividedBy(chaiPrice);
             userBalance = userBalance.multipliedBy(10 ** 18).dividedBy(chaiPrice);
@@ -1091,6 +1097,9 @@ export class FulcrumProvider {
                 const assetErc20Address = FulcrumProvider.Instance.getErc20AddressOfAsset(request.collateral);
                 if (assetErc20Address) {
                   const srcDecimals: number = AssetsDictionary.assets.get(baseAsset)!.decimals || 18;
+                  if (baseAsset === Asset.WBTC && key.positionType === PositionType.SHORT) {
+                    // srcDecimals = srcDecimals + 10;
+                  }
                   tradeAmountActual = await assetContract.burnToToken.callAsync(
                     account,
                     assetErc20Address,
@@ -1113,6 +1122,9 @@ export class FulcrumProvider {
             } else {
               try {
                 const srcDecimals: number = AssetsDictionary.assets.get(baseAsset)!.decimals || 18;
+                if (baseAsset === Asset.WBTC && key.positionType === PositionType.SHORT) {
+                  // srcDecimals = srcDecimals + 10;
+                }
                 tradeAmountActual = await assetContract.burnToEther.callAsync(
                   account,
                   new BigNumber(request.amount.multipliedBy(10 ** srcDecimals).toFixed(0, 1)),
@@ -1283,6 +1295,9 @@ export class FulcrumProvider {
       if (address) {
         result = await this.getErc20BalanceOfUser(address);
         result = result.multipliedBy(10 ** (18 - precision));
+        if (baseAsset === Asset.WBTC && selectedKey.positionType === PositionType.SHORT) {
+          result = result.div(10 ** 10);
+        }
       }
     }
 
