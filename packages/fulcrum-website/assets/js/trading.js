@@ -61,13 +61,25 @@ var leverageButton = () => document.querySelector(".button-group-gains .button-g
 var yourGain = document.querySelector(".your-gain");
 var gainText = document.querySelector(".gain-text");
 
+var coins = document.querySelectorAll('.chart-tokens .coin-calc');
 
 
 
 window.addEventListener('load', function () {
+    //change active button-coin
+    for (var i = 0; i < coins.length; i++) {
+        coins[i].onclick = function () {
+            var items = document.querySelectorAll('.coin-calc');
+            for (var i = 0; i < items.length; i++) {
+                items[i].classList.remove('active');
+            }
+            var token = this.getAttribute('data-token');
+            document.querySelector(".token-name").innerHTML = token.toUpperCase();
+            this.classList.add("active");
+        };
+    }
+
     var originalController = Chart.controllers.line;
-
-
     var ctx = document.getElementById("myChart");
     var data = getChartData();
     ctx.getContext("2d");

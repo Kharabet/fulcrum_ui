@@ -87,11 +87,6 @@
     border-radius: 29px;
     display: flex;
     padding: 1px;
-    margin: auto auto 30px auto;
-
-    @media (min-width: 992px) {
-        margin: auto auto 100px auto;
-    }
     .button-gains {
         color: var(--earn-color-hover);
 

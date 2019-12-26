@@ -13,8 +13,14 @@
 .jc-c {
   justify-content: center;
 }
+.jc-fe {
+  justify-content: flex-end;
+}
 .ai-c {
   align-items: center;
+}
+.ai-fs {
+  align-items: flex-start;
 }
 .ai-fe {
   align-items: flex-end;
@@ -31,6 +37,18 @@
 .fd-r {
   flex-direction: row;
 }
+
+.f-1{
+  flex: 1;
+}
+.f-2{
+  flex: 2;
+}
+.f-3{
+  flex: 3;
+}
+
+
 @media (max-width: 991px) {
   .fd-md-c {
     flex-direction: column;

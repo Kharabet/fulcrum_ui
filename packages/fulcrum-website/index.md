@@ -113,16 +113,42 @@ title: Crypto Margin Trading with Fulcrum | bZx
 <section class="bg-primary pb-45">
     <div class="row fw-w">
         <div class="col col-12">
-            <h2  class="circle jc-c mb-50 mx-auto mb-xs-0"><span class="blue left-r-50 top-r-10"></span>Maximize your potential gains</h2>
+            <h2  class="circle jc-c mb-50 mx-auto mb-xs-30"><span class="blue left-r-50 top-r-10"></span>Maximize your potential gains</h2>
         </div>
-        <div class="col col-12">            
-            <div class="button-group-gains" role="group" aria-label="Buttons gains">
-                <button type="button" class="button-gains active" data-leverage="2">2x</button>
-                <button type="button" class="button-gains" data-leverage="3">3x</button>
-                <button type="button" class="button-gains" data-leverage="4">4x</button>
-            </div>        
+    </div>  
+    <div class="row">
+        <div class="col col-12 chart-header">
+            <div class="flex fw-w jc-fe jc-md-c f-3 chart-tokens">
+                <button class="coin-calc active" data-token="eth">
+                    {% include svg/eth.svg %}
+                </button>
+                <button class="coin-calc" data-token="wbtc">
+                    {% include svg/wbtc.svg %}
+                </button>
+                <button class="coin-calc" data-token="link">
+                    {% include svg/link.svg %}
+                </button>
+                <button class="coin-calc" data-token="zrx">
+                    {% include svg/zrx.svg %}
+                </button>
+                <button class="coin-calc" data-token="knc">
+                    {% include svg/knc.svg %}
+                </button>
+            </div> 
+            <div class="f-2 flex jc-c ai-fs">
+                <div class="button-group-gains" role="group" aria-label="Buttons gains">
+                    <button type="button" class="button-gains active" data-leverage="2">2x</button>
+                    <button type="button" class="button-gains" data-leverage="3">3x</button>
+                    <button type="button" class="button-gains" data-leverage="4">4x</button>
+                </div>
+            </div>   
+            <div class="wrapper-result-gain f-3 flex fd-c">
+                <div class="flex fd-r"><p>If <span class="token-name">ETH</span> price goes <span class="result-gain"><span class="fw-800 eth-price">25</span>%</span></p></div>
+                <div class="flex fd-r"><p><span class="gain-text">You Gain</span> <span class="result-gain"><span class="fw-800 your-gain">25</span>%</span></p></div>
+            </div>
         </div>
-        <div class="flex mx-auto p-relative fd-md-c">
+    </div>
+    <div class="flex mx-auto p-relative fd-md-c">
         <div class="input-gain">
             <div class="before-gain">
                 {% include svg/arrow-gain.svg %}
@@ -130,19 +156,14 @@ title: Crypto Margin Trading with Fulcrum | bZx
             </div>
             <input class="gain-range" type="range" value="25" min="-99" max="100"/>
         </div>
-        <div class="wrapper-result-gain">
-            <div class="flex fd-r"><p>If ETH price goes <span class="result-gain"><span class="fw-800 eth-price">25</span>%</span></p></div>
-            <div class="flex fd-r"><p><span class="gain-text">You Gain</span> <span class="result-gain"><span class="fw-800 your-gain">25</span>%</span></p></div>
+    </div>
+    <div class="w-100 mb-30 p-relative">   
+        <div class="wrapper-chart">     
+            <canvas id="myChart"></canvas>
         </div>
-        </div>
-        <div class="w-100 mb-30 p-relative">   
-            <div class="wrapper-chart">     
-                <canvas id="myChart"></canvas>
-            </div>
-            <span class="chart-mark past ">past</span>
-            <span class="chart-mark today">today</span>
-            <span class="chart-mark future">future</span>
-        </div>
+        <span class="chart-mark past ">past</span>
+        <span class="chart-mark today">today</span>
+        <span class="chart-mark future">future</span>
     </div>
 </section>
 <section class="bg-primary pt-75 pb-75">
