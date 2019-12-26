@@ -2,7 +2,7 @@
 .mt-10 {
   margin-top: 10px;
 }
-@for $i from 1 through 15 {
+@for $i from 1 through 20 {
   .mb-#{5*$i} {
     margin-bottom: #{5 * $i}px;
   }

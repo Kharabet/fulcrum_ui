@@ -61,7 +61,7 @@ var leverageButton = () => document.querySelector(".button-group-gains .button-g
 var yourGain = document.querySelector(".your-gain");
 var gainText = document.querySelector(".gain-text");
 
-var coins = document.querySelectorAll('.item-calc .coin-calc');
+var coins = document.querySelectorAll('.chart-tokens .coin-calc');
 
 
 

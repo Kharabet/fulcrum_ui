@@ -71,15 +71,11 @@
   font-weight: 600;
   color: var(--primary-color);
   @media (min-width: 992px) {
-    position: absolute;
-    left: 440px;
-    top: -45px;
-    width: 63%;
     font-size: 20px;
   }
   @media (max-width: 991px) {
-    order: -1;
-    margin-bottom: 75px;
+    // order: -1;
+    // margin-bottom: 75px;
     font-size: 16px;
   }
   .result-gain {

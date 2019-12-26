@@ -427,10 +427,52 @@
 
 
 .chart-tokens{
-  position: absolute;
-    left: calc(50% - 360px);
     border-radius: 24px;
     background-color: var(--primary-bg);
     color: #ffffff;
     width: auto; 
+    .coin-calc {
+      background-color: transparent;
+      padding: 5px;
+      border: 3px solid transparent;
+      border-radius: 50%;
+      width: 52px;
+      height: 52px;
+      &:hover {
+        cursor: pointer;
+      }
+      &.active {
+        background-color: var(--btn-white-bg);
+        border: 3px solid #33dfcc;
+      }
+      &:not(.active) {
+        .path-gray {
+          fill: var(--coin-bg);
+        }
+        .path-white {
+          fill: #ffffff;
+        }
+      }
+    }
+  
+}
+
+.chart-header{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  padding: 0 calc((100% - 875px) / 2);
+  margin: auto;
+  margin-bottom: 100px;
+  @media (max-width: 767px) {
+    flex-wrap: wrap;
+    padding: 0 20px;
+    margin-bottom: 70px;
+    > div{
+      flex-basis: 100%;
+      &:not(:last-child){
+        margin-bottom: 10px;
+      }
+    }
+  }
 }
