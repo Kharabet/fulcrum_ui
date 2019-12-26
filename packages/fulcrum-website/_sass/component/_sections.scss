@@ -424,3 +424,13 @@
 .wrap-hours {
   display: none;
 }
+
+
+.chart-tokens{
+  position: absolute;
+    left: calc(50% - 360px);
+    border-radius: 24px;
+    background-color: var(--primary-bg);
+    color: #ffffff;
+    width: auto; 
+}
