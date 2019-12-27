@@ -334,7 +334,7 @@
     }
     &.active {
       background-color: var(--btn-white-bg);
-      border: 3px solid #33dfcc;
+      border: 3px solid #276BFB;
     }
     &:not(.active) {
       .path-gray {
@@ -442,7 +442,7 @@
         cursor: pointer;
       }
       &.active {
-        border: 3px solid #33dfcc;
+        border: 3px solid #276BFB;
       }
       &:not(.active) {
         .path-gray {

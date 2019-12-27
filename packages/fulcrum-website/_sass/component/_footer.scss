@@ -40,6 +40,11 @@ footer {
   }
   .item-link {
     display: flex;
+    &:hover {
+      circle, ellipse {
+        fill: #5b88ff;
+      }
+    }
     svg {
       width: 100%;
     }

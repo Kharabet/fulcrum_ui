@@ -166,7 +166,7 @@ window.addEventListener('load', function () {
     gainRange.addEventListener("input", function () {
         beforeDataGain.innerHTML = Math.abs(this.value);
         beforeGain.style.display = 'flex';
-        beforeGain.style.left = 'calc(50% + ' + this.value / 2 + '% - 33px - (12px *' + this.value / 100 + '))';
+        beforeGain.style.left = 'calc(50% + ' + this.value / 2 + '% - 33px - (20px *' + this.value / 100 + '))'; //20 - half of width thumb, 33 - half of with before-gain
         if (this.value < 0) {
             for (var i = 0; i < resultGain.length; i++) {
                 resultGain[i].classList.add("negative");
