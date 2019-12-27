@@ -1,7 +1,7 @@
 input[type="range"] {
   -webkit-appearance: none;
-  margin: 10px 0;
-  width: 225px;
+  margin: -12px auto 0 auto;
+  width: 227px;
   height: 24px;
   background-color: transparent;
   .input-gain & {
@@ -169,5 +169,23 @@ input[type="range"]::-ms-thumb {
     svg {
       margin-right: 3px;
     }
+  }
+}
+
+.border-range-quantity {
+  position: relative;
+  width: 227px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: -2px;
+  .left-range-quantity,
+  .right-range-quantity {
+    position: absolute;
+    top: 0;
+    justify-content: space-between;
+    display: flex;
+    width: 4px;
+    height: 4px;
+    background-color: var(--secondary-bg);
   }
 }
