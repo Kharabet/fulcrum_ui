@@ -406,7 +406,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
         <div class="row">
             <div class="col col-12 fd-c">
                 <h2 class="circle mb-15 mb-sm-25 jc-c"><span class="blue center top-r-60"></span>How to lend you crypto with Fulcrum?</h2>
-                <p class="fs-20 fs-sm-16 lh-150 c-secondary-blue mb-75 mb-sm-60">Three clicks. No Accounts. No fees.</p>
+                <p class="fs-20 fs-sm-16 lh-150 c-secondary-blue mb-75 mb-sm-60">Three clicks. No Minimum Deposit, no lock up period, withdraw anytime</p>
             </div>
         </div>
         <div class="row jc-c">
@@ -416,16 +416,14 @@ title: Crypto Margin Trading with Fulcrum | bZx
                         <span class="lend-count">1</span>
                         {% include svg/lend-step-1.svg %}
                     </div>
-                    <p class="c-dark-gray mt-25 mw-400 mx-auto">Whether you’re a lender or borrower, you stay in control
-                        of your keys.</p>
+                    <p class="c-dark-gray mt-25 mw-400 mx-auto">Choose the asset you want to securely lend with Fulcrum</p>
                 </div>
                 <div class="flex fd-c mb-md-55">
                     <div class="svg-blur mb-45">
                         <span class="lend-count">2</span>
                         {% include svg/lend-step-2.svg %}
                     </div>
-                    <p class="c-dark-gray mt-25 mw-400 mx-auto">Whether you’re a lender or borrower, you stay in control
-                        of your keys.</p>
+                    <p class="c-dark-gray mt-25 mw-400 mx-auto">Enter the quantity and confirm transaction</p>
                 </div>
             </div>
         </div>
