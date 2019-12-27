@@ -3,11 +3,10 @@ layout: privacy
 featured-image: /images/ogp.png
 metadescription: "Privacy Policy"
 title: Privacy Policy
-h1: Fulcrum
+h1: Privacy Policy
 permalink: privacy
 ---
 
-## Privacy Policy
 
 ## ***PLEASE READ CAREFULLY***
 
