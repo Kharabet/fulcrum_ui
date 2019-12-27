@@ -5,6 +5,7 @@ var quantityInput = document.querySelector('.input-quantity');
 var quantityRange = document.querySelector('.range-quantity');
 var leftRangeQuantity = document.querySelector('.left-range-quantity');
 var rightRangeQuantity = document.querySelector('.right-range-quantity');
+var trackRangeQuantity = document.querySelector('.track-range-quantity');
 
 var coins = document.querySelectorAll('#calculator-earn .coin-calc');
 var wrapperFinance = document.querySelector('.wrapper-finance');
@@ -39,6 +40,7 @@ function timer() {
 function changePositionBorderThumb (range, current) {
     leftRangeQuantity.style.left = 'calc(' + current.value / range.max * 100 + '% - 12px - (16px *' + (current.value - range.max / 2) / range.max + '))'; //12 - half of width thumb with border, 16 - width thumb without border
     rightRangeQuantity.style.left = 'calc(' + current.value / range.max * 100 + '% - 12px + 20px - (16px *' + (current.value - range.max / 2) / range.max + '))'; //12 - half of width thumb with border, 16 - width thumb without border 
+    trackRangeQuantity.style.width = 'calc(' + current.value / range.max * 100 + '% - 12px - (16px *' + (current.value - range.max / 2) / range.max + '))'; ;
 }
 
 window.addEventListener('load', function () {
