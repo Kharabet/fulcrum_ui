@@ -17,7 +17,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
                         powerful way to lend and margin trade. It is
                         the first and only completely trustless platform for margin; it does not use centralized price
                         feeds or
-                        centrally administered margin calls. It is permissionless and rent free; there are no fees and
+                        centrally administered margin calls. It is permissionless and rent free; there are no platform fees and
                         no
                         accounts.</p>
                     <div class="flex fd-xs-c">
@@ -134,7 +134,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
                 <button class="coin-calc" data-token="knc">
                     {% include svg/knc.svg %}
                 </button>
-            </div> 
+            </div>
             <div class="f-2 flex jc-c ai-fs">
                 <div class="button-group-gains" role="group" aria-label="Buttons gains">
                     <button type="button" class="button-gains active" data-leverage="2">2x</button>
@@ -188,7 +188,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
                         <span class="lend-count">2</span>
                         {% include svg/enter-quantity.svg %}
                     </div>
-                    <p class="c-dark-gray mt-25">Enter the quantity and confirm</p>
+                    <p class="c-dark-gray mt-25">Enter the quantity and confirm transaction</p>
                 </div>
             </div>
         </div>
@@ -356,46 +356,27 @@ title: Crypto Margin Trading with Fulcrum | bZx
                     <div class="accordion-item active">
                         <h4 class="accordion-toggle">What does going long or short mean in trading?</h4>
                         <div class="accordion-content">
-                            <p>1. When a trader enters a long position, he expects the underlying crypto asset (position
-                                token) price to appreciate. For example, if a trader goes long on ETH/USDC on Nuo, the
-                                platform borrows USDC from the reserve pool for the trader and converts it into ETH.
-                                Later,
-                                when the value of ETH goes up, the trader may sell it for more USDC than what was
-                                borrowed
-                                resulting in a profit. A short position is essentially the opposite of a long position.
-                                When
-                                a trader enters a short position, he expects the price of the underlying crypto asset to
-                                depreciate.</p>
+                            <p>Margin trading has two main aspects: trading with leverage and shorting. In trading with leverage, a trader borrows assets to increase the amount of assets they are trading. By doing so, they magnify the gains or losses of their trade. The borrowed assets are known as a margin loan. To obtain the margin loan, the trader puts up assets that serve as collateral. The terms of the margin loan specify a collateral-to-loan ratio. If the trade falls below the specified ratio, the trade is liquidated and the lender is made whole using the trader's collateral.
+
+Margin trading also includes shorting. In shorting, a trader essentially sells assets they do not own. The short investor borrows an asset and sells it on the expectation that the assets will lose value.
+
+</p>
                         </div>
                     </div>
                     <div class="accordion-item">
-                        <h4 class="accordion-toggle">What is margin trading?</h4>
+                        <h4 class="accordion-toggle">How are positions liquidated? Is there liquidity risk?</h4>
                         <div class="accordion-content">
-                            <p>2. When a trader enters a long position, he expects the underlying crypto asset (position
-                                token) price to appreciate. For example, if a trader goes long on ETH/USDC on Nuo, the
-                                platform borrows USDC from the reserve pool for the trader and converts it into ETH.
-                                Later,
-                                when the value of ETH goes up, the trader may sell it for more USDC than what was
-                                borrowed
-                                resulting in a profit. A short position is essentially the opposite of a long position.
-                                When
-                                a trader enters a short position, he expects the price of the underlying crypto asset to
-                                depreciate.</p>
+                            <p>Positions are liquidated using KyberSwap. When a trader goes under margin maintenance (15%), they are only partially liquidated, bringing their current margin to 25%.
+
+By only liquidating as much as is necessary, the risk of slippage from excessively large liquidations is reduced. Anyone can initiate a margin call. It is a process that is permissionless and incentivized. The incentive to liquidators is the a refund of your gas * 2. There’s also no capital carrying costs/risks you’d experience liquidating on the other protocols.
+
+This ensures that there are redundancies in the margin calling process. Moreover, there is an insurance fund which protects lenders. In the case that a lender would lose principal, the insurance fund will automatically disburse funds to the lender. This insurance is funded by a smart contract holding 10% of all interest that is paid by borrowers to lenders.</p>
                         </div>
                     </div>
                     <div class="accordion-item">
-                        <h4 class="accordion-toggle">Where do I manage my collateral?</h4>
+                        <h4 class="accordion-toggle">Are the smart contracts safe? Can I see the audits?</h4>
                         <div class="accordion-content">
-                            <p>3. When a trader enters a long position, he expects the underlying crypto asset (position
-                                token) price to appreciate. For example, if a trader goes long on ETH/USDC on Nuo, the
-                                platform borrows USDC from the reserve pool for the trader and converts it into ETH.
-                                Later,
-                                when the value of ETH goes up, the trader may sell it for more USDC than what was
-                                borrowed
-                                resulting in a profit. A short position is essentially the opposite of a long position.
-                                When
-                                a trader enters a short position, he expects the price of the underlying crypto asset to
-                                depreciate.</p>
+                            <p>Yes. The base protocol audit is publicly available. All custody is retained by the base protocol. Both the base protocol audit and iToken/pToken audit were conducted by [ZK Labs](https://github.com/mattdf/audits/blob/master/bZx/bzx-audit.pdf), a recognized leader in the space. Matthew DiFerrante, founder and lead auditor at ZK Labs, is a security engineer at the Ethereum Foundation and audits the Ethereum core protocol itself.</p>
                         </div>
                     </div>
                 </div>
@@ -417,7 +398,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
             <div class="col col-10 col-md-12 jc-sb fw-md-w">
                 <div class="order-md-1 mb-xs-30 mx-xs-auto">
                     <a href="https://fulcrum.trade/trade" class="button button-primary button-lg mb-20">Trade</a>
-                    <p class="fs-13 lh-150 text-center c-gray">Up to 5x Leverage, zero trading fees, <br />and perfect
+                    <p class="fs-13 lh-150 text-center c-gray">Up to 5x Leverage, zero platform fees, <br />and perfect
                         liquidity</p>
                 </div>
                 <div class="w-md-100 mb-md-25">
