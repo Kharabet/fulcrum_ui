@@ -1,8 +1,10 @@
 @media screen and (max-width: $mobile-version-max-width) {
   .trade-token-grid-header {
     text-align: center;
+    height:3rem;
   }
   @mixin trade-token-grid-header__col {
+    line-height: 3rem;
     &:not(:last-child) {
     margin-right: 0px;
   }
@@ -40,6 +42,7 @@
 
 @mixin trade-token-grid-row__col {
   display: inline-block;
+  line-height: 3.5rem;
   &:not(:last-child) {
     margin-right: 0px;
     text-align: center;
@@ -54,6 +57,7 @@
 }
 
 .trade-token-grid-row {
+  height: 3.5rem;
   text-align: center;
   &--active {
     .trade-token-grid-row__col-action {
@@ -95,6 +99,8 @@
   .trade-token-grid-row__buy-button{
     display:block;
     margin: auto;
+    height: 1.7rem;
+    margin-top:8px;
   }
   .trade-token-grid-row__long-button{
     display:block;
@@ -128,7 +134,7 @@
     display: flex;
     width: 80%;
     margin: auto;
-    margin-top: 15px;
+    //margin-top: 15px;
   }
   .trade-token-grid-row__help{
     display: inline;
@@ -155,24 +161,27 @@
   .trade-token-grid-row__group-button{
     display: inline;
     width: 40%;
+    height: 1.7rem;
   }
   .trade-token-grid-row__long-button{
     display: inline;
     width: 40%;
+    height: 1.7rem;
   }
 
   .trade-footer-mb{
     width:100%;
     position: fixed;
     bottom: 0px;
-    height:90px;
+    height:55px;
     overflow-y: scroll;
 
   }
   .trade-footer-grid{
     float: left;
-    width: 80px;
-    margin-top: 10px;
+    width: 70px;
+    height: 50px;
+    margin-top: 12px;
   }
 
 
@@ -189,8 +198,9 @@
     line-height: 0.4rem;
   }
   .trade-footer-grid--active{
-    margin-top: 0px;
+    margin-top: 2px;
     line-height: 2rem;
+    width: 70px;
   }
 
 
