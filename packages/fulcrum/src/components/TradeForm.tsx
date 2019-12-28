@@ -335,7 +335,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
           : (this.state.tradeAmountValue.gt(0) && this.state.slippageRate.eq(0))
             && (this.state.collateral === Asset.ETH || !this.state.maybeNeedsApproval)
             ? ``// `Your trade is too small.`
-            : this.state.slippageRate.gt(0) && this.state.slippageRate.lt(100) // gte(0.2)
+            : this.state.slippageRate.gt(0) // gte(0.2)
               ? `Slippage:`
               : "";
 
@@ -609,7 +609,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       return;
     }
     let usdPrice = this.state.tradeAmountValue
-    if (usdPrice !== null){
+    if(usdPrice != null){
         usdPrice = usdPrice.multipliedBy(usdAmount)
     }
     const randomNumber = Math.floor(Math.random() * 100000) + 1;

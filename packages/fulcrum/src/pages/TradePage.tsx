@@ -120,6 +120,7 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
             isLong={this.state.isLong}
             isShort={this.state.isShort}
             changeActiveBtn={this.changeActiveBtn.bind(this)}
+
           />
           {this.state.showMyTokensOnly ? (
             <OwnTokenGrid

@@ -408,7 +408,7 @@ export class AssetsDictionaryMobile {
         link_ts,
         "#FFFFFF",
         "#444e5a",
-        "#acb5c2",
+        "#444e5a",
         new Map<number, string | null>([
           [1, "0x514910771af9ca656af840dff83e8264ecf986ca"],
           [3, ""]
@@ -534,7 +534,7 @@ export class AssetsDictionaryMobile {
         eth_ts,
         "#FFFFFF",
         "#444e5a",
-        "#acb5c2",
+        "#333",
         new Map<number, string | null>([
           [1, "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"],
           [3, "0xc778417e063141139fce010982780140aa0cd5ab"],

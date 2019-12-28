@@ -32,7 +32,16 @@
 }
 
 .price-graph__hovered-price-marker {
-  font-size: 3rem;
+  font-size: 2rem;
+  font-weight: normal;
+  font-style: normal;
+  font-stretch: normal;
+  letter-spacing: -1.2px;
+  text-align: center;
+  color: #ffffff;
+}
+.price-graph__hovered-price-marker-label {
+  font-size: 2rem;
   font-weight: normal;
   font-style: normal;
   font-stretch: normal;
@@ -94,4 +103,30 @@
   font-stretch: normal;
   letter-spacing: normal;
   text-align: center;
+}
+
+@media screen and (max-width: $mobile-version-max-width) {
+  .price-graph__hovered-price-marker-label{
+    display: none;
+  }
+  .price-graph__hovered-price-marker {
+    font-size: 1.2rem;
+    margin-top: 6px;
+  }
+  .price-graph__hovered-time-delimiter {
+    display: none;
+  }
+  .price-graph__hovered-time{
+    display: none;
+  }
+  .price-graph__line{
+    margin: auto;
+  }
+  .price-graph__timeline{
+    width: 80%;
+    margin: auto;
+  }
+  .trade-token-grid-row__buy-button{
+
+  }
 }
