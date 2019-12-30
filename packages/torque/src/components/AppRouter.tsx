@@ -23,7 +23,9 @@ import siteConfig from "./../config/SiteConfig.json";
 
 const isMainnetProd =
   process.env.NODE_ENV && process.env.NODE_ENV !== "development"
-  && process.env.REACT_APP_ETH_NETWORK === "mainnet";
+  && process.env.REACT_APP_ETH_NETWORK === "kovan";
+
+console.log("isMainnetProd = ", isMainnetProd)
 
 if (isMainnetProd) {
   const tagManagerArgs = {
