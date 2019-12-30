@@ -45,7 +45,7 @@
                     <a href="https://bzx.network/#team">Team</a>
                     <a href="https://bzx.network/press">Press</a>
                     <a href="https://bzx.network/media-assets">Media assets</a>
-                    <a href="#">Contact us</a>
+                    <a href="#" class="contact-us-button">Contact us</a>
                 </div>
             </div>
         </div>
@@ -54,11 +54,11 @@
 
 <script type="text/javascript" src="/assets/js/main.js"></script>
 {% if page.layout == "lending" %}
-    <script type="text/javascript" src="/assets/js/lending.js"></script>
+<script type="text/javascript" src="/assets/js/lending.js"></script>
 {% endif %}
 {% if page.layout == "trading" %}
-    <script type="text/javascript" src="/assets/js/chart.js"></script>
-    <script type="text/javascript" src="/assets/js/trading.js"></script>
+<script type="text/javascript" src="/assets/js/chart.js"></script>
+<script type="text/javascript" src="/assets/js/trading.js"></script>
 {% endif %}
 <script>
 
@@ -72,17 +72,20 @@
         Intercom(display)
         return (true) //check to see if code was correctly copied
     }
+    function showIntercom(e) {
+        e.preventDefault();
+        messenger("show");
+    };
 </script>
 
 <script>(function () { var w = window; var ic = w.Intercom; if (typeof ic === "function") { ic('reattach_activator'); ic('update', w.intercomSettings); } else { var d = document; var i = function () { i.c(arguments); }; i.q = []; i.c = function (args) { i.q.push(args); }; w.Intercom = i; var l = function () { var s = d.createElement('script'); s.type = 'text/javascript'; s.async = true; s.src = 'https://widget.intercom.io/widget/dfk4n5ut'; var x = d.getElementsByTagName('script')[0]; x.parentNode.insertBefore(s, x); }; if (w.attachEvent) { w.attachEvent('onload', l); } else { w.addEventListener('load', l, false); } } })();</script>
 
 <script>
     window.onload = function () {
-        $(".contact-us-button").on("click", function (e) {
-            e.preventDefault();
-            messenger("show");
-        });
-
+        var contactButtons = document.querySelectorAll('.contact-us-button');
+        for (var i = 0; i < contactButtons.length; i++) {
+            contactButtons[i].addEventListener("click", showIntercom, false);
+        }
     };
 </script>
 
