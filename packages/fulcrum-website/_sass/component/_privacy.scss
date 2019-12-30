@@ -20,15 +20,15 @@
       margin-bottom: 10px;
     }
   }
+  h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #276bfb;
+    margin-bottom: 30px;
+  }
   p {
     margin-bottom: 10px;
     color: var(--primary-color);
-    &:first-of-type {
-      font-size: 16px;
-      font-weight: 600;
-      color: #276bfb;
-      margin-bottom: 30px;
-    }
   }
   a {
     color: #276bfb;
