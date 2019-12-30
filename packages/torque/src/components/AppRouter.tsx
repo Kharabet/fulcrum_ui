@@ -25,6 +25,8 @@ const isMainnetProd =
   process.env.NODE_ENV && process.env.NODE_ENV !== "development"
   && process.env.REACT_APP_ETH_NETWORK === "mainnet";
 
+  console.log("process.env.REACT_APP_ETH_NETWORK = ", process.env.REACT_APP_ETH_NETWORK)
+
 if (isMainnetProd) {
   const tagManagerArgs = {
      gtmId : configProviders.Google_TrackingID,
