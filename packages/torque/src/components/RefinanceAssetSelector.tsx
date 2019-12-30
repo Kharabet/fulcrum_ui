@@ -108,20 +108,40 @@ export class RefinanceAssetSelector extends Component<IRefinanceAssetSelectorPro
 
     let items;
     if (this.props.walletType === WalletType.Web3) {
-      items = refinance.cdpId.map((e, index) => {
-        alert(e)
-        return (
 
-          <RefinanceAssetSelectorItem key={this.state.refinanceData.urn[index]} asset={Asset.DAI} cdpId={this.state.refinanceData.cdpId[index]} urn={this.state.refinanceData.urn[index]} accountAddress={this.state.refinanceData.accountAddress} proxyAddress={this.state.refinanceData.proxyAddress} isProxy={this.state.refinanceData.isProxy} ilk={this.state.refinanceData.ilk[index]}/>
-        );
-      });
+      if(refinance.cdpId[0].gt(0)) {
+        items = refinance.cdpId.map((e, index) => {
+
+          return (
+
+            <RefinanceAssetSelectorItem key={this.state.refinanceData.urn[index]} asset={Asset.DAI}
+                                        cdpId={this.state.refinanceData.cdpId[index]}
+                                        urn={this.state.refinanceData.urn[index]}
+                                        accountAddress={this.state.refinanceData.accountAddress}
+                                        proxyAddress={this.state.refinanceData.proxyAddress}
+                                        isProxy={this.state.refinanceData.isProxy}
+                                        ilk={this.state.refinanceData.ilk[index]}/>
+          );
+        });
+      }
     } else {
       assetList = assetList.sort(e => this.assetsShown.get(e) ? -1 : 1);
-      items = refinance.cdpId.map((e, index) => {
-        return (
-          <RefinanceAssetSelectorItem key={this.state.refinanceData.urn[index]} asset={Asset.DAI} cdpId={this.state.refinanceData.cdpId[index]} urn={this.state.refinanceData.urn[index]} accountAddress={this.state.refinanceData.accountAddress} proxyAddress={this.state.refinanceData.proxyAddress} isProxy={this.state.refinanceData.isProxy}  ilk={this.state.refinanceData.ilk[index]}/>
-        );
-      });
+      if(refinance.cdpId[0] != undefined) {
+        if(refinance.cdpId[0].gt(0)) {
+          items = refinance.cdpId.map((e, index) => {
+
+            return (
+              <RefinanceAssetSelectorItem key={this.state.refinanceData.urn[index]} asset={Asset.DAI}
+                                          cdpId={this.state.refinanceData.cdpId[index]}
+                                          urn={this.state.refinanceData.urn[index]}
+                                          accountAddress={this.state.refinanceData.accountAddress}
+                                          proxyAddress={this.state.refinanceData.proxyAddress}
+                                          isProxy={this.state.refinanceData.isProxy}
+                                          ilk={this.state.refinanceData.ilk[index]}/>
+            );
+          });
+        }
+      }
     }
 
     return <div className="refinance-asset-selector">{items}</div>;

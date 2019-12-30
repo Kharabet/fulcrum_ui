@@ -131,6 +131,7 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
   public render() {
     const assetTypeModifier = "asset-selector-item--"+this.props.asset.toLowerCase();
     const assetsDt: any = this.getAssestsData()
+    if(this.state.refinanceData[0].debt.gt(0) || this.state.refinanceData[0].collateralAmount.gt(0)){
     return (
       <div className={`refinance-asset-selector-item `} >
         <div className="refinance-asset-selector__title">CDP {this.state.refinanceData[0].cdpId.toFixed(0)}</div>
@@ -194,7 +195,10 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
             Refinance with 3% APR Fixed
         </div>
       </div>
-    );
+    )
+    }else{
+      return ''
+    }
   }
 
   private getAssestsData = () => {
