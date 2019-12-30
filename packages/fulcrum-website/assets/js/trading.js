@@ -161,6 +161,9 @@ window.addEventListener('load', function () {
     gainRange.addEventListener("change", function () {
         beforeGain.style.display = 'none';
         updateChartData();
+        if (window.spinnerInput){
+            clearInterval(window.spinnerInput);
+        }
     });
 
     gainRange.addEventListener("input", function () {
@@ -183,14 +186,26 @@ window.addEventListener('load', function () {
     spinner.querySelector(".up").addEventListener("click", function (e) {
         gainRange.value++;
         gainRange.dispatchEvent(new Event('input', { bubbles: true }));
-        gainRange.dispatchEvent(new Event('change', { bubbles: true }));
+        if (window.spinnerInput){
+            clearInterval(window.spinnerInput);
+        }
+        window.spinnerInput = setInterval(function (){
+            gainRange.dispatchEvent(new Event('change', { bubbles: true }));
+        }, 500) 
 
     }, false);
 
     spinner.querySelector(".down").addEventListener("click", function (e) {
         gainRange.value--;
         gainRange.dispatchEvent(new Event('input', { bubbles: true }));
-        gainRange.dispatchEvent(new Event('change', { bubbles: true }));
+
+        if (window.spinnerInput){
+            clearInterval(window.spinnerInput);
+        }
+        window.spinnerInput = setInterval(function (){
+            gainRange.dispatchEvent(new Event('change', { bubbles: true }));
+        }, 500) 
+
     }, false)
 
     var buttonsGains = document.querySelectorAll('.button-gains');
