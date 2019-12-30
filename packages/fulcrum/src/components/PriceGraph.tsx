@@ -103,7 +103,7 @@ export class PriceGraph extends Component<IPriceGraphProps, IPriceGraphState> {
           </button>
         </div> : '')}
         <div className="price-graph__hovered-time-container">
-          <div className="price-graph__hovered-price-marker" style={{ fontSize: `2rem` }}>{this.state.assetDetails ? this.state.assetDetails.labelName : ``}</div>
+          <div className="price-graph__hovered-price-marker-label" >{this.state.assetDetails ? this.state.assetDetails.labelName : ``}</div>
           <div className="price-graph__hovered-time-delimiter">
             <div />
           </div>
@@ -114,7 +114,8 @@ export class PriceGraph extends Component<IPriceGraphProps, IPriceGraphState> {
           <Change24HMarker value={change24h} size={Change24HMarkerSize.LARGE} />
         </div>*/}
         <div className="price-graph__graph-container">
-          <ResponsiveContainer width="100%" height={160}>
+          {isMobileMedia ?
+            (<ResponsiveContainer className="price-graph__line" width="80%" height={60}>
             <LineChart data={this.state.data}>
               <Tooltip content={this.renderTooltip} />
 
@@ -132,7 +133,28 @@ export class PriceGraph extends Component<IPriceGraphProps, IPriceGraphState> {
                 <ReferenceLine y={this.state.liquidationPriceNormed} stroke="#ff0000" strokeDasharray="5 5" />
               ): ``}
             </LineChart>
-          </ResponsiveContainer>
+          </ResponsiveContainer>)
+            :
+
+            (<ResponsiveContainer width="100%" height={160}>
+            <LineChart data={this.state.data}>
+              <Tooltip content={this.renderTooltip} />
+
+              <Line
+                type="monotone"
+                dataKey="price"
+                animationDuration={500}
+                dot={false}
+                activeDot={false}
+                stroke={this.state.assetDetails ? this.state.assetDetails.bgColor : `#ffffff`}
+                strokeWidth={2}
+              />
+
+              {this.state.liquidationPriceNormed ? (
+                <ReferenceLine y={this.state.liquidationPriceNormed} stroke="#ff0000" strokeDasharray="5 5" />
+              ): ``}
+            </LineChart>
+          </ResponsiveContainer>)}
         </div>
         <div className="price-graph__timeline">
           <div className="price-graph__timeline-from">{timeStampFromText}</div>

@@ -1,8 +1,10 @@
 @media screen and (max-width: $mobile-version-max-width) {
   .trade-token-grid-header {
     text-align: center;
+    height:3rem;
   }
   @mixin trade-token-grid-header__col {
+    line-height: 3rem;
     &:not(:last-child) {
     margin-right: 0px;
   }
@@ -40,6 +42,7 @@
 
 @mixin trade-token-grid-row__col {
   display: inline-block;
+  line-height: 3.5rem;
   &:not(:last-child) {
     margin-right: 0px;
     text-align: center;
@@ -54,6 +57,7 @@
 }
 
 .trade-token-grid-row {
+  height: 3.5rem;
   text-align: center;
   &--active {
     .trade-token-grid-row__col-action {
@@ -95,6 +99,8 @@
   .trade-token-grid-row__buy-button{
     display:block;
     margin: auto;
+    height: 1.7rem;
+    margin-top:8px;
   }
   .trade-token-grid-row__long-button{
     display:block;
@@ -128,8 +134,26 @@
     display: flex;
     width: 80%;
     margin: auto;
-    margin-top: 15px;
+    //margin-top: 15px;
   }
+  .trade-token-grid-row__help{
+    display: inline;
+    width: 12%;
+    float: left;
+    position: absolute;
+    left: 8px;
+    height: 44px;
+    font-size: x-large;
+    cursor: pointer;
+  }
+  .button-help{
+      background-color: rgba(27, 99, 255, 0.69);
+      border:rgba(27, 99, 255, 0.69);
+      border-radius: 25px;
+      color:#FFFFFF;
+      float: left;
+      cursor: pointer;
+    }
   .trade-token-grid-row__buy-button{
     display: inline;
     width: 40%;
@@ -137,23 +161,29 @@
   .trade-token-grid-row__group-button{
     display: inline;
     width: 40%;
+    height: 1.7rem;
   }
   .trade-token-grid-row__long-button{
     display: inline;
     width: 40%;
+    height: 1.7rem;
   }
 
   .trade-footer-mb{
     width:100%;
     position: fixed;
     bottom: 0px;
+    height:70px;
     overflow-y: scroll;
 
   }
   .trade-footer-grid{
     float: left;
-    width: 80px;
+    width: 70px;
+    height: 66px;
+    margin-top: 12px;
   }
+
 
   .trade-foot-item{
     width: 480px;
@@ -165,7 +195,12 @@
 
 
   .trade-token-grid-row__col-token-image {
-    line-height: 0.5rem;
+    line-height: 0.4rem;
+  }
+  .trade-footer-grid--active{
+    margin-top: 2px;
+    line-height: 2rem;
+    width: 70px;
   }
 
 

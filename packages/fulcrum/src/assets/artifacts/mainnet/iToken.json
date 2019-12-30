@@ -759,6 +759,29 @@
                     "type": "uint256"
                 }
             ],
+            "name": "mintWithChai",
+            "outputs": [
+                {
+                    "name": "mintAmount",
+                    "type": "uint256"
+                }
+            ],
+            "payable": false,
+            "stateMutability": "nonpayable",
+            "type": "function"
+        },
+        {
+            "constant": false,
+            "inputs": [
+                {
+                    "name": "receiver",
+                    "type": "address"
+                },
+                {
+                    "name": "depositAmount",
+                    "type": "uint256"
+                }
+            ],
             "name": "mint",
             "outputs": [
                 {
@@ -794,6 +817,29 @@
             "stateMutability": "nonpayable",
             "type": "function",
             "signature": "0x81a6b250"
+        },
+        {
+            "constant": false,
+            "inputs": [
+                {
+                    "name": "receiver",
+                    "type": "address"
+                },
+                {
+                    "name": "burnAmount",
+                    "type": "uint256"
+                }
+            ],
+            "name": "burnToChai",
+            "outputs": [
+                {
+                    "name": "loanAmountPaid",
+                    "type": "uint256"
+                }
+            ],
+            "payable": false,
+            "stateMutability": "nonpayable",
+            "type": "function"
         },
         {
             "constant": false,
@@ -856,8 +902,50 @@
             ],
             "payable": true,
             "stateMutability": "payable",
-            "type": "function",
-            "signature": "0x985f7f3d"
+            "type": "function"
+        },
+        {
+            "constant": false,
+            "inputs": [
+                {
+                    "name": "borrowAmount",
+                    "type": "uint256"
+                },
+                {
+                    "name": "leverageAmount",
+                    "type": "uint256"
+                },
+                {
+                    "name": "initialLoanDuration",
+                    "type": "uint256"
+                },
+                {
+                    "name": "collateralTokenSent",
+                    "type": "uint256"
+                },
+                {
+                    "name": "borrower",
+                    "type": "address"
+                },
+                {
+                    "name": "receiver",
+                    "type": "address"
+                },
+                {
+                    "name": "collateralTokenAddress",
+                    "type": "address"
+                }
+            ],
+            "name": "borrowTokenFromDeposit",
+            "outputs": [
+                {
+                    "name": "loanOrderHash",
+                    "type": "bytes32"
+                }
+            ],
+            "payable": true,
+            "stateMutability": "payable",
+            "type": "function"
         },
         {
             "constant": false,
@@ -1074,6 +1162,20 @@
             "stateMutability": "view",
             "type": "function",
             "signature": "0x7ff9b596"
+        },
+        {
+            "constant": true,
+            "inputs": [],
+            "name": "chaiPrice",
+            "outputs": [
+                {
+                    "name": "price",
+                    "type": "uint256"
+                }
+            ],
+            "payable": false,
+            "stateMutability": "view",
+            "type": "function"
         },
         {
             "constant": true,

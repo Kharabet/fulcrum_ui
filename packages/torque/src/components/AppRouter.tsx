@@ -1,6 +1,6 @@
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import React, { Component } from "react";
-import ReactGA from "react-ga";
+// import ReactGA from "react-ga";
 import Intercom from "react-intercom";
 import { HashRouter, Redirect, Route, Switch } from "react-router-dom";
 import configProviders from "../config/providers.json";
@@ -19,7 +19,6 @@ import { NavService } from "../services/NavService";
 import { TorqueProvider } from "../services/TorqueProvider";
 import { LocationListener } from "./LocationListener";
 import TagManager from 'react-gtm-module';
-
 import siteConfig from "./../config/SiteConfig.json";
 
 const isMainnetProd =
@@ -82,8 +81,13 @@ export class AppRouter extends Component<any, IAppRouterState> {
                       </Switch>
                       {isMainnetProd ? (
                         <Route path="/" render={({location}) => {
-                           ReactGA.ga('set', 'page', location.pathname + location.search);
-                           ReactGA.ga('send', 'pageview');
+                          const tagManagerArgs = {
+                              dataLayer: {
+                                  userProject: 'Torque',
+                                  page: location.pathname + location.search
+                              }
+                          }
+                          TagManager.dataLayer(tagManagerArgs);
                           return null;
                         }} />
                       ) : ``}
@@ -103,8 +107,13 @@ export class AppRouter extends Component<any, IAppRouterState> {
                       </Switch>
                       {isMainnetProd ? (
                         <Route path="/" render={({location}) => {
-                           ReactGA.ga('set', 'page', location.pathname + location.search);
-                           ReactGA.ga('send', 'pageview');
+                          const tagManagerArgs = {
+                              dataLayer: {
+                                  userProject: 'Torque',
+                                  page: location.pathname + location.search
+                              }
+                          }
+                          TagManager.dataLayer(tagManagerArgs);
                           return null;
                         }} />
                       ) : ``}

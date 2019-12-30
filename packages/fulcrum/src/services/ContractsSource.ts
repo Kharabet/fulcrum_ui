@@ -235,7 +235,14 @@ export class ContractsSource {
 
   private async getITokenContractRaw(asset: Asset): Promise<iTokenContract | null> {
     await this.Init();
-    const symbol = asset === Asset.WETH ? `iETH` : `i${asset}`
+    let symbol;
+    if (asset === Asset.WETH) {
+      symbol = `iETH`;
+    } else if (asset === Asset.CHAI) {
+      symbol = `iDAI`;
+    } else {
+      symbol = `i${asset}`;
+    }
     const tokenContractInfo = ContractsSource.iTokensContractInfos.get(symbol) || null;
     return tokenContractInfo ? new iTokenContract(ContractsSource.iTokenJson.abi, tokenContractInfo.token, this.provider) : null;
   }
@@ -298,7 +305,15 @@ export class ContractsSource {
   }
 
   public getITokenErc20Address(asset: Asset): string | null {
-    const tokenContractInfo = ContractsSource.iTokensContractInfos.get(`i${asset}`) || null;
+    let symbol;
+    if (asset === Asset.WETH) {
+      symbol = `iETH`;
+    } else if (asset === Asset.CHAI) {
+      symbol = `iDAI`;
+    } else {
+      symbol = `i${asset}`;
+    }
+    const tokenContractInfo = ContractsSource.iTokensContractInfos.get(symbol) || null;
     return tokenContractInfo ? tokenContractInfo.token : null;
   }
 

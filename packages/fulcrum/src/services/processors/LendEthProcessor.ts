@@ -1,4 +1,4 @@
-import { BigNumber } from "bignumber.js";
+import { BigNumber } from "@0x/utils";
 import { iTokenContract } from "../../contracts/iTokenContract";
 import { AssetsDictionary } from "../../domain/AssetsDictionary";
 import { LendRequest } from "../../domain/LendRequest";
@@ -34,7 +34,7 @@ export class LendEthProcessor {
 
     // Waiting for token allowance
     if (skipGas) {
-      gasAmountBN = new BigNumber(3000000);
+      gasAmountBN = new BigNumber(600000);
     } else {
       // estimating gas amount
       const gasAmount = await tokenContract.mintWithEther.estimateGasAsync(account, { from: account, value: amountInBaseUnits, gas: FulcrumProvider.Instance.gasLimit });

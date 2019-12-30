@@ -82,6 +82,7 @@ export class TradeTokenGridRowMobile extends Component<ITradeTokenGridRowMBProps
 
   private async derivedUpdate() {
     let version = 2;
+
     const tradeTokenKey = new TradeTokenKey(this.props.asset, this.props.defaultUnitOfAccount, this.props.positionType, this.state.leverage, this.props.defaultTokenizeNeeded, version);
     if (tradeTokenKey.erc20Address === "") {
       tradeTokenKey.setVersion(1);
@@ -193,12 +194,13 @@ export class TradeTokenGridRowMobile extends Component<ITradeTokenGridRowMBProps
         <div title={`$${bnPrice.toFixed(18)}`} className="trade-token-grid-row__col-price">
           {!this.state.isLoading ?`$${bnPrice.toFixed(2)}` : 'Loading...'}
           </div>
-        <div title={this.state.interestRate.gt(0) ? `${this.state.interestRate.toFixed(18)}%` : ``} className="trade-token-grid-row__col-profit">
-          {this.state.interestRate.gt(0) ? `${this.state.interestRate.toFixed(4)}%` : "Loading..."}
-        </div>
         <div title={`$${bnLiquidationPrice.toFixed(18)}`} className="trade-token-grid-row__col-price">
           {!this.state.isLoading ? `$${bnLiquidationPrice.toFixed(2)}` : 'Loading...' }
           </div>
+        <div title={this.state.interestRate.gt(0) ? `${this.state.interestRate.toFixed(18)}%` : ``} className="trade-token-grid-row__col-profit">
+          {this.state.interestRate.gt(0) ? `${this.state.interestRate.toFixed(4)}%` : "Loading..."}
+        </div>
+
         {/*<div className="trade-token-grid-row__col-change24h">
           <Change24HMarker value={bnChange24h} size={Change24HMarkerSize.MEDIUM} />
         </div>*/}
