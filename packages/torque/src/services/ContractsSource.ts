@@ -8,6 +8,9 @@ import { iTokenContract } from "../contracts/iTokenContract";
 import { oracleContract } from "../contracts/oracle";
 import { vatContract } from "../contracts/vat";
 import { cdpManagerContract } from "../contracts/cdpManager";
+import { makerBridgeContract } from "../contracts/makerBridge";
+import { proxyRegistryContract } from "../contracts/proxyRegistry";
+import { dsProxyJsonContract } from "../contracts/dsProxyJson";
 
 import { Asset } from "../domain/Asset";
 
@@ -26,6 +29,10 @@ export class ContractsSource {
   private iENSJson: any;
   private vatJson: any;
   private cdpJson: any;
+  private makerBridgeJson: any;
+  private proxyRegisteryJson :any;
+  private dsProxyIsAllowJson: any;
+  private dsProxyJson: any;
   public networkId: number;
   public canWrite: boolean;
 
@@ -346,6 +353,10 @@ export class ContractsSource {
     this.iENSJson = await import(`./../assets/artifacts/${network}/iENSOwner.json`);
     this.vatJson = await import(`./../assets/artifacts/${network}/vat.json`);
     this.cdpJson = await import(`./../assets/artifacts/${network}/cdpManager.json`);
+    this.makerBridgeJson = await import(`./../assets/artifacts/${network}/makerBridge.json`);
+    this.proxyRegisteryJson = await import(`./../assets/artifacts/${network}/proxyRegistry.json`);
+    this.dsProxyJson = await import(`./../assets/artifacts/${network}/dsProxyJson.json`);
+    this.dsProxyIsAllowJson = await import(`./../assets/artifacts/${network}/dsProxyIsAllow.json`);
     ContractsSource.isInit = true;
   }
 
@@ -365,8 +376,25 @@ export class ContractsSource {
     await this.Init();
     return new cdpManagerContract(this.cdpJson.abi, addressCdp.toLowerCase(), this.provider);
   }
-
-
+  private async getmakerBridgeRaw(address: string): Promise<makerBridgeContract> {
+    await this.Init();
+    return new makerBridgeContract(this.makerBridgeJson.abi, address.toLowerCase(), this.provider);
+  }
+  private async getProxyRegisteryRaw(address: string): Promise<proxyRegistryContract> {
+    await this.Init();
+    return new proxyRegistryContract(this.proxyRegisteryJson.abi, address.toLowerCase(), this.provider);
+  }
+  private async getDsProxyRaw(address: string): Promise<dsProxyJsonContract> {
+    await this.Init();
+    return new dsProxyJsonContract(this.dsProxyJson.abi, address.toLowerCase(), this.provider);
+  }
+  private async getDsProxyAllowJSON(){
+    return this.dsProxyIsAllowJson;
+  }
+  public dsProxyAllowJson = _.memoize(this.getDsProxyAllowJSON);
+  public getProxyRegistery = _.memoize(this.getProxyRegisteryRaw);
+  public getDsProxy = _.memoize(this.getDsProxyRaw);
+  public getmakerBridge = _.memoize(this.getmakerBridgeRaw);
   public getCdpManager = _.memoize(this.getCdpManagerRaw);
   public getVatContract = _.memoize(this.getVatContractRaw);
   public getCdpContract = _.memoize(this.getCdpContractRaw);

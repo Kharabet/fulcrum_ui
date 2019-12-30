@@ -1,11 +1,10 @@
 import { BigNumber } from "@0x/utils";
-import React, { Component } from "react";
+import React, {ChangeEvent, Component} from "react";
 import { Asset } from "../domain/Asset";
 import { TorqueProviderEvents } from "../services/events/TorqueProviderEvents";
 import { TorqueProvider } from "../services/TorqueProvider";
-import { DotsBar } from "./DotsBar";
-import { SelectorIconsBar } from "./SelectorIconsBar";
-import {ActionType} from "../domain/ActionType";
+import { Observable, Subject } from "rxjs";
+import { debounceTime, switchMap } from "rxjs/operators";
 import bgDai  from "../assets/images/ic_token_dai.svg";
 import bgUsdc  from "../assets/images/ic_token_usdc.svg";
 import bgSai  from "../assets/images/ic_token_sai.svg";
@@ -22,26 +21,59 @@ import maker_img from "../assets/images/maker.svg";
 
 export interface IRefinanceAssetSelectorItemProps {
   asset: Asset;
-  onSelectAsset?: (asset: Asset) => void;
+  cdpId:BigNumber;
+  urn:string;
+  ilk:string;
+  accountAddress:string;
+  proxyAddress:string;
+  isProxy:boolean;
+  // onSelectAsset?: (asset: Asset) => void;
 }
 
 interface IRefinanceAssetSelectorItemState {
+  inputAmountText: number;
+  borrowAmount: BigNumber;
   refinanceData: RefinanceData[];
 }
 
 export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelectorItemProps, IRefinanceAssetSelectorItemState> {
   private _input: HTMLInputElement | null = null;
+  private readonly _inputTextChange: Subject<number>;
   constructor(props: IRefinanceAssetSelectorItemProps) {
     super(props);
-    this.state = {refinanceData:
+    this.state = {
+      inputAmountText: 0,
+      borrowAmount: new BigNumber(0),
+      refinanceData:
       [{
         collateralType: '',
         collateralAmount: new BigNumber(0),
         debt: new BigNumber(0),
         cdpId: new BigNumber(0),
+        accountAddress: '',
+        proxyAddress: '',
+        isProxy:false
       }]};
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
+    this._inputTextChange = new Subject<number>();
+    // this._inputTextChange
+    //   .pipe(
+    //     debounceTime(100),
+    //     switchMap(value => this.rxConvertToBigNumber(value)),
+    //     // switchMap(value => this.rxGetEstimate(value))
+    //   )
+      // .subscribe((value: IBorrowEstimate) => {
+      //   this.setState({
+      //     ...this.state,
+      //     depositAmount: value.depositAmount
+      //   });
+      // });
   }
+  private rxConvertToBigNumber = (textValue: string): Observable<BigNumber> => {
+    return new Observable<BigNumber>(observer => {
+      observer.next(new BigNumber(textValue));
+    });
+  };
 
   private onProviderAvailable = () => {
     this.derivedUpdate();
@@ -70,12 +102,30 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
   };
 
   private derivedUpdate = async () => {
-    const refinanceData = await TorqueProvider.Instance.checkCdp(this.props.asset);
-    this.setState({ ...this.state, refinanceData: refinanceData });
-
+    if (this.props.cdpId.gt(0)){
+      const refinanceData = await TorqueProvider.Instance.getCdpsVat(this.props.cdpId, this.props.urn, this.props.ilk, this.props.accountAddress,  this.props.isProxy, this.props.proxyAddress);
+      this.setState({ ...this.state, refinanceData: refinanceData });
+    }
   };
+  public loanAmountChange = async (event: ChangeEvent<HTMLInputElement>) => {
+    // handling different types of empty values
+    const amountText = event.target.value ? event.target.value : '0';
+    // console.log(amountText);
+    // setting inputAmountText to update display at the same time
+
+    this.setState({
+      ...this.state,
+      inputAmountText: parseInt(amountText),
+      borrowAmount: new BigNumber(amountText)
+    }, () => {
+      // emitting next event for processing with rx.js
+      this._inputTextChange.next(this.state.inputAmountText);
+    });
+  };
+
   private checkCdpManager = async () => {
-    const refinanceData = await TorqueProvider.Instance.checkCdpManager(this.state.refinanceData[0]);
+
+    const refinanceData = await TorqueProvider.Instance.checkCdpManager(this.state.refinanceData[0], this.state.borrowAmount);
   }
 
   public render() {
@@ -105,9 +155,9 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
                 <input
                   ref={this._setInputRef}
                   className="refinance__input-container__input-amount"
-                  type="text"
-                  value={this.state.refinanceData[0].debt.toFixed(2)}
+                  type="number"
                   placeholder={`Amount`}
+                  onChange={this.loanAmountChange}
                 />
               </div>
             </div>
@@ -182,9 +232,9 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
 
 
 
-  private onClick = () => {
-    if (this.props.onSelectAsset) {
-      this.props.onSelectAsset(this.props.asset);
-    }
-  };
+  // private onClick = () => {
+  //   if (this.props.onSelectAsset) {
+  //     this.props.onSelectAsset(this.props.asset);
+  //   }
+  // };
 }

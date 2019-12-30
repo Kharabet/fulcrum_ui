@@ -39,7 +39,7 @@ export class RefinancePage extends PureComponent<IRefinancePageParams & RouteCom
           {/*<div className="borrow-page__main" style={walletType === WalletType.Web3 ? { paddingBottom: `90rem`} : undefined}>*/}
           <div className="borrow-page__main">
             <RefinanceAssetCompoundSelector walletType={walletType}  />
-            <RefinanceAssetSelector walletType={walletType} onSelectAsset={this.onSelectAsset} />
+            <RefinanceAssetSelector walletType={walletType} />
           </div>
           <Footer />
         </div>

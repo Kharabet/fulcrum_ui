@@ -3,8 +3,7 @@ import React, { Component } from "react";
 import { Asset } from "../domain/Asset";
 import { TorqueProviderEvents } from "../services/events/TorqueProviderEvents";
 import { TorqueProvider } from "../services/TorqueProvider";
-import { DotsBar } from "./DotsBar";
-import { SelectorIconsBar } from "./SelectorIconsBar";
+
 import {ActionType} from "../domain/ActionType";
 import bgDai  from "../assets/images/ic_token_dai.svg";
 import bgUsdc  from "../assets/images/ic_token_usdc.svg";
@@ -21,6 +20,7 @@ import dydx_img from "../assets/images/dydx.svg";
 import compound_img from "../assets/images/compound.svg";
 
 import { RefinanceData } from "../domain/RefinanceData";
+import {IBorrowEstimate} from "../domain/IBorrowEstimate";
 
 export interface IRefinanceAssetCompoundSelectorItemProps {
   asset: Asset;
@@ -33,6 +33,7 @@ interface IRefinanceAssetCompoundSelectorItemState {
 
 export class RefinanceAssetCompoundSelectorItem extends Component<IRefinanceAssetCompoundSelectorItemProps, IRefinanceAssetCompoundSelectorItemState> {
   private _input: HTMLInputElement | null = null;
+
   constructor(props: IRefinanceAssetCompoundSelectorItemProps) {
     super(props);
     this.state = {refinanceData:
@@ -41,9 +42,14 @@ export class RefinanceAssetCompoundSelectorItem extends Component<IRefinanceAsse
         collateralType: '',
         collateralAmount: new BigNumber(0),
         debt: new BigNumber(0),
+        accountAddress:'',
+        isProxy: false,
+        proxyAddress: '',
       }]};
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
+
   }
+
 
   private onProviderAvailable = () => {
     this.derivedUpdate();
@@ -67,13 +73,15 @@ export class RefinanceAssetCompoundSelectorItem extends Component<IRefinanceAsse
     }
   }
 
+
+
   private _setInputRef = (input: HTMLInputElement) => {
     this._input = input;
   };
 
   private derivedUpdate = async () => {
-    const refinanceData = await TorqueProvider.Instance.checkCdp(this.props.asset);
-    this.setState({ ...this.state, refinanceData: refinanceData });
+    // const refinanceData = await TorqueProvider.Instance.checkCdp(this.props.asset);
+    // this.setState({ ...this.state, refinanceData: refinanceData });
 
   };
 
