@@ -145,7 +145,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
             <div class="wrapper-result-gain f-3 flex fd-c">
                 <div class="flex fd-r">
                 <p>If 
-                    <span class="token-name">ETH</span> price goes 
+                    <span class="token-name">ETH</span> price goes&nbsp;
                     <div class="result-gain">
                         <span class="fw-800 eth-price">+5</span>%
                         <div class="spinner">
@@ -155,7 +155,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
                     </div>
                 </p>
                 </div>
-                <div class="flex fd-r"><p><span class="gain-text">You Gain</span> <span class="result-gain"><span class="fw-800 your-gain">25</span>%</span></p></div>
+                <div class="flex fd-r"><p><span class="gain-text">You Gain</span>&nbsp;<div class="result-gain"><span class="fw-800 your-gain">25</span>%</div></p></div>
             </div>
         </div>
     </div>

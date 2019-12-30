@@ -93,7 +93,11 @@
     }
     @media (max-width: 767px) {
         padding-top: 0;
+        p {
+            font-size: 16px;
+        }
     }
+
     .result-gain {
         display: inline-flex;
         padding: 0 12px;
