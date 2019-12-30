@@ -160,11 +160,12 @@ window.addEventListener('load', function () {
 
     gainRange.addEventListener("change", function () {
         updateChartData();
-        ethPrice.innerHTML = this.value > 0 ? `+${this.value}` : this.value;
     });
 
     gainRange.addEventListener("input", function () {
         beforeDataGain.innerHTML = Math.abs(this.value);
+        ethPrice.innerHTML = this.value > 0 ? `+${this.value}` : this.value;
+
         beforeGain.style.display = 'flex';
         beforeGain.style.left = 'calc(50% + ' + this.value / 2 + '% - 33px - (20px *' + this.value / 100 + '))'; //20 - half of width thumb, 33 - half of with before-gain
         if (this.value < 0) {
