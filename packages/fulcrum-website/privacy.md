@@ -10,7 +10,7 @@ permalink: privacy
 
 ## ***PLEASE READ CAREFULLY***
 
-Last Updated: May 10, 2019
+### Last Updated: May 10, 2019
 
 Welcome to Fulcrum, a website operated by Leveragebox LLC (the “Company”, “we”, “us”, or “our”).  We consider privacy to be of utmost importance to our users.  We respect your privacy and are committed to protecting it through our compliance with this privacy policy (this “Privacy Policy”).  This Privacy Policy describes the types of information we may gather from you or that you may provide to us when you use our website, [https://fulcrum.trade](https://fulcrum.trade "https://fulcrum.trade") (the “Website”) and the services, features, and functionality offered by the Company (together with the Website, the “Services”).  Our terms and conditions (the “Terms and Conditions” or “Terms”), which can be found at [https://fulcrum.trade/tos](https://fulcrum.trade/tos "https://fulcrum.trade/tos"), are expressly incorporated herein by reference and are an integral part hereof.
 

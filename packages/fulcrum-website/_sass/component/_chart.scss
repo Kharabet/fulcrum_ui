@@ -71,11 +71,15 @@
   color: var(--primary-color);
   @media (min-width: 992px) {
     font-size: 20px;
+    padding-top: 5px;
   }
   @media (max-width: 991px) {
     // order: -1;
-    // margin-bottom: 75px;
+    padding-top: 9px;
     font-size: 16px;
+  }
+  @media(max-width: 767px){
+    padding-top: 0;
   }
   .result-gain {
     display: inline-flex;
