@@ -160,7 +160,7 @@ window.addEventListener('load', function () {
 
     gainRange.addEventListener("change", function () {
         updateChartData();
-        ethPrice.innerHTML = this.value;
+        ethPrice.innerHTML = this.value > 0 ? `+${this.value}` : this.value;
     });
 
     gainRange.addEventListener("input", function () {
