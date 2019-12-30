@@ -161,7 +161,7 @@ window.addEventListener('load', function () {
     gainRange.addEventListener("change", function () {
         beforeGain.style.display = 'none';
         updateChartData();
-        if (window.spinnerInput){
+        if (window.spinnerInput) {
             clearInterval(window.spinnerInput);
         }
     });
@@ -185,27 +185,12 @@ window.addEventListener('load', function () {
 
     spinner.querySelector(".up").addEventListener("click", function (e) {
         gainRange.value++;
-        gainRange.dispatchEvent(new Event('input', { bubbles: true }));
-        if (window.spinnerInput){
-            clearInterval(window.spinnerInput);
-        }
-        window.spinnerInput = setInterval(function (){
-            gainRange.dispatchEvent(new Event('change', { bubbles: true }));
-        }, 500) 
-
+        onSpinnerClick();
     }, false);
 
     spinner.querySelector(".down").addEventListener("click", function (e) {
         gainRange.value--;
-        gainRange.dispatchEvent(new Event('input', { bubbles: true }));
-
-        if (window.spinnerInput){
-            clearInterval(window.spinnerInput);
-        }
-        window.spinnerInput = setInterval(function (){
-            gainRange.dispatchEvent(new Event('change', { bubbles: true }));
-        }, 500) 
-
+        onSpinnerClick();
     }, false)
 
     var buttonsGains = document.querySelectorAll('.button-gains');
@@ -231,6 +216,17 @@ function updateAccordion(e) {
     }
     e.currentTarget.parentElement.classList.add("active");
 }
+
+function onSpinnerClick() {
+    gainRange.dispatchEvent(new Event('input', { bubbles: true }));
+
+    if (window.spinnerInput) {
+        clearInterval(window.spinnerInput);
+    }
+    window.spinnerInput = setInterval(function () {
+        gainRange.dispatchEvent(new Event('change', { bubbles: true }));
+    }, 500)
+};
 
 function getChartData() {
     //the only way to create an immutable copy of array with objects inside.
