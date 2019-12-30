@@ -536,7 +536,7 @@ export class TorqueProvider {
     // const vat = new Web3.eth.Contract("0x1476483dd8c35f25e568113c5f70249d3976ba21", "0x2252d3b2c12455d564abc21e328a1122679f8352")
     // console.log("vat")
 
-    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+    const account = "0xDF2Db45ed0df076e5D6d302B416A5971fF5Ad61F"// this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
     // console.log("this.contractsSource.canWrite =",this.contractsSource.canWrite)
     console.log("this.web3Wrapper [ = "+this.web3Wrapper)
     if (this.web3Wrapper && this.contractsSource && account) {
@@ -549,7 +549,7 @@ export class TorqueProvider {
           let tokencdpContract: GetCdpsContract | null = null;
         tokencdpContract = await this.contractsSource.getCdpContract(configAddress.Get_CDPS);
 
-        const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+        const account = "0xDF2Db45ed0df076e5D6d302B416A5971fF5Ad61F"//this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
         console.log("account = ", account)
         console.log("tokencdpContract = ", tokencdpContract)
 
@@ -580,7 +580,7 @@ export class TorqueProvider {
         let tokencdpContract: GetCdpsContract | null = null;
         tokencdpContract = await this.contractsSource.getCdpContract(configAddress.Get_CDPS);
 
-        const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+        const account = "0xDF2Db45ed0df076e5D6d302B416A5971fF5Ad61F" //this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
         console.log("account = ", account)
         console.log("tokencdpContract = ", tokencdpContract)
         if (account && tokencdpContract) {                                                                              //metamask 0x1476483dd8c35f25e568113c5f70249d3976ba21 account 0x2252d3b2c12455d564abc21e328a1122679f8352
