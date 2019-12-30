@@ -1,8 +1,13 @@
 .wrapper-chart {
     height: auto;
     max-height: 400px;
+    min-height: 380px;
     position: relative;
     width: 100%;
+    @media (max-width: 579px) {
+        min-height: 280px;
+    }
+
     > canvas {
         width: 100% !important;
     }
@@ -19,6 +24,10 @@
         width: 35px;
         left: 50%;
         bottom: -380px;
+        @media (max-width: 579px) {
+            height: 280px;
+            bottom: -280px;
+        }
     }
     &:after {
         position: absolute;
@@ -32,6 +41,10 @@
         right: 0;
         margin: auto;
         z-index: 100;
+        @media (max-width: 579px) {
+            height: 280px;
+            bottom: -277px;
+        }
     }
 }
 .chart-mark {
