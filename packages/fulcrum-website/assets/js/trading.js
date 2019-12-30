@@ -60,7 +60,7 @@ var beforeDataGain = document.querySelector('.before-data-gain');
 var leverageButton = () => document.querySelector(".button-group-gains .button-gains.active");
 var yourGain = document.querySelector(".your-gain");
 var gainText = document.querySelector(".gain-text");
-
+var spinner = document.querySelector(".spinner");
 var coins = document.querySelectorAll('.chart-tokens .coin-calc');
 
 
@@ -159,12 +159,17 @@ window.addEventListener('load', function () {
 
 
     gainRange.addEventListener("change", function () {
+        beforeGain.style.display = 'none';
         updateChartData();
-        ethPrice.innerHTML = this.value;
+        if (window.spinnerInput) {
+            clearInterval(window.spinnerInput);
+        }
     });
 
     gainRange.addEventListener("input", function () {
         beforeDataGain.innerHTML = Math.abs(this.value);
+        ethPrice.innerHTML = this.value > 0 ? `+${this.value}` : this.value;
+
         beforeGain.style.display = 'flex';
         beforeGain.style.left = 'calc(50% + ' + this.value / 2 + '% - 33px - (20px *' + this.value / 100 + '))'; //20 - half of width thumb, 33 - half of with before-gain
         if (this.value < 0) {
@@ -177,9 +182,16 @@ window.addEventListener('load', function () {
             }
         }
     });
-    gainRange.addEventListener("change", function () {
-        beforeGain.style.display = 'none';
-    })
+
+    spinner.querySelector(".up").addEventListener("click", function (e) {
+        gainRange.value++;
+        onSpinnerClick();
+    }, false);
+
+    spinner.querySelector(".down").addEventListener("click", function (e) {
+        gainRange.value--;
+        onSpinnerClick();
+    }, false)
 
     var buttonsGains = document.querySelectorAll('.button-gains');
     for (var i = 0; i < buttonsGains.length; i++) {
@@ -204,6 +216,17 @@ function updateAccordion(e) {
     }
     e.currentTarget.parentElement.classList.add("active");
 }
+
+function onSpinnerClick() {
+    gainRange.dispatchEvent(new Event('input', { bubbles: true }));
+
+    if (window.spinnerInput) {
+        clearInterval(window.spinnerInput);
+    }
+    window.spinnerInput = setInterval(function () {
+        gainRange.dispatchEvent(new Event('change', { bubbles: true }));
+    }, 500)
+};
 
 function getChartData() {
     //the only way to create an immutable copy of array with objects inside.
