@@ -60,7 +60,7 @@ var beforeDataGain = document.querySelector('.before-data-gain');
 var leverageButton = () => document.querySelector(".button-group-gains .button-gains.active");
 var yourGain = document.querySelector(".your-gain");
 var gainText = document.querySelector(".gain-text");
-
+var spinner = document.querySelector(".spinner");
 var coins = document.querySelectorAll('.chart-tokens .coin-calc');
 
 
@@ -159,6 +159,7 @@ window.addEventListener('load', function () {
 
 
     gainRange.addEventListener("change", function () {
+        beforeGain.style.display = 'none';
         updateChartData();
     });
 
@@ -178,9 +179,19 @@ window.addEventListener('load', function () {
             }
         }
     });
-    gainRange.addEventListener("change", function () {
-        beforeGain.style.display = 'none';
-    })
+
+    spinner.querySelector(".up").addEventListener("click", function (e) {
+        gainRange.value++;
+        gainRange.dispatchEvent(new Event('input', { bubbles: true }));
+        gainRange.dispatchEvent(new Event('change', { bubbles: true }));
+
+    }, false);
+
+    spinner.querySelector(".down").addEventListener("click", function (e) {
+        gainRange.value--;
+        gainRange.dispatchEvent(new Event('input', { bubbles: true }));
+        gainRange.dispatchEvent(new Event('change', { bubbles: true }));
+    }, false)
 
     var buttonsGains = document.querySelectorAll('.button-gains');
     for (var i = 0; i < buttonsGains.length; i++) {

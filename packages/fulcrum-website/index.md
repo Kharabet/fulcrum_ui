@@ -143,7 +143,18 @@ title: Crypto Margin Trading with Fulcrum | bZx
                 </div>
             </div>   
             <div class="wrapper-result-gain f-3 flex fd-c">
-                <div class="flex fd-r"><p>If <span class="token-name">ETH</span> price goes <span class="result-gain"><span class="fw-800 eth-price">+5</span>%</span></p></div>
+                <div class="flex fd-r">
+                <p>If 
+                    <span class="token-name">ETH</span> price goes 
+                    <div class="result-gain">
+                        <span class="fw-800 eth-price">+5</span>%
+                        <div class="spinner">
+                            <button type="button" class="up">{% include svg/spinner-arrow-up.svg %}</button>
+                            <button type="button" class="down">{% include svg/spinner-arrow-up.svg %}</button>
+                        </div>
+                    </div>
+                </p>
+                </div>
                 <div class="flex fd-r"><p><span class="gain-text">You Gain</span> <span class="result-gain"><span class="fw-800 your-gain">25</span>%</span></p></div>
             </div>
         </div>
@@ -154,7 +165,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
                 {% include svg/arrow-gain.svg %}
                 <span class="before-data-gain">25</span>%
             </div>
-            <input class="gain-range" type="range" value="25" min="-99" max="100"/>
+            <input class="gain-range" type="range" value="5" min="-99" max="100"/>
         </div>
     </div>
     <div class="w-100 mb-30 p-relative">   
