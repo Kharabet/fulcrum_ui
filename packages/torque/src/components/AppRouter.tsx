@@ -25,7 +25,9 @@ const isMainnetProd =
   process.env.NODE_ENV && process.env.NODE_ENV !== "development"
   && process.env.REACT_APP_ETH_NETWORK === "kovan";
 
+console.log("process.env.NODE_ENV = ", process.env.NODE_ENV)
 console.log("isMainnetProd = ", isMainnetProd)
+console.log("process.env.REACT_APP_ETH_NETWORK", process.env.REACT_APP_ETH_NETWORK)
 
 if (isMainnetProd) {
   const tagManagerArgs = {
