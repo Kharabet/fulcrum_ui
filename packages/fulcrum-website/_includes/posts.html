@@ -68,7 +68,7 @@
 <script>
 
     window.addEventListener('load', function () {
-        renderArticles("https://bzx.network/feed.xml");
+        renderArticles("http://localhost:4000/feed.xml");
     });
 
     function renderArticles(url) {
@@ -78,9 +78,10 @@
             var articleHTML = articleItems.slice(0, 3).map(item => {
                 var title = item.querySelector("title").textContent;
                 var info = item.querySelector("summary").textContent;
-                var date = new Date(item.querySelector("pubDate").textContent).toLocaleString('en-us', { day: "2-digit", month: "short" });
+                var date = new Date(item.querySelector("pubDate").textContent).toLocaleString('en-us', { day: "2-digit", month: "short", year: "numeric" });
                 var link = item.querySelector("link").textContent;
                 var cover = item.querySelector("logo").textContent;
+                var readingTime = item.querySelector("readingTime").textContent.trim();
                 return `<div class="col col-4 col-sm-12">
                     <div class="item-blog">
                         <a href="${link}" target="_blank">
@@ -92,7 +93,7 @@
                             <div class="item-blog-body">
                                 <h4 class="title my-20">${title}</h4>
                                 <p class="c-dark-gray mb-25">${info}</p>
-                                <div class="fs-12 lh-180 c-secondary-blue">${date}</div>
+                                <div class="fs-12 lh-180 c-secondary-blue">${date} - ${readingTime} min read</div>
                             </div>
                         </a>
                     </div>
