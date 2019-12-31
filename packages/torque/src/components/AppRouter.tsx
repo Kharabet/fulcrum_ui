@@ -25,8 +25,6 @@ const isMainnetProd =
   process.env.NODE_ENV && process.env.NODE_ENV !== "development"
   && process.env.REACT_APP_ETH_NETWORK === "mainnet";
 
-  console.log("process.env.REACT_APP_ETH_NETWORK = ", process.env.REACT_APP_ETH_NETWORK)
-
 if (isMainnetProd) {
   const tagManagerArgs = {
      gtmId : configProviders.Google_TrackingID,
@@ -99,7 +97,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
                   <HashRouter hashType="slash">
                     <LocationListener doNetworkConnect={this.doNetworkConnect}>
                       <Switch>
-                        <Route exact={true} path="/" component={LandingPage} />
+                        <Route exact={true} path="/" render={props => <LandingPage {...props} onSelectProvider={this.onProviderTypeSelect} />}  />
                         <Route exact={true} path="/wallet/:destinationAbbr" render={props => <WalletSelectionPage {...props} onSelectProvider={this.onProviderTypeSelect} isLoading={this.state.isLoading} />} />
                         <Route exact={true} path="/borrow/:walletTypeAbbr" render={props => <BorrowPage {...props} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} />} />
                         <Route exact={true} path="/dashboard/:walletTypeAbbr" render={props => <DashboardPage {...props} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} />} />
@@ -133,7 +131,6 @@ export class AppRouter extends Component<any, IAppRouterState> {
   };
 
   private onProviderTypeSelect = async (providerType: ProviderType) => {
-
     if (providerType === TorqueProvider.Instance.providerType && TorqueProvider.Instance.accounts.length !== 0) {
       const accountAddress = TorqueProvider.Instance.accounts[0];
 

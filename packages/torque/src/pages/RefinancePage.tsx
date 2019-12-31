@@ -37,8 +37,11 @@ export class RefinancePage extends PureComponent<IRefinancePageParams & RouteCom
         <div className="refinance-page">
           <HeaderOps isLoading={this.props.isLoading} doNetworkConnect={this.doNetworkConnect} />
           {/*<div className="borrow-page__main" style={walletType === WalletType.Web3 ? { paddingBottom: `90rem`} : undefined}>*/}
-          <div className="borrow-page__main">
+
+          <div className="refinance-page__main">
+
             <RefinanceAssetCompoundSelector walletType={walletType}  />
+
             <RefinanceAssetSelector walletType={walletType} />
           </div>
           <Footer />
@@ -114,7 +117,7 @@ export class RefinancePage extends PureComponent<IRefinancePageParams & RouteCom
 
   private doNetworkConnect = () => {
     if (this.props.doNetworkConnect) {
-      this.props.doNetworkConnect("b");
+      this.props.doNetworkConnect('r');
     }
   };
 }

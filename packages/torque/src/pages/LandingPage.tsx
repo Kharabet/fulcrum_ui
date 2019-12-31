@@ -1,12 +1,17 @@
 import React, { PureComponent } from "react";
 import { ButtonLanding, ButtonLandingColor } from "../components/ButtonLanding";
+import { ButtonLandingRefinance } from "../components/ButtonLandingRefinance";
 import { WalletType } from "../domain/WalletType";
 import { Footer } from "../layout/Footer";
 import { HeaderHome } from "../layout/HeaderHome";
 import { NavService } from "../services/NavService";
 import { TorqueProvider } from "../services/TorqueProvider";
+import {ProviderType} from "../domain/ProviderType";
+export interface IProviderSelectorItemProps {
+  onSelectProvider?: (providerType: ProviderType) => void;
+}
 
-export class LandingPage extends PureComponent {
+export class LandingPage extends PureComponent<IProviderSelectorItemProps> {
   public render() {
     const accountAddress =
       TorqueProvider.Instance.accounts.length > 0 && TorqueProvider.Instance.accounts[0]
@@ -30,7 +35,7 @@ export class LandingPage extends PureComponent {
             <div className="landing-page__jumbo-action-container">
               <ButtonLanding color={ButtonLandingColor.Blue} subtitle={"New user?"} title={"Borrow"} url={walletUrl} />
               <ButtonLanding color={ButtonLandingColor.Green} subtitle={"Existing user?"} title={"Track your loans"} url={trackLoansUrl} />
-              <ButtonLanding color={ButtonLandingColor.Purple} subtitle={"Already have a loan?"} title={"Refinance"} url={refinanceLoanUrl} />
+              <ButtonLandingRefinance color={ButtonLandingColor.Purple} subtitle={"Already have a loan?"} title={"Refinance"} onSelectProvider={this.props.onSelectProvider}  url={refinanceLoanUrl} />
             </div>
           </div>
         </main>
@@ -38,6 +43,7 @@ export class LandingPage extends PureComponent {
       </div>
     );
   }
+
 
   public componentDidMount(): void {
     const htmls = document.getElementsByTagName("html");

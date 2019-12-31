@@ -102,9 +102,11 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
   };
 
   private derivedUpdate = async () => {
+
     if (this.props.cdpId.gt(0)){
       const refinanceData = await TorqueProvider.Instance.getCdpsVat(this.props.cdpId, this.props.urn, this.props.ilk, this.props.accountAddress,  this.props.isProxy, this.props.proxyAddress);
-      this.setState({ ...this.state, refinanceData: refinanceData });
+      this.setState({ ...this.state, refinanceData: refinanceData,inputAmountText: parseInt(refinanceData[0].debt.toString()), borrowAmount:refinanceData[0].debt});
+      this._inputTextChange.next(this.state.inputAmountText);
     }
   };
   public loanAmountChange = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -146,8 +148,8 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
             {/*<div className="refinance-asset-selector__img"><img src={assetsDt.img} /></div>*/}
         </div>
         <div className="refinance-asset-selector__row mb2">
-            <div className="refinance-asset-selector__variabletxt">Variabl APY</div>
-            <div className="refinance-asset-selector__aprtxt">Fixed APY</div>
+            <div className="refinance-asset-selector__variabletxt">Variabl APR</div>
+            <div className="refinance-asset-selector__aprtxt">Fixed APR</div>
             {/*<div className="refinance-asset-selector__imgtxt">{this.props.asset}</div>*/}
         </div>
         <div className="refinance-asset-selector__row">
@@ -157,13 +159,19 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
                   ref={this._setInputRef}
                   className="refinance__input-container__input-amount"
                   type="number"
+                  defaultValue={this.state.refinanceData[0].debt.dp(3, BigNumber.ROUND_FLOOR).toString()}
                   placeholder={`Amount`}
                   onChange={this.loanAmountChange}
                 />
+                <div className="refinance-details-msg--warning">
+                  {this.state.borrowAmount.lte(0) ? 'Please enter value greater than 0' : ''}
+                  {this.state.borrowAmount.gt(this.state.refinanceData[0].debt) ? 'Please enter value less than equal to '+ this.state.refinanceData[0].debt.dp(3, BigNumber.ROUND_FLOOR).toString() : ''}
+                </div>
               </div>
+
             </div>
             <div className="refinance-asset-selector__loan">
-              {this.state.refinanceData[0].debt.toFixed(2)}
+              {this.state.refinanceData[0].debt.dp(3, BigNumber.ROUND_FLOOR).toString()}
               <div className="refinance-asset-selector__loantxt">Loan</div>
             </div>
 
@@ -178,7 +186,7 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
 
             </div>
             <div className="refinance-asset-selector__loan">
-              {this.state.refinanceData[0].collateralAmount.toFixed(2)}
+              {this.state.refinanceData[0].collateralAmount.dp(3, BigNumber.ROUND_FLOOR).toString()}
               <div className="refinance-asset-selector__loantxt">Collateral</div>
             </div>
 

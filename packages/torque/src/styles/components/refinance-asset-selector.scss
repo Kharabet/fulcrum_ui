@@ -25,8 +25,10 @@
       //margin: 1.3rem 0;
       vertical-align: middle;
   }
+
+
   .refinance__input-container {
-    padding-bottom: 1rem;
+    //padding-bottom: 1rem;
 
     .refinance__input-container__input-amount {
       display: block;
@@ -43,8 +45,26 @@
       color: black;
     }
   }
+
+  .refinance-details-msg {
+    margin-top: 1.5rem;
+
+    font-size: 1rem;
+    font-weight: normal;
+    font-style: normal;
+    font-stretch: normal;
+    line-height: 1.5;
+    letter-spacing: -0.16px;
+    text-align: center;
+    color: #a9b5c7;
+
+    &--warning {
+      text-align: center;
+      color: #801515;
+    }
+  }
   .refinance-asset-selector-item {
-    cursor: pointer;
+    //cursor: pointer;
 
     display: flex;
     flex-direction: column;
@@ -405,7 +425,7 @@
     letter-spacing: normal;
     text-align: center;
     color: #ffffff;
-
+    cursor: pointer;
     background-color: #9589f5;
   }
 }
@@ -583,3 +603,7 @@
     }
   }
 }
+.refinance-loading{
+    font-size: 2rem;
+    font-weight: bold;
+  }

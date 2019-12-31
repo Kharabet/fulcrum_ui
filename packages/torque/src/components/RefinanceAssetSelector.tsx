@@ -84,6 +84,7 @@ export class RefinanceAssetSelector extends Component<IRefinanceAssetSelectorPro
 
 
   private onProviderAvailable = () => {
+
     this.derivedUpdate();
   };
 
@@ -91,10 +92,10 @@ export class RefinanceAssetSelector extends Component<IRefinanceAssetSelectorPro
     this.derivedUpdate();
   }
   private derivedUpdate = async () => {
-
     const refinanceData = await TorqueProvider.Instance.checkCdp(Asset.DAI);
     console.log("refinanceData = ",refinanceData)
     this.setState({ ...this.state, refinanceData: refinanceData });
+
     console.log("refinanceData = ",this.state.refinanceData)
 
   };
@@ -110,6 +111,7 @@ export class RefinanceAssetSelector extends Component<IRefinanceAssetSelectorPro
     if (this.props.walletType === WalletType.Web3) {
 
       if(refinance.cdpId[0].gt(0)) {
+
         items = refinance.cdpId.map((e, index) => {
 
           return (
@@ -144,6 +146,12 @@ export class RefinanceAssetSelector extends Component<IRefinanceAssetSelectorPro
       }
     }
 
-    return <div className="refinance-asset-selector">{items}</div>;
+    return <div className="refinance-asset-selector">
+
+          <div className="refinance-page__main-centeredOverlay" style={!TorqueProvider.Instance.isLoading ? { display: `none`} : undefined}>
+              <span>Loading...</span>
+          </div>
+      {items}
+      </div>;
   }
 }
