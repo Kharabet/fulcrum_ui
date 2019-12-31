@@ -130,6 +130,7 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
               onDetails={this.onDetails}
               onManageCollateral={this.onManageCollateralRequested}
               onSelect={this.onSelect}
+              isMobileMedia={this.props.isMobileMedia}
               onTrade={this.onTradeRequested}
             />
           ) : (

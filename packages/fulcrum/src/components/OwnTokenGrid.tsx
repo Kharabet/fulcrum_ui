@@ -7,8 +7,13 @@ import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { TradeTransactionMinedEvent } from "../services/events/TradeTransactionMinedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
 import { OwnTokenGridHeader } from "./OwnTokenGridHeader";
+import { OwnTokenGridHeaderMobile } from "./OwnTokenGridHeaderMobile";
 import { IOwnTokenGridRowProps, OwnTokenGridRow } from "./OwnTokenGridRow";
-
+import { OwnTokenGridRowMobile } from "./OwnTokenGridRowMobile";
+import {TradeType} from "../domain/TradeType";
+import {Asset} from "../domain/Asset";
+import {PositionType} from "../domain/PositionType";
+import { BigNumber } from "@0x/utils";
 export interface IOwnTokenGridProps {
   showMyTokensOnly: boolean;
   selectedKey: TradeTokenKey;
@@ -18,6 +23,7 @@ export interface IOwnTokenGridProps {
   onManageCollateral: (request: ManageCollateralRequest) => void;
   onSelect: (key: TradeTokenKey) => void;
   onTrade: (request: TradeRequest) => void;
+  isMobileMedia: boolean;
 }
 
 interface IOwnTokenGridState {
@@ -64,11 +70,18 @@ export class OwnTokenGrid extends Component<IOwnTokenGridProps, IOwnTokenGridSta
   }
 
   public render() {
+
+    return !this.props.isMobileMedia ? this.renderDesktop() : this.renderMobile();
+
+  }
+
+  private renderDesktop = () => {
     const tokenRows = this.state.tokenRowsData.map(e => <OwnTokenGridRow key={`${e.currentKey.toString()}`} {...e} />);
 
     return (
       <div className="own-token-grid">
         <OwnTokenGridHeader
+
           showMyTokensOnly={this.props.showMyTokensOnly}
           onShowMyTokensOnlyChange={this.props.onShowMyTokensOnlyChange}
         />
@@ -76,6 +89,43 @@ export class OwnTokenGrid extends Component<IOwnTokenGridProps, IOwnTokenGridSta
       </div>
     );
   }
+
+  private renderMobile = () => {
+    const tokenRows = this.state.tokenRowsData.map(e => <OwnTokenGridRowMobile key={`${e.currentKey.toString()}`} {...e} />);
+
+    return (
+      <div className="own-token-grid">
+        <div className="own-token-grid-row__col-action-mb">
+          <button className="own-token-grid-row__sell-button" onClick={this.onSellClick}>
+            {TradeType.SELL}
+          </button>
+        </div>
+        <OwnTokenGridHeaderMobile
+
+          showMyTokensOnly={this.props.showMyTokensOnly}
+          onShowMyTokensOnlyChange={this.props.onShowMyTokensOnlyChange}
+        />
+        {tokenRows}
+      </div>
+    );
+  }
+  public onSellClick = (event: React.MouseEvent<HTMLElement>) => {
+    event.stopPropagation();
+
+    this.props.onTrade(
+      new TradeRequest(
+        TradeType.SELL,
+        this.props.selectedKey.asset,
+        this.props.selectedKey.unitOfAccount,
+        this.props.selectedKey.positionType === PositionType.SHORT ? this.props.selectedKey.asset : Asset.USDC,
+        this.props.selectedKey.positionType,
+        this.props.selectedKey.leverage,
+        new BigNumber(0),
+        this.props.selectedKey.isTokenized,
+        this.props.selectedKey.version
+      )
+    );
+  };
 
   private static getRowsData = async (props: IOwnTokenGridProps): Promise<IOwnTokenGridRowProps[]> => {
     const rowsData: IOwnTokenGridRowProps[] = [];
