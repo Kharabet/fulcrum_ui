@@ -163,9 +163,6 @@ export class OwnTokenGridRowMobile extends Component<IOwnTokenGridRowProps, IOwn
           <a
             className="own-token-grid-row__col-token-name-full"
             style={{cursor: `pointer`, textDecoration: `none`}}
-            title={this.state.pTokenAddress}
-            href={`${FulcrumProvider.Instance.web3ProviderSettings.etherscanURL}address/${this.state.pTokenAddress}#readContract`}
-            target="_blank"
             rel="noopener noreferrer"
           >
             {`${this.state.assetDetails.displayName} ${this.props.currentKey.leverage}x`}
