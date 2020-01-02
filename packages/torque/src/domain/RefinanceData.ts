@@ -13,9 +13,9 @@ export interface RefinanceData {
 }
 
 export interface RefinanceCdpData {
-  cdpId: BigNumber[];
-  'urn': string[];
-  'ilk': string[];
+  cdpId: BigNumber;
+  'urn': string;
+  'ilk': string;
   'accountAddress': string;
   isProxy: boolean;
   proxyAddress:string;

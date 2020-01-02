@@ -522,16 +522,16 @@ export class TorqueProvider {
     return str;
   }
 
-  public checkCdp = async (asset: Asset): Promise<RefinanceCdpData> => {
-    let result: RefinanceCdpData={
+  public checkCdp = async (asset: Asset): Promise<RefinanceCdpData[]> => {
+    let result: RefinanceCdpData[]=[{
 
-        cdpId: [new BigNumber(0)],
-        urn: [''],
-        ilk: [''],
+        cdpId: new BigNumber(0),
+        urn: '',
+        ilk: '',
         accountAddress: '',
         proxyAddress: '',
         isProxy:false
-      };
+      }];
     // this.web3ProviderSettings = await TorqueProvider.getWeb3ProviderSettings(1);
     // const vat = new Web3.eth.Contract("0x1476483dd8c35f25e568113c5f70249d3976ba21", "0x2252d3b2c12455d564abc21e328a1122679f8352")
     // console.log("vat")
@@ -540,11 +540,50 @@ export class TorqueProvider {
     // console.log("this.contractsSource.canWrite =",this.contractsSource.canWrite)
     console.log("this.web3Wrapper [ = "+this.web3Wrapper)
     if (this.web3Wrapper && this.contractsSource && account) {
+      let tokencdpContract: GetCdpsContract | null = null;
+        tokencdpContract = await this.contractsSource.getCdpContract(configAddress.Get_CDPS);
 
+        console.log("account = ", account)
+        console.log("tokencdpContract = ", tokencdpContract)
+        if (account && tokencdpContract) {                                                                              //metamask 0x1476483dd8c35f25e568113c5f70249d3976ba21 account 0x2252d3b2c12455d564abc21e328a1122679f8352
+          const cdpsresult = await tokencdpContract.getCdpsAsc.callAsync(configAddress.CDP_MANAGER, account); // multiple cdp 0xDF2Db45ed0df076e5D6d302B416A5971fF5Ad61F
+          console.log("cdpsresult = ", cdpsresult)
+          let cdpId = cdpsresult[0]
+          let urn = cdpsresult[1]
+          let ilk = cdpsresult[2]
+          console.log("ilk = ", ilk)
+          console.log("urn = ", urn)
+          for(var i=0;i<cdpId.length;i++){
+            if(!result[0].cdpId.gt(0)){
+              result = [{
+                'cdpId': cdpId[i],
+                'urn': urn[i],
+                'ilk': ilk[i],
+                'accountAddress': account,
+                'isProxy': false,
+                proxyAddress: '',
+              }];
+            }else{
+              result.push({
+                'cdpId': cdpId[i],
+                'urn': urn[i],
+                'ilk': ilk[i],
+                'accountAddress': account,
+                'isProxy': false,
+                proxyAddress: '',
+              });
+            }
+
+
+          }
+
+        }
+      console.log("result = ",result)
       let proxyRegistryContract: proxyRegistryContract | null = null;
       proxyRegistryContract = await this.contractsSource.getProxyRegistery(configAddress.proxy_Contract_Address)
       const proxyRegistryResult = await proxyRegistryContract.proxies.callAsync( account)
       console.log("proxyRegistryResult  = ",proxyRegistryResult)
+
       if(proxyRegistryResult !== configAddress.Empty_Proxy_Address){
           let tokencdpContract: GetCdpsContract | null = null;
         tokencdpContract = await this.contractsSource.getCdpContract(configAddress.Get_CDPS);
@@ -560,46 +599,50 @@ export class TorqueProvider {
           let ilk = cdpsresult[2]
           console.log("ilk = ", ilk)
           console.log("urn = ", urn)
-          result = {
-            'cdpId': cdpId,
-            'urn': urn,
-            'ilk': ilk,
-            'accountAddress': account,
-            isProxy: true,
-            proxyAddress: proxyRegistryResult,
+          for(var i=0;i<cdpId.length;i++){
+            if(!result[0].cdpId.gt(0)){
+              result = [{
+                'cdpId': cdpId[i],
+                'urn': urn[i],
+                'ilk': ilk[i],
+                'accountAddress': account,
+                'isProxy': false,
+                proxyAddress: '',
+              }];
+
+            }else{
+              result.push({
+                'cdpId': cdpId[i],
+                'urn': urn[i],
+                'ilk': ilk[i],
+                'accountAddress': account,
+                'isProxy': true,
+                proxyAddress: proxyRegistryResult,
+              });
+            }
+
+
+
           }
+          // result.urn = result.urn.concat(urn)
+          // result.ilk = result.ilk.concat(ilk)
+          // result.cdpId = result.cdpId.concat(cdpId)
+          // result.isProxy = true
+          // result.proxyAddress = proxyRegistryResult
+          // result = {
+          //   'cdpId': cdpId,
+          //   'urn': urn,
+          //   'ilk': ilk,
+          //   'accountAddress': account,
+          //   isProxy: true,
+          //   proxyAddress: proxyRegistryResult,
+          // }
         }
 
         // let dsProxyContract: dsProxyJsonContract | null = null;
         // const proxyRegistryResult = await dsProxyContract.proxies.callAsync("0xf906930AC464dB04500e45147d24bf28979CD4f3")
       }
-      else {
 
-
-        let tokencdpContract: GetCdpsContract | null = null;
-        tokencdpContract = await this.contractsSource.getCdpContract(configAddress.Get_CDPS);
-
-        const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
-        console.log("account = ", account)
-        console.log("tokencdpContract = ", tokencdpContract)
-        if (account && tokencdpContract) {                                                                              //metamask 0x1476483dd8c35f25e568113c5f70249d3976ba21 account 0x2252d3b2c12455d564abc21e328a1122679f8352
-          const cdpsresult = await tokencdpContract.getCdpsAsc.callAsync(configAddress.CDP_MANAGER, account); // multiple cdp 0xDF2Db45ed0df076e5D6d302B416A5971fF5Ad61F
-          console.log("cdpsresult = ", cdpsresult)
-          let cdpId = cdpsresult[0]
-          let urn = cdpsresult[1]
-          let ilk = cdpsresult[2]
-          console.log("ilk = ", ilk)
-          console.log("urn = ", urn)
-          result = {
-            'cdpId': cdpId,
-            'urn': urn,
-            'ilk': ilk,
-            'accountAddress': account,
-            'isProxy': false,
-            proxyAddress: '',
-          }
-        }
-      }
     }
     return result;
 
@@ -651,7 +694,7 @@ export class TorqueProvider {
       let dinks = web3.utils.toWei(loanAmount.toFixed().toString());
       console.log("w2 = ",dinks.toString())
       let tokendsProxyContract: dsProxyJsonContract | null = null;
-      // return false
+
       if(refRequest.isProxy){
         const cdpsresult = await tokenCdpManagerContract.cdpCan.callAsync(refRequest.proxyAddress, refRequest.cdpId, configAddress.token_Cdp_Address);
         console.log("checkCdpManager = ",cdpsresult)

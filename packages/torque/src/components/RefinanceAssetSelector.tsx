@@ -17,7 +17,7 @@ export interface IRefinanceAssetSelectorProps {
 }
 interface IRefinanceAssetSelectorItemState {
   asset:Asset,
-  refinanceData: RefinanceCdpData;
+  refinanceData: RefinanceCdpData[];
 }
 
 export class RefinanceAssetSelector extends Component<IRefinanceAssetSelectorProps,IRefinanceAssetSelectorItemState> {
@@ -26,14 +26,14 @@ export class RefinanceAssetSelector extends Component<IRefinanceAssetSelectorPro
     this.state = {
       asset: Asset.DAI,
       refinanceData:
-      {
-        cdpId: [new BigNumber(0)],
-        urn: [''],
-        ilk: [''],
+      [{
+        cdpId: new BigNumber(0),
+        urn: '',
+        ilk: '',
         accountAddress:'',
         proxyAddress:'',
         isProxy:false
-      }};
+      }]};
     console.log("this.state=  "+this.state)
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
 
@@ -105,41 +105,41 @@ export class RefinanceAssetSelector extends Component<IRefinanceAssetSelectorPro
 
     let assetList = Array.from(this.assetsShown.keys());
     let refinance = this.state.refinanceData;
-    console.log("this.state.refinanceData = "+this.state.refinanceData)
+    console.log("this.state.refinanceData = ",this.state.refinanceData)
 
     let items;
     if (this.props.walletType === WalletType.Web3) {
 
-      if(refinance.cdpId[0].gt(0)) {
+      if(refinance[0].cdpId.gt(0)) {
 
-        items = refinance.cdpId.map((e, index) => {
+        items = refinance.map((e, index) => {
 
           return (
 
-            <RefinanceAssetSelectorItem key={this.state.refinanceData.urn[index]} asset={Asset.DAI}
-                                        cdpId={this.state.refinanceData.cdpId[index]}
-                                        urn={this.state.refinanceData.urn[index]}
-                                        accountAddress={this.state.refinanceData.accountAddress}
-                                        proxyAddress={this.state.refinanceData.proxyAddress}
-                                        isProxy={this.state.refinanceData.isProxy}
-                                        ilk={this.state.refinanceData.ilk[index]}/>
+            <RefinanceAssetSelectorItem key={this.state.refinanceData[index].urn} asset={Asset.DAI}
+                                        cdpId={this.state.refinanceData[index].cdpId}
+                                        urn={this.state.refinanceData[index].urn}
+                                        accountAddress={this.state.refinanceData[index].accountAddress}
+                                        proxyAddress={this.state.refinanceData[index].proxyAddress}
+                                        isProxy={this.state.refinanceData[index].isProxy}
+                                        ilk={this.state.refinanceData[index].ilk}/>
           );
         });
       }
     } else {
       assetList = assetList.sort(e => this.assetsShown.get(e) ? -1 : 1);
-      if(refinance.cdpId[0] != undefined) {
-        if(refinance.cdpId[0].gt(0)) {
-          items = refinance.cdpId.map((e, index) => {
+      if(refinance[0].cdpId != undefined) {
+        if(refinance[0].cdpId.gt(0)) {
+          items = refinance.map((e, index) => {
 
             return (
-              <RefinanceAssetSelectorItem key={this.state.refinanceData.urn[index]} asset={Asset.DAI}
-                                          cdpId={this.state.refinanceData.cdpId[index]}
-                                          urn={this.state.refinanceData.urn[index]}
-                                          accountAddress={this.state.refinanceData.accountAddress}
-                                          proxyAddress={this.state.refinanceData.proxyAddress}
-                                          isProxy={this.state.refinanceData.isProxy}
-                                          ilk={this.state.refinanceData.ilk[index]}/>
+              <RefinanceAssetSelectorItem key={this.state.refinanceData[index].urn} asset={Asset.DAI}
+                                          cdpId={this.state.refinanceData[index].cdpId}
+                                          urn={this.state.refinanceData[index].urn}
+                                          accountAddress={this.state.refinanceData[index].accountAddress}
+                                          proxyAddress={this.state.refinanceData[index].proxyAddress}
+                                          isProxy={this.state.refinanceData[index].isProxy}
+                                          ilk={this.state.refinanceData[index].ilk}/>
             );
           });
         }
