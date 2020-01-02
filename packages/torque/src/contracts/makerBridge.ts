@@ -315,7 +315,11 @@ export class makerBridgeContract extends BaseContract {
     dinks,
     collateralDinks,
     borrowAmounts
-    ]);
+    ]); console.log("cdps = ",cdps)
+          console.log("darts = ",darts)
+          console.log("dinks = ",dinks)
+          console.log("collateralDinks = ",collateralDinks)
+          console.log("borrowAmounts = ",borrowAmounts)
             const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
                 {
                     to: self.address,

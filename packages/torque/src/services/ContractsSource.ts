@@ -33,6 +33,7 @@ export class ContractsSource {
   private proxyRegisteryJson :any;
   private dsProxyIsAllowJson: any;
   private dsProxyJson: any;
+  private proxyMigrationsJson: any;
   public networkId: number;
   public canWrite: boolean;
 
@@ -359,6 +360,7 @@ export class ContractsSource {
     this.makerBridgeJson = await import(`./../assets/artifacts/${network}/makerBridge.json`);
     this.proxyRegisteryJson = await import(`./../assets/artifacts/${network}/proxyRegistry.json`);
     this.dsProxyJson = await import(`./../assets/artifacts/${network}/dsProxyJson.json`);
+    this.proxyMigrationsJson = await import(`./../assets/artifacts/${network}/proxyMigrations.json`);
     this.dsProxyIsAllowJson = await import(`./../assets/artifacts/${network}/dsProxyIsAllow.json`);
     ContractsSource.isInit = true;
   }
@@ -394,6 +396,12 @@ export class ContractsSource {
   private async getDsProxyAllowJSON(){
     return this.dsProxyIsAllowJson;
   }
+  private async getProxyMigrationJSON(){
+    return this.proxyMigrationsJson
+  }
+
+
+  public getProxyMigration = _.memoize(this.getProxyMigrationJSON);
   public dsProxyAllowJson = _.memoize(this.getDsProxyAllowJSON);
   public getProxyRegistery = _.memoize(this.getProxyRegisteryRaw);
   public getDsProxy = _.memoize(this.getDsProxyRaw);
