@@ -831,7 +831,7 @@ export class FulcrumProvider {
 
     const baseAsset = this.getBaseAsset(selectedKey);
 
-    //console.log(baseAsset, selectedKey.positionType, selectedKey.unitOfAccount, result.toString());
+    // console.log(baseAsset, selectedKey.positionType, selectedKey.unitOfAccount, result.toString());
 
 
     let decimalOffset = 0;
@@ -841,7 +841,9 @@ export class FulcrumProvider {
           decimalOffset = 10;
         }
       } else {
-        //decimalOffset = -10;
+        if (tradeType === TradeType.SELL) {
+          decimalOffset = -10;
+        }
       }
     }
 
