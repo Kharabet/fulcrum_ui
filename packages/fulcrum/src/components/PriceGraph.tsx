@@ -1,6 +1,6 @@
 import { BigNumber } from "@0x/utils";
 import moment from "moment";
-import React, { Component, ReactNode } from "react";
+import React, {ChangeEvent, Component, ReactNode} from "react";
 import { Line, LineChart, ReferenceLine, ResponsiveContainer, Tooltip, TooltipProps } from "recharts";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
@@ -9,6 +9,7 @@ import { IPriceDataPoint } from "../domain/IPriceDataPoint";
 import { TradeTokenKey } from "../domain/TradeTokenKey";
 import {TradeType} from "../domain/TradeType";
 import { FulcrumProvider } from "../services/FulcrumProvider";
+import { CheckBox } from "./CheckBox";
 
 export interface IPriceGraphProps {
   data: IPriceDataPoint[];
@@ -16,6 +17,8 @@ export interface IPriceGraphProps {
   isLong: boolean;
   isShort: boolean;
   changeActiveBtn:  (activeType:string) => void;
+  showMyTokensOnly: boolean;
+  onShowMyTokensOnlyChange: (value: boolean) => void;
 }
 
 interface IPriceGraphState {
@@ -25,6 +28,7 @@ interface IPriceGraphState {
   liquidationPrice: number | null;
   liquidationPriceNormed: number | null;
   assetDetails: AssetDetails | null;
+
 }
 
 export class PriceGraph extends Component<IPriceGraphProps, IPriceGraphState> {
@@ -93,8 +97,9 @@ export class PriceGraph extends Component<IPriceGraphProps, IPriceGraphState> {
     const isMobileMedia = (window.innerWidth <= 959);
     return (
       <div className="price-graph">
-        {(isMobileMedia ?
+        {(isMobileMedia && !this.props.showMyTokensOnly ?
         <div className="trade-token-grid-row__col-action-mb">
+
           <button className={"trade-token-grid-row__group-button button-lg " + (this.props.isLong ? 'btn-active': '' )} onClick={() => changeActiveBtn('long')}>
             Long
           </button>
@@ -102,6 +107,14 @@ export class PriceGraph extends Component<IPriceGraphProps, IPriceGraphState> {
             Short
           </button>
         </div> : '')}
+
+        {(isMobileMedia && this.props.showMyTokensOnly ?
+            <div className="trade-token-grid-header__col-actions">
+              <span className="">
+                <CheckBox checked={this.props.showMyTokensOnly} onChange={this.showMyTokensOnlyChange}>Manage Open Positions</CheckBox>
+              </span>
+            </div>
+          :'')}
         <div className="price-graph__hovered-time-container">
           <div className="price-graph__hovered-price-marker-label" >{this.state.assetDetails ? this.state.assetDetails.labelName : ``}</div>
           <div className="price-graph__hovered-time-delimiter">
@@ -163,6 +176,10 @@ export class PriceGraph extends Component<IPriceGraphProps, IPriceGraphState> {
         </div>
       </div>
     );
+  }
+
+  public showMyTokensOnlyChange = (event: ChangeEvent<HTMLInputElement>) => {
+    this.props.onShowMyTokensOnlyChange(event.target.checked);
   }
 
   public renderTooltip = (e: TooltipProps): ReactNode => {
