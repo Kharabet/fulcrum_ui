@@ -830,6 +830,10 @@ export class FulcrumProvider {
     }
 
     const baseAsset = this.getBaseAsset(selectedKey);
+
+    //console.log(baseAsset, selectedKey.positionType, selectedKey.unitOfAccount, result.toString());
+
+
     let decimalOffset = 0;
     if (baseAsset === Asset.WBTC) {
       if (selectedKey.positionType === PositionType.SHORT) {
@@ -837,7 +841,7 @@ export class FulcrumProvider {
           decimalOffset = 10;
         }
       } else {
-        decimalOffset = -10;
+        //decimalOffset = -10;
       }
     }
 
@@ -1168,7 +1172,10 @@ export class FulcrumProvider {
                       gasPrice: new BigNumber(0)
                     }
                   );
-                  const destDecimals: number = AssetsDictionary.assets.get(baseAsset)!.decimals || 18;
+                  let destDecimals: number = AssetsDictionary.assets.get(baseAsset)!.decimals || 18;
+                  if (baseAsset === Asset.WBTC && key.positionType === PositionType.LONG) {
+                    destDecimals = destDecimals + 10;
+                  }
                   tradeAmountActual = tradeAmountActual.multipliedBy(10 ** (18 - destDecimals));
                 } else {
                   return null;
@@ -1188,7 +1195,10 @@ export class FulcrumProvider {
                     gasPrice: new BigNumber(0)
                   }
                 );
-                const destDecimals: number = AssetsDictionary.assets.get(baseAsset)!.decimals || 18;
+                let destDecimals: number = AssetsDictionary.assets.get(baseAsset)!.decimals || 18;
+                if (baseAsset === Asset.WBTC && key.positionType === PositionType.LONG) {
+                  destDecimals = destDecimals + 10;
+                }
                 tradeAmountActual = tradeAmountActual.multipliedBy(10 ** (18 - destDecimals));
               } catch(e) {
                 // console.log(e);

@@ -78,9 +78,12 @@ export class StatsTokenGrid extends Component<IStatsTokenGridProps, IStatsTokenG
 
   public render() {
     if (!this.state.tokenRowsData || !this.state.totalsRow) {
-      return (
+      return !this.props.isMobileMedia ? (
         <div className="stats-grid">
           <StatsTokenGridHeader />
+        </div>
+      ) : (
+        <div className="stats-grid">
         </div>
       );
     }
