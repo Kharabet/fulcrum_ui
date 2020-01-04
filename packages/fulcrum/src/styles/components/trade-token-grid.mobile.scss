@@ -59,6 +59,7 @@
 .trade-token-grid-row {
   height: 3.5rem;
   text-align: center;
+  width: 93%;
   &--active {
     .trade-token-grid-row__col-action {
       padding-right: 0px;
@@ -78,6 +79,11 @@
 .trade-token-grid-row__button--size-full {
   width: 100%;
   margin: 0 0rem;
+}
+
+.trade-token-grid-header__col-actions {
+  width: 100%;
+  text-align: center;
 }
 
 .trade-token-grid-row__col-action {
@@ -179,7 +185,7 @@
   }
   .trade-footer-grid{
     float: left;
-    width: 70px;
+    width: 60px;
     height: 66px;
     margin-top: 12px;
   }
@@ -195,6 +201,7 @@
 
 
   .trade-token-grid-row__col-token-image {
+    width: 3.7rem;
     line-height: 0.4rem;
   }
   .trade-footer-grid--active{
@@ -203,8 +210,18 @@
     width: 70px;
   }
 
-
-
+  .settings-img-div{
+    width:35px;
+    margin-left: 11px;
+    margin-top: 21px;
+    cursor:pointer;
+  }
+  .cb-container{
+    .cb-label {
+      font-size: 1.2rem;
+      color: #fff;
+    }
+  }
 
 }
 
@@ -215,7 +232,8 @@
   .trade-token-grid-row__button--size-full {
     width: 100%;
   }
-  .cb-container {
-    display: none;
-  }
+
+  //.cb-container {
+  //  display: none;
+  //}
 }

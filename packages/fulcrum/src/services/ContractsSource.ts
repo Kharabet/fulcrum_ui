@@ -9,6 +9,7 @@ import { FulcrumMcdBridgeContract } from "../contracts/FulcrumMcdBridgeContract"
 import { iTokenContract } from "../contracts/iTokenContract";
 import { oracleContract } from "../contracts/oracle";
 import { pTokenContract } from "../contracts/pTokenContract";
+import { DAppHelperContract } from "../contracts/DAppHelper";
 
 const ethNetwork = process.env.REACT_APP_ETH_NETWORK;
 
@@ -35,6 +36,7 @@ export class ContractsSource {
   private static pTokenJson: any;
   private static oracleJson: any;
   private static mcdBridgeJson: any;
+  private static DAppHelperJson: any;
 
   public networkId: number;
   public canWrite: boolean;
@@ -54,7 +56,10 @@ export class ContractsSource {
     ContractsSource.pTokenJson = await import(`./../assets/artifacts/${ethNetwork}/pToken.json`);
     ContractsSource.oracleJson = await import(`./../assets/artifacts/${ethNetwork}/oracle.json`);
     ContractsSource.mcdBridgeJson = await import(`./../assets/artifacts/${ethNetwork}/FulcrumMcdBridge.json`);
+    ContractsSource.DAppHelperJson = await import(`./../assets/artifacts/${ethNetwork}/DAppHelper.json`);
     
+    
+
     const iTokenList = (await import(`../assets/artifacts/${ethNetwork}/iTokenList.js`)).iTokenList;
     const pTokenList = (await import(`../assets/artifacts/${ethNetwork}/pTokenList.js`)).pTokenList;
     const pTokenListBurnOnly = (await import(`../assets/artifacts/${ethNetwork}/pTokenListBurnOnly.js`)).pTokenListBurnOnly;
@@ -186,7 +191,27 @@ export class ContractsSource {
     return address;
   }
 
-  private getOracleAddress(): string {
+  public getOracleAddress(): string {
+    let address: string = "";
+    switch (this.networkId) {
+      case 1:
+        address = "0xee14de2e67e1ec23c8561a6fad2635ff1b618db6";
+        break;
+      case 3:
+        address = "0x818e6fecd516ecc3849daf6845e3ec868087b755";
+        break;
+      case 4:
+        address = "0x76de3d406fee6c3316558406b17ff785c978e98c";
+        break;
+      case 42:
+        address = "0x85f9118760c1913dcc31e7c1b8ae35287bccd555";
+        break;
+    }
+
+    return address;
+  }
+
+  public getOracleHelperAddress(): string {
     let address: string = "";
     switch (this.networkId) {
       case 1:
@@ -200,6 +225,26 @@ export class ContractsSource {
         break;
       case 42:
         address = "0x692f391bCc85cefCe8C237C01e1f636BbD70EA4D";
+        break;
+    }
+
+    return address;
+  }
+
+  private getDAppHelperAddress(): string {
+    let address: string = "";
+    switch (this.networkId) {
+      case 1:
+        address = "0xbfdE53F20d50E41162a6085a9A591f27c9c47652";
+        break;
+      case 3:
+        address = "";
+        break;
+      case 4:
+        address = "";
+        break;
+      case 42:
+        address = "0x2237Ab35bf1bAFf40Af13F5284f39333bE1061F1";
         break;
     }
 
@@ -260,10 +305,20 @@ export class ContractsSource {
     await this.Init();
     return new oracleContract(
       ContractsSource.oracleJson.abi,
-      this.getOracleAddress().toLowerCase(),
+      this.getOracleHelperAddress().toLowerCase(),
       this.provider
     );
   }
+
+  private async getDAppHelperContractRaw(): Promise<DAppHelperContract> {
+    await this.Init();
+    return new DAppHelperContract(
+      ContractsSource.DAppHelperJson.abi,
+      this.getDAppHelperAddress().toLowerCase(),
+      this.provider
+    );
+  }
+  
 
   private async getFulcrumMcdBridgeContractRaw(): Promise<FulcrumMcdBridgeContract> {
     await this.Init();
@@ -304,6 +359,29 @@ export class ContractsSource {
     return result;
   }
 
+  public getITokenAddresses(assets: Asset[]): string[] {
+    const result: string[] = [];
+    assets.forEach(e => {
+      result.push(this.getITokenErc20Address(e)!);
+    });
+
+    return result;
+  }
+
+  public getITokenAddressesAndReduce(assets: Asset[]): [Asset[], string[]] {
+    const assetList: Asset[] = [];
+    const addressList: string[] = [];
+    assets.forEach(e => {
+      let addr = this.getITokenErc20Address(e)!;
+      if (addr) {
+        assetList.push(e);
+        addressList.push(addr!);
+      }
+    });
+
+    return [assetList, addressList];
+  }
+
   public getITokenErc20Address(asset: Asset): string | null {
     let symbol;
     if (asset === Asset.WETH) {
@@ -330,4 +408,5 @@ export class ContractsSource {
   public getPTokenContract = _.memoize(this.getPTokenContractRaw);
   public getOracleContract = _.memoize(this.getOracleContractRaw);
   public getFulcrumMcdBridgeContract = _.memoize(this.getFulcrumMcdBridgeContractRaw);
+  public getDAppHelperContract = _.memoize(this.getDAppHelperContractRaw);
 }

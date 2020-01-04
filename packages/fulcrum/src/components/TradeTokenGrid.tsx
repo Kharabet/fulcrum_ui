@@ -1,5 +1,5 @@
 import { BigNumber } from "@0x/utils";
-import React, { Component } from "react";
+import React, {ChangeEvent, Component} from "react";
 import TagManager from "react-gtm-module";
 import { Asset } from "../domain/Asset";
 import {AssetsDictionary} from "../domain/AssetsDictionary";
@@ -16,7 +16,7 @@ import { TradeTokenGridHeaderMobile } from "./TradeTokenGridHeaderMobile";
 import { ITradeTokenGridRowProps, TradeTokenGridRow } from "./TradeTokenGridRow";
 import { ITradeTokenGridRowFooterMBProps, TradeTokenGridRowMobileFooter } from "./TradeTokenGridRowFooterMobile";
 import { ITradeTokenGridRowMBProps, TradeTokenGridRowMobile } from "./TradeTokenGridRowMobile";
-
+import  settingSvg  from "../assets/images/settings.svg";
 
 // import siteConfig from "./../config/SiteConfig.json";
 
@@ -131,7 +131,7 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
     // const assetDetails = AssetsDictionary.assets.get(this.state.tokenRowsData[0].asset);
     const tokenRowsFooterMobile = this.state.tokenSingleRowsData.map(e => <TradeTokenGridRowMobileFooter key={`${e.asset}_${e.positionType}`} {...e} />);
     const tokenRowsMobile = this.state.tokenLongShortRowsData.map(e => <TradeTokenGridRowMobile key={`${e.asset}_${e.positionType}_${e.defaultLeverage}`} {...e} />);
-    console.log("tokenRowsMobile = "+tokenRowsMobile)
+    // console.log("tokenRowsMobile = "+tokenRowsMobile)
     return (
       <div className="trade-token-grid">
         <div className="trade-new-grid">
@@ -142,10 +142,18 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
         <div className="trade-footer-mb">
           <div className="trade-foot-item">
             {tokenRowsFooterMobile}
+            <div
+            className={`trade-token-grid-row__col-token-image settings-img-div`} onClick={this.showMyTokensOnlyChange}>
+            <img className={`settings-img`} src={settingSvg} />
+          </div>
           </div>
         </div>
       </div>
     );
+  }
+
+  public showMyTokensOnlyChange = () => {
+    this.props.onShowMyTokensOnlyChange(true);
   }
 
   private renderActions = (isBuyOnly: boolean) => {
