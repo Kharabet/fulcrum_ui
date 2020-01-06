@@ -35,7 +35,7 @@ export interface makerBridgeOwnershipTransferredEventArgs extends DecodedLogArgs
 export class makerBridgeContract extends BaseContract {
     public _migrateLoan = {
         async sendTransactionAsync(
-            borrower: string,
+            owner: string,
             cdps: BigNumber[],
             darts: BigNumber[],
             dinks: BigNumber[],
@@ -45,7 +45,7 @@ export class makerBridgeContract extends BaseContract {
             txData: Partial<TxData> = {},
         ): Promise<string> {
             const self = this as any as makerBridgeContract;
-            const encodedData = self._strictEncodeArguments('_migrateLoan(address,uint256[],uint256[],uint256[],uint256[],uint256,uint256[])', [borrower,
+            const encodedData = self._strictEncodeArguments('_migrateLoan(address,uint256[],uint256[],uint256[],uint256[],uint256,uint256[])', [owner,
     cdps,
     darts,
     dinks,
@@ -62,7 +62,7 @@ export class makerBridgeContract extends BaseContract {
                 self._web3Wrapper.getContractDefaults(),
                 (self as any)._migrateLoan.estimateGasAsync.bind(
                     self,
-                    borrower,
+                    owner,
                     cdps,
                     darts,
                     dinks,
@@ -75,7 +75,7 @@ export class makerBridgeContract extends BaseContract {
             return txHash;
         },
         async estimateGasAsync(
-            borrower: string,
+            owner: string,
             cdps: BigNumber[],
             darts: BigNumber[],
             dinks: BigNumber[],
@@ -85,7 +85,7 @@ export class makerBridgeContract extends BaseContract {
             txData: Partial<TxData> = {},
         ): Promise<number> {
             const self = this as any as makerBridgeContract;
-            const encodedData = self._strictEncodeArguments('_migrateLoan(address,uint256[],uint256[],uint256[],uint256[],uint256,uint256[])', [borrower,
+            const encodedData = self._strictEncodeArguments('_migrateLoan(address,uint256[],uint256[],uint256[],uint256[],uint256,uint256[])', [owner,
     cdps,
     darts,
     dinks,
@@ -105,7 +105,7 @@ export class makerBridgeContract extends BaseContract {
             return gas;
         },
         getABIEncodedTransactionData(
-            borrower: string,
+            owner: string,
             cdps: BigNumber[],
             darts: BigNumber[],
             dinks: BigNumber[],
@@ -114,7 +114,7 @@ export class makerBridgeContract extends BaseContract {
             borrowAmounts: BigNumber[],
         ): string {
             const self = this as any as makerBridgeContract;
-            const abiEncodedTransactionData = self._strictEncodeArguments('_migrateLoan(address,uint256[],uint256[],uint256[],uint256[],uint256,uint256[])', [borrower,
+            const abiEncodedTransactionData = self._strictEncodeArguments('_migrateLoan(address,uint256[],uint256[],uint256[],uint256[],uint256,uint256[])', [owner,
     cdps,
     darts,
     dinks,
@@ -125,7 +125,7 @@ export class makerBridgeContract extends BaseContract {
             return abiEncodedTransactionData;
         },
         async callAsync(
-            borrower: string,
+            owner: string,
             cdps: BigNumber[],
             darts: BigNumber[],
             dinks: BigNumber[],
@@ -137,7 +137,7 @@ export class makerBridgeContract extends BaseContract {
         ): Promise<void
         > {
             const self = this as any as makerBridgeContract;
-            const encodedData = self._strictEncodeArguments('_migrateLoan(address,uint256[],uint256[],uint256[],uint256[],uint256,uint256[])', [borrower,
+            const encodedData = self._strictEncodeArguments('_migrateLoan(address,uint256[],uint256[],uint256[],uint256[],uint256,uint256[])', [owner,
         cdps,
         darts,
         dinks,
@@ -274,6 +274,32 @@ export class makerBridgeContract extends BaseContract {
             return result;
         },
     };
+    public vat = {
+        async callAsync(
+            callData: Partial<CallData> = {},
+            defaultBlock?: BlockParam,
+        ): Promise<string
+        > {
+            const self = this as any as makerBridgeContract;
+            const encodedData = self._strictEncodeArguments('vat()', []);
+            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+                {
+                    to: self.address,
+                    ...callData,
+                    data: encodedData,
+                },
+                self._web3Wrapper.getContractDefaults(),
+            );
+            const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
+            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            const abiEncoder = self._lookupAbiEncoder('vat()');
+            // tslint:disable boolean-naming
+            const result = abiEncoder.strictDecodeReturnValue<string
+        >(rawCallResult);
+            // tslint:enable boolean-naming
+            return result;
+        },
+    };
     public joinDAI = {
         async callAsync(
             callData: Partial<CallData> = {},
@@ -315,11 +341,7 @@ export class makerBridgeContract extends BaseContract {
     dinks,
     collateralDinks,
     borrowAmounts
-    ]); console.log("cdps = ",cdps)
-          console.log("darts = ",darts)
-          console.log("dinks = ",dinks)
-          console.log("collateralDinks = ",collateralDinks)
-          console.log("borrowAmounts = ",borrowAmounts)
+    ]);
             const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
                 {
                     to: self.address,
@@ -545,6 +567,32 @@ export class makerBridgeContract extends BaseContract {
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
             BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('cdpManager()');
+            // tslint:disable boolean-naming
+            const result = abiEncoder.strictDecodeReturnValue<string
+        >(rawCallResult);
+            // tslint:enable boolean-naming
+            return result;
+        },
+    };
+    public proxyFactory = {
+        async callAsync(
+            callData: Partial<CallData> = {},
+            defaultBlock?: BlockParam,
+        ): Promise<string
+        > {
+            const self = this as any as makerBridgeContract;
+            const encodedData = self._strictEncodeArguments('proxyFactory()', []);
+            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+                {
+                    to: self.address,
+                    ...callData,
+                    data: encodedData,
+                },
+                self._web3Wrapper.getContractDefaults(),
+            );
+            const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
+            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            const abiEncoder = self._lookupAbiEncoder('proxyFactory()');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<string
         >(rawCallResult);

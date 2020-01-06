@@ -683,75 +683,66 @@ export class TorqueProvider {
 
   public checkCdpManager = async (refRequest:RefinanceData, loanAmount:BigNumber) => {
 
-    console.log("refRequest- = ",refRequest)
-    console.log('refRequest.cdpId = ',refRequest.cdpId)
+
     const cdpManagerAddress = configAddress.CDP_MANAGER
     if (this.web3Wrapper && this.contractsSource) {
       let tokenCdpManagerContract: cdpManagerContract | null = null;
       tokenCdpManagerContract = await this.contractsSource.getCdpManager(cdpManagerAddress)
       //        index 0 = 0x1476483dd8c35f25e568113c5f70249d3976ba21          // 0x2252d3b2c12455d564abc21e328a1122679f8352
-      let darts = web3.utils.toWei(refRequest.collateralAmount.toFixed().toString());
-      let dinks = web3.utils.toWei(loanAmount.toFixed().toString());
-      console.log("w2 = ",dinks.toString())
+
+      let darts = web3.utils.toWei(loanAmount.toString()); //loanAmount.toFixed().toString()
+      let dinks = web3.utils.toWei(refRequest.collateralAmount.toString());
       let tokendsProxyContract: dsProxyJsonContract | null = null;
 
       if(refRequest.isProxy){
-        const cdpsresult = await tokenCdpManagerContract.cdpCan.callAsync(refRequest.proxyAddress, refRequest.cdpId, configAddress.token_Cdp_Address);
-        console.log("checkCdpManager = ",cdpsresult)
+        const cdpsresult = await tokenCdpManagerContract.cdpCan.callAsync(refRequest.proxyAddress, refRequest.cdpId, configAddress.Maker_Bridge_Address);
+
         if(!cdpsresult.gt(0)){
-            console.log("console.loe allllowwwww = ", parseInt(refRequest.cdpId.toString()))
 
             let tokendsProxyContract: dsProxyJsonContract | null = null;
               tokendsProxyContract = await this.contractsSource.getDsProxy(refRequest.proxyAddress)
             let dsProxyAllowJson = await this.contractsSource.dsProxyAllowJson()
-            console.log("dsProxyAllowJson - ",dsProxyAllowJson.default)
-             var datatmp = web3.eth.abi.encodeFunctionCall( dsProxyAllowJson.default,[cdpManagerAddress, parseInt(refRequest.cdpId.toString()), configAddress.token_Cdp_Address, 1]);
+             var datatmp = web3.eth.abi.encodeFunctionCall( dsProxyAllowJson.default,[cdpManagerAddress, parseInt(refRequest.cdpId.toString()), configAddress.Maker_Bridge_Address, 1]);
 
-              console.log("datatmp = ",datatmp)
             var proxyActionsAddress = configAddress.proxy_Actions_Address;
             // if proxy use then use this function for cdpAllow
             const cdpDsProxyResult = await tokendsProxyContract.execute.sendTransactionAsync(proxyActionsAddress, datatmp, {from: refRequest.accountAddress})
-            console.log("cdpDsProxyResult = ",cdpDsProxyResult)
+
             var dsProxyAddress = refRequest.proxyAddress;
 
             let proxyMigrationJson = await this.contractsSource.getProxyMigration()
-            var data = web3.eth.abi.encodeFunctionCall(proxyMigrationJson.default, [configAddress.token_Cdp_Address, [parseInt(refRequest.cdpId.toString())],[darts.toString()],[dinks.toString()],[dinks.toString()],[darts.toString()]]);
-
-            console.log("data - ",data)
+            var data = web3.eth.abi.encodeFunctionCall(proxyMigrationJson.default, [configAddress.Maker_Bridge_Address, [parseInt(refRequest.cdpId.toString())],[darts.toString()],[dinks.toString()],[dinks.toString()],[darts.toString()]]);
 
             tokendsProxyContract = await this.contractsSource.getDsProxy(refRequest.proxyAddress)
             let bridgeActionAddress = configAddress.Bridge_Action_Address
             try{
               const cdpDsProxyResult2 = await tokendsProxyContract.execute.sendTransactionAsync(bridgeActionAddress, data, {from: refRequest.accountAddress})
-              console.log("cdpDsProxyResult = ",cdpDsProxyResult2)
               alert("Proxy Migration loan transaction completed successfully.")
             }catch (e){
-                console.log("catchhhhhhhh")
-                console.log(e)
+
               alert(e)
             }
 
           }else{
-              console.log("tokenmakerBridgeContract")
+
               let tokenmakerBridgeContract: makerBridgeContract | null = null;
               tokenmakerBridgeContract = await this.contractsSource.getmakerBridge(configAddress.CDP_MANAGER)
               var dsProxyAddress = refRequest.proxyAddress;
 
               let proxyMigrationJson = await this.contractsSource.getProxyMigration()
-              var data = web3.eth.abi.encodeFunctionCall(proxyMigrationJson.default, [configAddress.token_Cdp_Address, [parseInt(refRequest.cdpId.toString())],[darts.toString()],[dinks.toString()],[dinks.toString()],[darts.toString()]]);
+              var data = web3.eth.abi.encodeFunctionCall(proxyMigrationJson.default, [configAddress.Maker_Bridge_Address, [parseInt(refRequest.cdpId.toString())],[darts.toString()],[dinks.toString()],[dinks.toString()],[darts.toString()]]);
 
-              console.log("data - ",data)
+
               let tokendsProxyContract: dsProxyJsonContract | null = null;
               tokendsProxyContract = await this.contractsSource.getDsProxy(refRequest.proxyAddress)
               let bridgeActionAddress = configAddress.Bridge_Action_Address
               try{
-                console.log("tryyyyyyyyy")
+
                 const cdpDsProxyResult = await tokendsProxyContract.execute.sendTransactionAsync(bridgeActionAddress, data, {from: refRequest.accountAddress})
-                console.log("cdpDsProxyResult = ",cdpDsProxyResult)
+
                 alert("Proxy Migration loan transaction completed successfully.")
               }catch (e){
-                  console.log("catchhhhhhhh")
-                  console.log(e)
+
                 alert(e)
               }
 
@@ -760,34 +751,31 @@ export class TorqueProvider {
               // console.log("cdpsMakerresult = ",cdpsMakerresult)
           }
         }else{
-            const cdpsresult = await tokenCdpManagerContract.cdpCan.callAsync(refRequest.accountAddress, refRequest.cdpId, configAddress.token_Cdp_Address);
-            console.log("checkCdpManager = ",cdpsresult)
+            const cdpsresult = await tokenCdpManagerContract.cdpCan.callAsync(refRequest.accountAddress, refRequest.cdpId, configAddress.Maker_Bridge_Address);
+
             if(!cdpsresult.gt(0)) {
               //  Simple address Cdp Allow
               let isalow = new BigNumber(1)
-              const cdpsResp = await tokenCdpManagerContract.cdpAllow.sendTransactionAsync(refRequest.cdpId, configAddress.token_Cdp_Address, isalow, {from: refRequest.accountAddress}); //0x2252d3b2c12455d564abc21e328a1122679f8352
-              console.log("cdpsResp =- ", cdpsResp)
+              const cdpsResp = await tokenCdpManagerContract.cdpAllow.sendTransactionAsync(refRequest.cdpId, configAddress.Maker_Bridge_Address, isalow, {from: refRequest.accountAddress}); //0x2252d3b2c12455d564abc21e328a1122679f8352
+
               let tokenmakerBridgeContract: makerBridgeContract | null = null;
-              tokenmakerBridgeContract = await this.contractsSource.getmakerBridge(configAddress.token_Cdp_Address)
+              tokenmakerBridgeContract = await this.contractsSource.getmakerBridge(configAddress.Maker_Bridge_Address)
 
               try {
                 const cdpsMakerresult = await tokenmakerBridgeContract.migrateLoan.sendTransactionAsync( [refRequest.cdpId], [new BigNumber(darts)],[new BigNumber(dinks)],[ new BigNumber(dinks)],  [new BigNumber(darts)],{from: refRequest.accountAddress});
-                console.log("cdpsMakerresult = ", cdpsMakerresult)
+
                 alert("Migration loan transaction completed successfully.")
               }catch (e){
                 alert(e)
               }
             }else{
               let tokenmakerBridgeContract: makerBridgeContract | null = null;
-              console.log("refRequest.debt = ",refRequest.debt)
-              console.log("loanAmount - ",loanAmount)
-              console.log("refRequest.collateralAmount - ",)
-              tokenmakerBridgeContract = await this.contractsSource.getmakerBridge(configAddress.token_Cdp_Address)
-              console.log("refRequest.cdpId",refRequest.cdpId)
-              console.log("refRequest.accountAddress = ",refRequest.accountAddress)
+              tokenmakerBridgeContract = await this.contractsSource.getmakerBridge(configAddress.Maker_Bridge_Address)
+
               try {
-                const cdpsMakerresult = await tokenmakerBridgeContract.migrateLoan.sendTransactionAsync([refRequest.cdpId], [new BigNumber(darts)], [new BigNumber(dinks)], [new BigNumber(dinks)], [new BigNumber(darts)], {from: refRequest.accountAddress});
-                console.log("cdpsMakerresult = ", cdpsMakerresult)
+
+                const cdpsMakerresult = await tokenmakerBridgeContract.migrateLoan.sendTransactionAsync([refRequest.cdpId], [darts], [dinks], [dinks], [darts], {from: refRequest.accountAddress});
+
                 alert("Migration loan transaction completed successfully.")
               }catch (e){
                 alert(e)
@@ -804,8 +792,6 @@ export class TorqueProvider {
   }
   public checkMakerBridge = async (refRequest:RefinanceData) => {
 
-    console.log("refRequest- = ",refRequest)
-    console.log('refRequest.cdpId = ',refRequest.cdpId)
     if (this.web3Wrapper && this.contractsSource) {
       let tokenmakerBridgeContract: makerBridgeContract | null = null;
       tokenmakerBridgeContract = await this.contractsSource.getmakerBridge(configAddress.CDP_MANAGER)
