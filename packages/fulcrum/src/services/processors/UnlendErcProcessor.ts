@@ -5,6 +5,7 @@ import { LendRequest } from "../../domain/LendRequest";
 import { RequestTask } from "../../domain/RequestTask";
 import { FulcrumProviderEvents } from "../events/FulcrumProviderEvents";
 import { FulcrumProvider } from "../FulcrumProvider";
+import { Asset } from "../../domain/Asset";
 
 export class UnlendErcProcessor {
   public run = async (task: RequestTask, account: string, skipGas: boolean) => {
@@ -32,6 +33,10 @@ export class UnlendErcProcessor {
     task.processingStepNext();
 
     let gasAmountBN;
+
+    if (taskRequest.asset === Asset.DAI) {
+      skipGas = true;
+    }
 
     // Waiting for token allowance
     if (skipGas) {

@@ -194,3 +194,16 @@
     }
   }
 }
+
+
+@media screen and (max-width: $mobile-version-max-width) {
+
+  .lend-token-selector {
+
+    .token-selector-item {
+      max-width: 100%;
+      min-width: 100%;
+    }
+  }
+
+}

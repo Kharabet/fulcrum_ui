@@ -837,7 +837,7 @@ export class FulcrumProvider {
     let decimalOffset = 0;
     if (baseAsset === Asset.WBTC) {
       if (selectedKey.positionType === PositionType.SHORT) {
-        if (selectedKey.unitOfAccount !== Asset.USDC) {
+        if (selectedKey.version !== 1 && selectedKey.unitOfAccount !== Asset.USDC) {
           decimalOffset = 10;
         }
       } else {
