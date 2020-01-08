@@ -93,10 +93,7 @@ export class RefinanceAssetSelector extends Component<IRefinanceAssetSelectorPro
   }
   private derivedUpdate = async () => {
     const refinanceData = await TorqueProvider.Instance.checkCdp(Asset.DAI);
-    console.log("refinanceData = ",refinanceData)
     this.setState({ ...this.state, refinanceData: refinanceData });
-
-    console.log("refinanceData = ",this.state.refinanceData)
 
   };
 
@@ -105,7 +102,6 @@ export class RefinanceAssetSelector extends Component<IRefinanceAssetSelectorPro
 
     let assetList = Array.from(this.assetsShown.keys());
     let refinance = this.state.refinanceData;
-    console.log("this.state.refinanceData = ",this.state.refinanceData)
 
     let items;
     if (this.props.walletType === WalletType.Web3) {
@@ -133,7 +129,7 @@ export class RefinanceAssetSelector extends Component<IRefinanceAssetSelectorPro
           items = refinance.map((e, index) => {
 
             return (
-              <RefinanceAssetSelectorItem key={this.state.refinanceData[index].urn} asset={Asset.DAI}
+                <RefinanceAssetSelectorItem key={this.state.refinanceData[index].urn} asset={Asset.DAI}
                                           cdpId={this.state.refinanceData[index].cdpId}
                                           urn={this.state.refinanceData[index].urn}
                                           accountAddress={this.state.refinanceData[index].accountAddress}

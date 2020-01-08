@@ -40,7 +40,7 @@ export class RefinancePage extends PureComponent<IRefinancePageParams & RouteCom
 
           <div className="refinance-page__main">
 
-            <RefinanceAssetCompoundSelector walletType={walletType}  />
+            {/*<RefinanceAssetCompoundSelector walletType={walletType}  />*/}
 
             <RefinanceAssetSelector walletType={walletType} />
           </div>

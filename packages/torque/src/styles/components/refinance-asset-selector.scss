@@ -428,6 +428,26 @@
     cursor: pointer;
     background-color: #9589f5;
   }
+  .refinance-selector-icons-disabled__button {
+    width: 100%;
+
+    font-size: 1rem;
+    font-weight: bold;
+    font-style: normal;
+    font-stretch: normal;
+    line-height: 3.33;
+    letter-spacing: normal;
+    text-align: center;
+    color: #ffffff;
+    cursor: pointer;
+    background-color: #b6b5b9;
+  }
+  .refinanace-title-text{
+    font-size: 15px;
+    text-align: right;
+    float: right;
+    color: red;
+  }
 }
 
 @media only screen and (max-width: $mobile-version-width) {

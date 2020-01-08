@@ -430,7 +430,7 @@ export class TorqueProvider {
 
     let result: BigNumber = new BigNumber(0);
 
-    if (process.env.REACT_APP_ETH_NETWORK === "mainnet") {
+    if (process.env.REACT_APP_ETH_NETWORK == "mainnet") {
       if (!srcAmount) {
         srcAmount = TorqueProvider.UNLIMITED_ALLOWANCE_IN_BASE_UNITS;
       } else {
@@ -536,7 +536,8 @@ export class TorqueProvider {
     // const vat = new Web3.eth.Contract("0x1476483dd8c35f25e568113c5f70249d3976ba21", "0x2252d3b2c12455d564abc21e328a1122679f8352")
     // console.log("vat")
 
-    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+
+    const account =  this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
     // console.log("this.contractsSource.canWrite =",this.contractsSource.canWrite)
     console.log("this.web3Wrapper [ = "+this.web3Wrapper)
     if (this.web3Wrapper && this.contractsSource && account) {
@@ -593,7 +594,7 @@ export class TorqueProvider {
 
         if (account && tokencdpContract) {                                                                              //metamask 0x1476483dd8c35f25e568113c5f70249d3976ba21 account 0x2252d3b2c12455d564abc21e328a1122679f8352
           const cdpsresult = await tokencdpContract.getCdpsAsc.callAsync(configAddress.CDP_MANAGER, proxyRegistryResult); // multiple cdp 0xDF2Db45ed0df076e5D6d302B416A5971fF5Ad61F
-          console.log("cdpsresult = ", cdpsresult)
+          console.log(" proxycdpsresult = ", cdpsresult)
           let cdpId = cdpsresult[0]
           let urn = cdpsresult[1]
           let ilk = cdpsresult[2]
@@ -655,27 +656,43 @@ export class TorqueProvider {
           cdpId: new BigNumber(0),
           accountAddress:accountAddress,
           proxyAddress:proxyAddress,
-          isProxy: isProxy
+          isProxy: isProxy,
+          isDisabled: false
         }]
     if (this.web3Wrapper && this.contractsSource) {
       let vatContract: vatContract | null = null;
       vatContract = await this.contractsSource.getVatContract(configAddress.MCD_VAT_Address)
       // vat.methods.urns(ilk, urn).call().then(...
       let resp = await vatContract.urns.callAsync(ilk, urn)
-      console.log("resp = ", resp)
-      console.log("Resp Val = ", resp[0].multipliedBy(10 ** 18))
-      console.log("Resp Val 1= ", resp[1].multipliedBy(10 ** 18))
-      // var web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
+      let respIlks = await vatContract.ilks.callAsync(ilk)
 
-      console.log("urn val = ", await this.hex2a(ilk))
+      let rateIlk = respIlks[1].dividedBy(10 ** 27)
+      // alert("rateIlk = "+rateIlk)
+      let colletralAmount = resp[0].dividedBy(10 ** 18).toString()
+      let debtAmount = resp[1].dividedBy(10 ** 18)
+      // alert("debtAmount = "+debtAmount)
+      debtAmount = debtAmount.multipliedBy(rateIlk)
+      const ratio = parseFloat(colletralAmount) * 60 * 100 / parseFloat(debtAmount.toString())
+
+      let isDisabled=true
+      if(ratio>150){
+        isDisabled=false
+      }
+      let collateralType = await this.hex2a(ilk)
+
+      if(collateralType.toString().indexOf("ETH") !== -1){
+        collateralType="ETH"
+      }
+
       result = [{
         collateralAmount: resp[0].dividedBy(10 ** 18),
-        debt: resp[1].dividedBy(10 ** 18),
-        collateralType: await this.hex2a(ilk),
+        debt: debtAmount,
+        collateralType: collateralType,
         cdpId: cdpId,
         accountAddress: accountAddress,
         proxyAddress:proxyAddress,
-        isProxy: isProxy
+        isProxy: isProxy,
+        isDisabled: isDisabled
       }]
     }
     return result
@@ -686,12 +703,15 @@ export class TorqueProvider {
 
     const cdpManagerAddress = configAddress.CDP_MANAGER
     if (this.web3Wrapper && this.contractsSource) {
+      // const iBZxContract = await this.contractsSource.getiBZxContract();
+      // const loansData = await iBZxContract.getBasicLoansData.callAsync(refRequest.accountAddress, new BigNumber(50));
+
       let tokenCdpManagerContract: cdpManagerContract | null = null;
       tokenCdpManagerContract = await this.contractsSource.getCdpManager(cdpManagerAddress)
-      //        index 0 = 0x1476483dd8c35f25e568113c5f70249d3976ba21          // 0x2252d3b2c12455d564abc21e328a1122679f8352
+      let darts = web3.utils.toWei(loanAmount.dp(3, BigNumber.ROUND_FLOOR).toString()); //loanAmount.toFixed().toString()
+      let dinks = web3.utils.toWei(refRequest.collateralAmount.dp(3, BigNumber.ROUND_FLOOR).toString());
 
-      let darts = web3.utils.toWei(loanAmount.toString()); //loanAmount.toFixed().toString()
-      let dinks = web3.utils.toWei(refRequest.collateralAmount.toString());
+
       let tokendsProxyContract: dsProxyJsonContract | null = null;
 
       if(refRequest.isProxy){

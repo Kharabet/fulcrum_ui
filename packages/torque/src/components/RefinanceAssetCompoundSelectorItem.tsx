@@ -45,6 +45,7 @@ export class RefinanceAssetCompoundSelectorItem extends Component<IRefinanceAsse
         accountAddress:'',
         isProxy: false,
         proxyAddress: '',
+        isDisabled: false
       }]};
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
 
@@ -105,7 +106,7 @@ export class RefinanceAssetCompoundSelectorItem extends Component<IRefinanceAsse
             {/*<div className="refinance-asset-selector__img"><img src={assetsDt.img} /></div>*/}
         </div>
         <div className="refinance-asset-selector__row mb2">
-            <div className="refinance-asset-selector__variabletxt">Variabl APR</div>
+            <div className="refinance-asset-selector__variabletxt">Variable APR</div>
             <div className="refinance-asset-selector__aprtxt">Fixed APR</div>
             {/*<div className="refinance-asset-selector__imgtxt">{this.props.asset}</div>*/}
         </div>

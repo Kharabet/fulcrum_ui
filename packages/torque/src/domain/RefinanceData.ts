@@ -9,6 +9,7 @@ export interface RefinanceData {
   accountAddress:string;
   proxyAddress:string;
   isProxy: boolean;
+  isDisabled: boolean;
 
 }
 

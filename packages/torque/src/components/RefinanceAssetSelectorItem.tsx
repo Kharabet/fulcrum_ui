@@ -52,7 +52,8 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
         cdpId: new BigNumber(0),
         accountAddress: '',
         proxyAddress: '',
-        isProxy:false
+        isProxy:false,
+        isDisabled: false
       }]};
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
     this._inputTextChange = new Subject<number>();
@@ -133,10 +134,14 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
   public render() {
     const assetTypeModifier = "asset-selector-item--"+this.props.asset.toLowerCase();
     const assetsDt: any = this.getAssestsData()
-    if(this.state.refinanceData[0].debt.gt(0) || this.state.refinanceData[0].collateralAmount.gt(0)){
+    if(this.state.refinanceData[0].debt.gt(0) && this.state.refinanceData[0].collateralAmount.gt(0)){
     return (
       <div className={`refinance-asset-selector-item `} >
-        <div className="refinance-asset-selector__title">CDP {this.state.refinanceData[0].cdpId.toFixed(0)}</div>
+        <div className="refinance-asset-selector__title">CDP {this.state.refinanceData[0].cdpId.toFixed(0)}
+          {this.state.refinanceData[0].isDisabled ?
+          <div className="refinanace-title-text">Collateralization should be 150%+</div>
+           : ""}
+        </div>
         <div className="refinance-asset-selector__row">
           <div className="refinance-asset-selector__marker"><img className="logo__maker" src={maker_img} /> <img className="right-icon" src={arrow_right} /></div>
           <div className="refinance-asset-selector__torque"><img className="logo__image" src={torque_logo} alt="torque-logo" /></div>
@@ -148,7 +153,7 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
             {/*<div className="refinance-asset-selector__img"><img src={assetsDt.img} /></div>*/}
         </div>
         <div className="refinance-asset-selector__row mb2">
-            <div className="refinance-asset-selector__variabletxt">Variabl APR</div>
+            <div className="refinance-asset-selector__variabletxt">Variable APR</div>
             <div className="refinance-asset-selector__aprtxt">Fixed APR</div>
             {/*<div className="refinance-asset-selector__imgtxt">{this.props.asset}</div>*/}
         </div>
@@ -161,6 +166,7 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
                   type="number"
                   defaultValue={this.state.refinanceData[0].debt.dp(3, BigNumber.ROUND_FLOOR).toString()}
                   placeholder={`Amount`}
+                  disabled={this.state.refinanceData[0].isDisabled}
                   onChange={this.loanAmountChange}
                 />
                 <div className="refinance-details-msg--warning">
@@ -199,9 +205,17 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
         <div className="refinance-asset-selector__desc">{assetsDt.title}
           <div className="refinance-asset-selector__rs">$150/mo or $1500/yr</div>
         </div>
-        <div className="refinance-selector-icons__item refinance-selector-icons-bar__button" onClick={this.checkCdpManager}>
+        {this.state.refinanceData[0].isDisabled || this.state.borrowAmount.lte(0) || this.state.borrowAmount.gt(this.state.refinanceData[0].debt)?
+          <div className="refinance-selector-icons__item refinance-selector-icons-disabled__button">
             Refinance with 3% APR Fixed
-        </div>
+          </div>
+          :
+          <div className="refinance-selector-icons__item refinance-selector-icons-bar__button" onClick={this.checkCdpManager}>
+            Refinance with 3% APR Fixed
+          </div>
+        }
+
+
       </div>
     )
     }else{
