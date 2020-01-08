@@ -430,11 +430,7 @@ export class TorqueProvider {
 
     let result: BigNumber = new BigNumber(0);
 
-<<<<<<< HEAD
-    if (process.env.REACT_APP_ETH_NETWORK == "mainnet") {
-=======
     if (process.env.REACT_APP_ETH_NETWORK === "mainnet" || process.env.REACT_APP_ETH_NETWORK === "kovan") {
->>>>>>> master
       if (!srcAmount) {
         srcAmount = TorqueProvider.UNLIMITED_ALLOWANCE_IN_BASE_UNITS;
       } else {
