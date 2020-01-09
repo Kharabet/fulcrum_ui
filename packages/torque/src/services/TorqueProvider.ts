@@ -648,7 +648,7 @@ export class TorqueProvider {
     return result;
 
   }
-  public getCdpsVat = async (cdpId:BigNumber, urn: string, ilk: string, accountAddress: string, isProxy:boolean, proxyAddress:string ): Promise<RefinanceData[]> => {
+  public getCdpsVat = async (cdpId:BigNumber, urn: string, ilk: string, accountAddress: string, isProxy:boolean, proxyAddress:string, asset:Asset ): Promise<RefinanceData[]> => {
     let result: RefinanceData[] = [{
           collateralAmount: new BigNumber(0),
           debt: new BigNumber(0),
@@ -657,32 +657,48 @@ export class TorqueProvider {
           accountAddress:accountAddress,
           proxyAddress:proxyAddress,
           isProxy: isProxy,
-          isDisabled: false
+          isDisabled: false,
+          isShowCard:false
         }]
     if (this.web3Wrapper && this.contractsSource) {
       let vatContract: vatContract | null = null;
       vatContract = await this.contractsSource.getVatContract(configAddress.MCD_VAT_Address)
-      // vat.methods.urns(ilk, urn).call().then(...
+
       let resp = await vatContract.urns.callAsync(ilk, urn)
       let respIlks = await vatContract.ilks.callAsync(ilk)
 
       let rateIlk = respIlks[1].dividedBy(10 ** 27)
-      // alert("rateIlk = "+rateIlk)
-      let colletralAmount = resp[0].dividedBy(10 ** 18).toString()
+      let ratio = 0
+      let maintenanceMarginAmount = 1
+      let colletralAmount = resp[0].dividedBy(10 ** 18)
       let debtAmount = resp[1].dividedBy(10 ** 18)
-      // alert("debtAmount = "+debtAmount)
+
       debtAmount = debtAmount.multipliedBy(rateIlk)
-      const ratio = parseFloat(colletralAmount) * 60 * 100 / parseFloat(debtAmount.toString())
+      let isShowCard=false
+      if(parseFloat(colletralAmount.toString())>0 && parseFloat(debtAmount.toString())> 0) {
+        isShowCard=true
+        const usdPrice = await this.getSwapToUsdRate(asset)
+        const daitoUsd = debtAmount.multipliedBy(usdPrice)
+        const usdPriceEth = await this.getSwapRate(Asset.ETH, Asset.SAI, colletralAmount)
+        ratio = (parseFloat(usdPriceEth.toString()) * 100) / parseFloat(daitoUsd.toString())
+        const iBZxContract = await this.contractsSource.getiBZxContract();
+        const loansData = await iBZxContract.getBasicLoansData.callAsync(accountAddress, new BigNumber(50));
+
+        maintenanceMarginAmount = parseInt(loansData[0].maintenanceMarginAmount.dividedBy(10 ** 17).toString())
+      }
 
       let isDisabled=true
-      if(ratio>150){
+      if(ratio>=maintenanceMarginAmount){
         isDisabled=false
+
       }
+
       let collateralType = await this.hex2a(ilk)
 
       if(collateralType.toString().indexOf("ETH") !== -1){
         collateralType="ETH"
       }
+
 
       result = [{
         collateralAmount: resp[0].dividedBy(10 ** 18),
@@ -692,7 +708,8 @@ export class TorqueProvider {
         accountAddress: accountAddress,
         proxyAddress:proxyAddress,
         isProxy: isProxy,
-        isDisabled: isDisabled
+        isDisabled: isDisabled,
+        isShowCard:isShowCard
       }]
     }
     return result
@@ -703,8 +720,6 @@ export class TorqueProvider {
 
     const cdpManagerAddress = configAddress.CDP_MANAGER
     if (this.web3Wrapper && this.contractsSource) {
-      // const iBZxContract = await this.contractsSource.getiBZxContract();
-      // const loansData = await iBZxContract.getBasicLoansData.callAsync(refRequest.accountAddress, new BigNumber(50));
 
       let tokenCdpManagerContract: cdpManagerContract | null = null;
       tokenCdpManagerContract = await this.contractsSource.getCdpManager(cdpManagerAddress)

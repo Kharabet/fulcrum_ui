@@ -45,7 +45,8 @@ export class RefinanceAssetCompoundSelectorItem extends Component<IRefinanceAsse
         accountAddress:'',
         isProxy: false,
         proxyAddress: '',
-        isDisabled: false
+        isDisabled: false,
+        isShowCard:false
       }]};
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
 

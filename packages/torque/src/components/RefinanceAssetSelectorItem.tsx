@@ -53,7 +53,8 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
         accountAddress: '',
         proxyAddress: '',
         isProxy:false,
-        isDisabled: false
+        isDisabled: false,
+        isShowCard:false
       }]};
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
     this._inputTextChange = new Subject<number>();
@@ -105,7 +106,7 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
   private derivedUpdate = async () => {
 
     if (this.props.cdpId.gt(0)){
-      const refinanceData = await TorqueProvider.Instance.getCdpsVat(this.props.cdpId, this.props.urn, this.props.ilk, this.props.accountAddress,  this.props.isProxy, this.props.proxyAddress);
+      const refinanceData = await TorqueProvider.Instance.getCdpsVat(this.props.cdpId, this.props.urn, this.props.ilk, this.props.accountAddress,  this.props.isProxy, this.props.proxyAddress,this.props.asset);
       this.setState({ ...this.state, refinanceData: refinanceData,inputAmountText: parseInt(refinanceData[0].debt.toString()), borrowAmount:refinanceData[0].debt});
       this._inputTextChange.next(this.state.inputAmountText);
     }
@@ -134,13 +135,11 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
   public render() {
     const assetTypeModifier = "asset-selector-item--"+this.props.asset.toLowerCase();
     const assetsDt: any = this.getAssestsData()
-    if(this.state.refinanceData[0].debt.gt(0) && this.state.refinanceData[0].collateralAmount.gt(0)){
+    if(this.state.refinanceData[0].isShowCard){
     return (
       <div className={`refinance-asset-selector-item `} >
         <div className="refinance-asset-selector__title">CDP {this.state.refinanceData[0].cdpId.toFixed(0)}
-          {this.state.refinanceData[0].isDisabled ?
-          <div className="refinanace-title-text">Collateralization should be 150%+</div>
-           : ""}
+
         </div>
         <div className="refinance-asset-selector__row">
           <div className="refinance-asset-selector__marker"><img className="logo__maker" src={maker_img} /> <img className="right-icon" src={arrow_right} /></div>
@@ -189,10 +188,12 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
         </div>
         <div className="refinance-asset-selector__row">
             <div className="refinance-asset-selector__loanBlank">
-
+                {this.state.refinanceData[0].isDisabled ?
+                  <div className="refinanace-title-text">Collateralization should be 150%+</div>
+                   : ""}
             </div>
             <div className="refinance-asset-selector__loan">
-              {this.state.refinanceData[0].collateralAmount.dp(3, BigNumber.ROUND_FLOOR).toString()}
+              <div className="clr-red">{this.state.refinanceData[0].collateralAmount.dp(3, BigNumber.ROUND_FLOOR).toString()}</div>
               <div className="refinance-asset-selector__loantxt">Collateral</div>
             </div>
 

@@ -84,6 +84,13 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
 
     return (
       <div className={`borrowed-funds-list-item`}>
+          {assetDetails.displayName === Asset.SAI ? (
+              <div className="borrowed-funds-button-div">
+                <div className="borrowed-funds__item borrowed-funds-button" >
+                    Migrate to DAI
+                </div>
+              </div>
+          ):null}
         <div className="borrowed-funds-list-item__padding-container">
           <div className="borrowed-funds-list-item__general-container">
             <div className="borrowed-funds-list-item__general-container-values">
@@ -99,6 +106,7 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
               <div className="borrowed-funds-list-item__general-container-asset-name">
                 {assetDetails.displayName}
               </div>
+
             </div>
           </div>
         </div>

@@ -10,7 +10,7 @@ export interface RefinanceData {
   proxyAddress:string;
   isProxy: boolean;
   isDisabled: boolean;
-
+  isShowCard:boolean
 }
 
 export interface RefinanceCdpData {
