@@ -186,11 +186,12 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
             </div>
 
         </div>
+        {this.state.refinanceData[0].isDisabled ?(
         <div className="refinance-asset-selector__row">
             <div className="refinance-asset-selector__loanBlank">
-                {this.state.refinanceData[0].isDisabled ?
+
                   <div className="refinanace-title-text">Collateralization should be 150%+</div>
-                   : ""}
+
             </div>
             <div className="refinance-asset-selector__loan">
               <div className="clr-red">{this.state.refinanceData[0].collateralAmount.dp(3, BigNumber.ROUND_FLOOR).toString()}</div>
@@ -203,6 +204,7 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
             </div>
 
         </div>
+          ):null}
         <div className="refinance-asset-selector__desc">{assetsDt.title}
           <div className="refinance-asset-selector__rs">$150/mo or $1500/yr</div>
         </div>
