@@ -8,6 +8,7 @@ import { Footer } from "../layout/Footer";
 import { HeaderOps } from "../layout/HeaderOps";
 import { NavService } from "../services/NavService";
 import { TorqueProvider } from "../services/TorqueProvider";
+import {TorqueProviderEvents} from "../services/events/TorqueProviderEvents";
 
 export interface IBorrowPageRouteParams {
   walletTypeAbbr: string;
@@ -25,6 +26,10 @@ export class BorrowPage extends PureComponent<IBorrowPageParams & RouteComponent
     super(props, context);
 
     this.borrowDlgRef = React.createRef();
+  }
+  public componentWillUnmount(): void {
+
+    TorqueProvider.Instance.destinationAbbr = '';
   }
 
   public render() {
@@ -86,7 +91,7 @@ export class BorrowPage extends PureComponent<IBorrowPageParams & RouteComponent
         } else if (typeof error === "string") {
           errorMsg = error;
         }
-  
+
         if (errorMsg) {
           if (errorMsg.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)) {
             errorMsg = "The transaction seems like it will fail. You can submit the transaction anyway, or cancel.";
@@ -103,7 +108,7 @@ export class BorrowPage extends PureComponent<IBorrowPageParams & RouteComponent
             errorMsg = "";
           }
         }*/
-        
+
         this.borrowDlgRef.current.toggleDidSubmit(false);
         await this.borrowDlgRef.current.hide();
       }

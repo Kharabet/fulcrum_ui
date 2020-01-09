@@ -685,6 +685,7 @@ export class TorqueProvider {
         const loansData = await iBZxContract.getBasicLoansData.callAsync(accountAddress, new BigNumber(50));
 
         maintenanceMarginAmount = parseInt(loansData[0].maintenanceMarginAmount.dividedBy(10 ** 17).toString())
+
       }
 
       let isDisabled=true
@@ -755,7 +756,9 @@ export class TorqueProvider {
               alert("Proxy Migration loan transaction completed successfully.")
             }catch (e){
 
-              alert(e)
+              if(!e['code']){
+                  alert(e)
+                }
             }
 
           }else{
@@ -778,7 +781,9 @@ export class TorqueProvider {
                 alert("Proxy Migration loan transaction completed successfully.")
               }catch (e){
 
-                alert(e)
+                if(!e['code']){
+                  alert(e)
+                }
               }
 
 
@@ -801,7 +806,9 @@ export class TorqueProvider {
 
                 alert("Migration loan transaction completed successfully.")
               }catch (e){
-                alert(e)
+                if(!e['code']){
+                  alert(e)
+                }
               }
             }else{
               let tokenmakerBridgeContract: makerBridgeContract | null = null;
@@ -813,7 +820,10 @@ export class TorqueProvider {
 
                 alert("Migration loan transaction completed successfully.")
               }catch (e){
-                alert(e)
+                if(!e['code']){
+                  alert(e)
+                }
+
               }
             }
         }

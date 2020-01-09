@@ -23,7 +23,7 @@ export class LandingPage extends PureComponent<IProviderSelectorItemProps> {
       accountAddress
         ? NavService.Instance.getDashboardAddress(WalletType.Web3, accountAddress)
         : NavService.Instance.getWalletAddress("t");
-    const refinanceLoanUrl = NavService.Instance.getRefinanceAddress("b");
+    const refinanceLoanUrl = NavService.Instance.getRefinanceAddress("r");
     return (
       <div className="landing-page">
         <HeaderHome isLoading={false} />
