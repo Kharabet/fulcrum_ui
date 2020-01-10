@@ -62,6 +62,8 @@ export class LendChaiProcessor {
 
       let gasAmountBN;
 
+      skipGas = true;
+
       // Waiting for token allowance
       if (approvePromise || skipGas) {
         await approvePromise;

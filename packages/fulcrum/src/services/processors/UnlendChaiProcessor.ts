@@ -33,6 +33,8 @@ export class UnlendChaiProcessor {
 
     let gasAmountBN;
 
+    skipGas = true;
+
     // Waiting for token allowance
     if (skipGas) {
       gasAmountBN = new BigNumber(600000);

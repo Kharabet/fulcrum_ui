@@ -96,9 +96,11 @@ export class OwnTokenGrid extends Component<IOwnTokenGridProps, IOwnTokenGridSta
     return (
       <div className="own-token-grid">
         <div className="own-token-grid-row__col-action-mb">
+          {this.state.tokenRowsData.length > 0 ? (
           <button className="own-token-grid-row__sell-button" onClick={this.onSellClick}>
             {TradeType.SELL}
           </button>
+          ) : null}
         </div>
         <OwnTokenGridHeaderMobile
 
