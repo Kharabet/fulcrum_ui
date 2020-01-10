@@ -87,11 +87,13 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
   }
 
   public async derivedUpdate() {
+    if(!this.props.isMobileMedia){
+      this.setState({ ...this.state, tokenRowsData: TradeTokenGrid.getRowsData(this.props) }) ;
+    }else{
+      this.setState({ ...this.state, tokenSingleRowsData:TradeTokenGrid.getSingleRowData(this.props) }) ;
+    this.setState({ ...this.state, tokenSingleRowsData:TradeTokenGrid.getSingleRowData(this.props), tokenLongShortRowsData:TradeTokenGrid.getRowsLongShortData(this.props) }) ;
+    }
 
-    this.setState({ ...this.state, tokenSingleRowsData:TradeTokenGrid.getSingleRowData(this.props) }) ;
-    this.setState({ ...this.state, tokenRowsData: TradeTokenGrid.getRowsData(this.props) }) ;
-
-      this.setState({ ...this.state, tokenSingleRowsData:TradeTokenGrid.getSingleRowData(this.props), tokenLongShortRowsData:TradeTokenGrid.getRowsLongShortData(this.props) }) ;
       // this.setState({ ...this.state, tokenSingleRowsData:TradeTokenGrid.getSingleRowData(this.props) }) ;
   }
 
@@ -145,7 +147,6 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
     // const assetDetails = AssetsDictionary.assets.get(this.state.tokenRowsData[0].asset);
     const tokenRowsFooterMobile = this.state.tokenSingleRowsData.map(e => <TradeTokenGridRowMobileFooter key={`${e.asset}_${e.positionType}`} {...e} />);
     const tokenRowsMobile = this.state.tokenLongShortRowsData.map(e => <TradeTokenGridRowMobile key={`${e.asset}_${e.positionType}_${e.defaultLeverage}`} {...e} />);
-    // console.log("tokenRowsMobile = "+tokenRowsMobile)
     return (
       <div className="trade-token-grid">
         <div className="trade-new-grid">
@@ -203,7 +204,7 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
                               dataLayerName: 'PageDataLayer'
                           }
 
-    // console.log("tagManagerArgs = "+tagManagerArgs)
+
     TagManager.dataLayer(tagManagerArgs)
     //
     this.props.onTrade(
