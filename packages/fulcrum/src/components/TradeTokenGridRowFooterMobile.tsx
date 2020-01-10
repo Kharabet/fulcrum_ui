@@ -168,8 +168,8 @@ export class TradeTokenGridRowMobileFooter extends Component<ITradeTokenGridRowF
     // bnLiquidationPrice = bnLiquidationPrice.div(1000);
 
     // const bnChange24h = new BigNumber(this.state.latestPriceDataPoint.change24h);
-    console.log("this.props.asset - ",this.props.asset)
-    console.log("this.state.asset = "+this.props.selectedKey.asset)
+    // console.log("this.props.asset - ",this.props.asset)
+    // console.log("this.state.asset = "+this.props.selectedKey.asset)
     // console.log("this.props.selectedKey.asset - ",this.props.selectedKey.asset)
     const isActiveClassName =
       this.props.asset === this.props.selectedKey.asset ? "trade-footer-grid--active" : "";

@@ -13,3 +13,21 @@
     margin-top: 5rem;
   }
 }
+
+@media screen and (max-width: $mobile-version-max-width) {
+  .lend-page {
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+  justify-content: flex-start;
+
+  height: 100%;
+  width: 90%;
+  //max-width: 80%;
+  padding: 0rem;
+
+  .lend-page-main {
+    margin-top: 2rem;
+  }
+}
+}
