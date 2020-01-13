@@ -533,12 +533,9 @@ export class TorqueProvider {
         proxyAddress: '',
         isProxy:false
       }];
-    // this.web3ProviderSettings = await TorqueProvider.getWeb3ProviderSettings(1);
-    // const vat = new Web3.eth.Contract("0x1476483dd8c35f25e568113c5f70249d3976ba21", "0x2252d3b2c12455d564abc21e328a1122679f8352")
-    // console.log("vat")
+ 
 
     const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
-    // console.log("this.contractsSource.canWrite =",this.contractsSource.canWrite)
 
     if (this.web3Wrapper && this.contractsSource && account) {
       let tokencdpContract: GetCdpsContract | null = null;
