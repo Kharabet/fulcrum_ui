@@ -17,6 +17,7 @@ export interface IRefinanceAssetSelectorProps {
 }
 interface IRefinanceAssetSelectorItemState {
   asset:Asset,
+  isLoading:boolean;
   refinanceData: RefinanceCdpData[];
 }
 
@@ -25,6 +26,7 @@ export class RefinanceAssetSelector extends Component<IRefinanceAssetSelectorPro
     super(props);
     this.state = {
       asset: Asset.DAI,
+      isLoading:true,
       refinanceData:
       [{
         cdpId: new BigNumber(0),
@@ -93,7 +95,11 @@ export class RefinanceAssetSelector extends Component<IRefinanceAssetSelectorPro
   }
   private derivedUpdate = async () => {
     const refinanceData = await TorqueProvider.Instance.checkCdp(Asset.DAI);
-    this.setState({ ...this.state, refinanceData: refinanceData });
+    if(refinanceData[0].cdpId.gt(0)){
+      this.setState({ ...this.state, isLoading: false});
+    }
+
+    this.setState({ ...this.state, refinanceData: refinanceData});
 
   };
 
@@ -126,6 +132,7 @@ export class RefinanceAssetSelector extends Component<IRefinanceAssetSelectorPro
       assetList = assetList.sort(e => this.assetsShown.get(e) ? -1 : 1);
       if(refinance[0].cdpId != undefined) {
         if(refinance[0].cdpId.gt(0)) {
+
           items = refinance.map((e, index) => {
 
             return (
@@ -141,10 +148,9 @@ export class RefinanceAssetSelector extends Component<IRefinanceAssetSelectorPro
         }
       }
     }
-
     return <div className="refinance-asset-selector">
 
-          <div className="refinance-page__main-centeredOverlay" style={!TorqueProvider.Instance.isLoading ? { display: `none`} : undefined}>
+          <div className="refinance-page__main-centeredOverlay" style={ !this.state.isLoading ? { display: `none`} : undefined}>
               <span>Loading...</span>
           </div>
       {items}

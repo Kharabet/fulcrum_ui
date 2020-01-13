@@ -34,6 +34,8 @@ interface IRefinanceAssetSelectorItemState {
   inputAmountText: number;
   borrowAmount: BigNumber;
   refinanceData: RefinanceData[];
+  isLoading: boolean,
+  isTrack: boolean
 }
 
 export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelectorItemProps, IRefinanceAssetSelectorItemState> {
@@ -44,6 +46,8 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
     this.state = {
       inputAmountText: 0,
       borrowAmount: new BigNumber(0),
+      isLoading:false,
+      isTrack:false,
       refinanceData:
       [{
         collateralType: '',
@@ -128,14 +132,24 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
   };
 
   private checkCdpManager = async () => {
+    if(this.state.isTrack){
+      window.location.href="/#/dashboard/w/"
+    }else{
+      this.setState({ ...this.state, isLoading:true });
+      const refinanceData = await TorqueProvider.Instance.checkCdpManager(this.state.refinanceData[0], this.state.borrowAmount);
+      this.setState({ ...this.state, isLoading:false, isTrack:true });
+    }
 
-    const refinanceData = await TorqueProvider.Instance.checkCdpManager(this.state.refinanceData[0], this.state.borrowAmount);
   }
 
   public render() {
     const assetTypeModifier = "asset-selector-item--"+this.props.asset.toLowerCase();
     const assetsDt: any = this.getAssestsData()
+    // let btnClass = !this.state.isLoading ? 'refinance-selector-icons-bar__button' : 'refinance-selector-icons-disabled__button';
+    let btnValue = this.state.isLoading ? 'Loading...' : 'Refinance with 3% APR Fixed' ;
+    let btnActiveValue = this.state.isTrack ? 'Track' :'Refinance with 3% APR Fixed'
     if(this.state.refinanceData[0].isShowCard){
+
     return (
       <div className={`refinance-asset-selector-item `} >
         <div className="refinance-asset-selector__title">CDP {this.state.refinanceData[0].cdpId.toFixed(0)}
@@ -170,7 +184,7 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
                 />
                 <div className="refinance-details-msg--warning">
                   {this.state.borrowAmount.lte(0) ? 'Please enter value greater than 0' : ''}
-                  {this.state.borrowAmount.gt(this.state.refinanceData[0].debt) ? 'Please enter value less than equal to '+ this.state.refinanceData[0].debt.dp(3, BigNumber.ROUND_FLOOR).toString() : ''}
+                  {this.state.borrowAmount.gt(this.state.refinanceData[0].debt) ? 'Please enter value less than or equal to '+ this.state.refinanceData[0].debt.dp(3, BigNumber.ROUND_FLOOR).toString() : ''}
                 </div>
               </div>
 
@@ -205,16 +219,18 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
 
         </div>
           ):null}
-        <div className="refinance-asset-selector__desc">{assetsDt.title}
+        <div className="refinance-asset-selector__desc">
+          <div className="refinance-asset-selector__simple" >{assetsDt.title}</div>
           <div className="refinance-asset-selector__rs">$150/mo or $1500/yr</div>
         </div>
-        {this.state.refinanceData[0].isDisabled || this.state.borrowAmount.lte(0) || this.state.borrowAmount.gt(this.state.refinanceData[0].debt)?
-          <div className="refinance-selector-icons__item refinance-selector-icons-disabled__button">
-            Refinance with 3% APR Fixed
+
+        {this.state.refinanceData[0].isDisabled || this.state.borrowAmount.lte(0) || this.state.borrowAmount.gt(this.state.refinanceData[0].debt) || this.state.isLoading ?
+          <div className={`refinance-selector-icons__item refinance-selector-icons-disabled__button`}>
+            {btnValue}
           </div>
           :
-          <div className="refinance-selector-icons__item refinance-selector-icons-bar__button" onClick={this.checkCdpManager}>
-            Refinance with 3% APR Fixed
+          <div className={`refinance-selector-icons__item refinance-selector-icons-bar__button`} onClick={this.checkCdpManager}>
+            {btnActiveValue}
           </div>
         }
 

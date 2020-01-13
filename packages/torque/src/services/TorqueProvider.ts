@@ -429,12 +429,11 @@ export class TorqueProvider {
     }
 
     let result: BigNumber = new BigNumber(0);
-
     if (process.env.REACT_APP_ETH_NETWORK === "mainnet" || process.env.REACT_APP_ETH_NETWORK === "kovan") {
       if (!srcAmount) {
         srcAmount = TorqueProvider.UNLIMITED_ALLOWANCE_IN_BASE_UNITS;
       } else {
-        srcAmount = new BigNumber(srcAmount.toFixed(0, 1));
+        srcAmount = new BigNumber(srcAmount.toFixed(1, 1));
       }
 
       const srcAssetErc20Address = this.getErc20AddressOfAsset(srcAsset);
@@ -448,7 +447,9 @@ export class TorqueProvider {
             srcAmount
           );
           result = swapPriceData[0].dividedBy(10 ** 18);
+
         } catch(e) {
+
           result = new BigNumber(0);
         }
       }
@@ -475,7 +476,7 @@ export class TorqueProvider {
         }
       }
     }
-
+    console.log(" result =",result)
     return result;
   }
 
@@ -536,24 +537,19 @@ export class TorqueProvider {
     // const vat = new Web3.eth.Contract("0x1476483dd8c35f25e568113c5f70249d3976ba21", "0x2252d3b2c12455d564abc21e328a1122679f8352")
     // console.log("vat")
 
-
-    const account =  this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
     // console.log("this.contractsSource.canWrite =",this.contractsSource.canWrite)
-    console.log("this.web3Wrapper [ = "+this.web3Wrapper)
+
     if (this.web3Wrapper && this.contractsSource && account) {
       let tokencdpContract: GetCdpsContract | null = null;
         tokencdpContract = await this.contractsSource.getCdpContract(configAddress.Get_CDPS);
-
-        console.log("account = ", account)
-        console.log("tokencdpContract = ", tokencdpContract)
         if (account && tokencdpContract) {                                                                              //metamask 0x1476483dd8c35f25e568113c5f70249d3976ba21 account 0x2252d3b2c12455d564abc21e328a1122679f8352
           const cdpsresult = await tokencdpContract.getCdpsAsc.callAsync(configAddress.CDP_MANAGER, account); // multiple cdp 0xDF2Db45ed0df076e5D6d302B416A5971fF5Ad61F
-          console.log("cdpsresult = ", cdpsresult)
+          console.log("cdpsresult = ",cdpsresult)
           let cdpId = cdpsresult[0]
           let urn = cdpsresult[1]
           let ilk = cdpsresult[2]
-          console.log("ilk = ", ilk)
-          console.log("urn = ", urn)
+
           for(var i=0;i<cdpId.length;i++){
             if(!result[0].cdpId.gt(0)){
               result = [{
@@ -579,27 +575,21 @@ export class TorqueProvider {
           }
 
         }
-      console.log("result = ",result)
+
       let proxyRegistryContract: proxyRegistryContract | null = null;
       proxyRegistryContract = await this.contractsSource.getProxyRegistery(configAddress.proxy_Contract_Address)
       const proxyRegistryResult = await proxyRegistryContract.proxies.callAsync( account)
-      console.log("proxyRegistryResult  = ",proxyRegistryResult)
+
 
       if(proxyRegistryResult !== configAddress.Empty_Proxy_Address){
           let tokencdpContract: GetCdpsContract | null = null;
         tokencdpContract = await this.contractsSource.getCdpContract(configAddress.Get_CDPS);
 
-
-        console.log("tokencdpContract = ", tokencdpContract)
-
         if (account && tokencdpContract) {                                                                              //metamask 0x1476483dd8c35f25e568113c5f70249d3976ba21 account 0x2252d3b2c12455d564abc21e328a1122679f8352
           const cdpsresult = await tokencdpContract.getCdpsAsc.callAsync(configAddress.CDP_MANAGER, proxyRegistryResult); // multiple cdp 0xDF2Db45ed0df076e5D6d302B416A5971fF5Ad61F
-          console.log(" proxycdpsresult = ", cdpsresult)
           let cdpId = cdpsresult[0]
           let urn = cdpsresult[1]
           let ilk = cdpsresult[2]
-          console.log("ilk = ", ilk)
-          console.log("urn = ", urn)
           for(var i=0;i<cdpId.length;i++){
             if(!result[0].cdpId.gt(0)){
               result = [{
@@ -680,13 +670,17 @@ export class TorqueProvider {
         const usdPrice = await this.getSwapToUsdRate(asset)
         const daitoUsd = debtAmount.multipliedBy(usdPrice)
         const usdPriceEth = await this.getSwapRate(Asset.ETH, Asset.SAI, colletralAmount)
-        ratio = (parseFloat(usdPriceEth.toString()) * 100) / parseFloat(daitoUsd.toString())
+        ratio = (parseFloat(usdPriceEth.toString()) * 100 * parseFloat(colletralAmount.toString())) / parseFloat(daitoUsd.toString())
+          console.log("colletralAmount = ",parseFloat(colletralAmount.toString()))
+          console.log("ratio = ",ratio)
+          console.log("CDP  = ",cdpId)
         const iBZxContract = await this.contractsSource.getiBZxContract();
         const loansData = await iBZxContract.getBasicLoansData.callAsync(accountAddress, new BigNumber(50));
 
         maintenanceMarginAmount = parseInt(loansData[0].maintenanceMarginAmount.dividedBy(10 ** 17).toString())
 
       }
+
 
       let isDisabled=true
       if(ratio>=maintenanceMarginAmount){
@@ -735,31 +729,46 @@ export class TorqueProvider {
 
         if(!cdpsresult.gt(0)){
 
+
             let tokendsProxyContract: dsProxyJsonContract | null = null;
               tokendsProxyContract = await this.contractsSource.getDsProxy(refRequest.proxyAddress)
             let dsProxyAllowJson = await this.contractsSource.dsProxyAllowJson()
              var datatmp = web3.eth.abi.encodeFunctionCall( dsProxyAllowJson.default,[cdpManagerAddress, parseInt(refRequest.cdpId.toString()), configAddress.Maker_Bridge_Address, 1]);
-
             var proxyActionsAddress = configAddress.proxy_Actions_Address;
             // if proxy use then use this function for cdpAllow
             const cdpDsProxyResult = await tokendsProxyContract.execute.sendTransactionAsync(proxyActionsAddress, datatmp, {from: refRequest.accountAddress})
-
+            let receipt = null;
+            receipt = await this.waitForTransactionMined(cdpDsProxyResult);
+            console.log("receipt = ",receipt)
             var dsProxyAddress = refRequest.proxyAddress;
 
             let proxyMigrationJson = await this.contractsSource.getProxyMigration()
             var data = web3.eth.abi.encodeFunctionCall(proxyMigrationJson.default, [configAddress.Maker_Bridge_Address, [parseInt(refRequest.cdpId.toString())],[darts.toString()],[dinks.toString()],[dinks.toString()],[darts.toString()]]);
 
-            tokendsProxyContract = await this.contractsSource.getDsProxy(refRequest.proxyAddress)
+            var tokendsProxyContractMigrate = await this.contractsSource.getDsProxy(refRequest.proxyAddress)
             let bridgeActionAddress = configAddress.Bridge_Action_Address
-            try{
-              const cdpDsProxyResult2 = await tokendsProxyContract.execute.sendTransactionAsync(bridgeActionAddress, data, {from: refRequest.accountAddress})
-              alert("Proxy Migration loan transaction completed successfully.")
-            }catch (e){
+            if(receipt != null){
+              console.log("Status: ", receipt.status);
+              // clearInterval(timer);
+              if(receipt.status){
+                //Then call MigrateLoan function;
+                try{
+                  const cdpDsProxyResult2 = await tokendsProxyContract.execute.sendTransactionAsync(bridgeActionAddress, data, {from: refRequest.accountAddress})
+                  let receiptTransaction = await this.waitForTransactionMined(cdpDsProxyResult2);
+                  // if(receiptTransaction.status){
+                  //   alert("Proxy Migration loan transaction completed successfully.")
+                  // }
+                }catch (e){
 
-              if(!e['code']){
-                  alert(e)
+                  // if(!e['code']){
+                  //     alert(e)
+                  //   }
                 }
+
+              }
             }
+              // }, 5000);
+
 
           }else{
 
@@ -776,14 +785,16 @@ export class TorqueProvider {
               let bridgeActionAddress = configAddress.Bridge_Action_Address
               try{
 
-                const cdpDsProxyResult = await tokendsProxyContract.execute.sendTransactionAsync(bridgeActionAddress, data, {from: refRequest.accountAddress})
-
-                alert("Proxy Migration loan transaction completed successfully.")
+                const cdpDsProxyResult2 = await tokendsProxyContract.execute.sendTransactionAsync(bridgeActionAddress, data, {from: refRequest.accountAddress})
+                let receiptTransaction = await this.waitForTransactionMined(cdpDsProxyResult2);
+                  // if(receiptTransaction.status){
+                  //   alert("Proxy Migration loan transaction completed successfully.")
+                  // }
               }catch (e){
 
-                if(!e['code']){
-                  alert(e)
-                }
+                // if(!e['code']){
+                //   alert(e)
+                // }
               }
 
 
@@ -797,32 +808,36 @@ export class TorqueProvider {
               //  Simple address Cdp Allow
               let isalow = new BigNumber(1)
               const cdpsResp = await tokenCdpManagerContract.cdpAllow.sendTransactionAsync(refRequest.cdpId, configAddress.Maker_Bridge_Address, isalow, {from: refRequest.accountAddress}); //0x2252d3b2c12455d564abc21e328a1122679f8352
-
+              let receipt = null;
+              receipt = await this.waitForTransactionMined(cdpsResp);
               let tokenmakerBridgeContract: makerBridgeContract | null = null;
               tokenmakerBridgeContract = await this.contractsSource.getmakerBridge(configAddress.Maker_Bridge_Address)
 
               try {
-                const cdpsMakerresult = await tokenmakerBridgeContract.migrateLoan.sendTransactionAsync( [refRequest.cdpId], [new BigNumber(darts)],[new BigNumber(dinks)],[ new BigNumber(dinks)],  [new BigNumber(darts)],{from: refRequest.accountAddress});
-
-                alert("Migration loan transaction completed successfully.")
-              }catch (e){
-                if(!e['code']){
-                  alert(e)
+                if(receipt.status){
+                  const cdpsMakerresult = await tokenmakerBridgeContract.migrateLoan.sendTransactionAsync([refRequest.cdpId], [new BigNumber(darts)], [new BigNumber(dinks)], [new BigNumber(dinks)], [new BigNumber(darts)], {from: refRequest.accountAddress});
+                  let receiptTransaction = await this.waitForTransactionMined(cdpsMakerresult);
                 }
+
+
+                // alert("Migration loan transaction completed successfully.")
+              }catch (e){
+                // if(!e['code']){
+                //   alert(e)
+                // }
               }
             }else{
               let tokenmakerBridgeContract: makerBridgeContract | null = null;
               tokenmakerBridgeContract = await this.contractsSource.getmakerBridge(configAddress.Maker_Bridge_Address)
-
               try {
 
                 const cdpsMakerresult = await tokenmakerBridgeContract.migrateLoan.sendTransactionAsync([refRequest.cdpId], [darts], [dinks], [dinks], [darts], {from: refRequest.accountAddress});
-
-                alert("Migration loan transaction completed successfully.")
+                let receiptTransaction = await this.waitForTransactionMined(cdpsMakerresult);
+                // alert("Migration loan transaction completed successfully.")
               }catch (e){
-                if(!e['code']){
-                  alert(e)
-                }
+                // if(!e['code']){
+                //   alert(e)
+                // }
 
               }
             }
@@ -1353,7 +1368,7 @@ export class TorqueProvider {
 
         let gasAmountBN;
         try {
-          console.log(bZxContract.address);
+          // console.log(bZxContract.address);
           const gasAmount = await bZxContract.paybackLoanAndClose.estimateGasAsync(
             repayLoanRequest.loanOrderHash,
             account,
