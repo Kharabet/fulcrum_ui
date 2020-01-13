@@ -1,5 +1,6 @@
 import { BigNumber } from "@0x/utils";
 import React, { Component } from "react";
+import TagManager from "react-gtm-module";
 import { Asset } from "../domain/Asset";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
@@ -12,11 +13,10 @@ import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents"
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { TradeTransactionMinedEvent } from "../services/events/TradeTransactionMinedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
+import configProviders from "./../config/providers.json";
 // import { Change24HMarker, Change24HMarkerSize } from "./Change24HMarker";
 import { LeverageSelector } from "./LeverageSelector";
 import { PositionTypeMarker } from "./PositionTypeMarker";
-import TagManager from "react-gtm-module";
-import configProviders from "./../config/providers.json";
 // const tagManagerArgs = {
 //     gtmId: configProviders.Google_TrackingID
 // }
@@ -41,7 +41,7 @@ interface ITradeTokenGridRowState {
   assetDetails: AssetDetails | null;
   leverage: number;
   version: number;
-
+  asset:Asset;
   latestPriceDataPoint: IPriceDataPoint;
   interestRate: BigNumber;
   balance: BigNumber;
@@ -61,6 +61,7 @@ export class TradeTokenGridRowMobileFooter extends Component<ITradeTokenGridRowF
       interestRate: new BigNumber(0),
       balance: new BigNumber(0),
       version: 2,
+      asset:Asset.ETH,
       isLoading:true
     };
 
@@ -167,12 +168,15 @@ export class TradeTokenGridRowMobileFooter extends Component<ITradeTokenGridRowF
     // bnLiquidationPrice = bnLiquidationPrice.div(1000);
 
     // const bnChange24h = new BigNumber(this.state.latestPriceDataPoint.change24h);
+    // console.log("this.props.asset - ",this.props.asset)
+    // console.log("this.state.asset = "+this.props.selectedKey.asset)
+    // console.log("this.props.selectedKey.asset - ",this.props.selectedKey.asset)
     const isActiveClassName =
-      tradeTokenKey.toString() === this.props.selectedKey.toString() ? "trade-token-grid-row--active" : "";
+      this.props.asset === this.props.selectedKey.asset ? "trade-footer-grid--active" : "";
 
     return (
 
-      <div className={`trade-footer-grid`} onClick={this.onSelectClick}>
+      <div className={`trade-footer-grid ${isActiveClassName}`}  onClick={this.onSelectClick}>
 
         {/*<div className="trade-token-grid-row__col-token-name">*/}
           {/*/!*<span className="rounded-mark">?</span>*!/*/}
@@ -182,7 +186,7 @@ export class TradeTokenGridRowMobileFooter extends Component<ITradeTokenGridRowF
           {/*<PositionTypeMarker value={this.props.positionType} />*/}
         {/*</div>*/}
         <div
-            className="trade-token-grid-row__col-token-image"
+            className={`trade-token-grid-row__col-token-image ${isActiveClassName}`}
             style={{backgroundColor: this.state.assetDetails.bgColor, borderLeftColor: this.state.assetDetails.bgColor}}
           >
             <img src={this.state.assetDetails.logoSvg} alt={this.state.assetDetails.displayName}/>
@@ -259,7 +263,7 @@ export class TradeTokenGridRowMobileFooter extends Component<ITradeTokenGridRowF
                             },
                             dataLayerName: 'PageDataLayer'
                         }
-    console.log("tagManagerArgs = "+tagManagerArgs)
+    // console.log("tagManagerArgs = "+tagManagerArgs)
     TagManager.dataLayer(tagManagerArgs)
 
     this.props.onTrade(

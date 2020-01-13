@@ -12,6 +12,8 @@ import { TorqueProvider } from "../services/TorqueProvider";
 import { ActionViaTransferDetails } from "./ActionViaTransferDetails";
 import { ActionViaWeb3Details } from "./ActionViaWeb3Details";
 import { CollateralTokenSelectorToggle } from "./CollateralTokenSelectorToggle";
+import TagManager from 'react-gtm-module';
+import {FulcrumProvider} from "../../../fulcrum/src/services/FulcrumProvider";
 
 export interface IBorrowFormProps {
   borrowAsset: Asset;
@@ -130,7 +132,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
               <div className={`borrow-form-insufficient-balance ${!this.state.balanceTooLow ? `borrow-form-insufficient-balance--hidden` : ``}`}>
                 Insufficient {this.state.collateralAsset} balance in your wallet!
               </div>
-    
+
               <hr className="borrow-form__delimiter" />
             </React.Fragment>
           )}
@@ -185,7 +187,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
     if (this.props.onSubmit && !this.props.didSubmit && this.state.depositAmount.gt(0)) {
       if (this.props.walletType === WalletType.Web3) {
         this.props.toggleDidSubmit(true);
-        
+
         let assetBalance = await TorqueProvider.Instance.getAssetTokenBalanceOfUser(this.state.collateralAsset);
         if (this.state.collateralAsset === Asset.ETH) {
           assetBalance = assetBalance.gt(TorqueProvider.Instance.gasBufferForTxn) ? assetBalance.minus(TorqueProvider.Instance.gasBufferForTxn) : new BigNumber(0);
@@ -209,6 +211,28 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
           });
         }
       }
+      let randomNumber = Math.floor(Math.random() * 100000) + 1;
+      const usdAmount = await TorqueProvider.Instance.getSwapToUsdRate(this.props.borrowAsset);
+      let usdPrice = this.state.borrowAmount
+      if (usdPrice !== null){
+          usdPrice = usdPrice.multipliedBy(usdAmount)
+      }
+      const tagManagerArgs = {
+        dataLayer: {
+            event: 'purchase',
+            transactionId: randomNumber,
+            transactionTotal: new BigNumber(usdPrice),
+            transactionProducts: [{
+            name: "Borrow-"+this.props.borrowAsset,
+            sku: "Borrow-"+this.props.borrowAsset +'-'+ this.state.collateralAsset ,
+            category: "Borrow",
+            price: new BigNumber(usdPrice),
+            quantity: 1
+          }],
+        }
+      }
+      console.log("tagManagerArgs = ",tagManagerArgs)
+      TagManager.dataLayer(tagManagerArgs)
 
       this.props.onSubmit(
         new BorrowRequest(
@@ -229,7 +253,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
       asset,
       this.state.borrowAmount
     );
-    
+
     let assetBalance = await TorqueProvider.Instance.getAssetTokenBalanceOfUser(asset);
     if (asset === Asset.ETH) {
       assetBalance = assetBalance.gt(TorqueProvider.Instance.gasBufferForTxn) ? assetBalance.minus(TorqueProvider.Instance.gasBufferForTxn) : new BigNumber(0);

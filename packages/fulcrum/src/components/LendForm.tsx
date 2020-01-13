@@ -12,7 +12,8 @@ import { LendType } from "../domain/LendType";
 import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
-import configProviders from "./../config/providers.json";
+import { DaiOrChaiSelector } from "./DaiOrChaiSelector";
+// import configProviders from "./../config/providers.json";
 import { EthOrWethSelector } from "./EthOrWethSelector";
 
 // TagManager.initialize({
@@ -50,11 +51,15 @@ interface ILendFormState {
   interestRate: BigNumber | null;
   lendAmount: BigNumber | null;
   maxLendAmount: BigNumber | null;
+  maxTokenAmount: BigNumber | null;
   lendedAmountEstimate: BigNumber | null;
   ethBalance: BigNumber | null;
   iTokenAddress: string;
   maybeNeedsApproval: boolean;
   useWrapped: boolean;
+  useWrappedDai: boolean;
+  tokenPrice: BigNumber | null;
+  chaiPrice: BigNumber | null;
 }
 
 export class LendForm extends Component<ILendFormProps, ILendFormState> {
@@ -79,12 +84,16 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
       lendAmountText: "0",
       lendAmount: null,
       maxLendAmount: null,
+      maxTokenAmount: null,
       lendedAmountEstimate: null,
       interestRate: null,
       ethBalance: null,
       iTokenAddress: "",
       maybeNeedsApproval: false,
-      useWrapped: false
+      useWrapped: false,
+      useWrappedDai: false,
+      tokenPrice: null,
+      chaiPrice: null
     };
 
     this._inputChange = new Subject();
@@ -127,18 +136,35 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
     if(this.props.isMobileMedia){
       assetDetails = AssetsDictionaryMobile.assets.get(this.props.asset);
     }
+
+    let assetOrWrapped: Asset;
+    if (this.props.asset === Asset.ETH) {
+      assetOrWrapped = this.state.useWrapped ? Asset.WETH : Asset.ETH;
+    } else if (this.props.asset === Asset.DAI) {
+      assetOrWrapped = this.state.useWrappedDai ? Asset.CHAI : Asset.DAI;
+    } else {
+      assetOrWrapped = this.props.asset;
+    }
+    
     const interestRate = await FulcrumProvider.Instance.getLendTokenInterestRate(this.props.asset);
-    const maxLendAmount = (await FulcrumProvider.Instance.getMaxLendValue(
-      new LendRequest(this.props.lendType, this.state.useWrapped ? Asset.WETH : this.props.asset, new BigNumber(0))
+    const maxLendAmountArr = (await FulcrumProvider.Instance.getMaxLendValue(
+      new LendRequest(this.props.lendType, assetOrWrapped, new BigNumber(0))
     ));
-    const lendRequest = new LendRequest(this.props.lendType, this.state.useWrapped ? Asset.WETH : this.props.asset, maxLendAmount);
+    const maxLendAmount: BigNumber = maxLendAmountArr[0];
+    const maxTokenAmount: BigNumber = maxLendAmountArr[1];
+    const tokenPrice: BigNumber = maxLendAmountArr[2];
+    const chaiPrice: BigNumber = maxLendAmountArr[3];
+
+    const lendRequest = new LendRequest(this.props.lendType, assetOrWrapped, maxLendAmount);
     const lendedAmountEstimate = await FulcrumProvider.Instance.getLendedAmountEstimate(lendRequest);
     const ethBalance = await FulcrumProvider.Instance.getEthBalance();
     const address = FulcrumProvider.Instance.contractsSource ?
       await FulcrumProvider.Instance.contractsSource.getITokenErc20Address(this.props.asset) || "" :
       "";
 
-    const maybeNeedsApproval = await FulcrumProvider.Instance.checkCollateralApprovalForLend(this.state.useWrapped ? Asset.WETH : this.props.asset);
+    const maybeNeedsApproval = this.props.lendType === LendType.LEND ?
+      await FulcrumProvider.Instance.checkCollateralApprovalForLend(assetOrWrapped) :
+      false;
 
     this.setState({
       ...this.state,
@@ -146,11 +172,14 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
       lendAmountText: maxLendAmount.decimalPlaces(this._inputPrecision).toFixed(),
       lendAmount: maxLendAmount,
       maxLendAmount: maxLendAmount,
+      maxTokenAmount: maxTokenAmount,
       lendedAmountEstimate: lendedAmountEstimate,
       interestRate: interestRate,
       ethBalance: ethBalance,
       iTokenAddress: address,
-      maybeNeedsApproval: maybeNeedsApproval
+      maybeNeedsApproval: maybeNeedsApproval,
+      tokenPrice: tokenPrice,
+      chaiPrice: chaiPrice
     });
   }
 
@@ -175,7 +204,8 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
     if (
       this.props.lendType !== prevProps.lendType ||
       this.props.asset !== prevProps.asset ||
-      this.state.useWrapped !== prevState.useWrapped
+      this.state.useWrapped !== prevState.useWrapped ||
+      this.state.useWrappedDai !== prevState.useWrappedDai
     ) {
       this.derivedUpdate();
     }
@@ -200,8 +230,10 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
     const tokenNameBase = this.state.assetDetails.displayName;
     const tokenNamePosition = `i${this.state.assetDetails.displayName}`;
 
-    const tokenNameSource = this.props.lendType === LendType.LEND ? tokenNameBase : tokenNamePosition;
-    const tokenNameDestination = this.props.lendType === LendType.LEND ? tokenNamePosition : tokenNameBase;
+    // const tokenNameSource = this.props.lendType === LendType.LEND ? tokenNameBase : tokenNamePosition;
+    // const tokenNameDestination = this.props.lendType === LendType.LEND ? tokenNamePosition : tokenNameBase;
+    const tokenNameSource = tokenNameBase;
+    const tokenNameDestination = tokenNamePosition;
 
     const isAmountMaxed = this.state.lendAmount ? this.state.lendAmount.eq(this.state.maxLendAmount!) : false;
 
@@ -238,7 +270,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
             </div>
             <div className="lend-form__kv-container">
               <div className="lend-form__label">{this.props.lendType === LendType.LEND ? `Lend Amount` : `UnLend Amount`}</div>
-              {this.props.lendType !== LendType.LEND &&
+              {/*this.props.lendType !== LendType.LEND &&
                 this.state.iTokenAddress &&
                 FulcrumProvider.Instance.web3ProviderSettings &&
                 FulcrumProvider.Instance.web3ProviderSettings.etherscanURL ? (
@@ -260,6 +292,15 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
                 ) : (
                   <div className="lend-form__value">{tokenNameSource}</div>
                 )
+              */}
+              {
+                this.props.asset === Asset.ETH ? (
+                  <EthOrWethSelector items={[Asset.ETH, Asset.WETH]} value={this.state.useWrapped ? Asset.WETH : Asset.ETH} onChange={this.onChangeUseWrapped} />
+                ) : this.props.asset === Asset.DAI ? (
+                    <DaiOrChaiSelector items={[Asset.DAI, Asset.CHAI]} value={this.state.useWrappedDai ? Asset.CHAI : Asset.DAI} onChange={this.onChangeUseWrappedDai} />
+                  ) : (
+                    <div className="lend-form__value">{tokenNameSource}</div>
+                  )
               }
             </div>
             <div className="lend-form__amount-container">
@@ -288,7 +329,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
                 >
                   {/*<span className="rounded-mark">?</span>*/}
                 </Tooltip>
-                {this.props.lendType === LendType.LEND &&
+                {
                   this.state.iTokenAddress &&
                   FulcrumProvider.Instance.web3ProviderSettings &&
                   FulcrumProvider.Instance.web3ProviderSettings.etherscanURL ? (
@@ -349,6 +390,14 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
     }
   };
 
+  public onChangeUseWrappedDai = async (asset: Asset) => {
+    if (this.state.useWrappedDai && asset === Asset.DAI) {
+      this.setState({ ...this.state, useWrappedDai: false });
+    } else if (!this.state.useWrappedDai && asset === Asset.CHAI) {
+      this.setState({ ...this.state, useWrappedDai: true });
+    }
+  };
+
   public onInsertMaxValue = async () => {
     if (!this.state.assetDetails) {
       return null;
@@ -395,13 +444,30 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
       return;
     }
 
-    if (!this.state.lendAmount.isPositive()) {
+    if (!this.state.lendAmount.isPositive() || !this.state.tokenPrice || !this.state.maxTokenAmount || !this.state.maxLendAmount) {
       this.props.onCancel();
       return;
     }
 
-    let usdPrice = this.state.lendAmount
-    if(usdPrice != null){
+    let sendAmount;
+    if (this.props.lendType === LendType.LEND) {
+      sendAmount = this.state.lendAmount;
+    } else {
+      sendAmount = this.state.lendAmount.gte(this.state.maxLendAmount) ?
+        this.state.maxTokenAmount :
+        this.state.lendAmount.multipliedBy(10 ** 18).dividedBy(this.state.tokenPrice);
+
+      if (this.props.asset === Asset.CHAI && this.state.chaiPrice) {
+        sendAmount = sendAmount.multipliedBy(this.state.chaiPrice).dividedBy(10 ** 18);
+      }
+
+      if (sendAmount.gt(this.state.maxTokenAmount)) {
+        sendAmount = this.state.maxTokenAmount;
+      } 
+    }
+
+    let usdPrice = sendAmount
+    if (usdPrice !== null) {
         usdPrice = usdPrice.multipliedBy(usdAmount)
     }
 
@@ -420,22 +486,43 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
         }],
       }
     }
-    TagManager.dataLayer(tagManagerArgs)
-    this.props.onSubmit(
+    TagManager.dataLayer(tagManagerArgs);
 
+    let assetOrWrapped: Asset;
+    if (this.props.asset === Asset.ETH) {
+      assetOrWrapped = this.state.useWrapped ? Asset.WETH : Asset.ETH;
+    } else if (this.props.asset === Asset.DAI) {
+      assetOrWrapped = this.state.useWrappedDai ? Asset.CHAI : Asset.DAI;
+    } else {
+      assetOrWrapped = this.props.asset;
+    }
+
+    // console.log(`send amount`,sendAmount.toString());
+
+    this.props.onSubmit(
       new LendRequest(
         this.props.lendType,
-        this.state.useWrapped ? Asset.WETH : this.props.asset,
-        this.state.lendAmount
+        assetOrWrapped,
+        sendAmount
       )
     );
   };
 
   private rxFromMaxAmount = (): Observable<ILendAmountChangeEvent | null> => {
+    
+    let assetOrWrapped: Asset;
+    if (this.props.asset === Asset.ETH) {
+      assetOrWrapped = this.state.useWrapped ? Asset.WETH : Asset.ETH;
+    } else if (this.props.asset === Asset.DAI) {
+      assetOrWrapped = this.state.useWrappedDai ? Asset.CHAI : Asset.DAI;
+    } else {
+      assetOrWrapped = this.props.asset;
+    }
+    
     return new Observable<ILendAmountChangeEvent | null>(observer => {
       const lendRequest = new LendRequest(
         this.props.lendType,
-        this.state.useWrapped ? Asset.WETH : this.props.asset,
+        assetOrWrapped,
         this.state.maxLendAmount || new BigNumber(0)
       );
 
@@ -488,9 +575,18 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
       }
 
       if (!amount.isNaN()) {
+        let assetOrWrapped: Asset;
+        if (this.props.asset === Asset.ETH) {
+          assetOrWrapped = this.state.useWrapped ? Asset.WETH : Asset.ETH;
+        } else if (this.props.asset === Asset.DAI) {
+          assetOrWrapped = this.state.useWrappedDai ? Asset.CHAI : Asset.DAI;
+        } else {
+          assetOrWrapped = this.props.asset;
+        }
+        
         const lendRequest = new LendRequest(
           this.props.lendType,
-          this.state.useWrapped ? Asset.WETH : this.props.asset,
+          assetOrWrapped,
           amount
         );
 

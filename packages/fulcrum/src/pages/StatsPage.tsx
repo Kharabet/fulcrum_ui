@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { PureComponent } from "react";
 import { StatsTokenGrid } from "../components/StatsTokenGrid";
 import { Footer } from "../layout/Footer";
 import { HeaderOps } from "../layout/HeaderOps";
@@ -15,7 +15,7 @@ export interface IStatsPageProps {
 interface IStatsPageState {
 }
 
-export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
+export class StatsPage extends PureComponent<IStatsPageProps, IStatsPageState> {
   constructor(props: any) {
     super(props);
 

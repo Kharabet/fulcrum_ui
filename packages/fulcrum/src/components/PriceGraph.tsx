@@ -1,14 +1,15 @@
 import { BigNumber } from "@0x/utils";
 import moment from "moment";
-import React, { Component, ReactNode } from "react";
+import React, {ChangeEvent, Component, ReactNode} from "react";
 import { Line, LineChart, ReferenceLine, ResponsiveContainer, Tooltip, TooltipProps } from "recharts";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { IPriceDataPoint } from "../domain/IPriceDataPoint";
 // import { Change24HMarker, Change24HMarkerSize } from "./Change24HMarker";
 import { TradeTokenKey } from "../domain/TradeTokenKey";
-import { FulcrumProvider } from "../services/FulcrumProvider";
 import {TradeType} from "../domain/TradeType";
+import { FulcrumProvider } from "../services/FulcrumProvider";
+import { CheckBox } from "./CheckBox";
 
 export interface IPriceGraphProps {
   data: IPriceDataPoint[];
@@ -16,6 +17,8 @@ export interface IPriceGraphProps {
   isLong: boolean;
   isShort: boolean;
   changeActiveBtn:  (activeType:string) => void;
+  showMyTokensOnly: boolean;
+  onShowMyTokensOnlyChange: (value: boolean) => void;
 }
 
 interface IPriceGraphState {
@@ -25,6 +28,7 @@ interface IPriceGraphState {
   liquidationPrice: number | null;
   liquidationPriceNormed: number | null;
   assetDetails: AssetDetails | null;
+
 }
 
 export class PriceGraph extends Component<IPriceGraphProps, IPriceGraphState> {
@@ -89,12 +93,13 @@ export class PriceGraph extends Component<IPriceGraphProps, IPriceGraphState> {
     /*let liq
       const liquidationPrice = this.props.data.length > 0 && this.props.data
       ? */
-    let changeActiveBtn  =   this.props.changeActiveBtn;
-    let isMobileMedia = (window.innerWidth <= 959);
+    const changeActiveBtn  =   this.props.changeActiveBtn;
+    const isMobileMedia = (window.innerWidth <= 959);
     return (
       <div className="price-graph">
-        {(isMobileMedia ?
+        {(isMobileMedia && !this.props.showMyTokensOnly ?
         <div className="trade-token-grid-row__col-action-mb">
+
           <button className={"trade-token-grid-row__group-button button-lg " + (this.props.isLong ? 'btn-active': '' )} onClick={() => changeActiveBtn('long')}>
             Long
           </button>
@@ -102,8 +107,16 @@ export class PriceGraph extends Component<IPriceGraphProps, IPriceGraphState> {
             Short
           </button>
         </div> : '')}
+
+        {(isMobileMedia && this.props.showMyTokensOnly ?
+            <div className="trade-token-grid-header__col-actions">
+              <span className="">
+                <CheckBox checked={this.props.showMyTokensOnly} onChange={this.showMyTokensOnlyChange}>Manage Open Positions</CheckBox>
+              </span>
+            </div>
+          :'')}
         <div className="price-graph__hovered-time-container">
-          <div className="price-graph__hovered-price-marker" style={{ fontSize: `2rem` }}>{this.state.assetDetails ? this.state.assetDetails.labelName : ``}</div>
+          <div className="price-graph__hovered-price-marker-label" >{this.state.assetDetails ? this.state.assetDetails.labelName : ``}</div>
           <div className="price-graph__hovered-time-delimiter">
             <div />
           </div>
@@ -114,7 +127,8 @@ export class PriceGraph extends Component<IPriceGraphProps, IPriceGraphState> {
           <Change24HMarker value={change24h} size={Change24HMarkerSize.LARGE} />
         </div>*/}
         <div className="price-graph__graph-container">
-          <ResponsiveContainer width="100%" height={160}>
+          {isMobileMedia ?
+            (<ResponsiveContainer className="price-graph__line" width="80%" height={60}>
             <LineChart data={this.state.data}>
               <Tooltip content={this.renderTooltip} />
 
@@ -132,7 +146,28 @@ export class PriceGraph extends Component<IPriceGraphProps, IPriceGraphState> {
                 <ReferenceLine y={this.state.liquidationPriceNormed} stroke="#ff0000" strokeDasharray="5 5" />
               ): ``}
             </LineChart>
-          </ResponsiveContainer>
+          </ResponsiveContainer>)
+            :
+
+            (<ResponsiveContainer width="100%" height={160}>
+            <LineChart data={this.state.data}>
+              <Tooltip content={this.renderTooltip} />
+
+              <Line
+                type="monotone"
+                dataKey="price"
+                animationDuration={500}
+                dot={false}
+                activeDot={false}
+                stroke={this.state.assetDetails ? this.state.assetDetails.bgColor : `#ffffff`}
+                strokeWidth={2}
+              />
+
+              {this.state.liquidationPriceNormed ? (
+                <ReferenceLine y={this.state.liquidationPriceNormed} stroke="#ff0000" strokeDasharray="5 5" />
+              ): ``}
+            </LineChart>
+          </ResponsiveContainer>)}
         </div>
         <div className="price-graph__timeline">
           <div className="price-graph__timeline-from">{timeStampFromText}</div>
@@ -141,6 +176,10 @@ export class PriceGraph extends Component<IPriceGraphProps, IPriceGraphState> {
         </div>
       </div>
     );
+  }
+
+  public showMyTokensOnlyChange = (event: ChangeEvent<HTMLInputElement>) => {
+    this.props.onShowMyTokensOnlyChange(event.target.checked);
   }
 
   public renderTooltip = (e: TooltipProps): ReactNode => {

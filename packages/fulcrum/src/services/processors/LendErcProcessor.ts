@@ -1,4 +1,4 @@
-import { BigNumber } from "bignumber.js";
+import { BigNumber } from "@0x/utils";
 import { erc20Contract } from "../../contracts/erc20";
 import { iTokenContract } from "../../contracts/iTokenContract";
 import { AssetsDictionary } from "../../domain/AssetsDictionary";
@@ -6,6 +6,7 @@ import { LendRequest } from "../../domain/LendRequest";
 import { RequestTask } from "../../domain/RequestTask";
 import { FulcrumProviderEvents } from "../events/FulcrumProviderEvents";
 import { FulcrumProvider } from "../FulcrumProvider";
+import { Asset } from "../../domain/Asset";
 
 export class LendErcProcessor {
   public run = async (task: RequestTask, account: string, skipGas: boolean) => {
@@ -62,10 +63,14 @@ export class LendErcProcessor {
 
       let gasAmountBN;
 
+      if (taskRequest.asset === Asset.DAI) {
+        skipGas = true;
+      }
+
       // Waiting for token allowance
       if (approvePromise || skipGas) {
         await approvePromise;
-        gasAmountBN = new BigNumber(3000000);
+        gasAmountBN = new BigNumber(600000);
       } else {
         // estimating gas amount
         const gasAmount = await tokenContract.mint.estimateGasAsync(account, amountInBaseUnits, { from: account, gas: FulcrumProvider.Instance.gasLimit });

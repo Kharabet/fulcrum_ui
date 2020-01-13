@@ -229,7 +229,9 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       ? await FulcrumProvider.Instance.contractsSource.getPTokenErc20Address(tradeTokenKey) || ""
       : "";
 
-    const maybeNeedsApproval = await FulcrumProvider.Instance.checkCollateralApprovalForTrade(tradeRequest);
+    const maybeNeedsApproval = this.props.tradeType === TradeType.BUY ?
+      await FulcrumProvider.Instance.checkCollateralApprovalForTrade(tradeRequest) :
+      false;
 
     const latestPriceDataPoint = await FulcrumProvider.Instance.getTradeTokenAssetLatestDataPoint(tradeTokenKey);
     const liquidationPrice = new BigNumber(latestPriceDataPoint.liquidationPrice);
@@ -333,7 +335,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
           : (this.state.tradeAmountValue.gt(0) && this.state.slippageRate.eq(0))
             && (this.state.collateral === Asset.ETH || !this.state.maybeNeedsApproval)
             ? ``// `Your trade is too small.`
-            : this.state.slippageRate.gt(0) // gte(0.2)
+            : this.state.slippageRate.gt(0) && this.state.slippageRate.lt(99) // gte(0.2)
               ? `Slippage:`
               : "";
 

@@ -1,10 +1,11 @@
-import { BigNumber } from "bignumber.js";
+import { BigNumber } from "@0x/utils";
 import { iTokenContract } from "../../contracts/iTokenContract";
 import { AssetsDictionary } from "../../domain/AssetsDictionary";
 import { LendRequest } from "../../domain/LendRequest";
 import { RequestTask } from "../../domain/RequestTask";
 import { FulcrumProviderEvents } from "../events/FulcrumProviderEvents";
 import { FulcrumProvider } from "../FulcrumProvider";
+import { Asset } from "../../domain/Asset";
 
 export class UnlendErcProcessor {
   public run = async (task: RequestTask, account: string, skipGas: boolean) => {
@@ -15,7 +16,7 @@ export class UnlendErcProcessor {
     // Initializing loan
     const taskRequest: LendRequest = (task.request as LendRequest);
     const decimals: number = AssetsDictionary.assets.get(taskRequest.asset)!.decimals || 18;
-    const amountInBaseUnits = new BigNumber(taskRequest.amount.multipliedBy(10 ** decimals).toFixed(0, 1));
+    const amountInBaseUnits = new BigNumber(taskRequest.amount.multipliedBy(10 ** decimals).toFixed(0, 1)).plus(1);
     const tokenContract: iTokenContract | null = await FulcrumProvider.Instance.contractsSource.getITokenContract(taskRequest.asset);
     if (!tokenContract) {
       throw new Error("No iToken contract available!");
@@ -33,9 +34,13 @@ export class UnlendErcProcessor {
 
     let gasAmountBN;
 
+    if (taskRequest.asset === Asset.DAI) {
+      skipGas = true;
+    }
+
     // Waiting for token allowance
     if (skipGas) {
-      gasAmountBN = new BigNumber(3000000);
+      gasAmountBN = new BigNumber(600000);
     } else {
       // estimating gas amount
       const gasAmount = await tokenContract.burn.estimateGasAsync(account, amountInBaseUnits, { from: account, gas: FulcrumProvider.Instance.gasLimit });

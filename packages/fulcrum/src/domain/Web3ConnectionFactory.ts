@@ -261,10 +261,9 @@ export class Web3ConnectionFactory {
         //
         // }
 
-        let networkIdInt=1
+        const networkIdInt=1
         // const isMobileMedia = (window.innerWidth <= 959);
         if(isMobileMedia){
-
         Web3ConnectionFactory.networkId = networkIdInt;
             FulcrumProvider.Instance.unsupportedNetwork = false;
             let metaAccount = Web3ConnectionFactory.metamaskProvider.selectedAddress
@@ -274,6 +273,7 @@ export class Web3ConnectionFactory {
             if(metaAccount ==undefined){
               metaAccount =   Web3ConnectionFactory.userAccount.toString();
             }
+
             await FulcrumProvider.Instance.setWeb3ProviderMobileFinalize(
               providerType,
               [
