@@ -87,7 +87,7 @@ export class AssetsDictionary {
         btc_logo,
         btc_bg_btm,
         btc_ts,
-        "#F9B134",
+        "#884294",
         "#FFFFFF",
         "#FFFFFF",
         new Map<number, string | null>([
@@ -278,7 +278,7 @@ export class AssetsDictionary {
         knc_logo,
         knc_bg,
         knc_ts,
-        "#31766E",
+        "#49BC98",
         "#FFFFFF",
         "#FFFFFF",
         new Map<number, string | null>([
@@ -385,7 +385,7 @@ export class AssetsDictionaryMobile {
         btc_logo,
         btc_bg_btm,
         btc_ts,
-        "#F9B134",
+        "#884294",
         "#FFFFFF",
         "#FFFFFF",
         new Map<number, string | null>([
@@ -576,7 +576,7 @@ export class AssetsDictionaryMobile {
         knc_logo,
         knc_bg_btm,
         knc_ts,
-        "#31766E",
+        "#49BC98",
         "#FFFFFF",
         "#FFFFFF",
         new Map<number, string | null>([
