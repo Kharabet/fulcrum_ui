@@ -53,7 +53,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
                         {% include svg/step-1.svg %}
                     </div>
                     <h3 class="mb-20">Zero Platform fees</h3>
-                    <p>Whether you’re a lender or borrower, you stay in control of your keys.</p>
+                    <p>Enjoy zero fees on tokenized margin loans and margin positions with Fulcrum.</p>
                 </div>
             </div>
             <div class="col col-4 col-sm-6 col-xs-12">
@@ -62,7 +62,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
                         {% include svg/step-2.svg %}
                     </div>
                     <h3 class="mb-20">Non custodial</h3>
-                    <p>Whether you’re trader or lender, you stay in control of your keys and your assets.</p>
+                    <p>Whether you’re a trader or lender, our non-custodial platform puts you in control of your keys and assets.</p>
                 </div>
             </div>
             <div class="col col-4 col-sm-6 col-xs-12">
@@ -71,12 +71,11 @@ title: Crypto Margin Trading with Fulcrum | bZx
                         {% include svg/step-3.svg %}
                     </div>
                     <h3 class="mb-20">Everything is Tokenized</h3>
-                    <p>Margin positions are tokenized, minting ERC20s called pTokens. pTokens are static leverage tokens
-                        with
-                        variable interest rates.</p>
-                    <p>Margin loans are tokenized, minting ERC20s called iTokens. When a lender deposits ETH, DAI, etc
-                        into
-                        Fulcrum they receive iETH, iDAI, etc back.</p>
+                    <p>Tokenized margin loans and positions are transferrable, ERC20-compatible assets. </p>
+<br>
+<p>pTokens are tokenized margin positions offering static leverage with variable interest rates.</p>
+<br>
+<p>iTokens are tokenized margin loans offering interest on deposited funds.</p>
                 </div>
             </div>
             <div class="col col-4 col-sm-6 col-xs-12">
@@ -84,14 +83,10 @@ title: Crypto Margin Trading with Fulcrum | bZx
                     <div class="icon-advantager mb-25">
                         {% include svg/step-4.svg %}
                     </div>
-                    <h3 class="mb-20">Partial Liquidations with Minimal Penalties</h3>
-                    <p>Liquidation penalties are only slightly more than the gas cost required to liquidate. And there’s
-                        no
-                        reason for traders to be fully liquidated if their position goes under margin maintenance.
-                        Instead,
-                        traders are liquidated such that margin maintenance is brought from 15% to 25%. This reduces
-                        slippage,
-                        protects lenders, and allows traders to maintain their exposure.</p>
+                    <h3 class="mb-20">Minimal Liquidation Penalties</h3>
+                    <p>Why should borrowers be fully liquidated if their position goes under margin maintenance?<br></p>
+<p>Fulcrum liquidates traders such that margin maintenance is brought from 15% to 25%.</p><br>
+<p>This reduces slippage, protects lenders, and allows traders to maintain their exposure while reducing potential losses.</p>
                 </div>
             </div>
             <div class="col col-4 col-sm-6 col-xs-12">
@@ -99,12 +94,10 @@ title: Crypto Margin Trading with Fulcrum | bZx
                     <div class="icon-advantager mb-25">
                         {% include svg/step-5.svg %}
                     </div>
-                    <h3>Perpetual Positions</h3>
-                    <p>Trading positions automatically roll over and renew themselves without requiring any intervention
-                        from the trader and without rollover fees. This provides a great experience to traders as they
-                        don’t
-                        have to worry about expiration dates when they’re entering or holding positions. You can stay in
-                        position for as long as you want without worrying about fees!</p>
+                    <h3 class="mb-20">Perpetual Positions</h3>
+                    <p>Trading positions are automatically renewed with no intervention from the trader and zero rollover fees.  </p>
+                    <br>
+  <p>Without having to worry about expiration dates when entering or holding positions, users get to enjoy a frictionless trading experience.</p>
                 </div>
             </div>
         </div>
@@ -144,7 +137,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
             </div>   
             <div class="wrapper-result-gain f-3 flex fd-c">
                 <div class="flex fd-r">
-                <p>If 
+                <p>If
                     <span class="token-name">ETH</span> price goes&nbsp;
                     <div class="result-gain">
                         <span class="fw-800 eth-price">+5</span>%
@@ -293,38 +286,29 @@ title: Crypto Margin Trading with Fulcrum | bZx
                     {% include svg/icon-safe-1.svg %}
                 </div>
                 <h3 class="mb-20">Audited Smart Contracts</h3>
-                <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the
-                    industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type
-                    and scrambled it to make a type specimen book. It has survived not only five centuries, but also the
-                    leap into electronic typesetting, remaining essentially unchanged.</p>
-                <p>It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages,
-                    and more recently with desktop publishing software like Aldus PageMaker</p>
+                <p>The bZx base protocol successfully passed a security audit performed by leading blockchain security auditor ZK Labs.  </p>
+  <p>The audit noted that “The code is generally well structured and properly compartmentalized.”  </p>
+   <p>ZK Labs provides smart contract development and auditing services for projects built on Ethereum and is headed by Matthew DiFerrante, Dean Eigenmann, Nick Johnson, and Harry Roberts.</p>
             </div>
             <div class="col col-4 col-sm-12 item-safe fd-c">
                 <div class="icon-safe mb-50 mb-xs-15">
                     {% include svg/icon-safe-2.svg %}
                 </div>
                 <h3 class="mb-20">Insurance Fund</h3>
-                <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the
-                    industry's standard dummy text ever since the 1500s</p>
-                <p>When an unknown printer took a galley of type and scrambled it to make a type specimen book. It has
-                    survived not only five centuries, but also the leap into electronic typesetting, remaining
-                    essentially unchanged.</p>
-                <p>It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages,
-                    and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem
-                    Ipsum.</p>
+                <p>Lenders may lose money in the event that borrowers are not properly liquidated when their loans become undercollateralized.  </p>
+  <p>To mitigate this risk, Fulcrum automatically diverts 10% of the interest paid by borrowers to maintain an Insurance Fund.   </p>
+  <p>If borrowers are not properly liquidated, assets from the Insurance Fund are used to repay the lenders.
+To avoid slippage in the event the fund must pay out, collateralization of the fund has been diversified by allowing BZRX tokens to be exchanged for assets from the fund.</p>
+
             </div>
             <div class="col col-4 col-sm-12 item-safe fd-c">
                 <div class="icon-safe mb-50 mb-xs-15">
                     {% include svg/icon-safe-3.svg %}
                 </div>
                 <h3 class="mb-20">Open source</h3>
-                <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the
-                    industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type
-                    and scrambled it to make a type specimen book.</p>
-                <p>It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages,
-                    and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem
-                    Ipsum.</p>
+                <p>Would you prefer to evaluate our code yourself?  </p>
+  <p><a href="https://github.com/bZxNetwork">No problem!</a>    </p>  <p>As one of the founding principles of DeFi, we’re committed to interoperability and the development of open source code.  </p>
+  <p>Open sourcing code is how we continue to build DeFi legos in an accessible, transparent way.</p>
             </div>
         </div>
     </div>
