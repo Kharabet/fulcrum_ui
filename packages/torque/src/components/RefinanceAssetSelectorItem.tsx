@@ -163,8 +163,8 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
     const assetTypeModifier = "asset-selector-item--"+this.props.asset.toLowerCase();
     const assetsDt: any = this.getAssestsData()
     // let btnClass = !this.state.isLoading ? 'refinance-selector-icons-bar__button' : 'refinance-selector-icons-disabled__button';
-    let btnValue = this.state.isLoading ? 'Loading...' : 'Refinance with 3% APR Fixed' ;
-    let btnActiveValue = this.state.isTrack ? 'Track' :'Refinance with 3% APR Fixed'
+    let btnValue = this.state.isLoading ? 'Loading...' : 'Refinance with '+this.state.fixedApr.dp(1, BigNumber.ROUND_CEIL).toString()+'% APR Fixed' ;
+    let btnActiveValue = this.state.isTrack ? 'Track' :'Refinance with '+ this.state.fixedApr.dp(1, BigNumber.ROUND_CEIL).toString() +'% APR Fixed'
     let refRateYear = this.state.refinanceData[0].variableAPR.minus(this.state.fixedApr).multipliedBy(this.state.refinanceData[0].debt).dividedBy(100)  //.dp(3, BigNumber.ROUND_FLOOR) - this.state.fixedApr.dp(3, BigNumber.ROUND_FLOOR)
     let refRateMonth = refRateYear.dividedBy(12)
     if(this.state.refinanceData[0].isShowCard){
@@ -239,7 +239,7 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
         </div>
           ):null}
 
-        {this.state.refinanceData[0].variableAPR.gt(this.state.fixedApr) ?
+        {!this.state.refinanceData[0].variableAPR.gt(this.state.fixedApr) ?
         <div className="refinance-asset-selector__desc">
           <div className="refinance-asset-selector__simple" >{assetsDt.title}</div>
           <div className="refinance-asset-selector__rs">${refRateMonth.dp(2, BigNumber.ROUND_FLOOR).toString()}/mo or ${refRateYear.dp(2, BigNumber.ROUND_FLOOR).toString()}/yr</div>
