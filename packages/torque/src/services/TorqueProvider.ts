@@ -40,6 +40,7 @@ import configAddress from "../config/constant.json";
 import { ProviderChangedEvent } from "./events/ProviderChangedEvent";
 import { TorqueProviderEvents } from "./events/TorqueProviderEvents";
 import {vatContract} from "../contracts/vat";
+import {TradeTokenKey} from "../../../fulcrum/src/domain/TradeTokenKey";
 var Web3 = require('web3');
 var web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'));
 
@@ -427,7 +428,7 @@ export class TorqueProvider {
     if (srcAsset === destAsset) {
       return new BigNumber(1);
     }
-
+    // console.log("srcAmount 11 = "+srcAmount)
     let result: BigNumber = new BigNumber(0);
     if (process.env.REACT_APP_ETH_NETWORK === "mainnet" || process.env.REACT_APP_ETH_NETWORK === "kovan") {
       if (!srcAmount) {
@@ -435,7 +436,7 @@ export class TorqueProvider {
       } else {
         srcAmount = new BigNumber(srcAmount.toFixed(1, 1));
       }
-
+      // console.log("srcAmount 22 = "+srcAmount)
       const srcAssetErc20Address = this.getErc20AddressOfAsset(srcAsset);
       const destAssetErc20Address = this.getErc20AddressOfAsset(destAsset);
       if (this.contractsSource && srcAssetErc20Address && destAssetErc20Address) {
@@ -446,6 +447,7 @@ export class TorqueProvider {
             destAssetErc20Address,
             srcAmount
           );
+          // console.log("swapPriceData- ",swapPriceData[0])
           result = swapPriceData[0].dividedBy(10 ** 18);
 
         } catch(e) {
@@ -533,9 +535,12 @@ export class TorqueProvider {
         proxyAddress: '',
         isProxy:false
       }];
- 
+    // this.web3ProviderSettings = await TorqueProvider.getWeb3ProviderSettings(1);
+    // const vat = new Web3.eth.Contract("0x1476483dd8c35f25e568113c5f70249d3976ba21", "0x2252d3b2c12455d564abc21e328a1122679f8352")
+    // console.log("vat")
 
     const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+    // console.log("this.contractsSource.canWrite =",this.contractsSource.canWrite)
 
     if (this.web3Wrapper && this.contractsSource && account) {
       let tokencdpContract: GetCdpsContract | null = null;
@@ -645,7 +650,8 @@ export class TorqueProvider {
           proxyAddress:proxyAddress,
           isProxy: isProxy,
           isDisabled: false,
-          isShowCard:false
+          isShowCard:false,
+          variableAPR: new BigNumber(0)
         }]
     if (this.web3Wrapper && this.contractsSource) {
       let vatContract: vatContract | null = null;
@@ -653,27 +659,42 @@ export class TorqueProvider {
 
       let resp = await vatContract.urns.callAsync(ilk, urn)
       let respIlks = await vatContract.ilks.callAsync(ilk)
+      console.log("cdpId = ",cdpId)
+      console.log("respIlks - ",respIlks)
 
       let rateIlk = respIlks[1].dividedBy(10 ** 27)
       let ratio = 0
       let maintenanceMarginAmount = 1
       let colletralAmount = resp[0].dividedBy(10 ** 18)
       let debtAmount = resp[1].dividedBy(10 ** 18)
+      console.log("respIlks[1] - ",respIlks[1].toString())
+      let rateAmountIlkPerSecond = respIlks[1].dividedBy(10 ** 26)
+      let rateAmountIlkYr = rateAmountIlkPerSecond.multipliedBy(60*60*24*365).dividedBy(10 ** 8)
+      console.log("rateAmountIlk = ", parseFloat(rateAmountIlkYr.toString()))
 
       debtAmount = debtAmount.multipliedBy(rateIlk)
       let isShowCard=false
       if(parseFloat(colletralAmount.toString())>0 && parseFloat(debtAmount.toString())> 0) {
+        // if(cdpId.eq(240)){
         isShowCard=true
         const usdPrice = await this.getSwapToUsdRate(asset)
         const daitoUsd = debtAmount.multipliedBy(usdPrice)
+
+
         const usdPriceEth = await this.getSwapRate(Asset.ETH, Asset.SAI, colletralAmount)
+
         ratio = (parseFloat(usdPriceEth.toString()) * 100 * parseFloat(colletralAmount.toString())) / parseFloat(daitoUsd.toString())
+          // console.log("parseFloat(colletralAmount.toString()) = ",parseFloat(colletralAmount.toString()))
           console.log("colletralAmount = ",parseFloat(colletralAmount.toString()))
+          // console.log("usdPriceEth.toString() = ",usdPriceEth.toString())
+          // console.log("daitoUsd.toString()= ",daitoUsd.toString())
           console.log("ratio = ",ratio)
           console.log("CDP  = ",cdpId)
+        // }
+
         const iBZxContract = await this.contractsSource.getiBZxContract();
         const loansData = await iBZxContract.getBasicLoansData.callAsync(accountAddress, new BigNumber(50));
-
+        console.log("loansData = ",loansData)
         maintenanceMarginAmount = parseInt(loansData[0].maintenanceMarginAmount.dividedBy(10 ** 17).toString())
 
       }
@@ -701,7 +722,8 @@ export class TorqueProvider {
         proxyAddress:proxyAddress,
         isProxy: isProxy,
         isDisabled: isDisabled,
-        isShowCard:isShowCard
+        isShowCard:isShowCard,
+        variableAPR:rateAmountIlkYr,
       }]
     }
     return result
@@ -747,19 +769,26 @@ export class TorqueProvider {
             if(receipt != null){
               console.log("Status: ", receipt.status);
               // clearInterval(timer);
+
+
+
+
               if(receipt.status){
                 //Then call MigrateLoan function;
                 try{
-                  const cdpDsProxyResult2 = await tokendsProxyContract.execute.sendTransactionAsync(bridgeActionAddress, data, {from: refRequest.accountAddress})
-                  let receiptTransaction = await this.waitForTransactionMined(cdpDsProxyResult2);
+                  console.log("waiting start")
+                  window.setTimeout(() => {console.log("wait 2 second")}, 5000);
+                  console.log("waiting done")
+                    const cdpDsProxyResult2 = await tokendsProxyContract.execute.sendTransactionAsync(bridgeActionAddress, data, {from: refRequest.accountAddress})
+                    let receiptTransaction = await this.waitForTransactionMined(cdpDsProxyResult2);
+
                   // if(receiptTransaction.status){
                   //   alert("Proxy Migration loan transaction completed successfully.")
                   // }
                 }catch (e){
-
-                  // if(!e['code']){
-                  //     alert(e)
-                  //   }
+                  if(!e['code']){
+                      alert("Out of gas encountered during contract execution")
+                    }
                 }
 
               }
@@ -771,10 +800,10 @@ export class TorqueProvider {
 
               let tokenmakerBridgeContract: makerBridgeContract | null = null;
               tokenmakerBridgeContract = await this.contractsSource.getmakerBridge(configAddress.CDP_MANAGER)
-              var dsProxyAddress = refRequest.proxyAddress;
+              let dsProxyAddress = refRequest.proxyAddress;
 
               let proxyMigrationJson = await this.contractsSource.getProxyMigration()
-              var data = web3.eth.abi.encodeFunctionCall(proxyMigrationJson.default, [configAddress.Maker_Bridge_Address, [parseInt(refRequest.cdpId.toString())],[darts.toString()],[dinks.toString()],[dinks.toString()],[darts.toString()]]);
+              let data = web3.eth.abi.encodeFunctionCall(proxyMigrationJson.default, [configAddress.Maker_Bridge_Address, [parseInt(refRequest.cdpId.toString())],[darts.toString()],[dinks.toString()],[dinks.toString()],[darts.toString()]]);
 
 
               let tokendsProxyContract: dsProxyJsonContract | null = null;
@@ -789,9 +818,9 @@ export class TorqueProvider {
                   // }
               }catch (e){
 
-                // if(!e['code']){
-                //   alert(e)
-                // }
+                if(!e['code']){
+                  alert("Out of gas encountered during contract execution")
+                }
               }
 
 
@@ -819,9 +848,9 @@ export class TorqueProvider {
 
                 // alert("Migration loan transaction completed successfully.")
               }catch (e){
-                // if(!e['code']){
-                //   alert(e)
-                // }
+                if(!e['code']){
+                  alert("Out of gas encountered during contract execution")
+                }
               }
             }else{
               let tokenmakerBridgeContract: makerBridgeContract | null = null;
@@ -829,12 +858,14 @@ export class TorqueProvider {
               try {
 
                 const cdpsMakerresult = await tokenmakerBridgeContract.migrateLoan.sendTransactionAsync([refRequest.cdpId], [darts], [dinks], [dinks], [darts], {from: refRequest.accountAddress});
-                let receiptTransaction = await this.waitForTransactionMined(cdpsMakerresult);
+                console.log("cdpsMakerresult - ", cdpsMakerresult)
+                // let receiptTransaction = await this.waitForTransactionMined(cdpsMakerresult);
                 // alert("Migration loan transaction completed successfully.")
               }catch (e){
-                // if(!e['code']){
-                //   alert(e)
-                // }
+                console.log(e)
+                if(!e['code']){
+                  alert("Out of gas encountered during contract execution")
+                }
 
               }
             }

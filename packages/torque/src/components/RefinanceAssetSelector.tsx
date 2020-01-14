@@ -96,7 +96,9 @@ export class RefinanceAssetSelector extends Component<IRefinanceAssetSelectorPro
   private derivedUpdate = async () => {
     const refinanceData = await TorqueProvider.Instance.checkCdp(Asset.DAI);
     if(refinanceData[0].cdpId.gt(0)){
-      this.setState({ ...this.state, isLoading: false});
+      window.setTimeout(() => {
+        this.setState({ ...this.state, isLoading: false});
+      }, 1900);
     }
 
     this.setState({ ...this.state, refinanceData: refinanceData});
