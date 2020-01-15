@@ -169,8 +169,11 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
     // let btnClass = !this.state.isLoading ? 'refinance-selector-icons-bar__button' : 'refinance-selector-icons-disabled__button';
     let btnValue = this.state.isLoading ? 'Loading...' : 'Refinance with '+this.state.fixedApr.dp(1, BigNumber.ROUND_CEIL).toString()+'% APR Fixed' ;
     let btnActiveValue = this.state.isTrack ? 'Track' :'Refinance with '+ this.state.fixedApr.dp(1, BigNumber.ROUND_CEIL).toString() +'% APR Fixed'
-    let refRateYear = this.state.refinanceData[0].variableAPR.minus(this.state.fixedApr).multipliedBy(this.state.refinanceData[0].debt).dividedBy(100)  //.dp(3, BigNumber.ROUND_FLOOR) - this.state.fixedApr.dp(3, BigNumber.ROUND_FLOOR)
-    let refRateMonth = refRateYear.dividedBy(12)
+    // let refRateYear = this.state.refinanceData[0].variableAPR.minus(this.state.fixedApr)
+    //   refRateYear =   refRateYear.multipliedBy(this.state.refinanceData[0].debt)
+    //   refRateYear = refRateYear.dividedBy(100)  //.dp(3, BigNumber.ROUND_FLOOR) - this.state.fixedApr.dp(3, BigNumber.ROUND_FLOOR)
+    let refRateYear = ((parseFloat(this.state.refinanceData[0].variableAPR.dp(0, BigNumber.ROUND_CEIL).toString()) -  parseFloat(this.state.fixedApr.dp(1, BigNumber.ROUND_CEIL).toString())) * parseFloat(this.state.refinanceData[0].debt.dp(3, BigNumber.ROUND_FLOOR).toString()))/100;
+    let refRateMonth = refRateYear / 12
     let btnCls = this.state.refinanceData[0].variableAPR.gt(this.state.fixedApr) ? 'mt30' : '';
     if(this.state.refinanceData[0].isShowCard){
 
@@ -250,7 +253,7 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
           {this.state.refinanceData[0].variableAPR.gt(this.state.fixedApr) ?
           <div className="refinance-asset-selector__desc">
             <div className="refinance-asset-selector__simple" >Refinancing with <b>FIXED</b> rates could save you &nbsp;</div>
-            <div className="refinance-asset-selector__rs">${refRateMonth.dp(2, BigNumber.ROUND_FLOOR).toString()}/mo or ${refRateYear.dp(2, BigNumber.ROUND_FLOOR).toString()}/yr</div>
+            <div className="refinance-asset-selector__rs">${refRateMonth.toFixed(2)}/mo or ${refRateYear.toFixed(2)}/yr</div>
           </div>
             :<div className="refinance-asset-selector__desc"></div>
             }
