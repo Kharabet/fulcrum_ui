@@ -154,11 +154,15 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
     }else{
       this.setState({ ...this.state, isLoading:true });
       const refinanceData = await TorqueProvider.Instance.checkCdpManager(this.state.refinanceData[0], this.state.borrowAmount);
-      this.setState({ ...this.state, isLoading:false, isTrack:true });
+      if(refinanceData!==null){
+        this.setState({ ...this.state, isLoading:false, isTrack:true });
+      }else{
+        this.setState({ ...this.state, isLoading:false, isTrack:false });
+      }
+
     }
 
   }
-
   public render() {
     const assetTypeModifier = "asset-selector-item--"+this.props.asset.toLowerCase();
     const assetsDt: any = this.getAssestsData()
@@ -167,10 +171,12 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
     let btnActiveValue = this.state.isTrack ? 'Track' :'Refinance with '+ this.state.fixedApr.dp(1, BigNumber.ROUND_CEIL).toString() +'% APR Fixed'
     let refRateYear = this.state.refinanceData[0].variableAPR.minus(this.state.fixedApr).multipliedBy(this.state.refinanceData[0].debt).dividedBy(100)  //.dp(3, BigNumber.ROUND_FLOOR) - this.state.fixedApr.dp(3, BigNumber.ROUND_FLOOR)
     let refRateMonth = refRateYear.dividedBy(12)
+    let btnCls = this.state.refinanceData[0].variableAPR.gt(this.state.fixedApr) ? 'mt30' : '';
     if(this.state.refinanceData[0].isShowCard){
 
     return (
       <div className={`refinance-asset-selector-item `} >
+        <div className="refinance-asset-block">
         <div className="refinance-asset-selector__title">CDP {this.state.refinanceData[0].cdpId.toFixed(0)}
 
         </div>
@@ -189,7 +195,7 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
             <div className="refinance-asset-selector__aprtxt">Fixed APR</div>
             {/*<div className="refinance-asset-selector__imgtxt">{this.props.asset}</div>*/}
         </div>
-        <div className="refinance-asset-selector__row">
+        <div className="refinance-asset-selector__row mb2">
             <div className="refinance-asset-selector__inputBox">
               <div className="refinance__input-container">
                 <input
@@ -238,25 +244,27 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
 
         </div>
           ):null}
-
-        {!this.state.refinanceData[0].variableAPR.gt(this.state.fixedApr) ?
-        <div className="refinance-asset-selector__desc">
-          <div className="refinance-asset-selector__simple" >{assetsDt.title}</div>
-          <div className="refinance-asset-selector__rs">${refRateMonth.dp(2, BigNumber.ROUND_FLOOR).toString()}/mo or ${refRateYear.dp(2, BigNumber.ROUND_FLOOR).toString()}/yr</div>
         </div>
-          :<div className="refinance-asset-selector__desc"></div>
+        <div className="linehr"></div>
+          <div className="refinance-asset-block">
+          {this.state.refinanceData[0].variableAPR.gt(this.state.fixedApr) ?
+          <div className="refinance-asset-selector__desc">
+            <div className="refinance-asset-selector__simple" >Refinancing with <b>FIXED</b> rates could save you &nbsp;</div>
+            <div className="refinance-asset-selector__rs">${refRateMonth.dp(2, BigNumber.ROUND_FLOOR).toString()}/mo or ${refRateYear.dp(2, BigNumber.ROUND_FLOOR).toString()}/yr</div>
+          </div>
+            :<div className="refinance-asset-selector__desc"></div>
+            }
+
+          {this.state.refinanceData[0].isDisabled || this.state.borrowAmount.lte(0) || this.state.borrowAmount.gt(this.state.refinanceData[0].debt) || this.state.isLoading ?
+            <div className={`refinance-selector-icons__item refinance-selector-icons-disabled__button ${btnCls}`}>
+              {btnValue}
+            </div>
+            :
+            <div className={`refinance-selector-icons__item refinance-selector-icons-bar__button ${btnCls}`} onClick={this.checkCdpManager}>
+              {btnActiveValue}
+            </div>
           }
-
-        {this.state.refinanceData[0].isDisabled || this.state.borrowAmount.lte(0) || this.state.borrowAmount.gt(this.state.refinanceData[0].debt) || this.state.isLoading ?
-          <div className={`refinance-selector-icons__item refinance-selector-icons-disabled__button`}>
-            {btnValue}
           </div>
-          :
-          <div className={`refinance-selector-icons__item refinance-selector-icons-bar__button`} onClick={this.checkCdpManager}>
-            {btnActiveValue}
-          </div>
-        }
-
 
       </div>
     )
@@ -269,7 +277,7 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
     console.log("assestsType = ", this.props.asset)
     switch (this.props.asset) {
       case Asset.DAI:
-        return {name: "Compound", title:"Refinancing with Fixed rates could save you", img:bgDai}
+        return {name: "Compound", title:"Refinancing with <b>FIXED</b> rates could save you", img:bgDai}
         break;
       case Asset.SAI:
         return {name: "DX/DY", title:"Refinancing with Fixed rates could save you", img:bgSai}
