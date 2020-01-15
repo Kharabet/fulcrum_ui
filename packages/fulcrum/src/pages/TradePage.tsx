@@ -19,6 +19,9 @@ import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents"
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
 
+
+import { TVChartContainer } from '../components/TVChartContainer';
+
 export interface ITradePageProps {
   doNetworkConnect: () => void;
   isLoading: boolean;
@@ -70,8 +73,8 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
       isTokenAddressFormOpen: false,
       tradeTokenKey: TradeTokenKey.empty(),
       isManageCollateralModalOpen: false,
-      isLong:true,
-      isShort:false
+      isLong: true,
+      isShort: false
     };
     // let changeActiveBtn  = this.changeActiveBtn.bind(this);
 
@@ -98,14 +101,14 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
   }
 
   private async derivedUpdate() {
-    const priceGraphData = await FulcrumProvider.Instance.getPriceDataPoints(this.state.selectedKey);
-    this.setState({ ...this.state, selectedKey: this.state.selectedKey, priceGraphData: priceGraphData });
+    // const priceGraphData = await FulcrumProvider.Instance.getPriceDataPoints(this.state.selectedKey);
+    // this.setState({ ...this.state, selectedKey: this.state.selectedKey, priceGraphData: priceGraphData });
   }
-  public changeActiveBtn(activeType:string) {
-    if(activeType=='long'){
-      this.setState({ ...this.state, isLong: true, isShort:false });
-    }else{
-      this.setState({ ...this.state, isLong: false, isShort:true });
+  public changeActiveBtn(activeType: string) {
+    if (activeType == 'long') {
+      this.setState({ ...this.state, isLong: true, isShort: false });
+    } else {
+      this.setState({ ...this.state, isLong: false, isShort: true });
     }
   }
 
@@ -114,7 +117,10 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
       <div className="trade-page">
         <HeaderOps isMobileMedia={this.props.isMobileMedia} isLoading={this.props.isLoading} doNetworkConnect={this.props.doNetworkConnect} />
         <main>
-          <PriceGraph
+          <div className="chart-wrapper">
+            <TVChartContainer />
+          </div>
+          {/* <PriceGraph
             data={this.state.priceGraphData}
             selectedKey={this.state.selectedKey}
             isLong={this.state.isLong}
@@ -122,7 +128,7 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
             changeActiveBtn={this.changeActiveBtn.bind(this)}
             showMyTokensOnly={this.state.showMyTokensOnly}
             onShowMyTokensOnlyChange={this.onShowMyTokensOnlyChange}
-          />
+          /> */}
           {this.state.showMyTokensOnly ? (
             <OwnTokenGrid
               showMyTokensOnly={this.state.showMyTokensOnly}
@@ -135,19 +141,19 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
               onTrade={this.onTradeRequested}
             />
           ) : (
-            <TradeTokenGrid
-              isMobileMedia={this.props.isMobileMedia}
-              showMyTokensOnly={this.state.showMyTokensOnly}
-              selectedKey={this.state.selectedKey}
-              defaultLeverageShort={1}
-              defaultLeverageLong={2}
-              onShowMyTokensOnlyChange={this.onShowMyTokensOnlyChange}
-              onSelect={this.onSelect}
-              onTrade={this.onTradeRequested}
-              isLong={this.state.isLong}
-              isShort={this.state.isShort}
-            />
-          )}
+              <TradeTokenGrid
+                isMobileMedia={this.props.isMobileMedia}
+                showMyTokensOnly={this.state.showMyTokensOnly}
+                selectedKey={this.state.selectedKey}
+                defaultLeverageShort={1}
+                defaultLeverageLong={2}
+                onShowMyTokensOnlyChange={this.onShowMyTokensOnlyChange}
+                onSelect={this.onSelect}
+                onTrade={this.onTradeRequested}
+                isLong={this.state.isLong}
+                isShort={this.state.isShort}
+              />
+            )}
           <Modal
             isOpen={this.state.isTradeModalOpen}
             onRequestClose={this.onTradeRequestClose}
@@ -231,7 +237,7 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
     }
 
     if (request) {
-      this.setState({...this.state, isManageCollateralModalOpen: true});
+      this.setState({ ...this.state, isManageCollateralModalOpen: true });
     }
   };
 
