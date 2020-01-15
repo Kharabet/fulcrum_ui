@@ -35,7 +35,7 @@ function getLanguageFromURL(): LanguageCode | null {
 
 export class TVChartContainer extends React.PureComponent<Partial<ChartContainerProps>, ChartContainerState> {
 	public static defaultProps: ChartContainerProps = {
-		symbol: 'KNC_ETH',
+		symbol: 'ETH',
 		interval: 'D',
 		containerId: 'tv_chart_container',
 		datafeedUrl: 'https://api.kyber.network/chart',
@@ -46,7 +46,7 @@ export class TVChartContainer extends React.PureComponent<Partial<ChartContainer
 		userId: 'public_user_id',
 		fullscreen: false,
 		autosize: true,
-        studiesOverrides: {}
+		studiesOverrides: {}
 	};
 
 	private tvWidget: IChartingLibraryWidget | null = null;
@@ -60,7 +60,7 @@ export class TVChartContainer extends React.PureComponent<Partial<ChartContainer
 			interval: this.props.interval as ChartingLibraryWidgetOptions['interval'],
 			container_id: this.props.containerId as ChartingLibraryWidgetOptions['container_id'],
 			library_path: this.props.libraryPath as string,
-			
+
 			locale: getLanguageFromURL() || 'en',
 			disabled_features: ['use_localstorage_for_settings'],
 			enabled_features: ['study_templates'],
@@ -82,15 +82,29 @@ export class TVChartContainer extends React.PureComponent<Partial<ChartContainer
 				button.setAttribute('title', 'Click to show a notification popup');
 				button.classList.add('apply-common-tooltip');
 				button.addEventListener('click', () => tvWidget.showNoticeDialog({
-						title: 'Notification',
-						body: 'TradingView Charting Library API works correctly',
-						callback: () => {
-							console.log('Noticed!');
-						},
-					}));
+					title: 'Notification',
+					body: 'TradingView Charting Library API works correctly',
+					callback: () => {
+						console.log('Noticed!');
+					},
+				}));
 				button.innerHTML = 'Check API';
 			});
 		});
+	}
+
+	public changePair(baseSymbol: string) {
+		var widget = this.tvWidget;
+		if (widget) {
+			widget.onChartReady(() => {
+				if (widget) {
+
+				const chart = widget.chart();
+				const symbol = `${baseSymbol}_ETH`
+				chart.setSymbol(symbol, function e() {});
+				}
+			});
+		}
 	}
 
 	public componentWillUnmount(): void {
@@ -101,10 +115,13 @@ export class TVChartContainer extends React.PureComponent<Partial<ChartContainer
 	}
 
 	public render(): JSX.Element {
+		if (this.props.symbol)
+			this.changePair(this.props.symbol)
+			
 		return (
 			<div
-				id={ this.props.containerId }
-				className={ 'TVChartContainer' }
+				id={this.props.containerId}
+				className={'TVChartContainer'}
 			/>
 		);
 	}
