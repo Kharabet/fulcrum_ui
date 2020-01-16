@@ -12,8 +12,6 @@ import {
 	UdfResponse,
 } from './helpers';
 
-import axios from 'axios';
-
 import { Requester } from './requester';
 
 interface HistoryPartialDataResponse extends UdfOkResponse {
@@ -63,9 +61,9 @@ export class HistoryProvider {
 			to: rangeEndDate,
 		};
 
-		return new Promise(async (resolve: (result: GetBarsResult) => void, reject: (reason: string) => void) => {
+		return new Promise((resolve: (result: GetBarsResult) => void, reject: (reason: string) => void) => {
 			this._requester.sendRequest<HistoryResponse>(this._datafeedUrl, 'history', requestParams)
-				.then( async (response: HistoryResponse | UdfErrorResponse) => {
+				.then((response: HistoryResponse | UdfErrorResponse) => {
 					if (response.s !== 'ok' && response.s !== 'no_data') {
 						reject(response.errmsg);
 						return;
@@ -82,25 +80,20 @@ export class HistoryProvider {
 					} else {
 						const volumePresent = response.v !== undefined;
 						const ohlPresent = response.o !== undefined;
-						const rate = await axios.get("https://production-cache.kyber.network/rateETH").then((response: any) => {
 
-							console.log(response);
-							return response.data.data;
-						});
-						
 						for (let i = 0; i < response.t.length; ++i) {
 							const barValue: Bar = {
 								time: response.t[i] * 1000,
-								close: Number(response.c[i] * rate),
-								open: Number(response.c[i] * rate),
-								high: Number(response.c[i] * rate),
-								low: Number(response.c[i] * rate),
+								close: Number(response.c[i]),
+								open: Number(response.c[i]),
+								high: Number(response.c[i]),
+								low: Number(response.c[i]),
 							};
 
 							if (ohlPresent) {
-								barValue.open = Number((response as HistoryFullDataResponse).o[i]* rate);
-								barValue.high = Number((response as HistoryFullDataResponse).h[i]* rate);
-								barValue.low = Number((response as HistoryFullDataResponse).l[i])* rate;
+								barValue.open = Number((response as HistoryFullDataResponse).o[i]);
+								barValue.high = Number((response as HistoryFullDataResponse).h[i]);
+								barValue.low = Number((response as HistoryFullDataResponse).l[i]);
 							}
 
 							if (volumePresent) {

@@ -103,7 +103,7 @@ export class TVChartContainer extends React.PureComponent<Partial<ChartContainer
 				if (widget) {
 
 				const chart = widget.chart();
-				const symbol = `${baseSymbol}_ETH`
+				const symbol = `${baseSymbol}_SAI`
 				chart.setSymbol(symbol, function e() {});
 				}
 			});
