@@ -8,6 +8,7 @@ import { erc20Contract } from "../contracts/erc20";
 import { GetCdpsContract } from "../contracts/getCdps";
 import { cdpManagerContract } from "../contracts/cdpManager";
 import { makerBridgeContract } from "../contracts/makerBridge";
+import { saiToDAIBridgeContract } from "../contracts/saiToDaiBridge";
 import { proxyRegistryContract } from "../contracts/proxyRegistry";
 import { dsProxyJsonContract } from "../contracts/dsProxyJson";
 import { Asset } from "../domain/Asset";
@@ -582,7 +583,7 @@ export class TorqueProvider {
       proxyRegistryContract = await this.contractsSource.getProxyRegistery(configAddress.proxy_Contract_Address)
       const proxyRegistryResult = await proxyRegistryContract.proxies.callAsync( account)
 
-
+      console.log("proxyRegistryResult = ",proxyRegistryResult)
       if(proxyRegistryResult !== configAddress.Empty_Proxy_Address){
           let tokencdpContract: GetCdpsContract | null = null;
         tokencdpContract = await this.contractsSource.getCdpContract(configAddress.Get_CDPS);
@@ -726,6 +727,7 @@ export class TorqueProvider {
         variableAPR:rateAmountIlkYr,
       }]
     }
+
     return result
   }
 
@@ -781,7 +783,7 @@ export class TorqueProvider {
                   console.log("waiting done")
                     const cdpDsProxyResult2 = await tokendsProxyContract.execute.sendTransactionAsync(bridgeActionAddress, data, {from: refRequest.accountAddress})
                     let receiptTransaction = await this.waitForTransactionMined(cdpDsProxyResult2);
-
+                    return receiptTransaction
                   // if(receiptTransaction.status){
                   //   alert("Proxy Migration loan transaction completed successfully.")
                   // }
@@ -789,6 +791,7 @@ export class TorqueProvider {
                   if(!e['code']){
                       alert("Out of gas encountered during contract execution")
                     }
+                  return null
                 }
 
               }
@@ -813,6 +816,7 @@ export class TorqueProvider {
 
                 const cdpDsProxyResult2 = await tokendsProxyContract.execute.sendTransactionAsync(bridgeActionAddress, data, {from: refRequest.accountAddress})
                 let receiptTransaction = await this.waitForTransactionMined(cdpDsProxyResult2);
+                return receiptTransaction
                   // if(receiptTransaction.status){
                   //   alert("Proxy Migration loan transaction completed successfully.")
                   // }
@@ -821,6 +825,7 @@ export class TorqueProvider {
                 if(!e['code']){
                   alert("Out of gas encountered during contract execution")
                 }
+                return null
               }
 
 
@@ -843,6 +848,7 @@ export class TorqueProvider {
                 if(receipt.status){
                   const cdpsMakerresult = await tokenmakerBridgeContract.migrateLoan.sendTransactionAsync([refRequest.cdpId], [new BigNumber(darts)], [new BigNumber(dinks)], [new BigNumber(dinks)], [new BigNumber(darts)], {from: refRequest.accountAddress});
                   let receiptTransaction = await this.waitForTransactionMined(cdpsMakerresult);
+                  return receiptTransaction
                 }
 
 
@@ -851,6 +857,7 @@ export class TorqueProvider {
                 if(!e['code']){
                   alert("Out of gas encountered during contract execution")
                 }
+                return null
               }
             }else{
               let tokenmakerBridgeContract: makerBridgeContract | null = null;
@@ -858,7 +865,10 @@ export class TorqueProvider {
               try {
 
                 const cdpsMakerresult = await tokenmakerBridgeContract.migrateLoan.sendTransactionAsync([refRequest.cdpId], [darts], [dinks], [dinks], [darts], {from: refRequest.accountAddress});
+                let receiptTransaction = await this.waitForTransactionMined(cdpsMakerresult);
                 console.log("cdpsMakerresult - ", cdpsMakerresult)
+                return receiptTransaction
+
                 // let receiptTransaction = await this.waitForTransactionMined(cdpsMakerresult);
                 // alert("Migration loan transaction completed successfully.")
               }catch (e){
@@ -866,6 +876,7 @@ export class TorqueProvider {
                 if(!e['code']){
                   alert("Out of gas encountered during contract execution")
                 }
+                return null
 
               }
             }
@@ -878,6 +889,31 @@ export class TorqueProvider {
 
     }
   }
+
+  public migrateSaiToDai = async (loanOrderHash:string) => {
+
+    if (this.web3Wrapper && this.contractsSource) {
+      let tokenSaiToDaiContract: saiToDAIBridgeContract | null = null;
+      tokenSaiToDaiContract = await this.contractsSource.getSaitoDaiBridge(configAddress.SAI_TO_DAI_BRIDGE)
+      const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : '';
+      console.log("loanOrderHash = ",loanOrderHash)
+      try {
+        let respSaitoDai = await tokenSaiToDaiContract.migrateLoan.sendTransactionAsync(loanOrderHash, new BigNumber(0), {from: account})
+        console.log("respSaitoDai - ", respSaitoDai)
+        return respSaitoDai
+      }catch (e){
+        if(!e['code']){
+          alert("Out of gas encountered during contract execution")
+        }
+        return null
+      }
+      //        index 0 = 0x1476483dd8c35f25e568113c5f70249d3976ba21
+
+
+
+    }
+  }
+
   public checkMakerBridge = async (refRequest:RefinanceData) => {
 
     if (this.web3Wrapper && this.contractsSource) {
@@ -1075,7 +1111,9 @@ export class TorqueProvider {
     if (this.contractsSource) {
       const iBZxContract = await this.contractsSource.getiBZxContract();
       if (iBZxContract && walletDetails.walletAddress) {
+        console.log("walletDetails.walletAddress = ",walletDetails.walletAddress)
         const loansData = await iBZxContract.getBasicLoansData.callAsync(walletDetails.walletAddress, new BigNumber(50));
+        console.log("loansData = ",loansData)
         const zero = new BigNumber(0);
         result = loansData
           .filter(e => !e.loanTokenAmountFilled.eq(zero) && !e.collateralTokenAmountFilled.eq(zero))

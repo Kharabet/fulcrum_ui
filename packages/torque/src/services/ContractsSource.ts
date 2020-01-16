@@ -11,6 +11,7 @@ import { cdpManagerContract } from "../contracts/cdpManager";
 import { makerBridgeContract } from "../contracts/makerBridge";
 import { proxyRegistryContract } from "../contracts/proxyRegistry";
 import { dsProxyJsonContract } from "../contracts/dsProxyJson";
+import { saiToDAIBridgeContract } from "../contracts/saiToDaiBridge";
 
 import { Asset } from "../domain/Asset";
 
@@ -36,6 +37,7 @@ export class ContractsSource {
   private proxyMigrationsJson: any;
   public networkId: number;
   public canWrite: boolean;
+  public saiToDAIBridgeJson: any;
 
   public constructor(provider: any, networkId: number, canWrite: boolean) {
     this.provider = provider;
@@ -362,6 +364,7 @@ export class ContractsSource {
     this.dsProxyJson = await import(`./../assets/artifacts/${network}/dsProxyJson.json`);
     this.proxyMigrationsJson = await import(`./../assets/artifacts/${network}/proxyMigrations.json`);
     this.dsProxyIsAllowJson = await import(`./../assets/artifacts/${network}/dsProxyIsAllow.json`);
+    this.saiToDAIBridgeJson = await import(`./../assets/artifacts/${network}/saiToDAIBridge.json`);
     ContractsSource.isInit = true;
   }
 
@@ -393,6 +396,10 @@ export class ContractsSource {
     await this.Init();
     return new dsProxyJsonContract(this.dsProxyJson.abi, address.toLowerCase(), this.provider);
   }
+  private async getSaitoDaiBridgeRaw(address: string): Promise<saiToDAIBridgeContract> {
+    await this.Init();
+    return new saiToDAIBridgeContract(this.saiToDAIBridgeJson.abi, address.toLowerCase(), this.provider);
+  }
   private async getDsProxyAllowJSON(){
     return this.dsProxyIsAllowJson;
   }
@@ -403,6 +410,7 @@ export class ContractsSource {
 
   public getProxyMigration = _.memoize(this.getProxyMigrationJSON);
   public dsProxyAllowJson = _.memoize(this.getDsProxyAllowJSON);
+  public getSaitoDaiBridge = _.memoize(this.getSaitoDaiBridgeRaw);
   public getProxyRegistery = _.memoize(this.getProxyRegisteryRaw);
   public getDsProxy = _.memoize(this.getDsProxyRaw);
   public getmakerBridge = _.memoize(this.getmakerBridgeRaw);

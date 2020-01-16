@@ -55,7 +55,8 @@
   .refinance-page {
 
     padding: $page-padding-xs;
-
+    max-width: 100% !important;
+    width: 100%;
     .refinance-page__main {
       //padding-bottom: 200rem;
     }
