@@ -163,6 +163,9 @@ export class RefinanceAssetSelector extends Component<IRefinanceAssetSelectorPro
           <div className="refinance-page__main-centeredOverlay" style={ !this.state.isLoading ? { display: `none`} : undefined}>
               <span>Loading...</span>
           </div>
+          <div className="refinance-page__main-msgCentered" style={ this.state.isLoading && !items? { display: `none`} : undefined}>
+              <span>Looks like you don't have any Loans available to refinance.</span>
+          </div>
       {items}
       </div>;
   }
