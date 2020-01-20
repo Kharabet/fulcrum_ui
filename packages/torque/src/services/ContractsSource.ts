@@ -12,6 +12,7 @@ import { makerBridgeContract } from "../contracts/makerBridge";
 import { proxyRegistryContract } from "../contracts/proxyRegistry";
 import { dsProxyJsonContract } from "../contracts/dsProxyJson";
 import { saiToDAIBridgeContract } from "../contracts/saiToDaiBridge";
+import { instaRegistryContract } from "../contracts/instaRegistry";
 
 import { Asset } from "../domain/Asset";
 
@@ -38,6 +39,7 @@ export class ContractsSource {
   public networkId: number;
   public canWrite: boolean;
   public saiToDAIBridgeJson: any;
+  public instaRegistryeJson: any;
 
   public constructor(provider: any, networkId: number, canWrite: boolean) {
     this.provider = provider;
@@ -365,6 +367,7 @@ export class ContractsSource {
     this.proxyMigrationsJson = await import(`./../assets/artifacts/${network}/proxyMigrations.json`);
     this.dsProxyIsAllowJson = await import(`./../assets/artifacts/${network}/dsProxyIsAllow.json`);
     this.saiToDAIBridgeJson = await import(`./../assets/artifacts/${network}/saiToDAIBridge.json`);
+    this.instaRegistryeJson = await import(`./../assets/artifacts/${network}/instaRegistry.json`);
     ContractsSource.isInit = true;
   }
 
@@ -400,6 +403,10 @@ export class ContractsSource {
     await this.Init();
     return new saiToDAIBridgeContract(this.saiToDAIBridgeJson.abi, address.toLowerCase(), this.provider);
   }
+  private async getInstaRegistryRaw(address: string): Promise<instaRegistryContract> {
+    await this.Init();
+    return new instaRegistryContract(this.instaRegistryeJson.abi, address.toLowerCase(), this.provider);
+  }
   private async getDsProxyAllowJSON(){
     return this.dsProxyIsAllowJson;
   }
@@ -408,8 +415,12 @@ export class ContractsSource {
   }
 
 
+
+
+
   public getProxyMigration = _.memoize(this.getProxyMigrationJSON);
   public dsProxyAllowJson = _.memoize(this.getDsProxyAllowJSON);
+  public getInstaRegistry = _.memoize(this.getInstaRegistryRaw);
   public getSaitoDaiBridge = _.memoize(this.getSaitoDaiBridgeRaw);
   public getProxyRegistery = _.memoize(this.getProxyRegisteryRaw);
   public getDsProxy = _.memoize(this.getDsProxyRaw);

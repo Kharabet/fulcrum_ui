@@ -11,6 +11,8 @@ import { makerBridgeContract } from "../contracts/makerBridge";
 import { saiToDAIBridgeContract } from "../contracts/saiToDaiBridge";
 import { proxyRegistryContract } from "../contracts/proxyRegistry";
 import { dsProxyJsonContract } from "../contracts/dsProxyJson";
+import { instaRegistryContract } from "../contracts/instaRegistry";
+
 import { Asset } from "../domain/Asset";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { BorrowRequest } from "../domain/BorrowRequest";
@@ -579,6 +581,7 @@ export class TorqueProvider {
 
         }
 
+      // get Meta account proxies
       let proxyRegistryContract: proxyRegistryContract | null = null;
       proxyRegistryContract = await this.contractsSource.getProxyRegistery(configAddress.proxy_Contract_Address)
       const proxyRegistryResult = await proxyRegistryContract.proxies.callAsync( account)
@@ -614,27 +617,51 @@ export class TorqueProvider {
                 proxyAddress: proxyRegistryResult,
               });
             }
-
-
-
           }
-          // result.urn = result.urn.concat(urn)
-          // result.ilk = result.ilk.concat(ilk)
-          // result.cdpId = result.cdpId.concat(cdpId)
-          // result.isProxy = true
-          // result.proxyAddress = proxyRegistryResult
-          // result = {
-          //   'cdpId': cdpId,
-          //   'urn': urn,
-          //   'ilk': ilk,
-          //   'accountAddress': account,
-          //   isProxy: true,
-          //   proxyAddress: proxyRegistryResult,
-          // }
         }
+      }
 
-        // let dsProxyContract: dsProxyJsonContract | null = null;
-        // const proxyRegistryResult = await dsProxyContract.proxies.callAsync("0xf906930AC464dB04500e45147d24bf28979CD4f3")
+      // get InstaRegistry proxies
+      let instaRegistryContract: instaRegistryContract | null = null;
+      instaRegistryContract = await this.contractsSource.getInstaRegistry(configAddress.Insta_Registry_Address)
+      console.log("instaRegistryContract = ",instaRegistryContract)
+      console.log("user account address = ",account)
+      let instaRegistryResult = await instaRegistryContract.proxies.callAsync(account)
+
+      console.log("instaRegistryResult = ",instaRegistryResult)
+      if(instaRegistryResult !== configAddress.Empty_Proxy_Address){
+          let tokencdpContract: GetCdpsContract | null = null;
+        tokencdpContract = await this.contractsSource.getCdpContract(configAddress.Get_CDPS);
+        console.log("tokencdpContract = ",tokencdpContract)
+        if (account && tokencdpContract) {                                                                              //metamask 0x1476483dd8c35f25e568113c5f70249d3976ba21 account 0x2252d3b2c12455d564abc21e328a1122679f8352
+          const cdpsresult = await tokencdpContract.getCdpsAsc.callAsync(configAddress.CDP_MANAGER, instaRegistryResult); // multiple cdp 0xDF2Db45ed0df076e5D6d302B416A5971fF5Ad61F
+          console.log("cdpsresult INSTA = ",cdpsresult)
+          let cdpId = cdpsresult[0]
+          let urn = cdpsresult[1]
+          let ilk = cdpsresult[2]
+          for(var i=0;i<cdpId.length;i++){
+            if(!result[0].cdpId.gt(0)){
+              result = [{
+                'cdpId': cdpId[i],
+                'urn': urn[i],
+                'ilk': ilk[i],
+                'accountAddress': account,
+                'isProxy': false,
+                proxyAddress: '',
+              }];
+
+            }else{
+              result.push({
+                'cdpId': cdpId[i],
+                'urn': urn[i],
+                'ilk': ilk[i],
+                'accountAddress': account,
+                'isProxy': true,
+                proxyAddress: instaRegistryResult,
+              });
+            }
+          }
+        }
       }
 
     }
@@ -783,11 +810,18 @@ export class TorqueProvider {
                   console.log("waiting done")
                     const cdpDsProxyResult2 = await tokendsProxyContract.execute.sendTransactionAsync(bridgeActionAddress, data, {from: refRequest.accountAddress})
                     let receiptTransaction = await this.waitForTransactionMined(cdpDsProxyResult2);
-                    return receiptTransaction
+                    console.log("receiptTransaction = ",receiptTransaction)
+                    if(receiptTransaction.status==1){
+                      return receiptTransaction
+                    }else{
+                      return null
+                    }
+
                   // if(receiptTransaction.status){
                   //   alert("Proxy Migration loan transaction completed successfully.")
                   // }
                 }catch (e){
+                  console.log("EEEE = ",e)
                   if(!e['code']){
                       alert("Out of gas encountered during contract execution")
                     }
@@ -816,7 +850,12 @@ export class TorqueProvider {
 
                 const cdpDsProxyResult2 = await tokendsProxyContract.execute.sendTransactionAsync(bridgeActionAddress, data, {from: refRequest.accountAddress})
                 let receiptTransaction = await this.waitForTransactionMined(cdpDsProxyResult2);
-                return receiptTransaction
+                console.log("receiptTransaction = ",receiptTransaction)
+                if(receiptTransaction.status==1){
+                  return receiptTransaction
+                }else{
+                  return null
+                }
                   // if(receiptTransaction.status){
                   //   alert("Proxy Migration loan transaction completed successfully.")
                   // }
@@ -848,7 +887,11 @@ export class TorqueProvider {
                 if(receipt.status){
                   const cdpsMakerresult = await tokenmakerBridgeContract.migrateLoan.sendTransactionAsync([refRequest.cdpId], [new BigNumber(darts)], [new BigNumber(dinks)], [new BigNumber(dinks)], [new BigNumber(darts)], {from: refRequest.accountAddress});
                   let receiptTransaction = await this.waitForTransactionMined(cdpsMakerresult);
-                  return receiptTransaction
+                  if(receiptTransaction.status==1){
+                    return receiptTransaction
+                  }else{
+                    return null
+                  }
                 }
 
 
@@ -867,7 +910,11 @@ export class TorqueProvider {
                 const cdpsMakerresult = await tokenmakerBridgeContract.migrateLoan.sendTransactionAsync([refRequest.cdpId], [darts], [dinks], [dinks], [darts], {from: refRequest.accountAddress});
                 let receiptTransaction = await this.waitForTransactionMined(cdpsMakerresult);
                 console.log("cdpsMakerresult - ", cdpsMakerresult)
-                return receiptTransaction
+                if(receiptTransaction.status==1){
+                  return receiptTransaction
+                }else{
+                  return null
+                }
 
                 // let receiptTransaction = await this.waitForTransactionMined(cdpsMakerresult);
                 // alert("Migration loan transaction completed successfully.")
