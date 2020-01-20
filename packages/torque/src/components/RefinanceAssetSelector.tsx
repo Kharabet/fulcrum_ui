@@ -18,6 +18,7 @@ export interface IRefinanceAssetSelectorProps {
 interface IRefinanceAssetSelectorItemState {
   asset:Asset,
   isLoading:boolean;
+  isItems:boolean;
   refinanceData: RefinanceCdpData[];
 }
 
@@ -27,6 +28,7 @@ export class RefinanceAssetSelector extends Component<IRefinanceAssetSelectorPro
     this.state = {
       asset: Asset.DAI,
       isLoading:true,
+      isItems:false,
       refinanceData:
       [{
         cdpId: new BigNumber(0),
@@ -94,18 +96,30 @@ export class RefinanceAssetSelector extends Component<IRefinanceAssetSelectorPro
     this.derivedUpdate();
   }
   private derivedUpdate = async () => {
+    this.setState({ ...this.state, isLoading: true});
     const refinanceData = await TorqueProvider.Instance.checkCdp(Asset.DAI);
     console.log("refinanceData = ",refinanceData)
+    let isItem=false
+    for(var i=0;i<refinanceData.length; i++){
 
-
+      if(refinanceData[i].cdpId.gt(0)){
+        this.setState({ ...this.state, isItems: true});
+        isItem=true
+      }
+    }
+    if(!isItem){
+      this.setState({ ...this.state, isItems: false});
+    }
 
     if(refinanceData[0].cdpId.gt(0)){
       window.setTimeout(() => {
         this.setState({ ...this.state, isLoading: false});
+
       }, 1900);
     }else{
       window.setTimeout(() => {
         this.setState({ ...this.state, isLoading: false});
+
       }, 12000);
     }
 
@@ -120,6 +134,7 @@ export class RefinanceAssetSelector extends Component<IRefinanceAssetSelectorPro
     let refinance = this.state.refinanceData;
 
     let items;
+    let isItems=false
     if (this.props.walletType === WalletType.Web3) {
 
       if(refinance[0].cdpId.gt(0)) {
@@ -136,6 +151,7 @@ export class RefinanceAssetSelector extends Component<IRefinanceAssetSelectorPro
                                         isProxy={this.state.refinanceData[index].isProxy}
                                         ilk={this.state.refinanceData[index].ilk}/>
           );
+
         });
       }
     } else {
@@ -154,17 +170,19 @@ export class RefinanceAssetSelector extends Component<IRefinanceAssetSelectorPro
                                           isProxy={this.state.refinanceData[index].isProxy}
                                           ilk={this.state.refinanceData[index].ilk}/>
             );
+
           });
         }
       }
     }
+
     return <div className="refinance-asset-selector">
 
           <div className="refinance-page__main-centeredOverlay" style={ !this.state.isLoading ? { display: `none`} : undefined}>
               <span>Loading...</span>
           </div>
-          <div className="refinance-page__main-msgCentered" style={ this.state.isLoading && !items? { display: `none`} : undefined}>
-              <span>Looks like you don't have any Loans available to refinance.</span>
+          <div className="refinance-page__main-msgCentered" onClick={this.derivedUpdate} style={ this.state.isItems? { display: `none`} : undefined}>
+              <span>Looks like you don't have any loans available to refinance.</span>
           </div>
       {items}
       </div>;

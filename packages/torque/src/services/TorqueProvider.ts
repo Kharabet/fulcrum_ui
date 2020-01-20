@@ -38,7 +38,7 @@ import { Web3ConnectionFactory } from "../domain/Web3ConnectionFactory";
 import { BorrowRequestAwaitingStore } from "./BorrowRequestAwaitingStore";
 import { ContractsSource } from "./ContractsSource";
 import { NavService } from "./NavService";
-import configAddress from "../config/constant.json";
+import constantAddress from "../config/constant.json";
 
 import { ProviderChangedEvent } from "./events/ProviderChangedEvent";
 import { TorqueProviderEvents } from "./events/TorqueProviderEvents";
@@ -46,7 +46,12 @@ import {vatContract} from "../contracts/vat";
 import {TradeTokenKey} from "../../../fulcrum/src/domain/TradeTokenKey";
 var Web3 = require('web3');
 var web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'));
-
+let configAddress:any
+if(process.env.REACT_APP_ETH_NETWORK === "mainnet"){
+  configAddress = constantAddress.mainnet
+}else{
+  configAddress = constantAddress.kovan
+}
 
 export class TorqueProvider {
   public static Instance: TorqueProvider;
