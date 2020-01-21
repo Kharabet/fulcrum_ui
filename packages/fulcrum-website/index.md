@@ -181,7 +181,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
     <div class="container text-center">
         <div class="row">
             <div class="col col-12 fd-c">
-                <h2 class="circle jc-c mb-15"><span class="blue center top-r-60"></span>How to open leveraged position?</h2>
+                <h2 class="circle jc-c mb-25"><span class="blue center top-r-60"></span>How to open leveraged position?</h2>
                 <p class="fs-20 fs-sm-16 lh-150 c-secondary-blue mb-75 mb-sm-60">Three clicks. No Accounts. No fees.</p>
             </div>
         </div>
