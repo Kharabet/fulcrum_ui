@@ -46,10 +46,6 @@ export class AssetSelector extends Component<IAssetSelectorProps> {
       false
     ],
     [
-      Asset.REP,
-      false
-    ],
-    [
       Asset.KNC,
       false
     ],
