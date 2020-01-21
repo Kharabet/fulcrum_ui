@@ -10,7 +10,7 @@
     "Bridge_Action_contract": "0x2235cA95C748615d2A94f0b23Bb1a27F497433Cb",
     "Bridge_Action_Address": "0x2235cA95C748615d2A94f0b23Bb1a27F497433Cb",
     "SAI_TO_DAI_BRIDGE": "0xd8A4B5161DDB1a5c8d74C56EA3561a14C4AD2807",
-    "Insta_Registry_Address": "0x498b3bfabe9f73db90d252bcd4fa9548cd0fd981"
+    "Insta_Registry_Address": "0xdb4AF6e40090d0C1ea231150151368b52C2b2e02"
   },
   "mainnet": {
     "Get_CDPS": "0x36a724bd100c39f0ea4d3a20f7097ee01a8ff573",
