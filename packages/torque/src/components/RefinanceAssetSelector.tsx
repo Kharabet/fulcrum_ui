@@ -19,6 +19,7 @@ interface IRefinanceAssetSelectorItemState {
   asset:Asset,
   isLoading:boolean;
   isItems:boolean;
+  isShowRecord:boolean;
   refinanceData: RefinanceCdpData[];
 }
 
@@ -28,7 +29,8 @@ export class RefinanceAssetSelector extends Component<IRefinanceAssetSelectorPro
     this.state = {
       asset: Asset.DAI,
       isLoading:true,
-      isItems:false,
+      isItems:true,
+      isShowRecord:false,
       refinanceData:
       [{
         cdpId: new BigNumber(0),
@@ -96,18 +98,23 @@ export class RefinanceAssetSelector extends Component<IRefinanceAssetSelectorPro
     this.derivedUpdate();
   }
   private derivedUpdate = async () => {
-    this.setState({ ...this.state, isLoading: true});
+    let isItem=false
+    this.setState({ ...this.state, isLoading: true, isItems: true});
+
     const refinanceData = await TorqueProvider.Instance.checkCdp(Asset.DAI);
     console.log("refinanceData = ",refinanceData)
-    let isItem=false
+
     for(var i=0;i<refinanceData.length; i++){
 
       if(refinanceData[i].cdpId.gt(0)){
-        this.setState({ ...this.state, isItems: true});
         isItem=true
+        window.setTimeout(() => {
+          this.setState({ ...this.state, isLoading: false, isItems: true, isShowRecord:true});
+
+        }, 1900);
       }
     }
-    if(!isItem){
+    if(!isItem && !this.state.isLoading){
       this.setState({ ...this.state, isItems: false});
     }
 
@@ -119,7 +126,9 @@ export class RefinanceAssetSelector extends Component<IRefinanceAssetSelectorPro
     }else{
       window.setTimeout(() => {
         this.setState({ ...this.state, isLoading: false});
-
+        if(!isItem && !this.state.isLoading && !this.state.isShowRecord){
+          this.setState({ ...this.state, isItems: false});
+        }
       }, 12000);
     }
 
