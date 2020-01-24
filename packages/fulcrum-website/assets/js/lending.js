@@ -153,7 +153,7 @@ window.addEventListener('load', function () {
             quantityRange.value = 0;
 
         var rangeMax = new Number(quantityRange.getAttribute("max"));
-        if (e.currentTarget.value > rangeMax)
+        if (e.currentTarget.value > rangeMax || e.currentTarget.value <= 0 )
             e.currentTarget.value = rangeMax;
 
         quantityRange.value = e.currentTarget.value;
