@@ -17,21 +17,21 @@ title: Crypto Margin Trading with Fulcrum | bZx
                         no lock
                         up period, withdraw anytime.</p>
                     <div class="flex fd-xs-c">
-                        <div class="flex ai-c wrap-white mr-25 mx-xs-auto">
+                        <div class="flex ai-c wrap-white mr-25 mx-xs-auto apr-component" data-token="usdc">
                             <div class="icon-66 icon-sm-50 mr-15">
                                 {% include svg/usdc.svg %}
                             </div>
                             <div class="flex">
-                                <p class="fs-40 lh-100 c-primary-blue mr-15"><span class="fw-800">6,5</span>%</p>
+                                <p class="fs-40 lh-100 c-primary-blue mr-15"><span class="fw-800 apr-value">6,5</span>%</p>
                                 <span class="fs-18 lh-140 fw-600 c-gray">APR</span>
                             </div>
                         </div>
-                        <div class="flex ai-c wrap-white mr-25 mx-xs-auto">
+                        <div class="flex ai-c wrap-white mr-25 mx-xs-auto apr-component" data-token="dai">
                             <div class="icon-66 icon-sm-50 mr-15">
                                 {% include svg/dai.svg %}
                             </div>
                             <div class="flex">
-                                <p class="fs-40 lh-100 c-primary-blue mr-15"><span class="fw-800">7,2</span>%</p>
+                                <p class="fs-40 lh-100 c-primary-blue mr-15"><span class="fw-800 apr-value">7,2</span>%</p>
                                 <span class="fs-18 lh-140 fw-600 c-gray">APR</span>
                             </div>
                         </div>
@@ -48,76 +48,76 @@ title: Crypto Margin Trading with Fulcrum | bZx
                 </div>
             </div>
             <div class="col col-7 col-lg-9 col-md-12 fw-w jc-sb jc-sm-fs">
-                <div class="flex mr-30 mb-40 mb-xs-30">
+                <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-token="bat">
                     <div class="icon-50 mr-15 mr-xs-9">
                         {% include svg/bat.svg %}
                     </div>
                     <div>
                         <p class="lh-180 fw-700 c-gray">BAT</p>
-                        <p class="fs-24 c-primary"><span class="fw-800">4,2</span>%</p>
+                        <p class="fs-24 c-primary"><span class="fw-800 apr-value">4,2</span>%</p>
                     </div>
                 </div>
-                <div class="flex mr-30 mb-40 mb-xs-30">
+                <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-token="knc">
                     <div class="icon-50 mr-15 mr-xs-9">
                         {% include svg/knc.svg %}
                     </div>
                     <div>
                         <p class="lh-180 fw-700 c-gray">KNC</p>
-                        <p class="fs-24 c-primary"><span class="fw-800">5,3</span>%</p>
+                        <p class="fs-24 c-primary"><span class="fw-800 apr-value">5,3</span>%</p>
                     </div>
                 </div>
-                <div class="flex mr-30 mb-40 mb-xs-30">
+                <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-token="rep">
                     <div class="icon-50 mr-15 mr-xs-9">
                         {% include svg/rep.svg %}
                     </div>
                     <div>
                         <p class="lh-180 fw-700 c-gray">REP</p>
-                        <p class="fs-24 c-primary"><span class="fw-800">2,8</span>%</p>
+                        <p class="fs-24 c-primary"><span class="fw-800 apr-value">2,8</span>%</p>
                     </div>
                 </div>
-                <div class="flex mr-30 mb-40 mb-xs-30">
+                <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-token="zrx">
                     <div class="icon-50 mr-15 mr-xs-9">
                         {% include svg/zrx.svg %}
                     </div>
                     <div>
                         <p class="lh-180 fw-700 c-gray">ZRX</p>
-                        <p class="fs-24 c-primary"><span class="fw-800">1,6</span>%</p>
+                        <p class="fs-24 c-primary"><span class="fw-800 apr-value">1,6</span>%</p>
                     </div>
                 </div>
-                <div class="flex mr-30 mb-xs-30">
+                <div class="flex mr-20 mb-xs-30 apr-component" data-token="eth">
                     <div class="icon-50 mr-15 mr-xs-9">
                         {% include svg/eth.svg %}
                     </div>
                     <div>
                         <p class="lh-180 fw-700 c-gray">ETH</p>
-                        <p class="fs-24 c-primary"><span class="fw-800">4,2</span>%</p>
+                        <p class="fs-24 c-primary"><span class="fw-800 apr-value">4,2</span>%</p>
                     </div>
                 </div>
-                <div class="flex mr-30 mb-xs-30">
+                <div class="flex mr-20 mb-xs-30 apr-component" data-token="link">
                     <div class="icon-50 mr-15 mr-xs-9">
                         {% include svg/link.svg %}
                     </div>
                     <div>
                         <p class="lh-180 fw-700 c-gray">LINK</p>
-                        <p class="fs-24 c-primary"><span class="fw-800">4,2</span>%</p>
+                        <p class="fs-24 c-primary"><span class="fw-800 apr-value">4,2</span>%</p>
                     </div>
                 </div>
-                <div class="flex mr-30 mb-xs-30">
+                <div class="flex mr-20 mb-xs-30 apr-component" data-token="susd">
                     <div class="icon-50 mr-15 mr-xs-9">
                         {% include svg/susd.svg %}
                     </div>
                     <div>
                         <p class="lh-180 fw-700 c-gray">sUSD</p>
-                        <p class="fs-24 c-primary"><span class="fw-800">4,2</span>%</p>
+                        <p class="fs-24 c-primary"><span class="fw-800 apr-value">4,2</span>%</p>
                     </div>
                 </div>
-                <div class="flex mr-30 mb-xs-30">
+                <div class="flex mr-20 mb-xs-30 apr-component" data-token="wbtc">
                     <div class="icon-50 mr-15 mr-xs-9">
                         {% include svg/wbtc.svg %}
                     </div>
                     <div>
                         <p class="lh-180 fw-700 c-gray">WBTC</p>
-                        <p class="fs-24 c-primary"><span class="fw-800">4,2</span>%</p>
+                        <p class="fs-24 c-primary"><span class="fw-800 apr-value">4,2</span>%</p>
                     </div>
                 </div>
             </div>

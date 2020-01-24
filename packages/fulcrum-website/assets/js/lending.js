@@ -10,6 +10,31 @@ var trackRangeQuantity = document.querySelector('.track-range-quantity');
 var coins = document.querySelectorAll('#calculator-earn .coin-calc');
 var wrapperFinance = document.querySelector('.wrapper-finance');
 
+var api_url = "http://192.168.201.11:8080/api";
+
+(async function getAPR() {
+    var response = await fetch(api_url + '/apr');
+    var apr = await response.json();
+    var result = {};
+    Object.entries(apr).forEach(function (item) {
+        result[item[0]] = new Number(item[1]).toFixed(2).replace(".", ",");
+    });
+    window.apr = result;
+
+})();
+
+function renderAPR() {
+    if (!window.apr) return 
+    var apr = window.apr;
+    var aprComponentElements = document.querySelectorAll(".apr-component");
+    aprComponentElements.forEach(function (item) {
+        var token = item.dataset.token;
+        if (apr[token])
+            item.querySelector(".apr-value").textContent = apr[token];
+    });
+    clearInterval(window.aprRenderer);
+}
+
 function timer() {
     var wrapHours = document.querySelector('.wrap-hours');
     var seconds = 0;
@@ -37,13 +62,16 @@ function timer() {
     setInterval(visibleTimer, 1000);
 }
 
-function changePositionBorderThumb (range, current) {
+function changePositionBorderThumb(range, current) {
     leftRangeQuantity.style.left = 'calc(' + current.value / range.max * 100 + '% - 12px - (16px *' + (current.value - range.max / 2) / range.max + '))'; //12 - half of width thumb with border, 16 - width thumb without border
     rightRangeQuantity.style.left = 'calc(' + current.value / range.max * 100 + '% - 12px + 20px - (16px *' + (current.value - range.max / 2) / range.max + '))'; //12 - half of width thumb with border, 16 - width thumb without border 
-    trackRangeQuantity.style.width = 'calc(' + current.value / range.max * 100 + '% - 12px - (16px *' + (current.value - range.max / 2) / range.max + '))'; ;
+    trackRangeQuantity.style.width = 'calc(' + current.value / range.max * 100 + '% - 12px - (16px *' + (current.value - range.max / 2) / range.max + '))';;
 }
 
 window.addEventListener('load', function () {
+
+    window.aprRenderer = setInterval(renderAPR, 100);
+
     //change active button-coin
     for (var i = 0; i < coins.length; i++) {
         coins[i].onclick = function () {
