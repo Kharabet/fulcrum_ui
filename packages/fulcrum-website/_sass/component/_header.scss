@@ -71,3 +71,24 @@
     display: none;
   }
 }
+
+.active-url{
+  position: relative;
+  &:before{
+    @media(min-width: 768px){
+      content: '';
+      position: absolute;
+      width: 60px;
+      height: 8px;
+      left: 0;
+      right: 0;
+      margin: auto;
+      background-color: #276BFB;
+      border-radius: 6px;
+      top: -48px;
+    }
+    @media(min-width: 992px){
+      top: -67px;
+    }
+  }
+}

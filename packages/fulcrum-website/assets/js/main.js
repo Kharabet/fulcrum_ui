@@ -39,4 +39,10 @@ window.addEventListener('load', function () {
         closeMenu.style.display = 'none';
         body.classList.toggle("open-menu");
     }
+
+    var url = document.querySelectorAll('.nav-menu');
+    for (var i = 0; i < url.length; i++) {
+        if (url[i].getAttribute("href") == window.location.pathname) 
+            url[i].classList.add("active-url");
+    }
 });

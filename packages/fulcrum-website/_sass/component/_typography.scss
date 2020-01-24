@@ -27,7 +27,7 @@ h1 {
 h2 {
   font-size: 44px;
   font-weight: 900;
-  line-height: 1.4;
+  line-height: 1.2;
   @media (max-width: 991px) {
     font-size: 36px;
   }
@@ -61,6 +61,12 @@ h5 {
   color: var(--secondary-color);
   @media (max-width: 767px) {
     font-size: 16px;
+  }
+}
+a {
+  color: #276bfb;
+  &:hover {
+    color: #5b88ff;
   }
 }
 .fs-12 {
