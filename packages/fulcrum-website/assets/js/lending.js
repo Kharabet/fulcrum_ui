@@ -186,7 +186,7 @@ function updateEarningsCalc(quantity) {
 function updateTraditionalFinance(usdAmount) {
     var traditionalFinanceElements = document.querySelectorAll(".item-earn:not(.fulcrum)");
     traditionalFinanceElements.forEach(function (elem) {
-        var apr = new Number(elem.querySelector(".apr-value").textContent.replace(",", "."));
+        var apr = new Number(elem.querySelector(".apr-value").textContent);
         var monthAPR = apr / 12 / 100;
         var earnings = formatUsdPrice(usdAmount * monthAPR);
         elem.querySelector(".earn-usd-value").textContent = earnings;
@@ -213,7 +213,7 @@ function onWidgetAssetsClick(e) {
 };
 
 function formatUsdPrice(value) {
-    return new Number(value).toFixed(2).replace(".", ",");
+    return new Number(value).toFixed(2);
 };
 
 function numberWithCommas(x) {

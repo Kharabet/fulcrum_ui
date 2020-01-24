@@ -22,7 +22,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
                                 {% include svg/usdc.svg %}
                             </div>
                             <div class="flex">
-                                <p class="fs-40 lh-100 c-primary-blue mr-15"><span class="fw-800 apr-value">6,5</span>%</p>
+                                <p class="fs-40 lh-100 c-primary-blue mr-15"><span class="fw-800 apr-value">6.5</span>%</p>
                                 <span class="fs-18 lh-140 fw-600 c-gray">APR</span>
                             </div>
                         </div>
@@ -31,7 +31,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
                                 {% include svg/dai.svg %}
                             </div>
                             <div class="flex">
-                                <p class="fs-40 lh-100 c-primary-blue mr-15"><span class="fw-800 apr-value">7,2</span>%</p>
+                                <p class="fs-40 lh-100 c-primary-blue mr-15"><span class="fw-800 apr-value">7.2</span>%</p>
                                 <span class="fs-18 lh-140 fw-600 c-gray">APR</span>
                             </div>
                         </div>
@@ -54,7 +54,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
                     </div>
                     <div>
                         <p class="lh-180 fw-700 c-gray">BAT</p>
-                        <p class="fs-24 c-primary"><span class="fw-800 apr-value">4,2</span>%</p>
+                        <p class="fs-24 c-primary"><span class="fw-800 apr-value">4.2</span>%</p>
                     </div>
                 </div>
                 <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-token="knc">
@@ -63,7 +63,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
                     </div>
                     <div>
                         <p class="lh-180 fw-700 c-gray">KNC</p>
-                        <p class="fs-24 c-primary"><span class="fw-800 apr-value">5,3</span>%</p>
+                        <p class="fs-24 c-primary"><span class="fw-800 apr-value">5.3</span>%</p>
                     </div>
                 </div>
                 <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-token="rep">
@@ -72,7 +72,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
                     </div>
                     <div>
                         <p class="lh-180 fw-700 c-gray">REP</p>
-                        <p class="fs-24 c-primary"><span class="fw-800 apr-value">2,8</span>%</p>
+                        <p class="fs-24 c-primary"><span class="fw-800 apr-value">2.8</span>%</p>
                     </div>
                 </div>
                 <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-token="zrx">
@@ -81,7 +81,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
                     </div>
                     <div>
                         <p class="lh-180 fw-700 c-gray">ZRX</p>
-                        <p class="fs-24 c-primary"><span class="fw-800 apr-value">1,6</span>%</p>
+                        <p class="fs-24 c-primary"><span class="fw-800 apr-value">1.6</span>%</p>
                     </div>
                 </div>
                 <div class="flex mr-20 mb-xs-30 apr-component" data-token="eth">
@@ -90,7 +90,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
                     </div>
                     <div>
                         <p class="lh-180 fw-700 c-gray">ETH</p>
-                        <p class="fs-24 c-primary"><span class="fw-800 apr-value">4,2</span>%</p>
+                        <p class="fs-24 c-primary"><span class="fw-800 apr-value">4.2</span>%</p>
                     </div>
                 </div>
                 <div class="flex mr-20 mb-xs-30 apr-component" data-token="link">
@@ -108,7 +108,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
                     </div>
                     <div>
                         <p class="lh-180 fw-700 c-gray">sUSD</p>
-                        <p class="fs-24 c-primary"><span class="fw-800 apr-value">4,2</span>%</p>
+                        <p class="fs-24 c-primary"><span class="fw-800 apr-value">4.2</span>%</p>
                     </div>
                 </div>
                 <div class="flex mr-20 mb-xs-30 apr-component" data-token="wbtc">
@@ -117,7 +117,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
                     </div>
                     <div>
                         <p class="lh-180 fw-700 c-gray">WBTC</p>
-                        <p class="fs-24 c-primary"><span class="fw-800 apr-value">4,2</span>%</p>
+                        <p class="fs-24 c-primary"><span class="fw-800 apr-value">4.2</span>%</p>
                     </div>
                 </div>
             </div>
@@ -309,7 +309,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
                             </div>
                             <div class="footer-earn">
                                 <p class="fs-32 fs-md-20 mb-5 mb-md-0">$<span class="fw-800 earn-usd-value">109</span></p>
-                                <p class="fs-18 fs-md-20"><span class="fw-800 apr-value">2,2</span>%</p>
+                                <p class="fs-18 fs-md-20"><span class="fw-800 apr-value">2.2</span>%</p>
                             </div>
                         </div>
                         <div class="item-earn">
@@ -321,7 +321,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
                             </div>
                             <div class="footer-earn">
                                 <p class="fs-32 fs-md-20 mb-5 mb-md-0">$<span class="fw-800 earn-usd-value">103</span></p>
-                                <p class="fs-18 fs-md-20"><span class="fw-800 apr-value">2,06</span>%</p>
+                                <p class="fs-18 fs-md-20"><span class="fw-800 apr-value">2.06</span>%</p>
                             </div>
                         </div>
                         <div class="item-earn">
@@ -333,7 +333,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
                             </div>
                             <div class="footer-earn">
                                 <p class="fs-32 fs-md-20 mb-5 mb-md-0">$<span class="fw-800 earn-usd-value">90</span></p>
-                                <p class="fs-18 fs-md-20"><span class="fw-800 apr-value">1,09</span>%</p>
+                                <p class="fs-18 fs-md-20"><span class="fw-800 apr-value">1.09</span>%</p>
                             </div>
                         </div>
                         <div class="item-earn">
@@ -345,7 +345,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
                             </div>
                             <div class="footer-earn">
                                 <p class="fs-32 fs-md-20 mb-5 mb-md-0">$<span class="fw-800 earn-usd-value">2,50</span></p>
-                                <p class="fs-18 fs-md-20"><span class="fw-800 apr-value">0,05</span>%</p>
+                                <p class="fs-18 fs-md-20"><span class="fw-800 apr-value">0.05</span>%</p>
                             </div>
                         </div>
                         <div class="item-earn">
@@ -357,7 +357,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
                             </div>
                             <div class="footer-earn">
                                 <p class="fs-32 fs-md-20 mb-5 mb-md-0">$<span class="fw-800 earn-usd-value">2,45</span></p>
-                                <p class="fs-18 fs-md-20"><span class="fw-800 apr-value">0,04</span>%</p>
+                                <p class="fs-18 fs-md-20"><span class="fw-800 apr-value">0.04</span>%</p>
                             </div>
                         </div>
                     </div>
