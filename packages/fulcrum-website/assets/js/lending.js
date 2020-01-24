@@ -17,23 +17,42 @@ var api_url = "http://192.168.201.11:8080/api";
     var apr = await response.json();
     var result = {};
     Object.entries(apr).forEach(function (item) {
-        result[item[0]] = new Number(item[1]).toFixed(2).replace(".", ",");
+        result[item[0]] = new Number(item[1]).toFixed(2);
     });
     window.apr = result;
-
+    window.usdRates = await getUsdRates();
 })();
 
+async function getUsdRates() {
+    var response = await fetch(api_url + '/usd-rates');
+    var rates = await response.json();
+    var result = {};
+    Object.entries(rates).forEach(function (item) {
+        result[item[0]] = new Number(item[1]).toFixed(2);
+    });
+    return result;
+};
+
 function renderAPR() {
-    if (!window.apr) return 
+    if (!window.apr) return
     var apr = window.apr;
     var aprComponentElements = document.querySelectorAll(".apr-component");
     aprComponentElements.forEach(function (item) {
         var token = item.dataset.token;
         if (apr[token])
-            item.querySelector(".apr-value").textContent = apr[token];
+            item.querySelector(".apr-value").textContent = formatUsdPrice(apr[token]);
     });
+
+
+    var activeCalcWidgetToken = document.querySelector(".coin-calc.active").dataset.token;
+    document.querySelector(".item-earn.fulcrum .apr-value").textContent = formatUsdPrice(apr[activeCalcWidgetToken]);
+
+    updateEarningsCalc(quantityInput.value);
+
     clearInterval(window.aprRenderer);
 }
+
+
 
 function timer() {
     var wrapHours = document.querySelector('.wrap-hours');
@@ -74,35 +93,79 @@ window.addEventListener('load', function () {
 
     //change active button-coin
     for (var i = 0; i < coins.length; i++) {
-        coins[i].onclick = function () {
-            var items = document.querySelectorAll('.coin-calc');
-            for (var i = 0; i < items.length; i++) {
-                items[i].classList.remove('active');
-            }
-            var token = this.getAttribute('data-token');
-            wrapperFinance.style.display = ['dai', 'susd', 'usdc'].includes(token)
-                ? 'block'
-                : 'none';
-            this.classList.add("active");
-        };
+        coins[i].addEventListener('click', onWidgetAssetsClick, false);
     }
     changePositionBorderThumb(quantityRange, quantityRange);
 
-    quantityRange.oninput = function (event) {
-        quantityInput.value = event.currentTarget.value;
-        changePositionBorderThumb(quantityRange, event.currentTarget);
+    quantityRange.oninput = function (e) {
+        quantityInput.value = e.currentTarget.value;
+        changePositionBorderThumb(quantityRange, e.currentTarget);
+        updateEarningsCalc(e.currentTarget.value);
     }
 
-    quantityInput.oninput = function (event) {
-        if (!event.currentTarget.value)
+    quantityInput.oninput = function (e) {
+        if (!e.currentTarget.value)
             quantityRange.value = 0;
 
-        if (event.currentTarget.value > 1000000)
-            event.currentTarget.value = 1000000;
+            var rangeMax = new Number(quantityRange.getAttribute("max"));
+        if (e.currentTarget.value > rangeMax)
+            e.currentTarget.value = rangeMax;
 
-        quantityRange.value = event.currentTarget.value;
-        changePositionBorderThumb(quantityRange, event.currentTarget);
+        quantityRange.value = e.currentTarget.value;
+        updateEarningsCalc(e.currentTarget.value);
+
+        changePositionBorderThumb(quantityRange, e.currentTarget);
     }
-
     timer();
 });
+
+
+function updateEarningsCalc(quantity) {
+
+    var apr = window.apr;
+    var token = document.querySelector(".coin-calc.active").dataset.token;
+    if (!apr || !apr[token])
+        return null;
+    var monthAPR = apr[token] / 12 / 100;
+    var usdAmount = quantity * window.usdRates[token];
+
+    var earnings = formatUsdPrice(usdAmount * monthAPR);
+
+    document.querySelector(".item-earn.fulcrum .earn-usd-value").textContent = earnings;
+    document.querySelector(".result-calc .earn-usd-value").textContent = earnings;
+    updateTraditionalFinance(usdAmount);
+    // return earnings;
+};
+
+function updateTraditionalFinance(usdAmount) {
+    var traditionalFinanceElements = document.querySelectorAll(".item-earn:not(.fulcrum)");
+    traditionalFinanceElements.forEach(function (elem) {
+        var apr = new Number(elem.querySelector(".apr-value").textContent.replace(",", "."));
+        var monthAPR = apr / 12 / 100;
+        var earnings = formatUsdPrice(usdAmount * monthAPR);
+        elem.querySelector(".earn-usd-value").textContent = earnings;
+    });
+}
+
+function onWidgetAssetsClick(e) {
+    var items = document.querySelectorAll('.coin-calc');
+    for (var i = 0; i < items.length; i++) {
+        items[i].classList.remove('active');
+    }
+    var token = e.currentTarget.getAttribute('data-token');
+    wrapperFinance.style.display = 'none';
+
+    if (['dai', 'susd', 'usdc'].includes(token)) {
+        wrapperFinance.style.display = 'block';
+        if (window.apr && window.apr[token])
+            document.querySelector(".item-earn.fulcrum .apr-value").textContent = window.apr[token];
+    }
+    e.currentTarget.classList.add("active");
+
+    updateEarningsCalc(quantityInput.value);
+
+};
+
+function formatUsdPrice(value) {
+    return new Number(value).toFixed(2).replace(".", ",");
+};

@@ -264,9 +264,9 @@ title: Crypto Margin Trading with Fulcrum | bZx
                     </div>
                     <div class="flex fd-c input-calc">
                         <p class="fs-18 mb-15 mb-md-0 c-dark-gray text-md-center">Quantity</p>
-                        <input class="input-quantity" value="828349" />
+                        <input class="input-quantity" value="10" />
                         <div class="border-range-quantity">                            
-                            <input class="range-quantity" type="range" value="828349" min="0" max="1000000"/>
+                            <input class="range-quantity" type="range" value="10" min="0" max="1000"/>
                             <div class="left-range-quantity"></div>
                             <div class="right-range-quantity"></div>
                             <div class="track-range-quantity"></div>
@@ -274,7 +274,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
                     </div>
                     <div class="result-calc">
                         <p class="fs-18 text-md-center">Earn up to:</p>
-                        <p class="fs-66 lh-140 fw-400 text-md-center">$<span class="fw-900">30,56</span></p>
+                        <p class="fs-66 lh-140 fw-400 text-md-center">$<span class="fw-900 earn-usd-value">30,56</span></p>
                         <p class="fs-24 lh-140 fw-600 text-right month">/month</p>
                     </div>
                 </div>
@@ -289,7 +289,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
             <div class="row">
                 <div class="col col-12">
                     <div class="flex jc-sb fd-md-c mx-md-auto">
-                        <div class="item-earn active">
+                        <div class="item-earn fulcrum active">
                             <div class="head-earn">
                                 {% include svg/fulcrum.svg %}
                             </div>
@@ -297,8 +297,8 @@ title: Crypto Margin Trading with Fulcrum | bZx
                                 <p class="fs-13">Lending stablecoins <br /> with Fulcrum</p>
                             </div>
                             <div class="footer-earn">
-                                <p class="fs-32 fs-md-20 mb-5 mb-md-0">$<span class="fw-800">301</span></p>
-                                <p class="fs-18 fs-md-20"><span class="fw-800">6</span>%</p>
+                                <p class="fs-32 fs-md-20 mb-5 mb-md-0">$<span class="fw-800 earn-usd-value">301</span></p>
+                                <p class="fs-18 fs-md-20"><span class="fw-800 apr-value">6</span>%</p>
                             </div>
                         </div>
                         <div class="item-earn">
@@ -309,8 +309,8 @@ title: Crypto Margin Trading with Fulcrum | bZx
                                 <p class="fs-20 fs-md-13">TD Bank</p>
                             </div>
                             <div class="footer-earn">
-                                <p class="fs-32 fs-md-20 mb-5 mb-md-0">$<span class="fw-800">109</span></p>
-                                <p class="fs-18 fs-md-20"><span class="fw-800">2,2</span>%</p>
+                                <p class="fs-32 fs-md-20 mb-5 mb-md-0">$<span class="fw-800 earn-usd-value">109</span></p>
+                                <p class="fs-18 fs-md-20"><span class="fw-800 apr-value">2,2</span>%</p>
                             </div>
                         </div>
                         <div class="item-earn">
@@ -321,8 +321,8 @@ title: Crypto Margin Trading with Fulcrum | bZx
                                 <p class="fs-20 fs-md-13">SoFi</p>
                             </div>
                             <div class="footer-earn">
-                                <p class="fs-32 fs-md-20 mb-5 mb-md-0">$<span class="fw-800">103</span></p>
-                                <p class="fs-18 fs-md-20"><span class="fw-800">2,06</span>%</p>
+                                <p class="fs-32 fs-md-20 mb-5 mb-md-0">$<span class="fw-800 earn-usd-value">103</span></p>
+                                <p class="fs-18 fs-md-20"><span class="fw-800 apr-value">2,06</span>%</p>
                             </div>
                         </div>
                         <div class="item-earn">
@@ -333,8 +333,8 @@ title: Crypto Margin Trading with Fulcrum | bZx
                                 <p class="fs-20 fs-md-13">Wealthfront</p>
                             </div>
                             <div class="footer-earn">
-                                <p class="fs-32 fs-md-20 mb-5 mb-md-0">$<span class="fw-800">90</span></p>
-                                <p class="fs-18 fs-md-20"><span class="fw-800">1,09</span>%</p>
+                                <p class="fs-32 fs-md-20 mb-5 mb-md-0">$<span class="fw-800 earn-usd-value">90</span></p>
+                                <p class="fs-18 fs-md-20"><span class="fw-800 apr-value">1,09</span>%</p>
                             </div>
                         </div>
                         <div class="item-earn">
@@ -345,8 +345,8 @@ title: Crypto Margin Trading with Fulcrum | bZx
                                 <p class="fs-20 fs-md-13">Betterment</p>
                             </div>
                             <div class="footer-earn">
-                                <p class="fs-32 fs-md-20 mb-5 mb-md-0">$<span class="fw-800">2,50</span></p>
-                                <p class="fs-18 fs-md-20"><span class="fw-800">0,05</span>%</p>
+                                <p class="fs-32 fs-md-20 mb-5 mb-md-0">$<span class="fw-800 earn-usd-value">2,50</span></p>
+                                <p class="fs-18 fs-md-20"><span class="fw-800 apr-value">0,05</span>%</p>
                             </div>
                         </div>
                         <div class="item-earn">
@@ -357,8 +357,8 @@ title: Crypto Margin Trading with Fulcrum | bZx
                                 <p class="fs-20 fs-md-13">Industry Average</p>
                             </div>
                             <div class="footer-earn">
-                                <p class="fs-32 fs-md-20 mb-5 mb-md-0">$<span class="fw-800">2,45</span></p>
-                                <p class="fs-18 fs-md-20"><span class="fw-800">0,04</span>%</p>
+                                <p class="fs-32 fs-md-20 mb-5 mb-md-0">$<span class="fw-800 earn-usd-value">2,45</span></p>
+                                <p class="fs-18 fs-md-20"><span class="fw-800 apr-value">0,04</span>%</p>
                             </div>
                         </div>
                     </div>
