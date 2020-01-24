@@ -158,19 +158,19 @@ title: Crypto Margin Trading with Fulcrum | bZx
                         <p class="fs-44 fs-xs-28 fw-900 mb-15 lh-140 c-light-green">TVL in our Smart Contracts</p>
                         <div class="flex jc-sb fd-sm-c fs-44 fs-xs-36 fw-900 lh-140">
                             <div class="flex-xs fw-400">
-                                $<span class="fw-900">3,000,000</span>
+                                $<span class="fw-900 tvl-value" data-token="all">3,000,000</span>
                             </div>
                             <div class="flex ai-c">
                                 <div class="icon-40 icon-xs-30 icon-border-2 mr-10 mr-xs-20">
                                     {% include svg/eth.svg %}
                                 </div>
-                                <span>10,000</span>
+                                <span class="tvl-value" data-token="eth">10,000</span>
                             </div>
                             <div class="flex ai-c">
                                 <div class="icon-40 icon-xs-30 icon-border-2 mr-10 mr-xs-20">
                                     {% include svg/dai.svg %}
                                 </div>
-                                <span>10,000</span>
+                                <span class="tvl-value" data-token="dai">10,000</span>
                             </div>
                         </div>
                     </div>
@@ -378,7 +378,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
                 <div class="item-timer">
                     <span><span class="wrap-hours"><span class="hours">23</span>:</span><span class="minutes">0</span>:<span class="seconds">00</span></span>
                 </div>                
-                <p class="fs-56 fs-xs-44 fw-400 c-primary-blue mb-40 mb-xs-30 lh-140">$<span class="fw-900">45,459,300</span></p>
+                <p class="fs-56 fs-xs-44 fw-400 c-primary-blue mb-40 mb-xs-30 lh-140">$<span class="fw-900 live-earnings-value">45,459,300</span></p>
                 <a href="https://fulcrum.trade/lend" class="button button-secondary button-lg mb-15 mx-auto order-sm-1">Lend</a>
                 <p class="fs-13 lh-150 text-center c-gray mb-10 mb-sm-25">To Earn interest</p>
             </div>

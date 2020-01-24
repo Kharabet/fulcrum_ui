@@ -12,22 +12,40 @@ var wrapperFinance = document.querySelector('.wrapper-finance');
 
 var api_url = "http://192.168.201.11:8080/api";
 
-(async function getAPR() {
+
+(async function getData() {
+    var data = await Promise.all([getAPR(), getUsdRates(), getTVL()]);
+    window.apr = data[0];
+    window.usdRates = data[1];
+    window.tvl = data[2];
+})();
+
+
+async function getAPR() {
     var response = await fetch(api_url + '/apr');
     var apr = await response.json();
     var result = {};
     Object.entries(apr).forEach(function (item) {
         result[item[0]] = new Number(item[1]).toFixed(2);
     });
-    window.apr = result;
-    window.usdRates = await getUsdRates();
-})();
+    return result;
+};
 
 async function getUsdRates() {
     var response = await fetch(api_url + '/usd-rates');
     var rates = await response.json();
     var result = {};
     Object.entries(rates).forEach(function (item) {
+        result[item[0]] = new Number(item[1]).toFixed(2);
+    });
+    return result;
+};
+
+async function getTVL() {
+    var response = await fetch(api_url + '/tvl-usd');
+    var tvl = await response.json();
+    var result = {};
+    Object.entries(tvl).forEach(function (item) {
         result[item[0]] = new Number(item[1]).toFixed(2);
     });
     return result;
@@ -52,6 +70,19 @@ function renderAPR() {
     clearInterval(window.aprRenderer);
 }
 
+function renderTVL() {
+    if (!window.tvl) return
+    var tvl = window.tvl;
+    var tvlValueElements = document.querySelectorAll(".tvl-value");
+    tvlValueElements.forEach(function (item) {
+        var token = item.dataset.token;
+        if (tvl[token])
+            item.textContent = numberWithCommas(new Number(tvl[token]).toFixed(0));
+    });
+
+    clearInterval(window.tvlRenderer);
+}
+
 
 
 function timer() {
@@ -59,6 +90,8 @@ function timer() {
     var seconds = 0;
     var minutes = 0;
     var hours = 0;
+    var liveEarnings = 0;
+    var liveTVL = 0;
     function visibleTimer() {
         if (seconds === 59) {
             minutes += 1;
@@ -77,19 +110,31 @@ function timer() {
         itemSecond.innerHTML = seconds < 9 ? '0' + ++seconds : ++seconds;
         itemMinute.innerHTML = hours > 0 ? minutes < 9 ? '0' + minutes : minutes : minutes;
         itemHour.innerHTML = hours;
+
+
+        if (window.tvl) {
+            if (liveTVL === 0) liveTVL = new Number(window.tvl["all"]);
+            var daiSecAPR = window.apr["dai"] / 365 / 24 / 60 / 60 / 100;
+            liveEarnings += liveTVL * daiSecAPR;
+            liveTVL += liveEarnings;
+            console.log("liveEarnings: " + liveEarnings);
+            document.querySelector(".live-earnings-value").textContent = numberWithCommas(liveEarnings.toFixed(0));
+
+        }
     }
     setInterval(visibleTimer, 1000);
 }
 
 function changePositionBorderThumb(range, current) {
-    leftRangeQuantity.style.left = 'calc(' + current.value / (range.max ) * 100 + '% - 12px - (16px *' + (current.value - (range.max ) / 2) / range.max + '))'; //12 - half of width thumb with border, 16 - width thumb without border
-    rightRangeQuantity.style.left = 'calc(' + current.value / (range.max ) * 100 + '% - 12px + 20px - (16px *' + (current.value - (range.max ) / 2) / range.max+ '))'; //12 - half of width thumb with border, 16 - width thumb without border 
-    trackRangeQuantity.style.width = 'calc(' + current.value / (range.max ) * 100 + '% - 12px - (16px *' + (current.value - (range.max ) / 2) / range.max + '))';;
+    leftRangeQuantity.style.left = 'calc(' + current.value / (range.max) * 100 + '% - 12px - (16px *' + (current.value - (range.max) / 2) / range.max + '))'; //12 - half of width thumb with border, 16 - width thumb without border
+    rightRangeQuantity.style.left = 'calc(' + current.value / (range.max) * 100 + '% - 12px + 20px - (16px *' + (current.value - (range.max) / 2) / range.max + '))'; //12 - half of width thumb with border, 16 - width thumb without border 
+    trackRangeQuantity.style.width = 'calc(' + current.value / (range.max) * 100 + '% - 12px - (16px *' + (current.value - (range.max) / 2) / range.max + '))';;
 }
 
 window.addEventListener('load', function () {
 
     window.aprRenderer = setInterval(renderAPR, 100);
+    window.tvlRenderer = setInterval(renderTVL, 100);
 
     //change active button-coin
     for (var i = 0; i < coins.length; i++) {
@@ -116,6 +161,7 @@ window.addEventListener('load', function () {
 
         changePositionBorderThumb(quantityRange, e.currentTarget);
     }
+
     timer();
 });
 
@@ -169,3 +215,7 @@ function onWidgetAssetsClick(e) {
 function formatUsdPrice(value) {
     return new Number(value).toFixed(2).replace(".", ",");
 };
+
+function numberWithCommas(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
