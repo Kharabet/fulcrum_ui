@@ -44,6 +44,7 @@ import { ProviderChangedEvent } from "./events/ProviderChangedEvent";
 import { TorqueProviderEvents } from "./events/TorqueProviderEvents";
 import {vatContract} from "../contracts/vat";
 import {TradeTokenKey} from "../../../fulcrum/src/domain/TradeTokenKey";
+import {RefinanceCompoundData} from "../../src/domain/RefinanceData";
 var Web3 = require('web3');
 var web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'));
 let configAddress:any
@@ -534,6 +535,7 @@ export class TorqueProvider {
   }
 
   public checkCdp = async (asset: Asset): Promise<RefinanceCdpData[]> => {
+
     let result: RefinanceCdpData[]=[{
 
         cdpId: new BigNumber(0),
@@ -621,6 +623,7 @@ export class TorqueProvider {
                 'isProxy': true,
                 proxyAddress: proxyRegistryResult,
               });
+              console.log(result)
             }
           }
         }
@@ -684,7 +687,8 @@ export class TorqueProvider {
           isProxy: isProxy,
           isDisabled: false,
           isShowCard:false,
-          variableAPR: new BigNumber(0)
+          variableAPR: new BigNumber(0),
+
         }]
     if (this.web3Wrapper && this.contractsSource) {
       let vatContract: vatContract | null = null;
@@ -771,8 +775,13 @@ export class TorqueProvider {
 
       let tokenCdpManagerContract: cdpManagerContract | null = null;
       tokenCdpManagerContract = await this.contractsSource.getCdpManager(cdpManagerAddress)
+
+      let amountRemain = parseInt(refRequest.debt.dp(3, BigNumber.ROUND_FLOOR).toString())/parseInt(loanAmount.dp(3, BigNumber.ROUND_FLOOR).toString())
+      console.log("amountRemain = ",amountRemain)
+      let collateralAmount = parseFloat(refRequest.collateralAmount.dp(3, BigNumber.ROUND_FLOOR).toString()) / amountRemain
+      console.log("collateralAmount = ",collateralAmount )
       let darts = web3.utils.toWei(loanAmount.dp(3, BigNumber.ROUND_FLOOR).toString()); //loanAmount.toFixed().toString()
-      let dinks = web3.utils.toWei(refRequest.collateralAmount.dp(3, BigNumber.ROUND_FLOOR).toString());
+      let dinks = web3.utils.toWei(collateralAmount.toString());
 
 
       let tokendsProxyContract: dsProxyJsonContract | null = null;
@@ -976,6 +985,261 @@ export class TorqueProvider {
 
 
     }
+  }
+
+  public checkSoloMargin = async (): Promise<RefinanceCompoundData[]> => {
+    let dataItems:RefinanceCompoundData[]=[{
+      collateralAsset:Asset.DAI,
+      collateralAmount: new BigNumber(0),
+      loanAsset:Asset.DAI,
+      loanAmount:  new BigNumber(0),
+      variableAPR: new BigNumber(0),
+      isDisabled: false,
+      isShowCard:false,
+      collateralization:0
+      }]
+    if (this.web3Wrapper && this.contractsSource) {
+      let account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : '';
+      console.log("account = ",account)
+      console.log("process.env.REACT_APP_ETH_NETWORK = ",process.env.REACT_APP_ETH_NETWORK)
+      // 0x4EC3570cADaAEE08Ae384779B0f3A45EF85289DE
+      let soloMarginContract = await this.contractsSource.getSoloMargin("0x4EC3570cADaAEE08Ae384779B0f3A45EF85289DE")
+      // let n = unit(0)
+      let respMargin = await soloMarginContract.getAccountBalances.callAsync({owner: account,number: new BigNumber(0)})
+      console.log("respMargin = ",respMargin)
+
+      // for(var i=0;i<respMargin[0].length;i++){
+        // console.log("respMargin[0][i] = ",respMargin[0][i])
+        const loanAsset0 = this.contractsSource!.getAssetFromAddress(respMargin[0][0]);
+        const loanAsset1 = this.contractsSource!.getAssetFromAddress(respMargin[0][1]);
+        const loanAsset2 = Asset.ETH//this.contractsSource!.getAssetFromAddress(respMargin[0][2]);
+        //add first value to array index 0
+      if(respMargin[2][0].value.gt(0)) {
+        if (respMargin[2][0].sign == true) {
+          dataItems[0].collateralAsset = loanAsset0
+          dataItems[0].collateralAmount = respMargin[2][0].value.dividedBy(10 ** 18)
+        } else {
+          dataItems[0].loanAsset = loanAsset0
+          dataItems[0].loanAmount = respMargin[2][0].value
+        }
+      }
+
+        if(respMargin[2][1].value.gt(0)) {
+          if (respMargin[2][1].sign == true) {
+            // check first sign value is same as first array if same the add it in new index
+            if (respMargin[2][0].sign == true) {
+              let item = {
+                collateralAsset: loanAsset1,
+                collateralAmount: respMargin[2][1].value.dividedBy(10 ** 18),
+                loanAsset: Asset.DAI,
+                loanAmount: new BigNumber(0),
+                variableAPR: new BigNumber(0),
+                isDisabled: false,
+                isShowCard: false,
+                collateralization: 0
+              }
+              dataItems.push(item)
+            } else {
+              dataItems[0].collateralAsset = loanAsset1
+              dataItems[0].collateralAmount = respMargin[2][1].value.dividedBy(10 ** 18)
+            }
+
+          } else {
+            // check first sign value is same as first array if same the add it in new index
+            if (respMargin[2][0].sign == false) {
+              let item = {
+                collateralAsset: Asset.DAI,
+                collateralAmount: new BigNumber(0),
+                loanAsset: loanAsset1,
+                loanAmount: respMargin[2][1].value,
+                variableAPR: new BigNumber(0),
+                isDisabled: false,
+                isShowCard: false,
+                collateralization: 0
+              }
+              dataItems.push(item)
+            } else {
+              dataItems[0].loanAsset = loanAsset1
+              dataItems[0].loanAmount = respMargin[2][1].value
+            }
+          }
+        }
+
+
+        if(respMargin[2][2].sign==true){
+            if(respMargin[2][0].sign==false && respMargin[2][1].sign==false && respMargin[2][2].value.gt(0)){
+                dataItems[0].collateralAsset =loanAsset2
+                dataItems[0].collateralAmount =respMargin[2][2].value.dividedBy(10 ** 18)
+                dataItems[1].collateralAsset =loanAsset2
+                dataItems[1].collateralAmount =respMargin[2][2].value.dividedBy(10 ** 18)
+            }else if(respMargin[2][0].sign==true && respMargin[2][1].sign==false && respMargin[2][2].value.gt(0)){
+                 let item = {
+                          collateralAsset:loanAsset2,
+                          collateralAmount: respMargin[2][2].value.dividedBy(10 ** 18),
+                          loanAsset:loanAsset1,
+                          loanAmount:  respMargin[2][1].value,
+                          variableAPR: new BigNumber(0),
+                          isDisabled: false,
+                          isShowCard:false,
+                          collateralization:0
+                        }
+                dataItems.push(item)
+            }else if(respMargin[2][0].sign==false && respMargin[2][1].sign==true && respMargin[2][2].value.gt(0)){
+              let item = {
+                          collateralAsset:loanAsset2,
+                          collateralAmount: respMargin[2][2].value.dividedBy(10 ** 18),
+                          loanAsset:loanAsset0,
+                          loanAmount:  respMargin[2][0].value,
+                          variableAPR: new BigNumber(0),
+                          isDisabled: false,
+                          isShowCard:false,
+                          collateralization:0
+                        }
+                dataItems.push(item)
+            }
+
+        }else{
+          console.log("respMargin[2] = ",respMargin[2])
+          if(respMargin[2][0].sign==true && respMargin[2][1].sign==true && respMargin[2][2].value.gt(0)){
+                dataItems[0].loanAsset =loanAsset2
+                dataItems[0].loanAmount =respMargin[2][1].value.dividedBy(10 ** 18)
+                dataItems[1].loanAsset =loanAsset2
+                dataItems[1].loanAmount =respMargin[2][1].value.dividedBy(10 ** 18)
+            }else if(respMargin[2][0].sign==true && respMargin[2][1].sign==false && respMargin[2][2].value.gt(0)){
+                 let item = {
+                          collateralAsset:loanAsset0,
+                          collateralAmount: respMargin[2][0].value.dividedBy(10 ** 18),
+                          loanAsset:loanAsset2,
+                          loanAmount:  respMargin[2][2].value,
+                          variableAPR: new BigNumber(0),
+                          isDisabled: false,
+                          isShowCard:false,
+                          collateralization:0
+                        }
+                dataItems.push(item)
+            }else if(respMargin[2][0].sign==false && respMargin[2][1].sign==true && respMargin[2][2].value.gt(0)){
+              let item = {
+                          collateralAsset:loanAsset1,
+                          collateralAmount: respMargin[2][1].value.dividedBy(10 ** 18),
+                          loanAsset:loanAsset2,
+                          loanAmount:  respMargin[2][2].value,
+                          variableAPR: new BigNumber(0),
+                          isDisabled: false,
+                          isShowCard:false,
+                          collateralization:0
+                        }
+                dataItems.push(item)
+            }
+        }
+
+        let isShowCard=false
+        let ratio = 0
+        let maintenanceMarginAmount = 1
+        if(parseFloat(dataItems[0].collateralAmount.toString())>0 && parseFloat(dataItems[0].loanAmount.toString())> 0) {
+        // if(cdpId.eq(240)){
+        isShowCard=true
+        const usdPrice = await this.getSwapToUsdRate(dataItems[0].loanAsset)
+        const daitoUsd = dataItems[0].loanAmount.multipliedBy(usdPrice)
+
+
+        const usdPriceEth = await this.getSwapRate(dataItems[0].collateralAsset, Asset.SAI, dataItems[0].collateralAmount)
+
+        ratio = (parseFloat(usdPriceEth.toString()) * 100 * parseFloat(dataItems[0].collateralAmount.toString())) / parseFloat(daitoUsd.toString())
+          // console.log("parseFloat(colletralAmount.toString()) = ",parseFloat(colletralAmount.toString()))
+          console.log("colletralAmount = ",parseFloat(dataItems[0].collateralAmount.toString()))
+          // console.log("usdPriceEth.toString() = ",usdPriceEth.toString())
+          // console.log("daitoUsd.toString()= ",daitoUsd.toString())
+          console.log("ratio = ",ratio)
+        // }
+
+        const iBZxContract = await this.contractsSource.getiBZxContract();
+        const loansData = await iBZxContract.getBasicLoansData.callAsync(account, new BigNumber(50));
+        console.log("loansData = ",loansData)
+        maintenanceMarginAmount = parseInt(loansData[0].maintenanceMarginAmount.dividedBy(10 ** 17).toString())
+
+      }
+
+
+        let isDisabled=true
+        if(ratio>=maintenanceMarginAmount){
+          isDisabled=false
+        }
+        dataItems[0].isDisabled= isDisabled
+        dataItems[0].isShowCard= isShowCard
+
+        let rateAmountIlkPerSecond1 = dataItems[0].loanAmount.dividedBy(10 ** 26)
+        let rateAmountIlkYr1 = rateAmountIlkPerSecond1.multipliedBy(60*60*24*365).dividedBy(10 ** 8)
+        dataItems[0].variableAPR = rateAmountIlkYr1
+
+        if(dataItems.length==2){
+          let rateAmountIlkPerSecond2 = dataItems[0].loanAmount.dividedBy(10 ** 26)
+          let rateAmountIlkYr2 = rateAmountIlkPerSecond2.multipliedBy(60*60*24*365).dividedBy(10 ** 8)
+          dataItems[1].variableAPR = rateAmountIlkYr1
+          if(parseFloat(dataItems[1].collateralAmount.toString())>0 && parseFloat(dataItems[1].loanAmount.toString())> 0) {
+          // if(cdpId.eq(240)){
+            isShowCard=true
+            const usdPrice = await this.getSwapToUsdRate(dataItems[1].loanAsset)
+            const daitoUsd = dataItems[1].loanAmount.multipliedBy(usdPrice)
+
+
+            const usdPriceEth = await this.getSwapRate(dataItems[1].collateralAsset, Asset.SAI, dataItems[1].collateralAmount)
+
+            ratio = (parseFloat(usdPriceEth.toString()) * 100 * parseFloat(dataItems[0].collateralAmount.toString())) / parseFloat(daitoUsd.toString())
+              // console.log("parseFloat(colletralAmount.toString()) = ",parseFloat(colletralAmount.toString()))
+              console.log("colletralAmount = ",parseFloat(dataItems[1].collateralAmount.toString()))
+              // console.log("usdPriceEth.toString() = ",usdPriceEth.toString())
+              // console.log("daitoUsd.toString()= ",daitoUsd.toString())
+              console.log("ratio = ",ratio)
+            // }
+
+            const iBZxContract = await this.contractsSource.getiBZxContract();
+            const loansData = await iBZxContract.getBasicLoansData.callAsync(account, new BigNumber(50));
+            console.log("loansData = ",loansData)
+            maintenanceMarginAmount = parseInt(loansData[0].maintenanceMarginAmount.dividedBy(10 ** 17).toString())
+
+          }
+
+
+          let isDisabled=true
+          if(ratio>=maintenanceMarginAmount){
+            isDisabled=false
+          }
+          dataItems[1].isDisabled= isDisabled
+          dataItems[1].isShowCard= isShowCard
+        }
+
+        console.log("SSSSAAAWW")
+        console.log("rateAmountIlk 111 = ", parseFloat(rateAmountIlkYr1.toString()))
+        // console.log("loanAsset")
+        // if(respMargin[2][i].value.gt(0)){
+        //   let item ={
+        //     // erc20TokenAddress: respMargin[0][i],
+        //     asset:loanAsset,
+        //     sign: respMargin[2][i].sign,
+        //     value: respMargin[2][i].value
+        //   }
+        //   dataItems.push(item)
+        // }
+      // }
+      console.log("dataItems = ",dataItems)
+
+      // const loanAsset = this.contractsSource!.getAssetFromAddress(e.loanTokenAddress);
+
+      let respAccountValue = await soloMarginContract.getAccountValues.callAsync({owner: account,number: new BigNumber(0)})
+      console.log("respAccountValue1 = ",respAccountValue)
+      if(respAccountValue.length>1){
+        let suppliedValue = respAccountValue[0].value.dividedBy(10 ** 26)
+        let borrowedValue = respAccountValue[1].value.dividedBy(10 ** 18)
+        const collateralization = parseFloat(respAccountValue[0].value.dividedBy(respAccountValue[1].value).dividedBy(10 ** 13).dp(2, BigNumber.ROUND_FLOOR).toString())
+        dataItems[0].collateralization = collateralization
+        if(dataItems.length>1){
+          dataItems[1].collateralization = collateralization
+        }
+      }
+
+    }
+
+    return dataItems
   }
 
   public createAwaitingLoan = () => {
