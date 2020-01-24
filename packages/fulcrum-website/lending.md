@@ -48,16 +48,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
                 </div>
             </div>
             <div class="col col-7 col-lg-9 col-md-12 fw-w jc-sb jc-sm-fs">
-                <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-token="bat">
-                    <div class="icon-50 mr-15 mr-xs-9">
-                        {% include svg/bat.svg %}
-                    </div>
-                    <div>
-                        <p class="lh-180 fw-700 c-gray">BAT</p>
-                        <p class="fs-24 c-primary"><span class="fw-800 apr-value">4.2</span>%</p>
-                    </div>
-                </div>
-                <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-token="knc">
+                <div class="flex mr-40 mb-40 mb-xs-30 apr-component" data-token="knc">
                     <div class="icon-50 mr-15 mr-xs-9">
                         {% include svg/knc.svg %}
                     </div>
@@ -66,16 +57,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
                         <p class="fs-24 c-primary"><span class="fw-800 apr-value">5.3</span>%</p>
                     </div>
                 </div>
-                <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-token="rep">
-                    <div class="icon-50 mr-15 mr-xs-9">
-                        {% include svg/rep.svg %}
-                    </div>
-                    <div>
-                        <p class="lh-180 fw-700 c-gray">REP</p>
-                        <p class="fs-24 c-primary"><span class="fw-800 apr-value">2.8</span>%</p>
-                    </div>
-                </div>
-                <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-token="zrx">
+                <div class="flex mr-40 mb-40 mb-xs-30 apr-component" data-token="zrx">
                     <div class="icon-50 mr-15 mr-xs-9">
                         {% include svg/zrx.svg %}
                     </div>
@@ -84,7 +66,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
                         <p class="fs-24 c-primary"><span class="fw-800 apr-value">1.6</span>%</p>
                     </div>
                 </div>
-                <div class="flex mr-20 mb-xs-30 apr-component" data-token="eth">
+                <div class="flex mr-40 mb-xs-30 apr-component" data-token="eth">
                     <div class="icon-50 mr-15 mr-xs-9">
                         {% include svg/eth.svg %}
                     </div>
@@ -93,7 +75,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
                         <p class="fs-24 c-primary"><span class="fw-800 apr-value">4.2</span>%</p>
                     </div>
                 </div>
-                <div class="flex mr-20 mb-xs-30 apr-component" data-token="link">
+                <div class="flex mr-40 mb-xs-30 apr-component" data-token="link">
                     <div class="icon-50 mr-15 mr-xs-9">
                         {% include svg/link.svg %}
                     </div>
@@ -102,7 +84,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
                         <p class="fs-24 c-primary"><span class="fw-800 apr-value">4,2</span>%</p>
                     </div>
                 </div>
-                <div class="flex mr-20 mb-xs-30 apr-component" data-token="susd">
+                <div class="flex mr-40 mb-xs-30 apr-component" data-token="susd">
                     <div class="icon-50 mr-15 mr-xs-9">
                         {% include svg/susd.svg %}
                     </div>
@@ -111,7 +93,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
                         <p class="fs-24 c-primary"><span class="fw-800 apr-value">4.2</span>%</p>
                     </div>
                 </div>
-                <div class="flex mr-20 mb-xs-30 apr-component" data-token="wbtc">
+                <div class="flex mr-40 mb-xs-30 apr-component" data-token="wbtc">
                     <div class="icon-50 mr-15 mr-xs-9">
                         {% include svg/wbtc.svg %}
                     </div>
@@ -235,9 +217,6 @@ title: Crypto Margin Trading with Fulcrum | bZx
                             <button class="coin-calc" data-token="usdc">
                                 {% include svg/usdc.svg %}
                             </button>
-                            <button class="coin-calc" data-token="bat">
-                                {% include svg/bat.svg %}
-                            </button>
                             <button class="coin-calc" data-token="eth">
                                 {% include svg/eth.svg %}
                             </button>
@@ -246,9 +225,6 @@ title: Crypto Margin Trading with Fulcrum | bZx
                             </button>
                             <button class="coin-calc" data-token="knc">
                                 {% include svg/knc.svg %}
-                            </button>
-                            <button class="coin-calc" data-token="rep">
-                                {% include svg/rep.svg %}
                             </button>
                             <button class="coin-calc" data-token="susd">
                                 {% include svg/susd.svg %}
