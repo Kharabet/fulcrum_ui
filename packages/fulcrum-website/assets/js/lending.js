@@ -82,9 +82,9 @@ function timer() {
 }
 
 function changePositionBorderThumb(range, current) {
-    leftRangeQuantity.style.left = 'calc(' + current.value / range.max * 100 + '% - 12px - (16px *' + (current.value - range.max / 2) / range.max + '))'; //12 - half of width thumb with border, 16 - width thumb without border
-    rightRangeQuantity.style.left = 'calc(' + current.value / range.max * 100 + '% - 12px + 20px - (16px *' + (current.value - range.max / 2) / range.max + '))'; //12 - half of width thumb with border, 16 - width thumb without border 
-    trackRangeQuantity.style.width = 'calc(' + current.value / range.max * 100 + '% - 12px - (16px *' + (current.value - range.max / 2) / range.max + '))';;
+    leftRangeQuantity.style.left = 'calc(' + current.value / (range.max ) * 100 + '% - 12px - (16px *' + (current.value - (range.max ) / 2) / range.max + '))'; //12 - half of width thumb with border, 16 - width thumb without border
+    rightRangeQuantity.style.left = 'calc(' + current.value / (range.max ) * 100 + '% - 12px + 20px - (16px *' + (current.value - (range.max ) / 2) / range.max+ '))'; //12 - half of width thumb with border, 16 - width thumb without border 
+    trackRangeQuantity.style.width = 'calc(' + current.value / (range.max ) * 100 + '% - 12px - (16px *' + (current.value - (range.max ) / 2) / range.max + '))';;
 }
 
 window.addEventListener('load', function () {
@@ -107,7 +107,7 @@ window.addEventListener('load', function () {
         if (!e.currentTarget.value)
             quantityRange.value = 0;
 
-            var rangeMax = new Number(quantityRange.getAttribute("max"));
+        var rangeMax = new Number(quantityRange.getAttribute("max"));
         if (e.currentTarget.value > rangeMax)
             e.currentTarget.value = rangeMax;
 

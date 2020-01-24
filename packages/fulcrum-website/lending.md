@@ -266,7 +266,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
                         <p class="fs-18 mb-15 mb-md-0 c-dark-gray text-md-center">Quantity</p>
                         <input class="input-quantity" value="10" />
                         <div class="border-range-quantity">                            
-                            <input class="range-quantity" type="range" value="10" min="0" max="1000"/>
+                            <input class="range-quantity" type="range" value="10" min="1" max="10000"/>
                             <div class="left-range-quantity"></div>
                             <div class="right-range-quantity"></div>
                             <div class="track-range-quantity"></div>
