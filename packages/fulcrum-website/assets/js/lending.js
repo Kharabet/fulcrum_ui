@@ -10,7 +10,7 @@ var trackRangeQuantity = document.querySelector('.track-range-quantity');
 var coins = document.querySelectorAll('#calculator-earn .coin-calc');
 var wrapperFinance = document.querySelector('.wrapper-finance');
 
-var api_url = "http://192.168.201.11:8080/api";
+var api_url = "https://fulcrum-api-dev.herokuapp.com/api";
 
 
 (async function getData() {
