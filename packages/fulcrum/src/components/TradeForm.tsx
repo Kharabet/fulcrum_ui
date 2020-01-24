@@ -263,11 +263,13 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
   };
 
   public componentWillUnmount(): void {
+    window.history.back();
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
   public componentDidMount(): void {
     this.derivedUpdate();
+    window.history.pushState(null, "Trade Modal Opened", `/#/trade/${this.props.tradeType.toLocaleLowerCase()}-${this.props.leverage}x-${this.props.positionType.toLocaleLowerCase()}-${this.props.asset}/`);
 
     if (this._input) {
       this._input.select();
