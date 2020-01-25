@@ -1,9 +1,9 @@
 ---
 layout: lending
 featured-image: /images/ogp.png
-metadescription: "Try non-custodial crypto margin trading at DeFi platform Fulcrum. Enter into short/leveraged positions
-up to 4x without open fees. ETH and wBTC are available."
-title: Crypto Margin Trading with Fulcrum | bZx
+metadescription: "Earn interest on your idle crypto and stablecoins. Flexible High-Yield Returns – No Minimum Deposit, no lock up period, withdraw anytime."
+title: DeFi Crypto Lending Platform Fulcrum | bZx
+permalink:
 ---
 
 <section class="bg-primary bg-secondary-image pb-90 pb-xs-45">
