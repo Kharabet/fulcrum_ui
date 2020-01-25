@@ -135,7 +135,6 @@ permalink: lending
             <div class="col col-12">
                 <div class="item-green py-40 p-sm-30 flex jc-c">
                     <div class="col-10 col-md col-md-12 fd-c jc-sb">
-                        <p class="fs-24 fs-xs-20 fw-800 lh-150 mb-xs-15">You are in a good company</p>
                         <p class="fs-44 fs-xs-28 fw-900 mb-15 lh-140 c-light-green">TVL in our Smart Contracts</p>
                         <div class="flex jc-sb fd-sm-c fs-44 fs-xs-36 fw-900 lh-140">
                             <div class="flex-xs fw-400">
@@ -240,7 +239,7 @@ permalink: lending
                     <div class="flex fd-c input-calc">
                         <p class="fs-18 mb-15 mb-md-0 c-dark-gray text-md-center">Quantity</p>
                         <input class="input-quantity" value="10" />
-                        <div class="border-range-quantity">                            
+                        <div class="border-range-quantity">
                             <input class="range-quantity" type="range" value="10" min="0" max="200"/>
                             <div class="left-range-quantity"></div>
                             <div class="right-range-quantity"></div>
@@ -255,7 +254,7 @@ permalink: lending
                 </div>
             </div>
         </div>
-        <div class="wrapper-finance">        
+        <div class="wrapper-finance">
             <div class="row">
                 <div class="col col-12 jc-c">
                     <h5 class="fw-900 mb-35">Compare vs. traditional finance</h5>
@@ -352,7 +351,7 @@ permalink: lending
                     assets</p>
                 <div class="item-timer">
                     <span><span class="wrap-hours"><span class="hours">23</span>:</span><span class="minutes">0</span>:<span class="seconds">00</span></span>
-                </div>                
+                </div>
                 <p class="fs-56 fs-xs-44 fw-400 c-primary-blue mb-40 mb-xs-30 lh-140">$<span class="fw-900 live-earnings-value">45,459,300</span></p>
                 <a href="https://fulcrum.trade/lend" class="button button-secondary button-lg mb-15 mx-auto order-sm-1">Lend</a>
                 <p class="fs-13 lh-150 text-center c-gray mb-10 mb-sm-25">To Earn interest</p>
