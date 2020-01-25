@@ -391,7 +391,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
                   <img className="asset-logo" src={this.state.assetDetails.logoSvg} alt={tokenNameBase} />
                   <PositionTypeMarkerAlt assetDetails={this.state.assetDetails} value={this.props.positionType} />
                 </div>
-                <div className="trade-form__info_block__asset" style={{color: this.state.assetDetails.textColor}}>
+                <div className="trade-form__info_block__asset" style={this.props.asset === Asset.WBTC ? {color: this.state.assetDetails.textColor, paddingTop: `1rem` } : {color: this.state.assetDetails.textColor}}>
                   {tokenNameBase}
                 </div>
                 <div className="trade-form__info_block__stats"  style={{color: this.state.assetDetails.textColor2}}>
@@ -410,7 +410,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
                   <img className="asset-logo" src={this.state.assetDetails.logoSvg} alt={tokenNameBase} />
                   <PositionTypeMarkerAlt assetDetails={this.state.assetDetails} value={this.props.positionType} />
                 </div>
-                <div className="trade-form__info_block__asset" style={{color: this.state.assetDetails.textColor}}>
+                <div className="trade-form__info_block__asset" style={this.props.asset === Asset.WBTC ? {color: this.state.assetDetails.textColor, paddingTop: `1rem` } : {color: this.state.assetDetails.textColor}}>
                   {tokenNameBase}
                 </div>
                 <div className="trade-form__info_block__stats"  style={{color: this.state.assetDetails.textColor2}}>
