@@ -1,0 +1,15 @@
+<svg viewBox="0 0 120 120" fill="none" 
+    xmlns="http://www.w3.org/2000/svg">
+    <g>
+        <rect x="100" y="120" width="80" height="120" transform="rotate(-180 100 120)" class="icon-step-secondary" />
+        <path d="M100 80C111.046 80 120 71.0457 120 60C120 48.9543 111.046 40 100 40V80Z" fill="#51AAFF"/>
+        <path d="M100 40C88.9543 40 80 48.9543 80 60C80 71.0457 88.9543 80 100 80L100 40Z" fill="#176EFC"/>
+        <path d="M20 40C8.95431 40 2.7141e-06 48.9543 1.74846e-06 60C7.8281e-07 71.0457 8.95431 80 20 80L20 40Z" fill="#51AAFF"/>
+        <path d="M20 80C31.0457 80 40 71.0457 40 60C40 48.9543 31.0457 40 20 40L20 80Z" fill="#176EFC"/>
+        <circle cx="60" cy="60" r="30" fill="#13D8C4"/>
+        <circle cx="47" cy="60" r="3" fill="white"/>
+        <rect x="56" y="58" width="21" height="4" fill="white"/>
+        <rect x="50" y="48" width="21" height="4" fill="white"/>
+        <rect x="50" y="68" width="21" height="4" fill="white"/>
+    </g>
+</svg>
