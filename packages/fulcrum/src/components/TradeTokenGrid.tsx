@@ -59,6 +59,9 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
       TradeTokenGrid.assets = [
         Asset.ETH
       ];
+    } if (process.env.REACT_APP_ETH_NETWORK === "ropsten") {
+      TradeTokenGrid.assets = [
+      ];
     } else {
       TradeTokenGrid.assets = [
         Asset.ETH,
@@ -91,7 +94,7 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
       this.setState({ ...this.state, tokenRowsData: TradeTokenGrid.getRowsData(this.props) }) ;
     }else{
       this.setState({ ...this.state, tokenSingleRowsData:TradeTokenGrid.getSingleRowData(this.props) }) ;
-    this.setState({ ...this.state, tokenSingleRowsData:TradeTokenGrid.getSingleRowData(this.props), tokenLongShortRowsData:TradeTokenGrid.getRowsLongShortData(this.props) }) ;
+      this.setState({ ...this.state, tokenSingleRowsData:TradeTokenGrid.getSingleRowData(this.props), tokenLongShortRowsData:TradeTokenGrid.getRowsLongShortData(this.props) }) ;
     }
 
       // this.setState({ ...this.state, tokenSingleRowsData:TradeTokenGrid.getSingleRowData(this.props) }) ;

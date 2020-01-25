@@ -155,7 +155,7 @@ export class AssetsDictionary {
         "#FFFFFF",
         new Map<number, string | null>([
           [1, "0x6b175474e89094c44da98b954eedeac495271d0f"],
-          [3, ""],
+          [3, "0xf80A32A835F79D7787E8a8ee5721D0fEaFd78108"],
           [4, "0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea"],
           [42, "0x4f96fe3b7a6cf9725f59d353f723c1bdb64ca6aa"]
         ])
@@ -453,7 +453,7 @@ export class AssetsDictionaryMobile {
         "#FFFFFF",
         new Map<number, string | null>([
           [1, "0x6b175474e89094c44da98b954eedeac495271d0f"],
-          [3, ""],
+          [3, "0xf80A32A835F79D7787E8a8ee5721D0fEaFd78108"],
           [4, "0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea"],
           [42, "0x4f96fe3b7a6cf9725f59d353f723c1bdb64ca6aa"]
         ])
