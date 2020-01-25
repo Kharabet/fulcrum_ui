@@ -384,8 +384,8 @@ export class makerBridgeContract extends BaseContract {
                 },
                 self._web3Wrapper.getContractDefaults(),
             );
-            const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
-            return gas;
+          const gas = Math.floor((await self._web3Wrapper.estimateGasAsync(txDataWithDefaults)) * 1.2);
+          return (gas > 10000000 ? 10000000 : gas);
         },
         getABIEncodedTransactionData(
             cdps: BigNumber[],

@@ -1,18 +1,18 @@
 import * as _ from "lodash";
 
+import { cdpManagerContract } from "../contracts/cdpManager";
+import { dsProxyJsonContract } from "../contracts/dsProxyJson";
 import { erc20Contract } from "../contracts/erc20";
 import { GetCdpsContract } from "../contracts/getCdps";
 import { iBZxContract } from "../contracts/iBZxContract";
 import { iENSOwnerContract } from "../contracts/iENSOwnerContract";
-import { iTokenContract } from "../contracts/iTokenContract";
-import { oracleContract } from "../contracts/oracle";
-import { vatContract } from "../contracts/vat";
-import { cdpManagerContract } from "../contracts/cdpManager";
-import { makerBridgeContract } from "../contracts/makerBridge";
-import { proxyRegistryContract } from "../contracts/proxyRegistry";
-import { dsProxyJsonContract } from "../contracts/dsProxyJson";
-import { saiToDAIBridgeContract } from "../contracts/saiToDaiBridge";
 import { instaRegistryContract } from "../contracts/instaRegistry";
+import { iTokenContract } from "../contracts/iTokenContract";
+import { makerBridgeContract } from "../contracts/makerBridge";
+import { oracleContract } from "../contracts/oracle";
+import { proxyRegistryContract } from "../contracts/proxyRegistry";
+import { saiToDAIBridgeContract } from "../contracts/saiToDaiBridge";
+import { vatContract } from "../contracts/vat";
 
 import { Asset } from "../domain/Asset";
 
@@ -32,14 +32,14 @@ export class ContractsSource {
   private vatJson: any;
   private cdpJson: any;
   private makerBridgeJson: any;
-  private proxyRegisteryJson :any;
+  private proxyRegistryJson :any;
   private dsProxyIsAllowJson: any;
   private dsProxyJson: any;
   private proxyMigrationsJson: any;
   public networkId: number;
   public canWrite: boolean;
   public saiToDAIBridgeJson: any;
-  public instaRegistryeJson: any;
+  public instaRegistryJson: any;
 
   public constructor(provider: any, networkId: number, canWrite: boolean) {
     this.provider = provider;
@@ -129,7 +129,7 @@ export class ContractsSource {
             address = "0xb530f422ff1520cbb76a8300e39bd4f55bc03bbc";
             break;
           case 42:
-            address = "0x6c1e2b0f67e00c06c8e2be7dc681ab785163ff4d";//"0x3e37e3f4c3b0b0b5944cc1f366152dea22ef63f9"
+            address = "0x6c1e2b0f67e00c06c8e2be7dc681ab785163ff4d";
             break;
         }
         break;
@@ -362,12 +362,12 @@ export class ContractsSource {
     this.vatJson = await import(`./../assets/artifacts/${network}/vat.json`);
     this.cdpJson = await import(`./../assets/artifacts/${network}/cdpManager.json`);
     this.makerBridgeJson = await import(`./../assets/artifacts/${network}/makerBridge.json`);
-    this.proxyRegisteryJson = await import(`./../assets/artifacts/${network}/proxyRegistry.json`);
+    this.proxyRegistryJson = await import(`./../assets/artifacts/${network}/proxyRegistry.json`);
     this.dsProxyJson = await import(`./../assets/artifacts/${network}/dsProxyJson.json`);
     this.proxyMigrationsJson = await import(`./../assets/artifacts/${network}/proxyMigrations.json`);
     this.dsProxyIsAllowJson = await import(`./../assets/artifacts/${network}/dsProxyIsAllow.json`);
     this.saiToDAIBridgeJson = await import(`./../assets/artifacts/${network}/saiToDAIBridge.json`);
-    this.instaRegistryeJson = await import(`./../assets/artifacts/${network}/instaRegistry.json`);
+    this.instaRegistryJson = await import(`./../assets/artifacts/${network}/instaRegistry.json`);
     ContractsSource.isInit = true;
   }
 
@@ -387,25 +387,25 @@ export class ContractsSource {
     await this.Init();
     return new cdpManagerContract(this.cdpJson.abi, addressCdp.toLowerCase(), this.provider);
   }
-  private async getmakerBridgeRaw(address: string): Promise<makerBridgeContract> {
+  private async getMakerBridgeRaw(address: string): Promise<makerBridgeContract> {
     await this.Init();
     return new makerBridgeContract(this.makerBridgeJson.abi, address.toLowerCase(), this.provider);
   }
-  private async getProxyRegisteryRaw(address: string): Promise<proxyRegistryContract> {
+  private async getProxyRegistryRaw(address: string): Promise<proxyRegistryContract> {
     await this.Init();
-    return new proxyRegistryContract(this.proxyRegisteryJson.abi, address.toLowerCase(), this.provider);
+    return new proxyRegistryContract(this.proxyRegistryJson.abi, address.toLowerCase(), this.provider);
   }
   private async getDsProxyRaw(address: string): Promise<dsProxyJsonContract> {
     await this.Init();
     return new dsProxyJsonContract(this.dsProxyJson.abi, address.toLowerCase(), this.provider);
   }
-  private async getSaitoDaiBridgeRaw(address: string): Promise<saiToDAIBridgeContract> {
+  private async getSaiToDaiBridgeRaw(address: string): Promise<saiToDAIBridgeContract> {
     await this.Init();
     return new saiToDAIBridgeContract(this.saiToDAIBridgeJson.abi, address.toLowerCase(), this.provider);
   }
   private async getInstaRegistryRaw(address: string): Promise<instaRegistryContract> {
     await this.Init();
-    return new instaRegistryContract(this.instaRegistryeJson.abi, address.toLowerCase(), this.provider);
+    return new instaRegistryContract(this.instaRegistryJson.abi, address.toLowerCase(), this.provider);
   }
   private async getDsProxyAllowJSON(){
     return this.dsProxyIsAllowJson;
@@ -415,16 +415,13 @@ export class ContractsSource {
   }
 
 
-
-
-
   public getProxyMigration = _.memoize(this.getProxyMigrationJSON);
   public dsProxyAllowJson = _.memoize(this.getDsProxyAllowJSON);
   public getInstaRegistry = _.memoize(this.getInstaRegistryRaw);
-  public getSaitoDaiBridge = _.memoize(this.getSaitoDaiBridgeRaw);
-  public getProxyRegistery = _.memoize(this.getProxyRegisteryRaw);
+  public getSaiToDaiBridge = _.memoize(this.getSaiToDaiBridgeRaw);
+  public getProxyRegistry = _.memoize(this.getProxyRegistryRaw);
   public getDsProxy = _.memoize(this.getDsProxyRaw);
-  public getmakerBridge = _.memoize(this.getmakerBridgeRaw);
+  public getMakerBridge = _.memoize(this.getMakerBridgeRaw);
   public getCdpManager = _.memoize(this.getCdpManagerRaw);
   public getVatContract = _.memoize(this.getVatContractRaw);
   public getCdpContract = _.memoize(this.getCdpContractRaw);
