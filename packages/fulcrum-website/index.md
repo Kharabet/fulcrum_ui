@@ -370,7 +370,7 @@ This ensures that there are redundancies in the margin calling process. Moreover
                     <div class="accordion-item">
                         <h4 class="accordion-toggle">Are the smart contracts safe? Can I see the audits?</h4>
                         <div class="accordion-content">
-                            <p>Yes. The base protocol audit is publicly available. All custody is retained by the base protocol. Both the base protocol audit and iToken/pToken audit were conducted by [ZK Labs](https://github.com/mattdf/audits/blob/master/bZx/bzx-audit.pdf), a recognized leader in the space. Matthew DiFerrante, founder and lead auditor at ZK Labs, is a security engineer at the Ethereum Foundation and audits the Ethereum core protocol itself.</p>
+                            <p>Yes. The base protocol audit is publicly available. All custody is retained by the base protocol. Both the base protocol audit and iToken/pToken audit were conducted by <a href="https://github.com/mattdf/audits/blob/master/bZx/bzx-audit.pdf">ZK Labs</a>, a recognized leader in the space. Matthew DiFerrante, founder and lead auditor at ZK Labs, is a security engineer at the Ethereum Foundation and audits the Ethereum core protocol itself.</p>
                         </div>
                     </div>
                 </div>
