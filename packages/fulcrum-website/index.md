@@ -15,9 +15,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
                     <h1 class="mb-40">Margin made simple</h1>
                     <p class="fs-16 fs-xs-12 lh-160 mb-50 c-secondary"><span class="fw-600">Fulcrum</span> is the most simple and
                         powerful way to lend and margin trade. It is
-                        the first and only completely trustless platform for margin; it does not use centralized price
-                        feeds or
-                        centrally administered margin calls. It is permissionless and rent free; there are no platform fees and
+                        the first and only completely trustless platform for margin; permissionless and rent free; there are no platform fees and
                         no
                         accounts.</p>
                     <div class="flex fd-xs-c">
