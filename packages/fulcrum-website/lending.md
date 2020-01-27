@@ -13,9 +13,7 @@ permalink: lending
             <div class="col col-10 col-xs-12">
                 <div class="pl-55 pl-lg-0">
                     <h1 class="mb-40">Earn Interest on Crypto</h1>
-                    <p class="fs-16 lh-160 mb-50 mx-xs-auto mb-xs-30 c-secondary mw-390">Flexible High-Yield Returns – No Minimum Deposit,
-                        no lock
-                        up period, withdraw anytime.</p>
+                    <p class="fs-16 lh-160 mb-50 mx-xs-auto mb-xs-30 c-secondary mw-390">Flexible, high-yield returns – No minimum deposit, no lock-up period, withdraw anytime.</p>
                     <div class="flex fd-xs-c">
                         <div class="flex ai-c wrap-white mr-25 mx-xs-auto apr-component" data-token="usdc">
                             <div class="icon-66 icon-sm-50 mr-15">
@@ -119,15 +117,13 @@ permalink: lending
             <div class="col col-6 col-sm-12 fd-c">
                 <h2 class="circle mb-25"><span class="green left-165 top-r-10"></span>Who are <br />the borrowers?</h2>
                 <div class="pl-90 pl-md-60 c-primary">
-                    <p class="mb-10">Borrowers are individuals who want to use their digital assets to build leveraged positions. This is also referrred to as “margin trading.”
-                Fulcrum enables borrowers to create a leveraged position by borrowing assets from lenders.</p>
+                    <p class="mb-10">Borrowers are individuals who want to use their digital assets to build leveraged positions. This is also referrred to as “margin trading.” Fulcrum enables borrowers to create a leveraged position by borrowing assets from lenders.</p>
                 </div>
             </div>
             <div class="col col-6 col-sm-12 fd-c">
-                <h2 class="circle mb-25"><span class="big purple left-35 bottom-r-50 "></span>Where does the interest <br />  coming from? </h2>
+                <h2 class="circle mb-25"><span class="big purple left-35 bottom-r-50 "></span>Where does the <br/> interest come from? </h2>
                 <div class="pl-90 pl-md-60 c-primary">
-                    <p class="mb-10">The interest paid to lenders comes from the fees paid by borrowers in exchange for access to liquidity when trading on margin.
-                Fulcrum extends the bZx protocol by giving users the ability to create tokenized loans and margin positions.
+                    <p class="mb-10">The interest paid to lenders comes from the fees paid by borrowers in exchange for access to liquidity when trading on margin. Fulcrum extends the bZx protocol by giving users the ability to create tokenized loans and margin positions.
               </p>
                 </div>
             </div>
@@ -169,16 +165,14 @@ permalink: lending
 
 <section class="bg-secondary pt-105 pb-75 pb-xs-60 text-center">
     <div class="container">
-        <h2 class="mb-75 mb-xs-50 circle"><span class="purple center top-r-60"></span>How safe it is</h2>
+        <h2 class="mb-75 mb-xs-50 circle"><span class="purple center top-r-60"></span>How safe is it?</h2>
         <div class="flex fw-sm-w jc-sb">
             <div class="col col-4 col-sm-12 item-safe fd-c">
                 <div class="icon-safe mb-40 mb-xs-15">
                     {% include svg/icon-safe-4.svg %}
                 </div>
                 <h3 class="mb-20">Overcollateralized</h3>
-                <p>The bZx protocol must be overcollateralized in order to maintain sufficient liquidity for dApps using the protocol.
-                Borrowers must maintain the collateral-to-loan ratio specified by the terms of the loan or the collateral will be liquidated to repay the lender.
-
+                <p>Borrowers must maintain the collateral-to-loan ratio specified by the terms of the loan or the collateral will be liquidated to repay the lender and maintain sufficient liquidity for dApps using the protocol.
                 </p>
             </div>
             <div class="col col-4 col-sm-12 item-safe fd-c">
@@ -186,16 +180,14 @@ permalink: lending
                     {% include svg/icon-safe-1.svg %}
                 </div>
                 <h3 class="mb-20">Audited Smart Contracts</h3>
-                <p>The bZx base protocol audited by leading blockchain security auditor <a href="https://github.com/mattdf/audits/blob/master/bZx/bzx-audit.pdf">ZK Labs.</a>
-          ZK Labs provides smart contract development and auditing services for projects built on Ethereum and is headed by Matthew DiFerrante, Dean Eigenmann, Nick Johnson, and Harry Roberts.</p>
+                <p>The bZx base protocol has been successfully audited by leading blockchain security auditor ZK Labs, headed by Matthew DiFerrante, Dean Eigenmann, Nick Johnson, and Harry Roberts and available <a href="https://github.com/mattdf/audits/blob/master/bZx/bzx-audit.pdf">here.</a></p>
             </div>
             <div class="col col-4 col-sm-12 item-safe fd-c">
                 <div class="icon-safe mb-40 mb-xs-15">
                     {% include svg/icon-safe-2.svg %}
                 </div>
                 <h3 class="mb-20">Insurance fund</h3>
-                <p>bZx automatically diverts 10% of the interest paid to lenders by borrowers to maintain an Insurance Fund.
-              If lenders lose money from borrowers who are not properly liquidated, assets from the Insurance Fund are used to repay the lenders.
+                <p>10% of the interest paid by borrowers goes to an Insurance Fund for mitigating potential losses suffered by lenders in the event that undercollateralized loans are not properly liquidated.
       </p>
             </div>
         </div>
@@ -372,8 +364,8 @@ permalink: lending
     <div class="container">
         <div class="row">
             <div class="col col-12 fd-c">
-                <h2 class="circle mb-15 mb-sm-25 jc-c"><span class="blue center top-r-60"></span>How to lend you crypto with Fulcrum?</h2>
-                <p class="fs-20 fs-sm-16 lh-150 c-secondary-blue mb-75 mb-sm-60">Three clicks. No Minimum Deposit, no lock up period, withdraw anytime</p>
+                <h2 class="circle mb-15 mb-sm-25 jc-c"><span class="blue center top-r-60"></span>How do I lend crypto with Fulcrum?</h2>
+                <p class="fs-20 fs-sm-16 lh-150 c-secondary-blue mb-75 mb-sm-60">Three clicks. No minimum deposit, no lock-up period, withdraw anytime</p>
             </div>
         </div>
         <div class="row jc-c">
@@ -383,7 +375,7 @@ permalink: lending
                         <span class="lend-count">1</span>
                         {% include svg/lend-step-1.svg %}
                     </div>
-                    <p class="c-dark-gray mt-25 mw-400 mx-auto">Choose the asset you want to securely lend with Fulcrum</p>
+                    <p class="c-dark-gray mt-25 mw-400 mx-auto">Choose the asset you want to lend</p>
                 </div>
                 <div class="flex fd-c mb-md-55">
                     <div class="svg-blur mb-45">
