@@ -41,7 +41,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
         <div class="row fw-w">
             <div class="col col-4 col-sm-6 col-xs-12">
                 <div class="item-advantager">
-                    <h2 class="circle mb-50 mb-xs-0"><span class="blue left-r-50 top-r-10"></span>Why is <br />margin trading with Fulcrum 
+                    <h2 class="circle mb-50 mb-xs-0"><span class="blue left-r-50 top-r-10"></span>Why is <br />margin trading with Fulcrum
                         <br />
                         better?
                     </h2>
@@ -71,11 +71,8 @@ title: Crypto Margin Trading with Fulcrum | bZx
                         {% include svg/step-3.svg %}
                     </div>
                     <h3 class="mb-20">Everything is Tokenized</h3>
-                    <p>Tokenized margin loans and positions are transferrable, ERC20-compatible assets. </p>
-                    <br>
-                    <p>pTokens are tokenized margin positions offering static leverage with variable interest rates.</p>
-                    <br>
-                    <p>iTokens are tokenized margin loans offering interest on deposited funds.</p>
+                    <p>Tokenized margin loans and positions are transferrable, ERC20-compatible assets.              pTokens are tokenized margin positions offering static leverage with variable interest rates.
+                    iTokens are tokenized margin loans offering interest on deposited funds.</p>
                 </div>
             </div>
             <div class="col col-4 col-sm-6 col-xs-12">
@@ -84,9 +81,9 @@ title: Crypto Margin Trading with Fulcrum | bZx
                         {% include svg/step-4.svg %}
                     </div>
                     <h3 class="mb-20">Minimal Liquidation Penalties</h3>
-                    <p>Why should borrowers be fully liquidated if their position goes under margin maintenance?<br></p>
-                    <p>Fulcrum liquidates traders such that margin maintenance is brought from 15% to 25%.</p><br>
-                    <p>This reduces slippage, protects lenders, and allows traders to maintain their exposure while reducing potential losses.</p>
+                    <p>Why should borrowers be fully liquidated if their position goes under margin maintenance?
+              Fulcrum liquidates traders such that margin maintenance is brought from 15% to 25%.
+                This reduces slippage, protects lenders, and allows traders to maintain their exposure while reducing potential losses.</p>
                 </div>
             </div>
             <div class="col col-4 col-sm-6 col-xs-12">
@@ -95,9 +92,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
                         {% include svg/step-5.svg %}
                     </div>
                     <h3 class="mb-20">Perpetual Positions</h3>
-                    <p>Trading positions are automatically renewed with no intervention from the trader and zero rollover fees.  </p>
-                    <br>
-                    <p>Without having to worry about expiration dates when entering or holding positions, users get to enjoy a frictionless trading experience.</p>
+                    <p>Trading positions are automatically renewed with no intervention from the trader and zero rollover fees. Without having to worry about expiration dates when entering or holding positions, users get to enjoy a frictionless trading experience.</p>
                 </div>
             </div>
         </div>
@@ -280,28 +275,23 @@ title: Crypto Margin Trading with Fulcrum | bZx
                     {% include svg/icon-safe-1.svg %}
                 </div>
                 <h3 class="mb-20">Audited Smart Contracts</h3>
-                <p>The bZx base protocol successfully passed a security audit performed by leading blockchain security auditor ZK Labs.  </p>
-                <p>The audit noted that “The code is generally well structured and properly compartmentalized.”  </p>
-                <p>ZK Labs provides smart contract development and auditing services for projects built on Ethereum and is headed by Matthew DiFerrante, Dean Eigenmann, Nick Johnson, and Harry Roberts.</p>
+                <p>The bZx base protocol audited by leading blockchain security auditor ZK Labs.  
+                ZK Labs provides smart contract development and auditing services for projects built on Ethereum and is headed by Matthew DiFerrante, Dean Eigenmann, Nick Johnson, and Harry Roberts. You can read our audit by ZK Labs <a href="https://github.com/mattdf/audits/blob/master/bZx/bzx-audit.pdf">here.</a></p>
             </div>
             <div class="col col-4 col-sm-12 item-safe fd-c">
                 <div class="icon-safe mb-50 mb-xs-15">
                     {% include svg/icon-safe-2.svg %}
                 </div>
                 <h3 class="mb-20">Insurance Fund</h3>
-                <p>Lenders may lose money in the event that borrowers are not properly liquidated when their loans become undercollateralized.  </p>
-                <p>To mitigate this risk, Fulcrum automatically diverts 10% of the interest paid by borrowers to maintain an Insurance Fund.   </p>
-                <p>If borrowers are not properly liquidated, assets from the Insurance Fund are used to repay the lenders.
-                To avoid slippage in the event the fund must pay out, collateralization of the fund has been diversified by allowing BZRX tokens to be exchanged for assets from the fund.</p>
+                <p>Lenders may lose money in the event that borrowers are not properly liquidated when their loans become undercollateralized. To mitigate this risk, Fulcrum automatically diverts 10% of the interest paid by borrowers to maintain an Insurance Fund.
+            </p>
             </div>
             <div class="col col-4 col-sm-12 item-safe fd-c">
                 <div class="icon-safe mb-50 mb-xs-15">
                     {% include svg/icon-safe-3.svg %}
                 </div>
                 <h3 class="mb-20">Open source</h3>
-                <p>Would you prefer to evaluate our code yourself?  </p>
-                <p><a href="https://github.com/bZxNetwork">No problem!</a>    </p>  <p>As one of the founding principles of DeFi, we’re committed to interoperability and the development of open source code.  </p>
-                <p>Open sourcing code is how we continue to build DeFi legos in an accessible, transparent way.</p>
+                <p>Would you prefer to evaluate our code yourself? <a href="https://github.com/bZxNetwork">No problem!</a> As one of the founding principles of DeFi, we’re committed to interoperability and the development of open source code. Open sourcing code is how we continue to build DeFi legos in an accessible, transparent way.</p>
             </div>
         </div>
     </div>
