@@ -10,46 +10,10 @@ var trackRangeQuantity = document.querySelector('.track-range-quantity');
 var coins = document.querySelectorAll('#calculator-earn .coin-calc');
 var wrapperFinance = document.querySelector('.wrapper-finance');
 
-var api_url = "https://fulcrum-api-dev.herokuapp.com/api";
+var calcWidgetResult = document.querySelector(".result-calc .earn-usd-value");
+var liveEarningsElem = document.querySelector(".live-earnings-value");
 
-
-(async function getData() {
-    var data = await Promise.all([getAPR(), getUsdRates(), getTVL()]);
-    window.apr = data[0];
-    window.usdRates = data[1];
-    window.tvl = data[2];
-})();
-
-
-async function getAPR() {
-    var response = await fetch(api_url + '/apr');
-    var apr = await response.json();
-    var result = {};
-    Object.entries(apr).forEach(function (item) {
-        result[item[0]] = new Number(item[1]).toFixed(2);
-    });
-    return result;
-};
-
-async function getUsdRates() {
-    var response = await fetch(api_url + '/usd-rates');
-    var rates = await response.json();
-    var result = {};
-    Object.entries(rates).forEach(function (item) {
-        result[item[0]] = new Number(item[1]).toFixed(2);
-    });
-    return result;
-};
-
-async function getTVL() {
-    var response = await fetch(api_url + '/tvl-usd');
-    var tvl = await response.json();
-    var result = {};
-    Object.entries(tvl).forEach(function (item) {
-        result[item[0]] = new Number(item[1]).toFixed(2);
-    });
-    return result;
-};
+(getData)(['apr', 'rates', 'tvl']);
 
 function renderAPR() {
     if (!window.apr) return
@@ -112,16 +76,20 @@ function timer() {
         itemHour.innerHTML = hours;
 
 
+
+    }
+
+    function liveEarningsCounter() {
         if (window.tvl) {
             if (liveTVL === 0) liveTVL = new Number(window.tvl["all"]);
-            var daiSecAPR = window.apr["dai"] / 365 / 24 / 60 / 60 / 100;
+            var daiSecAPR = window.apr["dai"] / 365 / 24 / 60 / 60 / 100 / 100; //APR per 10ms
             liveEarnings += liveTVL * daiSecAPR;
             liveTVL += liveEarnings;
-            console.log("liveEarnings: " + liveEarnings);
-            document.querySelector(".live-earnings-value").textContent = numberWithCommas(liveEarnings.toFixed(0));
-
+            liveEarningsElem.textContent = numberWithCommas(formatUsdPrice(liveEarnings));
         }
     }
+
+    setInterval(liveEarningsCounter, 10);
     setInterval(visibleTimer, 1000);
 }
 
@@ -153,7 +121,7 @@ window.addEventListener('load', function () {
             quantityRange.value = 0;
 
         var rangeMax = new Number(quantityRange.getAttribute("max"));
-        if (e.currentTarget.value > rangeMax || e.currentTarget.value <= 0 )
+        if (e.currentTarget.value > rangeMax || e.currentTarget.value <= 0)
             e.currentTarget.value = rangeMax;
 
         quantityRange.value = e.currentTarget.value;
@@ -173,14 +141,17 @@ function updateEarningsCalc(quantity) {
     if (!apr || !apr[token])
         return null;
     var monthAPR = apr[token] / 12 / 100;
-    var usdAmount = quantity * window.usdRates[token];
+    var usdAmount = quantity * window.rates[token];
 
-    var earnings = formatUsdPrice(usdAmount * monthAPR);
+    var earnings = numberWithCommas(formatUsdPrice(usdAmount * monthAPR));
 
     document.querySelector(".item-earn.fulcrum .earn-usd-value").textContent = earnings;
-    document.querySelector(".result-calc .earn-usd-value").textContent = earnings;
+
+    calcWidgetResult.textContent = earnings;
+    updateCalcResultFontSize(calcWidgetResult);
+
+
     updateTraditionalFinance(usdAmount);
-    // return earnings;
 };
 
 function updateTraditionalFinance(usdAmount) {
@@ -212,10 +183,28 @@ function onWidgetAssetsClick(e) {
 
 };
 
-function formatUsdPrice(value) {
-    return new Number(value).toFixed(2);
-};
 
-function numberWithCommas(x) {
-    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-}
+function updateCalcResultFontSize(element) {
+    var wrapper = element.closest(".wrapper");
+    var wrapperWidth = wrapper.offsetWidth;
+    var desiredWidth = wrapperWidth - 40;
+    var size;
+
+    if (element.offsetWidth > wrapperWidth) {
+
+        while (element.offsetWidth > desiredWidth) {
+            size = parseInt(getFontSize(element), 10);
+            element.style.fontSize = (size - 1) + 'px';
+        }
+        return;
+    }
+    if (element.offsetWidth < desiredWidth) {
+        while (element.offsetWidth < desiredWidth) {
+            size = parseInt(getFontSize(element), 10);
+            if (size + 1 > 66) break;
+            element.style.fontSize = (size + 1) + 'px';
+        }
+        return;
+    }
+
+};

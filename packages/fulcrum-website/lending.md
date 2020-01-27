@@ -47,8 +47,17 @@ permalink: lending
                     <h2 class="mb-md-25">Fulcrum <br /> supports lending</h2>
                 </div>
             </div>
-            <div class="col col-7 col-lg-9 col-md-12 fw-w jc-sb jc-sm-fs">
-                <div class="flex mr-40 mb-40 mb-xs-30 apr-component" data-token="knc">
+            <div class="col col-7 col-lg-9 col-md-12 fw-w jc-fs jc-sm-fs">
+                <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-token="sai">
+                    <div class="icon-50 mr-15 mr-xs-9">
+                        {% include svg/sai.svg %}
+                    </div>
+                    <div>
+                        <p class="lh-180 fw-700 c-gray">SAI</p>
+                        <p class="fs-24 c-primary"><span class="fw-800 apr-value">5.3</span>%</p>
+                    </div>
+                </div>
+                <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-token="knc">
                     <div class="icon-50 mr-15 mr-xs-9">
                         {% include svg/knc.svg %}
                     </div>
@@ -57,7 +66,7 @@ permalink: lending
                         <p class="fs-24 c-primary"><span class="fw-800 apr-value">5.3</span>%</p>
                     </div>
                 </div>
-                <div class="flex mr-40 mb-40 mb-xs-30 apr-component" data-token="zrx">
+                <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-token="zrx">
                     <div class="icon-50 mr-15 mr-xs-9">
                         {% include svg/zrx.svg %}
                     </div>
@@ -66,7 +75,7 @@ permalink: lending
                         <p class="fs-24 c-primary"><span class="fw-800 apr-value">1.6</span>%</p>
                     </div>
                 </div>
-                <div class="flex mr-40 mb-xs-30 apr-component" data-token="eth">
+                <div class="flex mr-20 mb-xs-30 apr-component" data-token="eth">
                     <div class="icon-50 mr-15 mr-xs-9">
                         {% include svg/eth.svg %}
                     </div>
@@ -75,7 +84,7 @@ permalink: lending
                         <p class="fs-24 c-primary"><span class="fw-800 apr-value">4.2</span>%</p>
                     </div>
                 </div>
-                <div class="flex mr-40 mb-xs-30 apr-component" data-token="link">
+                <div class="flex mr-20 mb-xs-30 apr-component" data-token="link">
                     <div class="icon-50 mr-15 mr-xs-9">
                         {% include svg/link.svg %}
                     </div>
@@ -84,7 +93,7 @@ permalink: lending
                         <p class="fs-24 c-primary"><span class="fw-800 apr-value">4,2</span>%</p>
                     </div>
                 </div>
-                <div class="flex mr-40 mb-xs-30 apr-component" data-token="susd">
+                <div class="flex mr-20 mb-xs-30 apr-component" data-token="susd">
                     <div class="icon-50 mr-15 mr-xs-9">
                         {% include svg/susd.svg %}
                     </div>
@@ -93,7 +102,7 @@ permalink: lending
                         <p class="fs-24 c-primary"><span class="fw-800 apr-value">4.2</span>%</p>
                     </div>
                 </div>
-                <div class="flex mr-40 mb-xs-30 apr-component" data-token="wbtc">
+                <div class="flex mr-20 mb-xs-30 apr-component" data-token="wbtc">
                     <div class="icon-50 mr-15 mr-xs-9">
                         {% include svg/wbtc.svg %}
                     </div>
@@ -220,6 +229,9 @@ permalink: lending
                             <button class="coin-calc" data-token="eth">
                                 {% include svg/eth.svg %}
                             </button>
+                            <button class="coin-calc" data-token="sai">
+                                {% include svg/sai.svg %}
+                            </button>
                             <button class="coin-calc" data-token="link">
                                 {% include svg/link.svg %}
                             </button>
@@ -239,9 +251,9 @@ permalink: lending
                     </div>
                     <div class="flex fd-c input-calc">
                         <p class="fs-18 mb-15 mb-md-0 c-dark-gray text-md-center">Quantity</p>
-                        <input class="input-quantity" value="10" />
-                        <div class="border-range-quantity">
-                            <input class="range-quantity" type="range" value="10" min="0" max="200"/>
+                        <input type="number" class="input-quantity" value="10" />
+                        <div class="border-range-quantity">                            
+                            <input class="range-quantity" type="range" value="10" min="1" max="1000000"/>
                             <div class="left-range-quantity"></div>
                             <div class="right-range-quantity"></div>
                             <div class="track-range-quantity"></div>
@@ -249,7 +261,7 @@ permalink: lending
                     </div>
                     <div class="result-calc">
                         <p class="fs-18 text-md-center">Earn up to:</p>
-                        <p class="fs-66 lh-140 fw-400 text-md-center">$<span class="fw-900 earn-usd-value">30,56</span></p>
+                        <p class="fs-66 lh-140 fw-400 text-md-center wrapper">$<span class="fw-900 earn-usd-value">30,56</span></p>
                         <p class="fs-24 lh-140 fw-600 text-right month">/month</p>
                     </div>
                 </div>

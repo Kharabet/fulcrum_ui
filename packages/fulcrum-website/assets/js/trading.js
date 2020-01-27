@@ -63,9 +63,25 @@ var gainText = document.querySelector(".gain-text");
 var spinner = document.querySelector(".spinner");
 var coins = document.querySelectorAll('.chart-tokens .coin-calc');
 
+(getData)(['tvl']);
 
+function renderTVL() {
+    if (!window.tvl) return
+    var tvl = window.tvl;
+    var tvlValueElements = document.querySelectorAll(".tvl-value");
+    tvlValueElements.forEach(function (item) {
+        var token = item.dataset.token;
+        if (tvl[token])
+            item.textContent = numberWithCommas(new Number(tvl[token]).toFixed(0));
+    });
+
+    clearInterval(window.tvlRenderer);
+}
 
 window.addEventListener('load', function () {
+
+    window.tvlRenderer = setInterval(renderTVL, 100);
+
     //change active button-coin
     for (var i = 0; i < coins.length; i++) {
         coins[i].onclick = function () {
