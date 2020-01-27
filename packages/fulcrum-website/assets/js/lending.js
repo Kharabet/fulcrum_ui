@@ -82,11 +82,10 @@ function timer() {
     function liveEarningsCounter() {
         if (window.tvl) {
             if (liveTVL === 0) liveTVL = new Number(window.tvl["all"]);
-            var daiSecAPR = window.apr["dai"] / 365 / 24 / 60 / 60 / 100 / 100;
+            var daiSecAPR = window.apr["dai"] / 365 / 24 / 60 / 60 / 100 / 100; //APR per 10ms
             liveEarnings += liveTVL * daiSecAPR;
             liveTVL += liveEarnings;
-            // console.log("liveEarnings: " + liveEarnings);
-            liveEarningsElem.textContent = numberWithCommas(liveEarnings.toFixed(2));
+            liveEarningsElem.textContent = numberWithCommas(formatUsdPrice(liveEarnings));
         }
     }
 
