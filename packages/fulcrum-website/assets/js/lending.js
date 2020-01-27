@@ -11,7 +11,7 @@ var coins = document.querySelectorAll('#calculator-earn .coin-calc');
 var wrapperFinance = document.querySelector('.wrapper-finance');
 
 var calcWidgetResult = document.querySelector(".result-calc .earn-usd-value");
-
+var liveEarningsElem = document.querySelector(".live-earnings-value");
 
 (getData)(['apr', 'rates', 'tvl']);
 
@@ -76,16 +76,21 @@ function timer() {
         itemHour.innerHTML = hours;
 
 
+
+    }
+
+    function liveEarningsCounter() {
         if (window.tvl) {
             if (liveTVL === 0) liveTVL = new Number(window.tvl["all"]);
-            var daiSecAPR = window.apr["dai"] / 365 / 24 / 60 / 60 / 100;
+            var daiSecAPR = window.apr["dai"] / 365 / 24 / 60 / 60 / 100 / 100;
             liveEarnings += liveTVL * daiSecAPR;
             liveTVL += liveEarnings;
-            console.log("liveEarnings: " + liveEarnings);
-            document.querySelector(".live-earnings-value").textContent = numberWithCommas(liveEarnings.toFixed(0));
-
+            // console.log("liveEarnings: " + liveEarnings);
+            liveEarningsElem.textContent = numberWithCommas(liveEarnings.toFixed(2));
         }
     }
+
+    setInterval(liveEarningsCounter, 10);
     setInterval(visibleTimer, 1000);
 }
 
