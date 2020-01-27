@@ -209,9 +209,9 @@ title: Crypto Margin Trading with Fulcrum | bZx
         <div class="row">
             <div class="flex col-12 jc-sb fw-sm-w mw-sm-440 mx-xs-345 mx-sm-auto">
                 <div class="item-coin mb-sm-15">
-                    <span class="name-coin">Bat</span>
+                    <span class="name-coin">Sai</span>
                     <span class="flex border-coin-4">
-                        {% include svg/bat.svg %}
+                        {% include svg/sai.svg %}
                     </span>
                 </div>
                 <div class="item-coin mb-sm-15">
@@ -236,12 +236,6 @@ title: Crypto Margin Trading with Fulcrum | bZx
                     <span class="name-coin">Link</span>
                     <span class="flex border-coin-4">
                         {% include svg/link.svg %}
-                    </span>
-                </div>
-                <div class="item-coin">
-                    <span class="name-coin">Rep</span>
-                    <span class="flex border-coin-4">
-                        {% include svg/rep.svg %}
                     </span>
                 </div>
                 <div class="item-coin">

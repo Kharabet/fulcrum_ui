@@ -47,8 +47,17 @@ title: Crypto Margin Trading with Fulcrum | bZx
                     <h2 class="mb-md-25">Fulcrum <br /> supports lending</h2>
                 </div>
             </div>
-            <div class="col col-7 col-lg-9 col-md-12 fw-w jc-sb jc-sm-fs">
-                <div class="flex mr-40 mb-40 mb-xs-30 apr-component" data-token="knc">
+            <div class="col col-7 col-lg-9 col-md-12 fw-w jc-fs jc-sm-fs">
+                <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-token="sai">
+                    <div class="icon-50 mr-15 mr-xs-9">
+                        {% include svg/sai.svg %}
+                    </div>
+                    <div>
+                        <p class="lh-180 fw-700 c-gray">SAI</p>
+                        <p class="fs-24 c-primary"><span class="fw-800 apr-value">5.3</span>%</p>
+                    </div>
+                </div>
+                <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-token="knc">
                     <div class="icon-50 mr-15 mr-xs-9">
                         {% include svg/knc.svg %}
                     </div>
@@ -57,7 +66,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
                         <p class="fs-24 c-primary"><span class="fw-800 apr-value">5.3</span>%</p>
                     </div>
                 </div>
-                <div class="flex mr-40 mb-40 mb-xs-30 apr-component" data-token="zrx">
+                <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-token="zrx">
                     <div class="icon-50 mr-15 mr-xs-9">
                         {% include svg/zrx.svg %}
                     </div>
@@ -66,7 +75,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
                         <p class="fs-24 c-primary"><span class="fw-800 apr-value">1.6</span>%</p>
                     </div>
                 </div>
-                <div class="flex mr-40 mb-xs-30 apr-component" data-token="eth">
+                <div class="flex mr-20 mb-xs-30 apr-component" data-token="eth">
                     <div class="icon-50 mr-15 mr-xs-9">
                         {% include svg/eth.svg %}
                     </div>
@@ -75,7 +84,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
                         <p class="fs-24 c-primary"><span class="fw-800 apr-value">4.2</span>%</p>
                     </div>
                 </div>
-                <div class="flex mr-40 mb-xs-30 apr-component" data-token="link">
+                <div class="flex mr-20 mb-xs-30 apr-component" data-token="link">
                     <div class="icon-50 mr-15 mr-xs-9">
                         {% include svg/link.svg %}
                     </div>
@@ -84,7 +93,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
                         <p class="fs-24 c-primary"><span class="fw-800 apr-value">4,2</span>%</p>
                     </div>
                 </div>
-                <div class="flex mr-40 mb-xs-30 apr-component" data-token="susd">
+                <div class="flex mr-20 mb-xs-30 apr-component" data-token="susd">
                     <div class="icon-50 mr-15 mr-xs-9">
                         {% include svg/susd.svg %}
                     </div>
@@ -93,7 +102,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
                         <p class="fs-24 c-primary"><span class="fw-800 apr-value">4.2</span>%</p>
                     </div>
                 </div>
-                <div class="flex mr-40 mb-xs-30 apr-component" data-token="wbtc">
+                <div class="flex mr-20 mb-xs-30 apr-component" data-token="wbtc">
                     <div class="icon-50 mr-15 mr-xs-9">
                         {% include svg/wbtc.svg %}
                     </div>
@@ -219,6 +228,9 @@ title: Crypto Margin Trading with Fulcrum | bZx
                             </button>
                             <button class="coin-calc" data-token="eth">
                                 {% include svg/eth.svg %}
+                            </button>
+                            <button class="coin-calc" data-token="sai">
+                                {% include svg/sai.svg %}
                             </button>
                             <button class="coin-calc" data-token="link">
                                 {% include svg/link.svg %}
