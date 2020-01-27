@@ -41,9 +41,9 @@ title: Crypto Margin Trading with Fulcrum | bZx
         <div class="row fw-w">
             <div class="col col-4 col-sm-6 col-xs-12">
                 <div class="item-advantager">
-                    <h2 class="circle mb-50 mb-xs-0"><span class="blue left-r-50 top-r-10"></span>Why <br /> DeFi Margin Trading
+                    <h2 class="circle mb-50 mb-xs-0"><span class="blue left-r-50 top-r-10"></span>Why is <br />margin trading with Fulcrum 
                         <br />
-                        Better?
+                        better?
                     </h2>
                 </div>
             </div>
