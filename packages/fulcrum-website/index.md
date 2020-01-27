@@ -24,13 +24,13 @@ title: Crypto Margin Trading with Fulcrum | bZx
                         <div class="mr-30 mx-xs-auto mb-xs-30">
                             <a href="https://fulcrum.trade/trade"
                                 class="button button-primary button-lg mb-25 mb-xs-15">Trade</a>
-                            <p class="fs-13 lh-150 text-center c-gray">Up to 5x Leverage, zero platform <br /> fees, and
+                            <p class="fs-13 lh-150 text-center c-gray">Up to 4x Leverage, zero platform <br /> fees, and
                                 perfect liquidity</p>
                         </div>
                         <div class="mx-xs-auto">
                             <a href="https://fulcrum.trade/lend"
                                 class="button button-secondary button-lg mb-25 mb-xs-15">Lend</a>
-                            <p class="fs-13 lh-150 text-center c-gray">To Earn interest</p>
+                            <p class="fs-13 lh-150 text-center c-gray">To Earn interest<br /> on idle crypto and stablecoins</p>
                         </div>
                     </div>
                 </div>
@@ -271,7 +271,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
     <div class="container">
         <div class="row">
             <div class="col-12">
-                <h2 class="circle mb-65 mb-xs-50"><span class="blue right-r-50 top-r-10"></span>How safe it is</h2>
+                <h2 class="circle mb-65 mb-xs-50"><span class="blue right-r-50 top-r-10"></span>How safe it is?</h2>
             </div>
         </div>
         <div class="row jc-sb fw-sm-w">
@@ -372,7 +372,7 @@ This ensures that there are redundancies in the margin calling process. Moreover
                     <div class="accordion-item">
                         <h4 class="accordion-toggle">Are the smart contracts safe? Can I see the audits?</h4>
                         <div class="accordion-content">
-                            <p>Yes. The base protocol audit is publicly available. All custody is retained by the base protocol. Both the base protocol audit and iToken/pToken audit were conducted by [ZK Labs](https://github.com/mattdf/audits/blob/master/bZx/bzx-audit.pdf), a recognized leader in the space. Matthew DiFerrante, founder and lead auditor at ZK Labs, is a security engineer at the Ethereum Foundation and audits the Ethereum core protocol itself.</p>
+                            <p>Yes. The base protocol audit is publicly available. All custody is retained by the base protocol. Both the base protocol audit and iToken/pToken audit were conducted by <a href="https://github.com/mattdf/audits/blob/master/bZx/bzx-audit.pdf">ZK Labs</a>, a recognized leader in the space. Matthew DiFerrante, founder and lead auditor at ZK Labs, is a security engineer at the Ethereum Foundation and audits the Ethereum core protocol itself.</p>
                         </div>
                     </div>
                 </div>

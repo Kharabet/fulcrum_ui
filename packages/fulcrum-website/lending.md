@@ -1,9 +1,9 @@
 ---
 layout: lending
 featured-image: /images/ogp.png
-metadescription: "Try non-custodial crypto margin trading at DeFi platform Fulcrum. Enter into short/leveraged positions
-up to 4x without open fees. ETH and wBTC are available."
-title: Crypto Margin Trading with Fulcrum | bZx
+metadescription: "Earn interest on your idle crypto and stablecoins. Flexible High-Yield Returns – No Minimum Deposit, no lock up period, withdraw anytime."
+title: DeFi Crypto Lending Platform Fulcrum | bZx
+permalink: lending
 ---
 
 <section class="bg-primary bg-secondary-image pb-90 pb-xs-45">
@@ -144,7 +144,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
             <div class="col col-12">
                 <div class="item-green py-40 p-sm-30 flex jc-c">
                     <div class="col-10 col-md col-md-12 fd-c jc-sb">
-                        <p class="fs-24 fs-xs-20 fw-800 lh-150 mb-xs-15">You are in a good company</p>
+                        <p class="fs-24 fs-xs-20 fw-800 lh-150 mb-xs-15">Battle-Tested</p>
                         <p class="fs-44 fs-xs-28 fw-900 mb-15 lh-140 c-light-green">TVL in our Smart Contracts</p>
                         <div class="flex jc-sb fd-sm-c fs-44 fs-xs-36 fw-900 lh-140">
                             <div class="flex-xs fw-400">
@@ -267,7 +267,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
                 </div>
             </div>
         </div>
-        <div class="wrapper-finance">        
+        <div class="wrapper-finance">
             <div class="row">
                 <div class="col col-12 jc-c">
                     <h5 class="fw-900 mb-35">Compare vs. traditional finance</h5>
@@ -364,7 +364,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
                     assets</p>
                 <div class="item-timer">
                     <span><span class="wrap-hours"><span class="hours">23</span>:</span><span class="minutes">0</span>:<span class="seconds">00</span></span>
-                </div>                
+                </div>
                 <p class="fs-56 fs-xs-44 fw-400 c-primary-blue mb-40 mb-xs-30 lh-140">$<span class="fw-900 live-earnings-value">45,459,300</span></p>
                 <a href="https://fulcrum.trade/lend" class="button button-secondary button-lg mb-15 mx-auto order-sm-1">Lend</a>
                 <p class="fs-13 lh-150 text-center c-gray mb-10 mb-sm-25">To Earn interest</p>
