@@ -253,7 +253,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
                         <p class="fs-18 mb-15 mb-md-0 c-dark-gray text-md-center">Quantity</p>
                         <input class="input-quantity" value="10" />
                         <div class="border-range-quantity">                            
-                            <input class="range-quantity" type="range" value="10" min="0" max="200"/>
+                            <input class="range-quantity" type="range" value="10" min="1" max="1000000"/>
                             <div class="left-range-quantity"></div>
                             <div class="right-range-quantity"></div>
                             <div class="track-range-quantity"></div>
@@ -261,7 +261,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
                     </div>
                     <div class="result-calc">
                         <p class="fs-18 text-md-center">Earn up to:</p>
-                        <p class="fs-66 lh-140 fw-400 text-md-center">$<span class="fw-900 earn-usd-value">30,56</span></p>
+                        <p class="fs-66 lh-140 fw-400 text-md-center wrapper">$<span class="fw-900 earn-usd-value">30,56</span></p>
                         <p class="fs-24 lh-140 fw-600 text-right month">/month</p>
                     </div>
                 </div>

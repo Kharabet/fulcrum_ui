@@ -105,3 +105,7 @@ function formatUsdPrice(value) {
 function numberWithCommas(x) {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
+
+function getFontSize(el) {
+    return window.getComputedStyle(el, null).getPropertyValue('font-size');
+}

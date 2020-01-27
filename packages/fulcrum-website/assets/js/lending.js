@@ -10,6 +10,8 @@ var trackRangeQuantity = document.querySelector('.track-range-quantity');
 var coins = document.querySelectorAll('#calculator-earn .coin-calc');
 var wrapperFinance = document.querySelector('.wrapper-finance');
 
+var calcWidgetResult = document.querySelector(".result-calc .earn-usd-value");
+
 
 (getData)(['apr', 'rates', 'tvl']);
 
@@ -115,7 +117,7 @@ window.addEventListener('load', function () {
             quantityRange.value = 0;
 
         var rangeMax = new Number(quantityRange.getAttribute("max"));
-        if (e.currentTarget.value > rangeMax || e.currentTarget.value <= 0 )
+        if (e.currentTarget.value > rangeMax || e.currentTarget.value <= 0)
             e.currentTarget.value = rangeMax;
 
         quantityRange.value = e.currentTarget.value;
@@ -140,7 +142,11 @@ function updateEarningsCalc(quantity) {
     var earnings = formatUsdPrice(usdAmount * monthAPR);
 
     document.querySelector(".item-earn.fulcrum .earn-usd-value").textContent = earnings;
-    document.querySelector(".result-calc .earn-usd-value").textContent = earnings;
+
+    calcWidgetResult.textContent = earnings;
+    updateCalcResultFontSize(calcWidgetResult);
+
+
     updateTraditionalFinance(usdAmount);
     // return earnings;
 };
@@ -171,5 +177,31 @@ function onWidgetAssetsClick(e) {
     e.currentTarget.classList.add("active");
 
     updateEarningsCalc(quantityInput.value);
+
+};
+
+
+function updateCalcResultFontSize(element) {
+    var wrapper = element.closest(".wrapper");
+    var wrapperWidth = wrapper.offsetWidth;
+    var desiredWidth = wrapperWidth - 40;
+    var size;
+
+    if (element.offsetWidth > wrapperWidth) {
+
+        while (element.offsetWidth > desiredWidth) {
+            size = parseInt(getFontSize(element), 10);
+            element.style.fontSize = (size - 1) + 'px';
+        }
+        return;
+    }
+    if (element.offsetWidth < desiredWidth) {
+        while (element.offsetWidth < desiredWidth) {
+            size = parseInt(getFontSize(element), 10);
+            if (size + 1 > 66) break;
+            element.style.fontSize = (size + 1) + 'px';
+        }
+        return;
+    }
 
 };
