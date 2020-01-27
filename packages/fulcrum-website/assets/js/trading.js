@@ -63,15 +63,7 @@ var gainText = document.querySelector(".gain-text");
 var spinner = document.querySelector(".spinner");
 var coins = document.querySelectorAll('.chart-tokens .coin-calc');
 
-
-
-var api_url = "https://fulcrum-api-dev.herokuapp.com/api";
-
-
-(async function getData() {
-    var data = await Promise.all([getTVL()]);
-    window.tvl = data[0];
-})();
+(getData)(['tvl']);
 
 function renderTVL() {
     if (!window.tvl) return
@@ -85,18 +77,6 @@ function renderTVL() {
 
     clearInterval(window.tvlRenderer);
 }
-
-async function getTVL() {
-    var response = await fetch(api_url + '/tvl-usd');
-    var tvl = await response.json();
-    var result = {};
-    Object.entries(tvl).forEach(function (item) {
-        result[item[0]] = new Number(item[1]).toFixed(2);
-    });
-    return result;
-};
-
-
 
 window.addEventListener('load', function () {
 

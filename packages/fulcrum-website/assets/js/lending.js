@@ -10,46 +10,8 @@ var trackRangeQuantity = document.querySelector('.track-range-quantity');
 var coins = document.querySelectorAll('#calculator-earn .coin-calc');
 var wrapperFinance = document.querySelector('.wrapper-finance');
 
-var api_url = "https://fulcrum-api-dev.herokuapp.com/api";
 
-
-(async function getData() {
-    var data = await Promise.all([getAPR(), getUsdRates(), getTVL()]);
-    window.apr = data[0];
-    window.usdRates = data[1];
-    window.tvl = data[2];
-})();
-
-
-async function getAPR() {
-    var response = await fetch(api_url + '/apr');
-    var apr = await response.json();
-    var result = {};
-    Object.entries(apr).forEach(function (item) {
-        result[item[0]] = new Number(item[1]).toFixed(2);
-    });
-    return result;
-};
-
-async function getUsdRates() {
-    var response = await fetch(api_url + '/usd-rates');
-    var rates = await response.json();
-    var result = {};
-    Object.entries(rates).forEach(function (item) {
-        result[item[0]] = new Number(item[1]).toFixed(2);
-    });
-    return result;
-};
-
-async function getTVL() {
-    var response = await fetch(api_url + '/tvl-usd');
-    var tvl = await response.json();
-    var result = {};
-    Object.entries(tvl).forEach(function (item) {
-        result[item[0]] = new Number(item[1]).toFixed(2);
-    });
-    return result;
-};
+(getData)(['apr', 'rates', 'tvl']);
 
 function renderAPR() {
     if (!window.apr) return
@@ -173,7 +135,7 @@ function updateEarningsCalc(quantity) {
     if (!apr || !apr[token])
         return null;
     var monthAPR = apr[token] / 12 / 100;
-    var usdAmount = quantity * window.usdRates[token];
+    var usdAmount = quantity * window.rates[token];
 
     var earnings = formatUsdPrice(usdAmount * monthAPR);
 
