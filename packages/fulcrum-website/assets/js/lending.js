@@ -148,7 +148,6 @@ function updateEarningsCalc(quantity) {
 
 
     updateTraditionalFinance(usdAmount);
-    // return earnings;
 };
 
 function updateTraditionalFinance(usdAmount) {
