@@ -317,17 +317,25 @@ title: Crypto Margin Trading with Fulcrum | bZx
     <div class="container">
         <div class="row">
             <div class="col col-12">
-                <div class="item-blue flex py-40 py-xs-25 px-xs-40 fs-44 fs-xs-28 lh-140 jc-c">
-                    <div class="col-11 col-xs-12">
-                        <div class="flex jc-sb fw-md-w">
-                            <div class="fw-900 w-md-100 text-md-center text-sm-left mb-xs-15">Trading Stats</div>
-                            <div class="flex fd-c mb-xs-15">
-                                <span class="fw-400 mb-5">$<span class="fw-900 value">5,056,560</span></span>
-                                <span class="fs-16 fw-700 c-green text-left">24 Hour Volume</span>
+                <div class="item-green py-40 p-sm-30 flex jc-c">
+                    <div class="col-10 col-md col-md-12 fd-c jc-sb">
+                        <p class="fs-24 fs-xs-20 fw-800 lh-150 mb-xs-15">You are in a good company</p>
+                        <p class="fs-44 fs-xs-28 fw-900 mb-15 lh-140 c-light-green">TVL in our Smart Contracts</p>
+                        <div class="flex jc-sb fd-sm-c fs-44 fs-xs-36 fw-900 lh-140">
+                            <div class="flex-xs fw-400">
+                                $<span class="fw-900 tvl-value" data-token="all">3,000,000</span>
                             </div>
-                            <div class="flex fd-c">
-                                <span class="fw-400 mb-5">$<span class="fw-900 value">659,056,560</span></span>
-                                <span class="fs-16 fw-700 c-green text-left">30 Day Volume</span>
+                            <div class="flex ai-c">
+                                <div class="icon-40 icon-xs-30 icon-border-2 mr-10 mr-xs-20">
+                                    {% include svg/eth.svg %}
+                                </div>
+                                <span class="tvl-value" data-token="eth">10,000</span>
+                            </div>
+                            <div class="flex ai-c">
+                                <div class="icon-40 icon-xs-30 icon-border-2 mr-10 mr-xs-20">
+                                    {% include svg/dai.svg %}
+                                </div>
+                                <span class="tvl-value" data-token="dai">10,000</span>
                             </div>
                         </div>
                     </div>

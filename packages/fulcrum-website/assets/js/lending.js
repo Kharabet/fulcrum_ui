@@ -211,11 +211,3 @@ function onWidgetAssetsClick(e) {
     updateEarningsCalc(quantityInput.value);
 
 };
-
-function formatUsdPrice(value) {
-    return new Number(value).toFixed(2);
-};
-
-function numberWithCommas(x) {
-    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-}
