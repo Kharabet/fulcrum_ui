@@ -139,7 +139,7 @@ function updateEarningsCalc(quantity) {
     var monthAPR = apr[token] / 12 / 100;
     var usdAmount = quantity * window.rates[token];
 
-    var earnings = formatUsdPrice(usdAmount * monthAPR);
+    var earnings = numberWithCommas(formatUsdPrice(usdAmount * monthAPR));
 
     document.querySelector(".item-earn.fulcrum .earn-usd-value").textContent = earnings;
 
