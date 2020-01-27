@@ -119,19 +119,16 @@ permalink: lending
             <div class="col col-6 col-sm-12 fd-c">
                 <h2 class="circle mb-25"><span class="green left-165 top-r-10"></span>Who are <br />the borrowers?</h2>
                 <div class="pl-90 pl-md-60 c-primary">
-                    <p class="mb-10">Borrowers are individuals who want to use their digital assets to build leveraged positions. This is also referrred to as “margin trading.”</p>
-                    <p class="mb-10">Decentralized lending and borrowing applications enable lenders to loan digital assets for interest, making funds available for borrowers to trade on margin.</p>
-                    <p class="mb-10">Fulcrum enables borrowers to create a leveraged position by borrowing assets from lenders to create pTokens.</p>
-                    <p class="mb-10">A pToken is an ERC20-compliant token enabling long or short exposure to an asset and borrowing to create a leveraged position.</p>
+                    <p class="mb-10">Borrowers are individuals who want to use their digital assets to build leveraged positions. This is also referrred to as “margin trading.”
+                Fulcrum enables borrowers to create a leveraged position by borrowing assets from lenders.</p>
                 </div>
             </div>
             <div class="col col-6 col-sm-12 fd-c">
                 <h2 class="circle mb-25"><span class="big purple left-35 bottom-r-50 "></span>Where does the interest <br />  coming from? </h2>
                 <div class="pl-90 pl-md-60 c-primary">
-                    <p class="mb-10">The interest paid to lenders comes from the fees paid by borrowers in exchange for access to liquidity when trading on margin.</p>
-                    <p class="mb-10">Fulcrum extends the bZx protocol by giving users the ability to create tokenized loans and margin positions. </p>
-                    <p class="mb-10">Lenders can deposit digital assets to Fulcrum to create tokenized loans called iTokens.</p>
-                    <p class="mb-10">An iToken is an ERC20-compliant token that automatically accrues interest using the bZx protocol.</p>
+                    <p class="mb-10">The interest paid to lenders comes from the fees paid by borrowers in exchange for access to liquidity when trading on margin.
+                Fulcrum extends the bZx protocol by giving users the ability to create tokenized loans and margin positions.
+              </p>
                 </div>
             </div>
         </div>
@@ -179,10 +176,9 @@ permalink: lending
                     {% include svg/icon-safe-4.svg %}
                 </div>
                 <h3 class="mb-20">Overcollateralized</h3>
-                <p>The bZx protocol must be overcollateralized in order to maintain sufficient liquidity for dApps using the protocol.</p>
-                <p>To borrow digital assets, users must deposit other assets that serve as collateral. </p>
-                <p>Borrowers must maintain the collateral-to-loan ratio specified by the terms of the loan or the collateral will be liquidated to repay the lender. </p>
-                <p>Overcollateralization ensures that the system maintains greater supply than demand and does not go bankrupt.
+                <p>The bZx protocol must be overcollateralized in order to maintain sufficient liquidity for dApps using the protocol.
+                Borrowers must maintain the collateral-to-loan ratio specified by the terms of the loan or the collateral will be liquidated to repay the lender.
+
                 </p>
             </div>
             <div class="col col-4 col-sm-12 item-safe fd-c">
@@ -190,18 +186,17 @@ permalink: lending
                     {% include svg/icon-safe-1.svg %}
                 </div>
                 <h3 class="mb-20">Audited Smart Contracts</h3>
-                <p>The bZx base protocol successfully passed a security audit performed by leading blockchain security auditor <a href="https://github.com/mattdf/audits/blob/master/bZx/bzx-audit.pdf">ZK Labs.</a></p>
-                <p>The audit noted that “The code is generally well structured and properly compartmentalized.”</p>
-                <p>ZK Labs provides smart contract development and auditing services for projects built on Ethereum and is headed by Matthew DiFerrante, Dean Eigenmann, Nick Johnson, and Harry Roberts.</p>
+                <p>The bZx base protocol audited by leading blockchain security auditor <a href="https://github.com/mattdf/audits/blob/master/bZx/bzx-audit.pdf">ZK Labs.</a>
+          ZK Labs provides smart contract development and auditing services for projects built on Ethereum and is headed by Matthew DiFerrante, Dean Eigenmann, Nick Johnson, and Harry Roberts.</p>
             </div>
             <div class="col col-4 col-sm-12 item-safe fd-c">
                 <div class="icon-safe mb-40 mb-xs-15">
                     {% include svg/icon-safe-2.svg %}
                 </div>
                 <h3 class="mb-20">Insurance fund</h3>
-                <p>bZx automatically diverts 10% of the interest paid to lenders by borrowers to maintain an Insurance Fund.</p>
-                <p>If lenders lose money from borrowers who are not properly liquidated, assets from the Insurance Fund are used to repay the lenders.</p>
-                <p>To avoid slippage in the event the fund must pay out, collateralization of the fund has been diversified by allowing BZRX tokens to be exchanged for assets from the fund.</p>
+                <p>bZx automatically diverts 10% of the interest paid to lenders by borrowers to maintain an Insurance Fund.
+              If lenders lose money from borrowers who are not properly liquidated, assets from the Insurance Fund are used to repay the lenders.
+      </p>
             </div>
         </div>
     </div>
