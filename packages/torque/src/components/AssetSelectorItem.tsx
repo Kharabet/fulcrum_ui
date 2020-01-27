@@ -5,7 +5,16 @@ import { TorqueProviderEvents } from "../services/events/TorqueProviderEvents";
 import { TorqueProvider } from "../services/TorqueProvider";
 import { DotsBar } from "./DotsBar";
 import { SelectorIconsBar } from "./SelectorIconsBar";
-
+import bgDai  from "../assets/images/ic_token_dai.svg";
+import bgUsdc  from "../assets/images/ic_token_usdc.svg";
+import bgSai  from "../assets/images/ic_token_sai.svg";
+import bgEth  from "../assets/images/ic_token_eth.svg";
+import bgBtc  from "../assets/images/ic_token_btc.svg";
+import bgRep  from "../assets/images/ic_token_rep.svg";
+import bgZrx  from "../assets/images/ic_token_zrx.svg";
+import bgKnc  from "../assets/images/ic_token_knc.svg";
+import bgLink  from "../assets/images/ic_token_link.svg";
+import bgSusd  from "../assets/images/ic_token_susd.svg";
 export interface IAssetSelectorItemProps {
   asset: Asset;
 
@@ -54,18 +63,38 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
 
   public render() {
     const assetTypeModifier = "asset-selector-item--"+this.props.asset.toLowerCase();
+    const assetTypeImg = "asset-selector-icon";
+    const assetDiv = "asset-selector-div"
+    let assetImg:any = this.getAssestsData()
+    // try{
+    //   let tmpassetImg = this.getAssestsData()
+    //   assetImg = tmpassetImg.img
+    // }catch (e){}
+
+
 
     return (
       <div className={`asset-selector-item ${assetTypeModifier}`} onClick={this.onClick}>
-        <DotsBar />
-        <div className="asset-selector__title">{this.props.asset}</div>
-        {!this.props.onSelectAsset ? (
-          <div className="asset-selector__title--coming-soon">Browser wallets only</div>
-        ) : ``}
+        {/*<DotsBar />*/}
+
         <div className="asset-selector__interest-rate">
-          {this.state.interestRate.gt(0) ? `${this.state.interestRate.toFixed(2)}% APR` : ``}
+          {this.state.interestRate.gt(0) ? `${this.state.interestRate.toFixed(2)}%` : `0%`}
         </div>
-        <SelectorIconsBar />
+        <div className="asset-selector-row">
+          <div className="asset-selector__apr">APR</div>
+          <div className="asset-selector__fixed">FIXED</div>
+        </div>
+        <div className="asset-selector-row mt50">
+          <div className="asset-selector__title">{this.props.asset}</div>
+          {!this.props.onSelectAsset ? (
+            <div className="asset-selector__title--coming-soon">Browser wallets only</div>
+          ) : ``}
+
+          {/*<SelectorIconsBar />*/}
+          <img className={`${assetTypeImg}`} src={assetImg.img} />
+          {/*<SelectorIconsBar />*/}
+          <div className={`${assetDiv}`}><SelectorIconsBar /></div>
+        </div>
       </div>
     );
   }
@@ -75,4 +104,39 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
       this.props.onSelectAsset(this.props.asset);
     }
   };
+  private getAssestsData = () => {
+    console.log("assestsType = ", this.props.asset)
+    switch (this.props.asset) {
+      case Asset.DAI:
+        return { img:bgDai}
+        break;
+      case Asset.SAI:
+        return {img:bgSai}
+        break;
+      case Asset.USDC:
+        return {img:bgUsdc}
+        break;
+      case Asset.ETH:
+        return {img:bgEth}
+        break;
+      case Asset.WBTC:
+        return {img:bgBtc}
+        break;
+      case Asset.LINK:
+        return {img:bgLink}
+        break;
+      case Asset.ZRX:
+        return {img:bgZrx}
+        break;
+      case Asset.REP:
+        return {img:bgRep}
+        break;
+      case Asset.KNC:
+        return { img:bgKnc}
+        break;
+      case Asset.SUSD:
+        return { img:bgSusd}
+        break;
+    }
+  }
 }
