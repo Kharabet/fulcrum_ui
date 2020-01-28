@@ -12,6 +12,7 @@ import { makerBridgeContract } from "../contracts/makerBridge";
 import { oracleContract } from "../contracts/oracle";
 import { proxyRegistryContract } from "../contracts/proxyRegistry";
 import { saiToDAIBridgeContract } from "../contracts/saiToDaiBridge";
+import { SoloContract } from "../contracts/solo";
 import { vatContract } from "../contracts/vat";
 
 import { Asset } from "../domain/Asset";
@@ -25,6 +26,7 @@ export class ContractsSource {
 
   private erc20Json: any;
   private cdpsJson: any;
+  private soloJson: any;
   private iBZxJson: any;
   private iTokenJson: any;
   private oracleJson: any;
@@ -348,6 +350,25 @@ export class ContractsSource {
     );
   }
 
+  private getSoloAddress(): string {
+    let address: string = "";
+    switch (this.networkId) {
+      case 1:
+        address = "0x1e0447b19bb6ecfdae1e4ae1694b0c3659614e4e";
+        break;
+      case 42:
+        address = "0x4EC3570cADaAEE08Ae384779B0f3A45EF85289DE";
+        break;
+    }
+
+    return address;
+  }
+
+  private async getSoloContractRaw(): Promise<SoloContract> {
+    await this.Init();
+    return new SoloContract(this.soloJson.abi, this.getSoloAddress().toLowerCase(), this.provider);
+  }
+
   public async Init() {
     if (ContractsSource.isInit) {
       return;
@@ -355,6 +376,7 @@ export class ContractsSource {
     const network = ethNetwork || "1";
     this.erc20Json = await import(`./../assets/artifacts/${network}/erc20.json`);
     this.cdpsJson = await import(`./../assets/artifacts/${network}/GetCdps.json`);
+    this.soloJson = await import(`./../assets/artifacts/${network}/Solo.json`);
     this.iBZxJson = await import(`./../assets/artifacts/${network}/iBZx.json`);
     this.iTokenJson = await import(`./../assets/artifacts/${network}/iToken.json`);
     this.oracleJson = await import(`./../assets/artifacts/${network}/oracle.json`);
@@ -375,9 +397,9 @@ export class ContractsSource {
     await this.Init();
     return new erc20Contract(this.erc20Json.abi, addressErc20.toLowerCase(), this.provider);
   }
-  private async getCdpContractRaw(addresscdp: string): Promise<GetCdpsContract> {
+  private async getCdpContractRaw(addressCdp: string): Promise<GetCdpsContract> {
     await this.Init();
-    return new GetCdpsContract(this.cdpsJson.abi, addresscdp.toLowerCase(), this.provider);
+    return new GetCdpsContract(this.cdpsJson.abi, addressCdp.toLowerCase(), this.provider);
   }
   private async getVatContractRaw(addressVat: string): Promise<vatContract> {
     await this.Init();
@@ -425,6 +447,7 @@ export class ContractsSource {
   public getCdpManager = _.memoize(this.getCdpManagerRaw);
   public getVatContract = _.memoize(this.getVatContractRaw);
   public getCdpContract = _.memoize(this.getCdpContractRaw);
+  public getSoloContract = _.memoize(this.getSoloContractRaw);
   public getErc20Contract = _.memoize(this.getErc20ContractRaw);
   public getiBZxContract = _.memoize(this.getiBZxContractRaw);
   public getiTokenContract = _.memoize(this.getiTokenContractRaw);

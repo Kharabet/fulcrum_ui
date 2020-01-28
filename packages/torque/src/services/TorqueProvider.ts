@@ -16,6 +16,7 @@ import { instaRegistryContract } from "../contracts/instaRegistry";
 import { makerBridgeContract } from "../contracts/makerBridge";
 import { proxyRegistryContract } from "../contracts/proxyRegistry";
 import { saiToDAIBridgeContract } from "../contracts/saiToDaiBridge";
+import { SoloContract } from "../contracts/solo";
 
 import { vatContract } from "../contracts/vat";
 import { Asset } from "../domain/Asset";
@@ -519,6 +520,91 @@ export class TorqueProvider {
       str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
     }
     return str;
+  };
+
+  public getSoloLoans = async () => {
+    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+    if (this.contractsSource && account) {
+      const solo: SoloContract = await this.contractsSource.getSoloContract();
+      const [tokens, , balances] = await solo.getAccountBalances.callAsync(
+        { owner: account, number: new BigNumber(0) }
+      );
+      const values = await solo.getAccountValues.callAsync(
+        { owner: account, number: new BigNumber(0) }
+      );
+      const supplied = values[0].value.div(10 ** 36);
+      const borrowed = values[1].value.div(10 ** 36);
+      const ratio = supplied.div(borrowed);
+
+      console.log('values', values[0].value.toString(), values[1].value.toString());
+      console.log('supplied', supplied.toString());
+      console.log('borrowed', borrowed.toString());
+      console.log('ratio', ratio.toString());
+      console.log('tokens', tokens);
+      console.log('balances', balances);
+
+      const loans = [];
+      const deposits = [];
+      let inSupplied = new BigNumber(0);
+      let inBorrowed = new BigNumber(0);
+      for (let i = 0; i < tokens.length; i++) {
+        const balance = balances[i].value.div(10 ** 18); // TODO what if they'll add token with different decimals?
+        if (!balance.gt(0)) {
+          continue;
+        }
+        const asset = this.contractsSource.getAssetFromAddress(tokens[i]);
+        if (asset === Asset.UNKNOWN) {
+          continue;
+        }
+        const rate = await this.getSwapRate(asset, Asset.DAI);
+        const usdValue = balance.times(rate);
+        const token = {
+          asset,
+          rate,
+          balance,
+          usdValue
+        };
+        if (balances[i].sign) {
+          deposits.push(token);
+          inSupplied = inSupplied.plus(token.usdValue);
+        } else {
+          loans.push({
+            ...token,
+            isHealthy: false,
+            collateral: []
+          });
+          inBorrowed = inBorrowed.plus(token.usdValue);
+        }
+      }
+
+      const inRatio = inSupplied.div(inBorrowed);
+
+      console.log('inRatio', inRatio.toString());
+
+      for (const loan of loans) {
+        const goal = loan.usdValue.times(inRatio);
+        let current = new BigNumber(0);
+        for (const deposit of deposits) {
+          let take = deposit.usdValue;
+          if (current.plus(take).gt(goal)) {
+            take = take.minus(current.plus(take).minus(goal));
+          }
+          // @ts-ignore TODO
+          loan.collateral.push({ asset: deposit.asset, amount: take.div(deposit.rate) });
+          current = current.plus(take);
+          console.log('current', current.toString());
+          console.log('goal', goal.toString());
+          if (current.toString(10) === goal.toString(10)) {
+            loan.isHealthy = true;
+            break;
+          }
+        }
+      }
+
+      console.log('deposits', deposits, deposits[0].balance.toString());
+      // @ts-ignore
+      console.log('loans', loans, loans[0].balance.toString(), loans[0].collateral[0].amount.toString());
+    }
   };
 
   public getMakerCdps = async (): Promise<RefinanceCdpData[]> => {

@@ -1,0 +1,130 @@
+{
+  "abi": [
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "components": [
+            {
+              "name": "owner",
+              "type": "address"
+            },
+            {
+              "name": "number",
+              "type": "uint256"
+            }
+          ],
+          "name": "account",
+          "type": "tuple"
+        }
+      ],
+      "name": "getAccountValues",
+      "outputs": [
+        {
+          "components": [
+            {
+              "name": "value",
+              "type": "uint256"
+            }
+          ],
+          "name": "",
+          "type": "tuple"
+        },
+        {
+          "components": [
+            {
+              "name": "value",
+              "type": "uint256"
+            }
+          ],
+          "name": "",
+          "type": "tuple"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "components": [
+            {
+              "name": "owner",
+              "type": "address"
+            },
+            {
+              "name": "number",
+              "type": "uint256"
+            }
+          ],
+          "name": "account",
+          "type": "tuple"
+        }
+      ],
+      "name": "getAccountBalances",
+      "outputs": [
+        {
+          "name": "",
+          "type": "address[]"
+        },
+        {
+          "components": [
+            {
+              "name": "sign",
+              "type": "bool"
+            },
+            {
+              "name": "value",
+              "type": "uint128"
+            }
+          ],
+          "name": "",
+          "type": "tuple[]"
+        },
+        {
+          "components": [
+            {
+              "name": "sign",
+              "type": "bool"
+            },
+            {
+              "name": "value",
+              "type": "uint256"
+            }
+          ],
+          "name": "",
+          "type": "tuple[]"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "components": [
+            {
+              "name": "operator",
+              "type": "address"
+            },
+            {
+              "name": "trusted",
+              "type": "bool"
+            }
+          ],
+          "name": "args",
+          "type": "tuple[]"
+        }
+      ],
+      "name": "setOperators",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ]
+}

@@ -101,6 +101,8 @@ export class RefinanceAssetSelector extends Component<IRefinanceAssetSelectorPro
 
     const refinanceData = await TorqueProvider.Instance.getMakerCdps();
 
+    await TorqueProvider.Instance.getSoloLoans();
+
     // tslint:disable-next-line:prefer-for-of
     for (let i = 0; i < refinanceData.length; i++) {
       if (refinanceData[i].cdpId.gt(0)) {
