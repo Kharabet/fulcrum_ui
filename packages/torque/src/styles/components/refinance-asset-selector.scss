@@ -91,7 +91,10 @@
 
     &--warning {
       text-align: center;
-      color: #801515;
+      color: #DE4A4A;
+      font-size: 11px;
+      width: 80%;
+      text-align: left;
     }
   }
   .refinance-asset-block {
@@ -258,7 +261,7 @@
         .refinance-asset-selector__apr{
           font-size: 28px;
           font-weight: bold;
-          color: red;
+          color: #DE4A4A;
           width:33%;
           margin-top: 10px;
           float: left;
