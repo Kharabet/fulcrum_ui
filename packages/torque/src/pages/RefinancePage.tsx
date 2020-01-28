@@ -51,7 +51,6 @@ export class RefinancePage extends PureComponent<IRefinancePageParams & RouteCom
   }
 
   private onSelectAsset = async (asset: Asset) => {
-
     const walletType = walletTypeAbbrToWalletType(this.props.match.params.walletTypeAbbr);
 
     if (walletType === WalletType.Web3) {

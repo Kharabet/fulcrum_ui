@@ -521,15 +521,15 @@ export class TorqueProvider {
     return str;
   };
 
-  // noinspection JSUnusedLocalSymbols TODO why asset is not used?
-  public checkCdp = async (asset: Asset): Promise<RefinanceCdpData[]> => {
+  public getMakerCdps = async (): Promise<RefinanceCdpData[]> => {
     let result: RefinanceCdpData[] = [{
       cdpId: new BigNumber(0),
       urn: "",
       ilk: "",
       accountAddress: "",
       proxyAddress: "",
-      isProxy: false
+      isProxy: false,
+      isInstaProxy: false,
     }];
 
     const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
@@ -550,6 +550,7 @@ export class TorqueProvider {
               "ilk": ilk[i],
               "accountAddress": account,
               "isProxy": false,
+              "isInstaProxy": false,
               proxyAddress: ""
             }];
           } else {
@@ -559,6 +560,7 @@ export class TorqueProvider {
               "ilk": ilk[i],
               "accountAddress": account,
               "isProxy": false,
+              "isInstaProxy": false,
               proxyAddress: ""
             });
           }
@@ -584,8 +586,9 @@ export class TorqueProvider {
                 "urn": urn[i],
                 "ilk": ilk[i],
                 "accountAddress": account,
-                "isProxy": false,
-                proxyAddress: ""
+                "isProxy": true,
+                "isInstaProxy": false,
+                proxyAddress
               }];
             } else {
               result.push({
@@ -594,7 +597,8 @@ export class TorqueProvider {
                 "ilk": ilk[i],
                 "accountAddress": account,
                 "isProxy": true,
-                proxyAddress: proxyAddress
+                "isInstaProxy": false,
+                proxyAddress
               });
             }
           }
@@ -620,8 +624,9 @@ export class TorqueProvider {
                 "urn": urn[i],
                 "ilk": ilk[i],
                 "accountAddress": account,
-                "isProxy": false,
-                proxyAddress: ""
+                "isProxy": true,
+                "isInstaProxy": true,
+                proxyAddress
               }];
 
             } else {
@@ -631,26 +636,27 @@ export class TorqueProvider {
                 "ilk": ilk[i],
                 "accountAddress": account,
                 "isProxy": true,
-                proxyAddress: proxyAddress
+                "isInstaProxy": true,
+                proxyAddress
               });
             }
           }
         }
       }
-
     }
     return result;
   };
   
-  public getCdpsVat = async (cdpId: BigNumber, urn: string, ilk: string, accountAddress: string, isProxy: boolean, proxyAddress: string, asset: Asset): Promise<RefinanceData[]> => {
+  public getCdpsVat = async (cdpId: BigNumber, urn: string, ilk: string, accountAddress: string, isProxy: boolean, isInstaProxy: boolean, proxyAddress: string, asset: Asset): Promise<RefinanceData[]> => {
     let result: RefinanceData[] = [{
       collateralAmount: new BigNumber(0),
       debt: new BigNumber(0),
       collateralType: "",
       cdpId: new BigNumber(0),
-      accountAddress: accountAddress,
-      proxyAddress: proxyAddress,
-      isProxy: isProxy,
+      accountAddress,
+      proxyAddress,
+      isProxy,
+      isInstaProxy,
       isDisabled: false,
       isShowCard: false,
       variableAPR: new BigNumber(0)
@@ -697,13 +703,14 @@ export class TorqueProvider {
       result = [{
         collateralAmount: resp[0].dividedBy(10 ** 18),
         debt: debtAmount,
-        collateralType: collateralType,
-        cdpId: cdpId,
-        accountAddress: accountAddress,
-        proxyAddress: proxyAddress,
-        isProxy: isProxy,
-        isDisabled: isDisabled,
-        isShowCard: isShowCard,
+        collateralType,
+        cdpId,
+        accountAddress,
+        proxyAddress,
+        isProxy,
+        isInstaProxy,
+        isDisabled,
+        isShowCard,
         variableAPR: rateAmountIlkYr
       }];
     }
@@ -733,22 +740,29 @@ export class TorqueProvider {
           const allowData = web3.eth.abi.encodeFunctionCall(
             dsProxyAllowABI.default, [
               cdpManagerAddress,
-              refRequest.cdpId,
+              refRequest.cdpId.toString(),
               configAddress.Maker_Bridge_Address,
               1
             ]
           );
           const proxyActionsAddress = configAddress.proxy_Actions_Address;
 
-          // if proxy use then use this function for cdpAllow
-          const txHash = await proxy.execute.sendTransactionAsync(proxyActionsAddress, allowData, { from: refRequest.accountAddress });
-          const receipt = await this.waitForTransactionMined(txHash);
-          if (receipt != null) {
-            if (receipt.status) {
-              window.setTimeout(() => {
-                // do nothing
-              }, 5000);
+          try {
+            // if proxy use then use this function for cdpAllow
+            const txHash = await proxy.execute.sendTransactionAsync(proxyActionsAddress, allowData, { from: refRequest.accountAddress, isInstaProxy: refRequest.isInstaProxy });
+            const receipt = await this.waitForTransactionMined(txHash);
+            if (receipt != null) {
+              if (receipt.status) {
+                window.setTimeout(() => {
+                  // do nothing
+                }, 5000);
+              }
             }
+          } catch (e) {
+            if (!e.code) {
+              alert("Dry run failed");
+            }
+            return null;
           }
         }
 
@@ -761,11 +775,13 @@ export class TorqueProvider {
           [dinks],
           [darts]
         ];
+        // tslint:disable-next-line:no-console
+        console.log('params', params);
         // @ts-ignore
         const data = web3.eth.abi.encodeFunctionCall(proxyMigrationABI.default, params);
-        const bridgeActionAddress = configAddress.Bridge_Action_Address;
+        const bridgeActionsAddress = configAddress.Bridge_Action_Address;
         try {
-          const txHash = await proxy.execute.sendTransactionAsync(bridgeActionAddress, data, { from: refRequest.accountAddress });
+          const txHash = await proxy.execute.sendTransactionAsync(bridgeActionsAddress, data, { from: refRequest.accountAddress });
           const receipt = await this.waitForTransactionMined(txHash);
           if (receipt.status === 1) {
             return receipt;
@@ -782,13 +798,13 @@ export class TorqueProvider {
         const isCdpCan = await cdpManager.cdpCan.callAsync(refRequest.accountAddress, refRequest.cdpId, configAddress.Maker_Bridge_Address);
         if (!isCdpCan.gt(0)) {
           const cdpsResp = await cdpManager.cdpAllow.sendTransactionAsync(refRequest.cdpId, configAddress.Maker_Bridge_Address, new BigNumber(1), { from: refRequest.accountAddress }); // 0x2252d3b2c12455d564abc21e328a1122679f8352
-          const receipt = await this.waitForTransactionMined(cdpsResp);
+          let receipt = await this.waitForTransactionMined(cdpsResp);
           const makerBridge: makerBridgeContract = await this.contractsSource.getMakerBridge(configAddress.Maker_Bridge_Address);
 
           try {
             if (receipt.status) {
               const result = await makerBridge.migrateLoan.sendTransactionAsync([refRequest.cdpId], [new BigNumber(darts)], [new BigNumber(dinks)], [new BigNumber(dinks)], [new BigNumber(darts)], { from: refRequest.accountAddress });
-              const receipt = await this.waitForTransactionMined(result);
+              receipt = await this.waitForTransactionMined(result);
               if (receipt.status === 1) {
                 return receipt;
               } else {

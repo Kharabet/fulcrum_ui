@@ -34,7 +34,8 @@ export class RefinanceAssetSelector extends Component<IRefinanceAssetSelectorPro
           ilk: "",
           accountAddress: "",
           proxyAddress: "",
-          isProxy: false
+          isProxy: false,
+          isInstaProxy: false,
         }]
     };
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
@@ -98,7 +99,7 @@ export class RefinanceAssetSelector extends Component<IRefinanceAssetSelectorPro
     let isItem = false;
     this.setState({ ...this.state, isLoading: true, isItems: true });
 
-    const refinanceData = await TorqueProvider.Instance.checkCdp(Asset.DAI);
+    const refinanceData = await TorqueProvider.Instance.getMakerCdps();
 
     // tslint:disable-next-line:prefer-for-of
     for (let i = 0; i < refinanceData.length; i++) {
@@ -128,53 +129,47 @@ export class RefinanceAssetSelector extends Component<IRefinanceAssetSelectorPro
       }, 12000);
     }
 
-    this.setState({ ...this.state, refinanceData: refinanceData });
+    this.setState({ ...this.state, refinanceData });
   };
 
   public render() {
     const refinance = this.state.refinanceData;
     let items;
     if (this.props.walletType === WalletType.Web3) {
-
       if (refinance[0].cdpId.gt(0)) {
-
         items = refinance.map((e, index) => {
-
           return (
-
-            <RefinanceAssetSelectorItem key={this.state.refinanceData[index].urn} asset={Asset.DAI}
-                                        cdpId={this.state.refinanceData[index].cdpId}
-                                        urn={this.state.refinanceData[index].urn}
-                                        accountAddress={this.state.refinanceData[index].accountAddress}
-                                        proxyAddress={this.state.refinanceData[index].proxyAddress}
-                                        isProxy={this.state.refinanceData[index].isProxy}
-                                        ilk={this.state.refinanceData[index].ilk}/>
+            <RefinanceAssetSelectorItem key={refinance[index].urn} asset={Asset.DAI}
+                                        cdpId={refinance[index].cdpId}
+                                        urn={refinance[index].urn}
+                                        accountAddress={refinance[index].accountAddress}
+                                        proxyAddress={refinance[index].proxyAddress}
+                                        isProxy={refinance[index].isProxy}
+                                        isInstaProxy={refinance[index].isInstaProxy}
+                                        ilk={refinance[index].ilk}/>
           );
         });
       }
     } else {
       if (refinance[0].cdpId !== undefined) {
         if (refinance[0].cdpId.gt(0)) {
-
           items = refinance.map((e, index) => {
-
             return (
-              <RefinanceAssetSelectorItem key={this.state.refinanceData[index].urn} asset={Asset.DAI}
-                                          cdpId={this.state.refinanceData[index].cdpId}
-                                          urn={this.state.refinanceData[index].urn}
-                                          accountAddress={this.state.refinanceData[index].accountAddress}
-                                          proxyAddress={this.state.refinanceData[index].proxyAddress}
-                                          isProxy={this.state.refinanceData[index].isProxy}
-                                          ilk={this.state.refinanceData[index].ilk}/>
+              <RefinanceAssetSelectorItem key={refinance[index].urn} asset={Asset.DAI}
+                                          cdpId={refinance[index].cdpId}
+                                          urn={refinance[index].urn}
+                                          accountAddress={refinance[index].accountAddress}
+                                          proxyAddress={refinance[index].proxyAddress}
+                                          isProxy={refinance[index].isProxy}
+                                          isInstaProxy={refinance[index].isInstaProxy}
+                                          ilk={refinance[index].ilk}/>
             );
-
           });
         }
       }
     }
 
     return <div className="refinance-asset-selector">
-
       <div className="refinance-page__main-centeredOverlay"
            style={!this.state.isLoading ? { display: `none` } : undefined}>
         <span>Loading...</span>

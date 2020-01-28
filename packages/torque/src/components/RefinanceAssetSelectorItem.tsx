@@ -27,6 +27,7 @@ export interface IRefinanceAssetSelectorItemProps {
   accountAddress: string;
   proxyAddress: string;
   isProxy: boolean;
+  isInstaProxy: boolean;
   // onSelectAsset?: (asset: Asset) => void;
 }
 
@@ -60,6 +61,7 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
           accountAddress: "",
           proxyAddress: "",
           isProxy: false,
+          isInstaProxy: false,
           isDisabled: false,
           isShowCard: false,
           variableAPR: new BigNumber(0)
@@ -112,7 +114,7 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
 
   private derivedUpdate = async () => {
     if (this.props.cdpId.gt(0)) {
-      const refinanceData = await TorqueProvider.Instance.getCdpsVat(this.props.cdpId, this.props.urn, this.props.ilk, this.props.accountAddress, this.props.isProxy, this.props.proxyAddress, this.props.asset);
+      const refinanceData = await TorqueProvider.Instance.getCdpsVat(this.props.cdpId, this.props.urn, this.props.ilk, this.props.accountAddress, this.props.isProxy, this.props.isInstaProxy, this.props.proxyAddress, this.props.asset);
       this.setState({
         ...this.state,
         refinanceData: refinanceData,
@@ -130,7 +132,6 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
         const interestRate = await TorqueProvider.Instance.getAssetInterestRate(Asset.ETH);
         this.setState({ ...this.state, fixedApr: interestRate });
       }
-
     }
   };
 

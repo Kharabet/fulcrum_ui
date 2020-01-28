@@ -27,6 +27,10 @@ export interface dsProxyJsonLogNoteEventArgs extends DecodedLogArgs {
     fax: string;
 }
 
+export interface TxDataInsta extends TxDataPayable {
+  isInstaProxy?: boolean;
+}
+
 // tslint:disable-next-line:interface-name
 export interface dsProxyJsonLogSetAuthorityEventArgs extends DecodedLogArgs {
     authority: string;
@@ -122,12 +126,11 @@ export class dsProxyJsonContract extends BaseContract {
         async sendTransactionAsync(
             _target: string,
             _data: string,
-            txData: Partial<TxDataPayable> = {},
+            txData: Partial<TxDataInsta> = {},
         ): Promise<string> {
             const self = this as any as dsProxyJsonContract;
-            const encodedData = self._strictEncodeArguments('execute(address,bytes)', [_target,
-    _data
-    ]);
+            const functionSignature = txData.isInstaProxy ? 'execute(address,bytes,uint256,uint256)' : 'execute(address,bytes)';
+            const encodedData = self._strictEncodeArguments(functionSignature, [_target, _data, 0, 0]);
             const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
                 {
                     to: self.address,
@@ -138,7 +141,8 @@ export class dsProxyJsonContract extends BaseContract {
                 (self as any).execute.estimateGasAsync.bind(
                     self,
                     _target,
-                    _data
+                    _data,
+                    txData
                 ),
             );
             const txHash = await self._web3Wrapper.sendTransactionAsync(txDataWithDefaults);
@@ -147,12 +151,11 @@ export class dsProxyJsonContract extends BaseContract {
         async estimateGasAsync(
             _target: string,
             _data: string,
-            txData: Partial<TxData> = {},
+            txData: Partial<TxDataInsta> = {},
         ): Promise<number> {
             const self = this as any as dsProxyJsonContract;
-            const encodedData = self._strictEncodeArguments('execute(address,bytes)', [_target,
-    _data
-    ]);
+            const functionSignature = txData.isInstaProxy ? 'execute(address,bytes,uint256,uint256)' : 'execute(address,bytes)';
+            const encodedData = self._strictEncodeArguments(functionSignature, [_target, _data, 0, 0]);
             const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
                 {
                     to: self.address,
