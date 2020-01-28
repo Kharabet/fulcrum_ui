@@ -13,22 +13,20 @@ title: Crypto Margin Trading with Fulcrum | bZx
             <div class="col col-10 col-xs-12">
                 <div class="pl-55 pl-lg-0 w-100 text-xs-center">
                     <h1 class="mb-40">Margin made simple</h1>
-                    <p class="fs-16 fs-xs-12 lh-160 mb-50 c-secondary"><span class="fw-600">Fulcrum</span> is the most simple and
-                        powerful way to lend and margin trade. It is
-                        the first and only completely trustless platform for margin; permissionless and rent free; there are no platform fees and
-                        no
-                        accounts.</p>
+                    <p class="fs-16 fs-xs-12 lh-160 mb-50 c-secondary"><span class="fw-600">Fulcrum</span> is the first and only
+                      completely trustless platform for decentralized lending and margin trading. Permissionless and rent-free with
+                      with no accounts or platform fees, Fulcrum offers the simplest, most powerful way to lend and margin trade.
+                      </p>
                     <div class="flex fd-xs-c">
                         <div class="mr-30 mx-xs-auto mb-xs-30">
                             <a href="https://fulcrum.trade/trade"
                                 class="button button-primary button-lg mb-25 mb-xs-15">Trade</a>
-                            <p class="fs-13 lh-150 text-center c-gray">Up to 4x Leverage, zero platform <br /> fees, and
-                                perfect liquidity</p>
+                            <p class="fs-13 lh-150 text-center c-gray">Up to 4x long/short</p>
                         </div>
                         <div class="mx-xs-auto">
                             <a href="https://fulcrum.trade/lend"
                                 class="button button-secondary button-lg mb-25 mb-xs-15">Lend</a>
-                            <p class="fs-13 lh-150 text-center c-gray">To Earn interest<br /> on idle crypto and stablecoins</p>
+                            <p class="fs-13 lh-150 text-center c-gray">To earn interest</p>
                         </div>
                     </div>
                 </div>
@@ -50,8 +48,8 @@ title: Crypto Margin Trading with Fulcrum | bZx
                     <div class="icon-advantager mb-25">
                         {% include svg/step-1.svg %}
                     </div>
-                    <h3 class="mb-20">Zero Platform fees</h3>
-                    <p>Enjoy zero fees on tokenized margin loans and margin positions with Fulcrum.</p>
+                    <h3 class="mb-20">Zero Platform Fees</h3>
+                    <p>Enjoy zero fees on our transferrable, ERC20-compatible iTokens (tokenized margin loans) and pTokens (tokenized margin positions).</p>
                 </div>
             </div>
             <div class="col col-4 col-sm-6 col-xs-12">
@@ -59,8 +57,8 @@ title: Crypto Margin Trading with Fulcrum | bZx
                     <div class="icon-advantager mb-25">
                         {% include svg/step-2.svg %}
                     </div>
-                    <h3 class="mb-20">Non custodial</h3>
-                    <p>Whether you’re a trader or lender, our non-custodial platform puts you in control of your keys and assets.</p>
+                    <h3 class="mb-20">Non-Custodial</h3>
+                    <p>Whether lending or trading, maintain control of your own keys and assets with our non-custodial solution.</p>
                 </div>
             </div>
             <div class="col col-4 col-sm-6 col-xs-12">
@@ -69,8 +67,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
                         {% include svg/step-3.svg %}
                     </div>
                     <h3 class="mb-20">Everything is Tokenized</h3>
-                    <p>Tokenized margin loans and positions are transferrable, ERC20-compatible assets.              pTokens are tokenized margin positions offering static leverage with variable interest rates.
-                    iTokens are tokenized margin loans offering interest on deposited funds.</p>
+                    <p>iTokens (tokenized margin loans) earn the holder interest on borrowed funds and pTokens (tokenized margin positions) provide static leverage and variable interest rates.</p>
                 </div>
             </div>
             <div class="col col-4 col-sm-6 col-xs-12">
@@ -79,9 +76,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
                         {% include svg/step-4.svg %}
                     </div>
                     <h3 class="mb-20">Minimal Liquidation Penalties</h3>
-                    <p>Why should borrowers be fully liquidated if their position goes under margin maintenance?
-              Fulcrum liquidates traders such that margin maintenance is brought from 15% to 25%.
-                This reduces slippage, protects lenders, and allows traders to maintain their exposure while reducing potential losses.</p>
+                    <p>Undercollateralized positions are only liquidated enough to bring margin maintenance from 15% to 25%, protecting lenders while allowing traders to maintain positions with reduced losses.</p>
                 </div>
             </div>
             <div class="col col-4 col-sm-6 col-xs-12">
@@ -90,7 +85,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
                         {% include svg/step-5.svg %}
                     </div>
                     <h3 class="mb-20">Perpetual Positions</h3>
-                    <p>Trading positions are automatically renewed with no intervention from the trader and zero rollover fees. Without having to worry about expiration dates when entering or holding positions, users get to enjoy a frictionless trading experience.</p>
+                    <p>Enjoy a frictionless trading experience with trading positions that automatically renew with no intervention from the trader and zero rollover fees.</p>
                 </div>
             </div>
         </div>
@@ -273,15 +268,14 @@ title: Crypto Margin Trading with Fulcrum | bZx
                     {% include svg/icon-safe-1.svg %}
                 </div>
                 <h3 class="mb-20">Audited Smart Contracts</h3>
-                <p>The bZx base protocol audited by leading blockchain security auditor ZK Labs.  
-                ZK Labs provides smart contract development and auditing services for projects built on Ethereum and is headed by Matthew DiFerrante, Dean Eigenmann, Nick Johnson, and Harry Roberts. You can read our audit by ZK Labs <a href="https://github.com/mattdf/audits/blob/master/bZx/bzx-audit.pdf">here.</a></p>
+                <p>The bZx base protocol has been successfully audited by leading blockchain security auditor ZK Labs, headed by Matthew DiFerrante, Dean Eigenmann, Nick Johnson, and Harry Roberts and available <a href="https://github.com/mattdf/audits/blob/master/bZx/bzx-audit.pdf">here.</a></p>
             </div>
             <div class="col col-4 col-sm-12 item-safe fd-c">
                 <div class="icon-safe mb-50 mb-xs-15">
                     {% include svg/icon-safe-2.svg %}
                 </div>
                 <h3 class="mb-20">Insurance Fund</h3>
-                <p>Lenders may lose money in the event that borrowers are not properly liquidated when their loans become undercollateralized. To mitigate this risk, Fulcrum automatically diverts 10% of the interest paid by borrowers to maintain an Insurance Fund.
+                <p>10% of the interest paid by borrowers goes to an Insurance Fund for mitigating potential losses suffered by lenders in the event that undercollateralized loans are not properly liquidated.
             </p>
             </div>
             <div class="col col-4 col-sm-12 item-safe fd-c">
@@ -289,7 +283,8 @@ title: Crypto Margin Trading with Fulcrum | bZx
                     {% include svg/icon-safe-3.svg %}
                 </div>
                 <h3 class="mb-20">Open source</h3>
-                <p>Would you prefer to evaluate our code yourself? <a href="https://github.com/bZxNetwork">No problem!</a> As one of the founding principles of DeFi, we’re committed to interoperability and the development of open source code. Open sourcing code is how we continue to build DeFi legos in an accessible, transparent way.</p>
+                <p>As one of the founding principles of DeFi, we’re committed to interoperability and the development of open source code - <a href="https://github.com/bZxNetwork">see for yourself!</a>
+              </p>
             </div>
         </div>
     </div>
@@ -340,9 +335,9 @@ title: Crypto Margin Trading with Fulcrum | bZx
                     <div class="accordion-item active">
                         <h4 class="accordion-toggle">What does going long or short mean in trading?</h4>
                         <div class="accordion-content">
-                            <p>Margin trading has two main aspects: trading with leverage and shorting. In trading with leverage, a trader borrows assets to increase the amount of assets they are trading. By doing so, they magnify the gains or losses of their trade. The borrowed assets are known as a margin loan. To obtain the margin loan, the trader puts up assets that serve as collateral. The terms of the margin loan specify a collateral-to-loan ratio. If the trade falls below the specified ratio, the trade is liquidated and the lender is made whole using the trader's collateral.
+                            <p>Margin trading has two main aspects: leverage and shorting. When trading with leverage, a trader borrows assets to increase the amount of assets they are trading. By doing so, they magnify the gains or losses of their trade. The borrowed assets are known as a margin loan. To obtain the margin loan, the trader puts up assets that serve as collateral. The terms of the margin loan specify a collateral-to-loan ratio. If the trade falls below the specified ratio, the trade is liquidated and the lender gets repaid using the trader's collateral.
 
-Margin trading also includes shorting. In shorting, a trader essentially sells assets they do not own. The short investor borrows an asset and sells it on the expectation that the assets will lose value.
+Margin trading also includes shorting. When shorting, a trader essentially sells assets they do not own. The short investor borrows an asset and sells it with the expectation that the asset will lose value.
 
 </p>
                         </div>
@@ -352,15 +347,15 @@ Margin trading also includes shorting. In shorting, a trader essentially sells a
                         <div class="accordion-content">
                             <p>Positions are liquidated using KyberSwap. When a trader goes under margin maintenance (15%), they are only partially liquidated, bringing their current margin to 25%.
 
-By only liquidating as much as is necessary, the risk of slippage from excessively large liquidations is reduced. Anyone can initiate a margin call. It is a process that is permissionless and incentivized. The incentive to liquidators is the a refund of your gas * 2. There’s also no capital carrying costs/risks you’d experience liquidating on the other protocols.
+Only liquidating as much as necessary reduces the risk of slippage from large liquidations. Anyone can initiate a margin call: the process is permissionless and incentivized. The incentive to liquidators is a refund of your gas * 2. There’s also no capital costs or risks like those experienced when liquidating positions on other protocols.
 
-This ensures that there are redundancies in the margin calling process. Moreover, there is an insurance fund which protects lenders. In the case that a lender would lose principal, the insurance fund will automatically disburse funds to the lender. This insurance is funded by a smart contract holding 10% of all interest that is paid by borrowers to lenders.</p>
+This ensures redundancy in the margin calling process. Moreover, there is an insurance fund which protects lenders. In the case that a lender would lose their principal, the insurance fund will automatically disburse funds to the lender. This insurance is funded by a smart contract holding 10% of all interest that is paid by borrowers to lenders.</p>
                         </div>
                     </div>
                     <div class="accordion-item">
                         <h4 class="accordion-toggle">Are the smart contracts safe? Can I see the audits?</h4>
                         <div class="accordion-content">
-                            <p>Yes. The base protocol audit is publicly available. All custody is retained by the base protocol. Both the base protocol audit and iToken/pToken audit were conducted by <a href="https://github.com/mattdf/audits/blob/master/bZx/bzx-audit.pdf">ZK Labs</a>, a recognized leader in the space. Matthew DiFerrante, founder and lead auditor at ZK Labs, is a security engineer at the Ethereum Foundation and audits the Ethereum core protocol itself.</p>
+                            <p>Yes. The base protocol audit is <a href="https://github.com/mattdf/audits/blob/master/bZx/bzx-audit.pdf">publicly available</a>. All custody is retained by the base protocol. Both the base protocol audit and iToken/pToken audit were conducted by <a href="https://github.com/mattdf/audits/blob/master/bZx/bzx-audit.pdf">ZK Labs</a>, a recognized leader in the space. Matthew DiFerrante, founder and lead auditor at ZK Labs, is a security engineer at the Ethereum Foundation and audits the Ethereum core protocol itself.</p>
                         </div>
                     </div>
                 </div>
