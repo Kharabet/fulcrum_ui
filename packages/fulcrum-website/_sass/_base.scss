@@ -68,12 +68,12 @@ body {
   }
 }
 .bg-secondary-image {
-  background-position: 100% 0, 0 0;
+  background-position: 100% 0, 0 0, 0 100%;
   background-repeat: no-repeat;
   background-size: auto;
   [data-theme="dark"] & {
     @media(min-width: 768px){
-      background-image: url(/images/bg-secondary-dark-right.svg), url(/images/bg-secondary-dark-left.svg);
+      background-image: url(/images/bg-secondary-dark-right.svg), url(/images/bg-secondary-dark-left-top.svg), url(/images/bg-secondary-dark-left-bottom.svg);
     }
     @media(max-width: 767px){
       background-image: url(/images/bg-secondary-dark-right-mobile.svg), url(/images/bg-secondary-dark-left-mobile.svg);
@@ -81,23 +81,23 @@ body {
   }
   [data-theme="light"] & {  
     @media(min-width: 768px){
-      background-image: url(/images/bg-secondary-light-right.svg), url(/images/bg-secondary-light-left.svg);
+      background-image: url(/images/bg-secondary-light-right.svg), url(/images/bg-secondary-light-left-top.svg), url(/images/bg-secondary-light-left-bottom.svg);
     }
     @media(max-width: 767px){
       background-image: url(/images/bg-secondary-light-right-mobile.svg), url(/images/bg-secondary-light-left-mobile.svg);
     }
   }
   @media(max-width: 1399px){
-    background-position: 100% 0, -250px 0;
+    background-position: 100% 0, -250px 0, 0 100%;
   }
-  @media(max-width: 1199px){
-    background-position: 175% 0, 150% 0;
+  @media(max-width: 1099px){
+    background-position: 175% 0, -250px 0, -50% 100%;
   }
   @media(max-width: 991px){
-    background-position: 250% 0, 100% 0;
+    background-position: 250% 0, 100% 0, 0 100%;
   }
   @media(max-width: 767px){
-    background-position: 100% 0, 0 0;
+    background-position: 100% 0, 0 0, 0 90%;
   }
 }
 .bg-privacy-image {
