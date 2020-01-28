@@ -13,17 +13,16 @@ title: Crypto Margin Trading with Fulcrum | bZx
             <div class="col col-10 col-xs-12">
                 <div class="pl-55 pl-lg-0 w-100 text-xs-center">
                     <h1 class="mb-40">Margin made simple</h1>
-                    <p class="fs-16 fs-xs-12 lh-160 mb-50 c-secondary"><span class="fw-600">Fulcrum</span> is the first and only
-                      completely trustless platform for decentralized lending and margin trading. Permissionless and rent-free with no accounts or platform fees, Fulcrum offers the simplest, most powerful way to lend and margin trade.
+                    <p class="fs-16 fs-xs-12 lh-160 mb-50 c-secondary"><span class="fw-600">Fulcrum</span> is the first and only completely trustless platform for decentralized lending and margin trading. Permissionless and rent-free with no accounts or platform fees, Fulcrum offers the simplest, most powerful way to lend and margin trade.
                       </p>
                     <div class="flex fd-xs-c">
                         <div class="mr-30 mx-xs-auto mb-xs-30">
-                            <a href="https://fulcrum.trade/trade"
+                            <a href="https://app.fulcrum.trade/trade"
                                 class="button button-primary button-lg mb-25 mb-xs-15">Trade</a>
                             <p class="fs-13 lh-150 text-center c-gray">Up to 4x long/short</p>
                         </div>
                         <div class="mx-xs-auto">
-                            <a href="https://fulcrum.trade/lend"
+                            <a href="https://app.fulcrum.trade/lend"
                                 class="button button-secondary button-lg mb-25 mb-xs-15">Lend</a>
                             <p class="fs-13 lh-150 text-center c-gray">To earn interest</p>
                         </div>
