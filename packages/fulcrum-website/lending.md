@@ -240,7 +240,7 @@ permalink: lending
                         <p class="fs-18 mb-15 mb-md-0 c-dark-gray text-md-center">Quantity</p>
                         <input type="number" class="input-quantity" value="5000" />
                         <div class="border-range-quantity">                            
-                            <input class="range-quantity" type="range" value="10" min="1" max="1000000"/>
+                            <input class="range-quantity" type="range" value="5000" min="1" max="1000000"/>
                             <div class="left-range-quantity"></div>
                             <div class="right-range-quantity"></div>
                             <div class="track-range-quantity"></div>
