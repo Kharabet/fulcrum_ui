@@ -52,7 +52,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
                     <p>Enjoy zero fees on our transferrable, ERC20-compatible iTokens (tokenized margin loans) and pTokens (tokenized margin positions).</p>
                 </div>
             </div>
-            <div class="col col-4 col-sm-6 col-xs-12">
+            <div class="col col-4 col-sm-6 col-xs-12 as-b">
                 <div class="item-advantager as-fe as-sm-a">
                     <div class="icon-advantager mb-25">
                         {% include svg/step-2.svg %}

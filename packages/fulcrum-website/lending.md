@@ -15,21 +15,21 @@ permalink: lending
                     <h1 class="mb-40">Earn Interest on Crypto</h1>
                     <p class="fs-16 lh-160 mb-50 mx-xs-auto mb-xs-30 c-secondary mw-390">Flexible, high-yield returns – No minimum deposit, no lock-up period, withdraw anytime.</p>
                     <div class="flex fd-xs-c">
-                        <div class="flex ai-c wrap-white mr-25 mx-xs-auto apr-component" data-token="usdc">
-                            <div class="icon-66 icon-sm-50 mr-15">
-                                {% include svg/usdc.svg %}
-                            </div>
-                            <div class="flex">
-                                <p class="fs-40 lh-100 c-primary-blue mr-15"><span class="fw-800 apr-value">6.5</span>%</p>
-                                <span class="fs-18 lh-140 fw-600 c-gray">APR</span>
-                            </div>
-                        </div>
                         <div class="flex ai-c wrap-white mr-25 mx-xs-auto apr-component" data-token="dai">
                             <div class="icon-66 icon-sm-50 mr-15">
                                 {% include svg/dai.svg %}
                             </div>
                             <div class="flex">
                                 <p class="fs-40 lh-100 c-primary-blue mr-15"><span class="fw-800 apr-value">7.2</span>%</p>
+                                <span class="fs-18 lh-140 fw-600 c-gray">APR</span>
+                            </div>
+                        </div>
+                        <div class="flex ai-c wrap-white mr-25 mx-xs-auto apr-component" data-token="usdc">
+                            <div class="icon-66 icon-sm-50 mr-15">
+                                {% include svg/usdc.svg %}
+                            </div>
+                            <div class="flex">
+                                <p class="fs-40 lh-100 c-primary-blue mr-15"><span class="fw-800 apr-value">6.5</span>%</p>
                                 <span class="fs-18 lh-140 fw-600 c-gray">APR</span>
                             </div>
                         </div>
@@ -139,7 +139,7 @@ permalink: lending
                     <div class="col-10 col-md col-md-12 fd-c jc-sb">
                         <p class="fs-24 fs-xs-20 fw-800 lh-150 mb-xs-15">Battle-Tested</p>
                         <p class="fs-44 fs-xs-28 fw-900 mb-15 lh-140 c-light-green">TVL in our Smart Contracts</p>
-                        <div class="flex jc-sb fd-sm-c fs-44 fs-xs-36 fw-900 lh-140">
+                        <div class="flex jc-sb fd-sm-c fs-44 fs-md-36 fw-900 lh-140">
                             <div class="flex-xs fw-400">
                                 $<span class="fw-900 tvl-value" data-token="all">3,000,000</span>
                             </div>
