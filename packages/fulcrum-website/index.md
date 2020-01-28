@@ -259,7 +259,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
     <div class="container">
         <div class="row">
             <div class="col-12">
-                <h2 class="circle mb-65 mb-xs-50"><span class="blue right-r-50 top-r-10"></span>How safe it is?</h2>
+                <h2 class="circle mb-65 mb-xs-50"><span class="blue right-r-50 top-r-10"></span>How safe is it?</h2>
             </div>
         </div>
         <div class="row jc-sb fw-sm-w">
