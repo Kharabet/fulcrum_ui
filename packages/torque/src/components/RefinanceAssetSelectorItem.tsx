@@ -122,16 +122,9 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
         borrowAmount: refinanceData[0].debt
       });
       this._inputTextChange.next(this.state.inputAmountText);
-      if (this.state.refinanceData[0].collateralType === "DAI") {
-        const interestRate = await TorqueProvider.Instance.getAssetInterestRate(Asset.DAI);
-        this.setState({ ...this.state, fixedApr: interestRate });
-      } else if (this.state.refinanceData[0].collateralType === "SAI") {
-        const interestRate = await TorqueProvider.Instance.getAssetInterestRate(Asset.SAI);
-        this.setState({ ...this.state, fixedApr: interestRate });
-      } else {
-        const interestRate = await TorqueProvider.Instance.getAssetInterestRate(Asset.ETH);
-        this.setState({ ...this.state, fixedApr: interestRate });
-      }
+      // @ts-ignore
+      const interestRate = await TorqueProvider.Instance.getAssetInterestRate(Asset[this.state.refinanceData[0].collateralType]);
+      this.setState({ ...this.state, fixedApr: interestRate });
     }
   };
 
