@@ -1,6 +1,7 @@
 import React, { PureComponent, RefObject } from "react";
 import { RouteComponentProps } from "react-router";
 import { RefinanceAssetSelector } from "../components/RefinanceAssetSelector";
+import { RefinanceAssetSelectorMobile } from "../components/RefinanceAssetSelectorMobile";
 import { RefinanceAssetCompoundSelector } from "../components/RefinanceAssetCompoundSelector";
 import { BorrowDlg } from "../components/BorrowDlg";
 import { Asset } from "../domain/Asset";
@@ -17,6 +18,7 @@ export interface IRefinancePageRouteParams {
 export interface IRefinancePageParams {
   doNetworkConnect?: (destinationAbbr: string) => void;
   isLoading: boolean;
+  isMobileMedia: boolean;
 }
 
 export class RefinancePage extends PureComponent<IRefinancePageParams & RouteComponentProps<IRefinancePageRouteParams>> {
@@ -30,7 +32,7 @@ export class RefinancePage extends PureComponent<IRefinancePageParams & RouteCom
 
   public render() {
     const walletType = walletTypeAbbrToWalletType(this.props.match.params.walletTypeAbbr);
-
+    const isMobileMedia = this.props.isMobileMedia
     return (
       <React.Fragment>
         <BorrowDlg ref={this.borrowDlgRef} />
@@ -41,8 +43,11 @@ export class RefinancePage extends PureComponent<IRefinancePageParams & RouteCom
           <div className="refinance-page__main">
 
             {/*<RefinanceAssetCompoundSelector walletType={walletType}  />*/}
-
-            <RefinanceAssetSelector walletType={walletType} />
+            {isMobileMedia ?
+              < RefinanceAssetSelectorMobile walletType={walletType}/>
+              :
+              <RefinanceAssetSelector walletType={walletType}/>
+            }
           </div>
           <Footer />
         </div>

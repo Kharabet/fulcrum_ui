@@ -25,8 +25,32 @@
       width: 9rem;
       vertical-align: middle;
   }
+  .logo__dydx {
+      height: 3rem;
+      //width: 9rem;
+      vertical-align: middle;
+  }
+  .asset-collateral-show{
+    display:block;
+  }
+  .asset-collateral-hide{
+    display:none;
+  }
+  .arrow-icon{
+    width:10px;
 
-
+  }
+  .cursor-pointer{
+    cursor: pointer;
+  }
+  .arrow-div-down{
+    width: 27px;
+    float: right;
+  }
+  .arrow-div-top{
+    width: 27px;
+    float: right;
+  }
   .refinance__input-container {
     //padding-bottom: 1rem;
 
@@ -162,6 +186,9 @@
       //margin-top: 25px;
       //margin-bottom: 15px;
 
+    }
+    .mt20{
+      margin-top: 20px;
     }
     .refinance-asset-selector__simple{
       //width:18rem;
