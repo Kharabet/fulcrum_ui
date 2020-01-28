@@ -282,6 +282,157 @@
   }
 }
 
-//@media only screen and (max-width: $mobile-version-width) {
+@media only screen and (max-width: $mobile-version-width) {
 
-//}
+  .asset-selector {
+
+    .asset-selector-item {
+
+      .asset-selector-icon {
+        display: block;
+      }
+      .asset-selector-div {
+        display: none;
+      }
+      &:hover {
+        background-color: $color-borrow-card;
+        .asset-selector-div {
+          display: none;
+        }
+        .asset-selector-icon {
+          display: block;
+        }
+        .asset-selector__fixed {
+
+          background: none;
+          background-size: 200% auto;
+          color: #A9B5C7;
+          -webkit-background-clip: text;
+          animation: unset;
+          @keyframes shine {
+            to {
+              background-position: 200% center;
+            }
+          }
+        }
+      }
+    }
+
+    .asset-selector-item--bat {
+      background-image: url("../assets/images/bg_tile_bat.svg");
+      background-repeat: no-repeat;
+      background-position: right bottom;
+      bottom: 0;
+      &:hover {
+        background-size: unset;
+      }
+    }
+
+    .asset-selector-item--zrx {
+      background-image: url("../assets/images/intersect_zrx.svg");
+      background-repeat: no-repeat;
+      background-position: right bottom;
+      bottom: 0;
+      &:hover {
+        background-size: unset;
+      }
+    }
+
+    .asset-selector-item--wbtc {
+      background-image: url("../assets/images/intersect_wbtc.svg");
+      background-repeat: no-repeat;
+      background-position: right bottom;
+      bottom: 0;
+      &:hover {
+        background-size: unset;
+      }
+    }
+
+    .asset-selector-item--sai {
+      background-image: url("../assets/images/intersect_sai.svg");
+      background-repeat: no-repeat;
+      background-position: right bottom;
+      bottom: 0;
+      &:hover {
+        background-size: unset;
+      }
+    }
+
+    .asset-selector-item--dai {
+      background-image: url("../assets/images/Intersect_dai.svg");
+      background-repeat: no-repeat;
+      background-position: right bottom;
+      bottom: 0;
+
+      &:hover {
+        background-size: unset;
+      }
+    }
+
+    .asset-selector-item--usdc {
+      background-image: url("../assets/images/Intersect_usdc.svg");
+      background-repeat: no-repeat;
+      background-position: right bottom;
+      bottom: 0;
+      &:hover {
+        background-size: unset;
+      }
+    }
+
+    .asset-selector-item--susd {
+      background-image: url("../assets/images/intersect_susd.svg");
+      background-repeat: no-repeat;
+      background-position: right bottom;
+      bottom: 0;
+      &:hover {
+        background-size: unset;
+      }
+    }
+
+    .asset-selector-item--eth {
+      background-image: url("../assets/images/intersect_eth.svg");
+      background-repeat: no-repeat;
+      background-position: right bottom;
+      bottom: 0;
+      &:hover {
+        background-size: unset;
+      }
+    }
+
+    .asset-selector-item--knc {
+      background-image: url("../assets/images/intersect_knc.svg");
+      background-repeat: no-repeat;
+      background-position: right bottom;
+      bottom: 0;
+      &:hover {
+        background-size: unset;
+      }
+    }
+
+    .asset-selector-item--link {
+      background-image: url("../assets/images/intersect_link.svg");
+      background-repeat: no-repeat;
+      background-position: right bottom;
+      bottom: 0;
+      &:hover {
+        background-size: unset;
+      }
+    }
+
+    .asset-selector-item--mkr {
+      background-image: url("../assets/images/bg_tile_mkr.svg");
+      background-repeat: no-repeat;
+      background-position: right;
+    }
+
+    .asset-selector-item--rep {
+      background-image: url("../assets/images/intersect_rfp.svg");
+      background-repeat: no-repeat;
+      background-position: right bottom;
+      bottom: 0;
+      &:hover {
+        background-size: unset;
+      }
+    }
+  }
+}

@@ -4,7 +4,7 @@ import { Asset } from "../domain/Asset";
 import { TorqueProviderEvents } from "../services/events/TorqueProviderEvents";
 import { TorqueProvider } from "../services/TorqueProvider";
 import { DotsBar } from "./DotsBar";
-import { SelectorIconsBar } from "./SelectorIconsBar";
+import { BorrowSelectorIconsBar } from "./BorrowSelectorIconsBar";
 import bgDai  from "../assets/images/ic_token_dai.svg";
 import bgUsdc  from "../assets/images/ic_token_usdc.svg";
 import bgSai  from "../assets/images/ic_token_sai.svg";
@@ -93,7 +93,7 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
           {/*<SelectorIconsBar />*/}
           <img className={`${assetTypeImg}`} src={assetImg.img} />
           {/*<SelectorIconsBar />*/}
-          <div className={`${assetDiv}`}><SelectorIconsBar /></div>
+          <div className={`${assetDiv}`}><BorrowSelectorIconsBar /></div>
         </div>
       </div>
     );
