@@ -13,6 +13,7 @@ import { oracleContract } from "../contracts/oracle";
 import { proxyRegistryContract } from "../contracts/proxyRegistry";
 import { saiToDAIBridgeContract } from "../contracts/saiToDaiBridge";
 import { SoloContract } from "../contracts/solo";
+import { SoloBridgeContract } from "../contracts/SoloBridge";
 import { vatContract } from "../contracts/vat";
 
 import { Asset } from "../domain/Asset";
@@ -27,6 +28,7 @@ export class ContractsSource {
   private erc20Json: any;
   private cdpsJson: any;
   private soloJson: any;
+  private soloBridgeJson: any;
   private iBZxJson: any;
   private iTokenJson: any;
   private oracleJson: any;
@@ -253,6 +255,7 @@ export class ContractsSource {
 
     switch (this.networkId) {
       case 1:
+        // noinspection SpellCheckingInspection
         switch (addressErc20) {
           case "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2":
             asset = Asset.WETH;
@@ -360,13 +363,46 @@ export class ContractsSource {
         address = "0x4EC3570cADaAEE08Ae384779B0f3A45EF85289DE";
         break;
     }
-
     return address;
   }
 
   private async getSoloContractRaw(): Promise<SoloContract> {
     await this.Init();
     return new SoloContract(this.soloJson.abi, this.getSoloAddress().toLowerCase(), this.provider);
+  }
+
+  private static getSoloMarketRaw(asset: Asset): number {
+    switch (asset) {
+      case Asset.WETH:
+        return 0;
+      case Asset.DAI:
+        return 1;
+      case Asset.SAI:
+        return 1;
+      case Asset.USDC:
+        return 2;
+      default:
+        return -1;
+    }
+  }
+
+  private getSoloBridgeAddress(): string {
+    let address: string = "";
+    switch (this.networkId) {
+      case 1:
+        address = ""; // TODO
+        break;
+      case 42:
+        address = "0xc0307024fEBCAA79af9f1155b1A45FDfFbA41B03";
+        break;
+    }
+
+    return address;
+  }
+
+  private async getSoloBridgeContractRaw(): Promise<SoloBridgeContract> {
+    await this.Init();
+    return new SoloBridgeContract(this.soloBridgeJson.abi, this.getSoloBridgeAddress().toLowerCase(), this.provider);
   }
 
   public async Init() {
@@ -377,6 +413,7 @@ export class ContractsSource {
     this.erc20Json = await import(`./../assets/artifacts/${network}/erc20.json`);
     this.cdpsJson = await import(`./../assets/artifacts/${network}/GetCdps.json`);
     this.soloJson = await import(`./../assets/artifacts/${network}/Solo.json`);
+    this.soloBridgeJson = await import(`./../assets/artifacts/${network}/SoloBridge.json`);
     this.iBZxJson = await import(`./../assets/artifacts/${network}/iBZx.json`);
     this.iTokenJson = await import(`./../assets/artifacts/${network}/iToken.json`);
     this.oracleJson = await import(`./../assets/artifacts/${network}/oracle.json`);
@@ -448,6 +485,8 @@ export class ContractsSource {
   public getVatContract = _.memoize(this.getVatContractRaw);
   public getCdpContract = _.memoize(this.getCdpContractRaw);
   public getSoloContract = _.memoize(this.getSoloContractRaw);
+  public getSoloBridgeContract = _.memoize(this.getSoloBridgeContractRaw);
+  public getSoloMarket = _.memoize(ContractsSource.getSoloMarketRaw);
   public getErc20Contract = _.memoize(this.getErc20ContractRaw);
   public getiBZxContract = _.memoize(this.getiBZxContractRaw);
   public getiTokenContract = _.memoize(this.getiTokenContractRaw);

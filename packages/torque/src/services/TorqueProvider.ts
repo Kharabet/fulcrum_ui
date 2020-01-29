@@ -17,6 +17,7 @@ import { makerBridgeContract } from "../contracts/makerBridge";
 import { proxyRegistryContract } from "../contracts/proxyRegistry";
 import { saiToDAIBridgeContract } from "../contracts/saiToDaiBridge";
 import { SoloContract } from "../contracts/solo";
+import { SoloBridgeContract } from "../contracts/SoloBridge";
 
 import { vatContract } from "../contracts/vat";
 import { Asset } from "../domain/Asset";
@@ -36,7 +37,7 @@ import { IWalletDetails } from "../domain/IWalletDetails";
 import { IWeb3ProviderSettings } from "../domain/IWeb3ProviderSettings";
 import { ManageCollateralRequest } from "../domain/ManageCollateralRequest";
 import { ProviderType } from "../domain/ProviderType";
-import { RefinanceCdpData, RefinanceData } from "../domain/RefinanceData";
+import { ISoloLoan, ISoloToken, RefinanceCdpData, RefinanceData } from "../domain/RefinanceData";
 import { RepayLoanRequest } from "../domain/RepayLoanRequest";
 import { SetupENSRequest } from "../domain/SetupENSRequest";
 import { WalletType } from "../domain/WalletType";
@@ -441,7 +442,7 @@ export class TorqueProvider {
       } else {
         srcAmount = new BigNumber(srcAmount.toFixed(1, 1));
       }
-      
+
       if (this.contractsSource && srcAssetErc20Address && destAssetErc20Address) {
         const oracleContract = await this.contractsSource.getOracleContract();
         try {
@@ -478,7 +479,7 @@ export class TorqueProvider {
     }
     return result;
   }
-  
+
   public checkENSSetup = async (user: string): Promise<boolean | undefined> => {
     let result;
     if (this.contractsSource && this.web3Wrapper) {
@@ -512,7 +513,7 @@ export class TorqueProvider {
     }
     return result;
   };
-  
+
   public hex2a = (_hex: string): string => {
     const hex = _hex.toString(); // force conversion
     let str = "";
@@ -522,90 +523,163 @@ export class TorqueProvider {
     return str;
   };
 
-  public getSoloLoans = async () => {
+  public getSoloLoans = async (): Promise<ISoloLoan[]> => {
     const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
-    if (this.contractsSource && account) {
-      const solo: SoloContract = await this.contractsSource.getSoloContract();
-      const [tokens, , balances] = await solo.getAccountBalances.callAsync(
-        { owner: account, number: new BigNumber(0) }
-      );
-      const values = await solo.getAccountValues.callAsync(
-        { owner: account, number: new BigNumber(0) }
-      );
-      const supplied = values[0].value.div(10 ** 36);
-      const borrowed = values[1].value.div(10 ** 36);
-      const ratio = supplied.div(borrowed);
-
-      console.log('values', values[0].value.toString(), values[1].value.toString());
-      console.log('supplied', supplied.toString());
-      console.log('borrowed', borrowed.toString());
-      console.log('ratio', ratio.toString());
-      console.log('tokens', tokens);
-      console.log('balances', balances);
-
-      const loans = [];
-      const deposits = [];
-      let inSupplied = new BigNumber(0);
-      let inBorrowed = new BigNumber(0);
-      for (let i = 0; i < tokens.length; i++) {
-        const balance = balances[i].value.div(10 ** 18); // TODO what if they'll add token with different decimals?
-        if (!balance.gt(0)) {
-          continue;
-        }
-        const asset = this.contractsSource.getAssetFromAddress(tokens[i]);
-        if (asset === Asset.UNKNOWN) {
-          continue;
-        }
-        const rate = await this.getSwapRate(asset, Asset.DAI);
-        const usdValue = balance.times(rate);
-        const token = {
-          asset,
-          rate,
-          balance,
-          usdValue
-        };
-        if (balances[i].sign) {
-          deposits.push(token);
-          inSupplied = inSupplied.plus(token.usdValue);
-        } else {
-          loans.push({
-            ...token,
-            isHealthy: false,
-            collateral: []
-          });
-          inBorrowed = inBorrowed.plus(token.usdValue);
-        }
-      }
-
-      const inRatio = inSupplied.div(inBorrowed);
-
-      console.log('inRatio', inRatio.toString());
-
-      for (const loan of loans) {
-        const goal = loan.usdValue.times(inRatio);
-        let current = new BigNumber(0);
-        for (const deposit of deposits) {
-          let take = deposit.usdValue;
-          if (current.plus(take).gt(goal)) {
-            take = take.minus(current.plus(take).minus(goal));
-          }
-          // @ts-ignore TODO
-          loan.collateral.push({ asset: deposit.asset, amount: take.div(deposit.rate) });
-          current = current.plus(take);
-          console.log('current', current.toString());
-          console.log('goal', goal.toString());
-          if (current.toString(10) === goal.toString(10)) {
-            loan.isHealthy = true;
-            break;
-          }
-        }
-      }
-
-      console.log('deposits', deposits, deposits[0].balance.toString());
-      // @ts-ignore
-      console.log('loans', loans, loans[0].balance.toString(), loans[0].collateral[0].amount.toString());
+    if (!this.contractsSource || !account) {
+      return [];
     }
+    const solo: SoloContract = await this.contractsSource.getSoloContract();
+    const [tokens, , balances] = await solo.getAccountBalances.callAsync(
+      { owner: account, number: new BigNumber(0) }
+    );
+
+    // const values = await solo.getAccountValues.callAsync(
+    //   { owner: account, number: new BigNumber(0) }
+    // );
+    // const supplied = values[0].value.div(10 ** 36);
+    // const borrowed = values[1].value.div(10 ** 36);
+    // const ratio = supplied.div(borrowed);
+
+    // console.log('values', values[0].value.toString(), values[1].value.toString());
+    // console.log('supplied', supplied.toString());
+    // console.log('borrowed', borrowed.toString());
+    // console.log('ratio', ratio.toString());
+
+    const deposits: ISoloToken[] = [];
+    const loans: ISoloLoan[] = [];
+    let inSupplied = new BigNumber(0);
+    let inBorrowed = new BigNumber(0);
+    for (let i = 0; i < tokens.length; i++) {
+      const asset = this.contractsSource.getAssetFromAddress(tokens[i]);
+      if (asset === Asset.UNKNOWN) {
+        continue;
+      }
+      const market = this.contractsSource.getSoloMarket(asset);
+      if (market < 0) {
+        continue;
+      }
+      const decimals = AssetsDictionary.assets.get(asset)!.decimals || 18;
+      const balance = balances[i].value.div(10 ** decimals);
+      if (!balance.gt(0)) {
+        continue;
+      }
+      const rate = await this.getSwapRate(asset, Asset.DAI);
+      const usdValue = balance.times(rate);
+      const token: ISoloToken = {
+        asset,
+        rate,
+        balance,
+        usdValue,
+        market,
+        decimals
+      };
+      if (balances[i].sign) {
+        deposits.push(token);
+        inSupplied = inSupplied.plus(token.usdValue);
+      } else {
+        loans.push({
+          ...token,
+          isHealthy: false,
+          collateral: []
+        });
+        inBorrowed = inBorrowed.plus(token.usdValue);
+      }
+    }
+
+    const inRatio = inSupplied.div(inBorrowed);
+
+    for (const loan of loans) {
+      const goal = loan.usdValue.times(inRatio);
+      let current = new BigNumber(0);
+      for (const deposit of deposits) {
+        let take = deposit.usdValue;
+        if (current.plus(take).gt(goal)) {
+          take = take.minus(current.plus(take).minus(goal));
+        }
+        loan.collateral.push({
+          ...deposit,
+          amount: take.div(deposit.rate),
+          borrowAmount: loan.balance.div(goal.div(take)),
+        });
+        current = current.plus(take);
+        if (current.toString(10) === goal.toString(10)) {
+          loan.isHealthy = true;
+          break;
+        }
+      }
+    }
+
+    // TODO @bshevchenko: SoloMargin.getMarketInterestRate
+
+    return loans;
   };
+
+  public migrateSoloLoan = async (loan: ISoloLoan, amount: BigNumber) => {
+    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+    if (!this.web3Wrapper || !this.contractsSource || !account) {
+      return;
+    }
+
+    // TODO @bshevchenko: test with more than 1 collateral type
+
+    const solo: SoloContract = await this.contractsSource.getSoloContract();
+    const soloBridge: SoloBridgeContract = await this.contractsSource.getSoloBridgeContract();
+    const isOperator = await solo.getIsLocalOperator.callAsync(account, soloBridge.address);
+
+    if (!isOperator) {
+      try {
+        const txHash = await solo.setOperators.sendTransactionAsync(
+          [{ operator: soloBridge.address, trusted: true }],
+          { from: account }
+        );
+        const receipt = await this.waitForTransactionMined(txHash);
+        if (receipt && receipt.status) {
+          window.setTimeout(() => {
+            // do nothing
+          }, 3000);
+        }
+      } catch (e) {
+        if (!e.code) {
+          alert("setOperators failed: " + e.message);
+        }
+        return null;
+      }
+    }
+
+    const markets: BigNumber[] = [];
+    const amounts: BigNumber[] = [];
+    const borrowAmounts: BigNumber[] = [];
+
+    const divider = loan.balance.div(amount);
+
+    for (const token of loan.collateral) {
+      markets.push(new BigNumber(token.market));
+      amounts.push(
+        token.amount.div(divider).times(10 ** token.decimals)
+      );
+      borrowAmounts.push(
+        token.borrowAmount.div(divider).times(10 ** token.decimals)
+      );
+    }
+
+    if (amount.isEqualTo(loan.balance)) {
+      amount = new BigNumber(0);
+    }
+
+    try {
+      const txHash = await soloBridge.migrateLoan.sendTransactionAsync(
+        { owner: account, number: new BigNumber(0) },
+        new BigNumber(loan.market), amount.times(10 ** loan.decimals), markets, amounts, amounts, borrowAmounts,
+        { from: account }
+      )
+      return await this.waitForTransactionMined(txHash);
+    } catch (e) {
+      if (!e.code) {
+        alert("migrateLoan failed: " + e.message);
+      }
+      return null;
+    }
+  }
 
   public getMakerCdps = async (): Promise<RefinanceCdpData[]> => {
     let result: RefinanceCdpData[] = [{
@@ -615,8 +689,12 @@ export class TorqueProvider {
       accountAddress: "",
       proxyAddress: "",
       isProxy: false,
-      isInstaProxy: false,
+      isInstaProxy: false
     }];
+
+    if (result) { // TODO @bshevchenko: remove
+      return result;
+    }
 
     const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
 
@@ -732,7 +810,7 @@ export class TorqueProvider {
     }
     return result;
   };
-  
+
   public getCdpsVat = async (cdpId: BigNumber, urn: string, ilk: string, accountAddress: string, isProxy: boolean, isInstaProxy: boolean, proxyAddress: string, asset: Asset): Promise<RefinanceData[]> => {
     let result: RefinanceData[] = [{
       collateralAmount: new BigNumber(0),
@@ -804,7 +882,7 @@ export class TorqueProvider {
     return result;
   };
 
-  public checkCdpManager = async (refRequest: RefinanceData, loanAmount: BigNumber) => {
+  public migrateMakerLoan = async (refRequest: RefinanceData, loanAmount: BigNumber) => {
 
     const cdpManagerAddress = configAddress.CDP_MANAGER;
     if (this.web3Wrapper && this.contractsSource) {
@@ -835,7 +913,10 @@ export class TorqueProvider {
 
           try {
             // if proxy use then use this function for cdpAllow
-            const txHash = await proxy.execute.sendTransactionAsync(proxyActionsAddress, allowData, { from: refRequest.accountAddress, isInstaProxy: refRequest.isInstaProxy });
+            const txHash = await proxy.execute.sendTransactionAsync(proxyActionsAddress, allowData, {
+              from: refRequest.accountAddress,
+              isInstaProxy: refRequest.isInstaProxy
+            });
             const receipt = await this.waitForTransactionMined(txHash);
             if (receipt != null) {
               if (receipt.status) {
@@ -861,8 +942,6 @@ export class TorqueProvider {
           [dinks],
           [darts]
         ];
-        // tslint:disable-next-line:no-console
-        console.log('params', params);
         // @ts-ignore
         const data = web3.eth.abi.encodeFunctionCall(proxyMigrationABI.default, params);
         const bridgeActionsAddress = configAddress.Bridge_Action_Address;

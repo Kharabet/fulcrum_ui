@@ -151,7 +151,7 @@ export class RefinanceAssetSelectorItemMobile extends Component<IRefinanceAssetS
       window.location.href = "/#/dashboard/w/";
     } else {
       this.setState({ ...this.state, isLoading: true });
-      const refinanceData = await TorqueProvider.Instance.checkCdpManager(this.state.refinanceData[0], this.state.borrowAmount);
+      const refinanceData = await TorqueProvider.Instance.migrateMakerLoan(this.state.refinanceData[0], this.state.borrowAmount);
       if (refinanceData !== null) {
         this.setState({ ...this.state, isLoading: false, isTrack: true });
       } else {
