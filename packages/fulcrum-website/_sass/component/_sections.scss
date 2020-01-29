@@ -374,12 +374,7 @@ input[type="number"] {
     padding: 0 10px;
     justify-content: center;
     position: relative;
-    @media (min-width: 580px) {
-        margin: 0 auto 25px auto;
-    }
-    @media (max-width: 579px) {
-        margin: 0 auto 15px auto;
-    }
+    margin: 0 auto 15px auto;
     span {
         font-size: 35px;
         line-height: 1.4;
@@ -506,3 +501,8 @@ input[type="number"] {
         margin: auto;
     }
 }
+.wrap-apr-value {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
