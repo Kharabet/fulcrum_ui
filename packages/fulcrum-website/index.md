@@ -47,8 +47,8 @@ title: Crypto Margin Trading with Fulcrum | bZx
                     <div class="icon-advantager mb-25">
                         {% include svg/step-1.svg %}
                     </div>
-                    <h3 class="mb-20">Zero Platform Fees</h3>
-                    <p>Enjoy zero fees on our transferrable, ERC20-compatible iTokens (tokenized margin loans) and pTokens (tokenized margin positions).</p>
+                    <h3 class="mb-20">Without KYC</h3>
+                    <p>Fulcrum it's a decentralized margin trading platform, there is no need for any verification, KYC or AML.</p>
                 </div>
             </div>
             <div class="col col-4 col-sm-6 col-xs-12 as-b">
