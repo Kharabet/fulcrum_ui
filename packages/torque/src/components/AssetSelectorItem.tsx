@@ -87,7 +87,7 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
         <div className="asset-selector-row mt50">
           <div className="asset-selector__title">{this.props.asset}</div>
           {!this.props.onSelectAsset ? (
-            <div className="asset-selector__title--coming-soon">Browser wallets only</div>
+            <div className="asset-selector__title--coming-soon"></div>
           ) : ``}
 
           {/*<SelectorIconsBar />*/}
