@@ -258,6 +258,64 @@ export class iTokenContract extends BaseContract {
         },
     };
 
+    public loanOrderHashes = {
+        async callAsync(
+          index_0: BigNumber,
+          callData: Partial<CallData> = {},
+          defaultBlock?: BlockParam,
+        ): Promise<string
+          > {
+            const self = this as any as iTokenContract;
+            const encodedData = self._strictEncodeArguments('loanOrderHashes(uint256)', [index_0
+            ]);
+            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+              {
+                  to: self.address,
+                  ...callData,
+                  data: encodedData,
+              },
+              self._web3Wrapper.getContractDefaults(),
+            );
+            const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
+            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            const abiEncoder = self._lookupAbiEncoder('loanOrderHashes(uint256)');
+            // tslint:disable boolean-naming
+            const result = abiEncoder.strictDecodeReturnValue<string
+              >(rawCallResult);
+            // tslint:enable boolean-naming
+            return result;
+        },
+    };
+
+    public loanOrderData = {
+        async callAsync(
+          index_0: string,
+          callData: Partial<CallData> = {},
+          defaultBlock?: BlockParam,
+        ): Promise<[string, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber]
+          > {
+            const self = this as any as iTokenContract;
+            const encodedData = self._strictEncodeArguments('loanOrderData(bytes32)', [index_0
+            ]);
+            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+              {
+                  to: self.address,
+                  ...callData,
+                  data: encodedData,
+              },
+              self._web3Wrapper.getContractDefaults(),
+            );
+            const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
+            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            const abiEncoder = self._lookupAbiEncoder('loanOrderData(bytes32)');
+            // tslint:disable boolean-naming
+            const result = abiEncoder.strictDecodeReturnValue<[string, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber]
+              >(rawCallResult);
+            // tslint:enable boolean-naming
+            return result;
+        },
+    };
+
     constructor(abi: ContractAbi, address: string, provider: any, txDefaults?: Partial<TxData>) {
         super('iToken', abi, address.toLowerCase(), provider as SupportedProvider, txDefaults);
         classUtils.bindAll(this, ['_abiEncoderByFunctionSignature', 'address', 'abi', '_web3Wrapper']);

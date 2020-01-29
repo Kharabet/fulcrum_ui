@@ -574,12 +574,18 @@ export class TorqueProvider {
         decimals
       };
       if (balances[i].sign) {
+        const iToken = await this.contractsSource.getiTokenContract(asset);
+        const hash = await iToken.loanOrderHashes.callAsync(new BigNumber(2 * 10 ** 18));
+        const data = await iToken.loanOrderData.callAsync(hash);
+        token.maintenanceMarginAmount = data[3];
+
         deposits.push(token);
         inSupplied = inSupplied.plus(token.usdValue);
       } else {
         loans.push({
           ...token,
           isHealthy: false,
+          isDisabled: false,
           collateral: []
         });
         inBorrowed = inBorrowed.plus(token.usdValue);
@@ -601,6 +607,12 @@ export class TorqueProvider {
           amount: take.div(deposit.rate),
           borrowAmount: loan.balance.div(goal.div(take)),
         });
+
+        // @ts-ignore
+        if (inRatio.lte(deposit.maintenanceMarginAmount.div(10 ** 18))) {
+          loan.isDisabled = true;
+        }
+
         current = current.plus(take);
         if (current.toString(10) === goal.toString(10)) {
           loan.isHealthy = true;
@@ -610,6 +622,8 @@ export class TorqueProvider {
     }
 
     // TODO @bshevchenko: SoloMargin.getMarketInterestRate
+
+    console.log('loans', loans);
 
     return loans;
   };
@@ -691,10 +705,6 @@ export class TorqueProvider {
       isProxy: false,
       isInstaProxy: false
     }];
-
-    if (result) { // TODO @bshevchenko: remove
-      return result;
-    }
 
     const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
 
@@ -833,7 +843,7 @@ export class TorqueProvider {
 
       const rateIlk = respIlks[1].dividedBy(10 ** 27);
       let ratio = new BigNumber(0);
-      let maintenanceMarginAmount = 1;
+      let maintenanceMarginAmount = new BigNumber(1);
       const collateralAmount = resp[0].dividedBy(10 ** 18);
       let debtAmount = resp[1].dividedBy(10 ** 18);
       const rateAmountIlkPerSecond = respIlks[1].dividedBy(10 ** 26);
@@ -854,9 +864,10 @@ export class TorqueProvider {
 
         ratio = rate.times(collateralAmount).div(debtAmount);
 
-        const iBZxContract = await this.contractsSource.getiBZxContract();
-        const loansData = await iBZxContract.getBasicLoansData.callAsync(accountAddress, new BigNumber(50));
-        maintenanceMarginAmount = parseInt(loansData[0].maintenanceMarginAmount.dividedBy(10 ** 17).toString(), 10);
+        const iToken = await this.contractsSource.getiTokenContract(asset);
+        const hash = await iToken.loanOrderHashes.callAsync(new BigNumber(2 * 10 ** 18));
+        const data = await iToken.loanOrderData.callAsync(hash);
+        maintenanceMarginAmount = data[3];
       }
 
       let isDisabled = true;

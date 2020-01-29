@@ -32,11 +32,13 @@ export interface ISoloToken {
   usdValue: BigNumber;
   market: number;
   decimals: number;
+  maintenanceMarginAmount?: BigNumber;
 }
 
 export interface ISoloLoan extends ISoloToken {
   isHealthy: boolean;
   collateral: ISoloCollateral[];
+  isDisabled: boolean;
 }
 
 export interface ISoloCollateral extends ISoloToken {
