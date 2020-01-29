@@ -173,6 +173,34 @@ export class SoloContract extends BaseContract {
       return result;
     },
   };
+  public getMarketInterestRate = {
+    async callAsync(
+      marketId: BigNumber,
+      callData: Partial<CallData> = {},
+      defaultBlock?: BlockParam,
+    ): Promise<{value: BigNumber}
+      > {
+      const self = this as any as SoloContract;
+      const encodedData = self._strictEncodeArguments('getMarketInterestRate(uint256)', [marketId
+      ]);
+      const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+        {
+          to: self.address,
+          ...callData,
+          data: encodedData,
+        },
+        self._web3Wrapper.getContractDefaults(),
+      );
+      const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
+      BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+      const abiEncoder = self._lookupAbiEncoder('getMarketInterestRate(uint256)');
+      // tslint:disable boolean-naming
+      const result = abiEncoder.strictDecodeReturnValue<{value: BigNumber}
+        >(rawCallResult);
+      // tslint:enable boolean-naming
+      return result;
+    },
+  };
   constructor(abi: ContractAbi, address: string, provider: any, txDefaults?: Partial<TxData>) {
     super('Solo', abi, address.toLowerCase(), provider as SupportedProvider, txDefaults);
     classUtils.bindAll(this, ['_abiEncoderByFunctionSignature', 'address', 'abi', '_web3Wrapper']);

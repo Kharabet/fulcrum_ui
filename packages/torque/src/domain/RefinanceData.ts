@@ -39,6 +39,7 @@ export interface ISoloLoan extends ISoloToken {
   isHealthy: boolean;
   collateral: ISoloCollateral[];
   isDisabled: boolean;
+  apr: BigNumber;
 }
 
 export interface ISoloCollateral extends ISoloToken {

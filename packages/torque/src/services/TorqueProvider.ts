@@ -524,6 +524,7 @@ export class TorqueProvider {
   };
 
   public getSoloLoans = async (): Promise<ISoloLoan[]> => {
+
     const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
     if (!this.contractsSource || !account) {
       return [];
@@ -582,11 +583,13 @@ export class TorqueProvider {
         deposits.push(token);
         inSupplied = inSupplied.plus(token.usdValue);
       } else {
+        const interestRate = await solo.getMarketInterestRate.callAsync(new BigNumber(market));
         loans.push({
           ...token,
           isHealthy: false,
           isDisabled: false,
-          collateral: []
+          collateral: [],
+          apr: interestRate.value.times(60 * 60 * 24 * 365).div(10 ** 16)
         });
         inBorrowed = inBorrowed.plus(token.usdValue);
       }
@@ -620,10 +623,6 @@ export class TorqueProvider {
         }
       }
     }
-
-    // TODO @bshevchenko: SoloMargin.getMarketInterestRate
-
-    console.log('loans', loans);
 
     return loans;
   };
