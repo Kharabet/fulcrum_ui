@@ -29,7 +29,8 @@
       display: none;
     }
     &:hover {
-      background-color: $color-borrow-card;
+      background-color: #FFFFFF;
+      border: 1px solid #A9B5C7;
       .asset-selector-div{
         background-repeat: no-repeat;
         width: 38px;
