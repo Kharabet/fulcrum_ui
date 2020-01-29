@@ -47,7 +47,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
                     <div class="icon-advantager mb-25">
                         {% include svg/step-1.svg %}
                     </div>
-                    <h3 class="mb-20">Without KYC</h3>
+                    <h3 class="mb-20">No KYC</h3>
                     <p>Fulcrum it's a decentralized margin trading platform, there is no need for any verification, KYC or AML.</p>
                 </div>
             </div>
