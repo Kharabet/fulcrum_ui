@@ -50,18 +50,12 @@
     border-radius: 100px;
     background-color: #FFFFFF;
     margin: 0.5rem;
+    float: right;
 
-    &:first-child {
-      margin-left: 0;
-    }
-
-    &:last-child {
-      margin-right: 0;
-    }
   }
 
   .selector-icons-borrow-bar__icon {
-    width: 2.5rem;
+    //width: 2.5rem;
   }
 
   .selector-icons-borrow-bar__button {
