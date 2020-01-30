@@ -85,9 +85,9 @@ export class AssetsDictionary {
         "https://fulcrum.trade/images/iWBTC.svg",
         8,
         btc_logo,
-        btc_bg_btm,
+        btc_bg,
         btc_ts,
-        "#F9B134",
+        "#884294",
         "#FFFFFF",
         "#FFFFFF",
         new Map<number, string | null>([
@@ -155,7 +155,7 @@ export class AssetsDictionary {
         "#FFFFFF",
         new Map<number, string | null>([
           [1, "0x6b175474e89094c44da98b954eedeac495271d0f"],
-          [3, ""],
+          [3, "0xf80A32A835F79D7787E8a8ee5721D0fEaFd78108"],
           [4, "0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea"],
           [42, "0x4f96fe3b7a6cf9725f59d353f723c1bdb64ca6aa"]
         ])
@@ -278,7 +278,7 @@ export class AssetsDictionary {
         knc_logo,
         knc_bg,
         knc_ts,
-        "#31766E",
+        "#49BC98",
         "#FFFFFF",
         "#FFFFFF",
         new Map<number, string | null>([
@@ -383,9 +383,9 @@ export class AssetsDictionaryMobile {
         "https://fulcrum.trade/images/iWBTC.svg",
         8,
         btc_logo,
-        btc_bg_btm,
+        btc_bg,
         btc_ts,
-        "#F9B134",
+        "#884294",
         "#FFFFFF",
         "#FFFFFF",
         new Map<number, string | null>([
@@ -453,7 +453,7 @@ export class AssetsDictionaryMobile {
         "#FFFFFF",
         new Map<number, string | null>([
           [1, "0x6b175474e89094c44da98b954eedeac495271d0f"],
-          [3, ""],
+          [3, "0xf80A32A835F79D7787E8a8ee5721D0fEaFd78108"],
           [4, "0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea"],
           [42, "0x4f96fe3b7a6cf9725f59d353f723c1bdb64ca6aa"]
         ])
@@ -576,7 +576,7 @@ export class AssetsDictionaryMobile {
         knc_logo,
         knc_bg_btm,
         knc_ts,
-        "#31766E",
+        "#49BC98",
         "#FFFFFF",
         "#FFFFFF",
         new Map<number, string | null>([

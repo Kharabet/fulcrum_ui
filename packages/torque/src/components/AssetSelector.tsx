@@ -12,49 +12,80 @@ export interface IAssetSelectorProps {
 export class AssetSelector extends Component<IAssetSelectorProps> {
 
   // true includes ENS support
-  private readonly assetsShown: Map<Asset, boolean> = new Map<Asset, boolean>([
-    [
-      Asset.SAI,
-      true
-    ],
-    [
-      Asset.DAI,
-      false
-    ],
-    [
-      Asset.USDC,
-      true
-    ],
-    [
-      Asset.SUSD,
-      false
-    ],
-    [
-      Asset.ETH,
-      false
-    ],
-    [
-      Asset.WBTC,
-      false
-    ],
-    [
-      Asset.LINK,
-      false
-    ],
-    [
-      Asset.ZRX,
-      false
-    ],
-    [
-      Asset.REP,
-      false
-    ],
-    [
-      Asset.KNC,
-      false
-    ],
-  ]);
+  private assetsShown: Map<Asset, boolean>;
 
+  public constructor(props: IAssetSelectorProps) {
+    super(props);
+    
+    if (process.env.REACT_APP_ETH_NETWORK === "mainnet") {
+      this.assetsShown = new Map<Asset, boolean>([
+        [
+          Asset.SAI,
+          true
+        ],
+        [
+          Asset.DAI,
+          false
+        ],
+        [
+          Asset.USDC,
+          true
+        ],
+        [
+          Asset.SUSD,
+          false
+        ],
+        [
+          Asset.ETH,
+          false
+        ],
+        [
+          Asset.WBTC,
+          false
+        ],
+        [
+          Asset.LINK,
+          false
+        ],
+        [
+          Asset.ZRX,
+          false
+        ],
+        [
+          Asset.KNC,
+          false
+        ]
+      ]);
+    } else if (process.env.REACT_APP_ETH_NETWORK === "kovan") {
+      this.assetsShown = new Map<Asset, boolean>([
+        [
+          Asset.SAI,
+          true
+        ],
+        [
+          Asset.DAI,
+          false
+        ],
+        [
+          Asset.ETH,
+          false
+        ]
+      ]);
+    } else if (process.env.REACT_APP_ETH_NETWORK === "ropsten") {
+      this.assetsShown = new Map<Asset, boolean>([
+        [
+          Asset.DAI,
+          false
+        ],
+        [
+          Asset.ETH,
+          false
+        ]
+      ]);
+    } else {
+      this.assetsShown = new Map<Asset, boolean>([]);
+    }
+  }
 
   public render() {
 

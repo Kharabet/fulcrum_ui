@@ -1,0 +1,77 @@
+.circle {
+  position: relative;
+  display: inline-flex;
+
+  span {
+    position: absolute;
+    border-radius: 50%;
+    @media(min-width: 580px){
+      width: 22px;
+      height: 22px;
+    }
+    @media(max-width: 579px){
+      width: 14px;
+      height: 14px;
+    }
+    &.big {
+      @media(min-width: 580px){
+        width: 30px;
+        height: 30px;
+      }
+      @media(max-width: 579px){
+        width: 20px;
+        height: 20px;
+      }
+    }
+    &.purple {
+      background: radial-gradient(87.57% 87.57% at 62.32% 26.67%, #dad6ff 0%, #6f68ae 100%);
+    }
+    &.green {
+      background: radial-gradient(87.57% 87.57% at 62.32% 26.67%, #ffffff 0%, #33dfcc 100%);
+    }
+    &.blue {
+      background: radial-gradient(87.57% 87.57% at 62.32% 26.67%, #33dfcc 0%, #003cda 100%);
+    }
+  }
+  .left-r-30 {
+    left: -30px;
+  }
+  .left-35 {
+    left: 35px;
+    @media(max-width: 991px){
+      left: 5px;
+    }
+  }
+  .left-165 {
+    left: 165px;
+    @media(max-width: 579px){
+      left: 105px;
+    }
+  }
+  .left-r-50 {
+    left: -50px;
+  }
+  .right-r-50 {
+    right: -50px;
+  }
+  .center {
+    left: 0;
+    right: 0;
+    margin: auto;
+  }
+  .top-r-10 {
+    top: -10px;
+    @media(max-width: 579px){
+      top: 0;
+    }
+  }
+  .top-r-60 {
+    top: -60px;
+    @media(max-width: 579px){
+      top: -40px;
+    }
+  }
+  .bottom-r-50 {
+    bottom: -50px;
+  }
+}

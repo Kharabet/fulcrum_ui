@@ -188,11 +188,13 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
   };
 
   public componentWillUnmount(): void {
+    window.history.back();
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
   public componentDidMount(): void {
     this.derivedUpdate();
+    window.history.pushState(null, "Lend Modal Opened", `/#/lend/${this.props.lendType.toLocaleLowerCase()}-${this.props.asset}/`);
 
     if (this._input) {
       this._input.select();
