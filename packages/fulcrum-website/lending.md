@@ -344,7 +344,7 @@ permalink: lending
 
 
 
-<section class="bg-primary text-center pt-60 pb-135 pb-md-30">
+<section class="bg-primary text-center pt-60 pb-135 pb-md-30 pt-120">
     <div class="container">
         <div class="row">
             <div class="col col-12 fd-c">
