@@ -1,5 +1,6 @@
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import React, { Component } from "react";
+import TagManager from 'react-gtm-module';
 // import ReactGA from "react-ga";
 import Intercom from "react-intercom";
 import { HashRouter, Redirect, Route, Switch } from "react-router-dom";
@@ -16,9 +17,8 @@ import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { TorqueProviderEvents } from "../services/events/TorqueProviderEvents";
 import { NavService } from "../services/NavService";
 import { TorqueProvider } from "../services/TorqueProvider";
-import { LocationListener } from "./LocationListener";
-import TagManager from 'react-gtm-module';
 import siteConfig from "./../config/SiteConfig.json";
+import { LocationListener } from "./LocationListener";
 
 const isMainnetProd =
   process.env.NODE_ENV && process.env.NODE_ENV !== "development"

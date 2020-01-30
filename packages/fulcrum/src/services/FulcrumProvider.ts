@@ -553,7 +553,7 @@ export class FulcrumProvider {
       if (tokens && helperContract) {
         const swapRates = await this.getSwapToUsdRateBatch(
           assets,
-          process.env.REACT_APP_ETH_NETWORK === "mainnet" ?
+          process.env.REACT_APP_ETH_NETWORK === "mainnet" || process.env.REACT_APP_ETH_NETWORK === "ropsten" ?
             Asset.DAI :
             Asset.SAI
         );
