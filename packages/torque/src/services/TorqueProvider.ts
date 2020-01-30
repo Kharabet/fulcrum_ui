@@ -8,6 +8,8 @@ import Web3 from "web3";
 
 import constantAddress from "../config/constant.json";
 import { cdpManagerContract } from "../contracts/cdpManager";
+import { CompoundBridgeContract } from "../contracts/CompoundBridge";
+import { CompoundComptrollerContract } from "../contracts/CompoundComptroller";
 import { dsProxyJsonContract } from "../contracts/dsProxyJson";
 // import rawEncode  from "ethereumjs-abi";
 import { erc20Contract } from "../contracts/erc20";
@@ -37,7 +39,7 @@ import { IWalletDetails } from "../domain/IWalletDetails";
 import { IWeb3ProviderSettings } from "../domain/IWeb3ProviderSettings";
 import { ManageCollateralRequest } from "../domain/ManageCollateralRequest";
 import { ProviderType } from "../domain/ProviderType";
-import { ISoloLoan, ISoloToken, RefinanceCdpData, RefinanceData } from "../domain/RefinanceData";
+import { IRefinanceLoan, IRefinanceToken, RefinanceCdpData, RefinanceData } from "../domain/RefinanceData";
 import { RepayLoanRequest } from "../domain/RepayLoanRequest";
 import { SetupENSRequest } from "../domain/SetupENSRequest";
 import { WalletType } from "../domain/WalletType";
@@ -429,7 +431,8 @@ export class TorqueProvider {
   }
 
   public async getSwapRate(srcAsset: Asset, destAsset: Asset, srcAmount?: BigNumber): Promise<BigNumber> {
-    if (srcAsset === destAsset) {
+    if (srcAsset === destAsset || (srcAsset === Asset.USDC && destAsset === Asset.DAI) 
+      || (srcAsset === Asset.DAI && destAsset === Asset.USDC)) {
       return new BigNumber(1);
     }
     // console.log("srcAmount 11 = "+srcAmount)
@@ -523,7 +526,142 @@ export class TorqueProvider {
     return str;
   };
 
-  public getSoloLoans = async (): Promise<ISoloLoan[]> => {
+  private getMaintenanceMarginAmount = async (asset: Asset): Promise<BigNumber> => {
+    if (!this.contractsSource) {
+      throw new Error("contractsSource is not defined");
+    }
+    const iToken = await this.contractsSource.getiTokenContract(asset);
+    const hash = await iToken.loanOrderHashes.callAsync(new BigNumber(2 * 10 ** 18));
+    const data = await iToken.loanOrderData.callAsync(hash);
+    return data[3];
+  };
+
+  private assignCollateral = (loans: IRefinanceLoan[], deposits: IRefinanceToken[], inRatio: BigNumber) => {
+
+    // TODO @bshevchenko: fix: isHealthy is true even if inRatio is super low
+
+    for (const loan of loans) {
+      console.log('inRatio', inRatio.toString(10));
+      console.log('wow', loan.balance.toString(), loan.usdValue.toString(), loan.usdValue.times(inRatio).toString());
+      const goal = loan.usdValue.times(inRatio).dp(18, BigNumber.ROUND_FLOOR);
+      let current = new BigNumber(0);
+      for (const deposit of deposits) {
+        let take = deposit.usdValue;
+        if (current.plus(take).gt(goal)) {
+          take = take.minus(current.plus(take).minus(goal));
+        }
+        loan.collateral.push({
+          ...deposit,
+          amount: take.div(deposit.rate), // TODO probably mistake is here
+          borrowAmount: loan.balance.div(goal.div(take))
+        });
+
+        // @ts-ignore
+        if (inRatio.lte(deposit.maintenanceMarginAmount.div(10 ** 18))) {
+          loan.isDisabled = true;
+        }
+
+        current = current.plus(take).dp(18, BigNumber.ROUND_FLOOR);
+        if (current.toString(10) === goal.toString(10)) {
+          loan.isHealthy = true;
+          break;
+        }
+      }
+    }
+  };
+
+  public getCompoundLoans = async (): Promise<IRefinanceLoan[]> => {
+
+    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+    if (!this.contractsSource || !account) {
+      return [];
+    }
+    const comptroller: CompoundComptrollerContract = await this.contractsSource.getCompoundComptrollerContract();
+    const cTokens = await comptroller.getAssetsIn.callAsync(account);
+
+    const url = `https://ethgasstation.info/json/ethgasAPI.json`;
+    let blockTime;
+    try {
+      const response = await fetch(url);
+      const jsonData = await response.json();
+      blockTime = jsonData.block_time;
+    } catch (e) {
+      // tslint:disable-next-line:no-console
+      console.log("ethgasstation block_time error", e.message);
+      blockTime = 15;
+    }
+
+    const deposits: IRefinanceToken[] = [];
+    const loans: IRefinanceLoan[] = [];
+    let inSupplied = new BigNumber(0);
+    let inBorrowed = new BigNumber(0);
+    // tslint:disable-next-line
+    for (let i = 0; i < cTokens.length; i++) {
+      const cToken = await this.contractsSource.getCTokenContract(cTokens[i]);
+      let asset;
+      const underlying = await cToken.underlying.callAsync();
+      if (underlying === '0x0000000000000000000000000000000000000000') {
+        asset = Asset.ETH;
+      } else {
+        asset = this.contractsSource.getAssetFromAddress(underlying);
+        console.log('underlying', underlying, asset);
+      }
+      if (asset === Asset.UNKNOWN) {
+        continue;
+      }
+      const decimals = AssetsDictionary.assets.get(asset)!.decimals || 18;
+      let balance = await cToken.balanceOfUnderlying.callAsync(account);
+      let isDeposit = true;
+      if (!balance.gt(0)) {
+        isDeposit = false;
+        balance = await cToken.borrowBalanceCurrent.callAsync(account);
+        if (!balance.gt(0)) {
+          continue;
+        }
+      }
+      balance = balance.div(10 ** decimals);
+      const rate = await this.getSwapRate(asset, Asset.DAI);
+      console.log('rate', asset, rate.toString(10));
+      const usdValue = balance.times(rate);
+      const token: IRefinanceToken = {
+        asset,
+        rate,
+        balance,
+        usdValue,
+        market: cToken.address,
+        contract: cToken,
+        decimals
+      };
+      if (isDeposit) {
+        if (asset === Asset.USDC) { // TODO tmp
+          token.maintenanceMarginAmount = await this.getMaintenanceMarginAmount(Asset.DAI);
+        } else {
+          token.maintenanceMarginAmount = await this.getMaintenanceMarginAmount(asset);
+        }
+        deposits.push(token);
+        inSupplied = inSupplied.plus(token.usdValue);
+      } else {
+        const borrowRate = await cToken.borrowRatePerBlock.callAsync();
+        loans.push({
+          ...token,
+          isHealthy: false,
+          isDisabled: false,
+          collateral: [],
+          apr: borrowRate.times(60 * 60 * 24 * 365).div(10 ** 18).div(blockTime)
+        });
+        inBorrowed = inBorrowed.plus(token.usdValue);
+      }
+    }
+
+    console.log('inSupplied', inSupplied.toString(10));
+    console.log('inBorrowed', inBorrowed.toString(10));
+
+    this.assignCollateral(loans, deposits, inSupplied.div(inBorrowed));
+
+    return loans;
+  };
+
+  public getSoloLoans = async (): Promise<IRefinanceLoan[]> => {
 
     const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
     if (!this.contractsSource || !account) {
@@ -534,20 +672,8 @@ export class TorqueProvider {
       { owner: account, number: new BigNumber(0) }
     );
 
-    // const values = await solo.getAccountValues.callAsync(
-    //   { owner: account, number: new BigNumber(0) }
-    // );
-    // const supplied = values[0].value.div(10 ** 36);
-    // const borrowed = values[1].value.div(10 ** 36);
-    // const ratio = supplied.div(borrowed);
-
-    // console.log('values', values[0].value.toString(), values[1].value.toString());
-    // console.log('supplied', supplied.toString());
-    // console.log('borrowed', borrowed.toString());
-    // console.log('ratio', ratio.toString());
-
-    const deposits: ISoloToken[] = [];
-    const loans: ISoloLoan[] = [];
+    const deposits: IRefinanceToken[] = [];
+    const loans: IRefinanceLoan[] = [];
     let inSupplied = new BigNumber(0);
     let inBorrowed = new BigNumber(0);
     for (let i = 0; i < tokens.length; i++) {
@@ -566,7 +692,7 @@ export class TorqueProvider {
       }
       const rate = await this.getSwapRate(asset, Asset.DAI);
       const usdValue = balance.times(rate);
-      const token: ISoloToken = {
+      const token: IRefinanceToken = {
         asset,
         rate,
         balance,
@@ -575,11 +701,7 @@ export class TorqueProvider {
         decimals
       };
       if (balances[i].sign) {
-        const iToken = await this.contractsSource.getiTokenContract(asset);
-        const hash = await iToken.loanOrderHashes.callAsync(new BigNumber(2 * 10 ** 18));
-        const data = await iToken.loanOrderData.callAsync(hash);
-        token.maintenanceMarginAmount = data[3];
-
+        token.maintenanceMarginAmount = await this.getMaintenanceMarginAmount(asset);
         deposits.push(token);
         inSupplied = inSupplied.plus(token.usdValue);
       } else {
@@ -595,39 +717,84 @@ export class TorqueProvider {
       }
     }
 
-    const inRatio = inSupplied.div(inBorrowed);
-
-    for (const loan of loans) {
-      const goal = loan.usdValue.times(inRatio);
-      let current = new BigNumber(0);
-      for (const deposit of deposits) {
-        let take = deposit.usdValue;
-        if (current.plus(take).gt(goal)) {
-          take = take.minus(current.plus(take).minus(goal));
-        }
-        loan.collateral.push({
-          ...deposit,
-          amount: take.div(deposit.rate),
-          borrowAmount: loan.balance.div(goal.div(take)),
-        });
-
-        // @ts-ignore
-        if (inRatio.lte(deposit.maintenanceMarginAmount.div(10 ** 18))) {
-          loan.isDisabled = true;
-        }
-
-        current = current.plus(take);
-        if (current.toString(10) === goal.toString(10)) {
-          loan.isHealthy = true;
-          break;
-        }
-      }
-    }
+    this.assignCollateral(loans, deposits, inSupplied.div(inBorrowed));
 
     return loans;
   };
 
-  public migrateSoloLoan = async (loan: ISoloLoan, amount: BigNumber) => {
+  public migrateCompoundLoan = async (loan: IRefinanceLoan, amount: BigNumber) => {
+    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+    if (!this.web3Wrapper || !this.contractsSource || !account) {
+      return;
+    }
+
+    // TODO @bshevchenko: test with more than 1 collateral type
+
+    const compoundBridge: CompoundBridgeContract = await this.contractsSource.getCompoundBridgeContract();
+    const promises = [];
+    for (const token of loan.collateral) {
+      // @ts-ignore
+      const allowance = (await token.contract.allowance.callAsync(account, compoundBridge.address)).div(10 ** token.decimals);
+      if (allowance.lt(token.amount)) {
+        try {
+          // @ts-ignore
+          const txHash = await token.contract.approve.sendTransactionAsync(
+            compoundBridge.address, (new BigNumber(100000000000)).times(10 ** token.decimals),
+            { from: account }
+          );
+          promises.push(this.waitForTransactionMined(txHash));
+        } catch (e) {
+          if (!e.code) {
+            alert("approve for " + token.asset + " failed: " + e.message);
+          }
+          return null;
+        }
+      }
+    }
+    await Promise.all(promises);
+    window.setTimeout(() => {
+      // do nothing
+    }, 3000);
+
+    const assets: string[] = [];
+    const amounts: BigNumber[] = [];
+    const borrowAmounts: BigNumber[] = [];
+
+    const divider = loan.balance.div(amount);
+
+    let borrowAmountsSum = new BigNumber(0);
+    for (const token of loan.collateral) {
+      // @ts-ignore
+      assets.push(token.market);
+      amounts.push(
+        token.amount.div(divider).times(10 ** token.decimals).integerValue(BigNumber.ROUND_UP)
+      );
+      const borrowAmount = token.borrowAmount.div(divider).times(10 ** token.decimals).integerValue(BigNumber.ROUND_UP);
+      borrowAmounts.push(borrowAmount);
+      borrowAmountsSum = borrowAmountsSum.plus(borrowAmount);
+    }
+
+    amount = amount.times(10 ** loan.decimals).integerValue(BigNumber.ROUND_UP);
+
+    borrowAmounts[0] = borrowAmounts[0].plus(amount.minus(borrowAmountsSum));
+
+    console.log('hey', amounts[0].div(10 ** 18).toString(10));
+
+    try {
+      const txHash = await compoundBridge.migrateLoan.sendTransactionAsync(
+        String(loan.market), amount, assets, amounts, amounts, borrowAmounts,
+        { from: account }
+      );
+      return await this.waitForTransactionMined(txHash);
+    } catch (e) {
+      if (!e.code) {
+        alert("migrateLoan failed: " + e.message);
+      }
+      return null;
+    }
+  };
+
+  public migrateSoloLoan = async (loan: IRefinanceLoan, amount: BigNumber) => {
     const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
     if (!this.web3Wrapper || !this.contractsSource || !account) {
       return;
@@ -668,10 +835,10 @@ export class TorqueProvider {
     for (const token of loan.collateral) {
       markets.push(new BigNumber(token.market));
       amounts.push(
-        token.amount.div(divider).times(10 ** token.decimals)
+        token.amount.div(divider).times(10 ** token.decimals).integerValue(BigNumber.ROUND_UP)
       );
       borrowAmounts.push(
-        token.borrowAmount.div(divider).times(10 ** token.decimals)
+        token.borrowAmount.div(divider).times(10 ** token.decimals).integerValue(BigNumber.ROUND_UP)
       );
     }
 
@@ -679,12 +846,14 @@ export class TorqueProvider {
       amount = new BigNumber(0);
     }
 
+    amount = amount.times(10 ** loan.decimals).integerValue(BigNumber.ROUND_UP);
+
     try {
       const txHash = await soloBridge.migrateLoan.sendTransactionAsync(
         { owner: account, number: new BigNumber(0) },
-        new BigNumber(loan.market), amount.times(10 ** loan.decimals), markets, amounts, amounts, borrowAmounts,
+        new BigNumber(loan.market), amount, markets, amounts, amounts, borrowAmounts,
         { from: account }
-      )
+      );
       return await this.waitForTransactionMined(txHash);
     } catch (e) {
       if (!e.code) {
@@ -692,7 +861,7 @@ export class TorqueProvider {
       }
       return null;
     }
-  }
+  };
 
   public getMakerCdps = async (): Promise<RefinanceCdpData[]> => {
     let result: RefinanceCdpData[] = [{
@@ -704,6 +873,10 @@ export class TorqueProvider {
       isProxy: false,
       isInstaProxy: false
     }];
+
+    if (result) { // TODO remove
+      return result;
+    }
 
     const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
 
@@ -863,10 +1036,7 @@ export class TorqueProvider {
 
         ratio = rate.times(collateralAmount).div(debtAmount);
 
-        const iToken = await this.contractsSource.getiTokenContract(asset);
-        const hash = await iToken.loanOrderHashes.callAsync(new BigNumber(2 * 10 ** 18));
-        const data = await iToken.loanOrderData.callAsync(hash);
-        maintenanceMarginAmount = data[3];
+        maintenanceMarginAmount = await this.getMaintenanceMarginAmount(asset);
       }
 
       let isDisabled = true;

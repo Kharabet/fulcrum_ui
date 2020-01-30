@@ -1,6 +1,9 @@
 import * as _ from "lodash";
 
 import { cdpManagerContract } from "../contracts/cdpManager";
+import { CompoundBridgeContract } from "../contracts/CompoundBridge";
+import { CompoundComptrollerContract } from "../contracts/CompoundComptroller";
+import { CTokenContract } from "../contracts/CToken";
 import { dsProxyJsonContract } from "../contracts/dsProxyJson";
 import { erc20Contract } from "../contracts/erc20";
 import { GetCdpsContract } from "../contracts/getCdps";
@@ -27,6 +30,9 @@ export class ContractsSource {
 
   private erc20Json: any;
   private cdpsJson: any;
+  private compoundComptrollerJson: any;
+  private cTokenJson: any;
+  private compoundBridgeJson: any;
   private soloJson: any;
   private soloBridgeJson: any;
   private iBZxJson: any;
@@ -319,6 +325,9 @@ export class ContractsSource {
           case "0x4f96fe3b7a6cf9725f59d353f723c1bdb64ca6aa":
             asset = Asset.DAI;
             break;
+          case "0x75b0622cec14130172eae9cf166b92e5c112faff":
+            asset = Asset.USDC;
+            break;
         }
         break;
     }
@@ -351,6 +360,33 @@ export class ContractsSource {
       this.getiENSOwnerAddress().toLowerCase(),
       this.provider
     );
+  }
+
+  private getCompoundComptrollerAddress(): string {
+    let address: string = "";
+    switch (this.networkId) {
+      case 1:
+        address = "0x3d9819210a31b4961b30ef54be2aed79b9c9cd3b";
+        break;
+      case 42:
+        address = "0x1f5D7F3CaAC149fE41b8bd62A3673FE6eC0AB73b";
+        break;
+    }
+    return address;
+  }
+
+  private async getCompoundComptrollerContractRaw(): Promise<CompoundComptrollerContract> {
+    await this.Init();
+    return new CompoundComptrollerContract(
+      this.compoundComptrollerJson.abi,
+      this.getCompoundComptrollerAddress().toLowerCase(),
+      this.provider
+    );
+  }
+
+  private async getCTokenContractRaw(address: string): Promise<CTokenContract> {
+    await this.Init();
+    return new CTokenContract(this.cTokenJson.abi, address.toLowerCase(), this.provider);
   }
 
   private getSoloAddress(): string {
@@ -386,6 +422,28 @@ export class ContractsSource {
     }
   }
 
+  private getCompoundBridgeAddress(): string {
+    let address: string = "";
+    switch (this.networkId) {
+      case 1:
+        address = ""; // TODO
+        break;
+      case 42:
+        address = "0x3A4a525d6B4609A9d01B156eEB9B7FCD3df2D37c";
+        break;
+    }
+    return address;
+  }
+
+  private async getCompoundBridgeContractRaw(): Promise<CompoundBridgeContract> {
+    await this.Init();
+    return new CompoundBridgeContract(
+      this.compoundBridgeJson.abi,
+      this.getCompoundBridgeAddress().toLowerCase(),
+      this.provider
+    );
+  }
+
   private getSoloBridgeAddress(): string {
     let address: string = "";
     switch (this.networkId) {
@@ -396,7 +454,6 @@ export class ContractsSource {
         address = "0xc0307024fEBCAA79af9f1155b1A45FDfFbA41B03";
         break;
     }
-
     return address;
   }
 
@@ -412,6 +469,9 @@ export class ContractsSource {
     const network = ethNetwork || "1";
     this.erc20Json = await import(`./../assets/artifacts/${network}/erc20.json`);
     this.cdpsJson = await import(`./../assets/artifacts/${network}/GetCdps.json`);
+    this.compoundComptrollerJson = await import(`./../assets/artifacts/${network}/CompoundComptroller.json`);
+    this.cTokenJson = await import(`./../assets/artifacts/${network}/CToken.json`);
+    this.compoundBridgeJson = await import(`./../assets/artifacts/${network}/CompoundBridge.json`);
     this.soloJson = await import(`./../assets/artifacts/${network}/Solo.json`);
     this.soloBridgeJson = await import(`./../assets/artifacts/${network}/SoloBridge.json`);
     this.iBZxJson = await import(`./../assets/artifacts/${network}/iBZx.json`);
@@ -484,6 +544,9 @@ export class ContractsSource {
   public getCdpManager = _.memoize(this.getCdpManagerRaw);
   public getVatContract = _.memoize(this.getVatContractRaw);
   public getCdpContract = _.memoize(this.getCdpContractRaw);
+  public getCompoundComptrollerContract = _.memoize(this.getCompoundComptrollerContractRaw);
+  public getCTokenContract = _.memoize(this.getCTokenContractRaw);
+  public getCompoundBridgeContract = _.memoize(this.getCompoundBridgeContractRaw);
   public getSoloContract = _.memoize(this.getSoloContractRaw);
   public getSoloBridgeContract = _.memoize(this.getSoloBridgeContractRaw);
   public getSoloMarket = _.memoize(ContractsSource.getSoloMarketRaw);

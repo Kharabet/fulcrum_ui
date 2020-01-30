@@ -10,23 +10,21 @@ import { BigNumber, classUtils } from "@0x/utils";
 /* istanbul ignore next */
 // tslint:disable:no-parameter-reassignment
 // tslint:disable-next-line:class-name
-export class SoloBridgeContract extends BaseContract {
+export class CompoundBridgeContract extends BaseContract {
   public migrateLoan = {
     async sendTransactionAsync(
-      account: {owner: string;number: BigNumber},
-      marketId: BigNumber,
+      loanToken: string,
       loanAmount: BigNumber,
-      marketIds: BigNumber[],
+      assets: string[],
       amounts: BigNumber[],
       collateralAmounts: BigNumber[],
       borrowAmounts: BigNumber[],
       txData: Partial<TxData> = {},
     ): Promise<string> {
-      const self = this as any as SoloBridgeContract;
-      const encodedData = self._strictEncodeArguments('migrateLoan((address,uint256),uint256,uint256,uint256[],uint256[],uint256[],uint256[])', [account,
-        marketId,
+      const self = this as any as CompoundBridgeContract;
+      const encodedData = self._strictEncodeArguments('migrateLoan(address,uint256,address[],uint256[],uint256[],uint256[])', [loanToken,
         loanAmount,
-        marketIds,
+        assets,
         amounts,
         collateralAmounts,
         borrowAmounts
@@ -40,10 +38,9 @@ export class SoloBridgeContract extends BaseContract {
         self._web3Wrapper.getContractDefaults(),
         (self as any).migrateLoan.estimateGasAsync.bind(
           self,
-          account,
-          marketId,
+          loanToken,
           loanAmount,
-          marketIds,
+          assets,
           amounts,
           collateralAmounts,
           borrowAmounts
@@ -53,20 +50,19 @@ export class SoloBridgeContract extends BaseContract {
       return txHash;
     },
     async estimateGasAsync(
-      account: {owner: string;number: BigNumber},
-      marketId: BigNumber,
+      loanToken: string,
       loanAmount: BigNumber,
-      marketIds: BigNumber[],
+      assets: string[],
       amounts: BigNumber[],
       collateralAmounts: BigNumber[],
       borrowAmounts: BigNumber[],
       txData: Partial<TxData> = {},
     ): Promise<number> {
-      const self = this as any as SoloBridgeContract;
-      const encodedData = self._strictEncodeArguments('migrateLoan((address,uint256),uint256,uint256,uint256[],uint256[],uint256[],uint256[])', [account,
-        marketId,
+      return 10000000; // TODO remove
+      const self = this as any as CompoundBridgeContract;
+      const encodedData = self._strictEncodeArguments('migrateLoan(address,uint256,address[],uint256[],uint256[],uint256[])', [loanToken,
         loanAmount,
-        marketIds,
+        assets,
         amounts,
         collateralAmounts,
         borrowAmounts
@@ -83,19 +79,17 @@ export class SoloBridgeContract extends BaseContract {
       return gas > 10000000 ? 10000000 : Math.floor(gas);
     },
     getABIEncodedTransactionData(
-      account: {owner: string;number: BigNumber},
-      marketId: BigNumber,
+      loanToken: string,
       loanAmount: BigNumber,
-      marketIds: BigNumber[],
+      assets: string[],
       amounts: BigNumber[],
       collateralAmounts: BigNumber[],
       borrowAmounts: BigNumber[],
     ): string {
-      const self = this as any as SoloBridgeContract;
-      const abiEncodedTransactionData = self._strictEncodeArguments('migrateLoan((address,uint256),uint256,uint256,uint256[],uint256[],uint256[],uint256[])', [account,
-        marketId,
+      const self = this as any as CompoundBridgeContract;
+      const abiEncodedTransactionData = self._strictEncodeArguments('migrateLoan(address,uint256,address[],uint256[],uint256[],uint256[])', [loanToken,
         loanAmount,
-        marketIds,
+        assets,
         amounts,
         collateralAmounts,
         borrowAmounts
@@ -103,10 +97,9 @@ export class SoloBridgeContract extends BaseContract {
       return abiEncodedTransactionData;
     },
     async callAsync(
-      account: {owner: string;number: BigNumber},
-      marketId: BigNumber,
+      loanToken: string,
       loanAmount: BigNumber,
-      marketIds: BigNumber[],
+      assets: string[],
       amounts: BigNumber[],
       collateralAmounts: BigNumber[],
       borrowAmounts: BigNumber[],
@@ -114,11 +107,10 @@ export class SoloBridgeContract extends BaseContract {
       defaultBlock?: BlockParam,
     ): Promise<void
       > {
-      const self = this as any as SoloBridgeContract;
-      const encodedData = self._strictEncodeArguments('migrateLoan((address,uint256),uint256,uint256,uint256[],uint256[],uint256[],uint256[])', [account,
-        marketId,
+      const self = this as any as CompoundBridgeContract;
+      const encodedData = self._strictEncodeArguments('migrateLoan(address,uint256,address[],uint256[],uint256[],uint256[])', [loanToken,
         loanAmount,
-        marketIds,
+        assets,
         amounts,
         collateralAmounts,
         borrowAmounts
@@ -133,7 +125,7 @@ export class SoloBridgeContract extends BaseContract {
       );
       const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
       BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
-      const abiEncoder = self._lookupAbiEncoder('migrateLoan((address,uint256),uint256,uint256,uint256[],uint256[],uint256[],uint256[])');
+      const abiEncoder = self._lookupAbiEncoder('migrateLoan(address,uint256,address[],uint256[],uint256[],uint256[])');
       // tslint:disable boolean-naming
       const result = abiEncoder.strictDecodeReturnValue<void
         >(rawCallResult);
@@ -142,7 +134,7 @@ export class SoloBridgeContract extends BaseContract {
     },
   };
   constructor(abi: ContractAbi, address: string, provider: any, txDefaults?: Partial<TxData>) {
-    super('SoloBridge', abi, address.toLowerCase(), provider as SupportedProvider, txDefaults);
+    super('CompoundBridge', abi, address.toLowerCase(), provider as SupportedProvider, txDefaults);
     classUtils.bindAll(this, ['_abiEncoderByFunctionSignature', 'address', 'abi', '_web3Wrapper']);
   }
 } // tslint:disable:max-file-line-count

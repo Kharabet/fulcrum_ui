@@ -1,4 +1,5 @@
 import { BigNumber } from "@0x/utils";
+import { CTokenContract } from "../contracts/CToken";
 import { Asset } from "./Asset";
 
 export interface RefinanceData {
@@ -25,24 +26,25 @@ export interface RefinanceCdpData {
   proxyAddress: string;
 }
 
-export interface ISoloToken {
+export interface IRefinanceToken {
   asset: Asset;
   rate: BigNumber;
   balance: BigNumber;
   usdValue: BigNumber;
-  market: number;
+  market: number | string;
+  contract?: CTokenContract;
   decimals: number;
   maintenanceMarginAmount?: BigNumber;
 }
 
-export interface ISoloLoan extends ISoloToken {
+export interface IRefinanceLoan extends IRefinanceToken {
   isHealthy: boolean;
-  collateral: ISoloCollateral[];
+  collateral: IRefinanceCollateral[];
   isDisabled: boolean;
   apr: BigNumber;
 }
 
-export interface ISoloCollateral extends ISoloToken {
+export interface IRefinanceCollateral extends IRefinanceToken {
   amount: BigNumber;
   borrowAmount: BigNumber;
 }
