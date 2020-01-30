@@ -17,6 +17,12 @@ $width-button-action: 8rem;
 $margin-right-column: 1.5rem;
 
 .trade-token-grid {
+  background-color: #444E5A;
+  border-top: 2px solid #fff;
+  &__wrapper{
+    
+    // margin-top: 20px;
+  }
 }
 
 .rounded-mark {
@@ -28,6 +34,49 @@ $margin-right-column: 1.5rem;
   vertical-align: middle;
   margin-left: -7px;
   margin-right: 7px;
+}
+
+
+
+.trade-token-grid-head{
+  
+  padding-top: 30px;
+  overflow: hidden;
+  &__container{
+    display: flex;
+    justify-content: center;
+  }
+
+  &__token-image{
+
+  }
+
+  &-item{
+  width: 90px;
+  height: 90px;
+  margin-bottom: -10px;
+  transition: 0.3s ease-in-out all;
+  // z-index: -10;
+  &:not(:last-child){
+    margin-right: 3px;
+  }
+  &--active{
+    transform: translateY(-5px);
+  }
+  &:hover{
+    cursor: pointer;
+    transform: translateY(-5px);
+  }
+
+  &__col-token-image{
+    height: 100%;
+    width: 100%;
+    img{
+      height: 100%;
+      width: auto;
+    }
+  }
+}
 }
 
 .trade-token-grid-header {

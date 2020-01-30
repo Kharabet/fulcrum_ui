@@ -25,7 +25,7 @@ import { PositionTypeMarker } from "./PositionTypeMarker";
 
 export interface ITradeTokenGridRowFooterMBProps {
   selectedKey: TradeTokenKey;
-
+  isMobile: boolean;
   asset: Asset;
   defaultUnitOfAccount: Asset;
   positionType: PositionType;
@@ -172,11 +172,14 @@ export class TradeTokenGridRowMobileFooter extends Component<ITradeTokenGridRowF
     // console.log("this.state.asset = "+this.props.selectedKey.asset)
     // console.log("this.props.selectedKey.asset - ",this.props.selectedKey.asset)
     const isActiveClassName =
-      this.props.asset === this.props.selectedKey.asset ? "trade-footer-grid--active" : "";
+      this.props.asset === this.props.selectedKey.asset ? 
+      this.props.isMobile ? "trade-footer-grid--active" : "trade-token-grid-head-item--active"
+      : "";
 
+    const classNamePrefix = this.props.isMobile ? "trade-token-grid-row" : "trade-token-grid-head-item"
     return (
 
-      <div className={`trade-footer-grid ${isActiveClassName}`}  onClick={this.onSelectClick}>
+      <div className={`${this.props.isMobile ? "trade-footer-grid" : classNamePrefix} ${isActiveClassName}`}  onClick={this.onSelectClick}>
 
         {/*<div className="trade-token-grid-row__col-token-name">*/}
           {/*/!*<span className="rounded-mark">?</span>*!/*/}
@@ -186,7 +189,7 @@ export class TradeTokenGridRowMobileFooter extends Component<ITradeTokenGridRowF
           {/*<PositionTypeMarker value={this.props.positionType} />*/}
         {/*</div>*/}
         <div
-            className={`trade-token-grid-row__col-token-image ${isActiveClassName}`}
+            className={`${classNamePrefix}__col-token-image ${isActiveClassName}`}
             style={{backgroundColor: this.state.assetDetails.bgColor, borderLeftColor: this.state.assetDetails.bgColor}}
           >
             <img src={this.state.assetDetails.logoSvg} alt={this.state.assetDetails.displayName}/>

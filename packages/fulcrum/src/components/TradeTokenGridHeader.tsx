@@ -10,11 +10,11 @@ export class TradeTokenGridHeader extends Component<ITradeTokenGridHeaderProps> 
   public render() {
     return (
       <div className="trade-token-grid-header">
-        <div className="trade-token-grid-header__col-token-image">
+        {/* <div className="trade-token-grid-header__col-token-image">
           <span className="trade-token-grid-header__text">Asset</span>
-        </div>
+        </div> */}
         <div className="trade-token-grid-header__col-token-name">
-          <span className="trade-token-grid-header__text">&nbsp;</span>
+          <span className="trade-token-grid-header__text">Asset</span>
         </div>
         <div className="trade-token-grid-header__col-position-type">
           <span className="trade-token-grid-header__text">&nbsp;</span>

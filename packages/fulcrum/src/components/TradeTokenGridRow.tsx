@@ -166,12 +166,12 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
 
     return (
       <div className={`trade-token-grid-row ${isActiveClassName}`} onClick={this.onSelectClick}>
-        <div
+        {/* <div
           className="trade-token-grid-row__col-token-image"
           style={{ backgroundColor: this.state.assetDetails.bgColor, borderLeftColor: this.state.assetDetails.bgColor }}
         >
           <img src={this.state.assetDetails.logoSvg} alt={this.state.assetDetails.displayName} />
-        </div>
+        </div> */}
         <div className="trade-token-grid-row__col-token-name">
           {/*<span className="rounded-mark">?</span>*/}
           {this.state.assetDetails.displayName}
