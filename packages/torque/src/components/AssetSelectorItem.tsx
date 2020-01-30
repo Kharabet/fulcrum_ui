@@ -15,6 +15,7 @@ import bgZrx  from "../assets/images/ic_token_zrx.svg";
 import bgKnc  from "../assets/images/ic_token_knc.svg";
 import bgLink  from "../assets/images/ic_token_link.svg";
 import bgSusd  from "../assets/images/ic_token_susd.svg";
+import ic_arrow_right from "../assets/images/ic_arrow_right.svg";
 export interface IAssetSelectorItemProps {
   asset: Asset;
 
@@ -66,6 +67,7 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
     const assetTypeImg = "asset-selector-icon";
     const assetDiv = "asset-selector-div"
     let assetImg:any = this.getAssestsData()
+    let isload = !this.state.interestRate.gt(0) ? "op5": '';
     // try{
     //   let tmpassetImg = this.getAssestsData()
     //   assetImg = tmpassetImg.img
@@ -74,8 +76,11 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
 
 
     return (
-      <div className={`asset-selector-item ${assetTypeModifier}`} onClick={this.onClick}>
+      <div className={`asset-selector-item ${assetTypeModifier} ${isload}`} onClick={this.onClick}>
         {/*<DotsBar />*/}
+        <div className="asset-selector-centeredOverlay" style={ this.state.interestRate.gt(0) ? { display: `none`} : undefined}>
+          <span>Loading...</span>
+      </div>
 
         <div className="asset-selector__interest-rate">
           {this.state.interestRate.gt(0) ? `${this.state.interestRate.toFixed(2)}%` : `0%`}
@@ -92,8 +97,10 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
 
           {/*<SelectorIconsBar />*/}
           <img className={`${assetTypeImg}`} src={assetImg.img} />
+          <img className={`${assetDiv}`} src={ic_arrow_right} />
+
           {/*<SelectorIconsBar />*/}
-          <div className={`${assetDiv}`}><BorrowSelectorIconsBar /></div>
+          {/*<div className={`${assetDiv}`}><BorrowSelectorIconsBar /></div>*/}
         </div>
       </div>
     );

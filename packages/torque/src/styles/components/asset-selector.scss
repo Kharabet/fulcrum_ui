@@ -7,6 +7,32 @@
   //justify-content: space-between;
 
   margin-bottom: 2rem;
+  .op5{
+    opacity: .5;
+  }
+  .asset-selector-centeredOverlay {
+      position: fixed;
+      //background-color: rgba(255, 255, 255, 0.65);
+      //opacity: 0.8;
+      top:0;
+      left:0;
+      width:100%;
+      height:100%;
+      color:black;
+      text-align: center;
+      border-radius: 1rem;
+      font-size: 6rem;
+      font-weight: 600;
+      //z-index: 999;
+    }
+
+    .asset-selector-centeredOverlay span {
+      position: absolute;
+      top:50%;
+      left:50%;
+      -webkit-transform:translate(-50%, -50%);
+      transform:translate(-50%, -50%);
+    }
 
   .asset-selector-item {
     cursor: pointer;
@@ -32,11 +58,19 @@
       background-color: #FFFFFF;
       border: 1px solid #A9B5C7;
       .asset-selector-div{
+        //background-repeat: no-repeat;
+        //width: 38px;
+        //background-position: right bottom;
+        //bottom: -48px;
+        //margin-top: 2px;
         background-repeat: no-repeat;
         width: 38px;
         background-position: right bottom;
         bottom: -48px;
-        margin-top: 2px;
+        background-color: #FFFFFF;
+        border-radius: 100px;
+        float: right;
+        margin-top:0px;
         z-index: 1;
         display: block;
       }
@@ -197,13 +231,14 @@
     //margin-left: 112px;
     //position: absolute;
     float: right;
-    margin-top: 2px;
+    margin-top: 0px;
     z-index: 1;
     display: block;
     &:hover {
       display: none;
     }
   }
+
 
   .asset-selector-item--dai {
     background-image: url("../assets/images/Intersect_dai.svg");
