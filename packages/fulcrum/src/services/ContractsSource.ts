@@ -198,7 +198,7 @@ export class ContractsSource {
         address = "0xee14de2e67e1ec23c8561a6fad2635ff1b618db6";
         break;
       case 3:
-        address = "0x818e6fecd516ecc3849daf6845e3ec868087b755";
+        address = "0x4330762418df3555ddd1d732200b317c9239b941";
         break;
       case 4:
         address = "0x76de3d406fee6c3316558406b17ff785c978e98c";
@@ -218,7 +218,7 @@ export class ContractsSource {
         address = "0xee14de2e67e1ec23c8561a6fad2635ff1b618db6";
         break;
       case 3:
-        address = "0x818e6fecd516ecc3849daf6845e3ec868087b755";
+        address = "0x4330762418df3555ddd1d732200b317c9239b941";
         break;
       case 4:
         address = "0x76de3d406fee6c3316558406b17ff785c978e98c";
@@ -238,7 +238,7 @@ export class ContractsSource {
         address = "0xbfdE53F20d50E41162a6085a9A591f27c9c47652";
         break;
       case 3:
-        address = "";
+        address = "0x2B2db1E0bDf6485C87Bc2DddEd17E7E3D9ba675E";
         break;
       case 4:
         address = "";
