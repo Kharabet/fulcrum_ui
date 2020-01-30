@@ -13,13 +13,31 @@ export class PositionTypeMarkerAlt extends Component<IPositionTypeMarkerAltProps
       this.props.value === PositionType.SHORT ?
         "data:image/svg+xml;base64," +
         btoa(
-          '<svg xmlns="http://www.w3.org/2000/svg" id="ic_short" width="27" height="27" viewBox="0 0 27 27"><defs><style>.cls-1{fill:#fff}.cls-2{fill:#ff5353}.cls-3{fill:#AAA}</style></defs><rect id="Rectangle_517" width="27" height="27" class="cls-3" data-name="Rectangle 517" rx="13.5"/><rect id="Rectangle_376" width="19" height="19" class="cls-2" data-name="Rectangle 376" rx="9.5" transform="translate(4 4)"/><g id="Group_1080" data-name="Group 1080" transform="translate(10.672 10)"><path id="Rectangle_500" d="M0 0h1v6H0z" class="cls-1" data-name="Rectangle 500" transform="translate(2.328)"/><path id="Rectangle_501" d="M0 0h1v4H0z" class="cls-1" data-name="Rectangle 501" transform="rotate(-45 5.078 2.103)"/><path id="Rectangle_502" d="M0 0h1v4H0z" class="cls-1" data-name="Rectangle 502" transform="rotate(45 -1.75 7.725)"/></g></svg>'
+          `<svg width="23" height="23" viewBox="0 0 23 23" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <g clip-path="url(#clip0)">
+          <path d="M1.00536e-06 11.5C4.50116e-07 17.8513 5.14873 23 11.5 23C17.8513 23 23 17.8513 23 11.5C23 5.14873 17.8513 -4.50116e-07 11.5 -1.00536e-06C5.14873 -1.56061e-06 1.56061e-06 5.14872 1.00536e-06 11.5Z" fill="#34D6A3"/>
+          <path d="M12.105 15.7368L10.8945 15.7368L10.8945 8.47366L12.105 8.47366L12.105 15.7368Z" fill="white"/>
+          <path d="M14.9229 10.6445L14.0669 11.5005L10.643 8.07662L11.499 7.22064L14.9229 10.6445Z" fill="white"/>
+          <path d="M8.9314 11.5L8.07543 10.644L11.4993 7.22014L12.3553 8.07611L8.9314 11.5Z" fill="white"/>
+          </g>
+          <defs>
+          <clipPath id="clip0">
+          <rect x="23" y="23" width="23" height="23" transform="rotate(-180 23 23)" fill="white"/>
+          </clipPath>
+          </defs>
+          </svg>
+          `
           .replace("#AAA", this.props.assetDetails.bgColor)
         )
       : this.props.value === PositionType.LONG ?
           "data:image/svg+xml;base64," +
           btoa(
-            '<svg xmlns="http://www.w3.org/2000/svg" id="ic_long" width="27" height="27" viewBox="0 0 27 27"><defs><style>.cls-1{fill:#fff}.cls-2{fill:#69bf83;stroke:#69bf83}.cls-3{stroke:none}.cls-4{fill:none}.cls-5{fill:#AAA}</style></defs><rect id="Rectangle_517" width="27" height="27" class="cls-5" data-name="Rectangle 517" rx="13.5"/><g id="Rectangle_376" class="cls-2" data-name="Rectangle 376" transform="translate(4 4)"><rect width="19" height="19" class="cls-3" rx="9.5"/><rect width="18" height="18" x=".5" y=".5" class="cls-4" rx="9"/></g><g id="Group_1080" data-name="Group 1080" transform="translate(10.672 9.964)"><path id="Rectangle_500" d="M0 0h1v6H0z" class="cls-1" data-name="Rectangle 500" transform="translate(2.328 1.036)"/><path id="Rectangle_501" d="M0 0h1v4H0z" class="cls-1" data-name="Rectangle 501" transform="rotate(45 1.414 3.414)"/><path id="Rectangle_502" d="M0 0h1v4H0z" class="cls-1" data-name="Rectangle 502" transform="rotate(-45 1.914 -2.207)"/></g></svg>'
+            `<svg width="23" height="23" viewBox="0 0 23 23" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M23 11.5C23 5.14873 17.8513 0 11.5 0C5.14873 0 0 5.14873 0 11.5C0 17.8513 5.14873 23 11.5 23C17.8513 23 23 17.8513 23 11.5Z" fill="#FF5353"/>
+            <path d="M10.895 7.26318H12.1055V14.5263H10.895V7.26318Z" fill="white"/>
+            <path d="M8.07715 12.3555L8.93312 11.4995L12.357 14.9234L11.501 15.7794L8.07715 12.3555Z" fill="white"/>
+            <path d="M14.0686 11.5L14.9246 12.356L11.5007 15.7799L10.6447 14.9239L14.0686 11.5Z" fill="white"/>
+            </svg>`
             .replace("#AAA", this.props.assetDetails.bgColor)
           )
       : undefined;

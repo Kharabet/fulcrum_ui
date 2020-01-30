@@ -189,7 +189,7 @@ export class TradeTokenGridRowMobileFooter extends Component<ITradeTokenGridRowF
           {/*<PositionTypeMarker value={this.props.positionType} />*/}
         {/*</div>*/}
         <div
-            className={`${classNamePrefix}__col-token-image ${isActiveClassName}`}
+            className={`${classNamePrefix}__col-token-image`}
             style={{backgroundColor: this.state.assetDetails.bgColor, borderLeftColor: this.state.assetDetails.bgColor}}
           >
             <img src={this.state.assetDetails.logoSvg} alt={this.state.assetDetails.displayName}/>

@@ -91,10 +91,12 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
 
   public async derivedUpdate() {
     if(!this.props.isMobileMedia){
-      this.setState({ ...this.state, tokenRowsData: TradeTokenGrid.getRowsData(this.props) }) ;
+      await this.setState({ ...this.state, tokenRowsData: TradeTokenGrid.getRowsData(this.props) }) ;
+      await this.setState({ ...this.state, tokenSingleRowsData:TradeTokenGrid.getSingleRowData(this.props) }) ;
+
     }else{
-      this.setState({ ...this.state, tokenSingleRowsData:TradeTokenGrid.getSingleRowData(this.props) }) ;
-      this.setState({ ...this.state, tokenSingleRowsData:TradeTokenGrid.getSingleRowData(this.props), tokenLongShortRowsData:TradeTokenGrid.getRowsLongShortData(this.props) }) ;
+      await this.setState({ ...this.state, tokenSingleRowsData:TradeTokenGrid.getSingleRowData(this.props) }) ;
+      await this.setState({ ...this.state, tokenSingleRowsData:TradeTokenGrid.getSingleRowData(this.props), tokenLongShortRowsData:TradeTokenGrid.getRowsLongShortData(this.props) }) ;
     }
 
       // this.setState({ ...this.state, tokenSingleRowsData:TradeTokenGrid.getSingleRowData(this.props) }) ;
@@ -144,10 +146,6 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
         <div className="trade-token-grid-head">
           <div className="trade-token-grid-head__container">
             {tokenRowsFooterMobile}
-            <div
-              className={`trade-token-grid-head__token-image settings-img-div`} onClick={this.showMyTokensOnlyChange}>
-              <img className={`settings-img`} src={settingSvg} />
-            </div>
           </div>
         </div>
         <div className="trade-token-grid">

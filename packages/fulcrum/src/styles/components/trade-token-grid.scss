@@ -1,8 +1,8 @@
 $font-size-header: 0.75rem;
-$height-row: 4.5rem;
+$height-row: 6.875rem;
 
 $width-col-token-image: 5rem;
-$width-col-token-name: 3.5rem;
+$width-col-token-name: 6rem;
 $width-col-token-name-full: 11rem;
 $width-col-position-type: 6rem;
 $width-col-leverage: 13rem;
@@ -12,15 +12,17 @@ $width-col-change24h: 7rem;
 $width-col-profit: 5rem;
 $width-col-actions: 19rem;
 
-$width-button-action: 8rem;
+$width-button-action: 7rem;
 
 $margin-right-column: 1.5rem;
 
 .trade-token-grid {
   background-color: #444E5A;
   border-top: 2px solid #fff;
+  padding-top: 10px;
+  padding-bottom: 10px;
   &__wrapper{
-    
+    font-family: "Muli";
     // margin-top: 20px;
   }
 }
@@ -52,35 +54,38 @@ $margin-right-column: 1.5rem;
   }
 
   &-item{
-  width: 90px;
-  height: 90px;
-  margin-bottom: -10px;
-  transition: 0.3s ease-in-out all;
-  // z-index: -10;
-  &:not(:last-child){
-    margin-right: 3px;
-  }
-  &--active{
-    transform: translateY(-5px);
-  }
-  &:hover{
-    cursor: pointer;
-    transform: translateY(-5px);
-  }
-
-  &__col-token-image{
-    height: 100%;
-    width: 100%;
-    img{
-      height: 100%;
-      width: auto;
+    background-color: #fff;
+    width: 90px;
+    height: 90px;
+    margin-bottom: -10px;
+    transition: 0.3s ease-in-out all;
+    &:not(:last-child){
+      margin-right: 3px;
     }
-  }
+    &--active{
+        transform: translateY(-10px);
+    }
+    &:hover{
+      cursor: pointer;
+      .trade-token-grid-head-item__col-token-image {
+        opacity: 0.5;
+      }
+
+    }
+
+    &__col-token-image{
+      height: 100%;
+      width: 100%;
+      img{
+        height: 100%;
+        width: auto;
+      }
+    }
 }
 }
 
 .trade-token-grid-header {
-  height: $height-row;
+  height: 2rem;
 
   margin-left: 0.5rem;
   margin-right: 0.5rem;
@@ -91,7 +96,7 @@ $margin-right-column: 1.5rem;
 
   height: 100%;
   vertical-align: middle;
-  line-height: $height-row;
+  line-height: 3rem;
 
   font-size: $font-size-header;
   font-weight: normal;
@@ -100,8 +105,14 @@ $margin-right-column: 1.5rem;
   letter-spacing: normal;
   color: #a9b5c7;
 
+  font-weight: 600;
+  font-size: 12px;
+
   &:not(:last-child) {
     margin-right: $margin-right-column;
+  }
+  &:first-child {
+    margin-left: $margin-right-column;
   }
 }
 
@@ -167,22 +178,26 @@ $margin-right-column: 1.5rem;
 }
 
 .trade-token-grid-row {
+  &:first-child{
+    margin-top: -1rem;
+  }
   height: $height-row;
   margin-bottom: 1px;
 
-  background-color: rgba(169, 181, 199, 0.15);
+  // background-color: rgba(169, 181, 199, 0.15);
 
-  margin-left: 0.5rem;
-  margin-right: 0.5rem;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  position: relative;
 
   -webkit-transition: margin-left 0.5s, margin-right 0.5s; /* Safari */
   transition: margin-left 0.5s, margin-right 0.5s;
 
   &--active {
-    background-color: rgba(169, 181, 199, 0.3);
+    // background-color: rgba(169, 181, 199, 0.3);
 
-    margin-left: 0;
-    margin-right: 0;
+    // margin-left: 0;
+    // margin-right: 0;
 
     .trade-token-grid-row__col-token-image {
       padding-left: 0.5rem;
@@ -190,6 +205,19 @@ $margin-right-column: 1.5rem;
 
     .trade-token-grid-row__col-action {
       padding-right: 0.5rem;
+    }
+  }
+
+  &:nth-child(2n){
+    &:after{
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      width: 90%;
+      background-color: #394049;
+      height: 1px;
+      transform: translate(-50%, 0);
     }
   }
 }
@@ -210,6 +238,10 @@ $margin-right-column: 1.5rem;
 
   &:not(:last-child) {
     margin-right: $margin-right-column;
+  }
+
+  &:first-child {
+    margin-left: $margin-right-column;
   }
 }
 
@@ -236,6 +268,17 @@ $margin-right-column: 1.5rem;
   @include trade-token-grid-row__text-normal();
 
   width: $width-col-token-name;
+  font-weight: 800;
+  font-size: 22px;
+  &--inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    height: 100%;
+    img.position-type-marker-alt{
+
+    }
+  }
 }
 
 .trade-token-grid-row__col-token-name-full {
@@ -269,6 +312,14 @@ $margin-right-column: 1.5rem;
   @include trade-token-grid-row__text-normal();
 
   width: $width-col-price;
+
+  font-style: normal;
+  font-weight: 800;
+  font-size: 22px;
+  .fw-normal{
+    font-weight: normal;
+    color:#A2ABB8;
+  }
 }
 
 .trade-token-grid-row__col-change24h {
@@ -282,6 +333,14 @@ $margin-right-column: 1.5rem;
   @include trade-token-grid-row__text-normal();
 
   width: $width-col-profit;
+  
+  font-style: normal;
+  font-weight: 800;
+  font-size: 22px;
+  .fw-normal{
+    font-weight: normal;
+    color:#A2ABB8;
+  }
 }
 
 .trade-token-grid-row__col-action {
@@ -291,28 +350,44 @@ $margin-right-column: 1.5rem;
   transition: padding-left 0.5s, padding-right 0.5s;
 
   width: $width-col-actions;
+  
+  text-align: right;
 }
 
 .trade-token-grid-row__buy-button {
   display: inline-block;
-  cursor: pointer;
-
   border: 0;
+  padding: 16px 50px;
+  
+  color: #FFFFFF;
 
+  letter-spacing: 0.05em;
+
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 150%;
+
+  background: #276BFB;
+  border-radius: 43px;
   width: $width-button-action;
-  height: 2.5rem;
+  &:hover{
+    cursor: pointer;
+    background-color: #5B88FF;
+  }
 
-  border-radius: 100px;
-  background-color: #407bf7;
+  // height: 2.5rem;
 
-  text-transform: uppercase;
-  font-size: 0.75rem;
-  font-weight: normal;
-  font-style: normal;
-  font-stretch: normal;
-  letter-spacing: -0.3px;
-  color: #ffffff;
-  outline: none;
+  // border-radius: 100px;
+  // background-color: #407bf7;
+
+  // text-transform: uppercase;
+  // font-size: 0.75rem;
+  // font-weight: normal;
+  // font-style: normal;
+  // font-stretch: normal;
+  // letter-spacing: -0.3px;
+  // color: #ffffff;
+  // outline: none;
 }
 
 .trade-token-grid-row__group-button {
@@ -358,29 +433,42 @@ $margin-right-column: 1.5rem;
 
 .trade-token-grid-row__sell-button {
   display: inline-block;
-  cursor: pointer;
-
   border: 0;
+  padding: 16px 50px;
+  
+  color: #FFFFFF;
 
-  width: $width-button-action;
-  height: 2.5rem;
+  letter-spacing: 0.05em;
 
-  border-radius: 100px;
+  font-size: 16px;
+  line-height: 150%;
+  font-weight: 600;
   background-color: #ff5353;
 
-  text-transform: uppercase;
-  font-size: 0.75rem;
-  font-weight: normal;
-  font-style: normal;
-  font-stretch: normal;
-  letter-spacing: -0.3px;
-  color: #ffffff;
+  border-radius: 43px;
+  width: $width-button-action;
+  &:hover{
+    cursor: pointer;
+    background-color: #fb8e8e;
+  }
 
-  outline: none;
+  // height: 2.5rem;
+
+  // border-radius: 100px;
+
+  // text-transform: uppercase;
+  // font-size: 0.75rem;
+  // font-weight: normal;
+  // font-style: normal;
+  // font-stretch: normal;
+  // letter-spacing: -0.3px;
+  // color: #ffffff;
+
+  // outline: none;
 }
 
 .trade-token-grid-row__button--size-full {
-  width: 2 * $width-button-action + 1rem;
+  width: 2 * $width-button-action - 1rem;
   margin: 0 1rem;
 }
 
