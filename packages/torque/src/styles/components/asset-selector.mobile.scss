@@ -1,9 +1,27 @@
 @media screen and (max-width: $mobile-version-max-width) {
   .asset-selector {
     .asset-selector-item {
-      width: 100%;
+      width: 46%;
+      height: 179px;
+      margin-right:10px;
       .asset-selector__title {
-        width: 80%;
+        width: 47px;
+        font-size: 20px;
+      }
+      .mt50{
+        margin-top: 25px;
+      }
+      .asset-selector-icon{
+        width: 34px;
+      }
+      .asset-selector__interest-rate{
+        font-size: 32px;
+      }
+      .asset-selector__apr{
+        font-size: 11px;
+      }
+      .asset-selector__fixed{
+        font-size: 11px;
       }
     }
 

@@ -23,6 +23,7 @@
       border-radius: 1rem;
       font-size: 6rem;
       font-weight: 600;
+      margin-top: 100px;
       //z-index: 999;
     }
 
@@ -48,6 +49,10 @@
 
     border-radius: 1rem;
     background-color: $color-borrow-card;
+    border: 1px solid $color-borrow-card;
+    transition-property: background, border-radius;
+    transition-duration: .2s, 1s;
+    transition-timing-function: linear;
     .asset-selector-icon{
       display: block;
     }
@@ -57,6 +62,17 @@
     &:hover {
       background-color: #FFFFFF;
       border: 1px solid #A9B5C7;
+        -webkit-animation: slide 0.5s forwards;
+      -webkit-animation-delay: 2s;
+      animation: slide 0.5s forwards;
+      animation-delay: 2s;
+      @-webkit-keyframes slide {
+          100% { left: 0; }
+      }
+
+      @keyframes slide {
+          100% { left: 0; }
+      }
       .asset-selector-div{
         //background-repeat: no-repeat;
         //width: 38px;
@@ -76,6 +92,9 @@
       }
       .asset-selector-icon{
         display: none;
+      }
+      .asset-selector__interest-rate{
+        color: #3b364b;
       }
       .asset-selector__fixed {
 
@@ -188,6 +207,10 @@
     background-repeat: no-repeat;
     background-position: right bottom;
     bottom: 0;
+    background-size: 100px;
+    transition-property: background-size;
+    transition-duration: .5s, 1s;
+    transition-timing-function: linear;
     &:hover {
       background-size: 120px;
     }
@@ -198,6 +221,10 @@
     background-repeat: no-repeat;
     background-position: right bottom;
     bottom: 0;
+    background-size: 100px;
+    transition-property: background-size;
+    transition-duration: .5s, 1s;
+    transition-timing-function: linear;
     &:hover {
       background-size: 120px;
     }
@@ -208,6 +235,10 @@
     background-repeat: no-repeat;
     background-position: right bottom;
     bottom: 0;
+    background-size: 100px;
+    transition-property: background-size;
+    transition-duration: .5s, 1s;
+    transition-timing-function: linear;
     &:hover {
       background-size: 120px;
     }
@@ -218,6 +249,10 @@
     background-repeat: no-repeat;
     background-position: right bottom;
     bottom: 0;
+    background-size: 100px;
+    transition-property: background-size;
+    transition-duration: .5s, 1s;
+    transition-timing-function: linear;
     &:hover {
       background-size: 120px;
     }
@@ -245,7 +280,10 @@
     background-repeat: no-repeat;
     background-position: right bottom;
     bottom: 0;
-
+    background-size: 100px;
+    transition-property: background-size;
+    transition-duration: .5s, 1s;
+    transition-timing-function: linear;
     &:hover {
       background-size: 120px;
     }
@@ -256,6 +294,10 @@
     background-repeat: no-repeat;
     background-position: right bottom;
     bottom: 0;
+    background-size: 100px;
+    transition-property: background-size;
+    transition-duration: .5s, 1s;
+    transition-timing-function: linear;
     &:hover {
       background-size: 120px;
     }
@@ -266,6 +308,10 @@
     background-repeat: no-repeat;
     background-position: right bottom;
     bottom: 0;
+    background-size: 100px;
+    transition-property: background-size;
+    transition-duration: .5s, 1s;
+    transition-timing-function: linear;
     &:hover {
       background-size: 120px;
     }
@@ -276,6 +322,10 @@
     background-repeat: no-repeat;
     background-position: right bottom;
     bottom: 0;
+    background-size: 100px;
+    transition-property: background-size;
+    transition-duration: .5s, 1s;
+    transition-timing-function: linear;
     &:hover {
       background-size: 120px;
     }
@@ -286,6 +336,10 @@
     background-repeat: no-repeat;
     background-position: right bottom;
     bottom: 0;
+    background-size: 100px;
+    transition-property: background-size;
+    transition-duration: .5s, 1s;
+    transition-timing-function: linear;
     &:hover {
       background-size: 120px;
     }
@@ -296,6 +350,10 @@
     background-repeat: no-repeat;
     background-position: right bottom;
     bottom: 0;
+    background-size: 100px;
+    transition-property: background-size;
+    transition-duration: .5s, 1s;
+    transition-timing-function: linear;
     &:hover {
       background-size: 120px;
     }
@@ -312,6 +370,10 @@
     background-repeat: no-repeat;
     background-position: right bottom;
     bottom: 0;
+    background-size: 100px;
+    transition-property: background-size;
+    transition-duration: .5s, 1s;
+    transition-timing-function: linear;
     &:hover {
       background-size: 120px;
     }
@@ -359,8 +421,9 @@
       background-repeat: no-repeat;
       background-position: right bottom;
       bottom: 0;
+      background-size: 90px;
       &:hover {
-        background-size: unset;
+        background-size: 90px;
       }
     }
 
@@ -369,8 +432,9 @@
       background-repeat: no-repeat;
       background-position: right bottom;
       bottom: 0;
+      background-size: 90px;
       &:hover {
-        background-size: unset;
+        background-size: 90px;
       }
     }
 
@@ -379,8 +443,9 @@
       background-repeat: no-repeat;
       background-position: right bottom;
       bottom: 0;
+      background-size: 90px;
       &:hover {
-        background-size: unset;
+        background-size: 90px;
       }
     }
 
@@ -389,8 +454,9 @@
       background-repeat: no-repeat;
       background-position: right bottom;
       bottom: 0;
+      background-size: 90px;
       &:hover {
-        background-size: unset;
+        background-size: 90px;
       }
     }
 
@@ -399,9 +465,9 @@
       background-repeat: no-repeat;
       background-position: right bottom;
       bottom: 0;
-
+      background-size: 90px;
       &:hover {
-        background-size: unset;
+        background-size: 90px;
       }
     }
 
@@ -410,8 +476,9 @@
       background-repeat: no-repeat;
       background-position: right bottom;
       bottom: 0;
+      background-size: 90px;
       &:hover {
-        background-size: unset;
+        background-size: 90px;
       }
     }
 
@@ -420,8 +487,9 @@
       background-repeat: no-repeat;
       background-position: right bottom;
       bottom: 0;
+      background-size: 90px;
       &:hover {
-        background-size: unset;
+        background-size: 90px;
       }
     }
 
@@ -430,8 +498,9 @@
       background-repeat: no-repeat;
       background-position: right bottom;
       bottom: 0;
+      background-size: 90px;
       &:hover {
-        background-size: unset;
+        background-size: 90px;
       }
     }
 
@@ -440,8 +509,9 @@
       background-repeat: no-repeat;
       background-position: right bottom;
       bottom: 0;
+      background-size: 90px;
       &:hover {
-        background-size: unset;
+        background-size: 90px;
       }
     }
 
@@ -450,8 +520,9 @@
       background-repeat: no-repeat;
       background-position: right bottom;
       bottom: 0;
+      background-size: 90px;
       &:hover {
-        background-size: unset;
+        background-size: 90px;
       }
     }
 
@@ -459,6 +530,7 @@
       background-image: url("../assets/images/bg_tile_mkr.svg");
       background-repeat: no-repeat;
       background-position: right;
+      background-size: 90px;
     }
 
     .asset-selector-item--rep {
@@ -466,6 +538,7 @@
       background-repeat: no-repeat;
       background-position: right bottom;
       bottom: 0;
+      background-size: 90px;
       &:hover {
         background-size: unset;
       }
