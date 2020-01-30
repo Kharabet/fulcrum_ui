@@ -342,23 +342,7 @@ permalink: lending
     </div>
 </section>
 
-<section class="bg-primary py-60 pt-xs-90 pb-xs-45 text-center">
-    <div class="container">
-        <div class="row">
-            <div class="col col-12 fd-c">
-                <h2 class="mb-25">Continuously-compounding interest </h2>
-                <p class="fs-20 fs-xs-16 lh-150 fw-600 c-primary mb-25">While you were reading this page Fulcrum lenders earn on
-                    assets</p>
-                <div class="item-timer">
-                    <span><span class="wrap-hours"><span class="hours">23</span>:</span><span class="minutes">0</span>:<span class="seconds">00</span></span>
-                </div>
-                <p class="fs-56 fs-xs-44 fw-400 c-primary-blue mb-40 mb-xs-30 lh-140">$<span class="fw-900 live-earnings-value">45,459,300</span></p>
-                <a href="https://fulcrum.trade/lend" class="button button-secondary button-lg mb-15 mx-auto order-sm-1">Lend</a>
-                <p class="fs-13 lh-150 text-center c-gray mb-10 mb-sm-25">To Earn interest</p>
-            </div>
-        </div>
-    </div>
-</section>
+
 
 <section class="bg-primary text-center pt-60 pb-135 pb-md-30">
     <div class="container">
@@ -385,6 +369,16 @@ permalink: lending
                     <p class="c-dark-gray mt-25 mw-400 mx-auto">Enter the quantity and confirm transaction</p>
                 </div>
             </div>
+        </div>
+    </div>
+</section>
+<section class="bg-primary py-60 pt-xs-90 pb-xs-45 text-center">
+    <div class="container">
+        <div class="row">
+        <div class="col col-12 fd-c">
+                        <a href="https://fulcrum.trade/lend" class="button button-secondary button-lg mb-15 mx-auto order-sm-1">Lend</a>
+            <p class="fs-13 lh-150 text-center c-gray mb-10 mb-sm-25">To Earn interest</p>
+        </div>
         </div>
     </div>
 </section>
