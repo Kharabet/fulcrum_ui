@@ -74,10 +74,10 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
 
     const isActiveClassName =
       asset === this.props.selectedKey.asset && !this.state.isShowMyTokensOnly ?
-        this.props.isMobile ? "trade-footer-grid--active" : "trade-token-grid-head-item--active"
+        this.props.isMobile ? "trade-footer-grid--active" : "trade-token-grid-tab-item--active"
         : "";
 
-    const classNamePrefix = this.props.isMobile ? "trade-token-grid-row" : "trade-token-grid-head-item";
+    const classNamePrefix = this.props.isMobile ? "trade-token-grid-row" : "trade-token-grid-tab-item";
     // const onSelectClick = (event: React.MouseEvent<HTMLElement>) => {
     //   event.stopPropagation();
 
@@ -107,12 +107,12 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
 
   public render() {
     return (
-      <div className="trade-token-grid-head">
-        <div className="trade-token-grid-head__container">
+      <div className="trade-token-grid-tab">
+        <div className="trade-token-grid-tab__container">
           {this.props.assets.map(asset => (this.renderAsset(asset)))}
-          <div className={`trade-token-grid-head-item ${this.state.isShowMyTokensOnly ? "trade-token-grid-head-item--active" : ""}`} onClick={this.showMyTokensOnlyChange}>
+          <div className={`trade-token-grid-tab-item ${this.state.isShowMyTokensOnly ? "trade-token-grid-tab-item--active" : ""}`} onClick={this.showMyTokensOnlyChange}>
             <div
-              className={`trade-token-grid-head-item__col-token-image wallet-img-div`} >
+              className={`trade-token-grid-tab-item__col-token-image wallet-img-div`} >
               <img className={`wallet-img`} src={walletSvg} />
             </div>
           </div>

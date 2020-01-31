@@ -212,22 +212,13 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
   }
 
   private renderActions = (isBuyOnly: boolean) => {
-    return isBuyOnly ? (
-      <div className="trade-token-grid-row__col-action">
-        <button className="trade-token-grid-row__buy-button trade-token-grid-row__button--size-full" onClick={this.onBuyClick}>
-          {TradeType.BUY}
-        </button>
-      </div>
-    ) : (
+    return (
       <div className="trade-token-grid-row__col-action">
         <button className="trade-token-grid-row__buy-button trade-token-grid-row__button--size-half" onClick={this.onBuyClick}>
           {TradeType.BUY}
         </button>
-        <button className="trade-token-grid-row__sell-button trade-token-grid-row__button--size-half" onClick={this.onSellClick}>
-          {TradeType.SELL}
-        </button>
       </div>
-    );
+    )
   };
 
   public onLeverageSelect = (value: number) => {

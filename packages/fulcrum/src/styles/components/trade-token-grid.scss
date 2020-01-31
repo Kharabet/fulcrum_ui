@@ -40,7 +40,7 @@ $margin-right-column: 1.5rem;
 
 
 
-.trade-token-grid-head{
+.trade-token-grid-tab{
   
   padding-top: 30px;
   overflow: hidden;
@@ -67,7 +67,7 @@ $margin-right-column: 1.5rem;
     }
     &:hover{
       cursor: pointer;
-      .trade-token-grid-head-item__col-token-image {
+      .trade-token-grid-tab-item__col-token-image {
         opacity: 0.5;
       }
 

@@ -90,16 +90,16 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
   }
 
   public async derivedUpdate() {
-    if(!this.props.isMobileMedia){
-      await this.setState({ ...this.state, tokenRowsData: TradeTokenGrid.getRowsData(this.props) }) ;
-      await this.setState({ ...this.state, tokenSingleRowsData:TradeTokenGrid.getSingleRowData(this.props) }) ;
+    if (!this.props.isMobileMedia) {
+      await this.setState({ ...this.state, tokenRowsData: TradeTokenGrid.getRowsData(this.props) });
+      await this.setState({ ...this.state, tokenSingleRowsData: TradeTokenGrid.getSingleRowData(this.props) });
 
-    }else{
-      await this.setState({ ...this.state, tokenSingleRowsData:TradeTokenGrid.getSingleRowData(this.props) }) ;
-      await this.setState({ ...this.state, tokenSingleRowsData:TradeTokenGrid.getSingleRowData(this.props), tokenLongShortRowsData:TradeTokenGrid.getRowsLongShortData(this.props) }) ;
+    } else {
+      await this.setState({ ...this.state, tokenSingleRowsData: TradeTokenGrid.getSingleRowData(this.props) });
+      await this.setState({ ...this.state, tokenSingleRowsData: TradeTokenGrid.getSingleRowData(this.props), tokenLongShortRowsData: TradeTokenGrid.getRowsLongShortData(this.props) });
     }
 
-      // this.setState({ ...this.state, tokenSingleRowsData:TradeTokenGrid.getSingleRowData(this.props) }) ;
+    // this.setState({ ...this.state, tokenSingleRowsData:TradeTokenGrid.getSingleRowData(this.props) }) ;
   }
 
   public componentWillUnmount(): void {
@@ -143,7 +143,7 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
 
     return (
       <div className="trade-token-grid__wrapper">
-        
+
         <div className="trade-token-grid">
           <TradeTokenGridHeader showMyTokensOnly={this.props.showMyTokensOnly} onShowMyTokensOnlyChange={this.props.onShowMyTokensOnlyChange} />
           {tokenRows}
@@ -167,7 +167,7 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
         <div className="trade-footer-mb">
           <div className="trade-foot-item">
             {tokenRowsFooterMobile}
-            <div className="trade-token-grid-head-item">
+            <div className="trade-token-grid-tab-item">
               <div
                 className={`trade-token-grid-row__col-token-image wallet-img-div`} onClick={this.showMyTokensOnlyChange}>
                 <img className={`wallet-img`} src={walletSvg} />
@@ -184,22 +184,12 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
   }
 
   private renderActions = (isBuyOnly: boolean) => {
-    return isBuyOnly ? (
-      <div className="trade-token-grid-row__col-action-mb">
-        <button className="trade-token-grid-row__buy-button trade-token-grid-row__button--size-full" onClick={this.onBuyClick}>
-          {TradeType.BUY}
-        </button>
-      </div>
-    ) : (
-        <div className="trade-token-grid-row__col-action-mb">
-          <button className="trade-token-grid-row__buy-button trade-token-grid-row__button--size-half" onClick={this.onBuyClick}>
-            {TradeType.BUY}
-          </button>
-          <button className="trade-token-grid-row__sell-button trade-token-grid-row__button--size-half" onClick={this.onSellClick}>
-            {TradeType.SELL}
-          </button>
-        </div>
-      );
+    return (<div className="trade-token-grid-row__col-action-mb">
+      <button className="trade-token-grid-row__buy-button trade-token-grid-row__button--size-half" onClick={this.onBuyClick}>
+        {TradeType.BUY}
+      </button>
+    </div>
+    )
   };
   public onBuyClick = (event: React.MouseEvent<HTMLElement>) => {
     event.stopPropagation();

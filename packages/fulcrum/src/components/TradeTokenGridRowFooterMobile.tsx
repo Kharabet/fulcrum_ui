@@ -173,10 +173,10 @@ export class TradeTokenGridRowMobileFooter extends Component<ITradeTokenGridRowF
     // console.log("this.props.selectedKey.asset - ",this.props.selectedKey.asset)
     const isActiveClassName =
       this.props.asset === this.props.selectedKey.asset ? 
-      this.props.isMobile ? "trade-footer-grid--active" : "trade-token-grid-head-item--active"
+      this.props.isMobile ? "trade-footer-grid--active" : "trade-token-grid-tab-item--active"
       : "";
 
-    const classNamePrefix = this.props.isMobile ? "trade-token-grid-row" : "trade-token-grid-head-item"
+    const classNamePrefix = this.props.isMobile ? "trade-token-grid-row" : "trade-token-grid-tab-item"
     return (
 
       <div className={`${this.props.isMobile ? "trade-footer-grid" : classNamePrefix} ${isActiveClassName}`}  onClick={this.onSelectClick}>
