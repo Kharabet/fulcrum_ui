@@ -7,6 +7,15 @@
       .asset-selector__title {
         width: 47px;
         font-size: 20px;
+
+        &--coming-soon {
+          font-size: 11px;
+          color: #a9b5c7;
+          margin: unset;
+          letter-spacing: unset;
+          margin-top: -1.875rem;
+          margin-bottom: 0.8125rem;
+        }
       }
       .mt50{
         margin-top: 25px;

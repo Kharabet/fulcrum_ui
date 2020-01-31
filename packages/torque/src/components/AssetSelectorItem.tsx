@@ -92,7 +92,7 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
         <div className="asset-selector-row mt50">
           <div className="asset-selector__title">{this.props.asset}</div>
           {!this.props.onSelectAsset ? (
-            <div className="asset-selector__title--coming-soon"></div>
+            <div className="asset-selector__title--coming-soon">Web3 Only</div>
           ) : ``}
 
           {/*<SelectorIconsBar />*/}
@@ -112,7 +112,7 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
     }
   };
   private getAssestsData = () => {
-    console.log("assestsType = ", this.props.asset)
+    //console.log("assestsType = ", this.props.asset)
     switch (this.props.asset) {
       case Asset.DAI:
         return { img:bgDai}
