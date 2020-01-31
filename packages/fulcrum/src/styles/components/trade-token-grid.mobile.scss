@@ -210,18 +210,7 @@
     width: 70px;
   }
 
-  .wallet-img-div{
-    width:35px;
-    margin-left: 11px;
-    margin-top: 21px;
-    background-color: #6488FF;
-    &:hover{
-      cursor:pointer;
-    }
-    img.wallet-img {
-      height: 25px;
-    }
-  }
+
   .cb-container{
     .cb-label {
       font-size: 1.2rem;
@@ -242,4 +231,14 @@
   //.cb-container {
   //  display: none;
   //}
+}
+
+.wallet-img-div{
+  background-color: #6488FF;
+  &:hover{
+    cursor:pointer;
+  }
+  img.wallet-img {
+    height: 25px;
+  }
 }

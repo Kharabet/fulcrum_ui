@@ -143,15 +143,7 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
 
     return (
       <div className="trade-token-grid__wrapper">
-        <div className="trade-token-grid-head">
-          <div className="trade-token-grid-head__container">
-            {tokenRowsFooterMobile}
-            <div
-              className={`trade-token-grid-head__token-image wallet-img-div`} onClick={this.showMyTokensOnlyChange}>
-              <img className={`wallet-img`} src={walletSvg} />
-            </div>
-          </div>
-        </div>
+        
         <div className="trade-token-grid">
           <TradeTokenGridHeader showMyTokensOnly={this.props.showMyTokensOnly} onShowMyTokensOnlyChange={this.props.onShowMyTokensOnlyChange} />
           {tokenRows}
