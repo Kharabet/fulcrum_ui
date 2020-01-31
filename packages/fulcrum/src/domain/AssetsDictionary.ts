@@ -340,7 +340,7 @@ export class AssetsDictionary {
         zrx_logo,
         zrx_bg,
         zrx_ts,
-        "#7368D0",
+        "#000004",
         "#FFFFFF",
         "#FFFFFF",
         new Map<number, string | null>([
@@ -406,7 +406,7 @@ export class AssetsDictionaryMobile {
         link_logo,
         link_bg_btm,
         link_ts,
-        "#FFFFFF",
+        "#2A5ADA",
         "#444e5a",
         "#444e5a",
         new Map<number, string | null>([

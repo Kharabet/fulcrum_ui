@@ -16,7 +16,7 @@ import { TradeTokenGridHeaderMobile } from "./TradeTokenGridHeaderMobile";
 import { ITradeTokenGridRowProps, TradeTokenGridRow } from "./TradeTokenGridRow";
 import { ITradeTokenGridRowFooterMBProps, TradeTokenGridRowMobileFooter } from "./TradeTokenGridRowFooterMobile";
 import { ITradeTokenGridRowMBProps, TradeTokenGridRowMobile } from "./TradeTokenGridRowMobile";
-import settingSvg from "../assets/images/settings.svg";
+import walletSvg from "../assets/images/wallet-icon.svg";
 
 // import siteConfig from "./../config/SiteConfig.json";
 
@@ -146,6 +146,10 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
         <div className="trade-token-grid-head">
           <div className="trade-token-grid-head__container">
             {tokenRowsFooterMobile}
+            <div
+              className={`trade-token-grid-head__token-image wallet-img-div`} onClick={this.showMyTokensOnlyChange}>
+              <img className={`wallet-img`} src={walletSvg} />
+            </div>
           </div>
         </div>
         <div className="trade-token-grid">
@@ -171,9 +175,11 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
         <div className="trade-footer-mb">
           <div className="trade-foot-item">
             {tokenRowsFooterMobile}
-            <div
-              className={`trade-token-grid-row__col-token-image settings-img-div`} onClick={this.showMyTokensOnlyChange}>
-              <img className={`settings-img`} src={settingSvg} />
+            <div className="trade-token-grid-head-item">
+              <div
+                className={`trade-token-grid-row__col-token-image wallet-img-div`} onClick={this.showMyTokensOnlyChange}>
+                <img className={`wallet-img`} src={walletSvg} />
+              </div>
             </div>
           </div>
         </div>
