@@ -106,9 +106,13 @@ export class RefinanceAssetSelector extends Component<IRefinanceAssetSelectorPro
 
     console.log('compound', loans);
 
-    if (loans.length) { // TODO
-      await TorqueProvider.Instance.migrateCompoundLoan(loans[0], loans[0].balance.div(1.2)); // TODO
+    if (loans.length && !loans[0].isDisabled) { // TODO
+      console.log('A', loans[0].collateral[0].amount.toString(10));
+      console.log('B', loans[0].collateral[1].amount.toString(10));
+      await TorqueProvider.Instance.migrateCompoundLoan(loans[0], loans[0].balance.div(10)); // TODO
       // TODO @bshevchenko: migration didn't work for 100% (without div(n))
+    } else {
+      console.log('no valid loan for migration');
     }
 
     // tslint:disable-next-line:prefer-for-of

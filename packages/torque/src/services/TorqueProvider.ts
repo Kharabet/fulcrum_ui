@@ -536,11 +536,17 @@ export class TorqueProvider {
     return data[3];
   };
 
-  private assignCollateral = (loans: IRefinanceLoan[], deposits: IRefinanceToken[], inRatio: BigNumber) => {
+  private assignCollateral = (loans: IRefinanceLoan[], deposits: IRefinanceToken[], inRatio?: BigNumber) => {
 
-    // TODO @bshevchenko: fix: isHealthy is true even if inRatio is super low
+    // TODO @bshevchenko: fix: isHealthy is true even if inRatio is super low << NOT RELEVANT?
 
     for (const loan of loans) {
+      loan.collateral = [];
+      if (inRatio) {
+        loan.ratio = inRatio;
+      } else {
+        inRatio = loan.ratio;
+      }
       console.log('inRatio', inRatio.toString(10));
       console.log('wow', loan.balance.toString(), loan.usdValue.toString(), loan.usdValue.times(inRatio).toString());
       const goal = loan.usdValue.times(inRatio).dp(18, BigNumber.ROUND_FLOOR);
@@ -548,17 +554,26 @@ export class TorqueProvider {
       for (const deposit of deposits) {
         let take = deposit.usdValue;
         if (current.plus(take).gt(goal)) {
+          console.log('yes');
           take = take.minus(current.plus(take).minus(goal));
+        } else {
+          console.log('no', current.toString(10), take.toString(10), current.plus(take).toString(10), goal.toString(10));
         }
+        console.log('take', take.toString(10), deposit.asset, deposit.rate.toString(10), goal.toString(10));
         loan.collateral.push({
           ...deposit,
-          amount: take.div(deposit.rate), // TODO probably mistake is here
+          amount: take.div(deposit.rate),
           borrowAmount: loan.balance.div(goal.div(take))
         });
 
+        console.log('borrowAmount', loan.balance.div(goal.div(take)).toString(10), deposit.asset);
+
         // @ts-ignore
-        if (inRatio.lte(deposit.maintenanceMarginAmount.div(10 ** 18))) {
+        if (inRatio.lte(deposit.maintenanceMarginAmount.div(10 ** 19))) {
           loan.isDisabled = true;
+
+          // @ts-ignore
+          console.log('mma', deposit.maintenanceMarginAmount.div(10 ** 19).toString());
         }
 
         current = current.plus(take).dp(18, BigNumber.ROUND_FLOOR);
@@ -647,7 +662,8 @@ export class TorqueProvider {
           isHealthy: false,
           isDisabled: false,
           collateral: [],
-          apr: borrowRate.times(60 * 60 * 24 * 365).div(10 ** 18).div(blockTime)
+          apr: borrowRate.times(60 * 60 * 24 * 365).div(10 ** 18).div(blockTime),
+          ratio: new BigNumber(0)
         });
         inBorrowed = inBorrowed.plus(token.usdValue);
       }
@@ -711,11 +727,14 @@ export class TorqueProvider {
           isHealthy: false,
           isDisabled: false,
           collateral: [],
-          apr: interestRate.value.times(60 * 60 * 24 * 365).div(10 ** 16)
+          apr: interestRate.value.times(60 * 60 * 24 * 365).div(10 ** 16),
+          ratio: new BigNumber(0)
         });
         inBorrowed = inBorrowed.plus(token.usdValue);
       }
     }
+
+    // TODO @bshevchenko: migrateSoloLoan assignCollateral
 
     this.assignCollateral(loans, deposits, inSupplied.div(inBorrowed));
 
@@ -756,29 +775,36 @@ export class TorqueProvider {
       // do nothing
     }, 3000);
 
+    const divider = loan.balance.div(amount);
+    loan.usdValue = loan.usdValue.div(divider);
+    loan.balance = loan.balance.div(divider);
+    this.assignCollateral([loan], loan.collateral);
+
     const assets: string[] = [];
     const amounts: BigNumber[] = [];
     const borrowAmounts: BigNumber[] = [];
-
-    const divider = loan.balance.div(amount);
 
     let borrowAmountsSum = new BigNumber(0);
     for (const token of loan.collateral) {
       // @ts-ignore
       assets.push(token.market);
       amounts.push(
-        token.amount.div(divider).times(10 ** token.decimals).integerValue(BigNumber.ROUND_UP)
+        token.amount.times(10 ** token.decimals).integerValue(BigNumber.ROUND_DOWN)
       );
-      const borrowAmount = token.borrowAmount.div(divider).times(10 ** token.decimals).integerValue(BigNumber.ROUND_UP);
+      const borrowAmount = token.borrowAmount.times(10 ** loan.decimals).integerValue(BigNumber.ROUND_DOWN);
       borrowAmounts.push(borrowAmount);
       borrowAmountsSum = borrowAmountsSum.plus(borrowAmount);
     }
 
-    amount = amount.times(10 ** loan.decimals).integerValue(BigNumber.ROUND_UP);
+    amount = amount.times(10 ** loan.decimals).integerValue(BigNumber.ROUND_DOWN);
 
     borrowAmounts[0] = borrowAmounts[0].plus(amount.minus(borrowAmountsSum));
 
-    console.log('hey', amounts[0].div(10 ** 18).toString(10));
+    console.log('B1', borrowAmounts[0].toString(10));
+    console.log('B2', borrowAmounts[1].toString(10));
+
+    console.log('sum', borrowAmountsSum.toString(10), borrowAmounts[0].plus(borrowAmounts[1]).toString(10));
+    console.log('amount', amount.toString(10));
 
     try {
       const txHash = await compoundBridge.migrateLoan.sendTransactionAsync(
