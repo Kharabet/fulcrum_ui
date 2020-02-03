@@ -109,8 +109,8 @@ export class AssetsDictionary {
         link_bg,
         link_ts,
         "#FFFFFF",
-        "#444e5a",
-        "#acb5c2",
+        "#ffffff",
+        "#ffffff",
         new Map<number, string | null>([
           [1, "0x514910771af9ca656af840dff83e8264ecf986ca"],
           [3, ""]
@@ -407,8 +407,8 @@ export class AssetsDictionaryMobile {
         link_bg_btm,
         link_ts,
         "#2A5ADA",
-        "#444e5a",
-        "#444e5a",
+        "#FFFFFF",
+        "#FFFFFF",
         new Map<number, string | null>([
           [1, "0x514910771af9ca656af840dff83e8264ecf986ca"],
           [3, ""]
