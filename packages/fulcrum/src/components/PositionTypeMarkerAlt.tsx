@@ -10,7 +10,7 @@ export interface IPositionTypeMarkerAltProps {
 export class PositionTypeMarkerAlt extends Component<IPositionTypeMarkerAltProps> {
   public render() {
     const img =
-      this.props.value === PositionType.SHORT ?
+      this.props.value === PositionType.LONG ?
         "data:image/svg+xml;base64," +
         btoa(
           `<svg width="23" height="23" viewBox="0 0 23 23" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -29,7 +29,7 @@ export class PositionTypeMarkerAlt extends Component<IPositionTypeMarkerAltProps
           `
           .replace("#AAA", this.props.assetDetails.bgColor)
         )
-      : this.props.value === PositionType.LONG ?
+      : this.props.value === PositionType.SHORT ?
           "data:image/svg+xml;base64," +
           btoa(
             `<svg width="23" height="23" viewBox="0 0 23 23" fill="none" xmlns="http://www.w3.org/2000/svg">
