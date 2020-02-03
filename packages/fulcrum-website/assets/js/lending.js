@@ -129,8 +129,6 @@ window.addEventListener('load', function () {
 
         changePositionBorderThumb(quantityRange, e.currentTarget);
     }
-
-    timer();
 });
 
 
