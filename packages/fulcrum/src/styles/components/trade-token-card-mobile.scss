@@ -1,5 +1,5 @@
 .trade-token-card-mobile__wrapper {
-    font-family: Muli;
+    font-family: 'Muli', sans-serif;;
     padding: 15px;
 }
 
@@ -31,7 +31,7 @@
             top: 50%;
             transform: translate(-50%, -50%);
             button {
-                font-family: Muli;
+                font-family: 'Muli', sans-serif;;
 
                 border-radius: 30px;
                 font-style: normal;
@@ -75,7 +75,7 @@
             padding: 6px 27px;
             border: none;
             text-transform: uppercase;
-            font-family: Muli;
+            font-family: 'Muli', sans-serif;;
             font-style: normal;
             font-weight: bold;
             font-size: 14px;
@@ -96,7 +96,7 @@
         display: flex;
         flex-direction: column;
         > span:first-child {
-            font-family: Muli;
+            font-family: 'Muli', sans-serif;;
             font-style: normal;
             font-weight: 600;
             font-size: 10px;
@@ -115,7 +115,7 @@
 
                 color: #a2abb8;
             }
-            font-family: Muli;
+            font-family: 'Muli', sans-serif;;
             font-style: normal;
             font-weight: 800;
             font-size: 18px;

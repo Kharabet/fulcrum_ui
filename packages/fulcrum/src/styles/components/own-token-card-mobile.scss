@@ -3,7 +3,7 @@
     width: 100%;
     &__header {
         margin-bottom: 15px;
-        font-family: Muli;
+        font-family: 'Muli', sans-serif;;
         font-style: normal;
         font-weight: 600;
         font-size: 14px;
@@ -50,7 +50,7 @@
             padding: 6px 27px;
             border: none;
             text-transform: uppercase;
-            font-family: Muli;
+            font-family: 'Muli', sans-serif;;
             font-style: normal;
             font-weight: bold;
             font-size: 14px;
@@ -83,7 +83,7 @@
     }
 
     &__position-type {
-        font-family: Muli;
+        font-family: 'Muli', sans-serif;;
         font-style: normal;
         font-weight: 800;
         font-size: 10px;
@@ -97,7 +97,7 @@
         display: flex;
         flex-direction: column;
         > span:first-child {
-            font-family: Muli;
+            font-family: 'Muli', sans-serif;;
             font-style: normal;
             font-weight: 600;
             font-size: 10px;
@@ -116,7 +116,7 @@
 
                 color: #a2abb8;
             }
-            font-family: Muli;
+            font-family: 'Muli', sans-serif;;
             font-style: normal;
             font-weight: 800;
             font-size: 18px;
