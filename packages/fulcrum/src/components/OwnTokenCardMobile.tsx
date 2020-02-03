@@ -177,13 +177,13 @@ export class OwnTokenCardMobile extends Component<IOwnTokenCardMobileProps, IOwn
                     style={{ cursor: `pointer`, textDecoration: `none` }}
                     rel="noopener noreferrer"
                   >
-                    {this.state.assetDetails.displayName}&nbsp;&nbsp;
-              <PositionTypeMarkerAlt assetDetails={this.state.assetDetails} value={this.props.currentKey.positionType} />&nbsp;&nbsp;
+                    {this.state.assetDetails.displayName}&nbsp;
+              <PositionTypeMarkerAlt assetDetails={this.state.assetDetails} value={this.props.currentKey.positionType} />&nbsp;
               {`${this.props.currentKey.leverage}x`}
                   </a>
                 ) : (
-                  <div className="own-token-card-mobile__token-name-full">{`${this.state.assetDetails.displayName}`}&nbsp;&nbsp;
-            <PositionTypeMarkerAlt assetDetails={this.state.assetDetails} value={this.props.currentKey.positionType} />&nbsp;&nbsp;
+                  <div className="own-token-card-mobile__token-name-full">{`${this.state.assetDetails.displayName}`}&nbsp;
+            <PositionTypeMarkerAlt assetDetails={this.state.assetDetails} value={this.props.currentKey.positionType} />&nbsp;
             {`${this.props.currentKey.leverage}x`}
                   </div>)}
             </div>

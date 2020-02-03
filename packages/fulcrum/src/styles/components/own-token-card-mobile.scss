@@ -36,6 +36,13 @@
 
             align-items: center;
             padding: 10px 0px;
+
+            > div:first-child{
+              width: 40%;
+            }
+            > div + div, div:last-child{
+              width: 30%
+            }
         }
     }
     &__action {
@@ -124,8 +131,5 @@
 
             color: #ffffff;
         }
-    }
-    &__empty {
-        width: 40px;
     }
 }
