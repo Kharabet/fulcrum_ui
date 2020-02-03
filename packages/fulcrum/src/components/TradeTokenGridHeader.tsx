@@ -34,11 +34,6 @@ export class TradeTokenGridHeader extends Component<ITradeTokenGridHeaderProps> 
         <div className="trade-token-grid-header__col-profit">
           <span className="trade-token-grid-header__text">Interest APR</span>
         </div>
-        <div className="trade-token-grid-header__col-actions">
-          <span className="trade-token-grid-header__text-right">
-            <CheckBox checked={this.props.showMyTokensOnly} onChange={this.showMyTokensOnlyChange}>Manage Positions</CheckBox>
-          </span>
-        </div>
       </div>
     );
   }

@@ -28,7 +28,7 @@ export interface ITokenGridTabsProps {
   selectedKey: TradeTokenKey;
   isMobile: boolean;
   assets: Asset[];
-  
+
   isShowMyTokensOnly: boolean;
   defaultLeverageShort: number;
   defaultLeverageLong: number;
@@ -86,8 +86,8 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
 
     const onSelectClick = async (event: React.MouseEvent<HTMLElement>) => {
       event.stopPropagation();
-      
-      await this.setState({...this.state, isShowMyTokensOnly: false})
+
+      await this.setState({ ...this.state, isShowMyTokensOnly: false })
       await this.props.onShowMyTokensOnlyChange(false);
       await this.props.onSelect(this.getTradeTokenGridRowSelectionKey(asset));
     };
@@ -106,8 +106,11 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
 
 
   public render() {
+    var selectedAsset = AssetsDictionary.assets.get(this.props.selectedKey.asset);
+    var borderColor= !!selectedAsset ? selectedAsset.bgColor : "#fff"
+
     return (
-      <div className="trade-token-grid-tab">
+      <div className="trade-token-grid-tab" style={!this.props.isMobile && borderColor ? { borderBottom: `2px solid ${borderColor}` } : {}}>
         <div className="trade-token-grid-tab__container">
           {this.props.assets.map(asset => (this.renderAsset(asset)))}
           <div className={`trade-token-grid-tab-item ${this.state.isShowMyTokensOnly ? "trade-token-grid-tab-item--active" : ""}`} onClick={this.showMyTokensOnlyChange}>
@@ -124,7 +127,7 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
 
   public showMyTokensOnlyChange = async () => {
     await this.props.onShowMyTokensOnlyChange(true);
-    await this.setState({...this.state, isShowMyTokensOnly: true})
+    await this.setState({ ...this.state, isShowMyTokensOnly: true })
   }
 
   private getTradeTokenGridRowSelectionKeyRaw(asset: Asset) {
