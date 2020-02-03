@@ -23,6 +23,7 @@ export interface ChartContainerProps {
 	studiesOverrides: ChartingLibraryWidgetOptions['studies_overrides'];
 	containerId: ChartingLibraryWidgetOptions['container_id'];
 	theme: ChartingLibraryWidgetOptions['theme'];
+	preset: ChartingLibraryWidgetOptions['preset']
 }
 
 export interface ChartContainerState {
@@ -48,7 +49,8 @@ export class TVChartContainer extends React.PureComponent<Partial<ChartContainer
 		fullscreen: false,
 		autosize: true,
 		studiesOverrides: {},
-		theme: 'Dark'
+		theme: 'Dark',
+		preset: undefined
 	};
 
 	private tvWidget: IChartingLibraryWidget | null = null;
@@ -73,7 +75,8 @@ export class TVChartContainer extends React.PureComponent<Partial<ChartContainer
 			fullscreen: this.props.fullscreen,
 			autosize: this.props.autosize,
 			studies_overrides: this.props.studiesOverrides,
-			theme: this.props.theme
+			theme: this.props.theme,
+			preset: this.props.preset
 		};
 
 		const tvWidget = new widget(widgetOptions);

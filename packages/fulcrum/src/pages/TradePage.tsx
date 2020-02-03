@@ -165,7 +165,7 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
         <HeaderOps isMobileMedia={this.props.isMobileMedia} isLoading={this.props.isLoading} doNetworkConnect={this.props.doNetworkConnect} />
         <main>
           <div className="chart-wrapper">
-            <TVChartContainer symbol={this.state.selectedKey.asset} />
+            <TVChartContainer symbol={this.state.selectedKey.asset} preset={this.props.isMobileMedia ? "mobile" : undefined}/>
           </div>
           {/* <PriceGraph
             data={this.state.priceGraphData}
