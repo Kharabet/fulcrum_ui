@@ -1,0 +1,131 @@
+.own-token-cards {
+    margin-top: 20px;
+    width: 100%;
+    &__header {
+        margin-bottom: 15px;
+        font-family: Muli;
+        font-style: normal;
+        font-weight: 600;
+        font-size: 14px;
+        line-height: 150%;
+        /* identical to box height, or 21px */
+
+        display: flex;
+        justify-content: center;
+
+        text-align: center;
+
+        color: #a2abb8;
+    }
+    &__container {
+        padding: 0 15px;
+        display: flex;
+        flex-direction: column;
+    }
+}
+
+.own-token-card-mobile {
+    margin-bottom: 1px;
+    &__body {
+        background-color: #444e5a;
+
+        padding: 25px;
+        &-row {
+            display: flex;
+            justify-content: space-between;
+
+            align-items: center;
+            padding: 10px 0px;
+        }
+    }
+    &__action {
+        button {
+            padding: 6px 27px;
+            border: none;
+            text-transform: uppercase;
+            font-family: Muli;
+            font-style: normal;
+            font-weight: bold;
+            font-size: 14px;
+            line-height: 150%;
+            display: flex;
+            justify-content: center;
+            letter-spacing: 0.05em;
+            color: #ffffff;
+            background: #ff4f4f;
+            border-radius: 43px;
+            &:hover {
+                background: #fe7272;
+            }
+        }
+    }
+    .asset-name {
+        font-style: normal;
+        font-size: 18px;
+        line-height: 150%;
+        display: flex;
+        align-items: center;
+
+        /* Main/White */
+
+        color: #ffffff;
+        .own-token-card-mobile__token-name-full {
+            display: flex;
+            align-items: center;
+        }
+    }
+
+    &__position-type {
+        font-family: Muli;
+        font-style: normal;
+        font-weight: 800;
+        font-size: 10px;
+    }
+
+    &__unit-of-account,
+    &__position-value,
+    &__price,
+    &__profit,
+    &__empty {
+        display: flex;
+        flex-direction: column;
+        > span:first-child {
+            font-family: Muli;
+            font-style: normal;
+            font-weight: 600;
+            font-size: 10px;
+            line-height: 150%;
+            /* or 15px */
+
+            display: flex;
+            align-items: center;
+            text-align: center;
+
+            color: #a2abb8;
+        }
+        span + span {
+            .fw-normal {
+                font-weight: normal;
+
+                color: #a2abb8;
+            }
+            font-family: Muli;
+            font-style: normal;
+            font-weight: 800;
+            font-size: 18px;
+            line-height: 150%;
+            /* or 27px */
+
+            display: flex;
+            align-items: center;
+            text-align: center;
+
+            /* Main/White */
+
+            color: #ffffff;
+        }
+    }
+    &__empty {
+        width: 40px;
+    }
+}
