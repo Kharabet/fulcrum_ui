@@ -74,7 +74,7 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
 
     const isActiveClassName =
       asset === this.props.selectedKey.asset && !this.state.isShowMyTokensOnly ?
-        this.props.isMobile ? "trade-footer-grid--active" : "trade-token-grid-tab-item--active"
+        "trade-token-grid-tab-item--active"
         : "";
 
     const classNamePrefix = this.props.isMobile ? "trade-token-grid-row" : "trade-token-grid-tab-item";
@@ -93,7 +93,7 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
     };
 
     return (
-      <div className={`${this.props.isMobile ? "trade-footer-grid" : classNamePrefix} ${isActiveClassName}`} onClick={onSelectClick}>
+      <div className={`classNamePrefix} ${isActiveClassName}`} onClick={onSelectClick}>
         <div
           className={`${classNamePrefix}__col-token-image`}
           style={{ backgroundColor: assetDetails.bgColor, borderLeftColor: assetDetails.bgColor }}

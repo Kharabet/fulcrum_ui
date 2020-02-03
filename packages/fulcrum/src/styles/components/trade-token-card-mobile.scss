@@ -1,0 +1,160 @@
+.trade-token-card-mobile__wrapper {
+    font-family: Muli;
+    padding: 15px;
+}
+
+.trade-token-card-mobile {
+    &__header {
+        padding: 15px;
+
+        display: flex;
+        justify-content: space-between;
+        .asset-name {
+            font-style: normal;
+            font-weight: 800;
+            font-size: 18px;
+            line-height: 150%;
+            display: flex;
+            align-items: center;
+
+            /* Main/White */
+
+            color: #ffffff;
+        }
+        .poisition-type-switch {
+            background: #3d4651;
+            border-radius: 30px;
+            padding: 2px;
+            display: flex;
+            button {
+                font-family: Muli;
+
+                border-radius: 30px;
+                font-style: normal;
+                font-weight: 800;
+                font-size: 10px;
+                line-height: 150%;
+                /* or 15px */
+                text-transform: uppercase;
+
+                display: flex;
+                align-items: center;
+                text-align: center;
+
+                /* Main/White */
+
+                color: #ffffff;
+                background-color: #3d4651;
+                padding: 8px 12px;
+
+                border: none;
+                &.btn-active {
+                    background: #00c0ab;
+                }
+            }
+        }
+    }
+    &__body {
+        background-color: #444e5a;
+        padding: 25px;
+
+        &-row {
+            display: flex;
+            justify-content: space-between;
+            
+    align-items: center;
+    padding: 10px 0px;
+        }
+    }
+    &__action {
+        button {
+          padding: 6px 27px;
+          border: none;
+          text-transform: uppercase;
+          font-family: Muli;
+          font-style: normal;
+          font-weight: bold;
+          font-size: 14px;
+          line-height: 150%;
+          display: flex;
+          justify-content: center;
+          letter-spacing: 0.05em;
+          color: #ffffff;
+          background: #276bfb;
+          border-radius: 43px;
+            &:hover {
+                background: #5b88ff;
+            }
+        }
+    }
+    &__price,
+    &__profit {
+        display: flex;
+        flex-direction: column;
+        > span:first-child {
+            font-family: Muli;
+            font-style: normal;
+            font-weight: 600;
+            font-size: 10px;
+            line-height: 150%;
+            /* or 15px */
+
+            display: flex;
+            align-items: center;
+            text-align: center;
+
+            color: #a2abb8;
+        }
+        span + span {
+            .fw-normal {
+                font-weight: normal;
+
+                color: #a2abb8;
+            }
+            font-family: Muli;
+            font-style: normal;
+            font-weight: 800;
+            font-size: 18px;
+            line-height: 150%;
+            /* or 27px */
+
+            display: flex;
+            align-items: center;
+            text-align: center;
+
+            /* Main/White */
+
+            color: #ffffff;
+        }
+    }
+
+    .leverage-selector {
+        display: flex;
+        list-style-type: none;
+        padding: 2px;
+        background-color: #3d4651;
+        border-radius: 30px;
+        color: #fff;
+
+        height: auto;
+    }
+
+    .leverage-selector__item {
+        padding: 6px 8.5px;
+        border-radius: 30px;
+        font-weight: 800;
+        font-size: 12px;
+        line-height: 150%;
+        &--selected {
+            background: #00c0ab;
+            &:hover {
+                cursor: pointer;
+            }
+        }
+        &:hover:not(&--selected) {
+            cursor: pointer;
+
+            color: #00c0ab;
+        }
+    }
+}
