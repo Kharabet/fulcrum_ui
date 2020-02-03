@@ -93,7 +93,7 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
     };
 
     return (
-      <div className={`${classNamePrefix} ${isActiveClassName}`} onClick={onSelectClick}>
+      <div key={`${assetDetails.displayName}`} className={`${classNamePrefix} ${isActiveClassName}`} onClick={onSelectClick}>
         <div
           className={`${classNamePrefix}__col-token-image`}
           style={{ backgroundColor: assetDetails.bgColor, borderLeftColor: assetDetails.bgColor }}

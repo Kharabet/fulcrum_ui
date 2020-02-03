@@ -5,6 +5,7 @@ import {
 	ChartingLibraryWidgetOptions,
 	LanguageCode,
 	IChartingLibraryWidget,
+	StudyOverrides
 } from '../charting_library/charting_library.min';
 
 export interface ChartContainerProps {
@@ -27,6 +28,8 @@ export interface ChartContainerProps {
 }
 
 export interface ChartContainerState {
+	preset: ChartingLibraryWidgetOptions['preset']
+
 }
 
 function getLanguageFromURL(): LanguageCode | null {
@@ -36,6 +39,12 @@ function getLanguageFromURL(): LanguageCode | null {
 }
 
 export class TVChartContainer extends React.PureComponent<Partial<ChartContainerProps>, ChartContainerState> {
+	constructor(props: ChartContainerProps, context?: any) {
+		super(props, context);
+		this.state = {
+			preset: this.props.preset
+		}
+	}
 	public static defaultProps: ChartContainerProps = {
 		symbol: 'ETH',
 		interval: 'D',
@@ -76,27 +85,11 @@ export class TVChartContainer extends React.PureComponent<Partial<ChartContainer
 			autosize: this.props.autosize,
 			studies_overrides: this.props.studiesOverrides,
 			theme: this.props.theme,
-			preset: this.props.preset
+			preset: this.state.preset
 		};
 
 		const tvWidget = new widget(widgetOptions);
 		this.tvWidget = tvWidget;
-
-		tvWidget.onChartReady(() => {
-			tvWidget.headerReady().then(() => {
-				const button = tvWidget.createButton();
-				button.setAttribute('title', 'Click to show a notification popup');
-				button.classList.add('apply-common-tooltip');
-				button.addEventListener('click', () => tvWidget.showNoticeDialog({
-					title: 'Notification',
-					body: 'TradingView Charting Library API works correctly',
-					callback: () => {
-						console.log('Noticed!');
-					},
-				}));
-				button.innerHTML = 'Check API';
-			});
-		});
 	}
 
 	public changePair(baseSymbol: string) {
@@ -105,9 +98,9 @@ export class TVChartContainer extends React.PureComponent<Partial<ChartContainer
 			widget.onChartReady(() => {
 				if (widget) {
 
-				const chart = widget.chart();
-				const symbol = `${baseSymbol}_SAI`
-				chart.setSymbol(symbol, function e() {});
+					const chart = widget.chart();
+					const symbol = `${baseSymbol}_SAI`
+					chart.setSymbol(symbol, function e() { });
 				}
 			});
 		}
@@ -120,15 +113,49 @@ export class TVChartContainer extends React.PureComponent<Partial<ChartContainer
 		}
 	}
 
+	public componentDidUpdate(): void {
+		if (this.tvWidget) {
+			this.tvWidget.remove();
+			this.tvWidget = null;
+		}
+		// this.setState({...this.state, preset: this.props.preset });
+		const widgetOptions: ChartingLibraryWidgetOptions = {
+			symbol: `${this.props.symbol}_SAI` as string,
+			// BEWARE: no trailing slash is expected in feed URL
+			// tslint:disable-next-line:no-any
+			datafeed: new (window as any).Datafeeds.UDFCompatibleDatafeed(this.props.datafeedUrl),
+			interval: this.props.interval as ChartingLibraryWidgetOptions['interval'],
+			container_id: this.props.containerId as ChartingLibraryWidgetOptions['container_id'],
+			library_path: this.props.libraryPath as string,
+
+			locale: getLanguageFromURL() || 'en',
+			disabled_features: ['use_localstorage_for_settings'],
+			enabled_features: ['study_templates'],
+			charts_storage_url: this.props.chartsStorageUrl,
+			charts_storage_api_version: this.props.chartsStorageApiVersion,
+			client_id: this.props.clientId,
+			user_id: this.props.userId,
+			fullscreen: this.props.fullscreen,
+			autosize: this.props.autosize,
+			studies_overrides: this.props.studiesOverrides,
+			theme: this.props.theme,
+			preset: this.props.preset
+		};
+
+		const tvWidget = new widget(widgetOptions);
+		this.tvWidget = tvWidget;
+}
+
 	public render(): JSX.Element {
-		if (this.props.symbol)
-			this.changePair(this.props.symbol)
-			
-		return (
-			<div
-				id={this.props.containerId}
-				className={'TVChartContainer'}
-			/>
-		);
-	}
+	if (this.props.symbol)
+		this.changePair(this.props.symbol)
+
+
+	return (
+		<div
+			id={this.props.containerId}
+			className={'TVChartContainer'}
+		/>
+	);
+}
 }
