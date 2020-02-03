@@ -28,7 +28,7 @@
         display: block;
         padding-top: 10px;
         height: 35px;
-        z-index: 2;
+        z-index: 4;
         right: -53px;
         position:relative;
 
@@ -86,7 +86,7 @@
         padding: 20px;
         background-color: #393f49;
         animation: animateright 0.4s;
-        z-index:1;
+        z-index:3;
     }
 
     @keyframes animateright {
