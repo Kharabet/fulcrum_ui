@@ -1,58 +1,64 @@
-
-
-.trade-token-grid-tab{
-  
-  padding-top: 30px;
-  overflow: hidden;
-  &__container{
-    display: flex;
-    justify-content: center;
-  }
-
-  &__token-image{
-
-  }
-
-  &-item{
-    background-color: #fff;
-    width: 90px;
-    height: 90px;
-    margin-bottom: -10px;
-    transition: 0.3s ease-in-out all;
-    &:not(:last-child){
-      margin-right: 3px;
-    }
-    &--active{
-        transform: translateY(-10px);
-    }
-    &:hover{
-      cursor: pointer;
-      .trade-token-grid-tab-item__col-token-image {
-        opacity: 0.5;
-      }
-
+.trade-token-grid-tab {
+    padding-top: 30px;
+    overflow: hidden;
+    &__container {
+        display: flex;
+        justify-content: center;
     }
 
-    &__col-token-image{
-      height: 100%;
-      width: 100%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      img{
-        height: 60px;
-        width: auto;
-      }
+    &__token-image {
     }
-  }
 
-  
-@media screen and (max-width: $mobile-version-max-width) {
-  position: fixed;
-  bottom: 0;
-  main & ~ .footer{
-    
-    margin-bottom: 50px;
-  }
-}
+    &-item {
+        background-color: #fff;
+        width: 90px;
+        height: 90px;
+        margin-bottom: -10px;
+        transition: 0.3s ease-in-out all;
+        &:not(:last-child) {
+            margin-right: 3px;
+        }
+        &--active {
+            transform: translateY(-10px);
+        }
+        &:hover {
+            cursor: pointer;
+            .trade-token-grid-tab-item__col-token-image {
+                opacity: 0.5;
+            }
+        }
+
+        &__col-token-image {
+            height: 100%;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            img {
+                height: 60px;
+                width: auto;
+            }
+        }
+    }
+
+    @media screen and (max-width: $mobile-version-max-width) {
+        position: fixed;
+        bottom: 0;
+        z-index: 100;
+        width: 100%;
+        &-item {
+            width: auto;
+            flex: 1;
+            height: 60px;
+            &__col-token-image {
+                img {
+                    width: auto;
+                    height: 40px;
+                }
+            }
+        }
+        main & ~ .footer {
+            margin-bottom: 50px;
+        }
+    }
 }

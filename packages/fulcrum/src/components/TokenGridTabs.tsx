@@ -77,7 +77,7 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
         "trade-token-grid-tab-item--active"
         : "";
 
-    const classNamePrefix = this.props.isMobile ? "trade-token-grid-row" : "trade-token-grid-tab-item";
+    const classNamePrefix = "trade-token-grid-tab-item";
     // const onSelectClick = (event: React.MouseEvent<HTMLElement>) => {
     //   event.stopPropagation();
 
@@ -93,7 +93,7 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
     };
 
     return (
-      <div className={`classNamePrefix} ${isActiveClassName}`} onClick={onSelectClick}>
+      <div className={`${classNamePrefix} ${isActiveClassName}`} onClick={onSelectClick}>
         <div
           className={`${classNamePrefix}__col-token-image`}
           style={{ backgroundColor: assetDetails.bgColor, borderLeftColor: assetDetails.bgColor }}
