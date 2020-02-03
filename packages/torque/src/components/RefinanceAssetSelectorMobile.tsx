@@ -104,7 +104,7 @@ export class RefinanceAssetSelectorMobile extends Component<IRefinanceAssetSelec
     let isItem = false;
     this.setState({ ...this.state, isLoading: true, isItems: true });
 
-    const refinanceData = await TorqueProvider.Instance.getMakerCdps();
+    const refinanceData = await TorqueProvider.Instance.getMakerLoans();
 
     // tslint:disable-next-line
     for (let i = 0; i < refinanceData.length; i++) {

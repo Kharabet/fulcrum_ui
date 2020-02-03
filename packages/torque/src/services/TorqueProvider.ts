@@ -538,8 +538,6 @@ export class TorqueProvider {
 
   private assignCollateral = (loans: IRefinanceLoan[], deposits: IRefinanceToken[], inRatio?: BigNumber) => {
 
-    // TODO @bshevchenko: fix: isHealthy is true even if inRatio is super low << NOT RELEVANT?
-
     for (const loan of loans) {
       loan.collateral = [];
       if (inRatio) {
@@ -547,33 +545,22 @@ export class TorqueProvider {
       } else {
         inRatio = loan.ratio;
       }
-      console.log('inRatio', inRatio.toString(10));
-      console.log('wow', loan.balance.toString(), loan.usdValue.toString(), loan.usdValue.times(inRatio).toString());
       const goal = loan.usdValue.times(inRatio).dp(18, BigNumber.ROUND_FLOOR);
       let current = new BigNumber(0);
       for (const deposit of deposits) {
         let take = deposit.usdValue;
         if (current.plus(take).gt(goal)) {
-          console.log('yes');
           take = take.minus(current.plus(take).minus(goal));
-        } else {
-          console.log('no', current.toString(10), take.toString(10), current.plus(take).toString(10), goal.toString(10));
         }
-        console.log('take', take.toString(10), deposit.asset, deposit.rate.toString(10), goal.toString(10));
         loan.collateral.push({
           ...deposit,
           amount: take.div(deposit.rate),
           borrowAmount: loan.balance.div(goal.div(take))
         });
 
-        console.log('borrowAmount', loan.balance.div(goal.div(take)).toString(10), deposit.asset);
-
         // @ts-ignore
         if (inRatio.lte(deposit.maintenanceMarginAmount.div(10 ** 19))) {
           loan.isDisabled = true;
-
-          // @ts-ignore
-          console.log('mma', deposit.maintenanceMarginAmount.div(10 ** 19).toString());
         }
 
         current = current.plus(take).dp(18, BigNumber.ROUND_FLOOR);
@@ -591,6 +578,9 @@ export class TorqueProvider {
     if (!this.contractsSource || !account) {
       return [];
     }
+
+    // TODO @bshevchenko: instadapp
+
     const comptroller: CompoundComptrollerContract = await this.contractsSource.getCompoundComptrollerContract();
     const cTokens = await comptroller.getAssetsIn.callAsync(account);
 
@@ -619,7 +609,6 @@ export class TorqueProvider {
         asset = Asset.ETH;
       } else {
         asset = this.contractsSource.getAssetFromAddress(underlying);
-        console.log('underlying', underlying, asset);
       }
       if (asset === Asset.UNKNOWN) {
         continue;
@@ -636,7 +625,6 @@ export class TorqueProvider {
       }
       balance = balance.div(10 ** decimals);
       const rate = await this.getSwapRate(asset, Asset.DAI);
-      console.log('rate', asset, rate.toString(10));
       const usdValue = balance.times(rate);
       const token: IRefinanceToken = {
         asset,
@@ -668,9 +656,6 @@ export class TorqueProvider {
         inBorrowed = inBorrowed.plus(token.usdValue);
       }
     }
-
-    console.log('inSupplied', inSupplied.toString(10));
-    console.log('inBorrowed', inBorrowed.toString(10));
 
     this.assignCollateral(loans, deposits, inSupplied.div(inBorrowed));
 
@@ -734,8 +719,6 @@ export class TorqueProvider {
       }
     }
 
-    // TODO @bshevchenko: migrateSoloLoan assignCollateral
-
     this.assignCollateral(loans, deposits, inSupplied.div(inBorrowed));
 
     return loans;
@@ -746,8 +729,6 @@ export class TorqueProvider {
     if (!this.web3Wrapper || !this.contractsSource || !account) {
       return;
     }
-
-    // TODO @bshevchenko: test with more than 1 collateral type
 
     const compoundBridge: CompoundBridgeContract = await this.contractsSource.getCompoundBridgeContract();
     const promises = [];
@@ -800,12 +781,6 @@ export class TorqueProvider {
 
     borrowAmounts[0] = borrowAmounts[0].plus(amount.minus(borrowAmountsSum));
 
-    console.log('B1', borrowAmounts[0].toString(10));
-    console.log('B2', borrowAmounts[1].toString(10));
-
-    console.log('sum', borrowAmountsSum.toString(10), borrowAmounts[0].plus(borrowAmounts[1]).toString(10));
-    console.log('amount', amount.toString(10));
-
     try {
       const txHash = await compoundBridge.migrateLoan.sendTransactionAsync(
         String(loan.market), amount, assets, amounts, amounts, borrowAmounts,
@@ -825,8 +800,6 @@ export class TorqueProvider {
     if (!this.web3Wrapper || !this.contractsSource || !account) {
       return;
     }
-
-    // TODO @bshevchenko: test with more than 1 collateral type
 
     const solo: SoloContract = await this.contractsSource.getSoloContract();
     const soloBridge: SoloBridgeContract = await this.contractsSource.getSoloBridgeContract();
@@ -857,14 +830,17 @@ export class TorqueProvider {
     const borrowAmounts: BigNumber[] = [];
 
     const divider = loan.balance.div(amount);
+    loan.usdValue = loan.usdValue.div(divider);
+    loan.balance = loan.balance.div(divider);
+    this.assignCollateral([loan], loan.collateral);
 
     for (const token of loan.collateral) {
       markets.push(new BigNumber(token.market));
       amounts.push(
-        token.amount.div(divider).times(10 ** token.decimals).integerValue(BigNumber.ROUND_UP)
+        token.amount.times(10 ** token.decimals).integerValue(BigNumber.ROUND_DOWN)
       );
       borrowAmounts.push(
-        token.borrowAmount.div(divider).times(10 ** token.decimals).integerValue(BigNumber.ROUND_UP)
+        token.borrowAmount.times(10 ** token.decimals).integerValue(BigNumber.ROUND_DOWN)
       );
     }
 
@@ -872,7 +848,7 @@ export class TorqueProvider {
       amount = new BigNumber(0);
     }
 
-    amount = amount.times(10 ** loan.decimals).integerValue(BigNumber.ROUND_UP);
+    amount = amount.times(10 ** loan.decimals).integerValue(BigNumber.ROUND_DOWN);
 
     try {
       const txHash = await soloBridge.migrateLoan.sendTransactionAsync(
@@ -889,7 +865,7 @@ export class TorqueProvider {
     }
   };
 
-  public getMakerCdps = async (): Promise<RefinanceCdpData[]> => {
+  public getMakerLoans = async (): Promise<RefinanceCdpData[]> => {
     let result: RefinanceCdpData[] = [{
       cdpId: new BigNumber(0),
       urn: "",
@@ -899,10 +875,6 @@ export class TorqueProvider {
       isProxy: false,
       isInstaProxy: false
     }];
-
-    if (result) { // TODO remove
-      return result;
-    }
 
     const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
 
@@ -1115,7 +1087,8 @@ export class TorqueProvider {
               1
             ]
           );
-          const proxyActionsAddress = configAddress.proxy_Actions_Address;
+          const proxyActionsAddress = refRequest.isInstaProxy ?
+            configAddress.Insta_Proxy_Actions : configAddress.proxy_Actions_Address;
 
           try {
             // if proxy use then use this function for cdpAllow
@@ -1152,7 +1125,18 @@ export class TorqueProvider {
         const data = web3.eth.abi.encodeFunctionCall(proxyMigrationABI.default, params);
         const bridgeActionsAddress = configAddress.Bridge_Action_Address;
         try {
-          const txHash = await proxy.execute.sendTransactionAsync(bridgeActionsAddress, data, { from: refRequest.accountAddress });
+          let txHash;
+          if (refRequest.isInstaProxy) {
+            const makerBridge: makerBridgeContract = await this.contractsSource.getMakerBridge(configAddress.Maker_Bridge_Address);
+            txHash = await makerBridge.migrateLoan.sendTransactionAsync(
+              params[1], params[2], params[3], params[4], params[5],
+              { from: refRequest.accountAddress }
+            )
+          } else {
+            txHash = await proxy.execute.sendTransactionAsync(bridgeActionsAddress, data, {
+              from: refRequest.accountAddress
+            });
+          }
           const receipt = await this.waitForTransactionMined(txHash);
           if (receipt.status === 1) {
             return receipt;

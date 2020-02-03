@@ -99,21 +99,19 @@ export class RefinanceAssetSelector extends Component<IRefinanceAssetSelectorPro
     let isItem = false;
     this.setState({ ...this.state, isLoading: true, isItems: true });
 
-    const refinanceData = await TorqueProvider.Instance.getMakerCdps();
+    const refinanceData = await TorqueProvider.Instance.getMakerLoans();
 
     // await TorqueProvider.Instance.getSoloLoans(); // TODO
-    const loans = await TorqueProvider.Instance.getCompoundLoans(); // TODO
+    // onst loans = await TorqueProvider.Instance.getCompoundLoans(); // TODO
 
-    console.log('compound', loans);
-
-    if (loans.length && !loans[0].isDisabled) { // TODO
-      console.log('A', loans[0].collateral[0].amount.toString(10));
-      console.log('B', loans[0].collateral[1].amount.toString(10));
-      await TorqueProvider.Instance.migrateCompoundLoan(loans[0], loans[0].balance.div(10)); // TODO
-      // TODO @bshevchenko: migration didn't work for 100% (without div(n))
-    } else {
-      console.log('no valid loan for migration');
-    }
+    // console.log('compound', loans);
+    //
+    // if (loans.length && !loans[0].isDisabled) { // TODO
+    //   await TorqueProvider.Instance.migrateCompoundLoan(loans[0], loans[0].balance.div(10)); // TODO
+    //   // TODO @bshevchenko: migration didn't work for 100% (without div(n))
+    // } else {
+    //   console.log('no valid loan for migration');
+    // }
 
     // tslint:disable-next-line:prefer-for-of
     for (let i = 0; i < refinanceData.length; i++) {
