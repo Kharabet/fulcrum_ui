@@ -27,9 +27,9 @@
             padding: 2px;
             display: flex;
             position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
             button {
                 font-family: Muli;
 
@@ -151,6 +151,7 @@
         line-height: 150%;
         &--selected {
             background: #00c0ab;
+            color: #ffffff;
             &:hover {
                 cursor: pointer;
             }
