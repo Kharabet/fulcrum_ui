@@ -223,7 +223,7 @@ export class OwnTokenCardMobile extends Component<IOwnTokenCardMobileProps, IOwn
             <div className="own-token-card-mobile__empty">
             </div>
             <div title={this.state.assetBalance ? `$${this.state.assetBalance.toFixed(18)}` : ``} className="own-token-card-mobile__position-value">
-              <span>Interest APR</span>
+              <span>Position Value</span>
               <span>
                 {!this.state.isLoading ?
                   this.state.assetBalance ?
@@ -233,7 +233,7 @@ export class OwnTokenCardMobile extends Component<IOwnTokenCardMobileProps, IOwn
               </span>
             </div>
             <div title={this.state.profit ? `$${this.state.profit.toFixed(18)}` : ``} className="own-token-card-mobile__profit">
-              <span>Interest APR</span>
+              <span>Profit</span>
               <span>
                 {!this.state.isLoading ?
                   this.state.profit ?

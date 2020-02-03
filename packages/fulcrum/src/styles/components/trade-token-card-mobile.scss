@@ -154,11 +154,11 @@
             color: #ffffff;
             &:hover {
                 cursor: pointer;
+                color: #ffffff;
             }
         }
         &:hover:not(&--selected) {
             cursor: pointer;
-
             color: #00c0ab;
         }
     }

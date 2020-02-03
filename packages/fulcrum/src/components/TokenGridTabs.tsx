@@ -110,7 +110,7 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
     var borderColor= !!selectedAsset ? selectedAsset.bgColor : "#fff"
 
     return (
-      <div className="trade-token-grid-tab" style={!this.props.isMobile && borderColor ? { borderBottom: `2px solid ${borderColor}` } : {}}>
+      <div className="trade-token-grid-tab" style={{ borderBottom: `2px solid ${ !this.props.isMobile && borderColor && !this.state.isShowMyTokensOnly ? borderColor : "#6488ff"}` }}>
         <div className="trade-token-grid-tab__container">
           {this.props.assets.map(asset => (this.renderAsset(asset)))}
           <div className={`trade-token-grid-tab-item ${this.state.isShowMyTokensOnly ? "trade-token-grid-tab-item--active" : ""}`} onClick={this.showMyTokensOnlyChange}>
