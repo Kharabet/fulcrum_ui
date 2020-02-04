@@ -4,7 +4,7 @@
     flex-direction: row;
     justify-content: center;
 
-    padding: 1.25rem 0;
+    //padding: 1.25rem 0;
     margin-top: 15px;
     // background-color: rgba(169, 181, 199, 0.15);
   }
@@ -15,6 +15,7 @@
     }
     .on-chain-indicator__wallet-address {
       padding: 0 0.5rem;
+      border-left: solid 0px ;
     }
   }
 }
