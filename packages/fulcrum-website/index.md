@@ -18,12 +18,12 @@ title: Crypto Margin Trading with Fulcrum | bZx
                       </p>
                     <div class="flex fd-xs-c">
                         <div class="mr-30 mx-xs-auto mb-xs-30">
-                            <a href="https://fulcrum.trade/trade"
+                            <a href="https://app.fulcrum.trade/#/trade"
                                 class="button button-primary button-lg mb-25 mb-xs-15">Trade</a>
                             <p class="fs-13 lh-150 text-center c-gray">Up to 4x long/short</p>
                         </div>
                         <div class="mx-xs-auto">
-                            <a href="https://fulcrum.trade/lend"
+                            <a href="https://app.fulcrum.trade/#/lend"
                                 class="button button-secondary button-lg mb-25 mb-xs-15">Lend</a>
                             <p class="fs-13 lh-150 text-center c-gray">To earn interest</p>
                         </div>
@@ -375,7 +375,7 @@ This ensures redundancy in the margin calling process. Moreover, there is an ins
         <div class="row jc-c">
             <div class="col col-10 col-md-12 jc-sb fw-md-w">
                 <div class="order-md-1 mb-xs-30 mx-xs-auto">
-                    <a href="https://fulcrum.trade/trade" class="button button-primary button-lg mb-20">Trade</a>
+                    <a href="https://app.fulcrum.trade/#/trade" class="button button-primary button-lg mb-20">Trade</a>
                     <p class="fs-13 lh-150 text-center c-gray">Up to 4x Leverage, zero platform fees, <br />and perfect
                         liquidity</p>
                 </div>
@@ -383,7 +383,7 @@ This ensures redundancy in the margin calling process. Moreover, there is an ins
                     <p class="fs-44 fs-xs-28 fw-900 lh-140 c-primary">Start Now</p>
                 </div>
                 <div class="order-md-1 mx-xs-auto">
-                    <a href="https://fulcrum.trade/lend" class="button button-secondary button-lg mb-20">Lend</a>
+                    <a href="https://app.fulcrum.trade/#/lend" class="button button-secondary button-lg mb-20">Lend</a>
                     <p class="fs-13 lh-150 text-center c-gray">To Earn interest</p>
                 </div>
             </div>
