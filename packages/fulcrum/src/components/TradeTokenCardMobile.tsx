@@ -180,7 +180,7 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
       <div className="trade-token-card-mobile">
         <div className="trade-token-card-mobile__header">
           <div className="asset-name">
-            <span>{this.state.assetDetails.displayName}&nbsp;&nbsp;</span>
+            <span>{this.state.assetDetails.displayName}&nbsp;</span>
             <PositionTypeMarkerAlt assetDetails={this.state.assetDetails} value={this.props.positionType} />
           </div>
           <div className="poisition-type-switch">
