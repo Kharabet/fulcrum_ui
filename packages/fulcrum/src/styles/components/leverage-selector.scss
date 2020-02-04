@@ -1,52 +1,71 @@
+.leverage-selector__wrapper {
+    display: flex;
+    align-items: center;
+    height: 100%;
+}
 .leverage-selector {
-  display: inline-block;
-  vertical-align: middle;
+    display: inline-block;
+    vertical-align: middle;
+    padding: 2px;
+    border-radius: 100px;
+    display: flex;
+    background-color: rgba(169, 181, 199, 0.15);
 
-  height: 48px;
-  padding-bottom: 2px;
-  padding-top: 2px;
-  
-  border-radius: 100px;
-  background-color: rgba(169, 181, 199, 0.15);
+    @media only screen and (max-width: $mobile-version-max-width) {
+        display: flex;
+        list-style-type: none;
+        padding: 2px;
+        background-color: #3d4651;
+        border-radius: 30px;
+        color: #fff;
+
+        height: auto;
+    }
 }
 
 .leverage-selector__item {
-  display: inline-block;
-  vertical-align: top;
+    display: inline-block;
+    vertical-align: top;
 
+    line-height: initial;
 
-  // height: 2.5rem;
-  // width: 2.5rem;
-  line-height: 22px;
+    list-style: none;
 
-  list-style: none;
-
-  border-style: none;
-  border-radius: 100px;
-
-  font-size: 0.75rem;
-  font-weight: normal;
-  font-style: normal;
-  font-stretch: normal;
-  letter-spacing: -0.3px;
-  text-align: center;
-  color: #ffffff;
-
-  font-style: normal;
-  font-weight: 800;
-  font-size: 16px;
-
-  padding: 13px 16px;
-  &--selected {
     border-style: none;
-    background-color: #00C0AB;
-    &:hover{
-      cursor: pointer
-    }
-  }
-  &:hover:not(&--selected){
-    cursor: pointer;
+    border-radius: 100px;
 
-    color: #00C0AB;
-  }
+    font-size: 0.75rem;
+    font-weight: normal;
+    font-style: normal;
+    font-stretch: normal;
+    letter-spacing: -0.3px;
+    text-align: center;
+    color: #ffffff;
+
+    font-style: normal;
+    font-weight: 800;
+    font-size: 16px;
+
+    padding: 13px 15px;
+    &:hover:not(&--selected) {
+        cursor: pointer;
+        color: #00c0ab;
+    }
+    &--selected {
+        border-style: none;
+        background-color: #00c0ab;
+        color: #ffffff;
+        &:hover {
+            cursor: pointer;
+            color: #ffffff;
+        }
+    }
+
+    @media only screen and (max-width: $mobile-version-max-width) {
+        padding: 6px 8.5px;
+        border-radius: 30px;
+        font-weight: 800;
+        font-size: 12px;
+        line-height: 150%;
+    }
 }

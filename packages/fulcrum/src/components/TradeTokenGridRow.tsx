@@ -61,7 +61,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
       interestRate: new BigNumber(0),
       balance: new BigNumber(0),
       version: 2,
-      isLoading:true
+      isLoading: true
     };
 
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
@@ -141,7 +141,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
     if (
       prevState.leverage !== this.state.leverage ||
       (prevProps.selectedKey.toString() === prevTradeTokenKey.toString()) !==
-        (this.props.selectedKey.toString() === currentTradeTokenKey.toString())
+      (this.props.selectedKey.toString() === currentTradeTokenKey.toString())
     ) {
       this.derivedUpdate();
     }
@@ -176,35 +176,37 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
         </div> */}
         <div className="trade-token-grid-row__col-token-name">
           {/*<span className="rounded-mark">?</span>*/}
-          <div className= "trade-token-grid-row__col-token-name--inner">
+          <div className="trade-token-grid-row__col-token-name--inner">
             {this.state.assetDetails.displayName}
-            <PositionTypeMarkerAlt assetDetails={this.state.assetDetails} value={this.props.positionType}/>
+            <PositionTypeMarkerAlt assetDetails={this.state.assetDetails} value={this.props.positionType} />
           </div>
         </div>
         <div className="trade-token-grid-row__col-position-type">
           <PositionTypeMarker value={this.props.positionType} />
         </div>
         <div className="trade-token-grid-row__col-leverage">
-          <LeverageSelector
-            value={this.state.leverage}
-            minValue={this.props.positionType === PositionType.SHORT ? 1 : 2}
-            maxValue={4}
-            onChange={this.onLeverageSelect}
-          />
+          <div className="leverage-selector__wrapper">
+            <LeverageSelector
+              value={this.state.leverage}
+              minValue={this.props.positionType === PositionType.SHORT ? 1 : 2}
+              maxValue={4}
+              onChange={this.onLeverageSelect}
+            />
+          </div>
         </div>
         <div title={`$${bnPrice.toFixed(18)}`} className="trade-token-grid-row__col-price">
           {!this.state.isLoading ?
-          <React.Fragment><span className="fw-normal">$</span>{bnPrice.toFixed(2)}</React.Fragment> : 'Loading...'}
+            <React.Fragment><span className="fw-normal">$</span>{bnPrice.toFixed(2)}</React.Fragment> : 'Loading...'}
         </div>
         <div title={`$${bnLiquidationPrice.toFixed(18)}`} className="trade-token-grid-row__col-price">
           {!this.state.isLoading ?
-             <React.Fragment><span className="fw-normal">$</span>{bnLiquidationPrice.toFixed(2)}</React.Fragment> : 'Loading...'}
+            <React.Fragment><span className="fw-normal">$</span>{bnLiquidationPrice.toFixed(2)}</React.Fragment> : 'Loading...'}
         </div>
         {/*<div className="trade-token-grid-row__col-change24h">
           <Change24HMarker value={bnChange24h} size={Change24HMarkerSize.MEDIUM} />
         </div>*/}
         <div title={this.state.interestRate.gt(0) ? `${this.state.interestRate.toFixed(18)}%` : ``} className="trade-token-grid-row__col-profit">
-          {this.state.interestRate.gt(0) ?  <React.Fragment>{this.state.interestRate.toFixed(4)}<span className="fw-normal">%</span></React.Fragment> : "Loading..."}
+          {this.state.interestRate.gt(0) ? <React.Fragment>{this.state.interestRate.toFixed(4)}<span className="fw-normal">%</span></React.Fragment> : "Loading..."}
         </div>
         {this.renderActions(this.state.balance.eq(0))}
       </div>

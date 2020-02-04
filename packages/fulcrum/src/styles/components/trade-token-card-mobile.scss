@@ -131,35 +131,4 @@
             color: #ffffff;
         }
     }
-
-    .leverage-selector {
-        display: flex;
-        list-style-type: none;
-        padding: 2px;
-        background-color: #3d4651;
-        border-radius: 30px;
-        color: #fff;
-
-        height: auto;
-    }
-
-    .leverage-selector__item {
-        padding: 6px 8.5px;
-        border-radius: 30px;
-        font-weight: 800;
-        font-size: 12px;
-        line-height: 150%;
-        &--selected {
-            background: #00c0ab;
-            color: #ffffff;
-            &:hover {
-                cursor: pointer;
-                color: #ffffff;
-            }
-        }
-        &:hover:not(&--selected) {
-            cursor: pointer;
-            color: #00c0ab;
-        }
-    }
 }
