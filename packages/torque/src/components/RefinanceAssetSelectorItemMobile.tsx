@@ -62,6 +62,7 @@ export class RefinanceAssetSelectorItemMobile extends Component<IRefinanceAssetS
           isProxy: false,
           isInstaProxy: false,
           isDisabled: false,
+          isDust: false,
           isShowCard: false,
           variableAPR: new BigNumber(0)
         }]

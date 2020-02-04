@@ -42,7 +42,7 @@ export class ContractsSource {
   private vatJson: any;
   private cdpJson: any;
   private makerBridgeJson: any;
-  private proxyRegistryJson :any;
+  private proxyRegistryJson: any;
   private dsProxyIsAllowJson: any;
   private dsProxyJson: any;
   private proxyMigrationsJson: any;
@@ -218,7 +218,7 @@ export class ContractsSource {
             break;
         }
         break;
-      }
+    }
 
     return address;
   }
@@ -494,43 +494,53 @@ export class ContractsSource {
     await this.Init();
     return new erc20Contract(this.erc20Json.abi, addressErc20.toLowerCase(), this.provider);
   }
+
   private async getCdpContractRaw(addressCdp: string): Promise<GetCdpsContract> {
     await this.Init();
     return new GetCdpsContract(this.cdpsJson.abi, addressCdp.toLowerCase(), this.provider);
   }
+
   private async getVatContractRaw(addressVat: string): Promise<vatContract> {
     await this.Init();
     return new vatContract(this.vatJson.abi, addressVat.toLowerCase(), this.provider);
   }
+
   private async getCdpManagerRaw(addressCdp: string): Promise<cdpManagerContract> {
     await this.Init();
     return new cdpManagerContract(this.cdpJson.abi, addressCdp.toLowerCase(), this.provider);
   }
+
   private async getMakerBridgeRaw(address: string): Promise<makerBridgeContract> {
     await this.Init();
     return new makerBridgeContract(this.makerBridgeJson.abi, address.toLowerCase(), this.provider);
   }
+
   private async getProxyRegistryRaw(address: string): Promise<proxyRegistryContract> {
     await this.Init();
     return new proxyRegistryContract(this.proxyRegistryJson.abi, address.toLowerCase(), this.provider);
   }
+
   private async getDsProxyRaw(address: string): Promise<dsProxyJsonContract> {
     await this.Init();
     return new dsProxyJsonContract(this.dsProxyJson.abi, address.toLowerCase(), this.provider);
   }
+
   private async getSaiToDaiBridgeRaw(address: string): Promise<saiToDAIBridgeContract> {
     await this.Init();
     return new saiToDAIBridgeContract(this.saiToDAIBridgeJson.abi, address.toLowerCase(), this.provider);
   }
+
   private async getInstaRegistryRaw(address: string): Promise<instaRegistryContract> {
     await this.Init();
     return new instaRegistryContract(this.instaRegistryJson.abi, address.toLowerCase(), this.provider);
   }
-  private async getDsProxyAllowJSON(){
+
+  private async getDsProxyAllowJSON() {
     return this.dsProxyIsAllowJson;
   }
-  private async getProxyMigrationJSON(){
-    return this.proxyMigrationsJson
+
+  private async getProxyMigrationJSON() {
+    return this.proxyMigrationsJson;
   }
 
 

@@ -63,6 +63,7 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
           isProxy: false,
           isInstaProxy: false,
           isDisabled: false,
+          isDust: false,
           isShowCard: false,
           variableAPR: new BigNumber(0)
         }]
@@ -225,9 +226,9 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
             {this.state.refinanceData[0].isDisabled ? (
               <div className="refinance-asset-selector__row">
                 <div className="refinance-asset-selector__loanBlank">
-
-                  <div className="refinance-title-text">Collateralization should be more than 150%</div>
-
+                  <div className="refinance-title-text">
+                    {this.state.refinanceData[0].isDust ? "Dust" : "Collateralization should be more than 150%"}
+                  </div>
                 </div>
                 <div className="refinance-asset-selector__loan">
                   <div

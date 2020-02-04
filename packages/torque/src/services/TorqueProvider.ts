@@ -1002,21 +1002,22 @@ export class TorqueProvider {
       isProxy,
       isInstaProxy,
       isDisabled: false,
+      isDust: false,
       isShowCard: false,
       variableAPR: new BigNumber(0)
     }];
     if (this.web3Wrapper && this.contractsSource) {
       const vat: vatContract = await this.contractsSource.getVatContract(configAddress.MCD_VAT_Address);
 
-      const resp = await vat.urns.callAsync(ilk, urn);
-      const respIlks = await vat.ilks.callAsync(ilk);
+      const urnData = await vat.urns.callAsync(ilk, urn);
+      const ilkData = await vat.ilks.callAsync(ilk);
 
-      const rateIlk = respIlks[1].dividedBy(10 ** 27);
+      const rateIlk = ilkData[1].dividedBy(10 ** 27);
       let ratio = new BigNumber(0);
       let maintenanceMarginAmount = new BigNumber(1);
-      const collateralAmount = resp[0].dividedBy(10 ** 18);
-      let debtAmount = resp[1].dividedBy(10 ** 18);
-      const rateAmountIlkPerSecond = respIlks[1].dividedBy(10 ** 26);
+      const collateralAmount = urnData[0].dividedBy(10 ** 18);
+      let debtAmount = urnData[1].dividedBy(10 ** 18);
+      const rateAmountIlkPerSecond = ilkData[1].dividedBy(10 ** 26);
       const rateAmountIlkYr = rateAmountIlkPerSecond.multipliedBy(60 * 60 * 24 * 365).dividedBy(10 ** 8);
 
       let collateralType: string = this.hex2a(ilk);
@@ -1042,8 +1043,20 @@ export class TorqueProvider {
         isDisabled = false;
       }
 
+      if (cdpId.toString(10) == '735') {
+        console.log('ratio', ratio.times(100).toString(10));
+        console.log('mma', maintenanceMarginAmount.toString(10));
+        console.log('asset', asset);
+      }
+
+      let isDust = false;
+      if (urnData[1].times(ilkData[1]).lt(ilkData[4])) {
+        // isDisabled = true;
+        isDust = true;
+      }
+
       result = [{
-        collateralAmount: resp[0].dividedBy(10 ** 18),
+        collateralAmount: urnData[0].dividedBy(10 ** 18),
         debt: debtAmount,
         collateralType,
         cdpId,
@@ -1052,6 +1065,7 @@ export class TorqueProvider {
         isProxy,
         isInstaProxy,
         isDisabled,
+        isDust,
         isShowCard,
         variableAPR: rateAmountIlkYr
       }];
@@ -1062,6 +1076,8 @@ export class TorqueProvider {
 
   public migrateMakerLoan = async (refRequest: RefinanceData, loanAmount: BigNumber) => {
 
+    // TODO @bshevchenko: disable dust loans
+
     const cdpManagerAddress = configAddress.CDP_MANAGER;
     if (this.web3Wrapper && this.contractsSource) {
 
@@ -1069,9 +1085,9 @@ export class TorqueProvider {
 
       const collateralAmount = refRequest.collateralAmount.dividedBy(refRequest.debt.dividedBy(loanAmount));
       // @ts-ignore
-      const darts = web3.utils.toWei(loanAmount.dp(18, BigNumber.ROUND_FLOOR).toString());
+      const dart = web3.utils.toWei(loanAmount.dp(18, BigNumber.ROUND_UP).toString());
       // @ts-ignore
-      const dinks = web3.utils.toWei(collateralAmount.dp(18, BigNumber.ROUND_FLOOR).toString());
+      const dink = web3.utils.toWei(collateralAmount.dp(18, BigNumber.ROUND_FLOOR).toString());
 
       if (refRequest.isProxy) {
         const proxy: dsProxyJsonContract = await this.contractsSource.getDsProxy(refRequest.proxyAddress);
@@ -1116,11 +1132,12 @@ export class TorqueProvider {
         const params = [
           configAddress.Maker_Bridge_Address,
           [refRequest.cdpId.toString()],
-          [darts],
-          [dinks],
-          [dinks],
-          [darts]
+          [dart],
+          [dink],
+          [dink],
+          [dart]
         ];
+
         // @ts-ignore
         const data = web3.eth.abi.encodeFunctionCall(proxyMigrationABI.default, params);
         const bridgeActionsAddress = configAddress.Bridge_Action_Address;
@@ -1158,7 +1175,7 @@ export class TorqueProvider {
 
           try {
             if (receipt.status) {
-              const result = await makerBridge.migrateLoan.sendTransactionAsync([refRequest.cdpId], [new BigNumber(darts)], [new BigNumber(dinks)], [new BigNumber(dinks)], [new BigNumber(darts)], { from: refRequest.accountAddress });
+              const result = await makerBridge.migrateLoan.sendTransactionAsync([refRequest.cdpId], [new BigNumber(dart)], [new BigNumber(dink)], [new BigNumber(dink)], [new BigNumber(dart)], { from: refRequest.accountAddress });
               receipt = await this.waitForTransactionMined(result);
               if (receipt.status === 1) {
                 return receipt;
@@ -1175,7 +1192,7 @@ export class TorqueProvider {
         } else {
           const makerBridge: makerBridgeContract = await this.contractsSource.getMakerBridge(configAddress.Maker_Bridge_Address);
           try {
-            const cdpsMakerResult = await makerBridge.migrateLoan.sendTransactionAsync([refRequest.cdpId], [darts], [dinks], [dinks], [darts], { from: refRequest.accountAddress });
+            const cdpsMakerResult = await makerBridge.migrateLoan.sendTransactionAsync([refRequest.cdpId], [dart], [dink], [dink], [dart], { from: refRequest.accountAddress });
             const receipt = await this.waitForTransactionMined(cdpsMakerResult);
             if (receipt.status === 1) {
               return receipt;
