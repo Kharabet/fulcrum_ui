@@ -50,63 +50,63 @@ permalink: lending
                     <div class="icon-50 mr-15 mr-xs-9">
                         {% include svg/sai.svg %}
                     </div>
-                    <div>
-                        <p class="lh-180 fw-700 c-gray">SAI</p>
-                        <p class="fs-24 c-primary"><span class="fw-800 apr-value">5.3</span>%</p>
+                    <div class="wrap-apr-value">
+                        <p class="lh-100 fw-700 c-gray">SAI</p>
+                        <p class="fs-24 c-primary lh-125"><span class="fw-800 apr-value">5.3</span>%</p>
                     </div>
                 </div>
                 <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-token="knc">
                     <div class="icon-50 mr-15 mr-xs-9">
                         {% include svg/knc.svg %}
                     </div>
-                    <div>
-                        <p class="lh-180 fw-700 c-gray">KNC</p>
-                        <p class="fs-24 c-primary"><span class="fw-800 apr-value">5.3</span>%</p>
+                    <div class="wrap-apr-value">
+                        <p class="lh-100 fw-700 c-gray">KNC</p>
+                        <p class="fs-24 c-primary lh-125"><span class="fw-800 apr-value">5.3</span>%</p>
                     </div>
                 </div>
                 <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-token="zrx">
                     <div class="icon-50 mr-15 mr-xs-9">
                         {% include svg/zrx.svg %}
                     </div>
-                    <div>
-                        <p class="lh-180 fw-700 c-gray">ZRX</p>
-                        <p class="fs-24 c-primary"><span class="fw-800 apr-value">1.6</span>%</p>
+                    <div class="wrap-apr-value">
+                        <p class="lh-100 fw-700 c-gray">ZRX</p>
+                        <p class="fs-24 c-primary lh-125"><span class="fw-800 apr-value">1.6</span>%</p>
                     </div>
                 </div>
-                <div class="flex mr-20 mb-xs-30 apr-component" data-token="eth">
+                <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-token="eth">
                     <div class="icon-50 mr-15 mr-xs-9">
                         {% include svg/eth.svg %}
                     </div>
-                    <div>
-                        <p class="lh-180 fw-700 c-gray">ETH</p>
-                        <p class="fs-24 c-primary"><span class="fw-800 apr-value">4.2</span>%</p>
+                    <div class="wrap-apr-value">
+                        <p class="lh-100 fw-700 c-gray">ETH</p>
+                        <p class="fs-24 c-primary lh-125"><span class="fw-800 apr-value">4.2</span>%</p>
                     </div>
                 </div>
-                <div class="flex mr-20 mb-xs-30 apr-component" data-token="link">
+                <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-token="link">
                     <div class="icon-50 mr-15 mr-xs-9">
                         {% include svg/link.svg %}
                     </div>
-                    <div>
-                        <p class="lh-180 fw-700 c-gray">LINK</p>
-                        <p class="fs-24 c-primary"><span class="fw-800 apr-value">4,2</span>%</p>
+                    <div class="wrap-apr-value">
+                        <p class="lh-100 fw-700 c-gray">LINK</p>
+                        <p class="fs-24 c-primary lh-125"><span class="fw-800 apr-value">4,2</span>%</p>
                     </div>
                 </div>
-                <div class="flex mr-20 mb-xs-30 apr-component" data-token="susd">
+                <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-token="susd">
                     <div class="icon-50 mr-15 mr-xs-9">
                         {% include svg/susd.svg %}
                     </div>
-                    <div>
-                        <p class="lh-180 fw-700 c-gray">sUSD</p>
-                        <p class="fs-24 c-primary"><span class="fw-800 apr-value">4.2</span>%</p>
+                    <div class="wrap-apr-value">
+                        <p class="lh-100 fw-700 c-gray">sUSD</p>
+                        <p class="fs-24 c-primary lh-125"><span class="fw-800 apr-value">4.2</span>%</p>
                     </div>
                 </div>
-                <div class="flex mr-20 mb-xs-30 apr-component" data-token="wbtc">
+                <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-token="wbtc">
                     <div class="icon-50 mr-15 mr-xs-9">
                         {% include svg/wbtc.svg %}
                     </div>
-                    <div>
-                        <p class="lh-180 fw-700 c-gray">WBTC</p>
-                        <p class="fs-24 c-primary"><span class="fw-800 apr-value">4.2</span>%</p>
+                    <div class="wrap-apr-value">
+                        <p class="lh-100 fw-700 c-gray">WBTC</p>
+                        <p class="fs-24 c-primary lh-125"><span class="fw-800 apr-value">4.2</span>%</p>
                     </div>
                 </div>
             </div>
@@ -238,9 +238,9 @@ permalink: lending
                     </div>
                     <div class="flex fd-c input-calc">
                         <p class="fs-18 mb-15 mb-md-0 c-dark-gray text-md-center">Quantity</p>
-                        <input type="number" class="input-quantity" value="10" />
+                        <input type="number" class="input-quantity" value="5000" />
                         <div class="border-range-quantity">                            
-                            <input class="range-quantity" type="range" value="10" min="1" max="1000000"/>
+                            <input class="range-quantity" type="range" value="5000" min="1" max="1000000"/>
                             <div class="left-range-quantity"></div>
                             <div class="right-range-quantity"></div>
                             <div class="track-range-quantity"></div>
@@ -342,25 +342,9 @@ permalink: lending
     </div>
 </section>
 
-<section class="bg-primary py-60 pt-xs-90 pb-xs-45 text-center">
-    <div class="container">
-        <div class="row">
-            <div class="col col-12 fd-c">
-                <h2 class="mb-25">Continuously-compounding interest </h2>
-                <p class="fs-20 fs-xs-16 lh-150 fw-600 c-primary mb-25">While you were reading this page Fulcrum lenders earn on
-                    assets</p>
-                <div class="item-timer">
-                    <span><span class="wrap-hours"><span class="hours">23</span>:</span><span class="minutes">0</span>:<span class="seconds">00</span></span>
-                </div>
-                <p class="fs-56 fs-xs-44 fw-400 c-primary-blue mb-40 mb-xs-30 lh-140">$<span class="fw-900 live-earnings-value">45,459,300</span></p>
-                <a href="https://fulcrum.trade/lend" class="button button-secondary button-lg mb-15 mx-auto order-sm-1">Lend</a>
-                <p class="fs-13 lh-150 text-center c-gray mb-10 mb-sm-25">To Earn interest</p>
-            </div>
-        </div>
-    </div>
-</section>
 
-<section class="bg-primary text-center pt-60 pb-135 pb-md-30">
+
+<section class="bg-primary text-center pt-60 pb-60 pb-md-30 pt-120">
     <div class="container">
         <div class="row">
             <div class="col col-12 fd-c">
@@ -385,6 +369,16 @@ permalink: lending
                     <p class="c-dark-gray mt-25 mw-400 mx-auto">Enter the quantity and confirm transaction</p>
                 </div>
             </div>
+        </div>
+    </div>
+</section>
+<section class="bg-primary py-60 pt-xs-90 pb-xs-45 text-center">
+    <div class="container">
+        <div class="row">
+        <div class="col col-12 fd-c">
+                        <a href="https://fulcrum.trade/lend" class="button button-secondary button-lg mb-15 mx-auto order-sm-1">Lend</a>
+            <p class="fs-13 lh-150 text-center c-gray mb-10 mb-sm-25">To Earn interest</p>
+        </div>
         </div>
     </div>
 </section>
