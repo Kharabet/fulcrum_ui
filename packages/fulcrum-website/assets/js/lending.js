@@ -32,7 +32,21 @@ function renderAPR() {
     updateEarningsCalc(quantityInput.value);
 
     clearInterval(window.aprRenderer);
+
+    if (window.aprRenderer)
+        clearInterval(window.aprRenderer);
+
+    ///set data polling to update widgets every 60 secs
+    if (!window.aprPolling)
+        window.aprPolling = setInterval(updateData, 1000 * 60);
+
 }
+
+async function updateData() {
+    await (getData)(['apr', 'rates']);
+    renderAPR();
+}
+
 
 function timer() {
     var wrapHours = document.querySelector('.wrap-hours');
