@@ -19,7 +19,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
                         <div class="mr-30 mx-xs-auto mb-xs-30">
                             <a href="https://app.fulcrum.trade/#/trade"
                                 class="button button-primary button-lg mb-25 mb-xs-15">Trade</a>
-                            <p class="fs-13 lh-150 text-center c-gray">Up to 4x long/short</p>
+                            <p class="fs-13 lh-150 text-center c-gray">Up to 5x long/short</p>
                         </div>
                         <div class="mx-xs-auto">
                             <a href="https://app.fulcrum.trade/#/lend"
@@ -119,6 +119,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
                     <button type="button" class="button-gains active" data-leverage="2">2x</button>
                     <button type="button" class="button-gains" data-leverage="3">3x</button>
                     <button type="button" class="button-gains" data-leverage="4">4x</button>
+                    <button type="button" class="button-gains" data-leverage="5">5x</button>
                 </div>
             </div>   
             <div class="wrapper-result-gain f-3 flex fd-c">
@@ -375,7 +376,7 @@ This ensures redundancy in the margin calling process. Moreover, there is an ins
             <div class="col col-10 col-md-12 jc-sb fw-md-w">
                 <div class="order-md-1 mb-xs-30 mx-xs-auto">
                     <a href="https://app.fulcrum.trade/#/trade" class="button button-primary button-lg mb-20">Trade</a>
-                    <p class="fs-13 lh-150 text-center c-gray">Up to 4x Leverage, zero platform fees, <br />and perfect
+                    <p class="fs-13 lh-150 text-center c-gray">Up to 5x Leverage, zero platform fees, <br />and perfect
                         liquidity</p>
                 </div>
                 <div class="w-md-100 mb-md-25">
