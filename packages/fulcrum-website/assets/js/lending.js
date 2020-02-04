@@ -13,7 +13,7 @@ var wrapperFinance = document.querySelector('.wrapper-finance');
 var calcWidgetResult = document.querySelector(".result-calc .earn-usd-value");
 var liveEarningsElem = document.querySelector(".live-earnings-value");
 
-(getData)(['apr', 'rates', 'tvl']);
+(getData)(['apr', 'rates']);
 
 function renderAPR() {
     if (!window.apr) return
@@ -33,21 +33,6 @@ function renderAPR() {
 
     clearInterval(window.aprRenderer);
 }
-
-function renderTVL() {
-    if (!window.tvl) return
-    var tvl = window.tvl;
-    var tvlValueElements = document.querySelectorAll(".tvl-value");
-    tvlValueElements.forEach(function (item) {
-        var token = item.dataset.token;
-        if (tvl[token])
-            item.textContent = numberWithCommas(new Number(tvl[token]).toFixed(0));
-    });
-
-    clearInterval(window.tvlRenderer);
-}
-
-
 
 function timer() {
     var wrapHours = document.querySelector('.wrap-hours');
@@ -102,7 +87,6 @@ function changePositionBorderThumb(range, current) {
 window.addEventListener('load', function () {
 
     window.aprRenderer = setInterval(renderAPR, 100);
-    window.tvlRenderer = setInterval(renderTVL, 100);
 
     //change active button-coin
     for (var i = 0; i < coins.length; i++) {
