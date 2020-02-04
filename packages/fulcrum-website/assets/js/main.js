@@ -64,10 +64,10 @@ function renderTVL() {
 
     ///set data polling to update widgets every 60 secs
     if (!window.tvlPolling)
-        window.tvlPolling = setInterval(updateData, 1000 * 60);
+        window.tvlPolling = setInterval(updateTvl, 1000 * 60);
 }
 
-async function updateData() {
+async function updateTvl() {
     await (getData)(['tvl']);
     renderTVL();
 }
