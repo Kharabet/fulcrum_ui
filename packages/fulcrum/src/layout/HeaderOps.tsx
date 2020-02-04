@@ -47,7 +47,9 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
         { id: 0, title: "Home", link: "/", external: false },
         { id: 1, title: "Lend", link: "/lend", external: false },
         { id: 2, title: "Trade", link: "/trade", external: false },
-        { id: 3, title: "Faq", link: "https://bzx.network/faq-fulcrum.html", external: true }
+        { id: 3, title: "Borrow", link: "https://torque.loans", external: true },
+        { id: 4, title: "Faq", link: "https://bzx.network/faq-fulcrum.html", external: true },
+        { id: 5, title: "Stats", link: "/stats", external: false },
       ]
     };
 
@@ -75,7 +77,9 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
         { id: 0, title: "Home", link: "/", external: false },
         { id: 1, title: "Lend", link: "/lend", external: false },
         { id: 2, title: "Trade", link: "/trade", external: false },
-        { id: 3, title: "Faq", link: "https://bzx.network/faq-fulcrum.html", external: true }
+        { id: 3, title: "Borrow", link: "https://torque.loans", external: true },
+        { id: 4, title: "Faq", link: "https://bzx.network/faq-fulcrum.html", external: true },
+        { id: 5, title: "Stats", link: "/stats", external: false },
       ]
     };
     const toggleImg = !this.state.isMenuOpen ? menu_icon : ic_close;
