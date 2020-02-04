@@ -417,7 +417,7 @@ export class TorqueProvider {
 
     let result: BigNumber = new BigNumber(0);
 
-    if (process.env.REACT_APP_ETH_NETWORK === "mainnet") {
+    if (process.env.REACT_APP_ETH_NETWORK === "mainnet" || process.env.REACT_APP_ETH_NETWORK === "kovan") {
       if (!srcAmount) {
         srcAmount = TorqueProvider.UNLIMITED_ALLOWANCE_IN_BASE_UNITS;
       } else {
@@ -1113,7 +1113,7 @@ export class TorqueProvider {
             }
           );
           // console.log(txHash);
-        } else { // manageCollateralRequest.isWithdrawal == true
+        } else { // manageCollateralRequest.isWithdrawal === true
 
           let gasAmountBN;
           try {

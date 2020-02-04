@@ -10,23 +10,42 @@ export interface ILendTokenSelectorProps {
 }
 
 export class LendTokenSelector extends Component<ILendTokenSelectorProps> {
-  private readonly assets: Asset[] = [
-    Asset.ETH,
-    Asset.SAI,
-    Asset.DAI,
-    Asset.USDC,
-    Asset.SUSD,
-    Asset.WBTC,
-    Asset.LINK,
-    // Asset.MKR,
-    Asset.ZRX,
-    // Asset.BAT,
-    Asset.REP,
-    Asset.KNC
-  ];
+  private static assets: Asset[];
+
+  constructor(props: ILendTokenSelectorProps) {
+    super(props);
+
+    if (process.env.REACT_APP_ETH_NETWORK === "kovan") {
+      LendTokenSelector.assets = [
+        Asset.ETH,
+        Asset.SAI,
+        Asset.DAI
+      ];
+    } if (process.env.REACT_APP_ETH_NETWORK === "ropsten") {
+      LendTokenSelector.assets = [
+        Asset.ETH,
+        Asset.DAI
+      ];
+    } else {
+      LendTokenSelector.assets = [
+        Asset.ETH,
+        Asset.SAI,
+        Asset.DAI,
+        Asset.USDC,
+        Asset.SUSD,
+        Asset.WBTC,
+        Asset.LINK,
+        // Asset.MKR,
+        Asset.ZRX,
+        // Asset.BAT,
+        Asset.REP,
+        Asset.KNC
+      ]
+    }
+  }
 
   public render() {
-    const tokenItems = this.assets.map(e => <LendTokenSelectorItem key={e} asset={e} onLend={this.props.onLend} onFulcrumMcdBridge={this.props.onFulcrumMcdBridge} />);
+    const tokenItems = LendTokenSelector.assets.map(e => <LendTokenSelectorItem key={e} asset={e} onLend={this.props.onLend} onFulcrumMcdBridge={this.props.onFulcrumMcdBridge} />);
 
     return <div className="lend-token-selector">{tokenItems}</div>;
   }

@@ -120,6 +120,8 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
             isLong={this.state.isLong}
             isShort={this.state.isShort}
             changeActiveBtn={this.changeActiveBtn.bind(this)}
+            showMyTokensOnly={this.state.showMyTokensOnly}
+            onShowMyTokensOnlyChange={this.onShowMyTokensOnlyChange}
           />
           {this.state.showMyTokensOnly ? (
             <OwnTokenGrid
@@ -129,6 +131,7 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
               onDetails={this.onDetails}
               onManageCollateral={this.onManageCollateralRequested}
               onSelect={this.onSelect}
+              isMobileMedia={this.props.isMobileMedia}
               onTrade={this.onTradeRequested}
             />
           ) : (

@@ -8,13 +8,11 @@ import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents"
 import { FulcrumProvider } from "../services/FulcrumProvider";
 
 export interface IStatsTokenGridCardProps {
-  asset: Asset;
+  reserveDetails: ReserveDetails;
 }
 
 interface IStatsTokenGridCardState {
   assetDetails: AssetDetails | null;
-  reserveDetails: ReserveDetails;
-  swapPrice: BigNumber | null;
   usdSupply: BigNumber | null;
   usdTotalLocked: BigNumber | null;
   decimals: number;
@@ -26,8 +24,6 @@ export class StatsTokenGridCard extends Component<IStatsTokenGridCardProps, ISta
 
     this.state = {
       assetDetails: null,
-      reserveDetails: ReserveDetails.getEmpty(),
-      swapPrice: null,
       usdSupply: null,
       usdTotalLocked: null,
       decimals: 18
@@ -37,37 +33,11 @@ export class StatsTokenGridCard extends Component<IStatsTokenGridCardProps, ISta
   }
 
   private async derivedUpdate() {
-    const assetDetails = await AssetsDictionary.assets.get(this.props.asset);
-    const swapPrice = await FulcrumProvider.Instance.getSwapToUsdRate(this.props.asset);
-    const reserveDetails = await FulcrumProvider.Instance.getReserveDetails(this.props.asset);
-
-    let decimals = 18;
-    let usdSupply: BigNumber | null = null;
-    let usdTotalLocked: BigNumber | null = null;
-    if (assetDetails) {
-      decimals = assetDetails.decimals;
-      if (reserveDetails && reserveDetails.totalSupply) {
-        const precision = new BigNumber(10 ** (18 - decimals));
-        reserveDetails.totalSupply = reserveDetails.totalSupply!.times(precision);
-        reserveDetails.totalBorrow = reserveDetails.totalBorrow!.times(precision);
-        reserveDetails.liquidity = reserveDetails.liquidity!.times(precision);
-        reserveDetails.liquidityReserved = reserveDetails.liquidityReserved!.times(precision);
-        reserveDetails.lockedAssets = reserveDetails.lockedAssets!.times(precision);
-        if (swapPrice) {
-          usdSupply = reserveDetails.totalSupply!.times(swapPrice); // .div(10**(18-decimals));
-          usdTotalLocked = reserveDetails.liquidity!.plus(reserveDetails.lockedAssets!).times(swapPrice);
-        }
-      }
-    }
+    const assetDetails = await AssetsDictionary.assets.get(this.props.reserveDetails.asset!);
 
     this.setState({
       ...this.state,
       assetDetails: assetDetails || null,
-      reserveDetails: reserveDetails || ReserveDetails.getEmpty(),
-      usdSupply: usdSupply,
-      usdTotalLocked: usdTotalLocked,
-      swapPrice: swapPrice,
-      decimals
     });
   }
 
@@ -104,11 +74,44 @@ export class StatsTokenGridCard extends Component<IStatsTokenGridCardProps, ISta
   }*/
 
   public render() {
+    const details = this.props.reserveDetails;
+
+    if (this.props.reserveDetails.asset === Asset.UNKNOWN) {
+      return (
+        <div className="stats-grid-card">
+          <div className="stats-grid-card__details-container">
+            <div className="stats-grid-card__kv-container">
+              <div className="stats-grid-card__kv-title">
+                <span className="">All Assets - TLV (USD)</span>
+              </div>
+              <div className="stats-grid-card__kv-dots" />
+              <div
+                title={details.usdTotalLocked ? `$${details.usdTotalLocked.toFixed(18)}` : ``}
+                className="stats-grid-card__kv-value"
+              >
+                {details.usdTotalLocked ? `$${this.numberWithCommas(details.usdTotalLocked.toFixed(4))}` : `-`}
+              </div>
+            </div>
+            <div className="stats-grid-card__kv-container">
+              <div className="stats-grid-card__kv-title">
+                <span className="">All Assets - Total Supply (USD)</span>
+              </div>
+              <div className="stats-grid-card__kv-dots" />
+              <div
+                title={details.usdSupply ? `$${details.usdSupply.toFixed(18)}` : ``}
+                className="stats-grid-card__kv-value"
+              >
+                {details.usdSupply ? `$${this.numberWithCommas(details.usdSupply.toFixed(4))}` : `-`}
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     if (!this.state.assetDetails) {
       return null;
     }
-
-    const details = this.state.reserveDetails;
 
     return (
       <div className="stats-grid-card">
@@ -121,10 +124,10 @@ export class StatsTokenGridCard extends Component<IStatsTokenGridCardProps, ISta
             </div>
             <div className="stats-grid-card__kv-dots" />
             <div
-              title={this.state.usdTotalLocked ? `$${this.state.usdTotalLocked.toFixed(18)}` : ``}
+              title={details.usdTotalLocked ? `$${details.usdTotalLocked.toFixed(18)}` : ``}
               className="stats-grid-card__kv-value"
             >
-              {this.state.usdTotalLocked ? `$${this.numberWithCommas(this.state.usdTotalLocked.toFixed(4))}` : `-`}
+              {details.usdTotalLocked ? `$${this.numberWithCommas(details.usdTotalLocked.toFixed(4))}` : `-`}
             </div>
           </div>
           <div className="stats-grid-card__kv-container">
@@ -133,10 +136,10 @@ export class StatsTokenGridCard extends Component<IStatsTokenGridCardProps, ISta
             </div>
             <div className="stats-grid-card__kv-dots" />
             <div
-              title={this.state.usdSupply ? `$${this.state.usdSupply.toFixed(18)}` : ``}
+              title={details.usdSupply ? `$${details.usdSupply.toFixed(18)}` : ``}
               className="stats-grid-card__kv-value"
             >
-              {this.state.usdSupply ? `$${this.numberWithCommas(this.state.usdSupply.toFixed(4))}` : `-`}
+              {details.usdSupply ? `$${this.numberWithCommas(details.usdSupply.toFixed(4))}` : `-`}
             </div>
           </div>
           <div className="stats-grid-card__kv-container">
@@ -259,7 +262,7 @@ export class StatsTokenGridCard extends Component<IStatsTokenGridCardProps, ISta
           <img src={this.state.assetDetails.logoSvg} alt={this.state.assetDetails.displayName} />
         </div>
         <div className="stats-grid-row__col-name" style={{ textDecoration: `underline` }}>
-          {this.props.asset}
+          {details.asset!}
         </div>
       </a>
     ) : (
@@ -267,7 +270,7 @@ export class StatsTokenGridCard extends Component<IStatsTokenGridCardProps, ISta
         <div className="stats-grid-card__image">
           <img src={this.state.assetDetails.logoSvg} alt={this.state.assetDetails.displayName} />
         </div>
-        <div className="stats-grid-row__col-name">{this.props.asset}</div>
+        <div className="stats-grid-row__col-name">{details.asset!}</div>
       </div>
     );
   }

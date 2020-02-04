@@ -263,11 +263,13 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
   };
 
   public componentWillUnmount(): void {
+    window.history.back();
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
   public componentDidMount(): void {
     this.derivedUpdate();
+    window.history.pushState(null, "Trade Modal Opened", `/#/trade/${this.props.tradeType.toLocaleLowerCase()}-${this.props.leverage}x-${this.props.positionType.toLocaleLowerCase()}-${this.props.asset}/`);
 
     if (this._input) {
       this._input.select();
@@ -335,7 +337,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
           : (this.state.tradeAmountValue.gt(0) && this.state.slippageRate.eq(0))
             && (this.state.collateral === Asset.ETH || !this.state.maybeNeedsApproval)
             ? ``// `Your trade is too small.`
-            : this.state.slippageRate.gt(0) // gte(0.2)
+            : this.state.slippageRate.gt(0) && this.state.slippageRate.lt(99) // gte(0.2)
               ? `Slippage:`
               : "";
 
@@ -389,7 +391,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
                   <img className="asset-logo" src={this.state.assetDetails.logoSvg} alt={tokenNameBase} />
                   <PositionTypeMarkerAlt assetDetails={this.state.assetDetails} value={this.props.positionType} />
                 </div>
-                <div className="trade-form__info_block__asset" style={{color: this.state.assetDetails.textColor}}>
+                <div className="trade-form__info_block__asset" style={this.props.asset === Asset.WBTC ? {color: this.state.assetDetails.textColor, paddingTop: `1rem` } : {color: this.state.assetDetails.textColor}}>
                   {tokenNameBase}
                 </div>
                 <div className="trade-form__info_block__stats"  style={{color: this.state.assetDetails.textColor2}}>
@@ -408,7 +410,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
                   <img className="asset-logo" src={this.state.assetDetails.logoSvg} alt={tokenNameBase} />
                   <PositionTypeMarkerAlt assetDetails={this.state.assetDetails} value={this.props.positionType} />
                 </div>
-                <div className="trade-form__info_block__asset" style={{color: this.state.assetDetails.textColor}}>
+                <div className="trade-form__info_block__asset" style={this.props.asset === Asset.WBTC ? {color: this.state.assetDetails.textColor, paddingTop: `1rem` } : {color: this.state.assetDetails.textColor}}>
                   {tokenNameBase}
                 </div>
                 <div className="trade-form__info_block__stats"  style={{color: this.state.assetDetails.textColor2}}>

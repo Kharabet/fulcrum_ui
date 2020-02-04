@@ -1,5 +1,6 @@
 import { BigNumber } from "@0x/utils";
 import React, { ChangeEvent, Component, FormEvent } from "react";
+import TagManager from 'react-gtm-module';
 import { Observable, Subject } from "rxjs";
 import { debounceTime, switchMap } from "rxjs/operators";
 import { ActionType } from "../domain/ActionType";
@@ -12,8 +13,6 @@ import { TorqueProvider } from "../services/TorqueProvider";
 import { ActionViaTransferDetails } from "./ActionViaTransferDetails";
 import { ActionViaWeb3Details } from "./ActionViaWeb3Details";
 import { CollateralTokenSelectorToggle } from "./CollateralTokenSelectorToggle";
-import TagManager from 'react-gtm-module';
-import {FulcrumProvider} from "../../../fulcrum/src/services/FulcrumProvider";
 
 export interface IBorrowFormProps {
   borrowAsset: Asset;
@@ -211,10 +210,10 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
           });
         }
       }
-      let randomNumber = Math.floor(Math.random() * 100000) + 1;
-      const usdAmount = await TorqueProvider.Instance.getSwapToUsdRate(this.props.borrowAsset)
+      const randomNumber = Math.floor(Math.random() * 100000) + 1;
+      const usdAmount = await TorqueProvider.Instance.getSwapToUsdRate(this.props.borrowAsset);
       let usdPrice = this.state.borrowAmount
-      if(usdPrice != null){
+      if (usdPrice !== null){
           usdPrice = usdPrice.multipliedBy(usdAmount)
       }
       const tagManagerArgs = {

@@ -72,9 +72,11 @@ export class AppRouter extends Component<any, IAppRouterState> {
   public render() {
     return (
       <React.Fragment>
-        { isMainnetProd ? (
+        { isMainnetProd && !this.state.isMobileMedia ? (
+
           <Intercom appID="dfk4n5ut" />
         ) : null }
+
         <Modal
           isOpen={this.state.isProviderMenuModalOpen}
           onRequestClose={this.onRequestClose}
@@ -143,10 +145,17 @@ export class AppRouter extends Component<any, IAppRouterState> {
   }
 
   public doNetworkConnect = () => {
+    const isMobileMedia = (window.innerWidth <= 959);
+    if(this.state.isMobileMedia){
+      this.onProviderTypeSelect(ProviderType.MetaMask)
+    }else{
+      this.setState({ ...this.state, isProviderMenuModalOpen: true });
+    }
     this.setState({ ...this.state, isProviderMenuModalOpen: true });
   };
 
   public onProviderTypeSelect = async (providerType: ProviderType) => {
+
     if (providerType !== FulcrumProvider.Instance.providerType ||
       providerType !== ProviderType.None && FulcrumProvider.Instance.accounts.length === 0 || !FulcrumProvider.Instance.accounts[0]) {
       FulcrumProvider.Instance.isLoading = true;
