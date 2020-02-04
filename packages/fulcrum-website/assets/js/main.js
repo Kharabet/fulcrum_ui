@@ -48,7 +48,37 @@ async function getTVL() {
     return result;
 };
 
+
+function renderTVL() {
+    if (!window.tvl) return
+    var tvl = window.tvl;
+    var tvlValueElements = document.querySelectorAll(".tvl-value");
+    tvlValueElements.forEach(function (item) {
+        var token = item.dataset.token;
+        if (tvl[token])
+            item.textContent = numberWithCommas(new Number(tvl[token]).toFixed(0));
+    });
+
+    if (window.tvlRenderer)
+        clearInterval(window.tvlRenderer);
+
+    ///set data polling to update widgets every 60 secs
+    if (!window.tvlPolling)
+        window.tvlPolling = setInterval(updateTvl, 1000 * 60);
+}
+
+async function updateTvl() {
+    await (getData)(['tvl']);
+    renderTVL();
+}
+
+
+(getData)(['tvl']);
+
 window.addEventListener('load', function () {
+    
+    window.tvlRenderer = setInterval(renderTVL, 100);
+
     //switch theme
     var toggleSwitch = document.querySelector('.theme-switch input[type="checkbox"]');
     if (currentTheme === null) {
