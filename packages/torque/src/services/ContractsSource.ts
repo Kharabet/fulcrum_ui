@@ -522,7 +522,7 @@ export class ContractsSource {
         address = ""; // TODO
         break;
       case 42:
-        address = "0x0d6d5dc43aAaE6193B6ae81cDd88d5B92F2bbCCf";
+        address = "0x3A1DB6DC0c411C042276104aFEaAB23E0A8B0e28"; // "0x3A4a525d6B4609A9d01B156eEB9B7FCD3df2D37c";
         break;
     }
     return address;
@@ -556,7 +556,7 @@ export class ContractsSource {
   }
 
   public async Init() {
-    if (ContractsSource.isInit) {
+    if (ContractsSource.isInit && this.erc20Json) {
       return;
     }
     const network = ethNetwork || "1";
