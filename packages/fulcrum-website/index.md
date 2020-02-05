@@ -13,7 +13,8 @@ title: Crypto Margin Trading with Fulcrum | bZx
             <div class="col col-10 col-xs-12">
                 <div class="pl-55 pl-lg-0 w-100 text-xs-center">
                     <h1 class="mb-40">Margin made simple</h1>
-                    <p class="fs-16 fs-xs-12 lh-160 mb-50 c-secondary"><span class="fw-600">Fulcrum</span> is the first and only completely trustless platform for decentralized lending and margin trading. Permissionless and rent-free with no accounts or platform fees, Fulcrum offers the simplest, most powerful way to lend and margin trade.
+                    <p class="fs-16 fs-xs-12 lh-160 mb-50 c-secondary"><span class="fw-600">Fulcrum</span> is a powerful DeFi platform for tokenized lending and margin trading.
+
                       </p>
                     <div class="flex fd-xs-c">
                         <div class="mr-30 mx-xs-auto mb-xs-30">
@@ -65,7 +66,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
                         {% include svg/step-3.svg %}
                     </div>
                     <h3 class="mb-20">Everything is Tokenized</h3>
-                    <p>iTokens (tokenized margin loans) earn the holder interest on borrowed funds and pTokens (tokenized margin positions) provide static leverage and variable interest rates.</p>
+                    <p>iTokens (margin loans) earn holders interest on borrowed funds and pTokens (margin positions) provide static leverage and variable interest rates.</p>
                 </div>
             </div>
             <div class="col col-4 col-sm-6 col-xs-12">
@@ -74,7 +75,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
                         {% include svg/step-4.svg %}
                     </div>
                     <h3 class="mb-20">Minimal Liquidation Penalties</h3>
-                    <p>Undercollateralized positions are only liquidated enough to bring margin maintenance from 15% to 25%, protecting lenders while allowing traders to maintain positions with reduced losses.</p>
+                    <p>Positions that become undercollateralized are only liquidated enough to bring margin maintenance from 15% to 25%.</p>
                 </div>
             </div>
             <div class="col col-4 col-sm-6 col-xs-12">
@@ -83,7 +84,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
                         {% include svg/step-5.svg %}
                     </div>
                     <h3 class="mb-20">Perpetual Positions</h3>
-                    <p>Enjoy a frictionless trading experience with trading positions that automatically renew with no intervention from the trader and zero rollover fees.</p>
+                    <p>Enjoy a frictionless trading experience with positions that automatically renew and zero rollover fees.</p>
                 </div>
             </div>
         </div>
@@ -162,7 +163,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
         <div class="row">
             <div class="col col-12 fd-c">
                 <h2 class="circle jc-c mb-25"><span class="blue center top-r-60"></span>How to open a leveraged position?</h2>
-                <p class="fs-20 fs-sm-16 lh-150 c-secondary-blue mb-75 mb-sm-60">Three clicks. No Accounts. No fees.</p>
+                <p class="fs-20 fs-sm-16 lh-150 c-secondary-blue mb-75 mb-sm-60">Select an asset, set your leverage, and go long or short</p>
             </div>
         </div>
         <div class="row jc-c">
@@ -190,7 +191,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
     <div class="container text-center">
         <div class="row">
             <div class="col col-12 jc-c">
-                <h3 class="mb-40">Fulcrum supports leveraging, shorting and lending of </h3>
+                <h3 class="mb-40">Fulcrum supports leveraging, shorting, and lending of:</h3>
             </div>
         </div>
         <div class="row">
@@ -267,15 +268,14 @@ title: Crypto Margin Trading with Fulcrum | bZx
                     {% include svg/icon-safe-1.svg %}
                 </div>
                 <h3 class="mb-20">Audited Smart Contracts</h3>
-                <p>The bZx base protocol has been successfully audited by leading blockchain security auditor ZK Labs, headed by Matthew DiFerrante, Dean Eigenmann, Nick Johnson, and Harry Roberts and available <a href="https://github.com/mattdf/audits/blob/master/bZx/bzx-audit.pdf">here.</a></p>
+                <p>The bZx base protocol has been <a href="https://github.com/mattdf/audits/blob/master/bZx/bzx-audit.pdf">successfully audited</a> by leading blockchain security auditor ZK Labs.</p>
             </div>
             <div class="col col-4 col-sm-12 item-safe fd-c">
                 <div class="icon-safe mb-50 mb-xs-15">
                     {% include svg/icon-safe-2.svg %}
                 </div>
                 <h3 class="mb-20">Insurance Fund</h3>
-                <p>10% of the interest paid by borrowers goes to an Insurance Fund for mitigating potential losses suffered by lenders in the event that undercollateralized loans are not properly liquidated.
-            </p>
+                <p>If undercollateralized loans are not properly liquidated, lenders are repaid from a pool funded by 10% of the interest paid by borrowers.</p>
             </div>
             <div class="col col-4 col-sm-12 item-safe fd-c">
                 <div class="icon-safe mb-50 mb-xs-15">
@@ -376,7 +376,7 @@ This ensures redundancy in the margin calling process. Moreover, there is an ins
             <div class="col col-10 col-md-12 jc-sb fw-md-w">
                 <div class="order-md-1 mb-xs-30 mx-xs-auto">
                     <a href="https://app.fulcrum.trade/#/trade" class="button button-primary button-lg mb-20">Trade</a>
-                    <p class="fs-13 lh-150 text-center c-gray">Up to 5x Leverage, zero platform fees, <br />and perfect
+                    <p class="fs-13 lh-150 text-center c-gray">Up to 5x Leverage, <br />and perfect
                         liquidity</p>
                 </div>
                 <div class="w-md-100 mb-md-25">
@@ -384,7 +384,7 @@ This ensures redundancy in the margin calling process. Moreover, there is an ins
                 </div>
                 <div class="order-md-1 mx-xs-auto">
                     <a href="https://app.fulcrum.trade/#/lend" class="button button-secondary button-lg mb-20">Lend</a>
-                    <p class="fs-13 lh-150 text-center c-gray">To Earn interest</p>
+                    <p class="fs-13 lh-150 text-center c-gray">To earn interest</p>
                 </div>
             </div>
         </div>
