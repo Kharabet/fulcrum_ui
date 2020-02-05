@@ -552,15 +552,16 @@ export class TorqueProvider {
         if (current.plus(take).gt(goal)) {
           take = take.minus(current.plus(take).minus(goal));
         }
+        const maintenanceMarginAmount = await this.getMaintenanceMarginAmount(loan.asset, deposit.underlying);
         loan.collateral.push({
           ...deposit,
           amount: take.div(deposit.rate),
           borrowAmount: loan.balance.div(goal.div(take)),
-          maintenanceMarginAmount: await this.getMaintenanceMarginAmount(loan.asset, deposit.underlying)
+          maintenanceMarginAmount
         });
 
         // @ts-ignore
-        if (inRatio.lte(deposit.maintenanceMarginAmount.div(10 ** 19))) {
+        if (inRatio.lte(maintenanceMarginAmount.div(10 ** 19))) {
           loan.isDisabled = true;
         }
 
@@ -872,6 +873,10 @@ export class TorqueProvider {
       isProxy: false,
       isInstaProxy: false
     }];
+
+    if (result) { // TODO @bshevchenko: remove
+      return result;
+    }
 
     const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
 
