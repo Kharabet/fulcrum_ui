@@ -102,8 +102,8 @@ export class RefinanceAssetSelector extends Component<IRefinanceAssetSelectorPro
     const refinanceData = await TorqueProvider.Instance.getMakerLoans();
 
     // await TorqueProvider.Instance.getSoloLoans(); // TODO
-    // onst loans = await TorqueProvider.Instance.getCompoundLoans(); // TODO
 
+    // const loans = await TorqueProvider.Instance.getCompoundLoans(); // TODO
     // console.log('compound', loans);
     //
     // if (loans.length && !loans[0].isDisabled) { // TODO

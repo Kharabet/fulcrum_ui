@@ -335,6 +335,99 @@ export class ContractsSource {
     return asset;
   }
 
+  private getAddressFromAssetRaw(asset: Asset): string {
+    let address: string = "";
+
+    switch (this.networkId) {
+      case 1:
+        // noinspection SpellCheckingInspection
+        switch (asset) {
+          case Asset.ETH:
+          case Asset.WETH:
+            address = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";
+            break;
+          case Asset.SAI:
+            address = "0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359";
+            break;
+          case Asset.DAI:
+            address = "0x6b175474e89094c44da98b954eedeac495271d0f";
+            break;
+          case Asset.USDC:
+            address = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48";
+            break;
+          case Asset.SUSD:
+            address = "0x57ab1ec28d129707052df4df418d58a2d46d5f51";
+            break;
+          case Asset.WBTC:
+            address = "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599";
+            break;
+          case Asset.LINK:
+            address = "0x514910771af9ca656af840dff83e8264ecf986ca";
+            break;
+          case Asset.MKR:
+            address = "0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2";
+            break;
+          case Asset.ZRX:
+            address = "0xe41d2489571d322189246dafa5ebde1f4699f498";
+            break;
+          case Asset.BAT:
+            address = "0x0d8775f648430679a709e98d2b0cb6250d2887ef";
+            break;
+          case Asset.REP:
+            address = "0x1985365e9f78359a9b6ad760e32412f4a445e862";
+            break;
+          case Asset.KNC:
+            address = "0xdd974d5c2e2928dea5f71b9825b8b646686bd200";
+            break;
+        }
+        break;
+      case 4:
+        switch (asset) {
+          case Asset.ETH:
+          case Asset.WETH:
+            address = "0xc778417e063141139fce010982780140aa0cd5ab";
+            break;
+          case Asset.DAI:
+            address = "0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea";
+            break;
+          case Asset.REP:
+            address = "0x6e894660985207feb7cf89faf048998c71e8ee89";
+            break;
+        }
+        break;
+      case 42:
+        switch (asset) {
+          case Asset.ETH:
+          case Asset.WETH:
+            address = "0xd0a1e359811322d97991e03f863a0c30c2cf029c";
+            break;
+          case Asset.SAI:
+            address = "0xc4375b7de8af5a38a93548eb8453a498222c4ff2";
+            break;
+          case Asset.DAI:
+            address = "0x4f96fe3b7a6cf9725f59d353f723c1bdb64ca6aa";
+            break;
+          case Asset.USDC:
+            address = "0x75b0622cec14130172eae9cf166b92e5c112faff";
+            break;
+        }
+        break;
+    }
+
+    return address;
+  }
+
+  private static getAssetFromIlkRaw(ilk: string): Asset {
+    const hex = ilk.toString(); // force conversion
+    let str = "";
+    for (let i = 0; (i < hex.length && hex.substr(i, 2) !== '00'); i += 2) {
+      str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+    }
+    const symbol = str.split("-")[0].substring(1);
+    // @ts-ignore
+    return Asset[symbol];
+  }
+
   private async getiTokenContractRaw(asset: Asset): Promise<iTokenContract> {
     await this.Init();
     return new iTokenContract(
@@ -429,7 +522,7 @@ export class ContractsSource {
         address = ""; // TODO
         break;
       case 42:
-        address = "0x3A4a525d6B4609A9d01B156eEB9B7FCD3df2D37c";
+        address = "0x0d6d5dc43aAaE6193B6ae81cDd88d5B92F2bbCCf";
         break;
     }
     return address;
@@ -564,6 +657,8 @@ export class ContractsSource {
   public getiBZxContract = _.memoize(this.getiBZxContractRaw);
   public getiTokenContract = _.memoize(this.getiTokenContractRaw);
   public getAssetFromAddress = _.memoize(this.getAssetFromAddressRaw);
+  public getAssetFromIlk = _.memoize(ContractsSource.getAssetFromIlkRaw);
+  public getAddressFromAsset = _.memoize(this.getAddressFromAssetRaw);
   public getOracleContract = _.memoize(this.getOracleContractRaw);
   public getiENSOwnerContract = _.memoize(this.getiENSOwnerContractRaw);
 }

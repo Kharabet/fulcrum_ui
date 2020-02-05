@@ -431,7 +431,7 @@ export class TorqueProvider {
   }
 
   public async getSwapRate(srcAsset: Asset, destAsset: Asset, srcAmount?: BigNumber): Promise<BigNumber> {
-    if (srcAsset === destAsset || (srcAsset === Asset.USDC && destAsset === Asset.DAI) 
+    if (srcAsset === destAsset || (srcAsset === Asset.USDC && destAsset === Asset.DAI)
       || (srcAsset === Asset.DAI && destAsset === Asset.USDC)) {
       return new BigNumber(1);
     }
@@ -517,26 +517,26 @@ export class TorqueProvider {
     return result;
   };
 
-  public hex2a = (_hex: string): string => {
-    const hex = _hex.toString(); // force conversion
-    let str = "";
-    for (let i = 0; (i < hex.length && hex.substr(i, 2) !== '00'); i += 2) {
-      str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
-    }
-    return str;
-  };
-
-  private getMaintenanceMarginAmount = async (asset: Asset): Promise<BigNumber> => {
+  private getMaintenanceMarginAmount = async (asset: Asset, collateralTokenAddress: string): Promise<BigNumber> => {
     if (!this.contractsSource) {
       throw new Error("contractsSource is not defined");
     }
-    const iToken = await this.contractsSource.getiTokenContract(asset);
-    const hash = await iToken.loanOrderHashes.callAsync(new BigNumber(2 * 10 ** 18));
-    const data = await iToken.loanOrderData.callAsync(hash);
-    return data[3];
+    return new BigNumber("150"); // TODO @bshevchenko
+    // const iToken = await this.contractsSource.getiTokenContract(asset);
+    // console.log("collateralTokenAddress", collateralTokenAddress);
+    // // @ts-ignore
+    // const leverageAmount = web3.utils.soliditySha3(
+    //   { "type": "uint256", "value": new BigNumber(2 * 10 ** 18) },
+    //   { "type": "address", "value": collateralTokenAddress }
+    // );
+    // // @ts-ignore
+    // const hash = await iToken.loanOrderHashes.callAsync(web3.utils.keccak256(leverageAmount));
+    // console.log("hash", hash);
+    // const data = await iToken.loanOrderData.callAsync(hash);
+    // return data[3];
   };
 
-  private assignCollateral = (loans: IRefinanceLoan[], deposits: IRefinanceToken[], inRatio?: BigNumber) => {
+  private assignCollateral = async (loans: IRefinanceLoan[], deposits: IRefinanceToken[], inRatio?: BigNumber) => {
 
     for (const loan of loans) {
       loan.collateral = [];
@@ -555,7 +555,8 @@ export class TorqueProvider {
         loan.collateral.push({
           ...deposit,
           amount: take.div(deposit.rate),
-          borrowAmount: loan.balance.div(goal.div(take))
+          borrowAmount: loan.balance.div(goal.div(take)),
+          maintenanceMarginAmount: await this.getMaintenanceMarginAmount(loan.asset, deposit.underlying)
         });
 
         // @ts-ignore
@@ -605,7 +606,7 @@ export class TorqueProvider {
       const cToken = await this.contractsSource.getCTokenContract(cTokens[i]);
       let asset;
       const underlying = await cToken.underlying.callAsync();
-      if (underlying === '0x0000000000000000000000000000000000000000') {
+      if (underlying === "0x0000000000000000000000000000000000000000") {
         asset = Asset.ETH;
       } else {
         asset = this.contractsSource.getAssetFromAddress(underlying);
@@ -624,7 +625,7 @@ export class TorqueProvider {
         }
       }
       balance = balance.div(10 ** decimals);
-      const rate = await this.getSwapRate(asset, Asset.DAI);
+      const rate = await this.getSwapToUsdRate(asset);
       const usdValue = balance.times(rate);
       const token: IRefinanceToken = {
         asset,
@@ -633,14 +634,10 @@ export class TorqueProvider {
         usdValue,
         market: cToken.address,
         contract: cToken,
-        decimals
+        decimals,
+        underlying
       };
       if (isDeposit) {
-        if (asset === Asset.USDC) { // TODO tmp
-          token.maintenanceMarginAmount = await this.getMaintenanceMarginAmount(Asset.DAI);
-        } else {
-          token.maintenanceMarginAmount = await this.getMaintenanceMarginAmount(asset);
-        }
         deposits.push(token);
         inSupplied = inSupplied.plus(token.usdValue);
       } else {
@@ -691,7 +688,7 @@ export class TorqueProvider {
       if (!balance.gt(0)) {
         continue;
       }
-      const rate = await this.getSwapRate(asset, Asset.DAI);
+      const rate = await this.getSwapToUsdRate(asset);
       const usdValue = balance.times(rate);
       const token: IRefinanceToken = {
         asset,
@@ -699,10 +696,10 @@ export class TorqueProvider {
         balance,
         usdValue,
         market,
-        decimals
+        decimals,
+        underlying: tokens[i]
       };
       if (balances[i].sign) {
-        token.maintenanceMarginAmount = await this.getMaintenanceMarginAmount(asset);
         deposits.push(token);
         inSupplied = inSupplied.plus(token.usdValue);
       } else {
@@ -719,7 +716,7 @@ export class TorqueProvider {
       }
     }
 
-    this.assignCollateral(loans, deposits, inSupplied.div(inBorrowed));
+    await this.assignCollateral(loans, deposits, inSupplied.div(inBorrowed));
 
     return loans;
   };
@@ -759,7 +756,7 @@ export class TorqueProvider {
     const divider = loan.balance.div(amount);
     loan.usdValue = loan.usdValue.div(divider);
     loan.balance = loan.balance.div(divider);
-    this.assignCollateral([loan], loan.collateral);
+    await this.assignCollateral([loan], loan.collateral);
 
     const assets: string[] = [];
     const amounts: BigNumber[] = [];
@@ -832,7 +829,7 @@ export class TorqueProvider {
     const divider = loan.balance.div(amount);
     loan.usdValue = loan.usdValue.div(divider);
     loan.balance = loan.balance.div(divider);
-    this.assignCollateral([loan], loan.collateral);
+    await this.assignCollateral([loan], loan.collateral);
 
     for (const token of loan.collateral) {
       markets.push(new BigNumber(token.market));
@@ -1020,9 +1017,9 @@ export class TorqueProvider {
       const rateAmountIlkPerSecond = ilkData[1].dividedBy(10 ** 26);
       const rateAmountIlkYr = rateAmountIlkPerSecond.multipliedBy(60 * 60 * 24 * 365).dividedBy(10 ** 8);
 
-      let collateralType: string = this.hex2a(ilk);
-      if (collateralType.toString().indexOf("ETH") !== -1) {
-        collateralType = "ETH";
+      const collateralAsset: Asset = this.contractsSource.getAssetFromIlk(ilk);
+      if (collateralAsset === Asset.UNKNOWN) {
+        return result;
       }
 
       debtAmount = debtAmount.multipliedBy(rateIlk);
@@ -1030,23 +1027,19 @@ export class TorqueProvider {
       if (parseFloat(collateralAmount.toString()) > 0 && parseFloat(debtAmount.toString()) > 0) {
         isShowCard = true;
 
-        // @ts-ignore
-        const rate = await this.getSwapRate(Asset[collateralType], asset);
+        const rate = await this.getSwapRate(collateralAsset, asset);
 
         ratio = rate.times(collateralAmount).div(debtAmount);
 
-        maintenanceMarginAmount = await this.getMaintenanceMarginAmount(asset);
+        maintenanceMarginAmount = await this.getMaintenanceMarginAmount(
+          // @ts-ignore
+          asset, this.contractsSource.getAddressFromAsset(collateralAsset)
+        );
       }
 
       let isDisabled = true;
       if (ratio.times(100).gte(maintenanceMarginAmount)) {
         isDisabled = false;
-      }
-
-      if (cdpId.toString(10) == '735') {
-        console.log('ratio', ratio.times(100).toString(10));
-        console.log('mma', maintenanceMarginAmount.toString(10));
-        console.log('asset', asset);
       }
 
       let isDust = false;
@@ -1058,7 +1051,7 @@ export class TorqueProvider {
       result = [{
         collateralAmount: urnData[0].dividedBy(10 ** 18),
         debt: debtAmount,
-        collateralType,
+        collateralType: collateralAsset,
         cdpId,
         accountAddress,
         proxyAddress,
@@ -1148,7 +1141,7 @@ export class TorqueProvider {
             txHash = await makerBridge.migrateLoan.sendTransactionAsync(
               params[1], params[2], params[3], params[4], params[5],
               { from: refRequest.accountAddress }
-            )
+            );
           } else {
             txHash = await proxy.execute.sendTransactionAsync(bridgeActionsAddress, data, {
               from: refRequest.accountAddress

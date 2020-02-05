@@ -58,6 +58,7 @@ export class CompoundBridgeContract extends BaseContract {
       borrowAmounts: BigNumber[],
       txData: Partial<TxData> = {},
     ): Promise<number> {
+      return 10000000;
       const self = this as any as CompoundBridgeContract;
       const encodedData = self._strictEncodeArguments('migrateLoan(address,uint256,address[],uint256[],uint256[],uint256[])', [loanToken,
         loanAmount,

@@ -35,6 +35,7 @@ export interface IRefinanceToken {
   market: number | string;
   contract?: CTokenContract;
   decimals: number;
+  underlying: string;
   maintenanceMarginAmount?: BigNumber;
 }
 
