@@ -22,13 +22,14 @@
         &--active {
             transform: translateY(-10px);
         }
-        &:hover {
-            cursor: pointer;
-            .trade-token-grid-tab-item__col-token-image {
-                opacity: 0.5;
+        &:not(&--active){
+            &:hover {
+                cursor: pointer;
+                .trade-token-grid-tab-item__col-token-image {
+                    opacity: 0.5;
+                }
             }
         }
-
         &__col-token-image {
             height: 100%;
             width: 100%;

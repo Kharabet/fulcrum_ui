@@ -108,7 +108,7 @@ export class AssetsDictionary {
         link_logo,
         link_bg,
         link_ts,
-        "#FFFFFF",
+        "#2A5ADA",
         "#ffffff",
         "#ffffff",
         new Map<number, string | null>([
