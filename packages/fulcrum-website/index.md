@@ -66,7 +66,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
                         {% include svg/step-3.svg %}
                     </div>
                     <h3 class="mb-20">Everything is Tokenized</h3>
-                    <p>iTokens (margin loans) earn holders interest on borrowed funds and pTokens (margin positions) provide static leverage and variable interest rates.</p>
+                    <p>iTokens (margin loans) earn holders interest on borrowed funds and pTokens (tokenized margin positions) allow your margin positions to be composable.</p>
                 </div>
             </div>
             <div class="col col-4 col-sm-6 col-xs-12">

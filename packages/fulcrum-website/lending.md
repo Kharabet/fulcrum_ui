@@ -13,7 +13,7 @@ permalink: lending
             <div class="col col-10 col-xs-12">
                 <div class="pl-55 pl-lg-0">
                     <h1 class="mb-40">Earn Interest on Crypto</h1>
-                    <p class="fs-16 lh-160 mb-50 mx-xs-auto mb-xs-30 c-secondary mw-390">Flexible, high-yield returns – No minimum deposit, no lock-up period, withdraw anytime.</p>
+                    <p class="fs-16 lh-160 mb-50 mx-xs-auto mb-xs-30 c-secondary mw-390">Flexible, high-yield returns – no minimum deposit, no lock-up period, withdraw anytime.</p>
                     <div class="flex fd-xs-c">
                         <div class="flex ai-c wrap-white mr-25 mx-xs-auto apr-component" data-token="dai">
                             <div class="icon-66 icon-sm-50 mr-15">
