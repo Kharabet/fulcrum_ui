@@ -874,10 +874,6 @@ export class TorqueProvider {
       isInstaProxy: false
     }];
 
-    if (result) { // TODO @bshevchenko: remove
-      return result;
-    }
-
     const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
 
     if (this.web3Wrapper && this.contractsSource && account) {

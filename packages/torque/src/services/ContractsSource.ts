@@ -522,7 +522,7 @@ export class ContractsSource {
         address = ""; // TODO
         break;
       case 42:
-        address = "0x3A1DB6DC0c411C042276104aFEaAB23E0A8B0e28"; // "0x3A4a525d6B4609A9d01B156eEB9B7FCD3df2D37c";
+        address = "0xF8F41d2E18B0200cF655fe4094E3dB7D622b9eC3"; // "0x3A4a525d6B4609A9d01B156eEB9B7FCD3df2D37c";
         break;
     }
     return address;
