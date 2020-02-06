@@ -828,6 +828,11 @@ export class TorqueProvider {
     const borrowAmounts: BigNumber[] = [];
 
     const divider = loan.balance.div(amount);
+
+    if (amount.isEqualTo(loan.balance)) {
+      amount = new BigNumber(0);
+    }
+
     loan.usdValue = loan.usdValue.div(divider);
     loan.balance = loan.balance.div(divider);
     await this.assignCollateral([loan], loan.collateral);
@@ -840,10 +845,6 @@ export class TorqueProvider {
       borrowAmounts.push(
         token.borrowAmount.times(10 ** token.decimals).integerValue(BigNumber.ROUND_DOWN)
       );
-    }
-
-    if (amount.isEqualTo(loan.balance)) {
-      amount = new BigNumber(0);
     }
 
     amount = amount.times(10 ** loan.decimals).integerValue(BigNumber.ROUND_DOWN);
@@ -873,6 +874,10 @@ export class TorqueProvider {
       isProxy: false,
       isInstaProxy: false
     }];
+
+    if (result) { // TODO @bshevchenko: remove
+      return result;
+    }
 
     const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
 
