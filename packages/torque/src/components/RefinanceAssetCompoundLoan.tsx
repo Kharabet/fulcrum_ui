@@ -40,8 +40,16 @@ export class RefinanceAssetCompoundLoan extends Component<IRefinanceAssetCompoun
 
   private derivedUpdate = async () => {
     // const refinanceCompoundData = await TorqueProvider.Instance.checkSoloMargin();
-    const loans = await TorqueProvider.Instance.getCompoundLoans();
+    const loans = await TorqueProvider.Instance.getCompoundLoans(); // TODO
+
+    if (loans.length) {
+      console.log("compound", loans[0].balance.toString(10));
+    }
     this.setState({ ...this.state, refinanceCompoundData: loans });
+    const sololoans = await TorqueProvider.Instance.getSoloLoans(); // TODO
+    let soloLoans = loans.concat(sololoans);
+    console.log("sololoans = ", sololoans);
+    this.setState({ ...this.state, refinanceCompoundData: soloLoans });
   };
 
   public render() {

@@ -45,7 +45,10 @@ export class RefinanceAssetCompoundLoanMobile extends Component<IRefinanceAssetC
 
     console.log('compound', loans);
     this.setState({ ...this.state, refinanceCompoundData: loans });
-
+    const sololoans = await TorqueProvider.Instance.getSoloLoans(); // TODO
+    let soloLoans = loans.concat(sololoans);
+    console.log("sololoans = ", sololoans);
+    this.setState({ ...this.state, refinanceCompoundData: soloLoans });
   };
 
 

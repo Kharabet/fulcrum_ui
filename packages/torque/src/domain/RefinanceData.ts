@@ -45,6 +45,7 @@ export interface IRefinanceLoan extends IRefinanceToken {
   isDisabled: boolean;
   apr: BigNumber;
   ratio: BigNumber;
+  type: string;
 }
 
 export interface IRefinanceCollateral extends IRefinanceToken {

@@ -19,6 +19,7 @@ import { Asset } from "../domain/Asset";
 import { IRefinanceLoan } from "../domain/RefinanceData";
 import { TorqueProviderEvents } from "../services/events/TorqueProviderEvents";
 import { TorqueProvider } from "../services/TorqueProvider";
+import dydx_img from "../assets/images/dydx.svg";
 
 interface IRefinanceAssetCompoundLoanItemState {
   isShow: boolean;
@@ -106,7 +107,11 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceLoan, IR
   };
 
   public migrateLoan = async () => {
-    await TorqueProvider.Instance.migrateCompoundLoan({ ...this.props }, this.props.balance.div(10)); // TODO
+    if(this.props.type=="dydx"){
+      await TorqueProvider.Instance.migrateSoloLoan(this.props, this.props.balance.div(10)); // TODO
+    }else{
+      await TorqueProvider.Instance.migrateCompoundLoan(this.props, this.props.balance.div(10)); // TODO
+    }
   };
 
   private derivedUpdate = async () => {
@@ -123,12 +128,13 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceLoan, IR
       collateralAssetDt2 = this.getAssetsData(this.props.collateral[1].asset);
     }
     this.getAssetsData(this.props.collateral[0].asset);
+    const head_image = this.props.type=="dydx" ? dydx_img : compound_img;
     const assetTypeModifier = !this.state.isShow ? "asset-collateral-show" : "asset-collateral-hide";
     const showDetailsValue = this.state.isShow ? "Show details" : "Hide details";
     const arrowIcon = !this.state.isShow ? topArrow : downArrow;
     const arrowDiv = !this.state.isShow ? "arrow-div-down" : "arrow-div-top";
-    const btnValue = "Refinance with 30% APR Fixed";
-    const btnActiveValue = "Refinance with 30% APR Fixed";
+    let btnValue =  'Refinance with '+this.state.fixedApr.dp(1, BigNumber.ROUND_CEIL).toString()+'% APR Fixed' ;
+    let btnActiveValue =  'Refinance with '+this.state.fixedApr.dp(1, BigNumber.ROUND_CEIL).toString()+'% APR Fixed'
     const refRateYear = ((parseFloat(this.props.apr.dp(0, BigNumber.ROUND_CEIL).toString()) - parseFloat(this.state.fixedApr.dp(1, BigNumber.ROUND_CEIL).toString())) * parseFloat(this.props.balance.dp(3, BigNumber.ROUND_FLOOR).toString())) / 100;
     const refRateMonth = refRateYear / 12;
     const btnCls = this.props.apr.gt(this.state.fixedApr) ? "mt30" : "";
@@ -140,14 +146,14 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceLoan, IR
 
           {/*</div>*/}
           <div className="refinance-asset-selector__row">
-            <div className="refinance-asset-selector__marker"><img className="logo__dydx" src={compound_img}/> <img
+            <div className="refinance-asset-selector__marker"><img className="logo__dydx" src={head_image}/> <img
               className="right-icon" src={arrow_right}/></div>
             <div className="refinance-asset-selector__torque"><img className="logo__image" src={torque_logo}
                                                                    alt="torque-logo"/></div>
             {/*<div className="refinance-asset-selector__type">1.500</div>*/}
           </div>
           <div className="refinance-asset-selector__rowimg">
-            <div className="refinance-asset-selector__varapy">{this.props.apr.dp(1, BigNumber.ROUND_CEIL).toString()}%
+            <div className="refinance-asset-selector__varapy">{this.props.apr.dp(0, BigNumber.ROUND_CEIL).toString()}%
             </div>
             <div
               className="refinance-asset-selector__fixedapy">{this.state.fixedApr.dp(1, BigNumber.ROUND_CEIL).toString()}%

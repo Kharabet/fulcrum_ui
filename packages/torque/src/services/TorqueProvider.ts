@@ -649,7 +649,8 @@ export class TorqueProvider {
           isDisabled: false,
           collateral: [],
           apr: borrowRate.times(60 * 60 * 24 * 365).div(10 ** 16).div(blockTime),
-          ratio: new BigNumber(0)
+          ratio: new BigNumber(0),
+          type:"Compound"
         });
         inBorrowed = inBorrowed.plus(token.usdValue);
       }
@@ -717,7 +718,8 @@ export class TorqueProvider {
           isDisabled: false,
           collateral: [],
           apr: interestRate.value.times(60 * 60 * 24 * 365).div(10 ** 16),
-          ratio: new BigNumber(0)
+          ratio: new BigNumber(0),
+          type:"dydx"
         });
         inBorrowed = inBorrowed.plus(token.usdValue);
       }
