@@ -51,3 +51,18 @@ export interface IRefinanceCollateral extends IRefinanceToken {
   amount: BigNumber;
   borrowAmount: BigNumber;
 }
+
+export interface RefinanceCompoundData {
+  collateralAsset: Asset[];
+  collateralAmount: BigNumber[];
+  loanAsset: Asset;
+  loanAmount:  BigNumber;
+  variableAPR:BigNumber;
+  isDisabled: boolean;
+  isShowCard:boolean;
+  collateralization:number;
+  type:string;
+  usdValue: BigNumber;
+  decimals: number;
+  market: string;
+}
