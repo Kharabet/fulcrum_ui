@@ -147,7 +147,7 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceLoan, IR
             {/*<div className="refinance-asset-selector__type">1.500</div>*/}
           </div>
           <div className="refinance-asset-selector__rowimg">
-            <div className="refinance-asset-selector__varapy">{this.props.apr.dp(0, BigNumber.ROUND_CEIL).toString()}%
+            <div className="refinance-asset-selector__varapy">{this.props.apr.dp(1, BigNumber.ROUND_CEIL).toString()}%
             </div>
             <div
               className="refinance-asset-selector__fixedapy">{this.state.fixedApr.dp(1, BigNumber.ROUND_CEIL).toString()}%

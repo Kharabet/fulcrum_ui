@@ -134,7 +134,7 @@ export class RefinanceAssetCompoundLoanItemMobile extends Component<IRefinanceLo
         <div className="refinance-asset-block">
           <div className="refinance-asset-selector__row">
             <div className="refinance-asset-selector__marker"><img className="logo__dydx" src={compound_img}/></div>
-            <div className="refinance-asset-selector__varapy">{this.props.apr.dp(0, BigNumber.ROUND_CEIL).toString()}%
+            <div className="refinance-asset-selector__varapy">{this.props.apr.dp(1, BigNumber.ROUND_CEIL).toString()}%
             </div>
             <div className="refinance-asset-selector__variabletxt">Variable APR</div>
           </div>

@@ -585,17 +585,17 @@ export class TorqueProvider {
     const comptroller: CompoundComptrollerContract = await this.contractsSource.getCompoundComptrollerContract();
     const cTokens = await comptroller.getAssetsIn.callAsync(account);
 
-    const url = `https://ethgasstation.info/json/ethgasAPI.json`;
     let blockTime;
-    try {
-      const response = await fetch(url);
-      const jsonData = await response.json();
-      blockTime = jsonData.block_time;
-    } catch (e) {
-      // tslint:disable-next-line:no-console
-      console.log("ethgasstation block_time error", e.message);
-      blockTime = 15;
-    }
+    // try {
+    //   const response = await fetch(`https://ethgasstation.info/json/ethgasAPI.json`);
+    //   const jsonData = await response.json();
+    //   blockTime = jsonData.block_time;
+    // } catch (e) {
+    //   // tslint:disable-next-line:no-console
+    //   console.log("ethgasstation block_time error", e.message);
+    //   blockTime = 15;
+    // }
+    blockTime = 15;
 
     const deposits: IRefinanceToken[] = [];
     const loans: IRefinanceLoan[] = [];
@@ -648,7 +648,7 @@ export class TorqueProvider {
           isHealthy: false,
           isDisabled: false,
           collateral: [],
-          apr: borrowRate.times(60 * 60 * 24 * 365).div(10 ** 18).div(blockTime),
+          apr: borrowRate.times(60 * 60 * 24 * 365).div(10 ** 16).div(blockTime),
           ratio: new BigNumber(0)
         });
         inBorrowed = inBorrowed.plus(token.usdValue);
