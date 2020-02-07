@@ -603,6 +603,8 @@ var Datafeeds = (function (exports) {
                         onError('unknown_symbol');
                     }
                     else {
+                        if (response.listed_exchange === "Kyber Network")
+                            { response.pricescale = 100; }
                         onResultReady(response);
                     }
                 })
