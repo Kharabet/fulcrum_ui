@@ -2,7 +2,8 @@ import React, { PureComponent, RefObject } from "react";
 import { RouteComponentProps } from "react-router";
 import { RefinanceAssetSelector } from "../components/RefinanceAssetSelector";
 import { RefinanceAssetSelectorMobile } from "../components/RefinanceAssetSelectorMobile";
-import { RefinanceAssetCompoundSelector } from "../components/RefinanceAssetCompoundSelector";
+import { RefinanceAssetCompoundLoan } from "../components/RefinanceAssetCompoundLoan";
+import { RefinanceAssetCompoundLoanMobile } from "../components/RefinanceAssetCompoundLoanMobile";
 import { BorrowDlg } from "../components/BorrowDlg";
 import { Asset } from "../domain/Asset";
 import { WalletType, walletTypeAbbrToWalletType } from "../domain/WalletType";
@@ -41,7 +42,11 @@ export class RefinancePage extends PureComponent<IRefinancePageParams & RouteCom
           {/*<div className="borrow-page__main" style={walletType === WalletType.Web3 ? { paddingBottom: `90rem`} : undefined}>*/}
 
           <div className="refinance-page__main">
-
+            {isMobileMedia ?
+              <RefinanceAssetCompoundLoanMobile walletType={walletType}/>
+              :
+              <RefinanceAssetCompoundLoan walletType={walletType}/>
+            }
             {/*<RefinanceAssetCompoundSelector walletType={walletType}  />*/}
             {isMobileMedia ?
               < RefinanceAssetSelectorMobile walletType={walletType}/>
