@@ -1,27 +1,8 @@
-import { BigNumber } from "@0x/utils";
 import React, { Component } from "react";
-import TagManager from "react-gtm-module";
 import { Asset } from "../domain/Asset";
-import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
-import { IPriceDataPoint } from "../domain/IPriceDataPoint";
 import { PositionType } from "../domain/PositionType";
-import { TradeRequest } from "../domain/TradeRequest";
 import { TradeTokenKey } from "../domain/TradeTokenKey";
-import { TradeType } from "../domain/TradeType";
-import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
-import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
-import { TradeTransactionMinedEvent } from "../services/events/TradeTransactionMinedEvent";
-import { FulcrumProvider } from "../services/FulcrumProvider";
-import configProviders from "./../config/providers.json";
-// import { Change24HMarker, Change24HMarkerSize } from "./Change24HMarker";
-import { LeverageSelector } from "./LeverageSelector";
-import { PositionTypeMarker } from "./PositionTypeMarker";
-// const tagManagerArgs = {
-//     gtmId: configProviders.Google_TrackingID
-// }
-// TagManager.initialize(tagManagerArgs)
-
 import walletSvg from "../assets/images/wallet-icon.svg";
 
 export interface ITokenGridTabsProps {
@@ -45,12 +26,6 @@ interface ITokenGridTabsState {
 
   defaultUnitOfAccount: Asset;
   isShowMyTokensOnly: boolean;
-  // version: number;
-  // asset:Asset;
-  // latestPriceDataPoint: IPriceDataPoint;
-  // interestRate: BigNumber;
-  // balance: BigNumber;
-  // isLoading: boolean;
 }
 
 export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabsState> {
@@ -78,22 +53,10 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
         : "";
 
     const classNamePrefix = "trade-token-grid-tab-item";
-    // const onSelectClick = (event: React.MouseEvent<HTMLElement>) => {
-    //   event.stopPropagation();
 
-    //   this.props.onTabSelect(asset);
-    // };
-
-    const onSelectClick = async (event: React.MouseEvent<HTMLElement>) => {
-      event.stopPropagation();
-
-      await this.setState({ ...this.state, isShowMyTokensOnly: false })
-      await this.props.onShowMyTokensOnlyChange(false);
-      await this.props.onSelect(this.getTradeTokenGridRowSelectionKey(asset));
-    };
 
     return (
-      <div key={`${assetDetails.displayName}`} className={`${classNamePrefix} ${isActiveClassName}`} onClick={onSelectClick}>
+      <div key={`${assetDetails.displayName}`} className={`${classNamePrefix} ${isActiveClassName}`} onClick={(e) => { this.onSelectClick(e, asset) }}>
         <div
           className={`${classNamePrefix}__col-token-image`}
           style={{ backgroundColor: assetDetails.bgColor, borderLeftColor: assetDetails.bgColor }}
@@ -105,12 +68,21 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
   }
 
 
+  private async onSelectClick(event: React.MouseEvent<HTMLElement>, asset: Asset) {
+    event.stopPropagation();
+
+    await this.setState({ ...this.state, isShowMyTokensOnly: false })
+    await this.props.onShowMyTokensOnlyChange(false);
+    await this.props.onSelect(this.getTradeTokenGridRowSelectionKey(asset));
+  };
+
+
   public render() {
     var selectedAsset = AssetsDictionary.assets.get(this.props.selectedKey.asset);
-    var borderColor= !!selectedAsset ? selectedAsset.bgColor : "#fff"
+    var borderColor = !!selectedAsset ? selectedAsset.bgColor : "#fff"
 
     return (
-      <div className="trade-token-grid-tab" style={{ borderBottom: `2px solid ${ !this.props.isMobile && borderColor && !this.state.isShowMyTokensOnly ? borderColor : "#6488ff"}` }}>
+      <div className="trade-token-grid-tab" style={{ borderBottom: `2px solid ${!this.props.isMobile && borderColor && !this.state.isShowMyTokensOnly ? borderColor : "#6488ff"}` }}>
         <div className="trade-token-grid-tab__container">
           {this.props.assets.map(asset => (this.renderAsset(asset)))}
           <div className={`trade-token-grid-tab-item ${this.state.isShowMyTokensOnly ? "trade-token-grid-tab-item--active" : ""}`} onClick={this.showMyTokensOnlyChange}>

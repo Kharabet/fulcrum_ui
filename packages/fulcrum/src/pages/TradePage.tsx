@@ -167,15 +167,6 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
           <div className="chart-wrapper">
             <TVChartContainer symbol={this.state.selectedKey.asset} preset={this.props.isMobileMedia ? "mobile" : undefined}/>
           </div>
-          {/* <PriceGraph
-            data={this.state.priceGraphData}
-            selectedKey={this.state.selectedKey}
-            isLong={this.state.isLong}
-            isShort={this.state.isShort}
-            changeActiveBtn={this.changeActiveBtn.bind(this)}
-            showMyTokensOnly={this.state.showMyTokensOnly}
-            onShowMyTokensOnlyChange={this.onShowMyTokensOnlyChange}
-          /> */}
 
           <TokenGridTabs
             assets={this.state.assets}
