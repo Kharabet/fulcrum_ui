@@ -80,7 +80,7 @@ function extractField<Field extends keyof ExchangeDataResponseSymbolData>(data: 
 }
 
 export class SymbolsStorage {
-	private readonly _exchangesList: string[] = ['NYSE', 'FOREX', 'AMEX'];
+	private readonly _exchangesList: string[] = [];
 	private readonly _symbolsInfo: SymbolInfoMap = {};
 	private readonly _symbolsList: string[] = [];
 	private readonly _datafeedUrl: string;

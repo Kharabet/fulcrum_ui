@@ -8,7 +8,7 @@ function extractField(data, field, arrayIndex, valueIsArray) {
 }
 var SymbolsStorage = /** @class */ (function () {
     function SymbolsStorage(datafeedUrl, datafeedSupportedResolutions, requester) {
-        this._exchangesList = ['NYSE', 'FOREX', 'AMEX'];
+        this._exchangesList = [];
         this._symbolsInfo = {};
         this._symbolsList = [];
         this._datafeedUrl = datafeedUrl;
