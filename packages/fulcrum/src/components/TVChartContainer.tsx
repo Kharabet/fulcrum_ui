@@ -51,7 +51,7 @@ export class TVChartContainer extends React.PureComponent<Partial<ChartContainer
 		interval: 'D',
 		containerId: 'tv_chart_container',
 		datafeedUrl: 'https://api.kyber.network/chart',
-		disabledFeatures: ["left_toolbar", "header_compare", "header_undo_redo","header_saveload","header_settings", "header_screenshot", 'use_localstorage_for_settings', "header_fullscreen_button", "go_to_date"],
+		disabledFeatures: ["left_toolbar", "header_compare", "header_undo_redo", "header_saveload", "header_settings", "header_screenshot", 'use_localstorage_for_settings', "header_fullscreen_button", "go_to_date"],
 		libraryPath: '/charting_library/',
 		chartsStorageUrl: 'https://saveload.tradingview.com',
 		chartsStorageApiVersion: '1.1',
@@ -66,19 +66,17 @@ export class TVChartContainer extends React.PureComponent<Partial<ChartContainer
 
 	private tvWidget: IChartingLibraryWidget | null = null;
 
-	public componentDidMount(): void {
-		const widgetOptions: ChartingLibraryWidgetOptions = {
-			symbol: this.props.symbol as string,
+	private GetWidgetOptions(): ChartingLibraryWidgetOptions {
+		return {
+			symbol: `${this.props.symbol}_SAI` as string,
 			// BEWARE: no trailing slash is expected in feed URL
 			// tslint:disable-next-line:no-any
 			datafeed: new (window as any).Datafeeds.UDFCompatibleDatafeed(this.props.datafeedUrl),
 			interval: this.props.interval as ChartingLibraryWidgetOptions['interval'],
 			container_id: this.props.containerId as ChartingLibraryWidgetOptions['container_id'],
 			library_path: this.props.libraryPath as string,
-
 			locale: getLanguageFromURL() || 'en',
 			disabled_features: this.props.disabledFeatures,
-			// enabled_features: ['study_templates'],
 			charts_storage_url: this.props.chartsStorageUrl,
 			charts_storage_api_version: this.props.chartsStorageApiVersion,
 			client_id: this.props.clientId,
@@ -87,8 +85,11 @@ export class TVChartContainer extends React.PureComponent<Partial<ChartContainer
 			autosize: this.props.autosize,
 			studies_overrides: this.props.studiesOverrides,
 			theme: this.props.theme,
-			preset: this.state.preset
+			preset: this.props.preset
 		};
+	}
+	public componentDidMount(): void {
+		const widgetOptions: ChartingLibraryWidgetOptions = this.GetWidgetOptions();
 
 		const tvWidget = new widget(widgetOptions);
 		this.tvWidget = tvWidget;
@@ -120,43 +121,22 @@ export class TVChartContainer extends React.PureComponent<Partial<ChartContainer
 			this.tvWidget.remove();
 			this.tvWidget = null;
 		}
-		// this.setState({...this.state, preset: this.props.preset });
-		const widgetOptions: ChartingLibraryWidgetOptions = {
-			symbol: `${this.props.symbol}_SAI` as string,
-			// BEWARE: no trailing slash is expected in feed URL
-			// tslint:disable-next-line:no-any
-			datafeed: new (window as any).Datafeeds.UDFCompatibleDatafeed(this.props.datafeedUrl),
-			interval: this.props.interval as ChartingLibraryWidgetOptions['interval'],
-			container_id: this.props.containerId as ChartingLibraryWidgetOptions['container_id'],
-			library_path: this.props.libraryPath as string,
-
-			locale: getLanguageFromURL() || 'en',
-			disabled_features: this.props.disabledFeatures,
-			charts_storage_url: this.props.chartsStorageUrl,
-			charts_storage_api_version: this.props.chartsStorageApiVersion,
-			client_id: this.props.clientId,
-			user_id: this.props.userId,
-			fullscreen: this.props.fullscreen,
-			autosize: this.props.autosize,
-			studies_overrides: this.props.studiesOverrides,
-			theme: this.props.theme,
-			preset: this.props.preset
-		};
+		const widgetOptions: ChartingLibraryWidgetOptions = this.GetWidgetOptions();
 
 		const tvWidget = new widget(widgetOptions);
 		this.tvWidget = tvWidget;
-}
+	}
 
 	public render(): JSX.Element {
-	if (this.props.symbol)
-		this.changePair(this.props.symbol)
+		if (this.props.symbol)
+			this.changePair(this.props.symbol)
 
 
-	return (
-		<div
-			id={this.props.containerId}
-			className={'TVChartContainer'}
-		/>
-	);
-}
+		return (
+			<div
+				id={this.props.containerId}
+				className={'TVChartContainer'}
+			/>
+		);
+	}
 }
