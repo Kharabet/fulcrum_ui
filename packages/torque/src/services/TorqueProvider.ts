@@ -621,7 +621,7 @@ export class TorqueProvider {
       if (!balance.gt(0)) {
         isDeposit = false;
         balance = await cToken.borrowBalanceCurrent.callAsync(account);
-        if (!balance.gt(0)) {
+        if (!balance.div(10 ** decimals).dp(3, BigNumber.ROUND_FLOOR).gt(0)) {
           continue;
         }
       }
@@ -689,7 +689,10 @@ export class TorqueProvider {
       }
       const decimals = AssetsDictionary.assets.get(asset)!.decimals || 18;
       const balance = balances[i].value.div(10 ** decimals);
-      if (!balance.gt(0)) {
+      if (!balance.dp(3, BigNumber.ROUND_CEIL).gt(0)) {
+        continue;
+      }
+      if (!balances[i].sign && !balance.dp(3, BigNumber.ROUND_CEIL).gt(0)) {
         continue;
       }
       const rate = await this.getSwapToUsdRate(asset);
