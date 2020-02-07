@@ -101,17 +101,6 @@ export class RefinanceAssetSelector extends Component<IRefinanceAssetSelectorPro
 
     const refinanceData = await TorqueProvider.Instance.getMakerLoans();
 
-    // await TorqueProvider.Instance.getSoloLoans(); // TODO
-
-    // const loans = await TorqueProvider.Instance.getCompoundLoans(); // TODO
-    // console.log('compound', loans);
-    //
-    // if (loans.length && !loans[0].isDisabled) { // TODO
-    //   await TorqueProvider.Instance.migrateCompoundLoan(loans[0], loans[0].balance.div(1)); // TODO
-    // } else {
-    //   console.log('no valid loan for migration');
-    // }
-
     // tslint:disable-next-line:prefer-for-of
     for (let i = 0; i < refinanceData.length; i++) {
       if (refinanceData[i].cdpId.gt(0)) {

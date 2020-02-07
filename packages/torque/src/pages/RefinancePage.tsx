@@ -1,10 +1,10 @@
 import React, { PureComponent, RefObject } from "react";
 import { RouteComponentProps } from "react-router";
-import { RefinanceAssetSelector } from "../components/RefinanceAssetSelector";
-import { RefinanceAssetSelectorMobile } from "../components/RefinanceAssetSelectorMobile";
+import { BorrowDlg } from "../components/BorrowDlg";
 import { RefinanceAssetCompoundLoan } from "../components/RefinanceAssetCompoundLoan";
 import { RefinanceAssetCompoundLoanMobile } from "../components/RefinanceAssetCompoundLoanMobile";
-import { BorrowDlg } from "../components/BorrowDlg";
+import { RefinanceAssetSelector } from "../components/RefinanceAssetSelector";
+import { RefinanceAssetSelectorMobile } from "../components/RefinanceAssetSelectorMobile";
 import { Asset } from "../domain/Asset";
 import { WalletType, walletTypeAbbrToWalletType } from "../domain/WalletType";
 import { Footer } from "../layout/Footer";
@@ -47,7 +47,6 @@ export class RefinancePage extends PureComponent<IRefinancePageParams & RouteCom
               :
               <RefinanceAssetCompoundLoan walletType={walletType}/>
             }
-            {/*<RefinanceAssetCompoundSelector walletType={walletType}  />*/}
             {isMobileMedia ?
               < RefinanceAssetSelectorMobile walletType={walletType}/>
               :

@@ -1,12 +1,10 @@
 import React, { Component } from "react";
 import { Asset } from "../domain/Asset";
-import { BigNumber } from "@0x/utils";
+import { IRefinanceLoan } from "../domain/RefinanceData";
 import { WalletType } from "../domain/WalletType";
+import { TorqueProviderEvents } from "../services/events/TorqueProviderEvents";
+import { TorqueProvider } from "../services/TorqueProvider";
 import { RefinanceAssetCompoundLoanItem } from "./RefinanceAssetCompoundLoanItem";
-import {TorqueProvider} from "../services/TorqueProvider";
-import {TorqueProviderEvents} from "../services/events/TorqueProviderEvents";
-import {IRefinanceLoan, RefinanceCompoundData} from "../domain/RefinanceData";
-
 
 export interface IRefinanceAssetCompoundLoanProps {
   walletType: WalletType
@@ -15,7 +13,7 @@ export interface IRefinanceAssetCompoundLoanProps {
 }
 
 interface IRefinanceCompoundSelectorItemState {
-  asset:Asset,
+  asset: Asset,
   refinanceCompoundData: IRefinanceLoan[];
 }
 
@@ -25,61 +23,50 @@ export class RefinanceAssetCompoundLoan extends Component<IRefinanceAssetCompoun
 
     this.state = {
       asset: Asset.DAI,
-      refinanceCompoundData:[]
+      refinanceCompoundData: []
     };
     // console.log("this.state=  "+this.state)
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
 
   }
-  // true includes ENS support
-  private onProviderAvailable = () => {
 
+  private onProviderAvailable = () => {
     this.derivedUpdate();
   };
 
   public componentDidMount(): void {
     this.derivedUpdate();
   }
+
   private derivedUpdate = async () => {
     // const refinanceCompoundData = await TorqueProvider.Instance.checkSoloMargin();
     const loans = await TorqueProvider.Instance.getCompoundLoans(); // TODO
 
-    console.log('compound', loans);
+    if (loans.length) {
+      console.log("compound", loans[0].balance.toString(10));
+    }
     this.setState({ ...this.state, refinanceCompoundData: loans });
-
   };
 
-
   public render() {
-
-    // let assetList = Array.from(this.assetsShown.keys());
-    let refinanceCompound = this.state.refinanceCompoundData
+    const refinanceCompound = this.state.refinanceCompoundData;
     let items;
     if (this.props.walletType === WalletType.Web3) {
 
-      items = refinanceCompound.map((e, index)  => {
-
-          return (
-
-            <RefinanceAssetCompoundLoanItem key={index} {...e}/>
-          );
-
+      items = refinanceCompound.map((e, index) => {
+        return (
+          <RefinanceAssetCompoundLoanItem key={index} {...e}/>
+        );
       });
 
     } else {
-      // assetList = assetList.sort(e => this.assetsShown.get(e) ? -1 : 1);
-
-        items = refinanceCompound.map((e, index) => {
-
-          return (
-            <RefinanceAssetCompoundLoanItem key={index} {...e}/>
-          );
-
-        });
+      items = refinanceCompound.map((e, index) => {
+        return (
+          <RefinanceAssetCompoundLoanItem key={index} {...e}/>
+        );
+      });
 
     }
-
     return <div className="refinance-asset-selector">{items}</div>;
-
   }
 }
