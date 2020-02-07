@@ -655,7 +655,7 @@ export class TorqueProvider {
       }
     }
 
-    this.assignCollateral(loans, deposits, inSupplied.div(inBorrowed));
+    await this.assignCollateral(loans, deposits, inSupplied.div(inBorrowed));
 
     // @ts-ignore
     this.compoundDeposits = deposits;
