@@ -14,6 +14,7 @@ export interface ChartContainerProps {
 
 	// BEWARE: no trailing slash is expected in feed URL
 	datafeedUrl: string;
+	disabledFeatures: ChartingLibraryWidgetOptions['disabled_features']
 	libraryPath: ChartingLibraryWidgetOptions['library_path'];
 	chartsStorageUrl: ChartingLibraryWidgetOptions['charts_storage_url'];
 	chartsStorageApiVersion: ChartingLibraryWidgetOptions['charts_storage_api_version'];
@@ -50,6 +51,7 @@ export class TVChartContainer extends React.PureComponent<Partial<ChartContainer
 		interval: 'D',
 		containerId: 'tv_chart_container',
 		datafeedUrl: 'https://api.kyber.network/chart',
+		disabledFeatures: ["left_toolbar", "header_compare", "header_undo_redo","header_saveload","header_settings", "header_screenshot", 'use_localstorage_for_settings', "header_fullscreen_button", "go_to_date"],
 		libraryPath: '/charting_library/',
 		chartsStorageUrl: 'https://saveload.tradingview.com',
 		chartsStorageApiVersion: '1.1',
@@ -75,8 +77,8 @@ export class TVChartContainer extends React.PureComponent<Partial<ChartContainer
 			library_path: this.props.libraryPath as string,
 
 			locale: getLanguageFromURL() || 'en',
-			disabled_features: ['use_localstorage_for_settings'],
-			enabled_features: ['study_templates'],
+			disabled_features: this.props.disabledFeatures,
+			// enabled_features: ['study_templates'],
 			charts_storage_url: this.props.chartsStorageUrl,
 			charts_storage_api_version: this.props.chartsStorageApiVersion,
 			client_id: this.props.clientId,
@@ -129,8 +131,7 @@ export class TVChartContainer extends React.PureComponent<Partial<ChartContainer
 			library_path: this.props.libraryPath as string,
 
 			locale: getLanguageFromURL() || 'en',
-			disabled_features: ['use_localstorage_for_settings'],
-			enabled_features: ['study_templates'],
+			disabled_features: this.props.disabledFeatures,
 			charts_storage_url: this.props.chartsStorageUrl,
 			charts_storage_api_version: this.props.chartsStorageApiVersion,
 			client_id: this.props.clientId,
