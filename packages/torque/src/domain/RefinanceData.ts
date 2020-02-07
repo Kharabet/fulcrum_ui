@@ -12,7 +12,7 @@ export interface RefinanceData {
   isProxy: boolean;
   isInstaProxy: boolean;
   isDisabled: boolean;
-  isDust: boolean;
+  dust: BigNumber;
   isShowCard: boolean;
   variableAPR: BigNumber;
 }

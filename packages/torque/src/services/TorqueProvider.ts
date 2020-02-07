@@ -1010,7 +1010,7 @@ export class TorqueProvider {
       isProxy,
       isInstaProxy,
       isDisabled: false,
-      isDust: false,
+      dust: new BigNumber(0),
       isShowCard: false,
       variableAPR: new BigNumber(0)
     }];
@@ -1069,7 +1069,7 @@ export class TorqueProvider {
         isProxy,
         isInstaProxy,
         isDisabled,
-        isDust,
+        dust: ilkData[4].div(10 ** 27).div(10 ** 18),
         isShowCard,
         variableAPR: rateAmountIlkYr
       }];
@@ -1080,7 +1080,20 @@ export class TorqueProvider {
 
   public migrateMakerLoan = async (refRequest: RefinanceData, loanAmount: BigNumber) => {
 
-    // TODO @bshevchenko: disable dust loans
+    const left = refRequest.debt.minus(loanAmount);
+    const isDust = !(
+      loanAmount.dp(3, BigNumber.ROUND_DOWN)
+        .isEqualTo(refRequest.debt.dp(3, BigNumber.ROUND_DOWN))
+      ||
+      left.gt(refRequest.dust)
+    );
+
+    if (isDust) {
+      if (!confirm("Remaining debt should be zero or more than " + refRequest.dust.toString(10) + " DAI. Do you want to continue with total amount?")) {
+        return null;
+      }
+      loanAmount = refRequest.debt;
+    }
 
     const cdpManagerAddress = configAddress.CDP_MANAGER;
     if (this.web3Wrapper && this.contractsSource) {

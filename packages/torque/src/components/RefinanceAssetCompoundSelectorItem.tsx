@@ -46,7 +46,7 @@ export class RefinanceAssetCompoundSelectorItem extends Component<IRefinanceAsse
           isInstaProxy: false,
           proxyAddress: "",
           isDisabled: false,
-          isDust: false,
+          dust: new BigNumber(0),
           isShowCard: false,
           variableAPR: new BigNumber(0)
         }]
