@@ -521,19 +521,18 @@ export class TorqueProvider {
     if (!this.contractsSource) {
       throw new Error("contractsSource is not defined");
     }
-    return new BigNumber("150"); // TODO @bshevchenko
-    // const iToken = await this.contractsSource.getiTokenContract(asset);
-    // console.log("collateralTokenAddress", collateralTokenAddress);
-    // // @ts-ignore
-    // const leverageAmount = web3.utils.soliditySha3(
-    //   { "type": "uint256", "value": new BigNumber(2 * 10 ** 18) },
-    //   { "type": "address", "value": collateralTokenAddress }
-    // );
-    // // @ts-ignore
-    // const hash = await iToken.loanOrderHashes.callAsync(web3.utils.keccak256(leverageAmount));
-    // console.log("hash", hash);
-    // const data = await iToken.loanOrderData.callAsync(hash);
-    // return data[3];
+    const iToken = await this.contractsSource.getiTokenContract(asset);
+    console.log("collateralTokenAddress", collateralTokenAddress);
+    // @ts-ignore
+    const leverageAmount = web3.utils.soliditySha3(
+      { "type": "uint256", "value": new BigNumber(2 * 10 ** 18) },
+      { "type": "address", "value": collateralTokenAddress }
+    );
+    // @ts-ignore
+    const hash = await iToken.loanOrderHashes.callAsync(parseInt(leverageAmount, 10));
+    console.log("hash", hash);
+    const data = await iToken.loanOrderData.callAsync(hash);
+    return new BigNumber("150"); // TODO @bshevchenko return data[3];
   };
 
   private assignCollateral = async (loans: IRefinanceLoan[], deposits: IRefinanceToken[], inRatio?: BigNumber) => {
@@ -606,8 +605,9 @@ export class TorqueProvider {
     for (let i = 0; i < cTokens.length; i++) {
       const cToken = await this.contractsSource.getCTokenContract(cTokens[i]);
       let asset;
-      const underlying = await cToken.underlying.callAsync();
+      let underlying = await cToken.underlying.callAsync();
       if (underlying === "0x0000000000000000000000000000000000000000") {
+        underlying = this.contractsSource.getAddressFromAsset(Asset.ETH);
         asset = Asset.ETH;
       } else {
         asset = this.contractsSource.getAssetFromAddress(underlying);
@@ -656,6 +656,9 @@ export class TorqueProvider {
     }
 
     this.assignCollateral(loans, deposits, inSupplied.div(inBorrowed));
+
+    // @ts-ignore
+    this.compoundDeposits = deposits;
 
     return loans;
   };
@@ -719,6 +722,9 @@ export class TorqueProvider {
 
     await this.assignCollateral(loans, deposits, inSupplied.div(inBorrowed));
 
+    // @ts-ignore
+    this.soloDeposits = deposits;
+
     return loans;
   };
 
@@ -757,7 +763,9 @@ export class TorqueProvider {
     const divider = loan.balance.div(amount);
     loan.usdValue = loan.usdValue.div(divider);
     loan.balance = loan.balance.div(divider);
-    await this.assignCollateral([loan], loan.collateral);
+
+    // @ts-ignore
+    await this.assignCollateral([loan], this.compoundDeposits);
 
     const assets: string[] = [];
     const amounts: BigNumber[] = [];
@@ -835,7 +843,8 @@ export class TorqueProvider {
 
     loan.usdValue = loan.usdValue.div(divider);
     loan.balance = loan.balance.div(divider);
-    await this.assignCollateral([loan], loan.collateral);
+    // @ts-ignore
+    await this.assignCollateral([loan], this.soloDeposits);
 
     for (const token of loan.collateral) {
       markets.push(new BigNumber(token.market));
