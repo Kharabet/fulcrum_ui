@@ -145,7 +145,7 @@ export class RefinanceAssetCompoundLoanItemMobile extends Component<IRefinanceLo
                   ref={this._setInputRef}
                   className="refinance__input-container__input-amount"
                   type="number"
-                  defaultValue={this.props.balance.dp(0, BigNumber.ROUND_FLOOR).toString()}
+                  defaultValue={this.props.balance.dp(3, BigNumber.ROUND_FLOOR).toString()}
                   placeholder={`Amount`}
                   disabled={this.props.isDisabled}
                   onChange={this.loanAmountChange}
