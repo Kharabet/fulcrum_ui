@@ -181,9 +181,10 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
         </div>
         <div className="trade-token-grid-row__col-leverage">
           <LeverageSelector
+            asset={this.props.asset}
             value={this.state.leverage}
             minValue={this.props.positionType === PositionType.SHORT ? 1 : 2}
-            maxValue={4}
+            maxValue={5}
             onChange={this.onLeverageSelect}
           />
         </div>

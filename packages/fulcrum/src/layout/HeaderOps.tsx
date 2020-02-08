@@ -44,7 +44,7 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
 
     const menu: IHeaderMenuProps = {
       items: [
-        { id: 0, title: "Home", link: "/", external: false },
+        { id: 0, title: "Home", link: "https://fulcrum.trade", external: true },
         { id: 1, title: "Lend", link: "/lend", external: false },
         { id: 2, title: "Trade", link: "/trade", external: false },
         { id: 3, title: "Borrow", link: "https://torque.loans", external: true },
@@ -74,7 +74,7 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
 
     const menu: IHeaderMenuProps = {
       items: [
-        { id: 0, title: "Home", link: "/", external: false },
+        { id: 0, title: "Home", link: "https://fulcrum.trade", external: true },
         { id: 1, title: "Lend", link: "/lend", external: false },
         { id: 2, title: "Trade", link: "/trade", external: false },
         { id: 3, title: "Borrow", link: "https://torque.loans", external: true },

@@ -23,7 +23,7 @@ export class LandingPage extends PureComponent<ILandingPageProps> {
 
               <div className="landing-page__jumbo-action">
                 <Link className="landing-page__jumbo-action-button" to="/trade">Trade</Link>
-                <div className="landing-page__jumbo-action-description">WITH UP TO 4X LEVERAGE</div>
+                <div className="landing-page__jumbo-action-description">WITH UP TO 5X LEVERAGE</div>
               </div>
 
             </div>

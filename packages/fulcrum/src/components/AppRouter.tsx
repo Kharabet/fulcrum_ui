@@ -106,13 +106,16 @@ export class AppRouter extends Component<any, IAppRouterState> {
                 <HashRouter hashType="slash">
                   <LocationListener doNetworkConnect={this.doNetworkConnect}>
                     <Switch>
-                      <Route exact={true} path="/" render={() => <LandingPage isMobileMedia={this.state.isMobileMedia} />} />
+                      {/*<Route exact={true} path="/" render={() => <LandingPage isMobileMedia={this.state.isMobileMedia} />} />*/}
                       <Route exact={true} path="/lend" render={() => <LendPage isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} />} />
                       {/*{!this.state.isMobileMedia ? (*/}
-                        <Route exact={true} path="/trade" render={() => <TradePage isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} />} />
+                      <Route exact={true} path="/trade" render={() => <TradePage isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} />} />
                       // ) : ``}
                       <Route exact={true} path="/stats" render={() => <StatsPage isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} />} />
-                      <Route path="*" render={() => <Redirect to="/"/> } />
+                      <Route path="*" component={() => {
+                        window.location.href = 'https://fulcrum.trade'; 
+                        return null;
+                      }}/>
                     </Switch>
                     {isMainnetProd ? (
                       <Route path="/" render={({location}) => {

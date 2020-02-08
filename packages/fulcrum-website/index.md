@@ -305,19 +305,19 @@ title: Crypto Margin Trading with Fulcrum | bZx
                         <p class="fs-44 fs-xs-28 fw-900 mb-15 lh-140 c-light-green">TVL in our Smart Contracts</p>
                         <div class="flex jc-sb fd-sm-c fs-44 fs-md-36 fw-900 lh-140">
                             <div class="flex-xs fw-400">
-                                $<span class="fw-900 tvl-value" data-token="all">3,000,000</span>
+                                $<span class="fw-900 tvl-value" data-token="all"></span>
                             </div>
                             <div class="flex ai-c">
                                 <div class="icon-40 icon-xs-30 icon-border-2 mr-10 mr-xs-20">
                                     {% include svg/eth.svg %}
                                 </div>
-                                <span class="tvl-value" data-token="eth">10,000</span>
+                                <span class="tvl-value" data-token="eth"></span>
                             </div>
                             <div class="flex ai-c">
                                 <div class="icon-40 icon-xs-30 icon-border-2 mr-10 mr-xs-20">
                                     {% include svg/dai.svg %}
                                 </div>
-                                <span class="tvl-value" data-token="dai">10,000</span>
+                                <span class="tvl-value" data-token="dai"></span>
                             </div>
                         </div>
                     </div>
