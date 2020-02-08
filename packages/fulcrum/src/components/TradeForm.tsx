@@ -220,7 +220,8 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       this.props.leverage,
       limitedAmount.tradeAmountValue,// new BigNumber(0),
       this.state.tokenizeNeeded,
-      this.props.version
+      this.props.version,
+      this.state.inputAmountValue
     );
 
     const tradeExpectedResults = await this.getTradeExpectedResults(tradeRequest);
@@ -579,7 +580,8 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
         this.props.leverage,
         this.state.tradeAmountValue,
         this.state.tokenizeNeeded,
-        version
+        version,
+        this.state.inputAmountValue
       )
     );
   };
@@ -640,7 +642,8 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
         this.props.leverage,
         this.state.tradeAmountValue,
         this.state.tokenizeNeeded,
-        this.props.version
+        this.props.version,
+        this.state.inputAmountValue
       )
     );
   };
@@ -663,7 +666,8 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
                 this.props.leverage,
                 limitedAmount.tradeAmountValue,
                 this.state.tokenizeNeeded,
-                this.props.version
+                this.props.version,
+                this.state.inputAmountValue
               );
 
               this.getTradeExpectedResults(tradeRequest).then(tradeExpectedResults => {
@@ -704,7 +708,8 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
             this.props.leverage,
             limitedAmount.tradeAmountValue,
             this.state.tokenizeNeeded,
-            this.props.version
+            this.props.version,
+            this.state.inputAmountValue
           );
 
           this.getTradeExpectedResults(tradeRequest).then(tradeExpectedResults => {

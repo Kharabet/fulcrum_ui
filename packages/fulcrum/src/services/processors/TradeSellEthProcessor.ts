@@ -54,7 +54,20 @@ export class TradeSellEthProcessor {
       gasAmountBN = new BigNumber(3000000);
     } else {
       // estimating gas amount
-      const gasAmount = await tokenContract.burnToEther.estimateGasAsync(account, amountInBaseUnits, { from: account, gas: FulcrumProvider.Instance.gasLimit });
+      const gasAmount = await tokenContract.burnToEther.estimateGasAsync(
+        account,
+        amountInBaseUnits,
+        new BigNumber(0),
+          taskRequest.version === 2 && taskRequest.loanDataBytes ? 
+            taskRequest.loanDataBytes :
+            "0x",
+        {
+          from: account,
+          gas: FulcrumProvider.Instance.gasLimit,
+          value: taskRequest.version === 2 && taskRequest.loanDataBytes && taskRequest.zeroXFee ?
+            taskRequest.zeroXFee :
+            0
+        });
       gasAmountBN = new BigNumber(gasAmount).multipliedBy(FulcrumProvider.Instance.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
     }
 
@@ -63,10 +76,20 @@ export class TradeSellEthProcessor {
       FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.AskToOpenProgressDlg);
 
       // Closing trade
-      txHash = await tokenContract.burnToEther.sendTransactionAsync(account, amountInBaseUnits, {
+      txHash = await tokenContract.burnToEther.sendTransactionAsync(
+        account,
+        amountInBaseUnits,
+        new BigNumber(0),
+          taskRequest.version === 2 && taskRequest.loanDataBytes ? 
+            taskRequest.loanDataBytes :
+            "0x",
+        {
         from: account,
         gas: gasAmountBN.toString(),
-        gasPrice: await FulcrumProvider.Instance.gasPrice()
+        gasPrice: await FulcrumProvider.Instance.gasPrice(),
+        value: taskRequest.version === 2 && taskRequest.loanDataBytes && taskRequest.zeroXFee ?
+          taskRequest.zeroXFee :
+          0
       });
       task.setTxHash(txHash);
     }

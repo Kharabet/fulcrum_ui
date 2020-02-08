@@ -62,7 +62,17 @@ export class TradeSellErcProcessor {
           account,
           assetErc20Address,
           amountInBaseUnits,
-          { from: account, gas: FulcrumProvider.Instance.gasLimit }
+          new BigNumber(0),
+          taskRequest.version === 2 && taskRequest.loanDataBytes ? 
+            taskRequest.loanDataBytes :
+            "0x",
+          {
+            from: account,
+            gas: FulcrumProvider.Instance.gasLimit,
+            value: taskRequest.version === 2 && taskRequest.loanDataBytes && taskRequest.zeroXFee ?
+              taskRequest.zeroXFee :
+              0
+          }
         );
         gasAmountBN = new BigNumber(gasAmount).multipliedBy(FulcrumProvider.Instance.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
       }
@@ -76,10 +86,17 @@ export class TradeSellErcProcessor {
           account,
           assetErc20Address,
           amountInBaseUnits,
+          new BigNumber(0),
+          taskRequest.version === 2 && taskRequest.loanDataBytes ? 
+            taskRequest.loanDataBytes :
+            "0x",
           { 
             from: account,
             gas: gasAmountBN.toString(),
-            gasPrice: await FulcrumProvider.Instance.gasPrice()
+            gasPrice: await FulcrumProvider.Instance.gasPrice(),
+            value: taskRequest.version === 2 && taskRequest.loanDataBytes && taskRequest.zeroXFee ?
+              taskRequest.zeroXFee :
+              0
           }
         );
         task.setTxHash(txHash);

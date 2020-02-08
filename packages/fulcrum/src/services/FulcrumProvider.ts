@@ -2,8 +2,10 @@ import { Web3ProviderEngine } from "@0x/subproviders";
 import { BigNumber } from "@0x/utils";
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { EventEmitter } from "events";
+import Web3Utils from "web3-utils";
 import moment from "moment";
 import fetch from "node-fetch";
+import request from "request-promise";
 import { Asset } from "../domain/Asset";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { FulcrumMcdBridgeRequest } from "../domain/FulcrumMcdBridgeRequest";
@@ -42,6 +44,8 @@ import { TradeSellEthProcessor } from "./processors/TradeSellEthProcessor";
 import { UnlendChaiProcessor } from "./processors/UnlendChaiProcessor";
 import { UnlendErcProcessor } from "./processors/UnlendErcProcessor";
 import { UnlendEthProcessor } from "./processors/UnlendEthProcessor";
+
+import siteConfig from "./../config/SiteConfig.json";
 
 export class FulcrumProvider {
   private static readonly priceGraphQueryFunction = new Map<Asset, string>([
@@ -1168,6 +1172,8 @@ export class FulcrumProvider {
                     account,
                     assetErc20Address,
                     new BigNumber(request.amount.multipliedBy(10 ** srcDecimals).toFixed(0, 1)),
+                    new BigNumber(0),
+                    "0x",
                     {
                       from: account,
                       gas: "5000000",
@@ -1220,6 +1226,8 @@ export class FulcrumProvider {
                     account,
                     assetErc20Address,
                     new BigNumber(request.amount.multipliedBy(10 ** srcDecimals).toFixed(0, 1)),
+                    new BigNumber(0),
+                    "0x",
                     {
                       from: account,
                       gas: "5000000",
@@ -1244,6 +1252,8 @@ export class FulcrumProvider {
                 tradeAmountActual = await assetContract.burnToEther.callAsync(
                   account,
                   new BigNumber(request.amount.multipliedBy(10 ** srcDecimals).toFixed(0, 1)),
+                  new BigNumber(0),
+                    "0x",
                   {
                     from: account,
                     gas: "5000000",
@@ -1820,12 +1830,178 @@ export class FulcrumProvider {
 
       // Initializing loan
       const taskRequest: TradeRequest = (task.request as TradeRequest);
+  
+      // 0x api processing
+      let taskAmount = new BigNumber(0);
+      let zeroXTargetAmount = new BigNumber(0);
+      let zeroXTargetAmountInBaseUnits = new BigNumber(0);
+      let zeroXTargetType = "";
+      let srcTokenAddress = ""
+      let destTokenAddress = "";
+
+      if (taskRequest.version === 2) {
+        if (siteConfig.ZeroXAPIEnabledForBuys && taskRequest.tradeType === TradeType.BUY) {
+          taskAmount = taskRequest.amount;
+          zeroXTargetType = "sellAmount";
+          
+          let decimals: number;
+          if (taskRequest.positionType === PositionType.LONG) {
+            decimals = AssetsDictionary.assets.get(taskRequest.unitOfAccount)!.decimals;
+
+            if (taskRequest.collateral === taskRequest.unitOfAccount) {
+              zeroXTargetAmount = taskAmount.times(taskRequest.leverage);
+            } else {
+              zeroXTargetAmount = taskAmount.times(taskRequest.leverage-1);
+              const swapPrice = await this.getSwapRate(
+                taskRequest.collateral,
+                taskRequest.unitOfAccount
+              );
+              zeroXTargetAmount = zeroXTargetAmount.multipliedBy(swapPrice);
+            }
+            srcTokenAddress = this.getErc20AddressOfAsset(taskRequest.unitOfAccount)!;
+            destTokenAddress = this.getErc20AddressOfAsset(taskRequest.asset)!;
+          } else {
+            decimals = AssetsDictionary.assets.get(taskRequest.asset)!.decimals;
+
+            if (taskRequest.collateral === taskRequest.asset) {
+              zeroXTargetAmount = taskAmount.times(taskRequest.leverage+1);
+            } else {
+              zeroXTargetAmount = taskAmount.times(taskRequest.leverage);
+              const swapPrice = await this.getSwapRate(
+                taskRequest.collateral,
+                taskRequest.asset
+              );
+              zeroXTargetAmount = zeroXTargetAmount.multipliedBy(swapPrice);
+            }
+            srcTokenAddress = this.getErc20AddressOfAsset(taskRequest.asset)!;
+            destTokenAddress = this.getErc20AddressOfAsset(taskRequest.unitOfAccount)!;
+          }
+
+          if (decimals) {
+            zeroXTargetAmountInBaseUnits = new BigNumber(zeroXTargetAmount.multipliedBy(10 ** decimals).toFixed(0, 1));
+          }
+        } else if (siteConfig.ZeroXAPIEnabledForSells && taskRequest.tradeType === TradeType.SELL) {
+          taskAmount = taskRequest.inputAmountValue;
+          zeroXTargetType = "buyAmount";
+
+          const assetContract = await this.contractsSource.getPTokenContract(new TradeTokenKey(
+            taskRequest.asset,
+            taskRequest.unitOfAccount,
+            taskRequest.positionType,
+            taskRequest.leverage,
+            taskRequest.isTokenized,
+            taskRequest.version
+          ));
+          if (!assetContract) {
+            throw new Error("pToken access error");
+          }
+  
+          const currentLeverage = (await assetContract.currentLeverage.callAsync()).div(10**18);
+
+          let decimals: number;
+          if (taskRequest.positionType === PositionType.LONG) {
+            decimals = AssetsDictionary.assets.get(taskRequest.unitOfAccount)!.decimals;
+
+            zeroXTargetAmount = taskAmount.times(currentLeverage);
+            if (taskRequest.collateral !== taskRequest.unitOfAccount) {
+              const swapPrice = await this.getSwapRate(
+                taskRequest.collateral,
+                taskRequest.unitOfAccount
+              );
+              zeroXTargetAmount = zeroXTargetAmount.multipliedBy(swapPrice);
+            }
+            srcTokenAddress = this.getErc20AddressOfAsset(taskRequest.asset)!;
+            destTokenAddress = this.getErc20AddressOfAsset(taskRequest.unitOfAccount)!;
+          } else {
+            decimals = AssetsDictionary.assets.get(taskRequest.asset)!.decimals;
+            zeroXTargetAmount = taskAmount.times(currentLeverage);
+
+            if (taskRequest.collateral !== taskRequest.asset) {
+              const swapPrice = await this.getSwapRate(
+                taskRequest.collateral,
+                taskRequest.asset
+              );
+              zeroXTargetAmount = zeroXTargetAmount.multipliedBy(swapPrice);
+            }
+            srcTokenAddress = this.getErc20AddressOfAsset(taskRequest.unitOfAccount)!;
+            destTokenAddress = this.getErc20AddressOfAsset(taskRequest.asset)!;
+          }
+
+          if (decimals) {
+            zeroXTargetAmountInBaseUnits = new BigNumber(zeroXTargetAmount.multipliedBy(10 ** decimals).toFixed(0, 1));
+          }
+        }
+      }
+      
+      if (zeroXTargetAmountInBaseUnits.gt(0) && zeroXTargetType !== "") {
+        /*console.log(srcTokenAddress);
+        console.log(destTokenAddress);
+        console.log(new BigNumber(taskRequest.amount.multipliedBy(10 ** 18).toFixed(0, 1)).toString());*/
+
+        //zeroXTargetAmountInBaseUnits = new BigNumber(zeroXTargetAmountInBaseUnits.dividedBy(2).toFixed(0, 1));
+
+        try {
+          
+          let urlPrefix = "";
+          if (process.env.REACT_APP_ETH_NETWORK === "kovan") {
+            urlPrefix = "kovan.";
+          } else if (process.env.REACT_APP_ETH_NETWORK !== "mainnet") {
+            throw new Error("0x api not supported on this network");
+          }
+          
+
+          const responseString = await request("https://"+urlPrefix+"api.0x.org/swap/v0/quote?sellToken="+srcTokenAddress+"&buyToken="+destTokenAddress+"&"+zeroXTargetType+"="+zeroXTargetAmountInBaseUnits.toString());
+          const response = JSON.parse(responseString);
+          if (!response.protocolFee || !response.data) {
+            throw new Error(JSON.stringify(response));
+          }
+          //console.log(response);
+          //console.log(srcTokenAddress, destTokenAddress, zeroXTargetAmountInBaseUnits.toString());
+
+          if (response.protocolFee) { // && response.buyAmount && response.sellAmount) {
+            /*const SwapRate0x = new BigNumber(
+              new BigNumber(response.buyAmount)
+              .times(10**20)
+              .dividedBy(response.sellAmount)
+              .toFixed(0, 1)
+            ).toString();
+            console.log(`swapRate`, SwapRate0x);*/
+
+            taskRequest.zeroXFee = new BigNumber(response.protocolFee);
+
+            taskRequest.loanDataBytes = response.data +
+              //Web3Utils.padLeft(Web3Utils.numberToHex(SwapRate0x).substr(2), 64) +  
+              Web3Utils.padLeft(Web3Utils.numberToHex(response.protocolFee).substr(2), 64) +
+              Web3Utils.padLeft("0", 64);
+
+            
+            // swap marketBuyOrdersFillOrKill for marketBuyOrdersNoThrow if found
+            taskRequest.loanDataBytes = taskRequest.loanDataBytes.replace("0x8bc8efb3", "0x78d29ac1");
+          } else {
+            throw new Error("0x payload has missing params");
+          }
+        } catch (e) {
+          console.log(e);
+
+          taskRequest.zeroXFee = new BigNumber(0);
+          taskRequest.loanDataBytes = "";
+        }
+
+        //console.log(taskRequest.zeroXFee.toString());
+        //console.log(taskRequest.loanDataBytes)
+      }
+
       if (taskRequest.tradeType === TradeType.BUY) {
         if (taskRequest.collateral !== Asset.ETH) {
           const processor = new TradeBuyErcProcessor();
           await processor.run(task, account, skipGas);
         } else {
-          const processor = new TradeBuyEthProcessor();
+          let processor;
+          if (taskRequest.loanDataBytes && taskRequest.zeroXFee) {
+            processor = new TradeBuyErcProcessor();
+          } else {
+            processor = new TradeBuyEthProcessor();
+          }
           await processor.run(task, account, skipGas);
         }
       } else {

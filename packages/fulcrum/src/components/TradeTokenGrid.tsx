@@ -52,14 +52,15 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
     super(props);
 
     TradeTokenGrid.defaultUnitOfAccount = process.env.REACT_APP_ETH_NETWORK === "kovan" ?
-      Asset.SAI :
+      //Asset.SAI :
+      Asset.DAI :
       Asset.DAI;
 
     if (process.env.REACT_APP_ETH_NETWORK === "kovan") {
       TradeTokenGrid.assets = [
         Asset.ETH
       ];
-    } if (process.env.REACT_APP_ETH_NETWORK === "ropsten") {
+    } else if (process.env.REACT_APP_ETH_NETWORK === "ropsten") {
       TradeTokenGrid.assets = [
       ];
     } else {
