@@ -108,41 +108,66 @@ export class TradeBuyErcProcessor {
         gasAmountBN = new BigNumber(3000000);
       } else {
         // estimating gas amount
-        const gasAmount = await tokenContract.mintWithToken.estimateGasAsync(
-          account,
-          assetErc20Address, 
-          amountInBaseUnits,
-          new BigNumber(0),
-          taskRequest.version === 2 && taskRequest.loanDataBytes ? 
-            taskRequest.loanDataBytes :
-            "0x",
-        {
-          from: account,
-          gas: FulcrumProvider.Instance.gasLimit,
-          value: taskRequest.version === 2 && taskRequest.loanDataBytes && taskRequest.zeroXFee ?
-          sendAmountForValue.plus(taskRequest.zeroXFee) :
-            0
-        });
+        let gasAmount;
+        if (taskRequest.version === 2 && taskRequest.loanDataBytes) {
+          gasAmount = await tokenContract.mintWithToken.estimateGasAsync(
+            account,
+            assetErc20Address, 
+            amountInBaseUnits,
+            new BigNumber(0),
+            taskRequest.loanDataBytes,
+          {
+            from: account,
+            gas: FulcrumProvider.Instance.gasLimit,
+            value: taskRequest.zeroXFee ?
+              sendAmountForValue.plus(taskRequest.zeroXFee) :
+              0
+          });
+        } else {
+          gasAmount = await tokenContract.mintWithTokenNoBytes.estimateGasAsync(
+            account,
+            assetErc20Address, 
+            amountInBaseUnits,
+            new BigNumber(0),
+          {
+            from: account,
+            gas: FulcrumProvider.Instance.gasLimit,
+            value: 0
+          });
+        }
+        
         gasAmountBN = new BigNumber(gasAmount).multipliedBy(FulcrumProvider.Instance.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
       }
 
       // Submitting trade
-      txHash = await tokenContract.mintWithToken.sendTransactionAsync(
-        account,
-        assetErc20Address,
-        amountInBaseUnits,
-        new BigNumber(0),
-        taskRequest.version === 2 && taskRequest.loanDataBytes ? 
-          taskRequest.loanDataBytes :
-          "0x",
-      {
-        from: account,
-        gas: gasAmountBN.toString(),
-        gasPrice: await FulcrumProvider.Instance.gasPrice(),
-        value: taskRequest.version === 2 && taskRequest.loanDataBytes && taskRequest.zeroXFee ?
-          sendAmountForValue.plus(taskRequest.zeroXFee) :
-          0
-      });
+      if (taskRequest.version === 2 && taskRequest.loanDataBytes) {
+        txHash = await tokenContract.mintWithToken.sendTransactionAsync(
+          account,
+          assetErc20Address,
+          amountInBaseUnits,
+          new BigNumber(0),
+          taskRequest.loanDataBytes,
+        {
+          from: account,
+          gas: gasAmountBN.toString(),
+          gasPrice: await FulcrumProvider.Instance.gasPrice(),
+          value: taskRequest.zeroXFee ?
+            sendAmountForValue.plus(taskRequest.zeroXFee) :
+            0
+        });
+      } else {
+        txHash = await tokenContract.mintWithTokenNoBytes.sendTransactionAsync(
+          account,
+          assetErc20Address,
+          amountInBaseUnits,
+          new BigNumber(0),
+        {
+          from: account,
+          gas: gasAmountBN.toString(),
+          gasPrice: await FulcrumProvider.Instance.gasPrice(),
+          value: 0
+        });
+      }
       task.setTxHash(txHash);
     }
     finally {
