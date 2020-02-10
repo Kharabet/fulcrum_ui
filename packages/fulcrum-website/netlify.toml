@@ -1,0 +1,5 @@
+[[redirects]]
+from = "/#/stats"
+to = "https://app.fulcrum.trade/#/stats"
+status = 301
+force = false
