@@ -26,7 +26,6 @@ $width-col-actions: 13%;
 }
 
 .trade-token-grid {
-  background-color: #444e5a;
   padding-bottom: 10px;
   &__wrapper {
     font-family: "Muli", sans-serif;
@@ -34,7 +33,7 @@ $width-col-actions: 13%;
   .trade-token-grid-header {
     @include trade-token-grid-header__col();
     display: flex;
-    padding: 20px 40px 0 40px;
+    padding: 20px 40px 15px 40px;
     &__col-token-name {
       width: $width-col-token-name;
     }
@@ -58,29 +57,37 @@ $width-col-actions: 13%;
       text-align: right;
     }
   }
+
+  .trade-token-grid-row-wrapper {
+
+    &:not(:last-child) {
+      margin-bottom: 20px;
+    }
+    // &:first-child {
+    //   margin-top: -1rem;
+    // }
+  }
   .trade-token-grid-row {
     position: relative;
+    background-color: #444e5a;
     padding: 20px 40px;
+
     display: flex;
     flex-wrap: wrap;
     align-items: center;
+    margin-bottom: 1px;
+    // &:after {
+    //   content: "";
+    //   position: absolute;
+    //   bottom: 0;
+    //   left: 0;
+    //   right: 0;
+    //   margin: auto;
+    //   width: calc(100% - 80px);
+    //   background-color: #394049;
+    //   height: 1px;
+    // }
     @include trade-token-grid-row__col();
-    &:first-child {
-      margin-top: -1rem;
-    }
-    &:nth-child(2n) {
-      &:after {
-        content: "";
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        margin: auto;
-        width: calc(100% - 80px);
-        background-color: #394049;
-        height: 1px;
-      }
-    }
     &__col-token-name {
       width: $width-col-token-name;
       font-weight: 800;
@@ -88,14 +95,14 @@ $width-col-actions: 13%;
         display: flex;
         align-items: center;
         height: 100%;
-        img{
+        img {
           margin-left: 15px;
         }
       }
     }
     &__col-leverage {
       width: $width-col-leverage;
-    }    
+    }
     &__col-amount {
       width: $width-col-amount;
     }
