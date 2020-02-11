@@ -39,7 +39,7 @@ export class OwnTokenGridRowInner extends Component<IOwnTokenGridRowInnerProps, 
     super(props, context);
 
     const assetDetails = AssetsDictionary.assets.get(props.currentKey.asset);
-
+    this._isMobile = false;
     this.state = {
       assetDetails: assetDetails || null,
       latestAssetPriceDataPoint: FulcrumProvider.Instance.getPriceDefaultDataPoint(),
@@ -53,6 +53,8 @@ export class OwnTokenGridRowInner extends Component<IOwnTokenGridRowInnerProps, 
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.TradeTransactionMined, this.onTradeTransactionMined);
   }
+  
+  private _isMobile: boolean;
 
   private getTradeTokenGridRowSelectionKeyRaw(props: IOwnTokenGridRowInnerProps, leverage: number = this.props.currentKey.leverage) {
     return new TradeTokenKey(this.props.currentKey.asset, this.props.currentKey.unitOfAccount, this.props.currentKey.positionType, leverage, this.props.currentKey.isTokenized, this.props.currentKey.version);
@@ -84,7 +86,7 @@ export class OwnTokenGridRowInner extends Component<IOwnTokenGridRowInnerProps, 
     // const precision = AssetsDictionary.assets.get(this.props.selectedKey.loanAsset)!.decimals || 18;
     // const balanceString = this.props.balance.dividedBy(10 ** precision).toFixed();
 
-    this.setState(p => ({
+    this._isMobile && this.setState(p => ({
       ...this.state,
       latestAssetPriceDataPoint: latestAssetPriceDataPoint,
       assetBalance: assetBalance,
@@ -109,12 +111,15 @@ export class OwnTokenGridRowInner extends Component<IOwnTokenGridRowInnerProps, 
   };
 
   public componentWillUnmount(): void {
+    this._isMobile = false;
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.TradeTransactionMined, this.onTradeTransactionMined);
   }
 
   public componentDidMount(): void {
+    this._isMobile = true;
+
     this.derivedUpdate();
   }
 
