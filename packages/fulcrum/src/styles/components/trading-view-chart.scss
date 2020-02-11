@@ -1,4 +1,8 @@
 .TVChartContainer, .TVChartContainer > iframe, .chart-wrapper {
   width: 100%;
   height: 40vh; 
+  @media only screen and (min-width: $mobile-version-max-width){
+    min-height: 400px;
+
+  }
 }
