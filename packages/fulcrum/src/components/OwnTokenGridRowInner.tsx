@@ -199,21 +199,57 @@ export class OwnTokenGridRowInner extends Component<IOwnTokenGridRowInnerProps, 
         <div title={this.props.currentKey.unitOfAccount} className="own-token-grid-row-inner__col-asset-price">{this.props.currentKey.unitOfAccount}</div>
         <div title={`$${bnPrice.toFixed(18)}`} className="own-token-grid-row-inner__col-asset-price">
           {!this.state.isLoading ?
-          <React.Fragment><span className="sign-currency">$</span>{bnPrice.toFixed(2)}</React.Fragment> : 'Loading...'}
+          <React.Fragment><span className="sign-currency">$</span>{bnPrice.toFixed(2)}</React.Fragment> 
+          :                   
+          <React.Fragment>
+          <div className="wrapper-loader">
+            <div className="container-loader">
+              <div className="item-loader"></div>
+            </div>
+          </div>
+        </React.Fragment>
+        }
         </div>
         <div title={`$${bnLiquidationPrice.toFixed(18)}`} className="own-token-grid-row-inner__col-liquidation-price">
           {!this.state.isLoading ?
-          <React.Fragment><span className="sign-currency">$</span>{bnLiquidationPrice.toFixed(2)}</React.Fragment> : 'Loading...'}
+          <React.Fragment><span className="sign-currency">$</span>{bnLiquidationPrice.toFixed(2)}</React.Fragment> 
+          : 
+          <React.Fragment>
+            <div className="wrapper-loader">
+              <div className="container-loader">
+                <div className="item-loader"></div>
+              </div>
+            </div>
+          </React.Fragment>
+          }
         </div>
         <div title={this.state.assetBalance ? `$${this.state.assetBalance.toFixed(18)}` : ``} className="own-token-grid-row-inner__col-position-value">
           {!this.state.isLoading ? 
             this.state.assetBalance ?
-            <React.Fragment><span className="sign-currency">$</span>{this.state.assetBalance.toFixed(2)}</React.Fragment> : '$0.00' : 'Loading...'}
+            <React.Fragment><span className="sign-currency">$</span>{this.state.assetBalance.toFixed(2)}</React.Fragment> : '$0.00' 
+            : 
+            <React.Fragment>
+            <div className="wrapper-loader">
+              <div className="container-loader">
+                <div className="item-loader"></div>
+              </div>
+            </div>
+          </React.Fragment>
+            }
         </div>
         <div title={this.state.profit ? `$${this.state.profit.toFixed(18)}` : ``} className="own-token-grid-row-inner__col-profit">
           {!this.state.isLoading ? 
             this.state.profit ?
-            <React.Fragment><span className="sign-currency">$</span>{this.state.profit.toFixed(2)}</React.Fragment> : '$0.00' : 'Loading...'}
+            <React.Fragment><span className="sign-currency">$</span>{this.state.profit.toFixed(2)}</React.Fragment> : '$0.00' 
+            : 
+            <React.Fragment>
+            <div className="wrapper-loader">
+              <div className="container-loader">
+                <div className="item-loader"></div>
+              </div>
+            </div>
+          </React.Fragment>
+            }
         </div>
 
         

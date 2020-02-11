@@ -56,12 +56,13 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
 
 
     return (
-      <div key={`${assetDetails.displayName}`} className={`${classNamePrefix} ${isActiveClassName}`} onClick={(e) => { this.onSelectClick(e, asset) }}>
+      <div key={`${assetDetails.displayName}`} className={`${classNamePrefix} ${isActiveClassName}`} onClick={(e) => { this.onSelectClick(e, asset) }} style={{ backgroundColor: assetDetails.bgColor, borderLeftColor: assetDetails.bgColor }}>
         <div
           className={`${classNamePrefix}__col-token-image`}
-          style={{ backgroundColor: assetDetails.bgColor, borderLeftColor: assetDetails.bgColor }}
+          
         >
           <img src={assetDetails.logoSvg} alt={assetDetails.displayName} />
+          <span style={{color: assetDetails.textColor }}>{assetDetails.displayName}</span>
         </div>
       </div>
     );
@@ -89,6 +90,7 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
             <div
               className={`trade-token-grid-tab-item__col-token-image wallet-img-div`} >
               <img className={`wallet-img`} src={walletSvg} />
+              <span style={{color: "#ffffff" }}>Manage</span>
             </div>
           </div>
 
