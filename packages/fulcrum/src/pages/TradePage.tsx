@@ -164,10 +164,6 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
       <div className="trade-page">
         <HeaderOps isMobileMedia={this.props.isMobileMedia} isLoading={this.props.isLoading} doNetworkConnect={this.props.doNetworkConnect} />
         <main>
-          <div className="chart-wrapper">
-            <TVChartContainer symbol={this.state.selectedKey.asset} preset={this.props.isMobileMedia ? "mobile" : undefined}/>
-          </div>
-
           <TokenGridTabs
             assets={this.state.assets}
             selectedKey={this.state.selectedKey}
@@ -182,6 +178,10 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
             isLong={this.state.isLong}
           />
 
+          <div className="chart-wrapper">
+            <TVChartContainer symbol={this.state.selectedKey.asset} preset={this.props.isMobileMedia ? "mobile" : undefined} />
+          </div>
+
           {this.state.showMyTokensOnly ? (
             <OwnTokenGrid
               showMyTokensOnly={this.state.showMyTokensOnly}
@@ -195,6 +195,7 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
             />
           ) : (
               <TradeTokenGrid
+                assets={this.state.assets}
                 changeActiveBtn={this.changeActiveBtn.bind(this)}
                 isMobileMedia={this.props.isMobileMedia}
                 showMyTokensOnly={this.state.showMyTokensOnly}
