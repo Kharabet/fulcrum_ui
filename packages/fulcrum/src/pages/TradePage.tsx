@@ -92,26 +92,16 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
   }
 
   private getAssets(): Asset[] {
+    var assets: Asset[];
     if (process.env.REACT_APP_ETH_NETWORK === "kovan") {
-      return [
-        Asset.ETH,
-        // Asset.SAI,
-        // Asset.DAI,
-        // Asset.USDC,
-        // Asset.SUSD,
-        Asset.WBTC,
-        Asset.LINK,
-        // Asset.MKR,
-        Asset.ZRX,
-        // Asset.BAT,
-        // Asset.REP,
-        Asset.KNC
+      assets = [
+        Asset.ETH
       ];
-    } if (process.env.REACT_APP_ETH_NETWORK === "ropsten") {
-      return [
+    } else if (process.env.REACT_APP_ETH_NETWORK === "ropsten") {
+      assets = [
       ];
     } else {
-      return [
+      assets = [
         Asset.ETH,
         // Asset.SAI,
         // Asset.DAI,
@@ -126,6 +116,7 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
         Asset.KNC
       ];
     }
+    return assets;
   }
 
 

@@ -63,9 +63,8 @@ var gainText = document.querySelector(".gain-text");
 var spinner = document.querySelector(".spinner");
 var coins = document.querySelectorAll('.chart-tokens .coin-calc');
 
-
-
 window.addEventListener('load', function () {
+
     //change active button-coin
     for (var i = 0; i < coins.length; i++) {
         coins[i].onclick = function () {

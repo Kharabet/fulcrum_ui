@@ -83,12 +83,20 @@
       left: 0;
       right: 0;
       margin: auto;
-      background-color: #276BFB;
+      background-color: #276bfb;
       border-radius: 6px;
       top: -48px;
     }
     @media(min-width: 992px){
       top: -67px;
     }
+  }
+}
+.nav-menu {
+  position: relative;
+  .icon-external {
+    position: absolute;
+    top: -6px;
+    left: -16px;
   }
 }

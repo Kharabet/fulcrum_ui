@@ -196,9 +196,10 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
           <div className="trade-token-card-mobile__body-row">
             <div className="trade-token-card-mobile__leverage">
               <LeverageSelector
+                asset={this.props.asset}
                 value={this.state.leverage}
                 minValue={this.props.positionType === PositionType.SHORT ? 1 : 2}
-                maxValue={4}
+                maxValue={5}
                 onChange={this.onLeverageSelect}
               />
             </div>
@@ -218,7 +219,7 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
                       </div>
                     </div>
                   </React.Fragment>
-                  }
+                }
               </span>
             </div>
             <div title={`$${bnLiquidationPrice.toFixed(18)}`} className="trade-token-card-mobile__price">
@@ -240,7 +241,7 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
               <span>Interest APR</span>
               <span>
                 {this.state.interestRate.gt(0) ? <React.Fragment>{this.state.interestRate.toFixed(4)}<span className="fw-normal">%</span></React.Fragment>
-                  : 
+                  :
                   <React.Fragment>
                     <div className="wrapper-loader">
                       <div className="container-loader">
@@ -248,7 +249,7 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
                       </div>
                     </div>
                   </React.Fragment>
-                  }
+                }
               </span>
             </div>
           </div>

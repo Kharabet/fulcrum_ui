@@ -15,6 +15,9 @@ export class TradeRequest {
   public amount: BigNumber;
   public isTokenized: boolean;
   public version: number;
+  public inputAmountValue: BigNumber;
+  public loanDataBytes: string;
+  public zeroXFee: BigNumber;
 
   constructor(
     tradeType: TradeType,
@@ -25,7 +28,10 @@ export class TradeRequest {
     leverage: number,
     amount: BigNumber,
     isTokenized: boolean,
-    version?: number
+    version?: number,
+    inputAmountValue?: BigNumber,
+    loanDataBytes?: string,
+    zeroXFee?: BigNumber
     ) {
     this.id = moment().unix();
     this.tradeType = tradeType;
@@ -37,6 +43,9 @@ export class TradeRequest {
     this.amount = amount;
     this.isTokenized = isTokenized;
     this.version = version ? version : 1;
+    this.inputAmountValue = inputAmountValue ? inputAmountValue : new BigNumber(0)
+    this.loanDataBytes = loanDataBytes ? loanDataBytes : "";
+    this.zeroXFee = zeroXFee ? zeroXFee : new BigNumber(0);
   }
 
   public getRequestTypeName(): string {

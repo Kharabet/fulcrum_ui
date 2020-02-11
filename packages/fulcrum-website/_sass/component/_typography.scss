@@ -106,6 +106,9 @@ a {
 .lh-100 {
   line-height: 1;
 }
+.lh-125{
+  line-height: 1.25;
+}
 .lh-140 {
   line-height: 1.4;
 }
@@ -179,6 +182,9 @@ a {
   }
   .fs-md-20 {
     font-size: 20px;
+  }
+  .fs-md-36 {
+    font-size: 36px;
   }
 }
 @media (max-width: 767px) {
