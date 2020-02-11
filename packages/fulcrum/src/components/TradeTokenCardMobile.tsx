@@ -207,22 +207,48 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
           <div className="trade-token-card-mobile__body-row">
             <div title={`$${bnPrice.toFixed(18)}`} className="trade-token-card-mobile__price">
               <span>Asset Price</span>
-              <span>          
+              <span>
                 {!this.state.isLoading ?
-                <React.Fragment><span className="fw-normal">$</span>{bnPrice.toFixed(2)}</React.Fragment> : 'Loading...'}
+                  <React.Fragment><span className="fw-normal">$</span>{bnPrice.toFixed(2)}</React.Fragment>
+                  :
+                  <React.Fragment>
+                    <div className="wrapper-loader">
+                      <div className="container-loader">
+                        <div className="item-loader"></div>
+                      </div>
+                    </div>
+                  </React.Fragment>
+                  }
               </span>
             </div>
             <div title={`$${bnLiquidationPrice.toFixed(18)}`} className="trade-token-card-mobile__price">
               <span>Liquidation Price</span>
               <span>
                 {!this.state.isLoading ?
-                <React.Fragment><span className="fw-normal">$</span>{bnLiquidationPrice.toFixed(2)}</React.Fragment> : 'Loading...'}
+                  <React.Fragment><span className="fw-normal">$</span>{bnLiquidationPrice.toFixed(2)}</React.Fragment>
+                  :
+                  <React.Fragment>
+                    <div className="wrapper-loader">
+                      <div className="container-loader">
+                        <div className="item-loader"></div>
+                      </div>
+                    </div>
+                  </React.Fragment>}
               </span>
             </div>
             <div title={this.state.interestRate.gt(0) ? `${this.state.interestRate.toFixed(18)}%` : ``} className="trade-token-card-mobile__profit">
               <span>Interest APR</span>
               <span>
-                {this.state.interestRate.gt(0) ? <React.Fragment>{this.state.interestRate.toFixed(4)}<span className="fw-normal">%</span></React.Fragment> : "Loading..."}
+                {this.state.interestRate.gt(0) ? <React.Fragment>{this.state.interestRate.toFixed(4)}<span className="fw-normal">%</span></React.Fragment>
+                  : 
+                  <React.Fragment>
+                    <div className="wrapper-loader">
+                      <div className="container-loader">
+                        <div className="item-loader"></div>
+                      </div>
+                    </div>
+                  </React.Fragment>
+                  }
               </span>
             </div>
           </div>
