@@ -178,9 +178,10 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
             isLong={this.state.isLong}
           />
 
-          <div className="chart-wrapper">
-            <TVChartContainer symbol={this.state.selectedKey.asset} preset={this.props.isMobileMedia ? "mobile" : undefined} />
-          </div>
+          {!this.state.showMyTokensOnly ? (
+            <div className="chart-wrapper">
+              <TVChartContainer symbol={this.state.selectedKey.asset} preset={this.props.isMobileMedia ? "mobile" : undefined} />
+            </div>) : null}
 
           {this.state.showMyTokensOnly ? (
             <OwnTokenGrid
