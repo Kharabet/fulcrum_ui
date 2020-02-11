@@ -372,6 +372,9 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       submitButtonText += ` ${this.props.asset}`;
     }
 
+    //It could be field for OwnTradeTokenRow
+    // const currentAssets = this.state.positionTokenBalance && `${this.state.positionTokenBalance.div(10**this.state.assetDetails.decimals).toFixed()} ${this.state.assetDetails.displayName}`; //currentAssets
+
     // <form className="trade-form" onSubmit={!(this.props.asset === Asset.LINK && this.props.tradeType === TradeType.BUY) ? this.onSubmitClick : undefined} style={this.props.tradeType === TradeType.SELL ? { minHeight: `16.5625rem` } : undefined}>
     return (
       <form className="trade-form" onSubmit={this.onSubmitClick} style={this.props.tradeType === TradeType.SELL ? { minHeight: `16.5625rem` } : undefined}>
