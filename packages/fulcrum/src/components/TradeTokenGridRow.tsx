@@ -53,7 +53,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
     super(props, context);
 
     const assetDetails = AssetsDictionary.assets.get(props.asset);
-
+    this._isMounted = false;
     this.state = {
       leverage: this.props.defaultLeverage,
       assetDetails: assetDetails || null,
@@ -68,6 +68,8 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.TradeTransactionMined, this.onTradeTransactionMined);
   }
+  
+  private _isMounted: boolean;
 
   private getTradeTokenGridRowSelectionKeyRaw(props: ITradeTokenGridRowProps, leverage: number = this.state.leverage) {
     const key = new TradeTokenKey(props.asset, props.defaultUnitOfAccount, props.positionType, leverage, props.defaultTokenizeNeeded, 2);
@@ -96,7 +98,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
     const interestRate = await FulcrumProvider.Instance.getTradeTokenInterestRate(tradeTokenKey);
     const balance = await FulcrumProvider.Instance.getPTokenBalanceOfUser(tradeTokenKey);
 
-    this.setState(p => ({
+    this._isMounted && this.setState(p => ({
       ...this.state,
       latestPriceDataPoint: latestPriceDataPoint,
       interestRate: interestRate,
@@ -121,12 +123,16 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
   };
 
   public componentWillUnmount(): void {
+    this._isMounted = false;
+
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.TradeTransactionMined, this.onTradeTransactionMined);
   }
 
   public componentDidMount(): void {
+    this._isMounted = true;
+
     this.derivedUpdate();
   }
 
@@ -262,7 +268,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
   public onLeverageSelect = (value: number) => {
     const key = this.getTradeTokenGridRowSelectionKey(value);
 
-    this.setState({ ...this.state, leverage: value, version: key.version });
+    this._isMounted && this.setState({ ...this.state, leverage: value, version: key.version });
 
     this.props.onSelect(this.getTradeTokenGridRowSelectionKey(value));
   };

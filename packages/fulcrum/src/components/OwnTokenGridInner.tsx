@@ -33,6 +33,7 @@ export class OwnTokenGridInner extends Component<IOwnTokenGridProps, IOwnTokenGr
   constructor(props: IOwnTokenGridProps) {
     super(props);
 
+    this._isMounted = false;
     this.state = {
       tokenRowsData: []
     };
@@ -40,18 +41,21 @@ export class OwnTokenGridInner extends Component<IOwnTokenGridProps, IOwnTokenGr
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.TradeTransactionMined, this.onTradeTransactionMined);
   }
+  private _isMounted: boolean;
 
   public async derivedUpdate() {
     const tokenRowsData = await OwnTokenGridInner.getRowsData(this.props);
-    this.setState({ ...this.state, tokenRowsData: tokenRowsData });
+    this._isMounted && this.setState({ ...this.state, tokenRowsData: tokenRowsData });
   }
 
   public componentWillUnmount(): void {
+    this._isMounted = false;
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.TradeTransactionMined, this.onTradeTransactionMined);
   }
 
   public componentDidMount(): void {
+    this._isMounted = true;
     this.derivedUpdate();
   }
 
@@ -81,16 +85,8 @@ export class OwnTokenGridInner extends Component<IOwnTokenGridProps, IOwnTokenGr
       <div className="own-token-grid">
         <div className="own-token-grid-header-inner">
           <div className="own-token-grid-header-inner__col-token-image">
-            <span className="own-token-grid-header-inner__text">Asset Manage Positions</span>
+            <span className="own-token-grid-header-inner__text">Leverage</span>
           </div>
-          {/*        
-        <div className="own-token-grid-header-inner__col-token-name-full">
-          <span className="own-token-grid-header-inner__text">&nbsp;</span>
-        </div>
-        <div className="own-token-grid-header-inner__col-position-type">
-          <span className="own-token-grid-header-inner__text">&nbsp;</span>
-        </div>
-        */}
           <div className="own-token-grid-header-inner__col-asset-price">
             <span className="own-token-grid-header-inner__text">Unit of Account</span>
           </div>
@@ -106,13 +102,6 @@ export class OwnTokenGridInner extends Component<IOwnTokenGridProps, IOwnTokenGr
           <div className="own-token-grid-header-inner__col-profit">
             <span className="own-token-grid-header-inner__text">Profit</span>
           </div>
-          {/*
-        <div className="own-token-grid-header-inner__col-actions">
-          <span className="own-token-grid-header-inner__text-right">
-            <CheckBox checked={this.props.showMyTokensOnly} onChange={this.showMyTokensOnlyChange}>Manage Positions</CheckBox>
-          </span>
-        </div>
-        */}
         </div>
         {tokenRows}
       </div>
