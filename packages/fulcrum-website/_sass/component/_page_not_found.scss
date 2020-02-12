@@ -1,0 +1,44 @@
+.container-404 {
+  margin: 0 auto;
+  max-width: 730px;
+  color: #000085;
+  h1 {
+    font-size: 46px;
+    color: #000085;
+    margin: 60px 0 30px 0;
+  }
+  h2 {
+    font-size: 32px;
+    color: #000085;
+    margin: 30px 0 15px 0;
+    @media(max-width: 579px){
+      font-size: 27px;
+    }
+  }
+  p {
+    font-size: 18px;
+    margin-bottom: 15px;
+    strong {
+      font-weight: 800;
+    }
+  }
+  ul {
+    list-style: none;
+    margin-bottom: 60px;
+    li {
+    font-size: 18px;
+      line-height: 1.8;
+      padding-left: 30px;
+      position: relative;
+      @media(max-width: 579px){
+          font-size: 14px;
+      }
+      &:before {
+        content: "\2022";
+        position: absolute;
+        color: #33dfcc;
+        left: 0;
+      }
+    }
+  }
+}
