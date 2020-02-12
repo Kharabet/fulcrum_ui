@@ -11,6 +11,7 @@ import mkr_logo from "../assets/images/ic_token_mkr.svg";
 import rep_logo from "../assets/images/ic_token_rep.svg";
 import sai_logo from "../assets/images/ic_token_sai.svg";
 import susd_logo from "../assets/images/ic_token_susd.svg";
+import usdt_logo from "../assets/images/ic_token_usdt.svg";
 import usdc_logo from "../assets/images/ic_token_usdc.svg";
 import zrx_logo from "../assets/images/ic_token_zrx.svg";
 
@@ -24,11 +25,12 @@ import mkr_bg from "../assets/images/popup_left_token_mkr.svg";
 import rep_bg from "../assets/images/popup_left_token_rep.svg";
 import sai_bg from "../assets/images/popup_left_token_sai.svg";
 import susd_bg from "../assets/images/popup_left_token_susd.svg";
+import usdt_bg from "../assets/images/popup_left_token_usdt.svg";
 import usdc_bg from "../assets/images/popup_left_token_usdc.svg";
 import zrx_bg from "../assets/images/popup_left_token_zrx.svg";
 
 import bat_bg_btm from "../assets/images/popup_bottom_token_bat.svg";
-import btc_bg_btm from "../assets/images/popup_bottom_token_btc.svg";
+//import btc_bg_btm from "../assets/images/popup_bottom_token_btc.svg";
 import dai_bg_btm from "../assets/images/popup_bottom_token_dai.svg";
 import eth_bg_btm from "../assets/images/popup_bottom_token_eth.svg";
 import knc_bg_btm from "../assets/images/popup_bottom_token_knc.svg";
@@ -37,6 +39,7 @@ import mkr_bg_btm from "../assets/images/popup_bottom_token_mkr.svg";
 import rep_bg_btm from "../assets/images/popup_bottom_token_rep.svg";
 import sai_bg_btm from "../assets/images/popup_bottom_token_sai.svg";
 import susd_bg_btm from "../assets/images/popup_bottom_token_susd.svg";
+//import usdt_bg_btm from "../assets/images/popup_bottom_token_susd.svg";
 import usdc_bg_btm from "../assets/images/popup_bottom_token_usdc.svg";
 import zrx_bg_btm from "../assets/images/popup_bottom_token_zrx.svg";
 
@@ -50,6 +53,7 @@ import mkr_ts from "../assets/images/ic___token_selector___mkr.svg";
 import rep_ts from "../assets/images/ic___token_selector___rep.svg";
 import sai_ts from "../assets/images/ic___token_selector___sai.svg";
 import susd_ts from "../assets/images/ic___token_selector___susd.svg";
+import usdt_ts from "../assets/images/ic___token_selector___susd.svg";
 import usdc_ts from "../assets/images/ic___token_selector___usdc.svg";
 import btc_ts from "../assets/images/ic___token_selector___wbtc.svg";
 import zrx_ts from "../assets/images/ic___token_selector___zrx.svg";
@@ -117,7 +121,27 @@ export class AssetsDictionary {
         ])
       )
     ],
-
+    [
+      Asset.USDT,
+      new AssetDetails(
+        "USDT",
+        "Tether USD (USDT)",
+        "iUSDT",
+        "https://fulcrum.trade/images/iUSDT.svg",
+        6,
+        usdt_logo,
+        usdt_bg,
+        usdt_ts,
+        "#8777B1",
+        "#FFFFFF",
+        "#FFFFFF",
+        new Map<number, string | null>([
+          [1, "0xdac17f958d2ee523a2206206994597c13d831ec7"],
+          [3, ""],
+          [42, ""]
+        ])
+      )
+    ],
     [
       Asset.SAI,
       new AssetDetails(
@@ -415,7 +439,27 @@ export class AssetsDictionaryMobile {
         ])
       )
     ],
-
+    [
+      Asset.USDT,
+      new AssetDetails(
+        "USDT",
+        "Tether USD (USDT)",
+        "iUSDT",
+        "https://fulcrum.trade/images/iUSDT.svg",
+        6,
+        usdt_logo,
+        usdt_bg,
+        usdt_ts,
+        "#8777B1",
+        "#FFFFFF",
+        "#FFFFFF",
+        new Map<number, string | null>([
+          [1, "0xdac17f958d2ee523a2206206994597c13d831ec7"],
+          [3, ""],
+          [42, ""]
+        ])
+      )
+    ],
     [
       Asset.SAI,
       new AssetDetails(

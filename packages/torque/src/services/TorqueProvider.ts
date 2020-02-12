@@ -400,7 +400,7 @@ export class TorqueProvider {
   }
 
   public async getSwapToUsdRate(asset: Asset): Promise<BigNumber> {
-    if (asset === Asset.SAI || asset === Asset.DAI || asset === Asset.USDC || asset === Asset.SUSD) {
+    if (asset === Asset.SAI || asset === Asset.DAI || asset === Asset.USDC || asset === Asset.SUSD || asset === Asset.USDT) {
       return new BigNumber(1);
     }
 
@@ -1163,7 +1163,8 @@ export class TorqueProvider {
     if (asset === Asset.SAI ||
       asset === Asset.DAI ||
       asset === Asset.USDC ||
-      asset === Asset.SUSD) {
+      asset === Asset.SUSD ||
+      asset === Asset.USDT) {
         return true;
       } else {
         return false;

@@ -1533,7 +1533,7 @@ export class FulcrumProvider {
   }
 
   public async getSwapToUsdRate(asset: Asset): Promise<BigNumber> {
-    if (asset === Asset.SAI || asset === Asset.DAI || asset === Asset.USDC || asset === Asset.SUSD) {
+    if (asset === Asset.SAI || asset === Asset.DAI || asset === Asset.USDC || asset === Asset.SUSD || asset === Asset.USDT) {
       return new BigNumber(1);
     }
 
@@ -1558,6 +1558,7 @@ export class FulcrumProvider {
       case Asset.WBTC:
         return new BigNumber(10**6);
       case Asset.USDC:
+      case Asset.USDT:
         return new BigNumber(10**4);
       default:
         return new BigNumber(10**16);

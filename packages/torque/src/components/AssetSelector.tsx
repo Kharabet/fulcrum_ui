@@ -20,16 +20,16 @@ export class AssetSelector extends Component<IAssetSelectorProps> {
     if (process.env.REACT_APP_ETH_NETWORK === "mainnet") {
       this.assetsShown = new Map<Asset, boolean>([
         [
-          Asset.SAI,
-          true
-        ],
-        [
           Asset.DAI,
           false
         ],
         [
           Asset.USDC,
           true
+        ],
+        [
+          Asset.USDT,
+          false
         ],
         [
           Asset.SUSD,

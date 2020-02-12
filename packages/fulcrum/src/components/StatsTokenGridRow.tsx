@@ -66,7 +66,7 @@ export class StatsTokenGridRow extends Component<IStatsTokenGridRowProps, IStats
       return (
         <div className="stats-grid-row">
           <div className="stats-grid-row__col-name">ALL</div>
-          <div title={details.usdTotalLocked ? `$${details.usdTotalLocked.toFixed(18)}` : ``} className="stats-grid-row__col-total-tlv-usd">{details.usdTotalLocked ? `$${this.numberWithCommas(details.usdTotalLocked.toFixed(4))}` : `-`}</div>
+          <div title={details.usdTotalLocked ? `$${details.usdTotalLocked.toFixed(18)}` : ``} className="stats-grid-row__col-total-tvl-usd">{details.usdTotalLocked ? `$${this.numberWithCommas(details.usdTotalLocked.toFixed(4))}` : `-`}</div>
           <div title={details.totalSupply ? `${details.totalSupply.toFixed(this.state.decimals)}` : ``} className="stats-grid-row__col-total-supply-usd">{details.usdSupply ? `$${this.numberWithCommas(details.usdSupply.toFixed(4))}` : `-`}</div>
           <div className="stats-grid-row__col-total-supply">-</div>
           <div className="stats-grid-row__col-total-borrow">-</div>
@@ -111,7 +111,7 @@ export class StatsTokenGridRow extends Component<IStatsTokenGridRowProps, IStats
         ) : (
           <div className="stats-grid-row__col-name">{details.asset!}</div>
         )}
-        <div title={details.usdTotalLocked ? `$${details.usdTotalLocked.toFixed(18)}` : ``} className="stats-grid-row__col-total-tlv-usd">{details.usdTotalLocked ? `$${this.numberWithCommas(details.usdTotalLocked.toFixed(4))}` : `-`}</div>
+        <div title={details.usdTotalLocked ? `$${details.usdTotalLocked.toFixed(18)}` : ``} className="stats-grid-row__col-total-tvl-usd">{details.usdTotalLocked ? `$${this.numberWithCommas(details.usdTotalLocked.toFixed(4))}` : `-`}</div>
         <div title={details.usdSupply ? `$${details.usdSupply.toFixed(18)}` : ``} className="stats-grid-row__col-total-supply-usd">{details.usdSupply ? `$${this.numberWithCommas(details.usdSupply.toFixed(4))}` : `-`}</div>
         <div title={details.totalSupply ? `${details.totalSupply.toFixed(this.state.decimals)}` : ``} className="stats-grid-row__col-total-supply">{details.totalSupply ? `${this.numberWithCommas(details.totalSupply.toFixed(4))}` : `-`}</div>
         <div title={details.totalBorrow ? `${details.totalBorrow.toFixed(this.state.decimals)}` : ``} className="stats-grid-row__col-total-borrow">{details.totalBorrow ? `${this.numberWithCommas(details.totalBorrow.toFixed(4))}` : `-`}</div>
