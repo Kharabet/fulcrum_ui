@@ -1,12 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-  <defs>
-    <style>
-      .cls-1{fill:#fff}
-    </style>
-  </defs>
-  <g id="ic_menu">
-    <rect x="2" y="4" class="cls-1" width="20" height="2"/>
-    <rect x="2" y="10" class="cls-1" width="20" height="2"/>
-    <rect x="2" y="16" class="cls-1" width="20" height="2"/>
-  </g>
+<svg width="27" height="22" viewBox="0 0 27 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M0 0H19V2H0V0Z" fill="#276BFB"/>
+<path d="M0 20H12V22H0V20Z" fill="#276BFB"/>
+<path d="M27 10H0V12H27V10Z" fill="#276BFB"/>
 </svg>

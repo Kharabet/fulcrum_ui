@@ -5,10 +5,10 @@ import { HeaderMenu, IHeaderMenuProps } from "./HeaderMenu";
 import { HeaderMenuToggle } from "./HeaderMenuToggle";
 import ic_close from "../assets/images/ic_close.svg";
 import menu_icon from "../assets/images/ic_menu.svg";
-import {TorqueProvider} from "../../../torque/src/services/TorqueProvider";
-import {ProviderType} from "../../../torque/src/domain/ProviderType";
-
-``
+import { TorqueProvider } from "../../../torque/src/services/TorqueProvider";
+import { ProviderType } from "../../../torque/src/domain/ProviderType";
+import { ReactComponent as MenuIconOpen } from "../assets/images/ic_menu.svg";
+import { ReactComponent as MenuIconClose } from "../assets/images/ic_close.svg";
 
 export interface IHeaderOpsProps {
   doNetworkConnect: () => void;
@@ -90,11 +90,9 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
             <HeaderLogo />
           </div>
           <div className="header_icon" onClick={this.onMenuToggle}>
-              <img className="header__menu" src={toggleImg} />
-            </div>
-          {/*<div className="header__right">*/}
-            {/*<HeaderMenuToggle isMenuOpen={this.state.isMenuOpen} onMenuToggle={this.onMenuToggle} />*/}
-          {/*</div>*/}
+            {!this.state.isMenuOpen ? <MenuIconOpen className="header__menu" /> : <MenuIconClose className="header__menu" />}
+          </div>
+
         </div>
         {this.state.isMenuOpen ? (
 
@@ -114,6 +112,7 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
   };
 
   private onMenuToggle = () => {
+    document.body.style.overflow = !this.state.isMenuOpen ? "hidden" : "";
     this.setState({ ...this.state, isMenuOpen: !this.state.isMenuOpen });
   };
 }
