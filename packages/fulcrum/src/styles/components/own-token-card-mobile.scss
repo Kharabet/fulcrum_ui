@@ -41,7 +41,10 @@
               width: 40%;
             }
             > div + div, div:last-child{
-              width: 30%
+                width: 30%;
+                &.wrapper-loader, &.container-loader{
+                    width: 100%;
+                }
             }
         }
     }
