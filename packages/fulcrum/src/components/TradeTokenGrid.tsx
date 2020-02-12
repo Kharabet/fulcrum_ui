@@ -43,8 +43,8 @@ interface ITradeTokenGridState {
 export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenGridState> {
   private static assets: Asset[];
 
-  private static readonly longVal = [2,3,4];
-  private static readonly shortVal = [1,2,3,4];
+  private static readonly longVal = [2,3,4,5];
+  private static readonly shortVal = [1,2,3,4,5];
 
   private static defaultUnitOfAccount: Asset;
 
