@@ -13,11 +13,12 @@
 .header-menu {
   display: flex;
   flex-direction: row;
+  justify-content: flex-end;
+  width: 100%;
 }
 
 .header-menu__item {
-  width: 6.0rem;
-
+  margin-right: 50px;
   a {
     text-decoration: none;
     text-align: center;
@@ -25,6 +26,9 @@
 
 
     color: #00C0AB;
+    &.color-primary{
+      color: #276bfb;
+    }
 
     font-family: "Muli", sans-serif;
     font-style: normal;
@@ -47,8 +51,8 @@
         margin: auto;
         background-color: #276bfb;
         top: -44px;
-        left: 0;
-        right: 0;
+        left: 50%;
+        transform: translate(-50% ,0);
         border-radius: 6px;
       }
     }
