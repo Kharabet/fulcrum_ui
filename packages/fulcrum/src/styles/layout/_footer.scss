@@ -3,7 +3,7 @@
   position: fixed;
   bottom: 0;
   width: calc(100% - 30px);
-  .footer{
+  .footer {
     padding-bottom: 5px;
   }
 }
@@ -19,7 +19,12 @@
   margin-top: auto;
   padding-top: 1.5rem;
   padding-bottom: 1.75rem;
-  font-size: 0.75rem;
+  
+  font-family: "Muli", sans-serif;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 12px;
+  line-height: 150%;
 
   .footer-version {
     color: #758295;
@@ -37,6 +42,7 @@
 
     color: #758295;
 
+
     &:not(:first-child) {
       margin-left: 1.5rem;
     }
@@ -49,9 +55,6 @@
 
 @media screen and (max-width: $mobile-version-max-width) {
   .footer {
-    font-family: Muli;
-    font-style: normal;
-    font-weight: normal;
     font-size: 10px;
     line-height: 150%;
 
