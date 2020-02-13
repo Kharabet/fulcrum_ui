@@ -1,21 +1,16 @@
 .own-token-cards {
-    margin-top: 20px;
     width: 100%;
     &__header {
-        margin-bottom: 15px;
-        font-family: 'Muli', sans-serif;;
-        font-style: normal;
-        font-weight: 600;
-        font-size: 14px;
-        line-height: 150%;
-        /* identical to box height, or 21px */
-
         display: flex;
-        justify-content: center;
-
-        text-align: center;
-
-        color: #a2abb8;
+        justify-content: flex-start;
+        padding: 0 15px;
+        font-family: Muli;
+        font-style: normal;
+        font-weight: 900;
+        font-size: 28px;
+        line-height: 140%;
+        color: #FFFFFF;
+        margin-bottom: 15px;
     }
     &__container {
         padding: 0 15px;

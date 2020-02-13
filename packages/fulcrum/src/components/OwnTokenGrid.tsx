@@ -97,11 +97,8 @@ export class OwnTokenGrid extends Component<IOwnTokenGridProps, IOwnTokenGridSta
     return (
       <div className="own-token-cards">
 
-        <div className="own-token-cards__header">
-          Asset Manage Positions
-        </div>
+        <div className="own-token-cards__header">Manage</div>
         <div className="own-token-cards__container">
-
           {tokenRows}
         </div>
       </div>
