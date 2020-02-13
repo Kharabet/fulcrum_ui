@@ -225,7 +225,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
           <Change24HMarker value={bnChange24h} size={Change24HMarkerSize.MEDIUM} />
         </div>*/}
         <div title={this.state.interestRate.gt(0) ? `${this.state.interestRate.toFixed(18)}%` : ``} className="trade-token-grid-row__col-profit">
-          {this.state.interestRate.gt(0) ?
+          {this.state.interestRate.gt(0) && !this.state.isLoading ?
             <React.Fragment>
               {this.state.interestRate.toFixed(4)}
               <span className="fw-normal">%</span>
@@ -252,7 +252,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
   public onLeverageSelect = (value: number) => {
     const key = this.getTradeTokenGridRowSelectionKey(value);
 
-    this._isMounted && this.setState({ ...this.state, leverage: value, version: key.version });
+    this._isMounted && this.setState({ ...this.state, leverage: value, version: key.version, isLoading: true });
 
     this.props.onSelect(this.getTradeTokenGridRowSelectionKey(value));
   };

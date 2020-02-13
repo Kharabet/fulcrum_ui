@@ -228,7 +228,8 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
             <div title={this.state.interestRate.gt(0) ? `${this.state.interestRate.toFixed(18)}%` : ``} className="trade-token-card-mobile__profit">
               <span>Interest APR</span>
               <span>
-                {this.state.interestRate.gt(0) ? <React.Fragment>{this.state.interestRate.toFixed(4)}<span className="fw-normal">%</span></React.Fragment>
+                {this.state.interestRate.gt(0) && !this.state.isLoading
+                  ? <React.Fragment>{this.state.interestRate.toFixed(4)}<span className="fw-normal">%</span></React.Fragment>
                   : <Preloader />
                 }
               </span>
@@ -291,7 +292,7 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
   public onLeverageSelect = (value: number) => {
     const key = this.getTradeTokenGridRowSelectionKey(value);
 
-    this.setState({ ...this.state, leverage: value, version: key.version });
+    this.setState({ ...this.state, leverage: value, version: key.version, isLoading: true });
 
     this.props.onSelect(this.getTradeTokenGridRowSelectionKey(value));
   };
