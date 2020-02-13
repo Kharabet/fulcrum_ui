@@ -19,9 +19,10 @@ export class CollateralTokenSelector extends Component<ICollateralTokenSelectorP
     if (process.env.REACT_APP_ETH_NETWORK === "mainnet") {
       this.assets = [
         Asset.ETH,
-        Asset.SAI,
+        // Asset.SAI,
         Asset.DAI,
         Asset.USDC,
+        Asset.USDT,
         Asset.SUSD,
         Asset.LINK,
         Asset.WBTC,

@@ -82,7 +82,7 @@ export class StatsTokenGridCard extends Component<IStatsTokenGridCardProps, ISta
           <div className="stats-grid-card__details-container">
             <div className="stats-grid-card__kv-container">
               <div className="stats-grid-card__kv-title">
-                <span className="">All Assets - TLV (USD)</span>
+                <span className="">All Assets - TVL (USD)</span>
               </div>
               <div className="stats-grid-card__kv-dots" />
               <div
@@ -120,7 +120,7 @@ export class StatsTokenGridCard extends Component<IStatsTokenGridCardProps, ISta
         <div className="stats-grid-card__details-container">
           <div className="stats-grid-card__kv-container">
             <div className="stats-grid-card__kv-title">
-              <span className="">TLV (USD)</span>
+              <span className="">TVL (USD)</span>
             </div>
             <div className="stats-grid-card__kv-dots" />
             <div

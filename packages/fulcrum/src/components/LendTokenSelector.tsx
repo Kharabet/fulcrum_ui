@@ -32,6 +32,7 @@ export class LendTokenSelector extends Component<ILendTokenSelectorProps> {
         Asset.SAI,
         Asset.DAI,
         Asset.USDC,
+        Asset.USDT,
         Asset.SUSD,
         Asset.WBTC,
         Asset.LINK,

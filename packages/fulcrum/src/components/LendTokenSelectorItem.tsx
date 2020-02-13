@@ -140,13 +140,13 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
             </div>
           </div>
         ) : null}
-        {/*this.props.asset === Asset.DAI ? (
+        {this.props.asset === Asset.DAI ? (
           <div className="token-select-item-mcd-bridge" onClick={this.onFulcrumMcdBridgeClick}>
             <div className="token-select-item-mcd-bridge__text token-select-item-mcd-bridge__text--downgrade">
               MIGRATE TO<br/>iSAI
             </div>
           </div>
-        ) : null*/}
+        ) : null}
         <div className="token-selector-item__image">
           <img src={this.state.assetDetails.logoSvg} alt={this.state.assetDetails.displayName} />
         </div>
