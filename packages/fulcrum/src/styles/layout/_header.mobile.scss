@@ -18,6 +18,9 @@
         //width: 100%;
         z-index: 10001;
 
+        flex: initial;
+        width: calc(100% - 110px);
+    
         // float: left;
       }
       .header__center {
