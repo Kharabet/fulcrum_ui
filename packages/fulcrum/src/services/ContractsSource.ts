@@ -378,6 +378,7 @@ export class ContractsSource {
         addressList.push(addr!);
       }
     });
+    // console.log(assetList, addressList);
 
     return [assetList, addressList];
   }

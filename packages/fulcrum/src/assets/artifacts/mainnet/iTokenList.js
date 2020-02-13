@@ -10,4 +10,5 @@ export const iTokenList = [
   ["1","0xA7Eb2bc82df18013ecC2A6C533fc29446442EDEe","0xe41d2489571d322189246dafa5ebde1f4699f498","Fulcrum ZRX iToken","iZRX","1"  ],
   ["1","0x1D496da96caf6b518b133736beca85D5C4F9cBc5","0x514910771AF9Ca656af840dff83E8264EcF986CA","Fulcrum LINK iToken","iLINK","1"  ],
   ["1","0x49f4592e641820e928f9919ef4abd92a719b4b49","0x57ab1ec28d129707052df4df418d58a2d46d5f51","Fulcrum sUSD iToken","iSUSD","1"  ],
+  ["1","0x8326645f3aa6de6420102fdb7da9e3a91855045b","0xdac17f958d2ee523a2206206994597c13d831ec7","Fulcrum Tether iToken","iUSDT","1"  ],
 ];

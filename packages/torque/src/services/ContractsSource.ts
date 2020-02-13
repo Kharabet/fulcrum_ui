@@ -98,6 +98,16 @@ export class ContractsSource {
             break;
         }
         break;
+      case Asset.USDT:
+        switch (this.networkId) {
+          case 1:
+            address = "0x8326645f3aa6de6420102fdb7da9e3a91855045b";
+            break;
+          case 42:
+            address = "";
+            break;
+        }
+        break;
       case Asset.SAI:
         switch (this.networkId) {
           case 1:
@@ -254,6 +264,9 @@ export class ContractsSource {
             break;
           case "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48":
             asset = Asset.USDC;
+            break;
+          case "0xdac17f958d2ee523a2206206994597c13d831ec7":
+            asset = Asset.USDT;
             break;
           case "0x57ab1ec28d129707052df4df418d58a2d46d5f51":
             asset = Asset.SUSD;
