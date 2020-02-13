@@ -25,7 +25,9 @@ export interface ChartContainerProps {
 	studiesOverrides: ChartingLibraryWidgetOptions['studies_overrides'];
 	containerId: ChartingLibraryWidgetOptions['container_id'];
 	theme: ChartingLibraryWidgetOptions['theme'];
-	preset: ChartingLibraryWidgetOptions['preset']
+	preset: ChartingLibraryWidgetOptions['preset'];
+	overrides: ChartingLibraryWidgetOptions['overrides'];
+	custom_css_url: ChartingLibraryWidgetOptions['custom_css_url'];
 }
 
 export interface ChartContainerState {
@@ -48,7 +50,7 @@ export class TVChartContainer extends React.PureComponent<Partial<ChartContainer
 	}
 	public static defaultProps: ChartContainerProps = {
 		symbol: 'ETH',
-		interval: 'D',
+		interval: '30',
 		containerId: 'tv_chart_container',
 		datafeedUrl: 'https://api.kyber.network/chart',
 		disabledFeatures: ["left_toolbar", "header_compare", "header_undo_redo", "header_saveload", "header_settings", "header_screenshot", 'use_localstorage_for_settings', "header_fullscreen_button", "go_to_date"],
@@ -61,7 +63,11 @@ export class TVChartContainer extends React.PureComponent<Partial<ChartContainer
 		autosize: true,
 		studiesOverrides: {},
 		theme: 'Dark',
-		preset: undefined
+		preset: undefined,
+		overrides: {
+			"paneProperties.background": "#283038"
+		},
+		custom_css_url: "/charting_library/custom_css.css"
 	};
 
 	private tvWidget: IChartingLibraryWidget | null = null;
@@ -85,7 +91,9 @@ export class TVChartContainer extends React.PureComponent<Partial<ChartContainer
 			autosize: this.props.autosize,
 			studies_overrides: this.props.studiesOverrides,
 			theme: this.props.theme,
-			preset: this.props.preset
+			preset: this.props.preset,
+			overrides: this.props.overrides,
+			custom_css_url: this.props.custom_css_url
 		};
 	}
 	public componentDidMount(): void {
