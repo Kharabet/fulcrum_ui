@@ -16,11 +16,11 @@ export class ProviderMenuListItem extends Component<IProviderMenuListItemProps> 
       return null;
     }
 
-    const content = providerTypeDetails.logoSvg ? (
-      <img className="provider-menu__list-item-content-img" src={providerTypeDetails.logoSvg} alt={providerTypeDetails.displayName} />
-    ) : (
-      <div className="provider-menu__list-item-content-txt">{providerTypeDetails.displayName}</div>
-    );
+    const content = providerTypeDetails.logoSvg
+    ? 
+      (<div className="provider-menu__list-item-content-img">{providerTypeDetails.reactLogoSvg.render()}</div>) 
+    : 
+      (<div className="provider-menu__list-item-content-txt">{providerTypeDetails.displayName}</div>);
 
     const isProviderTypeActiveClass =
       this.props.providerType === this.props.selectedProviderType ? "provider-menu__list-item--selected" : "";
