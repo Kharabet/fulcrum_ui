@@ -57,7 +57,7 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
     super(props, context);
 
     const assetDetails = AssetsDictionary.assets.get(props.asset);
-
+    this._isMounted = false;
     this.state = {
       leverage: this.props.positionType === PositionType.SHORT
         ? TradeTokenCardMobile.shortVal[0] : TradeTokenCardMobile.longVal[0],
@@ -74,6 +74,8 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.TradeTransactionMined, this.onTradeTransactionMined);
   }
+
+  private _isMounted: boolean;
 
   private getTradeTokenGridRowSelectionKeyRaw(props: ITradeTokenCardMobileProps, leverage: number = this.state.leverage) {
     const key = new TradeTokenKey(props.asset, props.defaultUnitOfAccount, props.positionType, leverage, props.defaultTokenizeNeeded, 2);
@@ -103,7 +105,7 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
     const interestRate = await FulcrumProvider.Instance.getTradeTokenInterestRate(tradeTokenKey);
     const balance = await FulcrumProvider.Instance.getPTokenBalanceOfUser(tradeTokenKey);
 
-    this.setState({
+    this._isMounted && this.setState({
       ...this.state,
       latestPriceDataPoint: latestPriceDataPoint,
       interestRate: interestRate,
@@ -111,7 +113,7 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
       version: version
     });
     if (latestPriceDataPoint.price != 0) {
-      this.setState({
+      this._isMounted && this.setState({
         isLoading: false,
       });
     }
@@ -132,12 +134,16 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
   };
 
   public componentWillUnmount(): void {
+    this._isMounted = false;
+
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.TradeTransactionMined, this.onTradeTransactionMined);
   }
 
   public componentDidMount(): void {
+    this._isMounted = true;
+
     this.derivedUpdate();
   }
 
@@ -292,7 +298,7 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
   public onLeverageSelect = (value: number) => {
     const key = this.getTradeTokenGridRowSelectionKey(value);
 
-    this.setState({ ...this.state, leverage: value, version: key.version, isLoading: true });
+    this._isMounted && this.setState({ ...this.state, leverage: value, version: key.version, isLoading: true });
 
     this.props.onSelect(this.getTradeTokenGridRowSelectionKey(value));
   };
