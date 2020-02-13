@@ -30,11 +30,34 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
     };
   }
 
-  /*public componentDidMount(): void {
-  }*/
+  public componentWillMount(): void {
+    var currentTheme = localStorage.getItem('theme')!;
+    if (currentTheme === null) {
+      document.documentElement.setAttribute('data-theme', 'light');
+      localStorage.setItem('theme', 'light');
+    }
+    if (currentTheme)
+      if (currentTheme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        localStorage.setItem('theme', 'dark');
+      }
+  }
 
-  /*public componentWillUnmount(): void {
-  }*/
+  public componentDidMount(): void {
+    var currentTheme = localStorage.getItem('theme')!;
+    var toggleSwitch = document.querySelector<HTMLInputElement>('.theme-switch input[type="checkbox"]')!;
+    if (currentTheme === null) {
+      document.documentElement.setAttribute('data-theme', 'light');
+      localStorage.setItem('theme', 'light');
+      toggleSwitch.checked = false;
+    }
+    if (currentTheme)
+      if (currentTheme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        localStorage.setItem('theme', 'dark');
+        toggleSwitch.checked = true;
+      }
+  }
 
   public render() {
     return !this.props.isMobileMedia ? this.renderDesktop() : this.renderMobile();
@@ -63,6 +86,12 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
           </div>
           <div className="header__right">
             <OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />
+            <div className="theme-switch-wrapper">
+              <label className="theme-switch">
+                <input type="checkbox" id="checkbox" onChange={this.onSwitchTheme} />
+                <div className="slider round"></div>
+              </label>
+            </div>
           </div>
         </div>
       </header>
@@ -100,7 +129,12 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
             <div className="header_btn">
 
               <OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />
-
+              <div className="theme-switch-wrapper">
+                <label className="theme-switch" htmlFor="checkbox">
+                  <input type="checkbox" id="checkbox" onChange={this.onSwitchTheme} />
+                  <div className="slider round"></div>
+                </label>
+              </div>
             </div>
             <div className="heade_nav_menu">
               <HeaderMenu items={menu.items} />
@@ -117,5 +151,16 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
   private onMenuToggle = () => {
     document.body.style.overflow = !this.state.isMenuOpen ? "hidden" : "";
     this.setState({ ...this.state, isMenuOpen: !this.state.isMenuOpen });
+  };
+
+  private onSwitchTheme = () => {
+    var buttonToggleSwitch = document.querySelector<HTMLInputElement>('.theme-switch input[type="checkbox"]')!;
+    if (buttonToggleSwitch.checked) {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.setAttribute('data-theme', 'light');
+      localStorage.setItem('theme', 'light');
+    }
   };
 }

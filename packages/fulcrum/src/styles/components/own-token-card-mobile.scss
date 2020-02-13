@@ -23,7 +23,7 @@
 .own-token-card-mobile {
     margin-bottom: 1px;
     &__body {
-        background-color: #444e5a;
+        background-color: var(--primary-row);
 
         padding: 25px;
         &-row {
@@ -128,7 +128,7 @@
 
             /* Main/White */
 
-            color: #ffffff;
+            color: var(--primary-text);
         }
     }
 }

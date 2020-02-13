@@ -24,8 +24,6 @@
 
     text-decoration: none;
     text-align: center;
-    vertical-align: center;
-
     font-family: "Muli", sans-serif;
     font-style: normal;
     font-weight: 600;
@@ -46,7 +44,7 @@
 
 
     &.header-menu__item-link--active {
-      color: #ffffff;
+      color: var(--primary-text);
       &:before {
         content: "";
         position: absolute;

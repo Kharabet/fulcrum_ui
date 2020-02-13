@@ -15,7 +15,7 @@ html {
   min-height: 100%;
   min-width: 100%;
 
-  background-color: #283038;
+  background-color: var(--primary-bg);
 }
 
 body, #root {
