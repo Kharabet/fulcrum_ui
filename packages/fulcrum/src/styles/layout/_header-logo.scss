@@ -16,7 +16,9 @@
 
 @media only screen and (max-width: $mobile-version-max-width) {
   .header-logo__image {
-    height: 1.5rem;
+   
+    width: 148px;
+    height: auto;
     margin: .5rem 0;
     vertical-align: middle;
   }
