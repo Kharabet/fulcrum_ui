@@ -33,7 +33,7 @@ $width-button-action: 7rem;
   font-family: "Muli", sans-serif;
   font-size: 22px;
   font-weight: 800;
-  color: #ffffff;
+  color: var(--primary-text);
   font-style: normal;
   font-stretch: normal;
   line-height: 1.5;
@@ -74,7 +74,7 @@ $width-button-action: 7rem;
 .own-token-grid-row {
   display: flex;
   align-items: center;
-  background-color: #444e5a;
+  background-color: var(--primary-row);
   padding: 23px 40px;
   margin-bottom: 1px;
   position: relative;
@@ -124,7 +124,7 @@ $width-button-action: 7rem;
     font-style: normal;
     font-stretch: normal;
     letter-spacing: -0.3px;
-    color: #ffffff;
+    color: var(--primary-text);
     outline: none;
   }
   &__details-button {
@@ -142,7 +142,7 @@ $width-button-action: 7rem;
     font-style: normal;
     font-stretch: normal;
     letter-spacing: -0.3px;
-    color: #ffffff;
+    color: var(--primary-text);
     outline: none;
 
     &::after {
@@ -170,7 +170,7 @@ $width-button-action: 7rem;
     font-style: normal;
     font-stretch: normal;
     letter-spacing: -0.3px;
-    color: #ffffff;
+    color: var(--primary-text);
     outline: none;
   }
   &__sell-button {
@@ -186,7 +186,7 @@ $width-button-action: 7rem;
     background-color: #ff4f4f;
     text-transform: uppercase;
     font-style: normal;
-    color: #ffffff;
+    color: var(--primary-text);
     outline: none;
     padding: 14px 34px;
     &:hover {

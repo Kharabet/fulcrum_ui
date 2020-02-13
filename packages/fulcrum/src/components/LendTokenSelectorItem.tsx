@@ -172,7 +172,7 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
             )}
             {this.state.profit !== null ? (
               <div className="token-selector-item__profit-container">
-                <div className="token-selector-item__profit-title">Balance:</div>
+                <div className="token-selector-item__profit-title token-selector-item__profit-balance">Balance:</div>
                 <div
                   title={`$${this.state.balanceOfUser.toFixed(18)}`}
                   className="token-selector-item__profit-value"

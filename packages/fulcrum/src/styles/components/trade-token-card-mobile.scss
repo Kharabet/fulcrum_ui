@@ -1,5 +1,5 @@
 .trade-token-card-mobile__wrapper {
-    font-family: 'Muli', sans-serif;;
+    font-family: 'Muli', sans-serif;
     padding: 15px;
 }
 
@@ -19,10 +19,10 @@
 
             /* Main/White */
 
-            color: #ffffff;
+            color: var(--primary-text);
         }
         .poisition-type-switch {
-            background: #3d4651;
+            background: var(--secondary-row);
             border-radius: 30px;
             padding: 2px;
             display: flex;
@@ -31,7 +31,7 @@
             top: 50%;
             transform: translate(-50%, -50%);
             button {
-                font-family: 'Muli', sans-serif;;
+                font-family: 'Muli', sans-serif;
 
                 border-radius: 30px;
                 font-style: normal;
@@ -48,7 +48,7 @@
                 /* Main/White */
 
                 color: #ffffff;
-                background-color: #3d4651;
+                background-color: var(--secondary-row);
                 padding: 8px 12px;
 
                 border: none;
@@ -59,7 +59,7 @@
         }
     }
     &__body {
-        background-color: #444e5a;
+        background-color: var(--primary-row);
         padding: 25px;
 
         &-row {
@@ -75,7 +75,7 @@
             padding: 6px 27px;
             border: none;
             text-transform: uppercase;
-            font-family: 'Muli', sans-serif;;
+            font-family: 'Muli', sans-serif;
             font-style: normal;
             font-weight: bold;
             font-size: 14px;
@@ -96,7 +96,7 @@
         display: flex;
         flex-direction: column;
         > span:first-child {
-            font-family: 'Muli', sans-serif;;
+            font-family: 'Muli', sans-serif;
             font-style: normal;
             font-weight: 600;
             font-size: 10px;
@@ -115,7 +115,7 @@
 
                 color: #a2abb8;
             }
-            font-family: 'Muli', sans-serif;;
+            font-family: 'Muli', sans-serif;
             font-style: normal;
             font-weight: 800;
             font-size: 18px;
@@ -128,7 +128,7 @@
 
             /* Main/White */
 
-            color: #ffffff;
+            color: var(--primary-text);
         }
     }
 }
