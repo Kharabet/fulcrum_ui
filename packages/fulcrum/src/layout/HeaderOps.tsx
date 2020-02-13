@@ -9,7 +9,7 @@ import { TorqueProvider } from "../../../torque/src/services/TorqueProvider";
 import { ProviderType } from "../../../torque/src/domain/ProviderType";
 import { ReactComponent as MenuIconOpen } from "../assets/images/ic_menu.svg";
 import { ReactComponent as MenuIconClose } from "../assets/images/ic_close.svg";
-
+import { Footer } from "./Footer"
 export interface IHeaderOpsProps {
   doNetworkConnect: () => void;
   isLoading: boolean;
@@ -104,6 +104,9 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
             </div>
             <div className="heade_nav_menu">
               <HeaderMenu items={menu.items} />
+            </div>
+            <div className="footer-container">
+              <Footer isMobileMedia={this.props.isMobileMedia} />
             </div>
           </div>
         ) : null}

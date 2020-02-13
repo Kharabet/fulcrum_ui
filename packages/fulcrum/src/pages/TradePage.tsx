@@ -252,7 +252,7 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
             />
           </Modal>
         </main>
-        <Footer />
+        {!this.props.isMobileMedia ? <Footer isMobileMedia={this.props.isMobileMedia}/> : null}
       </div>
     );
   }

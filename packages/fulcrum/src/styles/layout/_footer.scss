@@ -1,3 +1,13 @@
+.footer-container {
+  padding: 0 15px;
+  position: fixed;
+  bottom: 0;
+  width: calc(100% - 30px);
+  .footer{
+    padding-bottom: 5px;
+  }
+}
+
 .footer {
   justify-self: flex-end;
 
@@ -39,20 +49,29 @@
 
 @media screen and (max-width: $mobile-version-max-width) {
   .footer {
-    flex-direction: column-reverse;
+    font-family: Muli;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 10px;
+    line-height: 150%;
 
     .footer-version {
       display: flex;
       flex-direction: row;
-      justify-content: center;
+      /* justify-content: space-between; */
+      // width: 55%;
+      /* padding-right: 0%;*/
+    }
+    .footer-menu__item:not(:first-child) {
+      margin-left: 15px;
     }
 
     .footer-menu {
       display: flex;
       flex-direction: row;
-      justify-content: center;
-
+      // justify-content: space-around;
       margin-bottom: 1.5rem;
+      // width: 40%;
     }
   }
 }
