@@ -26,6 +26,7 @@ export interface ChartContainerProps {
 	containerId: ChartingLibraryWidgetOptions['container_id'];
 	theme: ChartingLibraryWidgetOptions['theme'];
 	preset: ChartingLibraryWidgetOptions['preset'];
+	loading_screen: ChartingLibraryWidgetOptions['loading_screen'];
 	overrides: ChartingLibraryWidgetOptions['overrides'];
 	custom_css_url: ChartingLibraryWidgetOptions['custom_css_url'];
 }
@@ -47,7 +48,18 @@ export class TVChartContainer extends React.PureComponent<Partial<ChartContainer
 		this.state = {
 			preset: this.props.preset
 		}
+		var that = this;
+
+		this.observer = new MutationObserver(function (mutations) {
+			mutations.forEach(function (mutation) {
+				if (mutation.type == "attributes") {
+					that.updateWidget();
+				}
+			});
+		});
 	}
+	private observer: MutationObserver;
+
 	public static defaultProps: ChartContainerProps = {
 		symbol: 'ETH',
 		interval: '30',
@@ -62,11 +74,12 @@ export class TVChartContainer extends React.PureComponent<Partial<ChartContainer
 		fullscreen: false,
 		autosize: true,
 		studiesOverrides: {},
-		theme: 'Dark',
+		theme: localStorage.theme || "Dark",
 		preset: undefined,
-		overrides: {
+		loading_screen:  localStorage.theme === "Dark" ?  { backgroundColor: "#283038" } : {},
+		overrides: localStorage.theme === "Dark" ? {
 			"paneProperties.background": "#283038"
-		},
+		} : {},
 		custom_css_url: "/charting_library/custom_css.css"
 	};
 
@@ -90,13 +103,20 @@ export class TVChartContainer extends React.PureComponent<Partial<ChartContainer
 			fullscreen: this.props.fullscreen,
 			autosize: this.props.autosize,
 			studies_overrides: this.props.studiesOverrides,
-			theme: this.props.theme,
+			theme: localStorage.theme || "Dark",
+			loading_screen: localStorage.theme === "Dark" ?  { backgroundColor: "#283038" } : {},
 			preset: this.props.preset,
-			overrides: this.props.overrides,
+			overrides: localStorage.theme === "Dark" ? {
+				"paneProperties.background": "#283038"
+			} : {},
 			custom_css_url: this.props.custom_css_url
 		};
 	}
 	public componentDidMount(): void {
+		this.observer.observe(document.documentElement, {
+			attributes: true //configure it to listen to attribute changes
+		});
+
 		const widgetOptions: ChartingLibraryWidgetOptions = this.GetWidgetOptions();
 
 		const tvWidget = new widget(widgetOptions);
@@ -125,6 +145,10 @@ export class TVChartContainer extends React.PureComponent<Partial<ChartContainer
 	}
 
 	public componentDidUpdate(): void {
+		this.updateWidget();
+	}
+
+	public updateWidget(): void {
 		if (this.tvWidget) {
 			this.tvWidget.remove();
 			this.tvWidget = null;
@@ -133,6 +157,7 @@ export class TVChartContainer extends React.PureComponent<Partial<ChartContainer
 
 		const tvWidget = new widget(widgetOptions);
 		this.tvWidget = tvWidget;
+
 	}
 
 	public render(): JSX.Element {

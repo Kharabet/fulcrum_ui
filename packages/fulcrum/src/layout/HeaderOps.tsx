@@ -34,12 +34,12 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
     var currentTheme = localStorage.getItem('theme')!;
     if (currentTheme === null) {
       document.documentElement.setAttribute('data-theme', 'light');
-      localStorage.setItem('theme', 'light');
+      localStorage.setItem('theme', 'Light');
     }
     if (currentTheme)
-      if (currentTheme === 'dark') {
+      if (currentTheme === 'Dark') {
         document.documentElement.setAttribute('data-theme', 'dark');
-        localStorage.setItem('theme', 'dark');
+        localStorage.setItem('theme', 'Dark');
       }
   }
 
@@ -48,13 +48,13 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
     var toggleSwitch = document.querySelector<HTMLInputElement>('.theme-switch input[type="checkbox"]')!;
     if (currentTheme === null) {
       document.documentElement.setAttribute('data-theme', 'light');
-      localStorage.setItem('theme', 'light');
+      localStorage.setItem('theme', 'Light');
       toggleSwitch.checked = false;
     }
     if (currentTheme)
-      if (currentTheme === 'dark') {
+      if (currentTheme === 'Dark') {
         document.documentElement.setAttribute('data-theme', 'dark');
-        localStorage.setItem('theme', 'dark');
+        localStorage.setItem('theme', 'Dark');
         toggleSwitch.checked = true;
       }
   }
@@ -157,10 +157,10 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
     var buttonToggleSwitch = document.querySelector<HTMLInputElement>('.theme-switch input[type="checkbox"]')!;
     if (buttonToggleSwitch.checked) {
       document.documentElement.setAttribute('data-theme', 'dark');
-      localStorage.setItem('theme', 'dark');
+      localStorage.setItem('theme', 'Dark');
     } else {
       document.documentElement.setAttribute('data-theme', 'light');
-      localStorage.setItem('theme', 'light');
+      localStorage.setItem('theme', 'Light');
     }
   };
 }

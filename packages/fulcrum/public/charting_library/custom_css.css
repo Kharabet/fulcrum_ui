@@ -1,4 +1,4 @@
-:root:not(.theme-dark) {
+/* :root:not(.theme-dark) {
   --tv-color-platform-background: #d1c4e9;
   --tv-color-pane-background: rgb(251, 223, 244);
   --tv-color-pane-background-secondary: rgb(249, 185, 233);
@@ -12,7 +12,7 @@
   --tv-color-item-active-text: rgb(6, 6, 255);
   --tv-color-toolbar-toggle-button-background-active: red;
   --tv-color-toolbar-toggle-button-background-active-hover: magenta;
-}
+} */
 
 .theme-dark:root {
   --tv-color-platform-background: #283038;
