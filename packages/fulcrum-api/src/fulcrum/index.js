@@ -125,6 +125,7 @@ export default class Fulcrum {
             case "wbtc":
                 return new BigNumber(10 ** 6);
             case "usdc":
+            case "usdt":
                 return new BigNumber(10 ** 4);
             default:
                 return new BigNumber(10 ** 16);
