@@ -142,6 +142,7 @@ export class TVChartContainer extends React.PureComponent<Partial<ChartContainer
 			this.tvWidget.remove();
 			this.tvWidget = null;
 		}
+		this.observer.disconnect();
 	}
 
 	public componentDidUpdate(): void {
