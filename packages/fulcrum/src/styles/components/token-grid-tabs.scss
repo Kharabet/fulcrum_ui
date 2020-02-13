@@ -62,11 +62,10 @@
         }
       }
       &.wallet-img-div {
-        background-color: #6488FF;
-        img{
-            margin-left: 15px;
-            width: 17px;
-
+        background-color: #6488ff;
+        img {
+          margin-left: 15px;
+          height: 17px;
         }
       }
     }
@@ -83,10 +82,14 @@
       display: flex;
       height: 60px;
       &__col-token-image {
+        justify-content: center;
         img {
           width: auto;
           height: 40px;
-          margin-right: 0px;
+          margin: 0px;
+          &.wallet-img {
+            margin: 0px;
+          }
         }
       }
     }
