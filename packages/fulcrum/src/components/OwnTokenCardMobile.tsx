@@ -16,6 +16,8 @@ import { FulcrumProvider } from "../services/FulcrumProvider";
 import { PositionTypeMarker } from "./PositionTypeMarker";
 import { PositionTypeMarkerAlt } from "./PositionTypeMarkerAlt";
 // import { Change24HMarker, Change24HMarkerSize } from "./Change24HMarker";
+import { Preloader } from "./Preloader";
+
 
 export interface IOwnTokenCardMobileProps {
   selectedKey: TradeTokenKey;
@@ -208,14 +210,7 @@ export class OwnTokenCardMobile extends Component<IOwnTokenCardMobileProps, IOwn
               <span>
                 {!this.state.isLoading ?
                   <React.Fragment><span className="fw-normal">$</span>{bnPrice.toFixed(2)}</React.Fragment>
-                  :
-                  <React.Fragment>
-                    <div className="wrapper-loader">
-                      <div className="container-loader">
-                        <div className="item-loader"></div>
-                      </div>
-                    </div>
-                  </React.Fragment>
+                  : <Preloader />
                 }
               </span>
             </div>
@@ -224,14 +219,7 @@ export class OwnTokenCardMobile extends Component<IOwnTokenCardMobileProps, IOwn
               <span>
                 {!this.state.isLoading ?
                   <React.Fragment><span className="fw-normal">$</span>{bnLiquidationPrice.toFixed(2)}</React.Fragment>
-                  :
-                  <React.Fragment>
-                    <div className="wrapper-loader">
-                      <div className="container-loader">
-                        <div className="item-loader"></div>
-                      </div>
-                    </div>
-                  </React.Fragment>
+                  : <Preloader />
                 }
               </span>
             </div>
@@ -247,13 +235,7 @@ export class OwnTokenCardMobile extends Component<IOwnTokenCardMobileProps, IOwn
                   this.state.assetBalance ?
                     <React.Fragment><span className="fw-normal">$</span>{this.state.assetBalance.toFixed(2)}</React.Fragment> :
                     <React.Fragment><span className="fw-normal">$</span>0.00</React.Fragment> :
-                    <React.Fragment>
-                      <div className="wrapper-loader">
-                        <div className="container-loader">
-                          <div className="item-loader"></div>
-                        </div>
-                      </div>
-                    </React.Fragment>
+                  <Preloader />
                 }
               </span>
             </div>
@@ -264,14 +246,8 @@ export class OwnTokenCardMobile extends Component<IOwnTokenCardMobileProps, IOwn
                   this.state.profit ?
                     <React.Fragment><span className="fw-normal">$</span>{this.state.profit.toFixed(2)}</React.Fragment> :
                     <React.Fragment><span className="fw-normal">$</span>0.0000</React.Fragment> :
-                    <React.Fragment>
-                      <div className="wrapper-loader">
-                        <div className="container-loader">
-                          <div className="item-loader"></div>
-                        </div>
-                      </div>
-                    </React.Fragment>
-                  }
+                  <Preloader />
+                }
               </span>
             </div>
           </div>

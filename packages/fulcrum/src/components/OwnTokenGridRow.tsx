@@ -16,6 +16,7 @@ import { FulcrumProvider } from "../services/FulcrumProvider";
 import { PositionTypeMarker } from "./PositionTypeMarker";
 import { PositionTypeMarkerAlt } from "./PositionTypeMarkerAlt";
 // import { Change24HMarker, Change24HMarkerSize } from "./Change24HMarker";
+import { Preloader } from "./Preloader";
 
 export interface IOwnTokenGridRowProps {
   selectedKey: TradeTokenKey;
@@ -75,12 +76,12 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
       this.props.currentKey.version
     );
     const latestAssetPriceDataPoint = await FulcrumProvider.Instance.getTradeTokenAssetLatestDataPoint(tradeTokenKey);
-    
+
     const data: [BigNumber | null, BigNumber | null] = await FulcrumProvider.Instance.getTradeBalanceAndProfit(tradeTokenKey);
     const assetBalance = data[0];
     const profit = data[1];
 
-    const address = FulcrumProvider.Instance.contractsSource ? 
+    const address = FulcrumProvider.Instance.contractsSource ?
       await FulcrumProvider.Instance.contractsSource.getPTokenErc20Address(tradeTokenKey) || "" :
       "";
 
@@ -157,27 +158,27 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
           style={{ backgroundColor: this.state.assetDetails.bgColor, borderLeftColor: this.state.assetDetails.bgColor }}
         >
           <img src={this.state.assetDetails.logoSvg} alt={`${this.state.assetDetails.displayName} ${this.props.currentKey.leverage}x`} />
-        </div>*/}       
+        </div>*/}
         {this.state.pTokenAddress &&
-                FulcrumProvider.Instance.web3ProviderSettings &&
-                FulcrumProvider.Instance.web3ProviderSettings.etherscanURL ? (
-                  <a
-                  className="own-token-grid-row__col-token-name-full"
-                  style={{cursor: `pointer`, textDecoration: `none`}}
-                  title={this.state.pTokenAddress}
-                  href={`${FulcrumProvider.Instance.web3ProviderSettings.etherscanURL}address/${this.state.pTokenAddress}#readContract`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  >
-                    {this.state.assetDetails.displayName}&nbsp;
+          FulcrumProvider.Instance.web3ProviderSettings &&
+          FulcrumProvider.Instance.web3ProviderSettings.etherscanURL ? (
+            <a
+              className="own-token-grid-row__col-token-name-full"
+              style={{ cursor: `pointer`, textDecoration: `none` }}
+              title={this.state.pTokenAddress}
+              href={`${FulcrumProvider.Instance.web3ProviderSettings.etherscanURL}address/${this.state.pTokenAddress}#readContract`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {this.state.assetDetails.displayName}&nbsp;
               <PositionTypeMarkerAlt assetDetails={this.state.assetDetails} value={this.props.currentKey.positionType} />&nbsp;
               {`${this.props.currentKey.leverage}x`}
-                  </a>
-                ) : (
-                  <div className="own-token-grid-row__col-token-name-full">{`${this.state.assetDetails.displayName}`}&nbsp;
+            </a>
+          ) : (
+            <div className="own-token-grid-row__col-token-name-full">{`${this.state.assetDetails.displayName}`}&nbsp;
             <PositionTypeMarkerAlt assetDetails={this.state.assetDetails} value={this.props.currentKey.positionType} />&nbsp;
             {`${this.props.currentKey.leverage}x`}
-                  </div>)}
+            </div>)}
 
         {/* {this.state.pTokenAddress &&
           FulcrumProvider.Instance.web3ProviderSettings &&
@@ -205,14 +206,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
             <React.Fragment>
               <span className="sign-currency">$</span>{bnPrice.toFixed(2)}
             </React.Fragment>
-            :
-            <React.Fragment>
-              <div className="wrapper-loader">
-                <div className="container-loader">
-                  <div className="item-loader"></div>
-                </div>
-              </div>
-            </React.Fragment>
+            : <Preloader />
           }
         </div>
         <div title={`$${bnLiquidationPrice.toFixed(18)}`} className="own-token-grid-row__col-liquidation-price">
@@ -220,14 +214,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
             <React.Fragment>
               <span className="sign-currency">$</span>{bnLiquidationPrice.toFixed(2)}
             </React.Fragment>
-            :
-            <React.Fragment>
-              <div className="wrapper-loader">
-                <div className="container-loader">
-                  <div className="item-loader"></div>
-                </div>
-              </div>
-            </React.Fragment>}
+            : <Preloader />}
         </div>
         <div title={this.state.assetBalance ? `$${this.state.assetBalance.toFixed(18)}` : ``} className="own-token-grid-row__col-position-value">
           {!this.state.isLoading ?
@@ -237,14 +224,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
               </React.Fragment>
               :
               '$0.00'
-            :
-            <React.Fragment>
-              <div className="wrapper-loader">
-                <div className="container-loader">
-                  <div className="item-loader"></div>
-                </div>
-              </div>
-            </React.Fragment>
+            : <Preloader />
           }
         </div>
         <div title={this.state.profit ? `$${this.state.profit.toFixed(18)}` : ``} className="own-token-grid-row__col-profit">
@@ -254,14 +234,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
                 <span className="sign-currency">$</span>{this.state.profit.toFixed(2)}
               </React.Fragment>
               : '$0.00'
-            :
-            <React.Fragment>
-              <div className="wrapper-loader">
-                <div className="container-loader">
-                  <div className="item-loader"></div>
-                </div>
-              </div>
-            </React.Fragment>
+            : <Preloader />
           }
         </div>
 

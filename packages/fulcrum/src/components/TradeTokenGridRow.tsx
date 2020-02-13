@@ -19,6 +19,7 @@ import { PositionTypeMarkerAlt } from "./PositionTypeMarkerAlt";
 // import { Change24HMarker, Change24HMarkerSize } from "./Change24HMarker";
 import { LeverageSelector } from "./LeverageSelector";
 import { PositionTypeMarker } from "./PositionTypeMarker";
+import { Preloader } from "./Preloader";
 
 
 export interface ITradeTokenGridRowProps {
@@ -68,7 +69,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.TradeTransactionMined, this.onTradeTransactionMined);
   }
-  
+
   private _isMounted: boolean;
 
   private getTradeTokenGridRowSelectionKeyRaw(props: ITradeTokenGridRowProps, leverage: number = this.state.leverage) {
@@ -206,14 +207,8 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
             <React.Fragment>
               <span className="fw-normal">$</span>{bnPrice.toFixed(2)}
             </React.Fragment>
-          :
-            <React.Fragment>
-              <div className="wrapper-loader">
-                <div className="container-loader">
-                  <div className="item-loader"></div>
-                </div>
-              </div>
-            </React.Fragment>
+            :
+            <Preloader />
           }
         </div>
         <div title={`$${bnLiquidationPrice.toFixed(18)}`} className="trade-token-grid-row__col-price">
@@ -222,14 +217,8 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
               <React.Fragment>
                 <span className="fw-normal">$</span>{bnLiquidationPrice.toFixed(2)}
               </React.Fragment>
-            :
-              <React.Fragment>
-                <div className="wrapper-loader">
-                  <div className="container-loader">
-                    <div className="item-loader"></div>
-                  </div>
-                </div>
-              </React.Fragment>
+              :
+              <Preloader />
           }
         </div>
         {/*<div className="trade-token-grid-row__col-change24h">
@@ -241,14 +230,8 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
               {this.state.interestRate.toFixed(4)}
               <span className="fw-normal">%</span>
             </React.Fragment>
-          :
-            <React.Fragment>
-              <div className="wrapper-loader">
-                <div className="container-loader">
-                  <div className="item-loader"></div>
-                </div>
-              </div>
-            </React.Fragment>
+            :
+            <Preloader />
           }
         </div>
         {this.renderActions(this.state.balance.eq(0))}

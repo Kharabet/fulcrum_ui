@@ -20,6 +20,7 @@ import { ITradeTokenGridRowProps } from "./TradeTokenGridRow";
 // import { Change24HMarker, Change24HMarkerSize } from "./Change24HMarker";
 import { LeverageSelector } from "./LeverageSelector";
 import { PositionTypeMarker } from "./PositionTypeMarker";
+import { Preloader } from "./Preloader";
 
 
 export interface ITradeTokenCardMobileProps {
@@ -211,14 +212,7 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
               <span>
                 {!this.state.isLoading ?
                   <React.Fragment><span className="fw-normal">$</span>{bnPrice.toFixed(2)}</React.Fragment>
-                  :
-                  <React.Fragment>
-                    <div className="wrapper-loader">
-                      <div className="container-loader">
-                        <div className="item-loader"></div>
-                      </div>
-                    </div>
-                  </React.Fragment>
+                  : <Preloader />
                 }
               </span>
             </div>
@@ -227,28 +221,15 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
               <span>
                 {!this.state.isLoading ?
                   <React.Fragment><span className="fw-normal">$</span>{bnLiquidationPrice.toFixed(2)}</React.Fragment>
-                  :
-                  <React.Fragment>
-                    <div className="wrapper-loader">
-                      <div className="container-loader">
-                        <div className="item-loader"></div>
-                      </div>
-                    </div>
-                  </React.Fragment>}
+                  : <Preloader />
+                }
               </span>
             </div>
             <div title={this.state.interestRate.gt(0) ? `${this.state.interestRate.toFixed(18)}%` : ``} className="trade-token-card-mobile__profit">
               <span>Interest APR</span>
               <span>
                 {this.state.interestRate.gt(0) ? <React.Fragment>{this.state.interestRate.toFixed(4)}<span className="fw-normal">%</span></React.Fragment>
-                  :
-                  <React.Fragment>
-                    <div className="wrapper-loader">
-                      <div className="container-loader">
-                        <div className="item-loader"></div>
-                      </div>
-                    </div>
-                  </React.Fragment>
+                  : <Preloader />
                 }
               </span>
             </div>
