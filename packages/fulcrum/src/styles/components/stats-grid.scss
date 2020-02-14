@@ -193,6 +193,10 @@ $margin-right-column: 1.5rem;
     width: 28px;
     display: flex;
     align-items: center;
+    svg{
+      width: 28px;
+      height: 28px;
+    }
     img {
       width: 100%;
     }
