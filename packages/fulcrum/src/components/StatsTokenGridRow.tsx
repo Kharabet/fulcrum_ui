@@ -113,16 +113,14 @@ export class StatsTokenGridRow extends Component<IStatsTokenGridRowProps, IStats
               rel="noopener noreferrer"
             >
               <div className="stats-grid-row__image">
-                <img src={this.state.assetDetails.logoSvg} alt={this.state.assetDetails.displayName} />
-
+                {this.state.assetDetails.reactLogoSvg.render()}
               </div>
               <span className="stats-grid-row__asset-name fw-800 color-primary">{details.asset!}</span>
             </a>
           ) : (
             <div className="stats-grid-row__col-name">
               <div className="stats-grid-row__image">
-                <img src={this.state.assetDetails.logoSvg} alt={this.state.assetDetails.displayName} />
-
+                {this.state.assetDetails.reactLogoSvg.render()}
               </div>
               <span className="stats-grid-row__asset-name fw-800 color-primary">{details.asset!}</span>
             </div>

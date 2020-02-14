@@ -41,7 +41,9 @@
       top: 0px;
       right: 0px;
       border-bottom-left-radius: 1.5625rem;
-
+      &:hover{
+        background-color: var(--lend-item-before-hover);
+      }
       .token-select-item-mcd-bridge__text {
         position: absolute;
         top: 0%;
