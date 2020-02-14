@@ -48,7 +48,8 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
     }
   }
 
-  public componentDidMount(): void {
+  public componentWillUnmount(): void {
+    document.body.style.overflow = "";
 
   }
 
