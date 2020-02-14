@@ -51,7 +51,7 @@ export class TradeSellEthProcessor {
     let gasAmountBN;
 
     if (skipGas) {
-      gasAmountBN = new BigNumber(3000000);
+      gasAmountBN = new BigNumber(FulcrumProvider.Instance.gasLimit);
     } else {
       // estimating gas amount
       let gasAmount;

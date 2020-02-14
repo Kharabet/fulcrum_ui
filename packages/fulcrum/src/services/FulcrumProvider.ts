@@ -61,7 +61,7 @@ export class FulcrumProvider {
 
   public static Instance: FulcrumProvider;
 
-  public readonly gasLimit = "4000000";
+  public readonly gasLimit = "4500000";
 
   // gasBufferCoeff equal 110% gas reserve
   public readonly gasBufferCoeff = new BigNumber("1.06");

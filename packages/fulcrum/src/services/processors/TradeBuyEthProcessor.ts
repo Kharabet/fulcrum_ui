@@ -45,7 +45,7 @@ export class TradeBuyEthProcessor {
 
     // Waiting for token allowance
     if (skipGas) {
-      gasAmountBN = new BigNumber(3000000);
+      gasAmountBN = new BigNumber(FulcrumProvider.Instance.gasLimit);
     } else {
       // estimating gas amount
       const gasAmount = await tokenContract.mintWithEther.estimateGasAsync(account, { from: account, value: amountInBaseUnits, gas: FulcrumProvider.Instance.gasLimit });

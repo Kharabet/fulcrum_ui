@@ -1,6 +1,6 @@
 {
   "MaintenanceMode": false,
   "Trade_defaultUnitOfAccount": "DAI",
-  "ZeroXAPIEnabledForBuys": false,
+  "ZeroXAPIEnabledForBuys": true,
   "ZeroXAPIEnabledForSells": false
 }

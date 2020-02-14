@@ -105,7 +105,7 @@ export class TradeBuyErcProcessor {
       // Waiting for token allowance
       if (approvePromise || skipGas) {
         await approvePromise;
-        gasAmountBN = new BigNumber(3000000);
+        gasAmountBN = new BigNumber(FulcrumProvider.Instance.gasLimit);
       } else {
         // estimating gas amount
         let gasAmount;
