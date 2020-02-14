@@ -27,10 +27,10 @@
   line-height: 150%;
 
   .footer-version {
-    color: #758295;
+    color: var(--trade-header-color);
 
     a {
-      color: #758295;
+      color: var(--trade-header-color);
     }
   }
 
@@ -40,7 +40,7 @@
   .footer-menu__item {
     display: inline-block;
 
-    color: #758295;
+    color: var(--trade-header-color);
 
 
     &:not(:first-child) {
@@ -48,7 +48,7 @@
     }
 
     a {
-      color: #758295;
+      color: var(--trade-header-color);
     }
   }
 }
