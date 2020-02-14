@@ -119,7 +119,7 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
 
   private renderDesktop = () => {
     let tokenRows;
-    if (this.props.selectedKey.asset !== "UNKNOWN") {
+    if (this.props.selectedKey.asset !== Asset.UNKNOWN) {
       tokenRows = this.state.tokenRowsData.map(e => <TradeTokenGridRow key={`${e.asset}_${e.positionType}`} {...e} />);
     }
     const tokenRowsFooterMobile = this.state.tokenSingleRowsData.map(e => <TradeTokenGridRowMobileFooter isMobile={this.props.isMobileMedia} key={`${e.asset}_${e.positionType}`} {...e} />);
@@ -229,7 +229,7 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
 
 
     props.assets.forEach(e => {
-      if (props.selectedKey.asset === "UNKNOWN" || e == props.selectedKey.asset) {
+      if (props.selectedKey.asset === Asset.UNKNOWN || e == props.selectedKey.asset) {
         rowsData.push({
           selectedKey: props.selectedKey,
           asset: e,
