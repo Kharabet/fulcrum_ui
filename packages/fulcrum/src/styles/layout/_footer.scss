@@ -19,7 +19,7 @@
   margin-top: auto;
   padding-top: 1.5rem;
   padding-bottom: 1.75rem;
-  
+
   font-family: "Muli", sans-serif;
   font-style: normal;
   font-weight: normal;
@@ -42,13 +42,16 @@
 
     color: var(--trade-header-color);
 
-
+    
     &:not(:first-child) {
       margin-left: 1.5rem;
     }
 
     a {
-      color: var(--trade-header-color);
+      color: #00c0ab;
+      &:hover {
+        color: #33dfcc;
+      }
     }
   }
 }
