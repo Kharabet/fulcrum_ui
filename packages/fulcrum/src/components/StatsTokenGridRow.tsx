@@ -74,12 +74,12 @@ export class StatsTokenGridRow extends Component<IStatsTokenGridRowProps, IStats
           <div title={details.totalSupply ? `${details.totalSupply.toFixed(this.state.decimals)}` : ``} className="stats-grid-row__col-total-supply-usd">
             {details.usdSupply ? <React.Fragment>$<span className="fw-800 color-primary">{this.numberWithCommas(details.usdSupply.toFixed(4))}</span></React.Fragment> : `-`}
           </div>
-          <div className="stats-grid-row__col-total-supply">-</div>
-          <div className="stats-grid-row__col-total-borrow">-</div>
-          <div className="stats-grid-row__col-total-borrow">-</div>
-          <div className="stats-grid-row__col-liquidity">-</div>
-          <div className="stats-grid-row__col-supply-rate">-</div>
-          <div className="stats-grid-row__col-borrow-rate">-</div>
+          <div className="stats-grid-row__col-total-supply"></div>
+          <div className="stats-grid-row__col-total-borrow"></div>
+          <div className="stats-grid-row__col-total-borrow"></div>
+          <div className="stats-grid-row__col-liquidity"></div>
+          <div className="stats-grid-row__col-supply-rate"></div>
+          <div className="stats-grid-row__col-borrow-rate"></div>
         </div>
       );
     }
