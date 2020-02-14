@@ -61,7 +61,7 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
 
     TradeTokenGrid.changeActiveBtn = props.changeActiveBtn;
 
-
+    this._isMounted = false;
     this.state = {
       tokenRowsData: TradeTokenGrid.getRowsData(props),
       balance: new BigNumber(0),
@@ -72,26 +72,31 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.TradeTransactionMined, this.onTradeTransactionMined);
   }
 
+  private _isMounted: boolean;
+
   public async derivedUpdate() {
     if (!this.props.isMobileMedia) {
-      await this.setState({ ...this.state, tokenRowsData: TradeTokenGrid.getRowsData(this.props) });
-      await this.setState({ ...this.state, tokenSingleRowsData: TradeTokenGrid.getSingleRowData(this.props) });
+      await this._isMounted && this.setState({ ...this.state, tokenRowsData: TradeTokenGrid.getRowsData(this.props) });
+      await this._isMounted && this.setState({ ...this.state, tokenSingleRowsData: TradeTokenGrid.getSingleRowData(this.props) });
 
     } else {
-      await this.setState({ ...this.state, tokenSingleRowsData: TradeTokenGrid.getSingleRowData(this.props) });
-      await this.setState({ ...this.state, tokenSingleRowsData: TradeTokenGrid.getSingleRowData(this.props), tokenLongShortRowsData: TradeTokenGrid.getRowsLongShortData(this.props) });
+      await this._isMounted && this.setState({ ...this.state, tokenSingleRowsData: TradeTokenGrid.getSingleRowData(this.props) });
+      await this._isMounted && this.setState({ ...this.state, tokenSingleRowsData: TradeTokenGrid.getSingleRowData(this.props), tokenLongShortRowsData: TradeTokenGrid.getRowsLongShortData(this.props) });
     }
 
-    // this.setState({ ...this.state, tokenSingleRowsData:TradeTokenGrid.getSingleRowData(this.props) }) ;
+    // this._isMounted && this.setState({ ...this.state, tokenSingleRowsData:TradeTokenGrid.getSingleRowData(this.props) }) ;
   }
 
   public componentWillUnmount(): void {
+    this._isMounted = false;
 
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.TradeTransactionMined, this.onTradeTransactionMined);
   }
 
   public componentDidMount(): void {
+    this._isMounted = true;
+
     const e = this.state.tokenRowsData[0];
 
     this.props.onSelect(new TradeTokenKey(e.asset, e.defaultUnitOfAccount, e.positionType, e.defaultLeverage, e.defaultTokenizeNeeded));
@@ -102,9 +107,9 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
   public componentDidUpdate(prevProps: Readonly<ITradeTokenGridProps>, prevState: Readonly<ITradeTokenGridState>, snapshot?: any): void {
 
     if (this.props.isLong !== prevProps.isLong) {
-      this.setState({ ...this.state, tokenSingleRowsData: TradeTokenGrid.getSingleRowData(this.props) });
+      this._isMounted && this.setState({ ...this.state, tokenSingleRowsData: TradeTokenGrid.getSingleRowData(this.props) });
 
-      this.setState({ ...this.state, tokenLongShortRowsData: TradeTokenGrid.getRowsLongShortData(this.props) });
+      this._isMounted && this.setState({ ...this.state, tokenLongShortRowsData: TradeTokenGrid.getRowsLongShortData(this.props) });
     }
 
     if (this.props.selectedKey !== prevProps.selectedKey || this.props.showMyTokensOnly !== prevProps.showMyTokensOnly) {
