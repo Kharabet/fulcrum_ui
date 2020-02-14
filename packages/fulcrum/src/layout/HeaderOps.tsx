@@ -33,30 +33,30 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
   public componentWillMount(): void {
     var currentTheme = localStorage.getItem('theme')!;
     if (currentTheme === null) {
-      document.documentElement.setAttribute('data-theme', 'light');
-      localStorage.setItem('theme', 'Light');
+      document.documentElement.setAttribute('data-theme', 'dark');
+      localStorage.setItem('theme', 'Dark');
     }
-    if (currentTheme)
-      if (currentTheme === 'Dark') {
-        document.documentElement.setAttribute('data-theme', 'dark');
-        localStorage.setItem('theme', 'Dark');
-      }
+    if (currentTheme && currentTheme === 'Light')
+        document.documentElement.setAttribute('data-theme', 'light');
+        localStorage.setItem('theme', 'Light');
   }
 
   public componentDidMount(): void {
     var currentTheme = localStorage.getItem('theme')!;
-    var toggleSwitch = document.querySelector<HTMLInputElement>('.theme-switch input[type="checkbox"]')!;
-    if (currentTheme === null) {
-      document.documentElement.setAttribute('data-theme', 'light');
-      localStorage.setItem('theme', 'Light');
-      toggleSwitch.checked = false;
-    }
-    if (currentTheme)
-      if (currentTheme === 'Dark') {
-        document.documentElement.setAttribute('data-theme', 'dark');
-        localStorage.setItem('theme', 'Dark');
-        toggleSwitch.checked = true;
+    var toggleSwitch = document.querySelector<HTMLInputElement>('.theme-switch input[type="checkbox"]');
+    if (toggleSwitch) {
+      if (currentTheme === null) {
+        document.documentElement.setAttribute('data-theme', 'light');
+        localStorage.setItem('theme', 'Light');
+        toggleSwitch.checked = false;
       }
+      if (currentTheme)
+        if (currentTheme === 'Dark') {
+          document.documentElement.setAttribute('data-theme', 'dark');
+          localStorage.setItem('theme', 'Dark');
+          toggleSwitch.checked = true;
+        }
+    }
   }
 
   public render() {
@@ -131,7 +131,7 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
               <OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />
               <div className="theme-switch-wrapper">
                 <label className="theme-switch" htmlFor="checkbox">
-                  <input type="checkbox" id="checkbox" onChange={this.onSwitchTheme} />
+                  <input type="checkbox" id="checkbox" onChange={this.onSwitchTheme} defaultChecked={localStorage.theme === 'Dark' ? true : false}/>
                   <div className="slider round"></div>
                 </label>
               </div>

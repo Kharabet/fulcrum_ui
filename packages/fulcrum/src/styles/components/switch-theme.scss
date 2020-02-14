@@ -9,7 +9,7 @@
       width: 44px;
       input {
         display: none;
-        &:checked + .slider {
+        [data-theme="dark"] & + .slider {
           background-color: var(--switch-bg);
           &:before {
             transform: translateX(-19px);
