@@ -83,4 +83,10 @@
 
     text-decoration: none;*/
   }
+  span.on-chain-indicator__wallet-address,
+  span.on-chain-indicator__provider-txt{
+    justify-content: center;
+    display: flex;
+    width: 100%;
+  }
 }
