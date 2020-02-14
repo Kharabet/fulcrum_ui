@@ -54,6 +54,8 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
 
     const classNamePrefix = "trade-token-grid-tab-item";
 
+    
+
 
     return (
       <div key={`${assetDetails.displayName}`} className={`${classNamePrefix} ${isActiveClassName}`} onClick={(e) => { this.onSelectClick(e, asset) }} style={{ backgroundColor: assetDetails.bgColor, borderLeftColor: assetDetails.bgColor }}>
