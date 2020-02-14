@@ -376,6 +376,11 @@ $margin-right-column: 1.5rem;
 
         display: flex;
         align-items: center;
+        &.borrow-title {
+          flex-direction: column;
+          line-height: 12px;
+          align-items: initial;
+        }
       }
 
       .stats-grid-card__kv-dots {

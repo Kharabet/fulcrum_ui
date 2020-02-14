@@ -114,6 +114,16 @@ export class StatsTokenGridCard extends Component<IStatsTokenGridCardProps, ISta
       return null;
     }
 
+    let customBorrowTitle;
+    let customBorrowText;
+    if (details.borrowInterestRate && details.torqueBorrowInterestRate) {
+      customBorrowTitle = `${details.borrowInterestRate.toFixed(18)}% / ${details.torqueBorrowInterestRate.toFixed(18)}%`;
+      customBorrowText = <React.Fragment><span className="fw-800 color-primary">{details.borrowInterestRate.toFixed(2)}</span>%&nbsp;/&nbsp;<span className="fw-800 color-primary">{details.torqueBorrowInterestRate.toFixed(2)}</span>%</React.Fragment>;
+    } else {
+      customBorrowTitle = ``;
+      customBorrowText = `-`;
+    }
+
     return (
       <div className="stats-grid-card">
         {this.renderAssetInfo(details)}
@@ -208,25 +218,15 @@ export class StatsTokenGridCard extends Component<IStatsTokenGridCardProps, ISta
             </div>
           </div>
           <div className="stats-grid-card__kv-container">
-            <div className="stats-grid-card__kv-title">
-              <span className="">Fulcrum Borrow Rate (APR)</span>
+            <div className="stats-grid-card__kv-title borrow-title">
+              <span>Borrow Rate (APR)</span>
+              <span>Fulcrum / Torque</span>
             </div>
             <div
-              title={details.borrowInterestRate ? `${details.borrowInterestRate.toFixed(18)}%` : ``}
+              title={customBorrowTitle}
               className="stats-grid-card__kv-value"
             >
-              {details.borrowInterestRate ? <React.Fragment><span className="fw-800 color-primary">{details.borrowInterestRate.toFixed(4)}</span>%</React.Fragment> : `-`}
-            </div>
-          </div>
-          <div className="stats-grid-card__kv-container">
-            <div className="stats-grid-card__kv-title">
-              <span className="">Torque Borrow Rate (APR)</span>
-            </div>
-            <div
-              title={details.torqueBorrowInterestRate ? `${details.torqueBorrowInterestRate.toFixed(18)}%` : ``}
-              className="stats-grid-card__kv-value"
-            >
-              {details.torqueBorrowInterestRate ? <React.Fragment><span className="fw-800 color-primary">{details.torqueBorrowInterestRate.toFixed(4)}</span>%</React.Fragment> : `-`}
+              {customBorrowText}
             </div>
           </div>
         </div>
