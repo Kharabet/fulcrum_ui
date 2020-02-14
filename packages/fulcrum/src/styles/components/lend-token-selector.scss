@@ -1,5 +1,5 @@
 .lend-token-selector {
-  font-family: 'Muli', sans-serif;
+  font-family: "Muli", sans-serif;
   font-weight: 800;
   display: flex;
   flex-direction: row;
@@ -15,8 +15,8 @@
     flex-direction: column;
     flex-grow: 1;
 
-    max-width: 24%;
-    min-width: 18.9375rem;
+    width: calc(25% - 4px);
+    max-width: calc(25% - 4px);
 
     padding: 2rem;
     margin: 0 4px 4px 0;
@@ -72,10 +72,20 @@
 
       text-align: center;
 
-      img {
+      img,
+      svg {
         display: inline-block;
         height: 4rem;
         width: 4rem;
+        .eth-svg {
+          fill: #c8c8c8;
+        }
+        .wbtc-svg-bg{
+          fill: transparent;
+        }
+        .wbtc-svg-fill{
+          fill: var(--wbtc-svg);
+        }
       }
     }
 
@@ -124,7 +134,7 @@
           font-weight: 800;
           color: var(--primary-text);
         }
-        .token-selector-item__profit-balance{
+        .token-selector-item__profit-balance {
           text-align: left;
         }
       }

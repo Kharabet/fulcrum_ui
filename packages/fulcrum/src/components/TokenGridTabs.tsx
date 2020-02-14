@@ -3,7 +3,7 @@ import { Asset } from "../domain/Asset";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { PositionType } from "../domain/PositionType";
 import { TradeTokenKey } from "../domain/TradeTokenKey";
-import walletSvg from "../assets/images/wallet-icon.svg";
+import { ReactComponent as WalletSvg } from "../assets/images/wallet-icon.svg";
 
 export interface ITokenGridTabsProps {
   selectedKey: TradeTokenKey;
@@ -47,10 +47,9 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
     const assetDetails = AssetsDictionary.assets.get(asset);
     if (!assetDetails) return;
 
-    const isActiveClassName =
-      asset === this.props.selectedKey.asset && !this.state.isShowMyTokensOnly ?
-        "trade-token-grid-tab-item--active"
-        : "";
+    const isActiveClassName = asset === this.props.selectedKey.asset && !this.state.isShowMyTokensOnly
+      ? "trade-token-grid-tab-item--active"
+      : "";
 
     const classNamePrefix = "trade-token-grid-tab-item";
 
@@ -58,13 +57,13 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
 
 
     return (
-      <div key={`${assetDetails.displayName}`} className={`${classNamePrefix} ${isActiveClassName}`} onClick={(e) => { this.onSelectClick(e, asset) }} style={{ backgroundColor: assetDetails.bgColor, borderLeftColor: assetDetails.bgColor }}>
-        <div
-          className={`${classNamePrefix}__col-token-image`}
-          
-        >
-          <img src={assetDetails.logoSvg} alt={assetDetails.displayName} />
-          <span style={{color: assetDetails.textColor }}>{assetDetails.displayName}</span>
+      <div key={`${assetDetails.displayName}`}
+        className={`${classNamePrefix} ${isActiveClassName} ${asset.toLowerCase()}-tab`}
+        onClick={(e) => { this.onSelectClick(e, asset) }}
+      >
+        <div className={`${classNamePrefix}__col-token-image`}>
+          {assetDetails.reactLogoSvg.render()}
+          <span style={{ color: assetDetails.textColor }}>{assetDetails.displayName}</span>
         </div>
       </div>
     );
@@ -82,17 +81,16 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
 
   public render() {
     var selectedAsset = AssetsDictionary.assets.get(this.props.selectedKey.asset);
-    var borderColor = !!selectedAsset ? selectedAsset.bgColor : "#fff"
+    var displayName = !!selectedAsset ? selectedAsset.displayName : "manage"
 
     return (
-      <div className="trade-token-grid-tab" style={{ borderBottom: `2px solid ${borderColor && !this.state.isShowMyTokensOnly ? borderColor : "#6488ff"}` }}>
+      <div className={`trade-token-grid-tab ${displayName && !this.state.isShowMyTokensOnly ? displayName.toLowerCase() : "manage"}`} >
         <div className="trade-token-grid-tab__container">
           {this.props.assets.map(asset => (this.renderAsset(asset)))}
           <div className={`trade-token-grid-tab-item ${this.state.isShowMyTokensOnly ? "trade-token-grid-tab-item--active" : ""}`} onClick={this.showMyTokensOnlyChange}>
-            <div
-              className={`trade-token-grid-tab-item__col-token-image wallet-img-div`} >
-              <img className={`wallet-img`} src={walletSvg} />
-              <span style={{color: "#ffffff" }}>Manage</span>
+            <div className={`trade-token-grid-tab-item__col-token-image wallet-img-div`} >
+              {<WalletSvg />}
+              <span style={{ color: "#ffffff" }}>Manage</span>
             </div>
           </div>
 

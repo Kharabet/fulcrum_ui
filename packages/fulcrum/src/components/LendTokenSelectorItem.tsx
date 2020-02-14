@@ -156,7 +156,7 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
           </div>
         ) : null}
         <div className="token-selector-item__image">
-          <img src={this.state.assetDetails.logoSvg} alt={this.state.assetDetails.displayName} />
+          {this.state.assetDetails.reactLogoSvg.render()}
         </div>
         <div className="token-selector-item__descriptions" style={{ marginTop: this.state.profit === null ? `1.5rem` : undefined }}>
           <div className="token-selector-item__description">

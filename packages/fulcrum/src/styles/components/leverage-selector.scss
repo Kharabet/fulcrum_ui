@@ -58,7 +58,7 @@
     padding: 13px 15px;
     &:hover:not(&--selected) {
         cursor: pointer;
-        color: #00c0ab;
+        color: var(--leverage-color-hover);
     }
     &--selected {
         border-style: none;
