@@ -41,11 +41,28 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
       document.documentElement.setAttribute('data-theme', 'light');
       localStorage.setItem('theme', 'light');
     }
-    else{
+    else {
       document.documentElement.setAttribute('data-theme', 'dark');
       localStorage.setItem('theme', 'dark');
 
     }
+  }
+
+  public componentDidMount(): void {
+    var currentTheme = localStorage.getItem('theme')!;
+    var toggleSwitch = document.querySelector<HTMLInputElement>('.theme-switch input[type="checkbox"]');
+    if (toggleSwitch && currentTheme) {
+      if (currentTheme === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
+        localStorage.setItem('theme', 'light');
+        toggleSwitch.checked = false;
+      }
+      if (currentTheme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        localStorage.setItem('theme', 'dark');
+        toggleSwitch.checked = true;
+      }
+    };
   }
 
   public componentWillUnmount(): void {
