@@ -10,6 +10,15 @@
     border-radius: 100px;
     display: flex;
     background-color: var(--leverage-bg);
+    position: relative;
+    .active-selector{
+        position: absolute;
+        color: #fff;
+        border-style: none;
+        background-color: #00c0ab;
+        color: #ffffff;
+        transition: all 0.2s ease-in-out;
+    }
 
     @media only screen and (max-width: $mobile-version-max-width) {
         display: flex;
