@@ -34,29 +34,17 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
     var currentTheme = localStorage.getItem('theme')!;
     if (currentTheme === null) {
       document.documentElement.setAttribute('data-theme', 'dark');
-      localStorage.setItem('theme', 'Dark');
+      localStorage.setItem('theme', 'dark');
+      return;
     }
-    if (currentTheme && currentTheme === 'Light')
-        document.documentElement.setAttribute('data-theme', 'light');
-        localStorage.setItem('theme', 'Light');
+    if (currentTheme && currentTheme === 'light') {
+      document.documentElement.setAttribute('data-theme', 'light');
+      localStorage.setItem('theme', 'light');
+    }
   }
 
   public componentDidMount(): void {
-    var currentTheme = localStorage.getItem('theme')!;
-    var toggleSwitch = document.querySelector<HTMLInputElement>('.theme-switch input[type="checkbox"]');
-    if (toggleSwitch) {
-      if (currentTheme === null) {
-        document.documentElement.setAttribute('data-theme', 'light');
-        localStorage.setItem('theme', 'Light');
-        toggleSwitch.checked = false;
-      }
-      if (currentTheme)
-        if (currentTheme === 'Dark') {
-          document.documentElement.setAttribute('data-theme', 'dark');
-          localStorage.setItem('theme', 'Dark');
-          toggleSwitch.checked = true;
-        }
-    }
+
   }
 
   public render() {
@@ -131,7 +119,7 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
               <OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />
               <div className="theme-switch-wrapper">
                 <label className="theme-switch" htmlFor="checkbox">
-                  <input type="checkbox" id="checkbox" onChange={this.onSwitchTheme} defaultChecked={localStorage.theme === 'Dark' ? true : false}/>
+                  <input type="checkbox" id="checkbox" onChange={this.onSwitchTheme} defaultChecked={!localStorage.theme || localStorage.theme === 'dark' ? true : false} />
                   <div className="slider round"></div>
                 </label>
               </div>
@@ -157,10 +145,10 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
     var buttonToggleSwitch = document.querySelector<HTMLInputElement>('.theme-switch input[type="checkbox"]')!;
     if (buttonToggleSwitch.checked) {
       document.documentElement.setAttribute('data-theme', 'dark');
-      localStorage.setItem('theme', 'Dark');
+      localStorage.setItem('theme', 'dark');
     } else {
       document.documentElement.setAttribute('data-theme', 'light');
-      localStorage.setItem('theme', 'Light');
+      localStorage.setItem('theme', 'light');
     }
   };
 }

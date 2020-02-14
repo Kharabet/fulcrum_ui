@@ -74,10 +74,10 @@ export class TVChartContainer extends React.PureComponent<Partial<ChartContainer
 		fullscreen: false,
 		autosize: true,
 		studiesOverrides: {},
-		theme: localStorage.theme || "Dark",
+		theme: "Dark",
 		preset: undefined,
-		loading_screen:  localStorage.theme === "Dark" ?  { backgroundColor: "#283038" } : {},
-		overrides: localStorage.theme === "Dark" ? {
+		loading_screen:  localStorage.theme === "dark" ?  { backgroundColor: "#283038" } : {},
+		overrides: localStorage.theme === "dark" ? {
 			"paneProperties.background": "#283038"
 		} : {},
 		custom_css_url: "/charting_library/custom_css.css"
@@ -103,10 +103,10 @@ export class TVChartContainer extends React.PureComponent<Partial<ChartContainer
 			fullscreen: this.props.fullscreen,
 			autosize: this.props.autosize,
 			studies_overrides: this.props.studiesOverrides,
-			theme: localStorage.theme || "Dark",
-			loading_screen: localStorage.theme === "Dark" ?  { backgroundColor: "#283038" } : {},
+			theme: localStorage.theme === "dark" ? "Dark" : "Light",
+			loading_screen: localStorage.theme === "dark" ?  { backgroundColor: "#283038" } : {},
 			preset: this.props.preset,
-			overrides: localStorage.theme === "Dark" ? {
+			overrides: localStorage.theme === "dark" ? {
 				"paneProperties.background": "#283038"
 			} : {},
 			custom_css_url: this.props.custom_css_url
