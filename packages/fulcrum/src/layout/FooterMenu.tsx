@@ -20,9 +20,12 @@ export class FooterMenu extends Component<IFooterMenuProps> {
             <div className="footer-menu__item">
               <a href="https://bzx.network/faq-fulcrum.html">FAQ</a>
             </div>
-            <Link className="footer-menu__item" to="/stats">
-              Stats
-        </Link></React.Fragment>
+            <div className="footer-menu__item">
+              <Link to="/stats">
+                Stats
+              </Link>
+            </div>
+          </React.Fragment>
           : null}
       </div>
     );
