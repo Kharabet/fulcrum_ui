@@ -2,6 +2,36 @@
   padding-top: 50px;
   overflow: hidden;
   margin-bottom: 2px;
+  &.eth {
+    border-bottom: 2px solid var(--eth-bg);
+  }
+  &.wbtc {
+    border-bottom: 2px solid #884294;
+  }
+  &.link {
+    border-bottom: 2px solid #2a5ada;
+    /*.trade-token-grid-tab-item{
+      background-color: #2A5ADA;
+    }*/
+  }
+  &.zrx {
+    border-bottom: 2px solid #000004;
+    /*.trade-token-grid-tab-item{
+      background-color: #000004;
+    }*/
+  }
+  &.knc {
+    border-bottom: 2px solid #49bc98;
+    /*.trade-token-grid-tab-item{
+      background-color: #49BC98;
+    }*/
+  }
+  &.manage {
+    border-bottom: 2px solid #6488ff;
+    /*.trade-token-grid-tab-item{
+      background-color: #6488FF;
+    }*/
+  }
   &__container {
     display: flex;
     justify-content: center;
@@ -13,6 +43,42 @@
     height: 60px;
     margin-bottom: -10px;
     transition: 0.3s ease-in-out all;
+    &:hover {
+      cursor: pointer;
+      background: linear-gradient(0deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.15)), #6488FF;
+    }
+    &.eth-tab {
+      background-color: var(--eth-bg);
+    }
+    &.wbtc-tab {
+      background-color: rgb(136, 66, 148);
+      &:hover {
+        cursor: pointer;
+        background: linear-gradient(0deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.15)), #884294;
+      }
+    }
+    &.link-tab {
+      background-color: rgb(42, 90, 218);
+      &:hover {
+        cursor: pointer;
+        background: linear-gradient(0deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.15)), #2A5ADA;
+      }
+    }
+    &.zrx-tab {
+      background-color: rgb(0, 0, 4);
+      &:hover {
+        cursor: pointer;
+        background: linear-gradient(0deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.15)), #000004;
+      }
+    }
+    &.knc-tab {
+      background-color: rgb(73, 188, 152);
+      &:hover {
+        cursor: pointer;
+        background: linear-gradient(0deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.15)), #49BC98;
+      }
+    }
+
     &:not(:last-child) {
       margin-right: 3px;
     }
@@ -23,14 +89,15 @@
         margin-top: 5px;
       }
     }
-    &:not(&--active) {
+    /*&:not(&--active) {
       &:hover {
         cursor: pointer;
         .trade-token-grid-tab-item__col-token-image {
           opacity: 0.7;
         }
       }
-    }
+    }*/
+
     &__col-token-image {
       height: 50px;
       width: 100px;
@@ -38,11 +105,15 @@
       justify-content: flex-start;
       align-items: center;
 
-      img {
+      img,
+      svg {
         height: 34px;
         width: auto;
         margin-right: 6px;
         margin-left: 8px;
+        .fill-svg{
+          fill: transparent;
+        }
       }
       span {
         font-size: 12px;
@@ -63,7 +134,8 @@
       }
       &.wallet-img-div {
         background-color: #6488ff;
-        img {
+        img,
+        svg {
           margin-left: 15px;
           height: 17px;
         }
@@ -133,14 +205,7 @@
       border-radius: 15px;
       transform: translateX(-27px);
       animation: translateItem 0.8s cubic-bezier(0, 0, 1, 1) 0.6s infinite;
-      .trade-token-grid & {
-        background-color: var(--primary-row);
-        border: 2px solid var(--primary-bg);
-      }
-      .own-token-grid & {
-        background-color: var(--secondary-row);
-        border: 2px solid var(--secondary-bg);
-      }
+      background-color: var(--loader-slider);
     }
   }
 }

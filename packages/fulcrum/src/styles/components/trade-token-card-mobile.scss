@@ -48,13 +48,14 @@
 
                 /* Main/White */
 
-                color: #ffffff;
+                color: var(--primary-text);
                 background-color: var(--secondary-row);
                 padding: 8px 12px;
 
                 border: none;
                 &.btn-active {
                     background: #00c0ab;
+                    color: #ffffff;
                 }
             }
         }

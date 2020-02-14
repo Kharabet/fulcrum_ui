@@ -25,7 +25,10 @@
       max-width: 170px;
       margin: 20px auto 0 auto;
     }
-    &:hover,
+    &:hover{
+      transition: all 0.1s;
+      background-color: #758295;
+    }
     &--selected {
       background-color: #586473;
     }

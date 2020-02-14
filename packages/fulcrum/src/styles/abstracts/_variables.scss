@@ -19,7 +19,12 @@ $mobile-version-width-sm: 1024px;
   --position-marker-bg: #ffffff;
   --leverage-bg: #ffffff;
   --leverage-color: #00c0ab;
+  --leverage-color-hover: #33dfcc;
   --lend-item-before: #8992a4;
+  --indicator-border: #b9c7d6;
+  --loader-slider: #b9c7d6;
+  --eth-bg: #e0e0e0;
+  --wbtc-svg: #282237;
 }
 
 [data-theme="dark"] {
@@ -37,5 +42,11 @@ $mobile-version-width-sm: 1024px;
   --position-marker-bg: #444e5a;
   --leverage-bg: #3d4651;
   --leverage-color: #ffffff;
+  --leverage-color-hover: #33dfcc;
   --lend-item-before: #29323d;
+  --indicator-border: #444e5a;
+  --loader-slider: #3d4651;
+  --eth-bg: #ffffff;
+  --wbtc-svg: #ffffff;
+
 }

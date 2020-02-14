@@ -41,4 +41,9 @@
     border-top: solid 1px #393f49;
     border-bottom: solid 1px #393f49;
   }
+  svg{
+    .primary{
+      fill: var(--primary-text)
+    }
+  }
 }

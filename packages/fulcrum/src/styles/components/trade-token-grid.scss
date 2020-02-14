@@ -107,6 +107,7 @@ $width-col-actions: 13%;
       width: $width-col-amount;
     }
     &__col-position-type {
+      display: flex;
       width: $width-col-position-type;
     }
     &__col-price {

@@ -1,19 +1,20 @@
+import React, { Component } from "react";
 import { Asset } from "./Asset";
 import { AssetDetails } from "./AssetDetails";
 
-import bat_logo from "../assets/images/ic_token_bat.svg";
-import btc_logo from "../assets/images/ic_token_btc.svg";
-import dai_logo from "../assets/images/ic_token_dai.svg";
-import eth_logo from "../assets/images/ic_token_eth.svg";
-import knc_logo from "../assets/images/ic_token_knc.svg";
-import link_logo from "../assets/images/ic_token_link.svg";
-import mkr_logo from "../assets/images/ic_token_mkr.svg";
-import rep_logo from "../assets/images/ic_token_rep.svg";
-import sai_logo from "../assets/images/ic_token_sai.svg";
-import susd_logo from "../assets/images/ic_token_susd.svg";
-import usdt_logo from "../assets/images/ic_token_usdt.svg";
-import usdc_logo from "../assets/images/ic_token_usdc.svg";
-import zrx_logo from "../assets/images/ic_token_zrx.svg";
+import bat_logo, {ReactComponent as BATLogo} from "../assets/images/ic_token_bat.svg";
+import btc_logo, {ReactComponent as BTCLogo} from "../assets/images/ic_token_btc.svg";
+import dai_logo, {ReactComponent as DAILogo} from "../assets/images/ic_token_dai.svg";
+import eth_logo, {ReactComponent as ETHLogo} from "../assets/images/ic_token_eth.svg";
+import knc_logo, {ReactComponent as KNCLogo} from "../assets/images/ic_token_knc.svg";
+import link_logo, {ReactComponent as LINKLogo} from "../assets/images/ic_token_link.svg";
+import mkr_logo, {ReactComponent as MKRLogo} from "../assets/images/ic_token_mkr.svg";
+import rep_logo, {ReactComponent as REPLogo} from "../assets/images/ic_token_rep.svg";
+import sai_logo, {ReactComponent as SAILogo} from "../assets/images/ic_token_sai.svg";
+import susd_logo, {ReactComponent as SUSDLogo} from "../assets/images/ic_token_susd.svg";
+import usdt_logo, {ReactComponent as USDTLogo} from "../assets/images/ic_token_usdt.svg";
+import usdc_logo, {ReactComponent as USDCLogo} from "../assets/images/ic_token_usdc.svg";
+import zrx_logo, {ReactComponent as ZRXLogo} from "../assets/images/ic_token_zrx.svg";
 
 import bat_bg from "../assets/images/popup_left_token_bat.svg";
 import btc_bg from "../assets/images/popup_left_token_btc.svg";
@@ -69,6 +70,7 @@ export class AssetsDictionary {
         "https://fulcrum.trade/images/iBAT.svg",
         18,
         bat_logo,
+        BATLogo,
         bat_bg,
         bat_ts,
         "#CC3D84",
@@ -89,6 +91,7 @@ export class AssetsDictionary {
         "https://fulcrum.trade/images/iWBTC.svg",
         8,
         btc_logo,
+        BTCLogo,
         btc_bg,
         btc_ts,
         "#884294",
@@ -110,6 +113,7 @@ export class AssetsDictionary {
         "https://fulcrum.trade/images/iLINK.svg",
         18,
         link_logo,
+        LINKLogo,
         link_bg,
         link_ts,
         "#2A5ADA",
@@ -130,6 +134,7 @@ export class AssetsDictionary {
         "https://fulcrum.trade/images/iUSDT.svg",
         6,
         usdt_logo,
+        USDTLogo,
         usdt_bg,
         usdt_ts,
         "#8777B1",
@@ -151,6 +156,7 @@ export class AssetsDictionary {
         "https://fulcrum.trade/images/iSAI.svg",
         18,
         sai_logo,
+        SAILogo,
         sai_bg,
         sai_ts,
         "#8777B1",
@@ -172,6 +178,7 @@ export class AssetsDictionary {
         "https://fulcrum.trade/images/iDAI.svg",
         18,
         dai_logo,
+        DAILogo,
         dai_bg,
         dai_ts,
         "#8777B1",
@@ -194,6 +201,7 @@ export class AssetsDictionary {
         "https://fulcrum.trade/images/iDAI.svg",
         18,
         dai_logo,
+        DAILogo,
         dai_bg,
         dai_ts,
         "#8777B1",
@@ -216,6 +224,7 @@ export class AssetsDictionary {
         "https://fulcrum.trade/images/iUSDC.svg",
         6,
         usdc_logo,
+        USDCLogo,
         usdc_bg,
         usdc_ts,
         "#00000000",
@@ -236,6 +245,7 @@ export class AssetsDictionary {
         "https://fulcrum.trade/images/iSUSD.svg",
         18,
         susd_logo,
+        SUSDLogo,
         susd_bg,
         susd_ts,
         "#00000000",
@@ -256,6 +266,7 @@ export class AssetsDictionary {
         "https://fulcrum.trade/images/iETH.svg",
         18,
         eth_logo,
+        ETHLogo,
         eth_bg,
         eth_ts,
         "#FFFFFF",
@@ -278,6 +289,7 @@ export class AssetsDictionary {
         "https://fulcrum.trade/images/iETH.svg",
         18,
         eth_logo,
+        ETHLogo,
         eth_bg,
         eth_ts,
         "#FFFFFF",
@@ -300,6 +312,7 @@ export class AssetsDictionary {
         "https://fulcrum.trade/images/iKNC.svg",
         18,
         knc_logo,
+        KNCLogo,
         knc_bg,
         knc_ts,
         "#49BC98",
@@ -321,6 +334,7 @@ export class AssetsDictionary {
         "",
         18,
         mkr_logo,
+        MKRLogo,
         mkr_bg,
         mkr_ts,
         "#00BB99",
@@ -341,6 +355,7 @@ export class AssetsDictionary {
         "https://fulcrum.trade/images/iREP.svg",
         18,
         rep_logo,
+        REPLogo,
         rep_bg,
         rep_ts,
         "#8D3F76",
@@ -362,6 +377,7 @@ export class AssetsDictionary {
         "https://fulcrum.trade/images/iZRX.svg",
         18,
         zrx_logo,
+        ZRXLogo,
         zrx_bg,
         zrx_ts,
         "#000004",
@@ -387,6 +403,7 @@ export class AssetsDictionaryMobile {
         "https://fulcrum.trade/images/iBAT.svg",
         18,
         bat_logo,
+        BATLogo,
         bat_bg_btm,
         bat_ts,
         "#CC3D84",
@@ -407,6 +424,7 @@ export class AssetsDictionaryMobile {
         "https://fulcrum.trade/images/iWBTC.svg",
         8,
         btc_logo,
+        BTCLogo,
         btc_bg,
         btc_ts,
         "#884294",
@@ -428,6 +446,7 @@ export class AssetsDictionaryMobile {
         "https://fulcrum.trade/images/iLINK.svg",
         18,
         link_logo,
+        LINKLogo,
         link_bg_btm,
         link_ts,
         "#2A5ADA",
@@ -448,6 +467,7 @@ export class AssetsDictionaryMobile {
         "https://fulcrum.trade/images/iUSDT.svg",
         6,
         usdt_logo,
+        USDTLogo,
         usdt_bg,
         usdt_ts,
         "#8777B1",
@@ -469,6 +489,7 @@ export class AssetsDictionaryMobile {
         "https://fulcrum.trade/images/iSAI.svg",
         18,
         sai_logo,
+        SAILogo,
         sai_bg_btm,
         sai_ts,
         "#8777B1",
@@ -490,6 +511,7 @@ export class AssetsDictionaryMobile {
         "https://fulcrum.trade/images/iDAI.svg",
         18,
         dai_logo,
+        DAILogo,
         dai_bg_btm,
         dai_ts,
         "#8777B1",
@@ -512,6 +534,7 @@ export class AssetsDictionaryMobile {
         "https://fulcrum.trade/images/iDAI.svg",
         18,
         dai_logo,
+        DAILogo,
         dai_bg,
         dai_ts,
         "#8777B1",
@@ -534,6 +557,7 @@ export class AssetsDictionaryMobile {
         "https://fulcrum.trade/images/iUSDC.svg",
         6,
         usdc_logo,
+        USDCLogo,
         usdc_bg_btm,
         usdc_ts,
         "#00000000",
@@ -554,6 +578,7 @@ export class AssetsDictionaryMobile {
         "https://fulcrum.trade/images/iSUSD.svg",
         18,
         susd_logo,
+        SUSDLogo,
         susd_bg_btm,
         susd_ts,
         "#00000000",
@@ -574,6 +599,7 @@ export class AssetsDictionaryMobile {
         "https://fulcrum.trade/images/iETH.svg",
         18,
         eth_logo,
+        ETHLogo,
         eth_bg_btm,
         eth_ts,
         "#FFFFFF",
@@ -596,6 +622,7 @@ export class AssetsDictionaryMobile {
         "https://fulcrum.trade/images/iETH.svg",
         18,
         eth_logo,
+        ETHLogo,
         eth_bg_btm,
         eth_ts,
         "#FFFFFF",
@@ -618,6 +645,7 @@ export class AssetsDictionaryMobile {
         "https://fulcrum.trade/images/iKNC.svg",
         18,
         knc_logo,
+        KNCLogo,
         knc_bg_btm,
         knc_ts,
         "#49BC98",
@@ -639,6 +667,7 @@ export class AssetsDictionaryMobile {
         "",
         18,
         mkr_logo,
+        MKRLogo,
         mkr_bg_btm,
         mkr_ts,
         "#00BB99",
@@ -659,6 +688,7 @@ export class AssetsDictionaryMobile {
         "https://fulcrum.trade/images/iREP.svg",
         18,
         rep_logo,
+        REPLogo,
         rep_bg_btm,
         rep_ts,
         "#8D3F76",
@@ -680,6 +710,7 @@ export class AssetsDictionaryMobile {
         "https://fulcrum.trade/images/iZRX.svg",
         18,
         zrx_logo,
+        ZRXLogo,
         zrx_bg_btm,
         zrx_ts,
         "#7368D0",
