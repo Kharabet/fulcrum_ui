@@ -41,6 +41,11 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
       document.documentElement.setAttribute('data-theme', 'light');
       localStorage.setItem('theme', 'light');
     }
+    else{
+      document.documentElement.setAttribute('data-theme', 'dark');
+      localStorage.setItem('theme', 'dark');
+
+    }
   }
 
   public componentDidMount(): void {
