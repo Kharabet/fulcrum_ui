@@ -26,7 +26,9 @@
 @import "components/on-chain-indicator.mobile";
 @import "components/ops-selector";
 @import "components/own-token-grid";
+@import "components/own-token-grid-inner";
 @import "components/own-token-grid.mobile";
+@import "components/own-token-card-mobile";
 @import "components/position-type-marker";
 @import "components/position-type-marker-alt";
 @import "components/price-graph";
@@ -41,9 +43,13 @@
 @import "components/trade-form";
 @import "components/trade-form.mobile";
 @import "components/trade-token-grid";
+@import "components/token-grid-tabs";
+@import "components/trade-token-card-mobile";
 @import "components/trade-token-grid.mobile";
+@import "components/trading-view-chart";
 @import "components/unit-of-account";
 @import "components/eth-or-weth";
+@import "components/switch-theme";
 
 @import "layout/footer";
 @import "layout/header";

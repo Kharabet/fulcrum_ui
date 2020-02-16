@@ -6,6 +6,7 @@ export class AssetDetails {
   public iTokenLogoUrl: string = "";
   public decimals: number = 18;
   public logoSvg: any = null;
+  public reactLogoSvg: any = null;
   public bgColor: string = "#000000";
   public bgSvg: any = null;
   public tsSvg: any = null;
@@ -19,6 +20,7 @@ export class AssetDetails {
     iTokenLogoUrl: string,
     decimals: number,
     logoSvg: any,
+    reactLogoSvg: any,
     bgSvg: any,
     tsSvg: any,
     bgColor: string,
@@ -33,6 +35,7 @@ export class AssetDetails {
     this.iTokenLogoUrl = iTokenLogoUrl;
     this.decimals = decimals;
     this.logoSvg = logoSvg;
+    this.reactLogoSvg = reactLogoSvg;
     this.bgSvg = bgSvg;
     this.tsSvg = tsSvg;
     this.bgColor = bgColor;

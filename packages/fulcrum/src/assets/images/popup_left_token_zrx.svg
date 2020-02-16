@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="256" height="368">
     <defs>
         <style>
-            .cls-1,.cls-2,.cls-3{fill:#7668d5}.cls-1{opacity:.3}.cls-2{opacity:.5}
+            .cls-1,.cls-2,.cls-3{fill:#000}.cls-1{opacity:.3}.cls-2{opacity:.5}
         </style>
     </defs>
     <g id="popup_left_token_zrx" transform="translate(8 -16)">

@@ -1,5 +1,5 @@
 .header {
-  padding-top: 1.8rem;
+  padding-top: 50px;
   margin-bottom: 1rem;
 
   display: flex;
@@ -15,14 +15,19 @@
       display: flex;
       flex-direction: row;
       justify-content: flex-start;
-      width: 35%;
+      flex: 1;
     }
 
     .header__right {
       display: flex;
       flex-direction: row;
       justify-content: flex-end;
-      width: 35%;
+    }
+
+    .header__center {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
     }
   }
 
@@ -35,5 +40,10 @@
 
     border-top: solid 1px #393f49;
     border-bottom: solid 1px #393f49;
+  }
+  svg{
+    .primary{
+      fill: var(--primary-text)
+    }
   }
 }

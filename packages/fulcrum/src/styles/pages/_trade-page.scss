@@ -10,6 +10,12 @@
   flex-shrink: 0;
 }
 
+@media only screen and (max-width: 1279px){
+  .trade-page {
+    width: calc(100% - 30px);
+    padding: 0;
+  }
+}
 @media only screen and (max-width: $mobile-version-width-sm) {
   .trade-page {
     display: flex;
@@ -18,7 +24,6 @@
     justify-content: flex-start;
 
     height: 100%;
-    width: 100%;
     padding: 2px;
     flex-shrink: 0;
   }

@@ -1,5 +1,53 @@
 $page-max-width: 76rem;
 $page-padding: 0 2rem;
 $mobile-version-max-width: 59.9375rem;
-$mobile-version-width:600px;
-$mobile-version-width-sm:1024px;
+$mobile-version-width: 600px;
+$mobile-version-width-sm: 1024px;
+
+:root {
+  --primary-bg: #ffffff;
+  --primary-text: #283049;
+  --switch-bg: #283049;
+  --switch-button: #ffffff;
+  --primary-row: #e9f4ff;
+  --secondary-row: #f5f7f9;
+  --primary-row-border: #cbe2ff;
+  --trade-header-color: #8992a4;
+  --lend-border-hover: #e9f4ff;
+  --lend-bg-hover: #ffffff;
+  --position-marker-color: #8992a4;
+  --position-marker-bg: #ffffff;
+  --leverage-bg: #ffffff;
+  --leverage-color: #00c0ab;
+  --leverage-color-hover: #33dfcc;
+  --lend-item-before: #8992a4;
+  --lend-item-before-hover: #a9b5c7;
+  --indicator-border: #b9c7d6;
+  --loader-slider: #b9c7d6;
+  --eth-bg: #e0e0e0;
+  --wbtc-svg: #282237;
+}
+
+[data-theme="dark"] {
+  --primary-bg: #283038;
+  --primary-text: #ffffff;
+  --switch-bg: #ffffff;
+  --switch-button: #283038;
+  --primary-row: #444e5a;
+  --secondary-row: #3d4651;
+  --primary-row-border: #444e5a;
+  --trade-header-color: #a2abb8;
+  --lend-bg-hover: #586473;
+  --lend-border-hover: #586473;
+  --position-marker-color: #ffffff;
+  --position-marker-bg: #444e5a;
+  --leverage-bg: #3d4651;
+  --leverage-color: #ffffff;
+  --leverage-color-hover: #33dfcc;
+  --lend-item-before: #29323d;
+  --lend-item-before-hover: #343d49;
+  --indicator-border: #a2abb8;
+  --loader-slider: #3d4651;
+  --eth-bg: #ffffff;
+  --wbtc-svg: #ffffff;
+}

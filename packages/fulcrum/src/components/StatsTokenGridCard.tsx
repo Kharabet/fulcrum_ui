@@ -79,29 +79,30 @@ export class StatsTokenGridCard extends Component<IStatsTokenGridCardProps, ISta
     if (this.props.reserveDetails.asset === Asset.UNKNOWN) {
       return (
         <div className="stats-grid-card">
+          <div className="stats-grid-card__info-container">
+            <div className="stats-grid-row__col-name reserve-all">All reserve</div>
+          </div>
           <div className="stats-grid-card__details-container">
             <div className="stats-grid-card__kv-container">
               <div className="stats-grid-card__kv-title">
-                <span className="">All Assets - TVL (USD)</span>
+                <span className="">TVL (USD)</span>
               </div>
-              <div className="stats-grid-card__kv-dots" />
               <div
                 title={details.usdTotalLocked ? `$${details.usdTotalLocked.toFixed(18)}` : ``}
                 className="stats-grid-card__kv-value"
               >
-                {details.usdTotalLocked ? `$${this.numberWithCommas(details.usdTotalLocked.toFixed(4))}` : `-`}
+                {details.usdTotalLocked ? <React.Fragment>$<span className="fw-800 color-primary">{this.numberWithCommas(details.usdTotalLocked.toFixed(4))}</span></React.Fragment> : `-`}
               </div>
             </div>
             <div className="stats-grid-card__kv-container">
               <div className="stats-grid-card__kv-title">
-                <span className="">All Assets - Total Supply (USD)</span>
+                <span className="">Total Supply (USD)</span>
               </div>
-              <div className="stats-grid-card__kv-dots" />
               <div
                 title={details.usdSupply ? `$${details.usdSupply.toFixed(18)}` : ``}
                 className="stats-grid-card__kv-value"
               >
-                {details.usdSupply ? `$${this.numberWithCommas(details.usdSupply.toFixed(4))}` : `-`}
+                {details.usdSupply ? <React.Fragment>$<span className="fw-800 color-primary">{this.numberWithCommas(details.usdSupply.toFixed(4))}</span></React.Fragment> : `-`}
               </div>
             </div>
           </div>
@@ -113,6 +114,16 @@ export class StatsTokenGridCard extends Component<IStatsTokenGridCardProps, ISta
       return null;
     }
 
+    let customBorrowTitle;
+    let customBorrowText;
+    if (details.borrowInterestRate && details.torqueBorrowInterestRate) {
+      customBorrowTitle = `${details.borrowInterestRate.toFixed(18)}% / ${details.torqueBorrowInterestRate.toFixed(18)}%`;
+      customBorrowText = <React.Fragment><span className="fw-800 color-primary">{details.borrowInterestRate.toFixed(2)}</span>%&nbsp;/&nbsp;<span className="fw-800 color-primary">{details.torqueBorrowInterestRate.toFixed(2)}</span>%</React.Fragment>;
+    } else {
+      customBorrowTitle = ``;
+      customBorrowText = `-`;
+    }
+
     return (
       <div className="stats-grid-card">
         {this.renderAssetInfo(details)}
@@ -122,34 +133,31 @@ export class StatsTokenGridCard extends Component<IStatsTokenGridCardProps, ISta
             <div className="stats-grid-card__kv-title">
               <span className="">TVL (USD)</span>
             </div>
-            <div className="stats-grid-card__kv-dots" />
             <div
               title={details.usdTotalLocked ? `$${details.usdTotalLocked.toFixed(18)}` : ``}
               className="stats-grid-card__kv-value"
             >
-              {details.usdTotalLocked ? `$${this.numberWithCommas(details.usdTotalLocked.toFixed(4))}` : `-`}
+              {details.usdTotalLocked ? <React.Fragment>$<span className="fw-800 color-primary">{this.numberWithCommas(details.usdTotalLocked.toFixed(4))}</span></React.Fragment> : `-`}
             </div>
           </div>
           <div className="stats-grid-card__kv-container">
             <div className="stats-grid-card__kv-title">
               <span className="">Total Supply (USD)</span>
             </div>
-            <div className="stats-grid-card__kv-dots" />
             <div
               title={details.usdSupply ? `$${details.usdSupply.toFixed(18)}` : ``}
               className="stats-grid-card__kv-value"
             >
-              {details.usdSupply ? `$${this.numberWithCommas(details.usdSupply.toFixed(4))}` : `-`}
+              {details.usdSupply ? <React.Fragment>$<span className="fw-800 color-primary">{details.usdSupply.toFixed(4)}</span></React.Fragment> : ``}
             </div>
           </div>
           <div className="stats-grid-card__kv-container">
             <div className="stats-grid-card__kv-title">
               <span className="">Total Supply</span>
             </div>
-            <div className="stats-grid-card__kv-dots" />
             <div
               title={details.totalSupply ? `${details.totalSupply.toFixed(this.state.decimals)}` : ``}
-              className="stats-grid-card__kv-value"
+              className="stats-grid-card__kv-value fw-800 color-primary"
             >
               {details.totalSupply ? `${this.numberWithCommas(details.totalSupply.toFixed(4))}` : `-`}
             </div>
@@ -158,10 +166,9 @@ export class StatsTokenGridCard extends Component<IStatsTokenGridCardProps, ISta
             <div className="stats-grid-card__kv-title">
               <span className="">Total Borrow</span>
             </div>
-            <div className="stats-grid-card__kv-dots" />
             <div
               title={details.totalBorrow ? `${details.totalBorrow.toFixed(this.state.decimals)}` : ``}
-              className="stats-grid-card__kv-value"
+              className="stats-grid-card__kv-value fw-800 color-primary"
             >
               {details.totalBorrow ? `${this.numberWithCommas(details.totalBorrow.toFixed(4))}` : `-`}
             </div>
@@ -170,10 +177,9 @@ export class StatsTokenGridCard extends Component<IStatsTokenGridCardProps, ISta
             <div className="stats-grid-card__kv-title">
               <span className="">Vault Locked</span>
             </div>
-            <div className="stats-grid-card__kv-dots" />
             <div
               title={details.lockedAssets ? `${details.lockedAssets.toFixed(this.state.decimals)}` : ``}
-              className="stats-grid-card__kv-value"
+              className="stats-grid-card__kv-value fw-800 color-primary"
             >
               {details.lockedAssets ? `${this.numberWithCommas(details.lockedAssets.toFixed(4))}` : `-`}
             </div>
@@ -182,10 +188,9 @@ export class StatsTokenGridCard extends Component<IStatsTokenGridCardProps, ISta
             <div className="stats-grid-card__kv-title">
               <span className="">Free Liquidity</span>
             </div>
-            <div className="stats-grid-card__kv-dots" />
             <div
               title={details.liquidity ? `${details.liquidity.toFixed(this.state.decimals)}` : ``}
-              className="stats-grid-card__kv-value"
+              className="stats-grid-card__kv-value fw-800 color-primary"
             >
               {details.liquidity ? `${this.numberWithCommas(details.liquidity.toFixed(4))}` : `-`}
             </div>
@@ -194,7 +199,6 @@ export class StatsTokenGridCard extends Component<IStatsTokenGridCardProps, ISta
             <div className="stats-grid-card__kv-title">
               <span className="">Reserved Liquidity</span>
             </div>
-            <div className="stats-grid-card__kv-dots" />
             <div
               title={details.liquidityReserved ? `${details.liquidityReserved.toFixed(this.state.decimals)}` : ``}
               className="stats-grid-card__kv-value"
@@ -206,36 +210,23 @@ export class StatsTokenGridCard extends Component<IStatsTokenGridCardProps, ISta
             <div className="stats-grid-card__kv-title">
               <span className="">Supply Rate (APR)</span>
             </div>
-            <div className="stats-grid-card__kv-dots" />
             <div
               title={details.supplyInterestRate ? `${details.supplyInterestRate.toFixed(18)}%` : ``}
               className="stats-grid-card__kv-value"
             >
-              {details.supplyInterestRate ? `${details.supplyInterestRate.toFixed(4)}%` : `-`}
+              {details.supplyInterestRate ? <React.Fragment><span className="fw-800 color-primary">{details.supplyInterestRate.toFixed(4)}</span>%</React.Fragment> : `-`}
             </div>
           </div>
           <div className="stats-grid-card__kv-container">
-            <div className="stats-grid-card__kv-title">
-              <span className="">Fulcrum Borrow Rate (APR)</span>
+            <div className="stats-grid-card__kv-title borrow-title">
+              <span>Borrow Rate (APR)</span>
+              <span>Fulcrum / Torque</span>
             </div>
-            <div className="stats-grid-card__kv-dots" />
             <div
-              title={details.borrowInterestRate ? `${details.borrowInterestRate.toFixed(18)}%` : ``}
+              title={customBorrowTitle}
               className="stats-grid-card__kv-value"
             >
-              {details.borrowInterestRate ? `${details.borrowInterestRate.toFixed(4)}%` : `-`}
-            </div>
-          </div>
-          <div className="stats-grid-card__kv-container">
-            <div className="stats-grid-card__kv-title">
-              <span className="">Torque Borrow Rate (APR)</span>
-            </div>
-            <div className="stats-grid-card__kv-dots" />
-            <div
-              title={details.torqueBorrowInterestRate ? `${details.torqueBorrowInterestRate.toFixed(18)}%` : ``}
-              className="stats-grid-card__kv-value"
-            >
-              {details.torqueBorrowInterestRate ? `${details.torqueBorrowInterestRate.toFixed(4)}%` : `-`}
+              {customBorrowText}
             </div>
           </div>
         </div>
@@ -251,27 +242,27 @@ export class StatsTokenGridCard extends Component<IStatsTokenGridCardProps, ISta
     return details.addressErc20 &&
       FulcrumProvider.Instance.web3ProviderSettings &&
       FulcrumProvider.Instance.web3ProviderSettings.etherscanURL ? (
-      <a
-        className="stats-grid-card__info-container-link"
-        title={details.addressErc20}
-        href={`${FulcrumProvider.Instance.web3ProviderSettings.etherscanURL}token/${details.addressErc20}`}
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        <div className="stats-grid-card__image">
-          <img src={this.state.assetDetails.logoSvg} alt={this.state.assetDetails.displayName} />
+        <a
+          className="stats-grid-card__info-container-link"
+          title={details.addressErc20}
+          href={`${FulcrumProvider.Instance.web3ProviderSettings.etherscanURL}token/${details.addressErc20}`}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <div className="stats-grid-card__image">
+            <img src={this.state.assetDetails.logoSvg} alt={this.state.assetDetails.displayName} />
+          </div>
+          <div className="stats-grid-row__col-name">
+            {details.asset!}
+          </div>
+        </a>
+      ) : (
+        <div className="stats-grid-card__info-container">
+          <div className="stats-grid-card__image">
+            <img src={this.state.assetDetails.logoSvg} alt={this.state.assetDetails.displayName} />
+          </div>
+          <div className="stats-grid-row__col-name">{details.asset!}</div>
         </div>
-        <div className="stats-grid-row__col-name" style={{ textDecoration: `underline` }}>
-          {details.asset!}
-        </div>
-      </a>
-    ) : (
-      <div className="stats-grid-card__info-container">
-        <div className="stats-grid-card__image">
-          <img src={this.state.assetDetails.logoSvg} alt={this.state.assetDetails.displayName} />
-        </div>
-        <div className="stats-grid-row__col-name">{details.asset!}</div>
-      </div>
-    );
+      );
   }
 }

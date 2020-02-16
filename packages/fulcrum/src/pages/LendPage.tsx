@@ -71,7 +71,7 @@ export class LendPage extends PureComponent<ILendPageProps, ILendPageState> {
             />
           </Modal>
         </main>
-        <Footer />
+        <Footer isMobileMedia={this.props.isMobileMedia} />
       </div>
     );
   }

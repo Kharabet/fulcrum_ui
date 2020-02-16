@@ -14,7 +14,9 @@ import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { TradeTransactionMinedEvent } from "../services/events/TradeTransactionMinedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
 import { PositionTypeMarker } from "./PositionTypeMarker";
+import { PositionTypeMarkerAlt } from "./PositionTypeMarkerAlt";
 // import { Change24HMarker, Change24HMarkerSize } from "./Change24HMarker";
+import { Preloader } from "./Preloader";
 
 export interface IOwnTokenGridRowProps {
   selectedKey: TradeTokenKey;
@@ -42,6 +44,8 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
 
     const assetDetails = AssetsDictionary.assets.get(props.currentKey.asset);
 
+    this._isMounted = false;
+
     this.state = {
       assetDetails: assetDetails || null,
       latestAssetPriceDataPoint: FulcrumProvider.Instance.getPriceDefaultDataPoint(),
@@ -55,6 +59,8 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.TradeTransactionMined, this.onTradeTransactionMined);
   }
+
+  private _isMounted: boolean;
 
   private getTradeTokenGridRowSelectionKeyRaw(props: IOwnTokenGridRowProps, leverage: number = this.props.currentKey.leverage) {
     return new TradeTokenKey(this.props.currentKey.asset, this.props.currentKey.unitOfAccount, this.props.currentKey.positionType, leverage, this.props.currentKey.isTokenized, this.props.currentKey.version);
@@ -74,19 +80,19 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
       this.props.currentKey.version
     );
     const latestAssetPriceDataPoint = await FulcrumProvider.Instance.getTradeTokenAssetLatestDataPoint(tradeTokenKey);
-    
+
     const data: [BigNumber | null, BigNumber | null] = await FulcrumProvider.Instance.getTradeBalanceAndProfit(tradeTokenKey);
     const assetBalance = data[0];
     const profit = data[1];
 
-    const address = FulcrumProvider.Instance.contractsSource ? 
+    const address = FulcrumProvider.Instance.contractsSource ?
       await FulcrumProvider.Instance.contractsSource.getPTokenErc20Address(tradeTokenKey) || "" :
       "";
 
     // const precision = AssetsDictionary.assets.get(this.props.selectedKey.loanAsset)!.decimals || 18;
     // const balanceString = this.props.balance.dividedBy(10 ** precision).toFixed();
 
-    this.setState(p => ({
+    this._isMounted && this.setState(p => ({
       ...this.state,
       latestAssetPriceDataPoint: latestAssetPriceDataPoint,
       assetBalance: assetBalance,
@@ -111,12 +117,16 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
   };
 
   public componentWillUnmount(): void {
+    this._isMounted = false;
+    
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.TradeTransactionMined, this.onTradeTransactionMined);
   }
 
   public componentDidMount(): void {
+    this._isMounted = true;
+    
     this.derivedUpdate();
   }
 
@@ -151,13 +161,34 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
 
     return (
       <div className={`own-token-grid-row ${isActiveClassName}`} onClick={this.onSelectClick}>
-        <div
+        {/*        <div
           className="own-token-grid-row__col-token-image"
           style={{ backgroundColor: this.state.assetDetails.bgColor, borderLeftColor: this.state.assetDetails.bgColor }}
         >
           <img src={this.state.assetDetails.logoSvg} alt={`${this.state.assetDetails.displayName} ${this.props.currentKey.leverage}x`} />
-        </div>
+        </div>*/}
         {this.state.pTokenAddress &&
+          FulcrumProvider.Instance.web3ProviderSettings &&
+          FulcrumProvider.Instance.web3ProviderSettings.etherscanURL ? (
+            <a
+              className="own-token-grid-row__col-token-name-full"
+              style={{ cursor: `pointer`, textDecoration: `none` }}
+              title={this.state.pTokenAddress}
+              href={`${FulcrumProvider.Instance.web3ProviderSettings.etherscanURL}address/${this.state.pTokenAddress}#readContract`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {this.state.assetDetails.displayName}&nbsp;
+              <PositionTypeMarkerAlt assetDetails={this.state.assetDetails} value={this.props.currentKey.positionType} />&nbsp;
+              {`${this.props.currentKey.leverage}x`}
+            </a>
+          ) : (
+            <div className="own-token-grid-row__col-token-name-full">{`${this.state.assetDetails.displayName}`}&nbsp;
+            <PositionTypeMarkerAlt assetDetails={this.state.assetDetails} value={this.props.currentKey.positionType} />&nbsp;
+            {`${this.props.currentKey.leverage}x`}
+            </div>)}
+
+        {/* {this.state.pTokenAddress &&
           FulcrumProvider.Instance.web3ProviderSettings &&
           FulcrumProvider.Instance.web3ProviderSettings.etherscanURL ? (
           <a
@@ -172,7 +203,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
           </a>
         ) : (
           <div className="own-token-grid-row__col-token-name-full">{`${this.state.assetDetails.displayName} ${this.props.currentKey.leverage}x`}</div>
-        )}
+        )} */}
         <div className="own-token-grid-row__col-position-type">
           <PositionTypeMarker value={this.props.currentKey.positionType} />
         </div>
@@ -180,26 +211,44 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
         <div title={this.props.currentKey.unitOfAccount} className="own-token-grid-row__col-asset-price">{this.props.currentKey.unitOfAccount}</div>
         <div title={`$${bnPrice.toFixed(18)}`} className="own-token-grid-row__col-asset-price">
           {!this.state.isLoading ?
-          `$${bnPrice.toFixed(2)}` : 'Loading...'}
+            <React.Fragment>
+              <span className="sign-currency">$</span>{bnPrice.toFixed(2)}
+            </React.Fragment>
+            : <Preloader />
+          }
         </div>
         <div title={`$${bnLiquidationPrice.toFixed(18)}`} className="own-token-grid-row__col-liquidation-price">
           {!this.state.isLoading ?
-          `$${bnLiquidationPrice.toFixed(2)}` : 'Loading...'}
+            <React.Fragment>
+              <span className="sign-currency">$</span>{bnLiquidationPrice.toFixed(2)}
+            </React.Fragment>
+            : <Preloader />}
         </div>
         <div title={this.state.assetBalance ? `$${this.state.assetBalance.toFixed(18)}` : ``} className="own-token-grid-row__col-position-value">
-          {!this.state.isLoading ? 
+          {!this.state.isLoading ?
             this.state.assetBalance ?
-            `$${this.state.assetBalance.toFixed(2)}` : '$0.00' : 'Loading...'}
+              <React.Fragment>
+                <span className="sign-currency">$</span>{this.state.assetBalance.toFixed(2)}
+              </React.Fragment>
+              :
+              '$0.00'
+            : <Preloader />
+          }
         </div>
         <div title={this.state.profit ? `$${this.state.profit.toFixed(18)}` : ``} className="own-token-grid-row__col-profit">
-          {!this.state.isLoading ? 
+          {!this.state.isLoading ?
             this.state.profit ?
-            `$${this.state.profit.toFixed(2)}` : '$0.0000' : 'Loading...'}
+              <React.Fragment>
+                <span className="sign-currency">$</span>{this.state.profit.toFixed(2)}
+              </React.Fragment>
+              : '$0.00'
+            : <Preloader />
+          }
         </div>
 
-        
 
-        <div className="own-token-grid-row__col-action" style={{ textAlign: `right`}}>
+
+        <div className="own-token-grid-row__col-action" style={{ textAlign: `right` }}>
           {/*<button className="own-token-grid-row__details-button" onClick={this.onDetailsClick}>
             &nbsp;
             </button>*/}

@@ -1,11 +1,13 @@
-import React, { PureComponent } from "react";
+import React, { PureComponent, Component } from "react";
 import Modal from "react-modal";
 import { ManageCollateralForm } from "../components/ManageCollateralForm";
 import { OwnTokenGrid } from "../components/OwnTokenGrid";
 import { PriceGraph } from "../components/PriceGraph";
 import { TokenAddressForm } from "../components/TokenAddressForm";
 import { TradeForm } from "../components/TradeForm";
-import { TradeTokenGrid } from "../components/TradeTokenGrid";
+import { TradeTokenGrid, ITradeTokenGridProps } from "../components/TradeTokenGrid";
+import { ITradeTokenGridRowProps, TradeTokenGridRow } from "../components/TradeTokenGridRow";
+
 import { Asset } from "../domain/Asset";
 import { IPriceDataPoint } from "../domain/IPriceDataPoint";
 import { ManageCollateralRequest } from "../domain/ManageCollateralRequest";
@@ -19,6 +21,14 @@ import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents"
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
 
+import { TokenGridTabs } from "../components/TokenGridTabs";
+
+
+import { TVChartContainer } from '../components/TVChartContainer';
+import { AssetDetails } from "../domain/AssetDetails";
+
+
+
 export interface ITradePageProps {
   doNetworkConnect: () => void;
   isLoading: boolean;
@@ -26,9 +36,10 @@ export interface ITradePageProps {
 }
 
 interface ITradePageState {
+  assets: Asset[];
   showMyTokensOnly: boolean;
   selectedKey: TradeTokenKey;
-
+  selectedTab: Asset;
   isTradeModalOpen: boolean;
   tradeDataType: string,
   tradeType: TradeType;
@@ -53,10 +64,10 @@ interface ITradePageState {
 export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
   constructor(props: any) {
     super(props);
-
     this.state = {
       showMyTokensOnly: false,
       selectedKey: TradeTokenKey.empty(),
+      selectedTab: Asset.ETH,
       priceGraphData: [],
       isTradeModalOpen: false,
       tradeDataType: 'long',
@@ -70,14 +81,44 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
       isTokenAddressFormOpen: false,
       tradeTokenKey: TradeTokenKey.empty(),
       isManageCollateralModalOpen: false,
-      isLong:true,
-      isShort:false
+      isLong: true,
+      isShort: false,
+      assets: this.getAssets()
     };
     // let changeActiveBtn  = this.changeActiveBtn.bind(this);
 
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
   }
+
+  private getAssets(): Asset[] {
+    var assets: Asset[];
+    if (process.env.REACT_APP_ETH_NETWORK === "kovan") {
+      assets = [
+        Asset.ETH
+      ];
+    } else if (process.env.REACT_APP_ETH_NETWORK === "ropsten") {
+      assets = [
+      ];
+    } else {
+      assets = [
+        Asset.ETH,
+        // Asset.SAI,
+        // Asset.DAI,
+        // Asset.USDC,
+        // Asset.SUSD,
+        Asset.WBTC,
+        Asset.LINK,
+        // Asset.MKR,
+        Asset.ZRX,
+        // Asset.BAT,
+        // Asset.REP,
+        Asset.KNC
+      ];
+    }
+    return assets;
+  }
+
 
   public componentWillUnmount(): void {
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
@@ -98,14 +139,14 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
   }
 
   private async derivedUpdate() {
-    const priceGraphData = await FulcrumProvider.Instance.getPriceDataPoints(this.state.selectedKey);
-    this.setState({ ...this.state, selectedKey: this.state.selectedKey, priceGraphData: priceGraphData });
+    // const priceGraphData = await FulcrumProvider.Instance.getPriceDataPoints(this.state.selectedKey);
+    // this.setState({ ...this.state, selectedKey: this.state.selectedKey, priceGraphData: priceGraphData });
   }
-  public changeActiveBtn(activeType:string) {
-    if(activeType=='long'){
-      this.setState({ ...this.state, isLong: true, isShort:false });
-    }else{
-      this.setState({ ...this.state, isLong: false, isShort:true });
+  public changeActiveBtn(activeType: string) {
+    if (activeType == 'long') {
+      this.setState({ ...this.state, isLong: true, isShort: false });
+    } else {
+      this.setState({ ...this.state, isLong: false, isShort: true });
     }
   }
 
@@ -114,15 +155,25 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
       <div className="trade-page">
         <HeaderOps isMobileMedia={this.props.isMobileMedia} isLoading={this.props.isLoading} doNetworkConnect={this.props.doNetworkConnect} />
         <main>
-          <PriceGraph
-            data={this.state.priceGraphData}
+          <TokenGridTabs
+            assets={this.state.assets}
             selectedKey={this.state.selectedKey}
-            isLong={this.state.isLong}
-            isShort={this.state.isShort}
-            changeActiveBtn={this.changeActiveBtn.bind(this)}
-            showMyTokensOnly={this.state.showMyTokensOnly}
             onShowMyTokensOnlyChange={this.onShowMyTokensOnlyChange}
+            onTabSelect={this.onTabSelect}
+            isMobile={this.props.isMobileMedia}
+            onSelect={this.onSelect}
+            isShowMyTokensOnly={this.state.showMyTokensOnly}
+
+            defaultLeverageShort={1}
+            defaultLeverageLong={2}
+            isLong={this.state.isLong}
           />
+
+          {!this.state.showMyTokensOnly ? (
+            <div className="chart-wrapper">
+              <TVChartContainer symbol={this.state.selectedKey.asset} preset={this.props.isMobileMedia ? "mobile" : undefined} />
+            </div>) : null}
+
           {this.state.showMyTokensOnly ? (
             <OwnTokenGrid
               showMyTokensOnly={this.state.showMyTokensOnly}
@@ -135,19 +186,21 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
               onTrade={this.onTradeRequested}
             />
           ) : (
-            <TradeTokenGrid
-              isMobileMedia={this.props.isMobileMedia}
-              showMyTokensOnly={this.state.showMyTokensOnly}
-              selectedKey={this.state.selectedKey}
-              defaultLeverageShort={1}
-              defaultLeverageLong={2}
-              onShowMyTokensOnlyChange={this.onShowMyTokensOnlyChange}
-              onSelect={this.onSelect}
-              onTrade={this.onTradeRequested}
-              isLong={this.state.isLong}
-              isShort={this.state.isShort}
-            />
-          )}
+              <TradeTokenGrid
+                assets={this.state.assets}
+                changeActiveBtn={this.changeActiveBtn.bind(this)}
+                isMobileMedia={this.props.isMobileMedia}
+                showMyTokensOnly={this.state.showMyTokensOnly}
+                selectedKey={this.state.selectedKey}
+                defaultLeverageShort={1}
+                defaultLeverageLong={2}
+                onShowMyTokensOnlyChange={this.onShowMyTokensOnlyChange}
+                onSelect={this.onSelect}
+                onTrade={this.onTradeRequested}
+                isLong={this.state.isLong}
+                isShort={this.state.isShort}
+              />
+            )}
           <Modal
             isOpen={this.state.isTradeModalOpen}
             onRequestClose={this.onTradeRequestClose}
@@ -199,13 +252,16 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
             />
           </Modal>
         </main>
-        <Footer />
+        {!this.props.isMobileMedia ? <Footer isMobileMedia={this.props.isMobileMedia}/> : null}
       </div>
     );
   }
 
   public onSelect = async (key: TradeTokenKey) => {
-    this.setState({ ...this.state, selectedKey: key });
+    await this.setState({ ...this.state, selectedKey: key });
+  };
+  public onTabSelect = async (asset: Asset) => {
+    this.setState({ ...this.state, selectedTab: asset });
   };
 
   public onDetails = async (key: TradeTokenKey) => {
@@ -224,6 +280,10 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
     await this.derivedUpdate();
   };
 
+
+
+
+
   public onManageCollateralRequested = (request: ManageCollateralRequest) => {
     if (!FulcrumProvider.Instance.contractsSource || !FulcrumProvider.Instance.contractsSource.canWrite) {
       this.props.doNetworkConnect();
@@ -231,7 +291,7 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
     }
 
     if (request) {
-      this.setState({...this.state, isManageCollateralModalOpen: true});
+      this.setState({ ...this.state, isManageCollateralModalOpen: true });
     }
   };
 
@@ -291,8 +351,8 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
     });
   };
 
-  public onShowMyTokensOnlyChange = (value: boolean) => {
-    this.setState({
+  public onShowMyTokensOnlyChange = async (value: boolean) => {
+    await this.setState({
       ...this.state,
       showMyTokensOnly: value
     });

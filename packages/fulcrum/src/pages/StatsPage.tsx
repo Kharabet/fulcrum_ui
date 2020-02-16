@@ -35,7 +35,7 @@ export class StatsPage extends PureComponent<IStatsPageProps, IStatsPageState> {
         <main>
           <StatsTokenGrid isMobileMedia={this.props.isMobileMedia} />
         </main>
-        <Footer />
+        <Footer isMobileMedia={this.props.isMobileMedia}/>
       </div>
     );
   }

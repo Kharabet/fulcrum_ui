@@ -3,7 +3,10 @@ import { OpsSelector } from "../components/OpsSelector";
 import { Footer } from "../layout/Footer";
 import { HeaderHome } from "../layout/HeaderHome";
 
-export class HomePage extends PureComponent {
+export interface IHomePageProps {
+  isMobileMedia: boolean;
+}
+export class HomePage extends PureComponent<IHomePageProps> {
   public render() {
     return (
       <div className="home-page">
@@ -11,7 +14,7 @@ export class HomePage extends PureComponent {
         <main>
           <OpsSelector />
         </main>
-        <Footer />
+        <Footer isMobileMedia={this.props.isMobileMedia} />
       </div>
     );
   }

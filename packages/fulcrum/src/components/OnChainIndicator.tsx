@@ -137,12 +137,9 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
       if (providerTypeDetails !== null && providerTypeDetails.logoSvg !== null) {
         return (
           <React.Fragment>
-            <img
-              className="on-chain-indicator__provider-img"
-              src={providerTypeDetails.logoSvg}
-              alt={providerTypeDetails.displayName}
-              onClick={this.props.doNetworkConnect}
-            />
+            <div className="on-chain-indicator__svg">{providerTypeDetails.reactLogoSvgShort.render()}</div>
+            <div className="on-chain-indicator__description">
+              <span>{providerTypeDetails.displayName}</span>
             {walletAddressText ? (
               isSupportedNetwork && accountText && etherscanURL ? (
                 <a
@@ -161,6 +158,8 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
             ) : (
               ``
             )}
+            </div>
+
           </React.Fragment>
         );
       } else {

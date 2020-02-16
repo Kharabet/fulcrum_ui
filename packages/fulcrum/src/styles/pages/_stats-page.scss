@@ -10,3 +10,29 @@
   padding: $page-padding;
 
 }
+
+
+
+@media only screen and (max-width: 1279px){
+  .stats-page {
+    width: calc(100% - 30px);
+    padding: 0;
+  }
+}
+@media only screen and (max-width: $mobile-version-width-sm) {
+  .stats-page {
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+    justify-content: flex-start;
+
+    height: 100%;
+    padding: 2px;
+    flex-shrink: 0;
+  }
+  .trade-page-header{
+    width: 90%;
+    margin: auto;
+  }
+
+}

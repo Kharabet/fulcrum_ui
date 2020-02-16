@@ -42,6 +42,8 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
     const profit = null;
     const balanceOfUser = new BigNumber(0);
 
+    this._isMounted = false;
+
     this.state = {
       assetDetails: assetDetails || null,
       interestRate,
@@ -57,6 +59,8 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.LendTransactionMined, this.onLendTransactionMined);
   }
 
+  private _isMounted: boolean;
+
   private async derivedUpdate() {
     const assetDetails = AssetsDictionary.assets.get(this.props.asset);
     const interestRate = await FulcrumProvider.Instance.getLendTokenInterestRate(this.props.asset);
@@ -70,7 +74,7 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
       await FulcrumProvider.Instance.contractsSource.getITokenErc20Address(this.props.asset) || "" :
       "";
 
-    this.setState({
+    this._isMounted && this.setState({
       ...this.state,
       assetDetails: assetDetails || null,
       interestRate,
@@ -81,7 +85,7 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
     });
 
     if(address !== "") {
-      this.setState({
+      this._isMounted && this.setState({
         ...this.state,
         isLoading: false
       });
@@ -108,12 +112,16 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
   };
 
   public componentWillUnmount(): void {
+    this._isMounted = false;
+
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.LendTransactionMined, this.onLendTransactionMined);
   }
 
   public componentDidMount(): void {
+    this._isMounted = true;
+
     this.derivedUpdate();
   }
 
@@ -148,7 +156,7 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
           </div>
         ) : null}
         <div className="token-selector-item__image">
-          <img src={this.state.assetDetails.logoSvg} alt={this.state.assetDetails.displayName} />
+          {this.state.assetDetails.reactLogoSvg.render()}
         </div>
         <div className="token-selector-item__descriptions" style={{ marginTop: this.state.profit === null ? `1.5rem` : undefined }}>
           <div className="token-selector-item__description">
@@ -172,7 +180,7 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
             )}
             {this.state.profit !== null ? (
               <div className="token-selector-item__profit-container">
-                <div className="token-selector-item__profit-title">Balance:</div>
+                <div className="token-selector-item__profit-title token-selector-item__profit-balance">Balance:</div>
                 <div
                   title={`$${this.state.balanceOfUser.toFixed(18)}`}
                   className="token-selector-item__profit-value"

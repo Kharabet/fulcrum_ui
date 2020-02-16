@@ -10,9 +10,10 @@ import { OwnTokenGridHeader } from "./OwnTokenGridHeader";
 import { OwnTokenGridHeaderMobile } from "./OwnTokenGridHeaderMobile";
 import { IOwnTokenGridRowProps, OwnTokenGridRow } from "./OwnTokenGridRow";
 import { OwnTokenGridRowMobile } from "./OwnTokenGridRowMobile";
-import {TradeType} from "../domain/TradeType";
-import {Asset} from "../domain/Asset";
-import {PositionType} from "../domain/PositionType";
+import { IOwnTokenCardMobileProps, OwnTokenCardMobile } from "./OwnTokenCardMobile";
+import { TradeType } from "../domain/TradeType";
+import { Asset } from "../domain/Asset";
+import { PositionType } from "../domain/PositionType";
 import { BigNumber } from "@0x/utils";
 export interface IOwnTokenGridProps {
   showMyTokensOnly: boolean;
@@ -91,23 +92,15 @@ export class OwnTokenGrid extends Component<IOwnTokenGridProps, IOwnTokenGridSta
   }
 
   private renderMobile = () => {
-    const tokenRows = this.state.tokenRowsData.map(e => <OwnTokenGridRowMobile key={`${e.currentKey.toString()}`} {...e} />);
+    const tokenRows = this.state.tokenRowsData.map(e => <OwnTokenCardMobile key={`${e.currentKey.toString()}`} {...e} />);
 
     return (
-      <div className="own-token-grid">
-        <div className="own-token-grid-row__col-action-mb">
-          {this.state.tokenRowsData.length > 0 ? (
-          <button className="own-token-grid-row__sell-button" onClick={this.onSellClick}>
-            {TradeType.SELL}
-          </button>
-          ) : null}
-        </div>
-        <OwnTokenGridHeaderMobile
+      <div className="own-token-cards">
 
-          showMyTokensOnly={this.props.showMyTokensOnly}
-          onShowMyTokensOnlyChange={this.props.onShowMyTokensOnlyChange}
-        />
-        {tokenRows}
+        <div className="own-token-cards__header">Manage</div>
+        <div className="own-token-cards__container">
+          {tokenRows}
+        </div>
       </div>
     );
   }
