@@ -4,16 +4,16 @@
   align-content: center;
   justify-content: flex-start;
 
-  height: 100%;
-  width: $page-max-width;
-  padding: $page-padding;
+  //@at-root: 100%;
+  width: $container-desktop;
+  padding: 0 15px;
   flex-shrink: 0;
 }
 
 @media only screen and (max-width: 1279px){
   .trade-page {
     width: calc(100% - 30px);
-    padding: 0;
+    padding: 0 15px;
   }
 }
 @media only screen and (max-width: $mobile-version-width-sm) {
@@ -24,11 +24,10 @@
     justify-content: flex-start;
 
     height: 100%;
-    padding: 2px;
     flex-shrink: 0;
   }
   .trade-page-header{
-    width: 90%;
+    width: $container-mobile;
     margin: auto;
   }
 
