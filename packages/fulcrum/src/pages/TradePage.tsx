@@ -2,11 +2,9 @@ import React, { PureComponent, Component } from "react";
 import Modal from "react-modal";
 import { ManageCollateralForm } from "../components/ManageCollateralForm";
 import { OwnTokenGrid } from "../components/OwnTokenGrid";
-import { PriceGraph } from "../components/PriceGraph";
 import { TokenAddressForm } from "../components/TokenAddressForm";
 import { TradeForm } from "../components/TradeForm";
-import { TradeTokenGrid, ITradeTokenGridProps } from "../components/TradeTokenGrid";
-import { ITradeTokenGridRowProps, TradeTokenGridRow } from "../components/TradeTokenGridRow";
+import { TradeTokenGrid } from "../components/TradeTokenGrid";
 
 import { Asset } from "../domain/Asset";
 import { IPriceDataPoint } from "../domain/IPriceDataPoint";
@@ -25,7 +23,6 @@ import { TokenGridTabs } from "../components/TokenGridTabs";
 
 
 import { TVChartContainer } from '../components/TVChartContainer';
-import { AssetDetails } from "../domain/AssetDetails";
 
 
 
@@ -178,7 +175,6 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
             <OwnTokenGrid
               showMyTokensOnly={this.state.showMyTokensOnly}
               selectedKey={this.state.selectedKey}
-              onShowMyTokensOnlyChange={this.onShowMyTokensOnlyChange}
               // onDetails={this.onDetails}
               // onManageCollateral={this.onManageCollateralRequested}
               onSelect={this.onSelect}
@@ -194,7 +190,6 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
                 selectedKey={this.state.selectedKey}
                 defaultLeverageShort={1}
                 defaultLeverageLong={2}
-                onShowMyTokensOnlyChange={this.onShowMyTokensOnlyChange}
                 onSelect={this.onSelect}
                 onTrade={this.onTradeRequested}
                 isLong={this.state.isLong}
@@ -252,7 +247,7 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
             />
           </Modal>
         </main>
-        {!this.props.isMobileMedia ? <Footer isMobileMedia={this.props.isMobileMedia}/> : null}
+        {!this.props.isMobileMedia ? <Footer isMobileMedia={this.props.isMobileMedia} /> : null}
       </div>
     );
   }

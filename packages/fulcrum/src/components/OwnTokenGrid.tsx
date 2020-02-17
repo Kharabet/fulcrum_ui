@@ -19,8 +19,6 @@ export interface IOwnTokenGridProps {
 
   asset?: Asset;
   positionType?: PositionType;
-
-  onShowMyTokensOnlyChange: (value: boolean) => void;
   // onDetails: (key: TradeTokenKey) => void;
   // onManageCollateral: (request: ManageCollateralRequest) => void;
   onSelect: (key: TradeTokenKey) => void;
