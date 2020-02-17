@@ -163,7 +163,7 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
             isMobile={this.props.isMobileMedia}
             onSelect={this.onSelect}
             isShowMyTokensOnly={this.state.showMyTokensOnly}
-
+            defaultUnitOfAccount={this.state.tradeUnitOfAccount}
             defaultLeverageShort={1}
             defaultLeverageLong={2}
             isLong={this.state.isLong}

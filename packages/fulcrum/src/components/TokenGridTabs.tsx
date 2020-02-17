@@ -9,7 +9,7 @@ export interface ITokenGridTabsProps {
   selectedKey: TradeTokenKey;
   isMobile: boolean;
   assets: Asset[];
-
+  defaultUnitOfAccount: Asset;
   isShowMyTokensOnly: boolean;
   defaultLeverageShort: number;
   defaultLeverageLong: number;
@@ -24,7 +24,6 @@ interface ITokenGridTabsState {
   leverage: number;
   positionType: PositionType;
 
-  defaultUnitOfAccount: Asset;
   isShowMyTokensOnly: boolean;
 }
 
@@ -32,9 +31,6 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
   constructor(props: ITokenGridTabsProps, context?: any) {
     super(props, context);
     this.state = {
-      defaultUnitOfAccount: process.env.REACT_APP_ETH_NETWORK === "kovan" ?
-        Asset.SAI :
-        Asset.DAI,
       positionType: props.isLong ? PositionType.SHORT : PositionType.SHORT,
       leverage: props.isLong ? props.defaultLeverageLong : props.defaultLeverageShort,
       isShowMyTokensOnly: props.isShowMyTokensOnly
@@ -105,7 +101,7 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
   }
 
   private getTradeTokenGridRowSelectionKeyRaw(asset: Asset) {
-    const key = new TradeTokenKey(asset, this.state.defaultUnitOfAccount, this.state.positionType, this.state.leverage, true, 2);
+    const key = new TradeTokenKey(asset, this.props.defaultUnitOfAccount, this.state.positionType, this.state.leverage, true, 2);
 
     // check for version 2, and revert back to version if not found
     if (key.erc20Address === "") {
