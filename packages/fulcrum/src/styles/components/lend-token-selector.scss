@@ -15,14 +15,17 @@
     flex-direction: column;
     flex-grow: 1;
 
-    width: calc(25% - 4px);
-    max-width: calc(25% - 4px);
+    width: calc(25% - 3px);
+    max-width: calc(25% - 3px);
 
     padding: 2rem;
-    margin: 0 4px 4px 0;
+    margin-bottom: 4px;
 
     background-color: var(--primary-row);
     border: 2px solid transparent;
+    &:not(:nth-child(4n)){
+      margin-right: 4px;
+    }
     &:hover {
       cursor: pointer;
       background-color: var(--lend-bg-hover);
@@ -228,6 +231,7 @@
     .token-selector-item {
       max-width: 100%;
       min-width: 100%;
+      margin-right: 0;
     }
   }
 }

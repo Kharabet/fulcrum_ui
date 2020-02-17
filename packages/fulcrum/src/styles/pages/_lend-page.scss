@@ -3,31 +3,20 @@
   flex-direction: column;
   align-content: center;
   justify-content: flex-start;
-
-  height: 100%;
-  width: 100%;
-  max-width: $page-max-width;
-  padding: $page-padding;
+  width: $container-desktop;
+  padding: 0 15px;
 
   .lend-page-main {
     margin-top: 5rem;
   }
 }
 
-@media screen and (max-width: $mobile-version-max-width) {
+@media screen and (max-width: 1139px) {
   .lend-page {
-  display: flex;
-  flex-direction: column;
-  align-content: center;
-  justify-content: flex-start;
-
-  height: 100%;
-  width: 90%;
-  //max-width: 80%;
-  padding: 0rem;
-
-  .lend-page-main {
-    margin-top: 2rem;
+    width: $container-mobile;
+    padding: 0 15px;
+    .lend-page-main {
+      margin-top: 2rem;
+    }
   }
-}
 }
