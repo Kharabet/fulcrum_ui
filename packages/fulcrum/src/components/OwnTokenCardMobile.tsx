@@ -23,8 +23,8 @@ export interface IOwnTokenCardMobileProps {
   selectedKey: TradeTokenKey;
   currentKey: TradeTokenKey;
 
-  onDetails: (key: TradeTokenKey) => void;
-  onManageCollateral: (request: ManageCollateralRequest) => void;
+  // onDetails: (key: TradeTokenKey) => void;
+  // onManageCollateral: (request: ManageCollateralRequest) => void;
   onSelect: (key: TradeTokenKey) => void;
   onTrade: (request: TradeRequest) => void;
 }
@@ -155,26 +155,8 @@ export class OwnTokenCardMobile extends Component<IOwnTokenCardMobileProps, IOwn
       bnPrice = bnPrice.div(1000);
       bnLiquidationPrice = bnLiquidationPrice.div(1000);
     }*/
-
-    const isActiveClassName =
-      this.props.currentKey.toString() === this.props.selectedKey.toString() ? "own-token-card-mobile--active" : "";
-
     return (
       <div className="own-token-card-mobile">
-        {/* <div className="own-token-card-mobile__header">
-        <div className="asset-name">
-          <span>{this.state.assetDetails.displayName}&nbsp;&nbsp;</span>
-          <PositionTypeMarkerAlt assetDetails={this.state.assetDetails} value={this.props.positionType} />
-        </div>
-        <div className="poisition-type-switch">
-          <button className={"" + (this.state.isLong ? 'btn-active' : '')} onClick={() => this.props.changeActiveBtn('long')}>
-            Long
-        </button>
-          <button className={"" + (!this.state.isLong ? 'btn-active' : '')} onClick={() => this.props.changeActiveBtn('short')}>
-            Short
-        </button>
-        </div>
-      </div> */}
         <div className="own-token-card-mobile__body">
           <div className="own-token-card-mobile__body-row">
             <div className="asset-name">
@@ -272,13 +254,13 @@ export class OwnTokenCardMobile extends Component<IOwnTokenCardMobileProps, IOwn
   public onDetailsClick = (event: React.MouseEvent<HTMLElement>) => {
     event.stopPropagation();
 
-    this.props.onDetails(this.props.currentKey);
+    // this.props.onDetails(this.props.currentKey);
   };
 
   public onManageClick = (event: React.MouseEvent<HTMLElement>) => {
     event.stopPropagation();
 
-    this.props.onManageCollateral(new ManageCollateralRequest(new BigNumber(0)));
+    // this.props.onManageCollateral(new ManageCollateralRequest(new BigNumber(0)));
   };
 
   public onSellClick = (event: React.MouseEvent<HTMLElement>) => {

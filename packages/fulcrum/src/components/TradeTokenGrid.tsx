@@ -18,7 +18,7 @@ import { ITradeTokenGridRowFooterMBProps, TradeTokenGridRowMobileFooter } from "
 import { ITradeTokenGridRowMBProps, TradeTokenGridRowMobile } from "./TradeTokenGridRowMobile";
 import { ITradeTokenCardMobileProps, TradeTokenCardMobile } from "./TradeTokenCardMobile";
 import walletSvg from "../assets/images/wallet-icon.svg";
-import { OwnTokenGridInner } from "./OwnTokenGridInner";
+import { OwnTokenGrid } from "./OwnTokenGrid";
 
 // import siteConfig from "./../config/SiteConfig.json";
 
@@ -137,7 +137,7 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
           {tokenRows && tokenRows.map(row => {
             return (<div className="trade-token-grid-row-wrapper" key={`${row.props.asset}_${row.props.positionType}`}>
               {row}
-              <OwnTokenGridInner positionType={row.props.positionType} asset={row.props.asset} {...tradeTokenGridProps}/>
+              <OwnTokenGrid positionType={row.props.positionType} asset={row.props.asset} {...tradeTokenGridProps}/>
             </div>)
           })}
         </div>
