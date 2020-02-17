@@ -255,6 +255,12 @@ title: Crypto Margin Trading with Fulcrum | bZx
                         {% include svg/rep.svg %}
                     </span>
                 </div>
+                <div class="item-coin">
+                    <span class="name-coin">Usdt</span>
+                    <span class="flex border-coin-4">
+                        {% include svg/usdt.svg %}
+                    </span>
+                </div>
             </div>
         </div>
     </div>

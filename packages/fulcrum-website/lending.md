@@ -109,6 +109,15 @@ permalink: lending
                         <p class="fs-24 c-primary lh-125"><span class="fw-800 apr-value">4.2</span>%</p>
                     </div>
                 </div>
+                <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-token="usdt">
+                    <div class="icon-50 mr-15 mr-xs-9">
+                        {% include svg/usdt.svg %}
+                    </div>
+                    <div class="wrap-apr-value">
+                        <p class="lh-100 fw-700 c-gray">USDT</p>
+                        <p class="fs-24 c-primary lh-125"><span class="fw-800 apr-value">4.2</span>%</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -233,6 +242,9 @@ permalink: lending
                             </button>
                             <button class="coin-calc" data-token="zrx">
                                 {% include svg/zrx.svg %}
+                            </button>
+                            <button class="coin-calc" data-token="usdt">
+                                {% include svg/usdt.svg %}
                             </button>
                         </div>
                     </div>
