@@ -16,7 +16,7 @@ permalink: lending
                     <p class="fs-16 lh-160 mb-50 mx-xs-auto mb-xs-30 c-secondary mw-390">Flexible, high-yield returns – no minimum deposit, no lock-up period, withdraw anytime.</p>
                     <div class="flex fd-xs-c">
                         <div class="flex ai-c wrap-white mr-25 mx-xs-auto apr-component" data-token="dai">
-                            <div class="icon-66 icon-sm-50 mr-15">
+                            <div class="icon-66 icon-sm-40 mr-15 flex ai-c">
                                 {% include svg/dai.svg %}
                             </div>
                             <div class="flex">
@@ -25,7 +25,7 @@ permalink: lending
                             </div>
                         </div>
                         <div class="flex ai-c wrap-white mr-25 mx-xs-auto apr-component" data-token="usdc">
-                            <div class="icon-66 icon-sm-50 mr-15">
+                            <div class="icon-66 icon-sm-40 mr-15 flex ai-c">
                                 {% include svg/usdc.svg %}
                             </div>
                             <div class="flex">
