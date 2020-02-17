@@ -20,7 +20,7 @@ permalink: lending
                                 {% include svg/dai.svg %}
                             </div>
                             <div class="flex">
-                                <p class="fs-40 lh-100 c-primary-blue mr-15"><span class="fw-800 apr-value">7.2</span>%</p>
+                                <p class="fs-40 lh-100 c-primary-blue mr-15 mr-sm-5"><span class="fw-800 apr-value">7.2</span>%</p>
                                 <span class="fs-18 lh-140 fw-600 c-gray">APR</span>
                             </div>
                         </div>
@@ -29,7 +29,7 @@ permalink: lending
                                 {% include svg/usdc.svg %}
                             </div>
                             <div class="flex">
-                                <p class="fs-40 lh-100 c-primary-blue mr-15"><span class="fw-800 apr-value">6.5</span>%</p>
+                                <p class="fs-40 lh-100 c-primary-blue mr-15 mr-sm-5"><span class="fw-800 apr-value">6.5</span>%</p>
                                 <span class="fs-18 lh-140 fw-600 c-gray">APR</span>
                             </div>
                         </div>
