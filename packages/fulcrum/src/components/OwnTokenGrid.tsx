@@ -7,10 +7,8 @@ import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { TradeTransactionMinedEvent } from "../services/events/TradeTransactionMinedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
 import { OwnTokenGridHeader } from "./OwnTokenGridHeader";
-import { OwnTokenGridHeaderMobile } from "./OwnTokenGridHeaderMobile";
 import { IOwnTokenGridRowProps, OwnTokenGridRow } from "./OwnTokenGridRow";
-import { OwnTokenGridRowMobile } from "./OwnTokenGridRowMobile";
-import { IOwnTokenCardMobileProps, OwnTokenCardMobile } from "./OwnTokenCardMobile";
+import { OwnTokenCardMobile } from "./OwnTokenCardMobile";
 import { TradeType } from "../domain/TradeType";
 import { Asset } from "../domain/Asset";
 import { PositionType } from "../domain/PositionType";
@@ -19,9 +17,10 @@ export interface IOwnTokenGridProps {
   showMyTokensOnly: boolean;
   selectedKey: TradeTokenKey;
 
-  onShowMyTokensOnlyChange: (value: boolean) => void;
-  onDetails: (key: TradeTokenKey) => void;
-  onManageCollateral: (request: ManageCollateralRequest) => void;
+  asset?: Asset;
+  positionType?: PositionType;
+  // onDetails: (key: TradeTokenKey) => void;
+  // onManageCollateral: (request: ManageCollateralRequest) => void;
   onSelect: (key: TradeTokenKey) => void;
   onTrade: (request: TradeRequest) => void;
   isMobileMedia: boolean;
@@ -78,13 +77,13 @@ export class OwnTokenGrid extends Component<IOwnTokenGridProps, IOwnTokenGridSta
 
   private renderDesktop = () => {
     const tokenRows = this.state.tokenRowsData.map(e => <OwnTokenGridRow key={`${e.currentKey.toString()}`} {...e} />);
+    if (tokenRows.length === 0) return null;
 
     return (
       <div className="own-token-grid">
         <OwnTokenGridHeader
 
           showMyTokensOnly={this.props.showMyTokensOnly}
-          onShowMyTokensOnlyChange={this.props.onShowMyTokensOnlyChange}
         />
         {tokenRows}
       </div>
@@ -93,6 +92,7 @@ export class OwnTokenGrid extends Component<IOwnTokenGridProps, IOwnTokenGridSta
 
   private renderMobile = () => {
     const tokenRows = this.state.tokenRowsData.map(e => <OwnTokenCardMobile key={`${e.currentKey.toString()}`} {...e} />);
+    if (tokenRows.length === 0) return null;
 
     return (
       <div className="own-token-cards">
@@ -126,7 +126,9 @@ export class OwnTokenGrid extends Component<IOwnTokenGridProps, IOwnTokenGridSta
     const rowsData: IOwnTokenGridRowProps[] = [];
 
     if (FulcrumProvider.Instance.web3Wrapper && FulcrumProvider.Instance.contractsSource && FulcrumProvider.Instance.contractsSource.canWrite) {
-      const pTokens = FulcrumProvider.Instance.getPTokensAvailable();
+      const pTokens = props.asset && props.positionType
+        ? FulcrumProvider.Instance.getPTokensAvailable().filter(tradeToken => tradeToken.asset == props.asset && tradeToken.positionType == props.positionType)
+        : FulcrumProvider.Instance.getPTokensAvailable()
 
       const pTokenAddreses: string[] = FulcrumProvider.Instance.getPTokenErc20AddressList();
       const pTokenBalances = await FulcrumProvider.Instance.getErc20BalancesOfUser(pTokenAddreses);
@@ -140,11 +142,12 @@ export class OwnTokenGrid extends Component<IOwnTokenGridProps, IOwnTokenGridSta
         rowsData.push({
           selectedKey: props.selectedKey,
           currentKey: pToken,
-          // balance: balance,
-          onDetails: props.onDetails,
-          onManageCollateral: props.onManageCollateral,
+          // // balance: balance,
+          // onDetails: props.onDetails,
+          // onManageCollateral: props.onManageCollateral,
           onSelect: props.onSelect,
-          onTrade: props.onTrade
+          onTrade: props.onTrade,
+          showMyTokensOnly: props.showMyTokensOnly
         });
       }
     }

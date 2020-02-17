@@ -19,7 +19,6 @@ $margin-right-small-column: 0.5rem;
 $width-button-action: 7rem;
 
 @mixin own-token-grid-header__col {
-  
   font-family: "Muli", sans-serif;
   vertical-align: middle;
   font-size: $font-size-header;
@@ -38,7 +37,6 @@ $width-button-action: 7rem;
   font-stretch: normal;
   line-height: 1.5;
   display: flex;
-  
 }
 .own-token-grid-header {
   display: flex;
@@ -124,7 +122,7 @@ $width-button-action: 7rem;
     font-style: normal;
     font-stretch: normal;
     letter-spacing: -0.3px;
-    color: var(--primary-text);
+    color: #ffffff;
     outline: none;
   }
   &__details-button {
@@ -170,7 +168,7 @@ $width-button-action: 7rem;
     font-style: normal;
     font-stretch: normal;
     letter-spacing: -0.3px;
-    color: var(--primary-text);
+    color: #ffffff;
     outline: none;
   }
   &__sell-button {
@@ -186,7 +184,7 @@ $width-button-action: 7rem;
     background-color: #ff4f4f;
     text-transform: uppercase;
     font-style: normal;
-    color: var(--primary-text);
+    color: #ffffff;
     outline: none;
     padding: 14px 34px;
     &:hover {

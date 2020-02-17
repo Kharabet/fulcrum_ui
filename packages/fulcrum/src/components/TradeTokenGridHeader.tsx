@@ -1,18 +1,13 @@
-import React, { ChangeEvent, Component } from "react";
-import { CheckBox } from "./CheckBox";
+import React, { Component } from "react";
 
 export interface ITradeTokenGridHeaderProps {
   showMyTokensOnly: boolean;
-  onShowMyTokensOnlyChange: (value: boolean) => void;
 }
 
 export class TradeTokenGridHeader extends Component<ITradeTokenGridHeaderProps> {
   public render() {
     return (
       <div className="trade-token-grid-header">
-        {/* <div className="trade-token-grid-header__col-token-image">
-          <span className="trade-token-grid-header__text">Asset</span>
-        </div> */}
         <div className="trade-token-grid-header__col-token-name">
           <span className="trade-token-grid-header__text">Asset</span>
         </div>
@@ -28,17 +23,10 @@ export class TradeTokenGridHeader extends Component<ITradeTokenGridHeaderProps> 
         <div className="trade-token-grid-header__col-price">
           <span className="trade-token-grid-header__text">Liquidation Price</span>
         </div>
-        {/*<div className="trade-token-grid-header__col-change24h">
-          <span className="trade-token-grid-header__text">24 hours</span>
-        </div>*/}
         <div className="trade-token-grid-header__col-profit">
           <span className="trade-token-grid-header__text">Interest APR</span>
         </div>
       </div>
     );
-  }
-
-  public showMyTokensOnlyChange = (event: ChangeEvent<HTMLInputElement>) => {
-    this.props.onShowMyTokensOnlyChange(event.target.checked);
   }
 }

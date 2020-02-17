@@ -15,8 +15,6 @@ import { TradeTransactionMinedEvent } from "../services/events/TradeTransactionM
 import { FulcrumProvider } from "../services/FulcrumProvider";
 import { PositionTypeMarkerAlt } from "./PositionTypeMarkerAlt";
 
-
-// import { Change24HMarker, Change24HMarkerSize } from "./Change24HMarker";
 import { LeverageSelector } from "./LeverageSelector";
 import { PositionTypeMarker } from "./PositionTypeMarker";
 import { Preloader } from "./Preloader";
@@ -33,7 +31,6 @@ export interface ITradeTokenGridRowProps {
 
   onSelect: (key: TradeTokenKey) => void;
   onTrade: (request: TradeRequest) => void;
-  onShowMyTokensOnlyChange: (value: boolean) => void;
 }
 
 
@@ -175,14 +172,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
 
     return (
       <div className={`trade-token-grid-row ${isActiveClassName}`} onClick={this.onSelectClick}>
-        {/* <div
-          className="trade-token-grid-row__col-token-image"
-          style={{ backgroundColor: this.state.assetDetails.bgColor, borderLeftColor: this.state.assetDetails.bgColor }}
-        >
-          <img src={this.state.assetDetails.logoSvg} alt={this.state.assetDetails.displayName} />
-        </div> */}
         <div className="trade-token-grid-row__col-token-name">
-          {/*<span className="rounded-mark">?</span>*/}
           <div className="trade-token-grid-row__col-token-name--inner">
             {this.state.assetDetails.displayName}
             <PositionTypeMarkerAlt assetDetails={this.state.assetDetails} value={this.props.positionType} />
@@ -221,9 +211,6 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
               <Preloader />
           }
         </div>
-        {/*<div className="trade-token-grid-row__col-change24h">
-          <Change24HMarker value={bnChange24h} size={Change24HMarkerSize.MEDIUM} />
-        </div>*/}
         <div title={this.state.interestRate.gt(0) ? `${this.state.interestRate.toFixed(18)}%` : ``} className="trade-token-grid-row__col-profit">
           {this.state.interestRate.gt(0) && !this.state.isLoading ?
             <React.Fragment>
