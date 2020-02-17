@@ -8,6 +8,7 @@
   width: $container-desktop;
   padding: 0 15px;
   flex-shrink: 0;
+  box-sizing: border-box;
 }
 
 @media only screen and (max-width: 1279px){
