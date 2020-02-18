@@ -8,10 +8,14 @@
   width: 100%;
   z-index: 100002;
   background-color: rgba(0, 0, 0, 0.8);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  .modal-content-div:focus {
-    outline: none;
+  .modal-content-div {
+    display: inline-block;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
+    &:focus {
+      outline: none;
+    }
   }
 }
