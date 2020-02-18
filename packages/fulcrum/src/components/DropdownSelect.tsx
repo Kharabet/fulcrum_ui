@@ -48,7 +48,7 @@ export const DropdownSelect = (props: IDropdownSelectProps) => {
         {props.selectedOption.displayName}
       </div>
       <ul className="select-options">
-        {props.options.map((option, i) => (<li data-value={option.value} data-index={i} onClick={onLiClick}>{option.displayName}</li>))}
+        {props.options.map((option, i) => (<li data-value={option.value} data-index={i} key={i} onClick={onLiClick}>{option.displayName}</li>))}
 
       </ul>
     </div>
