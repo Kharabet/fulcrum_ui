@@ -33,7 +33,7 @@ interface IOwnTokenGridState {
 export class OwnTokenGrid extends Component<IOwnTokenGridProps, IOwnTokenGridState> {
   constructor(props: IOwnTokenGridProps) {
     super(props);
-
+    this._isMounted = false;
     this.state = {
       tokenRowsData: []
     };
@@ -42,17 +42,23 @@ export class OwnTokenGrid extends Component<IOwnTokenGridProps, IOwnTokenGridSta
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.TradeTransactionMined, this.onTradeTransactionMined);
   }
 
+  private _isMounted: boolean;
+
   public async derivedUpdate() {
     const tokenRowsData = await OwnTokenGrid.getRowsData(this.props);
-    this.setState({ ...this.state, tokenRowsData: tokenRowsData });
+    this._isMounted && this.setState({ ...this.state, tokenRowsData: tokenRowsData });
   }
 
   public componentWillUnmount(): void {
+    this._isMounted = false;
+
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.TradeTransactionMined, this.onTradeTransactionMined);
   }
 
   public componentDidMount(): void {
+    this._isMounted = true;
+
     this.derivedUpdate();
   }
 
