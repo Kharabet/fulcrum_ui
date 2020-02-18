@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 export interface IDropDownSelectOption {
   value: string;
   displayName: string;
@@ -26,6 +26,18 @@ export const DropdownSelect = (props: IDropdownSelectProps) => {
       ul.style.display = 'block';
     }
   }
+  const onClickOutOfComponent = (e: MouseEvent) => {
+
+    const ul = document.querySelector("ul.select-options") as HTMLElement;
+    const selectStyled = document.querySelector(".styled-select") as HTMLElement;
+    const target = e.target as HTMLElement;
+    if (target  == selectStyled) return;
+    selectStyled.classList.remove('active');
+
+    ul.style.display = 'none';
+
+  };
+
   const onLiClick = (e: React.MouseEvent<HTMLElement>) => {
     e.stopPropagation();
     const li = e.currentTarget;
@@ -39,6 +51,14 @@ export const DropdownSelect = (props: IDropdownSelectProps) => {
     ul.style.display = 'none';
     props.onDropdownSelect(li.dataset.value!);
   }
+
+  useEffect(() => {
+    document.addEventListener('click', onClickOutOfComponent);
+
+    return () => {
+      document.removeEventListener('click', onClickOutOfComponent)
+    }
+  }, [])
   return (
     <div className="select">
       <select className="select-hidden" value={props.selectedOption.value}>
