@@ -7,7 +7,7 @@ export interface IDropDownSelectOption {
 export interface IDropdownSelectProps {
   options: IDropDownSelectOption[];
   selectedOption: IDropDownSelectOption;
-  onDropdownSelect: (value: string) => void;
+  onDropdownSelect: (value: string) =>  void;
 }
 
 export const DropdownSelect = (props: IDropdownSelectProps) => {
@@ -38,7 +38,7 @@ export const DropdownSelect = (props: IDropdownSelectProps) => {
 
   };
 
-  const onLiClick = (e: React.MouseEvent<HTMLElement>) => {
+  const onLiClick = async (e: React.MouseEvent<HTMLElement>) => {
     e.stopPropagation();
     const li = e.currentTarget;
     const select = e.currentTarget.closest(".select") as HTMLElement;
@@ -49,26 +49,27 @@ export const DropdownSelect = (props: IDropdownSelectProps) => {
     selectStyled.classList.remove('active');
     selectNative.selectedIndex = parseInt(li.dataset.index!);
     ul.style.display = 'none';
-    props.onDropdownSelect(li.dataset.value!);
+    await props.onDropdownSelect(li.dataset.value!);
   }
 
   useEffect(() => {
     document.addEventListener('click', onClickOutOfComponent);
 
     return () => {
+      // returned function will be called on component unmount 
       document.removeEventListener('click', onClickOutOfComponent)
     }
   }, [])
   return (
     <div className="select">
       <select className="select-hidden" value={props.selectedOption.value}>
-        {props.options.map(option => (<option value={option.value}>{option.displayName}</option>))}
+        {props.options.map(option => option != props.selectedOption && (<option value={option.value}>{option.displayName}</option>))}
       </select>
       <div className="styled-select" onClick={onStyledSelectClick}>
         {props.selectedOption.displayName}
       </div>
       <ul className="select-options">
-        {props.options.map((option, i) => (<li data-value={option.value} data-index={i} key={i} onClick={onLiClick}>{option.displayName}</li>))}
+        {props.options.map((option, i) => option != props.selectedOption && (<li data-value={option.value} data-index={i} key={i} onClick={onLiClick}>{option.displayName}</li>))}
 
       </ul>
     </div>

@@ -82,6 +82,7 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
     }
     const asset = value as Asset;
 
+    await this.setState({ ...this.state, isShowMyTokensOnly: false })
     await this.props.onShowMyTokensOnlyChange(false);
     await this.props.onSelect(this.getTradeTokenGridRowSelectionKey(asset));
   }
