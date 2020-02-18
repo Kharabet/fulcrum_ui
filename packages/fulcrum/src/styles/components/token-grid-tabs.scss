@@ -49,7 +49,6 @@
   }
   &__container {
     display: flex;
-    justify-content: center;
   }
 
   &-item {
@@ -153,21 +152,19 @@
       img,
       svg {
         height: 28px;
-        width: auto;
-        margin-right: 7px;
-        margin-left: 8px;
+        width: 28px;
+        margin: 0 7px;
         .fill-svg {
           //   fill: transparent;
         }
       }
       span {
-        font-size: 12px;
+        font-size: 16px;
         font-weight: 600;
         font-family: Muli;
         font-style: normal;
         font-weight: bold;
-        font-size: 12px;
-        line-height: 150%;
+        line-height: 1.5;
         /* identical to box height, or 18px */
 
         /* Main/White */
@@ -180,9 +177,8 @@
       &.wallet-img-div {
         img,
         svg {
-          margin-left: 15px;
           height: 17px;
-          margin-right: 12px;
+          width: 17px;
           @media screen and (max-width: $mobile-version-max-width) {
             margin: 0;
           }
@@ -327,6 +323,7 @@
           svg {
             margin-left: 15px;
             height: 17px;
+            width: 17px;
             @media screen and (max-width: $mobile-version-max-width) {
               margin: 0;
             }

@@ -29,6 +29,10 @@ $container-mobile: 100%;
   --loader-slider: #b9c7d6;
   --eth-bg: #e0e0e0;
   --wbtc-svg: #282237;
+  --select-bg: #ffffff;
+  --select-border: #b9c7d6;
+  --select-arrow: #8992a4;
+  --select-option-hover: #F5F7F9;
 }
 
 [data-theme="dark"] {
@@ -53,4 +57,8 @@ $container-mobile: 100%;
   --loader-slider: #3d4651;
   --eth-bg: #ffffff;
   --wbtc-svg: #ffffff;
+  --select-bg: #586473;
+  --select-border: #586473;
+  --select-arrow: #ffffff;
+  --select-option-hover: #758295;
 }

@@ -1,35 +1,24 @@
 
-
-$background: #e74c3c;
-$select-color: #fff;
-$select-background: #c0392b;
-$select-width: 220px;
-$select-height: 40px; 
-
-h1 {
-  font-weight: normal;
-  font-size: 40px;
-  font-weight: normal;
-  text-transform: uppercase;
-  span { 
-    font-size: 13px;
-    display: block;
-    padding-left: 4px;
+.styled-select {
+  background-color: var(--select-bg);
+  border: 1px solid var(--select-border);
+  padding: 14px 20px;
+  border-radius: 26px;
+  color: var(--primary-text);
+  font-size: 14px;
+  font-weight: 600;
+  &.active {
+    border-radius: 26px 26px 0 0;
   }
-}
-p {
-  margin-top: 200px;
-  a {
-    text-transform: uppercase;
-    text-decoration: none;
-    display: inline-block;
-    color: #fff;
-    padding: 5px 10px;
-    margin: 0 5px;
-    background-color: darken($select-background, 2);
-    &:hover {
-      background-color: darken($select-background, 5);
-    }
+  &:after {
+    content: "";
+    width: 0;
+    height: 0;
+    border: 5px solid transparent;
+    border-color: var(--select-arrow) transparent transparent transparent;
+    position: absolute;
+    top: 21px;
+    right: 16px;
   }
 }
 .select-hidden {
@@ -42,42 +31,38 @@ p {
   display: inline-block;
   position: relative;
   font-size: 16px;
-  color: $select-color;
-  width: $select-width;
-  height: $select-height;
+  color: var(--select-arrow);
+  width: 130px;
+  height: 40px;
+  margin: 0 20px 0 40px;
 }
+
 .select-styled {
-  position: absolute; 
+  position: absolute;
   top: 0;
   right: 0;
   bottom: 0;
   left: 0;
-  background-color: $select-background;
-  padding: 8px 15px;
-  &:after {
-    content:"";
-    width: 0;
-    height: 0;
-    border: 7px solid transparent;
-    border-color: $select-color transparent transparent transparent;
-    position: absolute;
-    top: 16px;
-    right: 10px;
-  }
+  background-color: var(--select-bg);
+  border-color: 1px solid var(--select-border);
+  padding: 14px 20px;
+  border-radius: 26px;
+
   &:hover {
-    background-color: darken($select-background, 2);
+    background-color: var(--select-oprion-hover);
   }
-  &:active, &.active {
-    background-color: darken($select-background, 5);
+  &:active,
+  &.active {
+    background-color: var(--select-oprion-hover);
     &:after {
       top: 9px;
-      border-color: transparent transparent $select-color transparent;
+      border-color: transparent transparent var(--select-arrow) transparent;
     }
   }
 }
 
 .select-options {
-  display: none; 
+  display: none;
   position: absolute;
   top: 100%;
   right: 0;
@@ -86,15 +71,22 @@ p {
   margin: 0;
   padding: 0;
   list-style: none;
-  background-color: darken($select-background, 5);
+  background-color: var(--select-bg);
+  border-radius: 0 0 26px 26px;
+  border: 1px solid var(--select-border);
+  border-top: none;
   li {
     margin: 0;
     padding: 12px 0;
     text-indent: 15px;
-    border-top: 1px solid darken($select-background, 10);
+    border-top: 1px solid var(--select-option-hover);
+    background-color: var(--select-bg);
+    color: var(--primary-text);
     &:hover {
-      color: $select-background;
-      background: $select-color;
+      background-color: var(--select-option-hover);
+    }
+    &:last-child {
+      border-radius: 0 0 26px 26px;
     }
     &[rel="hide"] {
       display: none;

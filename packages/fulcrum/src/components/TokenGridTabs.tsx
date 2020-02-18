@@ -95,8 +95,10 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
       <div className={`trade-token-grid-tab ${displayName && !this.state.isShowMyTokensOnly ? displayName.toLowerCase() : "manage"}`} >
         <div className="trade-token-grid-tab__container">
           <div className="trade-token-grid-tab__selector">
-
-            <DropdownSelect {...this.getDropdownProps()} />
+            {!this.props.isMobile
+              ? <DropdownSelect {...this.getDropdownProps()} />
+              : null
+            }
           </div>
           {this.props.assets.map(asset => (this.renderAsset(asset)))}
           <div className={`trade-token-grid-tab-item ${this.state.isShowMyTokensOnly ? "trade-token-grid-tab-item--active" : ""}`} onClick={this.showMyTokensOnlyChange}>
