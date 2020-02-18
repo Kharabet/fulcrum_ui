@@ -99,6 +99,11 @@
     &:not(:last-child) {
       margin-right: 3px;
     }
+    .trade-token-grid-tab-item__col-token-image {
+      .wbtc-svg-fill{
+        fill: var(--wbtc-svg);
+      }
+    }
     &--active {
       //   height: 60px;
       position: relative;
