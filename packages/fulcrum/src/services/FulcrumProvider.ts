@@ -1399,11 +1399,12 @@ export class FulcrumProvider {
         const assetContract = await this.contractsSource.getITokenContract(asset);
         if (assetContract) {
           const precision = AssetsDictionary.assets.get(asset)!.decimals || 18;
-          const swapPrice = await this.getSwapToUsdRate(asset);
-          result = await assetContract.assetBalanceOf.callAsync(account);
-          result = result
-            .multipliedBy(swapPrice)
+          //const swapPrice = await this.getSwapToUsdRate(asset);
+          result = (await assetContract.assetBalanceOf.callAsync(account))
             .div(10 ** precision);
+          /*result = result
+            .multipliedBy(swapPrice)
+            .div(10 ** precision);*/
         }
       }
     }

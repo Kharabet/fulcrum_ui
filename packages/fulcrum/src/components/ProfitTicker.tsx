@@ -1,9 +1,11 @@
 import { BigNumber } from "@0x/utils";
 import React, { Component } from "react";
+import { Asset } from "../domain/Asset";
 
 export interface IProfitTickerProps {
   secondDiff: number;
   profit: BigNumber | null;
+  asset: Asset;
 }
 
 export class ProfitTicker extends Component<IProfitTickerProps> {
@@ -22,7 +24,7 @@ export class ProfitTicker extends Component<IProfitTickerProps> {
     setInterval(() => {
       if (this.container.current) {
         value = value + diff;
-        this.container.current.innerHTML = "$" + value.toFixed(8);
+        this.container.current.innerHTML = value.toFixed(8) + ` ${this.props.asset}`;
       }
     }, ms);
   }
@@ -33,7 +35,7 @@ export class ProfitTicker extends Component<IProfitTickerProps> {
       <div
         ref={this.container}
         className="token-selector-item__profit-value"
-      >${profit ? profit.toFixed(8) : ''}</div>
+      >${profit ? `${profit.toFixed(8)} ${this.props.asset}` : ''}</div>
     );
   }
 }

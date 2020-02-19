@@ -199,7 +199,7 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
               </div>
               <div className="token-selector-item__profit-container">
                 <div className="token-selector-item__profit-title">Profit:</div>
-                <ProfitTicker secondDiff={this.state.tickerSecondDiff} profit={this.state.profit} />
+                <ProfitTicker asset={this.props.asset} secondDiff={this.state.tickerSecondDiff} profit={this.state.profit} />
               </div>
             </div>
           ) : (
