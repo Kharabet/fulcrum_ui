@@ -32,12 +32,6 @@
         fill: var(--eth-bg);
       }
     }
-
-    .trade-token-grid-tab-item__col-token-image {
-      .wbtc-svg-fill {
-        fill: var(--wbtc-svg);
-      }
-    }
     &--active {
       position: relative;
 
