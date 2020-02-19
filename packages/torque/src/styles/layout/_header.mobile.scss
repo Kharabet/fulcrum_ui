@@ -30,6 +30,7 @@
       }
       .header_icon{
         width: 20%;
+        z-index: 10;
       }
 
     }
@@ -73,7 +74,8 @@
         right: 0px;
         padding: 20px;
         background-color: white;
-        animation: animateright 0.4s
+        animation: animateright 0.4s;
+        z-index: 9;
     }
 
     @keyframes animateright {
