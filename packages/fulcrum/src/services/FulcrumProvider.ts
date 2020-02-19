@@ -747,7 +747,7 @@ export class FulcrumProvider {
             .multipliedBy(balance)
             .dividedBy(10**36);
 
-          if (swapPrice) {
+          if (swapPrice && swapPrice.gt(0)) {
             result = result
               .multipliedBy(swapPrice);
           }
