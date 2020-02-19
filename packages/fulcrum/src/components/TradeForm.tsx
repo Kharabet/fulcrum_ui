@@ -466,7 +466,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
 
             </div>
 
-            {false && this.state.positionTokenBalance && this.props.tradeType === TradeType.BUY && this.state.positionTokenBalance.eq(0) ? (
+            {false && this.state.positionTokenBalance && this.props.tradeType === TradeType.BUY && this.state.positionTokenBalance!.eq(0) ? (
               <CollapsibleContainer titleOpen="View advanced options" titleClose="Hide advanced options" isTransparent={amountMsg !== ""}>
                 <div className="trade-form__kv-container">
                   <div className="trade-form__label trade-form__label--no-bg">

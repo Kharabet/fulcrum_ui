@@ -12,6 +12,7 @@ import { LendTransactionMinedEvent } from "../services/events/LendTransactionMin
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
 import { ProfitTicker } from "./ProfitTicker";
+import { Preloader } from "./Preloader";
 
 
 
@@ -84,7 +85,7 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
       tickerSecondDiff: balanceOfUser.toNumber() * (interestRate.toNumber() / 100) / 365 / 24 / 60 / 60,
     });
 
-    if(address !== "") {
+    if (address !== "") {
       this._isMounted && this.setState({
         ...this.state,
         isLoading: false
@@ -144,14 +145,14 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
         {this.props.asset === Asset.SAI ? (
           <div className="token-select-item-mcd-bridge" onClick={this.onFulcrumMcdBridgeClick}>
             <div className="token-select-item-mcd-bridge__text token-select-item-mcd-bridge__text--upgrade">
-              MIGRATE TO<br/>iDAI
+              MIGRATE TO<br />iDAI
             </div>
           </div>
         ) : null}
         {this.props.asset === Asset.DAI ? (
           <div className="token-select-item-mcd-bridge" onClick={this.onFulcrumMcdBridgeClick}>
             <div className="token-select-item-mcd-bridge__text token-select-item-mcd-bridge__text--downgrade">
-              MIGRATE TO<br/>iSAI
+              MIGRATE TO<br />iSAI
             </div>
           </div>
         ) : null}
@@ -163,65 +164,72 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
             {this.state.iTokenAddress &&
               FulcrumProvider.Instance.web3ProviderSettings &&
               FulcrumProvider.Instance.web3ProviderSettings.etherscanURL ? (
-              <div className="token-selector-item__name">
-                <a
-                  className="token-selector-item__name"
-                  style={{cursor: `pointer`, textDecoration: `none`}}
-                  title={this.state.iTokenAddress}
-                  href={`${FulcrumProvider.Instance.web3ProviderSettings.etherscanURL}address/${this.state.iTokenAddress}#readContract`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {this.state.assetDetails.displayName}
-                </a>
+                <div className="token-selector-item__name">
+                  <a
+                    className="token-selector-item__name"
+                    style={{ cursor: `pointer`, textDecoration: `none` }}
+                    title={this.state.iTokenAddress}
+                    href={`${FulcrumProvider.Instance.web3ProviderSettings.etherscanURL}address/${this.state.iTokenAddress}#readContract`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {this.state.assetDetails.displayName}
+                  </a>
+                </div>
+              ) : (
+                <div className="token-selector-item__name">{this.state.assetDetails.displayName}</div>
+              )}
+
+
+            <div className="token-selector-item__interest-rate-container">
+              <div className="token-selector-item__interest-rate-title">Interest APR:</div>
+              <div
+                title={`${this.state.interestRate.toFixed(18)}%`}
+                className="token-selector-item__interest-rate-value"
+              >
+                {!this.state.isLoading ? (<React.Fragment>{this.state.interestRate.toFixed(4)}<span className="sign-currency">%</span></React.Fragment>)
+                  : (<div className="token-selector-item__interest-rate-value"><Preloader /></div>)}
               </div>
-            ) : (
-              <div className="token-selector-item__name">{this.state.assetDetails.displayName}</div>
-            )}
-            {this.state.profit !== null ? (
-              <div className="token-selector-item__profit-container">
-                <div className="token-selector-item__profit-title token-selector-item__profit-balance">Balance:</div>
-                <div
-                  title={`${this.state.balanceOfUser.toFixed(18)} ${this.props.asset}`}
-                  className="token-selector-item__profit-value"
-                >{`${this.state.balanceOfUser.toFixed(2)} ${this.props.asset}`}</div>
-              </div>
-            ) : null}
+            </div>
+
           </div>
           {this.state.balanceOfUser.gt(0) ? (
             <div className="token-selector-item__description">
-              <div className="token-selector-item__interest-rate-container">
-                <div className="token-selector-item__interest-rate-title">Interest APR:</div>
-                <div
-                  title={`${this.state.interestRate.toFixed(18)}%`}
-                  className="token-selector-item__interest-rate-value"
-                >{`${this.state.interestRate.toFixed(4)}%`}</div>
-              </div>
+              {this.state.profit !== null ? (
+                <div className="token-selector-item__profit-container">
+                  <div className="token-selector-item__profit-title token-selector-item__profit-balance">Balance:</div>
+                  {!this.state.isLoading ? (<div
+                    title={`${this.state.balanceOfUser.toFixed(18)} ${this.props.asset}`}
+                    className="token-selector-item__profit-value"
+                  >{this.state.balanceOfUser.toFixed(2)} {this.props.asset}</div>)
+                    : (<div className="token-selector-item__interest-rate-value"><Preloader /></div>)}
+                </div>) : null}
+
               <div className="token-selector-item__profit-container">
                 <div className="token-selector-item__profit-title">Profit:</div>
                 <ProfitTicker asset={this.props.asset} secondDiff={this.state.tickerSecondDiff} profit={this.state.profit} />
               </div>
             </div>
           ) : (
-            <div className="token-selector-item__description">
-              <div className="token-selector-item__interest-rate-container">
-                <div className="token-selector-item__interest-rate-title">Interest APR :</div>
+              <div className="token-selector-item__description">
+                {/* <div className="token-selector-item__interest-rate-container">
+                  <div className="token-selector-item__interest-rate-title">Interest APR :</div>
 
-                {!this.state.isLoading ? (
-                  <div
-                    title={`${this.state.interestRate.toFixed(18)}%`}
-                    className="token-selector-item__interest-rate-value"
-                  >{`${this.state.interestRate.toFixed(4)}%`}</div>
-                ) : (
-                  <div className="token-selector-item__interest-rate-value">Loading...</div>
-                )}
+                  {!this.state.isLoading ? (
+                    <div
+                      title={`${this.state.interestRate.toFixed(18)}%`}
+                      className="token-selector-item__interest-rate-value"
+                    >{this.state.interestRate.toFixed(4)}<span className="sign-currency">%</span></div>
+                  ) : (
+                      <div className="token-selector-item__interest-rate-value"><Preloader /></div>
+                    )}
+                </div> */}
+                <div className="token-selector-item__interest-rate-container">
+                  <div className="token-selector-item__interest-rate-title" />
+                  <div className="token-selector-item__interest-rate-value" />
+                </div>
               </div>
-              <div className="token-selector-item__interest-rate-container">
-                <div className="token-selector-item__interest-rate-title" />
-                <div className="token-selector-item__interest-rate-value" />
-              </div>
-            </div>
-          )}
+            )}
         </div>
         {this.renderActions(this.state.balanceOfUser.eq(0))}
       </div>
@@ -239,21 +247,21 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
         </button>
       </div>
     ) : (
-      <div className="token-selector-item__actions">
-        <button
-          className="token-selector-item__lend-button token-selector-item__lend-button--size-half"
-          onClick={this.onLendClick}
-        >
-          Lend
+        <div className="token-selector-item__actions">
+          <button
+            className="token-selector-item__lend-button token-selector-item__lend-button--size-half"
+            onClick={this.onLendClick}
+          >
+            Lend
         </button>
-        <button
-          className="token-selector-item__un-lend-button token-selector-item__lend-button--size-half"
-          onClick={this.onUnLendClick}
-        >
-          UnLend
+          <button
+            className="token-selector-item__un-lend-button token-selector-item__lend-button--size-half"
+            onClick={this.onUnLendClick}
+          >
+            UnLend
         </button>
-      </div>
-    );
+        </div>
+      );
   };
 
   public onFulcrumMcdBridgeClick = () => {

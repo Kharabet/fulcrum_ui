@@ -35,7 +35,7 @@ export class ProfitTicker extends Component<IProfitTickerProps> {
       <div
         ref={this.container}
         className="token-selector-item__profit-value"
-      >${profit ? `${profit.toFixed(8)} ${this.props.asset}` : ''}</div>
+      >{profit ? `${profit.toFixed(8)} ${this.props.asset}` : ''}</div>
     );
   }
 }

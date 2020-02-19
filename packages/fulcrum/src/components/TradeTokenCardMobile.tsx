@@ -1,6 +1,5 @@
 import { BigNumber } from "@0x/utils";
 import React, { Component } from "react";
-import TagManager from "react-gtm-module";
 import { Asset } from "../domain/Asset";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
@@ -14,12 +13,8 @@ import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { TradeTransactionMinedEvent } from "../services/events/TradeTransactionMinedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
 import { PositionTypeMarkerAlt } from "./PositionTypeMarkerAlt";
-import { ITradeTokenGridRowProps } from "./TradeTokenGridRow";
 
-
-// import { Change24HMarker, Change24HMarkerSize } from "./Change24HMarker";
 import { LeverageSelector } from "./LeverageSelector";
-import { PositionTypeMarker } from "./PositionTypeMarker";
 import { Preloader } from "./Preloader";
 
 
@@ -34,7 +29,6 @@ export interface ITradeTokenCardMobileProps {
 
   onSelect: (key: TradeTokenKey) => void;
   onTrade: (request: TradeRequest) => void;
-  onShowMyTokensOnlyChange: (value: boolean) => void;
 }
 
 interface ITradeTokenCardMobileState {
@@ -51,16 +45,13 @@ interface ITradeTokenCardMobileState {
 
 export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, ITradeTokenCardMobileState> {
 
-  private static readonly longVal = [2, 3, 4];
-  private static readonly shortVal = [1, 2, 3, 4];
   constructor(props: ITradeTokenCardMobileProps, context?: any) {
     super(props, context);
 
     const assetDetails = AssetsDictionary.assets.get(props.asset);
     this._isMounted = false;
     this.state = {
-      leverage: this.props.positionType === PositionType.SHORT
-        ? TradeTokenCardMobile.shortVal[0] : TradeTokenCardMobile.longVal[0],
+      leverage: this.props.positionType === PositionType.SHORT ? 1 : 2,
       isLong: this.props.positionType === PositionType.LONG,
       assetDetails: assetDetails || null,
       latestPriceDataPoint: FulcrumProvider.Instance.getPriceDefaultDataPoint(),
@@ -172,17 +163,7 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
     const tradeTokenKey = this.getTradeTokenGridRowSelectionKey(this.state.leverage);
     const bnPrice = new BigNumber(this.state.latestPriceDataPoint.price);
     const bnLiquidationPrice = new BigNumber(this.state.latestPriceDataPoint.liquidationPrice);
-    /*if (this.props.positionType === PositionType.SHORT) {
-      bnPrice = bnPrice.div(1000);
-      bnLiquidationPrice = bnLiquidationPrice.div(1000);
-    }*/
-    // bnPrice = bnPrice.div(1000);
-    // bnLiquidationPrice = bnLiquidationPrice.div(1000);
-
-    // const bnChange24h = new BigNumber(this.state.latestPriceDataPoint.change24h);
-    const isActiveClassName =
-      tradeTokenKey.toString() === this.props.selectedKey.toString() ? "trade-token-grid-row--active" : "";
-
+   
     return (
       <div className="trade-token-card-mobile">
         <div className="trade-token-card-mobile__header">
@@ -243,52 +224,13 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
           </div>
         </div>
       </div>
-      // <div className={`trade-token-grid-row ${isActiveClassName}`} onClick={this.onSelectClick}>
-      //   {/*<div*/}
-      //   {/*className="trade-token-grid-row__col-token-image"*/}
-      //   {/*style={{ backgroundColor: this.state.assetDetails.bgColor, borderLeftColor: this.state.assetDetails.bgColor }}*/}
-      //   {/*>*/}
-      //   {/*<img src={this.state.assetDetails.logoSvg} alt={this.state.assetDetails.displayName} />*/}
-      //   {/*</div>*/}
-      //   {/*<div className="trade-token-grid-row__col-token-name">*/}
-      //   {/*/!*<span className="rounded-mark">?</span>*!/*/}
-      //   {/*{this.state.assetDetails.displayName}*/}
-      //   {/*</div>*/}
-      //   {/*<div className="trade-token-grid-row__col-position-type">*/}
-      //   {/*<PositionTypeMarker value={this.props.positionType} />*/}
-      //   {/*</div>*/}
-      //   <div className="trade-token-grid-row__col-leverage">
-      //     {this.state.leverage + 'x'}
-      //     {/*<LeverageSelector*/}
-      //     {/*value={this.state.leverage}*/}
-      //     {/*minValue={this.props.positionType === PositionType.SHORT ? 1 : 2}*/}
-      //     {/*maxValue={4}*/}
-      //     {/*onChange={this.onLeverageSelect}*/}
-      //     {/*/>*/}
-      //   </div>
-      //   <div title={`$${bnPrice.toFixed(18)}`} className="trade-token-grid-row__col-price">
-      //     {!this.state.isLoading ? `$${bnPrice.toFixed(2)}` : 'Loading...'}
-      //   </div>
-      //   <div title={`$${bnLiquidationPrice.toFixed(18)}`} className="trade-token-grid-row__col-price">
-      //     {!this.state.isLoading ? `$${bnLiquidationPrice.toFixed(2)}` : 'Loading...'}
-      //   </div>
-      //   <div title={this.state.interestRate.gt(0) ? `${this.state.interestRate.toFixed(18)}%` : ``} className="trade-token-grid-row__col-profit">
-      //     {this.state.interestRate.gt(0) ? `${this.state.interestRate.toFixed(4)}%` : "Loading..."}
-      //   </div>
-
-      //   {/*<div className="trade-token-grid-row__col-change24h">
-      //     <Change24HMarker value={bnChange24h} size={Change24HMarkerSize.MEDIUM} />
-      //   </div>*/}
-
-      //   {/*{this.renderActions(this.state.balance.eq(0))}*/}
-      // </div>
     );
   }
 
   private renderActions = (isBuyOnly: boolean) => {
     return (
       <div className="trade-token-card-mobile__action">
-        <button className="trade-token-card-mobile____buy-button" onClick={this.onBuyClick}>
+        <button className="trade-token-card-mobile____buy-button" disabled onClick={this.onBuyClick}>
           {TradeType.BUY}
         </button>
       </div>

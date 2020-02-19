@@ -333,9 +333,13 @@ $margin-right-column: 1.5rem;
     .stats-grid-card__image {
       text-align: center;
 
-      img {
+      img, svg {
         display: inline-block;
         width: 28px;
+        height: 28px;
+        .eth-svg {
+          fill: #c8c8c8;
+        }
       }
     }
     .stats-grid-row__col-name {

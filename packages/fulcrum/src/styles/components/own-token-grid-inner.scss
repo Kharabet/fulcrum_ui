@@ -116,12 +116,10 @@ $width-button-action: 7rem;
   }
   &__buy-button {
     display: inline-block;
-    cursor: pointer;
     border: 0;
     width: $width-button-action;
     height: 2.5rem;
     border-radius: 100px;
-    background-color: #407bf7;
     text-transform: uppercase;
     font-size: 0.75rem;
     font-weight: normal;
@@ -130,6 +128,14 @@ $width-button-action: 7rem;
     letter-spacing: -0.3px;
     color: var(--primary-text);
     outline: none;
+    &:not(:disabled){
+      cursor: pointer;
+    }
+    &:disabled {
+      background-color: var(--disabled-bg);
+      color: var(--disabled-color);
+      cursor: not-allowed;
+    }
   }
   &__details-button {
     display: inline-block;

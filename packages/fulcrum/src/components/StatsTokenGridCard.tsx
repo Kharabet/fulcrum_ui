@@ -250,7 +250,7 @@ export class StatsTokenGridCard extends Component<IStatsTokenGridCardProps, ISta
           rel="noopener noreferrer"
         >
           <div className="stats-grid-card__image">
-            <img src={this.state.assetDetails.logoSvg} alt={this.state.assetDetails.displayName} />
+            {this.state.assetDetails.reactLogoSvg.render()}
           </div>
           <div className="stats-grid-row__col-name">
             {details.asset!}
@@ -259,7 +259,7 @@ export class StatsTokenGridCard extends Component<IStatsTokenGridCardProps, ISta
       ) : (
         <div className="stats-grid-card__info-container">
           <div className="stats-grid-card__image">
-            <img src={this.state.assetDetails.logoSvg} alt={this.state.assetDetails.displayName} />
+            {this.state.assetDetails.reactLogoSvg.render()}
           </div>
           <div className="stats-grid-row__col-name">{details.asset!}</div>
         </div>

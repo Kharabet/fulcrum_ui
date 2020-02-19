@@ -137,7 +137,7 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
       if (providerTypeDetails !== null && providerTypeDetails.logoSvg !== null) {
         return (
           <React.Fragment>
-            <div className="on-chain-indicator__svg">{providerTypeDetails.reactLogoSvgShort.render()}</div>
+            <div className="on-chain-indicator__svg" onClick={this.props.doNetworkConnect}>{providerTypeDetails.reactLogoSvgShort.render()}</div>
             <div className="on-chain-indicator__description">
               <span>{providerTypeDetails.displayName}</span>
             {walletAddressText ? (

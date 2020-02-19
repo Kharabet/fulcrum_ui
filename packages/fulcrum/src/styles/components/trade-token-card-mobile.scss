@@ -1,36 +1,28 @@
 .trade-token-card-mobile__wrapper {
     font-family: 'Muli', sans-serif;
     padding: 15px;
-    margin-bottom: 30px;
 }
 
 .trade-token-card-mobile {
     &__header {
-        padding: 15px;
+        padding: 15px 10px;
 
         display: flex;
         // justify-content: space-between;
         position: relative;
-        .asset-name {
-            font-style: normal;
-            font-size: 18px;
-            line-height: 150%;
+        .asset-name {            
             display: flex;
             align-items: center;
-
-            /* Main/White */
-
+            font-size: 18px;
+            font-style: normal;            
+            line-height: 1.5;
             color: var(--primary-text);
+            margin-right: 40px;
         }
         .poisition-type-switch {
             background: var(--secondary-row);
             border-radius: 30px;
-            padding: 2px;
             display: flex;
-            position: absolute;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
             button {
                 font-family: 'Muli', sans-serif;
 
@@ -62,7 +54,7 @@
     }
     &__body {
         background-color: var(--primary-row);
-        padding: 25px;
+        padding: 15px 10px;
 
         &-row {
             display: flex;
@@ -90,6 +82,15 @@
             border-radius: 43px;
             &:hover {
                 background: #5b88ff;
+            }
+            
+            &:not(:disabled){
+                cursor: pointer;
+            }
+            &:disabled {
+                background-color: var(--disabled-bg);
+                color: var(--disabled-color);
+                cursor: not-allowed;
             }
         }
     }

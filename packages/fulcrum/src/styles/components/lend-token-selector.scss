@@ -15,14 +15,21 @@
     flex-direction: column;
     flex-grow: 1;
 
-    width: calc(25% - 4px);
-    max-width: calc(25% - 4px);
+    width: calc(25% - 3px);
+    max-width: calc(25% - 3px);
 
-    padding: 2rem;
-    margin: 0 4px 4px 0;
+    padding: 40px 15px 25px 15px;
+    margin-bottom: 4px;
 
     background-color: var(--primary-row);
     border: 2px solid transparent;
+    .sign-currency {
+      color: #a2abb8;
+      font-weight: 400;
+    }
+    &:not(:nth-child(4n)) {
+      margin-right: 4px;
+    }
     &:hover {
       cursor: pointer;
       background-color: var(--lend-bg-hover);
@@ -41,7 +48,7 @@
       top: 0px;
       right: 0px;
       border-bottom-left-radius: 1.5625rem;
-      &:hover{
+      &:hover {
         background-color: var(--lend-item-before-hover);
       }
       .token-select-item-mcd-bridge__text {
@@ -69,8 +76,7 @@
     }
 
     .token-selector-item__image {
-      margin-top: 0.75rem;
-      margin-bottom: 1rem;
+      margin-bottom: 10px;
 
       text-align: center;
 
@@ -82,10 +88,10 @@
         .eth-svg {
           fill: #c8c8c8;
         }
-        .wbtc-svg-bg{
+        .wbtc-svg-bg {
           fill: transparent;
         }
-        .wbtc-svg-fill{
+        .wbtc-svg-fill {
           fill: var(--wbtc-svg);
         }
       }
@@ -93,11 +99,18 @@
 
     .token-selector-item__descriptions {
       display: flex;
-      flex-direction: row;
+      flex-direction: column;
       justify-content: space-between;
 
       margin-bottom: 1.5rem;
-
+      .token-selector-item__description {
+        flex-direction: row;
+        display: flex;
+        justify-content: space-between;
+        & + .token-selector-item__description {
+          margin-top: 4px;
+        }
+      }
       .token-selector-item__name {
         font-size: 22px;
         font-weight: 800;
@@ -178,8 +191,7 @@
     .token-selector-item__actions {
       display: flex;
       flex-direction: row;
-
-      margin-bottom: 1.5rem;
+      justify-content: center;
 
       button {
         display: block;
@@ -228,6 +240,7 @@
     .token-selector-item {
       max-width: 100%;
       min-width: 100%;
+      margin-right: 0;
     }
   }
 }
