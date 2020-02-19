@@ -16,20 +16,20 @@ permalink: lending
                     <p class="fs-16 lh-160 mb-50 mx-xs-auto mb-xs-30 c-secondary mw-390">Flexible, high-yield returns – no minimum deposit, no lock-up period, withdraw anytime.</p>
                     <div class="flex fd-xs-c">
                         <div class="flex ai-c wrap-white mr-25 mx-xs-auto apr-component" data-token="dai">
-                            <div class="icon-66 icon-sm-50 mr-15">
+                            <div class="icon-66 icon-sm-40 mr-15 flex ai-c">
                                 {% include svg/dai.svg %}
                             </div>
                             <div class="flex">
-                                <p class="fs-40 lh-100 c-primary-blue mr-15"><span class="fw-800 apr-value">7.2</span>%</p>
+                                <p class="fs-40 lh-100 c-primary-blue mr-15 mr-sm-5"><span class="fw-800 apr-value">7.2</span>%</p>
                                 <span class="fs-18 lh-140 fw-600 c-gray">APR</span>
                             </div>
                         </div>
                         <div class="flex ai-c wrap-white mr-25 mx-xs-auto apr-component" data-token="usdc">
-                            <div class="icon-66 icon-sm-50 mr-15">
+                            <div class="icon-66 icon-sm-40 mr-15 flex ai-c">
                                 {% include svg/usdc.svg %}
                             </div>
                             <div class="flex">
-                                <p class="fs-40 lh-100 c-primary-blue mr-15"><span class="fw-800 apr-value">6.5</span>%</p>
+                                <p class="fs-40 lh-100 c-primary-blue mr-15 mr-sm-5"><span class="fw-800 apr-value">6.5</span>%</p>
                                 <span class="fs-18 lh-140 fw-600 c-gray">APR</span>
                             </div>
                         </div>
@@ -106,6 +106,15 @@ permalink: lending
                     </div>
                     <div class="wrap-apr-value">
                         <p class="lh-100 fw-700 c-gray">WBTC</p>
+                        <p class="fs-24 c-primary lh-125"><span class="fw-800 apr-value">4.2</span>%</p>
+                    </div>
+                </div>
+                <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-token="usdt">
+                    <div class="icon-50 mr-15 mr-xs-9">
+                        {% include svg/usdt.svg %}
+                    </div>
+                    <div class="wrap-apr-value">
+                        <p class="lh-100 fw-700 c-gray">USDT</p>
                         <p class="fs-24 c-primary lh-125"><span class="fw-800 apr-value">4.2</span>%</p>
                     </div>
                 </div>
@@ -233,6 +242,9 @@ permalink: lending
                             </button>
                             <button class="coin-calc" data-token="zrx">
                                 {% include svg/zrx.svg %}
+                            </button>
+                            <button class="coin-calc" data-token="usdt">
+                                {% include svg/usdt.svg %}
                             </button>
                         </div>
                     </div>
