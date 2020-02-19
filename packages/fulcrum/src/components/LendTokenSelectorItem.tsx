@@ -199,17 +199,17 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
                 <div className="token-selector-item__profit-container">
                   <div className="token-selector-item__profit-title token-selector-item__profit-balance">Balance:</div>
                   {!this.state.isLoading ? (<div
-                    title={`$${this.state.balanceOfUser.toFixed(18)}`}
+                    title={`$${this.state.balanceOfUser.toFixed(18)} ${this.props.asset}`}
                     className="token-selector-item__profit-value"
                   >
-                    <span className="sign-currency">$</span>{this.state.balanceOfUser.toFixed(2)}</div>)
+                    <span className="sign-currency">$</span>{this.state.balanceOfUser.toFixed(2)} {this.props.asset}</div>)
 
                     : (<div className="token-selector-item__interest-rate-value"><Preloader /></div>)}
                 </div>) : null}
 
               <div className="token-selector-item__profit-container">
                 <div className="token-selector-item__profit-title">Profit:</div>
-                <ProfitTicker secondDiff={this.state.tickerSecondDiff} profit={this.state.profit} />
+                <ProfitTicker asset={this.props.asset} secondDiff={this.state.tickerSecondDiff} profit={this.state.profit} />
               </div>
             </div>
           ) : (

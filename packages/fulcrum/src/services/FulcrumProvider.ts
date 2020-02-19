@@ -555,12 +555,17 @@ export class FulcrumProvider {
       const tokens = addressLookup[1];
       const helperContract = await this.contractsSource.getDAppHelperContract();
       if (tokens && helperContract) {
-        const swapRates = await this.getSwapToUsdRateBatch(
-          assets,
-          process.env.REACT_APP_ETH_NETWORK === "mainnet" || process.env.REACT_APP_ETH_NETWORK === "ropsten" ?
-            Asset.DAI :
-            Asset.SAI
-        );
+        let swapRates;
+        try {
+          swapRates = await this.getSwapToUsdRateBatch(
+            assets,
+            process.env.REACT_APP_ETH_NETWORK === "mainnet" || process.env.REACT_APP_ETH_NETWORK === "ropsten" ?
+              Asset.DAI :
+              Asset.SAI
+          );
+        } catch(e) {
+          //console.log(e);
+        }
         const reserveData = await helperContract.reserveDetails.callAsync(tokens);
         let usdSupplyAll = new BigNumber(0);
         let usdTotalLockedAll = new BigNumber(0);
@@ -589,7 +594,7 @@ export class FulcrumProvider {
             marketLiquidity = marketLiquidity.times(precision);
             //liquidityReserved = liquidityReserved.times(precision);
             vaultBalance = vaultBalance.times(precision);
-            if (swapRates[i]) {
+            if (swapRates && swapRates[i]) {
               usdSupply = totalAssetSupply!.times(swapRates[i]).dividedBy(10 ** 18);
               usdSupplyAll = usdSupplyAll.plus(usdSupply);
 
@@ -615,7 +620,7 @@ export class FulcrumProvider {
               // avgBorrowInterestRate.dividedBy(10 ** 18),
               new BigNumber(0),
               vaultBalance.dividedBy(10 ** 18),
-              swapRates[i],
+              swapRates ? swapRates[i] : new BigNumber(0),
               usdSupply.dividedBy(10 ** 18),
               usdTotalLocked.dividedBy(10 ** 18)
             ));
@@ -1399,11 +1404,12 @@ export class FulcrumProvider {
         const assetContract = await this.contractsSource.getITokenContract(asset);
         if (assetContract) {
           const precision = AssetsDictionary.assets.get(asset)!.decimals || 18;
-          const swapPrice = await this.getSwapToUsdRate(asset);
-          result = await assetContract.assetBalanceOf.callAsync(account);
-          result = result
-            .multipliedBy(swapPrice)
+          //const swapPrice = await this.getSwapToUsdRate(asset);
+          result = (await assetContract.assetBalanceOf.callAsync(account))
             .div(10 ** precision);
+          /*result = result
+            .multipliedBy(swapPrice)
+            .div(10 ** precision);*/
         }
       }
     }
