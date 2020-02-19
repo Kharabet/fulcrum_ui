@@ -7,18 +7,15 @@
   height: 100%;
   width: 100%;
   z-index: 100002;
-  background-color: rgba(0, 0, 0, .80);
-}
-
-.modal-content-div {
-  display: inline-block;
-  position: absolute;
-  //top: 50%;
-  top: 60vh;
-  left: 50%;
-  transform: translateX(-50%) translateY(-60%);
-
-  &:focus {
-    outline: none;
+  background-color: rgba(0, 0, 0, 0.8);
+  .modal-content-div {
+    display: inline-block;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
+    &:focus {
+      outline: none;
+    }
   }
 }

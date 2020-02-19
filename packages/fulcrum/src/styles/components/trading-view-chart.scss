@@ -3,6 +3,8 @@
   height: 40vh; 
   @media only screen and (min-width: $mobile-version-max-width){
     min-height: 400px;
-
+  }
+  @media(max-width: $max-lg){
+    padding-left: 5px;
   }
 }

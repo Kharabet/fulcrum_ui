@@ -15,8 +15,9 @@ import Fortmatic from "fortmatic";
 
 // @ts-ignore
 import Squarelink from "squarelink";
-import WalletLink from "walletlink"
-import Web3 from "web3"
+import WalletLink from "walletlink";
+// @ts-ignore
+import Web3 from "web3";
 
 import Torus from "@toruslabs/torus-embed";
 

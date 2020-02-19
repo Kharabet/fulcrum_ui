@@ -19,7 +19,6 @@ $margin-right-small-column: 0.5rem;
 $width-button-action: 7rem;
 
 @mixin own-token-grid-header__col {
-  
   font-family: "Muli", sans-serif;
   vertical-align: middle;
   font-size: $font-size-header;
@@ -38,7 +37,6 @@ $width-button-action: 7rem;
   font-stretch: normal;
   line-height: 1.5;
   display: flex;
-  
 }
 .own-token-grid-header {
   display: flex;
@@ -112,20 +110,26 @@ $width-button-action: 7rem;
   }
   &__buy-button {
     display: inline-block;
-    cursor: pointer;
     border: 0;
     width: $width-button-action;
     height: 2.5rem;
     border-radius: 100px;
-    background-color: #407bf7;
     text-transform: uppercase;
     font-size: 0.75rem;
     font-weight: normal;
     font-style: normal;
     font-stretch: normal;
     letter-spacing: -0.3px;
-    color: var(--primary-text);
+    color: #ffffff;
     outline: none;
+    &:not(:disabled){
+      cursor: pointer;
+    }
+    &:disabled {
+      background-color: var(--disabled-bg);
+      color: var(--disabled-color);
+      cursor: not-allowed;
+    }
   }
   &__details-button {
     display: inline-block;
@@ -170,7 +174,7 @@ $width-button-action: 7rem;
     font-style: normal;
     font-stretch: normal;
     letter-spacing: -0.3px;
-    color: var(--primary-text);
+    color: #ffffff;
     outline: none;
   }
   &__sell-button {
@@ -186,7 +190,7 @@ $width-button-action: 7rem;
     background-color: #ff4f4f;
     text-transform: uppercase;
     font-style: normal;
-    color: var(--primary-text);
+    color: #ffffff;
     outline: none;
     padding: 14px 34px;
     &:hover {

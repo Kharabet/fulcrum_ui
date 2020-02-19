@@ -4,6 +4,16 @@ $mobile-version-max-width: 59.9375rem;
 $mobile-version-width: 600px;
 $mobile-version-width-sm: 1024px;
 
+$container-desktop: 1140px;
+$container-mobile: 100%;
+
+$max-xl: 1109px;
+$min-xl: 1100px;
+
+$max-lg: 959px;
+$min-lg: 960px;
+
+
 :root {
   --primary-bg: #ffffff;
   --primary-text: #283049;
@@ -26,6 +36,12 @@ $mobile-version-width-sm: 1024px;
   --loader-slider: #b9c7d6;
   --eth-bg: #e0e0e0;
   --wbtc-svg: #282237;
+  --select-bg: #ffffff;
+  --select-border: #b9c7d6;
+  --select-arrow: #8992a4;
+  --select-option-hover: #F5F7F9;
+  --disabled-bg: #E0E0E0;
+  --disabled-color: #8992A4;
 }
 
 [data-theme="dark"] {
@@ -50,4 +66,10 @@ $mobile-version-width-sm: 1024px;
   --loader-slider: #3d4651;
   --eth-bg: #ffffff;
   --wbtc-svg: #ffffff;
+  --select-bg: #586473;
+  --select-border: #586473;
+  --select-arrow: #ffffff;
+  --select-option-hover: #758295;
+  --disabled-bg: #586473;
+  --disabled-color: #758295;
 }

@@ -147,11 +147,11 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
               />
             </div>
             {this.props.walletType === WalletType.NonWeb3 ? (
-              <button className="btn btn-size--small" type="submit">
+              <button className="btn btn-size--small btn-disabled" disabled={true} type="submit">
                 Track
               </button>
             ) : (
-              <button className={`btn btn-size--small ${this.props.didSubmit ? `btn-disabled` : ``}`} type="submit">
+              <button className={`btn btn-size--small btn-disabled`} disabled={true} type="submit">
                 {this.props.didSubmit ? "Submitting..." : "Submit"}
               </button>
             )}
