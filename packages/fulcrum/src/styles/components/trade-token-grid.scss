@@ -138,11 +138,14 @@ $width-col-actions: 13%;
       font-size: 16px;
       font-weight: 800;
       line-height: 1.5;
-      background: #276bfb;
       border-radius: 43px;
-      &:hover {
+      &:not(:disabled){
         cursor: pointer;
-        background-color: #5b88ff;
+      }
+      &:disabled {
+        background-color: var(--disabled-bg);
+        color: var(--disabled-color);
+        cursor: not-allowed;
       }
     }
   }

@@ -10,6 +10,7 @@ $container-mobile: 100%;
 $max-lg: 959px;
 $min-lg: 960px;
 
+
 :root {
   --primary-bg: #ffffff;
   --primary-text: #283049;
@@ -36,6 +37,8 @@ $min-lg: 960px;
   --select-border: #b9c7d6;
   --select-arrow: #8992a4;
   --select-option-hover: #F5F7F9;
+  --disabled-bg: #E0E0E0;
+  --disabled-color: #8992A4;
 }
 
 [data-theme="dark"] {
@@ -64,4 +67,6 @@ $min-lg: 960px;
   --select-border: #586473;
   --select-arrow: #ffffff;
   --select-option-hover: #758295;
+  --disabled-bg: #586473;
+  --disabled-color: #758295;
 }

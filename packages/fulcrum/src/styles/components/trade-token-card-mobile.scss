@@ -83,6 +83,15 @@
             &:hover {
                 background: #5b88ff;
             }
+            
+            &:not(:disabled){
+                cursor: pointer;
+            }
+            &:disabled {
+                background-color: var(--disabled-bg);
+                color: var(--disabled-color);
+                cursor: not-allowed;
+            }
         }
     }
     &__price,
