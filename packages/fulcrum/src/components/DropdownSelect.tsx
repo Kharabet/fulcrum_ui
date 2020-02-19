@@ -44,10 +44,10 @@ export const DropdownSelect = (props: IDropdownSelectProps) => {
     const select = e.currentTarget.closest(".select") as HTMLElement;
     const ul = select.querySelector("ul.select-options") as HTMLElement;
     const selectStyled = select.querySelector(".styled-select") as HTMLElement;
-    const selectNative = select.querySelector("select.select-hidden") as HTMLSelectElement
+    // const selectNative = select.querySelector("select.select-hidden") as HTMLSelectElement
     selectStyled.textContent = li.textContent
     selectStyled.classList.remove('active');
-    selectNative.selectedIndex = parseInt(li.dataset.index!);
+    // selectNative.selectedIndex = parseInt(li.dataset.index!);
     ul.style.display = 'none';
     await props.onDropdownSelect(li.dataset.value!);
   }
@@ -62,9 +62,9 @@ export const DropdownSelect = (props: IDropdownSelectProps) => {
   }, [])
   return (
     <div className="select">
-      <select className="select-hidden" value={props.selectedOption.value}>
+      {/* <select className="select-hidden" value={props.selectedOption.value}>
         {props.options.map(option => option != props.selectedOption && (<option value={option.value}>{option.displayName}</option>))}
-      </select>
+      </select> */}
       <div className="styled-select" onClick={onStyledSelectClick}>
         {props.selectedOption.displayName}
       </div>
