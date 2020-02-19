@@ -46,7 +46,7 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
       menu = {
         items: [
           { id: 1, title: "Wallets", link: "/wallet/b", external: false },
-          { id: 2, title: "Borrow", link: "/borrow/w", external: false },
+          // { id: 2, title: "Borrow", link: "/borrow/w", external: false },
           { id: 3, title: "Dashboard", link: "/dashboard/w", external: false },
           { id: 4, title: "Lend/Trade", link: "https://fulcrum.trade", external: true }
         ]
@@ -55,7 +55,7 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
       menu = {
         items: [
           { id: 1, title: "Wallets", link: "/wallet/b", external: false },
-          { id: 2, title: "Borrow", link: "/borrow/n", external: false },
+          // { id: 2, title: "Borrow", link: "/borrow/n", external: false },
           { id: 3, title: "Dashboard", link: "/dashboard/n", external: false },
           { id: 4, title: "Lend/Trade", link: "https://fulcrum.trade", external: true }
         ]

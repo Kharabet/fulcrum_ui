@@ -28,7 +28,7 @@ export class LandingPage extends PureComponent {
               <span className="landing-page__jumbo-header">Borrowing Made Simple</span>
             </h1>
             <div className="landing-page__jumbo-action-container">
-              <ButtonLanding color={ButtonLandingColor.Blue} subtitle={"New user?"} title={"Borrow"} url={walletUrl} />
+              {/* <ButtonLanding color={ButtonLandingColor.Blue} subtitle={"New user?"} title={"Borrow"} url={walletUrl} /> */}
               <ButtonLanding color={ButtonLandingColor.Green} subtitle={"Existing user?"} title={"Track your loans"} url={trackLoansUrl} />
             </div>
           </div>
