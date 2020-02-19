@@ -30,7 +30,7 @@
     "web3": "^1.2.5-rc.0"
   },
   "devDependencies": {
-    "eslint": "^3.1.1",
+    "eslint": "^6.8.0",
     "nodemon": "^1.9.2"
   }
 }
