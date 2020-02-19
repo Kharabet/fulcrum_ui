@@ -17,6 +17,15 @@
     padding: 0 15px;
   }
 }
+@media(max-width: $max-lg){
+  .trade-page {
+    width: 100%;
+    padding: 0;
+    .header{
+      padding: 0 15px;
+    }
+  }
+}
 @media only screen and (max-width: $mobile-version-width-sm) {
   .trade-page {
     display: flex;

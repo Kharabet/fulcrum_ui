@@ -96,19 +96,17 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
       <div className={`trade-token-grid-tab ${displayName && !this.state.isShowMyTokensOnly ? displayName.toLowerCase() : "manage"}`} >
         <div className="trade-token-grid-tab__container">
           <div className="trade-token-grid-tab__selector">
-            {!this.props.isMobile
-              ? <DropdownSelect {...this.getDropdownProps()} />
-              : null
-            }
+            <DropdownSelect {...this.getDropdownProps()} />
           </div>
-          {this.props.assets.map(asset => (this.renderAsset(asset)))}
-          <div className={`trade-token-grid-tab-item ${this.state.isShowMyTokensOnly ? "trade-token-grid-tab-item--active" : ""}`} onClick={this.showMyTokensOnlyChange}>
-            <div className={`trade-token-grid-tab-item__col-token-image wallet-img-div`} >
-              {<WalletSvg />}
-              <span>Manage</span>
+          <div className="trade-token-grid-tab__items">
+            {this.props.assets.map(asset => (this.renderAsset(asset)))}
+            <div className={`trade-token-grid-tab-item ${this.state.isShowMyTokensOnly ? "trade-token-grid-tab-item--active" : ""}`} onClick={this.showMyTokensOnlyChange}>
+              <div className={`trade-token-grid-tab-item__col-token-image wallet-img-div`} >
+                {<WalletSvg />}
+                <span>Manage</span>
+              </div>
             </div>
           </div>
-
         </div>
       </div>
     )

@@ -1,12 +1,18 @@
 
 .styled-select {
   background-color: var(--select-bg);
-  border: 1px solid var(--select-border);
-  padding: 14px 20px;
+  border: 1px solid var(--select-border);  
   border-radius: 26px;
-  color: var(--primary-text);
-  font-size: 14px;
+  color: var(--primary-text);  
   font-weight: 600;
+  @media(min-width: $min-lg){
+    font-size: 14px;
+    padding: 14px 20px;    
+  }
+  @media(max-width: $max-lg){
+    font-size: 12px;
+    padding: 9px 13px;
+  }
   &.active {
     border-radius: 26px 26px 0 0;
   }
@@ -17,8 +23,14 @@
     border: 5px solid transparent;
     border-color: var(--select-arrow) transparent transparent transparent;
     position: absolute;
-    top: 21px;
-    right: 16px;
+    @media(min-width: $min-lg){
+      top: 21px;
+      right: 16px;
+    }
+    @media(max-width: $max-lg){
+      top: 16px;
+      right: 9px;
+    }
   }
 }
 .select-hidden {
@@ -29,12 +41,20 @@
 .select {
   cursor: pointer;
   display: inline-block;
-  position: relative;
-  font-size: 16px;
+  position: relative;  
   color: var(--select-arrow);
-  width: 130px;
-  height: 40px;
-  margin: 0 20px 0 40px;
+  @media(min-width: $min-lg ){
+    font-size: 14px;
+    width: 130px;
+    height: 40px;
+    margin: 0 20px 0 40px;
+  }
+  @media(max-width: $max-lg ){
+    font-size: 12px;
+    width: 100px;
+    height: 32px;
+    margin:  0 0 15px 0;
+  }
 }
 
 .select-styled {
@@ -45,9 +65,13 @@
   left: 0;
   background-color: var(--select-bg);
   border-color: 1px solid var(--select-border);
-  padding: 14px 20px;
   border-radius: 26px;
-
+  @media(min-width: $min-lg){
+    padding: 14px 20px;    
+  }
+  @media(max-width: $max-lg){
+    padding: 9px 13px;
+  }
   &:hover {
     background-color: var(--select-oprion-hover);
   }
