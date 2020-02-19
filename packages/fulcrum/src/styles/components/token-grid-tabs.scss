@@ -26,15 +26,13 @@
 
 
   &-item {
-    width: 100px;
+    width: 110px;
     &.eth-tab {
       .eth-svg {
         fill: var(--eth-bg);
       }
     }
-    &:not(:last-child) {
-      margin-right: 3px;
-    }
+
     .trade-token-grid-tab-item__col-token-image {
       .wbtc-svg-fill {
         fill: var(--wbtc-svg);
@@ -72,7 +70,7 @@
 
     &__col-token-image {
       height: 50px;
-      width: 100px;
+      width: 110px;
       display: flex;
       justify-content: flex-start;
       align-items: center;
@@ -100,8 +98,18 @@
   }
   @media screen and (min-width: $min-lg) {
     padding-top: 50px;
+    &__container {
+      justify-content: center;
+    }
     &:after {
       width: calc(100vw - 17px);
+    }
+  }
+  @media screen and (min-width: $min-lg) {
+    &-item {
+      &:not(:last-child) {
+        margin: 0 5px;
+      }
     }
   }
   @media screen and (max-width: $max-lg) {

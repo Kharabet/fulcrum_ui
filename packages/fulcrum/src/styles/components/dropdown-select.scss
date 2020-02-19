@@ -47,6 +47,10 @@
     font-size: 14px;
     width: 130px;
     height: 40px;
+    position: absolute;
+    left: 0;
+  }
+  @media(min-width: $min-xl){
     margin: 0 20px 0 40px;
   }
   @media(max-width: $max-lg ){
