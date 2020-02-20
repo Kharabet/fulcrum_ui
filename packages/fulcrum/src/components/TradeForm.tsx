@@ -473,9 +473,6 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
                 {submitButtonText}
               </button>
             </div>
-            <div className="trade-form__form-info">
-              Once the next ejection happens, funds will arrive in your wallet.
-            </div>
             {false && this.state.positionTokenBalance && this.props.tradeType === TradeType.BUY && this.state.positionTokenBalance!.eq(0) ? (
               <CollapsibleContainer titleOpen="View advanced options" titleClose="Hide advanced options" isTransparent={amountMsg !== ""}>
                 <div className="trade-form__kv-container">
