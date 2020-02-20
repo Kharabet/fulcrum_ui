@@ -357,8 +357,8 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       liquidationPrice: this.state.liquidationPrice
     };
 
-    let submitButtonText = ``;
-    if (this.props.tradeType === TradeType.BUY) {
+    let submitButtonText = `EJECT`;
+    /*if (this.props.tradeType === TradeType.BUY) {
       if (this.props.positionType === PositionType.SHORT) {
         submitButtonText = `SHORT`;
       } else {
@@ -371,7 +371,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       submitButtonText += ` ${this.state.exposureValue.toFixed(2)} ${this.props.asset}`;
     } else {
       submitButtonText += ` ${this.props.asset}`;
-    }
+    }*/
 
     //It could be field for OwnTradeTokenRow
     // const currentAssets = this.state.positionTokenBalance && `${this.state.positionTokenBalance.div(10**this.state.assetDetails.decimals).toFixed()} ${this.state.assetDetails.displayName}`; //currentAssets
@@ -431,6 +431,9 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
         </div>
         <div className="trade-form__form-container" style={this.props.tradeType === TradeType.SELL ? { minHeight: `16.5625rem` } : undefined}>
           <div className="trade-form__form-values-container">
+            <span className="trade-form__form-info">
+              The protocol has been locked. press eject to have the administrator close your position. Ejections happen approximately every 5 hours.
+            </span>
             <div className="trade-form__amount-container">
               <input
                 type="text"
