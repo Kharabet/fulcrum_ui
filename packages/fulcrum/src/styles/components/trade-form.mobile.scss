@@ -101,7 +101,7 @@
     flex-direction: column;
 
     .trade-form__form-values-container {
-      margin-bottom: 2.5rem;
+      // margin-bottom: 2.5rem;
     }
 
     .trade-form__actions-container {
@@ -110,6 +110,8 @@
       justify-content: flex-end;
 
       margin-top: auto;
+      
+    justify-content: center;
     }
   }
 

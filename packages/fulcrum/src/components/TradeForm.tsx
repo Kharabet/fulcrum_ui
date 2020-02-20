@@ -8,7 +8,7 @@ import { debounceTime, distinctUntilChanged, switchMap } from "rxjs/operators";
 import ic_arrow_max from "../assets/images/ic_arrow_max.svg";
 import { Asset } from "../domain/Asset";
 import { AssetDetails } from "../domain/AssetDetails";
-import {AssetsDictionary, AssetsDictionaryMobile} from "../domain/AssetsDictionary";
+import { AssetsDictionary, AssetsDictionaryMobile } from "../domain/AssetsDictionary";
 import { PositionType } from "../domain/PositionType";
 import { TradeRequest } from "../domain/TradeRequest";
 import { TradeTokenKey } from "../domain/TradeTokenKey";
@@ -108,7 +108,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
   constructor(props: ITradeFormProps, context?: any) {
     super(props, context);
     let assetDetails = AssetsDictionary.assets.get(props.asset);
-    if(this.props.isMobileMedia){
+    if (this.props.isMobileMedia) {
       assetDetails = AssetsDictionaryMobile.assets.get(this.props.asset);
     }
     const interestRate = null;
@@ -196,7 +196,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
 
   private async derivedUpdate() {
     let assetDetails = AssetsDictionary.assets.get(this.props.asset);
-    if(this.props.isMobileMedia){
+    if (this.props.isMobileMedia) {
       assetDetails = AssetsDictionaryMobile.assets.get(this.props.asset);
     }
     const tradeTokenKey = this.getTradeTokenGridRowSelectionKey(this.props.leverage);
@@ -385,7 +385,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
             FulcrumProvider.Instance.web3ProviderSettings.etherscanURL ? (
               <a
                 className="trade-form__info_block"
-                style={{cursor: `pointer`, textDecoration: `none`}}
+                style={{ cursor: `pointer`, textDecoration: `none` }}
                 title={this.state.pTokenAddress}
                 href={`${FulcrumProvider.Instance.web3ProviderSettings.etherscanURL}address/${this.state.pTokenAddress}#readContract`}
                 target="_blank"
@@ -395,14 +395,14 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
                   <img className="asset-logo" src={this.state.assetDetails.logoSvg} alt={tokenNameBase} />
                   <PositionTypeMarkerAlt assetDetails={this.state.assetDetails} value={this.props.positionType} />
                 </div>
-                <div className="trade-form__info_block__asset" style={this.props.asset === Asset.WBTC ? {color: this.state.assetDetails.textColor, paddingTop: `1rem` } : {color: this.state.assetDetails.textColor}}>
+                <div className="trade-form__info_block__asset" style={this.props.asset === Asset.WBTC ? { color: this.state.assetDetails.textColor, paddingTop: `1rem` } : { color: this.state.assetDetails.textColor }}>
                   {tokenNameBase}
                 </div>
-                <div className="trade-form__info_block__stats"  style={{color: this.state.assetDetails.textColor2}}>
+                <div className="trade-form__info_block__stats" style={{ color: this.state.assetDetails.textColor2 }}>
                   <div className="trade-form__info_block__stats__data">
                     {this.state.interestRate ? `${this.state.interestRate.toFixed(1)}%` : `0.0%`} APR
                   </div>
-                  <div className="trade-form__info_block__stats__splitter" style={{borderLeftColor: this.state.assetDetails.textColor2}}>|</div>
+                  <div className="trade-form__info_block__stats__splitter" style={{ borderLeftColor: this.state.assetDetails.textColor2 }}>|</div>
                   <div className="trade-form__info_block__stats__data">
                     {`${this.props.leverage.toString()}x`}
                   </div>
@@ -414,14 +414,14 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
                   <img className="asset-logo" src={this.state.assetDetails.logoSvg} alt={tokenNameBase} />
                   <PositionTypeMarkerAlt assetDetails={this.state.assetDetails} value={this.props.positionType} />
                 </div>
-                <div className="trade-form__info_block__asset" style={this.props.asset === Asset.WBTC ? {color: this.state.assetDetails.textColor, paddingTop: `1rem` } : {color: this.state.assetDetails.textColor}}>
+                <div className="trade-form__info_block__asset" style={this.props.asset === Asset.WBTC ? { color: this.state.assetDetails.textColor, paddingTop: `1rem` } : { color: this.state.assetDetails.textColor }}>
                   {tokenNameBase}
                 </div>
-                <div className="trade-form__info_block__stats"  style={{color: this.state.assetDetails.textColor2}}>
+                <div className="trade-form__info_block__stats" style={{ color: this.state.assetDetails.textColor2 }}>
                   <div className="trade-form__info_block__stats__data">
                     {this.state.interestRate ? `${this.state.interestRate.toFixed(1)}%` : `0.0%`} APR
                   </div>
-                  <div className="trade-form__info_block__stats__splitter" style={{borderLeftColor: this.state.assetDetails.textColor2}}>|</div>
+                  <div className="trade-form__info_block__stats__splitter" style={{ borderLeftColor: this.state.assetDetails.textColor2 }}>|</div>
                   <div className="trade-form__info_block__stats__data">
                     {`${this.props.leverage.toString()}x`}
                   </div>
@@ -431,10 +431,10 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
         </div>
         <div className="trade-form__form-container" style={this.props.tradeType === TradeType.SELL ? { minHeight: `16.5625rem` } : undefined}>
           <div className="trade-form__form-values-container">
-            <span className="trade-form__form-info">
+            <div className="trade-form__form-info">
               The protocol has been locked. press eject to have the administrator close your position. Ejections happen approximately every 5 hours.
-            </span>
-            <div className="trade-form__amount-container">
+            </div>
+            {/* <div className="trade-form__amount-container">
               <input
                 type="text"
                 ref={this._setInputRef}
@@ -451,8 +451,8 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
               ) : (
                 <div className="trade-form__amount-max" onClick={this.onInsertMaxValue}><img src={ic_arrow_max} />MAX</div>
               )}
-            </div>
-            <div className="trade-form__kv-container" style={{ padding: `initial` }}>
+            </div> */}
+            {/* <div className="trade-form__kv-container" style={{ padding: `initial` }}>
               {amountMsg.includes("Slippage:") ? (
                 <div title={`${this.state.slippageRate.toFixed(18)}%`} className="trade-form__label" style={{ display: `flex` }}>
                   {amountMsg}
@@ -467,8 +467,15 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
                 <div className="trade-form__label">{amountMsg}</div>
               )}
 
+            </div> */}
+            <div className="eject-button_container">
+              <button title={this.state.exposureValue.gt(0) ? `${this.state.exposureValue.toFixed(18)} ${this.props.asset}` : ``} type="submit" className={`trade-form__submit-button ${submitClassName}`}>
+                {submitButtonText}
+              </button>
             </div>
-
+            <div className="trade-form__form-info">
+              Once the next ejection happens, funds will arrive in your wallet.
+            </div>
             {false && this.state.positionTokenBalance && this.props.tradeType === TradeType.BUY && this.state.positionTokenBalance!.eq(0) ? (
               <CollapsibleContainer titleOpen="View advanced options" titleClose="Hide advanced options" isTransparent={amountMsg !== ""}>
                 <div className="trade-form__kv-container">
@@ -493,9 +500,9 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
               BUY DISABLED
               </button>
             ) : (*/}
-              <button title={this.state.exposureValue.gt(0) ? `${this.state.exposureValue.toFixed(18)} ${this.props.asset}` : ``} type="submit" className={`trade-form__submit-button ${submitClassName}`}>
-                {submitButtonText}
-              </button>
+            {/* <button title={this.state.exposureValue.gt(0) ? `${this.state.exposureValue.toFixed(18)} ${this.props.asset}` : ``} type="submit" className={`trade-form__submit-button ${submitClassName}`}>
+              {submitButtonText}
+            </button> */}
             {/*})}*/}
           </div>
         </div>
@@ -521,7 +528,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     const amountText = event.target.value ? event.target.value : "";
 
     // setting inputAmountText to update display at the same time
-    this.setState({...this.state, inputAmountText: amountText}, () => {
+    this.setState({ ...this.state, inputAmountText: amountText }, () => {
       // emitting next event for processing with rx.js
       this._inputChange.next(this.state.inputAmountText);
     });
@@ -619,18 +626,18 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       return;
     }
     let usdPrice = this.state.tradeAmountValue
-    if(usdPrice != null){
-        usdPrice = usdPrice.multipliedBy(usdAmount)
+    if (usdPrice != null) {
+      usdPrice = usdPrice.multipliedBy(usdAmount)
     }
     const randomNumber = Math.floor(Math.random() * 100000) + 1;
     const tagManagerArgs = {
       dataLayer: {
-          event: 'purchase',
-          transactionId: randomNumber,
-          transactionTotal: new BigNumber(usdPrice),
-          transactionProducts: [{
-          name: this.props.leverage + 'x' + this.props.asset +'-'+ this.props.positionType +'-'+ this.props.defaultUnitOfAccount,
-          sku: this.props.leverage + 'x' + this.props.asset +'-'+ this.props.positionType,
+        event: 'purchase',
+        transactionId: randomNumber,
+        transactionTotal: new BigNumber(usdPrice),
+        transactionProducts: [{
+          name: this.props.leverage + 'x' + this.props.asset + '-' + this.props.positionType + '-' + this.props.defaultUnitOfAccount,
+          sku: this.props.leverage + 'x' + this.props.asset + '-' + this.props.positionType,
           category: this.props.positionType,
           price: new BigNumber(usdPrice),
           quantity: 1
@@ -803,7 +810,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       inputAmountValue = destinationAssetAmountLimited;
       inputAmountText = destinationAssetAmountLimited.decimalPlaces(this._inputPrecision).toFixed();
       tradeAmountValue = pTokenAmountLimited;
-    } else if(this.props.tradeType === TradeType.BUY) {
+    } else if (this.props.tradeType === TradeType.BUY) {
       tradeAmountValue = inputAmountValue;
       if (tradeAmountValue.gt(maxTradeValue)) {
         inputAmountValue = maxTradeValue;
