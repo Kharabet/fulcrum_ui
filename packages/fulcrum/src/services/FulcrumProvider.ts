@@ -423,64 +423,69 @@ export class FulcrumProvider {
 
   public getTradeTokenAssetLatestDataPoint = async (selectedKey: TradeTokenKey): Promise<IPriceDataPoint> => {
     try {
-      const currentPrice = await this.getSwapToUsdRate(selectedKey.asset);
+      // const currentPrice = await this.getSwapToUsdRate(selectedKey.asset);
       const priceLatestDataPoint = await this.getPriceDefaultDataPoint();
+
+      let kyberMarketPairs = await fetch("https://api.kyber.network/pairs/market");
+      let respJSON = await kyberMarketPairs.json();
+      let buyAssetPrice = respJSON.data.find((item: { pair: string; }) => item.pair === `SAI_${selectedKey.asset}`).buy_price
+      const currentPrice = new BigNumber(buyAssetPrice);
+
 
       priceLatestDataPoint.price = currentPrice.toNumber();
 
       if (this.contractsSource) {
-        const assetContract = await this.contractsSource.getPTokenContract(selectedKey);
-        if (assetContract) {
+        // const assetContract = await this.contractsSource.getPTokenContract(selectedKey);
+        // if (assetContract) {
+        // const currentLeverage = (await assetContract.currentLeverage.callAsync()).div(10**18);
+        // const currentMargin = currentLeverage.gt(0) ?
+        //   new BigNumber(1).div(currentLeverage) :
+        //   new BigNumber(1).div(selectedKey.leverage);
+        const currentLeverage =new BigNumber(selectedKey.leverage);
+        const currentMargin = new BigNumber(1).div(selectedKey.leverage);
 
-          const currentLeverage = (await assetContract.currentLeverage.callAsync()).div(10**18);
-          const currentMargin = currentLeverage.gt(0) ?
-            new BigNumber(1).div(currentLeverage) :
-            new BigNumber(1).div(selectedKey.leverage);
+        const maintenanceMargin = new BigNumber(0.15);
+        if (currentMargin.lte(maintenanceMargin) && priceLatestDataPoint.price > 0) {
+          priceLatestDataPoint.liquidationPrice = priceLatestDataPoint.price;
+        } else {
+          const initialLeverage = new BigNumber(selectedKey.leverage);
+          const initialMargin = new BigNumber(1).div(initialLeverage);
 
-          const maintenanceMargin = new BigNumber(0.15);
-
-          if (currentMargin.lte(maintenanceMargin)) {
-            priceLatestDataPoint.liquidationPrice = priceLatestDataPoint.price;
-          } else {
-            const initialLeverage = new BigNumber(selectedKey.leverage);
-            const initialMargin = new BigNumber(1).div(initialLeverage);
-
-            // initial_price = current_price - (current_price / initial_leverage * (current_margin - initial_margin))
-            const offset = currentPrice
-              .dividedBy(initialLeverage)
-              .multipliedBy(
-                currentMargin
+          // initial_price = current_price - (current_price / initial_leverage * (current_margin - initial_margin))
+          const offset = currentPrice
+            .dividedBy(initialLeverage)
+            .multipliedBy(
+              currentMargin
                 .minus(initialMargin)
-              );
+            );
 
-            const initialPrice = selectedKey.positionType === PositionType.SHORT ?
-              currentPrice.plus(offset) :
-              currentPrice.minus(offset);
+          const initialPrice = selectedKey.positionType === PositionType.SHORT ?
+            currentPrice.plus(offset) :
+            currentPrice.minus(offset);
 
-            // liquidation_price = initial_price * (maintenance_margin * current_leverage + initial_leverage) / (initial_leverage + 1)
-            let liquidationPrice = initialPrice
-              .multipliedBy(maintenanceMargin.times(currentLeverage).plus(initialLeverage))
-              .div(initialLeverage.plus(1));
+          // liquidation_price = initial_price * (maintenance_margin * current_leverage + initial_leverage) / (initial_leverage + 1)
+          let liquidationPrice = initialPrice
+            .multipliedBy(maintenanceMargin.times(currentLeverage).plus(initialLeverage))
+            .div(initialLeverage.plus(1));
 
-            if (selectedKey.positionType === PositionType.SHORT) {
-              liquidationPrice = initialPrice
-                .plus(initialPrice)
-                .minus(liquidationPrice);
-            }
-
-            /*console.log(`offset`,offset.toString());
-            console.log(`maintenanceMargin`,maintenanceMargin.toString());
-            console.log(`initialLeverage`,initialLeverage.toString());
-            console.log(`initialMargin`,initialMargin.toString())
-            console.log(`currentPrice`,currentPrice.toString());
-            console.log(`currentLeverage`,currentLeverage.toString());
-            console.log(`currentMargin`,currentMargin.toString());
-            console.log(`initialPrice`,initialPrice.toString());
-            console.log(`liquidationPrice`,liquidationPrice.toString());*/
-
-            priceLatestDataPoint.liquidationPrice = liquidationPrice
-              .toNumber();
+          if (selectedKey.positionType === PositionType.SHORT) {
+            liquidationPrice = initialPrice
+              .plus(initialPrice)
+              .minus(liquidationPrice);
           }
+
+          /*console.log(`offset`,offset.toString());
+          console.log(`maintenanceMargin`,maintenanceMargin.toString());
+          console.log(`initialLeverage`,initialLeverage.toString());
+          console.log(`initialMargin`,initialMargin.toString())
+          console.log(`currentPrice`,currentPrice.toString());
+          console.log(`currentLeverage`,currentLeverage.toString());
+          console.log(`currentMargin`,currentMargin.toString());
+          console.log(`initialPrice`,initialPrice.toString());
+          console.log(`liquidationPrice`,liquidationPrice.toString());*/
+
+          priceLatestDataPoint.liquidationPrice = liquidationPrice
+            .toNumber();
         }
       }
       return priceLatestDataPoint;
