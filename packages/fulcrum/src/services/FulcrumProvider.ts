@@ -788,7 +788,18 @@ export class FulcrumProvider {
         if (assetContract) {
           const baseAsset = this.getBaseAsset(selectedKey);
           const swapPrice = await this.getSwapToUsdRate(baseAsset);
-          const tokenPrice = await assetContract.tokenPrice.callAsync();
+          let ethPriceResponse = await fetch("https://production-cache.kyber.network/rateETH");
+          let ethPriceJson = await ethPriceResponse.json();
+          const ethPrice = parseInt(ethPriceJson.data);
+          let kyberMarketPairs = await fetch("https://api.kyber.network/change24h");
+          let respJSON = await kyberMarketPairs.json();
+          let rateEthPrice = respJSON[`ETH_${selectedKey.asset}`].rate_eth_now;
+          let decimals = AssetsDictionary.assets.get(selectedKey.asset)!.decimals || 18;
+          const precision = new BigNumber(10 ** (18 - decimals));
+
+          const tokenPrice = new BigNumber(rateEthPrice).multipliedBy(10 ** decimals);
+    
+          // const tokenPrice = await assetContract.tokenPrice.callAsync();
           const checkpointPrice = await assetContract.checkpointPrice.callAsync(account);
 
           let decimalOffset = 0;
