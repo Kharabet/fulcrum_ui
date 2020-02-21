@@ -10,6 +10,7 @@ import { iTokenContract } from "../contracts/iTokenContract";
 import { oracleContract } from "../contracts/oracle";
 import { pTokenContract } from "../contracts/pTokenContract";
 import { DAppHelperContract } from "../contracts/DAppHelper";
+import { BurnerContract } from "../contracts/Burner";
 
 const ethNetwork = process.env.REACT_APP_ETH_NETWORK;
 
@@ -37,6 +38,7 @@ export class ContractsSource {
   private static oracleJson: any;
   private static mcdBridgeJson: any;
   private static DAppHelperJson: any;
+  private static BurnerJson: any;
 
   public networkId: number;
   public canWrite: boolean;
@@ -57,6 +59,7 @@ export class ContractsSource {
     ContractsSource.oracleJson = await import(`./../assets/artifacts/${ethNetwork}/oracle.json`);
     ContractsSource.mcdBridgeJson = await import(`./../assets/artifacts/${ethNetwork}/FulcrumMcdBridge.json`);
     ContractsSource.DAppHelperJson = await import(`./../assets/artifacts/${ethNetwork}/DAppHelper.json`);
+    ContractsSource.BurnerJson = await import(`./../assets/artifacts/${ethNetwork}/Burner.json`);
     
     
 
@@ -250,6 +253,25 @@ export class ContractsSource {
 
     return address;
   }
+  private getBurnerAddress(): string {
+    let address: string = "";
+    switch (this.networkId) {
+      case 1:
+        address = "";
+        break;
+      case 3:
+        address = "";
+        break;
+      case 4:
+        address = "";
+        break;
+      case 42:
+        address = "0x2aC6ffE735d1B63ce0fDe6571e73fce1240Fa855";
+        break;
+    }
+
+    return address;
+  }
 
   private getFulcrumMcdBridgeAddress(): string {
     let address: string = "";
@@ -315,6 +337,15 @@ export class ContractsSource {
     return new DAppHelperContract(
       ContractsSource.DAppHelperJson.abi,
       this.getDAppHelperAddress().toLowerCase(),
+      this.provider
+    );
+  }
+
+  private async getBurnerContractRaw(): Promise<BurnerContract> {
+    await this.Init();
+    return new BurnerContract(
+      ContractsSource.BurnerJson.abi,
+      this.getBurnerAddress().toLowerCase(),
       this.provider
     );
   }
@@ -410,4 +441,5 @@ export class ContractsSource {
   public getOracleContract = _.memoize(this.getOracleContractRaw);
   public getFulcrumMcdBridgeContract = _.memoize(this.getFulcrumMcdBridgeContractRaw);
   public getDAppHelperContract = _.memoize(this.getDAppHelperContractRaw);
+  public getBurnerContract = _.memoize(this.getBurnerContractRaw);
 }

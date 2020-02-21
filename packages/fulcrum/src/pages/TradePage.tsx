@@ -127,6 +127,11 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
     if (!FulcrumProvider.Instance.web3Wrapper && (!provider || provider === "None")) {
       this.props.doNetworkConnect();
     }
+    if (FulcrumProvider.Instance.web3Wrapper) {
+      let account = FulcrumProvider.Instance.accounts.length > 0 && FulcrumProvider.Instance.accounts[0] ? FulcrumProvider.Instance.accounts[0].toLowerCase() : undefined;
+      
+    }
+
   }
 
   public componentDidUpdate(prevProps: Readonly<ITradePageProps>, prevState: Readonly<ITradePageState>, snapshot?: any): void {
@@ -152,6 +157,7 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
       <div className="trade-page">
         <HeaderOps isMobileMedia={this.props.isMobileMedia} isLoading={this.props.isLoading} doNetworkConnect={this.props.doNetworkConnect} />
         <main>
+
           <TokenGridTabs
             assets={this.state.assets}
             selectedKey={this.state.selectedKey}
