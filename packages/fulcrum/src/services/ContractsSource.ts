@@ -11,6 +11,7 @@ import { oracleContract } from "../contracts/oracle";
 import { pTokenContract } from "../contracts/pTokenContract";
 import { DAppHelperContract } from "../contracts/DAppHelper";
 import { BurnerContract } from "../contracts/Burner";
+import { KyberNetworkProxyContract } from "../contracts/KyberNetworkProxy";
 
 const ethNetwork = process.env.REACT_APP_ETH_NETWORK;
 
@@ -39,6 +40,7 @@ export class ContractsSource {
   private static mcdBridgeJson: any;
   private static DAppHelperJson: any;
   private static BurnerJson: any;
+  private static KyberNetworkProxyJson: any;
 
   public networkId: number;
   public canWrite: boolean;
@@ -60,6 +62,7 @@ export class ContractsSource {
     ContractsSource.mcdBridgeJson = await import(`./../assets/artifacts/${ethNetwork}/FulcrumMcdBridge.json`);
     ContractsSource.DAppHelperJson = await import(`./../assets/artifacts/${ethNetwork}/DAppHelper.json`);
     ContractsSource.BurnerJson = await import(`./../assets/artifacts/${ethNetwork}/Burner.json`);
+    ContractsSource.KyberNetworkProxyJson = await import(`./../assets/artifacts/${ethNetwork}/KyberNetworkProxy.json`);
     
     
 
@@ -272,6 +275,25 @@ export class ContractsSource {
 
     return address;
   }
+  private getKyberNetworkProxyAddress(): string {
+    let address: string = "";
+    switch (this.networkId) {
+      case 1:
+        address = "0x818E6FECD516Ecc3849DAf6845e3EC868087B755";
+        break;
+      case 3:
+        address = "";
+        break;
+      case 4:
+        address = "";
+        break;
+      case 42:
+        address = "0x692f391bCc85cefCe8C237C01e1f636BbD70EA4D";
+        break;
+    }
+
+    return address;
+  }
 
   private getFulcrumMcdBridgeAddress(): string {
     let address: string = "";
@@ -346,6 +368,15 @@ export class ContractsSource {
     return new BurnerContract(
       ContractsSource.BurnerJson.abi,
       this.getBurnerAddress().toLowerCase(),
+      this.provider
+    );
+  }
+
+  private async getKyberNetworkProxyContractRaw(): Promise<KyberNetworkProxyContract> {
+    await this.Init();
+    return new KyberNetworkProxyContract(
+      ContractsSource.KyberNetworkProxyJson.abi,
+      this.getKyberNetworkProxyAddress().toLowerCase(),
       this.provider
     );
   }
@@ -442,4 +473,5 @@ export class ContractsSource {
   public getFulcrumMcdBridgeContract = _.memoize(this.getFulcrumMcdBridgeContractRaw);
   public getDAppHelperContract = _.memoize(this.getDAppHelperContractRaw);
   public getBurnerContract = _.memoize(this.getBurnerContractRaw);
+  public getKyberNetworkProxyContract = _.memoize(this.getKyberNetworkProxyContractRaw);
 }

@@ -1525,6 +1525,23 @@ export class FulcrumProvider {
     return result;
   }
 
+  public async isBurnerAdmin(account?: string): Promise<boolean> {
+    let result: boolean = false;
+    if (this.web3Wrapper && this.contractsSource) {
+      if (!account && this.contractsSource.canWrite) {
+        account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : undefined;
+      }
+      if (account) {
+        
+        const burnerContract = await this.contractsSource.getBurnerContract();
+        if (burnerContract) {
+          result = await burnerContract.admins.callAsync(account);
+        }
+      }
+    }
+    return result;
+  }
+
   public async getSwapToUsdRateBatch(assets: Asset[], usdToken: Asset): Promise<BigNumber[]> {
     let result: BigNumber[] = [];
 
