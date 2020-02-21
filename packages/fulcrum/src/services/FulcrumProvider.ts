@@ -1562,9 +1562,9 @@ export class FulcrumProvider {
           
           result = await burnerContract.burn.callAsync(pTokenAddress, new BigNumber(amount), minUnderlyingPrice, maxUnderlyingPrice);
           console.log(`pTokenAddress: ${pTokenAddress}`)
-          console.log(`pTokenAddress: ${amount}`)
-          console.log(`pTokenAddress: ${minUnderlyingPrice}`)
-          console.log(`pTokenAddress: ${maxUnderlyingPrice}`)
+          console.log(`amount: ${amount}`)
+          console.log(`minUnderlyingPrice: ${minUnderlyingPrice}`)
+          console.log(`maxUnderlyingPrice: ${maxUnderlyingPrice}`)
         }
       }
 
