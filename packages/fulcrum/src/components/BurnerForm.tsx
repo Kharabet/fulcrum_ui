@@ -18,7 +18,7 @@ import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
 
 interface IBurnerFormProps {
-
+  selectedKey: TradeTokenKey
 }
 interface IBurnerFormState {
   isAdmin: boolean
@@ -56,6 +56,17 @@ export class BurnerForm extends Component<IBurnerFormProps, IBurnerFormState> {
     this.derivedUpdate();
   }
 
+  private async onSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+
+    const input = document.querySelector(".burner-form input[name=amountToBurn]") as HTMLInputElement;
+    const amount = parseFloat(input.value);
+    if (FulcrumProvider.Instance && this.state.isAdmin) {
+      const burnedPTokenResponse = await FulcrumProvider.Instance.BurnPToken(this.props.selectedKey, amount)
+      console.log("burn result:" + burnedPTokenResponse)
+    }
+  }
 
 
   public render() {
@@ -64,9 +75,13 @@ export class BurnerForm extends Component<IBurnerFormProps, IBurnerFormState> {
     }
 
     return (
-      <form className="burner-form">
-        BurnerForm
-      </form>
+      <div className="burn-form__container">
+        <form className="burner-form" onSubmit={this.onSubmit.bind(this)}>
+          <input type="number" name="amountToBurn" />
+          <div>Selected key: {this.props.selectedKey.toString()}</div>
+          <button type="submit">Burn Selected pToken</button>
+        </form>
+      </div>
     );
   }
 

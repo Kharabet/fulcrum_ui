@@ -42,3 +42,18 @@
   }
 
 }
+
+
+
+.burn-form__container{
+  padding: 20px;
+  background-color: var(--primary-row);
+  color: var(--primary-text);
+
+  .burner-form{
+    
+    display: flex;
+    justify-content: space-between;
+    max-width: 510px;
+  }
+}

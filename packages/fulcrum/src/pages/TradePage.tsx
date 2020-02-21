@@ -160,8 +160,7 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
       <div className="trade-page">
         <HeaderOps isMobileMedia={this.props.isMobileMedia} isLoading={this.props.isLoading} doNetworkConnect={this.props.doNetworkConnect} />
         <main>
-          <BurnerForm />
-          ========
+          <BurnerForm selectedKey={this.state.selectedKey}/>
           <TokenGridTabs
             assets={this.state.assets}
             selectedKey={this.state.selectedKey}

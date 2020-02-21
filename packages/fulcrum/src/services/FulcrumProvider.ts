@@ -1542,7 +1542,7 @@ export class FulcrumProvider {
     return result;
   }
 
-  public async BurnPToken(selectedKey: TradeTokenKey, amount: BigNumber): Promise<BigNumber> {
+  public async BurnPToken(selectedKey: TradeTokenKey, amount: number): Promise<BigNumber> {
     let result: BigNumber = new BigNumber(0);
 
     if (this.contractsSource) {
@@ -1560,7 +1560,11 @@ export class FulcrumProvider {
         if (burnerContract && pTokenAddress && minUnderlyingPrice && maxUnderlyingPrice && amount)
         {
           
-          result = await burnerContract.burn.callAsync(pTokenAddress, amount, minUnderlyingPrice, maxUnderlyingPrice);
+          result = await burnerContract.burn.callAsync(pTokenAddress, new BigNumber(amount), minUnderlyingPrice, maxUnderlyingPrice);
+          console.log(`pTokenAddress: ${pTokenAddress}`)
+          console.log(`pTokenAddress: ${amount}`)
+          console.log(`pTokenAddress: ${minUnderlyingPrice}`)
+          console.log(`pTokenAddress: ${maxUnderlyingPrice}`)
         }
       }
 
