@@ -1542,6 +1542,33 @@ export class FulcrumProvider {
     return result;
   }
 
+  public async BurnPToken(selectedKey: TradeTokenKey, amount: BigNumber): Promise<BigNumber> {
+    let result: BigNumber = new BigNumber(0);
+
+    if (this.contractsSource) {
+      const kyberNetworkProxy = await this.contractsSource.getKyberNetworkProxyContract();
+      const assetContract = await this.contractsSource.getPTokenContract(selectedKey); 
+      if (kyberNetworkProxy && assetContract) {
+        const loanTokenAddress = await assetContract.loanTokenAddress.callAsync();
+        const tradeTokenAddress = await assetContract.tradeTokenAddress.callAsync();
+        const swapRate = await kyberNetworkProxy.getExpectedRate.callAsync(loanTokenAddress, tradeTokenAddress, new BigNumber(1));
+        const expectedRate = swapRate[0]; 
+        const minUnderlyingPrice = expectedRate.multipliedBy(0.95);
+        const maxUnderlyingPrice = expectedRate.multipliedBy(1.05);
+        const burnerContract = await this.contractsSource.getBurnerContract();
+        const pTokenAddress = await this.contractsSource.getPTokenErc20Address(selectedKey);
+        if (burnerContract && pTokenAddress && minUnderlyingPrice && maxUnderlyingPrice && amount)
+        {
+          
+          result = await burnerContract.burn.callAsync(pTokenAddress, amount, minUnderlyingPrice, maxUnderlyingPrice);
+        }
+      }
+
+    }
+    return result;
+
+  }
+
   public async getSwapToUsdRateBatch(assets: Asset[], usdToken: Asset): Promise<BigNumber[]> {
     let result: BigNumber[] = [];
 
