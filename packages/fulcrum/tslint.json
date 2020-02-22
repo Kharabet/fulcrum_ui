@@ -2,7 +2,7 @@
   "extends": "../../tslint.json",
   "linterOptions": {
     "exclude": [
-      "./src/charting_library/charting_library.min.js"
+      "src/charting_library"
     ]
   }
 }
