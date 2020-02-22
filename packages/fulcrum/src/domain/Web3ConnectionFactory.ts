@@ -4,7 +4,6 @@ import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
 
 import { Web3Wrapper } from '@0x/web3-wrapper';
-import { EnvironmentTypes, SourceType, TerminalHttpProvider, Web3Versions } from '@terminal-packages/sdk';
 
 import Portis from "@portis/web3";
 // @ts-ignore
