@@ -4,7 +4,6 @@ import { TorqueProviderEvents } from "../services/events/TorqueProviderEvents";
 import { TorqueProvider } from "../services/TorqueProvider";
 
 import { Web3Wrapper } from '@0x/web3-wrapper';
-import { EnvironmentTypes, SourceType, TerminalHttpProvider, Web3Versions } from '@terminal-packages/sdk';
 
 import Portis from "@portis/web3";
 // @ts-ignore
@@ -138,7 +137,7 @@ export class Web3ConnectionFactory {
 
           // test for non-error
           await providerEngine.start();
-          web3Wrapper = new Web3Wrapper(await Web3ConnectionFactory.getTerminal(providerEngine));
+          web3Wrapper = new Web3Wrapper(providerEngine);
           await web3Wrapper.getAvailableAddressesAsync();
           canWrite = true;
         } catch (e) {
@@ -166,7 +165,7 @@ export class Web3ConnectionFactory {
     // @ts-ignore
     if (typeof web3Wrapper === "undefined") {
       await providerEngine.start();
-      web3Wrapper = new Web3Wrapper(await Web3ConnectionFactory.getTerminal(providerEngine));
+      web3Wrapper = new Web3Wrapper(providerEngine);
     }
 
     if (subProvider && providerType === ProviderType.MetaMask) {
@@ -266,33 +265,6 @@ export class Web3ConnectionFactory {
     }
 
     return [web3Wrapper, providerEngine, canWrite, Web3ConnectionFactory.networkId];
-  }
-
-  private static async getTerminal(providerEngine: Web3ProviderEngine): Promise<Web3ProviderEngine> {
-    const isMainnetProd =
-      process.env.NODE_ENV && process.env.NODE_ENV !== "development"
-      && process.env.REACT_APP_ETH_NETWORK === "mainnet";
-
-    if (isMainnetProd) {
-      await providerEngine.addProvider(
-        await new RPCSubprovider("https://terminal.co/networks/ethereum_main/04cbb3423e")
-      );
-      await providerEngine.start();
-      // @ts-ignore
-      const term = await new TerminalHttpProvider({
-        apiKey: "GjNDQd8pdZ9WQEWdgVKxJg==",
-        source: SourceType.Web3ProviderEngine,
-        projectId: "YOnZkpVEPrlKyGLm",
-        environment: EnvironmentTypes.live,
-        logLevel: 1,
-        web3Version: Web3Versions.one,
-        customHttpProvider: providerEngine
-      });
-      return term;
-    } else {
-      await providerEngine.start();
-      return providerEngine;
-    }
   }
 
   private static async getProviderMetaMask(): Promise<any | null> {
