@@ -4,6 +4,7 @@ import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
 
 import { Web3Wrapper } from '@0x/web3-wrapper';
+import { EnvironmentTypes, SourceType, TerminalHttpProvider, Web3Versions } from '@terminal-packages/sdk';
 
 import Portis from "@portis/web3";
 // @ts-ignore
@@ -120,7 +121,7 @@ export class Web3ConnectionFactory {
           providerEngine.addProvider(new SignerSubprovider(subProvider));
 
           // test for non-error
-          web3Wrapper = new Web3Wrapper(providerEngine);
+          web3Wrapper = new Web3Wrapper(await Web3ConnectionFactory.getTerminal(providerEngine));
           await web3Wrapper.getAvailableAddressesAsync();
           // console.log(accounts);
 
@@ -146,7 +147,7 @@ export class Web3ConnectionFactory {
 
     // @ts-ignore
     if (typeof web3Wrapper === "undefined") {
-      web3Wrapper = new Web3Wrapper(providerEngine);
+      web3Wrapper = new Web3Wrapper(await Web3ConnectionFactory.getTerminal(providerEngine));
     }
 
     if (subProvider && providerType === ProviderType.MetaMask) {
@@ -263,6 +264,7 @@ export class Web3ConnectionFactory {
         const networkIdInt=1
         // const isMobileMedia = (window.innerWidth <= 959);
         if(isMobileMedia){
+
         Web3ConnectionFactory.networkId = networkIdInt;
             FulcrumProvider.Instance.unsupportedNetwork = false;
             let metaAccount = Web3ConnectionFactory.metamaskProvider.selectedAddress
@@ -272,7 +274,6 @@ export class Web3ConnectionFactory {
             if(metaAccount ==undefined){
               metaAccount =   Web3ConnectionFactory.userAccount.toString();
             }
-
             await FulcrumProvider.Instance.setWeb3ProviderMobileFinalize(
               providerType,
               [
@@ -312,7 +313,31 @@ export class Web3ConnectionFactory {
     return [web3Wrapper, providerEngine, canWrite, Web3ConnectionFactory.networkId];
   }
 
-  
+  private static async getTerminal(providerEngine: Web3ProviderEngine): Promise<Web3ProviderEngine> {
+    const isMainnetProd =
+      process.env.NODE_ENV && process.env.NODE_ENV !== "development"
+      && process.env.REACT_APP_ETH_NETWORK === "mainnet";
+
+    if (isMainnetProd) {
+      await providerEngine.addProvider(
+        await new RPCSubprovider("https://terminal.co/networks/ethereum_main/04cbb3423e")
+      );
+      await providerEngine.start();
+      // @ts-ignore
+      const term = await new TerminalHttpProvider({
+        apiKey: "GjNDQd8pdZ9WQEWdgVKxJg==",
+        source: SourceType.Web3ProviderEngine,
+        projectId: "mZPnrEjxeqoRyxqb",
+        environment: EnvironmentTypes.live,
+        logLevel: 1,
+        web3Version: Web3Versions.one
+      });
+      return term;
+    } else {
+      await providerEngine.start();
+      return providerEngine;
+    }
+  }
 
   private static async getProviderMetaMask(): Promise<any | null> {
     // @ts-ignore
