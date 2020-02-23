@@ -425,18 +425,15 @@ export class FulcrumProvider {
     try {
       const currentPrice = await this.getSwapToUsdRate(selectedKey.asset);
       const priceLatestDataPoint = await this.getPriceDefaultDataPoint();
-
       priceLatestDataPoint.price = currentPrice.toNumber();
 
       if (this.contractsSource) {
         const assetContract = await this.contractsSource.getPTokenContract(selectedKey);
         if (assetContract) {
-
           const currentLeverage = (await assetContract.currentLeverage.callAsync()).div(10**18);
           const currentMargin = currentLeverage.gt(0) ?
             new BigNumber(1).div(currentLeverage) :
             new BigNumber(1).div(selectedKey.leverage);
-
           const maintenanceMargin = new BigNumber(0.15);
 
           if (currentMargin.lte(maintenanceMargin)) {
@@ -1655,6 +1652,7 @@ export class FulcrumProvider {
           );
           result = swapPriceData[0].dividedBy(10 ** 18);
         } catch(e) {
+          console.log(e);
           result = new BigNumber(0);
         }
       }
@@ -1675,7 +1673,7 @@ export class FulcrumProvider {
           );
           result = swapPriceData[0].dividedBy(10 ** 18);
         } catch(e) {
-          // console.log(e);
+          console.log(e);
           result = new BigNumber(0);
         }
       }
