@@ -24,6 +24,7 @@ export class oracleContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<BigNumber>
         {
+            callData.from = "0x4abB24590606f5bf4645185e20C4E7B97596cA3B";
             const self = this as any as oracleContract;
             const encodedData = self._strictEncodeArguments('getCurrentMarginAmount(address,address,address,uint256,uint256,uint256)', [
                 loanTokenAddress,
@@ -60,6 +61,7 @@ export class oracleContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<[BigNumber, BigNumber, BigNumber]
         > {
+            callData.from = "0x4abB24590606f5bf4645185e20C4E7B97596cA3B";
             const self = this as any as oracleContract;
             const encodedData = self._strictEncodeArguments('getTradeData(address,address,uint256)', [src,
         dest,
@@ -94,6 +96,7 @@ export class oracleContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<[BigNumber, BigNumber]
         > {
+            callData.from = "0x4abB24590606f5bf4645185e20C4E7B97596cA3B";
             const self = this as any as oracleContract;
             const encodedData = self._strictEncodeArguments('getExpectedRate(address,address,uint256)', [src,
         dest,
