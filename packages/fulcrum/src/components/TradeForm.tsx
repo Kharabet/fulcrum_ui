@@ -432,7 +432,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
         <div className="trade-form__form-container" style={this.props.tradeType === TradeType.SELL ? { minHeight: `16.5625rem` } : undefined}>
           <div className="trade-form__form-values-container">
             <div className="trade-form__form-info">
-              The protocol has been locked. press eject to have the administrator close your position. Ejections happen approximately every 5 hours.
+              The protocol has been locked. Press eject to have the administrator close your position. Ejections can take up to 5 hours.
             </div>
             {/* <div className="trade-form__amount-container">
               <input
