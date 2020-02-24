@@ -22,7 +22,7 @@ interface IBurnerFormProps {
 }
 interface IBurnerFormState {
   isAdmin: boolean
-  burnResult: number | undefined
+  burnResult: string | undefined
 }
 
 export class BurnerForm extends Component<IBurnerFormProps, IBurnerFormState> {
@@ -83,7 +83,7 @@ export class BurnerForm extends Component<IBurnerFormProps, IBurnerFormState> {
           <input type="text" name="amountToBurn" />
           <div>Selected key: {this.props.selectedKey.toString()}</div>
           <button type="submit">Burn Selected pToken</button>
-          {this.state.burnResult || this.state.burnResult === 0 ? <div>Burn result: {this.state.burnResult}</div> : null}
+          {this.state.burnResult || this.state.burnResult === "" ? <div>Burn result: {this.state.burnResult}</div> : null}
         </form>
       </div>
     );

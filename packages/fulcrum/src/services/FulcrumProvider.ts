@@ -1540,8 +1540,8 @@ export class FulcrumProvider {
     return result;
   }
 
-  public async BurnPToken(selectedKey: TradeTokenKey, amount: number): Promise<number> {
-    let result: number = 0;
+  public async BurnPToken(selectedKey: TradeTokenKey, amount: number): Promise<string> {
+    let result: string = "";
     const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : undefined;
     try {
       if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
@@ -1569,10 +1569,10 @@ export class FulcrumProvider {
             const amountInBaseUnits = new BigNumber(new BigNumber(amount).multipliedBy(10 ** decimals).toFixed(0, 1));
             if (burnerContract && pTokenAddress && minUnderlyingPrice && maxUnderlyingPrice && amountInBaseUnits) {
               console.warn(`pTokenAddress: ${pTokenAddress}`)
-              console.warn(`amount: ${amount.toFixed()}`)
+              console.warn(`amount: ${amountInBaseUnits.toFixed()}`)
               console.warn(`minUnderlyingPrice: ${minUnderlyingPrice.toFixed()}`)
               console.warn(`maxUnderlyingPrice: ${maxUnderlyingPrice.toFixed()}`)
-              result = await burnerContract.burn.estimateGasAsync(pTokenAddress, amountInBaseUnits, minUnderlyingPrice, maxUnderlyingPrice, { from: account });
+              result = await burnerContract.burn.sendTransactionAsync(pTokenAddress, amountInBaseUnits, minUnderlyingPrice, maxUnderlyingPrice, { from: account });
 
               console.warn(`txnHash: ${result}`);
             }
