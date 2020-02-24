@@ -127,6 +127,23 @@ export class OwnTokenGrid extends Component<IOwnTokenGridProps, IOwnTokenGridSta
       )
     );
   };
+  public onEjectClick = (event: React.MouseEvent<HTMLElement>) => {
+    event.stopPropagation();
+
+    this.props.onTrade(
+      new TradeRequest(
+        TradeType.EJECT,
+        this.props.selectedKey.asset,
+        this.props.selectedKey.unitOfAccount,
+        this.props.selectedKey.positionType === PositionType.SHORT ? this.props.selectedKey.asset : Asset.USDC,
+        this.props.selectedKey.positionType,
+        this.props.selectedKey.leverage,
+        new BigNumber(0),
+        this.props.selectedKey.isTokenized,
+        this.props.selectedKey.version
+      )
+    );
+  };
 
   private static getRowsData = async (props: IOwnTokenGridProps): Promise<IOwnTokenGridRowProps[]> => {
     const rowsData: IOwnTokenGridRowProps[] = [];

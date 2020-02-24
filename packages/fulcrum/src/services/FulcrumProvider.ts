@@ -44,6 +44,7 @@ import { TradeSellEthProcessor } from "./processors/TradeSellEthProcessor";
 import { UnlendChaiProcessor } from "./processors/UnlendChaiProcessor";
 import { UnlendErcProcessor } from "./processors/UnlendErcProcessor";
 import { UnlendEthProcessor } from "./processors/UnlendEthProcessor";
+import { PTokenEjectProcessor } from "./processors/PTokenEjectProcessor";
 
 import siteConfig from "./../config/SiteConfig.json";
 
@@ -2067,7 +2068,7 @@ export class FulcrumProvider {
           }
           await processor.run(task, account, skipGas);
         }
-      } else {
+      } else if (taskRequest.tradeType === TradeType.SELL){
         if (taskRequest.collateral !== Asset.ETH) {
           const processor = new TradeSellErcProcessor();
           await processor.run(task, account, skipGas);
@@ -2075,7 +2076,10 @@ export class FulcrumProvider {
           const processor = new TradeSellEthProcessor();
           await processor.run(task, account, skipGas);
         }
-      }
+      } else if (taskRequest.tradeType === TradeType.EJECT){
+        const processor = new PTokenEjectProcessor();
+        await processor.run(task, account, skipGas);
+      } 
 
       task.processingEnd(true, false, null);
     } catch (e) {

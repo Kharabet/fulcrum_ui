@@ -211,9 +211,9 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
       </div>
       <div className="own-token-grid-row__col-action" style={{ textAlign: `right` }}>
 
-        {/*<button className="own-token-grid-row__sell-button own-token-grid-row__button--size-half" onClick={this.onSellClick}>
-          {TradeType.SELL}
-        </button>*/}
+        <button className="own-token-grid-row__sell-button own-token-grid-row__button--size-half" onClick={this.onEjectClick}>
+          {TradeType.EJECT}
+        </button>
       </div>
     </div></React.Fragment>
     ) : (
@@ -265,9 +265,9 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
               }
             </div>
             <div className="own-token-grid-row-inner__col-action" style={{ textAlign: `right` }}>
-              {/*<button className="own-token-grid-row-inner__sell-button own-token-grid-row-inner__button--size-half" onClick={this.onSellClick}>
-                {TradeType.SELL}
-              </button>*/}
+              <button className="own-token-grid-row-inner__sell-button own-token-grid-row-inner__button--size-half" onClick={this.onEjectClick}>
+                {TradeType.EJECT}
+              </button>
             </div>
           </div>
         </React.Fragment>
@@ -317,6 +317,23 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
     this.props.onTrade(
       new TradeRequest(
         TradeType.SELL,
+        this.props.currentKey.asset,
+        this.props.currentKey.unitOfAccount,
+        this.props.currentKey.positionType === PositionType.SHORT ? this.props.currentKey.asset : Asset.USDC,
+        this.props.currentKey.positionType,
+        this.props.currentKey.leverage,
+        new BigNumber(0),
+        this.props.currentKey.isTokenized,
+        this.props.currentKey.version
+      )
+    );
+  };
+  public onEjectClick = (event: React.MouseEvent<HTMLElement>) => {
+    event.stopPropagation();
+
+    this.props.onTrade(
+      new TradeRequest(
+        TradeType.EJECT,
         this.props.currentKey.asset,
         this.props.currentKey.unitOfAccount,
         this.props.currentKey.positionType === PositionType.SHORT ? this.props.currentKey.asset : Asset.USDC,
