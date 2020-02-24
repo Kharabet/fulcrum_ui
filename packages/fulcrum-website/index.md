@@ -343,7 +343,10 @@ title: Crypto Margin Trading with Fulcrum | bZx
             <div class="col col-8 col-md-10 col-sm-12">
                 <div id="accordion">
                     <div class="accordion-item active">
-                        <h4 class="accordion-toggle">What does going long or short mean in trading?</h4>
+                        <h4 class="accordion-toggle">
+                            What does going long or short mean in trading?
+                            <span class="accordion-position"></span>
+                        </h4>
                         <div class="accordion-content">
                             <p>Margin trading has two main aspects: leverage and shorting. When trading with leverage, a trader borrows assets to increase the amount of assets they are trading. By doing so, they magnify the gains or losses of their trade. The borrowed assets are known as a margin loan. To obtain the margin loan, the trader puts up assets that serve as collateral. The terms of the margin loan specify a collateral-to-loan ratio. If the trade falls below the specified ratio, the trade is liquidated and the lender gets repaid using the trader's collateral.
 
@@ -353,7 +356,10 @@ Margin trading also includes shorting. When shorting, a trader essentially sells
                         </div>
                     </div>
                     <div class="accordion-item">
-                        <h4 class="accordion-toggle">How are positions liquidated? Is there liquidity risk?</h4>
+                        <h4 class="accordion-toggle">
+                            How are positions liquidated? Is there liquidity risk?
+                            <span class="accordion-position"></span>
+                        </h4>
                         <div class="accordion-content">
                             <p>Positions are liquidated using KyberSwap. When a trader goes under margin maintenance (15%), they are only partially liquidated, bringing their current margin to 25%.
 
@@ -363,7 +369,10 @@ This ensures redundancy in the margin calling process. Moreover, there is an ins
                         </div>
                     </div>
                     <div class="accordion-item">
-                        <h4 class="accordion-toggle">Are the smart contracts safe? Can I see the audits?</h4>
+                        <h4 class="accordion-toggle">
+                            Are the smart contracts safe? Can I see the audits?
+                            <span class="accordion-position"></span>
+                        </h4>
                         <div class="accordion-content">
                             <p>Yes. The base protocol audit is <a href="https://github.com/mattdf/audits/blob/master/bZx/bzx-audit.pdf">publicly available</a>. All custody is retained by the base protocol. Both the base protocol audit and iToken/pToken audit were conducted by <a href="https://github.com/mattdf/audits/blob/master/bZx/bzx-audit.pdf">ZK Labs</a>, a recognized leader in the space. Matthew DiFerrante, founder and lead auditor at ZK Labs, is a security engineer at the Ethereum Foundation and audits the Ethereum core protocol itself.</p>
                         </div>

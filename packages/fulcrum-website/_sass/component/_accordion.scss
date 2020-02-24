@@ -1,3 +1,29 @@
+@keyframes accordionIn {
+  0% {
+    opacity: 0;
+    transform:scale(0.9) rotateX(-60deg);
+    transform-origin: 50% 0;
+    max-height: 0;
+  }
+  100% {
+    opacity:1;
+    transform:scale(1);
+    max-height: 441px;
+  }
+}
+@keyframes accordionOut {
+  0% {
+    opacity:1;
+    transform:scale(1);
+    max-height: 441px;
+  }
+  100% {
+    opacity: 0;
+    transform:scale(0.9) rotateX(-60deg);
+    transform-origin: 50% 0;
+    max-height: 0;
+  }
+}
 #accordion {
   text-align: left;
   @media(min-width: 580px){
@@ -14,36 +40,57 @@
     .accordion-toggle {
       position: relative;
       padding-right: 60px;
-      &:before {
-        content: "";
-        background-image: url(/images/accordion-close.svg);
-        background-position: 50%;
-        background-repeat: no-repeat;
+      .accordion-position{
+        position: absolute;
         width: 30px;
         height: 30px;
-        position: absolute;
-        right: 15px;
-        border-radius: 50%;
         top: 0;
         bottom: 0;
         margin: auto;
-        display: flex;
-        justify-content: center;
-        align-content: center;
+        right: 15px;
+        background-color: transparent;
+        transition: all 0.15s;
+        border-radius: 50%;
+        &:before, &:after {
+          content: "";
+          background-color: #276bfb;
+          width: 12px;
+          height: 2px;
+          border-radius: 2px;
+          position: absolute;
+          left: 0;
+          right: 0;
+          top: 0;
+          bottom: 0;
+          margin: auto;
+          display: flex;
+          justify-content: center;
+          align-content: center;
+          
+        }
+        &:after{
+          transform: rotate(0);
+          transition: transform 0.15s;
+        }
       }
+
     }
     .accordion-content {
-      display: none;
+      animation: accordionOut 0.45s normal ease-in-out both 1; 
     }
     &.active {
       .accordion-content {
-        display: block;
+        animation: accordionIn 0.45s normal ease-in-out both 1; 
+        padding-bottom: 30px;
       }
       .accordion-toggle {
         color: #276bfb;
-        &:before {
-          background-image: url(/images/accordion-open.svg);
-          background-color: var(--accordion-bg);
+        .accordion-position{
+          background-color: #ffffff;
+          transition: all 0.15s;
+          &:after{
+            transform: rotate(-90deg);
+          }
         }
       }
     }
@@ -61,7 +108,6 @@
   }
   .accordion-content {
     padding-left: 30px;
-    margin-bottom: 45px;
     @media (max-width: 579px) {
       padding-right: 15px;
     }
