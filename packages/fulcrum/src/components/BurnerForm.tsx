@@ -22,6 +22,7 @@ interface IBurnerFormProps {
 }
 interface IBurnerFormState {
   isAdmin: boolean
+  burnResult: number | undefined
 }
 
 export class BurnerForm extends Component<IBurnerFormProps, IBurnerFormState> {
@@ -30,7 +31,8 @@ export class BurnerForm extends Component<IBurnerFormProps, IBurnerFormState> {
     super(props, context);
 
     this.state = {
-      isAdmin: false
+      isAdmin: false,
+      burnResult: undefined
     }
 
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
@@ -65,6 +67,7 @@ export class BurnerForm extends Component<IBurnerFormProps, IBurnerFormState> {
     if (FulcrumProvider.Instance && this.state.isAdmin) {
       const burnedPTokenResponse = await FulcrumProvider.Instance.BurnPToken(this.props.selectedKey, amount)
       console.log("burn result:" + burnedPTokenResponse)
+      this.setState({...this.state, burnResult: burnedPTokenResponse})
     }
   }
 
@@ -80,6 +83,7 @@ export class BurnerForm extends Component<IBurnerFormProps, IBurnerFormState> {
           <input type="text" name="amountToBurn" />
           <div>Selected key: {this.props.selectedKey.toString()}</div>
           <button type="submit">Burn Selected pToken</button>
+          {this.state.burnResult || this.state.burnResult === 0 ? <div>Burn result: {this.state.burnResult}</div> : null}
         </form>
       </div>
     );

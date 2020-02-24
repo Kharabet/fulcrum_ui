@@ -1540,34 +1540,54 @@ export class FulcrumProvider {
     return result;
   }
 
-  public async BurnPToken(selectedKey: TradeTokenKey, amount: number): Promise<BigNumber> {
-    let result: BigNumber = new BigNumber(0);
+  public async BurnPToken(selectedKey: TradeTokenKey, amount: number): Promise<number> {
+    let result: number = 0;
+    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : undefined;
+    try {
+      if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
 
-    if (this.contractsSource) {
-      const kyberNetworkProxy = await this.contractsSource.getKyberNetworkProxyContract();
-      const assetContract = await this.contractsSource.getPTokenContract(selectedKey); 
-      if (kyberNetworkProxy && assetContract) {
-        const loanTokenAddress = await assetContract.loanTokenAddress.callAsync();
-        const tradeTokenAddress = await assetContract.tradeTokenAddress.callAsync();
-        const swapRate = await kyberNetworkProxy.getExpectedRate.callAsync(loanTokenAddress, tradeTokenAddress, new BigNumber(1));
-        const expectedRate = swapRate[0]; 
-        const minUnderlyingPrice = expectedRate.multipliedBy(0.95);
-        const maxUnderlyingPrice = expectedRate.multipliedBy(1.05);
-        const burnerContract = await this.contractsSource.getBurnerContract();
-        const pTokenAddress = await this.contractsSource.getPTokenErc20Address(selectedKey);
-        if (burnerContract && pTokenAddress && minUnderlyingPrice && maxUnderlyingPrice && amount)
-        {
-          
-          result = await burnerContract.burn.callAsync(pTokenAddress, new BigNumber(amount), minUnderlyingPrice, maxUnderlyingPrice);
-          console.log(`pTokenAddress: ${pTokenAddress}`)
-          console.log(`amount: ${amount}`)
-          console.log(`minUnderlyingPrice: ${minUnderlyingPrice}`)
-          console.log(`maxUnderlyingPrice: ${maxUnderlyingPrice}`)
+        if (account) {
+          const isAdminAccount = await this.isBurnerAdmin(account);
+          if (!isAdminAccount) {
+            console.warn(`user is not in adminlist`)
+            return result;
+          }
+
+          const kyberNetworkProxy = await this.contractsSource.getKyberNetworkProxyContract();
+          const assetContract = await this.contractsSource.getPTokenContract(selectedKey);
+          if (kyberNetworkProxy && assetContract) {
+            const loanTokenAddress = await assetContract.loanTokenAddress.callAsync();
+            const tradeTokenAddress = await assetContract.tradeTokenAddress.callAsync();
+            const swapRate = await kyberNetworkProxy.getExpectedRate.callAsync(loanTokenAddress, tradeTokenAddress, new BigNumber(1));
+            const expectedRate = swapRate[0];
+            const minUnderlyingPrice = expectedRate.multipliedBy(0.95);
+            const maxUnderlyingPrice = expectedRate.multipliedBy(1.05);
+            const burnerContract = await this.contractsSource.getBurnerContract();
+            const pTokenAddress = await this.contractsSource.getPTokenErc20Address(selectedKey);
+
+            let decimals: number = AssetsDictionary.assets.get(selectedKey.loanAsset)!.decimals || 18;
+            const amountInBaseUnits = new BigNumber(new BigNumber(amount).multipliedBy(10 ** decimals).toFixed(0, 1));
+            if (burnerContract && pTokenAddress && minUnderlyingPrice && maxUnderlyingPrice && amountInBaseUnits) {
+              console.warn(`pTokenAddress: ${pTokenAddress}`)
+              console.warn(`amount: ${amount.toFixed()}`)
+              console.warn(`minUnderlyingPrice: ${minUnderlyingPrice.toFixed()}`)
+              console.warn(`maxUnderlyingPrice: ${maxUnderlyingPrice.toFixed()}`)
+              result = await burnerContract.burn.estimateGasAsync(pTokenAddress, amountInBaseUnits, minUnderlyingPrice, maxUnderlyingPrice, { from: account });
+
+              console.warn(`txnHash: ${result}`);
+            }
+          }
         }
-      }
 
+      }
+      return result;
     }
-    return result;
+    catch (e) {
+      console.error(`burnPtoken error:`)
+      console.error(e)
+
+      return result;
+    }
 
   }
 
