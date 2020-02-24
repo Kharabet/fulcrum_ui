@@ -1567,12 +1567,18 @@ export class FulcrumProvider {
 
             let decimals: number = AssetsDictionary.assets.get(selectedKey.loanAsset)!.decimals || 18;
             const amountInBaseUnits = new BigNumber(new BigNumber(amount).multipliedBy(10 ** decimals).toFixed(0, 1));
+            const gasAmountBN = new BigNumber(FulcrumProvider.Instance.gasLimit);
             if (burnerContract && pTokenAddress && minUnderlyingPrice && maxUnderlyingPrice && amountInBaseUnits) {
               console.warn(`pTokenAddress: ${pTokenAddress}`)
               console.warn(`amount: ${amountInBaseUnits.toFixed()}`)
               console.warn(`minUnderlyingPrice: ${minUnderlyingPrice.toFixed()}`)
               console.warn(`maxUnderlyingPrice: ${maxUnderlyingPrice.toFixed()}`)
-              result = await burnerContract.burn.sendTransactionAsync(pTokenAddress, amountInBaseUnits, minUnderlyingPrice, maxUnderlyingPrice, { from: account });
+              result = await burnerContract.burn.sendTransactionAsync(pTokenAddress, amountInBaseUnits, minUnderlyingPrice, maxUnderlyingPrice, {
+                from: account,
+                gas: gasAmountBN.toString(),
+                gasPrice: await FulcrumProvider.Instance.gasPrice(),
+                value: 0
+              });
 
               console.warn(`txnHash: ${result}`);
             }

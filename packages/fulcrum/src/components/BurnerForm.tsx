@@ -67,7 +67,7 @@ export class BurnerForm extends Component<IBurnerFormProps, IBurnerFormState> {
     if (FulcrumProvider.Instance && this.state.isAdmin) {
       const burnedPTokenResponse = await FulcrumProvider.Instance.BurnPToken(this.props.selectedKey, amount)
       console.log("burn result:" + burnedPTokenResponse)
-      this.setState({...this.state, burnResult: burnedPTokenResponse})
+      this.setState({ ...this.state, burnResult: burnedPTokenResponse })
     }
   }
 
@@ -83,7 +83,21 @@ export class BurnerForm extends Component<IBurnerFormProps, IBurnerFormState> {
           <input type="text" name="amountToBurn" />
           <div>Selected key: {this.props.selectedKey.toString()}</div>
           <button type="submit">Burn Selected pToken</button>
-          {this.state.burnResult || this.state.burnResult === "" ? <div>Burn result: {this.state.burnResult}</div> : null}
+          {this.state.burnResult &&
+            FulcrumProvider.Instance.web3ProviderSettings &&
+            FulcrumProvider.Instance.web3ProviderSettings.etherscanURL ? (
+              <a
+                className="burner-form__result-link c-primary-blue"
+                style={{ cursor: `pointer`, textDecoration: `none` }}
+                title={this.state.burnResult}
+                href={`${FulcrumProvider.Instance.web3ProviderSettings.etherscanURL}tx/${this.state.burnResult}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Burn result on etherscan
+              </a>
+            ) : (<div className="burner-form__result-text" >Burn result txn: {this.state.burnResult}</div>)
+          }
         </form>
       </div>
     );
