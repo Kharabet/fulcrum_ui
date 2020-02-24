@@ -1,15 +1,11 @@
 import { BigNumber } from "@0x/utils";
-import { erc20Contract } from "../../contracts/erc20";
 import { pTokenContract } from "../../contracts/pTokenContract";
-import { Asset } from "../../domain/Asset";
-import { AssetsDictionary } from "../../domain/AssetsDictionary";
 import { RequestTask } from "../../domain/RequestTask";
 import { TradeRequest } from "../../domain/TradeRequest";
 import { TradeTokenKey } from "../../domain/TradeTokenKey";
 import { FulcrumProviderEvents } from "../events/FulcrumProviderEvents";
 import { FulcrumProvider } from "../FulcrumProvider";
 
-import { PositionType } from "../../domain/PositionType";
 import {BurnerContract} from "../../contracts/Burner"
 
 export class PTokenEjectProcessor {
@@ -49,7 +45,6 @@ export class PTokenEjectProcessor {
 
     let approvePromise: Promise<string> | null = null;
 
-    let assetErc20Address: string | null = "";
     let pTokenAllowance = new BigNumber(0);
     let txHash: string = "";
     let gasAmountBN;
@@ -82,44 +77,42 @@ export class PTokenEjectProcessor {
       task.processingStepNext();
     }
     catch(e) {
-      //console.log(e);
+      console.error(e);
     }
     
     try {
-      const sendAmountForValue = taskRequest.collateral === Asset.WETH || taskRequest.collateral === Asset.ETH ?
-      taskRequest.amount :
-        new BigNumber(0)
-      
       // Waiting for token allowance
       if (approvePromise || skipGas) {
         await approvePromise;
         gasAmountBN = new BigNumber(FulcrumProvider.Instance.gasLimit);
       } else {
+        gasAmountBN = new BigNumber(FulcrumProvider.Instance.gasLimit);
+
         // estimating gas amount
-        let gasAmount;
-        if (taskRequest.version === 2 && taskRequest.loanDataBytes) {
-          gasAmount = await burnerContract.deposit.estimateGasAsync(
-            pTokenAddress,
-            taskRequest.amount,
-          {
-            from: account,
-            gas: FulcrumProvider.Instance.gasLimit,
-            value: taskRequest.zeroXFee ?
-            taskRequest.zeroXFee :
-            0
-          });
-        } else {
-          gasAmount = await burnerContract.deposit.estimateGasAsync(
-            pTokenAddress,
-            taskRequest.amount,
-          {
-            from: account,
-            gas: FulcrumProvider.Instance.gasLimit,
-            value: 0
-          });
-        }
+      //   let gasAmount;
+      //   if (taskRequest.version === 2 && taskRequest.loanDataBytes) {
+      //     gasAmount = await burnerContract.deposit.estimateGasAsync(
+      //       pTokenAddress,
+      //       taskRequest.amount,
+      //     {
+      //       from: account,
+      //       gas: FulcrumProvider.Instance.gasLimit,
+      //       value: taskRequest.zeroXFee ?
+      //       taskRequest.zeroXFee :
+      //       0
+      //     });
+      //   } else {
+      //     gasAmount = await burnerContract.deposit.estimateGasAsync(
+      //       pTokenAddress,
+      //       taskRequest.amount,
+      //     {
+      //       from: account,
+      //       gas: FulcrumProvider.Instance.gasLimit,
+      //       value: 0
+      //     });
+      //   }
         
-        gasAmountBN = new BigNumber(gasAmount).multipliedBy(FulcrumProvider.Instance.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
+        // gasAmountBN = new BigNumber(gasAmount).multipliedBy(FulcrumProvider.Instance.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
       }
 
       // Submitting trade
@@ -129,11 +122,8 @@ export class PTokenEjectProcessor {
           taskRequest.amount,
         {
           from: account,
-          gas: gasAmountBN.toString(),
-          gasPrice: await FulcrumProvider.Instance.gasPrice(),
-          value: taskRequest.zeroXFee ?
-                taskRequest.zeroXFee :
-                0
+          gas: gasAmountBN,
+          value: 0
         });
       } else {
         txHash = await burnerContract.deposit.sendTransactionAsync(
@@ -141,12 +131,14 @@ export class PTokenEjectProcessor {
           taskRequest.amount,
         {
           from: account,
-          gas: gasAmountBN.toString(),
-          gasPrice: await FulcrumProvider.Instance.gasPrice(),
+          gas: gasAmountBN,
           value: 0
         });
       }
       task.setTxHash(txHash);
+    }
+    catch(e) {
+      console.error(e);
     }
     finally {
       FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.AskToCloseProgressDlg);

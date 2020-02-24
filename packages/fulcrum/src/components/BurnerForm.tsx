@@ -83,7 +83,7 @@ export class BurnerForm extends Component<IBurnerFormProps, IBurnerFormState> {
           <input type="text" name="amountToBurn" />
           <div>Selected key: {this.props.selectedKey.toString()}</div>
           <button type="submit">Burn Selected pToken</button>
-          {this.state.burnResult &&
+          {this.state.burnResult ?
             FulcrumProvider.Instance.web3ProviderSettings &&
             FulcrumProvider.Instance.web3ProviderSettings.etherscanURL ? (
               <a
@@ -97,6 +97,7 @@ export class BurnerForm extends Component<IBurnerFormProps, IBurnerFormState> {
                 Burn result on etherscan
               </a>
             ) : (<div className="burner-form__result-text" >Burn result txn: {this.state.burnResult}</div>)
+            : null
           }
         </form>
       </div>
