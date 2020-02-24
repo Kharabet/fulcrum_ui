@@ -729,12 +729,12 @@ export class FulcrumProvider {
         result = new BigNumber(0);
         const assetContract = await this.contractsSource.getITokenContract(asset);
         if (assetContract) {
-          let swapPrice;
+          /*let swapPrice;
           try {
             swapPrice = await this.getSwapToUsdRate(asset);
           } catch(e) {
             // console.log(e);
-          }
+          }*/
 
           const tokenPrice = await assetContract.tokenPrice.callAsync();
           const checkpointPrice = await assetContract.checkpointPrice.callAsync(account);
@@ -744,10 +744,10 @@ export class FulcrumProvider {
             .multipliedBy(balance)
             .dividedBy(10**36);
 
-          if (swapPrice && swapPrice.gt(0)) {
+          /*if (swapPrice && swapPrice.gt(0)) {
             result = result
               .multipliedBy(swapPrice);
-          }
+          }*/
         }
       }
     }
