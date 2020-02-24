@@ -1,45 +1,23 @@
-@keyframes accordionIn {
-  0% {
-    opacity: 0;
-    transform:scale(0.9) rotateX(-60deg);
-    transform-origin: 50% 0;
-    max-height: 0;
-  }
-  100% {
-    opacity:1;
-    transform:scale(1);
-    max-height: 441px;
-  }
-}
-@keyframes accordionOut {
-  0% {
-    opacity:1;
-    transform:scale(1);
-    max-height: 441px;
-  }
-  100% {
-    opacity: 0;
-    transform:scale(0.9) rotateX(-60deg);
-    transform-origin: 50% 0;
-    max-height: 0;
-  }
-}
 #accordion {
   text-align: left;
-  @media(min-width: 580px){
-    margin-bottom: 60px;
-  }
-  @media(max-width: 579px){
-    margin-bottom: 45px;
-  }
+  width: 100%;
   .accordion-item {
     border-bottom: 1px solid var(--accordion-border);
+    z-index: 2;
+    position: relative;
     &:first-child {
       border-top: 1px solid var(--accordion-border);
     }
     .accordion-toggle {
       position: relative;
+      z-index: 2;
+      background-color: var(--primary-bg);
       padding-right: 60px;
+      &:not(.active){
+        position: relative;
+        z-index: 2;
+        background-color: var(--primary-bg);
+      }
       .accordion-position{
         position: absolute;
         width: 30px;
@@ -48,7 +26,7 @@
         bottom: 0;
         margin: auto;
         right: 15px;
-        background-color: transparent;
+        background-color: #ffffff;
         transition: all 0.15s;
         border-radius: 50%;
         &:before, &:after {
@@ -76,17 +54,24 @@
 
     }
     .accordion-content {
-      animation: accordionOut 0.45s normal ease-in-out both 1; 
+      &:not(.active){
+        position: relative;
+        z-index: 2;
+        background-color: var(--primary-bg);
+      }
+      max-height: 0;
+      transition: max-height .3s cubic-bezier(0, 0, 1, 1);
     }
     &.active {
       .accordion-content {
-        animation: accordionIn 0.45s normal ease-in-out both 1; 
+        max-height: 441px;
+        transition: max-height .3s cubic-bezier(0, 0, 1, 1);
         padding-bottom: 30px;
       }
       .accordion-toggle {
         color: #276bfb;
         .accordion-position{
-          background-color: #ffffff;
+          background-color: transparent;
           transition: all 0.15s;
           &:after{
             transform: rotate(-90deg);
@@ -115,4 +100,9 @@
       color: var(--secondary-color);
     }
   }
+}
+.after-accordion{
+  position: relative;
+  z-index: 2;
+  background-color: var(--primary-bg);
 }

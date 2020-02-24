@@ -207,13 +207,29 @@ function updateButtonGains(e) {
     e.currentTarget.classList.add("active");
     updateChartData();
 }
-
-function updateAccordion(e) {
-    var items = document.querySelectorAll('.accordion-item');
-    for (var i = 0; i < items.length; i++) {
-        items[i].classList.remove("active");
+setAriaAttr = function (el, ariaType, newProperty) {
+    el.setAttribute(ariaType, newProperty);
+};
+setAccordionAria = function (el2, expanded) {
+    switch (expanded) {
+        case "true":
+            setAriaAttr(el2, 'aria-hidden', 'false');
+            break;
+        case "false":
+            setAriaAttr(el2, 'aria-hidden', 'true');
+            break;
+        default:
+            break;
     }
-    e.currentTarget.parentElement.classList.add("active");
+};
+function updateAccordion(e) {   
+    if(e.currentTarget.parentElement.classList.contains("active")){        
+        setAccordionAria(e.currentTarget.nextElementSibling, "false");
+        e.currentTarget.parentElement.classList.remove("active");
+    }else{
+        setAccordionAria(e.currentTarget.nextElementSibling, "true");
+        e.currentTarget.parentElement.classList.add("active");
+    }
 }
 
 function onSpinnerClick() {
@@ -327,4 +343,3 @@ function drawLabels(t, ctx) {
     });
     ctx.restore();
 }
-
