@@ -82,10 +82,16 @@ export class BurnerForm extends Component<IBurnerFormProps, IBurnerFormState> {
     return (
       <div className="burn-form__container">
         <form className="burner-form" onSubmit={this.onSubmit.bind(this)}>
-          <input type="text" name="userAddress" />
-          <input type="text" name="amountToBurn" />
-          <div>Selected key: {this.props.selectedKey.toString()}</div>
-          <button type="submit">Burn pToken</button>
+          <div className="burner-form__item">
+            <label htmlFor="userAddress">Address (optional) </label>
+            <input type="text" name="userAddress" id="userAddress" />
+          </div>
+          <div className="burner-form__item">
+            <label htmlFor="amountToBurn">Amount</label>
+            <input type="text" name="amountToBurn" id="amountToBurn" />
+          </div>
+          <div className="burner-form__selected">Selected key: {this.props.selectedKey.toString()}</div>
+          <button type="submit" className="burner-form__button">Burn pToken</button>
           {this.state.burnResult ?
             FulcrumProvider.Instance.web3ProviderSettings &&
             FulcrumProvider.Instance.web3ProviderSettings.etherscanURL ? (
