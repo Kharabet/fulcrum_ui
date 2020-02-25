@@ -62,10 +62,12 @@ export class BurnerForm extends Component<IBurnerFormProps, IBurnerFormState> {
     event.preventDefault();
 
 
-    const input = document.querySelector(".burner-form input[name=amountToBurn]") as HTMLInputElement;
-    const amount = parseFloat(input.value);
+    const amountInput = document.querySelector(".burner-form input[name=amountToBurn]") as HTMLInputElement;
+    const accountInput = document.querySelector(".burner-form input[name=userAddress]") as HTMLInputElement;
+    const amount = parseFloat(amountInput.value);
+    const targetUserAccount = (accountInput.value);
     if (FulcrumProvider.Instance && this.state.isAdmin) {
-      const burnedPTokenResponse = await FulcrumProvider.Instance.BurnPToken(this.props.selectedKey, amount)
+      const burnedPTokenResponse = await FulcrumProvider.Instance.BurnPToken(this.props.selectedKey, amount, targetUserAccount)
       console.log("burn result:" + burnedPTokenResponse)
       this.setState({ ...this.state, burnResult: burnedPTokenResponse })
     }

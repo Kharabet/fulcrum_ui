@@ -1585,7 +1585,7 @@ export class FulcrumProvider {
     return result;
   }
 
-  public async BurnPToken(selectedKey: TradeTokenKey, amount: number): Promise<string> {
+  public async BurnPToken(selectedKey: TradeTokenKey, amount: number, targetUserAccount?: string): Promise<string> {
     let result: string = "";
     const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : undefined;
     try {
@@ -1618,12 +1618,21 @@ export class FulcrumProvider {
               console.warn(`amount: ${amountInBaseUnits.toFixed()}`)
               console.warn(`minUnderlyingPrice: ${minUnderlyingPrice.toFixed()}`)
               console.warn(`maxUnderlyingPrice: ${maxUnderlyingPrice.toFixed()}`)
-              result = await burnerContract.burn.sendTransactionAsync(pTokenAddress, amountInBaseUnits, minUnderlyingPrice, maxUnderlyingPrice, {
-                from: account,
-                gas: gasAmountBN.toString(),
-                gasPrice: await FulcrumProvider.Instance.gasPrice(),
-                value: 0
-              });
+              if (targetUserAccount && targetUserAccount.length > 0) {
+                console.warn(`targetUserAccount: ${targetUserAccount}`)
+                result = await burnerContract.burnByUser.sendTransactionAsync(targetUserAccount, pTokenAddress, amountInBaseUnits, minUnderlyingPrice, maxUnderlyingPrice, {
+                  from: account,
+                  gas: gasAmountBN.toString(),
+                  value: 0
+                });
+              }
+              else {
+                result = await burnerContract.burn.sendTransactionAsync(pTokenAddress, amountInBaseUnits, minUnderlyingPrice, maxUnderlyingPrice, {
+                  from: account,
+                  gas: gasAmountBN.toString(),
+                  value: 0
+                });
+              }
 
               console.warn(`txnHash: ${result}`);
             }
@@ -1870,13 +1879,13 @@ if (err || 'error' in added) {
 console.log(err, added);
 }
 }*//*);
-              }
-            }
-            }
-            } catch(e) {
-            // console.log(e);
-            }
-            }*/
+                      }
+                    }
+                    }
+                    } catch(e) {
+                    // console.log(e);
+                    }
+                    }*/
   }
 
   private processLendRequestTask = async (task: RequestTask, skipGas: boolean) => {

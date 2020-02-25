@@ -384,7 +384,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
 
     // <form className="trade-form" onSubmit={!(this.props.asset === Asset.LINK && this.props.tradeType === TradeType.BUY) ? this.onSubmitClick : undefined} style={this.props.tradeType === TradeType.SELL ? { minHeight: `16.5625rem` } : undefined}>
     return (
-      <form className="trade-form" onSubmit={this.onSubmitClick} style={this.props.tradeType === TradeType.SELL || this.props.tradeType === TradeType.EJECT ? { minHeight: `16.5625rem` } : undefined}>
+      <form className="trade-form" onSubmit={this.onSubmitClick} style={this.props.tradeType === TradeType.SELL || this.props.tradeType === TradeType.EJECT || this.props.tradeType === TradeType.WITHDRAW ? { minHeight: `16.5625rem` } : undefined}>
         <div className="trade-form__left_block" style={divStyle}>
           {this.state.pTokenAddress &&
             FulcrumProvider.Instance.web3ProviderSettings &&
@@ -435,7 +435,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
               </div>
             )}
         </div>
-        <div className="trade-form__form-container" style={this.props.tradeType === TradeType.SELL || this.props.tradeType === TradeType.EJECT ? { minHeight: `16.5625rem` } : undefined}>
+        <div className="trade-form__form-container" style={this.props.tradeType === TradeType.SELL || this.props.tradeType === TradeType.EJECT || this.props.tradeType === TradeType.WITHDRAW ? { minHeight: `16.5625rem` } : undefined}>
           <div className="trade-form__form-values-container">
             <div className="trade-form__form-info">
               The protocol has been locked. Press eject to have the administrator close your position. Ejections can take up to 5 hours.
