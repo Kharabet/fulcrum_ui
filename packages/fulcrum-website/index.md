@@ -380,7 +380,7 @@ This ensures redundancy in the margin calling process. Moreover, there is an ins
                 </div>
             </div>
         </div>
-        <div class="row pt-60 after-accordion">
+        <div class="row pt-60">
             <div class="col col-12">
                 <a href="https://help.bzx.network/en/" class="button button-sm button-white mx-auto">
                     <span class="mr-15">Help center</span>
@@ -391,7 +391,7 @@ This ensures redundancy in the margin calling process. Moreover, there is an ins
             </div>
         </div>
     </div>
-    <div class="container after-accordion pt-75 pt-xs-60">
+    <div class="container pt-75 pt-xs-60">
         <div class="row jc-c">
             <div class="col col-10 col-md-12 jc-sb fw-md-w">
                 <div class="order-md-1 mb-xs-30 mx-xs-auto">

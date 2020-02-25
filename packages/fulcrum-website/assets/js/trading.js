@@ -207,16 +207,16 @@ function updateButtonGains(e) {
     e.currentTarget.classList.add("active");
     updateChartData();
 }
-setAriaAttr = function (el, ariaType, newProperty) {
+function setAriaAttr (el, ariaType, newProperty) {
     el.setAttribute(ariaType, newProperty);
 };
-setAccordionAria = function (el2, expanded) {
+function setAccordionAria (el, expanded) {
     switch (expanded) {
         case "true":
-            setAriaAttr(el2, 'aria-hidden', 'false');
+            setAriaAttr(el, 'aria-hidden', 'false');
             break;
         case "false":
-            setAriaAttr(el2, 'aria-hidden', 'true');
+            setAriaAttr(el, 'aria-hidden', 'true');
             break;
         default:
             break;

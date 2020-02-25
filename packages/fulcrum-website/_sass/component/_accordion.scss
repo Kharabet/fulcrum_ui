@@ -17,6 +17,7 @@
         position: relative;
         z-index: 2;
         background-color: var(--primary-bg);
+        overflow: hidden;
       }
       .accordion-position{
         position: absolute;
@@ -26,7 +27,7 @@
         bottom: 0;
         margin: auto;
         right: 15px;
-        background-color: #ffffff;
+        background-color: transparent;
         transition: all 0.15s;
         border-radius: 50%;
         &:before, &:after {
@@ -47,7 +48,7 @@
           
         }
         &:after{
-          transform: rotate(0);
+          transform: rotate(-90deg);
           transition: transform 0.15s;
         }
       }
@@ -58,6 +59,7 @@
         position: relative;
         z-index: 2;
         background-color: var(--primary-bg);
+        overflow: hidden;
       }
       max-height: 0;
       transition: max-height .3s cubic-bezier(0, 0, 1, 1);
@@ -66,15 +68,14 @@
       .accordion-content {
         max-height: 441px;
         transition: max-height .3s cubic-bezier(0, 0, 1, 1);
-        padding-bottom: 30px;
       }
       .accordion-toggle {
         color: #276bfb;
         .accordion-position{
-          background-color: transparent;
+          background-color: var(--accordion-bg);
           transition: all 0.15s;
           &:after{
-            transform: rotate(-90deg);
+            transform: rotate(0);
           }
         }
       }
@@ -93,6 +94,9 @@
   }
   .accordion-content {
     padding-left: 30px;
+    p{
+      padding-bottom: 30px;
+    }
     @media (max-width: 579px) {
       padding-right: 15px;
     }
@@ -100,9 +104,4 @@
       color: var(--secondary-color);
     }
   }
-}
-.after-accordion{
-  position: relative;
-  z-index: 2;
-  background-color: var(--primary-bg);
 }
