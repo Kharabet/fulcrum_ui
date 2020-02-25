@@ -140,7 +140,7 @@ permalink: lending
     </div>
 </section>
 
-<section class="bg-secondary before-primary">
+<!--section class="bg-secondary before-primary">
     <div class="container">
         <div class="row">
             <div class="col col-12">
@@ -170,7 +170,7 @@ permalink: lending
             </div>
         </div>
     </div>
-</section>
+</section-->
 
 <section class="bg-secondary pt-105 pb-75 pb-xs-60 text-center">
     <div class="container">

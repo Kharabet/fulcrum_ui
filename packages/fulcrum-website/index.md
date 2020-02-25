@@ -300,7 +300,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
     </div>
 </section>
 
-<section class="bg-secondary after-primary">
+<!--section class="bg-secondary after-primary">
     <div class="container">
         <div class="row">
             <div class="col col-12">
@@ -330,7 +330,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
             </div>
         </div>
     </div>
-</section>
+</section-->
 
 <section class="bg-primary pt-135 pt-xs-90 pb-60 pb-xs-0 text-center">
     <div class="container">
