@@ -22,6 +22,7 @@ export interface IOwnTokenGridRowProps {
   selectedKey: TradeTokenKey;
   currentKey: TradeTokenKey;
   showMyTokensOnly: boolean;
+  isEjected: boolean;
 
   // onDetails: (key: TradeTokenKey) => void;
   // onManageCollateral: (request: ManageCollateralRequest) => void;
@@ -173,7 +174,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
       </div>
 
       <div title={props.currentKey.unitOfAccount} className="own-token-grid-row__col-asset-price">{props.currentKey.unitOfAccount}</div>
-      <div title={`$${bnPrice.toFixed(18)}`} className="own-token-grid-row__col-asset-price">
+      {!this.props.isEjected ? (<React.Fragment><div title={`$${bnPrice.toFixed(18)}`} className="own-token-grid-row__col-asset-price">
         {!state.isLoading ?
           <React.Fragment>
             <span className="sign-currency">$</span>{bnPrice.toFixed(2)}
@@ -181,39 +182,48 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
           : <Preloader />
         }
       </div>
-      <div title={`$${bnLiquidationPrice.toFixed(18)}`} className="own-token-grid-row__col-liquidation-price">
-        {!state.isLoading ?
-          <React.Fragment>
-            <span className="sign-currency">$</span>{bnLiquidationPrice.toFixed(2)}
-          </React.Fragment>
-          : <Preloader />}
-      </div>
-      <div title={state.assetBalance ? `$${state.assetBalance.toFixed(18)}` : ``} className="own-token-grid-row__col-position-value">
-        {!state.isLoading ?
-          state.assetBalance ?
+        <div title={`$${bnLiquidationPrice.toFixed(18)}`} className="own-token-grid-row__col-liquidation-price">
+          {!state.isLoading ?
             <React.Fragment>
-              <span className="sign-currency">$</span>{state.assetBalance.toFixed(2)}
+              <span className="sign-currency">$</span>{bnLiquidationPrice.toFixed(2)}
             </React.Fragment>
-            :
-            '$0.00'
-          : <Preloader />
-        }
-      </div>
-      <div title={state.profit ? `$${state.profit.toFixed(18)}` : ``} className="own-token-grid-row__col-profit">
-        {!state.isLoading ?
-          state.profit ?
-            <React.Fragment>
-              <span className="sign-currency">$</span>{state.profit.toFixed(2)}
-            </React.Fragment>
-            : '$0.00'
-          : <Preloader />
-        }
-      </div>
-      <div className="own-token-grid-row__col-action" style={{ textAlign: `right` }}>
+            : <Preloader />}
+        </div>
+        <div title={state.assetBalance ? `$${state.assetBalance.toFixed(18)}` : ``} className="own-token-grid-row__col-position-value">
+          {!state.isLoading ?
+            state.assetBalance ?
+              <React.Fragment>
+                <span className="sign-currency">$</span>{state.assetBalance.toFixed(2)}
+              </React.Fragment>
+              :
+              '$0.00'
+            : <Preloader />
+          }
+        </div>
+        <div title={state.profit ? `$${state.profit.toFixed(18)}` : ``} className="own-token-grid-row__col-profit">
+          {!state.isLoading ?
+            state.profit ?
+              <React.Fragment>
+                <span className="sign-currency">$</span>{state.profit.toFixed(2)}
+              </React.Fragment>
+              : '$0.00'
+            : <Preloader />
+          }
+        </div></React.Fragment>) : (<React.Fragment>
+          <div className="own-token-grid-row__col-ejected">Ejected position.</div>
+        </React.Fragment>
 
-        <button className="own-token-grid-row__sell-button own-token-grid-row__button--size-half" onClick={this.onEjectClick}>
-          {TradeType.SELL}
-        </button>
+        )}
+      <div className="own-token-grid-row__col-action" style={{ textAlign: `right` }}>
+        {this.props.isEjected ? (
+          <button className="own-token-grid-row-inner__sell-button own-token-grid-row-inner__button--size-half" onClick={this.onWithdrawClick}>
+            {TradeType.WITHDRAW}
+          </button>
+        ) :
+          (<button className="own-token-grid-row-inner__sell-button own-token-grid-row-inner__button--size-half" onClick={this.onEjectClick}>
+            {TradeType.SELL}
+          </button>)
+        }
       </div>
     </div></React.Fragment>
     ) : (
@@ -238,36 +248,47 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
             <PositionTypeMarkerAlt assetDetails={state.assetDetails} value={props.currentKey.positionType} />
                 </div>)}
             <div title={props.currentKey.unitOfAccount} className="own-token-grid-row-inner__col-asset-price">{props.currentKey.unitOfAccount}</div>
-            <div title={`$${bnPrice.toFixed(18)}`} className="own-token-grid-row-inner__col-asset-price">
-              {!state.isLoading ?
-                <React.Fragment><span className="sign-currency">$</span>{bnPrice.toFixed(2)}</React.Fragment>
-                : <Preloader />
-              }
-            </div>
-            <div title={`$${bnLiquidationPrice.toFixed(18)}`} className="own-token-grid-row-inner__col-liquidation-price">
-              {!state.isLoading ?
-                <React.Fragment><span className="sign-currency">$</span>{bnLiquidationPrice.toFixed(2)}</React.Fragment>
-                : <Preloader />
-              }
-            </div>
-            <div title={state.assetBalance ? `$${state.assetBalance.toFixed(18)}` : ``} className="own-token-grid-row-inner__col-position-value">
-              {!state.isLoading ?
-                state.assetBalance ?
-                  <React.Fragment><span className="sign-currency">$</span>{state.assetBalance.toFixed(2)}</React.Fragment> : '$0.00'
-                : <Preloader />
-              }
-            </div>
-            <div title={state.profit ? `$${state.profit.toFixed(18)}` : ``} className="own-token-grid-row-inner__col-profit">
-              {!state.isLoading ?
-                state.profit ?
-                  <React.Fragment><span className="sign-currency">$</span>{state.profit.toFixed(2)}</React.Fragment> : '$0.00'
-                : <Preloader />
-              }
-            </div>
+            {!this.props.isEjected ? (
+              <React.Fragment> <div title={`$${bnPrice.toFixed(18)}`} className="own-token-grid-row-inner__col-asset-price">
+                {!state.isLoading ?
+                  <React.Fragment><span className="sign-currency">$</span>{bnPrice.toFixed(2)}</React.Fragment>
+                  : <Preloader />
+                }
+              </div>
+                <div title={`$${bnLiquidationPrice.toFixed(18)}`} className="own-token-grid-row-inner__col-liquidation-price">
+                  {!state.isLoading ?
+                    <React.Fragment><span className="sign-currency">$</span>{bnLiquidationPrice.toFixed(2)}</React.Fragment>
+                    : <Preloader />
+                  }
+                </div>
+                <div title={state.assetBalance ? `$${state.assetBalance.toFixed(18)}` : ``} className="own-token-grid-row-inner__col-position-value">
+                  {!state.isLoading ?
+                    state.assetBalance ?
+                      <React.Fragment><span className="sign-currency">$</span>{state.assetBalance.toFixed(2)}</React.Fragment> : '$0.00'
+                    : <Preloader />
+                  }
+                </div>
+                <div title={state.profit ? `$${state.profit.toFixed(18)}` : ``} className="own-token-grid-row-inner__col-profit">
+                  {!state.isLoading ?
+                    state.profit ?
+                      <React.Fragment><span className="sign-currency">$</span>{state.profit.toFixed(2)}</React.Fragment> : '$0.00'
+                    : <Preloader />
+                  }
+                </div></React.Fragment>) : (<React.Fragment>
+                  <div className="own-token-grid-row__col-ejected">Ejected position.</div>
+                </React.Fragment>
+
+              )}
             <div className="own-token-grid-row-inner__col-action" style={{ textAlign: `right` }}>
-              <button className="own-token-grid-row-inner__sell-button own-token-grid-row-inner__button--size-half" onClick={this.onEjectClick}>
-                {TradeType.SELL}
-              </button>
+              {this.props.isEjected ? (
+                <button className="own-token-grid-row-inner__sell-button own-token-grid-row-inner__button--size-half" onClick={this.onWithdrawClick}>
+                  {TradeType.WITHDRAW}
+                </button>
+              ) :
+                (<button className="own-token-grid-row-inner__sell-button own-token-grid-row-inner__button--size-half" onClick={this.onEjectClick}>
+                  {TradeType.SELL}
+                </button>)
+              }
             </div>
           </div>
         </React.Fragment>
@@ -334,6 +355,24 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
     this.props.onTrade(
       new TradeRequest(
         TradeType.EJECT,
+        this.props.currentKey.asset,
+        this.props.currentKey.unitOfAccount,
+        this.props.currentKey.positionType === PositionType.SHORT ? this.props.currentKey.asset : Asset.USDC,
+        this.props.currentKey.positionType,
+        this.props.currentKey.leverage,
+        new BigNumber(0),
+        this.props.currentKey.isTokenized,
+        this.props.currentKey.version
+      )
+    );
+  };
+
+  public onWithdrawClick = (event: React.MouseEvent<HTMLElement>) => {
+    event.stopPropagation();
+
+    this.props.onTrade(
+      new TradeRequest(
+        TradeType.WITHDRAW,
         this.props.currentKey.asset,
         this.props.currentKey.unitOfAccount,
         this.props.currentKey.positionType === PositionType.SHORT ? this.props.currentKey.asset : Asset.USDC,

@@ -7,10 +7,38 @@ import { BigNumber, classUtils } from "@0x/utils";
 // tslint:enable:no-unused-variable
 
 export type BurnerEventArgs =
+    | BurnerDepositedEventArgs
+    | BurnerWithdrawalEventArgs
+    | BurnerBurntEventArgs
     | BurnerOwnershipTransferredEventArgs;
 
 export enum BurnerEvents {
+    Deposited = 'Deposited',
+    Withdrawal = 'Withdrawal',
+    Burnt = 'Burnt',
     OwnershipTransferred = 'OwnershipTransferred',
+}
+
+// tslint:disable-next-line:interface-name
+export interface BurnerDepositedEventArgs extends DecodedLogArgs {
+    sender: string;
+    token: string;
+    amount: BigNumber;
+}
+
+// tslint:disable-next-line:interface-name
+export interface BurnerWithdrawalEventArgs extends DecodedLogArgs {
+    sender: string;
+    token: string;
+    amount: BigNumber;
+}
+
+// tslint:disable-next-line:interface-name
+export interface BurnerBurntEventArgs extends DecodedLogArgs {
+    user: string;
+    token: string;
+    amount: BigNumber;
+    expectedRate: BigNumber;
 }
 
 // tslint:disable-next-line:interface-name
@@ -102,6 +130,82 @@ export class BurnerContract extends BaseContract {
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
             BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('setToken(address,bool)');
+            // tslint:disable boolean-naming
+            const result = abiEncoder.strictDecodeReturnValue<void
+        >(rawCallResult);
+            // tslint:enable boolean-naming
+            return result;
+        },
+    };
+    public pauseDepositing = {
+        async sendTransactionAsync(
+            isPaused: boolean,
+            txData: Partial<TxData> = {},
+        ): Promise<string> {
+            const self = this as any as BurnerContract;
+            const encodedData = self._strictEncodeArguments('pauseDepositing(bool)', [isPaused
+    ]);
+            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+                {
+                    to: self.address,
+                    ...txData,
+                    data: encodedData,
+                },
+                self._web3Wrapper.getContractDefaults(),
+                (self as any).pauseDepositing.estimateGasAsync.bind(
+                    self,
+                    isPaused
+                ),
+            );
+            const txHash = await self._web3Wrapper.sendTransactionAsync(txDataWithDefaults);
+            return txHash;
+        },
+        async estimateGasAsync(
+            isPaused: boolean,
+            txData: Partial<TxData> = {},
+        ): Promise<number> {
+            const self = this as any as BurnerContract;
+            const encodedData = self._strictEncodeArguments('pauseDepositing(bool)', [isPaused
+    ]);
+            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+                {
+                    to: self.address,
+                    ...txData,
+                    data: encodedData,
+                },
+                self._web3Wrapper.getContractDefaults(),
+            );
+            const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
+            return gas;
+        },
+        getABIEncodedTransactionData(
+            isPaused: boolean,
+        ): string {
+            const self = this as any as BurnerContract;
+            const abiEncodedTransactionData = self._strictEncodeArguments('pauseDepositing(bool)', [isPaused
+    ]);
+            return abiEncodedTransactionData;
+        },
+        async callAsync(
+            isPaused: boolean,
+            callData: Partial<CallData> = {},
+            defaultBlock?: BlockParam,
+        ): Promise<void
+        > {
+            const self = this as any as BurnerContract;
+            const encodedData = self._strictEncodeArguments('pauseDepositing(bool)', [isPaused
+        ]);
+            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+                {
+                    to: self.address,
+                    ...callData,
+                    data: encodedData,
+                },
+                self._web3Wrapper.getContractDefaults(),
+            );
+            const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
+            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            const abiEncoder = self._lookupAbiEncoder('pauseDepositing(bool)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<void
         >(rawCallResult);
@@ -418,6 +522,36 @@ export class BurnerContract extends BaseContract {
             return result;
         },
     };
+    public withdraws = {
+        async callAsync(
+            index_0: string,
+            index_1: string,
+            callData: Partial<CallData> = {},
+            defaultBlock?: BlockParam,
+        ): Promise<BigNumber
+        > {
+            const self = this as any as BurnerContract;
+            const encodedData = self._strictEncodeArguments('withdraws(address,address)', [index_0,
+        index_1
+        ]);
+            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+                {
+                    to: self.address,
+                    ...callData,
+                    data: encodedData,
+                },
+                self._web3Wrapper.getContractDefaults(),
+            );
+            const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
+            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            const abiEncoder = self._lookupAbiEncoder('withdraws(address,address)');
+            // tslint:disable boolean-naming
+            const result = abiEncoder.strictDecodeReturnValue<BigNumber
+        >(rawCallResult);
+            // tslint:enable boolean-naming
+            return result;
+        },
+    };
     public pointers = {
         async callAsync(
             index_0: string,
@@ -550,6 +684,144 @@ export class BurnerContract extends BaseContract {
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
             BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('setTokens(address[],bool[])');
+            // tslint:disable boolean-naming
+            const result = abiEncoder.strictDecodeReturnValue<void
+        >(rawCallResult);
+            // tslint:enable boolean-naming
+            return result;
+        },
+    };
+    public depositingPaused = {
+        async callAsync(
+            callData: Partial<CallData> = {},
+            defaultBlock?: BlockParam,
+        ): Promise<boolean
+        > {
+            const self = this as any as BurnerContract;
+            const encodedData = self._strictEncodeArguments('depositingPaused()', []);
+            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+                {
+                    to: self.address,
+                    ...callData,
+                    data: encodedData,
+                },
+                self._web3Wrapper.getContractDefaults(),
+            );
+            const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
+            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            const abiEncoder = self._lookupAbiEncoder('depositingPaused()');
+            // tslint:disable boolean-naming
+            const result = abiEncoder.strictDecodeReturnValue<boolean
+        >(rawCallResult);
+            // tslint:enable boolean-naming
+            return result;
+        },
+    };
+    public burnByUser = {
+        async sendTransactionAsync(
+            user: string,
+            token: string,
+            amount: BigNumber,
+            minUnderlyingPrice: BigNumber,
+            maxUnderlyingPrice: BigNumber,
+            txData: Partial<TxData> = {},
+        ): Promise<string> {
+            const self = this as any as BurnerContract;
+            const encodedData = self._strictEncodeArguments('burnByUser(address,address,uint256,uint256,uint256)', [user,
+    token,
+    amount,
+    minUnderlyingPrice,
+    maxUnderlyingPrice
+    ]);
+            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+                {
+                    to: self.address,
+                    ...txData,
+                    data: encodedData,
+                },
+                self._web3Wrapper.getContractDefaults(),
+                (self as any).burnByUser.estimateGasAsync.bind(
+                    self,
+                    user,
+                    token,
+                    amount,
+                    minUnderlyingPrice,
+                    maxUnderlyingPrice
+                ),
+            );
+            const txHash = await self._web3Wrapper.sendTransactionAsync(txDataWithDefaults);
+            return txHash;
+        },
+        async estimateGasAsync(
+            user: string,
+            token: string,
+            amount: BigNumber,
+            minUnderlyingPrice: BigNumber,
+            maxUnderlyingPrice: BigNumber,
+            txData: Partial<TxData> = {},
+        ): Promise<number> {
+            const self = this as any as BurnerContract;
+            const encodedData = self._strictEncodeArguments('burnByUser(address,address,uint256,uint256,uint256)', [user,
+    token,
+    amount,
+    minUnderlyingPrice,
+    maxUnderlyingPrice
+    ]);
+            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+                {
+                    to: self.address,
+                    ...txData,
+                    data: encodedData,
+                },
+                self._web3Wrapper.getContractDefaults(),
+            );
+            const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
+            return gas;
+        },
+        getABIEncodedTransactionData(
+            user: string,
+            token: string,
+            amount: BigNumber,
+            minUnderlyingPrice: BigNumber,
+            maxUnderlyingPrice: BigNumber,
+        ): string {
+            const self = this as any as BurnerContract;
+            const abiEncodedTransactionData = self._strictEncodeArguments('burnByUser(address,address,uint256,uint256,uint256)', [user,
+    token,
+    amount,
+    minUnderlyingPrice,
+    maxUnderlyingPrice
+    ]);
+            return abiEncodedTransactionData;
+        },
+        async callAsync(
+            user: string,
+            token: string,
+            amount: BigNumber,
+            minUnderlyingPrice: BigNumber,
+            maxUnderlyingPrice: BigNumber,
+            callData: Partial<CallData> = {},
+            defaultBlock?: BlockParam,
+        ): Promise<void
+        > {
+            const self = this as any as BurnerContract;
+            const encodedData = self._strictEncodeArguments('burnByUser(address,address,uint256,uint256,uint256)', [user,
+        token,
+        amount,
+        minUnderlyingPrice,
+        maxUnderlyingPrice
+        ]);
+            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+                {
+                    to: self.address,
+                    ...callData,
+                    data: encodedData,
+                },
+                self._web3Wrapper.getContractDefaults(),
+            );
+            const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
+            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            const abiEncoder = self._lookupAbiEncoder('burnByUser(address,address,uint256,uint256,uint256)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<void
         >(rawCallResult);
@@ -843,6 +1115,185 @@ export class BurnerContract extends BaseContract {
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
             BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder('transferOwnership(address)');
+            // tslint:disable boolean-naming
+            const result = abiEncoder.strictDecodeReturnValue<void
+        >(rawCallResult);
+            // tslint:enable boolean-naming
+            return result;
+        },
+    };
+    public withdraw = {
+        async sendTransactionAsync(
+            token: string,
+            amount: BigNumber,
+            txData: Partial<TxData> = {},
+        ): Promise<string> {
+            const self = this as any as BurnerContract;
+            const encodedData = self._strictEncodeArguments('withdraw(address,uint256)', [token,
+    amount
+    ]);
+            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+                {
+                    to: self.address,
+                    ...txData,
+                    data: encodedData,
+                },
+                self._web3Wrapper.getContractDefaults(),
+                (self as any).withdraw.estimateGasAsync.bind(
+                    self,
+                    token,
+                    amount
+                ),
+            );
+            const txHash = await self._web3Wrapper.sendTransactionAsync(txDataWithDefaults);
+            return txHash;
+        },
+        async estimateGasAsync(
+            token: string,
+            amount: BigNumber,
+            txData: Partial<TxData> = {},
+        ): Promise<number> {
+            const self = this as any as BurnerContract;
+            const encodedData = self._strictEncodeArguments('withdraw(address,uint256)', [token,
+    amount
+    ]);
+            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+                {
+                    to: self.address,
+                    ...txData,
+                    data: encodedData,
+                },
+                self._web3Wrapper.getContractDefaults(),
+            );
+            const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
+            return gas;
+        },
+        getABIEncodedTransactionData(
+            token: string,
+            amount: BigNumber,
+        ): string {
+            const self = this as any as BurnerContract;
+            const abiEncodedTransactionData = self._strictEncodeArguments('withdraw(address,uint256)', [token,
+    amount
+    ]);
+            return abiEncodedTransactionData;
+        },
+        async callAsync(
+            token: string,
+            amount: BigNumber,
+            callData: Partial<CallData> = {},
+            defaultBlock?: BlockParam,
+        ): Promise<void
+        > {
+            const self = this as any as BurnerContract;
+            const encodedData = self._strictEncodeArguments('withdraw(address,uint256)', [token,
+        amount
+        ]);
+            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+                {
+                    to: self.address,
+                    ...callData,
+                    data: encodedData,
+                },
+                self._web3Wrapper.getContractDefaults(),
+            );
+            const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
+            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            const abiEncoder = self._lookupAbiEncoder('withdraw(address,uint256)');
+            // tslint:disable boolean-naming
+            const result = abiEncoder.strictDecodeReturnValue<void
+        >(rawCallResult);
+            // tslint:enable boolean-naming
+            return result;
+        },
+    };
+    public withdrawBehalf = {
+        async sendTransactionAsync(
+            user: string,
+            token: string,
+            amount: BigNumber,
+            txData: Partial<TxData> = {},
+        ): Promise<string> {
+            const self = this as any as BurnerContract;
+            const encodedData = self._strictEncodeArguments('withdrawBehalf(address,address,uint256)', [user,
+    token,
+    amount
+    ]);
+            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+                {
+                    to: self.address,
+                    ...txData,
+                    data: encodedData,
+                },
+                self._web3Wrapper.getContractDefaults(),
+                (self as any).withdrawBehalf.estimateGasAsync.bind(
+                    self,
+                    user,
+                    token,
+                    amount
+                ),
+            );
+            const txHash = await self._web3Wrapper.sendTransactionAsync(txDataWithDefaults);
+            return txHash;
+        },
+        async estimateGasAsync(
+            user: string,
+            token: string,
+            amount: BigNumber,
+            txData: Partial<TxData> = {},
+        ): Promise<number> {
+            const self = this as any as BurnerContract;
+            const encodedData = self._strictEncodeArguments('withdrawBehalf(address,address,uint256)', [user,
+    token,
+    amount
+    ]);
+            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+                {
+                    to: self.address,
+                    ...txData,
+                    data: encodedData,
+                },
+                self._web3Wrapper.getContractDefaults(),
+            );
+            const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
+            return gas;
+        },
+        getABIEncodedTransactionData(
+            user: string,
+            token: string,
+            amount: BigNumber,
+        ): string {
+            const self = this as any as BurnerContract;
+            const abiEncodedTransactionData = self._strictEncodeArguments('withdrawBehalf(address,address,uint256)', [user,
+    token,
+    amount
+    ]);
+            return abiEncodedTransactionData;
+        },
+        async callAsync(
+            user: string,
+            token: string,
+            amount: BigNumber,
+            callData: Partial<CallData> = {},
+            defaultBlock?: BlockParam,
+        ): Promise<void
+        > {
+            const self = this as any as BurnerContract;
+            const encodedData = self._strictEncodeArguments('withdrawBehalf(address,address,uint256)', [user,
+        token,
+        amount
+        ]);
+            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+                {
+                    to: self.address,
+                    ...callData,
+                    data: encodedData,
+                },
+                self._web3Wrapper.getContractDefaults(),
+            );
+            const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
+            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            const abiEncoder = self._lookupAbiEncoder('withdrawBehalf(address,address,uint256)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<void
         >(rawCallResult);

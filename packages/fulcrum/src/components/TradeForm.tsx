@@ -363,7 +363,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       liquidationPrice: this.state.liquidationPrice
     };
 
-    let submitButtonText = `EJECT`;
+    let submitButtonText = this.props.tradeType;
     /*if (this.props.tradeType === TradeType.BUY) {
       if (this.props.positionType === PositionType.SHORT) {
         submitButtonText = `SHORT`;
@@ -457,8 +457,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
               ) : (
                 <div className="trade-form__amount-max" onClick={this.onInsertMaxValue}><img src={ic_arrow_max} />MAX</div>
               )}
-            </div> */}
-            {/* <div className="trade-form__kv-container" style={{ padding: `initial` }}>
+            </div><div className="trade-form__kv-container" style={{ padding: `initial` }}>
               {amountMsg.includes("Slippage:") ? (
                 <div title={`${this.state.slippageRate.toFixed(18)}%`} className="trade-form__label" style={{ display: `flex` }}>
                   {amountMsg}
@@ -473,7 +472,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
                 <div className="trade-form__label">{amountMsg}</div>
               )}
 
-            </div> */}
+            </div>  */}
             <div className="eject-button_container">
               <button title={this.state.exposureValue.gt(0) ? `${this.state.exposureValue.toFixed(18)} ${this.props.asset}` : ``} type="submit" className={`trade-form__submit-button ${submitClassName}`}>
                 {submitButtonText}
@@ -504,8 +503,8 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
               </button>
             ) : (*/}
             {/* <button title={this.state.exposureValue.gt(0) ? `${this.state.exposureValue.toFixed(18)} ${this.props.asset}` : ``} type="submit" className={`trade-form__submit-button ${submitClassName}`}>
-              {submitButtonText}
-            </button> */}
+              {TradeType.BUY}
+            </button>  */}
             {/*})}*/}
           </div>
         </div>
@@ -625,6 +624,25 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
         this.state.inputAmountValue
       );
       this.props.onSubmit(tradeRequest);
+      return;
+    }
+    if (this.props.tradeType === TradeType.WITHDRAW){
+      const tradeTokenKey = this.getTradeTokenGridRowSelectionKey(this.props.leverage);
+      const poTokenEjectedBalance = await FulcrumProvider.Instance.getPTokenEjectedBalanceOfUser(tradeTokenKey);
+      const tradeRequest = new TradeRequest(
+        this.props.tradeType,
+        this.props.asset,
+        this.props.defaultUnitOfAccount,
+        this.state.collateral,
+        this.props.positionType,
+        this.props.leverage,
+        poTokenEjectedBalance,// new BigNumber(0),
+        this.state.tokenizeNeeded,
+        this.props.version,
+        this.state.inputAmountValue
+      );
+      this.props.onSubmit(tradeRequest);
+      return;
     }
 
 
