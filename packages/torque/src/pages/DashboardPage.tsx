@@ -90,15 +90,13 @@ export class DashboardPage extends PureComponent<
     };
 
     let isENSSetup;
-    // if (this.state.walletDetails.walletType === WalletType.NonWeb3) {
-    //   if (walletAddress) {
-    //     isENSSetup = await TorqueProvider.Instance.checkENSSetup(walletAddress);
-    //   }
-    // } else {
-    //   isENSSetup = true;
-    // }
-    isENSSetup = undefined;
-
+    if (this.state.walletDetails.walletType === WalletType.NonWeb3) {
+      if (walletAddress) {
+        isENSSetup = await TorqueProvider.Instance.checkENSSetup(walletAddress);
+      }
+    } else {
+      isENSSetup = true;
+    }
 
     let items: IBorrowedFundsState[] = [];
     let itemsAwaiting: ReadonlyArray<BorrowRequestAwaiting> = [];
