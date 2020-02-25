@@ -8,7 +8,6 @@ $width-col-asset-price: 13%;
 $width-col-liquidation-price: 13%;
 $width-col-position-value: 13%;
 $width-col-profit: 11%;
-$width-col-eject: 50%;
 $width-col-actions: 11%;
 
 $width-button-action: 11%;
@@ -67,12 +66,11 @@ $width-button-action: 7rem;
     width: $width-col-actions;
     text-align: right;
   }
-}  
+}
 
-.own-token-grid-row__col-ejected{
-    
+.own-token-grid-row__col-ejected {
   @include own-token-grid-row__col();
-  width: $width-col-eject;
+  width: 44%;
   font-family: "Muli", sans-serif;
   font-size: 22px;
   font-weight: 800;
@@ -80,7 +78,11 @@ $width-button-action: 7rem;
   font-style: normal;
   font-stretch: normal;
   line-height: 1.5;
-
+}
+.own-token-grid-row-inner {
+  .own-token-grid-row__col-ejected {
+    width: 50%;
+  }
 }
 
 .own-token-grid-row {
@@ -137,7 +139,7 @@ $width-button-action: 7rem;
     letter-spacing: -0.3px;
     color: #ffffff;
     outline: none;
-    &:not(:disabled){
+    &:not(:disabled) {
       cursor: pointer;
     }
     &:disabled {
