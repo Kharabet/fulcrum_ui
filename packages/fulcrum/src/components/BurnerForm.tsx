@@ -83,12 +83,12 @@ export class BurnerForm extends Component<IBurnerFormProps, IBurnerFormState> {
       <div className="burn-form__container">
         <form className="burner-form" onSubmit={this.onSubmit.bind(this)}>
           <div className="burner-form__item">
-            <label htmlFor="userAddress">Address (optional) </label>
+            <label htmlFor="userAddress">User Address (optional) </label>
             <input type="text" name="userAddress" id="userAddress" />
           </div>
           <div className="burner-form__item">
             <label htmlFor="amountToBurn">Amount</label>
-            <input type="text" name="amountToBurn" id="amountToBurn" />
+            <input type="text" name="amountToBurn" id="amountToBurn" required />
           </div>
           <div className="burner-form__selected">Selected pToken: {this.props.selectedKey.toString()}</div>
           <button type="submit" className="burner-form__button">Burn</button>
