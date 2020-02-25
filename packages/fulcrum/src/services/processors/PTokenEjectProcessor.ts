@@ -74,7 +74,6 @@ export class PTokenEjectProcessor {
         approvePromise = tokenContract!.approve.sendTransactionAsync(burnerContract.address, taskRequest.amount, { from: account });
       }
       task.processingStepNext();
-      task.processingStepNext();
     }
     catch(e) {
       console.error(e);
