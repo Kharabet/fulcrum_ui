@@ -957,6 +957,25 @@ export class FulcrumProvider {
     return result.dividedBy(10 ** 18);
   };
 
+  public getPTokenValueOfUser = async (selectedKey: TradeTokenKey, account?: string): Promise<BigNumber> => {
+    let result = new BigNumber(0);
+
+    if (this.web3Wrapper && this.contractsSource) {
+      if (!account && this.contractsSource.canWrite) {
+        account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : undefined;
+      }
+
+      if (account) {
+        const assetContract = await this.contractsSource.getPTokenContract(selectedKey);
+        if (assetContract) {
+          result = await assetContract.positionValue.callAsync(account);
+        }
+      }
+    }
+
+    return result.dividedBy(10 ** 18);
+  };
+
   public getTradedAmountEstimate = async (request: TradeRequest): Promise<BigNumber> => {
     let result = new BigNumber(0);
 
@@ -1747,11 +1766,11 @@ export class FulcrumProvider {
                 },
                 id: id,
               }*//*, (err: any, added: any) => {
-      // console.log('provider returned', err, added)
-      if (err || 'error' in added) {
-        console.log(err, added);
-      }
-    }*//*);
+// console.log('provider returned', err, added)
+if (err || 'error' in added) {
+console.log(err, added);
+}
+}*//*);
   }
 }
 }
