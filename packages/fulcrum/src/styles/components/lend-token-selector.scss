@@ -23,7 +23,7 @@
     border: 2px solid transparent;
     @media screen and (min-width: $breakpoint-desktop-min){
       width: calc(25% - 3px);
-      max-width: calc(25%);
+      max-width: calc(25%  - 3px);
       &:not(:nth-child(4n)) {
         margin-right: 4px;
       }
