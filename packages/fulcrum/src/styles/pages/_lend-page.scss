@@ -4,19 +4,26 @@
   align-content: center;
   justify-content: flex-start;
   width: $container-desktop;
-  padding: 0 15px;
   box-sizing: border-box;
-  .lend-page-main {
-    margin-top: 5rem;
+}
+@media screen and (max-width: $breakpoint-desktop-max) {
+  .lend-page {
+    width: $container-laptop;
   }
 }
-
-@media screen and (max-width: 1139px) {
+@media screen and (min-width: $breakpoint-laptop-min) {
+  .lend-page {
+    .lend-page-main {
+      margin-top: 45px;
+    }
+  }
+}
+@media screen and (max-width: $breakpoint-laptop-max) {
   .lend-page {
     width: $container-mobile;
     padding: 0 15px;
     .lend-page-main {
-      margin-top: 2rem;
+      margin-top: 15px;
     }
   }
 }

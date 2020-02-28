@@ -15,20 +15,29 @@
     flex-direction: column;
     flex-grow: 1;
 
-    width: calc(25% - 3px);
-    max-width: calc(25% - 3px);
 
     padding: 40px 15px 25px 15px;
     margin-bottom: 4px;
 
     background-color: var(--primary-row);
     border: 2px solid transparent;
+    @media screen and (min-width: $breakpoint-desktop-min){
+      width: calc(25% - 3px);
+      max-width: calc(25%);
+      &:not(:nth-child(4n)) {
+        margin-right: 4px;
+      }
+    }
+    @media screen and (max-width: $breakpoint-desktop-max){
+      width: calc(100% / 3 - 2px);
+      max-width: calc(100% / 3);
+      &:not(:nth-child(3n)) {
+        margin-right: 3px;
+      }
+    }
     .sign-currency {
       color: #a2abb8;
       font-weight: 400;
-    }
-    &:not(:nth-child(4n)) {
-      margin-right: 4px;
     }
     &:hover {
       cursor: pointer;
@@ -192,7 +201,7 @@
         cursor: pointer;
 
         border: 0;
-        height: 2.5rem;
+        height: 45px;
         border-radius: 100px;
         text-transform: uppercase;
         outline: none;
@@ -201,12 +210,12 @@
         margin: auto;
 
         &.token-selector-item__lend-button--size-full {
-          width: 100%;
+          width: 120px;
         }
 
         &.token-selector-item__lend-button--size-half {
-          width: 45%;
-          margin: 0 5%;
+          width: 110px;
+          margin: 0 5px;
 
           &:first-child {
             margin-left: 0;
