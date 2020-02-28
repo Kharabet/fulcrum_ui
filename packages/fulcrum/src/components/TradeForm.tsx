@@ -107,6 +107,8 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
   private readonly _inputChange: Subject<string>;
   private readonly _inputSetMax: Subject<void>;
 
+  private _isMounted: boolean;
+
   constructor(props: ITradeFormProps, context?: any) {
     super(props, context);
     let assetDetails = AssetsDictionary.assets.get(props.asset);
@@ -123,7 +125,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     const currentPrice = new BigNumber(0);
     const liquidationPrice = new BigNumber(0);
     const exposureValue = new BigNumber(0);
-
+    this._isMounted = false;
     this.state = {
       assetDetails: assetDetails || null,
       collateral: props.bestCollateral,
@@ -164,9 +166,9 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       switchMap((value) => new Observable<ITradeAmountChangeEvent | null>((observer) => observer.next(value)))
     ).subscribe(next => {
       if (next) {
-        this.setState({ ...this.state, ...next });
+        this._isMounted && this.setState({ ...this.state, ...next });
       } else {
-        this.setState({
+        this._isMounted && this.setState({
           ...this.state,
           isTradeAmountTouched: false,
           inputAmountText: "",
@@ -240,7 +242,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     const latestPriceDataPoint = await FulcrumProvider.Instance.getTradeTokenAssetLatestDataPoint(tradeTokenKey);
     const liquidationPrice = new BigNumber(latestPriceDataPoint.liquidationPrice);
 
-    this.setState({
+    this._isMounted && this.setState({
       ...this.state,
       assetDetails: assetDetails || null,
       inputAmountText: limitedAmount.inputAmountText,// "",
@@ -267,11 +269,15 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
   };
 
   public componentWillUnmount(): void {
+    this._isMounted = false;
+
     window.history.back();
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
   public componentDidMount(): void {
+    this._isMounted = true;
+
     this.derivedUpdate();
     window.history.pushState(null, "Trade Modal Opened", `/#/trade/${this.props.tradeType.toLocaleLowerCase()}-${this.props.leverage}x-${this.props.positionType.toLocaleLowerCase()}-${this.props.asset}/`);
 
@@ -297,7 +303,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       this.state.collateral !== prevState.collateral
     ) {
       if (this.state.collateral !== prevState.collateral) {
-        this.setState({
+        this._isMounted && this.setState({
           ...this.state,
           inputAmountText: "",
           inputAmountValue: new BigNumber(0),
@@ -525,7 +531,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     const amountText = event.target.value ? event.target.value : "";
 
     // setting inputAmountText to update display at the same time
-    this.setState({...this.state, inputAmountText: amountText}, () => {
+    this._isMounted && this.setState({ ...this.state, inputAmountText: amountText }, () => {
       // emitting next event for processing with rx.js
       this._inputChange.next(this.state.inputAmountText);
     });
@@ -562,15 +568,15 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
   public onChangeCollateralOpen = (event: React.MouseEvent<HTMLElement>) => {
     event.preventDefault();
 
-    this.setState({ ...this.state, isChangeCollateralOpen: true });
+    this._isMounted && this.setState({ ...this.state, isChangeCollateralOpen: true });
   };
 
   private onChangeCollateralClose = () => {
-    this.setState({ ...this.state, isChangeCollateralOpen: false });
+    this._isMounted && this.setState({ ...this.state, isChangeCollateralOpen: false });
   };
 
   public onChangeCollateralClicked = async (asset: Asset) => {
-    this.setState({ ...this.state, isChangeCollateralOpen: false, collateral: asset });
+    this._isMounted && this.setState({ ...this.state, isChangeCollateralOpen: false, collateral: asset });
   };
 
   public onChangeUnitOfAccount = (asset: Asset) => {
@@ -597,7 +603,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
   };
 
   public onChangeTokenizeNeeded = async (event: ChangeEvent<HTMLInputElement>) => {
-    this.setState({ ...this.state, tokenizeNeeded: event.target.checked });
+    this._isMounted && this.setState({ ...this.state, tokenizeNeeded: event.target.checked });
   };
 
   public onSubmitClick = async (event: FormEvent<HTMLFormElement>) => {
