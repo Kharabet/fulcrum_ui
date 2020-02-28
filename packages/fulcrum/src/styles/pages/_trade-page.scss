@@ -17,7 +17,7 @@
     padding: 0 15px;
   }
 }
-@media(max-width: $max-lg){
+@media(max-width: $breakpoint-mobile-max){
   .trade-page {
     width: 100%;
     padding: 0;

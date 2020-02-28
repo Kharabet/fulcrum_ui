@@ -90,7 +90,7 @@
       }
     }
   }
-  @media screen and (min-width: $min-lg) {
+  @media screen and (min-width: $breakpoint-mobile-min) {
     padding-top: 50px;
     &__container {
       justify-content: center;
@@ -99,14 +99,14 @@
       width: calc(100vw - 17px);
     }
   }
-  @media screen and (min-width: $min-lg) {
+  @media screen and (min-width: $breakpoint-mobile-min) {
     &-item {
       &:not(:last-child) {
         margin: 0 5px;
       }
     }
   }
-  @media screen and (max-width: $max-lg) {
+  @media screen and (max-width: $breakpoint-mobile-max) {
     padding: 25px 0 0 15px;
     &:after {
       width: 100%;
