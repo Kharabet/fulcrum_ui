@@ -3,30 +3,26 @@
   flex-direction: column;
   align-content: center;
   justify-content: flex-start;
-
   width: $container-desktop;
-  padding: 0 15px;
   box-sizing: border-box;
 }
-
-
-
-@media only screen and (max-width: 1140px){
+@media screen and (max-width: $breakpoint-desktop-max) {
   .stats-page {
-    width: calc(100% - 30px);
+    width: $container-laptop;
+  }
+}
+@media screen and (max-width: $breakpoint-laptop-max) {
+  .stats-page {
+    width: $container-mobile;
+    padding: 0 15px;
   }
 }
 @media only screen and (max-width: $mobile-version-width-sm) {
   .stats-page {
-    display: flex;
-    flex-direction: column;
-    align-content: center;
-    justify-content: flex-start;
-    flex-shrink: 0;
+    height: 100%;
   }
-  .trade-page-header{
+  .stats-page-header {
     width: $container-mobile;
     margin: auto;
   }
-
 }
