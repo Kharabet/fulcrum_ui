@@ -18,7 +18,16 @@
 }
 
 .header-menu__item {
-  margin-right: 50px;
+  @media screen and (min-width: $breakpoint-desktop-min){
+    margin-right: 75px;
+    &:last-child{
+      margin-right: 135px;
+    }
+  }
+  @media screen and (max-width: $breakpoint-desktop-max){
+    margin-right: 45px;
+  }
+  
   a {
     position: relative;
 
