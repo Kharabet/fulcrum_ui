@@ -209,24 +209,24 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
           asset: e,
           defaultUnitOfAccount: TradeTokenGrid.defaultUnitOfAccount,
           defaultTokenizeNeeded: true,
-          positionType: PositionType.SHORT,
-          defaultLeverage: props.defaultLeverageShort,
+          positionType: PositionType.LONG,
+          defaultLeverage: props.defaultLeverageLong,
           onSelect: props.onSelect,
           onTrade: props.onTrade
         });
 
         /*let unit = Asset.USDC;
-        if (props.selectedKey.asset === Asset.ETH && props.defaultLeverageLong === 2) {
-          unit = Asset.DAI;
-        }*/
+            if (props.selectedKey.asset === Asset.ETH && props.defaultLeverageLong === 2) {
+              unit = Asset.DAI;
+            }*/
 
         rowsData.push({
           selectedKey: props.selectedKey,
           asset: e,
           defaultUnitOfAccount: TradeTokenGrid.defaultUnitOfAccount,
           defaultTokenizeNeeded: true,
-          positionType: PositionType.LONG,
-          defaultLeverage: props.defaultLeverageLong,
+          positionType: PositionType.SHORT,
+          defaultLeverage: props.defaultLeverageShort,
           onSelect: props.onSelect,
           onTrade: props.onTrade
         });
