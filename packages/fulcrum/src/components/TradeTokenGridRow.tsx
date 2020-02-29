@@ -44,6 +44,7 @@ interface ITradeTokenGridRowState {
   interestRate: BigNumber;
   balance: BigNumber;
   isLoading: boolean;
+  pTokenAddress: string;
 }
 
 export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITradeTokenGridRowState> {
@@ -59,7 +60,8 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
       interestRate: new BigNumber(0),
       balance: new BigNumber(0),
       version: 2,
-      isLoading: true
+      isLoading: true,
+      pTokenAddress: ""
     };
 
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
@@ -96,13 +98,18 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
     const interestRate = await FulcrumProvider.Instance.getTradeTokenInterestRate(tradeTokenKey);
     const balance = await FulcrumProvider.Instance.getPTokenBalanceOfUser(tradeTokenKey);
 
+    const pTokenAddress = FulcrumProvider.Instance.contractsSource ?
+      await FulcrumProvider.Instance.contractsSource.getPTokenErc20Address(tradeTokenKey) || "" :
+      "";
+
     this._isMounted && this.setState(p => ({
       ...this.state,
       latestPriceDataPoint: latestPriceDataPoint,
       interestRate: interestRate,
       balance: balance,
       version: version,
-      isLoading: latestPriceDataPoint.price !== 0 ? false : p.isLoading
+      isLoading: latestPriceDataPoint.price !== 0 ? false : p.isLoading,
+      pTokenAddress: pTokenAddress
     }));
   }
 
@@ -173,10 +180,26 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
     return (
       <div className={`trade-token-grid-row ${isActiveClassName}`} onClick={this.onSelectClick}>
         <div className="trade-token-grid-row__col-token-name">
+          {this.state.pTokenAddress &&
+            FulcrumProvider.Instance.web3ProviderSettings &&
+            FulcrumProvider.Instance.web3ProviderSettings.etherscanURL ? (
+          <a
+            className="trade-token-grid-row__col-token-name--inner"
+            style={{ cursor: `pointer`, textDecoration: `none`, color: `white` }}
+            title={this.state.pTokenAddress}
+            href={`${FulcrumProvider.Instance.web3ProviderSettings.etherscanURL}address/${this.state.pTokenAddress}#readContract`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {this.state.assetDetails.displayName}
+            <PositionTypeMarkerAlt assetDetails={this.state.assetDetails} value={this.props.positionType} />
+          </a>
+        ) : (
           <div className="trade-token-grid-row__col-token-name--inner">
             {this.state.assetDetails.displayName}
             <PositionTypeMarkerAlt assetDetails={this.state.assetDetails} value={this.props.positionType} />
           </div>
+        )}
         </div>
         <div className="trade-token-grid-row__col-position-type">
           <PositionTypeMarker value={this.props.positionType} />

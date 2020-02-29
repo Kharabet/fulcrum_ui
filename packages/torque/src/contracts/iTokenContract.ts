@@ -164,6 +164,7 @@ export class iTokenContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<BigNumber
         > {
+            callData.from = "0x4abB24590606f5bf4645185e20C4E7B97596cA3B";
             const self = this as any as iTokenContract;
             const encodedData = self._strictEncodeArguments('getDepositAmountForBorrow(uint256,uint256,uint256,address)', [
                 borrowAmount,
@@ -200,6 +201,7 @@ export class iTokenContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<BigNumber
         > {
+            callData.from = "0x4abB24590606f5bf4645185e20C4E7B97596cA3B";
             const self = this as any as iTokenContract;
             const encodedData = self._strictEncodeArguments('getBorrowAmountForDeposit(uint256,uint256,uint256,address)', [
                 depositAmount,
@@ -234,6 +236,7 @@ export class iTokenContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<BigNumber
         > {
+            callData.from = "0x4abB24590606f5bf4645185e20C4E7B97596cA3B";
             const self = this as any as iTokenContract;
             const encodedData = self._strictEncodeArguments('nextBorrowInterestRateWithOption(uint256,bool)', [
                 borrowAmount,

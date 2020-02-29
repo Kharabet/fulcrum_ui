@@ -103,6 +103,28 @@
     margin-bottom: 2.5rem;
   }
 
+  .trade-form__form-info{
+    font-size: 12px;
+    color: #ffffff;
+    margin-bottom: 20px;
+    display: block;
+    letter-spacing: 0.1px;
+    background: #fff;
+    color: #394049;
+    padding: 12px;
+    padding-left: 27px;
+    position: relative;
+    &:before{
+      content: "";
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    background: url("../assets/images/error_icon.svg");
+    left: -12px;
+    top: 10px;
+    }
+  }
+
   .trade-form__actions-container {
     display: flex;
     flex-direction: row;
