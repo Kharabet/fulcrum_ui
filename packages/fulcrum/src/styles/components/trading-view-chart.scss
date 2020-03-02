@@ -4,7 +4,7 @@
   @media only screen and (min-width: $mobile-version-max-width){
     min-height: 400px;
   }
-  @media(max-width: $max-lg){
+  @media(max-width: $breakpoint-mobile-max){
     padding-left: 5px;
   }
 }

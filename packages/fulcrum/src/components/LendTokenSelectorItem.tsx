@@ -141,7 +141,7 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
       return null;
     }
     return (
-      <div className="token-selector-item">
+      <div className={`token-selector-item ${this.state.balanceOfUser.eq(0) ? "" : "token-selector-item_active"}`}>
         {this.props.asset === Asset.SAI ? (
           <div className="token-select-item-mcd-bridge" onClick={this.onFulcrumMcdBridgeClick}>
             <div className="token-select-item-mcd-bridge__text token-select-item-mcd-bridge__text--upgrade">
@@ -191,45 +191,31 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
                   : (<div className="token-selector-item__interest-rate-value"><Preloader /></div>)}
               </div>
             </div>
+            {this.state.balanceOfUser.gt(0) 
+              ? (<React.Fragment>
+                {this.state.profit !== null ? (
+                  <div className="token-selector-item__profit-container token-selector-item__balance-container">
+                    <div className="token-selector-item__profit-title token-selector-item__profit-balance">Balance:</div>
+                    {!this.state.isLoading ? (<div
+                      title={`${this.state.balanceOfUser.toFixed(18)} ${this.props.asset}`}
+                      className="token-selector-item__profit-value token-selector-item__balance-value"
+                    >{this.state.balanceOfUser.toFixed(2)} {this.props.asset}</div>)
+                    : (<div className="token-selector-item__interest-rate-value"><Preloader /></div>)}
+                  </div>) : null}                
+                <div className="token-selector-item__profit-container">
+                  <div className="token-selector-item__profit-title">Profit:</div>
+                  <ProfitTicker asset={this.props.asset} secondDiff={this.state.tickerSecondDiff} profit={this.state.profit} />
+                </div>
+                </React.Fragment>) 
+              : (<div className="token-selector-item__description">
+                  <div className="token-selector-item__interest-rate-container">
+                    <div className="token-selector-item__interest-rate-title" />
+                    <div className="token-selector-item__interest-rate-value" />
+                  </div>
+                </div>)
+            }
 
           </div>
-          {this.state.balanceOfUser.gt(0) ? (
-            <div className="token-selector-item__description">
-              {this.state.profit !== null ? (
-                <div className="token-selector-item__profit-container">
-                  <div className="token-selector-item__profit-title token-selector-item__profit-balance">Balance:</div>
-                  {!this.state.isLoading ? (<div
-                    title={`${this.state.balanceOfUser.toFixed(18)} ${this.props.asset}`}
-                    className="token-selector-item__profit-value"
-                  >{this.state.balanceOfUser.toFixed(2)} {this.props.asset}</div>)
-                    : (<div className="token-selector-item__interest-rate-value"><Preloader /></div>)}
-                </div>) : null}
-
-              <div className="token-selector-item__profit-container">
-                <div className="token-selector-item__profit-title">Profit:</div>
-                <ProfitTicker asset={this.props.asset} secondDiff={this.state.tickerSecondDiff} profit={this.state.profit} />
-              </div>
-            </div>
-          ) : (
-              <div className="token-selector-item__description">
-                {/* <div className="token-selector-item__interest-rate-container">
-                  <div className="token-selector-item__interest-rate-title">Interest APR :</div>
-
-                  {!this.state.isLoading ? (
-                    <div
-                      title={`${this.state.interestRate.toFixed(18)}%`}
-                      className="token-selector-item__interest-rate-value"
-                    >{this.state.interestRate.toFixed(4)}<span className="sign-currency">%</span></div>
-                  ) : (
-                      <div className="token-selector-item__interest-rate-value"><Preloader /></div>
-                    )}
-                </div> */}
-                <div className="token-selector-item__interest-rate-container">
-                  <div className="token-selector-item__interest-rate-title" />
-                  <div className="token-selector-item__interest-rate-value" />
-                </div>
-              </div>
-            )}
         </div>
         {this.renderActions(this.state.balanceOfUser.eq(0))}
       </div>

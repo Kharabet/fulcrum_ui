@@ -3,42 +3,27 @@
   flex-direction: column;
   align-content: center;
   justify-content: flex-start;
-
-  //@at-root: 100%;
   width: $container-desktop;
-  padding: 0 15px;
   flex-shrink: 0;
   box-sizing: border-box;
 }
-
-@media only screen and (max-width: 1279px){
+@media screen and (max-width: $breakpoint-desktop-max) {
   .trade-page {
-    width: calc(100% - 30px);
-    padding: 0 15px;
+    width: $container-laptop;
   }
 }
-@media(max-width: $max-lg){
+@media screen and (max-width: $breakpoint-laptop-max) {
   .trade-page {
-    width: 100%;
-    padding: 0;
-    .header{
-      padding: 0 15px;
-    }
+    width: $container-mobile;
+    padding: 0 15px;
   }
 }
 @media only screen and (max-width: $mobile-version-width-sm) {
   .trade-page {
-    display: flex;
-    flex-direction: column;
-    align-content: center;
-    justify-content: flex-start;
-
     height: 100%;
-    flex-shrink: 0;
   }
-  .trade-page-header{
+  .trade-page-header {
     width: $container-mobile;
     margin: auto;
   }
-
 }

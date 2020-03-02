@@ -15,28 +15,28 @@
     flex-direction: column;
     flex-grow: 1;
 
-    width: calc(25% - 3px);
-    max-width: calc(25% - 3px);
 
-    padding: 40px 15px 25px 15px;
+    padding: 40px 30px 25px 30px;
     margin-bottom: 4px;
-
     background-color: var(--primary-row);
     border: 2px solid transparent;
+    @media screen and (min-width: $breakpoint-desktop-min){
+      width: calc(25% - 3px);
+      max-width: calc(25%  - 3px);
+      &:not(:nth-child(4n)) {
+        margin-right: 4px;
+      }
+    }
+    @media screen and (max-width: $breakpoint-desktop-max){
+      width: calc(100% / 3 - 2px);
+      max-width: calc(100% / 3);
+      &:not(:nth-child(3n)) {
+        margin-right: 3px;
+      }
+    }
     .sign-currency {
       color: #a2abb8;
       font-weight: 400;
-    }
-    &:not(:nth-child(4n)) {
-      margin-right: 4px;
-    }
-    &:hover {
-      cursor: pointer;
-      background-color: var(--lend-bg-hover);
-      border-color: var(--lend-border-hover);
-      .token-selector-item__lend-button {
-        background-color: #33dfcc !important;
-      }
     }
 
     .token-select-item-mcd-bridge {
@@ -101,12 +101,16 @@
         flex-direction: row;
         display: flex;
         justify-content: space-between;
+        flex-wrap: wrap;
+        > div {
+          width: 50%;
+        }
         & + .token-selector-item__description {
           margin-top: 4px;
         }
       }
       .token-selector-item__name {
-        font-size: 22px;
+        font-size: 26px;
         font-weight: 800;
         font-style: normal;
         font-stretch: normal;
@@ -124,7 +128,6 @@
 
         .token-selector-item__profit-title {
           font-size: 12px;
-          margin-bottom: 2px;
           font-weight: normal;
           font-style: normal;
           font-stretch: normal;
@@ -143,9 +146,6 @@
           font-weight: 800;
           color: var(--primary-text);
         }
-        .token-selector-item__profit-balance {
-          text-align: left;
-        }
       }
 
       .token-selector-item__interest-rate-container {
@@ -160,7 +160,6 @@
 
         .token-selector-item__interest-rate-title {
           font-size: 12px;
-          margin-bottom: 2px;
           font-weight: normal;
           font-style: normal;
           font-stretch: normal;
@@ -170,7 +169,7 @@
         }
 
         .token-selector-item__interest-rate-value {
-          font-size: 22px;
+          font-size: 26px;
           font-weight: 600;
           font-style: normal;
           font-stretch: normal;
@@ -192,21 +191,24 @@
         cursor: pointer;
 
         border: 0;
-        height: 2.5rem;
+        height: 45px;
         border-radius: 100px;
         text-transform: uppercase;
         outline: none;
         max-width: 130px;
         color: #ffffff;
         margin: auto;
+        font-size: 14px;
+        font-weight: 600;
+        letter-spacing: 0.05em;
 
         &.token-selector-item__lend-button--size-full {
-          width: 100%;
+          width: 120px;
         }
 
         &.token-selector-item__lend-button--size-half {
-          width: 45%;
-          margin: 0 5%;
+          width: 110px;
+          margin: 0 5px;
 
           &:first-child {
             margin-left: 0;
@@ -219,10 +221,51 @@
 
         &.token-selector-item__lend-button {
           background-color: #00c0ab;
+          &:hover {
+            cursor: pointer;
+            background-color: #33dfcc;
+          }
         }
 
         &.token-selector-item__un-lend-button {
           background-color: #ff5353;
+          &:hover {
+            cursor: pointer;
+            background-color: #FE7272;
+          }
+        }
+      }
+    }
+    .wrapper-loader{
+      float: right;
+      padding: 10px 0;
+    }
+    &_active {
+      background-color: var(--lend-bg-hover);
+      border-color: var(--lend-border-hover);
+      .token-selector-item__descriptions {
+        .token-selector-item__description {
+          align-items: flex-end;
+          .token-selector-item__name {
+            order: -2;
+            font-size: 18px;
+          }
+          .token-selector-item__interest-rate-container {
+            margin-bottom: 0;
+            .token-selector-item__interest-rate-title {
+              text-align: left;
+            }
+            .token-selector-item__interest-rate-value {
+              text-align: left;
+              font-size: 18px;
+            }
+          }
+          .token-selector-item__profit-container {
+            &.token-selector-item__balance-container {
+              order: -1;
+              margin-bottom: 10px;
+            }
+          }
         }
       }
     }
