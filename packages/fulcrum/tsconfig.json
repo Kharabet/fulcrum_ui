@@ -4,7 +4,7 @@
     "src"
   ],
   "exclude": [
-    "src/charting_library",
+    "./src/charting_library",
     "node_modules",
     "**/*.spec.ts"
   ]
