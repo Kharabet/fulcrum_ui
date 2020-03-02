@@ -196,5 +196,13 @@ $width-button-action: 7rem;
     &:hover {
       background-color: #fe7272;
     }
+    &:not(:disabled){
+      cursor: pointer;
+    }
+    &:disabled {
+      background-color: var(--disabled-bg);
+      color: var(--disabled-color);
+      cursor: not-allowed;
+    }
   }
 }
