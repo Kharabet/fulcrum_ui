@@ -1877,6 +1877,34 @@ export class pTokenContract extends BaseContract {
       return result;
     }
   };
+  public positionValue = {
+    async callAsync(
+        _owner: string,
+        callData: Partial<CallData> = {},
+        defaultBlock?: BlockParam,
+    ): Promise<BigNumber
+    > {
+        const self = this as any as pTokenContract;
+        const encodedData = self._strictEncodeArguments('positionValue(address)', [_owner
+    ]);
+        const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            {
+                to: self.address,
+                ...callData,
+                data: encodedData,
+            },
+            self._web3Wrapper.getContractDefaults(),
+        );
+        const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
+        BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+        const abiEncoder = self._lookupAbiEncoder('positionValue(address)');
+        // tslint:disable boolean-naming
+        const result = abiEncoder.strictDecodeReturnValue<BigNumber
+    >(rawCallResult);
+        // tslint:enable boolean-naming
+        return result;
+    },
+  };
   public tokenPrice = {
     async callAsync(callData: Partial<CallData> = {}, defaultBlock?: BlockParam): Promise<BigNumber> {
       callData.from = "0x4abB24590606f5bf4645185e20C4E7B97596cA3B";
