@@ -221,10 +221,18 @@
 
         &.token-selector-item__lend-button {
           background-color: #00c0ab;
+          &:hover {
+            cursor: pointer;
+            background-color: #33dfcc;
+          }
         }
 
         &.token-selector-item__un-lend-button {
           background-color: #ff5353;
+          &:hover {
+            cursor: pointer;
+            background-color: #FE7272;
+          }
         }
       }
     }
