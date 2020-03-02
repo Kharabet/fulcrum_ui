@@ -24,6 +24,11 @@ export class ProviderMenu extends Component<IProviderMenuProps> {
       <div className="provider-menu">
         <div className="provider-menu__title">Select Wallet Provider</div>
         <ul className="provider-menu__list">{listItems}</ul>
+        <div className="provider-menu__footer">
+          By connecting, you agree to the&nbsp;
+          <a href="https://fulcrum.trade/tos/">Terms of Service</a>&nbsp;and&nbsp;          
+          <a href="https://fulcrum.trade/privacy/">Privacy Policy</a>
+        </div>
       </div>
     );
   }

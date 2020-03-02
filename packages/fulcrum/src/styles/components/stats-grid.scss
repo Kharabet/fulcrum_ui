@@ -2,27 +2,27 @@ $font-size-header: 0.75rem;
 $height-row: 80px;
 
 $width-col-name: 4.5rem;
-$width-col-total-tvl-usd: 8rem;
-$width-col-total-supply-usd: 8rem;
+$width-col-total-tvl-usd: 9rem;
+$width-col-total-supply-usd: 9rem;
 $width-col-total-supply: 8rem;
 $width-col-total-borrow: 8rem;
 $width-col-liquidity: 8rem;
 $width-col-liquidity-reserved: 8rem;
-$width-col-supply-rate: 8rem;
+$width-col-supply-rate: 6rem;
 $width-col-borrow-rate: 10rem;
 
 $flex-col-name: 4.5;
-$flex-col-total-tvl-usd: 8;
-$flex-col-total-supply-usd: 8;
+$flex-col-total-tvl-usd: 9;
+$flex-col-total-supply-usd: 9;
 $flex-col-total-supply: 8;
 $flex-col-total-borrow: 8;
 $flex-col-liquidity: 8;
 $flex-col-liquidity-reserved: 8;
-$flex-col-supply-rate: 8;
+$flex-col-supply-rate: 6;
 $flex-col-borrow-rate: 8;
 
-$margin-left-column: 1.5rem;
-$margin-right-column: 1.5rem;
+$margin-left-column: 1rem;
+$margin-right-column: 1rem;
 
 .stats-grid {
   display: flex;
@@ -59,7 +59,13 @@ $margin-right-column: 1.5rem;
     display: grid;
   }
 }
-
+.stats-grid-header__col-supply-rate{
+  .stats-grid-header__text {
+    white-space: nowrap;
+    overflow: inherit;
+    text-overflow: clip;
+  }
+}
 .stats-grid-header__text {
   white-space: nowrap;
   overflow: hidden;
@@ -71,6 +77,7 @@ $margin-right-column: 1.5rem;
 
   margin-left: $margin-left-column;
   width: $width-col-name;
+  min-width: $width-col-name;
   flex-grow: $flex-col-name;
   flex-shrink: $flex-col-name;
 }
@@ -185,6 +192,7 @@ $margin-right-column: 1.5rem;
 
   margin-left: $margin-left-column;
   width: $width-col-name;
+  min-width: $width-col-name;
   flex-grow: $flex-col-name;
   flex-shrink: $flex-col-name;
 

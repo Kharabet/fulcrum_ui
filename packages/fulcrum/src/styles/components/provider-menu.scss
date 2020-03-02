@@ -9,6 +9,24 @@
     text-align: center;
     color: #a2abb8;
   }
+  &__footer{
+    
+    color: var(--trade-header-color);
+    
+    display: flex;
+    margin-top: 20px;
+    flex-wrap: wrap;
+    max-width: 280px;
+    
+    justify-content: center;
+    
+    a {
+      color: #00c0ab;
+      &:hover {
+        color: #33dfcc;
+      }
+    }
+  }
   &__list-item {
     display: flex;
     justify-content: center;
