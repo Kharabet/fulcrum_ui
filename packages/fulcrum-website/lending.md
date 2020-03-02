@@ -274,7 +274,7 @@ permalink: lending
             </div>
             <div class="row">
                 <div class="col col-12">
-                    <div class="flex jc-sb fd-md-c mx-md-auto">
+                    <div class="flex jc-sb fd-md-c mx-auto">
                         <div class="item-earn fulcrum active">
                             <div class="head-earn">
                                 {% include svg/fulcrum.svg %}
@@ -365,7 +365,7 @@ permalink: lending
             </div>
         </div>
         <div class="row jc-c">
-            <div class="col col-10 col-lg-12 flex jc-sb fd-md-c">
+            <div class="col col-10 col-lg-12 flex jc-sa fd-md-c">
                 <div class="flex fd-c mb-md-55">
                     <div class="svg-blur mb-45">
                         <span class="lend-count">1</span>
