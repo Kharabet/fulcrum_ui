@@ -96,8 +96,8 @@
   .mb-md-55 {
     margin-bottom: 55px;
   }
-  .mr-md-30{
-    margin-right: 30px;
+  .mr-md-45{
+    margin-right: 45px;
   }
   .mx-md-auto{
     margin-left: auto;
@@ -128,6 +128,9 @@
   }
 }
 @media (max-width: 767px) {
+  .mr-sm-0{
+    margin-right: 0;
+  }
   .mr-sm-5{
     margin-right: 5px;
   }
