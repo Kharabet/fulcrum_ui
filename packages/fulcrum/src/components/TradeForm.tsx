@@ -322,9 +322,9 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       return null;
     }
 
-    const divStyle = {
+    /*const divStyle = {
       backgroundImage: `url(${this.state.assetDetails.bgSvg})`
-    };
+    };*/
 
     const submitClassName =
       this.props.tradeType === TradeType.BUY ? "trade-form__submit-button--buy" : "trade-form__submit-button--sell";
@@ -387,8 +387,8 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
 
     // <form className="trade-form" onSubmit={!(this.props.asset === Asset.LINK && this.props.tradeType === TradeType.BUY) ? this.onSubmitClick : undefined} style={this.props.tradeType === TradeType.SELL ? { minHeight: `16.5625rem` } : undefined}>
     return (
-      <form className="trade-form" onSubmit={this.onSubmitClick} style={this.props.tradeType === TradeType.SELL ? { minHeight: `16.5625rem` } : undefined}>
-        <div className="trade-form__left_block" style={divStyle}>
+      <form className="trade-form" onSubmit={this.onSubmitClick} /*style={this.props.tradeType === TradeType.SELL ? { minHeight: `16.5625rem` } : undefined}*/>
+        <div className="trade-form__left_block">
           {this.state.pTokenAddress &&
             FulcrumProvider.Instance.web3ProviderSettings &&
             FulcrumProvider.Instance.web3ProviderSettings.etherscanURL ? (
@@ -401,7 +401,8 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
                 rel="noopener noreferrer"
               >
                 <div className="trade-form__info_block__logo">
-                  <img className="asset-logo" src={this.state.assetDetails.logoSvg} alt={tokenNameBase} />
+                  {this.state.assetDetails.reactLogoSvg.render()}
+                  {/*<img className="asset-logo" src={this.state.assetDetails.logoSvg} alt={tokenNameBase} />*/}
                   <PositionTypeMarkerAlt assetDetails={this.state.assetDetails} value={this.props.positionType} />
                 </div>
                 <div className="trade-form__info_block__asset" style={this.props.asset === Asset.WBTC ? { color: this.state.assetDetails.textColor, paddingTop: `1rem` } : { color: this.state.assetDetails.textColor }}>
@@ -411,7 +412,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
                   <div className="trade-form__info_block__stats__data">
                     {this.state.interestRate ? `${this.state.interestRate.toFixed(1)}%` : `0.0%`} APR
                   </div>
-                  <div className="trade-form__info_block__stats__splitter" style={{ borderLeftColor: this.state.assetDetails.textColor2 }}>|</div>
+                  {/*<div className="trade-form__info_block__stats__splitter" style={{ borderLeftColor: this.state.assetDetails.textColor2 }}>|</div>*/}
                   <div className="trade-form__info_block__stats__data">
                     {`${this.props.leverage.toString()}x`}
                   </div>
@@ -452,11 +453,17 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
               <div className="trade-form__collateral-button-container">
                 <CollateralTokenButton asset={this.state.collateral} onClick={this.onChangeCollateralOpen} />
               </div>
-              {isAmountMaxed ? (
+              {/*isAmountMaxed ? (
                 <div className="trade-form__amount-maxed">MAX</div>
               ) : (
                   <div className="trade-form__amount-max" onClick={this.onInsertMaxValue}><img src={ic_arrow_max} />MAX</div>
-                )}
+              )*/}
+            </div>
+            <div className="trade-form__group-button"> 
+              <button>25%</button>
+              <button>50%</button>
+              <button>75%</button>
+              <button>100%</button>
             </div>
             <div className="trade-form__kv-container" style={{ padding: `initial` }}>
               {amountMsg.includes("Slippage:") ? (
@@ -495,9 +502,9 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
             </div> : null}
 
           <div className="trade-form__actions-container">
-            <button className="trade-form__cancel-button" onClick={this.onCancelClick}>
+            {/*<button className="trade-form__cancel-button" onClick={this.onCancelClick}>
               <span className="trade-form__label--action">Cancel</span>
-            </button>
+            </button>*/}
             {/*this.props.asset === Asset.LINK && this.props.tradeType === TradeType.BUY ? (
               <button style={{backgroundColor: `#3a3f4a`, color: `#758295`}} title={`BUY DISABLED`} disabled={true} className={`trade-form__submit-button ${submitClassName}`}>
               BUY DISABLED
