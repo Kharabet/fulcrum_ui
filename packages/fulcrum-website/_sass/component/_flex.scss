@@ -53,7 +53,9 @@
 .f-3{
   flex: 3;
 }
-
+.fg-1{
+  flex-grow: 1;
+}
 
 @media (max-width: 991px) {
   .fd-md-c {
