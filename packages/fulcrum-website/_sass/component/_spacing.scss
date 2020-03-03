@@ -15,6 +15,12 @@
 .mr-90{
   margin-right: 90px;
 }
+.mr-115{
+  margin-right: 115px;
+}
+.mr-205{
+  margin-right: 205px;
+}
 .my-20 {
   margin-top: 20px;
   margin-bottom: 20px;
@@ -61,6 +67,11 @@
   padding-top: 60px;
   padding-bottom: 60px;
 }
+@media (max-width: 1409px){
+  .mr-xl-90{
+    margin-right: 90px;
+  }
+}
 @media (max-width: 1199px) {
   .pl-lg-0 {
     padding-left: 0;
@@ -70,6 +81,9 @@
   }
   .mr-lg-30{
     margin-right: 30px;
+  }  
+  .mr-lg-60{
+    margin-right: 60px;
   }
 }
 @media (max-width: 991px) {
@@ -81,6 +95,9 @@
   }
   .mb-md-55 {
     margin-bottom: 55px;
+  }
+  .mr-md-45{
+    margin-right: 45px;
   }
   .mx-md-auto{
     margin-left: auto;
@@ -111,6 +128,9 @@
   }
 }
 @media (max-width: 767px) {
+  .mr-sm-0{
+    margin-right: 0;
+  }
   .mr-sm-5{
     margin-right: 5px;
   }

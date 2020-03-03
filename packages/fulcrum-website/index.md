@@ -393,7 +393,7 @@ This ensures redundancy in the margin calling process. Moreover, there is an ins
     </div>
     <div class="container pt-75 pt-xs-60">
         <div class="row jc-c">
-            <div class="col col-10 col-md-12 jc-sb fw-md-w">
+            <div class="col col-8 col-xl-10 col-md-12 jc-sb fw-md-w">
                 <div class="order-md-1 mb-xs-30 mx-xs-auto">
                     <a href="https://app.fulcrum.trade/#/trade" class="button button-primary button-lg mb-20">Trade</a>
                     <p class="fs-13 lh-150 text-center c-gray">Up to 5x Leverage, <br />and perfect
