@@ -12,8 +12,8 @@
     margin-right: #{5 * $i}px;
   }
 }
-.mr-90{
-  margin-right: 90px;
+.mr-270{
+  margin-right: 270px;
 }
 .my-20 {
   margin-top: 20px;
@@ -60,6 +60,11 @@
 .py-60 {
   padding-top: 60px;
   padding-bottom: 60px;
+}
+@media (max-width: 1409px){
+  .mr-xl-135{
+    margin-right: 135px;
+  }
 }
 @media (max-width: 1199px) {
   .pl-lg-0 {
