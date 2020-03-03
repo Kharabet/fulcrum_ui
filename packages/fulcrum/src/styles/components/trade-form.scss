@@ -220,6 +220,18 @@
   background: #394049;
   width: 100%;
   height: 65px;
+  position: relative;
+  &:before{
+    content: '';
+    position: absolute;
+    border: 16px solid transparent;
+    border-left: 16px solid #ffffff;
+    left: -30.5px;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+    height: 32px
+  }
 
   .trade-form__amount-input {
     width: 65%;

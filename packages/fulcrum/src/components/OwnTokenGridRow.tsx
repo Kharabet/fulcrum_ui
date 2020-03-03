@@ -265,7 +265,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
               }
             </div>
             <div className="own-token-grid-row-inner__col-action" style={{ textAlign: `right` }}>
-              <button className="own-token-grid-row-inner__sell-button own-token-grid-row-inner__button--size-half" disabled onClick={this.onSellClick}>
+              <button className="own-token-grid-row-inner__sell-button own-token-grid-row-inner__button--size-half" onClick={this.onSellClick}>
                 {TradeType.SELL}
               </button>
             </div>
