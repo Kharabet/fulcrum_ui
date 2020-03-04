@@ -98,6 +98,7 @@ interface ITradeFormState {
   exposureValue: BigNumber;
 
   isAmountExceeded: boolean;
+  maxAmountMultiplier: BigNumber;
 }
 
 export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
@@ -105,7 +106,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
   private _input: HTMLInputElement | null = null;
 
   private readonly _inputChange: Subject<string>;
-  private readonly _inputSetMax: Subject<void>;
+  private readonly _inputSetMax: Subject<BigNumber>;
 
   private _isMounted: boolean;
 
@@ -125,6 +126,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     const currentPrice = new BigNumber(0);
     const liquidationPrice = new BigNumber(0);
     const exposureValue = new BigNumber(0);
+    const maxAmountMultiplier = new BigNumber(0);
     this._isMounted = false;
     this.state = {
       assetDetails: assetDetails || null,
@@ -147,7 +149,8 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       currentPrice: currentPrice,
       liquidationPrice: liquidationPrice,
       exposureValue: exposureValue,
-      isAmountExceeded: false
+      isAmountExceeded: false,
+      maxAmountMultiplier: maxAmountMultiplier
     };
 
     this._inputChange = new Subject();
@@ -160,7 +163,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
         switchMap((value) => this.rxFromCurrentAmount(value))
       ),
       this._inputSetMax.pipe(
-        switchMap(() => this.rxFromMaxAmount())
+        switchMap((value) => this.rxFromMaxAmountWithMultiplier(value))
       )
     ).pipe(
       switchMap((value) => new Observable<ITradeAmountChangeEvent | null>((observer) => observer.next(value)))
@@ -339,6 +342,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     // const tokenNameDestination = this.props.tradeType === TradeType.BUY ? tokenNamePosition : this.state.collateral;
 
     const isAmountMaxed = this.state.tradeAmountValue.eq(this.state.maxTradeValue);
+    const multiplier = this.state.tradeAmountValue.dividedBy(this.state.maxTradeValue).toNumber();
     const amountMsg =
       this.state.ethBalance && this.state.ethBalance.lte(FulcrumProvider.Instance.gasBufferForTrade)
         ? "Insufficient funds for gas \u2639"
@@ -402,7 +406,6 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
               >
                 <div className="trade-form__info_block__logo">
                   {this.state.assetDetails.reactLogoSvg.render()}
-                  {/*<img className="asset-logo" src={this.state.assetDetails.logoSvg} alt={tokenNameBase} />*/}
                   <PositionTypeMarkerAlt assetDetails={this.state.assetDetails} value={this.props.positionType} />
                 </div>
                 <div className="trade-form__info_block__asset" style={this.props.asset === Asset.WBTC ? { color: this.state.assetDetails.textColor, paddingTop: `1rem` } : { color: this.state.assetDetails.textColor }}>
@@ -421,7 +424,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
             ) : (
               <div className="trade-form__info_block">
                 <div className="trade-form__info_block__logo">
-                  <img className="asset-logo" src={this.state.assetDetails.logoSvg} alt={tokenNameBase} />
+                  {this.state.assetDetails.reactLogoSvg.render()}
                   <PositionTypeMarkerAlt assetDetails={this.state.assetDetails} value={this.props.positionType} />
                 </div>
                 <div className="trade-form__info_block__asset" style={this.props.asset === Asset.WBTC ? { color: this.state.assetDetails.textColor, paddingTop: `1rem` } : { color: this.state.assetDetails.textColor }}>
@@ -460,10 +463,10 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
               )*/}
             </div>
             <div className="trade-form__group-button"> 
-              <button>25%</button>
-              <button>50%</button>
-              <button>75%</button>
-              <button>100%</button>
+              <button data-value="0.25" className={multiplier === 0.25 ? "active ": ""} onClick={this.onInsertMaxValue}>25%</button>
+              <button data-value="0.5" className={multiplier === 0.5 ? "active ": ""} onClick={this.onInsertMaxValue}>50%</button>
+              <button data-value="0.75" className={multiplier === 0.75 ? "active ": ""} onClick={this.onInsertMaxValue}>75%</button>
+              <button data-value="1" className={multiplier === 1 ? "active ": ""} onClick={this.onInsertMaxValue}>100%</button>
             </div>
             <div className="trade-form__kv-container" style={{ padding: `initial` }}>
               {amountMsg.includes("Slippage:") ? (
@@ -544,13 +547,15 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     });
   };
 
-  public onInsertMaxValue = async () => {
-    if (!this.state.assetDetails) {
+  public onInsertMaxValue = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    event.preventDefault();
+    if (!this.state.assetDetails || !event || !event.currentTarget) {
       return null;
     }
-
+    const buttonElement = event.currentTarget as HTMLButtonElement;
+    const value = new BigNumber(parseFloat(buttonElement.dataset.value!));
     // emitting next event for processing with rx.js
-    this._inputSetMax.next();
+    this._inputSetMax.next(value);
   };
 
   public onCancelClick = () => {
@@ -708,14 +713,15 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     );
   };
 
-  private rxFromMaxAmount = (): Observable<ITradeAmountChangeEvent | null> => {
+  private rxFromMaxAmountWithMultiplier = (multiplier: BigNumber): Observable<ITradeAmountChangeEvent | null> => {
     return new Observable<ITradeAmountChangeEvent | null>(observer => {
 
       const tradeTokenKey = this.getTradeTokenGridRowSelectionKey();
       FulcrumProvider.Instance.getMaxTradeValue(this.props.tradeType, tradeTokenKey, this.state.collateral)
         .then(maxTradeValue => {
           // maxTradeValue is raw here, so we should not use it directly
-          this.getInputAmountLimitedFromBigNumber(maxTradeValue, tradeTokenKey, maxTradeValue, true).then(limitedAmount => {
+          const bnTradeValue = maxTradeValue.multipliedBy(multiplier);
+          this.getInputAmountLimitedFromBigNumber(maxTradeValue, tradeTokenKey, maxTradeValue, multiplier, true).then(limitedAmount => {
             if (!limitedAmount.tradeAmountValue.isNaN()) {
               const tradeRequest = new TradeRequest(
                 this.props.tradeType,
@@ -812,14 +818,14 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     return this.getInputAmountLimited(inputAmountText, inputAmountValue, tradeTokenKey, maxTradeValue, skipLimitCheck);
   };
 
-  private getInputAmountLimitedFromBigNumber = async (bnValue: BigNumber, tradeTokenKey: TradeTokenKey, maxTradeValue: BigNumber, skipLimitCheck: boolean): Promise<IInputAmountLimited> => {
+  private getInputAmountLimitedFromBigNumber = async (bnValue: BigNumber, tradeTokenKey: TradeTokenKey, maxTradeValue: BigNumber, multiplier: BigNumber, skipLimitCheck: boolean): Promise<IInputAmountLimited> => {
     const inputAmountValue = bnValue;
     const inputAmountText = bnValue.decimalPlaces(this._inputPrecision).toFixed();
 
-    return this.getInputAmountLimited(inputAmountText, inputAmountValue, tradeTokenKey, maxTradeValue, skipLimitCheck);
+    return this.getInputAmountLimited(inputAmountText, inputAmountValue, tradeTokenKey, maxTradeValue, skipLimitCheck, multiplier);
   };
 
-  private getInputAmountLimited = async (textValue: string, bnValue: BigNumber, tradeTokenKey: TradeTokenKey, maxTradeValue: BigNumber, skipLimitCheck: boolean): Promise<IInputAmountLimited> => {
+  private getInputAmountLimited = async (textValue: string, bnValue: BigNumber, tradeTokenKey: TradeTokenKey, maxTradeValue: BigNumber, skipLimitCheck: boolean, multiplier: BigNumber = new BigNumber(1)): Promise<IInputAmountLimited> => {
     let inputAmountText = textValue;
     let inputAmountValue = bnValue;
 
@@ -839,7 +845,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       const swapRate = await FulcrumProvider.Instance.getSwapRate(pTokenBaseAsset, destinationAsset);
       // console.log(`swapRate: ${swapRate.toFixed()}`);
 
-      const pTokenAmountMax = maxTradeValue;
+      const pTokenAmountMax = maxTradeValue.multipliedBy(multiplier);
       // console.log(`pTokenAmountMax: ${pTokenAmountMax.toFixed()}`);
       const pTokenBaseAssetAmountMax = pTokenAmountMax.multipliedBy(pTokenPrice);
       // console.log(`pTokenBaseAssetAmountMax: ${pTokenBaseAssetAmountMax.toFixed()}`);
