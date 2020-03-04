@@ -6,6 +6,7 @@ import Modal from "react-modal";
 import { merge, Observable, Subject } from "rxjs";
 import { debounceTime, distinctUntilChanged, switchMap } from "rxjs/operators";
 import ic_arrow_max from "../assets/images/ic_arrow_max.svg";
+import { ReactComponent as CloseIcon } from "../assets/images/ic__close.svg"
 import { Asset } from "../domain/Asset";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary, AssetsDictionaryMobile } from "../domain/AssetsDictionary";
@@ -392,6 +393,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     // <form className="trade-form" onSubmit={!(this.props.asset === Asset.LINK && this.props.tradeType === TradeType.BUY) ? this.onSubmitClick : undefined} style={this.props.tradeType === TradeType.SELL ? { minHeight: `16.5625rem` } : undefined}>
     return (
       <form className="trade-form" onSubmit={this.onSubmitClick} /*style={this.props.tradeType === TradeType.SELL ? { minHeight: `16.5625rem` } : undefined}*/>
+        <CloseIcon className="close-icon" onClick={this.onCancelClick} />
         <div className="trade-form__left_block">
           {this.state.pTokenAddress &&
             FulcrumProvider.Instance.web3ProviderSettings &&
@@ -437,7 +439,6 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
                     <div className="trade-form__info_block__stats__data">
                       {this.state.interestRate ? `${this.state.interestRate.toFixed(1)}%` : `0.0%`} APR
                   </div>
-                    <div className="trade-form__info_block__stats__splitter">|</div>
                     <div className="trade-form__info_block__stats__data">
                       {`${this.props.leverage.toString()}x`}
                     </div>

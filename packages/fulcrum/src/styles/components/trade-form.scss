@@ -5,6 +5,15 @@
   width: 575px;
   min-height: 285px;
   background-color: #444e5a;
+  position: relative;
+  .close-icon{
+    position: absolute;
+    right: 24px;
+    top: 24px;
+    height: 16px;
+    width: 16px;
+    cursor: pointer;
+  }
   &__left_block {
     display: flex;
     align-items: center;
