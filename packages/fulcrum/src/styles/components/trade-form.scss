@@ -67,6 +67,9 @@
       &:not(:last-child){
         margin-right: 2px;
       }
+      &:hover{
+        background: #758295;
+      }
     }
   }
 }
