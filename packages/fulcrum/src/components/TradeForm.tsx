@@ -490,7 +490,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
 
             </div>
 
-            {false && this.state.positionTokenBalance && this.props.tradeType === TradeType.BUY && this.state.positionTokenBalance!.eq(0) ? (
+            {this.state.positionTokenBalance && this.props.tradeType === TradeType.BUY && this.state.positionTokenBalance!.eq(0) ? (
               <CollapsibleContainer titleOpen="View advanced options" titleClose="Hide advanced options" isTransparent={amountMsg !== ""}>
                 <div className="trade-form__kv-container">
                   <div className="trade-form__label trade-form__label--no-bg">
@@ -871,16 +871,16 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     } else if (this.props.tradeType === TradeType.BUY) {
       tradeAmountValue = inputAmountValue;
       if (tradeAmountValue.gt(maxTradeValue)) {
-        inputAmountValue = maxTradeValue;
-        inputAmountText = maxTradeValue.decimalPlaces(this._inputPrecision).toFixed();
-        tradeAmountValue = maxTradeValue;
+        inputAmountValue = maxTradeValue.multipliedBy(multiplier);
+        inputAmountText = maxTradeValue.multipliedBy(multiplier).decimalPlaces(this._inputPrecision).toFixed();
+        tradeAmountValue = maxTradeValue.multipliedBy(multiplier);
       }
     }
 
     return {
-      inputAmountValue: inputAmountValue,
-      inputAmountText: inputAmountText,
-      tradeAmountValue: tradeAmountValue,
+      inputAmountValue: inputAmountValue.multipliedBy(multiplier),
+      inputAmountText: isNaN(parseFloat(inputAmountText)) ? "" : new BigNumber(parseFloat(inputAmountText)).multipliedBy(multiplier).toFixed(),
+      tradeAmountValue: tradeAmountValue.multipliedBy(multiplier),
       maxTradeValue
     };
   };
