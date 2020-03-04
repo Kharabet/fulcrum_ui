@@ -182,7 +182,7 @@ export class OwnTokenCardMobile extends Component<IOwnTokenCardMobileProps, IOwn
               <PositionTypeMarker value={this.props.currentKey.positionType} />
             </div>
             <div className="own-token-card-mobile__action" style={{ textAlign: `right` }}>
-              <button className="own-token-card-mobile__sell-button own-token-card-mobile__button--size-half" disabled onClick={this.onSellClick}>
+              <button className="own-token-card-mobile__sell-button own-token-card-mobile__button--size-half" onClick={this.onSellClick}>
                 {TradeType.SELL}
               </button>
             </div>
