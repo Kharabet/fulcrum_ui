@@ -408,16 +408,18 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
                   {this.state.assetDetails.reactLogoSvg.render()}
                   <PositionTypeMarkerAlt assetDetails={this.state.assetDetails} value={this.props.positionType} />
                 </div>
-                <div className="trade-form__info_block__asset" style={this.props.asset === Asset.WBTC ? { color: this.state.assetDetails.textColor, paddingTop: `1rem` } : { color: this.state.assetDetails.textColor }}>
-                  {tokenNameBase}
-                </div>
-                <div className="trade-form__info_block__stats" style={{ color: this.state.assetDetails.textColor2 }}>
-                  <div className="trade-form__info_block__stats__data">
-                    {this.state.interestRate ? `${this.state.interestRate.toFixed(1)}%` : `0.0%`} APR
+                <div className="trade-form__asset-stats">
+                  <div className="trade-form__info_block__asset">
+                    {tokenNameBase}
                   </div>
-                  {/*<div className="trade-form__info_block__stats__splitter" style={{ borderLeftColor: this.state.assetDetails.textColor2 }}>|</div>*/}
-                  <div className="trade-form__info_block__stats__data">
-                    {`${this.props.leverage.toString()}x`}
+                  <div className="trade-form__info_block__stats">
+                    <div className="trade-form__info_block__stats__data">
+                      {this.state.interestRate ? `${this.state.interestRate.toFixed(1)}%` : `0.0%`} APR
+                  </div>
+                    {/*<div className="trade-form__info_block__stats__splitter" style={{ borderLeftColor: this.state.assetDetails.textColor2 }}>|</div>*/}
+                    <div className="trade-form__info_block__stats__data">
+                      {`${this.props.leverage.toString()}x`}
+                    </div>
                   </div>
                 </div>
               </a>
@@ -427,22 +429,24 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
                   {this.state.assetDetails.reactLogoSvg.render()}
                   <PositionTypeMarkerAlt assetDetails={this.state.assetDetails} value={this.props.positionType} />
                 </div>
-                <div className="trade-form__info_block__asset" style={this.props.asset === Asset.WBTC ? { color: this.state.assetDetails.textColor, paddingTop: `1rem` } : { color: this.state.assetDetails.textColor }}>
-                  {tokenNameBase}
-                </div>
-                <div className="trade-form__info_block__stats" style={{ color: this.state.assetDetails.textColor2 }}>
-                  <div className="trade-form__info_block__stats__data">
-                    {this.state.interestRate ? `${this.state.interestRate.toFixed(1)}%` : `0.0%`} APR
+                <div className="trade-form__asset-stats">
+                  <div className="trade-form__info_block__asset">
+                    {tokenNameBase}
                   </div>
-                  <div className="trade-form__info_block__stats__splitter" style={{ borderLeftColor: this.state.assetDetails.textColor2 }}>|</div>
-                  <div className="trade-form__info_block__stats__data">
-                    {`${this.props.leverage.toString()}x`}
+                  <div className="trade-form__info_block__stats">
+                    <div className="trade-form__info_block__stats__data">
+                      {this.state.interestRate ? `${this.state.interestRate.toFixed(1)}%` : `0.0%`} APR
+                  </div>
+                    <div className="trade-form__info_block__stats__splitter">|</div>
+                    <div className="trade-form__info_block__stats__data">
+                      {`${this.props.leverage.toString()}x`}
+                    </div>
                   </div>
                 </div>
               </div>
             )}
         </div>
-        <div className="trade-form__form-container" style={this.props.tradeType === TradeType.SELL ? { minHeight: `16.5625rem` } : undefined}>
+        <div className="trade-form__form-container">
           <div className="trade-form__form-values-container">
             <div className="trade-form__amount-container">
               <input
@@ -462,11 +466,11 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
                   <div className="trade-form__amount-max" onClick={this.onInsertMaxValue}><img src={ic_arrow_max} />MAX</div>
               )*/}
             </div>
-            <div className="trade-form__group-button"> 
-              <button data-value="0.25" className={multiplier === 0.25 ? "active ": ""} onClick={this.onInsertMaxValue}>25%</button>
-              <button data-value="0.5" className={multiplier === 0.5 ? "active ": ""} onClick={this.onInsertMaxValue}>50%</button>
-              <button data-value="0.75" className={multiplier === 0.75 ? "active ": ""} onClick={this.onInsertMaxValue}>75%</button>
-              <button data-value="1" className={multiplier === 1 ? "active ": ""} onClick={this.onInsertMaxValue}>100%</button>
+            <div className="trade-form__group-button">
+              <button data-value="0.25" className={multiplier === 0.25 ? "active " : ""} onClick={this.onInsertMaxValue}>25%</button>
+              <button data-value="0.5" className={multiplier === 0.5 ? "active " : ""} onClick={this.onInsertMaxValue}>50%</button>
+              <button data-value="0.75" className={multiplier === 0.75 ? "active " : ""} onClick={this.onInsertMaxValue}>75%</button>
+              <button data-value="1" className={multiplier === 1 ? "active " : ""} onClick={this.onInsertMaxValue}>100%</button>
             </div>
             <div className="trade-form__kv-container" style={{ padding: `initial` }}>
               {amountMsg.includes("Slippage:") ? (

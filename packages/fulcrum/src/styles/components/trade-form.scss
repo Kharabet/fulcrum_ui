@@ -28,33 +28,40 @@
       border-radius: 50%;
       width: 27px;
     }
+    .trade-form__asset-stats {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      margin-top: 5px;
+    }
   }
   &__info_block__asset {
+    font-weight: 700;
     font-size: 24px;
-    line-height: 1.5;
-    font-weight: 600;
+    line-height: 150%;
+    color: #282f36;
     text-align: center;
-    margin-bottom: 7px;
   }
   &__info_block__stats {
+    font-weight: 600;
+    font-size: 13px;
+    line-height: 150%;
+
+    color: #a2abb8;
     display: flex;
     flex-direction: row;
     justify-content: center;
-    font-size: 13px;
-    line-height: 1;
-    letter-spacing: normal;
-    text-align: center;
     &__data {
       &:first-child {
-        border-right: 1px solid rgb(172, 181, 194);
+        border-right: 1px solid #a2abb8;
         margin-right: 3px;
         padding-right: 3px;
       }
     }
   }
-  &__group-button{
+  &__group-button {
     margin-top: 3px;
-    button{
+    button {
       font-size: 12px;
       font-weight: 600;
       width: calc(25% - 1.5px);
@@ -64,10 +71,10 @@
       border: none;
       outline: none;
       cursor: pointer;
-      &:not(:last-child){
+      &:not(:last-child) {
         margin-right: 2px;
       }
-      &:hover{
+      &:hover {
         background: #758295;
       }
     }
@@ -224,16 +231,16 @@
   width: 100%;
   height: 65px;
   position: relative;
-  &:before{
-    content: '';
+  &:before {
+    content: "";
     position: absolute;
     border: 16px solid transparent;
     border-left: 16px solid #ffffff;
-    left: -30.5px;
+    left: -31px;
     top: 0;
     bottom: 0;
     margin: auto;
-    height: 32px
+    height: 32px;
   }
 
   .trade-form__amount-input {
@@ -257,7 +264,7 @@
   .trade-form__collateral-button-container {
     display: flex;
     width: 35%;
-    border: none;    
+    border: none;
   }
 
   /*.trade-form__amount-max {
