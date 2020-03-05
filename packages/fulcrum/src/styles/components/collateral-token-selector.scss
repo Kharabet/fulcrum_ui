@@ -7,6 +7,12 @@
   box-sizing: border-box;
   width: 100%;
   z-index: 100004;
+  &__wrapper{
+    width: 100vw;
+    height: 100vh;
+    position: absolute;
+    z-index: 100003;
+  }
   &__title {
     margin-bottom: 12px;
     font-size: 14px;
@@ -47,12 +53,6 @@
         width: 25px;
         height: 25px;
       }
-    }
-    &__wrapper{
-      width: 100vw;
-      height: 100vh;
-      position: absolute;
-      z-index: 100003;
     }
   }
 }

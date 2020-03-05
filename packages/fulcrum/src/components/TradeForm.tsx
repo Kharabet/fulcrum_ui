@@ -489,16 +489,6 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
                 :
                 null
               }
-              {this.state.isChangeCollateralOpen
-                ?
-                <CollateralTokenSelector
-                  selectedCollateral={this.state.collateral}
-                  collateralType={this.props.tradeType === TradeType.BUY ? `Purchase` : `Withdrawal`}
-                  onCollateralChange={this.onChangeCollateralClicked}
-                  onClose={this.onChangeCollateralClose}/>
-                :
-                null
-              }
               {/*isAmountMaxed ? (
                 <div className="trade-form__amount-maxed">MAX</div>
               ) : (
