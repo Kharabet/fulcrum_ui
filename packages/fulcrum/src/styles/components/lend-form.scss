@@ -164,20 +164,17 @@
   }
 
   .lend-form__amount-input {
-    height: 4rem;
-    width: calc(100% - 4rem);
-
-    background-color: rgba(32, 31, 35, 0.3);
-    padding: 0.8125rem 1rem 0.9375rem;
-    border: 0 none;
-
-    font-size: 1.5rem;
+    height: 65px;
+    width: 100%;
+    background-color: #394049;
+    border: none;
+    font-size: 32px;
     font-weight: 600;
     font-style: normal;
     font-stretch: normal;
     letter-spacing: normal;
-    text-align: right;
     color: #ffffff;
+    padding-left: 15px;
 
     &:focus {
       outline: none;

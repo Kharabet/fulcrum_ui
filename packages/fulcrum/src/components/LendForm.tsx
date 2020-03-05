@@ -313,11 +313,11 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
                 value={this.state.lendAmountText}
                 onChange={this.onLendAmountChange}
               />
-              {isAmountMaxed ? (
+              {/*isAmountMaxed ? (
                 <div className="lend-form__amount-maxed">MAX</div>
               ) : (
                   <div className="lend-form__amount-max" onClick={this.onInsertMaxValue}>&#65087;<br />MAX</div>
-                )}
+                )*/}
             </div>
             <div className="lend-form__kv-container jc-fe">
               <div title={this.state.lendedAmountEstimate ? `$${this.state.lendedAmountEstimate.toFixed(18)}` : ``} className="lend-form__value lend-form__value--no- fw-600">
