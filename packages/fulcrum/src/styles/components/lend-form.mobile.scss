@@ -1,12 +1,8 @@
-
 @media only screen and (max-width: $mobile-version-max-width) {
   .lend-form {
     @include clearfix();
-
-    width: 100%;
-    background-color: #444e5a;
-
-    
+    flex-wrap: wrap;
+    max-width: 310px;
     .close-icon {
       position: absolute;
       right: 20px;
@@ -14,43 +10,31 @@
       z-index: 100;
     }
   }
-
   .lend-form__image {
-    float: left;
-    transform: rotate3d(2);
-    position: unset;
-    height: 100%;
     width: 100%;
-
-    top: 0;
-    left: 0;
-
-    background-size: 100% 100%;
-
-    img {
-      position: relative;
-
-      height: 14rem;
-      width: 8rem;
-
-      top: 95px;
-      left: 60%;
-
-      transform: translateX(-75%) translateY(-50%);
+    justify-content: center;
+    padding: 17px 0;
+    position: relative;
+    svg{
+      width: 55px;
+      height: 55px;
+    }
+    &:after{
+      content: "";
+      position: absolute;
+      border: 12px solid transparent;
+      border-top: 12px solid #ffffff;
+      bottom: -23px;
+      left: 0;
+      right: 0;
+      margin: auto;
+      width: 24px;
+      height: 12px;
+      box-sizing: border-box;
     }
   }
-
   .lend-form__form-container {
-    float: right;
-    box-sizing: border-box;
-
-    height: 100%;
-    width: 20rem;
-
-    top: 0;
-    left: 0;
-
-    padding: 3rem 3rem 3rem 1rem;
+    padding: 20px 30px 30px 30px;
   }
 
   .lend-form__form-values-container {
@@ -64,11 +48,7 @@
   }
 
   .lend-form__kv-container {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-
-    padding: 0.22rem 0;
+    margin-bottom: 8px;
   }
 
   .lend-form__kv-container--w_dots {
@@ -97,14 +77,8 @@
   }
 
   .lend-form__label {
-    line-height: 2;
-    font-size: 0.75rem;
-    font-weight: normal;
-    font-style: normal;
-    font-stretch: normal;
-    letter-spacing: normal;
-    color: #a9b5c7;
-    background-color: #444e5a;
+    line-height: 1;
+    font-size: 12px;
   }
 
   .lend-form__label--action {
@@ -122,14 +96,7 @@
   }
 
   .lend-form__value {
-    line-height: 2;
-    font-size: 0.75rem;
-    font-weight: 600;
-    font-style: normal;
-    font-stretch: normal;
-    letter-spacing: normal;
-    color: #ffe546;
-    background-color: #444e5a;
+    line-height: 1;
 
     &--no-color {
       color: #a9b5c7;
@@ -137,30 +104,27 @@
   }
 
   .lend-form__amount-container {
-    display: flex;
+    &:before{
+      content: none;
+    }
 
     .lend-form__amount-input {
-      height: 4rem;
-      width: calc(100% - 4rem);
-
-      background-color: rgba(32, 31, 35, 0.3);
-      padding: 0.8125rem 1rem 0.9375rem;
-      border: 0 none;
-
-      font-size: 1.5rem;
+      height: 65px;
+      width: 100%;
+      background-color: #394049;
+      font-size: 32px;
       font-weight: 600;
-      font-style: normal;
-      font-stretch: normal;
-      letter-spacing: normal;
-      text-align: right;
       color: #ffffff;
+      border: none;
+      outline: none;
+      padding-left: 15px;
 
       &:focus {
         outline: none;
       }
     }
 
-    .lend-form__amount-max {
+    /*.lend-form__amount-max {
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -183,9 +147,9 @@
       color: #ffffff;
 
       cursor: pointer;
-    }
+    }*/
 
-    .lend-form__amount-maxed {
+    /*.lend-form__amount-maxed {
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -208,7 +172,7 @@
       color: #00ff00;
 
       cursor: pointer;
-    }
+    }*/
   }
 
   .rounded-mark {
