@@ -9,7 +9,6 @@
 @import "base/animations";
 @import "base/base";
 @import "base/typography";
-@import "base/utilities";
 
 @import "components/check-box";
 
@@ -65,3 +64,6 @@
 @import "pages/maintenance-page";
 @import "pages/stats-page";
 @import "pages/trade-page";
+
+
+@import "base/utilities";

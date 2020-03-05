@@ -6,7 +6,7 @@ import { merge, Observable, Subject } from "rxjs";
 import { debounceTime, distinctUntilChanged, switchMap } from "rxjs/operators";
 import { Asset } from "../domain/Asset";
 import { AssetDetails } from "../domain/AssetDetails";
-import {AssetsDictionary, AssetsDictionaryMobile} from "../domain/AssetsDictionary";
+import { AssetsDictionary, AssetsDictionaryMobile } from "../domain/AssetsDictionary";
 import { LendRequest } from "../domain/LendRequest";
 import { LendType } from "../domain/LendType";
 import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
@@ -15,6 +15,8 @@ import { FulcrumProvider } from "../services/FulcrumProvider";
 import { DaiOrChaiSelector } from "./DaiOrChaiSelector";
 // import configProviders from "./../config/providers.json";
 import { EthOrWethSelector } from "./EthOrWethSelector";
+
+import { ReactComponent as CloseIcon } from "../assets/images/ic__close.svg"
 
 // TagManager.initialize({
 //   gtmId: configProviders.Google_TrackingID,
@@ -74,7 +76,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
 
 
     let assetDetails = AssetsDictionary.assets.get(this.props.asset);
-    if(this.props.isMobileMedia){
+    if (this.props.isMobileMedia) {
       assetDetails = AssetsDictionaryMobile.assets.get(this.props.asset);
     }
 
@@ -133,7 +135,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
 
   private async derivedUpdate() {
     let assetDetails = AssetsDictionary.assets.get(this.props.asset);
-    if(this.props.isMobileMedia){
+    if (this.props.isMobileMedia) {
       assetDetails = AssetsDictionaryMobile.assets.get(this.props.asset);
     }
 
@@ -145,7 +147,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
     } else {
       assetOrWrapped = this.props.asset;
     }
-    
+
     const interestRate = await FulcrumProvider.Instance.getLendTokenInterestRate(this.props.asset);
     const maxLendAmountArr = (await FulcrumProvider.Instance.getMaxLendValue(
       new LendRequest(this.props.lendType, assetOrWrapped, new BigNumber(0))
@@ -218,9 +220,6 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
       return null;
     }
 
-    const divStyle = {
-      backgroundImage: `url(${this.state.assetDetails.bgSvg})`
-    };
 
     if (this.props.asset === Asset.SUSD) {
       // @ts-ignore
@@ -241,9 +240,9 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
 
     const amountMsg =
       this.state.ethBalance && this.state.ethBalance.lte(FulcrumProvider.Instance.gasBufferForLend)
-        ? "Insufficient funds for gas \u2639"
+        ? "Insufficient funds for gas"
         : this.state.maxLendAmount && this.state.maxLendAmount.eq(0)
-          ? "Your wallet is empty \u2639"
+          ? "Your wallet is empty"
           : "";
 
     const lendedAmountEstimateText =
@@ -257,54 +256,55 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
 
     return (
       <form className="lend-form" onSubmit={this.onSubmitClick}>
-        <div className="lend-form__image" style={divStyle}>
-          <img src={this.state.assetDetails.logoSvg} alt={tokenNameSource} />
+        <CloseIcon className="close-icon" onClick={this.onCancelClick}/>
+        <div className="lend-form__image">
+          {this.state.iTokenAddress &&
+            FulcrumProvider.Instance.web3ProviderSettings &&
+            FulcrumProvider.Instance.web3ProviderSettings.etherscanURL ? (
+              <a
+                className="trade-form__info_block"
+                style={{ cursor: `pointer`, textDecoration: `none` }}
+                title={this.state.iTokenAddress}
+                href={`${FulcrumProvider.Instance.web3ProviderSettings.etherscanURL}address/${this.state.iTokenAddress}#readContract`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {this.state.assetDetails.reactLogoSvg.render()}
+              </a>) :
+
+            this.state.assetDetails.reactLogoSvg.render()
+          }
         </div>
         <div className="lend-form__form-container">
           <div className="lend-form__form-values-container">
-            <div className="lend-form__kv-container lend-form__kv-container--w_dots">
+            <div className="lend-form__kv-container">
               <div className="lend-form__label">Asset</div>
+              <hr></hr>
+
               <div className="lend-form__value">{tokenNameSource}</div>
             </div>
-            <div className="lend-form__kv-container lend-form__kv-container--w_dots">
+            <div className="lend-form__kv-container">
               <div className="lend-form__label">Interest APR</div>
+              <hr></hr>
               <div title={this.state.interestRate ? `${this.state.interestRate.toFixed(18)}%` : ``} className="lend-form__value">{this.state.interestRate ? `${this.state.interestRate.toFixed(4)}%` : `0.0000%`}</div>
             </div>
             <div className="lend-form__kv-container">
               <div className="lend-form__label">{this.props.lendType === LendType.LEND ? `Lend Amount` : `UnLend Amount`}</div>
-              {/*this.props.lendType !== LendType.LEND &&
-                this.state.iTokenAddress &&
-                FulcrumProvider.Instance.web3ProviderSettings &&
-                FulcrumProvider.Instance.web3ProviderSettings.etherscanURL ? (
-                <div className="lend-form__value">
-                  <a
-                    className="lend-form__value"
-                    style={{cursor: `pointer`, textDecoration: `none`}}
-                    title={this.state.iTokenAddress}
-                    href={`${FulcrumProvider.Instance.web3ProviderSettings.etherscanURL}address/${this.state.iTokenAddress}#readContract`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {tokenNameSource}
-                  </a>
-                </div>
-              ) :
-                this.props.asset === Asset.ETH ? (
-                  <EthOrWethSelector items={[Asset.ETH, Asset.WETH]} value={this.state.useWrapped ? Asset.WETH : Asset.ETH} onChange={this.onChangeUseWrapped} />
-                ) : (
-                  <div className="lend-form__value">{tokenNameSource}</div>
-                )
-              */}
               {
                 this.props.asset === Asset.ETH ? (
                   <EthOrWethSelector items={[Asset.ETH, Asset.WETH]} value={this.state.useWrapped ? Asset.WETH : Asset.ETH} onChange={this.onChangeUseWrapped} />
                 ) : this.props.asset === Asset.DAI ? (
-                    <DaiOrChaiSelector items={[Asset.DAI, Asset.CHAI]} value={this.state.useWrappedDai ? Asset.CHAI : Asset.DAI} onChange={this.onChangeUseWrappedDai} />
-                  ) : (
-                    <div className="lend-form__value">{tokenNameSource}</div>
-                  )
+                  <DaiOrChaiSelector items={[Asset.DAI, Asset.CHAI]} value={this.state.useWrappedDai ? Asset.CHAI : Asset.DAI} onChange={this.onChangeUseWrappedDai} />
+                ) : (
+                      <div className="lend-form__value">{tokenNameSource}</div>
+                    )
               }
             </div>
+            
+            <div className="lend-form__amount-message">
+              {amountMsg}
+            </div>
+
             <div className="lend-form__amount-container">
               <input
                 type="text"
@@ -316,12 +316,11 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
               {isAmountMaxed ? (
                 <div className="lend-form__amount-maxed">MAX</div>
               ) : (
-                <div className="lend-form__amount-max" onClick={this.onInsertMaxValue}>&#65087;<br/>MAX</div>
-              )}
+                  <div className="lend-form__amount-max" onClick={this.onInsertMaxValue}>&#65087;<br />MAX</div>
+                )}
             </div>
-            <div className="lend-form__kv-container">
-              <div className="trade-form__label">{amountMsg}</div>
-              <div title={this.state.lendedAmountEstimate ? `$${this.state.lendedAmountEstimate.toFixed(18)}` : ``} className="lend-form__value lend-form__value--no-color">
+            <div className="lend-form__kv-container jc-fe">
+              <div title={this.state.lendedAmountEstimate ? `$${this.state.lendedAmountEstimate.toFixed(18)}` : ``} className="lend-form__value lend-form__value--no- fw-600">
                 <Tooltip
                   html={
                     <div style={{ /*maxWidth: `300px`*/ }}>
@@ -333,21 +332,21 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
                 </Tooltip>
                 {
                   this.state.iTokenAddress &&
-                  FulcrumProvider.Instance.web3ProviderSettings &&
-                  FulcrumProvider.Instance.web3ProviderSettings.etherscanURL ? (
-                  <a
-                    className="lend-form__value--no-color"
-                    style={{cursor: `pointer`, textDecoration: `none`}}
-                    title={this.state.iTokenAddress}
-                    href={`${FulcrumProvider.Instance.web3ProviderSettings.etherscanURL}address/${this.state.iTokenAddress}#readContract`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    &nbsp; {lendedAmountEstimateText} {tokenNameDestination}
-                  </a>
-                ) : (
-                  <React.Fragment>&nbsp; {lendedAmountEstimateText} {tokenNameDestination}</React.Fragment>
-                )}
+                    FulcrumProvider.Instance.web3ProviderSettings &&
+                    FulcrumProvider.Instance.web3ProviderSettings.etherscanURL ? (
+                      <a
+                        className="lend-form__value--no-color"
+                        style={{ cursor: `pointer`, textDecoration: `none` }}
+                        title={this.state.iTokenAddress}
+                        href={`${FulcrumProvider.Instance.web3ProviderSettings.etherscanURL}address/${this.state.iTokenAddress}#readContract`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        &nbsp; {lendedAmountEstimateText} {tokenNameDestination}
+                      </a>
+                    ) : (
+                      <React.Fragment>&nbsp; {lendedAmountEstimateText} {tokenNameDestination}</React.Fragment>
+                    )}
               </div>
             </div>
 
@@ -357,13 +356,10 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
                   You may be prompted to approve the asset after clicking LEND.
                 </div>
               </div>
-            ) : ``}
+            ) : <div style={{height: "10px"}}></div>}
           </div>
 
-          <div className="lend-form__actions-container" style={needsApprovalMessage ? { marginBottom: `-1.875rem`, marginTop: `-1.3125rem`} : undefined}>
-            <button className="lend-form__cancel-button" onClick={this.onCancelClick}>
-              <span className="lend-form__label--action">Cancel</span>
-            </button>
+          <div className="lend-form__actions-container">
             <button type="submit" className={`lend-form__submit-button ${submitClassName}`}>
               {this.props.lendType}
             </button>
@@ -378,7 +374,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
     const amountText = event.target.value ? event.target.value : "";
 
     // setting tradeAmountText to update display at the same time
-    this.setState({...this.state, lendAmountText: amountText}, () => {
+    this.setState({ ...this.state, lendAmountText: amountText }, () => {
       // emitting next event for processing with rx.js
       this._inputChange.next(this.state.lendAmountText);
     });
@@ -411,7 +407,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
 
   public onCancelClick = () => {
 
-    
+
     // let tmpNum = parseInt(this.state.lendAmount) +150
     // alert(tmpNum)
     // let randomNumber = Math.floor(Math.random() * 100000) + 1;
@@ -465,12 +461,12 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
 
       if (sendAmount.gt(this.state.maxTokenAmount)) {
         sendAmount = this.state.maxTokenAmount;
-      } 
+      }
     }
 
     let usdPrice = sendAmount
     if (usdPrice !== null) {
-        usdPrice = usdPrice.multipliedBy(usdAmount)
+      usdPrice = usdPrice.multipliedBy(usdAmount)
     }
 
     const randomNumber = Math.floor(Math.random() * 100000) + 1;
@@ -482,7 +478,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
         transactionProducts: [{
           name: this.props.lendType + '-' + this.props.asset,
           sku: this.props.asset,
-          category:this.props.lendType,
+          category: this.props.lendType,
           price: new BigNumber(usdPrice),
           quantity: 1
         }],
@@ -511,7 +507,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
   };
 
   private rxFromMaxAmount = (): Observable<ILendAmountChangeEvent | null> => {
-    
+
     let assetOrWrapped: Asset;
     if (this.props.asset === Asset.ETH) {
       assetOrWrapped = this.state.useWrapped ? Asset.WETH : Asset.ETH;
@@ -520,7 +516,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
     } else {
       assetOrWrapped = this.props.asset;
     }
-    
+
     return new Observable<ILendAmountChangeEvent | null>(observer => {
       const lendRequest = new LendRequest(
         this.props.lendType,
@@ -585,7 +581,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
         } else {
           assetOrWrapped = this.props.asset;
         }
-        
+
         const lendRequest = new LendRequest(
           this.props.lendType,
           assetOrWrapped,

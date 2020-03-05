@@ -1,51 +1,40 @@
 .lend-form {
   @include clearfix();
 
-  width: 36rem;
-
+  max-width: 575px;
   background-color: #444e5a;
+  display: flex;
+  flex-direction: row;
+
+  .close-icon {
+    position: absolute;
+    right: 24px;
+    top: 24px;
+    height: 16px;
+    width: 16px;
+    cursor: pointer;
+  }
 }
 
 .lend-form__image {
-  float: left;
-
-  position:absolute;
-  height: 100%;
-  width: 16rem;
-
-  top: 0;
-  left: 0;
-
-  background-size: 100% 100%;
-
-  img {
-    position: relative;
-
-    height: 8rem;
-    width: 8rem;
-
-    top: 50%;
-    left: 50%;
-
-    transform: translateX(-75%) translateY(-50%);
+  background: #fff;
+  display: flex;
+  align-items: center;
+  padding: 40px;
+  svg{
+    height: 90px;
+    width: 90px;
+    .eth-svg{
+      fill: #c8c8c8;
+    }
   }
 }
 
 .lend-form__form-container {
-  float: right;
-  box-sizing: border-box;
-
-  height: 100%;
-  width: 20rem;
-
-  top: 0;
-  left: 0;
-
-  padding: 3rem 3rem 3rem 1rem;
+  padding: 55px 50px 30px 30px;
 }
 
 .lend-form__form-values-container {
-  margin-bottom: 2.5rem;
 }
 
 .lend-form__actions-container {
@@ -55,7 +44,7 @@
 
   .lend-form__poweredBy {
     position: absolute;
-    background: #29323D;
+    background: #29323d;
     bottom: 0px;
     right: 0px;
     line-height: 2;
@@ -71,7 +60,7 @@
 
     &--link {
       cursor: pointer;
-      textDecoration: underline;
+      textdecoration: underline;
       line-height: 2;
       font-size: 0.75rem;
       font-weight: normal;
@@ -89,21 +78,19 @@
   flex-direction: row;
   justify-content: space-between;
 
-  padding: 0.22rem 0;
-}
+  padding: 0;
 
-.lend-form__kv-container--w_dots {
-  background-image: url("../assets/images/dotted_line.png");
-  background-repeat: repeat-x;
-  background-position-y: 1.25rem;
+  margin-bottom: 15px;
 }
 
 .lend-form__token-message-container {
-  margin: 0.25rem 0 0.5rem;
-  padding: 0.75rem 1.375rem;
+  margin-bottom: 5px;
 
-  border-radius: 0.25rem;
-  background-color: #0000001a;
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 150%;
+  color: #ffffff;
+  max-width: 245px;
 }
 
 .lend-form__token-message-container--message {
@@ -118,14 +105,10 @@
 }
 
 .lend-form__label {
-  line-height: 2;
-  font-size: 0.75rem;
-  font-weight: normal;
-  font-style: normal;
-  font-stretch: normal;
-  letter-spacing: normal;
-  color: #a9b5c7;
-  background-color: #444e5a;
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 150%;
+  color: #a2abb8;
 }
 
 .lend-form__label--action {
@@ -143,22 +126,42 @@
 }
 
 .lend-form__value {
-  line-height: 2;
-  font-size: 0.75rem;
-  font-weight: 600;
-  font-style: normal;
-  font-stretch: normal;
-  letter-spacing: normal;
-  color: #ffe546;
-  background-color: #444e5a;
+  font-weight: bold;
+  font-size: 12px;
+  line-height: 150%;
+  color: #ffe352;
 
   &--no-color {
-    color: #a9b5c7;
+    color: #A2ABB8;
   }
+}
+
+.lend-form__amount-message{
+  text-align: left;
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 150%;
+  color: #FE7272;
+  margin-bottom: 10px;
 }
 
 .lend-form__amount-container {
   display: flex;
+  position: relative;
+  
+  &:before {
+    content: "";
+    position: absolute;
+    border: 16px solid transparent;
+    border-left: 16px solid #ffffff;
+    left: -31px;
+    top: 50%;
+    transform: translate(0, -50%);
+    bottom: 0;
+    width: 16px;
+    height: 32px;
+    box-sizing: border-box;
+  }
 
   .lend-form__amount-input {
     height: 4rem;
@@ -183,9 +186,9 @@
 
   .lend-form__amount-max {
     display: flex;
-    flex-direction:column;
-    justify-content:center;
-    align-content:center;
+    flex-direction: column;
+    justify-content: center;
+    align-content: center;
 
     width: 4rem;
     padding: 0.5rem;
@@ -194,7 +197,6 @@
     border-left: 1px solid #444e5a;
 
     background-color: rgba(32, 31, 35, 0.3);
-
 
     font-size: 0.75rem;
     font-weight: 600;
@@ -209,9 +211,9 @@
 
   .lend-form__amount-maxed {
     display: flex;
-    flex-direction:column;
-    justify-content:center;
-    align-content:center;
+    flex-direction: column;
+    justify-content: center;
+    align-content: center;
 
     width: 4rem;
     padding: 0.5rem;
@@ -220,7 +222,6 @@
     border-left: 1px solid #444e5a;
 
     background-color: rgba(32, 31, 35, 0.3);
-
 
     font-size: 0.75rem;
     font-weight: 600;
@@ -242,37 +243,44 @@
   padding: 0.0625rem 0.3125rem;
 }
 
-.lend-form__cancel-button {
-  display: inline-block;
-
-  cursor: pointer;
-  border: 0;
-  height: 2.5rem;
-  width: 6.5rem;
-  background-color: rgba(0, 0, 0, 0);
-  text-decoration: underline;
-  text-decoration-style: dotted;
-  color: #a9b5c7;
-  outline: none;
-}
-
 .lend-form__submit-button {
-  display: inline-block;
+  display: flex;
 
   cursor: pointer;
   border: 0;
-  height: 2.5rem;
-  width: 6.5rem;
-  border-radius: 100px;
+  padding: 12px 25px;
+  border-radius: 40px;
   color: #ffffff;
   text-transform: uppercase;
   outline: none;
 
   &--lend {
-    background-color: #69bf83;
+    background: #00c0ab;
   }
 
   &--un-lend {
-    background-color: #ff5353;
+    background: #ff4f4f;
   }
+}
+
+
+
+.fw-600{
+  font-weight: 600;
+}
+
+.text-right{
+  text-align: right;
+}
+
+hr{
+  
+  border: none;
+  color: #fff;
+  flex: 3;
+  align-self: flex-end;
+  border-top: 1px dashed rgba(162, 171, 184, 0.5);
+  height: 3px;
+  margin: 0 4px;
+
 }
