@@ -451,8 +451,6 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
         </div>
         <div className={`trade-form__form-container ${this.props.tradeType === TradeType.BUY ? "buy" : "sell"}`}>
           <div className="trade-form__form-values-container">
-
-
             {!this.props.isMobileMedia && this.state.positionTokenBalance && this.props.tradeType === TradeType.BUY ? (
               <TradeExpectedResult value={tradeExpectedResultValue} />
             ) : null}
@@ -481,6 +479,31 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
               <div className="trade-form__collateral-button-container">
                 <CollateralTokenButton asset={this.state.collateral} onClick={this.onChangeCollateralOpen} />
               </div>
+              {this.state.isChangeCollateralOpen
+                ?
+                <CollateralTokenSelector
+                  selectedCollateral={this.state.collateral}
+                  collateralType={this.props.tradeType === TradeType.BUY ? `Purchase` : `Withdrawal`}
+                  onCollateralChange={this.onChangeCollateralClicked}
+                  onClose={this.onChangeCollateralClose}/>
+                :
+                null
+              }
+              {this.state.isChangeCollateralOpen
+                ?
+                <CollateralTokenSelector
+                  selectedCollateral={this.state.collateral}
+                  collateralType={this.props.tradeType === TradeType.BUY ? `Purchase` : `Withdrawal`}
+                  onCollateralChange={this.onChangeCollateralClicked}
+                  onClose={this.onChangeCollateralClose}/>
+                :
+                null
+              }
+              {/*isAmountMaxed ? (
+                <div className="trade-form__amount-maxed">MAX</div>
+              ) : (
+                  <div className="trade-form__amount-max" onClick={this.onInsertMaxValue}><img src={ic_arrow_max} />MAX</div>
+              )*/}
             </div>
             <div className="trade-form__group-button">
               <button data-value="0.25" className={multiplier === 0.25 ? "active " : ""} onClick={this.onInsertMaxValue}>25%</button>
@@ -523,10 +546,6 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
               BUY DISABLED
               </button>
             ) : (*/}
-
-
-
-
             <button title={this.state.exposureValue.gt(0) ? `${this.state.exposureValue.toFixed(18)} ${this.props.asset}` : ``} type="submit" className={`trade-form__submit-button ${submitClassName}`}>
               {submitButtonText}
             </button>
@@ -544,19 +563,6 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
               </CollapsibleContainer>
             </div> : null}
         </div>
-        <Modal
-          isOpen={this.state.isChangeCollateralOpen}
-          onRequestClose={this.onChangeCollateralClose}
-          className="modal-content-div"
-          overlayClassName="modal-overlay-div"
-        >
-          <CollateralTokenSelector
-            selectedCollateral={this.state.collateral}
-            collateralType={this.props.tradeType === TradeType.BUY ? `Purchase` : `Withdrawal`}
-            onCollateralChange={this.onChangeCollateralClicked}
-            onClose={this.onChangeCollateralClose}
-          />
-        </Modal>
       </form >
     );
   }

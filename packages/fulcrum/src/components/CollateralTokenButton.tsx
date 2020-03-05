@@ -1,5 +1,5 @@
 import React, { Component, MouseEvent } from "react";
-import ic__token_selector__down from "../assets/images/ic___token_selector___down.svg";
+import {ReactComponent as IcTokenSelectorDown} from "../assets/images/ic___token_selector___down.svg";
 import { Asset } from "../domain/Asset";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
@@ -44,9 +44,9 @@ export class CollateralTokenButton extends Component<ICollateralTokenButtonProps
       <React.Fragment>
         {this.state.assetDetails ? (
           <div className="collateral-token-button" onClick={this.onClick}>
-            <img src={this.state.assetDetails.tsSvg} />
-            {this.state.assetDetails.displayName}
-            <img src={ic__token_selector__down} />
+            {this.state.assetDetails.reactLogoSvg.render()}
+            <span>{this.state.assetDetails.displayName}</span>  
+            <div className="selector-down"><IcTokenSelectorDown/></div>
           </div>
         ) : null}
       </React.Fragment>
