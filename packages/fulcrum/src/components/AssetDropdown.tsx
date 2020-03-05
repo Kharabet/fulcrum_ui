@@ -71,8 +71,8 @@ export class AssetDropdown extends Component<IAssetDropdownProps, IAssetDropdown
     const activeAssetDetails = AssetsDictionary.assets.get(this.props.selectedAsset);
     if (!activeAssetDetails) return null;
     return (
-<div className="asset-dropdown-container">
-        <div className={`collateral-token-button ${this.state.isOpened ? "opened" : "closed"}`} onClick={this.onOpenClick}>
+      <div className="asset-dropdown-container">
+        <div className={`asset-dropdown-button ${this.state.isOpened ? "opened" : "closed"}`} onClick={this.onOpenClick}>
           {activeAssetDetails.reactLogoSvg.render()}
           <span>{activeAssetDetails.displayName}</span>
         </div>
@@ -80,12 +80,9 @@ export class AssetDropdown extends Component<IAssetDropdownProps, IAssetDropdown
           <React.Fragment><div className="asset-dropdown__wrapper" onClick={this.onClose}></div>
             <div className="asset-dropdown">
               <div className="asset-dropdown__items">{this.tokenItems()}</div>
-              {/*<div className="asset-dropdown__actions">
-            <div className="asset-dropdown__action--close" onClick={this.props.onClose}>Close</div>
-          </div>*/}
             </div>
           </React.Fragment> : null}
-          </div>
+      </div>
     );
   }
 }
