@@ -5,6 +5,15 @@
   width: 575px;
   min-height: 285px;
   background-color: #444e5a;
+  position: relative;
+  .close-icon {
+    position: absolute;
+    right: 24px;
+    top: 24px;
+    height: 16px;
+    width: 16px;
+    cursor: pointer;
+  }
   &__left_block {
     display: flex;
     align-items: center;
@@ -61,6 +70,7 @@
   }
   &__group-button {
     margin-top: 3px;
+    margin-bottom: 10px;
     button {
       font-size: 12px;
       font-weight: 600;
@@ -85,6 +95,9 @@
   padding: 75px 45px 30px 30px;
   display: flex;
   flex-direction: column;
+  &.buy {
+    padding-top: 55px;
+  }
 
   .trade-form__form-values-container {
     margin-bottom: 30px;
@@ -119,30 +132,62 @@
 
     margin-top: auto;
   }
+  .trade-how-it-works-container {
+    margin-top: -30px;
+    margin-bottom: 10px;
+    .trade-form__how-it-works {
+      display: flex;
+      margin-top: 30px;
+    }
+
+    .hiw-icon {
+      margin-right: 13px;
+      svg {
+        width: 24px;
+        height: 24px;
+      }
+    }
+    .hiw-content {
+      font-weight: 600;
+      font-size: 12px;
+      line-height: 150%;
+      color: #b9c7d6;
+    }
+  }
 }
 
 .trade-form__position-type-container {
   margin-bottom: 1rem;
 }
 
-.trade-form__slippage-amount {
-  //background-color: #fff3f3;
-  color: #ee344e;
-  width: 49px;
-  height: 25px;
-  border-radius: 23px;
+.trade-form__unit-of-account-container {
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 150%;
+  color: #a2abb8;
+
   display: flex;
   align-items: center;
-  justify-content: center;
-  margin-left: 5px;
-  font-weight: 600;
 }
 
-.trade-form__slippage-amount img {
-  width: 10px;
-  height: auto;
-  margin-left: 2px;
-}
+// .trade-form__slippage-amount {
+//   //background-color: #fff3f3;
+//   color: #ee344e;
+//   width: 49px;
+//   height: 25px;
+//   border-radius: 23px;
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+//   margin-left: 5px;
+//   font-weight: 600;
+// }
+
+// .trade-form__slippage-amount img {
+//   width: 10px;
+//   height: auto;
+//   margin-left: 2px;
+// }
 
 .trade-form__kv-container {
   display: flex;
@@ -178,14 +223,25 @@
 }
 
 .trade-form__label {
-  line-height: 2;
-  font-size: 0.75rem;
-  font-weight: normal;
-  font-style: normal;
-  font-stretch: normal;
-  letter-spacing: normal;
-  color: #a9b5c7;
-  background-color: #444e5a;
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 150%;
+  color: #fe7272;
+  margin-bottom: 10px;
+
+  &.slippage {
+    font-size: 14px;
+    display: flex;
+    .trade-form__slippage-amount {
+      font-weight: 800;
+
+      display: flex;
+      align-items: center;
+      svg {
+        margin-left: 2px;
+      }
+    }
+  }
 
   &--no-bg {
     background-color: transparent;
@@ -256,9 +312,21 @@
     color: #ffffff;
     background-color: transparent;
 
+    &input::-webkit-outer-spin-button,
+    &input::-webkit-inner-spin-button {
+      /* display: none; <- Crashes Chrome on hover */
+      -webkit-appearance: none;
+      margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+    }
+
+    &input[type="number"] {
+      -moz-appearance: textfield; /* Firefox */
+    }
+
     &:focus {
       outline: none;
     }
+    
   }
 
   .trade-form__collateral-button-container {
@@ -374,4 +442,16 @@
   &--sell {
     background-color: #ff5353;
   }
+}
+
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    /* display: none; <- Crashes Chrome on hover */
+    -webkit-appearance: none;
+    margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+}
+
+input[type=number] {
+    -moz-appearance:textfield; /* Firefox */
 }

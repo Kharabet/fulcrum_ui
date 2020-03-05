@@ -12,15 +12,25 @@
 
 .collapsible-container__toggle-label {
   cursor: pointer;
-  display: block;
-  padding: 0 0 0.5rem 0;
-
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 150%;
   text-align: right;
-  text-decoration: underline dotted;
-  line-height: 2;
-  font-size: 0.75rem;
-
-  //transition: all 0.25s ease-out;
+  border-bottom: 1px dashed #a2abb8;
+  color: #a2abb8;
+  .opened & {
+    color: #ffffff;
+    position: relative;
+    &:after {
+      content: "";
+      position: absolute;
+      right: -8px;
+      top: 50%;
+      transform: translate(0, -50%);
+      border: 3px solid transparent;
+      border-bottom: 3px solid #ffffff;
+    }
+  }
 
   &.collapsible-container__toggle-label--transparent {
     margin-top: -1.5625rem;
@@ -32,19 +42,14 @@
 }
 
 .collapsible-container__content {
-  max-height: 0;
-  overflow: hidden;
+  .closed & {
+    display: none;
+  }
+  margin-top: 20px;
   transition: max-height 0.25s ease-in-out;
 
   .collapsible-container__content-inner {
-    background: #0000001a;
-    border: 1px solid rgba(32, 31, 35, 0.3);
-    padding: 0.8125rem 1rem 0.9375rem;
-    font-size: 0.75rem;
-    line-height: 1.33;
+
   }
 }
 
-.collapsible-container__toggle-cb:checked + .collapsible-container__toggle-label + .collapsible-container__content {
-  max-height: 32rem;
-}

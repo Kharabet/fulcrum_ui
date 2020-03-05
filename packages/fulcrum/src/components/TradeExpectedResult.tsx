@@ -22,18 +22,17 @@ export class TradeExpectedResult extends Component<ITradeExpectedResultProps> {
             {this.props.value.tradeType === TradeType.SELL ? `Exit Price` : `Entry Price`}
           </div>
           <div title={`${this.props.value.currentPrice.toFixed(18)}`} className="trade-expected-result__column-value">
-            {`${this.props.value.currentPrice.toFixed(2)} USD`}
+            <span className="value">{this.props.value.currentPrice.toFixed(2)}</span>&nbsp;USD
           </div>
         </div>
 
-        <div className="trade-expected-result__delimiter" />
 
         <div className="trade-expected-result__column">
           <div className="trade-expected-result__column-title">
             Liquidation Price
           </div>
           <div title={`${this.props.value.liquidationPrice.toFixed(18)}`} className="trade-expected-result__column-value">
-            {`${this.props.value.liquidationPrice.toFixed(2)} USD`}
+            <span className="value">{this.props.value.liquidationPrice.toFixed(2)}</span>&nbsp;USD
           </div>
         </div>
       </div>
