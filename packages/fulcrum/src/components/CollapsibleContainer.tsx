@@ -22,7 +22,7 @@ export class CollapsibleContainer extends Component<ICollapsibleContainerProps, 
     const labelTransparentClassname = this.props.isTransparent ? "collapsible-container__toggle-label--transparent" : "";
 
     return (
-      <div className="collapsible-container">
+      <div className={`collapsible-container ${this.state.isOpen ? "opened" : "closed"}`}>
         <input id={uuid} className="collapsible-container__toggle-cb" type="checkbox" value={(this.state.isOpen as any)} />
         <label htmlFor={uuid} className={`collapsible-container__toggle-label ${labelTransparentClassname}`} onClick={this.onCheckedChange}>
           {this.state.isOpen ? this.props.titleClose : this.props.titleOpen}

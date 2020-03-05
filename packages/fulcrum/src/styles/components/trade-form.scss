@@ -70,6 +70,7 @@
   }
   &__group-button {
     margin-top: 3px;
+    margin-bottom: 10px;
     button {
       font-size: 12px;
       font-weight: 600;
@@ -94,6 +95,9 @@
   padding: 75px 45px 30px 30px;
   display: flex;
   flex-direction: column;
+  &.buy {
+    padding-top: 55px;
+  }
 
   .trade-form__form-values-container {
     margin-bottom: 30px;
@@ -128,10 +132,39 @@
 
     margin-top: auto;
   }
+  .trade-how-it-works-container {
+    margin-top: -30px;
+    margin-bottom: 10px;
+    .trade-form__how-it-works {
+      display: flex;
+      margin-top: 30px;
+  
+    }
+
+    .hiw-icon {
+      margin-right: 13px;
+    }
+    .hiw-content {
+      font-weight: 600;
+      font-size: 12px;
+      line-height: 150%;
+      color: #b9c7d6;
+    }
+  }
 }
 
 .trade-form__position-type-container {
   margin-bottom: 1rem;
+}
+
+.trade-form__unit-of-account-container {
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 150%;
+  color: #a2abb8;
+
+  display: flex;
+  align-items: center;
 }
 
 // .trade-form__slippage-amount {

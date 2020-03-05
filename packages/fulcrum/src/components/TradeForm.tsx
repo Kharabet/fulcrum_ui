@@ -7,6 +7,7 @@ import { merge, Observable, Subject } from "rxjs";
 import { debounceTime, distinctUntilChanged, switchMap } from "rxjs/operators";
 import ic_arrow_max from "../assets/images/ic_arrow_max.svg";
 import { ReactComponent as CloseIcon } from "../assets/images/ic__close.svg"
+import { ReactComponent as QuestionIcon } from "../assets/images/ic__question_mark.svg"
 import { ReactComponent as SlippageDown } from "../assets/images/ic__slippage_down.svg"
 import { Asset } from "../domain/Asset";
 import { AssetDetails } from "../domain/AssetDetails";
@@ -448,8 +449,14 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
               </div>
             )}
         </div>
-        <div className="trade-form__form-container">
+        <div className={`trade-form__form-container ${this.props.tradeType === TradeType.BUY ? "buy" : "sell"}`}>
           <div className="trade-form__form-values-container">
+
+
+            {this.state.positionTokenBalance && this.props.tradeType === TradeType.BUY ? (
+              <TradeExpectedResult value={tradeExpectedResultValue} />
+            ) : null}
+
             <div className="trade-form__kv-container" style={{ padding: `initial` }}>
               {amountMsg.includes("Slippage:") ? (
                 <div title={`${this.state.slippageRate.toFixed(18)}%`} className="trade-form__label slippage">
@@ -483,17 +490,18 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
 
             {this.state.positionTokenBalance && this.props.tradeType === TradeType.BUY && this.state.positionTokenBalance!.eq(0) ? (
               <CollapsibleContainer titleOpen="View advanced options" titleClose="Hide advanced options" isTransparent={amountMsg !== ""}>
-                <div className="trade-form__kv-container">
-                  <div className="trade-form__label trade-form__label--no-bg">
-                    Unit of Account &nbsp;
-                    <UnitOfAccountSelector items={[Asset.USDC, Asset.DAI]} value={this.props.defaultUnitOfAccount} onChange={this.onChangeUnitOfAccount} />
-                  </div>
+                <div className="trade-form__unit-of-account-container">
+                  Unit of Account
+                    <UnitOfAccountSelector items={[
+                    Asset.USDC,
+                    process.env.REACT_APP_ETH_NETWORK === "kovan"
+                      ? Asset.SAI
+                      : Asset.DAI
+                  ]} value={this.props.defaultUnitOfAccount} onChange={this.onChangeUnitOfAccount} />
                 </div>
               </CollapsibleContainer>
             ) : null}
-            {this.state.positionTokenBalance && this.props.tradeType === TradeType.BUY ? (
-              <TradeExpectedResult value={tradeExpectedResultValue} />
-            ) : null}
+
           </div>
 
           {this.state.isAmountExceeded ? <div className="trade-form__form-info">
@@ -509,10 +517,24 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
               BUY DISABLED
               </button>
             ) : (*/}
+
+
+
+
             <button title={this.state.exposureValue.gt(0) ? `${this.state.exposureValue.toFixed(18)} ${this.props.asset}` : ``} type="submit" className={`trade-form__submit-button ${submitClassName}`}>
               {submitButtonText}
             </button>
             {/*})}*/}
+          </div>
+          <div className="trade-how-it-works-container">
+            <CollapsibleContainer titleOpen="How it works?" titleClose="How it works?" isTransparent={amountMsg !== ""}>
+              <div className="trade-form__how-it-works">
+                <div className="hiw-icon"><QuestionIcon/></div>
+                <div className="hiw-content">
+                  You are opening {this.props.leverage} {this.state.assetDetails.displayName} position. You’re borrowing {this.props.defaultUnitOfAccount} from a Fulcrum lending pool and that {this.props.defaultUnitOfAccount} is swapped into {this.state.assetDetails.displayName} on KyberNetwork.
+                </div>
+              </div>
+            </CollapsibleContainer>
           </div>
         </div>
         <Modal
@@ -528,7 +550,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
             onClose={this.onChangeCollateralClose}
           />
         </Modal>
-      </form>
+      </form >
     );
   }
 
