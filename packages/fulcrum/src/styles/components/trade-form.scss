@@ -138,11 +138,14 @@
     .trade-form__how-it-works {
       display: flex;
       margin-top: 30px;
-  
     }
 
     .hiw-icon {
       margin-right: 13px;
+      svg {
+        width: 24px;
+        height: 24px;
+      }
     }
     .hiw-content {
       font-weight: 600;
@@ -309,9 +312,21 @@
     color: #ffffff;
     background-color: transparent;
 
+    &input::-webkit-outer-spin-button,
+    &input::-webkit-inner-spin-button {
+      /* display: none; <- Crashes Chrome on hover */
+      -webkit-appearance: none;
+      margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+    }
+
+    &input[type="number"] {
+      -moz-appearance: textfield; /* Firefox */
+    }
+
     &:focus {
       outline: none;
     }
+    
   }
 
   .trade-form__collateral-button-container {

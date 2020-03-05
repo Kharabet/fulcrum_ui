@@ -11,13 +11,11 @@
   .trade-expected-result__column {
     display: flex;
     flex-direction: column;
-    flex-grow: 1;
-    flex-shrink: 1;
-
+    width: 50%;
     padding: 13px 17px;
 
     + .trade-expected-result__column {
-      border: 1px solid #586473;
+      border-left: 1px solid #586473;
     }
 
     .trade-expected-result__column-value {
@@ -38,6 +36,22 @@
       line-height: 150%;
       text-align: left;
       color: #939fac;
+    }
+  }
+
+  @media screen and (max-width: $breakpoint-mobile-max) {
+    margin-top: 20px;
+    margin-bottom: 0;
+    .trade-expected-result__column {
+      padding: 12px 15px;
+
+      .trade-expected-result__column-value {
+        font-size: 16px;
+      }
+
+      .trade-expected-result__column-title {
+        font-size: 10px;
+      }
     }
   }
 }

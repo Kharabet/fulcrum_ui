@@ -453,7 +453,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
           <div className="trade-form__form-values-container">
 
 
-            {this.state.positionTokenBalance && this.props.tradeType === TradeType.BUY ? (
+            {!this.props.isMobileMedia && this.state.positionTokenBalance && this.props.tradeType === TradeType.BUY ? (
               <TradeExpectedResult value={tradeExpectedResultValue} />
             ) : null}
 
@@ -466,6 +466,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
                   </span>
                 </div>
               ) : (<div className="trade-form__label">{amountMsg}</div>)}
+               
             </div>
 
             <div className="trade-form__amount-container">
@@ -500,6 +501,11 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
                   ]} value={this.props.defaultUnitOfAccount} onChange={this.onChangeUnitOfAccount} />
                 </div>
               </CollapsibleContainer>
+            ) : null}
+
+
+            {this.props.isMobileMedia && this.state.positionTokenBalance && this.props.tradeType === TradeType.BUY ? (
+              <TradeExpectedResult value={tradeExpectedResultValue} />
             ) : null}
 
           </div>

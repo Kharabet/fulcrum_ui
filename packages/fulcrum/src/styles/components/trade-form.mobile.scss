@@ -9,11 +9,11 @@
     display: flex;
     flex-direction: column;
     padding: 0;
-    .close-icon{
+    .close-icon {
       position: absolute;
       right: 20px;
       top: 20px;
-  
+      z-index: 100;
     }
   }
 
@@ -25,6 +25,20 @@
     justify-content: center;
 
     align-items: flex-start;
+    position: relative;
+    &:before {
+      content: "";
+      position: absolute;
+      border: 16px solid transparent;
+      border-top: 16px solid #ffffff;
+      left: 50%;
+      .buy & {
+      }
+      bottom: -30px;
+      margin: auto;
+      height: 24px;
+      transform: translate(-50%, 0);
+    }
 
     .trade-form__info_block {
       position: relative;
@@ -99,8 +113,12 @@
     display: flex;
     flex-direction: column;
 
+    &.buy {
+      padding-top: 30px;
+    }
+
     .trade-form__form-values-container {
-      margin-bottom: 2.5rem;
+      margin-bottom: 20px;
     }
 
     .trade-form__actions-container {
@@ -110,6 +128,25 @@
 
       margin-top: 0;
     }
+
+    .trade-how-it-works-container {
+      .trade-form__how-it-works {
+    
+      }
+  
+      .hiw-icon {
+        svg{
+          width: 20px;
+          height: 20px;
+        }
+      }
+      .hiw-content {
+        font-weight: 600;
+        font-size: 10px;
+        line-height: 150%;
+        color: #b9c7d6;
+      }
+    }
   }
 
   .trade-form__position-type-container {
@@ -117,16 +154,6 @@
   }
 
   .trade-form__slippage-amount {
-    //background-color: #fff3f3;
-    color: #ee344e;
-    width: 49px;
-    height: 25px;
-    border-radius: 23px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-left: 5px;
-    font-weight: 600;
   }
 
   .trade-form__slippage-amount img {
@@ -169,14 +196,13 @@
   }
 
   .trade-form__label {
-    line-height: 2;
-    font-size: 0.6rem;
-    font-weight: normal;
-    font-style: normal;
-    font-stretch: normal;
-    letter-spacing: normal;
-    color: #a9b5c7;
-    background-color: #444e5a;
+    font-weight: 600;
+    font-size: 10px;
+    line-height: 150%;
+    color: #fe7272;
+    &.slippage {
+      font-size: 12px;
+    }
 
     &--no-bg {
       background-color: transparent;
@@ -220,18 +246,8 @@
     display: flex;
 
     &:before {
-      content: "";
-      position: absolute;
-      border: 16px solid transparent;
-      border-top: 16px solid #ffffff;
-      left: 50%;
-      top: -98px;
-      bottom: 0;
-      margin: auto;
-      height: 24px;
-      transform: translate(-50%, 0);
+      display: none;
     }
-
     .trade-form__amount-input {
       height: 52px;
       width: calc(100% - 80px);
