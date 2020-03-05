@@ -460,6 +460,16 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
               <div className="trade-form__collateral-button-container">
                 <CollateralTokenButton asset={this.state.collateral} onClick={this.onChangeCollateralOpen} />
               </div>
+              {this.state.isChangeCollateralOpen
+                ?
+                <CollateralTokenSelector
+                  selectedCollateral={this.state.collateral}
+                  collateralType={this.props.tradeType === TradeType.BUY ? `Purchase` : `Withdrawal`}
+                  onCollateralChange={this.onChangeCollateralClicked}
+                  onClose={this.onChangeCollateralClose}/>
+                :
+                null
+              }
               {/*isAmountMaxed ? (
                 <div className="trade-form__amount-maxed">MAX</div>
               ) : (
@@ -523,19 +533,6 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
             {/*})}*/}
           </div>
         </div>
-        <Modal
-          isOpen={this.state.isChangeCollateralOpen}
-          onRequestClose={this.onChangeCollateralClose}
-          className="modal-content-div"
-          overlayClassName="modal-overlay-div"
-        >
-          <CollateralTokenSelector
-            selectedCollateral={this.state.collateral}
-            collateralType={this.props.tradeType === TradeType.BUY ? `Purchase` : `Withdrawal`}
-            onCollateralChange={this.onChangeCollateralClicked}
-            onClose={this.onChangeCollateralClose}
-          />
-        </Modal>
       </form>
     );
   }

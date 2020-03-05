@@ -1,25 +1,33 @@
 .collateral-token-button {
   cursor: pointer;
-
   display: flex;
   flex-direction: row;
   box-sizing: border-box;
-
-  margin: 1.125rem 0;
-
-  border-radius: 0.75rem;
-  border: solid 0.0625rem #ffffff;
-
-  font-size: 0.75rem;
-  font-weight: 600;
-  font-style: normal;
-  font-stretch: normal;
-  line-height: 2;
-  letter-spacing: normal;
-  text-align: left;
-  color: #ffffff;
-
-  img {
-    padding: 0 0.5rem;
+  border-radius: 26px;
+  background-color: #586473;
+  width: 100px;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px;
+  svg {
+    width: 25px;
+    height: 25px;
+  }
+  .selector-down {
+    display: flex;
+    svg {
+      width: 8px;
+      margin-right: 10px;
+      height: auto;
+    }
+  }
+  span {
+    font-size: 12px;
+    font-weight: 600;
+    font-style: normal;
+    font-stretch: normal;
+    line-height: 1.5;
+    letter-spacing: 0.05em;
+    color: #ffffff;
   }
 }
