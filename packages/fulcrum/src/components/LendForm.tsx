@@ -290,18 +290,6 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
               <hr></hr>
               <div title={this.state.interestRate ? `${this.state.interestRate.toFixed(18)}%` : ``} className="lend-form__value">{this.state.interestRate ? `${this.state.interestRate.toFixed(4)}%` : `0.0000%`}</div>
             </div>
-            <div className="lend-form__kv-container">
-              <div className="lend-form__label">{this.props.lendType === LendType.LEND ? `Lend Amount` : `UnLend Amount`}</div>
-              {
-                this.props.asset === Asset.ETH ? (
-                  <EthOrWethSelector items={[Asset.ETH, Asset.WETH]} value={this.state.useWrapped ? Asset.WETH : Asset.ETH} onChange={this.onChangeUseWrapped} />
-                ) : this.props.asset === Asset.DAI ? (
-                  <DaiOrChaiSelector items={[Asset.DAI, Asset.CHAI]} value={this.state.useWrappedDai ? Asset.CHAI : Asset.DAI} onChange={this.onChangeUseWrappedDai} />
-                ) : (
-                      <div className="lend-form__value">{tokenNameSource}</div>
-                    )
-              }
-            </div>
 
             <div className="lend-form__amount-message">
               {amountMsg}
@@ -332,12 +320,6 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
                       <div className="lend-form__value">{tokenNameSource}</div>
                     )
               }
-
-              {/* {isAmountMaxed ? (
-                <div className="lend-form__amount-maxed">MAX</div>
-              ) : (
-                  <div className="lend-form__amount-max" onClick={this.onInsertMaxValue}>&#65087;<br />MAX</div>
-                )} */}
             </div>
 
             <div className="trade-form__group-button">
