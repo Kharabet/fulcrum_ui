@@ -7,6 +7,9 @@
   box-sizing: border-box;
   width: 100%;
   z-index: 100004;
+  @media screen and (max-width: $mobile-version-max-width) {
+    top: 50px;
+  }
   &__wrapper{
     width: 100vw;
     height: 100vh;
@@ -31,6 +34,9 @@
     width: 20%;
     padding: 8px 0;
     text-align: center;
+    @media screen and (max-width: $mobile-version-max-width) {
+      width: 25%;
+    }
     &:hover {
       cursor: pointer;
       background-color: #8b97a9;
