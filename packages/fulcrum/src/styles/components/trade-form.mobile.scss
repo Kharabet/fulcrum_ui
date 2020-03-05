@@ -243,26 +243,15 @@
   }
 
   .trade-form__amount-container {
-    display: flex;
+    height: 52px;
+    padding-right: 10px;
 
     &:before {
       display: none;
     }
     .trade-form__amount-input {
-      height: 52px;
-      width: calc(100% - 80px);
-
-      background-color: rgba(32, 31, 35, 0.3);
-      padding: 0.8125rem 1rem 0.9375rem;
-      border: 0 none;
-
-      font-size: 1rem;
-      font-weight: 600;
-      font-style: normal;
-      font-stretch: normal;
-      letter-spacing: normal;
-      text-align: left;
-      color: #ffffff;
+      width: calc(100% - 95px);
+      font-size: 24px;
 
       &:focus {
         outline: none;
@@ -270,11 +259,9 @@
     }
 
     .trade-form__collateral-button-container {
-      width: 6rem;
-      border: 0;
-      background-color: rgba(32, 31, 35, 0.3);
-
-      display: flex;
+      .collateral-token-button{
+        width: 95px;
+      }
     }
 
     .trade-form__amount-max {

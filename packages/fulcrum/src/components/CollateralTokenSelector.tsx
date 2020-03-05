@@ -26,7 +26,7 @@ export class CollateralTokenSelector extends Component<ICollateralTokenSelectorP
   componentDidMount() {
     const collateralTokenSelector = document.querySelector(".collateral-token-selector__wrapper") as HTMLElement;
     const boundingClient = collateralTokenSelector.getBoundingClientRect();
-    collateralTokenSelector!.style.top =-1 * boundingClient!.top + "px";
+    //collateralTokenSelector!.style.top =-1 * boundingClient!.top + "px";
     collateralTokenSelector!.style.left =-1 * boundingClient!.left + "px";
   }
   public render() {

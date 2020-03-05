@@ -139,7 +139,11 @@ $width-col-actions: 13%;
       font-weight: 800;
       line-height: 1.5;
       border-radius: 43px;
-      background-color: #276bfb;;
+      background-color: #276bfb;
+      outline: none;
+      &:hover{
+        background-color: #5B88FF;
+      }
       &:not(:disabled){
         cursor: pointer;
       }
