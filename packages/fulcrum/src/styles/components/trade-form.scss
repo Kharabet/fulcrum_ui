@@ -433,10 +433,16 @@
   &--buy {
     z-index: 2;
     background-color: #407bf7;
+    &:hover {
+      background-color: #5b88ff;
+    }
   }
 
   &--sell {
     background-color: #ff5353;
+    &:hover {
+      background-color: #fe7272;
+    }
   }
 }
 
