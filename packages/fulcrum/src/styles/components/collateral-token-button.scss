@@ -6,19 +6,42 @@
   border-radius: 26px;
   background-color: #586473;
   width: 105px;
-  justify-content: space-between;
   align-items: center;
   padding: 4px;
+  position: relative;
   svg {
     width: 25px;
     height: 25px;
+    margin-right: 7px;
   }
-  .selector-down {
-    display: flex;
-    svg {
-      width: 8px;
-      margin-right: 10px;
-      height: auto;
+  // .selector-down {
+  //   display: flex;
+  //   svg {
+  //     width: 8px;
+  //     margin-right: 10px;
+  //     height: auto;
+  //   }
+  // }
+  &::after {
+    content: "";
+    position: absolute;
+    right: 13px;
+    top: calc(50% - 2px);
+    transform: translate(0, -50%);
+    width: 8px;
+    border: 5px solid transparent;
+  }
+
+  &.closed {
+    &::after {
+      top: calc(50% + 2px);
+      border-top: 4px solid #ffffff;
+    }
+  }
+
+  &.opened {
+    &::after {
+      border-bottom: 4px solid #ffffff;
     }
   }
   span {

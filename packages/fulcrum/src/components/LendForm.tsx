@@ -17,6 +17,7 @@ import { DaiOrChaiSelector } from "./DaiOrChaiSelector";
 import { EthOrWethSelector } from "./EthOrWethSelector";
 
 import { ReactComponent as CloseIcon } from "../assets/images/ic__close.svg"
+import { AssetDropdown } from "./AssetDropdown";
 
 // TagManager.initialize({
 //   gtmId: configProviders.Google_TrackingID,
@@ -62,6 +63,7 @@ interface ILendFormState {
   useWrappedDai: boolean;
   tokenPrice: BigNumber | null;
   chaiPrice: BigNumber | null;
+
 }
 
 export class LendForm extends Component<ILendFormProps, ILendFormState> {
@@ -313,6 +315,24 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
                 value={this.state.lendAmountText}
                 onChange={this.onLendAmountChange}
               />
+              {
+                this.props.asset === Asset.ETH ? (
+                  <AssetDropdown
+                    selectedAsset={this.state.useWrapped ? Asset.WETH : Asset.ETH}
+                    onAssetChange={this.onChangeUseWrapped}
+                    assets={[Asset.WETH, Asset.ETH]} />
+
+
+                ) : this.props.asset === Asset.DAI ? (
+                  <AssetDropdown
+                    selectedAsset={this.state.useWrappedDai ? Asset.CHAI : Asset.DAI}
+                    onAssetChange={this.onChangeUseWrappedDai}
+                    assets={[Asset.DAI, Asset.CHAI]} />
+                ) : (
+                      <div className="lend-form__value">{tokenNameSource}</div>
+                    )
+              }
+
               {/* {isAmountMaxed ? (
                 <div className="lend-form__amount-maxed">MAX</div>
               ) : (
@@ -528,7 +548,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
       assetOrWrapped = this.props.asset;
     }
 
-    
+
     const multipliedLendAmount = this.state.maxLendAmount ? this.state.maxLendAmount.multipliedBy(multiplier) : new BigNumber(0);
     return new Observable<ILendAmountChangeEvent | null>(observer => {
 

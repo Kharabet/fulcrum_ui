@@ -6,6 +6,7 @@ import { AssetsDictionary } from "../domain/AssetsDictionary";
 
 export interface ICollateralTokenButtonProps {
   asset: Asset;
+  isChangeCollateralOpen: boolean;
   onClick: (event: React.MouseEvent<HTMLElement>) => void;
 }
 
@@ -43,10 +44,9 @@ export class CollateralTokenButton extends Component<ICollateralTokenButtonProps
     return (
       <React.Fragment>
         {this.state.assetDetails ? (
-          <div className="collateral-token-button" onClick={this.onClick}>
+          <div className={`collateral-token-button ${this.props.isChangeCollateralOpen ? "opened" : "closed"}`} onClick={this.onClick}>
             {this.state.assetDetails.reactLogoSvg.render()}
             <span>{this.state.assetDetails.displayName}</span>  
-            <div className="selector-down"><IcTokenSelectorDown/></div>
           </div>
         ) : null}
       </React.Fragment>

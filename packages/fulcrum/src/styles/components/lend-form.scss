@@ -146,8 +146,13 @@
 }
 
 .lend-form__amount-container {
-  display: flex;
+  background: #394049;
+  width: 100%;
+  height: 65px;
   position: relative;
+  padding-right: 15px;
+  align-items: center;
+  box-sizing: border-box;
   
   &:before {
     content: "";
@@ -164,20 +169,17 @@
   }
 
   .lend-form__amount-input {
-    height: 4rem;
-    width: calc(100% - 4rem);
-
-    background-color: rgba(32, 31, 35, 0.3);
-    padding: 0.8125rem 1rem 0.9375rem;
-    border: 0 none;
-
-    font-size: 1.5rem;
+    width: calc(100% - 105px);
+    padding-left: 15px;
+    border: none;
+    font-size: 32px;
     font-weight: 600;
     font-style: normal;
     font-stretch: normal;
     letter-spacing: normal;
-    text-align: right;
+    text-align: left;
     color: #ffffff;
+    background-color: transparent;
 
     &:focus {
       outline: none;

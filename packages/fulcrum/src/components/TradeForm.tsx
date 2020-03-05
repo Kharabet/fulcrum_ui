@@ -477,7 +477,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
                 placeholder={`Amount`}
               />
               <div className="trade-form__collateral-button-container">
-                <CollateralTokenButton asset={this.state.collateral} onClick={this.onChangeCollateralOpen} />
+                <CollateralTokenButton asset={this.state.collateral} onClick={this.onChangeCollateralOpen} isChangeCollateralOpen={this.state.isChangeCollateralOpen} />
               </div>
               {this.state.isChangeCollateralOpen
                 ?
