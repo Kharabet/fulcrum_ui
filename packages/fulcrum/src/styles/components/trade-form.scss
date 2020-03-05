@@ -287,6 +287,8 @@
   width: 100%;
   height: 65px;
   position: relative;
+  padding-right: 15px;
+  align-items: center;
   &:before {
     content: "";
     position: absolute;
@@ -300,7 +302,7 @@
   }
 
   .trade-form__amount-input {
-    width: 65%;
+    width: calc(100% - 105px);
     padding-left: 15px;
     border: none;
     font-size: 32px;
@@ -327,13 +329,6 @@
       outline: none;
     }
     
-  }
-
-  .trade-form__collateral-button-container {
-    display: flex;
-    width: 35%;
-    border: none;
-    padding: 16px 0;
   }
 
   /*.trade-form__amount-max {
