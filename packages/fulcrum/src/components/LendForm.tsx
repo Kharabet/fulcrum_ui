@@ -69,7 +69,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
   private _input: HTMLInputElement | null = null;
 
   private readonly _inputChange: Subject<string>;
-  private readonly _inputSetMax: Subject<void>;
+  private readonly _inputSetMax: Subject<BigNumber>;
 
   constructor(props: ILendFormProps, context?: any) {
     super(props, context);
@@ -108,7 +108,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
         switchMap((value) => this.rxFromCurrentAmount(value))
       ),
       this._inputSetMax.pipe(
-        switchMap(() => this.rxFromMaxAmount())
+        switchMap((value) => this.rxFromMaxAmountWithMultiplier(value))
       )
     ).pipe(
       switchMap((value) => new Observable<ILendAmountChangeEvent | null>((observer) => observer.next(value)))
@@ -256,7 +256,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
 
     return (
       <form className="lend-form" onSubmit={this.onSubmitClick}>
-        <CloseIcon className="close-icon" onClick={this.onCancelClick}/>
+        <CloseIcon className="close-icon" onClick={this.onCancelClick} />
         <div className="lend-form__image">
           {this.state.iTokenAddress &&
             FulcrumProvider.Instance.web3ProviderSettings &&
@@ -300,7 +300,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
                     )
               }
             </div>
-            
+
             <div className="lend-form__amount-message">
               {amountMsg}
             </div>
@@ -313,12 +313,20 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
                 value={this.state.lendAmountText}
                 onChange={this.onLendAmountChange}
               />
-              {isAmountMaxed ? (
+              {/* {isAmountMaxed ? (
                 <div className="lend-form__amount-maxed">MAX</div>
               ) : (
                   <div className="lend-form__amount-max" onClick={this.onInsertMaxValue}>&#65087;<br />MAX</div>
-                )}
+                )} */}
             </div>
+
+            <div className="trade-form__group-button">
+              <button data-value="0.25" onClick={this.onInsertMaxValue}>25%</button>
+              <button data-value="0.5" onClick={this.onInsertMaxValue}>50%</button>
+              <button data-value="0.75" onClick={this.onInsertMaxValue}>75%</button>
+              <button data-value="1" onClick={this.onInsertMaxValue}>100%</button>
+            </div>
+
             <div className="lend-form__kv-container jc-fe">
               <div title={this.state.lendedAmountEstimate ? `$${this.state.lendedAmountEstimate.toFixed(18)}` : ``} className="lend-form__value lend-form__value--no- fw-600">
                 <Tooltip
@@ -356,7 +364,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
                   You may be prompted to approve the asset after clicking LEND.
                 </div>
               </div>
-            ) : <div style={{height: "10px"}}></div>}
+            ) : <div style={{ height: "10px" }}></div>}
           </div>
 
           <div className="lend-form__actions-container">
@@ -396,13 +404,16 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
     }
   };
 
-  public onInsertMaxValue = async () => {
+  public onInsertMaxValue = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    event.preventDefault();
     if (!this.state.assetDetails) {
       return null;
     }
+    const buttonElement = event.currentTarget as HTMLButtonElement;
+    const value = new BigNumber(parseFloat(buttonElement.dataset.value!));
 
     // emitting next event for processing with rx.js
-    this._inputSetMax.next();
+    this._inputSetMax.next(value);
   };
 
   public onCancelClick = () => {
@@ -506,7 +517,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
     );
   };
 
-  private rxFromMaxAmount = (): Observable<ILendAmountChangeEvent | null> => {
+  private rxFromMaxAmountWithMultiplier = (multiplier: BigNumber = new BigNumber(1)): Observable<ILendAmountChangeEvent | null> => {
 
     let assetOrWrapped: Asset;
     if (this.props.asset === Asset.ETH) {
@@ -517,18 +528,21 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
       assetOrWrapped = this.props.asset;
     }
 
+    
+    const multipliedLendAmount = this.state.maxLendAmount ? this.state.maxLendAmount.multipliedBy(multiplier) : new BigNumber(0);
     return new Observable<ILendAmountChangeEvent | null>(observer => {
+
       const lendRequest = new LendRequest(
         this.props.lendType,
         assetOrWrapped,
-        this.state.maxLendAmount || new BigNumber(0)
+        multipliedLendAmount || new BigNumber(0)
       );
 
       FulcrumProvider.Instance.getLendedAmountEstimate(lendRequest).then(lendedAmountEstimate => {
         observer.next({
           isLendAmountTouched: this.state.isLendAmountTouched || false,
-          lendAmountText: this.state.maxLendAmount ? this.state.maxLendAmount.decimalPlaces(this._inputPrecision).toFixed() : "0",
-          lendAmount: this.state.maxLendAmount || new BigNumber(0),
+          lendAmountText: multipliedLendAmount ? multipliedLendAmount.decimalPlaces(this._inputPrecision).toFixed() : "0",
+          lendAmount: multipliedLendAmount || new BigNumber(0),
           maxLendAmount: this.state.maxLendAmount || new BigNumber(0),
           lendedAmountEstimate: lendedAmountEstimate || new BigNumber(0)
         });
