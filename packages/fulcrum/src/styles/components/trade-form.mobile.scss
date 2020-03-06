@@ -54,6 +54,7 @@
       margin: 0;
       &__logo {
         margin-right: 35px;
+        padding: 0;
         .trade-form__asset-stats {
           display: flex;
           flex-direction: column;
@@ -137,11 +138,10 @@
 
     .trade-how-it-works-container {
       .trade-form__how-it-works {
-    
       }
-  
+
       .hiw-icon {
-        svg{
+        svg {
           width: 20px;
           height: 20px;
         }
@@ -265,7 +265,7 @@
     }
 
     .trade-form__collateral-button-container {
-      .collateral-token-button{
+      .collateral-token-button {
         width: 95px;
       }
     }
