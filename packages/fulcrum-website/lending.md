@@ -188,8 +188,8 @@ permalink: lending
                 <div class="icon-safe mb-40 mb-xs-15">
                     {% include svg/icon-safe-5.svg %}
                 </div>
-                <h3 class="mb-20">Oracles</h3>
-                <p>If undercollateralized loans are not properly liquidated, lenders are repaid from a pool funded by 10% of the interest paid by borrowers.</p>
+                <h3 class="mb-20">Secure Oracles</h3>
+                <p>Chainlink’s <a href="https://feeds.chain.link/">decentralized oracle network</a> is used for price information.</p>
             </div>
             <div class="col col-3 col-md-6 col-sm-12 item-safe fd-c">
                 <div class="icon-safe mb-40 mb-xs-15">
