@@ -322,7 +322,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
               }
             </div>
 
-            <div className="trade-form__group-button">
+            <div className="lend-form__group-button">
               <button data-value="0.25" onClick={this.onInsertMaxValue}>25%</button>
               <button data-value="0.5" onClick={this.onInsertMaxValue}>50%</button>
               <button data-value="0.75" onClick={this.onInsertMaxValue}>75%</button>

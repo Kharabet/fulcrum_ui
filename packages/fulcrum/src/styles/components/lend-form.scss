@@ -14,6 +14,28 @@
     width: 16px;
     cursor: pointer;
   }
+  &__group-button {
+    margin-top: 3px;
+    margin-bottom: 10px;
+    button {
+      font-size: 12px;
+      font-weight: 600;
+      width: calc(25% - 1.5px);
+      padding: 8px 0;
+      color: #ffffff;
+      background-color: #586473;
+      border: none;
+      outline: none;
+      cursor: pointer;
+      line-height: 1.5;
+      &:not(:last-child) {
+        margin-right: 2px;
+      }
+      &:hover {
+        background: #758295;
+      }
+    }
+  }
 }
 
 .lend-form__image {
@@ -282,7 +304,7 @@
 }
 
 hr{
-  
+
   border: none;
   color: #fff;
   flex: 3;
