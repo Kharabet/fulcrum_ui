@@ -299,7 +299,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
 
             <div className="lend-form__amount-container">
               <input
-                type="text"
+                type="number"
                 ref={this._setInputRef}
                 className="lend-form__amount-input"
                 value={this.state.lendAmountText}
