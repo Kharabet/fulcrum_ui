@@ -223,11 +223,6 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
     }
 
 
-    if (this.props.asset === Asset.SUSD) {
-      // @ts-ignore
-      divStyle.backgroundSize = `unset`;
-    }
-
     const submitClassName =
       this.props.lendType === LendType.LEND ? "lend-form__submit-button--lend" : "lend-form__submit-button--un-lend";
     const tokenNameBase = this.state.assetDetails.displayName;
@@ -265,7 +260,6 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
             FulcrumProvider.Instance.web3ProviderSettings.etherscanURL ? (
               <a
                 className="lend-form__info_block"
-                style={{ cursor: `pointer`, textDecoration: `none` }}
                 title={this.state.iTokenAddress}
                 href={`${FulcrumProvider.Instance.web3ProviderSettings.etherscanURL}address/${this.state.iTokenAddress}#readContract`}
                 target="_blank"
@@ -339,7 +333,6 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
                     FulcrumProvider.Instance.web3ProviderSettings.etherscanURL ? (
                       <a
                         className="lend-form__value lend-estimate"
-                        style={{ cursor: `pointer`, textDecoration: `none` }}
                         title={this.state.iTokenAddress}
                         href={`${FulcrumProvider.Instance.web3ProviderSettings.etherscanURL}address/${this.state.iTokenAddress}#readContract`}
                         target="_blank"

@@ -14,8 +14,9 @@
     width: 16px;
     cursor: pointer;
   }
-  &__info_block{
+  &__info_block {
     display: flex;
+    
   }
   &__group-button {
     margin-top: 3px;
@@ -46,10 +47,10 @@
   display: flex;
   align-items: center;
   padding: 40px;
-  svg{
+  svg {
     height: 90px;
     width: 90px;
-    .eth-svg{
+    .eth-svg {
       fill: #c8c8c8;
     }
   }
@@ -121,7 +122,7 @@
   line-height: 1.33;
   letter-spacing: normal;
   text-align: left;
-  color: #FFFFFF;
+  color: #ffffff;
 }
 
 .lend-form__label {
@@ -149,20 +150,20 @@
   color: #ffe352;
 
   &--no-color {
-    color: #A2ABB8;
+    color: #a2abb8;
   }
-  &.lend-estimate{
-    color: #A2ABB8;
+  &.lend-estimate {
+    color: #a2abb8;
     font-weight: 600;
   }
 }
 
-.lend-form__amount-message{
+.lend-form__amount-message {
   text-align: left;
   font-weight: 600;
   font-size: 12px;
   line-height: 150%;
-  color: #FE7272;
+  color: #fe7272;
   margin-bottom: 10px;
 }
 
@@ -175,7 +176,7 @@
   padding-right: 15px;
   align-items: center;
   box-sizing: border-box;
-  
+
   &:before {
     content: "";
     position: absolute;
@@ -283,30 +284,19 @@
   line-height: 1.5;
   &--lend {
     background: #00c0ab;
-    &:hover{
-      background-color: #33DFCC;     
+    &:hover {
+      background-color: #33dfcc;
     }
   }
 
   &--un-lend {
     background: #ff4f4f;
-    &:hover{
-      background-color: #FE7272;
+    &:hover {
+      background-color: #fe7272;
     }
   }
 }
-
-
-
-.fw-600{
-  font-weight: 600;
-}
-
-.text-right{
-  text-align: right;
-}
-
-hr{
+hr {
   border: none;
   color: #fff;
   flex: 3;
