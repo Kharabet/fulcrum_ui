@@ -70,6 +70,8 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
   private readonly _inputPrecision = 6;
   private _input: HTMLInputElement | null = null;
 
+  private _isMounted: boolean;
+
   private readonly _inputChange: Subject<string>;
   private readonly _inputSetMax: Subject<BigNumber>;
 
@@ -81,6 +83,8 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
     if (this.props.isMobileMedia) {
       assetDetails = AssetsDictionaryMobile.assets.get(this.props.asset);
     }
+
+    this._isMounted = false;
 
     this.state = {
       assetDetails: assetDetails || null,
@@ -116,9 +120,9 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
       switchMap((value) => new Observable<ILendAmountChangeEvent | null>((observer) => observer.next(value)))
     ).subscribe(next => {
       if (next) {
-        this.setState({ ...this.state, ...next });
+        this._isMounted && this.setState({ ...this.state, ...next });
       } else {
-        this.setState({
+        this._isMounted && this.setState({
           ...this.state,
           isLendAmountTouched: false,
           lendAmountText: "",
@@ -170,7 +174,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
       await FulcrumProvider.Instance.checkCollateralApprovalForLend(assetOrWrapped) :
       false;
 
-    this.setState({
+    this._isMounted && this.setState({
       ...this.state,
       assetDetails: assetDetails || null,
       lendAmountText: maxLendAmount.decimalPlaces(this._inputPrecision).toFixed(),
@@ -192,11 +196,15 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
   };
 
   public componentWillUnmount(): void {
+    this._isMounted = false;
+
     window.history.back();
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
   public componentDidMount(): void {
+    this._isMounted = true;
+
     this.derivedUpdate();
     window.history.pushState(null, "Lend Modal Opened", `/#/lend/${this.props.lendType.toLocaleLowerCase()}-${this.props.asset}/`);
 
@@ -370,7 +378,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
     const amountText = event.target.value ? event.target.value : "";
 
     // setting tradeAmountText to update display at the same time
-    this.setState({ ...this.state, lendAmountText: amountText }, () => {
+    this._isMounted && this.setState({ ...this.state, lendAmountText: amountText }, () => {
       // emitting next event for processing with rx.js
       this._inputChange.next(this.state.lendAmountText);
     });
@@ -378,17 +386,17 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
 
   public onChangeUseWrapped = async (asset: Asset) => {
     if (this.state.useWrapped && asset === Asset.ETH) {
-      this.setState({ ...this.state, useWrapped: false });
+      this._isMounted && this.setState({ ...this.state, useWrapped: false });
     } else if (!this.state.useWrapped && asset === Asset.WETH) {
-      this.setState({ ...this.state, useWrapped: true });
+      this._isMounted && this.setState({ ...this.state, useWrapped: true });
     }
   };
 
   public onChangeUseWrappedDai = async (asset: Asset) => {
     if (this.state.useWrappedDai && asset === Asset.DAI) {
-      this.setState({ ...this.state, useWrappedDai: false });
+      this._isMounted && this.setState({ ...this.state, useWrappedDai: false });
     } else if (!this.state.useWrappedDai && asset === Asset.CHAI) {
-      this.setState({ ...this.state, useWrappedDai: true });
+      this._isMounted && this.setState({ ...this.state, useWrappedDai: true });
     }
   };
 
