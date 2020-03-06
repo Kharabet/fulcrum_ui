@@ -19,15 +19,15 @@ export class AssetDropdown extends Component<IAssetDropdownProps, IAssetDropdown
     this.state = { isOpened: false };
   }
 
-  componentDidMount() {
-    if (document.querySelector(".asset-dropdown__wrapper")) {
-      const assetDropdownSelector = document.querySelector(".asset-dropdown__wrapper") as HTMLElement;
-      const boundingClient = assetDropdownSelector.getBoundingClientRect();
-      assetDropdownSelector!.style.top = -1 * boundingClient!.top + "px";
-      assetDropdownSelector!.style.left = -1 * boundingClient!.left + "px";
+  componentDidUpdate (prevProps: Readonly<IAssetDropdownProps>, prevState: Readonly<IAssetDropdownState>, snapshot?: any) : void{    
+    if (prevState.isOpened !== this.state.isOpened){
+      if (document.querySelector(".asset-dropdown__wrapper")) {
+        const assetDropdownSelector = document.querySelector(".asset-dropdown__wrapper") as HTMLElement;
+        const boundingClient = assetDropdownSelector.getBoundingClientRect();
+        assetDropdownSelector!.style.left = -1 * boundingClient!.left + "px";
+      }
     }
   }
-
   tokenItems() {
     return this.props.assets.filter(asset => asset !== this.props.selectedAsset).map(e => {
       const assetDetails = AssetsDictionary.assets.get(e);
@@ -77,7 +77,8 @@ export class AssetDropdown extends Component<IAssetDropdownProps, IAssetDropdown
           <span>{activeAssetDetails.displayName}</span>
         </div>
         {this.state.isOpened ?
-          <React.Fragment><div className="asset-dropdown__wrapper" onClick={this.onClose}></div>
+          <React.Fragment>
+            <div className="asset-dropdown__wrapper" onClick={this.onClose}></div>
             <div className="asset-dropdown">
               <div className="asset-dropdown__items">{this.tokenItems()}</div>
             </div>
