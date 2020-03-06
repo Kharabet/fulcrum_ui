@@ -5,7 +5,7 @@ import { AssetsDictionary } from "../domain/AssetsDictionary";
 export interface IAssetDropdownProps {
   assets: Asset[];
   selectedAsset: Asset;
-  onAssetChange: (asset: Asset) => void;
+  onAssetChange?: (asset: Asset) => void;
 }
 
 export interface IAssetDropdownState {
@@ -19,8 +19,8 @@ export class AssetDropdown extends Component<IAssetDropdownProps, IAssetDropdown
     this.state = { isOpened: false };
   }
 
-  componentDidUpdate (prevProps: Readonly<IAssetDropdownProps>, prevState: Readonly<IAssetDropdownState>, snapshot?: any) : void{    
-    if (prevState.isOpened !== this.state.isOpened){
+  componentDidUpdate(prevProps: Readonly<IAssetDropdownProps>, prevState: Readonly<IAssetDropdownState>, snapshot?: any): void {
+    if (prevState.isOpened !== this.state.isOpened) {
       if (document.querySelector(".asset-dropdown__wrapper")) {
         const assetDropdownSelector = document.querySelector(".asset-dropdown__wrapper") as HTMLElement;
         const boundingClient = assetDropdownSelector.getBoundingClientRect();
@@ -54,7 +54,8 @@ export class AssetDropdown extends Component<IAssetDropdownProps, IAssetDropdown
   };
 
   private onSelect = (asset: Asset) => {
-    this.props.onAssetChange(asset);
+    if (this.props.onAssetChange)
+      this.props.onAssetChange(asset);
     this.onClose();
   }
 
@@ -72,7 +73,7 @@ export class AssetDropdown extends Component<IAssetDropdownProps, IAssetDropdown
     if (!activeAssetDetails) return null;
     return (
       <div className="asset-dropdown-container">
-        <div className={`asset-dropdown-button ${this.state.isOpened ? "opened" : "closed"}`} onClick={this.onOpenClick}>
+        <div className={`asset-dropdown-button ${this.state.isOpened ? "opened" : "closed"} ${this.props.assets.length === 1 ? "empty" : ""}`} onClick={this.onOpenClick}>
           {activeAssetDetails.reactLogoSvg.render()}
           <span>{activeAssetDetails.displayName}</span>
         </div>

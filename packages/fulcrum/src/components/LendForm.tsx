@@ -317,7 +317,9 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
                     onAssetChange={this.onChangeUseWrappedDai}
                     assets={[Asset.DAI, Asset.CHAI]} />
                 ) : (
-                      <div className="lend-form__value">{tokenNameSource}</div>
+                      <AssetDropdown
+                    selectedAsset={this.props.asset}
+                    assets={[this.props.asset]} />
                     )
               }
             </div>
@@ -330,16 +332,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
             </div>
 
             <div className="lend-form__kv-container jc-fe">
-              <div title={this.state.lendedAmountEstimate ? `$${this.state.lendedAmountEstimate.toFixed(18)}` : ``} className="lend-form__value lend-form__value--no- fw-600">
-                <Tooltip
-                  html={
-                    <div style={{ /*maxWidth: `300px`*/ }}>
-                      {/*... Info ...*/}
-                    </div>
-                  }
-                >
-                  {/*<span className="rounded-mark">?</span>*/}
-                </Tooltip>
+              <div title={this.state.lendedAmountEstimate ? `$${this.state.lendedAmountEstimate.toFixed(18)}` : ``} className="lend-form__value lend-estimate">
                 {
                   this.state.iTokenAddress &&
                     FulcrumProvider.Instance.web3ProviderSettings &&
