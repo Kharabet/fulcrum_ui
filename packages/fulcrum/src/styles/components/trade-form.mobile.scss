@@ -1,8 +1,9 @@
-@media screen and (max-width: $mobile-version-max-width) {
+@media screen and (max-width: $breakpoint-mobile-max) {
   .trade-form {
     @include clearfix();
 
-    width: 100%;
+    max-width: 320px;
+    width: 320px;
 
     background-color: #444e5a;
 

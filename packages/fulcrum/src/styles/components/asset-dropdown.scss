@@ -1,18 +1,17 @@
-.asset-dropdown-container{
-  
+.asset-dropdown-container {
   display: flex;
   align-items: center;
   position: relative;
 }
 .asset-dropdown {
   position: absolute;
-  top: calc( 50% + 20px);
+  top: calc(50% + 20px);
   border-radius: 4px;
   background-color: #758295;
   box-sizing: border-box;
   width: 100%;
   z-index: 100004;
-  &__wrapper{
+  &__wrapper {
     width: 100vw;
     height: 100vh;
     position: absolute;
@@ -44,7 +43,7 @@
     }
     &--selected {
       background-color: #586473;
-      &:hover{
+      &:hover {
         background-color: #586473;
       }
     }
@@ -85,9 +84,13 @@
     @media only screen and (max-width: $mobile-version-max-width) {
       margin-right: 3px;
     }
+    .eth-svg {
+      fill: #c8c8c8;
+    }
   }
-  &::after {
+  &:not(.empty)::after {
     content: "";
+
     position: absolute;
     right: 13px;
     top: calc(50% - 2px);
@@ -98,7 +101,6 @@
       right: 10px;
     }
   }
-
   &.closed {
     &::after {
       top: calc(50% + 2px);

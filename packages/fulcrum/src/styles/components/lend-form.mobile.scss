@@ -1,8 +1,9 @@
-@media only screen and (max-width: $mobile-version-max-width) {
+@media only screen and (max-width: $breakpoint-mobile-max) {
   .lend-form {
     @include clearfix();
-    flex-wrap: wrap;
-    max-width: 310px;
+    flex-direction: column;
+    max-width: 320px;
+    width: 320px;
     .close-icon {
       right: 20px;
       top: 20px;

@@ -345,7 +345,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
                     FulcrumProvider.Instance.web3ProviderSettings &&
                     FulcrumProvider.Instance.web3ProviderSettings.etherscanURL ? (
                       <a
-                        className="lend-form__value--no-color"
+                        className="lend-form__value lend-estimate"
                         style={{ cursor: `pointer`, textDecoration: `none` }}
                         title={this.state.iTokenAddress}
                         href={`${FulcrumProvider.Instance.web3ProviderSettings.etherscanURL}address/${this.state.iTokenAddress}#readContract`}
