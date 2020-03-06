@@ -17,11 +17,11 @@
   &__left_block {
     display: flex;
     align-items: center;
-    padding: 0 40px;
     background-color: #ffffff;
   }
   &__info_block__logo {
     position: relative;
+    padding: 0 40px;
     svg {
       width: 90px;
       height: 90px;
@@ -32,7 +32,7 @@
     .position-type-marker-alt {
       position: absolute;
       top: 32px;
-      right: -13.5px;
+      right: 26.5px;
       border: 4px solid #fff;
       border-radius: 50%;
       width: 27px;
