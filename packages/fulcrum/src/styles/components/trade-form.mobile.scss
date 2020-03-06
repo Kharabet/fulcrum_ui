@@ -15,6 +15,11 @@
       top: 20px;
       z-index: 100;
     }
+    &__group-button {
+      button {
+        padding: 5px 0;
+      }
+    }
   }
 
   .trade-form__left_block {
