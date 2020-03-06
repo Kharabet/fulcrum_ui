@@ -12,9 +12,6 @@
   box-sizing: border-box;
   width: 100%;
   z-index: 100004;
-  @media screen and (max-width: $mobile-version-max-width) {
-    top: 50px;
-  }
   &__wrapper{
     width: 100vw;
     height: 100vh;
@@ -38,7 +35,7 @@
     align-items: center;
     box-sizing: border-box;
     width: 100%;
-    padding: 6px 4px;
+    padding: 4px;
     border-radius: 4px;
     text-align: center;
     &:hover {
@@ -78,10 +75,16 @@
   align-items: center;
   padding: 4px;
   position: relative;
+  @media only screen and (max-width: $mobile-version-max-width) {
+    width: 95px;
+  }
   svg {
     width: 25px;
     height: 25px;
     margin-right: 7px;
+    @media only screen and (max-width: $mobile-version-max-width) {
+      margin-right: 3px;
+    }
   }
   &::after {
     content: "";
@@ -91,6 +94,9 @@
     transform: translate(0, -50%);
     width: 8px;
     border: 5px solid transparent;
+    @media only screen and (max-width: $mobile-version-max-width) {
+      right: 10px;
+    }
   }
 
   &.closed {

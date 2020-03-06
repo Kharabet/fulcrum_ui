@@ -4,10 +4,14 @@
     flex-wrap: wrap;
     max-width: 310px;
     .close-icon {
-      position: absolute;
       right: 20px;
       top: 20px;
       z-index: 100;
+    }
+    &__group-button {
+      button {
+        padding: 5px 0;
+      }
     }
   }
   .lend-form__image {
@@ -38,17 +42,7 @@
   }
 
   .lend-form__form-values-container {
-    margin-bottom: 2.5rem;
-  }
-
-  .lend-form__actions-container {
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-end;
-  }
-
-  .lend-form__kv-container {
-    margin-bottom: 8px;
+    margin-bottom: 10px;
   }
 
   .lend-form__kv-container--w_dots {
@@ -90,9 +84,6 @@
     &:focus {
       outline: none;
     }
-    //background-image: url("../assets/images/dotted_line.png");
-    //background-repeat: repeat-x;
-    //background-position-y: 1.25rem;
   }
 
   .lend-form__value {
@@ -104,20 +95,13 @@
   }
 
   .lend-form__amount-container {
+    height: 52px;
+    padding-right: 10px;
     &:before{
       content: none;
     }
-
     .lend-form__amount-input {
-      height: 65px;
-      width: 100%;
-      background-color: #394049;
-      font-size: 32px;
-      font-weight: 600;
-      color: #ffffff;
-      border: none;
-      outline: none;
-      padding-left: 15px;
+      font-size: 24px;
 
       &:focus {
         outline: none;
@@ -174,7 +158,9 @@
       cursor: pointer;
     }*/
   }
-
+  &__submit-button{
+    padding: 10px 25px;
+  }
   .rounded-mark {
     font-size: 0.5rem;
     border-width: 1px;
@@ -185,7 +171,6 @@
 
   .lend-form__cancel-button {
     display: inline-block;
-
     cursor: pointer;
     border: 0;
     height: 2.5rem;
@@ -195,26 +180,5 @@
     text-decoration-style: dotted;
     color: #a9b5c7;
     outline: none;
-  }
-
-  .lend-form__submit-button {
-    display: inline-block;
-
-    cursor: pointer;
-    border: 0;
-    height: 2.5rem;
-    width: 6.5rem;
-    border-radius: 100px;
-    color: #ffffff;
-    text-transform: uppercase;
-    outline: none;
-
-    &--lend {
-      background-color: #69bf83;
-    }
-
-    &--un-lend {
-      background-color: #ff5353;
-    }
   }
 }
