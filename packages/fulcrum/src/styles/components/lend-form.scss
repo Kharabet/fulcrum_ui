@@ -56,9 +56,6 @@
   padding: 55px 50px 30px 30px;
 }
 
-.lend-form__form-values-container {
-}
-
 .lend-form__actions-container {
   display: flex;
   flex-direction: row;
@@ -82,7 +79,7 @@
 
     &--link {
       cursor: pointer;
-      textdecoration: underline;
+      text-decoration: underline;
       line-height: 2;
       font-size: 0.75rem;
       font-weight: normal;
@@ -99,9 +96,7 @@
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-
   padding: 0;
-
   margin-bottom: 15px;
 }
 
@@ -142,9 +137,6 @@
   &:focus {
     outline: none;
   }
-  //background-image: url("../assets/images/dotted_line.png");
-  //background-repeat: repeat-x;
-  //background-position-y: 1.25rem;
 }
 
 .lend-form__value {
@@ -168,7 +160,6 @@
 }
 
 .lend-form__amount-container {
-  
   display: flex;
   background: #394049;
   width: 100%;
@@ -200,13 +191,10 @@
     letter-spacing: normal;
     text-align: left;
     color: #ffffff;
-    
-    height: 65px;
     width: 100%;
     background-color: #394049;
     border: none;
     font-size: 32px;
-    
     padding-left: 15px;
 
     &:focus {
@@ -283,13 +271,21 @@
   color: #ffffff;
   text-transform: uppercase;
   outline: none;
-
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
   &--lend {
     background: #00c0ab;
+    &:hover{
+      background-color: #33DFCC;     
+    }
   }
 
   &--un-lend {
     background: #ff4f4f;
+    &:hover{
+      background-color: #FE7272;
+    }
   }
 }
 
@@ -304,7 +300,6 @@
 }
 
 hr{
-
   border: none;
   color: #fff;
   flex: 3;
@@ -312,5 +307,4 @@ hr{
   border-top: 1px dashed rgba(162, 171, 184, 0.5);
   height: 3px;
   margin: 0 4px;
-
 }
