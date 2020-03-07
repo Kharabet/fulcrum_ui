@@ -19,6 +19,7 @@ import { LocationListener } from "./LocationListener";
 import { ProgressFragment } from "./ProgressFragment";
 import { ProviderMenu } from "./ProviderMenu";
 
+import {errors} from "ethers"
 import siteConfig from "./../config/SiteConfig.json";
 
 const isMainnetProd =
@@ -62,6 +63,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
   public componentDidMount(): void {
     window.addEventListener("resize", this.didResize.bind(this));
     this.didResize();
+    errors.setLogLevel("error")
   }
 
   public componentWillUnmount(): void {
