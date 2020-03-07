@@ -1,11 +1,12 @@
 import React, { Component, MouseEvent } from "react";
-import ic__token_selector__down from "../assets/images/ic___token_selector___down.svg";
+import {ReactComponent as IcTokenSelectorDown} from "../assets/images/ic___token_selector___down.svg";
 import { Asset } from "../domain/Asset";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 
 export interface ICollateralTokenButtonProps {
   asset: Asset;
+  isChangeCollateralOpen: boolean;
   onClick: (event: React.MouseEvent<HTMLElement>) => void;
 }
 
@@ -43,10 +44,9 @@ export class CollateralTokenButton extends Component<ICollateralTokenButtonProps
     return (
       <React.Fragment>
         {this.state.assetDetails ? (
-          <div className="collateral-token-button" onClick={this.onClick}>
-            <img src={this.state.assetDetails.tsSvg} />
-            {this.state.assetDetails.displayName}
-            <img src={ic__token_selector__down} />
+          <div className={`collateral-token-button ${this.props.isChangeCollateralOpen ? "opened" : "closed"}`} onClick={this.onClick}>
+            {this.state.assetDetails.reactLogoSvg.render()}
+            <span>{this.state.assetDetails.displayName}</span>  
           </div>
         ) : null}
       </React.Fragment>

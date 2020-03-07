@@ -23,6 +23,12 @@ export class CollateralTokenSelector extends Component<ICollateralTokenSelectorP
     Asset.KNC
   ];
 
+  componentDidMount() {
+    const collateralTokenSelector = document.querySelector(".collateral-token-selector__wrapper") as HTMLElement;
+    const boundingClient = collateralTokenSelector.getBoundingClientRect();
+    //collateralTokenSelector!.style.top =-1 * boundingClient!.top + "px";
+    collateralTokenSelector!.style.left =-1 * boundingClient!.left + "px";
+  }
   public render() {
     const tokenItems = this.assets.map(e => (
       <CollateralTokenSelectorItem
@@ -34,13 +40,16 @@ export class CollateralTokenSelector extends Component<ICollateralTokenSelectorP
     ));
 
     return (
-      <div className="collateral-token-selector">
-        <div className="collateral-token-selector__title">Select {this.props.collateralType} token</div>
-        <div className="collateral-token-selector__items">{tokenItems}</div>
-        <div className="collateral-token-selector__actions">
-          <div className="collateral-token-selector__action--close" onClick={this.props.onClose}>Close</div>
+      <React.Fragment>
+        <div className="collateral-token-selector__wrapper" onClick={this.props.onClose}></div>
+        <div className="collateral-token-selector">
+          <div className="collateral-token-selector__title">Select {this.props.collateralType} token</div>
+          <div className="collateral-token-selector__items">{tokenItems}</div>
+          {/*<div className="collateral-token-selector__actions">
+            <div className="collateral-token-selector__action--close" onClick={this.props.onClose}>Close</div>
+          </div>*/}
         </div>
-      </div>
+      </React.Fragment>
     );
   }
 }

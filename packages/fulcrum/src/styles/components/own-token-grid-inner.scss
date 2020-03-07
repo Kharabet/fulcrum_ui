@@ -128,6 +128,9 @@ $width-button-action: 7rem;
     letter-spacing: -0.3px;
     color: var(--primary-text);
     outline: none;
+    &:hover{
+      background-color: #5B88FF;
+    }
     &:not(:disabled){
       cursor: pointer;
     }

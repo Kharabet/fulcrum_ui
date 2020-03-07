@@ -9,9 +9,9 @@
 @import "base/animations";
 @import "base/base";
 @import "base/typography";
-@import "base/utilities";
 
 @import "components/check-box";
+@import "components/asset-dropdown";
 
 @import "components/change-24-h-marker";
 @import "components/collapsible-container";
@@ -65,3 +65,6 @@
 @import "pages/maintenance-page";
 @import "pages/stats-page";
 @import "pages/trade-page";
+
+
+@import "base/utilities";

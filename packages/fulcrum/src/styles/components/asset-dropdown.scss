@@ -1,0 +1,125 @@
+.asset-dropdown-container {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+.asset-dropdown {
+  position: absolute;
+  top: calc(50% + 20px);
+  border-radius: 4px;
+  background-color: #758295;
+  box-sizing: border-box;
+  width: 100%;
+  z-index: 100004;
+  &__wrapper {
+    width: 100vw;
+    height: 100vh;
+    position: absolute;
+    z-index: 100003;
+  }
+  &__title {
+    margin-bottom: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.5;
+    letter-spacing: 0.05px;
+    color: #ffffff;
+  }
+  &__items {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  &-item {
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+    width: 100%;
+    padding: 4px;
+    border-radius: 4px;
+    text-align: center;
+    &:hover {
+      cursor: pointer;
+      background-color: #8b97a9;
+    }
+    &--selected {
+      background-color: #586473;
+      &:hover {
+        background-color: #586473;
+      }
+    }
+    &__name {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      color: #ffffff;
+    }
+    &__image-container {
+      margin-right: 7px;
+      svg {
+        width: 25px;
+        height: 25px;
+      }
+    }
+  }
+}
+
+.asset-dropdown-button {
+  cursor: pointer;
+  display: flex;
+  flex-direction: row;
+  box-sizing: border-box;
+  border-radius: 26px;
+  background-color: #586473;
+  width: 105px;
+  align-items: center;
+  padding: 4px;
+  position: relative;
+  @media only screen and (max-width: $mobile-version-max-width) {
+    width: 95px;
+  }
+  svg {
+    width: 25px;
+    height: 25px;
+    margin-right: 7px;
+    @media only screen and (max-width: $mobile-version-max-width) {
+      margin-right: 3px;
+    }
+    .eth-svg {
+      fill: #c8c8c8;
+    }
+  }
+  &:not(.empty)::after {
+    content: "";
+
+    position: absolute;
+    right: 13px;
+    top: calc(50% - 2px);
+    transform: translate(0, -50%);
+    width: 8px;
+    border: 5px solid transparent;
+    @media only screen and (max-width: $mobile-version-max-width) {
+      right: 10px;
+    }
+  }
+  &.closed {
+    &::after {
+      top: calc(50% + 2px);
+      border-top: 4px solid #ffffff;
+    }
+  }
+
+  &.opened {
+    &::after {
+      border-bottom: 4px solid #ffffff;
+    }
+  }
+  span {
+    font-size: 12px;
+    font-weight: 600;
+    font-style: normal;
+    font-stretch: normal;
+    line-height: 1.5;
+    letter-spacing: 0.05em;
+    color: #ffffff;
+  }
+}

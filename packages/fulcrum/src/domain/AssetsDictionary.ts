@@ -15,6 +15,8 @@ import susd_logo, {ReactComponent as SUSDLogo} from "../assets/images/ic_token_s
 import usdt_logo, {ReactComponent as USDTLogo} from "../assets/images/ic_token_usdt.svg";
 import usdc_logo, {ReactComponent as USDCLogo} from "../assets/images/ic_token_usdc.svg";
 import zrx_logo, {ReactComponent as ZRXLogo} from "../assets/images/ic_token_zrx.svg";
+import weth_logo, {ReactComponent as WETHLogo} from "../assets/images/ic_token_weth.svg";
+import chai_logo, {ReactComponent as CHAILogo} from "../assets/images/ic_token_chai.svg";
 
 import bat_bg from "../assets/images/popup_left_token_bat.svg";
 import btc_bg from "../assets/images/popup_left_token_btc.svg";
@@ -200,8 +202,8 @@ export class AssetsDictionary {
         "iDAI",
         "https://fulcrum.trade/images/iDAI.svg",
         18,
-        dai_logo,
-        DAILogo,
+        chai_logo,
+        CHAILogo,
         dai_bg,
         dai_ts,
         "#8777B1",
@@ -288,8 +290,8 @@ export class AssetsDictionary {
         "iETH",
         "https://fulcrum.trade/images/iETH.svg",
         18,
-        eth_logo,
-        ETHLogo,
+        weth_logo,
+        WETHLogo,
         eth_bg,
         eth_ts,
         "#FFFFFF",
@@ -533,8 +535,8 @@ export class AssetsDictionaryMobile {
         "iDAI",
         "https://fulcrum.trade/images/iDAI.svg",
         18,
-        dai_logo,
-        DAILogo,
+        chai_logo,
+        CHAILogo,
         dai_bg,
         dai_ts,
         "#8777B1",
@@ -621,8 +623,8 @@ export class AssetsDictionaryMobile {
         "iETH",
         "https://fulcrum.trade/images/iETH.svg",
         18,
-        eth_logo,
-        ETHLogo,
+        weth_logo,
+        WETHLogo,
         eth_bg_btm,
         eth_ts,
         "#FFFFFF",
