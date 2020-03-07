@@ -5,7 +5,7 @@ export enum ProviderType {
   Fortmatic = "Fortmatic",
   Portis = "Portis",
   WalletConnect = "WalletConnect",
-  Squarelink = "Squarelink",
+  // Squarelink = "Squarelink",
   None = "None"
 }
 

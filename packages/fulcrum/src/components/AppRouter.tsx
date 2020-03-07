@@ -92,7 +92,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
               ProviderType.Fortmatic,
               ProviderType.Portis,
               ProviderType.Bitski,
-              ProviderType.Squarelink,
+              // ProviderType.Squarelink,
               // ProviderType.WalletConnect,
               ProviderType.None
             ]}
