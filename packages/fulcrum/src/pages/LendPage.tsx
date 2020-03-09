@@ -10,6 +10,7 @@ import { LendType } from "../domain/LendType";
 import { Footer } from "../layout/Footer";
 import { HeaderOps } from "../layout/HeaderOps";
 import { FulcrumProvider } from "../services/FulcrumProvider";
+import { InfoBlock } from "../components/InfoBlock";
 
 export interface ILendPageProps {
   doNetworkConnect: () => void;
@@ -43,6 +44,9 @@ export class LendPage extends PureComponent<ILendPageProps, ILendPageState> {
       <div className="lend-page">
         <HeaderOps isMobileMedia={this.props.isMobileMedia} isLoading={this.props.isLoading} doNetworkConnect={this.props.doNetworkConnect} />
         <main className="lend-page-main">
+          <InfoBlock localstorageItemProp="lend-page-info">
+            Currently only our lending and unlending functions are enabled. Full functionality will return after a thorough audit of our newly implemented and preexisting smart contracts
+          </InfoBlock>
           <LendTokenSelector onLend={this.onLendRequested} onFulcrumMcdBridge={this.onFulcrumMcdBridgeRequested} />
           <Modal
             isOpen={this.state.isLendModalOpen}

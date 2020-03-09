@@ -23,6 +23,7 @@ import { TokenGridTabs } from "../components/TokenGridTabs";
 
 
 import { TVChartContainer } from '../components/TVChartContainer';
+import { InfoBlock } from "../components/InfoBlock";
 
 
 
@@ -152,6 +153,9 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
       <div className="trade-page">
         <HeaderOps isMobileMedia={this.props.isMobileMedia} isLoading={this.props.isLoading} doNetworkConnect={this.props.doNetworkConnect} />
         <main>
+          <InfoBlock localstorageItemProp="trade-page-info">
+            Currently only our lending and unlending functions are enabled. Full functionality will return after a thorough audit of our newly implemented and preexisting smart contracts
+          </InfoBlock>
           <TokenGridTabs
             assets={this.state.assets}
             selectedKey={this.state.selectedKey}
