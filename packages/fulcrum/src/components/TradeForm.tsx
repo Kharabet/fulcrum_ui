@@ -397,7 +397,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       submitButtonText = `CLOSE`;
     }
     if (this.state.exposureValue.gt(0)) {
-      submitButtonText += ` ${this.state.exposureValue.toFixed(2)} ${this.props.asset}`;
+      submitButtonText += ` ${this.formatPrecision(this.state.exposureValue.toNumber())} ${this.props.asset}`;
     } else {
       submitButtonText += ` ${this.props.asset}`;
     }
@@ -487,7 +487,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
                 onChange={this.onTradeAmountChange}
               />
               {!this.state.isLoading ? null
-                : <div className="preloader-container"> <Preloader width="80px"/></div>
+                : <div className="preloader-container"> <Preloader width="80px" /></div>
               }
               <div className="trade-form__collateral-button-container">
                 <CollateralTokenButton asset={this.state.collateral} onClick={this.onChangeCollateralOpen} isChangeCollateralOpen={this.state.isChangeCollateralOpen} />
@@ -498,8 +498,8 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
                   selectedCollateral={this.state.collateral}
                   collateralType={this.props.tradeType === TradeType.BUY ? `Purchase` : `Withdrawal`}
                   onCollateralChange={this.onChangeCollateralClicked}
-                  onClose={this.onChangeCollateralClose} 
-                  tradeType = {this.props.tradeType} />
+                  onClose={this.onChangeCollateralClose}
+                  tradeType={this.props.tradeType} />
                 :
                 null
               }
@@ -539,7 +539,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
           <div className="trade-form__actions-container">
 
             <button title={this.state.exposureValue.gt(0) ? `${this.state.exposureValue.toFixed(18)} ${this.props.asset}` : ``} type="submit" className={`trade-form__submit-button ${submitClassName}`}>
-              {this.state.isLoading ? <Preloader width="75px"/> : submitButtonText}
+              {this.state.isLoading ? <Preloader width="75px" /> : submitButtonText}
             </button>
           </div>
           {this.props.tradeType === TradeType.BUY ?
@@ -563,7 +563,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     const amountText = event.target.value ? event.target.value : "";
 
     // setting inputAmountText to update display at the same time
-    this._isMounted && this.setState({ ...this.state, inputAmountText: amountText }, () => {
+    this._isMounted && this.setState({ ...this.state, inputAmountText: amountText}, () => {
       // emitting next event for processing with rx.js
       this._inputChange.next(this.state.inputAmountText);
     });
@@ -784,6 +784,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
   private rxFromCurrentAmount = (value: string): Observable<ITradeAmountChangeEvent | null> => {
     return new Observable<ITradeAmountChangeEvent | null>(observer => {
 
+      this._isMounted && this.setState({ ...this.state, isLoading: true });
       const tradeTokenKey = this.getTradeTokenGridRowSelectionKey();
       const maxTradeValue = this.state.maxTradeValue;
       this.getInputAmountLimitedFromText(value, tradeTokenKey, maxTradeValue, false).then(limitedAmount => {
@@ -903,4 +904,13 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       maxTradeValue
     };
   };
+
+  private formatPrecision(output: number): string {
+    let n = Math.log(output) / Math.LN10;
+    let x = 6 - n;
+    if (x < 0)
+      x = 0;
+    let result = new Number(output.toFixed(x)).toString();
+    return result;
+  }
 }
