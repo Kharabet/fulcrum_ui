@@ -539,7 +539,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
           <div className="trade-form__actions-container">
 
             <button title={this.state.exposureValue.gt(0) ? `${this.state.exposureValue.toFixed(18)} ${this.props.asset}` : ``} type="submit" className={`trade-form__submit-button ${submitClassName}`}>
-              {submitButtonText}
+              {this.state.isLoading ? <Preloader width="75px"/> : submitButtonText}
             </button>
           </div>
           {this.props.tradeType === TradeType.BUY ?
