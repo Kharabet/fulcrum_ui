@@ -27,6 +27,10 @@
   &__items {
     display: flex;
     flex-wrap: wrap;
+    margin-bottom: 20px;
+    @media screen and (max-width: $mobile-version-max-width) {
+      margin-bottom: 15px;
+    }
   }
   &-item {
     display: inline-block;
@@ -62,6 +66,16 @@
           fill: #c8c8c8;
         }
       }
+    }
+  }
+  &__description{    
+    font-size: 12px;
+    line-height: 1.5;
+    font-weight: 600;
+    color: #B9C7D6;
+    letter-spacing: 0.05px;
+    @media screen and (max-width: $mobile-version-max-width) {
+      font-size: 10px;
     }
   }
 }

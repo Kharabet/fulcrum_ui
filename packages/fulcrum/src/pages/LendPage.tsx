@@ -47,7 +47,7 @@ export class LendPage extends PureComponent<ILendPageProps, ILendPageState> {
           <Modal
             isOpen={this.state.isLendModalOpen}
             onRequestClose={this.onRequestClose}
-            className="modal-content-div"
+            className="modal-content-div modal-content-div-form"
             overlayClassName="modal-overlay-div"
           >
             <LendForm
