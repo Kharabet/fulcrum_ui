@@ -88,7 +88,7 @@ permalink: lending
                     </div>
                     <div class="wrap-apr-value">
                         <p class="lh-100 fw-700 c-gray">LINK</p>
-                        <p class="fs-24 c-primary lh-125"><span class="fw-800 apr-value">4,2</span>%</p>
+                        <p class="fs-24 c-primary lh-125"><span class="fw-800 apr-value">4.2</span>%</p>
                     </div>
                 </div>
                 <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-token="susd">
