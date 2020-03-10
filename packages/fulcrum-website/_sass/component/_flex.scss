@@ -56,7 +56,11 @@
 .fg-1{
   flex-grow: 1;
 }
-
+@media(max-width: 1409px){
+  .ai-xl-fe {
+    align-items: flex-end;
+  }
+}
 @media (max-width: 991px) {
   .fd-md-c {
     flex-direction: column;

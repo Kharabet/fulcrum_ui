@@ -175,8 +175,8 @@ permalink: lending
 <section class="bg-secondary pt-105 pb-75 pb-xs-60 text-center">
     <div class="container">
         <h2 class="mb-75 mb-xs-50 circle"><span class="purple center top-r-60"></span>How safe is it?</h2>
-        <div class="flex fw-sm-w jc-sb">
-            <div class="col col-4 col-sm-12 item-safe fd-c">
+        <div class="flex fw-md-w jc-sb">
+            <div class="col col-3 col-md-6 col-sm-12 item-safe fd-c">
                 <div class="icon-safe mb-40 mb-xs-15">
                     {% include svg/icon-safe-4.svg %}
                 </div>
@@ -184,14 +184,21 @@ permalink: lending
                 <p>Borrowers must maintain the collateral-to-loan ratio specified by the terms of the loan or the collateral will be liquidated to repay the lender and maintain sufficient liquidity for dApps using the protocol.
                 </p>
             </div>
-            <div class="col col-4 col-sm-12 item-safe fd-c">
+            <div class="col col-3 col-md-6 col-sm-12 item-safe fd-c">
+                <div class="icon-safe mb-40 mb-xs-15">
+                    {% include svg/icon-safe-5.svg %}
+                </div>
+                <h3 class="mb-20">Secure Oracles</h3>
+                <p>Chainlink’s <a href="https://feeds.chain.link/">decentralized oracle network</a> is used for price information.</p>
+            </div>
+            <div class="col col-3 col-md-6 col-sm-12 item-safe fd-c">
                 <div class="icon-safe mb-40 mb-xs-15">
                     {% include svg/icon-safe-1.svg %}
                 </div>
                 <h3 class="mb-20">Audited Smart Contracts</h3>
                 <p>The bZx base protocol has been successfully audited by leading blockchain security auditor ZK Labs, headed by Matthew DiFerrante, Dean Eigenmann, Nick Johnson, and Harry Roberts and available <a href="https://github.com/mattdf/audits/blob/master/bZx/bzx-audit.pdf">here.</a></p>
             </div>
-            <div class="col col-4 col-sm-12 item-safe fd-c">
+            <div class="col col-3 col-md-6 col-sm-12 item-safe fd-c">
                 <div class="icon-safe mb-40 mb-xs-15">
                     {% include svg/icon-safe-2.svg %}
                 </div>

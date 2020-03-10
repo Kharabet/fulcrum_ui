@@ -273,22 +273,29 @@ title: Crypto Margin Trading with Fulcrum | bZx
                 <h2 class="circle mb-65 mb-xs-50"><span class="blue right-r-50 top-r-10"></span>How safe is it?</h2>
             </div>
         </div>
-        <div class="row jc-sb fw-sm-w">
-            <div class="col col-4 col-sm-12 item-safe fd-c">
+        <div class="row jc-sb fw-md-w ai-xl-fe">
+            <div class="col col-3 col-md-6 col-sm-12 item-safe fd-c">
                 <div class="icon-safe mb-50 mb-xs-15">
                     {% include svg/icon-safe-1.svg %}
                 </div>
                 <h3 class="mb-20">Audited Smart Contracts</h3>
                 <p>The bZx base protocol has been <a href="https://github.com/mattdf/audits/blob/master/bZx/bzx-audit.pdf">successfully audited</a> by leading blockchain security auditor ZK Labs.</p>
             </div>
-            <div class="col col-4 col-sm-12 item-safe fd-c">
+            <div class="col col-3 col-md-6 col-sm-12 item-safe fd-c">
+                <div class="icon-safe mb-50 mb-xs-15">
+                    {% include svg/icon-safe-5.svg %}
+                </div>
+                <h3 class="mb-20">Secure Oracles</h3>
+                <p>Chainlink’s <a href="https://feeds.chain.link/">decentralized oracle network</a> is used for price information.</p>
+            </div>
+            <div class="col col-3 col-md-6 col-sm-12 item-safe fd-c">
                 <div class="icon-safe mb-50 mb-xs-15">
                     {% include svg/icon-safe-2.svg %}
                 </div>
                 <h3 class="mb-20">Insurance Fund</h3>
                 <p>If undercollateralized loans are not properly liquidated, lenders are repaid from a pool funded by 10% of the interest paid by borrowers.</p>
             </div>
-            <div class="col col-4 col-sm-12 item-safe fd-c">
+            <div class="col col-3 col-md-6 col-sm-12 item-safe fd-c">
                 <div class="icon-safe mb-50 mb-xs-15">
                     {% include svg/icon-safe-3.svg %}
                 </div>
