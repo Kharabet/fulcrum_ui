@@ -34,7 +34,7 @@
 
     .manage-collateral-form-insufficient-balance {
       color: red;
-      padding: 0.25rem;
+      padding: .25rem;
       text-align: center;
 
       &--hidden {
@@ -80,28 +80,6 @@
       padding-bottom: 1rem;
       padding-left: 2.5rem;
 
-      &.temp-warning {
-        font-size: 12px;
-        color: #ffffff;
-        margin-bottom: 20px;
-        display: block;
-        letter-spacing: 0.1px;
-        background: #fff;
-        color: #394049;
-        padding: 12px;
-        padding-left: 27px;
-        position: relative;
-        &:before {
-          content: "";
-          position: absolute;
-          width: 24px;
-          height: 24px;
-          background: url("../assets/images/error_icon.svg");
-          left: -12px;
-          top: 10px;
-        }
-      }
-
       .manage-collateral-form__info-liquidated-at-msg {
         font-size: 1rem;
         font-weight: normal;
@@ -126,6 +104,7 @@
     }
 
     .manage-collateral-form__transfer-details {
+
       padding-bottom: 1rem;
 
       .manage-collateral-form__transfer-details-msg {
@@ -157,6 +136,6 @@
 
 @media only screen and (max-width: $mobile-version-max-width) {
   .manage-collateral-form {
-    width: 100%;
+    width:100%
   }
 }
