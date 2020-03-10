@@ -525,7 +525,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
             ) : null}
 
 
-            {this.props.isMobileMedia && this.state.positionTokenBalance && this.props.tradeType === TradeType.BUY ? (
+            {this.props.isMobileMedia && this.props.tradeType === TradeType.BUY ? (
               <TradeExpectedResult value={tradeExpectedResultValue} />
             ) : null}
 
