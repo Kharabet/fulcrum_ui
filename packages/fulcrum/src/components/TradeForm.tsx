@@ -516,9 +516,9 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
 
           </div>
 
-          {this.state.isAmountExceeded ? <div className="trade-form__form-info">
+          {/*this.state.isAmountExceeded ? <div className="trade-form__form-info">
             You are exceeding max trade value size.
-            </div> : null}
+            </div> : null*/}
 
           <div className="trade-form__actions-container">
 
@@ -652,7 +652,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       usdPrice = usdPrice.multipliedBy(usdAmount)
     }
 
-    if (this.props.tradeType === TradeType.SELL) {
+    /*if (this.props.tradeType === TradeType.SELL) {
 
       const tradeTokenKey = this.getTradeTokenGridRowSelectionKey();
       if (FulcrumProvider.Instance.web3Wrapper && FulcrumProvider.Instance.contractsSource) {
@@ -683,7 +683,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
           }
         }
       }
-    }
+    }*/
 
 
 
