@@ -545,7 +545,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
                 <div className="trade-form__how-it-works">
                   <div className="hiw-icon"><QuestionIcon /></div>
                   <div className="hiw-content">
-                    You are opening {this.props.leverage}x {this.props.positionType} {this.state.assetDetails.displayName} position. You’re borrowing {this.props.defaultUnitOfAccount} from a Fulcrum lending pool and that {this.props.defaultUnitOfAccount} is swapped into {this.state.assetDetails.displayName} on KyberNetwork.
+                    You are opening {this.props.leverage}x {this.props.positionType} {this.state.assetDetails.displayName} position. You’re borrowing {this.props.defaultUnitOfAccount} from a Fulcrum lending pool and that {this.props.defaultUnitOfAccount} is swapped into {this.state.assetDetails.displayName} using an on-chain DEX.
                 </div>
                 </div>
               </CollapsibleContainer>
