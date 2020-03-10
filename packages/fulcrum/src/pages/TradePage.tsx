@@ -199,7 +199,7 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
           <Modal
             isOpen={this.state.isTradeModalOpen}
             onRequestClose={this.onTradeRequestClose}
-            className="modal-content-div"
+            className="modal-content-div modal-content-div-form"
             overlayClassName="modal-overlay-div"
           >
             <TradeForm
