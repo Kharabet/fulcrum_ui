@@ -27,6 +27,7 @@ import { CollateralTokenSelector } from "./CollateralTokenSelector";
 import { PositionTypeMarkerAlt } from "./PositionTypeMarkerAlt";
 import { TradeExpectedResult } from "./TradeExpectedResult";
 import { UnitOfAccountSelector } from "./UnitOfAccountSelector";
+import { Preloader } from "./Preloader";
 
 
 interface IInputAmountLimited {
@@ -102,6 +103,8 @@ interface ITradeFormState {
 
   isAmountExceeded: boolean;
   maxAmountMultiplier: BigNumber;
+
+  isLoading: boolean;
 }
 
 export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
@@ -153,7 +156,8 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       liquidationPrice: liquidationPrice,
       exposureValue: exposureValue,
       isAmountExceeded: false,
-      maxAmountMultiplier: maxAmountMultiplier
+      maxAmountMultiplier: maxAmountMultiplier,
+      isLoading: true
     };
 
     this._inputChange = new Subject();
@@ -172,7 +176,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       switchMap((value) => new Observable<ITradeAmountChangeEvent | null>((observer) => observer.next(value)))
     ).subscribe(next => {
       if (next) {
-        this._isMounted && this.setState({ ...this.state, ...next });
+        this._isMounted && this.setState({ ...this.state, ...next, isLoading: false });
       } else {
         this._isMounted && this.setState({
           ...this.state,
@@ -182,7 +186,8 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
           tradeAmountValue: new BigNumber(0),
           tradedAmountEstimate: new BigNumber(0),
           slippageRate: new BigNumber(0),
-          exposureValue: new BigNumber(0)
+          exposureValue: new BigNumber(0),
+          isLoading: false
         })
       }
     });
@@ -206,6 +211,12 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
   };
 
   private async derivedUpdate() {
+
+    this._isMounted && this.setState({
+      ...this.state,
+      isLoading: true
+    });
+
     let assetDetails = AssetsDictionary.assets.get(this.props.asset);
     if (this.props.isMobileMedia) {
       assetDetails = AssetsDictionaryMobile.assets.get(this.props.asset);
@@ -266,7 +277,8 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       maybeNeedsApproval: maybeNeedsApproval,
       currentPrice: new BigNumber(latestPriceDataPoint.price),
       liquidationPrice: liquidationPrice,
-      exposureValue: tradeExpectedResults.exposureValue
+      exposureValue: tradeExpectedResults.exposureValue,
+      isLoading: false
     });
   }
 
@@ -281,15 +293,16 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
-  public componentDidMount(): void {
+  public async componentDidMount() {
     this._isMounted = true;
 
-    this.derivedUpdate();
+    await this.derivedUpdate();
     window.history.pushState(null, "Trade Modal Opened", `/#/trade/${this.props.tradeType.toLocaleLowerCase()}-${this.props.leverage}x-${this.props.positionType.toLocaleLowerCase()}-${this.props.asset}/`);
 
     if (this._input) {
       this._input.select();
       this._input.focus();
+      this._inputSetMax.next(new BigNumber(1));
     }
   }
 
@@ -449,7 +462,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
         </div>
         <div className={`trade-form__form-container ${this.props.tradeType === TradeType.BUY ? "buy" : "sell"}`}>
           <div className="trade-form__form-values-container">
-            {!this.props.isMobileMedia && this.state.positionTokenBalance && this.props.tradeType === TradeType.BUY ? (
+            {!this.props.isMobileMedia && this.props.tradeType === TradeType.BUY ? (
               <TradeExpectedResult value={tradeExpectedResultValue} />
             ) : null}
 
@@ -470,10 +483,12 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
                 type="number"
                 ref={this._setInputRef}
                 className="trade-form__amount-input"
-                value={this.state.inputAmountText}
+                value={!this.state.isLoading ? this.state.inputAmountText : ""}
                 onChange={this.onTradeAmountChange}
-                placeholder={`Amount`}
               />
+              {!this.state.isLoading ? null
+                : <div className="preloader-container"> <Preloader /></div>
+              }
               <div className="trade-form__collateral-button-container">
                 <CollateralTokenButton asset={this.state.collateral} onClick={this.onChangeCollateralOpen} isChangeCollateralOpen={this.state.isChangeCollateralOpen} />
               </div>
@@ -560,8 +575,10 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     }
     const buttonElement = event.currentTarget as HTMLButtonElement;
     const value = new BigNumber(parseFloat(buttonElement.dataset.value!));
-    // emitting next event for processing with rx.js
-    this._inputSetMax.next(value);
+    this._isMounted && this.setState({ ...this.state, isLoading: true }, () => {
+      // emitting next event for processing with rx.js
+      this._inputSetMax.next(value);
+    });
   };
 
   public onCancelClick = () => {
