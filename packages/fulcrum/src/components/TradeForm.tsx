@@ -300,7 +300,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     window.history.pushState(null, "Trade Modal Opened", `/#/trade/${this.props.tradeType.toLocaleLowerCase()}-${this.props.leverage}x-${this.props.positionType.toLocaleLowerCase()}-${this.props.asset}/`);
 
     if (this._input) {
-      this._input.select();
+      // this._input.select();
       this._input.focus();
       this._inputSetMax.next(new BigNumber(1));
     }
