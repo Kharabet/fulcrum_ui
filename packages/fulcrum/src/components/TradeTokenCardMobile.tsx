@@ -199,7 +199,7 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
               <span>
                 {!this.state.isLoading ?
                   <React.Fragment><span className="fw-normal">$</span>{bnPrice.toFixed(2)}</React.Fragment>
-                  : <Preloader />
+                  : <Preloader width="74px"/>
                 }
               </span>
             </div>
@@ -208,7 +208,7 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
               <span>
                 {!this.state.isLoading ?
                   <React.Fragment><span className="fw-normal">$</span>{bnLiquidationPrice.toFixed(2)}</React.Fragment>
-                  : <Preloader />
+                  : <Preloader width="74px"/>
                 }
               </span>
             </div>
@@ -217,7 +217,7 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
               <span>
                 {this.state.interestRate.gt(0) && !this.state.isLoading
                   ? <React.Fragment>{this.state.interestRate.toFixed(4)}<span className="fw-normal">%</span></React.Fragment>
-                  : <Preloader />
+                  : <Preloader width="74px"/>
                 }
               </span>
             </div>

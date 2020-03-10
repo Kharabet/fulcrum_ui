@@ -487,7 +487,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
                 onChange={this.onTradeAmountChange}
               />
               {!this.state.isLoading ? null
-                : <div className="preloader-container"> <Preloader /></div>
+                : <div className="preloader-container"> <Preloader width="80px"/></div>
               }
               <div className="trade-form__collateral-button-container">
                 <CollateralTokenButton asset={this.state.collateral} onClick={this.onChangeCollateralOpen} isChangeCollateralOpen={this.state.isChangeCollateralOpen} />
