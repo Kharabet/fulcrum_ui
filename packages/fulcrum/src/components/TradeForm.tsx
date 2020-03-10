@@ -529,9 +529,9 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
 
           </div>
 
-          {this.state.isAmountExceeded ? <div className="trade-form__form-info">
+          {/*this.state.isAmountExceeded ? <div className="trade-form__form-info">
             You are exceeding max trade value size.
-            </div> : null}
+            </div> : null*/}
 
           <div className="trade-form__actions-container">
 
@@ -560,7 +560,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     const amountText = event.target.value ? event.target.value : "";
 
     // setting inputAmountText to update display at the same time
-    this._isMounted && this.setState({ ...this.state, inputAmountText: amountText}, () => {
+    this._isMounted && this.setState({ ...this.state, inputAmountText: amountText }, () => {
       // emitting next event for processing with rx.js
       this._inputChange.next(this.state.inputAmountText);
     });
@@ -667,7 +667,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       usdPrice = usdPrice.multipliedBy(usdAmount)
     }
 
-    if (this.props.tradeType === TradeType.SELL) {
+    /*if (this.props.tradeType === TradeType.SELL) {
 
       const tradeTokenKey = this.getTradeTokenGridRowSelectionKey();
       if (FulcrumProvider.Instance.web3Wrapper && FulcrumProvider.Instance.contractsSource) {
@@ -698,7 +698,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
           }
         }
       }
-    }
+    }*/
 
 
 
@@ -905,9 +905,9 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
 
   private formatPrecision(output: number): string {
     let n = Math.log(output) / Math.LN10;
-    let x = 6 - n;
-    if (x < 0)
-      x = 0;
+    let x = 3 - n;
+    if (x < 0) x = 0;
+    if (x > 5) x = 5;
     let result = new Number(output.toFixed(x)).toString();
     return result;
   }
