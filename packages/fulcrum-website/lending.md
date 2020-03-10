@@ -88,7 +88,7 @@ permalink: lending
                     </div>
                     <div class="wrap-apr-value">
                         <p class="lh-100 fw-700 c-gray">LINK</p>
-                        <p class="fs-24 c-primary lh-125"><span class="fw-800 apr-value">4,2</span>%</p>
+                        <p class="fs-24 c-primary lh-125"><span class="fw-800 apr-value">4.2</span>%</p>
                     </div>
                 </div>
                 <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-token="susd">
@@ -267,7 +267,7 @@ permalink: lending
                     </div>
                     <div class="result-calc">
                         <p class="fs-18 text-md-center">Earn up to:</p>
-                        <p class="fs-66 lh-140 fw-400 text-md-center wrapper">$<span class="fw-900 earn-usd-value">30,56</span></p>
+                        <p class="fs-66 lh-140 fw-400 text-md-center wrapper">$<span class="fw-900 earn-usd-value">30.56</span></p>
                         <p class="fs-24 lh-140 fw-600 text-right month">/month</p>
                     </div>
                 </div>
@@ -338,7 +338,7 @@ permalink: lending
                                 <p class="fs-20 fs-md-13">Betterment</p>
                             </div>
                             <div class="footer-earn">
-                                <p class="fs-32 fs-md-20 mb-5 mb-md-0">$<span class="fw-800 earn-usd-value">2,50</span></p>
+                                <p class="fs-32 fs-md-20 mb-5 mb-md-0">$<span class="fw-800 earn-usd-value">2.50</span></p>
                                 <p class="fs-18 fs-md-20"><span class="fw-800 apr-value">0.05</span>%</p>
                             </div>
                         </div>
@@ -350,7 +350,7 @@ permalink: lending
                                 <p class="fs-20 fs-md-13">Industry Average</p>
                             </div>
                             <div class="footer-earn">
-                                <p class="fs-32 fs-md-20 mb-5 mb-md-0">$<span class="fw-800 earn-usd-value">2,45</span></p>
+                                <p class="fs-32 fs-md-20 mb-5 mb-md-0">$<span class="fw-800 earn-usd-value">2.45</span></p>
                                 <p class="fs-18 fs-md-20"><span class="fw-800 apr-value">0.04</span>%</p>
                             </div>
                         </div>
