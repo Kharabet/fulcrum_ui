@@ -1,10 +1,12 @@
 import React, { Component } from "react";
 import { Asset } from "../domain/Asset";
 import { CollateralTokenSelectorItem } from "./CollateralTokenSelectorItem";
+import { TradeType } from "../domain/TradeType";
 
 export interface ICollateralTokenSelectorProps {
   selectedCollateral: Asset;
   collateralType: string;
+  tradeType: string;
 
   onCollateralChange: (asset: Asset) => void;
   onClose: () => void;
@@ -48,6 +50,7 @@ export class CollateralTokenSelector extends Component<ICollateralTokenSelectorP
           {/*<div className="collateral-token-selector__actions">
             <div className="collateral-token-selector__action--close" onClick={this.props.onClose}>Close</div>
           </div>*/}
+          <p className="collateral-token-selector__description">{this.props.tradeType === TradeType.BUY ? `Lorem ipsum purchase token explainer` : `Lorem ipsum redemption token explainer`}</p>
         </div>
       </React.Fragment>
     );

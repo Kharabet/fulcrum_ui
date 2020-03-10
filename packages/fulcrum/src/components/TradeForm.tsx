@@ -483,7 +483,8 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
                   selectedCollateral={this.state.collateral}
                   collateralType={this.props.tradeType === TradeType.BUY ? `Purchase` : `Withdrawal`}
                   onCollateralChange={this.onChangeCollateralClicked}
-                  onClose={this.onChangeCollateralClose} />
+                  onClose={this.onChangeCollateralClose} 
+                  tradeType = {this.props.tradeType} />
                 :
                 null
               }
