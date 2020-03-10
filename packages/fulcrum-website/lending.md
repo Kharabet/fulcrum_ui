@@ -150,19 +150,19 @@ permalink: lending
                         <p class="fs-44 fs-xs-28 fw-900 mb-15 lh-140 c-light-green">Currently in Fulcrum</p>
                         <div class="flex jc-sb fd-sm-c fs-44 fs-md-36 fw-900 lh-140">
                             <div class="flex-xs fw-400">
-                                $<span class="fw-900 tvl-value" data-token="all">3,000,000</span>
+                                $<span class="fw-900 tvl-value" data-token="all">3.000 000</span>
                             </div>
                             <div class="flex ai-c">
                                 <div class="icon-40 icon-xs-30 icon-border-2 mr-10 mr-xs-20">
                                     {% include svg/eth.svg %}
                                 </div>
-                                <span class="tvl-value" data-token="eth">10,000</span>
+                                <span class="tvl-value" data-token="eth">10.000</span>
                             </div>
                             <div class="flex ai-c">
                                 <div class="icon-40 icon-xs-30 icon-border-2 mr-10 mr-xs-20">
                                     {% include svg/dai.svg %}
                                 </div>
-                                <span class="tvl-value" data-token="dai">10,000</span>
+                                <span class="tvl-value" data-token="dai">10.000</span>
                             </div>
                         </div>
                     </div>
@@ -267,7 +267,7 @@ permalink: lending
                     </div>
                     <div class="result-calc">
                         <p class="fs-18 text-md-center">Earn up to:</p>
-                        <p class="fs-66 lh-140 fw-400 text-md-center wrapper">$<span class="fw-900 earn-usd-value">30,56</span></p>
+                        <p class="fs-66 lh-140 fw-400 text-md-center wrapper">$<span class="fw-900 earn-usd-value">30.56</span></p>
                         <p class="fs-24 lh-140 fw-600 text-right month">/month</p>
                     </div>
                 </div>
@@ -338,7 +338,7 @@ permalink: lending
                                 <p class="fs-20 fs-md-13">Betterment</p>
                             </div>
                             <div class="footer-earn">
-                                <p class="fs-32 fs-md-20 mb-5 mb-md-0">$<span class="fw-800 earn-usd-value">2,50</span></p>
+                                <p class="fs-32 fs-md-20 mb-5 mb-md-0">$<span class="fw-800 earn-usd-value">2.50</span></p>
                                 <p class="fs-18 fs-md-20"><span class="fw-800 apr-value">0.05</span>%</p>
                             </div>
                         </div>
@@ -350,7 +350,7 @@ permalink: lending
                                 <p class="fs-20 fs-md-13">Industry Average</p>
                             </div>
                             <div class="footer-earn">
-                                <p class="fs-32 fs-md-20 mb-5 mb-md-0">$<span class="fw-800 earn-usd-value">2,45</span></p>
+                                <p class="fs-32 fs-md-20 mb-5 mb-md-0">$<span class="fw-800 earn-usd-value">2.45</span></p>
                                 <p class="fs-18 fs-md-20"><span class="fw-800 apr-value">0.04</span>%</p>
                             </div>
                         </div>
