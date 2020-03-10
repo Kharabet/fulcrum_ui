@@ -105,6 +105,7 @@ interface ITradeFormState {
   maxAmountMultiplier: BigNumber;
 
   isLoading: boolean;
+  isExposureLoading: boolean;
 }
 
 export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
@@ -157,7 +158,8 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       exposureValue: exposureValue,
       isAmountExceeded: false,
       maxAmountMultiplier: maxAmountMultiplier,
-      isLoading: true
+      isLoading: true,
+      isExposureLoading: true
     };
 
     this._inputChange = new Subject();
@@ -176,7 +178,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       switchMap((value) => new Observable<ITradeAmountChangeEvent | null>((observer) => observer.next(value)))
     ).subscribe(next => {
       if (next) {
-        this._isMounted && this.setState({ ...this.state, ...next, isLoading: false });
+        this._isMounted && this.setState({ ...this.state, ...next, isLoading: false, isExposureLoading: false });
       } else {
         this._isMounted && this.setState({
           ...this.state,
@@ -187,7 +189,8 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
           tradedAmountEstimate: new BigNumber(0),
           slippageRate: new BigNumber(0),
           exposureValue: new BigNumber(0),
-          isLoading: false
+          isLoading: false,
+          isExposureLoading: false
         })
       }
     });
@@ -211,11 +214,6 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
   };
 
   private async derivedUpdate() {
-
-    this._isMounted && this.setState({
-      ...this.state,
-      isLoading: true
-    });
 
     let assetDetails = AssetsDictionary.assets.get(this.props.asset);
     if (this.props.isMobileMedia) {
@@ -277,8 +275,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       maybeNeedsApproval: maybeNeedsApproval,
       currentPrice: new BigNumber(latestPriceDataPoint.price),
       liquidationPrice: liquidationPrice,
-      exposureValue: tradeExpectedResults.exposureValue,
-      isLoading: false
+      exposureValue: tradeExpectedResults.exposureValue
     });
   }
 
@@ -539,7 +536,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
           <div className="trade-form__actions-container">
 
             <button title={this.state.exposureValue.gt(0) ? `${this.state.exposureValue.toFixed(18)} ${this.props.asset}` : ``} type="submit" className={`trade-form__submit-button ${submitClassName}`}>
-              {this.state.isLoading ? <Preloader width="75px" /> : submitButtonText}
+              {this.state.isExposureLoading || this.state.isLoading ? <Preloader width="75px" /> : submitButtonText}
             </button>
           </div>
           {this.props.tradeType === TradeType.BUY ?
@@ -576,7 +573,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     }
     const buttonElement = event.currentTarget as HTMLButtonElement;
     const value = new BigNumber(parseFloat(buttonElement.dataset.value!));
-    this._isMounted && this.setState({ ...this.state, isLoading: true }, () => {
+    this._isMounted && this.setState({ ...this.state }, () => {
       // emitting next event for processing with rx.js
       this._inputSetMax.next(value);
     });
@@ -740,6 +737,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
   private rxFromMaxAmountWithMultiplier = (multiplier: BigNumber): Observable<ITradeAmountChangeEvent | null> => {
     return new Observable<ITradeAmountChangeEvent | null>(observer => {
 
+      this._isMounted && this.setState({ ...this.state, isLoading: true });
       const tradeTokenKey = this.getTradeTokenGridRowSelectionKey();
       FulcrumProvider.Instance.getMaxTradeValue(this.props.tradeType, tradeTokenKey, this.state.collateral)
         .then(maxTradeValue => {
@@ -784,7 +782,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
   private rxFromCurrentAmount = (value: string): Observable<ITradeAmountChangeEvent | null> => {
     return new Observable<ITradeAmountChangeEvent | null>(observer => {
 
-      this._isMounted && this.setState({ ...this.state, isLoading: true });
+      this._isMounted && this.setState({ ...this.state, isExposureLoading: true });
       const tradeTokenKey = this.getTradeTokenGridRowSelectionKey();
       const maxTradeValue = this.state.maxTradeValue;
       this.getInputAmountLimitedFromText(value, tradeTokenKey, maxTradeValue, false).then(limitedAmount => {
