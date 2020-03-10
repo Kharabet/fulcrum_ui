@@ -98,7 +98,7 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
             </div>
           </div>
           <InfoBlock localstorageItemProp="torque-page-info">
-          Only management of existing loans is enabled. Full functionality will return after a thorough audit of our newly implemented and preexisting smart contracts. 
+          You may only manage and repay your existing loans. Full functionality will return after a thorough audit of our newly implemented and preexisting smart contracts. 
       </InfoBlock>
 
         </header>
