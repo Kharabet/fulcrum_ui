@@ -45,7 +45,7 @@ export class LendPage extends PureComponent<ILendPageProps, ILendPageState> {
         <HeaderOps isMobileMedia={this.props.isMobileMedia} isLoading={this.props.isLoading} doNetworkConnect={this.props.doNetworkConnect} />
         <main className="lend-page-main">
           <InfoBlock localstorageItemProp="lend-page-info">
-            Currently only our lending and unlending functions are enabled. Full functionality will return after a thorough audit of our newly implemented and preexisting smart contracts
+            Currently only our lending, unlending, and closing of position functions are enabled. Full functionality will return after a thorough audit of our newly implemented and preexisting smart contracts.
           </InfoBlock>
           <LendTokenSelector onLend={this.onLendRequested} onFulcrumMcdBridge={this.onFulcrumMcdBridgeRequested} />
           <Modal

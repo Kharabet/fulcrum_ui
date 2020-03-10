@@ -154,7 +154,7 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
         <HeaderOps isMobileMedia={this.props.isMobileMedia} isLoading={this.props.isLoading} doNetworkConnect={this.props.doNetworkConnect} />
         <main>
           <InfoBlock localstorageItemProp="trade-page-info">
-            Currently only our lending and unlending functions are enabled. Full functionality will return after a thorough audit of our newly implemented and preexisting smart contracts
+            Currently only our lending, unlending, and closing of position functions are enabled. Full functionality will return after a thorough audit of our newly implemented and preexisting smart contracts.
           </InfoBlock>
           <TokenGridTabs
             assets={this.state.assets}
