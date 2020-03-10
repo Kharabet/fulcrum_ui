@@ -18,6 +18,7 @@ import { EthOrWethSelector } from "./EthOrWethSelector";
 
 import { ReactComponent as CloseIcon } from "../assets/images/ic__close.svg"
 import { AssetDropdown } from "./AssetDropdown";
+import { Preloader } from "./Preloader";
 
 // TagManager.initialize({
 //   gtmId: configProviders.Google_TrackingID,
@@ -64,6 +65,7 @@ interface ILendFormState {
   tokenPrice: BigNumber | null;
   chaiPrice: BigNumber | null;
 
+  isLoading: boolean;
 }
 
 export class LendForm extends Component<ILendFormProps, ILendFormState> {
@@ -101,7 +103,8 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
       useWrapped: false,
       useWrappedDai: false,
       tokenPrice: null,
-      chaiPrice: null
+      chaiPrice: null,
+      isLoading: true
     };
 
     this._inputChange = new Subject();
@@ -120,14 +123,15 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
       switchMap((value) => new Observable<ILendAmountChangeEvent | null>((observer) => observer.next(value)))
     ).subscribe(next => {
       if (next) {
-        this._isMounted && this.setState({ ...this.state, ...next });
+        this._isMounted && this.setState({ ...this.state, ...next, isLoading: false });
       } else {
         this._isMounted && this.setState({
           ...this.state,
           isLendAmountTouched: false,
           lendAmountText: "",
           lendAmount: new BigNumber(0),
-          lendedAmountEstimate: new BigNumber(0)
+          lendedAmountEstimate: new BigNumber(0),
+          isLoading: false
         })
       }
     });
@@ -140,6 +144,12 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
   };
 
   private async derivedUpdate() {
+
+    this._isMounted && this.setState({
+      ...this.state,
+      isLoading: true
+    });
+
     let assetDetails = AssetsDictionary.assets.get(this.props.asset);
     if (this.props.isMobileMedia) {
       assetDetails = AssetsDictionaryMobile.assets.get(this.props.asset);
@@ -187,7 +197,8 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
       iTokenAddress: address,
       maybeNeedsApproval: maybeNeedsApproval,
       tokenPrice: tokenPrice,
-      chaiPrice: chaiPrice
+      chaiPrice: chaiPrice,
+      isLoading: false
     });
   }
 
@@ -202,15 +213,16 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
-  public componentDidMount(): void {
+  public async componentDidMount() {
     this._isMounted = true;
 
-    this.derivedUpdate();
+    await this.derivedUpdate();
     window.history.pushState(null, "Lend Modal Opened", `/#/lend/${this.props.lendType.toLocaleLowerCase()}-${this.props.asset}/`);
 
     if (this._input) {
-      this._input.select();
+      // this._input.select();
       this._input.focus();
+      this._inputSetMax.next(new BigNumber(1));
     }
   }
 
@@ -302,9 +314,13 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
                 type="number"
                 ref={this._setInputRef}
                 className="lend-form__amount-input"
-                value={this.state.lendAmountText}
+                value={!this.state.isLoading ? this.state.lendAmountText : ""}
                 onChange={this.onLendAmountChange}
               />
+              {!this.state.isLoading ? null
+                : <div className="preloader-container"> <Preloader width="80px"/></div>
+              }
+
               {
                 this.props.asset === Asset.ETH ? (
                   <AssetDropdown
@@ -409,7 +425,10 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
     const value = new BigNumber(parseFloat(buttonElement.dataset.value!));
 
     // emitting next event for processing with rx.js
-    this._inputSetMax.next(value);
+    this._isMounted && this.setState({ ...this.state, isLoading: true }, () => {
+      // emitting next event for processing with rx.js
+      this._inputSetMax.next(value);
+    });
   };
 
   public onCancelClick = () => {
