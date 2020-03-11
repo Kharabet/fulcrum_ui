@@ -61,7 +61,7 @@ export default class Fulcrum {
         var result = [];
         var tokenAddresses = iTokens.map(x => (x.address));
         var swapRates = await this.getSwapToUsdRateBatch(iTokens.find(x => x.name === "dai"));
-        var reserveData = await this.DappHeperContract.methods.reserveDetails(tokenAddresses).call();
+        var reserveData = await this.DappHeperContract.methods.reserveDetails(tokenAddresses).call({from: "0x4abB24590606f5bf4645185e20C4E7B97596cA3B"});
 
         let usdTotalLockedAll = new BigNumber(0);
         let usdSupplyAll = new BigNumber(0);
@@ -124,7 +124,8 @@ export default class Fulcrum {
         switch (assetName) {
             case "wbtc":
                 return new BigNumber(10 ** 6);
-            case "usdc":
+            case "usdc":                
+                return new BigNumber(10 ** 4);
             case "usdt":
                 return new BigNumber(10 ** 4);
             default:
@@ -138,7 +139,7 @@ export default class Fulcrum {
         const underlyings = iTokens.map(e => (e.erc20Address));
         const amounts = iTokens.map(e => (this.getGoodSourceAmountOfAsset(e.name).toFixed()));
 
-        result = await this.DappHeperContract.methods.assetRates(oracleAddress, usdTokenAddress, underlyings, amounts).call();
+        result = await this.DappHeperContract.methods.assetRates(oracleAddress, usdTokenAddress, underlyings, amounts).call({from: "0x4abB24590606f5bf4645185e20C4E7B97596cA3B"});
 
         return result;
     }
