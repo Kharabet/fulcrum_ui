@@ -506,3 +506,24 @@ input[type="number"] {
     flex-direction: column;
     justify-content: space-between;
   }
+.apr-wrapper {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    @media (max-width: 767px) {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    @media (max-width: 479px) {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+.apr-value-after{
+    position: relative;
+    &:after{
+        content: 'APR';
+        position: absolute;
+        font-size: 10px;
+        color: #8992A4;
+        top: 4px;
+        right: -21px; 
+    }
+}
