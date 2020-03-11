@@ -478,6 +478,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
             <div className="trade-form__amount-container">
               <input
                 type="number"
+                step="any"
                 ref={this._setInputRef}
                 className="trade-form__amount-input"
                 value={!this.state.isLoading ? this.state.inputAmountText : ""}
