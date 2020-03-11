@@ -299,7 +299,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     if (this._input) {
       // this._input.select();
       this._input.focus();
-      this._inputSetMax.next(new BigNumber(1));
+      this._inputSetMax.next();
     }
   }
 
@@ -610,7 +610,9 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
   };
 
   public onChangeCollateralClicked = async (asset: Asset) => {
-    this._isMounted && this.setState({ ...this.state, isChangeCollateralOpen: false, collateral: asset });
+    await this._isMounted && this.setState({ ...this.state, isChangeCollateralOpen: false, collateral: asset });
+    
+    this._inputSetMax.next();
   };
 
   public onChangeUnitOfAccount = (asset: Asset) => {
@@ -743,7 +745,6 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       FulcrumProvider.Instance.getMaxTradeValue(this.props.tradeType, tradeTokenKey, this.state.collateral)
         .then(maxTradeValue => {
           // maxTradeValue is raw here, so we should not use it directly
-          const bnTradeValue = maxTradeValue.multipliedBy(multiplier);
           this.getInputAmountLimitedFromBigNumber(maxTradeValue, tradeTokenKey, maxTradeValue, multiplier, true).then(limitedAmount => {
             if (!limitedAmount.tradeAmountValue.isNaN()) {
               const tradeRequest = new TradeRequest(
