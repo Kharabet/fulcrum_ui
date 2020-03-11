@@ -47,75 +47,75 @@ permalink: lending
             </div>
             <div class="col col-7 col-lg-9 col-md-12 apr-wrapper">
                 <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-token="sai">
-                    <div class="icon-50 mr-15 mr-xs-9">
+                    <div class="icon-50 mr-15 mr-xl-5 mr-xs-9">
                         {% include svg/sai.svg %}
                     </div>
                     <div class="wrap-apr-value">
                         <p class="lh-100 fw-700 c-gray">SAI</p>
-                        <p class="fs-24 c-primary lh-125"><span class="fw-800 apr-value">5.3</span>%</p>
+                        <p class="fs-24 fs-xl-21 c-primary lh-125 apr-value-after"><span class="fw-800 apr-value">5.3</span>%</p>
                     </div>
                 </div>
                 <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-token="knc">
-                    <div class="icon-50 mr-15 mr-xs-9">
+                    <div class="icon-50 mr-15 mr-xl-5 mr-xs-9">
                         {% include svg/knc.svg %}
                     </div>
                     <div class="wrap-apr-value">
                         <p class="lh-100 fw-700 c-gray">KNC</p>
-                        <p class="fs-24 c-primary lh-125"><span class="fw-800 apr-value">5.3</span>%</p>
+                        <p class="fs-24 fs-xl-21 c-primary lh-125 apr-value-after"><span class="fw-800 apr-value">5.3</span>%</p>
                     </div>
                 </div>
                 <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-token="zrx">
-                    <div class="icon-50 mr-15 mr-xs-9">
+                    <div class="icon-50 mr-15 mr-xl-5 mr-xs-9">
                         {% include svg/zrx.svg %}
                     </div>
                     <div class="wrap-apr-value">
                         <p class="lh-100 fw-700 c-gray">ZRX</p>
-                        <p class="fs-24 c-primary lh-125"><span class="fw-800 apr-value">1.6</span>%</p>
+                        <p class="fs-24 fs-xl-21 c-primary lh-125 apr-value-after"><span class="fw-800 apr-value">1.6</span>%</p>
                     </div>
                 </div>
                 <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-token="eth">
-                    <div class="icon-50 mr-15 mr-xs-9">
+                    <div class="icon-50 mr-15 mr-xl-5 mr-xs-9">
                         {% include svg/eth.svg %}
                     </div>
                     <div class="wrap-apr-value">
                         <p class="lh-100 fw-700 c-gray">ETH</p>
-                        <p class="fs-24 c-primary lh-125"><span class="fw-800 apr-value">4.2</span>%</p>
+                        <p class="fs-24 fs-xl-21 c-primary lh-125 apr-value-after"><span class="fw-800 apr-value">4.2</span>%</p>
                     </div>
                 </div>
                 <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-token="link">
-                    <div class="icon-50 mr-15 mr-xs-9">
+                    <div class="icon-50 mr-15 mr-xl-5 mr-xs-9">
                         {% include svg/link.svg %}
                     </div>
                     <div class="wrap-apr-value">
                         <p class="lh-100 fw-700 c-gray">LINK</p>
-                        <p class="fs-24 c-primary lh-125"><span class="fw-800 apr-value">4.2</span>%</p>
+                        <p class="fs-24 fs-xl-21 c-primary lh-125 apr-value-after"><span class="fw-800 apr-value">4.2</span>%</p>
                     </div>
                 </div>
                 <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-token="susd">
-                    <div class="icon-50 mr-15 mr-xs-9">
+                    <div class="icon-50 mr-15 mr-xl-5 mr-xs-9">
                         {% include svg/susd.svg %}
                     </div>
                     <div class="wrap-apr-value">
                         <p class="lh-100 fw-700 c-gray">sUSD</p>
-                        <p class="fs-24 c-primary lh-125"><span class="fw-800 apr-value">4.2</span>%</p>
+                        <p class="fs-24 fs-xl-21 c-primary lh-125 apr-value-after"><span class="fw-800 apr-value">4.2</span>%</p>
                     </div>
                 </div>
                 <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-token="wbtc">
-                    <div class="icon-50 mr-15 mr-xs-9">
+                    <div class="icon-50 mr-15 mr-xl-5 mr-xs-9">
                         {% include svg/wbtc.svg %}
                     </div>
                     <div class="wrap-apr-value">
                         <p class="lh-100 fw-700 c-gray">WBTC</p>
-                        <p class="fs-24 c-primary lh-125"><span class="fw-800 apr-value">4.2</span>%</p>
+                        <p class="fs-24 fs-xl-21 c-primary lh-125 apr-value-after"><span class="fw-800 apr-value">4.2</span>%</p>
                     </div>
                 </div>
                 <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-token="usdt">
-                    <div class="icon-50 mr-15 mr-xs-9">
+                    <div class="icon-50 mr-15 mr-xl-5 mr-xs-9">
                         {% include svg/usdt.svg %}
                     </div>
                     <div class="wrap-apr-value">
                         <p class="lh-100 fw-700 c-gray">USDT</p>
-                        <p class="fs-24 c-primary lh-125"><span class="fw-800 apr-value">4.2</span>%</p>
+                        <p class="fs-24 fs-xl-21 c-primary lh-125 apr-value-after"><span class="fw-800 apr-value">4.2</span>%</p>
                     </div>
                 </div>
             </div>
