@@ -45,7 +45,7 @@ permalink: lending
                     <h2 class="mb-md-25">Fulcrum <br /> supports lending</h2>
                 </div>
             </div>
-            <div class="col col-7 col-lg-9 col-md-12 fw-w jc-fs jc-sm-fs">
+            <div class="col col-7 col-lg-9 col-md-12 apr-wrapper">
                 <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-token="sai">
                     <div class="icon-50 mr-15 mr-xs-9">
                         {% include svg/sai.svg %}
