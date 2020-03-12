@@ -48,6 +48,7 @@
     width: 100px;
     display: flex;
     justify-content: flex-end;
+    align-items: center;
     button {
       border: 0;
       padding: 6px 25px;
@@ -59,6 +60,7 @@
       border-radius: 43px;
       background-color: #276bfb;
       outline: none;
+      max-height: 36px;
       cursor: pointer;
       &:hover {
         background-color: #5b88ff;
