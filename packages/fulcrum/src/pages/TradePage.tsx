@@ -153,7 +153,7 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
       <div className="trade-page">
         <HeaderOps isMobileMedia={this.props.isMobileMedia} isLoading={this.props.isLoading} doNetworkConnect={this.props.doNetworkConnect} />
         <main>
-          <InfoBlock localstorageItemProp="defi-risk-notice">
+          <InfoBlock localstorageItemProp="defi-risk-notice" onAccept={() => {this.forceUpdate()}}>
           For your safety, please ensure the URL in your browser is: <a href="https://fulcrum.trade/" className="regular-link">https://fulcrum.trade/</a>. Fulcrum is a non-custodial platform for tokenized lending and margin trading. “Non-custodial” means YOU are responsible for the security of your digital assets. To learn more about how to stay safe when using bZx, please read our <a className="disclosure-link" href="">DeFi Risk Disclosure</a>
           </InfoBlock>
           {localStorage.getItem("defi-risk-notice") ?
