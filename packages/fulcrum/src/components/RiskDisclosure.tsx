@@ -30,13 +30,13 @@ export class RiskDisclosure extends Component<IRiskDisclosureProps> {
           </ul>
           <h3>Do your own research</h3>
           <ul>
-            <li>ALWAYS evaluate the smart contracts (Read our audits <a href="#">here</a> and <a href="#">here</a>)</li>
+            <li>ALWAYS evaluate the smart contracts (Read our audits <a href="https://bzx.network/pdfs/CertiK%20Verification%20Report%20for%20bZx.pdf">here</a> and <a href="https://bzx.network/pdfs/CertiK_Review_Report_for_bZx_v2.pdf">here</a>)</li>
             <li>NEVER invest more than you can afford to lose</li>
           </ul>
           <p>To learn more about how to protect yourself from phishing, please read our article on <a href="#">How to stay safe when using Fulcrum and Torque.</a></p>
           <p>We have done our best to make this an effective resource for beginners wanting to learn how to secure their digital assets against the basic risks associated with dApps, however, it’s important to consider that using emerging technologies constitutes a risk unto itself.</p>
           <p>Undiscovered vulnerabilities and the deployment of new dApps may cause unforeseen consequences. Users should always exercise caution when using emerging technologies.</p>
-          <p>To get started with tokenized lending and margin trading please visit <a href="https://fulcrum.trade/" target="_blank">https://fulcrum.trade/</a> or head over to <a href="https://torque.loans/#/" target="_blank">https://torque.loans/#/</a> for the smoothest borrowing experience in DeFi.</p>
+
         </div>
         <div className="disclosure__footer">
           <button onClick={this.onTokenAddressFormRequestClose}>Got it!</button>
