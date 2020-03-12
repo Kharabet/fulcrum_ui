@@ -104,7 +104,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
         <Modal
           isOpen={this.state.isRiskDisclosureModalOpen}
           onRequestClose={this.onRiskDisclosureRequestClose}
-          className="modal-content-div"
+          className="modal-content-div-top"
           overlayClassName="modal-overlay-div overflow-auto"
         >
           <RiskDisclosure onClose={this.onRiskDisclosureRequestClose} />
