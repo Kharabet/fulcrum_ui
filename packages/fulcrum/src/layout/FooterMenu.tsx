@@ -15,6 +15,9 @@ export class FooterMenu extends Component<IFooterMenuProps> {
         <div className="footer-menu__item">
           <a href="https://fulcrum.trade/privacy/">Privacy policy</a>
         </div>
+        <div className="footer-menu__item">
+          <a href="#">Risk Disclosure</a>
+        </div>
         {!this.props.isMobileMedia ?
           <React.Fragment>
             <div className="footer-menu__item">
