@@ -12,6 +12,7 @@ import { ReactComponent as MenuIconClose } from "../assets/images/ic_close.svg";
 import { Footer } from "./Footer"
 export interface IHeaderOpsProps {
   doNetworkConnect: () => void;
+  isRiskDisclosureModalOpen: () => void;
   isLoading: boolean;
   isMobileMedia: boolean;
 }
@@ -151,7 +152,7 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
               <HeaderMenu items={menu.items} />
             </div>
             <div className="footer-container">
-              <Footer isMobileMedia={this.props.isMobileMedia} />
+              <Footer isMobileMedia={this.props.isMobileMedia}  isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen}/>
             </div>
           </div>
         ) : null}

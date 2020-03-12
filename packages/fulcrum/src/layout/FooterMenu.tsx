@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 
 interface IFooterMenuProps {
   isMobileMedia: boolean;
+  isRiskDisclosureModalOpen: () => void;
 }
 
 export class FooterMenu extends Component<IFooterMenuProps> {
@@ -16,7 +17,7 @@ export class FooterMenu extends Component<IFooterMenuProps> {
           <a href="https://fulcrum.trade/privacy/">Privacy policy</a>
         </div>
         <div className="footer-menu__item">
-          <a href="#">Risk Disclosure</a>
+          <button onClick={this.props.isRiskDisclosureModalOpen}>Risk Disclosure</button>
         </div>
         {!this.props.isMobileMedia ?
           <React.Fragment>

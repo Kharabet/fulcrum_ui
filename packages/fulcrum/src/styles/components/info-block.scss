@@ -34,6 +34,10 @@
     .disclosure-link {
       font-weight: 700;
       color: #fff;
+      border: none;
+      outline: none;
+      background-color: transparent;
+      cursor: pointer;
       &:hover {
         color: #fff;
       }

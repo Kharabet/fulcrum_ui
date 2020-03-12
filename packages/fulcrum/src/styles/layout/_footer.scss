@@ -47,8 +47,13 @@
       margin-left: 1.5rem;
     }
 
-    a {
+    a, button {
+      background-color: transparent;
+      border: none;
+      outline: none;
+      cursor: pointer;
       color: #00c0ab;
+      text-align: left;
       &:hover {
         color: #33dfcc;
       }
@@ -78,6 +83,9 @@
       // justify-content: space-around;
       margin-bottom: 1.5rem;
       // width: 40%;
+    }
+    button{
+      font-size: 9.5px;
     }
   }
 }
