@@ -19,18 +19,14 @@ export class FooterMenu extends Component<IFooterMenuProps> {
         <div className="footer-menu__item">
           <button onClick={this.props.isRiskDisclosureModalOpen}>Risk Disclosure</button>
         </div>
-        {!this.props.isMobileMedia ?
-          <React.Fragment>
-            <div className="footer-menu__item">
-              <a href="https://bzx.network/faq-fulcrum.html">FAQ</a>
-            </div>
-            <div className="footer-menu__item">
-              <Link to="/stats">
-                Stats
+        <div className="footer-menu__item">
+          <a href="https://bzx.network/faq-fulcrum.html">FAQ</a>
+        </div>
+        <div className="footer-menu__item">
+          <Link to="/stats">
+            Stats
               </Link>
-            </div>
-          </React.Fragment>
-          : null}
+        </div>
       </div>
     );
   }
