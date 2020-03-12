@@ -33,7 +33,7 @@ export class RiskDisclosure extends Component<IRiskDisclosureProps> {
             <li>ALWAYS evaluate the smart contracts (Read our audits <a href="https://bzx.network/pdfs/CertiK%20Verification%20Report%20for%20bZx.pdf">here</a> and <a href="https://bzx.network/pdfs/CertiK_Review_Report_for_bZx_v2.pdf">here</a>)</li>
             <li>NEVER invest more than you can afford to lose</li>
           </ul>
-          <p>To learn more about how to protect yourself from phishing, please read our article on <a href="#">How to stay safe when using Fulcrum and Torque.</a></p>
+          <p>To learn more about how to protect yourself from phishing, please read our article on <a href="https://help.bzx.network/en/articles/3750994-how-to-stay-safe-when-using-fulcrum-and-torque">How to stay safe when using Fulcrum and Torque.</a></p>
           <p>We have done our best to make this an effective resource for beginners wanting to learn how to secure their digital assets against the basic risks associated with dApps, however, it’s important to consider that using emerging technologies constitutes a risk unto itself.</p>
           <p>Undiscovered vulnerabilities and the deployment of new dApps may cause unforeseen consequences. Users should always exercise caution when using emerging technologies.</p>
 
