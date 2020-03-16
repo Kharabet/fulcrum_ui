@@ -4,6 +4,7 @@ import { FooterVersion } from "./FooterVersion";
 
 interface IFooterProps {
   isMobileMedia: boolean;
+  isRiskDisclosureModalOpen: () => void;
 }
 
 export class Footer extends Component<IFooterProps> {

@@ -102,6 +102,9 @@
   justify-content: space-between;
   padding: 0;
   margin-bottom: 15px;
+  &.jc-fe{
+    justify-content: flex-end;
+  }
 }
 
 .lend-form__token-message-container {

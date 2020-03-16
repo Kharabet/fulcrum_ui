@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 
 interface IFooterMenuProps {
   isMobileMedia: boolean;
+  isRiskDisclosureModalOpen: () => void;
 }
 
 export class FooterMenu extends Component<IFooterMenuProps> {
@@ -15,18 +16,17 @@ export class FooterMenu extends Component<IFooterMenuProps> {
         <div className="footer-menu__item">
           <a href="https://fulcrum.trade/privacy/">Privacy policy</a>
         </div>
-        {!this.props.isMobileMedia ?
-          <React.Fragment>
-            <div className="footer-menu__item">
-              <a href="https://bzx.network/faq-fulcrum.html">FAQ</a>
-            </div>
-            <div className="footer-menu__item">
-              <Link to="/stats">
-                Stats
+        <div className="footer-menu__item">
+          <button onClick={this.props.isRiskDisclosureModalOpen}>Risk Disclosure</button>
+        </div>
+        <div className="footer-menu__item">
+          <a href="https://bzx.network/faq-fulcrum.html">FAQ</a>
+        </div>
+        <div className="footer-menu__item">
+          <Link to="/stats">
+            Stats
               </Link>
-            </div>
-          </React.Fragment>
-          : null}
+        </div>
       </div>
     );
   }
