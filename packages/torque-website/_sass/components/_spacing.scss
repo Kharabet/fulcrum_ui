@@ -22,7 +22,7 @@
   margin-top: 20px;
   margin-bottom: 20px;
 }
-.mx-auto {
+.mx-a {
   margin-left: auto;
   margin-right: auto;
 }
@@ -32,6 +32,9 @@
   .pt-#{15*$i} {
     padding-top: #{15 * $i}px;
   }
+}
+.pt-45{
+  padding-top: 45px;
 }
 .pt-50{
   padding-top: 50px;
