@@ -1,0 +1,22 @@
+/* -- posts blog of bzx -- */
+.item-blog {
+  background-color: var(--secondary-bg);
+  border-radius: 16px;
+  @media (max-width: 767px) {
+    max-width: 350px;
+    margin: 0 auto 20px auto;
+  }
+  &:hover {
+    cursor: pointer;
+    box-shadow: 0px 8px 16px rgba(13, 76, 211, 0.16);
+  }
+  .item-blog-header {
+    img {
+      border-radius: 16px 16px 0 0;
+      max-width: 100%;
+    }
+  }
+  .item-blog-body {
+    padding: 0 20px 25px 20px;
+  }
+}

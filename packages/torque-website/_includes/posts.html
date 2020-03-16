@@ -1,0 +1,125 @@
+<section class="pt-60 pb-105 py-xs-45">
+    <div class="container">
+        <div class="row">
+            <div class="col col-12 jc-c">
+                <h2 class="mb-50 mb-sm-25 text-xs-center">Latest from bZx Blog</h2>
+            </div>
+        </div>
+        <div id="articles-container" class="row jc-sb fw-sm-w">
+            <div class="col col-4 col-sm-12">
+                <div class="item-blog">
+                    <a href="#" target="_blank">
+                        <div class="item-blog-header">
+                            <img src="/images/blog/step-by-step-lending-guide.png"
+                                alt="bZx + Bamboo: Step by Step Lending Guide"
+                                title="bZx + Bamboo: Step by Step Lending Guide" />
+                        </div>
+                        <div class="item-blog-body">
+                            <h4 class="title my-20">bZx + Bamboo: Step by Step Lending Guide</h4>
+                            <p class="c-dark-gray mb-25">Bamboo Relay is the first 0x-standard relay, and in fact the
+                                first
+                                DEX, to ever offer non-custodial peer-to-peer margin lending. The debut…</p>
+                            <div class="fs-12 lh-180 c-secondary-blue">April 2, 2019 - 11 min read</div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            <div class="col col-4 col-sm-12">
+                <div class="item-blog">
+                    <a href="#" target="_blank">
+                        <div class="item-blog-header">
+                            <img src="/images/blog/fulcrum-itokens-now-available-on-eidoo.png"
+                                alt="bZx + Bamboo: Step by Step Lending Guide"
+                                title="bZx + Bamboo: Step by Step Lending Guide" />
+                        </div>
+                        <div class="item-blog-body">
+                            <h4 class="title my-20">Fulcrum iTOKENS Now Available On Eidoo</h4>
+                            <p class="c-dark-gray mb-25">Bamboo Relay is the first 0x-standard relay, and in fact the
+                                first
+                                DEX, to ever offer non-custodial peer-to-peer margin lending. The debut…</p>
+                            <div class="fs-12 lh-180 c-secondary-blue">April 2, 2019 - 11 min read</div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            <div class="col col-4 col-sm-12">
+                <div class="item-blog">
+                    <a href="#" target="_blank">
+                        <div class="item-blog-header">
+                            <img src="/images/blog/streamlined-trading-experience-on-fulcrum.png"
+                                alt="bZx + Bamboo: Step by Step Lending Guide"
+                                title="bZx + Bamboo: Step by Step Lending Guide" />
+                        </div>
+                        <div class="item-blog-body">
+                            <h4 class="title my-20">Streamlined Trading Experience on Fulcrum</h4>
+                            <p class="c-dark-gray mb-25">Relay is the first 0x-standard relay, and in fact the first
+                                DEX, to
+                                ever offer non-custodial peer-to-peer margin lending. The debut…</p>
+                            <div class="fs-12 lh-180 c-secondary-blue">April 2, 2019 - 11 min read</div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<script>
+
+    window.addEventListener('load', function () {
+        renderArticles("https://bzx.network/feed.xml");
+    });
+
+    function renderArticles(url) {
+        get(url).then(res => {
+            var feedHtml = new window.DOMParser().parseFromString(res, "text/xml" );
+            var articleItems = Array.prototype.slice.call(feedHtml.querySelectorAll("rss item"));
+            var articleHTML = articleItems.slice(0, 3).map(item => {
+                var title = item.querySelector("title").textContent;
+                var info = item.querySelector("summary").textContent;
+                var date = new Date(item.querySelector("pubDate").textContent).toLocaleString('en-us', { day: "2-digit", month: "short", year: "numeric" });
+                var link = item.querySelector("link").textContent;
+                var cover = item.querySelector("logo").textContent;
+                var readingTime = item.querySelector("readingTime").textContent.trim();
+                return `<div class="col col-4 col-sm-12">
+                    <div class="item-blog">
+                        <a href="${link}" target="_blank">
+                            <div class="item-blog-header">
+                                <img src="${cover}"
+                                    alt="${title}"
+                                    title="${title}" />
+                            </div>
+                            <div class="item-blog-body">
+                                <h4 class="title my-20">${title}</h4>
+                                <p class="c-dark-gray mb-25">${info}</p>
+                                <div class="fs-12 lh-180 c-secondary-blue">${date} - ${readingTime} min read</div>
+                            </div>
+                        </a>
+                    </div>
+                </div>`;
+            })
+            document.getElementById('articles-container').innerHTML = articleHTML.join('');
+        })
+    }
+
+
+    function get(url) {
+        return new Promise(function (resolve, reject) {
+            var req = new XMLHttpRequest();
+            req.open('GET', url);
+            req.onload = function () {
+                if (req.status == 200) {
+                    resolve(req.response);
+                }
+                else {
+                    reject(Error(req.statusText));
+                }
+            };
+            req.onerror = function () {
+                reject(Error("Network Error"));
+            };
+            req.send();
+        });
+    }
+</script>
