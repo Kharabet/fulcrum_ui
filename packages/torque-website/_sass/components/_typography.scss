@@ -160,6 +160,11 @@ a {
 .c-light-gray {
   color: var(--light-gray-color);
 }
+.c-gradient {
+  background: -webkit-linear-gradient(#407bf7, #00d3a6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
 a {
   text-decoration: none;
   &.c-green {
