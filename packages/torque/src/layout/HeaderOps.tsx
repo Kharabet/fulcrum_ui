@@ -99,8 +99,8 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
           </div>
         </div>
         <InfoBlock localstorageItemProp="torque-risk-notice"  onAccept={() => {this.forceUpdate()}}>
-        For your safety, please ensure the URL in your browser is: https://fulcrum.trade/. <br />
-            Fulcrum is a non-custodial platform for tokenized lending and margin trading. <br />          
+        For your safety, please ensure the URL in your browser is: https://torque.loans/. <br />
+        Torque is a non-custodial platform for borrowing digital assets <br />
             “Non-custodial” means YOU are responsible for the security of your digital assets. <br />
             To learn more about how to stay safe when using bZx, please read our <button className="disclosure-link" onClick={this.props.isRiskDisclosureModalOpen}>DeFi Risk Disclosure</button>
         </InfoBlock>
