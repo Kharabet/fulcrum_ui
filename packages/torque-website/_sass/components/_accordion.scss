@@ -1,49 +1,79 @@
 #accordion {
   text-align: left;
-  @media(min-width: 580px){
-    margin-bottom: 60px;
-  }
-  @media(max-width: 579px){
-    margin-bottom: 45px;
-  }
+  width: 100%;
   .accordion-item {
     border-bottom: 1px solid var(--accordion-border);
+    z-index: 2;
+    position: relative;
     &:first-child {
       border-top: 1px solid var(--accordion-border);
     }
     .accordion-toggle {
       position: relative;
+      z-index: 2;
       padding-right: 60px;
-      &:before {
-        content: "";
-        background-image: url(/images/accordion-close.svg);
-        background-position: 50%;
-        background-repeat: no-repeat;
+      &:not(.active){
+        position: relative;
+        z-index: 2;
+        overflow: hidden;
+      }
+      .accordion-position{
+        position: absolute;
         width: 30px;
         height: 30px;
-        position: absolute;
-        right: 15px;
-        border-radius: 50%;
         top: 0;
         bottom: 0;
         margin: auto;
-        display: flex;
-        justify-content: center;
-        align-content: center;
+        right: 15px;
+        background-color: transparent;
+        transition: all 0.15s;
+        border-radius: 50%;
+        &:before, &:after {
+          content: "";
+          background-color: #276bfb;
+          width: 12px;
+          height: 2px;
+          border-radius: 2px;
+          position: absolute;
+          left: 0;
+          right: 0;
+          top: 0;
+          bottom: 0;
+          margin: auto;
+          display: flex;
+          justify-content: center;
+          align-content: center;
+          
+        }
+        &:after{
+          transform: rotate(-90deg);
+          transition: transform 0.15s;
+        }
       }
+
     }
     .accordion-content {
-      display: none;
+      &:not(.active){
+        position: relative;
+        z-index: 2;
+        overflow: hidden;
+      }
+      max-height: 0;
+      transition: max-height .3s cubic-bezier(0, 0, 1, 1);
     }
     &.active {
       .accordion-content {
-        display: block;
+        max-height: 441px;
+        transition: max-height .3s cubic-bezier(0, 0, 1, 1);
       }
       .accordion-toggle {
         color: #276bfb;
-        &:before {
-          background-image: url(/images/accordion-open.svg);
+        .accordion-position{
           background-color: var(--accordion-bg);
+          transition: all 0.15s;
+          &:after{
+            transform: rotate(0);
+          }
         }
       }
     }
@@ -53,7 +83,7 @@
     cursor: pointer;
     font-size: 22px;
     line-height: 1.5;
-    padding: 15px 0;
+    padding: 20px 0;
     font-weight: 700;
     @media (max-width: 579px) {
       font-size: 16px;
@@ -61,7 +91,9 @@
   }
   .accordion-content {
     padding-left: 30px;
-    margin-bottom: 45px;
+    p{
+      padding-bottom: 30px;
+    }
     @media (max-width: 579px) {
       padding-right: 15px;
     }
