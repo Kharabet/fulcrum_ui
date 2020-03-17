@@ -38,21 +38,12 @@
 .button-lg {
   width: 400px;
   border-radius: 90px;
-  padding: 13px 25px 13px 40px
+  padding: 13px 25px 13px 40px;
 }
 .button-md {
   width: 355px;
-  font-weight: 600;
-  @media (min-width: 768px) {
-    width: 250px;
-    height: 70px;
-    font-size: 22px;
-  }
-  @media (max-width: 767px) {
-    width: 145px;
-    height: 55px;
-    font-size: 16px;
-  }
+  border-radius: 90px;
+  padding: 13px 25px 13px 40px;
 }
 .button-sm {
   width: 180px;

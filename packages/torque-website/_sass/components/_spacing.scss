@@ -12,6 +12,9 @@
     margin-right: #{5 * $i}px;
   }
 }
+.mr-35{
+  margin-right: 35px;
+}
 .mr-90{
   margin-right: 90px;
 }
@@ -32,6 +35,9 @@
   .pt-#{15*$i} {
     padding-top: #{15 * $i}px;
   }
+}
+.pt-15{
+  padding-top: 15px;
 }
 .pt-45{
   padding-top: 45px;
