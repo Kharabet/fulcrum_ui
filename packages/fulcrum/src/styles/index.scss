@@ -18,6 +18,7 @@
 @import "components/collateral-token-button";
 @import "components/collateral-token-selector";
 @import "components/dropdown-select";
+@import "components/info-block";
 @import "components/lend-form";
 @import "components/lend-form.mobile";
 @import "components/lend-token-selector";
@@ -50,6 +51,7 @@
 @import "components/eth-or-weth";
 @import "components/switch-theme";
 @import "components/preloader";
+@import "components/risk-disclosure";
 
 @import "layout/footer";
 @import "layout/header";
@@ -67,4 +69,4 @@
 @import "pages/trade-page";
 
 
-@import "base/utilities";
+@import "base/modal";
