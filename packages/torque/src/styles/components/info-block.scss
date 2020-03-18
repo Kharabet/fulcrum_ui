@@ -25,12 +25,30 @@
     font-size: 14px;
     color: #fff;
     margin-top: 2px;
+    .regular-link {
+      color: #003cda;
+      &:hover {
+        color: #5b88ff;
+      }
+    }
+    .disclosure-link {
+      font-weight: 700;
+      color: #fff;
+      border: none;
+      outline: none;
+      background-color: transparent;
+      cursor: pointer;
+      &:hover {
+        color: #fff;
+      }
+    }
   }
 
   &__right {
     width: 100px;
     display: flex;
     justify-content: flex-end;
+    align-items: center;
     button {
       border: 0;
       padding: 6px 25px;
@@ -42,6 +60,7 @@
       border-radius: 43px;
       background-color: #276bfb;
       outline: none;
+      max-height: 36px;
       cursor: pointer;
       &:hover {
         background-color: #5b88ff;
@@ -57,9 +76,6 @@
     &__center,
     &__right {
       width: 100%;
-    }
-    &__right {
-      margin-top: 10px;
     }
   }
 }

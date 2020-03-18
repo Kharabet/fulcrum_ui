@@ -6,7 +6,12 @@ import { HeaderHome } from "../layout/HeaderHome";
 import { NavService } from "../services/NavService";
 import { TorqueProvider } from "../services/TorqueProvider";
 
-export class LandingPage extends PureComponent {
+
+export interface ILandingPageProps {
+  isRiskDisclosureModalOpen: () => void;
+}
+
+export class LandingPage extends PureComponent<ILandingPageProps> {
   public render() {
     const accountAddress =
       TorqueProvider.Instance.accounts.length > 0 && TorqueProvider.Instance.accounts[0]
@@ -33,7 +38,7 @@ export class LandingPage extends PureComponent {
             </div>
           </div>
         </main>
-        <Footer />
+        <Footer isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen}/>
       </div>
     );
   }

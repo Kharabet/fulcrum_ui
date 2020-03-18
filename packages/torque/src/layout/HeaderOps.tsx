@@ -10,6 +10,7 @@ import { HeaderMenuToggle } from "./HeaderMenuToggle";
 import { InfoBlock } from "../components/InfoBlock";
 export interface IHeaderOpsProps {
   doNetworkConnect: () => void;
+  isRiskDisclosureModalOpen: () => void;
   isLoading: boolean;
   // isMobileMedia: boolean;
 }
@@ -66,42 +67,50 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
     const toggleImg = !this.state.isMenuOpen ? menu_icon : ic_close;
     const sidebarClass = !this.state.isMenuOpen ? 'sidebar_h' : 'sidebar_v'
     return (
-        <header className="header">
-          <div className="header__row">
-            <div className="header__left">
-              <HeaderLogo />
-            </div>
-            <div className="header__center">
-              <HeaderMenu items={menu.items} />
-            </div>
-            <div className="header__right">
-              <div className="header__provider">
-                {TorqueProvider.Instance.providerType !== ProviderType.None ? (
-                  <OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />
-                ) : ``}
-              </div>
-              <div className="header_icon" onClick={this.onMenuToggle}>
-                <img className="header__menu" src={toggleImg} />
-              </div>
-            </div>
-
+      <header className="header">
+        <div className="header__row">
+          <div className="header__left">
+            <HeaderLogo />
           </div>
-
-          <div className={sidebarClass}>
-            <div className="header_btn">
+          <div className="header__center">
+            <HeaderMenu items={menu.items} />
+          </div>
+          <div className="header__right">
+            <div className="header__provider">
               {TorqueProvider.Instance.providerType !== ProviderType.None ? (
                 <OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />
               ) : ``}
             </div>
-            <div className="heade_nav_menu">
-              <HeaderMenu items={menu.items} />
+            <div className="header_icon" onClick={this.onMenuToggle}>
+              <img className="header__menu" src={toggleImg} />
             </div>
           </div>
-          <InfoBlock localstorageItemProp="torque-page-info">
-          You may only manage and repay your existing loans. Full functionality will return after a thorough audit of our newly implemented and preexisting smart contracts. 
-      </InfoBlock>
 
-        </header>
+        </div>
+
+        <div className={sidebarClass}>
+          <div className="header_btn">
+            {TorqueProvider.Instance.providerType !== ProviderType.None ? (
+              <OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />
+            ) : ``}
+          </div>
+          <div className="heade_nav_menu">
+            <HeaderMenu items={menu.items} />
+          </div>
+        </div>
+        <InfoBlock localstorageItemProp="torque-risk-notice"  onAccept={() => {this.forceUpdate()}}>
+        For your safety, please ensure the URL in your browser is: https://torque.loans/. <br />
+        Torque is a non-custodial platform for borrowing digital assets <br />
+            “Non-custodial” means YOU are responsible for the security of your digital assets. <br />
+            To learn more about how to stay safe when using bZx, please read our <button className="disclosure-link" onClick={this.props.isRiskDisclosureModalOpen}>DeFi Risk Disclosure</button>
+        </InfoBlock>
+        {localStorage.getItem("torque-risk-notice") ?
+          <InfoBlock localstorageItemProp="torque-page-info">
+            You may only manage and repay your existing loans. Full functionality will return after a thorough audit of our newly implemented and preexisting smart contracts.
+        </InfoBlock>
+          : null}
+
+      </header>
     );
   };
   private onMenuToggle = () => {

@@ -53,6 +53,17 @@
       justify-content: center;
 
       margin-bottom: 1.5rem;
+
+      flex-wrap: wrap;
+      margin-bottom: 0;
+    }
+
+    .footer-menu__item {
+      margin-bottom: 10px;
+      width: 33%;
+      &:not(:first-child) {
+        margin-left: 0;
+      }
     }
   }
 }
