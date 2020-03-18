@@ -30,7 +30,7 @@ export default class Fulcrum {
     async getTotalAssetSupply() {
         var reserveData = await this.getReserveData()
         var totalAssetSupply = {};
-        reserveData.forEach(item => totalAssetSupply[item.token] = item.totalAssetSupply);
+        reserveData.forEach(item => totalAssetSupply[item.token] = item.totalSupply);
 
         return totalAssetSupply;
     }
@@ -38,7 +38,7 @@ export default class Fulcrum {
     async getTotalAssetBorrow() {
         var reserveData = await this.getReserveData()
         var totalAssetBorrow = {};
-        reserveData.forEach(item => totalAssetBorrow[item.token] = item.totalAssetBorrow);
+        reserveData.forEach(item => totalAssetBorrow[item.token] = item.totalBorrow);
 
         return totalAssetBorrow;
     }
