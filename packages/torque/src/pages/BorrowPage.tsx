@@ -15,6 +15,7 @@ export interface IBorrowPageRouteParams {
 
 export interface IBorrowPageParams {
   doNetworkConnect?: (destinationAbbr: string) => void;
+  isRiskDisclosureModalOpen: ()  => void;
   isLoading: boolean;
 }
 
@@ -34,12 +35,12 @@ export class BorrowPage extends PureComponent<IBorrowPageParams & RouteComponent
       <React.Fragment>
         <BorrowDlg ref={this.borrowDlgRef} />
         <div className="borrow-page">
-          <HeaderOps isLoading={this.props.isLoading} doNetworkConnect={this.doNetworkConnect} />
+          <HeaderOps isLoading={this.props.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
           {/*<div className="borrow-page__main" style={walletType === WalletType.Web3 ? { paddingBottom: `90rem`} : undefined}>*/}
           <div className="borrow-page__main">
             <AssetSelector walletType={walletType} onSelectAsset={this.onSelectAsset} />
           </div>
-          <Footer />
+          <Footer isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
         </div>
       </React.Fragment>
     );
