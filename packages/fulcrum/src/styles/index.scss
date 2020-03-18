@@ -51,6 +51,7 @@
 @import "components/eth-or-weth";
 @import "components/switch-theme";
 @import "components/preloader";
+@import "components/risk-disclosure";
 
 @import "layout/footer";
 @import "layout/header";
@@ -68,4 +69,4 @@
 @import "pages/trade-page";
 
 
-@import "base/utilities";
+@import "base/modal";

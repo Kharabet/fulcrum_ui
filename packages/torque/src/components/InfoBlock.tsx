@@ -1,8 +1,7 @@
 import React, { Component } from "react";
 
 export interface IInfoBlockProps {
-  localstorageItemProp: string;
-  onAccept?: () => void;
+  localstorageItemProp: string
 }
 export interface IInfoBlockState {
   isLocalstorageItemAccepted: boolean
@@ -22,8 +21,6 @@ export class InfoBlock extends Component<IInfoBlockProps, IInfoBlockState> {
   onAccept = () => {
     localStorage.setItem(this.props.localstorageItemProp, "true");
     this.setState({ ...this.state, isLocalstorageItemAccepted: true });
-    if (this.props.onAccept)
-      this.props.onAccept();
   }
 
   public render() {
