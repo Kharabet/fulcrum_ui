@@ -94,9 +94,7 @@ layout: home
     <div class="container pt-15 pt-xs-30 pb-45 pb-xs-75">
         <div class="row fd-md-c">
             <div class="col col-5 col-lg-3 col-md-12">
-                <div class="pl-55 pl-lg-0">
-                    <h2 class="mb-md-25">Crypto-backed loans with fixed interest rates </h2>
-                </div>
+                <h2 class="mb-md-25">Crypto-backed loans with fixed interest rates </h2>
             </div>
             <div class="col col-7 col-lg-9 col-md-12 apr-wrapper">
                 <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-token="bat">
@@ -212,13 +210,15 @@ layout: home
             </div>
         </div>
     </div>
-    <div class="pt-90 pb-105">
-        <div class="container container-lg">
+    <div class="pt-90 pb-30">
+        <div class="container">
             <div class="row">
                 <div class="col col-12">
                     <h2 class="circle mb-75 mb-xs-50">Why Torque? </h2>
                 </div>
             </div>
+        </div>
+        <div class="container container-lg">
             <div class="row">
                 <div class="col flex fw-w">
                     <div class="item-reason">
@@ -356,7 +356,7 @@ layout: home
     </div>
 </section>
 
-<section class="bg-secondary pt-30 pb-90">
+<section class="bg-secondary pt-45 pb-90">
     <div class="container container-md">
         <div class="row">
             <div class="col col-12 jc-c">
