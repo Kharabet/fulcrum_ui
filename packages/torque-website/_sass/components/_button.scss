@@ -7,7 +7,7 @@
   color: #ffffff;
   font-weight: 600;
   line-height: 1.4;
-  &:hover{
+  &:hover {
     color: #ffffff;
   }
   span {
@@ -17,23 +17,45 @@
   p {
     font-size: 24px;
   }
-  + span{
-      font-size: 13px;
-      line-height: 1.5;
-      color: #8992A4;
-      margin: 20px 0 0 40px;
+  + span {
+    font-size: 13px;
+    line-height: 1.5;
+    color: #8992a4;
+    margin: 20px 0 0 40px;
   }
 }
 
 .button-blue {
   background-color: #276bfb;
-
+  &:hover {
+    background-color: #5b88ff;
+  }
 }
 .button-green {
   background-color: #00c0ab;
+  &:hover {
+    background-color: #33dfcc;
+  }
 }
 .button-purple {
   background-color: #8e7df7;
+  &:hover {
+    background-color: #b79eff;
+  }
+}
+.button-white {
+  border: 2px solid #b9c7d6;
+  border-radius: 60px;
+  color: #a3b4c7;
+  &:hover {
+    background-color: #b9c7d6;
+    color: #ffffff;
+    .icon-arrow {
+      path {
+        stroke: #ffffff;
+      }
+    }
+  }
 }
 .button-lg {
   width: 400px;
@@ -49,38 +71,12 @@
   width: 180px;
   height: 50px;
   font-size: 16px;
-  font-weight: 600;
+  padding: 0 30px;
 }
 .button-xs {
-  width: 66px;
-  height: 36px;
-  min-height: 36px;
-  font-weight: 600;
-}
-.button-group-gains {
-  background-color: var(--secondary-bg);
-  border-radius: 29px;
-  display: flex;
-  padding: 1px;
-  .button-gains {
-    font-family: "Muli", sans-serif;
-    color: var(--earn-color-hover);
-    font-size: 15px;
-    line-height: 1.5;
-    font-weight: 700;
-    cursor: pointer;
-    @media (min-width: 768px) {
-      width: 46px;
-      height: 46px;
-    }
-    @media (max-width: 767px) {
-      width: 38px;
-      height: 38px;
-    }
-    &.active {
-      background-color: #276bfb;
-      color: #ffffff;
-      border-radius: 50%;
-    }
-  }
+  width: 70px;
+  height: 40px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 60px;
 }

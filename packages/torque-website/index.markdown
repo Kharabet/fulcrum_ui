@@ -184,7 +184,7 @@ layout: home
                                 <span>New user?</span>
                                 <p>Borrow</p>
                             </div>
-                            {% include svg/button-arrow.svg %}
+                            {% include svg/arrow-in-circle.svg %}
                         </a>
                         <span class="info-after-button">Up to 5x Leverage, zero platform fees, <br /> and perfect liquidity</span>
                     </div>    
@@ -194,7 +194,7 @@ layout: home
                                 <span>Existing user?</span>
                                 <p>Select Wallet</p>
                             </div>
-                            {% include svg/button-arrow.svg %}
+                            {% include svg/arrow-in-circle.svg %}
                         </a>
                         <span class="info-after-button">Up to 5x Leverage, zero platform fees, <br /> and perfect liquidity</span>
                     </div>        
@@ -204,7 +204,7 @@ layout: home
                                 <span>Already have a loan?</span>
                                 <p>Refinance</p>
                             </div>
-                            {% include svg/button-arrow.svg %}
+                            {% include svg/arrow-in-circle.svg %}
                         </a>
                         <span class="fs-13 lh-150 c-gray mt-20 ml-40">Up to 5x Leverage, zero platform fees, <br /> and perfect liquidity</span>
                     </div>          
@@ -371,7 +371,7 @@ layout: home
                             <span>New user?</span>
                             <p>Borrow</p>
                         </div>
-                        {% include svg/button-arrow.svg %}
+                        {% include svg/arrow-in-circle.svg %}
                     </a>
                     <span class="info-after-button">Up to 5x Leverage, zero platform fees, <br /> and perfect liquidity</span>
                 </div>          
@@ -381,7 +381,7 @@ layout: home
                             <span>Already have a loan?</span>
                             <p>Refinance</p>
                         </div>
-                        {% include svg/button-arrow.svg %}
+                        {% include svg/arrow-in-circle.svg %}
                     </a>
                     <span class="fs-13 lh-150 c-gray mt-20 ml-40">Up to 5x Leverage, zero platform fees, <br /> and perfect liquidity</span>
                 </div>          
@@ -428,6 +428,16 @@ layout: home
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+        <div class="row mt-60">
+            <div class="col col-12 jc-c">
+                <a href="https://help.bzx.network/en/" class="button button-sm button-white mx-auto">
+                    Help center
+                    <div class="icon-arrow">
+                        {% include svg/arrow.svg %}
+                    </div>
+                </a>
             </div>
         </div>
     </div>
