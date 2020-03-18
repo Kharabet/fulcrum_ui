@@ -90,38 +90,49 @@
 }
 .wrapper-stats {
   font-size: 44px;
-  background-color: #8e7df6;
+  /*background-image: url(/images/bg-stats.svg);
+  background-repeat: no-repeat;
+  background-size: cover;*/
   border-radius: 16px;
   color: #ffffff;
   position: relative;
   display: flex;
+  width: 100%;
+  //padding: 40px;
+  background-color: #00a1fc;
   h2 {
     color: #ffffff;
     width: calc(100% / 3);
     position: relative;
     padding: 40px 0 40px 40px;
     z-index: 2;
-    &:after{
-      content: '';
-      position: absolute;
-      //width: 4 * 100%;
-      height: 4 * 100%;
-      background-color: red;
-      top: 0;
-      left: 0;
-    }
   }
   .item-stats {
     width: calc(100% / 3);
     display: flex;
     flex-direction: column;
     line-height: 1.2;
-    margin-bottom: 15px;
     padding: 40px 0 40px 40px;
-
+    position: relative;
+    &:not(:last-child) {
+      &:after {
+        content: "";
+        position: absolute;
+        width: 166px;
+        height: 166px;
+        background-image: url(/images/after-stats.svg);
+        top: 0;
+        right: 0;
+      }
+    }
+    &:last-child {
+      background-color: #8e7df7;
+      border-radius: 0 16px 16px 0;
+    }
     > span {
       font-size: 16px;
       color: #33dfcc;
+      margin-bottom: 15px;
     }
   }
 }
@@ -139,25 +150,25 @@
 
   z-index: 3;
   @media (min-width: 992px) {
-      left: -32px;
+    left: -32px;
   }
   @media (max-width: 991px) {
-      left: 0;
-      right: 0;
-      margin: auto;
+    left: 0;
+    right: 0;
+    margin: auto;
   }
   @media (min-width: 768px) {
-      width: 60px;
-      height: 60px;
-      border: 8px solid var(--secondary-bg);
-      top: -32px;
-      font-size: 18px;
+    width: 60px;
+    height: 60px;
+    border: 8px solid var(--secondary-bg);
+    top: -32px;
+    font-size: 18px;
   }
   @media (max-width: 767px) {
-      width: 48px;
-      height: 48px;
-      border: 5px solid var(--secondary-bg);
-      top: -28px;
-      font-size: 16px;
+    width: 48px;
+    height: 48px;
+    border: 5px solid var(--secondary-bg);
+    top: -28px;
+    font-size: 16px;
   }
 }

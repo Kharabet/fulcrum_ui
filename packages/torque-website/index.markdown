@@ -308,15 +308,19 @@ layout: home
 
 <section class="section-stats">
     <div class="container">
-        <div class="wrapper-stats">
-            <h2>Our stats</h2>
-            <div class="item-stats">
-                <div>$<span class="fw-900">5,056,560</span></div>
-                <span>Loans Originated</span>
-            </div>
-            <div class="item-stats">
-                <div>$<span class="fw-900">659,056,560</span></div>
-                <span>Loans Refinanced</span>
+        <div class="row">
+            <div class="col col-12">
+                <div class="wrapper-stats">
+                    <h2>Our stats</h2>
+                    <div class="item-stats">
+                        <div>$<span class="fw-900">5,056,560</span></div>
+                        <span>Loans Originated</span>
+                    </div>
+                    <div class="item-stats">
+                        <div>$<span class="fw-900">659,056,560</span></div>
+                        <span>Loans Refinanced</span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
