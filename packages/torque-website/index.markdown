@@ -265,7 +265,7 @@ layout: home
 
 
 
-<section class="pt-90 pb-75 py-xs-75 text-center">
+<section class="pt-90 pb-75 py-xs-75 ta-c">
     <div class="container">
         <div class="row">
             <div class="col col-12 jc-c">
@@ -322,7 +322,40 @@ layout: home
     </div>
 </section>
 
-<section class="pt-45 pb-90">
+<section class="pt-120 pb-45 ta-c">
+    <div class="container">
+        <div class="row">
+            <div class="col col-12 fd-c jc-c">
+                <h2 class="mb-25">How to borrow</h2>
+                <p class="fs-20 lh-150 fw-600 c-secondary-blue mb-75">Three clicks. No Accounts. No fees.</p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col col-9 mx-a jc-sb">
+                <div class="flex fd-c mb-md-55">
+                    <div class="svg-blur mb-45">
+                        <span class="lend-count">1</span>
+                        <div>
+                        {% include svg/step-1.svg %}
+                        </div>
+                    </div>
+                    <p class="c-dark-gray mt-25">Sellect an asset with fixed APR</p>
+                </div>
+                <div class="flex fd-c">
+                    <div class="svg-blur mb-45">
+                        <span class="lend-count">2</span>
+                        <div>
+                        {% include svg/step-2.svg %}
+                        </div>
+                    </div>
+                    <p class="c-dark-gray mt-25">Enter amount to borrow and confirm transaction at Metamask</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="pt-30 pb-90">
     <div class="container container-md">
         <div class="row">
             <div class="col col-12 jc-c">
@@ -356,7 +389,7 @@ layout: home
     </div>
 </section>
 
-<section class="py-105 pt-xs-90 text-center">
+<section class="py-105 pt-xs-90 ta-c">
     <div class="container container-sm">
         <div class="row">
             <div class="col col-12 jc-c">

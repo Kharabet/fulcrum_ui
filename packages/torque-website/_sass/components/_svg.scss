@@ -53,13 +53,13 @@
 .svg-blur {
   display: flex;
   position: relative;
-  width: 440px;
+  width: 460px;
   svg{
     width: 100%;
     height: auto;
   }
   @media(max-width: 991px){
-    max-width: 440px;
+    max-width: 460px;
     margin-left: auto;
     margin-right: auto;
   }

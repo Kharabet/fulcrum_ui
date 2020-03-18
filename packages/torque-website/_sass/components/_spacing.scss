@@ -39,6 +39,9 @@
 .pt-15{
   padding-top: 15px;
 }
+.pt-30{
+  padding-top: 30px;
+}
 .pt-45{
   padding-top: 45px;
 }
@@ -51,21 +54,12 @@
 .pl-55 {
   padding-left: 55px;
 }
-.pl-60 {
-  padding-left: 60px;
-}
-.pl-90 {
-  padding-left: 90px;
-}
 @for $i from 2 through 9 {
   .pb-#{15*$i} {
     padding-bottom: #{15 * $i}px;
   }
 }
-.py-40 {
-  padding-top: 40px;
-  padding-bottom: 40px;
-}
+
 .py-60 {
   padding-top: 60px;
   padding-bottom: 60px;
