@@ -38,7 +38,7 @@
     "http"
   ],
   "paths": {
-    "/apr": {
+    "/supply-rate-apr": {
       "get": {
         "tags": [
           "Stats"
@@ -143,7 +143,7 @@
         ]
       }
     },
-    "/tvl-usd": {
+    "/vault-balance-usd": {
       "get": {
         "tags": [
           "Stats"
@@ -158,7 +158,7 @@
         ]
       }
     },
-    "/usd-rates": {
+    "/assets-usd-rates": {
       "get": {
         "tags": [
           "Stats"

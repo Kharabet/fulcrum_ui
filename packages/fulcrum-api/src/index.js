@@ -25,9 +25,10 @@ app.use(bodyParser.json({
 }));
 
 
-app.use('/', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 // api router
 app.use('/api', api({ config }));
+
+app.use('/', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.server.listen({
     port: process.env.PORT || config.port,

@@ -28,7 +28,13 @@ export default ({ config }) => {
 		res.json(totalAssetBorrow);
 	});
 
+	//TODO: replace with supply-rate-apr endpoint
 	api.get('/apr', async (req, res) => {
+		const apr = await fulcrum.getSupplyRateAPR();
+		res.json(apr);
+	});
+
+	api.get('/supply-rate-apr', async (req, res) => {
 		const apr = await fulcrum.getSupplyRateAPR();
 		res.json(apr);
 	});
@@ -53,12 +59,24 @@ export default ({ config }) => {
 		res.json(liquidity);
 	});
 
+	//TODO: replace with vault-balance-usd endpoint
 	api.get('/tvl-usd', async (req, res) => {
 		const tvl = await fulcrum.getTVL();
 		res.json(tvl);
 	});
 
+	api.get('/vault-balance-usd', async (req, res) => {
+		const tvl = await fulcrum.getTVL();
+		res.json(tvl);
+	});
+
+	//TODO: replace with assets-usd-rates endpoint
 	api.get('/usd-rates', async (req, res) => {
+		const usdRates = await fulcrum.getUsdRates();
+		res.json(usdRates);
+	});
+
+	api.get('/assets-usd-rates', async (req, res) => {
 		const usdRates = await fulcrum.getUsdRates();
 		res.json(usdRates);
 	});
