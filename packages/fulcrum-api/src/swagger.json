@@ -210,6 +210,21 @@
           "application/json"
         ]
       }
+    },
+    "/itoken-prices-usd": {
+      "get": {
+        "tags": [
+          "iTokens Prices"
+        ],
+        "summary": "Get iToken prices",
+        "description": "",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ]
+      }
     }
   }
 }

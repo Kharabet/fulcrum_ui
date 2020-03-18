@@ -11,9 +11,8 @@ export default class Fulcrum {
     constructor(web3, cache) {
         this.web3 = web3;
         this.cache = cache
-        this.cache.on( "expired", async function( key, value ){
-            if(key == "reserve_data")
-            {
+        this.cache.on("expired", async function (key, value) {
+            if (key == "reserve_data") {
                 var result = await this.updateReservedData();
                 this.cache.set("reserve_data", result);
             }
@@ -88,6 +87,21 @@ export default class Fulcrum {
         return usdRates;
     }
 
+    async getITokensPricesUsd() {
+        let result = {};
+        const usdRates = await this.getUsdRates();
+        for (const token in iTokens) {
+            const iToken = iTokens[token];
+            const iTokenContract = new this.web3.eth.Contract(iTokenJson.abi, iToken.address);
+            const tokenPrice = await iTokenContract.methods.tokenPrice().call();
+
+            //price is in loanAsset of iToken contract
+            const price = new BigNumber(tokenPrice).multipliedBy(usdRates[iToken.name]).dividedBy(10 ** iToken.decimals);
+            result[iToken.name] = price.toNumber();
+        }
+        return result;
+    }
+
 
     async  getReserveData() {
         var result = this.cache.get("reserve_data");
@@ -95,7 +109,7 @@ export default class Fulcrum {
 
             console.warn("No reserve_data in cache!")
             result = await this.updateReservedData();
-            
+
             this.cache.set("reserve_data", result);
             console.dir(`reserve_data:`);
             console.dir(result);
@@ -103,11 +117,11 @@ export default class Fulcrum {
         return result;
     }
 
-    async updateReservedData(){
+    async updateReservedData() {
         var result = [];
         var tokenAddresses = iTokens.map(x => (x.address));
         var swapRates = await this.getSwapToUsdRateBatch(iTokens.find(x => x.name === "dai"));
-        var reserveData = await this.DappHeperContract.methods.reserveDetails(tokenAddresses).call({from: "0x4abB24590606f5bf4645185e20C4E7B97596cA3B"});
+        var reserveData = await this.DappHeperContract.methods.reserveDetails(tokenAddresses).call({ from: "0x4abB24590606f5bf4645185e20C4E7B97596cA3B" });
 
         let usdTotalLockedAll = new BigNumber(0);
         let usdSupplyAll = new BigNumber(0);
@@ -171,7 +185,7 @@ export default class Fulcrum {
         switch (assetName) {
             case "wbtc":
                 return new BigNumber(10 ** 6);
-            case "usdc":                
+            case "usdc":
                 return new BigNumber(10 ** 4);
             case "usdt":
                 return new BigNumber(10 ** 4);
@@ -186,10 +200,9 @@ export default class Fulcrum {
         const underlyings = iTokens.map(e => (e.erc20Address));
         const amounts = iTokens.map(e => (this.getGoodSourceAmountOfAsset(e.name).toFixed()));
 
-        result = await this.DappHeperContract.methods.assetRates(oracleAddress, usdTokenAddress, underlyings, amounts).call({from: "0x4abB24590606f5bf4645185e20C4E7B97596cA3B"});
+        result = await this.DappHeperContract.methods.assetRates(oracleAddress, usdTokenAddress, underlyings, amounts).call({ from: "0x4abB24590606f5bf4645185e20C4E7B97596cA3B" });
 
         return result;
     }
 
 }
-

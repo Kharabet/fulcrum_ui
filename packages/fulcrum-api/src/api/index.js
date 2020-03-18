@@ -81,6 +81,11 @@ export default ({ config }) => {
 		res.json(usdRates);
 	});
 
+	api.get('/itoken-prices', async (req, res) => {
+		const usdRates = await fulcrum.getITokensPrices();
+		res.json(usdRates);
+	});
+
 	api.get('/borrow-deposit-estimate', [
 		query('borrow_asset').isIn(iTokens.map(token => token.name)),
 		query('borrow_asset').isIn(iTokens.map(token => token.name)),
