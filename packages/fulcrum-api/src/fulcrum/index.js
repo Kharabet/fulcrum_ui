@@ -1,4 +1,4 @@
-import { iTokens } from './config';
+import { iTokens } from '../config/iTokens';
 
 import BigNumber from 'bignumber.js';
 import { DappHelperJson, mainnetAddress as dappHelperAddress } from './contracts/DappHelperContract'
@@ -41,6 +41,12 @@ export default class Fulcrum {
         var usdRates = {};
         reserveData.forEach(item => usdRates[item.token] = item.swapToUSDPrice);
         return usdRates;
+    }
+    async getTorqueBorrowRates() {
+        var reserveData = await this.getReserveData()
+        var torqueBorrowRates = {};
+        reserveData.forEach(item => torqueBorrowRates[item.token] = item.torqueBorrowInterestRate);
+        return torqueBorrowRates;
     }
 
     async  getReserveData() {
