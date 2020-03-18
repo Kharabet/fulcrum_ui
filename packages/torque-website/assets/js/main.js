@@ -29,7 +29,7 @@ window.addEventListener('load', function () {
     for (var i = 0; i < accordions.length; i++) {
         accordions[i].addEventListener("click", updateAccordion, false);
     }
-    
+
     function setAriaAttr (el, ariaType, newProperty) {
         el.setAttribute(ariaType, newProperty);
     };
@@ -53,5 +53,11 @@ window.addEventListener('load', function () {
             setAccordionAria(e.currentTarget.nextElementSibling, "true");
             e.currentTarget.parentElement.classList.add("active");
         }
+    }
+
+    var url = document.querySelectorAll('.nav-menu');
+    for (var i = 0; i < url.length; i++) {
+        if (url[i].getAttribute("href") == window.location.pathname)
+            url[i].classList.add("active-url");
     }
 });
