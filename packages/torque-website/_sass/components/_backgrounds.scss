@@ -13,4 +13,9 @@
       background-image: url(/images/bg-light-left.svg), url(/images/bg-light-right.svg);
     }
   }
+  [data-theme="dark"] & {
+    @media (min-width: 768px) {
+      background-image: url(/images/bg-dark-left.svg), url(/images/bg-dark-right.svg);
+    }
+  }
 }
