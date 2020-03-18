@@ -6,6 +6,7 @@
   border-radius: 16px;
   display: flex;
   align-items: center;
+  position: relative;
   .item-form {
     display: flex;
     flex-direction: column;
@@ -118,5 +119,10 @@
       font-weight: 800;
       color: #00c0ab;
     }
+  }
+  .cube{
+    position: absolute;
+    bottom: -90px;
+    left: 50%;
   }
 }

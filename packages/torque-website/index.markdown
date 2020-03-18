@@ -86,6 +86,7 @@ layout: home
                         <span>APR <span class="c-gradient fw-900">FIXED</span></span>
                         <div class="value-result">2.54%</div>
                     </div>
+                    <span class="cube">{% include svg/big-cube.svg %}</span>
                 </form>
                 </div>
             </div>
@@ -94,7 +95,10 @@ layout: home
     <div class="container pt-15 pt-xs-30 pb-45 pb-xs-75">
         <div class="row fd-md-c">
             <div class="col col-5 col-lg-3 col-md-12">
-                <h2 class="mb-md-25">Crypto-backed loans with fixed interest rates </h2>
+                <h2 class="triangle mb-md-25">
+                <span class="t-r-75 l-r-125">{% include svg/big-triangle.svg %}</span>
+                Crypto-backed loans with fixed interest rates 
+                </h2>
             </div>
             <div class="col col-7 col-lg-9 col-md-12 apr-wrapper">
                 <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-token="bat">
@@ -214,7 +218,9 @@ layout: home
         <div class="container">
             <div class="row">
                 <div class="col col-12">
-                    <h2 class="circle mb-75 mb-xs-50">Why Torque? </h2>
+                    <h2 class="triangle mb-75 mb-xs-50">
+                    <span class="l-r-125">{% include svg/small-triangle.svg %}</span>                    
+                    Why Torque? </h2>
                 </div>
             </div>
         </div>
@@ -267,7 +273,9 @@ layout: home
     <div class="container">
         <div class="row">
             <div class="col col-12 jc-c">
-                <h2 class="circle mb-65 mb-xs-50">Security Is Our Priority</h2>
+                <h2 class="triangle mb-65 mb-xs-50">
+                <span class="t-r-55 r-r-75">{% include svg/small-triangle.svg %}</span>
+                Security Is Our Priority</h2>
             </div>
         </div>
         <div class="row jc-sb fw-md-w ai-xl-fe">
@@ -395,7 +403,10 @@ layout: home
     <div class="container container-sm">
         <div class="row">
             <div class="col col-12 jc-c">
-                <h2 class="circle mb-50 mb-xs-40"><span class="blue center top-r-60"></span>Frequently Asked Questions</h2>
+                <h2 class="cube mb-50 mb-xs-40">
+                <span class="t-r-75 center">{% include svg/small-cube.svg %}</span>
+                Frequently Asked Questions
+                </h2>
             </div>
         </div>
         <div class="row jc-c">

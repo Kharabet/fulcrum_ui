@@ -172,3 +172,28 @@
     font-size: 16px;
   }
 }
+
+.triangle, .cube{
+  position: relative;
+  span{
+    position: absolute;
+    &.l-r-125{
+      left: -125px;
+    }
+    &.t-r-55{
+      top: -55px;
+    }
+    &.t-r-75{
+      top: -75px;
+    }
+    &.r-r-75{
+      right: -75px;
+    }
+
+    &.center{
+      left: 0;
+      right: 0;
+      margin: auto;
+    }
+  }
+}

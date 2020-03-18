@@ -1,0 +1,19 @@
+<svg width="105" height="134" viewBox="0 0 105 134" fill="none" 
+    xmlns="http://www.w3.org/2000/svg">
+    <g filter="url(#big-triangle)">
+        <path d="M52.1795 40.6714L88.359 59.1494L52.1795 77.6261L16 59.1494L52.1795 40.6714Z" fill="#D9EBFD"/>
+    </g>
+    <path d="M52.1795 0.158752V77.6308L16 59.1528L52.1795 0.158752Z" fill="#F3F9FF"/>
+    <path d="M52.1796 0.158752V77.6308L88.3591 59.1528L52.1796 0.158752Z" fill="#DDE2E8"/>
+    <defs>
+        <filter id="big-triangle" x="0" y="40.6714" width="104.359" height="92.9547" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+            <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+            <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"/>
+            <feOffset dy="40"/>
+            <feGaussianBlur stdDeviation="8"/>
+            <feColorMatrix type="matrix" values="0 0 0 0 0.0484375 0 0 0 0 0.21825 0 0 0 0 0.375 0 0 0 0.05 0"/>
+            <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow"/>
+            <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow" result="shape"/>
+        </filter>
+    </defs>
+</svg>
