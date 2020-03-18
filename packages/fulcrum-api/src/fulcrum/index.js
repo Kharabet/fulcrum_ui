@@ -3,11 +3,13 @@ import { pTokens } from '../config/pTokens';
 
 import BigNumber from 'bignumber.js';
 import { DappHelperJson, mainnetAddress as dappHelperAddress } from './contracts/DappHelperContract'
-import { mainnetAddress as oracleAddress } from './contracts/OracleContract'
+import { mainnetAddress as oracleAddress, oracleJson } from './contracts/OracleContract'
 import { iTokenJson } from './contracts/iTokenContract';
 import { pTokenJson } from './contracts/pTokenContract';
 
-
+const UNLIMITED_ALLOWANCE_IN_BASE_UNITS = new BigNumber(2)
+    .pow(256)
+    .minus(1);
 
 export default class Fulcrum {
     constructor(web3, cache) {
@@ -18,7 +20,7 @@ export default class Fulcrum {
         this.DappHeperContract = new this.web3.eth.Contract(DappHelperJson.abi, dappHelperAddress);
     }
 
-    async setReserveData (key, value) {
+    async setReserveData(key, value) {
         if (key == "reserve_data") {
             var result = await this.updateReservedData();
             this.cache.set("reserve_data", result);
@@ -112,18 +114,78 @@ export default class Fulcrum {
         try {
             for (const token in pTokens) {
                 const pToken = pTokens[token];
-                if (pToken.unit === "WBTC") continue;
                 const pTokenContract = new this.web3.eth.Contract(pTokenJson.abi, pToken.address);
                 const tokenPrice = await pTokenContract.methods.tokenPrice().call({ from: "0x4abB24590606f5bf4645185e20C4E7B97596cA3B" });
                 const decimals = await pTokenContract.methods.decimals().call({ from: "0x4abB24590606f5bf4645185e20C4E7B97596cA3B" });
                 //price is in loanAsset of iToken contract
-                const price = new BigNumber(tokenPrice).multipliedBy(usdRates[pToken.asset.toLowerCase()]).dividedBy(10 ** decimals);
+                const baseAsset = this.getBaseAsset(pToken);
+                const swapPrice = await this.getSwapToUsdRate(baseAsset);
+                const price = new BigNumber(tokenPrice).multipliedBy(swapPrice).dividedBy(10 ** decimals);
                 result[pToken.id] = price.toNumber();
             }
         }
         catch (e) {
             console.log(e);
         }
+        return result;
+    }
+
+    getBaseAsset(pToken) {
+        return pToken.direction === "SHORT" ? pToken.unit : pToken.asset;
+
+    }
+
+    async getSwapToUsdRate(asset) {
+        if (asset === "SAI" || asset === "DAI" || asset === "USDC" || asset === "SUSD" || asset === "USDT") {
+            return new BigNumber(1);
+        }
+
+        /*const swapRates = await this.getSwapToUsdRateBatch(
+          [asset],
+          process.env.REACT_APP_ETH_NETWORK === "mainnet" ?
+            Asset.DAI :
+            Asset.SAI
+        );
+    
+        return swapRates[0];*/
+        return this.getSwapRate(
+            asset,
+            "DAI"
+        );
+    }
+
+    async getSwapRate(srcAsset, destAsset, srcAmount) {
+        if (srcAsset === destAsset) {
+            return new BigNumber(1);
+        }
+
+        let result = new BigNumber(0);
+
+        if (!srcAmount) {
+            srcAmount = UNLIMITED_ALLOWANCE_IN_BASE_UNITS;
+        } else {
+            srcAmount = new BigNumber(srcAmount.toFixed(0, 1));
+        }
+
+        const srcAssetErc20Address = iTokens.find(token => token.name === srcAsset.toLowerCase()).erc20Address;
+        const destAssetErc20Address = iTokens.find(token => token.name === destAsset.toLowerCase()).erc20Address;
+        if (srcAssetErc20Address && destAssetErc20Address) {
+            const oracleContract = new this.web3.eth.Contract(oracleJson.abi, oracleAddress);
+
+            try {
+                const swapPriceData = await oracleContract.methods.getTradeData(
+                    srcAssetErc20Address,
+                    destAssetErc20Address,
+                    srcAmount
+                ).call({ from: "0x4abB24590606f5bf4645185e20C4E7B97596cA3B" });
+                result = new BigNumber(swapPriceData[0]).dividedBy(10 ** 18);
+            } catch (e) {
+                console.log(e)
+                result = new BigNumber(0);
+            }
+        }
+
+
         return result;
     }
 
