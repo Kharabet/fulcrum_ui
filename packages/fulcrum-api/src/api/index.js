@@ -17,23 +17,50 @@ export default ({ config }) => {
 
 	var fulcrum = new Fulcrum(web3, cache);
 	var torque = new Torque(web3, cache);
+
+	api.get('/total-asset-supply', async (req, res) => {
+		const totalAssetSupply = await fulcrum.getTotalAssetSupply();
+		res.json(totalAssetSupply);
+	});
+
+	api.get('/total-asset-borrow', async (req, res) => {
+		const totalAssetBorrow = await fulcrum.getTotalAssetBorrow();
+		res.json(totalAssetBorrow);
+	});
+
 	api.get('/apr', async (req, res) => {
-		var apr = await fulcrum.getAPR();
+		const apr = await fulcrum.getSupplyRateAPR();
 		res.json(apr);
 	});
 
+	api.get('/borrow-rate-apr', async (req, res) => {
+		const apr = await fulcrum.getBorrowRateAPR();
+		res.json(apr);
+	});
+	
+	api.get('/torque-borrow-rate-apr', async (req, res) => {
+		const torqueBorrowRates = await fulcrum.getTorqueBorrowRateAPR();
+		res.json(torqueBorrowRates);
+	});
+
+	api.get('/vault-balance', async (req, res) => {
+		const vaultBalance = await fulcrum.getVaultBalance();
+		res.json(vaultBalance);
+	});
+	
+	api.get('/liquidity', async (req, res) => {
+		const liquidity = await fulcrum.getFreeLiquidity();
+		res.json(liquidity);
+	});
+
 	api.get('/tvl-usd', async (req, res) => {
-		var tvl = await fulcrum.getTVL();
+		const tvl = await fulcrum.getTVL();
 		res.json(tvl);
 	});
 
 	api.get('/usd-rates', async (req, res) => {
-		var usdRates = await fulcrum.getUsdRates();
+		const usdRates = await fulcrum.getUsdRates();
 		res.json(usdRates);
-	});
-	api.get('/torque-borrow-rates', async (req, res) => {
-		var torqueBorrowRates = await fulcrum.getTorqueBorrowRates();
-		res.json(torqueBorrowRates);
 	});
 
 	api.get('/borrow-deposit-estimate', [

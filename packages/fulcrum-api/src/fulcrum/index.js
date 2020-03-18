@@ -22,12 +22,57 @@ export default class Fulcrum {
         this.DappHeperContract = new this.web3.eth.Contract(DappHelperJson.abi, dappHelperAddress);
     }
 
-    async getAPR() {
+    async getTotalAssetSupply() {
+        var reserveData = await this.getReserveData()
+        var totalAssetSupply = {};
+        reserveData.forEach(item => totalAssetSupply[item.token] = item.totalAssetSupply);
+
+        return totalAssetSupply;
+    }
+
+    async getTotalAssetBorrow() {
+        var reserveData = await this.getReserveData()
+        var totalAssetBorrow = {};
+        reserveData.forEach(item => totalAssetBorrow[item.token] = item.totalAssetBorrow);
+
+        return totalAssetBorrow;
+    }
+
+    async getSupplyRateAPR() {
         var reserveData = await this.getReserveData()
         var apr = {};
         reserveData.forEach(item => apr[item.token] = item.supplyInterestRate);
 
         return apr;
+    }
+
+    async getBorrowRateAPR() {
+        var reserveData = await this.getReserveData()
+        var apr = {};
+        reserveData.forEach(item => apr[item.token] = item.borrowInterestRate);
+
+        return apr;
+    }
+
+    async getTorqueBorrowRateAPR() {
+        var reserveData = await this.getReserveData()
+        var torqueBorrowRates = {};
+        reserveData.forEach(item => torqueBorrowRates[item.token] = item.torqueBorrowInterestRate);
+        return torqueBorrowRates;
+    }
+
+    async getVaultBalance() {
+        var reserveData = await this.getReserveData()
+        var vaultBalance = {};
+        reserveData.forEach(item => vaultBalance[item.token] = item.vaultBalance);
+        return vaultBalance;
+    }
+
+    async getFreeLiquidity() {
+        var reserveData = await this.getReserveData()
+        var freeLiquidity = {};
+        reserveData.forEach(item => freeLiquidity[item.token] = item.liquidity);
+        return freeLiquidity;
     }
 
     async getTVL() {
@@ -42,12 +87,7 @@ export default class Fulcrum {
         reserveData.forEach(item => usdRates[item.token] = item.swapToUSDPrice);
         return usdRates;
     }
-    async getTorqueBorrowRates() {
-        var reserveData = await this.getReserveData()
-        var torqueBorrowRates = {};
-        reserveData.forEach(item => torqueBorrowRates[item.token] = item.torqueBorrowInterestRate);
-        return torqueBorrowRates;
-    }
+
 
     async  getReserveData() {
         var result = this.cache.get("reserve_data");
@@ -108,6 +148,7 @@ export default class Fulcrum {
                     supplyInterestRate: supplyInterestRate.dividedBy(10 ** 18).toFixed(),
                     borrowInterestRate: borrowInterestRate.dividedBy(10 ** 18).toFixed(),
                     torqueBorrowInterestRate: torqueBorrowInterestRate.dividedBy(10 ** 18).toFixed(),
+                    vaultBalance: vaultBalance.dividedBy(10 ** 18).toFixed(),
                     swapRates: swapRates[i],
                     lockedAssets: vaultBalance.dividedBy(10 ** 18).toFixed(),
                     swapToUSDPrice: new BigNumber(swapRates[i]).dividedBy(10 ** 18).toFixed(),
