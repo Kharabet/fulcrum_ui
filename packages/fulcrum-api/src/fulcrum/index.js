@@ -12,15 +12,17 @@ import { pTokenJson } from './contracts/pTokenContract';
 export default class Fulcrum {
     constructor(web3, cache) {
         this.web3 = web3;
-        this.cache = cache
-        this.cache.on("expired", async function (key, value) {
-            if (key == "reserve_data") {
-                var result = await this.updateReservedData();
-                this.cache.set("reserve_data", result);
-            }
-        });
+        this.cache = cache;
+        this.cache.on("expired", this.setReserveData.bind(this));
         // this.iTokenContract = new this.web3.eth.Contract(iTokenJson.abi, token.address);
         this.DappHeperContract = new this.web3.eth.Contract(DappHelperJson.abi, dappHelperAddress);
+    }
+
+    async setReserveData (key, value) {
+        if (key == "reserve_data") {
+            var result = await this.updateReservedData();
+            this.cache.set("reserve_data", result);
+        }
     }
 
     async getTotalAssetSupply() {
