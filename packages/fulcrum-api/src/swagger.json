@@ -216,8 +216,8 @@
         "tags": [
           "Torque"
         ],
-        "summary": "Borrow Deposit Estimate",
-        "description": "Estimates how many collateral token you will deposit by borrowing AMOUNT of asset",
+        "summary": "Collateral Estimate",
+        "description": "Estimates how much of collateral you have to deposit to borrow AMOUNT of asset",
         "parameters": [
           {
             "name": "borrow_asset",
