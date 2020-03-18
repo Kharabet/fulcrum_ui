@@ -44,13 +44,11 @@
           "Stats"
         ],
         "summary": "Get Fulcrum Supply APR",
-        "description": "",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ]
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
       }
     },
     "/total-asset-supply": {
@@ -65,7 +63,12 @@
         ],
         "produces": [
           "application/json"
-        ]
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
       }
     },
     "/total-asset-borrow": {
@@ -80,7 +83,12 @@
         ],
         "produces": [
           "application/json"
-        ]
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
       }
     },
     "/borrow-rate-apr": {
@@ -95,7 +103,12 @@
         ],
         "produces": [
           "application/json"
-        ]
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
       }
     },
     "/torque-borrow-rate-apr": {
@@ -110,7 +123,12 @@
         ],
         "produces": [
           "application/json"
-        ]
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
       }
     },
     "/vault-balance": {
@@ -125,7 +143,12 @@
         ],
         "produces": [
           "application/json"
-        ]
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
       }
     },
     "/liquidity": {
@@ -140,7 +163,12 @@
         ],
         "produces": [
           "application/json"
-        ]
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
       }
     },
     "/vault-balance-usd": {
@@ -155,7 +183,12 @@
         ],
         "produces": [
           "application/json"
-        ]
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
       }
     },
     "/assets-usd-rates": {
@@ -170,7 +203,12 @@
         ],
         "produces": [
           "application/json"
-        ]
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
       }
     },
     "/borrow-deposit-estimate": {
@@ -208,7 +246,12 @@
         ],
         "produces": [
           "application/json"
-        ]
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
       }
     },
     "/itoken-prices-usd": {
@@ -223,7 +266,12 @@
         ],
         "produces": [
           "application/json"
-        ]
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
       }
     },
     "/ptoken-prices-usd": {
@@ -238,7 +286,12 @@
         ],
         "produces": [
           "application/json"
-        ]
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
       }
     }
   }
