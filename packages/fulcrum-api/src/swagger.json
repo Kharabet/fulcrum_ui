@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "description": "This is a public API for Fulcrum and Torque.",
+    "description": "This is a public API for bZx protocol, Fulcrum and Torque.",
     "version": "1.0.0",
     "title": "Fulcrum API",
     "license": {
@@ -16,13 +16,13 @@
       "name": "Stats",
       "description": "",
       "externalDocs": {
-        "description": "Data from Fulcrum stats page",
+        "description": "See data on Fulcrum stats page",
         "url": "https://app.fulcrum.trade/#/stats"
       }
     },
     {
       "name": "Torque",
-      "description": "Torque-related calculations"
+      "description": "Torque-specific endpoints"
     },
     {
       "name": "pTokens Prices",
@@ -43,7 +43,7 @@
         "tags": [
           "Stats"
         ],
-        "summary": "Get Fulcrum Supply APR",
+        "summary": "Get supply interest rates (APR)",
         "responses": {
           "200": {
             "description": "Success"
@@ -56,7 +56,7 @@
         "tags": [
           "Stats"
         ],
-        "summary": "Get Fulcrum Total Supply Assets",
+        "summary": "Get Total Supply (USD)",
         "description": "",
         "consumes": [
           "application/json"
@@ -76,7 +76,7 @@
         "tags": [
           "Stats"
         ],
-        "summary": "Get Fulcrum Total Borrow Assets",
+        "summary": "Get Total Borrow Assets",
         "description": "",
         "consumes": [
           "application/json"
@@ -96,7 +96,7 @@
         "tags": [
           "Stats"
         ],
-        "summary": "Get Fulcrum Borrow Rate APR",
+        "summary": "Get Fulcrum Borrow Interest Rates (APR)",
         "description": "",
         "consumes": [
           "application/json"
@@ -116,7 +116,7 @@
         "tags": [
           "Stats"
         ],
-        "summary": "Get Torque Borrow Rate APR",
+        "summary": "Get Torque Borrow Interest Rates (APR)",
         "description": "",
         "consumes": [
           "application/json"
@@ -136,7 +136,7 @@
         "tags": [
           "Stats"
         ],
-        "summary": "Get Fulcrum Vault Balance",
+        "summary": "Get bZx Vault Balance",
         "description": "",
         "consumes": [
           "application/json"
@@ -156,7 +156,7 @@
         "tags": [
           "Stats"
         ],
-        "summary": "Get Fulcrum Free Liquidity",
+        "summary": "Get bZx Free Liquidity",
         "description": "",
         "consumes": [
           "application/json"
@@ -176,7 +176,7 @@
         "tags": [
           "Stats"
         ],
-        "summary": "Get Fulcrum TVL in USD",
+        "summary": "Get bZx TVL in USD",
         "description": "",
         "consumes": [
           "application/json"
