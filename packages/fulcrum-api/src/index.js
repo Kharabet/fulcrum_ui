@@ -5,6 +5,9 @@ import morgan from 'morgan';
 import bodyParser from 'body-parser';
 import api from './api';
 import config from './config.json';
+import swaggerUi from 'swagger-ui-express';
+import swaggerDocument from './swagger.json';
+
 
 let app = express();
 app.server = http.createServer(app);
@@ -21,6 +24,8 @@ app.use(bodyParser.json({
     limit: config.bodyLimit
 }));
 
+
+app.use('/', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 // api router
 app.use('/api', api({ config }));
 

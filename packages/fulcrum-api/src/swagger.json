@@ -1,0 +1,215 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "This is a public API for Fulcrum and Torque.",
+    "version": "1.0.0",
+    "title": "Fulcrum API",
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  },
+  "host": "fulcrum-api-dev.herokuapp.com",
+  "basePath": "/api",
+  "tags": [
+    {
+      "name": "Stats",
+      "description": "",
+      "externalDocs": {
+        "description": "Data from Fulcrum stats page",
+        "url": "https://app.fulcrum.trade/#/stats"
+      }
+    },
+    {
+      "name": "Torque",
+      "description": "Torque-related calculations"
+    },
+    {
+      "name": "pTokens Prices",
+      "description": "pTokens Prices in USD and ETH"
+    },
+    {
+      "name": "iTokens Prices",
+      "description": "iTokens Prices in USD and ETH"
+    }
+  ],
+  "schemes": [
+    "https",
+    "http"
+  ],
+  "paths": {
+    "/apr": {
+      "get": {
+        "tags": [
+          "Stats"
+        ],
+        "summary": "Get Fulcrum Supply APR",
+        "description": "",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ]
+      }
+    },
+    "/total-asset-supply": {
+      "get": {
+        "tags": [
+          "Stats"
+        ],
+        "summary": "Get Fulcrum Total Supply Assets",
+        "description": "",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ]
+      }
+    },
+    "/total-asset-borrow": {
+      "get": {
+        "tags": [
+          "Stats"
+        ],
+        "summary": "Get Fulcrum Total Borrow Assets",
+        "description": "",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ]
+      }
+    },
+    "/borrow-rate-apr": {
+      "get": {
+        "tags": [
+          "Stats"
+        ],
+        "summary": "Get Fulcrum Borrow Rate APR",
+        "description": "",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ]
+      }
+    },
+    "/torque-borrow-rate-apr": {
+      "get": {
+        "tags": [
+          "Stats"
+        ],
+        "summary": "Get Torque Borrow Rate APR",
+        "description": "",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ]
+      }
+    },
+    "/vault-balance": {
+      "get": {
+        "tags": [
+          "Stats"
+        ],
+        "summary": "Get Fulcrum Vault Balance",
+        "description": "",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ]
+      }
+    },
+    "/liquidity": {
+      "get": {
+        "tags": [
+          "Stats"
+        ],
+        "summary": "Get Fulcrum Free Liquidity",
+        "description": "",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ]
+      }
+    },
+    "/tvl-usd": {
+      "get": {
+        "tags": [
+          "Stats"
+        ],
+        "summary": "Get Fulcrum TVL in USD",
+        "description": "",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ]
+      }
+    },
+    "/usd-rates": {
+      "get": {
+        "tags": [
+          "Stats"
+        ],
+        "summary": "Get iTokens Rates in USD",
+        "description": "",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ]
+      }
+    },
+    "/borrow-deposit-estimate": {
+      "get": {
+        "tags": [
+          "Torque"
+        ],
+        "summary": "Borrow Deposit Estimate",
+        "description": "Estimates how many collateral token you will deposit by borrowing AMOUNT of asset",
+        "parameters": [
+          {
+            "name": "borrow_asset",
+            "in": "query",
+            "required": "true",
+            "type": "string",
+            "description": "Borrow asset"
+          },
+          {
+            "name": "collateral_asset",
+            "in": "query",
+            "required": "true",
+            "type": "string",
+            "description": "Collateral asset"
+          },
+          {
+            "name": "amonut",
+            "in": "query",
+            "required": "true",
+            "type": "integer",
+            "description": "Loan amount"
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ]
+      }
+    }
+  }
+}
