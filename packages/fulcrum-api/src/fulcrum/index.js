@@ -1,9 +1,11 @@
 import { iTokens } from '../config/iTokens';
+import { pTokens } from '../config/pTokens';
 
 import BigNumber from 'bignumber.js';
 import { DappHelperJson, mainnetAddress as dappHelperAddress } from './contracts/DappHelperContract'
 import { mainnetAddress as oracleAddress } from './contracts/OracleContract'
 import { iTokenJson } from './contracts/iTokenContract';
+import { pTokenJson } from './contracts/pTokenContract';
 
 
 
@@ -98,6 +100,27 @@ export default class Fulcrum {
             //price is in loanAsset of iToken contract
             const price = new BigNumber(tokenPrice).multipliedBy(usdRates[iToken.name]).dividedBy(10 ** iToken.decimals);
             result[iToken.name] = price.toNumber();
+        }
+        return result;
+    }
+
+    async getPTokensPricesUsd() {
+        let result = {};
+        const usdRates = await this.getUsdRates();
+        try {
+            for (const token in pTokens) {
+                const pToken = pTokens[token];
+                if (pToken.unit === "WBTC") continue;
+                const pTokenContract = new this.web3.eth.Contract(pTokenJson.abi, pToken.address);
+                const tokenPrice = await pTokenContract.methods.tokenPrice().call({ from: "0x4abB24590606f5bf4645185e20C4E7B97596cA3B" });
+                const decimals = await pTokenContract.methods.decimals().call({ from: "0x4abB24590606f5bf4645185e20C4E7B97596cA3B" });
+                //price is in loanAsset of iToken contract
+                const price = new BigNumber(tokenPrice).multipliedBy(usdRates[pToken.asset.toLowerCase()]).dividedBy(10 ** decimals);
+                result[pToken.id] = price.toNumber();
+            }
+        }
+        catch (e) {
+            console.log(e);
         }
         return result;
     }

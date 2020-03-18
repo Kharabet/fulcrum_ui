@@ -225,6 +225,21 @@
           "application/json"
         ]
       }
+    },
+    "/ptoken-prices-usd": {
+      "get": {
+        "tags": [
+          "pTokens Prices"
+        ],
+        "summary": "Get pToken prices",
+        "description": "",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ]
+      }
     }
   }
 }

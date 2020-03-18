@@ -81,8 +81,12 @@ export default ({ config }) => {
 		res.json(usdRates);
 	});
 
-	api.get('/itoken-prices', async (req, res) => {
+	api.get('/itoken-prices-usd', async (req, res) => {
 		const usdRates = await fulcrum.getITokensPrices();
+		res.json(usdRates);
+	});
+	api.get('/ptoken-prices-usd', async (req, res) => {
+		const usdRates = await fulcrum.getPTokensPricesUsd();
 		res.json(usdRates);
 	});
 
