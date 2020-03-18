@@ -120,7 +120,7 @@ export default class Fulcrum {
                 //price is in loanAsset of iToken contract
                 const baseAsset = this.getBaseAsset(pToken);
                 const swapPrice = await this.getSwapToUsdRate(baseAsset);
-                const price = new BigNumber(tokenPrice).multipliedBy(swapPrice).dividedBy(10 ** decimals);
+                const price = new BigNumber(tokenPrice).multipliedBy(usdRates[pToken.asset.toLowerCase()]).dividedBy(10 ** decimals);
                 result[pToken.id] = price.toNumber();
             }
         }
