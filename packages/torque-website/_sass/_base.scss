@@ -31,12 +31,7 @@ body {
 .relative{
   position: relative;
 }
-.bg-primary {
-  background-color: var(--primary-bg);
-}
-.bg-secondary {
-  background-color: var(--secondary-bg);
-}
+
 @media(max-width: 991px){
   .w-md-50{
     width: 50%;

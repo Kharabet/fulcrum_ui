@@ -1,0 +1,16 @@
+.bg-primary {
+  background-color: var(--primary-bg);
+}
+.bg-secondary {
+  background-color: var(--secondary-bg);
+}
+.bg-primary-image {
+  background-position: 0 0, 100% 0;
+  background-repeat: no-repeat;
+  background-size: auto;
+  [data-theme="light"] & {
+    @media (min-width: 768px) {
+      background-image: url(/images/bg-light-left.svg), url(/images/bg-light-right.svg);
+    }
+  }
+}
