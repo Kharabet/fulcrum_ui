@@ -264,6 +264,7 @@ layout: home
 </div>
 
 
+
 <section class="pt-90 pb-75 py-xs-75 text-center">
     <div class="container">
         <div class="row">
@@ -304,6 +305,23 @@ layout: home
         </div>
     </div>
 </section>
+
+<section class="section-stats">
+    <div class="container">
+        <div class="wrapper-stats">
+            <h2>Our stats</h2>
+            <div class="item-stats">
+                <div>$<span class="fw-900">5,056,560</span></div>
+                <span>Loans Originated</span>
+            </div>
+            <div class="item-stats">
+                <div>$<span class="fw-900">659,056,560</span></div>
+                <span>Loans Refinanced</span>
+            </div>
+        </div>
+    </div>
+</section>
+
 <section class="pt-45 pb-90">
     <div class="container container-md">
         <div class="row">
