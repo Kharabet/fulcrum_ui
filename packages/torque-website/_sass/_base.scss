@@ -5,6 +5,7 @@ body {
   p {
     margin-bottom: 0;
     line-height: 1.8;
+    color: var(--primary-color);
     @media(max-width: 579px){
       font-size: 12px;
     }

@@ -103,7 +103,7 @@ layout: home
                     </div>
                     <div class="wrap-apr-value">
                         <p class="lh-100 fw-700 c-gray">BAT</p>
-                        <p class="fs-24 fs-xl-21 c-primary lh-125 apr-value-after"><span class="fw-800 apr-value">5.3</span>%</p>
+                        <p class="fs-24 fs-xl-21 lh-125 apr-value-after"><span class="fw-800 apr-value">5.3</span>%</p>
                     </div>
                 </div>
                 <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-token="knc">
@@ -112,7 +112,7 @@ layout: home
                     </div>
                     <div class="wrap-apr-value">
                         <p class="lh-100 fw-700 c-gray">KNC</p>
-                        <p class="fs-24 fs-xl-21 c-primary lh-125 apr-value-after"><span class="fw-800 apr-value">5.3</span>%</p>
+                        <p class="fs-24 fs-xl-21 lh-125 apr-value-after"><span class="fw-800 apr-value">5.3</span>%</p>
                     </div>
                 </div>
                 <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-token="rep">
@@ -121,7 +121,7 @@ layout: home
                     </div>
                     <div class="wrap-apr-value">
                         <p class="lh-100 fw-700 c-gray">REP</p>
-                        <p class="fs-24 fs-xl-21 c-primary lh-125 apr-value-after"><span class="fw-800 apr-value">5.3</span>%</p>
+                        <p class="fs-24 fs-xl-21 lh-125 apr-value-after"><span class="fw-800 apr-value">5.3</span>%</p>
                     </div>
                 </div>
                 <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-token="zrx">
@@ -130,7 +130,7 @@ layout: home
                     </div>
                     <div class="wrap-apr-value">
                         <p class="lh-100 fw-700 c-gray">ZRX</p>
-                        <p class="fs-24 fs-xl-21 c-primary lh-125 apr-value-after"><span class="fw-800 apr-value">1.6</span>%</p>
+                        <p class="fs-24 fs-xl-21 lh-125 apr-value-after"><span class="fw-800 apr-value">1.6</span>%</p>
                     </div>
                 </div>
                 <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-token="eth">
@@ -139,7 +139,7 @@ layout: home
                     </div>
                     <div class="wrap-apr-value">
                         <p class="lh-100 fw-700 c-gray">ETH</p>
-                        <p class="fs-24 fs-xl-21 c-primary lh-125 apr-value-after"><span class="fw-800 apr-value">4.2</span>%</p>
+                        <p class="fs-24 fs-xl-21 lh-125 apr-value-after"><span class="fw-800 apr-value">4.2</span>%</p>
                     </div>
                 </div>
                 <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-token="link">
@@ -148,7 +148,7 @@ layout: home
                     </div>
                     <div class="wrap-apr-value">
                         <p class="lh-100 fw-700 c-gray">LINK</p>
-                        <p class="fs-24 fs-xl-21 c-primary lh-125 apr-value-after"><span class="fw-800 apr-value">4.2</span>%</p>
+                        <p class="fs-24 fs-xl-21 lh-125 apr-value-after"><span class="fw-800 apr-value">4.2</span>%</p>
                     </div>
                 </div>
                 <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-token="susd">
@@ -157,7 +157,7 @@ layout: home
                     </div>
                     <div class="wrap-apr-value">
                         <p class="lh-100 fw-700 c-gray">sUSD</p>
-                        <p class="fs-24 fs-xl-21 c-primary lh-125 apr-value-after"><span class="fw-800 apr-value">4.2</span>%</p>
+                        <p class="fs-24 fs-xl-21 lh-125 apr-value-after"><span class="fw-800 apr-value">4.2</span>%</p>
                     </div>
                 </div>
                 <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-token="wbtc">
@@ -166,7 +166,7 @@ layout: home
                     </div>
                     <div class="wrap-apr-value">
                         <p class="lh-100 fw-700 c-gray">WBTC</p>
-                        <p class="fs-24 fs-xl-21 c-primary lh-125 apr-value-after"><span class="fw-800 apr-value">4.2</span>%</p>
+                        <p class="fs-24 fs-xl-21 lh-125 apr-value-after"><span class="fw-800 apr-value">4.2</span>%</p>
                     </div>
                 </div>
             </div>
@@ -262,7 +262,8 @@ layout: home
         </div>
     </div>
 </section>
-<section class="pt-90 pb-75 py-xs-75 ta-c">
+
+<section class="bg-secondary pt-90 pb-75 py-xs-75 ta-c">
     <div class="container">
         <div class="row">
             <div class="col col-12 jc-c">

@@ -44,6 +44,7 @@
   }
 }
 .button-white {
+  background-color: var(--btn-white-bg);
   border: 2px solid #b9c7d6;
   border-radius: 60px;
   color: #a3b4c7;
@@ -56,6 +57,15 @@
       }
     }
   }
+}
+.button-primary {
+    background-color: var(--btn-blue-bg);
+    border: 2px solid var(--btn-blue-border);
+    color: var(--btn-blue-color);
+    &:hover{
+      background-color: var(--btn-blue-bg-hover);
+      border: 2px solid var(--btn-blue-bg-hover);
+    }
 }
 .button-lg {
   width: 400px;

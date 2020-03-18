@@ -1,6 +1,6 @@
 /* -- posts blog of bzx -- */
 .item-blog {
-  background-color: var(--secondary-bg);
+  background-color: var(--bg-post);
   border-radius: 16px;
   @media (max-width: 767px) {
     max-width: 350px;
@@ -8,7 +8,7 @@
   }
   &:hover {
     cursor: pointer;
-    box-shadow: 0px 8px 16px rgba(13, 76, 211, 0.16);
+    box-shadow: var(--shadow-post);
   }
   .item-blog-header {
     img {
@@ -51,7 +51,6 @@
   text-align: center;
   p {
     margin-bottom: 10px;
-    color: var(--primary-color);
     text-align: center;
     @media (max-width: 579px) {
       font-size: 12px;
