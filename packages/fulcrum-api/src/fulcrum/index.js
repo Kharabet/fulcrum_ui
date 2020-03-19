@@ -165,7 +165,7 @@ export default class Fulcrum {
                 const baseAsset = this.getBaseAsset(pToken);
                 const swapPrice = await this.getSwapToUsdRate(baseAsset);
                 const price = new BigNumber(tokenPrice).multipliedBy(usdRates[pToken.asset.toLowerCase()]).dividedBy(10 ** decimals);
-                result[pToken.symbol.toLowerCase()] = price.toNumber();
+                result[pToken.ticker.toLowerCase()] = price.toNumber();
             }
         }
         catch (e) {
