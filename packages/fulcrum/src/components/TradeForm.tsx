@@ -106,6 +106,8 @@ interface ITradeFormState {
 
   isLoading: boolean;
   isExposureLoading: boolean;
+
+  selectedUnitOfAccount: Asset;
 }
 
 export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
@@ -159,7 +161,8 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       isAmountExceeded: false,
       maxAmountMultiplier: maxAmountMultiplier,
       isLoading: true,
-      isExposureLoading: true
+      isExposureLoading: true,
+      selectedUnitOfAccount: this.props.defaultUnitOfAccount
     };
 
     this._inputChange = new Subject();
@@ -201,7 +204,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
   private getTradeTokenGridRowSelectionKey(leverage: number = this.props.leverage) {
     return new TradeTokenKey(
       this.props.asset,
-      this.props.defaultUnitOfAccount,
+      this.state.selectedUnitOfAccount,
       this.props.positionType,
       leverage,
       this.state.tokenizeNeeded,
@@ -234,7 +237,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     const tradeRequest = new TradeRequest(
       this.props.tradeType,
       this.props.asset,
-      this.props.defaultUnitOfAccount,
+      this.state.selectedUnitOfAccount,
       this.state.collateral,
       this.props.positionType,
       this.props.leverage,
@@ -518,7 +521,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
                     process.env.REACT_APP_ETH_NETWORK === "kovan"
                       ? Asset.SAI
                       : Asset.DAI
-                  ]} value={this.props.defaultUnitOfAccount} onChange={this.onChangeUnitOfAccount} />
+                  ]} value={this.state.selectedUnitOfAccount} onChange={this.onChangeUnitOfAccount} />
                 </div>
               </CollapsibleContainer>
             ) : null}
@@ -546,7 +549,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
                 <div className="trade-form__how-it-works">
                   <div className="hiw-icon"><QuestionIcon /></div>
                   <div className="hiw-content">
-                    You are opening {this.props.leverage}x {this.props.positionType} {this.state.assetDetails.displayName} position. You’re borrowing {this.props.defaultUnitOfAccount} from a Fulcrum lending pool and that {this.props.defaultUnitOfAccount} is swapped into {this.state.assetDetails.displayName} using an on-chain DEX.
+                    You are opening {this.props.leverage}x {this.props.positionType} {this.state.assetDetails.displayName} position. You’re borrowing {this.props.defaultUnitOfAccount} from a Fulcrum lending pool and that {this.state.selectedUnitOfAccount} is swapped into {this.state.assetDetails.displayName} using an on-chain DEX.
                 </div>
                 </div>
               </CollapsibleContainer>
@@ -621,6 +624,8 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     if (key.erc20Address === "") {
       version = 1;
     }
+
+    this._isMounted && this.setState({...this.state, selectedUnitOfAccount: asset});
 
     this.props.onTrade(
       new TradeRequest(
@@ -712,7 +717,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
         transactionId: randomNumber,
         transactionTotal: new BigNumber(usdPrice),
         transactionProducts: [{
-          name: this.props.leverage + 'x' + this.props.asset + '-' + this.props.positionType + '-' + this.props.defaultUnitOfAccount,
+          name: this.props.leverage + 'x' + this.props.asset + '-' + this.props.positionType + '-' + this.state.selectedUnitOfAccount,
           sku: this.props.leverage + 'x' + this.props.asset + '-' + this.props.positionType,
           category: this.props.positionType,
           price: new BigNumber(usdPrice),
@@ -725,7 +730,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       new TradeRequest(
         this.props.tradeType,
         this.props.asset,
-        this.props.defaultUnitOfAccount,
+        this.state.selectedUnitOfAccount,
         this.state.collateral,
         this.props.positionType,
         this.props.leverage,
@@ -750,7 +755,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
               const tradeRequest = new TradeRequest(
                 this.props.tradeType,
                 this.props.asset,
-                this.props.defaultUnitOfAccount,
+                this.state.selectedUnitOfAccount,
                 this.state.collateral,
                 this.props.positionType,
                 this.props.leverage,
@@ -793,7 +798,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
           const tradeRequest = new TradeRequest(
             this.props.tradeType,
             this.props.asset,
-            this.props.defaultUnitOfAccount,
+            this.state.selectedUnitOfAccount,
             this.state.collateral,
             this.props.positionType,
             this.props.leverage,
