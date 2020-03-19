@@ -10,13 +10,13 @@ import { iTokens } from '../config/iTokens';
 
 export default ({ config }) => {
 
-	let api = Router();
+	const api = Router();
 	const cache = new NodeCache({ stdTTL: config.cache_ttl_sec, checkperiod: config.cache_ttl_sec });
-	var web3 = new Web3(new Web3.providers.HttpProvider(config.web3_provider_url));
+	const web3 = new Web3(new Web3.providers.HttpProvider(config.web3_provider_url));
 
 
-	var fulcrum = new Fulcrum(web3, cache);
-	var torque = new Torque(web3, cache);
+	const fulcrum = new Fulcrum(web3, cache);
+	const torque = new Torque(web3, cache);
 
 	api.get('/total-asset-supply', async (req, res) => {
 		const totalAssetSupply = await fulcrum.getTotalAssetSupply();
@@ -102,10 +102,8 @@ export default ({ config }) => {
 		let borrowAsset = req.query.borrow_asset;
 		let collateralAsset = req.query.collateral_asset;
 		let amount = req.query.amount;
-		var borrowDepositEstimate = await torque.getBorrowDepositEstimate(borrowAsset, collateralAsset, amount);
+		const borrowDepositEstimate = await torque.getBorrowDepositEstimate(borrowAsset, collateralAsset, amount);
 		res.json(borrowDepositEstimate);
-
-
 	});
 
 	return api;

@@ -22,73 +22,73 @@ export default class Fulcrum {
 
     async setReserveData(key, value) {
         if (key == "reserve_data") {
-            var result = await this.updateReservedData();
+            const result = await this.updateReservedData();
             this.cache.set("reserve_data", result);
         }
     }
 
     async getTotalAssetSupply() {
-        var reserveData = await this.getReserveData()
-        var totalAssetSupply = {};
+        const reserveData = await this.getReserveData()
+        let totalAssetSupply = {};
         reserveData.forEach(item => totalAssetSupply[item.token] = item.totalSupply);
 
         return totalAssetSupply;
     }
 
     async getTotalAssetBorrow() {
-        var reserveData = await this.getReserveData()
-        var totalAssetBorrow = {};
+        const reserveData = await this.getReserveData()
+        let totalAssetBorrow = {};
         reserveData.forEach(item => totalAssetBorrow[item.token] = item.totalBorrow);
 
         return totalAssetBorrow;
     }
 
     async getSupplyRateAPR() {
-        var reserveData = await this.getReserveData()
-        var apr = {};
+        const reserveData = await this.getReserveData()
+        let apr = {};
         reserveData.forEach(item => apr[item.token] = item.supplyInterestRate);
 
         return apr;
     }
 
     async getBorrowRateAPR() {
-        var reserveData = await this.getReserveData()
-        var apr = {};
+        const reserveData = await this.getReserveData()
+        let apr = {};
         reserveData.forEach(item => apr[item.token] = item.borrowInterestRate);
 
         return apr;
     }
 
     async getTorqueBorrowRateAPR() {
-        var reserveData = await this.getReserveData()
-        var torqueBorrowRates = {};
+        const reserveData = await this.getReserveData()
+        let torqueBorrowRates = {};
         reserveData.forEach(item => torqueBorrowRates[item.token] = item.torqueBorrowInterestRate);
         return torqueBorrowRates;
     }
 
     async getVaultBalance() {
-        var reserveData = await this.getReserveData()
-        var vaultBalance = {};
+        const reserveData = await this.getReserveData()
+        let vaultBalance = {};
         reserveData.forEach(item => vaultBalance[item.token] = item.vaultBalance);
         return vaultBalance;
     }
 
     async getFreeLiquidity() {
-        var reserveData = await this.getReserveData()
-        var freeLiquidity = {};
+        const reserveData = await this.getReserveData()
+        let freeLiquidity = {};
         reserveData.forEach(item => freeLiquidity[item.token] = item.liquidity);
         return freeLiquidity;
     }
 
     async getTVL() {
-        var reserveData = await this.getReserveData()
-        var tvl = {};
+        const reserveData = await this.getReserveData()
+        let tvl = {};
         reserveData.forEach(item => tvl[item.token] = item.usdTotalLocked);
         return tvl;
     }
     async getUsdRates() {
-        var reserveData = await this.getReserveData()
-        var usdRates = {};
+        const reserveData = await this.getReserveData()
+        let usdRates = {};
         reserveData.forEach(item => usdRates[item.token] = item.swapToUSDPrice);
         return usdRates;
     }
@@ -208,7 +208,7 @@ export default class Fulcrum {
         var result = [];
         var tokenAddresses = iTokens.map(x => (x.address));
         var swapRates = await this.getSwapToUsdRateBatch(iTokens.find(x => x.name === "dai"));
-        var reserveData = await this.DappHeperContract.methods.reserveDetails(tokenAddresses).call({ from: "0x4abB24590606f5bf4645185e20C4E7B97596cA3B" });
+        const reserveData = await this.DappHeperContract.methods.reserveDetails(tokenAddresses).call({ from: "0x4abB24590606f5bf4645185e20C4E7B97596cA3B" });
 
         let usdTotalLockedAll = new BigNumber(0);
         let usdSupplyAll = new BigNumber(0);
