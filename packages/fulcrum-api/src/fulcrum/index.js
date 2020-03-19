@@ -24,7 +24,23 @@ export default class Fulcrum {
         if (key == "reserve_data") {
             const result = await this.updateReservedData();
             this.cache.set("reserve_data", result);
+            console.log("reserve_data updated");
+            return;
         }
+        if (key == "itoken-prices-usd") {
+            const result = await this.updateITokensPricesUsd();
+            this.cache.set("itoken-prices-usd", result);
+            console.log("itoken-prices-usd updated");
+            return;
+
+        }
+        if (key == "ptoken-prices-usd") {
+            const result = await this.updatePTokensPricesUsd();
+            this.cache.set("ptoken-prices-usd", result);
+            console.log("ptoken-prices-usd updated");
+            return;
+        }
+        console.log("nothing in cache")
     }
 
     async getTotalAssetSupply() {
@@ -94,6 +110,20 @@ export default class Fulcrum {
     }
 
     async getITokensPricesUsd() {
+        var result = this.cache.get("itoken-prices-usd");
+        if (!result) {
+
+            console.warn("No itoken-prices-usd in cache!")
+            result = await this.updateITokensPricesUsd();
+
+            this.cache.set("itoken-prices-usd", result);
+            // console.dir(`itoken-prices-usd:`);
+            // console.dir(result);
+        }
+        return result;
+    }
+
+    async updateITokensPricesUsd() {
         let result = {};
         const usdRates = await this.getUsdRates();
         for (const token in iTokens) {
@@ -109,6 +139,20 @@ export default class Fulcrum {
     }
 
     async getPTokensPricesUsd() {
+        var result = this.cache.get("ptoken-prices-usd");
+        if (!result) {
+
+            console.warn("No ptoken-prices-usd in cache!")
+            result = await this.updatePTokensPricesUsd();
+
+            this.cache.set("ptoken-prices-usd", result);
+            // console.dir(`ptoken-prices-usd:`);
+            // console.dir(result);
+        }
+        return result;
+    }
+
+    async updatePTokensPricesUsd() {
         let result = {};
         const usdRates = await this.getUsdRates();
         try {
@@ -198,8 +242,8 @@ export default class Fulcrum {
             result = await this.updateReservedData();
 
             this.cache.set("reserve_data", result);
-            console.dir(`reserve_data:`);
-            console.dir(result);
+            // console.dir(`reserve_data:`);
+            // console.dir(result);
         }
         return result;
     }
