@@ -103,7 +103,7 @@ export default class Fulcrum {
 
             //price is in loanAsset of iToken contract
             const price = new BigNumber(tokenPrice).multipliedBy(usdRates[iToken.name]).dividedBy(10 ** iToken.decimals);
-            result[iToken.iTokenName] = price.toNumber();
+            result[iToken.iTokenName.toLowerCase()] = price.toNumber();
         }
         return result;
     }
@@ -121,7 +121,7 @@ export default class Fulcrum {
                 const baseAsset = this.getBaseAsset(pToken);
                 const swapPrice = await this.getSwapToUsdRate(baseAsset);
                 const price = new BigNumber(tokenPrice).multipliedBy(usdRates[pToken.asset.toLowerCase()]).dividedBy(10 ** decimals);
-                result[pToken.symbol] = price.toNumber();
+                result[pToken.symbol.toLowerCase()] = price.toNumber();
             }
         }
         catch (e) {
