@@ -191,12 +191,12 @@
         }
       }
     },
-    "/assets-usd-rates": {
+    "/oracle-rates-usd": {
       "get": {
         "tags": [
           "Stats"
         ],
-        "summary": "Get iTokens Rates in USD",
+        "summary": "Oracle Assets Prices in USD",
         "description": "",
         "consumes": [
           "application/json"
