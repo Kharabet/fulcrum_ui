@@ -76,7 +76,7 @@ export default ({ config }) => {
 		res.json(usdRates);
 	});
 
-	api.get('/assets-usd-rates', async (req, res) => {
+	api.get('/oracle-rates-usd', async (req, res) => {
 		const usdRates = await fulcrum.getUsdRates();
 		res.json(usdRates);
 	});
