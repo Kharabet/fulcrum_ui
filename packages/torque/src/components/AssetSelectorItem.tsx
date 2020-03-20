@@ -77,7 +77,7 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
 
 
     return (
-      <div className={`asset-selector-item ${assetTypeModifier} ${isload}`}>
+      <div className={`asset-selector-item ${assetTypeModifier} ${isload}`} onClick={this.onClick}>
         {/*<DotsBar />*/}
         <div className="asset-selector-centeredOverlay" style={ this.state.interestRate.gt(0) ? { display: `none`} : undefined}>
           <span>Loading...</span>
