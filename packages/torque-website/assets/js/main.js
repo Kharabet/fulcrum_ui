@@ -44,9 +44,13 @@ window.addEventListener('load', function () {
 window.onclick = function (event) {
     const listSelect = document.querySelectorAll("ul.select-options");
     const selectStyled = document.querySelectorAll(".select-styled");
+    const options = document.querySelectorAll(".li-options");
     for (let i = 0; i < listSelect.length; i++) {
         if (event.target !== listSelect)
             listSelect[i].style.display = "none";
+    }
+    for (let i = 0; i < options.length; i++) {
+        options[i].classList.remove('hidden');
     }
     selectStyled.forEach(item => item.classList.remove('active'));
     if (event.target !== listSelect) {
@@ -65,15 +69,26 @@ async function collateralEstimate(loanAsset, collateralAsset, amount) {
 async function onLoanInputChange(e) {
     const form = e.currentTarget;
     const inputLoan = form.querySelector('.input-loan');
+    const inputLoanValue = parseInt(inputLoan.value);
+    inputLoanValue > 0
+        ? form.classList.add('active')
+        : form.classList.remove('active');
+    updateCollateralInput();
+}
+
+async function updateCollateralInput() {
+    const form = document.querySelector('.form-loan');
+    const inputLoan = form.querySelector('.input-loan');
     const inputCollateral = form.querySelector('.input-collateral');
     const loanAsset = form.querySelector(".item-form.loan .select-styled").dataset.asset;
     const collateralAsset = form.querySelector(".item-form.collateral .select-styled").dataset.asset;
-    const inputLoanValue = inputLoan.value;
-    inputLoanValue.includes("")
-        ? form.classList.remove('active')
-        : form.classList.add('active');
-    const collateralEstimateValue = await collateralEstimate(loanAsset, collateralAsset, inputLoanValue);
-    inputCollateral.value = collateralEstimateValue;
+    const inputLoanValue = parseInt(inputLoan.value);
+    (inputLoanValue === 0 || inputLoan.value.length === 0)
+        inputCollateral.value = 0;
+    if (inputLoanValue > 0) {
+        const collateralEstimateValue = await collateralEstimate(loanAsset, collateralAsset, inputLoanValue);
+        inputCollateral.value = collateralEstimateValue;
+    }
 }
 
 function setAriaAttr(el, ariaType, newProperty) {
@@ -132,9 +147,10 @@ function onStyledSelectClick(event) {
     const select = current.closest(".select");
     const listSelect = select.querySelector("ul.select-options");
     const options = select.querySelectorAll(".li-options");
-    const asset = current.dataset.asset;
+    const loanAsset = document.querySelector(".item-form.loan .select-styled").dataset.asset;
+    const collateralAsset = document.querySelector(".item-form.collateral .select-styled").dataset.asset;
     for (let i = 0; i < options.length; i++) {
-        if (options[i].dataset.asset && options[i].dataset.asset === asset)
+        if (options[i].dataset.asset && (options[i].dataset.asset === loanAsset || options[i].dataset.asset === collateralAsset))
             options[i].classList.add('hidden');
     }
     if (current.classList.contains("active")) {
@@ -147,7 +163,7 @@ function onStyledSelectClick(event) {
     document.body.classList.add('open-modal');
 }
 
-function onItemFormLiClick(event) {
+async function onItemFormLiClick(event) {
     event.stopPropagation();
     const li = event.currentTarget;
     const itemForm = li.closest('.item-form');
@@ -171,6 +187,7 @@ function onItemFormLiClick(event) {
         if (window.borrowAPR && window.borrowAPR[asset])
             aprComponent.querySelector(".apr-value").textContent = parseFloat(window.borrowAPR[asset]).toFixed(2);
     }
+    updateCollateralInput();
     document.body.classList.remove('open-modal');
 }
 
