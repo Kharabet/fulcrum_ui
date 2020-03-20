@@ -108,6 +108,10 @@
     fill: #495460
   }
 }
+.gradient-susd{
+  border-radius: 50%;
+  background: linear-gradient(135deg, #342F49 15.63%, #000000 88.28%);
+}
 @media(max-width: 767px){
   .icon-sm-50{
     width: 50px;
