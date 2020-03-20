@@ -19,17 +19,17 @@ layout: home
             <div class="col col-12">
                 <div class="mw-100 px-55 px-lg-0">
                 <form class="form-loan">
-                    <div class="item-form">
+                    <div class="item-form loan">
                         <span>Loan</span>
                         <div class="input-with-select">
-                            <input placeholder="0" type="number" class="input" />
+                            <input placeholder="0" type="number" class="input input-loan" />
                             <div class="select">
-                                <div class="select-styled" aria-selected="dai" >
+                                <div class="select-styled" data-asset="dai">
                                     DAI
                                 </div>
                                 <ul class="select-options">
                                     {% for product in site.data.products %}
-                                        <li class="li-options" aria-data="{{ product.name }}">
+                                        <li class="li-options" data-asset="{{ product.name }}">
                                             {% include svg/{{ product.name }}.svg %}
                                             {{ product.name }}
                                         </li>
@@ -41,17 +41,17 @@ layout: home
                     <div class="item-connect"> 
                         {% include svg/connect.svg %}
                     </div>
-                    <div class="item-form">
+                    <div class="item-form collateral">
                         <span>Collateral</span>
                         <div class="input-with-select">
-                            <input placeholder="0" type="number" class="input" />
+                            <input placeholder="0" type="number" class="input input-collateral" readonly/>
                             <div class="select">
-                                <div class="select-styled" aria-selected="eth" >
+                                <div class="select-styled" data-asset="eth" >
                                     ETH
                                 </div>
                                 <ul class="select-options">
                                     {% for product in site.data.products %}
-                                        <li class="li-options" aria-data="{{ product.name }}">
+                                        <li class="li-options" data-asset="{{ product.name }}">
                                             {% include svg/{{ product.name }}.svg %}
                                             {{ product.name }}
                                         </li>
@@ -60,9 +60,9 @@ layout: home
                             </div>
                         </div>
                     </div>
-                    <div class="item-result">
+                    <div class="item-result apr-component"  data-asset="dai">
                         <span>APR <span class="c-gradient fw-900">FIXED</span></span>
-                        <div><span class="value-result">2.54</span>%</div>
+                        <div><span class="value-result apr-value">2.54</span>%</div>
                     </div>
                     <span class="cube">{% include svg/big-cube.svg %}</span>
                 </form>
@@ -432,61 +432,3 @@ layout: home
         </div>
     </div>
 </section>
-<script>
-    let products = {{ site.data.products | jsonify }}; 
-    const onStyledSelectClick = (event) => {
-        event.stopPropagation();    
-        const current = event.currentTarget;  
-        const select = current.closest(".select");  
-        const listSelect = select.querySelector("ul.select-options");
-        const options = select.querySelectorAll(".li-options");
-        const attrSelected = current.getAttribute('aria-selected');
-        for (let i = 0; i < options.length; i++) {
-            if(options[i].getAttribute('aria-data') === attrSelected)
-                options[i].classList.add('hidden');
-        }
-        if (current.classList.contains("active")) {
-          current.classList.remove("active");
-          listSelect.style.display = 'none';
-        } else {
-          current.classList.add("active");
-          listSelect.style.display = 'block';
-        }
-        document.body.classList.add('open-modal');
-    }    
-    const onLiClick = (event) => {
-        event.stopPropagation();
-        const current = event.currentTarget;
-        const select = event.currentTarget.closest(".select");
-        const listSelect = select.querySelector("ul.select-options");
-        const options = select.querySelectorAll(".li-options");
-        const selectStyled = select.querySelector(".select-styled");
-        const attrLi = event.currentTarget.getAttribute("aria-data");
-        selectStyled.textContent = current.textContent;
-        selectStyled.style.backgroundImage = `url(/images/${attrLi.toLowerCase()}.svg)`;
-        selectStyled.classList.remove('active');
-        listSelect.style.display = 'none';        
-        for (let i = 0; i < options.length; i++) {
-            options[i].classList.remove('hidden');
-        }
-        selectStyled.setAttribute('aria-selected', attrLi);
-        document.body.classList.remove('open-modal');
-    }
-    let select = document.querySelectorAll('.select-styled');
-    let options = document.querySelectorAll('.li-options');
-    var modal = document.querySelector('.modal');
-    select.forEach(selected => selected.addEventListener("click", onStyledSelectClick));
-    options.forEach(option => option.addEventListener("click", onLiClick));
-    window.onclick = function(event) {
-        const listSelect = document.querySelectorAll("ul.select-options");
-        const selectStyled = document.querySelectorAll(".select-styled");
-        for (let i = 0; i < listSelect.length; i++) {
-            if (event.target !== listSelect)
-                listSelect[i].style.display = "none";
-        }
-        selectStyled.forEach(item => item.classList.remove('active'));
-        if (event.target !== listSelect) {
-            document.body.classList.remove('open-modal');
-        }
-    }
-</script>
