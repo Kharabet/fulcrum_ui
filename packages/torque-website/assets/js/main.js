@@ -179,4 +179,5 @@ async function getTorqueBorrowApr() {
     const response = await fetch(requestUrl);
     const responseJson = await response.json();
     renderBorrowApr(responseJson);
+    window.borrowAPR = responseJson;
 }
