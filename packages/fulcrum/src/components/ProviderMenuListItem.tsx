@@ -17,9 +17,9 @@ export class ProviderMenuListItem extends Component<IProviderMenuListItemProps> 
     }
 
     const content = providerTypeDetails.logoSvg
-    ? 
-      (<div className="provider-menu__list-item-content-img">{providerTypeDetails.reactLogoSvg.render()}</div>) 
-    : 
+      ?
+      (<div className="provider-menu__list-item-content-img">{providerTypeDetails.reactLogoSvg.render()}</div>)
+      :
       (<div className="provider-menu__list-item-content-txt">{providerTypeDetails.displayName}</div>);
 
     const isProviderTypeActiveClass =
@@ -28,6 +28,11 @@ export class ProviderMenuListItem extends Component<IProviderMenuListItemProps> 
     return (
       <li className={`provider-menu__list-item ${isProviderTypeActiveClass}`} onClick={this.onClick}>
         {content}
+        {this.props.providerType === ProviderType.Squarelink ? <span className="warning" style={{
+          textAlign: "center",
+          fontSize: "12px",
+          color: "var(--trade-header-color)"
+        }}>Please note: Squrelink has shutdown. We recommend to move to a different wallet.</span> : null}
       </li>
     );
   }
