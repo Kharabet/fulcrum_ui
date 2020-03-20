@@ -23,17 +23,17 @@ window.addEventListener('load', function () {
     }
 
     toggleSwitch.addEventListener('change', switchTheme, false);
-    
+
     //accordion
     var accordions = document.querySelectorAll('#accordion .accordion-toggle');
     for (var i = 0; i < accordions.length; i++) {
         accordions[i].addEventListener("click", updateAccordion, false);
     }
 
-    function setAriaAttr (el, ariaType, newProperty) {
+    function setAriaAttr(el, ariaType, newProperty) {
         el.setAttribute(ariaType, newProperty);
     };
-    function setAccordionAria (el, expanded) {
+    function setAccordionAria(el, expanded) {
         switch (expanded) {
             case "true":
                 setAriaAttr(el, 'aria-hidden', 'false');
@@ -45,11 +45,11 @@ window.addEventListener('load', function () {
                 break;
         }
     };
-    function updateAccordion(e) {   
-        if(e.currentTarget.parentElement.classList.contains("active")){        
+    function updateAccordion(e) {
+        if (e.currentTarget.parentElement.classList.contains("active")) {
             setAccordionAria(e.currentTarget.nextElementSibling, "false");
             e.currentTarget.parentElement.classList.remove("active");
-        }else{
+        } else {
             setAccordionAria(e.currentTarget.nextElementSibling, "true");
             e.currentTarget.parentElement.classList.add("active");
         }
@@ -60,4 +60,16 @@ window.addEventListener('load', function () {
         if (url[i].getAttribute("href") == window.location.pathname)
             url[i].classList.add("active-url");
     }
+
+    function checkActiveForm() {
+        let form = document.querySelector('.form-loan');
+        let inputs = form.querySelectorAll('.input');
+        let inputsArray = Array.prototype.slice.call(inputs);
+        let values = [];
+        inputsArray.forEach(element => values.push(element.value));
+        values.includes("") ? form.classList.remove('active') : form.classList.add('active');
+    }
+
+    let inputs = document.querySelectorAll('.input');
+    inputs.forEach(input => input.addEventListener("input", checkActiveForm, false));
 });
