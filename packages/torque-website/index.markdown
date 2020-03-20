@@ -22,7 +22,7 @@ layout: home
                     <div class="item-form loan">
                         <span>Loan</span>
                         <div class="input-with-select">
-                            <input placeholder="0" type="number" class="input input-loan" />
+                            <input placeholder="0" type="number" step="any" class="input input-loan" />
                             <div class="select">
                                 <div class="select-styled" data-asset="dai">
                                     DAI
@@ -44,7 +44,7 @@ layout: home
                     <div class="item-form collateral">
                         <span>Collateral</span>
                         <div class="input-with-select">
-                            <input placeholder="0" type="number" class="input input-collateral" readonly/>
+                            <input placeholder="0" type="number" step="any" class="input input-collateral" readonly/>
                             <div class="select">
                                 <div class="select-styled" data-asset="eth" >
                                     ETH
