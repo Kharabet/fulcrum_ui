@@ -170,7 +170,7 @@ function onItemFormLiClick(event) {
         const aprComponent = form.querySelector(".apr-component");
         aprComponent.dataset.asset = asset;
         if (window.borrowAPR && window.borrowAPR[asset])
-            aprComponent.querySelector(".apr-value").textContent = window.borrowAPR[asset];
+            aprComponent.querySelector(".apr-value").textContent = parseFloat(window.borrowAPR[asset]).toFixed(2);
     }
     document.body.classList.remove('open-modal');
 }
