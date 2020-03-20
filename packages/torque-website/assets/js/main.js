@@ -23,11 +23,6 @@ window.addEventListener('load', function () {
         accordions[i].addEventListener("click", updateAccordion, false);
     }
 
-    function setAriaAttr(el, ariaType, newProperty) {
-        el.setAttribute(ariaType, newProperty);
-    };
-
-
     var url = document.querySelectorAll('.nav-menu');
     for (var i = 0; i < url.length; i++) {
         if (url[i].getAttribute("href") == window.location.pathname)
@@ -80,6 +75,10 @@ async function onLoanInputChange(e) {
     const collateralEstimateValue = await collateralEstimate(loanAsset, collateralAsset, inputLoanValue);
     inputCollateral.value = collateralEstimateValue;
 }
+
+function setAriaAttr(el, ariaType, newProperty) {
+    el.setAttribute(ariaType, newProperty);
+};
 
 function updateAccordion(e) {
     if (e.currentTarget.parentElement.classList.contains("active")) {
