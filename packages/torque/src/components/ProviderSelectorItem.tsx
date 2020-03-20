@@ -54,7 +54,7 @@ export class ProviderSelectorItem extends Component<IProviderSelectorItemProps> 
           </div>
           <div className="provider-selector-item__title">{this.props.providerType}</div>
           {this.props.providerType === ProviderType.Squarelink 
-          ? <span style={{fontSize: "10px", textAlign: "center", maxWidth: "80%", margin: "5px auto"}}>Please note: Squrelink has shutdown. We recommend to move to a different wallet.</span> 
+          ? <span style={{fontSize: "10px", textAlign: "center", maxWidth: "80%", margin: "5px auto"}}>Please note: Squarelink has shutdown. We recommend moving your funds to a different wallet.</span>
           : null}
         </div>
       </div>

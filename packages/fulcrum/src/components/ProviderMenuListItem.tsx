@@ -32,7 +32,7 @@ export class ProviderMenuListItem extends Component<IProviderMenuListItemProps> 
           textAlign: "center",
           fontSize: "12px",
           color: "var(--trade-header-color)"
-        }}>Please note: Squrelink has shutdown. We recommend to move to a different wallet.</span> : null}
+        }}>Please note: Squarelink has shutdown. We recommend moving your funds to a different wallet.</span> : null}
       </li>
     );
   }
