@@ -1,16 +1,60 @@
 const apiUrl = "https://fulcrum-api-dev.herokuapp.com/api";
 
-async function getTorqueBorrowApr(){
+async function getTorqueBorrowApr() {
     const requestUrl = `${apiUrl}/torque-borrow-rate-apr`;
     const respone = await fetch(requestUrl);
     const responseJson = await response.json();
 
 }
 
-function renderBorrowApr(apr){
-    
+function renderBorrowApr(apr) {
+
 }
 
+function onStyledSelectClick(event) {
+    event.stopPropagation();
+    const current = event.currentTarget;
+    const select = current.closest(".select");
+    const listSelect = select.querySelector("ul.select-options");
+    const options = select.querySelectorAll(".li-options");
+    const asset = current.dataset.asset;
+    for (let i = 0; i < options.length; i++) {
+        if (options[i].dataset.asset && options[i].dataset.asset === asset)
+            options[i].classList.add('hidden');
+    }
+    if (current.classList.contains("active")) {
+        current.classList.remove("active");
+        listSelect.style.display = 'none';
+    } else {
+        current.classList.add("active");
+        listSelect.style.display = 'block';
+    }
+    document.body.classList.add('open-modal');
+}
+function onItemFormLiClick (event) {
+    event.stopPropagation();
+    const li = event.currentTarget;
+    const itemForm = li.closest('.item-form');
+    const select = li.closest(".select");
+    const listSelect = select.querySelector("ul.select-options");
+    const options = select.querySelectorAll(".li-options");
+    const selectStyled = select.querySelector(".select-styled");
+    const asset = li.dataset.asset;
+    selectStyled.textContent = li.textContent;
+    selectStyled.style.backgroundImage = `url(/images/${asset.toLowerCase()}.svg)`;
+    selectStyled.classList.remove('active');
+    listSelect.style.display = 'none';
+    for (let i = 0; i < options.length; i++) {
+        options[i].classList.remove('hidden');
+    }
+    selectStyled.dataset.asset = asset;
+    if (itemForm.classList.contains("loan")) {
+        const form = li.closest('form.form-loan');
+        const aprComponent = form.querySelector(".apr-component");
+        aprComponent.dataset.asset = asset;
+    }
+    document.body.classList.remove('open-modal');
+}
 window.addEventListener('load', function () {
     //switch theme
     var toggleSwitch = document.querySelector('.theme-switch input[type="checkbox"]');
@@ -98,4 +142,24 @@ window.addEventListener('load', function () {
 
     const formLoan = document.querySelector('.form-loan');
     formLoan.addEventListener("input", onLoanInputChange, false);
+
+
+    const itemForm = document.querySelectorAll('.item-form');
+    itemForm.forEach(item => {
+        item.querySelector('.select-styled').addEventListener("click", onStyledSelectClick);
+        item.querySelectorAll('.li-options').forEach(option => option.addEventListener("click", onItemFormLiClick));
+    });
 });
+
+window.onclick = function (event) {
+    const listSelect = document.querySelectorAll("ul.select-options");
+    const selectStyled = document.querySelectorAll(".select-styled");
+    for (let i = 0; i < listSelect.length; i++) {
+        if (event.target !== listSelect)
+            listSelect[i].style.display = "none";
+    }
+    selectStyled.forEach(item => item.classList.remove('active'));
+    if (event.target !== listSelect) {
+        document.body.classList.remove('open-modal');
+    }
+}
