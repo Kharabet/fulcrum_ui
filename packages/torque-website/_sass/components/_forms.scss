@@ -91,10 +91,10 @@
     background-position: 4px 50%;
     padding-left: 40px;
     text-transform: uppercase;
-    &[aria-selected="dai"] {
+    &[data-asset="dai"] {
       background-image: url(/images/dai.svg);
     }
-    &[aria-selected="eth"] {
+    &[data-asset="eth"] {
       background-image: url(/images/eth.svg);
     }
     &.active {

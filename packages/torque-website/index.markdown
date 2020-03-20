@@ -19,17 +19,17 @@ layout: home
             <div class="col col-12">
                 <div class="mw-100 px-55">
                 <form class="form-loan">
-                    <div class="item-form">
+                    <div class="item-form loan">
                         <span>Loan</span>
                         <div class="input-with-select">
-                            <input placeholder="0" type="number" class="input" />
+                            <input placeholder="0" type="number" class="input input-loan" />
                             <div class="select">
-                                <div class="select-styled" aria-selected="dai" >
+                                <div class="select-styled" data-asset="dai">
                                     DAI
                                 </div>
                                 <ul class="select-options">
                                     {% for product in site.data.products %}
-                                        <li class="li-options" aria-data="{{ product.name }}">
+                                        <li class="li-options" data-asset="{{ product.name }}">
                                             {% include svg/{{ product.name }}.svg %}
                                             {{ product.name }}
                                         </li>
@@ -41,17 +41,17 @@ layout: home
                     <div class="item-connect"> 
                         {% include svg/connect.svg %}
                     </div>
-                    <div class="item-form">
+                    <div class="item-form collateral">
                         <span>Collateral</span>
                         <div class="input-with-select">
-                            <input placeholder="0" type="number" class="input" />
+                            <input placeholder="0" type="number" class="input input-collateral" readonly/>
                             <div class="select">
-                                <div class="select-styled" aria-selected="eth" >
+                                <div class="select-styled" data-asset="eth" >
                                     ETH
                                 </div>
                                 <ul class="select-options">
                                     {% for product in site.data.products %}
-                                        <li class="li-options" aria-data="{{ product.name }}">
+                                        <li class="li-options" data-asset="{{ product.name }}">
                                             {% include svg/{{ product.name }}.svg %}
                                             {{ product.name }}
                                         </li>
@@ -60,9 +60,9 @@ layout: home
                             </div>
                         </div>
                     </div>
-                    <div class="item-result">
+                    <div class="item-result apr-component"  data-token="dai">
                         <span>APR <span class="c-gradient fw-900">FIXED</span></span>
-                        <div><span class="value-result">2.54</span>%</div>
+                        <div><span class="value-result apr-value">2.54</span>%</div>
                     </div>
                     <span class="cube">{% include svg/big-cube.svg %}</span>
                 </form>
@@ -440,9 +440,9 @@ layout: home
         const select = current.closest(".select");  
         const listSelect = select.querySelector("ul.select-options");
         const options = select.querySelectorAll(".li-options");
-        const attrSelected = current.getAttribute('aria-selected');
+        const asset = current.dataset.asset;
         for (let i = 0; i < options.length; i++) {
-            if(options[i].getAttribute('aria-data') === attrSelected)
+            if(options[i].dataset.asset && options[i].dataset.asset === asset)
                 options[i].classList.add('hidden');
         }
         if (current.classList.contains("active")) {
@@ -461,15 +461,15 @@ layout: home
         const listSelect = select.querySelector("ul.select-options");
         const options = select.querySelectorAll(".li-options");
         const selectStyled = select.querySelector(".select-styled");
-        const attrLi = event.currentTarget.getAttribute("aria-data");
+        const asset = event.currentTarget.dataset.asset;
         selectStyled.textContent = current.textContent;
-        selectStyled.style.backgroundImage = `url(/images/${attrLi.toLowerCase()}.svg)`;
+        selectStyled.style.backgroundImage = `url(/images/${asset.toLowerCase()}.svg)`;
         selectStyled.classList.remove('active');
         listSelect.style.display = 'none';        
         for (let i = 0; i < options.length; i++) {
             options[i].classList.remove('hidden');
         }
-        selectStyled.setAttribute('aria-selected', attrLi);
+        selectStyled.dataset.asset = asset;
         document.body.classList.remove('open-modal');
     }
     let select = document.querySelectorAll('.select-styled');

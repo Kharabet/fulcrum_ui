@@ -1,3 +1,16 @@
+const apiUrl = "https://fulcrum-api-dev.herokuapp.com/api";
+
+async function getTorqueBorrowApr(){
+    const requestUrl = `${apiUrl}/torque-borrow-rate-apr`;
+    const respone = await fetch(requestUrl);
+    const responseJson = await response.json();
+
+}
+
+function renderBorrowApr(apr){
+    
+}
+
 window.addEventListener('load', function () {
     //switch theme
     var toggleSwitch = document.querySelector('.theme-switch input[type="checkbox"]');
@@ -61,15 +74,28 @@ window.addEventListener('load', function () {
             url[i].classList.add("active-url");
     }
 
-    function checkActiveForm() {
-        let form = document.querySelector('.form-loan');
-        let inputs = form.querySelectorAll('.input');
-        let inputsArray = Array.prototype.slice.call(inputs);
-        let values = [];
-        inputsArray.forEach(element => values.push(element.value));
-        values.includes("") ? form.classList.remove('active') : form.classList.add('active');
+    async function onLoanInputChange(e) {
+        const form = e.currentTarget;
+        const inputLoan = form.querySelector('.input-loan');
+        const inputCollateral = form.querySelector('.input-collateral');
+        const loanAsset = form.querySelector(".item-form.loan .select-styled").dataset.asset;
+        const collateralAsset = form.querySelector(".item-form.collateral .select-styled").dataset.asset;
+        const inputLoanValue = inputLoan.value;
+        inputLoanValue.includes("")
+            ? form.classList.remove('active')
+            : form.classList.add('active');
+        const collateralEstimateValue = await collateralEstimate(loanAsset, collateralAsset, inputLoanValue);
+        inputCollateral.value = collateralEstimateValue;
     }
 
-    let inputs = document.querySelectorAll('.input');
-    inputs.forEach(input => input.addEventListener("input", checkActiveForm, false));
+    async function collateralEstimate(loanAsset, collateralAsset, amount) {
+        const requestUrl = `${apiUrl}//borrow-deposit-estimate?borrow_asset=${loanAsset}&collateral_asset=${collateralAsset}&amount=${amount}`;
+        const collateralEstimateResponse = await fetch(requestUrl);
+        const responseJson = await collateralEstimateResponse.json();
+        const depositAmount = responseJson.depositAmount;
+        return depositAmount;
+    }
+
+    const formLoan = document.querySelector('.form-loan');
+    formLoan.addEventListener("input", onLoanInputChange, false);
 });
