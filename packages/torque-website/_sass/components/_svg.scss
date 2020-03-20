@@ -83,6 +83,31 @@
     margin: auto;
   }
 }
+.left-triangle{
+  [data-theme="dark"] & {
+    fill: #B9C7D6;
+  }
+}
+.right-triangle{
+  [data-theme="dark"] & {
+    fill: #939FAC
+  }
+}
+.top-cube{
+  [data-theme="dark"] & {
+    fill: #C3CDD8;
+  }
+}
+.left-cube{
+  [data-theme="dark"] & {
+    fill: #939FAC;
+  }
+}
+.right-cube{
+  [data-theme="dark"] & {
+    fill: #495460
+  }
+}
 @media(max-width: 767px){
   .icon-sm-50{
     width: 50px;

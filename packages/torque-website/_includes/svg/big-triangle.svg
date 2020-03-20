@@ -3,8 +3,8 @@
     <g filter="url(#big-triangle)">
         <path d="M52.1795 40.6714L88.359 59.1494L52.1795 77.6261L16 59.1494L52.1795 40.6714Z" fill="#D9EBFD"/>
     </g>
-    <path d="M52.1795 0.158752V77.6308L16 59.1528L52.1795 0.158752Z" fill="#F3F9FF"/>
-    <path d="M52.1796 0.158752V77.6308L88.3591 59.1528L52.1796 0.158752Z" fill="#DDE2E8"/>
+    <path d="M52.1795 0.158752V77.6308L16 59.1528L52.1795 0.158752Z" fill="#F3F9FF" class="left-triangle" />
+    <path d="M52.1796 0.158752V77.6308L88.3591 59.1528L52.1796 0.158752Z" fill="#DDE2E8" class="right-triangle" />
     <defs>
         <filter id="big-triangle" x="0" y="40.6714" width="104.359" height="92.9547" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
             <feFlood flood-opacity="0" result="BackgroundImageFix"/>

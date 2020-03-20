@@ -1,10 +1,10 @@
 <svg width="108" height="112" viewBox="0 0 108 112" fill="none" 
     xmlns="http://www.w3.org/2000/svg">
     <g filter="url(#big-cube)">
-        <path d="M53.9161 0L83.8322 13.8054L53.9161 27.6108L24 13.8054L53.9161 0Z" fill="#F6F8FB"/>
+        <path d="M53.9161 0L83.8322 13.8054L53.9161 27.6108L24 13.8054L53.9161 0Z" fill="#F6F8FB" class="top-cube" />
     </g>
-    <path d="M24 13.8057L53.9161 27.6111V62.1228L24 48.3174V13.8057Z" fill="#DEE3EA"/>
-    <path d="M83.8322 13.8057L53.916 27.6111V62.1228L83.8322 48.3174V13.8057Z" fill="#CFD6E0"/>
+    <path d="M24 13.8057L53.9161 27.6111V62.1228L24 48.3174V13.8057Z" fill="#DEE3EA" class="left-cube" />
+    <path d="M83.8322 13.8057L53.916 27.6111V62.1228L83.8322 48.3174V13.8057Z" fill="#CFD6E0" class="right-cube" />
     <defs>
         <filter id="big-cube" x="0" y="0" width="107.832" height="111.611" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
             <feFlood flood-opacity="0" result="BackgroundImageFix"/>
