@@ -11,16 +11,16 @@ h1 {
   font-weight: 800;
   line-height: 1;
   letter-spacing: -0.02em;
-  @media (max-width: 1199px) {
+  @media screen and (max-width: $breakpoint-lg-down) {
     font-size: 112px;
   }
-  @media (max-width: 991px) {
+  @media screen and (max-width: $breakpoint-md-down) {
     font-size: 96px;
   }
-  @media (max-width: 767px) {
+  @media screen and (max-width: $breakpoint-sm-down) {
     font-size: 70px;
   }
-  @media (max-width: 579px) {
+  @media screen and (max-width: $breakpoint-xs-down) {
     font-size: 56px;
   }
 }
@@ -28,13 +28,13 @@ h2 {
   font-size: 44px;
   font-weight: 900;
   line-height: 1.2;
-  @media (max-width: 991px) {
+  @media screen and (max-width: $breakpoint-md-down) {
     font-size: 36px;
   }
-  @media (max-width: 767px) {
+  @media screen and (max-width: $breakpoint-sm-down) {
     font-size: 32px;
   }
-  @media (max-width: 579px) {
+  @media screen and (max-width: $breakpoint-xs-down) {
     font-size: 28px;
   }
 }
@@ -42,7 +42,7 @@ h3 {
   font-size: 24px;
   line-height: 1.5;
   font-weight: 800;
-  @media (max-width: 579px) {
+  @media screen and (max-width: $breakpoint-xs-down) {
     font-size: 20px;
   }
 }
@@ -50,7 +50,7 @@ h4 {
   font-size: 22px;
   line-height: 1.5;
   font-weight: 900;
-  @media (max-width: 579px) {
+  @media screen and (max-width: $breakpoint-xs-down) {
     font-size: 16px;
   }
 }
@@ -59,7 +59,7 @@ h5 {
   line-height: 1.25;
   font-weight: 700;
   color: var(--secondary-color);
-  @media (max-width: 767px) {
+  @media screen and (max-width: $breakpoint-sm-down) {
     font-size: 16px;
   }
 }
@@ -175,7 +175,7 @@ a {
     }
   }
 }
-@media (max-width: 991px) {
+@media screen and (max-width: $breakpoint-md-down) {
   .fs-md-13 {
     font-size: 13px;
   }
@@ -189,7 +189,7 @@ a {
     font-size: 36px;
   }
 }
-@media (max-width: 767px) {
+@media screen and (max-width: $breakpoint-sm-down) {
   .fs-sm-16 {
     font-size: 16px;
   }
@@ -197,7 +197,7 @@ a {
     font-size: 10px;
   }
 }
-@media (max-width: 579px) {
+@media screen and (max-width: $breakpoint-xs-down) {
   .fs-xs-12 {
     font-size: 12px;
   }

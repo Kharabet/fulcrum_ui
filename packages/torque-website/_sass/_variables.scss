@@ -53,3 +53,15 @@
   --bg-post: #3d4651;
   --shadow-post: 0px 12px 20px rgba(0, 0, 0, 0.1);
 }
+
+$breakpoint-xl-down: 1409px;
+$breakpoint-lg-down: 1199px;
+$breakpoint-md-down: 991px;
+$breakpoint-sm-down: 767px;
+$breakpoint-xs-down: 579px;
+
+$breakpoint-xl-up: 1410px;
+$breakpoint-lg-up: 1200px;
+$breakpoint-md-up: 992px;
+$breakpoint-sm-up: 768px;
+$breakpoint-xs-up: 580px;
