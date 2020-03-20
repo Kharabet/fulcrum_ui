@@ -60,7 +60,7 @@ layout: home
                             </div>
                         </div>
                     </div>
-                    <div class="item-result apr-component"  data-token="dai">
+                    <div class="item-result apr-component"  data-asset="dai">
                         <span>APR <span class="c-gradient fw-900">FIXED</span></span>
                         <div><span class="value-result apr-value">2.54</span>%</div>
                     </div>
@@ -454,29 +454,38 @@ layout: home
         }
         document.body.classList.add('open-modal');
     }    
-    const onLiClick = (event) => {
+    const onItemFormLiClick = (event) => {
         event.stopPropagation();
-        const current = event.currentTarget;
-        const select = event.currentTarget.closest(".select");
+        const li = event.currentTarget;
+        const itemForm = li.closest('.item-form');
+        const select = li.closest(".select");
         const listSelect = select.querySelector("ul.select-options");
         const options = select.querySelectorAll(".li-options");
         const selectStyled = select.querySelector(".select-styled");
-        const asset = event.currentTarget.dataset.asset;
-        selectStyled.textContent = current.textContent;
+        const asset = li.dataset.asset;
+        selectStyled.textContent = li.textContent;
         selectStyled.style.backgroundImage = `url(/images/${asset.toLowerCase()}.svg)`;
         selectStyled.classList.remove('active');
         listSelect.style.display = 'none';        
         for (let i = 0; i < options.length; i++) {
             options[i].classList.remove('hidden');
         }
-        selectStyled.dataset.asset = asset;
+        selectStyled.dataset.asset = asset;        
+        if (itemForm.classList.contains("loan")){
+            const form = li.closest('form.form-loan');
+            const aprComponent = form.querySelector(".apr-component");
+            aprComponent.dataset.asset=asset;
+        }
         document.body.classList.remove('open-modal');
     }
+    let itemForm = document.querySelectorAll('.item-form');
     let select = document.querySelectorAll('.select-styled');
     let options = document.querySelectorAll('.li-options');
     var modal = document.querySelector('.modal');
-    select.forEach(selected => selected.addEventListener("click", onStyledSelectClick));
-    options.forEach(option => option.addEventListener("click", onLiClick));
+    itemForm.forEach(item => {
+        item.querySelector('.select-styled').addEventListener("click", onStyledSelectClick);
+        item.querySelectorAll('.li-options').forEach(option => option.addEventListener("click", onItemFormLiClick));
+    });
     window.onclick = function(event) {
         const listSelect = document.querySelectorAll("ul.select-options");
         const selectStyled = document.querySelectorAll(".select-styled");
