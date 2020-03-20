@@ -120,8 +120,7 @@ function renderBorrowApr(apr) {
     aprComponents.forEach(aprComponent => {
         if (!aprComponent.dataset.asset) return;
         const asset = aprComponent.dataset.asset;
-        if (apr[asset] !== undefined)
-        {
+        if (apr[asset] !== undefined) {
             const aprValue = aprComponent.querySelector(".apr-value");
             aprValue.textContent = parseFloat(apr[asset]).toFixed(2);
         }
@@ -170,6 +169,8 @@ function onItemFormLiClick(event) {
         const form = li.closest('form.form-loan');
         const aprComponent = form.querySelector(".apr-component");
         aprComponent.dataset.asset = asset;
+        if (window.borrowAPR && window.borrowAPR[asset])
+            aprComponent.querySelector(".apr-value").textContent = window.borrowAPR[asset];
     }
     document.body.classList.remove('open-modal');
 }
