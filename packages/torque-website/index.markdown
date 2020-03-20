@@ -79,7 +79,7 @@ layout: home
                 </h2>
             </div>
             <div class="col col-7 col-lg-9 col-md-12 apr-wrapper">
-                <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-token="bat">
+                <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-asset="bat">
                     <div class="icon-50 mr-15 mr-xl-5 mr-xs-9">
                         {% include svg/bat.svg %}
                     </div>
@@ -88,7 +88,7 @@ layout: home
                         <p class="fs-24 fs-xl-21 lh-125 apr-value-after"><span class="fw-800 apr-value">5.3</span>%</p>
                     </div>
                 </div>
-                <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-token="knc">
+                <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-asset="knc">
                     <div class="icon-50 mr-15 mr-xl-5 mr-xs-9">
                         {% include svg/knc.svg %}
                     </div>
@@ -97,7 +97,7 @@ layout: home
                         <p class="fs-24 fs-xl-21 lh-125 apr-value-after"><span class="fw-800 apr-value">5.3</span>%</p>
                     </div>
                 </div>
-                <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-token="rep">
+                <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-asset="rep">
                     <div class="icon-50 mr-15 mr-xl-5 mr-xs-9">
                         {% include svg/rep.svg %}
                     </div>
@@ -106,7 +106,7 @@ layout: home
                         <p class="fs-24 fs-xl-21 lh-125 apr-value-after"><span class="fw-800 apr-value">5.3</span>%</p>
                     </div>
                 </div>
-                <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-token="zrx">
+                <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-asset="zrx">
                     <div class="icon-50 mr-15 mr-xl-5 mr-xs-9">
                         {% include svg/zrx.svg %}
                     </div>
@@ -115,7 +115,7 @@ layout: home
                         <p class="fs-24 fs-xl-21 lh-125 apr-value-after"><span class="fw-800 apr-value">1.6</span>%</p>
                     </div>
                 </div>
-                <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-token="eth">
+                <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-asset="eth">
                     <div class="icon-50 mr-15 mr-xl-5 mr-xs-9">
                         {% include svg/eth.svg %}
                     </div>
@@ -124,7 +124,7 @@ layout: home
                         <p class="fs-24 fs-xl-21 lh-125 apr-value-after"><span class="fw-800 apr-value">4.2</span>%</p>
                     </div>
                 </div>
-                <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-token="link">
+                <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-asset="link">
                     <div class="icon-50 mr-15 mr-xl-5 mr-xs-9">
                         {% include svg/link.svg %}
                     </div>
@@ -133,7 +133,7 @@ layout: home
                         <p class="fs-24 fs-xl-21 lh-125 apr-value-after"><span class="fw-800 apr-value">4.2</span>%</p>
                     </div>
                 </div>
-                <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-token="susd">
+                <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-asset="susd">
                     <div class="icon-50 mr-15 mr-xl-5 mr-xs-9">
                         {% include svg/susd.svg %}
                     </div>
@@ -142,7 +142,7 @@ layout: home
                         <p class="fs-24 fs-xl-21 lh-125 apr-value-after"><span class="fw-800 apr-value">4.2</span>%</p>
                     </div>
                 </div>
-                <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-token="wbtc">
+                <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-asset="wbtc">
                     <div class="icon-50 mr-15 mr-xl-5 mr-xs-9">
                         {% include svg/wbtc.svg %}
                     </div>

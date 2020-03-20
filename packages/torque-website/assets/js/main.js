@@ -1,5 +1,6 @@
 const apiUrl = "https://fulcrum-api-dev.herokuapp.com/api";
 
+(getTorqueBorrowApr)();
 
 window.addEventListener('load', function () {
     //switch theme
@@ -115,7 +116,16 @@ function switchTheme(e) {
     }
 }
 function renderBorrowApr(apr) {
-
+    const aprComponents = document.querySelectorAll(".apr-component");
+    aprComponents.forEach(aprComponent => {
+        if (!aprComponent.dataset.asset) return;
+        const asset = aprComponent.dataset.asset;
+        if (apr[asset] !== undefined)
+        {
+            const aprValue = aprComponent.querySelector(".apr-value");
+            aprValue.textContent = parseFloat(apr[asset]).toFixed(2);
+        }
+    })
 }
 
 function onStyledSelectClick(event) {
@@ -166,7 +176,7 @@ function onItemFormLiClick(event) {
 
 async function getTorqueBorrowApr() {
     const requestUrl = `${apiUrl}/torque-borrow-rate-apr`;
-    const respone = await fetch(requestUrl);
+    const response = await fetch(requestUrl);
     const responseJson = await response.json();
-
+    renderBorrowApr(responseJson);
 }
