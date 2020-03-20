@@ -2,7 +2,7 @@
 .item-blog {
   background-color: var(--bg-post);
   border-radius: 16px;
-  @media (max-width: 767px) {
+  @media screen and (max-width: $breakpoint-sm-down) {
     max-width: 350px;
     margin: 0 auto 20px auto;
   }
@@ -23,11 +23,13 @@
 .apr-wrapper {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  margin-top: 60px;
-  @media (max-width: 767px) {
+  @media screen and (min-width: $breakpoint-lg-up){
+    margin-top: 60px;
+  }
+  @media screen and (max-width: $breakpoint-sm-down) {
     grid-template-columns: repeat(3, 1fr);
   }
-  @media (max-width: 479px) {
+  @media screen and (max-width: 479px) {
     grid-template-columns: repeat(2, 1fr);
   }
 }
@@ -52,7 +54,7 @@
   p {
     margin-bottom: 10px;
     text-align: center;
-    @media (max-width: 579px) {
+    @media screen and (max-width: $breakpoint-xs-down) {
       font-size: 12px;
     }
   }
@@ -60,10 +62,10 @@
     display: flex;
     justify-content: center;
     svg {
-      @media (min-width: 580px) {
+      @media screen and (min-width: $breakpoint-xs-up) {
         width: 120px;
       }
-      @media (max-width: 579px) {
+      @media screen and (max-width: $breakpoint-xs-down) {
         width: 80px;
       }
     }
@@ -76,10 +78,10 @@
   .icon-reason {
     margin-right: 40px;
     svg {
-      @media (min-width: 580px) {
+      @media screen and (min-width: $breakpoint-xs-up) {
         width: 120px;
       }
-      @media (max-width: 579px) {
+      @media screen and (max-width: $breakpoint-xs-down) {
         width: 80px;
       }
     }
@@ -149,22 +151,22 @@
   position: absolute;
 
   z-index: 3;
-  @media (min-width: 992px) {
+  @media screen and (min-width: $breakpoint-md-up) {
     left: -32px;
   }
-  @media (max-width: 991px) {
+  @media screen and (max-width: $breakpoint-md-down) {
     left: 0;
     right: 0;
     margin: auto;
   }
-  @media (min-width: 768px) {
+  @media screen and (min-width: $breakpoint-sm-up) {
     width: 60px;
     height: 60px;
     border: 8px solid var(--secondary-bg);
     top: -32px;
     font-size: 18px;
   }
-  @media (max-width: 767px) {
+  @media screen and (max-width: $breakpoint-sm-down) {
     width: 48px;
     height: 48px;
     border: 5px solid var(--secondary-bg);

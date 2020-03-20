@@ -1,15 +1,15 @@
 footer {
-    @media (min-width: 992px) {
+    @media screen and (min-width: $breakpoint-md-up) {
       padding: 85px 0;
     }
-    @media (max-width: 991px) {
+    @media screen and (max-width: $breakpoint-md-down) {
       padding: 45px 0;
     }
     .bzx-logo {
-      @media (min-width: 768px) {
+      @media screen and (min-width: $breakpoint-sm-up) {
         max-width: 140px;
       }
-      @media (max-width: 767px) {
+      @media screen and (max-width: $breakpoint-sm-down) {
         max-width: 100px;
       }
     }
@@ -23,16 +23,16 @@ footer {
           color: #5b88ff;
         }
   
-        @media (min-width: 992px) {
+        @media screen and (min-width: $breakpoint-md-up) {
           font-size: 16px;
         }
-        @media (max-width: 991px) {
+        @media screen and (max-width: $breakpoint-md-down) {
           font-size: 14px;
         }
-        @media (min-width: 768px) {
+        @media screen and (min-width: $breakpoint-sm-up) {
           margin-bottom: 20px;
         }
-        @media (max-width: 767px) {
+        @media screen and (max-width: $breakpoint-sm-down) {
           margin-bottom: 15px;
           font-size: 12px;
         }
@@ -48,11 +48,11 @@ footer {
       svg {
         width: 100%;
       }
-      @media (min-width: 992px) {
+      @media screen and (min-width: $breakpoint-md-up) {
         margin-right: 15px;
         width: 56px;
       }
-      @media (max-width: 991px) {
+      @media screen and (max-width: $breakpoint-md-down) {
         margin-right: 10px;
         width: 48px;
       }

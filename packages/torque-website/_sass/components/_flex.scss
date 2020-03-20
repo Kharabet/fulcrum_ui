@@ -53,9 +53,16 @@
 .f-3{
   flex: 3;
 }
+@media screen and (max-width: $breakpoint-lg-down) {
+  .fw-lg-w{
+    flex-wrap: wrap;
+  }
+  .jc-lg-fe{
+    justify-content: flex-end;
+  }
+}
 
-
-@media (max-width: 991px) {
+@media screen and (max-width: $breakpoint-md-down) {
   .fd-md-c {
     flex-direction: column;
   }
@@ -69,7 +76,7 @@
     order: 1;
   }
 }
-@media (max-width: 767px) {
+@media screen and (max-width: $breakpoint-sm-down) {
   .fw-sm-w {
     flex-wrap: wrap;
   }
@@ -92,7 +99,7 @@
     align-items: inherit;
   }
 }
-@media (max-width: 579px) {
+@media screen and (max-width: $breakpoint-xs-down) {
   .flex-xs {
     display: flex;
   }

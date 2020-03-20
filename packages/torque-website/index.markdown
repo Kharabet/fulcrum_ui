@@ -8,7 +8,7 @@ layout: home
     {% include header.html %}
     <div class="container pt-90 pb-60">
         <div class="row">
-        <div class="col col-8 col-xs-12">
+        <div class="col col-8 col-xl-12">
                 <div class="pl-55 pl-lg-0 w-100 text-xs-center">
                     <h1 class="mb-40">Borrowing Made Simple</h1>
                     <p class="fs-16 fs-xs-12 lh-160 mb-50 c-secondary"><span class="fw-700">Torque</span> is the first crypto loan platform with indefinite-term loans and fixed interest rates. Get an instant crypto-backed loan with no credit checks.</p>
@@ -17,7 +17,7 @@ layout: home
         </div>
         <div class="row">
             <div class="col col-12">
-                <div class="mw-100 px-55">
+                <div class="mw-100 px-55 px-lg-0">
                 <form class="form-loan">
                     <div class="item-form loan">
                         <span>Loan</span>
@@ -71,8 +71,8 @@ layout: home
         </div>
     </div>
     <div class="container pt-15 pt-xs-30 pb-45 pb-xs-75">
-        <div class="row fd-md-c">
-            <div class="col col-5 col-lg-3 col-md-12">
+        <div class="row fw-lg-w jc-lg-fe">
+            <div class="col col-5 col-lg-12">
                 <h2 class="triangle mb-md-25">
                 <span class="t-r-75 l-r-125">{% include svg/big-triangle.svg %}</span>
                 Crypto-backed loans with fixed interest rates 
@@ -297,7 +297,7 @@ layout: home
                 <div class="wrapper-stats">
                     <h2>Our stats</h2>
                     <div class="item-stats">
-                        <div>$<span class="fw-900">5,056,560</span></div>
+                        <div class="zi-2">$<span class="fw-900">5,056,560</span></div>
                         <span>Loans Originated</span>
                     </div>
                     <div class="item-stats">
@@ -319,7 +319,7 @@ layout: home
             </div>
         </div>
         <div class="row">
-            <div class="col col-9 mx-a jc-sb">
+            <div class="col col-9 col-xl-11 mx-a jc-sb">
                 <div class="flex fd-c mb-md-55">
                     <div class="svg-blur mb-45">
                         <span class="lend-count">1</span>

@@ -39,7 +39,7 @@
       }
     }
   }
-  @media (max-width: 767px) {
+  @media screen and (max-width: $breakpoint-sm-down) {
     position: absolute;
     top: 33px;
     right: 70px;

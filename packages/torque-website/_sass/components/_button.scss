@@ -71,15 +71,25 @@
       border: 2px solid var(--btn-blue-bg-hover);
     }
 }
-.button-lg {
-  width: 400px;
+.button-lg {  
   border-radius: 90px;
   padding: 13px 25px 13px 40px;
+  @media screen and (min-width: $breakpoint-xl-up){
+    width: 400px;
+  }
+  @media screen and (max-width: $breakpoint-xl-down){
+    width: 345px;
+  }
 }
-.button-md {
-  width: 355px;
+.button-md {  
   border-radius: 90px;
   padding: 13px 25px 13px 40px;
+  @media screen and (min-width: $breakpoint-xl-up){
+    width: 355px;
+  }
+  @media screen and (max-width: $breakpoint-xl-down){
+    width: 290px;
+  }
 }
 .button-sm {
   width: 180px;

@@ -1,9 +1,9 @@
 .wrap-logo {
   svg {
-    @media (max-width: 991px) {
+    @media screen and (max-width: $breakpoint-md-down) {
       max-width: 105px;
     }
-    @media (max-width: 767px) {
+    @media screen and (max-width: $breakpoint-sm-down) {
       max-width: 145px;
       height: auto;
     }
@@ -14,7 +14,7 @@
   position: absolute;
   top: 35px;
   right: 15px;
-  @media (min-width: 768px) {
+  @media screen and (min-width: $breakpoint-sm-up) {
     display: none;
   }
   #hamburger-menu-open {
@@ -28,7 +28,7 @@
 }
 .header-content-menu {
   display: flex;
-  @media (max-width: 767px) {
+  @media screen and (max-width: $breakpoint-sm-down) {
     display: none;
   }
   .bzx-logo {
@@ -75,7 +75,7 @@
 .active-url{
   position: relative;
   &:before{
-    @media(min-width: 768px){
+    @media screen and (min-width: $breakpoint-sm-up){
       content: '';
       position: absolute;
       width: 60px;
@@ -87,7 +87,7 @@
       border-radius: 6px;
       top: -48px;
     }
-    @media(min-width: 992px){
+    @media screen and (min-width: $breakpoint-md-up){
       top: -67px;
     }
   }
