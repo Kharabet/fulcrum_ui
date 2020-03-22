@@ -12,6 +12,7 @@ jobs:
           node-version: '10.x'
     - name: Build
       run: |
+        ls -lah
         cd $GITHUB_WORKSPACE/packages/fulcrum-api && npm install
         cd $GITHUB_WORKSPACE/packages/fulcrum-api && npm run build
     - name: deploy to server
