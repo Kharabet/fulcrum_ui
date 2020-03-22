@@ -6,11 +6,11 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Install and Build
+    - name: Install
       uses: actions/setup-node@v1
-        with:
+      with:
           node-version: '10.x'
+    - name: Build
       run: |
         npm install
         npm run build
