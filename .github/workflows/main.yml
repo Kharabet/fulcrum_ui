@@ -12,8 +12,8 @@ jobs:
           node-version: '10.x'
     - name: Build
       run: |
-        npm install
-        npm run build
+        cd ./packages/fulcrum-api && npm install && ../..
+        cd ./packages/fulcrum-api && npm run build && ../..
     - name: deploy to server
       uses: AEnterprise/rsync-deploy@v1.0
       env:
