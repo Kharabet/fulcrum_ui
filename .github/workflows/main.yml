@@ -1,6 +1,7 @@
 on:
   push:
-    branches: [ fulcrum-api ]
+    branches:
+      - fulcrum-api
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
