@@ -2,12 +2,16 @@ import React, { Component } from "react";
 import { FooterMenu } from "./FooterMenu";
 import { FooterVersion } from "./FooterVersion";
 
-export class Footer extends Component {
+interface IFooterProps {
+  isRiskDisclosureModalOpen: () => void;
+}
+
+export class Footer extends Component<IFooterProps> {
   public render() {
     return (
       <footer className="footer">
         <FooterVersion />
-        <FooterMenu />
+        <FooterMenu  {...this.props}/>
       </footer>
     );
   }

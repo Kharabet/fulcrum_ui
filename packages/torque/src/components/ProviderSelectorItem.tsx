@@ -4,7 +4,7 @@ import { ProviderType } from "../domain/ProviderType";
 import ic_bitski from "./../assets/images/ic_bitski.svg";
 import ic_fortmatic from "./../assets/images/ic_formatic.svg";
 import ic_portis from "./../assets/images/ic_portis.svg";
-//import ic_squarelink from "./../assets/images/ic_squarelink.svg";
+import ic_squarelink from "./../assets/images/ic_squarelink.svg";
 import ic_torus from "./../assets/images/ic_torus.svg";
 import ic_wallet from "./../assets/images/wallet.svg";
 
@@ -23,8 +23,8 @@ export class ProviderSelectorItem extends Component<IProviderSelectorItemProps> 
         ? "provider-selector-item--formatic"
         : this.props.providerType === ProviderType.Portis
         ? "provider-selector-item--portis"
-        //: this.props.providerType === ProviderType.Squarelink
-        //? "provider-selector-item--squarelink"
+        : this.props.providerType === ProviderType.Squarelink
+        ? "provider-selector-item--squarelink"
         : this.props.providerType === ProviderType.Torus
         ? "provider-selector-item--torus"
         : this.props.providerType === ProviderType.WalletLink
@@ -38,8 +38,8 @@ export class ProviderSelectorItem extends Component<IProviderSelectorItemProps> 
         ? ic_fortmatic
         : this.props.providerType === ProviderType.Portis
         ? ic_portis
-        //: this.props.providerType === ProviderType.Squarelink
-        //? ic_squarelink
+        : this.props.providerType === ProviderType.Squarelink
+        ? ic_squarelink
         : this.props.providerType === ProviderType.Torus
         ? ic_torus
         : this.props.providerType === ProviderType.WalletLink
@@ -53,6 +53,9 @@ export class ProviderSelectorItem extends Component<IProviderSelectorItemProps> 
             <img src={providerIcon} />
           </div>
           <div className="provider-selector-item__title">{this.props.providerType}</div>
+          {this.props.providerType === ProviderType.Squarelink 
+          ? <span style={{fontSize: "10px", textAlign: "center", maxWidth: "80%", margin: "5px auto"}}>Please note: Squarelink has shutdown. We recommend moving your funds to a different wallet.</span>
+          : null}
         </div>
       </div>
     );
