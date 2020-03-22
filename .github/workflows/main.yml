@@ -14,7 +14,6 @@ jobs:
           node-version: '10.x'
     - name: Build
       run: |
-        cd $GITHUB_WORKSPACE && ls -lah
         cd $GITHUB_WORKSPACE/packages/fulcrum-api && npm install
         cd $GITHUB_WORKSPACE/packages/fulcrum-api && npm run build
     - name: deploy to server
@@ -23,7 +22,7 @@ jobs:
         DEPLOY_KEY: ${{ secrets.SERVER_SSH_KEY }}
         ARGS: "-e -c -r --delete"
         SERVER_PORT: ${{ secrets.SERVER_PORT }}
-        FOLDER: "../../"
+        FOLDER: "$GITHUB_WORKSPACE"
         SERVER_IP: ${{ secrets.SERVER_IP }}
         USERNAME: ${{ secrets.USERNAME }}
         SERVER_DESTINATION: ${{ secrets.SERVER_DESTINATION }}
