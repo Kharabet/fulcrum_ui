@@ -16,13 +16,13 @@ jobs:
       run: |
         cd $GITHUB_WORKSPACE/packages/fulcrum-api && npm install
         cd $GITHUB_WORKSPACE/packages/fulcrum-api && npm run build
-    - name: deploy to server
+    - name: Deploy
       uses: AEnterprise/rsync-deploy@v1.0
       env:
         DEPLOY_KEY: ${{ secrets.SERVER_SSH_KEY }}
         ARGS: "-e -c -r --delete"
         SERVER_PORT: ${{ secrets.SERVER_PORT }}
-        FOLDER: "./"
+        FOLDER: "./packages/fulcrum-api/dist/"
         SERVER_IP: ${{ secrets.SERVER_IP }}
         USERNAME: ${{ secrets.USERNAME }}
         SERVER_DESTINATION: ${{ secrets.SERVER_DESTINATION }}
