@@ -1,22 +1,28 @@
 import { Router } from 'express';
 import Fulcrum from "../fulcrum";
 import Torque from "../torque";
-import NodeCache from "node-cache";
 import Web3 from 'web3';
 
 import { query, oneOf, validationResult } from 'express-validator';
 import { iTokens } from '../config/iTokens';
 
+import storage from 'node-persist';
 
 export default ({ config }) => {
 
 	const api = Router();
-	const cache = new NodeCache({ stdTTL: config.cache_ttl_sec, checkperiod: config.cache_ttl_sec });
+
+	(async () => {
+		await storage.init({
+			dir: 'persist-storage'
+		});
+	})()
+
 	const web3 = new Web3(new Web3.providers.HttpProvider(config.web3_provider_url));
 
 
-	const fulcrum = new Fulcrum(web3, cache);
-	const torque = new Torque(web3, cache);
+	const fulcrum = new Fulcrum(web3);
+	const torque = new Torque(web3);
 
 	api.get('/total-asset-supply', async (req, res) => {
 		const totalAssetSupply = await fulcrum.getTotalAssetSupply();
@@ -43,7 +49,7 @@ export default ({ config }) => {
 		const apr = await fulcrum.getBorrowRateAPR();
 		res.json(apr);
 	});
-	
+
 	api.get('/torque-borrow-rate-apr', async (req, res) => {
 		const torqueBorrowRates = await fulcrum.getTorqueBorrowRateAPR();
 		res.json(torqueBorrowRates);
@@ -53,7 +59,7 @@ export default ({ config }) => {
 		const vaultBalance = await fulcrum.getVaultBalance();
 		res.json(vaultBalance);
 	});
-	
+
 	api.get('/liquidity', async (req, res) => {
 		const liquidity = await fulcrum.getFreeLiquidity();
 		res.json(liquidity);

@@ -7,40 +7,35 @@ import { mainnetAddress as oracleAddress, oracleJson } from './contracts/OracleC
 import { iTokenJson } from './contracts/iTokenContract';
 import { pTokenJson } from './contracts/pTokenContract';
 
+import storage from 'node-persist';
+import config from '../config.json';
+
 const UNLIMITED_ALLOWANCE_IN_BASE_UNITS = new BigNumber(2)
     .pow(256)
     .minus(1);
 
 export default class Fulcrum {
-    constructor(web3, cache) {
+    constructor(web3) {
         this.web3 = web3;
-        this.cache = cache;
-        this.cache.on("expired", this.setReserveData.bind(this));
+        setInterval(this.updateCache.bind(this), config.cache_ttl_sec * 1000);
         // this.iTokenContract = new this.web3.eth.Contract(iTokenJson.abi, token.address);
         this.DappHeperContract = new this.web3.eth.Contract(DappHelperJson.abi, dappHelperAddress);
     }
 
-    async setReserveData(key, value) {
-        if (key == "reserve_data") {
-            const result = await this.updateReservedData();
-            this.cache.set("reserve_data", result);
-            console.log("reserve_data updated");
-            return;
-        }
-        if (key == "itoken-prices-usd") {
-            const result = await this.updateITokensPricesUsd();
-            this.cache.set("itoken-prices-usd", result);
-            console.log("itoken-prices-usd updated");
-            return;
+    async updateCache(key, value) {
+        const reserve_data = await this.updateReservedData();
+        await storage.setItem("reserve_data", reserve_data);
+        console.log("reserve_data updated");
 
-        }
-        if (key == "ptoken-prices-usd") {
-            const result = await this.updatePTokensPricesUsd();
-            this.cache.set("ptoken-prices-usd", result);
-            console.log("ptoken-prices-usd updated");
-            return;
-        }
-        console.log("nothing in cache")
+        const itoken = await this.updateITokensPricesUsd();
+        await storage.setItem("itoken-prices-usd", itoken);
+        console.log("itoken-prices-usd updated");
+
+        const ptoken = await this.updatePTokensPricesUsd();
+        await storage.setItem("ptoken-prices-usd", ptoken);
+        console.log("ptoken-prices-usd updated");
+
+        return;
     }
 
     async getTotalAssetSupply() {
@@ -110,13 +105,13 @@ export default class Fulcrum {
     }
 
     async getITokensPricesUsd() {
-        var result = this.cache.get("itoken-prices-usd");
+        let result = await storage.getItem("itoken-prices-usd");
         if (!result) {
 
             console.warn("No itoken-prices-usd in cache!")
             result = await this.updateITokensPricesUsd();
 
-            this.cache.set("itoken-prices-usd", result);
+            await storage.setItem("itoken-prices-usd", result);
             // console.dir(`itoken-prices-usd:`);
             // console.dir(result);
         }
@@ -139,13 +134,12 @@ export default class Fulcrum {
     }
 
     async getPTokensPricesUsd() {
-        var result = this.cache.get("ptoken-prices-usd");
+        let result = await storage.getItem("ptoken-prices-usd");
         if (!result) {
 
             console.warn("No ptoken-prices-usd in cache!")
             result = await this.updatePTokensPricesUsd();
-
-            this.cache.set("ptoken-prices-usd", result);
+            await storage.setItem("ptoken-prices-usd", result);
             // console.dir(`ptoken-prices-usd:`);
             // console.dir(result);
         }
@@ -235,13 +229,12 @@ export default class Fulcrum {
 
 
     async  getReserveData() {
-        var result = this.cache.get("reserve_data");
+        let result = await storage.getItem("reserve_data");
         if (!result) {
 
             console.warn("No reserve_data in cache!")
             result = await this.updateReservedData();
-
-            this.cache.set("reserve_data", result);
+            await storage.setItem("reserve_data", result);
             // console.dir(`reserve_data:`);
             // console.dir(result);
         }
