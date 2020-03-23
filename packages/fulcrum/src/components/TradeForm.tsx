@@ -545,11 +545,11 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
           </div>
           {this.props.tradeType === TradeType.BUY ?
             <div className="trade-how-it-works-container">
-              <CollapsibleContainer titleOpen="How it works?" titleClose="How it works?" isTransparent={amountMsg !== ""}>
+              <CollapsibleContainer titleOpen="What is this?" titleClose="What is this?" isTransparent={amountMsg !== ""}>
                 <div className="trade-form__how-it-works">
                   <div className="hiw-icon"><QuestionIcon /></div>
                   <div className="hiw-content">
-                    You are opening {this.props.leverage}x {this.props.positionType} {this.state.assetDetails.displayName} position. You’re borrowing {this.props.positionType === PositionType.LONG ? this.props.defaultUnitOfAccount : this.state.assetDetails.displayName} from a Fulcrum lending pool and that {this.props.positionType === PositionType.LONG ? this.props.defaultUnitOfAccount : this.state.assetDetails.displayName} is swapped into {this.props.positionType === PositionType.LONG ? this.state.assetDetails.displayName : this.props.defaultUnitOfAccount} using an on-chain DEX.
+                    You are opening {this.props.leverage}x {this.props.positionType} {this.state.assetDetails.displayName} position. This will borrow {this.props.positionType === PositionType.LONG ? this.props.defaultUnitOfAccount : this.state.assetDetails.displayName} from a Fulcrum lending pool and that {this.props.positionType === PositionType.LONG ? this.props.defaultUnitOfAccount : this.state.assetDetails.displayName} is swapped into {this.props.positionType === PositionType.LONG ? this.state.assetDetails.displayName : this.props.defaultUnitOfAccount} using an on-chain DEX.
                 </div>
                 </div>
               </CollapsibleContainer>

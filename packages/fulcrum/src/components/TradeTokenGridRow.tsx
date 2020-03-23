@@ -14,6 +14,7 @@ import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { TradeTransactionMinedEvent } from "../services/events/TradeTransactionMinedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
 import { PositionTypeMarkerAlt } from "./PositionTypeMarkerAlt";
+import siteConfig from "../config/SiteConfig.json";
 
 import { LeverageSelector } from "./LeverageSelector";
 import { PositionTypeMarker } from "./PositionTypeMarker";
@@ -252,7 +253,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
   private renderActions = (isBuyOnly: boolean) => {
     return (
       <div className="trade-token-grid-row__col-action">
-        <button className="trade-token-grid-row__buy-button trade-token-grid-row__button--size-half" onClick={this.onBuyClick}>
+        <button className="trade-token-grid-row__buy-button trade-token-grid-row__button--size-half" disabled={siteConfig.TradeBuyDisabled} onClick={this.onBuyClick}>
           {TradeType.BUY}
         </button>
       </div>

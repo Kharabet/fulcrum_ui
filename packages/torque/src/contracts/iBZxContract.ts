@@ -261,7 +261,7 @@ export class iBZxContract extends BaseContract {
     > {
       callData.from = "0x4abB24590606f5bf4645185e20C4E7B97596cA3B";
       const self = (this as any) as iBZxContract;
-      const encodedData = self._strictEncodeArguments("getBasicLoansData(address,uint256)", [borrower, count]);
+      const encodedData = self._strictEncodeArguments("getBasicLoansData(address,uint256,uint256)", [borrower, count, "2"]);
       const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
         {
           to: self.address,
@@ -272,7 +272,7 @@ export class iBZxContract extends BaseContract {
       );
       const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
       BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
-      const abiEncoder = self._lookupAbiEncoder("getBasicLoansData(address,uint256)");
+      const abiEncoder = self._lookupAbiEncoder("getBasicLoansData(address,uint256,uint256)");
       // tslint:disable boolean-naming
       const result = abiEncoder.strictDecodeReturnValue<
         Array<{

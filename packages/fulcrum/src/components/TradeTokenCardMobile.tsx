@@ -13,6 +13,7 @@ import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { TradeTransactionMinedEvent } from "../services/events/TradeTransactionMinedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
 import { PositionTypeMarkerAlt } from "./PositionTypeMarkerAlt";
+import siteConfig from "../config/SiteConfig.json";
 
 import { LeverageSelector } from "./LeverageSelector";
 import { Preloader } from "./Preloader";
@@ -230,7 +231,7 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
   private renderActions = (isBuyOnly: boolean) => {
     return (
       <div className="trade-token-card-mobile__action">
-        <button className="trade-token-card-mobile____buy-button" onClick={this.onBuyClick}>
+        <button className="trade-token-card-mobile____buy-button" disabled={siteConfig.TradeBuyDisabled} onClick={this.onBuyClick}>
           {TradeType.BUY}
         </button>
       </div>
