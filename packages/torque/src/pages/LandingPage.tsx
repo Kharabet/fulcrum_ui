@@ -36,7 +36,7 @@ export class LandingPage extends PureComponent<ILandingPageProps> {
             <div className="landing-page__jumbo-action-container">
               <ButtonLanding color={ButtonLandingColor.Blue} subtitle={"New user?"} title={"Borrow"} url={walletUrl} />
               <ButtonLanding color={ButtonLandingColor.Green} subtitle={"Existing user?"} title={"Track your loans"} url={trackLoansUrl} />
-              <ButtonLandingRefinance color={ButtonLandingColor.Purple} subtitle={"Already have a loan?"} title={"Refinance"} onSelectProvider={this.props.onSelectProvider}  url={refinanceLoanUrl} />
+              <ButtonLandingRefinance color={ButtonLandingColor.Purple} subtitle={"Already have a loan?"} title={"Refinance"} url={refinanceLoanUrl} />
             </div>
           </div>
         </main>

@@ -19,6 +19,7 @@ export interface IRefinancePageRouteParams {
 export interface IRefinancePageParams {
   doNetworkConnect?: (destinationAbbr: string) => void;
   isLoading: boolean;
+  isMobileMedia: boolean;
   isRiskDisclosureModalOpen: () => void;
 }
 
