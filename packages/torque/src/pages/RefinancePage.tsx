@@ -17,6 +17,7 @@ export interface IRefinancePageRouteParams {
 export interface IRefinancePageParams {
   doNetworkConnect?: (destinationAbbr: string) => void;
   isLoading: boolean;
+  isRiskDisclosureModalOpen: () => void;
 }
 
 export class RefinancePage extends PureComponent<IRefinancePageParams & RouteComponentProps<IRefinancePageRouteParams>> {
@@ -35,13 +36,13 @@ export class RefinancePage extends PureComponent<IRefinancePageParams & RouteCom
       <React.Fragment>
         <BorrowDlg ref={this.borrowDlgRef} />
         <div className="refinance-page">
-          <HeaderOps isLoading={this.props.isLoading} doNetworkConnect={this.doNetworkConnect} />
+          <HeaderOps isLoading={this.props.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen}/>
           {/*<div className="borrow-page__main" style={walletType === WalletType.Web3 ? { paddingBottom: `90rem`} : undefined}>*/}
           <div className="borrow-page__main">
             <RefinanceAssetCompoundSelector walletType={walletType}  />
             <RefinanceAssetSelector walletType={walletType} />
           </div>
-          <Footer />
+          <Footer isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen}/>
         </div>
       </React.Fragment>
     );
