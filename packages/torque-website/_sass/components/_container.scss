@@ -8,6 +8,9 @@
     @media screen and(max-width: $breakpoint-xl-down) {
       width: 950px;
     }
+    @media screen and(max-width: $breakpoint-md-down) {
+      width: 100%;
+    }
   }
   &.container-md {    
     @media screen and (min-width: $breakpoint-xl-up) {
@@ -16,9 +19,14 @@
     @media screen and(max-width: $breakpoint-xl-down) {
       width: 750px;
     }
+    @media screen and(max-width: $breakpoint-md-down) {
+      width: 100%;
+    }
   }
-  &.container-sm {
-    width: 760px;
+  &.container-sm {    
+    @media screen and(min-width: $breakpoint-sm-up) {
+      width: 760px;
+    }
   }
   @media screen and (min-width: $breakpoint-xl-up) {
     width: 1410px;

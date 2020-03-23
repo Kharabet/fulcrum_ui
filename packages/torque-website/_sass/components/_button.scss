@@ -7,25 +7,39 @@
   color: #ffffff;
   font-weight: 600;
   line-height: 1.4;
-  p{
-  color: #ffffff;
-
+  p {
+    color: #ffffff;
   }
   &:hover {
     color: #ffffff;
   }
-  span {
-    font-size: 15px;
+  span {    
     opacity: 0.5;
+    @media screen and (min-width: $breakpoint-sm-up){
+      font-size: 15px;
+    }
+    @media screen and (max-width: $breakpoint-sm-down){
+      font-size: 13px;
+    }
   }
   p {
-    font-size: 24px;
+    @media screen and (min-width: $breakpoint-sm-up){
+      font-size: 24px;
+    }
+    @media screen and (max-width: $breakpoint-sm-down){
+      font-size: 20px;
+    }
   }
   + span {
-    font-size: 13px;
     line-height: 1.5;
     color: #8992a4;
     margin: 20px 0 0 40px;
+    @media screen and (min-width: $breakpoint-sm-up){
+      font-size: 13px;
+    }
+    @media screen and (max-width: $breakpoint-sm-down){
+      font-size: 10px;
+    }
   }
 }
 
@@ -63,39 +77,56 @@
   }
 }
 .button-primary {
-    background-color: var(--btn-blue-bg);
-    border: 2px solid var(--btn-blue-border);
-    color: var(--btn-blue-color);
-    &:hover{
-      background-color: var(--btn-blue-bg-hover);
-      border: 2px solid var(--btn-blue-bg-hover);
-    }
+  background-color: var(--btn-blue-bg);
+  border: 2px solid var(--btn-blue-border);
+  color: var(--btn-blue-color);
+  &:hover {
+    background-color: var(--btn-blue-bg-hover);
+    border: 2px solid var(--btn-blue-bg-hover);
+  }
 }
-.button-lg {  
+.button-lg {
   border-radius: 90px;
   padding: 13px 25px 13px 40px;
-  @media screen and (min-width: $breakpoint-xl-up){
+  @media screen and (min-width: $breakpoint-xl-up) {
     width: 400px;
   }
-  @media screen and (max-width: $breakpoint-xl-down){
+  @media screen and (max-width: $breakpoint-xl-down) {
     width: 345px;
   }
+  @media screen and (max-width: $breakpoint-lg-down) {
+    width: 290px;
+  }
+  @media screen and (max-width: $breakpoint-sm-down) {
+    width: 255px;
+  }
 }
-.button-md {  
+.button-md {
   border-radius: 90px;
   padding: 13px 25px 13px 40px;
-  @media screen and (min-width: $breakpoint-xl-up){
+  @media screen and (min-width: $breakpoint-xl-up) {
     width: 355px;
   }
-  @media screen and (max-width: $breakpoint-xl-down){
+  @media screen and (max-width: $breakpoint-xl-down) {
     width: 290px;
+  }
+  @media screen and (max-width: $breakpoint-sm-down) {
+    width: 255px;
   }
 }
 .button-sm {
-  width: 180px;
-  height: 50px;
-  font-size: 16px;
-  padding: 0 30px;
+  @media screen and (min-width: $breakpoint-sm-up){
+    width: 180px;
+    height: 50px;
+    font-size: 16px;
+    padding: 0 30px;
+  }
+  @media screen and (max-width: $breakpoint-sm-down){
+    width: 140px;
+    height: 42px;
+    font-size: 13px;
+    padding: 0 20px;
+  }
 }
 .button-xs {
   width: 70px;

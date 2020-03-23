@@ -1,6 +1,5 @@
 .form-loan {
-  background-color: var(--bg-form);  
-  padding: 30px 20px 40px 20px;
+  background-color: var(--bg-form);    
   box-shadow: 0px 16px 37px var(--shadow-form);
   border-radius: 16px;
   display: flex;
@@ -15,14 +14,56 @@
   @media screen and (max-width: $breakpoint-lg-down){
     width: 100%;
   }
+  @media screen and (max-width: $breakpoint-md-down){
+    flex-wrap: wrap;
+  }
+  @media screen and (min-width: $breakpoint-sm-up){
+    padding: 30px 20px 40px 20px;
+  }
+  @media screen and (max-width: $breakpoint-sm-down){
+    padding: 20px;
+  }
   .item-form {
     display: flex;
     flex-direction: column;
-
+    position: relative;
+    @media screen and (max-width: $breakpoint-md-down){
+      width: calc(50% - 32px);
+    }
+    @media screen and (max-width: $breakpoint-sm-down){
+      width: calc(100% - 40px);
+      &:after{
+        content: '';
+        position: absolute;
+        right: -26px;
+        width: 17px;
+        height: 27px;
+        border-right: 2px solid #E7EBF0;
+      }
+      &.loan{
+        &:after{
+          bottom: 2px;
+          border-top-right-radius: 7px;
+          border-top: 2px solid #E7EBF0;
+        }
+      }
+      &.collateral{
+        &:after{
+          bottom: 27px;
+          border-bottom-right-radius: 7px;
+          border-bottom: 2px solid #E7EBF0;
+        }
+      }
+    }
     > span {
-      font-size: 18px;
       color: #758295;
       margin-bottom: 12px;
+      @media screen and (min-width: $breakpoint-sm-up){
+        font-size: 18px;
+      }
+      @media screen and (max-width: $breakpoint-sm-down){
+        font-size: 12px;
+      }
     }
     .input-with-select {
       display: flex;
@@ -44,6 +85,14 @@
         }
         @media screen and (max-width: $breakpoint-xl-down){
           width: 175px;
+        }
+        @media screen and (max-width: $breakpoint-md-down){
+          width: calc(100% - 110px);
+          font-size: 24px;
+        }
+        @media screen and (max-width: $breakpoint-sm-down){
+          width: calc(100% - 90px);
+          height: 30px;
         }
         &::-webkit-outer-spin-button,
         &::-webkit-inner-spin-button {
@@ -75,22 +124,40 @@
   }
   .item-connect {    
     background-color: #e9f4ff;
-    padding: 12px 6px;
     border-radius: 50%;
-    width: 44px;
-    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     @media screen and (min-width: $breakpoint-lg-up){
       margin: 35px 20px 0 20px;
     }
     @media screen and (max-width: $breakpoint-lg-down){
       margin: 35px 10px 0 10px;
     }
+    @media screen and (min-width: $breakpoint-sm-up){
+      width: 44px;
+      height: 44px;
+    }
+    @media screen and (max-width: $breakpoint-sm-down){
+      position: absolute;
+      right: 20px;
+      top: 104px;
+      margin: 0;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      svg{
+        width: 21px;
+        height: auto;
+      }
+    }
   }
   .select {
     position: relative;
   }
   .select-styled {
-    width: 110px;
     padding: 4px;
     border-radius: 26px;
     background-color: var(--bg-selector-form);
@@ -102,13 +169,21 @@
     display: flex;
     align-items: center;
     position: relative;
-
-    background-repeat: no-repeat;
-    height: 38px;
-    background-size: 30px;
-    background-position: 4px 50%;
-    padding-left: 40px;
+    background-repeat: no-repeat;    
+    background-position: 4px 50%;    
     text-transform: uppercase;
+    @media screen and (min-width: $breakpoint-sm-up){
+      height: 38px;
+      width: 110px;
+      background-size: 30px;
+      padding-left: 40px;
+    }
+    @media screen and (max-width: $breakpoint-sm-down){
+      height: 30px;
+      width: 90px;
+      background-size: 24px;
+      padding-left: 32px;
+    }
     &[data-asset="dai"] {
       background-image: url(/images/dai.svg);
     }
@@ -174,22 +249,50 @@
   }
   .item-result {
     display: flex;
-    flex-direction: column;
-    margin-left: 45px;
+    flex-direction: column;    
+    @media screen and (min-width: $breakpoint-md-up){
+      margin-left: 45px;
+    }
+    @media screen and (max-width: $breakpoint-md-down){
+      width: 100%;
+      justify-content: center;
+      align-items: center;
+    }
+    @media screen and (max-width: $breakpoint-sm-down){
+      justify-content: flex-start;
+      align-items: flex-start;
+    }
     span {
       font-size: 18px;
-      color: #758295;
-      margin-bottom: 12px;
+      color: #758295;      
+      @media screen and (min-width: $breakpoint-md-up){
+        margin-bottom: 12px;
+      }
+      @media screen and (max-width: $breakpoint-md-down){
+        margin-top: 12px;
+      }
     }
-    > div {
-      font-size: 50px;
-      line-height: 1.44;
+    > div {      
       color: #00c0ab;
-      .value-result {
+      @media screen and (min-width: $breakpoint-sm-up){
         font-size: 50px;
         line-height: 1.44;
+      }
+      @media screen and (max-width: $breakpoint-sm-down){
+        font-size: 34px;
+        line-height: 1.2;
+      }
+      .value-result {
         color: #00c0ab;
         font-weight: 800;
+        @media screen and (min-width: $breakpoint-sm-up){
+          font-size: 50px;
+          line-height: 1.44;
+        }
+        @media screen and (max-width: $breakpoint-sm-down){
+          font-size: 34px;
+          line-height: 1.2;
+        }
       }
     }
   }
@@ -201,6 +304,9 @@
     }
     @media screen and (max-width: $breakpoint-xl-down){
       left: 73%;
+    }
+    @media screen and (max-width: $breakpoint-xs-down){
+      left: 65%;
     }
   }
 }

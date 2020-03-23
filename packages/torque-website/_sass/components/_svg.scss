@@ -53,21 +53,19 @@
 .svg-blur {
   display: flex;
   position: relative;
-  width: 460px;
+  max-width: 460px;
   svg{
-    width: 100%;
+    position: relative;
+    max-width: 100%;
     height: auto;
   }
-  @media screen and (max-width: $breakpoint-md-down){
-    max-width: 460px;
+  @media screen and (max-width: $breakpoint-lg-down){
+    max-width: 440px;
     margin-left: auto;
     margin-right: auto;
   }
   @media screen and (max-width: $breakpoint-xs-down){
     max-width: 100%;
-  }
-  svg {
-    position: relative;
   }
   &:before {
     content: "";

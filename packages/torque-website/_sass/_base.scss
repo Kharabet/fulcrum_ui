@@ -2,81 +2,15 @@ body {
   font-family: "Muli", sans-serif;
   font-size: 14px;
   font-weight: 400;
-  &.open-modal{
-    .modal{
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      position: fixed;
-      top: 0;
-      left: 0;
-    }
-  }
   p {
     margin-bottom: 0;
     line-height: 1.8;
     color: var(--primary-color);
-    @media screen and (max-width: $breakpoint-xs-down){
+    @media screen and (max-width: $breakpoint-xs-down) {
       font-size: 12px;
     }
   }
 }
-.w-100{
+.w-100 {
   width: 100%;
-}
-.mw-100{
-  min-width: 100%;
-}
-.mw-md {
-  max-width: 1170px;
-}
-.ta-c {
-  text-align: center;
-}
-.ta-l {
-  text-align: left;
-}
-.ta-r{
-  text-align: right;
-}
-.relative{
-  position: relative;
-}
-.zi-2{
-  z-index: 2;
-}
-@media screen and (max-width: $breakpoint-md-down){
-  .w-md-50{
-    width: 50%;
-  }
-  .w-md-100{
-    width: 100%;
-  }
-  .text-md-center{
-    text-align: center;
-  }
-}
-@media screen and (min-width: $breakpoint-sm-up){
-  .hidden-md{
-    display: none !important;
-  }
-}
-@media screen and (max-width: $breakpoint-sm-down){
-  .text-sm-left{
-    text-align: left;
-  }
-  .mw-sm-440{
-    max-width: 440px;
-  }
-}
-@media screen and (max-width: $breakpoint-xs-down){
-  .hidden-xs{
-    display: none;
-  }
-  .text-xs-center{
-    text-align: center;
-  }
-  .mx-xs-345{
-    max-width: 345px;
-  }
 }
