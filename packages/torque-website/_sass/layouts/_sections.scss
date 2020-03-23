@@ -92,15 +92,11 @@
 }
 .wrapper-stats {
   font-size: 44px;
-  /*background-image: url(/images/bg-stats.svg);
-  background-repeat: no-repeat;
-  background-size: cover;*/
   border-radius: 16px;
   color: #ffffff;
   position: relative;
   display: flex;
   width: 100%;
-  //padding: 40px;
   background-color: #00a1fc;
   h2 {
     color: #ffffff;
@@ -116,20 +112,14 @@
     line-height: 1.2;
     padding: 40px 0 40px 40px;
     position: relative;
-    &:not(:last-child) {
-      &:after {
-        content: "";
-        position: absolute;
-        width: 166px;
-        height: 166px;
-        background-image: url(/images/after-stats.svg);
-        top: 0;
-        right: 0;
-      }
-    }
     &:last-child {
       background-color: #8e7df7;
       border-radius: 0 16px 16px 0;
+    }
+    .stats-svg{
+      position: absolute;
+      right: 0;
+      top: 0;
     }
     > span {
       font-size: 16px;
