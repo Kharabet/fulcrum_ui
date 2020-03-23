@@ -1,10 +1,17 @@
 import * as _ from "lodash";
 
 import { erc20Contract } from "../contracts/erc20";
+import { GetCdpsContract } from "../contracts/getCdps";
 import { iBZxContract } from "../contracts/iBZxContract";
 import { iENSOwnerContract } from "../contracts/iENSOwnerContract";
 import { iTokenContract } from "../contracts/iTokenContract";
 import { oracleContract } from "../contracts/oracle";
+import { vatContract } from "../contracts/vat";
+import { cdpManagerContract } from "../contracts/cdpManager";
+import { makerBridgeContract } from "../contracts/makerBridge";
+import { proxyRegistryContract } from "../contracts/proxyRegistry";
+import { dsProxyJsonContract } from "../contracts/dsProxyJson";
+
 import { Asset } from "../domain/Asset";
 
 const ethNetwork = process.env.REACT_APP_ETH_NETWORK;
@@ -15,11 +22,17 @@ export class ContractsSource {
   private static isInit = false;
 
   private erc20Json: any;
+  private cdpsJson: any;
   private iBZxJson: any;
   private iTokenJson: any;
   private oracleJson: any;
   private iENSJson: any;
-
+  private vatJson: any;
+  private cdpJson: any;
+  private makerBridgeJson: any;
+  private proxyRegisteryJson :any;
+  private dsProxyIsAllowJson: any;
+  private dsProxyJson: any;
   public networkId: number;
   public canWrite: boolean;
 
@@ -201,7 +214,7 @@ export class ContractsSource {
             address = "0xBA9262578EFef8b3aFf7F60Cd629d6CC8859C8b5";
             break;
         }
-        break;        
+        break;
       case Asset.ZRX:
         switch (this.networkId) {
           case 1:
@@ -368,10 +381,17 @@ export class ContractsSource {
     }
     const network = ethNetwork || "1";
     this.erc20Json = await import(`./../assets/artifacts/${network}/erc20.json`);
+    this.cdpsJson = await import(`./../assets/artifacts/${network}/GetCdps.json`);
     this.iBZxJson = await import(`./../assets/artifacts/${network}/iBZx.json`);
     this.iTokenJson = await import(`./../assets/artifacts/${network}/iToken.json`);
     this.oracleJson = await import(`./../assets/artifacts/${network}/oracle.json`);
     this.iENSJson = await import(`./../assets/artifacts/${network}/iENSOwner.json`);
+    this.vatJson = await import(`./../assets/artifacts/${network}/vat.json`);
+    this.cdpJson = await import(`./../assets/artifacts/${network}/cdpManager.json`);
+    this.makerBridgeJson = await import(`./../assets/artifacts/${network}/makerBridge.json`);
+    this.proxyRegisteryJson = await import(`./../assets/artifacts/${network}/proxyRegistry.json`);
+    this.dsProxyJson = await import(`./../assets/artifacts/${network}/dsProxyJson.json`);
+    this.dsProxyIsAllowJson = await import(`./../assets/artifacts/${network}/dsProxyIsAllow.json`);
     ContractsSource.isInit = true;
   }
 
@@ -379,7 +399,40 @@ export class ContractsSource {
     await this.Init();
     return new erc20Contract(this.erc20Json.abi, addressErc20.toLowerCase(), this.provider);
   }
-
+  private async getCdpContractRaw(addresscdp: string): Promise<GetCdpsContract> {
+    await this.Init();
+    return new GetCdpsContract(this.cdpsJson.abi, addresscdp.toLowerCase(), this.provider);
+  }
+  private async getVatContractRaw(addressVat: string): Promise<vatContract> {
+    await this.Init();
+    return new vatContract(this.vatJson.abi, addressVat.toLowerCase(), this.provider);
+  }
+  private async getCdpManagerRaw(addressCdp: string): Promise<cdpManagerContract> {
+    await this.Init();
+    return new cdpManagerContract(this.cdpJson.abi, addressCdp.toLowerCase(), this.provider);
+  }
+  private async getmakerBridgeRaw(address: string): Promise<makerBridgeContract> {
+    await this.Init();
+    return new makerBridgeContract(this.makerBridgeJson.abi, address.toLowerCase(), this.provider);
+  }
+  private async getProxyRegisteryRaw(address: string): Promise<proxyRegistryContract> {
+    await this.Init();
+    return new proxyRegistryContract(this.proxyRegisteryJson.abi, address.toLowerCase(), this.provider);
+  }
+  private async getDsProxyRaw(address: string): Promise<dsProxyJsonContract> {
+    await this.Init();
+    return new dsProxyJsonContract(this.dsProxyJson.abi, address.toLowerCase(), this.provider);
+  }
+  private async getDsProxyAllowJSON(){
+    return this.dsProxyIsAllowJson;
+  }
+  public dsProxyAllowJson = _.memoize(this.getDsProxyAllowJSON);
+  public getProxyRegistery = _.memoize(this.getProxyRegisteryRaw);
+  public getDsProxy = _.memoize(this.getDsProxyRaw);
+  public getmakerBridge = _.memoize(this.getmakerBridgeRaw);
+  public getCdpManager = _.memoize(this.getCdpManagerRaw);
+  public getVatContract = _.memoize(this.getVatContractRaw);
+  public getCdpContract = _.memoize(this.getCdpContractRaw);
   public getErc20Contract = _.memoize(this.getErc20ContractRaw);
   public getiBZxContract = _.memoize(this.getiBZxContractRaw);
   public getiTokenContract = _.memoize(this.getiTokenContractRaw);

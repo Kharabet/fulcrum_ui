@@ -1,14 +1,22 @@
 import { Web3ProviderEngine } from "@0x/subproviders";
 import { BigNumber } from "@0x/utils";
 import { Web3Wrapper } from "@0x/web3-wrapper";
+// import Web3 from 'web3';
 import { EventEmitter } from "events";
+// import rawEncode  from "ethereumjs-abi";
 import { erc20Contract } from "../contracts/erc20";
+import { GetCdpsContract } from "../contracts/getCdps";
+import { cdpManagerContract } from "../contracts/cdpManager";
+import { makerBridgeContract } from "../contracts/makerBridge";
+import { proxyRegistryContract } from "../contracts/proxyRegistry";
+import { dsProxyJsonContract } from "../contracts/dsProxyJson";
 import { Asset } from "../domain/Asset";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { BorrowRequest } from "../domain/BorrowRequest";
 import { BorrowRequestAwaiting } from "../domain/BorrowRequestAwaiting";
 import { ExtendLoanRequest } from "../domain/ExtendLoanRequest";
 import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
+import { RefinanceCdpData, RefinanceData } from "../domain/RefinanceData";
 import { IBorrowEstimate } from "../domain/IBorrowEstimate";
 import { ICollateralChangeEstimate } from "../domain/ICollateralChangeEstimate";
 import { ICollateralManagementParams } from "../domain/ICollateralManagementParams";
@@ -27,9 +35,14 @@ import { Web3ConnectionFactory } from "../domain/Web3ConnectionFactory";
 import { BorrowRequestAwaitingStore } from "./BorrowRequestAwaitingStore";
 import { ContractsSource } from "./ContractsSource";
 import { NavService } from "./NavService";
+import configAddress from "../config/constant.json";
 
 import { ProviderChangedEvent } from "./events/ProviderChangedEvent";
 import { TorqueProviderEvents } from "./events/TorqueProviderEvents";
+import {vatContract} from "../contracts/vat";
+var Web3 = require('web3');
+var web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'));
+
 
 export class TorqueProvider {
   public static Instance: TorqueProvider;
@@ -500,6 +513,201 @@ export class TorqueProvider {
     }
 
     return result;
+  }
+  public hex2a = async (hexx: string): Promise<string> =>{
+    var hex = hexx.toString();//force conversion
+    var str = '';
+    for (var i = 0; (i < hex.length && hex.substr(i, 2) !== '00'); i += 2)
+        str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+    return str;
+  }
+
+  public checkCdp = async (asset: Asset): Promise<RefinanceCdpData> => {
+    let result: RefinanceCdpData={
+
+        cdpId: [new BigNumber(0)],
+        urn: [''],
+        ilk: [''],
+        accountAddress: '',
+        proxyAddress: '',
+        isProxy:false
+      };
+    // this.web3ProviderSettings = await TorqueProvider.getWeb3ProviderSettings(1);
+    // const vat = new Web3.eth.Contract("0x1476483dd8c35f25e568113c5f70249d3976ba21", "0x2252d3b2c12455d564abc21e328a1122679f8352")
+    // console.log("vat")
+
+    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+    // console.log("this.contractsSource.canWrite =",this.contractsSource.canWrite)
+    console.log("this.web3Wrapper [ = "+this.web3Wrapper)
+    if (this.web3Wrapper && this.contractsSource && account) {
+
+      let proxyRegistryContract: proxyRegistryContract | null = null;
+      proxyRegistryContract = await this.contractsSource.getProxyRegistery(configAddress.proxy_Contract_Address)
+      const proxyRegistryResult = await proxyRegistryContract.proxies.callAsync( account)
+      console.log("proxyRegistryResult  = ",proxyRegistryResult)
+      if(proxyRegistryResult !== configAddress.Empty_Proxy_Address){
+          let tokencdpContract: GetCdpsContract | null = null;
+        tokencdpContract = await this.contractsSource.getCdpContract(configAddress.Get_CDPS);
+
+        const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+        console.log("account = ", account)
+        console.log("tokencdpContract = ", tokencdpContract)
+
+        if (account && tokencdpContract) {                                                                              //metamask 0x1476483dd8c35f25e568113c5f70249d3976ba21 account 0x2252d3b2c12455d564abc21e328a1122679f8352
+          const cdpsresult = await tokencdpContract.getCdpsAsc.callAsync(configAddress.CDP_MANAGER, proxyRegistryResult); // multiple cdp 0xDF2Db45ed0df076e5D6d302B416A5971fF5Ad61F
+          console.log("cdpsresult = ", cdpsresult)
+          let cdpId = cdpsresult[0]
+          let urn = cdpsresult[1]
+          let ilk = cdpsresult[2]
+          console.log("ilk = ", ilk)
+          console.log("urn = ", urn)
+          result = {
+            'cdpId': cdpId,
+            'urn': urn,
+            'ilk': ilk,
+            'accountAddress': account,
+            isProxy: true,
+            proxyAddress: proxyRegistryResult,
+          }
+        }
+
+        // let dsProxyContract: dsProxyJsonContract | null = null;
+        // const proxyRegistryResult = await dsProxyContract.proxies.callAsync("0xf906930AC464dB04500e45147d24bf28979CD4f3")
+      }
+      else {
+
+
+        let tokencdpContract: GetCdpsContract | null = null;
+        tokencdpContract = await this.contractsSource.getCdpContract(configAddress.Get_CDPS);
+
+        const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+        console.log("account = ", account)
+        console.log("tokencdpContract = ", tokencdpContract)
+        if (account && tokencdpContract) {                                                                              //metamask 0x1476483dd8c35f25e568113c5f70249d3976ba21 account 0x2252d3b2c12455d564abc21e328a1122679f8352
+          const cdpsresult = await tokencdpContract.getCdpsAsc.callAsync(configAddress.CDP_MANAGER, account); // multiple cdp 0xDF2Db45ed0df076e5D6d302B416A5971fF5Ad61F
+          console.log("cdpsresult = ", cdpsresult)
+          let cdpId = cdpsresult[0]
+          let urn = cdpsresult[1]
+          let ilk = cdpsresult[2]
+          console.log("ilk = ", ilk)
+          console.log("urn = ", urn)
+          result = {
+            'cdpId': cdpId,
+            'urn': urn,
+            'ilk': ilk,
+            'accountAddress': account,
+            'isProxy': false,
+            proxyAddress: '',
+          }
+        }
+      }
+    }
+    return result;
+
+  }
+  public getCdpsVat = async (cdpId:BigNumber, urn: string, ilk: string, accountAddress: string, isProxy:boolean, proxyAddress:string ): Promise<RefinanceData[]> => {
+    let result: RefinanceData[] = [{
+          collateralAmount: new BigNumber(0),
+          debt: new BigNumber(0),
+          collateralType: '',
+          cdpId: new BigNumber(0),
+          accountAddress:accountAddress,
+          proxyAddress:proxyAddress,
+          isProxy: isProxy
+        }]
+    if (this.web3Wrapper && this.contractsSource) {
+      let vatContract: vatContract | null = null;
+      vatContract = await this.contractsSource.getVatContract(configAddress.MCD_VAT_Address)
+      // vat.methods.urns(ilk, urn).call().then(...
+      let resp = await vatContract.urns.callAsync(ilk, urn)
+      console.log("resp = ", resp)
+      console.log("Resp Val = ", resp[0].dividedBy(10 ** 18))
+      console.log("Resp Val 1= ", resp[1].dividedBy(10 ** 18))
+      // var web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
+
+      console.log("urn val = ", await this.hex2a(ilk))
+      result = [{
+        collateralAmount: resp[0].dividedBy(10 ** 18),
+        debt: resp[1].dividedBy(10 ** 18),
+        collateralType: await this.hex2a(ilk),
+        cdpId: cdpId,
+        accountAddress: accountAddress,
+        proxyAddress:proxyAddress,
+        isProxy: isProxy
+      }]
+    }
+    return result
+  }
+
+  public checkCdpManager = async (refRequest:RefinanceData, loanAmount:BigNumber) => {
+
+    console.log("refRequest- = ",refRequest)
+    console.log('refRequest.cdpId = ',refRequest.cdpId)
+    const cdpManagerAddress = configAddress.CDP_MANAGER
+    if (this.web3Wrapper && this.contractsSource) {
+      let tokenCdpManagerContract: cdpManagerContract | null = null;
+      tokenCdpManagerContract = await this.contractsSource.getCdpManager(cdpManagerAddress)
+      //        index 0 = 0x1476483dd8c35f25e568113c5f70249d3976ba21          // 0x2252d3b2c12455d564abc21e328a1122679f8352
+
+      if(refRequest.isProxy){
+        const cdpsresult = await tokenCdpManagerContract.cdpCan.callAsync(refRequest.proxyAddress, refRequest.cdpId, configAddress.token_Cdp_Address);
+        console.log("checkCdpManager = ",cdpsresult)
+        if(!cdpsresult.gt(0)){
+            console.log("console.loe allllowwwww = ", parseInt(refRequest.cdpId.toString()))
+
+            let tokendsProxyContract: dsProxyJsonContract | null = null;
+              tokendsProxyContract = await this.contractsSource.getDsProxy(refRequest.proxyAddress)
+            let dsProxyAllowJson = await this.contractsSource.dsProxyAllowJson()
+            console.log("dsProxyAllowJson - ",dsProxyAllowJson.default)
+             var datatmp = web3.eth.abi.encodeFunctionCall( dsProxyAllowJson.default,[cdpManagerAddress, parseInt(refRequest.cdpId.toString()), configAddress.token_Cdp_Address, 1]);
+
+              console.log("datatmp = ",datatmp)
+            var proxyActionsAddress = configAddress.proxy_Actions_Address;
+            // if proxy use then use this function for cdpAllow
+            const cdpDsProxyResult = await tokendsProxyContract.execute.sendTransactionAsync(proxyActionsAddress, datatmp, {from: refRequest.accountAddress})
+            console.log("cdpDsProxyResult = ",cdpDsProxyResult)
+
+          }else{
+              // let tokenmakerBridgeContract: makerBridgeContract | null = null;
+              // tokenmakerBridgeContract = await this.contractsSource.getmakerBridge("0x1476483dd8c35f25e568113c5f70249d3976ba21")
+              // const cdpsMakerresult = await tokenmakerBridgeContract._migrateLoan.sendTransactionAsync( "0x2252d3b2c12455d564abc21e328a1122679f8352", [refRequest.cdpId], [refRequest.debt],[loanAmount],[refRequest.collateralAmount], refRequest.collateralAmount,  [loanAmount], {from:"0x2252d3b2c12455d564abc21e328a1122679f8352"});
+              // console.log("cdpsMakerresult = ",cdpsMakerresult)
+          }
+        }else{
+            const cdpsresult = await tokenCdpManagerContract.cdpCan.callAsync(refRequest.accountAddress, refRequest.cdpId, configAddress.token_Cdp_Address);
+            console.log("checkCdpManager = ",cdpsresult)
+            if(!cdpsresult.gt(0)) {
+              //  Simple address Cdp Allow
+              let isalow = new BigNumber(1)
+              const cdpsResp = await tokenCdpManagerContract.cdpAllow.sendTransactionAsync(refRequest.cdpId, configAddress.token_Cdp_Address, isalow, {from: refRequest.accountAddress}); //0x2252d3b2c12455d564abc21e328a1122679f8352
+              console.log("cdpsResp =- ", cdpsResp)
+            }else{
+              // let tokenmakerBridgeContract: makerBridgeContract | null = null;
+              // tokenmakerBridgeContract = await this.contractsSource.getmakerBridge("0x1476483dd8c35f25e568113c5f70249d3976ba21")
+              // const cdpsMakerresult = await tokenmakerBridgeContract._migrateLoan.sendTransactionAsync( "0x2252d3b2c12455d564abc21e328a1122679f8352", [refRequest.cdpId], [refRequest.debt],[loanAmount],[refRequest.collateralAmount], refRequest.collateralAmount,  [loanAmount], {from:"0x2252d3b2c12455d564abc21e328a1122679f8352"});
+              // console.log("cdpsMakerresult = ",cdpsMakerresult)
+            }
+        }
+
+
+
+
+
+
+    }
+  }
+  public checkMakerBridge = async (refRequest:RefinanceData) => {
+
+    console.log("refRequest- = ",refRequest)
+    console.log('refRequest.cdpId = ',refRequest.cdpId)
+    if (this.web3Wrapper && this.contractsSource) {
+      let tokenmakerBridgeContract: makerBridgeContract | null = null;
+      tokenmakerBridgeContract = await this.contractsSource.getmakerBridge(configAddress.CDP_MANAGER)
+      //        index 0 = 0x1476483dd8c35f25e568113c5f70249d3976ba21
+
+
+
+    }
   }
 
   public createAwaitingLoan = () => {

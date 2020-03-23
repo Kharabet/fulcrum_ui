@@ -1,0 +1,431 @@
+@media screen and (max-width: $mobile-version-max-width) {
+  //.refinance-asset-selector {
+  //  flex-direction: column;
+  //  justify-content: flex-start;
+  //  min-height: 30rem;
+  //
+  //
+  //
+  //  .refinance-asset-selector-item {
+  //    margin: 1rem 0;
+  //    min-height: 27rem;
+  //
+  //    //&:first-child {
+  //    //  margin-top: 0;
+  //    //}
+  //    //
+  //    //&:last-child {
+  //    //  margin-bottom: 0;
+  //    //}
+  //  }
+  //}
+
+
+.refinance-asset-selector {
+  flex-direction: column;
+    justify-content: flex-start;
+    min-height: 30rem;
+  .mb2{
+    margin-bottom: 1.4rem;
+  }
+  .logo__image {
+      height: 1.4rem;
+      margin: 0.7rem 0;
+      vertical-align: middle;
+  }
+  .logo__imagedydx {
+      height: 2.7rem;
+      //margin: 1.3rem 0;
+      vertical-align: middle;
+  }
+  .logo__maker {
+      height: 1.4rem;
+      //margin: 1.3rem 0;
+      vertical-align: middle;
+  }
+  .refinance__input-container {
+    padding-bottom: 1rem;
+
+    .refinance__input-container__input-amount {
+      display: block;
+      height: 5rem;
+      width: 80%;
+      border-radius: 0.25rem;
+      font-size: 1.4rem;
+      font-weight: bold;
+      line-height: 1.17;
+      letter-spacing: -0.48px;
+      padding-left: 15px;
+      //text-align: center;
+      background-color: #FFFFFF;
+      color: black;
+    }
+  }
+  .refinance-asset-selector-item {
+    cursor: pointer;
+
+    display: flex;
+    flex-direction: column;
+    flex: 0 47%;
+    height: 100%;
+    width: 100%;
+    margin: 0 1rem;
+    padding: 1.4rem;
+
+    border-radius: 1rem;
+    background-color: $color-gray-light;
+
+    &:hover {
+      background-color: $color-gray-darker;
+    }
+
+    &:active {
+      background-color: $color-gray-darker-2;
+    }
+
+    &:nth-child(2) {
+      margin-left: 0;
+      margin-top: 2.5rem;
+    }
+
+    //&:first-child {
+    //  margin-top: unset;
+    //}
+    //
+    //&:first-child + div {
+    //  margin-top: unset;
+    //}
+
+    //&:last-child {
+    //  margin-right: 0;
+    //}
+
+    margin-left: 0;
+    margin-top: 2.5rem;
+
+    .refinance-asset-selector__title {
+      width: 100%;
+      margin: 1.4rem 0;
+
+      font-size: 1.4rem;
+      font-weight: bold;
+      line-height: 1.17;
+      letter-spacing: -0.48px;
+      text-align: left;
+      color: #a6a5ab;
+
+      &--coming-soon {
+        font-size: 1rem;
+        color: #a9b5c7;
+        margin: unset;
+        letter-spacing: unset;
+        margin-top: -1.875rem;
+        margin-bottom: 0.8125rem;
+      }
+    }
+    .refinance-asset-selector__desc{
+      width:95%;
+      color: #758295;
+      margin-top: 15px;
+      font-size: 1rem;
+      //font-weight: bold;
+      //text-align: left;
+      float: left;
+      margin: auto;
+      margin-top: 15px;
+      margin-bottom: 15px;
+    }
+    .refinance-asset-selector__txt{
+      float: left;
+      margin-right: 5px;
+      //width:10%;
+      //color: #39e2b5;
+      //margin-top: 5px;
+      //font-size: 1rem;
+      //font-weight: bold;
+      //text-align: left;
+      //float: left;
+    }
+    .refinance-asset-selector__rs{
+      //width:10%;
+      color: #39e2b5;
+
+      font-size: 1rem;
+      font-weight: bold;
+      //text-align: left;
+      //float: left;
+    }
+    .refinance-asset-selector__loanBlank{
+        font-size: 1.4rem;
+        font-weight: bold;
+        color: black;
+        width:50%;
+        margin-top: 10px;
+        float: left;
+      }
+    .refinance-asset-selector__loan{
+        font-size: 1.4rem;
+        font-weight: bold;
+        color: black;
+        width:40%;
+        margin-top: 10px;
+        float: left;
+      }
+    .refinance-asset-selector__detail{
+        font-size: 1.3rem;
+        font-weight: bold;
+        color: #9589f5;
+        width:40%;
+        margin-top: 10px;
+        float: left;
+      }
+
+
+    .refinance-asset-selector__price{
+        font-size: 1.4rem;
+        font-weight: bold;
+        color: black;
+        width:40%;
+        margin-top: 10px;
+        float: left;
+      }
+    .refinance-asset-selector__rowimg {
+          width:100%;
+          color: #758295;
+          float: left;
+          line-height: 45px;
+
+
+        .refinance-asset-selector__apr{
+          font-size: 1.4rem;
+          font-weight: bold;
+          color: red;
+          width:33%;
+          margin-top: 10px;
+          float: left;
+        }
+        .refinance-asset-selector__varapy{
+          font-size: 1.4rem;
+          font-weight: bold;
+          color: red;
+          width:50%;
+          margin-top: 10px;
+          float: left;
+        }
+        .refinance-asset-selector__fixedapy{
+          font-size: 1.4rem;
+          font-weight: bold;
+          color: #39e2b5;
+          width:40%;
+          margin-top: 10px;
+          float: left;
+        }
+        .refinance-asset-selector__img{
+          font-size: 1.4rem;
+          font-weight: bold;
+          float: left;
+          width:33%
+        }
+
+
+      }
+
+      .refinance-asset-selector__row{
+          width:100%;
+          color: #758295;
+          float: left;
+        .right-icon{
+          //width: 30px;
+          ////float: right;
+          //margin-left:15px;
+          //color: #758295;
+          width: 20px;
+          margin-left: 14px;
+          margin-top: 8px;
+          color: #758295;
+          float:right;
+          margin-right: 16px;
+        }
+        .refinance-asset-selector__marker{
+          font-size: 1.4rem;
+          //font-weight: bold;
+
+          width:50%;
+          float: left;
+        }
+        .refinance-asset-selector__torque{
+          font-size: 1rem;
+          font-weight: bold;
+
+          width:40%;
+          float: left;
+        }
+        .refinance-asset-selector__type{
+          font-size: 1rem;
+          font-weight: bold;
+
+          width:20%;
+          float: left;
+        }
+        .refinance-asset-selector__inputBox{
+          width:50%;
+          float: left;
+        }
+        .refinance-asset-selector__variabletxt{
+          font-size: 1rem;
+          color: #758295;
+          font-weight: normal;
+          width:50%;
+          float: left;
+        }
+        .refinance-asset-selector__loantxt{
+          font-size: 1rem;
+          color: #758295;
+          font-weight: normal;
+          width:100%;
+          float: left;
+        }
+        .refinance-asset-selector__imglogo{
+          font-size: 1rem;
+          //font-weight: bold;
+          width:10%;
+          float: left;
+          text-align: center;
+        }
+        .refinance-asset-selector__aprtxt{
+          font-size: 1rem;
+          //font-weight: bold;
+          width:40%;
+          float: left;
+        }
+        .refinance-loan-type__img{
+          width:35px;
+
+        }
+        .refinance-asset-selector__imgtxt{
+          font-size: 1rem;
+          font-weight: bold;
+          float: left;
+          margin-left: 14px;
+          width:29%
+        }
+
+      }
+
+    .refinance-asset-selector__interest-rate {
+      width: 100%;
+      font-size: 1rem;
+      font-weight: bold;
+      line-height: 1.5;
+      letter-spacing: -0.16px;
+      text-align: left;
+      background: -webkit-linear-gradient(left, #ecc75c, #6cd6b2 15%, #92a7ea 30%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+  }
+
+  .refinance-asset-selector-item--bat {
+    background-image: url("../assets/images/bg_tile_bat.svg");
+    background-repeat: no-repeat;
+    background-position: right;
+  }
+
+  .refinance-asset-selector-item--zrx {
+    background-image: url("../assets/images/bg_tile_zrx.svg");
+    background-repeat: no-repeat;
+    background-position: right;
+  }
+
+  .refinance-asset-selector-item--wbtc {
+    background-image: url("../assets/images/bg_tile_btc.svg");
+    background-repeat: no-repeat;
+    background-position: right;
+  }
+
+  .refinance-asset-selector-item--sai {
+    background-image: url("../assets/images/bg_tile_sai.svg");
+    background-repeat: no-repeat;
+    background-position: right;
+  }
+
+  .refinance-asset-selector-item--dai {
+    background-image: url("../assets/images/bg_tile_dai.svg");
+    background-repeat: no-repeat;
+    background-position: right;
+  }
+
+  .refinance-asset-selector-item--usdc {
+    background-image: url("../assets/images/bg_tile_usdc.svg");
+    background-repeat: no-repeat;
+    background-position: right;
+    margin-top: 2.5rem;
+  }
+
+  .refinance-asset-selector-item--susd {
+    background-image: url("../assets/images/bg_tile_susd.svg");
+    background-repeat: no-repeat;
+    background-position: right;
+  }
+
+  .refinance-asset-selector-item--eth {
+    background-image: url("../assets/images/bg_tile_eth.svg");
+    background-repeat: no-repeat;
+    background-position: right;
+  }
+
+  .refinance-asset-selector-item--knc {
+    background-image: url("../assets/images/bg_tile_knc.svg");
+    background-repeat: no-repeat;
+    background-position: right;
+  }
+
+  .refinance-asset-selector-item--link {
+    background-image: url("../assets/images/bg_tile_link.svg");
+    background-repeat: no-repeat;
+    background-position: right;
+  }
+
+  .refinance-asset-selector-item--mkr {
+    background-image: url("../assets/images/bg_tile_mkr.svg");
+    background-repeat: no-repeat;
+    background-position: right;
+  }
+
+  .refinance-asset-selector-item--rep {
+    background-image: url("../assets/images/bg_tile_rep.svg");
+    background-repeat: no-repeat;
+    background-position: right;
+  }
+
+  .refinance-selector-icons__item {
+    height: 3.5rem;
+    border-radius: 100px;
+
+    margin: 0.5rem;
+
+    &:first-child {
+      margin-left: 0;
+    }
+
+    &:last-child {
+      margin-right: 0;
+    }
+  }
+  .refinance-selector-icons-bar__button {
+    width: 100%;
+
+    font-size: 1rem;
+    font-weight: bold;
+    font-style: normal;
+    font-stretch: normal;
+    line-height: 3.33;
+    letter-spacing: normal;
+    text-align: center;
+    color: #ffffff;
+
+    background-color: #9589f5;
+  }
+}
+
+}

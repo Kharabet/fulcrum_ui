@@ -13,6 +13,7 @@ import { LandingPage } from "../pages/LandingPage";
 import { LandingPageStatic } from "../pages/LandingPageStatic";
 import { MaintenancePage } from "../pages/MaintenancePage";
 import { WalletSelectionPage } from "../pages/WalletSelectionPage";
+import { RefinancePage } from "../pages/RefinancePage";
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { TorqueProviderEvents } from "../services/events/TorqueProviderEvents";
 import { NavService } from "../services/NavService";
@@ -25,6 +26,8 @@ import Modal from "react-modal";
 const isMainnetProd =
   process.env.NODE_ENV && process.env.NODE_ENV !== "development"
   && process.env.REACT_APP_ETH_NETWORK === "mainnet";
+
+  console.log("process.env.REACT_APP_ETH_NETWORK = ", process.env.REACT_APP_ETH_NETWORK)
 
 if (isMainnetProd) {
   const tagManagerArgs = {
@@ -113,6 +116,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
                         <Route exact={true} path="/borrow/:walletTypeAbbr" render={props => <BorrowPage {...props} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen}/>} />
                         <Route exact={true} path="/dashboard/:walletTypeAbbr" render={props => <DashboardPage {...props} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen}/>}  />
                         <Route exact={true} path="/dashboard/:walletTypeAbbr/:walletAddress" render={props => <DashboardPage {...props} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />} />
+                        <Route exact={true} path="/refinance/:walletTypeAbbr" render={props => <RefinancePage {...props} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen}/>} />
                         <Route path="*" render={() => <Redirect to="/"/> } />
                       </Switch>
                       {isMainnetProd ? (

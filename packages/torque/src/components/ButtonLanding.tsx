@@ -5,7 +5,8 @@ import ic_arrow_right from "../assets/images/ic_arrow_right.svg";
 
 export enum ButtonLandingColor {
   Green,
-  Blue
+  Blue,
+  Purple
 }
 
 export interface IButtonLandingProps {
@@ -20,12 +21,12 @@ export class ButtonLanding extends Component<IButtonLandingProps> {
     const buttonLandingContainerColorStyle =
       this.props.color === ButtonLandingColor.Green
         ? "button-landing-container--green"
-        : "button-landing-container--blue";
+        : this.props.color === ButtonLandingColor.Purple ? "button-landing-container--purple" : "button-landing-container--blue";
 
     const buttonLandingColorStyle =
       this.props.color === ButtonLandingColor.Green
         ? "button-landing--green"
-        : "button-landing--blue";
+        : this.props.color === ButtonLandingColor.Purple ? "button-landing--purple": "button-landing--blue";
 
     return (
       <div className={`button-landing-container ${buttonLandingContainerColorStyle}`}>

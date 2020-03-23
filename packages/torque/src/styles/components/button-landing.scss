@@ -105,6 +105,17 @@
   }
 }
 
+.button-landing--purple {
+  background-color: $color-purple;
+
+  &:hover {
+    background-color: $color-purple--hover;
+  }
+
+  &:active {
+    background-color: $color-purple--pressed;
+  }
+}
 
 @media only screen and (max-width: $mobile-version-max-width) {
   .button-landing-container {
