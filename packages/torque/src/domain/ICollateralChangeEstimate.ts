@@ -5,5 +5,5 @@ export interface ICollateralChangeEstimate {
   collateralizedPercent: BigNumber;
   liquidationPrice: BigNumber;
   gasEstimate: BigNumber;
-  isWithdrawl: boolean
+  isWithdrawal: boolean
 }

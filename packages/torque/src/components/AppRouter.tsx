@@ -27,8 +27,6 @@ const isMainnetProd =
   process.env.NODE_ENV && process.env.NODE_ENV !== "development"
   && process.env.REACT_APP_ETH_NETWORK === "mainnet";
 
-  console.log("process.env.REACT_APP_ETH_NETWORK = ", process.env.REACT_APP_ETH_NETWORK)
-
 if (isMainnetProd) {
   const tagManagerArgs = {
      gtmId : configProviders.Google_TrackingID,
@@ -47,6 +45,7 @@ interface IAppRouterState {
   selectedProviderType: ProviderType;
   isLoading: boolean;
   web3: Web3Wrapper| null;
+  isMobileMedia: boolean;
 }
 
 export class AppRouter extends Component<any, IAppRouterState> {
@@ -58,7 +57,8 @@ export class AppRouter extends Component<any, IAppRouterState> {
       isRiskDisclosureModalOpen: false,
       isLoading: false,
       selectedProviderType: TorqueProvider.Instance.providerType,
-      web3: TorqueProvider.Instance.web3Wrapper
+      web3: TorqueProvider.Instance.web3Wrapper,
+      isMobileMedia:false,
     };
 
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderChanged, this.onProviderChanged);
@@ -66,6 +66,10 @@ export class AppRouter extends Component<any, IAppRouterState> {
 
   public componentWillUnmount(): void {
     TorqueProvider.Instance.eventEmitter.removeListener(TorqueProviderEvents.ProviderChanged, this.onProviderChanged);
+  }
+  public componentDidMount(): void {
+    window.addEventListener("resize", this.didResize.bind(this));
+    this.didResize();
   }
 
   public render() {
@@ -116,7 +120,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
                         <Route exact={true} path="/borrow/:walletTypeAbbr" render={props => <BorrowPage {...props} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen}/>} />
                         <Route exact={true} path="/dashboard/:walletTypeAbbr" render={props => <DashboardPage {...props} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen}/>}  />
                         <Route exact={true} path="/dashboard/:walletTypeAbbr/:walletAddress" render={props => <DashboardPage {...props} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />} />
-                        <Route exact={true} path="/refinance/:walletTypeAbbr" render={props => <RefinancePage {...props} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen}/>} />
+                        <Route exact={true} path="/refinance/:walletTypeAbbr" render={props => <RefinancePage {...props} isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen}/>} />
                         <Route path="*" render={() => <Redirect to="/"/> } />
                       </Switch>
                       {isMainnetProd ? (
@@ -139,13 +143,18 @@ export class AppRouter extends Component<any, IAppRouterState> {
     );
   }
 
+  private didResize = () => {
+    const isMobileMedia = (window.innerWidth <= 959);
+    if (isMobileMedia !== this.state.isMobileMedia) {
+      this.setState({ isMobileMedia });
+    }
+  }
   public doNetworkConnect = (destinationAbbr: string) => {
     NavService.Instance.History.replace(NavService.Instance.getWalletAddress(destinationAbbr));
     // this.setState({ ...this.state, isProviderMenuModalOpen: true });
   };
 
   private onProviderTypeSelect = async (providerType: ProviderType) => {
-
     if (providerType === TorqueProvider.Instance.providerType && TorqueProvider.Instance.accounts.length !== 0) {
       const accountAddress = TorqueProvider.Instance.accounts[0];
 

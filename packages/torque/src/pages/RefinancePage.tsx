@@ -1,8 +1,10 @@
 import React, { PureComponent, RefObject } from "react";
 import { RouteComponentProps } from "react-router";
-import { RefinanceAssetSelector } from "../components/RefinanceAssetSelector";
-import { RefinanceAssetCompoundSelector } from "../components/RefinanceAssetCompoundSelector";
 import { BorrowDlg } from "../components/BorrowDlg";
+import { RefinanceAssetCompoundLoan } from "../components/RefinanceAssetCompoundLoan";
+import { RefinanceAssetCompoundLoanMobile } from "../components/RefinanceAssetCompoundLoanMobile";
+import { RefinanceAssetSelector } from "../components/RefinanceAssetSelector";
+import { RefinanceAssetSelectorMobile } from "../components/RefinanceAssetSelectorMobile";
 import { Asset } from "../domain/Asset";
 import { WalletType, walletTypeAbbrToWalletType } from "../domain/WalletType";
 import { Footer } from "../layout/Footer";
@@ -17,6 +19,7 @@ export interface IRefinancePageRouteParams {
 export interface IRefinancePageParams {
   doNetworkConnect?: (destinationAbbr: string) => void;
   isLoading: boolean;
+  isMobileMedia: boolean;
   isRiskDisclosureModalOpen: () => void;
 }
 
@@ -31,16 +34,25 @@ export class RefinancePage extends PureComponent<IRefinancePageParams & RouteCom
 
   public render() {
     const walletType = walletTypeAbbrToWalletType(this.props.match.params.walletTypeAbbr);
-
+    const isMobileMedia = this.props.isMobileMedia
     return (
       <React.Fragment>
         <BorrowDlg ref={this.borrowDlgRef} />
         <div className="refinance-page">
           <HeaderOps isLoading={this.props.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen}/>
           {/*<div className="borrow-page__main" style={walletType === WalletType.Web3 ? { paddingBottom: `90rem`} : undefined}>*/}
-          <div className="borrow-page__main">
-            <RefinanceAssetCompoundSelector walletType={walletType}  />
-            <RefinanceAssetSelector walletType={walletType} />
+
+          <div className="refinance-page__main">
+            {isMobileMedia ?
+              <RefinanceAssetCompoundLoanMobile walletType={walletType}/>
+              :
+              <RefinanceAssetCompoundLoan walletType={walletType}/>
+            }
+            {isMobileMedia ?
+              < RefinanceAssetSelectorMobile walletType={walletType}/>
+              :
+              <RefinanceAssetSelector walletType={walletType}/>
+            }
           </div>
           <Footer isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen}/>
         </div>
@@ -49,7 +61,6 @@ export class RefinancePage extends PureComponent<IRefinancePageParams & RouteCom
   }
 
   private onSelectAsset = async (asset: Asset) => {
-
     const walletType = walletTypeAbbrToWalletType(this.props.match.params.walletTypeAbbr);
 
     if (walletType === WalletType.Web3) {
@@ -115,7 +126,7 @@ export class RefinancePage extends PureComponent<IRefinancePageParams & RouteCom
 
   private doNetworkConnect = () => {
     if (this.props.doNetworkConnect) {
-      this.props.doNetworkConnect("b");
+      this.props.doNetworkConnect('r');
     }
   };
 }

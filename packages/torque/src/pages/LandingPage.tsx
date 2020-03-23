@@ -1,5 +1,6 @@
 import React, { PureComponent } from "react";
 import { ButtonLanding, ButtonLandingColor } from "../components/ButtonLanding";
+import { ButtonLandingRefinance } from "../components/ButtonLandingRefinance";
 import { WalletType } from "../domain/WalletType";
 import { Footer } from "../layout/Footer";
 import { HeaderHome } from "../layout/HeaderHome";
@@ -23,7 +24,7 @@ export class LandingPage extends PureComponent<ILandingPageProps> {
       accountAddress
         ? NavService.Instance.getDashboardAddress(WalletType.Web3, accountAddress)
         : NavService.Instance.getWalletAddress("t");
-    const refinanceLoanUrl = NavService.Instance.getRefinanceAddress("b");
+    const refinanceLoanUrl = NavService.Instance.getRefinanceAddress("r");
     return (
       <div className="landing-page">
         <HeaderHome isLoading={false} />
@@ -35,7 +36,7 @@ export class LandingPage extends PureComponent<ILandingPageProps> {
             <div className="landing-page__jumbo-action-container">
               <ButtonLanding color={ButtonLandingColor.Blue} subtitle={"New user?"} title={"Borrow"} url={walletUrl} />
               <ButtonLanding color={ButtonLandingColor.Green} subtitle={"Existing user?"} title={"Track your loans"} url={trackLoansUrl} />
-              <ButtonLanding color={ButtonLandingColor.Purple} subtitle={"Already have a loan?"} title={"Refinance"} url={refinanceLoanUrl} />
+              <ButtonLandingRefinance color={ButtonLandingColor.Purple} subtitle={"Already have a loan?"} title={"Refinance"} url={refinanceLoanUrl} />
             </div>
           </div>
         </main>
@@ -43,6 +44,7 @@ export class LandingPage extends PureComponent<ILandingPageProps> {
       </div>
     );
   }
+
 
   public componentDidMount(): void {
     const htmls = document.getElementsByTagName("html");

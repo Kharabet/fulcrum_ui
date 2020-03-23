@@ -53,7 +53,17 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
     const assetDetails = AssetsDictionary.assets.get(this.props.item.loanAsset) || null;
     this.setState({ ...this.state, assetDetails: assetDetails, interestRate: this.props.item.interestRate });
   };
+  private migrateSaiToDai = async() =>{
+// migrateSaiToDai
+    if(this.props.item.loanData){
+      let loanOrderHash = this.props.item.loanData.loanOrderHash
+      if(loanOrderHash==undefined){
+        loanOrderHash=''
+      }
+      const migrateresp = TorqueProvider.Instance.migrateSaiToDai(loanOrderHash);
+    }
 
+  }
   public render() {
     if (!this.state.assetDetails) {
       return null;
@@ -84,6 +94,13 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
 
     return (
       <div className={`borrowed-funds-list-item`}>
+          {assetDetails.displayName === Asset.SAI ? (
+              <div className="borrowed-funds-button-div" onClick={this.migrateSaiToDai}>
+                <div className="borrowed-funds__item borrowed-funds-button" >
+                    Migrate to DAI
+                </div>
+              </div>
+          ):null}
         <div className="borrowed-funds-list-item__padding-container">
           <div className="borrowed-funds-list-item__general-container">
             <div className="borrowed-funds-list-item__general-container-values">
@@ -99,6 +116,7 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
               <div className="borrowed-funds-list-item__general-container-asset-name">
                 {assetDetails.displayName}
               </div>
+
             </div>
           </div>
         </div>
