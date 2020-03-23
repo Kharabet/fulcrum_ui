@@ -188,7 +188,7 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
                 className="token-selector-item__interest-rate-value"
               >
                 {!this.state.isLoading ? (<React.Fragment>{this.state.interestRate.toFixed(4)}<span className="sign-currency">%</span></React.Fragment>)
-                  : (<div className="token-selector-item__interest-rate-value"><Preloader /></div>)}
+                  : (<div className="token-selector-item__interest-rate-value"><Preloader width="74px"/></div>)}
               </div>
             </div>
             {this.state.balanceOfUser.gt(0) 
@@ -200,7 +200,7 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
                       title={`${this.state.balanceOfUser.toFixed(18)} ${this.props.asset}`}
                       className="token-selector-item__profit-value token-selector-item__balance-value"
                     >{this.state.balanceOfUser.toFixed(2)} {this.props.asset}</div>)
-                    : (<div className="token-selector-item__interest-rate-value"><Preloader /></div>)}
+                    : (<div className="token-selector-item__interest-rate-value"><Preloader width="74px"/></div>)}
                   </div>) : null}                
                 <div className="token-selector-item__profit-container">
                   <div className="token-selector-item__profit-title">Profit:</div>

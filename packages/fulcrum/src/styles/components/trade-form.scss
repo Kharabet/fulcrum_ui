@@ -439,3 +439,11 @@ input::-webkit-inner-spin-button {
 input[type=number] {
     -moz-appearance:textfield; /* Firefox */
 }
+
+.preloader-container{
+position: absolute;
+top: 50%;
+left: 20px;
+transform: translate(0%, -50%);
+width: 100%;
+}
