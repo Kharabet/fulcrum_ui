@@ -1,9 +1,14 @@
 .lend-token-selector {
+  font-family: "Muli", sans-serif;
+  font-weight: 800;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
 
   justify-content: flex-start;
+
+  margin-top: 45px;
+
 
   .token-selector-item {
     box-sizing: border-box;
@@ -13,29 +18,47 @@
     flex-direction: column;
     flex-grow: 1;
 
-    max-width: 24%;
-    min-width: 18.9375rem;
 
-    padding: 2rem;
-    margin: 0 1px 1px 0;
-
-    background-color: #4f5b67;
+    padding: 40px 30px 25px 30px;
+    margin-bottom: 4px;
+    background-color: var(--primary-row);
+    border: 2px solid transparent;
+    @media screen and (min-width: $breakpoint-desktop-min){
+      width: calc(25% - 3px);
+      max-width: calc(25%  - 3px);
+      &:not(:nth-child(4n)) {
+        margin-right: 4px;
+      }
+    }
+    @media screen and (max-width: $breakpoint-desktop-max){
+      width: calc(100% / 3 - 2px);
+      max-width: calc(100% / 3);
+      &:not(:nth-child(3n)) {
+        margin-right: 3px;
+      }
+    }
+    .sign-currency {
+      color: #a2abb8;
+      font-weight: 400;
+    }
 
     .token-select-item-mcd-bridge {
       cursor: pointer;
       position: absolute;
-      background: #29323D;
+      background-color: var(--lend-item-before);
       width: 5.5625rem;
       height: 2.5rem;
       top: 0px;
       right: 0px;
       border-bottom-left-radius: 1.5625rem;
-
+      &:hover {
+        background-color: var(--lend-item-before-hover);
+      }
       .token-select-item-mcd-bridge__text {
         position: absolute;
         top: 0%;
         bottom: 0%;
-        font-family: Muli;
+        font-family: "Muli", sans-serif;
         font-style: normal;
         font-weight: 800;
         font-size: 9px;
@@ -44,8 +67,7 @@
         align-items: center;
         text-align: center;
         letter-spacing: 0.05em;
-        color: #FFFFFF;
-
+        color: #ffffff;
         &--upgrade {
           left: 0.9rem;
         }
@@ -57,36 +79,48 @@
     }
 
     .token-selector-item__image {
-      margin-top: 0.75rem;
-      margin-bottom: 1rem;
+      margin-bottom: 10px;
 
       text-align: center;
 
-      img {
+      img,
+      svg {
         display: inline-block;
         height: 4rem;
         width: 4rem;
+        .eth-svg {
+          fill: #c8c8c8;
+        }
       }
     }
 
     .token-selector-item__descriptions {
       display: flex;
-      flex-direction: row;
+      flex-direction: column;
       justify-content: space-between;
 
       margin-bottom: 1.5rem;
-
+      .token-selector-item__description {
+        flex-direction: row;
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        > div {
+          width: 50%;
+        }
+        & + .token-selector-item__description {
+          margin-top: 4px;
+        }
+      }
       .token-selector-item__name {
-        font-size: 2.25rem;
-        line-height: 2.5rem;
-        font-weight: 600;
+        font-size: 26px;
+        font-weight: 800;
         font-style: normal;
         font-stretch: normal;
-        letter-spacing: -0.9px;
         text-align: left;
-        color: #ffffff;
-        margin-top: -0.5rem;
-        margin-bottom: 0.5rem;
+        color: var(--primary-text);
+        margin-top: 9px;
+        margin-bottom: 12px;
       }
 
       .token-selector-item__profit-container {
@@ -96,23 +130,24 @@
         height: 2.5rem;
 
         .token-selector-item__profit-title {
-          font-size: 0.75rem;
+          font-size: 12px;
           font-weight: normal;
           font-style: normal;
           font-stretch: normal;
           letter-spacing: normal;
           text-align: right;
-          color: #acb5c2;
+          color: var(--trade-header-color);
         }
 
         .token-selector-item__profit-value {
-          font-size: 1rem;
+          font-size: 18px;
           font-weight: 600;
           font-style: normal;
           font-stretch: normal;
           letter-spacing: -0.4px;
           text-align: right;
-          color: #ffe546;
+          font-weight: 800;
+          color: var(--primary-text);
         }
       }
 
@@ -124,26 +159,27 @@
 
         height: 2.5rem;
         margin-top: -0.5rem;
-        margin-bottom: 0.5rem;
+        margin-bottom: 12px;
 
         .token-selector-item__interest-rate-title {
-          font-size: 0.75rem;
+          font-size: 12px;
           font-weight: normal;
           font-style: normal;
           font-stretch: normal;
           letter-spacing: normal;
           text-align: right;
-          color: #acb5c2;
+          color: var(--trade-header-color);
         }
 
         .token-selector-item__interest-rate-value {
-          font-size: 1rem;
+          font-size: 26px;
           font-weight: 600;
           font-style: normal;
           font-stretch: normal;
           letter-spacing: -0.4px;
           text-align: right;
-          color: #ffe546;
+          font-weight: 800;
+          color: var(--primary-text);
         }
       }
     }
@@ -151,28 +187,31 @@
     .token-selector-item__actions {
       display: flex;
       flex-direction: row;
-
-      margin-bottom: 1.5rem;
+      justify-content: center;
 
       button {
         display: block;
         cursor: pointer;
 
         border: 0;
-        height: 2.5rem;
+        height: 45px;
         border-radius: 100px;
-        color: #ffffff;
-
         text-transform: uppercase;
         outline: none;
+        max-width: 130px;
+        color: #ffffff;
+        margin: auto;
+        font-size: 14px;
+        font-weight: 600;
+        letter-spacing: 0.05em;
 
         &.token-selector-item__lend-button--size-full {
-          width: 100%;
+          width: 120px;
         }
 
         &.token-selector-item__lend-button--size-half {
-          width: 45%;
-          margin: 0 5%;
+          width: 110px;
+          margin: 0 5px;
 
           &:first-child {
             margin-left: 0;
@@ -184,26 +223,64 @@
         }
 
         &.token-selector-item__lend-button {
-          background-color: #69bf83;
+          background-color: #00c0ab;
+          &:hover {
+            cursor: pointer;
+            background-color: #33dfcc;
+          }
         }
 
         &.token-selector-item__un-lend-button {
           background-color: #ff5353;
+          &:hover {
+            cursor: pointer;
+            background-color: #FE7272;
+          }
+        }
+      }
+    }
+    .wrapper-loader{
+      float: right;
+      padding: 10px 0;
+    }
+    &_active {
+      background-color: var(--lend-bg-hover);
+      border-color: var(--lend-border-hover);
+      .token-selector-item__descriptions {
+        .token-selector-item__description {
+          align-items: flex-end;
+          .token-selector-item__name {
+            order: -2;
+            font-size: 18px;
+          }
+          .token-selector-item__interest-rate-container {
+            margin-bottom: 0;
+            .token-selector-item__interest-rate-title {
+              text-align: left;
+            }
+            .token-selector-item__interest-rate-value {
+              text-align: left;
+              font-size: 18px;
+            }
+          }
+          .token-selector-item__profit-container {
+            &.token-selector-item__balance-container {
+              order: -1;
+              margin-bottom: 10px;
+            }
+          }
         }
       }
     }
   }
 }
 
-
 @media screen and (max-width: $mobile-version-max-width) {
-
   .lend-token-selector {
-
     .token-selector-item {
       max-width: 100%;
       min-width: 100%;
+      margin-right: 0;
     }
   }
-
 }

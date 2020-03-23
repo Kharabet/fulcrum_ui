@@ -55,15 +55,38 @@ export class TradeSellErcProcessor {
     if (assetErc20Address) {
       // Waiting for token allowance
       if (skipGas) {
-        gasAmountBN = new BigNumber(3000000);
+        gasAmountBN = new BigNumber(FulcrumProvider.Instance.gasLimit);
       } else {
         // estimating gas amount
-        const gasAmount = await tokenContract.burnToToken.estimateGasAsync(
-          account,
-          assetErc20Address,
-          amountInBaseUnits,
-          { from: account, gas: FulcrumProvider.Instance.gasLimit }
-        );
+        let gasAmount;
+        if (taskRequest.version === 2 && taskRequest.loanDataBytes) {
+          gasAmount = await tokenContract.burnToToken.estimateGasAsync(
+            account,
+            assetErc20Address,
+            amountInBaseUnits,
+            new BigNumber(0),
+            taskRequest.loanDataBytes,
+            {
+              from: account,
+              gas: FulcrumProvider.Instance.gasLimit,
+              value: taskRequest.zeroXFee ?
+                taskRequest.zeroXFee :
+                0
+            }
+          );
+        } else {
+          gasAmount = await tokenContract.burnToTokenNoBytes.estimateGasAsync(
+            account,
+            assetErc20Address,
+            amountInBaseUnits,
+            new BigNumber(0),
+            {
+              from: account,
+              gas: FulcrumProvider.Instance.gasLimit,
+              value: 0
+            }
+          );
+        }
         gasAmountBN = new BigNumber(gasAmount).multipliedBy(FulcrumProvider.Instance.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
       }
 
@@ -72,16 +95,36 @@ export class TradeSellErcProcessor {
         FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.AskToOpenProgressDlg);
 
         // Closing trade
-        txHash = await tokenContract.burnToToken.sendTransactionAsync(
-          account,
-          assetErc20Address,
-          amountInBaseUnits,
-          { 
-            from: account,
-            gas: gasAmountBN.toString(),
-            gasPrice: await FulcrumProvider.Instance.gasPrice()
-          }
-        );
+        if (taskRequest.version === 2 && taskRequest.loanDataBytes) {
+          txHash = await tokenContract.burnToToken.sendTransactionAsync(
+            account,
+            assetErc20Address,
+            amountInBaseUnits,
+            new BigNumber(0),
+            taskRequest.loanDataBytes,
+            { 
+              from: account,
+              gas: gasAmountBN.toString(),
+              gasPrice: await FulcrumProvider.Instance.gasPrice(),
+              value: taskRequest.zeroXFee ?
+                taskRequest.zeroXFee :
+                0
+            }
+          );
+        } else {
+          txHash = await tokenContract.burnToTokenNoBytes.sendTransactionAsync(
+            account,
+            assetErc20Address,
+            amountInBaseUnits,
+            new BigNumber(0),
+            { 
+              from: account,
+              gas: gasAmountBN.toString(),
+              gasPrice: await FulcrumProvider.Instance.gasPrice(),
+              value: 0
+            }
+          );
+        }
         task.setTxHash(txHash);
       }
       finally {

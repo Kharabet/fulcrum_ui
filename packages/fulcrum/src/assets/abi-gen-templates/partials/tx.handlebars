@@ -1,4 +1,4 @@
-public {{this.tsName}} = {
+public {{languageSpecificName}} = {
     async sendTransactionAsync(
     {{> typed_params inputs=inputs}}
     {{#this.payable}}
@@ -17,7 +17,7 @@ public {{this.tsName}} = {
                 data: encodedData,
             },
             self._web3Wrapper.getContractDefaults(),
-            (self as any).{{this.tsName}}.estimateGasAsync.bind(
+            (self as any).{{languageSpecificName}}.estimateGasAsync.bind(
                 self,
                 {{> params inputs=inputs}}
             ),

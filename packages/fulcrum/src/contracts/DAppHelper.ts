@@ -21,6 +21,7 @@ export class DAppHelperContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<BigNumber[]
         > {
+            callData.from = "0x4abB24590606f5bf4645185e20C4E7B97596cA3B";
             const self = this as any as DAppHelperContract;
             const encodedData = self._strictEncodeArguments('assetRates(address,address,address[],uint256[])', [
                 oracleAddress,
@@ -54,6 +55,7 @@ export class DAppHelperContract extends BaseContract {
             defaultBlock?: BlockParam,
         ): Promise<[BigNumber[], BigNumber[], BigNumber[], BigNumber[], BigNumber[], BigNumber[]]
         > {
+            callData.from = "0x4abB24590606f5bf4645185e20C4E7B97596cA3B";
             const self = this as any as DAppHelperContract;
             const encodedData = self._strictEncodeArguments('reserveDetails(address[])', [
                 tokenAddresses

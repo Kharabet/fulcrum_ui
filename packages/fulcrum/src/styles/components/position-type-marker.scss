@@ -1,13 +1,13 @@
 .position-type-marker {
-  font-size: 0.625rem;
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 800;
   font-style: normal;
   font-stretch: normal;
   letter-spacing: normal;
   text-align: left;
-  color: #ffffff;
-
-  padding: 0.125rem 0.25rem;
-  border: solid 1px #ffffff;
-  border-radius: .25rem;
+  color: var(--position-marker-color);
+  background-color: var(--position-marker-bg);
+  padding: 6px 12px;
+  border: solid 1px #a2abb8;
+  border-radius: 1.5rem;
 }

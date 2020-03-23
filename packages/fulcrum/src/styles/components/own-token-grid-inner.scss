@@ -1,0 +1,217 @@
+$font-size-header: 12px;
+$height-row: 4.5rem;
+
+$width-col-token-image: 15%;
+$width-col-token-name-full: 15%;
+$width-col-position-type: 11%;
+$width-col-asset-price: 13%;
+$width-col-liquidation-price: 13%;
+$width-col-position-value: 13%;
+$width-col-profit: 11%;
+
+$width-col-actions: 22%;
+
+$width-button-action: 11%;
+
+$margin-right-column: 1.5rem;
+$margin-right-small-column: 0.5rem;
+
+$width-button-action: 7rem;
+
+@mixin own-token-grid-header-inner__col {
+  font-family: "Muli", sans-serif;
+  vertical-align: middle;
+  font-size: $font-size-header;
+  font-weight: 600;
+  font-style: normal;
+  font-stretch: normal;
+  letter-spacing: normal;
+  color: #a2abb8;
+}
+@mixin own-token-grid-row-inner__col {
+  font-family: "Muli", sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--primary-text);
+  font-style: normal;
+  font-stretch: normal;
+  line-height: 1.5;
+  display: flex;
+}
+.own-token-grid-header-inner {
+  display: flex;
+  padding: 15px 40px 0px 40px;
+  font-family: "Muli", sans-serif;
+  background-color: var(--secondary-row);
+  margin-bottom: -15px;
+  position: relative;
+  z-index: 2;
+  &__col-token-image {
+    @include own-token-grid-header-inner__col();
+    width: $width-col-token-image;
+  }
+  &__col-asset-price {
+    @include own-token-grid-header-inner__col();
+    width: $width-col-asset-price;
+  }
+  &__col-liquidation-price {
+    @include own-token-grid-header-inner__col();
+    width: $width-col-liquidation-price;
+  }
+  &__col-position-value {
+    @include own-token-grid-header-inner__col();
+    width: $width-col-position-value;
+  }
+  &__col-profit {
+    @include own-token-grid-header-inner__col();
+    width: $width-col-profit;
+  }
+  &__col-actions {
+    @include own-token-grid-header-inner__col();
+    width: $width-col-actions;
+    text-align: right;
+  }
+}
+
+.own-token-grid-row-inner {
+  display: flex;
+  align-items: center;
+  background-color: var(--secondary-row);
+
+  padding: 18px 40px;
+  margin-bottom: 1px;
+  position: relative;
+  .sign-currency {
+    color: #a2abb8;
+    font-weight: 400;
+  }
+  &__col-token-name-full {
+    @include own-token-grid-row-inner__col();
+    width: $width-col-token-name-full;
+  }
+  &__col-position-type {
+    @include own-token-grid-row-inner__col();
+    width: $width-col-position-type;
+  }
+  &__col-asset-price {
+    @include own-token-grid-row-inner__col();
+    width: $width-col-asset-price;
+  }
+  &__col-liquidation-price {
+    @include own-token-grid-row-inner__col();
+    width: $width-col-liquidation-price;
+  }
+  &__col-position-value {
+    @include own-token-grid-row-inner__col();
+    width: $width-col-position-value;
+  }
+  &__col-profit {
+    @include own-token-grid-row-inner__col();
+    width: $width-col-profit;
+  }
+  &__col-action {
+    @include own-token-grid-row-inner__col();
+    justify-content: flex-end;
+    width: $width-col-actions;
+  }
+  &__buy-button {
+    display: inline-block;
+    border: 0;
+    width: $width-button-action;
+    height: 2.5rem;
+    border-radius: 100px;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    font-weight: normal;
+    font-style: normal;
+    font-stretch: normal;
+    letter-spacing: -0.3px;
+    color: var(--primary-text);
+    outline: none;
+    &:hover{
+      background-color: #5B88FF;
+    }
+    &:not(:disabled){
+      cursor: pointer;
+    }
+    &:disabled {
+      background-color: var(--disabled-bg);
+      color: var(--disabled-color);
+      cursor: not-allowed;
+    }
+  }
+  &__details-button {
+    display: inline-block;
+    cursor: pointer;
+    position: relative;
+    border: solid 1px #758295;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 100px;
+    background-color: rgba(0, 0, 0, 0);
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    font-weight: normal;
+    font-style: normal;
+    font-stretch: normal;
+    letter-spacing: -0.3px;
+    color: var(--primary-text);
+    outline: none;
+
+    &::after {
+      position: absolute;
+      content: "•••";
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(90deg);
+      font-size: 0.5rem;
+      letter-spacing: 0.125rem;
+      margin-top: 0.125rem;
+    }
+  }
+  &__manage-button {
+    display: inline-block;
+    cursor: pointer;
+    border: 0;
+    width: $width-button-action;
+    height: 2.5rem;
+    border-radius: 100px;
+    background-color: #407bf7;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    font-weight: normal;
+    font-style: normal;
+    font-stretch: normal;
+    letter-spacing: -0.3px;
+    color: var(--primary-text);
+    outline: none;
+  }
+  &__sell-button {
+    font-family: "Muli", sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    font-weight: 700;
+    display: inline-block;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    border: 0;
+    border-radius: 43px;
+    background-color: #ff4f4f;
+    text-transform: uppercase;
+    font-style: normal;
+    color: #ffffff;
+    outline: none;
+    padding: 14px 34px;
+    &:hover {
+      background-color: #fe7272;
+    }
+    &:not(:disabled){
+      cursor: pointer;
+    }
+    &:disabled {
+      background-color: var(--disabled-bg);
+      color: var(--disabled-color);
+      cursor: not-allowed;
+    }
+  }
+}

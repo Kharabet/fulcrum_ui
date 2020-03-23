@@ -3,28 +3,27 @@
   flex-direction: column;
   align-content: center;
   justify-content: flex-start;
-
-  height: 100%;
-  width: $page-max-width;
-  padding: $page-padding;
+  width: $container-desktop;
   flex-shrink: 0;
+  box-sizing: border-box;
 }
-
+@media screen and (max-width: $breakpoint-desktop-max) {
+  .trade-page {
+    width: $container-laptop;
+  }
+}
+@media screen and (max-width: $breakpoint-laptop-max) {
+  .trade-page {
+    width: $container-mobile;
+    padding: 0 15px;
+  }
+}
 @media only screen and (max-width: $mobile-version-width-sm) {
   .trade-page {
-    display: flex;
-    flex-direction: column;
-    align-content: center;
-    justify-content: flex-start;
-
     height: 100%;
-    width: 100%;
-    padding: 2px;
-    flex-shrink: 0;
   }
-  .trade-page-header{
-    width: 90%;
+  .trade-page-header {
+    width: $container-mobile;
     margin: auto;
   }
-
 }

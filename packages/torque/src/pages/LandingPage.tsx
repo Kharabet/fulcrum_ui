@@ -6,7 +6,12 @@ import { HeaderHome } from "../layout/HeaderHome";
 import { NavService } from "../services/NavService";
 import { TorqueProvider } from "../services/TorqueProvider";
 
-export class LandingPage extends PureComponent {
+
+export interface ILandingPageProps {
+  isRiskDisclosureModalOpen: () => void;
+}
+
+export class LandingPage extends PureComponent<ILandingPageProps> {
   public render() {
     const accountAddress =
       TorqueProvider.Instance.accounts.length > 0 && TorqueProvider.Instance.accounts[0]
@@ -28,13 +33,13 @@ export class LandingPage extends PureComponent {
               <span className="landing-page__jumbo-header">Borrowing Made Simple</span>
             </h1>
             <div className="landing-page__jumbo-action-container">
-              <ButtonLanding color={ButtonLandingColor.Blue} subtitle={"New user?"} title={"Borrow"} url={walletUrl} />
+              {/* <ButtonLanding color={ButtonLandingColor.Blue} subtitle={"New user?"} title={"Borrow"} url={walletUrl} /> */}
               <ButtonLanding color={ButtonLandingColor.Green} subtitle={"Existing user?"} title={"Track your loans"} url={trackLoansUrl} />
               <ButtonLanding color={ButtonLandingColor.Purple} subtitle={"Already have a loan?"} title={"Refinance"} url={refinanceLoanUrl} />
             </div>
           </div>
         </main>
-        <Footer />
+        <Footer isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen}/>
       </div>
     );
   }

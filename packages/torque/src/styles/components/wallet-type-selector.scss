@@ -50,6 +50,10 @@
     background-image: url("../assets/images/bg_tile_browser_wallets.svg");
     background-repeat: no-repeat;
     background-position:top;
+    
+    background-position: center;
+    background-size: cover;
+    width: 100%;
   }
 
   .wallet-type-selector-item--non-web3-wallet {

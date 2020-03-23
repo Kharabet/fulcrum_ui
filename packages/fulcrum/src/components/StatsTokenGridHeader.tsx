@@ -10,8 +10,8 @@ export class StatsTokenGridHeader extends Component<IStatsTokenGridHeaderProps> 
         <div className="stats-grid-header__col-name">
           <span className="stats-grid-header__text">Reserve</span>
         </div>
-        <div className="stats-grid-header__col-total-tlv-usd">
-          <span className="stats-grid-header__text">TLV (USD)</span>
+        <div className="stats-grid-header__col-total-tvl-usd">
+          <span className="stats-grid-header__text">TVL (USD)</span>
         </div>
         <div className="stats-grid-header__col-total-supply-usd">
           <span className="stats-grid-header__text">Total Supply (USD)</span>
@@ -36,7 +36,7 @@ export class StatsTokenGridHeader extends Component<IStatsTokenGridHeaderProps> 
         </div>
         <div className="stats-grid-header__col-borrow-rate">
           {/*<span className="stats-grid-header__text">Avg/Next Borrow Rate (APR)</span>*/}
-          <span className="stats-grid-header__text" style={{ marginBottom: `-3.2rem` }}>Borrow Rate (APR)</span>
+          <span className="stats-grid-header__text">Borrow Rate (APR)</span>
           <span className="stats-grid-header__text">Fulcrum / Torque</span>
         </div>
         {/*<div className="stats-grid-header__col-next-rate">

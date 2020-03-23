@@ -21,12 +21,18 @@ export class LendTokenSelector extends Component<ILendTokenSelectorProps> {
         Asset.SAI,
         Asset.DAI
       ];
+    } else if (process.env.REACT_APP_ETH_NETWORK === "ropsten") {
+      LendTokenSelector.assets = [
+        Asset.ETH,
+        Asset.DAI
+      ];
     } else {
       LendTokenSelector.assets = [
         Asset.ETH,
         Asset.SAI,
         Asset.DAI,
         Asset.USDC,
+        Asset.USDT,
         Asset.SUSD,
         Asset.WBTC,
         Asset.LINK,

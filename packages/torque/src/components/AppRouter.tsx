@@ -1,5 +1,6 @@
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import React, { Component } from "react";
+import TagManager from 'react-gtm-module';
 // import ReactGA from "react-ga";
 import Intercom from "react-intercom";
 import { HashRouter, Redirect, Route, Switch } from "react-router-dom";
@@ -17,9 +18,10 @@ import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { TorqueProviderEvents } from "../services/events/TorqueProviderEvents";
 import { NavService } from "../services/NavService";
 import { TorqueProvider } from "../services/TorqueProvider";
-import { LocationListener } from "./LocationListener";
-import TagManager from 'react-gtm-module';
 import siteConfig from "./../config/SiteConfig.json";
+import { LocationListener } from "./LocationListener";
+import { RiskDisclosure } from "./RiskDisclosure";
+import Modal from "react-modal";
 
 const isMainnetProd =
   process.env.NODE_ENV && process.env.NODE_ENV !== "development"
@@ -41,6 +43,7 @@ if (isMainnetProd) {
 
 interface IAppRouterState {
 //  isProviderMenuModalOpen: boolean;
+  isRiskDisclosureModalOpen: boolean;
   selectedProviderType: ProviderType;
   isLoading: boolean;
   web3: Web3Wrapper| null;
@@ -52,6 +55,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
 
     this.state = {
       // isProviderMenuModalOpen: false,
+      isRiskDisclosureModalOpen: false,
       isLoading: false,
       selectedProviderType: TorqueProvider.Instance.providerType,
       web3: TorqueProvider.Instance.web3Wrapper
@@ -67,6 +71,14 @@ export class AppRouter extends Component<any, IAppRouterState> {
   public render() {
     return (
       <React.Fragment>
+        <Modal
+          isOpen={this.state.isRiskDisclosureModalOpen}
+          onRequestClose={this.onRiskDisclosureRequestClose}
+          className="modal-content-div-top"
+          overlayClassName="modal-overlay-div overflow-auto"
+        >
+          <RiskDisclosure onClose={this.onRiskDisclosureRequestClose} />
+        </Modal>
         { isMainnetProd ? (
           <Intercom appID="dfk4n5ut" />
         ) : null }
@@ -78,7 +90,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
                 ? <HashRouter hashType="slash">
                     <LocationListener doNetworkConnect={this.doNetworkConnect}>
                       <Switch>
-                        <Route exact={true} path="/" component={LandingPageStatic} />
+                        <Route exact={true} path="/" render={props => <LandingPageStatic {...props} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen}/>} />
                         <Route path="*" render={() => <Redirect to="/"/> } />
                       </Switch>
                       {isMainnetProd ? (
@@ -99,12 +111,12 @@ export class AppRouter extends Component<any, IAppRouterState> {
                   <HashRouter hashType="slash">
                     <LocationListener doNetworkConnect={this.doNetworkConnect}>
                       <Switch>
-                        <Route exact={true} path="/" component={LandingPage} />
-                        <Route exact={true} path="/wallet/:destinationAbbr" render={props => <WalletSelectionPage {...props} onSelectProvider={this.onProviderTypeSelect} isLoading={this.state.isLoading} />} />
-                        <Route exact={true} path="/borrow/:walletTypeAbbr" render={props => <BorrowPage {...props} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} />} />
-                        <Route exact={true} path="/dashboard/:walletTypeAbbr" render={props => <DashboardPage {...props} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} />} />
-                        <Route exact={true} path="/dashboard/:walletTypeAbbr/:walletAddress" render={props => <DashboardPage {...props} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} />} />
-                        <Route exact={true} path="/refinance/:walletTypeAbbr" render={props => <RefinancePage {...props} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} />} />
+                        <Route exact={true} path="/" render={props => <LandingPage {...props} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen}/>}  />
+                        <Route exact={true} path="/wallet/:destinationAbbr" render={props => <WalletSelectionPage {...props} onSelectProvider={this.onProviderTypeSelect} isLoading={this.state.isLoading} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />} />
+                        {/* <Route exact={true} path="/borrow/:walletTypeAbbr" render={props => <BorrowPage {...props} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen}/>} /> */}
+                        <Route exact={true} path="/dashboard/:walletTypeAbbr" render={props => <DashboardPage {...props} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen}/>}  />
+                        <Route exact={true} path="/dashboard/:walletTypeAbbr/:walletAddress" render={props => <DashboardPage {...props} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />} />
+                        <Route exact={true} path="/refinance/:walletTypeAbbr" render={props => <RefinancePage {...props} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect}/>} />
                         <Route path="*" render={() => <Redirect to="/"/> } />
                       </Switch>
                       {isMainnetProd ? (
@@ -190,4 +202,10 @@ export class AppRouter extends Component<any, IAppRouterState> {
       web3: event.web3
     });
   };
+  public onRiskDisclosureRequestClose = () => {
+    this.setState({ ...this.state, isRiskDisclosureModalOpen: false });
+  }
+  public onRiskDisclosureRequestOpen = () => {
+    this.setState({ ...this.state, isRiskDisclosureModalOpen: true });
+  }
 }

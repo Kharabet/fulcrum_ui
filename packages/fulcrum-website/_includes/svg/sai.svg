@@ -1,0 +1,7 @@
+<svg viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+<circle cx="25" cy="25" r="25" fill="#8878B5" class="path-gray"></circle>
+<path d="M25 10.0046L39.9878 25.0023L25 39.9999L10.0122 25.0023L25 10.0046Z" fill="#FFCE45" class="path-white"></path>
+<path d="M25 29.8918L10 24.9976L25 10L40 24.9976L25 29.8918Z" fill="#FEBE44" class="path-gray"></path>
+<path d="M15.2173 24.0227H22.061L24.9954 20.7599L28.256 24.0227H35.0998L25.0001 13.0918L15.2173 24.0227Z" fill="white" class="path-white"></path>
+<path opacity="0.42" d="M25 39.9981V10.0038L39.9869 25.0014L25 39.9981Z" fill="#D9A547" class="path-white"></path>
+</svg>

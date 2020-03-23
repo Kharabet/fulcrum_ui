@@ -6,6 +6,17 @@
     display: block;
     height: 100%;
   }
+  .header-logo-partial {
+    display: none;
+  }
+  @media only screen and (max-width: $breakpoint-laptop-max) and (min-width: $breakpoint-mobile-min) {
+    .header-logo-partial {
+      display: block;
+    }
+    .header-logo-full {
+      display: none;
+    }
+  }
 }
 
 .header-logo__image {
@@ -16,7 +27,9 @@
 
 @media only screen and (max-width: $mobile-version-max-width) {
   .header-logo__image {
-    height: 1.5rem;
+   
+    width: 148px;
+    height: auto;
     margin: .5rem 0;
     vertical-align: middle;
   }

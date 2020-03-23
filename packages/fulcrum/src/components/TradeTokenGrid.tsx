@@ -1,22 +1,19 @@
 import { BigNumber } from "@0x/utils";
-import React, {ChangeEvent, Component} from "react";
+import React, { ChangeEvent, Component } from "react";
 import TagManager from "react-gtm-module";
 import { Asset } from "../domain/Asset";
-import {AssetsDictionary} from "../domain/AssetsDictionary";
 import { PositionType } from "../domain/PositionType";
 import { TradeRequest } from "../domain/TradeRequest";
 import { TradeTokenKey } from "../domain/TradeTokenKey";
-import {TradeType} from "../domain/TradeType";
+import { TradeType } from "../domain/TradeType";
 import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { TradeTransactionMinedEvent } from "../services/events/TradeTransactionMinedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
 import { TradeTokenGridHeader } from "./TradeTokenGridHeader";
-import { TradeTokenGridHeaderMobile } from "./TradeTokenGridHeaderMobile";
 import { ITradeTokenGridRowProps, TradeTokenGridRow } from "./TradeTokenGridRow";
-import { ITradeTokenGridRowFooterMBProps, TradeTokenGridRowMobileFooter } from "./TradeTokenGridRowFooterMobile";
-import { ITradeTokenGridRowMBProps, TradeTokenGridRowMobile } from "./TradeTokenGridRowMobile";
-import  settingSvg  from "../assets/images/settings.svg";
+import { ITradeTokenCardMobileProps, TradeTokenCardMobile } from "./TradeTokenCardMobile";
+import { OwnTokenGrid } from "./OwnTokenGrid";
 
 // import siteConfig from "./../config/SiteConfig.json";
 
@@ -26,9 +23,10 @@ export interface ITradeTokenGridProps {
   defaultLeverageShort: number;
   defaultLeverageLong: number;
   isMobileMedia: boolean;
-  onShowMyTokensOnlyChange: (value: boolean) => void;
+  assets: Asset[];
   onSelect: (key: TradeTokenKey) => void;
   onTrade: (request: TradeRequest) => void;
+  changeActiveBtn: (activeType: string) => void;
   isLong: boolean;
   isShort: boolean;
 }
@@ -36,15 +34,12 @@ export interface ITradeTokenGridProps {
 interface ITradeTokenGridState {
   tokenRowsData: ITradeTokenGridRowProps[];
   balance: BigNumber;
-  tokenSingleRowsData: ITradeTokenGridRowMBProps[];
-  tokenLongShortRowsData: ITradeTokenGridRowProps[];
+  tokenLongShortRowsData: ITradeTokenCardMobileProps[];
 }
 
 export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenGridState> {
-  private static assets: Asset[];
 
-  private static readonly longVal = [2,3,4];
-  private static readonly shortVal = [1,2,3,4];
+  private static changeActiveBtn: (activeType: string) => void;
 
   private static defaultUnitOfAccount: Asset;
 
@@ -55,55 +50,39 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
       Asset.SAI :
       Asset.DAI;
 
-    if (process.env.REACT_APP_ETH_NETWORK === "kovan") {
-      TradeTokenGrid.assets = [
-        Asset.ETH
-      ];
-    } else {
-      TradeTokenGrid.assets = [
-        Asset.ETH,
-        // Asset.SAI,
-        // Asset.DAI,
-        // Asset.USDC,
-        // Asset.SUSD,
-        Asset.WBTC,
-        Asset.LINK,
-        // Asset.MKR,
-        Asset.ZRX,
-        // Asset.BAT,
-        // Asset.REP,
-        Asset.KNC
-      ];
-    }
+    TradeTokenGrid.changeActiveBtn = props.changeActiveBtn;
 
+    this._isMounted = false;
     this.state = {
       tokenRowsData: TradeTokenGrid.getRowsData(props),
       balance: new BigNumber(0),
-      tokenSingleRowsData:TradeTokenGrid.getSingleRowData(props),
-      tokenLongShortRowsData:TradeTokenGrid.getRowsLongShortData(props),
+      tokenLongShortRowsData: TradeTokenGrid.getRowsLongShortData(props),
     };
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.TradeTransactionMined, this.onTradeTransactionMined);
   }
 
-  public async derivedUpdate() {
-    if(!this.props.isMobileMedia){
-      this.setState({ ...this.state, tokenRowsData: TradeTokenGrid.getRowsData(this.props) }) ;
-    }else{
-      this.setState({ ...this.state, tokenSingleRowsData:TradeTokenGrid.getSingleRowData(this.props) }) ;
-    this.setState({ ...this.state, tokenSingleRowsData:TradeTokenGrid.getSingleRowData(this.props), tokenLongShortRowsData:TradeTokenGrid.getRowsLongShortData(this.props) }) ;
-    }
+  private _isMounted: boolean;
 
-      // this.setState({ ...this.state, tokenSingleRowsData:TradeTokenGrid.getSingleRowData(this.props) }) ;
+  public async derivedUpdate() {
+    if (!this.props.isMobileMedia) {
+      await this._isMounted && this.setState({ ...this.state, tokenRowsData: TradeTokenGrid.getRowsData(this.props) });
+
+    } else {
+      await this._isMounted && this.setState({ ...this.state, tokenLongShortRowsData: TradeTokenGrid.getRowsLongShortData(this.props) });
+    }
   }
 
   public componentWillUnmount(): void {
+    this._isMounted = false;
 
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.TradeTransactionMined, this.onTradeTransactionMined);
   }
 
   public componentDidMount(): void {
+    this._isMounted = true;
+
     const e = this.state.tokenRowsData[0];
 
     this.props.onSelect(new TradeTokenKey(e.asset, e.defaultUnitOfAccount, e.positionType, e.defaultLeverage, e.defaultTokenizeNeeded));
@@ -113,10 +92,9 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
 
   public componentDidUpdate(prevProps: Readonly<ITradeTokenGridProps>, prevState: Readonly<ITradeTokenGridState>, snapshot?: any): void {
 
-    if(this.props.isLong !==  prevProps.isLong){
-      this.setState({ ...this.state, tokenSingleRowsData:TradeTokenGrid.getSingleRowData(this.props) }) ;
+    if (this.props.isLong !== prevProps.isLong) {
 
-      this.setState({ ...this.state, tokenLongShortRowsData:TradeTokenGrid.getRowsLongShortData(this.props) }) ;
+      this._isMounted && this.setState({ ...this.state, tokenLongShortRowsData: TradeTokenGrid.getRowsLongShortData(this.props) });
     }
 
     if (this.props.selectedKey !== prevProps.selectedKey || this.props.showMyTokensOnly !== prevProps.showMyTokensOnly) {
@@ -125,84 +103,57 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
   }
 
   public render() {
-
     return !this.props.isMobileMedia ? this.renderDesktop() : this.renderMobile();
-
   }
 
 
   private renderDesktop = () => {
-    const tokenRows = this.state.tokenRowsData.map(e => <TradeTokenGridRow key={`${e.asset}_${e.positionType}`} {...e} />);
-
+    let tokenRows;
+    if (this.props.selectedKey.asset !== Asset.UNKNOWN) {
+      tokenRows = this.state.tokenRowsData.map(e => <TradeTokenGridRow key={`${e.asset}_${e.positionType}`} {...e} />);
+    }
+    let tradeTokenGridProps = this.props;
     return (
-      <div className="trade-token-grid">
-        <TradeTokenGridHeader showMyTokensOnly={this.props.showMyTokensOnly} onShowMyTokensOnlyChange={this.props.onShowMyTokensOnlyChange} />
-        {tokenRows}
+      <div className="trade-token-grid__wrapper">
+
+        <div className="trade-token-grid">
+          <TradeTokenGridHeader showMyTokensOnly={this.props.showMyTokensOnly} />
+          {tokenRows && tokenRows.map(row => {
+            return (<div className="trade-token-grid-row-wrapper" key={`${row.props.asset}_${row.props.positionType}`}>
+              {row}
+              <OwnTokenGrid positionType={row.props.positionType} asset={row.props.asset} {...tradeTokenGridProps} />
+            </div>)
+          })}
+        </div>
       </div>
     );
 
   }
 
   private renderMobile = () => {
-    // const assetDetails = AssetsDictionary.assets.get(this.state.tokenRowsData[0].asset);
-    const tokenRowsFooterMobile = this.state.tokenSingleRowsData.map(e => <TradeTokenGridRowMobileFooter key={`${e.asset}_${e.positionType}`} {...e} />);
-    const tokenRowsMobile = this.state.tokenLongShortRowsData.map(e => <TradeTokenGridRowMobile key={`${e.asset}_${e.positionType}_${e.defaultLeverage}`} {...e} />);
+    const tokenRowsMobile = this.state.tokenLongShortRowsData.map(e => <TradeTokenCardMobile key={`${e.asset}_${e.positionType}`} {...e} />);
     return (
-      <div className="trade-token-grid">
-        <div className="trade-new-grid">
-          {this.renderActions(this.state.balance.eq(0))}
-        </div>
-        <TradeTokenGridHeaderMobile showMyTokensOnly={this.props.showMyTokensOnly} onShowMyTokensOnlyChange={this.props.onShowMyTokensOnlyChange} />
+      <div className="trade-token-card-mobile__wrapper">
+
         {tokenRowsMobile}
-        <div className="trade-footer-mb">
-          <div className="trade-foot-item">
-            {tokenRowsFooterMobile}
-            <div
-            className={`trade-token-grid-row__col-token-image settings-img-div`} onClick={this.showMyTokensOnlyChange}>
-            <img className={`settings-img`} src={settingSvg} />
-          </div>
-          </div>
-        </div>
       </div>
     );
   }
 
-  public showMyTokensOnlyChange = () => {
-    this.props.onShowMyTokensOnlyChange(true);
-  }
-
-  private renderActions = (isBuyOnly: boolean) => {
-    return isBuyOnly ? (
-      <div className="trade-token-grid-row__col-action-mb">
-        <button className="trade-token-grid-row__buy-button trade-token-grid-row__button--size-full" onClick={this.onBuyClick}>
-          {TradeType.BUY}
-        </button>
-      </div>
-    ) : (
-      <div className="trade-token-grid-row__col-action-mb">
-        <button className="trade-token-grid-row__buy-button trade-token-grid-row__button--size-half" onClick={this.onBuyClick}>
-          {TradeType.BUY}
-        </button>
-        <button className="trade-token-grid-row__sell-button trade-token-grid-row__button--size-half" onClick={this.onSellClick}>
-          {TradeType.SELL}
-        </button>
-      </div>
-    );
-  };
   public onBuyClick = (event: React.MouseEvent<HTMLElement>) => {
     event.stopPropagation();
     const e = this.props;
 
     const tagManagerArgs = {
-                              dataLayer: {
-                                  name:e.selectedKey.leverage + 'x' + e.selectedKey.asset +'-'+ e.selectedKey.positionType +'-'+ e.selectedKey.unitOfAccount,
-                                  sku:e.selectedKey.leverage + 'x' + e.selectedKey.asset +'-'+ e.selectedKey.positionType,
-                                  category:e.selectedKey.positionType,
-                                  price:'0',
-                                  status:"In-progress"
-                              },
-                              dataLayerName: 'PageDataLayer'
-                          }
+      dataLayer: {
+        name: e.selectedKey.leverage + 'x' + e.selectedKey.asset + '-' + e.selectedKey.positionType + '-' + e.selectedKey.unitOfAccount,
+        sku: e.selectedKey.leverage + 'x' + e.selectedKey.asset + '-' + e.selectedKey.positionType,
+        category: e.selectedKey.positionType,
+        price: '0',
+        status: "In-progress"
+      },
+      dataLayerName: 'PageDataLayer'
+    }
 
 
     TagManager.dataLayer(tagManagerArgs)
@@ -251,119 +202,8 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
     }*/
 
 
-    TradeTokenGrid.assets.forEach(e => {
-      rowsData.push({
-        selectedKey: props.selectedKey,
-        asset: e,
-        defaultUnitOfAccount: TradeTokenGrid.defaultUnitOfAccount,
-        defaultTokenizeNeeded: true,
-        positionType: PositionType.SHORT,
-        defaultLeverage: props.defaultLeverageShort,
-        onSelect: props.onSelect,
-        onTrade: props.onTrade,
-        onShowMyTokensOnlyChange: props.onShowMyTokensOnlyChange
-      });
-
-      /*let unit = Asset.USDC;
-      if (props.selectedKey.asset === Asset.ETH && props.defaultLeverageLong === 2) {
-        unit = Asset.DAI;
-      }*/
-
-      rowsData.push({
-        selectedKey: props.selectedKey,
-        asset: e,
-        defaultUnitOfAccount: TradeTokenGrid.defaultUnitOfAccount,
-        defaultTokenizeNeeded: true,
-        positionType: PositionType.LONG,
-        defaultLeverage: props.defaultLeverageLong,
-        onSelect: props.onSelect,
-        onTrade: props.onTrade,
-        onShowMyTokensOnlyChange: props.onShowMyTokensOnlyChange
-      });
-    });
-
-    return rowsData;
-  };
-  private static getRowsLongShortData = (props: ITradeTokenGridProps): ITradeTokenGridRowMBProps[] => {
-    const singleRowMBData: ITradeTokenGridRowMBProps[] = [];
-
-    /*let defaultUnitOfAccount: Asset;
-    if (Object.values(Asset).includes(siteConfig.Trade_defaultUnitOfAccount)) {
-      defaultUnitOfAccount = Asset.[siteConfig.Trade_defaultUnitOfAccount];
-    } else {
-      defaultUnitOfAccount = Asset.DAI;
-    }*/
-
-    if(props.isLong){
-        TradeTokenGrid.longVal.forEach(e => {
-          singleRowMBData.push({
-            selectedKey: props.selectedKey,
-            asset: props.selectedKey.asset,
-            defaultUnitOfAccount: TradeTokenGrid.defaultUnitOfAccount,
-            defaultTokenizeNeeded: true,
-            positionType: PositionType.LONG,
-            defaultLeverage: e,
-            onSelect: props.onSelect,
-            onTrade: props.onTrade,
-            onShowMyTokensOnlyChange: props.onShowMyTokensOnlyChange
-          });
-        })
-      }
-      /*let unit = Asset.USDC;
-      if (props.selectedKey.asset === Asset.ETH && props.defaultLeverageLong === 2) {
-        unit = Asset.DAI;
-      }*/
-
-      if(props.isShort){
-        TradeTokenGrid.shortVal.forEach(e => {
-          singleRowMBData.push({
-            selectedKey: props.selectedKey,
-            asset: props.selectedKey.asset,
-            defaultUnitOfAccount: TradeTokenGrid.defaultUnitOfAccount,
-            defaultTokenizeNeeded: true,
-            positionType: PositionType.SHORT,
-            defaultLeverage: e,
-            onSelect: props.onSelect,
-            onTrade: props.onTrade,
-            onShowMyTokensOnlyChange: props.onShowMyTokensOnlyChange
-          });
-        });
-      }
-
-    return singleRowMBData;
-  };
-
-  private static getSingleRowData = (props: ITradeTokenGridProps): ITradeTokenGridRowProps[] => {
-    let rowsData: ITradeTokenGridRowProps[] = [];
-
-    /*let defaultUnitOfAccount: Asset;
-    if (Object.values(Asset).includes(siteConfig.Trade_defaultUnitOfAccount)) {
-      defaultUnitOfAccount = Asset.[siteConfig.Trade_defaultUnitOfAccount];
-    } else {
-      defaultUnitOfAccount = Asset.DAI;
-    }*/
-
-      TradeTokenGrid.assets.forEach(e => {
-      if(props.isShort){
-        rowsData.push({
-          selectedKey: props.selectedKey,
-          asset: e,
-          defaultUnitOfAccount: TradeTokenGrid.defaultUnitOfAccount,
-          defaultTokenizeNeeded: true,
-          positionType: PositionType.SHORT,
-          defaultLeverage: props.defaultLeverageShort,
-          onSelect: props.onSelect,
-          onTrade: props.onTrade,
-          onShowMyTokensOnlyChange: props.onShowMyTokensOnlyChange
-        });
-
-      }
-
-      /*let unit = Asset.USDC;
-      if (props.selectedKey.asset === Asset.ETH && props.defaultLeverageLong === 2) {
-        unit = Asset.DAI;
-      }*/
-      if(props.isLong) {
+    props.assets.forEach(e => {
+      if (props.selectedKey.asset === Asset.UNKNOWN || e == props.selectedKey.asset) {
         rowsData.push({
           selectedKey: props.selectedKey,
           asset: e,
@@ -372,14 +212,70 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
           positionType: PositionType.LONG,
           defaultLeverage: props.defaultLeverageLong,
           onSelect: props.onSelect,
-          onTrade: props.onTrade,
-          onShowMyTokensOnlyChange: props.onShowMyTokensOnlyChange
+          onTrade: props.onTrade
+        });
+
+        /*let unit = Asset.USDC;
+            if (props.selectedKey.asset === Asset.ETH && props.defaultLeverageLong === 2) {
+              unit = Asset.DAI;
+            }*/
+
+        rowsData.push({
+          selectedKey: props.selectedKey,
+          asset: e,
+          defaultUnitOfAccount: TradeTokenGrid.defaultUnitOfAccount,
+          defaultTokenizeNeeded: true,
+          positionType: PositionType.SHORT,
+          defaultLeverage: props.defaultLeverageShort,
+          onSelect: props.onSelect,
+          onTrade: props.onTrade
         });
       }
     });
 
     return rowsData;
+  };
+  private static getRowsLongShortData = (props: ITradeTokenGridProps): ITradeTokenCardMobileProps[] => {
+    const singleRowMBData: ITradeTokenCardMobileProps[] = [];
 
+    /*let defaultUnitOfAccount: Asset;
+    if (Object.values(Asset).includes(siteConfig.Trade_defaultUnitOfAccount)) {
+      defaultUnitOfAccount = Asset.[siteConfig.Trade_defaultUnitOfAccount];
+    } else {
+      defaultUnitOfAccount = Asset.DAI;
+    }*/
+
+    if (props.isLong) {
+      singleRowMBData.push({
+        selectedKey: props.selectedKey,
+        asset: props.selectedKey.asset,
+        defaultUnitOfAccount: TradeTokenGrid.defaultUnitOfAccount,
+        defaultTokenizeNeeded: true,
+        positionType: PositionType.LONG,
+        changeActiveBtn: TradeTokenGrid.changeActiveBtn,
+        onSelect: props.onSelect,
+        onTrade: props.onTrade
+      })
+    }
+    /*let unit = Asset.USDC;
+    if (props.selectedKey.asset === Asset.ETH && props.defaultLeverageLong === 2) {
+      unit = Asset.DAI;
+    }*/
+
+    if (props.isShort) {
+      singleRowMBData.push({
+        selectedKey: props.selectedKey,
+        asset: props.selectedKey.asset,
+        defaultUnitOfAccount: TradeTokenGrid.defaultUnitOfAccount,
+        defaultTokenizeNeeded: true,
+        positionType: PositionType.SHORT,
+        changeActiveBtn: TradeTokenGrid.changeActiveBtn,
+        onSelect: props.onSelect,
+        onTrade: props.onTrade
+      });
+    }
+
+    return singleRowMBData;
   };
 
   private onProviderChanged = async (event: ProviderChangedEvent) => {

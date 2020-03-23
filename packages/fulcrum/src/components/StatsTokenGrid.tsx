@@ -24,6 +24,7 @@ export class StatsTokenGrid extends Component<IStatsTokenGridProps, IStatsTokenG
     Asset.SAI,
     Asset.DAI,
     Asset.USDC,
+    Asset.USDT,
     Asset.SUSD,
     Asset.WBTC,
     Asset.LINK,
@@ -56,7 +57,7 @@ export class StatsTokenGrid extends Component<IStatsTokenGridProps, IStatsTokenG
       totalsRow = rowData.pop()!;
     }
 
-    this.setState({ 
+    this.setState({
       ...this.state,
       tokenRowsData: rowData,
       totalsRow: totalsRow,
@@ -83,9 +84,12 @@ export class StatsTokenGrid extends Component<IStatsTokenGridProps, IStatsTokenG
           <StatsTokenGridHeader />
         </div>
       ) : (
-        <div className="stats-grid">
-        </div>
-      );
+          <React.Fragment>
+            <div className="stats-grid__header">Stats</div>
+            <div className="stats-grid">
+            </div>
+          </React.Fragment>
+        );
     }
 
     let tokenRows;
@@ -105,11 +109,15 @@ export class StatsTokenGrid extends Component<IStatsTokenGridProps, IStatsTokenG
         {totalsRow}
       </div>
     ) : (
-      <div className="stats-grid">
-        {totalsRow}
-        {tokenRows}
-      </div>
-    );
+        <React.Fragment>
+          <div className="stats-grid__header">Stats</div>
+
+          <div className="stats-grid">
+            {totalsRow}
+            {tokenRows}
+          </div>
+        </React.Fragment>
+      );
   }
 
   private static getRowsData = async (reserveDetails: ReserveDetails[]): Promise<IStatsTokenGridRowProps[]> => {

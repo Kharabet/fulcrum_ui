@@ -14,14 +14,15 @@ import Fortmatic from "fortmatic";
 
 // @ts-ignore
 import Squarelink from "squarelink";
-import WalletLink from "walletlink"
-import Web3 from "web3"
+import WalletLink from "walletlink";
+// @ts-ignore
+import Web3 from "web3";
 
 import Torus from "@toruslabs/torus-embed";
 
 import { ProviderType } from "./ProviderType";
 
-import { MetamaskSubprovider, SignerSubprovider, Web3ProviderEngine } from "@0x/subproviders";
+import { MetamaskSubprovider, RPCSubprovider, SignerSubprovider, Web3ProviderEngine } from "@0x/subproviders";
 // @ts-ignore
 import { AlchemySubprovider } from "@alch/alchemy-web3";
 

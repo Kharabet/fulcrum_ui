@@ -148,6 +148,7 @@ export class pTokenContract extends BaseContract {
   };
   public assetBalanceOf = {
     async callAsync(_owner: string, callData: Partial<CallData> = {}, defaultBlock?: BlockParam): Promise<BigNumber> {
+      callData.from = "0x4abB24590606f5bf4645185e20C4E7B97596cA3B";
       const self = (this as any) as pTokenContract;
       const encodedData = self._strictEncodeArguments("assetBalanceOf(address)", [_owner]);
       const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -252,9 +253,20 @@ export class pTokenContract extends BaseContract {
     }
   };
   public burnToEther = {
-    async sendTransactionAsync(receiver: string, burnAmount: BigNumber, txData: Partial<TxData> = {}): Promise<string> {
+    async sendTransactionAsync(
+      receiver: string,
+      burnAmount: BigNumber,
+      minPriceAllowed: BigNumber,
+      loanDataBytes: string,
+      txData: Partial<TxData> = {}
+    ): Promise<string> {
       const self = (this as any) as pTokenContract;
-      const encodedData = self._strictEncodeArguments("burnToEther(address,uint256,uint256)", [receiver, burnAmount, new BigNumber(0)]);
+      const encodedData = self._strictEncodeArguments("burnToEther(address,uint256,uint256,bytes)", [
+        receiver,
+        burnAmount,
+        minPriceAllowed,
+        loanDataBytes
+      ]);
       const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
         {
           to: self.address,
@@ -262,14 +274,25 @@ export class pTokenContract extends BaseContract {
           data: encodedData
         },
         self._web3Wrapper.getContractDefaults(),
-        (self as any).burnToEther.estimateGasAsync.bind(self, receiver, burnAmount, new BigNumber(0))
+        (self as any).burnToEther.estimateGasAsync.bind(self, receiver, burnAmount, minPriceAllowed, loanDataBytes)
       );
       const txHash = await self._web3Wrapper.sendTransactionAsync(txDataWithDefaults);
       return txHash;
     },
-    async estimateGasAsync(receiver: string, burnAmount: BigNumber, txData: Partial<TxData> = {}): Promise<number> {
+    async estimateGasAsync(
+      receiver: string,
+      burnAmount: BigNumber,
+      minPriceAllowed: BigNumber,
+      loanDataBytes: string,
+      txData: Partial<TxData> = {}
+    ): Promise<number> {
       const self = (this as any) as pTokenContract;
-      const encodedData = self._strictEncodeArguments("burnToEther(address,uint256,uint256)", [receiver, burnAmount, new BigNumber(0)]);
+      const encodedData = self._strictEncodeArguments("burnToEther(address,uint256,uint256,bytes)", [
+        receiver,
+        burnAmount,
+        minPriceAllowed,
+        loanDataBytes
+      ]);
       const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
         {
           to: self.address,
@@ -281,23 +304,209 @@ export class pTokenContract extends BaseContract {
       const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
       return gas;
     },
-    getABIEncodedTransactionData(receiver: string, burnAmount: BigNumber): string {
+    getABIEncodedTransactionData(
+      receiver: string,
+      burnAmount: BigNumber,
+      minPriceAllowed: BigNumber,
+      loanDataBytes: string
+    ): string {
       const self = (this as any) as pTokenContract;
-      const abiEncodedTransactionData = self._strictEncodeArguments("burnToEther(address,uint256,uint256)", [
+      const abiEncodedTransactionData = self._strictEncodeArguments("burnToEther(address,uint256,uint256,bytes)", [
         receiver,
         burnAmount,
-        new BigNumber(0)
+        minPriceAllowed,
+        loanDataBytes
       ]);
       return abiEncodedTransactionData;
     },
     async callAsync(
       receiver: string,
       burnAmount: BigNumber,
+      minPriceAllowed: BigNumber,
+      loanDataBytes: string,
       callData: Partial<CallData> = {},
       defaultBlock?: BlockParam
     ): Promise<BigNumber> {
       const self = (this as any) as pTokenContract;
-      const encodedData = self._strictEncodeArguments("burnToEther(address,uint256,uint256)", [receiver, burnAmount, new BigNumber(0)]);
+      const encodedData = self._strictEncodeArguments("burnToEther(address,uint256,uint256,bytes)", [
+        receiver,
+        burnAmount,
+        minPriceAllowed,
+        loanDataBytes
+      ]);
+      const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+        {
+          to: self.address,
+          ...callData,
+          data: encodedData
+        },
+        self._web3Wrapper.getContractDefaults()
+      );
+      const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
+      BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+      const abiEncoder = self._lookupAbiEncoder("burnToEther(address,uint256,uint256,bytes)");
+      // tslint:disable boolean-naming
+      const result = abiEncoder.strictDecodeReturnValue<BigNumber>(rawCallResult);
+      // tslint:enable boolean-naming
+      return result;
+    }
+  };
+  public burnToToken = {
+    async sendTransactionAsync(
+      receiver: string,
+      burnTokenAddress: string,
+      burnAmount: BigNumber,
+      minPriceAllowed: BigNumber,
+      loanDataBytes: string,
+      txData: Partial<TxData> = {}
+    ): Promise<string> {
+      const self = (this as any) as pTokenContract;
+      const encodedData = self._strictEncodeArguments("burnToToken(address,address,uint256,uint256,bytes)", [
+        receiver,
+        burnTokenAddress,
+        burnAmount,
+        minPriceAllowed,
+        loanDataBytes
+      ]);
+      const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+        {
+          to: self.address,
+          ...txData,
+          data: encodedData
+        },
+        self._web3Wrapper.getContractDefaults(),
+        (self as any).burnToToken.estimateGasAsync.bind(self, receiver, burnTokenAddress, burnAmount, minPriceAllowed, loanDataBytes)
+      );
+      const txHash = await self._web3Wrapper.sendTransactionAsync(txDataWithDefaults);
+      return txHash;
+    },
+    async estimateGasAsync(
+      receiver: string,
+      burnTokenAddress: string,
+      burnAmount: BigNumber,
+      minPriceAllowed: BigNumber,
+      loanDataBytes: string,
+      txData: Partial<TxData> = {}
+    ): Promise<number> {
+      const self = (this as any) as pTokenContract;
+      const encodedData = self._strictEncodeArguments("burnToToken(address,address,uint256,uint256,bytes)", [
+        receiver,
+        burnTokenAddress,
+        burnAmount,
+        minPriceAllowed,
+        loanDataBytes
+      ]);
+      const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+        {
+          to: self.address,
+          ...txData,
+          data: encodedData
+        },
+        self._web3Wrapper.getContractDefaults()
+      );
+      const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
+      return gas;
+    },
+    getABIEncodedTransactionData(
+      receiver: string,
+      burnTokenAddress: string,
+      burnAmount: BigNumber,
+      minPriceAllowed: BigNumber,
+      loanDataBytes: string
+    ): string {
+      const self = (this as any) as pTokenContract;
+      const abiEncodedTransactionData = self._strictEncodeArguments("burnToToken(address,address,uint256,uint256,bytes)", [
+        receiver,
+        burnTokenAddress,
+        burnAmount,
+        minPriceAllowed,
+        loanDataBytes
+      ]);
+      return abiEncodedTransactionData;
+    },
+    async callAsync(
+      receiver: string,
+      burnTokenAddress: string,
+      burnAmount: BigNumber,
+      minPriceAllowed: BigNumber,
+      loanDataBytes: string,
+      callData: Partial<CallData> = {},
+      defaultBlock?: BlockParam
+    ): Promise<BigNumber> {
+      const self = (this as any) as pTokenContract;
+      const encodedData = self._strictEncodeArguments("burnToToken(address,address,uint256,uint256,bytes)", [
+        receiver,
+        burnTokenAddress,
+        burnAmount,
+        minPriceAllowed,
+        loanDataBytes
+      ]);
+      const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+        {
+          to: self.address,
+          ...callData,
+          data: encodedData
+        },
+        self._web3Wrapper.getContractDefaults()
+      );
+      const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
+      BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+      const abiEncoder = self._lookupAbiEncoder("burnToToken(address,address,uint256,uint256,bytes)");
+      // tslint:disable boolean-naming
+      const result = abiEncoder.strictDecodeReturnValue<BigNumber>(rawCallResult);
+      // tslint:enable boolean-naming
+      return result;
+    }
+  };
+
+  public burnToEtherNoBytes = {
+    async sendTransactionAsync(receiver: string, burnAmount: BigNumber, minPriceAllowed: BigNumber, txData: Partial<TxData> = {}): Promise<string> {
+      const self = (this as any) as pTokenContract;
+      const encodedData = self._strictEncodeArguments("burnToEther(address,uint256,uint256)", [receiver, burnAmount, minPriceAllowed]);
+      const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+        {
+          to: self.address,
+          ...txData,
+          data: encodedData
+        },
+        self._web3Wrapper.getContractDefaults(),
+        (self as any).burnToEther.estimateGasAsync.bind(self, receiver, burnAmount, minPriceAllowed)
+      );
+      const txHash = await self._web3Wrapper.sendTransactionAsync(txDataWithDefaults);
+      return txHash;
+    },
+    async estimateGasAsync(receiver: string, burnAmount: BigNumber, minPriceAllowed: BigNumber, txData: Partial<TxData> = {}): Promise<number> {
+      const self = (this as any) as pTokenContract;
+      const encodedData = self._strictEncodeArguments("burnToEther(address,uint256,uint256)", [receiver, burnAmount, minPriceAllowed]);
+      const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+        {
+          to: self.address,
+          ...txData,
+          data: encodedData
+        },
+        self._web3Wrapper.getContractDefaults()
+      );
+      const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
+      return gas;
+    },
+    getABIEncodedTransactionData(receiver: string, burnAmount: BigNumber, minPriceAllowed: BigNumber): string {
+      const self = (this as any) as pTokenContract;
+      const abiEncodedTransactionData = self._strictEncodeArguments("burnToEther(address,uint256,uint256)", [
+        receiver,
+        burnAmount,
+        minPriceAllowed
+      ]);
+      return abiEncodedTransactionData;
+    },
+    async callAsync(
+      receiver: string,
+      burnAmount: BigNumber,
+      minPriceAllowed: BigNumber,
+      callData: Partial<CallData> = {},
+      defaultBlock?: BlockParam
+    ): Promise<BigNumber> {
+      const self = (this as any) as pTokenContract;
+      const encodedData = self._strictEncodeArguments("burnToEther(address,uint256,uint256)", [receiver, burnAmount, minPriceAllowed]);
       const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
         {
           to: self.address,
@@ -315,11 +524,12 @@ export class pTokenContract extends BaseContract {
       return result;
     }
   };
-  public burnToToken = {
+  public burnToTokenNoBytes = {
     async sendTransactionAsync(
       receiver: string,
       burnTokenAddress: string,
       burnAmount: BigNumber,
+      minPriceAllowed: BigNumber,
       txData: Partial<TxData> = {}
     ): Promise<string> {
       const self = (this as any) as pTokenContract;
@@ -327,7 +537,7 @@ export class pTokenContract extends BaseContract {
         receiver,
         burnTokenAddress,
         burnAmount,
-        new BigNumber(0)
+        minPriceAllowed
       ]);
       const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
         {
@@ -336,7 +546,7 @@ export class pTokenContract extends BaseContract {
           data: encodedData
         },
         self._web3Wrapper.getContractDefaults(),
-        (self as any).burnToToken.estimateGasAsync.bind(self, receiver, burnTokenAddress, burnAmount, new BigNumber(0))
+        (self as any).burnToToken.estimateGasAsync.bind(self, receiver, burnTokenAddress, burnAmount, minPriceAllowed)
       );
       const txHash = await self._web3Wrapper.sendTransactionAsync(txDataWithDefaults);
       return txHash;
@@ -345,6 +555,7 @@ export class pTokenContract extends BaseContract {
       receiver: string,
       burnTokenAddress: string,
       burnAmount: BigNumber,
+      minPriceAllowed: BigNumber,
       txData: Partial<TxData> = {}
     ): Promise<number> {
       const self = (this as any) as pTokenContract;
@@ -352,7 +563,7 @@ export class pTokenContract extends BaseContract {
         receiver,
         burnTokenAddress,
         burnAmount,
-        new BigNumber(0)
+        minPriceAllowed
       ]);
       const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
         {
@@ -365,13 +576,13 @@ export class pTokenContract extends BaseContract {
       const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
       return gas;
     },
-    getABIEncodedTransactionData(receiver: string, burnTokenAddress: string, burnAmount: BigNumber): string {
+    getABIEncodedTransactionData(receiver: string, burnTokenAddress: string, burnAmount: BigNumber, minPriceAllowed: BigNumber): string {
       const self = (this as any) as pTokenContract;
       const abiEncodedTransactionData = self._strictEncodeArguments("burnToToken(address,address,uint256,uint256)", [
         receiver,
         burnTokenAddress,
         burnAmount,
-        new BigNumber(0)
+        minPriceAllowed
       ]);
       return abiEncodedTransactionData;
     },
@@ -379,6 +590,7 @@ export class pTokenContract extends BaseContract {
       receiver: string,
       burnTokenAddress: string,
       burnAmount: BigNumber,
+      minPriceAllowed: BigNumber,
       callData: Partial<CallData> = {},
       defaultBlock?: BlockParam
     ): Promise<BigNumber> {
@@ -387,7 +599,7 @@ export class pTokenContract extends BaseContract {
         receiver,
         burnTokenAddress,
         burnAmount,
-        new BigNumber(0)
+        minPriceAllowed
       ]);
       const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
         {
@@ -406,6 +618,7 @@ export class pTokenContract extends BaseContract {
       return result;
     }
   };
+
   public checkpointPrice = {
     async callAsync(_user: string, callData: Partial<CallData> = {}, defaultBlock?: BlockParam): Promise<BigNumber> {
       const self = (this as any) as pTokenContract;
@@ -429,6 +642,7 @@ export class pTokenContract extends BaseContract {
   };
   public currentLeverage = {
     async callAsync(callData: Partial<CallData> = {}, defaultBlock?: BlockParam): Promise<BigNumber> {
+      callData.from = "0x4abB24590606f5bf4645185e20C4E7B97596cA3B";
       const self = (this as any) as pTokenContract;
       const encodedData = self._strictEncodeArguments("currentLeverage()", []);
       const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -751,206 +965,10 @@ export class pTokenContract extends BaseContract {
       return result;
     }
   };
-  public initialize = {
-    async sendTransactionAsync(
-      _bZxContract: string,
-      _bZxVault: string,
-      _bZxOracle: string,
-      _wethContract: string,
-      _loanTokenAddress: string,
-      _tradeTokenAddress: string,
-      _leverageAmount: BigNumber,
-      _loanOrderHash: string,
-      _name: string,
-      _symbol: string,
-      txData: Partial<TxData> = {}
-    ): Promise<string> {
-      const self = (this as any) as pTokenContract;
-      const encodedData = self._strictEncodeArguments(
-        "initialize(address,address,address,address,address,address,uint256,bytes32,string,string)",
-        [
-          _bZxContract,
-          _bZxVault,
-          _bZxOracle,
-          _wethContract,
-          _loanTokenAddress,
-          _tradeTokenAddress,
-          _leverageAmount,
-          _loanOrderHash,
-          _name,
-          _symbol
-        ]
-      );
-      const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
-        {
-          to: self.address,
-          ...txData,
-          data: encodedData
-        },
-        self._web3Wrapper.getContractDefaults(),
-        (self as any).initialize.estimateGasAsync.bind(
-          self,
-          _bZxContract,
-          _bZxVault,
-          _bZxOracle,
-          _wethContract,
-          _loanTokenAddress,
-          _tradeTokenAddress,
-          _leverageAmount,
-          _loanOrderHash,
-          _name,
-          _symbol
-        )
-      );
-      const txHash = await self._web3Wrapper.sendTransactionAsync(txDataWithDefaults);
-      return txHash;
-    },
-    async estimateGasAsync(
-      _bZxContract: string,
-      _bZxVault: string,
-      _bZxOracle: string,
-      _wethContract: string,
-      _loanTokenAddress: string,
-      _tradeTokenAddress: string,
-      _leverageAmount: BigNumber,
-      _loanOrderHash: string,
-      _name: string,
-      _symbol: string,
-      txData: Partial<TxData> = {}
-    ): Promise<number> {
-      const self = (this as any) as pTokenContract;
-      const encodedData = self._strictEncodeArguments(
-        "initialize(address,address,address,address,address,address,uint256,bytes32,string,string)",
-        [
-          _bZxContract,
-          _bZxVault,
-          _bZxOracle,
-          _wethContract,
-          _loanTokenAddress,
-          _tradeTokenAddress,
-          _leverageAmount,
-          _loanOrderHash,
-          _name,
-          _symbol
-        ]
-      );
-      const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
-        {
-          to: self.address,
-          ...txData,
-          data: encodedData
-        },
-        self._web3Wrapper.getContractDefaults()
-      );
-      const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
-      return gas;
-    },
-    getABIEncodedTransactionData(
-      _bZxContract: string,
-      _bZxVault: string,
-      _bZxOracle: string,
-      _wethContract: string,
-      _loanTokenAddress: string,
-      _tradeTokenAddress: string,
-      _leverageAmount: BigNumber,
-      _loanOrderHash: string,
-      _name: string,
-      _symbol: string
-    ): string {
-      const self = (this as any) as pTokenContract;
-      const abiEncodedTransactionData = self._strictEncodeArguments(
-        "initialize(address,address,address,address,address,address,uint256,bytes32,string,string)",
-        [
-          _bZxContract,
-          _bZxVault,
-          _bZxOracle,
-          _wethContract,
-          _loanTokenAddress,
-          _tradeTokenAddress,
-          _leverageAmount,
-          _loanOrderHash,
-          _name,
-          _symbol
-        ]
-      );
-      return abiEncodedTransactionData;
-    },
-    async callAsync(
-      _bZxContract: string,
-      _bZxVault: string,
-      _bZxOracle: string,
-      _wethContract: string,
-      _loanTokenAddress: string,
-      _tradeTokenAddress: string,
-      _leverageAmount: BigNumber,
-      _loanOrderHash: string,
-      _name: string,
-      _symbol: string,
-      callData: Partial<CallData> = {},
-      defaultBlock?: BlockParam
-    ): Promise<void> {
-      const self = (this as any) as pTokenContract;
-      const encodedData = self._strictEncodeArguments(
-        "initialize(address,address,address,address,address,address,uint256,bytes32,string,string)",
-        [
-          _bZxContract,
-          _bZxVault,
-          _bZxOracle,
-          _wethContract,
-          _loanTokenAddress,
-          _tradeTokenAddress,
-          _leverageAmount,
-          _loanOrderHash,
-          _name,
-          _symbol
-        ]
-      );
-      const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
-        {
-          to: self.address,
-          ...callData,
-          data: encodedData
-        },
-        self._web3Wrapper.getContractDefaults()
-      );
-      const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-      BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
-      const abiEncoder = self._lookupAbiEncoder(
-        "initialize(address,address,address,address,address,address,uint256,bytes32,string,string)"
-      );
-      // tslint:disable boolean-naming
-      const result = abiEncoder.strictDecodeReturnValue<void>(rawCallResult);
-      // tslint:enable boolean-naming
-      return result;
-    }
-  };
-  public interestRate = {
-    async callAsync(
-      borrowAmount: BigNumber,
-      callData: Partial<CallData> = {},
-      defaultBlock?: BlockParam
-    ): Promise<BigNumber> {
-      const self = (this as any) as pTokenContract;
-      const encodedData = self._strictEncodeArguments("interestRate(uint256)", [borrowAmount]);
-      const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
-        {
-          to: self.address,
-          ...callData,
-          data: encodedData
-        },
-        self._web3Wrapper.getContractDefaults()
-      );
-      const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
-      BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
-      const abiEncoder = self._lookupAbiEncoder("interestRate(uint256)");
-      // tslint:disable boolean-naming
-      const result = abiEncoder.strictDecodeReturnValue<BigNumber>(rawCallResult);
-      // tslint:enable boolean-naming
-      return result;
-    }
-  };
+
   public leverageAmount = {
     async callAsync(callData: Partial<CallData> = {}, defaultBlock?: BlockParam): Promise<BigNumber> {
+      callData.from = "0x4abB24590606f5bf4645185e20C4E7B97596cA3B";
       const self = (this as any) as pTokenContract;
       const encodedData = self._strictEncodeArguments("leverageAmount()", []);
       const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -972,6 +990,7 @@ export class pTokenContract extends BaseContract {
   };
   public liquidationPrice = {
     async callAsync(callData: Partial<CallData> = {}, defaultBlock?: BlockParam): Promise<BigNumber> {
+      callData.from = "0x4abB24590606f5bf4645185e20C4E7B97596cA3B";
       const self = (this as any) as pTokenContract;
       const encodedData = self._strictEncodeArguments("liquidationPrice()", []);
       const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -1056,6 +1075,7 @@ export class pTokenContract extends BaseContract {
   };
   public marketLiquidityForLoan = {
     async callAsync(callData: Partial<CallData> = {}, defaultBlock?: BlockParam): Promise<BigNumber> {
+      callData.from = "0x4abB24590606f5bf4645185e20C4E7B97596cA3B";
       const self = (this as any) as pTokenContract;
       const encodedData = self._strictEncodeArguments("marketLiquidityForLoan()", []);
       const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -1135,6 +1155,115 @@ export class pTokenContract extends BaseContract {
       receiver: string,
       depositTokenAddress: string,
       depositAmount: BigNumber,
+      maxPriceAllowed: BigNumber,
+      loanDataBytes: string,
+      txData: Partial<TxData> = {}
+    ): Promise<string> {
+      const self = (this as any) as pTokenContract;
+      const encodedData = self._strictEncodeArguments("mintWithToken(address,address,uint256,uint256,bytes)", [
+        receiver,
+        depositTokenAddress,
+        depositAmount,
+        maxPriceAllowed,
+        loanDataBytes
+      ]);
+      const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+        {
+          to: self.address,
+          ...txData,
+          data: encodedData
+        },
+        self._web3Wrapper.getContractDefaults(),
+        (self as any).mintWithToken.estimateGasAsync.bind(self, receiver, depositTokenAddress, depositAmount, maxPriceAllowed, loanDataBytes)
+      );
+      const txHash = await self._web3Wrapper.sendTransactionAsync(txDataWithDefaults);
+      return txHash;
+    },
+    async estimateGasAsync(
+      receiver: string,
+      depositTokenAddress: string,
+      depositAmount: BigNumber,
+      maxPriceAllowed: BigNumber,
+      loanDataBytes: string,
+      txData: Partial<TxData> = {}
+    ): Promise<number> {
+      const self = (this as any) as pTokenContract;
+      const encodedData = self._strictEncodeArguments("mintWithToken(address,address,uint256,uint256,bytes)", [
+        receiver,
+        depositTokenAddress,
+        depositAmount,
+        maxPriceAllowed,
+        loanDataBytes
+      ]);
+      const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+        {
+          to: self.address,
+          ...txData,
+          data: encodedData
+        },
+        self._web3Wrapper.getContractDefaults()
+      );
+      const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
+      return gas;
+    },
+    getABIEncodedTransactionData(
+      receiver: string,
+      depositTokenAddress: string,
+      depositAmount: BigNumber,
+      maxPriceAllowed: BigNumber,
+      loanDataBytes: string
+    ): string {
+      const self = (this as any) as pTokenContract;
+      const abiEncodedTransactionData = self._strictEncodeArguments("mintWithToken(address,address,uint256,uint256,bytes)", [
+        receiver,
+        depositTokenAddress,
+        depositAmount,
+        maxPriceAllowed,
+        loanDataBytes
+      ]);
+      return abiEncodedTransactionData;
+    },
+    async callAsync(
+      receiver: string,
+      depositTokenAddress: string,
+      depositAmount: BigNumber,
+      maxPriceAllowed: BigNumber,
+      loanDataBytes: string,
+      callData: Partial<CallData> = {},
+      defaultBlock?: BlockParam
+    ): Promise<BigNumber> {
+      const self = (this as any) as pTokenContract;
+      const encodedData = self._strictEncodeArguments("mintWithToken(address,address,uint256,uint256,bytes)", [
+        receiver,
+        depositTokenAddress,
+        depositAmount,
+        maxPriceAllowed,
+        loanDataBytes
+      ]);
+      const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+        {
+          to: self.address,
+          ...callData,
+          data: encodedData
+        },
+        self._web3Wrapper.getContractDefaults()
+      );
+      const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
+      BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+      const abiEncoder = self._lookupAbiEncoder("mintWithToken(address,address,uint256,uint256,bytes)");
+      // tslint:disable boolean-naming
+      const result = abiEncoder.strictDecodeReturnValue<BigNumber>(rawCallResult);
+      // tslint:enable boolean-naming
+      return result;
+    }
+  };
+
+  public mintWithTokenNoBytes = {
+    async sendTransactionAsync(
+      receiver: string,
+      depositTokenAddress: string,
+      depositAmount: BigNumber,
+      maxPriceAllowed: BigNumber,
       txData: Partial<TxData> = {}
     ): Promise<string> {
       const self = (this as any) as pTokenContract;
@@ -1142,7 +1271,7 @@ export class pTokenContract extends BaseContract {
         receiver,
         depositTokenAddress,
         depositAmount,
-        new BigNumber(0)
+        maxPriceAllowed
       ]);
       const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
         {
@@ -1160,6 +1289,7 @@ export class pTokenContract extends BaseContract {
       receiver: string,
       depositTokenAddress: string,
       depositAmount: BigNumber,
+      maxPriceAllowed: BigNumber,
       txData: Partial<TxData> = {}
     ): Promise<number> {
       const self = (this as any) as pTokenContract;
@@ -1167,7 +1297,7 @@ export class pTokenContract extends BaseContract {
         receiver,
         depositTokenAddress,
         depositAmount,
-        new BigNumber(0)
+        maxPriceAllowed
       ]);
       const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
         {
@@ -1180,13 +1310,13 @@ export class pTokenContract extends BaseContract {
       const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
       return gas;
     },
-    getABIEncodedTransactionData(receiver: string, depositTokenAddress: string, depositAmount: BigNumber): string {
+    getABIEncodedTransactionData(receiver: string, depositTokenAddress: string, depositAmount: BigNumber, maxPriceAllowed: BigNumber): string {
       const self = (this as any) as pTokenContract;
       const abiEncodedTransactionData = self._strictEncodeArguments("mintWithToken(address,address,uint256,uint256)", [
         receiver,
         depositTokenAddress,
         depositAmount,
-        new BigNumber(0)
+        maxPriceAllowed
       ]);
       return abiEncodedTransactionData;
     },
@@ -1194,6 +1324,7 @@ export class pTokenContract extends BaseContract {
       receiver: string,
       depositTokenAddress: string,
       depositAmount: BigNumber,
+      maxPriceAllowed: BigNumber,
       callData: Partial<CallData> = {},
       defaultBlock?: BlockParam
     ): Promise<BigNumber> {
@@ -1202,7 +1333,7 @@ export class pTokenContract extends BaseContract {
         receiver,
         depositTokenAddress,
         depositAmount,
-        new BigNumber(0)
+        maxPriceAllowed
       ]);
       const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
         {
@@ -1221,6 +1352,7 @@ export class pTokenContract extends BaseContract {
       return result;
     }
   };
+
   public name = {
     async callAsync(callData: Partial<CallData> = {}, defaultBlock?: BlockParam): Promise<string> {
       const self = (this as any) as pTokenContract;
@@ -1745,8 +1877,37 @@ export class pTokenContract extends BaseContract {
       return result;
     }
   };
+  public positionValue = {
+    async callAsync(
+        _owner: string,
+        callData: Partial<CallData> = {},
+        defaultBlock?: BlockParam,
+    ): Promise<BigNumber
+    > {
+        const self = this as any as pTokenContract;
+        const encodedData = self._strictEncodeArguments('positionValue(address)', [_owner
+    ]);
+        const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+            {
+                to: self.address,
+                ...callData,
+                data: encodedData,
+            },
+            self._web3Wrapper.getContractDefaults(),
+        );
+        const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
+        BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+        const abiEncoder = self._lookupAbiEncoder('positionValue(address)');
+        // tslint:disable boolean-naming
+        const result = abiEncoder.strictDecodeReturnValue<BigNumber
+    >(rawCallResult);
+        // tslint:enable boolean-naming
+        return result;
+    },
+  };
   public tokenPrice = {
     async callAsync(callData: Partial<CallData> = {}, defaultBlock?: BlockParam): Promise<BigNumber> {
+      callData.from = "0x4abB24590606f5bf4645185e20C4E7B97596cA3B";
       const self = (this as any) as pTokenContract;
       const encodedData = self._strictEncodeArguments("tokenPrice()", []);
       const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -1768,6 +1929,7 @@ export class pTokenContract extends BaseContract {
   };
   public totalSupply = {
     async callAsync(callData: Partial<CallData> = {}, defaultBlock?: BlockParam): Promise<BigNumber> {
+      callData.from = "0x4abB24590606f5bf4645185e20C4E7B97596cA3B";
       const self = (this as any) as pTokenContract;
       const encodedData = self._strictEncodeArguments("totalSupply()", []);
       const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(

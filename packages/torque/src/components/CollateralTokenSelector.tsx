@@ -11,20 +11,42 @@ export interface ICollateralTokenSelectorProps {
 }
 
 export class CollateralTokenSelector extends Component<ICollateralTokenSelectorProps> {
-  private readonly assets: Asset[] = [
-    Asset.ETH,
-    Asset.SAI,
-    Asset.DAI,
-    Asset.USDC,
-    Asset.SUSD,
-    Asset.LINK,
-    Asset.WBTC,
-    Asset.MKR,
-    Asset.ZRX,
-    Asset.BAT,
-    Asset.REP,
-    Asset.KNC
-  ];
+  private assets: Asset[];
+  
+  public constructor(props: ICollateralTokenSelectorProps) {
+    super(props);
+    
+    if (process.env.REACT_APP_ETH_NETWORK === "mainnet") {
+      this.assets = [
+        Asset.ETH,
+        // Asset.SAI,
+        Asset.DAI,
+        Asset.USDC,
+        Asset.USDT,
+        Asset.SUSD,
+        Asset.LINK,
+        Asset.WBTC,
+        Asset.MKR,
+        Asset.ZRX,
+        Asset.BAT,
+        Asset.REP,
+        Asset.KNC
+      ];
+    } else if (process.env.REACT_APP_ETH_NETWORK === "kovan") {
+      this.assets = [
+        Asset.ETH,
+        Asset.SAI,
+        Asset.DAI,
+      ];
+    } else if (process.env.REACT_APP_ETH_NETWORK === "ropsten") {
+      this.assets = [
+        Asset.ETH,
+        Asset.DAI,
+      ];
+    } else {
+      this.assets = [];
+    }
+  }
 
   public render() {
     const tokenItems = this.assets.filter(e => 

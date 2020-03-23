@@ -1,0 +1,144 @@
+.own-token-cards {
+  width: 100%;
+  padding-bottom: 40px;
+  &__header {
+    display: flex;
+    justify-content: flex-start;
+    padding: 0 15px;
+    font-family: Muli;
+    font-style: normal;
+    font-weight: 900;
+    font-size: 28px;
+    line-height: 140%;
+    color: #ffffff;
+    margin-bottom: 15px;
+  }
+  &__container {
+    padding: 0 15px;
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.own-token-card-mobile {
+  margin-bottom: 1px;
+  &__body {
+    background-color: var(--primary-row);
+
+    padding: 25px;
+    &-row {
+      display: flex;
+      justify-content: space-between;
+
+      align-items: center;
+      padding: 10px 0px;
+
+      > div:first-child {
+        width: 40%;
+      }
+      > div + div,
+      div:last-child {
+        width: 30%;
+        &.wrapper-loader,
+        &.container-loader {
+          width: 100%;
+        }
+      }
+    }
+  }
+  &__action {
+    button {
+      padding: 6px 27px;
+      border: none;
+      text-transform: uppercase;
+      font-family: "Muli", sans-serif;
+      font-style: normal;
+      font-weight: bold;
+      font-size: 14px;
+      line-height: 150%;
+      display: flex;
+      justify-content: center;
+      letter-spacing: 0.05em;
+      color: #ffffff;
+      background: #ff4f4f;
+      border-radius: 43px;
+      &:hover {
+        background: #fe7272;
+      }
+      &:not(:disabled) {
+        cursor: pointer;
+      }
+      &:disabled {
+        background-color: var(--disabled-bg);
+        color: var(--disabled-color);
+        cursor: not-allowed;
+      }
+    }
+  }
+  .asset-name {
+    font-style: normal;
+    font-size: 18px;
+    line-height: 150%;
+    display: flex;
+    align-items: center;
+
+    /* Main/White */
+
+    color: #ffffff;
+    .own-token-card-mobile__token-name-full {
+      display: flex;
+      align-items: center;
+    }
+  }
+
+  &__position-type {
+    font-family: "Muli", sans-serif;
+    font-style: normal;
+    font-weight: 800;
+    font-size: 10px;
+  }
+
+  &__unit-of-account,
+  &__position-value,
+  &__price,
+  &__profit,
+  &__empty {
+    display: flex;
+    flex-direction: column;
+    > span:first-child {
+      font-family: "Muli", sans-serif;
+      font-style: normal;
+      font-weight: 600;
+      font-size: 10px;
+      line-height: 150%;
+      /* or 15px */
+
+      display: flex;
+      align-items: center;
+      text-align: center;
+
+      color: #a2abb8;
+    }
+    span + span {
+      .fw-normal {
+        font-weight: normal;
+
+        color: #a2abb8;
+      }
+      font-family: "Muli", sans-serif;
+      font-style: normal;
+      font-weight: 800;
+      font-size: 18px;
+      line-height: 150%;
+      /* or 27px */
+
+      display: flex;
+      align-items: center;
+      text-align: center;
+
+      /* Main/White */
+
+      color: var(--primary-text);
+    }
+  }
+}
