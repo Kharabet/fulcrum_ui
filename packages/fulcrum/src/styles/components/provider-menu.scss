@@ -34,7 +34,8 @@
     cursor: pointer;
     box-sizing: border-box;
     border-radius: 43px;
-    &:not(:last-child) {
+    flex-direction: column;
+    &:not(:last-child){
       height: 75px;
       width: 280px;
     }

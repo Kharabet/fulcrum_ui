@@ -25,6 +25,7 @@ export interface IDashboardPageRouteParams {
 
 export interface IDashboardPageParams {
   doNetworkConnect?: (destinationAbbr: string) => void;
+  isRiskDisclosureModalOpen: ()  => void;
   isLoading: boolean;
 }
 
@@ -158,7 +159,7 @@ export class DashboardPage extends PureComponent<
         <ExtendLoanDlg ref={this.extendLoanDlgRef} />
         <WalletAddressDlg ref={this.walletAddressDlgRef} />
         <div className="dashboard-page">
-          <HeaderOps isLoading={this.props.isLoading} doNetworkConnect={this.doNetworkConnect} />
+          <HeaderOps isLoading={this.props.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
           <div className="dashboard-page__main">
             {this.state.walletDetails.walletAddress ? (
               <React.Fragment>
@@ -222,7 +223,7 @@ export class DashboardPage extends PureComponent<
               </React.Fragment>
             )}
           </div>
-          <Footer />
+          <Footer isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen}/>
         </div>
       </React.Fragment>
     );

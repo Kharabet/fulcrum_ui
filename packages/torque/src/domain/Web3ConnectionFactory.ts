@@ -13,8 +13,7 @@ import { AuthenticationStatus, Bitski } from "bitski";
 import Fortmatic from "fortmatic";
 
 // @ts-ignore
-//import Squarelink from "squarelink";
-
+import Squarelink from "squarelink";
 import WalletLink from "walletlink";
 // @ts-ignore
 import Web3 from "web3";
@@ -74,10 +73,10 @@ export class Web3ConnectionFactory {
           subProvider = await Web3ConnectionFactory.getProviderPortis();
           break;
         }
-        /*case ProviderType.Squarelink: {
+        case ProviderType.Squarelink: {
           subProvider = await Web3ConnectionFactory.getProviderSquarelink();
           break;
-        }*/
+        }
         case ProviderType.Torus: {
           subProvider = await Web3ConnectionFactory.getProviderTorus();
           break;
@@ -132,7 +131,7 @@ export class Web3ConnectionFactory {
         } catch (e) {
           // console.log(e);
         }
-      }/* else if (providerType === ProviderType.Squarelink) {
+      } else if (providerType === ProviderType.Squarelink) {
         try {
           providerEngine.addProvider(new SignerSubprovider(subProvider));
 
@@ -153,7 +152,7 @@ export class Web3ConnectionFactory {
           // @ts-ignore
           web3Wrapper = undefined;
         }
-      }*/ else if (providerType === ProviderType.WalletLink) {
+      } else if (providerType === ProviderType.WalletLink) {
         providerEngine.addProvider(new Web3(subProvider));
         canWrite = true;
       }
@@ -351,12 +350,12 @@ export class Web3ConnectionFactory {
     return portis.provider;
   }
 
-  /*private static async getProviderSquarelink(): Promise<any> {
+  private static async getProviderSquarelink(): Promise<any> {
     await this.cleanupProviders();
 
     const sqlk = await new Squarelink(configProviders.Squarelink_ClientId, ethNetwork || undefined);
     return sqlk.getProvider();
-  }*/
+  }
 
   private static async getProviderTorus(): Promise<any> {
     await this.cleanupProviders();
