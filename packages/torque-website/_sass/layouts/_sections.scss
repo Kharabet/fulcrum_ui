@@ -37,6 +37,9 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  p{
+    text-transform: uppercase;
+  }
 }
 .apr-value-after {
   position: relative;
