@@ -1,7 +1,7 @@
 ---
-# Feel free to add content and custom Front Matter to this file.
-# To modify the layout, see https://jekyllrb.com/docs/themes/#overriding-theme-defaults
-
+featured-image: /images/ogp.png
+metadescription: "Torque is the first crypto loan platform with indefinite-term loans and fixed interest rates. Get an instant crypto-backed loan with no credit checks"
+title: Torque Crypto Loans | Borrowing Made Simple | bZx
 layout: home
 ---
 <section class="bg-primary bg-primary-image">
@@ -37,7 +37,7 @@ layout: home
                             </div>
                         </div>
                     </div>
-                    <div class="item-connect"> 
+                    <div class="item-connect">
                         {% include svg/connect.svg %}
                     </div>
                     <div class="item-form collateral">
@@ -73,7 +73,7 @@ layout: home
             <div class="col col-5 col-lg-12">
                 <h2 class="big-triangle triangle mb-md-30">
                 <span class="t-r-75 l-r-125 l-r-xs-5">{% include svg/big-triangle.svg %}</span>
-                Crypto-backed loans with fixed interest rates 
+                Crypto-backed loans with fixed interest rates
                 </h2>
             </div>
             <div class="col col-7 col-lg-9 col-md-12 apr-wrapper">
