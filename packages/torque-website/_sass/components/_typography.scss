@@ -60,7 +60,7 @@ h5 {
   font-weight: 700;
   color: var(--secondary-color);
   @media screen and (max-width: $breakpoint-sm-down) {
-    font-size: 16px;
+    font-size: 15px;
   }
 }
 a {
@@ -175,6 +175,9 @@ a {
     }
   }
 }
+.ta-c {
+  text-align: center;
+}
 @media screen and (max-width: $breakpoint-md-down) {
   .fs-md-13 {
     font-size: 13px;
@@ -215,5 +218,8 @@ a {
   }
   .fs-xs-44 {
     font-size: 44px;
+  }
+  .ta-xs-c {
+    text-align: center;
   }
 }

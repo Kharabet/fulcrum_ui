@@ -1,25 +1,24 @@
 ---
-# Feel free to add content and custom Front Matter to this file.
-# To modify the layout, see https://jekyllrb.com/docs/themes/#overriding-theme-defaults
-
+featured-image: /images/ogp.png
+metadescription: "Torque is the first crypto loan platform with indefinite-term loans and fixed interest rates. Get an instant crypto-backed loan with no credit checks"
+title: Torque Crypto Loans | Borrowing Made Simple | bZx
 layout: home
 ---
 <section class="bg-primary bg-primary-image">
     {% include header.html %}
     <div class="container pt-90 pb-60">
         <div class="row">
-        <div class="col col-8 col-xl-12">
-                <div class="pl-55 pl-lg-0 w-100 text-xs-center">
+        <div class="col col-8 col-xl-9 col-md-12">
+                <div class="pl-55 pl-lg-0 w-100 ta-xs-c">
                     <h1 class="mb-40">Borrowing Made Simple</h1>
                     <p class="fs-16 fs-xs-12 lh-160 mb-50 c-secondary"><span class="fw-700">Torque</span> is the first crypto loan platform with indefinite-term loans and fixed interest rates. Get an instant crypto-backed loan with no credit checks.</p>
                 </div>
             </div>
         </div>
         <div class="row">
-            <div class="col col-12">
-                <div class="mw-100 px-55 px-lg-0">
+            <div class="col col-10 col-xl-11 col-lg-12">
                 <form class="form-loan">
-                    <div class="item-form loan">
+                    <div class="item-form loan mb-sm-15">
                         <span>Loan</span>
                         <div class="input-with-select">
                             <input placeholder="0" type="number" step="any" class="input input-loan" />
@@ -38,7 +37,7 @@ layout: home
                             </div>
                         </div>
                     </div>
-                    <div class="item-connect"> 
+                    <div class="item-connect">
                         {% include svg/connect.svg %}
                     </div>
                     <div class="item-form collateral">
@@ -66,99 +65,37 @@ layout: home
                     </div>
                     <span class="cube">{% include svg/big-cube.svg %}</span>
                 </form>
-                </div>
             </div>
         </div>
     </div>
-    <div class="container pt-15 pt-xs-30 pb-45 pb-xs-75">
+    <div class="container pt-15 pt-xs-30 pb-45 pb-xs-0">
         <div class="row fw-lg-w jc-lg-fe">
             <div class="col col-5 col-lg-12">
-                <h2 class="triangle mb-md-25">
-                <span class="t-r-75 l-r-125">{% include svg/big-triangle.svg %}</span>
-                Crypto-backed loans with fixed interest rates 
+                <h2 class="big-triangle triangle mb-md-30">
+                <span class="t-r-75 l-r-125 l-r-xs-5">{% include svg/big-triangle.svg %}</span>
+                Crypto-backed loans with fixed interest rates
                 </h2>
             </div>
             <div class="col col-7 col-lg-9 col-md-12 apr-wrapper">
-                <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-asset="bat">
-                    <div class="icon-50 mr-15 mr-xl-5 mr-xs-9">
-                        {% include svg/bat.svg %}
+                {% for product in site.data.products %}
+                    <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-asset="{{ product.name }}">
+                        <div class="icon-50 mr-15 mr-xl-5 mr-xs-9">
+                            {% include svg/{{ product.name }}.svg %}
+                        </div>
+                        <div class="wrap-apr-value">
+                            <p class="lh-100 fw-700 c-gray">{{ product.name }}</p>
+                            <p class="fs-24 fs-xl-21 lh-125 apr-value-after"><span class="fw-800 apr-value">5.3</span>%</p>
+                        </div>
                     </div>
-                    <div class="wrap-apr-value">
-                        <p class="lh-100 fw-700 c-gray">BAT</p>
-                        <p class="fs-24 fs-xl-21 lh-125 apr-value-after"><span class="fw-800 apr-value">5.3</span>%</p>
-                    </div>
-                </div>
-                <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-asset="knc">
-                    <div class="icon-50 mr-15 mr-xl-5 mr-xs-9">
-                        {% include svg/knc.svg %}
-                    </div>
-                    <div class="wrap-apr-value">
-                        <p class="lh-100 fw-700 c-gray">KNC</p>
-                        <p class="fs-24 fs-xl-21 lh-125 apr-value-after"><span class="fw-800 apr-value">5.3</span>%</p>
-                    </div>
-                </div>
-                <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-asset="rep">
-                    <div class="icon-50 mr-15 mr-xl-5 mr-xs-9">
-                        {% include svg/rep.svg %}
-                    </div>
-                    <div class="wrap-apr-value">
-                        <p class="lh-100 fw-700 c-gray">REP</p>
-                        <p class="fs-24 fs-xl-21 lh-125 apr-value-after"><span class="fw-800 apr-value">5.3</span>%</p>
-                    </div>
-                </div>
-                <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-asset="zrx">
-                    <div class="icon-50 mr-15 mr-xl-5 mr-xs-9">
-                        {% include svg/zrx.svg %}
-                    </div>
-                    <div class="wrap-apr-value">
-                        <p class="lh-100 fw-700 c-gray">ZRX</p>
-                        <p class="fs-24 fs-xl-21 lh-125 apr-value-after"><span class="fw-800 apr-value">1.6</span>%</p>
-                    </div>
-                </div>
-                <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-asset="eth">
-                    <div class="icon-50 mr-15 mr-xl-5 mr-xs-9">
-                        {% include svg/eth.svg %}
-                    </div>
-                    <div class="wrap-apr-value">
-                        <p class="lh-100 fw-700 c-gray">ETH</p>
-                        <p class="fs-24 fs-xl-21 lh-125 apr-value-after"><span class="fw-800 apr-value">4.2</span>%</p>
-                    </div>
-                </div>
-                <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-asset="link">
-                    <div class="icon-50 mr-15 mr-xl-5 mr-xs-9">
-                        {% include svg/link.svg %}
-                    </div>
-                    <div class="wrap-apr-value">
-                        <p class="lh-100 fw-700 c-gray">LINK</p>
-                        <p class="fs-24 fs-xl-21 lh-125 apr-value-after"><span class="fw-800 apr-value">4.2</span>%</p>
-                    </div>
-                </div>
-                <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-asset="susd">
-                    <div class="icon-50 mr-15 mr-xl-5 mr-xs-9">
-                        {% include svg/susd.svg %}
-                    </div>
-                    <div class="wrap-apr-value">
-                        <p class="lh-100 fw-700 c-gray">sUSD</p>
-                        <p class="fs-24 fs-xl-21 lh-125 apr-value-after"><span class="fw-800 apr-value">4.2</span>%</p>
-                    </div>
-                </div>
-                <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-asset="wbtc">
-                    <div class="icon-50 mr-15 mr-xl-5 mr-xs-9">
-                        {% include svg/wbtc.svg %}
-                    </div>
-                    <div class="wrap-apr-value">
-                        <p class="lh-100 fw-700 c-gray">WBTC</p>
-                        <p class="fs-24 fs-xl-21 lh-125 apr-value-after"><span class="fw-800 apr-value">4.2</span>%</p>
-                    </div>
-                </div>
+                {% endfor %}
             </div>
         </div>
     </div>
     <div class="py-60">
         <div class="container container-lg">
             <div class="row">
-                <div class="col jc-sb w-100">
-                    <div class="flex fd-c">
+                <div class="col jc-sb w-100 fd-md-c">
+                    <div class="flex fd-c mx-md-a mb-md-15">
                         <a href="#" class="button button-blue button-md">
                             <div class="flex fd-c">
                                 <span>New user?</span>
@@ -168,7 +105,7 @@ layout: home
                         </a>
                         <span class="info-after-button">Up to 5x Leverage, zero platform fees, <br /> and perfect liquidity</span>
                     </div>    
-                    <div class="flex fd-c">
+                    <div class="flex fd-c mx-md-a mb-md-15">
                         <a href="#" class="button button-green button-md">
                             <div class="flex fd-c">
                                 <span>Existing user?</span>
@@ -178,7 +115,7 @@ layout: home
                         </a>
                         <span class="info-after-button">Up to 5x Leverage, zero platform fees, <br /> and perfect liquidity</span>
                     </div>        
-                    <div class="flex fd-c">
+                    <div class="flex fd-c mx-md-a mb-md-15">
                         <a href="#" class="button button-purple button-md">
                             <div class="flex fd-c">
                                 <span>Already have a loan?</span>
@@ -192,11 +129,11 @@ layout: home
             </div>
         </div>
     </div>
-    <div class="pt-90 pb-30">
+    <div class="pt-90 pb-30 pt-xs-0">
         <div class="container">
             <div class="row">
                 <div class="col col-12">
-                    <h2 class="triangle mb-75 mb-xs-50">
+                    <h2 class="small-triangle triangle mb-75 mb-xs-45">
                     <span class="l-r-125">{% include svg/small-triangle.svg %}</span>                    
                     Why Torque? </h2>
                 </div>
@@ -206,7 +143,7 @@ layout: home
             <div class="row">
                 <div class="col flex fw-w">
                     <div class="item-reason">
-                        <div class="icon-reason mb-50 mb-xs-15">
+                        <div class="icon-reason">
                             {% include svg/icon-safe-1.svg %}
                         </div>
                         <div class="content-reason">
@@ -215,7 +152,7 @@ layout: home
                         </div>
                     </div>
                     <div class="item-reason">
-                        <div class="icon-reason mb-50 mb-xs-15">
+                        <div class="icon-reason">
                             {% include svg/icon-safe-1.svg %}
                         </div>
                         <div class="content-reason">
@@ -224,7 +161,7 @@ layout: home
                         </div>
                     </div>
                     <div class="item-reason">
-                        <div class="icon-reason mb-50 mb-xs-15">
+                        <div class="icon-reason">
                             {% include svg/icon-safe-1.svg %}
                         </div>
                         <div class="content-reason">
@@ -233,7 +170,7 @@ layout: home
                         </div>
                     </div>
                     <div class="item-reason">
-                        <div class="icon-reason mb-50 mb-xs-15">
+                        <div class="icon-reason">
                             {% include svg/icon-safe-1.svg %}
                         </div>
                         <div class="content-reason">
@@ -247,12 +184,12 @@ layout: home
     </div>
 </section>
 
-<section class="bg-secondary pt-90 pb-75 py-xs-75 ta-c">
+<section class="bg-secondary pt-90 pb-75 py-xs-45 ta-c">
     <div class="container">
         <div class="row">
             <div class="col col-12 jc-c">
-                <h2 class="triangle mb-65 mb-xs-50">
-                <span class="t-r-55 r-r-75">{% include svg/small-triangle.svg %}</span>
+                <h2 class="small-triangle triangle mb-65 mb-xs-45">
+                <span class="t-r-55 t-r-xs-75 r-r-75 center-xs">{% include svg/small-triangle.svg %}</span>
                 Security Is Our Priority</h2>
             </div>
         </div>
@@ -297,8 +234,12 @@ layout: home
                 <div class="wrapper-stats">
                     <h2>Our stats</h2>
                     <div class="item-stats">
-                        <div class="zi-2">$<span class="fw-900">5,056,560</span></div>
-                        <span>Loans Originated</span>
+                        <div>$<span class="fw-900">5,056,560</span></div>
+                        <span>Loans Originated</span>   
+                        <div class="stats-svg">
+                            {% include svg/after-stats.svg %}
+                            {% include svg/after-stats-mobile.svg %}
+                        </div>                     
                     </div>
                     <div class="item-stats">
                         <div>$<span class="fw-900">659,056,560</span></div>
@@ -310,17 +251,17 @@ layout: home
     </div>
 </section>
 
-<section class="bg-secondary pt-120 pb-45 ta-c">
+<section class="bg-secondary pt-120 pb-45 ta-c pt-xs-90">
     <div class="container">
         <div class="row">
             <div class="col col-12 fd-c jc-c">
                 <h2 class="mb-25">How to borrow</h2>
-                <p class="fs-20 lh-150 fw-600 c-secondary-blue mb-75">Three clicks. No Accounts. No fees.</p>
+                <p class="fs-20 fs-xs-16 lh-150 fw-600 c-secondary-blue mb-75">Three clicks. No Accounts. No fees.</p>
             </div>
         </div>
         <div class="row">
-            <div class="col col-9 col-xl-11 mx-a jc-sb">
-                <div class="flex fd-c mb-md-55">
+            <div class="col col-9 col-xl-11 col-lg-12 mx-a jc-sb fd-md-c">
+                <div class="flex fd-c mb-md-60">
                     <div class="svg-blur mb-45">
                         <span class="lend-count">1</span>
                         <div>
@@ -343,7 +284,7 @@ layout: home
     </div>
 </section>
 
-<section class="bg-secondary pt-45 pb-90">
+<section class="bg-secondary pt-45 pb-90 pt-xs-30">
     <div class="container container-md">
         <div class="row">
             <div class="col col-12 jc-c">
@@ -351,8 +292,8 @@ layout: home
             </div>
         </div>
         <div class="row">
-            <div class="col jc-sb w-100">
-                <div class="flex fd-c">
+            <div class="col jc-sb w-100 fd-xs-c jc-xs-c al-xs-c">
+                <div class="flex fd-c mb-xs-15">
                     <a href="#" class="button button-blue button-lg">
                         <div class="flex fd-c">
                             <span>New user?</span>
@@ -377,12 +318,12 @@ layout: home
     </div>
 </section>
 
-<section class="bg-secondary py-105 pt-xs-90 ta-c">
+<section class="bg-secondary py-105 pt-xs-0 pb-xs-60 ta-c">
     <div class="container container-sm">
         <div class="row">
             <div class="col col-12 jc-c">
-                <h2 class="cube mb-50 mb-xs-40">
-                <span class="t-r-75 center">{% include svg/small-cube.svg %}</span>
+                <h2 class="cube mb-50 mb-xs-45">
+                <span class="t-r-75 t-r-xs-50 center">{% include svg/small-cube.svg %}</span>
                 Frequently Asked Questions
                 </h2>
             </div>

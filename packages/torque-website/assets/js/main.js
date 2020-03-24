@@ -39,6 +39,21 @@ window.addEventListener('load', function () {
         item.querySelector('.select-styled').addEventListener("click", onStyledSelectClick);
         item.querySelectorAll('.li-options').forEach(option => option.addEventListener("click", onItemFormLiClick));
     });
+
+    //mobile menu
+    let openMenu = document.querySelector("#hamburger-menu-open");
+    let closeMenu = document.querySelector("#hamburger-menu-close");
+    let body = document.querySelector('body');
+    openMenu.onclick = function () {
+        openMenu.style.display = 'none';
+        closeMenu.style.display = 'block';
+        body.classList.toggle("open-menu");
+    }
+    closeMenu.onclick = function () {
+        openMenu.style.display = 'block';
+        closeMenu.style.display = 'none';
+        body.classList.toggle("open-menu");
+    }
 });
 
 window.onclick = function (event) {

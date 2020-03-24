@@ -106,4 +106,10 @@
   .fd-xs-c {
     flex-direction: column;
   }
+  .jc-xs-c{
+    justify-content: ceil($number: 0);
+  } 
+  .al-xs-c{
+    align-items: center;
+  }
 }
