@@ -26,74 +26,74 @@ export default ({ config }) => {
 
 	api.get('/total-asset-supply', async (req, res) => {
 		const totalAssetSupply = await fulcrum.getTotalAssetSupply();
-		res.json(totalAssetSupply);
+		res.json({data: totalAssetSupply, success: true});
 	});
 
 	api.get('/total-asset-borrow', async (req, res) => {
 		const totalAssetBorrow = await fulcrum.getTotalAssetBorrow();
-		res.json(totalAssetBorrow);
+		res.json({data: totalAssetBorrow, success: true});
 	});
 
 	//TODO: replace with supply-rate-apr endpoint
 	api.get('/apr', async (req, res) => {
 		const apr = await fulcrum.getSupplyRateAPR();
-		res.json(apr);
+		res.json({data: apr, success: true});
 	});
 
 	api.get('/supply-rate-apr', async (req, res) => {
 		const apr = await fulcrum.getSupplyRateAPR();
-		res.json(apr);
+		res.json({data: apr, success: true});
 	});
 
 	api.get('/borrow-rate-apr', async (req, res) => {
 		const apr = await fulcrum.getBorrowRateAPR();
-		res.json(apr);
+		res.json({data: apr, success: true});
 	});
 
 	api.get('/torque-borrow-rate-apr', async (req, res) => {
 		const torqueBorrowRates = await fulcrum.getTorqueBorrowRateAPR();
-		res.json(torqueBorrowRates);
+		res.json({data: torqueBorrowRates, success: true});
 	});
 
 	api.get('/vault-balance', async (req, res) => {
 		const vaultBalance = await fulcrum.getVaultBalance();
-		res.json(vaultBalance);
+		res.json({data: vaultBalance, success: true});
 	});
 
 	api.get('/liquidity', async (req, res) => {
 		const liquidity = await fulcrum.getFreeLiquidity();
-		res.json(liquidity);
+		res.json({data: liquidity, success: true});
 	});
 
 	//TODO: replace with vault-balance-usd endpoint
 	api.get('/tvl-usd', async (req, res) => {
 		const tvl = await fulcrum.getTVL();
-		res.json(tvl);
+		res.json({data: tvl, success: true});
 	});
 
 	api.get('/vault-balance-usd', async (req, res) => {
 		const tvl = await fulcrum.getTVL();
-		res.json(tvl);
+		res.json({data: tvl, success: true});
 	});
 
 	//TODO: replace with assets-usd-rates endpoint
 	api.get('/usd-rates', async (req, res) => {
 		const usdRates = await fulcrum.getUsdRates();
-		res.json(usdRates);
+		res.json({ data: usdRates, success: true});
 	});
 
 	api.get('/oracle-rates-usd', async (req, res) => {
 		const usdRates = await fulcrum.getUsdRates();
-		res.json(usdRates);
+		res.json({ data: usdRates, success: true});
 	});
 
 	api.get('/itoken-prices-usd', async (req, res) => {
 		const usdRates = await fulcrum.getITokensPricesUsd();
-		res.json(usdRates);
+		res.json({ data: usdRates, success: true});
 	});
 	api.get('/ptoken-prices-usd', async (req, res) => {
 		const usdRates = await fulcrum.getPTokensPricesUsd();
-		res.json(usdRates);
+		res.json({ data: usdRates, success: true});
 	});
 
 	api.get('/borrow-deposit-estimate', [
@@ -109,7 +109,13 @@ export default ({ config }) => {
 		let collateralAsset = req.query.collateral_asset;
 		let amount = req.query.amount;
 		const borrowDepositEstimate = await torque.getBorrowDepositEstimate(borrowAsset, collateralAsset, amount);
-		res.json(borrowDepositEstimate);
+		if (borrowDepositEstimate.depositAmount === 0 && amount > 0) {
+
+			res.json({ message: "You entered too large amount", succes: false, });
+		}
+		else {
+			res.json({ data: borrowDepositEstimate, succes: true });
+		}
 	});
 
 	return api;
