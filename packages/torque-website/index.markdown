@@ -16,8 +16,7 @@ layout: home
             </div>
         </div>
         <div class="row">
-            <div class="col col-12">
-                <div class="w-100 px-55 px-lg-0">
+            <div class="col col-10 col-xl-11 col-lg-12">
                 <form class="form-loan">
                     <div class="item-form loan mb-sm-15">
                         <span>Loan</span>
@@ -66,7 +65,6 @@ layout: home
                     </div>
                     <span class="cube">{% include svg/big-cube.svg %}</span>
                 </form>
-                </div>
             </div>
         </div>
     </div>

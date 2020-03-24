@@ -1,19 +1,11 @@
 .form-loan {
+  width: 100%;
   background-color: var(--bg-form);    
   box-shadow: 0px 16px 37px var(--shadow-form);
   border-radius: 16px;
   display: flex;
   align-items: center;
   position: relative;
-  @media screen and (min-width: $breakpoint-xl-up){
-    width: 1220px;
-  }
-  @media screen and (max-width: $breakpoint-xl-down){
-    width: 980px;
-  }
-  @media screen and (max-width: $breakpoint-lg-down){
-    width: 100%;
-  }
   @media screen and (max-width: $breakpoint-md-down){
     flex-wrap: wrap;
   }
@@ -81,7 +73,7 @@
         outline: none;
         background-color: transparent;
         @media screen and (min-width: $breakpoint-xl-up){
-          width: 265px;
+          width: 240px;
         }
         @media screen and (max-width: $breakpoint-xl-down){
           width: 175px;
@@ -300,7 +292,7 @@
     position: absolute;
     bottom: -90px;    
     @media screen and (min-width: $breakpoint-xl-up){
-      left: 50%;
+      left: 58%;
     }
     @media screen and (max-width: $breakpoint-xl-down){
       left: 73%;
