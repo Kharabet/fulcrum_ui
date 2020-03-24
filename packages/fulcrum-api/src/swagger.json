@@ -13,7 +13,7 @@
   "basePath": "/api",
   "tags": [
     {
-      "name": "StatsSSS",
+      "name": "Stats",
       "description": "",
       "externalDocs": {
         "description": "See data on Fulcrum stats page",
