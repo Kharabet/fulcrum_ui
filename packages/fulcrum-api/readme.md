@@ -1,2 +1,3 @@
-Rest API for Fulcrum website
-To run: npm start
+Rest API for Fulcrum website  
+
+To run: npm start 
