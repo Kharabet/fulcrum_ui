@@ -71,8 +71,10 @@
   padding-top: 105px;
   padding-bottom: 105px;
 }
-.px-55{
-  padding: 0 55px;
+@media screen and (max-width: $breakpoint-xl-down){
+  .mr-xl-90{
+    margin-right: 90px;
+  }
 }
 @media screen and (max-width: $breakpoint-lg-down) {
   .pl-lg-0 {
@@ -96,6 +98,9 @@
   }
 }
 @media screen and (max-width: $breakpoint-md-down) {
+  .mr-md-45{
+    margin-right: 45px;
+  }
   .mb-md-0 {
     margin-bottom: 0;
   }
