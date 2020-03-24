@@ -523,7 +523,7 @@ export class TorqueProvider {
   }
     const iToken = await this.contractsSource.getiTokenContract(asset);
     console.log("collateralTokenAddress", collateralTokenAddress);
-    const bigNumber = new BigNumber(2 * 10 ** 18);
+    const bigNumber = new BigNumber(2 * 10 ** 18); //bigNumber.toFixed() is workaround to prevent soliditySha3 error
     // @ts-ignore
     const leverageAmount = web3.utils.soliditySha3(
       { "type": "uint256", "value": bigNumber.toFixed() },
