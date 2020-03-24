@@ -1,7 +1,7 @@
 on:
   push:
     branches:
-      - fulcrum-api
+      - bzx-api-production
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -11,7 +11,7 @@ jobs:
     - name: Install
       uses: actions/setup-node@v1
       with:
-          node-version: '10.x'
+          node-version: '12.x'
     - name: Build
       run: |
         cd $GITHUB_WORKSPACE/packages/fulcrum-api && npm install
