@@ -9,7 +9,7 @@
       "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
     }
   },
-  "host": "3.127.58.79",
+  "host": "api.bzx.network",
   "basePath": "/api",
   "tags": [
     {
