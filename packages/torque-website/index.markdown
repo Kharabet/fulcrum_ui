@@ -8,7 +8,7 @@ layout: home
     {% include header.html %}
     <div class="container pt-90 pb-60">
         <div class="row">
-        <div class="col col-8 col-xl-12">
+        <div class="col col-8 col-xl-9 col-md-12">
                 <div class="pl-55 pl-lg-0 w-100 ta-xs-c">
                     <h1 class="mb-40">Borrowing Made Simple</h1>
                     <p class="fs-16 fs-xs-12 lh-160 mb-50 c-secondary"><span class="fw-700">Torque</span> is the first crypto loan platform with indefinite-term loans and fixed interest rates. Get an instant crypto-backed loan with no credit checks.</p>

@@ -8,3 +8,13 @@
     display: none;
   }
 }
+@media screen and (min-width: $breakpoint-sm-up) {
+  .shown-sm {
+    display: none !important;
+  }
+}
+@media screen and (max-width: $breakpoint-sm-down) {
+  .hidden-sm {
+    display: none;
+  }
+}
