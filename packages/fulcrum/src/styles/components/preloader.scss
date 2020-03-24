@@ -16,7 +16,6 @@
 }
 .wrapper-loader {
   overflow: hidden;
-  width: 74px;
   border-radius: 48%;
   padding: 7px 0;
   .container-loader {
@@ -34,6 +33,29 @@
       transform: translateX(-27px);
       animation: translateItem 0.8s cubic-bezier(0, 0, 1, 1) 0.6s infinite;
       background-color: var(--loader-slider);
+    }
+    
+  }
+  .trade-form__submit-button--buy & {
+    padding: 3px 0;
+
+    .container-loader {
+      background-color: #5b88ff;
+
+      .item-loader {
+        background-color: #407bf7;
+      }
+    }
+  }
+  .trade-form__submit-button--sell & {
+    padding: 3px 0;
+
+    .container-loader {
+      background-color: #fe7272;
+
+      .item-loader {
+        background-color: #ff5353;
+      }
     }
   }
 }
