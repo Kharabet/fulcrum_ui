@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "description": "This is a public API for bZx protocol, Fulcrum and Torque. (test change)",
+    "description": "This is a public API for bZx protocol, Fulcrum and Torque.",
     "version": "1.0.0",
     "title": "Fulcrum API",
     "license": {
