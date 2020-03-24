@@ -526,7 +526,7 @@ export class TorqueProvider {
     const bigNumber = new BigNumber(2 * 10 ** 18);
     // @ts-ignore
     const leverageAmount = web3.utils.soliditySha3(
-      { "type": "uint256", "value": bigNumber },
+      { "type": "uint256", "value": bigNumber.toFixed() },
       { "type": "address", "value": collateralTokenAddress }
     );
     // @ts-ignore
