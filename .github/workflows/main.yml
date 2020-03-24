@@ -20,7 +20,7 @@ jobs:
       uses: AEnterprise/rsync-deploy@v1.0
       env:
         DEPLOY_KEY: ${{ secrets.SERVER_SSH_KEY }}
-        ARGS: "-e -c -r --delete --exclude './packages/fulcrum-api/dist/persist-storage'"
+        ARGS: "-e -c -r --delete --exclude /packages/fulcrum-api/dist/persist-storage"
         SERVER_PORT: ${{ secrets.SERVER_PORT }}
         FOLDER: "./packages/fulcrum-api/"
         SERVER_IP: ${{ secrets.SERVER_IP }}
