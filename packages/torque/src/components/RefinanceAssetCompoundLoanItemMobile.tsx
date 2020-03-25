@@ -1,25 +1,25 @@
 import { BigNumber } from "@0x/utils";
 import React, { ChangeEvent, Component } from "react";
 import { Subject } from "rxjs";
-import compound_img from "../assets/images/compound.svg";
-import downArrow from "../assets/images/down-arrow.svg";
-import bgBtc from "../assets/images/ic_token_btc.svg";
-import bgDai from "../assets/images/ic_token_dai.svg";
-import bgEth from "../assets/images/ic_token_eth.svg";
-import bgKnc from "../assets/images/ic_token_knc.svg";
-import bgLink from "../assets/images/ic_token_link.svg";
-import bgRep from "../assets/images/ic_token_rep.svg";
-import bgSai from "../assets/images/ic_token_sai.svg";
-import bgUsdc from "../assets/images/ic_token_usdc.svg";
-import bgZrx from "../assets/images/ic_token_zrx.svg";
-import topArrow from "../assets/images/top-arrow.svg";
-import torque_logo from "../assets/images/torque_logo.svg";
-import down_arrow from "../assets/images/vector-down-arrow.svg";
+import { ReactComponent as CompoundImg } from "../assets/images/compound.svg";
+import { ReactComponent as ArrowDown } from "../assets/images/down-arrow.svg";
+import { ReactComponent as ArrowTop } from "../assets/images/top-arrow.svg";
+import { ReactComponent as Btc} from "../assets/images/ic_token_btc.svg";
+import { ReactComponent as Dai} from "../assets/images/ic_token_dai.svg";
+import { ReactComponent as Eth} from "../assets/images/ic_token_eth.svg";
+import { ReactComponent as Knc} from "../assets/images/ic_token_knc.svg";
+import { ReactComponent as Link} from "../assets/images/ic_token_link.svg";
+import { ReactComponent as Rep} from "../assets/images/ic_token_rep.svg";
+import { ReactComponent as Sai} from "../assets/images/ic_token_sai.svg";
+import { ReactComponent as Usdc} from "../assets/images/ic_token_usdc.svg";
+import { ReactComponent as Zrx} from "../assets/images/ic_token_zrx.svg";
+import { ReactComponent as TorqueLogo } from "../assets/images/torque_logo.svg";
+import { ReactComponent as SeparatorArrow } from "../assets/images/vector-down-arrow.svg";
 import { Asset } from "../domain/Asset";
 import { IRefinanceLoan } from "../domain/RefinanceData";
 import { TorqueProviderEvents } from "../services/events/TorqueProviderEvents";
 import { TorqueProvider } from "../services/TorqueProvider";
-import dydx_img from "../assets/images/dydx.svg";
+import {ReactComponent as DydxImg } from "../assets/images/dydx.svg";
 
 interface IRefinanceAssetCompoundLoanItemMobileState {
   isShow: boolean;
@@ -124,10 +124,10 @@ export class RefinanceAssetCompoundLoanItemMobile extends Component<IRefinanceLo
       collateralAssetDt2 = this.getAssetsData(this.props.collateral[1].asset);
     }
     this.getAssetsData(this.props.collateral[0].asset);
-    const head_image = this.props.type=="dydx" ? dydx_img : compound_img;
+    const head_image = this.props.type=="dydx" ? <DydxImg /> : <CompoundImg />; 
     const assetTypeModifier = !this.state.isShow ? "asset-collateral-show" : "asset-collateral-hide";
     const showDetailsValue = this.state.isShow ? "Show details" : "Hide details";
-    const arrowIcon = !this.state.isShow ? topArrow : downArrow;
+    const arrowIcon = !this.state.isShow ? <ArrowTop /> : <ArrowDown />;
     const arrowDiv = !this.state.isShow ? "arrow-div-down" : "arrow-div-top";
     let btnValue =  'Refinance with '+this.state.fixedApr.dp(1, BigNumber.ROUND_CEIL).toString()+'% APR Fixed' ;
     let btnActiveValue =  'Refinance with '+this.state.fixedApr.dp(1, BigNumber.ROUND_CEIL).toString()+'% APR Fixed'
@@ -139,14 +139,17 @@ export class RefinanceAssetCompoundLoanItemMobile extends Component<IRefinanceLo
       <div className={`refinance-asset-selector-item `}>
         <div className="refinance-asset-block">
           <div className="refinance-asset-selector__row">
-            <div className="refinance-asset-selector__marker"><img className="logo__dydx" src={head_image}/></div>
-            <div className="refinance-asset-selector__varapy">{this.props.apr.dp(0, BigNumber.ROUND_CEIL).toString()}%
+            <div className="refinance-asset-selector__marker">
+              {head_image}
             </div>
-            <div className="refinance-asset-selector__variabletxt">Variable APR</div>
+            <div>            
+              <div className="refinance-asset-selector__varapy">{this.props.apr.dp(0, BigNumber.ROUND_CEIL).toString()}%</div>
+              <div className="refinance-asset-selector__variabletxt">Variable APR</div>
+            </div>
           </div>
           <div className="refinance-asset-selector__row mt20">
             <div className="refinance-asset-selector__inputBox">
-              <div className="refinance__input-container">
+              <div className={`refinance__input-container ${(this.state.borrowAmount.lte(0) || this.state.borrowAmount.gt(this.props.balance)) ? 'error' : ``}`}>
                 <input
                   ref={this._setInputRef}
                   className="refinance__input-container__input-amount"
@@ -164,26 +167,26 @@ export class RefinanceAssetCompoundLoanItemMobile extends Component<IRefinanceLo
               </div>
 
             </div>
-            <div className="refinance-asset-selector__imglogo mt15">
-              <img className="refinance-loan-type__img" src={loanAssetDt.img}/>
+            <div className="refinance-asset-selector__imglogo">
+              <div className="refinance-asset-selector__icon">
+                {loanAssetDt}
+              </div>                
               <div className="refinance-asset-selector__loantxt">{this.props.asset}</div>
             </div>
-
-            {/*<div className="refinance-asset-selector__img"><img src={assetsDt.img} /></div>*/}
           </div>
-          <div className="refinance-asset-selector__row mb2 mt20">
+          <div className="refinance-asset-selector__row separator">
             <div className="down_arrow">
-              <img src={down_arrow} alt="torque-logo"/>
+              <SeparatorArrow  />
             </div>
           </div>
           <div className="refinance-asset-selector__rowimg">
 
             <div className="refinance-asset-selector__torque">
-              <img className="logo__image" src={torque_logo} alt="torque-logo"/>
+              <TorqueLogo />
             </div>
             <div className="refinance-asset-selector__divtxt">
-              <div
-                className="refinance-asset-selector__fixedapy">{this.state.fixedApr.dp(1, BigNumber.ROUND_CEIL).toString()}%
+              <div className="refinance-asset-selector__fixedapy">
+                  {this.state.fixedApr.dp(1, BigNumber.ROUND_CEIL).toString()}%
               </div>
               <div className="refinance-asset-selector__aprtxt">Fixed APR</div>
             </div>
@@ -193,21 +196,28 @@ export class RefinanceAssetCompoundLoanItemMobile extends Component<IRefinanceLo
           <div className="refinance-asset-selector__row mb2 mt20">
 
             <div className="refinance-asset-selector__loan">
-              {this.props.balance.dp(3, BigNumber.ROUND_FLOOR).toString()}
-              <div className="refinance-asset-selector__loantxt mt11">Loan</div>
+              <div className="refinance-asset-selector__loanvalue">
+                {this.props.balance.dp(3, BigNumber.ROUND_FLOOR).toString()}
+              </div>              
+              <div className="refinance-asset-selector__loantxt">Loan</div>
             </div>
 
             <div className="refinance-asset-selector__imglogo">
-              <img className="refinance-loan-type__img" src={loanAssetDt.img}/>
-              <div className="refinance-asset-selector__loantxt">{this.props.asset}</div>
+              <div className="refinance-asset-selector__icon">
+                {loanAssetDt}
+              </div>
+              <div className="refinance-asset-selector__loantxt">
+                {this.props.asset}
+              </div>
             </div>
 
           </div>
 
           <div className="refinance-asset-selector__row">
             <div className="refinance-asset-selector__detail cursor-pointer" onClick={this.showDetails}>
-              <div className="ref-show">{showDetailsValue}
-                <div className={`${arrowDiv}`}><img className="arrow-icon" src={arrowIcon}/></div>
+              <div className="ref-show">
+                <span className="ref-show__value">{showDetailsValue}</span>                
+                <div className="ref-show__icon">{arrowIcon}</div>                
               </div>
 
             </div>
@@ -221,11 +231,13 @@ export class RefinanceAssetCompoundLoanItemMobile extends Component<IRefinanceLo
             </div>
             <div className="refinance-asset-selector__loan">
               <div className="">{this.props.collateral[0].balance.dp(3, BigNumber.ROUND_FLOOR).toString()}</div>
-              <div className="refinance-asset-selector__loantxt mt11">Collateral</div>
+              <div className="refinance-asset-selector__loantxt">Collateral</div>
             </div>
 
             <div className="refinance-asset-selector__imglogo">
-              <img className="refinance-loan-type__img" src={collateralAssetDt.img}/>
+              <div className="refinance-asset-selector__icon">
+                {collateralAssetDt}
+              </div>
               <div className="refinance-asset-selector__loantxt">{this.props.collateral[0].asset}</div>
             </div>
           </div>
@@ -236,18 +248,20 @@ export class RefinanceAssetCompoundLoanItemMobile extends Component<IRefinanceLo
               </div>
               <div className="refinance-asset-selector__loan ">
                 <div className="">{this.props.collateral[1].balance.dp(3, BigNumber.ROUND_FLOOR).toString()}</div>
-                <div className="refinance-asset-selector__loantxt mt11">Collateral</div>
+                <div className="refinance-asset-selector__loantxt">Collateral</div>
               </div>
 
               <div className="refinance-asset-selector__imglogo">
-                <img className="refinance-loan-type__img" src={collateralAssetDt2.img}/>
+                <div className="refinance-asset-selector__icon">
+                  {collateralAssetDt2}
+                </div>
                 <div className="refinance-asset-selector__loantxt">{this.props.collateral[1].asset}</div>
               </div>
 
             </div>
           ) : null}
         </div>
-        <div className="linehr"/>
+        {/*<div className="linehr"/>*/}
         <div className="refinance-asset-block">
           {this.props.apr.gt(this.state.fixedApr) ?
             <div className="refinance-asset-selector__desc">
@@ -278,23 +292,23 @@ export class RefinanceAssetCompoundLoanItemMobile extends Component<IRefinanceLo
   private getAssetsData = (asset: Asset) => {
     switch (asset) {
       case Asset.DAI:
-        return { img: bgDai };
+        return <Dai />;
       case Asset.SAI:
-        return { img: bgSai };
+        return <Sai />;
       case Asset.USDC:
-        return { img: bgUsdc };
+        return <Usdc />;
       case Asset.ETH:
-        return { img: bgEth };
+        return <Eth />;
       case Asset.WBTC:
-        return { img: bgBtc };
+        return <Btc />;
       case Asset.LINK:
-        return { img: bgLink };
+        return <Link />;
       case Asset.ZRX:
-        return { img: bgZrx };
+        return <Zrx />;
       case Asset.REP:
-        return { img: bgRep };
+        return <Rep />;
       case Asset.KNC:
-        return { img: bgKnc };
+        return <Knc />;
     }
   };
 }
