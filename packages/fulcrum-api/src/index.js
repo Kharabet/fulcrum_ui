@@ -26,7 +26,7 @@ app.use(bodyParser.json({
 
 
 // api router
-app.use('/api', api({ config }));
+app.use('/v1', api({ config }));
 
 app.use('/', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
