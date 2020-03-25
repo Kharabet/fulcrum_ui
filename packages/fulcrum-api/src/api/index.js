@@ -111,10 +111,10 @@ export default ({ config }) => {
 		const borrowDepositEstimate = await torque.getBorrowDepositEstimate(borrowAsset, collateralAsset, amount);
 		if (parseFloat(borrowDepositEstimate.depositAmount) === 0 && amount > 0) {
 
-			res.json({ message: "You entered too large amount", succes: false, });
+			res.json({ message: "You entered too large amount", success: false, });
 		}
 		else {
-			res.json({ data: borrowDepositEstimate, succes: true });
+			res.json({ data: borrowDepositEstimate, success: true });
 		}
 	});
 
