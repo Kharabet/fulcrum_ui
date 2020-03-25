@@ -2,8 +2,22 @@ import { iTokens } from '../config/iTokens';
 
 import BigNumber from 'bignumber.js';
 import { iTokenJson } from './contracts/iTokenContract';
+import winston from 'winston';
 
-
+const logger = winston.createLogger({
+    level: 'info',
+    format: winston.format.combine(winston.format.timestamp(), winston.format.simple()),
+    defaultMeta: { service: 'user-service' },
+    transports: [
+        //
+        // - Write all logs with level `error` and below to `error.log`
+        // - Write all logs with level `info` and below to `combined.log`
+        //
+        new winston.transports.File({ filename: 'error.log', level: 'error' }),
+        new winston.transports.File({ filename: 'access.log', level: 'info' }),
+        new winston.transports.File({ filename: 'combined.log' })
+    ]
+});
 
 export default class Torque {
     constructor(web3, cache) {
@@ -22,6 +36,8 @@ export default class Torque {
         if (iTokenContract && collateralAssetErc20Address) {
             const loanPrecision = borrowAsset.decimals || 18;
             const collateralPrecision = collateralAsset.decimals || 18;
+            logger.info("call iTokenContract for Torque");
+
             const borrowEstimate = await iTokenContract.methods.getDepositAmountForBorrow(
                 new BigNumber(amount).multipliedBy(10 ** loanPrecision),
                 new BigNumber(2 * 10 ** 18),
