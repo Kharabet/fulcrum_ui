@@ -1,7 +1,7 @@
 on:
   push:
     branches:
-      - fulcrum-api
+      - bzx-api-production
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
