@@ -6,13 +6,39 @@ import { DappHelperJson, mainnetAddress as dappHelperAddress } from './contracts
 import { mainnetAddress as oracleAddress, oracleJson } from './contracts/OracleContract'
 import { iTokenJson } from './contracts/iTokenContract';
 import { pTokenJson } from './contracts/pTokenContract';
-
-import storage from 'node-persist';
+import winston from 'winston';
 import config from '../config.json';
+
+import QueuedStorage from "../QueuedStorage";
+
 
 const UNLIMITED_ALLOWANCE_IN_BASE_UNITS = new BigNumber(2)
     .pow(256)
     .minus(1);
+
+const logger = winston.createLogger({
+    level: 'info',
+    format: winston.format.combine(winston.format.timestamp(), winston.format.simple()),
+    defaultMeta: { service: 'user-service' },
+    transports: [
+        //
+        // - Write all logs with level `error` and below to `error.log`
+        // - Write all logs with level `info` and below to `combined.log`
+        //
+        new winston.transports.File({ filename: 'error.log', level: 'error' }),
+        new winston.transports.File({ filename: 'access.log', level: 'info' }),
+        new winston.transports.File({ filename: 'combined.log' })
+    ]
+});
+
+
+const storage = new QueuedStorage();
+
+(async () => {
+    await storage.init({
+        dir: 'persist-storage'
+    });
+})()
 
 export default class Fulcrum {
     constructor(web3) {
@@ -20,20 +46,23 @@ export default class Fulcrum {
         setInterval(this.updateCache.bind(this), config.cache_ttl_sec * 1000);
         // this.iTokenContract = new this.web3.eth.Contract(iTokenJson.abi, token.address);
         this.DappHeperContract = new this.web3.eth.Contract(DappHelperJson.abi, dappHelperAddress);
+        this.storage = new QueuedStorage();
+        this.updateCache();
+
     }
 
     async updateCache(key, value) {
         const reserve_data = await this.updateReservedData();
         await storage.setItem("reserve_data", reserve_data);
-        console.log("reserve_data updated");
+        logger.info("reserve_data updated");
 
         const itoken = await this.updateITokensPricesUsd();
         await storage.setItem("itoken-prices-usd", itoken);
-        console.log("itoken-prices-usd updated");
+        logger.info("itoken-prices-usd updated");
 
         const ptoken = await this.updatePTokensPricesUsd();
         await storage.setItem("ptoken-prices-usd", ptoken);
-        console.log("ptoken-prices-usd updated");
+        logger.info("ptoken-prices-usd updated");
 
         return;
     }
@@ -108,10 +137,10 @@ export default class Fulcrum {
         let result = await storage.getItem("itoken-prices-usd");
         if (!result) {
 
-            console.warn("No itoken-prices-usd in cache!")
-            result = await this.updateITokensPricesUsd();
+            logger.info("No itoken-prices-usd in cache!")
+            // result = await this.updateITokensPricesUsd();
 
-            await storage.setItem("itoken-prices-usd", result);
+            // await storage.setItem("itoken-prices-usd", result);
             // console.dir(`itoken-prices-usd:`);
             // console.dir(result);
         }
@@ -124,6 +153,7 @@ export default class Fulcrum {
         for (const token in iTokens) {
             const iToken = iTokens[token];
             const iTokenContract = new this.web3.eth.Contract(iTokenJson.abi, iToken.address);
+            logger.info("call iTokenContract");
             const tokenPrice = await iTokenContract.methods.tokenPrice().call();
 
             //price is in loanAsset of iToken contract
@@ -137,9 +167,9 @@ export default class Fulcrum {
         let result = await storage.getItem("ptoken-prices-usd");
         if (!result) {
 
-            console.warn("No ptoken-prices-usd in cache!")
-            result = await this.updatePTokensPricesUsd();
-            await storage.setItem("ptoken-prices-usd", result);
+            logger.info("No ptoken-prices-usd in cache!")
+            // result = await this.updatePTokensPricesUsd();
+            // await storage.setItem("ptoken-prices-usd", result);
             // console.dir(`ptoken-prices-usd:`);
             // console.dir(result);
         }
@@ -153,17 +183,19 @@ export default class Fulcrum {
             for (const token in pTokens) {
                 const pToken = pTokens[token];
                 const pTokenContract = new this.web3.eth.Contract(pTokenJson.abi, pToken.address);
+                logger.info("call pTokenContract");
+
                 const tokenPrice = await pTokenContract.methods.tokenPrice().call({ from: "0x4abB24590606f5bf4645185e20C4E7B97596cA3B" });
                 const decimals = await pTokenContract.methods.decimals().call({ from: "0x4abB24590606f5bf4645185e20C4E7B97596cA3B" });
                 //price is in loanAsset of iToken contract
                 const baseAsset = this.getBaseAsset(pToken);
-                const swapPrice = await this.getSwapToUsdRate(baseAsset);
+                //const swapPrice = await this.getSwapToUsdRate(baseAsset);
                 const price = new BigNumber(tokenPrice).multipliedBy(usdRates[pToken.asset.toLowerCase()]).dividedBy(10 ** decimals);
                 result[pToken.ticker.toLowerCase()] = price.toNumber();
             }
         }
         catch (e) {
-            console.log(e);
+            logger.info(e);
         }
         return result;
     }
@@ -211,6 +243,8 @@ export default class Fulcrum {
             const oracleContract = new this.web3.eth.Contract(oracleJson.abi, oracleAddress);
 
             try {
+                logger.info("call oracleContract");
+
                 const swapPriceData = await oracleContract.methods.getTradeData(
                     srcAssetErc20Address,
                     destAssetErc20Address,
@@ -218,7 +252,7 @@ export default class Fulcrum {
                 ).call({ from: "0x4abB24590606f5bf4645185e20C4E7B97596cA3B" });
                 result = new BigNumber(swapPriceData[0]).dividedBy(10 ** 18);
             } catch (e) {
-                console.log(e)
+                logger.info(e)
                 result = new BigNumber(0);
             }
         }
@@ -232,9 +266,9 @@ export default class Fulcrum {
         let result = await storage.getItem("reserve_data");
         if (!result) {
 
-            console.warn("No reserve_data in cache!")
-            result = await this.updateReservedData();
-            await storage.setItem("reserve_data", result);
+            logger.info("No reserve_data in cache!")
+            // result = await this.updateReservedData();
+            // await storage.setItem("reserve_data", result);
             // console.dir(`reserve_data:`);
             // console.dir(result);
         }

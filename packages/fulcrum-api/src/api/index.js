@@ -12,11 +12,11 @@ export default ({ config }) => {
 
 	const api = Router();
 
-	(async () => {
-		await storage.init({
-			dir: 'persist-storage'
-		});
-	})()
+	// (async () => {
+	// 	await storage.init({
+	// 		dir: 'persist-storage'
+	// 	});
+	// })()
 
 	const web3 = new Web3(new Web3.providers.HttpProvider(config.web3_provider_url));
 
