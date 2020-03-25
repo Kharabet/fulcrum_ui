@@ -10,7 +10,7 @@
     }
   },
   "host": "api.bzx.network",
-  "basePath": "/api",
+  "basePath": "/v1",
   "tags": [
     {
       "name": "Stats",
@@ -34,8 +34,7 @@
     }
   ],
   "schemes": [
-    "https",
-    "http"
+    "https"
   ],
   "paths": {
     "/supply-rate-apr": {
