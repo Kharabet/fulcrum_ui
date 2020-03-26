@@ -44,7 +44,6 @@ export default class Fulcrum {
     constructor(web3) {
         this.web3 = web3;
         setInterval(this.updateCache.bind(this), config.cache_ttl_sec * 1000);
-        // this.iTokenContract = new this.web3.eth.Contract(iTokenJson.abi, token.address);
         this.DappHeperContract = new this.web3.eth.Contract(DappHelperJson.abi, dappHelperAddress);
         this.storage = new QueuedStorage();
         this.updateCache();
