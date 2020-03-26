@@ -20,17 +20,7 @@ jobs:
       uses: AEnterprise/rsync-deploy@v1.0
       env:
         DEPLOY_KEY: ${{ secrets.SERVER_SSH_KEY }}
-        ARGS: "-e -c -r --delete --exclude dist/persist-storage"
-        SERVER_PORT: ${{ secrets.SERVER_PORT }}
-        FOLDER: "./packages/fulcrum-api/"
-        SERVER_IP: ${{ secrets.SERVER_IP }}
-        USERNAME: ${{ secrets.USERNAME }}
-        SERVER_DESTINATION: ${{ secrets.SERVER_DESTINATION }}
-    - name: Restart
-      uses: AEnterprise/rsync-deploy@v1.0
-      env:
-        DEPLOY_KEY: ${{ secrets.SERVER_SSH_KEY }}
-        ARGS: "--rsync-path=${{ secrets.SERVER_DESTINATION }}/scripts/bzx-api-start.sh"
+        ARGS: "-e -c -r --delete --exclude dist/persist-storage --rsync-path=${{ secrets.SERVER_DESTINATION }}/scripts/bzx-api-start.sh"
         SERVER_PORT: ${{ secrets.SERVER_PORT }}
         FOLDER: "./packages/fulcrum-api/"
         SERVER_IP: ${{ secrets.SERVER_IP }}
