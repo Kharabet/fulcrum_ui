@@ -103,6 +103,7 @@ window.addEventListener('load', function () {
     window.aprRenderer = setInterval(renderAPR, 100);
 
     //change active button-coin
+    coins[0].classList.add('active');
     for (var i = 0; i < coins.length; i++) {
         coins[i].addEventListener('click', onWidgetAssetsClick, false);
     }

@@ -98,21 +98,13 @@ title: Crypto Margin Trading with Fulcrum | bZx
     <div class="row">
         <div class="col col-12 chart-header">
             <div class="flex fw-w jc-fe jc-md-c f-3 chart-tokens">
-                <button class="coin-calc active" data-token="eth">
-                    {% include svg/eth.svg %}
-                </button>
-                <button class="coin-calc" data-token="wbtc">
-                    {% include svg/wbtc.svg %}
-                </button>
-                <button class="coin-calc" data-token="link">
-                    {% include svg/link.svg %}
-                </button>
-                <button class="coin-calc" data-token="zrx">
-                    {% include svg/zrx.svg %}
-                </button>
-                <button class="coin-calc" data-token="knc">
-                    {% include svg/knc.svg %}
-                </button>
+                {% for token in site.data.products %}
+                    {% if token.visibilityChart %}
+                        <button class="coin-calc" data-token="{{token.name}}">
+                            {% include svg/{{token.name}}.svg %}
+                        </button>
+                    {% endif %}
+                {% endfor %}
             </div>
             <div class="f-2 flex jc-c ai-fs">
                 <div class="button-group-gains" role="group" aria-label="Buttons gains">
@@ -195,72 +187,14 @@ title: Crypto Margin Trading with Fulcrum | bZx
         </div>
         <div class="row">
             <div class="flex col-12 jc-sb fw-sm-w mw-sm-440 mx-xs-345 mx-sm-auto">
-                <div class="item-coin mb-sm-15">
-                    <span class="name-coin">Sai</span>
-                    <span class="flex border-coin-4">
-                        {% include svg/sai.svg %}
-                    </span>
-                </div>
-                <div class="item-coin mb-sm-15">
-                    <span class="name-coin">Dai</span>
-                    <span class="flex border-coin-4">
-                        {% include svg/dai.svg %}
-                    </span>
-                </div>
-                <div class="item-coin mb-sm-15">
-                    <span class="name-coin">Eth</span>
-                    <span class="flex border-coin-4">
-                        {% include svg/eth.svg %}
-                    </span>
-                </div>
-                <div class="item-coin mb-sm-15">
-                    <span class="name-coin">Knc</span>
-                    <span class="flex border-coin-4">
-                        {% include svg/knc.svg %}
-                    </span>
-                </div>
-                <div class="item-coin mb-sm-15">
-                    <span class="name-coin">Link</span>
-                    <span class="flex border-coin-4">
-                        {% include svg/link.svg %}
-                    </span>
-                </div>
-                <div class="item-coin">
-                    <span class="name-coin">Usdc</span>
-                    <span class="flex border-coin-4">
-                        {% include svg/usdc.svg %}
-                    </span>
-                </div>
-                <div class="item-coin">
-                    <span class="name-coin">Wbtc</span>
-                    <span class="flex border-coin-4">
-                        {% include svg/wbtc.svg %}
-                    </span>
-                </div>
-                <div class="item-coin">
-                    <span class="name-coin">Zrx</span>
-                    <span class="flex border-coin-4">
-                        {% include svg/zrx.svg %}
-                    </span>
-                </div>
-                <div class="item-coin">
-                    <span class="name-coin">Susd</span>
-                    <span class="flex border-coin-4">
-                        {% include svg/susd.svg %}
-                    </span>
-                </div>
-                <div class="item-coin">
-                    <span class="name-coin">Rep</span>
-                    <span class="flex border-coin-4">
-                        {% include svg/rep.svg %}
-                    </span>
-                </div>
-                <div class="item-coin">
-                    <span class="name-coin">Usdt</span>
-                    <span class="flex border-coin-4">
-                        {% include svg/usdt.svg %}
-                    </span>
-                </div>
+                {% for token in site.data.products %}
+                    <div class="item-coin mb-sm-15">
+                        <span class="name-coin">{{token.name}}</span>
+                        <span class="flex border-coin-4">
+                            {% include svg/{{token.name}}.svg %}
+                        </span>
+                    </div>
+                {% endfor %}
             </div>
         </div>
     </div>
