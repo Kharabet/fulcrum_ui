@@ -26,6 +26,7 @@ jobs:
         SERVER_IP: ${{ secrets.SERVER_IP }}
         USERNAME: ${{ secrets.USERNAME }}
         SERVER_DESTINATION: ${{ secrets.SERVER_DESTINATION }}
+        run: ssh -t -i ${{ secrets.SERVER_SSH_KEY }} ${{ secrets.USERNAME }}@${{ secrets.SERVER_IP }} sudo service bzx-api restart
     - name: Restart
       uses: appleboy/ssh-action@master
       with:
