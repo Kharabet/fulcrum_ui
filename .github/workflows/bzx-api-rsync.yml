@@ -16,7 +16,6 @@ jobs:
       run: |
         cd $GITHUB_WORKSPACE/packages/fulcrum-api && npm install
         cd $GITHUB_WORKSPACE/packages/fulcrum-api && npm run build
-        ls
     - name: Deploy
       uses: AEnterprise/rsync-deploy@v1.0
       env:
@@ -27,3 +26,11 @@ jobs:
         SERVER_IP: ${{ secrets.SERVER_IP }}
         USERNAME: ${{ secrets.USERNAME }}
         SERVER_DESTINATION: ${{ secrets.SERVER_DESTINATION }}
+    - name: Restart
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.SERVER_IP }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.SERVER_SSH_KEY }}
+        port: ${{ secrets.SERVER_PORT }}
+        script: sudo bash ${{ secrets.SERVER_DESTINATION }}/scripts/bzx-api-start.sh
