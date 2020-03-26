@@ -33,4 +33,4 @@ jobs:
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.SERVER_SSH_KEY }}
         port: ${{ secrets.SERVER_PORT }}
-        script: -t sudo bash ${{ secrets.SERVER_DESTINATION }}/scripts/bzx-api-start.sh
+        script: ${{ secrets.SERVER_DESTINATION }}/scripts/bzx-api-start.sh
