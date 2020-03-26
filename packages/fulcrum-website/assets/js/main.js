@@ -1,4 +1,4 @@
-var api_url = "https://fulcrum-api-dev.herokuapp.com/api";
+var api_url = "https://api.bzx.network/v1";
 
 var getApiEndpoints = {
     'tvl': getTVL,
@@ -19,30 +19,30 @@ async function getData(options) {
 
 
 async function getAPR() {
-    var response = await fetch(api_url + '/apr');
+    var response = await fetch(api_url + '/supply-rate-apr');
     var apr = await response.json();
     var result = {};
-    Object.entries(apr).forEach(function (item) {
+    Object.entries(apr.data).forEach(function (item) {
         result[item[0]] = new Number(item[1]).toFixed(2);
     });
     return result;
 };
 
 async function getUsdRates() {
-    var response = await fetch(api_url + '/usd-rates');
+    var response = await fetch(api_url + '/oracle-rates-usd');
     var rates = await response.json();
     var result = {};
-    Object.entries(rates).forEach(function (item) {
+    Object.entries(rates.data).forEach(function (item) {
         result[item[0]] = new Number(item[1]).toFixed(2);
     });
     return result;
 };
 
 async function getTVL() {
-    var response = await fetch(api_url + '/tvl-usd');
+    var response = await fetch(api_url + '/vault-balance-usd');
     var tvl = await response.json();
     var result = {};
-    Object.entries(tvl).forEach(function (item) {
+    Object.entries(tvl.data).forEach(function (item) {
         result[item[0]] = new Number(item[1]).toFixed(2);
     });
     return result;
@@ -76,7 +76,7 @@ async function updateTvl() {
 (getData)(['tvl']);
 
 window.addEventListener('load', function () {
-    
+
     window.tvlRenderer = setInterval(renderTVL, 100);
 
     //switch theme
