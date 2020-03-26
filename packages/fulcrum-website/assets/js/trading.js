@@ -66,6 +66,7 @@ var coins = document.querySelectorAll('.chart-tokens .coin-calc');
 window.addEventListener('load', function () {
 
     //change active button-coin
+    coins[0].classList.add('active');
     for (var i = 0; i < coins.length; i++) {
         coins[i].onclick = function () {
             var items = document.querySelectorAll('.coin-calc');

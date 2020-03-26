@@ -46,78 +46,19 @@ permalink: lending
                 </div>
             </div>
             <div class="col col-7 col-lg-9 col-md-12 apr-wrapper">
-                <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-token="sai">
-                    <div class="icon-50 mr-15 mr-xl-5 mr-xs-9">
-                        {% include svg/sai.svg %}
-                    </div>
-                    <div class="wrap-apr-value">
-                        <p class="lh-100 fw-700 c-gray">SAI</p>
-                        <p class="fs-24 fs-xl-21 c-primary lh-125 apr-value-after"><span class="fw-800 apr-value">5.3</span>%</p>
-                    </div>
-                </div>
-                <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-token="knc">
-                    <div class="icon-50 mr-15 mr-xl-5 mr-xs-9">
-                        {% include svg/knc.svg %}
-                    </div>
-                    <div class="wrap-apr-value">
-                        <p class="lh-100 fw-700 c-gray">KNC</p>
-                        <p class="fs-24 fs-xl-21 c-primary lh-125 apr-value-after"><span class="fw-800 apr-value">5.3</span>%</p>
-                    </div>
-                </div>
-                <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-token="zrx">
-                    <div class="icon-50 mr-15 mr-xl-5 mr-xs-9">
-                        {% include svg/zrx.svg %}
-                    </div>
-                    <div class="wrap-apr-value">
-                        <p class="lh-100 fw-700 c-gray">ZRX</p>
-                        <p class="fs-24 fs-xl-21 c-primary lh-125 apr-value-after"><span class="fw-800 apr-value">1.6</span>%</p>
-                    </div>
-                </div>
-                <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-token="eth">
-                    <div class="icon-50 mr-15 mr-xl-5 mr-xs-9">
-                        {% include svg/eth.svg %}
-                    </div>
-                    <div class="wrap-apr-value">
-                        <p class="lh-100 fw-700 c-gray">ETH</p>
-                        <p class="fs-24 fs-xl-21 c-primary lh-125 apr-value-after"><span class="fw-800 apr-value">4.2</span>%</p>
-                    </div>
-                </div>
-                <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-token="link">
-                    <div class="icon-50 mr-15 mr-xl-5 mr-xs-9">
-                        {% include svg/link.svg %}
-                    </div>
-                    <div class="wrap-apr-value">
-                        <p class="lh-100 fw-700 c-gray">LINK</p>
-                        <p class="fs-24 fs-xl-21 c-primary lh-125 apr-value-after"><span class="fw-800 apr-value">4.2</span>%</p>
-                    </div>
-                </div>
-                <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-token="susd">
-                    <div class="icon-50 mr-15 mr-xl-5 mr-xs-9">
-                        {% include svg/susd.svg %}
-                    </div>
-                    <div class="wrap-apr-value">
-                        <p class="lh-100 fw-700 c-gray">sUSD</p>
-                        <p class="fs-24 fs-xl-21 c-primary lh-125 apr-value-after"><span class="fw-800 apr-value">4.2</span>%</p>
-                    </div>
-                </div>
-                <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-token="wbtc">
-                    <div class="icon-50 mr-15 mr-xl-5 mr-xs-9">
-                        {% include svg/wbtc.svg %}
-                    </div>
-                    <div class="wrap-apr-value">
-                        <p class="lh-100 fw-700 c-gray">WBTC</p>
-                        <p class="fs-24 fs-xl-21 c-primary lh-125 apr-value-after"><span class="fw-800 apr-value">4.2</span>%</p>
-                    </div>
-                </div>
-                <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-token="usdt">
-                    <div class="icon-50 mr-15 mr-xl-5 mr-xs-9">
-                        {% include svg/usdt.svg %}
-                    </div>
-                    <div class="wrap-apr-value">
-                        <p class="lh-100 fw-700 c-gray">USDT</p>
-                        <p class="fs-24 fs-xl-21 c-primary lh-125 apr-value-after"><span class="fw-800 apr-value">4.2</span>%</p>
-                    </div>
-                </div>
+                {% for token in site.data.products %}
+                    {% if token.visibilityApr %}
+                        <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-token="{{token.name}}">
+                            <div class="icon-50 mr-15 mr-xl-5 mr-xs-9">
+                                {% include svg/{{token.name}}.svg %}
+                            </div>
+                            <div class="wrap-apr-value">
+                                <p class="lh-100 fw-700 c-gray text-uppercase">{{token.name}}</p>
+                                <p class="fs-24 fs-xl-21 c-primary lh-125 apr-value-after"><span class="fw-800 apr-value">5.3</span>%</p>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
             </div>
         </div>
     </div>
@@ -223,36 +164,13 @@ permalink: lending
                     <div class="coins-calc">
                         <p class="fs-18 mb-15 mb-md-0 c-dark-gray text-md-center">Asset</p>
                         <div class="flex fw-w jc-md-c">
-                            <button class="coin-calc active" data-token="dai">
-                                {% include svg/dai.svg %}
-                            </button>
-                            <button class="coin-calc" data-token="usdc">
-                                {% include svg/usdc.svg %}
-                            </button>
-                            <button class="coin-calc" data-token="eth">
-                                {% include svg/eth.svg %}
-                            </button>
-                            <button class="coin-calc" data-token="sai">
-                                {% include svg/sai.svg %}
-                            </button>
-                            <button class="coin-calc" data-token="link">
-                                {% include svg/link.svg %}
-                            </button>
-                            <button class="coin-calc" data-token="knc">
-                                {% include svg/knc.svg %}
-                            </button>
-                            <button class="coin-calc" data-token="susd">
-                                {% include svg/susd.svg %}
-                            </button>
-                            <button class="coin-calc" data-token="wbtc">
-                                {% include svg/wbtc.svg %}
-                            </button>
-                            <button class="coin-calc" data-token="zrx">
-                                {% include svg/zrx.svg %}
-                            </button>
-                            <button class="coin-calc" data-token="usdt">
-                                {% include svg/usdt.svg %}
-                            </button>
+                            {% for token in site.data.products  %}
+                                {% if token.visibilityEarn %}
+                                    <button class="coin-calc" data-token="{{token.name}}">
+                                        {% include svg/{{token.name}}.svg %}
+                                    </button>
+                                {% endif %}
+                            {% endfor %}
                         </div>
                     </div>
                     <div class="flex fd-c input-calc">
