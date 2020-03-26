@@ -26,8 +26,16 @@ jobs:
         SERVER_IP: ${{ secrets.SERVER_IP }}
         USERNAME: ${{ secrets.USERNAME }}
         SERVER_DESTINATION: ${{ secrets.SERVER_DESTINATION }}
-    - name: Restart
-      run: ssh -t -i "${{ secrets.SERVER_SSH_KEY }}" ${{ secrets.USERNAME }}@${{ secrets.SERVER_IP }} sudo service bzx-api restart
+    - name: SSH
+      uses: fifsky/ssh-action@master
+      with:
+        command: |
+          sudo service bzx-api restart
+        host: ${{ secrets.SERVER_IP }}
+        port: ${{ secrets.SERVER_PORT }}
+        user: ${{ secrets.USERNAME }}
+        key: ${{ secrets.SERVER_SSH_KEY }}
+        args: -tt
     - name: Restart2
       uses: appleboy/ssh-action@master
       with:
