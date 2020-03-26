@@ -224,9 +224,7 @@ export class RefinanceAssetSelectorItemMobile extends Component<IRefinanceAssetS
               </div>
             </div>
             <div className="refinance-asset-selector__row separator">
-              <div className="down_arrow">
-                <SeparatorArrow />
-              </div>
+              <SeparatorArrow />
             </div>
             <div className="refinance-asset-selector__rowimg">
               <div className="refinance-asset-selector__torque">
