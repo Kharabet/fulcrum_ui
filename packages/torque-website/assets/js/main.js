@@ -1,4 +1,4 @@
-const apiUrl = "https://fulcrum-api-dev.herokuapp.com/api";
+const apiUrl = "https://api.bzx.network/v1";
 
 (getTorqueBorrowApr)();
 
@@ -78,8 +78,9 @@ async function collateralEstimate(loanAsset, collateralAsset, amount) {
     const requestUrl = `${apiUrl}//borrow-deposit-estimate?borrow_asset=${loanAsset}&collateral_asset=${collateralAsset}&amount=${amount}`;
     const collateralEstimateResponse = await fetch(requestUrl);
     const responseJson = await collateralEstimateResponse.json();
-    const depositAmount = responseJson.depositAmount;
-    return depositAmount;
+    return (!responseJson.success)
+            ? console.error(responseJson.message)
+            : responseJson.data.depositAmount;
 }
 async function onLoanInputChange(e) {
     const form = e.currentTarget;
@@ -210,6 +211,8 @@ async function getTorqueBorrowApr() {
     const requestUrl = `${apiUrl}/torque-borrow-rate-apr`;
     const response = await fetch(requestUrl);
     const responseJson = await response.json();
-    renderBorrowApr(responseJson);
+    (!responseJson.success)
+        ? console.error(responseJson.message)
+        : renderBorrowApr(responseJson.data);
     window.borrowAPR = responseJson;
 }
