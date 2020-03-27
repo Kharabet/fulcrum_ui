@@ -50,22 +50,31 @@
   width: 50px;
   height: 50px;
 }
+.wrapper-svg-blur{
+  width: calc(50% - 120px);
+  @media screen and (max-width: $breakpoint-lg-down){
+    width: calc(50% - 60px);
+  }
+  @media screen and (max-width: $breakpoint-md-down){
+    width: 100%;
+  }
+}
 .svg-blur {
   display: flex;
   position: relative;
-  max-width: 460px;
+  max-width: 100%;
+  width: 100%;
   svg{
     position: relative;
-    max-width: 100%;
+    width: 100%;
     height: auto;
   }
   @media screen and (max-width: $breakpoint-lg-down){
-    max-width: 440px;
     margin-left: auto;
     margin-right: auto;
   }
-  @media screen and (max-width: $breakpoint-xs-down){
-    max-width: 100%;
+  @media screen and (max-width: $breakpoint-md-down){
+    width: 440px;
   }
   &:before {
     content: "";

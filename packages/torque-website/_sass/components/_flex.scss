@@ -4,6 +4,9 @@
 .fw-w {
   flex-wrap: wrap;
 }
+.fg-1{
+  flex-grow: 1;
+}
 .jc-sb {
   justify-content: space-between;
 }
@@ -60,6 +63,9 @@
   .jc-lg-fe{
     justify-content: flex-end;
   }
+  .jc-lg-fs{
+    justify-content: flex-start;
+  }
 }
 
 @media screen and (max-width: $breakpoint-md-down) {
@@ -74,6 +80,9 @@
   }
   .order-md-1{
     order: 1;
+  }
+  .fg-lg-initial{
+    flex-grow: initial;
   }
 }
 @media screen and (max-width: $breakpoint-sm-down) {
