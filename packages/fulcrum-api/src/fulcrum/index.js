@@ -9,6 +9,7 @@ import { pTokenJson } from './contracts/pTokenContract';
 import config from '../config.json';
 import { pTokenPricesModel, pTokenPriceModel } from "../models/pTokenPrices"
 import { iTokenPricesModel, iTokenPriceModel } from "../models/iTokenPrices"
+import { statsModel, tokenStatsModel, allTokensStatsModel } from "../models/stats"
 
 
 const UNLIMITED_ALLOWANCE_IN_BASE_UNITS = new BigNumber(2)
@@ -109,7 +110,7 @@ export default class Fulcrum {
     }
 
     async getITokensPricesUsd() {
-        const lastITokenPrices = (await iTokenPricesModel.find().sort({ _id: -1 }).select({iTokenPrices: 1 }).limit(1))[0];
+        const lastITokenPrices = (await iTokenPricesModel.find().sort({ _id: -1 }).select({ iTokenPrices: 1 }).limit(1))[0];
         if (!lastITokenPrices) {
 
             this.logger.info("No itoken-prices-usd in db!");
@@ -152,7 +153,7 @@ export default class Fulcrum {
     }
 
     async getPTokensPricesUsd() {
-        const lastPTokenPrices = (await pTokenPricesModel.find().sort({ _id: -1 }).select({pTokenPrices: 1 }).limit(1))[0];
+        const lastPTokenPrices = (await pTokenPricesModel.find().sort({ _id: -1 }).select({ pTokenPrices: 1 }).limit(1))[0];
         if (!lastPTokenPrices) {
 
             this.logger.info("No ptoken-prices-usd in db!");
@@ -161,7 +162,7 @@ export default class Fulcrum {
             // console.dir(`ptoken-prices-usd:`);
             // console.dir(result);
         }
-        let result = {}
+        let result = {};
         lastPTokenPrices.pTokenPrices.forEach(pTokenPrice => {
             result[pTokenPrice.token] = pTokenPrice.priceUsd;
         })
@@ -263,15 +264,21 @@ export default class Fulcrum {
 
 
     async  getReserveData() {
-        let result = await this.storage.getItem("reserve_data");
-        if (!result) {
+        const lastReserveData = (await statsModel.find().sort({ _id: -1 }).select({ tokensStats: 1, allTokensStats: 1 }).limit(1))[0];
 
-            this.logger.info("No reserve_data in cache!")
-            // result = await this.updateReservedData();
+        if (!lastReserveData) {
+
+            this.logger.info("No reserve_data in db!")
+            result = await this.updateReservedData();
             // await this.storage.setItem("reserve_data", result);
             // console.dir(`reserve_data:`);
             // console.dir(result);
         }
+        let result = [];
+        lastReserveData.tokensStats.forEach(tokensStat => {
+            result.push(tokensStat);
+        });
+        result.push(lastReserveData.allTokensStats);
         return result;
     }
 
@@ -283,6 +290,8 @@ export default class Fulcrum {
 
         let usdTotalLockedAll = new BigNumber(0);
         let usdSupplyAll = new BigNumber(0);
+        let stats = new statsModel();
+        stats.tokensStats = [];
         if (reserveData && reserveData.totalAssetSupply.length > 0) {
             iTokens.forEach((token, i) => {
                 let totalAssetSupply = new BigNumber(reserveData.totalAssetSupply[i]);
@@ -312,7 +321,7 @@ export default class Fulcrum {
                     usdTotalLockedAll = usdTotalLockedAll.plus(usdTotalLocked);
                 }
 
-                result.push({
+                stats.tokensStats.push(new tokenStatsModel({
                     token: token.name,
                     liquidity: marketLiquidity.dividedBy(10 ** 18).toFixed(),
                     totalSupply: totalAssetSupply.dividedBy(10 ** 18).toFixed(),
@@ -326,14 +335,14 @@ export default class Fulcrum {
                     swapToUSDPrice: new BigNumber(swapRates[i]).dividedBy(10 ** 18).toFixed(),
                     usdSupply: usdSupply.dividedBy(10 ** 18).toFixed(),
                     usdTotalLocked: usdTotalLocked.dividedBy(10 ** 18).toFixed(),
-                });
+                }));
             });
-            result.push({
+            stats.allTokensStats = new allTokensStatsModel({
                 token: "all",
                 usdSupply: usdSupplyAll.dividedBy(10 ** 18).toFixed(),
                 usdTotalLocked: usdTotalLockedAll.dividedBy(10 ** 18).toFixed()
-            })
-
+            });
+            await stats.save();
         }
         return result;
     }

@@ -1,24 +1,7 @@
 const mongoose = require('mongoose')
 
-const statsSchema = new mongoose.Schema({
-  date: {
-    type: Date,
-    required: true,
-    default: Date.now
-  },
-  tokensStats: {
-    type: [tokenStatsSchema],
-    required: true,
-    default: undefined
-  },
-  allStats: {
-    type: allTokenTokensStatsSchema,
-    required: true,
-    default: Date.now
-  }
-});
 
-const tokenStatsSchema = new mongoose.Schema({
+const tokenStatsModel = new mongoose.Schema({
   token: {
     type: String,
     required: true
@@ -71,9 +54,9 @@ const tokenStatsSchema = new mongoose.Schema({
     type: String,
     required: true
   }
-})
+});
 
-const allTokenTokensStatsSchema = new mongoose.Schema({
+const allTokensStatsModel = new mongoose.Schema({
   token: {
     type: String,
     required: true
@@ -86,6 +69,24 @@ const allTokenTokensStatsSchema = new mongoose.Schema({
     type: String,
     required: true
   }
-})
+});
 
-module.exports = mongoose.model('stats', statsSchema)
+const statsModel = new mongoose.Schema({
+  date: {
+    type: Date,
+    required: true,
+    default: Date.now
+  },
+  tokensStats: {
+    type: [tokenStatsModel],
+    required: true,
+    default: undefined
+  },
+  allTokensStats: {
+    type: allTokensStatsModel,
+    required: true
+  }
+});
+module.exports.statsModel = mongoose.model('stats', statsModel);
+module.exports.tokenStatsModel = mongoose.model('token_stats', tokenStatsModel);
+module.exports.allTokensStatsModel = mongoose.model('all_token_stats', allTokensStatsModel);
