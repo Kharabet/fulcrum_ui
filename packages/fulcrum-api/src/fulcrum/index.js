@@ -8,6 +8,7 @@ import { iTokenJson } from './contracts/iTokenContract';
 import { pTokenJson } from './contracts/pTokenContract';
 import config from '../config.json';
 import { pTokenPricesModel, pTokenPriceModel } from "../models/pTokenPrices"
+import { iTokenPricesModel, iTokenPriceModel } from "../models/iTokenPrices"
 
 
 const UNLIMITED_ALLOWANCE_IN_BASE_UNITS = new BigNumber(2)
@@ -108,22 +109,29 @@ export default class Fulcrum {
     }
 
     async getITokensPricesUsd() {
-        let result = await this.storage.getItem("itoken-prices-usd");
-        if (!result) {
+        const lastITokenPrices = (await iTokenPricesModel.find().sort({ _id: -1 }).select({iTokenPrices: 1 }).limit(1))[0];
+        if (!lastITokenPrices) {
 
-            this.logger.info("No itoken-prices-usd in cache!")
+            this.logger.info("No itoken-prices-usd in db!");
+            await this.updateITokensPricesUsd();
             // result = await this.updateITokensPricesUsd();
 
             // await this.storage.setItem("itoken-prices-usd", result);
             // console.dir(`itoken-prices-usd:`);
             // console.dir(result);
         }
+        let result = {}
+        lastITokenPrices.iTokenPrices.forEach(iTokenPrice => {
+            result[iTokenPrice.token] = iTokenPrice.priceUsd;
+        })
         return result;
     }
 
     async updateITokensPricesUsd() {
         let result = {};
         const usdRates = await this.getUsdRates();
+        let iTokenPrices = new iTokenPricesModel();
+        iTokenPrices.iTokenPrices = [];
         for (const token in iTokens) {
             const iToken = iTokens[token];
             const iTokenContract = new this.web3.eth.Contract(iTokenJson.abi, iToken.address);
@@ -133,7 +141,13 @@ export default class Fulcrum {
             //price is in loanAsset of iToken contract
             const price = new BigNumber(tokenPrice).multipliedBy(usdRates[iToken.name]).dividedBy(10 ** iToken.decimals);
             result[iToken.iTokenName.toLowerCase()] = price.toNumber();
+            const iTokenPrice = new iTokenPriceModel({
+                token: iToken.iTokenName.toLowerCase(),
+                priceUsd: price.toNumber()
+            });
+            iTokenPrices.iTokenPrices.push(iTokenPrice);
         }
+        await iTokenPrices.save();
         return result;
     }
 
@@ -141,7 +155,7 @@ export default class Fulcrum {
         const lastPTokenPrices = (await pTokenPricesModel.find().sort({ _id: -1 }).select({pTokenPrices: 1 }).limit(1))[0];
         if (!lastPTokenPrices) {
 
-            this.logger.info("No ptoken-prices-usd in db!")
+            this.logger.info("No ptoken-prices-usd in db!");
             await this.updatePTokensPricesUsd();
             // await this.storage.setItem("ptoken-prices-usd", result);
             // console.dir(`ptoken-prices-usd:`);
