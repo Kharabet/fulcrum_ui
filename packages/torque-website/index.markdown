@@ -107,20 +107,11 @@ layout: home
                             </div>
                             {% include svg/arrow-in-circle.svg %}
                         </a>
-                        <span class="info-after-button">Up to 5x Leverage, zero platform fees, and perfect liquidity</span>
-                    </div>            
+                        <span class="info-after-button">Crypto loans with fixed interest rates[need better call to action here]</span>
+                    </div>
                 </div>
                 <div class="col fg-1 fg-lg-initial jc-sb jc-lg-fs fd-md-c">
-                    <div class="flex fd-c mb-md-15 mx-md-a mr-lg-30">
-                        <a href="#" class="button button-green button-md">
-                            <div class="flex fd-c">
-                                <span>Existing user?</span>
-                                <p>Select Wallet</p>
-                            </div>
-                            {% include svg/arrow-in-circle.svg %}
-                        </a>
-                        <span class="info-after-button">Up to 5x Leverage, zero platform fees, <br /> and perfect liquidity</span>
-                    </div>        
+
                     <div class="flex fd-c mx-md-a mb-md-15">
                         <a href="#" class="button button-purple button-md">
                             <div class="flex fd-c">
@@ -129,8 +120,18 @@ layout: home
                             </div>
                             {% include svg/arrow-in-circle.svg %}
                         </a>
-                        <span class="info-after-button">Up to 5x Leverage, zero platform fees, <br /> and perfect liquidity</span>
-                    </div>  
+                        <span class="info-after-button">See if you can save when you refinance your loan<br />with fixed rates</span>
+                    </div>
+                    <div class="flex fd-c mb-md-15 mx-md-a mr-lg-30">
+                        <a href="#" class="button button-green button-md">
+                            <div class="flex fd-c">
+                                <span>Existing user?</span>
+                                <p>Select Wallet</p>
+                            </div>
+                            {% include svg/arrow-in-circle.svg %}
+                        </a>
+                        <span class="info-after-button">Manage your loan: add or remove collateral <br /> or repay any time</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -140,7 +141,7 @@ layout: home
             <div class="row">
                 <div class="col col-12">
                     <h2 class="small-triangle triangle mb-75 mb-xs-45">
-                    <span class="l-r-125">{% include svg/small-triangle.svg %}</span>                    
+                    <span class="l-r-125">{% include svg/small-triangle.svg %}</span>
                     Why Torque? </h2>
                 </div>
             </div>
@@ -162,7 +163,7 @@ layout: home
                             {% include svg/icon-safe-1.svg %}
                         </div>
                         <div class="content-reason">
-                            <h3 class="mb-10">Non custodial</h3>
+                          <h3 class="mb-10">Partial Liquidations</h3>
                             <p>Enjoy zero fees on tokenized margin loans and margin positions with Fulcrum.</p>
                         </div>
                     </div>
@@ -180,7 +181,7 @@ layout: home
                             {% include svg/icon-safe-1.svg %}
                         </div>
                         <div class="content-reason">
-                            <h3 class="mb-10">Partial Liquidations</h3>
+                          <h3 class="mb-10">Non custodial</h3>
                             <p>Enjoy zero fees on tokenized margin loans and margin positions with Fulcrum.</p>
                         </div>
                     </div>
@@ -241,11 +242,11 @@ layout: home
                     <h2>Our stats</h2>
                     <div class="item-stats">
                         <div>$<span class="fw-900">5,056,560</span></div>
-                        <span>Loans Originated</span>   
+                        <span>Loans Originated</span>
                         <div class="stats-svg">
                             {% include svg/after-stats.svg %}
                             {% include svg/after-stats-mobile.svg %}
-                        </div>                     
+                        </div>
                     </div>
                     <div class="item-stats">
                         <div>$<span class="fw-900">659,056,560</span></div>
@@ -261,8 +262,8 @@ layout: home
     <div class="container">
         <div class="row">
             <div class="col col-12 fd-c jc-c">
-                <h2 class="mb-25">How to borrow</h2>
-                <p class="fs-20 fs-xs-16 lh-150 fw-600 c-secondary-blue mb-75">Three clicks. No Accounts. No fees.</p>
+                <h2 class="mb-25">How to Borrow</h2>
+                <p class="fs-20 fs-xs-16 lh-150 fw-600 c-secondary-blue mb-75">Three clicks. No credit checks. Flexible collateral.</p>
             </div>
         </div>
         <div class="row">
@@ -290,7 +291,7 @@ layout: home
     <div class="container container-md">
         <div class="row">
             <div class="col col-12 jc-c">
-                <h2 class="mb-30">Start now</h2>            
+                <h2 class="mb-30">Start Now</h2>
             </div>
         </div>
         <div class="row">
@@ -304,7 +305,7 @@ layout: home
                         {% include svg/arrow-in-circle.svg %}
                     </a>
                     <span class="info-after-button">Up to 5x Leverage, zero platform fees, <br /> and perfect liquidity</span>
-                </div>          
+                </div>
                 <div class="flex fd-c">
                     <a href="#" class="button button-purple button-lg">
                         <div class="flex fd-c">
@@ -314,7 +315,7 @@ layout: home
                         {% include svg/arrow-in-circle.svg %}
                     </a>
                     <span class="info-after-button">Up to 5x Leverage, zero platform fees, <br /> and perfect liquidity</span>
-                </div>          
+                </div>
             </div>
         </div>
     </div>
@@ -335,20 +336,20 @@ layout: home
                 <div id="accordion">
                     <div class="accordion-item active">
                         <h4 class="accordion-toggle">
-                            What does going long or short mean in trading?
+                          What are the fees involved when opening a loan on Torque?
                             <span class="accordion-position"></span>
                         </h4>
                         <div class="accordion-content" aria-hidden="false">
-                            <p>Margin trading has two main aspects: leverage and shorting. When trading with leverage, a trader borrows assets to increase the amount of assets they are trading. By doing so, they magnify the gains or losses of their trade. The borrowed assets are known as a margin loan. To obtain the margin loan, the trader puts up assets that serve as collateral. The terms of the margin loan specify a collateral-to-loan ratio. If the trade falls below the specified ratio, the trade is liquidated and the lender gets repaid using the trader's collateral. Margin trading also includes shorting. When shorting, a trader essentially sells assets they do not own. The short investor borrows an asset and sells it with the expectation that the asset will lose value. </p>
+                            <p>There are no fees involved with opening the loan. You just pay the interest.</p>
                         </div>
                     </div>
                     <div class="accordion-item">
                         <h4 class="accordion-toggle">
-                            How are positions liquidated? Is there liquidity risk?
+                          Can a loan be liquidated on Torque? How undercollaterized loans are liquidated?
                             <span class="accordion-position"></span>
                         </h4>
                         <div class="accordion-content" aria-hidden="true">
-                            <p>Positions are liquidated using KyberSwap. When a trader goes under margin maintenance (15%), they are only partially liquidated, bringing their current margin to 25%. Only liquidating as much as necessary reduces the risk of slippage from large liquidations. Anyone can initiate a margin call: the process is permissionless and incentivized. The incentive to liquidators is a refund of your gas * 2. There’s also no capital costs or risks like those experienced when liquidating positions on other protocols. This ensures redundancy in the margin calling process. Moreover, there is an insurance fund which protects lenders. In the case that a lender would lose their principal, the insurance fund will automatically disburse funds to the lender. This insurance is funded by a smart contract holding 10% of all interest that is paid by borrowers to lenders.</p>
+                            <p>Loan are liquidated if your position goes below margin maintenance. But only partially, enough to bring your margin up 10% above margin maintenance.</p>
                         </div>
                     </div>
                     <div class="accordion-item">
