@@ -7,9 +7,27 @@ import api from './api';
 import config from './config.json';
 import swaggerUi from 'swagger-ui-express';
 import swaggerDocument from './swagger.json';
+import winston from 'winston';
 
 let app = express();
 app.server = http.createServer(app);
+
+
+const logger = winston.createLogger({
+    level: 'info',
+    format: winston.format.combine(winston.format.timestamp(), winston.format.simple()),
+    defaultMeta: { service: 'user-service' },
+    transports: [
+        //
+        // - Write all logs with level `error` and below to `error.log`
+        // - Write all logs with level `info` and below to `combined.log`
+        //
+        new winston.transports.File({ filename: 'error.log', level: 'error' }),
+        new winston.transports.File({ filename: 'access.log', level: 'info' }),
+        new winston.transports.File({ filename: 'combined.log' })
+    ]
+});
+
 
 // logger
 app.use(morgan('dev'));
@@ -26,7 +44,7 @@ app.use(bodyParser.json({
 
 
 // api router
-app.use('/v1', api({ config }));
+app.use('/v1', api({ config, logger }));
 
 app.use('/', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 

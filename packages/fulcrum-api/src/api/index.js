@@ -6,23 +6,24 @@ import Web3 from 'web3';
 import { query, oneOf, validationResult } from 'express-validator';
 import { iTokens } from '../config/iTokens';
 
-import storage from 'node-persist';
+import QueuedStorage from "../QueuedStorage";
 
-export default ({ config }) => {
+export default ({ config, logger }) => {
 
 	const api = Router();
 
-	// (async () => {
-	// 	await storage.init({
-	// 		dir: 'persist-storage'
-	// 	});
-	// })()
+	const storage = new QueuedStorage();
 
+	(async () => {
+		await storage.init({
+			dir: 'persist-storage'
+		});
+	})()
 	const web3 = new Web3(new Web3.providers.HttpProvider(config.web3_provider_url));
 
 
-	const fulcrum = new Fulcrum(web3);
-	const torque = new Torque(web3);
+	const fulcrum = new Fulcrum(web3, storage, logger);
+	const torque = new Torque(web3, storage, logger);
 
 	api.get('/total-asset-supply', async (req, res) => {
 		const totalAssetSupply = await fulcrum.getTotalAssetSupply();
