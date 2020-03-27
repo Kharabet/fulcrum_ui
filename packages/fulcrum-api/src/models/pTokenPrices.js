@@ -25,5 +25,5 @@ const pTokenPricesSchema = new mongoose.Schema({
 });
 
 
-exports.pTokenPricesModel = mongoose.model('pTokenPrices', pTokenPricesSchema);
-exports.pTokenPriceModel = mongoose.model('pTokenPrice', pTokenPriceSchema);
+exports.pTokenPricesModel = mongoose.model('ptoken_prices', pTokenPricesSchema);
+exports.pTokenPriceModel = mongoose.model('ptoken_price', pTokenPriceSchema);

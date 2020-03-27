@@ -88,4 +88,4 @@ const allTokenTokensStatsSchema = new mongoose.Schema({
   }
 })
 
-module.exports = mongoose.model('Stats', statsSchema)
+module.exports = mongoose.model('stats', statsSchema)
