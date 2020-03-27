@@ -61,13 +61,13 @@
       display: flex;
       align-items: center;
       background-color: var(--bg-item-form);
-      border: 2px solid #e7ebf0;
+      border: 2px solid var(--border-item-form);
       padding: 10px 17px;
       border-radius: 4px;
       input {
         font-size: 32px;
         font-weight: 800;
-        color: #283049;
+        color: var(--input-form);
         height: 48px;        
         border: none;
         outline: none;
@@ -107,15 +107,12 @@
     .item-connect {
       background-color: #276bfb;
     }
-    .connected {
-      stroke: #ffffff;
-    }
-    .connected-color {
+    .connected-stroke {
       stroke: #ffffff;
     }
   }
   .item-connect {    
-    background-color: #e9f4ff;
+    background-color: var(--bg-connect);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -153,7 +150,7 @@
     padding: 4px;
     border-radius: 26px;
     background-color: var(--bg-selector-form);
-    color: #8992a4;
+    color: var(--color-selector-form);
     font-size: 14px;
     letter-spacing: 0.05em;
     line-height: 1.5;
@@ -212,7 +209,8 @@
     box-shadow: 0px 4px 18px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
     width: 126px;
-    background-color: #ffffff;
+    color: var(--color-selector-form);
+    background-color: var(--bg-selector-form);
     list-style: none;
     left: -8px;
     top: 47px;
@@ -225,17 +223,21 @@
       &.hidden {
         display: none;
       }
+      &:last-child{
+        border-bottom-left-radius: 8px;
+        border-bottom-right-radius: 8px;
+      }
       svg {
         width: 30px;
         height: 30px;
         margin-right: 6px;
       }
       &:not(:last-child) {
-        border-bottom: 1px solid #f5f7f9;
+        border-bottom: 1px solid var(--border-selector-form);
       }
       &:hover {
         cursor: pointer;
-        background-color: #e9f4ff;
+        background-color: var(--bg-hover-selector-form);
       }
     }
   }

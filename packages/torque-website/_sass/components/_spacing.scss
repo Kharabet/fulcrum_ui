@@ -15,9 +15,6 @@
     margin-right: #{5 * $i}px;
   }
 }
-.mr-35{
-  margin-right: 35px;
-}
 .mr-90{
   margin-right: 90px;
 }
@@ -34,56 +31,26 @@
 }
 
 /* padding */
-@for $i from 4 through 9 {
+@for $i from 1 through 8 {
   .pt-#{15*$i} {
     padding-top: #{15 * $i}px;
   }
 }
-.pt-15{
-  padding-top: 15px;
-}
-.pt-30{
-  padding-top: 30px;
-}
-.pt-45{
-  padding-top: 45px;
-}
-.pt-50{
-  padding-top: 50px;
-}
-.pt-120{
-  padding-top: 120px;
-}
-.pl-55 {
-  padding-left: 55px;
-}
-@for $i from 2 through 9 {
+@for $i from 1 through 8 {
   .pb-#{15*$i} {
     padding-bottom: #{15 * $i}px;
   }
 }
 
-.py-60 {
-  padding-top: 60px;
-  padding-bottom: 60px;
-}
-.py-105{
-  padding-top: 105px;
-  padding-bottom: 105px;
-}
 @media screen and (max-width: $breakpoint-xl-down){
+  .mr-xl-10{
+    margin-right: 10px;
+  }
   .mr-xl-90{
     margin-right: 90px;
   }
 }
 @media screen and (max-width: $breakpoint-lg-down) {
-  .pl-lg-0 {
-    padding-left: 0;
-  }
-  .px-lg-0{
-    padding-left: 0;
-    padding-right: 0;
-  }
   .mr-lg-15{
     margin-right: 15px;
   }
@@ -95,6 +62,9 @@
   }
   .mb-lg-15{
     margin-bottom: 15px;
+  }
+  .pt-lg-0{
+    padding-top: 0;
   }
 }
 @media screen and (max-width: $breakpoint-md-down) {

@@ -30,15 +30,19 @@
       font-size: 20px;
     }
   }
-  + span {
+  + .info-after-button {
     line-height: 1.5;
     color: #8992a4;
     margin: 20px 0 0 40px;
     @media screen and (min-width: $breakpoint-sm-up){
       font-size: 13px;
     }
+    @media screen and (max-width: $breakpoint-lg-down){
+      max-width: 250px;
+    }
     @media screen and (max-width: $breakpoint-sm-down){
       font-size: 10px;
+      max-width: 215px;
     }
   }
 }
@@ -85,6 +89,22 @@
     border: 2px solid var(--btn-blue-bg-hover);
   }
 }
+.button-xl {
+  border-radius: 90px;
+  padding: 13px 25px 13px 40px;
+  @media screen and (min-width: $breakpoint-xl-up) {
+    width: 535px;
+  }
+  @media screen and (max-width: $breakpoint-xl-down) {
+    width: 415px;
+  }
+  @media screen and (max-width: $breakpoint-lg-down) {
+    width: 290px;
+  }
+  @media screen and (max-width: $breakpoint-sm-down) {
+    width: 255px;
+  }
+}
 .button-lg {
   border-radius: 90px;
   padding: 13px 25px 13px 40px;
@@ -105,7 +125,7 @@
   border-radius: 90px;
   padding: 13px 25px 13px 40px;
   @media screen and (min-width: $breakpoint-xl-up) {
-    width: 355px;
+    width: 395px;
   }
   @media screen and (max-width: $breakpoint-xl-down) {
     width: 290px;

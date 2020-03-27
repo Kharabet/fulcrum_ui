@@ -20,11 +20,31 @@
     padding: 0 20px 25px 20px;
   }
 }
+.apr-title{
+  padding-right: 30px;
+  @media screen and (min-width: $breakpoint-xl-up){
+    width: 535px;
+  }
+  @media screen and (max-width: $breakpoint-xl-down){
+    width: 415px;
+  }
+  @media screen and (max-width: $breakpoint-lg-down) {
+    width: 75%;
+    margin-bottom: 30px;
+  }
+}
 .apr-wrapper {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
+  width: 100%;
   @media screen and (min-width: $breakpoint-lg-up){
     margin-top: 60px;
+  }
+  @media screen and (max-width: $breakpoint-lg-down) {
+    grid-template-columns: repeat(5, 1fr);
+  }
+  @media screen and (max-width: $breakpoint-md-down) {
+    grid-template-columns: repeat(4, 1fr);
   }
   @media screen and (max-width: $breakpoint-sm-down) {
     grid-template-columns: repeat(3, 1fr);

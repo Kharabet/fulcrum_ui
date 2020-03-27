@@ -6,13 +6,13 @@ layout: home
 ---
 <section class="bg-primary bg-primary-image">
     {% include header.html %}
-    <div class="container pt-90 pb-60">
-        <div class="row">
-        <div class="col col-8 col-xl-9 col-md-12">
-                <div class="pl-55 pl-lg-0 w-100 ta-xs-c">
-                    <h1 class="mb-40">Borrowing Made Simple</h1>
-                    <p class="fs-16 fs-xs-12 lh-160 mb-50 c-secondary"><span class="fw-700">Torque</span> is the first crypto loan platform with indefinite-term loans and fixed interest rates. Get an instant crypto-backed loan with no credit checks.</p>
-                </div>
+    <div class="container pt-90 pb-90">
+        <div class="row fd-c">
+            <div class="col col-8 col-xl-10 col-md-12">
+                <h1 class="mb-40">Borrowing Made Simple</h1>
+            </div>
+            <div class="col col-7 col-xl-9 col-md-12">
+                <p class="fs-16 fs-xs-12 lh-160 mb-50 c-secondary"><span class="fw-700">Torque</span> is the first crypto loan platform with indefinite-term loans and fixed interest rates. Get an instant crypto-backed loan with no credit checks.</p>
             </div>
         </div>
         <div class="row">
@@ -68,44 +68,50 @@ layout: home
             </div>
         </div>
     </div>
-    <div class="container pt-15 pt-xs-30 pb-45 pb-xs-0">
-        <div class="row fw-lg-w jc-lg-fe">
-            <div class="col col-5 col-lg-12">
-                <h2 class="big-triangle triangle mb-md-30">
-                <span class="t-r-75 l-r-125 l-r-xs-5">{% include svg/big-triangle.svg %}</span>
-                Crypto-backed loans with fixed interest rates
-                </h2>
+    <div class="container pb-45 pb-xs-0">
+        <div class="row fw-w">
+            <div class="col">
+                <div class="apr-title">
+                    <h2 class="big-triangle triangle mb-md-30">
+                    <span class="t-r-75 l-r-125 l-r-xs-5">{% include svg/big-triangle.svg %}</span>
+                    Crypto-backed loans with fixed interest rates
+                    </h2>
+                </div>
             </div>
-            <div class="col col-7 col-lg-9 col-md-12 apr-wrapper">
-                {% for product in site.data.products %}
-                    <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-asset="{{ product.name }}">
-                        <div class="icon-50 mr-15 mr-xl-5 mr-xs-9">
-                            {% include svg/{{ product.name }}.svg %}
+            <div class="col fg-1">
+                <div class="apr-wrapper">
+                    {% for product in site.data.products %}
+                        <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-asset="{{ product.name }}">
+                            <div class="icon-50 mr-15 mr-xl-10 mr-xs-9">
+                                {% include svg/{{ product.name }}.svg %}
+                            </div>
+                            <div class="wrap-apr-value">
+                                <p class="lh-100 fw-700 c-gray">{{ product.name }}</p>
+                                <p class="fs-24 fs-xl-21 lh-125 apr-value-after"><span class="fw-800 apr-value">5.3</span>%</p>
+                            </div>
                         </div>
-                        <div class="wrap-apr-value">
-                            <p class="lh-100 fw-700 c-gray">{{ product.name }}</p>
-                            <p class="fs-24 fs-xl-21 lh-125 apr-value-after"><span class="fw-800 apr-value">5.3</span>%</p>
-                        </div>
-                    </div>
-                {% endfor %}
+                    {% endfor %}
+                </div>
             </div>
         </div>
     </div>
-    <div class="py-60">
-        <div class="container container-lg">
-            <div class="row">
-                <div class="col jc-sb w-100 fd-md-c">
+    <div class="pt-60 pb-60 pt-lg-0">
+        <div class="container">
+            <div class="row fw-w fd-r fd-md-c">
+                <div class="col">
                     <div class="flex fd-c mx-md-a mb-md-15">
-                        <a href="#" class="button button-blue button-md">
+                        <a href="#" class="button button-blue button-xl">
                             <div class="flex fd-c">
                                 <span>New user?</span>
                                 <p>Borrow</p>
                             </div>
                             {% include svg/arrow-in-circle.svg %}
                         </a>
-                        <span class="info-after-button">Up to 5x Leverage, zero platform fees, <br /> and perfect liquidity</span>
-                    </div>    
-                    <div class="flex fd-c mx-md-a mb-md-15">
+                        <span class="info-after-button">Up to 5x Leverage, zero platform fees, and perfect liquidity</span>
+                    </div>            
+                </div>
+                <div class="col fg-1 fg-lg-initial jc-sb jc-lg-fs fd-md-c">
+                    <div class="flex fd-c mb-md-15 mx-md-a mr-lg-30">
                         <a href="#" class="button button-green button-md">
                             <div class="flex fd-c">
                                 <span>Existing user?</span>
@@ -123,13 +129,13 @@ layout: home
                             </div>
                             {% include svg/arrow-in-circle.svg %}
                         </a>
-                        <span class="fs-13 lh-150 c-gray mt-20 ml-40">Up to 5x Leverage, zero platform fees, <br /> and perfect liquidity</span>
-                    </div>          
+                        <span class="info-after-button">Up to 5x Leverage, zero platform fees, <br /> and perfect liquidity</span>
+                    </div>  
                 </div>
             </div>
         </div>
     </div>
-    <div class="pt-90 pb-30 pt-xs-0">
+    <div class="pt-30 pb-45 pt-xs-0">
         <div class="container">
             <div class="row">
                 <div class="col col-12">
@@ -184,7 +190,7 @@ layout: home
     </div>
 </section>
 
-<section class="bg-secondary pt-90 pb-75 py-xs-45 ta-c">
+<section class="bg-secondary pt-90 pb-90 py-xs-45 ta-c">
     <div class="container">
         <div class="row">
             <div class="col col-12 jc-c">
@@ -251,7 +257,7 @@ layout: home
     </div>
 </section>
 
-<section class="bg-secondary pt-120 pb-45 ta-c pt-xs-90">
+<section class="bg-secondary pt-120 pb-75 ta-c pt-xs-90">
     <div class="container">
         <div class="row">
             <div class="col col-12 fd-c jc-c">
@@ -260,22 +266,18 @@ layout: home
             </div>
         </div>
         <div class="row">
-            <div class="col col-9 col-xl-11 col-lg-12 mx-a jc-sb fd-md-c">
-                <div class="flex fd-c mb-md-60">
+            <div class="col col-12 mx-a jc-sa fd-md-c">
+                <div class="flex fd-c wrapper-svg-blur mb-md-60">
                     <div class="svg-blur mb-45">
                         <span class="lend-count">1</span>
-                        <div>
                         {% include svg/step-1.svg %}
-                        </div>
                     </div>
                     <p class="c-dark-gray mt-25">Sellect an asset with fixed APR</p>
                 </div>
-                <div class="flex fd-c">
+                <div class="flex fd-c wrapper-svg-blur">
                     <div class="svg-blur mb-45">
                         <span class="lend-count">2</span>
-                        <div>
                         {% include svg/step-2.svg %}
-                        </div>
                     </div>
                     <p class="c-dark-gray mt-25">Enter amount to borrow and confirm transaction at Metamask</p>
                 </div>
@@ -284,7 +286,7 @@ layout: home
     </div>
 </section>
 
-<section class="bg-secondary pt-45 pb-90 pt-xs-30">
+<section class="bg-secondary pt-75 pb-105 pt-xs-30">
     <div class="container container-md">
         <div class="row">
             <div class="col col-12 jc-c">
@@ -311,14 +313,14 @@ layout: home
                         </div>
                         {% include svg/arrow-in-circle.svg %}
                     </a>
-                    <span class="fs-13 lh-150 c-gray mt-20 ml-40">Up to 5x Leverage, zero platform fees, <br /> and perfect liquidity</span>
+                    <span class="info-after-button">Up to 5x Leverage, zero platform fees, <br /> and perfect liquidity</span>
                 </div>          
             </div>
         </div>
     </div>
 </section>
 
-<section class="bg-secondary py-105 pt-xs-0 pb-xs-60 ta-c">
+<section class="bg-secondary pt-105 pb-30 pt-xs-0 pb-xs-60 ta-c">
     <div class="container container-sm">
         <div class="row">
             <div class="col col-12 jc-c">
