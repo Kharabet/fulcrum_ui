@@ -29,15 +29,15 @@ export default class Fulcrum {
 
     async updateCache(key, value) {
         const reserve_data = await this.updateReservedData();
-        await this.storage.setItem("reserve_data", reserve_data);
+        // await this.storage.setItem("reserve_data", reserve_data);
         this.logger.info("reserve_data updated");
 
         const itoken = await this.updateITokensPricesUsd();
-        await this.storage.setItem("itoken-prices-usd", itoken);
+        // await this.storage.setItem("itoken-prices-usd", itoken);
         this.logger.info("itoken-prices-usd updated");
 
         const ptoken = await this.updatePTokensPricesUsd();
-        await this.storage.setItem("ptoken-prices-usd", ptoken);
+        // await this.storage.setItem("ptoken-prices-usd", ptoken);
         this.logger.info("ptoken-prices-usd updated");
 
         return;
