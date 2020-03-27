@@ -78,9 +78,10 @@ async function collateralEstimate(loanAsset, collateralAsset, amount) {
     const requestUrl = `${apiUrl}//borrow-deposit-estimate?borrow_asset=${loanAsset}&collateral_asset=${collateralAsset}&amount=${amount}`;
     const collateralEstimateResponse = await fetch(requestUrl);
     const responseJson = await collateralEstimateResponse.json();
+    const errorLargeLoan = 'Loan is too large';
     return (!responseJson.success)
-            ? console.error(responseJson.message)
-            : responseJson.data.depositAmount;
+        ? errorLargeLoan
+        : (new Number(responseJson.data.depositAmount)).toFixed(2);
 }
 async function onLoanInputChange(e) {
     const form = e.currentTarget;
@@ -100,9 +101,12 @@ async function updateCollateralInput() {
     const collateralAsset = form.querySelector(".item-form.collateral .select-styled").dataset.asset;
     const inputLoanValue = parseInt(inputLoan.value);
     (inputLoanValue === 0 || inputLoan.value.length === 0)
-        inputCollateral.value = 0;
+    inputCollateral.value = 0;
     if (inputLoanValue > 0) {
         const collateralEstimateValue = await collateralEstimate(loanAsset, collateralAsset, inputLoanValue);
+        isNaN(collateralEstimateValue)
+            ? inputCollateral.classList.add('error')
+            : inputCollateral.classList.remove('error');
         inputCollateral.value = collateralEstimateValue;
     }
 }

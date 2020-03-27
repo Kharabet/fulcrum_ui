@@ -72,6 +72,13 @@
         border: none;
         outline: none;
         background-color: transparent;
+        &.error{
+          font-size: 14px;
+          color: #DE4A4A;
+          @media screen and (max-width: $breakpoint-sm-down){
+            font-size: 12px;
+          }
+        }
         @media screen and (min-width: $breakpoint-xl-up){
           width: 240px;
         }
