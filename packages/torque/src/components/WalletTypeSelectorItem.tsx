@@ -59,9 +59,9 @@ export class WalletTypeSelectorItem extends Component<IWalletTypeSelectorItemPro
     );
   };
 
-  private onClick = () => {
+  private onClick = async () => {
     if (this.props.onSelectWalletType) {
-      this.props.onSelectWalletType(this.props.walletType);
+      await this.props.onSelectWalletType(this.props.walletType);
     }
   };
 }
