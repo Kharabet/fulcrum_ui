@@ -7,7 +7,7 @@ import { mainnetAddress as oracleAddress, oracleJson } from './contracts/OracleC
 import { iTokenJson } from './contracts/iTokenContract';
 import { pTokenJson } from './contracts/pTokenContract';
 import config from '../config.json';
-
+import { pTokenPricesModel, pTokenPriceModel } from "../models/pTokenPrices"
 
 
 const UNLIMITED_ALLOWANCE_IN_BASE_UNITS = new BigNumber(2)
@@ -138,21 +138,27 @@ export default class Fulcrum {
     }
 
     async getPTokensPricesUsd() {
-        let result = await this.storage.getItem("ptoken-prices-usd");
-        if (!result) {
+        const lastPTokenPrices = (await pTokenPricesModel.find().sort({ _id: -1 }).select({pTokenPrices: 1 }).limit(1))[0];
+        if (!lastPTokenPrices) {
 
-            this.logger.info("No ptoken-prices-usd in cache!")
-            // result = await this.updatePTokensPricesUsd();
+            this.logger.info("No ptoken-prices-usd in db!")
+            await this.updatePTokensPricesUsd();
             // await this.storage.setItem("ptoken-prices-usd", result);
             // console.dir(`ptoken-prices-usd:`);
             // console.dir(result);
         }
+        let result = {}
+        lastPTokenPrices.pTokenPrices.forEach(pTokenPrice => {
+            result[pTokenPrice.token] = pTokenPrice.priceUsd;
+        })
         return result;
     }
 
     async updatePTokensPricesUsd() {
         let result = {};
         const usdRates = await this.getUsdRates();
+        let pTokenPrices = new pTokenPricesModel();
+        pTokenPrices.pTokenPrices = [];
         try {
             for (const token in pTokens) {
                 const pToken = pTokens[token];
@@ -166,10 +172,16 @@ export default class Fulcrum {
                 //const swapPrice = await this.getSwapToUsdRate(baseAsset);
                 const price = new BigNumber(tokenPrice).multipliedBy(usdRates[baseAsset.toLowerCase()]).dividedBy(10 ** decimals);
                 result[pToken.ticker.toLowerCase()] = price.toNumber();
-            }
+                const pTokenPrice = new pTokenPriceModel({
+                    token: pToken.ticker.toLowerCase(),
+                    priceUsd: price.toNumber()
+                });
+                pTokenPrices.pTokenPrices.push(pTokenPrice);
+            };
+            await pTokenPrices.save();
         }
         catch (e) {
-            this.logger.info(e);
+            this.logger.error(e);
         }
         return result;
     }
