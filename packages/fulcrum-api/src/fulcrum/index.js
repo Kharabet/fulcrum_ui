@@ -110,7 +110,7 @@ export default class Fulcrum {
     }
 
     async getITokensPricesUsd() {
-        const lastITokenPrices = (await iTokenPricesModel.find().sort({ _id: -1 }).select({ iTokenPrices: 1 }).limit(1))[0];
+        const lastITokenPrices = (await iTokenPricesModel.find().sort({ _id: -1 }).select({ iTokenPrices: 1 }).lean().limit(1))[0];
         if (!lastITokenPrices) {
 
             this.logger.info("No itoken-prices-usd in db!");
@@ -153,7 +153,7 @@ export default class Fulcrum {
     }
 
     async getPTokensPricesUsd() {
-        const lastPTokenPrices = (await pTokenPricesModel.find().sort({ _id: -1 }).select({ pTokenPrices: 1 }).limit(1))[0];
+        const lastPTokenPrices = (await pTokenPricesModel.find().sort({ _id: -1 }).select({ pTokenPrices: 1 }).lean().limit(1))[0];
         if (!lastPTokenPrices) {
 
             this.logger.info("No ptoken-prices-usd in db!");
@@ -264,7 +264,7 @@ export default class Fulcrum {
 
 
     async  getReserveData() {
-        const lastReserveData = (await statsModel.find().sort({ _id: -1 }).select({ tokensStats: 1, allTokensStats: 1 }).limit(1))[0];
+        const lastReserveData = (await statsModel.find().sort({ _id: -1 }).select({ tokensStats: 1, allTokensStats: 1 }).lean().limit(1))[0];
 
         if (!lastReserveData) {
 

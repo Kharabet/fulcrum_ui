@@ -15,7 +15,8 @@ const pTokenPriceSchema = new mongoose.Schema({
 const pTokenPricesSchema = new mongoose.Schema({
     date: {
       type: Date,
-      default: Date.now
+      default: Date.now,
+      index: true
     },
     pTokenPrices: {
       type: [pTokenPriceSchema],

@@ -75,7 +75,8 @@ const statsModel = new mongoose.Schema({
   date: {
     type: Date,
     required: true,
-    default: Date.now
+    default: Date.now,
+    index: true
   },
   tokensStats: {
     type: [tokenStatsModel],
@@ -87,6 +88,7 @@ const statsModel = new mongoose.Schema({
     required: true
   }
 });
+
 module.exports.statsModel = mongoose.model('stats', statsModel);
 module.exports.tokenStatsModel = mongoose.model('token_stats', tokenStatsModel);
 module.exports.allTokensStatsModel = mongoose.model('all_token_stats', allTokensStatsModel);
