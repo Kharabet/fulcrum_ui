@@ -1,2 +1,2 @@
 #!/bin/bash
-sudo service bzx-api restart
+sudo systemctl restart bzx-api
