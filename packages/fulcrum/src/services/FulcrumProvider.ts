@@ -152,9 +152,9 @@ export class FulcrumProvider {
     }
   }
 
-  public async setWeb3Provider(providerType: ProviderType) {
+  public async setWeb3Provider(providerType: ProviderType, provider?: any) {
     this.unsupportedNetwork = false;
-    await this.setWeb3ProviderFinalize(providerType, await Web3ConnectionFactory.getWeb3Provider(providerType, this.eventEmitter));
+    await this.setWeb3ProviderFinalize(providerType, await Web3ConnectionFactory.getWeb3Provider(provider, this.eventEmitter));
   }
 
   public async setWeb3ProviderFinalize(providerType: ProviderType, providerData: [Web3Wrapper | null, Web3ProviderEngine | null, boolean, number]) { // : Promise<boolean> {
@@ -177,7 +177,7 @@ export class FulcrumProvider {
 
     if (this.web3Wrapper && canWrite) {
       try {
-        this.accounts = await this.web3Wrapper.getAvailableAddressesAsync() || [];
+        this.accounts = await this.web3Wrapper.getAvailableAddressesAsync();
       } catch (e) {
         // console.log(e);
         this.accounts = [];

@@ -19,22 +19,41 @@ import { LocationListener } from "./LocationListener";
 import { ProgressFragment } from "./ProgressFragment";
 import { ProviderMenu } from "./ProviderMenu";
 import { RiskDisclosure } from "./RiskDisclosure";
-import {errors} from "ethers"
+import { errors } from "ethers"
 import siteConfig from "./../config/SiteConfig.json";
+import { SupportedProvider } from "ethereum-types";
 
+import {
+  Web3ReactProvider,
+  useWeb3React, createWeb3ReactRoot
+} from "@web3-react/core";
+import { MetamaskSubprovider, RPCSubprovider, SignerSubprovider, Web3ProviderEngine } from "@0x/subproviders";
+import { Web3ConnectionFactory } from '../domain/Web3ConnectionFactory';
+import {
+  injected,
+  fortmatic,
+  portis,
+  squarelink,
+} from '../domain/WalletConnectors'
+import { AbstractConnector } from '@web3-react/abstract-connector'
+
+const Web3ReactProviderAlchemy = createWeb3ReactRoot('alchemy')
 const isMainnetProd =
   process.env.NODE_ENV && process.env.NODE_ENV !== "development"
   && process.env.REACT_APP_ETH_NETWORK === "mainnet";
 
 if (isMainnetProd) {
   const tagManagerArgs = {
-       gtmId : configProviders.Google_TrackingID,
-       'dataLayer' : {
-                'name' : "Home",
-                'status' : "Intailized"
-            }
+    gtmId: configProviders.Google_TrackingID,
+    'dataLayer': {
+      'name': "Home",
+      'status': "Intailized"
     }
-    TagManager.initialize(tagManagerArgs)
+  }
+  TagManager.initialize(tagManagerArgs)
+}
+function getKeyByValue(object: { [name: string]: AbstractConnector }, value: AbstractConnector): ProviderType {
+  return Object.keys(object).find(key => object[key] === value) as ProviderType;
 }
 
 interface IAppRouterState {
@@ -42,8 +61,14 @@ interface IAppRouterState {
   isRiskDisclosureModalOpen: boolean;
   selectedProviderType: ProviderType;
   isLoading: boolean;
-  web3: Web3Wrapper| null;
+  web3: Web3Wrapper | null;
   isMobileMedia: boolean;
+}
+const connectorsByName: { [name: string]: AbstractConnector } = {
+  [ProviderType.MetaMask]: injected,
+  [ProviderType.Fortmatic]: fortmatic,
+  [ProviderType.Portis]: portis,
+  [ProviderType.Squarelink]: squarelink,
 }
 
 export class AppRouter extends Component<any, IAppRouterState> {
@@ -73,70 +98,76 @@ export class AppRouter extends Component<any, IAppRouterState> {
     window.removeEventListener("resize", this.didResize.bind(this));
   }
 
+  public getLibrary = async (provider: any, connector: any): Promise<Web3ProviderEngine> => {
+    await this.onProviderTypeSelect(getKeyByValue(connectorsByName, connector), provider)
+    return Web3ConnectionFactory.currentWeb3Engine;
+  }
+
   public render() {
     return (
-      <React.Fragment>
-        { isMainnetProd && !this.state.isMobileMedia ? (
+      <Web3ReactProviderAlchemy getLibrary={this.getLibrary}>
+        <Web3ReactProvider getLibrary={this.getLibrary}>
+          {isMainnetProd && !this.state.isMobileMedia ? (
 
-          <Intercom appID="dfk4n5ut" />
-        ) : null }
+            <Intercom appID="dfk4n5ut" />
+          ) : null}
 
-        <Modal
-          isOpen={this.state.isProviderMenuModalOpen}
-          onRequestClose={this.onRequestClose}
-          className="modal-content-div"
-          overlayClassName="modal-overlay-div"
-        >
-          <ProviderMenu
-            selectedProviderType={this.state.selectedProviderType}
-            providerTypes={[
-              ProviderType.MetaMask,
-              ProviderType.Fortmatic,
-              ProviderType.Portis,
-              ProviderType.Bitski,
-              ProviderType.Squarelink,
-              // ProviderType.WalletConnect,
-              ProviderType.None
-            ]}
-            onSelect={this.onProviderTypeSelect}
-          />
-        </Modal>
-        <Modal
-          isOpen={this.state.isRiskDisclosureModalOpen}
-          onRequestClose={this.onRiskDisclosureRequestClose}
-          className="modal-content-div-top"
-          overlayClassName="modal-overlay-div overflow-auto"
-        >
-          <RiskDisclosure onClose={this.onRiskDisclosureRequestClose} />
-        </Modal>
-        <ProgressFragment />
-        <div className="pages-container">
-          {
-            siteConfig.MaintenanceMode
-              ? <MaintenancePage />
-              :
+          <Modal
+            isOpen={this.state.isProviderMenuModalOpen}
+            onRequestClose={this.onRequestClose}
+            className="modal-content-div"
+            overlayClassName="modal-overlay-div"
+          >
+            <ProviderMenu
+              selectedProviderType={this.state.selectedProviderType}
+              providerTypes={[
+                ProviderType.MetaMask,
+                ProviderType.Fortmatic,
+                ProviderType.Portis,
+                ProviderType.Bitski,
+                ProviderType.Squarelink,
+                // ProviderType.WalletConnect,
+                ProviderType.None
+              ]}
+              onSelect={this.onProviderTypeSelect}
+            />
+          </Modal>
+          <Modal
+            isOpen={this.state.isRiskDisclosureModalOpen}
+            onRequestClose={this.onRiskDisclosureRequestClose}
+            className="modal-content-div-top"
+            overlayClassName="modal-overlay-div overflow-auto"
+          >
+            <RiskDisclosure onClose={this.onRiskDisclosureRequestClose} />
+          </Modal>
+          <ProgressFragment />
+          <div className="pages-container">
+            {
+              siteConfig.MaintenanceMode
+                ? <MaintenancePage />
+                :
                 <HashRouter hashType="slash">
                   <LocationListener doNetworkConnect={this.doNetworkConnect}>
                     <Switch>
                       {!isMainnetProd ? <Route exact={true} path="/" render={() => <LandingPage isMobileMedia={this.state.isMobileMedia} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />} /> : undefined}
                       <Route exact={true} path="/lend" render={() => <LendPage isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />} />
                       {/*{!this.state.isMobileMedia ? (*/}
-                      <Route exact={true} path="/trade" render={() => <TradePage isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen}  />} />
+                      <Route exact={true} path="/trade" render={() => <TradePage isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />} />
                       // ) : ``}
-                      <Route exact={true} path="/stats" render={() => <StatsPage isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen}  />} />
+                      <Route exact={true} path="/stats" render={() => <StatsPage isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />} />
                       {isMainnetProd ? <Route path="*" component={() => {
-                        window.location.href = 'https://fulcrum.trade'; 
+                        window.location.href = 'https://fulcrum.trade';
                         return null;
-                      }}/> : <Route path="*" render={() => <Redirect to="/"/> } /> }
+                      }} /> : <Route path="*" render={() => <Redirect to="/" />} />}
                     </Switch>
                     {isMainnetProd ? (
-                      <Route path="/" render={({location}) => {
+                      <Route path="/" render={({ location }) => {
                         const tagManagerArgs = {
-                            dataLayer: {
-                                // userId: '001',
-                                userProject: 'fulcrum',
-                                page: location.pathname + location.search
-                            }
+                          dataLayer: {
+                            // userId: '001',
+                            userProject: 'fulcrum',
+                            page: location.pathname + location.search
+                          }
                         }
                         // ReactGA.ga('set', 'page', location.pathname + location.search);
                         // ReactGA.ga('send', 'pageview');
@@ -146,12 +177,12 @@ export class AppRouter extends Component<any, IAppRouterState> {
                     ) : ``}
                   </LocationListener>
                 </HashRouter>
-          }
-        </div>
-      </React.Fragment>
+            }
+          </div>
+        </Web3ReactProvider>
+      </Web3ReactProviderAlchemy>
     );
   }
-
   private didResize = () => {
     const isMobileMedia = (window.innerWidth <= 959);
     if (isMobileMedia !== this.state.isMobileMedia) {
@@ -161,15 +192,15 @@ export class AppRouter extends Component<any, IAppRouterState> {
 
   public doNetworkConnect = () => {
     const isMobileMedia = (window.innerWidth <= 959);
-    if(this.state.isMobileMedia){
+    if (this.state.isMobileMedia) {
       this.onProviderTypeSelect(ProviderType.MetaMask)
-    }else{
+    } else {
       this.setState({ ...this.state, isProviderMenuModalOpen: true });
     }
     this.setState({ ...this.state, isProviderMenuModalOpen: true });
   };
 
-  public onProviderTypeSelect = async (providerType: ProviderType) => {
+  public onProviderTypeSelect = async (providerType: ProviderType, provider?: any) => {
 
     if (providerType !== FulcrumProvider.Instance.providerType ||
       providerType !== ProviderType.None && FulcrumProvider.Instance.accounts.length === 0 || !FulcrumProvider.Instance.accounts[0]) {
@@ -182,7 +213,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
         isLoading: true,
         isProviderMenuModalOpen: false
       }, async () => {
-        await FulcrumProvider.Instance.setWeb3Provider(providerType);
+        await FulcrumProvider.Instance.setWeb3Provider(providerType, provider);
 
         FulcrumProvider.Instance.isLoading = false;
 
