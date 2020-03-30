@@ -113,7 +113,7 @@ export class FulcrumProvider {
       });
     } else {
       // setting up readonly provider
-      Web3ConnectionFactory.getWeb3Provider(null, this.eventEmitter).then((providerData) => {
+      Web3ConnectionFactory.getWeb3Provider(ProviderType.None, this.eventEmitter).then((providerData) => {
         // @ts-ignore
         const web3Wrapper = providerData[0];
         FulcrumProvider.getWeb3ProviderSettings(providerData[3]).then((web3ProviderSettings) => {
@@ -154,15 +154,15 @@ export class FulcrumProvider {
 
   public async setWeb3Provider(providerType: ProviderType, provider?: any) {
     this.unsupportedNetwork = false;
-    await this.setWeb3ProviderFinalize(providerType, await Web3ConnectionFactory.getWeb3Provider(provider, this.eventEmitter));
+    await this.setWeb3ProviderFinalize(providerType, await Web3ConnectionFactory.getWeb3Provider(providerType, this.eventEmitter));
   }
 
-  public async setWeb3ProviderFinalize(providerType: ProviderType, providerData: [Web3Wrapper | null, Web3ProviderEngine | null, boolean, number]) { // : Promise<boolean> {
+  public async setWeb3ProviderFinalize(providerType: ProviderType, providerData: [Web3Wrapper | null, Web3ProviderEngine | null, boolean, number, string]) { // : Promise<boolean> {
     this.web3Wrapper = providerData[0];
     this.providerEngine = providerData[1];
     let canWrite = providerData[2];
     let networkId = providerData[3];
-
+    const account = providerData[4];
     this.web3ProviderSettings = await FulcrumProvider.getWeb3ProviderSettings(networkId);
     if (this.web3Wrapper) {
       if (this.web3ProviderSettings.networkName !== process.env.REACT_APP_ETH_NETWORK) {
@@ -175,17 +175,14 @@ export class FulcrumProvider {
       }
     }
 
-    if (this.web3Wrapper && canWrite) {
+    if (this.web3Wrapper && canWrite && account) {
       try {
-        this.accounts = await this.web3Wrapper.getAvailableAddressesAsync();
+        this.accounts = [account];
       } catch (e) {
-        // console.log(e);
-        this.accounts = [];
-      }
-      if (this.accounts.length === 0) {
-        canWrite = false; // revert back to read-only
+        console.log(e);
       }
     } else {
+      canWrite = false;
       // this.accounts = [];
       if (providerType === ProviderType.Bitski && networkId !== 1) {
         this.unsupportedNetwork = true;
@@ -1771,13 +1768,13 @@ if (err || 'error' in added) {
 console.log(err, added);
 }
 }*//*);
-  }
-}
-}
-} catch(e) {
-// console.log(e);
-}
-}*/
+      }
+    }
+    }
+    } catch(e) {
+    // console.log(e);
+    }
+    }*/
   }
 
   private processLendRequestTask = async (task: RequestTask, skipGas: boolean) => {

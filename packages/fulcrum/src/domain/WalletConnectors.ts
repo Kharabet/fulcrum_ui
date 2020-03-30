@@ -8,7 +8,8 @@ import { InjectedConnector } from '@web3-react/injected-connector'
 // import { AuthereumConnector } from '@web3-react/authereum-connector'
 import { FortmaticConnector } from '@web3-react/fortmatic-connector'
 import { PortisConnector } from '@web3-react/portis-connector'
-import { SquarelinkConnector } from '@web3-react/squarelink-connector'
+// import { SquarelinkConnector } from '@web3-react/squarelink-connector'
+import { SquarelinkConnector } from './SquarelinkCustomConnector'
 // import { TorusConnector } from '@web3-react/torus-connector'
 
 
@@ -81,7 +82,7 @@ export const portis = new PortisConnector({
 
 export const squarelink = new SquarelinkConnector({
   clientId: configProviders.Squarelink_ClientId as string,
-  networks: [1, 100]
+  networks: [networkId]
 })
 
 // export const torus = new TorusConnector({ chainId: 1 })

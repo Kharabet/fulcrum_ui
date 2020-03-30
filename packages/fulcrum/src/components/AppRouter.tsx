@@ -37,7 +37,6 @@ import {
 } from '../domain/WalletConnectors'
 import { AbstractConnector } from '@web3-react/abstract-connector'
 
-const Web3ReactProviderAlchemy = createWeb3ReactRoot('alchemy')
 const isMainnetProd =
   process.env.NODE_ENV && process.env.NODE_ENV !== "development"
   && process.env.REACT_APP_ETH_NETWORK === "mainnet";
@@ -102,19 +101,19 @@ export class AppRouter extends Component<any, IAppRouterState> {
     window.removeEventListener("resize", this.didResize.bind(this));
   }
 
-  public componentWillMount(): void {
-    const { connector, library, chainId, account, activate, deactivate, active, error } = this.context;
-    this.onProviderTypeSelect(getKeyByValue(connectorsByName, connector))
-  }
+  // public componentWillMount(): void {
+  //   const { connector, library, chainId, account, activate, deactivate, active, error } = this.context;
+  //   this.onProviderTypeSelect(getKeyByValue(connectorsByName, connector))
+  // }
 
   public getLibrary = async (provider: any, connector: any): Promise<Web3ProviderEngine> => {
+    console.log(provider);
     await this.onProviderTypeSelect(getKeyByValue(connectorsByName, connector), provider)
     return Web3ConnectionFactory.currentWeb3Engine;
   }
 
   public render() {
     return (
-      <Web3ReactProviderAlchemy getLibrary={this.getLibrary}>
         <Web3ReactProvider getLibrary={this.getLibrary}>
           {isMainnetProd && !this.state.isMobileMedia ? (
 
@@ -189,7 +188,6 @@ export class AppRouter extends Component<any, IAppRouterState> {
             }
           </div>
         </Web3ReactProvider>
-      </Web3ReactProviderAlchemy>
     );
   }
   private didResize = () => {

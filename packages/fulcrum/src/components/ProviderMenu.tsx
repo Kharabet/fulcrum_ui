@@ -64,7 +64,7 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
           }
           //@ts-ignore
           setActivatingConnector(currentConnector)
-          activate(connectorsByName[e])
+          activate(connectorsByName[e], (err) => console.log(err))
         }}
       />
     });

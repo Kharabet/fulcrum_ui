@@ -22,9 +22,24 @@ import { MetamaskSubprovider, RPCSubprovider, SignerSubprovider, Web3ProviderEng
 import { AlchemySubprovider } from "@alch/alchemy-web3";
 
 import configProviders from "../config/providers.json";
-
+import {
+  injected,
+  fortmatic,
+  portis,
+  squarelink,
+} from '../domain/WalletConnectors'
+import { AbstractConnector } from '@web3-react/abstract-connector'
 
 const ethNetwork = process.env.REACT_APP_ETH_NETWORK;
+
+const connectorsByName: { [name: string]: AbstractConnector | null } = {
+  [ProviderType.MetaMask]: injected,
+  [ProviderType.Fortmatic]: fortmatic,
+  [ProviderType.Portis]: portis,
+  [ProviderType.Squarelink]: squarelink,
+  [ProviderType.None]: null 
+}
+
 
 export class Web3ConnectionFactory {
   public static metamaskProvider: any | null;
@@ -36,15 +51,9 @@ export class Web3ConnectionFactory {
   public static userAccount: any | null;
   public static currentWeb3Engine: Web3ProviderEngine;
   public static currentWeb3Wrapper: Web3Wrapper;
-  public static async getWeb3Provider(provider: any, eventEmitter: EventEmitter): Promise<[Web3Wrapper | null, Web3ProviderEngine | null, boolean, number]> {
+  public static async getWeb3Provider(providerType: ProviderType, eventEmitter: EventEmitter): Promise<[Web3Wrapper | null, Web3ProviderEngine | null, boolean, number, string]> {
     let canWrite = false;
-    let subProvider: any | null = null;
-
-
-    if (!subProvider) {
-      subProvider = null;
-    }
-
+    const connector = connectorsByName[providerType];
     /*
       TODO:
       Set pollingInterval to 8000. Use https://github.com/MetaMask/eth-block-tracker with Web3ProviderEngine
@@ -70,20 +79,17 @@ export class Web3ConnectionFactory {
       Web3ConnectionFactory.alchemyProvider = new AlchemySubprovider(`https://eth-${ethNetwork}.alchemyapi.io/jsonrpc/${configProviders.Alchemy_ApiKey}`, { writeProvider: null });
     }
     providerEngine.addProvider(Web3ConnectionFactory.alchemyProvider);
-    if (provider) {
-      try {
-        providerEngine.addProvider(new SignerSubprovider(provider));  
-          // test for non-error
-        await providerEngine.start();
-        web3Wrapper = new Web3Wrapper(providerEngine);
-        await web3Wrapper.getAvailableAddressesAsync();
-        // console.log(accounts);
 
+    const provider = connector ? await connector.getProvider() : null;
+    if (provider && connector) {
+      try {
+        providerEngine.addProvider(new SignerSubprovider(provider));
         canWrite = true;
+        const account = await connector.getAccount();
+        Web3ConnectionFactory.userAccount = account;
       } catch (e) {
         // console.log(e);
 
-        provider = null;
         await providerEngine.stop();
 
         // rebuild providerEngine
@@ -95,10 +101,12 @@ export class Web3ConnectionFactory {
       }
 
     }
+    // @ts-ignore
+    if (typeof web3Wrapper === "undefined") {
+      await providerEngine.start();
+      web3Wrapper = new Web3Wrapper(providerEngine);
+    }
 
-
-    await providerEngine.start();
-    web3Wrapper = new Web3Wrapper(providerEngine);
 
 
     Web3ConnectionFactory.networkId = await web3Wrapper.getNetworkIdAsync();
@@ -106,7 +114,7 @@ export class Web3ConnectionFactory {
     Web3ConnectionFactory.currentWeb3Wrapper = web3Wrapper;
 
 
-    return [web3Wrapper, providerEngine, canWrite, Web3ConnectionFactory.networkId];
+    return [web3Wrapper, providerEngine, canWrite, Web3ConnectionFactory.networkId, Web3ConnectionFactory.userAccount];
   }
 
 
