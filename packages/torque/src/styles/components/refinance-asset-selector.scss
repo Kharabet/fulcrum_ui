@@ -3,7 +3,7 @@
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: center;
-  margin-bottom: 30px;
+  margin-top: 45px;
   .mb-20 {
     margin-bottom: 20px;
   }
@@ -117,10 +117,6 @@
     }
     &:active {
       background-color: #effcff;
-    }
-    &:nth-child(2) {
-      margin-left: 0;
-      margin-top: 2.5rem;
     }
 
     //&:first-child {
