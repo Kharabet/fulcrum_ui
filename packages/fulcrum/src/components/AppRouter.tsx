@@ -1,5 +1,5 @@
 import { Web3Wrapper } from '@0x/web3-wrapper';
-import React, { Component } from "react";
+import React, { Component, Context } from "react";
 
 import TagManager from 'react-gtm-module';
 import Intercom from "react-intercom";
@@ -25,7 +25,7 @@ import { SupportedProvider } from "ethereum-types";
 
 import {
   Web3ReactProvider,
-  useWeb3React, createWeb3ReactRoot
+  useWeb3React, createWeb3ReactRoot, getWeb3ReactContext
 } from "@web3-react/core";
 import { MetamaskSubprovider, RPCSubprovider, SignerSubprovider, Web3ProviderEngine } from "@0x/subproviders";
 import { Web3ConnectionFactory } from '../domain/Web3ConnectionFactory';
@@ -71,7 +71,11 @@ const connectorsByName: { [name: string]: AbstractConnector } = {
   [ProviderType.Squarelink]: squarelink,
 }
 
+
+const Web3ReactContext = getWeb3ReactContext()
+
 export class AppRouter extends Component<any, IAppRouterState> {
+  static contextType = Web3ReactContext;
   constructor(props: any) {
     super(props);
 
@@ -96,6 +100,11 @@ export class AppRouter extends Component<any, IAppRouterState> {
   public componentWillUnmount(): void {
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
     window.removeEventListener("resize", this.didResize.bind(this));
+  }
+
+  public componentWillMount(): void {
+    const { connector, library, chainId, account, activate, deactivate, active, error } = this.context;
+    this.onProviderTypeSelect(getKeyByValue(connectorsByName, connector))
   }
 
   public getLibrary = async (provider: any, connector: any): Promise<Web3ProviderEngine> => {
