@@ -130,7 +130,7 @@ layout: home
                             </div>
                             {% include svg/arrow-in-circle.svg %}
                         </a>
-                        <span class="info-after-button">Manage your loan: add or remove collateral <br /> or repay any time</span>
+                        <span class="info-after-button">Manage your loan: add or remove collateral <br /> and repay any time</span>
                     </div>
                 </div>
             </div>
@@ -154,7 +154,7 @@ layout: home
                             {% include svg/icon-safe-1.svg %}
                         </div>
                         <div class="content-reason">
-                            <h3 class="mb-10">Fixed APR </h3>
+                            <h3 class="mb-10">Fixed APR</h3>
                             <p>Enjoy zero fees on tokenized margin loans and margin positions with Fulcrum.</p>
                         </div>
                     </div>
@@ -172,7 +172,7 @@ layout: home
                             {% include svg/icon-safe-1.svg %}
                         </div>
                         <div class="content-reason">
-                            <h3 class="mb-10">Three clicks. <br /> No Accounts. No fees</h3>
+                            <h3 class="mb-10">Three clicks. <br /> No credit checks.</h3>
                             <p>Enjoy zero fees on tokenized margin loans and margin positions with Fulcrum.</p>
                         </div>
                     </div>
@@ -314,7 +314,7 @@ layout: home
                         </div>
                         {% include svg/arrow-in-circle.svg %}
                     </a>
-                    <span class="info-after-button">Up to 5x Leverage, zero platform fees, <br /> and perfect liquidity</span>
+                    <span class="info-after-button">Refinance your loan with fixed interest rate</span>
                 </div>
             </div>
         </div>
@@ -367,7 +367,7 @@ layout: home
         <div class="row mt-60">
             <div class="col col-12 jc-c">
                 <a href="https://help.bzx.network/en/" class="button button-sm button-white mx-auto">
-                    Help center
+                    Help Center
                     <div class="icon-arrow">
                         {% include svg/arrow.svg %}
                     </div>
