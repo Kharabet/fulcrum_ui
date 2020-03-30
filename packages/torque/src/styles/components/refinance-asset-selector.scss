@@ -289,6 +289,10 @@
       }
       .refinance-asset-selector__torque {
         display: flex;
+        svg{
+          width: 130px;
+          height: auto;
+        }
       }
       /*.refinance-asset-selector__type{
           font-size: 1rem;

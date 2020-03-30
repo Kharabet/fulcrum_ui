@@ -1,21 +1,16 @@
 .header-logo {
-  display: inline-block;
-  height: 100%;
-
   a {
-    display: block;
-    height: 100%;
+    display: flex;
+    &:hover{
+      cursor: pointer;
+    }
   }
 }
-
-.header-logo__image {
-  height: 3rem;
-  margin: .5rem 0;
-  vertical-align: middle;
-}
-
-@media screen and (max-width: $mobile-version-max-width) {
-  .header-logo__image {
-    height: 2.2rem;
+@media screen and (max-width: $mobile-version-max-mobile) {
+  .header-logo {
+    svg{
+      width: 140px;
+      height: auto;
+    }
   }
 }

@@ -1,6 +1,6 @@
 import React, { Component } from "react";
-import ic_close from "../assets/images/close.svg";
-import menu_icon from "../assets/images/menu-icon.svg";
+import { ReactComponent as CloseMenu } from "../assets/images/close.svg";
+import { ReactComponent as OpenMenu } from "../assets/images/menu-icon.svg";
 import { OnChainIndicator } from "../components/OnChainIndicator";
 import { ProviderType } from "../domain/ProviderType";
 import { TorqueProvider } from "../services/TorqueProvider";
@@ -8,6 +8,8 @@ import { HeaderLogo } from "./HeaderLogo";
 import { HeaderMenu, IHeaderMenuProps } from "./HeaderMenu";
 import { HeaderMenuToggle } from "./HeaderMenuToggle";
 import { InfoBlock } from "../components/InfoBlock";
+import { FooterMenu } from "./FooterMenu";
+import { FooterVersion } from "./FooterVersion"
 export interface IHeaderOpsProps {
   doNetworkConnect: () => void;
   isRiskDisclosureModalOpen: () => void;
@@ -64,7 +66,7 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
       };
     }
 
-    const toggleImg = !this.state.isMenuOpen ? menu_icon : ic_close;
+    const toggleMenuIcon = !this.state.isMenuOpen ? <OpenMenu /> : <CloseMenu />;
     const sidebarClass = !this.state.isMenuOpen ? 'sidebar_h' : 'sidebar_v'
     return (
       <header className="header">
@@ -76,30 +78,48 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
             <HeaderMenu items={menu.items} />
           </div>
           <div className="header__right">
+            <a className="help__item" href="https://help.bzx.network/en/collections/2008807-torque">Help Center</a>
             <div className="header__provider">
               {TorqueProvider.Instance.providerType !== ProviderType.None ? (
                 <OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />
               ) : ``}
             </div>
             <div className="header_icon" onClick={this.onMenuToggle}>
-              <img className="header__menu" src={toggleImg} />
+              <div className="toggle_icon">
+                {toggleMenuIcon}
+              </div>
             </div>
           </div>
 
         </div>
 
         <div className={sidebarClass}>
-          <div className="header_btn">
-            {TorqueProvider.Instance.providerType !== ProviderType.None ? (
-              <OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />
-            ) : ``}
+          <div className="sidebar_header">
+            <HeaderLogo />
+            <div className="header_icon" onClick={this.onMenuToggle}>
+              <div className="toggle_icon">
+                {toggleMenuIcon}
+              </div>
+            </div>
           </div>
-          <div className="heade_nav_menu">
-            <HeaderMenu items={menu.items} />
+          <div className="sidebar_content">
+            <div className="header_btn">
+              {TorqueProvider.Instance.providerType !== ProviderType.None ? (
+                <OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />
+              ) : ``}
+            </div>
+            <div className="heade_nav_menu">
+              <HeaderMenu items={menu.items} />
+              <a className="help__item" href="https://help.bzx.network/en/collections/2008807-torque">Help Center</a>
+            </div>
+          </div>
+          <div className="sidebar_footer">
+            <FooterVersion />
+            <FooterMenu {...this.props}/>
           </div>
         </div>
-        <InfoBlock localstorageItemProp="torque-risk-notice"  onAccept={() => {this.forceUpdate()}}>
-        For your safety, please ensure the URL in your browser starts with: https://torque.loans/. <br />
+        <InfoBlock localstorageItemProp="torque-risk-notice" onAccept={() => { this.forceUpdate() }}>
+          For your safety, please ensure the URL in your browser starts with: https://torque.loans/. <br />
         Torque is a non-custodial platform for borrowing digital assets. <br />
         "Non-custodial" means YOU are responsible for the security of your digital assets. <br />
         To learn more about how to stay safe when using Torque and other bZx products, please read our <button className="disclosure-link" onClick={this.props.isRiskDisclosureModalOpen}>DeFi Risk Disclosure</button>.
