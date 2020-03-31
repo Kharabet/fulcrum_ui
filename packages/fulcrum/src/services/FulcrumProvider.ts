@@ -103,15 +103,15 @@ export class FulcrumProvider {
       FulcrumProvider.Instance = this;
     }
 
-    if (providerType) {
-      FulcrumProvider.Instance.setWeb3Provider(providerType).then(() => {
-        this.eventEmitter.emit(FulcrumProviderEvents.ProviderAvailable);
-        FulcrumProvider.Instance.eventEmitter.emit(
-          FulcrumProviderEvents.ProviderChanged,
-          new ProviderChangedEvent(FulcrumProvider.Instance.providerType, FulcrumProvider.Instance.web3Wrapper)
-        );
-      });
-    } else {
+    // if (providerType) {
+    //   FulcrumProvider.Instance.setWeb3Provider(providerType).then(() => {
+    //     this.eventEmitter.emit(FulcrumProviderEvents.ProviderAvailable);
+    //     FulcrumProvider.Instance.eventEmitter.emit(
+    //       FulcrumProviderEvents.ProviderChanged,
+    //       new ProviderChangedEvent(FulcrumProvider.Instance.providerType, FulcrumProvider.Instance.web3Wrapper)
+    //     );
+    //   });
+    // } else {
       // setting up readonly provider
       Web3ConnectionFactory.getWeb3Provider(ProviderType.None, this.eventEmitter).then((providerData) => {
         // @ts-ignore
@@ -129,7 +129,7 @@ export class FulcrumProvider {
           }
         });
       });
-    }
+    // }
 
     return FulcrumProvider.Instance;
   }

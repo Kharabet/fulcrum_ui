@@ -4,6 +4,7 @@ import { ProviderMenuListItem } from "./ProviderMenuListItem";
 import { useWeb3React } from '@web3-react/core'
 import { useEagerConnect, useInactiveListener } from '../domain/WalletHooks'
 import { ProviderTypeDictionary } from "../domain/ProviderTypeDictionary";
+import { FulcrumProvider } from "../services/FulcrumProvider";
 
 export interface IProviderMenuProps {
   providerTypes: ProviderType[];
@@ -17,9 +18,17 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
   const { connector, library, chainId, account, activate, deactivate, active, error } = context
   if (props.isMobileMedia && activate) {
     activate(ProviderTypeDictionary.getConnectorByProviderType(ProviderType.MetaMask)!);
-
     return null;
   }
+
+  const storedProvider: any = FulcrumProvider.getLocalstorageItem('providerType');
+  // const providerType: ProviderType | null = ProviderType[storedProvider] as ProviderType || null;
+  const providerType: ProviderType | null = storedProvider as ProviderType || null;
+  if (providerType && providerType!== FulcrumProvider.Instance.providerType && activate) {
+    activate(ProviderTypeDictionary.getConnectorByProviderType(providerType)!);
+    return null;
+  }
+
   // handle logic to recognize the connector currently being activated
   //@ts-ignore
   const [activatingConnector, setActivatingConnector] = React.useState()

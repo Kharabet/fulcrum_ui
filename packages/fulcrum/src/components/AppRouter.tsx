@@ -59,7 +59,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
     super(props);
 
     this.state = {
-      isProviderMenuModalOpen: false,
+      isProviderMenuModalOpen: true,
       isRiskDisclosureModalOpen: false,
       isLoading: false,
       selectedProviderType: FulcrumProvider.Instance.providerType,
@@ -74,10 +74,6 @@ export class AppRouter extends Component<any, IAppRouterState> {
     window.addEventListener("resize", this.didResize.bind(this));
     this.didResize();
     errors.setLogLevel("error");
-    const { connector, library, chainId, account, activate, deactivate, active, error } = this.context;
-    if (this.state.isMobileMedia) {
-      activate(ProviderTypeDictionary.getConnectorByProviderType(ProviderType.MetaMask));
-    }
   }
 
   public componentWillUnmount(): void {
@@ -93,64 +89,64 @@ export class AppRouter extends Component<any, IAppRouterState> {
 
   public render() {
     return (
-        <Web3ReactProvider getLibrary={this.getLibrary}>
-          {isMainnetProd && !this.state.isMobileMedia ? (
+      <Web3ReactProvider getLibrary={this.getLibrary}>
+               {isMainnetProd && !this.state.isMobileMedia ? (
 
-            <Intercom appID="dfk4n5ut" />
-          ) : null}
+          <Intercom appID="dfk4n5ut" />
+        ) : null}
 
-          <Modal
-            isOpen={this.state.isProviderMenuModalOpen}
-            onRequestClose={this.onRequestClose}
-            className="modal-content-div"
-            overlayClassName="modal-overlay-div"
-          >
-            <ProviderMenu
-              selectedProviderType={this.state.selectedProviderType}
-              providerTypes={[
-                ProviderType.MetaMask,
-                ProviderType.Fortmatic,
-                ProviderType.Portis,
-                ProviderType.Bitski,
-                ProviderType.Squarelink,
-                ProviderType.Ledger,
-                // ProviderType.WalletConnect,
-                ProviderType.None
-              ]}
-              isMobileMedia={this.state.isMobileMedia}
-              onSelect={this.onProviderTypeSelect}
-            />
-          </Modal>
-          <Modal
-            isOpen={this.state.isRiskDisclosureModalOpen}
-            onRequestClose={this.onRiskDisclosureRequestClose}
-            className="modal-content-div-top"
-            overlayClassName="modal-overlay-div overflow-auto"
-          >
-            <RiskDisclosure onClose={this.onRiskDisclosureRequestClose} />
-          </Modal>
-          <ProgressFragment />
-          <div className="pages-container">
-            {
-              siteConfig.MaintenanceMode
-                ? <MaintenancePage />
-                :
-                <HashRouter hashType="slash">
-                  <LocationListener doNetworkConnect={this.doNetworkConnect}>
-                    <Switch>
-                      {!isMainnetProd ? <Route exact={true} path="/" render={() => <LandingPage isMobileMedia={this.state.isMobileMedia} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />} /> : undefined}
-                      <Route exact={true} path="/lend" render={() => <LendPage isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />} />
-                      {/*{!this.state.isMobileMedia ? (*/}
-                      <Route exact={true} path="/trade" render={() => <TradePage isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />} />
-                      // ) : ``}
-                      <Route exact={true} path="/stats" render={() => <StatsPage isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />} />
-                      {isMainnetProd ? <Route path="*" component={() => {
-                        window.location.href = 'https://fulcrum.trade';
-                        return null;
-                      }} /> : <Route path="*" render={() => <Redirect to="/" />} />}
-                    </Switch>
-                    {isMainnetProd ? (
-                      <Route path="/" render={({ location }) => {
+        <Modal
+          isOpen={this.state.isProviderMenuModalOpen}
+          onRequestClose={this.onRequestClose}
+          className="modal-content-div"
+          overlayClassName="modal-overlay-div"
+        >
+          <ProviderMenu
+            selectedProviderType={this.state.selectedProviderType}
+            providerTypes={[
+              ProviderType.MetaMask,
+              ProviderType.Fortmatic,
+              ProviderType.Portis,
+              ProviderType.Bitski,
+              ProviderType.Squarelink,
+              ProviderType.Ledger,
+              // ProviderType.WalletConnect,
+              ProviderType.None
+            ]}
+            isMobileMedia={this.state.isMobileMedia}
+            onSelect={this.onProviderTypeSelect}
+          />
+        </Modal>
+        <Modal
+          isOpen={this.state.isRiskDisclosureModalOpen}
+          onRequestClose={this.onRiskDisclosureRequestClose}
+          className="modal-content-div-top"
+          overlayClassName="modal-overlay-div overflow-auto"
+        >
+          <RiskDisclosure onClose={this.onRiskDisclosureRequestClose} />
+        </Modal>
+        <ProgressFragment />
+        <div className="pages-container">
+          {
+            siteConfig.MaintenanceMode
+              ? <MaintenancePage />
+              :
+              <HashRouter hashType="slash">
+                <LocationListener doNetworkConnect={this.doNetworkConnect}>
+                  <Switch>
+                    {!isMainnetProd ? <Route exact={true} path="/" render={() => <LandingPage isMobileMedia={this.state.isMobileMedia} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />} /> : undefined}
+                    <Route exact={true} path="/lend" render={() => <LendPage isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />} />
+                    {/*{!this.state.isMobileMedia ? (*/}
+                    <Route exact={true} path="/trade" render={() => <TradePage isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />} />
+                    // ) : ``}
+                    <Route exact={true} path="/stats" render={() => <StatsPage isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />} />
+                    {isMainnetProd ? <Route path="*" component={() => {
+                      window.location.href = 'https://fulcrum.trade';
+                      return null;
+                    }} /> : <Route path="*" render={() => <Redirect to="/" />} />}
+                  </Switch>
+                  {isMainnetProd ? (
+                    <Route path="/" render={({ location }) => {
                       const tagManagerArgs = {
                         dataLayer: {
                           // userId: '001',
