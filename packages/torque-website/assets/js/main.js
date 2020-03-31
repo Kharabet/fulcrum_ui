@@ -1,6 +1,12 @@
 const apiUrl = "https://api.bzx.network/v1";
 
+const loader = document.querySelector('.loader');
+
+loader.classList.add('visible');
 (getTorqueBorrowApr)();
+setTimeout(function () {
+    loader.classList.remove('visible')
+}, 500);
 
 window.addEventListener('load', function () {
     //switch theme
@@ -31,7 +37,8 @@ window.addEventListener('load', function () {
 
 
     const formLoan = document.querySelector('.form-loan');
-    formLoan.addEventListener("input", onLoanInputChange, false);
+    if (formLoan)
+        formLoan.addEventListener("input", onLoanInputChange, false);
 
 
     const itemForm = document.querySelectorAll('.item-form');
@@ -99,9 +106,13 @@ async function updateCollateralInput() {
     const inputCollateral = form.querySelector('.input-collateral');
     const loanAsset = form.querySelector(".item-form.loan .select-styled").dataset.asset;
     const collateralAsset = form.querySelector(".item-form.collateral .select-styled").dataset.asset;
+
     const inputLoanValue = parseInt(inputLoan.value);
-    (inputLoanValue === 0 || inputLoan.value.length === 0)
-    inputCollateral.value = 0;
+    if (inputLoanValue === 0 || inputLoan.value.length === 0) {
+        if (inputCollateral.classList.contains('error'))
+            inputCollateral.classList.remove('error')
+        inputCollateral.value = 0;
+    }
     if (inputLoanValue > 0) {
         const collateralEstimateValue = await collateralEstimate(loanAsset, collateralAsset, inputLoanValue);
         isNaN(collateralEstimateValue)
@@ -204,8 +215,12 @@ async function onItemFormLiClick(event) {
         const form = li.closest('form.form-loan');
         const aprComponent = form.querySelector(".apr-component");
         aprComponent.dataset.asset = asset;
+        loader.classList.add('visible');
         if (window.borrowAPR && window.borrowAPR[asset])
             aprComponent.querySelector(".apr-value").textContent = parseFloat(window.borrowAPR[asset]).toFixed(2);
+        setTimeout(function () {
+            loader.classList.remove('visible')
+        }, 500);
     }
     updateCollateralInput();
     document.body.classList.remove('open-modal');
@@ -218,5 +233,5 @@ async function getTorqueBorrowApr() {
     (!responseJson.success)
         ? console.error(responseJson.message)
         : renderBorrowApr(responseJson.data);
-    window.borrowAPR = responseJson;
+    window.borrowAPR = responseJson.data;
 }

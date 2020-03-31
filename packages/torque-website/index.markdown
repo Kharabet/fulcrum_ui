@@ -61,7 +61,15 @@ layout: home
                     </div>
                     <div class="item-result apr-component"  data-asset="dai">
                         <span>APR <span class="c-gradient fw-900">FIXED</span></span>
-                        <div><span class="value-result apr-value">2.54</span>%</div>
+                        <div class="wrap-loader">
+                            <div class="loader">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </div>
+                            <span class="value-result apr-value">2.54</span>%
+                        </div>
                     </div>
                     <span class="cube">{% include svg/big-cube.svg %}</span>
                 </form>
@@ -111,8 +119,7 @@ layout: home
                     </div>
                 </div>
                 <div class="col fg-1 fg-lg-initial jc-sb jc-lg-fs fd-md-c">
-
-                    <div class="flex fd-c mx-md-a mb-md-15">
+                    <div class="flex fd-c  mr-lg-30 mx-md-a mb-md-15">
                         <a href="#" class="button button-purple button-md">
                             <div class="flex fd-c">
                                 <span>Already have a loan?</span>
@@ -122,7 +129,7 @@ layout: home
                         </a>
                         <span class="info-after-button">See if you can save when you refinance your loan<br />with fixed rates</span>
                     </div>
-                    <div class="flex fd-c mb-md-15 mx-md-a mr-lg-30">
+                    <div class="flex fd-c mb-md-15 mx-md-a">
                         <a href="#" class="button button-green button-md">
                             <div class="flex fd-c">
                                 <span>Existing user?</span>

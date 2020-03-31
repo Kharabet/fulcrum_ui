@@ -19,7 +19,11 @@
 @import "components/_backgrounds";
 @import "components/_visibility";
 @import "components/_modal";
+@import "components/_loader";
 
 @import "layouts/_header";
 @import "layouts/_footer";
 @import "layouts/_sections";
+
+@import "pages/_404";
+@import "pages/_additional";

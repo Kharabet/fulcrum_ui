@@ -49,3 +49,55 @@
     }
   }
 }
+.bg-additional-image {  
+  background-repeat: no-repeat;
+  background-size: auto;
+  [data-theme="light"] & {
+    background-position: 0 0, 100% 0, 0 101%;
+    @media screen and (max-width: 1799px) {
+      background-size: 50% auto, 50% auto, 100% auto;
+      background-position: 0 0, 100% 0, 0 101%;;
+    }
+    @media screen and (max-width: $breakpoint-lg-down) {
+      background-size: 75% auto, 75% auto, 100% auto;
+      background-position: 0% 0, 200% 50px, 0 101%;
+    }
+    @media screen and (max-width: $breakpoint-md-down) {
+      background-position: 0% 0, 250% 50px, 0 101%;
+    }
+    @media screen and (max-width: $breakpoint-sm-down) {
+      background-size: auto;
+      background-position: 0 0, 100% 0, 0 101%;
+    }
+    @media screen and (min-width: $breakpoint-sm-up) {
+      background-image: url(/images/bg-add-light-left.svg), url(/images/bg-add-light-right.svg), url(/images/bg-add-light-bottom.svg);
+    }
+    @media screen and (max-width: $breakpoint-sm-down) {
+      background-image: url(/images/bg-light-left-mobile.svg), url(/images/bg-light-right-mobile.svg);
+    }
+  }
+  [data-theme="dark"] & {
+    background-position: 0 0, 100% 0;
+    @media screen and (max-width: 1799px) {
+      background-size: 50% auto, 50% auto;
+      background-position: 0 0, 100% 0;
+    }
+    @media screen and (max-width: $breakpoint-lg-down) {
+      background-size: 75% auto, 75% auto;
+      background-position: 0% 0, 200% 50px;
+    }
+    @media screen and (max-width: $breakpoint-md-down) {
+      background-position: 0% 0, 250% 50px;
+    }
+    @media screen and (max-width: $breakpoint-sm-down) {
+      background-size: auto;
+      background-position: 0 0, 100% 0;
+    }
+    @media screen and (min-width: $breakpoint-sm-up) {
+      background-image: url(/images/bg-add-dark-left.svg), url(/images/bg-add-dark-right.svg);
+    }
+    @media screen and (max-width: $breakpoint-sm-down) {
+      background-image: url(/images/bg-dark-left-mobile.svg), url(/images/bg-dark-right-mobile.svg);
+    }
+  }
+}

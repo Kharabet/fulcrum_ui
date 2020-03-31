@@ -225,8 +225,12 @@
       }
     }
     .stats-svg{
+      display: flex;
+      justify-self: flex-end;
+      justify-content: flex-end;
+      justify-items: flex-end;
       position: absolute;
-      right: 0;      
+      right: 0;   
               
       @media screen and (min-width: $breakpoint-md-up){
         top: 0;
