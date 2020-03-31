@@ -79,7 +79,7 @@
     "start": "react-scripts start",
     "start-mainnet": "cross-env-shell REACT_APP_ETH_NETWORK=mainnet \"react-scripts start\"",
     "start-ropsten": "cross-env-shell REACT_APP_ETH_NETWORK=ropsten \"react-scripts start\"",
-    "start-kovan": "cross-env-shell REACT_APP_ETH_NETWORK=kovan \"react-scripts start\"",
+    "start-kovan": "cross-env-shell REACT_APP_ETH_NETWORK=kovan HTTPS=true \"react-scripts start\"",
     "start-rinkeby": "cross-env-shell REACT_APP_ETH_NETWORK=rinkeby \"react-scripts start\"",
     "lint": "tslint 'src/**/*.{ts,tsx}'",
     "lint:fix": "tslint 'src/**/*.{ts,tsx}' --fix",

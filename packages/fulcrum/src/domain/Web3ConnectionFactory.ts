@@ -70,12 +70,22 @@ export class Web3ConnectionFactory {
     const provider = connector ? await connector.getProvider() : null;
     if (provider && connector) {
       try {
-        providerEngine.addProvider(new SignerSubprovider(provider));
+        if (providerType === ProviderType.Ledger) {
+          provider.addProvider(Web3ConnectionFactory.alchemyProvider);
+          await provider.start();
+          web3Wrapper = new Web3Wrapper(provider);
+        }
+        else {
+          providerEngine.addProvider(new SignerSubprovider(provider));
+          await providerEngine.start();
+          web3Wrapper = new Web3Wrapper(providerEngine);
+        }
         canWrite = true;
         const account = await connector.getAccount();
         const chainId = (await connector.getChainId()).toString();
         networkId = chainId.includes("0x") ? parseInt(chainId, 16) : parseInt(chainId, 10);
         Web3ConnectionFactory.userAccount = account;
+
       } catch (e) {
         console.log(e);
 
@@ -89,11 +99,9 @@ export class Web3ConnectionFactory {
         web3Wrapper = undefined;
       }
 
-    }
-    // @ts-ignore
-    if (typeof web3Wrapper === "undefined") {
-      await providerEngine.start();
-      web3Wrapper = new Web3Wrapper(providerEngine);
+    } else {
+      // @ts-ignore
+      web3Wrapper = undefined;
     }
 
 
