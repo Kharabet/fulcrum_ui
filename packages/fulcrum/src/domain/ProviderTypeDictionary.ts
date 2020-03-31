@@ -7,12 +7,14 @@ import metamask_logo, { ReactComponent as MetamaskLogo } from '../assets/images/
 import portis_logo, { ReactComponent as PortisLogo } from '../assets/images/logo_big___portis.svg';
 import squarelink_logo, { ReactComponent as SquarelinkLogo } from '../assets/images/logo_big___squarelink.svg';
 import walletconnect_logo, { ReactComponent as WalletconnectLogo } from '../assets/images/logo_big___wallectconnect.svg';
+import ledger_logo, { ReactComponent as LedgerLogo } from '../assets/images/logo_short___ledger.svg';
 
 import { ReactComponent as BitskiLogoShort } from '../assets/images/logo_short___bitski.svg';
 import { ReactComponent as FortmaticLogoShort } from '../assets/images/logo_short___fortmatic.svg';
 import { ReactComponent as MetamaskLogoShort } from '../assets/images/logo_short___metamask.svg';
 import { ReactComponent as PortisLogoShort } from '../assets/images/logo_short___portis.svg';
 import { ReactComponent as SquarelinkLogoShort } from '../assets/images/logo_short___squarelink.svg';
+import { ReactComponent as LedgerLogoShort } from '../assets/images/logo_short___ledger.svg';
 
 import {
   injected,
@@ -43,7 +45,7 @@ export class ProviderTypeDictionary {
     [ProviderType.WalletConnect, new ProviderTypeDetails("WalletConnect", walletconnect_logo, WalletconnectLogo, null, null)],
     [ProviderType.Portis, new ProviderTypeDetails("Portis", portis_logo, PortisLogo, PortisLogoShort, portis)],
     [ProviderType.Squarelink, new ProviderTypeDetails("Squarelink", squarelink_logo, SquarelinkLogo, SquarelinkLogoShort, squarelink)],
-    [ProviderType.Ledger, new ProviderTypeDetails("Ledger", squarelink_logo, SquarelinkLogo, SquarelinkLogoShort, ledger)],
+    [ProviderType.Ledger, new ProviderTypeDetails("Ledger", ledger_logo, LedgerLogo, LedgerLogoShort, ledger)],
     [ProviderType.None, new ProviderTypeDetails("None", null, null, null, null)]
   ]);
 
