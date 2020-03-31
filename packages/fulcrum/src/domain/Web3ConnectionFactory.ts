@@ -27,6 +27,7 @@ import {
   fortmatic,
   portis,
   squarelink,
+  bitski
 } from '../domain/WalletConnectors'
 import { AbstractConnector } from '@web3-react/abstract-connector'
 
@@ -37,6 +38,7 @@ const connectorsByName: { [name: string]: AbstractConnector | null } = {
   [ProviderType.Fortmatic]: fortmatic,
   [ProviderType.Portis]: portis,
   [ProviderType.Squarelink]: squarelink,
+  [ProviderType.Bitski]: bitski,
   [ProviderType.None]: null
 }
 

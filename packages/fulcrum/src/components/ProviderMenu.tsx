@@ -10,6 +10,7 @@ import {
   fortmatic,
   portis,
   squarelink,
+  bitski
 } from '../domain/WalletConnectors'
 
 export interface IProviderMenuProps {
@@ -24,6 +25,7 @@ const connectorsByName: { [name: string]: AbstractConnector } = {
   Fortmatic: fortmatic,
   Portis: portis,
   Squarelink: squarelink,
+  Bitski: bitski
 }
 
 

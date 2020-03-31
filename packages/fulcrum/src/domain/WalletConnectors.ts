@@ -10,6 +10,7 @@ import { FortmaticConnector } from '@web3-react/fortmatic-connector'
 import { PortisConnector } from '@web3-react/portis-connector'
 // import { SquarelinkConnector } from '@web3-react/squarelink-connector'
 import { SquarelinkConnector } from './SquarelinkCustomConnector'
+import { BitskiConnector } from './BitskiCustomConnector'
 // import { TorusConnector } from '@web3-react/torus-connector'
 
 
@@ -83,6 +84,12 @@ export const portis = new PortisConnector({
 export const squarelink = new SquarelinkConnector({
   clientId: configProviders.Squarelink_ClientId as string,
   networks: [networkId]
+})
+
+export const bitski = new BitskiConnector({
+  clientId: configProviders.Bitski_ClientId as string,
+  network: networkId,
+  redirectUri: `https://app.fulcrum.trade/callback.html`
 })
 
 // export const torus = new TorusConnector({ chainId: 1 })
