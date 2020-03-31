@@ -226,6 +226,9 @@
     }
     .stats-svg{
       display: flex;
+      justify-self: flex-end;
+      justify-content: flex-end;
+      justify-items: flex-end;
       position: absolute;
       right: 0;   
               

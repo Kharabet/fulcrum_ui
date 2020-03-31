@@ -161,10 +161,10 @@
     color: var(--color-selector-form);
     font-size: 14px;
     letter-spacing: 0.05em;
-    line-height: 1.5;
+    line-height: 2.2;
     font-weight: 700;
     display: flex;
-    align-items: center;
+    //align-items: center;
     position: relative;
     background-repeat: no-repeat;    
     background-position: 4px 50%;    
@@ -190,20 +190,20 @@
     &.active {
       &:after {
         transform: rotate(180deg);
-        margin-top: -2px;
+        margin-top: 10px;
       }
     }
     &:hover {
       cursor: pointer;
     }
-
+    
     &:after {
       content: "";
       position: absolute;
       border: 4px solid transparent;
       border-top: 4px solid #8992a4;
       right: 12px;
-      margin-top: 2px;
+      margin-top: 12px;
     }
     svg {
       width: 30px;
