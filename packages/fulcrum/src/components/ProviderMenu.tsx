@@ -30,11 +30,11 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
 
   // handle logic to eagerly connect to the injected ethereum provider, if it exists and has granted access already
   // const triedEager = useEagerConnect()
-  if (!activatingConnector && props.isMobileMedia) {
+  if (!activatingConnector && props.isMobileMedia && FulcrumProvider.Instance.providerType !== ProviderType.MetaMask) {
     //@ts-ignore
     setActivatingConnector(ProviderTypeDictionary.getConnectorByProviderType(ProviderType.MetaMask)!);
     activate(ProviderTypeDictionary.getConnectorByProviderType(ProviderType.MetaMask)!);
-    return null;
+    return <React.Fragment/>;
   }
   const storedProvider: any = FulcrumProvider.getLocalstorageItem('providerType');
   const providerType: ProviderType | null = storedProvider as ProviderType || null;
@@ -42,7 +42,7 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
     //@ts-ignore
     setActivatingConnector(ProviderTypeDictionary.getConnectorByProviderType(providerType)!);
     activate(ProviderTypeDictionary.getConnectorByProviderType(providerType)!);
-    return null;
+    return <React.Fragment/>;
   }
   // handle logic to connect in reaction to certain events on the injected ethereum provider, if it exists
   // useInactiveListener(!triedEager || !!activatingConnector);
@@ -71,7 +71,7 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
     });
   }
 
-  return activatingConnector ? null : (
+  return activatingConnector ? <React.Fragment/> : (
     <div className="provider-menu">
       <div className="provider-menu__title">Select Wallet Provider</div>
       <ul className="provider-menu__list">{renderItems()}</ul>
