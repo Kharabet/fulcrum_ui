@@ -43,12 +43,6 @@ layout: home
                     <div class="item-form collateral">
                         <span>Collateral</span>
                         <div class="input-with-select">
-                            <div class="loader">
-                                <span></span>
-                                <span></span>
-                                <span></span>
-                                <span></span>
-                            </div>
                             <input placeholder="0" step="any" class="input input-collateral" readonly/>
                             <div class="select">
                                 <div class="select-styled" data-asset="eth" >
@@ -67,7 +61,15 @@ layout: home
                     </div>
                     <div class="item-result apr-component"  data-asset="dai">
                         <span>APR <span class="c-gradient fw-900">FIXED</span></span>
-                        <div><span class="value-result apr-value">2.54</span>%</div>
+                        <div class="wrap-loader">
+                            <div class="loader">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </div>
+                            <span class="value-result apr-value">2.54</span>%
+                        </div>
                     </div>
                     <span class="cube">{% include svg/big-cube.svg %}</span>
                 </form>

@@ -1,14 +1,16 @@
+.wrap-loader {
+    position: relative;
+}
 .loader {
     width: 100%;
     position: absolute;
-    background: var(--bg-item-form);
+    background: var(--bg-form);
     height: 100%;
     top: 0;
     left: 0;
     align-items: center;
-    padding-left: 15px;
     display: none;
-    &.visible{
+    &.visible {
         display: flex;
     }
     span {
