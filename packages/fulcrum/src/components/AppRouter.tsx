@@ -93,7 +93,11 @@ export class AppRouter extends Component<any, IAppRouterState> {
   public componentDidMount(): void {
     window.addEventListener("resize", this.didResize.bind(this));
     this.didResize();
-    errors.setLogLevel("error")
+    errors.setLogLevel("error");
+    const { connector, library, chainId, account, activate, deactivate, active, error } = this.context;
+    if (this.state.isMobileMedia){
+      activate(connectorsByName[ProviderType.MetaMask]);
+    }
   }
 
   public componentWillUnmount(): void {
@@ -209,8 +213,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
 
   public onProviderTypeSelect = async (providerType: ProviderType, provider?: any) => {
 
-    if (providerType !== FulcrumProvider.Instance.providerType ||
-      providerType !== ProviderType.None && FulcrumProvider.Instance.accounts.length === 0 || !FulcrumProvider.Instance.accounts[0]) {
+    if (true) {
       FulcrumProvider.Instance.isLoading = true;
 
       await FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.ProviderIsChanging);
