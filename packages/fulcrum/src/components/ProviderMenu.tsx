@@ -5,34 +5,23 @@ import { ProviderMenuListItem } from "./ProviderMenuListItem";
 import { AbstractConnector } from '@web3-react/abstract-connector'
 import { useWeb3React } from '@web3-react/core'
 import { useEagerConnect, useInactiveListener } from '../domain/WalletHooks'
-import {
-  injected,
-  fortmatic,
-  portis,
-  squarelink,
-  bitski
-} from '../domain/WalletConnectors'
+import { ProviderTypeDictionary } from "../domain/ProviderTypeDictionary";
 
 export interface IProviderMenuProps {
   providerTypes: ProviderType[];
   selectedProviderType: ProviderType;
-
+  isMobileMedia: boolean;
   onSelect: (providerType: ProviderType) => void;
 }
-
-const connectorsByName: { [name: string]: AbstractConnector } = {
-  Injected: injected,
-  Fortmatic: fortmatic,
-  Portis: portis,
-  Squarelink: squarelink,
-  Bitski: bitski
-}
-
 
 export const ProviderMenu = (props: IProviderMenuProps) => {
   const context = useWeb3React()
   const { connector, library, chainId, account, activate, deactivate, active, error } = context
+  if (props.isMobileMedia && activate) {
+    activate(ProviderTypeDictionary.getConnectorByProviderType(ProviderType.MetaMask)!);
 
+    return null;
+  }
   // handle logic to recognize the connector currently being activated
   //@ts-ignore
   const [activatingConnector, setActivatingConnector] = React.useState()
@@ -50,7 +39,7 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
   useInactiveListener(!triedEager || !!activatingConnector);
   const renderItems = () => {
     return props.providerTypes.map(e => {
-      const currentConnector = connectorsByName[e]
+      const currentConnector = ProviderTypeDictionary.getConnectorByProviderType(e);
       const activating = currentConnector === activatingConnector
       const connected = currentConnector === connector
       const disabled = !triedEager || !!activatingConnector || connected || !!error
@@ -64,9 +53,10 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
             props.onSelect(ProviderType.None);
             return;
           }
+          if (!currentConnector) return;
           //@ts-ignore
           setActivatingConnector(currentConnector)
-          activate(connectorsByName[e], (err) => console.log(err))
+          activate(currentConnector, (err) => console.log(err))
         }}
       />
     });

@@ -14,14 +14,42 @@ import { ReactComponent as MetamaskLogoShort } from '../assets/images/logo_short
 import { ReactComponent as PortisLogoShort } from '../assets/images/logo_short___portis.svg';
 import { ReactComponent as SquarelinkLogoShort } from '../assets/images/logo_short___squarelink.svg';
 
+import {
+  injected,
+  fortmatic,
+  portis,
+  squarelink,
+  bitski
+} from './WalletConnectors';
+import { AbstractConnector } from '@web3-react/abstract-connector'
+
+const connectorsByName: { [name: string]: AbstractConnector | null } = {
+  [ProviderType.MetaMask]: injected,
+  [ProviderType.Fortmatic]: fortmatic,
+  [ProviderType.Portis]: portis,
+  [ProviderType.Squarelink]: squarelink,
+  [ProviderType.Bitski]: bitski,
+  [ProviderType.None]: null
+}
+
+
 export class ProviderTypeDictionary {
   public static providerTypes: Map<ProviderType, ProviderTypeDetails> = new Map<ProviderType, ProviderTypeDetails>([
-    [ProviderType.MetaMask, new ProviderTypeDetails("MetaMask", metamask_logo, MetamaskLogo, MetamaskLogoShort)],
-    [ProviderType.Bitski, new ProviderTypeDetails("Bitski", bitski_logo, BitskiLogo,BitskiLogoShort)],
-    [ProviderType.Fortmatic, new ProviderTypeDetails("Fortmatic", fortmatic_logo, FortmaticLogo, FortmaticLogoShort)],
-    [ProviderType.WalletConnect, new ProviderTypeDetails("WalletConnect", walletconnect_logo, WalletconnectLogo, null)],
-    [ProviderType.Portis, new ProviderTypeDetails("Portis", portis_logo, PortisLogo, PortisLogoShort)],
-    [ProviderType.Squarelink, new ProviderTypeDetails("Squarelink", squarelink_logo, SquarelinkLogo, SquarelinkLogoShort)],
-    [ProviderType.None, new ProviderTypeDetails("None", null, null, null)]
+    [ProviderType.MetaMask, new ProviderTypeDetails("MetaMask", metamask_logo, MetamaskLogo, MetamaskLogoShort, injected)],
+    [ProviderType.Bitski, new ProviderTypeDetails("Bitski", bitski_logo, BitskiLogo, BitskiLogoShort, bitski)],
+    [ProviderType.Fortmatic, new ProviderTypeDetails("Fortmatic", fortmatic_logo, FortmaticLogo, FortmaticLogoShort, fortmatic)],
+    [ProviderType.WalletConnect, new ProviderTypeDetails("WalletConnect", walletconnect_logo, WalletconnectLogo, null, null)],
+    [ProviderType.Portis, new ProviderTypeDetails("Portis", portis_logo, PortisLogo, PortisLogoShort, portis)],
+    [ProviderType.Squarelink, new ProviderTypeDetails("Squarelink", squarelink_logo, SquarelinkLogo, SquarelinkLogoShort, squarelink)],
+    [ProviderType.None, new ProviderTypeDetails("None", null, null, null, null)]
   ]);
+
+  public static getProviderTypeByConnector(value: AbstractConnector): ProviderType {
+    return Object.keys(connectorsByName).find(key => connectorsByName[key] === value) as ProviderType;
+
+  }
+  public static getConnectorByProviderType(providerType: ProviderType): AbstractConnector | null {
+    return connectorsByName[providerType];
+
+  }
 }

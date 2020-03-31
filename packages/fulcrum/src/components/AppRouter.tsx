@@ -1,5 +1,5 @@
 import { Web3Wrapper } from '@0x/web3-wrapper';
-import React, { Component, Context } from "react";
+import React, { Component } from "react";
 
 import TagManager from 'react-gtm-module';
 import Intercom from "react-intercom";
@@ -21,22 +21,11 @@ import { ProviderMenu } from "./ProviderMenu";
 import { RiskDisclosure } from "./RiskDisclosure";
 import { errors } from "ethers"
 import siteConfig from "./../config/SiteConfig.json";
-import { SupportedProvider } from "ethereum-types";
 
-import {
-  Web3ReactProvider,
-  useWeb3React, createWeb3ReactRoot, getWeb3ReactContext
-} from "@web3-react/core";
-import { MetamaskSubprovider, RPCSubprovider, SignerSubprovider, Web3ProviderEngine } from "@0x/subproviders";
+import { Web3ReactProvider, getWeb3ReactContext } from "@web3-react/core";
+import { Web3ProviderEngine } from "@0x/subproviders";
 import { Web3ConnectionFactory } from '../domain/Web3ConnectionFactory';
-import {
-  injected,
-  fortmatic,
-  portis,
-  squarelink,
-  bitski
-} from '../domain/WalletConnectors'
-import { AbstractConnector } from '@web3-react/abstract-connector'
+import { ProviderTypeDictionary } from '../domain/ProviderTypeDictionary';
 
 const isMainnetProd =
   process.env.NODE_ENV && process.env.NODE_ENV !== "development"
@@ -52,9 +41,6 @@ if (isMainnetProd) {
   }
   TagManager.initialize(tagManagerArgs)
 }
-function getKeyByValue(object: { [name: string]: AbstractConnector }, value: AbstractConnector): ProviderType {
-  return Object.keys(object).find(key => object[key] === value) as ProviderType;
-}
 
 interface IAppRouterState {
   isProviderMenuModalOpen: boolean;
@@ -64,14 +50,6 @@ interface IAppRouterState {
   web3: Web3Wrapper | null;
   isMobileMedia: boolean;
 }
-const connectorsByName: { [name: string]: AbstractConnector } = {
-  [ProviderType.MetaMask]: injected,
-  [ProviderType.Fortmatic]: fortmatic,
-  [ProviderType.Portis]: portis,
-  [ProviderType.Squarelink]: squarelink,
-  [ProviderType.Bitski]: bitski,
-}
-
 
 const Web3ReactContext = getWeb3ReactContext()
 
@@ -97,8 +75,8 @@ export class AppRouter extends Component<any, IAppRouterState> {
     this.didResize();
     errors.setLogLevel("error");
     const { connector, library, chainId, account, activate, deactivate, active, error } = this.context;
-    if (this.state.isMobileMedia){
-      activate(connectorsByName[ProviderType.MetaMask]);
+    if (this.state.isMobileMedia) {
+      activate(ProviderTypeDictionary.getConnectorByProviderType(ProviderType.MetaMask));
     }
   }
 
@@ -107,14 +85,9 @@ export class AppRouter extends Component<any, IAppRouterState> {
     window.removeEventListener("resize", this.didResize.bind(this));
   }
 
-  // public componentWillMount(): void {
-  //   const { connector, library, chainId, account, activate, deactivate, active, error } = this.context;
-  //   this.onProviderTypeSelect(getKeyByValue(connectorsByName, connector))
-  // }
-
   public getLibrary = async (provider: any, connector: any): Promise<Web3ProviderEngine> => {
     console.log(provider);
-    await this.onProviderTypeSelect(getKeyByValue(connectorsByName, connector), provider)
+    await this.onProviderTypeSelect(ProviderTypeDictionary.getProviderTypeByConnector(connector), provider)
     return Web3ConnectionFactory.currentWeb3Engine;
   }
 
@@ -143,6 +116,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
                 // ProviderType.WalletConnect,
                 ProviderType.None
               ]}
+              isMobileMedia={this.state.isMobileMedia}
               onSelect={this.onProviderTypeSelect}
             />
           </Modal>
@@ -176,24 +150,24 @@ export class AppRouter extends Component<any, IAppRouterState> {
                     </Switch>
                     {isMainnetProd ? (
                       <Route path="/" render={({ location }) => {
-                        const tagManagerArgs = {
-                          dataLayer: {
-                            // userId: '001',
-                            userProject: 'fulcrum',
-                            page: location.pathname + location.search
-                          }
+                      const tagManagerArgs = {
+                        dataLayer: {
+                          // userId: '001',
+                          userProject: 'fulcrum',
+                          page: location.pathname + location.search
                         }
-                        // ReactGA.ga('set', 'page', location.pathname + location.search);
-                        // ReactGA.ga('send', 'pageview');
-                        TagManager.dataLayer(tagManagerArgs);
-                        return null;
-                      }} />
-                    ) : ``}
-                  </LocationListener>
-                </HashRouter>
-            }
-          </div>
-        </Web3ReactProvider>
+                      }
+                      // ReactGA.ga('set', 'page', location.pathname + location.search);
+                      // ReactGA.ga('send', 'pageview');
+                      TagManager.dataLayer(tagManagerArgs);
+                      return null;
+                    }} />
+                  ) : ``}
+                </LocationListener>
+              </HashRouter>
+          }
+        </div>
+      </Web3ReactProvider>
     );
   }
   private didResize = () => {
@@ -204,12 +178,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
   }
 
   public doNetworkConnect = () => {
-    const isMobileMedia = (window.innerWidth <= 959);
-    if (this.state.isMobileMedia) {
-      this.onProviderTypeSelect(ProviderType.MetaMask)
-    } else {
-      this.setState({ ...this.state, isProviderMenuModalOpen: true });
-    }
+
     this.setState({ ...this.state, isProviderMenuModalOpen: true });
   };
 

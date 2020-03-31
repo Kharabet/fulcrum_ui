@@ -3,6 +3,7 @@ import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents"
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
 
+import { ProviderTypeDictionary } from '../domain/ProviderTypeDictionary';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 
 import Portis from "@portis/web3";
@@ -33,15 +34,6 @@ import { AbstractConnector } from '@web3-react/abstract-connector'
 
 const ethNetwork = process.env.REACT_APP_ETH_NETWORK;
 
-const connectorsByName: { [name: string]: AbstractConnector | null } = {
-  [ProviderType.MetaMask]: injected,
-  [ProviderType.Fortmatic]: fortmatic,
-  [ProviderType.Portis]: portis,
-  [ProviderType.Squarelink]: squarelink,
-  [ProviderType.Bitski]: bitski,
-  [ProviderType.None]: null
-}
-
 
 export class Web3ConnectionFactory {
   public static metamaskProvider: any | null;
@@ -55,7 +47,7 @@ export class Web3ConnectionFactory {
   public static currentWeb3Wrapper: Web3Wrapper;
   public static async getWeb3Provider(providerType: ProviderType, eventEmitter: EventEmitter): Promise<[Web3Wrapper | null, Web3ProviderEngine | null, boolean, number, string]> {
     let canWrite = false;
-    const connector = connectorsByName[providerType];
+    const connector = ProviderTypeDictionary.getConnectorByProviderType(providerType)
     /*
       TODO:
       Set pollingInterval to 8000. Use https://github.com/MetaMask/eth-block-tracker with Web3ProviderEngine
