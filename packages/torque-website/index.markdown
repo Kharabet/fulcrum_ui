@@ -43,6 +43,12 @@ layout: home
                     <div class="item-form collateral">
                         <span>Collateral</span>
                         <div class="input-with-select">
+                            <div class="loader">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </div>
                             <input placeholder="0" step="any" class="input input-collateral" readonly/>
                             <div class="select">
                                 <div class="select-styled" data-asset="eth" >

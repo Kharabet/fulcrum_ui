@@ -93,15 +93,20 @@ async function onLoanInputChange(e) {
     updateCollateralInput();
 }
 
-async function updateCollateralInput() {
+async function updateCollateralInput() {   
     const form = document.querySelector('.form-loan');
     const inputLoan = form.querySelector('.input-loan');
     const inputCollateral = form.querySelector('.input-collateral');
     const loanAsset = form.querySelector(".item-form.loan .select-styled").dataset.asset;
     const collateralAsset = form.querySelector(".item-form.collateral .select-styled").dataset.asset;
+    const loader = form.querySelector('.loader');
     const inputLoanValue = parseInt(inputLoan.value);
-    (inputLoanValue === 0 || inputLoan.value.length === 0)
-    inputCollateral.value = 0;
+    loader.classList.add('visible');
+    if (inputLoanValue === 0 || inputLoan.value.length === 0){
+        if(inputCollateral.classList.contains('error'))
+            inputCollateral.classList.remove('error')
+        inputCollateral.value = 0;
+    }    
     if (inputLoanValue > 0) {
         const collateralEstimateValue = await collateralEstimate(loanAsset, collateralAsset, inputLoanValue);
         isNaN(collateralEstimateValue)
@@ -109,6 +114,7 @@ async function updateCollateralInput() {
             : inputCollateral.classList.remove('error');
         inputCollateral.value = collateralEstimateValue;
     }
+    loader.classList.remove('visible');
 }
 
 function setAriaAttr(el, ariaType, newProperty) {
