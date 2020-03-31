@@ -101,7 +101,8 @@ export class Web3ConnectionFactory {
 
     } else {
       // @ts-ignore
-      web3Wrapper = undefined;
+      await providerEngine.start();
+      web3Wrapper = new Web3Wrapper(providerEngine);
     }
 
 

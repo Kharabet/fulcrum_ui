@@ -55,11 +55,12 @@ const Web3ReactContext = getWeb3ReactContext()
 
 export class AppRouter extends Component<any, IAppRouterState> {
   static contextType = Web3ReactContext;
+  private _isMounted: boolean = false;
   constructor(props: any) {
     super(props);
 
     this.state = {
-      isProviderMenuModalOpen: true,
+      isProviderMenuModalOpen: false,
       isRiskDisclosureModalOpen: false,
       isLoading: false,
       selectedProviderType: FulcrumProvider.Instance.providerType,
@@ -71,12 +72,15 @@ export class AppRouter extends Component<any, IAppRouterState> {
   }
 
   public componentDidMount(): void {
+    this._isMounted = true;
     window.addEventListener("resize", this.didResize.bind(this));
     this.didResize();
     errors.setLogLevel("error");
+    this.doNetworkConnect();
   }
 
   public componentWillUnmount(): void {
+    this._isMounted = false;
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
     window.removeEventListener("resize", this.didResize.bind(this));
   }
@@ -167,26 +171,26 @@ export class AppRouter extends Component<any, IAppRouterState> {
       </Web3ReactProvider>
     );
   }
-  private didResize = () => {
+  private didResize = async () => {
     const isMobileMedia = (window.innerWidth <= 959);
     if (isMobileMedia !== this.state.isMobileMedia) {
-      this.setState({ isMobileMedia });
+      await this._isMounted && this.setState({ isMobileMedia });
     }
   }
 
-  public doNetworkConnect = () => {
+  public doNetworkConnect = async () => {
 
-    this.setState({ ...this.state, isProviderMenuModalOpen: true });
+    await this._isMounted && this.setState({ ...this.state, isProviderMenuModalOpen: true });
   };
 
   public onProviderTypeSelect = async (providerType: ProviderType, provider?: any) => {
 
-    if (true) {
+    if (!this.state.isLoading) {
       FulcrumProvider.Instance.isLoading = true;
 
       await FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.ProviderIsChanging);
 
-      this.setState({
+      await this._isMounted && this.setState({
         ...this.state,
         isLoading: true,
         isProviderMenuModalOpen: false
@@ -201,29 +205,29 @@ export class AppRouter extends Component<any, IAppRouterState> {
         );
       });
     } else {
-      this.setState({
+      await this._isMounted && this.setState({
         ...this.state,
         isProviderMenuModalOpen: false
       });
     }
   };
 
-  public onRequestClose = () => {
-    this.setState({ ...this.state, isProviderMenuModalOpen: false });
+  public onRequestClose = async () => {
+    await this._isMounted && this.setState({ ...this.state, isProviderMenuModalOpen: false });
   };
 
   public onProviderChanged = async (event: ProviderChangedEvent) => {
-    this.setState({
+    await this._isMounted && this.setState({
       ...this.state,
       selectedProviderType: event.providerType,
       isLoading: false,
       web3: event.web3
     });
   };
-  public onRiskDisclosureRequestClose = () => {
-    this.setState({ ...this.state, isRiskDisclosureModalOpen: false });
+  public onRiskDisclosureRequestClose = async () => {
+    await this._isMounted && this.setState({ ...this.state, isRiskDisclosureModalOpen: false });
   }
-  public onRiskDisclosureRequestOpen = () => {
-    this.setState({ ...this.state, isRiskDisclosureModalOpen: true });
+  public onRiskDisclosureRequestOpen = async () => {
+    await this._isMounted && this.setState({ ...this.state, isRiskDisclosureModalOpen: true });
   }
 }
