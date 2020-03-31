@@ -67,6 +67,7 @@
   svg{
     position: relative;
     width: 100%;
+    min-width: 100%;
     height: auto;
   }
   @media screen and (max-width: $breakpoint-lg-down){
@@ -117,6 +118,11 @@
 }
 .gradient-susd{
   border-radius: 50%;
+  background-color: #342F49;
+  background: -moz-linear-gradient(135deg, #342F49 15.63%, #000000 88.28%);
+  background: -webkit-linear-gradient(135deg, #342F49 15.63%, #000000 88.28%);
+  background: -o-linear-gradient(135deg, #342F49 15.63%, #000000 88.28%);
+  background: -ms-linear-gradient(135deg, #342F49 15.63%, #000000 88.28%);
   background: linear-gradient(135deg, #342F49 15.63%, #000000 88.28%);
 }
 @media screen and (max-width: $breakpoint-sm-down){
