@@ -30,6 +30,7 @@
   --bg-connect: #e9f4ff;
   --bg-post: #ffffff;
   --shadow-post: 0px 8px 16px rgba(13, 76, 211, 0.16);
+  --color-404: #000085;
 }
 
 [data-theme="dark"] {
@@ -64,6 +65,7 @@
   --bg-connect: #c3cdd8;
   --bg-post: #3d4651;
   --shadow-post: 0px 12px 20px rgba(0, 0, 0, 0.1);
+  --color-404: #ffffff;
 }
 
 $breakpoint-xl-down: 1409px;
