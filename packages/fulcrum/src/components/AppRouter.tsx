@@ -113,6 +113,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
                 ProviderType.Portis,
                 ProviderType.Bitski,
                 ProviderType.Squarelink,
+                ProviderType.Ledger,
                 // ProviderType.WalletConnect,
                 ProviderType.None
               ]}

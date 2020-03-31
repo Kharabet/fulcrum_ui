@@ -1,8 +1,6 @@
 import React, { Component } from "react";
 import { ProviderType } from "../domain/ProviderType";
 import { ProviderMenuListItem } from "./ProviderMenuListItem";
-
-import { AbstractConnector } from '@web3-react/abstract-connector'
 import { useWeb3React } from '@web3-react/core'
 import { useEagerConnect, useInactiveListener } from '../domain/WalletHooks'
 import { ProviderTypeDictionary } from "../domain/ProviderTypeDictionary";

@@ -23,14 +23,7 @@ import { MetamaskSubprovider, RPCSubprovider, SignerSubprovider, Web3ProviderEng
 import { AlchemySubprovider } from "@alch/alchemy-web3";
 
 import configProviders from "../config/providers.json";
-import {
-  injected,
-  fortmatic,
-  portis,
-  squarelink,
-  bitski
-} from '../domain/WalletConnectors'
-import { AbstractConnector } from '@web3-react/abstract-connector'
+
 
 const ethNetwork = process.env.REACT_APP_ETH_NETWORK;
 

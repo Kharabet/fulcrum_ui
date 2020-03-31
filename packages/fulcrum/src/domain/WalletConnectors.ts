@@ -2,7 +2,7 @@ import { InjectedConnector } from '@web3-react/injected-connector'
 // import { NetworkConnector } from '@web3-react/network-connector'
 // import { WalletConnectConnector } from '@web3-react/walletconnect-connector'
 // import { WalletLinkConnector } from '@web3-react/walletlink-connector'
-// import { LedgerConnector } from '@web3-react/ledger-connector'
+import { LedgerConnector } from '@web3-react/ledger-connector'
 // import { TrezorConnector } from '@web3-react/trezor-connector'
 // import { FrameConnector } from '@web3-react/frame-connector'
 // import { AuthereumConnector } from '@web3-react/authereum-connector'
@@ -31,11 +31,12 @@ const getNetworkIdByString = (networkName: string | undefined) => {
 }
 const networkId = getNetworkIdByString(process.env.REACT_APP_ETH_NETWORK);
 
-const POLLING_INTERVAL = 12000
-const RPC_URLS: { [chainId: number]: string } = {
-  1: process.env.RPC_URL_1 as string,
-  4: process.env.RPC_URL_4 as string
-}
+const RPC_URL = networkId === 42
+  ? `https://eth-${ethNetwork}.alchemyapi.io/jsonrpc/${configProviders.Alchemy_ApiKey_kovan}`
+  : `https://eth-${ethNetwork}.alchemyapi.io/jsonrpc/${configProviders.Alchemy_ApiKey}`
+
+const POLLING_INTERVAL = 3600000
+
 
 export const injected = new InjectedConnector({ supportedChainIds: [1, 3, 4, 42] })
 
@@ -57,7 +58,11 @@ export const injected = new InjectedConnector({ supportedChainIds: [1, 3, 4, 42]
 //   appName: 'web3-react example'
 // })
 
-// export const ledger = new LedgerConnector({ chainId: 1, url: RPC_URLS[1], pollingInterval: POLLING_INTERVAL })
+export const ledger = new LedgerConnector({
+  chainId: networkId,
+  url: RPC_URL,
+  pollingInterval: POLLING_INTERVAL
+})
 
 // export const trezor = new TrezorConnector({
 //   chainId: 1,
