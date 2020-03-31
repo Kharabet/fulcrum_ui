@@ -515,8 +515,6 @@ export class TorqueProvider {
   
 
   public doBorrow = async (borrowRequest: BorrowRequest) => {
-    return;
-    /*
     // console.log(borrowRequest);
     
     if (borrowRequest.borrowAmount.lte(0) || borrowRequest.depositAmount.lte(0)) {
@@ -641,7 +639,6 @@ export class TorqueProvider {
     }
 
     return;
-    */
   }
 
   public gasPrice = async (): Promise<BigNumber> => {

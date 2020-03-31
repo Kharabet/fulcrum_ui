@@ -17,7 +17,7 @@ import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { TorqueProviderEvents } from "../services/events/TorqueProviderEvents";
 import { NavService } from "../services/NavService";
 import { TorqueProvider } from "../services/TorqueProvider";
-import siteConfig from "./../config/SiteConfig.json";
+import siteConfig from "../config/SiteConfig.json";
 import { LocationListener } from "./LocationListener";
 import { RiskDisclosure } from "./RiskDisclosure";
 import Modal from "react-modal";
@@ -110,7 +110,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
                       <Switch>
                         <Route exact={true} path="/" render={props => <LandingPage {...props} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen}/>}  />
                         <Route exact={true} path="/wallet/:destinationAbbr" render={props => <WalletSelectionPage {...props} onSelectProvider={this.onProviderTypeSelect} isLoading={this.state.isLoading} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />} />
-                        {/* <Route exact={true} path="/borrow/:walletTypeAbbr" render={props => <BorrowPage {...props} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen}/>} /> */}
+                        {!siteConfig.BorrowDisabled || (TorqueProvider.Instance.accounts.length !== 0 && TorqueProvider.Instance.accounts[0].toLowerCase() === "0xadff3ada12ed0f8a87e31e5a04dfd2ee054e1118") ? <Route exact={true} path="/borrow/:walletTypeAbbr" render={props => <BorrowPage {...props} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen}/>} /> : undefined}
                         <Route exact={true} path="/dashboard/:walletTypeAbbr" render={props => <DashboardPage {...props} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen}/>}  />
                         <Route exact={true} path="/dashboard/:walletTypeAbbr/:walletAddress" render={props => <DashboardPage {...props} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />} />
                         <Route path="*" render={() => <Redirect to="/"/> } />

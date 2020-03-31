@@ -8,6 +8,7 @@ import { HeaderLogo } from "./HeaderLogo";
 import { HeaderMenu, IHeaderMenuProps } from "./HeaderMenu";
 import { HeaderMenuToggle } from "./HeaderMenuToggle";
 import { InfoBlock } from "../components/InfoBlock";
+import siteConfig from "../config/SiteConfig.json";
 export interface IHeaderOpsProps {
   doNetworkConnect: () => void;
   isRiskDisclosureModalOpen: () => void;
@@ -48,7 +49,7 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
       menu = {
         items: [
           { id: 1, title: "Wallets", link: "/wallet/b", external: false },
-          // { id: 2, title: "Borrow", link: "/borrow/w", external: false },
+          { id: 2, title: "Borrow", link: "/borrow/w", external: false },
           { id: 3, title: "Dashboard", link: "/dashboard/w", external: false },
           { id: 4, title: "Lend", link: "https://fulcrum.trade", external: true }
         ]
@@ -57,11 +58,15 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
       menu = {
         items: [
           { id: 1, title: "Wallets", link: "/wallet/b", external: false },
-          // { id: 2, title: "Borrow", link: "/borrow/n", external: false },
+          { id: 2, title: "Borrow", link: "/borrow/n", external: false },
           { id: 3, title: "Dashboard", link: "/dashboard/n", external: false },
           { id: 4, title: "Lend", link: "https://fulcrum.trade", external: true }
         ]
       };
+    }
+
+    if (siteConfig.BorrowDisabled && !(TorqueProvider.Instance.accounts.length > 0 && TorqueProvider.Instance.accounts[0].toLowerCase() === "0xadff3ada12ed0f8a87e31e5a04dfd2ee054e1118")) {
+      menu.items.splice(1, 1);
     }
 
     const toggleImg = !this.state.isMenuOpen ? menu_icon : ic_close;
