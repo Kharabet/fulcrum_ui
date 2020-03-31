@@ -11,7 +11,7 @@
       font-size: 32px;
       color: var(--color-404);
       margin: 30px 0 15px 0;
-      @media(max-width: 579px){
+      @media screen and (max-width: $breakpoint-xs-down){
         font-size: 27px;
       }
     }
@@ -30,7 +30,7 @@
         line-height: 1.8;
         padding-left: 30px;
         position: relative;
-        @media(max-width: 579px){
+        @media screen and (max-width: $breakpoint-xs-down){
             font-size: 14px;
         }
         &:before {
