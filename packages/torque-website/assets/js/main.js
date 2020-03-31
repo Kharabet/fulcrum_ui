@@ -31,7 +31,8 @@ window.addEventListener('load', function () {
 
 
     const formLoan = document.querySelector('.form-loan');
-    formLoan.addEventListener("input", onLoanInputChange, false);
+    if (formLoan) 
+        formLoan.addEventListener("input", onLoanInputChange, false);
 
 
     const itemForm = document.querySelectorAll('.item-form');
