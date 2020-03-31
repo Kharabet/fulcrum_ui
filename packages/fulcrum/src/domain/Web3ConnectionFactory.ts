@@ -37,7 +37,7 @@ const connectorsByName: { [name: string]: AbstractConnector | null } = {
   [ProviderType.Fortmatic]: fortmatic,
   [ProviderType.Portis]: portis,
   [ProviderType.Squarelink]: squarelink,
-  [ProviderType.None]: null 
+  [ProviderType.None]: null
 }
 
 
@@ -65,7 +65,7 @@ export class Web3ConnectionFactory {
           blockTrackerProvider?: any;
       }
     */
-
+    let networkId: number = 0;
     let web3Wrapper: Web3Wrapper;
     let providerEngine: Web3ProviderEngine = new Web3ProviderEngine({ pollingInterval: 3600000 }); // 1 hour polling
 
@@ -86,9 +86,11 @@ export class Web3ConnectionFactory {
         providerEngine.addProvider(new SignerSubprovider(provider));
         canWrite = true;
         const account = await connector.getAccount();
+        const chainId = (await connector.getChainId()).toString();
+        networkId = chainId.includes("0x") ? parseInt(chainId, 16) : parseInt(chainId, 10);
         Web3ConnectionFactory.userAccount = account;
       } catch (e) {
-        // console.log(e);
+        console.log(e);
 
         await providerEngine.stop();
 
@@ -109,7 +111,7 @@ export class Web3ConnectionFactory {
 
 
 
-    Web3ConnectionFactory.networkId = await web3Wrapper.getNetworkIdAsync();
+    Web3ConnectionFactory.networkId = networkId ? networkId : await web3Wrapper.getNetworkIdAsync();
     Web3ConnectionFactory.currentWeb3Engine = providerEngine;
     Web3ConnectionFactory.currentWeb3Wrapper = web3Wrapper;
 

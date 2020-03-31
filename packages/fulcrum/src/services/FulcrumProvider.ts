@@ -175,20 +175,22 @@ export class FulcrumProvider {
       }
     }
 
-    if (this.web3Wrapper && canWrite && account) {
+    if (this.web3Wrapper && canWrite) {
       try {
-        this.accounts = [account];
+        this.accounts = await this.web3Wrapper.getAvailableAddressesAsync();
       } catch (e) {
-        console.log(e);
+        // console.log(e);
+        this.accounts = [];
+      }
+      if (this.accounts.length === 0) {
+        canWrite = false; // revert back to read-only
       }
     } else {
-      canWrite = false;
       // this.accounts = [];
       if (providerType === ProviderType.Bitski && networkId !== 1) {
         this.unsupportedNetwork = true;
       }
     }
-
     if (this.web3Wrapper && this.web3ProviderSettings.networkId > 0) {
       this.contractsSource = await new ContractsSource(this.providerEngine, this.web3ProviderSettings.networkId, canWrite);
       if (canWrite) {
@@ -1768,13 +1770,13 @@ if (err || 'error' in added) {
 console.log(err, added);
 }
 }*//*);
-      }
-    }
-    }
-    } catch(e) {
-    // console.log(e);
-    }
-    }*/
+              }
+            }
+            }
+            } catch(e) {
+            // console.log(e);
+            }
+            }*/
   }
 
   private processLendRequestTask = async (task: RequestTask, skipGas: boolean) => {
