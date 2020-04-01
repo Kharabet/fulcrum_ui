@@ -70,12 +70,13 @@ export class Web3ConnectionFactory {
     const provider = connector ? await connector.getProvider() : null;
     if (provider && connector) {
       try {
-        if (providerType === ProviderType.Ledger || providerType === ProviderType.Bitski) {
-          provider.addProvider(Web3ConnectionFactory.alchemyProvider);
-          await provider.start();
-          web3Wrapper = new Web3Wrapper(provider);
-        }
-        else if (providerType === ProviderType.MetaMask) {
+        // if (providerType === ProviderType.Ledger || providerType === ProviderType.Bitski) {
+        //   provider.addProvider(Web3ConnectionFactory.alchemyProvider);
+        //   await provider.start();
+        //   web3Wrapper = new Web3Wrapper(provider);
+        // }
+        // else
+         if (providerType === ProviderType.MetaMask) {
           providerEngine.addProvider(new MetamaskSubprovider(provider));
           await providerEngine.start();
           web3Wrapper = new Web3Wrapper(providerEngine);
