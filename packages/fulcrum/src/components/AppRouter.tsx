@@ -117,8 +117,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
               ProviderType.Bitski,
               ProviderType.Squarelink,
               ProviderType.Ledger,
-              // ProviderType.WalletConnect,
-              ProviderType.None
+              // ProviderType.WalletConnect
             ]}
             isMobileMedia={this.state.isMobileMedia}
             onSelect={this.onProviderTypeSelect}

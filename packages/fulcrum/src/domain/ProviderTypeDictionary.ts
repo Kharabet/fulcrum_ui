@@ -16,6 +16,7 @@ import { ReactComponent as PortisLogoShort } from '../assets/images/logo_short__
 import { ReactComponent as SquarelinkLogoShort } from '../assets/images/logo_short___squarelink.svg';
 import { ReactComponent as LedgerLogoShort } from '../assets/images/logo_short___ledger.svg';
 import { ReactComponent as TrustWalletLogoShort } from '../assets/images/logo_short___trustwallet.svg';
+import { ReactComponent as FrameLogoShort } from '../assets/images/logo_short___frame.svg';
 
 import {
   injected,
@@ -45,7 +46,7 @@ export class ProviderTypeDictionary {
   public static providerTypes: Map<ProviderType, ProviderTypeDetails> = new Map<ProviderType, ProviderTypeDetails>([
     [ProviderType.MetaMask, new ProviderTypeDetails("MetaMask", metamask_logo, MetamaskLogo, MetamaskLogoShort, injected)],
     [ProviderType.TrustWallet, new ProviderTypeDetails("TrustWallet", metamask_logo, TrustWalletLogoShort, TrustWalletLogoShort, injected)],
-    [ProviderType.Frame, new ProviderTypeDetails("Frame", metamask_logo, MetamaskLogo, MetamaskLogoShort, frame)],
+    [ProviderType.Frame, new ProviderTypeDetails("Frame", metamask_logo, MetamaskLogo, FrameLogoShort, frame)],
     [ProviderType.Bitski, new ProviderTypeDetails("Bitski", bitski_logo, BitskiLogo, BitskiLogoShort, bitski)],
     [ProviderType.Fortmatic, new ProviderTypeDetails("Fortmatic", fortmatic_logo, FortmaticLogo, FortmaticLogoShort, fortmatic)],
     [ProviderType.WalletConnect, new ProviderTypeDetails("WalletConnect", walletconnect_logo, WalletconnectLogo, null, null)],

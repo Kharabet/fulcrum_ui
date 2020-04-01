@@ -55,6 +55,8 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
       return < ProviderMenuListItem
         key={e}
         providerType={e}
+        isConnected = {connected}
+        isActivating = {activating}
         selectedProviderType={props.selectedProviderType}
         onSelect={() => {
           if (e === ProviderType.None) {
@@ -75,6 +77,15 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
     <div className="provider-menu">
       <div className="provider-menu__title">Select Wallet Provider</div>
       <ul className="provider-menu__list">{renderItems()}</ul>
+      < button
+      className="disconnect"
+        key={ProviderType.None}
+        onClick={() => {
+            deactivate()
+            props.onSelect(ProviderType.None);
+        }}
+      >DISCONNECT
+      </button>
       <div className="provider-menu__footer">
         By connecting, you agree to the&nbsp;
           <a href="https://fulcrum.trade/tos/">Terms of Service</a>&nbsp;and&nbsp;
