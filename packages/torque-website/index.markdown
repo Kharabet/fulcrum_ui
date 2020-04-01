@@ -115,7 +115,7 @@ layout: home
                             </div>
                             {% include svg/arrow-in-circle.svg %}
                         </a>
-                        <span class="info-after-button">Crypto loans with fixed interest rates[need better call to action here]</span>
+                        <span class="info-after-button">Crypto loans with fixed interest rates [need better call to action here]</span>
                     </div>
                 </div>
                 <div class="col fg-1 fg-lg-initial jc-sb jc-lg-fs fd-md-c">
@@ -127,7 +127,7 @@ layout: home
                             </div>
                             {% include svg/arrow-in-circle.svg %}
                         </a>
-                        <span class="info-after-button">See if you can save when you refinance your loan<br />with fixed rates</span>
+                        <span class="info-after-button">See if you can save when you refinance your loan with fixed rates</span>
                     </div>
                     <div class="flex fd-c mb-md-15 mx-md-a">
                         <a href="#" class="button button-green button-md">
@@ -137,7 +137,7 @@ layout: home
                             </div>
                             {% include svg/arrow-in-circle.svg %}
                         </a>
-                        <span class="info-after-button">Manage your loan: add or remove collateral <br /> and repay any time</span>
+                        <span class="info-after-button">Manage your loan: add or remove collateral  and repay any time</span>
                     </div>
                 </div>
             </div>
@@ -311,7 +311,7 @@ layout: home
                         </div>
                         {% include svg/arrow-in-circle.svg %}
                     </a>
-                    <span class="info-after-button">Up to 5x Leverage, zero platform fees, <br /> and perfect liquidity</span>
+                    <span class="info-after-button">Up to 5x Leverage, zero platform fees, and perfect liquidity</span>
                 </div>
                 <div class="flex fd-c">
                     <a href="#" class="button button-purple button-lg">
