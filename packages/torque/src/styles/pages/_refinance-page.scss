@@ -39,28 +39,6 @@
     align-content: center;
     justify-content: space-between;
     //overflow-y: scroll;
-    .refinance-page__main-centeredOverlay {
-      position: fixed;
-      background-color: rgba(255, 255, 255, 0.65);
-      top:0;
-      left:0;
-      width:100%;
-      height:100%;
-      color:black;
-      text-align: center;
-      border-radius: 1rem;
-      font-size: 6rem;
-      font-weight: 600;
-      z-index: 999;
-    }
-
-    .refinance-page__main-centeredOverlay span {
-      position: absolute;
-      top:50%;
-      left:50%;
-      -webkit-transform:translate(-50%, -50%);
-      transform:translate(-50%, -50%);
-    }
   }
   .refinance-page__main_p {
     display: flex;
