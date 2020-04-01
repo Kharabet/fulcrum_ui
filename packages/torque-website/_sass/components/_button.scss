@@ -13,20 +13,20 @@
   &:hover {
     color: #ffffff;
   }
-  span {    
+  span {
     opacity: 0.5;
-    @media screen and (min-width: $breakpoint-sm-up){
+    @media screen and (min-width: $breakpoint-sm-up) {
       font-size: 15px;
     }
-    @media screen and (max-width: $breakpoint-sm-down){
+    @media screen and (max-width: $breakpoint-sm-down) {
       font-size: 13px;
     }
   }
   p {
-    @media screen and (min-width: $breakpoint-sm-up){
+    @media screen and (min-width: $breakpoint-sm-up) {
       font-size: 24px;
     }
-    @media screen and (max-width: $breakpoint-sm-down){
+    @media screen and (max-width: $breakpoint-sm-down) {
       font-size: 20px;
     }
   }
@@ -34,13 +34,13 @@
     line-height: 1.5;
     color: #8992a4;
     margin: 20px 0 0 40px;
-    @media screen and (min-width: $breakpoint-sm-up){
+    @media screen and (min-width: $breakpoint-sm-up) {
       font-size: 13px;
     }
-    @media screen and (max-width: $breakpoint-lg-down){
+    @media screen and (max-width: $breakpoint-lg-down) {
       max-width: 250px;
     }
-    @media screen and (max-width: $breakpoint-sm-down){
+    @media screen and (max-width: $breakpoint-sm-down) {
       font-size: 10px;
       max-width: 215px;
     }
@@ -97,17 +97,29 @@
   }
   @media screen and (max-width: $breakpoint-xl-down) {
     width: 415px;
+    + .info-after-button {
+      max-width: 325px;
+    }
   }
   @media screen and (max-width: $breakpoint-lg-down) {
     width: 290px;
+    + .info-after-button {
+      max-width: 245px;
+    }
   }
   @media screen and (max-width: $breakpoint-sm-down) {
     width: 255px;
+    + .info-after-button {
+      max-width: 185px;
+    }
   }
 }
 .button-lg {
   border-radius: 90px;
   padding: 13px 25px 13px 40px;
+  + .info-after-button {
+    max-width: 245px;
+  }
   @media screen and (min-width: $breakpoint-xl-up) {
     width: 400px;
   }
@@ -119,29 +131,39 @@
   }
   @media screen and (max-width: $breakpoint-sm-down) {
     width: 255px;
+    + .info-after-button {
+      width: 185px;
+    }
   }
 }
 .button-md {
   border-radius: 90px;
   padding: 13px 25px 13px 40px;
+  + .info-after-button {
+    max-width: 215px;
+  }
   @media screen and (min-width: $breakpoint-xl-up) {
     width: 395px;
+
   }
   @media screen and (max-width: $breakpoint-xl-down) {
     width: 290px;
   }
   @media screen and (max-width: $breakpoint-sm-down) {
     width: 255px;
+    + .info-after-button {
+      width: 185px;
+    }
   }
 }
 .button-sm {
-  @media screen and (min-width: $breakpoint-sm-up){
+  @media screen and (min-width: $breakpoint-sm-up) {
     width: 180px;
     height: 50px;
     font-size: 16px;
     padding: 0 30px;
   }
-  @media screen and (max-width: $breakpoint-sm-down){
+  @media screen and (max-width: $breakpoint-sm-down) {
     width: 140px;
     height: 42px;
     font-size: 13px;
