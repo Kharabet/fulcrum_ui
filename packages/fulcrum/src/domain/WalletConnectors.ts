@@ -94,7 +94,7 @@ export const squarelink = new SquarelinkConnector({
 export const bitski = new BitskiConnector({
   clientId: configProviders.Bitski_ClientId as string,
   network: networkId,
-  redirectUri: `https://app.fulcrum.trade/callback.html`
+  redirectUri: `${location.origin}/callback.html`
 })
 
 // export const torus = new TorusConnector({ chainId: 1 })
