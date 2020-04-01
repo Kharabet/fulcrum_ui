@@ -8,8 +8,30 @@
   width: 100%;
   min-height: $page-min-height;
   max-width: $page-max-width;
-  padding: $page-padding;
-
+  padding: 0 15px;
+  @media screen and (min-width: $breakpoint-min-xl){
+    min-width: 1410px;
+  }
+  @media screen and (max-width: $breakpoint-max-xl){
+    min-width: 1140px;
+  }
+  @media screen and (max-width: $breakpoint-max-lg){
+    min-width: 100%;
+  }
+  h1{
+    font-size: 52px;
+    font-weight: 900;
+    text-align: center;
+    margin-bottom: 25px;
+  }
+  .description{
+    font-size: 15px;
+    line-height: 1.5;
+    color: #758295;
+    max-width: 800px;
+    margin: auto;
+    text-align: center;
+  }
   .refinance-page__main {
     //padding-bottom: 90rem;
     display: flex;
@@ -17,28 +39,6 @@
     align-content: center;
     justify-content: space-between;
     //overflow-y: scroll;
-    .refinance-page__main-centeredOverlay {
-      position: fixed;
-      background-color: rgba(255, 255, 255, 0.65);
-      top:0;
-      left:0;
-      width:100%;
-      height:100%;
-      color:black;
-      text-align: center;
-      border-radius: 1rem;
-      font-size: 6rem;
-      font-weight: 600;
-      z-index: 999;
-    }
-
-    .refinance-page__main-centeredOverlay span {
-      position: absolute;
-      top:50%;
-      left:50%;
-      -webkit-transform:translate(-50%, -50%);
-      transform:translate(-50%, -50%);
-    }
   }
   .refinance-page__main_p {
     display: flex;
@@ -51,15 +51,15 @@
 
 }
 
-@media only screen and (max-width: $mobile-version-width) {
+@media only screen and (max-width: $mobile-version-max-mobile) {
   .refinance-page {
-
-    padding: $page-padding-xs;
     max-width: 100% !important;
     width: 100%;
-    .refinance-page__main {
-      //padding-bottom: 200rem;
+    h1{
+      font-size: 36px;
+    }
+    .description{
+      font-size: 12px;
     }
   }
-
 }

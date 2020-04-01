@@ -1,14 +1,2 @@
 @media screen and (max-width: $mobile-version-max-width) {
-  .on-chain-indicator {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-
-    padding: .25rem 1.25rem .25rem 0;
-
-    // background-color: rgba(169, 181, 199, 0.15);
-  }
-  .on-chain-indicator__container {
-    margin: 3rem 0;
-  }
 }

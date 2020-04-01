@@ -1,68 +1,66 @@
 .header-menu-toggle {
   display: flex;
-  flex-direction: row;
   justify-content: flex-end;
-
   height: 100%;
   width: 1.75rem;
   line-height: 3rem;
-
   cursor: pointer;
 }
 
 .header-menu {
   display: flex;
-  flex-direction: row;
 }
 
 .header-menu__item {
-  width: 8rem;
+  position: relative;
+  @media screen and ( min-width: $mobile-version-max-mobile) {
+    &:not(:first-child) {
+      margin-left: 35px;
+    }
+    &:not(:last-child) {
+      margin-right: 35px;
+    }
+  }
+  @media screen and ( max-width: $breakpoint-max-lg) {
+    &:not(:first-child) {
+      margin-left: 15px;
+    }
+    &:not(:last-child) {
+      margin-right: 15px;
+    }
+  }
 
   a {
-    text-decoration: none;
-    text-align: center;
-    text-transform: uppercase;
-    vertical-align: center;
-
-    height: 3rem;
-    line-height: 3rem;
-
-    color: #acb5c2;
-
-    font-size: 0.875rem;
+    font-size: 18px;
     font-weight: 600;
     font-style: normal;
-    font-stretch: normal;
-    letter-spacing: normal;
-
-    margin-left: auto;
-    margin-right: auto;
-    display: block;
+    line-height: 1.5;
+    text-decoration: none;
+    color: #00c0ab;
 
     &.header-menu__item-link--active {
-      color: black;
-
       .header-menu__item-link__accent-container {
         .header-menu__item-link__accent {
-          background-color: #69bf83;
-          transform: translateY(-0.5rem);
+          height: 8px;
+          width: 70px;
+          border-radius: 6px;
+          background-color: #276bfb;
+          position: absolute;
+          top: -66px;
+          left: 0;
+          right: 0;
+          margin: auto;
         }
       }
     }
 
-    .header-menu__item-link__accent-container {
-      height: 0.125rem;
-
+    /*.header-menu__item-link__accent-container {
       .header-menu__item-link__accent {
-        //width: 0.5rem;
-        height: 0.125rem;
-        margin: 0 2.5rem;
-        border-radius: 0.75rem;
-
-        &--active {
-          background-color: #69bf83;
-        }
+        height: 8px;
+        width: 70px;
+        border-radius: 6px;
+        background-color: #276BFB;
       }
-    }
+    }*/
   }
 }

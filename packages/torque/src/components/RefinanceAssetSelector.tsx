@@ -6,6 +6,7 @@ import { WalletType } from "../domain/WalletType";
 import { TorqueProviderEvents } from "../services/events/TorqueProviderEvents";
 import { TorqueProvider } from "../services/TorqueProvider";
 import { RefinanceAssetSelectorItem } from "./RefinanceAssetSelectorItem";
+import { Loader } from "./Loader";
 
 export interface IRefinanceAssetSelectorProps {
   walletType: WalletType
@@ -170,10 +171,7 @@ export class RefinanceAssetSelector extends Component<IRefinanceAssetSelectorPro
     }
 
     return <div className="refinance-asset-selector">
-      <div className="refinance-page__main-centeredOverlay"
-           style={!this.state.isLoading ? { display: `none` } : undefined}>
-        <span>Loading...</span>
-      </div>
+      {this.state.isLoading ? <Loader /> : null}
       <div className="refinance-page__main-msgCentered" onClick={this.derivedUpdate}
            style={this.state.isItems ? { display: `none` } : undefined}>
         <span>Looks like you don't have any loans available to refinance.</span>

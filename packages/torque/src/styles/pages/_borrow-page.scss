@@ -8,7 +8,16 @@
   width: 100%;
   min-height: $page-min-height;
   max-width: $page-max-width;
-  padding: $page-padding;
+  padding: 0 15px;
+  @media screen and (min-width: $breakpoint-min-xl){
+    min-width: 1410px;
+  }
+  @media screen and (max-width: $breakpoint-max-xl){
+    min-width: 1140px;
+  }
+  @media screen and (max-width: $breakpoint-max-lg){
+    min-width: 100%;
+  }
 
   .borrow-page__main {
     //padding-bottom: 90rem;

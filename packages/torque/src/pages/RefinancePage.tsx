@@ -41,7 +41,8 @@ export class RefinancePage extends PureComponent<IRefinancePageParams & RouteCom
         <div className="refinance-page">
           <HeaderOps isLoading={this.props.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen}/>
           {/*<div className="borrow-page__main" style={walletType === WalletType.Web3 ? { paddingBottom: `90rem`} : undefined}>*/}
-
+          <h1>Refinance Your Loans</h1>
+          <p className="description">Lorem ipsum is placeholder text commonly used in the graphic, print, and publishing industries for previewing layouts and visual mockups.</p>
           <div className="refinance-page__main">
             {isMobileMedia ?
               <RefinanceAssetCompoundLoanMobile walletType={walletType}/>
