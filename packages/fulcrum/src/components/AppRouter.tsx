@@ -87,7 +87,8 @@ export class AppRouter extends Component<any, IAppRouterState> {
 
   public getLibrary = async (provider: any, connector: any): Promise<Web3ProviderEngine> => {
     console.log(provider);
-    await this.onProviderTypeSelect(ProviderTypeDictionary.getProviderTypeByConnector(connector), provider)
+    const providerType = await ProviderTypeDictionary.getProviderTypeByConnector(connector);
+    await this.onProviderTypeSelect(providerType, provider)
     return Web3ConnectionFactory.currentWeb3Engine;
   }
 
@@ -109,6 +110,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
             selectedProviderType={this.state.selectedProviderType}
             providerTypes={[
               ProviderType.MetaMask,
+              ProviderType.TrustWallet,
               ProviderType.Frame,
               ProviderType.Fortmatic,
               ProviderType.Portis,
@@ -186,7 +188,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
 
   public onProviderTypeSelect = async (providerType: ProviderType, provider?: any) => {
 
-    if (!this.state.isLoading && providerType !== FulcrumProvider.Instance.providerType) {
+    if (!this.state.isLoading) {
       FulcrumProvider.Instance.isLoading = true;
 
       await FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.ProviderIsChanging);

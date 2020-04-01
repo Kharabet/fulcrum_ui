@@ -15,6 +15,7 @@ import { ReactComponent as MetamaskLogoShort } from '../assets/images/logo_short
 import { ReactComponent as PortisLogoShort } from '../assets/images/logo_short___portis.svg';
 import { ReactComponent as SquarelinkLogoShort } from '../assets/images/logo_short___squarelink.svg';
 import { ReactComponent as LedgerLogoShort } from '../assets/images/logo_short___ledger.svg';
+import { ReactComponent as TrustWalletLogoShort } from '../assets/images/logo_short___trustwallet.svg';
 
 import {
   injected,
@@ -29,6 +30,7 @@ import { AbstractConnector } from '@web3-react/abstract-connector'
 
 const connectorsByName: { [name: string]: AbstractConnector | null } = {
   [ProviderType.MetaMask]: injected,
+  [ProviderType.TrustWallet]: injected,
   [ProviderType.Frame]: frame,
   [ProviderType.Fortmatic]: fortmatic,
   [ProviderType.Portis]: portis,
@@ -42,6 +44,7 @@ const connectorsByName: { [name: string]: AbstractConnector | null } = {
 export class ProviderTypeDictionary {
   public static providerTypes: Map<ProviderType, ProviderTypeDetails> = new Map<ProviderType, ProviderTypeDetails>([
     [ProviderType.MetaMask, new ProviderTypeDetails("MetaMask", metamask_logo, MetamaskLogo, MetamaskLogoShort, injected)],
+    [ProviderType.TrustWallet, new ProviderTypeDetails("TrustWallet", metamask_logo, TrustWalletLogoShort, TrustWalletLogoShort, injected)],
     [ProviderType.Frame, new ProviderTypeDetails("Frame", metamask_logo, MetamaskLogo, MetamaskLogoShort, frame)],
     [ProviderType.Bitski, new ProviderTypeDetails("Bitski", bitski_logo, BitskiLogo, BitskiLogoShort, bitski)],
     [ProviderType.Fortmatic, new ProviderTypeDetails("Fortmatic", fortmatic_logo, FortmaticLogo, FortmaticLogoShort, fortmatic)],
@@ -52,7 +55,10 @@ export class ProviderTypeDictionary {
     [ProviderType.None, new ProviderTypeDetails("None", null, null, null, null)]
   ]);
 
-  public static getProviderTypeByConnector(value: AbstractConnector): ProviderType {
+  public static async getProviderTypeByConnector(value: AbstractConnector): Promise<ProviderType> {
+    const provider = await value.getProvider();
+    if (value === injected)
+      return provider.isMetaMask ? ProviderType.MetaMask : ProviderType.TrustWallet;
     return Object.keys(connectorsByName).find(key => connectorsByName[key] === value) as ProviderType;
 
   }

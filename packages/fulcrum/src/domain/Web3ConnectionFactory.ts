@@ -75,7 +75,11 @@ export class Web3ConnectionFactory {
           await provider.start();
           web3Wrapper = new Web3Wrapper(provider);
         }
-        else {
+        else if (providerType === ProviderType.MetaMask) {
+          providerEngine.addProvider(new MetamaskSubprovider(provider));
+          await providerEngine.start();
+          web3Wrapper = new Web3Wrapper(providerEngine);
+        }else{
           providerEngine.addProvider(new SignerSubprovider(provider));
           await providerEngine.start();
           web3Wrapper = new Web3Wrapper(providerEngine);
