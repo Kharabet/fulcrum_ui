@@ -1,69 +1,55 @@
 .footer {
-  justify-self: flex-end;
-
   display: flex;
-  flex-shrink: 0;
-  flex-direction: row;
   justify-content: space-between;
-
-  margin-top: auto;
-  padding-top: 1.5rem;
-  padding-bottom: 1.75rem;
-  font-size: 0.75rem;
-
+  padding-bottom: 45px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #758295;
+  @media screen and (max-width: $mobile-version-max-width) {
+    flex-direction: column-reverse;
+  }
+  a {
+    text-decoration: none;
+    color: #00c0ab;
+  }
   .footer-version {
-    color: #758295;
-
-    a {
-      color: #758295;
+    display: flex;
+    flex-wrap: wrap;
+    @media screen and (max-width: $mobile-version-max-width) {
+      justify-content: center;
+      margin-top: 15px;
     }
   }
-
   .footer-menu {
+    display: flex;
+    flex-wrap: wrap;
+    @media screen and (max-width: $mobile-version-max-width) {
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .footer-menu__item {
+      @media screen and (max-width: 450px) {
+        &:not(:last-child) {
+          margin-bottom: 10px;
+        }        
+        &:nth-child(3) {
+          margin-right: 0;
+        }
+        &:last-child {
+          text-align: center;
+          width: 100%;
+          margin-left: 0;
+        }
+      }
+    }
   }
 
   .footer-menu__item {
-    display: inline-block;
-
-    color: #758295;
-
     &:not(:first-child) {
-      margin-left: 1.5rem;
+      margin-left: 15px;
     }
-
-    a {
-      color: #758295;
-    }
-  }
-}
-
-@media screen and (max-width: $mobile-version-max-width) {
-  .footer {
-    flex-direction: column-reverse;
-
-    .footer-version {
-      display: flex;
-      flex-direction: row;
-      justify-content: center;
-    }
-
-    .footer-menu {
-      display: flex;
-      flex-direction: row;
-      justify-content: center;
-
-      margin-bottom: 1.5rem;
-
-      flex-wrap: wrap;
-      margin-bottom: 0;
-    }
-
-    .footer-menu__item {
-      margin-bottom: 10px;
-      width: 33%;
-      &:not(:first-child) {
-        margin-left: 0;
-      }
+    &:not(:last-child) {
+      margin-right: 15px;
     }
   }
 }
