@@ -190,12 +190,40 @@
       margin-top: 10px;
       float: left;
     }
+    .refinance-asset-selector__collateral{
+      display: flex;
+      flex-wrap: wrap;
+      width: 50%;
+      margin-top: 20px;
+      .refinance-asset-selector__loan{
+        width: calc(100% - 40px);
+      }
+    }
+    .refinance-asset-selector__collateral_info{
+      width: 100%;
+      font-size: 12px;
+      line-height: 1.5;
+      margin-top: 15px;
+      padding: 15px;
+      border: 1px solid rgba(169, 181, 199, 0.2);
+      border-radius: 4px;
+    }
+    .refinance-asset-selector__info_icon{
+      display: flex;
+    }
     .refinance-asset-selector__loan {
       font-size: 28px;
       font-weight: 800;
       color: #000000;
       width: calc(50% - 40px);
       margin-top: 10px;
+      .refinance-asset-selector__info {
+        display: flex;
+        svg {
+          margin-left: 10px;
+          cursor: pointer;
+        }
+      }
     }
     .refinance-asset-selector__detail {
       margin-top: 10px;

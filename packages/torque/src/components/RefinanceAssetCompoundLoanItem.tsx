@@ -5,7 +5,7 @@ import { ReactComponent as ArrowRight } from "../assets/images/arrow.svg";
 import { ReactComponent as CompoundImg } from "../assets/images/compound.svg";
 import { ReactComponent as DownArrow } from "../assets/images/down-arrow.svg";
 import { ReactComponent as Btc } from "../assets/images/ic_token_btc.svg";
-import { ReactComponent as Dai }  from "../assets/images/ic_token_dai.svg";
+import { ReactComponent as Dai } from "../assets/images/ic_token_dai.svg";
 import { ReactComponent as Eth } from "../assets/images/ic_token_eth.svg";
 import { ReactComponent as Knc } from "../assets/images/ic_token_knc.svg";
 import { ReactComponent as Link } from "../assets/images/ic_token_link.svg";
@@ -20,9 +20,14 @@ import { IRefinanceLoan } from "../domain/RefinanceData";
 import { TorqueProviderEvents } from "../services/events/TorqueProviderEvents";
 import { TorqueProvider } from "../services/TorqueProvider";
 import { ReactComponent as DydxImg } from "../assets/images/dydx.svg";
+import { ReactComponent as IconInfo } from "../assets/images/icon_info.svg";
+import { ReactComponent as IconInfoActive } from "../assets/images/icon_info_active.svg";
+import { CollateralInfo } from "./CollateralInfo";
 
 interface IRefinanceAssetCompoundLoanItemState {
   isShow: boolean;
+  isShowInfoCollateralAssetDt0: boolean;
+  isShowInfoCollateralAssetDt1: boolean;
   isLoading: boolean;
   isTrack: boolean;
   inputAmountText: number;
@@ -38,6 +43,8 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceLoan, IR
     super(props);
     this.state = {
       isShow: true,
+      isShowInfoCollateralAssetDt0: false,
+      isShowInfoCollateralAssetDt1: false,
       inputAmountText: parseInt(this.props.balance.dp(3, BigNumber.ROUND_FLOOR).toString(), 10),
       borrowAmount: this.props.balance,
       fixedApr: new BigNumber(0),
@@ -107,9 +114,9 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceLoan, IR
   };
 
   public migrateLoan = async () => {
-    if(this.props.type=="dydx"){
+    if (this.props.type == "dydx") {
       await TorqueProvider.Instance.migrateSoloLoan(this.props, this.props.balance.div(10)); // TODO
-    }else{
+    } else {
       await TorqueProvider.Instance.migrateCompoundLoan(this.props, this.props.balance.div(10)); // TODO
     }
   };
@@ -117,6 +124,14 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceLoan, IR
   private derivedUpdate = async () => {
     const interestRate = await TorqueProvider.Instance.getAssetInterestRate(this.props.collateral[0].asset);
     this.setState({ ...this.state, fixedApr: interestRate });
+  };
+
+  public showInfoCollateralAssetDt0 = () => {
+    this.setState({ ...this.state, isShowInfoCollateralAssetDt0: !this.state.isShowInfoCollateralAssetDt0 });
+  };
+
+  public showInfoCollateralAssetDt1 = () => {
+    this.setState({ ...this.state, isShowInfoCollateralAssetDt1: !this.state.isShowInfoCollateralAssetDt1 });
   };
 
   public render() {
@@ -128,16 +143,18 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceLoan, IR
       collateralAssetDt2 = this.getAssetsData(this.props.collateral[1].asset);
     }
     this.getAssetsData(this.props.collateral[0].asset);
-    const head_image = this.props.type=="dydx" ? <DydxImg /> : <CompoundImg />;
+    const head_image = this.props.type == "dydx" ? <DydxImg /> : <CompoundImg />;
     const assetTypeModifier = !this.state.isShow ? "asset-collateral-show" : "asset-collateral-hide";
     const showDetailsValue = this.state.isShow ? "Show details" : "Hide details";
     const arrowIcon = !this.state.isShow ? <TopArrow /> : <DownArrow />;
     const arrowDiv = !this.state.isShow ? "arrow-div-down" : "arrow-div-top";
-    let btnValue =  'Refinance with '+this.state.fixedApr.dp(1, BigNumber.ROUND_CEIL).toString()+'% APR Fixed' ;
-    let btnActiveValue =  'Refinance with '+this.state.fixedApr.dp(1, BigNumber.ROUND_CEIL).toString()+'% APR Fixed'
+    let btnValue = 'Refinance with ' + this.state.fixedApr.dp(1, BigNumber.ROUND_CEIL).toString() + '% APR Fixed';
+    let btnActiveValue = 'Refinance with ' + this.state.fixedApr.dp(1, BigNumber.ROUND_CEIL).toString() + '% APR Fixed'
     const refRateYear = ((parseFloat(this.props.apr.dp(0, BigNumber.ROUND_CEIL).toString()) - parseFloat(this.state.fixedApr.dp(1, BigNumber.ROUND_CEIL).toString())) * parseFloat(this.props.balance.dp(3, BigNumber.ROUND_FLOOR).toString())) / 100;
     const refRateMonth = refRateYear / 12;
     const btnCls = this.props.apr.gt(this.state.fixedApr) ? "mt30" : "";
+    const iconInfoCollateralAssetDt0 = this.state.isShowInfoCollateralAssetDt0 ? <IconInfoActive /> : <IconInfo />;
+    const iconInfoCollateralAssetDt1 = this.state.isShowInfoCollateralAssetDt1 ? <IconInfoActive /> : <IconInfo />;
     return (
 
       <div className={`refinance-asset-selector-item `}>
@@ -198,7 +215,7 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceLoan, IR
             <div className="refinance-asset-selector__imglogo">
               <div className="refinance-asset-selector__icon">
                 {loanAssetDt}
-              </div>              
+              </div>
               {/*<img className="refinance-loan-type__img" src={loanAssetDt.img}/>*/}
               <div className="refinance-asset-selector__loantxt ml7">{this.props.asset}</div>
             </div>
@@ -208,7 +225,7 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceLoan, IR
           <div className="refinance-asset-selector__row">
             <div className="refinance-asset-selector__loanBlank"></div>
             <div className="refinance-asset-selector__detail cursor-pointer" onClick={this.showDetails}>
-              <span>{showDetailsValue}</span>    
+              <span>{showDetailsValue}</span>
               <div className={`${arrowDiv}`}>
                 {arrowIcon}
                 {/*<img className="arrow-icon" src={arrowIcon}/>*/}
@@ -222,17 +239,29 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceLoan, IR
               {this.props.isDisabled ? (
                 <div className="refinanace-title-text">Collateralization should be 150%+</div>) : null}
             </div>
-            <div className="refinance-asset-selector__loan">
-              <div className="refinance-asset-selector__value">{this.props.collateral[0].balance.dp(3, BigNumber.ROUND_FLOOR).toString()}</div>
-              <div className="refinance-asset-selector__loantxt">Collateral</div>
-            </div>
-
-            <div className="refinance-asset-selector__imglogo">
-              <div className="refinance-asset-selector__icon">
-                {collateralAssetDt}
-              </div>              
-              {/*<img className="refinance-loan-type__img" src={collateralAssetDt.img}/>*/}
-              <div className="refinance-asset-selector__loantxt ml7">{this.props.collateral[0].asset}</div>
+            <div className="refinance-asset-selector__collateral">
+              <div className="refinance-asset-selector__loan">
+                <div className="refinance-asset-selector__info">
+                  <div className="refinance-asset-selector__value">
+                    {this.props.collateral[0].balance.dp(3, BigNumber.ROUND_FLOOR).toString()}
+                  </div>
+                  <div className="refinance-asset-selector__info_icon" onClick={this.showInfoCollateralAssetDt0}>
+                    {iconInfoCollateralAssetDt0}
+                  </div>
+                </div>
+                <div className="refinance-asset-selector__loantxt">Collateral</div>
+              </div>
+              <div className="refinance-asset-selector__imglogo">
+                <div className="refinance-asset-selector__icon">
+                  {collateralAssetDt}
+                </div>
+                {/*<img className="refinance-loan-type__img" src={collateralAssetDt.img}/>*/}
+                <div className="refinance-asset-selector__loantxt ml7">{this.props.collateral[0].asset}</div>
+              </div>
+              {this.state.isShowInfoCollateralAssetDt0
+                ? <CollateralInfo />
+                : null
+              }
             </div>
           </div>
           {collateralAssetDt2 ? (
@@ -240,19 +269,30 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceLoan, IR
               <div className="refinance-asset-selector__loanBlank">
                 {/*<div className="refinanace-title-text">Collateralization should be 150%+</div>*/}
               </div>
-              <div className="refinance-asset-selector__loan">
-                <div className="refinance-asset-selector__value">{this.props.collateral[1].balance.dp(3, BigNumber.ROUND_FLOOR).toString()}</div>
-                <div className="refinance-asset-selector__loantxt">Collateral</div>
-              </div>
-
-              <div className="refinance-asset-selector__imglogo">
-                <div className="refinance-asset-selector__icon">
-                  {collateralAssetDt2}
+              <div className="refinance-asset-selector__collateral">
+                <div className="refinance-asset-selector__loan">
+                  <div className="refinance-asset-selector__info">
+                    <div className="refinance-asset-selector__value">
+                      {this.props.collateral[1].balance.dp(3, BigNumber.ROUND_FLOOR).toString()}
+                    </div>
+                    <div className="refinance-asset-selector__info_icon" onClick={this.showInfoCollateralAssetDt1}>
+                      {iconInfoCollateralAssetDt1}
+                    </div>
+                  </div>
+                  <div className="refinance-asset-selector__loantxt">Collateral</div>
                 </div>
-                {/*<img className="refinance-loan-type__img" src={collateralAssetDt2.img}/>*/}
-                <div className="refinance-asset-selector__loantxt ml7">{this.props.collateral[1].asset}</div>
+                <div className="refinance-asset-selector__imglogo">
+                  <div className="refinance-asset-selector__icon">
+                    {collateralAssetDt2}
+                  </div>
+                  {/*<img className="refinance-loan-type__img" src={collateralAssetDt2.img}/>*/}
+                  <div className="refinance-asset-selector__loantxt ml7">{this.props.collateral[1].asset}</div>
+                </div>
               </div>
-
+              {this.state.isShowInfoCollateralAssetDt1
+                ? <CollateralInfo />
+                : null
+              }
             </div>) : null}
         </div>
         {/*<div className="linehr"/>*/}
@@ -265,7 +305,7 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceLoan, IR
                 ${refRateYear.toFixed(2)}/yr
               </div>
             </div>
-            : <div className="refinance-asset-selector__desc"/>
+            : <div className="refinance-asset-selector__desc" />
           }
 
           {this.props.isDisabled || this.state.borrowAmount.lte(0) || this.state.borrowAmount.gt(this.props.balance) || this.state.isLoading ?
@@ -274,7 +314,7 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceLoan, IR
             </div>
             :
             <div className={`refinance-selector-icons__item refinance-selector-icons-bar__button ${btnCls}`}
-                 onClick={this.migrateLoan}>
+              onClick={this.migrateLoan}>
               {btnActiveValue}
             </div>
           }
