@@ -4,7 +4,7 @@ import { InjectedConnector } from '@web3-react/injected-connector'
 // import { WalletLinkConnector } from '@web3-react/walletlink-connector'
 import { LedgerConnector } from '@web3-react/ledger-connector'
 // import { TrezorConnector } from '@web3-react/trezor-connector'
-// import { FrameConnector } from '@web3-react/frame-connector'
+import { FrameConnector } from '@web3-react/frame-connector'
 // import { AuthereumConnector } from '@web3-react/authereum-connector'
 import { FortmaticConnector } from '@web3-react/fortmatic-connector'
 import { PortisConnector } from '@web3-react/portis-connector'
@@ -72,7 +72,7 @@ export const ledger = new LedgerConnector({
 //   manifestAppUrl: 'http://localhost:1234'
 // })
 
-// export const frame = new FrameConnector({ supportedChainIds: [1] })
+export const frame = new FrameConnector({ supportedChainIds: [1] })
 
 // export const authereum = new AuthereumConnector({ chainId: 42 })
 

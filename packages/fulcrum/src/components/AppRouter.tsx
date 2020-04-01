@@ -109,6 +109,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
             selectedProviderType={this.state.selectedProviderType}
             providerTypes={[
               ProviderType.MetaMask,
+              ProviderType.Frame,
               ProviderType.Fortmatic,
               ProviderType.Portis,
               ProviderType.Bitski,

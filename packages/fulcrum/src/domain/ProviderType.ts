@@ -1,6 +1,7 @@
 export enum ProviderType {
   Alchemy = "Alchemy",
   MetaMask = "Injected",
+  Frame = "Frame",
   Bitski = "Bitski",
   Fortmatic = "Fortmatic",
   Portis = "Portis",

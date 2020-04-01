@@ -22,12 +22,14 @@ import {
   portis,
   squarelink,
   bitski,
-  ledger
+  ledger,
+  frame
 } from './WalletConnectors';
 import { AbstractConnector } from '@web3-react/abstract-connector'
 
 const connectorsByName: { [name: string]: AbstractConnector | null } = {
   [ProviderType.MetaMask]: injected,
+  [ProviderType.Frame]: frame,
   [ProviderType.Fortmatic]: fortmatic,
   [ProviderType.Portis]: portis,
   [ProviderType.Squarelink]: squarelink,
@@ -40,6 +42,7 @@ const connectorsByName: { [name: string]: AbstractConnector | null } = {
 export class ProviderTypeDictionary {
   public static providerTypes: Map<ProviderType, ProviderTypeDetails> = new Map<ProviderType, ProviderTypeDetails>([
     [ProviderType.MetaMask, new ProviderTypeDetails("MetaMask", metamask_logo, MetamaskLogo, MetamaskLogoShort, injected)],
+    [ProviderType.Frame, new ProviderTypeDetails("Frame", metamask_logo, MetamaskLogo, MetamaskLogoShort, frame)],
     [ProviderType.Bitski, new ProviderTypeDetails("Bitski", bitski_logo, BitskiLogo, BitskiLogoShort, bitski)],
     [ProviderType.Fortmatic, new ProviderTypeDetails("Fortmatic", fortmatic_logo, FortmaticLogo, FortmaticLogoShort, fortmatic)],
     [ProviderType.WalletConnect, new ProviderTypeDetails("WalletConnect", walletconnect_logo, WalletconnectLogo, null, null)],
