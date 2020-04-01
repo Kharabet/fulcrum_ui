@@ -68,7 +68,12 @@ export class InjectedConnector extends AbstractConnector {
     if (__DEV__) {
       console.log("Handling 'networkChanged' event with payload", networkId)
     }
-    this.emitUpdate({ chainId: networkId, provider: window.ethereum })
+    this.emitUpdate({
+      chainId: networkId.toString().includes("0x")
+        ? parseInt(networkId.toString(), 16)
+        : networkId
+      , provider: window.ethereum
+    })
   }
 
   public async activate(): Promise<ConnectorUpdate> {
@@ -84,7 +89,7 @@ export class InjectedConnector extends AbstractConnector {
     }
 
     if ((window.ethereum as any).isMetaMask) {
-      ;(window.ethereum as any).autoRefreshOnNetworkChange = false
+      ; (window.ethereum as any).autoRefreshOnNetworkChange = false
     }
 
     // try to activate + get account via eth_requestAccounts
@@ -178,7 +183,7 @@ export class InjectedConnector extends AbstractConnector {
     }
 
     if (!account) {
-        //@ts-ignore
+      //@ts-ignore
       account = parseSendReturn(window.ethereum.send({ method: 'eth_accounts' }))[0]
     }
 
@@ -195,27 +200,26 @@ export class InjectedConnector extends AbstractConnector {
   }
 
   public async isAuthorized(): Promise<boolean> {
+    //@ts-ignore
     if (!window.ethereum) {
-      alert("!window.ethereum")
 
       return false
     }
-    alert("window.ethereum")
 
-    try {
-      return await window.ethereum.send('eth_accounts').then(sendReturn => {
-        if (parseSendReturn(sendReturn).length > 0) {
-          return true
-        } else {
-          
-      alert("send return < 0")
-          return false
-        }
-      })
-    } catch (e){
-      
-      alert(e);
-      return false
-    }
+    // try {
+    //   return window.ethereum.send('eth_accounts').then(sendReturn => {
+    //     if (parseSendReturn(sendReturn).length > 0) {
+    //       return true
+    //     } else {
+
+    //       return false
+    //     }
+    //   })
+    // } catch (e) {
+
+    //   return false
+    // }
+    return true;
+
   }
 }

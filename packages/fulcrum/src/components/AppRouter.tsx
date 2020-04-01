@@ -76,7 +76,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
     window.addEventListener("resize", this.didResize.bind(this));
     this.didResize();
     errors.setLogLevel("error");
-    // this.doNetworkConnect();
+    this.doNetworkConnect();
   }
 
   public componentWillUnmount(): void {
@@ -87,8 +87,6 @@ export class AppRouter extends Component<any, IAppRouterState> {
 
   public getLibrary = async (provider: any, connector: any): Promise<Web3ProviderEngine> => {
     console.log(provider);
-alert("get library")
-
     const providerType = await ProviderTypeDictionary.getProviderTypeByConnector(connector);
     await this.onProviderTypeSelect(providerType, provider)
     return Web3ConnectionFactory.currentWeb3Engine;
@@ -184,7 +182,6 @@ alert("get library")
   }
 
   public doNetworkConnect = async () => {
-alert("donetwork connect")
     await this._isMounted && this.setState({ ...this.state, isProviderMenuModalOpen: true });
   };
 
@@ -192,7 +189,6 @@ alert("donetwork connect")
 
     if (!this.state.isLoading) {
       FulcrumProvider.Instance.isLoading = true;
-      alert("onProviderTypeSelect")
 
       await FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.ProviderIsChanging);
 

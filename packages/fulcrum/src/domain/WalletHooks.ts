@@ -10,15 +10,11 @@ export function useEagerConnect() {
 
   useEffect(() => {
     injected.isAuthorized().then((isAuthorized: boolean) => {
-      alert(`Authorized ${isAuthorized}`);
       if (isAuthorized) {
-        activate(injected, (err) => alert(err)).catch((e) => {
-          alert("catch");
-          alert(e);
+        activate(injected, undefined, true).catch((e) => {
           setTried(true)
         })
       } else {
-        alert("not authorized");
 
         setTried(true)
       }

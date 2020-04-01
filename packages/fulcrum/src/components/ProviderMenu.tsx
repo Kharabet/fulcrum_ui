@@ -17,7 +17,6 @@ export interface IProviderMenuProps {
 export const ProviderMenu = (props: IProviderMenuProps) => {
   const context = useWeb3React()
   const { connector, library, chainId, account, activate, deactivate, active, error } = context
-  alert("rendering providerMenu");
 
   // handle logic to recognize the connector currently being activated
   //@ts-ignore
@@ -29,28 +28,24 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
   }, [activatingConnector, connector])
 
   // handle logic to eagerly connect to the injected ethereum provider, if it exists and has granted access already
-  const triedEager = useEagerConnect()
-  // if (!activatingConnector && connector !== injected && props.isMobileMedia && FulcrumProvider.Instance.providerType !== ProviderType.MetaMask) {
-  //   alert("activateMobile");
+  if (!activatingConnector && connector !== injected && props.isMobileMedia && FulcrumProvider.Instance.providerType !== ProviderType.MetaMask) {
 
-  //   //@ts-ignore
-  //   setActivatingConnector(injected);
-  //   activate(injected);
-  //   // return <React.Fragment/>;
-  // }
-  // const storedProvider: any = FulcrumProvider.getLocalstorageItem('providerType');
-  // const providerType: ProviderType | null = storedProvider as ProviderType || null;
-  // if (!activatingConnector && providerType && providerType !== FulcrumProvider.Instance.providerType) {
-  //   alert("localstorage");
+    //@ts-ignore
+    setActivatingConnector(injected);
+    activate(injected);
+    // return <React.Fragment/>;
+  }
+  const storedProvider: any = FulcrumProvider.getLocalstorageItem('providerType');
+  const providerType: ProviderType | null = storedProvider as ProviderType || null;
+  if (!activatingConnector && providerType && providerType !== FulcrumProvider.Instance.providerType) {
 
-  //   //@ts-ignore
-  //   setActivatingConnector(ProviderTypeDictionary.getConnectorByProviderType(providerType)!);
-  //   activate(ProviderTypeDictionary.getConnectorByProviderType(providerType)!);
-  //   // return <React.Fragment/>;
-  // }
+    //@ts-ignore
+    setActivatingConnector(ProviderTypeDictionary.getConnectorByProviderType(providerType)!);
+    activate(ProviderTypeDictionary.getConnectorByProviderType(providerType)!);
+    // return <React.Fragment/>;
+  }
   // handle logic to connect in reaction to certain events on the injected ethereum provider, if it exists
-  useInactiveListener(!triedEager || !!activatingConnector);
-  alert(`eager ${triedEager}`)
+  // useInactiveListener(!triedEager || !!activatingConnector);
   const renderItems = () => {
     return props.providerTypes.map(e => {
       const currentConnector = ProviderTypeDictionary.getConnectorByProviderType(e);
@@ -75,7 +70,6 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
       />
     });
   }
-  alert("render as usual")
 
   return (
     <div className="provider-menu">
