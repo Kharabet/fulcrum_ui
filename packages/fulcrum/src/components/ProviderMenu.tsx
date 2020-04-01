@@ -5,6 +5,7 @@ import { useWeb3React } from '@web3-react/core'
 import { useEagerConnect, useInactiveListener } from '../domain/WalletHooks'
 import { ProviderTypeDictionary } from "../domain/ProviderTypeDictionary";
 import { FulcrumProvider } from "../services/FulcrumProvider";
+import { injected } from "../domain/WalletConnectors";
 
 export interface IProviderMenuProps {
   providerTypes: ProviderType[];
@@ -16,36 +17,40 @@ export interface IProviderMenuProps {
 export const ProviderMenu = (props: IProviderMenuProps) => {
   const context = useWeb3React()
   const { connector, library, chainId, account, activate, deactivate, active, error } = context
-
+  alert("rendering providerMenu");
 
   // handle logic to recognize the connector currently being activated
   //@ts-ignore
-  const [activatingConnector, setActivatingConnector] = React.useState(undefined)
+  const [activatingConnector, setActivatingConnector] = React.useState()
   React.useEffect(() => {
     if (activatingConnector && activatingConnector === connector) {
-      //@ts-ignore
       setActivatingConnector(undefined)
     }
   }, [activatingConnector, connector])
 
   // handle logic to eagerly connect to the injected ethereum provider, if it exists and has granted access already
-  // const triedEager = useEagerConnect()
-  if (!activatingConnector && props.isMobileMedia && FulcrumProvider.Instance.providerType !== ProviderType.MetaMask) {
-    //@ts-ignore
-    setActivatingConnector(ProviderTypeDictionary.getConnectorByProviderType(ProviderType.MetaMask)!);
-    activate(ProviderTypeDictionary.getConnectorByProviderType(ProviderType.MetaMask)!);
-    return <React.Fragment/>;
-  }
-  const storedProvider: any = FulcrumProvider.getLocalstorageItem('providerType');
-  const providerType: ProviderType | null = storedProvider as ProviderType || null;
-  if (!activatingConnector && providerType && providerType !== FulcrumProvider.Instance.providerType) {
-    //@ts-ignore
-    setActivatingConnector(ProviderTypeDictionary.getConnectorByProviderType(providerType)!);
-    activate(ProviderTypeDictionary.getConnectorByProviderType(providerType)!);
-    return <React.Fragment/>;
-  }
+  const triedEager = useEagerConnect()
+  // if (!activatingConnector && connector !== injected && props.isMobileMedia && FulcrumProvider.Instance.providerType !== ProviderType.MetaMask) {
+  //   alert("activateMobile");
+
+  //   //@ts-ignore
+  //   setActivatingConnector(injected);
+  //   activate(injected);
+  //   // return <React.Fragment/>;
+  // }
+  // const storedProvider: any = FulcrumProvider.getLocalstorageItem('providerType');
+  // const providerType: ProviderType | null = storedProvider as ProviderType || null;
+  // if (!activatingConnector && providerType && providerType !== FulcrumProvider.Instance.providerType) {
+  //   alert("localstorage");
+
+  //   //@ts-ignore
+  //   setActivatingConnector(ProviderTypeDictionary.getConnectorByProviderType(providerType)!);
+  //   activate(ProviderTypeDictionary.getConnectorByProviderType(providerType)!);
+  //   // return <React.Fragment/>;
+  // }
   // handle logic to connect in reaction to certain events on the injected ethereum provider, if it exists
-  // useInactiveListener(!triedEager || !!activatingConnector);
+  useInactiveListener(!triedEager || !!activatingConnector);
+  alert(`eager ${triedEager}`)
   const renderItems = () => {
     return props.providerTypes.map(e => {
       const currentConnector = ProviderTypeDictionary.getConnectorByProviderType(e);
@@ -70,8 +75,9 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
       />
     });
   }
+  alert("render as usual")
 
-  return activatingConnector ? <React.Fragment/> : (
+  return (
     <div className="provider-menu">
       <div className="provider-menu__title">Select Wallet Provider</div>
       <ul className="provider-menu__list">{renderItems()}</ul>
