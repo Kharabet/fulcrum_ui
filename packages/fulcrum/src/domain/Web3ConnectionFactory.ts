@@ -70,7 +70,7 @@ export class Web3ConnectionFactory {
     const provider = connector ? await connector.getProvider() : null;
     if (provider && connector) {
       try {
-        if (providerType === ProviderType.Ledger) {
+        if (providerType === ProviderType.Ledger || providerType === ProviderType.Bitski) {
           provider.addProvider(Web3ConnectionFactory.alchemyProvider);
           await provider.start();
           web3Wrapper = new Web3Wrapper(provider);
@@ -79,7 +79,7 @@ export class Web3ConnectionFactory {
           providerEngine.addProvider(new MetamaskSubprovider(provider));
           await providerEngine.start();
           web3Wrapper = new Web3Wrapper(providerEngine);
-        }else{
+        } else {
           providerEngine.addProvider(new SignerSubprovider(provider));
           await providerEngine.start();
           web3Wrapper = new Web3Wrapper(providerEngine);
@@ -100,7 +100,7 @@ export class Web3ConnectionFactory {
         providerEngine.addProvider(Web3ConnectionFactory.alchemyProvider);
 
         // @ts-ignore
-        web3Wrapper = undefined;
+        web3Wrapper = new Web3Wrapper(providerEngine);
       }
 
     } else {

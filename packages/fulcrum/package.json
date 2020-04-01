@@ -78,7 +78,7 @@
   "scripts": {
     "clean": "rm -rf ./node_modules",
     "start": "react-scripts start",
-    "start-mainnet": "cross-env-shell REACT_APP_ETH_NETWORK=mainnet HTTPS=true \"react-scripts start\"",
+    "start-mainnet": "cross-env-shell REACT_APP_ETH_NETWORK=mainnet \"react-scripts start\"",
     "start-ropsten": "cross-env-shell REACT_APP_ETH_NETWORK=ropsten \"react-scripts start\"",
     "start-kovan": "cross-env-shell REACT_APP_ETH_NETWORK=kovan \"react-scripts start\"",
     "start-rinkeby": "cross-env-shell REACT_APP_ETH_NETWORK=rinkeby \"react-scripts start\"",

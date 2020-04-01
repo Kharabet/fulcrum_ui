@@ -24,6 +24,7 @@ interface BitskiConnectorArguments {
 export class BitskiConnector extends AbstractConnector {
   private readonly clientId: string;
   private readonly networkName: any;
+  private readonly chainId: number;
 
   public bitski: any
 
@@ -36,6 +37,7 @@ export class BitskiConnector extends AbstractConnector {
       additionalScopes,
       options
     )
+    this.chainId = network;
     this.networkName = chainIdToNetwork[network];
     this.clientId = clientId;
   }
@@ -56,13 +58,12 @@ export class BitskiConnector extends AbstractConnector {
   }
 
   public async getChainId(): Promise<number | string> {
-    const provider = await this.getProvider();
-    return await provider.send('eth_chainId')
+    return this.chainId;
   }
 
   public async getAccount(): Promise<null | string> {
 
-    return await this.bitski.getUser().accounts[0] || null;
+    return (await this.bitski.getUser()).accounts[0] || null;
   }
 
   public async deactivate() {
