@@ -188,31 +188,26 @@
       padding-left: 40px;
     }
     &:not(:last-child){
-      div, span{
-        z-index: 2;
+      background-repeat: no-repeat;
+      background-size: contain;
+      @media screen and (min-width: $breakpoint-md-up){
+        background-image: url(/images/bg-stats.svg);
+        background-position: 100% 0;
       }
       @media screen and (max-width: $breakpoint-md-down){
-        padding-bottom: 90px;
-      }
-      @media screen and (max-width: $breakpoint-sm-down){
+        background-image: url(/images/bg-stats-mobile.svg);
+        background-position: 0 100%;
         padding-bottom: 60px;
       }
     }
     &:last-child {
-      background-color: #8e7df7;      
+      background-color: #8e7df7;    
       @media screen and (min-width: $breakpoint-md-up){
         border-radius: 0 16px 16px 0;
       }
       @media screen and (max-width: $breakpoint-md-down){
         border-radius: 0 0 16px 16px;
         padding-bottom: 30px;
-        margin-top: -30px;
-      }
-      @media screen and (max-width: $breakpoint-sm-down){
-        margin-top: -10px;
-      }
-      div, span{
-        z-index: 3;
       }
     }
     > span {      
@@ -223,23 +218,6 @@
       }
       @media screen and (max-width: $breakpoint-sm-down){
         font-size: 14px;
-      }
-    }
-    .stats-svg{
-      display: flex;
-      position: absolute;
-      right: 0;   
-              
-      @media screen and (min-width: $breakpoint-md-up){
-        top: 0;
-      }
-      @media screen and (max-width: $breakpoint-md-down){
-        bottom: 0;
-        width: 100%;  
-      }
-      svg{
-        width: 100%;
-        height: auto;
       }
     }
   }

@@ -250,10 +250,6 @@ layout: home
                     <div class="item-stats">
                         <div>$<span class="fw-900">5,056,560</span></div>
                         <span>Loans Originated</span>
-                        <div class="stats-svg">
-                            {% include svg/after-stats.svg %}
-                            {% include svg/after-stats-mobile.svg %}
-                        </div>
                     </div>
                     <div class="item-stats">
                         <div>$<span class="fw-900">659,056,560</span></div>
