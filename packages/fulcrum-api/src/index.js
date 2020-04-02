@@ -1,3 +1,4 @@
+require('dotenv').config()
 import http from 'http';
 import express from 'express';
 import cors from 'cors';
@@ -8,10 +9,18 @@ import config from './config.json';
 import swaggerUi from 'swagger-ui-express';
 import swaggerDocument from './swagger.json';
 import winston from 'winston';
+import mongoose from 'mongoose';
+
+
 
 let app = express();
 app.server = http.createServer(app);
 
+
+mongoose.connect(process.env.DATABASE_URL, { useNewUrlParser: true })
+const db = mongoose.connection
+db.on('error', (error) => console.error(error))
+db.once('open', () => console.log('connected to database'))
 
 const logger = winston.createLogger({
     level: 'info',
