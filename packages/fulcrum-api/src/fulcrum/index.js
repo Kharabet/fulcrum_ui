@@ -7,7 +7,9 @@ import { mainnetAddress as oracleAddress, oracleJson } from './contracts/OracleC
 import { iTokenJson } from './contracts/iTokenContract';
 import { pTokenJson } from './contracts/pTokenContract';
 import config from '../config.json';
-
+import { pTokenPricesModel, pTokenPriceModel } from "../models/pTokenPrices"
+import { iTokenPricesModel, iTokenPriceModel } from "../models/iTokenPrices"
+import { statsModel, tokenStatsModel, allTokensStatsModel } from "../models/stats"
 
 
 const UNLIMITED_ALLOWANCE_IN_BASE_UNITS = new BigNumber(2)
@@ -27,15 +29,15 @@ export default class Fulcrum {
 
     async updateCache(key, value) {
         const reserve_data = await this.updateReservedData();
-        await this.storage.setItem("reserve_data", reserve_data);
+        // await this.storage.setItem("reserve_data", reserve_data);
         this.logger.info("reserve_data updated");
 
         const itoken = await this.updateITokensPricesUsd();
-        await this.storage.setItem("itoken-prices-usd", itoken);
+        // await this.storage.setItem("itoken-prices-usd", itoken);
         this.logger.info("itoken-prices-usd updated");
 
         const ptoken = await this.updatePTokensPricesUsd();
-        await this.storage.setItem("ptoken-prices-usd", ptoken);
+        // await this.storage.setItem("ptoken-prices-usd", ptoken);
         this.logger.info("ptoken-prices-usd updated");
 
         return;
@@ -108,22 +110,29 @@ export default class Fulcrum {
     }
 
     async getITokensPricesUsd() {
-        let result = await this.storage.getItem("itoken-prices-usd");
-        if (!result) {
+        const lastITokenPrices = (await iTokenPricesModel.find().sort({ _id: -1 }).select({ iTokenPrices: 1 }).lean().limit(1))[0];
+        if (!lastITokenPrices) {
 
-            this.logger.info("No itoken-prices-usd in cache!")
+            this.logger.info("No itoken-prices-usd in db!");
+            await this.updateITokensPricesUsd();
             // result = await this.updateITokensPricesUsd();
 
             // await this.storage.setItem("itoken-prices-usd", result);
             // console.dir(`itoken-prices-usd:`);
             // console.dir(result);
         }
+        let result = {}
+        lastITokenPrices.iTokenPrices.forEach(iTokenPrice => {
+            result[iTokenPrice.token] = iTokenPrice.priceUsd;
+        })
         return result;
     }
 
     async updateITokensPricesUsd() {
         let result = {};
         const usdRates = await this.getUsdRates();
+        let iTokenPrices = new iTokenPricesModel();
+        iTokenPrices.iTokenPrices = [];
         for (const token in iTokens) {
             const iToken = iTokens[token];
             const iTokenContract = new this.web3.eth.Contract(iTokenJson.abi, iToken.address);
@@ -133,26 +142,38 @@ export default class Fulcrum {
             //price is in loanAsset of iToken contract
             const price = new BigNumber(tokenPrice).multipliedBy(usdRates[iToken.name]).dividedBy(10 ** iToken.decimals);
             result[iToken.iTokenName.toLowerCase()] = price.toNumber();
+            const iTokenPrice = new iTokenPriceModel({
+                token: iToken.iTokenName.toLowerCase(),
+                priceUsd: price.toNumber()
+            });
+            iTokenPrices.iTokenPrices.push(iTokenPrice);
         }
+        await iTokenPrices.save();
         return result;
     }
 
     async getPTokensPricesUsd() {
-        let result = await this.storage.getItem("ptoken-prices-usd");
-        if (!result) {
+        const lastPTokenPrices = (await pTokenPricesModel.find().sort({ _id: -1 }).select({ pTokenPrices: 1 }).lean().limit(1))[0];
+        if (!lastPTokenPrices) {
 
-            this.logger.info("No ptoken-prices-usd in cache!")
-            // result = await this.updatePTokensPricesUsd();
+            this.logger.info("No ptoken-prices-usd in db!");
+            await this.updatePTokensPricesUsd();
             // await this.storage.setItem("ptoken-prices-usd", result);
             // console.dir(`ptoken-prices-usd:`);
             // console.dir(result);
         }
+        let result = {};
+        lastPTokenPrices.pTokenPrices.forEach(pTokenPrice => {
+            result[pTokenPrice.token] = pTokenPrice.priceUsd;
+        })
         return result;
     }
 
     async updatePTokensPricesUsd() {
         let result = {};
         const usdRates = await this.getUsdRates();
+        let pTokenPrices = new pTokenPricesModel();
+        pTokenPrices.pTokenPrices = [];
         try {
             for (const token in pTokens) {
                 const pToken = pTokens[token];
@@ -166,10 +187,16 @@ export default class Fulcrum {
                 //const swapPrice = await this.getSwapToUsdRate(baseAsset);
                 const price = new BigNumber(tokenPrice).multipliedBy(usdRates[baseAsset.toLowerCase()]).dividedBy(10 ** decimals);
                 result[pToken.ticker.toLowerCase()] = price.toNumber();
-            }
+                const pTokenPrice = new pTokenPriceModel({
+                    token: pToken.ticker.toLowerCase(),
+                    priceUsd: price.toNumber()
+                });
+                pTokenPrices.pTokenPrices.push(pTokenPrice);
+            };
+            await pTokenPrices.save();
         }
         catch (e) {
-            this.logger.info(e);
+            this.logger.error(e);
         }
         return result;
     }
@@ -237,15 +264,21 @@ export default class Fulcrum {
 
 
     async  getReserveData() {
-        let result = await this.storage.getItem("reserve_data");
-        if (!result) {
+        const lastReserveData = (await statsModel.find().sort({ _id: -1 }).select({ tokensStats: 1, allTokensStats: 1 }).lean().limit(1))[0];
 
-            this.logger.info("No reserve_data in cache!")
-            // result = await this.updateReservedData();
+        if (!lastReserveData) {
+
+            this.logger.info("No reserve_data in db!")
+            result = await this.updateReservedData();
             // await this.storage.setItem("reserve_data", result);
             // console.dir(`reserve_data:`);
             // console.dir(result);
         }
+        let result = [];
+        lastReserveData.tokensStats.forEach(tokensStat => {
+            result.push(tokensStat);
+        });
+        result.push(lastReserveData.allTokensStats);
         return result;
     }
 
@@ -257,6 +290,8 @@ export default class Fulcrum {
 
         let usdTotalLockedAll = new BigNumber(0);
         let usdSupplyAll = new BigNumber(0);
+        let stats = new statsModel();
+        stats.tokensStats = [];
         if (reserveData && reserveData.totalAssetSupply.length > 0) {
             iTokens.forEach((token, i) => {
                 let totalAssetSupply = new BigNumber(reserveData.totalAssetSupply[i]);
@@ -286,7 +321,7 @@ export default class Fulcrum {
                     usdTotalLockedAll = usdTotalLockedAll.plus(usdTotalLocked);
                 }
 
-                result.push({
+                stats.tokensStats.push(new tokenStatsModel({
                     token: token.name,
                     liquidity: marketLiquidity.dividedBy(10 ** 18).toFixed(),
                     totalSupply: totalAssetSupply.dividedBy(10 ** 18).toFixed(),
@@ -300,14 +335,14 @@ export default class Fulcrum {
                     swapToUSDPrice: new BigNumber(swapRates[i]).dividedBy(10 ** 18).toFixed(),
                     usdSupply: usdSupply.dividedBy(10 ** 18).toFixed(),
                     usdTotalLocked: usdTotalLocked.dividedBy(10 ** 18).toFixed(),
-                });
+                }));
             });
-            result.push({
+            stats.allTokensStats = new allTokensStatsModel({
                 token: "all",
                 usdSupply: usdSupplyAll.dividedBy(10 ** 18).toFixed(),
                 usdTotalLocked: usdTotalLockedAll.dividedBy(10 ** 18).toFixed()
-            })
-
+            });
+            await stats.save();
         }
         return result;
     }

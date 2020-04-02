@@ -12,6 +12,11 @@ export default class Torque {
     }
 
     async getBorrowDepositEstimate(borrowAssetName, collateralAssetName, amount) {
+        const cachedResult = await this.storage.getItem(`borrow-deposit-estimate-${borrowAssetName}_${collateralAssetName}_${amount}`);
+        if (cachedResult) {
+            return cachedResult;
+        }
+        console.log("no cache")
         const result = { depositAmount: new BigNumber(0), gasEstimate: new BigNumber(0) };
         const borrowAsset = iTokens.find(token => token.name === borrowAssetName)
         const collateralAsset = iTokens.find(token => token.name === collateralAssetName)
@@ -37,6 +42,8 @@ export default class Torque {
               ...
             }));*/
         }
+        await this.storage.setItem(`borrow-deposit-estimate-${borrowAssetName}_${collateralAssetName}_${amount}`, result, {ttl: 1000*60*5 /* 5 mins */ });
+
 
         return result;
     }
