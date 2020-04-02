@@ -17,6 +17,7 @@ import { ReactComponent as SquarelinkLogoShort } from '../assets/images/logo_sho
 import { ReactComponent as LedgerLogoShort } from '../assets/images/logo_short___ledger.svg';
 import { ReactComponent as TrustWalletLogoShort } from '../assets/images/logo_short___trustwallet.svg';
 import { ReactComponent as FrameLogoShort } from '../assets/images/logo_short___frame.svg';
+import { ReactComponent as TorusLogoShort } from '../assets/images/logo_short___frame.svg';
 
 import {
   injected,
@@ -25,6 +26,7 @@ import {
   squarelink,
   bitski,
   ledger,
+  torus,
   frame
 } from './WalletConnectors';
 import { AbstractConnector } from '@web3-react/abstract-connector'
@@ -38,6 +40,7 @@ const connectorsByName: { [name: string]: AbstractConnector | null } = {
   [ProviderType.Squarelink]: squarelink,
   [ProviderType.Bitski]: bitski,
   [ProviderType.Ledger]: ledger,
+  [ProviderType.Torus]: torus,
   [ProviderType.None]: null
 }
 
@@ -53,6 +56,7 @@ export class ProviderTypeDictionary {
     [ProviderType.Portis, new ProviderTypeDetails("Portis", portis_logo, PortisLogo, PortisLogoShort, portis)],
     [ProviderType.Squarelink, new ProviderTypeDetails("Squarelink", squarelink_logo, SquarelinkLogo, SquarelinkLogoShort, squarelink)],
     [ProviderType.Ledger, new ProviderTypeDetails("Ledger", ledger_logo, LedgerLogo, LedgerLogoShort, ledger)],
+    [ProviderType.Torus, new ProviderTypeDetails("Torus", ledger_logo, LedgerLogo, TorusLogoShort, torus)],
     [ProviderType.None, new ProviderTypeDetails("None", null, null, null, null)]
   ]);
 

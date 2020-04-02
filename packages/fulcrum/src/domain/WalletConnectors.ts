@@ -12,7 +12,7 @@ import { PortisConnector } from '@web3-react/portis-connector'
 // import { SquarelinkConnector } from '@web3-react/squarelink-connector'
 import { SquarelinkConnector } from './SquarelinkCustomConnector'
 import { BitskiConnector } from './BitskiCustomConnector'
-// import { TorusConnector } from '@web3-react/torus-connector'
+import { TorusConnector } from '@web3-react/torus-connector'
 
 
 import configProviders from "../config/providers.json";
@@ -98,4 +98,4 @@ export const bitski = new BitskiConnector({
   redirectUri: `${location.origin}/callback.html`
 })
 
-// export const torus = new TorusConnector({ chainId: 1 })
+export const torus = new TorusConnector({ chainId: 1 })

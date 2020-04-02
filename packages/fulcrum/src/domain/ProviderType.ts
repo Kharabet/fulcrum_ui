@@ -9,6 +9,7 @@ export enum ProviderType {
   WalletConnect = "WalletConnect",
   Squarelink = "Squarelink",
   Ledger = "Ledger",
+  Torus = "Torus",
   None = "None"
 }
 
