@@ -90,6 +90,10 @@
 .item-blog {
     background-color: var(--secondary-bg);
     border-radius: 16px;
+    &:hover {
+        cursor: pointer;
+        box-shadow: var(--shadow-post);
+    }
     @media (max-width: 767px) {
         max-width: 350px;
         margin: 0 auto 20px auto;
@@ -505,7 +509,7 @@ input[type="number"] {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-  }
+}
 .apr-wrapper {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -516,14 +520,14 @@ input[type="number"] {
         grid-template-columns: repeat(2, 1fr);
     }
 }
-.apr-value-after{
+.apr-value-after {
     position: relative;
-    &:after{
-        content: 'APR';
+    &:after {
+        content: "APR";
         position: absolute;
         font-size: 10px;
-        color: #8992A4;
+        color: #8992a4;
         top: 4px;
-        right: -21px; 
+        right: -21px;
     }
 }
