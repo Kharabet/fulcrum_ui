@@ -2,11 +2,14 @@ const apiUrl = "https://api.bzx.network/v1";
 
 const loader = document.querySelector('.loader');
 
-loader.classList.add('visible');
-(getTorqueBorrowApr)();
-setTimeout(function () {
-    loader.classList.remove('visible')
-}, 500);
+if (loader) {
+    loader.classList.add('visible');
+    (getTorqueBorrowApr)();
+    setTimeout(function () {
+        loader.classList.remove('visible')
+    }, 500);
+}
+
 
 window.addEventListener('load', function () {
     //switch theme
