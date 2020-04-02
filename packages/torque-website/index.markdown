@@ -12,7 +12,7 @@ layout: home
                 <h1 class="mb-40">Borrowing Made Simple</h1>
             </div>
             <div class="col col-7 col-xl-9 col-md-12">
-                <p class="fs-16 fs-xs-12 lh-160 mb-50 c-secondary"><span class="fw-700">Torque</span> is the first crypto loan platform with indefinite-term loans and fixed interest rates. Get an instant crypto-backed loan with no credit checks.</p>
+                <p class="fs-16 fs-xs-12 lh-160 mb-50 c-secondary"><span class="fw-700">Torque</span> is a powerful DeFi platform for borrowing assets with indefinite-term loans and fixed interest rates. Get an instant, crypto-backed loan with no KYC or credit checks.</p>
             </div>
         </div>
         <div class="row">
@@ -115,7 +115,7 @@ layout: home
                             </div>
                             {% include svg/arrow-in-circle.svg %}
                         </a>
-                        <span class="info-after-button">Crypto loans with fixed interest rates [need better call to action here]</span>
+                        <span class="info-after-button">Borrow crypto-assets and stablecoins with fixed interest</span>
                     </div>
                 </div>
                 <div class="col fg-1 fg-lg-initial jc-sb jc-lg-fs fd-md-c">
@@ -137,7 +137,7 @@ layout: home
                             </div>
                             {% include svg/arrow-in-circle.svg %}
                         </a>
-                        <span class="info-after-button">Manage your loan: add or remove collateral  and repay any time</span>
+                        <span class="info-after-button">Add or subtract collateral and repay at any time</span>
                     </div>
                 </div>
             </div>
@@ -161,8 +161,8 @@ layout: home
                             {% include svg/icon-safe-1.svg %}
                         </div>
                         <div class="content-reason">
-                            <h3 class="mb-10">Fixed APR</h3>
-                            <p>Enjoy zero fees on tokenized margin loans and margin positions with Fulcrum.</p>
+                            <h3 class="mb-10">Fixed Interest</h3>
+                            <p>With fixed interest you always know what you’re paying.</p>
                         </div>
                     </div>
                     <div class="item-reason">
@@ -171,7 +171,7 @@ layout: home
                         </div>
                         <div class="content-reason">
                           <h3 class="mb-10">Partial Liquidations</h3>
-                            <p>Enjoy zero fees on tokenized margin loans and margin positions with Fulcrum.</p>
+                            <p>When volatility strikes, we keep your loans collateralized with minimal liquidation, only to bring collateral 10% above margin maintenance.</p>
                         </div>
                     </div>
                     <div class="item-reason">
@@ -179,8 +179,8 @@ layout: home
                             {% include svg/icon-safe-1.svg %}
                         </div>
                         <div class="content-reason">
-                            <h3 class="mb-10">Three clicks. <br /> No credit checks.</h3>
-                            <p>Enjoy zero fees on tokenized margin loans and margin positions with Fulcrum.</p>
+                            <h3 class="mb-10">No KYC, Credit Checks</h3>
+                            <p>We take decentralization seriously. Get a loan with no verification, KYC/AML or credit checks.</p>
                         </div>
                     </div>
                     <div class="item-reason">
@@ -189,7 +189,7 @@ layout: home
                         </div>
                         <div class="content-reason">
                           <h3 class="mb-10">Non custodial</h3>
-                            <p>Enjoy zero fees on tokenized margin loans and margin positions with Fulcrum.</p>
+                            <p>Your keys, your coins, your loans. Always. Control your keys and assets with our non-custodial solution.</p>
                         </div>
                     </div>
                 </div>
@@ -213,28 +213,28 @@ layout: home
                     {% include svg/icon-safe-1.svg %}
                 </div>
                 <h3 class="mb-20">Audited Smart Contracts</h3>
-                <p>The bZx base protocol has been <a href="https://github.com/mattdf/audits/blob/master/bZx/bzx-audit.pdf">successfully audited</a> by leading blockchain security auditor ZK Labs.</p>
+                <p>Our smart contracts have been audited by leading blockchain security auditors ZK Labs and Certik.</p>
             </div>
             <div class="col col-3 col-md-6 col-sm-12 item-safe fd-c">
                 <div class="icon-safe mb-50 mb-xs-15">
                     {% include svg/icon-safe-5.svg %}
                 </div>
                 <h3 class="mb-20">Oracles</h3>
-                <p>If undercollateralized loans are not properly liquidated, lenders are repaid from a pool funded by 10% of the interest paid by borrowers.</p>
+                <p>We work with industry-leading oracle providers to tackle the unique security challenges associated with oracles in a decentralized environment.</p>
             </div>
             <div class="col col-3 col-md-6 col-sm-12 item-safe fd-c">
                 <div class="icon-safe mb-50 mb-xs-15">
                     {% include svg/icon-safe-2.svg %}
                 </div>
                 <h3 class="mb-20">Insurance Fund</h3>
-                <p>If undercollateralized loans are not properly liquidated, lenders are repaid from a pool funded by 10% of the interest paid by borrowers.</p>
+                <p>10% of the interest paid by borrowers goes to an insurance fund used in the event that undercollateralized loans are not properly liquidated.</p>
             </div>
             <div class="col col-3 col-md-6 col-sm-12 item-safe fd-c">
                 <div class="icon-safe mb-50 mb-xs-15">
                     {% include svg/icon-safe-3.svg %}
                 </div>
                 <h3 class="mb-20">Open source</h3>
-                <p>As one of the founding principles of DeFi, we’re committed to interoperability and the development of open source code - <a href="https://github.com/bZxNetwork">see for yourself!</a>
+                <p>Interoperability and Open Source are among the founding principles of DeFi, which bZx is proudly committed to - <a href="https://github.com/bZxNetwork">see for yourself!</a>
               </p>
             </div>
         </div>
