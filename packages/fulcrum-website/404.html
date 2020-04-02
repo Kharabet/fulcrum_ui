@@ -1,60 +1,67 @@
 ---
+title: Page not found
 permalink: /404.html
-layout: default
+layout: 404
 ---
 
-<div class="container-404">
-  <div class="row">
-    <div class="col col-12 flex fd-c">
-      <h1>404</h1>
-      <p><strong>Page not found 😱</strong></p>
-      <p>The requested page could not be found.</p>
-      <h2>Recent posts:</h2>
-      <ul id="list-posts"></ul>
+<section class="bg-primary">
+  {% include header.html %}
+</section>
+
+<section class="bg-primary">
+  <div class="container-404">
+    <div class="row">
+      <div class="col col-12 flex fd-c">
+        <h1>404</h1>
+        <p><strong>Page not found 😱</strong></p>
+        <p>The requested page could not be found.</p>
+        <h2>Recent posts:</h2>
+        <ul id="list-posts"></ul>
+      </div>
     </div>
   </div>
-</div>
+</section>
 
 
 
 <script>
   window.addEventListener('load', function () {
-      renderArticles("https://bzx.network/feed.xml");
+    renderArticles("https://bzx.network/feed.xml");
   });
 
   function renderArticles(url) {
-      get(url).then(res => {
-          var feedHtml = new window.DOMParser().parseFromString(res, "text/xml" );
-          var articleItems = Array.prototype.slice.call(feedHtml.querySelectorAll("rss item"));
-          var articleHTML = articleItems.slice(0, 10).map(item => {
-              var title = item.querySelector("title").textContent;
-              var link = item.querySelector("link").textContent;
-              return `<li>
+    get(url).then(res => {
+      var feedHtml = new window.DOMParser().parseFromString(res, "text/xml" );
+      var articleItems = Array.prototype.slice.call(feedHtml.querySelectorAll("rss item"));
+      var articleHTML = articleItems.slice(0, 10).map(item => {
+        var title = item.querySelector("title").textContent;
+        var link = item.querySelector("link").textContent;
+        return `<li>
                         <a href="${link}" target="_blank">
                           ${title}
                         </a>
                       </li>`;
-          })
-          document.getElementById('list-posts').innerHTML = articleHTML.join('');
       })
+      document.getElementById('list-posts').innerHTML = articleHTML.join('');
+    })
   }
 
   function get(url) {
-      return new Promise(function (resolve, reject) {
-          var req = new XMLHttpRequest();
-          req.open('GET', url);
-          req.onload = function () {
-              if (req.status == 200) {
-                  resolve(req.response);
-              }
-              else {
-                  reject(Error(req.statusText));
-              }
-          };
-          req.onerror = function () {
-              reject(Error("Network Error"));
-          };
-          req.send();
-      });
+    return new Promise(function (resolve, reject) {
+      var req = new XMLHttpRequest();
+      req.open('GET', url);
+      req.onload = function () {
+        if (req.status == 200) {
+          resolve(req.response);
+        }
+        else {
+          reject(Error(req.statusText));
+        }
+      };
+      req.onerror = function () {
+        reject(Error("Network Error"));
+      };
+      req.send();
+    });
   }
 </script>

@@ -1,16 +1,31 @@
 .container-404 {
   margin: 0 auto;
   max-width: 730px;
-  color: #000085;
+  [data-theme="light"] & {
+    color: #000085;
+  }
+  [data-theme="dark"] & {
+    color: #ffffff;
+  }
   h1 {
     font-size: 46px;
-    color: #000085;
     margin: 60px 0 30px 0;
+    [data-theme="light"] & {
+      color: #000085;
+    }
+    [data-theme="dark"] & {
+      color: #ffffff;
+    }
   }
   h2 {
     font-size: 32px;
-    color: #000085;
     margin: 30px 0 15px 0;
+    [data-theme="light"] & {
+      color: #000085;
+    }
+    [data-theme="dark"] & {
+      color: #ffffff;
+    }
     @media(max-width: 579px){
       font-size: 27px;
     }
@@ -26,12 +41,12 @@
     list-style: none;
     margin-bottom: 60px;
     li {
-    font-size: 18px;
+      font-size: 18px;
       line-height: 1.8;
       padding-left: 30px;
       position: relative;
       @media(max-width: 579px){
-          font-size: 14px;
+        font-size: 14px;
       }
       &:before {
         content: "\2022";
