@@ -3,7 +3,8 @@
   "private": true,
   "license": "Apache-2.0",
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "packages/web3-react-6/packages/*"
   ],
   "devDependencies": {
     "cross-env": "^5.2.0",
@@ -13,6 +14,7 @@
     "clean-all": "rm -rf ./packages/**/node_modules ./node_modules",
     "build-all": "yarn run build-alchemy-web3 && yarn run build-fulcrum-ropsten",
     "build-alchemy-web3": "./scripts/build-alchemy-web3.sh",
+    "bootstrap": "lerna bootstrap",
     "build-fulcrum-rinkeby": "cross-env-shell REACT_APP_ETH_NETWORK=rinkeby \"./scripts/build-fulcrum.sh\"",
     "build-fulcrum-kovan": "cross-env-shell REACT_APP_ETH_NETWORK=kovan \"./scripts/build-fulcrum.sh\"",
     "build-fulcrum-ropsten": "cross-env-shell REACT_APP_ETH_NETWORK=ropsten \"./scripts/build-fulcrum.sh\"",
