@@ -63,7 +63,8 @@ window.addEventListener('load', function () {
     }
 });
 
-window.onclick = function (event) {
+const modal = document.querySelector(".modal");
+modal.onclick = function (event) {
     const listSelect = document.querySelectorAll("ul.select-options");
     const selectStyled = document.querySelectorAll(".select-styled");
     const options = document.querySelectorAll(".li-options");
