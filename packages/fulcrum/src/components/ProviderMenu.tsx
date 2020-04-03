@@ -47,7 +47,6 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
 
     //@ts-ignore
     setActivatingConnector(ProviderTypeDictionary.getConnectorByProviderType(providerType)!);
-    //@ts-ignore
     activate(ProviderTypeDictionary.getConnectorByProviderType(providerType)!);
     // return <React.Fragment/>;
   }
@@ -57,7 +56,6 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
     return props.providerTypes.map(e => {
       const currentConnector = ProviderTypeDictionary.getConnectorByProviderType(e);
       const activating = currentConnector === activatingConnector
-      //@ts-ignore
       const connected = currentConnector === connector
       const disabled = !!activatingConnector || connected || !!error
       return < ProviderMenuListItem
@@ -70,7 +68,6 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
           if (!currentConnector) return;
           //@ts-ignore
           setActivatingConnector(currentConnector)
-          //@ts-ignore
           activate(currentConnector, (err) => console.log(err))
         }}
       />
