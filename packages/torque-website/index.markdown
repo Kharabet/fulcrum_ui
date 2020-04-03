@@ -280,7 +280,7 @@ layout: home
                         <span class="lend-count">1</span>
                         {% include svg/step-1.svg %}
                     </div>
-                    <p class="c-dark-gray mt-25">Sellect an asset with fixed APR</p>
+                    <p class="c-dark-gray mt-25">Select an asset with fixed APR</p>
                 </div>
                 <div class="flex fd-c wrapper-svg-blur">
                     <div class="svg-blur mb-45">
