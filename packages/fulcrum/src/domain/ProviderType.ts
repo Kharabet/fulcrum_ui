@@ -10,6 +10,7 @@ export enum ProviderType {
   Ledger = "Ledger",
   Torus = "Torus",
   Authereum = "Authereum",
+  Trezor = "Trezor",
   None = "None"
 }
 
