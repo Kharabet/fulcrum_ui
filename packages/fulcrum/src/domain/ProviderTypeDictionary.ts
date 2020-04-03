@@ -17,7 +17,7 @@ import { ReactComponent as SquarelinkLogoShort } from '../assets/images/logo_sho
 import { ReactComponent as LedgerLogoShort } from '../assets/images/logo_short___ledger.svg';
 import { ReactComponent as TrustWalletLogoShort } from '../assets/images/logo_short___trustwallet.svg';
 import { ReactComponent as FrameLogoShort } from '../assets/images/logo_short___frame.svg';
-import { ReactComponent as TorusLogoShort } from '../assets/images/logo_short___frame.svg';
+import { ReactComponent as TorusLogoShort } from '../assets/images/logo_short___torus.svg';
 
 import {
   injected,

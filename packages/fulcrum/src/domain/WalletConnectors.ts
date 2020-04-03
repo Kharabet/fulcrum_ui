@@ -30,11 +30,12 @@ const getNetworkIdByString = (networkName: string | undefined) => {
       return 0;
   }
 }
-const networkId = getNetworkIdByString(process.env.REACT_APP_ETH_NETWORK);
+const networkName = process.env.REACT_APP_ETH_NETWORK;
+const networkId = getNetworkIdByString(networkName);
 
 const RPC_URL = networkId === 42
-  ? `https://eth-${process.env.REACT_APP_ETH_NETWORK}.alchemyapi.io/jsonrpc/${configProviders.Alchemy_ApiKey_kovan}`
-  : `https://eth-${process.env.REACT_APP_ETH_NETWORK}.alchemyapi.io/jsonrpc/${configProviders.Alchemy_ApiKey}`
+  ? `https://eth-${networkName}.alchemyapi.io/jsonrpc/${configProviders.Alchemy_ApiKey_kovan}`
+  : `https://eth-${networkName}.alchemyapi.io/jsonrpc/${configProviders.Alchemy_ApiKey}`
 
 const POLLING_INTERVAL = 3600000
 
@@ -98,4 +99,19 @@ export const bitski = new BitskiConnector({
   redirectUri: `${location.origin}/callback.html`
 })
 
-export const torus = new TorusConnector({ chainId: 1 })
+export const torus = new TorusConnector({
+  chainId: 1, 
+  constructorOptions: {
+    buttonPosition: 'top-left' // default: bottom-left
+  },
+  initOptions: {
+    buildEnv: 'production',
+    enableLogging: false,
+    network: {
+      host: networkName || "mainnet",
+      chainId: 1,
+      networkName: "Main Ethereum Network"
+    },
+    showTorusButton: true
+  } 
+})
