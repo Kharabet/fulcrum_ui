@@ -11,6 +11,7 @@ import { ReactComponent as TrustWalletLogoShort } from '../assets/images/logo_sh
 import { ReactComponent as TorusLogoShort } from '../assets/images/logo_short___torus.svg';
 import { ReactComponent as AuthereumLogoShort } from '../assets/images/logo_short___authereum.svg';
 import { ReactComponent as TrezorLogoShort } from '../assets/images/logo_short___trezor.svg';
+import { ReactComponent as WalletConnectLogoShort } from '../assets/images/logo_short___walletconnect.svg';
 
 import {
   injected,
@@ -21,7 +22,8 @@ import {
   ledger,
   torus,
   authereum,
-  trezor
+  trezor,
+  walletconnect
 } from './WalletConnectors';
 import { AbstractConnector } from '@web3-react/abstract-connector'
 
@@ -36,6 +38,7 @@ const connectorsByName: { [name: string]: AbstractConnector | null } = {
   [ProviderType.Torus]: torus,
   [ProviderType.Authereum]: authereum,
   [ProviderType.Trezor]: trezor,
+  [ProviderType.WalletConnect]: walletconnect,
   [ProviderType.None]: null
 }
 
@@ -51,7 +54,8 @@ export class ProviderTypeDictionary {
     ProviderType.Ledger,
     ProviderType.Torus,
     ProviderType.Authereum,
-    ProviderType.Trezor
+    ProviderType.Trezor,
+    ProviderType.WalletConnect
   ];
 
   public static providerTypes: Map<ProviderType, ProviderTypeDetails> = new Map<ProviderType, ProviderTypeDetails>([
@@ -59,7 +63,7 @@ export class ProviderTypeDictionary {
     [ProviderType.TrustWallet, new ProviderTypeDetails("TrustWallet", TrustWalletLogoShort, injected)],
     [ProviderType.Bitski, new ProviderTypeDetails("Bitski", BitskiLogoShort, bitski)],
     [ProviderType.Fortmatic, new ProviderTypeDetails("Fortmatic", FortmaticLogoShort, fortmatic)],
-    [ProviderType.WalletConnect, new ProviderTypeDetails("WalletConnect", null, null)],
+    [ProviderType.WalletConnect, new ProviderTypeDetails("WalletConnect", WalletConnectLogoShort, walletconnect)],
     [ProviderType.Portis, new ProviderTypeDetails("Portis", PortisLogoShort, portis)],
     [ProviderType.Squarelink, new ProviderTypeDetails("Squarelink", SquarelinkLogoShort, squarelink)],
     [ProviderType.Ledger, new ProviderTypeDetails("Ledger", LedgerLogoShort, ledger)],
