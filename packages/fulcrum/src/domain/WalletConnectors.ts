@@ -1,19 +1,15 @@
 import { InjectedConnector } from '@web3-react/injected-connector';
-// import { InjectedConnector } from './InjectedCustomProvider';
-// import { NetworkConnector } from '@web3-react/network-connector'
-import { WalletConnectConnector } from '@web3-react/walletconnect-connector'
-import { WalletLinkConnector } from '@web3-react/walletlink-connector'
-import { LedgerConnector } from '@web3-react/ledger-connector'
-import { TrezorConnector } from '@web3-react/trezor-connector'
+import { WalletConnectConnector } from '@web3-react/walletconnect-connector';
+import { WalletLinkConnector } from '@web3-react/walletlink-connector';
+import { LedgerConnector } from '@web3-react/ledger-connector';
+import { TrezorConnector } from '@web3-react/trezor-connector';
 // import { FrameConnector } from '@web3-react/frame-connector'
-import { AuthereumConnector } from '@web3-react/authereum-connector'
-import { FortmaticConnector } from '@web3-react/fortmatic-connector'
-import { PortisConnector } from '@web3-react/portis-connector'
-import { SquarelinkConnector } from '@web3-react/squarelink-connector'
-// import { SquarelinkConnector } from './SquarelinkCustomConnector'
-// import { BitskiConnector } from './BitskiCustomConnector'
-import { BitskiConnector } from '@web3-react/bitski-connector'
-import { TorusConnector } from '@web3-react/torus-connector'
+import { AuthereumConnector } from '@web3-react/authereum-connector';
+import { FortmaticConnector } from '@web3-react/fortmatic-connector';
+import { PortisConnector } from '@web3-react/portis-connector';
+import { SquarelinkConnector } from '@web3-react/squarelink-connector';
+import { BitskiConnector } from '@web3-react/bitski-connector';
+import { TorusConnector } from '@web3-react/torus-connector';
 
 import fulcrumLogo from "../assets/images/fulcrum_logo.svg";
 
