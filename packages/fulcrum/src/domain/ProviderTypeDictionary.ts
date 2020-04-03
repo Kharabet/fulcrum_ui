@@ -29,7 +29,7 @@ import {
 } from './WalletConnectors';
 import { AbstractConnector } from '@web3-react/abstract-connector'
 
-const connectorsByName: { [name: string]: AbstractConnector | null } = {
+const connectorsByName: { [name: string]: any | null } = {
   [ProviderType.MetaMask]: injected,
   [ProviderType.TrustWallet]: injected,
   [ProviderType.Fortmatic]: fortmatic,
@@ -82,6 +82,7 @@ export class ProviderTypeDictionary {
 
   public static async getProviderTypeByConnector(value: AbstractConnector): Promise<ProviderType> {
     const provider = await value.getProvider();
+    //@ts-ignore 
     if (value === injected)
       return provider.isMetaMask ? ProviderType.MetaMask : ProviderType.TrustWallet;
     return Object.keys(connectorsByName).find(key => connectorsByName[key] === value) as ProviderType;
