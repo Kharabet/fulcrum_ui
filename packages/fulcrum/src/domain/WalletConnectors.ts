@@ -11,7 +11,8 @@ import { FortmaticConnector } from '@web3-react/fortmatic-connector'
 import { PortisConnector } from '@web3-react/portis-connector'
 import { SquarelinkConnector } from '@web3-react/squarelink-connector'
 // import { SquarelinkConnector } from './SquarelinkCustomConnector'
-import { BitskiConnector } from './BitskiCustomConnector'
+// import { BitskiConnector } from './BitskiCustomConnector'
+import { BitskiConnector } from '@web3-react/bitski-connector'
 import { TorusConnector } from '@web3-react/torus-connector'
 
 import fulcrumLogo from "../assets/images/fulcrum_logo.svg";
