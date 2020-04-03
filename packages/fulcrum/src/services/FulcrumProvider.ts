@@ -1534,7 +1534,8 @@ export class FulcrumProvider {
       }
       if (account) {
         // @ts-ignore
-        const resp = await Web3ConnectionFactory.alchemyProvider!.alchemy!.getTokenBalances(account, addressesErc20);
+        const alchemyProvider = await Web3ConnectionFactory.getAlchemyProvider();
+        const resp = await alchemyProvider.alchemy!.getTokenBalances(account, addressesErc20);
         if (resp) {
           // @ts-ignore
           result = resp.tokenBalances.filter(t => !t.error && t.tokenBalance !== "0").reduce((map, obj) => (map.set(obj.contractAddress, new BigNumber(obj.tokenBalance!)), map), new Map<string, BigNumber>());
