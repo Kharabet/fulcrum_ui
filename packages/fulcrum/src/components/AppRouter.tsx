@@ -111,7 +111,6 @@ export class AppRouter extends Component<any, IAppRouterState> {
             providerTypes={[
               ProviderType.MetaMask,
               ProviderType.TrustWallet,
-              ProviderType.Frame,
               ProviderType.Fortmatic,
               ProviderType.Portis,
               ProviderType.Bitski,
