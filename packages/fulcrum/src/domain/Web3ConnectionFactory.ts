@@ -24,6 +24,7 @@ import { AlchemySubprovider } from "@alch/alchemy-web3";
 
 import configProviders from "../config/providers.json";
 
+import { AbstractConnector } from '@web3-react/abstract-connector';
 
 const ethNetwork = process.env.REACT_APP_ETH_NETWORK;
 
@@ -34,6 +35,7 @@ export class Web3ConnectionFactory {
   public static fortmaticProvider: Fortmatic | null;
   public static bitski: Bitski | null;
   public static networkId: number;
+  public static canWrite: boolean;
   private static publicStoreUpdate: any | null;
   public static userAccount: any | null;
   public static currentWeb3Engine: Web3ProviderEngine;
@@ -76,7 +78,7 @@ export class Web3ConnectionFactory {
         //   web3Wrapper = new Web3Wrapper(provider);
         // }
         // else
-         if (providerType === ProviderType.MetaMask) {
+        if (providerType === ProviderType.MetaMask) {
           providerEngine.addProvider(new MetamaskSubprovider(provider));
           await providerEngine.start();
           web3Wrapper = new Web3Wrapper(providerEngine);
@@ -115,9 +117,86 @@ export class Web3ConnectionFactory {
     Web3ConnectionFactory.networkId = networkId ? networkId : await web3Wrapper.getNetworkIdAsync();
     Web3ConnectionFactory.currentWeb3Engine = providerEngine;
     Web3ConnectionFactory.currentWeb3Wrapper = web3Wrapper;
+    Web3ConnectionFactory.canWrite = canWrite;
 
 
     return [web3Wrapper, providerEngine, canWrite, Web3ConnectionFactory.networkId, Web3ConnectionFactory.userAccount];
+  }
+
+  public static async setWalletProvider(connector: AbstractConnector, web3ReactAccount?: string) {
+    let canWrite = false;
+    let networkId: number = 0;
+    let web3Wrapper: Web3Wrapper;
+
+    let providerEngine: Web3ProviderEngine = new Web3ProviderEngine({ pollingInterval: 3600000 }); // 1 hour polling
+
+    if (!Web3ConnectionFactory.alchemyProvider) {
+      let key;
+      if (ethNetwork === "kovan") {
+        key = configProviders.Alchemy_ApiKey_kovan;
+      } else {
+        key = configProviders.Alchemy_ApiKey
+      }
+      Web3ConnectionFactory.alchemyProvider = new AlchemySubprovider(`https://eth-${ethNetwork}.alchemyapi.io/jsonrpc/${configProviders.Alchemy_ApiKey}`, { writeProvider: null });
+    }
+    providerEngine.addProvider(Web3ConnectionFactory.alchemyProvider);
+
+    const provider = await connector.getProvider();
+
+    try {
+
+      providerEngine.addProvider(new SignerSubprovider(provider));
+      await providerEngine.start();
+      web3Wrapper = new Web3Wrapper(providerEngine);
+      canWrite = true;
+      const account = await connector.getAccount();
+      const chainId = (await connector.getChainId()).toString();
+      networkId = chainId.includes("0x") ? parseInt(chainId, 16) : parseInt(chainId, 10);
+      Web3ConnectionFactory.userAccount = account
+        ? account
+        : web3ReactAccount ? web3ReactAccount : undefined;
+
+    } catch (e) {
+      console.log(e);
+
+      await providerEngine.stop();
+
+      // rebuild providerEngine
+      providerEngine = new Web3ProviderEngine({ pollingInterval: 3600000 }); // 1 hour polling
+      providerEngine.addProvider(Web3ConnectionFactory.alchemyProvider);
+
+      // @ts-ignore
+      web3Wrapper = new Web3Wrapper(providerEngine);
+    }
+    Web3ConnectionFactory.networkId = networkId ? networkId : await web3Wrapper.getNetworkIdAsync();
+    Web3ConnectionFactory.currentWeb3Engine = providerEngine;
+    Web3ConnectionFactory.currentWeb3Wrapper = web3Wrapper;
+    Web3ConnectionFactory.canWrite = canWrite;
+
+  }
+
+  public static async setReadonlyProvider() {
+
+    let providerEngine: Web3ProviderEngine = new Web3ProviderEngine({ pollingInterval: 3600000 }); // 1 hour polling
+
+    if (!Web3ConnectionFactory.alchemyProvider) {
+      let key;
+      if (ethNetwork === "kovan") {
+        key = configProviders.Alchemy_ApiKey_kovan;
+      } else {
+        key = configProviders.Alchemy_ApiKey
+      }
+      Web3ConnectionFactory.alchemyProvider = new AlchemySubprovider(`https://eth-${ethNetwork}.alchemyapi.io/jsonrpc/${configProviders.Alchemy_ApiKey}`, { writeProvider: null });
+    }
+    providerEngine.addProvider(Web3ConnectionFactory.alchemyProvider);
+
+    // @ts-ignore
+    await providerEngine.start();
+
+    Web3ConnectionFactory.currentWeb3Engine = providerEngine;
+    Web3ConnectionFactory.currentWeb3Wrapper = new Web3Wrapper(providerEngine);
+    Web3ConnectionFactory.networkId = await Web3ConnectionFactory.currentWeb3Wrapper.getNetworkIdAsync();
+    Web3ConnectionFactory.canWrite = false;
   }
 
 

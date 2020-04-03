@@ -6,12 +6,13 @@ import { useEagerConnect, useInactiveListener } from '../domain/WalletHooks'
 import { ProviderTypeDictionary } from "../domain/ProviderTypeDictionary";
 import { FulcrumProvider } from "../services/FulcrumProvider";
 import { injected } from "../domain/WalletConnectors";
+import { AbstractConnector } from '@web3-react/abstract-connector';
 
 export interface IProviderMenuProps {
   providerTypes: ProviderType[];
   selectedProviderType: ProviderType;
   isMobileMedia: boolean;
-  onSelect: (providerType: ProviderType) => void;
+  onSelect: (connector: AbstractConnector, account?: string) => void;
 }
 
 export const ProviderMenu = (props: IProviderMenuProps) => {
@@ -23,6 +24,10 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
   const [activatingConnector, setActivatingConnector] = React.useState()
   React.useEffect(() => {
     if (activatingConnector && activatingConnector === connector) {
+      if (active && connector && account) {
+        connector; 
+        props.onSelect(connector, account);
+      }
       setActivatingConnector(undefined)
     }
   }, [activatingConnector, connector])
@@ -55,15 +60,10 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
       return < ProviderMenuListItem
         key={e}
         providerType={e}
-        isConnected = {connected}
-        isActivating = {activating}
+        isConnected={connected}
+        isActivating={activating}
         selectedProviderType={props.selectedProviderType}
         onSelect={() => {
-          if (e === ProviderType.None) {
-            deactivate()
-            props.onSelect(ProviderType.None);
-            return;
-          }
           if (!currentConnector) return;
           //@ts-ignore
           setActivatingConnector(currentConnector)
@@ -78,11 +78,11 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
       <div className="provider-menu__title">Select Wallet Provider</div>
       <ul className="provider-menu__list">{renderItems()}</ul>
       < button
-      className="disconnect"
+        className="disconnect"
         key={ProviderType.None}
         onClick={() => {
-            deactivate()
-            props.onSelect(ProviderType.None);
+          deactivate()
+          FulcrumProvider.Instance.setReadonlyWeb3Provider();
         }}
       >DISCONNECT
       </button>

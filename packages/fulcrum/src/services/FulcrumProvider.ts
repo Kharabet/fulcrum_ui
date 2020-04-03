@@ -45,7 +45,10 @@ import { UnlendChaiProcessor } from "./processors/UnlendChaiProcessor";
 import { UnlendErcProcessor } from "./processors/UnlendErcProcessor";
 import { UnlendEthProcessor } from "./processors/UnlendEthProcessor";
 
+import { AbstractConnector } from '@web3-react/abstract-connector';
+
 import siteConfig from "./../config/SiteConfig.json";
+import { ProviderTypeDictionary } from "../domain/ProviderTypeDictionary";
 
 export class FulcrumProvider {
   private static readonly priceGraphQueryFunction = new Map<Asset, string>([
@@ -112,23 +115,23 @@ export class FulcrumProvider {
     //     );
     //   });
     // } else {
-      // setting up readonly provider
-      Web3ConnectionFactory.getWeb3Provider(ProviderType.None, this.eventEmitter).then((providerData) => {
-        // @ts-ignore
-        const web3Wrapper = providerData[0];
-        FulcrumProvider.getWeb3ProviderSettings(providerData[3]).then((web3ProviderSettings) => {
-          if (web3Wrapper && web3ProviderSettings) {
-            const contractsSource = new ContractsSource(providerData[1], web3ProviderSettings.networkId, providerData[2]);
-            contractsSource.Init().then(() => {
-              this.web3Wrapper = web3Wrapper;
-              this.providerEngine = providerData[1];
-              this.web3ProviderSettings = web3ProviderSettings;
-              this.contractsSource = contractsSource;
-              this.eventEmitter.emit(FulcrumProviderEvents.ProviderAvailable);
-            });
-          }
-        });
+    // setting up readonly provider
+    Web3ConnectionFactory.getWeb3Provider(ProviderType.None, this.eventEmitter).then((providerData) => {
+      // @ts-ignore
+      const web3Wrapper = providerData[0];
+      FulcrumProvider.getWeb3ProviderSettings(providerData[3]).then((web3ProviderSettings) => {
+        if (web3Wrapper && web3ProviderSettings) {
+          const contractsSource = new ContractsSource(providerData[1], web3ProviderSettings.networkId, providerData[2]);
+          contractsSource.Init().then(() => {
+            this.web3Wrapper = web3Wrapper;
+            this.providerEngine = providerData[1];
+            this.web3ProviderSettings = web3ProviderSettings;
+            this.contractsSource = contractsSource;
+            this.eventEmitter.emit(FulcrumProviderEvents.ProviderAvailable);
+          });
+        }
       });
+    });
     // }
 
     return FulcrumProvider.Instance;
@@ -152,17 +155,24 @@ export class FulcrumProvider {
     }
   }
 
-  public async setWeb3Provider(providerType: ProviderType, provider?: any) {
+  public async setWeb3Provider(connector: AbstractConnector, account?: string) {
     this.unsupportedNetwork = false;
-    await this.setWeb3ProviderFinalize(providerType, await Web3ConnectionFactory.getWeb3Provider(providerType, this.eventEmitter));
+    await Web3ConnectionFactory.setWalletProvider(connector, account);
+    const providerType = await ProviderTypeDictionary.getProviderTypeByConnector(connector);
+    await this.setWeb3ProviderFinalize(providerType);
   }
 
-  public async setWeb3ProviderFinalize(providerType: ProviderType, providerData: [Web3Wrapper | null, Web3ProviderEngine | null, boolean, number, string]) { // : Promise<boolean> {
-    this.web3Wrapper = providerData[0];
-    this.providerEngine = providerData[1];
-    let canWrite = providerData[2];
-    let networkId = providerData[3];
-    const account = providerData[4];
+  public async setReadonlyWeb3Provider() {
+    await Web3ConnectionFactory.setReadonlyProvider();
+    await this.setWeb3ProviderFinalize(ProviderType.None);
+  }
+
+  public async setWeb3ProviderFinalize(providerType: ProviderType) { // : Promise<boolean> {
+    this.web3Wrapper = Web3ConnectionFactory.currentWeb3Wrapper;
+    this.providerEngine = Web3ConnectionFactory.currentWeb3Engine;
+    let canWrite = Web3ConnectionFactory.canWrite;
+    let networkId = Web3ConnectionFactory.networkId;
+    this.accounts = Web3ConnectionFactory.userAccount ? [Web3ConnectionFactory.userAccount] : [];
     this.web3ProviderSettings = await FulcrumProvider.getWeb3ProviderSettings(networkId);
     if (this.web3Wrapper) {
       if (this.web3ProviderSettings.networkName !== process.env.REACT_APP_ETH_NETWORK) {
@@ -176,20 +186,17 @@ export class FulcrumProvider {
     }
 
     if (this.web3Wrapper && canWrite) {
-      try {
-        this.accounts = await this.web3Wrapper.getAvailableAddressesAsync();
-      } catch (e) {
-        // console.log(e);
-        this.accounts = [];
-      }
+      const web3EngineAccounts = await this.web3Wrapper.getAvailableAddressesAsync();
+      if (web3EngineAccounts.length > 0 && this.accounts.length === 0)
+        this.accounts = web3EngineAccounts;
       if (this.accounts.length === 0) {
         canWrite = false; // revert back to read-only
       }
     } else {
       // this.accounts = [];
-      if (providerType === ProviderType.Bitski && networkId !== 1) {
-        this.unsupportedNetwork = true;
-      }
+      // if (providerType === ProviderType.Bitski && networkId !== 1) {
+      //   this.unsupportedNetwork = true;
+      // }
     }
     if (this.web3Wrapper && this.web3ProviderSettings.networkId > 0) {
       this.contractsSource = await new ContractsSource(this.providerEngine, this.web3ProviderSettings.networkId, canWrite);
@@ -1770,13 +1777,13 @@ if (err || 'error' in added) {
 console.log(err, added);
 }
 }*//*);
-              }
-            }
-            }
-            } catch(e) {
-            // console.log(e);
-            }
-            }*/
+                      }
+                    }
+                    }
+                    } catch(e) {
+                    // console.log(e);
+                    }
+                    }*/
   }
 
   private processLendRequestTask = async (task: RequestTask, skipGas: boolean) => {

@@ -26,6 +26,7 @@ import { Web3ReactProvider, getWeb3ReactContext } from "@web3-react/core";
 import { Web3ProviderEngine } from "@0x/subproviders";
 import { Web3ConnectionFactory } from '../domain/Web3ConnectionFactory';
 import { ProviderTypeDictionary } from '../domain/ProviderTypeDictionary';
+import { AbstractConnector } from '@web3-react/abstract-connector';
 
 const isMainnetProd =
   process.env.NODE_ENV && process.env.NODE_ENV !== "development"
@@ -87,8 +88,8 @@ export class AppRouter extends Component<any, IAppRouterState> {
 
   public getLibrary = async (provider: any, connector: any): Promise<Web3ProviderEngine> => {
     console.log(provider);
-    const providerType = await ProviderTypeDictionary.getProviderTypeByConnector(connector);
-    await this.onProviderTypeSelect(providerType, provider)
+    // const providerType = await ProviderTypeDictionary.getProviderTypeByConnector(connector);
+    // await this.onProviderTypeSelect(connector, provider)
     return Web3ConnectionFactory.currentWeb3Engine;
   }
 
@@ -174,8 +175,8 @@ export class AppRouter extends Component<any, IAppRouterState> {
     await this._isMounted && this.setState({ ...this.state, isProviderMenuModalOpen: true });
   };
 
-  public onProviderTypeSelect = async (providerType: ProviderType, provider?: any) => {
-
+  public onProviderTypeSelect = async (connector: AbstractConnector, account?: string) => {
+    const providerType = await ProviderTypeDictionary.getProviderTypeByConnector(connector);
     if (!this.state.isLoading) {
       FulcrumProvider.Instance.isLoading = true;
 
@@ -186,7 +187,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
         isLoading: true,
         isProviderMenuModalOpen: false
       }, async () => {
-        await FulcrumProvider.Instance.setWeb3Provider(providerType, provider);
+        await FulcrumProvider.Instance.setWeb3Provider(connector, account);
 
         FulcrumProvider.Instance.isLoading = false;
 
