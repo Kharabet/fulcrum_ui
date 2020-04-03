@@ -197,6 +197,7 @@ export class Web3ConnectionFactory {
     Web3ConnectionFactory.currentWeb3Wrapper = new Web3Wrapper(providerEngine);
     Web3ConnectionFactory.networkId = await Web3ConnectionFactory.currentWeb3Wrapper.getNetworkIdAsync();
     Web3ConnectionFactory.canWrite = false;
+    Web3ConnectionFactory.userAccount = undefined;
   }
 
 

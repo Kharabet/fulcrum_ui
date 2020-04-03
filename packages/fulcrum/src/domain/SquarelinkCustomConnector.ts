@@ -1,8 +1,9 @@
 import { ConnectorUpdate } from '@web3-react/types'
 import { AbstractConnector } from '@web3-react/abstract-connector'
 import invariant from 'tiny-invariant'
-// @ts-ignore
-import Squarelink from "squarelink";
+//@ts-ignore
+import Squarelink from 'squarelink';
+
 
 const chainIdToNetwork: { [network: number]: string } = {
   1: 'mainnet',
@@ -38,12 +39,12 @@ export class SquarelinkConnector extends AbstractConnector {
 
     this.clientId = clientId
     this.networks = networks
-    this.options = options;
+    this.options = options
   }
 
   public async activate(): Promise<ConnectorUpdate> {
     if (!this.squarelink) {
-      this.squarelink = await new Squarelink(
+      this.squarelink = new Squarelink(
         this.clientId,
         typeof this.networks[0] === 'number' ? chainIdToNetwork[this.networks[0]] : this.networks[0],
         this.options
@@ -54,35 +55,23 @@ export class SquarelinkConnector extends AbstractConnector {
 
     const account = await provider.enable().then((accounts: string[]): string => accounts[0])
 
-    return { provider, account }
+    const chainId = await provider.send('eth_chainId');
+
+    return { provider, account, chainId }
   }
 
   public async getProvider(): Promise<any> {
-    if (!this.squarelink) {
-      this.squarelink = await new Squarelink(
-        this.clientId,
-        typeof this.networks[0] === 'number' ? chainIdToNetwork[this.networks[0]] : this.networks[0],
-        this.options
-      )
-    }
     return await this.squarelink.getProvider()
   }
 
   public async getChainId(): Promise<number | string> {
-    const provider = await this.getProvider();
-    return await provider.send('eth_chainId')
+    const provider = await this.squarelink.getProvider();
+    return await provider.send('eth_chainId');
   }
 
   public async getAccount(): Promise<null | string> {
-    if (!this.squarelink) {
-      this.squarelink = await new Squarelink(
-        this.clientId,
-        typeof this.networks[0] === 'number' ? chainIdToNetwork[this.networks[0]] : this.networks[0],
-        this.options
-      )
-    }
-    const provider = await this.getProvider();
-    return await provider.send('eth_accounts').then((accounts: string[]): string => accounts[0])
+    const provider = await this.squarelink.getProvider();
+    return await provider.send('eth_accounts').then((accounts: string[]): string => accounts[0]);
   }
 
   public deactivate() {}

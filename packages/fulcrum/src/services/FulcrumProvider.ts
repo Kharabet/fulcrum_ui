@@ -106,25 +106,20 @@ export class FulcrumProvider {
       FulcrumProvider.Instance = this;
     }
 
-    // if (providerType) {
-    //   FulcrumProvider.Instance.setWeb3Provider(providerType).then(() => {
-    //     this.eventEmitter.emit(FulcrumProviderEvents.ProviderAvailable);
-    //     FulcrumProvider.Instance.eventEmitter.emit(
-    //       FulcrumProviderEvents.ProviderChanged,
-    //       new ProviderChangedEvent(FulcrumProvider.Instance.providerType, FulcrumProvider.Instance.web3Wrapper)
-    //     );
-    //   });
-    // } else {
+
     // setting up readonly provider
-    Web3ConnectionFactory.getWeb3Provider(ProviderType.None, this.eventEmitter).then((providerData) => {
-      // @ts-ignore
-      const web3Wrapper = providerData[0];
-      FulcrumProvider.getWeb3ProviderSettings(providerData[3]).then((web3ProviderSettings) => {
+   
+    Web3ConnectionFactory.setReadonlyProvider().then(() => {
+      const web3Wrapper = Web3ConnectionFactory.currentWeb3Wrapper;
+      const engine = Web3ConnectionFactory.currentWeb3Engine;
+      const networkId = Web3ConnectionFactory.networkId;
+      const canWrite = Web3ConnectionFactory.canWrite;
+      FulcrumProvider.getWeb3ProviderSettings(networkId).then((web3ProviderSettings) => {
         if (web3Wrapper && web3ProviderSettings) {
-          const contractsSource = new ContractsSource(providerData[1], web3ProviderSettings.networkId, providerData[2]);
+          const contractsSource = new ContractsSource(engine, web3ProviderSettings.networkId, canWrite);
           contractsSource.Init().then(() => {
             this.web3Wrapper = web3Wrapper;
-            this.providerEngine = providerData[1];
+            this.providerEngine = engine;
             this.web3ProviderSettings = web3ProviderSettings;
             this.contractsSource = contractsSource;
             this.eventEmitter.emit(FulcrumProviderEvents.ProviderAvailable);
@@ -132,7 +127,6 @@ export class FulcrumProvider {
         }
       });
     });
-    // }
 
     return FulcrumProvider.Instance;
   }

@@ -88,8 +88,8 @@ export class AppRouter extends Component<any, IAppRouterState> {
 
   public getLibrary = async (provider: any, connector: any): Promise<Web3ProviderEngine> => {
     console.log(provider);
-    // const providerType = await ProviderTypeDictionary.getProviderTypeByConnector(connector);
-    // await this.onProviderTypeSelect(connector, provider)
+    //handle connectors events (i.e. netw changed)
+    await this.onProviderTypeSelect(connector) 
     return Web3ConnectionFactory.currentWeb3Engine;
   }
 
@@ -112,6 +112,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
             providerTypes={ProviderTypeDictionary.WalletProviders}
             isMobileMedia={this.state.isMobileMedia}
             onSelect={this.onProviderTypeSelect}
+            onDeactivate={this.onDeactivate}
           />
         </Modal>
         <Modal
@@ -174,6 +175,26 @@ export class AppRouter extends Component<any, IAppRouterState> {
   public doNetworkConnect = async () => {
     await this._isMounted && this.setState({ ...this.state, isProviderMenuModalOpen: true });
   };
+
+
+  public onDeactivate = async () => {
+    
+    FulcrumProvider.Instance.isLoading = true;
+
+    await FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.ProviderIsChanging);
+
+    await this._isMounted && this.setState({
+      ...this.state,
+      isProviderMenuModalOpen: false
+    });
+    await FulcrumProvider.Instance.setReadonlyWeb3Provider();
+    
+    FulcrumProvider.Instance.isLoading = false;
+    await FulcrumProvider.Instance.eventEmitter.emit(
+      FulcrumProviderEvents.ProviderChanged,
+      new ProviderChangedEvent(FulcrumProvider.Instance.providerType, FulcrumProvider.Instance.web3Wrapper)
+    );
+  }
 
   public onProviderTypeSelect = async (connector: AbstractConnector, account?: string) => {
     const providerType = await ProviderTypeDictionary.getProviderTypeByConnector(connector);

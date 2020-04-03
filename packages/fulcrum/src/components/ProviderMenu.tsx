@@ -13,6 +13,7 @@ export interface IProviderMenuProps {
   selectedProviderType: ProviderType;
   isMobileMedia: boolean;
   onSelect: (connector: AbstractConnector, account?: string) => void;
+  onDeactivate: () => void;
 }
 
 export const ProviderMenu = (props: IProviderMenuProps) => {
@@ -82,7 +83,7 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
         key={ProviderType.None}
         onClick={() => {
           deactivate()
-          FulcrumProvider.Instance.setReadonlyWeb3Provider();
+          props.onDeactivate()
         }}
       >DISCONNECT
       </button>
