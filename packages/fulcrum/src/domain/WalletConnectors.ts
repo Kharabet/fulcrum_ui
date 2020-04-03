@@ -67,7 +67,7 @@ export const ledger = new LedgerConnector({
 })
 
 // export const trezor = new TrezorConnector({
-//   chainId: 1,
+//   chainId: networkId,
 //   url: RPC_URLS[1],
 //   pollingInterval: POLLING_INTERVAL,
 //   manifestEmail: 'dummy@abc.xyz',
@@ -100,7 +100,7 @@ export const bitski = new BitskiConnector({
 })
 
 export const torus = new TorusConnector({
-  chainId: 1, 
+  chainId: networkId, 
   constructorOptions: {
     buttonPosition: 'top-left' // default: bottom-left
   },
@@ -109,8 +109,7 @@ export const torus = new TorusConnector({
     enableLogging: false,
     network: {
       host: networkName || "mainnet",
-      chainId: 1,
-      networkName: "Main Ethereum Network"
+      chainId: networkId
     },
     showTorusButton: true
   } 
