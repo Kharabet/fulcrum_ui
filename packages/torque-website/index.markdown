@@ -127,7 +127,7 @@ layout: home
                             </div>
                             {% include svg/arrow-in-circle.svg %}
                         </a>
-                        <span class="info-after-button">See if you can save when you refinance your loan with fixed rates</span>
+                        <span class="info-after-button">Stabilize your loan(s) by refinancing from variable to fixed rates</span>
                     </div>
                     <div class="flex fd-c mb-md-15 mx-md-a">
                         <a href="#" class="button button-green button-md">
@@ -311,7 +311,7 @@ layout: home
                         </div>
                         {% include svg/arrow-in-circle.svg %}
                     </a>
-                    <span class="info-after-button">Up to 5x Leverage, zero platform fees, and perfect liquidity</span>
+                    <span class="info-after-button">Borrow crypto-assets and stablecoins with fixed interest</span>
                 </div>
                 <div class="flex fd-c">
                     <a href="#" class="button button-purple button-lg">
@@ -321,7 +321,7 @@ layout: home
                         </div>
                         {% include svg/arrow-in-circle.svg %}
                     </a>
-                    <span class="info-after-button">Refinance your loan with fixed interest rate</span>
+                    <span class="info-after-button">Stabilize your loan(s) by refinancing from variable to fixed rates</span>
                 </div>
             </div>
         </div>
