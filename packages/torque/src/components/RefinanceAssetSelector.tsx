@@ -9,7 +9,8 @@ import { RefinanceAssetSelectorItem } from "./RefinanceAssetSelectorItem";
 import { Loader } from "./Loader";
 
 export interface IRefinanceAssetSelectorProps {
-  walletType: WalletType
+  walletType: WalletType,
+  updateStateShowLoader: (value: any) => void
 }
 
 interface IRefinanceAssetSelectorItemState {
@@ -133,6 +134,12 @@ export class RefinanceAssetSelector extends Component<IRefinanceAssetSelectorPro
     this.setState({ ...this.state, refinanceData });
   };
 
+  public componentDidUpdate(prevState: any) {
+    if (this.state.isLoading !== prevState.isLoading) {
+      this.props.updateStateShowLoader(this.state.isLoading);
+    }
+  }
+
   public render() {
     const refinance = this.state.refinanceData;
     let items;
@@ -140,14 +147,15 @@ export class RefinanceAssetSelector extends Component<IRefinanceAssetSelectorPro
       if (refinance[0].cdpId.gt(0)) {
         items = refinance.map((e, index) => {
           return (
-            <RefinanceAssetSelectorItem key={refinance[index].urn} asset={Asset.DAI}
-                                        cdpId={refinance[index].cdpId}
-                                        urn={refinance[index].urn}
-                                        accountAddress={refinance[index].accountAddress}
-                                        proxyAddress={refinance[index].proxyAddress}
-                                        isProxy={refinance[index].isProxy}
-                                        isInstaProxy={refinance[index].isInstaProxy}
-                                        ilk={refinance[index].ilk}/>
+            <RefinanceAssetSelectorItem
+              key={refinance[index].urn} asset={Asset.DAI}
+              cdpId={refinance[index].cdpId}
+              urn={refinance[index].urn}
+              accountAddress={refinance[index].accountAddress}
+              proxyAddress={refinance[index].proxyAddress}
+              isProxy={refinance[index].isProxy}
+              isInstaProxy={refinance[index].isInstaProxy}
+              ilk={refinance[index].ilk} />
           );
         });
       }
@@ -156,14 +164,15 @@ export class RefinanceAssetSelector extends Component<IRefinanceAssetSelectorPro
         if (refinance[0].cdpId.gt(0)) {
           items = refinance.map((e, index) => {
             return (
-              <RefinanceAssetSelectorItem key={refinance[index].urn} asset={Asset.DAI}
-                                          cdpId={refinance[index].cdpId}
-                                          urn={refinance[index].urn}
-                                          accountAddress={refinance[index].accountAddress}
-                                          proxyAddress={refinance[index].proxyAddress}
-                                          isProxy={refinance[index].isProxy}
-                                          isInstaProxy={refinance[index].isInstaProxy}
-                                          ilk={refinance[index].ilk}/>
+              <RefinanceAssetSelectorItem
+                key={refinance[index].urn} asset={Asset.DAI}
+                cdpId={refinance[index].cdpId}
+                urn={refinance[index].urn}
+                accountAddress={refinance[index].accountAddress}
+                proxyAddress={refinance[index].proxyAddress}
+                isProxy={refinance[index].isProxy}
+                isInstaProxy={refinance[index].isInstaProxy}
+                ilk={refinance[index].ilk} />
             );
           });
         }
@@ -171,9 +180,8 @@ export class RefinanceAssetSelector extends Component<IRefinanceAssetSelectorPro
     }
 
     return <div className="refinance-asset-selector">
-      {this.state.isLoading ? <Loader /> : null}
       <div className="refinance-page__main-msgCentered" onClick={this.derivedUpdate}
-           style={this.state.isItems ? { display: `none` } : undefined}>
+        style={this.state.isItems ? { display: `none` } : undefined}>
         <span>Looks like you don't have any loans available to refinance.</span>
       </div>
       {items}
