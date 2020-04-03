@@ -108,17 +108,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
         >
           <ProviderMenu
             selectedProviderType={this.state.selectedProviderType}
-            providerTypes={[
-              ProviderType.MetaMask,
-              ProviderType.TrustWallet,
-              ProviderType.Fortmatic,
-              ProviderType.Portis,
-              ProviderType.Bitski,
-              ProviderType.Squarelink,
-              ProviderType.Ledger,
-              ProviderType.Torus,
-              // ProviderType.WalletConnect
-            ]}
+            providerTypes={ProviderTypeDictionary.WalletProviders}
             isMobileMedia={this.state.isMobileMedia}
             onSelect={this.onProviderTypeSelect}
           />

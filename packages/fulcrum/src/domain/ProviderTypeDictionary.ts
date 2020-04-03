@@ -9,6 +9,7 @@ import { ReactComponent as SquarelinkLogoShort } from '../assets/images/logo_sho
 import { ReactComponent as LedgerLogoShort } from '../assets/images/logo_short___ledger.svg';
 import { ReactComponent as TrustWalletLogoShort } from '../assets/images/logo_short___trustwallet.svg';
 import { ReactComponent as TorusLogoShort } from '../assets/images/logo_short___torus.svg';
+import { ReactComponent as AuthereumLogoShort } from '../assets/images/logo_short___authereum.svg';
 
 import {
   injected,
@@ -17,7 +18,8 @@ import {
   squarelink,
   bitski,
   ledger,
-  torus
+  torus,
+  authereum
 } from './WalletConnectors';
 import { AbstractConnector } from '@web3-react/abstract-connector'
 
@@ -30,11 +32,24 @@ const connectorsByName: { [name: string]: AbstractConnector | null } = {
   [ProviderType.Bitski]: bitski,
   [ProviderType.Ledger]: ledger,
   [ProviderType.Torus]: torus,
+  [ProviderType.Authereum]: authereum,
   [ProviderType.None]: null
 }
 
-
 export class ProviderTypeDictionary {
+
+  public static readonly WalletProviders: ProviderType[] = [
+    ProviderType.MetaMask,
+    ProviderType.TrustWallet,
+    ProviderType.Fortmatic,
+    ProviderType.Portis,
+    ProviderType.Squarelink,
+    ProviderType.Bitski,
+    ProviderType.Ledger,
+    ProviderType.Torus,
+    ProviderType.Authereum
+  ];
+
   public static providerTypes: Map<ProviderType, ProviderTypeDetails> = new Map<ProviderType, ProviderTypeDetails>([
     [ProviderType.MetaMask, new ProviderTypeDetails("MetaMask", MetamaskLogoShort, injected)],
     [ProviderType.TrustWallet, new ProviderTypeDetails("TrustWallet", TrustWalletLogoShort, injected)],
@@ -45,8 +60,11 @@ export class ProviderTypeDictionary {
     [ProviderType.Squarelink, new ProviderTypeDetails("Squarelink", SquarelinkLogoShort, squarelink)],
     [ProviderType.Ledger, new ProviderTypeDetails("Ledger", LedgerLogoShort, ledger)],
     [ProviderType.Torus, new ProviderTypeDetails("Torus", TorusLogoShort, torus)],
+    [ProviderType.Authereum, new ProviderTypeDetails("Authereum", AuthereumLogoShort, authereum)],
     [ProviderType.None, new ProviderTypeDetails("None", null, null)]
   ]);
+
+
 
   public static async getProviderTypeByConnector(value: AbstractConnector): Promise<ProviderType> {
     const provider = await value.getProvider();

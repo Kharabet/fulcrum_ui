@@ -6,7 +6,7 @@ import { InjectedConnector } from './InjectedCustomProvider';
 import { LedgerConnector } from '@web3-react/ledger-connector'
 // import { TrezorConnector } from '@web3-react/trezor-connector'
 // import { FrameConnector } from '@web3-react/frame-connector'
-// import { AuthereumConnector } from '@web3-react/authereum-connector'
+import { AuthereumConnector } from '@web3-react/authereum-connector'
 import { FortmaticConnector } from '@web3-react/fortmatic-connector'
 import { PortisConnector } from '@web3-react/portis-connector'
 // import { SquarelinkConnector } from '@web3-react/squarelink-connector'
@@ -76,7 +76,7 @@ export const ledger = new LedgerConnector({
 
 // export const frame = new FrameConnector({ supportedChainIds: [1] })
 
-// export const authereum = new AuthereumConnector({ chainId: 42 })
+export const authereum = new AuthereumConnector({ chainId: networkId })
 
 export const fortmatic = new FortmaticConnector({
   apiKey: configProviders.Fortmatic_ApiKey as string,
