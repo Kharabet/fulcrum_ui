@@ -2,7 +2,7 @@
 import { InjectedConnector } from './InjectedCustomProvider';
 // import { NetworkConnector } from '@web3-react/network-connector'
 import { WalletConnectConnector } from '@web3-react/walletconnect-connector'
-// import { WalletLinkConnector } from '@web3-react/walletlink-connector'
+import { WalletLinkConnector } from '@web3-react/walletlink-connector'
 import { LedgerConnector } from '@web3-react/ledger-connector'
 import { TrezorConnector } from '@web3-react/trezor-connector'
 // import { FrameConnector } from '@web3-react/frame-connector'
@@ -13,6 +13,8 @@ import { PortisConnector } from '@web3-react/portis-connector'
 import { SquarelinkConnector } from './SquarelinkCustomConnector'
 import { BitskiConnector } from './BitskiCustomConnector'
 import { TorusConnector } from '@web3-react/torus-connector'
+
+import fulcrumLogo from "../assets/images/fulcrum_logo.svg";
 
 
 import configProviders from "../config/providers.json";
@@ -55,10 +57,11 @@ export const walletconnect = new WalletConnectConnector({
   pollingInterval: POLLING_INTERVAL
 })
 
-// export const walletlink = new WalletLinkConnector({
-//   url: RPC_URLS[1],
-//   appName: 'web3-react example'
-// })
+export const walletlink = new WalletLinkConnector({
+  url: RPC_URL,
+  appName: 'bZx | Fulcrum'
+  // appLogoUrl: `https://app.fulcrum.trade${fulcrumLogo}`
+})
 
 export const ledger = new LedgerConnector({
   chainId: networkId,

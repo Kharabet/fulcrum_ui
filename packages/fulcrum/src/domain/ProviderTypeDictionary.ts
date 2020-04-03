@@ -12,6 +12,7 @@ import { ReactComponent as TorusLogoShort } from '../assets/images/logo_short___
 import { ReactComponent as AuthereumLogoShort } from '../assets/images/logo_short___authereum.svg';
 import { ReactComponent as TrezorLogoShort } from '../assets/images/logo_short___trezor.svg';
 import { ReactComponent as WalletConnectLogoShort } from '../assets/images/logo_short___walletconnect.svg';
+import { ReactComponent as WalletLinkLogoShort } from '../assets/images/logo_short___coinbase.svg';
 
 import {
   injected,
@@ -23,7 +24,8 @@ import {
   torus,
   authereum,
   trezor,
-  walletconnect
+  walletconnect,
+  walletlink
 } from './WalletConnectors';
 import { AbstractConnector } from '@web3-react/abstract-connector'
 
@@ -39,6 +41,7 @@ const connectorsByName: { [name: string]: AbstractConnector | null } = {
   [ProviderType.Authereum]: authereum,
   [ProviderType.Trezor]: trezor,
   [ProviderType.WalletConnect]: walletconnect,
+  [ProviderType.WalletLink]: walletlink,
   [ProviderType.None]: null
 }
 
@@ -55,7 +58,8 @@ export class ProviderTypeDictionary {
     ProviderType.Torus,
     ProviderType.Authereum,
     ProviderType.Trezor,
-    ProviderType.WalletConnect
+    ProviderType.WalletConnect,
+    ProviderType.WalletLink
   ];
 
   public static providerTypes: Map<ProviderType, ProviderTypeDetails> = new Map<ProviderType, ProviderTypeDetails>([
@@ -70,6 +74,7 @@ export class ProviderTypeDictionary {
     [ProviderType.Torus, new ProviderTypeDetails("Torus", TorusLogoShort, torus)],
     [ProviderType.Authereum, new ProviderTypeDetails("Authereum", AuthereumLogoShort, authereum)],
     [ProviderType.Trezor, new ProviderTypeDetails("Trezor", TrezorLogoShort, trezor)],
+    [ProviderType.WalletLink, new ProviderTypeDetails("Coinbase", WalletLinkLogoShort, walletlink)],
     [ProviderType.None, new ProviderTypeDetails("None", null, null)]
   ]);
 
