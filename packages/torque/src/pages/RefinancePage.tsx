@@ -11,6 +11,7 @@ import { Footer } from "../layout/Footer";
 import { HeaderOps } from "../layout/HeaderOps";
 import { NavService } from "../services/NavService";
 import { TorqueProvider } from "../services/TorqueProvider";
+import { Loader } from "../components/Loader";
 
 export interface IRefinancePageRouteParams {
   walletTypeAbbr: string;
@@ -22,40 +23,50 @@ export interface IRefinancePageParams {
   isMobileMedia: boolean;
   isRiskDisclosureModalOpen: () => void;
 }
-
-export class RefinancePage extends PureComponent<IRefinancePageParams & RouteComponentProps<IRefinancePageRouteParams>> {
+interface IRefinancePageState {
+  isShowLoader: boolean
+}
+export class RefinancePage extends PureComponent<IRefinancePageParams & RouteComponentProps<IRefinancePageRouteParams>, IRefinancePageState> {
   private borrowDlgRef: RefObject<BorrowDlg>;
 
   public constructor(props: any, context?: any) {
     super(props, context);
 
     this.borrowDlgRef = React.createRef();
+    this.state = {
+      isShowLoader: true
+    }
   }
 
   public render() {
     const walletType = walletTypeAbbrToWalletType(this.props.match.params.walletTypeAbbr);
-    const isMobileMedia = this.props.isMobileMedia
+    const isMobileMedia = this.props.isMobileMedia;
+    const isShowLoader = this.state.isShowLoader;
     return (
       <React.Fragment>
         <BorrowDlg ref={this.borrowDlgRef} />
         <div className="refinance-page">
-          <HeaderOps isLoading={this.props.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen}/>
+          <HeaderOps isLoading={this.props.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
           {/*<div className="borrow-page__main" style={walletType === WalletType.Web3 ? { paddingBottom: `90rem`} : undefined}>*/}
-          <h1>Refinance Your Loans</h1>
-          <p className="description">Lorem ipsum is placeholder text commonly used in the graphic, print, and publishing industries for previewing layouts and visual mockups.</p>
           <div className="refinance-page__main">
-            {isMobileMedia ?
-              <RefinanceAssetCompoundLoanMobile walletType={walletType}/>
-              :
-              <RefinanceAssetCompoundLoan walletType={walletType}/>
+            {isShowLoader
+              ? <Loader />
+              : (
+                <React.Fragment>
+                  <h1>Refinance Your Loans</h1>
+                  <p className="description">Lorem ipsum is placeholder text commonly used in the graphic, print, and publishing industries for previewing layouts and visual mockups.</p>
+                </React.Fragment>
+              )
             }
-            {isMobileMedia ?
-              < RefinanceAssetSelectorMobile walletType={walletType}/>
-              :
-              <RefinanceAssetSelector walletType={walletType}/>
+            {isMobileMedia
+              ? <RefinanceAssetCompoundLoanMobile walletType={walletType} />
+              : <RefinanceAssetCompoundLoan walletType={walletType} />}
+            {isMobileMedia
+              ? <RefinanceAssetSelectorMobile updateStateShowLoader={this.updateStateShowLoader} walletType={walletType} />
+              : <RefinanceAssetSelector updateStateShowLoader={this.updateStateShowLoader} walletType={walletType} />
             }
           </div>
-          <Footer isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen}/>
+          <Footer isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
         </div>
       </React.Fragment>
     );
@@ -94,7 +105,7 @@ export class RefinancePage extends PureComponent<IRefinancePageParams & RouteCom
           this.borrowDlgRef.current.toggleDidSubmit(false);
           await this.borrowDlgRef.current.hide();
         }
-      } catch(error) {
+      } catch (error) {
         /*let errorMsg;
         if (error.message) {
           errorMsg = error.message;
@@ -130,4 +141,7 @@ export class RefinancePage extends PureComponent<IRefinancePageParams & RouteCom
       this.props.doNetworkConnect('r');
     }
   };
+  public updateStateShowLoader = (value: any) => {
+    this.setState({ isShowLoader: value })
+  }
 }

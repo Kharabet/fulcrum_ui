@@ -17,6 +17,7 @@ import { HeaderOps } from "../layout/HeaderOps";
 import { TorqueProviderEvents } from "../services/events/TorqueProviderEvents";
 import { NavService } from "../services/NavService";
 import { TorqueProvider } from "../services/TorqueProvider";
+import { Loader } from "../components/Loader";
 
 export interface IDashboardPageRouteParams {
   walletTypeAbbr: string;
@@ -40,7 +41,7 @@ interface IDashboardPageState {
 export class DashboardPage extends PureComponent<
   IDashboardPageParams & RouteComponentProps<IDashboardPageRouteParams>,
   IDashboardPageState
-> {
+  > {
   private setupENSDlgRef: RefObject<SetupENSDlg>;
   private manageCollateralDlgRef: RefObject<ManageCollateralDlg>;
   private repayLoanDlgRef: RefObject<RepayLoanDlg>;
@@ -170,19 +171,16 @@ export class DashboardPage extends PureComponent<
                     onClearWalletAddress={this.onClearWalletAddress}
                   />
                 ) : null}
-                { !TorqueProvider.Instance.unsupportedNetwork && this.state.isENSSetup ? (
+                {!TorqueProvider.Instance.unsupportedNetwork && this.state.isENSSetup ? (
                   <React.Fragment>
-                    <div style={{ textAlign: `center`, fontSize: `2rem`, paddingBottom: `1.5rem` }}>
-                      {this.state.isDataLoading ? (
-                        <div>
-                          Loading...
-                        </div>
-                      ) : (
-                        <div onClick={this.refreshPage} style={{ cursor: `pointer` }}>
+                    {this.state.isDataLoading
+                      ? <Loader />
+                      : (<React.Fragment>
+                        <div onClick={this.refreshPage} style={{ cursor: `pointer`, textAlign: `center`, fontSize: `2rem`, paddingBottom: `1.5rem` }}>
                           Click to refresh and see recent loan activity.
                         </div>
-                      )}
-                    </div>
+                      </React.Fragment>)
+                    }
                     <BorrowedFundsList
                       walletDetails={this.state.walletDetails}
                       items={this.state.items}
@@ -210,18 +208,17 @@ export class DashboardPage extends PureComponent<
                 }
               </React.Fragment>
             ) : (
-              <React.Fragment>
-                {this.state.walletDetails.walletType === WalletType.NonWeb3 || this.state.walletDetails.walletType === WalletType.ViewOnly ? (
-                  <div className="dashboard-page__form">
-                    <WalletAddressLargeForm onSubmit={this.onWalletAddressChange} />
-                  </div>
-                ) : <div style={{ textAlign: `center`, fontSize: `2rem`, paddingBottom: `1.5rem` }}>
-                      <div>
-                          Loading...
-                        </div>
-                </div>}
-              </React.Fragment>
-            )}
+                <React.Fragment>
+                  {this.state.walletDetails.walletType === WalletType.NonWeb3 || this.state.walletDetails.walletType === WalletType.ViewOnly
+                    ? (<React.Fragment>
+                      <div className="dashboard-page__form">
+                        <WalletAddressLargeForm onSubmit={this.onWalletAddressChange} />
+                      </div>
+                    </React.Fragment>)
+                    : <Loader />
+                  }
+                </React.Fragment>
+              )}
           </div>
           <Footer isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen}/>
         </div>
@@ -237,18 +234,18 @@ export class DashboardPage extends PureComponent<
       items: [],
       itemsAwaiting: []
     },
-    () => {
-      setTimeout(() => {
-        this.derivedUpdate();
-        /*this.setState({
-          ...this.state,
-          isDataLoading: true
-        },
-        () => {
+      () => {
+        setTimeout(() => {
           this.derivedUpdate();
-        });*/
-      }, 1000);
-    });
+          /*this.setState({
+            ...this.state,
+            isDataLoading: true
+          },
+          () => {
+            this.derivedUpdate();
+          });*/
+        }, 1000);
+      });
   };
 
   private onSelectNewWalletAddress = async () => {
