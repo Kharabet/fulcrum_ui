@@ -14,6 +14,7 @@
     "clean-all": "rm -rf ./packages/**/node_modules ./node_modules",
     "build-all": "yarn run build-alchemy-web3 && yarn run build-fulcrum-ropsten",
     "build-alchemy-web3": "./scripts/build-alchemy-web3.sh",
+    "build-web3-react": "./scripts/build-web3-react.sh",
     "bootstrap": "lerna bootstrap",
     "build-fulcrum-rinkeby": "cross-env-shell REACT_APP_ETH_NETWORK=rinkeby \"./scripts/build-fulcrum.sh\"",
     "build-fulcrum-kovan": "cross-env-shell REACT_APP_ETH_NETWORK=kovan \"./scripts/build-fulcrum.sh\"",
