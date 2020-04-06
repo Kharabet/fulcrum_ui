@@ -94,7 +94,7 @@
     "build": "react-scripts build",
     "build-mainnet": "cross-env-shell REACT_APP_ETH_NETWORK=mainnet \"react-scripts build\"",
     "build-ropsten": "cross-env-shell REACT_APP_ETH_NETWORK=ropsten \"react-scripts build\"",
-    "build-kovan": "cross-env-shell REACT_APP_ETH_NETWORK=kovan \"react-scripts build\"",
+    "build-kovan": "cross-env-shell REACT_APP_ETH_NETWORK=kovan GENERATE_SOURCEMAP=false \"react-scripts build\"",
     "build-rinkeby": "cross-env-shell REACT_APP_ETH_NETWORK=rinkeby \"react-scripts build\"",
     "test": "react-scripts test",
     "test-mainnet": "cross-env-shell REACT_APP_ETH_NETWORK=mainnet \"react-scripts test\"",
