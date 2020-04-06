@@ -71,7 +71,7 @@ export const trezor = new TrezorConnector({
   url: RPC_URL,
   pollingInterval: POLLING_INTERVAL,
   manifestEmail: 'hello@bzx.network',
-  manifestAppUrl: location.origin
+  manifestAppUrl: window.location.origin
 })
 
 // export const frame = new FrameConnector({ supportedChainIds: [1] })
@@ -96,7 +96,7 @@ export const squarelink = new SquarelinkConnector({
 export const bitski = new BitskiConnector({
   clientId: configProviders.Bitski_ClientId as string,
   network: networkId,
-  redirectUri: `${location.origin}/callback.html`
+  redirectUri: `${window.location.origin}/callback.html`
 })
 
 export const torus = new TorusConnector({

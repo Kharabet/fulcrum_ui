@@ -26,7 +26,6 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
   React.useEffect(() => {
     if (activatingConnector && activatingConnector === connector) {
       if (active && connector && account) {
-        connector; 
         props.onSelect(connector, account);
       }
       setActivatingConnector(undefined)
