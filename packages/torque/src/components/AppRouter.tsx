@@ -17,6 +17,7 @@ import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { TorqueProviderEvents } from "../services/events/TorqueProviderEvents";
 import { NavService } from "../services/NavService";
 import { TorqueProvider } from "../services/TorqueProvider";
+import { errors } from "ethers"
 import siteConfig from "../config/SiteConfig.json";
 import { LocationListener } from "./LocationListener";
 import { RiskDisclosure } from "./RiskDisclosure";
@@ -59,6 +60,10 @@ export class AppRouter extends Component<any, IAppRouterState> {
     };
 
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderChanged, this.onProviderChanged);
+  }
+
+  public componentDidMount(): void {
+    errors.setLogLevel("error");
   }
 
   public componentWillUnmount(): void {
