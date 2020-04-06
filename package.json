@@ -4,6 +4,7 @@
   "license": "Apache-2.0",
   "workspaces": [
     "packages/*",
+    "packages/web3-react-6/",
     "packages/web3-react-6/packages/*"
   ],
   "devDependencies": {
@@ -11,7 +12,7 @@
     "lerna": "^3.14.1"
   },
   "scripts": {
-    "clean-all": "rm -rf ./packages/**/node_modules ./node_modules",
+    "clean-all": "rm -rf ./packages/**/node_modules ./node_modules ./packages/web3-react-6/node_modules ./packages/web3-react-6/packages/**/node_modules",
     "build-all": "yarn run build-alchemy-web3 && yarn run build-fulcrum-ropsten",
     "build-alchemy-web3": "./scripts/build-alchemy-web3.sh",
     "build-web3-react": "./scripts/build-web3-react.sh",
