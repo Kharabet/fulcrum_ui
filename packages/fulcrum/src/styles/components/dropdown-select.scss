@@ -5,16 +5,16 @@
   border-radius: 26px;
   color: var(--primary-text);  
   font-weight: 600;
+  padding: 10px 20px; 
   @media(min-width: $breakpoint-mobile-min){
     font-size: 14px;
-    padding: 14px 20px;    
   }
   @media(max-width: $breakpoint-mobile-max){
     font-size: 12px;
     padding: 9px 13px;
   }
   &.active {
-    border-radius: 26px 26px 0 0;
+    border-radius: 26px;
   }
   &:after {
     content: "";
@@ -24,7 +24,7 @@
     border-color: var(--select-arrow) transparent transparent transparent;
     position: absolute;
     @media(min-width: $breakpoint-mobile-min){
-      top: 21px;
+      top: 17px;
       right: 16px;
     }
     @media(max-width: $breakpoint-mobile-max){
@@ -45,19 +45,13 @@
   color: var(--select-arrow);
   @media(min-width: $breakpoint-mobile-min){
     font-size: 14px;
-    width: 130px;
+    width: 150px;
     height: 40px;
-    position: absolute;
-    left: 0;
-  }
-  @media(min-width: $breakpoint-laptop-min){
-    margin: 0 20px 0 40px;
   }
   @media(max-width: $breakpoint-mobile-max){
     font-size: 12px;
     width: 100px;
     height: 32px;
-    margin:  0 0 15px 0;
   }
 }
 
@@ -92,29 +86,33 @@
 .select-options {
   display: none;
   position: absolute;
-  top: 100%;
+  top: calc(100% + 5px);
   right: 0;
   left: 0;
   z-index: 999;
   margin: 0;
   padding: 0;
   list-style: none;
-  background-color: var(--select-bg);
-  border-radius: 0 0 26px 26px;
-  border: 1px solid var(--select-border);
-  border-top: none;
+  background-color: var(--select-option);
+  border-radius: 4px;
   li {
     margin: 0;
     padding: 12px 0;
     text-indent: 15px;
-    border-top: 1px solid var(--select-option-hover);
-    background-color: var(--select-bg);
+    background-color: transparent;
     color: var(--primary-text);
     &:hover {
       background-color: var(--select-option-hover);
     }
-    &:last-child {
-      border-radius: 0 0 26px 26px;
+
+    &:first-child{
+      border-radius: 4px 4px 0 0;
+    }
+    &:last-child{
+      border-radius: 0 0 4px 4px;
+    }
+    &:only-child{
+      border-radius: 4px;
     }
     &[rel="hide"] {
       display: none;

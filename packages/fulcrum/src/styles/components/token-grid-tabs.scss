@@ -90,11 +90,12 @@
       }
     }
   }
+  &__container {
+    justify-content: space-between;
+  }
   @media screen and (min-width: $breakpoint-mobile-min) {
     padding-top: 50px;
-    &__container {
-      justify-content: center;
-    }
+
     &:after {
       width: calc(100vw - 17px);
     }
