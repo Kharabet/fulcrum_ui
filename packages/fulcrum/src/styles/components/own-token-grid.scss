@@ -108,7 +108,47 @@ $width-button-action: 7rem;
     @include own-token-grid-row__col();
     width: $width-col-actions;
   }
-  &__buy-button {
+  &_button{
+    width: 82px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "Muli", sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    border: 0;
+    border-radius: 43px;
+    text-transform: uppercase;
+    font-style: normal;
+    color: #ffffff;
+    outline: none;
+    &:not(:disabled) {
+      cursor: pointer;
+    }
+    &:disabled {
+      background-color: var(--disabled-bg);
+      color: var(--disabled-color);
+      cursor: not-allowed;
+    }
+  }
+  &__sell-button {
+    background-color: #ff4f4f;
+    &:hover {
+      background-color: #fe7272;
+    }
+    &:not(:disabled){
+      cursor: pointer;
+    }
+    &:disabled {
+      background-color: var(--disabled-bg);
+      color: var(--disabled-color);
+      cursor: not-allowed;
+    }
+  }
+  /*&__buy-button {
     display: inline-block;
     border: 0;
     width: $width-button-action;
@@ -207,5 +247,5 @@ $width-button-action: 7rem;
       color: var(--disabled-color);
       cursor: not-allowed;
     }
-  }
+  }*/
 }

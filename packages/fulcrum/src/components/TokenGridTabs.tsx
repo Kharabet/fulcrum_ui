@@ -105,6 +105,7 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
               <div className={`trade-token-grid-tab-item__col-token-image wallet-img-div`} >
                 {<WalletSvg />}
                 <span>Manage</span>
+                <span className="count-open-position">2</span>
               </div>
             </div>
           </div>
