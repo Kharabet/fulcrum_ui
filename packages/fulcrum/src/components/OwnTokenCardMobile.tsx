@@ -199,7 +199,7 @@ export class OwnTokenCardMobile extends Component<IOwnTokenCardMobileProps, IOwn
               <span>
                 {!this.state.isLoading ?
                   <React.Fragment><span className="fw-normal">$</span>{bnPrice.toFixed(2)}</React.Fragment>
-                  : <Preloader />
+                  : <Preloader width="74px"/>
                 }
               </span>
             </div>
@@ -208,7 +208,7 @@ export class OwnTokenCardMobile extends Component<IOwnTokenCardMobileProps, IOwn
               <span>
                 {!this.state.isLoading ?
                   <React.Fragment><span className="fw-normal">$</span>{bnLiquidationPrice.toFixed(2)}</React.Fragment>
-                  : <Preloader />
+                  : <Preloader width="74px"/>
                 }
               </span>
             </div>
@@ -224,7 +224,7 @@ export class OwnTokenCardMobile extends Component<IOwnTokenCardMobileProps, IOwn
                   this.state.assetBalance ?
                     <React.Fragment><span className="fw-normal">$</span>{this.state.assetBalance.toFixed(2)}</React.Fragment> :
                     <React.Fragment><span className="fw-normal">$</span>0.00</React.Fragment> :
-                  <Preloader />
+                  <Preloader width="74px"/>
                 }
               </span>
             </div>
@@ -235,7 +235,7 @@ export class OwnTokenCardMobile extends Component<IOwnTokenCardMobileProps, IOwn
                   this.state.profit ?
                     <React.Fragment><span className="fw-normal">$</span>{this.state.profit.toFixed(2)}</React.Fragment> :
                     <React.Fragment><span className="fw-normal">$</span>0.0000</React.Fragment> :
-                  <Preloader />
+                  <Preloader width="74px"/>
                 }
               </span>
             </div>
