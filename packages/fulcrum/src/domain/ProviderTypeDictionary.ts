@@ -50,16 +50,16 @@ export class ProviderTypeDictionary {
   public static readonly WalletProviders: ProviderType[] = [
     ProviderType.MetaMask,
     ProviderType.TrustWallet,
+    ProviderType.Ledger,
+    ProviderType.Trezor,
+    ProviderType.WalletConnect,
+    ProviderType.WalletLink,
     ProviderType.Fortmatic,
     ProviderType.Portis,
     ProviderType.Squarelink,
     ProviderType.Bitski,
-    ProviderType.Ledger,
     ProviderType.Torus,
-    ProviderType.Authereum,
-    ProviderType.Trezor,
-    ProviderType.WalletConnect,
-    ProviderType.WalletLink
+    ProviderType.Authereum
   ];
 
   public static providerTypes: Map<ProviderType, ProviderTypeDetails> = new Map<ProviderType, ProviderTypeDetails>([
