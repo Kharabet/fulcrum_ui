@@ -158,7 +158,7 @@ layout: home
                 <div class="col flex fw-w">
                     <div class="item-reason">
                         <div class="icon-reason">
-                            {% include svg/icon-safe-1.svg %}
+                            {% include svg/icon-torque-1.svg %}
                         </div>
                         <div class="content-reason">
                             <h3 class="mb-10">Fixed Interest</h3>
@@ -167,7 +167,7 @@ layout: home
                     </div>
                     <div class="item-reason">
                         <div class="icon-reason">
-                            {% include svg/icon-safe-1.svg %}
+                            {% include svg/icon-torque-2.svg %}
                         </div>
                         <div class="content-reason">
                           <h3 class="mb-10">Partial Liquidations</h3>
@@ -176,7 +176,7 @@ layout: home
                     </div>
                     <div class="item-reason">
                         <div class="icon-reason">
-                            {% include svg/icon-safe-1.svg %}
+                            {% include svg/icon-torque-3.svg %}
                         </div>
                         <div class="content-reason">
                             <h3 class="mb-10">No KYC, Credit Checks</h3>
@@ -185,7 +185,7 @@ layout: home
                     </div>
                     <div class="item-reason">
                         <div class="icon-reason">
-                            {% include svg/icon-safe-1.svg %}
+                            {% include svg/icon-torque-4.svg %}
                         </div>
                         <div class="content-reason">
                           <h3 class="mb-10">Non custodial</h3>
