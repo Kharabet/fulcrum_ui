@@ -26,6 +26,9 @@ layout: home
                                 <div class="select-styled" data-asset="dai">
                                     DAI
                                 </div>
+                                <div class="select-arrow">
+                                    {% include svg/arrow-form.svg %}
+                                </div>
                                 <ul class="select-options">
                                     {% for product in site.data.products %}
                                         <li class="li-options" data-asset="{{ product.name }}">
@@ -47,6 +50,9 @@ layout: home
                             <div class="select">
                                 <div class="select-styled" data-asset="eth" >
                                     ETH
+                                </div>
+                                <div class="select-arrow">
+                                    {% include svg/arrow-form.svg %}
                                 </div>
                                 <ul class="select-options">
                                     {% for product in site.data.products %}
@@ -158,7 +164,7 @@ layout: home
                 <div class="col flex fw-w">
                     <div class="item-reason">
                         <div class="icon-reason">
-                            {% include svg/icon-safe-1.svg %}
+                            {% include svg/icon-torque-1.svg %}
                         </div>
                         <div class="content-reason">
                             <h3 class="mb-10">Fixed Interest</h3>
@@ -167,7 +173,7 @@ layout: home
                     </div>
                     <div class="item-reason">
                         <div class="icon-reason">
-                            {% include svg/icon-safe-1.svg %}
+                            {% include svg/icon-torque-2.svg %}
                         </div>
                         <div class="content-reason">
                           <h3 class="mb-10">Partial Liquidations</h3>
@@ -176,7 +182,7 @@ layout: home
                     </div>
                     <div class="item-reason">
                         <div class="icon-reason">
-                            {% include svg/icon-safe-1.svg %}
+                            {% include svg/icon-torque-3.svg %}
                         </div>
                         <div class="content-reason">
                             <h3 class="mb-10">No KYC, Credit Checks</h3>
@@ -185,7 +191,7 @@ layout: home
                     </div>
                     <div class="item-reason">
                         <div class="icon-reason">
-                            {% include svg/icon-safe-1.svg %}
+                            {% include svg/icon-torque-4.svg %}
                         </div>
                         <div class="content-reason">
                           <h3 class="mb-10">Non custodial</h3>
@@ -250,10 +256,6 @@ layout: home
                     <div class="item-stats">
                         <div>$<span class="fw-900">5,056,560</span></div>
                         <span>Loans Originated</span>
-                        <div class="stats-svg">
-                            {% include svg/after-stats.svg %}
-                            {% include svg/after-stats-mobile.svg %}
-                        </div>
                     </div>
                     <div class="item-stats">
                         <div>$<span class="fw-900">659,056,560</span></div>

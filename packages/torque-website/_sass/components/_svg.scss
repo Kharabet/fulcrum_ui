@@ -51,9 +51,10 @@
   height: 50px;
 }
 .wrapper-svg-blur{
-  width: calc(50% - 120px);
+  width: 50%;
+  padding: 0 60px;
   @media screen and (max-width: $breakpoint-lg-down){
-    width: calc(50% - 60px);
+    padding: 0 30px;
   }
   @media screen and (max-width: $breakpoint-md-down){
     width: 100%;
@@ -61,6 +62,7 @@
 }
 .svg-blur {
   display: flex;
+  align-items: center;
   position: relative;
   max-width: 100%;
   width: 100%;
