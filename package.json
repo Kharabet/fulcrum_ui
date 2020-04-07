@@ -17,13 +17,13 @@
     "build-alchemy-web3": "./scripts/build-alchemy-web3.sh",
     "build-web3-react": "./scripts/build-web3-react.sh",
     "bootstrap": "lerna bootstrap",
-    "build-fulcrum-rinkeby": "cross-env-shell REACT_APP_ETH_NETWORK=rinkeby \"./scripts/build-fulcrum.sh\"",
+    "build-fulcrum-rinkeby": "cross-env-shell REACT_APP_ETH_NETWORK=rinkeby GENERATE_SOURCEMAP=false \"./scripts/build-fulcrum.sh\"",
     "build-fulcrum-kovan": "cross-env-shell REACT_APP_ETH_NETWORK=kovan GENERATE_SOURCEMAP=false \"./scripts/build-fulcrum.sh\"",
-    "build-fulcrum-ropsten": "cross-env-shell REACT_APP_ETH_NETWORK=ropsten \"./scripts/build-fulcrum.sh\"",
-    "build-fulcrum-mainnet": "cross-env-shell REACT_APP_ETH_NETWORK=mainnet \"./scripts/build-fulcrum.sh\"",
-    "build-torque-rinkeby": "cross-env-shell REACT_APP_ETH_NETWORK=rinkeby \"./scripts/build-torque.sh\"",
-    "build-torque-kovan": "cross-env-shell REACT_APP_ETH_NETWORK=kovan \"./scripts/build-torque.sh\"",
-    "build-torque-ropsten": "cross-env-shell REACT_APP_ETH_NETWORK=ropsten \"./scripts/build-torque.sh\"",
-    "build-torque-mainnet": "cross-env-shell REACT_APP_ETH_NETWORK=mainnet \"./scripts/build-torque.sh\""
+    "build-fulcrum-ropsten": "cross-env-shell REACT_APP_ETH_NETWORK=ropsten GENERATE_SOURCEMAP=false \"./scripts/build-fulcrum.sh\"",
+    "build-fulcrum-mainnet": "cross-env-shell REACT_APP_ETH_NETWORK=mainnet GENERATE_SOURCEMAP=false \"./scripts/build-fulcrum.sh\"",
+    "build-torque-rinkeby": "cross-env-shell REACT_APP_ETH_NETWORK=rinkeby GENERATE_SOURCEMAP=false \"./scripts/build-torque.sh\"",
+    "build-torque-kovan": "cross-env-shell REACT_APP_ETH_NETWORK=kovan GENERATE_SOURCEMAP=false \"./scripts/build-torque.sh\"",
+    "build-torque-ropsten": "cross-env-shell REACT_APP_ETH_NETWORK=ropsten GENERATE_SOURCEMAP=false \"./scripts/build-torque.sh\"",
+    "build-torque-mainnet": "cross-env-shell REACT_APP_ETH_NETWORK=mainnet GENERATE_SOURCEMAP=false \"./scripts/build-torque.sh\""
   }
 }
