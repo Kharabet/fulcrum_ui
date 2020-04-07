@@ -1095,7 +1095,7 @@ export class TorqueProvider {
     );
 
     if (isDust) {
-      if (!confirm("Remaining debt should be zero or more than " + refRequest.dust.toString(10) + " DAI. Do you want to continue with total amount?")) {
+      if (!window.confirm("Remaining debt should be zero or more than " + refRequest.dust.toString(10) + " DAI. Do you want to continue with total amount?")) {
         return null;
     }
       loanAmount = refRequest.debt;
