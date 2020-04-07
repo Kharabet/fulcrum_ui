@@ -34,7 +34,10 @@ export function ProviderMenuListItem(props: IProviderMenuListItemProps) {
     return null;
   }
 
-
+  const onClick = () => {
+    // if (props.isConnected) return;
+    props.onSelect(props.providerType);
+  };
   if (props.isConnected) {
     const isUnSupportedNetwork = FulcrumProvider.Instance.unsupportedNetwork;
 
@@ -50,7 +53,7 @@ export function ProviderMenuListItem(props: IProviderMenuListItemProps) {
       : "";
 
     return (
-      <li className={`provider-menu__list-item provider-menu__list-item--selected`}>
+      <li className={`provider-menu__list-item provider-menu__list-item--selected`} onClick={onClick}>
         <div className="provider-menu__list-item-description">
           <span className="provider-name">{providerTypeDetails.displayName}</span>
 
@@ -75,10 +78,6 @@ export function ProviderMenuListItem(props: IProviderMenuListItemProps) {
       </li>)
   }
 
-  const onClick = () => {
-    if (props.isConnected) return;
-    props.onSelect(props.providerType);
-  };
 
   return (
     <li className={`provider-menu__list-item `} onClick={onClick}>
