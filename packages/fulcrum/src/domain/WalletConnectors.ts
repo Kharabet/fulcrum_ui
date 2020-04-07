@@ -10,7 +10,6 @@ import { PortisConnector } from '@web3-react/portis-connector';
 import { SquarelinkConnector } from '@web3-react/squarelink-connector';
 import { BitskiConnector } from '@web3-react/bitski-connector';
 import { TorusConnector } from '@web3-react/torus-connector';
-
 import fulcrumLogo from "../assets/images/fulcrum_logo.svg";
 
 

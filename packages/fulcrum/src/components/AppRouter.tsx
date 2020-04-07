@@ -5,7 +5,6 @@ import TagManager from 'react-gtm-module';
 import Intercom from "react-intercom";
 import Modal from "react-modal";
 import { HashRouter, Redirect, Route, Switch } from "react-router-dom";
-import { ProviderType } from "../domain/ProviderType";
 import { LandingPage } from "../pages/LandingPage";
 import { LendPage } from "../pages/LendPage";
 import { MaintenancePage } from "../pages/MaintenancePage";
@@ -22,7 +21,7 @@ import { RiskDisclosure } from "./RiskDisclosure";
 import { errors } from "ethers"
 import siteConfig from "./../config/SiteConfig.json";
 
-import { Web3ReactProvider, getWeb3ReactContext } from "@web3-react/core";
+import { Web3ReactProvider } from "@web3-react/core";
 import { Web3ProviderEngine } from "@0x/subproviders";
 import { Web3ConnectionFactory } from '../domain/Web3ConnectionFactory';
 import { ProviderTypeDictionary } from '../domain/ProviderTypeDictionary';
@@ -51,10 +50,7 @@ interface IAppRouterState {
   isMobileMedia: boolean;
 }
 
-const Web3ReactContext = getWeb3ReactContext()
-
 export class AppRouter extends Component<any, IAppRouterState> {
-  static contextType = Web3ReactContext;
   private _isMounted: boolean = false;
   constructor(props: any) {
     super(props);
@@ -86,7 +82,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
 
   public getLibrary = async (provider: any, connector: any): Promise<Web3ProviderEngine> => {
     console.log(provider);
-    //handle connectors events (i.e. netw changed)
+    //handle connectors events (i.e. network changed)
     await this.onProviderTypeSelect(connector) 
     return Web3ConnectionFactory.currentWeb3Engine;
   }
@@ -194,7 +190,6 @@ export class AppRouter extends Component<any, IAppRouterState> {
   }
 
   public onProviderTypeSelect = async (connector: AbstractConnector, account?: string) => {
-    const providerType = await ProviderTypeDictionary.getProviderTypeByConnector(connector);
     if (!this.state.isLoading) {
       FulcrumProvider.Instance.isLoading = true;
 
