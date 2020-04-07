@@ -46,7 +46,6 @@ if (isMainnetProd) {
 interface IAppRouterState {
   isProviderMenuModalOpen: boolean;
   isRiskDisclosureModalOpen: boolean;
-  selectedProviderType: ProviderType;
   isLoading: boolean;
   web3: Web3Wrapper | null;
   isMobileMedia: boolean;
@@ -64,7 +63,6 @@ export class AppRouter extends Component<any, IAppRouterState> {
       isProviderMenuModalOpen: false,
       isRiskDisclosureModalOpen: false,
       isLoading: false,
-      selectedProviderType: FulcrumProvider.Instance.providerType,
       web3: FulcrumProvider.Instance.web3Wrapper,
       isMobileMedia: false
     };
@@ -108,7 +106,6 @@ export class AppRouter extends Component<any, IAppRouterState> {
           overlayClassName="modal-overlay-div"
         >
           <ProviderMenu
-            selectedProviderType={this.state.selectedProviderType}
             providerTypes={ProviderTypeDictionary.WalletProviders}
             isMobileMedia={this.state.isMobileMedia}
             onSelect={this.onProviderTypeSelect}
@@ -232,7 +229,6 @@ export class AppRouter extends Component<any, IAppRouterState> {
   public onProviderChanged = async (event: ProviderChangedEvent) => {
     await this._isMounted && this.setState({
       ...this.state,
-      selectedProviderType: event.providerType,
       isLoading: false,
       web3: event.web3
     });

@@ -44,7 +44,7 @@
     flex-direction: column;
     flex-direction: row;
     /* width: 50%; */
-    padding: 20px 30px;
+    padding: 18px 30px;
     flex-wrap: wrap;
     background-color: #3d4651;
     width: 250px;
@@ -54,7 +54,27 @@
       background-color: #758295;
     }
     &--selected {
-      background-color: #586473;
+      background-color: #444e5a;
+      border: 1px solid #586473;
+      padding: 10px 30px;
+      &:hover{
+        background-color: initial;
+      }
+      .provider-menu__list-item-description {
+        display: flex;
+        flex-direction: column;
+        .provider-name {
+          font-weight: 800;
+          font-size: 15px;
+          line-height: 180%;
+          color: #fff;
+        }
+        .address {
+          font-size: 13px;
+          line-height: 180%;
+          color: #758295;
+        }
+      }
     }
     &-content {
       &-img {
@@ -73,8 +93,8 @@
     font-weight: 600;
     font-size: 16px;
     line-height: 150%;
-    color: #FFFFFF;
-    
+    color: #ffffff;
+
     display: flex;
     align-items: center;
     letter-spacing: 0.05em;
@@ -104,18 +124,55 @@
       font-size: 14px;
     }
   }
-  /*.provider-menu__list-item:last-child {
-    margin-top: 0rem;
+}
+
+.loader {
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  .loader-content {
+    .loader-dots {
+      text-align: center;
+      display: flex;
+      padding: 0 2px;
+      span {
+        &:not(:first-child):not(:last-child){
+          margin: 0 6px;
+        }
+        display: inline-block;
+        background: #758295;
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        animation: animationDotsLoader 3s infinite cubic-bezier(0, 1, 1, 0);
+        &:nth-child(2) {
+          animation-delay: 0.6s;
+        }
+        &:nth-child(3) {
+          animation-delay: 1.2s;
+        }
+        &:nth-child(4) {
+          animation-delay: 1.8s;
+        }
+        &:nth-child(5) {
+          animation-delay: 2.4s;
+        }
+      }
+    }
   }
-  .provider-menu__list-item {
-    height: 4.5rem;
+}
+
+@keyframes animationDotsLoader {
+  0% {
+    transform: scale(1);
+    background-color: #a9b5c7;
   }
-  .provider-menu__title {
-    margin-bottom: 1rem;
+  10% {
+    transform: scale(1.8);
+    background: #00c0ab;
   }
-  .provider-menu {
-    width: 200px;
-    margin: auto;
-    margin-bottom: 38px;
-  }*/
+  20% {
+    transform: scale(1);
+    background-color: #a9b5c7;
+  }
 }

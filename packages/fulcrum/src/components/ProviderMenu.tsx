@@ -1,8 +1,7 @@
 import React, { Component } from "react";
 import { ProviderType } from "../domain/ProviderType";
 import { ProviderMenuListItem } from "./ProviderMenuListItem";
-import { useWeb3React } from '@web3-react/core'
-import { useEagerConnect, useInactiveListener } from '../domain/WalletHooks'
+import { useWeb3React } from '@web3-react/core';
 import { ProviderTypeDictionary } from "../domain/ProviderTypeDictionary";
 import { FulcrumProvider } from "../services/FulcrumProvider";
 import { injected } from "../domain/WalletConnectors";
@@ -10,7 +9,6 @@ import { AbstractConnector } from '@web3-react/abstract-connector';
 
 export interface IProviderMenuProps {
   providerTypes: ProviderType[];
-  selectedProviderType: ProviderType;
   isMobileMedia: boolean;
   onSelect: (selectedConnector: AbstractConnector, account?: string) => void;
   onDeactivate: () => void;
@@ -38,8 +36,8 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
     //@ts-ignore
     setActivatingConnector(injected);
     activate(injected);
-    // return <React.Fragment/>;
   }
+
   const storedProvider: any = FulcrumProvider.getLocalstorageItem('providerType');
   const providerType: ProviderType | null = storedProvider as ProviderType || null;
   if (!activatingConnector && providerType && providerType !== FulcrumProvider.Instance.providerType) {
@@ -47,8 +45,8 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
     //@ts-ignore
     setActivatingConnector(ProviderTypeDictionary.getConnectorByProviderType(providerType)!);
     activate(ProviderTypeDictionary.getConnectorByProviderType(providerType)!);
-    // return <React.Fragment/>;
   }
+
   // handle logic to connect in reaction to certain events on the injected ethereum provider, if it exists
   // useInactiveListener(!triedEager || !!activatingConnector);
   const renderItems = () => {
@@ -62,12 +60,11 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
         providerType={e}
         isConnected={connected}
         isActivating={activating}
-        selectedProviderType={props.selectedProviderType}
         onSelect={() => {
           if (!currentConnector) return;
           //@ts-ignore
           setActivatingConnector(currentConnector)
-          activate(currentConnector, (err) => console.log(err))
+          activate(currentConnector, (err) => console.error(err))
         }}
       />
     });
