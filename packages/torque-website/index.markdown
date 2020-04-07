@@ -26,6 +26,9 @@ layout: home
                                 <div class="select-styled" data-asset="dai">
                                     DAI
                                 </div>
+                                <div class="select-arrow">
+                                    {% include svg/arrow-form.svg %}
+                                </div>
                                 <ul class="select-options">
                                     {% for product in site.data.products %}
                                         <li class="li-options" data-asset="{{ product.name }}">
@@ -47,6 +50,9 @@ layout: home
                             <div class="select">
                                 <div class="select-styled" data-asset="eth" >
                                     ETH
+                                </div>
+                                <div class="select-arrow">
+                                    {% include svg/arrow-form.svg %}
                                 </div>
                                 <ul class="select-options">
                                     {% for product in site.data.products %}
