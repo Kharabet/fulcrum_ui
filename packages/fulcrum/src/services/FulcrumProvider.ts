@@ -119,23 +119,30 @@ export class FulcrumProvider {
       FulcrumProvider.Instance = this;
     }
 
-    // setting up readonly provider
-    this.web3ProviderSettings = FulcrumProvider.getWeb3ProviderSettings(initialNetworkId);
-    Web3ConnectionFactory.setReadonlyProvider().then(() => {
-      const web3Wrapper = Web3ConnectionFactory.currentWeb3Wrapper;
-      const engine = Web3ConnectionFactory.currentWeb3Engine;
-      const canWrite = Web3ConnectionFactory.canWrite;
 
-      if (web3Wrapper && this.web3ProviderSettings) {
-        const contractsSource = new ContractsSource(engine, this.web3ProviderSettings.networkId, canWrite);
-        contractsSource.Init().then(() => {
-          this.web3Wrapper = web3Wrapper;
-          this.providerEngine = engine;
-          this.contractsSource = contractsSource;
-          this.eventEmitter.emit(FulcrumProviderEvents.ProviderAvailable);
-        });
-      }
-    });
+    const storedProvider: any = FulcrumProvider.getLocalstorageItem('providerType');
+    const providerType: ProviderType | null = storedProvider as ProviderType || null;
+    
+    this.web3ProviderSettings = FulcrumProvider.getWeb3ProviderSettings(initialNetworkId);
+    if (!providerType) {
+      // setting up readonly provider
+      Web3ConnectionFactory.setReadonlyProvider().then(() => {
+        const web3Wrapper = Web3ConnectionFactory.currentWeb3Wrapper;
+        const engine = Web3ConnectionFactory.currentWeb3Engine;
+        const canWrite = Web3ConnectionFactory.canWrite;
+
+        if (web3Wrapper && this.web3ProviderSettings) {
+          const contractsSource = new ContractsSource(engine, this.web3ProviderSettings.networkId, canWrite);
+          contractsSource.Init().then(() => {
+            this.web3Wrapper = web3Wrapper;
+            this.providerEngine = engine;
+            this.contractsSource = contractsSource;
+            this.eventEmitter.emit(FulcrumProviderEvents.ProviderAvailable);
+          });
+        }
+      });
+    }
+
 
     return FulcrumProvider.Instance;
   }
@@ -1770,13 +1777,13 @@ if (err || 'error' in added) {
 console.log(err, added);
 }
 }*//*);
-                                  }
-                                }
-                                }
-                                } catch(e) {
-                                // console.log(e);
-                                }
-                                }*/
+                                          }
+                                        }
+                                        }
+                                        } catch(e) {
+                                        // console.log(e);
+                                        }
+                                        }*/
   }
 
   private processLendRequestTask = async (task: RequestTask, skipGas: boolean) => {
