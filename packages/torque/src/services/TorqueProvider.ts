@@ -125,6 +125,12 @@ export class TorqueProvider {
       TorqueProvider.Instance = this;
     }
 
+    const storedProvider: any = TorqueProvider.getLocalstorageItem('providerType');
+    const providerType: ProviderType | null = storedProvider as ProviderType || null;
+    
+    this.web3ProviderSettings = TorqueProvider.getWeb3ProviderSettings(initialNetworkId);
+    if (!providerType) {
+
       // TorqueProvider.Instance.isLoading = true;
       // setting up readonly provider
       this.web3ProviderSettings = TorqueProvider.getWeb3ProviderSettings(initialNetworkId);
@@ -145,6 +151,7 @@ export class TorqueProvider {
           });
         }
       });
+    }
 
 
 
