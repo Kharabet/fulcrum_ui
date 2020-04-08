@@ -29,6 +29,7 @@ import { Web3ProviderEngine } from "@0x/subproviders";
 import { Web3ConnectionFactory } from '../domain/Web3ConnectionFactory';
 import { ProviderTypeDictionary } from '../domain/ProviderTypeDictionary';
 import { AbstractConnector } from '@web3-react/abstract-connector';
+import {errors} from "ethers"
 
 const isMainnetProd =
   process.env.NODE_ENV && process.env.NODE_ENV !== "development"
@@ -82,6 +83,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
     this._isMounted = true;
     window.addEventListener("resize", this.didResize.bind(this));
     this.didResize();
+    errors.setLogLevel("error")
     this.doNetworkConnect();
   }
 
