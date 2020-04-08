@@ -45,7 +45,27 @@ import { UnlendChaiProcessor } from "./processors/UnlendChaiProcessor";
 import { UnlendErcProcessor } from "./processors/UnlendErcProcessor";
 import { UnlendEthProcessor } from "./processors/UnlendEthProcessor";
 
+import { AbstractConnector } from '@web3-react/abstract-connector';
+
 import siteConfig from "./../config/SiteConfig.json";
+import { ProviderTypeDictionary } from "../domain/ProviderTypeDictionary";
+
+const getNetworkIdByString = (networkName: string | undefined) => {
+  switch (networkName) {
+    case 'mainnet':
+      return 1;
+    case 'ropsten':
+      return 3;
+    case 'rinkeby':
+      return 4;
+    case 'kovan':
+      return 42;
+    default:
+      return 0;
+  }
+}
+const networkName = process.env.REACT_APP_ETH_NETWORK;
+const initialNetworkId = getNetworkIdByString(networkName);
 
 export class FulcrumProvider {
   private static readonly priceGraphQueryFunction = new Map<Asset, string>([
@@ -82,7 +102,7 @@ export class FulcrumProvider {
   public providerType: ProviderType = ProviderType.None;
   public providerEngine: Web3ProviderEngine | null = null;
   public web3Wrapper: Web3Wrapper | null = null;
-  public web3ProviderSettings: IWeb3ProviderSettings | null = null;
+  public web3ProviderSettings: IWeb3ProviderSettings;
   public contractsSource: ContractsSource | null = null;
   public accounts: string[] = [];
   public isLoading: boolean = false;
@@ -94,42 +114,28 @@ export class FulcrumProvider {
     this.eventEmitter.setMaxListeners(1000);
     TasksQueue.Instance.on(TasksQueueEvents.Enqueued, this.onTaskEnqueued);
 
-    const storedProvider: any = FulcrumProvider.getLocalstorageItem('providerType');
-    // const providerType: ProviderType | null = ProviderType[storedProvider] as ProviderType || null;
-    const providerType: ProviderType | null = storedProvider as ProviderType || null;
-
     // singleton
     if (!FulcrumProvider.Instance) {
       FulcrumProvider.Instance = this;
     }
 
-    if (providerType) {
-      FulcrumProvider.Instance.setWeb3Provider(providerType).then(() => {
-        this.eventEmitter.emit(FulcrumProviderEvents.ProviderAvailable);
-        FulcrumProvider.Instance.eventEmitter.emit(
-          FulcrumProviderEvents.ProviderChanged,
-          new ProviderChangedEvent(FulcrumProvider.Instance.providerType, FulcrumProvider.Instance.web3Wrapper)
-        );
-      });
-    } else {
-      // setting up readonly provider
-      Web3ConnectionFactory.getWeb3Provider(null, this.eventEmitter).then((providerData) => {
-        // @ts-ignore
-        const web3Wrapper = providerData[0];
-        FulcrumProvider.getWeb3ProviderSettings(providerData[3]).then((web3ProviderSettings) => {
-          if (web3Wrapper && web3ProviderSettings) {
-            const contractsSource = new ContractsSource(providerData[1], web3ProviderSettings.networkId, providerData[2]);
-            contractsSource.Init().then(() => {
-              this.web3Wrapper = web3Wrapper;
-              this.providerEngine = providerData[1];
-              this.web3ProviderSettings = web3ProviderSettings;
-              this.contractsSource = contractsSource;
-              this.eventEmitter.emit(FulcrumProviderEvents.ProviderAvailable);
-            });
-          }
+    // setting up readonly provider
+    this.web3ProviderSettings = FulcrumProvider.getWeb3ProviderSettings(initialNetworkId);
+    Web3ConnectionFactory.setReadonlyProvider().then(() => {
+      const web3Wrapper = Web3ConnectionFactory.currentWeb3Wrapper;
+      const engine = Web3ConnectionFactory.currentWeb3Engine;
+      const canWrite = Web3ConnectionFactory.canWrite;
+
+      if (web3Wrapper && this.web3ProviderSettings) {
+        const contractsSource = new ContractsSource(engine, this.web3ProviderSettings.networkId, canWrite);
+        contractsSource.Init().then(() => {
+          this.web3Wrapper = web3Wrapper;
+          this.providerEngine = engine;
+          this.contractsSource = contractsSource;
+          this.eventEmitter.emit(FulcrumProviderEvents.ProviderAvailable);
         });
-      });
-    }
+      }
+    });
 
     return FulcrumProvider.Instance;
   }
@@ -152,61 +158,53 @@ export class FulcrumProvider {
     }
   }
 
-  public async setWeb3Provider(providerType: ProviderType) {
+  public async setWeb3Provider(connector: AbstractConnector, account?: string) {
     this.unsupportedNetwork = false;
-    await this.setWeb3ProviderFinalize(providerType, await Web3ConnectionFactory.getWeb3Provider(providerType, this.eventEmitter));
+    await Web3ConnectionFactory.setWalletProvider(connector, account);
+    const providerType = await ProviderTypeDictionary.getProviderTypeByConnector(connector);
+    await this.setWeb3ProviderFinalize(providerType);
   }
 
-  public async setWeb3ProviderFinalize(providerType: ProviderType, providerData: [Web3Wrapper | null, Web3ProviderEngine | null, boolean, number]) { // : Promise<boolean> {
-    this.web3Wrapper = providerData[0];
-    this.providerEngine = providerData[1];
-    let canWrite = providerData[2];
-    let networkId = providerData[3];
+  public async setReadonlyWeb3Provider() {
+    await Web3ConnectionFactory.setReadonlyProvider();
+    await this.setWeb3ProviderFinalize(ProviderType.None);
+  }
 
-    this.web3ProviderSettings = await FulcrumProvider.getWeb3ProviderSettings(networkId);
-    if (this.web3Wrapper) {
-      if (this.web3ProviderSettings.networkName !== process.env.REACT_APP_ETH_NETWORK) {
-        // TODO: inform the user they are on the wrong network. Make it provider specific (MetaMask, etc)
+  public async setWeb3ProviderFinalize(providerType: ProviderType) { // : Promise<boolean> {
+    this.web3Wrapper = Web3ConnectionFactory.currentWeb3Wrapper;
+    this.providerEngine = Web3ConnectionFactory.currentWeb3Engine;
+    let canWrite = Web3ConnectionFactory.canWrite;
+    const networkId = Web3ConnectionFactory.networkId;
+    this.accounts = Web3ConnectionFactory.userAccount ? [Web3ConnectionFactory.userAccount] : [];
 
-        this.unsupportedNetwork = true;
-        canWrite = false; // revert back to read-only
-        networkId = await this.web3Wrapper.getNetworkIdAsync();
-        this.web3ProviderSettings = await FulcrumProvider.getWeb3ProviderSettings(networkId);
-      }
+    if (this.web3Wrapper && networkId !== initialNetworkId) {
+      // TODO: inform the user they are on the wrong network. Make it provider specific (MetaMask, etc)
+      this.unsupportedNetwork = true;
+      canWrite = false; // revert back to read-only
     }
 
     if (this.web3Wrapper && canWrite) {
-      try {
-        this.accounts = await this.web3Wrapper.getAvailableAddressesAsync() || [];
-      } catch (e) {
-        // console.log(e);
-        this.accounts = [];
-      }
+      const web3EngineAccounts = await this.web3Wrapper.getAvailableAddressesAsync();
+      if (web3EngineAccounts.length > 0 && this.accounts.length === 0)
+        this.accounts = web3EngineAccounts;
       if (this.accounts.length === 0) {
         canWrite = false; // revert back to read-only
-      }
-    } else {
-      // this.accounts = [];
-      if (providerType === ProviderType.Bitski && networkId !== 1) {
-        this.unsupportedNetwork = true;
       }
     }
 
     if (this.web3Wrapper && this.web3ProviderSettings.networkId > 0) {
       this.contractsSource = await new ContractsSource(this.providerEngine, this.web3ProviderSettings.networkId, canWrite);
-      if (canWrite) {
-        this.providerType = providerType;
-      } else {
-        this.providerType = ProviderType.None;
-      }
-      FulcrumProvider.setLocalstorageItem('providerType', this.providerType);
+      await this.contractsSource.Init();
     } else {
       this.contractsSource = null;
     }
 
-    if (this.contractsSource) {
-      await this.contractsSource.Init();
-    }
+    this.providerType = canWrite
+      ? providerType
+      : ProviderType.None;
+
+    FulcrumProvider.setLocalstorageItem('providerType', this.providerType);
+
   }
 
   public async setWeb3ProviderMobileFinalize(providerType: ProviderType, providerData: [Web3Wrapper | null, Web3ProviderEngine | null, boolean, number, string]) { // : Promise<boolean> {
@@ -216,15 +214,12 @@ export class FulcrumProvider {
     let networkId = providerData[3];
     const sellectedAccount = providerData[4];
 
-    this.web3ProviderSettings = await FulcrumProvider.getWeb3ProviderSettings(networkId);
     if (this.web3Wrapper) {
       if (this.web3ProviderSettings.networkName !== process.env.REACT_APP_ETH_NETWORK) {
         // TODO: inform the user they are on the wrong network. Make it provider specific (MetaMask, etc)
 
         this.unsupportedNetwork = true;
         canWrite = false; // revert back to read-only
-        networkId = await this.web3Wrapper.getNetworkIdAsync();
-        this.web3ProviderSettings = await FulcrumProvider.getWeb3ProviderSettings(networkId);
       }
     }
 
@@ -1354,7 +1349,7 @@ export class FulcrumProvider {
     return requestAmount.multipliedBy(request.leverage);
   }
 
-  public static async getWeb3ProviderSettings(networkId: number | null): Promise<IWeb3ProviderSettings> {
+  public static getWeb3ProviderSettings(networkId: number): IWeb3ProviderSettings {
     // tslint:disable-next-line:one-variable-per-declaration
     let networkName, etherscanURL;
     switch (networkId) {
@@ -1534,7 +1529,8 @@ export class FulcrumProvider {
       }
       if (account) {
         // @ts-ignore
-        const resp = await Web3ConnectionFactory.alchemyProvider!.alchemy!.getTokenBalances(account, addressesErc20);
+        const alchemyProvider = await Web3ConnectionFactory.getAlchemyProvider();
+        const resp = await alchemyProvider.alchemy!.getTokenBalances(account, addressesErc20);
         if (resp) {
           // @ts-ignore
           result = resp.tokenBalances.filter(t => !t.error && t.tokenBalance !== "0").reduce((map, obj) => (map.set(obj.contractAddress, new BigNumber(obj.tokenBalance!)), map), new Map<string, BigNumber>());
@@ -1771,13 +1767,13 @@ if (err || 'error' in added) {
 console.log(err, added);
 }
 }*//*);
-  }
-}
-}
-} catch(e) {
-// console.log(e);
-}
-}*/
+                                  }
+                                }
+                                }
+                                } catch(e) {
+                                // console.log(e);
+                                }
+                                }*/
   }
 
   private processLendRequestTask = async (task: RequestTask, skipGas: boolean) => {

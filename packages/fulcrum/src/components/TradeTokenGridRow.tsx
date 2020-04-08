@@ -14,6 +14,7 @@ import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { TradeTransactionMinedEvent } from "../services/events/TradeTransactionMinedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
 import { PositionTypeMarkerAlt } from "./PositionTypeMarkerAlt";
+import siteConfig from "../config/SiteConfig.json";
 
 import { LeverageSelector } from "./LeverageSelector";
 import { PositionTypeMarker } from "./PositionTypeMarker";
@@ -221,7 +222,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
               <span className="fw-normal">$</span>{bnPrice.toFixed(2)}
             </React.Fragment>
             :
-            <Preloader />
+            <Preloader width="74px"/>
           }
         </div>
         <div title={`$${bnLiquidationPrice.toFixed(18)}`} className="trade-token-grid-row__col-price">
@@ -231,7 +232,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
                 <span className="fw-normal">$</span>{bnLiquidationPrice.toFixed(2)}
               </React.Fragment>
               :
-              <Preloader />
+              <Preloader width="74px"/>
           }
         </div>
         <div title={this.state.interestRate.gt(0) ? `${this.state.interestRate.toFixed(18)}%` : ``} className="trade-token-grid-row__col-profit">
@@ -241,7 +242,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
               <span className="fw-normal">%</span>
             </React.Fragment>
             :
-            <Preloader />
+            <Preloader width="74px"/>
           }
         </div>
         {this.renderActions(this.state.balance.eq(0))}
@@ -252,7 +253,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
   private renderActions = (isBuyOnly: boolean) => {
     return (
       <div className="trade-token-grid-row__col-action">
-        <button className="trade-token-grid-row__button trade-token-grid-row__buy-button trade-token-grid-row__button--size-half" disabled onClick={this.onBuyClick}>
+        <button className="trade-token-grid-row__button trade-token-grid-row__buy-button trade-token-grid-row__button--size-half" disabled={siteConfig.TradeBuyDisabled} onClick={this.onBuyClick}>
           {TradeType.BUY}
         </button>
       </div>
