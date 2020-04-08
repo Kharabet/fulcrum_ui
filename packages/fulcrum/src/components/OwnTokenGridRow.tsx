@@ -184,51 +184,53 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
               ? <React.Fragment>
                 <span className="sign-currency">$</span>{bnPrice.toFixed(2)}
               </React.Fragment>
-              : <Preloader width="74px" />}
+              : <Preloader width="74px" />
             }
           </div>
-          {!state.isLoading
-            ? state.assetBalance
-              ? <React.Fragment>
-                <span className="sign-currency">$</span>{bnLiquidationPrice.toFixed(2)}
-              </React.Fragment>
-              : '$0.00'
-            : <Preloader width="74px" />
-          }
-        </div>
-        <div className="own-token-grid-row__col-collateral">
-          <div className="own-token-grid-row__col-collateral-wrapper">
-            <span><span className="sign-currency">$</span>15.25</span>
-            <span className="own-token-grid-row__col-asset-collateral-small">16.5%</span>
+          <div title={`$${bnPrice.toFixed(18)}`} className="own-token-grid-row__col-liquidation-price">
+            {!state.isLoading
+              ? state.assetBalance
+                ? <React.Fragment>
+                  <span className="sign-currency">$</span>{bnLiquidationPrice.toFixed(2)}
+                </React.Fragment>
+                : '$0.00'
+              : <Preloader width="74px" />
+            }
           </div>
-          <div className="own-token-grid-row__open-manage-collateral" onClick={this.onManageClick}>
-            <OpenManageCollateral />
+          <div className="own-token-grid-row__col-collateral">
+            <div className="own-token-grid-row__col-collateral-wrapper">
+              <span><span className="sign-currency">$</span>15.25</span>
+              <span className="own-token-grid-row__col-asset-collateral-small">16.5%</span>
+            </div>
+            <div className="own-token-grid-row__open-manage-collateral" onClick={this.onManageClick}>
+              <OpenManageCollateral />
+            </div>
           </div>
-        </div>
-        <div title={state.assetBalance ? `$${state.assetBalance.toFixed(18)}` : ``} className="own-token-grid-row__col-position-value">
-          {!state.isLoading
-            ? state.assetBalance
-              ? <React.Fragment>
-                <span className="sign-currency">$</span>{state.assetBalance.toFixed(2)}
-              </React.Fragment>
-              : '$0.00'
-            : <Preloader width="74px" />
-          }
-        </div>
-        <div title={state.profit ? `$${state.profit.toFixed(18)}` : ``} className="own-token-grid-row__col-profit">
-          {!state.isLoading
-            ? state.profit
-              ? <React.Fragment>
-                <span className="sign-currency">$</span>{state.profit.toFixed(2)}
-              </React.Fragment>
-              : '$0.00'
-            : <Preloader width="74px" />
-          }
-        </div>
-        <div className="own-token-grid-row__col-action">
-          <button className="own-token-grid-row_button own-token-grid-row__sell-button own-token-grid-row__button--size-half" onClick={this.onSellClick}>
-            {TradeType.SELL}
-          </button>
+          <div title={state.assetBalance ? `$${state.assetBalance.toFixed(18)}` : ``} className="own-token-grid-row__col-position-value">
+            {!state.isLoading
+              ? state.assetBalance
+                ? <React.Fragment>
+                  <span className="sign-currency">$</span>{state.assetBalance.toFixed(2)}
+                </React.Fragment>
+                : '$0.00'
+              : <Preloader width="74px" />
+            }
+          </div>
+          <div title={state.profit ? `$${state.profit.toFixed(18)}` : ``} className="own-token-grid-row__col-profit">
+            {!state.isLoading
+              ? state.profit
+                ? <React.Fragment>
+                  <span className="sign-currency">$</span>{state.profit.toFixed(2)}
+                </React.Fragment>
+                : '$0.00'
+              : <Preloader width="74px" />
+            }
+          </div>
+          <div className="own-token-grid-row__col-action">
+            <button className="own-token-grid-row_button own-token-grid-row__sell-button own-token-grid-row__button--size-half" onClick={this.onSellClick}>
+              {TradeType.SELL}
+            </button>
+          </div>
         </div>
       </React.Fragment>
     );
