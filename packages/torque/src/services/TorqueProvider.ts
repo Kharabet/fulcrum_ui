@@ -264,8 +264,9 @@ export class TorqueProvider {
     }
 
     if (this.web3Wrapper && this.web3ProviderSettings.networkId > 0) {
-      this.contractsSource = await new ContractsSource(this.providerEngine, this.web3ProviderSettings.networkId, canWrite);
-      await this.contractsSource.Init();
+      const newContractsSource = await new ContractsSource(this.providerEngine, this.web3ProviderSettings.networkId, canWrite);
+      await newContractsSource.Init();
+      this.contractsSource = newContractsSource;
     } else {
       this.contractsSource = null;
     }
