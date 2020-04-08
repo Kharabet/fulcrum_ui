@@ -1,14 +1,18 @@
+import { AbstractConnector } from '@web3-react/abstract-connector'
+
 export class ProviderTypeDetails {
-  public displayName: string = "";
-  public logoSvg: any = null;
-  public reactLogoSvg: any = null;
-  public reactLogoSvgShort: any = null;
+  public readonly displayName: string = "";
+  public readonly reactLogoSvgShort: any = null;
+  public readonly connector: AbstractConnector | null = null;
 
 
-  constructor(displayName: string, logoSvg: any, reactLogoSvg: any, reactLogoSvgShort: any) {
+  constructor(
+    displayName: string,
+    reactLogoSvgShort: any,
+    connector: AbstractConnector | null 
+  ) {
     this.displayName = displayName;
-    this.logoSvg = logoSvg;
-    this.reactLogoSvg = reactLogoSvg;
     this.reactLogoSvgShort = reactLogoSvgShort;
+    this.connector = connector;
   }
 }

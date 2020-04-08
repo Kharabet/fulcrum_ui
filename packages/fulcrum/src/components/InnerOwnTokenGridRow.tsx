@@ -180,7 +180,7 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
                 <span className="sign-currency">$</span>{bnPrice.toFixed(2)}
                 <span className="own-token-grid-row-inner__col-asset-price-small">12.25%</span>
               </React.Fragment>
-              : <Preloader />
+              : <Preloader width="74px" />
             }
           </div>
           <div className="own-token-grid-row-inner__col-asset-collateral">
@@ -197,13 +197,13 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
               ? state.assetBalance
                 ? <React.Fragment><span className="sign-currency">$</span>{state.assetBalance.toFixed(2)}</React.Fragment>
                 : '$0.00'
-              : <Preloader />
+              : <Preloader width="74px" />
             }
           </div>
           <div title={`$${bnLiquidationPrice.toFixed(18)}`} className="own-token-grid-row-inner__col-liquidation-price">
             {!state.isLoading
               ? <React.Fragment><span className="sign-currency">$</span>{bnLiquidationPrice.toFixed(2)}</React.Fragment>
-              : <Preloader />
+              : <Preloader width="74px" />
             }
           </div>
           <div title={state.profit ? `$${state.profit.toFixed(18)}` : ``} className="own-token-grid-row-inner__col-profit">
@@ -211,7 +211,7 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
               state.profit
                 ? <React.Fragment><span className="sign-currency">$</span>{state.profit.toFixed(2)}</React.Fragment>
                 : '$0.00'
-              : <Preloader />
+              : <Preloader width="74px" />
             }
           </div>
           <div className="own-token-grid-row-inner__col-action">
