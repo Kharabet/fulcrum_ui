@@ -45,25 +45,13 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
 
   private renderDesktop = () => {
 
-    let menu: IHeaderMenuProps;
-    if (TorqueProvider.Instance.providerType !== ProviderType.None) {
-      menu = {
-        items: [
-          { id: 1, title: "Wallets", link: "/wallet/b", external: false },
-          { id: 2, title: "Borrow", link: "/borrow/w", external: false },
-          { id: 3, title: "Dashboard", link: "/dashboard/w", external: false },
-          { id: 4, title: "Lend", link: "https://fulcrum.trade", external: true }
-        ]
-      };
-    } else {
-      menu = {
-        items: [
-          { id: 1, title: "Wallets", link: "/wallet/b", external: false },
-          { id: 2, title: "Borrow", link: "/borrow/n", external: false },
-          { id: 3, title: "Dashboard", link: "/dashboard/n", external: false },
-          { id: 4, title: "Lend", link: "https://fulcrum.trade", external: true }
-        ]
-      };
+    let menu: IHeaderMenuProps = {
+      items: [
+        { id: 1, title: "Borrow", link: "/borrow/n", external: false },
+        { id: 2, title: "Dashboard", link: "/dashboard/n", external: false },
+        { id: 3, title: "Lend", link: "https://fulcrum.trade", external: true },
+        { id: 4, title: "Help Center", link: "https://help.bzx.network/en/collections/2008807-torque", external: true },
+      ]
     }
 
     const toggleMenuIcon = !this.state.isMenuOpen ? <OpenMenu /> : <CloseMenu />;
@@ -78,11 +66,8 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
             <HeaderMenu items={menu.items} />
           </div>
           <div className="header__right">
-            <a className="help__item" href="https://help.bzx.network/en/collections/2008807-torque">Help Center</a>
             <div className="header__provider">
-              {TorqueProvider.Instance.providerType !== ProviderType.None ? (
-                <OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />
-              ) : ``}
+              <OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />
             </div>
             <div className="header_icon" onClick={this.onMenuToggle}>
               <div className="toggle_icon">
@@ -115,7 +100,7 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
           </div>
           <div className="sidebar_footer">
             <FooterVersion />
-            <FooterMenu {...this.props}/>
+            <FooterMenu {...this.props} />
           </div>
         </div>
         <InfoBlock localstorageItemProp="torque-risk-notice" onAccept={() => { this.forceUpdate() }}>
