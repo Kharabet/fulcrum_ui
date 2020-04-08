@@ -193,8 +193,11 @@ export class FulcrumProvider {
     }
 
     if (this.web3Wrapper && this.web3ProviderSettings.networkId > 0) {
-      this.contractsSource = await new ContractsSource(this.providerEngine, this.web3ProviderSettings.networkId, canWrite);
-      await this.contractsSource.Init();
+      const newContractsSource = await new ContractsSource(this.providerEngine, this.web3ProviderSettings.networkId, canWrite);
+      await newContractsSource.Init();
+      this.contractsSource = newContractsSource;
+      console.log(`contractsource: ${this.contractsSource}`)
+      console.log(`contractsource can write: ${this.contractsSource.canWrite}`)
     } else {
       this.contractsSource = null;
     }
