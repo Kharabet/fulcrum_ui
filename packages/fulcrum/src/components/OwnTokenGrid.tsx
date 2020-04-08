@@ -89,6 +89,7 @@ export class OwnTokenGrid extends Component<IOwnTokenGridProps, IOwnTokenGridSta
 
   private renderDesktop = () => {
     const tokenRows = this.state.tokenRowsData.map(e => <OwnTokenGridRow key={`${e.currentKey.toString()}`} {...e} />);
+    const historyRows = this.state.tokenRowsData.map(e => <HistoryTokenGridRow key={`${e.currentKey.toString()}`} {...e} />);
     if (tokenRows.length === 0) return null;
 
     return (
@@ -100,7 +101,7 @@ export class OwnTokenGrid extends Component<IOwnTokenGridProps, IOwnTokenGridSta
         {this.state.isShowHistory
           ? <React.Fragment>
             <HistoryTokenGridHeader />
-            <div>History</div>
+            {historyRows}
           </React.Fragment>
           : <React.Fragment>
             <OwnTokenGridHeader />

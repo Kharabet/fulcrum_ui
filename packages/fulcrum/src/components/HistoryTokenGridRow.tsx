@@ -125,11 +125,70 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
 
     this.derivedUpdate();
   }
-  private renderOwnTokenRow = (state: IHistoryTokenGridRowState, props: IHistoryTokenGridRowProps, bnPrice: BigNumber, bnLiquidationPrice: BigNumber, isActiveClassName: string): React.ReactFragment => {
+  private renderOwnTokenRowHistory = (state: IHistoryTokenGridRowState, props: IHistoryTokenGridRowProps, bnPrice: BigNumber, bnLiquidationPrice: BigNumber): React.ReactFragment => {
     if (!state.assetDetails) return <React.Fragment></React.Fragment>;
     return (
       <React.Fragment>
-        <div>History</div>
+        <div className="own-token-grid-row-history">
+          <div className="own-token-grid-row-history__col-token-date">
+            12 June 2019
+          </div>
+          <div className="own-token-grid-row-history__col-token-asset">
+            SAI
+          </div>
+          <div className="own-token-grid-row-history__col-type">
+            <div className="position-type-marker">
+              {`${props.currentKey.leverage}x ${props.currentKey.positionType}`}
+            </div>
+          </div>
+          <div className="own-token-grid-row-history__col-asset-unit">
+            {props.currentKey.unitOfAccount}
+          </div>
+          <div className="own-token-grid-row-history__col-position">
+            0.8884
+          </div>
+          <div className="own-token-grid-row-history__col-asset-price">
+            {!state.isLoading
+              ? <React.Fragment>
+                <span className="sign-currency">$</span>{bnPrice.toFixed(2)}
+              </React.Fragment>
+              : <Preloader width="74px" />
+            }
+          </div>
+          <div className="own-token-grid-row-history__col-liquidation-price">
+            {!state.isLoading
+              ? state.assetBalance
+                ? <React.Fragment>
+                  <span className="sign-currency">$</span>{bnLiquidationPrice.toFixed(2)}
+                </React.Fragment>
+                : '$0.00'
+              : <Preloader width="74px" />
+            }
+          </div>
+          <div className="own-token-grid-row-history__col-position-value">
+            {!state.isLoading
+              ? state.assetBalance
+                ? <React.Fragment>
+                  <span className="sign-currency">$</span>{state.assetBalance.toFixed(2)}
+                </React.Fragment>
+                : '$0.00'
+              : <Preloader width="74px" />
+            }
+          </div>
+          <div className="own-token-grid-row-history__col-profit">
+            {!state.isLoading
+              ? state.profit
+                ? <React.Fragment>
+                  <span className="sign-currency">$</span>{state.profit.toFixed(2)}
+                </React.Fragment>
+                : '$0.00'
+              : <Preloader width="74px" />
+            }
+          </div>
+          <div className="own-token-grid-row-history__result">
+            Liquidated
+          </div>
+        </div>
       </React.Fragment>
     );
 
@@ -142,9 +201,7 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
 
     const bnPrice = new BigNumber(this.state.latestAssetPriceDataPoint.price);
     const bnLiquidationPrice = new BigNumber(this.state.latestAssetPriceDataPoint.liquidationPrice);
-    const isActiveClassName =
-      this.props.currentKey.toString() === this.props.selectedKey.toString() ? "own-token-grid-row--active" : "";
 
-    return this.renderOwnTokenRow(this.state, this.props, bnPrice, bnLiquidationPrice, isActiveClassName);
+    return this.renderOwnTokenRowHistory(this.state, this.props, bnPrice, bnLiquidationPrice);
   }
 }
