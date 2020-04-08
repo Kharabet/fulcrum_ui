@@ -87,7 +87,7 @@ export class TVChartContainer extends React.PureComponent<Partial<ChartContainer
 
 	private GetWidgetOptions(): ChartingLibraryWidgetOptions {
 		return {
-			symbol: `${this.props.symbol}_SAI` as string,
+			symbol: `${this.props.symbol}_DAI` as string,
 			// BEWARE: no trailing slash is expected in feed URL
 			// tslint:disable-next-line:no-any
 			datafeed: new (window as any).Datafeeds.UDFCompatibleDatafeed(this.props.datafeedUrl),
