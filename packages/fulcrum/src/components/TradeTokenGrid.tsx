@@ -13,7 +13,7 @@ import { FulcrumProvider } from "../services/FulcrumProvider";
 import { TradeTokenGridHeader } from "./TradeTokenGridHeader";
 import { ITradeTokenGridRowProps, TradeTokenGridRow } from "./TradeTokenGridRow";
 import { ITradeTokenCardMobileProps, TradeTokenCardMobile } from "./TradeTokenCardMobile";
-import { OwnTokenGrid } from "./OwnTokenGrid";
+import { InnerOwnTokenGrid } from "./InnerOwnTokenGrid";
 
 // import siteConfig from "./../config/SiteConfig.json";
 
@@ -121,7 +121,7 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
           {tokenRows && tokenRows.map(row => {
             return (<div className="trade-token-grid-row-wrapper" key={`${row.props.asset}_${row.props.positionType}`}>
               {row}
-              <OwnTokenGrid positionType={row.props.positionType} asset={row.props.asset} {...tradeTokenGridProps} />
+              <InnerOwnTokenGrid positionType={row.props.positionType} asset={row.props.asset} {...tradeTokenGridProps} />
             </div>)
           })}
         </div>

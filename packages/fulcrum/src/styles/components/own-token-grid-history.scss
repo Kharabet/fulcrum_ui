@@ -1,0 +1,79 @@
+$font-size-header: 12px;
+$font-size-row: 18px;
+$width-col-token-date: 12%;
+$width-col-token-asset: 9%;
+$width-col-type: 9%;
+$width-col-asset-unit: 10%;
+$width-col-position: 12%;
+$width-col-asset-price: 12%;
+$width-col-liquidation-price: 10%;
+$width-col-position-value: 10%;
+$width-col-profit: 9%;
+$width-col-result: 7%;
+
+@mixin own-token-grid-header-history__col {
+  font-family: "Muli", sans-serif;
+  font-size: $font-size-header;
+  font-weight: 600;
+  line-height: 1.5;
+  font-style: normal;
+  font-stretch: normal;
+  letter-spacing: normal;
+  color: #a2abb8;
+}
+@mixin own-token-grid-row-history__col {
+  font-family: "Muli", sans-serif;
+  font-size: $font-size-row;
+  font-weight: 800;
+  color: var(--primary-text);
+  font-style: normal;
+  font-stretch: normal;
+  line-height: 1.5;
+  display: flex;
+}
+.own-token-grid-header-history {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 0 40px 22px 40px;
+  font-family: "Muli", sans-serif;
+  &__col-token-date {
+    @include own-token-grid-header-history__col();
+    width: $width-col-token-date;
+  }
+  &__col-type {
+    @include own-token-grid-header-history__col();
+    width: $width-col-type;
+  }
+  &__col-asset-unit {
+    @include own-token-grid-header-history__col();
+    width: $width-col-asset-unit;
+  }
+  &__col-token-asset {
+    @include own-token-grid-header-history__col();
+    width: $width-col-token-asset;
+  }
+  &__col-position {
+    @include own-token-grid-header-history__col();
+    width: $width-col-position;
+  }
+  &__col-asset-price {
+    @include own-token-grid-header-history__col();
+    width: $width-col-asset-price;
+  }
+  &__col-liquidation-price {
+    @include own-token-grid-header-history__col();
+    width: $width-col-liquidation-price;
+  }
+  &__col-position-value {
+    @include own-token-grid-header-history__col();
+    width: $width-col-position-value;
+  }
+  &__col-profit {
+    @include own-token-grid-header-history__col();
+    width: $width-col-profit;
+  }
+  &__col-result {
+    @include own-token-grid-header-history__col();
+    width: $width-col-result;
+  }
+}
