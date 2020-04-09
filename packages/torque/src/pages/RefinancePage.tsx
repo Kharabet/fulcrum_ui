@@ -46,7 +46,7 @@ export class RefinancePage extends PureComponent<IRefinancePageParams & RouteCom
       <React.Fragment>
         <BorrowDlg ref={this.borrowDlgRef} />
         <div className="refinance-page">
-          <HeaderOps isLoading={this.props.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
+          <HeaderOps isMobileMedia={this.props.isMobileMedia} isLoading={this.props.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
           {/*<div className="borrow-page__main" style={walletType === WalletType.Web3 ? { paddingBottom: `90rem`} : undefined}>*/}
           <div className="refinance-page__main">
             {isShowLoader
