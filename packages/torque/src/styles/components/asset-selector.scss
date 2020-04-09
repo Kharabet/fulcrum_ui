@@ -2,16 +2,12 @@
   display: flex;
   flex-wrap: wrap;
   margin-bottom: 30px;
-  /*&:after {
-    content: "";
-    flex: auto;
-  }*/
   .asset-selector-item {
     cursor: pointer;
     display: flex;
-    flex-direction: column;
+    flex-wrap: wrap;
     height: 205px;
-    width: 210px;
+    width: calc(100% / 6 - 20px);
     padding: 25px;
     margin-bottom: 20px;
     border-radius: 8px;
@@ -89,18 +85,14 @@
       display: flex;
       flex-wrap: wrap;
       width: 100%;
-      &.jc-sb {
-        justify-content: space-between;
-      }
-      &.ai-c {
-        align-items: center;
-      }
-      &.mt-26 {
-        margin-top: 26px;
-      }
-      &.mt-40 {
-        margin-top: 40px;
-      }
+    }
+    .asset-selector-footer {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      align-self: flex-end;
+      width: 100%;
     }
     .asset-selector__fixed {
       font-size: 13px;
@@ -116,35 +108,24 @@
       margin-right: 5px;
     }
     .asset-selector__interest-rate {
-      span {
-        font-size: 42px;
+      font-size: 42px;
+      line-height: 1.2;
+      color: #4ecea3;
+      &-value{
         font-weight: 800;
-        line-height: 1.2;
-        color: #4ecea3;
       }
     }
   }
-  .asset-selector-item--bat,
-  .asset-selector-item--zrx,
-  .asset-selector-item--wbtc,
-  .asset-selector-item--sai,
-  .asset-selector-item--dai,
-  .asset-selector-item--usdc,
-  .asset-selector-item--susd,
-  .asset-selector-item--eth,
-  .asset-selector-item--knc,
-  .asset-selector-item--link,
-  .asset-selector-item--usdt,
-  .asset-selector-item--rep {
+  .asset-selector-item {
     bottom: 0;
     background-repeat: no-repeat;
     background-position: right bottom;
-    background-size: 100px;
+    background-size: 102px;
     transition-property: background-size;
     transition-duration: 0.5s, 1s;
     transition-timing-function: linear;
     &:hover {
-      background-size: 120px;
+      background-size: 123px;
     }
   }
 
@@ -209,11 +190,12 @@
     }
   }
 }
-@media screen and(min-width: $breakpoint-min-lg) {
+@media screen and(max-width: $breakpoint-max-xl) {
   .asset-selector {
     .asset-selector-item {
+      width: calc(100% / 5 - 20px);
       &:not(:nth-child(5n)) {
-        margin-right: 15px;
+        margin-right: 25px;
       }
     }
   }
@@ -221,186 +203,13 @@
 @media screen and(max-width: $breakpoint-max-lg) {
   .asset-selector {
     .asset-selector-item {
-      margin-right: 15px;
-    }
-  }
-}
-/*@media screen and(max-width: $breakpoint-max-lg) {
-  .asset-selector {
-    .asset-selector-item {
-      margin-left: 
-    }
-  }
-}*/
-
-/*@media screen and(max-width: $breakpoint-max-xl) {
-  .asset-selector {
-    .asset-selector-item {
-      &:not(:nth-child(5n)) {
-        margin-right: 15px;
+      width: calc(100% / 4 - 15px);
+      &:nth-child(4n) {
+        margin-right: 0;
       }
-    }
-  }
-}*/
-/*@media only screen and (max-width: $mobile-version-width) {
-  .asset-selector {
-    .asset-selector-item {
-      .asset-selector-icon {
-        display: block;
-      }
-      .asset-selector-div {
-        display: none;
-      }
-      &:hover {
-        background-color: $color-borrow-card;
-        .asset-selector-div {
-          display: none;
-        }
-        .asset-selector-icon {
-          display: block;
-        }
-        .asset-selector__fixed {
-          background: none;
-          background-size: 200% auto;
-          color: #a9b5c7;
-          -webkit-background-clip: text;
-          animation: unset;
-          @keyframes shine {
-            to {
-              background-position: 200% center;
-            }
-          }
-        }
-      }
-    }
-
-    .asset-selector-item--bat {
-      background-image: url("../../assets/images/bg_tile_bat.svg");
-      background-repeat: no-repeat;
-      background-position: right bottom;
-      bottom: 0;
-      background-size: 90px;
-      &:hover {
-        background-size: 90px;
-      }
-    }
-
-    .asset-selector-item--zrx {
-      background-image: url("../../assets/images/intersect_zrx.svg");
-      background-repeat: no-repeat;
-      background-position: right bottom;
-      bottom: 0;
-      background-size: 90px;
-      &:hover {
-        background-size: 90px;
-      }
-    }
-
-    .asset-selector-item--wbtc {
-      background-image: url("../../assets/images/intersect_wbtc.svg");
-      background-repeat: no-repeat;
-      background-position: right bottom;
-      bottom: 0;
-      background-size: 90px;
-      &:hover {
-        background-size: 90px;
-      }
-    }
-
-    .asset-selector-item--sai {
-      background-image: url("../../assets/images/intersect_sai.svg");
-      background-repeat: no-repeat;
-      background-position: right bottom;
-      bottom: 0;
-      background-size: 90px;
-      &:hover {
-        background-size: 90px;
-      }
-    }
-
-    .asset-selector-item--dai {
-      background-image: url("../../assets/images/Intersect_dai.svg");
-      background-repeat: no-repeat;
-      background-position: right bottom;
-      bottom: 0;
-      background-size: 90px;
-      &:hover {
-        background-size: 90px;
-      }
-    }
-
-    .asset-selector-item--usdc {
-      background-image: url("../../assets/images/Intersect_usdc.svg");
-      background-repeat: no-repeat;
-      background-position: right bottom;
-      bottom: 0;
-      background-size: 90px;
-      &:hover {
-        background-size: 90px;
-      }
-    }
-
-    .asset-selector-item--susd {
-      background-image: url("../../assets/images/intersect_susd.svg");
-      background-repeat: no-repeat;
-      background-position: right bottom;
-      bottom: 0;
-      background-size: 90px;
-      &:hover {
-        background-size: 90px;
-      }
-    }
-
-    .asset-selector-item--eth {
-      background-image: url("../../assets/images/intersect_eth.svg");
-      background-repeat: no-repeat;
-      background-position: right bottom;
-      bottom: 0;
-      background-size: 90px;
-      &:hover {
-        background-size: 90px;
-      }
-    }
-
-    .asset-selector-item--knc {
-      background-image: url("../../assets/images/intersect_knc.svg");
-      background-repeat: no-repeat;
-      background-position: right bottom;
-      bottom: 0;
-      background-size: 90px;
-      &:hover {
-        background-size: 90px;
-      }
-    }
-
-    .asset-selector-item--link {
-      background-image: url("../../assets/images/intersect_link.svg");
-      background-repeat: no-repeat;
-      background-position: right bottom;
-      bottom: 0;
-      background-size: 90px;
-      &:hover {
-        background-size: 90px;
-      }
-    }
-
-    .asset-selector-item--mkr {
-      background-image: url("../../assets/images/bg_tile_mkr.svg");
-      background-repeat: no-repeat;
-      background-position: right;
-      background-size: 90px;
-    }
-
-    .asset-selector-item--rep {
-      background-image: url("../../assets/images/intersect_rfp.svg");
-      background-repeat: no-repeat;
-      background-position: right bottom;
-      bottom: 0;
-      background-size: 90px;
-      &:hover {
-        background-size: unset;
+      &:not(:nth-child(4n)) {
+        margin-right: 20px;
       }
     }
   }
 }
-*/

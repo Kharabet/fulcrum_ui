@@ -83,19 +83,21 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
           ? <Loader />
           : (<React.Fragment>
             <div className={`asset-selector-item ${assetTypeModifier}`} onClick={this.onClick}>
-              <div className="asset-selector-row">
-                <div className="asset-selector__interest-rate">
-                  <span>{this.state.interestRate.gt(0) ? `${this.state.interestRate.toFixed(2)}%` : `0%`}</span>
+              <div className="asset-selector-content">
+                <div className="asset-selector-row">
+                  <div className="asset-selector__interest-rate">
+                    <span className="asset-selector__interest-rate-value">{this.state.interestRate.gt(0) ? `${this.state.interestRate.toFixed(2)}` : `0`}</span>%
+                  </div>
+                </div>
+                <div className="asset-selector-row">
+                  <div className="asset-selector__apr">APR</div>
+                  <div className="asset-selector__fixed">FIXED</div>
                 </div>
               </div>
-              <div className="asset-selector-row">
-                <div className="asset-selector__apr">APR</div>
-                <div className="asset-selector__fixed">FIXED</div>
-              </div>
-              <div className={`asset-selector-row jc-sb ai-c  ${!this.props.onSelectAsset ? `mt-26` : `mt-40`}`}>
+              <div className="asset-selector-footer">
                 {!this.props.onSelectAsset
-                  ? (<div className="asset-selector__title--coming-soon">Web3 Only</div>)
-                  : ``
+                  ? <div className="asset-selector__title--coming-soon">Web3 Only</div>
+                  : null
                 }
                 <div className="asset-selector__title">{this.props.asset}</div>
                 <div className={`${assetTypeImg}`}>{assetImg}</div>
