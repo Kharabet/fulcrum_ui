@@ -13,6 +13,7 @@ import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { TradeTransactionMinedEvent } from "../services/events/TradeTransactionMinedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
 import { PositionTypeMarkerAlt } from "./PositionTypeMarkerAlt";
+import siteConfig from "../config/SiteConfig.json";
 
 import { LeverageSelector } from "./LeverageSelector";
 import { Preloader } from "./Preloader";
@@ -199,7 +200,7 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
               <span>
                 {!this.state.isLoading ?
                   <React.Fragment><span className="fw-normal">$</span>{bnPrice.toFixed(2)}</React.Fragment>
-                  : <Preloader />
+                  : <Preloader width="74px"/>
                 }
               </span>
             </div>
@@ -208,7 +209,7 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
               <span>
                 {!this.state.isLoading ?
                   <React.Fragment><span className="fw-normal">$</span>{bnLiquidationPrice.toFixed(2)}</React.Fragment>
-                  : <Preloader />
+                  : <Preloader width="74px"/>
                 }
               </span>
             </div>
@@ -217,7 +218,7 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
               <span>
                 {this.state.interestRate.gt(0) && !this.state.isLoading
                   ? <React.Fragment>{this.state.interestRate.toFixed(4)}<span className="fw-normal">%</span></React.Fragment>
-                  : <Preloader />
+                  : <Preloader width="74px"/>
                 }
               </span>
             </div>
@@ -230,7 +231,7 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
   private renderActions = (isBuyOnly: boolean) => {
     return (
       <div className="trade-token-card-mobile__action">
-        <button className="trade-token-card-mobile____buy-button" disabled onClick={this.onBuyClick}>
+        <button className="trade-token-card-mobile____buy-button" disabled={siteConfig.TradeBuyDisabled} onClick={this.onBuyClick}>
           {TradeType.BUY}
         </button>
       </div>
