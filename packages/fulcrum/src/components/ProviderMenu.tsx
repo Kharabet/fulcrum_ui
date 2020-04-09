@@ -36,7 +36,6 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
     //@ts-ignore
     setActivatingConnector(injected);
     activate(injected);
-    return null
   }
 
   const storedProvider: any = FulcrumProvider.getLocalstorageItem('providerType');
@@ -46,11 +45,8 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
     //@ts-ignore
     setActivatingConnector(ProviderTypeDictionary.getConnectorByProviderType(providerType)!);
     activate(ProviderTypeDictionary.getConnectorByProviderType(providerType)!);
-    return null
     
   }
-  if (activatingConnector)
-    return null;
 
   // handle logic to connect in reaction to certain events on the injected ethereum provider, if it exists
   // useInactiveListener(!triedEager || !!activatingConnector);
