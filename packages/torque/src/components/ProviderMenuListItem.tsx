@@ -6,9 +6,9 @@ import { TorqueProvider } from '../services/TorqueProvider';
 
 const Loader = () => {
   return (
-    <div className="loader">
-      <div className="loader-content">
-        <div className="loader-dots">
+    <div className="wallet-provider-loader">
+      <div className="wallet-provider-loader-content">
+        <div className="wallet-provider-loader-dots">
           <span></span>
           <span></span>
           <span></span>
