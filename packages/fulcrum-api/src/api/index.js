@@ -71,11 +71,11 @@ export default ({ config, logger }) => {
 	});
 
 	api.get('/itoken-prices', async (req, res) => {
-		const usdRates = await fulcrum.getITokensPricesUsd();
+		const usdRates = await fulcrum.getITokensPrices();
 		res.json({ data: usdRates, success: true});
 	});
-	api.get('/ptoken-prices-usd', async (req, res) => {
-		const usdRates = await fulcrum.getPTokensPricesUsd();
+	api.get('/ptoken-prices', async (req, res) => {
+		const usdRates = await fulcrum.getPTokensPrices();
 		res.json({ data: usdRates, success: true});
 	});
 

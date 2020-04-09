@@ -273,7 +273,7 @@
         }
       }
     },
-    "/ptoken-prices-usd": {
+    "/ptoken-prices": {
       "get": {
         "tags": [
           "pTokens Prices"
