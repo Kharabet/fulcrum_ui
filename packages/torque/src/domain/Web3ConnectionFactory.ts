@@ -114,7 +114,7 @@ export class Web3ConnectionFactory {
       } else {
         key = configProviders.Alchemy_ApiKey
       }
-      Web3ConnectionFactory.alchemyProvider = new AlchemySubprovider(`https://eth-${ethNetwork}.alchemyapi.io/jsonrpc/${configProviders.Alchemy_ApiKey}`, { writeProvider: null });
+      Web3ConnectionFactory.alchemyProvider = new AlchemySubprovider(`https://eth-${ethNetwork}.alchemyapi.io/v2/${configProviders.Alchemy_ApiKey}`, { writeProvider: null });
     }
     providerEngine.addProvider(Web3ConnectionFactory.alchemyProvider);
 
