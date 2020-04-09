@@ -101,5 +101,9 @@ export default ({ config, logger }) => {
 		}
 	});
 
+	api.get('*', function(req, res){
+		res.status(404).send("Endpoint not found. Go to <a href='https://api.bzx.network'>bZx API docs page</a>");
+	  });
+
 	return api;
 }
