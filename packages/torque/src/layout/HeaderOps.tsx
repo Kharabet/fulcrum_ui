@@ -37,10 +37,11 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
 
   private Menu: IHeaderMenuProps = {
     items: [
-      { id: 1, title: "Borrow", link: "/borrow/n", external: false },
-      { id: 2, title: "Dashboard", link: "/dashboard/n", external: false },
-      { id: 3, title: "Lend", link: "https://fulcrum.trade", external: true },
-      { id: 4, title: "Help Center", link: "https://help.bzx.network/en/collections/2008807-torque", external: true },
+      { id: 1, title: "Borrow", link: "/borrow", external: false },
+      { id: 2, title: "Your Loans", link: "/dashboard", external: false },
+      { id: 3, title: "Refinance", link: "/refinance", external: false },
+      { id: 4, title: "Lend", link: "https://fulcrum.trade", external: true },
+      { id: 5, title: "Help Center", link: "https://help.bzx.network/en/collections/2008807-torque", external: true },
     ]
   }
 

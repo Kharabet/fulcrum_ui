@@ -129,7 +129,7 @@ export class TorqueProvider {
     const providerType: ProviderType | null = storedProvider as ProviderType || null;
     
     this.web3ProviderSettings = TorqueProvider.getWeb3ProviderSettings(initialNetworkId);
-    if (!providerType) {
+    if (!providerType || providerType === ProviderType.None) {
 
       // TorqueProvider.Instance.isLoading = true;
       // setting up readonly provider
@@ -146,7 +146,6 @@ export class TorqueProvider {
             this.providerEngine = engine;
             this.contractsSource = contractsSource;
             this.borrowRequestAwaitingStore = new BorrowRequestAwaitingStore(this.web3ProviderSettings.networkId, web3Wrapper);
-
             this.eventEmitter.emit(TorqueProviderEvents.ProviderAvailable);
           });
         }
@@ -191,60 +190,12 @@ export class TorqueProvider {
 
     await this.setWeb3ProviderFinalize(providerType);
     this.isLoading = false;
-
-    const accountAddress =
-      this.accounts.length > 0 && this.accounts[0]
-        ? this.accounts[0].toLowerCase()
-        : null;
-
-    const walletType = TorqueProvider.Instance.providerType !== ProviderType.None ?
-      WalletType.Web3 :
-      WalletType.NonWeb3;
-
-    if (this.destinationAbbr === "b") {
-      NavService.Instance.History.replace(
-        NavService.Instance.getBorrowAddress(walletType)
-      );
-    }
-    if (this.destinationAbbr === "t") {
-      if (accountAddress) {
-        NavService.Instance.History.replace(
-          NavService.Instance.getDashboardAddress(walletType, accountAddress)
-        );
-      }
-    } else {
-      // do nothing
-    }
   }
 
   public async setReadonlyWeb3Provider() {
     await Web3ConnectionFactory.setReadonlyProvider();
     await this.setWeb3ProviderFinalize(ProviderType.None);
     this.isLoading = false;
-
-    const accountAddress =
-      this.accounts.length > 0 && this.accounts[0]
-        ? this.accounts[0].toLowerCase()
-        : null;
-
-    const walletType = TorqueProvider.Instance.providerType !== ProviderType.None ?
-      WalletType.Web3 :
-      WalletType.NonWeb3;
-
-    if (this.destinationAbbr === "b") {
-      NavService.Instance.History.replace(
-        NavService.Instance.getBorrowAddress(walletType)
-      );
-    }
-    if (this.destinationAbbr === "t") {
-      if (accountAddress) {
-        NavService.Instance.History.replace(
-          NavService.Instance.getDashboardAddress(walletType, accountAddress)
-        );
-      }
-    } else {
-      // do nothing
-    }
   }
 
   public async setWeb3ProviderFinalize(providerType: ProviderType) { // : Promise<boolean> {

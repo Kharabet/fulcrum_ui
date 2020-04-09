@@ -36,6 +36,7 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
     this.state = { interestRate: new BigNumber(0) };
 
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
+    TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderChanged, this.derivedUpdate);
   }
 
   private onProviderAvailable = () => {

@@ -6,10 +6,12 @@ export enum WalletType {
 }
 
 export const walletTypeToWalletTypeAbbr = (walletType: WalletType): string => {
+  return "w"
   return walletType === WalletType.Web3 ? "w" : walletType === WalletType.NonWeb3 ? "n" : "";
 };
 
 export const walletTypeAbbrToWalletType = (walletTypeAbbr: string): WalletType => {
+  return WalletType.Web3;
   switch (walletTypeAbbr) {
     case "w":
       return WalletType.Web3;

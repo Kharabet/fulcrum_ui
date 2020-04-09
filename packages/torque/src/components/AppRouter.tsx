@@ -155,10 +155,9 @@ export class AppRouter extends Component<any, IAppRouterState> {
                     <Switch>
                       <Route exact={true} path="/" render={props => <LandingPage {...props} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />} />
                       {/* <Route exact={true} path="/wallet/:destinationAbbr" render={props => <WalletSelectionPage {...props} onSelectProvider={this.onProviderTypeSelect} isLoading={this.state.isLoading} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />} /> */}
-                      <Route exact={true} path="/borrow/:walletTypeAbbr" render={props => <BorrowPage {...props} isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />} />
-                      <Route exact={true} path="/dashboard/:walletTypeAbbr" render={props => <DashboardPage {...props} isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />} />
-                      <Route exact={true} path="/dashboard/:walletTypeAbbr/:walletAddress" render={props => <DashboardPage {...props} isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />} />
-                      <Route exact={true} path="/refinance/:walletTypeAbbr" render={props => <RefinancePage {...props} isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />} />
+                      <Route exact={true} path="/borrow" render={props => <BorrowPage {...props} isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />} />
+                      <Route exact={true} path="/dashboard" render={props => <DashboardPage {...props} isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />} />
+                      <Route exact={true} path="/refinance" render={props => <RefinancePage {...props} isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />} />
                       <Route path="*" render={() => <Redirect to="/" />} />
                     </Switch>
                     {isMainnetProd ? (
