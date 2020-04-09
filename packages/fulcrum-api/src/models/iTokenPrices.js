@@ -6,7 +6,19 @@ const iTokenPriceSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  symbol: {
+    type: String,
+    required: true
+  },
+  address: {
+    type: String,
+    required: true
+  },
   priceUsd: {
+    type: Number,
+    required: true
+  },
+  priceAsset: {
     type: Number,
     required: true
   }

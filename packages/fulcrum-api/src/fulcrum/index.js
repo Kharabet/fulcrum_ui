@@ -32,13 +32,13 @@ export default class Fulcrum {
         // await this.storage.setItem("reserve_data", reserve_data);
         this.logger.info("reserve_data updated");
 
-        const itoken = await this.updateITokensPricesUsd();
-        // await this.storage.setItem("itoken-prices-usd", itoken);
-        this.logger.info("itoken-prices-usd updated");
+        const itoken = await this.updateITokensPrices();
+        // await this.storage.setItem("itoken-prices", itoken);
+        this.logger.info("itoken-prices updated");
 
-        const ptoken = await this.updatePTokensPricesUsd();
-        // await this.storage.setItem("ptoken-prices-usd", ptoken);
-        this.logger.info("ptoken-prices-usd updated");
+        const ptoken = await this.updatePTokensPrices();
+        // await this.storage.setItem("ptoken-prices", ptoken);
+        this.logger.info("ptoken-prices updated");
 
         return;
     }
@@ -109,27 +109,31 @@ export default class Fulcrum {
         return usdRates;
     }
 
-    async getITokensPricesUsd() {
+    async getITokensPrices() {
         const lastITokenPrices = (await iTokenPricesModel.find().sort({ _id: -1 }).select({ iTokenPrices: 1 }).lean().limit(1))[0];
         if (!lastITokenPrices) {
 
-            this.logger.info("No itoken-prices-usd in db!");
-            await this.updateITokensPricesUsd();
-            // result = await this.updateITokensPricesUsd();
+            this.logger.info("No itoken-prices in db!");
+            await this.updateITokensPrices();
+            // result = await this.updateITokensPrices();
 
-            // await this.storage.setItem("itoken-prices-usd", result);
-            // console.dir(`itoken-prices-usd:`);
+            // await this.storage.setItem("itoken-prices", result);
+            // console.dir(`itoken-prices:`);
             // console.dir(result);
         }
         let result = {}
         lastITokenPrices.iTokenPrices.forEach(iTokenPrice => {
-            result[iTokenPrice.token] = iTokenPrice.priceUsd;
+            result[iTokenPrice.token] = {
+                symbol: iTokenPrice.symbol,
+                address: iTokenPrice.address,
+                price_usd: iTokenPrice.priceUsd,
+                price_asset: iTokenPrice.priceAsset,
+            };
         })
         return result;
     }
 
-    async updateITokensPricesUsd() {
-        let result = {};
+    async updateITokensPrices() {
         const usdRates = await this.getUsdRates();
         let iTokenPrices = new iTokenPricesModel();
         iTokenPrices.iTokenPrices = [];
@@ -140,36 +144,42 @@ export default class Fulcrum {
             const tokenPrice = await iTokenContract.methods.tokenPrice().call();
 
             //price is in loanAsset of iToken contract
-            const price = new BigNumber(tokenPrice).multipliedBy(usdRates[iToken.name]).dividedBy(10 ** iToken.decimals);
-            result[iToken.iTokenName.toLowerCase()] = price.toNumber();
+            const priceUsd = new BigNumber(tokenPrice).multipliedBy(usdRates[iToken.name]).dividedBy(10 ** 18);
+            const priceAsset = new BigNumber(tokenPrice).dividedBy(10 ** 18);
             const iTokenPrice = new iTokenPriceModel({
                 token: iToken.iTokenName.toLowerCase(),
-                priceUsd: price.toNumber()
+                symbol: iToken.iTokenName,
+                address: iToken.address.toLowerCase(),
+                priceUsd: priceUsd.toNumber(),
+                priceAsset: priceAsset.toNumber()
             });
             iTokenPrices.iTokenPrices.push(iTokenPrice);
         }
         await iTokenPrices.save();
-        return result;
     }
 
-    async getPTokensPricesUsd() {
+    async getPTokensPrices() {
         const lastPTokenPrices = (await pTokenPricesModel.find().sort({ _id: -1 }).select({ pTokenPrices: 1 }).lean().limit(1))[0];
         if (!lastPTokenPrices) {
 
-            this.logger.info("No ptoken-prices-usd in db!");
-            await this.updatePTokensPricesUsd();
-            // await this.storage.setItem("ptoken-prices-usd", result);
-            // console.dir(`ptoken-prices-usd:`);
+            this.logger.info("No ptoken-prices in db!");
+            await this.updatePTokensPrices();
+            // await this.storage.setItem("ptoken-prices", result);
+            // console.dir(`ptoken-prices:`);
             // console.dir(result);
         }
         let result = {};
         lastPTokenPrices.pTokenPrices.forEach(pTokenPrice => {
-            result[pTokenPrice.token] = pTokenPrice.priceUsd;
+            result[pTokenPrice.token] = {
+                symbol: pTokenPrice.symbol,
+                address: pTokenPrice.address,
+                price_usd: pTokenPrice.priceUsd
+            };
         })
         return result;
     }
 
-    async updatePTokensPricesUsd() {
+    async updatePTokensPrices() {
         let result = {};
         const usdRates = await this.getUsdRates();
         let pTokenPrices = new pTokenPricesModel();
@@ -181,14 +191,14 @@ export default class Fulcrum {
                 this.logger.info("call pTokenContract");
 
                 const tokenPrice = await pTokenContract.methods.tokenPrice().call({ from: "0x4abB24590606f5bf4645185e20C4E7B97596cA3B" });
-                const decimals = await pTokenContract.methods.decimals().call({ from: "0x4abB24590606f5bf4645185e20C4E7B97596cA3B" });
                 //price is in loanAsset of iToken contract
                 const baseAsset = this.getBaseAsset(pToken);
                 //const swapPrice = await this.getSwapToUsdRate(baseAsset);
-                const price = new BigNumber(tokenPrice).multipliedBy(usdRates[baseAsset.toLowerCase()]).dividedBy(10 ** decimals);
-                result[pToken.ticker.toLowerCase()] = price.toNumber();
+                const price = new BigNumber(tokenPrice).multipliedBy(usdRates[baseAsset.toLowerCase()]).dividedBy(10 ** 18);
                 const pTokenPrice = new pTokenPriceModel({
                     token: pToken.ticker.toLowerCase(),
+                    symbol: pToken.ticker,
+                    address: pToken.address,
                     priceUsd: price.toNumber()
                 });
                 pTokenPrices.pTokenPrices.push(pTokenPrice);

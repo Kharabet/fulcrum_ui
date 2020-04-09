@@ -70,12 +70,12 @@ export default ({ config, logger }) => {
 		res.json({ data: usdRates, success: true});
 	});
 
-	api.get('/itoken-prices-usd', async (req, res) => {
-		const usdRates = await fulcrum.getITokensPricesUsd();
+	api.get('/itoken-prices', async (req, res) => {
+		const usdRates = await fulcrum.getITokensPrices();
 		res.json({ data: usdRates, success: true});
 	});
-	api.get('/ptoken-prices-usd', async (req, res) => {
-		const usdRates = await fulcrum.getPTokensPricesUsd();
+	api.get('/ptoken-prices', async (req, res) => {
+		const usdRates = await fulcrum.getPTokensPrices();
 		res.json({ data: usdRates, success: true});
 	});
 
@@ -100,6 +100,10 @@ export default ({ config, logger }) => {
 			res.json({ data: borrowDepositEstimate, success: true });
 		}
 	});
+
+	api.get('*', function(req, res){
+		res.status(404).send("Endpoint not found. Go to <a href='https://api.bzx.network'>bZx API docs page</a>");
+	  });
 
 	return api;
 }

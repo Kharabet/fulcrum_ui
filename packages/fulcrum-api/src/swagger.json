@@ -253,7 +253,7 @@
         }
       }
     },
-    "/itoken-prices-usd": {
+    "/itoken-prices": {
       "get": {
         "tags": [
           "iTokens Prices"
@@ -273,7 +273,7 @@
         }
       }
     },
-    "/ptoken-prices-usd": {
+    "/ptoken-prices": {
       "get": {
         "tags": [
           "pTokens Prices"
