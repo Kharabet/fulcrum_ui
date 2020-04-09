@@ -30,6 +30,18 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
     }
   }, [activatingConnector, connector])
 
+  
+  const storedProvider: any = FulcrumProvider.getLocalstorageItem('providerType');
+  const providerType: ProviderType | null = storedProvider as ProviderType || null;
+  if (!activatingConnector && providerType) {
+
+    //@ts-ignore
+    setActivatingConnector(ProviderTypeDictionary.getConnectorByProviderType(providerType)!);
+    activate(ProviderTypeDictionary.getConnectorByProviderType(providerType)!);
+    return null
+    
+  }
+
   // handle logic to eagerly connect to the injected ethereum provider, if it exists and has granted access already
   if (!activatingConnector && connector !== injected && props.isMobileMedia && FulcrumProvider.Instance.providerType !== ProviderType.MetaMask) {
 
@@ -39,16 +51,6 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
     return null
   }
 
-  const storedProvider: any = FulcrumProvider.getLocalstorageItem('providerType');
-  const providerType: ProviderType | null = storedProvider as ProviderType || null;
-  if (!activatingConnector && providerType && providerType !== FulcrumProvider.Instance.providerType) {
-
-    //@ts-ignore
-    setActivatingConnector(ProviderTypeDictionary.getConnectorByProviderType(providerType)!);
-    activate(ProviderTypeDictionary.getConnectorByProviderType(providerType)!);
-    return null
-    
-  }
   if (activatingConnector)
     return null;
 

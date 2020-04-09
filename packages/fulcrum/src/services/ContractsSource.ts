@@ -42,6 +42,7 @@ export class ContractsSource {
   public canWrite: boolean;
 
   public constructor(provider: any, networkId: number, canWrite: boolean) {
+    console.log("init source with canwrite: "+ canWrite)
     this.provider = provider;
     this.networkId = networkId;
     this.canWrite = canWrite;
