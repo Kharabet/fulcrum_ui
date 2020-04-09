@@ -1,37 +1,23 @@
 .provider-menu {
-  padding: 50px 60px 40px 60px;
-  background-color: #444e5a;
+  padding: 40px;
+  border-radius: 16px;
+  background-color: #fff;
+  display: flex;
+  flex-direction: column;
   &__title {
+    font-weight: 900;
     font-size: 22px;
-    font-weight: 600;
-    line-height: 1.5;
+    line-height: 150%;
     margin-bottom: 30px;
-    text-align: center;
-    color: #a2abb8;
-  }
-  &__footer {
-    color: #8992A4;
-
-    display: flex;
-    margin-top: 20px;
-    flex-wrap: wrap;
-    max-width: 280px;
-
-    justify-content: center;
-    margin: 0 auto;
-    a {
-      color: #00c0ab;
-      &:hover {
-        color: #33dfcc;
-      }
-    }
+    text-align: left;
+    color: #283049;
   }
   &__list {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
 
     grid-row-gap: 15px;
-    grid-column-gap: 25px;
+    grid-column-gap: 30px;
   }
   &__list-item {
     display: flex;
@@ -43,20 +29,21 @@
     border-radius: 43px;
     flex-direction: column;
     flex-direction: row;
-    /* width: 50%; */
-    padding: 18px 30px;
+    padding: 15px 30px;
     flex-wrap: wrap;
-    background-color: #3d4651;
-    width: 250px;
+    background: #F5F7F9;
+    width: 240px;
 
+    color: #758295;
     &:hover {
       transition: all 0.1s;
-      background-color: #758295;
+      background: #5B88FF;
+      color: #fff;
     }
     &--selected {
-      background-color: #444e5a;
-      border: 1px solid #586473;
-      padding: 10px 30px;
+      background-color: #fff;
+      border: 1px solid #B9C7D6;
+      padding: 6px 30px;
       &:hover {
         background-color: initial;
       }
@@ -67,7 +54,7 @@
           font-weight: 800;
           font-size: 15px;
           line-height: 180%;
-          color: #fff;
+          color: #283049;
         }
         .address {
           font-size: 13px;
@@ -84,7 +71,7 @@
         font-weight: normal;
         font-size: 20px;
         line-height: 150%;
-        color: #ffffff;
+        
       }
     }
   }
@@ -94,19 +81,18 @@
     font-size: 16px;
     line-height: 150%;
     color: #ffffff;
-
+    padding: 20px 50px;
     display: flex;
     align-items: center;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    background: #586473;
+    background: #A9B5C7;
     border-radius: 43px;
     text-align: center;
-    padding: 20px 50px;
-    margin: 30px auto;
+    margin-top: 40px;
+    align-self: flex-end;
     &:hover {
+      cursor: pointer;
       transition: all 0.1s;
-      background-color: #758295;
+      background: #758295;
     }
   }
 
@@ -156,7 +142,7 @@
     }
     &__list-item {
       width: 100%;
-      min-width: 140px;
+      min-width: 125px;
       padding: 4px 12px;
       &--selected {
         padding: 3px 12px;
@@ -182,7 +168,7 @@
     .disconnect {
       font-size: 12px;
       padding: 10px 30px;
-      margin: 20px auto;
+      margin-top: 20px ;
     }
   }
 }
@@ -194,7 +180,7 @@
   }
   10% {
     transform: scale(1.8);
-    background: #00c0ab;
+    background: #276BFB;
   }
   20% {
     transform: scale(1);

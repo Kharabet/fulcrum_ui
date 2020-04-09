@@ -93,65 +93,6 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
         </InfoBlock>
           : null}
       </header>
-      // <header className="header">
-      //   <div className="header__row">
-      //     <div className="header__left">
-      //       <HeaderLogo />
-      //     </div>
-      //     <div className="header__center">
-      //       <HeaderMenu items={menu.items} />
-      //     </div>
-      //     <div className="header__right">
-      //       <div className="header__provider">
-      //         <OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />
-      //       </div>
-      //       <div className="header_icon" onClick={this.onMenuToggle}>
-      //         <div className="toggle_icon">
-      //           {toggleMenuIcon}
-      //         </div>
-      //       </div>
-      //     </div>
-
-      //   </div>
-
-      //   <div className={sidebarClass}>
-      //     <div className="sidebar_header">
-      //       <HeaderLogo />
-      //       <div className="header_icon" onClick={this.onMenuToggle}>
-      //         <div className="toggle_icon">
-      //           {toggleMenuIcon}
-      //         </div>
-      //       </div>
-      //     </div>
-      //     <div className="sidebar_content">
-      //       <div className="header_btn">
-      //         {TorqueProvider.Instance.providerType !== ProviderType.None ? (
-      //           <OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />
-      //         ) : ``}
-      //       </div>
-      //       <div className="heade_nav_menu">
-      //         <HeaderMenu items={menu.items} />
-      //         <a className="help__item" href="https://help.bzx.network/en/collections/2008807-torque">Help Center</a>
-      //       </div>
-      //     </div>
-      //     <div className="sidebar_footer">
-      //       <FooterVersion />
-      //       <FooterMenu {...this.props} />
-      //     </div>
-      //   </div>
-      //   <InfoBlock localstorageItemProp="torque-risk-notice" onAccept={() => { this.forceUpdate() }}>
-      //     For your safety, please ensure the URL in your browser starts with: https://torque.loans/. <br />
-      //   Torque is a non-custodial platform for borrowing digital assets. <br />
-      //   "Non-custodial" means YOU are responsible for the security of your digital assets. <br />
-      //   To learn more about how to stay safe when using Torque and other bZx products, please read our <button className="disclosure-link" onClick={this.props.isRiskDisclosureModalOpen}>DeFi Risk Disclosure</button>.
-      //   </InfoBlock>
-      //   {localStorage.getItem("torque-risk-notice") ?
-      //     <InfoBlock localstorageItemProp="torque-page-info">
-      //       You may only manage and repay your existing loans. Full functionality will return after a thorough audit of our newly implemented and preexisting smart contracts.
-      //   </InfoBlock>
-      //     : null}
-
-      // </header>
     );
   };
 

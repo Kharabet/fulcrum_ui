@@ -1,51 +1,30 @@
 @media only screen and (max-width: $mobile-version-max-width) {
   .header {
-    // padding-left: 2rem;
     margin-top: 15px;
     padding-top: 0;
     margin-bottom: 0;
-    // padding-right: 2rem;
     .header__row {
       align-items: center;
-      //.header__left {
-      //  width: 50%;
-      //}
-      //
-      //.header__right {
-      //  width: 50%;
-      //}
       .header__left {
-        //width: 100%;
         z-index: 10001;
 
         flex: initial;
         width: calc(100% - 110px);
-    
-        // float: left;
       }
       .header__center {
         display: none;
       }
 
       .header__right {
-        // width: 65%;
-        // float: left;
       }
       .header__menu {
-        // display: block;
-        // padding-top: 10px;
-        // height: 35px;
-        // z-index: 4;
-        // right: -53px;
-        // position:relative;
       }
       .header_icon {
         z-index: 10001;
       }
     }
     .header-menu__item {
-      // margin-bottom: 40px;
-      font-family: Muli;
+      font-family: "Muli";
       font-style: normal;
       font-weight: 600;
       font-size: 26px;
@@ -76,12 +55,9 @@
     }
 
     .header_btn {
-      //position: absolute;
-      //top:0;
       margin-bottom: 40px;
     }
     .heade_nav_menu {
-      //margin-top: 5rem;
     }
     .header__provider {
       display: none;
@@ -111,11 +87,8 @@
       display: block;
       width: 100vw;
       height: 100vh;
-      /* height: 100%; */
-      /* right: 0px; */
       padding-top: 100px;
       background-color: #fff;
-      -webkit-animation: animateright 0.4s;
       animation: animateright 0.4s;
       z-index: 1000;
       top: 0;
