@@ -119,23 +119,30 @@ export class FulcrumProvider {
       FulcrumProvider.Instance = this;
     }
 
-    // setting up readonly provider
-    this.web3ProviderSettings = FulcrumProvider.getWeb3ProviderSettings(initialNetworkId);
-    Web3ConnectionFactory.setReadonlyProvider().then(() => {
-      const web3Wrapper = Web3ConnectionFactory.currentWeb3Wrapper;
-      const engine = Web3ConnectionFactory.currentWeb3Engine;
-      const canWrite = Web3ConnectionFactory.canWrite;
 
-      if (web3Wrapper && this.web3ProviderSettings) {
-        const contractsSource = new ContractsSource(engine, this.web3ProviderSettings.networkId, canWrite);
-        contractsSource.Init().then(() => {
-          this.web3Wrapper = web3Wrapper;
-          this.providerEngine = engine;
-          this.contractsSource = contractsSource;
-          this.eventEmitter.emit(FulcrumProviderEvents.ProviderAvailable);
-        });
-      }
-    });
+    const storedProvider: any = FulcrumProvider.getLocalstorageItem('providerType');
+    const providerType: ProviderType | null = storedProvider as ProviderType || null;
+    
+    this.web3ProviderSettings = FulcrumProvider.getWeb3ProviderSettings(initialNetworkId);
+    if (!providerType || providerType === ProviderType.None) {
+      // setting up readonly provider
+      Web3ConnectionFactory.setReadonlyProvider().then(() => {
+        const web3Wrapper = Web3ConnectionFactory.currentWeb3Wrapper;
+        const engine = Web3ConnectionFactory.currentWeb3Engine;
+        const canWrite = Web3ConnectionFactory.canWrite;
+
+        if (web3Wrapper && this.web3ProviderSettings) {
+          const contractsSource = new ContractsSource(engine, this.web3ProviderSettings.networkId, canWrite);
+          contractsSource.Init().then(() => {
+            this.web3Wrapper = web3Wrapper;
+            this.providerEngine = engine;
+            this.contractsSource = contractsSource;
+            this.eventEmitter.emit(FulcrumProviderEvents.ProviderAvailable);
+          });
+        }
+      });
+    }
+
 
     return FulcrumProvider.Instance;
   }
@@ -193,8 +200,11 @@ export class FulcrumProvider {
     }
 
     if (this.web3Wrapper && this.web3ProviderSettings.networkId > 0) {
-      this.contractsSource = await new ContractsSource(this.providerEngine, this.web3ProviderSettings.networkId, canWrite);
-      await this.contractsSource.Init();
+      const newContractsSource = await new ContractsSource(this.providerEngine, this.web3ProviderSettings.networkId, canWrite);
+      await newContractsSource.Init();
+      this.contractsSource = newContractsSource;
+      console.log(`contractsource: ${this.contractsSource}`)
+      console.log(`contractsource can write: ${this.contractsSource.canWrite}`)
     } else {
       this.contractsSource = null;
     }
@@ -1767,13 +1777,13 @@ if (err || 'error' in added) {
 console.log(err, added);
 }
 }*//*);
-                                  }
-                                }
-                                }
-                                } catch(e) {
-                                // console.log(e);
-                                }
-                                }*/
+                                          }
+                                        }
+                                        }
+                                        } catch(e) {
+                                        // console.log(e);
+                                        }
+                                        }*/
   }
 
   private processLendRequestTask = async (task: RequestTask, skipGas: boolean) => {

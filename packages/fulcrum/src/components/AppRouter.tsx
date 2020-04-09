@@ -83,14 +83,14 @@ export class AppRouter extends Component<any, IAppRouterState> {
   public getLibrary = async (provider: any, connector: any): Promise<Web3ProviderEngine> => {
     console.log(provider);
     //handle connectors events (i.e. network changed)
-    await this.onProviderTypeSelect(connector) 
+    await this.onProviderTypeSelect(connector)
     return Web3ConnectionFactory.currentWeb3Engine;
   }
 
   public render() {
     return (
       <Web3ReactProvider getLibrary={this.getLibrary}>
-               {isMainnetProd && !this.state.isMobileMedia ? (
+        {isMainnetProd && !this.state.isMobileMedia ? (
 
           <Intercom appID="dfk4n5ut" />
         ) : null}
@@ -171,7 +171,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
 
 
   public onDeactivate = async () => {
-    
+
     FulcrumProvider.Instance.isLoading = true;
 
     await FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.ProviderIsChanging);
@@ -181,7 +181,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
       isProviderMenuModalOpen: false
     });
     await FulcrumProvider.Instance.setReadonlyWeb3Provider();
-    
+
     FulcrumProvider.Instance.isLoading = false;
     await FulcrumProvider.Instance.eventEmitter.emit(
       FulcrumProviderEvents.ProviderChanged,
@@ -208,6 +208,10 @@ export class AppRouter extends Component<any, IAppRouterState> {
           FulcrumProviderEvents.ProviderChanged,
           new ProviderChangedEvent(FulcrumProvider.Instance.providerType, FulcrumProvider.Instance.web3Wrapper)
         );
+        await this._isMounted && this.setState({
+          ...this.state,
+          isLoading: false
+        })
       });
     } else {
       await this._isMounted && this.setState({
