@@ -70,7 +70,7 @@ export default ({ config, logger }) => {
 		res.json({ data: usdRates, success: true});
 	});
 
-	api.get('/itoken-prices-usd', async (req, res) => {
+	api.get('/itoken-prices', async (req, res) => {
 		const usdRates = await fulcrum.getITokensPricesUsd();
 		res.json({ data: usdRates, success: true});
 	});
