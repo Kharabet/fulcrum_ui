@@ -170,7 +170,11 @@ export default class Fulcrum {
         }
         let result = {};
         lastPTokenPrices.pTokenPrices.forEach(pTokenPrice => {
-            result[pTokenPrice.token] = pTokenPrice.priceUsd;
+            result[pTokenPrice.token] = {
+                symbol: pTokenPrice.symbol,
+                address: pTokenPrice.address,
+                price_usd: pTokenPrice.priceUsd
+            };
         })
         return result;
     }
@@ -187,14 +191,14 @@ export default class Fulcrum {
                 this.logger.info("call pTokenContract");
 
                 const tokenPrice = await pTokenContract.methods.tokenPrice().call({ from: "0x4abB24590606f5bf4645185e20C4E7B97596cA3B" });
-                const decimals = await pTokenContract.methods.decimals().call({ from: "0x4abB24590606f5bf4645185e20C4E7B97596cA3B" });
                 //price is in loanAsset of iToken contract
                 const baseAsset = this.getBaseAsset(pToken);
                 //const swapPrice = await this.getSwapToUsdRate(baseAsset);
-                const price = new BigNumber(tokenPrice).multipliedBy(usdRates[baseAsset.toLowerCase()]).dividedBy(10 ** decimals);
-                result[pToken.ticker.toLowerCase()] = price.toNumber();
+                const price = new BigNumber(tokenPrice).multipliedBy(usdRates[baseAsset.toLowerCase()]).dividedBy(10 ** 18);
                 const pTokenPrice = new pTokenPriceModel({
                     token: pToken.ticker.toLowerCase(),
+                    symbol: pToken.ticker,
+                    address: pToken.address,
                     priceUsd: price.toNumber()
                 });
                 pTokenPrices.pTokenPrices.push(pTokenPrice);
