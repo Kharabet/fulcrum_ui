@@ -33,8 +33,8 @@ const networkName = process.env.REACT_APP_ETH_NETWORK;
 const networkId = getNetworkIdByString(networkName);
 
 const RPC_URL = networkId === 42
-  ? `https://eth-${networkName}.alchemyapi.io/jsonrpc/${configProviders.Alchemy_ApiKey_kovan}`
-  : `https://eth-${networkName}.alchemyapi.io/jsonrpc/${configProviders.Alchemy_ApiKey}`
+  ? `https://eth-${networkName}.alchemyapi.io/v2/${configProviders.Alchemy_ApiKey_kovan}`
+  : `https://eth-${networkName}.alchemyapi.io/v2/${configProviders.Alchemy_ApiKey}`
 
 const POLLING_INTERVAL = 3600000
 
