@@ -5,7 +5,12 @@
   justify-content: flex-start;
   width: $container-desktop;
   box-sizing: border-box;
-
+  flex-wrap: wrap;
+  padding: 0 15px;
+  .footer {
+    width: 100%;
+    align-self: flex-end;
+  }
   @media screen and (max-width: $breakpoint-desktop-max) {
     width: $container-laptop;
   }
@@ -16,28 +21,16 @@
   }
 
   .borrow-page__main {
-    //padding-bottom: 90rem;
     display: flex;
     flex-direction: column;
     align-content: center;
     justify-content: space-between;
-    //overflow-y: scroll;
+    width: 100%;
   }
   .borrow-page__main_p {
     display: flex;
     flex-direction: column;
     align-content: center;
     justify-content: space-between;
-    //overflow-y: scroll;
   }
 }
-
-// @media only screen and (max-width: $mobile-version-width) {
-//   .borrow-page {
-//     padding: $page-padding-xs;
-
-//     .borrow-page__main {
-//       //padding-bottom: 200rem;
-//     }
-//   }
-// }
