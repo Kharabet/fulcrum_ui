@@ -94,7 +94,7 @@ $width-col-actions: 13%;
       &--inner {
         display: flex;
         align-items: center;
-        height: 100%;
+        color: var(--primary-text);
         img {
           margin-left: 15px;
         }
