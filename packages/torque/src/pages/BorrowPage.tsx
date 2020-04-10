@@ -15,7 +15,7 @@ export interface IBorrowPageRouteParams {
 }
 
 export interface IBorrowPageParams {
-  doNetworkConnect?: (destinationAbbr: string) => void;
+  doNetworkConnect: () => void;
   isRiskDisclosureModalOpen: () => void;
   isLoading: boolean;
   isMobileMedia: boolean;
@@ -41,7 +41,7 @@ export class BorrowPage extends PureComponent<IBorrowPageParams & RouteComponent
       <React.Fragment>
         <BorrowDlg ref={this.borrowDlgRef} />
         <div className="borrow-page">
-          <HeaderOps isMobileMedia={this.props.isMobileMedia} isLoading={this.props.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
+          <HeaderOps isMobileMedia={this.props.isMobileMedia} isLoading={this.props.isLoading} doNetworkConnect={this.props.doNetworkConnect} isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
           {/*<div className="borrow-page__main" style={walletType === WalletType.Web3 ? { paddingBottom: `90rem`} : undefined}>*/}
           <div className="borrow-page__main">
             <AssetSelector walletType={walletType} onSelectAsset={this.onSelectAsset} />
@@ -112,12 +112,6 @@ export class BorrowPage extends PureComponent<IBorrowPageParams & RouteComponent
         this.borrowDlgRef.current.toggleDidSubmit(false);
         await this.borrowDlgRef.current.hide();
       }
-    }
-  };
-
-  private doNetworkConnect = () => {
-    if (this.props.doNetworkConnect) {
-      this.props.doNetworkConnect("b");
     }
   };
 }

@@ -24,7 +24,7 @@ export interface IDashboardPageRouteParams {
 }
 
 export interface IDashboardPageParams {
-  doNetworkConnect?: (destinationAbbr: string) => void;
+  doNetworkConnect: () => void;
   isRiskDisclosureModalOpen: () => void;
   isLoading: boolean;
   isMobileMedia: boolean;
@@ -54,14 +54,14 @@ export class DashboardPage extends PureComponent<
     this.extendLoanDlgRef = React.createRef();
     this.walletAddressDlgRef = React.createRef();
 
-    this.state = { 
-      walletDetails: { 
-        walletType: WalletType.Unknown, 
-        walletAddress: "" 
-      }, 
-      items: [], 
-      itemsAwaiting: [], 
-      isDataLoading: true 
+    this.state = {
+      walletDetails: {
+        walletType: WalletType.Unknown,
+        walletAddress: ""
+      },
+      items: [],
+      itemsAwaiting: [],
+      isDataLoading: true
     };
 
     // TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
@@ -74,20 +74,22 @@ export class DashboardPage extends PureComponent<
     }
 
     const walletType = walletTypeAbbrToWalletType(this.props.match.params.walletTypeAbbr);
+
+    walletType !== WalletType.Web3 && this.props.doNetworkConnect()
+
     let walletAddress = this.props.match.params.walletAddress ?
       this.props.match.params.walletAddress.toLowerCase() :
       "";
-    if (walletType === WalletType.Web3) {
-      const account = TorqueProvider.Instance.accounts.length !== 0 ?
-        TorqueProvider.Instance.accounts[0].toLowerCase() :
-        "";
-      if (!account || !TorqueProvider.Instance.contractsSource || !TorqueProvider.Instance.contractsSource.canWrite) {
-        return;
-      } else {
-        if (walletAddress.toLowerCase() !== account) {
-          NavService.Instance.History.replace(NavService.Instance.getDashboardAddress(WalletType.Web3, account));
-          walletAddress = account;
-        }
+
+    const account = TorqueProvider.Instance.accounts.length !== 0 ?
+      TorqueProvider.Instance.accounts[0].toLowerCase() :
+      "";
+    if (!account || !TorqueProvider.Instance.contractsSource || !TorqueProvider.Instance.contractsSource.canWrite) {
+      return;
+    } else {
+      if (walletAddress.toLowerCase() !== account) {
+        NavService.Instance.History.replace(NavService.Instance.getDashboardAddress(WalletType.Web3, account));
+        walletAddress = account;
       }
     }
 
@@ -147,6 +149,10 @@ export class DashboardPage extends PureComponent<
   }
 
   public render() {
+
+    const walletType = walletTypeAbbrToWalletType(this.props.match.params.walletTypeAbbr);
+
+
     return (
       <React.Fragment>
         <ManageCollateralDlg ref={this.manageCollateralDlgRef} />
@@ -154,38 +160,39 @@ export class DashboardPage extends PureComponent<
         <ExtendLoanDlg ref={this.extendLoanDlgRef} />
         <WalletAddressDlg ref={this.walletAddressDlgRef} />
         <div className="dashboard-page">
-          <HeaderOps isMobileMedia={this.props.isMobileMedia} isLoading={this.props.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
+          <HeaderOps isMobileMedia={this.props.isMobileMedia} isLoading={this.props.isLoading} doNetworkConnect={this.props.doNetworkConnect} isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
           <div className="dashboard-page__main">
-            <React.Fragment>
-              {!TorqueProvider.Instance.unsupportedNetwork ? (
-                <React.Fragment>
-                  {this.state.isDataLoading
-                    ? <Loader />
-                    : (<React.Fragment>
-                      <div onClick={this.refreshPage} style={{ cursor: `pointer`, textAlign: `center`, fontSize: `2rem`, paddingBottom: `1.5rem` }}>
-                        Click to refresh and see recent loan activity.
+
+            {this.state.items.length > 0 && <h2>You have no loans!</h2>}
+
+            {!TorqueProvider.Instance.unsupportedNetwork ? (
+              <React.Fragment>
+                {this.state.isDataLoading
+                  ? <Loader />
+                  : (<React.Fragment>
+                    <div onClick={this.refreshPage} style={{ cursor: `pointer`, textAlign: `center`, fontSize: `2rem`, paddingBottom: `1.5rem` }}>
+                      Click to refresh and see recent loan activity.
                         </div>
-                    </React.Fragment>)
-                  }
-                  <BorrowedFundsList
-                    walletDetails={this.state.walletDetails}
-                    items={this.state.items}
-                    itemsAwaiting={this.state.itemsAwaiting}
-                    onManageCollateral={this.onManageCollateral}
-                    onRepayLoan={this.onRepayLoan}
-                    onExtendLoan={this.onExtendLoan}
-                  />
-                </React.Fragment>
-              ) :
-                (
-                  <div style={{ textAlign: `center`, fontSize: `2rem`, paddingBottom: `1.5rem` }}>
-                    <div style={{ cursor: `pointer` }}>
-                      You are connected to the wrong network.
+                  </React.Fragment>)
+                }
+                <BorrowedFundsList
+                  walletDetails={this.state.walletDetails}
+                  items={this.state.items}
+                  itemsAwaiting={this.state.itemsAwaiting}
+                  onManageCollateral={this.onManageCollateral}
+                  onRepayLoan={this.onRepayLoan}
+                  onExtendLoan={this.onExtendLoan}
+                />
+              </React.Fragment>
+            ) :
+              (
+                <div style={{ textAlign: `center`, fontSize: `2rem`, paddingBottom: `1.5rem` }}>
+                  <div style={{ cursor: `pointer` }}>
+                    You are connected to the wrong network.
                       </div>
-                  </div>
-                )
-              }
-            </React.Fragment>
+                </div>
+              )
+            }
           </div>
           <Footer isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
         </div>
@@ -332,12 +339,6 @@ export class DashboardPage extends PureComponent<
         this.manageCollateralDlgRef.current.toggleDidSubmit(false);
         await this.manageCollateralDlgRef.current.hide();
       }
-    }
-  };
-
-  private doNetworkConnect = () => {
-    if (this.props.doNetworkConnect) {
-      this.props.doNetworkConnect("b");
     }
   };
 }

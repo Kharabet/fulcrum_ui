@@ -1,3 +1,6 @@
+import { ProviderType } from "../domain/ProviderType";
+import { TorqueProvider } from "../services/TorqueProvider";
+
 export enum WalletType {
   Web3 = "Web3", // "w" abbreviation
   NonWeb3 = "NonWeb3", // "n" abbreviation
@@ -11,7 +14,9 @@ export const walletTypeToWalletTypeAbbr = (walletType: WalletType): string => {
 };
 
 export const walletTypeAbbrToWalletType = (walletTypeAbbr: string): WalletType => {
-  return WalletType.Web3;
+  return TorqueProvider.Instance.providerType !== ProviderType.None ?
+          WalletType.Web3 :
+          WalletType.ViewOnly;
   switch (walletTypeAbbr) {
     case "w":
       return WalletType.Web3;
