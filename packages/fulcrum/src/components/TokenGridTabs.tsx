@@ -24,7 +24,7 @@ export interface ITokenGridTabsProps {
 interface ITokenGridTabsState {
   leverage: number;
   positionType: PositionType;
-
+  isPro: boolean;
   isShowMyTokensOnly: boolean;
 }
 
@@ -34,9 +34,10 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
     this.state = {
       positionType: props.isLong ? PositionType.SHORT : PositionType.SHORT,
       leverage: props.isLong ? props.defaultLeverageLong : props.defaultLeverageShort,
-      isShowMyTokensOnly: props.isShowMyTokensOnly
+      isShowMyTokensOnly: props.isShowMyTokensOnly,
+      isPro: false
     };
-
+    this.onSwitchPro = this.onSwitchPro.bind(this);
   }
 
 
@@ -104,8 +105,15 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
               <div className={`trade-token-grid-tab-item__col-token-image wallet-img-div`} >
                 {<WalletSvg />}
                 <span>Manage</span>
+                <span className="count-open-position">2</span>
               </div>
             </div>
+          </div>
+          <div className="pro-switch-wrapper">
+            <label className={`pro-switch ${this.state.isPro ? `active` : ``}`}>
+              <input type="checkbox" id="checkbox" onChange={this.onSwitchPro} />
+              <div className="slider round"></div>
+            </label>
           </div>
         </div>
       </div>
@@ -153,5 +161,7 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
       onDropdownSelect: this.onDropdownSelect.bind(this)
     }
   }
-
+  private onSwitchPro() {
+    this.setState({ ...this.state, isPro: !this.state.isPro });
+  }
 }

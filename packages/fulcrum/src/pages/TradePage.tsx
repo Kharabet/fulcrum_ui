@@ -29,7 +29,7 @@ import { InfoBlock } from "../components/InfoBlock";
 
 export interface ITradePageProps {
   doNetworkConnect: () => void;
-  isRiskDisclosureModalOpen: ()  => void;
+  isRiskDisclosureModalOpen: () => void;
   isLoading: boolean;
   isMobileMedia: boolean;
 }
@@ -154,7 +154,7 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
       <div className="trade-page">
         <HeaderOps isMobileMedia={this.props.isMobileMedia} isLoading={this.props.isLoading} doNetworkConnect={this.props.doNetworkConnect} isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
         <main>
-          <InfoBlock localstorageItemProp="defi-risk-notice" onAccept={() => {this.forceUpdate()}}>
+          <InfoBlock localstorageItemProp="defi-risk-notice" onAccept={() => { this.forceUpdate() }}>
             For your safety, please ensure the URL in your browser starts with: https://app.fulcrum.trade/. <br />
             Fulcrum is a non-custodial platform for tokenized lending and margin trading. <br />
             "Non-custodial" means YOU are responsible for the security of your digital assets. <br />
@@ -162,7 +162,7 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
           </InfoBlock>
           {localStorage.getItem("defi-risk-notice") ?
             <InfoBlock localstorageItemProp="trade-page-info">
-              Currently only our lending, unlending, and closing of position functions are enabled. <br /> 
+              Currently only our lending, unlending, and closing of position functions are enabled. <br />
               Full functionality will return after a thorough audit of our newly implemented and preexisting smart contracts.
           </InfoBlock>
             : null}
@@ -189,25 +189,27 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
             <OwnTokenGrid
               showMyTokensOnly={this.state.showMyTokensOnly}
               selectedKey={this.state.selectedKey}
+              isMobileMedia={this.props.isMobileMedia}
               // onDetails={this.onDetails}
               // onManageCollateral={this.onManageCollateralRequested}
               onSelect={this.onSelect}
-              isMobileMedia={this.props.isMobileMedia}
               onTrade={this.onTradeRequested}
+              onManageCollateralOpen={this.onManageCollateralRequestOpen}
             />
           ) : (
               <TradeTokenGrid
                 assets={this.state.assets}
                 changeActiveBtn={this.changeActiveBtn.bind(this)}
                 isMobileMedia={this.props.isMobileMedia}
+                isLong={this.state.isLong}
+                isShort={this.state.isShort}
                 showMyTokensOnly={this.state.showMyTokensOnly}
                 selectedKey={this.state.selectedKey}
                 defaultLeverageShort={1}
                 defaultLeverageLong={2}
                 onSelect={this.onSelect}
                 onTrade={this.onTradeRequested}
-                isLong={this.state.isLong}
-                isShort={this.state.isShort}
+                onManageCollateralOpen={this.onManageCollateralRequestOpen}
               />
             )}
           <Modal
@@ -239,6 +241,7 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
           </Modal>
           <Modal
             isOpen={this.state.isTokenAddressFormOpen}
+
             onRequestClose={this.onTokenAddressFormRequestClose}
             className="modal-content-div"
             overlayClassName="modal-overlay-div"
@@ -255,9 +258,24 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
             overlayClassName="modal-overlay-div"
           >
             <ManageCollateralForm
+              isMobileMedia={this.props.isMobileMedia}
               asset={Asset.ETH}
+              tradeType={this.state.tradeType}
+              leverage={this.state.tradeLeverage}
+              positionType={this.state.tradePositionType}
+              bestCollateral={
+                this.state.tradeAsset === Asset.ETH ?
+                  Asset.ETH :
+                  this.state.tradePositionType === PositionType.SHORT ?
+                    this.state.tradeAsset :
+                    this.state.tradeUnitOfAccount}
+              defaultCollateral={this.state.collateralToken}
+              defaultUnitOfAccount={this.state.tradeUnitOfAccount}
+              defaultTokenizeNeeded={true}
               onSubmit={this.onManageCollateralConfirmed}
               onCancel={this.onManageCollateralRequestClose}
+              onManage={this.onManageCollateralRequested}
+              version={this.state.tradeVersion}
             />
           </Modal>
         </main>
@@ -300,7 +318,17 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
     }
 
     if (request) {
-      this.setState({ ...this.state, isManageCollateralModalOpen: true });
+      this.setState({
+        ...this.state,
+        isManageCollateralModalOpen: true,
+        collateralToken: request.collateral,
+        tradeType: request.tradeType,
+        tradeAsset: request.asset,
+        tradeUnitOfAccount: request.unitOfAccount,
+        tradePositionType: request.positionType,
+        tradeLeverage: request.leverage,
+        tradeVersion: request.version
+      });
     }
   };
 
@@ -309,6 +337,13 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
     this.setState({
       ...this.state,
       isManageCollateralModalOpen: false
+    });
+  };
+
+  public onManageCollateralRequestOpen = () => {
+    this.setState({
+      ...this.state,
+      isManageCollateralModalOpen: true
     });
   };
 

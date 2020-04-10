@@ -8,7 +8,7 @@ $container-desktop: 1380px;
 $container-laptop: 1110px;
 $container-mobile: 100%;
 
-$breakpoint-desktop-max: 1409px; 
+$breakpoint-desktop-max: 1409px;
 $breakpoint-desktop-min: 1410px;
 
 $breakpoint-laptop-max: 1139px;
@@ -25,6 +25,7 @@ $breakpoint-mobile-min: 960px;
   --switch-button: #ffffff;
   --primary-row: #e9f4ff;
   --secondary-row: #f5f7f9;
+  --history-row: #e9f4ff;
   --primary-row-border: #cbe2ff;
   --trade-header-color: #8992a4;
   --lend-border-hover: #e9f4ff;
@@ -43,9 +44,15 @@ $breakpoint-mobile-min: 960px;
   --select-bg: #ffffff;
   --select-border: #b9c7d6;
   --select-arrow: #8992a4;
-  --select-option-hover: #F5F7F9;
+  --select-option: #f5f7f9;
+  --select-option-hover: #f5f7f9;
   --disabled-bg: #d1ddea;
   --disabled-color: #ffffff;
+  --switch-bg-pro: #e9f4ff;
+  --switch-button-pro: #ffffff;
+  --switch-text-pro: #283049;
+  --bg-icon-collateral: #ffffff;
+  --icon-collateral: #283049;
 }
 
 [data-theme="dark"] {
@@ -55,6 +62,7 @@ $breakpoint-mobile-min: 960px;
   --switch-button: #283038;
   --primary-row: #444e5a;
   --secondary-row: #3d4651;
+  --history-row: #37414D;
   --primary-row-border: #444e5a;
   --trade-header-color: #a2abb8;
   --lend-bg-hover: #586473;
@@ -70,10 +78,16 @@ $breakpoint-mobile-min: 960px;
   --loader-slider: #3d4651;
   --eth-bg: #ffffff;
   --wbtc-svg: #ffffff;
-  --select-bg: #586473;
-  --select-border: #586473;
+  --select-bg: #333c46;
+  --select-border: #333c46;
   --select-arrow: #ffffff;
-  --select-option-hover: #758295;
+  --select-option: #758295;
+  --select-option-hover: #8b97a9;
   --disabled-bg: #586473;
   --disabled-color: #758295;
+  --switch-bg-pro: #333c46;
+  --switch-button-pro: #758295;
+  --switch-text-pro: #ffffff;
+  --bg-icon-collateral: #586473;
+  --icon-collateral: #ffffff;
 }

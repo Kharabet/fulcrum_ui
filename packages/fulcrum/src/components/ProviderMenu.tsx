@@ -65,7 +65,10 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
           if (!currentConnector) return;
           //@ts-ignore
           setActivatingConnector(currentConnector)
-          activate(currentConnector, (err) => console.error(err))
+          activate(currentConnector, (err) => {
+            console.error(err)
+            props.onDeactivate();
+          })
         }}
       />
     });
