@@ -28,6 +28,7 @@ export interface IOwnTokenGridRowProps {
   // onManageCollateral: (request: ManageCollateralRequest) => void;
   onSelect: (key: TradeTokenKey) => void;
   onTrade: (request: TradeRequest) => void;
+  onManageCollateralOpen: () => void;
 }
 
 interface IOwnTokenGridRowState {
@@ -38,6 +39,7 @@ interface IOwnTokenGridRowState {
   profit: BigNumber | null;
   pTokenAddress: string;
   isLoading: boolean;
+  isManageColllateralOpen: boolean;
 }
 
 export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenGridRowState> {
@@ -54,7 +56,8 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
       assetBalance: new BigNumber(0),
       profit: new BigNumber(0),
       pTokenAddress: "",
-      isLoading: true
+      isLoading: true,
+      isManageColllateralOpen: false
     };
 
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
@@ -269,6 +272,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
   public onManageClick = (event: React.MouseEvent<HTMLElement>) => {
     event.stopPropagation();
 
+    this.props.onManageCollateralOpen();
     // this.props.onManageCollateral(new ManageCollateralRequest(new BigNumber(0)));
   };
 

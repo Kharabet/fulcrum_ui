@@ -189,30 +189,29 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
             <OwnTokenGrid
               showMyTokensOnly={this.state.showMyTokensOnly}
               selectedKey={this.state.selectedKey}
+              isMobileMedia={this.props.isMobileMedia}
               // onDetails={this.onDetails}
               // onManageCollateral={this.onManageCollateralRequested}
               onSelect={this.onSelect}
-              isMobileMedia={this.props.isMobileMedia}
               onTrade={this.onTradeRequested}
+              onManageCollateralOpen={this.onManageCollateralRequestOpen}
             />
           ) : (
               <TradeTokenGrid
                 assets={this.state.assets}
                 changeActiveBtn={this.changeActiveBtn.bind(this)}
                 isMobileMedia={this.props.isMobileMedia}
+                isLong={this.state.isLong}
+                isShort={this.state.isShort}
                 showMyTokensOnly={this.state.showMyTokensOnly}
                 selectedKey={this.state.selectedKey}
                 defaultLeverageShort={1}
                 defaultLeverageLong={2}
                 onSelect={this.onSelect}
                 onTrade={this.onTradeRequested}
-                isLong={this.state.isLong}
-                isShort={this.state.isShort}
+                onManageCollateralOpen={this.onManageCollateralRequestOpen}
               />
             )}
-          <button className="trade-token-grid-row__button trade-token-grid-row__buy-button trade-token-grid-row__button--size-half" onClick={this.onManageCollateralRequestOpen}>
-            Open
-          </button>
           <Modal
             isOpen={this.state.isTradeModalOpen}
             onRequestClose={this.onTradeRequestClose}

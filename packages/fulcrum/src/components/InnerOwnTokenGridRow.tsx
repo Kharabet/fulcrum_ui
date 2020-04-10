@@ -28,6 +28,7 @@ export interface IInnerOwnTokenGridRowProps {
   // onManageCollateral: (request: ManageCollateralRequest) => void;
   onSelect: (key: TradeTokenKey) => void;
   onTrade: (request: TradeRequest) => void;
+  onManageCollateralOpen: () => void;
 }
 
 interface IInnerOwnTokenGridRowState {
@@ -250,6 +251,8 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
 
   public onManageClick = (event: React.MouseEvent<HTMLElement>) => {
     event.stopPropagation();
+
+    this.props.onManageCollateralOpen();
   };
 
   public onSellClick = (event: React.MouseEvent<HTMLElement>) => {

@@ -15,6 +15,8 @@ import { TradeType } from "../domain/TradeType";
 import { Asset } from "../domain/Asset";
 import { PositionType } from "../domain/PositionType";
 import { BigNumber } from "@0x/utils";
+import { ReactComponent as OpenManageCollateral } from "../assets/images/openManageCollateral.svg";
+
 export interface IOwnTokenGridProps {
   showMyTokensOnly: boolean;
   selectedKey: TradeTokenKey;
@@ -26,6 +28,7 @@ export interface IOwnTokenGridProps {
   onSelect: (key: TradeTokenKey) => void;
   onTrade: (request: TradeRequest) => void;
   isMobileMedia: boolean;
+  onManageCollateralOpen: () => void;
 }
 
 interface IOwnTokenGridState {
@@ -88,7 +91,7 @@ export class OwnTokenGrid extends Component<IOwnTokenGridProps, IOwnTokenGridSta
   }
 
   private renderDesktop = () => {
-    const tokenRows = this.state.tokenRowsData.map(e => <OwnTokenGridRow key={`${e.currentKey.toString()}`} {...e} />);
+    const tokenRows = this.state.tokenRowsData.map(e => <OwnTokenGridRow onManageCollateralOpen={this.props.onManageCollateralOpen} key={`${e.currentKey.toString()}`} {...e} />);
     const historyRows = this.state.tokenRowsData.map(e => <HistoryTokenGridRow key={`${e.currentKey.toString()}`} {...e} />);
     if (tokenRows.length === 0) return null;
 
@@ -167,9 +170,10 @@ export class OwnTokenGrid extends Component<IOwnTokenGridProps, IOwnTokenGridSta
           currentKey: pToken,
           // // balance: balance,
           // onDetails: props.onDetails,
-          // onManageCollateral: props.onManageCollateral,
+          //onManageCollateral: props.onManageCollateral,
           onSelect: props.onSelect,
           onTrade: props.onTrade,
+          onManageCollateralOpen: props.onManageCollateralOpen,
           showMyTokensOnly: props.showMyTokensOnly
         });
       }

@@ -21,6 +21,7 @@ export interface IInnerOwnTokenGridProps {
   positionType?: PositionType;
   onSelect: (key: TradeTokenKey) => void;
   onTrade: (request: TradeRequest) => void;
+  onManageCollateralOpen: () => void;
   isMobileMedia: boolean;
 }
 
@@ -85,7 +86,7 @@ export class InnerOwnTokenGrid extends Component<IInnerOwnTokenGridProps, IInner
   }
 
   private renderDesktop = () => {
-    const tokenRows = this.state.tokenRowsData.map(e => <InnerOwnTokenGridRow key={`${e.currentKey.toString()}`} {...e} />);
+    const tokenRows = this.state.tokenRowsData.map(e => <InnerOwnTokenGridRow onManageCollateralOpen={this.props.onManageCollateralOpen} key={`${e.currentKey.toString()}`} {...e} />);
     if (tokenRows.length === 0) return null;
 
     return (
@@ -153,6 +154,7 @@ export class InnerOwnTokenGrid extends Component<IInnerOwnTokenGridProps, IInner
           // onManageCollateral: props.onManageCollateral,
           onSelect: props.onSelect,
           onTrade: props.onTrade,
+          onManageCollateralOpen: props.onManageCollateralOpen,
           showMyTokensOnly: props.showMyTokensOnly
         });
       }
