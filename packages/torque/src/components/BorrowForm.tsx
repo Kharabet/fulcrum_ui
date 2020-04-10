@@ -183,7 +183,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
           }],
         }
       }
-      console.log("tagManagerArgs = ", tagManagerArgs)
+      //console.log("tagManagerArgs = ", tagManagerArgs)
       TagManager.dataLayer(tagManagerArgs)
 
       this.props.onSubmit(

@@ -15,6 +15,7 @@ import { ReactComponent as MenuIconOpen } from "../assets/images/ic_menu.svg";
 import { ReactComponent as MenuIconClose } from "../assets/images/ic_close.svg";
 import { Footer } from "./Footer"
 
+import siteConfig from "../config/SiteConfig.json";
 export interface IHeaderOpsProps {
   doNetworkConnect: () => void;
   isRiskDisclosureModalOpen: () => void;
@@ -62,6 +63,9 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
   private renderDesktop = () => {
 
     const toggleMenuIcon = !this.state.isMenuOpen ? <OpenMenu /> : <CloseMenu />;
+    if (siteConfig.BorrowDisabled && !(TorqueProvider.Instance.accounts.length > 0 && TorqueProvider.Instance.accounts[0].toLowerCase() === "0xadff3ada12ed0f8a87e31e5a04dfd2ee054e1118")) {
+      this.Menu.items.splice(0, 1);
+    }
     const sidebarClass = !this.state.isMenuOpen ? 'sidebar_h' : 'sidebar_v'
     return (
       <header className="header">
