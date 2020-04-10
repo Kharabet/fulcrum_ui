@@ -186,7 +186,6 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
             FulcrumProvider.Instance.web3ProviderSettings.etherscanURL ? (
           <a
             className="trade-token-grid-row__col-token-name--inner"
-            style={{ cursor: `pointer`, textDecoration: `none`, color: `white` }}
             title={this.state.pTokenAddress}
             href={`${FulcrumProvider.Instance.web3ProviderSettings.etherscanURL}address/${this.state.pTokenAddress}#readContract`}
             target="_blank"
