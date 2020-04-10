@@ -21,8 +21,6 @@ export class WalletTypeSelectorItem extends Component<IWalletTypeSelectorItemPro
     const walletTypeModifier =
       this.props.walletType === WalletType.Web3
         ? "wallet-type-selector-item--browser-wallet"
-        : this.props.walletType === WalletType.NonWeb3
-        ? "wallet-type-selector-item--non-web3-wallet"
         : "";
 
     return (

@@ -157,13 +157,6 @@ export class DashboardPage extends PureComponent<
           <HeaderOps isMobileMedia={this.props.isMobileMedia} isLoading={this.props.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
           <div className="dashboard-page__main">
             <React.Fragment>
-              {this.state.walletDetails.walletType === WalletType.NonWeb3 || this.state.walletDetails.walletType === WalletType.ViewOnly ? (
-                <WalletAddressHint
-                  walletAddress={this.state.walletDetails.walletAddress || ""}
-                  onSelectNewWalletAddress={this.onSelectNewWalletAddress}
-                  onClearWalletAddress={this.onClearWalletAddress}
-                />
-              ) : null}
               {!TorqueProvider.Instance.unsupportedNetwork ? (
                 <React.Fragment>
                   {this.state.isDataLoading
@@ -220,31 +213,6 @@ export class DashboardPage extends PureComponent<
           });*/
         }, 1000);
       });
-  };
-
-  private onSelectNewWalletAddress = async () => {
-    if (this.walletAddressDlgRef.current) {
-      try {
-        const walletAddress = await this.walletAddressDlgRef.current.getValue();
-        this.onWalletAddressChange(walletAddress);
-      } finally {
-        this.walletAddressDlgRef.current.hide();
-      }
-    }
-  };
-
-  private onClearWalletAddress = () => {
-    // console.log("onClearWalletAddress");
-    NavService.Instance.History.replace(NavService.Instance.getDashboardAddress(WalletType.NonWeb3, ""));
-    this.props.match.params.walletAddress = "";
-    this.refreshPage();
-  };
-
-  private onWalletAddressChange = (walletAddress: string) => {
-    // console.log("onWalletAddressChange", walletAddress);
-    NavService.Instance.History.replace(NavService.Instance.getDashboardAddress(WalletType.NonWeb3, walletAddress));
-    this.props.match.params.walletAddress = walletAddress;
-    this.refreshPage();
   };
 
   private onRepayLoan = async (item: IBorrowedFundsState) => {

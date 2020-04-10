@@ -5,7 +5,6 @@ import { IWalletDetails } from "../domain/IWalletDetails";
 import { ManageCollateralRequest } from "../domain/ManageCollateralRequest";
 import { WalletType } from "../domain/WalletType";
 import { DialogHeader } from "./DialogHeader";
-import { ManageCollateralFormNonWeb3 } from "./ManageCollateralFormNonWeb3";
 import { ManageCollateralFormWeb3 } from "./ManageCollateralFormWeb3";
 
 interface IManageCollateralDlgState {
@@ -41,29 +40,15 @@ export class ManageCollateralDlg extends Component<any, IManageCollateralDlgStat
         onRequestClose={this.onFormDecline}
         shouldCloseOnOverlayClick={false}
       >
-        {this.state.walletDetails.walletType === WalletType.NonWeb3 ? (
-          <React.Fragment>
-            <DialogHeader title={`Top up how much ${`ETH`} collateral?`} onDecline={this.onFormDecline} />
-            <ManageCollateralFormNonWeb3
-              walletDetails={this.state.walletDetails}
-              loanOrderState={this.state.loanOrderState}
-              onSubmit={this.onFormSubmit}
-              onClose={this.onFormDecline}
-            />
-          </React.Fragment>
-        ) : (
-          <React.Fragment>
-            <DialogHeader title="Manage Collateral" onDecline={this.onFormDecline} />
-            <ManageCollateralFormWeb3
-              walletDetails={this.state.walletDetails}
-              loanOrderState={this.state.loanOrderState}
-              onSubmit={this.onFormSubmit}
-              onClose={this.onFormDecline}
-              didSubmit={this.state.didSubmit}
-              toggleDidSubmit={this.toggleDidSubmit} 
-            />
-          </React.Fragment>
-        )}
+        <DialogHeader title="Manage Collateral" onDecline={this.onFormDecline} />
+        <ManageCollateralFormWeb3
+          walletDetails={this.state.walletDetails}
+          loanOrderState={this.state.loanOrderState}
+          onSubmit={this.onFormSubmit}
+          onClose={this.onFormDecline}
+          didSubmit={this.state.didSubmit}
+          toggleDidSubmit={this.toggleDidSubmit}
+        />
       </ReactModal>
     );
   }

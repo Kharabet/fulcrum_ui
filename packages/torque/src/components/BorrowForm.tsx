@@ -101,19 +101,13 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
               <CollateralTokenSelectorToggle
                 borrowAsset={this.props.borrowAsset}
                 collateralAsset={this.state.collateralAsset}
-                readonly={this.props.walletType === WalletType.NonWeb3 || this.props.didSubmit}
+                readonly={this.props.didSubmit}
                 onChange={this.onCollateralChange}
               />
             </div>
-            {this.props.walletType === WalletType.NonWeb3 ? (
-              <button className="btn btn-size--small" type="submit">
-                Track
-              </button>
-            ) : (
                 <button className={`btn btn-size--small ${this.props.didSubmit ? `btn-disabled` : ``}`} type="submit">
                   {this.props.didSubmit ? "Submitting..." : "Submit"}
                 </button>
-              )}
           </div>
         </section>
       </form>

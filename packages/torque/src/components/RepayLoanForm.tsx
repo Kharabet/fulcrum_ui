@@ -211,15 +211,9 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
         </section>
         <section className="dialog-actions">
           <div className="repay-loan-form__actions-container">
-            {this.props.walletDetails.walletType === WalletType.NonWeb3 ? (
-              <button type="button" className="btn btn-size--small" onClick={this.props.onClose}>
-                Close
-              </button>
-            ) : (
-                <button type="submit" className={`btn btn-size--small ${this.props.didSubmit ? `btn-disabled` : ``}`}>
-                  {this.props.didSubmit ? "Submitting..." : "Repay"}
-                </button>
-              )}
+            <button type="submit" className={`btn btn-size--small ${this.props.didSubmit ? `btn-disabled` : ``}`}>
+              {this.props.didSubmit ? "Submitting..." : "Repay"}
+            </button>
           </div>
         </section>
       </form>

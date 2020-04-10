@@ -268,7 +268,7 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
             </section>
             <section className="dialog-actions">
               <div className="manage-collateral-form__actions-container">
-                {this.props.walletDetails.walletType === WalletType.NonWeb3 || this.state.loanValue === this.state.selectedValue ? (
+                {this.state.loanValue === this.state.selectedValue ? (
                   <button type="button" className="btn btn-size--small" onClick={this.props.onClose}>
                     Close
                   </button>

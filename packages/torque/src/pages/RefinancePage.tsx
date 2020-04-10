@@ -86,9 +86,7 @@ export class RefinancePage extends PureComponent<IRefinancePageParams & RouteCom
       try {
         const borrowRequest = await this.borrowDlgRef.current.getValue(walletType, asset);
 
-        if (borrowRequest.walletType === WalletType.NonWeb3) {
-          NavService.Instance.History.replace(NavService.Instance.getDashboardAddress(walletType, ""));
-        } else if (borrowRequest.walletType === WalletType.Web3) {
+        if (borrowRequest.walletType === WalletType.Web3) {
           const accountAddress =
             TorqueProvider.Instance.accounts.length > 0 && TorqueProvider.Instance.accounts[0]
               ? TorqueProvider.Instance.accounts[0].toLowerCase()

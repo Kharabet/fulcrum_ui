@@ -184,15 +184,9 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
         </section>
         <section className="dialog-actions">
           <div className="extend-loan-form__actions-container">
-            {this.props.walletDetails.walletType === WalletType.NonWeb3 ? (
-              <button type="button" className="btn btn-size--small" onClick={this.props.onClose}>
-                Close
-              </button>
-            ) : (
-                <button type="submit" className={`btn btn-size--small ${this.props.didSubmit ? `btn-disabled` : ``}`}>
-                  {this.props.didSubmit ? "Submitting..." : "Extend"}
-                </button>
-              )}
+            <button type="submit" className={`btn btn-size--small ${this.props.didSubmit ? `btn-disabled` : ``}`}>
+              {this.props.didSubmit ? "Submitting..." : "Extend"}
+            </button>
           </div>
         </section>
       </form>

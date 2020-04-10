@@ -1542,11 +1542,7 @@ export class TorqueProvider {
     loanValue: BigNumber,
     selectedValue: BigNumber
   ): Promise<string | null> => {
-    if (walletDetails.walletType === WalletType.NonWeb3) {
-      return `topup.${asset.toLowerCase()}.tokenloan.eth`;
-    } else {
       return `${loanValue > selectedValue ? `withdraw.${asset.toLowerCase()}.tokenloan.eth` : `topup.${asset.toLowerCase()}.tokenloan.eth`}`;
-    }
   };
 
   //
@@ -1646,15 +1642,11 @@ export class TorqueProvider {
   };
 
   public getLoanRepayEstimate = async (walletDetails: IWalletDetails, borrowedFundsState: IBorrowedFundsState, repayPercent: number): Promise<IRepayEstimate> => {
-    return (walletDetails.walletType === WalletType.NonWeb3)
-      ? { repayAmount: borrowedFundsState.amountOwed }
-      : { repayAmount: borrowedFundsState.amountOwed.multipliedBy(repayPercent).dividedBy(100) };
+    return { repayAmount: borrowedFundsState.amountOwed.multipliedBy(repayPercent).dividedBy(100) };
   };
 
   public getLoanRepayPercent = async (walletDetails: IWalletDetails, borrowedFundsState: IBorrowedFundsState, repayAmount: BigNumber): Promise<IRepayEstimate> => {
-    return (walletDetails.walletType === WalletType.NonWeb3)
-      ? { repayAmount: new BigNumber(0) }
-      : {
+    return {
         repayAmount: repayAmount,
         repayPercent: Math.round(repayAmount.multipliedBy(100).dividedBy(borrowedFundsState.amountOwed).toNumber())
       };

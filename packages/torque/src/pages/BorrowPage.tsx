@@ -8,7 +8,7 @@ import { Footer } from "../layout/Footer";
 import { HeaderOps } from "../layout/HeaderOps";
 import { NavService } from "../services/NavService";
 import { TorqueProvider } from "../services/TorqueProvider";
-import {TorqueProviderEvents} from "../services/events/TorqueProviderEvents";
+import { TorqueProviderEvents } from "../services/events/TorqueProviderEvents";
 
 export interface IBorrowPageRouteParams {
   walletTypeAbbr: string;
@@ -16,7 +16,7 @@ export interface IBorrowPageRouteParams {
 
 export interface IBorrowPageParams {
   doNetworkConnect?: (destinationAbbr: string) => void;
-  isRiskDisclosureModalOpen: ()  => void;
+  isRiskDisclosureModalOpen: () => void;
   isLoading: boolean;
   isMobileMedia: boolean;
 }
@@ -67,9 +67,7 @@ export class BorrowPage extends PureComponent<IBorrowPageParams & RouteComponent
       try {
         const borrowRequest = await this.borrowDlgRef.current.getValue(walletType, asset);
 
-        if (borrowRequest.walletType === WalletType.NonWeb3) {
-          NavService.Instance.History.replace(NavService.Instance.getDashboardAddress(walletType, ""));
-        } else if (borrowRequest.walletType === WalletType.Web3) {
+        if (borrowRequest.walletType === WalletType.Web3) {
           const accountAddress =
             TorqueProvider.Instance.accounts.length > 0 && TorqueProvider.Instance.accounts[0]
               ? TorqueProvider.Instance.accounts[0].toLowerCase()
@@ -86,7 +84,7 @@ export class BorrowPage extends PureComponent<IBorrowPageParams & RouteComponent
           this.borrowDlgRef.current.toggleDidSubmit(false);
           await this.borrowDlgRef.current.hide();
         }
-      } catch(error) {
+      } catch (error) {
         /*let errorMsg;
         if (error.message) {
           errorMsg = error.message;
