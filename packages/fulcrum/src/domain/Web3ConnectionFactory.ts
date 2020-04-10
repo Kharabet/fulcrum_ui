@@ -97,6 +97,6 @@ export class Web3ConnectionFactory {
     } else {
       key = configProviders.Alchemy_ApiKey
     }
-    return new AlchemySubprovider(`https://eth-${ethNetwork}.alchemyapi.io/jsonrpc/${key}`, { writeProvider: null });
+    return new AlchemySubprovider(`https://eth-${ethNetwork}.alchemyapi.io/v2/${key}`, { writeProvider: null });
   }
 }

@@ -124,7 +124,7 @@ export class FulcrumProvider {
     const providerType: ProviderType | null = storedProvider as ProviderType || null;
     
     this.web3ProviderSettings = FulcrumProvider.getWeb3ProviderSettings(initialNetworkId);
-    if (!providerType) {
+    if (!providerType || providerType === ProviderType.None) {
       // setting up readonly provider
       Web3ConnectionFactory.setReadonlyProvider().then(() => {
         const web3Wrapper = Web3ConnectionFactory.currentWeb3Wrapper;

@@ -1,19 +1,23 @@
 .borrow-page {
   display: flex;
+  flex-direction: column;
+  align-content: center;
+  justify-content: flex-start;
+  width: $container-desktop;
+  box-sizing: border-box;
   flex-wrap: wrap;
   padding: 0 15px;
   .footer {
     width: 100%;
     align-self: flex-end;
   }
-  @media screen and (min-width: $breakpoint-min-xl) {
-    width: 1410px;
+  @media screen and (max-width: $breakpoint-desktop-max) {
+    width: $container-laptop;
   }
-  @media screen and (max-width: $breakpoint-max-xl) {
-    width: 1140px;
-  }
-  @media screen and (max-width: $breakpoint-max-lg) {
-    width: 100%;
+
+  @media screen and (max-width: $breakpoint-laptop-max) {
+    width: $container-mobile;
+    padding: 0 15px;
   }
 
   .borrow-page__main {

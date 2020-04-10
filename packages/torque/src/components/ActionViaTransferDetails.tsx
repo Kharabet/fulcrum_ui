@@ -41,11 +41,6 @@ export class ActionViaTransferDetails extends Component<IActionViaTransferDetail
     let classes1: string = "";
     let classes2: string = "";
     switch (this.props.action) {
-      case ActionType.SetupENS:
-          actionAsset = "ETH";
-          actionContract1 = this.props.contractAddress;
-          classes1 = "action-via-transfer-details__input-center";
-        break;
       case ActionType.Borrow:
         actionAsset = "ETH";
         actionContract1 = this.props.contractAddress;

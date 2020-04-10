@@ -18,7 +18,7 @@ export interface IRefinancePageRouteParams {
 }
 
 export interface IRefinancePageParams {
-  doNetworkConnect?: (destinationAbbr: string) => void;
+  doNetworkConnect: () => void;
   isLoading: boolean;
   isMobileMedia: boolean;
   isRiskDisclosureModalOpen: () => void;
@@ -46,7 +46,7 @@ export class RefinancePage extends PureComponent<IRefinancePageParams & RouteCom
       <React.Fragment>
         <BorrowDlg ref={this.borrowDlgRef} />
         <div className="refinance-page">
-          <HeaderOps isLoading={this.props.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
+          <HeaderOps isMobileMedia={this.props.isMobileMedia} isLoading={this.props.isLoading} doNetworkConnect={this.props.doNetworkConnect} isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
           {/*<div className="borrow-page__main" style={walletType === WalletType.Web3 ? { paddingBottom: `90rem`} : undefined}>*/}
           <div className="refinance-page__main">
             {isShowLoader
@@ -86,9 +86,7 @@ export class RefinancePage extends PureComponent<IRefinancePageParams & RouteCom
       try {
         const borrowRequest = await this.borrowDlgRef.current.getValue(walletType, asset);
 
-        if (borrowRequest.walletType === WalletType.NonWeb3) {
-          NavService.Instance.History.replace(NavService.Instance.getDashboardAddress(walletType, ""));
-        } else if (borrowRequest.walletType === WalletType.Web3) {
+        if (borrowRequest.walletType === WalletType.Web3) {
           const accountAddress =
             TorqueProvider.Instance.accounts.length > 0 && TorqueProvider.Instance.accounts[0]
               ? TorqueProvider.Instance.accounts[0].toLowerCase()
@@ -136,11 +134,6 @@ export class RefinancePage extends PureComponent<IRefinancePageParams & RouteCom
     }
   };
 
-  private doNetworkConnect = () => {
-    if (this.props.doNetworkConnect) {
-      this.props.doNetworkConnect('r');
-    }
-  };
   public updateStateShowLoader = (value: any) => {
     this.setState({ isShowLoader: value })
   }

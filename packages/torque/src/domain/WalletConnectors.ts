@@ -14,6 +14,7 @@ import fulcrumLogo from "../assets/images/fulcrum_logo.svg";
 
 
 import configProviders from "../config/providers.json";
+
 const getNetworkIdByString = (networkName: string | undefined) => {
   switch (networkName) {
     case 'mainnet':

@@ -3,7 +3,7 @@ import { ProviderType } from "../domain/ProviderType";
 import { ProviderMenuListItem } from "./ProviderMenuListItem";
 import { useWeb3React } from '@web3-react/core';
 import { ProviderTypeDictionary } from "../domain/ProviderTypeDictionary";
-import { FulcrumProvider } from "../services/FulcrumProvider";
+import { TorqueProvider } from "../services/TorqueProvider";
 import { injected } from "../domain/WalletConnectors";
 import { AbstractConnector } from '@web3-react/abstract-connector';
 
@@ -31,23 +31,23 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
   }, [activatingConnector, connector])
 
   // handle logic to eagerly connect to the injected ethereum provider, if it exists and has granted access already
-  if (!activatingConnector && connector !== injected && props.isMobileMedia && FulcrumProvider.Instance.providerType !== ProviderType.MetaMask) {
+  if (!activatingConnector && connector !== injected && props.isMobileMedia && TorqueProvider.Instance.providerType !== ProviderType.MetaMask) {
 
     //@ts-ignore
     setActivatingConnector(injected);
     activate(injected);
   }
 
-  const storedProvider: any = FulcrumProvider.getLocalstorageItem('providerType');
+  const storedProvider: any = TorqueProvider.getLocalstorageItem('providerType');
   const providerType: ProviderType | null = storedProvider as ProviderType || null;
-  if (!activatingConnector && providerType && providerType !== FulcrumProvider.Instance.providerType) {
+  if (!activatingConnector && providerType && providerType !== TorqueProvider.Instance.providerType) {
 
     //@ts-ignore
     setActivatingConnector(ProviderTypeDictionary.getConnectorByProviderType(providerType)!);
     activate(ProviderTypeDictionary.getConnectorByProviderType(providerType)!);
     
   }
-
+  
   // handle logic to connect in reaction to certain events on the injected ethereum provider, if it exists
   // useInactiveListener(!triedEager || !!activatingConnector);
   const renderItems = () => {
@@ -73,7 +73,7 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
 
   return (
     <div className="provider-menu">
-      <div className="provider-menu__title">Select Wallet Provider</div>
+      <div className="provider-menu__title">Select Wallet</div>
       <ul className="provider-menu__list">{renderItems()}</ul>
       < button
         className="disconnect"
@@ -82,13 +82,8 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
           deactivate()
           props.onDeactivate()
         }}
-      >DISCONNECT
+      >Deactivate
       </button>
-      <div className="provider-menu__footer">
-        By connecting, you agree to the&nbsp;
-          <a href="https://fulcrum.trade/tos/">Terms of Service</a>&nbsp;and&nbsp;
-          <a href="https://fulcrum.trade/privacy/">Privacy Policy</a>
-      </div>
     </div>
   );
 }
