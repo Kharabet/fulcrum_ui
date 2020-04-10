@@ -2,22 +2,19 @@
   display: flex;
   flex-direction: column;
   align-content: center;
-  justify-content: space-between;
+  justify-content: flex-start;
+  width: $container-desktop;
+  box-sizing: border-box;
 
-  height: 100%;
-  width: 100%;
-  min-height: $page-min-height;
-  max-width: $page-max-width;
-  padding: 0 15px;
-  @media screen and (min-width: $breakpoint-min-xl){
-    min-width: 1410px;
+  @media screen and (max-width: $breakpoint-desktop-max) {
+    width: $container-laptop;
   }
-  @media screen and (max-width: $breakpoint-max-xl){
-    min-width: 1140px;
+
+  @media screen and (max-width: $breakpoint-laptop-max) {
+    width: $container-mobile;
+    padding: 0 15px;
   }
-  @media screen and (max-width: $breakpoint-max-lg){
-    min-width: 100%;
-  }
+
   h1{
     font-size: 52px;
     font-weight: 900;
@@ -51,15 +48,15 @@
 
 }
 
-@media only screen and (max-width: $mobile-version-max-mobile) {
-  .refinance-page {
-    max-width: 100% !important;
-    width: 100%;
-    h1{
-      font-size: 36px;
-    }
-    .description{
-      font-size: 12px;
-    }
-  }
-}
+// @media only screen and (max-width: $mobile-version-max-mobile) {
+//   .refinance-page {
+//     max-width: 100% !important;
+//     width: 100%;
+//     h1{
+//       font-size: 36px;
+//     }
+//     .description{
+//       font-size: 12px;
+//     }
+//   }
+// }
