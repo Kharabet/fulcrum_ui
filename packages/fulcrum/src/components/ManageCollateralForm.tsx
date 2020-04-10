@@ -16,6 +16,7 @@ import TagManager from "react-gtm-module";
 import { merge, Observable, Subject } from "rxjs";
 import { debounceTime, distinctUntilChanged, switchMap } from "rxjs/operators";
 import { ReactComponent as SlippageDown } from "../assets/images/ic__slippage_down.svg"
+import { ReactComponent as CloseIcon } from "../assets/images/ic__close.svg"
 import { Asset } from "../domain/Asset";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary, AssetsDictionaryMobile } from "../domain/AssetsDictionary";
@@ -134,7 +135,7 @@ interface IManageCollateralFormState {
 
 export class ManageCollateralForm extends Component<IManageCollateralFormProps, IManageCollateralFormState> {
   private minValue: number = 0;
-  private maxValue: number = 100;
+  private maxValue: number = 300;
 
   //#region tradeComponent
   private readonly _inputPrecision = 6;
@@ -170,9 +171,9 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
 
     this.state = {
       // assetDetails: AssetsDictionary.assets.get(this.props.asset) || null,
-      positionValue: 66,
-      currentValue: 66,
-      selectedValue: 66,
+      positionValue: 250.6,
+      currentValue: 250.6,
+      selectedValue: 250.6,
       diffAmount: new BigNumber(0),
       // liquidationPrice: new BigNumber(700),
 
@@ -427,7 +428,13 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
 
     return (
       <form className="manage-collateral-form" onSubmit={this.onSubmitClick}>
-        <div className="manage-collateral-form__title">Manage your collateral</div>
+
+        <CloseIcon className="close-icon" onClick={this.props.onCancel} />
+
+        <div className="manage-collateral-form__title">Manage Collateral</div>
+        <div className="manage-collateral-form__description">Your position is collateralized</div>
+        <div className="manage-collateral-form__collaterized"><span>{this.state.currentValue.toFixed(2)}</span>%</div>
+
 
         <CollateralSlider
           minValue={this.minValue}
@@ -442,7 +449,7 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
           <div className="manage-collateral-form__tip">Top Up</div>
         </div>
 
-        <hr className="manage-collateral-form__delimiter" />
+        {/* <hr className="manage-collateral-form__delimiter" />
 
         <div className="manage-collateral-form__info-liquidated-at-container">
           <div className="manage-collateral-form__info-liquidated-at-msg">
@@ -451,7 +458,7 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
           <div className="manage-collateral-form__info-liquidated-at-price">
             {this.state.assetDetails.displayName} falls below ${this.state.liquidationPrice.toFixed(2)}
           </div>
-        </div>
+        </div> */}
 
         {this.state.positionValue !== this.state.selectedValue ? (
           <div className="manage-collateral-form__operation-result-container">
@@ -467,81 +474,82 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
 
         {//#region tradeComponent
         }
-        <div className={`trade-form__form-container ${this.props.tradeType === TradeType.BUY ? "buy" : "sell"}`}>
-          <div className="trade-form__form-values-container">
-            {/* {!this.props.isMobileMedia && this.props.tradeType === TradeType.BUY ? (
+        <div className="manage-collateral-form__trade-form" >
+          <div className={`trade-form__form-container  ${this.props.tradeType === TradeType.BUY ? "buy" : "sell"}`}>
+            <div className="trade-form__form-values-container">
+              {/* {!this.props.isMobileMedia && this.props.tradeType === TradeType.BUY ? (
               <TradeExpectedResult value={tradeExpectedResultValue} />
             ) : null} */}
 
-            <div className="trade-form__kv-container">
-              {amountMsg.includes("Slippage:") ? (
-                <div title={`${this.state.slippageRate.toFixed(18)}%`} className="trade-form__label slippage">
-                  {amountMsg}
-                  <span className="trade-form__slippage-amount">
-                    &nbsp;{`${this.state.slippageRate.toFixed(2)}%`}<SlippageDown />
-                  </span>
-                </div>
-              ) : (<div className="trade-form__label">{amountMsg}</div>)}
+              <div className="trade-form__kv-container">
+                {amountMsg.includes("Slippage:") ? (
+                  <div title={`${this.state.slippageRate.toFixed(18)}%`} className="trade-form__label slippage">
+                    {amountMsg}
+                    <span className="trade-form__slippage-amount">
+                      &nbsp;{`${this.state.slippageRate.toFixed(2)}%`}<SlippageDown />
+                    </span>
+                  </div>
+                ) : (<div className="trade-form__label">{amountMsg}</div>)}
 
-            </div>
-
-            <div className="trade-form__amount-container">
-              <input
-                type="number"
-                step="any"
-                ref={this._setInputRef}
-                className="trade-form__amount-input"
-                value={!this.state.isLoading ? this.state.inputAmountText : ""}
-                onChange={this.onTradeAmountChange}
-              />
-              {!this.state.isLoading ? null
-                : <div className="preloader-container"> <Preloader width="80px" /></div>
-              }
-              <div className="trade-form__collateral-button-container">
-                <CollateralTokenButton asset={this.state.collateral} onClick={this.onChangeCollateralOpen} isChangeCollateralOpen={this.state.isChangeCollateralOpen} />
               </div>
-              {this.state.isChangeCollateralOpen
-                ?
-                <CollateralTokenSelector
-                  selectedCollateral={this.state.collateral}
-                  collateralType={this.props.tradeType === TradeType.BUY ? `Purchase` : `Withdrawal`}
-                  onCollateralChange={this.onChangeCollateralClicked}
-                  onClose={this.onChangeCollateralClose}
-                  tradeType={this.props.tradeType} />
-                :
-                null
-              }
-            </div>
-            <div className="trade-form__group-button">
-              <button data-value="0.25" className={multiplier === 0.25 ? "active " : ""} onClick={this.onInsertMaxValue}>25%</button>
-              <button data-value="0.5" className={multiplier === 0.5 ? "active " : ""} onClick={this.onInsertMaxValue}>50%</button>
-              <button data-value="0.75" className={multiplier === 0.75 ? "active " : ""} onClick={this.onInsertMaxValue}>75%</button>
-              <button data-value="1" className={multiplier === 1 ? "active " : ""} onClick={this.onInsertMaxValue}>100%</button>
-            </div>
 
-            {this.state.positionTokenBalance && this.props.tradeType === TradeType.BUY && this.state.positionTokenBalance!.eq(0) ? (
-              <CollapsibleContainer titleOpen="View advanced options" titleClose="Hide advanced options" isTransparent={amountMsg !== ""}>
-                <div className="trade-form__unit-of-account-container">
-                  Unit of Account
-                    <UnitOfAccountSelector items={[
-                    Asset.USDC,
-                    process.env.REACT_APP_ETH_NETWORK === "kovan"
-                      ? Asset.SAI
-                      : Asset.DAI
-                  ]} value={this.state.selectedUnitOfAccount} onChange={this.onChangeUnitOfAccount} />
+              <div className="trade-form__amount-container">
+                <input
+                  type="number"
+                  step="any"
+                  ref={this._setInputRef}
+                  className="trade-form__amount-input"
+                  value={!this.state.isLoading ? this.state.inputAmountText : ""}
+                  onChange={this.onTradeAmountChange}
+                />
+                {!this.state.isLoading ? null
+                  : <div className="preloader-container"> <Preloader width="80px" /></div>
+                }
+                <div className="trade-form__collateral-button-container">
+                  <CollateralTokenButton asset={this.state.collateral} onClick={this.onChangeCollateralOpen} isChangeCollateralOpen={this.state.isChangeCollateralOpen} />
                 </div>
-              </CollapsibleContainer>
-            ) : null}
+                {this.state.isChangeCollateralOpen
+                  ?
+                  <CollateralTokenSelector
+                    selectedCollateral={this.state.collateral}
+                    collateralType={this.props.tradeType === TradeType.BUY ? `Purchase` : `Withdrawal`}
+                    onCollateralChange={this.onChangeCollateralClicked}
+                    onClose={this.onChangeCollateralClose}
+                    tradeType={this.props.tradeType} />
+                  :
+                  null
+                }
+              </div>
+              <div className="trade-form__group-button">
+                <button data-value="0.25" className={multiplier === 0.25 ? "active " : ""} onClick={this.onInsertMaxValue}>25%</button>
+                <button data-value="0.5" className={multiplier === 0.5 ? "active " : ""} onClick={this.onInsertMaxValue}>50%</button>
+                <button data-value="0.75" className={multiplier === 0.75 ? "active " : ""} onClick={this.onInsertMaxValue}>75%</button>
+                <button data-value="1" className={multiplier === 1 ? "active " : ""} onClick={this.onInsertMaxValue}>100%</button>
+              </div>
+
+              {this.state.positionTokenBalance && this.props.tradeType === TradeType.BUY && this.state.positionTokenBalance!.eq(0) ? (
+                <CollapsibleContainer titleOpen="View advanced options" titleClose="Hide advanced options" isTransparent={amountMsg !== ""}>
+                  <div className="trade-form__unit-of-account-container">
+                    Unit of Account
+                    <UnitOfAccountSelector items={[
+                      Asset.USDC,
+                      process.env.REACT_APP_ETH_NETWORK === "kovan"
+                        ? Asset.SAI
+                        : Asset.DAI
+                    ]} value={this.state.selectedUnitOfAccount} onChange={this.onChangeUnitOfAccount} />
+                  </div>
+                </CollapsibleContainer>
+              ) : null}
+            </div>
           </div>
-        </div>
-        {//#endregion tradeComponent
-        }
+          {//#endregion tradeComponent
+          }</div>
 
         {this.state.positionValue !== this.state.selectedValue ? (
           <div className="manage-collateral-form__actions-container">
-            <button className="manage-collateral-form__action-cancel" onClick={this.props.onCancel}>
+            {/* <button className="manage-collateral-form__action-cancel" onClick={this.props.onCancel}>
               Cancel
-            </button>
+            </button> */}
             {this.state.positionValue > this.state.selectedValue ? (
               <button type="submit" className="manage-collateral-form__action-withdraw">
                 Withdraw
