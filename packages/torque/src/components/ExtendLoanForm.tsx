@@ -12,7 +12,6 @@ import { IExtendEstimate } from "../domain/IExtendEstimate";
 import { IWalletDetails } from "../domain/IWalletDetails";
 import { WalletType } from "../domain/WalletType";
 import { TorqueProvider } from "../services/TorqueProvider";
-import { ActionViaTransferDetails } from "./ActionViaTransferDetails";
 import { ExtendLoanSlider } from "./ExtendLoanSlider";
 import { OpsEstimatedResult } from "./OpsEstimatedResult";
 
@@ -136,7 +135,7 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
 
     let daysLeft;
     if (this.props.loanOrderState.loanData) {
-      daysLeft = this.props.loanOrderState.loanData.loanEndUnixTimestampSec.minus(Date.now()/1000).dividedBy(86400).toFixed(1);
+      daysLeft = this.props.loanOrderState.loanData.loanEndUnixTimestampSec.minus(Date.now() / 1000).dividedBy(86400).toFixed(1);
     }
 
     return (
@@ -173,42 +172,15 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
               {this.state.selectedValue} {this.pluralize("day", "days", this.state.selectedValue)}
             </div>
           </div>
-
-          {this.props.walletDetails.walletType === WalletType.NonWeb3 ? (
-            <div className="extend-loan-form__transfer-details">
-              <ActionViaTransferDetails
-                contractAddress={this.state.extendManagementAddress || ""}
-                borrowAsset={this.props.loanOrderState.loanAsset}
-                assetAmount={this.state.depositAmount}
-                account={this.props.loanOrderState.accountAddress}
-                action={ActionType.ExtendLoan}
-              />
-              <div className="extend-loan-form__transfer-details-msg extend-loan-form__transfer-details-msg--warning">
-                Please send at least 2,500,000 gas with your transaction.
+          <OpsEstimatedResult
+            assetDetails={this.state.assetDetails}
+            actionTitle="You will send"
+            amount={this.state.depositAmount}
+            precision={6}
+          />
+          <div className={`extend-loan-form-insufficient-balance ${!this.state.balanceTooLow ? `extend-loan-form-insufficient-balance--hidden` : ``}`}>
+            Insufficient {this.state.assetDetails.displayName} balance in your wallet!
               </div>
-              <div className="extend-loan-form__transfer-details-msg extend-loan-form__transfer-details-msg--warning">
-                Always send funds from a private wallet to which you hold the private key!
-              </div>
-              {/*<div className="extend-loan-form__transfer-details-msg extend-loan-form__transfer-details-msg--warning">
-                Note 3: If you want to partially repay loan use a web3 wallet!
-              </div>*/}
-              <div className="extend-loan-form__transfer-details-msg">
-                That's it! Once you've sent the funds, click Close to return to the dashboard.
-              </div>
-            </div>
-          ) : (
-            <React.Fragment>
-              <OpsEstimatedResult
-                assetDetails={this.state.assetDetails}
-                actionTitle="You will send"
-                amount={this.state.depositAmount}
-                precision={6}
-              />
-              <div className={`extend-loan-form-insufficient-balance ${!this.state.balanceTooLow ? `extend-loan-form-insufficient-balance--hidden` : ``}`}>
-                Insufficient {this.state.assetDetails.displayName} balance in your wallet!
-              </div>
-            </React.Fragment>
-          )}
         </section>
         <section className="dialog-actions">
           <div className="extend-loan-form__actions-container">
@@ -217,10 +189,10 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
                 Close
               </button>
             ) : (
-              <button type="submit" className={`btn btn-size--small ${this.props.didSubmit ? `btn-disabled` : ``}`}>
-                {this.props.didSubmit ? "Submitting..." : "Extend"}
-              </button>
-            )}
+                <button type="submit" className={`btn btn-size--small ${this.props.didSubmit ? `btn-disabled` : ``}`}>
+                  {this.props.didSubmit ? "Submitting..." : "Extend"}
+                </button>
+              )}
           </div>
         </section>
       </form>
@@ -262,7 +234,7 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
         assetBalance = assetBalance.gt(TorqueProvider.Instance.gasBufferForTxn) ? assetBalance.minus(TorqueProvider.Instance.gasBufferForTxn) : new BigNumber(0);
       }
       const precision = AssetsDictionary.assets.get(this.props.loanOrderState.loanAsset)!.decimals || 18;
-      const amountInBaseUnits = new BigNumber(this.state.depositAmount.multipliedBy(10**precision).toFixed(0, 1));
+      const amountInBaseUnits = new BigNumber(this.state.depositAmount.multipliedBy(10 ** precision).toFixed(0, 1));
       if (assetBalance.lt(amountInBaseUnits)) {
         this.props.toggleDidSubmit(false);
 

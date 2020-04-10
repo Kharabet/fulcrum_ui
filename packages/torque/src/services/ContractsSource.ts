@@ -8,7 +8,6 @@ import { dsProxyJsonContract } from "../contracts/dsProxyJson";
 import { erc20Contract } from "../contracts/erc20";
 import { GetCdpsContract } from "../contracts/getCdps";
 import { iBZxContract } from "../contracts/iBZxContract";
-import { iENSOwnerContract } from "../contracts/iENSOwnerContract";
 import { instaRegistryContract } from "../contracts/instaRegistry";
 import { iTokenContract } from "../contracts/iTokenContract";
 import { makerBridgeContract } from "../contracts/makerBridge";
@@ -38,7 +37,6 @@ export class ContractsSource {
   private iBZxJson: any;
   private iTokenJson: any;
   private oracleJson: any;
-  private iENSJson: any;
   private vatJson: any;
   private cdpJson: any;
   private makerBridgeJson: any;
@@ -262,17 +260,6 @@ export class ContractsSource {
     return address;
   }
 
-  private getiENSOwnerAddress(): string {
-    let address: string = "";
-    switch (this.networkId) {
-      case 1:
-        address = "0x100157a893503b3b27112ab602f8d80e6d0df9a8";
-        break;
-    }
-
-    return address;
-  }
-
   private getAssetFromAddressRaw(addressErc20: string): Asset {
     let asset: Asset = Asset.UNKNOWN;
 
@@ -478,15 +465,6 @@ export class ContractsSource {
     );
   }
 
-  private async getiENSOwnerContractRaw(): Promise<iENSOwnerContract> {
-    await this.Init();
-    return new iENSOwnerContract(
-      this.iENSJson.abi,
-      this.getiENSOwnerAddress().toLowerCase(),
-      this.provider
-    );
-  }
-
   private getCompoundComptrollerAddress(): string {
     let address: string = "";
     switch (this.networkId) {
@@ -602,7 +580,6 @@ export class ContractsSource {
     this.iBZxJson = await import(`./../assets/artifacts/${network}/iBZx.json`);
     this.iTokenJson = await import(`./../assets/artifacts/${network}/iToken.json`);
     this.oracleJson = await import(`./../assets/artifacts/${network}/oracle.json`);
-    this.iENSJson = await import(`./../assets/artifacts/${network}/iENSOwner.json`);
     this.vatJson = await import(`./../assets/artifacts/${network}/vat.json`);
     this.cdpJson = await import(`./../assets/artifacts/${network}/cdpManager.json`);
     this.makerBridgeJson = await import(`./../assets/artifacts/${network}/makerBridge.json`);
@@ -692,5 +669,4 @@ export class ContractsSource {
   public getAssetFromIlk = _.memoize(ContractsSource.getAssetFromIlkRaw);
   public getAddressFromAsset = _.memoize(this.getAddressFromAssetRaw);
   public getOracleContract = _.memoize(this.getOracleContractRaw);
-  public getiENSOwnerContract = _.memoize(this.getiENSOwnerContractRaw);
 }

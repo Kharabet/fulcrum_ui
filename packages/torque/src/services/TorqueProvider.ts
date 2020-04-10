@@ -41,7 +41,6 @@ import { ManageCollateralRequest } from "../domain/ManageCollateralRequest";
 import { ProviderType } from "../domain/ProviderType";
 import { IRefinanceLoan, IRefinanceToken, RefinanceCdpData, RefinanceData } from "../domain/RefinanceData";
 import { RepayLoanRequest } from "../domain/RepayLoanRequest";
-import { SetupENSRequest } from "../domain/SetupENSRequest";
 import { WalletType } from "../domain/WalletType";
 import { Web3ConnectionFactory } from "../domain/Web3ConnectionFactory";
 import { BorrowRequestAwaitingStore } from "./BorrowRequestAwaitingStore";
@@ -460,17 +459,6 @@ export class TorqueProvider {
     }
     return result;
   }
-
-  public checkENSSetup = async (user: string): Promise<boolean | undefined> => {
-    let result;
-    if (this.contractsSource && this.web3Wrapper) {
-      const iENSOwnerContract = await this.contractsSource.getiENSOwnerContract();
-      if (iENSOwnerContract) {
-        result = (await iENSOwnerContract.checkUserSetup.callAsync(user)) !== TorqueProvider.ZERO_ADDRESS;
-      }
-    }
-    return result;
-  };
 
   public checkAndSetApproval = async (asset: Asset, spender: string, amountInBaseUnits: BigNumber): Promise<boolean> => {
     let result = false;
@@ -1547,10 +1535,6 @@ export class TorqueProvider {
     ];
   };
 
-  public getSetupENSAddress = async (): Promise<string | null> => {
-    return `tokenloan.eth`;
-  };
-
   public getLoanCollateralManagementManagementAddress = async (
     asset: Asset,
     walletDetails: IWalletDetails,
@@ -1644,11 +1628,6 @@ export class TorqueProvider {
     }
 
     return result;
-  };
-
-  // noinspection JSUnusedLocalSymbols TODO
-  public setupENS = async (setupENSRequest: SetupENSRequest) => {
-    return;
   };
 
   public getLoanRepayGasAmount = async (): Promise<BigNumber> => {
