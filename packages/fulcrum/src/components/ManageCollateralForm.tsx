@@ -899,8 +899,7 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
       tradeAmountValue = pTokenAmountLimited;
     } else if (this.props.tradeType === TradeType.BUY) {
       tradeAmountValue = inputAmountValue;
-      if (tradeAmountValue.gt(maxTrad
-        eValue)) {
+      if (tradeAmountValue.gt(maxTradeValue)) {
         inputAmountValue = maxTradeValue.multipliedBy(multiplier);
         inputAmountText = maxTradeValue.multipliedBy(multiplier).decimalPlaces(this._inputPrecision).toFixed();
         tradeAmountValue = maxTradeValue.multipliedBy(multiplier);
