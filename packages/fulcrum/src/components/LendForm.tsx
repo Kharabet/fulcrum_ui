@@ -66,6 +66,7 @@ interface ILendFormState {
   chaiPrice: BigNumber | null;
 
   isLoading: boolean;
+  infoMessage: string;
 }
 
 export class LendForm extends Component<ILendFormProps, ILendFormState> {
@@ -104,7 +105,8 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
       useWrappedDai: false,
       tokenPrice: null,
       chaiPrice: null,
-      isLoading: true
+      isLoading: true,
+      infoMessage: ""
     };
 
     this._inputChange = new Subject();
@@ -172,6 +174,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
     const maxTokenAmount: BigNumber = maxLendAmountArr[1];
     const tokenPrice: BigNumber = maxLendAmountArr[2];
     const chaiPrice: BigNumber = maxLendAmountArr[3];
+    const infoMessage = maxLendAmountArr[4];
 
     const lendRequest = new LendRequest(this.props.lendType, assetOrWrapped, maxLendAmount);
     const lendedAmountEstimate = await FulcrumProvider.Instance.getLendedAmountEstimate(lendRequest);
@@ -198,7 +201,8 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
       maybeNeedsApproval: maybeNeedsApproval,
       tokenPrice: tokenPrice,
       chaiPrice: chaiPrice,
-      isLoading: false
+      isLoading: false,
+      infoMessage: infoMessage
     });
   }
 
@@ -260,7 +264,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
         ? "Insufficient funds for gas"
         : this.state.maxLendAmount && this.state.maxLendAmount.eq(0)
           ? "Your wallet is empty"
-          : "";
+          : this.state.infoMessage ?  this.state.infoMessage : "";
 
     const lendedAmountEstimateText =
       !this.state.lendedAmountEstimate || this.state.lendedAmountEstimate.eq(0)

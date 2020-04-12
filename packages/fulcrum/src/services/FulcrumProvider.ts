@@ -892,12 +892,12 @@ export class FulcrumProvider {
     return result;
   };
 
-  public getMaxLendValue = async (request: LendRequest): Promise<[BigNumber, BigNumber, BigNumber, BigNumber]> => {
+  public getMaxLendValue = async (request: LendRequest): Promise<[BigNumber, BigNumber, BigNumber, BigNumber, string]> => {
     let maxLendAmount = new BigNumber(0);
     let maxTokenAmount = new BigNumber(0);
     let tokenPrice = new BigNumber(0);
     let chaiPrice = new BigNumber(0);
-
+    let infoMessage: string = "";
     if (request.lendType === LendType.LEND) {
       maxLendAmount = await this.getAssetTokenBalanceOfUser(request.asset);
       if (request.asset === Asset.ETH) {
@@ -928,6 +928,8 @@ export class FulcrumProvider {
           if (freeSupply.lt(userBalance)) {
             maxLendAmount = freeSupply;
             maxTokenAmount = maxTokenAmount.multipliedBy(freeSupply).dividedBy(userBalance);
+            if (request.lendType === LendType.UNLEND)
+              infoMessage = "Insufficient liquidity for unlend. PLease try again later.";
           } else {
             maxLendAmount = userBalance;
           }
@@ -941,7 +943,7 @@ export class FulcrumProvider {
     maxLendAmount = maxLendAmount.dividedBy(10 ** 18);
     maxTokenAmount = maxTokenAmount.dividedBy(10 ** 18);
 
-    return [maxLendAmount, maxTokenAmount, tokenPrice, chaiPrice];
+    return [maxLendAmount, maxTokenAmount, tokenPrice, chaiPrice, infoMessage];
   };
 
   public getPTokenPrice = async (selectedKey: TradeTokenKey): Promise<BigNumber> => {
