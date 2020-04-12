@@ -347,7 +347,7 @@ export class Web3ConnectionFactory {
         await Web3ConnectionFactory.bitski.signIn();
       }
     } else {
-      Web3ConnectionFactory.bitski = new Bitski(configProviders.Bitski_ClientId, `${window.location.origin}/callback.html`);
+      Web3ConnectionFactory.bitski = new Bitski(configProviders.Bitski_ClientId, `${location.origin}/callback.html`);
       await Web3ConnectionFactory.bitski.signIn();
     }
     return Web3ConnectionFactory.bitski;

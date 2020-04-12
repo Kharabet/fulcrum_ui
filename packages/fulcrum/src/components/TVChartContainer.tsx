@@ -38,7 +38,7 @@ export interface ChartContainerState {
 
 function getLanguageFromURL(): LanguageCode | null {
 	const regex = new RegExp('[\\?&]lang=([^&#]*)');
-	const results = regex.exec(window.location.search);
+	const results = regex.exec(location.search);
 	return results === null ? null : decodeURIComponent(results[1].replace(/\+/g, ' ')) as LanguageCode;
 }
 
