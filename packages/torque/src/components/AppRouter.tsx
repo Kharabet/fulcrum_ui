@@ -115,19 +115,19 @@ export class AppRouter extends Component<any, IAppRouterState> {
                     <Switch>
                       <Route exact={true} path="/" render={props => <LandingPage {...props} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />} />
 
-                      <Route exact={true} path="/#/wallet/:destinationAbbr" render={props => <Redirect to="/wallet/:destinationAbbr" />} />
+                      <Redirect exact={true} from="/#/wallet/:destinationAbbr" to="/wallet/:destinationAbbr" />
                       <Route exact={true} path="/wallet/:destinationAbbr" render={props => <WalletSelectionPage {...props} onSelectProvider={this.onProviderTypeSelect} isLoading={this.state.isLoading} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />} />
 
-                      <Route exact={true} path="/#/borrow/:walletTypeAbbr" render={props => <Redirect to="/borrow/:walletTypeAbbr" />} />
+                      <Redirect exact={true} from="/#/borrow/:walletTypeAbbr" to="/borrow/:walletTypeAbbr" />
                       {!siteConfig.BorrowDisabled || (TorqueProvider.Instance.accounts.length !== 0 && TorqueProvider.Instance.accounts[0].toLowerCase() === "0xadff3ada12ed0f8a87e31e5a04dfd2ee054e1118")
                         ? <Route exact={true} path="/borrow/:walletTypeAbbr" render={props => <BorrowPage {...props} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />} />
                         : undefined
                       }
 
-                      <Route exact={true} path="/#/dashboard/:walletTypeAbbr" render={props => <Redirect to="/dashboard/:walletTypeAbbr" />} />
+                      <Redirect exact={true} from="/#/dashboard/:walletTypeAbbr" to="/dashboard/:walletTypeAbbr" />
                       <Route exact={true} path="/dashboard/:walletTypeAbbr" render={props => <DashboardPage {...props} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />} />
 
-                      <Route exact={true} path="/#/dashboard/:walletTypeAbbr/:walletAddress" render={props => <Redirect to="/dashboard/:walletTypeAbbr/:walletAddress" />} />
+                      <Redirect exact={true} from="/#/dashboard/:walletTypeAbbr/:walletAddress" to="/dashboard/:walletTypeAbbr/:walletAddress" />
                       <Route exact={true} path="/dashboard/:walletTypeAbbr/:walletAddress" render={props => <DashboardPage {...props} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />} />
                       <Route path="*" render={() => <Redirect to="/" />} />
                     </Switch>

@@ -119,13 +119,13 @@ export class AppRouter extends Component<any, IAppRouterState> {
                   <Switch>
                     {!isMainnetProd ? <Route exact={true} path="/" render={() => <LandingPage isMobileMedia={this.state.isMobileMedia} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />} /> : undefined}
 
-                    <Route exact={true} path="/#/lend" render={props => <Redirect to="/lend" />} />
+                    <Redirect exact={true} from="/#/lend" to="/lend" />
                     <Route exact={true} path="/lend" render={() => <LendPage isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />} />
                     {/*{!this.state.isMobileMedia ? (*/}
-                    <Route exact={true} path="/#/trade" render={props => <Redirect to="/trade" />} />
+                    <Redirect exact={true} from="/#/trade" to="/trade" />
                     <Route exact={true} path="/trade" render={() => <TradePage isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />} />
 
-                    <Route exact={true} path="/#/stats" render={props => <Redirect to="/stats" />} />
+                    <Redirect exact={true} from="/#/stats" to="/stats" />
                     <Route exact={true} path="/stats" render={() => <StatsPage isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />} />
                     {isMainnetProd ? <Route path="*" component={() => {
                       window.location.href = 'https://fulcrum.trade';
