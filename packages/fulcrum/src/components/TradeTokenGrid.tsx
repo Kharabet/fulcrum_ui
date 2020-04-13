@@ -26,7 +26,7 @@ export interface ITradeTokenGridProps {
   assets: Asset[];
   onSelect: (key: TradeTokenKey) => void;
   onTrade: (request: TradeRequest) => void;
-  onManageCollateralOpen: () => void;
+  onManageCollateralOpen: (request: TradeRequest) => void;
   changeActiveBtn: (activeType: string) => void;
   isLong: boolean;
   isShort: boolean;

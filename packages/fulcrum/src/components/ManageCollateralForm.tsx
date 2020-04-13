@@ -333,7 +333,9 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
       maybeNeedsApproval: maybeNeedsApproval,
       currentPrice: new BigNumber(latestPriceDataPoint.price),
       liquidationPrice: liquidationPrice,
-      exposureValue: tradeExpectedResults.exposureValue
+      exposureValue: tradeExpectedResults.exposureValue,
+      diffAmount: new BigNumber(this.state.selectedValue * 3),
+
     });
   }
 

@@ -28,7 +28,7 @@ export interface IInnerOwnTokenGridRowProps {
   // onManageCollateral: (request: ManageCollateralRequest) => void;
   onSelect: (key: TradeTokenKey) => void;
   onTrade: (request: TradeRequest) => void;
-  onManageCollateralOpen: () => void;
+  onManageCollateralOpen: (request: TradeRequest) => void;
 }
 
 interface IInnerOwnTokenGridRowState {
@@ -252,7 +252,17 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
   public onManageClick = (event: React.MouseEvent<HTMLElement>) => {
     event.stopPropagation();
 
-    this.props.onManageCollateralOpen();
+    this.props.onManageCollateralOpen(new TradeRequest(
+      TradeType.SELL,
+      this.props.currentKey.asset,
+      this.props.currentKey.unitOfAccount,
+      this.props.currentKey.positionType === PositionType.SHORT ? this.props.currentKey.asset : Asset.USDC,
+      this.props.currentKey.positionType,
+      this.props.currentKey.leverage,
+      new BigNumber(0),
+      this.props.currentKey.isTokenized,
+      this.props.currentKey.version
+    ));
   };
 
   public onSellClick = (event: React.MouseEvent<HTMLElement>) => {

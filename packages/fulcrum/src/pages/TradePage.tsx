@@ -276,6 +276,7 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
               onCancel={this.onManageCollateralRequestClose}
               onManage={this.onManageCollateralRequested}
               version={this.state.tradeVersion}
+
             />
           </Modal>
         </main>
@@ -340,9 +341,16 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
     });
   };
 
-  public onManageCollateralRequestOpen = () => {
+  public onManageCollateralRequestOpen = (request: TradeRequest) => {
     this.setState({
       ...this.state,
+      collateralToken: request.collateral,
+      tradeType: request.tradeType,
+      tradeAsset: request.asset,
+      tradeUnitOfAccount: request.unitOfAccount,
+      tradePositionType: request.positionType,
+      tradeLeverage: request.leverage,
+      tradeVersion: request.version,
       isManageCollateralModalOpen: true
     });
   };
