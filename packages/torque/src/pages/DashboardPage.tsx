@@ -4,7 +4,6 @@ import { BorrowedFundsList } from "../components/BorrowedFundsList";
 import { ExtendLoanDlg } from "../components/ExtendLoanDlg";
 import { ManageCollateralDlg } from "../components/ManageCollateralDlg";
 import { RepayLoanDlg } from "../components/RepayLoanDlg";
-import { WalletAddressDlg } from "../components/WalletAddressDlg";
 import { BorrowRequestAwaiting } from "../domain/BorrowRequestAwaiting";
 import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
 import { Footer } from "../layout/Footer";
@@ -39,7 +38,6 @@ export class DashboardPage extends PureComponent<
   private manageCollateralDlgRef: RefObject<ManageCollateralDlg>;
   private repayLoanDlgRef: RefObject<RepayLoanDlg>;
   private extendLoanDlgRef: RefObject<ExtendLoanDlg>;
-  private walletAddressDlgRef: RefObject<WalletAddressDlg>;
 
   constructor(props: any) {
     super(props);
@@ -47,7 +45,6 @@ export class DashboardPage extends PureComponent<
     this.manageCollateralDlgRef = React.createRef();
     this.repayLoanDlgRef = React.createRef();
     this.extendLoanDlgRef = React.createRef();
-    this.walletAddressDlgRef = React.createRef();
 
     this.state = {
       items: [],
@@ -110,7 +107,6 @@ export class DashboardPage extends PureComponent<
         <ManageCollateralDlg ref={this.manageCollateralDlgRef} />
         <RepayLoanDlg ref={this.repayLoanDlgRef} />
         <ExtendLoanDlg ref={this.extendLoanDlgRef} />
-        <WalletAddressDlg ref={this.walletAddressDlgRef} />
         <div className="dashboard-page">
           <HeaderOps isMobileMedia={this.props.isMobileMedia} isLoading={this.props.isLoading} doNetworkConnect={this.props.doNetworkConnect} isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
           <div className="dashboard-page__main">

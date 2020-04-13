@@ -19,8 +19,6 @@
 @import "components/borrow-form";
 @import "components/borrow-form.mobile";
 @import "components/borrow-via-transfer-address-qr-form";
-@import "components/action-via-transfer-details";
-@import "components/action-via-web3-details";
 @import "components/borrowed-funds-list";
 @import "components/button";
 @import "components/button-landing";
@@ -35,7 +33,6 @@
 @import "components/info-block";
 @import "components/manage-collateral-form";
 @import "components/manage-collateral-form.mobile";
-@import "components/setup-ens-form";
 @import "components/on-chain-indicator";
 @import "components/ops-estimated-result";
 @import "components/ops-selector";
@@ -45,9 +42,6 @@
 @import "components/repay-loan-form";
 @import "components/risk-disclosure";
 @import "components/selector-icons-bar";
-@import "components/wallet-address-form";
-@import "components/wallet-address-hint";
-@import "components/wallet-address-large-form";
 @import "components/loader";
 
 @import "layout/footer";
