@@ -9,6 +9,7 @@ import { HeaderOps } from "../layout/HeaderOps";
 import { NavService } from "../services/NavService";
 import { TorqueProvider } from "../services/TorqueProvider";
 import { TorqueProviderEvents } from "../services/events/TorqueProviderEvents";
+import { ProviderType } from "../domain/ProviderType";
 
 export interface IBorrowPageRouteParams {
   walletTypeAbbr: string;
@@ -26,25 +27,19 @@ export class BorrowPage extends PureComponent<IBorrowPageParams & RouteComponent
 
   public constructor(props: any, context?: any) {
     super(props, context);
-
     this.borrowDlgRef = React.createRef();
   }
   public componentWillUnmount(): void {
-
-    TorqueProvider.Instance.destinationAbbr = '';
   }
 
   public render() {
-    const walletType = walletTypeAbbrToWalletType(this.props.match.params.walletTypeAbbr);
-
     return (
       <React.Fragment>
         <BorrowDlg ref={this.borrowDlgRef} />
         <div className="borrow-page">
           <HeaderOps isMobileMedia={this.props.isMobileMedia} isLoading={this.props.isLoading} doNetworkConnect={this.props.doNetworkConnect} isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
-          {/*<div className="borrow-page__main" style={walletType === WalletType.Web3 ? { paddingBottom: `90rem`} : undefined}>*/}
           <div className="borrow-page__main">
-            <AssetSelector walletType={walletType} onSelectAsset={this.onSelectAsset} />
+            <AssetSelector  onSelectAsset={this.onSelectAsset} />
           </div>
           <Footer isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
         </div>
@@ -54,64 +49,25 @@ export class BorrowPage extends PureComponent<IBorrowPageParams & RouteComponent
 
   private onSelectAsset = async (asset: Asset) => {
 
+    if (!this.borrowDlgRef.current) return;
+
     const walletType = walletTypeAbbrToWalletType(this.props.match.params.walletTypeAbbr);
-
-    if (walletType === WalletType.Web3) {
-      if (!TorqueProvider.Instance.contractsSource || !TorqueProvider.Instance.contractsSource.canWrite) {
-        NavService.Instance.History.replace(NavService.Instance.getWalletAddress("b"));
-        return;
-      }
+    
+    if (TorqueProvider.Instance.providerType === ProviderType.None || !TorqueProvider.Instance.contractsSource || !TorqueProvider.Instance.contractsSource.canWrite) {
+      this.props.doNetworkConnect()
+      return
     }
 
-    if (this.borrowDlgRef.current) {
-      try {
-        const borrowRequest = await this.borrowDlgRef.current.getValue(walletType, asset);
+    const borrowRequest = await this.borrowDlgRef.current.getValue(walletType, asset);
 
-        if (borrowRequest.walletType === WalletType.Web3) {
-          const accountAddress =
-            TorqueProvider.Instance.accounts.length > 0 && TorqueProvider.Instance.accounts[0]
-              ? TorqueProvider.Instance.accounts[0].toLowerCase()
-              : null;
-
-          if (!accountAddress || !TorqueProvider.Instance.contractsSource || !TorqueProvider.Instance.contractsSource.canWrite) {
-            NavService.Instance.History.replace(NavService.Instance.getWalletAddress("b"));
-            return;
-          }
-
-          await TorqueProvider.Instance.doBorrow(borrowRequest);
-          NavService.Instance.History.replace(NavService.Instance.getDashboardAddress(walletType, accountAddress));
-
-          this.borrowDlgRef.current.toggleDidSubmit(false);
-          await this.borrowDlgRef.current.hide();
-        }
-      } catch (error) {
-        /*let errorMsg;
-        if (error.message) {
-          errorMsg = error.message;
-        } else if (typeof error === "string") {
-          errorMsg = error;
-        }
-
-        if (errorMsg) {
-          if (errorMsg.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)) {
-            errorMsg = "The transaction seems like it will fail. You can submit the transaction anyway, or cancel.";
-          } else if (errorMsg.includes("Reverted by EVM")) {
-            errorMsg = "The transaction failed. Click View More for details.";
-          } else if (errorMsg.includes("MetaMask Tx Signature: User denied transaction signature.")) {
-            errorMsg = "You didn't confirm in MetaMask. Please try again.";
-            await this.borrowDlgRef.current.hide();
-          } else if (errorMsg.includes("User denied account authorization.")) {
-            errorMsg = "You didn't authorize MetaMask. Please try again.";
-          } else if (errorMsg.includes("Transaction rejected")) {
-            errorMsg = "You didn't confirm in Gnosis Safe. Please try again.";
-          } else {
-            errorMsg = "";
-          }
-        }*/
-
-        this.borrowDlgRef.current.toggleDidSubmit(false);
-        await this.borrowDlgRef.current.hide();
-      }
+    try {
+      await TorqueProvider.Instance.doBorrow(borrowRequest);
+    } catch (error) {
+      console.error(error);
     }
+
+    this.borrowDlgRef.current.toggleDidSubmit(false);
+    await this.borrowDlgRef.current.hide();
+
   };
 }
