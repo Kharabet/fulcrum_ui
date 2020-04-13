@@ -3,7 +3,6 @@ import { RouteComponentProps } from "react-router";
 import { AssetSelector } from "../components/AssetSelector";
 import { BorrowDlg } from "../components/BorrowDlg";
 import { Asset } from "../domain/Asset";
-import { WalletType, walletTypeAbbrToWalletType } from "../domain/WalletType";
 import { Footer } from "../layout/Footer";
 import { HeaderOps } from "../layout/HeaderOps";
 import { NavService } from "../services/NavService";
@@ -12,7 +11,6 @@ import { TorqueProviderEvents } from "../services/events/TorqueProviderEvents";
 import { ProviderType } from "../domain/ProviderType";
 
 export interface IBorrowPageRouteParams {
-  walletTypeAbbr: string;
 }
 
 export interface IBorrowPageParams {
@@ -50,17 +48,14 @@ export class BorrowPage extends PureComponent<IBorrowPageParams & RouteComponent
   private onSelectAsset = async (asset: Asset) => {
 
     if (!this.borrowDlgRef.current) return;
-
-    const walletType = walletTypeAbbrToWalletType(this.props.match.params.walletTypeAbbr);
     
     if (TorqueProvider.Instance.providerType === ProviderType.None || !TorqueProvider.Instance.contractsSource || !TorqueProvider.Instance.contractsSource.canWrite) {
       this.props.doNetworkConnect()
       return
     }
 
-    const borrowRequest = await this.borrowDlgRef.current.getValue(walletType, asset);
-
     try {
+      const borrowRequest = await this.borrowDlgRef.current.getValue(asset);
       await TorqueProvider.Instance.doBorrow(borrowRequest);
     } catch (error) {
       console.error(error);
@@ -68,6 +63,5 @@ export class BorrowPage extends PureComponent<IBorrowPageParams & RouteComponent
 
     this.borrowDlgRef.current.toggleDidSubmit(false);
     await this.borrowDlgRef.current.hide();
-
   };
 }

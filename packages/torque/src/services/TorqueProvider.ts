@@ -360,7 +360,6 @@ export class TorqueProvider {
   }*/
 
   public getBorrowDepositEstimate = async (
-    walletType: WalletType,
     borrowAsset: Asset,
     collateralAsset: Asset,
     amount: BigNumber
