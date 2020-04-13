@@ -1,9 +1,12 @@
 .manage-collateral-form {
   width: 520px;
-  padding: 40px 48px;
+ 
 
   background-color: #444e5a;
-  
+  >div{
+ padding: 40px 48px;
+  }
+
  .close-icon {
     position: absolute;
     right: 24px;
@@ -23,7 +26,7 @@
     text-align: left;
     color: #ffffff;
   }
-.manage-collateral-form__description {
+.manage-collateral-form__text {
     font-size: 20px;
     font-weight: 600;
     line-height: 35px;
@@ -48,7 +51,7 @@
     // hack around slider
     padding-top: 1rem;
 
-    margin-bottom: 0.875rem;
+    margin-bottom: 23px;
   }
 
   .manage-collateral-form__tip {
@@ -56,7 +59,7 @@
     font-weight: normal;
     font-style: normal;
     font-stretch: normal;
-    line-height: 21px;
+    line-height: 26px;
     letter-spacing: normal;
     color: #a9b5c7;
   }
@@ -179,6 +182,15 @@
   }
 }
 
-.manage-collateral-form__trade-form .trade-form__amount-container:before{
+.manage-collateral-form__trade-form{
+  margin-top: 5px;
+.trade-form__amount-container:before{
   content: none;
+}
+.trade-form__form-container.buy {
+    padding: 0;
+}
+.trade-form__amount-container{
+      width: auto;
+}
 }
