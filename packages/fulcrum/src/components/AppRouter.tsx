@@ -19,7 +19,7 @@ import { LocationListener } from "./LocationListener";
 import { ProgressFragment } from "./ProgressFragment";
 import { ProviderMenu } from "./ProviderMenu";
 import { RiskDisclosure } from "./RiskDisclosure";
-import {errors} from "ethers"
+import { errors } from "ethers"
 import siteConfig from "./../config/SiteConfig.json";
 
 const isMainnetProd =
@@ -28,13 +28,13 @@ const isMainnetProd =
 
 if (isMainnetProd) {
   const tagManagerArgs = {
-       gtmId : configProviders.Google_TrackingID,
-       'dataLayer' : {
-                'name' : "Home",
-                'status' : "Intailized"
-            }
+    gtmId: configProviders.Google_TrackingID,
+    'dataLayer': {
+      'name': "Home",
+      'status': "Intailized"
     }
-    TagManager.initialize(tagManagerArgs)
+  }
+  TagManager.initialize(tagManagerArgs)
 }
 
 interface IAppRouterState {
@@ -42,7 +42,7 @@ interface IAppRouterState {
   isRiskDisclosureModalOpen: boolean;
   selectedProviderType: ProviderType;
   isLoading: boolean;
-  web3: Web3Wrapper| null;
+  web3: Web3Wrapper | null;
   isMobileMedia: boolean;
 }
 
@@ -76,10 +76,10 @@ export class AppRouter extends Component<any, IAppRouterState> {
   public render() {
     return (
       <React.Fragment>
-        { isMainnetProd && !this.state.isMobileMedia ? (
+        {isMainnetProd && !this.state.isMobileMedia ? (
 
           <Intercom appID="dfk4n5ut" />
-        ) : null }
+        ) : null}
 
         <Modal
           isOpen={this.state.isProviderMenuModalOpen}
@@ -115,36 +115,40 @@ export class AppRouter extends Component<any, IAppRouterState> {
             siteConfig.MaintenanceMode
               ? <MaintenancePage />
               : <BrowserRouter>
-                  <LocationListener doNetworkConnect={this.doNetworkConnect}>
-                    <Switch>
-                      {!isMainnetProd ? <Route exact={true} path="/" render={() => <LandingPage isMobileMedia={this.state.isMobileMedia} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />} /> : undefined}
-                      <Route exact={true} path="/lend" render={() => <LendPage isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />} />
-                      {/*{!this.state.isMobileMedia ? (*/}
-                      <Route exact={true} path="/trade" render={() => <TradePage isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen}  />} />
-                      // ) : ``}
-                      <Route exact={true} path="/stats" render={() => <StatsPage isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen}  />} />
-                      {isMainnetProd ? <Route path="*" component={() => {
-                        window.location.href = 'https://fulcrum.trade'; 
-                        return null;
-                      }}/> : <Route path="*" render={() => <Redirect to="/"/> } /> }
-                    </Switch>
-                    {isMainnetProd ? (
-                      <Route path="/" render={({location}) => {
-                        const tagManagerArgs = {
-                            dataLayer: {
-                                // userId: '001',
-                                userProject: 'fulcrum',
-                                page: location.pathname + location.search
-                            }
+                <LocationListener doNetworkConnect={this.doNetworkConnect}>
+                  <Switch>
+                    {!isMainnetProd ? <Route exact={true} path="/" render={() => <LandingPage isMobileMedia={this.state.isMobileMedia} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />} /> : undefined}
+
+                    <Route exact={true} path="/#/lend" render={props => <Redirect to="/lend" />} />
+                    <Route exact={true} path="/lend" render={() => <LendPage isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />} />
+                    {/*{!this.state.isMobileMedia ? (*/}
+                    <Route exact={true} path="/#/trade" render={props => <Redirect to="/trade" />} />
+                    <Route exact={true} path="/trade" render={() => <TradePage isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />} />
+
+                    <Route exact={true} path="/#/stats" render={props => <Redirect to="/stats" />} />
+                    <Route exact={true} path="/stats" render={() => <StatsPage isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />} />
+                    {isMainnetProd ? <Route path="*" component={() => {
+                      window.location.href = 'https://fulcrum.trade';
+                      return null;
+                    }} /> : <Route path="*" render={() => <Redirect to="/" />} />}
+                  </Switch>
+                  {isMainnetProd ? (
+                    <Route path="/" render={({ location }) => {
+                      const tagManagerArgs = {
+                        dataLayer: {
+                          // userId: '001',
+                          userProject: 'fulcrum',
+                          page: location.pathname + location.search
                         }
-                        // ReactGA.ga('set', 'page', location.pathname + location.search);
-                        // ReactGA.ga('send', 'pageview');
-                        TagManager.dataLayer(tagManagerArgs);
-                        return null;
-                      }} />
-                    ) : ``}
-                  </LocationListener>
-                </BrowserRouter>
+                      }
+                      // ReactGA.ga('set', 'page', location.pathname + location.search);
+                      // ReactGA.ga('send', 'pageview');
+                      TagManager.dataLayer(tagManagerArgs);
+                      return null;
+                    }} />
+                  ) : ``}
+                </LocationListener>
+              </BrowserRouter>
           }
         </div>
       </React.Fragment>
@@ -160,9 +164,9 @@ export class AppRouter extends Component<any, IAppRouterState> {
 
   public doNetworkConnect = () => {
     const isMobileMedia = (window.innerWidth <= 959);
-    if(this.state.isMobileMedia){
+    if (this.state.isMobileMedia) {
       this.onProviderTypeSelect(ProviderType.MetaMask)
-    }else{
+    } else {
       this.setState({ ...this.state, isProviderMenuModalOpen: true });
     }
     this.setState({ ...this.state, isProviderMenuModalOpen: true });
