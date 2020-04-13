@@ -1,7 +1,6 @@
 import React, { PureComponent } from "react";
 import { ButtonLanding, ButtonLandingColor } from "../components/ButtonLanding";
 import { ButtonLandingRefinance } from "../components/ButtonLandingRefinance";
-import { WalletType } from "../domain/WalletType";
 import { Footer } from "../layout/Footer";
 import { HeaderHome } from "../layout/HeaderHome";
 import { NavService } from "../services/NavService";
@@ -20,13 +19,12 @@ export class LandingPage extends PureComponent<ILandingPageProps> {
         ? TorqueProvider.Instance.accounts[0].toLowerCase()
         : null;
 
-    const walletUrl = NavService.Instance.getWalletAddress("b");
-    const borrowUrl = NavService.Instance.getBorrowAddress(WalletType.Web3);
+    const borrowUrl = NavService.Instance.getBorrowAddress();
     const trackLoansUrl =
       accountAddress
-        ? NavService.Instance.getDashboardAddress(WalletType.Web3, accountAddress)
-        : NavService.Instance.getWalletAddress("t");
-    const refinanceLoanUrl = NavService.Instance.getRefinanceAddress("r");
+        ? NavService.Instance.getDashboardAddress()
+        : NavService.Instance.getBorrowAddress();
+    const refinanceLoanUrl = NavService.Instance.getRefinanceAddress();
     return (
       <div className="landing-page">
         <HeaderHome isLoading={false} />

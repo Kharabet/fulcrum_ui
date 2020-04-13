@@ -1,5 +1,4 @@
 import { createHashHistory, History } from "history";
-import { WalletType, walletTypeToWalletTypeAbbr } from "../domain/WalletType";
 
 export class NavService {
   public static Instance: NavService;
@@ -17,39 +16,16 @@ export class NavService {
     return NavService.Instance;
   }
 
-  public getWalletAddress = (
-    destinationAbbr: string // "b" - borrow, "t" - track, dashboard
-  ) => {
-    return `/wallet/${destinationAbbr}`;
-    /*// return `/dashboard/n`;
-    return destinationAbbr === "t" ?
-      `/dashboard/n` :
-      `/borrow/n`;*/
-  };
-
-  public getBorrowAddress = (walletType: WalletType) => {
+  public getBorrowAddress = () => {
     return "/borrow";
-    const walletTypeAbbr = walletTypeToWalletTypeAbbr(walletType);
-    return `/borrow/${walletTypeAbbr}`;
   };
 
-  public getDashboardAddress = (walletType: WalletType, walletAddress: string | undefined) => {
+  public getDashboardAddress = () => {
     return "/dashboard";
-
-    const walletTypeAbbr = walletTypeToWalletTypeAbbr(walletType);
-    return `/dashboard/${walletTypeAbbr}/${walletAddress}`;
   };
 
-   public getRefinanceAddress = (
-    destinationAbbr: string // "b" - borrow, "t" - track, dashboard
-  ) => {
+   public getRefinanceAddress = () => {
     return "/refinance";
-
-    return `/refinance/${destinationAbbr}`;
-    /*// return `/dashboard/n`;
-    return destinationAbbr === "t" ?
-      `/dashboard/n` :
-      `/borrow/n`;*/
   };
 }
 
