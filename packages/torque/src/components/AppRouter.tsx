@@ -8,13 +8,10 @@ import configProviders from "../config/providers.json";
 import { ProviderType } from "../domain/ProviderType";
 import { BorrowPage } from "../pages/BorrowPage";
 import { DashboardPage } from "../pages/DashboardPage";
-import { LandingPage } from "../pages/LandingPage";
-import { LandingPageStatic } from "../pages/LandingPageStatic";
 import { MaintenancePage } from "../pages/MaintenancePage";
 import { RefinancePage } from "../pages/RefinancePage";
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { TorqueProviderEvents } from "../services/events/TorqueProviderEvents";
-import { NavService } from "../services/NavService";
 import { TorqueProvider } from "../services/TorqueProvider";
 import siteConfig from "../config/SiteConfig.json";
 import { LocationListener } from "./LocationListener";
@@ -27,7 +24,7 @@ import { Web3ProviderEngine } from "@0x/subproviders";
 import { Web3ConnectionFactory } from '../domain/Web3ConnectionFactory';
 import { ProviderTypeDictionary } from '../domain/ProviderTypeDictionary';
 import { AbstractConnector } from '@web3-react/abstract-connector';
-import {errors} from "ethers"
+import { errors } from "ethers"
 
 const isMainnetProd =
   process.env.NODE_ENV && process.env.NODE_ENV !== "development"
@@ -126,51 +123,29 @@ export class AppRouter extends Component<any, IAppRouterState> {
           {
             siteConfig.MaintenanceMode
               ? <MaintenancePage />
-              : siteConfig.LandingPage
-                ? <HashRouter hashType="slash">
-                  <LocationListener doNetworkConnect={this.doNetworkConnect}>
-                    <Switch>
-                      <Route exact={true} path="/" render={props => <LandingPageStatic {...props} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />} />
-                      <Route path="*" render={() => <Redirect to="/" />} />
-                    </Switch>
-                    {isMainnetProd ? (
-                      <Route path="/" render={({ location }) => {
-                        const tagManagerArgs = {
-                          dataLayer: {
-                            userProject: 'Torque',
-                            page: location.pathname + location.search
-                          }
+              : <HashRouter hashType="slash">
+                <LocationListener doNetworkConnect={this.doNetworkConnect}>
+                  <Switch>
+                    <Route path="/" render={() => <Redirect to="/borrow" />} />
+                    <Route exact={true} path="/borrow" render={props => <BorrowPage {...props} isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />} />
+                    {!siteConfig.BorrowDisabled || (TorqueProvider.Instance.accounts.length !== 0 && TorqueProvider.Instance.accounts[0].toLowerCase() === "0xadff3ada12ed0f8a87e31e5a04dfd2ee054e1118") ? <Route exact={true} path="/dashboard" render={props => <DashboardPage {...props} isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />} /> : undefined}
+                    <Route exact={true} path="/refinance" render={props => <RefinancePage {...props} isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />} />
+                    <Route path="*" render={() => <Redirect to="/" />} />
+                  </Switch>
+                  {isMainnetProd ? (
+                    <Route path="/" render={({ location }) => {
+                      const tagManagerArgs = {
+                        dataLayer: {
+                          userProject: 'Torque',
+                          page: location.pathname + location.search
                         }
-                        TagManager.dataLayer(tagManagerArgs);
-                        return null;
-                      }} />
-                    ) : ``}
-                  </LocationListener>
-                </HashRouter>
-                :
-                <HashRouter hashType="slash">
-                  <LocationListener doNetworkConnect={this.doNetworkConnect}>
-                    <Switch>
-                      <Route exact={true} path="/" render={props => <LandingPage {...props} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />} />
-                      <Route exact={true} path="/borrow" render={props => <BorrowPage {...props} isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />} />
-                      {!siteConfig.BorrowDisabled || (TorqueProvider.Instance.accounts.length !== 0 && TorqueProvider.Instance.accounts[0].toLowerCase() === "0xadff3ada12ed0f8a87e31e5a04dfd2ee054e1118") ? <Route exact={true} path="/dashboard" render={props => <DashboardPage {...props} isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />} /> : undefined}
-                      <Route exact={true} path="/refinance" render={props => <RefinancePage {...props} isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />} />
-                      <Route path="*" render={() => <Redirect to="/" />} />
-                    </Switch>
-                    {isMainnetProd ? (
-                      <Route path="/" render={({ location }) => {
-                        const tagManagerArgs = {
-                          dataLayer: {
-                            userProject: 'Torque',
-                            page: location.pathname + location.search
-                          }
-                        }
-                        TagManager.dataLayer(tagManagerArgs);
-                        return null;
-                      }} />
-                    ) : ``}
-                  </LocationListener>
-                </HashRouter>
+                      }
+                      TagManager.dataLayer(tagManagerArgs);
+                      return null;
+                    }} />
+                  ) : ``}
+                </LocationListener>
+              </HashRouter>
           }
         </div>
       </Web3ReactProvider>
