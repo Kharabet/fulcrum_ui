@@ -38,16 +38,19 @@ export class RefinanceAssetSelector extends Component<IRefinanceAssetSelectorPro
           isInstaProxy: false,
         }]
     };
-    TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
+    
+    TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderAvailable, this.derivedUpdate);
+    TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderChanged, this.derivedUpdate);
   }
-  private onProviderAvailable = () => {
-    // noinspection JSIgnoredPromiseFromCall
-    this.derivedUpdate();
-  };
 
   public componentDidMount(): void {
     // noinspection JSIgnoredPromiseFromCall
     this.derivedUpdate();
+  }
+
+  public componentWillUnmount(): void {
+    TorqueProvider.Instance.eventEmitter.removeListener(TorqueProviderEvents.ProviderAvailable, this.derivedUpdate);
+    TorqueProvider.Instance.eventEmitter.removeListener(TorqueProviderEvents.ProviderChanged, this.derivedUpdate);
   }
 
   private derivedUpdate = async () => {

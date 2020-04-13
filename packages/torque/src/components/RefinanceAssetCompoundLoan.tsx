@@ -23,17 +23,18 @@ export class RefinanceAssetCompoundLoan extends Component<IRefinanceAssetCompoun
       asset: Asset.DAI,
       refinanceCompoundData: []
     };
-    // console.log("this.state=  "+this.state)
-    TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
-
+    
+    TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderAvailable, this.derivedUpdate);
+    TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderChanged, this.derivedUpdate);
   }
-
-  private onProviderAvailable = () => {
-    this.derivedUpdate();
-  };
 
   public componentDidMount(): void {
     this.derivedUpdate();
+  }
+
+  public componentWillUnmount(): void{
+    TorqueProvider.Instance.eventEmitter.removeListener(TorqueProviderEvents.ProviderAvailable, this.derivedUpdate);
+    TorqueProvider.Instance.eventEmitter.removeListener(TorqueProviderEvents.ProviderChanged, this.derivedUpdate);
   }
 
   private derivedUpdate = async () => {

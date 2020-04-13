@@ -24,19 +24,19 @@ export class RefinanceAssetCompoundLoanMobile extends Component<IRefinanceAssetC
       refinanceCompoundData:
       []
     };
-    // console.log("this.state=  "+this.state)
-    TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
-
+    TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderAvailable, this.derivedUpdate);
+    TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderChanged, this.derivedUpdate);
   }
-  // true includes ENS support
-  private onProviderAvailable = () => {
-
-    this.derivedUpdate();
-  };
 
   public componentDidMount(): void {
     this.derivedUpdate();
   }
+
+  componentWillUnmount(): void{
+    TorqueProvider.Instance.eventEmitter.removeListener(TorqueProviderEvents.ProviderAvailable, this.derivedUpdate);
+    TorqueProvider.Instance.eventEmitter.removeListener(TorqueProviderEvents.ProviderChanged, this.derivedUpdate);
+  }
+
   private derivedUpdate = async () => {
     const loans = await TorqueProvider.Instance.getCompoundLoans(); // TODO
 
