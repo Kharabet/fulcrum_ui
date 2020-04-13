@@ -1,13 +1,11 @@
 import React, { Component } from "react";
 import { Asset } from "../domain/Asset";
 import { IRefinanceLoan } from "../domain/RefinanceData";
-import { WalletType } from "../domain/WalletType";
 import { TorqueProviderEvents } from "../services/events/TorqueProviderEvents";
 import { TorqueProvider } from "../services/TorqueProvider";
 import { RefinanceAssetCompoundLoanItem } from "./RefinanceAssetCompoundLoanItem";
 
 export interface IRefinanceAssetCompoundLoanProps {
-  walletType: WalletType
 
   onSelectAsset?: (asset: Asset) => void;
 }
@@ -53,24 +51,8 @@ export class RefinanceAssetCompoundLoan extends Component<IRefinanceAssetCompoun
   };
 
   public render() {
-    const refinanceCompound = this.state.refinanceCompoundData;
-    let items;
-    if (this.props.walletType === WalletType.Web3) {
+    const items = this.state.refinanceCompoundData.map((e, index) => (<RefinanceAssetCompoundLoanItem key={index} {...e} />));
 
-      items = refinanceCompound.map((e, index) => {
-        return (
-          <RefinanceAssetCompoundLoanItem key={index} {...e}/>
-        );
-      });
-
-    } else {
-      items = refinanceCompound.map((e, index) => {
-        return (
-          <RefinanceAssetCompoundLoanItem key={index} {...e}/>
-        );
-      });
-
-    }
     return <div className="refinance-asset-selector">{items}</div>;
   }
 }

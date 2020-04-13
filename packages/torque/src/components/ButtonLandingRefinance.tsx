@@ -2,7 +2,6 @@ import React, { Component, MouseEventHandler } from "react";
 import { Link } from "react-router-dom";
 
 import ic_arrow_right from "../assets/images/ic_arrow_right.svg";
-import {WalletType} from "../domain/WalletType";
 import {ProviderType} from "../domain/ProviderType";
 export enum ButtonLandingColor {
   Green,

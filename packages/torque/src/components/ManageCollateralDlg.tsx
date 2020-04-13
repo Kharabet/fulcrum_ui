@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import ReactModal from "react-modal";
 import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
 import { ManageCollateralRequest } from "../domain/ManageCollateralRequest";
-import { WalletType } from "../domain/WalletType";
 import { DialogHeader } from "./DialogHeader";
 import { ManageCollateralFormWeb3 } from "./ManageCollateralFormWeb3";
 

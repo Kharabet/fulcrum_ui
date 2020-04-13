@@ -2,14 +2,12 @@ import { BigNumber } from "@0x/utils";
 import React, { Component } from "react";
 import { Asset } from "../domain/Asset";
 import { RefinanceCdpData } from "../domain/RefinanceData";
-import { WalletType } from "../domain/WalletType";
 import { TorqueProviderEvents } from "../services/events/TorqueProviderEvents";
 import { TorqueProvider } from "../services/TorqueProvider";
 import { RefinanceAssetSelectorItem } from "./RefinanceAssetSelectorItem";
 import { Loader } from "./Loader";
 
 export interface IRefinanceAssetSelectorProps {
-  walletType: WalletType,
   updateStateShowLoader: (value: any) => void
 }
 
@@ -42,51 +40,6 @@ export class RefinanceAssetSelector extends Component<IRefinanceAssetSelectorPro
     };
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
   }
-
-  // true includes ENS support
-  // private readonly assetsShown: Map<Asset, boolean> = new Map<Asset, boolean>([
-  //   [
-  //     Asset.DAI,
-  //     true
-  //   ]
-  //   // [
-  //   //   Asset.DAI,
-  //   //   false
-  //   // ],
-  //   // [
-  //   //   Asset.USDC,
-  //   //   true
-  //   // ],
-  //   // /*[
-  //   //   Asset.SUSD,
-  //   //   false
-  //   // ],*/
-  //   // [
-  //   //   Asset.ETH,
-  //   //   false
-  //   // ],
-  //   // [
-  //   //   Asset.WBTC,
-  //   //   false
-  //   // ],
-  //   // [
-  //   //   Asset.LINK,
-  //   //   false
-  //   // ],
-  //   // [
-  //   //   Asset.ZRX,
-  //   //   false
-  //   // ],
-  //   // [
-  //   //   Asset.REP,
-  //   //   false
-  //   // ],
-  //   // [
-  //   //   Asset.KNC,
-  //   //   false
-  //   // ],
-  // ]);
-
   private onProviderAvailable = () => {
     // noinspection JSIgnoredPromiseFromCall
     this.derivedUpdate();
@@ -143,40 +96,20 @@ export class RefinanceAssetSelector extends Component<IRefinanceAssetSelectorPro
   public render() {
     const refinance = this.state.refinanceData;
     let items;
-    if (this.props.walletType === WalletType.Web3) {
-      if (refinance[0].cdpId.gt(0)) {
-        items = refinance.map((e, index) => {
-          return (
-            <RefinanceAssetSelectorItem
-              key={refinance[index].urn} asset={Asset.DAI}
-              cdpId={refinance[index].cdpId}
-              urn={refinance[index].urn}
-              accountAddress={refinance[index].accountAddress}
-              proxyAddress={refinance[index].proxyAddress}
-              isProxy={refinance[index].isProxy}
-              isInstaProxy={refinance[index].isInstaProxy}
-              ilk={refinance[index].ilk} />
-          );
-        });
-      }
-    } else {
-      if (refinance[0].cdpId !== undefined) {
-        if (refinance[0].cdpId.gt(0)) {
-          items = refinance.map((e, index) => {
-            return (
-              <RefinanceAssetSelectorItem
-                key={refinance[index].urn} asset={Asset.DAI}
-                cdpId={refinance[index].cdpId}
-                urn={refinance[index].urn}
-                accountAddress={refinance[index].accountAddress}
-                proxyAddress={refinance[index].proxyAddress}
-                isProxy={refinance[index].isProxy}
-                isInstaProxy={refinance[index].isInstaProxy}
-                ilk={refinance[index].ilk} />
-            );
-          });
-        }
-      }
+    if (refinance[0].cdpId.gt(0)) {
+      items = refinance.map((e, index) => {
+        return (
+          <RefinanceAssetSelectorItem
+            key={refinance[index].urn} asset={Asset.DAI}
+            cdpId={refinance[index].cdpId}
+            urn={refinance[index].urn}
+            accountAddress={refinance[index].accountAddress}
+            proxyAddress={refinance[index].proxyAddress}
+            isProxy={refinance[index].isProxy}
+            isInstaProxy={refinance[index].isInstaProxy}
+            ilk={refinance[index].ilk} />
+        );
+      });
     }
 
     return <div className="refinance-asset-selector">

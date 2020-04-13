@@ -2,7 +2,6 @@ import { BigNumber } from "@0x/utils";
 import React, { Component } from "react";
 import { Asset } from "../domain/Asset";
 import { RefinanceCdpData } from "../domain/RefinanceData";
-import { WalletType } from "../domain/WalletType";
 import { TorqueProviderEvents } from "../services/events/TorqueProviderEvents";
 import { TorqueProvider } from "../services/TorqueProvider";
 import { RefinanceAssetSelectorItemMobile } from "./RefinanceAssetSelectorItemMobile";
@@ -12,7 +11,6 @@ import { Loader } from "./Loader";
 //   onSelectAsset?: (asset: Asset) => void;
 // }
 export interface IRefinanceAssetSelectorMobileProps {
-  walletType: WalletType,
   updateStateShowLoader: (value: any) => void
   // onSelectAsset?: (asset: Asset) => void;
 }
@@ -47,51 +45,6 @@ export class RefinanceAssetSelectorMobile extends Component<IRefinanceAssetSelec
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
 
   }
-
-  // true includes ENS support
-  private readonly assetsShown: Map<Asset, boolean> = new Map<Asset, boolean>([
-    [
-      Asset.DAI,
-      true
-    ]
-    // [
-    //   Asset.DAI,
-    //   false
-    // ],
-    // [
-    //   Asset.USDC,
-    //   true
-    // ],
-    // /*[
-    //   Asset.SUSD,
-    //   false
-    // ],*/
-    // [
-    //   Asset.ETH,
-    //   false
-    // ],
-    // [
-    //   Asset.WBTC,
-    //   false
-    // ],
-    // [
-    //   Asset.LINK,
-    //   false
-    // ],
-    // [
-    //   Asset.ZRX,
-    //   false
-    // ],
-    // [
-    //   Asset.REP,
-    //   false
-    // ],
-    // [
-    //   Asset.KNC,
-    //   false
-    // ],
-  ]);
-
 
   private onProviderAvailable = () => {
 
@@ -147,51 +100,22 @@ export class RefinanceAssetSelectorMobile extends Component<IRefinanceAssetSelec
   }
 
   public render() {
-
     const refinance = this.state.refinanceData;
-
     let items;
-    if (this.props.walletType === WalletType.Web3) {
-
-      if (refinance[0].cdpId.gt(0)) {
-
-        items = refinance.map((e, index) => {
-
-          return (
-            <RefinanceAssetSelectorItemMobile
-              key={this.state.refinanceData[index].urn} asset={Asset.DAI}
-              cdpId={this.state.refinanceData[index].cdpId}
-              urn={this.state.refinanceData[index].urn}
-              accountAddress={this.state.refinanceData[index].accountAddress}
-              proxyAddress={this.state.refinanceData[index].proxyAddress}
-              isProxy={this.state.refinanceData[index].isProxy}
-              isInstaProxy={this.state.refinanceData[index].isInstaProxy}
-              ilk={this.state.refinanceData[index].ilk} />
-          );
-
-        });
-      }
-    } else {
-      if (refinance[0].cdpId !== undefined) {
-        if (refinance[0].cdpId.gt(0)) {
-
-          items = refinance.map((e, index) => {
-
-            return (
-              <RefinanceAssetSelectorItemMobile
-                key={this.state.refinanceData[index].urn} asset={Asset.DAI}
-                cdpId={this.state.refinanceData[index].cdpId}
-                urn={this.state.refinanceData[index].urn}
-                accountAddress={this.state.refinanceData[index].accountAddress}
-                proxyAddress={this.state.refinanceData[index].proxyAddress}
-                isProxy={this.state.refinanceData[index].isProxy}
-                isInstaProxy={this.state.refinanceData[index].isInstaProxy}
-                ilk={this.state.refinanceData[index].ilk} />
-            );
-
-          });
-        }
-      }
+    if (refinance[0].cdpId.gt(0)) {
+      items = refinance.map((e, index) => {
+        return (
+          <RefinanceAssetSelectorItemMobile
+            key={this.state.refinanceData[index].urn} asset={Asset.DAI}
+            cdpId={this.state.refinanceData[index].cdpId}
+            urn={this.state.refinanceData[index].urn}
+            accountAddress={this.state.refinanceData[index].accountAddress}
+            proxyAddress={this.state.refinanceData[index].proxyAddress}
+            isProxy={this.state.refinanceData[index].isProxy}
+            isInstaProxy={this.state.refinanceData[index].isInstaProxy}
+            ilk={this.state.refinanceData[index].ilk} />
+        );
+      });
     }
 
     return <div className="refinance-asset-selector">

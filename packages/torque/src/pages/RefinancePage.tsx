@@ -4,7 +4,6 @@ import { RefinanceAssetCompoundLoan } from "../components/RefinanceAssetCompound
 import { RefinanceAssetCompoundLoanMobile } from "../components/RefinanceAssetCompoundLoanMobile";
 import { RefinanceAssetSelector } from "../components/RefinanceAssetSelector";
 import { RefinanceAssetSelectorMobile } from "../components/RefinanceAssetSelectorMobile";
-import { WalletType, walletTypeAbbrToWalletType } from "../domain/WalletType";
 import { Footer } from "../layout/Footer";
 import { HeaderOps } from "../layout/HeaderOps";
 import { Loader } from "../components/Loader";
@@ -33,14 +32,12 @@ export class RefinancePage extends PureComponent<IRefinancePageParams & RouteCom
   }
 
   public render() {
-    const walletType = walletTypeAbbrToWalletType(this.props.match.params.walletTypeAbbr);
     const isMobileMedia = this.props.isMobileMedia;
     const isShowLoader = this.state.isShowLoader;
     return (
       <React.Fragment>
         <div className="refinance-page">
           <HeaderOps isMobileMedia={this.props.isMobileMedia} isLoading={this.props.isLoading} doNetworkConnect={this.props.doNetworkConnect} isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
-          {/*<div className="borrow-page__main" style={walletType === WalletType.Web3 ? { paddingBottom: `90rem`} : undefined}>*/}
           <div className="refinance-page__main">
             {isShowLoader
               ? <Loader />
@@ -52,11 +49,11 @@ export class RefinancePage extends PureComponent<IRefinancePageParams & RouteCom
               )
             }
             {isMobileMedia
-              ? <RefinanceAssetCompoundLoanMobile walletType={walletType} />
-              : <RefinanceAssetCompoundLoan walletType={walletType} />}
+              ? <RefinanceAssetCompoundLoanMobile />
+              : <RefinanceAssetCompoundLoan />}
             {isMobileMedia
-              ? <RefinanceAssetSelectorMobile updateStateShowLoader={this.updateStateShowLoader} walletType={walletType} />
-              : <RefinanceAssetSelector updateStateShowLoader={this.updateStateShowLoader} walletType={walletType} />
+              ? <RefinanceAssetSelectorMobile updateStateShowLoader={this.updateStateShowLoader} />
+              : <RefinanceAssetSelector updateStateShowLoader={this.updateStateShowLoader} />
             }
           </div>
           <Footer isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />

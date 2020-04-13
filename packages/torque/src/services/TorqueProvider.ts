@@ -40,7 +40,6 @@ import { ManageCollateralRequest } from "../domain/ManageCollateralRequest";
 import { ProviderType } from "../domain/ProviderType";
 import { IRefinanceLoan, IRefinanceToken, RefinanceCdpData, RefinanceData } from "../domain/RefinanceData";
 import { RepayLoanRequest } from "../domain/RepayLoanRequest";
-import { WalletType } from "../domain/WalletType";
 import { Web3ConnectionFactory } from "../domain/Web3ConnectionFactory";
 import { BorrowRequestAwaitingStore } from "./BorrowRequestAwaitingStore";
 import { ContractsSource } from "./ContractsSource";
