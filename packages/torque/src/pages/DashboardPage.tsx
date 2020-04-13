@@ -9,7 +9,6 @@ import { WalletAddressHint } from "../components/WalletAddressHint";
 import { WalletAddressLargeForm } from "../components/WalletAddressLargeForm";
 import { BorrowRequestAwaiting } from "../domain/BorrowRequestAwaiting";
 import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
-import { IWalletDetails } from "../domain/IWalletDetails";
 import { WalletType, walletTypeAbbrToWalletType } from "../domain/WalletType";
 import { Footer } from "../layout/Footer";
 import { HeaderOps } from "../layout/HeaderOps";
@@ -17,6 +16,7 @@ import { TorqueProviderEvents } from "../services/events/TorqueProviderEvents";
 import { NavService } from "../services/NavService";
 import { TorqueProvider } from "../services/TorqueProvider";
 import { Loader } from "../components/Loader";
+import { ProviderType } from "../domain/ProviderType";
 
 export interface IDashboardPageRouteParams {
   walletTypeAbbr: string;
@@ -31,7 +31,6 @@ export interface IDashboardPageParams {
 }
 
 interface IDashboardPageState {
-  walletDetails: IWalletDetails;
   items: IBorrowedFundsState[];
   itemsAwaiting: ReadonlyArray<BorrowRequestAwaiting>;
   isDataLoading: boolean;
@@ -55,10 +54,6 @@ export class DashboardPage extends PureComponent<
     this.walletAddressDlgRef = React.createRef();
 
     this.state = {
-      walletDetails: {
-        walletType: WalletType.Unknown,
-        walletAddress: ""
-      },
       items: [],
       itemsAwaiting: [],
       isDataLoading: true
@@ -73,44 +68,19 @@ export class DashboardPage extends PureComponent<
       return;
     }
 
-    const walletType = walletTypeAbbrToWalletType(this.props.match.params.walletTypeAbbr);
-
-    walletType !== WalletType.Web3 && this.props.doNetworkConnect()
-
-    let walletAddress = this.props.match.params.walletAddress ?
-      this.props.match.params.walletAddress.toLowerCase() :
-      "";
-
-    const account = TorqueProvider.Instance.accounts.length !== 0 ?
-      TorqueProvider.Instance.accounts[0].toLowerCase() :
-      "";
-    if (!account || !TorqueProvider.Instance.contractsSource || !TorqueProvider.Instance.contractsSource.canWrite) {
+    if (TorqueProvider.Instance.providerType === ProviderType.None || !TorqueProvider.Instance.contractsSource || !TorqueProvider.Instance.contractsSource.canWrite) {
+      this.props.doNetworkConnect()
       return;
-    } else {
-      if (walletAddress.toLowerCase() !== account) {
-        NavService.Instance.History.replace(NavService.Instance.getDashboardAddress(WalletType.Web3, account));
-        walletAddress = account;
-      }
     }
-
-    const walletDetails = {
-      walletType: walletTypeAbbrToWalletType(this.props.match.params.walletTypeAbbr),
-      walletAddress: walletAddress
-    };
-
-
 
     let items: IBorrowedFundsState[] = [];
     let itemsAwaiting: ReadonlyArray<BorrowRequestAwaiting> = [];
-    // console.log(walletDetails);
-    items = await TorqueProvider.Instance.getLoansList(walletDetails);
-    itemsAwaiting = await TorqueProvider.Instance.getLoansAwaitingList(walletDetails);
-    // console.log(items);
-    // console.log(itemsAwaiting);
+
+    items = await TorqueProvider.Instance.getLoansList();
+    itemsAwaiting = await TorqueProvider.Instance.getLoansAwaitingList();
 
     this.setState({
       ...this.state,
-      walletDetails: walletDetails,
       items: items,
       itemsAwaiting: itemsAwaiting,
       isDataLoading: false
@@ -135,17 +105,6 @@ export class DashboardPage extends PureComponent<
   public componentDidMount(): void {
     // console.log("componentDidMount");
     this.refreshPage();
-  }
-
-  public componentDidUpdate(
-    prevProps: Readonly<IDashboardPageParams & RouteComponentProps<IDashboardPageRouteParams>>,
-    prevState: Readonly<IDashboardPageState>,
-    snapshot?: any
-  ): void {
-    if (this.state.walletDetails.walletAddress !== prevState.walletDetails.walletAddress) {
-      // console.log("componentDidUpdate", this.state.walletDetails.walletAddress, prevState.walletDetails.walletAddress);
-      this.refreshPage();
-    }
   }
 
   public render() {
@@ -176,7 +135,6 @@ export class DashboardPage extends PureComponent<
                   </React.Fragment>)
                 }
                 <BorrowedFundsList
-                  walletDetails={this.state.walletDetails}
                   items={this.state.items}
                   itemsAwaiting={this.state.itemsAwaiting}
                   onManageCollateral={this.onManageCollateral}
@@ -225,7 +183,7 @@ export class DashboardPage extends PureComponent<
   private onRepayLoan = async (item: IBorrowedFundsState) => {
     if (this.repayLoanDlgRef.current) {
       try {
-        const repayLoanRequest = await this.repayLoanDlgRef.current.getValue(this.state.walletDetails, item);
+        const repayLoanRequest = await this.repayLoanDlgRef.current.getValue(item);
         await TorqueProvider.Instance.doRepayLoan(repayLoanRequest);
 
         this.repayLoanDlgRef.current.toggleDidSubmit(false);
@@ -264,7 +222,7 @@ export class DashboardPage extends PureComponent<
   private onExtendLoan = async (item: IBorrowedFundsState) => {
     if (this.extendLoanDlgRef.current) {
       try {
-        const extendLoanRequest = await this.extendLoanDlgRef.current.getValue(this.state.walletDetails, item);
+        const extendLoanRequest = await this.extendLoanDlgRef.current.getValue(item);
         await TorqueProvider.Instance.doExtendLoan(extendLoanRequest);
 
         this.extendLoanDlgRef.current.toggleDidSubmit(false);
@@ -303,10 +261,7 @@ export class DashboardPage extends PureComponent<
   private onManageCollateral = async (item: IBorrowedFundsState) => {
     if (this.manageCollateralDlgRef.current) {
       try {
-        const manageCollateralRequest = await this.manageCollateralDlgRef.current.getValue(
-          this.state.walletDetails,
-          item
-        );
+        const manageCollateralRequest = await this.manageCollateralDlgRef.current.getValue(item);
         await TorqueProvider.Instance.doManageCollateral(manageCollateralRequest);
 
         this.manageCollateralDlgRef.current.toggleDidSubmit(false);

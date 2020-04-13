@@ -3,11 +3,9 @@ import { Asset } from "../domain/Asset";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { BorrowRequestAwaiting } from "../domain/BorrowRequestAwaiting";
-import { IWalletDetails } from "../domain/IWalletDetails";
 import { TorqueProvider } from "../services/TorqueProvider";
 
 export interface IBorrowedFundsAwaitingListItemProps {
-  walletDetails: IWalletDetails;
   itemAwaiting: BorrowRequestAwaiting;
 }
 
