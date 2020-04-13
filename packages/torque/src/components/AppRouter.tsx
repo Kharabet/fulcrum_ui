@@ -3,7 +3,7 @@ import React, { Component } from "react";
 import TagManager from 'react-gtm-module';
 // import ReactGA from "react-ga";
 import Intercom from "react-intercom";
-import { HashRouter, Redirect, Route, Switch } from "react-router-dom";
+import { HashRouter, Redirect, Route, Switch, BrowserRouter } from "react-router-dom";
 import configProviders from "../config/providers.json";
 import { ProviderType } from "../domain/ProviderType";
 import { WalletType } from "../domain/WalletType";
@@ -110,7 +110,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
                     </LocationListener>
                   </HashRouter>
                 :
-                  <HashRouter hashType="slash">
+                  <BrowserRouter>
                     <LocationListener doNetworkConnect={this.doNetworkConnect}>
                       <Switch>
                         <Route exact={true} path="/" render={props => <LandingPage {...props} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen}/>}  />
@@ -133,7 +133,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
                         }} />
                       ) : ``}
                     </LocationListener>
-                  </HashRouter>
+                  </BrowserRouter>
           }
         </div>
       </React.Fragment>

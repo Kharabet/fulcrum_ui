@@ -4,7 +4,7 @@ import React, { Component } from "react";
 import TagManager from 'react-gtm-module';
 import Intercom from "react-intercom";
 import Modal from "react-modal";
-import { HashRouter, Redirect, Route, Switch } from "react-router-dom";
+import { BrowserRouter, Redirect, Route, Switch } from "react-router-dom";
 import { ProviderType } from "../domain/ProviderType";
 import { LandingPage } from "../pages/LandingPage";
 import { LendPage } from "../pages/LendPage";
@@ -114,8 +114,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
           {
             siteConfig.MaintenanceMode
               ? <MaintenancePage />
-              :
-                <HashRouter hashType="slash">
+              : <BrowserRouter>
                   <LocationListener doNetworkConnect={this.doNetworkConnect}>
                     <Switch>
                       {!isMainnetProd ? <Route exact={true} path="/" render={() => <LandingPage isMobileMedia={this.state.isMobileMedia} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />} /> : undefined}
@@ -145,7 +144,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
                       }} />
                     ) : ``}
                   </LocationListener>
-                </HashRouter>
+                </BrowserRouter>
           }
         </div>
       </React.Fragment>
