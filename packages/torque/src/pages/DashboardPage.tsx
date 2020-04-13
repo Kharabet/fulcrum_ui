@@ -5,15 +5,11 @@ import { ExtendLoanDlg } from "../components/ExtendLoanDlg";
 import { ManageCollateralDlg } from "../components/ManageCollateralDlg";
 import { RepayLoanDlg } from "../components/RepayLoanDlg";
 import { WalletAddressDlg } from "../components/WalletAddressDlg";
-import { WalletAddressHint } from "../components/WalletAddressHint";
-import { WalletAddressLargeForm } from "../components/WalletAddressLargeForm";
 import { BorrowRequestAwaiting } from "../domain/BorrowRequestAwaiting";
 import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
-import { WalletType, walletTypeAbbrToWalletType } from "../domain/WalletType";
 import { Footer } from "../layout/Footer";
 import { HeaderOps } from "../layout/HeaderOps";
 import { TorqueProviderEvents } from "../services/events/TorqueProviderEvents";
-import { NavService } from "../services/NavService";
 import { TorqueProvider } from "../services/TorqueProvider";
 import { Loader } from "../components/Loader";
 import { ProviderType } from "../domain/ProviderType";
@@ -109,9 +105,6 @@ export class DashboardPage extends PureComponent<
 
   public render() {
 
-    const walletType = walletTypeAbbrToWalletType(this.props.match.params.walletTypeAbbr);
-
-
     return (
       <React.Fragment>
         <ManageCollateralDlg ref={this.manageCollateralDlgRef} />
@@ -181,119 +174,44 @@ export class DashboardPage extends PureComponent<
   };
 
   private onRepayLoan = async (item: IBorrowedFundsState) => {
-    if (this.repayLoanDlgRef.current) {
-      try {
-        const repayLoanRequest = await this.repayLoanDlgRef.current.getValue(item);
-        await TorqueProvider.Instance.doRepayLoan(repayLoanRequest);
+    if (!this.repayLoanDlgRef.current) return;
 
-        this.repayLoanDlgRef.current.toggleDidSubmit(false);
-        await this.repayLoanDlgRef.current.hide();
-      } catch (error) {
-        /*let errorMsg;
-        if (error.message) {
-          errorMsg = error.message;
-        } else if (typeof error === "string") {
-          errorMsg = error;
-        }
-
-        if (errorMsg) {
-          if (errorMsg.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)) {
-            errorMsg = "The transaction seems like it will fail. You can submit the transaction anyway, or cancel.";
-          } else if (errorMsg.includes("Reverted by EVM")) {
-            errorMsg = "The transaction failed. Click View More for details.";
-          } else if (errorMsg.includes("MetaMask Tx Signature: User denied transaction signature.")) {
-            errorMsg = "You didn't confirm in MetaMask. Please try again.";
-            await this.repayLoanDlgRef.current.hide();
-          } else if (errorMsg.includes("User denied account authorization.")) {
-            errorMsg = "You didn't authorize MetaMask. Please try again.";
-          } else if (errorMsg.includes("Transaction rejected")) {
-            errorMsg = "You didn't confirm in Gnosis Safe. Please try again.";
-          } else {
-            errorMsg = "";
-          }
-        }*/
-
-        this.repayLoanDlgRef.current.toggleDidSubmit(false);
-        await this.repayLoanDlgRef.current.hide();
-      }
+    try {
+      const repayLoanRequest = await this.repayLoanDlgRef.current.getValue(item);
+      await TorqueProvider.Instance.doRepayLoan(repayLoanRequest);
+    } catch (error) {
+      console.error(error);
     }
+
+    this.repayLoanDlgRef.current.toggleDidSubmit(false);
+    await this.repayLoanDlgRef.current.hide();
   };
 
   private onExtendLoan = async (item: IBorrowedFundsState) => {
-    if (this.extendLoanDlgRef.current) {
-      try {
-        const extendLoanRequest = await this.extendLoanDlgRef.current.getValue(item);
-        await TorqueProvider.Instance.doExtendLoan(extendLoanRequest);
+    if (!this.extendLoanDlgRef.current) return
 
-        this.extendLoanDlgRef.current.toggleDidSubmit(false);
-        await this.extendLoanDlgRef.current.hide();
-      } catch (error) {
-        /*let errorMsg;
-        if (error.message) {
-          errorMsg = error.message;
-        } else if (typeof error === "string") {
-          errorMsg = error;
-        }
-
-        if (errorMsg) {
-          if (errorMsg.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)) {
-            errorMsg = "The transaction seems like it will fail. You can submit the transaction anyway, or cancel.";
-          } else if (errorMsg.includes("Reverted by EVM")) {
-            errorMsg = "The transaction failed. Click View More for details.";
-          } else if (errorMsg.includes("MetaMask Tx Signature: User denied transaction signature.")) {
-            errorMsg = "You didn't confirm in MetaMask. Please try again.";
-            await this.extendLoanDlgRef.current.hide();
-          } else if (errorMsg.includes("User denied account authorization.")) {
-            errorMsg = "You didn't authorize MetaMask. Please try again.";
-          } else if (errorMsg.includes("Transaction rejected")) {
-            errorMsg = "You didn't confirm in Gnosis Safe. Please try again.";
-          } else {
-            errorMsg = "";
-          }
-        }*/
-
-        this.extendLoanDlgRef.current.toggleDidSubmit(false);
-        await this.extendLoanDlgRef.current.hide();
-      }
+    try {
+      const extendLoanRequest = await this.extendLoanDlgRef.current.getValue(item);
+      await TorqueProvider.Instance.doExtendLoan(extendLoanRequest);
+    } catch (error) {
+      console.error(error);
     }
+
+    this.extendLoanDlgRef.current.toggleDidSubmit(false);
+    await this.extendLoanDlgRef.current.hide();
   };
 
   private onManageCollateral = async (item: IBorrowedFundsState) => {
-    if (this.manageCollateralDlgRef.current) {
-      try {
-        const manageCollateralRequest = await this.manageCollateralDlgRef.current.getValue(item);
-        await TorqueProvider.Instance.doManageCollateral(manageCollateralRequest);
+    if (!this.manageCollateralDlgRef.current) return;
 
-        this.manageCollateralDlgRef.current.toggleDidSubmit(false);
-        await this.manageCollateralDlgRef.current.hide();
-      } catch (error) {
-        /*let errorMsg;
-        if (error.message) {
-          errorMsg = error.message;
-        } else if (typeof error === "string") {
-          errorMsg = error;
-        }
-
-        if (errorMsg) {
-          if (errorMsg.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)) {
-            errorMsg = "The transaction seems like it will fail. You can submit the transaction anyway, or cancel.";
-          } else if (errorMsg.includes("Reverted by EVM")) {
-            errorMsg = "The transaction failed. Click View More for details.";
-          } else if (errorMsg.includes("MetaMask Tx Signature: User denied transaction signature.")) {
-            errorMsg = "You didn't confirm in MetaMask. Please try again.";
-            await this.manageCollateralDlgRef.current.hide();
-          } else if (errorMsg.includes("User denied account authorization.")) {
-            errorMsg = "You didn't authorize MetaMask. Please try again.";
-          } else if (errorMsg.includes("Transaction rejected")) {
-            errorMsg = "You didn't confirm in Gnosis Safe. Please try again.";
-          } else {
-            errorMsg = "";
-          }
-        }*/
-
-        this.manageCollateralDlgRef.current.toggleDidSubmit(false);
-        await this.manageCollateralDlgRef.current.hide();
-      }
+    try {
+      const manageCollateralRequest = await this.manageCollateralDlgRef.current.getValue(item);
+      await TorqueProvider.Instance.doManageCollateral(manageCollateralRequest);
+    } catch (error) {
+      console.error(error);
     }
+
+    this.manageCollateralDlgRef.current.toggleDidSubmit(false);
+    await this.manageCollateralDlgRef.current.hide();
   };
 }
