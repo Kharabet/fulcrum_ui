@@ -122,7 +122,16 @@ export class AppRouter extends Component<any, IAppRouterState> {
                         ? <Redirect to={props.location.hash.replace('#', '')} />
                         : <LandingPage {...props} isMobileMedia={this.state.isMobileMedia} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />
                       )} />
-                      : undefined}
+                      : <Route exact={true} path="/" render={props => {
+                        if (props.location.hash.startsWith('#/')) {
+                          return <Redirect to={props.location.hash.replace('#/', '')} />
+                        }
+                        else {
+                          window.location.href = 'https://fulcrum.trade';
+                          return null;
+                        }
+                      }} />
+                    }
 
                     <Route exact={true} path="/lend" render={() => <LendPage isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />} />
                     {/*{!this.state.isMobileMedia ? (*/}
