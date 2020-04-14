@@ -11,6 +11,7 @@ export interface IBorrowedFundsListProps {
   onManageCollateral: (item: IBorrowedFundsState) => void;
   onRepayLoan: (item: IBorrowedFundsState) => void;
   onExtendLoan: (item: IBorrowedFundsState) => void;
+  onBorrowMore: (item: IBorrowedFundsState) => void;
 }
 
 interface IBorrowedFundsListState {
