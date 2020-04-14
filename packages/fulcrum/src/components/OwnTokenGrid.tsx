@@ -28,7 +28,7 @@ export interface IOwnTokenGridProps {
   onSelect: (key: TradeTokenKey) => void;
   onTrade: (request: TradeRequest) => void;
   isMobileMedia: boolean;
-  onManageCollateralOpen: () => void;
+  onManageCollateralOpen: (request: ManageCollateralRequest) => void;
   getOwnRowsData: Promise<IOwnTokenGridRowProps[]>;
 }
 
