@@ -929,7 +929,7 @@ export class FulcrumProvider {
             maxLendAmount = freeSupply;
             maxTokenAmount = maxTokenAmount.multipliedBy(freeSupply).dividedBy(userBalance);
             if (request.lendType === LendType.UNLEND)
-              infoMessage = "Insufficient liquidity for unlend. PLease try again later.";
+              infoMessage = "Insufficient liquidity for unlend. Please try again later.";
           } else {
             maxLendAmount = userBalance;
           }
