@@ -87,6 +87,10 @@
       {
         "name": "count",
         "type": "uint256"
+      },
+      {
+        "name": "loanType",
+        "type": "uint256"
       }
     ],
     "name": "getBasicLoansData",
