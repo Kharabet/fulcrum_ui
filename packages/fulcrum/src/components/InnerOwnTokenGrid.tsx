@@ -13,6 +13,7 @@ import { TradeType } from "../domain/TradeType";
 import { Asset } from "../domain/Asset";
 import { PositionType } from "../domain/PositionType";
 import { BigNumber } from "@0x/utils";
+
 export interface IInnerOwnTokenGridProps {
   showMyTokensOnly: boolean;
   selectedKey: TradeTokenKey;
@@ -23,10 +24,11 @@ export interface IInnerOwnTokenGridProps {
   onTrade: (request: TradeRequest) => void;
   onManageCollateralOpen: () => void;
   isMobileMedia: boolean;
+  getOwnRowsData: Promise<IInnerOwnTokenGridRowProps[]>;
 }
 
 interface IInnerOwnTokenGridState {
-  tokenRowsData: IInnerOwnTokenGridRowProps[];
+  innerOwnRowsData: IInnerOwnTokenGridRowProps[];
   isShowHistory: boolean;
 }
 
@@ -35,7 +37,7 @@ export class InnerOwnTokenGrid extends Component<IInnerOwnTokenGridProps, IInner
     super(props);
     this._isMounted = false;
     this.state = {
-      tokenRowsData: [],
+      innerOwnRowsData: [],
       isShowHistory: false
     };
 
@@ -49,8 +51,9 @@ export class InnerOwnTokenGrid extends Component<IInnerOwnTokenGridProps, IInner
   private _isMounted: boolean;
 
   public async derivedUpdate() {
-    const tokenRowsData = await InnerOwnTokenGrid.getRowsData(this.props);
-    this._isMounted && this.setState({ ...this.state, tokenRowsData: tokenRowsData });
+    const innerOwnRowsData = await this.props.getOwnRowsData;
+
+    this._isMounted && this.setState({ ...this.state, innerOwnRowsData: innerOwnRowsData });
   }
 
   public componentWillUnmount(): void {
@@ -59,10 +62,11 @@ export class InnerOwnTokenGrid extends Component<IInnerOwnTokenGridProps, IInner
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.TradeTransactionMined, this.onTradeTransactionMined);
   }
-
+  public componentWillMount(): void {
+    this.derivedUpdate();
+  }
   public componentDidMount(): void {
     this._isMounted = true;
-
     this.derivedUpdate();
   }
 
@@ -73,7 +77,8 @@ export class InnerOwnTokenGrid extends Component<IInnerOwnTokenGridProps, IInner
   ): void {
     if (
       this.props.selectedKey !== prevProps.selectedKey ||
-      this.props.showMyTokensOnly !== prevProps.showMyTokensOnly
+      this.props.showMyTokensOnly !== prevProps.showMyTokensOnly ||
+      this.state.innerOwnRowsData !== prevState.innerOwnRowsData
     ) {
       this.derivedUpdate();
     }
@@ -86,26 +91,26 @@ export class InnerOwnTokenGrid extends Component<IInnerOwnTokenGridProps, IInner
   }
 
   private renderDesktop = () => {
-    const tokenRows = this.state.tokenRowsData.map(e => <InnerOwnTokenGridRow onManageCollateralOpen={this.props.onManageCollateralOpen} key={`${e.currentKey.toString()}`} {...e} />);
-    if (tokenRows.length === 0) return null;
+    const innerOwnRowsData = this.state.innerOwnRowsData.map(e => <InnerOwnTokenGridRow onManageCollateralOpen={this.props.onManageCollateralOpen} key={`${e.currentKey.toString()}`}  {...e} onSelect={this.props.onSelect} onTrade={this.props.onTrade} />);
+    if (innerOwnRowsData.length === 0) return null;
 
     return (
       <div className="own-token-grid-inner">
         <InnerOwnTokenGridHeader />
-        {tokenRows}
+        {innerOwnRowsData}
       </div>
     );
   }
 
   private renderMobile = () => {
-    const tokenRows = this.state.tokenRowsData.map(e => <OwnTokenCardMobile key={`${e.currentKey.toString()}`} {...e} />);
-    if (tokenRows.length === 0) return null;
+    const innerOwnRowsData = this.state.innerOwnRowsData.map(e => <OwnTokenCardMobile key={`${e.currentKey.toString()}`} {...e} onSelect={this.props.onSelect} onTrade={this.props.onTrade} />);
+    if (innerOwnRowsData.length === 0) return null;
 
     return (
       <div className="own-token-cards">
         <div className="own-token-cards__header">Manage</div>
         <div className="own-token-cards__container">
-          {tokenRows}
+          {innerOwnRowsData}
         </div>
 
       </div>
@@ -127,40 +132,6 @@ export class InnerOwnTokenGrid extends Component<IInnerOwnTokenGridProps, IInner
         this.props.selectedKey.version
       )
     );
-  };
-
-  private static getRowsData = async (props: IInnerOwnTokenGridProps): Promise<IInnerOwnTokenGridRowProps[]> => {
-    const rowsData: IInnerOwnTokenGridRowProps[] = [];
-
-    if (FulcrumProvider.Instance.web3Wrapper && FulcrumProvider.Instance.contractsSource && FulcrumProvider.Instance.contractsSource.canWrite) {
-      const pTokens = props.asset && props.positionType
-        ? FulcrumProvider.Instance.getPTokensAvailable().filter(tradeToken => tradeToken.asset == props.asset && tradeToken.positionType == props.positionType)
-        : FulcrumProvider.Instance.getPTokensAvailable()
-
-      const pTokenAddreses: string[] = FulcrumProvider.Instance.getPTokenErc20AddressList();
-      const pTokenBalances = await FulcrumProvider.Instance.getErc20BalancesOfUser(pTokenAddreses);
-      for (const pToken of pTokens) {
-        // console.log(pToken);
-        const balance = pTokenBalances.get(pToken.erc20Address);
-        if (!balance) {
-          continue;
-        }
-
-        rowsData.push({
-          selectedKey: props.selectedKey,
-          currentKey: pToken,
-          // // balance: balance,
-          // onDetails: props.onDetails,
-          // onManageCollateral: props.onManageCollateral,
-          onSelect: props.onSelect,
-          onTrade: props.onTrade,
-          onManageCollateralOpen: props.onManageCollateralOpen,
-          showMyTokensOnly: props.showMyTokensOnly
-        });
-      }
-    }
-
-    return rowsData;
   };
 
   private onProviderChanged = async (event: ProviderChangedEvent) => {

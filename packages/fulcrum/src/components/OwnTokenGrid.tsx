@@ -29,10 +29,11 @@ export interface IOwnTokenGridProps {
   onTrade: (request: TradeRequest) => void;
   isMobileMedia: boolean;
   onManageCollateralOpen: () => void;
+  getOwnRowsData: Promise<IOwnTokenGridRowProps[]>;
 }
 
 interface IOwnTokenGridState {
-  tokenRowsData: IOwnTokenGridRowProps[];
+  ownRowsData: IOwnTokenGridRowProps[];
   isShowHistory: boolean;
 }
 
@@ -41,7 +42,7 @@ export class OwnTokenGrid extends Component<IOwnTokenGridProps, IOwnTokenGridSta
     super(props);
     this._isMounted = false;
     this.state = {
-      tokenRowsData: [],
+      ownRowsData: [],
       isShowHistory: false
     };
 
@@ -54,8 +55,8 @@ export class OwnTokenGrid extends Component<IOwnTokenGridProps, IOwnTokenGridSta
   private _isMounted: boolean;
 
   public async derivedUpdate() {
-    const tokenRowsData = await OwnTokenGrid.getRowsData(this.props);
-    this._isMounted && this.setState({ ...this.state, tokenRowsData: tokenRowsData });
+    const ownRowsData = await this.props.getOwnRowsData;
+    this._isMounted && this.setState({ ...this.state, ownRowsData: ownRowsData});
   }
 
   public componentWillUnmount(): void {
@@ -91,9 +92,9 @@ export class OwnTokenGrid extends Component<IOwnTokenGridProps, IOwnTokenGridSta
   }
 
   private renderDesktop = () => {
-    const tokenRows = this.state.tokenRowsData.map(e => <OwnTokenGridRow onManageCollateralOpen={this.props.onManageCollateralOpen} key={`${e.currentKey.toString()}`} {...e} />);
-    const historyRows = this.state.tokenRowsData.map(e => <HistoryTokenGridRow key={`${e.currentKey.toString()}`} {...e} />);
-    if (tokenRows.length === 0) return null;
+    const ownRows = this.state.ownRowsData.map(e => <OwnTokenGridRow key={`${e.currentKey.toString()}`} {...e} onManageCollateralOpen={this.props.onManageCollateralOpen} onSelect={this.props.onSelect} onTrade={this.props.onTrade} />);
+    const historyRows = this.state.ownRowsData.map(e => <HistoryTokenGridRow key={`${e.currentKey.toString()}`} {...e} onSelect={this.props.onSelect} onTrade={this.props.onTrade} />);
+    if (ownRows.length === 0) return null;
 
     return (
       <div className="own-token-grid">
@@ -108,7 +109,7 @@ export class OwnTokenGrid extends Component<IOwnTokenGridProps, IOwnTokenGridSta
           </React.Fragment>
           : <React.Fragment>
             <OwnTokenGridHeader />
-            {tokenRows}
+            {ownRows}
           </React.Fragment>
         }
 
@@ -117,15 +118,15 @@ export class OwnTokenGrid extends Component<IOwnTokenGridProps, IOwnTokenGridSta
   }
 
   private renderMobile = () => {
-    const tokenRows = this.state.tokenRowsData.map(e => <OwnTokenCardMobile key={`${e.currentKey.toString()}`} {...e} />);
-    if (tokenRows.length === 0) return null;
+    const ownRows = this.state.ownRowsData.map(e => <OwnTokenCardMobile key={`${e.currentKey.toString()}`} {...e} onSelect={this.props.onSelect} onTrade={this.props.onTrade} />);
+    if (ownRows.length === 0) return null;
 
     return (
       <div className="own-token-cards">
 
         <div className="own-token-cards__header">Manage</div>
         <div className="own-token-cards__container">
-          {tokenRows}
+          {ownRows}
         </div>
       </div>
     );
@@ -146,40 +147,6 @@ export class OwnTokenGrid extends Component<IOwnTokenGridProps, IOwnTokenGridSta
         this.props.selectedKey.version
       )
     );
-  };
-
-  private static getRowsData = async (props: IOwnTokenGridProps): Promise<IOwnTokenGridRowProps[]> => {
-    const rowsData: IOwnTokenGridRowProps[] = [];
-
-    if (FulcrumProvider.Instance.web3Wrapper && FulcrumProvider.Instance.contractsSource && FulcrumProvider.Instance.contractsSource.canWrite) {
-      const pTokens = props.asset && props.positionType
-        ? FulcrumProvider.Instance.getPTokensAvailable().filter(tradeToken => tradeToken.asset == props.asset && tradeToken.positionType == props.positionType)
-        : FulcrumProvider.Instance.getPTokensAvailable()
-
-      const pTokenAddreses: string[] = FulcrumProvider.Instance.getPTokenErc20AddressList();
-      const pTokenBalances = await FulcrumProvider.Instance.getErc20BalancesOfUser(pTokenAddreses);
-      for (const pToken of pTokens) {
-        // console.log(pToken);
-        const balance = pTokenBalances.get(pToken.erc20Address);
-        if (!balance) {
-          continue;
-        }
-
-        rowsData.push({
-          selectedKey: props.selectedKey,
-          currentKey: pToken,
-          // // balance: balance,
-          // onDetails: props.onDetails,
-          //onManageCollateral: props.onManageCollateral,
-          onSelect: props.onSelect,
-          onTrade: props.onTrade,
-          onManageCollateralOpen: props.onManageCollateralOpen,
-          showMyTokensOnly: props.showMyTokensOnly
-        });
-      }
-    }
-
-    return rowsData;
   };
 
   private onProviderChanged = async (event: ProviderChangedEvent) => {
