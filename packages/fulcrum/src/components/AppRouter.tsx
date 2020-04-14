@@ -117,15 +117,17 @@ export class AppRouter extends Component<any, IAppRouterState> {
               : <BrowserRouter>
                 <LocationListener doNetworkConnect={this.doNetworkConnect}>
                   <Switch>
-                    {!isMainnetProd ? <Route exact={true} path="/" render={() => <LandingPage isMobileMedia={this.state.isMobileMedia} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />} /> : undefined}
+                    {!isMainnetProd
+                      ? <Route exact={true} path="/" render={props => (props.location.hash.startsWith('#/')
+                        ? <Redirect to={props.location.hash.replace('#', '')} />
+                        : <LandingPage {...props} isMobileMedia={this.state.isMobileMedia} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />
+                      )} />
+                      : undefined}
 
-                    <Redirect exact={true} from="/#/lend" to="/lend" />
                     <Route exact={true} path="/lend" render={() => <LendPage isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />} />
                     {/*{!this.state.isMobileMedia ? (*/}
-                    <Redirect exact={true} from="/#/trade" to="/trade" />
                     <Route exact={true} path="/trade" render={() => <TradePage isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />} />
 
-                    <Redirect exact={true} from="/#/stats" to="/stats" />
                     <Route exact={true} path="/stats" render={() => <StatsPage isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />} />
                     {isMainnetProd ? <Route path="*" component={() => {
                       window.location.href = 'https://fulcrum.trade';
