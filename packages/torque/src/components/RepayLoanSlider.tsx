@@ -20,7 +20,7 @@ export class RepayLoanSlider extends Component<IRepayLoanSliderProps> {
       <Slider
         disabled={this.props.readonly}
         mode={1}
-        step={1}
+        step={.01}
         domain={[this.props.minValue, this.props.maxValue]}
         rootProps={{ className: "xexe" }}
         rootStyle={{

@@ -135,7 +135,7 @@ interface IManageCollateralFormState {
 
 export class ManageCollateralForm extends Component<IManageCollateralFormProps, IManageCollateralFormState> {
   private minValue: number = 0;
-  private maxValue: number = 300;
+  private maxValue: number = 11;
 
   //#region tradeComponent
   private readonly _inputPrecision = 6;
@@ -171,9 +171,9 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
 
     this.state = {
       // assetDetails: AssetsDictionary.assets.get(this.props.asset) || null,
-      positionValue: 250.6,
-      currentValue: 250.6,
-      selectedValue: 250.6,
+      positionValue: 0,
+      currentValue: 0,
+      selectedValue: 100,
       diffAmount: new BigNumber(0),
       // liquidationPrice: new BigNumber(700),
 
@@ -265,11 +265,11 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
   private async derivedUpdate() {
 
     // TODO: calculate and update this.state.diffAmount and this.state.liquidationPrice
-    this.setState({
-      ...this.state,
-      diffAmount: new BigNumber(this.state.selectedValue * 3),
-      liquidationPrice: new BigNumber(700 - this.state.selectedValue)
-    });
+    // this.setState({
+    //   ...this.state,
+    //   diffAmount: new BigNumber(this.state.selectedValue * 3),
+    //   liquidationPrice: new BigNumber(700 - this.state.selectedValue)
+    // });
 
     //#region tradeComponent
     let assetDetails = AssetsDictionary.assets.get(this.props.asset);
@@ -334,7 +334,7 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
       currentPrice: new BigNumber(latestPriceDataPoint.price),
       liquidationPrice: liquidationPrice,
       exposureValue: tradeExpectedResults.exposureValue,
-      diffAmount: new BigNumber(this.state.selectedValue * 3),
+      diffAmount: new BigNumber(this.state.selectedValue * .2),
 
     });
   }
@@ -356,7 +356,6 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
 
     //#region tradeComponent
     this._isMounted = true;
-
     await this.derivedUpdate();
     window.history.pushState(null, "Trade Modal Opened", `/#/trade/${this.props.tradeType.toLocaleLowerCase()}-${this.props.leverage}x-${this.props.positionType.toLocaleLowerCase()}-${this.props.asset}/`);
 
@@ -439,6 +438,7 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
 
           <CollateralSlider
             minValue={this.minValue}
+            // maxValue={this.state.inputAmountText}
             maxValue={this.maxValue}
             value={this.state.currentValue}
             onUpdate={this.onUpdate}

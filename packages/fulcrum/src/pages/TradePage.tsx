@@ -259,8 +259,8 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
           >
             <ManageCollateralForm
               isMobileMedia={this.props.isMobileMedia}
-              asset={Asset.ETH}
-              tradeType={this.state.tradeType}
+              asset={this.state.tradeAsset}
+              tradeType={TradeType.BUY}
               leverage={this.state.tradeLeverage}
               positionType={this.state.tradePositionType}
               bestCollateral={

@@ -3,6 +3,7 @@ import { Handles, HandlesObject, Rail, Slider } from "react-compound-slider";
 import { RailObject } from "react-compound-slider/Rail/Rail";
 import { CollateralSliderHandle } from "./CollateralSliderHandle";
 import { CollateralSliderRail } from "./CollateralSliderRail";
+import { number } from "prop-types";
 
 export interface ICollateralSliderProps {
   minValue: number;
@@ -14,11 +15,24 @@ export interface ICollateralSliderProps {
 }
 
 export class CollateralSlider extends Component<ICollateralSliderProps> {
+  constructor(props: ICollateralSliderProps, context?: any) {
+    super(props, context);
+
+    this.state = {
+      maxValue: number,
+      value: number
+    };
+
+    this.setState({
+      ...this.state,
+    });
+  }
+
   public render() {
     return (
       <Slider
         mode={1}
-        step={1}
+        step={.01}
         domain={[this.props.minValue, this.props.maxValue]}
         rootProps={{ className: "xexe" }}
         rootStyle={{
