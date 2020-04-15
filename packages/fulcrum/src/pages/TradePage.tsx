@@ -71,7 +71,6 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
   static onSelect: (key: TradeTokenKey) => void;
   static onTradeRequested: (request: TradeRequest) => void;
   static changeActiveBtn: (activeType: string) => void;
-  static onManageCollateralOpen: () => void;
   constructor(props: any) {
     super(props);
     this.state = {
@@ -210,11 +209,9 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
               showMyTokensOnly={this.state.showMyTokensOnly}
               selectedKey={this.state.selectedKey}
               isMobileMedia={this.props.isMobileMedia}
-              // onDetails={this.onDetails}
-              // onManageCollateral={this.onManageCollateralRequested}
               onSelect={this.onSelect}
               onTrade={this.onTradeRequested}
-              onManageCollateralOpen={this.onManageCollateralRequestOpen}
+              onManageCollateralOpen={this.onManageCollateralRequested}
               getOwnRowsData={this.getOwnRowsData(this.state)}
             />
           ) : (
@@ -229,7 +226,7 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
                 onSelect={this.onSelect}
                 onTrade={this.onTradeRequested}
                 defaultLeverage={this.state.tradeLeverage}
-                onManageCollateralOpen={this.onManageCollateralRequestOpen}
+                onManageCollateralOpen={this.onManageCollateralRequested}
                 getTokenRowsData={this.getTokenRowsData(this.state)}
                 getOwnRowsData={this.getOwnRowsData(this.state)}
               />
@@ -362,13 +359,6 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
     });
   };
 
-  public onManageCollateralRequestOpen = () => {
-    this.setState({
-      ...this.state,
-      isManageCollateralModalOpen: true
-    });
-  };
-
   public onManageCollateralRequestClose = () => {
     this.setState({
       ...this.state,
@@ -445,7 +435,7 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
           showMyTokensOnly: state.showMyTokensOnly,
           onSelect: TradePage.onSelect,
           onTrade: TradePage.onTradeRequested,
-          onManageCollateralOpen: TradePage.onManageCollateralOpen,
+          onManageCollateralOpen: this.onManageCollateralRequested,
         });
       }
     }

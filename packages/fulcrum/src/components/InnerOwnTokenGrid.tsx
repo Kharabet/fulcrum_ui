@@ -23,7 +23,7 @@ export interface IInnerOwnTokenGridProps {
   positionType?: PositionType;
   onSelect: (key: TradeTokenKey) => void;
   onTrade: (request: TradeRequest) => void;
-  onManageCollateralOpen: () => void;
+  onManageCollateralOpen: (request: ManageCollateralRequest) => void;
   isMobileMedia: boolean;
   getOwnRowsData: Promise<IInnerOwnTokenGridRowProps[]>;
 }
