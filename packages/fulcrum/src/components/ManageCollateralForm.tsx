@@ -134,8 +134,8 @@ interface IManageCollateralFormState {
 }
 
 export class ManageCollateralForm extends Component<IManageCollateralFormProps, IManageCollateralFormState> {
-  private minValue: number = 0;
-  private maxValue: number = 11;
+  private minValue: number = 115;
+  private maxValue: number = 300;
 
   //#region tradeComponent
   private readonly _inputPrecision = 6;
@@ -171,9 +171,9 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
 
     this.state = {
       // assetDetails: AssetsDictionary.assets.get(this.props.asset) || null,
-      positionValue: 0,
-      currentValue: 0,
-      selectedValue: 100,
+      positionValue: 150,
+      currentValue: 150,
+      selectedValue: 150,
       diffAmount: new BigNumber(0),
       // liquidationPrice: new BigNumber(700),
 
@@ -464,7 +464,7 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
           <div className="manage-collateral-form__text">
             You will {this.state.positionValue > this.state.selectedValue ? "withdraw" : "top up"}</div>
 
-          {this.state.positionValue !== this.state.selectedValue ? (
+          {/* {this.state.positionValue !== this.state.selectedValue ? (
             <div className="manage-collateral-form__operation-result-container">
               <img className="manage-collateral-form__operation-result-img" src={this.state.assetDetails.logoSvg} />
               <div className="manage-collateral-form__operation-result-msg">
@@ -474,7 +474,7 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
                 {this.state.diffAmount.toFixed(6)} {this.state.assetDetails.displayName}
               </div>
             </div>
-          ) : null}
+          ) : null} */}
 
           {//#region tradeComponent
           }
