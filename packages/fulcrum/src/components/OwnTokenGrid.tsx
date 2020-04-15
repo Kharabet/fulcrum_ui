@@ -14,7 +14,7 @@ import { OwnTokenCardMobile } from "./OwnTokenCardMobile";
 
 export interface IOwnTokenGridProps {
   isMobileMedia: boolean;
-  getOwnRowsData: IOwnTokenGridRowProps[];
+  ownRowsData: IOwnTokenGridRowProps[];
 }
 
 interface IOwnTokenGridState {
@@ -40,8 +40,6 @@ export class OwnTokenGrid extends Component<IOwnTokenGridProps, IOwnTokenGridSta
   private _isMounted: boolean;
 
   public async derivedUpdate() {
-    const ownRowsData = await this.props.getOwnRowsData;
-    this._isMounted && this.setState({ ...this.state, ownRowsData: ownRowsData });
   }
 
   public componentWillUnmount(): void {
@@ -80,8 +78,8 @@ export class OwnTokenGrid extends Component<IOwnTokenGridProps, IOwnTokenGridSta
   }
 
   private renderDesktop = () => {
-    const ownRows = this.state.ownRowsData.map(e => <OwnTokenGridRow key={`${e.currentKey.toString()}`} {...e} />);
-    const historyRows = this.state.ownRowsData.map(e => <HistoryTokenGridRow key={`${e.currentKey.toString()}`} {...e} />);
+    const ownRows = this.props.ownRowsData.map(e => <OwnTokenGridRow key={`${e.currentKey.toString()}`} {...e} />);
+    const historyRows = this.props.ownRowsData.map(e => <HistoryTokenGridRow key={`${e.currentKey.toString()}`} {...e} />);
     if (ownRows.length === 0) return null;
 
     return (
@@ -106,7 +104,7 @@ export class OwnTokenGrid extends Component<IOwnTokenGridProps, IOwnTokenGridSta
   }
 
   private renderMobile = () => {
-    const ownRows = this.state.ownRowsData.map(e => <OwnTokenCardMobile key={`${e.currentKey.toString()}`} {...e} />);
+    const ownRows = this.props.ownRowsData.map(e => <OwnTokenCardMobile key={`${e.currentKey.toString()}`} {...e} />);
     if (ownRows.length === 0) return null;
 
     return (
