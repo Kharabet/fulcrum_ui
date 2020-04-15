@@ -111,7 +111,6 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
 
   private renderDesktop = () => {
     let tokenRows;
-    let ownRows: any;
     let tradeTokenGridProps = this.props;
 
     if (this.props.selectedKey.asset !== Asset.UNKNOWN) {
@@ -137,6 +136,7 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
 
   private renderMobile = () => {
     let tokenRowsMobile;
+    let tradeTokenGridProps = this.props;
     if (this.props.isLong)
       tokenRowsMobile = this.state.tokenRowsData.filter(e => e.positionType === "LONG").map(e => <TradeTokenCardMobile key={`${e.asset}_${e.positionType}`} {...e} changeActiveBtn={this.props.changeActiveBtn} onSelect={this.props.onSelect} onTrade={this.props.onTrade} />);
     if (this.props.isShort)
@@ -146,7 +146,9 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
         {tokenRowsMobile && tokenRowsMobile.map(row => {
           return (<div className="trade-token-grid-row-wrapper" key={`${row.props.asset}_${row.props.positionType}`}>
             {row}
-            <InnerOwnTokenGrid onManageCollateralOpen={this.props.onManageCollateralOpen} positionType={row.props.positionType} asset={row.props.asset} {...this.props} />
+            {this.state.ownRowsData
+              .filter(e => e.currentKey.positionType === row.props.positionType)
+              .map((e) => <InnerOwnTokenGrid key={`${e.currentKey.positionType}`} positionType={this.props.selectedKey.positionType} asset={this.props.selectedKey.asset} onManageCollateralOpen={this.props.onManageCollateralOpen} getOwnRowsData={this.props.getOwnRowsData} onSelect={this.props.onSelect} onTrade={this.props.onTrade} {...tradeTokenGridProps} />)}
           </div>)
         })}
       </div>

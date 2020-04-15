@@ -1,0 +1,264 @@
+:root {
+  @media screen and (min-width: $breakpoint-mobile-min) {
+    --font-size-header: 12px;
+    --font-size-row: 22px;
+    --font-size-button: 16px;
+    --width-col-token-image: 13%;
+    --width-col-token-name-full: 13%;
+    --width-col-position-type: 10%;
+    --width-col-asset-price: 13%;
+    --width-col-asset-value: 12%;
+    --width-col-liquidation-price: 13%;
+    --width-col-position-value: 13%;
+    --width-col-profit: 11%;
+    --width-col-asset-type: 10%;
+    --width-col-asset-collateral: 12%;
+    --width-col-actions: 15%;
+    --width-button: 110px;
+    --height-button: 44px;
+    --padding: 22px 40px 35px 40px;
+  }
+
+  @media screen and (max-width: $breakpoint-mobile-max) {
+    --font-size-header: 12px;
+    --font-size-row: 16px;
+    --font-size-button: 14px;
+    --width-col-token-image: 33%;
+    --width-col-token-name-full: 33%;
+    --width-col-position-type: 33%;
+    --width-col-asset-price: 33%;
+    --width-col-asset-value: 33%;
+    --width-col-liquidation-price: 33%;
+    --width-col-position-value: 33%;
+    --width-col-profit: 33%;
+    --width-col-asset-type: 33%;
+    --width-col-asset-collateral: 67%;
+    --width-col-actions: 33%;
+    --width-button: 90px;
+    --height-button: 33px;
+    --padding: 15px 15px 30px 15px;
+  }
+}
+@mixin inner-own-token-grid-header__col {
+  font-family: "Muli", sans-serif;
+  vertical-align: middle;
+  font-size: var(--font-size-header);
+  font-weight: 600;
+  font-style: normal;
+  font-stretch: normal;
+  letter-spacing: normal;
+  color: #a2abb8;
+}
+@mixin inner-own-token-grid-row__col {
+  font-family: "Muli", sans-serif;
+  font-size: var(--font-size-row);
+  font-weight: 800;
+  color: var(--primary-text);
+  font-style: normal;
+  font-stretch: normal;
+  line-height: 1.5;
+  display: flex;
+  flex-wrap: wrap;
+}
+.inner-own-token-grid {
+  .inner-own-token-grid-header {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 17px 40px 0px 40px;
+    font-family: "Muli", sans-serif;
+    background-color: var(--secondary-row);
+    margin-bottom: -15px;
+    position: relative;
+    z-index: 2;
+    &__col-token-image {
+      @include inner-own-token-grid-header__col();
+      width: var(--width-col-token-image);
+    }
+    &__col-asset-type {
+      @include inner-own-token-grid-header__col();
+      width: var(--width-col-asset-type);
+    }
+    &__col-asset-price {
+      @include inner-own-token-grid-header__col();
+      width: var(--width-col-asset-price);
+    }
+    &__col-asset-value {
+      @include inner-own-token-grid-header__col();
+      width: var(--width-col-asset-value);
+    }
+    &__col-asset-collateral {
+      @include inner-own-token-grid-header__col();
+      width: var(--width-col-asset-collateral);
+    }
+    &__col-liquidation-price {
+      @include inner-own-token-grid-header__col();
+      width: var(--width-col-liquidation-price);
+    }
+    &__col-position-value {
+      @include inner-own-token-grid-header__col();
+      width: var(--width-col-position-value);
+    }
+    &__col-profit {
+      @include inner-own-token-grid-header__col();
+      width: var(--width-col-profit);
+    }
+    &__col-actions {
+      @include inner-own-token-grid-header__col();
+      width: var(--width-col-actions);
+      text-align: right;
+    }
+  }
+
+  .inner-own-token-grid-row,
+  .inner-own-token-card-mobile {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    background-color: var(--secondary-row);
+    padding: var(--padding);
+    margin-bottom: 1px;
+    position: relative;
+    .sign-currency {
+      color: #a2abb8;
+      font-weight: 400;
+    }
+    .inner-own-token-card-mobile__body-row {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      .inner-own-token-header {
+        width: 100%;
+        font-size: 10px;
+        font-weight: 600;
+        line-height: 1.5;
+        color: #a2abb8;
+        margin-bottom: 3px;
+      }
+    }
+    &__col-token-name-full {
+      @include inner-own-token-grid-row__col();
+      width: var(--width-col-token-name-full);
+      @media screen and (max-width: $breakpoint-mobile-max) {
+        margin-bottom: 25px;
+      }
+    }
+    &__col-position-type {
+      @include inner-own-token-grid-row__col();
+      width: var(--width-col-position-type);
+    }
+    &__col-asset-price {
+      @include inner-own-token-grid-row__col();
+      width: var(--width-col-asset-price);
+      position: relative;
+      @media screen and (max-width: $breakpoint-mobile-max) {
+        margin-bottom: 35px;
+      }
+    }
+    &__col-asset-price-small {
+      position: absolute;
+      font-size: 12px;
+      font-weight: 700;
+      text-indent: 13px;
+      color: #1cd8c4;
+      top: 100%;
+      @media screen and (max-width: $breakpoint-mobile-max) {
+        text-indent: 10px;
+      }
+    }
+    &__col-asset-value {
+      @include inner-own-token-grid-row__col();
+      width: var(--width-col-asset-value);
+    }
+    &__col-asset-type {
+      @include inner-own-token-grid-row__col();
+      width: var(--width-col-asset-type);
+      @media screen and (max-width: $breakpoint-mobile-max) {
+        margin-bottom: 25px;
+      }
+    }
+    &__col-liquidation-price {
+      @include inner-own-token-grid-row__col();
+      width: var(--width-col-liquidation-price);
+    }
+    &__col-position-value {
+      @include inner-own-token-grid-row__col();
+      width: var(--width-col-position-value);
+    }
+    &__col-asset-collateral {
+      @include inner-own-token-grid-row__col();
+      align-items: center;
+      position: relative;
+      width: var(--width-col-asset-collateral);
+      @media screen and (max-width: $breakpoint-mobile-max) {
+        margin-bottom: 35px;
+      }
+    }
+    &__col-asset-collateral-small {
+      position: absolute;
+      font-size: 12px;
+      font-weight: 700;
+      text-indent: 13px;
+      color: #ff4f4f;
+      top: 100%;
+    }
+    &__open-manage-collateral {
+      background-color: var(--bg-icon-collateral);
+      width: 26px;
+      height: 26px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      margin-left: 10px;
+      cursor: pointer;
+      .icon-collateral {
+        fill: var(--icon-collateral);
+      }
+    }
+    &__col-profit {
+      @include inner-own-token-grid-row__col();
+      width: var(--width-col-profit);
+    }
+    &__col-action {
+      @include inner-own-token-grid-row__col();
+      display: flex;
+      justify-content: flex-end;
+      width: var(--width-col-actions);
+      @media screen and (max-width: $breakpoint-mobile-max) {
+        margin-bottom: 25px;
+      }
+    }
+    &_button {
+      width: var(--width-button);
+      height: var(--height-button);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: "Muli", sans-serif;
+      font-size: var(--font-size-button);
+      line-height: 1.5;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      border: 0;
+      border-radius: 43px;
+      text-transform: uppercase;
+      font-style: normal;
+      color: #ffffff;
+      outline: none;
+      &:not(:disabled) {
+        cursor: pointer;
+      }
+      &:disabled {
+        background-color: var(--disabled-bg);
+        color: var(--disabled-color);
+        cursor: not-allowed;
+      }
+    }
+    &__sell-button {
+      background-color: #ff4f4f;
+      &:hover {
+        background-color: #fe7272;
+      }
+    }
+  }
+}
