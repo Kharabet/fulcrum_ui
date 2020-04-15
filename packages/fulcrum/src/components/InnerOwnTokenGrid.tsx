@@ -15,24 +15,12 @@ import { BigNumber } from "@0x/utils";
 import { InnerOwnTokenCardMobile } from "./InnerOwnTokenCardMobile"; 
 import { throwIfEmpty } from "rxjs/operators";
 
-export interface IInnerOwnTokenGridProps {
-  showMyTokensOnly: boolean;
-  selectedKey: TradeTokenKey;
-
-  asset?: Asset;
-  positionType?: PositionType;
-
-  onSelect: (key: TradeTokenKey) => void;
-  onTrade: (request: TradeRequest) => void;
-  onManageCollateralOpen: (request: ManageCollateralRequest) => void;
- 
+export interface IInnerOwnTokenGridProps { 
   isMobileMedia: boolean;
-  getOwnRowsData: Promise<IInnerOwnTokenGridRowProps[]>;
+  ownRowsData: IInnerOwnTokenGridRowProps[];
 }
 
 interface IInnerOwnTokenGridState {
-  innerOwnRowsData: IInnerOwnTokenGridRowProps[];
-  isShowHistory: boolean;
 }
 
 export class InnerOwnTokenGrid extends Component<IInnerOwnTokenGridProps, IInnerOwnTokenGridState> {
@@ -40,23 +28,15 @@ export class InnerOwnTokenGrid extends Component<IInnerOwnTokenGridProps, IInner
     super(props);
     this._isMounted = false;
     this.state = {
-      innerOwnRowsData: [],
-      isShowHistory: false
     };
 
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.TradeTransactionMined, this.onTradeTransactionMined);
-
-    this.onShowHistory = this.onShowHistory.bind(this);
-    this.onShowOpenPositions = this.onShowOpenPositions.bind(this);
   }
 
   private _isMounted: boolean;
 
   public async derivedUpdate() {
-    const innerOwnRowsData = await this.props.getOwnRowsData;
-
-    this._isMounted && this.setState({ ...this.state, innerOwnRowsData: innerOwnRowsData });
   }
 
   public componentWillUnmount(): void {
@@ -80,13 +60,6 @@ export class InnerOwnTokenGrid extends Component<IInnerOwnTokenGridProps, IInner
     prevState: Readonly<IInnerOwnTokenGridState>,
     snapshot?: any
   ): void {
-    if (
-      this.props.selectedKey !== prevProps.selectedKey ||
-      this.props.showMyTokensOnly !== prevProps.showMyTokensOnly ||
-      this.state.innerOwnRowsData !== prevState.innerOwnRowsData
-    ) {
-      this.derivedUpdate();
-    }
   }
 
   public render() {
@@ -96,19 +69,19 @@ export class InnerOwnTokenGrid extends Component<IInnerOwnTokenGridProps, IInner
   }
 
   private renderDesktop = () => {
-    const innerOwnRowsData = this.state.innerOwnRowsData.map(e => <InnerOwnTokenGridRow key={`${e.currentKey.toString()}`}  {...e} onManageCollateralOpen={this.props.onManageCollateralOpen} onSelect={this.props.onSelect} onTrade={this.props.onTrade} />);
+    const innerOwnRowsData = this.props.ownRowsData.map(e => <InnerOwnTokenGridRow key={`${e.currentKey.toString()}`}  {...e} />);
     if (innerOwnRowsData.length === 0) return null;
 
     return (
       <div className="inner-own-token-grid">
-        <InnerOwnTokenGridHeader asset={this.props.asset} />
+        <InnerOwnTokenGridHeader asset={this.props.ownRowsData[0].currentKey.asset} />
         {innerOwnRowsData}
       </div>
     );
   }
 
   private renderMobile = () => {
-    const innerOwnRowsDataMobile = this.state.innerOwnRowsData.map(e => <InnerOwnTokenCardMobile onManageCollateralOpen={this.props.onManageCollateralOpen} key={`${e.currentKey.toString()}`} {...e} onSelect={this.props.onSelect} onTrade={this.props.onTrade} />);
+    const innerOwnRowsDataMobile = this.props.ownRowsData.map(e => <InnerOwnTokenCardMobile key={`${e.currentKey.toString()}`} {...e} />);
     if (innerOwnRowsDataMobile.length === 0) return null;
 
     return (
@@ -117,23 +90,7 @@ export class InnerOwnTokenGrid extends Component<IInnerOwnTokenGridProps, IInner
       </div>
     );
   }
-  public onSellClick = (event: React.MouseEvent<HTMLElement>) => {
-    event.stopPropagation();
-
-    this.props.onTrade(
-      new TradeRequest(
-        TradeType.SELL,
-        this.props.selectedKey.asset,
-        this.props.selectedKey.unitOfAccount,
-        this.props.selectedKey.positionType === PositionType.SHORT ? this.props.selectedKey.asset : Asset.USDC,
-        this.props.selectedKey.positionType,
-        this.props.selectedKey.leverage,
-        new BigNumber(0),
-        this.props.selectedKey.isTokenized,
-        this.props.selectedKey.version
-      )
-    );
-  };
+  
 
   private onProviderChanged = async (event: ProviderChangedEvent) => {
     await this.derivedUpdate();
@@ -141,12 +98,5 @@ export class InnerOwnTokenGrid extends Component<IInnerOwnTokenGridProps, IInner
 
   private onTradeTransactionMined = async (event: TradeTransactionMinedEvent) => {
     await this.derivedUpdate();
-  };
-  private onShowHistory = () => {
-    this._isMounted && this.setState({ ...this.state, isShowHistory: true });
-  };
-
-  private onShowOpenPositions = () => {
-    this._isMounted && this.setState({ ...this.state, isShowHistory: false });
   };
 }

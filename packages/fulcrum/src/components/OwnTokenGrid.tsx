@@ -11,26 +11,10 @@ import { HistoryTokenGridHeader } from "./HistoryTokenGridHeader";
 import { IOwnTokenGridRowProps, OwnTokenGridRow } from "./OwnTokenGridRow";
 import { HistoryTokenGridRow } from "./HistoryTokenGridRow";
 import { OwnTokenCardMobile } from "./OwnTokenCardMobile";
-import { TradeType } from "../domain/TradeType";
-import { Asset } from "../domain/Asset";
-import { PositionType } from "../domain/PositionType";
-import { BigNumber } from "@0x/utils";
-import { ReactComponent as OpenManageCollateral } from "../assets/images/openManageCollateral.svg";
 
 export interface IOwnTokenGridProps {
-  showMyTokensOnly: boolean;
-  selectedKey: TradeTokenKey;
-
-  asset?: Asset;
-  positionType?: PositionType;
-  // onDetails: (key: TradeTokenKey) => void;
-  // onManageCollateral: (request: ManageCollateralRequest) => void;
-  onSelect: (key: TradeTokenKey) => void;
-  onTrade: (request: TradeRequest) => void;
-  onManageCollateralOpen: (request: ManageCollateralRequest) => void;
-
   isMobileMedia: boolean;
-  getOwnRowsData: Promise<IOwnTokenGridRowProps[]>;
+  getOwnRowsData: IOwnTokenGridRowProps[];
 }
 
 interface IOwnTokenGridState {
@@ -83,8 +67,6 @@ export class OwnTokenGrid extends Component<IOwnTokenGridProps, IOwnTokenGridSta
     snapshot?: any
   ): void {
     if (
-      this.props.selectedKey !== prevProps.selectedKey ||
-      this.props.showMyTokensOnly !== prevProps.showMyTokensOnly ||
       this.state.ownRowsData !== prevState.ownRowsData
     ) {
       this.derivedUpdate();
@@ -98,8 +80,8 @@ export class OwnTokenGrid extends Component<IOwnTokenGridProps, IOwnTokenGridSta
   }
 
   private renderDesktop = () => {
-    const ownRows = this.state.ownRowsData.map(e => <OwnTokenGridRow key={`${e.currentKey.toString()}`} {...e} onManageCollateralOpen={this.props.onManageCollateralOpen} onSelect={this.props.onSelect} onTrade={this.props.onTrade} />);
-    const historyRows = this.state.ownRowsData.map(e => <HistoryTokenGridRow key={`${e.currentKey.toString()}`} {...e} onSelect={this.props.onSelect} onTrade={this.props.onTrade} />);
+    const ownRows = this.state.ownRowsData.map(e => <OwnTokenGridRow key={`${e.currentKey.toString()}`} {...e} />);
+    const historyRows = this.state.ownRowsData.map(e => <HistoryTokenGridRow key={`${e.currentKey.toString()}`} {...e} />);
     if (ownRows.length === 0) return null;
 
     return (
@@ -124,7 +106,7 @@ export class OwnTokenGrid extends Component<IOwnTokenGridProps, IOwnTokenGridSta
   }
 
   private renderMobile = () => {
-    const ownRows = this.state.ownRowsData.map(e => <OwnTokenCardMobile key={`${e.currentKey.toString()}`} {...e} onSelect={this.props.onSelect} onTrade={this.props.onTrade} />);
+    const ownRows = this.state.ownRowsData.map(e => <OwnTokenCardMobile key={`${e.currentKey.toString()}`} {...e} />);
     if (ownRows.length === 0) return null;
 
     return (
@@ -137,23 +119,6 @@ export class OwnTokenGrid extends Component<IOwnTokenGridProps, IOwnTokenGridSta
       </div>
     );
   }
-  public onSellClick = (event: React.MouseEvent<HTMLElement>) => {
-    event.stopPropagation();
-
-    this.props.onTrade(
-      new TradeRequest(
-        TradeType.SELL,
-        this.props.selectedKey.asset,
-        this.props.selectedKey.unitOfAccount,
-        this.props.selectedKey.positionType === PositionType.SHORT ? this.props.selectedKey.asset : Asset.USDC,
-        this.props.selectedKey.positionType,
-        this.props.selectedKey.leverage,
-        new BigNumber(0),
-        this.props.selectedKey.isTokenized,
-        this.props.selectedKey.version
-      )
-    );
-  };
 
   private onProviderChanged = async (event: ProviderChangedEvent) => {
     await this.derivedUpdate();

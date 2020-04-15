@@ -40,7 +40,7 @@ interface ITradePageState {
   assets: Asset[];
   showMyTokensOnly: boolean;
   selectedKey: TradeTokenKey;
-  selectedTab: Asset;
+  selectedTabAsset: Asset;
   isTradeModalOpen: boolean;
   tradeDataType: string,
   tradeType: TradeType;
@@ -65,19 +65,20 @@ interface ITradePageState {
   defaultLeverageShort: number;
   defaultLeverageLong: number;
   openPosition: number;
+  tokenRowsData: ITradeTokenGridRowProps[];
+  ownRowsData: IOwnTokenGridRowProps[];
 }
 
 export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
   static onSelect: (key: TradeTokenKey) => void;
   static onTradeRequested: (request: TradeRequest) => void;
   static changeActiveBtn: (activeType: string) => void;
-  static onManageCollateralOpen: (request: ManageCollateralRequest) => void;
   constructor(props: any) {
     super(props);
     this.state = {
       showMyTokensOnly: false,
       selectedKey: TradeTokenKey.empty(),
-      selectedTab: Asset.ETH,
+      selectedTabAsset: Asset.ETH,
       priceGraphData: [],
       isTradeModalOpen: false,
       tradeDataType: 'long',
@@ -98,7 +99,9 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
       defaultTokenizeNeeded: true,
       defaultLeverageShort: 1,
       defaultLeverageLong: 2,
-      openPosition: 0
+      openPosition: 0,
+      tokenRowsData: [],
+      ownRowsData: []
     };
     // let changeActiveBtn  = this.changeActiveBtn.bind(this);
 
@@ -145,6 +148,7 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
     if (!FulcrumProvider.Instance.web3Wrapper && (!provider || provider === "None")) {
       this.props.doNetworkConnect();
     }
+    this.derivedUpdate();
   }
 
   public componentDidUpdate(prevProps: Readonly<ITradePageProps>, prevState: Readonly<ITradePageState>, snapshot?: any): void {
@@ -154,8 +158,13 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
   }
 
   private async derivedUpdate() {
-    // const priceGraphData = await FulcrumProvider.Instance.getPriceDataPoints(this.state.selectedKey);
-    // this.setState({ ...this.state, selectedKey: this.state.selectedKey, priceGraphData: priceGraphData });
+    const tradeTokenRowsData = await this.getTokenRowsData(this.state);
+    const ownTokenRowsData = await this.getOwnRowsData(this.state);
+    this.setState({
+      ...this.state,
+      tokenRowsData: tradeTokenRowsData,
+      ownRowsData: ownTokenRowsData
+    });
   }
   public changeActiveBtn(activeType: string) {
     if (activeType == 'long') {
@@ -184,16 +193,11 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
             : null}
           <TokenGridTabs
             assets={this.state.assets}
-            selectedKey={this.state.selectedKey}
+            selectedTabAsset={this.state.selectedTabAsset}
             onShowMyTokensOnlyChange={this.onShowMyTokensOnlyChange}
             onTabSelect={this.onTabSelect}
             isMobile={this.props.isMobileMedia}
-            onSelect={this.onSelect}
             isShowMyTokensOnly={this.state.showMyTokensOnly}
-            defaultUnitOfAccount={this.state.tradeUnitOfAccount}
-            defaultLeverageShort={1}
-            defaultLeverageLong={2}
-            isLong={this.state.isLong}
             openPosition={this.state.openPosition}
           />
 
@@ -207,32 +211,19 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
           }
           {this.state.showMyTokensOnly ? (
             <OwnTokenGrid
-              showMyTokensOnly={this.state.showMyTokensOnly}
-              selectedKey={this.state.selectedKey}
               isMobileMedia={this.props.isMobileMedia}
-              // onDetails={this.onDetails}
-              // onManageCollateral={this.onManageCollateralRequested}
-              onSelect={this.onSelect}
-              onTrade={this.onTradeRequested}
-              onManageCollateralOpen={this.onManageCollateralRequestOpen}
-              getOwnRowsData={this.getOwnRowsData(this.state)}
+              getOwnRowsData={this.state.ownRowsData}
             />
           ) : (
-            
+
               <TradeTokenGrid
-                assets={this.state.assets}
+                selectedTabAsset={this.state.selectedTabAsset}
                 changeActiveBtn={this.changeActiveBtn.bind(this)}
                 isMobileMedia={this.props.isMobileMedia}
                 isLong={this.state.isLong}
                 isShort={this.state.isShort}
-                showMyTokensOnly={this.state.showMyTokensOnly}
-                selectedKey={this.state.selectedKey}
-                onSelect={this.onSelect}
-                onTrade={this.onTradeRequested}
-                defaultLeverage={this.state.tradeLeverage}
-                onManageCollateralOpen={this.onManageCollateralRequestOpen}
-                getTokenRowsData={this.getTokenRowsData(this.state)}
-                getOwnRowsData={this.getOwnRowsData(this.state)}
+                tokenRowsData={this.state.tokenRowsData.filter(e => e.asset === this.state.selectedTabAsset)}
+                ownRowsData={this.state.ownRowsData}
               />
             )}
           <Modal
@@ -312,7 +303,7 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
     await this.setState({ ...this.state, selectedKey: key });
   };
   public onTabSelect = async (asset: Asset) => {
-    this.setState({ ...this.state, selectedTab: asset });
+    await this.setState({ ...this.state, selectedTabAsset: asset });
   };
 
   public onDetails = async (key: TradeTokenKey) => {
@@ -436,9 +427,10 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
   public getOwnRowsData = async (state: ITradePageState): Promise<IOwnTokenGridRowProps[]> => {
     const ownRowsData: IOwnTokenGridRowProps[] = [];
     if (FulcrumProvider.Instance.web3Wrapper && FulcrumProvider.Instance.contractsSource && FulcrumProvider.Instance.contractsSource.canWrite) {
-      const pTokens = state.assets && state.tradePositionType
-        ? FulcrumProvider.Instance.getPTokensAvailable().filter(tradeToken => tradeToken.asset == state.selectedKey.asset && tradeToken.positionType == state.tradePositionType)
-        : FulcrumProvider.Instance.getPTokensAvailable()
+      // const pTokens = state.assets && state.tradePositionType
+      //   ? FulcrumProvider.Instance.getPTokensAvailable().filter(tradeToken => tradeToken.asset == state.selectedKey.asset && tradeToken.positionType == state.tradePositionType)
+      //   : FulcrumProvider.Instance.getPTokensAvailable()
+        const pTokens = FulcrumProvider.Instance.getPTokensAvailable();
       //const pTokens = FulcrumProvider.Instance.getPTokensAvailable();
       const pTokenAddreses: string[] = FulcrumProvider.Instance.getPTokenErc20AddressList();
       const pTokenBalances = await FulcrumProvider.Instance.getErc20BalancesOfUser(pTokenAddreses);
@@ -454,7 +446,7 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
           showMyTokensOnly: state.showMyTokensOnly,
           onSelect: TradePage.onSelect,
           onTrade: TradePage.onTradeRequested,
-          onManageCollateralOpen: TradePage.onManageCollateralOpen,
+          onManageCollateralOpen: this.onManageCollateralRequested,
         });
       }
     }
@@ -465,30 +457,30 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
   public getTokenRowsData = (state: ITradePageState): ITradeTokenGridRowProps[] => {
     const tokenRowsData: ITradeTokenGridRowProps[] = [];
     state.assets.forEach(e => {
-      if (state.selectedKey.asset === Asset.UNKNOWN || e == state.selectedKey.asset) {
-        tokenRowsData.push({
-          selectedKey: state.selectedKey,
-          asset: e,
-          defaultUnitOfAccount: state.defaultUnitOfAccount,
-          defaultTokenizeNeeded: true,
-          positionType: PositionType.LONG,
-          defaultLeverage: state.defaultLeverageLong,
-          changeActiveBtn: TradePage.changeActiveBtn,
-          onSelect: TradePage.onSelect,
-          onTrade: TradePage.onTradeRequested
-        });
-        tokenRowsData.push({
-          selectedKey: state.selectedKey,
-          asset: e,
-          defaultUnitOfAccount: state.defaultUnitOfAccount,
-          defaultTokenizeNeeded: true,
-          positionType: PositionType.SHORT,
-          defaultLeverage: state.defaultLeverageShort,
-          changeActiveBtn: TradePage.changeActiveBtn,
-          onSelect: TradePage.onSelect,
-          onTrade: TradePage.onTradeRequested
-        });
-      }
+      // if (state.selectedKey.asset === Asset.UNKNOWN || e == state.selectedKey.asset) {
+      tokenRowsData.push({
+        selectedKey: state.selectedKey,
+        asset: e,
+        defaultUnitOfAccount: state.defaultUnitOfAccount,
+        defaultTokenizeNeeded: true,
+        positionType: PositionType.LONG,
+        defaultLeverage: state.defaultLeverageLong,
+        changeActiveBtn: TradePage.changeActiveBtn,
+        onSelect: TradePage.onSelect,
+        onTrade: TradePage.onTradeRequested
+      });
+      tokenRowsData.push({
+        selectedKey: state.selectedKey,
+        asset: e,
+        defaultUnitOfAccount: state.defaultUnitOfAccount,
+        defaultTokenizeNeeded: true,
+        positionType: PositionType.SHORT,
+        defaultLeverage: state.defaultLeverageShort,
+        changeActiveBtn: TradePage.changeActiveBtn,
+        onSelect: TradePage.onSelect,
+        onTrade: TradePage.onTradeRequested
+      });
+      // }
     });
     return tokenRowsData;
   };
