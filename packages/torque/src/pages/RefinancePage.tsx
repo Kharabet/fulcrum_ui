@@ -9,7 +9,6 @@ import { HeaderOps } from "../layout/HeaderOps";
 import { Loader } from "../components/Loader";
 
 export interface IRefinancePageRouteParams {
-  walletTypeAbbr: string;
 }
 
 export interface IRefinancePageParams {

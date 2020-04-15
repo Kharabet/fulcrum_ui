@@ -14,7 +14,6 @@ import { Loader } from "../components/Loader";
 import { ProviderType } from "../domain/ProviderType";
 
 export interface IDashboardPageRouteParams {
-  walletTypeAbbr: string;
   walletAddress: string | undefined;
 }
 
