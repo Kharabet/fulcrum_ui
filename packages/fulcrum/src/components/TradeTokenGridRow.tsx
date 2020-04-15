@@ -29,7 +29,7 @@ export interface ITradeTokenGridRowProps {
   positionType: PositionType;
   defaultLeverage: number;
   defaultTokenizeNeeded: boolean;
-  changeActiveBtn: (activeType: string) => void;
+  
   onSelect: (key: TradeTokenKey) => void;
   onTrade: (request: TradeRequest) => void;
 }

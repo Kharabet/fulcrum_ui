@@ -17,19 +17,11 @@ import siteConfig from "../config/SiteConfig.json";
 
 import { LeverageSelector } from "./LeverageSelector";
 import { Preloader } from "./Preloader";
+import { ITradeTokenGridRowProps } from "./TradeTokenGridRow";
 
 
-export interface ITradeTokenCardMobileProps {
-  selectedKey: TradeTokenKey;
-
-  asset: Asset;
-  defaultUnitOfAccount: Asset;
-  positionType: PositionType;
-  defaultTokenizeNeeded: boolean;
-  changeActiveBtn: (activeType: string) => void;
-
-  onSelect: (key: TradeTokenKey) => void;
-  onTrade: (request: TradeRequest) => void;
+export interface ITradeTokenCardMobileProps extends ITradeTokenGridRowProps{
+  changeGridPositionType: (activePositionType: PositionType) => void;
 }
 
 interface ITradeTokenCardMobileState {
@@ -37,7 +29,6 @@ interface ITradeTokenCardMobileState {
   leverage: number;
   version: number;
 
-  isLong: boolean;
   latestPriceDataPoint: IPriceDataPoint;
   interestRate: BigNumber;
   balance: BigNumber;
@@ -53,7 +44,6 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
     this._isMounted = false;
     this.state = {
       leverage: this.props.positionType === PositionType.SHORT ? 1 : 2,
-      isLong: this.props.positionType === PositionType.LONG,
       assetDetails: assetDetails || null,
       latestPriceDataPoint: FulcrumProvider.Instance.getPriceDefaultDataPoint(),
       interestRate: new BigNumber(0),
@@ -173,10 +163,10 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
             <PositionTypeMarkerAlt assetDetails={this.state.assetDetails} value={this.props.positionType} />
           </div>
           <div className="poisition-type-switch">
-            <button className={"" + (this.state.isLong ? 'btn-active' : '')} onClick={() => this.props.changeActiveBtn('long')}>
+            <button className={"" + (this.props.positionType === PositionType.LONG ? 'btn-active' : '')} onClick={() => this.props.changeGridPositionType(PositionType.LONG)}>
               Long
           </button>
-            <button className={"" + (!this.state.isLong ? 'btn-active' : '')} onClick={() => this.props.changeActiveBtn('short')}>
+            <button className={"" + (this.props.positionType === PositionType.SHORT ? 'btn-active' : '')} onClick={() => this.props.changeGridPositionType(PositionType.SHORT)}>
               Short
           </button>
           </div>
