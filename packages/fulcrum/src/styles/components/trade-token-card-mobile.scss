@@ -1,9 +1,11 @@
 .trade-token-card-mobile__wrapper {
     font-family: 'Muli', sans-serif;
-    padding: 15px;
+    padding: 0;
+    margin-bottom: 15px;
 }
 
 .trade-token-card-mobile {
+    margin-bottom: 1px;
     &__header {
         padding: 15px 10px;
 

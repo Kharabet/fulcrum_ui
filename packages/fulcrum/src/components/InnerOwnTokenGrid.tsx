@@ -8,11 +8,12 @@ import { TradeTransactionMinedEvent } from "../services/events/TradeTransactionM
 import { FulcrumProvider } from "../services/FulcrumProvider";
 import { InnerOwnTokenGridHeader } from "./InnerOwnTokenGridHeader";
 import { IInnerOwnTokenGridRowProps, InnerOwnTokenGridRow } from "./InnerOwnTokenGridRow";
-import { OwnTokenCardMobile } from "./OwnTokenCardMobile";
 import { TradeType } from "../domain/TradeType";
 import { Asset } from "../domain/Asset";
 import { PositionType } from "../domain/PositionType";
 import { BigNumber } from "@0x/utils";
+import { InnerOwnTokenCardMobile } from "./InnerOwnTokenCardMobile"; 
+import { throwIfEmpty } from "rxjs/operators";
 
 export interface IInnerOwnTokenGridProps {
   showMyTokensOnly: boolean;
@@ -95,24 +96,20 @@ export class InnerOwnTokenGrid extends Component<IInnerOwnTokenGridProps, IInner
     if (innerOwnRowsData.length === 0) return null;
 
     return (
-      <div className="own-token-grid-inner">
-        <InnerOwnTokenGridHeader />
+      <div className="inner-own-token-grid">
+        <InnerOwnTokenGridHeader asset={this.props.asset} />
         {innerOwnRowsData}
       </div>
     );
   }
 
   private renderMobile = () => {
-    const innerOwnRowsData = this.state.innerOwnRowsData.map(e => <OwnTokenCardMobile key={`${e.currentKey.toString()}`} {...e} onSelect={this.props.onSelect} onTrade={this.props.onTrade} />);
-    if (innerOwnRowsData.length === 0) return null;
+    const innerOwnRowsDataMobile = this.state.innerOwnRowsData.map(e => <InnerOwnTokenCardMobile onManageCollateralOpen={this.props.onManageCollateralOpen} key={`${e.currentKey.toString()}`} {...e} onSelect={this.props.onSelect} onTrade={this.props.onTrade} />);
+    if (innerOwnRowsDataMobile.length === 0) return null;
 
     return (
-      <div className="own-token-cards">
-        <div className="own-token-cards__header">Manage</div>
-        <div className="own-token-cards__container">
-          {innerOwnRowsData}
-        </div>
-
+      <div className="inner-own-token-grid">
+        {innerOwnRowsDataMobile}
       </div>
     );
   }
