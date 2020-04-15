@@ -30,7 +30,7 @@ export interface IOwnTokenGridProps {
   onManageCollateralOpen: (request: ManageCollateralRequest) => void;
 
   isMobileMedia: boolean;
-  getOwnRowsData: Promise<IOwnTokenGridRowProps[]>;
+  ownRowsData: IOwnTokenGridRowProps[];
 }
 
 interface IOwnTokenGridState {
@@ -56,7 +56,7 @@ export class OwnTokenGrid extends Component<IOwnTokenGridProps, IOwnTokenGridSta
   private _isMounted: boolean;
 
   public async derivedUpdate() {
-    const ownRowsData = await this.props.getOwnRowsData;
+    const ownRowsData = await this.props.ownRowsData;
     this._isMounted && this.setState({ ...this.state, ownRowsData: ownRowsData });
   }
 

@@ -15,7 +15,7 @@ export interface ITokenGridTabsProps {
   defaultLeverageShort: number;
   defaultLeverageLong: number;
   isLong: boolean;
-  openPosition: number;
+  openedPositionsCount: number;
   onSelect: (key: TradeTokenKey) => void;
 
   onTabSelect: (key: Asset) => void;
@@ -106,7 +106,7 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
               <div className={`trade-token-grid-tab-item__col-token-image wallet-img-div`} >
                 {<WalletSvg />}
                 <span>Manage</span>
-                <span className="count-open-position">{this.props.openPosition}</span>
+                <span className="count-open-position">{this.props.openedPositionsCount}</span>
               </div>
             </div>
           </div>

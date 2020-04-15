@@ -31,8 +31,8 @@ export interface ITradeTokenGridProps {
   changeActiveBtn: (activeType: string) => void;
   isLong: boolean;
   isShort: boolean;
-  getTokenRowsData: ITradeTokenGridRowProps[];
-  getOwnRowsData: Promise<IOwnTokenGridRowProps[]>;
+  tokenRowsData: ITradeTokenGridRowProps[];
+  ownRowsData: IOwnTokenGridRowProps[];
 }
 
 interface ITradeTokenGridState {
@@ -58,7 +58,7 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
 
     this._isMounted = false;
     this.state = {
-      tokenRowsData: props.getTokenRowsData,
+      tokenRowsData: props.tokenRowsData,
       ownRowsData: [],
       balance: new BigNumber(0)
     };
@@ -69,9 +69,9 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
   private _isMounted: boolean;
 
   public async derivedUpdate() {
-    const ownRowsData = await this.props.getOwnRowsData;
-    const tokenRowsData = this.props.getTokenRowsData;
-    await this._isMounted && this.setState({ ...this.state, tokenRowsData: tokenRowsData, ownRowsData: ownRowsData });
+    const ownRowsData = await this.props.ownRowsData;
+    const tokenRowsData = this.props.tokenRowsData;
+    await this._isMounted && this.setState({ ...this.state, tokenRowsData: tokenRowsData});
   }
 
   public componentWillUnmount(): void {
@@ -96,7 +96,8 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
 
   public componentDidUpdate(prevProps: Readonly<ITradeTokenGridProps>, prevState: Readonly<ITradeTokenGridState>, snapshot?: any): void {
     if (this.props.isLong !== prevProps.isLong) {
-      this._isMounted && this.setState({ ...this.state, tokenRowsData: this.props.getTokenRowsData });
+      const tokenRowsData = this.props.tokenRowsData;
+      this._isMounted && this.setState({ ...this.state, tokenRowsData: tokenRowsData });
     }
 
     if (this.props.selectedKey !== prevProps.selectedKey || this.props.showMyTokensOnly !== prevProps.showMyTokensOnly || this.state.ownRowsData !== prevState.ownRowsData) {
@@ -126,7 +127,7 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
               {row}
               {this.state.ownRowsData
                 .filter(e => e.currentKey.positionType === row.props.positionType)
-                .map(() => <InnerOwnTokenGrid positionType={this.props.selectedKey.positionType} asset={this.props.selectedKey.asset} onManageCollateralOpen={this.props.onManageCollateralOpen} getOwnRowsData={this.props.getOwnRowsData} onSelect={this.props.onSelect} onTrade={this.props.onTrade} {...tradeTokenGridProps} />)}
+                .map(() => <InnerOwnTokenGrid positionType={this.props.selectedKey.positionType} asset={this.props.selectedKey.asset} onManageCollateralOpen={this.props.onManageCollateralOpen} onSelect={this.props.onSelect} ownRowsData={this.state.ownRowsData} onTrade={this.props.onTrade} {...tradeTokenGridProps} />)}
             </div>)
           })}
         </div>
@@ -148,7 +149,7 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
             {row}
             {this.state.ownRowsData
               .filter(e => e.currentKey.positionType === row.props.positionType)
-              .map((e) => <InnerOwnTokenGrid key={`${e.currentKey.positionType}`} positionType={this.props.selectedKey.positionType} asset={this.props.selectedKey.asset} onManageCollateralOpen={this.props.onManageCollateralOpen} getOwnRowsData={this.props.getOwnRowsData} onSelect={this.props.onSelect} onTrade={this.props.onTrade} {...tradeTokenGridProps} />)}
+              .map((e) => <InnerOwnTokenGrid key={`${e.currentKey.positionType}`} positionType={this.props.selectedKey.positionType} asset={this.props.selectedKey.asset} onManageCollateralOpen={this.props.onManageCollateralOpen} onSelect={this.props.onSelect} onTrade={this.props.onTrade} {...tradeTokenGridProps} />)}
           </div>)
         })}
       </div>
