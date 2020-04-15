@@ -15,6 +15,7 @@ import { FulcrumProvider } from "../services/FulcrumProvider";
 
 import { Preloader } from "./Preloader";
 import { ReactComponent as OpenManageCollateral } from "../assets/images/openManageCollateral.svg";
+import { ManageCollateralRequest } from "../domain/ManageCollateralRequest";
 
 export interface IInnerOwnTokenCardMobileProps {
   selectedKey: TradeTokenKey;
@@ -23,7 +24,7 @@ export interface IInnerOwnTokenCardMobileProps {
 
   onSelect: (key: TradeTokenKey) => void;
   onTrade: (request: TradeRequest) => void;
-  onManageCollateralOpen: () => void;
+  onManageCollateralOpen: (request: ManageCollateralRequest) => void;
 }
 
 interface IInnerOwnTokenCardMobileState {
@@ -220,7 +221,20 @@ export class InnerOwnTokenCardMobile extends Component<IInnerOwnTokenCardMobileP
   public onManageClick = (event: React.MouseEvent<HTMLElement>) => {
     event.stopPropagation();
 
-    this.props.onManageCollateralOpen();
+    this.props.onManageCollateralOpen(
+      new ManageCollateralRequest(
+        new BigNumber(0),
+        TradeType.BUY,
+        this.props.currentKey.asset,
+        this.props.currentKey.unitOfAccount,
+        this.props.currentKey.positionType === PositionType.SHORT ? this.props.currentKey.asset : Asset.USDC,
+        this.props.currentKey.positionType,
+        this.props.currentKey.leverage,
+        new BigNumber(0),
+        this.props.currentKey.isTokenized,
+        this.props.currentKey.version
+      )
+    );
   };
 
   public onSellClick = (event: React.MouseEvent<HTMLElement>) => {
