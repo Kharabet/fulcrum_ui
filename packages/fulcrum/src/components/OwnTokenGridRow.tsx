@@ -28,7 +28,7 @@ export interface IOwnTokenGridRowProps {
   // onManageCollateral: (request: ManageCollateralRequest) => void;
   onSelect: (key: TradeTokenKey) => void;
   onTrade: (request: TradeRequest) => void;
-  onManageCollateralOpen: (request: TradeRequest) => void;
+  onManageCollateralOpen: (request: ManageCollateralRequest) => void;
 }
 
 interface IOwnTokenGridRowState {
@@ -39,7 +39,6 @@ interface IOwnTokenGridRowState {
   profit: BigNumber | null;
   pTokenAddress: string;
   isLoading: boolean;
-  isManageColllateralOpen: boolean;
 }
 
 export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenGridRowState> {
@@ -56,8 +55,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
       assetBalance: new BigNumber(0),
       profit: new BigNumber(0),
       pTokenAddress: "",
-      isLoading: true,
-      isManageColllateralOpen: false
+      isLoading: true
     };
 
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
@@ -127,6 +125,9 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.TradeTransactionMined, this.onTradeTransactionMined);
+  }
+  public componentWillMount(): void {
+    this.derivedUpdate();
   }
 
   public componentDidMount(): void {
@@ -272,18 +273,20 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
   public onManageClick = (event: React.MouseEvent<HTMLElement>) => {
     event.stopPropagation();
 
-    this.props.onManageCollateralOpen(new TradeRequest(
-      TradeType.SELL,
-      this.props.currentKey.asset,
-      this.props.currentKey.unitOfAccount,
-      this.props.currentKey.positionType === PositionType.SHORT ? this.props.currentKey.asset : Asset.USDC,
-      this.props.currentKey.positionType,
-      this.props.currentKey.leverage,
-      new BigNumber(0),
-      this.props.currentKey.isTokenized,
-      this.props.currentKey.version
-    ));
-    // this.props.onManageCollateral(new ManageCollateralRequest(new BigNumber(0)));
+    this.props.onManageCollateralOpen(
+      new ManageCollateralRequest(
+        new BigNumber(0),
+        TradeType.BUY,
+        this.props.currentKey.asset,
+        this.props.currentKey.unitOfAccount,
+        this.props.currentKey.positionType === PositionType.SHORT ? this.props.currentKey.asset : Asset.USDC,
+        this.props.currentKey.positionType,
+        this.props.currentKey.leverage,
+        new BigNumber(0),
+        this.props.currentKey.isTokenized,
+        this.props.currentKey.version
+      )
+    );
   };
 
   public onSellClick = (event: React.MouseEvent<HTMLElement>) => {

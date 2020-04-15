@@ -20,9 +20,11 @@ export interface IInnerOwnTokenGridProps {
 
   asset?: Asset;
   positionType?: PositionType;
+
   onSelect: (key: TradeTokenKey) => void;
   onTrade: (request: TradeRequest) => void;
-  onManageCollateralOpen: (request: TradeRequest) => void;
+  onManageCollateralOpen: (request: ManageCollateralRequest) => void;
+ 
   isMobileMedia: boolean;
   getOwnRowsData: Promise<IInnerOwnTokenGridRowProps[]>;
 }
@@ -62,9 +64,11 @@ export class InnerOwnTokenGrid extends Component<IInnerOwnTokenGridProps, IInner
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.TradeTransactionMined, this.onTradeTransactionMined);
   }
+
   public componentWillMount(): void {
     this.derivedUpdate();
   }
+
   public componentDidMount(): void {
     this._isMounted = true;
     this.derivedUpdate();
@@ -91,7 +95,7 @@ export class InnerOwnTokenGrid extends Component<IInnerOwnTokenGridProps, IInner
   }
 
   private renderDesktop = () => {
-    const innerOwnRowsData = this.state.innerOwnRowsData.map(e => <InnerOwnTokenGridRow onManageCollateralOpen={this.props.onManageCollateralOpen} key={`${e.currentKey.toString()}`}  {...e} onSelect={this.props.onSelect} onTrade={this.props.onTrade} />);
+    const innerOwnRowsData = this.state.innerOwnRowsData.map(e => <InnerOwnTokenGridRow key={`${e.currentKey.toString()}`}  {...e} onManageCollateralOpen={this.props.onManageCollateralOpen} onSelect={this.props.onSelect} onTrade={this.props.onTrade} />);
     if (innerOwnRowsData.length === 0) return null;
 
     return (

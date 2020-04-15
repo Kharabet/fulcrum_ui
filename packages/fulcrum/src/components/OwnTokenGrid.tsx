@@ -27,8 +27,9 @@ export interface IOwnTokenGridProps {
   // onManageCollateral: (request: ManageCollateralRequest) => void;
   onSelect: (key: TradeTokenKey) => void;
   onTrade: (request: TradeRequest) => void;
+  onManageCollateralOpen: (request: ManageCollateralRequest) => void;
+
   isMobileMedia: boolean;
-  onManageCollateralOpen: () => void;
   getOwnRowsData: Promise<IOwnTokenGridRowProps[]>;
 }
 
@@ -66,6 +67,10 @@ export class OwnTokenGrid extends Component<IOwnTokenGridProps, IOwnTokenGridSta
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.TradeTransactionMined, this.onTradeTransactionMined);
   }
 
+  public componentWillMount(): void {
+    this.derivedUpdate();
+  }
+
   public componentDidMount(): void {
     this._isMounted = true;
 
@@ -79,7 +84,8 @@ export class OwnTokenGrid extends Component<IOwnTokenGridProps, IOwnTokenGridSta
   ): void {
     if (
       this.props.selectedKey !== prevProps.selectedKey ||
-      this.props.showMyTokensOnly !== prevProps.showMyTokensOnly
+      this.props.showMyTokensOnly !== prevProps.showMyTokensOnly ||
+      this.state.ownRowsData !== prevState.ownRowsData
     ) {
       this.derivedUpdate();
     }

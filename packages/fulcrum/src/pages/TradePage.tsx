@@ -71,7 +71,7 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
   static onSelect: (key: TradeTokenKey) => void;
   static onTradeRequested: (request: TradeRequest) => void;
   static changeActiveBtn: (activeType: string) => void;
-  static onManageCollateralOpen: () => void;
+  static onManageCollateralOpen: (request: ManageCollateralRequest) => void;
   constructor(props: any) {
     super(props);
     this.state = {
@@ -218,6 +218,7 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
               getOwnRowsData={this.getOwnRowsData(this.state)}
             />
           ) : (
+            
               <TradeTokenGrid
                 assets={this.state.assets}
                 changeActiveBtn={this.changeActiveBtn.bind(this)}
@@ -363,7 +364,7 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
     });
   };
 
-  public onManageCollateralRequestOpen = (request: TradeRequest) => {
+  public onManageCollateralRequestOpen = (request: ManageCollateralRequest) => {
     this.setState({
       ...this.state,
       collateralToken: request.collateral,

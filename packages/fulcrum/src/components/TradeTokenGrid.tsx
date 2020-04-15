@@ -15,6 +15,7 @@ import { ITradeTokenGridRowProps, TradeTokenGridRow } from "./TradeTokenGridRow"
 import { ITradeTokenCardMobileProps, TradeTokenCardMobile } from "./TradeTokenCardMobile";
 import { InnerOwnTokenGrid } from "./InnerOwnTokenGrid";
 import { IOwnTokenGridRowProps } from "./OwnTokenGridRow";
+import { ManageCollateralRequest } from "../domain/ManageCollateralRequest";
 
 // import siteConfig from "./../config/SiteConfig.json";
 
@@ -26,7 +27,7 @@ export interface ITradeTokenGridProps {
   assets: Asset[];
   onSelect: (key: TradeTokenKey) => void;
   onTrade: (request: TradeRequest) => void;
-  onManageCollateralOpen: (request: TradeRequest) => void;
+  onManageCollateralOpen: (request: ManageCollateralRequest) => void;
   changeActiveBtn: (activeType: string) => void;
   isLong: boolean;
   isShort: boolean;
