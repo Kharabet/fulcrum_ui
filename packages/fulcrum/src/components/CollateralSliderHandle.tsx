@@ -37,22 +37,11 @@ export function CollateralSliderHandle({
         aria-valuemin={min}
         aria-valuemax={max}
         aria-valuenow={value}
+        className="collateral-slider-handle__slider"
         style={{
-          left: `${percent}%`,
-          position: "absolute",
-          transform: "translate(-50%, -50%)",
-          zIndex: 2,
-          width: "31px",
-          height: "31px",
-          border: "6px solid #444e5a",
-          borderRadius: "50%",
-          backgroundColor: "#276BFB"
+          left: `${percent}%`        
         }}>
-        <div
-          style={{
-            padding: "7px 9px",
-            transform: "scale(1.1)"
-          }}>
+        <div className="collateral-slider-handle__icon">
           <OpenManageCollateral /></div>
       </div>
     </Fragment>
