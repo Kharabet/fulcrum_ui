@@ -203,7 +203,7 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
           {!this.state.showMyTokensOnly
             ? <React.Fragment>
               <div className="chart-wrapper">
-                <TVChartContainer symbol={this.state.selectedKey.asset} preset={this.props.isMobileMedia ? "mobile" : undefined} />
+                <TVChartContainer symbol={this.state.selectedTabAsset} preset={this.props.isMobileMedia ? "mobile" : undefined} />
               </div>
             </React.Fragment>
             : null
