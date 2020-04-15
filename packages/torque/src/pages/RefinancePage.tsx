@@ -33,6 +33,7 @@ export class RefinancePage extends PureComponent<IRefinancePageParams & RouteCom
   public render() {
     const isMobileMedia = this.props.isMobileMedia;
     const isShowLoader = this.state.isShowLoader;
+    
     return (
       <React.Fragment>
         <div className="refinance-page">
@@ -49,7 +50,7 @@ export class RefinancePage extends PureComponent<IRefinancePageParams & RouteCom
             }
             {isMobileMedia
               ? <RefinanceAssetCompoundLoanMobile />
-              : <RefinanceAssetCompoundLoan />}
+              : <RefinanceAssetCompoundLoan doNetworkConnect={this.props.doNetworkConnect} />}
             {isMobileMedia
               ? <RefinanceAssetSelectorMobile updateStateShowLoader={this.updateStateShowLoader} />
               : <RefinanceAssetSelector updateStateShowLoader={this.updateStateShowLoader} />

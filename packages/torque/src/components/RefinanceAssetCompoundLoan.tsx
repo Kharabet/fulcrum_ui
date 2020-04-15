@@ -4,9 +4,11 @@ import { IRefinanceLoan } from "../domain/RefinanceData";
 import { TorqueProviderEvents } from "../services/events/TorqueProviderEvents";
 import { TorqueProvider } from "../services/TorqueProvider";
 import { RefinanceAssetCompoundLoanItem } from "./RefinanceAssetCompoundLoanItem";
+import { ProviderType } from "../domain/ProviderType";
 
 export interface IRefinanceAssetCompoundLoanProps {
 
+  doNetworkConnect: () => void;
   onSelectAsset?: (asset: Asset) => void;
 }
 
@@ -38,6 +40,12 @@ export class RefinanceAssetCompoundLoan extends Component<IRefinanceAssetCompoun
   }
 
   private derivedUpdate = async () => {
+    
+    if (TorqueProvider.Instance.providerType === ProviderType.None || !TorqueProvider.Instance.contractsSource || !TorqueProvider.Instance.contractsSource.canWrite) {
+      this.props.doNetworkConnect()
+      return;
+    }
+    
     // const refinanceCompoundData = await TorqueProvider.Instance.checkSoloMargin();
     const loans = await TorqueProvider.Instance.getCompoundLoans(); // TODO
 
