@@ -4,6 +4,11 @@ to = "https://app.fulcrum.trade/#/stats"
 status = 301
 force = false
 [[redirects]]
+from = "/stats"
+to = "https://app.fulcrum.trade/#/stats"
+status = 301
+force = false
+[[redirects]]
 from = "/artifacts"
 to = "https://artifacts.fulcrum.trade"
 status = 301
