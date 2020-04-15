@@ -20,7 +20,7 @@ import { Preloader } from "./Preloader";
 import { ITradeTokenGridRowProps } from "./TradeTokenGridRow";
 
 
-export interface ITradeTokenCardMobileProps extends ITradeTokenGridRowProps{
+export interface ITradeTokenCardMobileProps extends ITradeTokenGridRowProps {
   changeGridPositionType: (activePositionType: PositionType) => void;
 }
 
@@ -134,14 +134,7 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
     prevState: Readonly<ITradeTokenCardMobileState>,
     snapshot?: any
   ): void {
-    const currentTradeTokenKey = this.getTradeTokenGridRowSelectionKey(this.state.leverage);
-    const prevTradeTokenKey = this.getTradeTokenGridRowSelectionKeyRaw(prevProps, prevState.leverage);
-
-    if (
-      prevState.leverage !== this.state.leverage ||
-      (prevProps.selectedKey.toString() === prevTradeTokenKey.toString()) !==
-      (this.props.selectedKey.toString() === currentTradeTokenKey.toString())
-    ) {
+    if (prevState.leverage !== this.state.leverage) {
       this.derivedUpdate();
     }
   }
@@ -151,10 +144,9 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
       return null;
     }
 
-    const tradeTokenKey = this.getTradeTokenGridRowSelectionKey(this.state.leverage);
     const bnPrice = new BigNumber(this.state.latestPriceDataPoint.price);
     const bnLiquidationPrice = new BigNumber(this.state.latestPriceDataPoint.liquidationPrice);
-   
+
     return (
       <div className="trade-token-card-mobile">
         <div className="trade-token-card-mobile__header">
@@ -182,7 +174,11 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
                 onChange={this.onLeverageSelect}
               />
             </div>
-            {this.renderActions(this.state.balance.eq(0))}
+            <div className="trade-token-card-mobile__action">
+              <button className="trade-token-card-mobile____buy-button" disabled={siteConfig.TradeBuyDisabled} onClick={this.onBuyClick}>
+                {TradeType.BUY}
+              </button>
+            </div>
           </div>
           <div className="trade-token-card-mobile__body-row">
             <div title={`$${bnPrice.toFixed(18)}`} className="trade-token-card-mobile__price">
@@ -190,7 +186,7 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
               <span>
                 {!this.state.isLoading ?
                   <React.Fragment><span className="fw-normal">$</span>{bnPrice.toFixed(2)}</React.Fragment>
-                  : <Preloader width="74px"/>
+                  : <Preloader width="74px" />
                 }
               </span>
             </div>
@@ -199,7 +195,7 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
               <span>
                 {!this.state.isLoading ?
                   <React.Fragment><span className="fw-normal">$</span>{bnLiquidationPrice.toFixed(2)}</React.Fragment>
-                  : <Preloader width="74px"/>
+                  : <Preloader width="74px" />
                 }
               </span>
             </div>
@@ -208,7 +204,7 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
               <span>
                 {this.state.interestRate.gt(0) && !this.state.isLoading
                   ? <React.Fragment>{this.state.interestRate.toFixed(4)}<span className="fw-normal">%</span></React.Fragment>
-                  : <Preloader width="74px"/>
+                  : <Preloader width="74px" />
                 }
               </span>
             </div>
@@ -218,28 +214,10 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
     );
   }
 
-  private renderActions = (isBuyOnly: boolean) => {
-    return (
-      <div className="trade-token-card-mobile__action">
-        <button className="trade-token-card-mobile____buy-button" disabled={siteConfig.TradeBuyDisabled} onClick={this.onBuyClick}>
-          {TradeType.BUY}
-        </button>
-      </div>
-    )
-  };
-
   public onLeverageSelect = (value: number) => {
     const key = this.getTradeTokenGridRowSelectionKey(value);
 
     this._isMounted && this.setState({ ...this.state, leverage: value, version: key.version, isLoading: true });
-
-    this.props.onSelect(this.getTradeTokenGridRowSelectionKey(value));
-  };
-
-  public onSelectClick = (event: React.MouseEvent<HTMLElement>) => {
-    event.stopPropagation();
-
-    this.props.onSelect(this.getTradeTokenGridRowSelectionKey());
   };
 
   public onBuyClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -251,24 +229,6 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
         this.props.asset,
         this.props.defaultUnitOfAccount, // TODO: depends on which one they own
         Asset.ETH,
-        this.props.positionType,
-        this.state.leverage,
-        new BigNumber(0),
-        this.props.defaultTokenizeNeeded, // TODO: depends on which one they own
-        this.state.version
-      )
-    );
-  };
-
-  public onSellClick = (event: React.MouseEvent<HTMLElement>) => {
-    event.stopPropagation();
-
-    this.props.onTrade(
-      new TradeRequest(
-        TradeType.SELL,
-        this.props.asset,
-        this.props.defaultUnitOfAccount, // TODO: depends on which one they own
-        this.props.selectedKey.positionType === PositionType.SHORT ? this.props.selectedKey.asset : Asset.DAI,
         this.props.positionType,
         this.state.leverage,
         new BigNumber(0),

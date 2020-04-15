@@ -1,19 +1,11 @@
 import React, { Component } from "react";
-import { ManageCollateralRequest } from "../domain/ManageCollateralRequest";
-import { TradeRequest } from "../domain/TradeRequest";
-import { TradeTokenKey } from "../domain/TradeTokenKey";
 import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { TradeTransactionMinedEvent } from "../services/events/TradeTransactionMinedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
 import { InnerOwnTokenGridHeader } from "./InnerOwnTokenGridHeader";
 import { IInnerOwnTokenGridRowProps, InnerOwnTokenGridRow } from "./InnerOwnTokenGridRow";
-import { TradeType } from "../domain/TradeType";
-import { Asset } from "../domain/Asset";
-import { PositionType } from "../domain/PositionType";
-import { BigNumber } from "@0x/utils";
 import { InnerOwnTokenCardMobile } from "./InnerOwnTokenCardMobile"; 
-import { throwIfEmpty } from "rxjs/operators";
 
 export interface IInnerOwnTokenGridProps { 
   isMobileMedia: boolean;

@@ -1,24 +1,15 @@
-import { BigNumber } from "@0x/utils";
-import React, { ChangeEvent, Component } from "react";
-import TagManager from "react-gtm-module";
+import React, { Component } from "react";
 import { Asset } from "../domain/Asset";
 import { PositionType } from "../domain/PositionType";
-import { TradeRequest } from "../domain/TradeRequest";
-import { TradeTokenKey } from "../domain/TradeTokenKey";
-import { TradeType } from "../domain/TradeType";
 import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { TradeTransactionMinedEvent } from "../services/events/TradeTransactionMinedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
 import { TradeTokenGridHeader } from "./TradeTokenGridHeader";
 import { ITradeTokenGridRowProps, TradeTokenGridRow } from "./TradeTokenGridRow";
-import { ITradeTokenCardMobileProps, TradeTokenCardMobile } from "./TradeTokenCardMobile";
+import { TradeTokenCardMobile } from "./TradeTokenCardMobile";
 import { InnerOwnTokenGrid } from "./InnerOwnTokenGrid";
 import { IOwnTokenGridRowProps } from "./OwnTokenGridRow";
-import { ManageCollateralRequest } from "../domain/ManageCollateralRequest";
-import { OwnTokenGrid } from "./OwnTokenGrid";
-
-// import siteConfig from "./../config/SiteConfig.json";
 
 export interface ITradeTokenGridProps {
   selectedTabAsset: Asset;

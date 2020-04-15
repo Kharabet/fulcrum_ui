@@ -1,6 +1,5 @@
 import { BigNumber } from "@0x/utils";
 import React, { Component } from "react";
-import TagManager from "react-gtm-module";
 import { Asset } from "../domain/Asset";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
@@ -22,19 +21,15 @@ import { Preloader } from "./Preloader";
 
 
 export interface ITradeTokenGridRowProps {
-  selectedKey: TradeTokenKey;
 
   asset: Asset;
   defaultUnitOfAccount: Asset;
   positionType: PositionType;
   defaultLeverage: number;
   defaultTokenizeNeeded: boolean;
-  
-  onSelect: (key: TradeTokenKey) => void;
+
   onTrade: (request: TradeRequest) => void;
 }
-
-
 
 interface ITradeTokenGridRowState {
   assetDetails: AssetDetails | null;
@@ -147,14 +142,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
     prevState: Readonly<ITradeTokenGridRowState>,
     snapshot?: any
   ): void {
-    const currentTradeTokenKey = this.getTradeTokenGridRowSelectionKey(this.state.leverage);
-    const prevTradeTokenKey = this.getTradeTokenGridRowSelectionKeyRaw(prevProps, prevState.leverage);
-
-    if (
-      prevState.leverage !== this.state.leverage ||
-      (prevProps.selectedKey.toString() === prevTradeTokenKey.toString()) !==
-      (this.props.selectedKey.toString() === currentTradeTokenKey.toString())
-    ) {
+    if (prevState.leverage !== this.state.leverage) {
       this.derivedUpdate();
     }
   }
@@ -175,11 +163,9 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
     // bnLiquidationPrice = bnLiquidationPrice.div(1000);
 
     // const bnChange24h = new BigNumber(this.state.latestPriceDataPoint.change24h);
-    const isActiveClassName =
-      tradeTokenKey.toString() === this.props.selectedKey.toString() ? "trade-token-grid-row--active" : "";
 
     return (
-      <div className={`trade-token-grid-row ${isActiveClassName}`} onClick={this.onSelectClick}>
+      <div className={`trade-token-grid-row `}>
         <div className="trade-token-grid-row__col-token-name">
           {this.state.pTokenAddress &&
             FulcrumProvider.Instance.web3ProviderSettings &&
@@ -244,33 +230,19 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
             <Preloader width="74px" />
           }
         </div>
-        {this.renderActions(this.state.balance.eq(0))}
+        <div className="trade-token-grid-row__col-action">
+          <button className="trade-token-grid-row__button trade-token-grid-row__buy-button trade-token-grid-row__button--size-half" disabled={siteConfig.TradeBuyDisabled} onClick={this.onBuyClick}>
+            {TradeType.BUY}
+          </button>
+        </div>
       </div>
     );
   }
-
-  private renderActions = (isBuyOnly: boolean) => {
-    return (
-      <div className="trade-token-grid-row__col-action">
-        <button className="trade-token-grid-row__button trade-token-grid-row__buy-button trade-token-grid-row__button--size-half" disabled={siteConfig.TradeBuyDisabled} onClick={this.onBuyClick}>
-          {TradeType.BUY}
-        </button>
-      </div>
-    )
-  };
 
   public onLeverageSelect = (value: number) => {
     const key = this.getTradeTokenGridRowSelectionKey(value);
 
     this._isMounted && this.setState({ ...this.state, leverage: value, version: key.version, isLoading: true });
-
-    this.props.onSelect(this.getTradeTokenGridRowSelectionKey(value));
-  };
-
-  public onSelectClick = (event: React.MouseEvent<HTMLElement>) => {
-    event.stopPropagation();
-
-    this.props.onSelect(this.getTradeTokenGridRowSelectionKey());
   };
 
   public onBuyClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -281,24 +253,6 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
         this.props.asset,
         this.props.defaultUnitOfAccount, // TODO: depends on which one they own
         Asset.ETH,
-        this.props.positionType,
-        this.state.leverage,
-        new BigNumber(0),
-        this.props.defaultTokenizeNeeded, // TODO: depends on which one they own
-        this.state.version
-      )
-    );
-  };
-
-  public onSellClick = (event: React.MouseEvent<HTMLElement>) => {
-    event.stopPropagation();
-
-    this.props.onTrade(
-      new TradeRequest(
-        TradeType.SELL,
-        this.props.asset,
-        this.props.defaultUnitOfAccount, // TODO: depends on which one they own
-        this.props.selectedKey.positionType === PositionType.SHORT ? this.props.selectedKey.asset : Asset.DAI,
         this.props.positionType,
         this.state.leverage,
         new BigNumber(0),

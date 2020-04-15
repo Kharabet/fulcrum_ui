@@ -1,12 +1,10 @@
 import { BigNumber } from "@0x/utils";
 import React, { Component } from "react";
-import { Asset } from "../domain/Asset";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { IPriceDataPoint } from "../domain/IPriceDataPoint";
 import { TradeRequest } from "../domain/TradeRequest";
 import { TradeTokenKey } from "../domain/TradeTokenKey";
-import { TradeType } from "../domain/TradeType";
 import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { TradeTransactionMinedEvent } from "../services/events/TradeTransactionMinedEvent";
@@ -14,13 +12,8 @@ import { FulcrumProvider } from "../services/FulcrumProvider";
 import { Preloader } from "./Preloader";
 
 export interface IHistoryTokenGridRowProps {
-  selectedKey: TradeTokenKey;
   currentKey: TradeTokenKey;
-  showMyTokensOnly: boolean;
-
-  // onDetails: (key: TradeTokenKey) => void;
-  // onManageCollateral: (request: ManageCollateralRequest) => void;
-  onSelect: (key: TradeTokenKey) => void;
+  pTokenAddress: string;
   onTrade: (request: TradeRequest) => void;
 }
 
@@ -30,7 +23,6 @@ interface IHistoryTokenGridRowState {
   latestAssetPriceDataPoint: IPriceDataPoint;
   assetBalance: BigNumber | null;
   profit: BigNumber | null;
-  pTokenAddress: string;
   isLoading: boolean;
 }
 
@@ -47,7 +39,6 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
       latestAssetPriceDataPoint: FulcrumProvider.Instance.getPriceDefaultDataPoint(),
       assetBalance: new BigNumber(0),
       profit: new BigNumber(0),
-      pTokenAddress: "",
       isLoading: true
     };
 
@@ -58,42 +49,19 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
 
   private _isMounted: boolean;
 
-  private getTradeTokenGridRowSelectionKeyRaw(props: IHistoryTokenGridRowProps, leverage: number = this.props.currentKey.leverage) {
-    return new TradeTokenKey(this.props.currentKey.asset, this.props.currentKey.unitOfAccount, this.props.currentKey.positionType, leverage, this.props.currentKey.isTokenized, this.props.currentKey.version);
-  }
-
-  private getTradeTokenGridRowSelectionKey(leverage: number = this.props.currentKey.leverage) {
-    return this.getTradeTokenGridRowSelectionKeyRaw(this.props, leverage);
-  }
-
   private async derivedUpdate() {
-    const tradeTokenKey = new TradeTokenKey(
-      this.props.currentKey.asset,
-      this.props.currentKey.unitOfAccount,
-      this.props.currentKey.positionType,
-      this.props.currentKey.leverage,
-      this.props.currentKey.isTokenized,
-      this.props.currentKey.version
-    );
+    const tradeTokenKey = this.props.currentKey;
     const latestAssetPriceDataPoint = await FulcrumProvider.Instance.getTradeTokenAssetLatestDataPoint(tradeTokenKey);
 
     const data: [BigNumber | null, BigNumber | null] = await FulcrumProvider.Instance.getTradeBalanceAndProfit(tradeTokenKey);
     const assetBalance = data[0];
     const profit = data[1];
 
-    const address = FulcrumProvider.Instance.contractsSource ?
-      await FulcrumProvider.Instance.contractsSource.getPTokenErc20Address(tradeTokenKey) || "" :
-      "";
-
-    // const precision = AssetsDictionary.assets.get(this.props.selectedKey.loanAsset)!.decimals || 18;
-    // const balanceString = this.props.balance.dividedBy(10 ** precision).toFixed();
-
     this._isMounted && this.setState(p => ({
       ...this.state,
       latestAssetPriceDataPoint: latestAssetPriceDataPoint,
       assetBalance: assetBalance,
       profit: profit,
-      pTokenAddress: address,
       isLoading: latestAssetPriceDataPoint.price !== 0 ? false : p.isLoading
     }));
   }

@@ -13,31 +13,22 @@ import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents"
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { TradeTransactionMinedEvent } from "../services/events/TradeTransactionMinedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
-//import { PositionTypeMarker } from "./PositionTypeMarker";
-//import { PositionTypeMarkerAlt } from "./PositionTypeMarkerAlt";
-// import { Change24HMarker, Change24HMarkerSize } from "./Change24HMarker";
 import { Preloader } from "./Preloader";
 import { ReactComponent as OpenManageCollateral } from "../assets/images/openManageCollateral.svg";
 
 export interface IOwnTokenGridRowProps {
-  selectedKey: TradeTokenKey;
   currentKey: TradeTokenKey;
-  showMyTokensOnly: boolean;
 
-  // onDetails: (key: TradeTokenKey) => void;
-  // onManageCollateral: (request: ManageCollateralRequest) => void;
-  onSelect: (key: TradeTokenKey) => void;
+  pTokenAddress: string;
   onTrade: (request: TradeRequest) => void;
   onManageCollateralOpen: (request: ManageCollateralRequest) => void;
 }
 
 interface IOwnTokenGridRowState {
   assetDetails: AssetDetails | null;
-
   latestAssetPriceDataPoint: IPriceDataPoint;
   assetBalance: BigNumber | null;
   profit: BigNumber | null;
-  pTokenAddress: string;
   isLoading: boolean;
 }
 
@@ -54,7 +45,6 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
       latestAssetPriceDataPoint: FulcrumProvider.Instance.getPriceDefaultDataPoint(),
       assetBalance: new BigNumber(0),
       profit: new BigNumber(0),
-      pTokenAddress: "",
       isLoading: true
     };
 
@@ -74,33 +64,18 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
   }
 
   private async derivedUpdate() {
-    const tradeTokenKey = new TradeTokenKey(
-      this.props.currentKey.asset,
-      this.props.currentKey.unitOfAccount,
-      this.props.currentKey.positionType,
-      this.props.currentKey.leverage,
-      this.props.currentKey.isTokenized,
-      this.props.currentKey.version
-    );
+    const tradeTokenKey = this.props.currentKey;
     const latestAssetPriceDataPoint = await FulcrumProvider.Instance.getTradeTokenAssetLatestDataPoint(tradeTokenKey);
 
     const data: [BigNumber | null, BigNumber | null] = await FulcrumProvider.Instance.getTradeBalanceAndProfit(tradeTokenKey);
     const assetBalance = data[0];
     const profit = data[1];
 
-    const address = FulcrumProvider.Instance.contractsSource ?
-      await FulcrumProvider.Instance.contractsSource.getPTokenErc20Address(tradeTokenKey) || "" :
-      "";
-
-    // const precision = AssetsDictionary.assets.get(this.props.selectedKey.loanAsset)!.decimals || 18;
-    // const balanceString = this.props.balance.dividedBy(10 ** precision).toFixed();
-
     this._isMounted && this.setState(p => ({
       ...this.state,
       latestAssetPriceDataPoint: latestAssetPriceDataPoint,
       assetBalance: assetBalance,
       profit: profit,
-      pTokenAddress: address,
       isLoading: latestAssetPriceDataPoint.price !== 0 ? false : p.isLoading
     }));
   }
@@ -136,32 +111,19 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
     this.derivedUpdate();
   }
 
-  /*public componentDidUpdate(
-    prevProps: Readonly<IOwnTokenGridRowProps>,
-    prevState: Readonly<IOwnTokenGridRowState>,
-    snapshot?: any
-  ): void {
-    if (
-      prevProps.currentKey.leverage !== this.props.currentKey.leverage ||
-      (prevProps.selectedKey.toString() === prevProps.currentKey.toString()) !==
-        (this.props.selectedKey.toString() === this.props.currentKey.toString())
-    ) {
-      this.derivedUpdate();
-    }
-  }*/
-  private renderOwnTokenRow = (state: IOwnTokenGridRowState, props: IOwnTokenGridRowProps, bnPrice: BigNumber, bnLiquidationPrice: BigNumber, isActiveClassName: string): React.ReactFragment => {
+  private renderOwnTokenRow = (state: IOwnTokenGridRowState, props: IOwnTokenGridRowProps, bnPrice: BigNumber, bnLiquidationPrice: BigNumber): React.ReactFragment => {
     if (!state.assetDetails) return <React.Fragment></React.Fragment>;
     return (
       <React.Fragment>
-        <div className={`own-token-grid-row ${isActiveClassName}`} onClick={this.onSelectClick}>
-          {state.pTokenAddress &&
+        <div className={`own-token-grid-row`}>
+          {props.pTokenAddress &&
             FulcrumProvider.Instance.web3ProviderSettings &&
             FulcrumProvider.Instance.web3ProviderSettings.etherscanURL ? (
               <a
                 className="own-token-grid-row__col-token-name"
                 style={{ cursor: `pointer`, textDecoration: `none` }}
-                title={state.pTokenAddress}
-                href={`${FulcrumProvider.Instance.web3ProviderSettings.etherscanURL}address/${state.pTokenAddress}#readContract`}
+                title={props.pTokenAddress}
+                href={`${FulcrumProvider.Instance.web3ProviderSettings.etherscanURL}address/${props.pTokenAddress}#readContract`}
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -247,22 +209,9 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
 
     const bnPrice = new BigNumber(this.state.latestAssetPriceDataPoint.price);
     const bnLiquidationPrice = new BigNumber(this.state.latestAssetPriceDataPoint.liquidationPrice);
-    /*if (this.props.currentKey.positionType === PositionType.SHORT) {
-      bnPrice = bnPrice.div(1000);
-      bnLiquidationPrice = bnLiquidationPrice.div(1000);
-    }*/
 
-    const isActiveClassName =
-      this.props.currentKey.toString() === this.props.selectedKey.toString() ? "own-token-grid-row--active" : "";
-
-    return this.renderOwnTokenRow(this.state, this.props, bnPrice, bnLiquidationPrice, isActiveClassName);
+    return this.renderOwnTokenRow(this.state, this.props, bnPrice, bnLiquidationPrice);
   }
-
-  public onSelectClick = (event: React.MouseEvent<HTMLElement>) => {
-    event.stopPropagation();
-
-    this.props.onSelect(this.getTradeTokenGridRowSelectionKey());
-  };
 
   public onDetailsClick = (event: React.MouseEvent<HTMLElement>) => {
     event.stopPropagation();

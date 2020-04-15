@@ -39,10 +39,8 @@ export interface ITradePageProps {
 interface ITradePageState {
   assets: Asset[];
   showMyTokensOnly: boolean;
-  selectedKey: TradeTokenKey;
   selectedTabAsset: Asset;
   isTradeModalOpen: boolean;
-  tradeDataType: string,
   tradeType: TradeType;
   tradeAsset: Asset;
   tradeUnitOfAccount: Asset;
@@ -58,8 +56,6 @@ interface ITradePageState {
 
   isManageCollateralModalOpen: boolean;
 
-  priceGraphData: IPriceDataPoint[];
-
   defaultTokenizeNeeded: boolean;
   defaultLeverageShort: number;
   defaultLeverageLong: number;
@@ -73,11 +69,8 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
     super(props);
     this.state = {
       showMyTokensOnly: false,
-      selectedKey: TradeTokenKey.empty(),
       selectedTabAsset: Asset.ETH,
-      priceGraphData: [],
       isTradeModalOpen: false,
-      tradeDataType: 'long',
       tradeType: TradeType.BUY,
       tradeAsset: Asset.UNKNOWN,
       tradeUnitOfAccount: Asset.UNKNOWN,
@@ -150,7 +143,7 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
   }
 
   public componentDidUpdate(prevProps: Readonly<ITradePageProps>, prevState: Readonly<ITradePageState>, snapshot?: any): void {
-    if (prevState.selectedKey !== this.state.selectedKey) {
+    if (prevState.selectedTabAsset !== this.state.selectedTabAsset) {
       this.derivedUpdate();
     }
   }
@@ -279,9 +272,6 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
     );
   }
 
-  public onSelect = async (key: TradeTokenKey) => {
-    await this.setState({ ...this.state, selectedKey: key });
-  };
   public onTabSelect = async (asset: Asset) => {
     await this.setState({ ...this.state, selectedTabAsset: asset });
   };
@@ -415,10 +405,8 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
           continue;
 
         ownRowsData.push({
-          selectedKey: state.selectedKey,
           currentKey: pToken,
-          showMyTokensOnly: state.showMyTokensOnly,
-          onSelect: this.onSelect,
+          pTokenAddress: pToken.erc20Address,
           onTrade: this.onTradeRequested,
           onManageCollateralOpen: this.onManageCollateralRequested,
         });
@@ -431,28 +419,22 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
   public getTokenRowsData = (state: ITradePageState): ITradeTokenGridRowProps[] => {
     const tokenRowsData: ITradeTokenGridRowProps[] = [];
     state.assets.forEach(e => {
-      // if (state.selectedKey.asset === Asset.UNKNOWN || e == state.selectedKey.asset) {
       tokenRowsData.push({
-        selectedKey: state.selectedKey,
         asset: e,
         defaultUnitOfAccount: state.defaultUnitOfAccount,
         defaultTokenizeNeeded: true,
         positionType: PositionType.LONG,
         defaultLeverage: state.defaultLeverageLong,
-        onSelect: this.onSelect,
         onTrade: this.onTradeRequested
       });
       tokenRowsData.push({
-        selectedKey: state.selectedKey,
         asset: e,
         defaultUnitOfAccount: state.defaultUnitOfAccount,
         defaultTokenizeNeeded: true,
         positionType: PositionType.SHORT,
         defaultLeverage: state.defaultLeverageShort,
-        onSelect: this.onSelect,
         onTrade: this.onTradeRequested
       });
-      // }
     });
     return tokenRowsData;
   };

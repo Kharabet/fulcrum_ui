@@ -18,11 +18,8 @@ import { ReactComponent as OpenManageCollateral } from "../assets/images/openMan
 import { ManageCollateralRequest } from "../domain/ManageCollateralRequest";
 
 export interface IInnerOwnTokenCardMobileProps {
-  selectedKey: TradeTokenKey;
   currentKey: TradeTokenKey;
-  showMyTokensOnly: boolean;
-
-  onSelect: (key: TradeTokenKey) => void;
+  pTokenAddress: string;
   onTrade: (request: TradeRequest) => void;
   onManageCollateralOpen: (request: ManageCollateralRequest) => void;
 }
@@ -33,7 +30,6 @@ interface IInnerOwnTokenCardMobileState {
   latestAssetPriceDataPoint: IPriceDataPoint;
   assetBalance: BigNumber | null;
   profit: BigNumber | null;
-  pTokenAddress: string;
   isLoading: boolean;
 }
 
@@ -50,7 +46,6 @@ export class InnerOwnTokenCardMobile extends Component<IInnerOwnTokenCardMobileP
       latestAssetPriceDataPoint: FulcrumProvider.Instance.getPriceDefaultDataPoint(),
       assetBalance: new BigNumber(0),
       profit: new BigNumber(0),
-      pTokenAddress: "",
       isLoading: true
     };
 
@@ -61,38 +56,19 @@ export class InnerOwnTokenCardMobile extends Component<IInnerOwnTokenCardMobileP
 
   private _isMounted: boolean;
 
-  private getTradeTokenGridRowSelectionKeyRaw(props: IInnerOwnTokenCardMobileProps, leverage: number = this.props.currentKey.leverage) {
-    return new TradeTokenKey(this.props.currentKey.asset, this.props.currentKey.unitOfAccount, this.props.currentKey.positionType, leverage, this.props.currentKey.isTokenized, this.props.currentKey.version);
-  }
-
-  private getTradeTokenGridRowSelectionKey(leverage: number = this.props.currentKey.leverage) {
-    return this.getTradeTokenGridRowSelectionKeyRaw(this.props, leverage);
-  }
-
   private async derivedUpdate() {
-    const tradeTokenKey = new TradeTokenKey(
-      this.props.currentKey.asset,
-      this.props.currentKey.unitOfAccount,
-      this.props.currentKey.positionType,
-      this.props.currentKey.leverage,
-      this.props.currentKey.isTokenized,
-      this.props.currentKey.version
-    );
+    const tradeTokenKey = this.props.currentKey;
     const latestAssetPriceDataPoint = await FulcrumProvider.Instance.getTradeTokenAssetLatestDataPoint(tradeTokenKey);
 
     const data: [BigNumber | null, BigNumber | null] = await FulcrumProvider.Instance.getTradeBalanceAndProfit(tradeTokenKey);
     const assetBalance = data[0];
     const profit = data[1];
 
-    const address = FulcrumProvider.Instance.contractsSource
-      ? await FulcrumProvider.Instance.contractsSource.getPTokenErc20Address(tradeTokenKey) || ""
-      : "";
     this._isMounted && this.setState(p => ({
       ...this.state,
       latestAssetPriceDataPoint: latestAssetPriceDataPoint,
       assetBalance: assetBalance,
       profit: profit,
-      pTokenAddress: address,
       isLoading: latestAssetPriceDataPoint.price !== 0 ? false : p.isLoading
     }));
   }
@@ -128,7 +104,7 @@ export class InnerOwnTokenCardMobile extends Component<IInnerOwnTokenCardMobileP
     if (!state.assetDetails) return <React.Fragment></React.Fragment>;
     return (
       <React.Fragment>
-        <div className="inner-own-token-card-mobile" onClick={this.onSelectClick}>
+        <div className="inner-own-token-card-mobile">
           <div className="inner-own-token-card-mobile__body-row">
             <div className="inner-own-token-card-mobile__col-token-name-full">
               <span className="inner-own-token-header">{`Position (${this.props.currentKey.asset}/DAI)`}</span>
@@ -207,12 +183,6 @@ export class InnerOwnTokenCardMobile extends Component<IInnerOwnTokenCardMobileP
     const bnLiquidationPrice = new BigNumber(this.state.latestAssetPriceDataPoint.liquidationPrice);
     return this.renderOwnTokenRow(this.state, this.props, bnPrice, bnLiquidationPrice);
   }
-
-  public onSelectClick = (event: React.MouseEvent<HTMLElement>) => {
-    event.stopPropagation();
-
-    this.props.onSelect(this.getTradeTokenGridRowSelectionKey());
-  };
 
   public onDetailsClick = (event: React.MouseEvent<HTMLElement>) => {
     event.stopPropagation();
