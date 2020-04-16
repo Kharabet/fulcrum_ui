@@ -4,7 +4,6 @@ import { Asset } from "../domain/Asset";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { IPriceDataPoint } from "../domain/IPriceDataPoint";
-import { ManageCollateralRequest } from "../domain/ManageCollateralRequest";
 import { PositionType } from "../domain/PositionType";
 import { TradeRequest } from "../domain/TradeRequest";
 import { TradeTokenKey } from "../domain/TradeTokenKey";
@@ -13,16 +12,13 @@ import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents"
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { TradeTransactionMinedEvent } from "../services/events/TradeTransactionMinedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
-import { PositionTypeMarker } from "./PositionTypeMarker";
 import { PositionTypeMarkerAlt } from "./PositionTypeMarkerAlt";
 import { Preloader } from "./Preloader";
 import { ReactComponent as OpenManageCollateral } from "../assets/images/openManageCollateral.svg";
 
 
 export interface IOwnTokenCardMobileProps {
-  selectedKey: TradeTokenKey;
   currentKey: TradeTokenKey;
-  onSelect: (key: TradeTokenKey) => void;
   onTrade: (request: TradeRequest) => void;
 }
 
@@ -32,7 +28,6 @@ interface IOwnTokenCardMobileState {
   latestAssetPriceDataPoint: IPriceDataPoint;
   assetBalance: BigNumber | null;
   profit: BigNumber | null;
-  pTokenAddress: string;
   isLoading: boolean;
 }
 
@@ -48,7 +43,6 @@ export class OwnTokenCardMobile extends Component<IOwnTokenCardMobileProps, IOwn
       latestAssetPriceDataPoint: FulcrumProvider.Instance.getPriceDefaultDataPoint(),
       assetBalance: new BigNumber(0),
       profit: new BigNumber(0),
-      pTokenAddress: "",
       isLoading: true
     };
 
@@ -59,39 +53,19 @@ export class OwnTokenCardMobile extends Component<IOwnTokenCardMobileProps, IOwn
 
   private _isMounted: boolean;
 
-  private getTradeTokenGridRowSelectionKeyRaw(props: IOwnTokenCardMobileProps, leverage: number = this.props.currentKey.leverage) {
-    return new TradeTokenKey(this.props.currentKey.asset, this.props.currentKey.unitOfAccount, this.props.currentKey.positionType, leverage, this.props.currentKey.isTokenized, this.props.currentKey.version);
-  }
-
-  private getTradeTokenGridRowSelectionKey(leverage: number = this.props.currentKey.leverage) {
-    return this.getTradeTokenGridRowSelectionKeyRaw(this.props, leverage);
-  }
-
   private async derivedUpdate() {
-    const tradeTokenKey = new TradeTokenKey(
-      this.props.currentKey.asset,
-      this.props.currentKey.unitOfAccount,
-      this.props.currentKey.positionType,
-      this.props.currentKey.leverage,
-      this.props.currentKey.isTokenized,
-      this.props.currentKey.version
-    );
+    const tradeTokenKey = this.props.currentKey;
     const latestAssetPriceDataPoint = await FulcrumProvider.Instance.getTradeTokenAssetLatestDataPoint(tradeTokenKey);
 
     const data: [BigNumber | null, BigNumber | null] = await FulcrumProvider.Instance.getTradeBalanceAndProfit(tradeTokenKey);
     const assetBalance = data[0];
     const profit = data[1];
 
-    const address = FulcrumProvider.Instance.contractsSource
-      ? await FulcrumProvider.Instance.contractsSource.getPTokenErc20Address(tradeTokenKey) || ""
-      : "";
-
     this._isMounted && this.setState(p => ({
       ...this.state,
       latestAssetPriceDataPoint: latestAssetPriceDataPoint,
       assetBalance: assetBalance,
       profit: profit,
-      pTokenAddress: address,
       isLoading: latestAssetPriceDataPoint.price !== 0 ? false : p.isLoading
     }));
   }
@@ -140,19 +114,9 @@ export class OwnTokenCardMobile extends Component<IOwnTokenCardMobileProps, IOwn
           </div>
           <div className="own-token-card-mobile__body-row">
             <div className="own-token-card-mobile__asset-name">
-              {this.state.pTokenAddress &&
-                FulcrumProvider.Instance.web3ProviderSettings &&
-                FulcrumProvider.Instance.web3ProviderSettings.etherscanURL ? (
-                  <a
-                    className="own-token-card-mobile__token-name-full"
-                    rel="noopener noreferrer"
-                  >
-                    {this.state.assetDetails.displayName}
-                  </a>
-                ) : (
-                  <div className="own-token-card-mobile__token-name-full">
-                    {this.state.assetDetails.displayName}
-                  </div>)}
+              <span className="own-token-card-mobile__value">
+                {`${this.state.assetDetails.displayName}`}
+              </span>
             </div>
             <div className="own-token-card-mobile__position-type">
               <span className="position-type-marker">{`${this.props.currentKey.leverage}x`}&nbsp;{this.props.currentKey.positionType}</span>
@@ -233,12 +197,6 @@ export class OwnTokenCardMobile extends Component<IOwnTokenCardMobileProps, IOwn
       </div>
     );
   }
-
-  public onSelectClick = (event: React.MouseEvent<HTMLElement>) => {
-    event.stopPropagation();
-
-    this.props.onSelect(this.getTradeTokenGridRowSelectionKey());
-  };
 
   public onDetailsClick = (event: React.MouseEvent<HTMLElement>) => {
     event.stopPropagation();

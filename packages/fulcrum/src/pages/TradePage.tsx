@@ -39,10 +39,8 @@ export interface ITradePageProps {
 interface ITradePageState {
   assets: Asset[];
   showMyTokensOnly: boolean;
-  selectedKey: TradeTokenKey;
   selectedTabAsset: Asset;
   isTradeModalOpen: boolean;
-  tradeDataType: string,
   tradeType: TradeType;
   tradeAsset: Asset;
   tradeUnitOfAccount: Asset;
@@ -58,9 +56,6 @@ interface ITradePageState {
 
   isManageCollateralModalOpen: boolean;
 
-  priceGraphData: IPriceDataPoint[];
-  isLong: boolean;
-  isShort: boolean;
   defaultTokenizeNeeded: boolean;
   defaultLeverageShort: number;
   defaultLeverageLong: number;
@@ -74,11 +69,8 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
     super(props);
     this.state = {
       showMyTokensOnly: false,
-      selectedKey: TradeTokenKey.empty(),
       selectedTabAsset: Asset.ETH,
-      priceGraphData: [],
       isTradeModalOpen: false,
-      tradeDataType: 'long',
       tradeType: TradeType.BUY,
       tradeAsset: Asset.UNKNOWN,
       tradeUnitOfAccount: Asset.UNKNOWN,
@@ -90,8 +82,6 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
       isTokenAddressFormOpen: false,
       tradeTokenKey: TradeTokenKey.empty(),
       isManageCollateralModalOpen: false,
-      isLong: true,
-      isShort: false,
       assets: this.getAssets(),
       defaultTokenizeNeeded: true,
       defaultLeverageShort: 1,
@@ -100,7 +90,6 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
       tokenRowsData: [],
       ownRowsData: []
     };
-    // let changeActiveBtn  = this.changeActiveBtn.bind(this);
 
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
@@ -154,7 +143,7 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
   }
 
   public componentDidUpdate(prevProps: Readonly<ITradePageProps>, prevState: Readonly<ITradePageState>, snapshot?: any): void {
-    if (prevState.selectedKey !== this.state.selectedKey) {
+    if (prevState.selectedTabAsset !== this.state.selectedTabAsset) {
       this.derivedUpdate();
     }
   }
@@ -163,14 +152,6 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
     const tokenRowsData = this.getTokenRowsData(this.state);
     const ownRowsData = await this.getOwnRowsData(this.state);
     await this.setState({ ...this.state, ownRowsData: ownRowsData, tokenRowsData: tokenRowsData });
-  }
-
-  public changeActiveBtn(activeType: string) {
-    if (activeType == 'long') {
-      this.setState({ ...this.state, isLong: true, isShort: false });
-    } else {
-      this.setState({ ...this.state, isLong: false, isShort: true });
-    }
   }
 
   public render() {
@@ -200,30 +181,23 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
             openedPositionsCount={this.state.openedPositionsCount}
           />
 
-          {!this.state.showMyTokensOnly
-            ? <React.Fragment>
-              <div className="chart-wrapper">
-                <TVChartContainer symbol={this.state.selectedTabAsset} preset={this.props.isMobileMedia ? "mobile" : undefined} />
-              </div>
-            </React.Fragment>
-            : null
-          }
           {this.state.showMyTokensOnly ? (
             <OwnTokenGrid
               isMobileMedia={this.props.isMobileMedia}
               ownRowsData={this.state.ownRowsData}
             />
           ) : (
-
-              <TradeTokenGrid
-                selectedTabAsset={this.state.selectedTabAsset}
-                changeActiveBtn={this.changeActiveBtn.bind(this)}
-                isMobileMedia={this.props.isMobileMedia}
-                isLong={this.state.isLong}
-                isShort={this.state.isShort}
-                tokenRowsData={this.state.tokenRowsData.filter(e => e.asset === this.state.selectedTabAsset)}
-                ownRowsData={this.state.ownRowsData}
-              />
+              <React.Fragment>
+                <div className="chart-wrapper">
+                  <TVChartContainer symbol={this.state.selectedTabAsset} preset={this.props.isMobileMedia ? "mobile" : undefined} />
+                </div>
+                <TradeTokenGrid
+                  selectedTabAsset={this.state.selectedTabAsset}
+                  isMobileMedia={this.props.isMobileMedia}
+                  tokenRowsData={this.state.tokenRowsData.filter(e => e.asset === this.state.selectedTabAsset)}
+                  ownRowsData={this.state.ownRowsData}
+                />
+              </React.Fragment>
             )}
           <Modal
             isOpen={this.state.isTradeModalOpen}
@@ -298,9 +272,6 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
     );
   }
 
-  public onSelect = async (key: TradeTokenKey) => {
-    await this.setState({ ...this.state, selectedKey: key });
-  };
   public onTabSelect = async (asset: Asset) => {
     await this.setState({ ...this.state, selectedTabAsset: asset });
   };
@@ -434,10 +405,8 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
           continue;
 
         ownRowsData.push({
-          selectedKey: state.selectedKey,
           currentKey: pToken,
-          showMyTokensOnly: state.showMyTokensOnly,
-          onSelect: this.onSelect,
+          pTokenAddress: pToken.erc20Address,
           onTrade: this.onTradeRequested,
           onManageCollateralOpen: this.onManageCollateralRequested,
         });
@@ -450,30 +419,22 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
   public getTokenRowsData = (state: ITradePageState): ITradeTokenGridRowProps[] => {
     const tokenRowsData: ITradeTokenGridRowProps[] = [];
     state.assets.forEach(e => {
-      // if (state.selectedKey.asset === Asset.UNKNOWN || e == state.selectedKey.asset) {
       tokenRowsData.push({
-        selectedKey: state.selectedKey,
         asset: e,
         defaultUnitOfAccount: state.defaultUnitOfAccount,
         defaultTokenizeNeeded: true,
         positionType: PositionType.LONG,
         defaultLeverage: state.defaultLeverageLong,
-          changeActiveBtn: this.changeActiveBtn,
-          onSelect: this.onSelect,
-          onTrade: this.onTradeRequested
+        onTrade: this.onTradeRequested
       });
       tokenRowsData.push({
-        selectedKey: state.selectedKey,
         asset: e,
         defaultUnitOfAccount: state.defaultUnitOfAccount,
         defaultTokenizeNeeded: true,
         positionType: PositionType.SHORT,
         defaultLeverage: state.defaultLeverageShort,
-          changeActiveBtn: this.changeActiveBtn,
-          onSelect: this.onSelect,
-          onTrade: this.onTradeRequested
+        onTrade: this.onTradeRequested
       });
-      // }
     });
     return tokenRowsData;
   };

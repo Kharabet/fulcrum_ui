@@ -1,36 +1,25 @@
-import { BigNumber } from "@0x/utils";
-import React, { ChangeEvent, Component } from "react";
-import TagManager from "react-gtm-module";
+import React, { Component } from "react";
 import { Asset } from "../domain/Asset";
 import { PositionType } from "../domain/PositionType";
-import { TradeRequest } from "../domain/TradeRequest";
-import { TradeTokenKey } from "../domain/TradeTokenKey";
-import { TradeType } from "../domain/TradeType";
 import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { TradeTransactionMinedEvent } from "../services/events/TradeTransactionMinedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
 import { TradeTokenGridHeader } from "./TradeTokenGridHeader";
 import { ITradeTokenGridRowProps, TradeTokenGridRow } from "./TradeTokenGridRow";
-import { ITradeTokenCardMobileProps, TradeTokenCardMobile } from "./TradeTokenCardMobile";
+import { TradeTokenCardMobile } from "./TradeTokenCardMobile";
 import { InnerOwnTokenGrid } from "./InnerOwnTokenGrid";
 import { IOwnTokenGridRowProps } from "./OwnTokenGridRow";
-import { ManageCollateralRequest } from "../domain/ManageCollateralRequest";
-import { OwnTokenGrid } from "./OwnTokenGrid";
-
-// import siteConfig from "./../config/SiteConfig.json";
 
 export interface ITradeTokenGridProps {
   selectedTabAsset: Asset;
   isMobileMedia: boolean;
-  changeActiveBtn: (activeType: string) => void;
-  isLong: boolean;
-  isShort: boolean;
   tokenRowsData: ITradeTokenGridRowProps[];
   ownRowsData: IOwnTokenGridRowProps[];
 }
 
 interface ITradeTokenGridState {
+  positionType: PositionType;
 }
 
 export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenGridState> {
@@ -39,6 +28,9 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
     super(props);
 
     this._isMounted = false;
+    this.state = {
+      positionType: PositionType.LONG
+    }
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.TradeTransactionMined, this.onTradeTransactionMined);
   }
@@ -101,21 +93,20 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
   }
 
   private renderMobile = () => {
-    let tokenRowsMobile;
-    if (this.props.isLong)
-      tokenRowsMobile = this.props.tokenRowsData.filter(e => e.positionType === "LONG").map(e => <TradeTokenCardMobile key={`${e.asset}_${e.positionType}`} {...e} changeActiveBtn={this.props.changeActiveBtn} />);
-    if (this.props.isShort)
-      tokenRowsMobile = this.props.tokenRowsData.filter(e => e.positionType === "SHORT").map(e => <TradeTokenCardMobile key={`${e.asset}_${e.positionType}`} {...e} changeActiveBtn={this.props.changeActiveBtn} />);
+    const tokenRowsMobile = this.props.tokenRowsData
+    .filter(e => e.positionType === this.state.positionType)
+    .map(e => <TradeTokenCardMobile key={`${e.asset}_${e.positionType}`} {...e} changeGridPositionType={this.changeGridPositionType} />);
+
     return (
       <div className="trade-token-card-mobile__wrapper">
         {tokenRowsMobile && tokenRowsMobile.map(row => {
           return (<div className="trade-token-grid-row-wrapper" key={`${row.props.asset}_${row.props.positionType}`}>
             {row}
             <InnerOwnTokenGrid
-                ownRowsData={this.props.ownRowsData
-                  .filter(e => e.currentKey.positionType === row.props.positionType && e.currentKey.asset === row.props.asset)}
-                isMobileMedia={this.props.isMobileMedia}
-              />
+              ownRowsData={this.props.ownRowsData
+                .filter(e => e.currentKey.positionType === row.props.positionType && e.currentKey.asset === row.props.asset)}
+              isMobileMedia={this.props.isMobileMedia}
+            />
           </div>)
         })}
       </div>
@@ -128,4 +119,8 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
   private onTradeTransactionMined = async (event: TradeTransactionMinedEvent) => {
     await this.derivedUpdate();
   };
+
+  private changeGridPositionType= async (positionType: PositionType) =>{
+    await this._isMounted && this.setState({...this.state, positionType: positionType})
+  } 
 }

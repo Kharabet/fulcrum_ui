@@ -47,8 +47,4 @@ export class StatsPage extends PureComponent<IStatsPageProps, IStatsPageState> {
       </div>
     );
   }
-
-  /*private onProviderChanged = async (event: ProviderChangedEvent) => {
-    this.setState({ ...this.state, selectedKey: this.state.selectedKey, priceGraphData: priceGraphData });
-  };*/
 }

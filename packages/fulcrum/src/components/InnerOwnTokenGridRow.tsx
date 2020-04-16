@@ -13,20 +13,12 @@ import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents"
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { TradeTransactionMinedEvent } from "../services/events/TradeTransactionMinedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
-//import { PositionTypeMarker } from "./PositionTypeMarker";
-//import { PositionTypeMarkerAlt } from "./PositionTypeMarkerAlt";
-// import { Change24HMarker, Change24HMarkerSize } from "./Change24HMarker";
 import { Preloader } from "./Preloader";
 import { ReactComponent as OpenManageCollateral } from "../assets/images/openManageCollateral.svg";
 
 export interface IInnerOwnTokenGridRowProps {
-  selectedKey: TradeTokenKey;
   currentKey: TradeTokenKey;
-  showMyTokensOnly: boolean;
-
-  // onDetails: (key: TradeTokenKey) => void;
-  // onManageCollateral: (request: ManageCollateralRequest) => void;
-  onSelect: (key: TradeTokenKey) => void;
+  pTokenAddress: string;
   onTrade: (request: TradeRequest) => void;
   onManageCollateralOpen: (request: ManageCollateralRequest) => void;
 }
@@ -37,7 +29,6 @@ interface IInnerOwnTokenGridRowState {
   latestAssetPriceDataPoint: IPriceDataPoint;
   assetBalance: BigNumber | null;
   profit: BigNumber | null;
-  pTokenAddress: string;
   isLoading: boolean;
 }
 
@@ -54,7 +45,6 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
       latestAssetPriceDataPoint: FulcrumProvider.Instance.getPriceDefaultDataPoint(),
       assetBalance: new BigNumber(0),
       profit: new BigNumber(0),
-      pTokenAddress: "",
       isLoading: true
     };
 
@@ -74,33 +64,18 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
   }
 
   private async derivedUpdate() {
-    const tradeTokenKey = new TradeTokenKey(
-      this.props.currentKey.asset,
-      this.props.currentKey.unitOfAccount,
-      this.props.currentKey.positionType,
-      this.props.currentKey.leverage,
-      this.props.currentKey.isTokenized,
-      this.props.currentKey.version
-    );
+    const tradeTokenKey = this.props.currentKey;
     const latestAssetPriceDataPoint = await FulcrumProvider.Instance.getTradeTokenAssetLatestDataPoint(tradeTokenKey);
 
     const data: [BigNumber | null, BigNumber | null] = await FulcrumProvider.Instance.getTradeBalanceAndProfit(tradeTokenKey);
     const assetBalance = data[0];
     const profit = data[1];
 
-    const address = FulcrumProvider.Instance.contractsSource ?
-      await FulcrumProvider.Instance.contractsSource.getPTokenErc20Address(tradeTokenKey) || "" :
-      "";
-
-    // const precision = AssetsDictionary.assets.get(this.props.selectedKey.loanAsset)!.decimals || 18;
-    // const balanceString = this.props.balance.dividedBy(10 ** precision).toFixed();
-
     this._isMounted && this.setState(p => ({
       ...this.state,
       latestAssetPriceDataPoint: latestAssetPriceDataPoint,
       assetBalance: assetBalance,
       profit: profit,
-      pTokenAddress: address,
       isLoading: latestAssetPriceDataPoint.price !== 0 ? false : p.isLoading
     }));
   }
@@ -130,7 +105,7 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
   public componentWillMount(): void {
     this.derivedUpdate();
   }
-  
+
   public componentDidMount(): void {
     this._isMounted = true;
 
@@ -150,11 +125,11 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
       this.derivedUpdate();
     }
   }*/
-  private renderOwnTokenRow = (state: IInnerOwnTokenGridRowState, props: IInnerOwnTokenGridRowProps, bnPrice: BigNumber, bnLiquidationPrice: BigNumber, isActiveClassName: string): React.ReactFragment => {
+  private renderOwnTokenRow = (state: IInnerOwnTokenGridRowState, props: IInnerOwnTokenGridRowProps, bnPrice: BigNumber, bnLiquidationPrice: BigNumber): React.ReactFragment => {
     if (!state.assetDetails) return <React.Fragment></React.Fragment>;
     return (
       <React.Fragment>
-        <div className={`inner-own-token-grid-row ${isActiveClassName}`} onClick={this.onSelectClick}>
+        <div className={`inner-own-token-grid-row`}>
           <div className="inner-own-token-grid-row__col-token-name-full">
             0.8884
             </div>
@@ -237,17 +212,9 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
 
     const bnPrice = new BigNumber(this.state.latestAssetPriceDataPoint.price);
     const bnLiquidationPrice = new BigNumber(this.state.latestAssetPriceDataPoint.liquidationPrice);
-    const isActiveClassName =
-      this.props.currentKey.toString() === this.props.selectedKey.toString() ? "own-token-grid-row--active" : "";
 
-    return this.renderOwnTokenRow(this.state, this.props, bnPrice, bnLiquidationPrice, isActiveClassName);
+    return this.renderOwnTokenRow(this.state, this.props, bnPrice, bnLiquidationPrice);
   }
-
-  public onSelectClick = (event: React.MouseEvent<HTMLElement>) => {
-    event.stopPropagation();
-
-    this.props.onSelect(this.getTradeTokenGridRowSelectionKey());
-  };
 
   public onDetailsClick = (event: React.MouseEvent<HTMLElement>) => {
     event.stopPropagation();

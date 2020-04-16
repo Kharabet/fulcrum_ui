@@ -21,16 +21,13 @@ import { Asset } from "../domain/Asset";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary, AssetsDictionaryMobile } from "../domain/AssetsDictionary";
 import { PositionType } from "../domain/PositionType";
-//import { TradeRequest } from "../domain/TradeRequest";
 import { TradeTokenKey } from "../domain/TradeTokenKey";
 import { TradeType } from "../domain/TradeType";
 import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
-import { CollapsibleContainer } from "./CollapsibleContainer";
 import { CollateralTokenButton } from "./CollateralTokenButton";
 import { CollateralTokenSelector } from "./CollateralTokenSelector";
-import { UnitOfAccountSelector } from "./UnitOfAccountSelector";
 import { Preloader } from "./Preloader";
 
 
