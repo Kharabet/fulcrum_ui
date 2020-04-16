@@ -131,7 +131,7 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
                 </label>
               </div> */}
             </div>
-            <div className="heade_nav_menu">
+            <div className="header_nav_menu">
               <HeaderMenu items={this.Menu.items} />
             </div>
             <div className="footer-container">

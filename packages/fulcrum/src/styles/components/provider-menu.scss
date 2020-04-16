@@ -147,7 +147,7 @@
   }
 }
 
-@media only screen and (max-width: $mobile-version-max-width) {
+@media only screen and (max-width: $breakpoint-mobile-max) {
   .provider-menu {
     padding: 30px 15px 15px 15px;
     &__list {
@@ -158,6 +158,7 @@
       width: 100%;
       min-width: 140px;
       padding: 4px 12px;
+      min-height: 43px;
       &--selected {
         padding: 3px 12px;
         .provider-menu__list-item-description {
