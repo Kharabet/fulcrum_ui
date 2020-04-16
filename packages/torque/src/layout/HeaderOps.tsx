@@ -1,6 +1,4 @@
 import React, { Component } from "react";
-import { ReactComponent as CloseMenu } from "../assets/images/close.svg";
-import { ReactComponent as OpenMenu } from "../assets/images/menu-icon.svg";
 import { OnChainIndicator } from "../components/OnChainIndicator";
 import { ProviderType } from "../domain/ProviderType";
 import { TorqueProvider } from "../services/TorqueProvider";
@@ -10,11 +8,17 @@ import { HeaderMenuToggle } from "./HeaderMenuToggle";
 import { InfoBlock } from "../components/InfoBlock";
 import { FooterMenu } from "./FooterMenu";
 import { FooterVersion } from "./FooterVersion"
+
+import { ReactComponent as MenuIconOpen } from "../assets/images/ic_menu.svg";
+import { ReactComponent as MenuIconClose } from "../assets/images/ic_close.svg";
+import { Footer } from "./Footer"
+
+import siteConfig from "../config/SiteConfig.json";
 export interface IHeaderOpsProps {
   doNetworkConnect: () => void;
   isRiskDisclosureModalOpen: () => void;
   isLoading: boolean;
-  // isMobileMedia: boolean;
+  isMobileMedia: boolean;
 }
 
 interface IHeaderOpsState {
@@ -30,43 +34,35 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
     };
   }
 
+  private Menu: IHeaderMenuProps = {
+    items: [
+      { id: 1, title: "Borrow", link: "/borrow", external: false },
+      { id: 2, title: "Your Loans", link: "/dashboard", external: false },
+      { id: 3, title: "Refinance", link: "/refinance", external: false },
+      { id: 4, title: "Lend", link: "https://fulcrum.trade", external: true },
+      { id: 5, title: "Help Center", link: "https://help.bzx.network/en/collections/2008807-torque", external: true },
+    ]
+  }
+
   /*public componentDidMount(): void {
   }*/
 
-  /*public componentWillUnmount(): void {
-  }*/
+  public componentWillUnmount(): void {
+    document.body.style.overflow = "";
+
+  }
 
   public render() {
-    // return !this.props.isMobileMedia ? this.renderDesktop() : this.renderMobile();
-    return this.renderDesktop();
+    return !this.props.isMobileMedia ? this.renderDesktop() : this.renderMobile();
   }
 
 
 
   private renderDesktop = () => {
 
-    let menu: IHeaderMenuProps;
-    if (TorqueProvider.Instance.providerType !== ProviderType.None) {
-      menu = {
-        items: [
-          { id: 1, title: "Wallets", link: "/wallet/b", external: false },
-          { id: 2, title: "Borrow", link: "/borrow/w", external: false },
-          { id: 3, title: "Dashboard", link: "/dashboard/w", external: false },
-          { id: 4, title: "Lend", link: "https://fulcrum.trade", external: true }
-        ]
-      };
-    } else {
-      menu = {
-        items: [
-          { id: 1, title: "Wallets", link: "/wallet/b", external: false },
-          { id: 2, title: "Borrow", link: "/borrow/n", external: false },
-          { id: 3, title: "Dashboard", link: "/dashboard/n", external: false },
-          { id: 4, title: "Lend", link: "https://fulcrum.trade", external: true }
-        ]
-      };
+    if (siteConfig.BorrowDisabled && !(TorqueProvider.Instance.accounts.length > 0 && TorqueProvider.Instance.accounts[0].toLowerCase() === "0xadff3ada12ed0f8a87e31e5a04dfd2ee054e1118")) {
+      this.Menu.items.splice(0, 1);
     }
-
-    const toggleMenuIcon = !this.state.isMenuOpen ? <OpenMenu /> : <CloseMenu />;
     const sidebarClass = !this.state.isMenuOpen ? 'sidebar_h' : 'sidebar_v'
     return (
       <header className="header">
@@ -75,47 +71,16 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
             <HeaderLogo />
           </div>
           <div className="header__center">
-            <HeaderMenu items={menu.items} />
+            <HeaderMenu items={this.Menu.items} />
           </div>
           <div className="header__right">
-            <a className="help__item" href="https://help.bzx.network/en/collections/2008807-torque">Help Center</a>
-            <div className="header__provider">
-              {TorqueProvider.Instance.providerType !== ProviderType.None ? (
-                <OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />
-              ) : ``}
-            </div>
-            <div className="header_icon" onClick={this.onMenuToggle}>
-              <div className="toggle_icon">
-                {toggleMenuIcon}
-              </div>
-            </div>
-          </div>
-
-        </div>
-
-        <div className={sidebarClass}>
-          <div className="sidebar_header">
-            <HeaderLogo />
-            <div className="header_icon" onClick={this.onMenuToggle}>
-              <div className="toggle_icon">
-                {toggleMenuIcon}
-              </div>
-            </div>
-          </div>
-          <div className="sidebar_content">
-            <div className="header_btn">
-              {TorqueProvider.Instance.providerType !== ProviderType.None ? (
-                <OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />
-              ) : ``}
-            </div>
-            <div className="heade_nav_menu">
-              <HeaderMenu items={menu.items} />
-              <a className="help__item" href="https://help.bzx.network/en/collections/2008807-torque">Help Center</a>
-            </div>
-          </div>
-          <div className="sidebar_footer">
-            <FooterVersion />
-            <FooterMenu {...this.props}/>
+            <OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />
+            {/* <div className="theme-switch-wrapper">
+              <label className="theme-switch">
+                <input type="checkbox" id="checkbox" onChange={this.onSwitchTheme} />
+                <div className="slider round"></div>
+              </label>
+            </div> */}
           </div>
         </div>
         <InfoBlock localstorageItemProp="torque-risk-notice" onAccept={() => { this.forceUpdate() }}>
@@ -129,24 +94,15 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
             You may only manage and repay your existing loans. Full functionality will return after a thorough audit of our newly implemented and preexisting smart contracts.
         </InfoBlock>
           : null}
-
       </header>
     );
   };
-  private onMenuToggle = () => {
-    this.setState({ ...this.state, isMenuOpen: !this.state.isMenuOpen });
-  };
 
 
-  /*private renderMobile = () => {
 
-    const menu: IHeaderMenuProps = {
-      items: [
-        { id: 0, title: "Home", link: "/", external: false },
-        { id: 1, title: "Lend", link: "/lend", external: false },
-        { id: 3, title: "Faq", link: "https://bzx.network/faq-fulcrum.html", external: true }
-      ]
-    };
+  private renderMobile = () => {
+
+    const sidebarClass = !this.state.isMenuOpen ? 'sidebar_h' : 'sidebar_v'
 
     return (
       <header className="header">
@@ -154,21 +110,38 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
           <div className="header__left">
             <HeaderLogo />
           </div>
-          <div className="header__right">
-            <HeaderMenuToggle isMenuOpen={this.state.isMenuOpen} onMenuToggle={this.onMenuToggle} />
+          <div className="header_icon" onClick={this.onMenuToggle}>
+            {!this.state.isMenuOpen ? <MenuIconOpen className="header__menu" /> : <MenuIconClose className="header__menu" />}
           </div>
+
         </div>
         {this.state.isMenuOpen ? (
-          <div className="header__popup-container">
-            <HeaderMenu items={menu.items} />
-            <OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />
+
+          <div className={sidebarClass}>
+            <div className="header_btn">
+
+              <OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />
+              {/* <div className="theme-switch-wrapper">
+                <label className="theme-switch" htmlFor="checkbox">
+                  <input type="checkbox" id="checkbox" onChange={this.onSwitchTheme} defaultChecked={!localStorage.theme || localStorage.theme === 'dark' ? true : false} />
+                  <div className="slider round"></div>
+                </label>
+              </div> */}
+            </div>
+            <div className="header_nav_menu">
+              <HeaderMenu items={this.Menu.items} />
+            </div>
+            <div className="footer-container">
+              <Footer isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
+            </div>
           </div>
         ) : null}
       </header>
     );
   };
 
-  private onMenuToggle = (value: boolean) => {
-    this.setState({ ...this.state, isMenuOpen: value });
-  };*/
+  private onMenuToggle = () => {
+    document.body.style.overflow = !this.state.isMenuOpen ? "hidden" : "";
+    this.setState({ ...this.state, isMenuOpen: !this.state.isMenuOpen });
+  };
 }

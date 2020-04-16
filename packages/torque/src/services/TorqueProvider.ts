@@ -35,20 +35,21 @@ import { IExtendEstimate } from "../domain/IExtendEstimate";
 import { IExtendState } from "../domain/IExtendState";
 import { IRepayEstimate } from "../domain/IRepayEstimate";
 import { IRepayState } from "../domain/IRepayState";
-import { IWalletDetails } from "../domain/IWalletDetails";
 import { IWeb3ProviderSettings } from "../domain/IWeb3ProviderSettings";
 import { ManageCollateralRequest } from "../domain/ManageCollateralRequest";
 import { ProviderType } from "../domain/ProviderType";
 import { IRefinanceLoan, IRefinanceToken, RefinanceCdpData, RefinanceData } from "../domain/RefinanceData";
 import { RepayLoanRequest } from "../domain/RepayLoanRequest";
-import { SetupENSRequest } from "../domain/SetupENSRequest";
-import { WalletType } from "../domain/WalletType";
 import { Web3ConnectionFactory } from "../domain/Web3ConnectionFactory";
 import { BorrowRequestAwaitingStore } from "./BorrowRequestAwaitingStore";
 import { ContractsSource } from "./ContractsSource";
 import { ProviderChangedEvent } from "./events/ProviderChangedEvent";
 import { TorqueProviderEvents } from "./events/TorqueProviderEvents";
 import { NavService } from "./NavService";
+
+
+import { AbstractConnector } from '@web3-react/abstract-connector';
+import { ProviderTypeDictionary } from "../domain/ProviderTypeDictionary";
 
 const web3: Web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
 let configAddress: any;
@@ -57,6 +58,25 @@ if (process.env.REACT_APP_ETH_NETWORK === "mainnet") {
 } else {
   configAddress = constantAddress.kovan;
 }
+
+
+const getNetworkIdByString = (networkName: string | undefined) => {
+  switch (networkName) {
+    case 'mainnet':
+      return 1;
+    case 'ropsten':
+      return 3;
+    case 'rinkeby':
+      return 4;
+    case 'kovan':
+      return 42;
+    default:
+      return 0;
+  }
+}
+const networkName = process.env.REACT_APP_ETH_NETWORK;
+const initialNetworkId = getNetworkIdByString(networkName);
+
 
 export class TorqueProvider {
   public static Instance: TorqueProvider;
@@ -80,7 +100,7 @@ export class TorqueProvider {
   public providerType: ProviderType = ProviderType.None;
   public providerEngine: Web3ProviderEngine | null = null;
   public web3Wrapper: Web3Wrapper | null = null;
-  public web3ProviderSettings: IWeb3ProviderSettings | null = null;
+  public web3ProviderSettings: IWeb3ProviderSettings;
   public contractsSource: ContractsSource | null = null;
   public borrowRequestAwaitingStore: BorrowRequestAwaitingStore | null = null;
   public accounts: string[] = [];
@@ -102,45 +122,34 @@ export class TorqueProvider {
       TorqueProvider.Instance = this;
     }
 
-    const storedProvider: any = TorqueProvider.getLocalstorageItem("providerType");
+    const storedProvider: any = TorqueProvider.getLocalstorageItem('providerType');
     const providerType: ProviderType | null = storedProvider as ProviderType || null;
-    if (providerType) {
-      TorqueProvider.Instance.setWeb3Provider(providerType).then(() => {
-        this.eventEmitter.emit(TorqueProviderEvents.ProviderAvailable);
-        TorqueProvider.Instance.eventEmitter.emit(
-          TorqueProviderEvents.ProviderChanged,
-          new ProviderChangedEvent(TorqueProvider.Instance.providerType, TorqueProvider.Instance.web3Wrapper)
-        );
-      });
-    } else {
-      try {
-        // TorqueProvider.Instance.isLoading = true;
 
-        // setting up readonly provider
-        Web3ConnectionFactory.getWeb3Provider(null, this.eventEmitter).then((providerData) => {
-          // @ts-ignore
-          const web3Wrapper = providerData[0];
-          TorqueProvider.getWeb3ProviderSettings(providerData[3]).then((web3ProviderSettings) => {
-            if (web3Wrapper && web3ProviderSettings) {
-              const contractsSource = new ContractsSource(providerData[1], web3ProviderSettings.networkId, providerData[2]);
-              contractsSource.Init().then(() => {
-                this.web3Wrapper = web3Wrapper;
-                this.providerEngine = providerData[1];
-                this.web3ProviderSettings = web3ProviderSettings;
-                this.contractsSource = contractsSource;
-                this.borrowRequestAwaitingStore = new BorrowRequestAwaitingStore(web3ProviderSettings.networkId, web3Wrapper);
-                // TorqueProvider.Instance.isLoading = false;
-                this.eventEmitter.emit(TorqueProviderEvents.ProviderAvailable);
-              });
-            }
+    this.web3ProviderSettings = TorqueProvider.getWeb3ProviderSettings(initialNetworkId);
+    if (!providerType || providerType === ProviderType.None) {
+
+      // TorqueProvider.Instance.isLoading = true;
+      // setting up readonly provider
+      this.web3ProviderSettings = TorqueProvider.getWeb3ProviderSettings(initialNetworkId);
+      Web3ConnectionFactory.setReadonlyProvider().then(() => {
+        const web3Wrapper = Web3ConnectionFactory.currentWeb3Wrapper;
+        const engine = Web3ConnectionFactory.currentWeb3Engine;
+        const canWrite = Web3ConnectionFactory.canWrite;
+
+        if (web3Wrapper && this.web3ProviderSettings) {
+          const contractsSource = new ContractsSource(engine, this.web3ProviderSettings.networkId, canWrite);
+          contractsSource.Init().then(() => {
+            this.web3Wrapper = web3Wrapper;
+            this.providerEngine = engine;
+            this.contractsSource = contractsSource;
+            this.borrowRequestAwaitingStore = new BorrowRequestAwaitingStore(this.web3ProviderSettings.networkId, web3Wrapper);
+            this.eventEmitter.emit(TorqueProviderEvents.ProviderAvailable);
           });
-        });
-      } catch (e) {
-        // console.log(e);
-        TorqueProvider.Instance.isLoading = false;
-      }
-
+        }
+      });
     }
+
+
 
     return TorqueProvider.Instance;
   }
@@ -163,12 +172,12 @@ export class TorqueProvider {
     }
   }
 
-  public async setWeb3Provider(providerType: ProviderType) {
-    let providerData: [Web3Wrapper | null, Web3ProviderEngine | null, boolean, number];
+  public async setWeb3Provider(connector: AbstractConnector, account?: string) {
+    const providerType = await ProviderTypeDictionary.getProviderTypeByConnector(connector);
     try {
       this.isLoading = true;
       this.unsupportedNetwork = false;
-      providerData = await Web3ConnectionFactory.getWeb3Provider(providerType, this.eventEmitter);
+      await Web3ConnectionFactory.setWalletProvider(connector, account);
     } catch (e) {
       // console.log(e);
       this.isLoading = false;
@@ -176,86 +185,52 @@ export class TorqueProvider {
       return;
     }
 
-    await this.setWeb3ProviderFinalize(providerType, providerData);
+    await this.setWeb3ProviderFinalize(providerType);
     this.isLoading = false;
-
-    const accountAddress =
-      this.accounts.length > 0 && this.accounts[0]
-        ? this.accounts[0].toLowerCase()
-        : null;
-
-    const walletType = TorqueProvider.Instance.providerType !== ProviderType.None ?
-      WalletType.Web3 :
-      WalletType.NonWeb3;
-
-    if (this.destinationAbbr === "b") {
-      NavService.Instance.History.replace(
-        NavService.Instance.getBorrowAddress(walletType)
-      );
-    }
-    if (this.destinationAbbr === "t") {
-      if (accountAddress) {
-        NavService.Instance.History.replace(
-          NavService.Instance.getDashboardAddress(walletType, accountAddress)
-        );
-      }
-    } else {
-      // do nothing
-    }
   }
 
-  public async setWeb3ProviderFinalize(providerType: ProviderType, providerData: [Web3Wrapper | null, Web3ProviderEngine | null, boolean, number]) { // : Promise<boolean> {
-    this.web3Wrapper = providerData[0];
-    this.providerEngine = providerData[1];
-    let canWrite = providerData[2];
-    let networkId = providerData[3];
+  public async setReadonlyWeb3Provider() {
+    await Web3ConnectionFactory.setReadonlyProvider();
+    await this.setWeb3ProviderFinalize(ProviderType.None);
+    this.isLoading = false;
+  }
 
-    this.web3ProviderSettings = await TorqueProvider.getWeb3ProviderSettings(networkId);
-    if (this.web3Wrapper) {
-      if (this.web3ProviderSettings.networkName !== process.env.REACT_APP_ETH_NETWORK) {
-        // TODO: inform the user they are on the wrong network. Make it provider specific (MetaMask, etc)
+  public async setWeb3ProviderFinalize(providerType: ProviderType) { // : Promise<boolean> {
+    this.web3Wrapper = Web3ConnectionFactory.currentWeb3Wrapper;
+    this.providerEngine = Web3ConnectionFactory.currentWeb3Engine;
+    let canWrite = Web3ConnectionFactory.canWrite;
+    const networkId = Web3ConnectionFactory.networkId;
+    this.accounts = Web3ConnectionFactory.userAccount ? [Web3ConnectionFactory.userAccount] : [];
 
-        this.unsupportedNetwork = true;
-        canWrite = false; // revert back to read-only
-        networkId = await this.web3Wrapper.getNetworkIdAsync();
-        this.web3ProviderSettings = await TorqueProvider.getWeb3ProviderSettings(networkId);
-      } else {
-        this.unsupportedNetwork = false;
-      }
+
+    if (this.web3Wrapper && networkId !== initialNetworkId) {
+      // TODO: inform the user they are on the wrong network. Make it provider specific (MetaMask, etc)
+      this.unsupportedNetwork = true;
+      canWrite = false; // revert back to read-only
     }
 
     if (this.web3Wrapper && canWrite) {
-      try {
-        this.accounts = await this.web3Wrapper.getAvailableAddressesAsync() || [];
-      } catch (e) {
-        this.accounts = [];
-      }
+      const web3EngineAccounts = await this.web3Wrapper.getAvailableAddressesAsync();
+      if (web3EngineAccounts.length > 0 && this.accounts.length === 0)
+        this.accounts = web3EngineAccounts;
       if (this.accounts.length === 0) {
         canWrite = false; // revert back to read-only
-      }
-    } else {
-      // this.accounts = [];
-      if (providerType === ProviderType.Bitski && networkId !== 1) {
-        this.unsupportedNetwork = true;
       }
     }
 
     if (this.web3Wrapper && this.web3ProviderSettings.networkId > 0) {
-      this.contractsSource = await new ContractsSource(this.providerEngine, this.web3ProviderSettings.networkId, canWrite);
-      this.borrowRequestAwaitingStore = new BorrowRequestAwaitingStore(this.web3ProviderSettings.networkId, this.web3Wrapper);
-      if (canWrite) {
-        this.providerType = providerType;
-      } else {
-        this.providerType = ProviderType.None;
-      }
-      TorqueProvider.setLocalstorageItem("providerType", providerType);
+      const newContractsSource = await new ContractsSource(this.providerEngine, this.web3ProviderSettings.networkId, canWrite);
+      await newContractsSource.Init();
+      this.contractsSource = newContractsSource;
     } else {
       this.contractsSource = null;
     }
 
-    if (this.contractsSource) {
-      await this.contractsSource.Init();
-    }
+    this.providerType = canWrite
+      ? providerType
+      : ProviderType.None;
+
+    TorqueProvider.setLocalstorageItem('providerType', this.providerType);
   }
 
   public async setWeb3ProviderMobileFinalize(providerType: ProviderType, providerData: [Web3Wrapper | null, Web3ProviderEngine | null, boolean, number, string]) { // : Promise<boolean> {
@@ -315,7 +290,7 @@ export class TorqueProvider {
     TorqueProvider.Instance.isLoading = false;
   }
 
-  public static async getWeb3ProviderSettings(networkId: number | null): Promise<IWeb3ProviderSettings> {
+  public static getWeb3ProviderSettings(networkId: number | null): IWeb3ProviderSettings {
     // tslint:disable-next-line:one-variable-per-declaration
     let networkName, etherscanURL;
     switch (networkId) {
@@ -384,7 +359,6 @@ export class TorqueProvider {
   }*/
 
   public getBorrowDepositEstimate = async (
-    walletType: WalletType,
     borrowAsset: Asset,
     collateralAsset: Asset,
     amount: BigNumber
@@ -483,17 +457,6 @@ export class TorqueProvider {
     return result;
   }
 
-  public checkENSSetup = async (user: string): Promise<boolean | undefined> => {
-    let result;
-    if (this.contractsSource && this.web3Wrapper) {
-      const iENSOwnerContract = await this.contractsSource.getiENSOwnerContract();
-      if (iENSOwnerContract) {
-        result = (await iENSOwnerContract.checkUserSetup.callAsync(user)) !== TorqueProvider.ZERO_ADDRESS;
-      }
-    }
-    return result;
-  };
-
   public checkAndSetApproval = async (asset: Asset, spender: string, amountInBaseUnits: BigNumber): Promise<boolean> => {
     let result = false;
 
@@ -520,7 +483,7 @@ export class TorqueProvider {
   private getMaintenanceMarginAmount = async (asset: Asset, collateralTokenAddress: string): Promise<BigNumber> => {
     if (!this.contractsSource) {
       throw new Error("contractsSource is not defined");
-  }
+    }
     const iToken = await this.contractsSource.getiTokenContract(asset);
     console.log("collateralTokenAddress", collateralTokenAddress);
     const bigNumber = new BigNumber(2 * 10 ** 18); //bigNumber.toFixed() is workaround to prevent soliditySha3 error
@@ -544,7 +507,7 @@ export class TorqueProvider {
         loan.ratio = inRatio;
       } else {
         inRatio = loan.ratio;
-  }
+      }
       const goal = loan.usdValue.times(inRatio).dp(18, BigNumber.ROUND_FLOOR);
       let current = new BigNumber(0);
       for (const deposit of deposits) {
@@ -572,7 +535,7 @@ export class TorqueProvider {
         }
       }
     }
-      };
+  };
 
   public getCompoundLoans = async (): Promise<IRefinanceLoan[]> => {
 
@@ -651,7 +614,7 @@ export class TorqueProvider {
           collateral: [],
           apr: borrowRate.times(60 * 60 * 24 * 365).div(10 ** 16).div(blockTime),
           ratio: new BigNumber(0),
-          type:"Compound"
+          type: "Compound"
         });
         inBorrowed = inBorrowed.plus(token.usdValue);
       }
@@ -667,7 +630,7 @@ export class TorqueProvider {
 
   public getSoloLoans = async (): Promise<IRefinanceLoan[]> => {
 
-        const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
     if (!this.contractsSource || !account) {
       return [];
     }
@@ -684,11 +647,11 @@ export class TorqueProvider {
       const asset = this.contractsSource.getAssetFromAddress(tokens[i]);
       if (asset === Asset.UNKNOWN) {
         continue;
-          }
+      }
       const market = this.contractsSource.getSoloMarket(asset);
       if (market < 0) {
         continue;
-        }
+      }
       const decimals = AssetsDictionary.assets.get(asset)!.decimals || 18;
       const balance = balances[i].value.div(10 ** decimals);
       if (!balance.dp(3, BigNumber.ROUND_CEIL).gt(0)) {
@@ -720,7 +683,7 @@ export class TorqueProvider {
           collateral: [],
           apr: interestRate.value.times(60 * 60 * 24 * 365).div(10 ** 16),
           ratio: new BigNumber(0),
-          type:"dydx"
+          type: "dydx"
         });
         inBorrowed = inBorrowed.plus(token.usdValue);
       }
@@ -738,7 +701,7 @@ export class TorqueProvider {
     const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
     if (!this.web3Wrapper || !this.contractsSource || !account) {
       return;
-      }
+    }
 
     const compoundBridge: CompoundBridgeContract = await this.contractsSource.getCompoundBridgeContract();
     const promises = [];
@@ -808,10 +771,10 @@ export class TorqueProvider {
   };
 
   public migrateSoloLoan = async (loan: IRefinanceLoan, amount: BigNumber) => {
-        const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
     if (!this.web3Wrapper || !this.contractsSource || !account) {
       return;
-          }
+    }
 
     const solo: SoloContract = await this.contractsSource.getSoloContract();
     const soloBridge: SoloBridgeContract = await this.contractsSource.getSoloBridgeContract();
@@ -832,9 +795,9 @@ export class TorqueProvider {
       } catch (e) {
         if (!e.code) {
           alert("setOperators failed: " + e.message);
-      }
+        }
         return null;
-    }
+      }
     }
 
     const markets: BigNumber[] = [];
@@ -845,7 +808,7 @@ export class TorqueProvider {
 
     if (amount.isEqualTo(loan.balance)) {
       amount = new BigNumber(0);
-  }
+    }
 
     loan.usdValue = loan.usdValue.div(divider);
     loan.balance = loan.balance.div(divider);
@@ -881,7 +844,7 @@ export class TorqueProvider {
 
   public getMakerLoans = async (): Promise<RefinanceCdpData[]> => {
     let result: RefinanceCdpData[] = [{
-          cdpId: new BigNumber(0),
+      cdpId: new BigNumber(0),
       urn: "",
       ilk: "",
       accountAddress: "",
@@ -902,7 +865,7 @@ export class TorqueProvider {
 
         for (let i = 0; i < cdpId.length; i++) {
           if (!result[0].cdpId.gt(0)) {
-      result = [{
+            result = [{
               "cdpId": cdpId[i],
               "urn": urn[i],
               "ilk": ilk[i],
@@ -921,8 +884,8 @@ export class TorqueProvider {
               "isInstaProxy": false,
               proxyAddress: ""
             });
-    }
-  }
+          }
+        }
       }
 
       // get Meta account proxies
@@ -1052,18 +1015,18 @@ export class TorqueProvider {
           // @ts-ignore
           asset, this.contractsSource.getAddressFromAsset(collateralAsset)
         );
-          }
+      }
 
       let isDisabled = true;
       if (ratio.times(100).gte(maintenanceMarginAmount)) {
         isDisabled = false;
-            }
+      }
 
       let isDust = false;
       if (urnData[1].times(ilkData[1]).lt(ilkData[4])) {
         // isDisabled = true;
         isDust = true;
-        }
+      }
 
       result = [{
         collateralAmount: urnData[0].dividedBy(10 ** 18),
@@ -1097,9 +1060,9 @@ export class TorqueProvider {
     if (isDust) {
       if (!window.confirm("Remaining debt should be zero or more than " + refRequest.dust.toString(10) + " DAI. Do you want to continue with total amount?")) {
         return null;
-    }
+      }
       loanAmount = refRequest.debt;
-  }
+    }
 
     const cdpManagerAddress = configAddress.CDP_MANAGER;
     if (this.web3Wrapper && this.contractsSource) {
@@ -1120,11 +1083,11 @@ export class TorqueProvider {
           // @ts-ignore
           const allowData = web3.eth.abi.encodeFunctionCall(
             dsProxyAllowABI.default, [
-              cdpManagerAddress,
-              refRequest.cdpId.toString(),
-              configAddress.Maker_Bridge_Address,
-              1
-            ]
+            cdpManagerAddress,
+            refRequest.cdpId.toString(),
+            configAddress.Maker_Bridge_Address,
+            1
+          ]
           );
           const proxyActionsAddress = refRequest.isInstaProxy ?
             configAddress.Insta_Proxy_Actions : configAddress.proxy_Actions_Address;
@@ -1141,8 +1104,8 @@ export class TorqueProvider {
                 window.setTimeout(() => {
                   // do nothing
                 }, 5000);
-    }
-  }
+              }
+            }
           } catch (e) {
             if (!e.code) {
               alert("Dry run failed");
@@ -1176,7 +1139,7 @@ export class TorqueProvider {
             txHash = await proxy.execute.sendTransactionAsync(bridgeActionsAddress, data, {
               from: refRequest.accountAddress
             });
-    }
+          }
           const receipt = await this.waitForTransactionMined(txHash);
           if (receipt.status === 1) {
             return receipt;
@@ -1249,10 +1212,8 @@ export class TorqueProvider {
   };
 
   public doBorrow = async (borrowRequest: BorrowRequest) => {
-    return;
-    /*
     // console.log(borrowRequest);
-    
+
     if (borrowRequest.borrowAmount.lte(0) || borrowRequest.depositAmount.lte(0)) {
       return;
     }
@@ -1376,7 +1337,6 @@ export class TorqueProvider {
     }
 
     return;
-    */
   }
 
   public gasPrice = async (): Promise<BigNumber> => {
@@ -1410,66 +1370,72 @@ export class TorqueProvider {
     return result;
   };
 
-  public getLoansList = async (walletDetails: IWalletDetails): Promise<IBorrowedFundsState[]> => {
+  public getLoansList = async (): Promise<IBorrowedFundsState[]> => {
     let result: IBorrowedFundsState[] = [];
-    if (this.contractsSource) {
-      const iBZxContract = await this.contractsSource.getiBZxContract();
-      if (iBZxContract && walletDetails.walletAddress) {
-        const loansData = await iBZxContract.getBasicLoansData.callAsync(walletDetails.walletAddress, new BigNumber(50));
-        // console.log(loansData);
-        const zero = new BigNumber(0);
-        result = loansData
-          .filter(e => (!e.loanTokenAmountFilled.eq(zero) && !e.currentMarginAmount.eq(zero) && !e.interestDepositRemaining.eq(zero)) || (walletDetails.walletAddress!.toLowerCase() === "0x4abb24590606f5bf4645185e20c4e7b97596ca3b"))
-          .map(e => {
-          const loanAsset = this.contractsSource!.getAssetFromAddress(e.loanTokenAddress);
-          const loanPrecision = AssetsDictionary.assets.get(loanAsset)!.decimals || 18;
-          const collateralAsset = this.contractsSource!.getAssetFromAddress(e.collateralTokenAddress);
-          const collateralPrecision = AssetsDictionary.assets.get(collateralAsset)!.decimals || 18;
-            let amountOwned = e.loanTokenAmountFilled.minus(e.positionTokenAmountFilled).minus(e.interestDepositRemaining);
-          if (amountOwned.lte(0)) {
-            amountOwned = new BigNumber(0);
-          } else {
-              amountOwned = amountOwned.dividedBy(10 ** loanPrecision).dp(5, BigNumber.ROUND_CEIL);
-          }
-          return {
-            accountAddress: walletDetails.walletAddress || "",
-            loanOrderHash: e.loanOrderHash,
-            loanAsset: loanAsset,
-            collateralAsset: collateralAsset,
-              amount: e.loanTokenAmountFilled.dividedBy(10 ** loanPrecision).dp(5, BigNumber.ROUND_CEIL),
-            amountOwed: amountOwned,
-              collateralAmount: e.collateralTokenAmountFilled.dividedBy(10 ** collateralPrecision),
-              collateralizedPercent: e.currentMarginAmount.dividedBy(10 ** 20),
-            interestRate: e.interestOwedPerDay.dividedBy(e.loanTokenAmountFilled).multipliedBy(365),
-              interestOwedPerDay: e.interestOwedPerDay.dividedBy(10 ** loanPrecision),
-            hasManagementContract: true,
-            isInProgress: false,
-            loanData: e
-            };
-        });
-        // console.log(result);
-      }
-    }
+
+    if (!this.contractsSource) return result;
+
+    const iBZxContract = await this.contractsSource.getiBZxContract();
+    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+
+    if (!iBZxContract || !account) return result;
+
+    const loansData = await iBZxContract.getBasicLoansData.callAsync(account, new BigNumber(50));
+    // console.log(loansData);
+    const zero = new BigNumber(0);
+    result = loansData
+      .filter(e => (!e.loanTokenAmountFilled.eq(zero) && !e.currentMarginAmount.eq(zero) && !e.interestDepositRemaining.eq(zero)) || (account.toLowerCase() === "0x4abb24590606f5bf4645185e20c4e7b97596ca3b"))
+      .map(e => {
+        const loanAsset = this.contractsSource!.getAssetFromAddress(e.loanTokenAddress);
+        const loanPrecision = AssetsDictionary.assets.get(loanAsset)!.decimals || 18;
+        const collateralAsset = this.contractsSource!.getAssetFromAddress(e.collateralTokenAddress);
+        const collateralPrecision = AssetsDictionary.assets.get(collateralAsset)!.decimals || 18;
+        let amountOwned = e.loanTokenAmountFilled.minus(e.positionTokenAmountFilled).minus(e.interestDepositRemaining);
+        if (amountOwned.lte(0)) {
+          amountOwned = new BigNumber(0);
+        } else {
+          amountOwned = amountOwned.dividedBy(10 ** loanPrecision).dp(5, BigNumber.ROUND_CEIL);
+        }
+        return {
+          accountAddress: account,
+          loanOrderHash: e.loanOrderHash,
+          loanAsset: loanAsset,
+          collateralAsset: collateralAsset,
+          amount: e.loanTokenAmountFilled.dividedBy(10 ** loanPrecision).dp(5, BigNumber.ROUND_CEIL),
+          amountOwed: amountOwned,
+          collateralAmount: e.collateralTokenAmountFilled.dividedBy(10 ** collateralPrecision),
+          collateralizedPercent: e.currentMarginAmount.dividedBy(10 ** 20),
+          interestRate: e.interestOwedPerDay.dividedBy(e.loanTokenAmountFilled).multipliedBy(365),
+          interestOwedPerDay: e.interestOwedPerDay.dividedBy(10 ** loanPrecision),
+          hasManagementContract: true,
+          isInProgress: false,
+          loanData: e
+        };
+      });
+    // console.log(result);
     return result;
   };
 
-  public getLoansAwaitingList = async (walletDetails: IWalletDetails): Promise<ReadonlyArray<BorrowRequestAwaiting>> => {
+  public getLoansAwaitingList = async (): Promise<ReadonlyArray<BorrowRequestAwaiting>> => {
     let result: ReadonlyArray<BorrowRequestAwaiting> = [];
-    if (this.borrowRequestAwaitingStore) {
-      await this.borrowRequestAwaitingStore.cleanUp(walletDetails);
-      result = await this.borrowRequestAwaitingStore.list(walletDetails);
-    }
+    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
 
+    if (!this.borrowRequestAwaitingStore || !account) return result
+
+    await this.borrowRequestAwaitingStore.cleanUp(account);
+    result = await this.borrowRequestAwaitingStore.list(account);
     return result;
   };
 
   // noinspection JSUnusedGlobalSymbols
-  public getLoansListTest = async (walletDetails: IWalletDetails): Promise<IBorrowedFundsState[]> => {
+  public getLoansListTest = async (): Promise<IBorrowedFundsState[]> => {
+    
+    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
     // noinspection SpellCheckingInspection
     return [
       {
         // TEST ORDER 01
-        accountAddress: walletDetails.walletAddress || "0x1a9f2F3697EbFB35ab0bf337fd7f847637931D4C",
+        accountAddress: account || "0x1a9f2F3697EbFB35ab0bf337fd7f847637931D4C",
         loanOrderHash: "0x0061583F7764A09B35F5594B5AC5062E090614B7FE2B5EF96ACF16496E8B914C",
         loanAsset: Asset.ETH,
         collateralAsset: Asset.ETH,
@@ -1483,7 +1449,7 @@ export class TorqueProvider {
         isInProgress: false
       },
       {
-        accountAddress: walletDetails.walletAddress || "0x1a9f2F3697EbFB35ab0bf337fd7f847637931D4C",
+        accountAddress: account || "0x1a9f2F3697EbFB35ab0bf337fd7f847637931D4C",
         loanOrderHash: "0x2F099560938A4831006D674082201DC31762F2C3926640D4DB3748BDB1A813BF",
         loanAsset: Asset.WBTC,
         collateralAsset: Asset.ETH,
@@ -1497,7 +1463,7 @@ export class TorqueProvider {
         isInProgress: false
       },
       {
-        accountAddress: walletDetails.walletAddress || "0x1a9f2F3697EbFB35ab0bf337fd7f847637931D4C",
+        accountAddress: account || "0x1a9f2F3697EbFB35ab0bf337fd7f847637931D4C",
         loanOrderHash: "0x0A708B339C4472EF9A348269FACAD686E18345EC1342E8C171CCB0DF7DB13A28",
         loanAsset: Asset.SAI,
         collateralAsset: Asset.ETH,
@@ -1511,7 +1477,7 @@ export class TorqueProvider {
         isInProgress: false
       },
       {
-        accountAddress: walletDetails.walletAddress || "0x1a9f2F3697EbFB35ab0bf337fd7f847637931D4C",
+        accountAddress: account || "0x1a9f2F3697EbFB35ab0bf337fd7f847637931D4C",
         loanOrderHash: "0xAA81E9EA1EABE0EBB47A6557716839A7C149864220F10EB628E4DEA6249262DE",
         loanAsset: Asset.BAT,
         collateralAsset: Asset.ETH,
@@ -1525,7 +1491,7 @@ export class TorqueProvider {
         isInProgress: false
       },
       {
-        accountAddress: walletDetails.walletAddress || "0x1a9f2F3697EbFB35ab0bf337fd7f847637931D4C",
+        accountAddress: account || "0x1a9f2F3697EbFB35ab0bf337fd7f847637931D4C",
         loanOrderHash: "0xD826732AC58AB77E4EE0EB80B95D8BC9053EDAB328E5E4DDEAF6DA9BF1A6FCEB",
         loanAsset: Asset.MKR,
         collateralAsset: Asset.ETH,
@@ -1539,7 +1505,7 @@ export class TorqueProvider {
         isInProgress: false
       },
       {
-        accountAddress: walletDetails.walletAddress || "0x1a9f2F3697EbFB35ab0bf337fd7f847637931D4C",
+        accountAddress: account || "0x1a9f2F3697EbFB35ab0bf337fd7f847637931D4C",
         loanOrderHash: "0xE6F8A9C8CDF06CA7C73ACD0B1F414EDB4CE23AD8F9144D22463686A11DD53561",
         loanAsset: Asset.KNC,
         collateralAsset: Asset.ETH,
@@ -1553,7 +1519,7 @@ export class TorqueProvider {
         isInProgress: false
       },
       {
-        accountAddress: walletDetails.walletAddress || "0x1a9f2F3697EbFB35ab0bf337fd7f847637931D4C",
+        accountAddress: account || "0x1a9f2F3697EbFB35ab0bf337fd7f847637931D4C",
         loanOrderHash: "0xA4B2E54FDA03335C1EF63A939A06E2192E0661F923E7C048CDB94B842016CA61",
         loanAsset: Asset.USDC,
         collateralAsset: Asset.ETH,
@@ -1569,22 +1535,13 @@ export class TorqueProvider {
     ];
   };
 
-  public getSetupENSAddress = async (): Promise<string | null> => {
-    return `tokenloan.eth`;
-  };
-
   public getLoanCollateralManagementManagementAddress = async (
     asset: Asset,
-    walletDetails: IWalletDetails,
     borrowedFundsState: IBorrowedFundsState,
     loanValue: BigNumber,
     selectedValue: BigNumber
   ): Promise<string | null> => {
-    if (walletDetails.walletType === WalletType.NonWeb3) {
-      return `topup.${asset.toLowerCase()}.tokenloan.eth`;
-    } else {
-      return `${loanValue > selectedValue ? `withdraw.${asset.toLowerCase()}.tokenloan.eth` : `topup.${asset.toLowerCase()}.tokenloan.eth`}`;
-    }
+    return `${loanValue > selectedValue ? `withdraw.${asset.toLowerCase()}.tokenloan.eth` : `topup.${asset.toLowerCase()}.tokenloan.eth`}`;
   };
 
   //
@@ -1620,12 +1577,11 @@ export class TorqueProvider {
   };
 
   // noinspection JSUnusedLocalSymbols TODO
-  public getLoanCollateralManagementParams = async (walletDetails: IWalletDetails, borrowedFundsState: IBorrowedFundsState): Promise<ICollateralManagementParams> => {
+  public getLoanCollateralManagementParams = async (borrowedFundsState: IBorrowedFundsState): Promise<ICollateralManagementParams> => {
     return { minValue: 0, maxValue: 1.5 * 10 ** 20, currentValue: 0 };
   };
 
   public getLoanCollateralChangeEstimate = async (
-    walletDetails: IWalletDetails,
     borrowedFundsState: IBorrowedFundsState,
     collateralAmount: BigNumber,
     isWithdrawal: boolean
@@ -1668,39 +1624,28 @@ export class TorqueProvider {
     return result;
   };
 
-  // noinspection JSUnusedLocalSymbols TODO
-  public setupENS = async (setupENSRequest: SetupENSRequest) => {
-    return;
-  };
-
   public getLoanRepayGasAmount = async (): Promise<BigNumber> => {
     return new BigNumber(3000000);
   };
 
-  public getLoanRepayAddress = async (walletDetails: IWalletDetails, borrowedFundsState: IBorrowedFundsState): Promise<string | null> => {
+  public getLoanRepayAddress = async (borrowedFundsState: IBorrowedFundsState): Promise<string | null> => {
     return `repay.${borrowedFundsState.loanAsset.toLowerCase()}.tokenloan.eth`;
   };
 
   // noinspection JSUnusedLocalSymbols TODO
-  public getLoanRepayParams = async (walletDetails: IWalletDetails, borrowedFundsState: IBorrowedFundsState): Promise<IRepayState> => {
-    return (walletDetails.walletType === WalletType.Web3)
-        ? { minValue: 0, maxValue: 100, currentValue: 100 }
-        : { minValue: 0, maxValue: 100, currentValue: 100 };
+  public getLoanRepayParams = async (borrowedFundsState: IBorrowedFundsState): Promise<IRepayState> => {
+    return { minValue: 0, maxValue: 100, currentValue: 100 };
   };
 
-  public getLoanRepayEstimate = async (walletDetails: IWalletDetails, borrowedFundsState: IBorrowedFundsState, repayPercent: number): Promise<IRepayEstimate> => {
-    return (walletDetails.walletType === WalletType.NonWeb3)
-      ? { repayAmount: borrowedFundsState.amountOwed }
-      : { repayAmount: borrowedFundsState.amountOwed.multipliedBy(repayPercent).dividedBy(100) };
+  public getLoanRepayEstimate = async (borrowedFundsState: IBorrowedFundsState, repayPercent: number): Promise<IRepayEstimate> => {
+    return { repayAmount: borrowedFundsState.amountOwed.multipliedBy(repayPercent).dividedBy(100) };
   };
 
-  public getLoanRepayPercent = async (walletDetails: IWalletDetails, borrowedFundsState: IBorrowedFundsState, repayAmount: BigNumber): Promise<IRepayEstimate> => {
-    return (walletDetails.walletType === WalletType.NonWeb3)
-      ? { repayAmount: new BigNumber(0) }
-      : {
-        repayAmount: repayAmount,
-        repayPercent: Math.round(repayAmount.multipliedBy(100).dividedBy(borrowedFundsState.amountOwed).toNumber())
-  };
+  public getLoanRepayPercent = async (borrowedFundsState: IBorrowedFundsState, repayAmount: BigNumber): Promise<IRepayEstimate> => {
+    return {
+      repayAmount: repayAmount,
+      repayPercent: Math.round(repayAmount.multipliedBy(100).dividedBy(borrowedFundsState.amountOwed).toNumber())
+    };
   };
 
   public doRepayLoan = async (repayLoanRequest: RepayLoanRequest) => {
@@ -1752,7 +1697,7 @@ export class TorqueProvider {
             {
               from: account,
               value: this.isETHAsset(repayLoanRequest.borrowAsset) ?
-              closeAmountInBaseUnitsValue :
+                closeAmountInBaseUnitsValue :
                 undefined,
               gas: this.gasLimit
             }
@@ -1774,7 +1719,7 @@ export class TorqueProvider {
           {
             from: account,
             value: this.isETHAsset(repayLoanRequest.borrowAsset) ?
-            closeAmountInBaseUnitsValue :
+              closeAmountInBaseUnitsValue :
               undefined,
             gas: gasAmountBN ? gasAmountBN.toString() : "3000000",
             gasPrice: await this.gasPrice()
@@ -1838,7 +1783,7 @@ export class TorqueProvider {
             {
               from: account,
               value: this.isETHAsset(manageCollateralRequest.loanOrderState.collateralAsset) ?
-              collateralAmountInBaseUnitsValue :
+                collateralAmountInBaseUnitsValue :
                 undefined,
               gas: gasAmountBN ? gasAmountBN.toString() : "3000000",
               gasPrice: await this.gasPrice()
@@ -1895,22 +1840,22 @@ export class TorqueProvider {
       asset === Asset.USDC ||
       asset === Asset.SUSD ||
       asset === Asset.USDT) {
-        return true;
-      } else {
-        return false;
-      }
+      return true;
+    } else {
+      return false;
+    }
   }
 
   public getLoanExtendGasAmount = async (): Promise<BigNumber> => {
     return new BigNumber(1000000);
   };
 
-  public getLoanExtendManagementAddress = async (walletDetails: IWalletDetails, borrowedFundsState: IBorrowedFundsState): Promise<string | null> => {
+  public getLoanExtendManagementAddress = async (borrowedFundsState: IBorrowedFundsState): Promise<string | null> => {
     return `extend.${borrowedFundsState.loanAsset.toLowerCase()}.tokenloan.eth`;
   };
 
   // noinspection JSUnusedLocalSymbols TODO
-  public getLoanExtendParams = async (walletDetails: IWalletDetails, borrowedFundsState: IBorrowedFundsState): Promise<IExtendState> => {
+  public getLoanExtendParams = async (borrowedFundsState: IBorrowedFundsState): Promise<IExtendState> => {
     return { minValue: 1, maxValue: 365, currentValue: 90 };
   };
 

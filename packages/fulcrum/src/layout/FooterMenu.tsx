@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import { Link } from "react-router-dom";
 
 interface IFooterMenuProps {
-  isMobileMedia: boolean;
   isRiskDisclosureModalOpen: () => void;
 }
 

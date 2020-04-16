@@ -33,8 +33,8 @@ $breakpoint-mobile-min: 960px;
   --position-marker-color: #8992a4;
   --position-marker-bg: #ffffff;
   --leverage-bg: #ffffff;
-  --leverage-color: #00c0ab;
-  --leverage-color-hover: #33dfcc;
+  --leverage-color: #276BFB;
+  --leverage-color-hover: #5B88FF;
   --lend-item-before: #8992a4;
   --lend-item-before-hover: #a9b5c7;
   --indicator-border: #b9c7d6;
@@ -53,6 +53,8 @@ $breakpoint-mobile-min: 960px;
   --switch-text-pro: #283049;
   --bg-icon-collateral: #ffffff;
   --icon-collateral: #283049;
+  --bg-header: #e9f4ff;
+  --border-tab: #b9c7d6;
 }
 
 [data-theme="dark"] {
@@ -71,7 +73,7 @@ $breakpoint-mobile-min: 960px;
   --position-marker-bg: #444e5a;
   --leverage-bg: #3d4651;
   --leverage-color: #ffffff;
-  --leverage-color-hover: #33dfcc;
+  --leverage-color-hover: #5B88FF;
   --lend-item-before: #29323d;
   --lend-item-before-hover: #343d49;
   --indicator-border: #a2abb8;
@@ -90,4 +92,6 @@ $breakpoint-mobile-min: 960px;
   --switch-text-pro: #8992A4;
   --bg-icon-collateral: #586473;
   --icon-collateral: #ffffff;
+  --bg-header: #333C46;
+  --border-tab: #444e5a;
 }

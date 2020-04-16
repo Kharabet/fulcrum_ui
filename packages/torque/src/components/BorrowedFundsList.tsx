@@ -1,14 +1,10 @@
 import React, { Component, RefObject } from "react";
 import { BorrowRequestAwaiting } from "../domain/BorrowRequestAwaiting";
 import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
-import { IWalletDetails } from "../domain/IWalletDetails";
-import { WalletType } from "../domain/WalletType";
-import { TorqueProvider } from "../services/TorqueProvider";
 import { BorrowedFundsAwaitingListItem } from "./BorrowedFundsAwaitingListItem";
 import { BorrowedFundsListItem } from "./BorrowedFundsListItem";
 
 export interface IBorrowedFundsListProps {
-  walletDetails: IWalletDetails;
   items: IBorrowedFundsState[];
   itemsAwaiting: ReadonlyArray<BorrowRequestAwaiting>;
 
@@ -41,36 +37,20 @@ export class BorrowedFundsList extends Component<IBorrowedFundsListProps, IBorro
   // }
 
   public render() {
-    const itemsAwaiting = this.props.itemsAwaiting.filter(e =>
-      this.props.walletDetails.walletType === WalletType.Web3
-      || this.props.walletDetails.walletType === WalletType.ViewOnly
-      || TorqueProvider.Instance.isETHAsset(e.collateralAsset)
-    )
-      .map((e, index) => {
+    const itemsAwaiting = this.props.itemsAwaiting.map((e, index) => {
         // const rest = index % this.state.colsCount;
         return (
           <BorrowedFundsAwaitingListItem
             key={index}
-            // firstInTheRow={rest === 0}
-            // lastInTheRow={rest === (this.state.colsCount - 1)}
-            walletDetails={this.props.walletDetails}
             itemAwaiting={e}
           />
         );
       });
-    const items = this.props.items.filter(e =>
-      this.props.walletDetails.walletType === WalletType.Web3
-      || this.props.walletDetails.walletType === WalletType.ViewOnly
-      || TorqueProvider.Instance.isETHAsset(e.collateralAsset)
-    )
-      .map((e, index) => {
+    const items = this.props.items.map((e, index) => {
       // const rest = index % this.state.colsCount;
       return (
         <BorrowedFundsListItem
           key={index}
-          // firstInTheRow={rest === 0}
-          // lastInTheRow={rest === (this.state.colsCount - 1)}
-          walletDetails={this.props.walletDetails}
           item={e}
           onManageCollateral={this.props.onManageCollateral}
           onRepayLoan={this.props.onRepayLoan}

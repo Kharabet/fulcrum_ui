@@ -1,6 +1,4 @@
 .trade-token-grid-tab {
-  position: relative;
-  margin-bottom: 2px;
 
   &:after {
     content: "";
@@ -13,18 +11,14 @@
   }
   &__container {
     display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
   }
   &__items {
     display: flex;
+    align-self: flex-end;
   }
-  & .wallet-img-div {
-    [data-theme="light"] & svg path {
-      fill: #c8c8c8;
-    }
-  }
-
   &-item {
-    width: 110px;
     &.eth-tab {
       .eth-svg {
         fill: var(--eth-bg);
@@ -55,7 +49,7 @@
         .trade-token-grid-tab-item__col-token-image {
           span {
             color: #33dfcc;
-            &.count-open-position {
+            &.opened-positions-count {
               color: #ffffff;
             }
           }
@@ -64,16 +58,13 @@
     }
 
     &__col-token-image {
-      height: 50px;
-      width: 136px;
       display: flex;
-      justify-content: flex-start;
+      justify-content: center;
       align-items: center;
-      margin-bottom: 10px;
+      margin-bottom: 15px;
       svg {
         height: 28px;
         width: 28px;
-        margin: 0 7px;
       }
 
       span {
@@ -82,7 +73,7 @@
         font-style: normal;
         line-height: 1.5;
         color: var(--trade-header-color);
-        &.count-open-position {
+        &.opened-positions-count {
           display: flex;
           align-items: center;
           justify-content: center;
@@ -94,69 +85,100 @@
           color: #ffffff;
           font-size: 12px;
           font-weight: 900;
-          line-height: 1;
-        }
-      }
-      &.wallet-img-div {
-        svg {
-          height: 17px;
-          width: 17px;
+          line-height: 21px;
         }
       }
     }
   }
-  &__container {
-    justify-content: space-between;
+  .manage-tab {
+    [data-theme="light"] & svg path {
+      fill: #c8c8c8;
+    }
   }
   @media screen and (min-width: $breakpoint-mobile-min) {
-    padding-top: 50px;
+    position: relative;
 
     &:after {
       width: calc(100vw - 17px);
     }
-  }
-  @media screen and (min-width: $breakpoint-mobile-min) {
+    &__selector {
+      margin-bottom: 15px;
+    }
     &-item {
+      &:not(.manage-tab) {
+        width: 110px;
+      }
       &:not(:last-child) {
         margin: 0 5px;
       }
+      &__col-token-image {
+        svg {
+          margin-right: 7px;
+        }
+      }
+    }
+
+    .manage-tab {
+      width: 155px;
+      svg {
+        height: 17px;
+        width: 17px;
+      }
     }
   }
+
   @media screen and (max-width: $breakpoint-mobile-max) {
-    padding: 25px 0 0 15px;
     &:after {
-      width: 100%;
+      content: none;
     }
-    &__container {
-      flex-direction: column;
+    &__selector {
+      width: 100%;
+      margin: 15px 0;
+      padding: 0 15px;
     }
     &__items {
-      overflow: scroll;
-      scrollbar-width: none;
-      -webkit-overflow-scrolling: touch;
-      &::-webkit-scrollbar {
-        display: none;
-        width: 0px;
-        background: transparent;
-      }
+      width: 100%;
+      order: -1;
+      border-bottom: 1px solid var(--border-tab);
+      padding: 0 15px;
+      background-color: var(--bg-header);
     }
     &-item {
       display: flex;
       &.trade-token-grid-tab-item {
-        width: 80px;
-        &:not(:last-child) {
-          margin-right: 0;
+        &:not(.manage-tab) {
+          width: calc(100% / 5);
         }
       }
       &__col-token-image {
-        display: flex;
-        svg {
-          height: 23px;
-          width: 23px;
-        }
+        margin-left: auto;
+        margin-right: auto;
         span {
-          font-size: 14px;
+          &.opened-positions-count {
+            position: absolute;
+            top: -10px;
+            right: -20px;
+            margin-right: 0;
+          }
         }
+      }
+    }
+    &.manage {
+      .trade-token-grid-tab__selector {
+        display: none;
+      }
+    }
+    .manage-tab {
+      width: auto;
+      position: absolute;
+      top: 25px;
+      right: 87px;
+      &:after {
+        content: none;
+      }
+      svg {
+        height: 20px;
+        width: 20px;
       }
     }
   }

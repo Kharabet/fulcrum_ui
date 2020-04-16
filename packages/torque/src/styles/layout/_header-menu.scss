@@ -1,66 +1,72 @@
 .header-menu-toggle {
   display: flex;
+  flex-direction: row;
   justify-content: flex-end;
+
   height: 100%;
   width: 1.75rem;
   line-height: 3rem;
+
   cursor: pointer;
 }
 
 .header-menu {
   display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  width: 100%;
 }
 
 .header-menu__item {
-  position: relative;
-  @media screen and ( min-width: $mobile-version-max-mobile) {
-    &:not(:first-child) {
-      margin-left: 35px;
-    }
-    &:not(:last-child) {
-      margin-right: 35px;
+  @media screen and (min-width: $breakpoint-desktop-min){
+    margin-right: 40px;
+    &:last-child{
+      margin-left: 30px;
+      margin-right: 20px;
     }
   }
-  @media screen and ( max-width: $breakpoint-max-lg) {
-    &:not(:first-child) {
-      margin-left: 15px;
-    }
-    &:not(:last-child) {
-      margin-right: 15px;
-    }
+  @media screen and (max-width: $breakpoint-desktop-max){
+    margin-right: 45px;
   }
-
+  
   a {
-    font-size: 18px;
-    font-weight: 600;
-    font-style: normal;
-    line-height: 1.5;
+    position: relative;
+
     text-decoration: none;
-    color: #00c0ab;
+    text-align: center;
+    font-family: "Muli", sans-serif;
+    font-style: normal;
+    font-weight: 600;
+    font-size: 18px;
+    line-height: 150%;
+
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+
+    .icon-external {
+      position: absolute;
+      top: -6px;
+      left: -16px;
+    }
+    &:hover .icon-external svg path{
+      stroke: #33dfcc;
+    }
+
 
     &.header-menu__item-link--active {
-      .header-menu__item-link__accent-container {
-        .header-menu__item-link__accent {
-          height: 8px;
-          width: 70px;
-          border-radius: 6px;
-          background-color: #276bfb;
-          position: absolute;
-          top: -66px;
-          left: 0;
-          right: 0;
-          margin: auto;
-        }
+      &:before {
+        content: "";
+        position: absolute;
+        width: 60px;
+        height: 8px;
+        margin: auto;
+        background-color: #276bfb;
+        top: -66px;
+        left: 50%;
+        transform: translate(-50%, 0);
+        border-radius: 6px;
       }
     }
-
-    /*.header-menu__item-link__accent-container {
-      .header-menu__item-link__accent {
-        height: 8px;
-        width: 70px;
-        border-radius: 6px;
-        background-color: #276BFB;
-      }
-    }*/
   }
 }

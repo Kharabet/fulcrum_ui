@@ -1,7 +1,5 @@
 import React, { Component } from "react";
 import { Asset } from "../domain/Asset";
-import { BigNumber } from "@0x/utils";
-import { WalletType } from "../domain/WalletType";
 import { RefinanceAssetCompoundLoanItemMobile } from "./RefinanceAssetCompoundLoanItemMobile";
 import {TorqueProvider} from "../services/TorqueProvider";
 import {TorqueProviderEvents} from "../services/events/TorqueProviderEvents";
@@ -9,7 +7,6 @@ import {RefinanceCompoundData, IRefinanceLoan} from "../domain/RefinanceData";
 
 
 export interface IRefinanceAssetCompoundLoanMobileProps {
-  walletType: WalletType
 
   onSelectAsset?: (asset: Asset) => void;
 }
@@ -27,19 +24,19 @@ export class RefinanceAssetCompoundLoanMobile extends Component<IRefinanceAssetC
       refinanceCompoundData:
       []
     };
-    // console.log("this.state=  "+this.state)
-    TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
-
+    TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderAvailable, this.derivedUpdate);
+    TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderChanged, this.derivedUpdate);
   }
-  // true includes ENS support
-  private onProviderAvailable = () => {
-
-    this.derivedUpdate();
-  };
 
   public componentDidMount(): void {
     this.derivedUpdate();
   }
+
+  componentWillUnmount(): void{
+    TorqueProvider.Instance.eventEmitter.removeListener(TorqueProviderEvents.ProviderAvailable, this.derivedUpdate);
+    TorqueProvider.Instance.eventEmitter.removeListener(TorqueProviderEvents.ProviderChanged, this.derivedUpdate);
+  }
+
   private derivedUpdate = async () => {
     const loans = await TorqueProvider.Instance.getCompoundLoans(); // TODO
 
@@ -53,34 +50,8 @@ export class RefinanceAssetCompoundLoanMobile extends Component<IRefinanceAssetC
 
 
   public render() {
-
-    // let assetList = Array.from(this.assetsShown.keys());
-    let refinanceCompound = this.state.refinanceCompoundData
-    let items;
-    if (this.props.walletType === WalletType.Web3) {
-      items = refinanceCompound.map((e, index)  => {
-
-          return (
-
-            <RefinanceAssetCompoundLoanItemMobile key={index} {...e} />
-          );
-
-      });
-
-    } else {
-      // assetList = assetList.sort(e => this.assetsShown.get(e) ? -1 : 1);
-
-        items = refinanceCompound.map((e, index) => {
-
-          return (
-            <RefinanceAssetCompoundLoanItemMobile key={index} {...e} />
-          );
-
-        });
-
-    }
+    const items = this.state.refinanceCompoundData.map((e, index) => (<RefinanceAssetCompoundLoanItemMobile key={index} {...e} />));
 
     return <div className="refinance-asset-selector">{items}</div>;
-
   }
 }
