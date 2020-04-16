@@ -53,6 +53,8 @@ $breakpoint-mobile-min: 960px;
   --switch-text-pro: #283049;
   --bg-icon-collateral: #ffffff;
   --icon-collateral: #283049;
+  --bg-header: #e9f4ff;
+  --border-tab: #b9c7d6;
 }
 
 [data-theme="dark"] {
@@ -90,4 +92,6 @@ $breakpoint-mobile-min: 960px;
   --switch-text-pro: #8992A4;
   --bg-icon-collateral: #586473;
   --icon-collateral: #ffffff;
+  --bg-header: #333C46;
+  --border-tab: #444e5a;
 }

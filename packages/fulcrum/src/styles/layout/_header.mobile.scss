@@ -1,9 +1,9 @@
 @media only screen and (max-width: $mobile-version-max-width) {
   .header {
     // padding-left: 2rem;
-    margin-top: 15px;
-    padding-top: 0;
+    padding: 15px 15px 20px 15px;
     margin-bottom: 0;
+    background-color: var(--bg-header);
     // padding-right: 2rem;
     .header__row {
       align-items: center;

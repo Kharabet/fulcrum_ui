@@ -90,13 +90,12 @@
         }
       }
     }
-    .manage-tab {
-      [data-theme="light"] & svg path {
-        fill: #c8c8c8;
-      }
+  }
+  .manage-tab {
+    [data-theme="light"] & svg path {
+      fill: #c8c8c8;
     }
   }
-
   @media screen and (min-width: $breakpoint-mobile-min) {
     position: relative;
     padding-top: 50px;
@@ -137,12 +136,14 @@
     &__selector {
       width: 100%;
       margin: 15px 0;
+      padding: 0 15px;
     }
     &__items {
       width: 100%;
       order: -1;
-      border-bottom: 1px solid #444e5a;
-      margin-top: 20px;
+      border-bottom: 1px solid var(--border-tab);
+      padding: 0 15px;
+      background-color: var(--bg-header);
     }
     &-item {
       display: flex;
