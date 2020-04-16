@@ -20,7 +20,7 @@ $width: 33%;
     font-weight: 900;
     line-height: 1.4;
     text-align: center;
-    margin: 25px auto 15px auto;
+    margin: 25px auto 0 auto;
     color: var(--primary-text);
   }
 }
@@ -30,7 +30,7 @@ $width: 33%;
   display: flex;
   flex-wrap: wrap;
   width: 248px;
-  margin: 0 auto 20px auto;
+  margin: 20px auto 30px auto;
   border: 1px solid #444e5a;
   button {
     width: 123px;

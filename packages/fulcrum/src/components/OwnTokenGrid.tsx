@@ -8,6 +8,7 @@ import { HistoryTokenGridHeader } from "./HistoryTokenGridHeader";
 import { IOwnTokenGridRowProps, OwnTokenGridRow } from "./OwnTokenGridRow";
 import { HistoryTokenGridRow } from "./HistoryTokenGridRow";
 import { OwnTokenCardMobile } from "./OwnTokenCardMobile";
+import { HistoryTokenCardMobile } from "./HistoryTokenCardMobile";
 
 export interface IOwnTokenGridProps {
   isMobileMedia: boolean;
@@ -102,12 +103,14 @@ export class OwnTokenGrid extends Component<IOwnTokenGridProps, IOwnTokenGridSta
 
   private renderMobile = () => {
     const ownRows = this.props.ownRowsData.map(e => <OwnTokenCardMobile key={`${e.currentKey.toString()}`} {...e} />);
-    const historyRows = this.props.ownRowsData.map(e => <HistoryTokenGridRow key={`${e.currentKey.toString()}`} {...e} />);
+    const historyRows = this.props.ownRowsData.map(e => <HistoryTokenCardMobile key={`${e.currentKey.toString()}`} {...e} />);
     if (ownRows.length === 0) return null;
 
     return (
       <div className="own-token-cards">
-        <div className="own-token-cards__header">Manage</div>
+        {!this.state.isShowHistory
+          ? <div className="own-token-cards__header">Manage</div>
+          : null}
         <div className="group-button">
           <button className={`${!this.state.isShowHistory ? `active` : ``}`} onClick={this.onShowOpenPositions}>Open positions</button>
           <button className={`${this.state.isShowHistory ? `active` : ``}`} onClick={this.onShowHistory}>Trade history</button>
