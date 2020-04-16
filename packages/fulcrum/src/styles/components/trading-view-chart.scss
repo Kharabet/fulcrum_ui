@@ -4,7 +4,10 @@
   @media only screen and (min-width: $mobile-version-max-width){
     min-height: 400px;
   }
+}
+.chart-wrapper{
   @media(max-width: $breakpoint-mobile-max){
-    padding-left: 5px;
+    padding-left: 15px;
+    padding-right: 15px;
   }
 }

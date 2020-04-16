@@ -1,9 +1,11 @@
 .trade-token-card-mobile__wrapper {
     font-family: 'Muli', sans-serif;
-    padding: 15px;
+    padding: 0 15px;
+    margin-bottom: 15px;
 }
 
 .trade-token-card-mobile {
+    margin-bottom: 1px;
     &__header {
         padding: 15px 10px;
 
@@ -46,7 +48,7 @@
 
                 border: none;
                 &.btn-active {
-                    background: #00c0ab;
+                    background: #276BFB;
                     color: #ffffff;
                 }
             }
@@ -78,10 +80,10 @@
             justify-content: center;
             letter-spacing: 0.05em;
             color: #ffffff;
-            background: #276bfb;
+            background: #00C0AB;
             border-radius: 43px;
             &:hover {
-                background: #5b88ff;
+                background: #33DFCC;
             }
             
             &:not(:disabled){

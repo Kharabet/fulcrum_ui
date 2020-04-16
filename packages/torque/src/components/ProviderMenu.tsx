@@ -6,12 +6,14 @@ import { ProviderTypeDictionary } from "../domain/ProviderTypeDictionary";
 import { TorqueProvider } from "../services/TorqueProvider";
 import { injected } from "../domain/WalletConnectors";
 import { AbstractConnector } from '@web3-react/abstract-connector';
+import { ReactComponent as CloseIcon } from "../assets/images/ic__close.svg"
 
 export interface IProviderMenuProps {
   providerTypes: ProviderType[];
   isMobileMedia: boolean;
   onSelect: (selectedConnector: AbstractConnector, account?: string) => void;
   onDeactivate: () => void;
+  onProviderMenuClose: () => void;
 }
 
 export const ProviderMenu = (props: IProviderMenuProps) => {
@@ -73,7 +75,10 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
 
   return (
     <div className="provider-menu">
-      <div className="provider-menu__title">Select Wallet</div>
+      <div className="provider-menu__title">
+        Select Wallet
+        <CloseIcon className="disclosure__close" onClick={props.onProviderMenuClose} />
+      </div>
       <ul className="provider-menu__list">{renderItems()}</ul>
       < button
         className="disconnect"
@@ -82,7 +87,7 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
           deactivate()
           props.onDeactivate()
         }}
-      >Deactivate
+      >Disconnect
       </button>
     </div>
   );

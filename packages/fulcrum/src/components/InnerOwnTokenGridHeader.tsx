@@ -1,32 +1,34 @@
 import React, { Component } from "react";
+import { Asset } from "../domain/Asset";
 
 export interface IInnerOwnTokenGridHeaderProps {
+  asset?: Asset;
 }
 
 export class InnerOwnTokenGridHeader extends Component<IInnerOwnTokenGridHeaderProps> {
   public render() {
     return (
-      <div className="own-token-grid-header-inner">
-        <div className="own-token-grid-header-inner__col-token-image">
-          <span className="own-token-grid-header-inner__text">Position (ETH/DAI)</span>
+      <div className="inner-own-token-grid-header">
+        <div className="inner-own-token-grid-header__col-token-image">
+    <span className="inner-own-token-grid-header__text">{`Position (${this.props.asset}/DAI)`}</span>
         </div>
-        <div className="own-token-grid-header-inner__col-asset-type">
-          <span className="own-token-grid-header-inner__text">Type</span>
+        <div className="inner-own-token-grid-header__col-asset-type">
+          <span className="inner-own-token-grid-header__text">Type</span>
         </div>
-        <div className="own-token-grid-header-inner__col-asset-price">
-          <span className="own-token-grid-header-inner__text">Value</span>
+        <div className="inner-own-token-grid-header__col-asset-price">
+          <span className="inner-own-token-grid-header__text">Value</span>
         </div>
-        <div className="own-token-grid-header-inner__col-asset-collateral">
-          <span className="own-token-grid-header-inner__text">Collateral</span>
+        <div className="inner-own-token-grid-header__col-asset-collateral">
+          <span className="inner-own-token-grid-header__text">Collateral</span>
         </div>
-        <div className="own-token-grid-header-inner__col-position-value">
-          <span className="own-token-grid-header-inner__text">Open Price</span>
+        <div className="inner-own-token-grid-header__col-position-value">
+          <span className="inner-own-token-grid-header__text">Open Price</span>
         </div>
-        <div className="own-token-grid-header-inner__col-liquidation-price">
-          <span className="own-token-grid-header-inner__text">Liquidation Price</span>
+        <div className="inner-own-token-grid-header__col-liquidation-price">
+          <span className="inner-own-token-grid-header__text">Liquidation Price</span>
         </div>
-        <div className="own-token-grid-header-inner__col-profit">
-          <span className="own-token-grid-header-inner__text">Profit</span>
+        <div className="inner-own-token-grid-header__col-profit">
+          <span className="inner-own-token-grid-header__text">Profit</span>
         </div>
       </div>
     );

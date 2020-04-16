@@ -1,7 +1,4 @@
 import React, { Component } from "react";
-import { ManageCollateralRequest } from "../domain/ManageCollateralRequest";
-import { TradeRequest } from "../domain/TradeRequest";
-import { TradeTokenKey } from "../domain/TradeTokenKey";
 import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { TradeTransactionMinedEvent } from "../services/events/TradeTransactionMinedEvent";
@@ -11,28 +8,15 @@ import { HistoryTokenGridHeader } from "./HistoryTokenGridHeader";
 import { IOwnTokenGridRowProps, OwnTokenGridRow } from "./OwnTokenGridRow";
 import { HistoryTokenGridRow } from "./HistoryTokenGridRow";
 import { OwnTokenCardMobile } from "./OwnTokenCardMobile";
-import { TradeType } from "../domain/TradeType";
-import { Asset } from "../domain/Asset";
-import { PositionType } from "../domain/PositionType";
-import { BigNumber } from "@0x/utils";
-import { ReactComponent as OpenManageCollateral } from "../assets/images/openManageCollateral.svg";
+import { HistoryTokenCardMobile } from "./HistoryTokenCardMobile";
 
 export interface IOwnTokenGridProps {
-  showMyTokensOnly: boolean;
-  selectedKey: TradeTokenKey;
-
-  asset?: Asset;
-  positionType?: PositionType;
-  // onDetails: (key: TradeTokenKey) => void;
-  // onManageCollateral: (request: ManageCollateralRequest) => void;
-  onSelect: (key: TradeTokenKey) => void;
-  onTrade: (request: TradeRequest) => void;
   isMobileMedia: boolean;
-  onManageCollateralOpen: () => void;
+  ownRowsData: IOwnTokenGridRowProps[];
 }
 
 interface IOwnTokenGridState {
-  tokenRowsData: IOwnTokenGridRowProps[];
+  ownRowsData: IOwnTokenGridRowProps[];
   isShowHistory: boolean;
 }
 
@@ -41,7 +25,7 @@ export class OwnTokenGrid extends Component<IOwnTokenGridProps, IOwnTokenGridSta
     super(props);
     this._isMounted = false;
     this.state = {
-      tokenRowsData: [],
+      ownRowsData: [],
       isShowHistory: false
     };
 
@@ -54,8 +38,6 @@ export class OwnTokenGrid extends Component<IOwnTokenGridProps, IOwnTokenGridSta
   private _isMounted: boolean;
 
   public async derivedUpdate() {
-    const tokenRowsData = await OwnTokenGrid.getRowsData(this.props);
-    this._isMounted && this.setState({ ...this.state, tokenRowsData: tokenRowsData });
   }
 
   public componentWillUnmount(): void {
@@ -63,6 +45,10 @@ export class OwnTokenGrid extends Component<IOwnTokenGridProps, IOwnTokenGridSta
 
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.TradeTransactionMined, this.onTradeTransactionMined);
+  }
+
+  public componentWillMount(): void {
+    this.derivedUpdate();
   }
 
   public componentDidMount(): void {
@@ -77,8 +63,7 @@ export class OwnTokenGrid extends Component<IOwnTokenGridProps, IOwnTokenGridSta
     snapshot?: any
   ): void {
     if (
-      this.props.selectedKey !== prevProps.selectedKey ||
-      this.props.showMyTokensOnly !== prevProps.showMyTokensOnly
+      this.state.ownRowsData !== prevState.ownRowsData
     ) {
       this.derivedUpdate();
     }
@@ -91,15 +76,15 @@ export class OwnTokenGrid extends Component<IOwnTokenGridProps, IOwnTokenGridSta
   }
 
   private renderDesktop = () => {
-    const tokenRows = this.state.tokenRowsData.map(e => <OwnTokenGridRow onManageCollateralOpen={this.props.onManageCollateralOpen} key={`${e.currentKey.toString()}`} {...e} />);
-    const historyRows = this.state.tokenRowsData.map(e => <HistoryTokenGridRow key={`${e.currentKey.toString()}`} {...e} />);
-    if (tokenRows.length === 0) return null;
+    const ownRows = this.props.ownRowsData.map(e => <OwnTokenGridRow key={`${e.currentKey.toString()}`} {...e} />);
+    const historyRows = this.props.ownRowsData.map(e => <HistoryTokenGridRow key={`${e.currentKey.toString()}`} {...e} />);
+    if (ownRows.length === 0) return null;
 
     return (
       <div className="own-token-grid">
-        <div className="group-button">
-          <button className={`${!this.state.isShowHistory ? `active` : ``}`} onClick={this.onShowOpenPositions}>Open positions</button>
-          <button className={`${this.state.isShowHistory ? `active` : ``}`} onClick={this.onShowHistory}>Trade history</button>
+        <div className="group-tabs">
+          <div className={`tab ${!this.state.isShowHistory ? `active` : ``}`} onClick={this.onShowOpenPositions}>Open positions</div>
+          <div className={`tab ${this.state.isShowHistory ? `active` : ``}`} onClick={this.onShowHistory}>Trade history</div>
         </div>
         {this.state.isShowHistory
           ? <React.Fragment>
@@ -108,7 +93,7 @@ export class OwnTokenGrid extends Component<IOwnTokenGridProps, IOwnTokenGridSta
           </React.Fragment>
           : <React.Fragment>
             <OwnTokenGridHeader />
-            {tokenRows}
+            {ownRows}
           </React.Fragment>
         }
 
@@ -117,70 +102,25 @@ export class OwnTokenGrid extends Component<IOwnTokenGridProps, IOwnTokenGridSta
   }
 
   private renderMobile = () => {
-    const tokenRows = this.state.tokenRowsData.map(e => <OwnTokenCardMobile key={`${e.currentKey.toString()}`} {...e} />);
-    if (tokenRows.length === 0) return null;
+    const ownRows = this.props.ownRowsData.map(e => <OwnTokenCardMobile key={`${e.currentKey.toString()}`} {...e} />);
+    const historyRows = this.props.ownRowsData.map(e => <HistoryTokenCardMobile key={`${e.currentKey.toString()}`} {...e} />);
+    if (ownRows.length === 0) return null;
 
     return (
       <div className="own-token-cards">
-
-        <div className="own-token-cards__header">Manage</div>
+        {!this.state.isShowHistory
+          ? <div className="own-token-cards__header">Manage</div>
+          : null}
+        <div className="group-button">
+          <button className={`${!this.state.isShowHistory ? `active` : ``}`} onClick={this.onShowOpenPositions}>Open positions</button>
+          <button className={`${this.state.isShowHistory ? `active` : ``}`} onClick={this.onShowHistory}>Trade history</button>
+        </div>
         <div className="own-token-cards__container">
-          {tokenRows}
+          {this.state.isShowHistory ? historyRows : ownRows}
         </div>
       </div>
     );
   }
-  public onSellClick = (event: React.MouseEvent<HTMLElement>) => {
-    event.stopPropagation();
-
-    this.props.onTrade(
-      new TradeRequest(
-        TradeType.SELL,
-        this.props.selectedKey.asset,
-        this.props.selectedKey.unitOfAccount,
-        this.props.selectedKey.positionType === PositionType.SHORT ? this.props.selectedKey.asset : Asset.USDC,
-        this.props.selectedKey.positionType,
-        this.props.selectedKey.leverage,
-        new BigNumber(0),
-        this.props.selectedKey.isTokenized,
-        this.props.selectedKey.version
-      )
-    );
-  };
-
-  private static getRowsData = async (props: IOwnTokenGridProps): Promise<IOwnTokenGridRowProps[]> => {
-    const rowsData: IOwnTokenGridRowProps[] = [];
-
-    if (FulcrumProvider.Instance.web3Wrapper && FulcrumProvider.Instance.contractsSource && FulcrumProvider.Instance.contractsSource.canWrite) {
-      const pTokens = props.asset && props.positionType
-        ? FulcrumProvider.Instance.getPTokensAvailable().filter(tradeToken => tradeToken.asset == props.asset && tradeToken.positionType == props.positionType)
-        : FulcrumProvider.Instance.getPTokensAvailable()
-
-      const pTokenAddreses: string[] = FulcrumProvider.Instance.getPTokenErc20AddressList();
-      const pTokenBalances = await FulcrumProvider.Instance.getErc20BalancesOfUser(pTokenAddreses);
-      for (const pToken of pTokens) {
-        // console.log(pToken);
-        const balance = pTokenBalances.get(pToken.erc20Address);
-        if (!balance) {
-          continue;
-        }
-
-        rowsData.push({
-          selectedKey: props.selectedKey,
-          currentKey: pToken,
-          // // balance: balance,
-          // onDetails: props.onDetails,
-          //onManageCollateral: props.onManageCollateral,
-          onSelect: props.onSelect,
-          onTrade: props.onTrade,
-          onManageCollateralOpen: props.onManageCollateralOpen,
-          showMyTokensOnly: props.showMyTokensOnly
-        });
-      }
-    }
-
-    return rowsData;
-  };
 
   private onProviderChanged = async (event: ProviderChangedEvent) => {
     await this.derivedUpdate();

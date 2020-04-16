@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 
 export interface ITradeTokenGridHeaderProps {
-  showMyTokensOnly: boolean;
 }
 
 export class TradeTokenGridHeader extends Component<ITradeTokenGridHeaderProps> {

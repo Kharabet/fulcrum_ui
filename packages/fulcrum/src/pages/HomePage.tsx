@@ -15,7 +15,7 @@ export class HomePage extends PureComponent<IHomePageProps> {
         <main>
           <OpsSelector />
         </main>
-        <Footer isMobileMedia={this.props.isMobileMedia} isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
+        <Footer isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
       </div>
     );
   }

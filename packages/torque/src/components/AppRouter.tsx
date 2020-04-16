@@ -106,6 +106,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
             isMobileMedia={this.state.isMobileMedia}
             onSelect={this.onProviderTypeSelect}
             onDeactivate={this.onDeactivate}
+            onProviderMenuClose={this.onRequestClose}
           />
         </Modal>
 
