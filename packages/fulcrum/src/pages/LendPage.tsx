@@ -85,7 +85,7 @@ export class LendPage extends PureComponent<ILendPageProps, ILendPageState> {
             />
           </Modal>
         </main>
-        <Footer isMobileMedia={this.props.isMobileMedia} isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
+        <Footer isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
       </div>
     );
   }

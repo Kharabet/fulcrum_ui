@@ -267,7 +267,7 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
             />
           </Modal>
         </main>
-        {!this.props.isMobileMedia ? <Footer isMobileMedia={this.props.isMobileMedia} isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} /> : null}
+        {!this.props.isMobileMedia ? <Footer isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} /> : null}
       </div>
     );
   }

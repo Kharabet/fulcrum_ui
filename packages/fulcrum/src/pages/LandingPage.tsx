@@ -30,7 +30,7 @@ export class LandingPage extends PureComponent<ILandingPageProps> {
             </div>
           </div>
         </main>
-        <Footer isMobileMedia={this.props.isMobileMedia} isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
+        <Footer isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
       </div>
     );
   }
