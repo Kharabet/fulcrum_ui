@@ -3,7 +3,9 @@
     // padding-left: 2rem;
     padding: 15px 15px 20px 15px;
     margin-bottom: 0;
-    background-color: var(--bg-header);
+    .trade-page &{
+      background-color: var(--bg-header);
+    }
     // padding-right: 2rem;
     .header__row {
       align-items: center;
