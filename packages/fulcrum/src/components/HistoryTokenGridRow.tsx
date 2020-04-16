@@ -97,25 +97,25 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
     if (!state.assetDetails) return <React.Fragment></React.Fragment>;
     return (
       <React.Fragment>
-        <div className="own-token-grid-row-history">
-          <div className="own-token-grid-row-history__col-token-date">
+        <div className="history-token-grid-row">
+          <div className="history-token-grid-row__col-token-date">
             12 June 2019
           </div>
-          <div className="own-token-grid-row-history__col-token-asset">
+          <div className="history-token-grid-row__col-token-asset">
             SAI
           </div>
-          <div className="own-token-grid-row-history__col-type">
+          <div className="history-token-grid-row__col-type">
             <div className="position-type-marker">
               {`${props.currentKey.leverage}x ${props.currentKey.positionType}`}
             </div>
           </div>
-          <div className="own-token-grid-row-history__col-asset-unit">
+          <div className="history-token-grid-row__col-asset-unit">
             {props.currentKey.unitOfAccount}
           </div>
-          <div className="own-token-grid-row-history__col-position">
+          <div className="history-token-grid-row__col-position">
             0.8884
           </div>
-          <div className="own-token-grid-row-history__col-asset-price">
+          <div className="history-token-grid-row__col-asset-price">
             {!state.isLoading
               ? <React.Fragment>
                 <span className="sign-currency">$</span>{bnPrice.toFixed(2)}
@@ -123,7 +123,7 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
               : <Preloader width="74px" />
             }
           </div>
-          <div className="own-token-grid-row-history__col-liquidation-price">
+          <div className="history-token-grid-row__col-liquidation-price">
             {!state.isLoading
               ? state.assetBalance
                 ? <React.Fragment>
@@ -133,7 +133,7 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
               : <Preloader width="74px" />
             }
           </div>
-          <div className="own-token-grid-row-history__col-position-value">
+          <div className="history-token-grid-row__col-position-value">
             {!state.isLoading
               ? state.assetBalance
                 ? <React.Fragment>
@@ -143,7 +143,7 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
               : <Preloader width="74px" />
             }
           </div>
-          <div className="own-token-grid-row-history__col-profit">
+          <div className="history-token-grid-row__col-profit">
             {!state.isLoading
               ? state.profit
                 ? <React.Fragment>
@@ -153,7 +153,7 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
               : <Preloader width="74px" />
             }
           </div>
-          <div className="own-token-grid-row-history__result">
+          <div className="history-token-grid-row__result">
             Liquidated
           </div>
         </div>
