@@ -177,6 +177,7 @@ $width: 33%;
   &__col-collateral-wrapper {
     display: flex;
     flex-direction: column;
+    color: var(--primary-text);
   }
   &__position-value {
     align-self: start;
