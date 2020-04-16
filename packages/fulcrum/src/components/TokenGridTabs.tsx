@@ -89,8 +89,8 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
           </div>
           <div className="trade-token-grid-tab__items">
             {this.props.assets.map(asset => (this.renderAsset(asset)))}
-            <div className={`trade-token-grid-tab-item ${this.state.isShowMyTokensOnly ? "trade-token-grid-tab-item--active" : ""}`} onClick={this.showMyTokensOnlyChange}>
-              <div className={`trade-token-grid-tab-item__col-token-image wallet-img-div`} >
+            <div className={`trade-token-grid-tab-item manage-tab ${this.state.isShowMyTokensOnly ? "trade-token-grid-tab-item--active" : ""}`} onClick={this.showMyTokensOnlyChange}>
+              <div className={`trade-token-grid-tab-item__col-token-image`} >
                 {<WalletSvg />}
                 <span>Manage</span>
                 <span className="count-open-position">{this.props.openedPositionsCount}</span>
