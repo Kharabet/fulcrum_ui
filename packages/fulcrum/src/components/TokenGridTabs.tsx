@@ -97,12 +97,17 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
               </div>
             </div>
           </div>
-          <div className="pro-switch-wrapper">
-            <label className={`pro-switch ${this.state.isPro ? `active` : ``}`}>
-              <input type="checkbox" id="checkbox" onChange={this.onSwitchPro} />
-              <div className="slider round"></div>
-            </label>
-          </div>
+          {!this.props.isMobile
+            ? <React.Fragment>
+              <div className="pro-switch-wrapper">
+                <label className={`pro-switch ${this.state.isPro ? `active` : ``}`}>
+                  <input type="checkbox" id="checkbox" onChange={this.onSwitchPro} />
+                  <div className="slider round"></div>
+                </label>
+              </div>
+            </React.Fragment>
+            : null
+          }
         </div>
       </div>
     )
