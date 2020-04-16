@@ -34,33 +34,37 @@ $width-col-actions: 10%;
   display: flex;
 }
 .own-token-grid {
-  .group-button {
-    background-color: var(--switch-bg-pro);
-    border-radius: 35px;
-    padding: 4px;
+  .group-tabs {
     display: flex;
     flex-wrap: wrap;
-    width: 288px;
-    margin: 35px auto;
-    button {
-      width: 140px;
-      height: 40px;
-      border-radius: 35px;
-      border: none;
-      outline: none;
+    margin: 45px auto 40px auto;
+    padding-left: 25px;
+    border-bottom: 1px solid var(--indicator-border);
+    width: 100%;
+    overflow: hidden;
+    .tab {
       display: flex;
       align-self: center;
       justify-content: center;
-      background-color: transparent;
-      font-size: 12px;
+      font-size: 14px;
       line-height: 1.5;
       font-weight: 800;
       color: #8992a4;
       text-transform: uppercase;
       cursor: pointer;
+      padding: 10px 20px;
       &.active {
-        background-color: #276bfb;
-        color: #ffffff;
+        color: var(--primary-text);
+        position: relative;
+        &:after {
+          content: "";
+          height: 8px;
+          border-radius: 4px;
+          width: 100%;
+          position: absolute;
+          bottom: -4px;
+          background-color: #276bfb;
+        }
       }
     }
   }

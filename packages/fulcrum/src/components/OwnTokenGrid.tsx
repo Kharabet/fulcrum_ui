@@ -81,9 +81,9 @@ export class OwnTokenGrid extends Component<IOwnTokenGridProps, IOwnTokenGridSta
 
     return (
       <div className="own-token-grid">
-        <div className="group-button">
-          <button className={`${!this.state.isShowHistory ? `active` : ``}`} onClick={this.onShowOpenPositions}>Open positions</button>
-          <button className={`${this.state.isShowHistory ? `active` : ``}`} onClick={this.onShowHistory}>Trade history</button>
+        <div className="group-tabs">
+          <div className={`tab ${!this.state.isShowHistory ? `active` : ``}`} onClick={this.onShowOpenPositions}>Open positions</div>
+          <div className={`tab ${this.state.isShowHistory ? `active` : ``}`} onClick={this.onShowHistory}>Trade history</div>
         </div>
         {this.state.isShowHistory
           ? <React.Fragment>
