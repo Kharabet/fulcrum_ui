@@ -8,15 +8,12 @@ import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
 import { IRepayEstimate } from "../domain/IRepayEstimate";
-import { IWalletDetails } from "../domain/IWalletDetails";
 import { RepayLoanRequest } from "../domain/RepayLoanRequest";
-import { WalletType } from "../domain/WalletType";
 import { TorqueProvider } from "../services/TorqueProvider";
 import { OpsEstimatedResult } from "./OpsEstimatedResult";
 import { RepayLoanSlider } from "./RepayLoanSlider";
 
 export interface IRepayLoanFormProps {
-  walletDetails: IWalletDetails;
   loanOrderState: IBorrowedFundsState;
 
   didSubmit: boolean;
@@ -96,11 +93,9 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
 
   public componentDidMount(): void {
     TorqueProvider.Instance.getLoanRepayParams(
-      this.props.walletDetails,
       this.props.loanOrderState,
     ).then(collateralState => {
       TorqueProvider.Instance.getLoanRepayAddress(
-        this.props.walletDetails,
         this.props.loanOrderState
       ).then(repayManagementAddress => {
         TorqueProvider.Instance.getLoanRepayGasAmount().then(gasAmountNeeded => {
@@ -136,7 +131,6 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
       prevState.selectedValue !== this.state.selectedValue
     ) {
       TorqueProvider.Instance.getLoanRepayAddress(
-        this.props.walletDetails,
         this.props.loanOrderState
       ).then(repayManagementAddress => {
         TorqueProvider.Instance.getLoanRepayGasAmount().then(gasAmountNeeded => {
@@ -168,36 +162,32 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
     return (
       <form className="repay-loan-form" onSubmit={this.onSubmitClick}>
         <section className="dialog-content">
-          {this.props.walletDetails.walletType === WalletType.Web3 ? (
-            <React.Fragment>
-              <div className="repay-loan-form__input-container" style={this.props.walletDetails.walletType === WalletType.Web3 ? { paddingBottom: `1rem` } : undefined}>
-                <input
-                  ref={this._setInputRef}
-                  className="repay-loan-form__input-container__input-amount"
-                  type="text"
-                  onChange={this.onTradeAmountChange}
-                  placeholder={`Enter amount`}
-                  value={this.state.inputAmountText}
-                />
-              </div>
+          <div className="repay-loan-form__input-container" style={{ paddingBottom: `1rem` }}>
+            <input
+              ref={this._setInputRef}
+              className="repay-loan-form__input-container__input-amount"
+              type="text"
+              onChange={this.onTradeAmountChange}
+              placeholder={`Enter amount`}
+              value={this.state.inputAmountText}
+            />
+          </div>
 
-              <RepayLoanSlider
-                readonly={false}
-                minValue={this.state.minValue}
-                maxValue={this.state.maxValue}
-                value={this.state.currentValue}
-                onUpdate={this.onUpdate}
-                onChange={this.onChange}
-              />
+          <RepayLoanSlider
+            readonly={false}
+            minValue={this.state.minValue}
+            maxValue={this.state.maxValue}
+            value={this.state.currentValue}
+            onUpdate={this.onUpdate}
+            onChange={this.onChange}
+          />
 
-              <div className="repay-loan-form__tips">
-                <div className="repay-loan-form__tip">Current state</div>
-                <div className="repay-loan-form__tip">Full repayment</div>
-              </div>
+          <div className="repay-loan-form__tips">
+            <div className="repay-loan-form__tip">Current state</div>
+            <div className="repay-loan-form__tip">Full repayment</div>
+          </div>
 
-              <hr className="repay-loan-form__delimiter" />
-            </React.Fragment>
-          ) : null}
+          <hr className="repay-loan-form__delimiter" />
 
           <OpsEstimatedResult
             assetDetails={this.state.assetDetails}
@@ -223,7 +213,6 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
   private rxGetEstimate = (selectedValue: number): Observable<IRepayEstimate> => {
     return new Observable<IRepayEstimate>(observer => {
       TorqueProvider.Instance.getLoanRepayEstimate(
-        this.props.walletDetails,
         this.props.loanOrderState,
         selectedValue
       ).then(value => {
@@ -244,7 +233,6 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
 
     return new Observable<IRepayEstimate>(observer => {
       TorqueProvider.Instance.getLoanRepayPercent(
-        this.props.walletDetails,
         this.props.loanOrderState,
         repayAmount
       ).then(value => {
@@ -296,14 +284,12 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
       }
 
       const percentData = await TorqueProvider.Instance.getLoanRepayPercent(
-        this.props.walletDetails,
         this.props.loanOrderState,
         repayAmount
       );
 
       this.props.onSubmit(
         new RepayLoanRequest(
-          this.props.walletDetails,
           this.props.loanOrderState.loanAsset,
           this.props.loanOrderState.collateralAsset,
           this.props.loanOrderState.accountAddress,

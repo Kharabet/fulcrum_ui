@@ -8,13 +8,11 @@ import { Asset } from "../domain/Asset";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { BorrowRequest } from "../domain/BorrowRequest";
 import { IBorrowEstimate } from "../domain/IBorrowEstimate";
-import { WalletType } from "../domain/WalletType";
 import { TorqueProvider } from "../services/TorqueProvider";
 import { CollateralTokenSelectorToggle } from "./CollateralTokenSelectorToggle";
 
 export interface IBorrowFormProps {
   borrowAsset: Asset;
-  walletType: WalletType;
 
   didSubmit: boolean;
   toggleDidSubmit: (submit: boolean) => void;
@@ -73,7 +71,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
     return (
       <form className="borrow-form" onSubmit={this.onSubmit}>
         <section className="dialog-content">
-          <div className="borrow-form__input-container" style={this.props.walletType === WalletType.Web3 ? { paddingBottom: `1rem` } : undefined}>
+          <div className="borrow-form__input-container" style={{ paddingBottom: `1rem` }}>
             <input
               ref={this._setInputRef}
               className="borrow-form__input-container__input-amount"
@@ -123,7 +121,6 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
   private rxGetEstimate = (selectedValue: BigNumber): Observable<IBorrowEstimate> => {
     return new Observable<IBorrowEstimate>(observer => {
       TorqueProvider.Instance.getBorrowDepositEstimate(
-        this.props.walletType,
         this.props.borrowAsset,
         this.state.collateralAsset,
         selectedValue
@@ -137,7 +134,6 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
     event.preventDefault();
 
     if (this.props.onSubmit && !this.props.didSubmit && this.state.depositAmount.gt(0)) {
-      if (this.props.walletType === WalletType.Web3) {
         this.props.toggleDidSubmit(true);
 
         let assetBalance = await TorqueProvider.Instance.getAssetTokenBalanceOfUser(this.state.collateralAsset);
@@ -162,7 +158,6 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
             balanceTooLow: false
           });
         }
-      }
       const randomNumber = Math.floor(Math.random() * 100000) + 1;
       const usdAmount = await TorqueProvider.Instance.getSwapToUsdRate(this.props.borrowAsset);
       let usdPrice = this.state.borrowAmount
@@ -188,7 +183,6 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
 
       this.props.onSubmit(
         new BorrowRequest(
-          this.props.walletType,
           this.props.borrowAsset,
           this.state.borrowAmount,
           this.state.collateralAsset,
@@ -200,7 +194,6 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
 
   private onCollateralChange = async (asset: Asset) => {
     const borrowEstimate = await TorqueProvider.Instance.getBorrowDepositEstimate(
-      this.props.walletType,
       this.props.borrowAsset,
       asset,
       this.state.borrowAmount

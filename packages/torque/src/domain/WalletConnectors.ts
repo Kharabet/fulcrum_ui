@@ -10,8 +10,6 @@ import { PortisConnector } from '@web3-react/portis-connector';
 import { SquarelinkConnector } from '@web3-react/squarelink-connector';
 import { BitskiConnector } from '@web3-react/bitski-connector';
 import { TorusConnector } from '@web3-react/torus-connector';
-import fulcrumLogo from "../assets/images/fulcrum_logo.svg";
-
 
 import configProviders from "../config/providers.json";
 
@@ -56,8 +54,7 @@ export const walletconnect = new WalletConnectConnector({
 
 export const walletlink = new WalletLinkConnector({
   url: RPC_URL,
-  appName: 'bZx | Fulcrum'
-  // appLogoUrl: `https://app.fulcrum.trade${fulcrumLogo}`
+  appName: 'bZx | Torque'
 })
 
 export const ledger = new LedgerConnector({

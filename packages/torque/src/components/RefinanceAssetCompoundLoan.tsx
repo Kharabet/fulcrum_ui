@@ -1,14 +1,14 @@
 import React, { Component } from "react";
 import { Asset } from "../domain/Asset";
 import { IRefinanceLoan } from "../domain/RefinanceData";
-import { WalletType } from "../domain/WalletType";
 import { TorqueProviderEvents } from "../services/events/TorqueProviderEvents";
 import { TorqueProvider } from "../services/TorqueProvider";
 import { RefinanceAssetCompoundLoanItem } from "./RefinanceAssetCompoundLoanItem";
+import { ProviderType } from "../domain/ProviderType";
 
 export interface IRefinanceAssetCompoundLoanProps {
-  walletType: WalletType
 
+  doNetworkConnect: () => void;
   onSelectAsset?: (asset: Asset) => void;
 }
 
@@ -25,20 +25,27 @@ export class RefinanceAssetCompoundLoan extends Component<IRefinanceAssetCompoun
       asset: Asset.DAI,
       refinanceCompoundData: []
     };
-    // console.log("this.state=  "+this.state)
-    TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
-
+    
+    TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderAvailable, this.derivedUpdate);
+    TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderChanged, this.derivedUpdate);
   }
-
-  private onProviderAvailable = () => {
-    this.derivedUpdate();
-  };
 
   public componentDidMount(): void {
     this.derivedUpdate();
   }
 
+  public componentWillUnmount(): void{
+    TorqueProvider.Instance.eventEmitter.removeListener(TorqueProviderEvents.ProviderAvailable, this.derivedUpdate);
+    TorqueProvider.Instance.eventEmitter.removeListener(TorqueProviderEvents.ProviderChanged, this.derivedUpdate);
+  }
+
   private derivedUpdate = async () => {
+    
+    if (TorqueProvider.Instance.providerType === ProviderType.None || !TorqueProvider.Instance.contractsSource || !TorqueProvider.Instance.contractsSource.canWrite) {
+      this.props.doNetworkConnect()
+      return;
+    }
+    
     // const refinanceCompoundData = await TorqueProvider.Instance.checkSoloMargin();
     const loans = await TorqueProvider.Instance.getCompoundLoans(); // TODO
 
@@ -53,24 +60,8 @@ export class RefinanceAssetCompoundLoan extends Component<IRefinanceAssetCompoun
   };
 
   public render() {
-    const refinanceCompound = this.state.refinanceCompoundData;
-    let items;
-    if (this.props.walletType === WalletType.Web3) {
+    const items = this.state.refinanceCompoundData.map((e, index) => (<RefinanceAssetCompoundLoanItem key={index} {...e} />));
 
-      items = refinanceCompound.map((e, index) => {
-        return (
-          <RefinanceAssetCompoundLoanItem key={index} {...e}/>
-        );
-      });
-
-    } else {
-      items = refinanceCompound.map((e, index) => {
-        return (
-          <RefinanceAssetCompoundLoanItem key={index} {...e}/>
-        );
-      });
-
-    }
     return <div className="refinance-asset-selector">{items}</div>;
   }
 }

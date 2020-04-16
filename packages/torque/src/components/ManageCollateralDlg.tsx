@@ -1,15 +1,12 @@
 import React, { Component } from "react";
 import ReactModal from "react-modal";
 import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
-import { IWalletDetails } from "../domain/IWalletDetails";
 import { ManageCollateralRequest } from "../domain/ManageCollateralRequest";
-import { WalletType } from "../domain/WalletType";
 import { DialogHeader } from "./DialogHeader";
 import { ManageCollateralFormWeb3 } from "./ManageCollateralFormWeb3";
 
 interface IManageCollateralDlgState {
   isOpen: boolean;
-  walletDetails: IWalletDetails | null;
   loanOrderState: IBorrowedFundsState | null;
   didSubmit: boolean;
 
@@ -20,13 +17,10 @@ export class ManageCollateralDlg extends Component<any, IManageCollateralDlgStat
   public constructor(props: any, context?: any) {
     super(props, context);
 
-    this.state = { isOpen: false, walletDetails: null, loanOrderState: null, didSubmit: false, executorParams: null };
+    this.state = { isOpen: false, loanOrderState: null, didSubmit: false, executorParams: null };
   }
 
   public render() {
-    if (this.state.walletDetails === null) {
-      return null;
-    }
 
     if (this.state.loanOrderState === null) {
       return null;
@@ -42,7 +36,6 @@ export class ManageCollateralDlg extends Component<any, IManageCollateralDlgStat
       >
         <DialogHeader title="Manage Collateral" onDecline={this.onFormDecline} />
         <ManageCollateralFormWeb3
-          walletDetails={this.state.walletDetails}
           loanOrderState={this.state.loanOrderState}
           onSubmit={this.onFormSubmit}
           onClose={this.onFormDecline}
@@ -60,7 +53,7 @@ export class ManageCollateralDlg extends Component<any, IManageCollateralDlgStat
     });
   }
 
-  public getValue = async (walletDetails: IWalletDetails, item: IBorrowedFundsState): Promise<ManageCollateralRequest> => {
+  public getValue = async (item: IBorrowedFundsState): Promise<ManageCollateralRequest> => {
     if (this.state.isOpen) {
       return new Promise<ManageCollateralRequest>((resolve, reject) => reject());
     }
@@ -70,7 +63,6 @@ export class ManageCollateralDlg extends Component<any, IManageCollateralDlgStat
         ...this.state,
         isOpen: true,
         executorParams: { resolve: resolve, reject: reject },
-        walletDetails: walletDetails,
         loanOrderState: item
       });
     });

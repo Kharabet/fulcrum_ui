@@ -9,14 +9,11 @@ import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { ExtendLoanRequest } from "../domain/ExtendLoanRequest";
 import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
 import { IExtendEstimate } from "../domain/IExtendEstimate";
-import { IWalletDetails } from "../domain/IWalletDetails";
-import { WalletType } from "../domain/WalletType";
 import { TorqueProvider } from "../services/TorqueProvider";
 import { ExtendLoanSlider } from "./ExtendLoanSlider";
 import { OpsEstimatedResult } from "./OpsEstimatedResult";
 
 export interface IExtendLoanFormProps {
-  walletDetails: IWalletDetails;
   loanOrderState: IBorrowedFundsState;
 
   didSubmit: boolean;
@@ -73,11 +70,9 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
 
   public componentDidMount(): void {
     TorqueProvider.Instance.getLoanExtendParams(
-      this.props.walletDetails,
       this.props.loanOrderState
     ).then(collateralState => {
       TorqueProvider.Instance.getLoanExtendManagementAddress(
-        this.props.walletDetails,
         this.props.loanOrderState
       ).then(extendManagementAddress => {
         this.setState(
@@ -109,7 +104,6 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
       prevState.selectedValue !== this.state.selectedValue
     ) {
       TorqueProvider.Instance.getLoanExtendManagementAddress(
-        this.props.walletDetails,
         this.props.loanOrderState
       ).then(extendManagementAddress => {
         TorqueProvider.Instance.getLoanExtendGasAmount().then(gasAmountNeeded => {
@@ -248,7 +242,6 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
 
       this.props.onSubmit(
         new ExtendLoanRequest(
-          this.props.walletDetails,
           this.props.loanOrderState.loanAsset,
           this.props.loanOrderState.accountAddress,
           this.props.loanOrderState.loanOrderHash,

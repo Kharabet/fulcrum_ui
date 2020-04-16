@@ -4,22 +4,16 @@ import { BorrowedFundsList } from "../components/BorrowedFundsList";
 import { ExtendLoanDlg } from "../components/ExtendLoanDlg";
 import { ManageCollateralDlg } from "../components/ManageCollateralDlg";
 import { RepayLoanDlg } from "../components/RepayLoanDlg";
-import { WalletAddressDlg } from "../components/WalletAddressDlg";
-import { WalletAddressHint } from "../components/WalletAddressHint";
-import { WalletAddressLargeForm } from "../components/WalletAddressLargeForm";
 import { BorrowRequestAwaiting } from "../domain/BorrowRequestAwaiting";
 import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
-import { IWalletDetails } from "../domain/IWalletDetails";
-import { WalletType, walletTypeAbbrToWalletType } from "../domain/WalletType";
 import { Footer } from "../layout/Footer";
 import { HeaderOps } from "../layout/HeaderOps";
 import { TorqueProviderEvents } from "../services/events/TorqueProviderEvents";
-import { NavService } from "../services/NavService";
 import { TorqueProvider } from "../services/TorqueProvider";
 import { Loader } from "../components/Loader";
+import { ProviderType } from "../domain/ProviderType";
 
 export interface IDashboardPageRouteParams {
-  walletTypeAbbr: string;
   walletAddress: string | undefined;
 }
 
@@ -31,7 +25,6 @@ export interface IDashboardPageParams {
 }
 
 interface IDashboardPageState {
-  walletDetails: IWalletDetails;
   items: IBorrowedFundsState[];
   itemsAwaiting: ReadonlyArray<BorrowRequestAwaiting>;
   isDataLoading: boolean;
@@ -44,7 +37,6 @@ export class DashboardPage extends PureComponent<
   private manageCollateralDlgRef: RefObject<ManageCollateralDlg>;
   private repayLoanDlgRef: RefObject<RepayLoanDlg>;
   private extendLoanDlgRef: RefObject<ExtendLoanDlg>;
-  private walletAddressDlgRef: RefObject<WalletAddressDlg>;
 
   constructor(props: any) {
     super(props);
@@ -52,13 +44,8 @@ export class DashboardPage extends PureComponent<
     this.manageCollateralDlgRef = React.createRef();
     this.repayLoanDlgRef = React.createRef();
     this.extendLoanDlgRef = React.createRef();
-    this.walletAddressDlgRef = React.createRef();
 
     this.state = {
-      walletDetails: {
-        walletType: WalletType.Unknown,
-        walletAddress: ""
-      },
       items: [],
       itemsAwaiting: [],
       isDataLoading: true
@@ -73,44 +60,19 @@ export class DashboardPage extends PureComponent<
       return;
     }
 
-    const walletType = walletTypeAbbrToWalletType(this.props.match.params.walletTypeAbbr);
-
-    walletType !== WalletType.Web3 && this.props.doNetworkConnect()
-
-    let walletAddress = this.props.match.params.walletAddress ?
-      this.props.match.params.walletAddress.toLowerCase() :
-      "";
-
-    const account = TorqueProvider.Instance.accounts.length !== 0 ?
-      TorqueProvider.Instance.accounts[0].toLowerCase() :
-      "";
-    if (!account || !TorqueProvider.Instance.contractsSource || !TorqueProvider.Instance.contractsSource.canWrite) {
+    if (TorqueProvider.Instance.providerType === ProviderType.None || !TorqueProvider.Instance.contractsSource || !TorqueProvider.Instance.contractsSource.canWrite) {
+      this.props.doNetworkConnect()
       return;
-    } else {
-      if (walletAddress.toLowerCase() !== account) {
-        NavService.Instance.History.replace(NavService.Instance.getDashboardAddress(WalletType.Web3, account));
-        walletAddress = account;
-      }
     }
-
-    const walletDetails = {
-      walletType: walletTypeAbbrToWalletType(this.props.match.params.walletTypeAbbr),
-      walletAddress: walletAddress
-    };
-
-
 
     let items: IBorrowedFundsState[] = [];
     let itemsAwaiting: ReadonlyArray<BorrowRequestAwaiting> = [];
-    // console.log(walletDetails);
-    items = await TorqueProvider.Instance.getLoansList(walletDetails);
-    itemsAwaiting = await TorqueProvider.Instance.getLoansAwaitingList(walletDetails);
-    // console.log(items);
-    // console.log(itemsAwaiting);
+
+    items = await TorqueProvider.Instance.getLoansList();
+    itemsAwaiting = await TorqueProvider.Instance.getLoansAwaitingList();
 
     this.setState({
       ...this.state,
-      walletDetails: walletDetails,
       items: items,
       itemsAwaiting: itemsAwaiting,
       isDataLoading: false
@@ -137,33 +99,16 @@ export class DashboardPage extends PureComponent<
     this.refreshPage();
   }
 
-  public componentDidUpdate(
-    prevProps: Readonly<IDashboardPageParams & RouteComponentProps<IDashboardPageRouteParams>>,
-    prevState: Readonly<IDashboardPageState>,
-    snapshot?: any
-  ): void {
-    if (this.state.walletDetails.walletAddress !== prevState.walletDetails.walletAddress) {
-      // console.log("componentDidUpdate", this.state.walletDetails.walletAddress, prevState.walletDetails.walletAddress);
-      this.refreshPage();
-    }
-  }
-
   public render() {
-
-    const walletType = walletTypeAbbrToWalletType(this.props.match.params.walletTypeAbbr);
-
 
     return (
       <React.Fragment>
         <ManageCollateralDlg ref={this.manageCollateralDlgRef} />
         <RepayLoanDlg ref={this.repayLoanDlgRef} />
         <ExtendLoanDlg ref={this.extendLoanDlgRef} />
-        <WalletAddressDlg ref={this.walletAddressDlgRef} />
         <div className="dashboard-page">
           <HeaderOps isMobileMedia={this.props.isMobileMedia} isLoading={this.props.isLoading} doNetworkConnect={this.props.doNetworkConnect} isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
           <div className="dashboard-page__main">
-
-            {this.state.items.length === 0 && <h2>You have no loans!</h2>}
 
             {!TorqueProvider.Instance.unsupportedNetwork ? (
               <React.Fragment>
@@ -176,7 +121,6 @@ export class DashboardPage extends PureComponent<
                   </React.Fragment>)
                 }
                 <BorrowedFundsList
-                  walletDetails={this.state.walletDetails}
                   items={this.state.items}
                   itemsAwaiting={this.state.itemsAwaiting}
                   onManageCollateral={this.onManageCollateral}
@@ -223,122 +167,44 @@ export class DashboardPage extends PureComponent<
   };
 
   private onRepayLoan = async (item: IBorrowedFundsState) => {
-    if (this.repayLoanDlgRef.current) {
-      try {
-        const repayLoanRequest = await this.repayLoanDlgRef.current.getValue(this.state.walletDetails, item);
-        await TorqueProvider.Instance.doRepayLoan(repayLoanRequest);
+    if (!this.repayLoanDlgRef.current) return;
 
-        this.repayLoanDlgRef.current.toggleDidSubmit(false);
-        await this.repayLoanDlgRef.current.hide();
-      } catch (error) {
-        /*let errorMsg;
-        if (error.message) {
-          errorMsg = error.message;
-        } else if (typeof error === "string") {
-          errorMsg = error;
-        }
-
-        if (errorMsg) {
-          if (errorMsg.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)) {
-            errorMsg = "The transaction seems like it will fail. You can submit the transaction anyway, or cancel.";
-          } else if (errorMsg.includes("Reverted by EVM")) {
-            errorMsg = "The transaction failed. Click View More for details.";
-          } else if (errorMsg.includes("MetaMask Tx Signature: User denied transaction signature.")) {
-            errorMsg = "You didn't confirm in MetaMask. Please try again.";
-            await this.repayLoanDlgRef.current.hide();
-          } else if (errorMsg.includes("User denied account authorization.")) {
-            errorMsg = "You didn't authorize MetaMask. Please try again.";
-          } else if (errorMsg.includes("Transaction rejected")) {
-            errorMsg = "You didn't confirm in Gnosis Safe. Please try again.";
-          } else {
-            errorMsg = "";
-          }
-        }*/
-
-        this.repayLoanDlgRef.current.toggleDidSubmit(false);
-        await this.repayLoanDlgRef.current.hide();
-      }
+    try {
+      const repayLoanRequest = await this.repayLoanDlgRef.current.getValue(item);
+      await TorqueProvider.Instance.doRepayLoan(repayLoanRequest);
+    } catch (error) {
+      console.error(error);
     }
+
+    this.repayLoanDlgRef.current.toggleDidSubmit(false);
+    await this.repayLoanDlgRef.current.hide();
   };
 
   private onExtendLoan = async (item: IBorrowedFundsState) => {
-    if (this.extendLoanDlgRef.current) {
-      try {
-        const extendLoanRequest = await this.extendLoanDlgRef.current.getValue(this.state.walletDetails, item);
-        await TorqueProvider.Instance.doExtendLoan(extendLoanRequest);
+    if (!this.extendLoanDlgRef.current) return
 
-        this.extendLoanDlgRef.current.toggleDidSubmit(false);
-        await this.extendLoanDlgRef.current.hide();
-      } catch (error) {
-        /*let errorMsg;
-        if (error.message) {
-          errorMsg = error.message;
-        } else if (typeof error === "string") {
-          errorMsg = error;
-        }
-
-        if (errorMsg) {
-          if (errorMsg.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)) {
-            errorMsg = "The transaction seems like it will fail. You can submit the transaction anyway, or cancel.";
-          } else if (errorMsg.includes("Reverted by EVM")) {
-            errorMsg = "The transaction failed. Click View More for details.";
-          } else if (errorMsg.includes("MetaMask Tx Signature: User denied transaction signature.")) {
-            errorMsg = "You didn't confirm in MetaMask. Please try again.";
-            await this.extendLoanDlgRef.current.hide();
-          } else if (errorMsg.includes("User denied account authorization.")) {
-            errorMsg = "You didn't authorize MetaMask. Please try again.";
-          } else if (errorMsg.includes("Transaction rejected")) {
-            errorMsg = "You didn't confirm in Gnosis Safe. Please try again.";
-          } else {
-            errorMsg = "";
-          }
-        }*/
-
-        this.extendLoanDlgRef.current.toggleDidSubmit(false);
-        await this.extendLoanDlgRef.current.hide();
-      }
+    try {
+      const extendLoanRequest = await this.extendLoanDlgRef.current.getValue(item);
+      await TorqueProvider.Instance.doExtendLoan(extendLoanRequest);
+    } catch (error) {
+      console.error(error);
     }
+
+    this.extendLoanDlgRef.current.toggleDidSubmit(false);
+    await this.extendLoanDlgRef.current.hide();
   };
 
   private onManageCollateral = async (item: IBorrowedFundsState) => {
-    if (this.manageCollateralDlgRef.current) {
-      try {
-        const manageCollateralRequest = await this.manageCollateralDlgRef.current.getValue(
-          this.state.walletDetails,
-          item
-        );
-        await TorqueProvider.Instance.doManageCollateral(manageCollateralRequest);
+    if (!this.manageCollateralDlgRef.current) return;
 
-        this.manageCollateralDlgRef.current.toggleDidSubmit(false);
-        await this.manageCollateralDlgRef.current.hide();
-      } catch (error) {
-        /*let errorMsg;
-        if (error.message) {
-          errorMsg = error.message;
-        } else if (typeof error === "string") {
-          errorMsg = error;
-        }
-
-        if (errorMsg) {
-          if (errorMsg.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)) {
-            errorMsg = "The transaction seems like it will fail. You can submit the transaction anyway, or cancel.";
-          } else if (errorMsg.includes("Reverted by EVM")) {
-            errorMsg = "The transaction failed. Click View More for details.";
-          } else if (errorMsg.includes("MetaMask Tx Signature: User denied transaction signature.")) {
-            errorMsg = "You didn't confirm in MetaMask. Please try again.";
-            await this.manageCollateralDlgRef.current.hide();
-          } else if (errorMsg.includes("User denied account authorization.")) {
-            errorMsg = "You didn't authorize MetaMask. Please try again.";
-          } else if (errorMsg.includes("Transaction rejected")) {
-            errorMsg = "You didn't confirm in Gnosis Safe. Please try again.";
-          } else {
-            errorMsg = "";
-          }
-        }*/
-
-        this.manageCollateralDlgRef.current.toggleDidSubmit(false);
-        await this.manageCollateralDlgRef.current.hide();
-      }
+    try {
+      const manageCollateralRequest = await this.manageCollateralDlgRef.current.getValue(item);
+      await TorqueProvider.Instance.doManageCollateral(manageCollateralRequest);
+    } catch (error) {
+      console.error(error);
     }
+
+    this.manageCollateralDlgRef.current.toggleDidSubmit(false);
+    await this.manageCollateralDlgRef.current.hide();
   };
 }

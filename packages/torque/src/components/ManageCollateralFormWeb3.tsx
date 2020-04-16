@@ -2,21 +2,17 @@ import { BigNumber } from "@0x/utils";
 import React, { Component, FormEvent } from "react";
 import { Observable, Subject } from "rxjs";
 import { debounceTime, switchMap } from "rxjs/operators";
-import { ActionType } from "../domain/ActionType";
 import { Asset } from "../domain/Asset";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
 import { ICollateralChangeEstimate } from "../domain/ICollateralChangeEstimate";
-import { IWalletDetails } from "../domain/IWalletDetails";
 import { ManageCollateralRequest } from "../domain/ManageCollateralRequest";
-import { WalletType } from "../domain/WalletType";
 import { TorqueProvider } from "../services/TorqueProvider";
 import { CollateralSlider } from "./CollateralSlider";
 import { OpsEstimatedResult } from "./OpsEstimatedResult";
 
 export interface IManageCollateralFormWeb3Props {
-  walletDetails: IWalletDetails;
   loanOrderState: IBorrowedFundsState;
 
   didSubmit: boolean;
@@ -85,7 +81,6 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
     TorqueProvider.Instance.isLoading = true;
     
     TorqueProvider.Instance.getLoanCollateralManagementParams(
-      this.props.walletDetails,
       this.props.loanOrderState
     ).then(collateralState => {
       TorqueProvider.Instance.getLoanCollateralManagementGasAmount().then(gasAmountNeeded => {
@@ -312,7 +307,6 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
 
     return new Observable<ICollateralChangeEstimate>(observer => {
       TorqueProvider.Instance.getLoanCollateralChangeEstimate(
-        this.props.walletDetails,
         this.props.loanOrderState,
         collateralAmount,
         selectedValue < this.state.loanValue
@@ -369,7 +363,6 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
 
       this.props.onSubmit(
         new ManageCollateralRequest(
-          this.props.walletDetails,
           this.props.loanOrderState,
           new BigNumber(this.state.collateralAmount),
           this.state.loanValue > this.state.selectedValue

@@ -4,17 +4,12 @@ import { Asset } from "../domain/Asset";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
-import { IWalletDetails } from "../domain/IWalletDetails";
-import { WalletType } from "../domain/WalletType";
 import { TorqueProvider } from "../services/TorqueProvider";
 import { CollateralSlider } from "./CollateralSlider";
 
 import ic_unsafe from "./../assets/images/ic_unsafe.svg";
 
 export interface IBorrowedFundsListItemProps {
-  // firstInTheRow: boolean;
-  // lastInTheRow: boolean;
-  walletDetails: IWalletDetails;
   item: IBorrowedFundsState;
 
   onManageCollateral: (item: IBorrowedFundsState) => void;
