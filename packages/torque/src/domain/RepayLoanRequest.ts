@@ -1,9 +1,7 @@
 import { BigNumber } from "@0x/utils";
 import { Asset } from "./Asset";
-import { IWalletDetails } from "./IWalletDetails";
 
 export class RepayLoanRequest {
-  public walletDetails: IWalletDetails;
   public borrowAsset: Asset;
   public collateralAsset: Asset;
   public accountAddress: string;
@@ -12,8 +10,7 @@ export class RepayLoanRequest {
   public repayPercent: BigNumber;
   public amountOwed: BigNumber;
 
-  constructor(walletDetails: IWalletDetails, borrowAsset: Asset, collateralAsset: Asset, accountAddress: string, loanOrderHash: string, repayAmount: BigNumber, repayPercent: BigNumber, amountOwed: BigNumber) {
-    this.walletDetails = walletDetails;
+  constructor(borrowAsset: Asset, collateralAsset: Asset, accountAddress: string, loanOrderHash: string, repayAmount: BigNumber, repayPercent: BigNumber, amountOwed: BigNumber) {
     this.borrowAsset = borrowAsset;
     this.collateralAsset = collateralAsset;
     this.accountAddress = accountAddress;

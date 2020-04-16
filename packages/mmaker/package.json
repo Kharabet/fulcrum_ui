@@ -42,7 +42,6 @@
     "@types/node-fetch": "^2.5.3",
     "@types/ws": "^6.0.3",
     "@types/web3": "^1.0.18",
-    "babel-loader": "8.0.5",
     "babel-plugin-named-asset-import": "^0.3.1",
     "cross-env": "^5.2.0",
     "tslib": "^1.9.0",

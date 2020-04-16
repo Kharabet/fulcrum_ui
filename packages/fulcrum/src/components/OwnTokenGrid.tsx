@@ -7,12 +7,16 @@ import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { TradeTransactionMinedEvent } from "../services/events/TradeTransactionMinedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
 import { OwnTokenGridHeader } from "./OwnTokenGridHeader";
+import { HistoryTokenGridHeader } from "./HistoryTokenGridHeader";
 import { IOwnTokenGridRowProps, OwnTokenGridRow } from "./OwnTokenGridRow";
+import { HistoryTokenGridRow } from "./HistoryTokenGridRow";
 import { OwnTokenCardMobile } from "./OwnTokenCardMobile";
 import { TradeType } from "../domain/TradeType";
 import { Asset } from "../domain/Asset";
 import { PositionType } from "../domain/PositionType";
 import { BigNumber } from "@0x/utils";
+import { ReactComponent as OpenManageCollateral } from "../assets/images/openManageCollateral.svg";
+
 export interface IOwnTokenGridProps {
   showMyTokensOnly: boolean;
   selectedKey: TradeTokenKey;
@@ -24,10 +28,12 @@ export interface IOwnTokenGridProps {
   onSelect: (key: TradeTokenKey) => void;
   onTrade: (request: TradeRequest) => void;
   isMobileMedia: boolean;
+  onManageCollateralOpen: () => void;
 }
 
 interface IOwnTokenGridState {
   tokenRowsData: IOwnTokenGridRowProps[];
+  isShowHistory: boolean;
 }
 
 export class OwnTokenGrid extends Component<IOwnTokenGridProps, IOwnTokenGridState> {
@@ -35,11 +41,14 @@ export class OwnTokenGrid extends Component<IOwnTokenGridProps, IOwnTokenGridSta
     super(props);
     this._isMounted = false;
     this.state = {
-      tokenRowsData: []
+      tokenRowsData: [],
+      isShowHistory: false
     };
 
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.TradeTransactionMined, this.onTradeTransactionMined);
+    this.onShowHistory = this.onShowHistory.bind(this);
+    this.onShowOpenPositions = this.onShowOpenPositions.bind(this);
   }
 
   private _isMounted: boolean;
@@ -82,16 +91,27 @@ export class OwnTokenGrid extends Component<IOwnTokenGridProps, IOwnTokenGridSta
   }
 
   private renderDesktop = () => {
-    const tokenRows = this.state.tokenRowsData.map(e => <OwnTokenGridRow key={`${e.currentKey.toString()}`} {...e} />);
+    const tokenRows = this.state.tokenRowsData.map(e => <OwnTokenGridRow onManageCollateralOpen={this.props.onManageCollateralOpen} key={`${e.currentKey.toString()}`} {...e} />);
+    const historyRows = this.state.tokenRowsData.map(e => <HistoryTokenGridRow key={`${e.currentKey.toString()}`} {...e} />);
     if (tokenRows.length === 0) return null;
 
     return (
       <div className="own-token-grid">
-        <OwnTokenGridHeader
+        <div className="group-button">
+          <button className={`${!this.state.isShowHistory ? `active` : ``}`} onClick={this.onShowOpenPositions}>Open positions</button>
+          <button className={`${this.state.isShowHistory ? `active` : ``}`} onClick={this.onShowHistory}>Trade history</button>
+        </div>
+        {this.state.isShowHistory
+          ? <React.Fragment>
+            <HistoryTokenGridHeader />
+            {historyRows}
+          </React.Fragment>
+          : <React.Fragment>
+            <OwnTokenGridHeader />
+            {tokenRows}
+          </React.Fragment>
+        }
 
-          showMyTokensOnly={this.props.showMyTokensOnly}
-        />
-        {tokenRows}
       </div>
     );
   }
@@ -150,9 +170,10 @@ export class OwnTokenGrid extends Component<IOwnTokenGridProps, IOwnTokenGridSta
           currentKey: pToken,
           // // balance: balance,
           // onDetails: props.onDetails,
-          // onManageCollateral: props.onManageCollateral,
+          //onManageCollateral: props.onManageCollateral,
           onSelect: props.onSelect,
           onTrade: props.onTrade,
+          onManageCollateralOpen: props.onManageCollateralOpen,
           showMyTokensOnly: props.showMyTokensOnly
         });
       }
@@ -167,5 +188,12 @@ export class OwnTokenGrid extends Component<IOwnTokenGridProps, IOwnTokenGridSta
 
   private onTradeTransactionMined = async (event: TradeTransactionMinedEvent) => {
     await this.derivedUpdate();
+  };
+  private onShowHistory = () => {
+    this._isMounted && this.setState({ ...this.state, isShowHistory: true });
+  };
+
+  private onShowOpenPositions = () => {
+    this._isMounted && this.setState({ ...this.state, isShowHistory: false });
   };
 }

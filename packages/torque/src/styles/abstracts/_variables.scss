@@ -1,11 +1,32 @@
 $page-min-height: 52.75rem;
 $page-max-width: 75.5rem;
+$refpage-max-width: 90.5rem;
 $page-padding: 0 3.25rem;
 $page-padding-xs: 0 1.25rem;
 $mobile-version-max-width: 700px;
+$mobile-version-max-mobile: 960px;
 $mobile-version-width:1024px;
 $mobile-version-ix:800px;
 $mobile-version-max-ix-width:601px;
+
+$breakpoint-max-xl: 1409px;
+$breakpoint-min-xl: 1410px;
+$breakpoint-max-lg: 1139px;
+$breakpoint-min-lg: 1140px;
+
+
+$container-desktop: 1380px;
+$container-laptop: 1110px;
+$container-mobile: 100%;
+
+$breakpoint-desktop-max: 1409px; 
+$breakpoint-desktop-min: 1410px;
+
+$breakpoint-laptop-max: 1139px;
+$breakpoint-laptop-min: 1140px;
+
+$breakpoint-mobile-max: 959px;
+$breakpoint-mobile-min: 960px;
 
 $color-blue: #6488ff;
 $color-blue--hover: #5074eb;
@@ -13,6 +34,9 @@ $color-blue--pressed: #3158d9;
 $color-green: #4ecea3;
 $color-green--hover: #3ec497;
 $color-green--pressed: #24b483;
+$color-purple: #9589f5;
+$color-purple--hover: #8b7df5;
+$color-purple--pressed: #8378f5;
 $color-gray: #a9b5c7;
 $color-gray-light: #f5f7f9;
 $color-borrow-card:#F3F9FF;

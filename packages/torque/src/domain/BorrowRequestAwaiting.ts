@@ -1,10 +1,8 @@
 import { BigNumber } from "@0x/utils";
 import { Asset } from "./Asset";
 import { BorrowRequest } from "./BorrowRequest";
-import { WalletType } from "./WalletType";
 
 export class BorrowRequestAwaiting {
-  public walletType: WalletType;
   public walletAddress: string;
   public borrowAsset: Asset;
   public borrowAmount: BigNumber;
@@ -14,7 +12,6 @@ export class BorrowRequestAwaiting {
   public txHash: string;
 
   constructor(borrowRequest: BorrowRequest, networkId: number, walletAddress: string, txHash: string) {
-    this.walletType = borrowRequest.walletType;
     this.borrowAsset = borrowRequest.borrowAsset;
     this.borrowAmount = borrowRequest.borrowAmount;
     this.collateralAsset = borrowRequest.collateralAsset;
@@ -26,7 +23,6 @@ export class BorrowRequestAwaiting {
 
   public static toObj(bra: BorrowRequestAwaiting): any {
     const result = {
-      walletType: bra.walletType,
       walletAddress: bra.walletAddress,
       borrowAsset: bra.borrowAsset,
       borrowAmount: bra.borrowAmount.toFixed(),
@@ -43,7 +39,6 @@ export class BorrowRequestAwaiting {
     const result = new BorrowRequestAwaiting(
       new BorrowRequest(
         // @ts-ignore
-        (data.walletType as string),
         // @ts-ignore
         (data.borrowAsset as string),
         // @ts-ignore
@@ -71,7 +66,6 @@ export class BorrowRequestAwaiting {
 
     return (this.networkId === bra.networkId) &&
       (this.txHash === bra.txHash) &&
-      (this.walletType === bra.walletType) &&
       (this.walletAddress === bra.walletAddress) &&
       (this.borrowAsset === bra.borrowAsset) &&
       (this.collateralAsset === bra.collateralAsset) &&

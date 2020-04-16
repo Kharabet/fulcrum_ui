@@ -1,5 +1,6 @@
 import React, { Fragment } from "react";
 import { Tooltip } from "react-tippy";
+import { ReactComponent as OpenManageCollateral } from "../assets/images/openManageCollateral.svg";
 
 export function CollateralSliderHandle({
   domain: [min, max],
@@ -19,8 +20,8 @@ export function CollateralSliderHandle({
           transform: "translate(-50%, -50%)",
           WebkitTapHighlightColor: "rgba(0,0,0,0)",
           zIndex: 5,
-          width: "2.25rem",
-          height: "2.25rem",
+          width: "43px",
+          height: "31px",
           cursor: "pointer",
           backgroundColor: "none"
         }}
@@ -41,13 +42,19 @@ export function CollateralSliderHandle({
           position: "absolute",
           transform: "translate(-50%, -50%)",
           zIndex: 2,
-          width: "1.75rem",
-          height: "1.75rem",
-          border: "0.25rem solid #444e5a",
+          width: "31px",
+          height: "31px",
+          border: "6px solid #444e5a",
           borderRadius: "50%",
-          backgroundColor: "#ffffff"
-        }}
-      />
+          backgroundColor: "#276BFB"
+        }}>
+        <div
+          style={{
+            padding: "7px 9px",
+            transform: "scale(1.1)"
+          }}>
+          <OpenManageCollateral /></div>
+      </div>
     </Fragment>
   );
 }

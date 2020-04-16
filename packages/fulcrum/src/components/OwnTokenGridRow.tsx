@@ -13,10 +13,11 @@ import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents"
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { TradeTransactionMinedEvent } from "../services/events/TradeTransactionMinedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
-import { PositionTypeMarker } from "./PositionTypeMarker";
-import { PositionTypeMarkerAlt } from "./PositionTypeMarkerAlt";
+//import { PositionTypeMarker } from "./PositionTypeMarker";
+//import { PositionTypeMarkerAlt } from "./PositionTypeMarkerAlt";
 // import { Change24HMarker, Change24HMarkerSize } from "./Change24HMarker";
 import { Preloader } from "./Preloader";
+import { ReactComponent as OpenManageCollateral } from "../assets/images/openManageCollateral.svg";
 
 export interface IOwnTokenGridRowProps {
   selectedKey: TradeTokenKey;
@@ -27,6 +28,7 @@ export interface IOwnTokenGridRowProps {
   // onManageCollateral: (request: ManageCollateralRequest) => void;
   onSelect: (key: TradeTokenKey) => void;
   onTrade: (request: TradeRequest) => void;
+  onManageCollateralOpen: () => void;
 }
 
 interface IOwnTokenGridRowState {
@@ -37,6 +39,7 @@ interface IOwnTokenGridRowState {
   profit: BigNumber | null;
   pTokenAddress: string;
   isLoading: boolean;
+  isManageColllateralOpen: boolean;
 }
 
 export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenGridRowState> {
@@ -53,7 +56,8 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
       assetBalance: new BigNumber(0),
       profit: new BigNumber(0),
       pTokenAddress: "",
-      isLoading: true
+      isLoading: true,
+      isManageColllateralOpen: false
     };
 
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
@@ -146,133 +150,93 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
   }*/
   private renderOwnTokenRow = (state: IOwnTokenGridRowState, props: IOwnTokenGridRowProps, bnPrice: BigNumber, bnLiquidationPrice: BigNumber, isActiveClassName: string): React.ReactFragment => {
     if (!state.assetDetails) return <React.Fragment></React.Fragment>;
-    return props.showMyTokensOnly ? (<React.Fragment> <div className={`own-token-grid-row ${isActiveClassName}`} onClick={this.onSelectClick}>
-      {state.pTokenAddress &&
-        FulcrumProvider.Instance.web3ProviderSettings &&
-        FulcrumProvider.Instance.web3ProviderSettings.etherscanURL ? (
-          <a
-            className="own-token-grid-row__col-token-name-full"
-            style={{ cursor: `pointer`, textDecoration: `none` }}
-            title={state.pTokenAddress}
-            href={`${FulcrumProvider.Instance.web3ProviderSettings.etherscanURL}address/${state.pTokenAddress}#readContract`}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {state.assetDetails.displayName}&nbsp;
-          <PositionTypeMarkerAlt assetDetails={state.assetDetails} value={props.currentKey.positionType} />&nbsp;
-          {`${props.currentKey.leverage}x`}
-          </a>
-        ) : (
-          <div className="own-token-grid-row__col-token-name-full">{`${state.assetDetails.displayName}`}&nbsp;
-        <PositionTypeMarkerAlt assetDetails={state.assetDetails} value={props.currentKey.positionType} />&nbsp;
-        {`${props.currentKey.leverage}x`}
-          </div>)}
+    return (
+      <React.Fragment>
+        <div className={`own-token-grid-row ${isActiveClassName}`} onClick={this.onSelectClick}>
+          {state.pTokenAddress &&
+            FulcrumProvider.Instance.web3ProviderSettings &&
+            FulcrumProvider.Instance.web3ProviderSettings.etherscanURL ? (
+              <a
+                className="own-token-grid-row__col-token-name"
+                style={{ cursor: `pointer`, textDecoration: `none` }}
+                title={state.pTokenAddress}
+                href={`${FulcrumProvider.Instance.web3ProviderSettings.etherscanURL}address/${state.pTokenAddress}#readContract`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {state.assetDetails.displayName}&nbsp;
+              </a>
+            ) : (
+              <div className="own-token-grid-row__col-token-name">{`${state.assetDetails.displayName}`}
+              </div>)}
 
-      <div className="own-token-grid-row__col-position-type">
-        <PositionTypeMarker value={props.currentKey.positionType} />
-      </div>
+          <div className="own-token-grid-row__col-position-type">
+            <span className="position-type-marker">
+              {`${props.currentKey.leverage}x ${props.currentKey.positionType}`}
+            </span>
+          </div>
 
-      <div title={props.currentKey.unitOfAccount} className="own-token-grid-row__col-asset-price">{props.currentKey.unitOfAccount}</div>
-      <div title={`$${bnPrice.toFixed(18)}`} className="own-token-grid-row__col-asset-price">
-        {!state.isLoading ?
-          <React.Fragment>
-            <span className="sign-currency">$</span>{bnPrice.toFixed(2)}
-          </React.Fragment>
-          : <Preloader width="74px"/>
-        }
+          <div title={props.currentKey.unitOfAccount} className="own-token-grid-row__col-asset-unit">
+            {props.currentKey.unitOfAccount}
+          </div>
+          <div title={props.currentKey.unitOfAccount} className="own-token-grid-row__col-position">
+            0.8884
       </div>
-      <div title={`$${bnLiquidationPrice.toFixed(18)}`} className="own-token-grid-row__col-liquidation-price">
-        {!state.isLoading ?
-          <React.Fragment>
-            <span className="sign-currency">$</span>{bnLiquidationPrice.toFixed(2)}
-          </React.Fragment>
-          : <Preloader width="74px"/>}
-      </div>
-      <div title={state.assetBalance ? `$${state.assetBalance.toFixed(18)}` : ``} className="own-token-grid-row__col-position-value">
-        {!state.isLoading ?
-          state.assetBalance ?
-            <React.Fragment>
-              <span className="sign-currency">$</span>{state.assetBalance.toFixed(2)}
-            </React.Fragment>
-            :
-            '$0.00'
-          : <Preloader width="74px"/>
-        }
-      </div>
-      <div title={state.profit ? `$${state.profit.toFixed(18)}` : ``} className="own-token-grid-row__col-profit">
-        {!state.isLoading ?
-          state.profit ?
-            <React.Fragment>
-              <span className="sign-currency">$</span>{state.profit.toFixed(2)}
-            </React.Fragment>
-            : '$0.00'
-          : <Preloader width="74px"/>
-        }
-      </div>
-      <div className="own-token-grid-row__col-action" style={{ textAlign: `right` }}>
-
-        <button className="own-token-grid-row__sell-button own-token-grid-row__button--size-half" onClick={this.onSellClick}>
-          {TradeType.SELL}
-        </button>
-      </div>
-    </div></React.Fragment>
-    ) : (
-        <React.Fragment>
-          <div className={`own-token-grid-row-inner ${isActiveClassName}`} onClick={this.onSelectClick}>
-            {state.pTokenAddress &&
-              FulcrumProvider.Instance.web3ProviderSettings &&
-              FulcrumProvider.Instance.web3ProviderSettings.etherscanURL ? (
-                <a
-                  className="own-token-grid-row-inner__col-token-name-full"
-                  style={{ cursor: `pointer`, textDecoration: `none` }}
-                  title={state.pTokenAddress}
-                  href={`${FulcrumProvider.Instance.web3ProviderSettings.etherscanURL}address/${state.pTokenAddress}#readContract`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {`${props.currentKey.leverage}x`}&nbsp;
-              <PositionTypeMarkerAlt assetDetails={state.assetDetails} value={props.currentKey.positionType} />
-                </a>
-              ) : (
-                <div className="own-token-grid-row-inner__col-token-name-full">{`${props.currentKey.leverage}x`}&nbsp;
-            <PositionTypeMarkerAlt assetDetails={state.assetDetails} value={props.currentKey.positionType} />
-                </div>)}
-            <div title={props.currentKey.unitOfAccount} className="own-token-grid-row-inner__col-asset-price">{props.currentKey.unitOfAccount}</div>
-            <div title={`$${bnPrice.toFixed(18)}`} className="own-token-grid-row-inner__col-asset-price">
-              {!state.isLoading ?
-                <React.Fragment><span className="sign-currency">$</span>{bnPrice.toFixed(2)}</React.Fragment>
-                : <Preloader width="74px"/>
-              }
+          <div title={`$${bnPrice.toFixed(18)}`} className="own-token-grid-row__col-asset-price">
+            {!state.isLoading
+              ? <React.Fragment>
+                <span className="sign-currency">$</span>{bnPrice.toFixed(2)}
+              </React.Fragment>
+              : <Preloader width="74px" />
+            }
+          </div>
+          <div title={`$${bnPrice.toFixed(18)}`} className="own-token-grid-row__col-liquidation-price">
+            {!state.isLoading
+              ? state.assetBalance
+                ? <React.Fragment>
+                  <span className="sign-currency">$</span>{bnLiquidationPrice.toFixed(2)}
+                </React.Fragment>
+                : '$0.00'
+              : <Preloader width="74px" />
+            }
+          </div>
+          <div className="own-token-grid-row__col-collateral">
+            <div className="own-token-grid-row__col-collateral-wrapper">
+              <span><span className="sign-currency">$</span>15.25</span>
+              <span className="own-token-grid-row__col-asset-collateral-small">16.5%</span>
             </div>
-            <div title={`$${bnLiquidationPrice.toFixed(18)}`} className="own-token-grid-row-inner__col-liquidation-price">
-              {!state.isLoading ?
-                <React.Fragment><span className="sign-currency">$</span>{bnLiquidationPrice.toFixed(2)}</React.Fragment>
-                : <Preloader width="74px"/>
-              }
-            </div>
-            <div title={state.assetBalance ? `$${state.assetBalance.toFixed(18)}` : ``} className="own-token-grid-row-inner__col-position-value">
-              {!state.isLoading ?
-                state.assetBalance ?
-                  <React.Fragment><span className="sign-currency">$</span>{state.assetBalance.toFixed(2)}</React.Fragment> : '$0.00'
-                : <Preloader width="74px"/>
-              }
-            </div>
-            <div title={state.profit ? `$${state.profit.toFixed(18)}` : ``} className="own-token-grid-row-inner__col-profit">
-              {!state.isLoading ?
-                state.profit ?
-                  <React.Fragment><span className="sign-currency">$</span>{state.profit.toFixed(2)}</React.Fragment> : '$0.00'
-                : <Preloader width="74px"/>
-              }
-            </div>
-            <div className="own-token-grid-row-inner__col-action" style={{ textAlign: `right` }}>
-              <button className="own-token-grid-row-inner__sell-button own-token-grid-row-inner__button--size-half" onClick={this.onSellClick}>
-                {TradeType.SELL}
-              </button>
+            <div className="own-token-grid-row__open-manage-collateral" onClick={this.onManageClick}>
+              <OpenManageCollateral />
             </div>
           </div>
-        </React.Fragment>
-      );
-
+          <div title={state.assetBalance ? `$${state.assetBalance.toFixed(18)}` : ``} className="own-token-grid-row__col-position-value">
+            {!state.isLoading
+              ? state.assetBalance
+                ? <React.Fragment>
+                  <span className="sign-currency">$</span>{state.assetBalance.toFixed(2)}
+                </React.Fragment>
+                : '$0.00'
+              : <Preloader width="74px" />
+            }
+          </div>
+          <div title={state.profit ? `$${state.profit.toFixed(18)}` : ``} className="own-token-grid-row__col-profit">
+            {!state.isLoading
+              ? state.profit
+                ? <React.Fragment>
+                  <span className="sign-currency">$</span>{state.profit.toFixed(2)}
+                </React.Fragment>
+                : '$0.00'
+              : <Preloader width="74px" />
+            }
+          </div>
+          <div className="own-token-grid-row__col-action">
+            <button className="own-token-grid-row_button own-token-grid-row__sell-button own-token-grid-row__button--size-half" onClick={this.onSellClick}>
+              {TradeType.SELL}
+            </button>
+          </div>
+        </div>
+      </React.Fragment>
+    );
   }
 
   public render() {
@@ -308,6 +272,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
   public onManageClick = (event: React.MouseEvent<HTMLElement>) => {
     event.stopPropagation();
 
+    this.props.onManageCollateralOpen();
     // this.props.onManageCollateral(new ManageCollateralRequest(new BigNumber(0)));
   };
 

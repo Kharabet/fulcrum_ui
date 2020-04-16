@@ -186,7 +186,6 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
             FulcrumProvider.Instance.web3ProviderSettings.etherscanURL ? (
           <a
             className="trade-token-grid-row__col-token-name--inner"
-            style={{ cursor: `pointer`, textDecoration: `none`, color: `white` }}
             title={this.state.pTokenAddress}
             href={`${FulcrumProvider.Instance.web3ProviderSettings.etherscanURL}address/${this.state.pTokenAddress}#readContract`}
             target="_blank"
@@ -253,7 +252,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
   private renderActions = (isBuyOnly: boolean) => {
     return (
       <div className="trade-token-grid-row__col-action">
-        <button className="trade-token-grid-row__buy-button trade-token-grid-row__button--size-half" disabled={siteConfig.TradeBuyDisabled} onClick={this.onBuyClick}>
+        <button className="trade-token-grid-row__button trade-token-grid-row__buy-button trade-token-grid-row__button--size-half" disabled={siteConfig.TradeBuyDisabled} onClick={this.onBuyClick}>
           {TradeType.BUY}
         </button>
       </div>

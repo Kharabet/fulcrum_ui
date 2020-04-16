@@ -1,6 +1,6 @@
 .header {
-  padding-top: 1.8rem;
-  margin-bottom: 4rem;
+  padding-top: 50px;
+  margin-bottom: 60px;
 
   display: flex;
   flex-direction: column;
@@ -15,22 +15,21 @@
       display: flex;
       flex-direction: row;
       justify-content: flex-start;
-      width: 35%;
+      flex: 1;
     }
 
     .header__right {
       display: flex;
       flex-direction: row;
       justify-content: flex-end;
-      width: 35%;
     }
-    .header__menu{
-      display: none;
+
+    .header__center {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
     }
   }
-  .header__provider{
-     display: block;
-   }
 
   .header__popup-container {
     display: flex;
@@ -42,14 +41,9 @@
     border-top: solid 1px #393f49;
     border-bottom: solid 1px #393f49;
   }
-  .sidebar_h{
-    display: none;
+  svg{
+    .primary{
+      fill: #283049;
+    }
   }
-  .sidebar_v{
-    display: none;
-  }
-
-
-
-
 }
