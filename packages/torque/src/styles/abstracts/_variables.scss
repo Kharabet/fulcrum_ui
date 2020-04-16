@@ -14,6 +14,20 @@ $breakpoint-min-xl: 1410px;
 $breakpoint-max-lg: 1139px;
 $breakpoint-min-lg: 1140px;
 
+
+$container-desktop: 1380px;
+$container-laptop: 1110px;
+$container-mobile: 100%;
+
+$breakpoint-desktop-max: 1409px; 
+$breakpoint-desktop-min: 1410px;
+
+$breakpoint-laptop-max: 1139px;
+$breakpoint-laptop-min: 1140px;
+
+$breakpoint-mobile-max: 959px;
+$breakpoint-mobile-min: 960px;
+
 $color-blue: #6488ff;
 $color-blue--hover: #5074eb;
 $color-blue--pressed: #3158d9;

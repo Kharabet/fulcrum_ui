@@ -3,26 +3,24 @@ import React, { Component } from "react";
 import { Asset } from "../domain/Asset";
 import { TorqueProviderEvents } from "../services/events/TorqueProviderEvents";
 import { TorqueProvider } from "../services/TorqueProvider";
-import { DotsBar } from "./DotsBar";
-import { BorrowSelectorIconsBar } from "./BorrowSelectorIconsBar";
-import bgDai  from "../assets/images/ic_token_dai.svg";
-import bgUsdc  from "../assets/images/ic_token_usdc.svg";
-import bgUsdt  from "../assets/images/ic_token_usdt.svg";
-import bgSai  from "../assets/images/ic_token_sai.svg";
-import bgEth  from "../assets/images/ic_token_eth.svg";
-import bgBtc  from "../assets/images/ic_token_btc.svg";
-import bgRep  from "../assets/images/ic_token_rep.svg";
-import bgZrx  from "../assets/images/ic_token_zrx.svg";
-import bgKnc  from "../assets/images/ic_token_knc.svg";
-import bgLink  from "../assets/images/ic_token_link.svg";
-import bgSusd  from "../assets/images/ic_token_susd.svg";
-import ic_arrow_right from "../assets/images/ic_arrow_right.svg";
+
+import { ReactComponent as Dai } from "../assets/images/ic_token_dai.svg";
+import { ReactComponent as Usdc } from "../assets/images/ic_token_usdc.svg";
+import { ReactComponent as Usdt } from "../assets/images/ic_token_usdt.svg";
+import { ReactComponent as Sai } from "../assets/images/ic_token_sai.svg";
+import { ReactComponent as Eth } from "../assets/images/ic_token_eth.svg";
+import { ReactComponent as Btc } from "../assets/images/ic_token_btc.svg";
+import { ReactComponent as Rep } from "../assets/images/ic_token_rep.svg";
+import { ReactComponent as Zrx } from "../assets/images/ic_token_zrx.svg";
+import { ReactComponent as Knc } from "../assets/images/ic_token_knc.svg";
+import { ReactComponent as Link } from "../assets/images/ic_token_link.svg";
+import { ReactComponent as Susd } from "../assets/images/ic_token_susd.svg";
+import { ReactComponent as ArrowRight } from "../assets/images/ic_arrow_right.svg";
 import { Loader } from "./Loader";
 
 export interface IAssetSelectorItemProps {
   asset: Asset;
-
-  onSelectAsset?: (asset: Asset) => void;
+  onSelectAsset: (asset: Asset) => void;
 }
 
 interface IAssetSelectorItemState {
@@ -36,6 +34,7 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
     this.state = { interestRate: new BigNumber(0) };
 
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
+    TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderChanged, this.derivedUpdate);
   }
 
   private onProviderAvailable = () => {
@@ -44,6 +43,7 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
 
   public componentWillUnmount(): void {
     TorqueProvider.Instance.eventEmitter.removeListener(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
+    TorqueProvider.Instance.eventEmitter.removeListener(TorqueProviderEvents.ProviderChanged, this.derivedUpdate);
   }
 
   public componentDidMount(): void {
@@ -66,92 +66,71 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
   };
 
   public render() {
-    const assetTypeModifier = "asset-selector-item--"+this.props.asset.toLowerCase();
+    const assetTypeModifier = "asset-selector-item--" + this.props.asset.toLowerCase();
     const assetTypeImg = "asset-selector-icon";
     const assetDiv = "asset-selector-div"
-    let assetImg:any = this.getAssestsData()
+    let assetImg: any = this.getAssestsData()
     // try{
     //   let tmpassetImg = this.getAssestsData()
     //   assetImg = tmpassetImg.img
     // }catch (e){}
 
-
-
-    return (
-      <React.Fragment>
-        {!this.state.interestRate.gt(0)
-          ? <Loader />
-          : (<React.Fragment>
-            <div className={`asset-selector-item ${assetTypeModifier}`} onClick={this.onClick}>
+    return (!this.state.interestRate.gt(0)
+      ? <Loader />
+      : (<React.Fragment>
+        <div className={`asset-selector-item ${assetTypeModifier}`} onClick={this.onClick}>
+          <div className="asset-selector-content">
+            <div className="asset-selector-row">
               <div className="asset-selector__interest-rate">
-                {this.state.interestRate.gt(0) ? `${this.state.interestRate.toFixed(2)}%` : `0%`}
-              </div>
-              <div className="asset-selector-row">
-                <div className="asset-selector__apr">APR</div>
-                <div className="asset-selector__fixed">FIXED</div>
-              </div>
-              <div className="asset-selector-row mt50">
-                <div className="asset-selector__title">{this.props.asset}</div>
-                {!this.props.onSelectAsset
-                  ? (<div className="asset-selector__title--coming-soon">Web3 Only</div>)
-                  : ``
-                }
-
-                {/*<SelectorIconsBar />*/}
-                <img className={`${assetTypeImg}`} src={assetImg.img} />
-                <img className={`${assetDiv}`} src={ic_arrow_right} />
-
-                {/*<SelectorIconsBar />*/}
-                {/*<div className={`${assetDiv}`}><BorrowSelectorIconsBar /></div>*/}
-              </div>
+                <span className="asset-selector__interest-rate-value">{this.state.interestRate.gt(0) ? `${this.state.interestRate.toFixed(2)}` : `0`}</span>%
+                  </div>
             </div>
-          </React.Fragment>)
-        }
-      </React.Fragment>
-    );
+            <div className="asset-selector-row">
+              <div className="asset-selector__apr">APR</div>
+              <div className="asset-selector__fixed">FIXED</div>
+            </div>
+          </div>
+          <div className="asset-selector-footer">
+            <div className="asset-selector__title">{this.props.asset}</div>
+            <div className={`${assetTypeImg}`}>{assetImg}</div>
+            <div className={`${assetDiv}`}>
+              <ArrowRight />
+            </div>
+          </div>
+        </div>
+      </React.Fragment>)
+    )
   }
 
   private onClick = () => {
-    if (this.props.onSelectAsset) {
-      this.props.onSelectAsset(this.props.asset);
-    }
+    this.props.onSelectAsset(this.props.asset);
   };
+
   private getAssestsData = () => {
     //console.log("assestsType = ", this.props.asset)
     switch (this.props.asset) {
       case Asset.DAI:
-        return { img:bgDai}
-        break;
+        return <Dai />
       case Asset.SAI:
-        return {img:bgSai}
-        break;
+        return <Sai />
       case Asset.USDC:
-        return {img:bgUsdc}
-        break;
+        return <Usdc />
       case Asset.USDT:
-        return {img:bgUsdt}
-        break;
+        return <Usdt />
       case Asset.ETH:
-        return {img:bgEth}
-        break;
+        return <Eth />
       case Asset.WBTC:
-        return {img:bgBtc}
-        break;
+        return <Btc />
       case Asset.LINK:
-        return {img:bgLink}
-        break;
+        return <Link />
       case Asset.ZRX:
-        return {img:bgZrx}
-        break;
+        return <Zrx />
       case Asset.REP:
-        return {img:bgRep}
-        break;
+        return <Rep />
       case Asset.KNC:
-        return { img:bgKnc}
-        break;
+        return <Knc />
       case Asset.SUSD:
-        return { img:bgSusd}
-        break;
+        return <Susd />
     }
   }
 }

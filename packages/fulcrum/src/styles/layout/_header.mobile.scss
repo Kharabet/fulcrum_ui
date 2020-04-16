@@ -1,95 +1,40 @@
-@media only screen and (max-width: $mobile-version-max-width) {
+@media only screen and (max-width: $breakpoint-mobile-max) {
   .header {
-    // padding-left: 2rem;
-    padding: 15px 15px 20px 15px;
-    margin-bottom: 0;
+    margin-top: 20px;
+    padding-top: 0;
+    margin-bottom: 40px;
     .trade-page &{
       background-color: var(--bg-header);
+      padding: 15px 15px 20px 15px;
+      margin-bottom: 0;
+	  margin-top: 0;
     }
-    // padding-right: 2rem;
     .header__row {
       align-items: center;
-      //.header__left {
-      //  width: 50%;
-      //}
-      //
-      //.header__right {
-      //  width: 50%;
-      //}
       .header__left {
-        //width: 100%;
         z-index: 10001;
 
         flex: initial;
         width: calc(100% - 110px);
-    
-        // float: left;
+        .header-logo svg {
+          height: 32px;
+          width: 148px;
+      }
       }
       .header__center {
         display: none;
       }
-
-      .header__right {
-        // width: 65%;
-        // float: left;
-      }
-      .header__menu {
-        // display: block;
-        // padding-top: 10px;
-        // height: 35px;
-        // z-index: 4;
-        // right: -53px;
-        // position:relative;
-      }
       .header_icon {
         z-index: 10001;
+        padding-right: 10px;
       }
-    }
-    .header-menu__item {
-      // margin-bottom: 40px;
-      font-family: Muli;
-      font-style: normal;
-      font-weight: 600;
-      font-size: 26px;
-      line-height: 150%;
-    }
-    .header-menu__item:not(:last-child) {
-      margin-bottom: 45px;
-    }
-
-    .header-menu__item {
-      .header-menu__item-link--active:before {
-        content: "";
-        position: absolute;
-        width: 8px;
-        height: 60px;
-        margin: auto;
-        background-color: #276bfb;
-        top: 50%;
-        left: -4px;
-        -webkit-transform: translate(-50%, 0);
-        transform: translate(0, -50%);
-        border-radius: 6px;
-      }
-    }
-
-    .header__popup-container {
-      height: 625px;
     }
 
     .header_btn {
-      //position: absolute;
-      //top:0;
       margin-bottom: 40px;
+      margin-top: 60px;
     }
-    .heade_nav_menu {
-      //margin-top: 5rem;
-    }
-    .header__provider {
-      display: none;
-    }
-    .sidebar_n {
-      width: 300px;
+    .header_nav_menu {
     }
 
     .sidebar_h {
@@ -113,11 +58,8 @@
       display: block;
       width: 100vw;
       height: 100vh;
-      /* height: 100%; */
-      /* right: 0px; */
-      padding-top: 100px;
+      padding-top: 50px;
       background-color: var(--primary-row);
-      -webkit-animation: animateright 0.4s;
       animation: animateright 0.4s;
       z-index: 1000;
       top: 0;

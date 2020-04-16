@@ -1,5 +1,4 @@
 .trade-token-grid-tab {
-  margin-bottom: 2px;
 
   &:after {
     content: "";
@@ -98,7 +97,6 @@
   }
   @media screen and (min-width: $breakpoint-mobile-min) {
     position: relative;
-    padding-top: 50px;
 
     &:after {
       width: calc(100vw - 17px);

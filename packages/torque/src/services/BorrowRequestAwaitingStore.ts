@@ -1,6 +1,5 @@
 import { Web3Wrapper } from "@0x/web3-wrapper";
 import { BorrowRequestAwaiting } from "../domain/BorrowRequestAwaiting";
-import { IWalletDetails } from "../domain/IWalletDetails";
 
 export class BorrowRequestAwaitingStore {
   private readonly _networkId: number;
@@ -49,7 +48,7 @@ export class BorrowRequestAwaitingStore {
     this._storeData();
   }
 
-  public async cleanUp(walletDetails: IWalletDetails) {
+  public async cleanUp(address: string) {
     const itemsCleaned = Array<BorrowRequestAwaiting>();
     for (const item of this._items) {
       if (item.networkId !== this._networkId) {
@@ -58,7 +57,7 @@ export class BorrowRequestAwaitingStore {
         continue;
       }
 
-      if (item.walletAddress !== walletDetails.walletAddress) {
+      if (item.walletAddress !== address) {
         itemsCleaned.push(item);
 
         continue;
@@ -74,8 +73,8 @@ export class BorrowRequestAwaitingStore {
     this._storeData();
   }
 
-  public async list(walletDetails: IWalletDetails): Promise<ReadonlyArray<BorrowRequestAwaiting>> {
-    return this._items.filter(e => e.walletAddress === walletDetails.walletAddress);
+  public async list(address: string): Promise<ReadonlyArray<BorrowRequestAwaiting>> {
+    return this._items.filter(e => e.walletAddress === address);
   }
 
   private _loadData() {

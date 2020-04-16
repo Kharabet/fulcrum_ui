@@ -1,59 +1,26 @@
 .asset-selector {
   display: flex;
-  flex-direction: row;
   flex-wrap: wrap;
-  min-height: 30rem;
-  //justify-content: space-between;
-
-  margin-bottom: 2rem;
-  .op5 {
-    opacity: 0.5;
-  }
-  .asset-selector-centeredOverlay {
-    position: fixed;
-    //background-color: rgba(255, 255, 255, 0.65);
-    //opacity: 0.8;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    color: black;
-    text-align: center;
-    border-radius: 1rem;
-    font-size: 6rem;
-    font-weight: 600;
-    margin-top: 100px;
-    //z-index: 999;
-  }
-
-  .asset-selector-centeredOverlay span {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    -webkit-transform: translate(-50%, -50%);
-    transform: translate(-50%, -50%);
-  }
-
+  margin-bottom: 30px;
   .asset-selector-item {
     cursor: pointer;
-
     display: flex;
-    flex-direction: column;
-    //flex: 0 47%;
-
+    flex-wrap: wrap;
     height: 205px;
-    width: 195px;
-    margin: 0 1rem;
+    width: calc(100% / 6 - 20px);
     padding: 25px;
-
-    border-radius: 1rem;
+    margin-bottom: 20px;
+    border-radius: 8px;
     background-color: $color-borrow-card;
     border: 1px solid $color-borrow-card;
-    transition-property: background, border-radius;
+    transition-property: background-color, border-radius;
     transition-duration: 0.2s, 1s;
     transition-timing-function: linear;
     .asset-selector-icon {
-      display: block;
+      display: flex;
+      &:hover {
+        display: none;
+      }
     }
     .asset-selector-div {
       display: none;
@@ -77,27 +44,12 @@
         }
       }
       .asset-selector-div {
-        //background-repeat: no-repeat;
-        //width: 38px;
-        //background-position: right bottom;
-        //bottom: -48px;
-        //margin-top: 2px;
-        background-repeat: no-repeat;
-        width: 38px;
-        background-position: right bottom;
-        bottom: -48px;
+        display: flex;
         background-color: #ffffff;
-        border-radius: 100px;
-        float: right;
-        margin-top: 0px;
-        z-index: 1;
-        display: block;
+        border-radius: 50%;
       }
       .asset-selector-icon {
         display: none;
-      }
-      .asset-selector__interest-rate {
-        color: #3b364b;
       }
       .asset-selector__fixed {
         background: linear-gradient(to right, #3022ff, #ff22cf, #ff0, #ff22e4);
@@ -116,427 +68,147 @@
     &:active {
       background-color: $color-gray-darker-2;
     }
-
-    &:nth-child(2) {
-      margin-left: 0;
-      margin-top: 2.5rem;
-    }
-
-    //&:first-child {
-    //  margin-top: unset;
-    //}
-    //
-    //&:first-child + div {
-    //  margin-top: unset;
-    //}
-
-    //&:last-child {
-    //  margin-right: 0;
-    //}
-
-    margin-left: 0;
-    margin-top: 2.5rem;
-    .mt50 {
-      margin-top: 50px;
-    }
     .asset-selector__title {
-      width: 80px;
-      margin-top: 9px;
-      float: left;
+      display: flex;
+      align-items: center;
       font-size: 22px;
-      font-weight: bold;
-      line-height: 1.17;
-      letter-spacing: -0.48px;
-      text-align: left;
+      font-weight: 900;
+      line-height: 1.5;
       color: $color-gray-dark;
-
       &--coming-soon {
+        width: 100%;
         font-size: 11px;
         color: #a9b5c7;
-        margin: unset;
-        letter-spacing: unset;
-        margin-top: -3rem;
-        margin-bottom: 0.8125rem;
       }
     }
     .asset-selector-row {
+      display: flex;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+    .asset-selector-footer {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      align-self: flex-end;
       width: 100%;
     }
     .asset-selector__fixed {
-      width: 43px;
-      height: 21px;
-      left: 59px;
-      top: 73px;
-      font-style: normal;
-      font-weight: 800;
       font-size: 13px;
-      line-height: 170%;
+      font-weight: 800;
+      line-height: 1.7;
       color: #a9b5c7;
-      float: left;
     }
     .asset-selector__apr {
-      width: 34px;
-      height: 21px;
-      left: 27px;
-      top: 73px;
       font-weight: 600;
       font-size: 13px;
-      line-height: 170%;
+      line-height: 1.7;
       color: #4ecea3;
-      float: left;
+      margin-right: 5px;
     }
     .asset-selector__interest-rate {
-      width: 100%;
-      font-weight: 800;
       font-size: 42px;
-      line-height: 50px;
-      height: 50px;
+      line-height: 1.2;
       color: #4ecea3;
-      //font-size: 1rem;
-      //font-weight: bold;
-      //line-height: 1.5;
-      letter-spacing: -0.16px;
-      text-align: left;
-      //background: -webkit-linear-gradient(left, #ecc75c, #6cd6b2 15%, #92a7ea 30%);
-      //-webkit-background-clip: text;
-      //-webkit-text-fill-color: transparent;
+      &-value{
+        font-weight: 800;
+      }
+    }
+  }
+  .asset-selector-item {
+    bottom: 0;
+    background-repeat: no-repeat;
+    background-position: right bottom;
+    background-size: 102px;
+    transition-property: background-size;
+    transition-duration: 0.5s, 1s;
+    transition-timing-function: linear;
+    &:hover {
+      background-size: 123px;
     }
   }
 
   .asset-selector-item--bat {
-    background-image: url("../assets/images/bg_tile_bat.svg");
-    background-repeat: no-repeat;
-    background-position: right bottom;
-    bottom: 0;
-    background-size: 100px;
-    transition-property: background-size;
-    transition-duration: 0.5s, 1s;
-    transition-timing-function: linear;
-    &:hover {
-      background-size: 120px;
-    }
+    background-image: url("../../assets/images/bg_tile_bat.svg");
   }
 
   .asset-selector-item--zrx {
-    background-image: url("../assets/images/intersect_zrx.svg");
-    background-repeat: no-repeat;
-    background-position: right bottom;
-    bottom: 0;
-    background-size: 100px;
-    transition-property: background-size;
-    transition-duration: 0.5s, 1s;
-    transition-timing-function: linear;
-    &:hover {
-      background-size: 120px;
-    }
+    background-image: url("../../assets/images/intersect_zrx.svg");
   }
 
   .asset-selector-item--wbtc {
-    background-image: url("../assets/images/intersect_wbtc.svg");
-    background-repeat: no-repeat;
-    background-position: right bottom;
-    bottom: 0;
-    background-size: 100px;
-    transition-property: background-size;
-    transition-duration: 0.5s, 1s;
-    transition-timing-function: linear;
-    &:hover {
-      background-size: 120px;
-    }
+    background-image: url("../../assets/images/intersect_wbtc.svg");
   }
 
   .asset-selector-item--sai {
-    background-image: url("../assets/images/intersect_sai.svg");
-    background-repeat: no-repeat;
-    background-position: right bottom;
-    bottom: 0;
-    background-size: 100px;
-    transition-property: background-size;
-    transition-duration: 0.5s, 1s;
-    transition-timing-function: linear;
-    &:hover {
-      background-size: 120px;
-    }
-  }
-  .asset-selector-icon {
-    //background-image: url("../assets/images/ic_token_sai.svg");
-    background-repeat: no-repeat;
-    width: 38px;
-    background-position: right bottom;
-    bottom: -48px;
-    //margin-left: 112px;
-    //position: absolute;
-    float: right;
-    margin-top: 0px;
-    z-index: 1;
-    display: block;
-    &:hover {
-      display: none;
-    }
+    background-image: url("../../assets/images/intersect_sai.svg");
   }
 
   .asset-selector-item--dai {
-    background-image: url("../assets/images/Intersect_dai.svg");
-    background-repeat: no-repeat;
-    background-position: right bottom;
-    bottom: 0;
-    background-size: 100px;
-    transition-property: background-size;
-    transition-duration: 0.5s, 1s;
-    transition-timing-function: linear;
-    &:hover {
-      background-size: 120px;
-    }
+    background-image: url("../../assets/images/Intersect_dai.svg");
   }
 
   .asset-selector-item--usdc {
-    background-image: url("../assets/images/Intersect_usdc.svg");
-    background-repeat: no-repeat;
-    background-position: right bottom;
-    bottom: 0;
-    background-size: 100px;
-    transition-property: background-size;
-    transition-duration: 0.5s, 1s;
-    transition-timing-function: linear;
-    &:hover {
-      background-size: 120px;
-    }
+    background-image: url("../../assets/images/Intersect_usdc.svg");
   }
 
   .asset-selector-item--susd {
-    background-image: url("../assets/images/intersect_susd.svg");
-    background-repeat: no-repeat;
-    background-position: right bottom;
-    bottom: 0;
-    background-size: 100px;
-    transition-property: background-size;
-    transition-duration: 0.5s, 1s;
-    transition-timing-function: linear;
-    &:hover {
-      background-size: 120px;
-    }
+    background-image: url("../../assets/images/intersect_susd.svg");
   }
 
   .asset-selector-item--eth {
-    background-image: url("../assets/images/intersect_eth.svg");
-    background-repeat: no-repeat;
-    background-position: right bottom;
-    bottom: 0;
-    background-size: 100px;
-    transition-property: background-size;
-    transition-duration: 0.5s, 1s;
-    transition-timing-function: linear;
-    &:hover {
-      background-size: 120px;
-    }
+    background-image: url("../../assets/images/intersect_eth.svg");
   }
 
   .asset-selector-item--knc {
-    background-image: url("../assets/images/intersect_knc.svg");
-    background-repeat: no-repeat;
-    background-position: right bottom;
-    bottom: 0;
-    background-size: 100px;
-    transition-property: background-size;
-    transition-duration: 0.5s, 1s;
-    transition-timing-function: linear;
-    &:hover {
-      background-size: 120px;
-    }
+    background-image: url("../../assets/images/intersect_knc.svg");
   }
 
   .asset-selector-item--link {
-    background-image: url("../assets/images/intersect_link.svg");
-    background-repeat: no-repeat;
-    background-position: right bottom;
-    bottom: 0;
-    background-size: 100px;
-    transition-property: background-size;
-    transition-duration: 0.5s, 1s;
-    transition-timing-function: linear;
-    &:hover {
-      background-size: 120px;
-    }
-  }
-
-  .asset-selector-item--mkr {
-    background-image: url("../assets/images/bg_tile_mkr.svg");
-    background-repeat: no-repeat;
-    background-position: right;
+    background-image: url("../../assets/images/intersect_link.svg");
   }
 
   .asset-selector-item--rep {
-    background-image: url("../assets/images/intersect_rfp.svg");
+    background-image: url("../../assets/images/intersect_rfp.svg");
+  }
+  .asset-selector-item--usdt {
+    background-image: url("../../assets/images/intersect_usdt.svg");
+  }
+  .asset-selector-item--mkr {
+    background-image: url("../../assets/images/bg_tile_mkr.svg");
     background-repeat: no-repeat;
-    background-position: right bottom;
-    bottom: 0;
-    background-size: 100px;
-    transition-property: background-size;
-    transition-duration: 0.5s, 1s;
-    transition-timing-function: linear;
-    &:hover {
-      background-size: 120px;
+    background-position: right;
+  }
+}
+@media screen and(min-width: $breakpoint-min-xl) {
+  .asset-selector {
+    .asset-selector-item {
+      &:not(:nth-child(6n)) {
+        margin-right: 24px;
+      }
     }
   }
 }
-
-@media only screen and (max-width: $mobile-version-width) {
+@media screen and(max-width: $breakpoint-max-xl) {
   .asset-selector {
     .asset-selector-item {
-      .asset-selector-icon {
-        display: block;
-      }
-      .asset-selector-div {
-        display: none;
-      }
-      &:hover {
-        background-color: $color-borrow-card;
-        .asset-selector-div {
-          display: none;
-        }
-        .asset-selector-icon {
-          display: block;
-        }
-        .asset-selector__fixed {
-          background: none;
-          background-size: 200% auto;
-          color: #a9b5c7;
-          -webkit-background-clip: text;
-          animation: unset;
-          @keyframes shine {
-            to {
-              background-position: 200% center;
-            }
-          }
-        }
+      width: calc(100% / 5 - 20px);
+      &:not(:nth-child(5n)) {
+        margin-right: 25px;
       }
     }
-
-    .asset-selector-item--bat {
-      background-image: url("../assets/images/bg_tile_bat.svg");
-      background-repeat: no-repeat;
-      background-position: right bottom;
-      bottom: 0;
-      background-size: 90px;
-      &:hover {
-        background-size: 90px;
+  }
+}
+@media screen and(max-width: $breakpoint-max-lg) {
+  .asset-selector {
+    .asset-selector-item {
+      width: calc(100% / 4 - 15px);
+      &:nth-child(4n) {
+        margin-right: 0;
       }
-    }
-
-    .asset-selector-item--zrx {
-      background-image: url("../assets/images/intersect_zrx.svg");
-      background-repeat: no-repeat;
-      background-position: right bottom;
-      bottom: 0;
-      background-size: 90px;
-      &:hover {
-        background-size: 90px;
-      }
-    }
-
-    .asset-selector-item--wbtc {
-      background-image: url("../assets/images/intersect_wbtc.svg");
-      background-repeat: no-repeat;
-      background-position: right bottom;
-      bottom: 0;
-      background-size: 90px;
-      &:hover {
-        background-size: 90px;
-      }
-    }
-
-    .asset-selector-item--sai {
-      background-image: url("../assets/images/intersect_sai.svg");
-      background-repeat: no-repeat;
-      background-position: right bottom;
-      bottom: 0;
-      background-size: 90px;
-      &:hover {
-        background-size: 90px;
-      }
-    }
-
-    .asset-selector-item--dai {
-      background-image: url("../assets/images/Intersect_dai.svg");
-      background-repeat: no-repeat;
-      background-position: right bottom;
-      bottom: 0;
-      background-size: 90px;
-      &:hover {
-        background-size: 90px;
-      }
-    }
-
-    .asset-selector-item--usdc {
-      background-image: url("../assets/images/Intersect_usdc.svg");
-      background-repeat: no-repeat;
-      background-position: right bottom;
-      bottom: 0;
-      background-size: 90px;
-      &:hover {
-        background-size: 90px;
-      }
-    }
-
-    .asset-selector-item--susd {
-      background-image: url("../assets/images/intersect_susd.svg");
-      background-repeat: no-repeat;
-      background-position: right bottom;
-      bottom: 0;
-      background-size: 90px;
-      &:hover {
-        background-size: 90px;
-      }
-    }
-
-    .asset-selector-item--eth {
-      background-image: url("../assets/images/intersect_eth.svg");
-      background-repeat: no-repeat;
-      background-position: right bottom;
-      bottom: 0;
-      background-size: 90px;
-      &:hover {
-        background-size: 90px;
-      }
-    }
-
-    .asset-selector-item--knc {
-      background-image: url("../assets/images/intersect_knc.svg");
-      background-repeat: no-repeat;
-      background-position: right bottom;
-      bottom: 0;
-      background-size: 90px;
-      &:hover {
-        background-size: 90px;
-      }
-    }
-
-    .asset-selector-item--link {
-      background-image: url("../assets/images/intersect_link.svg");
-      background-repeat: no-repeat;
-      background-position: right bottom;
-      bottom: 0;
-      background-size: 90px;
-      &:hover {
-        background-size: 90px;
-      }
-    }
-
-    .asset-selector-item--mkr {
-      background-image: url("../assets/images/bg_tile_mkr.svg");
-      background-repeat: no-repeat;
-      background-position: right;
-      background-size: 90px;
-    }
-
-    .asset-selector-item--rep {
-      background-image: url("../assets/images/intersect_rfp.svg");
-      background-repeat: no-repeat;
-      background-position: right bottom;
-      bottom: 0;
-      background-size: 90px;
-      &:hover {
-        background-size: unset;
+      &:not(:nth-child(4n)) {
+        margin-right: 20px;
       }
     }
   }
