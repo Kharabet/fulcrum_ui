@@ -23,7 +23,7 @@ export class Web3ConnectionFactory {
     let networkId: number = 0;
     let web3Wrapper: Web3Wrapper;
 
-        /*
+    /*
       TODO:
       Set pollingInterval to 8000. Use https://github.com/MetaMask/eth-block-tracker with Web3ProviderEngine
       to poll for new blocks and use events to update the UI.
@@ -41,12 +41,12 @@ export class Web3ConnectionFactory {
 
     const provider = await connector.getProvider();
 
-    try {
+        try {
 
       providerEngine.addProvider(new SignerSubprovider(provider));
-      await providerEngine.start();
-      web3Wrapper = new Web3Wrapper(providerEngine);
-      canWrite = true;
+          await providerEngine.start();
+          web3Wrapper = new Web3Wrapper(providerEngine);
+          canWrite = true;
       const account = await connector.getAccount();
       const chainId = (await connector.getChainId()).toString();
       networkId = chainId.includes("0x") ? parseInt(chainId, 16) : parseInt(chainId, 10);
@@ -57,13 +57,13 @@ export class Web3ConnectionFactory {
     } catch (e) {
       console.log(e);
 
-      await providerEngine.stop();
+          await providerEngine.stop();
 
-      // rebuild providerEngine
-      providerEngine = new Web3ProviderEngine({ pollingInterval: 3600000 }); // 1 hour polling
-      providerEngine.addProvider(Web3ConnectionFactory.alchemyProvider);
+          // rebuild providerEngine
+          providerEngine = new Web3ProviderEngine({ pollingInterval: 3600000 }); // 1 hour polling
+          providerEngine.addProvider(Web3ConnectionFactory.alchemyProvider);
 
-      // @ts-ignore
+          // @ts-ignore
       web3Wrapper = new Web3Wrapper(providerEngine);
     }
     Web3ConnectionFactory.networkId = networkId ? networkId : await web3Wrapper.getNetworkIdAsync();
@@ -71,7 +71,7 @@ export class Web3ConnectionFactory {
     Web3ConnectionFactory.currentWeb3Wrapper = web3Wrapper;
     Web3ConnectionFactory.canWrite = canWrite;
 
-  }
+            }
 
   public static async setReadonlyProvider() {
 
@@ -88,7 +88,7 @@ export class Web3ConnectionFactory {
     Web3ConnectionFactory.networkId = await Web3ConnectionFactory.currentWeb3Wrapper.getNetworkIdAsync();
     Web3ConnectionFactory.canWrite = false;
     Web3ConnectionFactory.userAccount = undefined;
-  }
+      }
 
   public static async getAlchemyProvider(): Promise<AlchemySubprovider> {
     let key;
