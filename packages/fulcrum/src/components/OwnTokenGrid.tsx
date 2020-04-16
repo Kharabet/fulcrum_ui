@@ -105,14 +105,18 @@ export class OwnTokenGrid extends Component<IOwnTokenGridProps, IOwnTokenGridSta
 
   private renderMobile = () => {
     const ownRows = this.props.ownRowsData.map(e => <OwnTokenCardMobile key={`${e.currentKey.toString()}`} {...e} />);
+    const historyRows = this.props.ownRowsData.map(e => <HistoryTokenGridRow key={`${e.currentKey.toString()}`} {...e} />);
     if (ownRows.length === 0) return null;
 
     return (
       <div className="own-token-cards">
-
         <div className="own-token-cards__header">Manage</div>
+        <div className="group-button">
+          <button className={`${!this.state.isShowHistory ? `active` : ``}`} onClick={this.onShowOpenPositions}>Open positions</button>
+          <button className={`${this.state.isShowHistory ? `active` : ``}`} onClick={this.onShowHistory}>Trade history</button>
+        </div>
         <div className="own-token-cards__container">
-          {ownRows}
+          {this.state.isShowHistory ? historyRows : ownRows}
         </div>
       </div>
     );
