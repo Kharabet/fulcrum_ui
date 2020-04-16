@@ -1,5 +1,4 @@
 .trade-token-grid-tab {
-  position: relative;
   margin-bottom: 2px;
 
   &:after {
@@ -14,14 +13,13 @@
   &__container {
     display: flex;
     justify-content: space-between;
+    flex-wrap: wrap;
   }
   &__items {
     display: flex;
+    align-self: flex-end;
   }
   &-item {
-    &:not(.manage-tab) {
-      width: 110px;
-    }
     &.eth-tab {
       .eth-svg {
         fill: var(--eth-bg);
@@ -61,15 +59,13 @@
     }
 
     &__col-token-image {
-      height: 50px;
       display: flex;
       justify-content: center;
       align-items: center;
-      margin-bottom: 10px;
+      margin-bottom: 15px;
       svg {
         height: 28px;
         width: 28px;
-        margin-right: 7px;
       }
 
       span {
@@ -94,66 +90,96 @@
         }
       }
     }
-  }
-  .manage-tab {
-    width: 155px;
-    [data-theme="light"] & svg path {
-      fill: #c8c8c8;
-    }
-    svg {
-      height: 17px;
-      width: 17px;
+    .manage-tab {
+      [data-theme="light"] & svg path {
+        fill: #c8c8c8;
+      }
     }
   }
+
   @media screen and (min-width: $breakpoint-mobile-min) {
+    position: relative;
     padding-top: 50px;
 
     &:after {
       width: calc(100vw - 17px);
     }
-  }
-  @media screen and (min-width: $breakpoint-mobile-min) {
+    &__selector {
+      margin-bottom: 15px;
+    }
     &-item {
+      &:not(.manage-tab) {
+        width: 110px;
+      }
       &:not(:last-child) {
         margin: 0 5px;
       }
+      &__col-token-image {
+        svg {
+          margin-right: 7px;
+        }
+      }
+    }
+
+    .manage-tab {
+      width: 155px;
+      svg {
+        height: 17px;
+        width: 17px;
+      }
     }
   }
+
   @media screen and (max-width: $breakpoint-mobile-max) {
-    padding: 25px 0 0 15px;
     &:after {
-      width: 100%;
+      content: none;
     }
-    &__container {
-      flex-direction: column;
+    &__selector {
+      width: 100%;
+      margin: 15px 0;
     }
     &__items {
-      overflow: scroll;
-      scrollbar-width: none;
-      -webkit-overflow-scrolling: touch;
-      &::-webkit-scrollbar {
-        display: none;
-        width: 0px;
-        background: transparent;
-      }
+      width: 100%;
+      order: -1;
+      border-bottom: 1px solid #444e5a;
+      margin-top: 20px;
     }
     &-item {
       display: flex;
       &.trade-token-grid-tab-item {
-        width: 80px;
-        &:not(:last-child) {
-          margin-right: 0;
+        &:not(.manage-tab) {
+          width: calc(100% / 5);
         }
       }
       &__col-token-image {
-        display: flex;
-        svg {
-          height: 23px;
-          width: 23px;
-        }
+        margin-left: auto;
+        margin-right: auto;
         span {
-          font-size: 14px;
+          &.count-open-position {
+            position: absolute;
+            top: -10px;
+            right: -20px;
+            margin-right: 0;
+          }
         }
+      }
+    }
+    &.manage {
+      .trade-token-grid-tab__selector {
+        display: none;
+      }
+    }
+    .manage-tab {
+      width: auto;
+      position: absolute;
+      top: 25px;
+      right: 87px;
+      &:after {
+        content: none;
+      }
+      svg {
+        height: 20px;
+        width: 20px;
       }
     }
   }

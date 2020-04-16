@@ -49,7 +49,7 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
       >
         <div className={`${classNamePrefix}__col-token-image`}>
           {assetDetails.reactLogoSvg.render()}
-          <span >{assetDetails.displayName}</span>
+          {!this.props.isMobile ? <span >{assetDetails.displayName}</span> : null}
         </div>
       </div>
     );
@@ -92,7 +92,7 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
             <div className={`trade-token-grid-tab-item manage-tab ${this.state.isShowMyTokensOnly ? "trade-token-grid-tab-item--active" : ""}`} onClick={this.showMyTokensOnlyChange}>
               <div className={`trade-token-grid-tab-item__col-token-image`} >
                 {<WalletSvg />}
-                <span>Manage</span>
+                {!this.props.isMobile ? <span>Manage</span> : null}
                 <span className="count-open-position">{this.props.openedPositionsCount}</span>
               </div>
             </div>
