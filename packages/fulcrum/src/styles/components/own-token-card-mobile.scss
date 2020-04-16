@@ -31,7 +31,7 @@ $width: 33%;
   flex-wrap: wrap;
   width: 248px;
   margin: 20px auto 30px auto;
-  border: 1px solid #444e5a;
+  border: 1px solid var(--switch-bg-pro);
   button {
     width: 123px;
     height: 33px;
@@ -45,12 +45,12 @@ $width: 33%;
     font-size: 10px;
     line-height: 1.5;
     font-weight: 800;
-    color: var(--switch-text-pro);
+    color: #8992A4;
     text-transform: uppercase;
     cursor: pointer;
     &.active {
-      background-color: #586473;
-      color: #ffffff;
+      background-color: var(--lend-bg-hover);
+      color: var(--primary-text);
     }
   }
 }
