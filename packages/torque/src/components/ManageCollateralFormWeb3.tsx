@@ -215,38 +215,18 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
         ) : (
           <React.Fragment>
             <section className="dialog-content">
-            <CollateralSlider
-              readonly={false}
-              minValue={this.state.minValue}
-              maxValue={this.state.maxValue}
-              value={this.state.selectedValue}
-              onUpdate={this.onUpdate}
-              onChange={this.onChange}
-            />
-
-            <div className="manage-collateral-form__tips">
-              <div className="manage-collateral-form__tip">Withdraw</div>
-              <div className="manage-collateral-form__tip">Top Up</div>
-            </div>
-
-            <hr className="manage-collateral-form__delimiter" />
 
             {this.state.loanValue !== this.state.selectedValue ? (
               <React.Fragment>
                 <div className="manage-collateral-form__info-liquidated-at-container">
                   <div className="manage-collateral-form__info-liquidated-at-msg">
-                    This will make your loan
+                    This will make your loan collateralized
                   </div>
                   <div className="manage-collateral-form__info-liquidated-at-price">
-                    {this.state.collateralizedPercent.toFixed(2)}% collateralized
+                    {this.state.collateralizedPercent.toFixed(2)}% 
                   </div>
                 </div>
-                <OpsEstimatedResult
-                  assetDetails={this.state.assetDetails}
-                  actionTitle={`You will ${this.state.loanValue > this.state.selectedValue ? "withdraw" : "top up"}`}
-                  amount={this.state.collateralAmount}
-                  precision={6}
-                />
+            
                 <div className={`manage-collateral-form-insufficient-balance ${!this.state.balanceTooLow ? `manage-collateral-form-insufficient-balance--hidden` : ``}`}>
                   Insufficient {this.state.assetDetails.displayName} balance in your wallet!
                 </div>
@@ -254,13 +234,43 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
             ) : (
               <div className="manage-collateral-form__info-liquidated-at-container">
                 <div className="manage-collateral-form__info-liquidated-at-msg">
-                  Your loan is
+                  Your loan is collateralized
                 </div>
                 <div className="manage-collateral-form__info-liquidated-at-price">
-                  {this.state.collateralizedPercent.toFixed(2)}% collateralized
+                  <span>{this.state.collateralizedPercent.toFixed(2)}</span>% 
                 </div>
               </div>
               )}
+            <CollateralSlider
+              readonly={false}
+            
+              minValue={this.state.minValue}
+              maxValue={this.state.maxValue}
+              value={this.state.selectedValue}
+              onUpdate={this.onUpdate}
+              onChange={this.onChange}
+            />
+    {/* <OpsEstimatedResult
+                  assetDetails={this.state.assetDetails}
+                  actionTitle={`You will ${this.state.loanValue > this.state.selectedValue ? "withdraw" : "top up"}`}
+                  amount={this.state.collateralAmount}
+                  precision={6}
+                /> */}
+
+            <div className="manage-collateral-form__tips">
+              <div className="manage-collateral-form__tip">Withdraw</div>
+              <div className="manage-collateral-form__tip">Top Up</div>
+            </div>
+
+            <hr className="manage-collateral-form__delimiter" />
+            <div className="manage-collateral-form__info-liquidated-at-msg">
+                    You will 
+                    {this.state.loanValue > this.state.selectedValue ?
+                      " withdraw" :
+                      " top up"
+                    }
+                  </div>
+    
             </section>
             <section className="dialog-actions">
               <div className="manage-collateral-form__actions-container">
