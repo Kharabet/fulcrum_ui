@@ -70,10 +70,10 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
 
     const positionSafetyText = TorqueProvider.Instance.getPositionSafetyText(item);
     const collateralizedStateSelector = positionSafetyText === "Safe" ?
-      "borrowed-funds-list-item__collateralized-state--safe" :
+      "safe" :
       positionSafetyText === "Danger" ?
-        "borrowed-funds-list-item__collateralized-state--danger" :
-        "borrowed-funds-list-item__collateralized-state--unsafe";
+        "danger" :
+        "unsafe";
 
     // const firstInRowModifier = this.props.firstInTheRow ? "borrowed-funds-list-item--first-in-row" : "";
     // const lastInRowModifier = this.props.lastInTheRow ? "borrowed-funds-list-item--last-in-row" : "";
@@ -90,72 +90,68 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
 
     return (
       <div className={`borrowed-funds-list-item`}>
-        {assetDetails.displayName === Asset.SAI ? (
+        {/* {assetDetails.displayName === Asset.SAI ? (
           <div className="borrowed-funds-button-div" onClick={this.migrateSaiToDai}>
             <div className="borrowed-funds__item borrowed-funds-button" >
               Migrate to DAI
                 </div>
           </div>
-        ) : null}
-        <div className="borrowed-funds-list-item__padding-container">
-          <div className="borrowed-funds-list-item__general-container">
-            <div className="borrowed-funds-list-item__general-container-values">
-              <div title={`${item.amountOwed.toFixed(18)} ${assetDetails.displayName}`} className="borrowed-funds-list-item__amount">{item.amountOwed.toFixed(5)}</div>
-              <div title={`${interestRate.multipliedBy(100).toFixed(18)}% APR`} className="borrowed-funds-list-item__interest-rate">
-                {interestRate.multipliedBy(100).toFixed(2)} % APR
-              </div>
+        ) : null} */}
+        <div className="borrowed-funds-list-item__header">
+          <div className="borrowed-funds-list-item__header-loan">
+            <div
+              title={`${item.amountOwed.toFixed(18)} ${assetDetails.displayName}`}
+              className="borrowed-funds-list-item__header-loan-owed">
+              {item.amountOwed.toFixed(5)}
             </div>
-            <div className="borrowed-funds-list-item__general-container-asset">
-              <div className="borrowed-funds-list-item__general-container-asset-img">
-                <img src={assetDetails.logoSvg} alt={assetDetails.displayName} />
+            <div
+              title={`${interestRate.multipliedBy(100).toFixed(18)}% APR`}
+              className="borrowed-funds-list-item__header-loan-interest-rate"
+            >
+              <span className="value">{interestRate.multipliedBy(100).toFixed(2)}%</span>&nbsp;APR
               </div>
-              <div className="borrowed-funds-list-item__general-container-asset-name">
-                {assetDetails.displayName}
-              </div>
+          </div>
+          <div className="borrowed-funds-list-item__header-asset">
+            <div className="borrowed-funds-list-item__header-asset-img">
+              <img src={assetDetails.logoSvg} alt={assetDetails.displayName} />
+            </div>
+            <div className="borrowed-funds-list-item__header-asset-name">
+              {assetDetails.displayName}
+            </div>
 
-            </div>
           </div>
         </div>
-        <div className="borrowed-funds-list-item__padding-container">
-          <div className="borrowed-funds-list-item__collateral-container">
-            <div className="borrowed-funds-list-item__collateral-info-container">
-              {positionSafetyText !== "Display Error" ? (
-                <div className="borrowed-funds-list-item__collateralized-value-container">
-                  <div title={`${item.collateralizedPercent.multipliedBy(100).plus(100).toFixed(18)}%`} className="borrowed-funds-list-item__collateralized">
-                    {item.collateralizedPercent.multipliedBy(100).plus(100).toFixed(2)}%
+        <div className="borrowed-funds-list-item__body">
+          {positionSafetyText !== "Display Error" &&
+            <div
+              title={`${item.collateralizedPercent.multipliedBy(100).plus(100).toFixed(18)}%`}
+              className={`borrowed-funds-list-item__body-collateralized ${collateralizedStateSelector}`}>
+              <span className="value">{item.collateralizedPercent.multipliedBy(100).plus(100).toFixed(2)}</span>%
                 </div>
-                  <div className="borrowed-funds-list-item__collateralized-label">Collateralized</div>
-                </div>
-              ) : ``}
-              <div className="borrowed-funds-list-item__collateralized-state-container" style={positionSafetyText === "Display Error" ? { width: `100%`, alignItems: `unset` } : undefined}>
-                <div className="borrowed-funds-list-item__collateralized-state-icon">
-                  {positionSafetyText === "Liquidation Pending" ? <img src={ic_unsafe} alt="unsafe" /> : null}
-                </div>
-                <div className={`borrowed-funds-list-item__collateralized-state ${collateralizedStateSelector}`} style={positionSafetyText === "Display Error" ? { fontSize: `1rem` } : undefined}>
-                  {positionSafetyText}
-                  {positionSafetyText === "Danger" ? (
-                    <React.Fragment><br />Add Collateral</React.Fragment>
-                  ) : null}
-                </div>
-              </div>
+          }
+          <div className="d-flex j-c-sb">
+            {positionSafetyText !== "Display Error" &&
+              <div className="borrowed-funds-list-item__body-collateralized-label">Collateralized</div>
+            }
+            <div className={`borrowed-funds-list-item__body-collateralized-state ${collateralizedStateSelector}`}>
+              {positionSafetyText}
+              {positionSafetyText === "Danger" ? (
+                <React.Fragment><br />Add Collateral</React.Fragment>
+              ) : null}
             </div>
-            <div className="borrowed-funds-list-item__collateralized-slider-container">
-              <CollateralSlider
-                readonly={true}
-                minValue={sliderMin}
-                maxValue={sliderMax}
-                value={sliderValue}
-              />
-            </div>
-            <div className="borrowed-funds-list-item__collateral-info-container">
-              <div className="borrowed-funds-list-item__collateralized-value-container">
-                <div title={`${item.collateralAmount.toFixed(18)} ${item.collateralAsset}`}
-                  className="borrowed-funds-list-item__collateralized-value">
-                  {item.collateralAmount.toFixed(4)}&nbsp;
+          </div>
+          <div className="borrowed-funds-list-item__body-slider-container">
+            <CollateralSlider
+              readonly={true}
+              minValue={sliderMin}
+              maxValue={sliderMax}
+              value={sliderValue}
+            />
+          </div>
+          <div title={`${item.collateralAmount.toFixed(18)} ${item.collateralAsset}`}
+            className="borrowed-funds-list-item__body-collateralized-value">
+            <span className="value">{item.collateralAmount.toFixed(4)}</span>&nbsp;
                   {item.collateralAsset === Asset.WETH ? Asset.ETH : item.collateralAsset}
-                </div>
-              </div>
-            </div>
           </div>
         </div>
         {this.state.isInProgress ? (
@@ -166,26 +162,18 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
         ) : (
             <div className="borrowed-funds-list-item__actions-container">
 
-              <div className="borrowed-funds-list-item__action" onClick={this.onManageCollateral}>
-                <div className="borrowed-funds-list-item__action-title">
-                  <div>Manage Collateral</div>
-                </div>
-              </div>
-              <div className="borrowed-funds-list-item__action" onClick={this.onExtendLoan}>
-                <div className="borrowed-funds-list-item__action-title">
-                  <div>Front Interest</div>
-                </div>
-              </div>
-              <div className="borrowed-funds-list-item__action" onClick={this.onRepayLoan}>
-                <div className="borrowed-funds-list-item__action-title">
-                  <div>Repay Loan</div>
-                </div>
-              </div>
-              <div className="borrowed-funds-list-item__action" onClick={this.onBorrowMore}>
-                <div className="borrowed-funds-list-item__action-title">
-                  <div>Borrow More</div>
-                </div>
-              </div>
+              <button className="" onClick={this.onManageCollateral}>
+                Manage Collateral
+              </button>
+              <button className="" onClick={this.onExtendLoan}>
+                Front Interest
+              </button>
+              <button className="" onClick={this.onRepayLoan}>
+                Repay Loan
+              </button>
+              <button className="" onClick={this.onBorrowMore}>
+                Borrow More
+              </button>
             </div>
           )}
       </div>
