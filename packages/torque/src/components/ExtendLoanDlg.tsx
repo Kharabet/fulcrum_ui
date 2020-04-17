@@ -8,7 +8,6 @@ import { ExtendLoanForm } from "./ExtendLoanForm";
 interface IExtendLoanDlgState {
   isOpen: boolean;
   loanOrderState: IBorrowedFundsState | null;
-  didSubmit: boolean;
 
   executorParams: { resolve: (value?: ExtendLoanRequest) => void; reject: (reason?: any) => void } | null;
 }
@@ -17,7 +16,7 @@ export class ExtendLoanDlg extends Component<any, IExtendLoanDlgState> {
   public constructor(props: any, context?: any) {
     super(props, context);
 
-    this.state = { isOpen: false, loanOrderState: null, didSubmit: false, executorParams: null };
+    this.state = { isOpen: false, loanOrderState: null, executorParams: null };
   }
 
   public render() {
@@ -39,18 +38,9 @@ export class ExtendLoanDlg extends Component<any, IExtendLoanDlgState> {
           loanOrderState={this.state.loanOrderState}
           onSubmit={this.onFormSubmit}
           onClose={this.onFormDecline}
-          didSubmit={this.state.didSubmit}
-          toggleDidSubmit={this.toggleDidSubmit}
         />
       </ReactModal>
     );
-  }
-
-  public toggleDidSubmit = (submit: boolean) => {
-    this.setState({
-      ...this.state,
-      didSubmit: submit
-    });
   }
 
   public getValue = async (item: IBorrowedFundsState): Promise<ExtendLoanRequest> => {
@@ -68,20 +58,21 @@ export class ExtendLoanDlg extends Component<any, IExtendLoanDlgState> {
     });
   };
 
-  public hide = () => {
-    this.setState({ ...this.state, isOpen: false, executorParams: null, didSubmit: false });
+  private hide = async () => {
+    await this.setState({ ...this.state, isOpen: false, executorParams: null });
   };
 
-  private onFormSubmit = (value: ExtendLoanRequest) => {
+  private onFormSubmit = async (value: ExtendLoanRequest) => {
     if (this.state.executorParams) {
       this.state.executorParams.resolve(value);
     }
+    await this.hide();
   };
 
-  private onFormDecline = () => {
-    this.hide();
+  private onFormDecline = async () => {
     if (this.state.executorParams) {
       this.state.executorParams.reject();
     }
+    await this.hide();
   };
 }

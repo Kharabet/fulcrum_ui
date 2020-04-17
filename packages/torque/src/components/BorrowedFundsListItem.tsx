@@ -15,6 +15,7 @@ export interface IBorrowedFundsListItemProps {
   onManageCollateral: (item: IBorrowedFundsState) => void;
   onRepayLoan: (item: IBorrowedFundsState) => void;
   onExtendLoan: (item: IBorrowedFundsState) => void;
+  onBorrowMore: (item: IBorrowedFundsState) => void;
 }
 
 interface IBorrowedFundsListItemState {
@@ -167,17 +168,22 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
 
               <div className="borrowed-funds-list-item__action" onClick={this.onManageCollateral}>
                 <div className="borrowed-funds-list-item__action-title">
-                  <div>Manage<br />Collateral</div>
+                  <div>Manage Collateral</div>
                 </div>
               </div>
               <div className="borrowed-funds-list-item__action" onClick={this.onExtendLoan}>
                 <div className="borrowed-funds-list-item__action-title">
-                  <div>Front<br />Interest</div>
+                  <div>Front Interest</div>
                 </div>
               </div>
               <div className="borrowed-funds-list-item__action" onClick={this.onRepayLoan}>
                 <div className="borrowed-funds-list-item__action-title">
-                  <div>Repay<br />Loan</div>
+                  <div>Repay Loan</div>
+                </div>
+              </div>
+              <div className="borrowed-funds-list-item__action" onClick={this.onBorrowMore}>
+                <div className="borrowed-funds-list-item__action-title">
+                  <div>Borrow More</div>
                 </div>
               </div>
             </div>
@@ -196,5 +202,9 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
 
   private onExtendLoan = () => {
     this.props.onExtendLoan({ ...this.props.item });
+  };
+
+  private onBorrowMore = () => {
+    this.props.onBorrowMore({ ...this.props.item });
   };
 }

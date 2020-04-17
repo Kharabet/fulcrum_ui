@@ -11,14 +11,9 @@ import { IBorrowEstimate } from "../domain/IBorrowEstimate";
 import { TorqueProvider } from "../services/TorqueProvider";
 import { CollateralTokenSelectorToggle } from "./CollateralTokenSelectorToggle";
 
-import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
-
 export interface IBorrowMoreFormProps {
-    borrowAsset: Asset;
-    loanOrderState: IBorrowedFundsState | null;
+  borrowAsset: Asset;
 
-  didSubmit: boolean;
-  toggleDidSubmit: (submit: boolean) => void;
   onSubmit?: (value: BorrowRequest) => void;
   onDecline: () => void;
 }
@@ -31,6 +26,8 @@ interface IBorrowMoreFormState {
   depositAmount: BigNumber;
   gasAmountNeeded: BigNumber;
   balanceTooLow: boolean;
+
+  didSubmit: boolean;
 }
 
 export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreFormState> {
@@ -44,11 +41,12 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
 
     this.state = {
       borrowAmount: new BigNumber(0),
-      collateralAsset: props.loanOrderState ? props.loanOrderState.collateralAsset : Asset.UNKNOWN,
+      collateralAsset: TorqueProvider.Instance.isETHAsset(props.borrowAsset) ? Asset.DAI : Asset.ETH,
       inputAmountText: "",
       depositAmount: new BigNumber(0),
       gasAmountNeeded: new BigNumber(3000000),
-      balanceTooLow: false
+      balanceTooLow: false,
+      didSubmit: false
     };
 
     this._inputTextChange = new Subject<string>();
@@ -102,13 +100,13 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
               <CollateralTokenSelectorToggle
                 borrowAsset={this.props.borrowAsset}
                 collateralAsset={this.state.collateralAsset}
-                readonly={this.props.didSubmit}
+                readonly={this.state.didSubmit}
                 onChange={this.onCollateralChange}
               />
             </div>
-                <button className={`btn btn-size--small ${this.props.didSubmit ? `btn-disabled` : ``}`} type="submit">
-                  {this.props.didSubmit ? "Submitting..." : "Submit"}
-                </button>
+            <button className={`btn btn-size--small ${this.state.didSubmit ? `btn-disabled` : ``}`} type="submit">
+              {this.state.didSubmit ? "Submitting..." : "Submit"}
+            </button>
           </div>
         </section>
       </form>
@@ -136,31 +134,31 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
   private onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (this.props.onSubmit && !this.props.didSubmit && this.state.depositAmount.gt(0)) {
-        this.props.toggleDidSubmit(true);
+    if (this.props.onSubmit && !this.state.didSubmit && this.state.depositAmount.gt(0)) {
+      this.setState({ ...this.state, didSubmit: true });
 
-        let assetBalance = await TorqueProvider.Instance.getAssetTokenBalanceOfUser(this.state.collateralAsset);
-        if (this.state.collateralAsset === Asset.ETH) {
-          assetBalance = assetBalance.gt(TorqueProvider.Instance.gasBufferForTxn) ? assetBalance.minus(TorqueProvider.Instance.gasBufferForTxn) : new BigNumber(0);
-        }
-        const precision = AssetsDictionary.assets.get(this.state.collateralAsset)!.decimals || 18;
-        const amountInBaseUnits = new BigNumber(this.state.depositAmount.multipliedBy(10 ** precision).toFixed(0, 1));
-        if (assetBalance.lt(amountInBaseUnits)) {
-          this.props.toggleDidSubmit(false);
+      let assetBalance = await TorqueProvider.Instance.getAssetTokenBalanceOfUser(this.state.collateralAsset);
+      if (this.state.collateralAsset === Asset.ETH) {
+        assetBalance = assetBalance.gt(TorqueProvider.Instance.gasBufferForTxn) ? assetBalance.minus(TorqueProvider.Instance.gasBufferForTxn) : new BigNumber(0);
+      }
+      const precision = AssetsDictionary.assets.get(this.state.collateralAsset)!.decimals || 18;
+      const amountInBaseUnits = new BigNumber(this.state.depositAmount.multipliedBy(10 ** precision).toFixed(0, 1));
+      if (assetBalance.lt(amountInBaseUnits)) {
 
-          this.setState({
-            ...this.state,
-            balanceTooLow: true
-          });
+        this.setState({
+          ...this.state,
+          balanceTooLow: true,
+          didSubmit: false
+        });
 
-          return;
+        return;
 
-        } else {
-          this.setState({
-            ...this.state,
-            balanceTooLow: false
-          });
-        }
+      } else {
+        this.setState({
+          ...this.state,
+          balanceTooLow: false
+        });
+      }
       const randomNumber = Math.floor(Math.random() * 100000) + 1;
       const usdAmount = await TorqueProvider.Instance.getSwapToUsdRate(this.props.borrowAsset);
       let usdPrice = this.state.borrowAmount

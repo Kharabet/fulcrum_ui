@@ -8,7 +8,6 @@ import { DialogHeader } from "./DialogHeader";
 interface IBorrowDlgState {
   isOpen: boolean;
   borrowAsset: Asset;
-  didSubmit: boolean;
 
   executorParams: { resolve: (value?: BorrowRequest) => void; reject: (reason?: any) => void } | null;
 }
@@ -17,7 +16,7 @@ export class BorrowDlg extends Component<any, IBorrowDlgState> {
   public constructor(props: any, context?: any) {
     super(props, context);
 
-    this.state = { isOpen: false, borrowAsset: Asset.UNKNOWN,didSubmit: false, executorParams: null };
+    this.state = { isOpen: false, borrowAsset: Asset.UNKNOWN, executorParams: null };
   }
 
   public render() {
@@ -30,16 +29,12 @@ export class BorrowDlg extends Component<any, IBorrowDlgState> {
         shouldCloseOnOverlayClick={false}
       >
         <DialogHeader title={`Borrow how much ${this.state.borrowAsset}?`} onDecline={this.onFormDecline} />
-        <BorrowForm borrowAsset={this.state.borrowAsset} didSubmit={this.state.didSubmit} toggleDidSubmit={this.toggleDidSubmit} onSubmit={this.onFormSubmit} onDecline={this.onFormDecline} />
+        <BorrowForm 
+        borrowAsset={this.state.borrowAsset}  
+        onSubmit={this.onFormSubmit} 
+        onDecline={this.onFormDecline} />
       </ReactModal>
     );
-  }
-
-  public toggleDidSubmit = (submit: boolean) => {
-    this.setState({
-      ...this.state,
-      didSubmit: submit
-    });
   }
 
   public getValue = async (borrowAsset: Asset): Promise<BorrowRequest> => {
@@ -57,20 +52,21 @@ export class BorrowDlg extends Component<any, IBorrowDlgState> {
     });
   };
 
-  public hide = () => {
-    this.setState({ ...this.state, isOpen: false, executorParams: null, didSubmit: false });
+  private hide = async () => {
+    await this.setState({ ...this.state, isOpen: false, executorParams: null });
   };
 
-  private onFormSubmit = (value: BorrowRequest) => {
+  private onFormSubmit = async (value: BorrowRequest) => {
     if (this.state.executorParams) {
       this.state.executorParams.resolve(value);
     }
+    await this.hide();
   };
 
-  private onFormDecline = () => {
-    this.hide();
+  private onFormDecline = async () => {
     if (this.state.executorParams) {
       this.state.executorParams.reject();
     }
+    await this.hide();
   };
 }

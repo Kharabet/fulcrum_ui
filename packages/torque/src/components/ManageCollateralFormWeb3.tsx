@@ -14,9 +14,7 @@ import { OpsEstimatedResult } from "./OpsEstimatedResult";
 
 export interface IManageCollateralFormWeb3Props {
   loanOrderState: IBorrowedFundsState;
-
-  didSubmit: boolean;
-  toggleDidSubmit: (submit: boolean) => void;
+  
   onSubmit: (request: ManageCollateralRequest) => void;
   onClose: () => void;
 }
@@ -36,6 +34,8 @@ interface IManageCollateralFormWeb3State {
   gasAmountNeeded: BigNumber;
   collateralizedPercent: BigNumber;
   balanceTooLow: boolean;
+
+  didSubmit: boolean;
 }
 
 export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb3Props, IManageCollateralFormWeb3State> {
@@ -58,7 +58,8 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
       collateralAmount: new BigNumber(0),
       collateralExcess: new BigNumber(0),
       collateralizedPercent: new BigNumber(0),
-      balanceTooLow: false
+      balanceTooLow: false,
+      didSubmit: false
     };
 
     this.selectedValueUpdate = new Subject<number>();
@@ -268,8 +269,8 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
                     Close
                   </button>
                 ) : (
-                  <button type="submit" className={`btn btn-size--small ${this.props.didSubmit ? `btn-disabled` : ``}`}>
-                    {this.props.didSubmit ? "Submitting..." : this.state.loanValue > this.state.selectedValue ?
+                  <button type="submit" className={`btn btn-size--small ${this.state.didSubmit ? `btn-disabled` : ``}`}>
+                    {this.state.didSubmit ? "Submitting..." : this.state.loanValue > this.state.selectedValue ?
                       "Withdraw" :
                       "Top Up"
                     }
@@ -328,8 +329,8 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
     event.preventDefault();
 
     // console.log(this.state.collateralAmount.toString(), new BigNumber(this.state.loanValue).dividedBy(10**18).toString(), new BigNumber(this.state.selectedValue).dividedBy(10**18).toString());
-    if (!this.props.didSubmit && this.state.collateralAmount.gt(0)) {
-      this.props.toggleDidSubmit(true);
+    if (!this.state.didSubmit && this.state.collateralAmount.gt(0)) {
+      this.setState({...this.state, didSubmit: true});
 
       if (this.state.loanValue < this.state.selectedValue) {
         let assetBalance = await TorqueProvider.Instance.getAssetTokenBalanceOfUser(this.props.loanOrderState.collateralAsset);
@@ -339,11 +340,11 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
         const precision = AssetsDictionary.assets.get(this.props.loanOrderState.collateralAsset)!.decimals || 18;
         const amountInBaseUnits = new BigNumber(this.state.collateralAmount.multipliedBy(10**precision).toFixed(0, 1));
         if (assetBalance.lt(amountInBaseUnits)) {
-          this.props.toggleDidSubmit(false);
 
           this.setState({
             ...this.state,
-            balanceTooLow: true
+            balanceTooLow: true,
+            didSubmit: false
           });
 
           return;

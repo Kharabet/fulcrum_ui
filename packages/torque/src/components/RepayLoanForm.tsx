@@ -16,8 +16,6 @@ import { RepayLoanSlider } from "./RepayLoanSlider";
 export interface IRepayLoanFormProps {
   loanOrderState: IBorrowedFundsState;
 
-  didSubmit: boolean;
-  toggleDidSubmit: (submit: boolean) => void;
   onSubmit: (request: RepayLoanRequest) => void;
   onClose: () => void;
 }
@@ -35,6 +33,8 @@ interface IRepayLoanFormState {
   repayManagementAddress: string | null;
   gasAmountNeeded: BigNumber;
   balanceTooLow: boolean;
+
+  didSubmit: boolean;
 }
 
 export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanFormState> {
@@ -58,7 +58,8 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
       repayAmount: props.loanOrderState.amountOwed,
       repayManagementAddress: null,
       gasAmountNeeded: new BigNumber(0),
-      balanceTooLow: false
+      balanceTooLow: false,
+      didSubmit: false
     };
 
     this.selectedValueUpdate = new Subject<number>();
@@ -201,8 +202,8 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
         </section>
         <section className="dialog-actions">
           <div className="repay-loan-form__actions-container">
-            <button type="submit" className={`btn btn-size--small ${this.props.didSubmit ? `btn-disabled` : ``}`}>
-              {this.props.didSubmit ? "Submitting..." : "Repay"}
+            <button type="submit" className={`btn btn-size--small ${this.state.didSubmit ? `btn-disabled` : ``}`}>
+              {this.state.didSubmit ? "Submitting..." : "Repay"}
             </button>
           </div>
         </section>
@@ -257,8 +258,8 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
       repayAmount = new BigNumber(0);
     }
 
-    if (!this.props.didSubmit) {
-      this.props.toggleDidSubmit(true);
+    if (!this.state.didSubmit) {
+      this.setState({...this.state, didSubmit: true});
 
       let assetBalance = await TorqueProvider.Instance.getAssetTokenBalanceOfUser(this.props.loanOrderState.loanAsset);
       if (this.props.loanOrderState.loanAsset === Asset.ETH) {
@@ -267,11 +268,11 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
       const precision = AssetsDictionary.assets.get(this.props.loanOrderState.loanAsset)!.decimals || 18;
       const amountInBaseUnits = new BigNumber(repayAmount.multipliedBy(10 ** precision).toFixed(0, 1));
       if (assetBalance.lt(amountInBaseUnits)) {
-        this.props.toggleDidSubmit(false);
 
         this.setState({
           ...this.state,
-          balanceTooLow: true
+          balanceTooLow: true,
+          didSubmit: false
         });
 
         return;

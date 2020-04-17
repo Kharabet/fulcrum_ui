@@ -2,78 +2,71 @@ import React, { Component } from "react";
 import ReactModal from "react-modal";
 import { Asset } from "../domain/Asset";
 import { BorrowRequest } from "../domain/BorrowRequest";
-import { BorrowMoreForm } from "./BorrowMoreForm";
+import { BorrowForm } from "./BorrowForm";
 import { DialogHeader } from "./DialogHeader";
-import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
 
 interface IBorrowMoreDlgState {
-    isOpen: boolean;
-    loanOrderState: IBorrowedFundsState | null;
-    didSubmit: boolean;
+  isOpen: boolean;
+  borrowAsset: Asset;
 
-    executorParams: { resolve: (value?: BorrowRequest) => void; reject: (reason?: any) => void } | null;
+  executorParams: { resolve: (value?: BorrowRequest) => void; reject: (reason?: any) => void } | null;
 }
 
 export class BorrowMoreDlg extends Component<any, IBorrowMoreDlgState> {
-    public constructor(props: any, context?: any) {
-        super(props, context);
+  public constructor(props: any, context?: any) {
+    super(props, context);
 
-        this.state = { isOpen: false, loanOrderState: null, didSubmit: false, executorParams: null };
+    this.state = { isOpen: false, borrowAsset: Asset.UNKNOWN, executorParams: null };
+  }
+
+  public render() {
+    return (
+      <ReactModal
+        isOpen={this.state.isOpen}
+        className="modal-content-div"
+        overlayClassName="modal-overlay-div"
+        onRequestClose={this.hide}
+        shouldCloseOnOverlayClick={false}
+      >
+        <DialogHeader title={`Borrow how much ${this.state.borrowAsset}?`} onDecline={this.onFormDecline} />
+        <BorrowForm 
+        borrowAsset={this.state.borrowAsset}  
+        onSubmit={this.onFormSubmit} 
+        onDecline={this.onFormDecline} />
+      </ReactModal>
+    );
+  }
+
+  public getValue = async (borrowAsset: Asset): Promise<BorrowRequest> => {
+    if (this.state.isOpen) {
+      return new Promise<BorrowRequest>((resolve, reject) => reject());
     }
 
-    public render() {
-        return (
-            <ReactModal
-                isOpen={this.state.isOpen}
-                className="modal-content-div"
-                overlayClassName="modal-overlay-div"
-                onRequestClose={this.hide}
-                shouldCloseOnOverlayClick={false}
-            >
-                <DialogHeader title={`Borrow how much ${this.state.loanOrderState?.loanAsset || Asset.UNKNOWN}?`} onDecline={this.onFormDecline} />
-                <BorrowMoreForm
-                    borrowAsset={this.state.loanOrderState?.loanAsset || Asset.UNKNOWN}
-                    loanOrderState={this.state.loanOrderState} didSubmit={this.state.didSubmit} toggleDidSubmit={this.toggleDidSubmit} onSubmit={this.onFormSubmit} onDecline={this.onFormDecline} />
-            </ReactModal>
-        );
+    return new Promise<BorrowRequest>((resolve, reject) => {
+      this.setState({
+        ...this.state,
+        isOpen: true,
+        executorParams: { resolve: resolve, reject: reject },
+        borrowAsset: borrowAsset
+      });
+    });
+  };
+
+  private hide = async () => {
+    await this.setState({ ...this.state, isOpen: false, executorParams: null });
+  };
+
+  private onFormSubmit = async (value: BorrowRequest) => {
+    if (this.state.executorParams) {
+      this.state.executorParams.resolve(value);
     }
+    await this.hide();
+  };
 
-    public toggleDidSubmit = (submit: boolean) => {
-        this.setState({
-            ...this.state,
-            didSubmit: submit
-        });
+  private onFormDecline = async () => {
+    if (this.state.executorParams) {
+      this.state.executorParams.reject();
     }
-
-    public getValue = async (item: IBorrowedFundsState): Promise<BorrowRequest> => {
-        if (this.state.isOpen) {
-            return new Promise<BorrowRequest>((resolve, reject) => reject());
-        }
-
-        return new Promise<BorrowRequest>((resolve, reject) => {
-            this.setState({
-                ...this.state,
-                isOpen: true,
-                executorParams: { resolve: resolve, reject: reject },
-                loanOrderState: item
-            });
-        });
-    };
-
-    public hide = () => {
-        this.setState({ ...this.state, isOpen: false, executorParams: null, didSubmit: false });
-    };
-
-    private onFormSubmit = (value: BorrowRequest) => {
-        if (this.state.executorParams) {
-            this.state.executorParams.resolve(value);
-        }
-    };
-
-    private onFormDecline = () => {
-        this.hide();
-        if (this.state.executorParams) {
-            this.state.executorParams.reject();
-        }
-    };
+    await this.hide();
+  };
 }

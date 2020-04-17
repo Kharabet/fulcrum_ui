@@ -180,9 +180,6 @@ export class DashboardPage extends PureComponent<
     } catch (error) {
       console.error(error);
     }
-
-    this.repayLoanDlgRef.current.toggleDidSubmit(false);
-    await this.repayLoanDlgRef.current.hide();
   };
 
   private onExtendLoan = async (item: IBorrowedFundsState) => {
@@ -194,9 +191,6 @@ export class DashboardPage extends PureComponent<
     } catch (error) {
       console.error(error);
     }
-
-    this.extendLoanDlgRef.current.toggleDidSubmit(false);
-    await this.extendLoanDlgRef.current.hide();
   };
 
   private onManageCollateral = async (item: IBorrowedFundsState) => {
@@ -208,22 +202,17 @@ export class DashboardPage extends PureComponent<
     } catch (error) {
       console.error(error);
     }
-
-    this.manageCollateralDlgRef.current.toggleDidSubmit(false);
-    await this.manageCollateralDlgRef.current.hide();
   };
 
   private onBorrowMore = async (item: IBorrowedFundsState) => {
     if (!this.borrowMoreDlgRef.current) return;
-
-    try {
-      const borrowMoreRequest = await this.borrowMoreDlgRef.current.getValue(item);
-      await TorqueProvider.Instance.doBorrow(borrowMoreRequest);
-    } catch (error) {
-      console.error(error);
-    }
-
-    this.borrowMoreDlgRef.current.toggleDidSubmit(false);
-    await this.borrowMoreDlgRef.current.hide();
+    alert("Borrow More call");
+    return;
+    // try {
+    //   const borrowMoreRequest = await this.borrowMoreDlgRef.current.getValue(item);
+    //   await TorqueProvider.Instance.doBorrow(borrowMoreRequest);
+    // } catch (error) {
+    //   console.error(error);
+    // }
   };
 }

@@ -56,6 +56,7 @@ export class BorrowedFundsList extends Component<IBorrowedFundsListProps, IBorro
           onManageCollateral={this.props.onManageCollateral}
           onRepayLoan={this.props.onRepayLoan}
           onExtendLoan={this.props.onExtendLoan}
+          onBorrowMore={this.props.onBorrowMore}
         />
       );
     });

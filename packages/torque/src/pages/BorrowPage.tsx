@@ -60,8 +60,5 @@ export class BorrowPage extends PureComponent<IBorrowPageParams & RouteComponent
     } catch (error) {
       console.error(error);
     }
-
-    this.borrowDlgRef.current.toggleDidSubmit(false);
-    await this.borrowDlgRef.current.hide();
   };
 }
