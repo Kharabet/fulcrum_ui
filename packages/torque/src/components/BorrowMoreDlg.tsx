@@ -1,53 +1,59 @@
 import React, { Component } from "react";
 import ReactModal from "react-modal";
-import { Asset } from "../domain/Asset";
-import { BorrowRequest } from "../domain/BorrowRequest";
-import { BorrowForm } from "./BorrowForm";
+import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
+import { RepayLoanRequest } from "../domain/RepayLoanRequest";
 import { DialogHeader } from "./DialogHeader";
+import { RepayLoanForm } from "./RepayLoanForm";
 
 interface IBorrowMoreDlgState {
   isOpen: boolean;
-  borrowAsset: Asset;
+  loanOrderState: IBorrowedFundsState | null;
 
-  executorParams: { resolve: (value?: BorrowRequest) => void; reject: (reason?: any) => void } | null;
+  executorParams: { resolve: (value?: RepayLoanRequest) => void; reject: (reason?: any) => void } | null;
 }
 
 export class BorrowMoreDlg extends Component<any, IBorrowMoreDlgState> {
   public constructor(props: any, context?: any) {
     super(props, context);
 
-    this.state = { isOpen: false, borrowAsset: Asset.UNKNOWN, executorParams: null };
+    this.state = { isOpen: false, loanOrderState: null, executorParams: null };
   }
 
   public render() {
+
+    if (this.state.loanOrderState === null) {
+      return null;
+    }
+
     return (
       <ReactModal
         isOpen={this.state.isOpen}
         className="modal-content-div"
         overlayClassName="modal-overlay-div"
-        onRequestClose={this.hide}
+        onRequestClose={this.onFormDecline}
         shouldCloseOnOverlayClick={false}
       >
-        <DialogHeader title={`Borrow how much ${this.state.borrowAsset}?`} onDecline={this.onFormDecline} />
-        <BorrowForm 
-        borrowAsset={this.state.borrowAsset}  
-        onSubmit={this.onFormSubmit} 
-        onDecline={this.onFormDecline} />
+        <DialogHeader title="Borrow More" onDecline={this.onFormDecline} />
+        <RepayLoanForm
+          loanOrderState={this.state.loanOrderState}
+          onSubmit={this.onFormSubmit}
+          onClose={this.onFormDecline}
+        />
       </ReactModal>
     );
   }
 
-  public getValue = async (borrowAsset: Asset): Promise<BorrowRequest> => {
+  public getValue = async (item: IBorrowedFundsState): Promise<RepayLoanRequest> => {
     if (this.state.isOpen) {
-      return new Promise<BorrowRequest>((resolve, reject) => reject());
+      return new Promise<RepayLoanRequest>((resolve, reject) => reject());
     }
 
-    return new Promise<BorrowRequest>((resolve, reject) => {
+    return new Promise<RepayLoanRequest>((resolve, reject) => {
       this.setState({
         ...this.state,
         isOpen: true,
         executorParams: { resolve: resolve, reject: reject },
-        borrowAsset: borrowAsset
+        loanOrderState: item
       });
     });
   };
@@ -56,7 +62,7 @@ export class BorrowMoreDlg extends Component<any, IBorrowMoreDlgState> {
     await this.setState({ ...this.state, isOpen: false, executorParams: null });
   };
 
-  private onFormSubmit = async (value: BorrowRequest) => {
+  private onFormSubmit = async (value: RepayLoanRequest) => {
     if (this.state.executorParams) {
       this.state.executorParams.resolve(value);
     }

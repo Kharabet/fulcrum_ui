@@ -206,13 +206,12 @@ export class DashboardPage extends PureComponent<
 
   private onBorrowMore = async (item: IBorrowedFundsState) => {
     if (!this.borrowMoreDlgRef.current) return;
-    alert("Borrow More call");
-    return;
-    // try {
-    //   const borrowMoreRequest = await this.borrowMoreDlgRef.current.getValue(item);
-    //   await TorqueProvider.Instance.doBorrow(borrowMoreRequest);
-    // } catch (error) {
-    //   console.error(error);
-    // }
+
+    try {
+      const borrowMoreRequest = await this.borrowMoreDlgRef.current.getValue(item);
+      // await TorqueProvider.Instance.doBorrow(borrowMoreRequest);
+    } catch (error) {
+      console.error(error);
+    }
   };
 }

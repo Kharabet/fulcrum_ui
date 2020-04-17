@@ -16,7 +16,7 @@ export class RepayLoanDlg extends Component<any, IRepayLoanDlgState> {
   public constructor(props: any, context?: any) {
     super(props, context);
 
-    this.state = { isOpen: false,loanOrderState: null, executorParams: null };
+    this.state = { isOpen: false, loanOrderState: null, executorParams: null };
   }
 
   public render() {
