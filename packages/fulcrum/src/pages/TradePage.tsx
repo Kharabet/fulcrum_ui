@@ -1,7 +1,7 @@
 import React, { PureComponent, Component } from "react";
 import Modal from "react-modal";
 import { ManageCollateralForm } from "../components/ManageCollateralForm";
-import { OwnTokenGrid } from "../components/OwnTokenGrid";
+import { ManageTokenGrid } from "../components/ManageTokenGrid";
 import { TokenAddressForm } from "../components/TokenAddressForm";
 import { TradeForm } from "../components/TradeForm";
 import { TradeTokenGrid } from "../components/TradeTokenGrid";
@@ -182,7 +182,7 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
           />
 
           {this.state.showMyTokensOnly ? (
-            <OwnTokenGrid
+            <ManageTokenGrid
               isMobileMedia={this.props.isMobileMedia}
               ownRowsData={this.state.ownRowsData}
             />

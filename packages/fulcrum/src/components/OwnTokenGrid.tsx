@@ -1,14 +1,7 @@
 import React, { Component } from "react";
-import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
-import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
-import { TradeTransactionMinedEvent } from "../services/events/TradeTransactionMinedEvent";
-import { FulcrumProvider } from "../services/FulcrumProvider";
+import { OwnTokenGridRow, IOwnTokenGridRowProps } from "./OwnTokenGridRow";
 import { OwnTokenGridHeader } from "./OwnTokenGridHeader";
-import { HistoryTokenGridHeader } from "./HistoryTokenGridHeader";
-import { IOwnTokenGridRowProps, OwnTokenGridRow } from "./OwnTokenGridRow";
-import { HistoryTokenGridRow } from "./HistoryTokenGridRow";
 import { OwnTokenCardMobile } from "./OwnTokenCardMobile";
-import { HistoryTokenCardMobile } from "./HistoryTokenCardMobile";
 
 export interface IOwnTokenGridProps {
   isMobileMedia: boolean;
@@ -23,117 +16,38 @@ interface IOwnTokenGridState {
 export class OwnTokenGrid extends Component<IOwnTokenGridProps, IOwnTokenGridState> {
   constructor(props: IOwnTokenGridProps) {
     super(props);
-    this._isMounted = false;
     this.state = {
       ownRowsData: [],
       isShowHistory: false
     };
-
-    FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
-    FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.TradeTransactionMined, this.onTradeTransactionMined);
-    this.onShowHistory = this.onShowHistory.bind(this);
-    this.onShowOpenPositions = this.onShowOpenPositions.bind(this);
-  }
-
-  private _isMounted: boolean;
-
-  public async derivedUpdate() {
-  }
-
-  public componentWillUnmount(): void {
-    this._isMounted = false;
-
-    FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
-    FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.TradeTransactionMined, this.onTradeTransactionMined);
-  }
-
-  public componentWillMount(): void {
-    this.derivedUpdate();
-  }
-
-  public componentDidMount(): void {
-    this._isMounted = true;
-
-    this.derivedUpdate();
-  }
-
-  public componentDidUpdate(
-    prevProps: Readonly<IOwnTokenGridProps>,
-    prevState: Readonly<IOwnTokenGridState>,
-    snapshot?: any
-  ): void {
-    if (
-      this.state.ownRowsData !== prevState.ownRowsData
-    ) {
-      this.derivedUpdate();
-    }
   }
 
   public render() {
-
     return !this.props.isMobileMedia ? this.renderDesktop() : this.renderMobile();
-
   }
 
   private renderDesktop = () => {
-    const ownRows = this.props.ownRowsData.map(e => <OwnTokenGridRow key={`${e.currentKey.toString()}`} {...e} />);
-    const historyRows = this.props.ownRowsData.map(e => <HistoryTokenGridRow key={`${e.currentKey.toString()}`} {...e} />);
-    if (ownRows.length === 0) return null;
+    const ownDesktopRows = this.props.ownRowsData.map(e => <OwnTokenGridRow key={`${e.currentKey.toString()}`} {...e} />);
+    if (ownDesktopRows.length === 0) return null;
 
     return (
       <div className="own-token-grid">
-        <div className="group-tabs">
-          <div className={`tab ${!this.state.isShowHistory ? `active` : ``}`} onClick={this.onShowOpenPositions}>Open positions</div>
-          <div className={`tab ${this.state.isShowHistory ? `active` : ``}`} onClick={this.onShowHistory}>Trade history</div>
-        </div>
-        {this.state.isShowHistory
-          ? <React.Fragment>
-            <HistoryTokenGridHeader />
-            {historyRows}
-          </React.Fragment>
-          : <React.Fragment>
-            <OwnTokenGridHeader />
-            {ownRows}
-          </React.Fragment>
-        }
-
+        <OwnTokenGridHeader />
+        {ownDesktopRows}
       </div>
     );
   }
 
   private renderMobile = () => {
-    const ownRows = this.props.ownRowsData.map(e => <OwnTokenCardMobile key={`${e.currentKey.toString()}`} {...e} />);
-    const historyRows = this.props.ownRowsData.map(e => <HistoryTokenCardMobile key={`${e.currentKey.toString()}`} {...e} />);
-    if (ownRows.length === 0) return null;
+    const ownMobileRows = this.props.ownRowsData.map(e => <OwnTokenCardMobile key={`${e.currentKey.toString()}`} {...e} />);
+    if (ownMobileRows.length === 0) return null;
 
     return (
       <div className="own-token-cards">
-        {!this.state.isShowHistory
-          ? <div className="own-token-cards__header">Manage</div>
-          : null}
-        <div className="group-button">
-          <button className={`${!this.state.isShowHistory ? `active` : ``}`} onClick={this.onShowOpenPositions}>Open positions</button>
-          <button className={`${this.state.isShowHistory ? `active` : ``}`} onClick={this.onShowHistory}>Trade history</button>
-        </div>
         <div className="own-token-cards__container">
-          {this.state.isShowHistory ? historyRows : ownRows}
+          {ownMobileRows}
         </div>
       </div>
     );
   }
-
-  private onProviderChanged = async (event: ProviderChangedEvent) => {
-    await this.derivedUpdate();
-  };
-
-  private onTradeTransactionMined = async (event: TradeTransactionMinedEvent) => {
-    await this.derivedUpdate();
-  };
-  private onShowHistory = () => {
-    this._isMounted && this.setState({ ...this.state, isShowHistory: true });
-  };
-
-  private onShowOpenPositions = () => {
-    this._isMounted && this.setState({ ...this.state, isShowHistory: false });
-  };
 }

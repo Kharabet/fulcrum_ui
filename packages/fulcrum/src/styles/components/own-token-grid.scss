@@ -34,40 +34,6 @@ $width-col-actions: 10%;
   display: flex;
 }
 .own-token-grid {
-  .group-tabs {
-    display: flex;
-    flex-wrap: wrap;
-    margin: 45px auto 40px auto;
-    padding-left: 25px;
-    border-bottom: 1px solid var(--indicator-border);
-    width: 100%;
-    overflow: hidden;
-    .tab {
-      display: flex;
-      align-self: center;
-      justify-content: center;
-      font-size: 14px;
-      line-height: 1.5;
-      font-weight: 800;
-      color: #8992a4;
-      text-transform: uppercase;
-      cursor: pointer;
-      padding: 10px 20px;
-      &.active {
-        color: var(--primary-text);
-        position: relative;
-        &:after {
-          content: "";
-          height: 8px;
-          border-radius: 4px;
-          width: 100%;
-          position: absolute;
-          bottom: -4px;
-          background-color: #276bfb;
-        }
-      }
-    }
-  }
   .own-token-grid-header {
     display: flex;
     flex-wrap: wrap;
