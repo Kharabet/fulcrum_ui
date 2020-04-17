@@ -1,17 +1,14 @@
 .btn {
+  font-size: 16px;
+  line-height: 1.4;
+  font-weight: 800;
+  text-align: center;
+  border-radius: 40px;
+  border: 0;
   cursor: pointer;
   outline: none;
-
-  border: 0;
-  border-radius: 100px;
-  color: $color-white;
-  background-color: $color-blue;
-
-  font-size: 1rem;
-  font-weight: 600;
-  line-height: 1.5;
-  text-align: center;
-  padding: 1rem;
+  color: #ffffff;
+  background-color: #276bfb;
 
   &:hover {
     background-color: $color-blue--hover;
@@ -23,8 +20,7 @@
 }
 
 .btn-size--small {
-  width: 10rem;
-  height: 4rem;
+  padding: 20px 46px;
 }
 
 .btn-disabled {
