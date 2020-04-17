@@ -1,6 +1,4 @@
 import React, { Component } from "react";
-import { ReactComponent as CloseMenu } from "../assets/images/close.svg";
-import { ReactComponent as OpenMenu } from "../assets/images/menu-icon.svg";
 import { OnChainIndicator } from "../components/OnChainIndicator";
 import { ProviderType } from "../domain/ProviderType";
 import { TorqueProvider } from "../services/TorqueProvider";
@@ -62,7 +60,6 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
 
   private renderDesktop = () => {
 
-    const toggleMenuIcon = !this.state.isMenuOpen ? <OpenMenu /> : <CloseMenu />;
     if (siteConfig.BorrowDisabled && !(TorqueProvider.Instance.accounts.length > 0 && TorqueProvider.Instance.accounts[0].toLowerCase() === "0xadff3ada12ed0f8a87e31e5a04dfd2ee054e1118")) {
       this.Menu.items.splice(0, 1);
     }
