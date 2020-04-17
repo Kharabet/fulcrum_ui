@@ -11,7 +11,7 @@ $width-col-position-value: 10%;
 $width-col-profit: 9%;
 $width-col-result: 7%;
 
-@mixin own-token-grid-header-history__col {
+@mixin history-token-grid-header__col {
   font-family: "Muli", sans-serif;
   font-size: $font-size-header;
   font-weight: 600;
@@ -35,49 +35,49 @@ $width-col-result: 7%;
     font-weight: 200;
   }
 }
-.own-token-grid-header-history {
+.history-token-grid-header {
   display: flex;
   flex-wrap: wrap;
   padding: 0 40px 22px 40px;
   font-family: "Muli", sans-serif;
   &__col-token-date {
-    @include own-token-grid-header-history__col();
+    @include history-token-grid-header__col();
     width: $width-col-token-date;
   }
   &__col-type {
-    @include own-token-grid-header-history__col();
+    @include history-token-grid-header__col();
     width: $width-col-type;
   }
   &__col-asset-unit {
-    @include own-token-grid-header-history__col();
+    @include history-token-grid-header__col();
     width: $width-col-asset-unit;
   }
   &__col-token-asset {
-    @include own-token-grid-header-history__col();
+    @include history-token-grid-header__col();
     width: $width-col-token-asset;
   }
   &__col-position {
-    @include own-token-grid-header-history__col();
+    @include history-token-grid-header__col();
     width: $width-col-position;
   }
   &__col-asset-price {
-    @include own-token-grid-header-history__col();
+    @include history-token-grid-header__col();
     width: $width-col-asset-price;
   }
   &__col-liquidation-price {
-    @include own-token-grid-header-history__col();
+    @include history-token-grid-header__col();
     width: $width-col-liquidation-price;
   }
   &__col-position-value {
-    @include own-token-grid-header-history__col();
+    @include history-token-grid-header__col();
     width: $width-col-position-value;
   }
   &__col-profit {
-    @include own-token-grid-header-history__col();
+    @include history-token-grid-header__col();
     width: $width-col-profit;
   }
   &__col-result {
-    @include own-token-grid-header-history__col();
+    @include history-token-grid-header__col();
     width: $width-col-result;
   }
 }

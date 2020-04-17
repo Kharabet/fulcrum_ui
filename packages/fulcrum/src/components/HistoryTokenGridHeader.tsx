@@ -6,36 +6,36 @@ export interface IHistoryTokenGridHeaderProps {
 export class HistoryTokenGridHeader extends Component<IHistoryTokenGridHeaderProps> {
   public render() {
     return (
-      <div className="own-token-grid-header-history">
-        <div className="own-token-grid-header-history__col-token-date">
-          <span className="own-token-grid-header-history__text">Date</span>
+      <div className="history-token-grid-header">
+        <div className="history-token-grid-header__col-token-date">
+          <span className="history-token-grid-header__text">Date</span>
         </div>
-        <div className="own-token-grid-header-history__col-token-asset">
-          <span className="own-token-grid-header-history__text">Asset</span>
+        <div className="history-token-grid-header__col-token-asset">
+          <span className="history-token-grid-header__text">Asset</span>
         </div>
-        <div className="own-token-grid-header-history__col-type">
-          <span className="own-token-grid-header-history__text">Type</span>
+        <div className="history-token-grid-header__col-type">
+          <span className="history-token-grid-header__text">Type</span>
         </div>
-        <div className="own-token-grid-header-history__col-asset-unit">
-          <span className="own-token-grid-header-history__text">Unit of Account</span>
+        <div className="history-token-grid-header__col-asset-unit">
+          <span className="history-token-grid-header__text">Unit of Account</span>
         </div>
-        <div className="own-token-grid-header-history__col-position">
-          <span className="own-token-grid-header-history__text">Position (ETH)</span>
+        <div className="history-token-grid-header__col-position">
+          <span className="history-token-grid-header__text">Position (ETH)</span>
         </div>
-        <div className="own-token-grid-header-history__col-asset-price">
-          <span className="own-token-grid-header-history__text">Open Price</span>
+        <div className="history-token-grid-header__col-asset-price">
+          <span className="history-token-grid-header__text">Open Price</span>
         </div>
-        <div className="own-token-grid-header-history__col-liquidation-price">
-          <span className="own-token-grid-header-history__text">Liq. Price</span>
+        <div className="history-token-grid-header__col-liquidation-price">
+          <span className="history-token-grid-header__text">Liq. Price</span>
         </div>
-        <div className="own-token-grid-header-history__col-position-value">
-          <span className="own-token-grid-header-history__text">Value</span>
+        <div className="history-token-grid-header__col-position-value">
+          <span className="history-token-grid-header__text">Value</span>
         </div>
-        <div className="own-token-grid-header-history__col-profit">
-          <span className="own-token-grid-header-history__text">Profit</span>
+        <div className="history-token-grid-header__col-profit">
+          <span className="history-token-grid-header__text">Profit</span>
         </div>
-        <div className="own-token-grid-header-history__col-result">
-          <span className="own-token-grid-header-history__text">Result</span>
+        <div className="history-token-grid-header__col-result">
+          <span className="history-token-grid-header__text">Result</span>
         </div>
       </div>
     );

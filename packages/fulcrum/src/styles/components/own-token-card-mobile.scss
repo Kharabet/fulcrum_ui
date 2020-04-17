@@ -25,36 +25,6 @@ $width: 33%;
     color: var(--primary-text);
   }
 }
-.group-button {
-  background-color: var(--switch-bg-pro);
-  border-radius: 30px;
-  display: flex;
-  flex-wrap: wrap;
-  width: 248px;
-  margin: 20px auto 30px auto;
-  border: 1px solid var(--switch-bg-pro);
-  button {
-    width: 123px;
-    height: 33px;
-    border-radius: 30px;
-    border: none;
-    outline: none;
-    display: flex;
-    align-self: center;
-    justify-content: center;
-    background-color: transparent;
-    font-size: 10px;
-    line-height: 1.5;
-    font-weight: 800;
-    color: #8992A4;
-    text-transform: uppercase;
-    cursor: pointer;
-    &.active {
-      background-color: var(--lend-bg-hover);
-      color: var(--primary-text);
-    }
-  }
-}
 .own-token-card-mobile {
   margin-bottom: 1px;
   &__body {
