@@ -25,12 +25,8 @@
       "description": "Torque-specific endpoints"
     },
     {
-      "name": "pTokens Prices",
-      "description": "pTokens Prices in USD and ETH"
-    },
-    {
       "name": "iTokens Prices",
-      "description": "iTokens Prices in USD and ETH"
+      "description": "iTokens Prices"
     }
   ],
   "schemes": [
@@ -259,26 +255,6 @@
           "iTokens Prices"
         ],
         "summary": "Get iToken prices",
-        "description": "",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "responses": {
-          "200": {
-            "description": "Success"
-          }
-        }
-      }
-    },
-    "/ptoken-prices": {
-      "get": {
-        "tags": [
-          "pTokens Prices"
-        ],
-        "summary": "Get pToken prices",
         "description": "",
         "consumes": [
           "application/json"
