@@ -7,23 +7,16 @@ import { ReactComponent as WalletSvg } from "../assets/images/wallet-icon.svg";
 import { IDropDownSelectOption, DropdownSelect, IDropdownSelectProps } from "./DropdownSelect";
 
 export interface ITokenGridTabsProps {
-  selectedKey: TradeTokenKey;
+  selectedTabAsset: Asset;
   isMobile: boolean;
   assets: Asset[];
-  defaultUnitOfAccount: Asset;
   isShowMyTokensOnly: boolean;
-  defaultLeverageShort: number;
-  defaultLeverageLong: number;
-  isLong: boolean;
-  onSelect: (key: TradeTokenKey) => void;
-
-  onTabSelect: (key: Asset) => void;
+  openedPositionsCount: number;
+  onTabSelect: (asset: Asset) => void;
   onShowMyTokensOnlyChange: (value: boolean) => void;
 }
 
 interface ITokenGridTabsState {
-  leverage: number;
-  positionType: PositionType;
   isPro: boolean;
   isShowMyTokensOnly: boolean;
 }
@@ -32,8 +25,6 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
   constructor(props: ITokenGridTabsProps, context?: any) {
     super(props, context);
     this.state = {
-      positionType: props.isLong ? PositionType.SHORT : PositionType.SHORT,
-      leverage: props.isLong ? props.defaultLeverageLong : props.defaultLeverageShort,
       isShowMyTokensOnly: props.isShowMyTokensOnly,
       isPro: false
     };
@@ -45,14 +36,11 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
     const assetDetails = AssetsDictionary.assets.get(asset);
     if (!assetDetails) return;
 
-    const isActiveClassName = asset === this.props.selectedKey.asset && !this.state.isShowMyTokensOnly
+    const isActiveClassName = asset === this.props.selectedTabAsset && !this.state.isShowMyTokensOnly
       ? "trade-token-grid-tab-item--active"
       : "";
 
     const classNamePrefix = "trade-token-grid-tab-item";
-
-
-
 
     return (
       <div key={`${assetDetails.displayName}`}
@@ -61,7 +49,7 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
       >
         <div className={`${classNamePrefix}__col-token-image`}>
           {assetDetails.reactLogoSvg.render()}
-          <span >{assetDetails.displayName}</span>
+          {!this.props.isMobile ? <span >{assetDetails.displayName}</span> : null}
         </div>
       </div>
     );
@@ -73,7 +61,7 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
 
     await this.setState({ ...this.state, isShowMyTokensOnly: false })
     await this.props.onShowMyTokensOnlyChange(false);
-    await this.props.onSelect(this.getTradeTokenGridRowSelectionKey(asset));
+    await this.props.onTabSelect(asset);
   };
 
   private async onDropdownSelect(value: string) {
@@ -85,12 +73,12 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
 
     await this.setState({ ...this.state, isShowMyTokensOnly: false })
     await this.props.onShowMyTokensOnlyChange(false);
-    await this.props.onSelect(this.getTradeTokenGridRowSelectionKey(asset));
+    await this.props.onTabSelect(asset);
   }
 
 
   public render() {
-    var selectedAsset = AssetsDictionary.assets.get(this.props.selectedKey.asset);
+    var selectedAsset = AssetsDictionary.assets.get(this.props.selectedTabAsset);
     var displayName = !!selectedAsset ? selectedAsset.displayName : "manage";
 
     return (
@@ -101,20 +89,25 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
           </div>
           <div className="trade-token-grid-tab__items">
             {this.props.assets.map(asset => (this.renderAsset(asset)))}
-            <div className={`trade-token-grid-tab-item ${this.state.isShowMyTokensOnly ? "trade-token-grid-tab-item--active" : ""}`} onClick={this.showMyTokensOnlyChange}>
-              <div className={`trade-token-grid-tab-item__col-token-image wallet-img-div`} >
+            <div className={`trade-token-grid-tab-item manage-tab ${this.state.isShowMyTokensOnly ? "trade-token-grid-tab-item--active" : ""}`} onClick={this.showMyTokensOnlyChange}>
+              <div className={`trade-token-grid-tab-item__col-token-image`} >
                 {<WalletSvg />}
-                <span>Manage</span>
-                <span className="count-open-position">2</span>
+                {!this.props.isMobile ? <span>Manage</span> : null}
+                <span className="opened-positions-count">{this.props.openedPositionsCount}</span>
               </div>
             </div>
           </div>
-          <div className="pro-switch-wrapper">
-            <label className={`pro-switch ${this.state.isPro ? `active` : ``}`}>
-              <input type="checkbox" id="checkbox" onChange={this.onSwitchPro} />
-              <div className="slider round"></div>
-            </label>
-          </div>
+          {!this.props.isMobile
+            ? <React.Fragment>
+              <div className="pro-switch-wrapper">
+                <label className={`pro-switch ${this.state.isPro ? `active` : ``}`}>
+                  <input type="checkbox" id="checkbox" onChange={this.onSwitchPro} />
+                  <div className="slider round"></div>
+                </label>
+              </div>
+            </React.Fragment>
+            : null
+          }
         </div>
       </div>
     )
@@ -123,21 +116,6 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
   public showMyTokensOnlyChange = async () => {
     await this.props.onShowMyTokensOnlyChange(true);
     await this.setState({ ...this.state, isShowMyTokensOnly: true })
-  }
-
-  private getTradeTokenGridRowSelectionKeyRaw(asset: Asset) {
-    const key = new TradeTokenKey(asset, this.props.defaultUnitOfAccount, this.state.positionType, this.state.leverage, true, 2);
-
-    // check for version 2, and revert back to version if not found
-    if (key.erc20Address === "") {
-      key.setVersion(1);
-    }
-
-    return key;
-  }
-
-  private getTradeTokenGridRowSelectionKey(asset: Asset) {
-    return this.getTradeTokenGridRowSelectionKeyRaw(asset);
   }
 
   private getDropdownProps(): IDropdownSelectProps {
@@ -153,7 +131,7 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
       displayName: "Manage"
     });
 
-    let activeDropDownOption = dropDownSelectOptions.find(option => this.state.isShowMyTokensOnly ? option.value === "manage" : option.value === this.props.selectedKey.asset);
+    let activeDropDownOption = dropDownSelectOptions.find(option => this.state.isShowMyTokensOnly ? option.value === "manage" : option.value === this.props.selectedTabAsset);
 
     return {
       options: dropDownSelectOptions,

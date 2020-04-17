@@ -4,7 +4,7 @@ import React, { Component } from "react";
 import TagManager from 'react-gtm-module';
 import Intercom from "react-intercom";
 import Modal from "react-modal";
-import { HashRouter, Redirect, Route, Switch } from "react-router-dom";
+import { BrowserRouter, Redirect, Route, Switch } from "react-router-dom";
 import { LandingPage } from "../pages/LandingPage";
 import { LendPage } from "../pages/LendPage";
 import { MaintenancePage } from "../pages/MaintenancePage";
@@ -121,15 +121,29 @@ export class AppRouter extends Component<any, IAppRouterState> {
           {
             siteConfig.MaintenanceMode
               ? <MaintenancePage />
-              :
-              <HashRouter hashType="slash">
+              : <BrowserRouter>
                 <LocationListener doNetworkConnect={this.doNetworkConnect}>
                   <Switch>
-                    {!isMainnetProd ? <Route exact={true} path="/" render={() => <LandingPage isMobileMedia={this.state.isMobileMedia} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />} /> : undefined}
+                    {!isMainnetProd
+                      ? <Route exact={true} path="/" render={props => (props.location.hash.startsWith('#/')
+                        ? <Redirect to={props.location.hash.replace('#', '')} />
+                        : <LandingPage {...props} isMobileMedia={this.state.isMobileMedia} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />
+                      )} />
+                      : <Route exact={true} path="/" render={props => {
+                        if (props.location.hash.startsWith('#/')) {
+                          return <Redirect to={props.location.hash.replace('#/', '')} />
+                        }
+                        else {
+                          window.location.href = 'https://fulcrum.trade';
+                          return null;
+                        }
+                      }} />
+                    }
+
                     <Route exact={true} path="/lend" render={() => <LendPage isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />} />
                     {/*{!this.state.isMobileMedia ? (*/}
                     <Route exact={true} path="/trade" render={() => <TradePage isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />} />
-                    // ) : ``}
+
                     <Route exact={true} path="/stats" render={() => <StatsPage isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />} />
                     {isMainnetProd ? <Route path="*" component={() => {
                       window.location.href = 'https://fulcrum.trade';
@@ -152,7 +166,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
                     }} />
                   ) : ``}
                 </LocationListener>
-              </HashRouter>
+              </BrowserRouter>
           }
         </div>
       </Web3ReactProvider>
@@ -172,12 +186,12 @@ export class AppRouter extends Component<any, IAppRouterState> {
 
   public onDeactivate = async () => {
 
-    FulcrumProvider.Instance.isLoading = true;
+      FulcrumProvider.Instance.isLoading = true;
 
-    await FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.ProviderIsChanging);
+      await FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.ProviderIsChanging);
 
     await this._isMounted && this.setState({
-      ...this.state,
+        ...this.state,
       isProviderMenuModalOpen: false
     });
     await FulcrumProvider.Instance.setReadonlyWeb3Provider();

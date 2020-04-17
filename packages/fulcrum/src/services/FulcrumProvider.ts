@@ -68,16 +68,6 @@ const networkName = process.env.REACT_APP_ETH_NETWORK;
 const initialNetworkId = getNetworkIdByString(networkName);
 
 export class FulcrumProvider {
-  private static readonly priceGraphQueryFunction = new Map<Asset, string>([
-    [Asset.ETH, "kyber-eth-dai"],
-    [Asset.WBTC, "kyber-wbtc-dai"],
-    [Asset.LINK, "kyber-link-dai"],
-    [Asset.MKR, "kyber-mkr-dai"],
-    [Asset.ZRX, "kyber-zrx-dai"],
-    [Asset.BAT, "kyber-bat-dai"],
-    [Asset.REP, "kyber-rep-dai"],
-    [Asset.KNC, "kyber-knc-dai"]
-  ]);
 
   public static Instance: FulcrumProvider;
 
@@ -315,115 +305,6 @@ export class FulcrumProvider {
     }
 
     return result;
-  };
-
-  public getPriceDataPoints = async (selectedKey: TradeTokenKey): Promise<IPriceDataPoint[]> => {
-    let priceDataObj: IPriceDataPoint[] = [];
-    // localStorage.removeItem(`priceData${selectedKey.asset}`);
-
-    if (this.web3Wrapper) {
-      let queriedBlocks = 0;
-      const currentBlock = await this.web3Wrapper.getBlockNumberAsync();
-      const earliestBlock = currentBlock - 17280; // ~5760 blocks per day
-      let fetchFromBlock = earliestBlock;
-      const nearestHour = new Date().setMinutes(0, 0, 0) / 1000;
-
-      const priceData = FulcrumProvider.getLocalstorageItem(`priceData${selectedKey.asset}`);
-      if (priceData) {
-        // console.log(`priceData`,priceData);
-        priceDataObj = JSON.parse(priceData);
-        if (priceDataObj.length > 0) {
-          // console.log(`priceDataObj`,priceDataObj);
-          const lastItem = priceDataObj[priceDataObj.length - 1];
-          // console.log(`lastItem`,lastItem);
-          // console.log(`nearestHour`,nearestHour);
-          if (lastItem && lastItem.timeStamp) {
-            // console.log(`lastItem.timeStamp`,lastItem.timeStamp);
-            if (lastItem.timeStamp < nearestHour) {
-              fetchFromBlock = currentBlock - (nearestHour - lastItem.timeStamp) / 15 - 240; // ~240 blocks per hour; 15 second blocks
-            } else {
-              fetchFromBlock = currentBlock;
-            }
-          }
-        }
-      }
-
-      fetchFromBlock = Math.max(fetchFromBlock, earliestBlock);
-      if (fetchFromBlock < currentBlock) {
-        let jsonData: any = {};
-        // const functionName = `${this.web3ProviderSettings.networkName}-${FulcrumProvider.priceGraphQueryFunction.get(selectedKey.asset)}`;
-        const functionName = `mainnet-${FulcrumProvider.priceGraphQueryFunction.get(selectedKey.asset)}`;
-        const url = `https://api.covalenthq.com/v1/function/${functionName}/?aggregate[Avg]&group_by[block_signed_at__hour]&starting-block=${fetchFromBlock}&key=${configProviders.Covalent_ApiKey}`;
-        try {
-          const response = await fetch(url);
-          jsonData = await response.json();
-
-          queriedBlocks = currentBlock - fetchFromBlock;
-          // console.log(jsonData);
-        } catch (error) {
-          // tslint:disable-next-line
-          console.log(error);
-        }
-
-        if (jsonData && jsonData.data) {
-          const dataArray = jsonData.data;
-          dataArray.map((value: any) => {
-            if (value && value.block_signed_at__hour && value.avg_value_0) {
-              priceDataObj.push({
-                timeStamp: Math.round(new Date(value.block_signed_at__hour).getTime() / 1000),
-                price: Math.round(value.avg_value_0) / (10 ** 18),
-                liquidationPrice: 0,
-                change24h: 0
-              });
-            }
-          });
-          // console.log(result);
-
-          // remove duplicates
-          priceDataObj = priceDataObj
-            .map(e => e.timeStamp)
-            .map((e, i, final) => final.indexOf(e) === i && i)
-            .filter((e, index) => priceDataObj[index]).map((e, i) => priceDataObj[i]);
-
-          // add nearestHour if not yet available from API
-          if (priceData && priceDataObj[priceDataObj.length - 1].timeStamp !== nearestHour) {
-            priceDataObj.push({
-              timeStamp: nearestHour,
-              price: priceDataObj[priceDataObj.length - 1].price,
-              liquidationPrice: 0,
-              change24h: 0
-            });
-          }
-
-          // keep no more than 72
-          if (priceDataObj.length > 72) {
-            priceDataObj = priceDataObj.splice(-72);
-          }
-
-          // console.log(priceDataObj.length);
-          FulcrumProvider.setLocalstorageItem(`priceData${selectedKey.asset}`, JSON.stringify(priceDataObj));
-        }
-      }
-
-      // console.log(`queriedBlocks`, queriedBlocks);
-    } else {
-      // getting empty data
-      const samplesCount = 72;
-      const intervalSeconds = 3600;
-
-      const beginningTime = moment()
-        .startOf("hour")
-        .subtract(intervalSeconds, "second");
-      for (let i = 0; i < samplesCount; i++) {
-        priceDataObj.push({ timeStamp: beginningTime.unix(), price: 1, liquidationPrice: 0, change24h: 0 });
-
-        // add mutates beginningTime
-        beginningTime.add(intervalSeconds, "second");
-      }
-    }
-    // console.log(priceDataObj);
-
-    return priceDataObj;
   };
 
   public getTradeTokenAssetLatestDataPoint = async (selectedKey: TradeTokenKey): Promise<IPriceDataPoint> => {
@@ -897,12 +778,12 @@ export class FulcrumProvider {
     return result;
   };
 
-  public getMaxLendValue = async (request: LendRequest): Promise<[BigNumber, BigNumber, BigNumber, BigNumber]> => {
+  public getMaxLendValue = async (request: LendRequest): Promise<[BigNumber, BigNumber, BigNumber, BigNumber, string]> => {
     let maxLendAmount = new BigNumber(0);
     let maxTokenAmount = new BigNumber(0);
     let tokenPrice = new BigNumber(0);
     let chaiPrice = new BigNumber(0);
-
+    let infoMessage: string = "";
     if (request.lendType === LendType.LEND) {
       maxLendAmount = await this.getAssetTokenBalanceOfUser(request.asset);
       if (request.asset === Asset.ETH) {
@@ -933,6 +814,8 @@ export class FulcrumProvider {
           if (freeSupply.lt(userBalance)) {
             maxLendAmount = freeSupply;
             maxTokenAmount = maxTokenAmount.multipliedBy(freeSupply).dividedBy(userBalance);
+            if (request.lendType === LendType.UNLEND)
+              infoMessage = "Insufficient liquidity for unlend. PLease try again later.";
           } else {
             maxLendAmount = userBalance;
           }
@@ -946,7 +829,7 @@ export class FulcrumProvider {
     maxLendAmount = maxLendAmount.dividedBy(10 ** 18);
     maxTokenAmount = maxTokenAmount.dividedBy(10 ** 18);
 
-    return [maxLendAmount, maxTokenAmount, tokenPrice, chaiPrice];
+    return [maxLendAmount, maxTokenAmount, tokenPrice, chaiPrice, infoMessage];
   };
 
   public getPTokenPrice = async (selectedKey: TradeTokenKey): Promise<BigNumber> => {

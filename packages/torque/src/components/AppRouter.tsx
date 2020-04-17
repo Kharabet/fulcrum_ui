@@ -3,7 +3,7 @@ import React, { Component } from "react";
 import TagManager from 'react-gtm-module';
 // import ReactGA from "react-ga";
 import Intercom from "react-intercom";
-import { HashRouter, Redirect, Route, Switch } from "react-router-dom";
+import { Redirect, Route, Router, Switch } from "react-router-dom";
 import configProviders from "../config/providers.json";
 import { ProviderType } from "../domain/ProviderType";
 import { BorrowPage } from "../pages/BorrowPage";
@@ -25,6 +25,7 @@ import { Web3ConnectionFactory } from '../domain/Web3ConnectionFactory';
 import { ProviderTypeDictionary } from '../domain/ProviderTypeDictionary';
 import { AbstractConnector } from '@web3-react/abstract-connector';
 import { errors } from "ethers"
+import { NavService } from '../services/NavService';
 
 const isMainnetProd =
   process.env.NODE_ENV && process.env.NODE_ENV !== "development"
@@ -105,6 +106,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
             isMobileMedia={this.state.isMobileMedia}
             onSelect={this.onProviderTypeSelect}
             onDeactivate={this.onDeactivate}
+            onProviderMenuClose={this.onRequestClose}
           />
         </Modal>
 
@@ -123,7 +125,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
           {
             siteConfig.MaintenanceMode
               ? <MaintenancePage />
-              : <HashRouter hashType="slash">
+              : <Router history={NavService.Instance.History}>
                 <LocationListener doNetworkConnect={this.doNetworkConnect}>
                   <Switch>
                     <Route exact={true} path="/" render={() => <Redirect to="/borrow" />} />
@@ -145,7 +147,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
                     }} />
                   ) : ``}
                 </LocationListener>
-              </HashRouter>
+              </Router>
           }
         </div>
       </Web3ReactProvider>
@@ -178,29 +180,29 @@ export class AppRouter extends Component<any, IAppRouterState> {
     await TorqueProvider.Instance.eventEmitter.emit(
       TorqueProviderEvents.ProviderChanged,
       new ProviderChangedEvent(TorqueProvider.Instance.providerType, TorqueProvider.Instance.web3Wrapper)
-    );
-  }
+        );
+        }
 
   public onProviderTypeSelect = async (connector: AbstractConnector, account?: string) => {
     if (!this.state.isLoading) {
-      TorqueProvider.Instance.isLoading = true;
+    TorqueProvider.Instance.isLoading = true;
 
-      await TorqueProvider.Instance.eventEmitter.emit(TorqueProviderEvents.ProviderIsChanging);
+    await TorqueProvider.Instance.eventEmitter.emit(TorqueProviderEvents.ProviderIsChanging);
 
       await this._isMounted && this.setState({
-        ...this.state,
-        isLoading: true,
+      ...this.state,
+      isLoading: true,
         isProviderMenuModalOpen: false
-      }, async () => {
+    }, async () => {
         await TorqueProvider.Instance.setWeb3Provider(connector, account);
 
-        TorqueProvider.Instance.isLoading = false;
+      TorqueProvider.Instance.isLoading = false;
 
-        await TorqueProvider.Instance.eventEmitter.emit(
-          TorqueProviderEvents.ProviderChanged,
-          new ProviderChangedEvent(TorqueProvider.Instance.providerType, TorqueProvider.Instance.web3Wrapper)
-        );
-      });
+      await TorqueProvider.Instance.eventEmitter.emit(
+        TorqueProviderEvents.ProviderChanged,
+        new ProviderChangedEvent(TorqueProvider.Instance.providerType, TorqueProvider.Instance.web3Wrapper)
+      );
+    });
     } else {
       await this._isMounted && this.setState({
         ...this.state,

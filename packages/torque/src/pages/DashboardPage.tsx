@@ -15,7 +15,6 @@ import { ProviderType } from "../domain/ProviderType";
 import { BorrowMoreDlg } from "../components/BorrowMoreDlg";
 
 export interface IDashboardPageRouteParams {
-  walletTypeAbbr: string;
   walletAddress: string | undefined;
 }
 
@@ -114,8 +113,6 @@ export class DashboardPage extends PureComponent<
         <div className="dashboard-page">
           <HeaderOps isMobileMedia={this.props.isMobileMedia} isLoading={this.props.isLoading} doNetworkConnect={this.props.doNetworkConnect} isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
           <div className="dashboard-page__main">
-
-            {this.state.items.length === 0 && <h2>You have no loans!</h2>}
 
             {!TorqueProvider.Instance.unsupportedNetwork ? (
               <React.Fragment>

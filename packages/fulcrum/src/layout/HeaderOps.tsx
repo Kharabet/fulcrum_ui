@@ -148,11 +148,11 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
                 </label>
               </div>
             </div>
-            <div className="heade_nav_menu">
+            <div className="header_nav_menu">
               <HeaderMenu items={menu.items} />
             </div>
             <div className="footer-container">
-              <Footer isMobileMedia={this.props.isMobileMedia}  isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen}/>
+              <Footer  isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen}/>
             </div>
           </div>
         ) : null}

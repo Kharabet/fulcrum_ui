@@ -92,7 +92,7 @@
   }
 }
 
-@media screen and (max-width: $mobile-version-max-width) {
+@media screen and (max-width: $breakpoint-mobile-max) {
   .on-chain-indicator {
     display: flex;
     flex-direction: row;

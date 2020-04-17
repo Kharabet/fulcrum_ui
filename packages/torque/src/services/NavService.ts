@@ -1,4 +1,4 @@
-import { createHashHistory, History } from "history";
+import { createBrowserHistory, History } from "history";
 
 export class NavService {
   public static Instance: NavService;
@@ -6,7 +6,7 @@ export class NavService {
 
   constructor() {
     // init
-    this.History = createHashHistory({ hashType: "slash" });
+    this.History = createBrowserHistory();
 
     // singleton
     if (!NavService.Instance) {

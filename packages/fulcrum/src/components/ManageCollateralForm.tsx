@@ -21,16 +21,13 @@ import { Asset } from "../domain/Asset";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary, AssetsDictionaryMobile } from "../domain/AssetsDictionary";
 import { PositionType } from "../domain/PositionType";
-//import { TradeRequest } from "../domain/TradeRequest";
 import { TradeTokenKey } from "../domain/TradeTokenKey";
 import { TradeType } from "../domain/TradeType";
 import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
-import { CollapsibleContainer } from "./CollapsibleContainer";
 import { CollateralTokenButton } from "./CollateralTokenButton";
 import { CollateralTokenSelector } from "./CollateralTokenSelector";
-import { UnitOfAccountSelector } from "./UnitOfAccountSelector";
 import { Preloader } from "./Preloader";
 
 
@@ -59,6 +56,8 @@ interface ITradeAmountChangeEvent {
   tradedAmountEstimate: BigNumber;
   slippageRate: BigNumber;
   exposureValue: BigNumber;
+  currentValue: number;
+  selectedValue: number;
 }
 //#endregion tradeComponent
 
@@ -93,6 +92,9 @@ interface IManageCollateralFormState {
   currentValue: number;
   selectedValue: number;
   diffAmount: BigNumber;
+  collateralAmount: BigNumber;
+  gasAmountNeeded: BigNumber;
+  collateralizedPercent: BigNumber;
   // liquidationPrice: BigNumber;
 
   //#region tradeComponent
@@ -134,7 +136,7 @@ interface IManageCollateralFormState {
 }
 
 export class ManageCollateralForm extends Component<IManageCollateralFormProps, IManageCollateralFormState> {
-  private minValue: number = 0;
+  private minValue: number = 115;
   private maxValue: number = 300;
 
   //#region tradeComponent
@@ -171,10 +173,14 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
 
     this.state = {
       // assetDetails: AssetsDictionary.assets.get(this.props.asset) || null,
-      positionValue: 250.6,
-      currentValue: 250.6,
-      selectedValue: 250.6,
+      positionValue: 150,
+      currentValue: 150,
+      selectedValue: 150,
       diffAmount: new BigNumber(0),
+
+      collateralAmount: new BigNumber(0),
+      gasAmountNeeded: new BigNumber(0),
+      collateralizedPercent: new BigNumber(0),
       // liquidationPrice: new BigNumber(700),
 
       //#region tradeComponent
@@ -223,7 +229,7 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
       switchMap((value) => new Observable<ITradeAmountChangeEvent | null>((observer) => observer.next(value)))
     ).subscribe(next => {
       if (next) {
-        this._isMounted && this.setState({ ...this.state, ...next, isLoading: false, isExposureLoading: false });
+        this._isMounted && this.setState({ ...this.state, ...next, isLoading: false, isExposureLoading: false, selectedValue: 150 });
       } else {
         this._isMounted && this.setState({
           ...this.state,
@@ -235,7 +241,9 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
           slippageRate: new BigNumber(0),
           exposureValue: new BigNumber(0),
           isLoading: false,
-          isExposureLoading: false
+          isExposureLoading: false, 
+          selectedValue: 150, 
+          currentValue: 150,
         })
       }
     });
@@ -263,14 +271,7 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
   //#endregion tradeComponent
 
   private async derivedUpdate() {
-
-    // TODO: calculate and update this.state.diffAmount and this.state.liquidationPrice
-    this.setState({
-      ...this.state,
-      diffAmount: new BigNumber(this.state.selectedValue * 3),
-      liquidationPrice: new BigNumber(700 - this.state.selectedValue)
-    });
-
+    this.setState({ ...this.state,isLoading: true });
     //#region tradeComponent
     let assetDetails = AssetsDictionary.assets.get(this.props.asset);
     if (this.props.isMobileMedia) {
@@ -284,11 +285,12 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
         ? await FulcrumProvider.Instance.getAssetTokenBalanceOfUser(this.state.collateral)
         : positionTokenBalance;
     const ethBalance = await FulcrumProvider.Instance.getEthBalance();
+    const maxTradeValue = await FulcrumProvider.Instance.getMaxTradeValue(this.props.tradeType, tradeTokenKey, this.state.collateral);
+
+    const limitedAmount = await this.getInputAmountLimited(this.state.inputAmountText, this.state.inputAmountValue, tradeTokenKey, maxTradeValue, false);
 
     // maxTradeValue is raw here, so we should not use it directly
-    const maxTradeValue = await FulcrumProvider.Instance.getMaxTradeValue(this.props.tradeType, tradeTokenKey, this.state.collateral);
-    const limitedAmount = await this.getInputAmountLimited(this.state.inputAmountText, this.state.inputAmountValue, tradeTokenKey, maxTradeValue, false);
-    const tradeRequest = new ManageCollateralRequest(
+   const tradeRequest = new ManageCollateralRequest(
       new BigNumber(this.state.currentValue),
       this.props.tradeType,
       this.props.asset,
@@ -314,8 +316,11 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
 
     const latestPriceDataPoint = await FulcrumProvider.Instance.getTradeTokenAssetLatestDataPoint(tradeTokenKey);
     const liquidationPrice = new BigNumber(latestPriceDataPoint.liquidationPrice);
+    //#endregion tradeComponent
+    const collateralizedPercent = maxTradeValue.dividedBy(2 * this.state.positionValue);
 
     this._isMounted && this.setState({
+      //#region tradeComponent
       ...this.state,
       assetDetails: assetDetails || null,
       inputAmountText: limitedAmount.inputAmountText,// "",
@@ -333,10 +338,12 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
       maybeNeedsApproval: maybeNeedsApproval,
       currentPrice: new BigNumber(latestPriceDataPoint.price),
       liquidationPrice: liquidationPrice,
-      exposureValue: tradeExpectedResults.exposureValue
+      exposureValue: tradeExpectedResults.exposureValue,
+      //#endregion tradeComponent   
+      collateralizedPercent: collateralizedPercent,
     });
   }
-
+  //#region tradeComponent
   private onProviderChanged = async (event: ProviderChangedEvent) => {
     await this.derivedUpdate();
   };
@@ -354,14 +361,13 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
 
     //#region tradeComponent
     this._isMounted = true;
-
     await this.derivedUpdate();
-    window.history.pushState(null, "Trade Modal Opened", `/#/trade/${this.props.tradeType.toLocaleLowerCase()}-${this.props.leverage}x-${this.props.positionType.toLocaleLowerCase()}-${this.props.asset}/`);
+    window.history.pushState(null, "Manage Collateral Modal Opened", `/#/trade/manage-${this.props.leverage}x-${this.props.positionType.toLocaleLowerCase()}-${this.props.asset}/`);
 
     if (this._input) {
       // this._input.select();
       this._input.focus();
-      this._inputSetMax.next();
+      this._inputSetMax.next(new BigNumber(.5));
     }
     //#endregion tradeComponent
   }
@@ -414,7 +420,7 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
     //#region tradeComponent
     const multiplier = this.state.tradeAmountValue.dividedBy(this.state.maxTradeValue).toNumber();
     const amountMsg =
-      this.state.ethBalance && this.state.ethBalance.lte(FulcrumProvider.Instance.gasBufferForTrade)
+      this.state.ethBalance && this.state.ethBalance.lte(this.state.gasAmountNeeded)
         ? "Insufficient funds for gas"
         : this.state.balance && this.state.balance.eq(0)
           ? "Your wallet is empty"
@@ -428,28 +434,28 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
 
     return (
       <form className="manage-collateral-form" onSubmit={this.onSubmitClick}>
+        <div> <CloseIcon className="close-icon" onClick={this.props.onCancel} />
 
-        <CloseIcon className="close-icon" onClick={this.props.onCancel} />
-
-        <div className="manage-collateral-form__title">Manage Collateral</div>
-        <div className="manage-collateral-form__description">Your position is collateralized</div>
-        <div className="manage-collateral-form__collaterized"><span>{this.state.currentValue.toFixed(2)}</span>%</div>
+          <div className="manage-collateral-form__title">Manage Collateral</div>
+          <div className="manage-collateral-form__text">Your position is collateralized</div>
+          <div className="manage-collateral-form__collaterized"><span>{this.state.currentValue.toFixed(2)}</span>%</div>
 
 
-        <CollateralSlider
-          minValue={this.minValue}
-          maxValue={this.maxValue}
-          value={this.state.currentValue}
-          onUpdate={this.onUpdate}
-          onChange={this.onChange}
-        />
+          <CollateralSlider
+            minValue={this.minValue}
+            // maxValue={this.state.inputAmountText}
+            maxValue={this.maxValue}
+            value={this.state.currentValue}
+            onUpdate={this.onUpdate}
+            onChange={this.onChange}
+          />
 
-        <div className="manage-collateral-form__tips">
-          <div className="manage-collateral-form__tip">Withdraw</div>
-          <div className="manage-collateral-form__tip">Top Up</div>
-        </div>
+          <div className="manage-collateral-form__tips">
+            <div className="manage-collateral-form__tip">Withdraw</div>
+            <div className="manage-collateral-form__tip">Top Up</div>
+          </div>
 
-        {/* <hr className="manage-collateral-form__delimiter" />
+          {/* <hr className="manage-collateral-form__delimiter" />
 
         <div className="manage-collateral-form__info-liquidated-at-container">
           <div className="manage-collateral-form__info-liquidated-at-msg">
@@ -460,92 +466,82 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
           </div>
         </div> */}
 
-        {this.state.positionValue !== this.state.selectedValue ? (
-          <div className="manage-collateral-form__operation-result-container">
-            <img className="manage-collateral-form__operation-result-img" src={this.state.assetDetails.logoSvg} />
-            <div className="manage-collateral-form__operation-result-msg">
-              You will {this.state.positionValue > this.state.selectedValue ? "withdraw" : "top up"}
-            </div>
-            <div className="manage-collateral-form__operation-result-amount">
-              {this.state.diffAmount.toFixed(6)} {this.state.assetDetails.displayName}
-            </div>
-          </div>
-        ) : null}
-
-        {//#region tradeComponent
-        }
-        <div className="manage-collateral-form__trade-form" >
-          <div className={`trade-form__form-container  ${this.props.tradeType === TradeType.BUY ? "buy" : "sell"}`}>
-            <div className="trade-form__form-values-container">
-              {/* {!this.props.isMobileMedia && this.props.tradeType === TradeType.BUY ? (
+          <div className="manage-collateral-form__text">
+            You will {this.state.positionValue > this.state.selectedValue ? "withdraw" : "top up"}</div>
+        
+          {//#region tradeComponent
+          }
+          <div className="manage-collateral-form__trade-form" >
+            <div className={`trade-form__form-container  ${this.props.tradeType === TradeType.BUY ? "buy" : "sell"}`}>
+              <div className="trade-form__form-values-container">
+                {/* {!this.props.isMobileMedia && this.props.tradeType === TradeType.BUY ? (
               <TradeExpectedResult value={tradeExpectedResultValue} />
             ) : null} */}
 
-              <div className="trade-form__kv-container">
-                {amountMsg.includes("Slippage:") ? (
-                  <div title={`${this.state.slippageRate.toFixed(18)}%`} className="trade-form__label slippage">
-                    {amountMsg}
-                    <span className="trade-form__slippage-amount">
-                      &nbsp;{`${this.state.slippageRate.toFixed(2)}%`}<SlippageDown />
-                    </span>
-                  </div>
-                ) : (<div className="trade-form__label">{amountMsg}</div>)}
+                <div className="trade-form__kv-container">
+                  {amountMsg.includes("Slippage:") ? (
+                    <div title={`${this.state.slippageRate.toFixed(18)}%`} className="trade-form__label slippage">
+                      {amountMsg}
+                      <span className="trade-form__slippage-amount">
+                        &nbsp;{`${this.state.slippageRate.toFixed(2)}%`}<SlippageDown />
+                      </span>
+                    </div>
+                  ) : (<div className="trade-form__label">{amountMsg}</div>)}
 
-              </div>
-
-              <div className="trade-form__amount-container">
-                <input
-                  type="number"
-                  step="any"
-                  ref={this._setInputRef}
-                  className="trade-form__amount-input"
-                  value={!this.state.isLoading ? this.state.inputAmountText : ""}
-                  onChange={this.onTradeAmountChange}
-                />
-                {!this.state.isLoading ? null
-                  : <div className="preloader-container"> <Preloader width="80px" /></div>
-                }
-                <div className="trade-form__collateral-button-container">
-                  <CollateralTokenButton asset={this.state.collateral} onClick={this.onChangeCollateralOpen} isChangeCollateralOpen={this.state.isChangeCollateralOpen} />
                 </div>
-                {this.state.isChangeCollateralOpen
-                  ?
-                  <CollateralTokenSelector
-                    selectedCollateral={this.state.collateral}
-                    collateralType={this.props.tradeType === TradeType.BUY ? `Purchase` : `Withdrawal`}
-                    onCollateralChange={this.onChangeCollateralClicked}
-                    onClose={this.onChangeCollateralClose}
-                    tradeType={this.props.tradeType} />
-                  :
-                  null
-                }
-              </div>
-              <div className="trade-form__group-button">
-                <button data-value="0.25" className={multiplier === 0.25 ? "active " : ""} onClick={this.onInsertMaxValue}>25%</button>
-                <button data-value="0.5" className={multiplier === 0.5 ? "active " : ""} onClick={this.onInsertMaxValue}>50%</button>
-                <button data-value="0.75" className={multiplier === 0.75 ? "active " : ""} onClick={this.onInsertMaxValue}>75%</button>
-                <button data-value="1" className={multiplier === 1 ? "active " : ""} onClick={this.onInsertMaxValue}>100%</button>
-              </div>
 
-              {this.state.positionTokenBalance && this.props.tradeType === TradeType.BUY && this.state.positionTokenBalance!.eq(0) ? (
-                <CollapsibleContainer titleOpen="View advanced options" titleClose="Hide advanced options" isTransparent={amountMsg !== ""}>
-                  <div className="trade-form__unit-of-account-container">
-                    Unit of Account
-                    <UnitOfAccountSelector items={[
-                      Asset.USDC,
-                      process.env.REACT_APP_ETH_NETWORK === "kovan"
-                        ? Asset.SAI
-                        : Asset.DAI
-                    ]} value={this.state.selectedUnitOfAccount} onChange={this.onChangeUnitOfAccount} />
+                <div className="trade-form__amount-container">
+                  <input
+                    type="number"
+                    step="any"
+                    ref={this._setInputRef}
+                    className="trade-form__amount-input"
+                    value={!this.state.isLoading ? this.formatPrecision(Number(this.state.inputAmountText))  : ""}
+                    onChange={this.onTradeAmountChange}
+                  />
+                  {!this.state.isLoading ? null
+                    : <div className="preloader-container"> <Preloader width="80px" /></div>
+                  }
+                  <div className="trade-form__collateral-button-container">
+                    <CollateralTokenButton asset={this.state.collateral} onClick={this.onChangeCollateralOpen} isChangeCollateralOpen={this.state.isChangeCollateralOpen} />
                   </div>
-                </CollapsibleContainer>
-              ) : null}
-            </div>
-          </div>
-          {//#endregion tradeComponent
-          }</div>
+                  {this.state.isChangeCollateralOpen
+                    ?
+                    <CollateralTokenSelector
+                      selectedCollateral={this.state.collateral}
+                      collateralType={this.props.tradeType === TradeType.BUY ? `Purchase` : `Withdrawal`}
+                      onCollateralChange={this.onChangeCollateralClicked}
+                      onClose={this.onChangeCollateralClose}
+                      tradeType={this.props.tradeType} />
+                    :
+                    null
+                  }
+                </div>
+                <div className="trade-form__group-button">
+                  <button data-value="0.25" className={multiplier === 0.25 ? "active " : ""} onClick={this.onInsertMaxValue}>25%</button>
+                  <button data-value="0.5" className={multiplier === 0.5 ? "active " : ""} onClick={this.onInsertMaxValue}>50%</button>
+                  <button data-value="0.75" className={multiplier === 0.75 ? "active " : ""} onClick={this.onInsertMaxValue}>75%</button>
+                  <button data-value="1" className={multiplier === 1 ? "active " : ""} onClick={this.onInsertMaxValue}>100%</button>
+                </div>
 
-        {this.state.positionValue !== this.state.selectedValue ? (
+                {/* {this.state.positionTokenBalance && this.props.tradeType === TradeType.BUY && this.state.positionTokenBalance!.eq(0) ? (
+                  <CollapsibleContainer titleOpen="View advanced options" titleClose="Hide advanced options" isTransparent={amountMsg !== ""}>
+                    <div className="trade-form__unit-of-account-container">
+                      Unit of Account
+                    <UnitOfAccountSelector items={[
+                        Asset.USDC,
+                        process.env.REACT_APP_ETH_NETWORK === "kovan"
+                          ? Asset.SAI
+                          : Asset.DAI
+                      ]} value={this.state.selectedUnitOfAccount} onChange={this.onChangeUnitOfAccount} />
+                    </div>
+                  </CollapsibleContainer>
+                ) : null} */}
+              </div>
+            </div>
+            {//#endregion tradeComponent
+            }</div>
+
           <div className="manage-collateral-form__actions-container">
             {/* <button className="manage-collateral-form__action-cancel" onClick={this.props.onCancel}>
               Cancel
@@ -560,23 +556,25 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
                 </button>
               )}
           </div>
-        ) : (
-            <div className="manage-collateral-form__actions-container">
-              <button className="manage-collateral-form__action-close" onClick={this.props.onCancel}>
-                Close
-            </button>
-            </div>
-          )}
+        </div>
+
       </form>
     );
   }
 
   private onChange = (value: number) => {
     this.setState({ ...this.state, currentValue: value });
+
+     const collateralAmount = this.state.collateralizedPercent.multipliedBy(this.state.currentValue);
+
+    this._inputChange.next(collateralAmount.toFixed(4));
   };
 
   private onUpdate = (value: number) => {
-    this.setState({ ...this.state, selectedValue: value });
+    this.setState({ ...this.state, selectedValue: value }); 
+    const collateralAmount = this.state.collateralizedPercent.multipliedBy(this.state.currentValue);
+
+    this._inputChange.next(collateralAmount.toFixed(4));
   };
   /*
     public onSubmitClick = (event: FormEvent<HTMLFormElement>) => {
@@ -775,6 +773,7 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
                 this.props.version,
                 this.state.inputAmountValue
               );
+              const selectedValue = limitedAmount.inputAmountValue.dividedBy(this.state.collateralizedPercent).toNumber();
 
               this.getTradeExpectedResults(tradeRequest).then(tradeExpectedResults => {
                 observer.next({
@@ -785,7 +784,9 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
                   maxTradeValue: limitedAmount.maxTradeValue,
                   tradedAmountEstimate: tradeExpectedResults.tradedAmountEstimate,
                   slippageRate: tradeExpectedResults.slippageRate,
-                  exposureValue: tradeExpectedResults.exposureValue
+                  exposureValue: tradeExpectedResults.exposureValue,
+                  selectedValue: selectedValue,
+                  currentValue: selectedValue
                 });
               });
             } else {
@@ -803,6 +804,7 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
       this._isMounted && this.setState({ ...this.state, isExposureLoading: true });
       const tradeTokenKey = this.getTradeTokenGridRowSelectionKey();
       const maxTradeValue = this.state.maxTradeValue;
+     
       this.getInputAmountLimitedFromText(value, tradeTokenKey, maxTradeValue, false).then(limitedAmount => {
         // updating stored value only if the new input value is a valid number
         if (!limitedAmount.tradeAmountValue.isNaN()) {
@@ -819,6 +821,7 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
             this.props.version,
             this.state.inputAmountValue
           );
+          const selectedValue = limitedAmount.inputAmountValue.dividedBy(this.state.collateralizedPercent).toNumber();
 
           this.getTradeExpectedResults(tradeRequest).then(tradeExpectedResults => {
             observer.next({
@@ -829,7 +832,10 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
               maxTradeValue: maxTradeValue,
               tradedAmountEstimate: tradeExpectedResults.tradedAmountEstimate,
               slippageRate: tradeExpectedResults.slippageRate,
-              exposureValue: tradeExpectedResults.exposureValue
+              exposureValue: tradeExpectedResults.exposureValue,
+              selectedValue: selectedValue,
+              currentValue: selectedValue
+
             });
           });
         } else {
@@ -844,7 +850,8 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
     const tradedAmountEstimate = await FulcrumProvider.Instance.getTradedAmountEstimate(manageCollateralRequest);
     const slippageRate = await FulcrumProvider.Instance.getTradeSlippageRate(manageCollateralRequest, tradedAmountEstimate);
     const exposureValue = await FulcrumProvider.Instance.getTradeFormExposure(manageCollateralRequest);
-
+    
+    
     return {
       tradedAmountEstimate: tradedAmountEstimate,
       slippageRate: slippageRate || new BigNumber(0),
@@ -856,6 +863,7 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
     const inputAmountText = textValue;
     const amountTextForConversion = inputAmountText === "" ? "0" : inputAmountText[0] === "." ? `0${inputAmountText}` : inputAmountText;
     const inputAmountValue = new BigNumber(amountTextForConversion);
+   
 
     return this.getInputAmountLimited(inputAmountText, inputAmountValue, tradeTokenKey, maxTradeValue, skipLimitCheck);
   };
@@ -916,20 +924,23 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
 
     return {
       inputAmountValue: inputAmountValue.multipliedBy(multiplier),
-      inputAmountText: isNaN(parseFloat(inputAmountText)) ? "" : new BigNumber(parseFloat(inputAmountText)).multipliedBy(multiplier).toFixed(),
+      inputAmountText: isNaN(parseFloat(inputAmountText)) ? "" : new BigNumber(parseFloat(inputAmountText)).multipliedBy(multiplier).minus(this.state.collateralizedPercent.multipliedBy(this.state.positionValue)).toFixed(),
       tradeAmountValue: tradeAmountValue.multipliedBy(multiplier),
       maxTradeValue
     };
   };
 
-  // private formatPrecision(output: number): string {
-  //   let n = Math.log(output) / Math.LN10;
-  //   let x = 3 - n;
-  //   if (x < 0) x = 0;
-  //   if (x > 5) x = 5;
-  //   let result = new Number(output.toFixed(x)).toString();
-  //   return result;
-  // }
+  private formatPrecision(output: number): string {
+    let sign = "";
+    if (output < 0)
+      sign = "-";
+    let n = Math.log(Math.abs(output)) / Math.LN10;
+    let x = 4 - n;
+    if (x < 0) x = 0;
+    if (x > 5) x = 5;
+    let result = new Number(output.toFixed(x)).toString();
+    return result?? sign + result;
+  }
 
   //#endregion tradeComponent
 

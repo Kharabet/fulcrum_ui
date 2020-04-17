@@ -43,12 +43,8 @@ export class StatsPage extends PureComponent<IStatsPageProps, IStatsPageState> {
           </InfoBlock>
           <StatsTokenGrid isMobileMedia={this.props.isMobileMedia} />
         </main>
-        <Footer isMobileMedia={this.props.isMobileMedia} isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
+        <Footer isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
       </div>
     );
   }
-
-  /*private onProviderChanged = async (event: ProviderChangedEvent) => {
-    this.setState({ ...this.state, selectedKey: this.state.selectedKey, priceGraphData: priceGraphData });
-  };*/
 }
