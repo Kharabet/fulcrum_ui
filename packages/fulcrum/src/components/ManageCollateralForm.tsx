@@ -56,7 +56,6 @@ interface ITradeAmountChangeEvent {
   tradedAmountEstimate: BigNumber;
   slippageRate: BigNumber;
   exposureValue: BigNumber;
-  currentValue: number;
   selectedValue: number;
 }
 //#endregion tradeComponent
@@ -89,7 +88,6 @@ export interface IManageCollateralFormProps {
 interface IManageCollateralFormState {
   // assetDetails: AssetDetails | null;
   positionValue: number;
-  currentValue: number;
   selectedValue: number;
   diffAmount: BigNumber;
   collateralAmount: BigNumber;
@@ -174,7 +172,6 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
     this.state = {
       // assetDetails: AssetsDictionary.assets.get(this.props.asset) || null,
       positionValue: 150,
-      currentValue: 150,
       selectedValue: 150,
       diffAmount: new BigNumber(0),
 
@@ -229,7 +226,7 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
       switchMap((value) => new Observable<ITradeAmountChangeEvent | null>((observer) => observer.next(value)))
     ).subscribe(next => {
       if (next) {
-        this._isMounted && this.setState({ ...this.state, ...next, isLoading: false, isExposureLoading: false, selectedValue: 150 });
+        this._isMounted && this.setState({ ...this.state, ...next, isLoading: false, isExposureLoading: false });
       } else {
         this._isMounted && this.setState({
           ...this.state,
@@ -242,8 +239,7 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
           exposureValue: new BigNumber(0),
           isLoading: false,
           isExposureLoading: false, 
-          selectedValue: 150, 
-          currentValue: 150,
+          selectedValue: 150
         })
       }
     });
@@ -271,7 +267,6 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
   //#endregion tradeComponent
 
   private async derivedUpdate() {
-    this.setState({ ...this.state,isLoading: true });
     //#region tradeComponent
     let assetDetails = AssetsDictionary.assets.get(this.props.asset);
     if (this.props.isMobileMedia) {
@@ -291,7 +286,7 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
 
     // maxTradeValue is raw here, so we should not use it directly
    const tradeRequest = new ManageCollateralRequest(
-      new BigNumber(this.state.currentValue),
+      new BigNumber(this.state.selectedValue),
       this.props.tradeType,
       this.props.asset,
       this.state.selectedUnitOfAccount,
@@ -357,8 +352,7 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
   //#endregion tradeComponent
 
   public async componentDidMount() {
-    // this.derivedUpdate();
-
+    
     //#region tradeComponent
     this._isMounted = true;
     await this.derivedUpdate();
@@ -378,8 +372,6 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
     snapshot?: any
   ): void {
     if (
-      prevProps.asset !== this.props.asset ||
-      prevState.positionValue !== this.state.positionValue ||
       //#region tradeComponent
       this.props.tradeType !== prevProps.tradeType ||
       this.props.asset !== prevProps.asset ||
@@ -394,18 +386,18 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
     ) {
       // this.derivedUpdate();
       //#region tradeComponent
-      if (this.state.collateral !== prevState.collateral) {
-        this._isMounted && this.setState({
-          ...this.state,
-          inputAmountText: "",
-          inputAmountValue: new BigNumber(0),
-          tradeAmountValue: new BigNumber(0)
-        }, () => {
-          this.derivedUpdate();
-        });
-      } else {
-        this.derivedUpdate();
-      }
+      // if (this.state.collateral !== prevState.collateral) {
+      //   this._isMounted && this.setState({
+      //     ...this.state,
+      //     inputAmountText: "",
+      //     inputAmountValue: new BigNumber(0),
+      //     tradeAmountValue: new BigNumber(0)
+      //   }, () => {
+      //     this.derivedUpdate();
+      //   });
+      // } else {
+      //   this.derivedUpdate();
+      // }
       //#endregion tradeComponent
 
     }
@@ -438,14 +430,13 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
 
           <div className="manage-collateral-form__title">Manage Collateral</div>
           <div className="manage-collateral-form__text">Your position is collateralized</div>
-          <div className="manage-collateral-form__collaterized"><span>{this.state.currentValue.toFixed(2)}</span>%</div>
+          <div className="manage-collateral-form__collaterized"><span>{this.state.selectedValue.toFixed(2)}</span>%</div>
 
 
           <CollateralSlider
             minValue={this.minValue}
-            // maxValue={this.state.inputAmountText}
             maxValue={this.maxValue}
-            value={this.state.currentValue}
+            value={this.state.selectedValue}
             onUpdate={this.onUpdate}
             onChange={this.onChange}
           />
@@ -496,7 +487,8 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
                     step="any"
                     ref={this._setInputRef}
                     className="trade-form__amount-input"
-                    value={!this.state.isLoading ? this.formatPrecision(Number(this.state.inputAmountText))  : ""}
+                    //value={!this.state.isLoading ? this.state.inputAmountValue.toFixed(5)  : ""}
+                     value={!this.state.isLoading ? this.formatPrecision(Number(this.state.inputAmountText))  : ""}
                     onChange={this.onTradeAmountChange}
                   />
                   {!this.state.isLoading ? null
@@ -563,17 +555,16 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
   }
 
   private onChange = (value: number) => {
-    this.setState({ ...this.state, currentValue: value });
+    this.setState({ ...this.state, selectedValue: value });
 
-     const collateralAmount = this.state.collateralizedPercent.multipliedBy(this.state.currentValue);
-
-    this._inputChange.next(collateralAmount.toFixed(4));
+     const collateralAmount = this.state.collateralizedPercent.multipliedBy(this.state.selectedValue);
+     this._inputChange.next(collateralAmount.toFixed(4));
   };
 
   private onUpdate = (value: number) => {
-    this.setState({ ...this.state, selectedValue: value }); 
-    const collateralAmount = this.state.collateralizedPercent.multipliedBy(this.state.currentValue);
-
+    this.setState({ ...this.state, selectedValue: value, isLoading:true });  
+    
+    const collateralAmount = this.state.collateralizedPercent.multipliedBy(this.state.selectedValue);
     this._inputChange.next(collateralAmount.toFixed(4));
   };
   /*
@@ -635,7 +626,7 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
 
     this.props.onManage(
       new ManageCollateralRequest(
-        new BigNumber(this.state.currentValue),
+        new BigNumber(this.state.selectedValue),
         this.props.tradeType,
         this.props.asset,
         asset,
@@ -735,7 +726,7 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
     TagManager.dataLayer(tagManagerArgs)
     this.props.onSubmit(
       new ManageCollateralRequest(
-        new BigNumber(this.state.currentValue),
+        new BigNumber(this.state.selectedValue),
         this.props.tradeType,
         this.props.asset,
         this.state.selectedUnitOfAccount,
@@ -755,13 +746,25 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
 
       this._isMounted && this.setState({ ...this.state, isLoading: true });
       const tradeTokenKey = this.getTradeTokenGridRowSelectionKey();
+     
       FulcrumProvider.Instance.getMaxTradeValue(this.props.tradeType, tradeTokenKey, this.state.collateral)
         .then(maxTradeValue => {
           // maxTradeValue is raw here, so we should not use it directly
-          this.getInputAmountLimitedFromBigNumber(maxTradeValue, tradeTokenKey, maxTradeValue, multiplier, true).then(limitedAmount => {
+          const selectedValue = new BigNumber(maxTradeValue).multipliedBy(multiplier).dividedBy(this.state.collateralizedPercent).toNumber();
+          let value = maxTradeValue;
+          if(selectedValue < this.minValue){
+            value = new BigNumber(this.minValue).multipliedBy(this.state.collateralizedPercent);
+            multiplier = new BigNumber(1);
+          }
+          
+          
+          this.getInputAmountLimitedFromBigNumber(value, tradeTokenKey, maxTradeValue, multiplier, true).then(limitedAmount => {
             if (!limitedAmount.tradeAmountValue.isNaN()) {
+            
+              const selectedValue = limitedAmount.inputAmountValue.dividedBy(this.state.collateralizedPercent).toNumber();
+             
               const tradeRequest = new ManageCollateralRequest(
-                new BigNumber(this.state.currentValue),
+                new BigNumber(this.state.selectedValue),
                 this.props.tradeType,
                 this.props.asset,
                 this.state.selectedUnitOfAccount,
@@ -773,7 +776,6 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
                 this.props.version,
                 this.state.inputAmountValue
               );
-              const selectedValue = limitedAmount.inputAmountValue.dividedBy(this.state.collateralizedPercent).toNumber();
 
               this.getTradeExpectedResults(tradeRequest).then(tradeExpectedResults => {
                 observer.next({
@@ -786,7 +788,6 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
                   slippageRate: tradeExpectedResults.slippageRate,
                   exposureValue: tradeExpectedResults.exposureValue,
                   selectedValue: selectedValue,
-                  currentValue: selectedValue
                 });
               });
             } else {
@@ -794,6 +795,7 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
             }
           });
         });
+
 
     });
   };
@@ -804,12 +806,17 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
       this._isMounted && this.setState({ ...this.state, isExposureLoading: true });
       const tradeTokenKey = this.getTradeTokenGridRowSelectionKey();
       const maxTradeValue = this.state.maxTradeValue;
-     
+      const selectedValue = new BigNumber(value).dividedBy(this.state.collateralizedPercent).toNumber();
+
+      if(selectedValue < this.minValue){
+        value = new BigNumber(this.minValue).multipliedBy(this.state.collateralizedPercent).toFixed();
+      }
+              
       this.getInputAmountLimitedFromText(value, tradeTokenKey, maxTradeValue, false).then(limitedAmount => {
         // updating stored value only if the new input value is a valid number
         if (!limitedAmount.tradeAmountValue.isNaN()) {
           const tradeRequest = new ManageCollateralRequest(
-            new BigNumber(this.state.currentValue),
+            new BigNumber(this.state.selectedValue),
             this.props.tradeType,
             this.props.asset,
             this.state.selectedUnitOfAccount,
@@ -833,9 +840,8 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
               tradedAmountEstimate: tradeExpectedResults.tradedAmountEstimate,
               slippageRate: tradeExpectedResults.slippageRate,
               exposureValue: tradeExpectedResults.exposureValue,
-              selectedValue: selectedValue,
-              currentValue: selectedValue
-
+              selectedValue: selectedValue
+              
             });
           });
         } else {
