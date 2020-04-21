@@ -161,7 +161,7 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
       <form className="repay-loan-form" onSubmit={this.onSubmitClick}>
         <section className="dialog-content">
           <InputAmount
-            asset={this.state.assetDetails.displayName}
+            asset={this.state.assetDetails.reactLogoSvg}
             inputAmountText={this.state.inputAmountText}
             updateInterestAmount={this.updateInterestAmount}
             onTradeAmountChange={this.onTradeAmountChange}

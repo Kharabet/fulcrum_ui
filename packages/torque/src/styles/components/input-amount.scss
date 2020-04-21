@@ -20,10 +20,15 @@
             width: calc(100% - 80px);
         }
         .asset-icon {
-            border: 2px solid #ffffff;
+            display: flex;
+            border: 3px solid #ffffff;
             border-radius: 50%;
             position: absolute;
             left: 0;
+            svg{
+                width: 36px;
+                height: auto;
+            }
         }
     }
 
