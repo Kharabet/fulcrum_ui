@@ -10,10 +10,11 @@
     width: 100%;
     border-radius: 16px;
     background: #f3f9ff;
-    border: 1px solid #a9b5c7;
     padding: 35px 50px;
+    border: 1px solid transparent;
     &:hover {
       background: #fff;
+      border: 1px solid #a9b5c7;
       .borrowed-funds-list-item__header-loan-interest-rate {
         color: #00c0ab;
       }
