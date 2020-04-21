@@ -1,12 +1,10 @@
 import React, { Component } from "react";
 import { Asset } from "../domain/Asset";
-import { FulcrumMcdBridgeRequest } from "../domain/FulcrumMcdBridgeRequest";
 import { LendRequest } from "../domain/LendRequest";
 import { LendTokenSelectorItem } from "./LendTokenSelectorItem";
 
 export interface ILendTokenSelectorProps {
   onLend: (request: LendRequest) => void;
-  onFulcrumMcdBridge: (request: FulcrumMcdBridgeRequest) => void;
 }
 
 export class LendTokenSelector extends Component<ILendTokenSelectorProps> {
@@ -46,7 +44,7 @@ export class LendTokenSelector extends Component<ILendTokenSelectorProps> {
   }
 
   public render() {
-    const tokenItems = LendTokenSelector.assets.map(e => <LendTokenSelectorItem key={e} asset={e} onLend={this.props.onLend} onFulcrumMcdBridge={this.props.onFulcrumMcdBridge} />);
+    const tokenItems = LendTokenSelector.assets.map(e => <LendTokenSelectorItem key={e} asset={e} onLend={this.props.onLend} />);
 
     return <div className="lend-token-selector">{tokenItems}</div>;
   }

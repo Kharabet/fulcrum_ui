@@ -102,7 +102,6 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
     } else {
       assets = [
         Asset.ETH,
-        // Asset.SAI,
         // Asset.DAI,
         // Asset.USDC,
         // Asset.SUSD,
