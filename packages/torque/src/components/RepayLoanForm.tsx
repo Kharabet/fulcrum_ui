@@ -2,7 +2,6 @@ import { BigNumber } from "@0x/utils";
 import React, { ChangeEvent, Component, FormEvent } from "react";
 import { Observable, Subject } from "rxjs";
 import { debounceTime, switchMap } from "rxjs/operators";
-import { ActionType } from "../domain/ActionType";
 import { Asset } from "../domain/Asset";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
@@ -10,8 +9,7 @@ import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
 import { IRepayEstimate } from "../domain/IRepayEstimate";
 import { RepayLoanRequest } from "../domain/RepayLoanRequest";
 import { TorqueProvider } from "../services/TorqueProvider";
-import { OpsEstimatedResult } from "./OpsEstimatedResult";
-import { RepayLoanSlider } from "./RepayLoanSlider";
+import { InputAmount } from "./InputAmount";
 
 export interface IRepayLoanFormProps {
   loanOrderState: IBorrowedFundsState;
@@ -33,13 +31,12 @@ interface IRepayLoanFormState {
   repayManagementAddress: string | null;
   gasAmountNeeded: BigNumber;
   balanceTooLow: boolean;
-
   didSubmit: boolean;
+  interestAmount: number;
 }
 
 export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanFormState> {
   private readonly _inputPrecision = 6;
-  private _input: HTMLInputElement | null = null;
 
   private readonly _inputTextChange: Subject<string>;
 
@@ -59,7 +56,8 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
       repayManagementAddress: null,
       gasAmountNeeded: new BigNumber(0),
       balanceTooLow: false,
-      didSubmit: false
+      didSubmit: false,
+      interestAmount: 0
     };
 
     this.selectedValueUpdate = new Subject<number>();
@@ -149,11 +147,10 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
         });
       });
     }
+    if (prevState.interestAmount !== this.state.interestAmount)
+      this.updateRepayAmount(this.state.interestAmount);
   }
 
-  private _setInputRef = (input: HTMLInputElement) => {
-    this._input = input;
-  };
 
   public render() {
     if (this.state.assetDetails === null) {
@@ -163,42 +160,17 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
     return (
       <form className="repay-loan-form" onSubmit={this.onSubmitClick}>
         <section className="dialog-content">
-          <div className="repay-loan-form__input-container" style={{ paddingBottom: `1rem` }}>
-            <input
-              ref={this._setInputRef}
-              className="repay-loan-form__input-container__input-amount"
-              type="text"
-              onChange={this.onTradeAmountChange}
-              placeholder={`Enter amount`}
-              value={this.state.inputAmountText}
-            />
-          </div>
-
-          <RepayLoanSlider
-            readonly={false}
-            minValue={this.state.minValue}
-            maxValue={this.state.maxValue}
-            value={this.state.currentValue}
-            onUpdate={this.onUpdate}
-            onChange={this.onChange}
+          <InputAmount
+            asset={this.state.assetDetails.displayName}
+            inputAmountText={this.state.inputAmountText}
+            updateInterestAmount={this.updateInterestAmount}
+            onTradeAmountChange={this.onTradeAmountChange}
+            interestAmount={this.state.interestAmount}
           />
-
-          <div className="repay-loan-form__tips">
-            <div className="repay-loan-form__tip">Current state</div>
-            <div className="repay-loan-form__tip">Full repayment</div>
-          </div>
-
-          <hr className="repay-loan-form__delimiter" />
-
-          <OpsEstimatedResult
-            assetDetails={this.state.assetDetails}
-            actionTitle="You will repay"
-            amount={this.state.repayAmount}
-            precision={6}
-          />
-          <div className={`repay-loan-form-insufficient-balance ${!this.state.balanceTooLow ? `repay-loan-form-insufficient-balance--hidden` : ``}`}>
-            Insufficient {this.state.assetDetails.displayName} balance in your wallet!
-              </div>
+          {this.state.balanceTooLow
+            ? <div className="repay-loan-form__insufficient-balance">Insufficient {this.state.assetDetails.displayName} balance in your wallet!</div>
+            : null
+          }
         </section>
         <section className="dialog-actions">
           <div className="repay-loan-form__actions-container">
@@ -240,14 +212,6 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
         observer.next(value);
       });
     });
-  };
-
-  private onChange = (value: number) => {
-    this.setState({ ...this.state, selectedValue: value, currentValue: value });
-  };
-
-  private onUpdate = (value: number) => {
-    this.setState({ ...this.state, selectedValue: value });
   };
 
   public onSubmitClick = async (event: FormEvent<HTMLFormElement>) => {
@@ -324,4 +288,18 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
       this._inputTextChange.next(this.state.inputAmountText);
     });
   };
+
+  public updateRepayAmount = (value: number) => {
+    let repayAmount = this.props.loanOrderState.amountOwed.multipliedBy(this.state.interestAmount);
+    let repayAmountText = repayAmount.toString();
+    this.setState({
+      ...this.state,
+      repayAmount: repayAmount,
+      inputAmountText: repayAmountText
+    })
+  }
+
+  public updateInterestAmount = (interest: number) => {
+    this.setState({ ...this.state, interestAmount: interest })
+  }
 }
