@@ -243,7 +243,7 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
               )}
             <CollateralSlider
               readonly={false}
-            
+              
               minValue={this.state.minValue}
               maxValue={this.state.maxValue}
               value={this.state.selectedValue}

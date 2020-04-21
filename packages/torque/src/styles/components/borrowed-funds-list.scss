@@ -118,12 +118,12 @@
             color: #de4a4a;
           }
         }
-        &-value{
+        &-value {
           font-weight: 600;
           font-size: 20px;
           line-height: 150%;
           color: #283049;
-          .value{
+          .value {
             font-weight: 800;
           }
         }
@@ -149,9 +149,10 @@
         font-size: 16px;
         line-height: 150%;
         color: #276bfb;
-        &:hover{
+        outline: none;
+        &:hover {
           color: #fff;
-          background: #5B88FF;
+          background: #5b88ff;
           cursor: pointer;
         }
       }
@@ -179,6 +180,15 @@
     order: 0;
     align-self: center;
     margin: 10px 10px 0px 0px;
+  }
+
+  @media screen and (max-width: $breakpoint-mobile-max) {
+    grid-template-columns: repeat(1, 1fr);
+    grid-row-gap: 30px;
+
+    .borrowed-funds-list-item {
+      padding: 20px 25px;
+    }
   }
 
   // .borrowed-funds-list-item {

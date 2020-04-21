@@ -143,6 +143,7 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
           <div className="borrowed-funds-list-item__body-slider-container">
             <CollateralSlider
               readonly={true}
+              showExactCollaterization={positionSafetyText !== "Safe"}
               minValue={sliderMin}
               maxValue={sliderMax}
               value={sliderValue}
