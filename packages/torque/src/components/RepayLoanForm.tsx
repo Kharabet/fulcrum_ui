@@ -166,6 +166,7 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
             updateInterestAmount={this.updateInterestAmount}
             onTradeAmountChange={this.onTradeAmountChange}
             interestAmount={this.state.interestAmount}
+            isShowAsset={true}
           />
           {this.state.balanceTooLow
             ? <div className="repay-loan-form__insufficient-balance">Insufficient {this.state.assetDetails.displayName} balance in your wallet!</div>

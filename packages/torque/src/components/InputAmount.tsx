@@ -4,6 +4,7 @@ interface IInputAmountProps {
     inputAmountText: string;
     asset: any;
     interestAmount: number;
+    isShowAsset: boolean;
     updateInterestAmount: (state: number) => void;
     onTradeAmountChange: (event: ChangeEvent<HTMLInputElement>) => void;
 }
@@ -36,7 +37,10 @@ export class InputAmount extends Component<IInputAmountProps, IInputAmountState>
             <React.Fragment>
                 <div className="input-container">
                     <div className="input-row">
-                        <span className="asset-icon">{this.props.asset.render()}</span>
+                        {this.props.isShowAsset
+                            ? <span className="asset-icon">{this.props.asset.render()}</span>
+                            : null
+                        }
                         <input
                             ref={this._setInputRef}
                             className="input-amount"
