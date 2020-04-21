@@ -212,7 +212,7 @@ export class RefinanceAssetCompoundLoanItemMobile extends Component<IRefinanceLo
 
             <div className="refinance-asset-selector__loan">
               <div className="refinance-asset-selector__loanvalue">
-                {this.props.balance.dp(3, BigNumber.ROUND_FLOOR).toString()}
+                {this.state.borrowAmount.dp(3, BigNumber.ROUND_FLOOR).toString()}
               </div>
               <div className="refinance-asset-selector__loantxt">Loan</div>
             </div>
