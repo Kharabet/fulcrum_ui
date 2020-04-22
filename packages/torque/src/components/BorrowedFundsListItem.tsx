@@ -122,16 +122,17 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
           </div>
         </div>
         <div className="borrowed-funds-list-item__body">
-          {positionSafetyText !== "Display Error" &&
-            <div
-              title={`${item.collateralizedPercent.multipliedBy(100).plus(100).toFixed(18)}%`}
-              className={`borrowed-funds-list-item__body-collateralized ${collateralizedStateSelector}`}>
-              <span className="value">{item.collateralizedPercent.multipliedBy(100).plus(100).toFixed(2)}</span>%
-                </div>
-          }
           <div className="d-flex j-c-sb">
             {positionSafetyText !== "Display Error" &&
-              <div className="borrowed-funds-list-item__body-collateralized-label">Collateralized</div>
+              <div>
+                <div
+                  title={`${item.collateralizedPercent.multipliedBy(100).plus(100).toFixed(18)}%`}
+                  className={`borrowed-funds-list-item__body-collateralized ${collateralizedStateSelector}`}>
+                  <span className="value">{item.collateralizedPercent.multipliedBy(100).plus(100).toFixed(2)}</span>%
+                </div>
+                <div className="borrowed-funds-list-item__body-collateralized-label">Collateralized</div>
+
+              </div>
             }
             <div className={`borrowed-funds-list-item__body-collateralized-state ${collateralizedStateSelector}`}>
               {positionSafetyText}
@@ -143,6 +144,7 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
           <div className="borrowed-funds-list-item__body-slider-container">
             <CollateralSlider
               readonly={true}
+              showExactCollaterization={positionSafetyText !== "Safe"}
               minValue={sliderMin}
               maxValue={sliderMax}
               value={sliderValue}

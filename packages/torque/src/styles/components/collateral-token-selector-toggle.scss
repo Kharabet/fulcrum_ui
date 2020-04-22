@@ -1,52 +1,44 @@
 .collateral-token-selector-toggle {
   display: flex;
-  flex-direction: row;
+  background-color: #f5f7f9;
+  border-radius: 26px;
+  padding: 2px;
+  border: 2px solid transparent;
+  position: relative;
+  &.active {
+    background-color: #ffffff;
+    border-color: #5b88ff;
+  }
 
-  padding: 0.5rem 0;
+  &__logo-container {
+    display: flex;
+    margin-right: 8px;
+  }
 
-  .collateral-token-selector-toggle__logo-container {
-    height: 2.5rem;
-    width: 2.5rem;
-
-    margin-right: 1.25rem;
-
-    img {
-      height: 2.5rem;
-      width: 2.5rem;
+  &__info-container {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    position: relative;
+    padding-right: 10px;
+  }
+  &__arrow {
+    display: flex;
+    path {
+      .active & {
+        fill: #5b88ff;
+      }
+    }
+    .active & {
+      transform: rotateX(180deg);
     }
   }
 
-  .collateral-token-selector-toggle__info-container {
-    display: flex;
-    flex-direction: column;
-
-    height: 2.5rem;
-
-    .collateral-token-selector-toggle__info-title {
-      height: 1.25rem;
-      font-size: 0.75rem;
-      font-weight: normal;
-      font-style: normal;
-      font-stretch: normal;
-      line-height: 1.67;
-      letter-spacing: normal;
-      text-align: left;
-      color: $color-gray-darker-3;
-    }
-
-    .collateral-token-selector-toggle__change-action {
-      cursor: pointer;
-
-      height: 1.25rem;
-      font-size: 0.75rem;
-      font-weight: normal;
-      font-style: normal;
-      font-stretch: normal;
-      line-height: 2;
-      letter-spacing: normal;
-      text-align: left;
-      color: #6488ff;
-      text-decoration: underline;
-    }
+  &__info-title {
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.5;
+    color: $color-gray-darker-3;
+    margin-right: 10px;
   }
 }

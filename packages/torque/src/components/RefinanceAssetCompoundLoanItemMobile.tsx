@@ -119,10 +119,11 @@ export class RefinanceAssetCompoundLoanItemMobile extends Component<IRefinanceLo
   };
 
   public migrateLoan = async () => {
+    const loan = Object.assign({},this.props);
     if (this.props.type == "dydx") {
-      await TorqueProvider.Instance.migrateSoloLoan(this.props, this.props.balance.div(10)); // TODO
+      await TorqueProvider.Instance.migrateSoloLoan(loan, this.state.borrowAmount); // TODO
     } else {
-      await TorqueProvider.Instance.migrateCompoundLoan(this.props, this.props.balance.div(10)); // TODO
+      await TorqueProvider.Instance.migrateCompoundLoan(loan, this.state.borrowAmount); // TODO
     }
   };
 
@@ -212,7 +213,7 @@ export class RefinanceAssetCompoundLoanItemMobile extends Component<IRefinanceLo
 
             <div className="refinance-asset-selector__loan">
               <div className="refinance-asset-selector__loanvalue">
-                {this.props.balance.dp(3, BigNumber.ROUND_FLOOR).toString()}
+                {this.state.borrowAmount.dp(3, BigNumber.ROUND_FLOOR).toString()}
               </div>
               <div className="refinance-asset-selector__loantxt">Loan</div>
             </div>

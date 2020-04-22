@@ -391,7 +391,7 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
       this.setState({ ...this.state, didSubmit: true });
 
       if (this.state.loanValue < this.state.selectedValue) {
-        let assetBalance = await TorqueProvider.Instance.getEthBalance.getAssetTokenBalanceOfUser(this.props.loanOrderState.collateralAsset);
+        let assetBalance = await TorqueProvider.Instance.getAssetTokenBalanceOfUser(this.props.loanOrderState.collateralAsset);
         if (this.props.loanOrderState.collateralAsset === Asset.ETH) {
           assetBalance = assetBalance.gt(TorqueProvider.Instance.gasBufferForTxn) ? assetBalance.minus(TorqueProvider.Instance.gasBufferForTxn) : new BigNumber(0);
         }

@@ -65,7 +65,17 @@ export class TVChartContainer extends React.PureComponent<Partial<ChartContainer
 		interval: '30',
 		containerId: 'tv_chart_container',
 		datafeedUrl: 'https://api.kyber.network/chart',
-		disabledFeatures: ["left_toolbar", "header_compare", "header_undo_redo", "header_saveload", "header_settings", "header_screenshot", 'use_localstorage_for_settings', "header_fullscreen_button", "go_to_date"],
+		disabledFeatures: [
+			"left_toolbar",
+			"header_compare",
+			"header_undo_redo",
+			"header_saveload",
+			"header_settings",
+			"header_screenshot",
+			'use_localstorage_for_settings',
+			"header_fullscreen_button", "go_to_date",
+			"timeframes_toolbar"
+		],
 		libraryPath: '/charting_library/',
 		chartsStorageUrl: 'https://saveload.tradingview.com',
 		chartsStorageApiVersion: '1.1',

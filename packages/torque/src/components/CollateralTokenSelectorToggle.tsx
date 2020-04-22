@@ -2,7 +2,8 @@ import React, { Component, RefObject } from "react";
 import { Asset } from "../domain/Asset";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
-import { CollateralTokenSelectorDlg } from "./CollateralTokenSelectorDlg";
+import { CollateralTokenSelector } from "./CollateralTokenSelector";
+import { ReactComponent as ArrowSelect } from '../assets/images/arrow-select.svg';
 
 export interface ICollateralTokenSelectorToggleProps {
   borrowAsset: Asset;
@@ -14,17 +15,21 @@ export interface ICollateralTokenSelectorToggleProps {
 
 interface IAssetSelectorItemState {
   assetDetails: AssetDetails | null;
+  activeToggle: boolean;
 }
 
 export class CollateralTokenSelectorToggle extends Component<ICollateralTokenSelectorToggleProps, IAssetSelectorItemState> {
-  private collateralTokenSelectorDlgRef: RefObject<CollateralTokenSelectorDlg>;
+  private CollateralTokenSelectorRef: RefObject<CollateralTokenSelector>;
 
   constructor(props: ICollateralTokenSelectorToggleProps) {
     super(props);
 
-    this.collateralTokenSelectorDlgRef = React.createRef();
+    this.CollateralTokenSelectorRef = React.createRef();
 
-    this.state = { assetDetails: null };
+    this.state = {
+      assetDetails: null,
+      activeToggle: false
+    };
   }
 
   public componentDidMount(): void {
@@ -53,28 +58,32 @@ export class CollateralTokenSelectorToggle extends Component<ICollateralTokenSel
 
     return (
       <React.Fragment>
-        <CollateralTokenSelectorDlg ref={this.collateralTokenSelectorDlgRef} />
-        <div className="collateral-token-selector-toggle">
+        <div className={`collateral-token-selector-toggle ${this.state.activeToggle ? `active` : ``}`}>
           <div className="collateral-token-selector-toggle__logo-container">
-            <img src={this.state.assetDetails.logoSvg} />
+            {this.state.assetDetails.reactLogoSvg.render()}
           </div>
-          <div className="collateral-token-selector-toggle__info-container">
-            <div className="collateral-token-selector-toggle__info-title">Collateral: {this.props.collateralAsset}</div>
-            {this.props.readonly ? null : <div className="collateral-token-selector-toggle__change-action" onClick={this.onChangeClick}>Change</div>}
+          <div className="collateral-token-selector-toggle__info-container" onClick={this.onChangeClick}>
+            <div className="collateral-token-selector-toggle__info-title">Collateral {this.props.collateralAsset}</div>
+            <span className="collateral-token-selector-toggle__arrow"><ArrowSelect /></span>
           </div>
+          <CollateralTokenSelector ref={this.CollateralTokenSelectorRef} updateStateActiveToggle={this.updateStateActiveToggle} />
         </div>
       </React.Fragment>
     );
   }
 
   private onChangeClick = async () => {
-    if (this.collateralTokenSelectorDlgRef.current) {
+    if (this.CollateralTokenSelectorRef.current) {
       try {
-        const collateralAsset = await this.collateralTokenSelectorDlgRef.current.getValue(this.props.borrowAsset, this.props.collateralAsset);
+        const collateralAsset = await this.CollateralTokenSelectorRef.current.getValue(this.props.borrowAsset, this.props.collateralAsset);
         this.props.onChange(collateralAsset);
       } finally {
-        await this.collateralTokenSelectorDlgRef.current.hide();
+        await this.CollateralTokenSelectorRef.current.onClose();
       }
     }
   };
+
+  public updateStateActiveToggle = (activeToggle: boolean) => {
+    this.setState({ ...this.state, activeToggle: activeToggle })
+  }
 }
