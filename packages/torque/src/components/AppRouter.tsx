@@ -161,7 +161,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
     }
   }
   public doNetworkConnect = async () => {
-    await !this.state.isProviderMenuModalOpen && this._isMounted && this.setState({ ...this.state, isProviderMenuModalOpen: true });
+    await this._isMounted &&  !this.state.isProviderMenuModalOpen && this.setState({ ...this.state, isProviderMenuModalOpen: true });
   };
 
   public onDeactivate = async () => {

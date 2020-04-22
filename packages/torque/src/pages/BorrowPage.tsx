@@ -36,9 +36,9 @@ export class BorrowPage extends PureComponent<IBorrowPageParams & RouteComponent
         <BorrowDlg ref={this.borrowDlgRef} />
         <div className="borrow-page">
           <HeaderOps isMobileMedia={this.props.isMobileMedia} isLoading={this.props.isLoading} doNetworkConnect={this.props.doNetworkConnect} isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
-          <div className="borrow-page__main">
+          <main>
             <AssetSelector  onSelectAsset={this.onSelectAsset} />
-          </div>
+          </main>
           <Footer isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
         </div>
       </React.Fragment>

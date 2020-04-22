@@ -112,17 +112,20 @@ export class DashboardPage extends PureComponent<
         <BorrowMoreDlg ref={this.borrowMoreDlgRef} />
         <div className="dashboard-page">
           <HeaderOps isMobileMedia={this.props.isMobileMedia} isLoading={this.props.isLoading} doNetworkConnect={this.props.doNetworkConnect} isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
-          <div className="dashboard-page__main">
+          
+          <main>
 
             {!TorqueProvider.Instance.unsupportedNetwork ? (
               <React.Fragment>
                 {this.state.isDataLoading
                   ? <Loader />
-                  : (<React.Fragment>
-                    <div onClick={this.refreshPage} style={{ cursor: `pointer`, textAlign: `center`, fontSize: `2rem`, paddingBottom: `1.5rem` }}>
+                  : (<div className="page-header">
+                    <h1>Your Loans</h1>
+                    <p>Lorem ipsum is placeholder text commonly used in the graphic, print, and publishing industries for previewing layouts and visual mockups.</p>
+                    {/* <div onClick={this.refreshPage} style={{ cursor: `pointer`, textAlign: `center`, fontSize: `2rem`, paddingBottom: `1.5rem` }}>
                       Click to refresh and see recent loan activity.
-                        </div>
-                  </React.Fragment>)
+                        </div> */}
+                  </div>)
                 }
                 <BorrowedFundsList
                   items={this.state.items}
@@ -142,7 +145,7 @@ export class DashboardPage extends PureComponent<
                 </div>
               )
             }
-          </div>
+          </main>
           <Footer isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
         </div>
       </React.Fragment>
