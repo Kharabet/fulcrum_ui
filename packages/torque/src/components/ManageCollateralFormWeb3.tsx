@@ -94,15 +94,7 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
         debounceTime(100),
         switchMap(value => this.rxConvertToBigNumber(value)),
         switchMap(value => this.rxGetEstimate(value.toNumber()))
-      )/*.subscribe((value: ICollateralChangeEstimate) => {
-        this.setState({
-          ...this.state,
-          liquidationPrice: value.liquidationPrice,
-          collateralAmount: value.collateralAmount,
-          collateralizedPercent: value.collateralizedPercent,
-          inputAmountText: value.collateralAmount.toString()
-        });
-      });*/
+      )
       .subscribe((value: ICollateralChangeEstimate) => {
         this.setState({
           ...this.state,
@@ -307,8 +299,7 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
                   inputAmountText={this.formatPrecision(Number(this.state.inputAmountText))}
                   updateInterestAmount={this.updateInterestAmount}
                   onTradeAmountChange={this.onTradeAmountChange}
-                  interestAmount={this.state.interestAmount}
-                  isShowAsset={true}
+                  interestAmount={this.state.interestAmount}             
                 />
               </section>
               <section className="dialog-actions">
@@ -339,19 +330,17 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
 
     let collateralAmount = new BigNumber(0);
     if (this.state.loanValue !== selectedValue && this.props.loanOrderState.loanData) {
-      // if (selectedValue < this.state.loanValue) {
-      //   collateralAmount = new BigNumber(this.state.loanValue)
-      //     .minus(selectedValue)
-      //     .dividedBy(this.state.loanValue)
-      //     .multipliedBy(this.state.collateralExcess);
-      // } else {
+      if (selectedValue < this.state.loanValue) {
+        collateralAmount = new BigNumber(this.state.loanValue)
+          .minus(selectedValue)
+          .dividedBy(this.state.loanValue)
+          .multipliedBy(this.state.collateralExcess);
+      } else {
       collateralAmount = new BigNumber(selectedValue)
         .minus(this.state.loanValue)
         .dividedBy(this.state.maxValue - this.state.loanValue)
         .multipliedBy(this.props.loanOrderState.collateralAmount);
-      // .multipliedBy(this.state.maxValue)
-      // .dividedBy(this.state.maxValue - this.state.loanValue);
-      // }
+      }
       // console.log(collateralAmount.toString(), this.state.maxValue, this.props.loanOrderState.collateralAmount.toString());
     }
 
@@ -486,13 +475,13 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
 
   private formatPrecision(output: number): string {
     let sign = "";
-    if (output < 0)
+    if (this.state.loanValue > this.state.selectedValue)
       sign = "-";
     let n = Math.log(Math.abs(output)) / Math.LN10;
     let x = 4 - n;
     if (x < 0) x = 0;
     if (x > 5) x = 5;
     let result = new Number(output.toFixed(x)).toString();
-    return result?? sign + result;
+    return result!="0"? sign + result:result;
   }
 }
