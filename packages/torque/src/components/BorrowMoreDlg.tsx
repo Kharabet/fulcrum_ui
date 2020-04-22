@@ -1,18 +1,18 @@
 import React, { Component } from "react";
 import ReactModal from "react-modal";
-import { ExtendLoanRequest } from "../domain/ExtendLoanRequest";
 import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
+import { RepayLoanRequest } from "../domain/RepayLoanRequest";
 import { DialogHeader } from "./DialogHeader";
-import { ExtendLoanForm } from "./ExtendLoanForm";
+import { RepayLoanForm } from "./RepayLoanForm";
 
-interface IExtendLoanDlgState {
+interface IBorrowMoreDlgState {
   isOpen: boolean;
   loanOrderState: IBorrowedFundsState | null;
 
-  executorParams: { resolve: (value?: ExtendLoanRequest) => void; reject: (reason?: any) => void } | null;
+  executorParams: { resolve: (value?: RepayLoanRequest) => void; reject: (reason?: any) => void } | null;
 }
 
-export class ExtendLoanDlg extends Component<any, IExtendLoanDlgState> {
+export class BorrowMoreDlg extends Component<any, IBorrowMoreDlgState> {
   public constructor(props: any, context?: any) {
     super(props, context);
 
@@ -30,11 +30,11 @@ export class ExtendLoanDlg extends Component<any, IExtendLoanDlgState> {
         isOpen={this.state.isOpen}
         className="modal-content-div"
         overlayClassName="modal-overlay-div"
-        onRequestClose={this.hide}
+        onRequestClose={this.onFormDecline}
         shouldCloseOnOverlayClick={false}
       >
-        <DialogHeader title="Front Interest" onDecline={this.onFormDecline} />
-        <ExtendLoanForm
+        <DialogHeader title="Borrow More" onDecline={this.onFormDecline} />
+        <RepayLoanForm
           loanOrderState={this.state.loanOrderState}
           onSubmit={this.onFormSubmit}
           onClose={this.onFormDecline}
@@ -43,12 +43,12 @@ export class ExtendLoanDlg extends Component<any, IExtendLoanDlgState> {
     );
   }
 
-  public getValue = async (item: IBorrowedFundsState): Promise<ExtendLoanRequest> => {
+  public getValue = async (item: IBorrowedFundsState): Promise<RepayLoanRequest> => {
     if (this.state.isOpen) {
-      return new Promise<ExtendLoanRequest>((resolve, reject) => reject());
+      return new Promise<RepayLoanRequest>((resolve, reject) => reject());
     }
 
-    return new Promise<ExtendLoanRequest>((resolve, reject) => {
+    return new Promise<RepayLoanRequest>((resolve, reject) => {
       this.setState({
         ...this.state,
         isOpen: true,
@@ -62,7 +62,7 @@ export class ExtendLoanDlg extends Component<any, IExtendLoanDlgState> {
     await this.setState({ ...this.state, isOpen: false, executorParams: null });
   };
 
-  private onFormSubmit = async (value: ExtendLoanRequest) => {
+  private onFormSubmit = async (value: RepayLoanRequest) => {
     if (this.state.executorParams) {
       this.state.executorParams.resolve(value);
     }

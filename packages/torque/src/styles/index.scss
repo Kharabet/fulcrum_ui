@@ -20,6 +20,7 @@
 @import "components/borrow-form.mobile";
 @import "components/borrowed-funds-list";
 @import "components/button";
+@import "components/collateral-slider";
 @import "components/collateral-token-selector-toggle";
 @import "components/collateral-token-selector";
 @import "components/collateral-token-selector.mobile";
@@ -37,6 +38,7 @@
 @import "components/repay-loan-form";
 @import "components/risk-disclosure";
 @import "components/loader";
+@import "components/input-amount";
 
 @import "layout/footer";
 @import "layout/header";
@@ -44,6 +46,7 @@
 @import "layout/header-logo";
 @import "layout/header-menu";
 @import "layout/header-menu.mobile";
+@import "layout/page-layout";
 
 @import "pages/borrow-page";
 @import "pages/refinance-page";

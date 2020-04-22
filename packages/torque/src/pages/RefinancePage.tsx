@@ -38,16 +38,16 @@ export class RefinancePage extends PureComponent<IRefinancePageParams & RouteCom
       <React.Fragment>
         <div className="refinance-page">
           <HeaderOps isMobileMedia={this.props.isMobileMedia} isLoading={this.props.isLoading} doNetworkConnect={this.props.doNetworkConnect} isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
-          <div className="refinance-page__main">
-            {isShowLoader
+
+          <main>            {isShowLoader
               ? <Loader />
-              : (
-                <React.Fragment>
+              : (<div className="page-header">
                   <h1>Refinance Your Loans</h1>
-                  <p className="description">Lorem ipsum is placeholder text commonly used in the graphic, print, and publishing industries for previewing layouts and visual mockups.</p>
-                </React.Fragment>
+                  <p>Lorem ipsum is placeholder text commonly used in the graphic, print, and publishing industries for previewing layouts and visual mockups.</p>
+                  </div>
               )
             }
+            <div className="refinance-list">
             {isMobileMedia
               ? <RefinanceAssetCompoundLoanMobile />
               : <RefinanceAssetCompoundLoan doNetworkConnect={this.props.doNetworkConnect} />}
@@ -55,7 +55,8 @@ export class RefinancePage extends PureComponent<IRefinancePageParams & RouteCom
               ? <RefinanceAssetSelectorMobile updateStateShowLoader={this.updateStateShowLoader} />
               : <RefinanceAssetSelector updateStateShowLoader={this.updateStateShowLoader} />
             }
-          </div>
+            </div>
+          </main>
           <Footer isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
         </div>
       </React.Fragment>

@@ -16,8 +16,6 @@ import { OpsEstimatedResult } from "./OpsEstimatedResult";
 export interface IExtendLoanFormProps {
   loanOrderState: IBorrowedFundsState;
 
-  didSubmit: boolean;
-  toggleDidSubmit: (submit: boolean) => void;
   onSubmit: (request: ExtendLoanRequest) => void;
   onClose: () => void;
 }
@@ -34,6 +32,8 @@ interface IExtendLoanFormState {
   extendManagementAddress: string | null;
   gasAmountNeeded: BigNumber;
   balanceTooLow: boolean;
+
+  didSubmit: boolean;
 }
 
 export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanFormState> {
@@ -51,7 +51,8 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
       depositAmount: new BigNumber(0),
       extendManagementAddress: null,
       gasAmountNeeded: new BigNumber(0),
-      balanceTooLow: false
+      balanceTooLow: false,
+      didSubmit: false
     };
 
     this.selectedValueUpdate = new Subject<number>();
@@ -178,8 +179,8 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
         </section>
         <section className="dialog-actions">
           <div className="extend-loan-form__actions-container">
-            <button type="submit" className={`btn btn-size--small ${this.props.didSubmit ? `btn-disabled` : ``}`}>
-              {this.props.didSubmit ? "Submitting..." : "Extend"}
+            <button type="submit" className={`btn btn-size--small ${this.state.didSubmit ? `btn-disabled` : ``}`}>
+              {this.state.didSubmit ? "Submitting..." : "Extend"}
             </button>
           </div>
         </section>
@@ -214,8 +215,8 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
   public onSubmitClick = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (!this.props.didSubmit && this.state.depositAmount.gt(0)) {
-      this.props.toggleDidSubmit(true);
+    if (!this.state.didSubmit && this.state.depositAmount.gt(0)) {
+      this.setState({...this.state, didSubmit: true});
 
       let assetBalance = await TorqueProvider.Instance.getAssetTokenBalanceOfUser(this.props.loanOrderState.loanAsset);
       if (this.props.loanOrderState.loanAsset === Asset.ETH) {
@@ -224,11 +225,11 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
       const precision = AssetsDictionary.assets.get(this.props.loanOrderState.loanAsset)!.decimals || 18;
       const amountInBaseUnits = new BigNumber(this.state.depositAmount.multipliedBy(10 ** precision).toFixed(0, 1));
       if (assetBalance.lt(amountInBaseUnits)) {
-        this.props.toggleDidSubmit(false);
 
         this.setState({
           ...this.state,
-          balanceTooLow: true
+          balanceTooLow: true,
+          didSubmit: false
         });
 
         return;

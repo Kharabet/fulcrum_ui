@@ -12,6 +12,7 @@ import { TorqueProviderEvents } from "../services/events/TorqueProviderEvents";
 import { TorqueProvider } from "../services/TorqueProvider";
 import { Loader } from "../components/Loader";
 import { ProviderType } from "../domain/ProviderType";
+import { BorrowMoreDlg } from "../components/BorrowMoreDlg";
 
 export interface IDashboardPageRouteParams {
   walletAddress: string | undefined;
@@ -37,6 +38,7 @@ export class DashboardPage extends PureComponent<
   private manageCollateralDlgRef: RefObject<ManageCollateralDlg>;
   private repayLoanDlgRef: RefObject<RepayLoanDlg>;
   private extendLoanDlgRef: RefObject<ExtendLoanDlg>;
+  private borrowMoreDlgRef: RefObject<BorrowMoreDlg>;
 
   constructor(props: any) {
     super(props);
@@ -44,6 +46,7 @@ export class DashboardPage extends PureComponent<
     this.manageCollateralDlgRef = React.createRef();
     this.repayLoanDlgRef = React.createRef();
     this.extendLoanDlgRef = React.createRef();
+    this.borrowMoreDlgRef = React.createRef();
 
     this.state = {
       items: [],
@@ -106,19 +109,23 @@ export class DashboardPage extends PureComponent<
         <ManageCollateralDlg ref={this.manageCollateralDlgRef} />
         <RepayLoanDlg ref={this.repayLoanDlgRef} />
         <ExtendLoanDlg ref={this.extendLoanDlgRef} />
+        <BorrowMoreDlg ref={this.borrowMoreDlgRef} />
         <div className="dashboard-page">
           <HeaderOps isMobileMedia={this.props.isMobileMedia} isLoading={this.props.isLoading} doNetworkConnect={this.props.doNetworkConnect} isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
-          <div className="dashboard-page__main">
+          
+          <main>
 
             {!TorqueProvider.Instance.unsupportedNetwork ? (
               <React.Fragment>
                 {this.state.isDataLoading
                   ? <Loader />
-                  : (<React.Fragment>
-                    <div onClick={this.refreshPage} style={{ cursor: `pointer`, textAlign: `center`, fontSize: `2rem`, paddingBottom: `1.5rem` }}>
+                  : (<div className="page-header">
+                    <h1>Your Loans</h1>
+                    <p>Lorem ipsum is placeholder text commonly used in the graphic, print, and publishing industries for previewing layouts and visual mockups.</p>
+                    {/* <div onClick={this.refreshPage} style={{ cursor: `pointer`, textAlign: `center`, fontSize: `2rem`, paddingBottom: `1.5rem` }}>
                       Click to refresh and see recent loan activity.
-                        </div>
-                  </React.Fragment>)
+                        </div> */}
+                  </div>)
                 }
                 <BorrowedFundsList
                   items={this.state.items}
@@ -126,6 +133,7 @@ export class DashboardPage extends PureComponent<
                   onManageCollateral={this.onManageCollateral}
                   onRepayLoan={this.onRepayLoan}
                   onExtendLoan={this.onExtendLoan}
+                  onBorrowMore={this.onBorrowMore}
                 />
               </React.Fragment>
             ) :
@@ -137,7 +145,7 @@ export class DashboardPage extends PureComponent<
                 </div>
               )
             }
-          </div>
+          </main>
           <Footer isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
         </div>
       </React.Fragment>
@@ -175,9 +183,6 @@ export class DashboardPage extends PureComponent<
     } catch (error) {
       console.error(error);
     }
-
-    this.repayLoanDlgRef.current.toggleDidSubmit(false);
-    await this.repayLoanDlgRef.current.hide();
   };
 
   private onExtendLoan = async (item: IBorrowedFundsState) => {
@@ -189,9 +194,6 @@ export class DashboardPage extends PureComponent<
     } catch (error) {
       console.error(error);
     }
-
-    this.extendLoanDlgRef.current.toggleDidSubmit(false);
-    await this.extendLoanDlgRef.current.hide();
   };
 
   private onManageCollateral = async (item: IBorrowedFundsState) => {
@@ -203,8 +205,16 @@ export class DashboardPage extends PureComponent<
     } catch (error) {
       console.error(error);
     }
+  };
 
-    this.manageCollateralDlgRef.current.toggleDidSubmit(false);
-    await this.manageCollateralDlgRef.current.hide();
+  private onBorrowMore = async (item: IBorrowedFundsState) => {
+    if (!this.borrowMoreDlgRef.current) return;
+
+    try {
+      const borrowMoreRequest = await this.borrowMoreDlgRef.current.getValue(item);
+      // await TorqueProvider.Instance.doBorrow(borrowMoreRequest);
+    } catch (error) {
+      console.error(error);
+    }
   };
 }

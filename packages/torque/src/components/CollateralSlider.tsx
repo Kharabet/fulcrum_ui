@@ -6,6 +6,7 @@ import { CollateralSliderRail } from "./CollateralSliderRail";
 
 export interface ICollateralSliderProps {
   readonly: boolean;
+  showExactCollaterization?: boolean;
   minValue: number;
   maxValue: number;
   value: number;
@@ -18,27 +19,31 @@ export class CollateralSlider extends Component<ICollateralSliderProps> {
   public render() {
     return (
       <Slider
+        className={`collateral-slider ${this.props.readonly ? "readonly" : ""}`}
         disabled={this.props.readonly}
         mode={1}
         step={1}
         domain={[this.props.minValue, this.props.maxValue]}
         rootProps={{ className: "xexe" }}
-        rootStyle={{
-          position: "relative",
-          width: "100%",
-          touchAction: "none"
-        }}
         onUpdate={this.onUpdate}
         onChange={this.onChange}
         values={[this.props.value]}
       >
-        <Rail>{(railObject: RailObject) => <CollateralSliderRail readonly={this.props.readonly} getRailProps={railObject.getRailProps} />}</Rail>
+        <Rail>{(railObject: RailObject) => <CollateralSliderRail
+          minValue={this.props.minValue}
+          maxValue={this.props.maxValue}
+          value={this.props.value}
+          showExactCollaterization={this.props.showExactCollaterization}
+          readonly={this.props.readonly}
+          getRailProps={railObject.getRailProps}
+        />}
+        </Rail>
         <Handles>
           {(handlesObject: HandlesObject) => (
             <div className="slider-handles">
               {handlesObject.handles.map(handle => (
                 <CollateralSliderHandle
-                  readonly={this.props.readonly} 
+                  readonly={this.props.readonly}
                   key={handle.id}
                   handle={handle}
                   domain={[this.props.minValue, this.props.maxValue]}
