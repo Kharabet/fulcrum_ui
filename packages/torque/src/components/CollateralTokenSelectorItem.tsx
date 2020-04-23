@@ -36,7 +36,7 @@ export class CollateralTokenSelectorItem extends Component<ICollateralTokenSelec
         onClick={this.onTokenClick}
       >
         <div className="collateral-token-selector-item__image-container">
-          <img className="collateral-token-selector-item__image" src={this.state.assetDetails.logoSvg} alt={this.state.assetDetails.displayName} />
+          {this.state.assetDetails.reactLogoSvg.render()}
         </div>
         <div className="collateral-token-selector-item__description-container">
           <div className="collateral-token-selector-item__name">{this.state.assetDetails.displayName}</div>

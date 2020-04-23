@@ -18,6 +18,14 @@
             border: none;
             text-align: center;
             width: calc(100% - 80px);
+            &::-webkit-outer-spin-button,
+            &::-webkit-inner-spin-button {
+                -webkit-appearance: none;
+                margin: 0;
+            }
+            &[type="number"] {
+                -moz-appearance: textfield;
+            }
         }
         .asset-icon {
             display: flex;
