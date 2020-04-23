@@ -114,7 +114,7 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceLoan, IR
   };
 
   public migrateLoan = async () => {
-    const loan = Object.assign({},this.props);
+    const loan = Object.assign({}, this.props);
     if (this.props.type == "dydx") {
       await TorqueProvider.Instance.migrateSoloLoan(loan, this.state.borrowAmount); // TODO
     } else {
@@ -159,149 +159,120 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceLoan, IR
     return (
 
       <div className={`refinance-asset-selector-item `}>
-        <div className="refinance-asset-block">
+        <div className="refinance-asset__main-block">
           {/*<div className="refinance-asset-selector__title">CDP {this.state.RefinanceCompoundData[0].cdpId.toFixed(0)}*/}
 
           {/*</div>*/}
-          <div className="refinance-asset-selector__row">
-            <div className="refinance-asset-selector__marker">
+          <div className="refinance-asset-selector__non-torque">
+            <div className="refinance-asset-selector__non-torque-logo">
               {head_image}
-              <ArrowRight />
-              {/*<img className="logo__dydx" src={head_image}/>
-              <img className="right-icon" src={arrow_right}/>*/}
             </div>
-            <div className="refinance-asset-selector__torque">
-              <TorqueLogo />
-              {/*<img className="logo__image" src={torque_logo} alt="torque-logo"/>*/}
+            <div className="refinance-asset-selector__non-torque-apr">
+              <div className="value">{this.props.apr.dp(0, BigNumber.ROUND_CEIL).toString()}%</div>
+              <div className="text">Variable APR</div>
             </div>
-            {/*<div className="refinance-asset-selector__type">1.500</div>*/}
-          </div>
-          <div className="refinance-asset-selector__rowimg">
-            <div className="refinance-asset-selector__varapy">{this.props.apr.dp(0, BigNumber.ROUND_CEIL).toString()}%
-            </div>
-            <div
-              className="refinance-asset-selector__fixedapy">{this.state.fixedApr.dp(1, BigNumber.ROUND_CEIL).toString()}%
-            </div>
-            {/*<div className="refinance-asset-selector__img"><img src={assetsDt.img} /></div>*/}
-          </div>
-          <div className="refinance-asset-selector__row mb-20">
-            <div className="refinance-asset-selector__variabletxt">Variable APR</div>
-            <div className="refinance-asset-selector__aprtxt">Fixed APR</div>
-            {/*<div className="refinance-asset-selector__imgtxt">{this.props.asset}</div>*/}
-          </div>
-          <div className="refinance-asset-selector__row mb-20">
-            <div className="refinance-asset-selector__inputBox">
-              <div className="refinance__input-container">
-                <input
-                  ref={this._setInputRef}
-                  className="refinance__input-container__input-amount"
-                  type="number"
-                  defaultValue={this.props.balance.dp(3, BigNumber.ROUND_FLOOR).toString()}
-                  placeholder={`Amount`}
-                  disabled={this.props.isDisabled}
-                  onChange={this.loanAmountChange}
-                />
-                <div className="refinance-details-msg--warning">
-                  {this.state.borrowAmount.lte(0) ? "Please enter value greater than 0" : ""}
-                  {this.state.borrowAmount.gt(this.props.balance) ? "Please enter value less than or equal to " + this.props.balance.dp(3, BigNumber.ROUND_FLOOR).toString() : ""}
-                </div>
+            <div className="refinance__input-container">
+              <input
+                ref={this._setInputRef}
+                className="input-amount"
+                type="number"
+                defaultValue={this.props.balance.dp(3, BigNumber.ROUND_FLOOR).toString()}
+                placeholder={`Amount`}
+                disabled={this.props.isDisabled}
+                onChange={this.loanAmountChange}
+              />
+              <div className="refinance-details-msg--warning">
+                {this.state.borrowAmount.lte(0) ? "Please enter value greater than 0" : ""}
+                {this.state.borrowAmount.gt(this.props.balance) ? "Please enter value less than or equal to " + this.props.balance.dp(3, BigNumber.ROUND_FLOOR).toString() : ""}
               </div>
-
-            </div>
-            <div className="refinance-asset-selector__loan">
-              <div className="refinance-asset-selector__value">{this.state.borrowAmount.dp(3, BigNumber.ROUND_FLOOR).toString()}</div>
-              <div className="refinance-asset-selector__loantxt">Loan</div>
             </div>
 
-            <div className="refinance-asset-selector__imglogo">
-              <div className="refinance-asset-selector__icon">
+              {this.props.isDisabled ? (
+                <div className="collaterization-warning">Collateralization should be 150%+</div>) : null}
+          </div>
+          <div className="refinance-asset-selector__torque">
+            <div className="refinance-asset-selector__torque-logo">
+              <TorqueLogo />
+            </div>
+            <div className="refinance-asset-selector__torque-apr">
+              <div className="value">{this.state.fixedApr.dp(1, BigNumber.ROUND_CEIL).toString()}%</div>
+              <div className="text">Fixed APR</div>
+            </div>
+            <div className="refinance-asset-selector__torque-loan-container">
+              <div className="asset-icon">
                 {loanAssetDt}
               </div>
-              {/*<img className="refinance-loan-type__img" src={loanAssetDt.img}/>*/}
-              <div className="refinance-asset-selector__loantxt ml7">{this.props.asset}</div>
+              <div className="loan-value">
+                <div className="value">{this.state.borrowAmount.dp(3, BigNumber.ROUND_FLOOR).toString()}</div>
+                <div className="text">Loan</div>
+              </div>
+              <div className="asset-name">{this.props.asset}</div>
             </div>
-
-          </div>
-
-          <div className="refinance-asset-selector__row">
-            <div className="refinance-asset-selector__loanBlank"></div>
-            <div className="refinance-asset-selector__detail cursor-pointer" onClick={this.showDetails}>
-              <span>{showDetailsValue}</span>
-              <div className={`${arrowDiv}`}>
+            <div className="refinance-asset-selector__torque-details" onClick={this.showDetails}>
+              <p>{showDetailsValue}</p>
+              <span className="arrow">
                 {arrowIcon}
                 {/*<img className="arrow-icon" src={arrowIcon}/>*/}
-              </div>
+              </span>
             </div>
-          </div>
+            {this.state.isShow && <div className="refinance-asset-selector__collateral-container">
+              <div className="refinance-asset-selector__collateral">
 
-          {/*{this.state.RefinanceCompoundData[0].isDisabled ?(*/}
-          <div className={`refinance-asset-selector__row ${assetTypeModifier}`}>
-            <div className="refinance-asset-selector__loanBlank">
-              {this.props.isDisabled ? (
-                <div className="refinanace-title-text">Collateralization should be 150%+</div>) : null}
-            </div>
-            <div className="refinance-asset-selector__collateral">
-              <div className="refinance-asset-selector__loan">
-                <div className="refinance-asset-selector__info">
-                  <div className="refinance-asset-selector__value">
+                <div className="asset-icon">
+                  {collateralAssetDt}
+                </div>
+                <div className="collateral-value">
+                  <div className="value">
                     {this.props.collateral[0].balance.dp(3, BigNumber.ROUND_FLOOR).toString()}
                   </div>
-                  <div className="refinance-asset-selector__info_icon" onClick={this.showInfoCollateralAssetDt0}>
+                  <div className="text">Collateral</div>
+                </div>
+                <div className="asset-name">
+                  {this.props.collateral[0].asset}
+
+                  <div className="info-icon" onClick={this.showInfoCollateralAssetDt0}>
                     {iconInfoCollateralAssetDt0}
                   </div>
                 </div>
-                <div className="refinance-asset-selector__loantxt">Collateral</div>
-              </div>
-              <div className="refinance-asset-selector__imglogo">
-                <div className="refinance-asset-selector__icon">
-                  {collateralAssetDt}
-                </div>
-                {/*<img className="refinance-loan-type__img" src={collateralAssetDt.img}/>*/}
-                <div className="refinance-asset-selector__loantxt ml7">{this.props.collateral[0].asset}</div>
+
               </div>
               {this.state.isShowInfoCollateralAssetDt0
                 ? <CollateralInfo />
                 : null
               }
             </div>
-          </div>
-          {collateralAssetDt2 ? (
-            <div className={`refinance-asset-selector__row ${assetTypeModifier}`}>
-              <div className="refinance-asset-selector__loanBlank">
-                {/*<div className="refinanace-title-text">Collateralization should be 150%+</div>*/}
-              </div>
-              <div className="refinance-asset-selector__collateral">
-                <div className="refinance-asset-selector__loan">
-                  <div className="refinance-asset-selector__info">
+            }
+            {this.state.isShow && collateralAssetDt2 &&
+              <div className="refinance-asset-selector__collateral-container">
+                <div className="refinance-asset-selector__collateral">
+
+                  <div className="refinance-asset-selector__icon">
+                    {collateralAssetDt2}
+                  </div>
+                  <div className="refinance-asset-selector__loan-value">
                     <div className="refinance-asset-selector__value">
                       {this.props.collateral[1].balance.dp(3, BigNumber.ROUND_FLOOR).toString()}
                     </div>
+                    <div className="refinance-asset-selector__loantxt">Collateral</div>
+                    <div className="refinance-asset-selector__loantxt ml7">{this.props.collateral[0].asset}</div>
+
                     <div className="refinance-asset-selector__info_icon" onClick={this.showInfoCollateralAssetDt1}>
                       {iconInfoCollateralAssetDt1}
                     </div>
                   </div>
-                  <div className="refinance-asset-selector__loantxt">Collateral</div>
                 </div>
-                <div className="refinance-asset-selector__imglogo">
-                  <div className="refinance-asset-selector__icon">
-                    {collateralAssetDt2}
-                  </div>
-                  {/*<img className="refinance-loan-type__img" src={collateralAssetDt2.img}/>*/}
-                  <div className="refinance-asset-selector__loantxt ml7">{this.props.collateral[1].asset}</div>
-                </div>
-              </div>
-              {this.state.isShowInfoCollateralAssetDt1
-                ? <CollateralInfo />
-                : null
-              }
-            </div>) : null}
+                {this.state.isShowInfoCollateralAssetDt1
+                  && <CollateralInfo />
+                }
+
+              </div>}
+          </div>
+          {/*<div className="refinance-asset-selector__type">1.500</div>*/}
         </div>
-        {/*<div className="linehr"/>*/}
-        <div className="refinance-asset-block">
+        <div className="refinance-asset__action-block">
           {this.props.apr.gt(this.state.fixedApr) ?
             <div className="refinance-asset-selector__desc">
-              <div className="refinance-asset-selector__simple">Refinancing with <b>FIXED</b> rates could save
-                you &nbsp;</div>
+              Refinancing with&nbsp;<b>FIXED</b>&nbsp;rates could save you &nbsp;
               <div className="refinance-asset-selector__rs">${refRateMonth.toFixed(2)}/mo or
                 ${refRateYear.toFixed(2)}/yr
               </div>
