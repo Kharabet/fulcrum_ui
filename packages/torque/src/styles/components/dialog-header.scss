@@ -15,5 +15,12 @@
   &__title-close {
     display: flex;
     cursor: pointer;
+    &:hover {
+      svg {
+        path {
+          fill: #758295;
+        }
+      }
+    }
   }
 }
