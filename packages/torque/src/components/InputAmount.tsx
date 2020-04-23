@@ -40,7 +40,8 @@ export class InputAmount extends Component<IInputAmountProps, IInputAmountState>
                         <input
                             ref={this._setInputRef}
                             className="input-amount"
-                            type="text"
+                            type="number"
+                            step="any"
                             placeholder={`Enter amount`}
                             value={this.props.inputAmountText}
                             onChange={this.props.onTradeAmountChange}

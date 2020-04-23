@@ -22,6 +22,14 @@
     border: 2px solid #e7ebf0;
     border-radius: 4px;
     padding: 20px 0;
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    &[type="number"] {
+      -moz-appearance: textfield;
+    }
     &:hover,
     &:focus {
       background-color: $color-gray-light;
