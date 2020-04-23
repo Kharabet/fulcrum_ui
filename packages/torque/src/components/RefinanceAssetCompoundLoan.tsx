@@ -7,7 +7,7 @@ import { RefinanceAssetCompoundLoanItem } from "./RefinanceAssetCompoundLoanItem
 import { ProviderType } from "../domain/ProviderType";
 
 export interface IRefinanceAssetCompoundLoanProps {
-
+  isMobileMedia: boolean;
   doNetworkConnect: () => void;
   onSelectAsset?: (asset: Asset) => void;
 }
@@ -60,7 +60,7 @@ export class RefinanceAssetCompoundLoan extends Component<IRefinanceAssetCompoun
   };
 
   public render() {
-    const items = this.state.refinanceCompoundData.map((e, index) => (<RefinanceAssetCompoundLoanItem key={index} {...e} />));
+    const items = this.state.refinanceCompoundData.map((e, index) => (<RefinanceAssetCompoundLoanItem key={index} {...e} isMobileMedia={this.props.isMobileMedia}/>));
 
     return <div className="refinance-asset-selector">{items}</div>;
   }
