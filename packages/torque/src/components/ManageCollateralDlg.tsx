@@ -34,6 +34,7 @@ export class ManageCollateralDlg extends Component<any, IManageCollateralDlgStat
         shouldCloseOnOverlayClick={false}
       >
         <DialogHeader title="Manage Collateral" onDecline={this.onFormDecline} />
+        
         <ManageCollateralFormWeb3
           loanOrderState={this.state.loanOrderState}
           onSubmit={this.onFormSubmit}
