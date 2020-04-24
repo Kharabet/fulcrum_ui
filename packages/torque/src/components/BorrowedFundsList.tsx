@@ -15,6 +15,7 @@ export interface IBorrowedFundsListProps {
 }
 
 interface IBorrowedFundsListState {
+  isLoading : boolean 
   // colsCount: number;
 }
 
@@ -25,13 +26,20 @@ export class BorrowedFundsList extends Component<IBorrowedFundsListProps, IBorro
     super(props);
 
     this.outerRef = React.createRef();
-    this.state = { /*colsCount: this.getColsCount()*/ };
+
+    this.state = {
+      isLoading:true 
+      /*colsCount: this.getColsCount()*/ };
   }
 
-  // public componentDidMount(): void {
-  //   window.addEventListener("resize", this.didResize.bind(this));
-  //   this.didResize();
-  // }
+  public componentDidMount(): void {
+    this.setState(
+      {       
+        isLoading : false 
+      });
+   // window.addEventListener("resize", this.didResize.bind(this));
+    //this.didResize();
+  }
   //
   // public componentWillUnmount(): void {
   //   window.removeEventListener("resize", this.didResize.bind(this));
@@ -60,9 +68,10 @@ export class BorrowedFundsList extends Component<IBorrowedFundsListProps, IBorro
         />
       );
     });
-
+    
+    
     return <div className="borrowed-funds-list" ref={this.outerRef}>
-      {itemsAwaiting.length === 0 && items.length === 0
+      {this.state.isLoading && itemsAwaiting.length === 0 && items.length === 0
         && <a href="/borrow" className="no-loans-msg">Looks like you don't have any loans.</a>}
       {itemsAwaiting}
       {items}
