@@ -3,7 +3,7 @@ import ReactModal from "react-modal";
 import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
 import { RepayLoanRequest } from "../domain/RepayLoanRequest";
 import { DialogHeader } from "./DialogHeader";
-import { RepayLoanForm } from "./RepayLoanForm";
+import { BorrowMoreForm } from "./BorrowMoreForm";
 
 interface IBorrowMoreDlgState {
   isOpen: boolean;
@@ -34,7 +34,7 @@ export class BorrowMoreDlg extends Component<any, IBorrowMoreDlgState> {
         shouldCloseOnOverlayClick={false}
       >
         <DialogHeader title="Borrow More" onDecline={this.onFormDecline} />
-        <RepayLoanForm
+        <BorrowMoreForm
           loanOrderState={this.state.loanOrderState}
           onSubmit={this.onFormSubmit}
           onClose={this.onFormDecline}

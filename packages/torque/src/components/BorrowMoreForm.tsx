@@ -12,6 +12,8 @@ import { RepayLoanRequest } from "../domain/RepayLoanRequest";
 import { TorqueProvider } from "../services/TorqueProvider";
 import { OpsEstimatedResult } from "./OpsEstimatedResult";
 import { RepayLoanSlider } from "./RepayLoanSlider";
+import { CollateralSlider } from "./CollateralSlider";
+import { LoaderData } from "./LoaderData";
 
 export interface IBorrowMoreFormProps {
   loanOrderState: IBorrowedFundsState;
@@ -35,6 +37,8 @@ interface IBorrowMoreFormState {
   balanceTooLow: boolean;
 
   didSubmit: boolean;
+  
+  isLoading: boolean;
 }
 
 export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreFormState> {
@@ -59,7 +63,8 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
       repayManagementAddress: null,
       gasAmountNeeded: new BigNumber(0),
       balanceTooLow: false,
-      didSubmit: false
+      didSubmit: false,
+        isLoading: false
     };
 
     this.selectedValueUpdate = new Subject<number>();
@@ -72,7 +77,7 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
         this.setState({
           ...this.state,
           repayAmount: value.repayAmount,
-          inputAmountText: value.repayAmount.toString()
+          inputAmountText: Number(value.repayAmount.toFixed(5))==0?"0":value.repayAmount.toFixed(5)
         });
       });
 
@@ -163,16 +168,14 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
     return (
       <form className="repay-loan-form" onSubmit={this.onSubmitClick}>
         <section className="dialog-content">
-          <div className="repay-loan-form__input-container" style={{ paddingBottom: `1rem` }}>
-            <input
-              ref={this._setInputRef}
-              className="repay-loan-form__input-container__input-amount"
-              type="text"
-              onChange={this.onTradeAmountChange}
-              placeholder={`Enter amount`}
-              value={this.state.inputAmountText}
-            />
-          </div>
+        {/* <CollateralSlider
+              readonly={true}
+              showExactCollaterization={positionSafetyText !== "Safe"}
+              minValue={sliderMin}
+              maxValue={sliderMax}
+              value={sliderValue}
+            /> */}
+          
 
           <RepayLoanSlider
             readonly={false}
@@ -188,17 +191,36 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
             <div className="repay-loan-form__tip">Full repayment</div>
           </div>
 
-          <hr className="repay-loan-form__delimiter" />
-
+          {/* <hr className="repay-loan-form__delimiter" /> */}
+       
+{/* 
           <OpsEstimatedResult
             assetDetails={this.state.assetDetails}
             actionTitle="You will repay"
             amount={this.state.repayAmount}
             precision={6}
           />
-          <div className={`repay-loan-form-insufficient-balance ${!this.state.balanceTooLow ? `repay-loan-form-insufficient-balance--hidden` : ``}`}>
-            Insufficient {this.state.assetDetails.displayName} balance in your wallet!
-              </div>
+           */}
+          <div className="input-container">
+                  <div className="input-row">
+                    <span className="asset-icon">{this.state.assetDetails.reactLogoSvg.render()}</span>
+                    {this.state.isLoading
+                      ? <LoaderData />
+                      : <React.Fragment>
+                        <input
+                          ref={this._setInputRef}
+                          className="input-amount"
+                          type="number"
+                          step="any"
+                          placeholder={`Enter amount`}
+                          value={this.state.inputAmountText}
+                          onChange={this.onTradeAmountChange}
+                        />
+                      </React.Fragment>
+                    }
+                  </div>
+                </div>
+
         </section>
         <section className="dialog-actions">
           <div className="repay-loan-form__actions-container">
@@ -305,7 +327,8 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
 
   public onTradeAmountChange = async (event: ChangeEvent<HTMLInputElement>) => {
     let amountText = event.target.value ? event.target.value : "";
-
+    const regexp = /^[-]?((\d+(\.\d{0,5})?)|(\.\d{0,5}}))$/;
+    if (amountText === "" || regexp.test(amountText)) {
     let repayAmount = new BigNumber(amountText);
     if (repayAmount.lt(0)) {
       repayAmount = new BigNumber(0);
@@ -323,5 +346,6 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
       // emitting next event for processing with rx.js
       this._inputTextChange.next(this.state.inputAmountText);
     });
+  }
   };
 }
