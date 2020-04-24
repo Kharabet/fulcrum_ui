@@ -1,108 +1,56 @@
 .extend-loan-form {
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
+  width: 535px;
+  padding-top: 40px;
 
-  width: 47rem;
-  padding-top: 1rem;
-
-  .extend-loan-form__tips {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-
-    // hack around slider
-    padding-top: 1rem;
-    // spacing
-    //padding-bottom: 3rem;
-
-    .extend-loan-form__tip {
-      font-size: 0.75rem;
-      font-weight: normal;
-      font-style: normal;
-      font-stretch: normal;
-      line-height: 2;
-      letter-spacing: normal;
-      color: #a9b5c7;
-    }
+  &__info-extended-by-container {
+    padding-bottom: 30px;
   }
-
-  .extend-loan-form-insufficient-balance {
-    color: red;
-    padding: .25rem;
+  &__info-extended-by-msg {
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.5;
     text-align: center;
-
-    &--hidden {
-      visibility: hidden;
-    }
+    color: #758295;
   }
-
-  .extend-loan-form__delimiter {
-    margin-bottom: 1rem;
-
-    border: 0;
-    border-top: solid 0.0625rem rgba(255, 255, 255, 0.2);
+  &__info-extended-by-price {
+    font-size: 28px;
+    font-weight: 800;
+    line-height: 1.5;
+    text-align: center;
+    color: #283049;
   }
-
-  .extend-loan-form__info-extended-by-container {
-    border-radius: 1rem;
-    background-color: #f5f7f9;
-    //padding: 2.5rem;
-    //margin-bottom: 1rem;
-
-    .extend-loan-form__info-extended-by-msg {
-      padding-top: 1rem;
-      font-size: 1rem;
-      font-weight: normal;
-      font-style: normal;
-      font-stretch: normal;
-      line-height: 1.5;
-      letter-spacing: -0.16px;
-      text-align: center;
-      color: #a9b5c7;
-    }
-
-    .extend-loan-form__info-extended-by-price {
-      font-size: 1.5rem;
-      font-weight: 600;
-      font-style: normal;
-      font-stretch: normal;
-      line-height: 1.67;
-      letter-spacing: -0.24px;
-      text-align: center;
-      color: #3b364b;
-    }
-  }
-
-  .extend-loan-form__transfer-details {
-
-    padding-bottom: 1rem;
-
-    .extend-loan-form__transfer-details-msg {
-      margin-top: 1.5rem;
-
-      font-size: 1rem;
-      font-weight: normal;
-      font-style: normal;
-      font-stretch: normal;
-      line-height: 1.5;
-      letter-spacing: -0.16px;
-      text-align: center;
-      color: #a9b5c7;
-
-      &--warning {
-        text-align: center;
-        color: #801515;
-      }
-    }
-  }
-
-  .extend-loan-form__actions-container {
+  &__tips {
     display: flex;
-    flex-direction: row;
-    justify-content: center;
+    justify-content: space-between;
+    padding-top: 20px;
+    padding-bottom: 35px;
+  }
+  &__tip {
+    font-size: 16px;
+    font-weight: 200;
+    line-height: 1.5;
+    color: #758295;
+  }
+  &__actions-container {
+    display: flex;
+    justify-content: flex-end;
+  }
+  &__insufficient-balance {
+    position: absolute;
+    left: 0;
+    font-size: 14px;
+    font-weight: 600;
+    width: 100%;
+    text-align: center;
+    color: #de4a4a;
+    padding-top: 15px;
+  }
+  .mb-20 {
+    margin-bottom: 20px;
   }
 }
-
 
 @media screen and (max-width: $mobile-version-max-width) {
   .extend-loan-form {
