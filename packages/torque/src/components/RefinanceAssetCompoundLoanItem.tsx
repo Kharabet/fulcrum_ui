@@ -184,6 +184,7 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
                   ? "warning"
                   : ""}`}
                 type="number"
+                step="any"
                 defaultValue={this.props.balance.dp(3, BigNumber.ROUND_FLOOR).toString()}
                 placeholder={`Amount`}
                 disabled={this.props.isDisabled}

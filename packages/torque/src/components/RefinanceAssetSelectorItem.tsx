@@ -181,6 +181,7 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
                   ? "warning"
                   : ""}`}
                 type="number"
+                step="any"
                 defaultValue={this.props.refinanceData.debt.dp(3, BigNumber.ROUND_FLOOR).toString()}
                 placeholder={`Amount`}
                 disabled={this.props.refinanceData.isDisabled}
