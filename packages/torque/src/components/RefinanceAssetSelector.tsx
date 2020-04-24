@@ -129,9 +129,8 @@ export class RefinanceAssetSelector extends Component<IRefinanceAssetSelectorPro
 
     return this.state.isLoading ? null
       : <React.Fragment>
-        {!this.state.isItems && <div className="refinance-page__main-msgCentered" onClick={this.derivedUpdate}
-          style={this.state.isItems ? { display: `none` } : undefined}>
-          <span>Looks like you don't have any loans available to refinance.</span>
+        {!this.state.isItems && <div className="no-loans-msg" onClick={this.derivedUpdate}>
+          Looks like you don't have any loans available to refinance.
         </div>}
         {soloCompoundItems}
         {makerItems}

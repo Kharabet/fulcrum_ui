@@ -2,6 +2,16 @@
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   grid-gap: 30px;
+  .no-loans-msg{
+    font-weight: 800;
+    font-size: 24px;
+    line-height: 140%;
+    color: #283049;
+    grid-column: 1/3;
+    place-self: center;
+    margin: 60px auto;
+    cursor: pointer;
+  }
   .refinance-asset-selector {
     &-item {
       display: flex;
@@ -33,6 +43,7 @@
         grid-template-columns: repeat(2, 1fr);
 
         padding: 40px;
+        padding-top: 55px;
         border-bottom: 1px solid rgba(169, 181, 199, 0.2);
         .refinance-asset-selector__non-torque {
           display: flex;
