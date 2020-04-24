@@ -48,12 +48,15 @@ export class RefinancePage extends PureComponent<IRefinancePageParams & RouteCom
               )
             }
             <div className="refinance-list">
-               <RefinanceAssetCompoundLoan isMobileMedia={this.props.isMobileMedia} doNetworkConnect={this.props.doNetworkConnect} />
+               {/* <RefinanceAssetCompoundLoan isMobileMedia={this.props.isMobileMedia} doNetworkConnect={this.props.doNetworkConnect} /> */}
             {/* {isMobileMedia
               ? <RefinanceAssetSelectorMobile updateStateShowLoader={this.updateStateShowLoader} />
               : <RefinanceAssetSelector updateStateShowLoader={this.updateStateShowLoader} />
             } */}
-            <RefinanceAssetSelector isMobileMedia={this.props.isMobileMedia} updateStateShowLoader={this.updateStateShowLoader} />
+            <RefinanceAssetSelector 
+            isMobileMedia={this.props.isMobileMedia} 
+            updateStateShowLoader={this.updateStateShowLoader} 
+            doNetworkConnect={this.props.doNetworkConnect} />
             </div>
           </main>
           <Footer isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />

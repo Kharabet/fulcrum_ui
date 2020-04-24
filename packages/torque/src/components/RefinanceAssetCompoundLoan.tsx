@@ -62,6 +62,6 @@ export class RefinanceAssetCompoundLoan extends Component<IRefinanceAssetCompoun
   public render() {
     const items = this.state.refinanceCompoundData.map((e, index) => (<RefinanceAssetCompoundLoanItem key={index} {...e} isMobileMedia={this.props.isMobileMedia}/>));
 
-    return <div className="refinance-asset-selector">{items}</div>;
+    return items;
   }
 }

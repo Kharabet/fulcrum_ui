@@ -3,10 +3,10 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  margin-bottom: 45px;
   .refinance-asset-selector {
-    margin-bottom: 45px;
-
+    &:not(:last-child){
+      margin-bottom: 45px;
+    }
     &-item {
       display: flex;
       flex-direction: column;

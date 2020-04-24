@@ -23,6 +23,7 @@ import { ReactComponent as DydxImg } from "../assets/images/dydx.svg";
 import { ReactComponent as IconInfo } from "../assets/images/icon_info.svg";
 import { ReactComponent as IconInfoActive } from "../assets/images/icon_info_active.svg";
 import { CollateralInfo } from "./CollateralInfo";
+import { RefinanceCard } from "./RefinanceCard";
 
 interface IRefinanceAssetCompoundLoanItemState {
   isShow: boolean;
@@ -160,6 +161,7 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
     const btnCls = this.props.apr.gt(this.state.fixedApr) ? "mt30" : "";
     const iconInfoCollateralAssetDt0 = this.state.isShowInfoCollateralAssetDt0 ? <IconInfoActive /> : <IconInfo />;
     const iconInfoCollateralAssetDt1 = this.state.isShowInfoCollateralAssetDt1 ? <IconInfoActive /> : <IconInfo />;
+
     return (
 
       <div className={`refinance-asset-selector-item `}>
