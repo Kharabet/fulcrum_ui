@@ -39,14 +39,14 @@ export class BorrowedFundsList extends Component<IBorrowedFundsListProps, IBorro
 
   public render() {
     const itemsAwaiting = this.props.itemsAwaiting.map((e, index) => {
-        // const rest = index % this.state.colsCount;
-        return (
-          <BorrowedFundsAwaitingListItem
-            key={index}
-            itemAwaiting={e}
-          />
-        );
-      });
+      // const rest = index % this.state.colsCount;
+      return (
+        <BorrowedFundsAwaitingListItem
+          key={index}
+          itemAwaiting={e}
+        />
+      );
+    });
     const items = this.props.items.map((e, index) => {
       // const rest = index % this.state.colsCount;
       return (
@@ -62,6 +62,8 @@ export class BorrowedFundsList extends Component<IBorrowedFundsListProps, IBorro
     });
 
     return <div className="borrowed-funds-list" ref={this.outerRef}>
+      {itemsAwaiting.length === 0 && items.length === 0
+        && <a href="/borrow" className="no-loans-msg">Looks like you don't have any loans.</a>}
       {itemsAwaiting}
       {items}
     </div>;
