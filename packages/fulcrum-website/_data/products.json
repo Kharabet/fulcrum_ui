@@ -6,12 +6,6 @@
         "visibilityChart": false
     },
     {
-        "name": "sai",
-        "visibilityApr": true,
-        "visibilityEarn": true,
-        "visibilityChart": false
-    },
-    {
         "name": "eth",
         "visibilityApr": true,
         "visibilityEarn": true,
