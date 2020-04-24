@@ -78,6 +78,10 @@
               border: 2px solid #e7ebf0;
               box-sizing: border-box;
               border-radius: 4px;
+              &.warning{
+                border-color:#DE4A4A;
+                color:#DE4A4A;
+              }
             }
             .refinance-details-msg--warning {
               margin-top: 10px;

@@ -53,7 +53,7 @@ export class RefinancePage extends PureComponent<IRefinancePageParams & RouteCom
               ? <RefinanceAssetSelectorMobile updateStateShowLoader={this.updateStateShowLoader} />
               : <RefinanceAssetSelector updateStateShowLoader={this.updateStateShowLoader} />
             } */}
-            <RefinanceAssetSelector updateStateShowLoader={this.updateStateShowLoader} />
+            <RefinanceAssetSelector isMobileMedia={this.props.isMobileMedia} updateStateShowLoader={this.updateStateShowLoader} />
             </div>
           </main>
           <Footer isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />

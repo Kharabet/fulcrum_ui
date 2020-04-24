@@ -8,6 +8,7 @@ import { RefinanceAssetSelectorItem } from "./RefinanceAssetSelectorItem";
 import { Loader } from "./Loader";
 
 export interface IRefinanceAssetSelectorProps {
+  isMobileMedia: boolean;
   updateStateShowLoader: (value: any) => void
 }
 
@@ -38,7 +39,7 @@ export class RefinanceAssetSelector extends Component<IRefinanceAssetSelectorPro
           isInstaProxy: false,
         }]
     };
-    
+
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderAvailable, this.derivedUpdate);
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderChanged, this.derivedUpdate);
   }
@@ -103,6 +104,7 @@ export class RefinanceAssetSelector extends Component<IRefinanceAssetSelectorPro
       items = refinance.map((e, index) => {
         return (
           <RefinanceAssetSelectorItem
+            isMobileMedia={this.props.isMobileMedia}
             key={refinance[index].urn} asset={Asset.DAI}
             cdpId={refinance[index].cdpId}
             urn={refinance[index].urn}
@@ -121,6 +123,6 @@ export class RefinanceAssetSelector extends Component<IRefinanceAssetSelectorPro
         <span>Looks like you don't have any loans available to refinance.</span>
       </div>
       {items}
-    </div>;
+    </div >;
   }
 }

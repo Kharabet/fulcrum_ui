@@ -35,7 +35,7 @@ interface IRefinanceAssetCompoundLoanItemState {
   fixedApr: BigNumber;
 }
 
-interface IRefinanceAssetCompoundLoanItemProps extends IRefinanceLoan{
+interface IRefinanceAssetCompoundLoanItemProps extends IRefinanceLoan {
   isMobileMedia: boolean;
 }
 
@@ -178,7 +178,9 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
             <div className="refinance__input-container">
               <input
                 ref={this._setInputRef}
-                className="input-amount"
+                className={`input-amount ${this.state.borrowAmount.lte(0) || this.state.borrowAmount.gt(this.props.balance)
+                  ? "warning"
+                  : ""}`}
                 type="number"
                 defaultValue={this.props.balance.dp(3, BigNumber.ROUND_FLOOR).toString()}
                 placeholder={`Amount`}
@@ -241,7 +243,7 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
                   </div>
 
                 </div>
-                  {this.state.isShowInfoCollateralAssetDt0 && <CollateralInfo />}
+                {this.state.isShowInfoCollateralAssetDt0 && <CollateralInfo />}
                 {this.state.isShow && collateralAssetDt2 &&
                   <div className="refinance-asset-selector__collateral">
 
@@ -266,7 +268,7 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
                 }
                 {this.state.isShowInfoCollateralAssetDt1 && <CollateralInfo />}
               </div>
-            }            
+            }
             {this.props.isDisabled && this.props.isMobileMedia &&
               <div className="collaterization-warning">Collateralization should be 150%+</div>}
 
