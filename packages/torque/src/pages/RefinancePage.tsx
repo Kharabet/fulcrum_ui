@@ -1,9 +1,6 @@
 import React, { PureComponent, RefObject } from "react";
 import { RouteComponentProps } from "react-router";
-import { RefinanceAssetCompoundLoan } from "../components/RefinanceAssetCompoundLoan";
-import { RefinanceAssetCompoundLoanMobile } from "../components/RefinanceAssetCompoundLoanMobile";
 import { RefinanceAssetSelector } from "../components/RefinanceAssetSelector";
-import { RefinanceAssetSelectorMobile } from "../components/RefinanceAssetSelectorMobile";
 import { Footer } from "../layout/Footer";
 import { HeaderOps } from "../layout/HeaderOps";
 import { Loader } from "../components/Loader";
@@ -33,30 +30,25 @@ export class RefinancePage extends PureComponent<IRefinancePageParams & RouteCom
   public render() {
     const isMobileMedia = this.props.isMobileMedia;
     const isShowLoader = this.state.isShowLoader;
-    
+
     return (
       <React.Fragment>
         <div className="refinance-page">
           <HeaderOps isMobileMedia={this.props.isMobileMedia} isLoading={this.props.isLoading} doNetworkConnect={this.props.doNetworkConnect} isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
 
           <main>            {isShowLoader
-              ? <Loader />
-              : (<div className="page-header">
-                  <h1>Refinance Your Loans</h1>
-                  <p>Lorem ipsum is placeholder text commonly used in the graphic, print, and publishing industries for previewing layouts and visual mockups.</p>
-                  </div>
-              )
-            }
+            ? <Loader />
+            : (<div className="page-header">
+              <h1>Refinance Your Loans</h1>
+              <p>Lorem ipsum is placeholder text commonly used in the graphic, print, and publishing industries for previewing layouts and visual mockups.</p>
+            </div>
+            )
+          }
             <div className="refinance-list">
-               {/* <RefinanceAssetCompoundLoan isMobileMedia={this.props.isMobileMedia} doNetworkConnect={this.props.doNetworkConnect} /> */}
-            {/* {isMobileMedia
-              ? <RefinanceAssetSelectorMobile updateStateShowLoader={this.updateStateShowLoader} />
-              : <RefinanceAssetSelector updateStateShowLoader={this.updateStateShowLoader} />
-            } */}
-            <RefinanceAssetSelector 
-            isMobileMedia={this.props.isMobileMedia} 
-            updateStateShowLoader={this.updateStateShowLoader} 
-            doNetworkConnect={this.props.doNetworkConnect} />
+              <RefinanceAssetSelector
+                isMobileMedia={this.props.isMobileMedia}
+                updateStateShowLoader={this.updateStateShowLoader}
+                doNetworkConnect={this.props.doNetworkConnect} />
             </div>
           </main>
           <Footer isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
