@@ -12,6 +12,7 @@ import { TorqueProvider } from "../services/TorqueProvider";
 import { CollateralSlider } from "./CollateralSlider";
 import { OpsEstimatedResult } from "./OpsEstimatedResult";
 import { InputAmount } from "./InputAmount";
+import { LoaderData } from "./LoaderData";
 
 export interface IManageCollateralFormWeb3Props {
   loanOrderState: IBorrowedFundsState;
@@ -39,14 +40,15 @@ interface IManageCollateralFormWeb3State {
   balanceTooLow: boolean;
 
   inputAmountText: string;
-  interestAmount: number;
 
   didSubmit: boolean;
+  isLoading: boolean;
 }
 
 export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb3Props, IManageCollateralFormWeb3State> {
   private readonly selectedValueUpdate: Subject<number>;
   private readonly _inputTextChange: Subject<string>;
+  private _input: HTMLInputElement | null = null;
 
   constructor(props: IManageCollateralFormWeb3Props, context?: any) {
     super(props, context);
@@ -68,8 +70,8 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
       collateralizedPercent: new BigNumber(0),
       balanceTooLow: false,
       inputAmountText: "",
-      interestAmount: 0,
-      didSubmit: false
+      didSubmit: false,
+      isLoading: false
     };
 
     this.selectedValueUpdate = new Subject<number>();
@@ -84,7 +86,7 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
           liquidationPrice: value.liquidationPrice,
           collateralAmount: value.collateralAmount,
           collateralizedPercent: value.collateralizedPercent,
-          inputAmountText: value.collateralAmount.toString()
+          inputAmountText: this.formatPrecision(value.collateralAmount.toString())
         });
       });
 
@@ -96,10 +98,7 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
         switchMap(value => this.rxGetEstimate(value.toNumber()))
       )
       .subscribe((value: ICollateralChangeEstimate) => {
-        this.setState({
-          ...this.state,
-          currentValue: value.collateralAmount.toNumber() ? value.collateralAmount.toNumber() : 0,
-        });
+
       });
 
   }
@@ -211,22 +210,21 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
     if (
       prevProps.loanOrderState.loanOrderHash !== this.props.loanOrderState.loanOrderHash ||
       prevState.loanValue !== this.state.loanValue ||
-      prevState.selectedValue !== this.state.selectedValue
-    ) {
+      prevState.selectedValue !== this.state.selectedValue) {
       TorqueProvider.Instance.getLoanCollateralManagementGasAmount().then(gasAmountNeeded => {
+      
         this.setState(
           {
             ...this.state,
+             isLoading: true,
             gasAmountNeeded: gasAmountNeeded
           },
           () => {
             this.selectedValueUpdate.next(this.state.selectedValue);
-          }
+           }
         );
       });
     }
-    if (prevState.interestAmount !== this.state.interestAmount)
-      this.updateCollateralAmount(this.state.interestAmount);
   }
 
   public render() {
@@ -234,7 +232,7 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
       return null;
     }
 
-    
+
     return (
       <form className="manage-collateral-form" onSubmit={this.onSubmitClick}>
         {TorqueProvider.Instance.isLoading ? (
@@ -280,7 +278,7 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
                   onUpdate={this.onUpdate}
                   onChange={this.onChange}
                 />
-               
+
                 <div className="manage-collateral-form__tips">
                   <div className="manage-collateral-form__tip">Withdraw</div>
                   <div className="manage-collateral-form__tip">Top Up</div>
@@ -294,13 +292,25 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
                     " top up"
                   }
                 </div>
-                <InputAmount
-                  asset={this.state.assetDetails.reactLogoSvg}
-                  inputAmountText={this.formatPrecision(Number(this.state.inputAmountText))}
-                  updateInterestAmount={this.updateInterestAmount}
-                  onTradeAmountChange={this.onTradeAmountChange}
-                  interestAmount={this.state.interestAmount}             
-                />
+
+                <div className="input-container">
+                  <div className="input-row">
+                    <span className="asset-icon">{this.state.assetDetails.reactLogoSvg.render()}</span>
+                    {this.state.isLoading
+                      ? <LoaderData />
+                      : <React.Fragment>
+                        <input
+                          ref={this._setInputRef}
+                          className="input-amount"
+                          type="text"
+                          placeholder={`Enter amount`}
+                          value={this.state.inputAmountText}
+                          onChange={this.onTradeAmountChange}
+                        />
+                      </React.Fragment>
+                    }
+                  </div>
+                </div>
               </section>
               <section className="dialog-actions">
                 <div className="manage-collateral-form__actions-container">
@@ -324,6 +334,9 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
     );
   }
 
+  private _setInputRef = (input: HTMLInputElement) => {
+    this._input = input;
+  };
   private rxGetEstimate = (selectedValue: number): Observable<ICollateralChangeEstimate> => {
 
     // console.log(this.state.loanValue, selectedValue);
@@ -336,10 +349,10 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
           .dividedBy(this.state.loanValue)
           .multipliedBy(this.state.collateralExcess);
       } else {
-      collateralAmount = new BigNumber(selectedValue)
-        .minus(this.state.loanValue)
-        .dividedBy(this.state.maxValue - this.state.loanValue)
-        .multipliedBy(this.props.loanOrderState.collateralAmount);
+        collateralAmount = new BigNumber(selectedValue)
+          .minus(this.state.loanValue)
+          .dividedBy(this.state.maxValue - this.state.loanValue)
+          .multipliedBy(this.props.loanOrderState.collateralAmount);
       }
       // console.log(collateralAmount.toString(), this.state.maxValue, this.props.loanOrderState.collateralAmount.toString());
     }
@@ -351,25 +364,26 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
         selectedValue < this.state.loanValue
       ).then(value => {
         observer.next(value);
+        this.changeStateLoading();
       });
     });
   };
 
 
   private rxConvertToBigNumber = (textValue: string): Observable<BigNumber> => {
-    const repayAmount = new BigNumber(textValue);
+    const collateralAmount = new BigNumber(textValue);
 
     return new Observable<BigNumber>(observer => {
-      observer.next(repayAmount);
+      observer.next(collateralAmount);
     });
   };
 
-  private onChange = (value: number) => {
+  private onChange = async (value: number) => {
     this.setState({ ...this.state, selectedValue: value });
   };
 
-  private onUpdate = (value: number) => {
-    this.setState({ ...this.state, selectedValue: value });
+  private onUpdate = async (value: number) => {
+     this.setState({ ...this.state, selectedValue: value });
   };
 
   public onSubmitClick = async (event: FormEvent<HTMLFormElement>) => {
@@ -419,61 +433,70 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
     }
   };
 
-  public onTradeAmountChange = async (event: ChangeEvent<HTMLInputElement>) => {
+
+  public onTradeAmountChange = (event: ChangeEvent<HTMLInputElement>) => {
+
     let amountText = event.target.value ? event.target.value : "";
+    const regexp = /^[-]?((\d+(\.\d{0,5})?)|(\.\d{0,5}}))$/;
 
-    let collateralAmount = new BigNumber(amountText);
-    let selectedValue = collateralAmount
-    .dividedBy(this.props.loanOrderState.collateralAmount)
-    .multipliedBy(this.state.maxValue - this.state.loanValue)
-    .plus(this.state.loanValue).toNumber();
+    if (amountText === "" || regexp.test(amountText)) {
 
-    if (collateralAmount.lt(0)) {
-      collateralAmount = new BigNumber(0);
-      amountText = "0"
-    } else if (collateralAmount.gt(this.props.loanOrderState.amountOwed)) {
-      collateralAmount = this.props.loanOrderState.amountOwed;
-      amountText = collateralAmount.toString();
+      let collateralAmount = new BigNumber(Math.abs(Number(amountText)));
+
+
+      if (collateralAmount.gt(this.props.loanOrderState.amountOwed)) {
+        collateralAmount = this.props.loanOrderState.amountOwed;
+        amountText = collateralAmount.toString();
+      }
+
+      if (Number(amountText) == 0) {
+
+        this.setState({
+          ...this.state,
+          inputAmountText: amountText
+        })
+      } else {
+
+        let selectedValue = (Number(amountText) > 0 ?
+          
+        collateralAmount
+          .dividedBy(this.props.loanOrderState.collateralAmount)
+          .multipliedBy(this.state.maxValue - this.state.loanValue)
+          .plus(this.state.loanValue)
+          :
+          new BigNumber(this.state.loanValue)
+          .minus(
+          collateralAmount
+          .dividedBy(this.state.collateralExcess)
+          .multipliedBy(this.state.loanValue)
+          )).toNumber();
+           
+
+        this.setState({
+          ...this.state,
+          inputAmountText: amountText,
+          selectedValue: selectedValue,
+          collateralAmount: collateralAmount,
+          isLoading: true
+        }, () => {
+          // emitting next event for processing with rx.js
+          this._inputTextChange.next(this.state.inputAmountText);
+        });
+
+      }
+
+
     }
-
-
-    this.setState({
-      ...this.state,
-      inputAmountText: amountText,
-      selectedValue: selectedValue,
-      collateralAmount: collateralAmount
-    }, () => {
-      // emitting next event for processing with rx.js
-      this._inputTextChange.next(this.state.inputAmountText);
-     // this.selectedValueUpdate.next(this.state.selectedValue);
-    });
   };
 
-  public updateCollateralAmount = (value: number) => {
-    let collateralAmount = this.props.loanOrderState.collateralAmount.multipliedBy(this.state.interestAmount)
-      .minus(this.props.loanOrderState.collateralAmount);
-
-    let selectedValue = collateralAmount
-      .dividedBy(this.props.loanOrderState.collateralAmount)
-      .multipliedBy(this.state.maxValue - this.state.loanValue)
-      .plus(this.state.loanValue).toNumber();
-
-
-    let collateralAmountText = collateralAmount.toString();
-    this.setState({
-      ...this.state,
-      collateralAmount: collateralAmount,
-      selectedValue: selectedValue,
-      inputAmountText: collateralAmountText
-    })
+  public changeStateLoading = () => {
+    if (this.state.collateralAmount) {
+      this.setState({ ...this.state, isLoading: false })
+    }
   }
 
-  public updateInterestAmount = (interest: number) => {
-
-    this.setState({ ...this.state, interestAmount: interest })
-  }
-
-  private formatPrecision(output: number): string {
+  public formatPrecision(outputText: string): string {
+    const output = Number(outputText);
     let sign = "";
     if (this.state.loanValue > this.state.selectedValue)
       sign = "-";
@@ -482,6 +505,6 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
     if (x < 0) x = 0;
     if (x > 5) x = 5;
     let result = new Number(output.toFixed(x)).toString();
-    return result!="0"? sign + result:result;
+    return result != "0" ? sign + result : result;
   }
 }

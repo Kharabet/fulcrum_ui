@@ -42,7 +42,7 @@ export function ExtendLoanSliderHandle({
           height: "1.625rem",
           border: "0.25rem solid #fff",
           borderRadius: "50%",
-          backgroundColor: "#6488ff"
+          backgroundColor: "#276BFB"
         }}
       />
     </Fragment>
