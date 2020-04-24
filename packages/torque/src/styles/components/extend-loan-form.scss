@@ -55,5 +55,17 @@
 @media screen and (max-width: $mobile-version-max-width) {
   .extend-loan-form {
     width: 100%;
+    &__info-extended-by-msg {
+      font-size: 16px;
+    }
+    &__info-extended-by-price {
+      font-size: 21px;
+    }
+    &__tips {
+      padding-bottom: 20px;
+    }
+    &__tip {
+      font-size: 14px;
+    }
   }
 }
