@@ -101,15 +101,15 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
   };
 
   private derivedUpdate = async () => {
-      this.setState({
-        ...this.state,
-        inputAmountText: parseInt(this.props.refinanceData.debt.toString(), 10),
-        borrowAmount: this.props.refinanceData.debt
-      });
-      this._inputTextChange.next(this.state.inputAmountText);
-      // @ts-ignore
-      const interestRate = await TorqueProvider.Instance.getAssetInterestRate(Asset[this.props.refinanceData.collateralType]);
-      this.setState({ ...this.state, fixedApr: interestRate });
+    this.setState({
+      ...this.state,
+      inputAmountText: parseInt(this.props.refinanceData.debt.toString(), 10),
+      borrowAmount: this.props.refinanceData.debt
+    });
+    this._inputTextChange.next(this.state.inputAmountText);
+    // @ts-ignore
+    const interestRate = await TorqueProvider.Instance.getAssetInterestRate(Asset[this.props.refinanceData.collateralType]);
+    this.setState({ ...this.state, fixedApr: interestRate });
   };
 
   public loanAmountChange = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -161,21 +161,18 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
     const arrowIcon = !this.state.isShow ? <TopArrow /> : <DownArrow />;
 
     if (!this.props.refinanceData.isShowCard) return null;
+
     return (
-
       <div className={`refinance-asset-selector-item `}>
-
         <div className="refinance-asset__main-block">
-
           <div className="refinance-asset-selector__non-torque">
-
+            <div className="refinance-asset-selector__cdp">CDP {this.props.refinanceData.cdpId.toFixed(0)}</div>
             <div className="refinance-asset-selector__non-torque-logo">
               <MakerImg />
             </div>
             <div className="refinance-asset-selector__non-torque-apr">
               <div className="value">{this.props.refinanceData.variableAPR.dp(0, BigNumber.ROUND_CEIL).toString()}%</div>
               <div className="text">Variable APR</div>
-
             </div>
             <div className="refinance__input-container">
               <input
@@ -196,9 +193,7 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
             </div>
             {this.props.refinanceData.isDisabled && !this.props.isMobileMedia &&
               <div className="collaterization-warning">Collateralization should be 150%+</div>}
-
           </div>
-
           <div className="refinance-asset-selector__torque">
             <div className="refinance-asset-selector__torque-logo">
               <TorqueLogo />
@@ -227,7 +222,6 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
             {this.state.isShow &&
               <div className="refinance-asset-selector__collateral-container">
                 <div className="refinance-asset-selector__collateral">
-
                   <div className="asset-icon">
                     <Eth />
                   </div>
@@ -239,12 +233,10 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
                   </div>
                   <div className="asset-name">
                     {this.props.refinanceData.collateralType}
-
                     <div className="info-icon" onClick={this.showInfoCollateralAssetDt0}>
                       {iconInfoCollateralAssetDt0}
                     </div>
                   </div>
-
                 </div>
                 {this.state.isShowInfoCollateralAssetDt0 && <CollateralInfo />}
               </div>}
@@ -260,7 +252,6 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
             </div>
             : <div className="refinance-asset-selector__desc" />
           }
-
           {this.props.refinanceData.isDisabled || this.state.borrowAmount.lte(0) || this.state.borrowAmount.gt(this.props.refinanceData.debt) || this.state.isLoading ?
             <button className="refinance-button disabled">
               {btnValue}
@@ -272,8 +263,6 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
             </button>
           }
         </div>
-
-
       </div>
     )
   }
