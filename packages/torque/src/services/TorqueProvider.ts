@@ -843,15 +843,7 @@ export class TorqueProvider {
   };
 
   public getMakerLoans = async (): Promise<RefinanceCdpData[]> => {
-    let result: RefinanceCdpData[] = [{
-      cdpId: new BigNumber(0),
-      urn: "",
-      ilk: "",
-      accountAddress: "",
-      proxyAddress: "",
-      isProxy: false,
-      isInstaProxy: false
-    }];
+    let result: RefinanceCdpData[] = [];
 
     const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
 
@@ -864,27 +856,16 @@ export class TorqueProvider {
         const ilk = cdpsResult[2];
 
         for (let i = 0; i < cdpId.length; i++) {
-          if (!result[0].cdpId.gt(0)) {
-            result = [{
-              "cdpId": cdpId[i],
-              "urn": urn[i],
-              "ilk": ilk[i],
-              "accountAddress": account,
-              "isProxy": false,
-              "isInstaProxy": false,
-              proxyAddress: ""
-            }];
-          } else {
-            result.push({
-              "cdpId": cdpId[i],
-              "urn": urn[i],
-              "ilk": ilk[i],
-              "accountAddress": account,
-              "isProxy": false,
-              "isInstaProxy": false,
-              proxyAddress: ""
-            });
-          }
+
+          result.push({
+            "cdpId": cdpId[i],
+            "urn": urn[i],
+            "ilk": ilk[i],
+            "accountAddress": account,
+            "isProxy": false,
+            "isInstaProxy": false,
+            proxyAddress: ""
+          });
         }
       }
 
@@ -901,27 +882,16 @@ export class TorqueProvider {
           const urn = cdpsResult[1];
           const ilk = cdpsResult[2];
           for (let i = 0; i < cdpId.length; i++) {
-            if (!result[0].cdpId.gt(0)) {
-              result = [{
-                "cdpId": cdpId[i],
-                "urn": urn[i],
-                "ilk": ilk[i],
-                "accountAddress": account,
-                "isProxy": true,
-                "isInstaProxy": false,
-                proxyAddress
-              }];
-            } else {
-              result.push({
-                "cdpId": cdpId[i],
-                "urn": urn[i],
-                "ilk": ilk[i],
-                "accountAddress": account,
-                "isProxy": true,
-                "isInstaProxy": false,
-                proxyAddress
-              });
-            }
+
+            result.push({
+              "cdpId": cdpId[i],
+              "urn": urn[i],
+              "ilk": ilk[i],
+              "accountAddress": account,
+              "isProxy": true,
+              "isInstaProxy": false,
+              proxyAddress
+            });
           }
         }
       }
@@ -939,28 +909,16 @@ export class TorqueProvider {
           const urn = cdpsResult[1];
           const ilk = cdpsResult[2];
           for (let i = 0; i < cdpId.length; i++) {
-            if (!result[0].cdpId.gt(0)) {
-              result = [{
-                "cdpId": cdpId[i],
-                "urn": urn[i],
-                "ilk": ilk[i],
-                "accountAddress": account,
-                "isProxy": true,
-                "isInstaProxy": true,
-                proxyAddress
-              }];
 
-            } else {
-              result.push({
-                "cdpId": cdpId[i],
-                "urn": urn[i],
-                "ilk": ilk[i],
-                "accountAddress": account,
-                "isProxy": true,
-                "isInstaProxy": true,
-                proxyAddress
-              });
-            }
+            result.push({
+              "cdpId": cdpId[i],
+              "urn": urn[i],
+              "ilk": ilk[i],
+              "accountAddress": account,
+              "isProxy": true,
+              "isInstaProxy": true,
+              proxyAddress
+            });
           }
         }
       }
@@ -1429,7 +1387,7 @@ export class TorqueProvider {
 
   // noinspection JSUnusedGlobalSymbols
   public getLoansListTest = async (): Promise<IBorrowedFundsState[]> => {
-    
+
     const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
     // noinspection SpellCheckingInspection
     return [

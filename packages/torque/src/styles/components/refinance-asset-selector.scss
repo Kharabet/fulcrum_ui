@@ -1,12 +1,8 @@
 .refinance-list {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-gap: 30px;
   .refinance-asset-selector {
-    &:not(:last-child){
-      margin-bottom: 45px;
-    }
     &-item {
       display: flex;
       flex-direction: column;
@@ -14,13 +10,19 @@
       background-color: #f3f9ff;
       border: 1px solid transparent;
       width: 670px;
+      &:last-child:nth-child(odd) { /*place center the last child in a row*/
+        grid-column: 1/3;
+        place-self: center;
+      }
       &:hover {
         background-color: transparent;
         border: 1px solid #a9b5c7;
         .refinance-asset__main-block .refinance-asset-selector__non-torque .refinance__input-container .input-amount {
           background-color: #f5f7f9;
         }
-        .refinance-asset__main-block .refinance-asset-selector__collateral-container .refinance-asset-selector__collateral_info{
+        .refinance-asset__main-block
+          .refinance-asset-selector__collateral-container
+          .refinance-asset-selector__collateral_info {
           background-color: #f3f9ff;
         }
       }
@@ -81,9 +83,9 @@
               border: 2px solid #e7ebf0;
               box-sizing: border-box;
               border-radius: 4px;
-              &.warning{
-                border-color:#DE4A4A;
-                color:#DE4A4A;
+              &.warning {
+                border-color: #de4a4a;
+                color: #de4a4a;
               }
             }
             .refinance-details-msg--warning {
@@ -95,7 +97,6 @@
               max-width: 185px;
             }
           }
-
         }
 
         .refinance-asset-selector__torque {
@@ -310,6 +311,7 @@
     }
   }
   @media screen and (max-width: $breakpoint-mobile-max) {
+    grid-template-columns: repeat(1, 1fr);
     .refinance-asset-selector {
       width: 100%;
 
@@ -439,7 +441,7 @@
             align-items: center;
             .refinance-asset-selector__collateral_info {
             }
-          }          
+          }
           .collaterization-warning {
             grid-row: 5;
             grid-column: 1/3;

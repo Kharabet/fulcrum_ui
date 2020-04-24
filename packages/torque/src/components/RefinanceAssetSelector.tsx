@@ -68,7 +68,13 @@ export class RefinanceAssetSelector extends Component<IRefinanceAssetSelectorPro
     const refinanceData = await this.getMakerRefinanceData()
     const refinanceCompoundData = await this.getSoloComoundRefinanceData();
 
-    this.setState({ ...this.state,  isLoading: false, isItems: refinanceData.length > 0 || refinanceCompoundData.length > 0,refinanceData, refinanceCompoundData });
+    this.setState({
+      ...this.state,
+      isLoading: false,
+      isItems: refinanceData.length > 0 || refinanceCompoundData.length > 0,
+      refinanceData,
+      refinanceCompoundData
+    });
   };
 
   private getSoloComoundRefinanceData = async (): Promise<IRefinanceLoan[]> => {
@@ -131,30 +137,29 @@ export class RefinanceAssetSelector extends Component<IRefinanceAssetSelectorPro
   }
 
   public render() {
-    const refinance = this.state.refinanceData;
-    let items;
-    if (refinance[0].cdpId.gt(0)) {
-      items = refinance.map((e, index) => {
-        return (
-          <RefinanceAssetSelectorItem
-            isMobileMedia={this.props.isMobileMedia}
-            key={refinance[index].urn} asset={Asset.DAI}
-            cdpId={refinance[index].cdpId}
-            urn={refinance[index].urn}
-            accountAddress={refinance[index].accountAddress}
-            proxyAddress={refinance[index].proxyAddress}
-            isProxy={refinance[index].isProxy}
-            isInstaProxy={refinance[index].isInstaProxy}
-            ilk={refinance[index].ilk} />
-        );
-      });
-    }
+    const makerItems = this.state.refinanceData.map((e, index, refinance) => (
+        <RefinanceAssetSelectorItem
+          isMobileMedia={this.props.isMobileMedia}
+          key={refinance[index].urn} asset={Asset.DAI}
+          cdpId={refinance[index].cdpId}
+          urn={refinance[index].urn}
+          accountAddress={refinance[index].accountAddress}
+          proxyAddress={refinance[index].proxyAddress}
+          isProxy={refinance[index].isProxy}
+          isInstaProxy={refinance[index].isInstaProxy}
+          ilk={refinance[index].ilk} />
+      ));
     const soloCompoundItems = this.state.refinanceCompoundData.map((e, index) => (<RefinanceAssetCompoundLoanItem key={index} {...e} isMobileMedia={this.props.isMobileMedia} />));
 
 
-    return <React.Fragment>
-      {soloCompoundItems}
-      {items}
+    return this.state.isLoading ? null
+      : <React.Fragment>
+        {!this.state.isItems && <div className="refinance-page__main-msgCentered" onClick={this.derivedUpdate}
+          style={this.state.isItems ? { display: `none` } : undefined}>
+          <span>Looks like you don't have any loans available to refinance.</span>
+        </div>}
+        {soloCompoundItems}
+        {makerItems}
       </React.Fragment>;
   }
 }
