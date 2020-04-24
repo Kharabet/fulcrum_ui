@@ -1,8 +1,7 @@
 import { BigNumber } from "@0x/utils";
-import React, { Component, FormEvent } from "react";
+import React, { Component, FormEvent, ChangeEvent } from "react";
 import { Observable, Subject } from "rxjs";
 import { debounceTime, switchMap } from "rxjs/operators";
-import { ActionType } from "../domain/ActionType";
 import { Asset } from "../domain/Asset";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
@@ -11,7 +10,7 @@ import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
 import { IExtendEstimate } from "../domain/IExtendEstimate";
 import { TorqueProvider } from "../services/TorqueProvider";
 import { ExtendLoanSlider } from "./ExtendLoanSlider";
-import { OpsEstimatedResult } from "./OpsEstimatedResult";
+import { InputAmount } from "./InputAmount";
 
 export interface IExtendLoanFormProps {
   loanOrderState: IBorrowedFundsState;
@@ -34,9 +33,14 @@ interface IExtendLoanFormState {
   balanceTooLow: boolean;
 
   didSubmit: boolean;
+  interestAmount: number;
+  inputAmountText: string,
+  maxDepositAmount: BigNumber;
 }
 
 export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanFormState> {
+  private readonly _inputDecimals = 6;
+  private readonly _inputTextChange: Subject<string>;
   private readonly selectedValueUpdate: Subject<number>;
 
   constructor(props: IExtendLoanFormProps, context?: any) {
@@ -46,13 +50,16 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
       minValue: 1,
       maxValue: 365,
       assetDetails: null,
-      currentValue: 100,
-      selectedValue: 100,
+      currentValue: 90,
+      selectedValue: 90,
       depositAmount: new BigNumber(0),
       extendManagementAddress: null,
       gasAmountNeeded: new BigNumber(0),
       balanceTooLow: false,
-      didSubmit: false
+      didSubmit: false,
+      interestAmount: 0,
+      inputAmountText: "",
+      maxDepositAmount: new BigNumber(0)
     };
 
     this.selectedValueUpdate = new Subject<number>();
@@ -67,6 +74,17 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
           depositAmount: value.depositAmount
         });
       });
+    this._inputTextChange = new Subject<string>();
+    this._inputTextChange
+      .pipe(
+        debounceTime(100),
+      )
+      .subscribe((value: string) => {
+        this.setState({
+          ...this.state,
+          inputAmountText: value
+        })
+      });
   }
 
   public componentDidMount(): void {
@@ -76,6 +94,7 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
       TorqueProvider.Instance.getLoanExtendManagementAddress(
         this.props.loanOrderState
       ).then(extendManagementAddress => {
+        let inputAmountText = this.state.maxDepositAmount.multipliedBy(this.state.selectedValue).dividedBy(this.state.maxValue).toFixed(this._inputDecimals).toString();
         this.setState(
           {
             ...this.state,
@@ -84,14 +103,17 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
             assetDetails: AssetsDictionary.assets.get(this.props.loanOrderState.loanAsset) || null,
             currentValue: collateralState.currentValue,
             selectedValue: collateralState.currentValue,
-            extendManagementAddress: extendManagementAddress
+            extendManagementAddress: extendManagementAddress,
+            inputAmountText: inputAmountText
           },
           () => {
             this.selectedValueUpdate.next(this.state.selectedValue);
+            this._inputTextChange.next(this.state.inputAmountText);
           }
         );
       });
     });
+    this.getMaxDepositAmount();
   }
 
   public componentDidUpdate(
@@ -116,10 +138,15 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
             },
             () => {
               this.selectedValueUpdate.next(this.state.selectedValue);
+              this._inputTextChange.next(this.state.inputAmountText);
             }
           );
         });
       });
+    }
+
+    if (prevState.interestAmount !== this.state.interestAmount) {
+      this.updateDepositAmount(this.state.interestAmount);
     }
   }
 
@@ -135,15 +162,13 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
 
     return (
       <form className="extend-loan-form" onSubmit={this.onSubmitClick}>
-        <section className="dialog-content" style={{ marginTop: `-2rem` }}>
-
-          {daysLeft ? (
-            <div className="extend-loan-form__info-extended-by-container">
-              <div className="extend-loan-form__info-extended-by-msg" style={{ fontSize: `0.9rem`, paddingBottom: `1rem` }}>There are {daysLeft} days until collateral will be partially liquidated to fund interest payments.</div>
+        <section className="dialog-content">
+          <div className="extend-loan-form__info-extended-by-container">
+            <div className="extend-loan-form__info-extended-by-msg">This date will be extended by</div>
+            <div className="extend-loan-form__info-extended-by-price">
+              {this.state.selectedValue} {this.pluralize("day", "days", this.state.selectedValue)}
             </div>
-          ) : ``}
-
-          <hr className="extend-loan-form__delimiter" />
+          </div>
 
           <ExtendLoanSlider
             readonly={false}
@@ -159,23 +184,22 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
             <div className="extend-loan-form__tip">Max</div>
           </div>
 
-          <hr className="extend-loan-form__delimiter" />
-
-          <div className="extend-loan-form__info-extended-by-container">
-            <div className="extend-loan-form__info-extended-by-msg">This date will be extended by</div>
-            <div className="extend-loan-form__info-extended-by-price">
-              {this.state.selectedValue} {this.pluralize("day", "days", this.state.selectedValue)}
-            </div>
-          </div>
-          <OpsEstimatedResult
-            assetDetails={this.state.assetDetails}
-            actionTitle="You will send"
-            amount={this.state.depositAmount}
-            precision={6}
+          <div className="extend-loan-form__info-extended-by-msg mb-20">You will send</div>
+          <InputAmount
+            asset={this.state.assetDetails.reactLogoSvg}
+            inputAmountText={this.state.inputAmountText}
+            updateInterestAmount={this.updateInterestAmount}
+            onTradeAmountChange={this.onTradeAmountChange}
+            interestAmount={this.state.interestAmount}
           />
-          <div className={`extend-loan-form-insufficient-balance ${!this.state.balanceTooLow ? `extend-loan-form-insufficient-balance--hidden` : ``}`}>
-            Insufficient {this.state.assetDetails.displayName} balance in your wallet!
+          {this.state.balanceTooLow
+            ? <React.Fragment>
+              <div className="extend-loan-form__insufficient-balance">
+                Insufficient {this.state.assetDetails.displayName} balance in your wallet!
               </div>
+            </React.Fragment>
+            : null
+          }
         </section>
         <section className="dialog-actions">
           <div className="extend-loan-form__actions-container">
@@ -205,18 +229,35 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
   };
 
   private onChange = (value: number) => {
-    this.setState({ ...this.state, selectedValue: value, currentValue: value });
+    let depositAmount = this.state.maxDepositAmount.multipliedBy(value).dividedBy(this.state.maxValue);
+    let depositAmountText = depositAmount.toFixed(this._inputDecimals).toString();
+    this.setState({
+      ...this.state,
+      selectedValue: value,
+      currentValue: value,
+      depositAmount: depositAmount,
+      inputAmountText: depositAmountText,
+      interestAmount: 0
+    });
   };
 
   private onUpdate = (value: number) => {
-    this.setState({ ...this.state, selectedValue: value });
+    let depositAmount = this.state.maxDepositAmount.multipliedBy(value).dividedBy(this.state.maxValue);
+    let depositAmountText = depositAmount.toFixed(this._inputDecimals).toString();
+    this.setState({
+      ...this.state,
+      selectedValue: value,
+      depositAmount: depositAmount,
+      inputAmountText: depositAmountText,
+      interestAmount: 0
+    });
   };
 
   public onSubmitClick = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     if (!this.state.didSubmit && this.state.depositAmount.gt(0)) {
-      this.setState({...this.state, didSubmit: true});
+      this.setState({ ...this.state, didSubmit: true });
 
       let assetBalance = await TorqueProvider.Instance.getAssetTokenBalanceOfUser(this.props.loanOrderState.loanAsset);
       if (this.props.loanOrderState.loanAsset === Asset.ETH) {
@@ -251,4 +292,57 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
       );
     }
   };
+
+  public onTradeAmountChange = (event: ChangeEvent<HTMLInputElement>) => {
+    let inputAmountText = event.target.value ? event.target.value : "";
+    let depositAmount = new BigNumber(inputAmountText);
+    let selectedValue = this.getSelectedValue(inputAmountText);
+
+    this.setState({
+      ...this.state,
+      depositAmount: depositAmount,
+      inputAmountText: inputAmountText,
+      selectedValue: selectedValue,
+      currentValue: selectedValue,
+      interestAmount: 0
+    });
+    this._inputTextChange.next(inputAmountText);
+    this.selectedValueUpdate.next(this.state.selectedValue);
+  };
+
+  public updateDepositAmount = (value: number) => {
+    if (value !== 0) {
+      let depositAmount = this.state.maxDepositAmount.multipliedBy(value);
+      let depositAmountText = depositAmount.toFixed(this._inputDecimals).toString();
+      let selectedValue = value === 1 ? value * this.state.maxValue : value * (this.state.maxValue - this.state.minValue);
+      this.setState({
+        ...this.state,
+        depositAmount: depositAmount,
+        inputAmountText: depositAmountText,
+        selectedValue: selectedValue,
+        currentValue: selectedValue
+      });
+      this._inputTextChange.next(this.state.inputAmountText);
+      this.selectedValueUpdate.next(this.state.selectedValue);
+    }
+  }
+
+  public updateInterestAmount = (interest: number) => {
+    this.setState({ ...this.state, interestAmount: interest })
+  }
+
+  private getMaxDepositAmount = async () => {
+    let maxDepositAmount = await TorqueProvider.Instance.getLoanExtendEstimate(this.props.loanOrderState.interestOwedPerDay, this.state.maxValue);
+    this.setState({ ...this.state, maxDepositAmount: maxDepositAmount.depositAmount });
+    return maxDepositAmount.depositAmount;
+  }
+  
+  public getSelectedValue = (value: string) => {
+    let maxDepositAmountText = this.state.maxDepositAmount.toString();
+    let maxDepositAmountNumber = Number(maxDepositAmountText);
+    let depositAmountText = new BigNumber(value);
+    let depositAmountNumber = Number(depositAmountText);
+    let selectedValue = Math.round(depositAmountNumber * this.state.maxValue / maxDepositAmountNumber);
+    return selectedValue;
+  }
 }

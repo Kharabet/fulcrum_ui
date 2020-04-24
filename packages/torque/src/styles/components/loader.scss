@@ -11,7 +11,8 @@
             color: #283049;
             margin-bottom: 0;
             text-align: center;
-            @media screen and (max-width: $mobile-version-max-width){
+            margin-bottom: 35px;
+            @media screen and (max-width: $mobile-version-max-width) {
                 font-size: 36px;
                 margin-bottom: 15px;
             }
@@ -24,6 +25,7 @@
         display: inline-block;
         margin: 0 10px;
         background-color: #a9b5c7;
+        opacity: 0.5;
         width: 12px;
         height: 12px;
         border-radius: 50%;
@@ -46,13 +48,21 @@
     0% {
         transform: scale(1);
         background-color: #a9b5c7;
+        opacity: 0.5;
     }
-    10% {
+    5% {
         transform: scale(1.8);
         background-color: #276bfb;
+        opacity: 1;
+    }
+    15% {
+        transform: scale(1.8);
+        background-color: #276bfb;
+        opacity: 1;
     }
     20% {
         transform: scale(1);
         background-color: #a9b5c7;
+        opacity: 0.5;
     }
 }

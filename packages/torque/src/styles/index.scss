@@ -9,15 +9,12 @@
 @import "base/animations";
 @import "base/base";
 @import "base/typography";
-@import "base/utilities";
-@import "base/utilities.mobile";
+@import "base/modal";
 
 @import "components/asset-selector";
 @import "components/asset-selector.mobile";
 @import "components/refinance-asset-selector";
-@import "components/refinance-asset-selector.mobile";
 @import "components/borrow-form";
-@import "components/borrow-form.mobile";
 @import "components/borrowed-funds-list";
 @import "components/button";
 @import "components/collateral-slider";
@@ -25,8 +22,6 @@
 @import "components/collateral-token-selector";
 @import "components/collateral-token-selector.mobile";
 @import "components/dialog";
-@import "components/dialog.mobile";
-@import "components/dialog-header";
 @import "components/extend-loan-form";
 @import "components/info-block";
 @import "components/manage-collateral-form";

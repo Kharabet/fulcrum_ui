@@ -1,3 +1,29 @@
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 38px 48px 0 48px;
+  &__title {
+    font-size: 22px;
+    line-height: 1.5;
+    font-weight: 900;
+    font-style: normal;
+    font-stretch: normal;
+    color: #283049;
+  }
+  &__title-close {
+    display: flex;
+    cursor: pointer;
+    &:hover {
+      svg {
+        path {
+          fill: #758295;
+        }
+      }
+    }
+  }
+}
 .dialog-content {
   width: 100%;
   padding: 0 48px;
@@ -6,4 +32,20 @@
 .dialog-actions {
   width: 100%;
   padding: 44px 48px;
+}
+
+@media screen and(max-width: $mobile-version-max-width) {
+  .dialog-header {
+    padding: 30px 40px 0 40px;
+    &__title {
+      font-size: 16px;
+    }
+  }
+  .dialog-content {
+    padding: 0 30px;
+  }
+
+  .dialog-actions {
+    padding: 30px 30px;
+  }
 }

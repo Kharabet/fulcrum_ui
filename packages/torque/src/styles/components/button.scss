@@ -1,4 +1,5 @@
 .btn {
+  font-family: 'Muli', sans-serif;
   font-size: 16px;
   line-height: 1.4;
   font-weight: 800;
@@ -33,5 +34,14 @@
 
   &:active {
     background-color: $color-blue !important;
+  }
+}
+@media screen and(max-width: $mobile-version-max-width) {
+  .btn {
+    font-size: 14px;
+  }
+
+  .btn-size--small {
+    padding: 15px 34px;
   }
 }

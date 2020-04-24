@@ -1,7 +1,7 @@
 import { BigNumber } from "@0x/utils";
 import React, { ChangeEvent, Component, FormEvent } from "react";
 import { Observable, Subject } from "rxjs";
-import { debounceTime, switchMap } from "rxjs/operators";
+import { debounceTime } from "rxjs/operators";
 import { Asset } from "../domain/Asset";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
@@ -20,13 +20,7 @@ export interface IRepayLoanFormProps {
 
 interface IRepayLoanFormState {
   assetDetails: AssetDetails | null;
-
-  minValue: number;
-  maxValue: number;
-
-  inputAmountText: string;
-  currentValue: number;
-  selectedValue: number;
+  repayAmountText: string;
   repayAmount: BigNumber;
   repayManagementAddress: string | null;
   gasAmountNeeded: BigNumber;
@@ -36,22 +30,14 @@ interface IRepayLoanFormState {
 }
 
 export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanFormState> {
-  private readonly _inputPrecision = 6;
-
   private readonly _inputTextChange: Subject<string>;
-
-  private readonly selectedValueUpdate: Subject<number>;
 
   constructor(props: IRepayLoanFormProps, context?: any) {
     super(props, context);
 
     this.state = {
-      minValue: 0,
-      maxValue: 100,
-      inputAmountText: "",
       assetDetails: null,
-      currentValue: 100,
-      selectedValue: 100,
+      repayAmountText: props.loanOrderState.amountOwed.toString(),
       repayAmount: props.loanOrderState.amountOwed,
       repayManagementAddress: null,
       gasAmountNeeded: new BigNumber(0),
@@ -60,32 +46,15 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
       interestAmount: 0
     };
 
-    this.selectedValueUpdate = new Subject<number>();
-    this.selectedValueUpdate
-      .pipe(
-        debounceTime(100),
-        switchMap(value => this.rxGetEstimate(value))
-      )
-      .subscribe((value: IRepayEstimate) => {
-        this.setState({
-          ...this.state,
-          repayAmount: value.repayAmount,
-          inputAmountText: value.repayAmount.toString()
-        });
-      });
-
     this._inputTextChange = new Subject<string>();
     this._inputTextChange
       .pipe(
-        debounceTime(100),
-        switchMap(value => this.rxConvertToBigNumber(value)),
-        switchMap(value => this.rxGetEstimatePercent(value))
+        debounceTime(100)
       )
-      .subscribe((value: IRepayEstimate) => {
+      .subscribe((value: string) => {
         this.setState({
           ...this.state,
-          currentValue: value.repayPercent ? value.repayPercent : 0,
-          repayAmount: value.repayAmount
+          repayAmountText: value
         });
       });
   }
@@ -101,17 +70,12 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
           this.setState(
             {
               ...this.state,
-              minValue: collateralState.minValue,
-              maxValue: collateralState.maxValue,
               assetDetails: AssetsDictionary.assets.get(this.props.loanOrderState.loanAsset) || null,
-              currentValue: collateralState.currentValue,
-              selectedValue: collateralState.currentValue,
               repayManagementAddress: repayManagementAddress,
               gasAmountNeeded: gasAmountNeeded
             },
             () => {
-              this.selectedValueUpdate.next(this.state.selectedValue);
-              // this._inputTextChange.next(this.state.inputAmountText);
+              this._inputTextChange.next(this.state.repayAmountText);
             }
           );
         });
@@ -126,8 +90,7 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
   ): void {
     if (
       prevProps.loanOrderState.accountAddress !== this.props.loanOrderState.accountAddress ||
-      prevProps.loanOrderState.loanOrderHash !== this.props.loanOrderState.loanOrderHash ||
-      prevState.selectedValue !== this.state.selectedValue
+      prevProps.loanOrderState.loanOrderHash !== this.props.loanOrderState.loanOrderHash
     ) {
       TorqueProvider.Instance.getLoanRepayAddress(
         this.props.loanOrderState
@@ -140,8 +103,7 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
               gasAmountNeeded: gasAmountNeeded
             },
             () => {
-              this.selectedValueUpdate.next(this.state.selectedValue);
-              // this._inputTextChange.next(this.state.inputAmountText);
+              this._inputTextChange.next(this.state.repayAmountText);
             }
           );
         });
@@ -162,7 +124,7 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
         <section className="dialog-content">
           <InputAmount
             asset={this.state.assetDetails.reactLogoSvg}
-            inputAmountText={this.state.inputAmountText}
+            inputAmountText={this.state.repayAmountText}
             updateInterestAmount={this.updateInterestAmount}
             onTradeAmountChange={this.onTradeAmountChange}
             interestAmount={this.state.interestAmount}
@@ -194,26 +156,6 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
     });
   };
 
-  private rxConvertToBigNumber = (textValue: string): Observable<BigNumber> => {
-    const repayAmount = new BigNumber(textValue);
-
-    return new Observable<BigNumber>(observer => {
-      observer.next(repayAmount);
-    });
-  };
-
-  private rxGetEstimatePercent = (repayAmount: BigNumber): Observable<IRepayEstimate> => {
-
-    return new Observable<IRepayEstimate>(observer => {
-      TorqueProvider.Instance.getLoanRepayPercent(
-        this.props.loanOrderState,
-        repayAmount
-      ).then(value => {
-        observer.next(value);
-      });
-    });
-  };
-
   public onSubmitClick = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -223,7 +165,7 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
     }
 
     if (!this.state.didSubmit) {
-      this.setState({...this.state, didSubmit: true});
+      this.setState({ ...this.state, didSubmit: true });
 
       let assetBalance = await TorqueProvider.Instance.getAssetTokenBalanceOfUser(this.props.loanOrderState.loanAsset);
       if (this.props.loanOrderState.loanAsset === Asset.ETH) {
@@ -268,35 +210,42 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
   };
 
   public onTradeAmountChange = async (event: ChangeEvent<HTMLInputElement>) => {
-    let amountText = event.target.value ? event.target.value : "";
+    let repayAmountText = event.target.value ? event.target.value : "";
 
-    let repayAmount = new BigNumber(amountText);
+    let repayAmount = new BigNumber(repayAmountText);
     if (repayAmount.lt(0)) {
       repayAmount = new BigNumber(0);
-      amountText = "0"
+      repayAmountText = "0"
     } else if (repayAmount.gt(this.props.loanOrderState.amountOwed)) {
       repayAmount = this.props.loanOrderState.amountOwed;
-      amountText = repayAmount.toString();
+      repayAmountText = repayAmount.toString();
     }
 
     this.setState({
       ...this.state,
-      inputAmountText: amountText,
-      repayAmount: repayAmount
+      repayAmountText: repayAmountText,
+      repayAmount: repayAmount,
+      interestAmount: 0
     }, () => {
       // emitting next event for processing with rx.js
-      this._inputTextChange.next(this.state.inputAmountText);
+      this._inputTextChange.next(this.state.repayAmountText);
     });
   };
 
   public updateRepayAmount = (value: number) => {
-    let repayAmount = this.props.loanOrderState.amountOwed.multipliedBy(this.state.interestAmount);
-    let repayAmountText = repayAmount.toString();
-    this.setState({
-      ...this.state,
-      repayAmount: repayAmount,
-      inputAmountText: repayAmountText
-    })
+    if (value !== 0) {
+      let repayAmount = this.props.loanOrderState.amountOwed.multipliedBy(this.state.interestAmount);
+      let repayAmountText = repayAmount.toString();
+      
+      this.setState({
+        ...this.state,
+        repayAmount: repayAmount,
+        repayAmountText: repayAmountText
+      }, () => {
+        // emitting next event for processing with rx.js
+        this._inputTextChange.next(this.state.repayAmountText);
+      });
+    }
   }
 
   public updateInterestAmount = (interest: number) => {

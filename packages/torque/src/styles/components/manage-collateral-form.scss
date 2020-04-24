@@ -82,6 +82,7 @@
     font-size: 18px;
     font-weight: bold;
     line-height: 27px;
+    margin-bottom: 15px;
     letter-spacing: -0.16px;
     text-align: center;
     color: #758295;
@@ -130,4 +131,12 @@
     justify-content: flex-end;
   }
 
+  .input-container .input-row 
+  {
+    height: 69px;
+    .input-amount::placeholder{
+    font-size: 42px;
+  }
+}
+  
 }

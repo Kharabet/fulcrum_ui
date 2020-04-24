@@ -22,6 +22,14 @@
     border: 2px solid #e7ebf0;
     border-radius: 4px;
     padding: 20px 0;
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    &[type="number"] {
+      -moz-appearance: textfield;
+    }
     &:hover,
     &:focus {
       background-color: $color-gray-light;
@@ -65,5 +73,17 @@
   }
   &__error{
     color: #de4a4a;
+  }
+}
+
+@media screen and (max-width: $mobile-version-max-width) {
+  .borrow-form {
+    width: 100%;
+    &__input-container {
+      padding: 0 40px 40px 40px;
+    }
+    &__input-amount {
+      font-size: 32px;
+    }
   }
 }

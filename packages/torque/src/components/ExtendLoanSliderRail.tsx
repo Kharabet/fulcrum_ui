@@ -16,7 +16,7 @@ const railInnerStyle: CSSProperties = {
   transform: "translate(0%, -50%)",
   borderRadius: "0.5rem",
   pointerEvents: "none",
-  backgroundImage: "linear-gradient(to right, #9be2ca, #2e7a61)"
+  backgroundImage: "linear-gradient(90deg, #009988 0%, #33DFCC 74.29%)"
 };
 
 export function ExtendLoanSliderRail(param: { getRailProps: GetRailProps }) {

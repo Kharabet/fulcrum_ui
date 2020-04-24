@@ -25,6 +25,9 @@ export class InputAmount extends Component<IInputAmountProps, IInputAmountState>
     public componentDidUpdate(prevProps: Readonly<IInputAmountProps>, prevState: Readonly<IInputAmountState>, snapshot?: any): void {
         if (this.state.interestAmount !== prevState.interestAmount)
             this.props.updateInterestAmount(this.state.interestAmount);
+        if (this.props.interestAmount !== prevProps.interestAmount){
+            this.setState({...this.state, interestAmount: this.props.interestAmount})
+        }
     }
 
     private _setInputRef = (input: HTMLInputElement) => {
@@ -40,7 +43,8 @@ export class InputAmount extends Component<IInputAmountProps, IInputAmountState>
                         <input
                             ref={this._setInputRef}
                             className="input-amount"
-                            type="text"
+                            type="number"
+                            step="any"
                             placeholder={`Enter amount`}
                             value={this.props.inputAmountText}
                             onChange={this.props.onTradeAmountChange}

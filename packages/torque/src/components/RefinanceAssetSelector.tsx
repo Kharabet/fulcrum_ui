@@ -1,13 +1,15 @@
-import { BigNumber } from "@0x/utils";
 import React, { Component } from "react";
 import { Asset } from "../domain/Asset";
-import { RefinanceCdpData } from "../domain/RefinanceData";
+import { IRefinanceLoan, RefinanceData } from "../domain/RefinanceData";
 import { TorqueProviderEvents } from "../services/events/TorqueProviderEvents";
 import { TorqueProvider } from "../services/TorqueProvider";
 import { RefinanceAssetSelectorItem } from "./RefinanceAssetSelectorItem";
-import { Loader } from "./Loader";
+import { ProviderType } from "../domain/ProviderType";
+import { RefinanceAssetCompoundLoanItem } from "./RefinanceAssetCompoundLoanItem";
 
 export interface IRefinanceAssetSelectorProps {
+  isMobileMedia: boolean;
+  doNetworkConnect: () => void;
   updateStateShowLoader: (value: any) => void
 }
 
@@ -16,7 +18,8 @@ interface IRefinanceAssetSelectorItemState {
   isLoading: boolean;
   isItems: boolean;
   isShowRecord: boolean;
-  refinanceData: RefinanceCdpData[];
+  refinanceData: RefinanceData[];
+  refinanceCompoundData: IRefinanceLoan[];
 }
 
 export class RefinanceAssetSelector extends Component<IRefinanceAssetSelectorProps, IRefinanceAssetSelectorItemState> {
@@ -27,18 +30,10 @@ export class RefinanceAssetSelector extends Component<IRefinanceAssetSelectorPro
       isLoading: true,
       isItems: true,
       isShowRecord: false,
-      refinanceData:
-        [{
-          cdpId: new BigNumber(0),
-          urn: "",
-          ilk: "",
-          accountAddress: "",
-          proxyAddress: "",
-          isProxy: false,
-          isInstaProxy: false,
-        }]
+      refinanceCompoundData: [],
+      refinanceData: []
     };
-    
+
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderAvailable, this.derivedUpdate);
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderChanged, this.derivedUpdate);
   }
@@ -54,41 +49,62 @@ export class RefinanceAssetSelector extends Component<IRefinanceAssetSelectorPro
   }
 
   private derivedUpdate = async () => {
-    let isItem = false;
-    this.setState({ ...this.state, isLoading: true, isItems: true });
-
-    const refinanceData = await TorqueProvider.Instance.getMakerLoans();
-
-    // tslint:disable-next-line:prefer-for-of
-    for (let i = 0; i < refinanceData.length; i++) {
-      if (refinanceData[i].cdpId.gt(0)) {
-        isItem = true;
-        window.setTimeout(() => {
-          this.setState({ ...this.state, isLoading: false, isItems: true, isShowRecord: true });
-
-        }, 1900);
-      }
+    if (TorqueProvider.Instance.providerType === ProviderType.None || !TorqueProvider.Instance.contractsSource || !TorqueProvider.Instance.contractsSource.canWrite) {
+      this.props.doNetworkConnect()
+      return;
     }
-    if (!isItem && !this.state.isLoading) {
-      this.setState({ ...this.state, isItems: false });
-    }
+    this.setState({ ...this.state, isLoading: true, isItems: false });
+    const refinanceData = await this.getMakerRefinanceData()
+    const refinanceCompoundData = await this.getSoloComoundRefinanceData();
 
-    if (refinanceData[0].cdpId.gt(0)) {
-      window.setTimeout(() => {
-        this.setState({ ...this.state, isLoading: false });
-
-      }, 1900);
-    } else {
-      window.setTimeout(() => {
-        this.setState({ ...this.state, isLoading: false });
-        if (!isItem && !this.state.isLoading && !this.state.isShowRecord) {
-          this.setState({ ...this.state, isItems: false });
-        }
-      }, 12000);
-    }
-
-    this.setState({ ...this.state, refinanceData });
+    this.setState({
+      ...this.state,
+      isLoading: false,
+      isItems: refinanceData.length > 0 || refinanceCompoundData.length > 0,
+      refinanceData,
+      refinanceCompoundData
+    });
   };
+
+  private getSoloComoundRefinanceData = async (): Promise<IRefinanceLoan[]> => {
+    // const refinanceCompoundData = await TorqueProvider.Instance.checkSoloMargin();
+    const loans = await TorqueProvider.Instance.getCompoundLoans(); // TODO
+
+    if (loans.length) {
+      console.log("compound", loans[0].balance.toString(10));
+    }
+    this.setState({ ...this.state, refinanceCompoundData: loans });
+
+    const sololoans = await TorqueProvider.Instance.getSoloLoans(); // TODO
+    console.log("sololoans = ", sololoans);
+
+    const refinanceData = loans.concat(sololoans)
+    return refinanceData;
+
+  }
+  private getMakerRefinanceData = async (): Promise<RefinanceData[]> => {
+
+    const makerLoans = await TorqueProvider.Instance.getMakerLoans();
+    let refinanceData: RefinanceData[] = [];
+    for (let cdpData in makerLoans) {
+      const refinanceDataItem = await TorqueProvider.Instance.getCdpsVat(
+        makerLoans[cdpData].cdpId,
+        makerLoans[cdpData].urn,
+        makerLoans[cdpData].ilk,
+        makerLoans[cdpData].accountAddress,
+        makerLoans[cdpData].isProxy,
+        makerLoans[cdpData].isInstaProxy,
+        makerLoans[cdpData].proxyAddress,
+        Asset.DAI
+      )
+      if (refinanceDataItem.cdpId.gt(0))
+        refinanceData.push(refinanceDataItem);
+    }
+
+
+
+    return refinanceData;
+  }
 
   public componentDidUpdate(prevState: any) {
     if (this.state.isLoading !== prevState.isLoading) {
@@ -97,30 +113,27 @@ export class RefinanceAssetSelector extends Component<IRefinanceAssetSelectorPro
   }
 
   public render() {
-    const refinance = this.state.refinanceData;
-    let items;
-    if (refinance[0].cdpId.gt(0)) {
-      items = refinance.map((e, index) => {
-        return (
-          <RefinanceAssetSelectorItem
-            key={refinance[index].urn} asset={Asset.DAI}
-            cdpId={refinance[index].cdpId}
-            urn={refinance[index].urn}
-            accountAddress={refinance[index].accountAddress}
-            proxyAddress={refinance[index].proxyAddress}
-            isProxy={refinance[index].isProxy}
-            isInstaProxy={refinance[index].isInstaProxy}
-            ilk={refinance[index].ilk} />
-        );
-      });
-    }
+    const makerItems = this.state.refinanceData.map((refinanceDataItem, index) => (
+      <RefinanceAssetSelectorItem
+        key={index}
+        isMobileMedia={this.props.isMobileMedia}
+        asset={Asset.DAI}
+        refinanceData={refinanceDataItem} />
+    ));
+    const soloCompoundItems = this.state.refinanceCompoundData.map((e, index) => (
+      <RefinanceAssetCompoundLoanItem key={index}
+        {...e}
+        isMobileMedia={this.props.isMobileMedia} />
+    ));
 
-    return <div className="refinance-asset-selector">
-      <div className="refinance-page__main-msgCentered" onClick={this.derivedUpdate}
-        style={this.state.isItems ? { display: `none` } : undefined}>
-        <span>Looks like you don't have any loans available to refinance.</span>
-      </div>
-      {items}
-    </div>;
+
+    return this.state.isLoading ? null
+      : <React.Fragment>
+        {!this.state.isItems && <div className="no-loans-msg" onClick={this.derivedUpdate}>
+          Looks like you don't have any loans available to refinance.
+        </div>}
+        {soloCompoundItems}
+        {makerItems}
+      </React.Fragment>;
   }
 }

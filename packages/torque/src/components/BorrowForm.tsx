@@ -80,7 +80,8 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
             <input
               ref={this._setInputRef}
               className="borrow-form__input-amount"
-              type="text"
+              type="number"
+              step="any"
               onChange={this.onTradeAmountChange}
               placeholder={`Enter amount`}
             />
