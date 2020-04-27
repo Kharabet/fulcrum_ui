@@ -11,8 +11,8 @@
     padding: 25px;
     margin-bottom: 20px;
     border-radius: 8px;
-    background-color: $color-borrow-card;
-    border: 1px solid $color-borrow-card;
+    background-color: #f3f9ff;
+    border: 1px solid #f3f9ff;
     transition-property: background-color, border-radius;
     transition-duration: 0.2s, 1s;
     transition-timing-function: linear;
@@ -67,7 +67,7 @@
     }
 
     &:active {
-      background-color: $color-gray-darker-2;
+      background-color: #e2e3e7;
     }
     .asset-selector__title {
       display: flex;
@@ -112,7 +112,7 @@
       font-size: 42px;
       line-height: 1.2;
       color: #4ecea3;
-      &-value{
+      &-value {
         font-weight: 800;
       }
     }
