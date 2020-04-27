@@ -26,6 +26,7 @@ import { ProviderTypeDictionary } from '../domain/ProviderTypeDictionary';
 import { AbstractConnector } from '@web3-react/abstract-connector';
 import { errors } from "ethers"
 import { NavService } from '../services/NavService';
+import { ConnectorEvent, ConnectorUpdate } from '@web3-react/types';
 
 const isMainnetProd =
   process.env.NODE_ENV && process.env.NODE_ENV !== "development"
@@ -87,6 +88,8 @@ export class AppRouter extends Component<any, IAppRouterState> {
     console.log(provider);
     //handle connectors events (i.e. network changed)
     await this.onProviderTypeSelect(connector)
+    if (!connector.listeners(ConnectorEvent.Update).includes(this.onConnectorUpdated))
+      connector.on(ConnectorEvent.Update, this.onConnectorUpdated)
     return Web3ConnectionFactory.currentWeb3Engine;
   }
 
@@ -161,8 +164,20 @@ export class AppRouter extends Component<any, IAppRouterState> {
     }
   }
   public doNetworkConnect = async () => {
-    await this._isMounted &&  !this.state.isProviderMenuModalOpen && this.setState({ ...this.state, isProviderMenuModalOpen: true });
+    await this._isMounted && !this.state.isProviderMenuModalOpen && this.setState({ ...this.state, isProviderMenuModalOpen: true });
   };
+
+  public async onConnectorUpdated(update: ConnectorUpdate) {
+    console.log("onConnectorUpdated")
+    await TorqueProvider.Instance.eventEmitter.emit(TorqueProviderEvents.ProviderIsChanging);
+
+    await Web3ConnectionFactory.updateConnector(update);
+    await TorqueProvider.Instance.setWeb3ProviderFinalize(TorqueProvider.Instance.providerType)
+    await TorqueProvider.Instance.eventEmitter.emit(
+      TorqueProviderEvents.ProviderChanged,
+      new ProviderChangedEvent(TorqueProvider.Instance.providerType, TorqueProvider.Instance.web3Wrapper)
+    );
+  }
 
   public onDeactivate = async () => {
 
@@ -180,29 +195,29 @@ export class AppRouter extends Component<any, IAppRouterState> {
     await TorqueProvider.Instance.eventEmitter.emit(
       TorqueProviderEvents.ProviderChanged,
       new ProviderChangedEvent(TorqueProvider.Instance.providerType, TorqueProvider.Instance.web3Wrapper)
-        );
-        }
+    );
+  }
 
   public onProviderTypeSelect = async (connector: AbstractConnector, account?: string) => {
     if (!this.state.isLoading) {
-    TorqueProvider.Instance.isLoading = true;
+      TorqueProvider.Instance.isLoading = true;
 
-    await TorqueProvider.Instance.eventEmitter.emit(TorqueProviderEvents.ProviderIsChanging);
+      await TorqueProvider.Instance.eventEmitter.emit(TorqueProviderEvents.ProviderIsChanging);
 
       await this._isMounted && this.setState({
-      ...this.state,
-      isLoading: true,
+        ...this.state,
+        isLoading: true,
         isProviderMenuModalOpen: false
-    }, async () => {
+      }, async () => {
         await TorqueProvider.Instance.setWeb3Provider(connector, account);
 
-      TorqueProvider.Instance.isLoading = false;
+        TorqueProvider.Instance.isLoading = false;
 
-      await TorqueProvider.Instance.eventEmitter.emit(
-        TorqueProviderEvents.ProviderChanged,
-        new ProviderChangedEvent(TorqueProvider.Instance.providerType, TorqueProvider.Instance.web3Wrapper)
-      );
-    });
+        await TorqueProvider.Instance.eventEmitter.emit(
+          TorqueProviderEvents.ProviderChanged,
+          new ProviderChangedEvent(TorqueProvider.Instance.providerType, TorqueProvider.Instance.web3Wrapper)
+        );
+      });
     } else {
       await this._isMounted && this.setState({
         ...this.state,
