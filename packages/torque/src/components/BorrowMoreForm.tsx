@@ -164,34 +164,58 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
     if (this.state.assetDetails === null) {
       return null;
     }
+    const positionSafetyText = this.state.selectedValue > 150 ?
+    "Safe":
+    this.state.selectedValue > 125 ?
+      "Danger":
+      'Liquidation pending';
+
+    const collateralizedStateSelector = positionSafetyText === "Safe" ?
+    "safe" :
+    positionSafetyText === "Danger" ?
+      "danger" :
+      "unsafe";
 
     return (
-      <form className="repay-loan-form" onSubmit={this.onSubmitClick}>
+      <form className="borrow-more-loan-form" onSubmit={this.onSubmitClick}>
         <section className="dialog-content">
-        {/* <CollateralSlider
-              readonly={true}
-              showExactCollaterization={positionSafetyText !== "Safe"}
-              minValue={sliderMin}
-              maxValue={sliderMax}
-              value={sliderValue}
-            /> */}
-          
+        <div className="borrow-more-loan-form__body">
+          <div className="d-flex j-c-sb">
+           
+              <div>
+                <div
+                  title={`${this.props.loanOrderState.collateralizedPercent.multipliedBy(100).plus(100).toFixed(18)}%`}
+                  className={`borrow-more-loan-form__body-collateralized ${collateralizedStateSelector}`}>
+                  <span className="value">{this.props.loanOrderState.collateralizedPercent.multipliedBy(100).plus(100).toFixed(2)}</span>%
+                </div>
+                <div className="borrow-more-loan-form__body-collateralized-label">Collateralized</div>
 
-          <RepayLoanSlider
-            readonly={false}
-            minValue={this.state.minValue}
-            maxValue={this.state.maxValue}
-            value={this.state.currentValue}
-            onUpdate={this.onUpdate}
-            onChange={this.onChange}
-          />
-
-          <div className="repay-loan-form__tips">
-            <div className="repay-loan-form__tip">Current state</div>
-            <div className="repay-loan-form__tip">Full repayment</div>
+              </div>
+            
+            <div className={`borrow-more-loan-form__body-collateralized-state ${collateralizedStateSelector}`}>
+              {positionSafetyText}
+              {positionSafetyText === "Danger" ? (
+                <React.Fragment><br />Add Collateral</React.Fragment>
+              ) : null}
+            </div>
+          </div>
           </div>
 
-          {/* <hr className="repay-loan-form__delimiter" /> */}
+            <CollateralSlider
+              readonly={true}
+             // showExactCollaterization={positionSafetyText !== "Safe"}
+             minValue={this.state.minValue}
+             maxValue={this.state.maxValue}
+             value={this.state.currentValue}
+             onUpdate={this.onUpdate}
+             onChange={this.onChange}
+            />
+          <div className="borrow-more-loan-form__tips">
+            <div className="borrow-more-loan-form__tip">Current state</div>
+            <div className="borrow-more-loan-form__tip">Full repayment</div>
+          </div>
+
+          {/* <hr className="borrow-more-loan-form__delimiter" /> */}
        
 {/* 
           <OpsEstimatedResult
@@ -223,7 +247,7 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
 
         </section>
         <section className="dialog-actions">
-          <div className="repay-loan-form__actions-container">
+          <div className="borrow-more-loan-form__actions-container">
             <button type="submit" className={`btn btn-size--small ${this.state.didSubmit ? `btn-disabled` : ``}`}>
               {this.state.didSubmit ? "Submitting..." : "Repay"}
             </button>
