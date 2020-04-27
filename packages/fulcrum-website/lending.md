@@ -309,7 +309,7 @@ permalink: lending
         </div>
     </div>
 </section>
-<section class="bg-primary py-60 pt-xs-90 pb-xs-45 text-center">
+<section class="bg-primary py-60 pt-xs-0 pb-xs-45 text-center">
     <div class="container">
         <div class="row">
         <div class="col col-12 fd-c">
