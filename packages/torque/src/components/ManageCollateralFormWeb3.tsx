@@ -254,7 +254,7 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
                   </div>
                     </div>
 
-                    <div className={`manage-collateral-form-insufficient-balance ${!this.state.balanceTooLow ? `manage-collateral-form-insufficient-balance--hidden` : ``}`}>
+                    <div className={`manage-collateral-form__insufficient-balance ${!this.state.balanceTooLow ? `manage-collateral-form__insufficient-balance--hidden` : ``}`}>
                       Insufficient {this.state.assetDetails.displayName} balance in your wallet!
                 </div>
                   </React.Fragment>
@@ -271,7 +271,6 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
                   )}
                 <CollateralSlider
                   readonly={false}
-
                   minValue={this.state.minValue}
                   maxValue={this.state.maxValue}
                   value={this.state.selectedValue}
