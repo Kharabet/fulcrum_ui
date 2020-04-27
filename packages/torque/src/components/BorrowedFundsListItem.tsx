@@ -78,8 +78,10 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
     // const firstInRowModifier = this.props.firstInTheRow ? "borrowed-funds-list-item--first-in-row" : "";
     // const lastInRowModifier = this.props.lastInTheRow ? "borrowed-funds-list-item--last-in-row" : "";
 
+    //115%
     const sliderMin = item.loanData!.maintenanceMarginAmount.div(10 ** 18).toNumber();
-    const sliderMax = sliderMin + 100;
+    //300%
+    const sliderMax = sliderMin + 185;
 
     let sliderValue = item.collateralizedPercent.multipliedBy(100).toNumber();
     if (sliderValue > sliderMax) {
@@ -144,7 +146,7 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
           <div className="borrowed-funds-list-item__body-slider-container">
             <CollateralSlider
               readonly={true}
-              showExactCollaterization={positionSafetyText !== "Safe"}
+              showExactCollaterization={true}
               minValue={sliderMin}
               maxValue={sliderMax}
               value={sliderValue}
