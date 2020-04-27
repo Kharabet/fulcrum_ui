@@ -13,7 +13,7 @@ import { TorqueProvider } from "../services/TorqueProvider";
 import { OpsEstimatedResult } from "./OpsEstimatedResult";
 import { RepayLoanSlider } from "./RepayLoanSlider";
 import { CollateralSlider } from "./CollateralSlider";
-import { LoaderData } from "./LoaderData";
+import { Loader } from "./Loader";
 
 export interface IBorrowMoreFormProps {
   loanOrderState: IBorrowedFundsState;
@@ -229,7 +229,7 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
                   <div className="input-row">
                     <span className="asset-icon">{this.state.assetDetails.reactLogoSvg.render()}</span>
                     {this.state.isLoading
-                      ? <LoaderData />
+                      ? <Loader quantityDots={4} sizeDots={'middle'} isShowTitle={false} isOverlay={false} />
                       : <React.Fragment>
                         <input
                           ref={this._setInputRef}

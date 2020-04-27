@@ -1,68 +1,89 @@
 .loader {
-    .loader-content {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        -webkit-transform: translate(-50%, -50%);
-        transform: translate(-50%, -50%);
-        .loader-text {
-            font-size: 52px;
-            font-weight: 900;
-            color: #283049;
-            margin-bottom: 0;
-            text-align: center;
-            margin-bottom: 35px;
-            @media screen and (max-width: $mobile-version-max-width) {
-                font-size: 36px;
-                margin-bottom: 15px;
-            }
-        }
+  &.loader-overlay {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    z-index: 2;
+  }
+  .loader-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -webkit-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    z-index: 3;
+    .loader-text {
+      font-size: 52px;
+      font-weight: 900;
+      color: #283049;
+      margin-bottom: 0;
+      text-align: center;
+      margin-bottom: 35px;
+      @media screen and (max-width: $mobile-version-max-width) {
+        font-size: 36px;
+        margin-bottom: 15px;
+      }
     }
+  }
 }
 .loader-dots {
-    text-align: center;
-    span {
-        display: inline-block;
-        margin: 0 10px;
-        background-color: #a9b5c7;
-        opacity: 0.5;
-        width: 12px;
-        height: 12px;
-        border-radius: 50%;
-        animation: animationDotsLoader 3s infinite cubic-bezier(0, 1, 1, 0);
-        &:nth-child(2) {
-            animation-delay: 0.6s;
-        }
-        &:nth-child(3) {
-            animation-delay: 1.2s;
-        }
-        &:nth-child(4) {
-            animation-delay: 1.8s;
-        }
-        &:nth-child(5) {
-            animation-delay: 2.4s;
-        }
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  span {
+    display: inline-flex;    
+    background-color: #a9b5c7;
+    opacity: 0.5;
+    border-radius: 50%;
+    animation-name: animationDotsLoader;
+    animation-iteration-count: infinite;
+    animation-timing-function: cubic-bezier(0, 0, 1, 1);
+    &.small-dots {
+      width: 5px;
+      height: 5px;
+      margin: 0 4px;
     }
+    &.middle-dots {
+      width: 8px;
+      height: 8px;
+      margin: 0 8px;
+    }
+    &.large-dots {
+      width: 12px;
+      height: 12px;
+      margin: 0 13px;
+    }
+    @for $i from 1 through 5 {
+      &:nth-child(#{$i}) {
+        animation-delay: calc(0.7s * (#{$i} - 1));
+      }
+    }
+  }
 }
 @keyframes animationDotsLoader {
-    0% {
-        transform: scale(1);
-        background-color: #a9b5c7;
-        opacity: 0.5;
-    }
-    5% {
-        transform: scale(1.8);
-        background-color: #276bfb;
-        opacity: 1;
-    }
-    15% {
-        transform: scale(1.8);
-        background-color: #276bfb;
-        opacity: 1;
-    }
-    20% {
-        transform: scale(1);
-        background-color: #a9b5c7;
-        opacity: 0.5;
-    }
+  0% {
+    transform: scale(1);
+    background-color: #a9b5c7;
+    opacity: 0.5;
+  }
+  5% {
+    transform: scale(1.4);
+    background-color: #276bfb;
+    opacity: 1;
+  }
+  10% {
+    transform: scale(1.8);
+    background-color: #276bfb;
+    opacity: 1;
+  }
+  15% {
+    transform: scale(1.4);
+    background-color: #276bfb;
+    opacity: 1;
+  }
+  20% {
+    transform: scale(1);
+    background-color: #a9b5c7;
+    opacity: 0.5;
+  }
 }

@@ -12,7 +12,7 @@ import { TorqueProvider } from "../services/TorqueProvider";
 import { CollateralSlider } from "./CollateralSlider";
 import { OpsEstimatedResult } from "./OpsEstimatedResult";
 import { InputAmount } from "./InputAmount";
-import { LoaderData } from "./LoaderData";
+import { Loader } from "./Loader";
 
 export interface IManageCollateralFormWeb3Props {
   loanOrderState: IBorrowedFundsState;
@@ -296,7 +296,7 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
             <div className="input-row">
               <span className="asset-icon">{this.state.assetDetails.reactLogoSvg.render()}</span>
               {this.state.isLoading
-                ? <LoaderData />
+                ? <Loader quantityDots={4} sizeDots={'middle'} isShowTitle={false} isOverlay={false} />
                 : <React.Fragment>
                   <input
                     ref={this._setInputRef}

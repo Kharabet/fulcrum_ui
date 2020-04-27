@@ -118,7 +118,7 @@ export class DashboardPage extends PureComponent<
             {!TorqueProvider.Instance.unsupportedNetwork ? (
               <React.Fragment>
                 {this.state.isDataLoading
-                  ? <Loader />
+                  ? <Loader quantityDots={5} sizeDots={'large'} isShowTitle={true} isOverlay={false} />
                   : (<div className="page-header">
                     <h1>Your Loans</h1>
                     <p>Lorem ipsum is placeholder text commonly used in the graphic, print, and publishing industries for previewing layouts and visual mockups.</p>
