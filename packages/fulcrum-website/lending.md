@@ -166,9 +166,12 @@ permalink: lending
                         <div class="flex fw-w jc-md-c">
                             {% for token in site.data.products  %}
                                 {% if token.visibilityEarn %}
-                                    <button class="coin-calc" data-token="{{token.name}}">
-                                        {% include svg/{{token.name}}.svg %}
-                                    </button>
+                                    <div class="flex fd-c mb-10">
+                                        <button class="coin-calc" data-token="{{token.name}}">
+                                            {% include svg/{{token.name}}.svg %}
+                                        </button>
+                                        <span>{{token.name}}</span>
+                                    </div>
                                 {% endif %}
                             {% endfor %}
                         </div>
@@ -309,7 +312,7 @@ permalink: lending
         </div>
     </div>
 </section>
-<section class="bg-primary py-60 pt-xs-90 pb-xs-45 text-center">
+<section class="bg-primary py-60 pt-xs-0 pb-xs-45 text-center">
     <div class="container">
         <div class="row">
         <div class="col col-12 fd-c">

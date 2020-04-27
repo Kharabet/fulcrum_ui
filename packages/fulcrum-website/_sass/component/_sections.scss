@@ -352,12 +352,24 @@ input[type="number"] {
         border-radius: 50%;
         width: 52px;
         height: 52px;
+        + span {
+            text-transform: uppercase;
+            text-align: center;
+            color: #8992a4;
+            font-weight: 600;
+            font-size: 12px;
+            line-height: 140%;
+            margin-top: 3px;
+        }
         &:hover {
             cursor: pointer;
         }
         &.active {
             background-color: var(--btn-white-bg);
             border: 3px solid #276bfb;
+            + span {
+                color: #276bfb;
+            }
         }
         &:not(.active) {
             .path-gray {
