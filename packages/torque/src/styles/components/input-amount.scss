@@ -9,6 +9,8 @@
     justify-content: center;
     position: relative;
     margin-bottom: 15px;
+    height: 72px;
+   
     .input-amount {
       font-size: 48px;
       line-height: 1.5;
@@ -22,6 +24,9 @@
       &::-webkit-inner-spin-button {
         -webkit-appearance: none;
         margin: 0;
+      }
+      &::placeholder {
+        font-size: 42px;
       }
       &[type="number"] {
         -moz-appearance: textfield;

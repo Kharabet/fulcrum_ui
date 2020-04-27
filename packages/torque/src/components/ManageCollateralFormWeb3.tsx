@@ -71,7 +71,7 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
       balanceTooLow: false,
       inputAmountText: "",
       didSubmit: false,
-      isLoading: false
+      isLoading: true
     };
 
     this.selectedValueUpdate = new Subject<number>();
@@ -104,11 +104,20 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
   }
 
   public componentDidMount(): void {
-    TorqueProvider.Instance.isLoading = true;
-
+  
     TorqueProvider.Instance.getLoanCollateralManagementParams(
       this.props.loanOrderState
     ).then(collateralState => {
+
+      this.setState(
+        {
+          ...this.state,        
+          minValue: collateralState.minValue,
+          maxValue: collateralState.maxValue,
+          assetDetails: AssetsDictionary.assets.get(this.props.loanOrderState.collateralAsset) || null,
+         
+        });
+
       TorqueProvider.Instance.getLoanCollateralManagementGasAmount().then(gasAmountNeeded => {
         TorqueProvider.Instance.getCollateralExcessAmount(this.props.loanOrderState).then(collateralExcess => {
           TorqueProvider.Instance.getAssetTokenBalanceOfUser(this.props.loanOrderState.collateralAsset).then(assetBalance => {
@@ -180,8 +189,6 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
             this.setState(
               {
                 ...this.state,
-                minValue: collateralState.minValue,
-                maxValue: collateralState.maxValue,
                 assetDetails: AssetsDictionary.assets.get(this.props.loanOrderState.collateralAsset) || null,
                 loanValue: currentCollateralNormalizedBN.toNumber(),
                 selectedValue: currentCollateralNormalizedBN.toNumber(),
@@ -193,7 +200,6 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
               () => {
                 this.selectedValueUpdate.next(this.state.selectedValue);
 
-                TorqueProvider.Instance.isLoading = false;
               }
             );
           });
@@ -234,13 +240,7 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
 
 
     return (
-      <form className="manage-collateral-form" onSubmit={this.onSubmitClick}>
-        {TorqueProvider.Instance.isLoading ? (
-          <div className="manage-collatera-loading">
-            Loading...
-          </div>
-        ) : (
-            <React.Fragment>
+      <form className="manage-collateral-form" onSubmit={this.onSubmitClick}> 
               <section className="dialog-content">
 
                 {this.state.loanValue !== this.state.selectedValue ? (
@@ -254,7 +254,7 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
                   </div>
                     </div>
 
-                    <div className={`manage-collateral-form-insufficient-balance ${!this.state.balanceTooLow ? `manage-collateral-form-insufficient-balance--hidden` : ``}`}>
+                    <div className={`manage-collateral-form__insufficient-balance ${!this.state.balanceTooLow ? `manage-collateral-form__insufficient-balance--hidden` : ``}`}>
                       Insufficient {this.state.assetDetails.displayName} balance in your wallet!
                 </div>
                   </React.Fragment>
@@ -271,7 +271,6 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
                   )}
                 <CollateralSlider
                   readonly={false}
-
                   minValue={this.state.minValue}
                   maxValue={this.state.maxValue}
                   value={this.state.selectedValue}
@@ -302,7 +301,8 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
                         <input
                           ref={this._setInputRef}
                           className="input-amount"
-                          type="text"
+                          type="number"
+                          step="any"
                           placeholder={`Enter amount`}
                           value={this.state.inputAmountText}
                           onChange={this.onTradeAmountChange}
@@ -328,8 +328,6 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
                     )}
                 </div>
               </section>
-            </React.Fragment>
-          )}
       </form>
     );
   }
