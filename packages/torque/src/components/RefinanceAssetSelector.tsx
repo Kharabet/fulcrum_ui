@@ -118,7 +118,8 @@ export class RefinanceAssetSelector extends Component<IRefinanceAssetSelectorPro
         key={index}
         isMobileMedia={this.props.isMobileMedia}
         asset={Asset.DAI}
-        refinanceData={refinanceDataItem} />
+        refinanceData={refinanceDataItem}
+        onCompleted={this.derivedUpdate} />
     ));
     const soloCompoundItems = this.state.refinanceCompoundData.map((e, index) => (
       <RefinanceAssetCompoundLoanItem key={index}

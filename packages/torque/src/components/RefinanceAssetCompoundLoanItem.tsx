@@ -169,7 +169,7 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
     const showDetailsValue = !this.state.isShow ? "Show details" : "Hide details";
     const arrowIcon = this.state.isShow ? <TopArrow /> : <DownArrow />;
     const arrowDiv = !this.state.isShow ? "arrow-div-down" : "arrow-div-top";
-    let btnValue = 'Refinance with ' + this.state.fixedApr.dp(1, BigNumber.ROUND_CEIL).toString() + '% APR Fixed';
+    let btnValue = this.state.isLoading ? "Loading..." : 'Refinance with ' + this.state.fixedApr.dp(1, BigNumber.ROUND_CEIL).toString() + '% APR Fixed';
     let btnActiveValue = 'Refinance with ' + this.state.fixedApr.dp(1, BigNumber.ROUND_CEIL).toString() + '% APR Fixed'
     const refRateYear = ((parseFloat(this.props.apr.dp(0, BigNumber.ROUND_CEIL).toString()) - parseFloat(this.state.fixedApr.dp(1, BigNumber.ROUND_CEIL).toString())) * parseFloat(this.props.balance.dp(3, BigNumber.ROUND_FLOOR).toString())) / 100;
     const refRateMonth = refRateYear / 12;
