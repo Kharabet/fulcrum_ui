@@ -104,6 +104,8 @@ export class TorqueProvider {
   public contractsSource: ContractsSource | null = null;
   public borrowRequestAwaitingStore: BorrowRequestAwaitingStore | null = null;
   public accounts: string[] = [];
+  public compoundDeposits: IRefinanceLoan[] = [];
+  public soloDeposits: IRefinanceLoan[] = [];
   public isLoading: boolean = false;
   public unsupportedNetwork: boolean = false;
   public static readonly UNLIMITED_ALLOWANCE_IN_BASE_UNITS = new BigNumber(2)
@@ -499,7 +501,7 @@ export class TorqueProvider {
     return new BigNumber("150"); // TODO @bshevchenko return data[3];
   };
 
-  private assignCollateral = async (loans: IRefinanceLoan[], deposits: IRefinanceToken[], inRatio?: BigNumber) => {
+  public assignCollateral = async (loans: IRefinanceLoan[], deposits: IRefinanceToken[], inRatio?: BigNumber) => {
 
     for (const loan of loans) {
       loan.collateral = [];

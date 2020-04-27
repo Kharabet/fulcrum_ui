@@ -92,14 +92,15 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
 
     return (
       <div className={`borrowed-funds-list-item`}>
-        {/* {assetDetails.displayName === Asset.SAI ? (
-          <div className="borrowed-funds-button-div" onClick={this.migrateSaiToDai}>
-            <div className="borrowed-funds__item borrowed-funds-button" >
-              Migrate to DAI
-                </div>
-          </div>
-        ) : null} */}
         <div className="borrowed-funds-list-item__header">
+          <div className="borrowed-funds-list-item__header-asset">
+            <div className="borrowed-funds-list-item__header-asset-img">
+              <img src={assetDetails.logoSvg} alt={assetDetails.displayName} />
+            </div>
+            <div className="borrowed-funds-list-item__header-asset-name">
+              {assetDetails.displayName}
+            </div>
+          </div>
           <div className="borrowed-funds-list-item__header-loan">
             <div
               title={`${item.amountOwed.toFixed(18)} ${assetDetails.displayName}`}
@@ -112,15 +113,6 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
             >
               <span className="value">{interestRate.multipliedBy(100).toFixed(2)}%</span>&nbsp;APR
               </div>
-          </div>
-          <div className="borrowed-funds-list-item__header-asset">
-            <div className="borrowed-funds-list-item__header-asset-img">
-              <img src={assetDetails.logoSvg} alt={assetDetails.displayName} />
-            </div>
-            <div className="borrowed-funds-list-item__header-asset-name">
-              {assetDetails.displayName}
-            </div>
-
           </div>
         </div>
         <div className="borrowed-funds-list-item__body">
