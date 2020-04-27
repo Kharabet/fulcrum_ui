@@ -1,0 +1,72 @@
+.borrow-more-loan-form {
+
+  &__body {
+    padding: 30px 0 25px 0;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    &:after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: #e4ebf4;
+      height: 1px;
+    }
+    &-collateralized {
+      font-weight: normal;
+      font-size: 28px;
+      line-height: 150%;
+      .value {
+        font-weight: 800;
+      }
+      &.safe {
+        color: #00c0ab;
+      }
+      &.unsafe,
+      &.danger {
+        color: #de4a4a;
+      }
+      &-label {
+        font-weight: normal;
+        font-size: 16px;
+        line-height: 150%;
+        color: #758295;
+      }
+      &-state {
+        font-weight: 800;
+        font-size: 16px;
+        line-height: 150%;
+        align-self: flex-end;
+        &.safe {
+          color: #00c0ab;
+        }
+        &.unsafe,
+        &.danger {
+          color: #de4a4a;
+        }
+      }
+      &-value {
+        font-weight: 600;
+        font-size: 20px;
+        line-height: 150%;
+        color: #283049;
+        .value {
+          font-weight: 800;
+        }
+      }
+    }
+    &-slider-container {
+      padding-top: 20px;
+      padding-bottom: 15px;
+    }
+  }
+
+  .d-flex {
+    display: flex;
+  }
+  .j-c-sb {
+    justify-content: space-between;
+  }
+}
