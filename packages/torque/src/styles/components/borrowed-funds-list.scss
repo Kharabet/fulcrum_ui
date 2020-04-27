@@ -41,7 +41,7 @@
     }
     &__header {
       display: flex;
-      justify-content: space-between;
+      justify-content: flex-start;
       padding-bottom: 30px;
       position: relative;
       &:after {
@@ -76,6 +76,8 @@
       &-asset {
         display: flex;
         flex-direction: column;
+        justify-content: space-around;
+        margin-right: 20px;
         &-img {
           img,
           svg {
