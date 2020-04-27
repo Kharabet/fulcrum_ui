@@ -93,6 +93,7 @@
             }
           }
           .refinance__input-container {
+            position: relative;
             .input-amount {
               height: 60px;
               width: 185px;
@@ -112,6 +113,10 @@
             }
             .refinance-details-msg--warning,
             .text {
+              position: absolute;
+              bottom: -20px;
+              left: 0;
+              height: 15px;
               margin-top: 10px;
               font-weight: normal;
               font-size: 12px;
@@ -121,7 +126,6 @@
             }
             .text {
               color: #758295;
-              padding-left: 15px;
             }
           }
         }
@@ -235,7 +239,7 @@
           height: 60px;
           align-items: center;
           width: 180px;
-          justify-content: space-between; 
+          justify-content: space-between;
 
           &:not(:last-child) {
             margin-bottom: 40px;
@@ -243,7 +247,7 @@
 
           .collateral-value {
             position: relative;
-            margin-right: 40px; 
+            margin-right: 40px;
             .value {
               font-weight: 800;
               font-size: 28px;
@@ -418,6 +422,9 @@
               }
               .refinance-details-msg--warning {
               }
+              .text {
+                padding-left: 15px;
+              }
             }
             .collaterization-warning {
             }
@@ -514,7 +521,7 @@
             }
             .asset-icon {
             }
-            .collateral-value { 
+            .collateral-value {
               padding-left: 15px;
               .value {
               }
