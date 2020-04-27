@@ -1,25 +1,15 @@
-$page-min-height: 52.75rem;
-$page-max-width: 75.5rem;
-$refpage-max-width: 90.5rem;
-$page-padding: 0 3.25rem;
-$page-padding-xs: 0 1.25rem;
 $mobile-version-max-width: 700px;
-$mobile-version-max-mobile: 960px;
-$mobile-version-width:1024px;
-$mobile-version-ix:800px;
-$mobile-version-max-ix-width:601px;
 
 $breakpoint-max-xl: 1409px;
 $breakpoint-min-xl: 1410px;
 $breakpoint-max-lg: 1139px;
 $breakpoint-min-lg: 1140px;
 
-
 $container-desktop: 1380px;
 $container-laptop: 1110px;
 $container-mobile: 100%;
 
-$breakpoint-desktop-max: 1409px; 
+$breakpoint-desktop-max: 1409px;
 $breakpoint-desktop-min: 1410px;
 
 $breakpoint-laptop-max: 1139px;
@@ -28,44 +18,14 @@ $breakpoint-laptop-min: 1140px;
 $breakpoint-mobile-max: 959px;
 $breakpoint-mobile-min: 960px;
 
-$color-blue: #276BFB;
-$color-blue--hover: #5B88FF;
-$color-blue--pressed: #5B88FF;
-$color-green: #4ecea3;
-$color-green--hover: #3ec497;
-$color-green--pressed: #24b483;
-$color-purple: #9589f5;
-$color-purple--hover: #8b7df5;
-$color-purple--pressed: #8378f5;
+$color-blue: #276bfb;
+$color-blue--hover: #5b88ff;
+$color-blue--pressed: #5b88ff;
+
+$color-white: #ffffff;
+
 $color-gray: #a9b5c7;
-$color-gray-light: #f5f7f9;
-$color-borrow-card:#F3F9FF;
-$color-gray-darker: #ececf0;
-$color-gray-darker-2: #e2e3e7;
-$color-gray-darker-3: #758295;
 $color-gray-dark: #3b364b;
-$color-white: #fff;
+$color-gray-darker: #758295;
 
-$color-bg-bitski: #ebeefc;
-$color-bg-bitski--hover: #e1e6fc;
-$color-bg-bitski--pressed:#d8defd;
-
-$color-bg-formatic: #ebeefc;
-$color-bg-formatic--hover: #e1e6fc;
-$color-bg-formatic--pressed: #d8defd;
-
-$color-bg-portis: #ebeefc;
-$color-bg-portis--hover: #e1e6fc;
-$color-bg-portis--pressed: #d8defd;
-
-$color-bg-squarelink: #ebeefc;
-$color-bg-squarelink--hover: #e1e6fc;
-$color-bg-squarelink--pressed: #d8defd;
-
-$color-bg-wallet-connect: #ebeefc;
-$color-bg-wallet-connect--hover: #e1e6fc;
-$color-bg-wallet-connect--pressed: #d8defd;
-
-$color-bg-torus: #ebeefc;
-$color-bg-torus--hover: #e1e6fc;
-$color-bg-torus--pressed: #d8defd;
+$bg-color-gray: #f5f7f9;
