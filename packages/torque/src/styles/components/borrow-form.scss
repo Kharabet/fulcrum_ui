@@ -18,7 +18,7 @@
     border: none;
     text-align: center;
     width: 100%;
-    background-color: $color-gray-light;
+    background-color: $bg-color-gray;
     border: 2px solid #e7ebf0;
     border-radius: 4px;
     padding: 20px 0;
@@ -32,7 +32,7 @@
     }
     &:hover,
     &:focus {
-      background-color: $color-gray-light;
+      background-color: $bg-color-gray;
       border: 2px solid #e7ebf0;
       color: #283049;
     }
@@ -54,7 +54,7 @@
 
   &__info-collateral-by-container {
     padding: 25px 0;
-    background-color: $color-gray-light;
+    background-color: $bg-color-gray;
     font-style: normal;
     font-stretch: normal;
     line-height: 1.5;
@@ -63,7 +63,7 @@
   &__info-collateral-by-msg {
     font-size: 16px;
     font-weight: 400;
-    color: $color-gray-darker-3;
+    color: $color-gray-darker;
   }
 
   &__info-collateral-by-amount {
@@ -83,7 +83,11 @@
       padding: 0 40px 40px 40px;
     }
     &__input-amount {
-      font-size: 32px;
+      padding: 10px 0;
+      font-size: 36px;
+      &::placeholder {
+        font-size: 28px;
+      }
     }
   }
 }

@@ -120,7 +120,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
               />
             </div>
             <button className={`btn btn-size--small ${this.state.didSubmit ? `btn-disabled` : ``}`} type="submit">
-              {this.state.didSubmit ? "Submitting..." : "Track"}
+              {this.state.didSubmit ? "Submitting..." : "Borrow"}
             </button>
           </div>
         </section>

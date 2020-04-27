@@ -151,8 +151,8 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
     this.getAssetsData(this.props.collateral[0].asset);
     const head_image = this.props.type == "dydx" ? <DydxImg /> : <CompoundImg />;
     const assetTypeModifier = !this.state.isShow ? "asset-collateral-show" : "asset-collateral-hide";
-    const showDetailsValue = this.state.isShow ? "Show details" : "Hide details";
-    const arrowIcon = !this.state.isShow ? <TopArrow /> : <DownArrow />;
+    const showDetailsValue = !this.state.isShow ? "Show details" : "Hide details";
+    const arrowIcon = this.state.isShow ? <TopArrow /> : <DownArrow />;
     const arrowDiv = !this.state.isShow ? "arrow-div-down" : "arrow-div-top";
     let btnValue = 'Refinance with ' + this.state.fixedApr.dp(1, BigNumber.ROUND_CEIL).toString() + '% APR Fixed';
     let btnActiveValue = 'Refinance with ' + this.state.fixedApr.dp(1, BigNumber.ROUND_CEIL).toString() + '% APR Fixed'
@@ -166,9 +166,6 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
 
       <div className={`refinance-asset-selector-item `}>
         <div className="refinance-asset__main-block">
-          {/*<div className="refinance-asset-selector__title">CDP {this.state.RefinanceCompoundData[0].cdpId.toFixed(0)}*/}
-
-          {/*</div>*/}
           <div className="refinance-asset-selector__non-torque">
             <div className="refinance-asset-selector__non-torque-logo">
               {head_image}
@@ -190,11 +187,22 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
                 disabled={this.props.isDisabled}
                 onChange={this.loanAmountChange}
               />
-              <div className="refinance-details-msg--warning">
-                {this.state.borrowAmount.lte(0) ? "Please enter value greater than 0" : ""}
-                {this.state.borrowAmount.gt(this.props.balance) ? "Please enter value less than or equal to " + this.props.balance.dp(3, BigNumber.ROUND_FLOOR).toString() : ""}
-              </div>
+              {this.state.borrowAmount.lte(0) || this.state.borrowAmount.gt(this.props.balance) ?
+                <div className="refinance-details-msg--warning">
+                  {this.state.borrowAmount.lte(0) ? "Please enter value greater than 0" : ""}
+                  {this.state.borrowAmount.gt(this.props.balance) ? "Please enter value less than or equal to " + this.props.balance.dp(3, BigNumber.ROUND_FLOOR).toString() : ""}
+                </div>
+                : <div className="text">Loan</div>
+              }
             </div>
+            {this.props.isMobileMedia &&
+              <div className="loan-asset">
+                <div className="asset-icon">
+                  {loanAssetDt}
+                </div>
+                <div className="asset-name">{this.props.asset}</div>
+              </div>
+            }
 
             {this.props.isDisabled && !this.props.isMobileMedia &&
               <div className="collaterization-warning">Collateralization should be 150%+</div>}
@@ -208,43 +216,43 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
               <div className="text">Fixed APR</div>
             </div>
             <div className="refinance-asset-selector__torque-loan-container">
-              <div className="asset-icon">
-                {loanAssetDt}
-              </div>
               <div className="loan-value">
                 <div className="value">{this.state.borrowAmount.dp(3, BigNumber.ROUND_FLOOR).toString()}</div>
                 <div className="text">Loan</div>
               </div>
-              <div className="asset-name">{this.props.asset}</div>
+              <div className="loan-asset">
+                <div className="asset-icon">
+                  {loanAssetDt}
+                </div>
+                <div className="asset-name">{this.props.asset}</div>
+              </div>
             </div>
             <div className="refinance-asset-selector__torque-details" onClick={this.showDetails}>
               <p>{showDetailsValue}</p>
               <span className="arrow">
                 {arrowIcon}
-                {/*<img className="arrow-icon" src={arrowIcon}/>*/}
               </span>
             </div>
             {this.state.isShow &&
               <div className="refinance-asset-selector__collateral-container">
                 <div className="refinance-asset-selector__collateral">
-
-                  <div className="asset-icon">
-                    {collateralAssetDt}
-                  </div>
                   <div className="collateral-value">
                     <div className={`value ${this.props.isDisabled ? "red" : ""}`}>
                       {this.props.collateral[0].balance.dp(3, BigNumber.ROUND_FLOOR).toString()}
                     </div>
                     <div className="text">Collateral</div>
-                  </div>
-                  <div className="asset-name">
-                    {this.props.collateral[0].asset}
-
                     <div className="info-icon" onClick={this.showInfoCollateralAssetDt0}>
                       {iconInfoCollateralAssetDt0}
                     </div>
                   </div>
-
+                  <div className="collateral-asset">
+                    <div className="asset-icon">
+                      {collateralAssetDt}
+                    </div>
+                    <div className="asset-name">
+                      {this.props.collateral[0].asset}
+                    </div>
+                  </div>
                 </div>
                 {this.state.isShowInfoCollateralAssetDt0 && <CollateralInfo />}
                 {this.state.isShow && collateralAssetDt2 &&
@@ -258,15 +266,18 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
                         {this.props.collateral[1].balance.dp(3, BigNumber.ROUND_FLOOR).toString()}
                       </div>
                       <div className="text">Collateral</div>
-                    </div>
-                    <div className="asset-name">
-                      {this.props.collateral[1].asset}
-
                       <div className="info-icon" onClick={this.showInfoCollateralAssetDt1}>
                         {iconInfoCollateralAssetDt1}
                       </div>
                     </div>
-
+                    <div className="collateral-asset">
+                      <div className="asset-icon">
+                        {collateralAssetDt2}
+                      </div>
+                      <div className="asset-name">
+                        {this.props.collateral[1].asset}
+                      </div>
+                    </div>
                   </div>
                 }
                 {this.state.isShowInfoCollateralAssetDt1 && <CollateralInfo />}

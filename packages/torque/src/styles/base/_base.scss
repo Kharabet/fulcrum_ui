@@ -32,11 +32,11 @@ input {
   border: solid 2px rgba(169, 181, 199, 0.2);
 
   color: $color-gray;
-  background-color: $color-gray-light;
+  background-color: $bg-color-gray;
 
   &:hover {
     color: $color-gray;
-    background-color: $color-gray-darker;
+    background-color: #ececf0;
   }
 
   &:active {
