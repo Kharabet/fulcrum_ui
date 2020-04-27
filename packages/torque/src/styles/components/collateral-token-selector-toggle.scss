@@ -42,3 +42,13 @@
     margin-right: 10px;
   }
 }
+@media screen and (max-width: $mobile-version-max-width) { 
+  .collateral-token-selector-toggle { 
+    &__logo-container {
+      svg{
+        width: 30px;
+        height: auto;
+      }
+    }
+  }
+}

@@ -47,3 +47,19 @@
     font-weight: 600;
   }
 }
+@media screen and (max-width: $mobile-version-max-width) {  
+  .collateral-token-selector {
+    &__container {
+      padding: 10px 0;
+    }
+  }
+  .collateral-token-selector-item {
+    padding: 6px 4px;
+    &__image-container {
+      svg {
+        width: 30px;
+        height: auto;
+      }
+    }
+  }
+}
