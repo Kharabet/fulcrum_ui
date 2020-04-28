@@ -2,6 +2,7 @@
   @include clearfix();
 
   max-width: 575px;
+  width: 575px;
   background-color: #444e5a;
   display: flex;
   flex-direction: row;
@@ -47,12 +48,23 @@
   display: flex;
   align-items: center;
   padding: 40px;
+  position: relative;
   svg {
     height: 90px;
     width: 90px;
     .eth-svg {
       fill: #c8c8c8;
     }
+  }
+}
+.lend-form__notification{
+  font-size: 11px;
+  font-weight: 600;
+  color: #586473;
+  @media screen and (min-width: $breakpoint-mobile-min){
+    position: absolute;
+    left: 13px;
+    bottom: 13px;
   }
 }
 
