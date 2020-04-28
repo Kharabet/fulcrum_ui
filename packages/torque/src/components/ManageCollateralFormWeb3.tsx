@@ -202,7 +202,7 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
 
               }
             );
-          });
+          }); 1
         });
       });
     });
@@ -496,7 +496,8 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
   public formatPrecision(outputText: string): string {
     const output = Number(outputText);
     let sign = "";
-    if (this.state.loanValue > this.state.selectedValue)
+    if (this.state
+      .loanValue > this.state.selectedValue)
       sign = "-";
     let n = Math.log(Math.abs(output)) / Math.LN10;
     let x = 4 - n;
