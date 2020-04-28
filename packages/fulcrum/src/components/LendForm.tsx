@@ -281,7 +281,8 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
         <div className="lend-form__image">
           {this.state.iTokenAddress &&
             FulcrumProvider.Instance.web3ProviderSettings &&
-            FulcrumProvider.Instance.web3ProviderSettings.etherscanURL ? (
+            FulcrumProvider.Instance.web3ProviderSettings.etherscanURL
+            ? (
               <a
                 className="lend-form__info_block"
                 title={this.state.iTokenAddress}
@@ -290,9 +291,13 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
                 rel="noopener noreferrer"
               >
                 {this.state.assetDetails.reactLogoSvg.render()}
-              </a>) :
+              </a>)
+            : this.state.assetDetails.reactLogoSvg.render()
 
-            this.state.assetDetails.reactLogoSvg.render()
+          }
+          {(this.props.asset === Asset.ETH)
+            ? <span className="lend-form__notification">This pool is currently paying above the standard market rate as it can lack sufficient liquidity to facilitate timely withdrawals. Please understand this risk before proceeding.</span>
+            : null
           }
         </div>
         <div className="lend-form__form-container">
@@ -323,7 +328,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
                 onChange={this.onLendAmountChange}
               />
               {!this.state.isLoading ? null
-                : <div className="preloader-container"> <Preloader width="80px"/></div>
+                : <div className="preloader-container"> <Preloader width="80px" /></div>
               }
 
               {
@@ -341,8 +346,8 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
                     assets={[Asset.DAI, Asset.CHAI]} />
                 ) : (
                       <AssetDropdown
-                    selectedAsset={this.props.asset}
-                    assets={[this.props.asset]} />
+                        selectedAsset={this.props.asset}
+                        assets={[this.props.asset]} />
                     )
               }
             </div>
