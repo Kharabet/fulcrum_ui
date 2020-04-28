@@ -202,7 +202,7 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
 
               }
             );
-          }); 1
+          });
         });
       });
     });
