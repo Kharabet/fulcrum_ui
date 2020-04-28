@@ -229,10 +229,18 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
 
         </section>
         <section className="dialog-actions">
+
           <div className="borrow-more-loan-form__actions-container">
-            <button type="submit" className={`btn btn-size--small ${this.state.didSubmit ? `btn-disabled` : ``}`}>
-              {this.state.didSubmit ? "Submitting..." : "Borrow"}
-            </button>
+            {this.state.selectedValue == 115 || !Number(this.state.inputAmountText) ? (
+              <button type="button" className="btn btn-size--small" onClick={this.props.onDecline}>
+                Close
+              </button>
+            ) : (
+                <button type="submit" className={`btn btn-size--small ${this.state.didSubmit ? `btn-disabled` : ``}`}>
+                  {this.state.didSubmit ? "Submitting..." : "Borrow"}
+                </button>
+
+              )}
           </div>
         </section>
       </form>
@@ -268,7 +276,7 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
   public onTradeAmountChange = async (event: ChangeEvent<HTMLInputElement>) => {
     // handling different types of empty values
     let amountText = event.target.value ? event.target.value : "";
-    const regexp = /^((\d+(\.\d{0,5})?)|(\.\d{0,5}}))$/;
+    const regexp = /^((\d{0,3}(\.\d{0,5})?)|(\.\d{0,5}}))$/;
     if (amountText === "" || regexp.test(amountText)) {
       // setting inputAmountText to update display at the same time
 
@@ -319,15 +327,19 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
       .minus(borrowAmount.times(500)).toNumber();
 
     if (selectedValue < 115) {
-      inputAmountText = "0";
-      selectedValue = defaultValue.toNumber()
+      selectedValue = this.state.minValue
     }
 
     const positionSafetyText = selectedValue > 125 ?
-      "Safe" : "Danger";
+      "Safe" :
+      selectedValue > 115 ?
+        "Danger" :
+        "Liquidation pending";
 
     const collateralizedStateSelector = positionSafetyText === "Safe" ?
-      "safe" : "danger";
+      "safe" :
+      positionSafetyText ? "danger" :
+        "unsafe";
 
 
     this.setState({

@@ -8,9 +8,9 @@
     align-items: center;
     justify-content: center;
     position: relative;
-    margin-bottom: 15px;
+    //margin-bottom: 15px;
     height: 72px;
-   
+
     .input-amount {
       font-size: 48px;
       line-height: 1.5;
@@ -27,6 +27,7 @@
       }
       &::placeholder {
         font-size: 42px;
+        transform: translate(0, -3px);
       }
       &[type="number"] {
         -moz-appearance: textfield;
@@ -75,9 +76,15 @@
 }
 @media screen and (max-width: $mobile-version-max-width) {
   .input-container {
+    padding: 0 15px;
     .input-row {
+      height: 57px;
       .input-amount {
         font-size: 36px;
+        &::placeholder {
+          font-size: 24px;
+          transform: translate(0, -4px);
+        }
       }
       .asset-icon {
         svg {
