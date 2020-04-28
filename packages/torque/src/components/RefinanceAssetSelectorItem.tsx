@@ -28,6 +28,8 @@ export interface IRefinanceAssetSelectorItemProps {
   isMobileMedia: boolean;
   asset: Asset;
   refinanceData: RefinanceData;
+  
+  onCompleted: () => void;
 }
 
 interface IRefinanceAssetSelectorItemState {
@@ -35,6 +37,7 @@ interface IRefinanceAssetSelectorItemState {
   isShowInfoCollateralAssetDt0: boolean;
   inputAmountText: number;
   borrowAmount: BigNumber;
+  collateralAmount: BigNumber;
   isLoading: boolean;
   isTrack: boolean;
   fixedApr: BigNumber;
@@ -51,6 +54,7 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
       isShowInfoCollateralAssetDt0: false,
       inputAmountText: 0,
       borrowAmount: new BigNumber(0),
+      collateralAmount: this.props.refinanceData.collateralAmount,
       isLoading: false,
       isTrack: false,
       fixedApr: new BigNumber(0),
@@ -117,11 +121,15 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
     const amountText = event.target.value ? event.target.value : "0";
     // console.log(amountText);
     // setting inputAmountText to update display at the same time
+    const borrowAmount = new BigNumber(amountText)
+
+    const collateralAmount = this.props.refinanceData.collateralAmount.dividedBy(this.props.refinanceData.debt.dividedBy(borrowAmount));
 
     this.setState({
       ...this.state,
       inputAmountText: parseInt(amountText, 10),
-      borrowAmount: new BigNumber(amountText)
+      borrowAmount: new BigNumber(amountText),
+      collateralAmount: collateralAmount
     }, () => {
       // emitting next event for processing with rx.js
       this._inputTextChange.next(this.state.inputAmountText);
@@ -130,7 +138,7 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
 
   private checkCdpManager = async () => {
     if (this.state.isTrack) {
-      window.location.href = "/#/dashboard/w/";
+      window.location.href = "/dashboard";
     } else {
       this.setState({ ...this.state, isLoading: true });
       const refinanceData = await TorqueProvider.Instance.migrateMakerLoan(this.props.refinanceData, this.state.borrowAmount);
@@ -139,6 +147,7 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
       } else {
         this.setState({ ...this.state, isLoading: false, isTrack: false });
       }
+      this.props.onCompleted();
     }
   };
 
@@ -187,11 +196,11 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
                 disabled={this.props.refinanceData.isDisabled}
                 onChange={this.loanAmountChange}
               />
-              
+
               {this.state.borrowAmount.lte(0) || this.state.borrowAmount.gt(this.props.refinanceData.debt) ?
                 <div className="refinance-details-msg--warning">
                   {this.state.borrowAmount.lte(0) ? "Please enter value greater than 0" : ""}
-                  {this.state.borrowAmount.gt(this.props.refinanceData.debt) ? "Please enter value less than or equal to " +this.props.refinanceData.debt.dp(3, BigNumber.ROUND_FLOOR).toString() : ""}
+                  {this.state.borrowAmount.gt(this.props.refinanceData.debt) ? "Please enter value less than or equal to " + this.props.refinanceData.debt.dp(3, BigNumber.ROUND_FLOOR).toString() : ""}
                 </div>
                 : <div className="text">Loan</div>
               }
@@ -239,7 +248,7 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
 
                   <div className="collateral-value">
                     <div className={`value ${this.props.refinanceData.isDisabled ? "red" : ""}`}>
-                      {this.props.refinanceData.collateralAmount.dp(3, BigNumber.ROUND_FLOOR).toString()}
+                      {this.state.collateralAmount.dp(3, BigNumber.ROUND_FLOOR).toString()}
                     </div>
                     <div className="text">Collateral</div>
                     <div className="info-icon" onClick={this.showInfoCollateralAssetDt0}>

@@ -11,8 +11,7 @@ import { IBorrowMoreEstimate } from "../domain/IBorrowMoreEstimate";
 import { BorrowRequest } from "../domain/BorrowRequest";
 import { TorqueProvider } from "../services/TorqueProvider";
 import { CollateralSlider } from "./CollateralSlider";
-import { LoaderData } from "./LoaderData";
-import { InputAmount } from "./InputAmount";
+import { Loader } from "./Loader";
 
 export interface IBorrowMoreFormProps {
   loanOrderState: IBorrowMoreState;
@@ -179,7 +178,8 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
 
               <div>
                 {this.state.isLoading
-                  ? <LoaderData /> : (
+                  ? <Loader quantityDots={4} sizeDots={'middle'} isShowTitle={false} isOverlay={false} />
+                  : (
                     <React.Fragment>
                       <div
                         title={`${this.state.selectedValue.toFixed(18)}%`}
@@ -209,18 +209,21 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
 
           <div className="input-container">
             <div className="input-row">
-              <span className="asset-icon">{this.state.assetDetails.reactLogoSvg.render()}</span>
+              ? <Loader quantityDots={4} sizeDots={'middle'} isShowTitle={false} isOverlay={false} />
+                   : (
+                    <React.Fragment>
+                <span className="asset-icon">{this.state.assetDetails.reactLogoSvg.render()}</span>
 
-              <input
-                ref={this._setInputRef}
-                className="input-amount"
-                type="number"
-                step="any"
-                placeholder={`Enter amount`}
-                value={this.state.inputAmountText}
-                onChange={this.onTradeAmountChange}
-              />
-
+                <input
+                  ref={this._setInputRef}
+                  className="input-amount"
+                  type="number"
+                  step="any"
+                  placeholder={`Enter amount`}
+                  value={this.state.inputAmountText}
+                  onChange={this.onTradeAmountChange}
+                />
+              </React.Fragment>)}
             </div>
           </div>
 

@@ -33,11 +33,14 @@ interface IRefinanceAssetCompoundLoanItemState {
   isTrack: boolean;
   inputAmountText: number;
   borrowAmount: BigNumber;
+  collateral0Amount: BigNumber;
+  collateral1Amount: BigNumber;
   fixedApr: BigNumber;
 }
 
 interface IRefinanceAssetCompoundLoanItemProps extends IRefinanceLoan {
   isMobileMedia: boolean;
+  onCompleted: () => void;
 }
 
 export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCompoundLoanItemProps, IRefinanceAssetCompoundLoanItemState> {
@@ -52,6 +55,8 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
       isShowInfoCollateralAssetDt1: false,
       inputAmountText: parseInt(this.props.balance.dp(3, BigNumber.ROUND_FLOOR).toString(), 10),
       borrowAmount: this.props.balance,
+      collateral0Amount: this.props.collateral[0].balance,
+      collateral1Amount: this.props.collateral[1] ? this.props.collateral[1].balance : new BigNumber(0),
       fixedApr: new BigNumber(0),
       isLoading: false,
       isTrack: false
@@ -103,11 +108,18 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
     const amountText = event.target.value ? event.target.value : "0";
     // console.log(amountText);
     // setting inputAmountText to update display at the same time
-
+    const borrowAmount = new BigNumber(amountText);
+    let loan: IRefinanceLoan = Object.assign({}, this.props); //deep clone of props object
+    const divider = loan.balance.div(borrowAmount);
+    loan.usdValue = loan.usdValue.div(divider);
+    loan.balance = loan.balance.div(divider);
+    await TorqueProvider.Instance.assignCollateral([loan], TorqueProvider.Instance.compoundDeposits)
     this.setState({
       ...this.state,
       inputAmountText: parseInt(amountText, 10),
-      borrowAmount: new BigNumber(amountText)
+      borrowAmount: borrowAmount,
+      collateral0Amount: loan.collateral[0].amount,
+      collateral1Amount: loan.collateral[1] ? loan.collateral[1].amount : new BigNumber(0),
     }, () => {
       // emitting next event for processing with rx.js
       this._inputTextChange.next(this.state.inputAmountText);
@@ -120,11 +132,14 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
 
   public migrateLoan = async () => {
     const loan = Object.assign({}, this.props);
+    let receipt;
     if (this.props.type == "dydx") {
-      await TorqueProvider.Instance.migrateSoloLoan(loan, this.state.borrowAmount); // TODO
+      receipt = await TorqueProvider.Instance.migrateSoloLoan(loan, this.state.borrowAmount); // TODO
     } else {
-      await TorqueProvider.Instance.migrateCompoundLoan(loan, this.state.borrowAmount); // TODO
+      receipt = await TorqueProvider.Instance.migrateCompoundLoan(loan, this.state.borrowAmount); // TODO
     }
+    this.props.onCompleted();
+
   };
 
   private derivedUpdate = async () => {
@@ -154,7 +169,7 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
     const showDetailsValue = !this.state.isShow ? "Show details" : "Hide details";
     const arrowIcon = this.state.isShow ? <TopArrow /> : <DownArrow />;
     const arrowDiv = !this.state.isShow ? "arrow-div-down" : "arrow-div-top";
-    let btnValue = 'Refinance with ' + this.state.fixedApr.dp(1, BigNumber.ROUND_CEIL).toString() + '% APR Fixed';
+    let btnValue = this.state.isLoading ? "Loading..." : 'Refinance with ' + this.state.fixedApr.dp(1, BigNumber.ROUND_CEIL).toString() + '% APR Fixed';
     let btnActiveValue = 'Refinance with ' + this.state.fixedApr.dp(1, BigNumber.ROUND_CEIL).toString() + '% APR Fixed'
     const refRateYear = ((parseFloat(this.props.apr.dp(0, BigNumber.ROUND_CEIL).toString()) - parseFloat(this.state.fixedApr.dp(1, BigNumber.ROUND_CEIL).toString())) * parseFloat(this.props.balance.dp(3, BigNumber.ROUND_FLOOR).toString())) / 100;
     const refRateMonth = refRateYear / 12;
@@ -238,7 +253,7 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
                 <div className="refinance-asset-selector__collateral">
                   <div className="collateral-value">
                     <div className={`value ${this.props.isDisabled ? "red" : ""}`}>
-                      {this.props.collateral[0].balance.dp(3, BigNumber.ROUND_FLOOR).toString()}
+                      {this.state.collateral0Amount.dp(3, BigNumber.ROUND_FLOOR).toString()}
                     </div>
                     <div className="text">Collateral</div>
                     <div className="info-icon" onClick={this.showInfoCollateralAssetDt0}>
@@ -263,7 +278,7 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
                     </div>
                     <div className="collateral-value">
                       <div className={`value ${this.props.isDisabled ? "red" : ""}`}>
-                        {this.props.collateral[1].balance.dp(3, BigNumber.ROUND_FLOOR).toString()}
+                        {this.state.collateral1Amount.dp(3, BigNumber.ROUND_FLOOR).toString()}
                       </div>
                       <div className="text">Collateral</div>
                       <div className="info-icon" onClick={this.showInfoCollateralAssetDt1}>

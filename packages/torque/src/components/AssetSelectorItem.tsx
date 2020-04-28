@@ -76,7 +76,7 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
     // }catch (e){}
 
     return (!this.state.interestRate.gt(0)
-      ? <Loader />
+      ? <Loader quantityDots={5} sizeDots={'large'} isShowTitle={true} isOverlay={false} />
       : (<React.Fragment>
         <div className={`asset-selector-item ${assetTypeModifier}`} onClick={this.onClick}>
           <div className="asset-selector-content">

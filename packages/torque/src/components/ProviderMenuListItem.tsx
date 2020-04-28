@@ -3,20 +3,7 @@ import { ProviderType } from "../domain/ProviderType";
 import { ProviderTypeDictionary } from "../domain/ProviderTypeDictionary";
 import { useWeb3React } from '@web3-react/core';
 import { TorqueProvider } from '../services/TorqueProvider';
-
-const Loader = () => {
-  return (
-    <div className="wallet-provider-loader">
-      <div className="wallet-provider-loader-content">
-        <div className="wallet-provider-loader-dots">
-          <span></span>
-          <span></span>
-          <span></span>
-        </div>
-      </div>
-    </div>
-  );
-}
+import { Loader } from './Loader';
 
 export interface IProviderMenuListItemProps {
   providerType: ProviderType;
@@ -84,7 +71,7 @@ export function ProviderMenuListItem(props: IProviderMenuListItemProps) {
       <div className="provider-menu__list-item-content-txt">{providerTypeDetails.displayName}</div>
       <div className="provider-menu__list-item-content-img">
         {props.isActivating
-          ? <Loader />
+          ? <Loader quantityDots={3} sizeDots={'small'} isShowTitle={false} isOverlay={false} />
           : providerTypeDetails.reactLogoSvgShort.render()
         }
       </div>
