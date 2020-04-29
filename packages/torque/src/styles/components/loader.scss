@@ -3,7 +3,20 @@
     width: 100%;
     height: 100%;
     position: absolute;
+    left: 0;
+    top: 0;
+    background-color: rgb(255,255, 255);
     z-index: 2;
+    border-radius: 8px;
+    .loader-content{
+      width: 100%;
+      height: 27%;
+      background-color: #F5F7F9;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
   }
   .loader-content {
     position: absolute;
@@ -13,12 +26,22 @@
     transform: translate(-50%, -50%);
     z-index: 3;
     .loader-text {
-      font-size: 52px;
       font-weight: 900;
       color: #283049;
       margin-bottom: 0;
       text-align: center;
-      margin-bottom: 35px;
+      &-small{
+        font-size: 12px;
+        margin-bottom: 10px;
+      }
+      &-middle{
+        font-size: 18px;
+        margin-bottom: 15px;
+      }
+      &-large{
+        font-size: 52px;
+        margin-bottom: 35px;
+      }
       @media screen and (max-width: $mobile-version-max-width) {
         font-size: 36px;
         margin-bottom: 15px;

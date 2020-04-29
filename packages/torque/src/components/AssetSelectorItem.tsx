@@ -21,6 +21,8 @@ import { Loader } from "./Loader";
 export interface IAssetSelectorItemProps {
   asset: Asset;
   onSelectAsset: (asset: Asset) => void;
+  selectedAsset: Asset;
+  isLoadingTransaction: boolean
 }
 
 interface IAssetSelectorItemState {
@@ -76,9 +78,15 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
     // }catch (e){}
 
     return (!this.state.interestRate.gt(0)
-      ? <Loader quantityDots={5} sizeDots={'large'} isShowTitle={true} isOverlay={false} />
+      ? <Loader quantityDots={5} sizeDots={'large'} title={'Loading'} isOverlay={false} />
       : (<React.Fragment>
         <div className={`asset-selector-item ${assetTypeModifier}`} onClick={this.onClick}>
+          {this.props.asset === this.props.selectedAsset
+            ? this.props.isLoadingTransaction
+              ? <Loader quantityDots={3} sizeDots={'small'} title={'Processed Token'} isOverlay={true} />
+              : null
+            : null
+          }
           <div className="asset-selector-content">
             <div className="asset-selector-row">
               <div className="asset-selector__interest-rate">

@@ -37,7 +37,7 @@ export class RefinancePage extends PureComponent<IRefinancePageParams & RouteCom
           <HeaderOps isMobileMedia={this.props.isMobileMedia} isLoading={this.props.isLoading} doNetworkConnect={this.props.doNetworkConnect} isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
 
           <main>            {isShowLoader
-            ? <Loader quantityDots={5} sizeDots={'large'} isShowTitle={true} isOverlay={false} />
+            ? <Loader quantityDots={5} sizeDots={'large'} title={'Loading'} isOverlay={false} />
             : (<div className="page-header">
               <h1>Refinance Your Loans</h1>
               <p>Lorem ipsum is placeholder text commonly used in the graphic, print, and publishing industries for previewing layouts and visual mockups.</p>

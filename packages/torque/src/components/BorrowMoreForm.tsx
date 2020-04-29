@@ -229,7 +229,7 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
                   <div className="input-row">
                     <span className="asset-icon">{this.state.assetDetails.reactLogoSvg.render()}</span>
                     {this.state.isLoading
-                      ? <Loader quantityDots={4} sizeDots={'middle'} isShowTitle={false} isOverlay={false} />
+                      ? <Loader quantityDots={4} sizeDots={'middle'} title={''} isOverlay={false} />
                       : <React.Fragment>
                         <input
                           ref={this._setInputRef}

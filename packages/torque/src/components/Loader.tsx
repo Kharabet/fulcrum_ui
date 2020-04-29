@@ -3,7 +3,7 @@ import React, { Component } from "react";
 interface ILoaderProps {
   quantityDots: number,
   sizeDots: string,
-  isShowTitle: boolean,
+  title: string,
   isOverlay: boolean,  
 }
 
@@ -24,8 +24,8 @@ export class Loader extends Component<ILoaderProps> {
     return (
       <div className={`loader ${this.props.isOverlay ? `loader-overlay` : ``}`}>
         <div className="loader-content">
-          {this.props.isShowTitle
-            ? <p className="loader-text">Loading</p>
+          {this.props.title.length !== 0
+            ? <p className={`loader-text loader-text-${this.props.sizeDots}`}>{this.props.title}</p>
             : null
           }
           <div className="loader-dots">

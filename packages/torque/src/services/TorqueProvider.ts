@@ -1173,6 +1173,7 @@ export class TorqueProvider {
 
   public doBorrow = async (borrowRequest: BorrowRequest) => {
     // console.log(borrowRequest);
+    let receipt;
 
     if (borrowRequest.borrowAmount.lte(0) || borrowRequest.depositAmount.lte(0)) {
       return;
@@ -1227,6 +1228,7 @@ export class TorqueProvider {
               gasPrice: await this.gasPrice()
             }
           );
+          receipt = await this.waitForTransactionMined(txHash);
           if (this.borrowRequestAwaitingStore && this.web3ProviderSettings) {
             // noinspection ES6MissingAwait
             this.borrowRequestAwaitingStore.add(
@@ -1280,6 +1282,7 @@ export class TorqueProvider {
               gasPrice: await this.gasPrice()
             }
           );
+          receipt = await this.waitForTransactionMined(txHash);
           if (this.borrowRequestAwaitingStore && this.web3ProviderSettings) {
             // noinspection ES6MissingAwait
             this.borrowRequestAwaitingStore.add(
@@ -1296,7 +1299,7 @@ export class TorqueProvider {
       }
     }
 
-    return;
+    return receipt.status === 1 ? receipt : null;
   }
 
   public gasPrice = async (): Promise<BigNumber> => {

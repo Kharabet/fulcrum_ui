@@ -71,7 +71,7 @@ export function ProviderMenuListItem(props: IProviderMenuListItemProps) {
       <div className="provider-menu__list-item-content-txt">{providerTypeDetails.displayName}</div>
       <div className="provider-menu__list-item-content-img">
         {props.isActivating
-          ? <Loader quantityDots={3} sizeDots={'small'} isShowTitle={false} isOverlay={false} />
+          ? <Loader quantityDots={3} sizeDots={'small'} title={''} isOverlay={false} />
           : providerTypeDetails.reactLogoSvgShort.render()
         }
       </div>

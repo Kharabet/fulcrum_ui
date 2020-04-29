@@ -16,6 +16,7 @@
     transition-property: background-color, border-radius;
     transition-duration: 0.2s, 1s;
     transition-timing-function: linear;
+    position: relative;
     .asset-selector-icon {
       display: flex;
       &:hover {
