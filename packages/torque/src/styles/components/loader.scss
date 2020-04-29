@@ -1,22 +1,27 @@
 .loader {
-  &.loader-overlay {
+  .loader-overlay {
     width: 100%;
     height: 100%;
     position: absolute;
     left: 0;
     top: 0;
-    background-color: rgb(255,255, 255);
-    z-index: 2;
-    border-radius: 8px;
+    background-color: rgb(255, 255, 255);
+    z-index: 10002;
     .loader-content{
       width: 100%;
       height: 27%;
-      background-color: #F5F7F9;
+      background-color: #f5f7f9;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
     }
+  }
+  .loader-wrapper {
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    z-index: 10001;
   }
   .loader-content {
     position: absolute;
@@ -24,7 +29,7 @@
     left: 50%;
     -webkit-transform: translate(-50%, -50%);
     transform: translate(-50%, -50%);
-    z-index: 3;
+    z-index: 10003;
     .loader-text {
       font-weight: 900;
       color: #283049;

@@ -20,19 +20,33 @@ export class Loader extends Component<ILoaderProps> {
     return wrapperDots;
   }
 
+  public componentDidMount(): void {
+    const loaderWrapper = document.querySelector(".loader-wrapper") as HTMLElement;
+    if (loaderWrapper) {
+      const boundingClient = loaderWrapper.getBoundingClientRect();
+      loaderWrapper!.style.top = -1 * boundingClient!.top + "px";
+      loaderWrapper!.style.left = -1 * (boundingClient!.left + 10) + "px";
+    }
+  }
+
   public render() {
     return (
-      <div className={`loader ${this.props.isOverlay ? `loader-overlay` : ``}`}>
-        <div className="loader-content">
-          {this.props.title.length !== 0
-            ? <p className={`loader-text loader-text-${this.props.sizeDots}`}>{this.props.title}</p>
-            : null
-          }
-          <div className="loader-dots">
-            {this.renderDots()}
+      <React.Fragment>
+        <div className="loader">
+          {this.props.isOverlay ? <div className="loader-wrapper"></div> : null}
+          <div className={`${this.props.isOverlay ? `loader-overlay` : ``}`}>
+            <div className="loader-content">
+              {this.props.title.length !== 0
+                ? <p className={`loader-text loader-text-${this.props.sizeDots}`}>{this.props.title}</p>
+                : null
+              }
+              <div className="loader-dots">
+                {this.renderDots()}
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+      </React.Fragment>
     );
   }
 }

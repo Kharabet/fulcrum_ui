@@ -7,11 +7,12 @@ import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
 import { TorqueProvider } from "../services/TorqueProvider";
 import { CollateralSlider } from "./CollateralSlider";
 
-import ic_unsafe from "./../assets/images/ic_unsafe.svg";
+import { Loader } from "./Loader";
 
 export interface IBorrowedFundsListItemProps {
   item: IBorrowedFundsState;
-
+  selectedAsset: Asset;
+  isLoadingTransaction: boolean;
   onManageCollateral: (item: IBorrowedFundsState) => void;
   onRepayLoan: (item: IBorrowedFundsState) => void;
   onExtendLoan: (item: IBorrowedFundsState) => void;
@@ -92,6 +93,12 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
 
     return (
       <div className={`borrowed-funds-list-item`}>
+        {this.props.item.loanAsset === this.props.selectedAsset
+          ? this.props.isLoadingTransaction
+            ? <Loader quantityDots={4} sizeDots={'middle'} title={'Processed Token'} isOverlay={true} />
+            : null
+          : null
+        }
         <div className="borrowed-funds-list-item__header">
           <div className="borrowed-funds-list-item__header-asset">
             <div className="borrowed-funds-list-item__header-asset-img">

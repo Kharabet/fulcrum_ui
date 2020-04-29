@@ -24,6 +24,10 @@
     background: #f3f9ff;
     padding: 35px 50px;
     border: 1px solid transparent;
+    position: relative;
+    .loader-overlay {
+      border-radius: 16px;
+    }
     /*place center the last child in a row*/
     &:last-child:nth-child(odd) {
       grid-column: 1/3;
