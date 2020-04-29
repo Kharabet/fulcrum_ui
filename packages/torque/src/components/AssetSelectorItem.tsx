@@ -80,31 +80,34 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
     return (!this.state.interestRate.gt(0)
       ? <Loader quantityDots={5} sizeDots={'large'} title={'Loading'} isOverlay={false} />
       : (<React.Fragment>
-        <div className={`asset-selector-item ${assetTypeModifier}`} onClick={this.onClick}>
+        <div className={`asset-selector-item ${assetTypeModifier}`}>
           {this.props.asset === this.props.selectedAsset
             ? this.props.isLoadingTransaction
               ? <Loader quantityDots={3} sizeDots={'small'} title={'Processed Token'} isOverlay={true} />
               : null
             : null
           }
-          <div className="asset-selector-content">
-            <div className="asset-selector-row">
-              <div className="asset-selector__interest-rate">
-                <span className="asset-selector__interest-rate-value">{this.state.interestRate.gt(0) ? `${this.state.interestRate.toFixed(2)}` : `0`}</span>%
+          <div className="asset-selector-item-content" onClick={this.onClick}>
+            <div className="asset-selector-body">
+              <div className="asset-selector-row">
+                <div className="asset-selector__interest-rate">
+                  <span className="asset-selector__interest-rate-value">{this.state.interestRate.gt(0) ? `${this.state.interestRate.toFixed(2)}` : `0`}</span>%
                   </div>
+              </div>
+              <div className="asset-selector-row">
+                <div className="asset-selector__apr">APR</div>
+                <div className="asset-selector__fixed">FIXED</div>
+              </div>
             </div>
-            <div className="asset-selector-row">
-              <div className="asset-selector__apr">APR</div>
-              <div className="asset-selector__fixed">FIXED</div>
+            <div className="asset-selector-footer">
+              <div className="asset-selector__title">{this.props.asset}</div>
+              <div className={`${assetTypeImg}`}>{assetImg}</div>
+              <div className={`${assetDiv}`}>
+                <ArrowRight />
+              </div>
             </div>
           </div>
-          <div className="asset-selector-footer">
-            <div className="asset-selector__title">{this.props.asset}</div>
-            <div className={`${assetTypeImg}`}>{assetImg}</div>
-            <div className={`${assetDiv}`}>
-              <ArrowRight />
-            </div>
-          </div>
+
         </div>
       </React.Fragment>)
     )
