@@ -19,7 +19,7 @@
   }
   .borrowed-funds-list-item {
     width: 100%;
-    max-width: 670px;
+    max-width: 585px;
     border-radius: 16px;
     background: #f3f9ff;
     padding: 35px 50px;
@@ -209,12 +209,19 @@
     align-self: center;
     margin: 10px 10px 0px 0px;
   }
-
+  @media screen and (min-width: $breakpoint-mobile-min) {
+    .borrowed-funds-list-item {
+      &:nth-child(odd) {
+        place-self: end;
+      }
+    }
+  }
   @media screen and (max-width: $breakpoint-mobile-max) {
     grid-template-columns: repeat(1, 1fr);
     grid-row-gap: 30px;
 
     .borrowed-funds-list-item {
+      place-self: center;
       padding: 20px 25px;
     }
   }
