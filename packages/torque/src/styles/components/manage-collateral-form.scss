@@ -20,6 +20,16 @@
     }
   }
 
+  .input-container {
+    padding: 21px 15px;
+    @media screen and (max-width: $mobile-version-max-width) {
+      padding: 10px 15px;
+    }
+    .input-row {
+      margin-bottom: 0;
+    }
+  }
+
   .slider-handles {
     margin-top: 40px;
   }

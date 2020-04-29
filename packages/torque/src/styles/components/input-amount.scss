@@ -8,7 +8,7 @@
     align-items: center;
     justify-content: center;
     position: relative;
-    //margin-bottom: 15px;
+    margin-bottom: 15px;
     height: 72px;
 
     .input-amount {
@@ -76,9 +76,7 @@
 }
 @media screen and (max-width: $mobile-version-max-width) {
   .input-container {
-    padding: 0 15px;
     .input-row {
-      height: 57px;
       .input-amount {
         font-size: 36px;
         &::placeholder {
