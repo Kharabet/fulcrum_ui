@@ -19,7 +19,13 @@
       height: 0;
     }
   }
+  .collateral-slider .rail-inner {
+    height: 7px;
+  }
 
+  .slider-handles {
+    margin-top: 40px;
+  }
   .input-container {
     padding: 21px 15px;
     @media screen and (max-width: $mobile-version-max-width) {
@@ -29,11 +35,6 @@
       margin-bottom: 0;
     }
   }
-
-  .slider-handles {
-    margin-top: 40px;
-  }
-
   &__tips {
     display: flex;
     flex-direction: row;
