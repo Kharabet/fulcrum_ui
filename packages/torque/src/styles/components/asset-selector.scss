@@ -17,6 +17,9 @@
     transition-duration: 0.2s, 1s;
     transition-timing-function: linear;
     position: relative;
+    .loader-overlay {
+      border-radius: 8px;
+    }
     .asset-selector-icon {
       display: flex;
       &:hover {
