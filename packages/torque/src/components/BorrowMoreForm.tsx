@@ -178,7 +178,7 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
 
               <div>
                 {this.state.isLoading
-                  ? <Loader quantityDots={4} sizeDots={'middle'} isShowTitle={false} isOverlay={false} />
+                  ? <Loader quantityDots={4} sizeDots={'middle'} title={''} isOverlay={false} />
                   : (
                     <React.Fragment>
                       <div
@@ -208,20 +208,22 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
           <hr className="borrow-more-loan-form__delimiter" />
 
           <div className="input-container">
-                  <div className="input-row">
-                    <span className="asset-icon">{this.state.assetDetails.reactLogoSvg.render()}</span>
-                      ? <Loader quantityDots={4} sizeDots={'middle'} title={''} isOverlay={false} />
-
-                    <input
-                      ref={this._setInputRef}
-                      className="input-amount"
-                      type="number"
-                      step="any"
-                      placeholder={`Enter amount`}
-                      value={this.state.inputAmountText}
-                      onChange={this.onTradeAmountChange}
-                    />
-                  </React.Fragment>)}
+            <div className="input-row">
+              <span className="asset-icon">{this.state.assetDetails.reactLogoSvg.render()}</span>
+              {this.state.isLoading
+                ? <Loader quantityDots={4} sizeDots={'middle'} title={''} isOverlay={false} />
+                : <React.Fragment>
+                  <input
+                    ref={this._setInputRef}
+                    className="input-amount"
+                    type="number"
+                    step="any"
+                    placeholder={`Enter amount`}
+                    value={this.state.inputAmountText}
+                    onChange={this.onTradeAmountChange}
+                  />
+                </React.Fragment>
+              }
             </div>
           </div>
 
@@ -241,7 +243,7 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
               )}
           </div>
         </section>
-      </form>
+      </form >
     );
   }
 
