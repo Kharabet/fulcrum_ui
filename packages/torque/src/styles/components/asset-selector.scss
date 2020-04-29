@@ -23,13 +23,13 @@
       flex-wrap: wrap;
       height: 205px;
     }
-    .asset-selector-icon {
+    .asset-selector__icon {
       display: flex;
       &:hover {
         display: none;
       }
     }
-    .asset-selector-div {
+    .asset-selector__arrow {
       display: none;
     }
     &:hover {
@@ -50,12 +50,12 @@
           left: 0;
         }
       }
-      .asset-selector-div {
+      .asset-selector__arrow {
         display: flex;
         background-color: #ffffff;
         border-radius: 50%;
       }
-      .asset-selector-icon {
+      .asset-selector__icon {
         display: none;
       }
       .asset-selector__fixed {
@@ -242,7 +242,7 @@
         .asset-selector__title {
           font-size: 20px;
         }
-        .asset-selector-icon {
+        .asset-selector__icon {
           svg {
             width: 30px;
             height: auto;
