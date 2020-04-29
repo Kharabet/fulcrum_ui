@@ -7,7 +7,7 @@
   height: 100%;
   width: 100%;
   z-index: 100002;
-  background-color: rgba(0, 0, 0, 0.8);
+  background: rgba(11, 40, 83, 0.4);
   &.overflow-auto {
     overflow: auto;
     -ms-overflow-style: none;
@@ -46,7 +46,7 @@
     .modal-content-div {
       top: 30px;
       left: 50%;
-      // width: calc(100% - 30px);
+      width: calc(100% - 30px);
       transform: translateX(-50%);
       border-radius: 8px;
     }
