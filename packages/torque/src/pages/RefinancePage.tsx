@@ -15,7 +15,7 @@ export interface IRefinancePageParams {
   isRiskDisclosureModalOpen: () => void;
 }
 interface IRefinancePageState {
-  isShowLoader: boolean
+  isShowLoader: boolean;
 }
 export class RefinancePage extends PureComponent<IRefinancePageParams & RouteComponentProps<IRefinancePageRouteParams>, IRefinancePageState> {
 
@@ -48,7 +48,8 @@ export class RefinancePage extends PureComponent<IRefinancePageParams & RouteCom
               <RefinanceAssetSelector
                 isMobileMedia={this.props.isMobileMedia}
                 updateStateShowLoader={this.updateStateShowLoader}
-                doNetworkConnect={this.props.doNetworkConnect} />
+                doNetworkConnect={this.props.doNetworkConnect}
+              />
             </div>
           </main>
           <Footer isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />

@@ -23,13 +23,17 @@ import { ReactComponent as DownArrow } from "../assets/images/down-arrow.svg";
 import { ReactComponent as TopArrow } from "../assets/images/top-arrow.svg";
 import { ReactComponent as IconInfo } from "../assets/images/icon_info.svg";
 import { ReactComponent as IconInfoActive } from "../assets/images/icon_info_active.svg";
+import { Loader } from "./Loader";
+
 
 export interface IRefinanceAssetSelectorItemProps {
   isMobileMedia: boolean;
   asset: Asset;
   refinanceData: RefinanceData;
-  
-  onCompleted: () => void;
+  refinanceAssetItemName: string;
+  selectedRefinanceAssetItemName: string;
+  isLoadingTransaction: boolean
+  onCompleted: (itemName: string) => void;
 }
 
 interface IRefinanceAssetSelectorItemState {
@@ -147,7 +151,7 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
       } else {
         this.setState({ ...this.state, isLoading: false, isTrack: false });
       }
-      this.props.onCompleted();
+      this.props.onCompleted(this.props.refinanceAssetItemName);
     }
   };
 
@@ -173,6 +177,13 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
 
     return (
       <div className={`refinance-asset-selector-item `}>
+        {this.props.refinanceAssetItemName === this.props.selectedRefinanceAssetItemName
+          ? this.props.isLoadingTransaction
+            ? <Loader quantityDots={4} sizeDots={'middle'} title={'Processed Token'} isOverlay={true} />
+            : null
+          : null
+        }
+
         <div className="refinance-asset__main-block">
           <div className="refinance-asset-selector__non-torque">
             <div className="refinance-asset-selector__cdp">CDP {this.props.refinanceData.cdpId.toFixed(0)}</div>
