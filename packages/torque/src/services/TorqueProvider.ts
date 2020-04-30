@@ -1045,7 +1045,7 @@ export class TorqueProvider {
 
       const cdpManager: cdpManagerContract = await this.contractsSource.getCdpManager(cdpManagerAddress);
 
-      const collateralAmount = refRequest.collateralAmount.dividedBy(refRequest.debt.dividedBy(loanAmount));
+      const collateralAmount = refRequest.collateralAmount//.dividedBy(refRequest.debt.dividedBy(loanAmount));
       // @ts-ignore
       const dart = web3.utils.toWei(loanAmount.dp(18, BigNumber.ROUND_UP).toString());
       // @ts-ignore
