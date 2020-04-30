@@ -510,7 +510,7 @@ export class TorqueProvider {
       } else {
         inRatio = loan.ratio;
       }
-      const goal = loan.usdValue.times(inRatio).dp(18, BigNumber.ROUND_FLOOR);
+      let goal = loan.usdValue.times(inRatio).dp(18, BigNumber.ROUND_FLOOR);
       let current = new BigNumber(0);
       for (const deposit of deposits) {
         let take = deposit.usdValue;
@@ -518,15 +518,15 @@ export class TorqueProvider {
           take = take.minus(current.plus(take).minus(goal));
         }
         if (current.plus(take).lt(goal)) {
-
+          goal = goal.minus(goal.minus(current.plus(take)))
         }
         const maintenanceMarginAmount = await this.getMaintenanceMarginAmount(loan.asset, deposit.underlying);
         loan.collateral.push({
           ...deposit,
           amount: take.div(deposit.rate),
           borrowAmount: loan.balance.div(goal.div(take)),
-          maintenanceMarginAmount: BigNumber.minimum(inRatio, take.div(loan.usdValue)).multipliedBy(100),
-          maxCollateralRatio: deposit.usdValue.div(loan.usdValue)
+          maintenanceMarginAmount: BigNumber.minimum(inRatio, goal.div(loan.usdValue)).multipliedBy(100),
+          maxCollateralRatio: new BigNumber(5)
         });
 
         // @ts-ignore
@@ -539,6 +539,16 @@ export class TorqueProvider {
         }
       }
     }
+  };
+
+  public assignMakerCollateral = async (refinanceData: RefinanceData, borrowAmount: BigNumber, maintenanceMarginAmount: BigNumber) => {
+    const collateralAmount = refinanceData.collateralAmount.dividedBy(refinanceData.debt.dividedBy(borrowAmount));
+    const collaterralWithRatio = collateralAmount.multipliedBy(maintenanceMarginAmount).div(refinanceData.maintenanceMarginAmount)
+    refinanceData.collateralAmount = collaterralWithRatio;
+    refinanceData.maintenanceMarginAmount = maintenanceMarginAmount;
+    const minMaintenanceMarginAmount = new BigNumber(150);
+    refinanceData.isDisabled = maintenanceMarginAmount.lte(minMaintenanceMarginAmount);
+    return refinanceData;
   };
 
   public getCompoundLoans = async (): Promise<IRefinanceLoan[]> => {
@@ -943,7 +953,9 @@ export class TorqueProvider {
       isDisabled: false,
       dust: new BigNumber(0),
       isShowCard: false,
-      variableAPR: new BigNumber(0)
+      variableAPR: new BigNumber(0),
+      maintenanceMarginAmount: new BigNumber(0),
+      maxCollateralRatio: new BigNumber(0),
     };
     if (this.web3Wrapper && this.contractsSource) {
       const vat: vatContract = await this.contractsSource.getVatContract(configAddress.MCD_VAT_Address);
@@ -1002,7 +1014,9 @@ export class TorqueProvider {
         isDisabled,
         dust: ilkData[4].div(10 ** 27).div(10 ** 18),
         isShowCard,
-        variableAPR: rateAmountIlkYr
+        variableAPR: rateAmountIlkYr,
+        maintenanceMarginAmount: ratio.times(100),
+        maxCollateralRatio: new BigNumber(5),
       };
     }
 
