@@ -74,6 +74,11 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
             <HeaderMenu items={this.Menu.items} />
           </div>
           <div className="header__right">
+            <div className="header-menu__item">
+              <a href="https://help.bzx.network/en/collections/2008807-torque" className="header-menu__item-link c-primary-blue help-center">
+                <span>Help Center</span>
+              </a>
+            </div>
             <OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />
             {/* <div className="theme-switch-wrapper">
               <label className="theme-switch">
