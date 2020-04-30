@@ -175,7 +175,7 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
 
     return (
 
-      <div className={`refinance-asset-selector-item `}>
+      <div className={`refinance-asset-selector-item ` + (this.state.isShowInfoCollateralAssetDt0 || this.state.isShowInfoCollateralAssetDt1 ? `inactive` : ``)}>
         {this.props.refinanceAssetItemName === this.props.selectedRefinanceAssetItemName
           ? this.props.isLoadingTransaction
             ? <Loader quantityDots={3} sizeDots={'small'} title={'Processed Token'} isOverlay={true} />
@@ -262,6 +262,12 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
                     <div className="info-icon" onClick={this.showInfoCollateralAssetDt0}>
                       {iconInfoCollateralAssetDt0}
                     </div>
+                    {this.state.isShowInfoCollateralAssetDt0 &&
+                      <React.Fragment>
+                        <div className="refinance-asset-selector__wrapper" onClick={this.showInfoCollateralAssetDt0}></div>
+                        <CollateralInfo />
+                      </React.Fragment>
+                    }
                   </div>
                   <div className="collateral-asset">
                     <div className="asset-icon">
@@ -272,7 +278,6 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
                     </div>
                   </div>
                 </div>
-                {this.state.isShowInfoCollateralAssetDt0 && <CollateralInfo />}
                 {this.state.isShow && collateralAssetDt2 &&
                   <div className="refinance-asset-selector__collateral">
 
@@ -287,6 +292,10 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
                       <div className="info-icon" onClick={this.showInfoCollateralAssetDt1}>
                         {iconInfoCollateralAssetDt1}
                       </div>
+                      {this.state.isShowInfoCollateralAssetDt1 && <React.Fragment>
+                        <div className="refinance-asset-selector__wrapper" onClick={this.showInfoCollateralAssetDt1}></div>
+                        <CollateralInfo />
+                      </React.Fragment>}
                     </div>
                     <div className="collateral-asset">
                       <div className="asset-icon">
@@ -298,7 +307,7 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
                     </div>
                   </div>
                 }
-                {this.state.isShowInfoCollateralAssetDt1 && <CollateralInfo />}
+
               </div>
             }
             {this.props.isDisabled && this.props.isMobileMedia &&

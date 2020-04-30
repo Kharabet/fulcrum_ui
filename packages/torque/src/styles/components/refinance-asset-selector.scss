@@ -36,11 +36,10 @@
         .refinance-asset__main-block .refinance-asset-selector__non-torque .refinance__input-container .input-amount {
           background-color: #f5f7f9;
         }
-        .refinance-asset__main-block
-          .refinance-asset-selector__collateral-container
-          .refinance-asset-selector__collateral_info {
-          background-color: #f3f9ff;
-        }
+      }
+      &.inactive {
+        background-color: #f3f9ff;
+        border: 1px solid transparent;
       }
       .refinance-asset__main-block {
         display: grid;
@@ -240,15 +239,43 @@
           }
         }
         .refinance-asset-selector__collateral-container {
+          position: relative;
           .refinance-asset-selector__collateral_info {
+            position: absolute;
+            width: 278px;
+            bottom: 60px;
+            right: -150px;
             background: #ffffff;
             border-radius: 8px;
-            padding: 30px;
+            padding: 28px;
             font-weight: normal;
             font-size: 12px;
             line-height: 150%;
             color: #758295;
+            // transform: translate(-50%, 0);
+            box-shadow: 0px 6px 20px rgba(95, 109, 130, 0.1);
+            z-index: 100004;
+            &:after {
+              position: absolute;
+              // z-index: -1;
+              content: "";
+              right: calc(50% - 10px);
+              bottom: -10px;
+              border-style: solid;
+              border-width: 10px 10px 0 10px;
+              border-color: #fff transparent transparent transparent;
+              transition-duration: 0.3s;
+              transition-property: transform;
+            }
           }
+        }
+        .refinance-asset-selector__wrapper {
+          width: 100vw;
+          height: 100vh;
+          top: 0;
+          left: 0;
+          position: fixed;
+          z-index: 100003;
         }
         .refinance-asset-selector__collateral {
           display: flex;
@@ -256,10 +283,6 @@
           align-items: center;
           width: 180px;
           justify-content: space-between;
-
-          &:not(:last-child) {
-            margin-bottom: 40px;
-          }
 
           .collateral-value {
             position: relative;

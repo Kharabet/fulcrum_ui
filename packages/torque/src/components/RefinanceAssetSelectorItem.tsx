@@ -170,7 +170,7 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
     if (!this.props.refinanceData.isShowCard) return null;
 
     return (
-      <div className={`refinance-asset-selector-item `}>
+      <div className={`refinance-asset-selector-item ` + (this.state.isShowInfoCollateralAssetDt0 ? `inactive` : ``)}>
         {this.props.refinanceAssetItemName === this.props.selectedRefinanceAssetItemName
           ? this.props.isLoadingTransaction
             ? <Loader quantityDots={4} sizeDots={'middle'} title={'Processed Token'} isOverlay={true} />
@@ -258,7 +258,12 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
                     <div className="text">Collateral</div>
                     <div className="info-icon" onClick={this.showInfoCollateralAssetDt0}>
                       {iconInfoCollateralAssetDt0}
+
                     </div>
+                    {this.state.isShowInfoCollateralAssetDt0 && <React.Fragment>
+                      <div className="refinance-asset-selector__wrapper" onClick={this.showInfoCollateralAssetDt0}></div>
+                      <CollateralInfo />
+                    </React.Fragment>}
                   </div>
                   <div className="collateral-asset">
                     <div className="asset-icon">
@@ -269,7 +274,7 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
                     </div>
                   </div>
                 </div>
-                {this.state.isShowInfoCollateralAssetDt0 && <CollateralInfo />}
+
               </div>}
           </div>
         </div>
