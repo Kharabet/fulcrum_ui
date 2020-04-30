@@ -104,6 +104,8 @@ export class TorqueProvider {
   public contractsSource: ContractsSource | null = null;
   public borrowRequestAwaitingStore: BorrowRequestAwaitingStore | null = null;
   public accounts: string[] = [];
+  public compoundDeposits: IRefinanceLoan[] = [];
+  public soloDeposits: IRefinanceLoan[] = [];
   public isLoading: boolean = false;
   public unsupportedNetwork: boolean = false;
   public static readonly UNLIMITED_ALLOWANCE_IN_BASE_UNITS = new BigNumber(2)
@@ -499,7 +501,7 @@ export class TorqueProvider {
     return new BigNumber("150"); // TODO @bshevchenko return data[3];
   };
 
-  private assignCollateral = async (loans: IRefinanceLoan[], deposits: IRefinanceToken[], inRatio?: BigNumber) => {
+  public assignCollateral = async (loans: IRefinanceLoan[], deposits: IRefinanceToken[], inRatio?: BigNumber) => {
 
     for (const loan of loans) {
       loan.collateral = [];
@@ -508,25 +510,27 @@ export class TorqueProvider {
       } else {
         inRatio = loan.ratio;
       }
-      const goal = loan.usdValue.times(inRatio).dp(18, BigNumber.ROUND_FLOOR);
+      let goal = loan.usdValue.times(inRatio).dp(18, BigNumber.ROUND_FLOOR);
       let current = new BigNumber(0);
       for (const deposit of deposits) {
         let take = deposit.usdValue;
         if (current.plus(take).gt(goal)) {
           take = take.minus(current.plus(take).minus(goal));
         }
+        if (current.plus(take).lt(goal)) {
+          goal = goal.minus(goal.minus(current.plus(take)))
+        }
         const maintenanceMarginAmount = await this.getMaintenanceMarginAmount(loan.asset, deposit.underlying);
         loan.collateral.push({
           ...deposit,
           amount: take.div(deposit.rate),
           borrowAmount: loan.balance.div(goal.div(take)),
-          maintenanceMarginAmount
+          maintenanceMarginAmount: BigNumber.minimum(inRatio, goal.div(loan.usdValue)).multipliedBy(100),
+          maxCollateralRatio: new BigNumber(5)
         });
 
         // @ts-ignore
-        if (inRatio.lte(maintenanceMarginAmount.div(10 ** 19))) {
-          loan.isDisabled = true;
-        }
+        loan.isDisabled = inRatio.lte(maintenanceMarginAmount.div(100));
 
         current = current.plus(take).dp(18, BigNumber.ROUND_FLOOR);
         if (current.toString(10) === goal.toString(10)) {
@@ -535,6 +539,16 @@ export class TorqueProvider {
         }
       }
     }
+  };
+
+  public assignMakerCollateral = async (refinanceData: RefinanceData, borrowAmount: BigNumber, maintenanceMarginAmount: BigNumber) => {
+    const collateralAmount = refinanceData.collateralAmount.dividedBy(refinanceData.debt.dividedBy(borrowAmount));
+    const collaterralWithRatio = collateralAmount.multipliedBy(maintenanceMarginAmount).div(refinanceData.maintenanceMarginAmount)
+    refinanceData.collateralAmount = collaterralWithRatio;
+    refinanceData.maintenanceMarginAmount = maintenanceMarginAmount;
+    const minMaintenanceMarginAmount = new BigNumber(150);
+    refinanceData.isDisabled = maintenanceMarginAmount.lte(minMaintenanceMarginAmount);
+    return refinanceData;
   };
 
   public getCompoundLoans = async (): Promise<IRefinanceLoan[]> => {
@@ -939,7 +953,9 @@ export class TorqueProvider {
       isDisabled: false,
       dust: new BigNumber(0),
       isShowCard: false,
-      variableAPR: new BigNumber(0)
+      variableAPR: new BigNumber(0),
+      maintenanceMarginAmount: new BigNumber(0),
+      maxCollateralRatio: new BigNumber(0),
     };
     if (this.web3Wrapper && this.contractsSource) {
       const vat: vatContract = await this.contractsSource.getVatContract(configAddress.MCD_VAT_Address);
@@ -998,7 +1014,9 @@ export class TorqueProvider {
         isDisabled,
         dust: ilkData[4].div(10 ** 27).div(10 ** 18),
         isShowCard,
-        variableAPR: rateAmountIlkYr
+        variableAPR: rateAmountIlkYr,
+        maintenanceMarginAmount: ratio.times(100),
+        maxCollateralRatio: new BigNumber(5),
       };
     }
 
@@ -1027,7 +1045,7 @@ export class TorqueProvider {
 
       const cdpManager: cdpManagerContract = await this.contractsSource.getCdpManager(cdpManagerAddress);
 
-      const collateralAmount = refRequest.collateralAmount.dividedBy(refRequest.debt.dividedBy(loanAmount));
+      const collateralAmount = refRequest.collateralAmount//.dividedBy(refRequest.debt.dividedBy(loanAmount));
       // @ts-ignore
       const dart = web3.utils.toWei(loanAmount.dp(18, BigNumber.ROUND_UP).toString());
       // @ts-ignore
@@ -1171,6 +1189,7 @@ export class TorqueProvider {
 
   public doBorrow = async (borrowRequest: BorrowRequest) => {
     // console.log(borrowRequest);
+    let receipt;
 
     if (borrowRequest.borrowAmount.lte(0) || borrowRequest.depositAmount.lte(0)) {
       return;
@@ -1225,6 +1244,7 @@ export class TorqueProvider {
               gasPrice: await this.gasPrice()
             }
           );
+          receipt = await this.waitForTransactionMined(txHash);
           if (this.borrowRequestAwaitingStore && this.web3ProviderSettings) {
             // noinspection ES6MissingAwait
             this.borrowRequestAwaitingStore.add(
@@ -1278,6 +1298,7 @@ export class TorqueProvider {
               gasPrice: await this.gasPrice()
             }
           );
+          receipt = await this.waitForTransactionMined(txHash);
           if (this.borrowRequestAwaitingStore && this.web3ProviderSettings) {
             // noinspection ES6MissingAwait
             this.borrowRequestAwaitingStore.add(
@@ -1294,7 +1315,7 @@ export class TorqueProvider {
       }
     }
 
-    return;
+    return receipt.status === 1 ? receipt : null;
   }
 
   public gasPrice = async (): Promise<BigNumber> => {
@@ -1607,6 +1628,7 @@ export class TorqueProvider {
   };
 
   public doRepayLoan = async (repayLoanRequest: RepayLoanRequest) => {
+    let receipt;
     if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
       const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
       const bZxContract = await this.contractsSource.getiBZxContract();
@@ -1666,7 +1688,7 @@ export class TorqueProvider {
           console.log(e);
         }
 
-        await bZxContract.paybackLoanAndClose.sendTransactionAsync(
+        const txHash = await bZxContract.paybackLoanAndClose.sendTransactionAsync(
           repayLoanRequest.loanOrderHash,                       // loanOrderHash
           account,                                              // borrower
           account,                                              // payer
@@ -1683,15 +1705,16 @@ export class TorqueProvider {
             gasPrice: await this.gasPrice()
           }
         );
+        receipt = await this.waitForTransactionMined(txHash);
       }
     }
 
-    return;
+    return receipt.status === 1 ? receipt : null;
   };
 
   public doManageCollateral = async (manageCollateralRequest: ManageCollateralRequest) => {
     // console.log(manageCollateralRequest);
-
+    let receipt;
     if (manageCollateralRequest.collateralAmount.lte(0)) {
       return;
     }
@@ -1768,7 +1791,7 @@ export class TorqueProvider {
             // console.log(e);
           }
 
-          await bZxContract.withdrawCollateralForBorrower.sendTransactionAsync(
+          const txHash = await bZxContract.withdrawCollateralForBorrower.sendTransactionAsync(
             manageCollateralRequest.loanOrderState.loanData!.loanOrderHash,             // loanOrderHash
             collateralAmountInBaseUnits,                                                // depositAmount
             account,                                                                    // trader
@@ -1781,11 +1804,12 @@ export class TorqueProvider {
               gasPrice: await this.gasPrice()
             }
           );
+          receipt = await this.waitForTransactionMined(txHash);
         }
       }
     }
 
-    return;
+    return receipt.status === 1 ? receipt : null;
   };
 
   public isETHAsset = (asset: Asset): boolean => {
@@ -1823,7 +1847,7 @@ export class TorqueProvider {
 
   public doExtendLoan = async (extendLoanRequest: ExtendLoanRequest) => {
     // console.log(extendLoanRequest);
-
+    let receipt;
     if (extendLoanRequest.depositAmount.lte(0)) {
       return;
     }
@@ -1864,7 +1888,7 @@ export class TorqueProvider {
           // console.log(e);
         }
 
-        await bZxContract.extendLoanByInterest.sendTransactionAsync(
+        const txHash = await bZxContract.extendLoanByInterest.sendTransactionAsync(
           extendLoanRequest.loanOrderHash,                      // loanOrderHash
           account,                                              // borrower
           account,                                              // payer
@@ -1879,10 +1903,11 @@ export class TorqueProvider {
             gasPrice: await this.gasPrice()
           }
         );
+        receipt = await this.waitForTransactionMined(txHash);
       }
     }
 
-    return;
+    return receipt.status === 1 ? receipt : null;
   };
 
   public getCollateralExcessAmount = async (borrowedFundsState: IBorrowedFundsState): Promise<BigNumber> => {

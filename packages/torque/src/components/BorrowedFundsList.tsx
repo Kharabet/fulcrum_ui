@@ -3,11 +3,13 @@ import { BorrowRequestAwaiting } from "../domain/BorrowRequestAwaiting";
 import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
 import { BorrowedFundsAwaitingListItem } from "./BorrowedFundsAwaitingListItem";
 import { BorrowedFundsListItem } from "./BorrowedFundsListItem";
+import { Asset } from "../domain/Asset";
 
 export interface IBorrowedFundsListProps {
   items: IBorrowedFundsState[];
   itemsAwaiting: ReadonlyArray<BorrowRequestAwaiting>;
-
+  selectedAsset: Asset;
+  isLoadingTransaction: boolean;
   onManageCollateral: (item: IBorrowedFundsState) => void;
   onRepayLoan: (item: IBorrowedFundsState) => void;
   onExtendLoan: (item: IBorrowedFundsState) => void;
@@ -15,6 +17,7 @@ export interface IBorrowedFundsListProps {
 }
 
 interface IBorrowedFundsListState {
+  isLoading : boolean 
   // colsCount: number;
 }
 
@@ -25,13 +28,20 @@ export class BorrowedFundsList extends Component<IBorrowedFundsListProps, IBorro
     super(props);
 
     this.outerRef = React.createRef();
-    this.state = { /*colsCount: this.getColsCount()*/ };
+
+    this.state = {
+      isLoading:true 
+      /*colsCount: this.getColsCount()*/ };
   }
 
-  // public componentDidMount(): void {
-  //   window.addEventListener("resize", this.didResize.bind(this));
-  //   this.didResize();
-  // }
+  public componentDidMount(): void {
+    this.setState(
+      {       
+        isLoading : false 
+      });
+   // window.addEventListener("resize", this.didResize.bind(this));
+    //this.didResize();
+  }
   //
   // public componentWillUnmount(): void {
   //   window.removeEventListener("resize", this.didResize.bind(this));
@@ -57,12 +67,15 @@ export class BorrowedFundsList extends Component<IBorrowedFundsListProps, IBorro
           onRepayLoan={this.props.onRepayLoan}
           onExtendLoan={this.props.onExtendLoan}
           onBorrowMore={this.props.onBorrowMore}
+          selectedAsset={this.props.selectedAsset}
+          isLoadingTransaction={this.props.isLoadingTransaction}
         />
       );
     });
-
+    
+    
     return <div className="borrowed-funds-list" ref={this.outerRef}>
-      {itemsAwaiting.length === 0 && items.length === 0
+      {this.state.isLoading && itemsAwaiting.length === 0 && items.length === 0
         && <a href="/borrow" className="no-loans-msg">Looks like you don't have any loans.</a>}
       {itemsAwaiting}
       {items}

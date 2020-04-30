@@ -10,7 +10,7 @@
     padding: 0 48px 40px 48px;
   }
   &__input-amount {
-    font-size: 48px;
+    font-size: 42px;
     line-height: 1.5;
     font-weight: 900;
     color: #283049;
@@ -18,7 +18,7 @@
     border: none;
     text-align: center;
     width: 100%;
-    background-color: $color-gray-light;
+    background-color: $bg-color-gray;
     border: 2px solid #e7ebf0;
     border-radius: 4px;
     padding: 20px 0;
@@ -32,7 +32,7 @@
     }
     &:hover,
     &:focus {
-      background-color: $color-gray-light;
+      background-color: $bg-color-gray;
       border: 2px solid #e7ebf0;
       color: #283049;
     }
@@ -54,7 +54,7 @@
 
   &__info-collateral-by-container {
     padding: 25px 0;
-    background-color: $color-gray-light;
+    background-color: $bg-color-gray;
     font-style: normal;
     font-stretch: normal;
     line-height: 1.5;
@@ -63,13 +63,22 @@
   &__info-collateral-by-msg {
     font-size: 16px;
     font-weight: 400;
-    color: $color-gray-darker-3;
+    color: $color-gray-darker;
   }
 
   &__info-collateral-by-amount {
     font-size: 20px;
     font-weight: 800;
     color: #283049;
+    position: relative;
+    .loader,
+    .loader-dots {
+      height: 30px;
+      .loader-content {
+        top: 0;
+        transform: translate(-50%, 0);
+      }
+    }
   }
   &__error{
     color: #de4a4a;
@@ -83,7 +92,11 @@
       padding: 0 40px 40px 40px;
     }
     &__input-amount {
-      font-size: 32px;
+      padding: 10px 0;
+      font-size: 36px;
+      &::placeholder {
+        font-size: 28px;
+      }
     }
   }
 }

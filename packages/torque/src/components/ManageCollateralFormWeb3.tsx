@@ -12,7 +12,7 @@ import { TorqueProvider } from "../services/TorqueProvider";
 import { CollateralSlider } from "./CollateralSlider";
 import { OpsEstimatedResult } from "./OpsEstimatedResult";
 import { InputAmount } from "./InputAmount";
-import { LoaderData } from "./LoaderData";
+import { Loader } from "./Loader";
 
 export interface IManageCollateralFormWeb3Props {
   loanOrderState: IBorrowedFundsState;
@@ -71,7 +71,7 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
       balanceTooLow: false,
       inputAmountText: "",
       didSubmit: false,
-      isLoading: false
+      isLoading: true
     };
 
     this.selectedValueUpdate = new Subject<number>();
@@ -104,11 +104,20 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
   }
 
   public componentDidMount(): void {
-    TorqueProvider.Instance.isLoading = true;
 
     TorqueProvider.Instance.getLoanCollateralManagementParams(
       this.props.loanOrderState
     ).then(collateralState => {
+
+      this.setState(
+        {
+          ...this.state,
+          minValue: collateralState.minValue,
+          maxValue: collateralState.maxValue,
+          assetDetails: AssetsDictionary.assets.get(this.props.loanOrderState.collateralAsset) || null,
+
+        });
+
       TorqueProvider.Instance.getLoanCollateralManagementGasAmount().then(gasAmountNeeded => {
         TorqueProvider.Instance.getCollateralExcessAmount(this.props.loanOrderState).then(collateralExcess => {
           TorqueProvider.Instance.getAssetTokenBalanceOfUser(this.props.loanOrderState.collateralAsset).then(assetBalance => {
@@ -180,8 +189,6 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
             this.setState(
               {
                 ...this.state,
-                minValue: collateralState.minValue,
-                maxValue: collateralState.maxValue,
                 assetDetails: AssetsDictionary.assets.get(this.props.loanOrderState.collateralAsset) || null,
                 loanValue: currentCollateralNormalizedBN.toNumber(),
                 selectedValue: currentCollateralNormalizedBN.toNumber(),
@@ -193,7 +200,6 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
               () => {
                 this.selectedValueUpdate.next(this.state.selectedValue);
 
-                TorqueProvider.Instance.isLoading = false;
               }
             );
           });
@@ -212,16 +218,16 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
       prevState.loanValue !== this.state.loanValue ||
       prevState.selectedValue !== this.state.selectedValue) {
       TorqueProvider.Instance.getLoanCollateralManagementGasAmount().then(gasAmountNeeded => {
-      
+
         this.setState(
           {
             ...this.state,
-             isLoading: true,
+            isLoading: true,
             gasAmountNeeded: gasAmountNeeded
           },
           () => {
             this.selectedValueUpdate.next(this.state.selectedValue);
-           }
+          }
         );
       });
     }
@@ -235,101 +241,93 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
 
     return (
       <form className="manage-collateral-form" onSubmit={this.onSubmitClick}>
-        {TorqueProvider.Instance.isLoading ? (
-          <div className="manage-collatera-loading">
-            Loading...
-          </div>
-        ) : (
+        <section className="dialog-content">
+
+          {this.state.loanValue !== this.state.selectedValue ? (
             <React.Fragment>
-              <section className="dialog-content">
-
-                {this.state.loanValue !== this.state.selectedValue ? (
-                  <React.Fragment>
-                    <div className="manage-collateral-form__info-liquidated-at-container">
-                      <div className="manage-collateral-form__info-liquidated-at-msg">
-                        This will make your loan collateralized
-                  </div>
-                      <div className="manage-collateral-form__info-liquidated-at-price">
-                        {this.state.collateralizedPercent.toFixed(2)}%
-                  </div>
-                    </div>
-
-                    <div className={`manage-collateral-form-insufficient-balance ${!this.state.balanceTooLow ? `manage-collateral-form-insufficient-balance--hidden` : ``}`}>
-                      Insufficient {this.state.assetDetails.displayName} balance in your wallet!
-                </div>
-                  </React.Fragment>
-                ) : (
-                    <div className="manage-collateral-form__info-liquidated-at-container">
-                      <div className="manage-collateral-form__info-liquidated-at-msg">
-                        Your loan is collateralized
-                </div>
-
-                      <div className="manage-collateral-form__info-liquidated-at-price">
-                        <span>{this.state.collateralizedPercent.toFixed(2)}</span>%
-                </div>
-                    </div>
-                  )}
-                <CollateralSlider
-                  readonly={false}
-
-                  minValue={this.state.minValue}
-                  maxValue={this.state.maxValue}
-                  value={this.state.selectedValue}
-                  onUpdate={this.onUpdate}
-                  onChange={this.onChange}
-                />
-
-                <div className="manage-collateral-form__tips">
-                  <div className="manage-collateral-form__tip">Withdraw</div>
-                  <div className="manage-collateral-form__tip">Top Up</div>
-                </div>
-
-                <hr className="manage-collateral-form__delimiter" />
+              <div className="manage-collateral-form__info-liquidated-at-container">
                 <div className="manage-collateral-form__info-liquidated-at-msg">
-                  You will
-                    {this.state.loanValue > this.state.selectedValue ?
-                    " withdraw" :
-                    " top up"
-                  }
+                  This will make your loan collateralized
+                  </div>
+                <div className="manage-collateral-form__info-liquidated-at-price">
+                  {this.state.collateralizedPercent.toFixed(2)}%
+                  </div>
+              </div>
+
+              <div className={`manage-collateral-form__insufficient-balance ${!this.state.balanceTooLow ? `manage-collateral-form__insufficient-balance--hidden` : ``}`}>
+                Insufficient {this.state.assetDetails.displayName} balance in your wallet!
+                </div>
+            </React.Fragment>
+          ) : (
+              <div className="manage-collateral-form__info-liquidated-at-container">
+                <div className="manage-collateral-form__info-liquidated-at-msg">
+                  Your loan is collateralized
                 </div>
 
-                <div className="input-container">
-                  <div className="input-row">
-                    <span className="asset-icon">{this.state.assetDetails.reactLogoSvg.render()}</span>
-                    {this.state.isLoading
-                      ? <LoaderData />
-                      : <React.Fragment>
-                        <input
-                          ref={this._setInputRef}
-                          className="input-amount"
-                          type="text"
-                          placeholder={`Enter amount`}
-                          value={this.state.inputAmountText}
-                          onChange={this.onTradeAmountChange}
-                        />
-                      </React.Fragment>
-                    }
-                  </div>
+                <div className="manage-collateral-form__info-liquidated-at-price">
+                  <span>{this.state.collateralizedPercent.toFixed(2)}</span>%
                 </div>
-              </section>
-              <section className="dialog-actions">
-                <div className="manage-collateral-form__actions-container">
-                  {this.state.loanValue === this.state.selectedValue ? (
-                    <button type="button" className="btn btn-size--small" onClick={this.props.onClose}>
-                      Close
-                    </button>
-                  ) : (
-                      <button type="submit" className={`btn btn-size--small ${this.state.didSubmit ? `btn-disabled` : ``}`}>
-                        {this.state.didSubmit ? "Submitting..." : this.state.loanValue > this.state.selectedValue ?
-                          "Withdraw" :
-                          "Top Up"
-                        }
-                      </button>
-                    )}
-                </div>
-              </section>
-            </React.Fragment>
-          )}
+              </div>
+            )}
+          <CollateralSlider
+            readonly={false}
+            minValue={this.state.minValue}
+            maxValue={this.state.maxValue}
+            value={this.state.selectedValue}
+            onUpdate={this.onUpdate}
+            onChange={this.onChange}
+          />
+
+          <div className="manage-collateral-form__tips">
+            <div className="manage-collateral-form__tip">Withdraw</div>
+            <div className="manage-collateral-form__tip">Top Up</div>
+          </div>
+
+          <hr className="manage-collateral-form__delimiter" />
+          <div className="manage-collateral-form__info-liquidated-at-msg">
+            You will
+                    {this.state.loanValue > this.state.selectedValue ?
+              " withdraw" :
+              " top up"
+            }
+          </div>
+
+          <div className="input-container">
+            <div className="input-row">
+              <span className="asset-icon">{this.state.assetDetails.reactLogoSvg.render()}</span>
+              {this.state.isLoading
+                ? <Loader quantityDots={4} sizeDots={'middle'} title={''} isOverlay={false} />
+                : <React.Fragment>
+                  <input
+                    ref={this._setInputRef}
+                    className="input-amount"
+                    type="number"
+                    step="any"
+                    placeholder={`Enter amount`}
+                    value={this.state.inputAmountText}
+                    onChange={this.onTradeAmountChange}
+                  />
+                </React.Fragment>
+              }
+            </div>
+          </div>
+        </section>
+        <section className="dialog-actions">
+          <div className="manage-collateral-form__actions-container">
+            {this.state.loanValue === this.state.selectedValue ? (
+              <button type="button" className="btn btn-size--small" onClick={this.props.onClose}>
+                Close
+              </button>
+            ) : (
+                <button type="submit" className={`btn btn-size--small ${this.state.didSubmit ? `btn-disabled` : ``}`}>
+                  {this.state.didSubmit ? "Submitting..." : this.state.loanValue > this.state.selectedValue ?
+                    "Withdraw" :
+                    "Top Up"
+                  }
+                </button>
+              )}
+          </div>
+        </section>
       </form>
     );
   }
@@ -383,7 +381,7 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
   };
 
   private onUpdate = async (value: number) => {
-     this.setState({ ...this.state, selectedValue: value });
+    this.setState({ ...this.state, selectedValue: value });
   };
 
   public onSubmitClick = async (event: FormEvent<HTMLFormElement>) => {
@@ -458,19 +456,19 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
       } else {
 
         let selectedValue = (Number(amountText) > 0 ?
-          
-        collateralAmount
-          .dividedBy(this.props.loanOrderState.collateralAmount)
-          .multipliedBy(this.state.maxValue - this.state.loanValue)
-          .plus(this.state.loanValue)
+
+          collateralAmount
+            .dividedBy(this.props.loanOrderState.collateralAmount)
+            .multipliedBy(this.state.maxValue - this.state.loanValue)
+            .plus(this.state.loanValue)
           :
           new BigNumber(this.state.loanValue)
-          .minus(
-          collateralAmount
-          .dividedBy(this.state.collateralExcess)
-          .multipliedBy(this.state.loanValue)
-          )).toNumber();
-           
+            .minus(
+              collateralAmount
+                .dividedBy(this.state.collateralExcess)
+                .multipliedBy(this.state.loanValue)
+            )).toNumber();
+
 
         this.setState({
           ...this.state,
@@ -498,7 +496,8 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
   public formatPrecision(outputText: string): string {
     const output = Number(outputText);
     let sign = "";
-    if (this.state.loanValue > this.state.selectedValue)
+    if (this.state
+      .loanValue > this.state.selectedValue)
       sign = "-";
     let n = Math.log(Math.abs(output)) / Math.LN10;
     let x = 4 - n;

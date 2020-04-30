@@ -9,8 +9,10 @@
     justify-content: center;
     position: relative;
     margin-bottom: 15px;
+    height: 72px;
+
     .input-amount {
-      font-size: 48px;
+      font-size: 42px;
       line-height: 1.5;
       font-weight: 900;
       color: #283049;
@@ -18,6 +20,7 @@
       border: none;
       text-align: center;
       width: calc(100% - 80px);
+      position: relative;
       &::-webkit-outer-spin-button,
       &::-webkit-inner-spin-button {
         -webkit-appearance: none;
@@ -73,6 +76,10 @@
     .input-row {
       .input-amount {
         font-size: 36px;
+        &::placeholder {
+          font-size: 24px;
+          transform: translate(0, -4px);
+        }
       }
       .asset-icon {
         svg {

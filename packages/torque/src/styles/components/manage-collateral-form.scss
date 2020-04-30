@@ -5,36 +5,13 @@
   width: 520px;
   padding-top: 1rem;
 
-
-  .manage-collatera-loading {
-    font-size: 3rem;
-    text-align: center;
-    padding-top: 2rem;
-    padding-bottom: 4rem;
+  @media only screen and (max-width: $mobile-version-max-width) {
+    width: 100%;
   }
 
-  .manage-collateral__input-container {
-    padding-bottom: 3rem;
-
-    .manage-collateral__input-container__input-amount {
-      display: block;
-
-      height: 7rem;
-      width: 100%;
-
-      border-radius: 0.25rem;
-
-      font-size: 3rem;
-      font-weight: bold;
-      line-height: 1.17;
-      letter-spacing: -0.48px;
-      text-align: center;
-    }
-  }
-
-  .manage-collateral-form-insufficient-balance {
+  &__insufficient-balance {
     color: red;
-    padding: .25rem;
+    padding: 0.25rem;
     text-align: center;
 
     &--hidden {
@@ -42,22 +19,30 @@
       height: 0;
     }
   }
-.slider-handles{
-  margin-top: 40px;
-}
-  .manage-collateral-form__tips {
+  .collateral-slider .rail-inner {
+    height: 7px;
+  }
+
+  .slider-handles {
+    margin-top: 40px;
+  }
+  .input-container {
+    padding: 21px 15px;
+    @media screen and (max-width: $mobile-version-max-width) {
+      padding: 10px 15px;
+    }
+    .input-row {
+      margin-bottom: 0;
+    }
+  }
+  &__tips {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-
-    // hack around slider
     padding-top: 16px;
-    // spacing
-    //padding-bottom: 2.5rem;
-
     margin-bottom: 0.875rem;
 
-    .manage-collateral-form__tip {
+    &__tip {
       font-size: 16px;
       font-weight: normal;
       font-style: normal;
@@ -68,17 +53,16 @@
     }
   }
 
-  .manage-collateral-form__delimiter {
-   margin-bottom: 16px;
+  &__delimiter {
+    margin-bottom: 16px;
     border: 0;
   }
 
-  .manage-collateral-form__info-liquidated-at-container {
-     padding-top: 25px;
-
-    
+  &__info-liquidated-at-container {
+    padding-top: 25px;
   }
-  .manage-collateral-form__info-liquidated-at-msg {
+
+  &__info-liquidated-at-msg {
     font-size: 18px;
     font-weight: bold;
     line-height: 27px;
@@ -88,7 +72,7 @@
     color: #758295;
   }
 
-  .manage-collateral-form__info-liquidated-at-price {
+  &__info-liquidated-at-price {
     font-size: 28px;
     font-weight: 600;
     font-style: normal;
@@ -98,45 +82,15 @@
     letter-spacing: -0.24px;
     text-align: center;
     color: #283049;
-    span{
-      font-weight:800;
-    }
-  }
-  .manage-collateral-form__transfer-details {
 
-    padding-bottom: 1rem;
-
-    .manage-collateral-form__transfer-details-msg {
-      margin-top: 1.5rem;
-
-      font-size: 1rem;
-      font-weight: normal;
-      font-style: normal;
-      font-stretch: normal;
-      line-height: 1.5;
-      letter-spacing: -0.16px;
-      text-align: center;
-      color: #a9b5c7;
-
-      &--warning {
-        text-align: center;
-        color: #801515;
-      }
+    span {
+      font-weight: 800;
     }
   }
 
-  .manage-collateral-form__actions-container {
+  &__actions-container {
     display: flex;
     flex-direction: row;
     justify-content: flex-end;
   }
-
-  .input-container .input-row 
-  {
-    height: 69px;
-    .input-amount::placeholder{
-    font-size: 42px;
-  }
-}
-  
 }

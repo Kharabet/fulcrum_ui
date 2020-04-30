@@ -16,10 +16,19 @@ html {
   min-width: 100%;
 }
 
-body, #root {
+body {
   height: 100%;
 }
-
+#root {
+  height: 100%;
+  .ReactModal__Body--open & {
+    filter: blur(13px);
+    -webkit-filter: blur(13px);
+    -moz-filter: blur(13px);
+    -o-filter: blur(13px);
+    -ms-filter: blur(13px);
+  }
+}
 .pages-container {
   display: flex;
   flex-direction: row;
@@ -32,11 +41,11 @@ input {
   border: solid 2px rgba(169, 181, 199, 0.2);
 
   color: $color-gray;
-  background-color: $color-gray-light;
+  background-color: $bg-color-gray;
 
   &:hover {
     color: $color-gray;
-    background-color: $color-gray-darker;
+    background-color: #ececf0;
   }
 
   &:active {

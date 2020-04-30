@@ -4,6 +4,8 @@ import { AssetSelectorItem } from "./AssetSelectorItem";
 
 export interface IAssetSelectorProps {
   onSelectAsset: (asset: Asset) => void;
+  isLoadingTransaction: boolean;
+  selectedAsset: Asset;
 }
 
 export class AssetSelector extends Component<IAssetSelectorProps> {
@@ -46,7 +48,7 @@ export class AssetSelector extends Component<IAssetSelectorProps> {
 
     const assetSelectorItems = this.assetsShown.map(asset => {
       return (
-        <AssetSelectorItem key={asset} asset={asset} onSelectAsset={this.props.onSelectAsset} />
+        <AssetSelectorItem key={asset} asset={asset} {...this.props} />
       );
     });
 

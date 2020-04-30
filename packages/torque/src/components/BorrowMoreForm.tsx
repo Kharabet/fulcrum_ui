@@ -6,18 +6,17 @@ import { ActionType } from "../domain/ActionType";
 import { Asset } from "../domain/Asset";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
-import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
-import { IRepayEstimate } from "../domain/IRepayEstimate";
-import { RepayLoanRequest } from "../domain/RepayLoanRequest";
+import { IBorrowMoreState } from "../domain/IBorrowMoreState";
+import { IBorrowMoreEstimate } from "../domain/IBorrowMoreEstimate";
+import { BorrowRequest } from "../domain/BorrowRequest";
 import { TorqueProvider } from "../services/TorqueProvider";
-import { OpsEstimatedResult } from "./OpsEstimatedResult";
-import { RepayLoanSlider } from "./RepayLoanSlider";
+import { CollateralSlider } from "./CollateralSlider";
+import { Loader } from "./Loader";
 
 export interface IBorrowMoreFormProps {
-  loanOrderState: IBorrowedFundsState;
-
-  onSubmit: (request: RepayLoanRequest) => void;
-  onClose: () => void;
+  loanOrderState: IBorrowMoreState;
+  onSubmit?: (value: BorrowRequest) => void;
+  onDecline: () => void;
 }
 
 interface IBorrowMoreFormState {
@@ -25,25 +24,28 @@ interface IBorrowMoreFormState {
 
   minValue: number;
   maxValue: number;
-
-  inputAmountText: string;
-  currentValue: number;
+  positionSafetyText: string;
+  collateralizedStateSelector: string;
+  collateralExcess: BigNumber;
+  minCollateral: BigNumber;
   selectedValue: number;
-  repayAmount: BigNumber;
-  repayManagementAddress: string | null;
+  borrowAmount: BigNumber;
+  loanAsset: Asset;
+  loanValue: number;
+  inputAmountText: string;
+  depositAmount: BigNumber;
   gasAmountNeeded: BigNumber;
+  interestRate: BigNumber;
   balanceTooLow: boolean;
-
   didSubmit: boolean;
+  isLoading: boolean;
 }
 
 export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreFormState> {
-  private readonly _inputPrecision = 6;
+
   private _input: HTMLInputElement | null = null;
 
   private readonly _inputTextChange: Subject<string>;
-
-  private readonly selectedValueUpdate: Subject<number>;
 
   constructor(props: IBorrowMoreFormProps, context?: any) {
     super(props, context);
@@ -51,277 +53,307 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
     this.state = {
       minValue: 0,
       maxValue: 100,
-      inputAmountText: "",
       assetDetails: null,
-      currentValue: 100,
       selectedValue: 100,
-      repayAmount: props.loanOrderState.amountOwed,
-      repayManagementAddress: null,
-      gasAmountNeeded: new BigNumber(0),
+      borrowAmount: new BigNumber(0),
+      minCollateral: new BigNumber(0),
+      collateralExcess: new BigNumber(0),
+      loanAsset: TorqueProvider.Instance.isETHAsset(props.loanOrderState.loanAsset) ? Asset.DAI : Asset.ETH,
+      loanValue: 0,
+      inputAmountText: "",
+      positionSafetyText: "",
+      collateralizedStateSelector: "",
+      depositAmount: new BigNumber(0),
+      interestRate: new BigNumber(0),
+      gasAmountNeeded: new BigNumber(3000000),
       balanceTooLow: false,
-      didSubmit: false
+      didSubmit: false,
+      isLoading: false
     };
-
-    this.selectedValueUpdate = new Subject<number>();
-    this.selectedValueUpdate
-      .pipe(
-        debounceTime(100),
-        switchMap(value => this.rxGetEstimate(value))
-      )
-      .subscribe((value: IRepayEstimate) => {
-        this.setState({
-          ...this.state,
-          repayAmount: value.repayAmount,
-          inputAmountText: value.repayAmount.toString()
-        });
-      });
 
     this._inputTextChange = new Subject<string>();
     this._inputTextChange
       .pipe(
         debounceTime(100),
+
         switchMap(value => this.rxConvertToBigNumber(value)),
-        switchMap(value => this.rxGetEstimatePercent(value))
+        switchMap(value => this.rxGetEstimate(value))
       )
-      .subscribe((value: IRepayEstimate) => {
-        this.setState({
-          ...this.state,
-          currentValue: value.repayPercent ? value.repayPercent : 0,
-          repayAmount: value.repayAmount
-        });
+      .subscribe(async (value: BigNumber) => {
+
+        const balanceTooLow = await this.checkBalanceTooLow(this.state.loanAsset);
+        this.setState({ ...this.state, depositAmount: value, balanceTooLow: balanceTooLow });
+
+        this.getCollateralPersent();
       });
   }
 
+
+  private _setInputRef = (input: HTMLInputElement) => {
+    this._input = input;
+  };
+
   public componentDidMount(): void {
-    TorqueProvider.Instance.getLoanRepayParams(
-      this.props.loanOrderState,
-    ).then(collateralState => {
-      TorqueProvider.Instance.getLoanRepayAddress(
-        this.props.loanOrderState
-      ).then(repayManagementAddress => {
-        TorqueProvider.Instance.getLoanRepayGasAmount().then(gasAmountNeeded => {
+    const assetDetails = AssetsDictionary.assets.get(this.props.loanOrderState.loanAsset) || null;
+
+    let sliderValue = this.props.loanOrderState.collateralizedPercent.multipliedBy(100).plus(100).toNumber();
+
+    //115%
+    const sliderMin = this.props.loanOrderState.loanData!.maintenanceMarginAmount.div(10 ** 18).plus(100).toNumber();
+    //300%
+    let sliderMax = sliderMin + 185;
+
+    if (sliderValue > sliderMax) {
+      sliderMax = sliderValue;
+    } else if (sliderValue < sliderMin) {
+      sliderValue = sliderMin;
+    }
+
+    this.setState(
+      {
+        ...this.state,
+        assetDetails: assetDetails,
+        selectedValue: sliderValue,
+        minValue: sliderMin,
+        maxValue: sliderMax
+      });
+
+    TorqueProvider.Instance.getLoanCollateralManagementGasAmount().then(gasAmountNeeded => {
+      TorqueProvider.Instance.getCollateralExcessAmount(this.props.loanOrderState).then(collateralExcess => {
+        TorqueProvider.Instance.getAssetTokenBalanceOfUser(this.props.loanOrderState.collateralAsset).then(assetBalance => {
+
+
+          let minCollateral;
+
+          const currentCollateral = this.props.loanOrderState.collateralAmount;
+
+
+          minCollateral = currentCollateral
+            .dividedBy(sliderValue - sliderMin);
+
+
+          if (minCollateral.lt(currentCollateral)) {
+            minCollateral = currentCollateral;
+          }
+
+
           this.setState(
             {
               ...this.state,
-              minValue: collateralState.minValue,
-              maxValue: collateralState.maxValue,
-              assetDetails: AssetsDictionary.assets.get(this.props.loanOrderState.loanAsset) || null,
-              currentValue: collateralState.currentValue,
-              selectedValue: collateralState.currentValue,
-              repayManagementAddress: repayManagementAddress,
+              loanValue: currentCollateral.toNumber(),
+              minCollateral: minCollateral,
+              collateralExcess: collateralExcess,
               gasAmountNeeded: gasAmountNeeded
             },
             () => {
-              this.selectedValueUpdate.next(this.state.selectedValue);
-              // this._inputTextChange.next(this.state.inputAmountText);
+              this._inputTextChange.next(this.state.inputAmountText);
             }
           );
         });
       });
     });
-  }
+  };
 
-  public componentDidUpdate(
-    prevProps: Readonly<IBorrowMoreFormProps>,
-    prevState: Readonly<IBorrowMoreFormState>,
-    snapshot?: any
-  ): void {
-    if (
-      prevProps.loanOrderState.accountAddress !== this.props.loanOrderState.accountAddress ||
-      prevProps.loanOrderState.loanOrderHash !== this.props.loanOrderState.loanOrderHash ||
-      prevState.selectedValue !== this.state.selectedValue
-    ) {
-      TorqueProvider.Instance.getLoanRepayAddress(
-        this.props.loanOrderState
-      ).then(repayManagementAddress => {
-        TorqueProvider.Instance.getLoanRepayGasAmount().then(gasAmountNeeded => {
-          this.setState(
-            {
-              ...this.state,
-              repayManagementAddress: repayManagementAddress,
-              gasAmountNeeded: gasAmountNeeded
-            },
-            () => {
-              this.selectedValueUpdate.next(this.state.selectedValue);
-              // this._inputTextChange.next(this.state.inputAmountText);
-            }
-          );
-        });
-      });
+
+  public componentDidUpdate(prevProps: Readonly<IBorrowMoreFormProps>, prevState: Readonly<IBorrowMoreFormState>, snapshot?: any): void {
+    if (this.state.depositAmount !== prevState.depositAmount
+      || this.state.loanAsset !== prevState.loanAsset) {
+      this.changeStateLoading();
     }
   }
 
-  private _setInputRef = (input: HTMLInputElement) => {
-    this._input = input;
-  };
 
   public render() {
     if (this.state.assetDetails === null) {
       return null;
     }
 
+    const { loanOrderState } = this.props;
+
     return (
-      <form className="repay-loan-form" onSubmit={this.onSubmitClick}>
+      <form className="borrow-more-loan-form" onSubmit={this.onSubmitClick}>
         <section className="dialog-content">
-          <div className="repay-loan-form__input-container" style={{ paddingBottom: `1rem` }}>
-            <input
-              ref={this._setInputRef}
-              className="repay-loan-form__input-container__input-amount"
-              type="text"
-              onChange={this.onTradeAmountChange}
-              placeholder={`Enter amount`}
-              value={this.state.inputAmountText}
-            />
+          <div className="borrow-more-loan-form__body">
+            <div className="d-flex j-c-sb">
+
+              <div>
+                {this.state.isLoading
+                  ? <Loader quantityDots={4} sizeDots={'middle'} title={''} isOverlay={false} />
+                  : (
+                    <React.Fragment>
+                      <div
+                        title={`${this.state.selectedValue.toFixed(18)}%`}
+                        className={`borrow-more-loan-form__body-collateralized ${this.state.collateralizedStateSelector}`}>
+                        <span className="value">{this.state.selectedValue.toFixed(2)}</span>%
+                </div>
+                    </React.Fragment>)}
+                <div className="borrow-more-loan-form__body-collateralized-label">Collateralized</div>
+
+              </div>
+
+              <div className={`borrow-more-loan-form__body-collateralized-state ${this.state.collateralizedStateSelector}`}>
+                {this.state.positionSafetyText}
+              </div>
+            </div>
           </div>
 
-          <RepayLoanSlider
-            readonly={false}
+          <CollateralSlider
+            readonly={true}
+            showExactCollaterization={true}
             minValue={this.state.minValue}
             maxValue={this.state.maxValue}
-            value={this.state.currentValue}
-            onUpdate={this.onUpdate}
-            onChange={this.onChange}
+            value={this.state.selectedValue}
           />
 
-          <div className="repay-loan-form__tips">
-            <div className="repay-loan-form__tip">Current state</div>
-            <div className="repay-loan-form__tip">Full repayment</div>
+          <hr className="borrow-more-loan-form__delimiter" />
+
+          <div className="input-container">
+            <div className="input-row">
+              <span className="asset-icon">{this.state.assetDetails.reactLogoSvg.render()}</span>
+              {this.state.isLoading
+                ? <Loader quantityDots={4} sizeDots={'middle'} title={''} isOverlay={false} />
+                : <React.Fragment>
+                  <input
+                    ref={this._setInputRef}
+                    className="input-amount"
+                    type="number"
+                    step="any"
+                    placeholder={`Enter amount`}
+                    value={this.state.inputAmountText}
+                    onChange={this.onTradeAmountChange}
+                  />
+                </React.Fragment>
+              }
+            </div>
           </div>
 
-          <hr className="repay-loan-form__delimiter" />
-
-          <OpsEstimatedResult
-            assetDetails={this.state.assetDetails}
-            actionTitle="You will repay"
-            amount={this.state.repayAmount}
-            precision={6}
-          />
-          <div className={`repay-loan-form-insufficient-balance ${!this.state.balanceTooLow ? `repay-loan-form-insufficient-balance--hidden` : ``}`}>
-            Insufficient {this.state.assetDetails.displayName} balance in your wallet!
-              </div>
         </section>
         <section className="dialog-actions">
-          <div className="repay-loan-form__actions-container">
-            <button type="submit" className={`btn btn-size--small ${this.state.didSubmit ? `btn-disabled` : ``}`}>
-              {this.state.didSubmit ? "Submitting..." : "Repay"}
-            </button>
+
+          <div className="borrow-more-loan-form__actions-container">
+            {this.state.selectedValue == 115 || !Number(this.state.inputAmountText) ? (
+              <button type="button" className="btn btn-size--small" onClick={this.props.onDecline}>
+                Close
+              </button>
+            ) : (
+                <button type="submit" className={`btn btn-size--small ${this.state.didSubmit ? `btn-disabled` : ``}`}>
+                  {this.state.didSubmit ? "Submitting..." : "Borrow"}
+                </button>
+
+              )}
           </div>
         </section>
-      </form>
+      </form >
     );
   }
 
-  private rxGetEstimate = (selectedValue: number): Observable<IRepayEstimate> => {
-    return new Observable<IRepayEstimate>(observer => {
-      TorqueProvider.Instance.getLoanRepayEstimate(
-        this.props.loanOrderState,
-        selectedValue
+  private rxGetEstimate = (inputAmount: BigNumber): Observable<BigNumber> => {
+
+    return new Observable<BigNumber>(observer => {
+
+      TorqueProvider.Instance.getBorrowDepositEstimate(
+        this.props.loanOrderState.loanAsset,
+        this.state.loanAsset,
+        inputAmount
       ).then(value => {
-        observer.next(value);
+        observer.next(value.depositAmount);
       });
     });
   };
 
   private rxConvertToBigNumber = (textValue: string): Observable<BigNumber> => {
-    const repayAmount = new BigNumber(textValue);
-
     return new Observable<BigNumber>(observer => {
-      observer.next(repayAmount);
+      observer.next(new BigNumber(textValue));
     });
   };
 
-  private rxGetEstimatePercent = (repayAmount: BigNumber): Observable<IRepayEstimate> => {
-
-    return new Observable<IRepayEstimate>(observer => {
-      TorqueProvider.Instance.getLoanRepayPercent(
-        this.props.loanOrderState,
-        repayAmount
-      ).then(value => {
-        observer.next(value);
-      });
-    });
-  };
-
-  private onChange = (value: number) => {
-    this.setState({ ...this.state, selectedValue: value, currentValue: value });
-  };
-
-  private onUpdate = (value: number) => {
-    this.setState({ ...this.state, selectedValue: value });
-  };
 
   public onSubmitClick = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    let repayAmount = this.state.repayAmount;
-    if (this.state.repayAmount.lt(0)) {
-      repayAmount = new BigNumber(0);
-    }
-
-    if (!this.state.didSubmit) {
-      this.setState({...this.state, didSubmit: true});
-
-      let assetBalance = await TorqueProvider.Instance.getAssetTokenBalanceOfUser(this.props.loanOrderState.loanAsset);
-      if (this.props.loanOrderState.loanAsset === Asset.ETH) {
-        assetBalance = assetBalance.gt(TorqueProvider.Instance.gasBufferForTxn) ? assetBalance.minus(TorqueProvider.Instance.gasBufferForTxn) : new BigNumber(0);
-      }
-      const precision = AssetsDictionary.assets.get(this.props.loanOrderState.loanAsset)!.decimals || 18;
-      const amountInBaseUnits = new BigNumber(repayAmount.multipliedBy(10 ** precision).toFixed(0, 1));
-      if (assetBalance.lt(amountInBaseUnits)) {
-
-        this.setState({
-          ...this.state,
-          balanceTooLow: true,
-          didSubmit: false
-        });
-
-        return;
-
-      } else {
-        this.setState({
-          ...this.state,
-          balanceTooLow: false
-        });
-      }
-
-      const percentData = await TorqueProvider.Instance.getLoanRepayPercent(
-        this.props.loanOrderState,
-        repayAmount
-      );
-
-      this.props.onSubmit(
-        new RepayLoanRequest(
-          this.props.loanOrderState.loanAsset,
-          this.props.loanOrderState.collateralAsset,
-          this.props.loanOrderState.accountAddress,
-          this.props.loanOrderState.loanOrderHash,
-          repayAmount,
-          percentData.repayPercent ? new BigNumber(percentData.repayPercent) : new BigNumber(0),
-          this.props.loanOrderState.amountOwed
-        )
-      );
-    }
   };
 
   public onTradeAmountChange = async (event: ChangeEvent<HTMLInputElement>) => {
+    // handling different types of empty values
     let amountText = event.target.value ? event.target.value : "";
+    const regexp = /^((\d{0,3}(\.\d{0,5})?)|(\.\d{0,5}}))$/;
+    if (amountText === "" || regexp.test(amountText)) {
+      // setting inputAmountText to update display at the same time
 
-    let repayAmount = new BigNumber(amountText);
-    if (repayAmount.lt(0)) {
-      repayAmount = new BigNumber(0);
-      amountText = "0"
-    } else if (repayAmount.gt(this.props.loanOrderState.amountOwed)) {
-      repayAmount = this.props.loanOrderState.amountOwed;
-      amountText = repayAmount.toString();
+      if (Number(amountText) == 0) {
+        this.setState({
+          ...this.state,
+          inputAmountText: amountText
+        })
+      } else {
+        this.setState({
+          ...this.state,
+          inputAmountText: amountText,
+          borrowAmount: new BigNumber(amountText)
+        }, () => {
+          // emitting next event for processing with rx.js
+          this._inputTextChange.next(this.state.inputAmountText);
+        });
+      }
     }
+  };
+
+
+  private checkBalanceTooLow = async (loanAsset: Asset) => {
+    const borrowEstimate = await this.getBorrowEstimate(loanAsset);
+    let assetBalance = await TorqueProvider.Instance.getAssetTokenBalanceOfUser(loanAsset);
+    if (loanAsset === Asset.ETH) {
+      assetBalance = assetBalance.gt(TorqueProvider.Instance.gasBufferForTxn) ? assetBalance.minus(TorqueProvider.Instance.gasBufferForTxn) : new BigNumber(0);
+    }
+    const decimals = AssetsDictionary.assets.get(loanAsset)!.decimals || 18;
+    const amountInBaseUnits = new BigNumber(borrowEstimate.depositAmount.multipliedBy(10 ** decimals).toFixed(0, 1));
+    return assetBalance.lt(amountInBaseUnits);
+  }
+
+
+  private getBorrowEstimate = async (loanAsset: Asset) => {
+
+    const borrowEstimate = await TorqueProvider.Instance.getBorrowDepositEstimate(this.props.loanOrderState.loanAsset, loanAsset, this.state.borrowAmount);
+    return borrowEstimate;
+  }
+
+  private getCollateralPersent = () => {
+
+    const borrowAmount = this.state.depositAmount.multipliedBy(1.005).dp(5, BigNumber.ROUND_CEIL);
+    let inputAmountText = this.state.inputAmountText;
+    const defaultValue = this.props.loanOrderState.collateralizedPercent.times(100).plus(100);
+
+    let selectedValue = defaultValue
+      .minus(borrowAmount.times(500)).toNumber();
+
+    if (selectedValue < 115) {
+      selectedValue = this.state.minValue
+    }
+
+    const positionSafetyText = selectedValue > 125 ?
+      "Safe" :
+      selectedValue > 115 ?
+        "Danger" :
+        "Liquidation pending";
+
+    const collateralizedStateSelector = positionSafetyText === "Safe" ?
+      "safe" :
+      positionSafetyText ? "danger" :
+        "unsafe";
+
 
     this.setState({
       ...this.state,
-      inputAmountText: amountText,
-      repayAmount: repayAmount
-    }, () => {
-      // emitting next event for processing with rx.js
-      this._inputTextChange.next(this.state.inputAmountText);
+      positionSafetyText: positionSafetyText,
+      collateralizedStateSelector: collateralizedStateSelector,
+      inputAmountText: inputAmountText,
+      selectedValue: selectedValue,
     });
-  };
+  }
+
+  public changeStateLoading = () => {
+    if (this.state.depositAmount) {
+      this.setState({ ...this.state, isLoading: false })
+    }
+  }
 }

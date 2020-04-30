@@ -13,6 +13,7 @@ import { TorqueProvider } from "../services/TorqueProvider";
 import { Loader } from "../components/Loader";
 import { ProviderType } from "../domain/ProviderType";
 import { BorrowMoreDlg } from "../components/BorrowMoreDlg";
+import { Asset } from "../domain/Asset";
 
 export interface IDashboardPageRouteParams {
   walletAddress: string | undefined;
@@ -29,6 +30,8 @@ interface IDashboardPageState {
   items: IBorrowedFundsState[];
   itemsAwaiting: ReadonlyArray<BorrowRequestAwaiting>;
   isDataLoading: boolean;
+  isLoadingTransaction: boolean;
+  selectedAsset: Asset;
 }
 
 export class DashboardPage extends PureComponent<
@@ -51,7 +54,9 @@ export class DashboardPage extends PureComponent<
     this.state = {
       items: [],
       itemsAwaiting: [],
-      isDataLoading: true
+      isDataLoading: true,
+      isLoadingTransaction: false,
+      selectedAsset: Asset.UNKNOWN
     };
 
     // TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
@@ -118,7 +123,7 @@ export class DashboardPage extends PureComponent<
             {!TorqueProvider.Instance.unsupportedNetwork ? (
               <React.Fragment>
                 {this.state.isDataLoading
-                  ? <Loader />
+                  ? <Loader quantityDots={5} sizeDots={'large'} title={'Loading'} isOverlay={false} />
                   : (<div className="page-header">
                     <h1>Your Loans</h1>
                     <p>Lorem ipsum is placeholder text commonly used in the graphic, print, and publishing industries for previewing layouts and visual mockups.</p>
@@ -134,6 +139,8 @@ export class DashboardPage extends PureComponent<
                   onRepayLoan={this.onRepayLoan}
                   onExtendLoan={this.onExtendLoan}
                   onBorrowMore={this.onBorrowMore}
+                  selectedAsset={this.state.selectedAsset}
+                  isLoadingTransaction={this.state.isLoadingTransaction}
                 />
               </React.Fragment>
             ) :
@@ -179,8 +186,12 @@ export class DashboardPage extends PureComponent<
 
     try {
       const repayLoanRequest = await this.repayLoanDlgRef.current.getValue(item);
-      await TorqueProvider.Instance.doRepayLoan(repayLoanRequest);
+      this.setState({...this.state, isLoadingTransaction: true, selectedAsset: item.loanAsset});
+      let receipt = await TorqueProvider.Instance.doRepayLoan(repayLoanRequest);
+      if (receipt.status === 1)
+        this.setState({ ...this.state, isLoadingTransaction: false, selectedAsset: item.loanAsset });
     } catch (error) {
+      this.setState({...this.state, isLoadingTransaction: false, selectedAsset: item.loanAsset});
       console.error(error);
     }
   };
@@ -190,8 +201,12 @@ export class DashboardPage extends PureComponent<
 
     try {
       const extendLoanRequest = await this.extendLoanDlgRef.current.getValue(item);
-      await TorqueProvider.Instance.doExtendLoan(extendLoanRequest);
+      this.setState({...this.state, isLoadingTransaction: true, selectedAsset: item.loanAsset});
+      const receipt = await TorqueProvider.Instance.doExtendLoan(extendLoanRequest);
+      if (receipt.status === 1)
+      this.setState({ ...this.state, isLoadingTransaction: false, selectedAsset: item.loanAsset });
     } catch (error) {
+      this.setState({...this.state, isLoadingTransaction: false, selectedAsset: item.loanAsset});
       console.error(error);
     }
   };
@@ -201,8 +216,12 @@ export class DashboardPage extends PureComponent<
 
     try {
       const manageCollateralRequest = await this.manageCollateralDlgRef.current.getValue(item);
-      await TorqueProvider.Instance.doManageCollateral(manageCollateralRequest);
+      this.setState({...this.state, isLoadingTransaction: true, selectedAsset: item.loanAsset});
+      const receipt = await TorqueProvider.Instance.doManageCollateral(manageCollateralRequest);
+      if (receipt.status === 1)
+        this.setState({ ...this.state, isLoadingTransaction: false, selectedAsset: item.loanAsset });
     } catch (error) {
+      this.setState({...this.state, isLoadingTransaction: false, selectedAsset: item.loanAsset});
       console.error(error);
     }
   };

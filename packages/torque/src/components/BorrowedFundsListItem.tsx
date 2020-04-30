@@ -7,11 +7,12 @@ import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
 import { TorqueProvider } from "../services/TorqueProvider";
 import { CollateralSlider } from "./CollateralSlider";
 
-import ic_unsafe from "./../assets/images/ic_unsafe.svg";
+import { Loader } from "./Loader";
 
 export interface IBorrowedFundsListItemProps {
   item: IBorrowedFundsState;
-
+  selectedAsset: Asset;
+  isLoadingTransaction: boolean;
   onManageCollateral: (item: IBorrowedFundsState) => void;
   onRepayLoan: (item: IBorrowedFundsState) => void;
   onExtendLoan: (item: IBorrowedFundsState) => void;
@@ -78,8 +79,10 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
     // const firstInRowModifier = this.props.firstInTheRow ? "borrowed-funds-list-item--first-in-row" : "";
     // const lastInRowModifier = this.props.lastInTheRow ? "borrowed-funds-list-item--last-in-row" : "";
 
+    //115%
     const sliderMin = item.loanData!.maintenanceMarginAmount.div(10 ** 18).toNumber();
-    const sliderMax = sliderMin + 100;
+    //300%
+    const sliderMax = sliderMin + 185;
 
     let sliderValue = item.collateralizedPercent.multipliedBy(100).toNumber();
     if (sliderValue > sliderMax) {
@@ -90,14 +93,21 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
 
     return (
       <div className={`borrowed-funds-list-item`}>
-        {/* {assetDetails.displayName === Asset.SAI ? (
-          <div className="borrowed-funds-button-div" onClick={this.migrateSaiToDai}>
-            <div className="borrowed-funds__item borrowed-funds-button" >
-              Migrate to DAI
-                </div>
-          </div>
-        ) : null} */}
+        {this.props.item.loanAsset === this.props.selectedAsset
+          ? this.props.isLoadingTransaction
+            ? <Loader quantityDots={4} sizeDots={'middle'} title={'Processed Token'} isOverlay={true} />
+            : null
+          : null
+        }
         <div className="borrowed-funds-list-item__header">
+          <div className="borrowed-funds-list-item__header-asset">
+            <div className="borrowed-funds-list-item__header-asset-img">
+              <img src={assetDetails.logoSvg} alt={assetDetails.displayName} />
+            </div>
+            <div className="borrowed-funds-list-item__header-asset-name">
+              {assetDetails.displayName}
+            </div>
+          </div>
           <div className="borrowed-funds-list-item__header-loan">
             <div
               title={`${item.amountOwed.toFixed(18)} ${assetDetails.displayName}`}
@@ -110,15 +120,6 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
             >
               <span className="value">{interestRate.multipliedBy(100).toFixed(2)}%</span>&nbsp;APR
               </div>
-          </div>
-          <div className="borrowed-funds-list-item__header-asset">
-            <div className="borrowed-funds-list-item__header-asset-img">
-              <img src={assetDetails.logoSvg} alt={assetDetails.displayName} />
-            </div>
-            <div className="borrowed-funds-list-item__header-asset-name">
-              {assetDetails.displayName}
-            </div>
-
           </div>
         </div>
         <div className="borrowed-funds-list-item__body">
@@ -144,7 +145,7 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
           <div className="borrowed-funds-list-item__body-slider-container">
             <CollateralSlider
               readonly={true}
-              showExactCollaterization={positionSafetyText !== "Safe"}
+              showExactCollaterization={true}
               minValue={sliderMin}
               maxValue={sliderMax}
               value={sliderValue}

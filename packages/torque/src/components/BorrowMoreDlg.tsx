@@ -1,15 +1,15 @@
 import React, { Component } from "react";
 import ReactModal from "react-modal";
-import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
-import { RepayLoanRequest } from "../domain/RepayLoanRequest";
+import { IBorrowMoreState } from "../domain/IBorrowMoreState";
+import { BorrowMoreRequest } from "../domain/BorrowMoreRequest";
 import { DialogHeader } from "./DialogHeader";
-import { RepayLoanForm } from "./RepayLoanForm";
+import { BorrowMoreForm } from "./BorrowMoreForm";
 
 interface IBorrowMoreDlgState {
   isOpen: boolean;
-  loanOrderState: IBorrowedFundsState | null;
+  loanOrderState: IBorrowMoreState | null;
 
-  executorParams: { resolve: (value?: RepayLoanRequest) => void; reject: (reason?: any) => void } | null;
+  executorParams: { resolve: (value?: BorrowMoreRequest) => void; reject: (reason?: any) => void } | null;
 }
 
 export class BorrowMoreDlg extends Component<any, IBorrowMoreDlgState> {
@@ -34,21 +34,21 @@ export class BorrowMoreDlg extends Component<any, IBorrowMoreDlgState> {
         shouldCloseOnOverlayClick={false}
       >
         <DialogHeader title="Borrow More" onDecline={this.onFormDecline} />
-        <RepayLoanForm
+        <BorrowMoreForm
           loanOrderState={this.state.loanOrderState}
           onSubmit={this.onFormSubmit}
-          onClose={this.onFormDecline}
+          onDecline={this.onFormDecline}
         />
       </ReactModal>
     );
   }
 
-  public getValue = async (item: IBorrowedFundsState): Promise<RepayLoanRequest> => {
+  public getValue = async (item: IBorrowMoreState): Promise<BorrowMoreRequest> => {
     if (this.state.isOpen) {
-      return new Promise<RepayLoanRequest>((resolve, reject) => reject());
+      return new Promise<BorrowMoreRequest>((resolve, reject) => reject());
     }
 
-    return new Promise<RepayLoanRequest>((resolve, reject) => {
+    return new Promise<BorrowMoreRequest>((resolve, reject) => {
       this.setState({
         ...this.state,
         isOpen: true,
@@ -62,7 +62,7 @@ export class BorrowMoreDlg extends Component<any, IBorrowMoreDlgState> {
     await this.setState({ ...this.state, isOpen: false, executorParams: null });
   };
 
-  private onFormSubmit = async (value: RepayLoanRequest) => {
+  private onFormSubmit = async (value: BorrowMoreRequest) => {
     if (this.state.executorParams) {
       this.state.executorParams.resolve(value);
     }

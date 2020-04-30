@@ -7,7 +7,7 @@ import { AlchemySubprovider } from "@alch/alchemy-web3";
 import configProviders from "../config/providers.json";
 
 import { AbstractConnector } from '@web3-react/abstract-connector';
-
+import { ConnectorUpdate } from '@web3-react/types';
 const ethNetwork = process.env.REACT_APP_ETH_NETWORK;
 
 export class Web3ConnectionFactory {
@@ -89,6 +89,15 @@ export class Web3ConnectionFactory {
     Web3ConnectionFactory.canWrite = false;
     Web3ConnectionFactory.userAccount = undefined;
       }
+  public static async updateConnector(update: ConnectorUpdate) {
+    const { provider, chainId, account } = update;
+    if (chainId) {
+      let networkId = chainId.toString();
+      Web3ConnectionFactory.networkId = networkId.includes("0x") ? parseInt(networkId, 16) : parseInt(networkId, 10);;
+    }
+    if (account)
+      Web3ConnectionFactory.userAccount = account;
+  }
 
   public static async getAlchemyProvider(): Promise<AlchemySubprovider> {
     let key;

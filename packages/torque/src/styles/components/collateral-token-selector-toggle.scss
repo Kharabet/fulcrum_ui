@@ -38,7 +38,17 @@
     font-size: 12px;
     font-weight: 400;
     line-height: 1.5;
-    color: $color-gray-darker-3;
+    color: $color-gray-darker;
     margin-right: 10px;
+  }
+}
+@media screen and (max-width: $mobile-version-max-width) { 
+  .collateral-token-selector-toggle { 
+    &__logo-container {
+      svg{
+        width: 30px;
+        height: auto;
+      }
+    }
   }
 }
