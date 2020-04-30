@@ -26,7 +26,7 @@ import { Web3ProviderEngine } from "@0x/subproviders";
 import { Web3ConnectionFactory } from '../domain/Web3ConnectionFactory';
 import { ProviderTypeDictionary } from '../domain/ProviderTypeDictionary';
 import { AbstractConnector } from '@web3-react/abstract-connector';
-
+import { ConnectorEvent, ConnectorUpdate } from '@web3-react/types';
 const isMainnetProd =
   process.env.NODE_ENV && process.env.NODE_ENV !== "development"
   && process.env.REACT_APP_ETH_NETWORK === "mainnet";
@@ -84,6 +84,8 @@ export class AppRouter extends Component<any, IAppRouterState> {
     console.log(provider);
     //handle connectors events (i.e. network changed)
     await this.onProviderTypeSelect(connector)
+    if (!connector.listeners(ConnectorEvent.Update).includes(this.onConnectorUpdated))
+      connector.on(ConnectorEvent.Update, this.onConnectorUpdated)
     return Web3ConnectionFactory.currentWeb3Engine;
   }
 
@@ -183,6 +185,17 @@ export class AppRouter extends Component<any, IAppRouterState> {
     await this._isMounted &&  !this.state.isProviderMenuModalOpen && this.setState({ ...this.state, isProviderMenuModalOpen: true });
   };
 
+  public async onConnectorUpdated(update: ConnectorUpdate) {
+    console.log("onConnectorUpdated")
+    await FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.ProviderIsChanging);
+
+    await Web3ConnectionFactory.updateConnector(update);
+    await FulcrumProvider.Instance.setWeb3ProviderFinalize(FulcrumProvider.Instance.providerType)
+    await FulcrumProvider.Instance.eventEmitter.emit(
+      FulcrumProviderEvents.ProviderChanged,
+      new ProviderChangedEvent(FulcrumProvider.Instance.providerType, FulcrumProvider.Instance.web3Wrapper)
+    );
+  };
 
   public onDeactivate = async () => {
 
