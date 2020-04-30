@@ -510,7 +510,7 @@ export class TorqueProvider {
       } else {
         inRatio = loan.ratio;
       }
-      const goal = loan.usdValue.times(inRatio).dp(18, BigNumber.ROUND_FLOOR);
+      let goal = loan.usdValue.times(inRatio).dp(18, BigNumber.ROUND_FLOOR);
       let current = new BigNumber(0);
       for (const deposit of deposits) {
         let take = deposit.usdValue;
@@ -518,15 +518,15 @@ export class TorqueProvider {
           take = take.minus(current.plus(take).minus(goal));
         }
         if (current.plus(take).lt(goal)) {
-
+          goal = goal.minus(goal.minus(current.plus(take)))
         }
         const maintenanceMarginAmount = await this.getMaintenanceMarginAmount(loan.asset, deposit.underlying);
         loan.collateral.push({
           ...deposit,
           amount: take.div(deposit.rate),
           borrowAmount: loan.balance.div(goal.div(take)),
-          maintenanceMarginAmount: BigNumber.minimum(inRatio, take.div(loan.usdValue)).multipliedBy(100),
-          maxCollateralRatio: deposit.usdValue.div(loan.usdValue)
+          maintenanceMarginAmount: BigNumber.minimum(inRatio, goal.div(loan.usdValue)).multipliedBy(100),
+          maxCollateralRatio: new BigNumber(5)
         });
 
         // @ts-ignore

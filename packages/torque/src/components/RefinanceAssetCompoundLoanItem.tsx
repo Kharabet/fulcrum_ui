@@ -185,20 +185,20 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
             <div className="refinance__input-container">
               <input
                 ref={this._setInputRef}
-                className={`input-amount ${this.state.borrowAmount.lte(0) || this.state.borrowAmount.gt(this.state.loan.balance)
+                className={`input-amount ${this.state.borrowAmount.lte(0) || this.state.borrowAmount.gt(this.props.loan.balance)
                   ? "warning"
                   : ""}`}
                 type="number"
                 step="any"
-                defaultValue={this.state.loan.balance.dp(3, BigNumber.ROUND_FLOOR).toString()}
+                defaultValue={this.props.loan.balance.dp(3, BigNumber.ROUND_FLOOR).toString()}
                 placeholder={`Amount`}
                 disabled={this.state.loan.isDisabled}
                 onChange={this.loanAmountChange}
               />
-              {this.state.borrowAmount.lte(0) || this.state.borrowAmount.gt(this.state.loan.balance) ?
+              {this.state.borrowAmount.lte(0) || this.state.borrowAmount.gt(this.props.loan.balance) ?
                 <div className="refinance-details-msg--warning">
                   {this.state.borrowAmount.lte(0) ? "Please enter value greater than 0" : ""}
-                  {this.state.borrowAmount.gt(this.state.loan.balance) ? "Please enter value less than or equal to " + this.state.loan.balance.dp(3, BigNumber.ROUND_FLOOR).toString() : ""}
+                  {this.state.borrowAmount.gt(this.props.loan.balance) ? "Please enter value less than or equal to " + this.props.loan.balance.dp(3, BigNumber.ROUND_FLOOR).toString() : ""}
                 </div>
                 : <div className="text">Loan</div>
               }
@@ -312,7 +312,7 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
             : <div className="refinance-asset-selector__desc" />
           }
 
-          {this.state.loan.isDisabled || this.state.borrowAmount.lte(0) || this.state.borrowAmount.gt(this.state.loan.balance) || this.state.isLoading ?
+          {this.state.loan.isDisabled || this.state.borrowAmount.lte(0) || this.state.borrowAmount.gt(this.props.loan.balance) || this.state.isLoading ?
             <button className="refinance-button disabled">
               {btnValue}
             </button>
