@@ -30,15 +30,22 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
       providerTypeDetails: null
     };
 
-    // TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderIsChanging, this.onProviderIsChanging);
+    TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderIsChanging, this.onProviderIsChanging);
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
-  /*private onProviderIsChanging = async () => {
-    await this.derivedUpdate();
-  };*/
+  private onProviderIsChanging = async () => {
+    this.setState({
+      ...this.state,
+      isLoading: true
+    });
+  };
 
   private onProviderChanged = async (event: ProviderChangedEvent) => {
+    this.setState({
+      ...this.state,
+      isLoading: true
+    });
     await this.derivedUpdate();
   };
 
