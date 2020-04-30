@@ -121,13 +121,16 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
     // console.log(amountText);
     // setting inputAmountText to update display at the same time
     const borrowAmount = new BigNumber(amountText)
+    const refinanceData = Object.assign({}, this.state.loan);
+    const collateralAmount = this.props.refinanceData.collateralAmount.dividedBy(this.props.refinanceData.debt.dividedBy(borrowAmount));
+    const collaterralWithRatio = collateralAmount.multipliedBy(refinanceData.maintenanceMarginAmount).div(this.props.refinanceData.maintenanceMarginAmount)
+    refinanceData.collateralAmount = collaterralWithRatio;
 
-    const loan = await TorqueProvider.Instance.assignMakerCollateral(this.props.refinanceData, borrowAmount, this.state.loan.maintenanceMarginAmount)
     this.setState({
       ...this.state,
       inputAmountText: parseInt(amountText, 10),
       borrowAmount: new BigNumber(amountText),
-      loan: loan
+      loan: refinanceData
     }, () => {
       // emitting next event for processing with rx.js
       this._inputTextChange.next(this.state.inputAmountText);
@@ -135,12 +138,18 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
   };
 
   public onCollaterizationChange = async (value: number) => {
+ const newMMA = new BigNumber(value);
 
-
-    const loan = await TorqueProvider.Instance.assignMakerCollateral(this.props.refinanceData, this.state.borrowAmount, new BigNumber(value))
+    const refinanceData = Object.assign({}, this.state.loan);
+    const collateralAmount = this.props.refinanceData.collateralAmount.dividedBy(this.props.refinanceData.debt.dividedBy(this.state.borrowAmount));
+    const collaterralWithRatio = collateralAmount.multipliedBy(newMMA).div(this.props.refinanceData.maintenanceMarginAmount)
+    refinanceData.collateralAmount = collaterralWithRatio;
+    refinanceData.maintenanceMarginAmount =newMMA;
+    const minMaintenanceMarginAmount = new BigNumber(150);
+    refinanceData.isDisabled = newMMA.lte(minMaintenanceMarginAmount);
     this.setState({
       ...this.state,
-      loan: loan
+      loan: refinanceData
     });
   };
 
@@ -178,7 +187,7 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
     const showDetailsValue = !this.state.isShow ? "Show details" : "Hide details";
     const arrowIcon = this.state.isShow ? <TopArrow /> : <DownArrow />;
 
-    if (!this.state.loan.isShowCard) return null;
+    if (!this.props.refinanceData.isShowCard) return null;
 
     return (
       <div className={`refinance-asset-selector-item ` + (this.state.isShowInfoCollateralAssetDt0 ? `inactive` : ``)}>
@@ -213,10 +222,10 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
                 onChange={this.loanAmountChange}
               />
 
-              {this.state.borrowAmount.lte(0) || this.state.borrowAmount.gt(this.state.loan.debt) ?
+              {this.state.borrowAmount.lte(0) || this.state.borrowAmount.gt(this.props.refinanceData.debt) ?
                 <div className="refinance-details-msg--warning">
                   {this.state.borrowAmount.lte(0) ? "Please enter value greater than 0" : ""}
-                  {this.state.borrowAmount.gt(this.state.loan.debt) ? "Please enter value less than or equal to " + this.state.loan.debt.dp(3, BigNumber.ROUND_FLOOR).toString() : ""}
+                  {this.state.borrowAmount.gt(this.props.refinanceData.debt) ? "Please enter value less than or equal to " + this.state.loan.debt.dp(3, BigNumber.ROUND_FLOOR).toString() : ""}
                 </div>
                 : <div className="text">Loan</div>
               }
@@ -307,7 +316,7 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
             </div>
             : <div className="refinance-asset-selector__desc" />
           }
-          {this.state.loan.isDisabled || this.state.borrowAmount.lte(0) || this.state.borrowAmount.gt(this.state.loan.debt) || this.state.isLoading ?
+          {this.state.loan.isDisabled || this.state.borrowAmount.lte(0) || this.state.borrowAmount.gt(this.props.refinanceData.debt) || this.state.isLoading ?
             <button className="refinance-button disabled">
               {btnValue}
             </button>
