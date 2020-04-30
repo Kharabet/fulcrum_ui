@@ -517,18 +517,20 @@ export class TorqueProvider {
         if (current.plus(take).gt(goal)) {
           take = take.minus(current.plus(take).minus(goal));
         }
+        if (current.plus(take).lt(goal)) {
+
+        }
         const maintenanceMarginAmount = await this.getMaintenanceMarginAmount(loan.asset, deposit.underlying);
         loan.collateral.push({
           ...deposit,
           amount: take.div(deposit.rate),
           borrowAmount: loan.balance.div(goal.div(take)),
-          maintenanceMarginAmount
+          maintenanceMarginAmount: BigNumber.minimum(inRatio, take.div(loan.usdValue)).multipliedBy(100),
+          maxCollateralRatio: deposit.usdValue.div(loan.usdValue)
         });
 
         // @ts-ignore
-        if (inRatio.lte(maintenanceMarginAmount.div(10 ** 19))) {
-          loan.isDisabled = true;
-        }
+        loan.isDisabled = inRatio.lte(maintenanceMarginAmount.div(100));
 
         current = current.plus(take).dp(18, BigNumber.ROUND_FLOOR);
         if (current.toString(10) === goal.toString(10)) {
@@ -1872,7 +1874,7 @@ export class TorqueProvider {
           // console.log(e);
         }
 
-      const txHash = await bZxContract.extendLoanByInterest.sendTransactionAsync(
+        const txHash = await bZxContract.extendLoanByInterest.sendTransactionAsync(
           extendLoanRequest.loanOrderHash,                      // loanOrderHash
           account,                                              // borrower
           account,                                              // payer

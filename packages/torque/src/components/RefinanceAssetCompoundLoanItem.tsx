@@ -15,6 +15,7 @@ import { CollateralInfo } from "./CollateralInfo";
 import { Loader } from "./Loader";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
+import { ExtendLoanSlider } from "./ExtendLoanSlider";
 
 interface IRefinanceAssetCompoundLoanItemState {
   isShow: boolean;
@@ -101,6 +102,15 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
     }, () => {
       // emitting next event for processing with rx.js
       this._inputTextChange.next(this.state.inputAmountText);
+    });
+  };
+  public onCollaterizationChange = async (value: number) => {
+    
+    let refinanceLoan: IRefinanceLoan = Object.assign({}, this.state.loan); //deep clone of props object
+    await TorqueProvider.Instance.assignCollateral([refinanceLoan], TorqueProvider.Instance.compoundDeposits, new BigNumber(value/100))
+    this.setState({
+      ...this.state,
+      loan: refinanceLoan
     });
   };
 
@@ -275,6 +285,14 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
                   </div>
                 }
                 {this.state.isShowInfoCollateralAssetDt1 && <CollateralInfo />}
+                <div>{this.state.loan.collateral[0].maintenanceMarginAmount!.dp(2, BigNumber.ROUND_FLOOR).toNumber()}</div>
+                <ExtendLoanSlider
+                  readonly={false}
+                  minValue={115}
+                  maxValue={this.state.loan.collateral[0].maxCollateralRatio!.multipliedBy(100).toNumber()}
+                  value={this.state.loan.collateral[0].maintenanceMarginAmount!.toNumber()}
+                  onChange={this.onCollaterizationChange}
+                />
               </div>
             }
             {this.state.loan.isDisabled && this.props.isMobileMedia &&

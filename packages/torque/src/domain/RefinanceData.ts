@@ -37,6 +37,7 @@ export interface IRefinanceToken {
   decimals: number;
   underlying: string;
   maintenanceMarginAmount?: BigNumber;
+  maxCollateralRatio?: BigNumber;
 }
 
 export interface IRefinanceLoan extends IRefinanceToken {
