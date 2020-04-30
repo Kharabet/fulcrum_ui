@@ -105,9 +105,9 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
     });
   };
   public onCollaterizationChange = async (value: number) => {
-    
+
     let refinanceLoan: IRefinanceLoan = Object.assign({}, this.state.loan); //deep clone of props object
-    await TorqueProvider.Instance.assignCollateral([refinanceLoan], TorqueProvider.Instance.compoundDeposits, new BigNumber(value/100))
+    await TorqueProvider.Instance.assignCollateral([refinanceLoan], TorqueProvider.Instance.compoundDeposits, new BigNumber(value / 100))
     this.setState({
       ...this.state,
       loan: refinanceLoan
@@ -165,7 +165,7 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
 
     return (
 
-      <div className={`refinance-asset-selector-item `}>
+      <div className={`refinance-asset-selector-item ` + (this.state.isShowInfoCollateralAssetDt0 || this.state.isShowInfoCollateralAssetDt1 ? `inactive` : ``)}>
         {this.props.refinanceAssetItemName === this.props.selectedRefinanceAssetItemName
           ? this.props.isLoadingTransaction
             ? <Loader quantityDots={3} sizeDots={'small'} title={'Processed Token'} isOverlay={true} />
@@ -252,6 +252,12 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
                     <div className="info-icon" onClick={this.showInfoCollateralAssetDt0}>
                       {this.state.isShowInfoCollateralAssetDt0 ? <IconInfoActive /> : <IconInfo />}
                     </div>
+                    {this.state.isShowInfoCollateralAssetDt0 &&
+                      <React.Fragment>
+                        <div className="refinance-asset-selector__wrapper" onClick={this.showInfoCollateralAssetDt0}></div>
+                        <CollateralInfo />
+                      </React.Fragment>
+                    }
                   </div>
                   <div className="collateral-asset">
                     <div className="asset-icon">
@@ -262,7 +268,6 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
                     </div>
                   </div>
                 </div>
-                {this.state.isShowInfoCollateralAssetDt0 && <CollateralInfo />}
                 {this.state.isShow && collateralAssetDt2 &&
                   <div className="refinance-asset-selector__collateral">
                     <div className="collateral-value">
@@ -273,6 +278,10 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
                       <div className="info-icon" onClick={this.showInfoCollateralAssetDt1}>
                         {this.state.isShowInfoCollateralAssetDt1 ? <IconInfoActive /> : <IconInfo />}
                       </div>
+                      {this.state.isShowInfoCollateralAssetDt1 && <React.Fragment>
+                        <div className="refinance-asset-selector__wrapper" onClick={this.showInfoCollateralAssetDt1}></div>
+                        <CollateralInfo />
+                      </React.Fragment>}
                     </div>
                     <div className="collateral-asset">
                       <div className="asset-icon">
