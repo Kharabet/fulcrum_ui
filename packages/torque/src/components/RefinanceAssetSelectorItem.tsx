@@ -17,7 +17,7 @@ import { ReactComponent as IconInfoActive } from "../assets/images/icon_info_act
 import { Loader } from "./Loader";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { AssetDetails } from "../domain/AssetDetails";
-import { ExtendLoanSlider } from "./ExtendLoanSlider";
+import { CollaterallRefinanceSlider } from "./CollaterallRefinanceSlider";
 
 
 export interface IRefinanceAssetSelectorItemProps {
@@ -287,15 +287,16 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
                     </div>
                   </div>
                 </div>
-
-                <div>{this.state.loan.maintenanceMarginAmount!.dp(2, BigNumber.ROUND_FLOOR).toNumber()}</div>
-                <ExtendLoanSlider
-                  readonly={false}
-                  minValue={115}
-                  maxValue={this.state.loan.maxCollateralRatio!.multipliedBy(100).toNumber()}
-                  value={this.state.loan.maintenanceMarginAmount!.toNumber()}
-                  onChange={this.onCollaterizationChange}
-                />
+                <div className="refinance-asset-selector__collateral-slider">
+                  <div className="collateral-value">{this.state.loan.maintenanceMarginAmount!.dp(2, BigNumber.ROUND_FLOOR).toNumber()}%</div>
+                  <CollaterallRefinanceSlider
+                    readonly={false}
+                    minValue={115}
+                    maxValue={this.state.loan.maxCollateralRatio!.multipliedBy(100).toNumber()}
+                    value={this.state.loan.maintenanceMarginAmount!.toNumber()}
+                    onChange={this.onCollaterizationChange}
+                  />
+                </div>
               </div>}
           </div>
         </div>
