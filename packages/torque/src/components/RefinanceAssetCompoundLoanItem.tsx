@@ -35,6 +35,7 @@ interface IRefinanceAssetCompoundLoanItemProps {
   selectedRefinanceAssetItemName: string;
   isLoadingTransaction: boolean
   onCompleted: (itemName: string) => void;
+  onCanceled: (itemName: string) => void;
 }
 
 export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCompoundLoanItemProps, IRefinanceAssetCompoundLoanItemState> {
@@ -127,9 +128,14 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
     } else {
       receipt = await TorqueProvider.Instance.migrateCompoundLoan(loan, this.state.borrowAmount); // TODO
     }
+
+    if (receipt !== null) {
+      this.props.onCompleted(this.props.refinanceAssetItemName);
+    }
+
     this.setState({ ...this.state, isLoading: false });
 
-    this.props.onCompleted(this.props.refinanceAssetItemName);
+    this.props.onCanceled(this.props.refinanceAssetItemName);
 
   };
 

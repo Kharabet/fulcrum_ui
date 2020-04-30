@@ -28,6 +28,7 @@ export interface IRefinanceAssetSelectorItemProps {
   selectedRefinanceAssetItemName: string;
   isLoadingTransaction: boolean
   onCompleted: (itemName: string) => void;
+  onCanceled: (itemName: string) => void;
 }
 
 interface IRefinanceAssetSelectorItemState {
@@ -152,10 +153,11 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
       const refinanceData = await TorqueProvider.Instance.migrateMakerLoan(this.state.loan, this.state.borrowAmount);
       if (refinanceData !== null) {
         this.setState({ ...this.state, isLoading: false, isTrack: true });
+        this.props.onCompleted(this.props.refinanceAssetItemName);
       } else {
         this.setState({ ...this.state, isLoading: false, isTrack: false });
+        this.props.onCanceled(this.props.refinanceAssetItemName);
       }
-      this.props.onCompleted(this.props.refinanceAssetItemName);
     }
   };
 
