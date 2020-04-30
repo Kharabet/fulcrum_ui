@@ -35,10 +35,17 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
   }
 
   private onProviderIsChanging = async () => {
-    await this.derivedUpdate();
+    this.setState({
+      ...this.state,
+      isLoading: true
+    });
   };
 
   private onProviderChanged = async (event: ProviderChangedEvent) => {
+    this.setState({
+      ...this.state,
+      isLoading: true
+    });
     await this.derivedUpdate();
   };
 
