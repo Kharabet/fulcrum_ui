@@ -24,6 +24,7 @@ import { ReactComponent as IconInfo } from "../assets/images/icon_info.svg";
 import { ReactComponent as IconInfoActive } from "../assets/images/icon_info_active.svg";
 import { CollateralInfo } from "./CollateralInfo";
 import { RefinanceCard } from "./RefinanceCard";
+import { Loader } from "./Loader";
 
 interface IRefinanceAssetCompoundLoanItemState {
   isShow: boolean;
@@ -35,12 +36,15 @@ interface IRefinanceAssetCompoundLoanItemState {
   borrowAmount: BigNumber;
   collateral0Amount: BigNumber;
   collateral1Amount: BigNumber;
-  fixedApr: BigNumber;
+  fixedApr: BigNumber
 }
 
 interface IRefinanceAssetCompoundLoanItemProps extends IRefinanceLoan {
   isMobileMedia: boolean;
-  onCompleted: () => void;
+  refinanceAssetItemName: string;
+  selectedRefinanceAssetItemName: string;
+  isLoadingTransaction: boolean
+  onCompleted: (itemName: string) => void;
 }
 
 export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCompoundLoanItemProps, IRefinanceAssetCompoundLoanItemState> {
@@ -60,7 +64,6 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
       fixedApr: new BigNumber(0),
       isLoading: false,
       isTrack: false
-
     };
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
     this._inputTextChange = new Subject<number>();
@@ -133,12 +136,15 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
   public migrateLoan = async () => {
     const loan = Object.assign({}, this.props);
     let receipt;
+    this.setState({ ...this.state, isLoading: true });
     if (this.props.type == "dydx") {
       receipt = await TorqueProvider.Instance.migrateSoloLoan(loan, this.state.borrowAmount); // TODO
     } else {
       receipt = await TorqueProvider.Instance.migrateCompoundLoan(loan, this.state.borrowAmount); // TODO
     }
-    this.props.onCompleted();
+    this.setState({ ...this.state, isLoading: false });
+
+    this.props.onCompleted(this.props.refinanceAssetItemName);
 
   };
 
@@ -154,6 +160,7 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
   public showInfoCollateralAssetDt1 = () => {
     this.setState({ ...this.state, isShowInfoCollateralAssetDt1: !this.state.isShowInfoCollateralAssetDt1 });
   };
+
 
   public render() {
     // const assetTypeModifier = "asset-selector-item--"+this.props.asset.toLowerCase();
@@ -180,7 +187,14 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
     return (
 
       <div className={`refinance-asset-selector-item `}>
+        {this.props.refinanceAssetItemName === this.props.selectedRefinanceAssetItemName
+          ? this.props.isLoadingTransaction
+            ? <Loader quantityDots={3} sizeDots={'small'} title={'Processed Token'} isOverlay={true} />
+            : null
+          : null
+        }
         <div className="refinance-asset__main-block">
+
           <div className="refinance-asset-selector__non-torque">
             <div className="refinance-asset-selector__non-torque-logo">
               {head_image}

@@ -3,11 +3,13 @@ import { BorrowRequestAwaiting } from "../domain/BorrowRequestAwaiting";
 import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
 import { BorrowedFundsAwaitingListItem } from "./BorrowedFundsAwaitingListItem";
 import { BorrowedFundsListItem } from "./BorrowedFundsListItem";
+import { Asset } from "../domain/Asset";
 
 export interface IBorrowedFundsListProps {
   items: IBorrowedFundsState[];
   itemsAwaiting: ReadonlyArray<BorrowRequestAwaiting>;
-
+  selectedAsset: Asset;
+  isLoadingTransaction: boolean;
   onManageCollateral: (item: IBorrowedFundsState) => void;
   onRepayLoan: (item: IBorrowedFundsState) => void;
   onExtendLoan: (item: IBorrowedFundsState) => void;
@@ -65,6 +67,8 @@ export class BorrowedFundsList extends Component<IBorrowedFundsListProps, IBorro
           onRepayLoan={this.props.onRepayLoan}
           onExtendLoan={this.props.onExtendLoan}
           onBorrowMore={this.props.onBorrowMore}
+          selectedAsset={this.props.selectedAsset}
+          isLoadingTransaction={this.props.isLoadingTransaction}
         />
       );
     });

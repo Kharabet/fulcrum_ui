@@ -9,7 +9,7 @@ import { BorrowRequest } from "../domain/BorrowRequest";
 import { IBorrowEstimate } from "../domain/IBorrowEstimate";
 import { TorqueProvider } from "../services/TorqueProvider";
 import { CollateralTokenSelectorToggle } from "./CollateralTokenSelectorToggle";
-import { LoaderData } from "./LoaderData";
+import { Loader } from "./Loader";
 
 export interface IBorrowFormProps {
   borrowAsset: Asset;
@@ -90,7 +90,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
             <div className="borrow-form__info-collateral-by-msg">To open the loan, you will deposit</div>
             <div className="borrow-form__info-collateral-by-amount">
               {this.state.isLoading
-                ? <LoaderData />
+                ? <Loader quantityDots={4} sizeDots={'middle'} title={''} isOverlay={false} />
                 : <React.Fragment>
                   {this.state.borrowAmount.gt(0) && this.state.depositAmount.eq(0)
                     ? <span className="borrow-form__error">Loan is too large</span>

@@ -16,10 +16,13 @@ export interface IRefinanceAssetSelectorProps {
 interface IRefinanceAssetSelectorItemState {
   asset: Asset,
   isLoading: boolean;
+  isLoadingTransaction: boolean;
+  selectedRefinanceAssetItemName: string;
   isItems: boolean;
   isShowRecord: boolean;
   refinanceData: RefinanceData[];
   refinanceCompoundData: IRefinanceLoan[];
+
 }
 
 export class RefinanceAssetSelector extends Component<IRefinanceAssetSelectorProps, IRefinanceAssetSelectorItemState> {
@@ -28,8 +31,10 @@ export class RefinanceAssetSelector extends Component<IRefinanceAssetSelectorPro
     this.state = {
       asset: Asset.DAI,
       isLoading: true,
+      isLoadingTransaction: true,
       isItems: true,
       isShowRecord: false,
+      selectedRefinanceAssetItemName: "",
       refinanceCompoundData: [],
       refinanceData: []
     };
@@ -40,6 +45,8 @@ export class RefinanceAssetSelector extends Component<IRefinanceAssetSelectorPro
 
   public componentDidMount(): void {
     // noinspection JSIgnoredPromiseFromCall
+    this.setState({ ...this.state, isLoading: true, isItems: false });
+
     this.derivedUpdate();
   }
 
@@ -47,19 +54,28 @@ export class RefinanceAssetSelector extends Component<IRefinanceAssetSelectorPro
     TorqueProvider.Instance.eventEmitter.removeListener(TorqueProviderEvents.ProviderAvailable, this.derivedUpdate);
     TorqueProvider.Instance.eventEmitter.removeListener(TorqueProviderEvents.ProviderChanged, this.derivedUpdate);
   }
+  private getSelectedRefinanceAssetItemName = async (itemName: string) => {
+    this.setState({
+      ...this.state,
+      selectedRefinanceAssetItemName: itemName
+    });
+    this.derivedUpdate();
+  }
 
   private derivedUpdate = async () => {
     if (TorqueProvider.Instance.providerType === ProviderType.None || !TorqueProvider.Instance.contractsSource || !TorqueProvider.Instance.contractsSource.canWrite) {
       this.props.doNetworkConnect()
       return;
     }
-    this.setState({ ...this.state, isLoading: true, isItems: false });
+    this.setState({ ...this.state, isLoadingTransaction: true });
+
     const refinanceData = await this.getMakerRefinanceData()
     const refinanceCompoundData = await this.getSoloComoundRefinanceData();
 
     this.setState({
       ...this.state,
       isLoading: false,
+      isLoadingTransaction: false,
       isItems: refinanceData.length > 0 || refinanceCompoundData.length > 0,
       refinanceData,
       refinanceCompoundData
@@ -119,13 +135,21 @@ export class RefinanceAssetSelector extends Component<IRefinanceAssetSelectorPro
         isMobileMedia={this.props.isMobileMedia}
         asset={Asset.DAI}
         refinanceData={refinanceDataItem}
-        onCompleted={this.derivedUpdate} />
+        onCompleted={this.getSelectedRefinanceAssetItemName}
+        refinanceAssetItemName={"RefinanceAssetSelectorItem" + index}
+        selectedRefinanceAssetItemName={this.state.selectedRefinanceAssetItemName}
+        isLoadingTransaction={this.state.isLoadingTransaction}
+      />
     ));
     const soloCompoundItems = this.state.refinanceCompoundData.map((e, index) => (
       <RefinanceAssetCompoundLoanItem key={index}
         {...e}
-        onCompleted={this.derivedUpdate}
-        isMobileMedia={this.props.isMobileMedia} />
+        onCompleted={this.getSelectedRefinanceAssetItemName}
+        isMobileMedia={this.props.isMobileMedia}
+        selectedRefinanceAssetItemName={this.state.selectedRefinanceAssetItemName}
+        refinanceAssetItemName={"RefinanceAssetCompoundLoanItem" + index}
+        isLoadingTransaction={this.state.isLoadingTransaction}
+      />
     ));
 
 

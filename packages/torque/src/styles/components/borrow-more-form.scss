@@ -1,23 +1,40 @@
 .borrow-more-loan-form {
+  width: 536px;
+
+  @media only screen and (max-width: $mobile-version-max-width) {
+    width: 100%;
+  }
+
+  .collateral-slider .rail-inner {
+    background: #f3f9ff;
+  }
+
+  .input-container {
+    padding: 21px 15px;
+    @media screen and (max-width: $mobile-version-max-width) {
+      padding: 10px 15px;
+    }
+    .input-row {
+      margin-bottom: 0;
+    }
+  }
 
   &__body {
-    padding: 30px 0 25px 0;
+    padding: 30px 0 23px 0;
     display: flex;
     flex-direction: column;
     position: relative;
-    &:after {
-      content: "";
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      background: #e4ebf4;
-      height: 1px;
+    @media only screen and (max-width: $mobile-version-max-width) {
+      padding: 31px 0 20px 0;
     }
     &-collateralized {
       font-weight: normal;
       font-size: 28px;
       line-height: 150%;
+      padding-bottom: 2px;
+      @media only screen and (max-width: $mobile-version-max-width) {
+        font-size: 26px;
+      }
       .value {
         font-weight: 800;
       }
@@ -33,12 +50,18 @@
         font-size: 16px;
         line-height: 150%;
         color: #758295;
+        @media only screen and (max-width: $mobile-version-max-width) {
+          font-size: 14px;
+        }
       }
       &-state {
         font-weight: 800;
         font-size: 16px;
         line-height: 150%;
         align-self: flex-end;
+        @media only screen and (max-width: $mobile-version-max-width) {
+          font-size: 14px;
+        }
         &.safe {
           color: #00c0ab;
         }
@@ -63,6 +86,18 @@
     }
   }
 
+  &__delimiter {
+    margin-bottom: 40px;
+    border: 0;
+    @media only screen and (max-width: $mobile-version-max-width) {
+      margin-bottom: 30px;
+    }
+  }
+  &__actions-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+  }
   .d-flex {
     display: flex;
   }
