@@ -93,21 +93,7 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
 
     return (
       <div className={`borrowed-funds-list-item`}>
-        {this.props.item.loanAsset === this.props.selectedAsset
-          ? this.props.isLoadingTransaction
-            ? <Loader quantityDots={4} sizeDots={'middle'} title={'Processed Token'} isOverlay={true} />
-            : null
-          : null
-        }
         <div className="borrowed-funds-list-item__header">
-          <div className="borrowed-funds-list-item__header-asset">
-            <div className="borrowed-funds-list-item__header-asset-img">
-              <img src={assetDetails.logoSvg} alt={assetDetails.displayName} />
-            </div>
-            <div className="borrowed-funds-list-item__header-asset-name">
-              {assetDetails.displayName}
-            </div>
-          </div>
           <div className="borrowed-funds-list-item__header-loan">
             <div
               title={`${item.amountOwed.toFixed(18)} ${assetDetails.displayName}`}
@@ -120,6 +106,15 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
             >
               <span className="value">{interestRate.multipliedBy(100).toFixed(2)}%</span>&nbsp;APR
               </div>
+          </div>
+          <div className="borrowed-funds-list-item__header-asset">
+            <div className="borrowed-funds-list-item__header-asset-img">
+              <img src={assetDetails.logoSvg} alt={assetDetails.displayName} />
+            </div>
+            <div className="borrowed-funds-list-item__header-asset-name">
+              {assetDetails.displayName}
+            </div>
+
           </div>
         </div>
         <div className="borrowed-funds-list-item__body">
