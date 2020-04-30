@@ -36,6 +36,11 @@
         .refinance-asset__main-block .refinance-asset-selector__non-torque .refinance__input-container .input-amount {
           background-color: #f5f7f9;
         }
+        .refinance-asset-selector__collateral-slider{
+          .slider-handle{
+            border: 4px solid #ffffff !important;
+          }
+        }
       }
       &.inactive {
         background-color: #f3f9ff;
@@ -240,6 +245,23 @@
         }
         .refinance-asset-selector__collateral-container {
           position: relative;
+         .refinance-asset-selector__collateral-slider{
+            display: flex;
+            flex-wrap: wrap;
+            padding-top: 35px;
+            width: 180px;
+            .collateral-value{
+              width: 100%;
+              font-size: 28px;
+              line-height: 1.5;
+              font-style: normal;
+              font-weight: 800;              
+              margin-bottom: 15px;
+            }
+            .slider-handle{
+              border: 4px solid #f3f9ff;
+            }
+          }
           .refinance-asset-selector__collateral_info {
             position: absolute;
             width: 278px;
@@ -571,6 +593,10 @@
             flex-direction: column;
             align-items: center;
             .refinance-asset-selector__collateral_info {
+            }
+            .refinance-asset-selector__collateral-slider{
+              width: 100%;
+              padding-left: 15px;
             }
           }
           .collaterization-warning {

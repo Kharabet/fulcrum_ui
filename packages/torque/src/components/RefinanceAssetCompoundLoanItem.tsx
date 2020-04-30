@@ -15,7 +15,7 @@ import { CollateralInfo } from "./CollateralInfo";
 import { Loader } from "./Loader";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
-import { ExtendLoanSlider } from "./ExtendLoanSlider";
+import { CollaterallRefinanceSlider } from "./CollaterallRefinanceSlider";
 
 interface IRefinanceAssetCompoundLoanItemState {
   isShow: boolean;
@@ -294,14 +294,16 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
                   </div>
                 }
                 {this.state.isShowInfoCollateralAssetDt1 && <CollateralInfo />}
-                <div>{this.state.loan.collateral[0].maintenanceMarginAmount!.dp(2, BigNumber.ROUND_FLOOR).toNumber()}</div>
-                <ExtendLoanSlider
-                  readonly={false}
-                  minValue={115}
-                  maxValue={this.state.loan.collateral[0].maxCollateralRatio!.multipliedBy(100).toNumber()}
-                  value={this.state.loan.collateral[0].maintenanceMarginAmount!.toNumber()}
-                  onChange={this.onCollaterizationChange}
-                />
+                <div className="refinance-asset-selector__collateral-slider">
+                  <div className="collateral-value">{this.state.loan.collateral[0].maintenanceMarginAmount!.dp(2, BigNumber.ROUND_FLOOR).toNumber()}%</div>
+                  <CollaterallRefinanceSlider
+                    readonly={false}
+                    minValue={115}
+                    maxValue={this.state.loan.collateral[0].maxCollateralRatio!.multipliedBy(100).toNumber()}
+                    value={this.state.loan.collateral[0].maintenanceMarginAmount!.toNumber()}
+                    onChange={this.onCollaterizationChange}
+                  />
+                </div>
               </div>
             }
             {this.state.loan.isDisabled && this.props.isMobileMedia &&
