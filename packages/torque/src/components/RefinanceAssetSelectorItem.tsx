@@ -3,15 +3,6 @@ import React, { ChangeEvent, Component } from "react";
 import { Subject } from "rxjs";
 // import { debounceTime, switchMap } from "rxjs/operators";
 import { ReactComponent as ArrowRight } from "../assets/images/arrow.svg";
-import { ReactComponent as Btc } from "../assets/images/ic_token_btc.svg";
-import { ReactComponent as Dai } from "../assets/images/ic_token_dai.svg";
-import { ReactComponent as Eth } from "../assets/images/ic_token_eth.svg";
-import { ReactComponent as Knc } from "../assets/images/ic_token_knc.svg";
-import { ReactComponent as Link } from "../assets/images/ic_token_link.svg";
-import { ReactComponent as Rep } from "../assets/images/ic_token_rep.svg";
-import { ReactComponent as Sai } from "../assets/images/ic_token_sai.svg";
-import { ReactComponent as Usdc } from "../assets/images/ic_token_usdc.svg";
-import { ReactComponent as Zrx } from "../assets/images/ic_token_zrx.svg";
 import { ReactComponent as MakerImg } from "../assets/images/maker.svg";
 import { ReactComponent as TorqueLogo } from "../assets/images/torque_logo.svg";
 import { Asset } from "../domain/Asset";
@@ -24,6 +15,8 @@ import { ReactComponent as TopArrow } from "../assets/images/top-arrow.svg";
 import { ReactComponent as IconInfo } from "../assets/images/icon_info.svg";
 import { ReactComponent as IconInfoActive } from "../assets/images/icon_info_active.svg";
 import { Loader } from "./Loader";
+import { AssetsDictionary } from "../domain/AssetsDictionary";
+import { AssetDetails } from "../domain/AssetDetails";
 
 
 export interface IRefinanceAssetSelectorItemProps {
@@ -163,7 +156,8 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
   };
 
   public render() {
-    const assetsDt: any = this.getAssetsData();
+    const asset = AssetsDictionary.assets.get(this.props.asset) as AssetDetails;
+    const assetETH = AssetsDictionary.assets.get(Asset.ETH) as AssetDetails;
     const btnValue = this.state.isLoading ? "Loading..." : "Refinance with " + this.state.fixedApr.dp(1, BigNumber.ROUND_CEIL).toString() + "% APR Fixed";
     const btnActiveValue = this.state.isTrack ? "Track" : "Refinance with " + this.state.fixedApr.dp(1, BigNumber.ROUND_CEIL).toString() + "% APR Fixed";
     const refRateYear = ((parseFloat(this.props.refinanceData.variableAPR.dp(0, BigNumber.ROUND_CEIL).toString()) - parseFloat(this.state.fixedApr.dp(1, BigNumber.ROUND_CEIL).toString())) * parseFloat(this.props.refinanceData.debt.dp(3, BigNumber.ROUND_FLOOR).toString())) / 100;
@@ -219,7 +213,7 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
             {this.props.isMobileMedia &&
               <div className="loan-asset">
                 <div className="asset-icon">
-                  {assetsDt}
+                  {asset.reactLogoSvg.render()}
                 </div>
                 <div className="asset-name">{this.props.asset}</div>
               </div>
@@ -242,7 +236,7 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
               </div>
               <div className="loan-asset">
                 <div className="asset-icon">
-                  {assetsDt}
+                  {asset.reactLogoSvg.render()}
                 </div>
                 <div className="asset-name">{this.props.asset}</div>
               </div>
@@ -268,7 +262,7 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
                   </div>
                   <div className="collateral-asset">
                     <div className="asset-icon">
-                      <Eth />
+                      {assetETH.reactLogoSvg.render()}
                     </div>
                     <div className="asset-name">
                       {this.props.refinanceData.collateralType}
@@ -303,34 +297,4 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
       </div>
     )
   }
-  private getAssetsData = () => {
-    switch (this.props.asset) {
-      case Asset.DAI:
-        return <Dai />;
-
-      case Asset.SAI:
-        return <Sai />;
-
-      case Asset.USDC:
-        return <Usdc />;
-
-      case Asset.ETH:
-        return <Eth />;
-
-      case Asset.WBTC:
-        return <Btc />;
-
-      case Asset.LINK:
-        return <Link />;
-
-      case Asset.ZRX:
-        return <Zrx />;
-
-      case Asset.REP:
-        return <Rep />;
-
-      case Asset.KNC:
-        return <Knc />;
-    }
-  };
 }

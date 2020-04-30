@@ -1,21 +1,10 @@
 import { BigNumber } from "@0x/utils";
 import React, { ChangeEvent, Component } from "react";
 import { Subject } from "rxjs";
-import { ReactComponent as ArrowRight } from "../assets/images/arrow.svg";
 import { ReactComponent as CompoundImg } from "../assets/images/compound.svg";
 import { ReactComponent as DownArrow } from "../assets/images/down-arrow.svg";
-import { ReactComponent as Btc } from "../assets/images/ic_token_btc.svg";
-import { ReactComponent as Dai } from "../assets/images/ic_token_dai.svg";
-import { ReactComponent as Eth } from "../assets/images/ic_token_eth.svg";
-import { ReactComponent as Knc } from "../assets/images/ic_token_knc.svg";
-import { ReactComponent as Link } from "../assets/images/ic_token_link.svg";
-import { ReactComponent as Rep } from "../assets/images/ic_token_rep.svg";
-import { ReactComponent as Sai } from "../assets/images/ic_token_sai.svg";
-import { ReactComponent as Usdc } from "../assets/images/ic_token_usdc.svg";
-import { ReactComponent as Zrx } from "../assets/images/ic_token_zrx.svg";
 import { ReactComponent as TopArrow } from "../assets/images/top-arrow.svg";
 import { ReactComponent as TorqueLogo } from "../assets/images/torque_logo.svg";
-import { Asset } from "../domain/Asset";
 import { IRefinanceLoan } from "../domain/RefinanceData";
 import { TorqueProviderEvents } from "../services/events/TorqueProviderEvents";
 import { TorqueProvider } from "../services/TorqueProvider";
@@ -23,8 +12,9 @@ import { ReactComponent as DydxImg } from "../assets/images/dydx.svg";
 import { ReactComponent as IconInfo } from "../assets/images/icon_info.svg";
 import { ReactComponent as IconInfoActive } from "../assets/images/icon_info_active.svg";
 import { CollateralInfo } from "./CollateralInfo";
-import { RefinanceCard } from "./RefinanceCard";
 import { Loader } from "./Loader";
+import { AssetDetails } from "../domain/AssetDetails";
+import { AssetsDictionary } from "../domain/AssetsDictionary";
 
 interface IRefinanceAssetCompoundLoanItemState {
   isShow: boolean;
@@ -164,13 +154,12 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
 
   public render() {
     // const assetTypeModifier = "asset-selector-item--"+this.props.asset.toLowerCase();
-    const loanAssetDt: any = this.getAssetsData(this.props.asset);
-    const collateralAssetDt: any = this.getAssetsData(this.props.collateral[0].asset);
+    const loanAssetDt = AssetsDictionary.assets.get(this.props.asset) as AssetDetails;
+    const collateralAssetDt = AssetsDictionary.assets.get(this.props.collateral[0].asset) as AssetDetails;;
     let collateralAssetDt2: any = "";
     if (this.props.collateral.length > 1) {
-      collateralAssetDt2 = this.getAssetsData(this.props.collateral[1].asset);
+      collateralAssetDt2 = AssetsDictionary.assets.get(this.props.collateral[1].asset) as AssetDetails;
     }
-    this.getAssetsData(this.props.collateral[0].asset);
     const head_image = this.props.type == "dydx" ? <DydxImg /> : <CompoundImg />;
     const assetTypeModifier = !this.state.isShow ? "asset-collateral-show" : "asset-collateral-hide";
     const showDetailsValue = !this.state.isShow ? "Show details" : "Hide details";
@@ -227,7 +216,7 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
             {this.props.isMobileMedia &&
               <div className="loan-asset">
                 <div className="asset-icon">
-                  {loanAssetDt}
+                  {loanAssetDt.reactLogoSvg.render()}
                 </div>
                 <div className="asset-name">{this.props.asset}</div>
               </div>
@@ -251,7 +240,7 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
               </div>
               <div className="loan-asset">
                 <div className="asset-icon">
-                  {loanAssetDt}
+                  {loanAssetDt.reactLogoSvg.render()}
                 </div>
                 <div className="asset-name">{this.props.asset}</div>
               </div>
@@ -276,7 +265,7 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
                   </div>
                   <div className="collateral-asset">
                     <div className="asset-icon">
-                      {collateralAssetDt}
+                      {collateralAssetDt.reactLogoSvg.render()}
                     </div>
                     <div className="asset-name">
                       {this.props.collateral[0].asset}
@@ -288,7 +277,7 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
                   <div className="refinance-asset-selector__collateral">
 
                     <div className="asset-icon">
-                      {collateralAssetDt2}
+                      {collateralAssetDt2.reactLogoSvg.render()}
                     </div>
                     <div className="collateral-value">
                       <div className={`value ${this.props.isDisabled ? "red" : ""}`}>
@@ -301,7 +290,7 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
                     </div>
                     <div className="collateral-asset">
                       <div className="asset-icon">
-                        {collateralAssetDt2}
+                        {collateralAssetDt2.reactLogoSvg.render()}
                       </div>
                       <div className="asset-name">
                         {this.props.collateral[1].asset}
@@ -344,27 +333,4 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
       </div >
     );
   }
-
-  private getAssetsData = (asset: Asset) => {
-    switch (asset) {
-      case Asset.DAI:
-        return <Dai />;
-      case Asset.SAI:
-        return <Sai />;
-      case Asset.USDC:
-        return <Usdc />;
-      case Asset.ETH:
-        return <Eth />;
-      case Asset.WBTC:
-        return <Btc />;
-      case Asset.LINK:
-        return <Link />;
-      case Asset.ZRX:
-        return <Zrx />;
-      case Asset.REP:
-        return <Rep />;
-      case Asset.KNC:
-        return <Knc />;
-    }
-  };
 }
