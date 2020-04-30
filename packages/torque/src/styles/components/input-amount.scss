@@ -12,7 +12,7 @@
     height: 72px;
 
     .input-amount {
-      font-size: 48px;
+      font-size: 42px;
       line-height: 1.5;
       font-weight: 900;
       color: #283049;
@@ -20,14 +20,11 @@
       border: none;
       text-align: center;
       width: calc(100% - 80px);
+      position: relative;
       &::-webkit-outer-spin-button,
       &::-webkit-inner-spin-button {
         -webkit-appearance: none;
         margin: 0;
-      }
-      &::placeholder {
-        font-size: 42px;
-        transform: translate(0, -3px);
       }
       &[type="number"] {
         -moz-appearance: textfield;
