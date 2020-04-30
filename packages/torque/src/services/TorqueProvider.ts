@@ -541,6 +541,16 @@ export class TorqueProvider {
     }
   };
 
+  public assignMakerCollateral = async (refinanceData: RefinanceData, borrowAmount: BigNumber, maintenanceMarginAmount: BigNumber) => {
+    const collateralAmount = refinanceData.collateralAmount.dividedBy(refinanceData.debt.dividedBy(borrowAmount));
+    const collaterralWithRatio = collateralAmount.multipliedBy(maintenanceMarginAmount).div(refinanceData.maintenanceMarginAmount)
+    refinanceData.collateralAmount = collaterralWithRatio;
+    refinanceData.maintenanceMarginAmount = maintenanceMarginAmount;
+    const minMaintenanceMarginAmount = new BigNumber(150);
+    refinanceData.isDisabled = maintenanceMarginAmount.lte(minMaintenanceMarginAmount);
+    return refinanceData;
+  };
+
   public getCompoundLoans = async (): Promise<IRefinanceLoan[]> => {
 
     const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
@@ -943,7 +953,9 @@ export class TorqueProvider {
       isDisabled: false,
       dust: new BigNumber(0),
       isShowCard: false,
-      variableAPR: new BigNumber(0)
+      variableAPR: new BigNumber(0),
+      maintenanceMarginAmount: new BigNumber(0),
+      maxCollateralRatio: new BigNumber(0),
     };
     if (this.web3Wrapper && this.contractsSource) {
       const vat: vatContract = await this.contractsSource.getVatContract(configAddress.MCD_VAT_Address);
@@ -1002,7 +1014,9 @@ export class TorqueProvider {
         isDisabled,
         dust: ilkData[4].div(10 ** 27).div(10 ** 18),
         isShowCard,
-        variableAPR: rateAmountIlkYr
+        variableAPR: rateAmountIlkYr,
+        maintenanceMarginAmount: ratio.times(100),
+        maxCollateralRatio: new BigNumber(5),
       };
     }
 

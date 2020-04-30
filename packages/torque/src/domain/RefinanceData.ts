@@ -15,6 +15,8 @@ export interface RefinanceData {
   dust: BigNumber;
   isShowCard: boolean;
   variableAPR: BigNumber;
+  maintenanceMarginAmount: BigNumber;
+  maxCollateralRatio: BigNumber;
 }
 
 export interface RefinanceCdpData {
