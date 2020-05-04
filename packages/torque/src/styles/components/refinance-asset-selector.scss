@@ -16,7 +16,7 @@
     &-item {
       position: relative;
       display: flex;
-      flex-direction: column;
+      flex-wrap: wrap;
       border-radius: 16px;
       background-color: #f3f9ff;
       border: 1px solid transparent;
@@ -52,7 +52,7 @@
 
         padding: 40px;
         padding-top: 55px;
-        border-bottom: 1px solid rgba(169, 181, 199, 0.2);
+        width: 100%;
         .refinance-asset-selector__non-torque {
           display: flex;
           flex-direction: column;
@@ -185,6 +185,9 @@
             .loan-value {
               position: relative;
               margin-right: 40px;
+              height: 60px;
+              display: flex;
+              align-items: center;
               .value {
                 font-weight: 800;
                 font-size: 28px;
@@ -370,6 +373,11 @@
       }
       .refinance-asset__action-block {
         padding: 40px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-self: flex-end;
+        border-top: 1px solid rgba(169, 181, 199, 0.2);
         .refinance-asset-selector {
           &__desc {
             display: flex;
@@ -435,6 +443,7 @@
   @media screen and (min-width: $breakpoint-mobile-min) {
     .refinance-asset-selector {
       &-item {
+        min-height: 748px;
         &:nth-child(odd) {
           place-self: end;
         }

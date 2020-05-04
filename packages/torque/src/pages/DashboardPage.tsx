@@ -86,7 +86,15 @@ export class DashboardPage extends PureComponent<
       isDataLoading: false
     });
   }
-
+  public componentDidUpdate(
+    prevProps: Readonly<IDashboardPageParams>,
+    prevState: Readonly<IDashboardPageState>,
+    snapshot?: any
+  ): void {
+    if (this.state.isLoadingTransaction !== prevState.isLoadingTransaction) {
+      this.derivedUpdate();
+    }
+  }
   /*private onProviderAvailable = () => {
     //console.log("onProviderAvailable");
     this.refreshPage();

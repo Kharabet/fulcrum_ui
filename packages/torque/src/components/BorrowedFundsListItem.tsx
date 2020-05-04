@@ -41,7 +41,7 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
     prevState: Readonly<IBorrowedFundsListItemState>,
     snapshot?: any
   ): void {
-    if (this.props.item.loanAsset !== prevProps.item.loanAsset) {
+    if (this.props.item.loanAsset !== prevProps.item.loanAsset || this.props.isLoadingTransaction !== prevProps.isLoadingTransaction) {
       this.derivedUpdate();
     }
   }
