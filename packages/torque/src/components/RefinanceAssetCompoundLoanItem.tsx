@@ -201,7 +201,6 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
                 step="any"
                 defaultValue={this.props.loan.balance.dp(3, BigNumber.ROUND_FLOOR).toString()}
                 placeholder={`Amount`}
-                disabled={this.state.loan.isDisabled}
                 onChange={this.loanAmountChange}
               />
               {this.state.borrowAmount.lte(0) || this.state.borrowAmount.gt(this.props.loan.balance) ?

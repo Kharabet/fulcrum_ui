@@ -220,7 +220,6 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
                 step="any"
                 defaultValue={this.state.loan.debt.dp(3, BigNumber.ROUND_FLOOR).toString()}
                 placeholder={`Amount`}
-                disabled={this.state.loan.isDisabled}
                 onChange={this.loanAmountChange}
               />
 
