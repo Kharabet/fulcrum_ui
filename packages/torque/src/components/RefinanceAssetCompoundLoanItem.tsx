@@ -109,9 +109,9 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
     });
   };
   public onCollaterizationChange = async (value: number) => {
-
+    if (Math.abs(this.state.loan.collateral[0].collaterizationPercent!.dp(2, BigNumber.ROUND_FLOOR).toNumber() - value) < 1) return
     let refinanceLoan: IRefinanceLoan = Object.assign({}, this.state.loan); //deep clone of props object
-    await TorqueProvider.Instance.assignCollateral([refinanceLoan], TorqueProvider.Instance.compoundDeposits, new BigNumber(value / 100))
+    await TorqueProvider.Instance.assignCollateral([refinanceLoan], TorqueProvider.Instance.compoundDeposits, new BigNumber(value).div(100))
     this.setState({
       ...this.state,
       loan: refinanceLoan
@@ -221,7 +221,7 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
             }
 
             {this.state.loan.isDisabled && !this.props.isMobileMedia &&
-              <div className="collaterization-warning">Collateralization should be {this.state.loan.minMaintenanceMarginAmount!.toNumber()}%+</div>}
+              <div className="collaterization-warning">Collateralization should be {this.state.loan.maintenanceMarginAmount!.toNumber()}%+</div>}
           </div>
           <div className="refinance-asset-selector__torque">
             <div className="refinance-asset-selector__torque-logo">
@@ -303,12 +303,12 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
                 }
                 {this.state.isShowInfoCollateralAssetDt1 && <CollateralInfo />}
                 <div className="refinance-asset-selector__collateral-slider">
-                  <div className="collateral-value">{this.state.loan.collateral[0].maintenanceMarginAmount!.dp(2, BigNumber.ROUND_FLOOR).toNumber()}%</div>
+                  <div className="collateral-value">{this.state.loan.collateral[0].collaterizationPercent!.dp(2, BigNumber.ROUND_FLOOR).toNumber()}%</div>
                   <CollaterallRefinanceSlider
                     readonly={false}
-                    minValue={this.state.loan.minMaintenanceMarginAmount!.toNumber()}
-                    maxValue={this.state.loan.collateral[0].maxCollateralRatio!.multipliedBy(100).toNumber()}
-                    value={this.state.loan.collateral[0].maintenanceMarginAmount!.toNumber()}
+                    minValue={this.state.loan.maintenanceMarginAmount!.dp(2, BigNumber.ROUND_FLOOR).toNumber()}
+                    maxValue={this.props.loan.collateral[0].collaterizationPercent!.dp(2, BigNumber.ROUND_FLOOR).toNumber()}
+                    value={this.state.loan.collateral[0].collaterizationPercent!.dp(2, BigNumber.ROUND_FLOOR).toNumber()}
                     onChange={this.onCollaterizationChange}
                   />
                 </div>

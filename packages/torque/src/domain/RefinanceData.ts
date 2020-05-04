@@ -40,7 +40,6 @@ export interface IRefinanceToken {
   decimals: number;
   underlying: string;
   maintenanceMarginAmount?: BigNumber;
-  maxCollateralRatio?: BigNumber;
 }
 
 export interface IRefinanceLoan extends IRefinanceToken {
@@ -50,12 +49,12 @@ export interface IRefinanceLoan extends IRefinanceToken {
   apr: BigNumber;
   ratio: BigNumber;
   type: string;
-  minMaintenanceMarginAmount?: BigNumber;
 }
 
 export interface IRefinanceCollateral extends IRefinanceToken {
   amount: BigNumber;
   borrowAmount: BigNumber;
+  collaterizationPercent: BigNumber;
 }
 
 export interface RefinanceCompoundData {

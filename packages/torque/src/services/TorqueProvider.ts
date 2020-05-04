@@ -523,13 +523,12 @@ export class TorqueProvider {
           goal = goal.minus(goal.minus(current.plus(take)))
         }
         const maintenanceMarginAmount = await this.getMaintenanceMarginAmount(loan.asset, deposit.underlying);
-        loan.minMaintenanceMarginAmount = maintenanceMarginAmount
+        loan.maintenanceMarginAmount = maintenanceMarginAmount
         loan.collateral.push({
           ...deposit,
           amount: take.div(deposit.rate),
           borrowAmount: loan.balance.div(goal.div(take)),
-          maintenanceMarginAmount: BigNumber.minimum(inRatio, goal.div(loan.usdValue)).multipliedBy(100),
-          maxCollateralRatio: new BigNumber(5)
+          collaterizationPercent: BigNumber.minimum(inRatio, goal.div(loan.usdValue)).multipliedBy(100)
         });
 
         // @ts-ignore
