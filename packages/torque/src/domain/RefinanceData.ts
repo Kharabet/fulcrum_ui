@@ -5,6 +5,7 @@ import { Asset } from "./Asset";
 export interface RefinanceData {
   collateralType: string;
   collateralAmount: BigNumber;
+  collaterizationPercent: BigNumber;
   debt: BigNumber;
   cdpId: BigNumber;
   accountAddress: string;
@@ -15,9 +16,7 @@ export interface RefinanceData {
   dust: BigNumber;
   isShowCard: boolean;
   variableAPR: BigNumber;
-  minMaintenanceMarginAmount: BigNumber;
   maintenanceMarginAmount: BigNumber;
-  maxCollateralRatio: BigNumber;
 }
 
 export interface RefinanceCdpData {

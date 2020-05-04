@@ -124,7 +124,7 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
     const borrowAmount = new BigNumber(amountText)
     const refinanceData = Object.assign({}, this.state.loan);
     const collateralAmount = this.props.refinanceData.collateralAmount.dividedBy(this.props.refinanceData.debt.dividedBy(borrowAmount));
-    const collaterralWithRatio = collateralAmount.multipliedBy(refinanceData.maintenanceMarginAmount).div(this.props.refinanceData.maintenanceMarginAmount)
+    const collaterralWithRatio = collateralAmount.multipliedBy(refinanceData.collaterizationPercent).div(this.props.refinanceData.collaterizationPercent)
     refinanceData.collateralAmount = collaterralWithRatio;
 
     this.setState({
@@ -139,14 +139,17 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
   };
 
   public onCollaterizationChange = async (value: number) => {
- const newMMA = new BigNumber(value);
+
+    if (Math.abs(this.state.loan.collaterizationPercent!.dp(2, BigNumber.ROUND_FLOOR).toNumber() - value) < 1) return
+
+    const newCollaterizationPercent = new BigNumber(value);
 
     const refinanceData = Object.assign({}, this.state.loan);
     const collateralAmount = this.props.refinanceData.collateralAmount.dividedBy(this.props.refinanceData.debt.dividedBy(this.state.borrowAmount));
-    const collaterralWithRatio = collateralAmount.multipliedBy(newMMA).div(this.props.refinanceData.maintenanceMarginAmount)
+    const collaterralWithRatio = collateralAmount.multipliedBy(newCollaterizationPercent).div(this.props.refinanceData.collaterizationPercent)
     refinanceData.collateralAmount = collaterralWithRatio;
-    refinanceData.maintenanceMarginAmount =newMMA;
-    refinanceData.isDisabled = newMMA.lte(this.props.refinanceData.minMaintenanceMarginAmount!);
+    refinanceData.collaterizationPercent = newCollaterizationPercent;
+    refinanceData.isDisabled = newCollaterizationPercent.lte(this.props.refinanceData.maintenanceMarginAmount);
     this.setState({
       ...this.state,
       loan: refinanceData
@@ -239,7 +242,7 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
               </div>
             }
             {this.state.loan.isDisabled && !this.props.isMobileMedia &&
-              <div className="collaterization-warning">Collateralization should be {this.props.refinanceData.minMaintenanceMarginAmount!.toNumber()}%+</div>}
+              <div className="collaterization-warning">Collateralization should be {this.props.refinanceData.maintenanceMarginAmount.toNumber()}%+</div>}
           </div>
           <div className="refinance-asset-selector__torque">
             <div className="refinance-asset-selector__torque-logo">
@@ -295,12 +298,12 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
                   </div>
                 </div>
                 <div className="refinance-asset-selector__collateral-slider">
-                  <div className="collateral-value">{this.state.loan.maintenanceMarginAmount!.dp(2, BigNumber.ROUND_FLOOR).toNumber()}%</div>
+                  <div className="collateral-value">{this.state.loan.collaterizationPercent!.dp(2, BigNumber.ROUND_FLOOR).toNumber()}%</div>
                   <CollaterallRefinanceSlider
                     readonly={false}
-                    minValue={115}
-                    maxValue={this.state.loan.maxCollateralRatio!.multipliedBy(100).toNumber()}
-                    value={this.state.loan.maintenanceMarginAmount!.toNumber()}
+                    minValue={this.state.loan.maintenanceMarginAmount.dp(2, BigNumber.ROUND_FLOOR).toNumber()}
+                    maxValue={this.props.refinanceData.collaterizationPercent!.dp(2, BigNumber.ROUND_FLOOR).toNumber()}
+                    value={this.state.loan.collaterizationPercent!.dp(2, BigNumber.ROUND_FLOOR).toNumber()}
                     onChange={this.onCollaterizationChange}
                   />
                 </div>

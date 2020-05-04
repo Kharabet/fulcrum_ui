@@ -543,15 +543,6 @@ export class TorqueProvider {
     }
   };
 
-  public assignMakerCollateral = async (refinanceData: RefinanceData, borrowAmount: BigNumber, maintenanceMarginAmount: BigNumber) => {
-    const collateralAmount = refinanceData.collateralAmount.dividedBy(refinanceData.debt.dividedBy(borrowAmount));
-    const collaterralWithRatio = collateralAmount.multipliedBy(maintenanceMarginAmount).div(refinanceData.maintenanceMarginAmount)
-    refinanceData.collateralAmount = collaterralWithRatio;
-    refinanceData.maintenanceMarginAmount = maintenanceMarginAmount;
-    refinanceData.isDisabled = maintenanceMarginAmount.lte(refinanceData.minMaintenanceMarginAmount);
-    return refinanceData;
-  };
-
   public getCompoundLoans = async (): Promise<IRefinanceLoan[]> => {
 
     const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
@@ -944,6 +935,7 @@ export class TorqueProvider {
   public getCdpsVat = async (cdpId: BigNumber, urn: string, ilk: string, accountAddress: string, isProxy: boolean, isInstaProxy: boolean, proxyAddress: string, asset: Asset): Promise<RefinanceData> => {
     let result: RefinanceData = {
       collateralAmount: new BigNumber(0),
+      collaterizationPercent: new BigNumber(0),
       debt: new BigNumber(0),
       collateralType: "",
       cdpId: new BigNumber(0),
@@ -955,9 +947,7 @@ export class TorqueProvider {
       dust: new BigNumber(0),
       isShowCard: false,
       variableAPR: new BigNumber(0),
-      minMaintenanceMarginAmount: new BigNumber(0),
       maintenanceMarginAmount: new BigNumber(0),
-      maxCollateralRatio: new BigNumber(0),
     };
     if (this.web3Wrapper && this.contractsSource) {
       const vat: vatContract = await this.contractsSource.getVatContract(configAddress.MCD_VAT_Address);
@@ -1006,6 +996,7 @@ export class TorqueProvider {
 
       result = {
         collateralAmount: urnData[0].dividedBy(10 ** 18),
+        collaterizationPercent: ratio.times(100),
         debt: debtAmount,
         collateralType: collateralAsset,
         cdpId,
@@ -1017,9 +1008,7 @@ export class TorqueProvider {
         dust: ilkData[4].div(10 ** 27).div(10 ** 18),
         isShowCard,
         variableAPR: rateAmountIlkYr,
-        maintenanceMarginAmount: ratio.times(100),
-        minMaintenanceMarginAmount: maintenanceMarginAmount,
-        maxCollateralRatio: new BigNumber(5),
+        maintenanceMarginAmount: maintenanceMarginAmount
       };
     }
 
@@ -1126,6 +1115,7 @@ export class TorqueProvider {
             return null;
           }
         } catch (e) {
+          console.log(e)
           if (!e.code) {
             alert("Dry run failed");
           }
