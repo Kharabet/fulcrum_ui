@@ -490,14 +490,16 @@ export class TorqueProvider {
     console.log("collateralTokenAddress", collateralTokenAddress);
     const bigNumber = new BigNumber(2 * 10 ** 18); //bigNumber.toFixed() is workaround to prevent soliditySha3 error
     // @ts-ignore
-    const leverageAmount = web3.utils.soliditySha3(
-      { "type": "uint256", "value": bigNumber.toFixed() },
+    const leverageAmount = new BigNumber(web3.utils.soliditySha3(
+      { "type": "uint256", "value": "2000000000000000000" }, // use 2000000000000000000 for 150% initial margin
       { "type": "address", "value": collateralTokenAddress }
-    );
-    // @ts-ignore
-    const hash = await iToken.loanOrderHashes.callAsync(parseInt(leverageAmount, 10));
+    ));
+    const hash = await iToken.loanOrderHashes.callAsync(leverageAmount);
     console.log("hash", hash);
     const data = await iToken.loanOrderData.callAsync(hash);
+    console.log(data)
+    console.log("mincollateriazation", data[3].div(10**18).plus(100).toFixed())
+    return data[3].div(10**18).plus(100);
     return new BigNumber("150"); // TODO @bshevchenko return data[3];
   };
 
@@ -521,6 +523,7 @@ export class TorqueProvider {
           goal = goal.minus(goal.minus(current.plus(take)))
         }
         const maintenanceMarginAmount = await this.getMaintenanceMarginAmount(loan.asset, deposit.underlying);
+        loan.minMaintenanceMarginAmount = maintenanceMarginAmount
         loan.collateral.push({
           ...deposit,
           amount: take.div(deposit.rate),
@@ -546,8 +549,7 @@ export class TorqueProvider {
     const collaterralWithRatio = collateralAmount.multipliedBy(maintenanceMarginAmount).div(refinanceData.maintenanceMarginAmount)
     refinanceData.collateralAmount = collaterralWithRatio;
     refinanceData.maintenanceMarginAmount = maintenanceMarginAmount;
-    const minMaintenanceMarginAmount = new BigNumber(150);
-    refinanceData.isDisabled = maintenanceMarginAmount.lte(minMaintenanceMarginAmount);
+    refinanceData.isDisabled = maintenanceMarginAmount.lte(refinanceData.minMaintenanceMarginAmount);
     return refinanceData;
   };
 
@@ -954,6 +956,7 @@ export class TorqueProvider {
       dust: new BigNumber(0),
       isShowCard: false,
       variableAPR: new BigNumber(0),
+      minMaintenanceMarginAmount: new BigNumber(0),
       maintenanceMarginAmount: new BigNumber(0),
       maxCollateralRatio: new BigNumber(0),
     };
@@ -1016,6 +1019,7 @@ export class TorqueProvider {
         isShowCard,
         variableAPR: rateAmountIlkYr,
         maintenanceMarginAmount: ratio.times(100),
+        minMaintenanceMarginAmount: maintenanceMarginAmount,
         maxCollateralRatio: new BigNumber(5),
       };
     }

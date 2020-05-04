@@ -15,6 +15,7 @@ export interface RefinanceData {
   dust: BigNumber;
   isShowCard: boolean;
   variableAPR: BigNumber;
+  minMaintenanceMarginAmount: BigNumber;
   maintenanceMarginAmount: BigNumber;
   maxCollateralRatio: BigNumber;
 }
@@ -49,6 +50,7 @@ export interface IRefinanceLoan extends IRefinanceToken {
   apr: BigNumber;
   ratio: BigNumber;
   type: string;
+  minMaintenanceMarginAmount?: BigNumber;
 }
 
 export interface IRefinanceCollateral extends IRefinanceToken {

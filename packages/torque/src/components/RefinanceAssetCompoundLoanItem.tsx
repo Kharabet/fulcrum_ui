@@ -221,7 +221,7 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
             }
 
             {this.state.loan.isDisabled && !this.props.isMobileMedia &&
-              <div className="collaterization-warning">Collateralization should be 150%+</div>}
+              <div className="collaterization-warning">Collateralization should be {this.state.loan.minMaintenanceMarginAmount!.toNumber()}%+</div>}
           </div>
           <div className="refinance-asset-selector__torque">
             <div className="refinance-asset-selector__torque-logo">
@@ -306,7 +306,7 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
                   <div className="collateral-value">{this.state.loan.collateral[0].maintenanceMarginAmount!.dp(2, BigNumber.ROUND_FLOOR).toNumber()}%</div>
                   <CollaterallRefinanceSlider
                     readonly={false}
-                    minValue={115}
+                    minValue={this.state.loan.minMaintenanceMarginAmount!.toNumber()}
                     maxValue={this.state.loan.collateral[0].maxCollateralRatio!.multipliedBy(100).toNumber()}
                     value={this.state.loan.collateral[0].maintenanceMarginAmount!.toNumber()}
                     onChange={this.onCollaterizationChange}

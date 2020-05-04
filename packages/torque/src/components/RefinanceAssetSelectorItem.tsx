@@ -146,8 +146,7 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
     const collaterralWithRatio = collateralAmount.multipliedBy(newMMA).div(this.props.refinanceData.maintenanceMarginAmount)
     refinanceData.collateralAmount = collaterralWithRatio;
     refinanceData.maintenanceMarginAmount =newMMA;
-    const minMaintenanceMarginAmount = new BigNumber(150);
-    refinanceData.isDisabled = newMMA.lte(minMaintenanceMarginAmount);
+    refinanceData.isDisabled = newMMA.lte(this.props.refinanceData.minMaintenanceMarginAmount!);
     this.setState({
       ...this.state,
       loan: refinanceData
@@ -240,7 +239,7 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
               </div>
             }
             {this.state.loan.isDisabled && !this.props.isMobileMedia &&
-              <div className="collaterization-warning">Collateralization should be 150%+</div>}
+              <div className="collaterization-warning">Collateralization should be {this.props.refinanceData.minMaintenanceMarginAmount!.toNumber()}%+</div>}
           </div>
           <div className="refinance-asset-selector__torque">
             <div className="refinance-asset-selector__torque-logo">
