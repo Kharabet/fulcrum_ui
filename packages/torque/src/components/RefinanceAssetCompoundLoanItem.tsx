@@ -91,10 +91,13 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
     // setting inputAmountText to update display at the same time
     const borrowAmount = new BigNumber(amountText);
     let refinanceLoan: IRefinanceLoan = Object.assign({}, this.state.loan); //deep clone of props object
-    const divider = refinanceLoan.balance.div(borrowAmount);
-    refinanceLoan.usdValue = refinanceLoan.usdValue.div(divider);
-    refinanceLoan.balance = refinanceLoan.balance.div(divider);
-    await TorqueProvider.Instance.assignCollateral([refinanceLoan], TorqueProvider.Instance.compoundDeposits)
+
+    if (borrowAmount.gt(0)) {
+      const divider = refinanceLoan.balance.div(borrowAmount);
+      refinanceLoan.usdValue = refinanceLoan.usdValue.div(divider);
+      refinanceLoan.balance = refinanceLoan.balance.div(divider);
+      await TorqueProvider.Instance.assignCollateral([refinanceLoan], TorqueProvider.Instance.compoundDeposits)
+    }
     this.setState({
       ...this.state,
       inputAmountText: parseInt(amountText, 10),
