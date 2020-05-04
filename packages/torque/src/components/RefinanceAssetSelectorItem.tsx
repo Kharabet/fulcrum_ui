@@ -49,7 +49,7 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
   constructor(props: IRefinanceAssetSelectorItemProps) {
     super(props);
     this.state = {
-      isShow: true,
+      isShow: false,
       isShowInfoCollateralAssetDt0: false,
       inputAmountText: 0,
       borrowAmount: new BigNumber(0),

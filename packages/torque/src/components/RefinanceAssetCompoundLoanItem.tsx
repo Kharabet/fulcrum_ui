@@ -45,7 +45,7 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
   constructor(props: IRefinanceAssetCompoundLoanItemProps) {
     super(props);
     this.state = {
-      isShow: true,
+      isShow: false,
       isShowInfoCollateralAssetDt0: false,
       isShowInfoCollateralAssetDt1: false,
       inputAmountText: parseInt(this.props.loan.balance.dp(3, BigNumber.ROUND_FLOOR).toString(), 10),
