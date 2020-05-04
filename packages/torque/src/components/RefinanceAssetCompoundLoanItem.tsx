@@ -21,19 +21,17 @@ interface IRefinanceAssetCompoundLoanItemState {
   isShow: boolean;
   isShowInfoCollateralAssetDt0: boolean;
   isShowInfoCollateralAssetDt1: boolean;
-  isLoading: boolean;
   inputAmountText: number;
   borrowAmount: BigNumber;
   fixedApr: BigNumber;
   loan: IRefinanceLoan;
+  isLoadingTransaction: boolean;
 }
 
 interface IRefinanceAssetCompoundLoanItemProps {
   loan: IRefinanceLoan
   isMobileMedia: boolean;
   refinanceAssetItemName: string;
-  selectedRefinanceAssetItemName: string;
-  isLoadingTransaction: boolean
   onCompleted: (itemName: string) => void;
   onCanceled: (itemName: string) => void;
 }
@@ -51,8 +49,8 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
       inputAmountText: parseInt(this.props.loan.balance.dp(3, BigNumber.ROUND_FLOOR).toString(), 10),
       borrowAmount: this.props.loan.balance,
       fixedApr: new BigNumber(0),
-      isLoading: false,
-      loan: props.loan
+      loan: props.loan,
+      isLoadingTransaction: false
     };
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
     this._inputTextChange = new Subject<number>();
@@ -122,21 +120,21 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
   public migrateLoan = async () => {
     const loan = Object.assign({}, this.state.loan);
     let receipt;
-    this.setState({ ...this.state, isLoading: true });
-    if (this.state.loan.type == "dydx") {
-      receipt = await TorqueProvider.Instance.migrateSoloLoan(loan, this.state.borrowAmount); // TODO
-    } else {
-      receipt = await TorqueProvider.Instance.migrateCompoundLoan(loan, this.state.borrowAmount); // TODO
+    try {
+      this.setState({ ...this.state, isLoadingTransaction: true });
+      this.state.loan.type === "dydx"
+        ? receipt = await TorqueProvider.Instance.migrateSoloLoan(loan, this.state.borrowAmount)  //TODO
+        : receipt = await TorqueProvider.Instance.migrateCompoundLoan(loan, this.state.borrowAmount)  // TODO
+      if (receipt.status === 1) {
+        this.setState({ ...this.state, isLoadingTransaction: false });
+        this.props.onCompleted(this.props.refinanceAssetItemName);
+        window.location.href = "/dashboard";
+      }
+    } catch (error) {
+      this.setState({ ...this.state, isLoadingTransaction: false });
+      console.log(error);
+      this.props.onCanceled(this.props.refinanceAssetItemName);
     }
-
-    if (receipt !== null) {
-      this.props.onCompleted(this.props.refinanceAssetItemName);
-    }
-
-    this.setState({ ...this.state, isLoading: false });
-
-    this.props.onCanceled(this.props.refinanceAssetItemName);
-
   };
 
   private derivedUpdate = async () => {
@@ -164,18 +162,14 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
     const head_image = this.state.loan.type == "dydx" ? <DydxImg /> : <CompoundImg />;
     const showDetailsValue = !this.state.isShow ? "Show details" : "Hide details";
     const arrowIcon = this.state.isShow ? <TopArrow /> : <DownArrow />;
-    let btnValue = this.state.isLoading ? "Loading..." : 'Refinance with ' + this.state.fixedApr.dp(1, BigNumber.ROUND_CEIL).toString() + '% APR Fixed';
-    let btnActiveValue = 'Refinance with ' + this.state.fixedApr.dp(1, BigNumber.ROUND_CEIL).toString() + '% APR Fixed'
     const refRateYear = ((parseFloat(this.state.loan.apr.dp(0, BigNumber.ROUND_CEIL).toString()) - parseFloat(this.state.fixedApr.dp(1, BigNumber.ROUND_CEIL).toString())) * parseFloat(this.state.loan.balance.dp(3, BigNumber.ROUND_FLOOR).toString())) / 100;
     const refRateMonth = refRateYear / 12;
 
     return (
 
       <div className={`refinance-asset-selector-item ` + (this.state.isShowInfoCollateralAssetDt0 || this.state.isShowInfoCollateralAssetDt1 ? `inactive` : ``)}>
-        {this.props.refinanceAssetItemName === this.props.selectedRefinanceAssetItemName
-          ? this.props.isLoadingTransaction
-            ? <Loader quantityDots={4} sizeDots={'middle'} title={'Processed Token'} isOverlay={true} />
-            : null
+        {this.state.isLoadingTransaction
+          ? <Loader quantityDots={4} sizeDots={'middle'} title={'Processed Token'} isOverlay={true} />
           : null
         }
         <div className="refinance-asset__main-block">
@@ -328,17 +322,7 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
             </div>
             : <div className="refinance-asset-selector__desc" />
           }
-
-          {this.state.loan.isDisabled || this.state.borrowAmount.lte(0) || this.state.borrowAmount.gt(this.props.loan.balance) || this.state.isLoading ?
-            <button className="refinance-button disabled">
-              {btnValue}
-            </button>
-            :
-            <button className="refinance-button"
-              onClick={this.migrateLoan}>
-              {btnActiveValue}
-            </button>
-          }
+          <button className="refinance-button" onClick={this.migrateLoan}>Refinance with {this.state.fixedApr.dp(1, BigNumber.ROUND_CEIL).toString()} % APR Fixed</button>
         </div>
 
       </div >

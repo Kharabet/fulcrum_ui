@@ -25,7 +25,7 @@ export class Loader extends Component<ILoaderProps> {
     if (loaderWrapper) {
       const boundingClient = loaderWrapper.getBoundingClientRect();
       loaderWrapper!.style.top = -1 * boundingClient!.top + "px";
-      loaderWrapper!.style.left = -1 * (boundingClient!.left + 10) + "px";
+      loaderWrapper!.style.left = -1 * (boundingClient!.left + 20) + "px";
     }
   }
 
