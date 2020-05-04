@@ -248,15 +248,17 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
               <div className="manage-collateral-form__info-liquidated-at-container">
                 <div className="manage-collateral-form__info-liquidated-at-msg">
                   This will make your loan collateralized
-                  </div>
+                </div>
                 <div className="manage-collateral-form__info-liquidated-at-price">
-                  {this.state.collateralizedPercent.toFixed(2)}%
+                  <span>{this.state.collateralizedPercent.toFixed(2)}</span>%
                   </div>
               </div>
-
-              <div className={`manage-collateral-form__insufficient-balance ${!this.state.balanceTooLow ? `manage-collateral-form__insufficient-balance--hidden` : ``}`}>
-                Insufficient {this.state.assetDetails.displayName} balance in your wallet!
+              {this.state.balanceTooLow
+                ? <div className="manage-collateral-form__insufficient-balance">
+                  Insufficient {this.state.assetDetails.displayName} balance in your wallet!
                 </div>
+                : null
+              }
             </React.Fragment>
           ) : (
               <div className="manage-collateral-form__info-liquidated-at-container">
@@ -328,7 +330,7 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
               )}
           </div>
         </section>
-      </form>
+      </form >
     );
   }
 
