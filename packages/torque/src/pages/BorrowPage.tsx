@@ -57,7 +57,7 @@ export class BorrowPage extends PureComponent<IBorrowPageParams & RouteComponent
   private onSelectAsset = async (asset: Asset) => {
 
     if (!this.borrowDlgRef.current) return;
-    
+
     if (TorqueProvider.Instance.providerType === ProviderType.None || !TorqueProvider.Instance.contractsSource || !TorqueProvider.Instance.contractsSource.canWrite) {
       this.props.doNetworkConnect()
       return
@@ -67,8 +67,10 @@ export class BorrowPage extends PureComponent<IBorrowPageParams & RouteComponent
       const borrowRequest = await this.borrowDlgRef.current.getValue(asset);
       this.setState({ ...this.state, isLoadingTransaction: true, selectedAsset: asset });
       let receipt = await TorqueProvider.Instance.doBorrow(borrowRequest);
-      if (receipt.status === 1)
+      if (receipt.status === 1) {
         this.setState({ ...this.state, isLoadingTransaction: false, selectedAsset: asset });
+        window.location.href = "/dashboard";
+      }
     } catch (error) {
       console.error(error);
       this.setState({ ...this.state, isLoadingTransaction: false, selectedAsset: asset });
