@@ -174,7 +174,7 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
       <div className={`refinance-asset-selector-item ` + (this.state.isShowInfoCollateralAssetDt0 || this.state.isShowInfoCollateralAssetDt1 ? `inactive` : ``)}>
         {this.props.refinanceAssetItemName === this.props.selectedRefinanceAssetItemName
           ? this.props.isLoadingTransaction
-            ? <Loader quantityDots={3} sizeDots={'small'} title={'Processed Token'} isOverlay={true} />
+            ? <Loader quantityDots={4} sizeDots={'middle'} title={'Processed Token'} isOverlay={true} />
             : null
           : null
         }
