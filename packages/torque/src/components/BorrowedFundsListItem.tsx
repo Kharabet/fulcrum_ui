@@ -93,6 +93,12 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
 
     return (
       <div className={`borrowed-funds-list-item`}>
+        {this.props.item.loanAsset === this.props.selectedAsset
+          ? this.props.isLoadingTransaction
+            ? <Loader quantityDots={4} sizeDots={'middle'} title={'Processed Token'} isOverlay={true} />
+            : null
+          : null
+        }
         <div className="borrowed-funds-list-item__header">
           <div className="borrowed-funds-list-item__header-loan">
             <div
