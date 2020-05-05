@@ -40,8 +40,6 @@ interface IRefinanceAssetSelectorItemState {
 }
 
 export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelectorItemProps, IRefinanceAssetSelectorItemState> {
-  private _input: HTMLInputElement | null = null;
-  private readonly _inputTextChange: Subject<number>;
 
   constructor(props: IRefinanceAssetSelectorItemProps) {
     super(props);
@@ -56,19 +54,7 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
       isLoadingTransaction: false
     };
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
-    this._inputTextChange = new Subject<number>();
-    // this._inputTextChange
-    //   .pipe(
-    //     debounceTime(100),
-    //     switchMap(value => this.rxConvertToBigNumber(value)),
-    //     // switchMap(value => this.rxGetEstimate(value))
-    //   )
-    // .subscribe((value: IBorrowEstimate) => {
-    //   this.setState({
-    //     ...this.state,
-    //     depositAmount: value.depositAmount
-    //   });
-    // });
+    TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
   private onProviderAvailable = () => {
@@ -76,8 +62,14 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
     this.derivedUpdate();
   };
 
+  private onProviderChanged = () => {
+    // noinspection JSIgnoredPromiseFromCall
+    this.derivedUpdate();
+  };
+
   public componentWillUnmount(): void {
     TorqueProvider.Instance.eventEmitter.removeListener(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
+    TorqueProvider.Instance.eventEmitter.removeListener(TorqueProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
   public componentDidMount(): void {
@@ -96,17 +88,12 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
     }
   }
 
-  private _setInputRef = (input: HTMLInputElement) => {
-    this._input = input;
-  };
-
   private derivedUpdate = async () => {
     this.setState({
       ...this.state,
       inputAmountText: parseInt(this.state.loan.debt.toString(), 10),
       borrowAmount: this.state.loan.debt
     });
-    this._inputTextChange.next(this.state.inputAmountText);
     // @ts-ignore
     const interestRate = await TorqueProvider.Instance.getAssetInterestRate(Asset[this.state.loan.collateralType]);
     this.setState({ ...this.state, fixedApr: interestRate });
@@ -115,7 +102,7 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
   public loanAmountChange = async (event: ChangeEvent<HTMLInputElement>) => {
     // handling different types of empty values
     const amountText = event.target.value ? event.target.value : "0";
-    // console.log(amountText);
+    
     // setting inputAmountText to update display at the same time
     const borrowAmount = new BigNumber(amountText)
     const refinanceData = Object.assign({}, this.state.loan);
@@ -128,9 +115,6 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
       inputAmountText: parseInt(amountText, 10),
       borrowAmount: new BigNumber(amountText),
       loan: refinanceData
-    }, () => {
-      // emitting next event for processing with rx.js
-      this._inputTextChange.next(this.state.inputAmountText);
     });
   };
 
@@ -204,7 +188,6 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
             </div>
             <div className="refinance__input-container">
               <input
-                ref={this._setInputRef}
                 className={`input-amount ${this.state.borrowAmount.lte(0) || this.state.borrowAmount.gt(this.state.loan.debt)
                   ? "warning"
                   : ""}`}
