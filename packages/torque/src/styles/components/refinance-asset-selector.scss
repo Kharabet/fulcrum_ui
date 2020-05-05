@@ -142,7 +142,7 @@
               margin-top: 10px;
               font-weight: normal;
               font-size: 12px;
-              line-height: 130%;
+              line-height: 1;
               color: #de4a4a;
               max-width: 185px;
             }
@@ -228,7 +228,9 @@
         .loan-asset {
           position: relative;
           width: 40px;
-          height: 40px;
+          height: 60px;
+          display: flex;
+          align-items: center;
           .asset-icon {
             width: 40px;
             height: 40px;
@@ -240,6 +242,7 @@
           .asset-name {
             font-weight: normal;
             font-size: 12px;
+            line-height: 1.5;
             color: #758295;
             position: absolute;
             bottom: -20px;
