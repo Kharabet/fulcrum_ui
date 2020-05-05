@@ -95,14 +95,10 @@ export class DashboardPage extends PureComponent<
       this.derivedUpdate();
     }
   }
-  /*private onProviderAvailable = () => {
-    //console.log("onProviderAvailable");
-    this.refreshPage();
-  };*/
-
+  
   private onProviderChanged = () => {
     // console.log("onProviderChanged");
-    this.refreshPage();
+    this.derivedUpdate();
   };
 
   public componentWillUnmount(): void {
@@ -111,8 +107,7 @@ export class DashboardPage extends PureComponent<
   }
 
   public componentDidMount(): void {
-    // console.log("componentDidMount");
-    this.refreshPage();
+    this.derivedUpdate();
   }
 
   public render() {
@@ -125,9 +120,7 @@ export class DashboardPage extends PureComponent<
         <BorrowMoreDlg ref={this.borrowMoreDlgRef} />
         <div className="dashboard-page">
           <HeaderOps isMobileMedia={this.props.isMobileMedia} isLoading={this.props.isLoading} doNetworkConnect={this.props.doNetworkConnect} isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
-          
           <main>
-
             {!TorqueProvider.Instance.unsupportedNetwork ? (
               <React.Fragment>
                 {this.state.isDataLoading
@@ -135,9 +128,6 @@ export class DashboardPage extends PureComponent<
                   : (<div className="page-header">
                     <h1>Your Loans</h1>
                     <p>Lorem ipsum is placeholder text commonly used in the graphic, print, and publishing industries for previewing layouts and visual mockups.</p>
-                    {/* <div onClick={this.refreshPage} style={{ cursor: `pointer`, textAlign: `center`, fontSize: `2rem`, paddingBottom: `1.5rem` }}>
-                      Click to refresh and see recent loan activity.
-                        </div> */}
                   </div>)
                 }
                 <BorrowedFundsList
@@ -167,39 +157,17 @@ export class DashboardPage extends PureComponent<
     );
   }
 
-  private refreshPage = () => {
-    // this.derivedUpdate();
-    this.setState({
-      ...this.state,
-      isDataLoading: true,
-      items: [],
-      itemsAwaiting: []
-    },
-      () => {
-        setTimeout(() => {
-          this.derivedUpdate();
-          /*this.setState({
-            ...this.state,
-            isDataLoading: true
-          },
-          () => {
-            this.derivedUpdate();
-          });*/
-        }, 1000);
-      });
-  };
-
   private onRepayLoan = async (item: IBorrowedFundsState) => {
     if (!this.repayLoanDlgRef.current) return;
 
     try {
       const repayLoanRequest = await this.repayLoanDlgRef.current.getValue(item);
-      this.setState({...this.state, isLoadingTransaction: true, selectedAsset: item.loanAsset});
+      this.setState({ ...this.state, isLoadingTransaction: true, selectedAsset: item.loanAsset });
       let receipt = await TorqueProvider.Instance.doRepayLoan(repayLoanRequest);
       if (receipt.status === 1)
         this.setState({ ...this.state, isLoadingTransaction: false, selectedAsset: item.loanAsset });
     } catch (error) {
-      this.setState({...this.state, isLoadingTransaction: false, selectedAsset: item.loanAsset});
+      this.setState({ ...this.state, isLoadingTransaction: false, selectedAsset: item.loanAsset });
       console.error(error);
     }
   };
@@ -209,12 +177,12 @@ export class DashboardPage extends PureComponent<
 
     try {
       const extendLoanRequest = await this.extendLoanDlgRef.current.getValue(item);
-      this.setState({...this.state, isLoadingTransaction: true, selectedAsset: item.loanAsset});
+      this.setState({ ...this.state, isLoadingTransaction: true, selectedAsset: item.loanAsset });
       const receipt = await TorqueProvider.Instance.doExtendLoan(extendLoanRequest);
       if (receipt.status === 1)
-      this.setState({ ...this.state, isLoadingTransaction: false, selectedAsset: item.loanAsset });
+        this.setState({ ...this.state, isLoadingTransaction: false, selectedAsset: item.loanAsset });
     } catch (error) {
-      this.setState({...this.state, isLoadingTransaction: false, selectedAsset: item.loanAsset});
+      this.setState({ ...this.state, isLoadingTransaction: false, selectedAsset: item.loanAsset });
       console.error(error);
     }
   };
@@ -224,12 +192,12 @@ export class DashboardPage extends PureComponent<
 
     try {
       const manageCollateralRequest = await this.manageCollateralDlgRef.current.getValue(item);
-      this.setState({...this.state, isLoadingTransaction: true, selectedAsset: item.loanAsset});
+      this.setState({ ...this.state, isLoadingTransaction: true, selectedAsset: item.loanAsset });
       const receipt = await TorqueProvider.Instance.doManageCollateral(manageCollateralRequest);
       if (receipt.status === 1)
         this.setState({ ...this.state, isLoadingTransaction: false, selectedAsset: item.loanAsset });
     } catch (error) {
-      this.setState({...this.state, isLoadingTransaction: false, selectedAsset: item.loanAsset});
+      this.setState({ ...this.state, isLoadingTransaction: false, selectedAsset: item.loanAsset });
       console.error(error);
     }
   };
