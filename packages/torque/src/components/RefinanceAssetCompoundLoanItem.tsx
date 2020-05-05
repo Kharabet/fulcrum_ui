@@ -16,6 +16,7 @@ import { Loader } from "./Loader";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { CollaterallRefinanceSlider } from "./CollaterallRefinanceSlider";
+import { NavService } from '../services/NavService';
 
 interface IRefinanceAssetCompoundLoanItemState {
   isShow: boolean;
@@ -131,7 +132,7 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
       if (receipt.status === 1) {
         this.setState({ ...this.state, isLoadingTransaction: false });
         this.props.onCompleted(this.props.refinanceAssetItemName);
-        window.location.href = "/dashboard";
+        NavService.Instance.History.push("/dashboard");
       }
     } catch (error) {
       this.setState({ ...this.state, isLoadingTransaction: false });

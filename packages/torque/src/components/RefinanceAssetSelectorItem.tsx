@@ -18,6 +18,7 @@ import { Loader } from "./Loader";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { AssetDetails } from "../domain/AssetDetails";
 import { CollaterallRefinanceSlider } from "./CollaterallRefinanceSlider";
+import { NavService } from '../services/NavService';
 
 
 export interface IRefinanceAssetSelectorItemProps {
@@ -118,10 +119,7 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
     });
   };
 
-  public onCollaterizationChange = async (value: number) => {
-
-    if (Math.abs(this.state.loan.collaterizationPercent!.dp(2, BigNumber.ROUND_FLOOR).toNumber() - value) < 1) return
-
+  public changeCollaterization = async (value: number): Promise<RefinanceData> => {
     const newCollaterizationPercent = new BigNumber(value);
 
     const refinanceData = Object.assign({}, this.state.loan);
@@ -130,9 +128,17 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
     refinanceData.collateralAmount = collaterralWithRatio;
     refinanceData.collaterizationPercent = newCollaterizationPercent;
     refinanceData.isDisabled = newCollaterizationPercent.lte(this.props.refinanceData.maintenanceMarginAmount);
+    return refinanceData;
+  }
+
+  public onCollaterizationChange = async (value: number) => {
+
+    if (Math.abs(this.state.loan.collaterizationPercent!.dp(2, BigNumber.ROUND_FLOOR).toNumber() - value) < 1) return
+    const updatedLoan = await this.changeCollaterization(value)
+    
     this.setState({
       ...this.state,
-      loan: refinanceData
+      loan: updatedLoan
     });
   };
 
@@ -143,7 +149,7 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
       if (receipt.status === 1) {
         this.setState({ ...this.state, isLoadingTransaction: false });
         this.props.onCompleted(this.props.refinanceAssetItemName);
-        window.location.href = "/dashboard";
+        NavService.Instance.History.push("/dashboard");
       }
     } catch (error) {
       this.setState({ ...this.state, isLoadingTransaction: false });

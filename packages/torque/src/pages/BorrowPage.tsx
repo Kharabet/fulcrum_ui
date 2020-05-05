@@ -69,7 +69,7 @@ export class BorrowPage extends PureComponent<IBorrowPageParams & RouteComponent
       let receipt = await TorqueProvider.Instance.doBorrow(borrowRequest);
       if (receipt.status === 1) {
         this.setState({ ...this.state, isLoadingTransaction: false, selectedAsset: asset });
-        window.location.href = "/dashboard";
+        NavService.Instance.History.push("/dashboard");
       }
     } catch (error) {
       console.error(error);
