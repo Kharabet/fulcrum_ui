@@ -40,6 +40,9 @@
           .slider-handle{
             border: 4px solid #ffffff !important;
           }
+          .slider-track-after{
+            background-color: #f5f7f9 !important;
+          }
         }
       }
       &.inactive {
@@ -262,6 +265,9 @@
             }
             .slider-handle{
               border: 4px solid #f3f9ff;
+            }
+            .slider-track-after {
+              background-color: #ffffff;
             }
           }
           .refinance-asset-selector__collateral_info {
