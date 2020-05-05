@@ -45,6 +45,17 @@ export function CollaterallRefinanceSliderHandle({
           backgroundColor: "#8E7DF6"
         }}
       />
+      <div 
+        className="slider-track-after"
+        style={{
+        position: "absolute",
+        width: `${100 - percent}%`,        
+        height: "0.5rem",
+        right: "-1px",
+        transform: "translate(0%, -50%)",
+        borderRadius: "0.5rem",
+        pointerEvents: "none",
+      }} />
     </Fragment>
   );
 }
