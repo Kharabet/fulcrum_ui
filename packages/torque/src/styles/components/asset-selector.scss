@@ -8,11 +8,8 @@
     border-radius: 8px;
     background-color: #f3f9ff;
     border: 1px solid #f3f9ff;
-
-    transition-property: background-color, border-radius;
-    transition-duration: 0.2s, 1s;
-    transition-timing-function: linear;
     position: relative;
+    overflow: hidden;
     .loader-overlay {
       border-radius: 8px;
     }
@@ -22,6 +19,19 @@
       display: flex;
       flex-wrap: wrap;
       height: 205px;
+      position: relative;
+      z-index: 2;
+    }
+    &-bg {
+      width: 205px;
+      height: 205px;
+      border-radius: 50%;
+      position: absolute;
+      right: -50%;
+      bottom: -50%;
+      transition-property: width, height;
+      transition-duration: 0.3s, 0.3s;
+      transition-timing-function: linear;
     }
     .asset-selector__icon {
       display: flex;
@@ -70,6 +80,13 @@
             background-position: 200% center;
           }
         }
+      }
+      .asset-selector-item-bg {
+        width: 225px;
+        height: 225px;
+        transition-property: width, height;
+        transition-duration: 0.3s, 0.3s;
+        transition-timing-function: linear;
       }
     }
 
@@ -124,70 +141,6 @@
       }
     }
   }
-  .asset-selector-item {
-    bottom: 0;
-    background-repeat: no-repeat;
-    background-position: right bottom;
-    background-size: 102px;
-    transition-property: background-size;
-    transition-duration: 0.5s, 1s;
-    transition-timing-function: linear;
-    &:hover {
-      background-size: 123px;
-    }
-  }
-
-  .asset-selector-item--bat {
-    background-image: url("../../assets/images/bg_tile_bat.svg");
-  }
-
-  .asset-selector-item--zrx {
-    background-image: url("../../assets/images/intersect_zrx.svg");
-  }
-
-  .asset-selector-item--wbtc {
-    background-image: url("../../assets/images/intersect_wbtc.svg");
-  }
-
-  .asset-selector-item--sai {
-    background-image: url("../../assets/images/intersect_sai.svg");
-  }
-
-  .asset-selector-item--dai {
-    background-image: url("../../assets/images/Intersect_dai.svg");
-  }
-
-  .asset-selector-item--usdc {
-    background-image: url("../../assets/images/Intersect_usdc.svg");
-  }
-
-  .asset-selector-item--susd {
-    background-image: url("../../assets/images/intersect_susd.svg");
-  }
-
-  .asset-selector-item--eth {
-    background-image: url("../../assets/images/intersect_eth.svg");
-  }
-
-  .asset-selector-item--knc {
-    background-image: url("../../assets/images/intersect_knc.svg");
-  }
-
-  .asset-selector-item--link {
-    background-image: url("../../assets/images/intersect_link.svg");
-  }
-
-  .asset-selector-item--rep {
-    background-image: url("../../assets/images/intersect_rfp.svg");
-  }
-  .asset-selector-item--usdt {
-    background-image: url("../../assets/images/intersect_usdt.svg");
-  }
-  .asset-selector-item--mkr {
-    background-image: url("../../assets/images/bg_tile_mkr.svg");
-    background-repeat: no-repeat;
-    background-position: right;
-  }
 }
 @media screen and(min-width: $breakpoint-min-xl) {
   .asset-selector {
@@ -228,10 +181,7 @@
         padding: 15px;
         height: 150px;
         margin-right: 15px;
-        background-size: 84px;
-        &:hover {
-          background-size: 102px;
-        }
+
         .asset-selector__interest-rate {
           font-size: 32px;
         }
@@ -247,6 +197,16 @@
             width: 30px;
             height: auto;
           }
+        }
+      }
+      &-bg {
+        width: 174px;
+        height: 168px;
+      }
+      &:hover {
+        .asset-selector-item-bg {
+          width: 205px;
+          height: 205px;
         }
       }
     }
