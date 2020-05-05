@@ -16,7 +16,6 @@ export interface IRefinanceAssetSelectorProps {
 interface IRefinanceAssetSelectorItemState {
   asset: Asset,
   isLoading: boolean;
-  selectedRefinanceAssetItemName: string;
   isItems: boolean;
   refinanceData: RefinanceData[];
   refinanceCompoundData: IRefinanceLoan[];
@@ -29,7 +28,6 @@ export class RefinanceAssetSelector extends Component<IRefinanceAssetSelectorPro
       asset: Asset.DAI,
       isLoading: true,
       isItems: true,
-      selectedRefinanceAssetItemName: "",
       refinanceCompoundData: [],
       refinanceData: []
     };
@@ -49,18 +47,6 @@ export class RefinanceAssetSelector extends Component<IRefinanceAssetSelectorPro
     TorqueProvider.Instance.eventEmitter.removeListener(TorqueProviderEvents.ProviderAvailable, this.derivedUpdate);
     TorqueProvider.Instance.eventEmitter.removeListener(TorqueProviderEvents.ProviderChanged, this.derivedUpdate);
   }
-  private getSelectedRefinanceAssetItemName = async (itemName: string) => {
-    this.setState({
-      ...this.state,
-      selectedRefinanceAssetItemName: itemName
-    });
-    this.derivedUpdate();
-  }
-
-  private refinanceCompleted = async (itemName: string) => {
-    this.getSelectedRefinanceAssetItemName(itemName);
-  }
-
 
   private derivedUpdate = async () => {
     if (TorqueProvider.Instance.providerType === ProviderType.None || !TorqueProvider.Instance.contractsSource || !TorqueProvider.Instance.contractsSource.canWrite) {
@@ -133,22 +119,15 @@ export class RefinanceAssetSelector extends Component<IRefinanceAssetSelectorPro
         isMobileMedia={this.props.isMobileMedia}
         asset={Asset.DAI}
         refinanceData={refinanceDataItem}
-        onCompleted={this.refinanceCompleted}
-        onCanceled={this.getSelectedRefinanceAssetItemName}
-        refinanceAssetItemName={"RefinanceAssetSelectorItem" + index}
       />
     ));
     const soloCompoundItems = this.state.refinanceCompoundData.map((e, index) => (
       <RefinanceAssetCompoundLoanItem
         key={index}
         loan={e}
-        onCompleted={this.refinanceCompleted}
-        onCanceled={this.getSelectedRefinanceAssetItemName}
         isMobileMedia={this.props.isMobileMedia}
-        refinanceAssetItemName={"RefinanceAssetCompoundLoanItem" + index}
       />
     ));
-
 
     return this.state.isLoading ? null
       : <React.Fragment>

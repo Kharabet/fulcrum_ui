@@ -24,9 +24,6 @@ export interface IRefinanceAssetSelectorItemProps {
   isMobileMedia: boolean;
   asset: Asset;
   refinanceData: RefinanceData;
-  refinanceAssetItemName: string;
-  onCompleted: (itemName: string) => void;
-  onCanceled: (itemName: string) => void;
 }
 
 interface IRefinanceAssetSelectorItemState {
@@ -158,12 +155,10 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
       const receipt = await TorqueProvider.Instance.migrateMakerLoan(this.state.loan, this.state.borrowAmount);
       if (receipt.status === 1) {
         this.setState({ ...this.state, isLoadingTransaction: false });
-        this.props.onCompleted(this.props.refinanceAssetItemName);
         window.location.href = "/dashboard";
       }
     } catch (error) {
       this.setState({ ...this.state, isLoadingTransaction: false });
-      this.props.onCanceled(this.props.refinanceAssetItemName);
     }
   };
 
@@ -215,8 +210,8 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
                 onChange={this.loanAmountChange}
               />
 
-              {this.state.borrowAmount.lte(0) || this.state.borrowAmount.gt(this.props.refinanceData.debt) ?
-                <div className="refinance-details-msg--warning">
+              {this.state.borrowAmount.lte(0) || this.state.borrowAmount.gt(this.props.refinanceData.debt)
+                ? <div className="refinance-details-msg--warning">
                   {this.state.borrowAmount.lte(0) ? "Please enter value greater than 0" : ""}
                   {this.state.borrowAmount.gt(this.props.refinanceData.debt) ? "Please enter value less than or equal to " + this.state.loan.debt.dp(3, BigNumber.ROUND_FLOOR).toString() : ""}
                 </div>
@@ -232,7 +227,8 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
               </div>
             }
             {this.state.loan.isDisabled && !this.props.isMobileMedia &&
-              <div className="collaterization-warning">Collateralization should be {this.props.refinanceData.maintenanceMarginAmount.toNumber()}%+</div>}
+              <div className="collaterization-warning">Collateralization should be {this.props.refinanceData.maintenanceMarginAmount.toNumber()}%+</div>
+            }
           </div>
           <div className="refinance-asset-selector__torque">
             <div className="refinance-asset-selector__torque-logo">
@@ -271,12 +267,12 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
                     <div className="text">Collateral</div>
                     <div className="info-icon" onClick={this.showInfoCollateralAssetDt0}>
                       {iconInfoCollateralAssetDt0}
-
                     </div>
-                    {this.state.isShowInfoCollateralAssetDt0 && <React.Fragment>
-                      <div className="refinance-asset-selector__wrapper" onClick={this.showInfoCollateralAssetDt0}></div>
-                      <CollateralInfo />
-                    </React.Fragment>}
+                    {this.state.isShowInfoCollateralAssetDt0 &&
+                      <React.Fragment>
+                        <div className="refinance-asset-selector__wrapper" onClick={this.showInfoCollateralAssetDt0}></div>
+                        <CollateralInfo />
+                      </React.Fragment>}
                   </div>
                   <div className="collateral-asset">
                     <div className="asset-icon">
@@ -299,13 +295,13 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
                 </div>
               </div>}
             {this.state.loan.isDisabled && this.props.isMobileMedia &&
-              <div className="collaterization-warning">Collateralization should be {this.props.refinanceData.maintenanceMarginAmount.toNumber()}%+</div>}
-
+              <div className="collaterization-warning">Collateralization should be {this.props.refinanceData.maintenanceMarginAmount.toNumber()}%+</div>
+            }
           </div>
         </div>
         <div className="refinance-asset__action-block">
-          {this.state.loan.variableAPR.gt(this.state.fixedApr) ?
-            <div className="refinance-asset-selector__desc">
+          {this.state.loan.variableAPR.gt(this.state.fixedApr)
+            ? <div className="refinance-asset-selector__desc">
               Refinancing with&nbsp;<b>FIXED</b>&nbsp;rates could save you &nbsp;
               <div className="refinance-asset-selector__rs">${refRateMonth.toFixed(2)}/mo or
                 ${refRateYear.toFixed(2)}/yr

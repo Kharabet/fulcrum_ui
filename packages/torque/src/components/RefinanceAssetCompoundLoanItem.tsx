@@ -31,9 +31,6 @@ interface IRefinanceAssetCompoundLoanItemState {
 interface IRefinanceAssetCompoundLoanItemProps {
   loan: IRefinanceLoan
   isMobileMedia: boolean;
-  refinanceAssetItemName: string;
-  onCompleted: (itemName: string) => void;
-  onCanceled: (itemName: string) => void;
 }
 
 export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCompoundLoanItemProps, IRefinanceAssetCompoundLoanItemState> {
@@ -130,13 +127,11 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
         : receipt = await TorqueProvider.Instance.migrateCompoundLoan(loan, this.state.borrowAmount)  // TODO
       if (receipt.status === 1) {
         this.setState({ ...this.state, isLoadingTransaction: false });
-        this.props.onCompleted(this.props.refinanceAssetItemName);
         window.location.href = "/dashboard";
       }
     } catch (error) {
       this.setState({ ...this.state, isLoadingTransaction: false });
       console.log(error);
-      this.props.onCanceled(this.props.refinanceAssetItemName);
     }
   };
 
@@ -176,7 +171,6 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
           : null
         }
         <div className="refinance-asset__main-block">
-
           <div className="refinance-asset-selector__non-torque">
             <div className="refinance-asset-selector__non-torque-logo">
               {head_image}
@@ -197,8 +191,8 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
                 placeholder={`Amount`}
                 onChange={this.loanAmountChange}
               />
-              {this.state.borrowAmount.lte(0) || this.state.borrowAmount.gt(this.props.loan.balance) ?
-                <div className="refinance-details-msg--warning">
+              {this.state.borrowAmount.lte(0) || this.state.borrowAmount.gt(this.props.loan.balance)
+                ? <div className="refinance-details-msg--warning">
                   {this.state.borrowAmount.lte(0) ? "Please enter value greater than 0" : ""}
                   {this.state.borrowAmount.gt(this.props.loan.balance) ? "Please enter value less than or equal to " + this.props.loan.balance.dp(3, BigNumber.ROUND_FLOOR).toString() : ""}
                 </div>
@@ -213,9 +207,9 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
                 <div className="asset-name">{this.state.loan.asset}</div>
               </div>
             }
-
             {this.state.loan.isDisabled && !this.props.isMobileMedia &&
-              <div className="collaterization-warning">Collateralization should be {this.state.loan.maintenanceMarginAmount!.toNumber()}%+</div>}
+              <div className="collaterization-warning">Collateralization should be {this.state.loan.maintenanceMarginAmount!.toNumber()}%+</div>
+            }
           </div>
           <div className="refinance-asset-selector__torque">
             <div className="refinance-asset-selector__torque-logo">
@@ -309,14 +303,14 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
               </div>
             }
             {this.state.loan.isDisabled && this.props.isMobileMedia &&
-              <div className="collaterization-warning">Collateralization should be {this.state.loan.maintenanceMarginAmount!.toNumber()}%+</div>}
-
+              <div className="collaterization-warning">Collateralization should be {this.state.loan.maintenanceMarginAmount!.toNumber()}%+</div>
+            }
           </div>
           {/*<div className="refinance-asset-selector__type">1.500</div>*/}
         </div>
         <div className="refinance-asset__action-block">
-          {this.state.loan.apr.gt(this.state.fixedApr) ?
-            <div className="refinance-asset-selector__desc">
+          {this.state.loan.apr.gt(this.state.fixedApr)
+            ? <div className="refinance-asset-selector__desc">
               Refinancing with&nbsp;<b>FIXED</b>&nbsp;rates could save you &nbsp;
               <div className="refinance-asset-selector__rs">${refRateMonth.toFixed(2)}/mo or
                 ${refRateYear.toFixed(2)}/yr
@@ -326,8 +320,7 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
           }
           <button className="refinance-button" onClick={this.migrateLoan}>Refinance with {this.state.fixedApr.dp(1, BigNumber.ROUND_CEIL).toString()} % APR Fixed</button>
         </div>
-
-      </div >
+      </div>
     );
   }
 }
