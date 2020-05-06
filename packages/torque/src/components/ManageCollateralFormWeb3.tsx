@@ -47,7 +47,6 @@ interface IManageCollateralFormWeb3State {
 
 export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb3Props, IManageCollateralFormWeb3State> {
   private readonly selectedValueUpdate: Subject<number>;
-  private readonly _inputTextChange: Subject<string>;
   private _input: HTMLInputElement | null = null;
 
   constructor(props: IManageCollateralFormWeb3Props, context?: any) {
@@ -78,7 +77,8 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
     this.selectedValueUpdate
       .pipe(
         debounceTime(100),
-        switchMap(value => this.rxGetEstimate(value))
+        switchMap(value => this.rxConvertToBigNumber(value)),
+        switchMap(value => this.rxGetEstimate(value.toNumber()))
       )
       .subscribe((value: ICollateralChangeEstimate) => {
         this.setState({
@@ -88,17 +88,6 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
           collateralizedPercent: value.collateralizedPercent,
           inputAmountText: this.formatPrecision(value.collateralAmount.toString())
         });
-      });
-
-    this._inputTextChange = new Subject<string>();
-    this._inputTextChange
-      .pipe(
-        debounceTime(100),
-        switchMap(value => this.rxConvertToBigNumber(value)),
-        switchMap(value => this.rxGetEstimate(value.toNumber()))
-      )
-      .subscribe((value: ICollateralChangeEstimate) => {
-
       });
 
   }
@@ -222,7 +211,6 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
         this.setState(
           {
             ...this.state,
-            isLoading: true,
             gasAmountNeeded: gasAmountNeeded
           },
           () => {
@@ -370,8 +358,8 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
   };
 
 
-  private rxConvertToBigNumber = (textValue: string): Observable<BigNumber> => {
-    const collateralAmount = new BigNumber(textValue);
+  private rxConvertToBigNumber = (value: number): Observable<BigNumber> => {
+    const collateralAmount = new BigNumber(value);
 
     return new Observable<BigNumber>(observer => {
       observer.next(collateralAmount);
@@ -443,12 +431,6 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
 
       let collateralAmount = new BigNumber(Math.abs(Number(amountText)));
 
-
-      if (collateralAmount.gt(this.props.loanOrderState.amountOwed)) {
-        collateralAmount = this.props.loanOrderState.amountOwed;
-        amountText = collateralAmount.toString();
-      }
-
       if (Number(amountText) == 0) {
 
         this.setState({
@@ -476,16 +458,13 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
           ...this.state,
           inputAmountText: amountText,
           selectedValue: selectedValue,
-          collateralAmount: collateralAmount,
-          isLoading: true
+          collateralAmount: collateralAmount
         }, () => {
           // emitting next event for processing with rx.js
-          this._inputTextChange.next(this.state.inputAmountText);
+          this.selectedValueUpdate.next(this.state.selectedValue);
         });
 
       }
-
-
     }
   };
 
