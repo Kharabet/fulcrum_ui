@@ -10,14 +10,9 @@
   }
 
   &__insufficient-balance {
-    color: red;
+    color: #de4a4a;
     padding: 0.25rem;
     text-align: center;
-
-    &--hidden {
-      visibility: hidden;
-      height: 0;
-    }
   }
   .collateral-slider .rail-inner {
     height: 7px;

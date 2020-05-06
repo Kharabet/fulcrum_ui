@@ -18,17 +18,13 @@ import { Loader } from "./Loader";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { AssetDetails } from "../domain/AssetDetails";
 import { CollaterallRefinanceSlider } from "./CollaterallRefinanceSlider";
+import { NavService } from '../services/NavService';
 
 
 export interface IRefinanceAssetSelectorItemProps {
   isMobileMedia: boolean;
   asset: Asset;
   refinanceData: RefinanceData;
-  refinanceAssetItemName: string;
-  selectedRefinanceAssetItemName: string;
-  isLoadingTransaction: boolean
-  onCompleted: (itemName: string) => void;
-  onCanceled: (itemName: string) => void;
 }
 
 interface IRefinanceAssetSelectorItemState {
@@ -37,42 +33,26 @@ interface IRefinanceAssetSelectorItemState {
   loan: RefinanceData;
   inputAmountText: number;
   borrowAmount: BigNumber;
-  isLoading: boolean;
-  isTrack: boolean;
   fixedApr: BigNumber;
+  isLoadingTransaction: boolean;
 }
 
 export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelectorItemProps, IRefinanceAssetSelectorItemState> {
-  private _input: HTMLInputElement | null = null;
-  private readonly _inputTextChange: Subject<number>;
 
   constructor(props: IRefinanceAssetSelectorItemProps) {
     super(props);
     this.state = {
-      isShow: true,
+      isShow: false,
       isShowInfoCollateralAssetDt0: false,
       inputAmountText: 0,
       borrowAmount: new BigNumber(0),
 
-      isLoading: false,
-      isTrack: false,
       fixedApr: new BigNumber(0),
-      loan: props.refinanceData
+      loan: props.refinanceData,
+      isLoadingTransaction: false
     };
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
-    this._inputTextChange = new Subject<number>();
-    // this._inputTextChange
-    //   .pipe(
-    //     debounceTime(100),
-    //     switchMap(value => this.rxConvertToBigNumber(value)),
-    //     // switchMap(value => this.rxGetEstimate(value))
-    //   )
-    // .subscribe((value: IBorrowEstimate) => {
-    //   this.setState({
-    //     ...this.state,
-    //     depositAmount: value.depositAmount
-    //   });
-    // });
+    TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
   private onProviderAvailable = () => {
@@ -80,8 +60,14 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
     this.derivedUpdate();
   };
 
+  private onProviderChanged = () => {
+    // noinspection JSIgnoredPromiseFromCall
+    this.derivedUpdate();
+  };
+
   public componentWillUnmount(): void {
     TorqueProvider.Instance.eventEmitter.removeListener(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
+    TorqueProvider.Instance.eventEmitter.removeListener(TorqueProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
   public componentDidMount(): void {
@@ -100,17 +86,12 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
     }
   }
 
-  private _setInputRef = (input: HTMLInputElement) => {
-    this._input = input;
-  };
-
   private derivedUpdate = async () => {
     this.setState({
       ...this.state,
       inputAmountText: parseInt(this.state.loan.debt.toString(), 10),
       borrowAmount: this.state.loan.debt
     });
-    this._inputTextChange.next(this.state.inputAmountText);
     // @ts-ignore
     const interestRate = await TorqueProvider.Instance.getAssetInterestRate(Asset[this.state.loan.collateralType]);
     this.setState({ ...this.state, fixedApr: interestRate });
@@ -119,12 +100,12 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
   public loanAmountChange = async (event: ChangeEvent<HTMLInputElement>) => {
     // handling different types of empty values
     const amountText = event.target.value ? event.target.value : "0";
-    // console.log(amountText);
+    
     // setting inputAmountText to update display at the same time
     const borrowAmount = new BigNumber(amountText)
     const refinanceData = Object.assign({}, this.state.loan);
     const collateralAmount = this.props.refinanceData.collateralAmount.dividedBy(this.props.refinanceData.debt.dividedBy(borrowAmount));
-    const collaterralWithRatio = collateralAmount.multipliedBy(refinanceData.maintenanceMarginAmount).div(this.props.refinanceData.maintenanceMarginAmount)
+    const collaterralWithRatio = collateralAmount.multipliedBy(refinanceData.collaterizationPercent).div(this.props.refinanceData.collaterizationPercent)
     refinanceData.collateralAmount = collaterralWithRatio;
 
     this.setState({
@@ -132,41 +113,42 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
       inputAmountText: parseInt(amountText, 10),
       borrowAmount: new BigNumber(amountText),
       loan: refinanceData
-    }, () => {
-      // emitting next event for processing with rx.js
-      this._inputTextChange.next(this.state.inputAmountText);
     });
   };
 
-  public onCollaterizationChange = async (value: number) => {
- const newMMA = new BigNumber(value);
+  public changeCollaterization = async (value: number): Promise<RefinanceData> => {
+    const newCollaterizationPercent = new BigNumber(value);
 
     const refinanceData = Object.assign({}, this.state.loan);
     const collateralAmount = this.props.refinanceData.collateralAmount.dividedBy(this.props.refinanceData.debt.dividedBy(this.state.borrowAmount));
-    const collaterralWithRatio = collateralAmount.multipliedBy(newMMA).div(this.props.refinanceData.maintenanceMarginAmount)
+    const collaterralWithRatio = collateralAmount.multipliedBy(newCollaterizationPercent).div(this.props.refinanceData.collaterizationPercent)
     refinanceData.collateralAmount = collaterralWithRatio;
-    refinanceData.maintenanceMarginAmount =newMMA;
-    const minMaintenanceMarginAmount = new BigNumber(150);
-    refinanceData.isDisabled = newMMA.lte(minMaintenanceMarginAmount);
+    refinanceData.collaterizationPercent = newCollaterizationPercent;
+    refinanceData.isDisabled = newCollaterizationPercent.lte(this.props.refinanceData.maintenanceMarginAmount);
+    return refinanceData;
+  }
+
+  public onCollaterizationChange = async (value: number) => {
+
+    if (Math.abs(this.state.loan.collaterizationPercent!.dp(2, BigNumber.ROUND_FLOOR).toNumber() - value) < 1) return
+    const updatedLoan = await this.changeCollaterization(value)
+    
     this.setState({
       ...this.state,
-      loan: refinanceData
+      loan: updatedLoan
     });
   };
 
   private checkCdpManager = async () => {
-    if (this.state.isTrack) {
-      window.location.href = "/dashboard";
-    } else {
-      this.setState({ ...this.state, isLoading: true });
-      const refinanceData = await TorqueProvider.Instance.migrateMakerLoan(this.state.loan, this.state.borrowAmount);
-      if (refinanceData !== null) {
-        this.setState({ ...this.state, isLoading: false, isTrack: true });
-        this.props.onCompleted(this.props.refinanceAssetItemName);
-      } else {
-        this.setState({ ...this.state, isLoading: false, isTrack: false });
-        this.props.onCanceled(this.props.refinanceAssetItemName);
+    try {
+      this.setState({ ...this.state, isLoadingTransaction: true });
+      const receipt = await TorqueProvider.Instance.migrateMakerLoan(this.state.loan, this.state.borrowAmount);
+      if (receipt.status === 1) {
+        this.setState({ ...this.state, isLoadingTransaction: false });
+        NavService.Instance.History.push("/dashboard");
       }
+    } catch (error) {
+      this.setState({ ...this.state, isLoadingTransaction: false });
     }
   };
 
@@ -180,11 +162,8 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
   public render() {
     const asset = AssetsDictionary.assets.get(this.props.asset) as AssetDetails;
     const assetETH = AssetsDictionary.assets.get(Asset.ETH) as AssetDetails;
-    const btnValue = this.state.isLoading ? "Loading..." : "Refinance with " + this.state.fixedApr.dp(1, BigNumber.ROUND_CEIL).toString() + "% APR Fixed";
-    const btnActiveValue = this.state.isTrack ? "Track" : "Refinance with " + this.state.fixedApr.dp(1, BigNumber.ROUND_CEIL).toString() + "% APR Fixed";
     const refRateYear = ((parseFloat(this.state.loan.variableAPR.dp(0, BigNumber.ROUND_CEIL).toString()) - parseFloat(this.state.fixedApr.dp(1, BigNumber.ROUND_CEIL).toString())) * parseFloat(this.state.loan.debt.dp(3, BigNumber.ROUND_FLOOR).toString())) / 100;
     const refRateMonth = refRateYear / 12;
-    const btnCls = this.state.loan.variableAPR.gt(this.state.fixedApr) ? "mt30" : "";
     const iconInfoCollateralAssetDt0 = this.state.isShowInfoCollateralAssetDt0 ? <IconInfoActive /> : <IconInfo />;
     const showDetailsValue = !this.state.isShow ? "Show details" : "Hide details";
     const arrowIcon = this.state.isShow ? <TopArrow /> : <DownArrow />;
@@ -193,10 +172,8 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
 
     return (
       <div className={`refinance-asset-selector-item ` + (this.state.isShowInfoCollateralAssetDt0 ? `inactive` : ``)}>
-        {this.props.refinanceAssetItemName === this.props.selectedRefinanceAssetItemName
-          ? this.props.isLoadingTransaction
-            ? <Loader quantityDots={4} sizeDots={'middle'} title={'Processed Token'} isOverlay={true} />
-            : null
+        {this.state.isLoadingTransaction
+          ? <Loader quantityDots={4} sizeDots={'middle'} title={'Processed Token'} isOverlay={true} />
           : null
         }
 
@@ -212,7 +189,6 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
             </div>
             <div className="refinance__input-container">
               <input
-                ref={this._setInputRef}
                 className={`input-amount ${this.state.borrowAmount.lte(0) || this.state.borrowAmount.gt(this.state.loan.debt)
                   ? "warning"
                   : ""}`}
@@ -220,12 +196,11 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
                 step="any"
                 defaultValue={this.state.loan.debt.dp(3, BigNumber.ROUND_FLOOR).toString()}
                 placeholder={`Amount`}
-                disabled={this.state.loan.isDisabled}
                 onChange={this.loanAmountChange}
               />
 
-              {this.state.borrowAmount.lte(0) || this.state.borrowAmount.gt(this.props.refinanceData.debt) ?
-                <div className="refinance-details-msg--warning">
+              {this.state.borrowAmount.lte(0) || this.state.borrowAmount.gt(this.props.refinanceData.debt)
+                ? <div className="refinance-details-msg--warning">
                   {this.state.borrowAmount.lte(0) ? "Please enter value greater than 0" : ""}
                   {this.state.borrowAmount.gt(this.props.refinanceData.debt) ? "Please enter value less than or equal to " + this.state.loan.debt.dp(3, BigNumber.ROUND_FLOOR).toString() : ""}
                 </div>
@@ -241,7 +216,8 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
               </div>
             }
             {this.state.loan.isDisabled && !this.props.isMobileMedia &&
-              <div className="collaterization-warning">Collateralization should be 150%+</div>}
+              <div className="collaterization-warning">Collateralization should be {this.props.refinanceData.maintenanceMarginAmount.toNumber()}%+</div>
+            }
           </div>
           <div className="refinance-asset-selector__torque">
             <div className="refinance-asset-selector__torque-logo">
@@ -280,9 +256,9 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
                     <div className="text">Collateral</div>
                     <div className="info-icon" onClick={this.showInfoCollateralAssetDt0}>
                       {iconInfoCollateralAssetDt0}
-
                     </div>
-                    {this.state.isShowInfoCollateralAssetDt0 && <React.Fragment>
+                    {this.state.isShowInfoCollateralAssetDt0 &&
+                      <React.Fragment>
                       <div className="refinance-asset-selector__wrapper" onClick={this.showInfoCollateralAssetDt0}></div>
                       <CollateralInfo />
                     </React.Fragment>}
@@ -297,21 +273,24 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
                   </div>
                 </div>
                 <div className="refinance-asset-selector__collateral-slider">
-                  <div className="collateral-value">{this.state.loan.maintenanceMarginAmount!.dp(2, BigNumber.ROUND_FLOOR).toNumber()}%</div>
+                  <div className="collateral-value">{this.state.loan.collaterizationPercent!.dp(2, BigNumber.ROUND_FLOOR).toNumber()}%</div>
                   <CollaterallRefinanceSlider
                     readonly={false}
-                    minValue={115}
-                    maxValue={this.state.loan.maxCollateralRatio!.multipliedBy(100).toNumber()}
-                    value={this.state.loan.maintenanceMarginAmount!.toNumber()}
+                    minValue={this.state.loan.maintenanceMarginAmount.dp(2, BigNumber.ROUND_FLOOR).toNumber()}
+                    maxValue={this.props.refinanceData.collaterizationPercent!.dp(2, BigNumber.ROUND_FLOOR).toNumber()}
+                    value={this.state.loan.collaterizationPercent!.dp(2, BigNumber.ROUND_FLOOR).toNumber()}
                     onChange={this.onCollaterizationChange}
                   />
                 </div>
               </div>}
+            {this.state.loan.isDisabled && this.props.isMobileMedia &&
+              <div className="collaterization-warning">Collateralization should be {this.props.refinanceData.maintenanceMarginAmount.toNumber()}%+</div>
+            }
           </div>
         </div>
         <div className="refinance-asset__action-block">
-          {this.state.loan.variableAPR.gt(this.state.fixedApr) ?
-            <div className="refinance-asset-selector__desc">
+          {this.state.loan.variableAPR.gt(this.state.fixedApr)
+            ? <div className="refinance-asset-selector__desc">
               Refinancing with&nbsp;<b>FIXED</b>&nbsp;rates could save you &nbsp;
               <div className="refinance-asset-selector__rs">${refRateMonth.toFixed(2)}/mo or
                 ${refRateYear.toFixed(2)}/yr
@@ -319,16 +298,7 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
             </div>
             : <div className="refinance-asset-selector__desc" />
           }
-          {this.state.loan.isDisabled || this.state.borrowAmount.lte(0) || this.state.borrowAmount.gt(this.props.refinanceData.debt) || this.state.isLoading ?
-            <button className="refinance-button disabled">
-              {btnValue}
-            </button>
-            :
-            <button className="refinance-button"
-              onClick={this.checkCdpManager}>
-              {btnActiveValue}
-            </button>
-          }
+          <button className="refinance-button" onClick={this.checkCdpManager}>Refinance with {this.state.fixedApr.dp(1, BigNumber.ROUND_CEIL).toString()} % APR Fixed</button>
         </div>
       </div>
     )

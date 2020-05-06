@@ -41,7 +41,7 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
     prevState: Readonly<IBorrowedFundsListItemState>,
     snapshot?: any
   ): void {
-    if (this.props.item.loanAsset !== prevProps.item.loanAsset) {
+    if (this.props.item.loanAsset !== prevProps.item.loanAsset || this.props.isLoadingTransaction !== prevProps.isLoadingTransaction) {
       this.derivedUpdate();
     }
   }
@@ -93,6 +93,12 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
 
     return (
       <div className={`borrowed-funds-list-item`}>
+        {this.props.item.loanAsset === this.props.selectedAsset
+          ? this.props.isLoadingTransaction
+            ? <Loader quantityDots={4} sizeDots={'middle'} title={'Processed Token'} isOverlay={true} />
+            : null
+          : null
+        }
         <div className="borrowed-funds-list-item__header">
           <div className="borrowed-funds-list-item__header-loan">
             <div

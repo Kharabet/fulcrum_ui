@@ -55,7 +55,7 @@ export class AssetsDictionary {
         Bat_react_logo,
         bat_bg,
         bat_ts,
-        "#CC3D84",
+        "#FFE1D3",
         "#FFFFFF",
         "#FFFFFF",
         new Map<number, string | null>([
@@ -74,7 +74,7 @@ export class AssetsDictionary {
         Btc_react_logo,
         btc_bg,
         btc_ts,
-        "#F9B134",
+        "#E9CAEE",
         "#FFFFFF",
         "#FFFFFF",
         new Map<number, string | null>([
@@ -94,7 +94,7 @@ export class AssetsDictionary {
         Link_react_logo,
         link_bg,
         link_ts,
-        "#FFFFFF",
+        "#B9E9FF",
         "#444e5a",
         "#acb5c2",
         new Map<number, string | null>([
@@ -113,7 +113,7 @@ export class AssetsDictionary {
         Usdt_react_logo,
         usdt_bg,
         usdt_ts,
-        "#8777B1",
+        "#E1FFC4",
         "#FFFFFF",
         "#FFFFFF",
         new Map<number, string | null>([
@@ -133,7 +133,7 @@ export class AssetsDictionary {
         Sai_react_logo,
         sai_bg,
         sai_ts,
-        "#8777B1",
+        "#E3D9FF",
         "#FFFFFF",
         "#FFFFFF",
         new Map<number, string | null>([
@@ -153,7 +153,7 @@ export class AssetsDictionary {
         Dai_react_logo,
         dai_bg,
         dai_ts,
-        "#8777B1",
+        "#FFE9BE",
         "#FFFFFF",
         "#FFFFFF",
         new Map<number, string | null>([
@@ -174,7 +174,7 @@ export class AssetsDictionary {
         Usdc_react_logo,
         usdc_bg,
         usdc_ts,
-        "#00000000",
+        "#C8E0FA",
         "#444e5a",
         "#acb5c2",
         new Map<number, string | null>([
@@ -193,7 +193,7 @@ export class AssetsDictionary {
         Susd_react_logo,
         susd_bg,
         susd_ts,
-        "#00000000",
+        "#D9D5E9",
         "#444e5a",
         "#acb5c2",
         new Map<number, string | null>([
@@ -212,7 +212,7 @@ export class AssetsDictionary {
         Eth_react_logo,
         eth_bg,
         eth_ts,
-        "#FFFFFF",
+        "#ECECEC",
         "#444e5a",
         "#acb5c2",
         new Map<number, string | null>([
@@ -233,7 +233,7 @@ export class AssetsDictionary {
         Eth_react_logo,
         eth_bg,
         eth_ts,
-        "#FFFFFF",
+        "#ECECEC",
         "#444e5a",
         "#acb5c2",
         new Map<number, string | null>([
@@ -254,7 +254,7 @@ export class AssetsDictionary {
         Knc_react_logo,
         knc_bg,
         knc_ts,
-        "#31766E",
+        "#B4EAD9",
         "#FFFFFF",
         "#FFFFFF",
         new Map<number, string | null>([
@@ -274,7 +274,7 @@ export class AssetsDictionary {
         Mkr_react_logo,
         mkr_bg,
         mkr_ts,
-        "#00BB99",
+        "#CAF6D7",
         "#FFFFFF",
         "#FFFFFF",
         new Map<number, string | null>([
@@ -293,7 +293,7 @@ export class AssetsDictionary {
         Rep_react_logo,
         rep_bg,
         rep_ts,
-        "#8D3F76",
+        "#EACAE2",
         "#FFFFFF",
         "#FFFFFF",
         new Map<number, string | null>([
@@ -313,7 +313,7 @@ export class AssetsDictionary {
         Zrx_react_logo,
         zrx_bg,
         zrx_ts,
-        "#7368D0",
+        "#D8D3FF",
         "#FFFFFF",
         "#FFFFFF",
         new Map<number, string | null>([

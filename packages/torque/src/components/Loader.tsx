@@ -15,7 +15,7 @@ export class Loader extends Component<ILoaderProps> {
     const animationDuration = 0.7 * this.props.quantityDots;
     let wrapperDots = [];
     for (var i = 0; i < this.props.quantityDots; i++) {
-      wrapperDots.push(<span className={`${this.props.sizeDots}-dots`} style={{animationDuration : `${animationDuration}s`}}></span>)
+      wrapperDots.push(<span key={i} className={`${this.props.sizeDots}-dots`} style={{animationDuration : `${animationDuration}s`}}></span>)
     }
     return wrapperDots;
   }
@@ -25,7 +25,7 @@ export class Loader extends Component<ILoaderProps> {
     if (loaderWrapper) {
       const boundingClient = loaderWrapper.getBoundingClientRect();
       loaderWrapper!.style.top = -1 * boundingClient!.top + "px";
-      loaderWrapper!.style.left = -1 * (boundingClient!.left + 10) + "px";
+      loaderWrapper!.style.left = -1 * (boundingClient!.left + 20) + "px";
     }
   }
 

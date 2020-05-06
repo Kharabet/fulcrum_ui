@@ -98,13 +98,10 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
                   }
                 </React.Fragment>
               }
-              {this.state.balanceTooLow
-                ? <React.Fragment>
-                  <div className="borrow-form__insufficient-balance borrow-form__error">
-                    Insufficient {this.state.collateralAsset} balance in your wallet!
+              {this.state.balanceTooLow &&
+                <div className="borrow-form__insufficient-balance borrow-form__error">
+                  Insufficient {this.state.collateralAsset} balance in your wallet!
               </div>
-                </React.Fragment>
-                : null
               }
             </div>
           </div>
@@ -119,7 +116,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
                 onChange={this.onCollateralChange}
               />
             </div>
-            <button className={`btn btn-size--small ${this.state.didSubmit ? `btn-disabled` : ``}`} type="submit">
+            <button className={`btn btn-size--small ${this.state.didSubmit || this.state.balanceTooLow ? `btn-disabled` : ``}`} disabled={this.state.balanceTooLow} type="submit">
               {this.state.didSubmit ? "Submitting..." : "Borrow"}
             </button>
           </div>

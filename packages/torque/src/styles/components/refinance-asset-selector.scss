@@ -16,7 +16,7 @@
     &-item {
       position: relative;
       display: flex;
-      flex-direction: column;
+      flex-wrap: wrap;
       border-radius: 16px;
       background-color: #f3f9ff;
       border: 1px solid transparent;
@@ -40,6 +40,9 @@
           .slider-handle{
             border: 4px solid #ffffff !important;
           }
+          .slider-track-after{
+            background-color: #f5f7f9 !important;
+          }
         }
       }
       &.inactive {
@@ -50,9 +53,8 @@
         display: grid;
         grid-template-columns: repeat(2, 1fr);
 
-        padding: 40px;
-        padding-top: 55px;
-        border-bottom: 1px solid rgba(169, 181, 199, 0.2);
+        padding: 55px 40px 40px;
+        width: 100%;
         .refinance-asset-selector__non-torque {
           display: flex;
           flex-direction: column;
@@ -140,7 +142,7 @@
               margin-top: 10px;
               font-weight: normal;
               font-size: 12px;
-              line-height: 130%;
+              line-height: 1;
               color: #de4a4a;
               max-width: 185px;
             }
@@ -185,6 +187,9 @@
             .loan-value {
               position: relative;
               margin-right: 40px;
+              height: 60px;
+              display: flex;
+              align-items: center;
               .value {
                 font-weight: 800;
                 font-size: 28px;
@@ -206,7 +211,6 @@
             display: flex;
             align-items: center;
             cursor: pointer;
-            margin-bottom: 35px;
             p {
               font-weight: bold;
               font-size: 16px;
@@ -224,7 +228,9 @@
         .loan-asset {
           position: relative;
           width: 40px;
-          height: 40px;
+          height: 60px;
+          display: flex;
+          align-items: center;
           .asset-icon {
             width: 40px;
             height: 40px;
@@ -236,6 +242,7 @@
           .asset-name {
             font-weight: normal;
             font-size: 12px;
+            line-height: 1.5;
             color: #758295;
             position: absolute;
             bottom: -20px;
@@ -245,6 +252,7 @@
         }
         .refinance-asset-selector__collateral-container {
           position: relative;
+          margin-top: 35px;
          .refinance-asset-selector__collateral-slider{
             display: flex;
             flex-wrap: wrap;
@@ -260,6 +268,9 @@
             }
             .slider-handle{
               border: 4px solid #f3f9ff;
+            }
+            .slider-track-after {
+              background-color: #ffffff;
             }
           }
           .refinance-asset-selector__collateral_info {
@@ -370,6 +381,11 @@
       }
       .refinance-asset__action-block {
         padding: 40px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-self: flex-end;
+        border-top: 1px solid rgba(169, 181, 199, 0.2);
         .refinance-asset-selector {
           &__desc {
             display: flex;
@@ -435,6 +451,7 @@
   @media screen and (min-width: $breakpoint-mobile-min) {
     .refinance-asset-selector {
       &-item {
+        height: 100%;
         &:nth-child(odd) {
           place-self: end;
         }
@@ -643,7 +660,6 @@
             }
             &__rs {
               text-align: center;
-              font-weight: normal;
               font-size: 12px;
               line-height: 170%;
             }

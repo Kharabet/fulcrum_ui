@@ -5,6 +5,7 @@ import { Asset } from "./Asset";
 export interface RefinanceData {
   collateralType: string;
   collateralAmount: BigNumber;
+  collaterizationPercent: BigNumber;
   debt: BigNumber;
   cdpId: BigNumber;
   accountAddress: string;
@@ -16,7 +17,6 @@ export interface RefinanceData {
   isShowCard: boolean;
   variableAPR: BigNumber;
   maintenanceMarginAmount: BigNumber;
-  maxCollateralRatio: BigNumber;
 }
 
 export interface RefinanceCdpData {
@@ -39,7 +39,6 @@ export interface IRefinanceToken {
   decimals: number;
   underlying: string;
   maintenanceMarginAmount?: BigNumber;
-  maxCollateralRatio?: BigNumber;
 }
 
 export interface IRefinanceLoan extends IRefinanceToken {
@@ -54,6 +53,7 @@ export interface IRefinanceLoan extends IRefinanceToken {
 export interface IRefinanceCollateral extends IRefinanceToken {
   amount: BigNumber;
   borrowAmount: BigNumber;
+  collaterizationPercent: BigNumber;
 }
 
 export interface RefinanceCompoundData {

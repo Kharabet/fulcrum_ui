@@ -63,7 +63,7 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
     return (!this.state.interestRate.gt(0)
       ? <Loader quantityDots={5} sizeDots={'large'} title={'Loading'} isOverlay={false} />
       : <React.Fragment>
-        <div className={`asset-selector-item asset-selector-item--${this.props.asset.toLowerCase()}`}>
+        <div className="asset-selector-item">
           {this.props.asset === this.props.selectedAsset
             ? this.props.isLoadingTransaction
               ? <Loader quantityDots={3} sizeDots={'small'} title={'Processed Token'} isOverlay={true} />
@@ -94,6 +94,7 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
               </div>
             </div>
           </div>
+          <div className="asset-selector-item-bg" style={{backgroundColor: asset.bgColor}}></div>
         </div>
       </React.Fragment>
     )
