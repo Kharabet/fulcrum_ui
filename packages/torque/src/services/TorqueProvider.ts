@@ -50,6 +50,9 @@ import { NavService } from "./NavService";
 
 import { AbstractConnector } from '@web3-react/abstract-connector';
 import { ProviderTypeDictionary } from "../domain/ProviderTypeDictionary";
+import { RequestTask } from "../domain/RequestTask";
+import { RequestStatus } from "../domain/RequestStatus";
+import { TasksQueue } from "./TasksQueue";
 
 const web3: Web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
 let configAddress: any;
@@ -95,6 +98,9 @@ export class TorqueProvider {
     .minus(1);
 
   public static readonly ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
+
+  private isProcessing: boolean = false;
+  private isChecking: boolean = false;
 
   public readonly eventEmitter: EventEmitter;
   public providerType: ProviderType = ProviderType.None;
@@ -416,7 +422,7 @@ export class TorqueProvider {
     const srcAssetErc20Address = this.getErc20AddressOfAsset(srcAsset);
     const destAssetErc20Address = this.getErc20AddressOfAsset(destAsset);
     if (process.env.REACT_APP_ETH_NETWORK === "mainnet" || process.env.REACT_APP_ETH_NETWORK === "kovan") {
-      if (!srcAmount ) {
+      if (!srcAmount) {
         srcAmount = TorqueProvider.UNLIMITED_ALLOWANCE_IN_BASE_UNITS;
       } else {
         srcAmount = new BigNumber(srcAmount.toFixed(1, 1));
@@ -495,7 +501,7 @@ export class TorqueProvider {
     ));
     const hash = await iToken.loanOrderHashes.callAsync(leverageAmount);
     const data = await iToken.loanOrderData.callAsync(hash);
-    return data[3].div(10**18).plus(100);
+    return data[3].div(10 ** 18).plus(100);
     return new BigNumber("150"); // TODO @bshevchenko return data[3];
   };
 
@@ -2003,6 +2009,91 @@ export class TorqueProvider {
         return new BigNumber(10 ** 16);
     }
   }
+
+  private onTaskEnqueued = async (requestTask: RequestTask) => {
+    await this.processQueue(false, false);
+  };
+
+  public onTaskRetry = async (requestTask: RequestTask, skipGas: boolean) => {
+    await this.processQueue(true, skipGas);
+  };
+
+  public onTaskCancel = async (requestTask: RequestTask) => {
+    await this.cancelRequestTask(requestTask);
+    await this.processQueue(false, false);
+  };
+
+  private cancelRequestTask = async (requestTask: RequestTask) => {
+    if (!(this.isProcessing || this.isChecking)) {
+      this.isProcessing = true;
+
+      try {
+        const task = TasksQueue.Instance.peek();
+
+        if (task) {
+          if (task.request.id === requestTask.request.id) {
+            TasksQueue.Instance.dequeue();
+          }
+        }
+      } finally {
+        this.isProcessing = false;
+      }
+    }
+  };
+
+  private processQueue = async (force: boolean, skipGas: boolean) => {
+    if (!(this.isProcessing || this.isChecking)) {
+      let forceOnce = force;
+      do {
+        this.isProcessing = true;
+        this.isChecking = false;
+
+        try {
+          const task = TasksQueue.Instance.peek();
+
+          if (task) {
+            if (task.status === RequestStatus.FAILED_SKIPGAS) {
+              task.status = RequestStatus.FAILED;
+            }
+            if (task.status === RequestStatus.AWAITING || (task.status === RequestStatus.FAILED && forceOnce)) {
+              await this.processRequestTask(task, skipGas);
+              // @ts-ignore
+              if (task.status === RequestStatus.DONE) {
+                TasksQueue.Instance.dequeue();
+              }
+            } else {
+              if (task.status === RequestStatus.FAILED && !forceOnce) {
+                this.isProcessing = false;
+                this.isChecking = false;
+                break;
+              }
+            }
+          }
+        } finally {
+          forceOnce = false;
+          this.isChecking = true;
+          this.isProcessing = false;
+        }
+      } while (TasksQueue.Instance.any());
+      this.isChecking = false;
+    }
+  };
+
+  private processRequestTask = async (task: RequestTask, skipGas: boolean) => {
+    // if (task.request instanceof LendRequest) {
+    //   await this.processLendRequestTask(task, skipGas);
+    // }
+
+    // if (task.request instanceof FulcrumMcdBridgeRequest) {
+    //   await this.processFulcrumMcdBridgeRequestTask(task, skipGas);
+    // }
+
+    // if (task.request instanceof TradeRequest) {
+    //   await this.processTradeRequestTask(task, skipGas);
+    // }
+
+    return false;
+  };
 
   public waitForTransactionMined = async (
     txHash: string): Promise<any> => {
