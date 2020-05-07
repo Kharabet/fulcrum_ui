@@ -136,15 +136,13 @@
             .refinance-details-msg--warning,
             .text {
               position: absolute;
-              bottom: -20px;
               left: 0;
-              height: 15px;
               margin-top: 10px;
               font-weight: normal;
               font-size: 12px;
-              line-height: 1;
+              line-height: 1.3;
               color: #de4a4a;
-              max-width: 185px;
+              max-width: 170px;
             }
             .text {
               color: #758295;
@@ -422,7 +420,7 @@
           &:hover {
             background-color: #b79eff;
           }
-          &.disabled {
+          &:disabled, &[disabled] {
             color: #a3b0c2;
             background-color: #eaeaee;
             cursor: not-allowed;
@@ -612,8 +610,10 @@
             .refinance-asset-selector__collateral_info {
             }
             .refinance-asset-selector__collateral-slider{
-              width: 100%;
-              padding-left: 15px;
+              width: 100%;              
+              .collateral-value{
+                padding-left: 15px;
+              }
             }
           }
           .collaterization-warning {
