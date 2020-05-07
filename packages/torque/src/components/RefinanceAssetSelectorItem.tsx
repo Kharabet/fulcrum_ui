@@ -100,14 +100,15 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
   public loanAmountChange = async (event: ChangeEvent<HTMLInputElement>) => {
     // handling different types of empty values
     const amountText = event.target.value ? event.target.value : "0";
-    
+
     // setting inputAmountText to update display at the same time
     const borrowAmount = new BigNumber(amountText)
     const refinanceData = Object.assign({}, this.state.loan);
-    const collateralAmount = this.props.refinanceData.collateralAmount.dividedBy(this.props.refinanceData.debt.dividedBy(borrowAmount));
-    const collaterralWithRatio = collateralAmount.multipliedBy(refinanceData.collaterizationPercent).div(this.props.refinanceData.collaterizationPercent)
-    refinanceData.collateralAmount = collaterralWithRatio;
-
+    if (borrowAmount.lt(this.props.refinanceData.debt)) {
+      const collateralAmount = this.props.refinanceData.collateralAmount.dividedBy(this.props.refinanceData.debt.dividedBy(borrowAmount));
+      const collaterralWithRatio = collateralAmount.multipliedBy(refinanceData.collaterizationPercent).div(this.props.refinanceData.collaterizationPercent)
+      refinanceData.collateralAmount = collaterralWithRatio;
+    }
     this.setState({
       ...this.state,
       inputAmountText: parseInt(amountText, 10),
@@ -132,7 +133,7 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
 
     if (Math.abs(this.state.loan.collaterizationPercent!.dp(2, BigNumber.ROUND_FLOOR).toNumber() - value) < 1) return
     const updatedLoan = await this.changeCollaterization(value)
-    
+
     this.setState({
       ...this.state,
       loan: updatedLoan
@@ -259,9 +260,9 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
                     </div>
                     {this.state.isShowInfoCollateralAssetDt0 &&
                       <React.Fragment>
-                      <div className="refinance-asset-selector__wrapper" onClick={this.showInfoCollateralAssetDt0}></div>
-                      <CollateralInfo />
-                    </React.Fragment>}
+                        <div className="refinance-asset-selector__wrapper" onClick={this.showInfoCollateralAssetDt0}></div>
+                        <CollateralInfo />
+                      </React.Fragment>}
                   </div>
                   <div className="collateral-asset">
                     <div className="asset-icon">

@@ -115,7 +115,8 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
       const divider = refinanceLoan.balance.div(borrowAmount);
       refinanceLoan.usdValue = refinanceLoan.usdValue.div(divider);
       refinanceLoan.balance = refinanceLoan.balance.div(divider);
-      await TorqueProvider.Instance.assignCollateral([refinanceLoan], TorqueProvider.Instance.compoundDeposits)
+      if (borrowAmount.lt(this.props.loan.balance))
+        await TorqueProvider.Instance.assignCollateral([refinanceLoan], TorqueProvider.Instance.compoundDeposits)
     }
     this.setState({
       ...this.state,
@@ -314,7 +315,7 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
                 <div className="refinance-asset-selector__collateral-slider">
                   <div className="collateral-value">{this.state.loan.collateral[0].collaterizationPercent!.dp(2, BigNumber.ROUND_FLOOR).toNumber()}%</div>
                   <CollaterallRefinanceSlider
-                    readonly={false}
+                    readonly={this.state.borrowAmount.lte(0) || this.state.borrowAmount.gt(this.props.loan.balance)}
                     minValue={this.state.loan.maintenanceMarginAmount!.dp(2, BigNumber.ROUND_FLOOR).toNumber()}
                     maxValue={this.props.loan.collateral[0].collaterizationPercent!.dp(2, BigNumber.ROUND_FLOOR).toNumber()}
                     value={this.state.loan.collateral[0].collaterizationPercent!.dp(2, BigNumber.ROUND_FLOOR).toNumber()}
