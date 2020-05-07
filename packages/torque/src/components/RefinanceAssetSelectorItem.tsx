@@ -180,7 +180,6 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
 
         <div className="refinance-asset__main-block">
           <div className="refinance-asset-selector__non-torque">
-            <div className="refinance-asset-selector__cdp">CDP {this.state.loan.cdpId.toFixed(0)}</div>
             <div className="refinance-asset-selector__non-torque-logo">
               <MakerImg />
             </div>
@@ -218,6 +217,7 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
             }
           </div>
           <div className="refinance-asset-selector__torque">
+            <div className="refinance-asset-selector__cdp">CDP <span>{this.state.loan.cdpId.toFixed(0)}</span></div>
             <div className="refinance-asset-selector__torque-logo">
               <TorqueLogo />
             </div>
@@ -295,7 +295,7 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
             </div>
             : <div className="refinance-asset-selector__desc" />
           }
-          <button className="refinance-button" disabled={this.state.loan.isDisabled || this.state.borrowAmount.lte(0) ||this.state.borrowAmount.gt(this.props.refinanceData.debt)} onClick={this.checkCdpManager}>Refinance with {this.state.fixedApr.dp(1, BigNumber.ROUND_CEIL).toString()} % APR Fixed</button>
+          <button className="refinance-button" disabled={this.state.loan.isDisabled || this.state.borrowAmount.lte(0) || this.state.borrowAmount.gt(this.props.refinanceData.debt)} onClick={this.checkCdpManager}>Refinance with {this.state.fixedApr.dp(1, BigNumber.ROUND_CEIL).toString()} % APR Fixed</button>
         </div>
       </div>
     )
