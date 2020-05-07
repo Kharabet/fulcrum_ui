@@ -212,13 +212,10 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
                 placeholder={`Amount`}
                 onChange={this.loanAmountChange}
               />
-              {this.state.borrowAmount.lte(0) || this.state.borrowAmount.gt(this.props.loan.balance)
-                ? <div className="refinance-details-msg--warning">
-                  {this.state.borrowAmount.lte(0) ? "Please enter value greater than 0" : ""}
-                  {this.state.borrowAmount.gt(this.props.loan.balance) ? "Please enter value less than or equal to " + this.props.loan.balance.dp(3, BigNumber.ROUND_FLOOR).toString() : ""}
-                </div>
-                : <div className="text">Loan</div>
-              }
+              <div className="refinance-details-msg--warning">
+                {this.state.borrowAmount.lte(0) ? "Please enter value greater than 0" : ""}
+                {this.state.borrowAmount.gt(this.props.loan.balance) ? "Please enter value less than or equal to " + this.props.loan.balance.dp(3, BigNumber.ROUND_FLOOR).toString() : ""}
+              </div>
             </div>
             {this.props.isMobileMedia &&
               <div className="loan-asset">
@@ -339,7 +336,7 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
             </div>
             : <div className="refinance-asset-selector__desc" />
           }
-          <button className="refinance-button" onClick={this.migrateLoan}>Refinance with {this.state.fixedApr.dp(1, BigNumber.ROUND_CEIL).toString()} % APR Fixed</button>
+          <button className="refinance-button" disabled={this.state.loan.isDisabled || this.state.borrowAmount.lte(0) || this.state.borrowAmount.gt(this.props.loan.balance)} onClick={this.migrateLoan}>Refinance with {this.state.fixedApr.dp(1, BigNumber.ROUND_CEIL).toString()} % APR Fixed</button>
         </div>
       </div>
     );

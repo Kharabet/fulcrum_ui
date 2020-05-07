@@ -199,13 +199,10 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
                 onChange={this.loanAmountChange}
               />
 
-              {this.state.borrowAmount.lte(0) || this.state.borrowAmount.gt(this.props.refinanceData.debt)
-                ? <div className="refinance-details-msg--warning">
-                  {this.state.borrowAmount.lte(0) ? "Please enter value greater than 0" : ""}
-                  {this.state.borrowAmount.gt(this.props.refinanceData.debt) ? "Please enter value less than or equal to " + this.state.loan.debt.dp(3, BigNumber.ROUND_FLOOR).toString() : ""}
-                </div>
-                : <div className="text">Loan</div>
-              }
+              <div className="refinance-details-msg--warning">
+                {this.state.borrowAmount.lte(0) ? "Please enter value greater than 0" : ""}
+                {this.state.borrowAmount.gt(this.props.refinanceData.debt) ? "Please enter value less than or equal to " + this.state.loan.debt.dp(3, BigNumber.ROUND_FLOOR).toString() : ""}
+              </div>
             </div>
             {this.props.isMobileMedia &&
               <div className="loan-asset">
@@ -298,7 +295,7 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
             </div>
             : <div className="refinance-asset-selector__desc" />
           }
-          <button className="refinance-button" onClick={this.checkCdpManager}>Refinance with {this.state.fixedApr.dp(1, BigNumber.ROUND_CEIL).toString()} % APR Fixed</button>
+          <button className="refinance-button" disabled={this.state.loan.isDisabled || this.state.borrowAmount.lte(0) ||this.state.borrowAmount.gt(this.props.refinanceData.debt)} onClick={this.checkCdpManager}>Refinance with {this.state.fixedApr.dp(1, BigNumber.ROUND_CEIL).toString()} % APR Fixed</button>
         </div>
       </div>
     )
