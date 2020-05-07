@@ -1,6 +1,7 @@
 import { BigNumber } from "@0x/utils";
 import React, { ChangeEvent, Component, ReactElement } from "react";
 import { Subject } from "rxjs";
+import { ReactComponent as Arrow } from "../assets/images/arrow.svg";
 import { ReactComponent as CompoundImg } from "../assets/images/compound.svg";
 import { ReactComponent as DownArrow } from "../assets/images/down-arrow.svg";
 import { ReactComponent as TopArrow } from "../assets/images/top-arrow.svg";
@@ -195,6 +196,7 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
           <div className="refinance-asset-selector__non-torque">
             <div className="refinance-asset-selector__non-torque-logo">
               {this.state.head_image}
+              {!this.props.isMobileMedia && <Arrow />}
             </div>
             <div className="refinance-asset-selector__non-torque-apr">
               <div className="value">{this.state.loan.apr.dp(0, BigNumber.ROUND_CEIL).toString()}%</div>
@@ -227,6 +229,11 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
             }
             {this.state.loan.isDisabled && !this.props.isMobileMedia &&
               <div className="collaterization-warning">Collateralization should be {this.state.loan.maintenanceMarginAmount!.toNumber()}%+</div>
+            }
+            {this.props.isMobileMedia &&
+              <div className="refinance-asset-selector__arrow">
+                <Arrow />
+              </div>
             }
           </div>
           <div className="refinance-asset-selector__torque">

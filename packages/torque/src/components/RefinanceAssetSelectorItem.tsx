@@ -2,7 +2,7 @@ import { BigNumber } from "@0x/utils";
 import React, { ChangeEvent, Component } from "react";
 import { Subject } from "rxjs";
 // import { debounceTime, switchMap } from "rxjs/operators";
-import { ReactComponent as ArrowRight } from "../assets/images/arrow.svg";
+import { ReactComponent as Arrow } from "../assets/images/arrow.svg";
 import { ReactComponent as MakerImg } from "../assets/images/maker.svg";
 import { ReactComponent as TorqueLogo } from "../assets/images/torque_logo.svg";
 import { Asset } from "../domain/Asset";
@@ -182,6 +182,7 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
             <div className="refinance-asset-selector__cdp">CDP {this.state.loan.cdpId.toFixed(0)}</div>
             <div className="refinance-asset-selector__non-torque-logo">
               <MakerImg />
+              {!this.props.isMobileMedia && <Arrow />}
             </div>
             <div className="refinance-asset-selector__non-torque-apr">
               <div className="value">{this.state.loan.variableAPR.dp(0, BigNumber.ROUND_CEIL).toString()}%</div>
@@ -214,6 +215,11 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
             }
             {this.state.loan.isDisabled && !this.props.isMobileMedia &&
               <div className="collaterization-warning">Collateralization should be {this.props.refinanceData.maintenanceMarginAmount.toNumber()}%+</div>
+            }
+            {this.props.isMobileMedia &&
+              <div className="refinance-asset-selector__arrow">
+                <Arrow />
+              </div>
             }
           </div>
           <div className="refinance-asset-selector__torque">
