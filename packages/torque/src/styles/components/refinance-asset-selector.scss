@@ -133,8 +133,7 @@
                 -moz-appearance: textfield; /* Firefox */
               }
             }
-            .refinance-details-msg--warning,
-            .text {
+            .refinance-details-msg--warning {
               position: absolute;
               left: 0;
               margin-top: 10px;
@@ -143,9 +142,6 @@
               line-height: 1.3;
               color: #de4a4a;
               max-width: 170px;
-            }
-            .text {
-              color: #758295;
             }
           }
         }
@@ -527,9 +523,6 @@
               .input-amount {
               }
               .refinance-details-msg--warning {
-              }
-              .text {
-                padding-left: 15px;
               }
             }
             .collaterization-warning {

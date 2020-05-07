@@ -241,7 +241,6 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
             <div className="refinance-asset-selector__torque-loan-container">
               <div className="loan-value">
                 <div className="value">{this.state.borrowAmount.dp(3, BigNumber.ROUND_FLOOR).toString()}</div>
-                <div className="text">Loan</div>
               </div>
               <div className="loan-asset">
                 <div className="asset-icon">
