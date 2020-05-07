@@ -36,11 +36,11 @@
         .refinance-asset__main-block .refinance-asset-selector__non-torque .refinance__input-container .input-amount {
           background-color: #f5f7f9;
         }
-        .refinance-asset-selector__collateral-slider{
-          .slider-handle{
+        .refinance-asset-selector__collateral-slider {
+          .slider-handle {
             border: 4px solid #ffffff !important;
           }
-          .slider-track-after{
+          .slider-track-after {
             background-color: #f5f7f9 !important;
           }
         }
@@ -247,21 +247,21 @@
         .refinance-asset-selector__collateral-container {
           position: relative;
           margin-top: 35px;
-         .refinance-asset-selector__collateral-slider{
+          .refinance-asset-selector__collateral-slider {
             display: flex;
             flex-wrap: wrap;
             padding-top: 35px;
             width: 180px;
-            .collateral-value{
+            .collateral-value {
               color: #283049;
               width: 100%;
               font-size: 28px;
               line-height: 1.5;
               font-style: normal;
-              font-weight: 800;              
+              font-weight: 800;
               margin-bottom: 15px;
             }
-            .slider-handle{
+            .slider-handle {
               border: 4px solid #f3f9ff;
             }
             .slider-track-after {
@@ -372,6 +372,9 @@
           font-size: 16px;
           line-height: 140%;
           color: #de4a4a;
+          &.hidden-details {
+            margin-top: 41px;
+          }
         }
       }
       .refinance-asset__action-block {
@@ -417,7 +420,8 @@
           &:hover {
             background-color: #b79eff;
           }
-          &:disabled, &[disabled] {
+          &:disabled,
+          &[disabled] {
             color: #a3b0c2;
             background-color: #eaeaee;
             cursor: not-allowed;
@@ -603,11 +607,11 @@
             align-items: center;
             .refinance-asset-selector__collateral_info {
             }
-            .refinance-asset-selector__collateral-slider{
-              width: 100%;              
-              .collateral-value{
+            .refinance-asset-selector__collateral-slider {
+              width: 100%;
+              .collateral-value {
                 padding-left: 15px;
-            color: #283049;
+                color: #283049;
               }
             }
           }
