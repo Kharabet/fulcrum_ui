@@ -71,7 +71,8 @@ export class RepayLoanDlg extends Component<any, IRepayLoanDlgState> {
 
   private onFormDecline = async () => {
     if (this.state.executorParams) {
-      this.state.executorParams.reject();
+            this.state.executorParams.reject(new Error("Form closed"));
+;
     }
     await this.hide();
   };

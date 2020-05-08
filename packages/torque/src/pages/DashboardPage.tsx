@@ -95,7 +95,7 @@ export class DashboardPage extends PureComponent<
       this.derivedUpdate();
     }
   }
-  
+
   private onProviderChanged = () => {
     // console.log("onProviderChanged");
     this.derivedUpdate();
@@ -168,7 +168,8 @@ export class DashboardPage extends PureComponent<
         this.setState({ ...this.state, isLoadingTransaction: false, selectedAsset: item.loanAsset });
     } catch (error) {
       this.setState({ ...this.state, isLoadingTransaction: false, selectedAsset: item.loanAsset });
-      console.error(error);
+      if (error.message !== "Form closed")
+        console.error(error);
     }
   };
 
@@ -183,7 +184,8 @@ export class DashboardPage extends PureComponent<
         this.setState({ ...this.state, isLoadingTransaction: false, selectedAsset: item.loanAsset });
     } catch (error) {
       this.setState({ ...this.state, isLoadingTransaction: false, selectedAsset: item.loanAsset });
-      console.error(error);
+      if (error.message !== "Form closed")
+        console.error(error);
     }
   };
 
@@ -198,7 +200,8 @@ export class DashboardPage extends PureComponent<
         this.setState({ ...this.state, isLoadingTransaction: false, selectedAsset: item.loanAsset });
     } catch (error) {
       this.setState({ ...this.state, isLoadingTransaction: false, selectedAsset: item.loanAsset });
-      console.error(error);
+      if (error.message !== "Form closed")
+        console.error(error);
     }
   };
 
@@ -209,7 +212,8 @@ export class DashboardPage extends PureComponent<
       const borrowMoreRequest = await this.borrowMoreDlgRef.current.getValue(item);
       // await TorqueProvider.Instance.doBorrow(borrowMoreRequest);
     } catch (error) {
-      console.error(error);
+      if (error.message !== "Form closed")
+        console.error(error);
     }
   };
 }

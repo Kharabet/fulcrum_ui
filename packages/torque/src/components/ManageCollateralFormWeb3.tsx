@@ -425,47 +425,44 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
   public onTradeAmountChange = (event: ChangeEvent<HTMLInputElement>) => {
 
     let amountText = event.target.value ? event.target.value : "";
-    const regexp = /^[-]?((\d+(\.\d{0,5})?)|(\.\d{0,5}}))$/;
 
-    if (amountText === "" || regexp.test(amountText)) {
+    let collateralAmount = new BigNumber(Math.abs(Number(amountText)));
 
-      let collateralAmount = new BigNumber(Math.abs(Number(amountText)));
+    if (Number(amountText) == 0) {
 
-      if (Number(amountText) == 0) {
+      this.setState({
+        ...this.state,
+        inputAmountText: amountText
+      })
+    } else {
 
-        this.setState({
-          ...this.state,
-          inputAmountText: amountText
-        })
-      } else {
+      let selectedValue = (Number(amountText) > 0 ?
 
-        let selectedValue = (Number(amountText) > 0 ?
-
-          collateralAmount
-            .dividedBy(this.props.loanOrderState.collateralAmount)
-            .multipliedBy(this.state.maxValue - this.state.loanValue)
-            .plus(this.state.loanValue)
-          :
-          new BigNumber(this.state.loanValue)
-            .minus(
-              collateralAmount
-                .dividedBy(this.state.collateralExcess)
-                .multipliedBy(this.state.loanValue)
-            )).toNumber();
+        collateralAmount
+          .dividedBy(this.props.loanOrderState.collateralAmount)
+          .multipliedBy(this.state.maxValue - this.state.loanValue)
+          .plus(this.state.loanValue)
+        :
+        new BigNumber(this.state.loanValue)
+          .minus(
+            collateralAmount
+              .dividedBy(this.state.collateralExcess)
+              .multipliedBy(this.state.loanValue)
+          )).toNumber();
 
 
-        this.setState({
-          ...this.state,
-          inputAmountText: amountText,
-          selectedValue: selectedValue,
-          collateralAmount: collateralAmount
-        }, () => {
-          // emitting next event for processing with rx.js
-          this.selectedValueUpdate.next(this.state.selectedValue);
-        });
+      this.setState({
+        ...this.state,
+        inputAmountText: amountText,
+        selectedValue: selectedValue,
+        collateralAmount: collateralAmount
+      }, () => {
+        // emitting next event for processing with rx.js
+        this.selectedValueUpdate.next(this.state.selectedValue);
+      });
 
-      }
     }
+
   };
 
   public changeStateLoading = () => {

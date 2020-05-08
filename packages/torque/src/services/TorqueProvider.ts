@@ -416,7 +416,7 @@ export class TorqueProvider {
     const srcAssetErc20Address = this.getErc20AddressOfAsset(srcAsset);
     const destAssetErc20Address = this.getErc20AddressOfAsset(destAsset);
     if (process.env.REACT_APP_ETH_NETWORK === "mainnet" || process.env.REACT_APP_ETH_NETWORK === "kovan") {
-      if (!srcAmount) {
+      if (!srcAmount ) {
         srcAmount = TorqueProvider.UNLIMITED_ALLOWANCE_IN_BASE_UNITS;
       } else {
         srcAmount = new BigNumber(srcAmount.toFixed(1, 1));
@@ -487,18 +487,14 @@ export class TorqueProvider {
       throw new Error("contractsSource is not defined");
     }
     const iToken = await this.contractsSource.getiTokenContract(asset);
-    console.log("collateralTokenAddress", collateralTokenAddress);
-    const bigNumber = new BigNumber(2 * 10 ** 18); //bigNumber.toFixed() is workaround to prevent soliditySha3 error
+
     // @ts-ignore
     const leverageAmount = new BigNumber(web3.utils.soliditySha3(
       { "type": "uint256", "value": "2000000000000000000" }, // use 2000000000000000000 for 150% initial margin
       { "type": "address", "value": collateralTokenAddress }
     ));
     const hash = await iToken.loanOrderHashes.callAsync(leverageAmount);
-    console.log("hash", hash);
     const data = await iToken.loanOrderData.callAsync(hash);
-    console.log(data)
-    console.log("mincollateriazation", data[3].div(10**18).plus(100).toFixed())
     return data[3].div(10**18).plus(100);
     return new BigNumber("150"); // TODO @bshevchenko return data[3];
   };

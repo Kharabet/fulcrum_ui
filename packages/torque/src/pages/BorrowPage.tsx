@@ -72,7 +72,8 @@ export class BorrowPage extends PureComponent<IBorrowPageParams & RouteComponent
         NavService.Instance.History.push("/dashboard");
       }
     } catch (error) {
-      console.error(error);
+      if (error.message !== "Form closed")
+        console.error(error);
       this.setState({ ...this.state, isLoadingTransaction: false, selectedAsset: asset });
     }
   };

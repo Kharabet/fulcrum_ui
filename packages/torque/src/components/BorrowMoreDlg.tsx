@@ -71,7 +71,7 @@ export class BorrowMoreDlg extends Component<any, IBorrowMoreDlgState> {
 
   private onFormDecline = async () => {
     if (this.state.executorParams) {
-      this.state.executorParams.reject();
+      this.state.executorParams.reject(new Error("Form closed"));
     }
     await this.hide();
   };
