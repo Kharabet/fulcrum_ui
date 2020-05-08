@@ -82,6 +82,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
               className="borrow-form__input-amount"
               type="number"
               step="any"
+              value={this.state.inputAmountText}
               onChange={this.onTradeAmountChange}
               placeholder={`Enter amount`}
             />
@@ -146,6 +147,10 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
   private onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
+    if (this.state.borrowAmount.lte(0) || this.state.depositAmount.lte(0)) {
+      return;
+    }
+
     if (this.props.onSubmit && !this.state.didSubmit && this.state.depositAmount.gt(0)) {
       this.setState({ ...this.state, didSubmit: true });
       let balanceTooLow = await this.checkBalanceTooLow(this.state.collateralAsset);
@@ -203,17 +208,17 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
 
   public onTradeAmountChange = async (event: ChangeEvent<HTMLInputElement>) => {
     // handling different types of empty values
-    const amountText = event.target.value ? event.target.value : "";
+    let inputAmountText = event.target.value ? event.target.value : "";
+    if (inputAmountText === "" || parseFloat(inputAmountText) < 0 ) return;
     // setting inputAmountText to update display at the same time
-    this.setState({
+    await this.setState({
       ...this.state,
-      inputAmountText: amountText,
-      borrowAmount: new BigNumber(amountText),
+      inputAmountText: inputAmountText,
+      borrowAmount: new BigNumber(inputAmountText),
       isLoading: true
-    }, () => {
-      // emitting next event for processing with rx.js
-      this._inputTextChange.next(this.state.inputAmountText);
     });
+    this._inputTextChange.next(this.state.inputAmountText);
+
   };
 
   private checkBalanceTooLow = async (collateralAsset: Asset) => {

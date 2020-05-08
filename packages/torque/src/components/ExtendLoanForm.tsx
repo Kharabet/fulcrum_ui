@@ -256,7 +256,11 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
   public onSubmitClick = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (!this.state.didSubmit && this.state.depositAmount.gt(0)) {
+    if (this.state.depositAmount.lte(0)) {
+      return;
+    }
+
+    if (!this.state.didSubmit) {
       this.setState({ ...this.state, didSubmit: true });
 
       let assetBalance = await TorqueProvider.Instance.getAssetTokenBalanceOfUser(this.props.loanOrderState.loanAsset);
@@ -293,12 +297,14 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
     }
   };
 
-  public onTradeAmountChange = (event: ChangeEvent<HTMLInputElement>) => {
+  public onTradeAmountChange = async (event: ChangeEvent<HTMLInputElement>) => {
     let inputAmountText = event.target.value ? event.target.value : "";
+    if (inputAmountText === "" || parseFloat(inputAmountText) < 0 ) return;
+
     let depositAmount = new BigNumber(inputAmountText);
     let selectedValue = this.getSelectedValue(inputAmountText);
 
-    this.setState({
+    await this.setState({
       ...this.state,
       depositAmount: depositAmount,
       inputAmountText: inputAmountText,
