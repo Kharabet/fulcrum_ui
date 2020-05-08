@@ -14,8 +14,29 @@ export class BorrowProcessor {
             throw new Error("No provider available!");
         }
 
-        // Initializing loan
         const taskRequest: BorrowRequest = (task.request as BorrowRequest);
+
+        if (TorqueProvider.Instance.isETHAsset(taskRequest.collateralAsset)) {
+            //Initializing
+            task.processingStart([
+                "Initializing",
+                "Submitting loan",
+                "Updating the blockchain",
+                "Transaction completed"
+            ]);
+        } else {
+            //Initializing
+            task.processingStart([
+                "Initializing",
+                "Detecting token allowance",
+                "Prompting token allowance",
+                "Waiting for token allowance",
+                "Submitting loan",
+                "Updating the blockchain",
+                "Transaction completed"
+            ]);
+        }
+        // Initializing loan
         const iTokenContract = await TorqueProvider.Instance.contractsSource.getiTokenContract(taskRequest.borrowAsset);
         const collateralAssetErc20Address = TorqueProvider.Instance.getErc20AddressOfAsset(taskRequest.collateralAsset) || "";
 
@@ -30,23 +51,7 @@ export class BorrowProcessor {
         const depositAmountInBaseUnits = new BigNumber(taskRequest.depositAmount.multipliedBy(10 ** collateralPrecision).toFixed(0, 1));
 
 
-        if (TorqueProvider.Instance.isETHAsset(taskRequest.collateralAsset)) {
-            task.processingStart([
-                "Initializing",
-                "Submitting loan",
-                "Updating the blockchain",
-                "Transaction completed"
-            ]);
-        } else {
-            task.processingStart([
-                "Initializing",
-                "Detecting token allowance",
-                "Prompting token allowance",
-                "Waiting for token allowance",
-                "Submitting loan",
-                "Updating the blockchain",
-                "Transaction completed"
-            ]);
+        if (!TorqueProvider.Instance.isETHAsset(taskRequest.collateralAsset)) {
 
             let tokenErc20Contract: erc20Contract | null = null;
             let assetErc20Address: string | null = "";
@@ -61,135 +66,101 @@ export class BorrowProcessor {
             if (!tokenErc20Contract) {
                 throw new Error("No ERC20 contract available!");
             }
+            // Detecting token allowance
+            task.processingStepNext();
+            erc20allowance = await tokenErc20Contract.allowance.callAsync(account, iTokenContract.address);
+
+            // Prompting token allowance
             task.processingStepNext();
 
-            // Detecting token allowance
-            erc20allowance = await tokenErc20Contract.allowance.callAsync(account, iTokenContract.address);
+            // Waiting for token allowance
             task.processingStepNext();
+            if (depositAmountInBaseUnits.gt(erc20allowance)) {
+                await tokenErc20Contract!.approve.sendTransactionAsync(iTokenContract.address, TorqueProvider.MAX_UINT, { from: account });
+            } 
         }
 
-        // no additional inits or checks
+        //Submitting loan
         task.processingStepNext();
 
         let gasAmountBN;
-        let receipt;
         let txHash: string = "";
 
-        if (TorqueProvider.Instance.isETHAsset(taskRequest.collateralAsset)) {
-            try {
-                const gasAmount = await iTokenContract.borrowTokenFromDeposit.estimateGasAsync(
-                    borrowAmountInBaseUnits,
-                    new BigNumber(2 * 10 ** 18),
-                    new BigNumber(7884000), // approximately 3 months
-                    new BigNumber(0),
-                    account,
-                    account,
-                    TorqueProvider.ZERO_ADDRESS,
-                    "0x",
-                    {
-                        from: account,
-                        value: depositAmountInBaseUnits,
-                        gas: TorqueProvider.Instance.gasLimit
-                    }
-                );
-                gasAmountBN = new BigNumber(gasAmount).multipliedBy(TorqueProvider.Instance.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
-            } catch (e) {
-                console.log(e);
-            }
-
-            txHash = await iTokenContract.borrowTokenFromDeposit.sendTransactionAsync(
-                borrowAmountInBaseUnits,      // borrowAmount
-                new BigNumber(2 * 10 ** 18),    // leverageAmount
-                new BigNumber(7884000),       // initialLoanDuration (approximately 3 months)
-                new BigNumber(0),             // collateralTokenSent
-                account,                      // borrower
-                account,                      // receiver
-                TorqueProvider.ZERO_ADDRESS,  // collateralTokenAddress
-                "0x",                         // loanData
+        try {
+            const gasAmount = await iTokenContract.borrowTokenFromDeposit.estimateGasAsync(
+                borrowAmountInBaseUnits,
+                new BigNumber(2 * 10 ** 18),
+                new BigNumber(7884000), // approximately 3 months
+                TorqueProvider.Instance.isETHAsset(taskRequest.collateralAsset)
+                    ? new BigNumber(0)
+                    : depositAmountInBaseUnits,
+                account,
+                account,
+                TorqueProvider.Instance.isETHAsset(taskRequest.collateralAsset)
+                    ? TorqueProvider.ZERO_ADDRESS
+                    : collateralAssetErc20Address,
+                "0x",
                 {
                     from: account,
-                    value: depositAmountInBaseUnits,
-                    gas: gasAmountBN ? gasAmountBN.toString() : "3000000",
-                    gasPrice: await TorqueProvider.Instance.gasPrice()
+                    value: TorqueProvider.Instance.isETHAsset(taskRequest.collateralAsset)
+                        ? depositAmountInBaseUnits
+                        : undefined,
+                    gas: TorqueProvider.Instance.gasLimit
                 }
             );
-            //   receipt = await TorqueProvider.Instance.waitForTransactionMined(txHash);
-            if (await TorqueProvider.Instance.borrowRequestAwaitingStore && await TorqueProvider.Instance.web3ProviderSettings) {
-                // noinspection ES6MissingAwait
-                await TorqueProvider.Instance.borrowRequestAwaitingStore!.add(
-                    new BorrowRequestAwaiting(
-                        taskRequest,
-                        await TorqueProvider.Instance.web3ProviderSettings.networkId,
-                        account,
-                        txHash
-                    )
-                );
-            }
-        } else {
-            await TorqueProvider.Instance.checkAndSetApproval(
-                taskRequest.collateralAsset,
-                iTokenContract.address,
-                depositAmountInBaseUnits
-            );
-
-            try {
-                const gasAmount = await iTokenContract.borrowTokenFromDeposit.estimateGasAsync(
-                    borrowAmountInBaseUnits,
-                    new BigNumber(2 * 10 ** 18),
-                    new BigNumber(7884000), // approximately 3 months
-                    depositAmountInBaseUnits,
-                    account,
-                    account,
-                    collateralAssetErc20Address,
-                    "0x",
-                    {
-                        from: account,
-                        gas: TorqueProvider.Instance.gasLimit
-                    }
-                );
-                gasAmountBN = new BigNumber(gasAmount).multipliedBy(TorqueProvider.Instance.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
-            } catch (e) {
-                console.log(e);
-            }
-
-            txHash = await iTokenContract.borrowTokenFromDeposit.sendTransactionAsync(
-                borrowAmountInBaseUnits,      // borrowAmount
-                new BigNumber(2 * 10 ** 18),    // leverageAmount
-                new BigNumber(7884000),       // initialLoanDuration (approximately 3 months)
-                depositAmountInBaseUnits,     // collateralTokenSent
-                account,                      // borrower
-                account,                      // receiver
-                collateralAssetErc20Address,  // collateralTokenAddress
-                "0x",                         // loanData
-                {
-                    from: account,
-                    gas: gasAmountBN ? gasAmountBN.toString() : "3000000",
-                    gasPrice: await TorqueProvider.Instance.gasPrice()
-                }
-            );
-            //   receipt = await TorqueProvider.Instance.waitForTransactionMined(txHash);
-            if (TorqueProvider.Instance.borrowRequestAwaitingStore && TorqueProvider.Instance.web3ProviderSettings) {
-                // noinspection ES6MissingAwait
-                TorqueProvider.Instance.borrowRequestAwaitingStore.add(
-                    new BorrowRequestAwaiting(
-                        taskRequest,
-                        TorqueProvider.Instance.web3ProviderSettings.networkId,
-                        account,
-                        txHash
-                    )
-                );
-            }
-            // console.log(txHash);
+            gasAmountBN = new BigNumber(gasAmount).multipliedBy(TorqueProvider.Instance.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
+        } catch (e) {
+            console.log(e);
         }
 
+        try {
+            txHash = await iTokenContract.borrowTokenFromDeposit.sendTransactionAsync(
+                borrowAmountInBaseUnits,      // borrowAmount
+                new BigNumber(2 * 10 ** 18),    // leverageAmount
+                new BigNumber(7884000),       // initialLoanDuration (approximately 3 months)
+                TorqueProvider.Instance.isETHAsset(taskRequest.collateralAsset)
+                    ? new BigNumber(0)
+                    : depositAmountInBaseUnits,   // collateralTokenSent
+                account,                      // borrower
+                account,                      // receiver
+                TorqueProvider.Instance.isETHAsset(taskRequest.collateralAsset)
+                    ? TorqueProvider.ZERO_ADDRESS
+                    : collateralAssetErc20Address, // collateralTokenAddress
+                "0x",                         // loanData
+                {
+                    from: account,
+                    value: TorqueProvider.Instance.isETHAsset(taskRequest.collateralAsset)
+                        ? depositAmountInBaseUnits
+                        : undefined,
+                    gas: gasAmountBN ? gasAmountBN.toString() : "3000000",
+                    gasPrice: await TorqueProvider.Instance.gasPrice()
+                }
+            );
+        } catch (e) {
+            console.log(e);
+        }
 
+        //   receipt = await TorqueProvider.Instance.waitForTransactionMined(txHash);
+        if (TorqueProvider.Instance.borrowRequestAwaitingStore && await TorqueProvider.Instance.web3ProviderSettings) {
+            // noinspection ES6MissingAwait
+            await TorqueProvider.Instance.borrowRequestAwaitingStore.add(
+                new BorrowRequestAwaiting(
+                    taskRequest,
+                    TorqueProvider.Instance.web3ProviderSettings.networkId,
+                    account,
+                    txHash
+                )
+            );
+        }
 
+        //Updating the blockchain
         task.processingStepNext();
         const txReceipt = await TorqueProvider.Instance.waitForTransactionMined(txHash);
         if (!txReceipt.status) {
             throw new Error("Reverted by EVM");
         }
 
+        //Transaction completed
         task.processingStepNext();
         await TorqueProvider.Instance.sleep(TorqueProvider.Instance.successDisplayTimeout);
     }
