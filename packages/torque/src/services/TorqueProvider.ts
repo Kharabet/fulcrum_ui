@@ -54,6 +54,7 @@ import { RequestTask } from "../domain/RequestTask";
 import { RequestStatus } from "../domain/RequestStatus";
 import { TasksQueue } from "./TasksQueue";
 import { TasksQueueEvents } from "./events/TasksQueueEvents";
+import { BorrowProcessor } from "./processors/BorrowProcessor";
 
 const web3: Web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
 let configAddress: any;
@@ -125,7 +126,7 @@ export class TorqueProvider {
     // init
     this.eventEmitter = new EventEmitter();
     this.eventEmitter.setMaxListeners(1000);
-    
+
     TasksQueue.Instance.on(TasksQueueEvents.Enqueued, this.onTaskEnqueued);
 
     // singleton
@@ -2101,7 +2102,40 @@ export class TorqueProvider {
     //   await this.processTradeRequestTask(task, skipGas);
     // }
 
+    if (task.request instanceof BorrowRequest) {
+      await this.processBorrowRequestTask(task, skipGas);
+    }
+
+
+
     return false;
+  };
+
+  private processBorrowRequestTask = async (task: RequestTask, skipGas: boolean) => {
+    try {
+      if (!(this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite)) {
+        throw new Error("No provider available!");
+      }
+
+      const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+      if (!account) {
+        throw new Error("Unable to get wallet address!");
+      }
+
+      // Initializing loan
+      const taskRequest: BorrowRequest = (task.request as BorrowRequest);
+
+      const processor = new BorrowProcessor();
+      await processor.run(task, account, skipGas);
+
+      task.processingEnd(true, false, null);
+    } catch (e) {
+      if (!e.message.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)) {
+        // tslint:disable-next-line:no-console
+        console.log(e);
+      }
+      task.processingEnd(false, false, e);
+    }
   };
 
   public waitForTransactionMined = async (
