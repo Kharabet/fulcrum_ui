@@ -297,12 +297,14 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
     }
   };
 
-  public onTradeAmountChange = (event: ChangeEvent<HTMLInputElement>) => {
+  public onTradeAmountChange = async (event: ChangeEvent<HTMLInputElement>) => {
     let inputAmountText = event.target.value ? event.target.value : "";
+    if (inputAmountText === "" || parseFloat(inputAmountText) < 0 ) return;
+
     let depositAmount = new BigNumber(inputAmountText);
     let selectedValue = this.getSelectedValue(inputAmountText);
 
-    this.setState({
+    await this.setState({
       ...this.state,
       depositAmount: depositAmount,
       inputAmountText: inputAmountText,
