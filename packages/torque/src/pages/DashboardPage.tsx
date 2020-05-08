@@ -179,8 +179,9 @@ export class DashboardPage extends PureComponent<
     try {
       const extendLoanRequest = await this.extendLoanDlgRef.current.getValue(item);
       this.setState({ ...this.state, isLoadingTransaction: true, selectedAsset: item.loanAsset });
-      const receipt = await TorqueProvider.Instance.doExtendLoan(extendLoanRequest);
-      if (receipt.status === 1)
+      // const receipt = await TorqueProvider.Instance.doExtendLoan(extendLoanRequest);
+      const receipt = await TorqueProvider.Instance.onDoExtendLoan(extendLoanRequest);
+      // if (receipt.status === 1)
         this.setState({ ...this.state, isLoadingTransaction: false, selectedAsset: item.loanAsset });
     } catch (error) {
       this.setState({ ...this.state, isLoadingTransaction: false, selectedAsset: item.loanAsset });
