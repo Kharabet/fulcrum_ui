@@ -69,7 +69,7 @@ export class BorrowPage extends PureComponent<IBorrowPageParams & RouteComponent
       await TorqueProvider.Instance.onDoBorrow(borrowRequest);
       // if (receipt.status === 1) {
         this.setState({ ...this.state, isLoadingTransaction: false, selectedAsset: asset });
-        NavService.Instance.History.push("/dashboard");
+        //NavService.Instance.History.push("/dashboard");
       // }
     } catch (error) {
       if (error.message !== "Form closed")

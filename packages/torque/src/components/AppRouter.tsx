@@ -27,6 +27,7 @@ import { AbstractConnector } from '@web3-react/abstract-connector';
 import { errors } from "ethers"
 import { NavService } from '../services/NavService';
 import { ConnectorEvent, ConnectorUpdate } from '@web3-react/types';
+import { ProgressFragment } from './ProgressFragment';
 
 const isMainnetProd =
   process.env.NODE_ENV && process.env.NODE_ENV !== "development"
@@ -124,6 +125,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
         {isMainnetProd ? (
           <Intercom appID="dfk4n5ut" />
         ) : null}
+        <ProgressFragment />
         <div className="pages-container">
           {
             siteConfig.MaintenanceMode
