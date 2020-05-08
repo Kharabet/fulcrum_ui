@@ -55,6 +55,7 @@ import { RequestStatus } from "../domain/RequestStatus";
 import { TasksQueue } from "./TasksQueue";
 import { TasksQueueEvents } from "./events/TasksQueueEvents";
 import { BorrowProcessor } from "./processors/BorrowProcessor";
+import { RepayLoanProcessor } from "./processors/RepayLoanProcessor";
 
 const web3: Web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
 let configAddress: any;
@@ -2019,6 +2020,11 @@ export class TorqueProvider {
       TasksQueue.Instance.enqueue(new RequestTask(request));
     }
   };
+  public onDoRepayLoan = async (request: RepayLoanRequest) => {
+    if (request) {
+      TasksQueue.Instance.enqueue(new RequestTask(request));
+    }
+  };
 
   private onTaskEnqueued = async (requestTask: RequestTask) => {
     await this.processQueue(false, false);
@@ -2105,6 +2111,9 @@ export class TorqueProvider {
     if (task.request instanceof BorrowRequest) {
       await this.processBorrowRequestTask(task, skipGas);
     }
+    if (task.request instanceof RepayLoanRequest) {
+      await this.processRepayLoanRequestTask(task, skipGas);
+    }
 
 
 
@@ -2137,7 +2146,32 @@ export class TorqueProvider {
       task.processingEnd(false, false, e);
     }
   };
+  private processRepayLoanRequestTask = async (task: RequestTask, skipGas: boolean) => {
+    try {
+      if (!(this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite)) {
+        throw new Error("No provider available!");
+      }
 
+      const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+      if (!account) {
+        throw new Error("Unable to get wallet address!");
+      }
+
+      // Initializing loan
+      const taskRequest: RepayLoanRequest = (task.request as RepayLoanRequest);
+
+      const processor = new RepayLoanProcessor();
+      await processor.run(task, account, skipGas);
+
+      task.processingEnd(true, false, null);
+    } catch (e) {
+      if (!e.message.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)) {
+        // tslint:disable-next-line:no-console
+        console.log(e);
+      }
+      task.processingEnd(false, false, e);
+    }
+  };
   public waitForTransactionMined = async (
     txHash: string): Promise<any> => {
 

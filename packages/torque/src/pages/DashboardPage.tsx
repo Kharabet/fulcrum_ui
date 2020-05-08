@@ -163,8 +163,8 @@ export class DashboardPage extends PureComponent<
     try {
       const repayLoanRequest = await this.repayLoanDlgRef.current.getValue(item);
       this.setState({ ...this.state, isLoadingTransaction: true, selectedAsset: item.loanAsset });
-      let receipt = await TorqueProvider.Instance.doRepayLoan(repayLoanRequest);
-      if (receipt.status === 1)
+      await TorqueProvider.Instance.onDoRepayLoan(repayLoanRequest);
+      //if (receipt.status === 1)
         this.setState({ ...this.state, isLoadingTransaction: false, selectedAsset: item.loanAsset });
     } catch (error) {
       this.setState({ ...this.state, isLoadingTransaction: false, selectedAsset: item.loanAsset });
