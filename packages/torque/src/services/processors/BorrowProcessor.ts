@@ -15,8 +15,8 @@ export class BorrowProcessor {
         }
 
         const taskRequest: BorrowRequest = (task.request as BorrowRequest);
-
-        if (TorqueProvider.Instance.isETHAsset(taskRequest.collateralAsset)) {
+        const isETHCollateralAsset = TorqueProvider.Instance.isETHAsset(taskRequest.collateralAsset);
+        if (isETHCollateralAsset) {
             //Initializing
             task.processingStart([
                 "Initializing",
@@ -51,7 +51,7 @@ export class BorrowProcessor {
         const depositAmountInBaseUnits = new BigNumber(taskRequest.depositAmount.multipliedBy(10 ** collateralPrecision).toFixed(0, 1));
 
 
-        if (!TorqueProvider.Instance.isETHAsset(taskRequest.collateralAsset)) {
+        if (!isETHCollateralAsset) {
 
             let tokenErc20Contract: erc20Contract | null = null;
             let assetErc20Address: string | null = "";
@@ -91,18 +91,18 @@ export class BorrowProcessor {
                 borrowAmountInBaseUnits,
                 new BigNumber(2 * 10 ** 18),
                 new BigNumber(7884000), // approximately 3 months
-                TorqueProvider.Instance.isETHAsset(taskRequest.collateralAsset)
+                isETHCollateralAsset
                     ? new BigNumber(0)
                     : depositAmountInBaseUnits,
                 account,
                 account,
-                TorqueProvider.Instance.isETHAsset(taskRequest.collateralAsset)
+                isETHCollateralAsset
                     ? TorqueProvider.ZERO_ADDRESS
                     : collateralAssetErc20Address,
                 "0x",
                 {
                     from: account,
-                    value: TorqueProvider.Instance.isETHAsset(taskRequest.collateralAsset)
+                    value: isETHCollateralAsset
                         ? depositAmountInBaseUnits
                         : undefined,
                     gas: TorqueProvider.Instance.gasLimit
@@ -118,18 +118,18 @@ export class BorrowProcessor {
                 borrowAmountInBaseUnits,      // borrowAmount
                 new BigNumber(2 * 10 ** 18),    // leverageAmount
                 new BigNumber(7884000),       // initialLoanDuration (approximately 3 months)
-                TorqueProvider.Instance.isETHAsset(taskRequest.collateralAsset)
+                isETHCollateralAsset
                     ? new BigNumber(0)
                     : depositAmountInBaseUnits,   // collateralTokenSent
                 account,                      // borrower
                 account,                      // receiver
-                TorqueProvider.Instance.isETHAsset(taskRequest.collateralAsset)
+                isETHCollateralAsset
                     ? TorqueProvider.ZERO_ADDRESS
                     : collateralAssetErc20Address, // collateralTokenAddress
                 "0x",                         // loanData
                 {
                     from: account,
-                    value: TorqueProvider.Instance.isETHAsset(taskRequest.collateralAsset)
+                    value: isETHCollateralAsset
                         ? depositAmountInBaseUnits
                         : undefined,
                     gas: gasAmountBN ? gasAmountBN.toString() : "3000000",
