@@ -214,7 +214,7 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
               </div>
             }
             {this.state.loan.isDisabled && !this.props.isMobileMedia &&
-              <div className="collaterization-warning">Collateralization should be {this.props.refinanceData.maintenanceMarginAmount.toNumber()}%+</div>
+              <div className={`collaterization-warning ${this.state.isShow ? "" : "hidden-details"}`}>Collateralization should be {this.props.refinanceData.maintenanceMarginAmount.toNumber()}%+</div>
             }
             {this.props.isMobileMedia &&
               <div className="refinance-asset-selector__arrow">
