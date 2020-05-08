@@ -116,7 +116,8 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
       const divider = refinanceLoan.balance.div(borrowAmount);
       refinanceLoan.usdValue = refinanceLoan.usdValue.div(divider);
       refinanceLoan.balance = refinanceLoan.balance.div(divider);
-      await TorqueProvider.Instance.assignCollateral([refinanceLoan], TorqueProvider.Instance.compoundDeposits)
+      if (borrowAmount.lt(this.props.loan.balance))
+        await TorqueProvider.Instance.assignCollateral([refinanceLoan], TorqueProvider.Instance.compoundDeposits)
     }
     this.setState({
       ...this.state,
@@ -187,7 +188,7 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
     const arrowIcon = this.state.isShow ? <TopArrow /> : <DownArrow />;
     return (
 
-      <div className={`refinance-asset-selector-item ` + (this.state.isShowInfoCollateralAssetDt0 || this.state.isShowInfoCollateralAssetDt1 ? `inactive` : ``)}>
+      <div className={`refinance-asset-selector-item ${this.state.isShowInfoCollateralAssetDt0 || this.state.isShowInfoCollateralAssetDt1 ? "inactive" : ""}`}>
         {this.state.isLoadingTransaction
           ? <Loader quantityDots={4} sizeDots={'middle'} title={'Processed Token'} isOverlay={true} />
           : null
@@ -228,7 +229,7 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
               </div>
             }
             {this.state.loan.isDisabled && !this.props.isMobileMedia &&
-              <div className="collaterization-warning">Collateralization should be {this.state.loan.maintenanceMarginAmount!.toNumber()}%+</div>
+              <div className={`collaterization-warning ${this.state.isShow ? "" : "hidden-details"}`}>Collateralization should be {this.state.loan.maintenanceMarginAmount!.toNumber()}%+</div>
             }
             {this.props.isMobileMedia &&
               <div className="refinance-asset-selector__arrow">
@@ -247,7 +248,6 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
             <div className="refinance-asset-selector__torque-loan-container">
               <div className="loan-value">
                 <div className="value">{this.state.borrowAmount.dp(3, BigNumber.ROUND_FLOOR).toString()}</div>
-                <div className="text">Loan</div>
               </div>
               <div className="loan-asset">
                 <div className="asset-icon">
@@ -318,7 +318,7 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
                 <div className="refinance-asset-selector__collateral-slider">
                   <div className="collateral-value">{this.state.loan.collateral[0].collaterizationPercent!.dp(2, BigNumber.ROUND_FLOOR).toNumber()}%</div>
                   <CollaterallRefinanceSlider
-                    readonly={false}
+                    readonly={this.state.borrowAmount.lte(0) || this.state.borrowAmount.gt(this.props.loan.balance)}
                     minValue={this.state.loan.maintenanceMarginAmount!.dp(2, BigNumber.ROUND_FLOOR).toNumber()}
                     maxValue={this.props.loan.collateral[0].collaterizationPercent!.dp(2, BigNumber.ROUND_FLOOR).toNumber()}
                     value={this.state.loan.collateral[0].collaterizationPercent!.dp(2, BigNumber.ROUND_FLOOR).toNumber()}
