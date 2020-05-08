@@ -53,6 +53,7 @@ import { ProviderTypeDictionary } from "../domain/ProviderTypeDictionary";
 import { RequestTask } from "../domain/RequestTask";
 import { RequestStatus } from "../domain/RequestStatus";
 import { TasksQueue } from "./TasksQueue";
+import { TasksQueueEvents } from "./events/TasksQueueEvents";
 
 const web3: Web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
 let configAddress: any;
@@ -124,6 +125,8 @@ export class TorqueProvider {
     // init
     this.eventEmitter = new EventEmitter();
     this.eventEmitter.setMaxListeners(1000);
+    
+    TasksQueue.Instance.on(TasksQueueEvents.Enqueued, this.onTaskEnqueued);
 
     // singleton
     if (!TorqueProvider.Instance) {
@@ -2009,6 +2012,12 @@ export class TorqueProvider {
         return new BigNumber(10 ** 16);
     }
   }
+
+  public onDoBorrow = async (request: BorrowRequest) => {
+    if (request) {
+      TasksQueue.Instance.enqueue(new RequestTask(request));
+    }
+  };
 
   private onTaskEnqueued = async (requestTask: RequestTask) => {
     await this.processQueue(false, false);
