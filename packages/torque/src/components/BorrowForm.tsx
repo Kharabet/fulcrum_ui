@@ -146,6 +146,10 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
   private onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
+    if (this.state.borrowAmount.lte(0) || this.state.depositAmount.lte(0)) {
+      return;
+    }
+
     if (this.props.onSubmit && !this.state.didSubmit && this.state.depositAmount.gt(0)) {
       this.setState({ ...this.state, didSubmit: true });
       let balanceTooLow = await this.checkBalanceTooLow(this.state.collateralAsset);
