@@ -74,11 +74,11 @@ export class RefinanceCompoundProcessor {
 
         borrowAmounts[0] = borrowAmounts[0].plus(taskRequest.loanAmount.minus(borrowAmountsSum));
 
-
+        let txHash = "";
         //Submitting loan refinance          
         task.processingStepNext();
         try {
-            const txHash = await compoundBridge.migrateLoan.sendTransactionAsync(
+            txHash = await compoundBridge.migrateLoan.sendTransactionAsync(
                 String(loan.market), taskRequest.loanAmount, assets, amounts, amounts, borrowAmounts,
                 { from: account }
             );
