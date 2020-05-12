@@ -164,6 +164,7 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
       //   this.setState({ ...this.state, isLoadingTransaction: false });
       //   NavService.Instance.History.push("/dashboard");
       // }
+      this.setState({ ...this.state, isLoadingTransaction: false });
     } catch (error) {
       this.setState({ ...this.state, isLoadingTransaction: false });
     }
