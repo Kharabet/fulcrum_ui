@@ -34,7 +34,7 @@ export class RefinanceMakerProcessor {
 
         if (isDust) {
             if (!window.confirm("Remaining debt should be zero or more than " + taskRequest.refLoan.dust.toString(10) + " DAI. Do you want to continue with total amount?")) {
-                return null;
+                throw new Error("No provider available!");
             }
             taskRequest.loanAmount = taskRequest.refLoan.debt;
         }
@@ -119,8 +119,7 @@ export class RefinanceMakerProcessor {
 
             //Submitting loan refinance          
             task.processingStepNext();
-            txHash = await makerBridge.migrateLoan.sendTransactionAsync([taskRequest.refLoan.cdpId], [dart], [dink], [dink], [dart], { from: taskRequest.refLoan.accountAddress });
-
+            txHash = await makerBridge.migrateLoan.sendTransactionAsync([taskRequest.refLoan.cdpId], [new BigNumber(dart)], [new BigNumber(dink)], [new BigNumber(dink)], [new BigNumber(dart)], { from: taskRequest.refLoan.accountAddress });
         }
 
         //Updating the blockchain
