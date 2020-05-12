@@ -34,7 +34,7 @@ export class RefinanceMakerProcessor {
 
         if (isDust) {
             if (!window.confirm("Remaining debt should be zero or more than " + taskRequest.refLoan.dust.toString(10) + " DAI. Do you want to continue with total amount?")) {
-                return null;
+                throw new Error("No provider available!");
             }
             taskRequest.loanAmount = taskRequest.refLoan.debt;
         }
@@ -73,10 +73,19 @@ export class RefinanceMakerProcessor {
                 //Submitting loan refinance          
                 task.processingStepNext();
                 // if proxy use then use this function for cdpAllow
-                txHash = await proxy.execute.sendTransactionAsync(proxyActionsAddress, allowData, {
-                    from: taskRequest.refLoan.accountAddress,
-                    isInstaProxy: taskRequest.refLoan.isInstaProxy
-                });
+                try {
+
+
+                    txHash = await proxy.execute.sendTransactionAsync(proxyActionsAddress, allowData, {
+                        from: taskRequest.refLoan.accountAddress,
+                        isInstaProxy: taskRequest.refLoan.isInstaProxy
+                    });
+                } catch (e) {
+                    if (!e.code) {
+                        throw new Error("Dry run failed");
+
+                    }
+                }
 
             } else {
 
@@ -95,16 +104,23 @@ export class RefinanceMakerProcessor {
                 const bridgeActionsAddress = configAddress.Bridge_Action_Address;
                 //Submitting loan refinance          
                 task.processingStepNext();
-                if (taskRequest.refLoan.isInstaProxy) {
-                    const makerBridge: makerBridgeContract = await TorqueProvider.Instance.contractsSource.getMakerBridge(configAddress.Maker_Bridge_Address);
-                    txHash = await makerBridge.migrateLoan.sendTransactionAsync(
-                        params[1], params[2], params[3], params[4], params[5],
-                        { from: taskRequest.refLoan.accountAddress }
-                    );
-                } else {
-                    txHash = await proxy.execute.sendTransactionAsync(bridgeActionsAddress, data, {
-                        from: taskRequest.refLoan.accountAddress
-                    });
+                try {
+                    if (taskRequest.refLoan.isInstaProxy) {
+                        const makerBridge: makerBridgeContract = await TorqueProvider.Instance.contractsSource.getMakerBridge(configAddress.Maker_Bridge_Address);
+                        txHash = await makerBridge.migrateLoan.sendTransactionAsync(
+                            params[1], params[2], params[3], params[4], params[5],
+                            { from: taskRequest.refLoan.accountAddress }
+                        );
+                    } else {
+                        txHash = await proxy.execute.sendTransactionAsync(bridgeActionsAddress, data, {
+                            from: taskRequest.refLoan.accountAddress
+                        });
+                    }
+                } catch (e) {
+                    if (!e.code) {
+                        throw new Error("Dry run failed");
+
+                    }
                 }
             }
         } else {
@@ -119,8 +135,13 @@ export class RefinanceMakerProcessor {
 
             //Submitting loan refinance          
             task.processingStepNext();
-            txHash = await makerBridge.migrateLoan.sendTransactionAsync([taskRequest.refLoan.cdpId], [dart], [dink], [dink], [dart], { from: taskRequest.refLoan.accountAddress });
-
+            try {
+                txHash = await makerBridge.migrateLoan.sendTransactionAsync([taskRequest.refLoan.cdpId], [new BigNumber(dart)], [new BigNumber(dink)], [new BigNumber(dink)], [new BigNumber(dart)], { from: taskRequest.refLoan.accountAddress });
+            } catch (e) {
+                if (!e.code) {
+                    throw new Error("Dry run failed");
+                }
+            }
         }
 
         //Updating the blockchain
