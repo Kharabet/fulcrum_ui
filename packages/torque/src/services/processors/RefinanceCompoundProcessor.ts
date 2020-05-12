@@ -41,7 +41,7 @@ export class RefinanceCompoundProcessor {
                     if (!e.code) {
                         alert("approve for " + token.asset + " failed: " + e.message);
                     }
-                    return null;
+                    console.log(e)
                 }
             }
         }
@@ -77,11 +77,14 @@ export class RefinanceCompoundProcessor {
 
         //Submitting loan refinance          
         task.processingStepNext();
-
-        const txHash = await compoundBridge.migrateLoan.sendTransactionAsync(
-            String(loan.market), taskRequest.loanAmount, assets, amounts, amounts, borrowAmounts,
-            { from: account }
-        );
+        try {
+            const txHash = await compoundBridge.migrateLoan.sendTransactionAsync(
+                String(loan.market), taskRequest.loanAmount, assets, amounts, amounts, borrowAmounts,
+                { from: account }
+            );
+        } catch (e) {
+            console.log(e)
+        }
 
 
         //Updating the blockchain

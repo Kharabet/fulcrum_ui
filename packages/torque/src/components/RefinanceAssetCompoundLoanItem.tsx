@@ -151,10 +151,11 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
       this.state.loan.type === "dydx"
         ? receipt = await TorqueProvider.Instance.migrateSoloLoan(loan, this.state.borrowAmount)  //TODO
         : receipt = await TorqueProvider.Instance.onMigrateCompoundLoan(new RefinanceCompoundRequest(loan, this.state.borrowAmount))  // TODO
-      if (receipt.status === 1) {
-        this.setState({ ...this.state, isLoadingTransaction: false });
-        NavService.Instance.History.push("/dashboard");
-      }
+      // if (receipt.status === 1) {
+      //   this.setState({ ...this.state, isLoadingTransaction: false });
+      //   NavService.Instance.History.push("/dashboard");
+      // }
+      this.setState({ ...this.state, isLoadingTransaction: false });
     } catch (error) {
       this.setState({ ...this.state, isLoadingTransaction: false });
       console.log(error);
