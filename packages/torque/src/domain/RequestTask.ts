@@ -6,18 +6,19 @@ import { ManageCollateralRequest } from "./ManageCollateralRequest";
 import { ExtendLoanRequest } from "./ExtendLoanRequest";
 import { RepayLoanRequest } from "./RepayLoanRequest";
 import { BorrowMoreRequest } from "./BorrowMoreRequest";
+import { RefinanceMakerRequest } from "./RefinanceMakerRequest";
 
 export class RequestTask {
   private eventEmitter: EventEmitter | null = null;
 
-  public readonly request: BorrowRequest | ManageCollateralRequest | ExtendLoanRequest | RepayLoanRequest | BorrowMoreRequest;
+  public readonly request: BorrowRequest | ManageCollateralRequest | ExtendLoanRequest | RepayLoanRequest | BorrowMoreRequest | RefinanceMakerRequest;
   public status: RequestStatus;
   public steps: string[];
   public stepCurrent: number;
   public txHash: string | null;
   public error: Error | null;
 
-  constructor(request: BorrowRequest | ManageCollateralRequest | ExtendLoanRequest | RepayLoanRequest | BorrowMoreRequest) {
+  constructor(request: BorrowRequest | ManageCollateralRequest | ExtendLoanRequest | RepayLoanRequest | BorrowMoreRequest | RefinanceMakerRequest) {
     this.request = request;
     this.status = RequestStatus.AWAITING;
     this.steps = ["Preparing processing..."];

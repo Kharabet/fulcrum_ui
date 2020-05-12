@@ -19,6 +19,7 @@ import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { AssetDetails } from "../domain/AssetDetails";
 import { CollaterallRefinanceSlider } from "./CollaterallRefinanceSlider";
 import { NavService } from '../services/NavService';
+import { RefinanceMakerRequest } from "../domain/RefinanceMakerRequest";
 
 
 export interface IRefinanceAssetSelectorItemProps {
@@ -143,11 +144,11 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
   private checkCdpManager = async () => {
     try {
       this.setState({ ...this.state, isLoadingTransaction: true });
-      const receipt = await TorqueProvider.Instance.migrateMakerLoan(this.state.loan, this.state.borrowAmount);
-      if (receipt.status === 1) {
-        this.setState({ ...this.state, isLoadingTransaction: false });
-        NavService.Instance.History.push("/dashboard");
-      }
+      /*const receipt = */await TorqueProvider.Instance.onMigrateMakerLoan(new RefinanceMakerRequest(this.state.loan, this.state.borrowAmount));
+      // if (receipt.status === 1) {
+      //   this.setState({ ...this.state, isLoadingTransaction: false });
+      //   NavService.Instance.History.push("/dashboard");
+      // }
     } catch (error) {
       this.setState({ ...this.state, isLoadingTransaction: false });
     }
