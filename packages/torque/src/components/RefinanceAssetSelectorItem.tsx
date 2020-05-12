@@ -197,7 +197,7 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
               <MakerImg />
             </div>
             <div className="refinance-asset-selector__non-torque-apr">
-              <div className="value">{this.state.loan.variableAPR.dp(0, BigNumber.ROUND_CEIL).toString()}%</div>
+              <div title={this.state.loan.variableAPR.toFixed()} className="value">{this.state.loan.variableAPR.dp(0, BigNumber.ROUND_CEIL).toString()}%</div>
               <div className="text">Variable APR</div>
             </div>
             <div className="refinance__input-container">
@@ -235,7 +235,7 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
               <TorqueLogo />
             </div>
             <div className="refinance-asset-selector__torque-apr">
-              <div className="value">{this.state.fixedApr.dp(1, BigNumber.ROUND_CEIL).toString()}%</div>
+              <div title={this.state.fixedApr.toFixed()} className="value">{this.state.fixedApr.dp(1, BigNumber.ROUND_CEIL).toString()}%</div>
               <div className="text">Fixed APR</div>
             </div>
             <div className="refinance-asset-selector__torque-loan-container">
@@ -302,8 +302,9 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
           {this.state.loan.variableAPR.gt(this.state.fixedApr)
             ? <div className="refinance-asset-selector__desc">
               Refinancing with&nbsp;<b>FIXED</b>&nbsp;rates could save you &nbsp;
-              <div className="refinance-asset-selector__rs">${this.state.refRateMonth.toFixed(2)}/mo or
-                ${this.state.refRateYear.toFixed(2)}/yr
+              <div className="refinance-asset-selector__rs">
+                <span title={this.state.refRateMonth.toString()}>${this.state.refRateMonth.toFixed(2)}/mo</span>&nbsp;or&nbsp;
+                <span title={this.state.refRateYear.toString()}>${this.state.refRateYear.toFixed(2)}/yr</span>
               </div>
             </div>
             : <div className="refinance-asset-selector__desc" />

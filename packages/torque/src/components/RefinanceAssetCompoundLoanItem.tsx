@@ -199,7 +199,7 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
               {this.state.head_image}
             </div>
             <div className="refinance-asset-selector__non-torque-apr">
-              <div className="value">{this.state.loan.apr.dp(0, BigNumber.ROUND_CEIL).toString()}%</div>
+              <div  title={this.state.loan.apr.toFixed()} className="value">{this.state.loan.apr.dp(0, BigNumber.ROUND_CEIL).toString()}%</div>
               <div className="text">Variable APR</div>
             </div>
             <div className="refinance__input-container">
@@ -236,7 +236,7 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
               <TorqueLogo />
             </div>
             <div className="refinance-asset-selector__torque-apr">
-              <div className="value">{this.state.fixedApr.dp(1, BigNumber.ROUND_CEIL).toString()}%</div>
+              <div title={this.state.fixedApr.toFixed()} className="value">{this.state.fixedApr.dp(1, BigNumber.ROUND_CEIL).toString()}%</div>
               <div className="text">Fixed APR</div>
             </div>
             <div className="refinance-asset-selector__torque-loan-container">
@@ -260,7 +260,7 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
               <div className="refinance-asset-selector__collateral-container">
                 <div className="refinance-asset-selector__collateral">
                   <div className="collateral-value">
-                    <div className={`value ${this.state.loan.isDisabled ? "red" : ""}`}>
+                    <div title={this.state.loan.collateral[0].amount.toFixed()} className={`value ${this.state.loan.isDisabled ? "red" : ""}`}>
                       {this.state.loan.collateral[0].amount.dp(3, BigNumber.ROUND_FLOOR).toString()}
                     </div>
                     <div className="text">Collateral</div>
@@ -331,8 +331,9 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
           {this.state.loan.apr.gt(this.state.fixedApr)
             ? <div className="refinance-asset-selector__desc">
               Refinancing with&nbsp;<b>FIXED</b>&nbsp;rates could save you &nbsp;
-              <div className="refinance-asset-selector__rs">${this.state.refRateMonth.toFixed(2)}/mo or
-                ${this.state.refRateYear.toFixed(2)}/yr
+              <div className="refinance-asset-selector__rs">
+                <span title={this.state.refRateMonth.toString()}>${this.state.refRateMonth.toFixed(2)}/mo</span>&nbsp;or&nbsp;
+                <span title={this.state.refRateYear.toString()}>${this.state.refRateYear.toFixed(2)}/yr</span>
               </div>
             </div>
             : <div className="refinance-asset-selector__desc" />
