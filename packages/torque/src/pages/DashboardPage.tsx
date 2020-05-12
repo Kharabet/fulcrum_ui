@@ -163,9 +163,9 @@ export class DashboardPage extends PureComponent<
     try {
       const repayLoanRequest = await this.repayLoanDlgRef.current.getValue(item);
       this.setState({ ...this.state, isLoadingTransaction: true, selectedAsset: item.loanAsset });
-      let receipt = await TorqueProvider.Instance.doRepayLoan(repayLoanRequest);
-      if (receipt.status === 1)
-        this.setState({ ...this.state, isLoadingTransaction: false, selectedAsset: item.loanAsset });
+      await TorqueProvider.Instance.onDoRepayLoan(repayLoanRequest);
+      //if (receipt.status === 1)
+      this.setState({ ...this.state, isLoadingTransaction: false, selectedAsset: item.loanAsset });
     } catch (error) {
       this.setState({ ...this.state, isLoadingTransaction: false, selectedAsset: item.loanAsset });
       if (error.message !== "Form closed")
@@ -182,7 +182,7 @@ export class DashboardPage extends PureComponent<
       // const receipt = await TorqueProvider.Instance.doExtendLoan(extendLoanRequest);
       const receipt = await TorqueProvider.Instance.onDoExtendLoan(extendLoanRequest);
       // if (receipt.status === 1)
-        this.setState({ ...this.state, isLoadingTransaction: false, selectedAsset: item.loanAsset });
+      this.setState({ ...this.state, isLoadingTransaction: false, selectedAsset: item.loanAsset });
     } catch (error) {
       this.setState({ ...this.state, isLoadingTransaction: false, selectedAsset: item.loanAsset });
       if (error.message !== "Form closed")
@@ -196,9 +196,9 @@ export class DashboardPage extends PureComponent<
     try {
       const manageCollateralRequest = await this.manageCollateralDlgRef.current.getValue(item);
       this.setState({ ...this.state, isLoadingTransaction: true, selectedAsset: item.loanAsset });
-      const receipt = await TorqueProvider.Instance.doManageCollateral(manageCollateralRequest);
-      if (receipt.status === 1)
-        this.setState({ ...this.state, isLoadingTransaction: false, selectedAsset: item.loanAsset });
+      await TorqueProvider.Instance.onDoManageCollateral(manageCollateralRequest);
+      // if (receipt.status === 1)
+      this.setState({ ...this.state, isLoadingTransaction: false, selectedAsset: item.loanAsset });
     } catch (error) {
       this.setState({ ...this.state, isLoadingTransaction: false, selectedAsset: item.loanAsset });
       if (error.message !== "Form closed")

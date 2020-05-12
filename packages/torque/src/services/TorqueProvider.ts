@@ -55,7 +55,9 @@ import { RequestStatus } from "../domain/RequestStatus";
 import { TasksQueue } from "./TasksQueue";
 import { TasksQueueEvents } from "./events/TasksQueueEvents";
 import { BorrowProcessor } from "./processors/BorrowProcessor";
+import { RepayLoanProcessor } from "./processors/RepayLoanProcessor";
 import { ExtendLoanProcessor } from "./processors/ExtendLoanProcessor";
+import { ManageCollateralProcessor } from "./processors/ManageCollateralProcessor";
 import { RefinanceMakerRequest } from "../domain/RefinanceMakerRequest";
 import { RefinanceMakerProcessor } from "./processors/RefinanceMakerProcessor";
 
@@ -2019,8 +2021,19 @@ export class TorqueProvider {
       TasksQueue.Instance.enqueue(new RequestTask(request));
     }
   };
+  public onDoRepayLoan = async (request: RepayLoanRequest) => {
+    if (request) {
+      TasksQueue.Instance.enqueue(new RequestTask(request));
+    }
+  };
 
   public onDoExtendLoan = async (request: ExtendLoanRequest) => {
+    if (request) {
+      TasksQueue.Instance.enqueue(new RequestTask(request));
+    }
+  };
+
+  public onDoManageCollateral = async (request: ManageCollateralRequest) => {
     if (request) {
       TasksQueue.Instance.enqueue(new RequestTask(request));
     }
@@ -2121,11 +2134,16 @@ export class TorqueProvider {
     if (task.request instanceof ExtendLoanRequest) {
       await this.processExtendLoanRequestTask(task, skipGas);
     }
+    if (task.request instanceof ManageCollateralRequest) {
+      await this.processManageCollateralRequestTask(task, skipGas);
+    }
+    if (task.request instanceof RepayLoanRequest) {
+      await this.processRepayLoanRequestTask(task, skipGas);
+    }
 
     if (task.request instanceof RefinanceMakerRequest) {
       await this.processRefinanceMakerRequestTask(task, skipGas);
     }
-
 
 
     return false;
@@ -2157,6 +2175,31 @@ export class TorqueProvider {
       task.processingEnd(false, false, e);
     }
   };
+  private processRepayLoanRequestTask = async (task: RequestTask, skipGas: boolean) => {
+    try {
+      if (!(this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite)) {
+        throw new Error("No provider available!");
+      }
+      const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+      if (!account) {
+        throw new Error("Unable to get wallet address!");
+      }
+
+      // Initializing loan
+      const taskRequest: RepayLoanRequest = (task.request as RepayLoanRequest);
+
+      const processor = new RepayLoanProcessor();
+      await processor.run(task, account, skipGas);
+
+      task.processingEnd(true, false, null);
+    } catch (e) {
+      if (!e.message.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)) {
+        // tslint:disable-next-line:no-console
+        console.log(e);
+      }
+      task.processingEnd(false, false, e);
+    }
+  };
 
   private processExtendLoanRequestTask = async (task: RequestTask, skipGas: boolean) => {
     try {
@@ -2173,6 +2216,33 @@ export class TorqueProvider {
       const taskRequest: ExtendLoanRequest = (task.request as ExtendLoanRequest);
 
       const processor = new ExtendLoanProcessor();
+      await processor.run(task, account, skipGas);
+
+      task.processingEnd(true, false, null);
+    } catch (e) {
+      if (!e.message.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)) {
+        // tslint:disable-next-line:no-console
+        console.log(e);
+      }
+      task.processingEnd(false, false, e);
+    }
+  };
+
+  private processManageCollateralRequestTask = async (task: RequestTask, skipGas: boolean) => {
+    try {
+      if (!(this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite)) {
+        throw new Error("No provider available!");
+      }
+
+      const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+      if (!account) {
+        throw new Error("Unable to get wallet address!");
+      }
+
+      // Initializing loan
+      const taskRequest: ManageCollateralRequest = (task.request as ManageCollateralRequest);
+
+      const processor = new ManageCollateralProcessor();
       await processor.run(task, account, skipGas);
 
       task.processingEnd(true, false, null);
