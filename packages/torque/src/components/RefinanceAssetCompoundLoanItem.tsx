@@ -17,6 +17,7 @@ import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { CollaterallRefinanceSlider } from "./CollaterallRefinanceSlider";
 import { NavService } from '../services/NavService';
+import { RefinanceCompoundRequest } from '../domain/RefinanceCompoundRequest';
 
 interface IRefinanceAssetCompoundLoanItemState {
   isShow: boolean;
@@ -149,7 +150,7 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
       this.setState({ ...this.state, isLoadingTransaction: true });
       this.state.loan.type === "dydx"
         ? receipt = await TorqueProvider.Instance.migrateSoloLoan(loan, this.state.borrowAmount)  //TODO
-        : receipt = await TorqueProvider.Instance.migrateCompoundLoan(loan, this.state.borrowAmount)  // TODO
+        : receipt = await TorqueProvider.Instance.onMigrateCompoundLoan(new RefinanceCompoundRequest(loan, this.state.borrowAmount))  // TODO
       if (receipt.status === 1) {
         this.setState({ ...this.state, isLoadingTransaction: false });
         NavService.Instance.History.push("/dashboard");

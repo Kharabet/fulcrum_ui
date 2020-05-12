@@ -7,18 +7,19 @@ import { ExtendLoanRequest } from "./ExtendLoanRequest";
 import { RepayLoanRequest } from "./RepayLoanRequest";
 import { BorrowMoreRequest } from "./BorrowMoreRequest";
 import { RefinanceMakerRequest } from "./RefinanceMakerRequest";
+import { RefinanceCompoundRequest } from "./RefinanceCompoundRequest";
 
 export class RequestTask {
   private eventEmitter: EventEmitter | null = null;
 
-  public readonly request: BorrowRequest | ManageCollateralRequest | ExtendLoanRequest | RepayLoanRequest | BorrowMoreRequest | RefinanceMakerRequest;
+  public readonly request: BorrowRequest | ManageCollateralRequest | ExtendLoanRequest | RepayLoanRequest | BorrowMoreRequest | RefinanceMakerRequest | RefinanceCompoundRequest;
   public status: RequestStatus;
   public steps: string[];
   public stepCurrent: number;
   public txHash: string | null;
   public error: Error | null;
 
-  constructor(request: BorrowRequest | ManageCollateralRequest | ExtendLoanRequest | RepayLoanRequest | BorrowMoreRequest | RefinanceMakerRequest) {
+  constructor(request: BorrowRequest | ManageCollateralRequest | ExtendLoanRequest | RepayLoanRequest | BorrowMoreRequest | RefinanceMakerRequest | RefinanceCompoundRequest) {
     this.request = request;
     this.status = RequestStatus.AWAITING;
     this.steps = ["Preparing processing..."];
@@ -40,7 +41,7 @@ export class RequestTask {
   }
 
   public processingStart(steps: string[]) {
-    while(this.steps.length > 0) {
+    while (this.steps.length > 0) {
       this.steps.splice(0, 1);
     }
     steps.forEach(e => this.steps.push(e));
@@ -63,7 +64,7 @@ export class RequestTask {
 
   public processingEnd(isSuccessful: boolean, skipGas: boolean, error: Error | null) {
     this.error = error;
-    this.status = isSuccessful ? RequestStatus.DONE : 
+    this.status = isSuccessful ? RequestStatus.DONE :
       skipGas ? RequestStatus.FAILED_SKIPGAS : RequestStatus.FAILED;
 
     if (this.eventEmitter) {
