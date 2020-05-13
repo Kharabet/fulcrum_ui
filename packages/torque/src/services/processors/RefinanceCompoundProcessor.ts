@@ -79,7 +79,7 @@ export class RefinanceCompoundProcessor {
         task.processingStepNext();
         try {
             txHash = await compoundBridge.migrateLoan.sendTransactionAsync(
-                String(loan.market), taskRequest.loanAmount, assets, amounts, amounts, borrowAmounts,
+                String(loan.market), loanAmount, assets, amounts, amounts, borrowAmounts,
                 { from: account }
             );
         } catch (e) {
