@@ -211,7 +211,9 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
     return (
       <div className={`refinance-asset-selector-item ` + (this.state.isShowConfirm ? `disabled-hover` : ``) + (this.state.isShowInfoCollateralAssetDt0 ? `inactive` : ``)}>
         {this.state.isShowConfirm &&
-          <Confirm amountDust={this.props.refinanceData.dust.toString(10)} onDecline={this.onDecline} onConfirm={this.onConfirm} />}
+          <Confirm onDecline={this.onDecline} onConfirm={this.onConfirm}>
+          <p>Remaining debt should be zero or more than {this.props.refinanceData.dust.toString(10)} DAI. Do you want to continue with total amount?</p>
+          </Confirm>}
 
         {this.state.isLoadingTransaction &&
           <Loader quantityDots={4} sizeDots={'middle'} title={'Processed Token'} isOverlay={true} />}
