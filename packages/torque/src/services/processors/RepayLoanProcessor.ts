@@ -34,11 +34,6 @@ export class RepayLoanProcessor {
       ]);
     }
 
-    const iTokenContract = await TorqueProvider.Instance.contractsSource.getiTokenContract(taskRequest.borrowAsset);
-
-    if (!iTokenContract) {
-      throw new Error("No iToken contract available!");
-    }
     // Initializing loan
     const bZxContract = await TorqueProvider.Instance.contractsSource.getiBZxContract();
 
@@ -76,7 +71,7 @@ export class RepayLoanProcessor {
         }
         // Detecting token allowance
         task.processingStepNext();
-        erc20allowance = await tokenErc20Contract.allowance.callAsync(account, iTokenContract.address);
+        erc20allowance = await tokenErc20Contract.allowance.callAsync(account, TorqueProvider.Instance.contractsSource.getVaultAddress().toLowerCase());
 
         // Prompting token allowance
         task.processingStepNext();
@@ -84,7 +79,7 @@ export class RepayLoanProcessor {
         // Waiting for token allowance
         task.processingStepNext();
         if (closeAmountInBaseUnits.gt(erc20allowance)) {
-          await tokenErc20Contract!.approve.sendTransactionAsync(iTokenContract.address, TorqueProvider.MAX_UINT, { from: account });
+          await tokenErc20Contract!.approve.sendTransactionAsync(TorqueProvider.Instance.contractsSource.getVaultAddress().toLowerCase(), TorqueProvider.MAX_UINT, { from: account });
         }
       }
 
