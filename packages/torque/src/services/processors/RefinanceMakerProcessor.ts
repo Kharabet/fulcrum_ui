@@ -24,22 +24,6 @@ export class RefinanceMakerProcessor {
             "Transaction completed"
         ]);
 
-        const left = taskRequest.refLoan.debt.minus(taskRequest.loanAmount);
-        const isDust = !(
-            taskRequest.loanAmount.dp(3, BigNumber.ROUND_DOWN)
-                .isEqualTo(taskRequest.refLoan.debt.dp(3, BigNumber.ROUND_DOWN))
-            ||
-            left.gt(taskRequest.refLoan.dust)
-        );
-
-        if (isDust) {
-            if (!window.confirm("Remaining debt should be zero or more than " + taskRequest.refLoan.dust.toString(10) + " DAI. Do you want to continue with total amount?")) {
-                throw new Error("No provider available!");
-            }
-            taskRequest.loanAmount = taskRequest.refLoan.debt;
-        }
-
-
         const cdpManagerAddress = configAddress.CDP_MANAGER;
         const cdpManager: cdpManagerContract = await TorqueProvider.Instance.contractsSource.getCdpManager(cdpManagerAddress);
 
