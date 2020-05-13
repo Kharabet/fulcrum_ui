@@ -49,8 +49,17 @@ export class RefinanceAssetSelector extends Component<IRefinanceAssetSelectorPro
   }
 
   private derivedUpdate = async () => {
+    this.setState({
+      ...this.state,
+      isLoading: true
+    })
     if (TorqueProvider.Instance.providerType === ProviderType.None || !TorqueProvider.Instance.contractsSource || !TorqueProvider.Instance.contractsSource.canWrite) {
-      this.props.doNetworkConnect()
+      this.props.doNetworkConnect();
+      this.setState({
+        refinanceCompoundData: [],
+        refinanceData: [],
+        isLoading: false
+      })
       return;
     }
     const refinanceData = await this.getMakerRefinanceData();

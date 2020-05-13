@@ -64,12 +64,26 @@ export class DashboardPage extends PureComponent<
   }
 
   private async derivedUpdate() {
+    this.setState({
+      ...this.state,
+      isDataLoading: true
+    });
     if (TorqueProvider.Instance.unsupportedNetwork) {
+      this.setState({
+        items: [],
+        itemsAwaiting: [],
+        isDataLoading: false
+      });
       return;
     }
 
     if (TorqueProvider.Instance.providerType === ProviderType.None || !TorqueProvider.Instance.contractsSource || !TorqueProvider.Instance.contractsSource.canWrite) {
-      this.props.doNetworkConnect()
+      this.props.doNetworkConnect();
+      this.setState({
+        items: [],
+        itemsAwaiting: [],
+        isDataLoading: false
+      });
       return;
     }
 
