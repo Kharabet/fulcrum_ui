@@ -30,19 +30,21 @@
         grid-column: 1/3;
         place-self: center;
       }
-      &:hover {
-        background-color: transparent;
-        border: 1px solid #a9b5c7;
-        .refinance-asset__main-block .refinance-asset-selector__non-torque .refinance__input-container .input-amount,
-        .refinance-asset__main-block .refinance-asset-selector__torque .refinance-asset-selector__cdp {
-          background-color: #f5f7f9;
-        }
-        .refinance-asset-selector__collateral-slider {
-          .slider-handle {
-            border: 4px solid #ffffff !important;
+      &:not(.disabled-hover) {
+        &:hover {
+          background-color: transparent;
+          border: 1px solid #a9b5c7;
+          .refinance-asset__main-block .refinance-asset-selector__non-torque .refinance__input-container .input-amount,
+          .refinance-asset__main-block .refinance-asset-selector__torque .refinance-asset-selector__cdp {
+            background-color: #f5f7f9;
           }
-          .slider-track-after {
-            background-color: #f5f7f9 !important;
+          .refinance-asset-selector__collateral-slider {
+            .slider-handle {
+              border: 4px solid #ffffff !important;
+            }
+            .slider-track-after {
+              background-color: #f5f7f9 !important;
+            }
           }
         }
       }
@@ -64,19 +66,16 @@
           &-logo {
             position: relative;
             margin-bottom: 25px;
-            &:after {
-              content: "";
-              position: absolute;
-              width: 39px;
-              height: 22px;
-              background: url("../../assets/images/arrow.svg");
-              right: 30px;
-              top: 3px;
-              background-size: cover;
-            }
-            svg {
+            svg:first-child {
               width: 130px;
               height: 30px;
+            }
+            svg:last-child {
+              position: absolute;
+              right: 30px;
+              top: 0;
+              bottom: 0;
+              margin: auto;
             }
           }
           &-apr {
@@ -382,6 +381,9 @@
           font-size: 16px;
           line-height: 140%;
           color: #de4a4a;
+          &.hidden-details {
+            margin-top: 41px;
+          }
         }
       }
       .refinance-asset__action-block {
@@ -477,10 +479,6 @@
       &-item {
         width: 100%;
         place-self: center;
-        &:hover {
-          .refinance-asset__main-block .refinance-asset-selector__non-torque .refinance__input-container .input-amount {
-          }
-        }
         .refinance-asset__main-block {
           grid-template-columns: repeat(1, 1fr);
           padding: 0;
@@ -488,20 +486,13 @@
             display: grid;
             grid-template-columns: 70% 30%;
             row-gap: 30px;
-            padding: 35px 30px 45px 30px;
+            padding: 55px 30px 45px 30px;
             border-bottom: 1px solid rgba(169, 181, 199, 0.2);
             position: relative;
-            padding-top: 55px;
-            &:after {
-              position: absolute;
-              content: "";
-              background: url(/static/media/arrow.f08e4e58.svg), #f3f9ff;
-              background-size: cover;
-              transform: translate(-50%, 0%) rotate(90deg);
-              left: 50%;
-              bottom: -15px;
-              width: 36px;
-              height: 20px;
+            .refinance-asset-selector__cdp {
+              font-size: 16px;
+              top: 15px;
+              left: 30px;
             }
             &-logo {
               display: flex;
@@ -548,7 +539,7 @@
             row-gap: 30px;
             padding: 30px;
             padding-bottom: 45px;
-            border-bottom: 1px solid rgba(169, 181, 199, 0.2);
+            border-bottom: 1px solid rgba(169, 181, 199, 0.2); //delete
             .refinance-asset-selector__cdp {
               font-size: 14px;
               top: 15px;
@@ -603,6 +594,17 @@
               }
               .arrow {
               }
+            }
+          }
+          .refinance-asset-selector__arrow {
+            position: absolute;
+            background: #f3f9ff;
+            display: flex;
+            bottom: -17px;
+            left: 50%;
+            transform: translateX(-50%);
+            svg {
+              transform: rotate(90deg);
             }
           }
           .refinance-asset-selector__collateral-container {
@@ -676,6 +678,11 @@
             font-size: 12px;
             line-height: 140%;
             padding: 15px 40px;
+          }
+        }
+        &:hover {
+          .refinance-asset-selector__arrow {
+            background-color: #ffffff;
           }
         }
       }

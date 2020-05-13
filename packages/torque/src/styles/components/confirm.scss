@@ -1,0 +1,55 @@
+.confirm-wrapper {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  background-color: rgba(11, 40, 83, 0.2);
+  border-radius: 16px;
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  .confirm {
+    width: 450px;
+    background-color: #ffffff;
+    border: 2px solid #fe7272;
+    box-sizing: border-box;
+    border-radius: 16px;
+    .btn {
+      width: 120px;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      &:not(:last-child) {
+        margin-right: 10px;
+      }
+    }
+    .dialog-content{
+      padding-top: 42px;
+    }
+    .dialog-actions {
+      display: flex;
+      justify-content: flex-end;
+      padding-top: 30px;
+    }
+  }
+}
+@media screen and (max-width: $mobile-version-max-width){
+  .confirm-wrapper {
+    .confirm {
+      width: calc(100% - 60px);
+      p{
+        font-size: 14px;
+      }
+      .btn {
+        height: 42px;
+      }
+      .dialog-content{
+        padding-top: 30px;
+      }
+      .dialog-actions {
+        padding-top: 18px;
+      }
+    }
+  }
+}
