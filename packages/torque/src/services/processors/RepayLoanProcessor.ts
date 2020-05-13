@@ -114,7 +114,10 @@ export class RepayLoanProcessor {
         console.log(e);
       }
       task.processingStepNext();
-      const txHash = await bZxContract.paybackLoanAndClose.sendTransactionAsync(
+      let txHash = ""; 
+      
+      try {
+        txHash = await bZxContract.paybackLoanAndClose.sendTransactionAsync(
         taskRequest.loanOrderHash,                                         // loanOrderHash
         account,                                                           // borrower
         account,                                                           // payer
@@ -131,6 +134,11 @@ export class RepayLoanProcessor {
           gasPrice: await TorqueProvider.Instance.gasPrice()
         }
       );
+      }
+      catch(e){
+        console.log(e);
+        throw new Error(e);
+      }
 
       //Updating the blockchain
       task.processingStepNext();

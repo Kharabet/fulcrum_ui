@@ -65,10 +65,7 @@ export class RefinanceMakerProcessor {
                         isInstaProxy: taskRequest.refLoan.isInstaProxy
                     });
                 } catch (e) {
-                    if (!e.code) {
-                        throw new Error("Dry run failed");
-
-                    }
+                    throw new Error(e);
                 }
 
             } else {
@@ -101,10 +98,7 @@ export class RefinanceMakerProcessor {
                         });
                     }
                 } catch (e) {
-                    if (!e.code) {
-                        throw new Error("Dry run failed");
-
-                    }
+                    throw new Error(e);
                 }
             }
         } else {
@@ -122,9 +116,7 @@ export class RefinanceMakerProcessor {
             try {
                 txHash = await makerBridge.migrateLoan.sendTransactionAsync([taskRequest.refLoan.cdpId], [new BigNumber(dart)], [new BigNumber(dink)], [new BigNumber(dink)], [new BigNumber(dart)], { from: taskRequest.refLoan.accountAddress });
             } catch (e) {
-                if (!e.code) {
-                    throw new Error("Dry run failed");
-                }
+                throw new Error(e);
             }
         }
 

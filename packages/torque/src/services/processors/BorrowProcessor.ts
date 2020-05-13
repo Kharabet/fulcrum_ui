@@ -138,6 +138,7 @@ export class BorrowProcessor {
             );
         } catch (e) {
             console.log(e);
+            throw new Error(e);
         }
 
         //   receipt = await TorqueProvider.Instance.waitForTransactionMined(txHash);

@@ -118,6 +118,7 @@ export class ManageCollateralProcessor {
                 );
             } catch (e) {
                 console.log(e);
+                throw new Error(e);
             }
 
         } else {
@@ -158,6 +159,7 @@ export class ManageCollateralProcessor {
             }
             catch (e) {
                 console.log(e);
+                throw new Error(e);
             }
         }
 

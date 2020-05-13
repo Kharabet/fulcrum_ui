@@ -124,6 +124,7 @@ export class ExtendLoanProcessor {
               );
         } catch (e) {
             console.log(e);
+            throw new Error(e);
         }
 
         //Updating the blockchain
