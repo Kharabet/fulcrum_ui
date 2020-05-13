@@ -4,6 +4,7 @@ import { RepayLoanRequest } from "../../domain/RepayLoanRequest";
 import { RequestTask } from "../../domain/RequestTask";
 import { TorqueProvider } from "../TorqueProvider";
 import { erc20Contract } from "../../contracts/erc20";
+import { Asset } from "../../domain/Asset";
 
 export class RepayLoanProcessor {
   public run = async (task: RequestTask, account: string, skipGas: boolean) => {
@@ -12,8 +13,9 @@ export class RepayLoanProcessor {
     }
 
     const taskRequest: RepayLoanRequest = (task.request as RepayLoanRequest);
+    const isETHBorrowAsset = taskRequest.borrowAsset === Asset.ETH;
 
-    if (TorqueProvider.Instance.isETHAsset(taskRequest.borrowAsset)) {
+    if (isETHBorrowAsset) {
       //Initializing
       task.processingStart([
         "Initializing",
@@ -50,11 +52,11 @@ export class RepayLoanProcessor {
       } else {
         // don't allow 0 payback if more is owed
         if (closeAmountInBaseUnits.eq(0))
-          return;
+          throw new Error("Close amount is 0");
       }
       closeAmountInBaseUnits = new BigNumber(closeAmountInBaseUnits.toFixed(0, 1));
 
-      if (!TorqueProvider.Instance.isETHAsset(taskRequest.borrowAsset)) {
+      if (!isETHBorrowAsset) {
 
         let tokenErc20Contract: erc20Contract | null = null;
         let assetErc20Address: string | null = "";
@@ -83,7 +85,6 @@ export class RepayLoanProcessor {
         }
       }
 
-      //Updating the blockchain
       let gasAmountBN;
       try {
         // console.log(bZxContract.address);
@@ -97,7 +98,7 @@ export class RepayLoanProcessor {
           closeAmountInBaseUnits,
           {
             from: account,
-            value: TorqueProvider.Instance.isETHAsset(taskRequest.borrowAsset) ?
+            value: isETHBorrowAsset ?
               closeAmountInBaseUnitsValue :
               undefined,
             gas: TorqueProvider.Instance.gasLimit
@@ -105,32 +106,33 @@ export class RepayLoanProcessor {
         );
         gasAmountBN = new BigNumber(gasAmount).multipliedBy(TorqueProvider.Instance.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
       } catch (e) {
-        // tslint:disable-next-line
         console.log(e);
       }
+
+      //Submitting loan
       task.processingStepNext();
-      let txHash = ""; 
-      
+      let txHash = "";
+
       try {
         txHash = await bZxContract.paybackLoanAndClose.sendTransactionAsync(
-        taskRequest.loanOrderHash,                                         // loanOrderHash
-        account,                                                           // borrower
-        account,                                                           // payer
-        TorqueProvider.Instance.isETHAsset(taskRequest.collateralAsset)    // receiver
-          ? TorqueProvider.ZERO_ADDRESS                                     // will refund with ETH
-          : account,
-        closeAmountInBaseUnits,                                             // closeAmount
-        {
-          from: account,
-          value: TorqueProvider.Instance.isETHAsset(taskRequest.borrowAsset)
-            ? closeAmountInBaseUnitsValue
-            : undefined,
-          gas: gasAmountBN ? gasAmountBN.toString() : "3000000",
-          gasPrice: await TorqueProvider.Instance.gasPrice()
-        }
-      );
+          taskRequest.loanOrderHash,                                         // loanOrderHash
+          account,                                                           // borrower
+          account,                                                           // payer
+          TorqueProvider.Instance.isETHAsset(taskRequest.collateralAsset)    // receiver
+            ? TorqueProvider.ZERO_ADDRESS                                     // will refund with ETH
+            : account,
+          closeAmountInBaseUnits,                                             // closeAmount
+          {
+            from: account,
+            value: isETHBorrowAsset
+              ? closeAmountInBaseUnitsValue
+              : undefined,
+            gas: gasAmountBN ? gasAmountBN.toString() : "3000000",
+            gasPrice: await TorqueProvider.Instance.gasPrice()
+          }
+        );
       }
-      catch(e){
+      catch (e) {
         console.log(e);
         throw new Error(e);
       }
