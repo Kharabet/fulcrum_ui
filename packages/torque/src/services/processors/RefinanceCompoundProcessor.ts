@@ -70,9 +70,9 @@ export class RefinanceCompoundProcessor {
             borrowAmountsSum = borrowAmountsSum.plus(borrowAmount);
         }
 
-        taskRequest.loanAmount = taskRequest.loanAmount.times(10 ** loan.decimals).integerValue(BigNumber.ROUND_DOWN);
+        const loanAmount = taskRequest.loanAmount.times(10 ** loan.decimals).integerValue(BigNumber.ROUND_DOWN);
 
-        borrowAmounts[0] = borrowAmounts[0].plus(taskRequest.loanAmount.minus(borrowAmountsSum));
+        borrowAmounts[0] = borrowAmounts[0].plus(loanAmount.minus(borrowAmountsSum));
 
         let txHash = "";
         //Submitting loan refinance          
