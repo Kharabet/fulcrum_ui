@@ -1030,7 +1030,7 @@ export class TorqueProvider {
 
   public migrateMakerLoan = async (refRequest: RefinanceData, loanAmount: BigNumber) => {
 
-    const left = refRequest.debt.minus(loanAmount);
+    /*const left = refRequest.debt.minus(loanAmount);
     const isDust = !(
       loanAmount.dp(3, BigNumber.ROUND_DOWN)
         .isEqualTo(refRequest.debt.dp(3, BigNumber.ROUND_DOWN))
@@ -1043,7 +1043,7 @@ export class TorqueProvider {
         return null;
       }
       loanAmount = refRequest.debt;
-    }
+    }*/
 
     const cdpManagerAddress = configAddress.CDP_MANAGER;
     if (this.web3Wrapper && this.contractsSource) {

@@ -18,6 +18,15 @@
   &:active {
     background-color: $color-blue--pressed;
   }
+  &.btn-light {
+    color: #276bfb;
+    background-color: rgba(203, 226, 255, 1);
+
+    &:hover,
+    &:active {
+      background-color: rgba(203, 226, 255, 0.8);
+    }
+  }
 }
 
 .btn-size--small {
