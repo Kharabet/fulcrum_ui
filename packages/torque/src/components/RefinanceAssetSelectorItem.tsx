@@ -41,7 +41,6 @@ interface IRefinanceAssetSelectorItemState {
   refRateMonth: number;
   refRateYear: number;
   isShowConfirm: boolean;
-  confirm: boolean;
 }
 
 export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelectorItemProps, IRefinanceAssetSelectorItemState> {
@@ -61,7 +60,6 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
       refRateMonth: 0,
       refRateYear: 0,
       isShowConfirm: false,
-      confirm: false,
     };
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderChanged, this.onProviderChanged);
@@ -158,11 +156,11 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
   };
 
   public onDecline = async () => {
-    await this.setState({ ...this.state, confirm: false, isShowConfirm: false });
+    await this.setState({ ...this.state, isShowConfirm: false });
   }
 
   public onConfirm = async () => {
-    await this.setState({ ...this.state, confirm: true, isShowConfirm: false, borrowAmount: this.props.refinanceData.debt });
+    await this.setState({ ...this.state, isShowConfirm: false, borrowAmount: this.props.refinanceData.debt });
     await this.checkCdpManager();
   }
 
