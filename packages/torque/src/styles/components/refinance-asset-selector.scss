@@ -30,19 +30,21 @@
         grid-column: 1/3;
         place-self: center;
       }
-      &:hover {
-        background-color: transparent;
-        border: 1px solid #a9b5c7;
-        .refinance-asset__main-block .refinance-asset-selector__non-torque .refinance__input-container .input-amount,
-        .refinance-asset__main-block .refinance-asset-selector__torque .refinance-asset-selector__cdp {
-          background-color: #f5f7f9;
-        }
-        .refinance-asset-selector__collateral-slider {
-          .slider-handle {
-            border: 4px solid #ffffff !important;
+      &:not(.disabled-hover) {
+        &:hover {
+          background-color: transparent;
+          border: 1px solid #a9b5c7;
+          .refinance-asset__main-block .refinance-asset-selector__non-torque .refinance__input-container .input-amount,
+          .refinance-asset__main-block .refinance-asset-selector__torque .refinance-asset-selector__cdp {
+            background-color: #f5f7f9;
           }
-          .slider-track-after {
-            background-color: #f5f7f9 !important;
+          .refinance-asset-selector__collateral-slider {
+            .slider-handle {
+              border: 4px solid #ffffff !important;
+            }
+            .slider-track-after {
+              background-color: #f5f7f9 !important;
+            }
           }
         }
       }
@@ -679,7 +681,7 @@
           }
         }
         &:hover {
-          .refinance-asset-selector__arrow{
+          .refinance-asset-selector__arrow {
             background-color: #ffffff;
           }
         }
