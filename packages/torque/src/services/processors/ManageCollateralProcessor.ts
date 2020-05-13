@@ -143,7 +143,7 @@ export class ManageCollateralProcessor {
 
             try {
 
-                const txHash = await bZxContract.withdrawCollateralForBorrower.sendTransactionAsync(
+                txHash = await bZxContract.withdrawCollateralForBorrower.sendTransactionAsync(
                     taskRequest.loanOrderState.loanData!.loanOrderHash,             // loanOrderHash
                     collateralAmountInBaseUnits,                                                // depositAmount
                     account,                                                                    // trader
