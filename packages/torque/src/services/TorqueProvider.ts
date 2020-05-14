@@ -2076,7 +2076,7 @@ export class TorqueProvider {
   };
 
   private cancelRequestTask = async (requestTask: RequestTask) => {
-    if (!(this.isProcessing || this.isChecking)) {
+    // if (!(this.isProcessing || this.isChecking)) {
       this.isProcessing = true;
 
       try {
@@ -2090,7 +2090,7 @@ export class TorqueProvider {
       } finally {
         this.isProcessing = false;
       }
-    }
+    // }
   };
 
   private processQueue = async (force: boolean, skipGas: boolean) => {
@@ -2314,6 +2314,8 @@ export class TorqueProvider {
         throw new Error("Unable to get wallet address!");
       }
 
+      this.eventEmitter.emit(TorqueProviderEvents.AskToOpenProgressDlg, task.request.id);
+
       const processor = new RefinanceCompoundProcessor();
       await processor.run(task, account, skipGas, configAddress, web3);
 
@@ -2324,6 +2326,10 @@ export class TorqueProvider {
         console.log(e);
       }
       task.processingEnd(false, false, e);
+    }
+    finally{
+      this.onTaskCancel(task)
+      this.eventEmitter.emit(TorqueProviderEvents.AskToCloseProgressDlg, task.request.id);
     }
   };
   

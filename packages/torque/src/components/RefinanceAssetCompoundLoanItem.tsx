@@ -20,6 +20,7 @@ import { CollaterallRefinanceSlider } from "./CollaterallRefinanceSlider";
 import { NavService } from '../services/NavService';
 import { RefinanceCompoundRequest } from '../domain/RefinanceCompoundRequest';
 import { RefinanceDydxRequest } from '../domain/RefinanceDydxRequest';
+import { ProgressFragment } from "./ProgressFragment";
 
 interface IRefinanceAssetCompoundLoanItemState {
   isShow: boolean;
@@ -36,6 +37,7 @@ interface IRefinanceAssetCompoundLoanItemState {
   head_image: ReactElement;
   refRateMonth: number;
   refRateYear: number;
+  taskId: number;
 }
 
 interface IRefinanceAssetCompoundLoanItemProps {
@@ -66,7 +68,8 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
 
       head_image: this.props.loan.type == "dydx" ? <DydxImg /> : <CompoundImg />,
       refRateMonth: 0,
-      refRateYear: 0
+      refRateYear: 0,
+      taskId: 0
     };
 
     const loanAssetDt = AssetsDictionary.assets.get(this.state.loan.asset) as AssetDetails;
@@ -77,9 +80,20 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
     }
     const head_image = this.state.loan.type == "dydx" ? <DydxImg /> : <CompoundImg />;
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
+    TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.AskToOpenProgressDlg, this.onAskToOpenProgressDlg);
+    TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.AskToCloseProgressDlg, this.onAskToCloseProgressDlg);
     this._inputTextChange = new Subject<number>();
   }
 
+  private onAskToOpenProgressDlg = (taskId: number) => {
+    if (taskId !== this.state.taskId) return;
+    this.setState({ ...this.state, isLoadingTransaction: true })
+  }
+  private onAskToCloseProgressDlg = (taskId: number) => {
+    if (taskId !== this.state.taskId) return;
+    this.setState({ ...this.state, isLoadingTransaction: false });
+    NavService.Instance.History.push("/dashboard");
+  }
 
   private onProviderAvailable = () => {
     this.derivedUpdate();
@@ -147,19 +161,25 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
 
   public migrateLoan = async () => {
     const loan = Object.assign({}, this.state.loan);
-    let receipt;
+    let receipt, request;
     try {
-      this.setState({ ...this.state, isLoadingTransaction: true });
-      this.state.loan.type === "dydx"
-        ? receipt = await TorqueProvider.Instance.onMigrateSoloLoan(new RefinanceDydxRequest(loan, this.state.borrowAmount))  
-        : receipt = await TorqueProvider.Instance.onMigrateCompoundLoan(new RefinanceCompoundRequest(loan, this.state.borrowAmount))  
+      // this.setState({ ...this.state, isLoadingTransaction: true });
+      if (this.state.loan.type === "dydx") {
+        request = new RefinanceDydxRequest(loan, this.state.borrowAmount);
+        await this.setState({ ...this.state, taskId: request.id });
+        receipt = await TorqueProvider.Instance.onMigrateSoloLoan(request);
+      } else {
+        request = new RefinanceCompoundRequest(loan, this.state.borrowAmount);
+        await this.setState({ ...this.state, taskId: request.id });
+        receipt = await TorqueProvider.Instance.onMigrateCompoundLoan(request);
+      }
       // if (receipt.status === 1) {
       //   this.setState({ ...this.state, isLoadingTransaction: false });
       //   NavService.Instance.History.push("/dashboard");
       // }
-      this.setState({ ...this.state, isLoadingTransaction: false });
+      // this.setState({ ...this.state, isLoadingTransaction: false });
     } catch (error) {
-      this.setState({ ...this.state, isLoadingTransaction: false });
+      // this.setState({ ...this.state, isLoadingTransaction: false });
       console.log(error);
     }
   };
@@ -192,10 +212,11 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
     return (
 
       <div className={`refinance-asset-selector-item ${this.state.isShowInfoCollateralAssetDt0 || this.state.isShowInfoCollateralAssetDt1 ? "inactive" : ""}`}>
-        {this.state.isLoadingTransaction
+        {this.state.isLoadingTransaction && <ProgressFragment taskId={this.state.taskId} />}
+        {/* {this.state.isLoadingTransaction
           ? <Loader quantityDots={4} sizeDots={'middle'} title={'Processed Token'} isOverlay={true} />
           : null
-        }
+        } */}
         <div className="refinance-asset__main-block">
           <div className="refinance-asset-selector__non-torque">
             <div className="refinance-asset-selector__non-torque-logo">
@@ -203,7 +224,7 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
               {!this.props.isMobileMedia && <Arrow />}
             </div>
             <div className="refinance-asset-selector__non-torque-apr">
-              <div  title={this.state.loan.apr.toFixed()} className="value">{this.state.loan.apr.dp(0, BigNumber.ROUND_CEIL).toString()}%</div>
+              <div title={this.state.loan.apr.toFixed()} className="value">{this.state.loan.apr.dp(0, BigNumber.ROUND_CEIL).toString()}%</div>
               <div className="text">Variable APR</div>
             </div>
             <div className="refinance__input-container">
