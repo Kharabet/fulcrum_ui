@@ -29,6 +29,7 @@ export interface IBorrowedFundsListItemProps {
 }
 
 interface IBorrowedFundsListItemState {
+  borrowedFundsItem: IBorrowedFundsState;
   assetDetails: AssetDetails | null;
   interestRate: BigNumber;
   isInProgress: boolean;
@@ -41,6 +42,7 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
     super(props);
 
     this.state = { 
+      borrowedFundsItem: props.item,
       assetDetails: null, 
       interestRate: new BigNumber(0), 
       isLoadingTransaction: false,
@@ -51,7 +53,7 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.AskToCloseProgressDlg, this.onAskToCloseProgressDlg);
 
   }
-
+  
   public componentDidMount(): void {
     this.derivedUpdate();
   }
@@ -65,7 +67,7 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
     if (!this.state.request || taskId !== this.state.request.id) return;
     this.setState({ ...this.state, isLoadingTransaction: true })
   }
-  private onAskToCloseProgressDlg = (task: RequestTask) => {
+  private onAskToCloseProgressDlg = async (task: RequestTask) => {
     if (!this.state.request || task.request.id !== this.state.request.id) return;
     if (task.status === RequestStatus.FAILED || task.status === RequestStatus.FAILED_SKIPGAS) {
       window.setTimeout(() => {
@@ -74,7 +76,8 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
       }, 5000)
       return;
     }
-    this.setState({ ...this.state, isLoadingTransaction: false });
+    await this.derivedUpdate();
+    await this.setState({ ...this.state, isLoadingTransaction: false });
   }
 
   public componentDidUpdate(
@@ -82,35 +85,30 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
     prevState: Readonly<IBorrowedFundsListItemState>,
     snapshot?: any
   ): void {
-    if (this.props.item.loanAsset !== prevProps.item.loanAsset || this.state.isLoadingTransaction !== prevState.isLoadingTransaction) {
+    if (this.props.item.loanAsset !== prevProps.item.loanAsset) {
       this.derivedUpdate();
     }
   }
 
   private derivedUpdate = async () => {
     const assetDetails = AssetsDictionary.assets.get(this.props.item.loanAsset) || null;
-    this.setState({ ...this.state, assetDetails: assetDetails, interestRate: this.props.item.interestRate });
+    const loans = await TorqueProvider.Instance.getLoansList(); 
+    const thisLoan = loans.find(loan => loan.loanOrderHash === this.props.item.loanOrderHash);
+    await this.setState({ ...this.state, 
+      assetDetails: assetDetails, 
+      interestRate: this.props.item.interestRate, 
+      borrowedFundsItem: thisLoan ? thisLoan : this.state.borrowedFundsItem 
+    });
   };
-  private migrateSaiToDai = async () => {
-    // migrateSaiToDai
-    if (this.props.item.loanData) {
-      let loanOrderHash = this.props.item.loanData.loanOrderHash
-      if (loanOrderHash == undefined) {
-        loanOrderHash = ''
-      }
-      const migrateresp = TorqueProvider.Instance.migrateSaiToDai(loanOrderHash);
-    }
-
-  }
+  
   public render() {
     if (!this.state.assetDetails) {
       return null;
     }
 
-    const { item } = this.props;
-    const { interestRate, assetDetails } = this.state;
+    const { interestRate, assetDetails, borrowedFundsItem } = this.state;
 
-    const positionSafetyText = TorqueProvider.Instance.getPositionSafetyText(item);
+    const positionSafetyText = TorqueProvider.Instance.getPositionSafetyText(borrowedFundsItem);
     const collateralizedStateSelector = positionSafetyText === "Safe" ?
       "safe" :
       positionSafetyText === "Danger" ?
@@ -121,11 +119,11 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
     // const lastInRowModifier = this.props.lastInTheRow ? "borrowed-funds-list-item--last-in-row" : "";
 
     //115%
-    const sliderMin = item.loanData!.maintenanceMarginAmount.div(10 ** 18).toNumber();
+    const sliderMin = borrowedFundsItem.loanData!.maintenanceMarginAmount.div(10 ** 18).toNumber();
     //300%
     const sliderMax = sliderMin + 185;
 
-    let sliderValue = item.collateralizedPercent.multipliedBy(100).toNumber();
+    let sliderValue = borrowedFundsItem.collateralizedPercent.multipliedBy(100).toNumber();
     if (sliderValue > sliderMax) {
       sliderValue = sliderMax;
     } else if (sliderValue < sliderMin) {
@@ -134,7 +132,7 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
 
     return (
       <div className={`borrowed-funds-list-item`}>
-        {/*this.props.item.loanAsset === this.props.selectedAsset
+        {/*this.props.borrowedFundsItem.loanAsset === this.props.selectedAsset
                 ? */this.state.isLoadingTransaction && this.state.request && <ProgressFragment taskId={this.state.request.id} />
 
           // ? this.state.isLoadingTransaction
@@ -145,9 +143,9 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
         <div className="borrowed-funds-list-item__header">
           <div className="borrowed-funds-list-item__header-loan">
             <div
-              title={`${item.amountOwed.toFixed(18)} ${assetDetails.displayName}`}
+              title={`${borrowedFundsItem.amountOwed.toFixed(18)} ${assetDetails.displayName}`}
               className="borrowed-funds-list-item__header-loan-owed">
-              {item.amountOwed.toFixed(5)}
+              {borrowedFundsItem.amountOwed.toFixed(5)}
             </div>
             <div
               title={`${interestRate.multipliedBy(100).toFixed(18)}% APR`}
@@ -171,9 +169,9 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
             {positionSafetyText !== "Display Error" &&
               <div>
                 <div
-                  title={`${item.collateralizedPercent.multipliedBy(100).plus(100).toFixed(18)}%`}
+                  title={`${borrowedFundsItem.collateralizedPercent.multipliedBy(100).plus(100).toFixed(18)}%`}
                   className={`borrowed-funds-list-item__body-collateralized ${collateralizedStateSelector}`}>
-                  <span className="value">{item.collateralizedPercent.multipliedBy(100).plus(100).toFixed(2)}</span>%
+                  <span className="value">{borrowedFundsItem.collateralizedPercent.multipliedBy(100).plus(100).toFixed(2)}</span>%
                 </div>
                 <div className="borrowed-funds-list-item__body-collateralized-label">Collateralized</div>
 
@@ -195,10 +193,10 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
               value={sliderValue}
             />
           </div>
-          <div title={`${item.collateralAmount.toFixed(18)} ${item.collateralAsset}`}
+          <div title={`${borrowedFundsItem.collateralAmount.toFixed(18)} ${borrowedFundsItem.collateralAsset}`}
             className="borrowed-funds-list-item__body-collateralized-value">
-            <span className="value">{item.collateralAmount.toFixed(4)}</span>&nbsp;
-                  {item.collateralAsset === Asset.WETH ? Asset.ETH : item.collateralAsset}
+            <span className="value">{borrowedFundsItem.collateralAmount.toFixed(4)}</span>&nbsp;
+                  {borrowedFundsItem.collateralAsset === Asset.WETH ? Asset.ETH : borrowedFundsItem.collateralAsset}
           </div>
         </div>
         {this.state.isInProgress ? (
