@@ -147,6 +147,7 @@ export class DashboardPage extends PureComponent<
                 <BorrowedFundsList
                   items={this.state.items}
                   itemsAwaiting={this.state.itemsAwaiting}
+                  manageCollateralDlgRef={this.manageCollateralDlgRef}
                   onManageCollateral={this.onManageCollateral}
                   onRepayLoan={this.onRepayLoan}
                   onExtendLoan={this.onExtendLoan}

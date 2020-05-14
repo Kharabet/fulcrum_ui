@@ -2077,19 +2077,19 @@ export class TorqueProvider {
 
   private cancelRequestTask = async (requestTask: RequestTask) => {
     // if (!(this.isProcessing || this.isChecking)) {
-      this.isProcessing = true;
+    this.isProcessing = true;
 
-      try {
-        const task = TasksQueue.Instance.peek();
+    try {
+      const task = TasksQueue.Instance.peek();
 
-        if (task) {
-          if (task.request.id === requestTask.request.id) {
-            TasksQueue.Instance.dequeue();
-          }
+      if (task) {
+        if (task.request.id === requestTask.request.id) {
+          TasksQueue.Instance.dequeue();
         }
-      } finally {
-        this.isProcessing = false;
       }
+    } finally {
+      this.isProcessing = false;
+    }
     // }
   };
 
@@ -2265,6 +2265,7 @@ export class TorqueProvider {
 
       // Initializing loan
       const taskRequest: ManageCollateralRequest = (task.request as ManageCollateralRequest);
+      this.eventEmitter.emit(TorqueProviderEvents.AskToOpenProgressDlg, task.request.id);
 
       const processor = new ManageCollateralProcessor();
       await processor.run(task, account, skipGas);
@@ -2276,6 +2277,9 @@ export class TorqueProvider {
         console.log(e);
       }
       task.processingEnd(false, false, e);
+    }
+    finally {
+      this.eventEmitter.emit(TorqueProviderEvents.AskToCloseProgressDlg, task);
     }
   };
 
@@ -2327,11 +2331,11 @@ export class TorqueProvider {
       }
       task.processingEnd(false, false, e);
     }
-    finally{
+    finally {
       this.eventEmitter.emit(TorqueProviderEvents.AskToCloseProgressDlg, task);
     }
   };
-  
+
   private processRefinanceDydxRequestTask = async (task: RequestTask, skipGas: boolean) => {
     try {
       if (!(this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite)) {

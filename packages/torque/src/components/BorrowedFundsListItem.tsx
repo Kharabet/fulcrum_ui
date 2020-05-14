@@ -8,32 +8,73 @@ import { TorqueProvider } from "../services/TorqueProvider";
 import { CollateralSlider } from "./CollateralSlider";
 
 import { Loader } from "./Loader";
+import { ManageCollateralRequest } from "../domain/ManageCollateralRequest";
+import { RepayLoanRequest } from "../domain/RepayLoanRequest";
+import { ExtendLoanRequest } from "../domain/ExtendLoanRequest";
+import { BorrowMoreRequest } from "../domain/BorrowMoreRequest";
+import { TorqueProviderEvents } from "../services/events/TorqueProviderEvents";
+import { RequestStatus } from "../domain/RequestStatus";
+import { RequestTask } from "../domain/RequestTask";
+import { ProgressFragment } from "./ProgressFragment";
+import { ManageCollateralDlg } from "./ManageCollateralDlg";
 
 export interface IBorrowedFundsListItemProps {
   item: IBorrowedFundsState;
   selectedAsset: Asset;
-  isLoadingTransaction: boolean;
   onManageCollateral: (item: IBorrowedFundsState) => void;
   onRepayLoan: (item: IBorrowedFundsState) => void;
   onExtendLoan: (item: IBorrowedFundsState) => void;
   onBorrowMore: (item: IBorrowedFundsState) => void;
+  manageCollateralDlgRef: React.RefObject<ManageCollateralDlg>
 }
 
 interface IBorrowedFundsListItemState {
   assetDetails: AssetDetails | null;
   interestRate: BigNumber;
   isInProgress: boolean;
+  isLoadingTransaction: boolean;
+  request: ManageCollateralRequest | RepayLoanRequest | ExtendLoanRequest | BorrowMoreRequest | undefined;
 }
 
 export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps, IBorrowedFundsListItemState> {
   constructor(props: IBorrowedFundsListItemProps) {
     super(props);
 
-    this.state = { assetDetails: null, interestRate: new BigNumber(0), isInProgress: props.item.isInProgress };
+    this.state = { 
+      assetDetails: null, 
+      interestRate: new BigNumber(0), 
+      isLoadingTransaction: false,
+      isInProgress: props.item.isInProgress,
+      request: undefined
+    };    
+    TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.AskToOpenProgressDlg, this.onAskToOpenProgressDlg);
+    TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.AskToCloseProgressDlg, this.onAskToCloseProgressDlg);
+
   }
 
   public componentDidMount(): void {
     this.derivedUpdate();
+  }
+  
+  public componentWillUnmount(): void {
+    TorqueProvider.Instance.eventEmitter.off(TorqueProviderEvents.AskToOpenProgressDlg, this.onAskToOpenProgressDlg);
+    TorqueProvider.Instance.eventEmitter.off(TorqueProviderEvents.AskToCloseProgressDlg, this.onAskToCloseProgressDlg);
+  }
+  
+  private onAskToOpenProgressDlg = (taskId: number) => {
+    if (!this.state.request || taskId !== this.state.request.id) return;
+    this.setState({ ...this.state, isLoadingTransaction: true })
+  }
+  private onAskToCloseProgressDlg = (task: RequestTask) => {
+    if (!this.state.request || task.request.id !== this.state.request.id) return;
+    if (task.status === RequestStatus.FAILED || task.status === RequestStatus.FAILED_SKIPGAS) {
+      window.setTimeout(() => {
+        TorqueProvider.Instance.onTaskCancel(task);
+        this.setState({ ...this.state, isLoadingTransaction: false })
+      }, 5000)
+      return;
+    }
+    this.setState({ ...this.state, isLoadingTransaction: false });
   }
 
   public componentDidUpdate(
@@ -41,7 +82,7 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
     prevState: Readonly<IBorrowedFundsListItemState>,
     snapshot?: any
   ): void {
-    if (this.props.item.loanAsset !== prevProps.item.loanAsset || this.props.isLoadingTransaction !== prevProps.isLoadingTransaction) {
+    if (this.props.item.loanAsset !== prevProps.item.loanAsset || this.state.isLoadingTransaction !== prevState.isLoadingTransaction) {
       this.derivedUpdate();
     }
   }
@@ -93,11 +134,13 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
 
     return (
       <div className={`borrowed-funds-list-item`}>
-        {this.props.item.loanAsset === this.props.selectedAsset
-          ? this.props.isLoadingTransaction
-            ? <Loader quantityDots={4} sizeDots={'middle'} title={'Processed Token'} isOverlay={true} />
-            : null
-          : null
+        {/*this.props.item.loanAsset === this.props.selectedAsset
+                ? */this.state.isLoadingTransaction && this.state.request && <ProgressFragment taskId={this.state.request.id} />
+
+          // ? this.state.isLoadingTransaction
+          //   ? <Loader quantityDots={4} sizeDots={'middle'} title={'Processed Token'} isOverlay={true} />
+          //   : null
+          // : null
         }
         <div className="borrowed-funds-list-item__header">
           <div className="borrowed-funds-list-item__header-loan">
@@ -184,8 +227,18 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
     );
   }
 
-  private onManageCollateral = () => {
-    this.props.onManageCollateral({ ...this.props.item });
+  private onManageCollateral = async () => {
+    if (!this.props.manageCollateralDlgRef.current) return;
+
+    try {
+      const manageCollateralRequest = await this.props.manageCollateralDlgRef.current.getValue({ ...this.props.item });
+      await this.setState({ ...this.state, request: manageCollateralRequest });
+      await TorqueProvider.Instance.onDoManageCollateral(manageCollateralRequest);
+    } catch (error) {
+      if (error.message !== "Form closed")
+        console.error(error);
+    }
+    // this.props.onManageCollateral({ ...this.props.item });
   };
 
   private onRepayLoan = () => {

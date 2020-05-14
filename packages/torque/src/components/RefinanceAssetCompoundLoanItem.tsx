@@ -105,7 +105,9 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
   };
 
   public componentWillUnmount(): void {
-    TorqueProvider.Instance.eventEmitter.removeListener(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
+    TorqueProvider.Instance.eventEmitter.off(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
+    TorqueProvider.Instance.eventEmitter.off(TorqueProviderEvents.AskToOpenProgressDlg, this.onAskToOpenProgressDlg);
+    TorqueProvider.Instance.eventEmitter.off(TorqueProviderEvents.AskToCloseProgressDlg, this.onAskToCloseProgressDlg);
   }
 
   public componentDidMount(): void {
