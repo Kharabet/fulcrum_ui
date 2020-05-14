@@ -62,6 +62,8 @@ import { RefinanceMakerRequest } from "../domain/RefinanceMakerRequest";
 import { RefinanceMakerProcessor } from "./processors/RefinanceMakerProcessor";
 import { RefinanceCompoundRequest } from "../domain/RefinanceCompoundRequest";
 import { RefinanceCompoundProcessor } from "./processors/RefinanceCompoundProcessor";
+import { RefinanceDydxRequest } from "../domain/RefinanceDydxRequest";
+import { RefinanceDydxProcessor } from "./processors/RefinanceDydxProcessor";
 
 const web3: Web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
 let configAddress: any;
@@ -821,6 +823,7 @@ export class TorqueProvider {
 
     const markets: BigNumber[] = [];
     const amounts: BigNumber[] = [];
+
     const borrowAmounts: BigNumber[] = [];
 
     const divider = loan.balance.div(amount);
@@ -2053,6 +2056,12 @@ export class TorqueProvider {
     }
   };
 
+  public onMigrateSoloLoan = async (request: RefinanceDydxRequest) => {
+    if (request) {
+      TasksQueue.Instance.enqueue(new RequestTask(request));
+    }
+  };
+
   private onTaskEnqueued = async (requestTask: RequestTask) => {
     await this.processQueue(false, false);
   };
@@ -2155,6 +2164,10 @@ export class TorqueProvider {
 
     if (task.request instanceof RefinanceCompoundRequest) {
       await this.processRefinanceCompoundRequestTask(task, skipGas);
+    }
+
+    if (task.request instanceof RefinanceDydxRequest) {
+      await this.processRefinanceDydxRequestTask(task, skipGas);
     }
 
     return false;
@@ -2302,6 +2315,30 @@ export class TorqueProvider {
       }
 
       const processor = new RefinanceCompoundProcessor();
+      await processor.run(task, account, skipGas, configAddress, web3);
+
+      task.processingEnd(true, false, null);
+    } catch (e) {
+      if (!e.message.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)) {
+        // tslint:disable-next-line:no-console
+        console.log(e);
+      }
+      task.processingEnd(false, false, e);
+    }
+  };
+  
+  private processRefinanceDydxRequestTask = async (task: RequestTask, skipGas: boolean) => {
+    try {
+      if (!(this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite)) {
+        throw new Error("No provider available!");
+      }
+
+      const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+      if (!account) {
+        throw new Error("Unable to get wallet address!");
+      }
+
+      const processor = new RefinanceDydxProcessor();
       await processor.run(task, account, skipGas, configAddress, web3);
 
       task.processingEnd(true, false, null);
