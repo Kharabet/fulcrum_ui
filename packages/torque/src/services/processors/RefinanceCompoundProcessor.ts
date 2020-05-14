@@ -94,7 +94,7 @@ export class RefinanceCompoundProcessor {
             );
         } catch (e) {
             console.log(e)
-            throw new Error(e);
+            throw e;
         }
 
 

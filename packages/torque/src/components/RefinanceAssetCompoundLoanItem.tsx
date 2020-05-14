@@ -21,6 +21,8 @@ import { NavService } from '../services/NavService';
 import { RefinanceCompoundRequest } from '../domain/RefinanceCompoundRequest';
 import { RefinanceDydxRequest } from '../domain/RefinanceDydxRequest';
 import { ProgressFragment } from "./ProgressFragment";
+import { RequestStatus } from "../domain/RequestStatus";
+import { RequestTask } from "../domain/RequestTask";
 
 interface IRefinanceAssetCompoundLoanItemState {
   isShow: boolean;
@@ -37,7 +39,7 @@ interface IRefinanceAssetCompoundLoanItemState {
   head_image: ReactElement;
   refRateMonth: number;
   refRateYear: number;
-  taskId: number;
+  request: RefinanceCompoundRequest | undefined;
 }
 
 interface IRefinanceAssetCompoundLoanItemProps {
@@ -69,7 +71,7 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
       head_image: this.props.loan.type == "dydx" ? <DydxImg /> : <CompoundImg />,
       refRateMonth: 0,
       refRateYear: 0,
-      taskId: 0
+      request: undefined
     };
 
     const loanAssetDt = AssetsDictionary.assets.get(this.state.loan.asset) as AssetDetails;
@@ -86,12 +88,20 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
   }
 
   private onAskToOpenProgressDlg = (taskId: number) => {
-    if (taskId !== this.state.taskId) return;
+    if (!this.state.request || taskId !== this.state.request.id) return;
     this.setState({ ...this.state, isLoadingTransaction: true })
   }
-  private onAskToCloseProgressDlg = (taskId: number) => {
-    if (taskId !== this.state.taskId) return;
+  private onAskToCloseProgressDlg = (task: RequestTask) => {
+    if (!this.state.request || task.request.id !== this.state.request.id) return;
+    if (task.status === RequestStatus.FAILED || task.status === RequestStatus.FAILED_SKIPGAS) {
+      window.setTimeout(() => {
+      TorqueProvider.Instance.onTaskCancel(task);
+      this.setState({ ...this.state, isLoadingTransaction: false })
+      }, 5000)
+      return;
+    }
     this.setState({ ...this.state, isLoadingTransaction: false });
+
     NavService.Instance.History.push("/dashboard");
   }
 
@@ -166,11 +176,11 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
       // this.setState({ ...this.state, isLoadingTransaction: true });
       if (this.state.loan.type === "dydx") {
         request = new RefinanceDydxRequest(loan, this.state.borrowAmount);
-        await this.setState({ ...this.state, taskId: request.id });
+        await this.setState({ ...this.state, request: request });
         receipt = await TorqueProvider.Instance.onMigrateSoloLoan(request);
       } else {
         request = new RefinanceCompoundRequest(loan, this.state.borrowAmount);
-        await this.setState({ ...this.state, taskId: request.id });
+        await this.setState({ ...this.state, request: request });
         receipt = await TorqueProvider.Instance.onMigrateCompoundLoan(request);
       }
       // if (receipt.status === 1) {
@@ -212,7 +222,7 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
     return (
 
       <div className={`refinance-asset-selector-item ${this.state.isShowInfoCollateralAssetDt0 || this.state.isShowInfoCollateralAssetDt1 ? "inactive" : ""}`}>
-        {this.state.isLoadingTransaction && <ProgressFragment taskId={this.state.taskId} />}
+        {this.state.isLoadingTransaction && this.state.request && <ProgressFragment taskId={this.state.request.id} />}
         {/* {this.state.isLoadingTransaction
           ? <Loader quantityDots={4} sizeDots={'middle'} title={'Processed Token'} isOverlay={true} />
           : null

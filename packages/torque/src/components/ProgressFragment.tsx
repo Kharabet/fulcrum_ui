@@ -51,11 +51,44 @@ export class ProgressFragment extends Component<IProgressFragmentProps, IProgres
   }
 
   public render() {
+    if (this.state.requestTask === undefined) return null;
     // return this.state.isProgressDetailsModalOpen === false ? null : (
-      console.log(this.state.requestTask)
+    console.log(this.state.requestTask);
+    let title = this.state.requestTask.steps.find((s, i) => i + 1 === this.state.requestTask!.stepCurrent)
+    if (!title)
+      title = this.state.requestTask.status;
+
+
+    let errorMsg;
+    if (this.state.requestTask.error) {
+      if (this.state.requestTask.error.message) {
+        errorMsg = this.state.requestTask.error.message;
+      } else if (typeof this.state.requestTask.error === "string") {
+        errorMsg = this.state.requestTask.error;
+      }
+
+      if (errorMsg) {
+        if (errorMsg.includes(`Request for method "eth_estimateGas" not handled by any subprovider`) ||
+          errorMsg.includes(`always failing transaction`)) {
+          errorMsg = "The transaction seems like it will fail. You can submit the transaction anyway, or cancel.";
+        } else if (errorMsg.includes("Reverted by EVM")) {
+          errorMsg = "The transaction failed. Etherscan link:";
+        } else if (errorMsg.includes("MetaMask Tx Signature: User denied transaction signature.")) {
+          errorMsg = "You didn't confirm in MetaMask. Please try again.";
+        } else if (errorMsg.includes("User denied account authorization.")) {
+          errorMsg = "You didn't authorize MetaMask. Please try again.";
+        } else if (errorMsg.includes("Transaction rejected")) {
+          errorMsg = "You didn't confirm in Gnosis Safe. Please try again.";
+        } else {
+          errorMsg = "";
+        }
+      }
+    }
+    if (errorMsg)
+      title = errorMsg;
     return <React.Fragment>
       {/*<ProgressBar requestTask={this.state.requestTask[0]} onViewMore={this.onViewMore} />*/}
-      {this.state.requestTask !== undefined && <Loader quantityDots={4} sizeDots={'middle'} title={this.state.requestTask.steps.find((s, i) => i + 1 === this.state.requestTask!.stepCurrent)!} isOverlay={true} />}
+      <Loader quantityDots={4} sizeDots={'middle'} title={title} isOverlay={true} />
     </React.Fragment>
     // );
   }

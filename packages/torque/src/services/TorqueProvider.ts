@@ -2328,8 +2328,7 @@ export class TorqueProvider {
       task.processingEnd(false, false, e);
     }
     finally{
-      this.onTaskCancel(task)
-      this.eventEmitter.emit(TorqueProviderEvents.AskToCloseProgressDlg, task.request.id);
+      this.eventEmitter.emit(TorqueProviderEvents.AskToCloseProgressDlg, task);
     }
   };
   
