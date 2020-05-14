@@ -46,7 +46,12 @@ export class BorrowPage extends PureComponent<IBorrowPageParams & RouteComponent
         <div className="borrow-page">
           <HeaderOps isMobileMedia={this.props.isMobileMedia} isLoading={this.props.isLoading} doNetworkConnect={this.props.doNetworkConnect} isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
           <main>
-            <AssetSelector onSelectAsset={this.onSelectAsset} isLoadingTransaction={this.state.isLoadingTransaction} selectedAsset={this.state.selectedAsset} />
+            <AssetSelector 
+            isLoadingTransaction={this.state.isLoadingTransaction} 
+            selectedAsset={this.state.selectedAsset} 
+            borrowDlgRef={this.borrowDlgRef}
+            doNetworkConnect={this.props.doNetworkConnect}
+            />
           </main>
           <Footer isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
         </div>

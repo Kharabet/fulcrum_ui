@@ -2186,6 +2186,7 @@ export class TorqueProvider {
 
       // Initializing loan
       const taskRequest: BorrowRequest = (task.request as BorrowRequest);
+      this.eventEmitter.emit(TorqueProviderEvents.AskToOpenProgressDlg, task.request.id);
 
       const processor = new BorrowProcessor();
       await processor.run(task, account, skipGas);
@@ -2197,6 +2198,9 @@ export class TorqueProvider {
         console.log(e);
       }
       task.processingEnd(false, false, e);
+    }
+    finally {
+      this.eventEmitter.emit(TorqueProviderEvents.AskToCloseProgressDlg, task);
     }
   };
   private processRepayLoanRequestTask = async (task: RequestTask, skipGas: boolean) => {
