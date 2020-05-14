@@ -80,7 +80,7 @@ export class ProgressFragment extends Component<IProgressFragmentProps, IProgres
         } else if (errorMsg.includes("Transaction rejected")) {
           errorMsg = "You didn't confirm in Gnosis Safe. Please try again.";
         } else {
-          errorMsg = "";
+          errorMsg = this.state.requestTask.status;
         }
       }
     }

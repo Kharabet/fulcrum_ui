@@ -127,7 +127,7 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
     }
     this.setState({
       ...this.state,
-      borrowAmount: new BigNumber(amountText),
+      borrowAmount: borrowAmount,
       loan: refinanceData
     });
   };

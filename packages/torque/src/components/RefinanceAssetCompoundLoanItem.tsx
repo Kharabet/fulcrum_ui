@@ -28,7 +28,6 @@ interface IRefinanceAssetCompoundLoanItemState {
   isShow: boolean;
   isShowInfoCollateralAssetDt0: boolean;
   isShowInfoCollateralAssetDt1: boolean;
-  inputAmountText: number;
   borrowAmount: BigNumber;
   fixedApr: BigNumber;
   loan: IRefinanceLoan;
@@ -48,8 +47,6 @@ interface IRefinanceAssetCompoundLoanItemProps {
 }
 
 export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCompoundLoanItemProps, IRefinanceAssetCompoundLoanItemState> {
-  private _input: HTMLInputElement | null = null;
-  private readonly _inputTextChange: Subject<number>;
 
   constructor(props: IRefinanceAssetCompoundLoanItemProps) {
     super(props);
@@ -57,7 +54,6 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
       isShow: false,
       isShowInfoCollateralAssetDt0: false,
       isShowInfoCollateralAssetDt1: false,
-      inputAmountText: parseInt(this.props.loan.balance.dp(3, BigNumber.ROUND_FLOOR).toString(), 10),
       borrowAmount: this.props.loan.balance,
       fixedApr: new BigNumber(0),
       loan: props.loan,
@@ -84,7 +80,6 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.AskToOpenProgressDlg, this.onAskToOpenProgressDlg);
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.AskToCloseProgressDlg, this.onAskToCloseProgressDlg);
-    this._inputTextChange = new Subject<number>();
   }
 
   private onAskToOpenProgressDlg = (taskId: number) => {
@@ -95,8 +90,8 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
     if (!this.state.request || task.request.id !== this.state.request.id) return;
     if (task.status === RequestStatus.FAILED || task.status === RequestStatus.FAILED_SKIPGAS) {
       window.setTimeout(() => {
-      TorqueProvider.Instance.onTaskCancel(task);
-      this.setState({ ...this.state, isLoadingTransaction: false })
+        TorqueProvider.Instance.onTaskCancel(task);
+        this.setState({ ...this.state, isLoadingTransaction: false })
       }, 5000)
       return;
     }
@@ -117,24 +112,15 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
     const amountText = this.state.loan.balance;
     this.setState({
       ...this.state,
-      inputAmountText: parseInt(this.state.loan.balance.dp(3, BigNumber.ROUND_FLOOR).toString(), 10),
       borrowAmount: amountText
-    }, () => {
-      // emitting next event for processing with rx.js
-      this._inputTextChange.next(this.state.inputAmountText);
     });
     this.derivedUpdate();
   }
 
-  private _setInputRef = (input: HTMLInputElement) => {
-    this._input = input;
-  };
-
   public loanAmountChange = async (event: ChangeEvent<HTMLInputElement>) => {
     // handling different types of empty values
     const amountText = event.target.value ? event.target.value : "0";
-    // console.log(amountText);
-    // setting inputAmountText to update display at the same time
+    
     const borrowAmount = new BigNumber(amountText);
     let refinanceLoan: IRefinanceLoan = Object.assign({}, this.state.loan); //deep clone of props object
 
@@ -142,17 +128,23 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
       const divider = refinanceLoan.balance.div(borrowAmount);
       refinanceLoan.usdValue = refinanceLoan.usdValue.div(divider);
       refinanceLoan.balance = refinanceLoan.balance.div(divider);
-      if (borrowAmount.lt(this.props.loan.balance))
+      if (borrowAmount.lt(this.props.loan.balance)) {
+        this.setState({ //update input value here because assignCollateral takes too much time and causes glitch
+          ...this.state,
+          borrowAmount: borrowAmount
+        });
         await TorqueProvider.Instance.assignCollateral([refinanceLoan], TorqueProvider.Instance.compoundDeposits)
+        this.setState({ //update colalteral
+          ...this.state,
+          loan: refinanceLoan
+        });
+        return
+      }
     }
     this.setState({
       ...this.state,
-      inputAmountText: parseInt(amountText, 10),
       borrowAmount: borrowAmount,
       loan: refinanceLoan
-    }, () => {
-      // emitting next event for processing with rx.js
-      this._inputTextChange.next(this.state.inputAmountText);
     });
   };
   public onCollaterizationChange = async (value: number) => {
@@ -239,13 +231,12 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
             </div>
             <div className="refinance__input-container">
               <input
-                ref={this._setInputRef}
                 className={`input-amount ${this.state.borrowAmount.lte(0) || this.state.borrowAmount.gt(this.props.loan.balance)
                   ? "warning"
                   : ""}`}
                 type="number"
                 step="any"
-                defaultValue={this.props.loan.balance.dp(3, BigNumber.ROUND_FLOOR).toString()}
+                value={this.state.borrowAmount.dp(3, BigNumber.ROUND_FLOOR).toString()}
                 placeholder={`Amount`}
                 onChange={this.loanAmountChange}
               />
