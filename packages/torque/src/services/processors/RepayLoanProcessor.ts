@@ -134,7 +134,7 @@ export class RepayLoanProcessor {
       }
       catch (e) {
         console.log(e);
-        throw new Error(e);
+        throw e;
       }
 
       //Updating the blockchain

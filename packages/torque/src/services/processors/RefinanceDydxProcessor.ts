@@ -45,7 +45,7 @@ export class RefinanceDydxProcessor {
                 );
             } catch (e) {
                 console.log(e)
-                throw new Error(e);
+                throw e;
             }
 
             const txReceipt = await TorqueProvider.Instance.waitForTransactionMined(txHash);
@@ -101,7 +101,7 @@ export class RefinanceDydxProcessor {
             );
         } catch (e) {
             console.log(e)
-            throw new Error(e);
+            throw e;
         }
 
 

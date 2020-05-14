@@ -65,7 +65,7 @@ export class RefinanceMakerProcessor {
                         isInstaProxy: taskRequest.refLoan.isInstaProxy
                     });
                 } catch (e) {
-                    throw new Error(e);
+                    throw e;
                 }
 
             } else {
@@ -98,7 +98,7 @@ export class RefinanceMakerProcessor {
                         });
                     }
                 } catch (e) {
-                    throw new Error(e);
+                    throw e;
                 }
             }
         } else {
@@ -116,7 +116,7 @@ export class RefinanceMakerProcessor {
             try {
                 txHash = await makerBridge.migrateLoan.sendTransactionAsync([taskRequest.refLoan.cdpId], [new BigNumber(dart)], [new BigNumber(dink)], [new BigNumber(dink)], [new BigNumber(dart)], { from: taskRequest.refLoan.accountAddress });
             } catch (e) {
-                throw new Error(e);
+                throw e;
             }
         }
 
