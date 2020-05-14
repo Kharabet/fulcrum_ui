@@ -102,7 +102,7 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
         : <React.Fragment>
           <div className="asset-selector-item">
             {
-              this.state.isLoadingTransaction && this.state.request && <ProgressFragment taskId={this.state.request.id} />
+              this.state.isLoadingTransaction && this.state.request && <ProgressFragment quantityDots={3} sizeDots={'small'} title={'Processed Token'} isOverlay={true} taskId={this.state.request.id} />
             }
             <div className="asset-selector-item-content" onClick={this.onClick}>
               <div className="asset-selector-body">

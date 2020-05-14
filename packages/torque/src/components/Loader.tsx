@@ -5,6 +5,7 @@ interface ILoaderProps {
   sizeDots: string,
   title: string,
   isOverlay: boolean,  
+  isWarningTitle?: boolean
 }
 
 export class Loader extends Component<ILoaderProps> {
@@ -37,7 +38,7 @@ export class Loader extends Component<ILoaderProps> {
           <div className={`${this.props.isOverlay ? `loader-overlay` : ``}`}>
             <div className="loader-content">
               {this.props.title.length !== 0
-                ? <p className={`loader-text loader-text-${this.props.sizeDots}`}>{this.props.title}</p>
+                ? <p className={`loader-text loader-text-${this.props.sizeDots} ${this.props.isWarningTitle ? "warning" : ""}`}>{this.props.title}</p>
                 : null
               }
               <div className="loader-dots">

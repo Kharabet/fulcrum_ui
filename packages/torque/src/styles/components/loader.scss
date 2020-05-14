@@ -38,6 +38,9 @@
       color: #283049;
       margin-bottom: 0;
       text-align: center;
+      &.warning{
+        color: #FF5C5C;
+      }
       &-small{
         font-size: 12px;
         margin-bottom: 10px;

@@ -133,7 +133,7 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
     return (
       <div className={`borrowed-funds-list-item`}>
         {/*this.props.borrowedFundsItem.loanAsset === this.props.selectedAsset
-                ? */this.state.isLoadingTransaction && this.state.request && <ProgressFragment taskId={this.state.request.id} />
+                ? */this.state.isLoadingTransaction && this.state.request && <ProgressFragment  quantityDots={4} sizeDots={'middle'} title={'Processed Token'} isOverlay={true} taskId={this.state.request.id} />
 
           // ? this.state.isLoadingTransaction
           //   ? <Loader quantityDots={4} sizeDots={'middle'} title={'Processed Token'} isOverlay={true} />

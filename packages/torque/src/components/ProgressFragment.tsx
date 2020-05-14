@@ -9,6 +9,10 @@ import { Loader } from "./Loader";
 
 export interface IProgressFragmentProps {
   taskId: number;
+  quantityDots: number,
+  sizeDots: string,
+  title: string,
+  isOverlay: boolean,  
 }
 
 export interface IProgressFragmentState {
@@ -88,7 +92,7 @@ export class ProgressFragment extends Component<IProgressFragmentProps, IProgres
       title = errorMsg;
     return <React.Fragment>
       {/*<ProgressBar requestTask={this.state.requestTask[0]} onViewMore={this.onViewMore} />*/}
-      <Loader quantityDots={4} sizeDots={'middle'} title={title} isOverlay={true} />
+      <Loader {...this.props} title={title} isWarningTitle={!!errorMsg} />
     </React.Fragment>
     // );
   }
