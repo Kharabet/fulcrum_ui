@@ -43,13 +43,16 @@ function getLanguageFromURL(): LanguageCode | null {
 }
 
 export class TVChartContainer extends React.PureComponent<Partial<ChartContainerProps>, ChartContainerState> {
+
+	private readonly baseSymbol: string;
+
 	constructor(props: ChartContainerProps, context?: any) {
 		super(props, context);
 		this.state = {
 			preset: this.props.preset
 		}
 		var that = this;
-
+		this.baseSymbol = "DAI";
 		this.observer = new MutationObserver(function (mutations) {
 			mutations.forEach(function (mutation) {
 				if (mutation.type == "attributes") {
@@ -86,7 +89,7 @@ export class TVChartContainer extends React.PureComponent<Partial<ChartContainer
 		studiesOverrides: {},
 		theme: "Dark",
 		preset: undefined,
-		loading_screen:  localStorage.theme === "dark" ?  { backgroundColor: "#283038" } : {},
+		loading_screen: localStorage.theme === "dark" ? { backgroundColor: "#283038" } : {},
 		overrides: localStorage.theme === "dark" ? {
 			"paneProperties.background": "#283038"
 		} : {},
@@ -97,7 +100,7 @@ export class TVChartContainer extends React.PureComponent<Partial<ChartContainer
 
 	private GetWidgetOptions(): ChartingLibraryWidgetOptions {
 		return {
-			symbol: `${this.props.symbol}_DAI` as string,
+			symbol: `${this.props.symbol}_${this.baseSymbol}` as string,
 			// BEWARE: no trailing slash is expected in feed URL
 			// tslint:disable-next-line:no-any
 			datafeed: new (window as any).Datafeeds.UDFCompatibleDatafeed(this.props.datafeedUrl),
@@ -114,7 +117,7 @@ export class TVChartContainer extends React.PureComponent<Partial<ChartContainer
 			autosize: this.props.autosize,
 			studies_overrides: this.props.studiesOverrides,
 			theme: localStorage.theme === "dark" ? "Dark" : "Light",
-			loading_screen: localStorage.theme === "dark" ?  { backgroundColor: "#283038" } : {},
+			loading_screen: localStorage.theme === "dark" ? { backgroundColor: "#283038" } : {},
 			preset: this.props.preset,
 			overrides: localStorage.theme === "dark" ? {
 				"paneProperties.background": "#283038"
@@ -133,15 +136,15 @@ export class TVChartContainer extends React.PureComponent<Partial<ChartContainer
 		this.tvWidget = tvWidget;
 	}
 
-	public changePair(baseSymbol: string) {
+	public changePair(symbol: string) {
 		var widget = this.tvWidget;
 		if (widget) {
 			widget.onChartReady(() => {
 				if (widget) {
 
 					const chart = widget.chart();
-					const symbol = `${baseSymbol}_SAI`
-					chart.setSymbol(symbol, function e() { });
+
+					chart.setSymbol(`${symbol}_${this.baseSymbol}`, function e() { });
 				}
 			});
 		}
@@ -155,7 +158,9 @@ export class TVChartContainer extends React.PureComponent<Partial<ChartContainer
 		this.observer.disconnect();
 	}
 
-	public componentDidUpdate(): void {
+	public componentDidUpdate(prevProps: Readonly<ChartContainerProps>): void {
+		if (this.props.symbol && prevProps.symbol !== this.props.symbol)
+			this.changePair(this.props.symbol)
 		this.updateWidget();
 	}
 
@@ -172,10 +177,6 @@ export class TVChartContainer extends React.PureComponent<Partial<ChartContainer
 	}
 
 	public render(): JSX.Element {
-		if (this.props.symbol)
-			this.changePair(this.props.symbol)
-
-
 		return (
 			<div
 				id={this.props.containerId}
