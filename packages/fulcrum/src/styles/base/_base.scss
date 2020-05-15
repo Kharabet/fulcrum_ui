@@ -29,6 +29,7 @@ body, #root {
   height: 100vh;
 }
 
+
 input {
   font-family: "Open Sans", sans-serif;
 }
@@ -40,4 +41,23 @@ button{
 a {
   cursor: pointer;
   text-decoration: none;
+}
+
+.pages-wrap {
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+  justify-content: flex-start;
+  width: $container-desktop;
+  box-sizing: border-box;
+
+  @media screen and (max-width: $breakpoint-desktop-max) {
+    width: $container-laptop;
+  }
+
+  @media screen and (max-width: $breakpoint-laptop-max) {
+    width: $container-mobile;
+    padding: 0 15px;
+  
+  }
 }

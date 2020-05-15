@@ -3,7 +3,7 @@ import React, { Component } from "react";
 import fulcrum_logo from "../assets/images/fulcrum_logo.svg"
 import ic_maintenance from "./../assets/images/ic_maintenance.svg"
 
-export class MaintenancePage extends Component {
+export default class MaintenancePage extends Component {
   public render() {
     return (
       <div className="maintenance-page">

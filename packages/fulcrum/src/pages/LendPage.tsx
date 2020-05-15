@@ -12,6 +12,8 @@ import { HeaderOps } from "../layout/HeaderOps";
 import { FulcrumProvider } from "../services/FulcrumProvider";
 import { InfoBlock } from "../components/InfoBlock";
 
+import "../styles/lend.scss";
+
 export interface ILendPageProps {
   doNetworkConnect: () => void;
   isRiskDisclosureModalOpen: ()  => void;
@@ -26,7 +28,7 @@ interface ILendPageState {
   lendAsset: Asset;
 }
 
-export class LendPage extends PureComponent<ILendPageProps, ILendPageState> {
+export default class LendPage extends PureComponent<ILendPageProps, ILendPageState> {
   constructor(props: any) {
     super(props);
 
@@ -43,7 +45,6 @@ export class LendPage extends PureComponent<ILendPageProps, ILendPageState> {
   public render() {
     return (
       <div className="lend-page">
-        <HeaderOps isMobileMedia={this.props.isMobileMedia} isLoading={this.props.isLoading} doNetworkConnect={this.props.doNetworkConnect} isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
         <main className="lend-page-main">
           <InfoBlock localstorageItemProp="defi-risk-notice"  onAccept={() => {this.forceUpdate()}}>
             For your safety, please ensure the URL in your browser starts with: https://app.fulcrum.trade/. <br />
@@ -85,7 +86,7 @@ export class LendPage extends PureComponent<ILendPageProps, ILendPageState> {
             />
           </Modal>
         </main>
-        <Footer isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
+        {/* <Footer isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} /> */}
       </div>
     );
   }

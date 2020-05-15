@@ -1,15 +1,21 @@
 import { Web3Wrapper } from '@0x/web3-wrapper';
-import React, { Component } from "react";
+import React, { ReactFragment, Component, Suspense } from "react";
 
 import TagManager from 'react-gtm-module';
-import Intercom from "react-intercom";
+//import Intercom from "react-intercom";
 import Modal from "react-modal";
 import { BrowserRouter, Redirect, Route, Switch } from "react-router-dom";
-import { LandingPage } from "../pages/LandingPage";
-import { LendPage } from "../pages/LendPage";
-import { MaintenancePage } from "../pages/MaintenancePage";
-import { StatsPage } from "../pages/StatsPage";
-import { TradePage } from "../pages/TradePage";
+//import { LandingPage } from "../pages/LandingPage";
+//import { LendPage } from "../pages/LendPage";
+//import { MaintenancePage } from "../pages/MaintenancePage";
+//import { StatsPage } from "../pages/StatsPage";
+//import { TradePage } from "../pages/TradePage";
+
+
+import { Footer } from "../layout/Footer";
+import { HeaderHome } from "../layout/HeaderHome";
+import { HeaderOps } from "../layout/HeaderOps";
+
 import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
@@ -27,6 +33,16 @@ import { Web3ConnectionFactory } from '../domain/Web3ConnectionFactory';
 import { ProviderTypeDictionary } from '../domain/ProviderTypeDictionary';
 import { AbstractConnector } from '@web3-react/abstract-connector';
 import { ConnectorEvent, ConnectorUpdate } from '@web3-react/types';
+
+
+
+const Intercom = React.lazy(() => import('react-intercom'));
+const LandingPage = React.lazy(() => import('../pages/LandingPage'));
+const LendPage = React.lazy(() => import('../pages/LendPage'));
+const MaintenancePage = React.lazy(() => import('../pages/MaintenancePage'));
+const StatsPage = React.lazy(() => import('../pages/StatsPage'));
+const TradePage = React.lazy(() => import('../pages/TradePage'));
+
 const isMainnetProd =
   process.env.NODE_ENV && process.env.NODE_ENV !== "development"
   && process.env.REACT_APP_ETH_NETWORK === "mainnet";
@@ -46,6 +62,7 @@ interface IAppRouterState {
   isProviderMenuModalOpen: boolean;
   isRiskDisclosureModalOpen: boolean;
   isLoading: boolean;
+  currentPage: string;
   web3: Web3Wrapper | null;
   isMobileMedia: boolean;
 }
@@ -59,6 +76,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
       isProviderMenuModalOpen: false,
       isRiskDisclosureModalOpen: false,
       isLoading: false,
+      currentPage:"",
       web3: FulcrumProvider.Instance.web3Wrapper,
       isMobileMedia: false
     };
@@ -86,94 +104,128 @@ export class AppRouter extends Component<any, IAppRouterState> {
     await this.onProviderTypeSelect(connector)
     if (!connector.listeners(ConnectorEvent.Update).includes(this.onConnectorUpdated))
       connector.on(ConnectorEvent.Update, this.onConnectorUpdated)
+
     return Web3ConnectionFactory.currentWeb3Engine;
   }
+  
 
-  public render() {
-    return (
-      <Web3ReactProvider getLibrary={this.getLibrary}>
-        {isMainnetProd && !this.state.isMobileMedia ? (
+    public render() {
+      return (
+        <Web3ReactProvider getLibrary={this.getLibrary}>
+          {isMainnetProd && !this.state.isMobileMedia ? (
+            <Intercom appID="dfk4n5ut" />
+          ) : null}
 
-          <Intercom appID="dfk4n5ut" />
-        ) : null}
+          <Modal
+            isOpen={this.state.isProviderMenuModalOpen}
+            onRequestClose={this.onRequestClose}
+            className="modal-content-div"
+            overlayClassName="modal-overlay-div"
+          >
+            <ProviderMenu
+              providerTypes={ProviderTypeDictionary.WalletProviders}
+              isMobileMedia={this.state.isMobileMedia}
+              onSelect={this.onProviderTypeSelect}
+              onDeactivate={this.onDeactivate}
+            />
+          </Modal>
+          <Modal
+            isOpen={this.state.isRiskDisclosureModalOpen}
+            onRequestClose={this.onRiskDisclosureRequestClose}
+            className="modal-content-div-top"
+            overlayClassName="modal-overlay-div overflow-auto"
+          >
+            <RiskDisclosure onClose={this.onRiskDisclosureRequestClose} />
+          </Modal>
+          <ProgressFragment />
+          <div className="pages-container">
+            <div className="pages-wrap">
 
-        <Modal
-          isOpen={this.state.isProviderMenuModalOpen}
-          onRequestClose={this.onRequestClose}
-          className="modal-content-div"
-          overlayClassName="modal-overlay-div"
-        >
-          <ProviderMenu
-            providerTypes={ProviderTypeDictionary.WalletProviders}
-            isMobileMedia={this.state.isMobileMedia}
-            onSelect={this.onProviderTypeSelect}
-            onDeactivate={this.onDeactivate}
-          />
-        </Modal>
-        <Modal
-          isOpen={this.state.isRiskDisclosureModalOpen}
-          onRequestClose={this.onRiskDisclosureRequestClose}
-          className="modal-content-div-top"
-          overlayClassName="modal-overlay-div overflow-auto"
-        >
-          <RiskDisclosure onClose={this.onRiskDisclosureRequestClose} />
-        </Modal>
-        <ProgressFragment />
-        <div className="pages-container">
-          {
-            siteConfig.MaintenanceMode
-              ? <MaintenancePage />
-              : <BrowserRouter>
-                <LocationListener doNetworkConnect={this.doNetworkConnect}>
-                  <Switch>
-                    {!isMainnetProd
-                      ? <Route exact={true} path="/" render={props => (props.location.hash.startsWith('#/')
-                        ? <Redirect to={props.location.hash.replace('#', '')} />
-                        : <LandingPage {...props} isMobileMedia={this.state.isMobileMedia} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />
-                      )} />
-                      : <Route exact={true} path="/" render={props => {
-                        if (props.location.hash.startsWith('#/')) {
-                          return <Redirect to={props.location.hash.replace('#/', '')} />
+              {
+                siteConfig.MaintenanceMode
+                  ? <MaintenancePage />
+                  : <BrowserRouter>
+                    <LocationListener doNetworkConnect={this.doNetworkConnect}>
+
+                      <Switch>
+                        {!isMainnetProd
+                          ? <Route exact={true} path="/" render={props => (props.location.hash.startsWith('#/')
+                            ? <Redirect to={props.location.hash.replace('#', '')} />
+                            :
+                            <Suspense fallback={<div>Loading...</div>}>
+                              <HeaderHome />
+                              <LandingPage {...props} isMobileMedia={this.state.isMobileMedia} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />
+                            </Suspense>
+
+                          )} />
+                          : <Route exact={true} path="/" render={props => {
+                            if (props.location.hash.startsWith('#/')) {
+                              return <Redirect to={props.location.hash.replace('#/', '')} />
+                            }
+                            else {
+                              window.location.href = 'https://fulcrum.trade';
+                              return null;
+                            }
+                          }} />
                         }
-                        else {
+
+
+                        <Route exact={true} path="/lend" render={() =>
+                          <React.Fragment><HeaderOps isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />
+                            <Suspense fallback={<div>Loading...</div>}>
+                              <LendPage isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />
+
+                            </Suspense>
+                          </React.Fragment>
+                        } />
+                        {/*{!this.state.isMobileMedia ? (*/}
+                        <Route exact={true} path="/trade" render={() =>
+                          <React.Fragment><HeaderOps isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />
+                            <Suspense fallback={<div>Loading...</div>}>
+                              <TradePage isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />
+                            </Suspense>
+                          </React.Fragment>
+                        } />
+
+
+                        <Route exact={true} path="/stats" render={() =>
+                          <React.Fragment><HeaderOps isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />
+                            <Suspense fallback={<div>Loading...</div>}>
+                              <StatsPage isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />
+                            </Suspense>
+                          </React.Fragment>
+                        } />
+                        {isMainnetProd ? <Route path="*" component={() => {
                           window.location.href = 'https://fulcrum.trade';
                           return null;
-                        }
-                      }} />
-                    }
+                        }} /> : <Route path="*" render={() => <Redirect to="/" />} />}
+                      </Switch>
+                      {isMainnetProd ? (
+                        <Route path="/" render={({ location }) => {
+                          const tagManagerArgs = {
+                            dataLayer: {
+                              // userId: '001',
+                              userProject: 'fulcrum',
+                              page: location.pathname + location.search
+                            }
+                          }
+                          // ReactGA.ga('set', 'page', location.pathname + location.search);
+                          // ReactGA.ga('send', 'pageview');
+                          TagManager.dataLayer(tagManagerArgs);
+                          return null;
+                        }} />
+                      ) : ``}
 
-                    <Route exact={true} path="/lend" render={() => <LendPage isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />} />
-                    {/*{!this.state.isMobileMedia ? (*/}
-                    <Route exact={true} path="/trade" render={() => <TradePage isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />} />
+                      <Footer isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />
 
-                    <Route exact={true} path="/stats" render={() => <StatsPage isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />} />
-                    {isMainnetProd ? <Route path="*" component={() => {
-                      window.location.href = 'https://fulcrum.trade';
-                      return null;
-                    }} /> : <Route path="*" render={() => <Redirect to="/" />} />}
-                  </Switch>
-                  {isMainnetProd ? (
-                    <Route path="/" render={({ location }) => {
-                      const tagManagerArgs = {
-                        dataLayer: {
-                          // userId: '001',
-                          userProject: 'fulcrum',
-                          page: location.pathname + location.search
-                        }
-                      }
-                      // ReactGA.ga('set', 'page', location.pathname + location.search);
-                      // ReactGA.ga('send', 'pageview');
-                      TagManager.dataLayer(tagManagerArgs);
-                      return null;
-                    }} />
-                  ) : ``}
-                </LocationListener>
-              </BrowserRouter>
-          }
-        </div>
-      </Web3ReactProvider>
-    );
-  }
+                    </LocationListener>
+                  </BrowserRouter>
+              }
+            </div>
+          </div>
+        </Web3ReactProvider>
+      );
+    }
   private didResize = async () => {
     const isMobileMedia = (window.innerWidth <= 959);
     if (isMobileMedia !== this.state.isMobileMedia) {
@@ -182,7 +234,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
   }
 
   public doNetworkConnect = async () => {
-    await this._isMounted &&  !this.state.isProviderMenuModalOpen && this.setState({ ...this.state, isProviderMenuModalOpen: true });
+    await this._isMounted && !this.state.isProviderMenuModalOpen && this.setState({ ...this.state, isProviderMenuModalOpen: true });
   };
 
   public async onConnectorUpdated(update: ConnectorUpdate) {
@@ -199,12 +251,12 @@ export class AppRouter extends Component<any, IAppRouterState> {
 
   public onDeactivate = async () => {
 
-      FulcrumProvider.Instance.isLoading = true;
+    FulcrumProvider.Instance.isLoading = true;
 
-      await FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.ProviderIsChanging);
+    await FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.ProviderIsChanging);
 
     await this._isMounted && this.setState({
-        ...this.state,
+      ...this.state,
       isProviderMenuModalOpen: false
     });
     await FulcrumProvider.Instance.setReadonlyWeb3Provider();
@@ -265,4 +317,5 @@ export class AppRouter extends Component<any, IAppRouterState> {
   public onRiskDisclosureRequestOpen = async () => {
     await this._isMounted && this.setState({ ...this.state, isRiskDisclosureModalOpen: true });
   }
+
 }
