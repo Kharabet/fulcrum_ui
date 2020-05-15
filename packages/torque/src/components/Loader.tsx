@@ -13,7 +13,7 @@ export class Loader extends Component<ILoaderProps> {
     super(props, context);
   }
   public renderDots = () => {
-    const animationDuration = 0.7 * this.props.quantityDots;
+    const animationDuration = 0.35 * this.props.quantityDots;
     let wrapperDots = [];
     for (var i = 0; i < this.props.quantityDots; i++) {
       wrapperDots.push(<span key={i} className={`${this.props.sizeDots}-dots`} style={{animationDuration : `${animationDuration}s`}}></span>)
