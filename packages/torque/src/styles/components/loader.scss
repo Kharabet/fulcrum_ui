@@ -9,7 +9,6 @@
     z-index: 10002;
     .loader-content {
       width: 100%;
-      height: 27%;
       background-color: #f5f7f9;
       display: flex;
       flex-direction: column;
@@ -18,6 +17,12 @@
       left: 0;
       -webkit-transform: translate(0, -50%);
       transform: translate(0, -50%);
+      &-small{
+        padding: 25px 0;
+      }
+      &-middle{
+        padding: 50px 0;
+      }
     }
   }
   .loader-wrapper {
