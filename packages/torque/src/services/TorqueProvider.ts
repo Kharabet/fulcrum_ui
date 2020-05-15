@@ -2132,49 +2132,9 @@ export class TorqueProvider {
   };
 
   private processRequestTask = async (task: RequestTask, skipGas: boolean) => {
-    // if (task.request instanceof LendRequest) {
-    //   await this.processLendRequestTask(task, skipGas);
-    // }
-
-    // if (task.request instanceof FulcrumMcdBridgeRequest) {
-    //   await this.processFulcrumMcdBridgeRequestTask(task, skipGas);
-    // }
-
-    // if (task.request instanceof TradeRequest) {
-    //   await this.processTradeRequestTask(task, skipGas);
-    // }
-
-    if (task.request instanceof BorrowRequest) {
-      await this.processBorrowRequestTask(task, skipGas);
-    }
-
-    if (task.request instanceof ExtendLoanRequest) {
-      await this.processExtendLoanRequestTask(task, skipGas);
-    }
-    if (task.request instanceof ManageCollateralRequest) {
-      await this.processManageCollateralRequestTask(task, skipGas);
-    }
-    if (task.request instanceof RepayLoanRequest) {
-      await this.processRepayLoanRequestTask(task, skipGas);
-    }
-
-    if (task.request instanceof RefinanceMakerRequest) {
-      await this.processRefinanceMakerRequestTask(task, skipGas);
-    }
-
-    if (task.request instanceof RefinanceCompoundRequest) {
-      await this.processRefinanceCompoundRequestTask(task, skipGas);
-    }
-
-    if (task.request instanceof RefinanceDydxRequest) {
-      await this.processRefinanceDydxRequestTask(task, skipGas);
-    }
-
-    return false;
-  };
-
-  private processBorrowRequestTask = async (task: RequestTask, skipGas: boolean) => {
     try {
+      this.eventEmitter.emit(TorqueProviderEvents.AskToOpenProgressDlg, task.request.id);
+
       if (!(this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite)) {
         throw new Error("No provider available!");
       }
@@ -2185,189 +2145,41 @@ export class TorqueProvider {
       }
 
       // Initializing loan
-      const taskRequest: BorrowRequest = (task.request as BorrowRequest);
-      this.eventEmitter.emit(TorqueProviderEvents.AskToOpenProgressDlg, task.request.id);
 
-      const processor = new BorrowProcessor();
-      await processor.run(task, account, skipGas);
-
-      task.processingEnd(true, false, null);
-    } catch (e) {
-      if (!e.message.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)) {
-        // tslint:disable-next-line:no-console
-        console.log(e);
-      }
-      task.processingEnd(false, false, e);
-    }
-    finally {
-      this.eventEmitter.emit(TorqueProviderEvents.AskToCloseProgressDlg, task);
-    }
-  };
-  private processRepayLoanRequestTask = async (task: RequestTask, skipGas: boolean) => {
-    try {
-      if (!(this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite)) {
-        throw new Error("No provider available!");
-      }
-      const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
-      if (!account) {
-        throw new Error("Unable to get wallet address!");
-      }
-      this.eventEmitter.emit(TorqueProviderEvents.AskToOpenProgressDlg, task.request.id);
-
-      // Initializing loan
-      const taskRequest: RepayLoanRequest = (task.request as RepayLoanRequest);
-
-      const processor = new RepayLoanProcessor();
-      await processor.run(task, account, skipGas);
-
-      task.processingEnd(true, false, null);
-    } catch (e) {
-      if (!e.message.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)) {
-        // tslint:disable-next-line:no-console
-        console.log(e);
-      }
-      task.processingEnd(false, false, e);
-    }
-    finally {
-      this.eventEmitter.emit(TorqueProviderEvents.AskToCloseProgressDlg, task);
-    }
-  };
-
-  private processExtendLoanRequestTask = async (task: RequestTask, skipGas: boolean) => {
-    try {
-      if (!(this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite)) {
-        throw new Error("No provider available!");
+      let processor;
+      if (task.request instanceof BorrowRequest) {
+        processor = new BorrowProcessor();
+        await processor.run(task, account, skipGas);
       }
 
-      const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
-      if (!account) {
-        throw new Error("Unable to get wallet address!");
-      }      
-      
-      this.eventEmitter.emit(TorqueProviderEvents.AskToOpenProgressDlg, task.request.id);
+      if (task.request instanceof ExtendLoanRequest) {
+        processor = new ExtendLoanProcessor();
+        await processor.run(task, account, skipGas);
 
-      // Initializing loan
-      const taskRequest: ExtendLoanRequest = (task.request as ExtendLoanRequest);
-
-      const processor = new ExtendLoanProcessor();
-      await processor.run(task, account, skipGas);
-
-      task.processingEnd(true, false, null);
-    } catch (e) {
-      if (!e.message.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)) {
-        // tslint:disable-next-line:no-console
-        console.log(e);
       }
-      task.processingEnd(false, false, e);
-    }
-    finally {
-      this.eventEmitter.emit(TorqueProviderEvents.AskToCloseProgressDlg, task);
-    }
-  };
-
-  private processManageCollateralRequestTask = async (task: RequestTask, skipGas: boolean) => {
-    try {
-      if (!(this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite)) {
-        throw new Error("No provider available!");
+      if (task.request instanceof ManageCollateralRequest) {
+        processor = new ManageCollateralProcessor();
+        await processor.run(task, account, skipGas);
+      }
+      if (task.request instanceof RepayLoanRequest) {
+        processor = new RepayLoanProcessor();
+        await processor.run(task, account, skipGas);
       }
 
-      const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
-      if (!account) {
-        throw new Error("Unable to get wallet address!");
+      if (task.request instanceof RefinanceMakerRequest) {
+        processor = new RefinanceMakerProcessor();
+        await processor.run(task, skipGas, configAddress, web3);
       }
 
-      // Initializing loan
-      const taskRequest: ManageCollateralRequest = (task.request as ManageCollateralRequest);
-      this.eventEmitter.emit(TorqueProviderEvents.AskToOpenProgressDlg, task.request.id);
-
-      const processor = new ManageCollateralProcessor();
-      await processor.run(task, account, skipGas);
-
-      task.processingEnd(true, false, null);
-    } catch (e) {
-      if (!e.message.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)) {
-        // tslint:disable-next-line:no-console
-        console.log(e);
-      }
-      task.processingEnd(false, false, e);
-    }
-    finally {
-      this.eventEmitter.emit(TorqueProviderEvents.AskToCloseProgressDlg, task);
-    }
-  };
-
-  private processRefinanceMakerRequestTask = async (task: RequestTask, skipGas: boolean) => {
-    try {
-      if (!(this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite)) {
-        throw new Error("No provider available!");
+      if (task.request instanceof RefinanceCompoundRequest) {
+        processor = new RefinanceCompoundProcessor();
+        await processor.run(task, account, skipGas);
       }
 
-      const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
-      if (!account) {
-        throw new Error("Unable to get wallet address!");
+      if (task.request instanceof RefinanceDydxRequest) {
+        processor = new RefinanceDydxProcessor();
+        await processor.run(task, account, skipGas);
       }
-      this.eventEmitter.emit(TorqueProviderEvents.AskToOpenProgressDlg, task.request.id);
-
-      const processor = new RefinanceMakerProcessor();
-      await processor.run(task, account, skipGas, configAddress, web3);
-
-      task.processingEnd(true, false, null);
-    } catch (e) {
-      if (!e.message.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)) {
-        // tslint:disable-next-line:no-console
-        console.log(e);
-      }
-      task.processingEnd(false, false, e);
-    }
-    finally {
-      this.eventEmitter.emit(TorqueProviderEvents.AskToCloseProgressDlg, task);
-    }
-  };
-
-  private processRefinanceCompoundRequestTask = async (task: RequestTask, skipGas: boolean) => {
-    try {
-      if (!(this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite)) {
-        throw new Error("No provider available!");
-      }
-
-      const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
-      if (!account) {
-        throw new Error("Unable to get wallet address!");
-      }
-
-      this.eventEmitter.emit(TorqueProviderEvents.AskToOpenProgressDlg, task.request.id);
-
-      const processor = new RefinanceCompoundProcessor();
-      await processor.run(task, account, skipGas, configAddress, web3);
-
-      task.processingEnd(true, false, null);
-    } catch (e) {
-      if (!e.message.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)) {
-        // tslint:disable-next-line:no-console
-        console.log(e);
-      }
-      task.processingEnd(false, false, e);
-    }
-    finally {
-      this.eventEmitter.emit(TorqueProviderEvents.AskToCloseProgressDlg, task);
-    }
-  };
-
-  private processRefinanceDydxRequestTask = async (task: RequestTask, skipGas: boolean) => {
-    try {
-      if (!(this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite)) {
-        throw new Error("No provider available!");
-      }
-
-      const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
-      if (!account) {
-        throw new Error("Unable to get wallet address!");
-      }
-      
-      this.eventEmitter.emit(TorqueProviderEvents.AskToOpenProgressDlg, task.request.id);
-
-      const processor = new RefinanceDydxProcessor();
-      await processor.run(task, account, skipGas, configAddress, web3);
 
       task.processingEnd(true, false, null);
     } catch (e) {

@@ -8,7 +8,7 @@ import { makerBridgeContract } from "../../contracts/makerBridge";
 import Web3 from "web3";
 
 export class RefinanceMakerProcessor {
-    public run = async (task: RequestTask, account: string, skipGas: boolean, configAddress: any, web3: Web3) => {
+    public run = async (task: RequestTask, skipGas: boolean, configAddress: any, web3: Web3) => {
         if (!(TorqueProvider.Instance.contractsSource && TorqueProvider.Instance.contractsSource.canWrite)) {
             throw new Error("No provider available!");
         }

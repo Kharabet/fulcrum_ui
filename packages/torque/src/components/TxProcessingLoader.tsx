@@ -1,10 +1,7 @@
 import React, { Component } from "react";
 import { RequestTask } from "../domain/RequestTask";
-import { TorqueProviderEvents } from "../services/events/TorqueProviderEvents";
 import { TasksQueueEvents } from "../services/events/TasksQueueEvents";
-import { TorqueProvider } from "../services/TorqueProvider";
 import { TasksQueue } from "../services/TasksQueue";
-import { ProgressDetails } from "./ProgressDetails";
 import { Loader } from "./Loader";
 
 export interface ITxProcessingLoaderProps {
@@ -53,9 +50,9 @@ export class TxProcessingLoader extends Component<ITxProcessingLoaderProps, ITxP
       if (errorMsg) {
         if (errorMsg.includes(`Request for method "eth_estimateGas" not handled by any subprovider`) ||
           errorMsg.includes(`always failing transaction`)) {
-          errorMsg = "The transaction seems like it will fail. You can submit the transaction anyway, or cancel.";
+          errorMsg = "The transaction seems like it will fail. Change request parameters and try agian, please."; //The transaction seems like it will fail. You can submit the transaction anyway, or cancel.
         } else if (errorMsg.includes("Reverted by EVM")) {
-          errorMsg = "The transaction failed. Etherscan link:";
+          errorMsg = "The transaction failed. Reverted by EVM"; //. Etherscan link:";
         } else if (errorMsg.includes("MetaMask Tx Signature: User denied transaction signature.")) {
           errorMsg = "You didn't confirm in MetaMask. Please try again.";
         } else if (errorMsg.includes("User denied account authorization.")) {
