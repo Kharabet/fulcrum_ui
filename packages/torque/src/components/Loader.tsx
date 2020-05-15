@@ -36,7 +36,7 @@ export class Loader extends Component<ILoaderProps> {
         <div className="loader">
           {this.props.isOverlay ? <div className="loader-wrapper"></div> : null}
           <div className={`${this.props.isOverlay ? `loader-overlay` : ``}`}>
-            <div className="loader-content">
+            <div className={`loader-content loader-content-${this.props.sizeDots}`}>
               {this.props.title.length !== 0
                 ? <p className={`loader-text loader-text-${this.props.sizeDots} ${this.props.isWarningTitle ? "warning" : ""}`}>{this.props.title}</p>
                 : null
