@@ -128,7 +128,7 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
   public loanAmountChange = async (event: ChangeEvent<HTMLInputElement>) => {
     // handling different types of empty values
     const amountText = event.target.value ? event.target.value : "0";
-    
+
     const borrowAmount = new BigNumber(amountText);
     let refinanceLoan: IRefinanceLoan = Object.assign({}, this.state.loan); //deep clone of props object
 
@@ -222,11 +222,14 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
     return (
 
       <div className={`refinance-asset-selector-item ${this.state.isShowInfoCollateralAssetDt0 || this.state.isShowInfoCollateralAssetDt1 ? "inactive" : ""}`}>
-        {this.state.isLoadingTransaction && this.state.request && <ProgressFragment  quantityDots={4} sizeDots={'middle'} title={'Processed Token'} isOverlay={true} taskId={this.state.request.id} />}
-        {/* {this.state.isLoadingTransaction
-          ? <Loader quantityDots={4} sizeDots={'middle'} title={'Processed Token'} isOverlay={true} />
-          : null
-        } */}
+        {this.state.isLoadingTransaction && this.state.request &&
+          <ProgressFragment
+            quantityDots={4}
+            sizeDots={'middle'}
+            isOverlay={true}
+            taskId={this.state.request.id}
+          />
+        }
         <div className="refinance-asset__main-block">
           <div className="refinance-asset-selector__non-torque">
             <div className="refinance-asset-selector__non-torque-logo">

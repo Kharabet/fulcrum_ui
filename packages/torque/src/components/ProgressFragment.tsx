@@ -11,7 +11,6 @@ export interface IProgressFragmentProps {
   taskId: number;
   quantityDots: number,
   sizeDots: string,
-  title: string,
   isOverlay: boolean,  
 }
 
