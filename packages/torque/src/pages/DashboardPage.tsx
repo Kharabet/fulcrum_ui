@@ -31,7 +31,6 @@ interface IDashboardPageState {
   itemsAwaiting: ReadonlyArray<BorrowRequestAwaiting>;
   isDataLoading: boolean;
   isLoadingTransaction: boolean;
-  selectedAsset: Asset;
 }
 
 export class DashboardPage extends PureComponent<
@@ -55,21 +54,34 @@ export class DashboardPage extends PureComponent<
       items: [],
       itemsAwaiting: [],
       isDataLoading: true,
-      isLoadingTransaction: false,
-      selectedAsset: Asset.UNKNOWN
+      isLoadingTransaction: false
     };
 
-    // TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
+    TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
   private async derivedUpdate() {
+    this.setState({
+      ...this.state,
+      isDataLoading: true
+    });
     if (TorqueProvider.Instance.unsupportedNetwork) {
+      this.setState({
+        items: [],
+        itemsAwaiting: [],
+        isDataLoading: false
+      });
       return;
     }
 
     if (TorqueProvider.Instance.providerType === ProviderType.None || !TorqueProvider.Instance.contractsSource || !TorqueProvider.Instance.contractsSource.canWrite) {
-      this.props.doNetworkConnect()
+      this.props.doNetworkConnect();
+      this.setState({
+        items: [],
+        itemsAwaiting: [],
+        isDataLoading: false
+      });
       return;
     }
 
@@ -97,12 +109,15 @@ export class DashboardPage extends PureComponent<
   }
 
   private onProviderChanged = () => {
-    // console.log("onProviderChanged");
+    this.derivedUpdate();
+  };
+
+  private onProviderAvailable = () => {
     this.derivedUpdate();
   };
 
   public componentWillUnmount(): void {
-    // TorqueProvider.Instance.eventEmitter.removeListener(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
+    TorqueProvider.Instance.eventEmitter.removeListener(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
     TorqueProvider.Instance.eventEmitter.removeListener(TorqueProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
@@ -133,11 +148,10 @@ export class DashboardPage extends PureComponent<
                 <BorrowedFundsList
                   items={this.state.items}
                   itemsAwaiting={this.state.itemsAwaiting}
-                  onManageCollateral={this.onManageCollateral}
-                  onRepayLoan={this.onRepayLoan}
-                  onExtendLoan={this.onExtendLoan}
+                  manageCollateralDlgRef={this.manageCollateralDlgRef}
+                  repayLoanDlgRef={this.repayLoanDlgRef}
+                  extendLoanDlgRef={this.extendLoanDlgRef}
                   onBorrowMore={this.onBorrowMore}
-                  selectedAsset={this.state.selectedAsset}
                   isLoadingTransaction={this.state.isLoadingTransaction}
                 />
               </React.Fragment>
@@ -156,54 +170,6 @@ export class DashboardPage extends PureComponent<
       </React.Fragment>
     );
   }
-
-  private onRepayLoan = async (item: IBorrowedFundsState) => {
-    if (!this.repayLoanDlgRef.current) return;
-
-    try {
-      const repayLoanRequest = await this.repayLoanDlgRef.current.getValue(item);
-      this.setState({ ...this.state, isLoadingTransaction: true, selectedAsset: item.loanAsset });
-      let receipt = await TorqueProvider.Instance.doRepayLoan(repayLoanRequest);
-      if (receipt.status === 1)
-        this.setState({ ...this.state, isLoadingTransaction: false, selectedAsset: item.loanAsset });
-    } catch (error) {
-      this.setState({ ...this.state, isLoadingTransaction: false, selectedAsset: item.loanAsset });
-      if (error.message !== "Form closed")
-        console.error(error);
-    }
-  };
-
-  private onExtendLoan = async (item: IBorrowedFundsState) => {
-    if (!this.extendLoanDlgRef.current) return
-
-    try {
-      const extendLoanRequest = await this.extendLoanDlgRef.current.getValue(item);
-      this.setState({ ...this.state, isLoadingTransaction: true, selectedAsset: item.loanAsset });
-      const receipt = await TorqueProvider.Instance.doExtendLoan(extendLoanRequest);
-      if (receipt.status === 1)
-        this.setState({ ...this.state, isLoadingTransaction: false, selectedAsset: item.loanAsset });
-    } catch (error) {
-      this.setState({ ...this.state, isLoadingTransaction: false, selectedAsset: item.loanAsset });
-      if (error.message !== "Form closed")
-        console.error(error);
-    }
-  };
-
-  private onManageCollateral = async (item: IBorrowedFundsState) => {
-    if (!this.manageCollateralDlgRef.current) return;
-
-    try {
-      const manageCollateralRequest = await this.manageCollateralDlgRef.current.getValue(item);
-      this.setState({ ...this.state, isLoadingTransaction: true, selectedAsset: item.loanAsset });
-      const receipt = await TorqueProvider.Instance.doManageCollateral(manageCollateralRequest);
-      if (receipt.status === 1)
-        this.setState({ ...this.state, isLoadingTransaction: false, selectedAsset: item.loanAsset });
-    } catch (error) {
-      this.setState({ ...this.state, isLoadingTransaction: false, selectedAsset: item.loanAsset });
-      if (error.message !== "Form closed")
-        console.error(error);
-    }
-  };
 
   private onBorrowMore = async (item: IBorrowedFundsState) => {
     if (!this.borrowMoreDlgRef.current) return;

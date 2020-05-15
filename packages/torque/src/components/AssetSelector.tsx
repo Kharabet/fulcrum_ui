@@ -1,11 +1,12 @@
 import React, { Component } from "react";
 import { Asset } from "../domain/Asset";
 import { AssetSelectorItem } from "./AssetSelectorItem";
+import { BorrowDlg } from "./BorrowDlg";
 
 export interface IAssetSelectorProps {
-  onSelectAsset: (asset: Asset) => void;
   isLoadingTransaction: boolean;
-  selectedAsset: Asset;
+  borrowDlgRef: React.RefObject<BorrowDlg>;
+  doNetworkConnect: () => void;
 }
 
 export class AssetSelector extends Component<IAssetSelectorProps> {
