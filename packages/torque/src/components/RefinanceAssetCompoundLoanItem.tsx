@@ -20,7 +20,7 @@ import { CollaterallRefinanceSlider } from "./CollaterallRefinanceSlider";
 import { NavService } from '../services/NavService';
 import { RefinanceCompoundRequest } from '../domain/RefinanceCompoundRequest';
 import { RefinanceDydxRequest } from '../domain/RefinanceDydxRequest';
-import { ProgressFragment } from "./ProgressFragment";
+import { TxProcessingLoader } from "./TxProcessingLoader";
 import { RequestStatus } from "../domain/RequestStatus";
 import { RequestTask } from "../domain/RequestTask";
 
@@ -223,7 +223,7 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
 
       <div className={`refinance-asset-selector-item ${this.state.isShowInfoCollateralAssetDt0 || this.state.isShowInfoCollateralAssetDt1 ? "inactive" : ""}`}>
         {this.state.isLoadingTransaction && this.state.request &&
-          <ProgressFragment
+          <TxProcessingLoader
             quantityDots={4}
             sizeDots={'middle'}
             isOverlay={true}

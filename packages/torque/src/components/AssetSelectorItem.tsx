@@ -14,7 +14,7 @@ import { BorrowRequest } from "../domain/BorrowRequest";
 import { RequestStatus } from "../domain/RequestStatus";
 import { RequestTask } from "../domain/RequestTask";
 import { NavService } from "../services/NavService";
-import { ProgressFragment } from "./ProgressFragment";
+import { TxProcessingLoader } from "./TxProcessingLoader";
 
 export interface IAssetSelectorItemProps {
   asset: Asset;
@@ -102,7 +102,7 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
         : <React.Fragment>
           <div className="asset-selector-item">
             {
-              this.state.isLoadingTransaction && this.state.request && <ProgressFragment quantityDots={3} sizeDots={'small'} isOverlay={true} taskId={this.state.request.id} />
+              this.state.isLoadingTransaction && this.state.request && <TxProcessingLoader quantityDots={3} sizeDots={'small'} isOverlay={true} taskId={this.state.request.id} />
             }
             <div className="asset-selector-item-content" onClick={this.onClick}>
               <div className="asset-selector-body">

@@ -23,7 +23,7 @@ import { RefinanceMakerRequest } from "../domain/RefinanceMakerRequest";
 import { Confirm } from "./Confirm";
 import { RequestTask } from "../domain/RequestTask";
 import { RequestStatus } from "../domain/RequestStatus";
-import { ProgressFragment } from "./ProgressFragment";
+import { TxProcessingLoader } from "./TxProcessingLoader";
 
 
 export interface IRefinanceAssetSelectorItemProps {
@@ -235,7 +235,7 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
             <p>Remaining debt should be zero or more than {this.props.refinanceData.dust.toString(10)} DAI. Do you want to continue with total amount?</p>
           </Confirm>}
 
-        {this.state.isLoadingTransaction && this.state.request && <ProgressFragment  quantityDots={4} sizeDots={'middle'} isOverlay={true} taskId={this.state.request.id} />}
+        {this.state.isLoadingTransaction && this.state.request && <TxProcessingLoader  quantityDots={4} sizeDots={'middle'} isOverlay={true} taskId={this.state.request.id} />}
 
         <div className="refinance-asset__main-block">
           <div className="refinance-asset-selector__non-torque">

@@ -15,7 +15,7 @@ import { BorrowMoreRequest } from "../domain/BorrowMoreRequest";
 import { TorqueProviderEvents } from "../services/events/TorqueProviderEvents";
 import { RequestStatus } from "../domain/RequestStatus";
 import { RequestTask } from "../domain/RequestTask";
-import { ProgressFragment } from "./ProgressFragment";
+import { TxProcessingLoader } from "./TxProcessingLoader";
 import { ManageCollateralDlg } from "./ManageCollateralDlg";
 import { RepayLoanDlg } from "./RepayLoanDlg";
 import { ExtendLoanDlg } from "./ExtendLoanDlg";
@@ -137,7 +137,7 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
     return (
       <div className={`borrowed-funds-list-item`}>
         {/*this.props.borrowedFundsItem.loanAsset === this.props.selectedAsset
-                ? */this.state.isLoadingTransaction && this.state.request && <ProgressFragment  quantityDots={4} sizeDots={'middle'} isOverlay={true} taskId={this.state.request.id} />
+                ? */this.state.isLoadingTransaction && this.state.request && <TxProcessingLoader  quantityDots={4} sizeDots={'middle'} isOverlay={true} taskId={this.state.request.id} />
 
           // ? this.state.isLoadingTransaction
           //   ? <Loader quantityDots={4} sizeDots={'middle'} title={'Processed Token'} isOverlay={true} />
