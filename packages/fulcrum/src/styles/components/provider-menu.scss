@@ -79,6 +79,7 @@
     &-content {
       &-img {
         display: flex;
+        position: relative;
       }
       &-txt {
         font-weight: normal;
@@ -128,7 +129,7 @@
           width: 5px;
           height: 5px;
           border-radius: 50%;
-          animation: animationDotsLoader 3s infinite cubic-bezier(0, 1, 1, 0);
+          animation: animationProvider 3s infinite cubic-bezier(0, 1, 1, 0);
           &:nth-child(2) {
             animation-delay: 0.6s;
           }
@@ -185,20 +186,5 @@
       padding: 10px 30px;
       margin: 20px auto;
     }
-  }
-}
-
-@keyframes animationDotsLoader {
-  0% {
-    transform: scale(1);
-    background-color: #a9b5c7;
-  }
-  10% {
-    transform: scale(1.8);
-    background: #00c0ab;
-  }
-  20% {
-    transform: scale(1);
-    background-color: #a9b5c7;
   }
 }
