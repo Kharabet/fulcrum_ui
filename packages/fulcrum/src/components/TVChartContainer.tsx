@@ -7,6 +7,7 @@ import {
 	IChartingLibraryWidget,
 	StudyOverrides
 } from '../charting_library/charting_library.min';
+import { PreloaderChart } from './PreloaderChart';
 
 export interface ChartContainerProps {
 	symbol: ChartingLibraryWidgetOptions['symbol'];
@@ -32,8 +33,8 @@ export interface ChartContainerProps {
 }
 
 export interface ChartContainerState {
-	preset: ChartingLibraryWidgetOptions['preset']
-
+	preset: ChartingLibraryWidgetOptions['preset'],
+	ready: boolean
 }
 
 function getLanguageFromURL(): LanguageCode | null {
@@ -43,13 +44,17 @@ function getLanguageFromURL(): LanguageCode | null {
 }
 
 export class TVChartContainer extends React.PureComponent<Partial<ChartContainerProps>, ChartContainerState> {
+
+	private readonly baseSymbol: string;
+
 	constructor(props: ChartContainerProps, context?: any) {
 		super(props, context);
 		this.state = {
-			preset: this.props.preset
+			preset: this.props.preset,
+			ready: true,
 		}
 		var that = this;
-
+		this.baseSymbol = "DAI";
 		this.observer = new MutationObserver(function (mutations) {
 			mutations.forEach(function (mutation) {
 				if (mutation.type == "attributes") {
@@ -86,7 +91,7 @@ export class TVChartContainer extends React.PureComponent<Partial<ChartContainer
 		studiesOverrides: {},
 		theme: "Dark",
 		preset: undefined,
-		loading_screen:  localStorage.theme === "dark" ?  { backgroundColor: "#283038" } : {},
+		loading_screen: localStorage.theme === "dark" ? { backgroundColor: "#283038" } : {},
 		overrides: localStorage.theme === "dark" ? {
 			"paneProperties.background": "#283038"
 		} : {},
@@ -97,7 +102,7 @@ export class TVChartContainer extends React.PureComponent<Partial<ChartContainer
 
 	private GetWidgetOptions(): ChartingLibraryWidgetOptions {
 		return {
-			symbol: `${this.props.symbol}_DAI` as string,
+			symbol: `${this.props.symbol}_${this.baseSymbol}` as string,
 			// BEWARE: no trailing slash is expected in feed URL
 			// tslint:disable-next-line:no-any
 			datafeed: new (window as any).Datafeeds.UDFCompatibleDatafeed(this.props.datafeedUrl),
@@ -114,7 +119,7 @@ export class TVChartContainer extends React.PureComponent<Partial<ChartContainer
 			autosize: this.props.autosize,
 			studies_overrides: this.props.studiesOverrides,
 			theme: localStorage.theme === "dark" ? "Dark" : "Light",
-			loading_screen: localStorage.theme === "dark" ?  { backgroundColor: "#283038" } : {},
+			loading_screen: localStorage.theme === "dark" ? { backgroundColor: "#283038" } : {},
 			preset: this.props.preset,
 			overrides: localStorage.theme === "dark" ? {
 				"paneProperties.background": "#283038"
@@ -126,22 +131,23 @@ export class TVChartContainer extends React.PureComponent<Partial<ChartContainer
 		this.observer.observe(document.documentElement, {
 			attributes: true //configure it to listen to attribute changes
 		});
-
 		const widgetOptions: ChartingLibraryWidgetOptions = this.GetWidgetOptions();
-
 		const tvWidget = new widget(widgetOptions);
 		this.tvWidget = tvWidget;
+		this.tvWidget.onChartReady(() => {
+			this.setState({ ...this.state, ready: false })
+		});
 	}
 
-	public changePair(baseSymbol: string) {
+	public changePair(symbol: string) {
 		var widget = this.tvWidget;
+		this.setState({ ...this.state, ready: true })
 		if (widget) {
 			widget.onChartReady(() => {
 				if (widget) {
-
 					const chart = widget.chart();
-					const symbol = `${baseSymbol}_SAI`
-					chart.setSymbol(symbol, function e() { });
+					chart.setSymbol(`${symbol}_${this.baseSymbol}`, function e() { });
+					this.setState({ ...this.state, ready: false })
 				}
 			});
 		}
@@ -155,11 +161,16 @@ export class TVChartContainer extends React.PureComponent<Partial<ChartContainer
 		this.observer.disconnect();
 	}
 
-	public componentDidUpdate(): void {
-		this.updateWidget();
+	public componentDidUpdate(prevProps: Readonly<ChartContainerProps>): void {
+		if (this.props.symbol && prevProps.symbol !== this.props.symbol)
+			this.changePair(this.props.symbol)
+		if(prevProps.theme !== this.props.theme){
+			this.updateWidget();
+		}
 	}
 
 	public updateWidget(): void {
+		this.setState({ ...this.state, ready: true })
 		if (this.tvWidget) {
 			this.tvWidget.remove();
 			this.tvWidget = null;
@@ -168,19 +179,17 @@ export class TVChartContainer extends React.PureComponent<Partial<ChartContainer
 
 		const tvWidget = new widget(widgetOptions);
 		this.tvWidget = tvWidget;
-
+		this.tvWidget.onChartReady(() => {
+			this.setState({ ...this.state, ready: false })
+		});
 	}
 
 	public render(): JSX.Element {
-		if (this.props.symbol)
-			this.changePair(this.props.symbol)
-
-
 		return (
-			<div
-				id={this.props.containerId}
-				className={'TVChartContainer'}
-			/>
+			<React.Fragment>
+				{this.state.ready && <PreloaderChart quantityDots={4} sizeDots={'middle'} title={"Loading"} isOverlay={false} />}
+				<div id={this.props.containerId} className={'TVChartContainer'} />
+			</React.Fragment>
 		);
 	}
 }
