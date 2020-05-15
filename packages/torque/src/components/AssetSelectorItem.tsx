@@ -15,7 +15,6 @@ import { RequestStatus } from "../domain/RequestStatus";
 import { RequestTask } from "../domain/RequestTask";
 import { NavService } from "../services/NavService";
 import { TxProcessingLoader } from "./TxProcessingLoader";
-import { TasksQueue } from "../services/TasksQueue";
 
 export interface IAssetSelectorItemProps {
   asset: Asset;
