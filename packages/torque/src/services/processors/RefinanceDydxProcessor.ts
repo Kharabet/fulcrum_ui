@@ -2,10 +2,9 @@ import { BigNumber } from "@0x/utils";
 import { RequestTask } from "../../domain/RequestTask";
 import { TorqueProvider } from "../TorqueProvider";
 import { RefinanceDydxRequest } from "../../domain/RefinanceDydxRequest";
-import Web3 from "web3";
 
 export class RefinanceDydxProcessor {
-    public run = async (task: RequestTask, account: string, skipGas: boolean, configAddress: any, web3: Web3) => {
+    public run = async (task: RequestTask, account: string, skipGas: boolean) => {
         if (!(TorqueProvider.Instance.contractsSource && TorqueProvider.Instance.contractsSource.canWrite)) {
             throw new Error("No provider available!");
         }

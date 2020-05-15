@@ -1,9 +1,7 @@
 import { BigNumber } from "@0x/utils";
-import { iTokenContract } from "../../contracts/iTokenContract";
 import { AssetsDictionary } from "../../domain/AssetsDictionary";
 import { ManageCollateralRequest } from "../../domain/ManageCollateralRequest";
 import { RequestTask } from "../../domain/RequestTask";
-import { TorqueProviderEvents } from "../events/TorqueProviderEvents";
 import { TorqueProvider } from "../TorqueProvider";
 import { erc20Contract } from "../../contracts/erc20";
 

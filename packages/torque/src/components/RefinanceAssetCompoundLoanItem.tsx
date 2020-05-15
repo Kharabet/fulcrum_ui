@@ -20,7 +20,7 @@ import { CollaterallRefinanceSlider } from "./CollaterallRefinanceSlider";
 import { NavService } from '../services/NavService';
 import { RefinanceCompoundRequest } from '../domain/RefinanceCompoundRequest';
 import { RefinanceDydxRequest } from '../domain/RefinanceDydxRequest';
-import { ProgressFragment } from "./ProgressFragment";
+import { TxProcessingLoader } from "./TxProcessingLoader";
 import { RequestStatus } from "../domain/RequestStatus";
 import { RequestTask } from "../domain/RequestTask";
 
@@ -92,11 +92,11 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
     if (task.status === RequestStatus.FAILED || task.status === RequestStatus.FAILED_SKIPGAS) {
       window.setTimeout(() => {
         TorqueProvider.Instance.onTaskCancel(task);
-        this.setState({ ...this.state, isLoadingTransaction: false })
+        this.setState({ ...this.state, isLoadingTransaction: false, request: undefined })
       }, 5000)
       return;
     }
-    this.setState({ ...this.state, isLoadingTransaction: false });
+    this.setState({ ...this.state, isLoadingTransaction: false, request: undefined });
 
     NavService.Instance.History.push("/dashboard");
   }
@@ -128,7 +128,7 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
   public loanAmountChange = async (event: ChangeEvent<HTMLInputElement>) => {
     // handling different types of empty values
     const amountText = event.target.value ? event.target.value : "0";
-    
+
     const borrowAmount = new BigNumber(amountText);
     let refinanceLoan: IRefinanceLoan = Object.assign({}, this.state.loan); //deep clone of props object
 
@@ -184,12 +184,12 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
         receipt = await TorqueProvider.Instance.onMigrateCompoundLoan(request);
       }
       // if (receipt.status === 1) {
-      //   this.setState({ ...this.state, isLoadingTransaction: false });
+      //   this.setState({ ...this.state, isLoadingTransaction: false, request: undefined });
       //   NavService.Instance.History.push("/dashboard");
       // }
-      // this.setState({ ...this.state, isLoadingTransaction: false });
+      // this.setState({ ...this.state, isLoadingTransaction: false, request: undefined });
     } catch (error) {
-      // this.setState({ ...this.state, isLoadingTransaction: false });
+      // this.setState({ ...this.state, isLoadingTransaction: false, request: undefined });
       console.log(error);
     }
   };
@@ -222,11 +222,14 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
     return (
 
       <div className={`refinance-asset-selector-item ${this.state.isShowInfoCollateralAssetDt0 || this.state.isShowInfoCollateralAssetDt1 ? "inactive" : ""}`}>
-        {this.state.isLoadingTransaction && this.state.request && <ProgressFragment  quantityDots={4} sizeDots={'middle'} title={'Processed Token'} isOverlay={true} taskId={this.state.request.id} />}
-        {/* {this.state.isLoadingTransaction
-          ? <Loader quantityDots={4} sizeDots={'middle'} title={'Processed Token'} isOverlay={true} />
-          : null
-        } */}
+        {this.state.isLoadingTransaction && this.state.request &&
+          <TxProcessingLoader
+            quantityDots={4}
+            sizeDots={'middle'}
+            isOverlay={true}
+            taskId={this.state.request.id}
+          />
+        }
         <div className="refinance-asset__main-block">
           <div className="refinance-asset-selector__non-torque">
             <div className="refinance-asset-selector__non-torque-logo">

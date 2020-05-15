@@ -23,11 +23,11 @@ export class Loader extends Component<ILoaderProps> {
 
   public componentDidMount(): void {
     const loaderWrapper = document.querySelector(".loader-wrapper") as HTMLElement;
-    if (loaderWrapper) {
-      const boundingClient = loaderWrapper.getBoundingClientRect();
-      loaderWrapper!.style.top = -1 * boundingClient!.top + "px";
-      loaderWrapper!.style.left = -1 * (boundingClient!.left + 20) + "px";
-    }
+    // if (loaderWrapper) {
+    //   const boundingClient = loaderWrapper.getBoundingClientRect();
+    //   loaderWrapper!.style.top = -1 * boundingClient!.top + "px";
+    //   loaderWrapper!.style.left = -1 * (boundingClient!.left + 20) + "px";
+    // }
   }
 
   public render() {

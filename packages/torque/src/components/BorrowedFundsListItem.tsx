@@ -15,8 +15,10 @@ import { BorrowMoreRequest } from "../domain/BorrowMoreRequest";
 import { TorqueProviderEvents } from "../services/events/TorqueProviderEvents";
 import { RequestStatus } from "../domain/RequestStatus";
 import { RequestTask } from "../domain/RequestTask";
-import { ProgressFragment } from "./ProgressFragment";
+import { TxProcessingLoader } from "./TxProcessingLoader";
 import { ManageCollateralDlg } from "./ManageCollateralDlg";
+import { RepayLoanDlg } from "./RepayLoanDlg";
+import { ExtendLoanDlg } from "./ExtendLoanDlg";
 
 export interface IBorrowedFundsListItemProps {
   item: IBorrowedFundsState;
@@ -25,7 +27,9 @@ export interface IBorrowedFundsListItemProps {
   onRepayLoan: (item: IBorrowedFundsState) => void;
   onExtendLoan: (item: IBorrowedFundsState) => void;
   onBorrowMore: (item: IBorrowedFundsState) => void;
-  manageCollateralDlgRef: React.RefObject<ManageCollateralDlg>
+  manageCollateralDlgRef: React.RefObject<ManageCollateralDlg>;
+  repayLoanDlgRef: React.RefObject<RepayLoanDlg>;
+  extendLoanDlgRef: React.RefObject<ExtendLoanDlg>;
 }
 
 interface IBorrowedFundsListItemState {
@@ -72,12 +76,12 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
     if (task.status === RequestStatus.FAILED || task.status === RequestStatus.FAILED_SKIPGAS) {
       window.setTimeout(() => {
         TorqueProvider.Instance.onTaskCancel(task);
-        this.setState({ ...this.state, isLoadingTransaction: false })
+        this.setState({ ...this.state, isLoadingTransaction: false, request: undefined })
       }, 5000)
       return;
     }
     await this.derivedUpdate();
-    await this.setState({ ...this.state, isLoadingTransaction: false });
+    await this.setState({ ...this.state, isLoadingTransaction: false, request: undefined });
   }
 
   public componentDidUpdate(
@@ -133,7 +137,7 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
     return (
       <div className={`borrowed-funds-list-item`}>
         {/*this.props.borrowedFundsItem.loanAsset === this.props.selectedAsset
-                ? */this.state.isLoadingTransaction && this.state.request && <ProgressFragment  quantityDots={4} sizeDots={'middle'} title={'Processed Token'} isOverlay={true} taskId={this.state.request.id} />
+                ? */this.state.isLoadingTransaction && this.state.request && <TxProcessingLoader  quantityDots={4} sizeDots={'middle'} isOverlay={true} taskId={this.state.request.id} />
 
           // ? this.state.isLoadingTransaction
           //   ? <Loader quantityDots={4} sizeDots={'middle'} title={'Processed Token'} isOverlay={true} />
@@ -239,12 +243,32 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
     // this.props.onManageCollateral({ ...this.props.item });
   };
 
-  private onRepayLoan = () => {
-    this.props.onRepayLoan({ ...this.props.item });
+  private onRepayLoan = async () => {
+    if (!this.props.repayLoanDlgRef.current) return;
+
+    try {
+      const repayLoanRequest = await this.props.repayLoanDlgRef.current.getValue({ ...this.props.item });
+      await this.setState({ ...this.state, request: repayLoanRequest });
+      await TorqueProvider.Instance.onDoRepayLoan(repayLoanRequest);
+    } catch (error) {
+      if (error.message !== "Form closed")
+        console.error(error);
+    }
+    // this.props.onRepayLoan({ ...this.props.item });
   };
 
-  private onExtendLoan = () => {
-    this.props.onExtendLoan({ ...this.props.item });
+  private onExtendLoan = async () => {
+    if (!this.props.extendLoanDlgRef.current) return;
+
+    try {
+      const extendLoanRequest = await this.props.extendLoanDlgRef.current.getValue({ ...this.props.item });
+      await this.setState({ ...this.state, request: extendLoanRequest });
+      await TorqueProvider.Instance.onDoExtendLoan(extendLoanRequest);
+    } catch (error) {
+      if (error.message !== "Form closed")
+        console.error(error);
+    }
+    // this.props.onExtendLoan({ ...this.props.item });
   };
 
   private onBorrowMore = () => {

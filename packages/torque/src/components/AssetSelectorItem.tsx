@@ -14,7 +14,8 @@ import { BorrowRequest } from "../domain/BorrowRequest";
 import { RequestStatus } from "../domain/RequestStatus";
 import { RequestTask } from "../domain/RequestTask";
 import { NavService } from "../services/NavService";
-import { ProgressFragment } from "./ProgressFragment";
+import { TxProcessingLoader } from "./TxProcessingLoader";
+import { TasksQueue } from "../services/TasksQueue";
 
 export interface IAssetSelectorItemProps {
   asset: Asset;
@@ -54,13 +55,13 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
     if (task.status === RequestStatus.FAILED || task.status === RequestStatus.FAILED_SKIPGAS) {
       window.setTimeout(() => {
         TorqueProvider.Instance.onTaskCancel(task);
-        this.setState({ ...this.state, isLoadingTransaction: false })
+        this.setState({ ...this.state, isLoadingTransaction: false, request: undefined})
       }, 5000)
       return;
     }
-    // await this.derivedUpdate();
-    await this.setState({ ...this.state, isLoadingTransaction: false });
-    NavService.Instance.History.push("/dashboard");
+    
+    await this.setState({ ...this.state, isLoadingTransaction: false, request: undefined });
+      NavService.Instance.History.push("/dashboard");
   }
 
   private onProviderAvailable = () => {
@@ -102,7 +103,7 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
         : <React.Fragment>
           <div className="asset-selector-item">
             {
-              this.state.isLoadingTransaction && this.state.request && <ProgressFragment quantityDots={3} sizeDots={'small'} title={'Processed Token'} isOverlay={true} taskId={this.state.request.id} />
+              this.state.isLoadingTransaction && this.state.request && <TxProcessingLoader quantityDots={3} sizeDots={'small'} isOverlay={true} taskId={this.state.request.id} />
             }
             <div className="asset-selector-item-content" onClick={this.onClick}>
               <div className="asset-selector-body">

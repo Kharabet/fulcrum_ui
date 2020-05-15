@@ -148,6 +148,8 @@ export class DashboardPage extends PureComponent<
                   items={this.state.items}
                   itemsAwaiting={this.state.itemsAwaiting}
                   manageCollateralDlgRef={this.manageCollateralDlgRef}
+                  repayLoanDlgRef={this.repayLoanDlgRef}
+                  extendLoanDlgRef={this.extendLoanDlgRef}
                   onManageCollateral={this.onManageCollateral}
                   onRepayLoan={this.onRepayLoan}
                   onExtendLoan={this.onExtendLoan}
