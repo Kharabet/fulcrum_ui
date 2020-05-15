@@ -18,7 +18,6 @@ import { TxProcessingLoader } from "./TxProcessingLoader";
 
 export interface IAssetSelectorItemProps {
   asset: Asset;
-  selectedAsset: Asset;
   isLoadingTransaction: boolean;
   borrowDlgRef: React.RefObject<BorrowDlg>;
   doNetworkConnect: () => void;
@@ -54,13 +53,13 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
     if (task.status === RequestStatus.FAILED || task.status === RequestStatus.FAILED_SKIPGAS) {
       window.setTimeout(() => {
         TorqueProvider.Instance.onTaskCancel(task);
-        this.setState({ ...this.state, isLoadingTransaction: false, request: undefined})
+        this.setState({ ...this.state, isLoadingTransaction: false, request: undefined })
       }, 5000)
       return;
     }
-    
+
     await this.setState({ ...this.state, isLoadingTransaction: false, request: undefined });
-      NavService.Instance.History.push("/dashboard");
+    NavService.Instance.History.push("/dashboard");
   }
 
   private onProviderAvailable = () => {
@@ -101,8 +100,13 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
         ? <Loader quantityDots={5} sizeDots={'large'} title={'Loading'} isOverlay={false} />
         : <React.Fragment>
           <div className="asset-selector-item">
-            {
-              this.state.isLoadingTransaction && this.state.request && <TxProcessingLoader quantityDots={3} sizeDots={'small'} isOverlay={true} taskId={this.state.request.id} />
+            {this.state.isLoadingTransaction && this.state.request &&
+              <TxProcessingLoader
+                quantityDots={3}
+                sizeDots={'small'}
+                isOverlay={true}
+                taskId={this.state.request.id}
+              />
             }
             <div className="asset-selector-item-content" onClick={this.onClick}>
               <div className="asset-selector-body">
@@ -147,15 +151,9 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
       const borrowRequest = await this.props.borrowDlgRef.current.getValue(this.props.asset);
       await this.setState({ ...this.state, request: borrowRequest });
       await TorqueProvider.Instance.onDoBorrow(borrowRequest);
-      // if (receipt.status === 1) {
-      // this.setState({ ...this.state, isLoadingTransaction: false, selectedAsset: asset });
-      //NavService.Instance.History.push("/dashboard");
-      // }
     } catch (error) {
       if (error.message !== "Form closed")
         console.error(error);
-      // this.setState({ ...this.state, isLoadingTransaction: false, selectedAsset: asset });
     }
-    // this.props.onSelectAsset(this.props.asset);
   };
 }

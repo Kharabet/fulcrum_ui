@@ -1,7 +1,5 @@
 import { BigNumber } from "@0x/utils";
 import React, { ChangeEvent, Component } from "react";
-import { Subject } from "rxjs";
-// import { debounceTime, switchMap } from "rxjs/operators";
 import { ReactComponent as Arrow } from "../assets/images/arrow.svg";
 import { ReactComponent as MakerImg } from "../assets/images/maker.svg";
 import { ReactComponent as TorqueLogo } from "../assets/images/torque_logo.svg";
@@ -14,7 +12,6 @@ import { ReactComponent as DownArrow } from "../assets/images/down-arrow.svg";
 import { ReactComponent as TopArrow } from "../assets/images/top-arrow.svg";
 import { ReactComponent as IconInfo } from "../assets/images/icon_info.svg";
 import { ReactComponent as IconInfoActive } from "../assets/images/icon_info_active.svg";
-import { Loader } from "./Loader";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { AssetDetails } from "../domain/AssetDetails";
 import { CollaterallRefinanceSlider } from "./CollaterallRefinanceSlider";
@@ -91,12 +88,10 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
   }
 
   private onProviderAvailable = () => {
-    // noinspection JSIgnoredPromiseFromCall
     this.derivedUpdate();
   };
 
   private onProviderChanged = () => {
-    // noinspection JSIgnoredPromiseFromCall
     this.derivedUpdate();
   };
 
@@ -108,7 +103,6 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
   }
 
   public componentDidMount(): void {
-    // noinspection JSIgnoredPromiseFromCall
     this.derivedUpdate();
     this.setState({
       ...this.state,
@@ -122,7 +116,6 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
     snapshot?: any
   ): void {
     if (this.props.asset !== prevProps.asset) {
-      // noinspection JSIgnoredPromiseFromCall
       this.derivedUpdate();
     }
   }
@@ -195,23 +188,16 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
     const left = this.state.loan.debt.minus(this.state.borrowAmount);
     const isDust = !(this.state.borrowAmount.dp(3, BigNumber.ROUND_DOWN).isEqualTo(this.state.loan.debt.dp(3, BigNumber.ROUND_DOWN)) || left.gt(this.props.refinanceData.dust));
     if (isDust) {
-      try {
-        this.setState({ ...this.state, isShowConfirm: true });
-        return;
-      } catch (error) {
-        console.log(error);
-      }
+      this.setState({ ...this.state, isShowConfirm: true });
+      return;
     }
     await this.checkCdpManager();
   }
 
   private checkCdpManager = async () => {
-    try {
-      const request =  new RefinanceMakerRequest(this.state.loan, this.state.borrowAmount)
-      await this.setState({ ...this.state, request: request });
-      await TorqueProvider.Instance.onMigrateMakerLoan(request);
-    } catch (error) {
-    }
+    const request = new RefinanceMakerRequest(this.state.loan, this.state.borrowAmount)
+    await this.setState({ ...this.state, request: request });
+    await TorqueProvider.Instance.onMigrateMakerLoan(request);
   };
 
   public showInfoCollateralAssetDt0 = () => {
@@ -235,7 +221,14 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
             <p>Remaining debt should be zero or more than {this.props.refinanceData.dust.toString(10)} DAI. Do you want to continue with total amount?</p>
           </Confirm>}
 
-        {this.state.isLoadingTransaction && this.state.request && <TxProcessingLoader  quantityDots={4} sizeDots={'middle'} isOverlay={true} taskId={this.state.request.id} />}
+        {this.state.isLoadingTransaction && this.state.request &&
+          <TxProcessingLoader
+            quantityDots={4}
+            sizeDots={'middle'}
+            isOverlay={true}
+            taskId={this.state.request.id}
+          />
+        }
 
         <div className="refinance-asset__main-block">
           <div className="refinance-asset-selector__non-torque">

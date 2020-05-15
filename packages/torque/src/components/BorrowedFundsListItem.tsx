@@ -7,7 +7,6 @@ import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
 import { TorqueProvider } from "../services/TorqueProvider";
 import { CollateralSlider } from "./CollateralSlider";
 
-import { Loader } from "./Loader";
 import { ManageCollateralRequest } from "../domain/ManageCollateralRequest";
 import { RepayLoanRequest } from "../domain/RepayLoanRequest";
 import { ExtendLoanRequest } from "../domain/ExtendLoanRequest";
@@ -22,10 +21,6 @@ import { ExtendLoanDlg } from "./ExtendLoanDlg";
 
 export interface IBorrowedFundsListItemProps {
   item: IBorrowedFundsState;
-  selectedAsset: Asset;
-  onManageCollateral: (item: IBorrowedFundsState) => void;
-  onRepayLoan: (item: IBorrowedFundsState) => void;
-  onExtendLoan: (item: IBorrowedFundsState) => void;
   onBorrowMore: (item: IBorrowedFundsState) => void;
   manageCollateralDlgRef: React.RefObject<ManageCollateralDlg>;
   repayLoanDlgRef: React.RefObject<RepayLoanDlg>;
@@ -45,28 +40,28 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
   constructor(props: IBorrowedFundsListItemProps) {
     super(props);
 
-    this.state = { 
+    this.state = {
       borrowedFundsItem: props.item,
-      assetDetails: null, 
-      interestRate: new BigNumber(0), 
+      assetDetails: null,
+      interestRate: new BigNumber(0),
       isLoadingTransaction: false,
       isInProgress: props.item.isInProgress,
       request: undefined
-    };    
+    };
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.AskToOpenProgressDlg, this.onAskToOpenProgressDlg);
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.AskToCloseProgressDlg, this.onAskToCloseProgressDlg);
 
   }
-  
+
   public componentDidMount(): void {
     this.derivedUpdate();
   }
-  
+
   public componentWillUnmount(): void {
     TorqueProvider.Instance.eventEmitter.off(TorqueProviderEvents.AskToOpenProgressDlg, this.onAskToOpenProgressDlg);
     TorqueProvider.Instance.eventEmitter.off(TorqueProviderEvents.AskToCloseProgressDlg, this.onAskToCloseProgressDlg);
   }
-  
+
   private onAskToOpenProgressDlg = (taskId: number) => {
     if (!this.state.request || taskId !== this.state.request.id) return;
     this.setState({ ...this.state, isLoadingTransaction: true })
@@ -96,15 +91,16 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
 
   private derivedUpdate = async () => {
     const assetDetails = AssetsDictionary.assets.get(this.props.item.loanAsset) || null;
-    const loans = await TorqueProvider.Instance.getLoansList(); 
+    const loans = await TorqueProvider.Instance.getLoansList();
     const thisLoan = loans.find(loan => loan.loanOrderHash === this.props.item.loanOrderHash);
-    await this.setState({ ...this.state, 
-      assetDetails: assetDetails, 
-      interestRate: this.props.item.interestRate, 
-      borrowedFundsItem: thisLoan ? thisLoan : this.state.borrowedFundsItem 
+    await this.setState({
+      ...this.state,
+      assetDetails: assetDetails,
+      interestRate: this.props.item.interestRate,
+      borrowedFundsItem: thisLoan ? thisLoan : this.state.borrowedFundsItem
     });
   };
-  
+
   public render() {
     if (!this.state.assetDetails) {
       return null;
@@ -136,13 +132,13 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
 
     return (
       <div className={`borrowed-funds-list-item`}>
-        {/*this.props.borrowedFundsItem.loanAsset === this.props.selectedAsset
-                ? */this.state.isLoadingTransaction && this.state.request && <TxProcessingLoader  quantityDots={4} sizeDots={'middle'} isOverlay={true} taskId={this.state.request.id} />
-
-          // ? this.state.isLoadingTransaction
-          //   ? <Loader quantityDots={4} sizeDots={'middle'} title={'Processed Token'} isOverlay={true} />
-          //   : null
-          // : null
+        {this.state.isLoadingTransaction && this.state.request &&
+          <TxProcessingLoader
+            quantityDots={4}
+            sizeDots={'middle'}
+            isOverlay={true}
+            taskId={this.state.request.id}
+          />
         }
         <div className="borrowed-funds-list-item__header">
           <div className="borrowed-funds-list-item__header-loan">

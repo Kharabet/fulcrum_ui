@@ -5,7 +5,6 @@ import { BorrowDlg } from "./BorrowDlg";
 
 export interface IAssetSelectorProps {
   isLoadingTransaction: boolean;
-  selectedAsset: Asset;
   borrowDlgRef: React.RefObject<BorrowDlg>;
   doNetworkConnect: () => void;
 }

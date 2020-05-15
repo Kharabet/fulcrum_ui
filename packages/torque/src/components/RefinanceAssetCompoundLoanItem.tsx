@@ -1,6 +1,5 @@
 import { BigNumber } from "@0x/utils";
 import React, { ChangeEvent, Component, ReactElement } from "react";
-import { Subject } from "rxjs";
 import { ReactComponent as Arrow } from "../assets/images/arrow.svg";
 import { ReactComponent as CompoundImg } from "../assets/images/compound.svg";
 import { ReactComponent as DownArrow } from "../assets/images/down-arrow.svg";
@@ -13,7 +12,6 @@ import { ReactComponent as DydxImg } from "../assets/images/dydx.svg";
 import { ReactComponent as IconInfo } from "../assets/images/icon_info.svg";
 import { ReactComponent as IconInfoActive } from "../assets/images/icon_info_active.svg";
 import { CollateralInfo } from "./CollateralInfo";
-import { Loader } from "./Loader";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { CollaterallRefinanceSlider } from "./CollaterallRefinanceSlider";
@@ -70,13 +68,11 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
       request: undefined
     };
 
-    const loanAssetDt = AssetsDictionary.assets.get(this.state.loan.asset) as AssetDetails;
-    const collateralAssetDt = AssetsDictionary.assets.get(this.state.loan.collateral[0].asset) as AssetDetails;;
+;
     let collateralAssetDt2: any = "";
     if (this.state.loan.collateral.length > 1) {
       collateralAssetDt2 = AssetsDictionary.assets.get(this.state.loan.collateral[1].asset) as AssetDetails;
     }
-    const head_image = this.state.loan.type == "dydx" ? <DydxImg /> : <CompoundImg />;
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderChanged, this.onProviderChanged);
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.AskToOpenProgressDlg, this.onAskToOpenProgressDlg);
@@ -172,8 +168,6 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
   public migrateLoan = async () => {
     const loan = Object.assign({}, this.state.loan);
     let receipt, request;
-    try {
-      // this.setState({ ...this.state, isLoadingTransaction: true });
       if (this.state.loan.type === "dydx") {
         request = new RefinanceDydxRequest(loan, this.state.borrowAmount);
         await this.setState({ ...this.state, request: request });
@@ -183,15 +177,6 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
         await this.setState({ ...this.state, request: request });
         receipt = await TorqueProvider.Instance.onMigrateCompoundLoan(request);
       }
-      // if (receipt.status === 1) {
-      //   this.setState({ ...this.state, isLoadingTransaction: false, request: undefined });
-      //   NavService.Instance.History.push("/dashboard");
-      // }
-      // this.setState({ ...this.state, isLoadingTransaction: false, request: undefined });
-    } catch (error) {
-      // this.setState({ ...this.state, isLoadingTransaction: false, request: undefined });
-      console.log(error);
-    }
   };
 
   private derivedUpdate = async () => {

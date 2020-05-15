@@ -5,9 +5,7 @@ import { BorrowDlg } from "../components/BorrowDlg";
 import { Asset } from "../domain/Asset";
 import { Footer } from "../layout/Footer";
 import { HeaderOps } from "../layout/HeaderOps";
-import { NavService } from "../services/NavService";
 import { TorqueProvider } from "../services/TorqueProvider";
-import { TorqueProviderEvents } from "../services/events/TorqueProviderEvents";
 import { ProviderType } from "../domain/ProviderType";
 
 export interface IBorrowPageRouteParams {
@@ -15,7 +13,6 @@ export interface IBorrowPageRouteParams {
 
 export interface IBorrowPageState {
   isLoadingTransaction: boolean;
-  selectedAsset: Asset
 }
 
 export interface IBorrowPageParams {
@@ -32,8 +29,7 @@ export class BorrowPage extends PureComponent<IBorrowPageParams & RouteComponent
     super(props, context);
     this.borrowDlgRef = React.createRef();
     this.state = {
-      isLoadingTransaction: false,
-      selectedAsset: Asset.UNKNOWN
+      isLoadingTransaction: false
     }
   }
   public componentWillUnmount(): void {
@@ -48,7 +44,6 @@ export class BorrowPage extends PureComponent<IBorrowPageParams & RouteComponent
           <main>
             <AssetSelector 
             isLoadingTransaction={this.state.isLoadingTransaction} 
-            selectedAsset={this.state.selectedAsset} 
             borrowDlgRef={this.borrowDlgRef}
             doNetworkConnect={this.props.doNetworkConnect}
             />
@@ -70,16 +65,16 @@ export class BorrowPage extends PureComponent<IBorrowPageParams & RouteComponent
 
     try {
       const borrowRequest = await this.borrowDlgRef.current.getValue(asset);
-      this.setState({ ...this.state, isLoadingTransaction: true, selectedAsset: asset });
+      this.setState({ ...this.state, isLoadingTransaction: true });
       await TorqueProvider.Instance.onDoBorrow(borrowRequest);
       // if (receipt.status === 1) {
-        this.setState({ ...this.state, isLoadingTransaction: false, selectedAsset: asset });
+        this.setState({ ...this.state, isLoadingTransaction: false });
         //NavService.Instance.History.push("/dashboard");
       // }
     } catch (error) {
       if (error.message !== "Form closed")
         console.error(error);
-      this.setState({ ...this.state, isLoadingTransaction: false, selectedAsset: asset });
+      this.setState({ ...this.state, isLoadingTransaction: false});
     }
   };
 }
