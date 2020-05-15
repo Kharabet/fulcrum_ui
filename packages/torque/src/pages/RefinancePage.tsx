@@ -28,22 +28,20 @@ export class RefinancePage extends PureComponent<IRefinancePageParams & RouteCom
   }
 
   public render() {
-    const isMobileMedia = this.props.isMobileMedia;
-    const isShowLoader = this.state.isShowLoader;
-
     return (
       <React.Fragment>
         <div className="refinance-page">
           <HeaderOps isMobileMedia={this.props.isMobileMedia} isLoading={this.props.isLoading} doNetworkConnect={this.props.doNetworkConnect} isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
 
-          <main>            {isShowLoader
-            ? <Loader quantityDots={5} sizeDots={'large'} title={'Loading'} isOverlay={false} />
-            : (<div className="page-header">
-              <h1>Refinance Your Loans</h1>
-              <p>Lorem ipsum is placeholder text commonly used in the graphic, print, and publishing industries for previewing layouts and visual mockups.</p>
-            </div>
-            )
-          }
+          <main>
+            {this.state.isShowLoader
+              ? <Loader quantityDots={5} sizeDots={'large'} title={'Loading'} isOverlay={false} />
+              : (<div className="page-header">
+                <h1>Refinance Your Loans</h1>
+                <p>Lorem ipsum is placeholder text commonly used in the graphic, print, and publishing industries for previewing layouts and visual mockups.</p>
+              </div>
+              )
+            }
             <div className="refinance-list">
               <RefinanceAssetSelector
                 isMobileMedia={this.props.isMobileMedia}
