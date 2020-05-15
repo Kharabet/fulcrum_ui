@@ -17,7 +17,6 @@ import siteConfig from "../config/SiteConfig.json";
 export interface IHeaderOpsProps {
   doNetworkConnect: () => void;
   isRiskDisclosureModalOpen: () => void;
-  isLoading: boolean;
   isMobileMedia: boolean;
 }
 

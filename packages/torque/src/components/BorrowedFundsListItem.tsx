@@ -75,7 +75,7 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
       }, 5000)
       return;
     }
-    await this.derivedUpdate();
+    await this.updateData();
     await this.setState({ ...this.state, isLoadingTransaction: false, request: undefined });
   }
 
@@ -89,15 +89,21 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
     }
   }
 
-  private derivedUpdate = async () => {
-    const assetDetails = AssetsDictionary.assets.get(this.props.item.loanAsset) || null;
+  private updateData = async () => {
     const loans = await TorqueProvider.Instance.getLoansList();
     const thisLoan = loans.find(loan => loan.loanOrderHash === this.props.item.loanOrderHash);
     await this.setState({
       ...this.state,
-      assetDetails: assetDetails,
-      interestRate: this.props.item.interestRate,
       borrowedFundsItem: thisLoan ? thisLoan : this.state.borrowedFundsItem
+    });
+  }
+
+  private derivedUpdate = async () => {
+    const assetDetails = AssetsDictionary.assets.get(this.props.item.loanAsset) || null;
+    await this.setState({
+      ...this.state,
+      assetDetails: assetDetails,
+      interestRate: this.props.item.interestRate
     });
   };
 

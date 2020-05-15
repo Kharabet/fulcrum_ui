@@ -132,9 +132,9 @@ export class AppRouter extends Component<any, IAppRouterState> {
                 <LocationListener doNetworkConnect={this.doNetworkConnect}>
                   <Switch>
                     <Route exact={true} path="/" render={() => <Redirect to="/borrow" />} />
-                    <Route exact={true} path="/borrow" render={props => <BorrowPage {...props} isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />} />
-                    {!siteConfig.BorrowDisabled || (TorqueProvider.Instance.accounts.length !== 0 && TorqueProvider.Instance.accounts[0].toLowerCase() === "0xadff3ada12ed0f8a87e31e5a04dfd2ee054e1118") ? <Route exact={true} path="/dashboard" render={props => <DashboardPage {...props} isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />} /> : undefined}
-                    <Route exact={true} path="/refinance" render={props => <RefinancePage {...props} isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />} />
+                    <Route exact={true} path="/borrow" render={props => <BorrowPage {...props} isMobileMedia={this.state.isMobileMedia} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />} />
+                    {!siteConfig.BorrowDisabled || (TorqueProvider.Instance.accounts.length !== 0 && TorqueProvider.Instance.accounts[0].toLowerCase() === "0xadff3ada12ed0f8a87e31e5a04dfd2ee054e1118") ? <Route exact={true} path="/dashboard" render={props => <DashboardPage {...props} isMobileMedia={this.state.isMobileMedia} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />} /> : undefined}
+                    <Route exact={true} path="/refinance" render={props => <RefinancePage {...props} isMobileMedia={this.state.isMobileMedia} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />} />
                     <Route path="*" render={() => <Redirect to="/" />} />
                   </Switch>
                   {isMainnetProd ? (

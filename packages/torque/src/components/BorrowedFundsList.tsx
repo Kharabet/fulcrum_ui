@@ -3,7 +3,6 @@ import { BorrowRequestAwaiting } from "../domain/BorrowRequestAwaiting";
 import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
 import { BorrowedFundsAwaitingListItem } from "./BorrowedFundsAwaitingListItem";
 import { BorrowedFundsListItem } from "./BorrowedFundsListItem";
-import { Asset } from "../domain/Asset";
 import { ManageCollateralDlg } from "./ManageCollateralDlg";
 import { RepayLoanDlg } from "./RepayLoanDlg";
 import { ExtendLoanDlg } from "./ExtendLoanDlg";
@@ -11,35 +10,24 @@ import { ExtendLoanDlg } from "./ExtendLoanDlg";
 export interface IBorrowedFundsListProps {
   items: IBorrowedFundsState[];
   itemsAwaiting: ReadonlyArray<BorrowRequestAwaiting>;
-  isLoadingTransaction: boolean;
   onBorrowMore: (item: IBorrowedFundsState) => void;
   manageCollateralDlgRef: React.RefObject<ManageCollateralDlg>;
   repayLoanDlgRef: React.RefObject<RepayLoanDlg>;
   extendLoanDlgRef: React.RefObject<ExtendLoanDlg>;
+  isLoading : boolean ;
 }
 
 interface IBorrowedFundsListState {
-  isLoading : boolean 
 }
 
 export class BorrowedFundsList extends Component<IBorrowedFundsListProps, IBorrowedFundsListState> {
-  private readonly outerRef: RefObject<HTMLDivElement>;
+
 
   constructor(props: IBorrowedFundsListProps) {
     super(props);
-
-    this.outerRef = React.createRef();
-
-    this.state = {
-      isLoading:true 
-    };
   }
 
   public componentDidMount(): void {
-    this.setState(
-      {       
-        isLoading : false 
-      });
   }
 
   public render() {
@@ -64,8 +52,8 @@ export class BorrowedFundsList extends Component<IBorrowedFundsListProps, IBorro
       );
     });
     
-    return <div className="borrowed-funds-list" ref={this.outerRef}>
-      {this.state.isLoading && itemsAwaiting.length === 0 && items.length === 0
+    return <div className="borrowed-funds-list">
+      {!this.props.isLoading && itemsAwaiting.length === 0 && items.length === 0
         && <a href="/borrow" className="no-loans-msg">Looks like you don't have any loans.</a>}
       {itemsAwaiting}
       {items}
