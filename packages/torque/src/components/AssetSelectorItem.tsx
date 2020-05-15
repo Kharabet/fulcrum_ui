@@ -15,6 +15,7 @@ import { RequestStatus } from "../domain/RequestStatus";
 import { RequestTask } from "../domain/RequestTask";
 import { NavService } from "../services/NavService";
 import { TxProcessingLoader } from "./TxProcessingLoader";
+import { TasksQueue } from "../services/TasksQueue";
 
 export interface IAssetSelectorItemProps {
   asset: Asset;
@@ -54,13 +55,13 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
     if (task.status === RequestStatus.FAILED || task.status === RequestStatus.FAILED_SKIPGAS) {
       window.setTimeout(() => {
         TorqueProvider.Instance.onTaskCancel(task);
-        this.setState({ ...this.state, isLoadingTransaction: false })
+        this.setState({ ...this.state, isLoadingTransaction: false, request: undefined})
       }, 5000)
       return;
     }
-    // await this.derivedUpdate();
-    await this.setState({ ...this.state, isLoadingTransaction: false });
-    NavService.Instance.History.push("/dashboard");
+    
+    await this.setState({ ...this.state, isLoadingTransaction: false, request: undefined });
+      NavService.Instance.History.push("/dashboard");
   }
 
   private onProviderAvailable = () => {

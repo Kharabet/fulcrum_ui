@@ -76,12 +76,12 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
     if (task.status === RequestStatus.FAILED || task.status === RequestStatus.FAILED_SKIPGAS) {
       window.setTimeout(() => {
         TorqueProvider.Instance.onTaskCancel(task);
-        this.setState({ ...this.state, isLoadingTransaction: false })
+        this.setState({ ...this.state, isLoadingTransaction: false, request: undefined })
       }, 5000)
       return;
     }
     await this.derivedUpdate();
-    await this.setState({ ...this.state, isLoadingTransaction: false });
+    await this.setState({ ...this.state, isLoadingTransaction: false, request: undefined });
   }
 
   public componentDidUpdate(

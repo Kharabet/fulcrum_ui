@@ -81,11 +81,11 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
     if (task.status === RequestStatus.FAILED || task.status === RequestStatus.FAILED_SKIPGAS) {
       window.setTimeout(() => {
         TorqueProvider.Instance.onTaskCancel(task);
-        this.setState({ ...this.state, isLoadingTransaction: false })
+        this.setState({ ...this.state, isLoadingTransaction: false, request: undefined })
       }, 5000)
       return;
     }
-    this.setState({ ...this.state, isLoadingTransaction: false });
+    this.setState({ ...this.state, isLoadingTransaction: false, request: undefined });
 
     NavService.Instance.History.push("/dashboard");
   }
