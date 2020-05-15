@@ -5,6 +5,7 @@ import { BorrowedFundsAwaitingListItem } from "./BorrowedFundsAwaitingListItem";
 import { BorrowedFundsListItem } from "./BorrowedFundsListItem";
 import { Asset } from "../domain/Asset";
 import { ManageCollateralDlg } from "./ManageCollateralDlg";
+import { RepayLoanDlg } from "./RepayLoanDlg";
 
 export interface IBorrowedFundsListProps {
   items: IBorrowedFundsState[];
@@ -15,7 +16,8 @@ export interface IBorrowedFundsListProps {
   onRepayLoan: (item: IBorrowedFundsState) => void;
   onExtendLoan: (item: IBorrowedFundsState) => void;
   onBorrowMore: (item: IBorrowedFundsState) => void;
-  manageCollateralDlgRef: React.RefObject<ManageCollateralDlg>
+  manageCollateralDlgRef: React.RefObject<ManageCollateralDlg>;
+  repayLoanDlgRef: React.RefObject<RepayLoanDlg>;
 }
 
 interface IBorrowedFundsListState {
@@ -71,6 +73,7 @@ export class BorrowedFundsList extends Component<IBorrowedFundsListProps, IBorro
           onBorrowMore={this.props.onBorrowMore}
           selectedAsset={this.props.selectedAsset}
           manageCollateralDlgRef={this.props.manageCollateralDlgRef}
+          repayLoanDlgRef={this.props.repayLoanDlgRef}
         />
       );
     });

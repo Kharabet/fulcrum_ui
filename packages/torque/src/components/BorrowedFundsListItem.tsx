@@ -17,6 +17,7 @@ import { RequestStatus } from "../domain/RequestStatus";
 import { RequestTask } from "../domain/RequestTask";
 import { ProgressFragment } from "./ProgressFragment";
 import { ManageCollateralDlg } from "./ManageCollateralDlg";
+import { RepayLoanDlg } from "./RepayLoanDlg";
 
 export interface IBorrowedFundsListItemProps {
   item: IBorrowedFundsState;
@@ -25,7 +26,8 @@ export interface IBorrowedFundsListItemProps {
   onRepayLoan: (item: IBorrowedFundsState) => void;
   onExtendLoan: (item: IBorrowedFundsState) => void;
   onBorrowMore: (item: IBorrowedFundsState) => void;
-  manageCollateralDlgRef: React.RefObject<ManageCollateralDlg>
+  manageCollateralDlgRef: React.RefObject<ManageCollateralDlg>;
+  repayLoanDlgRef: React.RefObject<RepayLoanDlg>;
 }
 
 interface IBorrowedFundsListItemState {
@@ -239,8 +241,18 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
     // this.props.onManageCollateral({ ...this.props.item });
   };
 
-  private onRepayLoan = () => {
-    this.props.onRepayLoan({ ...this.props.item });
+  private onRepayLoan = async () => {
+    if (!this.props.repayLoanDlgRef.current) return;
+
+    try {
+      const repayLoanRequest = await this.props.repayLoanDlgRef.current.getValue({ ...this.props.item });
+      await this.setState({ ...this.state, request: repayLoanRequest });
+      await TorqueProvider.Instance.onDoRepayLoan(repayLoanRequest);
+    } catch (error) {
+      if (error.message !== "Form closed")
+        console.error(error);
+    }
+    // this.props.onRepayLoan({ ...this.props.item });
   };
 
   private onExtendLoan = () => {
