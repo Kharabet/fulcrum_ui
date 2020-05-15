@@ -18,7 +18,6 @@ export interface IBorrowPageState {
 export interface IBorrowPageParams {
   doNetworkConnect: () => void;
   isRiskDisclosureModalOpen: () => void;
-  isLoading: boolean;
   isMobileMedia: boolean;
 }
 
@@ -40,7 +39,7 @@ export class BorrowPage extends PureComponent<IBorrowPageParams & RouteComponent
       <React.Fragment>
         <BorrowDlg ref={this.borrowDlgRef} />
         <div className="borrow-page">
-          <HeaderOps isMobileMedia={this.props.isMobileMedia} isLoading={this.props.isLoading} doNetworkConnect={this.props.doNetworkConnect} isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
+          <HeaderOps isMobileMedia={this.props.isMobileMedia} doNetworkConnect={this.props.doNetworkConnect} isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
           <main>
             <AssetSelector 
             isLoadingTransaction={this.state.isLoadingTransaction} 

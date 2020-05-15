@@ -22,7 +22,6 @@ export interface IDashboardPageRouteParams {
 export interface IDashboardPageParams {
   doNetworkConnect: () => void;
   isRiskDisclosureModalOpen: () => void;
-  isLoading: boolean;
   isMobileMedia: boolean;
 }
 
@@ -30,7 +29,6 @@ interface IDashboardPageState {
   items: IBorrowedFundsState[];
   itemsAwaiting: ReadonlyArray<BorrowRequestAwaiting>;
   isDataLoading: boolean;
-  isLoadingTransaction: boolean;
 }
 
 export class DashboardPage extends PureComponent<
@@ -53,8 +51,7 @@ export class DashboardPage extends PureComponent<
     this.state = {
       items: [],
       itemsAwaiting: [],
-      isDataLoading: true,
-      isLoadingTransaction: false
+      isDataLoading: true
     };
 
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
@@ -98,16 +95,7 @@ export class DashboardPage extends PureComponent<
       isDataLoading: false
     });
   }
-  public componentDidUpdate(
-    prevProps: Readonly<IDashboardPageParams>,
-    prevState: Readonly<IDashboardPageState>,
-    snapshot?: any
-  ): void {
-    if (this.state.isLoadingTransaction !== prevState.isLoadingTransaction) {
-      this.derivedUpdate();
-    }
-  }
-
+  
   private onProviderChanged = () => {
     this.derivedUpdate();
   };
@@ -134,7 +122,7 @@ export class DashboardPage extends PureComponent<
         <ExtendLoanDlg ref={this.extendLoanDlgRef} />
         <BorrowMoreDlg ref={this.borrowMoreDlgRef} />
         <div className="dashboard-page">
-          <HeaderOps isMobileMedia={this.props.isMobileMedia} isLoading={this.props.isLoading} doNetworkConnect={this.props.doNetworkConnect} isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
+          <HeaderOps isMobileMedia={this.props.isMobileMedia} doNetworkConnect={this.props.doNetworkConnect} isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
           <main>
             {!TorqueProvider.Instance.unsupportedNetwork ? (
               <React.Fragment>
@@ -152,7 +140,7 @@ export class DashboardPage extends PureComponent<
                   repayLoanDlgRef={this.repayLoanDlgRef}
                   extendLoanDlgRef={this.extendLoanDlgRef}
                   onBorrowMore={this.onBorrowMore}
-                  isLoadingTransaction={this.state.isLoadingTransaction}
+                  isLoading={this.state.isDataLoading}
                 />
               </React.Fragment>
             ) :

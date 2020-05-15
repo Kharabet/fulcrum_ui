@@ -10,7 +10,6 @@ export interface IRefinancePageRouteParams {
 
 export interface IRefinancePageParams {
   doNetworkConnect: () => void;
-  isLoading: boolean;
   isMobileMedia: boolean;
   isRiskDisclosureModalOpen: () => void;
 }
@@ -31,7 +30,7 @@ export class RefinancePage extends PureComponent<IRefinancePageParams & RouteCom
     return (
       <React.Fragment>
         <div className="refinance-page">
-          <HeaderOps isMobileMedia={this.props.isMobileMedia} isLoading={this.props.isLoading} doNetworkConnect={this.props.doNetworkConnect} isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
+          <HeaderOps isMobileMedia={this.props.isMobileMedia} doNetworkConnect={this.props.doNetworkConnect} isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
 
           <main>
             {this.state.isShowLoader
