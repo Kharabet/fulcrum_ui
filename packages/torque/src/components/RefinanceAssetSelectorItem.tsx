@@ -21,6 +21,9 @@ import { CollaterallRefinanceSlider } from "./CollaterallRefinanceSlider";
 import { NavService } from '../services/NavService';
 import { RefinanceMakerRequest } from "../domain/RefinanceMakerRequest";
 import { Confirm } from "./Confirm";
+import { RequestTask } from "../domain/RequestTask";
+import { RequestStatus } from "../domain/RequestStatus";
+import { ProgressFragment } from "./ProgressFragment";
 
 
 export interface IRefinanceAssetSelectorItemProps {
@@ -41,6 +44,7 @@ interface IRefinanceAssetSelectorItemState {
   refRateMonth: number;
   refRateYear: number;
   isShowConfirm: boolean;
+  request: RefinanceMakerRequest | undefined;
 }
 
 export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelectorItemProps, IRefinanceAssetSelectorItemState> {
@@ -60,9 +64,30 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
       refRateMonth: 0,
       refRateYear: 0,
       isShowConfirm: false,
+      request: undefined
     };
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderChanged, this.onProviderChanged);
+    TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.AskToOpenProgressDlg, this.onAskToOpenProgressDlg);
+    TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.AskToCloseProgressDlg, this.onAskToCloseProgressDlg);
+  }
+
+  private onAskToOpenProgressDlg = (taskId: number) => {
+    if (!this.state.request || taskId !== this.state.request.id) return;
+    this.setState({ ...this.state, isLoadingTransaction: true })
+  }
+  private onAskToCloseProgressDlg = (task: RequestTask) => {
+    if (!this.state.request || task.request.id !== this.state.request.id) return;
+    if (task.status === RequestStatus.FAILED || task.status === RequestStatus.FAILED_SKIPGAS) {
+      window.setTimeout(() => {
+        TorqueProvider.Instance.onTaskCancel(task);
+        this.setState({ ...this.state, isLoadingTransaction: false })
+      }, 5000)
+      return;
+    }
+    this.setState({ ...this.state, isLoadingTransaction: false });
+
+    NavService.Instance.History.push("/dashboard");
   }
 
   private onProviderAvailable = () => {
@@ -78,6 +103,8 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
   public componentWillUnmount(): void {
     TorqueProvider.Instance.eventEmitter.removeListener(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
     TorqueProvider.Instance.eventEmitter.removeListener(TorqueProviderEvents.ProviderChanged, this.onProviderChanged);
+    TorqueProvider.Instance.eventEmitter.removeListener(TorqueProviderEvents.AskToOpenProgressDlg, this.onAskToOpenProgressDlg);
+    TorqueProvider.Instance.eventEmitter.removeListener(TorqueProviderEvents.AskToCloseProgressDlg, this.onAskToCloseProgressDlg);
   }
 
   public componentDidMount(): void {
@@ -180,15 +207,10 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
 
   private checkCdpManager = async () => {
     try {
-      this.setState({ ...this.state, isLoadingTransaction: true });
-      /*const receipt = */await TorqueProvider.Instance.onMigrateMakerLoan(new RefinanceMakerRequest(this.state.loan, this.state.borrowAmount));
-      // if (receipt.status === 1) {
-      //   this.setState({ ...this.state, isLoadingTransaction: false });
-      //   NavService.Instance.History.push("/dashboard");
-      // }
-      this.setState({ ...this.state, isLoadingTransaction: false });
+      const request =  new RefinanceMakerRequest(this.state.loan, this.state.borrowAmount)
+      await this.setState({ ...this.state, request: request });
+      await TorqueProvider.Instance.onMigrateMakerLoan(request);
     } catch (error) {
-      this.setState({ ...this.state, isLoadingTransaction: false });
     }
   };
 
@@ -210,11 +232,10 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
       <div className={`refinance-asset-selector-item ` + (this.state.isShowConfirm ? `disabled-hover` : ``) + (this.state.isShowInfoCollateralAssetDt0 ? `inactive` : ``)}>
         {this.state.isShowConfirm &&
           <Confirm onDecline={this.onDecline} onConfirm={this.onConfirm}>
-          <p>Remaining debt should be zero or more than {this.props.refinanceData.dust.toString(10)} DAI. Do you want to continue with total amount?</p>
+            <p>Remaining debt should be zero or more than {this.props.refinanceData.dust.toString(10)} DAI. Do you want to continue with total amount?</p>
           </Confirm>}
 
-        {this.state.isLoadingTransaction &&
-          <Loader quantityDots={4} sizeDots={'middle'} title={'Processed Token'} isOverlay={true} />}
+        {this.state.isLoadingTransaction && this.state.request && <ProgressFragment  quantityDots={4} sizeDots={'middle'} title={'Processed Token'} isOverlay={true} taskId={this.state.request.id} />}
 
         <div className="refinance-asset__main-block">
           <div className="refinance-asset-selector__non-torque">

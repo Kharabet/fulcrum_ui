@@ -2297,6 +2297,7 @@ export class TorqueProvider {
       if (!account) {
         throw new Error("Unable to get wallet address!");
       }
+      this.eventEmitter.emit(TorqueProviderEvents.AskToOpenProgressDlg, task.request.id);
 
       const processor = new RefinanceMakerProcessor();
       await processor.run(task, account, skipGas, configAddress, web3);
@@ -2308,6 +2309,9 @@ export class TorqueProvider {
         console.log(e);
       }
       task.processingEnd(false, false, e);
+    }
+    finally {
+      this.eventEmitter.emit(TorqueProviderEvents.AskToCloseProgressDlg, task);
     }
   };
 

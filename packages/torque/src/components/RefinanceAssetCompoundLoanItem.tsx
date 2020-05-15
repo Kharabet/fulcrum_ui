@@ -78,6 +78,7 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
     }
     const head_image = this.state.loan.type == "dydx" ? <DydxImg /> : <CompoundImg />;
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
+    TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderChanged, this.onProviderChanged);
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.AskToOpenProgressDlg, this.onAskToOpenProgressDlg);
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.AskToCloseProgressDlg, this.onAskToCloseProgressDlg);
   }
@@ -104,8 +105,13 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
     this.derivedUpdate();
   };
 
+  private onProviderChanged = () => {
+    this.derivedUpdate();
+  };
+
   public componentWillUnmount(): void {
     TorqueProvider.Instance.eventEmitter.off(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
+    TorqueProvider.Instance.eventEmitter.off(TorqueProviderEvents.ProviderChanged, this.onProviderChanged);
     TorqueProvider.Instance.eventEmitter.off(TorqueProviderEvents.AskToOpenProgressDlg, this.onAskToOpenProgressDlg);
     TorqueProvider.Instance.eventEmitter.off(TorqueProviderEvents.AskToCloseProgressDlg, this.onAskToCloseProgressDlg);
   }
