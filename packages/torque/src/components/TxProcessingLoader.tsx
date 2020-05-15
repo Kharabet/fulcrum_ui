@@ -3,6 +3,7 @@ import { RequestTask } from "../domain/RequestTask";
 import { TasksQueueEvents } from "../services/events/TasksQueueEvents";
 import { TasksQueue } from "../services/TasksQueue";
 import { Loader } from "./Loader";
+import { TorqueProvider } from "../services/TorqueProvider";
 
 export interface ITxProcessingLoaderProps {
   taskId: number;
@@ -30,6 +31,8 @@ export class TxProcessingLoader extends Component<ITxProcessingLoaderProps, ITxP
   public componentWillUnmount(): void {
     TasksQueue.Instance.off(TasksQueueEvents.QueueChanged, this.onTasksQueueChanged);
     TasksQueue.Instance.off(TasksQueueEvents.TaskChanged, this.onTasksQueueChanged);
+    if (this.state.requestTask)
+      TorqueProvider.Instance.onTaskCancel(this.state.requestTask);
   }
 
   public getTitle = () => {
@@ -67,7 +70,7 @@ export class TxProcessingLoader extends Component<ITxProcessingLoaderProps, ITxP
     if (errorMsg)
       title = errorMsg;
 
-    return { message: title, isWarning: errorMsg !== ""}
+    return { message: title, isWarning: errorMsg !== "" }
   }
 
   public render() {
