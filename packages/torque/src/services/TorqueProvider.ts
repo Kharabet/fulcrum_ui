@@ -2242,7 +2242,9 @@ export class TorqueProvider {
       const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
       if (!account) {
         throw new Error("Unable to get wallet address!");
-      }
+      }      
+      
+      this.eventEmitter.emit(TorqueProviderEvents.AskToOpenProgressDlg, task.request.id);
 
       // Initializing loan
       const taskRequest: ExtendLoanRequest = (task.request as ExtendLoanRequest);
@@ -2257,6 +2259,9 @@ export class TorqueProvider {
         console.log(e);
       }
       task.processingEnd(false, false, e);
+    }
+    finally {
+      this.eventEmitter.emit(TorqueProviderEvents.AskToCloseProgressDlg, task);
     }
   };
 
