@@ -34,6 +34,8 @@ import { ProviderTypeDictionary } from '../domain/ProviderTypeDictionary';
 import { AbstractConnector } from '@web3-react/abstract-connector';
 import { ConnectorEvent, ConnectorUpdate } from '@web3-react/types';
 
+import { PreloaderChart } from '../components/PreloaderChart';
+
 
 
 const Intercom = React.lazy(() => import('react-intercom'));
@@ -152,7 +154,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
                           ? <Route exact={true} path="/" render={props => (props.location.hash.startsWith('#/')
                             ? <Redirect to={props.location.hash.replace('#', '')} />
                             :
-                            <Suspense fallback={<div>Loading...</div>}>
+                            <Suspense fallback={<PreloaderChart quantityDots={4} sizeDots={'middle'} title={"Loading"} isOverlay={false} />}>
                               <HeaderHome />
                               <LandingPage {...props} isMobileMedia={this.state.isMobileMedia} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />
                             </Suspense>
@@ -172,7 +174,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
 
                         <Route exact={true} path="/lend" render={() =>
                           <React.Fragment><HeaderOps isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />
-                            <Suspense fallback={<div>Loading...</div>}>
+                            <Suspense fallback={<PreloaderChart quantityDots={4} sizeDots={'middle'} title={"Loading"} isOverlay={false} />}>
                               <LendPage isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />
 
                             </Suspense>
@@ -181,7 +183,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
                         {/*{!this.state.isMobileMedia ? (*/}
                         <Route exact={true} path="/trade" render={() =>
                           <React.Fragment><HeaderOps isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />
-                            <Suspense fallback={<div>Loading...</div>}>
+                            <Suspense fallback={<PreloaderChart quantityDots={4} sizeDots={'middle'} title={"Loading"} isOverlay={false} />}>
                               <TradePage isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />
                             </Suspense>
                           </React.Fragment>
@@ -190,7 +192,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
 
                         <Route exact={true} path="/stats" render={() =>
                           <React.Fragment><HeaderOps isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />
-                            <Suspense fallback={<div>Loading...</div>}>
+                            <Suspense fallback={<PreloaderChart quantityDots={4} sizeDots={'middle'} title={"Loading"} isOverlay={false} />}>
                               <StatsPage isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />
                             </Suspense>
                           </React.Fragment>
