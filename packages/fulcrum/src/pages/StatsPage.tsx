@@ -5,9 +5,11 @@ import { InfoBlock } from "../components/InfoBlock";
 // import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 // import { FulcrumProvider } from "../services/FulcrumProvider";
 
+import "../styles/stats.scss"
+
 export interface IStatsPageProps {
   doNetworkConnect: () => void;
-  isRiskDisclosureModalOpen: ()  => void;
+  isRiskDisclosureModalOpen: () => void;
   isLoading: boolean;
   isMobileMedia: boolean;
 }
