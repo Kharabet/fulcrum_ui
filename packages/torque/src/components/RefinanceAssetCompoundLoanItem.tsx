@@ -113,11 +113,6 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
   }
 
   public componentDidMount(): void {
-    const amountText = this.state.loan.balance;
-    this.setState({
-      ...this.state,
-      borrowAmount: amountText
-    });
     this.derivedUpdate();
   }
 
@@ -128,6 +123,10 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
     const borrowAmount = new BigNumber(amountText);
     let refinanceLoan: IRefinanceLoan = Object.assign({}, this.state.loan); //deep clone of props object
 
+    const refRateYear = ((parseFloat(this.state.loan.apr.dp(0, BigNumber.ROUND_CEIL).toString()) - parseFloat(this.state.fixedApr.dp(1, BigNumber.ROUND_CEIL).toString())) * parseFloat(borrowAmount.dp(3, BigNumber.ROUND_FLOOR).toString())) / 100;
+    const refRateMonth = refRateYear / 12;
+
+
     if (borrowAmount.gt(0)) {
       const divider = refinanceLoan.balance.div(borrowAmount);
       refinanceLoan.usdValue = refinanceLoan.usdValue.div(divider);
@@ -135,7 +134,9 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
       if (borrowAmount.lt(this.props.loan.balance)) {
         this.setState({ //update input value here because assignCollateral takes too much time and causes glitch
           ...this.state,
-          borrowAmount: borrowAmount
+          borrowAmount: borrowAmount,
+          refRateMonth,
+          refRateYear
         });
         await TorqueProvider.Instance.assignCollateral([refinanceLoan], TorqueProvider.Instance.compoundDeposits)
         this.setState({ //update colalteral
@@ -144,11 +145,14 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
         });
         return
       }
-    }
-    this.setState({
+    }    
+
+    await this.setState({
       ...this.state,
       borrowAmount: borrowAmount,
-      loan: refinanceLoan
+      loan: refinanceLoan,
+      refRateMonth,
+      refRateYear
     });
   };
   public onCollaterizationChange = async (value: number) => {
@@ -181,7 +185,7 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
 
   private derivedUpdate = async () => {
     const interestRate = await TorqueProvider.Instance.getAssetInterestRate(this.state.loan.collateral[0].asset);
-    const refRateYear = ((parseFloat(this.state.loan.apr.dp(0, BigNumber.ROUND_CEIL).toString()) - parseFloat(interestRate.dp(1, BigNumber.ROUND_CEIL).toString())) * parseFloat(this.state.loan.balance.dp(3, BigNumber.ROUND_FLOOR).toString())) / 100;
+    const refRateYear = ((parseFloat(this.state.loan.apr.dp(0, BigNumber.ROUND_CEIL).toString()) - parseFloat(interestRate.dp(1, BigNumber.ROUND_CEIL).toString())) * parseFloat(this.state.borrowAmount.dp(3, BigNumber.ROUND_FLOOR).toString())) / 100;
     const refRateMonth = refRateYear / 12;
 
     this.setState({
