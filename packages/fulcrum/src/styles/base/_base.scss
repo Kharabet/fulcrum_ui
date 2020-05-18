@@ -57,7 +57,9 @@ a {
 
   @media screen and (max-width: $breakpoint-laptop-max) {
     width: $container-mobile;
-    padding: 0 15px;
+    > div{
+      padding: 0 15px;
+    }
   
   }
 }

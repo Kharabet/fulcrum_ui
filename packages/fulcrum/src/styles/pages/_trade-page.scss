@@ -1,11 +1,11 @@
 
 @media screen and (max-width: $breakpoint-laptop-max) {
-  .html-trade-page-active .pages-wrap {
+  .trade-page {
     padding: 0;
   }
 }
 @media only screen and (max-width: $mobile-version-width-sm) {
-  .html-trade-page-active .pages-wrap {
+ .trade-page {
     height: 100%;
   }
   .trade-page-header {

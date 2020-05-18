@@ -124,8 +124,6 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
 
 
   public componentWillUnmount(): void {
-    const htmls = document.getElementsByTagName("html");
-    this.removeClass(htmls[0], "html-trade-page-active");
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
   }
@@ -137,9 +135,6 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
   }
 
   public async componentDidMount() {
-    const htmls = document.getElementsByTagName("html");
-    this.addClass(htmls[0], "html-trade-page-active");
-
     const provider = FulcrumProvider.getLocalstorageItem('providerType');
     if (!FulcrumProvider.Instance.web3Wrapper && (!provider || provider === "None")) {
       this.props.doNetworkConnect();
@@ -153,20 +148,6 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     }
   }
   
-  private hasClass = (ele: Element, cls: string) => {
-    return !!ele.className.match(new RegExp('(\\s|^)'+cls+'(\\s|$)'));
-  };
-
-  private addClass = (ele: Element, cls: string) => {
-    if (!this.hasClass(ele,cls)) ele.className += " "+cls;
-  };
-
-  private removeClass = (ele: Element, cls: string) => {
-    if (this.hasClass(ele,cls)) {
-      const reg = new RegExp('(\\s|^)'+cls+'(\\s|$)');
-      ele.className=ele.className.replace(reg,' ');
-    }
-  };
 
   private async derivedUpdate() {
     const tokenRowsData = this.getTokenRowsData(this.state);
