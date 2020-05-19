@@ -44,6 +44,7 @@ export interface ILendFormProps {
   onSubmit: (request: LendRequest) => void;
   onCancel: () => void;
   isMobileMedia: boolean;
+  isModalOpen: boolean;
 }
 
 interface ILendFormState {
@@ -213,7 +214,7 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
   public componentWillUnmount(): void {
     this._isMounted = false;
 
-    window.history.back();
+    window.history.pushState(null, "Lend Modal Closed", `/lend`);
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
@@ -221,7 +222,8 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
     this._isMounted = true;
 
     await this.derivedUpdate();
-    window.history.pushState(null, "Lend Modal Opened", `/lend/${this.props.lendType.toLocaleLowerCase()}-${this.props.asset}/`);
+    if (this.props.isModalOpen)
+      window.history.pushState(null, "Lend Modal Opened", `/lend/${this.props.lendType.toLocaleLowerCase()}-${this.props.asset}/`);
 
     if (this._input) {
       // this._input.select();
@@ -281,7 +283,8 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
         <div className="lend-form__image">
           {this.state.iTokenAddress &&
             FulcrumProvider.Instance.web3ProviderSettings &&
-            FulcrumProvider.Instance.web3ProviderSettings.etherscanURL ? (
+            FulcrumProvider.Instance.web3ProviderSettings.etherscanURL
+            ? (
               <a
                 className="lend-form__info_block"
                 title={this.state.iTokenAddress}
@@ -290,9 +293,13 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
                 rel="noopener noreferrer"
               >
                 {this.state.assetDetails.reactLogoSvg.render()}
-              </a>) :
+              </a>)
+            : this.state.assetDetails.reactLogoSvg.render()
 
-            this.state.assetDetails.reactLogoSvg.render()
+          }
+          {(this.props.asset === Asset.ETH)
+            ? <span className="lend-form__notification">This pool is currently paying above the standard market rate as it can lack sufficient liquidity to facilitate timely withdrawals. Please understand this risk before proceeding.</span>
+            : null
           }
         </div>
         <div className="lend-form__form-container">

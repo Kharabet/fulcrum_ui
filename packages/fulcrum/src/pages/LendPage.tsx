@@ -2,7 +2,6 @@ import React, { PureComponent } from "react";
 import Modal from "react-modal";
 import { LendTokenSelector } from "../components/LendTokenSelector";
 import { Asset } from "../domain/Asset";
-import { FulcrumMcdBridgeRequest } from "../domain/FulcrumMcdBridgeRequest";
 import { LendRequest } from "../domain/LendRequest";
 import { LendType } from "../domain/LendType";
 import { FulcrumProvider } from "../services/FulcrumProvider";
@@ -10,7 +9,6 @@ import { InfoBlock } from "../components/InfoBlock";
 
 import "../styles/lend.scss";
 
-const FulcrumMcdBridgeForm = React.lazy(() => import('../components/FulcrumMcdBridgeForm'));
 const LendForm = React.lazy(() => import('../components/LendForm'));
 
 export interface ILendPageProps {
@@ -21,7 +19,6 @@ export interface ILendPageProps {
 }
 
 interface ILendPageState {
-  isFulcrumMcdBridgeModalOpen: boolean;
   isLendModalOpen: boolean;
   lendType: LendType;
   lendAsset: Asset;
@@ -31,7 +28,7 @@ export default class LendPage extends PureComponent<ILendPageProps, ILendPageSta
   constructor(props: any) {
     super(props);
 
-    this.state = { isLendModalOpen: false, isFulcrumMcdBridgeModalOpen: false, lendType: LendType.LEND, lendAsset: Asset.UNKNOWN };
+    this.state = { isLendModalOpen: false, lendType: LendType.LEND, lendAsset: Asset.UNKNOWN };
   }
 
   public componentDidMount(): void {
@@ -57,7 +54,7 @@ export default class LendPage extends PureComponent<ILendPageProps, ILendPageSta
               Full functionality will return after a thorough audit of our newly implemented and preexisting smart contracts.
           </InfoBlock>
             : null}
-          <LendTokenSelector onLend={this.onLendRequested} onFulcrumMcdBridge={this.onFulcrumMcdBridgeRequested} />
+          <LendTokenSelector onLend={this.onLendRequested} />
           <Modal
             isOpen={this.state.isLendModalOpen}
             onRequestClose={this.onRequestClose}
@@ -70,18 +67,7 @@ export default class LendPage extends PureComponent<ILendPageProps, ILendPageSta
               onSubmit={this.onLendConfirmed}
               onCancel={this.onRequestClose}
               isMobileMedia={this.props.isMobileMedia}
-            />
-          </Modal>
-          <Modal
-            isOpen={this.state.isFulcrumMcdBridgeModalOpen}
-            onRequestClose={this.onRequestClose}
-            className="modal-content-div"
-            overlayClassName="modal-overlay-div"
-          >
-            <FulcrumMcdBridgeForm
-              asset={this.state.lendAsset}
-              onSubmit={this.onFulcrumMcdBridgeConfirmed}
-              onCancel={this.onRequestClose}
+              isModalOpen={this.state.isLendModalOpen}
             />
           </Modal>
         </main>
@@ -89,30 +75,6 @@ export default class LendPage extends PureComponent<ILendPageProps, ILendPageSta
       </div>
     );
   }
-
-
-  public onFulcrumMcdBridgeRequested = (request: FulcrumMcdBridgeRequest) => {
-    if (!FulcrumProvider.Instance.contractsSource || !FulcrumProvider.Instance.contractsSource.canWrite) {
-      this.props.doNetworkConnect();
-      return;
-    }
-
-    if (request) {
-      this.setState({
-        ...this.state,
-        isFulcrumMcdBridgeModalOpen: true,
-        lendAsset: request.asset
-      });
-    }
-  };
-
-  public onFulcrumMcdBridgeConfirmed = (request: FulcrumMcdBridgeRequest) => {
-    this.setState({
-      ...this.state,
-      isFulcrumMcdBridgeModalOpen: false,
-    });
-    FulcrumProvider.Instance.onFulcrumMcdBridgeConfirmed(request);
-  };
 
   public onLendRequested = (request: LendRequest) => {
     if (!FulcrumProvider.Instance.contractsSource || !FulcrumProvider.Instance.contractsSource.canWrite) {
@@ -141,7 +103,6 @@ export default class LendPage extends PureComponent<ILendPageProps, ILendPageSta
   public onRequestClose = () => {
     this.setState({
       ...this.state,
-      isFulcrumMcdBridgeModalOpen: false,
       isLendModalOpen: false
     });
   };

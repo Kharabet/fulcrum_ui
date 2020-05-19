@@ -1,6 +1,5 @@
 import { BigNumber } from "@0x/utils";
 import React, { ChangeEvent, Component, ReactElement } from "react";
-import { Subject } from "rxjs";
 import { ReactComponent as Arrow } from "../assets/images/arrow.svg";
 import { ReactComponent as CompoundImg } from "../assets/images/compound.svg";
 import { ReactComponent as DownArrow } from "../assets/images/down-arrow.svg";
@@ -13,19 +12,20 @@ import { ReactComponent as DydxImg } from "../assets/images/dydx.svg";
 import { ReactComponent as IconInfo } from "../assets/images/icon_info.svg";
 import { ReactComponent as IconInfoActive } from "../assets/images/icon_info_active.svg";
 import { CollateralInfo } from "./CollateralInfo";
-import { Loader } from "./Loader";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { CollaterallRefinanceSlider } from "./CollaterallRefinanceSlider";
 import { NavService } from '../services/NavService';
 import { RefinanceCompoundRequest } from '../domain/RefinanceCompoundRequest';
 import { RefinanceDydxRequest } from '../domain/RefinanceDydxRequest';
+import { TxProcessingLoader } from "./TxProcessingLoader";
+import { RequestStatus } from "../domain/RequestStatus";
+import { RequestTask } from "../domain/RequestTask";
 
 interface IRefinanceAssetCompoundLoanItemState {
   isShow: boolean;
   isShowInfoCollateralAssetDt0: boolean;
   isShowInfoCollateralAssetDt1: boolean;
-  inputAmountText: number;
   borrowAmount: BigNumber;
   fixedApr: BigNumber;
   loan: IRefinanceLoan;
@@ -36,6 +36,7 @@ interface IRefinanceAssetCompoundLoanItemState {
   head_image: ReactElement;
   refRateMonth: number;
   refRateYear: number;
+  request: RefinanceCompoundRequest | undefined;
 }
 
 interface IRefinanceAssetCompoundLoanItemProps {
@@ -44,8 +45,6 @@ interface IRefinanceAssetCompoundLoanItemProps {
 }
 
 export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCompoundLoanItemProps, IRefinanceAssetCompoundLoanItemState> {
-  private _input: HTMLInputElement | null = null;
-  private readonly _inputTextChange: Subject<number>;
 
   constructor(props: IRefinanceAssetCompoundLoanItemProps) {
     super(props);
@@ -53,7 +52,6 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
       isShow: false,
       isShowInfoCollateralAssetDt0: false,
       isShowInfoCollateralAssetDt1: false,
-      inputAmountText: parseInt(this.props.loan.balance.dp(3, BigNumber.ROUND_FLOOR).toString(), 10),
       borrowAmount: this.props.loan.balance,
       fixedApr: new BigNumber(0),
       loan: props.loan,
@@ -66,69 +64,95 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
 
       head_image: this.props.loan.type == "dydx" ? <DydxImg /> : <CompoundImg />,
       refRateMonth: 0,
-      refRateYear: 0
+      refRateYear: 0,
+      request: undefined
     };
 
-    const loanAssetDt = AssetsDictionary.assets.get(this.state.loan.asset) as AssetDetails;
-    const collateralAssetDt = AssetsDictionary.assets.get(this.state.loan.collateral[0].asset) as AssetDetails;;
+;
     let collateralAssetDt2: any = "";
     if (this.state.loan.collateral.length > 1) {
       collateralAssetDt2 = AssetsDictionary.assets.get(this.state.loan.collateral[1].asset) as AssetDetails;
     }
-    const head_image = this.state.loan.type == "dydx" ? <DydxImg /> : <CompoundImg />;
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
-    this._inputTextChange = new Subject<number>();
+    TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderChanged, this.onProviderChanged);
+    TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.AskToOpenProgressDlg, this.onAskToOpenProgressDlg);
+    TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.AskToCloseProgressDlg, this.onAskToCloseProgressDlg);
   }
 
+  private onAskToOpenProgressDlg = (taskId: number) => {
+    if (!this.state.request || taskId !== this.state.request.id) return;
+    this.setState({ ...this.state, isLoadingTransaction: true })
+  }
+  private onAskToCloseProgressDlg = (task: RequestTask) => {
+    if (!this.state.request || task.request.id !== this.state.request.id) return;
+    if (task.status === RequestStatus.FAILED || task.status === RequestStatus.FAILED_SKIPGAS) {
+      window.setTimeout(() => {
+        TorqueProvider.Instance.onTaskCancel(task);
+        this.setState({ ...this.state, isLoadingTransaction: false, request: undefined })
+      }, 5000)
+      return;
+    }
+    this.setState({ ...this.state, isLoadingTransaction: false, request: undefined });
+
+    NavService.Instance.History.push("/dashboard");
+  }
 
   private onProviderAvailable = () => {
     this.derivedUpdate();
   };
 
+  private onProviderChanged = () => {
+    this.derivedUpdate();
+  };
+
   public componentWillUnmount(): void {
-    TorqueProvider.Instance.eventEmitter.removeListener(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
+    TorqueProvider.Instance.eventEmitter.off(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
+    TorqueProvider.Instance.eventEmitter.off(TorqueProviderEvents.ProviderChanged, this.onProviderChanged);
+    TorqueProvider.Instance.eventEmitter.off(TorqueProviderEvents.AskToOpenProgressDlg, this.onAskToOpenProgressDlg);
+    TorqueProvider.Instance.eventEmitter.off(TorqueProviderEvents.AskToCloseProgressDlg, this.onAskToCloseProgressDlg);
   }
 
   public componentDidMount(): void {
-    const amountText = this.state.loan.balance;
-    this.setState({
-      ...this.state,
-      inputAmountText: parseInt(this.state.loan.balance.dp(3, BigNumber.ROUND_FLOOR).toString(), 10),
-      borrowAmount: amountText
-    }, () => {
-      // emitting next event for processing with rx.js
-      this._inputTextChange.next(this.state.inputAmountText);
-    });
     this.derivedUpdate();
   }
-
-  private _setInputRef = (input: HTMLInputElement) => {
-    this._input = input;
-  };
 
   public loanAmountChange = async (event: ChangeEvent<HTMLInputElement>) => {
     // handling different types of empty values
     const amountText = event.target.value ? event.target.value : "0";
-    // console.log(amountText);
-    // setting inputAmountText to update display at the same time
+
     const borrowAmount = new BigNumber(amountText);
     let refinanceLoan: IRefinanceLoan = Object.assign({}, this.state.loan); //deep clone of props object
+
+    const refRateYear = ((parseFloat(this.state.loan.apr.dp(0, BigNumber.ROUND_CEIL).toString()) - parseFloat(this.state.fixedApr.dp(1, BigNumber.ROUND_CEIL).toString())) * parseFloat(borrowAmount.dp(3, BigNumber.ROUND_FLOOR).toString())) / 100;
+    const refRateMonth = refRateYear / 12;
+
 
     if (borrowAmount.gt(0)) {
       const divider = refinanceLoan.balance.div(borrowAmount);
       refinanceLoan.usdValue = refinanceLoan.usdValue.div(divider);
       refinanceLoan.balance = refinanceLoan.balance.div(divider);
-      if (borrowAmount.lt(this.props.loan.balance))
+      if (borrowAmount.lt(this.props.loan.balance)) {
+        this.setState({ //update input value here because assignCollateral takes too much time and causes glitch
+          ...this.state,
+          borrowAmount: borrowAmount,
+          refRateMonth,
+          refRateYear
+        });
         await TorqueProvider.Instance.assignCollateral([refinanceLoan], TorqueProvider.Instance.compoundDeposits)
-    }
-    this.setState({
+        this.setState({ //update colalteral
+          ...this.state,
+          loan: refinanceLoan
+        });
+        return
+      }
+    }    
+
+    await this.setState({
       ...this.state,
-      inputAmountText: parseInt(amountText, 10),
       borrowAmount: borrowAmount,
-      loan: refinanceLoan
-    }, () => {
-      // emitting next event for processing with rx.js
-      this._inputTextChange.next(this.state.inputAmountText);
+      loan: refinanceLoan,
+      refRateMonth,
+      refRateYear
     });
   };
   public onCollaterizationChange = async (value: number) => {
@@ -147,26 +171,21 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
 
   public migrateLoan = async () => {
     const loan = Object.assign({}, this.state.loan);
-    let receipt;
-    try {
-      this.setState({ ...this.state, isLoadingTransaction: true });
-      this.state.loan.type === "dydx"
-        ? receipt = await TorqueProvider.Instance.onMigrateSoloLoan(new RefinanceDydxRequest(loan, this.state.borrowAmount))  
-        : receipt = await TorqueProvider.Instance.onMigrateCompoundLoan(new RefinanceCompoundRequest(loan, this.state.borrowAmount))  
-      // if (receipt.status === 1) {
-      //   this.setState({ ...this.state, isLoadingTransaction: false });
-      //   NavService.Instance.History.push("/dashboard");
-      // }
-      this.setState({ ...this.state, isLoadingTransaction: false });
-    } catch (error) {
-      this.setState({ ...this.state, isLoadingTransaction: false });
-      console.log(error);
-    }
+    let receipt, request;
+      if (this.state.loan.type === "dydx") {
+        request = new RefinanceDydxRequest(loan, this.state.borrowAmount);
+        await this.setState({ ...this.state, request: request });
+        receipt = await TorqueProvider.Instance.onMigrateSoloLoan(request);
+      } else {
+        request = new RefinanceCompoundRequest(loan, this.state.borrowAmount);
+        await this.setState({ ...this.state, request: request });
+        receipt = await TorqueProvider.Instance.onMigrateCompoundLoan(request);
+      }
   };
 
   private derivedUpdate = async () => {
     const interestRate = await TorqueProvider.Instance.getAssetInterestRate(this.state.loan.collateral[0].asset);
-    const refRateYear = ((parseFloat(this.state.loan.apr.dp(0, BigNumber.ROUND_CEIL).toString()) - parseFloat(interestRate.dp(1, BigNumber.ROUND_CEIL).toString())) * parseFloat(this.state.loan.balance.dp(3, BigNumber.ROUND_FLOOR).toString())) / 100;
+    const refRateYear = ((parseFloat(this.state.loan.apr.dp(0, BigNumber.ROUND_CEIL).toString()) - parseFloat(interestRate.dp(1, BigNumber.ROUND_CEIL).toString())) * parseFloat(this.state.borrowAmount.dp(3, BigNumber.ROUND_FLOOR).toString())) / 100;
     const refRateMonth = refRateYear / 12;
 
     this.setState({
@@ -192,9 +211,13 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
     return (
 
       <div className={`refinance-asset-selector-item ${this.state.isShowInfoCollateralAssetDt0 || this.state.isShowInfoCollateralAssetDt1 ? "inactive" : ""}`}>
-        {this.state.isLoadingTransaction
-          ? <Loader quantityDots={4} sizeDots={'middle'} title={'Processed Token'} isOverlay={true} />
-          : null
+        {this.state.isLoadingTransaction && this.state.request &&
+          <TxProcessingLoader
+            quantityDots={4}
+            sizeDots={'middle'}
+            isOverlay={true}
+            taskId={this.state.request.id}
+          />
         }
         <div className="refinance-asset__main-block">
           <div className="refinance-asset-selector__non-torque">
@@ -203,18 +226,17 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
               {!this.props.isMobileMedia && <Arrow />}
             </div>
             <div className="refinance-asset-selector__non-torque-apr">
-              <div  title={this.state.loan.apr.toFixed()} className="value">{this.state.loan.apr.dp(0, BigNumber.ROUND_CEIL).toString()}%</div>
+              <div title={this.state.loan.apr.toFixed()} className="value">{this.state.loan.apr.dp(0, BigNumber.ROUND_CEIL).toString()}%</div>
               <div className="text">Variable APR</div>
             </div>
             <div className="refinance__input-container">
               <input
-                ref={this._setInputRef}
                 className={`input-amount ${this.state.borrowAmount.lte(0) || this.state.borrowAmount.gt(this.props.loan.balance)
                   ? "warning"
                   : ""}`}
                 type="number"
                 step="any"
-                defaultValue={this.props.loan.balance.dp(3, BigNumber.ROUND_FLOOR).toString()}
+                value={this.state.borrowAmount.dp(3, BigNumber.ROUND_FLOOR).toString()}
                 placeholder={`Amount`}
                 onChange={this.loanAmountChange}
               />

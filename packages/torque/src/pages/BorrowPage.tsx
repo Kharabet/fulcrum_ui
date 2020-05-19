@@ -5,9 +5,7 @@ import { BorrowDlg } from "../components/BorrowDlg";
 import { Asset } from "../domain/Asset";
 import { Footer } from "../layout/Footer";
 import { HeaderOps } from "../layout/HeaderOps";
-import { NavService } from "../services/NavService";
 import { TorqueProvider } from "../services/TorqueProvider";
-import { TorqueProviderEvents } from "../services/events/TorqueProviderEvents";
 import { ProviderType } from "../domain/ProviderType";
 
 export interface IBorrowPageRouteParams {
@@ -15,13 +13,11 @@ export interface IBorrowPageRouteParams {
 
 export interface IBorrowPageState {
   isLoadingTransaction: boolean;
-  selectedAsset: Asset
 }
 
 export interface IBorrowPageParams {
   doNetworkConnect: () => void;
   isRiskDisclosureModalOpen: () => void;
-  isLoading: boolean;
   isMobileMedia: boolean;
 }
 
@@ -32,8 +28,7 @@ export class BorrowPage extends PureComponent<IBorrowPageParams & RouteComponent
     super(props, context);
     this.borrowDlgRef = React.createRef();
     this.state = {
-      isLoadingTransaction: false,
-      selectedAsset: Asset.UNKNOWN
+      isLoadingTransaction: false
     }
   }
   public componentWillUnmount(): void {
@@ -44,9 +39,13 @@ export class BorrowPage extends PureComponent<IBorrowPageParams & RouteComponent
       <React.Fragment>
         <BorrowDlg ref={this.borrowDlgRef} />
         <div className="borrow-page">
-          <HeaderOps isMobileMedia={this.props.isMobileMedia} isLoading={this.props.isLoading} doNetworkConnect={this.props.doNetworkConnect} isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
+          <HeaderOps isMobileMedia={this.props.isMobileMedia} doNetworkConnect={this.props.doNetworkConnect} isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
           <main>
-            <AssetSelector onSelectAsset={this.onSelectAsset} isLoadingTransaction={this.state.isLoadingTransaction} selectedAsset={this.state.selectedAsset} />
+            <AssetSelector 
+            isLoadingTransaction={this.state.isLoadingTransaction} 
+            borrowDlgRef={this.borrowDlgRef}
+            doNetworkConnect={this.props.doNetworkConnect}
+            />
           </main>
           <Footer isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
         </div>
@@ -65,16 +64,16 @@ export class BorrowPage extends PureComponent<IBorrowPageParams & RouteComponent
 
     try {
       const borrowRequest = await this.borrowDlgRef.current.getValue(asset);
-      this.setState({ ...this.state, isLoadingTransaction: true, selectedAsset: asset });
+      this.setState({ ...this.state, isLoadingTransaction: true });
       await TorqueProvider.Instance.onDoBorrow(borrowRequest);
       // if (receipt.status === 1) {
-        this.setState({ ...this.state, isLoadingTransaction: false, selectedAsset: asset });
+        this.setState({ ...this.state, isLoadingTransaction: false });
         //NavService.Instance.History.push("/dashboard");
       // }
     } catch (error) {
       if (error.message !== "Form closed")
         console.error(error);
-      this.setState({ ...this.state, isLoadingTransaction: false, selectedAsset: asset });
+      this.setState({ ...this.state, isLoadingTransaction: false});
     }
   };
 }

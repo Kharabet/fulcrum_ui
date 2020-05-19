@@ -1,6 +1,5 @@
 import { EventEmitter } from "events";
 import { TasksQueueEvents } from "../services/events/TasksQueueEvents";
-import { FulcrumMcdBridgeRequest } from "./FulcrumMcdBridgeRequest";
 import { LendRequest } from "./LendRequest";
 import { RequestStatus } from "./RequestStatus";
 import { TradeRequest } from "./TradeRequest";
@@ -8,14 +7,14 @@ import { TradeRequest } from "./TradeRequest";
 export class RequestTask {
   private eventEmitter: EventEmitter | null = null;
 
-  public readonly request: LendRequest | TradeRequest | FulcrumMcdBridgeRequest;
+  public readonly request: LendRequest | TradeRequest;
   public status: RequestStatus;
   public steps: string[];
   public stepCurrent: number;
   public txHash: string | null;
   public error: Error | null;
 
-  constructor(request: LendRequest | TradeRequest | FulcrumMcdBridgeRequest) {
+  constructor(request: LendRequest | TradeRequest) {
     this.request = request;
     this.status = RequestStatus.AWAITING;
     this.steps = ["Preparing processing..."];

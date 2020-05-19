@@ -106,7 +106,6 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     } else {
       assets = [
         Asset.ETH,
-        // Asset.SAI,
         // Asset.DAI,
         // Asset.USDC,
         // Asset.SUSD,
@@ -224,6 +223,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
               onCancel={this.onTradeRequestClose}
               onTrade={this.onTradeRequested}
               version={this.state.tradeVersion}
+              isOpenModal={this.state.isTradeModalOpen}
             />
           </Modal>
           <Modal
@@ -263,6 +263,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
               onCancel={this.onManageCollateralRequestClose}
               onManage={this.onManageCollateralRequested}
               version={this.state.tradeVersion}
+              isOpenModal={this.state.isManageCollateralModalOpen} 
 
             />
           </Modal>

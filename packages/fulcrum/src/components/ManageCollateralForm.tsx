@@ -77,6 +77,7 @@ export interface IManageCollateralFormProps {
   bestCollateral: Asset;
   version: number;
   isMobileMedia: boolean;
+  isOpenModal: boolean;
 
   // onSubmit: (request: TradeRequest) => void;
   //onCancel: () => void;
@@ -346,7 +347,7 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
   public componentWillUnmount(): void {
     this._isMounted = false;
 
-    window.history.back();
+    window.history.pushState(null, "Manage Collateral Modal Closed", `/trade`);
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
   }
   //#endregion tradeComponent
@@ -356,7 +357,8 @@ export class ManageCollateralForm extends Component<IManageCollateralFormProps, 
     //#region tradeComponent
     this._isMounted = true;
     await this.derivedUpdate();
-    window.history.pushState(null, "Manage Collateral Modal Opened", `/#/trade/manage-${this.props.leverage}x-${this.props.positionType.toLocaleLowerCase()}-${this.props.asset}/`);
+    if(this.props.isOpenModal)
+      window.history.pushState(null, "Manage Collateral Modal Opened", `/trade/manage-${this.props.leverage}x-${this.props.positionType.toLocaleLowerCase()}-${this.props.asset}/`);
 
     if (this._input) {
       // this._input.select();

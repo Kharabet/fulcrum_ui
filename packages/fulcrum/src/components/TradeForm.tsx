@@ -71,6 +71,7 @@ export interface ITradeFormProps {
   onCancel: () => void;
   onTrade: (request: TradeRequest) => void;
   isMobileMedia: boolean;
+  isOpenModal: boolean;
 }
 
 interface ITradeFormState {
@@ -289,7 +290,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
   public componentWillUnmount(): void {
     this._isMounted = false;
 
-    window.history.back();
+    window.history.pushState(null, "Trade Modal Closed", `/trade`);
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
@@ -297,7 +298,8 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     this._isMounted = true;
 
     await this.derivedUpdate();
-    window.history.pushState(null, "Trade Modal Opened", `/trade/${this.props.tradeType.toLocaleLowerCase()}-${this.props.leverage}x-${this.props.positionType.toLocaleLowerCase()}-${this.props.asset}/`);
+    if (this.props.isOpenModal)
+      window.history.pushState(null, "Trade Modal Opened", `/trade/${this.props.tradeType.toLocaleLowerCase()}-${this.props.leverage}x-${this.props.positionType.toLocaleLowerCase()}-${this.props.asset}/`);
 
     if (this._input) {
       // this._input.select();

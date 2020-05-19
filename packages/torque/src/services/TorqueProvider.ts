@@ -365,20 +365,6 @@ export class TorqueProvider {
     return result;
   }
 
-  /*public getMarginPremiumAmount = (asset: Asset): number => {
-    let marginPremium = 0;
-    switch (asset) {
-      case Asset.SAI:
-      case Asset.USDC:
-        marginPremium = 0;
-        break;
-      default:
-        marginPremium = 100;
-    }
-
-    return marginPremium;
-  }*/
-
   public getBorrowDepositEstimate = async (
     borrowAsset: Asset,
     collateralAsset: Asset,
@@ -421,7 +407,7 @@ export class TorqueProvider {
 
     return this.getSwapRate(
       asset,
-      Asset.SAI
+      Asset.DAI
     );
   }
 
@@ -1826,11 +1812,11 @@ export class TorqueProvider {
   };
 
   public isStableAsset = (asset: Asset): boolean => {
-    if (asset === Asset.SAI ||
-      asset === Asset.DAI ||
+    if (asset === Asset.DAI ||
       asset === Asset.USDC ||
       asset === Asset.SUSD ||
-      asset === Asset.USDT) {
+      asset === Asset.USDT ||
+      asset === Asset.SAI) {
       return true;
     } else {
       return false;
@@ -2076,21 +2062,21 @@ export class TorqueProvider {
   };
 
   private cancelRequestTask = async (requestTask: RequestTask) => {
-    if (!(this.isProcessing || this.isChecking)) {
-      this.isProcessing = true;
+    // if (!(this.isProcessing || this.isChecking)) {
+    this.isProcessing = true;
 
-      try {
-        const task = TasksQueue.Instance.peek();
+    try {
+      const task = TasksQueue.Instance.peek();
 
-        if (task) {
-          if (task.request.id === requestTask.request.id) {
-            TasksQueue.Instance.dequeue();
-          }
+      if (task) {
+        if (task.request.id === requestTask.request.id) {
+          TasksQueue.Instance.dequeue();
         }
-      } finally {
-        this.isProcessing = false;
       }
+    } finally {
+      this.isProcessing = false;
     }
+    // }
   };
 
   private processQueue = async (force: boolean, skipGas: boolean) => {
@@ -2132,49 +2118,9 @@ export class TorqueProvider {
   };
 
   private processRequestTask = async (task: RequestTask, skipGas: boolean) => {
-    // if (task.request instanceof LendRequest) {
-    //   await this.processLendRequestTask(task, skipGas);
-    // }
-
-    // if (task.request instanceof FulcrumMcdBridgeRequest) {
-    //   await this.processFulcrumMcdBridgeRequestTask(task, skipGas);
-    // }
-
-    // if (task.request instanceof TradeRequest) {
-    //   await this.processTradeRequestTask(task, skipGas);
-    // }
-
-    if (task.request instanceof BorrowRequest) {
-      await this.processBorrowRequestTask(task, skipGas);
-    }
-
-    if (task.request instanceof ExtendLoanRequest) {
-      await this.processExtendLoanRequestTask(task, skipGas);
-    }
-    if (task.request instanceof ManageCollateralRequest) {
-      await this.processManageCollateralRequestTask(task, skipGas);
-    }
-    if (task.request instanceof RepayLoanRequest) {
-      await this.processRepayLoanRequestTask(task, skipGas);
-    }
-
-    if (task.request instanceof RefinanceMakerRequest) {
-      await this.processRefinanceMakerRequestTask(task, skipGas);
-    }
-
-    if (task.request instanceof RefinanceCompoundRequest) {
-      await this.processRefinanceCompoundRequestTask(task, skipGas);
-    }
-
-    if (task.request instanceof RefinanceDydxRequest) {
-      await this.processRefinanceDydxRequestTask(task, skipGas);
-    }
-
-    return false;
-  };
-
-  private processBorrowRequestTask = async (task: RequestTask, skipGas: boolean) => {
     try {
+      this.eventEmitter.emit(TorqueProviderEvents.AskToOpenProgressDlg, task.request.id);
+
       if (!(this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite)) {
         throw new Error("No provider available!");
       }
@@ -2185,10 +2131,41 @@ export class TorqueProvider {
       }
 
       // Initializing loan
-      const taskRequest: BorrowRequest = (task.request as BorrowRequest);
 
-      const processor = new BorrowProcessor();
-      await processor.run(task, account, skipGas);
+      let processor;
+      if (task.request instanceof BorrowRequest) {
+        processor = new BorrowProcessor();
+        await processor.run(task, account, skipGas);
+      }
+
+      if (task.request instanceof ExtendLoanRequest) {
+        processor = new ExtendLoanProcessor();
+        await processor.run(task, account, skipGas);
+
+      }
+      if (task.request instanceof ManageCollateralRequest) {
+        processor = new ManageCollateralProcessor();
+        await processor.run(task, account, skipGas);
+      }
+      if (task.request instanceof RepayLoanRequest) {
+        processor = new RepayLoanProcessor();
+        await processor.run(task, account, skipGas);
+      }
+
+      if (task.request instanceof RefinanceMakerRequest) {
+        processor = new RefinanceMakerProcessor();
+        await processor.run(task, skipGas, configAddress, web3);
+      }
+
+      if (task.request instanceof RefinanceCompoundRequest) {
+        processor = new RefinanceCompoundProcessor();
+        await processor.run(task, account, skipGas);
+      }
+
+      if (task.request instanceof RefinanceDydxRequest) {
+        processor = new RefinanceDydxProcessor();
+        await processor.run(task, account, skipGas);
+      }
 
       task.processingEnd(true, false, null);
     } catch (e) {
@@ -2198,156 +2175,8 @@ export class TorqueProvider {
       }
       task.processingEnd(false, false, e);
     }
-  };
-  private processRepayLoanRequestTask = async (task: RequestTask, skipGas: boolean) => {
-    try {
-      if (!(this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite)) {
-        throw new Error("No provider available!");
-      }
-      const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
-      if (!account) {
-        throw new Error("Unable to get wallet address!");
-      }
-
-      // Initializing loan
-      const taskRequest: RepayLoanRequest = (task.request as RepayLoanRequest);
-
-      const processor = new RepayLoanProcessor();
-      await processor.run(task, account, skipGas);
-
-      task.processingEnd(true, false, null);
-    } catch (e) {
-      if (!e.message.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)) {
-        // tslint:disable-next-line:no-console
-        console.log(e);
-      }
-      task.processingEnd(false, false, e);
-    }
-  };
-
-  private processExtendLoanRequestTask = async (task: RequestTask, skipGas: boolean) => {
-    try {
-      if (!(this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite)) {
-        throw new Error("No provider available!");
-      }
-
-      const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
-      if (!account) {
-        throw new Error("Unable to get wallet address!");
-      }
-
-      // Initializing loan
-      const taskRequest: ExtendLoanRequest = (task.request as ExtendLoanRequest);
-
-      const processor = new ExtendLoanProcessor();
-      await processor.run(task, account, skipGas);
-
-      task.processingEnd(true, false, null);
-    } catch (e) {
-      if (!e.message.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)) {
-        // tslint:disable-next-line:no-console
-        console.log(e);
-      }
-      task.processingEnd(false, false, e);
-    }
-  };
-
-  private processManageCollateralRequestTask = async (task: RequestTask, skipGas: boolean) => {
-    try {
-      if (!(this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite)) {
-        throw new Error("No provider available!");
-      }
-
-      const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
-      if (!account) {
-        throw new Error("Unable to get wallet address!");
-      }
-
-      // Initializing loan
-      const taskRequest: ManageCollateralRequest = (task.request as ManageCollateralRequest);
-
-      const processor = new ManageCollateralProcessor();
-      await processor.run(task, account, skipGas);
-
-      task.processingEnd(true, false, null);
-    } catch (e) {
-      if (!e.message.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)) {
-        // tslint:disable-next-line:no-console
-        console.log(e);
-      }
-      task.processingEnd(false, false, e);
-    }
-  };
-
-  private processRefinanceMakerRequestTask = async (task: RequestTask, skipGas: boolean) => {
-    try {
-      if (!(this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite)) {
-        throw new Error("No provider available!");
-      }
-
-      const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
-      if (!account) {
-        throw new Error("Unable to get wallet address!");
-      }
-
-      const processor = new RefinanceMakerProcessor();
-      await processor.run(task, account, skipGas, configAddress, web3);
-
-      task.processingEnd(true, false, null);
-    } catch (e) {
-      if (!e.message.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)) {
-        // tslint:disable-next-line:no-console
-        console.log(e);
-      }
-      task.processingEnd(false, false, e);
-    }
-  };
-
-  private processRefinanceCompoundRequestTask = async (task: RequestTask, skipGas: boolean) => {
-    try {
-      if (!(this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite)) {
-        throw new Error("No provider available!");
-      }
-
-      const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
-      if (!account) {
-        throw new Error("Unable to get wallet address!");
-      }
-
-      const processor = new RefinanceCompoundProcessor();
-      await processor.run(task, account, skipGas, configAddress, web3);
-
-      task.processingEnd(true, false, null);
-    } catch (e) {
-      if (!e.message.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)) {
-        // tslint:disable-next-line:no-console
-        console.log(e);
-      }
-      task.processingEnd(false, false, e);
-    }
-  };
-  
-  private processRefinanceDydxRequestTask = async (task: RequestTask, skipGas: boolean) => {
-    try {
-      if (!(this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite)) {
-        throw new Error("No provider available!");
-      }
-
-      const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
-      if (!account) {
-        throw new Error("Unable to get wallet address!");
-      }
-
-      const processor = new RefinanceDydxProcessor();
-      await processor.run(task, account, skipGas, configAddress, web3);
-
-      task.processingEnd(true, false, null);
-    } catch (e) {
-      if (!e.message.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)) {
-        // tslint:disable-next-line:no-console
-        console.log(e);
-      }
-      task.processingEnd(false, false, e);
+    finally {
+      this.eventEmitter.emit(TorqueProviderEvents.AskToCloseProgressDlg, task);
     }
   };
 

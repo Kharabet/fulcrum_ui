@@ -7,9 +7,8 @@
     top: 0;
     background-color: rgb(255, 255, 255);
     z-index: 10002;
-    .loader-content{
+    .loader-content {
       width: 100%;
-      height: 27%;
       background-color: #f5f7f9;
       display: flex;
       flex-direction: column;
@@ -18,12 +17,18 @@
       left: 0;
       -webkit-transform: translate(0, -50%);
       transform: translate(0, -50%);
+      &-small{
+        padding: 25px 0;
+      }
+      &-middle{
+        padding: 50px 0;
+      }
     }
   }
   .loader-wrapper {
     position: absolute;
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 100%;
     z-index: 10001;
   }
   .loader-content {
@@ -38,15 +43,18 @@
       color: #283049;
       margin-bottom: 0;
       text-align: center;
-      &-small{
+      &.warning {
+        color: #ff5c5c;
+      }
+      &-small {
         font-size: 12px;
         margin-bottom: 10px;
       }
-      &-middle{
+      &-middle {
         font-size: 18px;
         margin-bottom: 15px;
       }
-      &-large{
+      &-large {
         font-size: 52px;
         margin-bottom: 35px;
         @media screen and (max-width: $mobile-version-max-width) {
@@ -67,9 +75,12 @@
         animation-name: animationDotsLoader;
         animation-iteration-count: infinite;
         animation-timing-function: cubic-bezier(0, 0, 1, 1);
+        .refinance-list & {
+          animation-name: animationDotsLoaderRefinance;
+        }
         &.small-dots {
-          width: 5px;
-          height: 5px;
+          width: 6px;
+          height: 6px;
           margin: 0 4px;
         }
         &.middle-dots {
@@ -84,7 +95,7 @@
         }
         @for $i from 1 through 5 {
           &:nth-child(#{$i}) {
-            animation-delay: calc(0.7s * (#{$i} - 1));
+            animation-delay: calc(0.35s * (#{$i} - 1));
           }
         }
       }
@@ -98,18 +109,35 @@
     opacity: 0.5;
   }
   5% {
-    transform: scale(1.4);
-    background-color: #276bfb;
-    opacity: 1;
-  }
-  10% {
     transform: scale(1.8);
     background-color: #276bfb;
     opacity: 1;
   }
   15% {
-    transform: scale(1.4);
+    transform: scale(1.8);
     background-color: #276bfb;
+    opacity: 1;
+  }
+  20% {
+    transform: scale(1);
+    background-color: #a9b5c7;
+    opacity: 0.5;
+  }
+}
+@keyframes animationDotsLoaderRefinance {
+  0% {
+    transform: scale(1);
+    background-color: #a9b5c7;
+    opacity: 0.5;
+  }
+  5% {
+    transform: scale(1.8);
+    background-color: #8e7df7;
+    opacity: 1;
+  }
+  15% {
+    transform: scale(1.8);
+    background-color: #8e7df7;
     opacity: 1;
   }
   20% {

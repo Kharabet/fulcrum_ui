@@ -1,7 +1,5 @@
 import { BigNumber } from "@0x/utils";
 import React, { ChangeEvent, Component } from "react";
-import { Subject } from "rxjs";
-// import { debounceTime, switchMap } from "rxjs/operators";
 import { ReactComponent as Arrow } from "../assets/images/arrow.svg";
 import { ReactComponent as MakerImg } from "../assets/images/maker.svg";
 import { ReactComponent as TorqueLogo } from "../assets/images/torque_logo.svg";
@@ -14,13 +12,15 @@ import { ReactComponent as DownArrow } from "../assets/images/down-arrow.svg";
 import { ReactComponent as TopArrow } from "../assets/images/top-arrow.svg";
 import { ReactComponent as IconInfo } from "../assets/images/icon_info.svg";
 import { ReactComponent as IconInfoActive } from "../assets/images/icon_info_active.svg";
-import { Loader } from "./Loader";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { AssetDetails } from "../domain/AssetDetails";
 import { CollaterallRefinanceSlider } from "./CollaterallRefinanceSlider";
 import { NavService } from '../services/NavService';
 import { RefinanceMakerRequest } from "../domain/RefinanceMakerRequest";
 import { Confirm } from "./Confirm";
+import { RequestTask } from "../domain/RequestTask";
+import { RequestStatus } from "../domain/RequestStatus";
+import { TxProcessingLoader } from "./TxProcessingLoader";
 
 
 export interface IRefinanceAssetSelectorItemProps {
@@ -41,6 +41,7 @@ interface IRefinanceAssetSelectorItemState {
   refRateMonth: number;
   refRateYear: number;
   isShowConfirm: boolean;
+  request: RefinanceMakerRequest | undefined;
 }
 
 export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelectorItemProps, IRefinanceAssetSelectorItemState> {
@@ -60,28 +61,48 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
       refRateMonth: 0,
       refRateYear: 0,
       isShowConfirm: false,
+      request: undefined
     };
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderChanged, this.onProviderChanged);
+    TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.AskToOpenProgressDlg, this.onAskToOpenProgressDlg);
+    TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.AskToCloseProgressDlg, this.onAskToCloseProgressDlg);
+  }
+
+  private onAskToOpenProgressDlg = (taskId: number) => {
+    if (!this.state.request || taskId !== this.state.request.id) return;
+    this.setState({ ...this.state, isLoadingTransaction: true })
+  }
+  private onAskToCloseProgressDlg = (task: RequestTask) => {
+    if (!this.state.request || task.request.id !== this.state.request.id) return;
+    if (task.status === RequestStatus.FAILED || task.status === RequestStatus.FAILED_SKIPGAS) {
+      window.setTimeout(() => {
+        TorqueProvider.Instance.onTaskCancel(task);
+        this.setState({ ...this.state, isLoadingTransaction: false, request: undefined })
+      }, 5000)
+      return;
+    }
+    this.setState({ ...this.state, isLoadingTransaction: false, request: undefined });
+
+    NavService.Instance.History.push("/dashboard");
   }
 
   private onProviderAvailable = () => {
-    // noinspection JSIgnoredPromiseFromCall
     this.derivedUpdate();
   };
 
   private onProviderChanged = () => {
-    // noinspection JSIgnoredPromiseFromCall
     this.derivedUpdate();
   };
 
   public componentWillUnmount(): void {
     TorqueProvider.Instance.eventEmitter.removeListener(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
     TorqueProvider.Instance.eventEmitter.removeListener(TorqueProviderEvents.ProviderChanged, this.onProviderChanged);
+    TorqueProvider.Instance.eventEmitter.removeListener(TorqueProviderEvents.AskToOpenProgressDlg, this.onAskToOpenProgressDlg);
+    TorqueProvider.Instance.eventEmitter.removeListener(TorqueProviderEvents.AskToCloseProgressDlg, this.onAskToCloseProgressDlg);
   }
 
   public componentDidMount(): void {
-    // noinspection JSIgnoredPromiseFromCall
     this.derivedUpdate();
     this.setState({
       ...this.state,
@@ -95,7 +116,6 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
     snapshot?: any
   ): void {
     if (this.props.asset !== prevProps.asset) {
-      // noinspection JSIgnoredPromiseFromCall
       this.derivedUpdate();
     }
   }
@@ -103,7 +123,7 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
   private derivedUpdate = async () => {
     // @ts-ignore
     const interestRate = await TorqueProvider.Instance.getAssetInterestRate(Asset[this.state.loan.collateralType]);
-    const refRateYear = ((parseFloat(this.state.loan.variableAPR.dp(0, BigNumber.ROUND_CEIL).toString()) - parseFloat(interestRate.dp(1, BigNumber.ROUND_CEIL).toString())) * parseFloat(this.state.loan.debt.dp(3, BigNumber.ROUND_FLOOR).toString())) / 100;
+    const refRateYear = ((parseFloat(this.state.loan.variableAPR.dp(0, BigNumber.ROUND_CEIL).toString()) - parseFloat(interestRate.dp(1, BigNumber.ROUND_CEIL).toString())) * parseFloat(this.state.borrowAmount.dp(3, BigNumber.ROUND_FLOOR).toString())) / 100;
     const refRateMonth = refRateYear / 12;
     this.setState({
       ...this.state,
@@ -125,10 +145,15 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
       const collaterralWithRatio = collateralAmount.multipliedBy(refinanceData.collaterizationPercent).div(this.props.refinanceData.collaterizationPercent)
       refinanceData.collateralAmount = collaterralWithRatio;
     }
+    const refRateYear = ((parseFloat(this.state.loan.variableAPR.dp(0, BigNumber.ROUND_CEIL).toString()) - parseFloat(this.state.fixedApr.dp(1, BigNumber.ROUND_CEIL).toString())) * parseFloat(borrowAmount.dp(3, BigNumber.ROUND_FLOOR).toString())) / 100;
+    const refRateMonth = refRateYear / 12;
+
     this.setState({
       ...this.state,
-      borrowAmount: new BigNumber(amountText),
-      loan: refinanceData
+      borrowAmount: borrowAmount,
+      loan: refinanceData,
+      refRateMonth,
+      refRateYear
     });
   };
 
@@ -168,28 +193,16 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
     const left = this.state.loan.debt.minus(this.state.borrowAmount);
     const isDust = !(this.state.borrowAmount.dp(3, BigNumber.ROUND_DOWN).isEqualTo(this.state.loan.debt.dp(3, BigNumber.ROUND_DOWN)) || left.gt(this.props.refinanceData.dust));
     if (isDust) {
-      try {
-        this.setState({ ...this.state, isShowConfirm: true });
-        return;
-      } catch (error) {
-        console.log(error);
-      }
+      this.setState({ ...this.state, isShowConfirm: true });
+      return;
     }
     await this.checkCdpManager();
   }
 
   private checkCdpManager = async () => {
-    try {
-      this.setState({ ...this.state, isLoadingTransaction: true });
-      /*const receipt = */await TorqueProvider.Instance.onMigrateMakerLoan(new RefinanceMakerRequest(this.state.loan, this.state.borrowAmount));
-      // if (receipt.status === 1) {
-      //   this.setState({ ...this.state, isLoadingTransaction: false });
-      //   NavService.Instance.History.push("/dashboard");
-      // }
-      this.setState({ ...this.state, isLoadingTransaction: false });
-    } catch (error) {
-      this.setState({ ...this.state, isLoadingTransaction: false });
-    }
+    const request = new RefinanceMakerRequest(this.state.loan, this.state.borrowAmount)
+    await this.setState({ ...this.state, request: request });
+    await TorqueProvider.Instance.onMigrateMakerLoan(request);
   };
 
   public showInfoCollateralAssetDt0 = () => {
@@ -210,11 +223,17 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
       <div className={`refinance-asset-selector-item ` + (this.state.isShowConfirm ? `disabled-hover` : ``) + (this.state.isShowInfoCollateralAssetDt0 ? `inactive` : ``)}>
         {this.state.isShowConfirm &&
           <Confirm onDecline={this.onDecline} onConfirm={this.onConfirm}>
-          <p>Remaining debt should be zero or more than {this.props.refinanceData.dust.toString(10)} DAI. Do you want to continue with total amount?</p>
+            <p>Remaining debt should be zero or more than {this.props.refinanceData.dust.toString(10)} DAI. Do you want to continue with total amount?</p>
           </Confirm>}
 
-        {this.state.isLoadingTransaction &&
-          <Loader quantityDots={4} sizeDots={'middle'} title={'Processed Token'} isOverlay={true} />}
+        {this.state.isLoadingTransaction && this.state.request &&
+          <TxProcessingLoader
+            quantityDots={4}
+            sizeDots={'middle'}
+            isOverlay={true}
+            taskId={this.state.request.id}
+          />
+        }
 
         <div className="refinance-asset__main-block">
           <div className="refinance-asset-selector__non-torque">

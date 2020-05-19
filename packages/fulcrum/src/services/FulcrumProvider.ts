@@ -8,7 +8,6 @@ import fetch from "node-fetch";
 import request from "request-promise";
 import { Asset } from "../domain/Asset";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
-import { FulcrumMcdBridgeRequest } from "../domain/FulcrumMcdBridgeRequest";
 import { IPriceDataPoint } from "../domain/IPriceDataPoint";
 import { IWeb3ProviderSettings } from "../domain/IWeb3ProviderSettings";
 import { LendRequest } from "../domain/LendRequest";
@@ -33,7 +32,6 @@ import { TasksQueue } from "./TasksQueue";
 
 import TagManager from "react-gtm-module";
 import configProviders from "../config/providers.json";
-import { FulcrumMcdBridgeProcessor } from "./processors/FulcrumMcdBridgeProcessor";
 import { LendChaiProcessor } from "./processors/LendChaiProcessor";
 import { LendErcProcessor } from "./processors/LendErcProcessor";
 import { LendEthProcessor } from "./processors/LendEthProcessor";
@@ -256,12 +254,6 @@ export class FulcrumProvider {
       await this.contractsSource.Init();
     }
   }
-
-  public onFulcrumMcdBridgeConfirmed = async (request: FulcrumMcdBridgeRequest) => {
-    if (request) {
-      TasksQueue.Instance.enqueue(new RequestTask(request));
-    }
-  };
 
   public onLendConfirmed = async (request: LendRequest) => {
     if (request) {
@@ -758,26 +750,6 @@ export class FulcrumProvider {
   };
 
 
-  public getMaxMCDBridgeValue = async (request: FulcrumMcdBridgeRequest): Promise<BigNumber> => {
-    let result = new BigNumber(0);
-
-    if (this.contractsSource) {
-      const assetContract = await this.contractsSource.getITokenContract(request.asset);
-      if (assetContract) {
-        const balanceOfUser = await this.getITokenBalanceOfUser(request.asset);
-        const marketLiquidity = await assetContract.marketLiquidity.callAsync();
-
-        result = marketLiquidity.lt(balanceOfUser) ?
-          marketLiquidity :
-          balanceOfUser;
-      }
-    }
-
-    result = result.dividedBy(10 ** 18);
-
-    return result;
-  };
-
   public getMaxLendValue = async (request: LendRequest): Promise<[BigNumber, BigNumber, BigNumber, BigNumber, string]> => {
     let maxLendAmount = new BigNumber(0);
     let maxTokenAmount = new BigNumber(0);
@@ -815,7 +787,7 @@ export class FulcrumProvider {
             maxLendAmount = freeSupply;
             maxTokenAmount = maxTokenAmount.multipliedBy(freeSupply).dividedBy(userBalance);
             if (request.lendType === LendType.UNLEND)
-              infoMessage = "Insufficient liquidity for unlend. PLease try again later.";
+              infoMessage = "Insufficient liquidity for unlend. Please try again later.";
           } else {
             maxLendAmount = userBalance;
           }
@@ -908,42 +880,6 @@ export class FulcrumProvider {
 
     return result;
   };
-
-  public getMCDBridgeAmountEstimate = async (request: FulcrumMcdBridgeRequest): Promise<BigNumber> => {
-    let result = new BigNumber(0);
-
-    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
-    if (account && this.contractsSource) {
-      const bridgeContract = await this.contractsSource.getFulcrumMcdBridgeContract();
-      if (bridgeContract) {
-        try {
-          if (request.isSAIUpgrade()) {
-            result = await bridgeContract.bridgeISaiToIDai.callAsync(
-              new BigNumber(request.amount.times(10 ** 18).toFixed(0)),
-              {
-                from: account,
-                gas: "5000000",
-                gasPrice: new BigNumber(0)
-              }
-            );
-          } else {
-            result = await bridgeContract.bridgeIDaiToISai.callAsync(
-              new BigNumber(request.amount.times(10 ** 18).toFixed(0)),
-              {
-                from: account,
-                gas: "5000000",
-                gasPrice: new BigNumber(0)
-              }
-            );
-          }
-        } catch (e) {
-          // console.log(e);
-        }
-      }
-    }
-
-    return result.dividedBy(10 ** 18);
-  }
 
   public getLendedAmountEstimate = async (request: LendRequest): Promise<BigNumber> => {
     let result = new BigNumber(0);
@@ -1618,10 +1554,6 @@ export class FulcrumProvider {
       await this.processLendRequestTask(task, skipGas);
     }
 
-    if (task.request instanceof FulcrumMcdBridgeRequest) {
-      await this.processFulcrumMcdBridgeRequestTask(task, skipGas);
-    }
-
     if (task.request instanceof TradeRequest) {
       await this.processTradeRequestTask(task, skipGas);
     }
@@ -1708,30 +1640,6 @@ console.log(err, added);
         }
       }
 
-      task.processingEnd(true, false, null);
-    } catch (e) {
-      if (!e.message.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)) {
-        // tslint:disable-next-line:no-console
-        console.log(e);
-      }
-      task.processingEnd(false, false, e);
-    }
-  };
-
-  private processFulcrumMcdBridgeRequestTask = async (task: RequestTask, skipGas: boolean) => {
-    try {
-      if (!(this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite)) {
-        throw new Error("No provider available!");
-      }
-
-      const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
-      if (!account) {
-        throw new Error("Unable to get wallet address!");
-      }
-
-      // Initializing conversion
-      const processor = new FulcrumMcdBridgeProcessor();
-      await processor.run(task, account, skipGas);
       task.processingEnd(true, false, null);
     } catch (e) {
       if (!e.message.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)) {
@@ -1951,7 +1859,7 @@ console.log(err, added);
 
   public waitForTransactionMined = async (
     txHash: string,
-    request: LendRequest | TradeRequest | FulcrumMcdBridgeRequest): Promise<any> => {
+    request: LendRequest | TradeRequest): Promise<any> => {
 
     return new Promise((resolve, reject) => {
       try {
@@ -1969,7 +1877,7 @@ console.log(err, added);
   private waitForTransactionMinedRecursive = async (
     txHash: string,
     web3Wrapper: Web3Wrapper,
-    request: LendRequest | TradeRequest | FulcrumMcdBridgeRequest,
+    request: LendRequest | TradeRequest,
     resolve: (value: any) => void,
     reject: (value: any) => void) => {
 
@@ -1990,23 +1898,6 @@ console.log(err, added);
             }
           }
           TagManager.dataLayer(tagManagerArgs)
-          this.eventEmitter.emit(
-            FulcrumProviderEvents.LendTransactionMined,
-            new LendTransactionMinedEvent(request.asset, txHash)
-          );
-        } else if (request instanceof FulcrumMcdBridgeRequest) {
-          const randomNumber = Math.floor(Math.random() * 100000) + 1;
-          const tagManagerArgs = {
-            dataLayer: {
-              transactionId: randomNumber,
-              transactionProducts: [{
-                name: "Transaction-FulcrumMcdBridge-" + request.asset,
-                sku: request.asset,
-                category: 'FulcrumMcdBridge'
-              }],
-            }
-          }
-          TagManager.dataLayer(tagManagerArgs);
           this.eventEmitter.emit(
             FulcrumProviderEvents.LendTransactionMined,
             new LendTransactionMinedEvent(request.asset, txHash)
