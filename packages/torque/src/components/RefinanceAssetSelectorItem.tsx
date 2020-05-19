@@ -1,7 +1,5 @@
 import { BigNumber } from "@0x/utils";
 import React, { ChangeEvent, Component } from "react";
-import { Subject } from "rxjs";
-// import { debounceTime, switchMap } from "rxjs/operators";
 import { ReactComponent as Arrow } from "../assets/images/arrow.svg";
 import { ReactComponent as MakerImg } from "../assets/images/maker.svg";
 import { ReactComponent as TorqueLogo } from "../assets/images/torque_logo.svg";
@@ -14,12 +12,15 @@ import { ReactComponent as DownArrow } from "../assets/images/down-arrow.svg";
 import { ReactComponent as TopArrow } from "../assets/images/top-arrow.svg";
 import { ReactComponent as IconInfo } from "../assets/images/icon_info.svg";
 import { ReactComponent as IconInfoActive } from "../assets/images/icon_info_active.svg";
-import { Loader } from "./Loader";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { AssetDetails } from "../domain/AssetDetails";
 import { CollaterallRefinanceSlider } from "./CollaterallRefinanceSlider";
 import { NavService } from '../services/NavService';
+import { RefinanceMakerRequest } from "../domain/RefinanceMakerRequest";
 import { Confirm } from "./Confirm";
+import { RequestTask } from "../domain/RequestTask";
+import { RequestStatus } from "../domain/RequestStatus";
+import { TxProcessingLoader } from "./TxProcessingLoader";
 
 
 export interface IRefinanceAssetSelectorItemProps {
@@ -35,8 +36,12 @@ interface IRefinanceAssetSelectorItemState {
   borrowAmount: BigNumber;
   fixedApr: BigNumber;
   isLoadingTransaction: boolean;
+  loanAssetDt: AssetDetails;
+  collateralAssetDt: AssetDetails;
+  refRateMonth: number;
+  refRateYear: number;
   isShowConfirm: boolean;
-  confirm: boolean;
+  request: RefinanceMakerRequest | undefined;
 }
 
 export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelectorItemProps, IRefinanceAssetSelectorItemState> {
@@ -51,31 +56,58 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
       fixedApr: new BigNumber(0),
       loan: props.refinanceData,
       isLoadingTransaction: false,
+      loanAssetDt: AssetsDictionary.assets.get(this.props.asset) as AssetDetails,
+      collateralAssetDt: AssetsDictionary.assets.get(Asset.ETH) as AssetDetails,
+      refRateMonth: 0,
+      refRateYear: 0,
       isShowConfirm: false,
-      confirm: false,
+      request: undefined
     };
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderChanged, this.onProviderChanged);
+    TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.AskToOpenProgressDlg, this.onAskToOpenProgressDlg);
+    TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.AskToCloseProgressDlg, this.onAskToCloseProgressDlg);
+  }
+
+  private onAskToOpenProgressDlg = (taskId: number) => {
+    if (!this.state.request || taskId !== this.state.request.id) return;
+    this.setState({ ...this.state, isLoadingTransaction: true })
+  }
+  private onAskToCloseProgressDlg = (task: RequestTask) => {
+    if (!this.state.request || task.request.id !== this.state.request.id) return;
+    if (task.status === RequestStatus.FAILED || task.status === RequestStatus.FAILED_SKIPGAS) {
+      window.setTimeout(() => {
+        TorqueProvider.Instance.onTaskCancel(task);
+        this.setState({ ...this.state, isLoadingTransaction: false, request: undefined })
+      }, 5000)
+      return;
+    }
+    this.setState({ ...this.state, isLoadingTransaction: false, request: undefined });
+
+    NavService.Instance.History.push("/dashboard");
   }
 
   private onProviderAvailable = () => {
-    // noinspection JSIgnoredPromiseFromCall
     this.derivedUpdate();
   };
 
   private onProviderChanged = () => {
-    // noinspection JSIgnoredPromiseFromCall
     this.derivedUpdate();
   };
 
   public componentWillUnmount(): void {
     TorqueProvider.Instance.eventEmitter.removeListener(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
     TorqueProvider.Instance.eventEmitter.removeListener(TorqueProviderEvents.ProviderChanged, this.onProviderChanged);
+    TorqueProvider.Instance.eventEmitter.removeListener(TorqueProviderEvents.AskToOpenProgressDlg, this.onAskToOpenProgressDlg);
+    TorqueProvider.Instance.eventEmitter.removeListener(TorqueProviderEvents.AskToCloseProgressDlg, this.onAskToCloseProgressDlg);
   }
 
   public componentDidMount(): void {
-    // noinspection JSIgnoredPromiseFromCall
     this.derivedUpdate();
+    this.setState({
+      ...this.state,
+      borrowAmount: this.state.loan.debt
+    });
   }
 
   public componentDidUpdate(
@@ -84,19 +116,22 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
     snapshot?: any
   ): void {
     if (this.props.asset !== prevProps.asset) {
-      // noinspection JSIgnoredPromiseFromCall
       this.derivedUpdate();
     }
   }
 
   private derivedUpdate = async () => {
-    this.setState({
-      ...this.state,
-      borrowAmount: this.state.loan.debt
-    });
     // @ts-ignore
     const interestRate = await TorqueProvider.Instance.getAssetInterestRate(Asset[this.state.loan.collateralType]);
-    this.setState({ ...this.state, fixedApr: interestRate });
+    const refRateYear = ((parseFloat(this.state.loan.variableAPR.dp(0, BigNumber.ROUND_CEIL).toString()) - parseFloat(interestRate.dp(1, BigNumber.ROUND_CEIL).toString())) * parseFloat(this.state.borrowAmount.dp(3, BigNumber.ROUND_FLOOR).toString())) / 100;
+    const refRateMonth = refRateYear / 12;
+    this.setState({
+      ...this.state,
+      fixedApr: interestRate,
+      refRateMonth,
+      refRateYear,
+      borrowAmount: this.state.loan.debt
+    });
   };
 
   public loanAmountChange = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -110,10 +145,15 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
       const collaterralWithRatio = collateralAmount.multipliedBy(refinanceData.collaterizationPercent).div(this.props.refinanceData.collaterizationPercent)
       refinanceData.collateralAmount = collaterralWithRatio;
     }
+    const refRateYear = ((parseFloat(this.state.loan.variableAPR.dp(0, BigNumber.ROUND_CEIL).toString()) - parseFloat(this.state.fixedApr.dp(1, BigNumber.ROUND_CEIL).toString())) * parseFloat(borrowAmount.dp(3, BigNumber.ROUND_FLOOR).toString())) / 100;
+    const refRateMonth = refRateYear / 12;
+
     this.setState({
       ...this.state,
-      borrowAmount: new BigNumber(amountText),
-      loan: refinanceData
+      borrowAmount: borrowAmount,
+      loan: refinanceData,
+      refRateMonth,
+      refRateYear
     });
   };
 
@@ -141,11 +181,11 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
   };
 
   public onDecline = async () => {
-    await this.setState({ ...this.state, confirm: false, isShowConfirm: false });
+    await this.setState({ ...this.state, isShowConfirm: false });
   }
 
   public onConfirm = async () => {
-    await this.setState({ ...this.state, confirm: true, isShowConfirm: false, borrowAmount: this.props.refinanceData.debt });
+    await this.setState({ ...this.state, isShowConfirm: false, borrowAmount: this.props.refinanceData.debt });
     await this.checkCdpManager();
   }
 
@@ -153,27 +193,16 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
     const left = this.state.loan.debt.minus(this.state.borrowAmount);
     const isDust = !(this.state.borrowAmount.dp(3, BigNumber.ROUND_DOWN).isEqualTo(this.state.loan.debt.dp(3, BigNumber.ROUND_DOWN)) || left.gt(this.props.refinanceData.dust));
     if (isDust) {
-      try {
-        this.setState({ ...this.state, isShowConfirm: true });
-        return;
-      } catch (error) {
-        console.log(error);
-      }
+      this.setState({ ...this.state, isShowConfirm: true });
+      return;
     }
     await this.checkCdpManager();
   }
 
   private checkCdpManager = async () => {
-    try {
-      this.setState({ ...this.state, isLoadingTransaction: true });
-      const receipt = await TorqueProvider.Instance.migrateMakerLoan(this.state.loan, this.state.borrowAmount);
-      if (receipt.status === 1) {
-        this.setState({ ...this.state, isLoadingTransaction: false });
-        NavService.Instance.History.push("/dashboard");
-      }
-    } catch (error) {
-      this.setState({ ...this.state, isLoadingTransaction: false });
-    }
+    const request = new RefinanceMakerRequest(this.state.loan, this.state.borrowAmount)
+    await this.setState({ ...this.state, request: request });
+    await TorqueProvider.Instance.onMigrateMakerLoan(request);
   };
 
   public showInfoCollateralAssetDt0 = () => {
@@ -184,11 +213,7 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
   };
 
   public render() {
-    const asset = AssetsDictionary.assets.get(this.props.asset) as AssetDetails;
-    const assetETH = AssetsDictionary.assets.get(Asset.ETH) as AssetDetails;
-    const refRateYear = ((parseFloat(this.state.loan.variableAPR.dp(0, BigNumber.ROUND_CEIL).toString()) - parseFloat(this.state.fixedApr.dp(1, BigNumber.ROUND_CEIL).toString())) * parseFloat(this.state.loan.debt.dp(3, BigNumber.ROUND_FLOOR).toString())) / 100;
-    const refRateMonth = refRateYear / 12;
-    const iconInfoCollateralAssetDt0 = this.state.isShowInfoCollateralAssetDt0 ? <IconInfoActive /> : <IconInfo />;
+
     const showDetailsValue = !this.state.isShow ? "Show details" : "Hide details";
     const arrowIcon = this.state.isShow ? <TopArrow /> : <DownArrow />;
 
@@ -197,10 +222,18 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
     return (
       <div className={`refinance-asset-selector-item ` + (this.state.isShowConfirm ? `disabled-hover` : ``) + (this.state.isShowInfoCollateralAssetDt0 ? `inactive` : ``)}>
         {this.state.isShowConfirm &&
-          <Confirm amountDust={this.props.refinanceData.dust.toString(10)} onDecline={this.onDecline} onConfirm={this.onConfirm} />}
+          <Confirm onDecline={this.onDecline} onConfirm={this.onConfirm}>
+            <p>Remaining debt should be zero or more than {this.props.refinanceData.dust.toString(10)} DAI. Do you want to continue with total amount?</p>
+          </Confirm>}
 
-        {this.state.isLoadingTransaction &&
-          <Loader quantityDots={4} sizeDots={'middle'} title={'Processed Token'} isOverlay={true} />}
+        {this.state.isLoadingTransaction && this.state.request &&
+          <TxProcessingLoader
+            quantityDots={4}
+            sizeDots={'middle'}
+            isOverlay={true}
+            taskId={this.state.request.id}
+          />
+        }
 
         <div className="refinance-asset__main-block">
           <div className="refinance-asset-selector__non-torque">
@@ -209,7 +242,7 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
               {!this.props.isMobileMedia && <Arrow />}
             </div>
             <div className="refinance-asset-selector__non-torque-apr">
-              <div className="value">{this.state.loan.variableAPR.dp(0, BigNumber.ROUND_CEIL).toString()}%</div>
+              <div title={this.state.loan.variableAPR.toFixed()} className="value">{this.state.loan.variableAPR.dp(0, BigNumber.ROUND_CEIL).toString()}%</div>
               <div className="text">Variable APR</div>
             </div>
             <div className="refinance__input-container">
@@ -232,7 +265,7 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
             {this.props.isMobileMedia &&
               <div className="loan-asset">
                 <div className="asset-icon">
-                  {asset.reactLogoSvg.render()}
+                  {this.state.loanAssetDt.reactLogoSvg.render()}
                 </div>
                 <div className="asset-name">{this.props.asset}</div>
               </div>
@@ -252,7 +285,7 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
               <TorqueLogo />
             </div>
             <div className="refinance-asset-selector__torque-apr">
-              <div className="value">{this.state.fixedApr.dp(1, BigNumber.ROUND_CEIL).toString()}%</div>
+              <div title={this.state.fixedApr.toFixed()} className="value">{this.state.fixedApr.dp(1, BigNumber.ROUND_CEIL).toString()}%</div>
               <div className="text">Fixed APR</div>
             </div>
             <div className="refinance-asset-selector__torque-loan-container">
@@ -261,7 +294,7 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
               </div>
               <div className="loan-asset">
                 <div className="asset-icon">
-                  {asset.reactLogoSvg.render()}
+                  {this.state.loanAssetDt.reactLogoSvg.render()}
                 </div>
                 <div className="asset-name">{this.props.asset}</div>
               </div>
@@ -282,7 +315,7 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
                     </div>
                     <div className="text">Collateral</div>
                     <div className="info-icon" onClick={this.showInfoCollateralAssetDt0}>
-                      {iconInfoCollateralAssetDt0}
+                      {this.state.isShowInfoCollateralAssetDt0 ? <IconInfoActive /> : <IconInfo />}
                     </div>
                     {this.state.isShowInfoCollateralAssetDt0 &&
                       <React.Fragment>
@@ -292,7 +325,7 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
                   </div>
                   <div className="collateral-asset">
                     <div className="asset-icon">
-                      {assetETH.reactLogoSvg.render()}
+                      {this.state.collateralAssetDt.reactLogoSvg.render()}
                     </div>
                     <div className="asset-name">
                       {this.state.loan.collateralType}
@@ -319,8 +352,9 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
           {this.state.loan.variableAPR.gt(this.state.fixedApr)
             ? <div className="refinance-asset-selector__desc">
               Refinancing with&nbsp;<b>FIXED</b>&nbsp;rates could save you &nbsp;
-              <div className="refinance-asset-selector__rs">${refRateMonth.toFixed(2)}/mo or
-                ${refRateYear.toFixed(2)}/yr
+              <div className="refinance-asset-selector__rs">
+                <span title={this.state.refRateMonth.toString()}>${this.state.refRateMonth.toFixed(2)}/mo</span>&nbsp;or&nbsp;
+                <span title={this.state.refRateYear.toString()}>${this.state.refRateYear.toFixed(2)}/yr</span>
               </div>
             </div>
             : <div className="refinance-asset-selector__desc" />

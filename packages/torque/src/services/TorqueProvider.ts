@@ -50,6 +50,20 @@ import { NavService } from "./NavService";
 
 import { AbstractConnector } from '@web3-react/abstract-connector';
 import { ProviderTypeDictionary } from "../domain/ProviderTypeDictionary";
+import { RequestTask } from "../domain/RequestTask";
+import { RequestStatus } from "../domain/RequestStatus";
+import { TasksQueue } from "./TasksQueue";
+import { TasksQueueEvents } from "./events/TasksQueueEvents";
+import { BorrowProcessor } from "./processors/BorrowProcessor";
+import { RepayLoanProcessor } from "./processors/RepayLoanProcessor";
+import { ExtendLoanProcessor } from "./processors/ExtendLoanProcessor";
+import { ManageCollateralProcessor } from "./processors/ManageCollateralProcessor";
+import { RefinanceMakerRequest } from "../domain/RefinanceMakerRequest";
+import { RefinanceMakerProcessor } from "./processors/RefinanceMakerProcessor";
+import { RefinanceCompoundRequest } from "../domain/RefinanceCompoundRequest";
+import { RefinanceCompoundProcessor } from "./processors/RefinanceCompoundProcessor";
+import { RefinanceDydxRequest } from "../domain/RefinanceDydxRequest";
+import { RefinanceDydxProcessor } from "./processors/RefinanceDydxProcessor";
 
 const web3: Web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
 let configAddress: any;
@@ -96,6 +110,9 @@ export class TorqueProvider {
 
   public static readonly ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 
+  private isProcessing: boolean = false;
+  private isChecking: boolean = false;
+
   public readonly eventEmitter: EventEmitter;
   public providerType: ProviderType = ProviderType.None;
   public providerEngine: Web3ProviderEngine | null = null;
@@ -118,6 +135,8 @@ export class TorqueProvider {
     // init
     this.eventEmitter = new EventEmitter();
     this.eventEmitter.setMaxListeners(1000);
+
+    TasksQueue.Instance.on(TasksQueueEvents.Enqueued, this.onTaskEnqueued);
 
     // singleton
     if (!TorqueProvider.Instance) {
@@ -402,7 +421,7 @@ export class TorqueProvider {
     const srcAssetErc20Address = this.getErc20AddressOfAsset(srcAsset);
     const destAssetErc20Address = this.getErc20AddressOfAsset(destAsset);
     if (process.env.REACT_APP_ETH_NETWORK === "mainnet" || process.env.REACT_APP_ETH_NETWORK === "kovan") {
-      if (!srcAmount ) {
+      if (!srcAmount) {
         srcAmount = TorqueProvider.UNLIMITED_ALLOWANCE_IN_BASE_UNITS;
       } else {
         srcAmount = new BigNumber(srcAmount.toFixed(1, 1));
@@ -481,7 +500,7 @@ export class TorqueProvider {
     ));
     const hash = await iToken.loanOrderHashes.callAsync(leverageAmount);
     const data = await iToken.loanOrderData.callAsync(hash);
-    return data[3].div(10**18).plus(100);
+    return data[3].div(10 ** 18).plus(100);
     return new BigNumber("150"); // TODO @bshevchenko return data[3];
   };
 
@@ -790,6 +809,7 @@ export class TorqueProvider {
 
     const markets: BigNumber[] = [];
     const amounts: BigNumber[] = [];
+
     const borrowAmounts: BigNumber[] = [];
 
     const divider = loan.balance.div(amount);
@@ -1823,9 +1843,6 @@ export class TorqueProvider {
   public doExtendLoan = async (extendLoanRequest: ExtendLoanRequest) => {
     // console.log(extendLoanRequest);
     let receipt;
-    if (extendLoanRequest.depositAmount.lte(0)) {
-      return;
-    }
 
     if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
       const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
@@ -1989,6 +2006,179 @@ export class TorqueProvider {
         return new BigNumber(10 ** 16);
     }
   }
+
+  public onDoBorrow = async (request: BorrowRequest) => {
+    if (request) {
+      TasksQueue.Instance.enqueue(new RequestTask(request));
+    }
+  };
+  public onDoRepayLoan = async (request: RepayLoanRequest) => {
+    if (request) {
+      TasksQueue.Instance.enqueue(new RequestTask(request));
+    }
+  };
+
+  public onDoExtendLoan = async (request: ExtendLoanRequest) => {
+    if (request) {
+      TasksQueue.Instance.enqueue(new RequestTask(request));
+    }
+  };
+
+  public onDoManageCollateral = async (request: ManageCollateralRequest) => {
+    if (request) {
+      TasksQueue.Instance.enqueue(new RequestTask(request));
+    }
+  };
+
+  public onMigrateMakerLoan = async (request: RefinanceMakerRequest) => {
+    if (request) {
+      TasksQueue.Instance.enqueue(new RequestTask(request));
+    }
+  };
+
+  public onMigrateCompoundLoan = async (request: RefinanceCompoundRequest) => {
+    if (request) {
+      TasksQueue.Instance.enqueue(new RequestTask(request));
+    }
+  };
+
+  public onMigrateSoloLoan = async (request: RefinanceDydxRequest) => {
+    if (request) {
+      TasksQueue.Instance.enqueue(new RequestTask(request));
+    }
+  };
+
+  private onTaskEnqueued = async (requestTask: RequestTask) => {
+    await this.processQueue(false, false);
+  };
+
+  public onTaskRetry = async (requestTask: RequestTask, skipGas: boolean) => {
+    await this.processQueue(true, skipGas);
+  };
+
+  public onTaskCancel = async (requestTask: RequestTask) => {
+    await this.cancelRequestTask(requestTask);
+    await this.processQueue(false, false);
+  };
+
+  private cancelRequestTask = async (requestTask: RequestTask) => {
+    // if (!(this.isProcessing || this.isChecking)) {
+    this.isProcessing = true;
+
+    try {
+      const task = TasksQueue.Instance.peek();
+
+      if (task) {
+        if (task.request.id === requestTask.request.id) {
+          TasksQueue.Instance.dequeue();
+        }
+      }
+    } finally {
+      this.isProcessing = false;
+    }
+    // }
+  };
+
+  private processQueue = async (force: boolean, skipGas: boolean) => {
+    if (!(this.isProcessing || this.isChecking)) {
+      let forceOnce = force;
+      do {
+        this.isProcessing = true;
+        this.isChecking = false;
+
+        try {
+          const task = TasksQueue.Instance.peek();
+
+          if (task) {
+            if (task.status === RequestStatus.FAILED_SKIPGAS) {
+              task.status = RequestStatus.FAILED;
+            }
+            if (task.status === RequestStatus.AWAITING || (task.status === RequestStatus.FAILED && forceOnce)) {
+              await this.processRequestTask(task, skipGas);
+              // @ts-ignore
+              if (task.status === RequestStatus.DONE) {
+                TasksQueue.Instance.dequeue();
+              }
+            } else {
+              if (task.status === RequestStatus.FAILED && !forceOnce) {
+                this.isProcessing = false;
+                this.isChecking = false;
+                break;
+              }
+            }
+          }
+        } finally {
+          forceOnce = false;
+          this.isChecking = true;
+          this.isProcessing = false;
+        }
+      } while (TasksQueue.Instance.any());
+      this.isChecking = false;
+    }
+  };
+
+  private processRequestTask = async (task: RequestTask, skipGas: boolean) => {
+    try {
+      this.eventEmitter.emit(TorqueProviderEvents.AskToOpenProgressDlg, task.request.id);
+
+      if (!(this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite)) {
+        throw new Error("No provider available!");
+      }
+
+      const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+      if (!account) {
+        throw new Error("Unable to get wallet address!");
+      }
+
+      // Initializing loan
+
+      let processor;
+      if (task.request instanceof BorrowRequest) {
+        processor = new BorrowProcessor();
+        await processor.run(task, account, skipGas);
+      }
+
+      if (task.request instanceof ExtendLoanRequest) {
+        processor = new ExtendLoanProcessor();
+        await processor.run(task, account, skipGas);
+
+      }
+      if (task.request instanceof ManageCollateralRequest) {
+        processor = new ManageCollateralProcessor();
+        await processor.run(task, account, skipGas);
+      }
+      if (task.request instanceof RepayLoanRequest) {
+        processor = new RepayLoanProcessor();
+        await processor.run(task, account, skipGas);
+      }
+
+      if (task.request instanceof RefinanceMakerRequest) {
+        processor = new RefinanceMakerProcessor();
+        await processor.run(task, skipGas, configAddress, web3);
+      }
+
+      if (task.request instanceof RefinanceCompoundRequest) {
+        processor = new RefinanceCompoundProcessor();
+        await processor.run(task, account, skipGas);
+      }
+
+      if (task.request instanceof RefinanceDydxRequest) {
+        processor = new RefinanceDydxProcessor();
+        await processor.run(task, account, skipGas);
+      }
+
+      task.processingEnd(true, false, null);
+    } catch (e) {
+      if (!e.message.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)) {
+        // tslint:disable-next-line:no-console
+        console.log(e);
+      }
+      task.processingEnd(false, false, e);
+    }
+    finally {
+      this.eventEmitter.emit(TorqueProviderEvents.AskToCloseProgressDlg, task);
+    }
+  };
 
   public waitForTransactionMined = async (
     txHash: string): Promise<any> => {
