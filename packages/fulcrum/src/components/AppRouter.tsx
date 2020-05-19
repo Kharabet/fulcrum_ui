@@ -30,7 +30,6 @@ import { PreloaderChart } from '../components/PreloaderChart';
 
 
 const Intercom = React.lazy(() => import('react-intercom'));
-const LandingPage = React.lazy(() => import('../pages/LandingPage'));
 const LendPage = React.lazy(() => import('../pages/LendPage'));
 const MaintenancePage = React.lazy(() => import('../pages/MaintenancePage'));
 
@@ -152,10 +151,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
                         ? <Route exact={true} path="/" render={props => (props.location.hash.startsWith('#/')
                           ? <Redirect to={props.location.hash.replace('#', '')} />
                           :
-                          <Suspense fallback={<PreloaderChart quantityDots={4} sizeDots={'middle'} title={"Loading"} isOverlay={false} />}>
-                            <HeaderHome />
-                            <LandingPage {...props} isMobileMedia={this.state.isMobileMedia} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />
-                          </Suspense>
+                          <Redirect to={props.location.hash.replace('', 'trade')} />
 
                         )} />
                         : <Route exact={true} path="/" render={props => {
