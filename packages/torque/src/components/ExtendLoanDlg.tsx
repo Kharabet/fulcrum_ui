@@ -31,7 +31,6 @@ export class ExtendLoanDlg extends Component<any, IExtendLoanDlgState> {
         className="modal-content-div"
         overlayClassName="modal-overlay-div"
         onRequestClose={this.hide}
-        shouldCloseOnOverlayClick={false}
       >
         <DialogHeader title="Front Interest" onDecline={this.onFormDecline} />
         <ExtendLoanForm
