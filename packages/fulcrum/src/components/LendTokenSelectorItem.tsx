@@ -4,7 +4,6 @@ import TagManager from "react-gtm-module";
 import { Asset } from "../domain/Asset";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
-import { FulcrumMcdBridgeRequest } from "../domain/FulcrumMcdBridgeRequest";
 import { LendRequest } from "../domain/LendRequest";
 import { LendType } from "../domain/LendType";
 import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
@@ -20,7 +19,6 @@ import { Preloader } from "./Preloader";
 export interface ILendTokenSelectorItemProps {
   asset: Asset;
   onLend: (request: LendRequest) => void;
-  onFulcrumMcdBridge: (request: FulcrumMcdBridgeRequest) => void;
 }
 
 
@@ -142,20 +140,6 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
     }
     return (
       <div className={`token-selector-item ${this.state.balanceOfUser.eq(0) ? "" : "token-selector-item_active"}`}>
-        {this.props.asset === Asset.SAI ? (
-          <div className="token-select-item-mcd-bridge" onClick={this.onFulcrumMcdBridgeClick}>
-            <div className="token-select-item-mcd-bridge__text token-select-item-mcd-bridge__text--upgrade">
-              MIGRATE TO<br />iDAI
-            </div>
-          </div>
-        ) : null}
-        {this.props.asset === Asset.DAI ? (
-          <div className="token-select-item-mcd-bridge" onClick={this.onFulcrumMcdBridgeClick}>
-            <div className="token-select-item-mcd-bridge__text token-select-item-mcd-bridge__text--downgrade">
-              MIGRATE TO<br />iSAI
-            </div>
-          </div>
-        ) : null}
         <div className="token-selector-item__image">
           {this.state.assetDetails.reactLogoSvg.render()}
         </div>
@@ -227,7 +211,7 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
       <div className="token-selector-item__actions" style={{ marginTop: `-1.5rem` }}>
         <button
           className="token-selector-item__lend-button token-selector-item__lend-button--size-full"
-          onClick={this.onLendClick}
+          onClick={this.onLendClick} disabled={this.props.asset === Asset.SAI}
         >
           Lend
         </button>
@@ -236,7 +220,7 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
         <div className="token-selector-item__actions">
           <button
             className="token-selector-item__lend-button token-selector-item__lend-button--size-half"
-            onClick={this.onLendClick}
+            onClick={this.onLendClick} disabled={this.props.asset === Asset.SAI}
           >
             Lend
         </button>
@@ -248,10 +232,6 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
         </button>
         </div>
       );
-  };
-
-  public onFulcrumMcdBridgeClick = () => {
-    this.props.onFulcrumMcdBridge(new FulcrumMcdBridgeRequest(this.props.asset, new BigNumber(0)));
   };
 
   public onLendClick = () => {

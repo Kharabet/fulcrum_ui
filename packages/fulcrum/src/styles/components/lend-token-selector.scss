@@ -188,7 +188,6 @@
 
       button {
         display: block;
-        cursor: pointer;
 
         border: 0;
         height: 45px;
@@ -222,8 +221,16 @@
         &.token-selector-item__lend-button {
           background-color: #00c0ab;
           &:hover {
-            cursor: pointer;
             background-color: #33dfcc;
+
+            &:not(:disabled){
+              cursor: pointer;
+            }
+          }
+          &:disabled {
+            background-color: #5e6b7b;
+            color: #94a4bb;
+            cursor: not-allowed;
           }
         }
 

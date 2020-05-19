@@ -21,8 +21,8 @@ interface IStatsTokenGridState {
 export class StatsTokenGrid extends Component<IStatsTokenGridProps, IStatsTokenGridState> {
   private static readonly assets: Asset[] = [
     Asset.ETH,
-    Asset.SAI,
     Asset.DAI,
+    Asset.SAI,
     Asset.USDC,
     Asset.USDT,
     Asset.SUSD,
