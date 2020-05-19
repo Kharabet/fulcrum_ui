@@ -70,6 +70,7 @@ export class LendPage extends PureComponent<ILendPageProps, ILendPageState> {
               onSubmit={this.onLendConfirmed}
               onCancel={this.onRequestClose}
               isMobileMedia={this.props.isMobileMedia}
+              isModalOpen={this.state.isLendModalOpen}
             />
           </Modal>
           <Modal

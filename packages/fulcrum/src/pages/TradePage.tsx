@@ -224,6 +224,7 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
               onCancel={this.onTradeRequestClose}
               onTrade={this.onTradeRequested}
               version={this.state.tradeVersion}
+              isOpenModal={this.state.isTradeModalOpen}
             />
           </Modal>
           <Modal
@@ -263,6 +264,7 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
               onCancel={this.onManageCollateralRequestClose}
               onManage={this.onManageCollateralRequested}
               version={this.state.tradeVersion}
+              isOpenModal={this.state.isManageCollateralModalOpen} 
 
             />
           </Modal>
