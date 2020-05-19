@@ -1,22 +1,21 @@
 import React, { PureComponent } from "react";
 import Modal from "react-modal";
-import { FulcrumMcdBridgeForm } from "../components/FulcrumMcdBridgeForm";
-import { LendForm } from "../components/LendForm";
 import { LendTokenSelector } from "../components/LendTokenSelector";
 import { Asset } from "../domain/Asset";
 import { FulcrumMcdBridgeRequest } from "../domain/FulcrumMcdBridgeRequest";
 import { LendRequest } from "../domain/LendRequest";
 import { LendType } from "../domain/LendType";
-import { Footer } from "../layout/Footer";
-import { HeaderOps } from "../layout/HeaderOps";
 import { FulcrumProvider } from "../services/FulcrumProvider";
 import { InfoBlock } from "../components/InfoBlock";
 
 import "../styles/lend.scss";
 
+const FulcrumMcdBridgeForm = React.lazy(() => import('../components/FulcrumMcdBridgeForm'));
+const LendForm = React.lazy(() => import('../components/LendForm'));
+
 export interface ILendPageProps {
   doNetworkConnect: () => void;
-  isRiskDisclosureModalOpen: ()  => void;
+  isRiskDisclosureModalOpen: () => void;
   isLoading: boolean;
   isMobileMedia: boolean;
 }
@@ -46,7 +45,7 @@ export default class LendPage extends PureComponent<ILendPageProps, ILendPageSta
     return (
       <div className="lend-page">
         <main className="lend-page-main">
-          <InfoBlock localstorageItemProp="defi-risk-notice"  onAccept={() => {this.forceUpdate()}}>
+          <InfoBlock localstorageItemProp="defi-risk-notice" onAccept={() => { this.forceUpdate() }}>
             For your safety, please ensure the URL in your browser starts with: https://app.fulcrum.trade/. <br />
             Fulcrum is a non-custodial platform for tokenized lending and margin trading. <br />
             "Non-custodial" means YOU are responsible for the security of your digital assets. <br />

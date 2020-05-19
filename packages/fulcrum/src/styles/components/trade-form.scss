@@ -310,7 +310,6 @@
     &:focus {
       outline: none;
     }
-    
   }
 
   /*.trade-form__amount-max {
@@ -428,22 +427,21 @@
   }
 }
 
-
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
-    /* display: none; <- Crashes Chrome on hover */
-    -webkit-appearance: none;
-    margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+  /* display: none; <- Crashes Chrome on hover */
+  -webkit-appearance: none;
+  margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
 }
 
-input[type=number] {
-    -moz-appearance:textfield; /* Firefox */
+input[type="number"] {
+  -moz-appearance: textfield; /* Firefox */
 }
 
-.preloader-container{
-position: absolute;
-top: 50%;
-left: 20px;
-transform: translate(0%, -50%);
-width: 100%;
+.preloader-container {
+  position: absolute;
+  top: 50%;
+  left: 20px;
+  transform: translate(0%, -50%);
+  width: 100%;
 }

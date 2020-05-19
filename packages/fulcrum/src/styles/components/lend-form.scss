@@ -16,7 +16,6 @@
   }
   &__info_block {
     display: flex;
-    
   }
   &__group-button {
     margin-top: 3px;
@@ -102,7 +101,7 @@
   justify-content: space-between;
   padding: 0;
   margin-bottom: 15px;
-  &.jc-fe{
+  &.jc-fe {
     justify-content: flex-end;
   }
 }
@@ -309,14 +308,21 @@ hr {
   margin: 0 4px;
 }
 
-
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
-    /* display: none; <- Crashes Chrome on hover */
-    -webkit-appearance: none;
-    margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+  /* display: none; <- Crashes Chrome on hover */
+  -webkit-appearance: none;
+  margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
 }
 
-input[type=number] {
-    -moz-appearance:textfield; /* Firefox */
+input[type="number"] {
+  -moz-appearance: textfield; /* Firefox */
+}
+
+.preloader-container {
+  position: absolute;
+  top: 50%;
+  left: 20px;
+  transform: translate(0%, -50%);
+  width: 100%;
 }

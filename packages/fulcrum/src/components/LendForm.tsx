@@ -12,9 +12,9 @@ import { LendType } from "../domain/LendType";
 import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
-import { DaiOrChaiSelector } from "./DaiOrChaiSelector";
+//import { DaiOrChaiSelector } from "./DaiOrChaiSelector";
 // import configProviders from "./../config/providers.json";
-import { EthOrWethSelector } from "./EthOrWethSelector";
+//import { EthOrWethSelector } from "./EthOrWethSelector";
 
 import { ReactComponent as CloseIcon } from "../assets/images/ic__close.svg"
 import { AssetDropdown } from "./AssetDropdown";
@@ -69,7 +69,7 @@ interface ILendFormState {
   infoMessage: string;
 }
 
-export class LendForm extends Component<ILendFormProps, ILendFormState> {
+export default class LendForm extends Component<ILendFormProps, ILendFormState> {
   private readonly _inputPrecision = 6;
   private _input: HTMLInputElement | null = null;
 
@@ -264,7 +264,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
         ? "Insufficient funds for gas"
         : this.state.maxLendAmount && this.state.maxLendAmount.eq(0)
           ? "Your wallet is empty"
-          : this.state.infoMessage ?  this.state.infoMessage : "";
+          : this.state.infoMessage ? this.state.infoMessage : "";
 
     const lendedAmountEstimateText =
       !this.state.lendedAmountEstimate || this.state.lendedAmountEstimate.eq(0)
@@ -323,7 +323,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
                 onChange={this.onLendAmountChange}
               />
               {!this.state.isLoading ? null
-                : <div className="preloader-container"> <Preloader width="80px"/></div>
+                : <div className="preloader-container"> <Preloader width="80px" /></div>
               }
 
               {
@@ -341,8 +341,8 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
                     assets={[Asset.DAI, Asset.CHAI]} />
                 ) : (
                       <AssetDropdown
-                    selectedAsset={this.props.asset}
-                    assets={[this.props.asset]} />
+                        selectedAsset={this.props.asset}
+                        assets={[this.props.asset]} />
                     )
               }
             </div>

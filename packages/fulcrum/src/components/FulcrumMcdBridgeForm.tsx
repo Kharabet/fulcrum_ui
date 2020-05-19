@@ -44,7 +44,7 @@ interface IFulcrumMcdBridgeFormState {
   maybeNeedsApproval: boolean;
 }
 
-export class FulcrumMcdBridgeForm extends Component<IFulcrumMcdBridgeFormProps, IFulcrumMcdBridgeFormState> {
+export default class FulcrumMcdBridgeForm extends Component<IFulcrumMcdBridgeFormProps, IFulcrumMcdBridgeFormState> {
   private readonly _inputPrecision = 6;
   private _input: HTMLInputElement | null = null;
 
@@ -181,7 +181,7 @@ export class FulcrumMcdBridgeForm extends Component<IFulcrumMcdBridgeFormProps, 
 
     const tokenNameSource = `i${this.props.asset}`;
     const tokenNameDestination = this.props.asset === Asset.SAI ?
-      `i${Asset.DAI}`:
+      `i${Asset.DAI}` :
       `i${Asset.SAI}`;
 
     const isAmountMaxed = this.state.mcdBridgeAmount ? this.state.mcdBridgeAmount.eq(this.state.maxMCDBridgeAmount!) : false;
@@ -220,19 +220,19 @@ export class FulcrumMcdBridgeForm extends Component<IFulcrumMcdBridgeFormProps, 
               {this.state.iTokenSrcAddress &&
                 FulcrumProvider.Instance.web3ProviderSettings &&
                 FulcrumProvider.Instance.web3ProviderSettings.etherscanURL ? (
-                <div className="lend-form__value">
-                  <a
-                    className="lend-form__value"
-                    style={{cursor: `pointer`, textDecoration: `none`}}
-                    title={this.state.iTokenSrcAddress}
-                    href={`${FulcrumProvider.Instance.web3ProviderSettings.etherscanURL}address/${this.state.iTokenSrcAddress}#readContract`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {tokenNameSource}
-                  </a>
-                </div>
-              ) :
+                  <div className="lend-form__value">
+                    <a
+                      className="lend-form__value"
+                      style={{ cursor: `pointer`, textDecoration: `none` }}
+                      title={this.state.iTokenSrcAddress}
+                      href={`${FulcrumProvider.Instance.web3ProviderSettings.etherscanURL}address/${this.state.iTokenSrcAddress}#readContract`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {tokenNameSource}
+                    </a>
+                  </div>
+                ) :
                 <div className="lend-form__value">{tokenNameSource}</div>
               }
             </div>
@@ -247,8 +247,8 @@ export class FulcrumMcdBridgeForm extends Component<IFulcrumMcdBridgeFormProps, 
               {isAmountMaxed ? (
                 <div className="lend-form__amount-maxed">MAX</div>
               ) : (
-                <div className="lend-form__amount-max" onClick={this.onInsertMaxValue}>&#65087;<br/>MAX</div>
-              )}
+                  <div className="lend-form__amount-max" onClick={this.onInsertMaxValue}>&#65087;<br />MAX</div>
+                )}
             </div>
             <div className="lend-form__kv-container">
               <div className="trade-form__label">{amountMsg}</div>
@@ -265,19 +265,19 @@ export class FulcrumMcdBridgeForm extends Component<IFulcrumMcdBridgeFormProps, 
                 {this.state.iTokenDestAddress &&
                   FulcrumProvider.Instance.web3ProviderSettings &&
                   FulcrumProvider.Instance.web3ProviderSettings.etherscanURL ? (
-                  <a
-                    className="lend-form__value--no-color"
-                    style={{cursor: `pointer`, textDecoration: `none`}}
-                    title={this.state.iTokenDestAddress}
-                    href={`${FulcrumProvider.Instance.web3ProviderSettings.etherscanURL}address/${this.state.iTokenDestAddress}#readContract`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    &nbsp; {mcdBridgeAmountEstimateText} {tokenNameDestination}
-                  </a>
-                ) : (
-                  <React.Fragment>&nbsp; {mcdBridgeAmountEstimateText} {tokenNameDestination}</React.Fragment>
-                )}
+                    <a
+                      className="lend-form__value--no-color"
+                      style={{ cursor: `pointer`, textDecoration: `none` }}
+                      title={this.state.iTokenDestAddress}
+                      href={`${FulcrumProvider.Instance.web3ProviderSettings.etherscanURL}address/${this.state.iTokenDestAddress}#readContract`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      &nbsp; {mcdBridgeAmountEstimateText} {tokenNameDestination}
+                    </a>
+                  ) : (
+                    <React.Fragment>&nbsp; {mcdBridgeAmountEstimateText} {tokenNameDestination}</React.Fragment>
+                  )}
               </div>
             </div>
           </div>
@@ -312,7 +312,7 @@ export class FulcrumMcdBridgeForm extends Component<IFulcrumMcdBridgeFormProps, 
     const amountText = event.target.value ? event.target.value : "";
 
     // setting tradeAmountText to update display at the same time
-    this.setState({...this.state, mcdBridgeAmountText: amountText}, () => {
+    this.setState({ ...this.state, mcdBridgeAmountText: amountText }, () => {
       // emitting next event for processing with rx.js
       this._inputChange.next(this.state.mcdBridgeAmountText);
     });
@@ -354,15 +354,15 @@ export class FulcrumMcdBridgeForm extends Component<IFulcrumMcdBridgeFormProps, 
     const randomNumber = Math.floor(Math.random() * 100000) + 1;
     const tagManagerArgs = {
       dataLayer: {
-          transactionId: randomNumber,
-          transactionTotal: this.state.mcdBridgeAmount,
-          transactionProducts: [{
-            name: this.props.asset === Asset.SAI ? "Upgrade SAI" : "Downgrade DAI",
-            sku: this.props.asset,
-            category: "MCDMigration",
-            price: this.state.mcdBridgeAmount,
-            quantity: 1
-          }],
+        transactionId: randomNumber,
+        transactionTotal: this.state.mcdBridgeAmount,
+        transactionProducts: [{
+          name: this.props.asset === Asset.SAI ? "Upgrade SAI" : "Downgrade DAI",
+          sku: this.props.asset,
+          category: "MCDMigration",
+          price: this.state.mcdBridgeAmount,
+          quantity: 1
+        }],
       }
     }
     TagManager.dataLayer(tagManagerArgs)

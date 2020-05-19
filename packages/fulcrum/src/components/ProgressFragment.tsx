@@ -8,13 +8,15 @@ import { TasksQueue } from "../services/TasksQueue";
 import { ProgressBar } from "./ProgressBar";
 import { ProgressDetails } from "./ProgressDetails";
 
+import "../styles/progress.scss"
+
 export interface IProgressFragmentState {
   isProgressDetailsModalOpen: boolean;
   counterProgressDetails: number;
   requestTasks: RequestTask[];
 }
 
-export class ProgressFragment extends Component<any, IProgressFragmentState> {
+export default class ProgressFragment extends Component<any, IProgressFragmentState> {
   constructor(props: any) {
     super(props);
 

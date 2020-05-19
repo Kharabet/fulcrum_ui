@@ -2,16 +2,8 @@ import { Web3Wrapper } from '@0x/web3-wrapper';
 import React, { ReactFragment, Component, Suspense } from "react";
 
 import TagManager from 'react-gtm-module';
-//import Intercom from "react-intercom";
 import Modal from "react-modal";
 import { BrowserRouter, Redirect, Route, Switch } from "react-router-dom";
-//import { LandingPage } from "../pages/LandingPage";
-//import { LendPage } from "../pages/LendPage";
-//import { MaintenancePage } from "../pages/MaintenancePage";
-//import { StatsPage } from "../pages/StatsPage";
-//import { TradePage } from "../pages/TradePage";
-
-
 import { Footer } from "../layout/Footer";
 import { HeaderHome } from "../layout/HeaderHome";
 import { HeaderOps } from "../layout/HeaderOps";
@@ -21,7 +13,6 @@ import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
 import configProviders from "./../config/providers.json";
 import { LocationListener } from "./LocationListener";
-import { ProgressFragment } from "./ProgressFragment";
 import { ProviderMenu } from "./ProviderMenu";
 import { RiskDisclosure } from "./RiskDisclosure";
 import { errors } from "ethers"
@@ -42,8 +33,10 @@ const Intercom = React.lazy(() => import('react-intercom'));
 const LandingPage = React.lazy(() => import('../pages/LandingPage'));
 const LendPage = React.lazy(() => import('../pages/LendPage'));
 const MaintenancePage = React.lazy(() => import('../pages/MaintenancePage'));
+
 const StatsPage = React.lazy(() => import('../pages/StatsPage'));
 const TradePage = React.lazy(() => import('../pages/TradePage'));
+const ProgressFragment = React.lazy(() => import('./ProgressFragment'));
 
 const isMainnetProd =
   process.env.NODE_ENV && process.env.NODE_ENV !== "development"
@@ -78,7 +71,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
       isProviderMenuModalOpen: false,
       isRiskDisclosureModalOpen: false,
       isLoading: false,
-      currentPage:"",
+      currentPage: "",
       web3: FulcrumProvider.Instance.web3Wrapper,
       isMobileMedia: false
     };
@@ -109,125 +102,130 @@ export class AppRouter extends Component<any, IAppRouterState> {
 
     return Web3ConnectionFactory.currentWeb3Engine;
   }
-  
 
-    public render() {
-      return (
-        <Web3ReactProvider getLibrary={this.getLibrary}>
-          {isMainnetProd && !this.state.isMobileMedia ? (
-            <Intercom appID="dfk4n5ut" />
-          ) : null}
 
-          <Modal
-            isOpen={this.state.isProviderMenuModalOpen}
-            onRequestClose={this.onRequestClose}
-            className="modal-content-div"
-            overlayClassName="modal-overlay-div"
-          >
-            <ProviderMenu
-              providerTypes={ProviderTypeDictionary.WalletProviders}
-              isMobileMedia={this.state.isMobileMedia}
-              onSelect={this.onProviderTypeSelect}
-              onDeactivate={this.onDeactivate}
-            />
-          </Modal>
-          <Modal
-            isOpen={this.state.isRiskDisclosureModalOpen}
-            onRequestClose={this.onRiskDisclosureRequestClose}
-            className="modal-content-div-top"
-            overlayClassName="modal-overlay-div overflow-auto"
-          >
-            <RiskDisclosure onClose={this.onRiskDisclosureRequestClose} />
-          </Modal>
+  public render() {
+    return (
+      <Web3ReactProvider getLibrary={this.getLibrary}>
+        {isMainnetProd && !this.state.isMobileMedia ? (
+          <React.Fragment>
+            <Suspense fallback={<PreloaderChart quantityDots={4} sizeDots={'middle'} title={"Loading"} isOverlay={false} />}>
+              <Intercom appID="dfk4n5ut" />
+            </Suspense></React.Fragment>
+        ) : null}
+
+        <Modal
+          isOpen={this.state.isProviderMenuModalOpen}
+          onRequestClose={this.onRequestClose}
+          className="modal-content-div"
+          overlayClassName="modal-overlay-div"
+        >
+          <ProviderMenu
+            providerTypes={ProviderTypeDictionary.WalletProviders}
+            isMobileMedia={this.state.isMobileMedia}
+            onSelect={this.onProviderTypeSelect}
+            onDeactivate={this.onDeactivate}
+          />
+        </Modal>
+        <Modal
+          isOpen={this.state.isRiskDisclosureModalOpen}
+          onRequestClose={this.onRiskDisclosureRequestClose}
+          className="modal-content-div-top"
+          overlayClassName="modal-overlay-div overflow-auto"
+        >
+          <RiskDisclosure onClose={this.onRiskDisclosureRequestClose} />
+        </Modal>
+        <Suspense fallback={<PreloaderChart quantityDots={4} sizeDots={'middle'} title={"Loading"} isOverlay={false} />}>
           <ProgressFragment />
-          <div className="pages-container">
-            <div className="pages-wrap">
+        </Suspense>
+        <div className="pages-container">
+          <div className="pages-wrap">
 
-              {
-                siteConfig.MaintenanceMode
-                  ? <MaintenancePage />
-                  : <BrowserRouter>
-                    <LocationListener doNetworkConnect={this.doNetworkConnect}>
+            {
+              siteConfig.MaintenanceMode
+                ? <MaintenancePage />
+                : <BrowserRouter>
+                  <LocationListener doNetworkConnect={this.doNetworkConnect}>
 
-                      <Switch>
-                        {!isMainnetProd
-                          ? <Route exact={true} path="/" render={props => (props.location.hash.startsWith('#/')
-                            ? <Redirect to={props.location.hash.replace('#', '')} />
-                            :
-                            <Suspense fallback={<PreloaderChart quantityDots={4} sizeDots={'middle'} title={"Loading"} isOverlay={false} />}>
-                              <HeaderHome />
-                              <LandingPage {...props} isMobileMedia={this.state.isMobileMedia} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />
-                            </Suspense>
+                    <Switch>
+                      {!isMainnetProd
+                        ? <Route exact={true} path="/" render={props => (props.location.hash.startsWith('#/')
+                          ? <Redirect to={props.location.hash.replace('#', '')} />
+                          :
+                          <Suspense fallback={<PreloaderChart quantityDots={4} sizeDots={'middle'} title={"Loading"} isOverlay={false} />}>
+                            <HeaderHome />
+                            <LandingPage {...props} isMobileMedia={this.state.isMobileMedia} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />
+                          </Suspense>
 
-                          )} />
-                          : <Route exact={true} path="/" render={props => {
-                            if (props.location.hash.startsWith('#/')) {
-                              return <Redirect to={props.location.hash.replace('#/', '')} />
-                            }
-                            else {
-                              window.location.href = 'https://fulcrum.trade';
-                              return null;
-                            }
-                          }} />
-                        }
-
-
-                        <Route exact={true} path="/lend" render={() =>
-                          <React.Fragment><HeaderOps isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />
-                            <Suspense fallback={<PreloaderChart quantityDots={4} sizeDots={'middle'} title={"Loading"} isOverlay={false} />}>
-                              <LendPage isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />
-
-                            </Suspense>
-                          </React.Fragment>
-                        } />
-                        {/*{!this.state.isMobileMedia ? (*/}
-                        <Route exact={true} path="/trade" render={() =>
-                          <React.Fragment><HeaderOps isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />
-                            <Suspense fallback={<PreloaderChart quantityDots={4} sizeDots={'middle'} title={"Loading"} isOverlay={false} />}>
-                              <TradePage isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />
-                            </Suspense>
-                          </React.Fragment>
-                        } />
-
-
-                        <Route exact={true} path="/stats" render={() =>
-                          <React.Fragment><HeaderOps isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />
-                            <Suspense fallback={<PreloaderChart quantityDots={4} sizeDots={'middle'} title={"Loading"} isOverlay={false} />}>
-                              <StatsPage isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />
-                            </Suspense>
-                          </React.Fragment>
-                        } />
-                        {isMainnetProd ? <Route path="*" component={() => {
-                          window.location.href = 'https://fulcrum.trade';
-                          return null;
-                        }} /> : <Route path="*" render={() => <Redirect to="/" />} />}
-                      </Switch>
-                      {isMainnetProd ? (
-                        <Route path="/" render={({ location }) => {
-                          const tagManagerArgs = {
-                            dataLayer: {
-                              // userId: '001',
-                              userProject: 'fulcrum',
-                              page: location.pathname + location.search
-                            }
+                        )} />
+                        : <Route exact={true} path="/" render={props => {
+                          if (props.location.hash.startsWith('#/')) {
+                            return <Redirect to={props.location.hash.replace('#/', '')} />
                           }
-                          // ReactGA.ga('set', 'page', location.pathname + location.search);
-                          // ReactGA.ga('send', 'pageview');
-                          TagManager.dataLayer(tagManagerArgs);
-                          return null;
+                          else {
+                            window.location.href = 'https://fulcrum.trade';
+                            return null;
+                          }
                         }} />
-                      ) : ``}
+                      }
 
-                      <Footer isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />
 
-                    </LocationListener>
-                  </BrowserRouter>
-              }
-            </div>
+                      <Route exact={true} path="/lend" render={() =>
+                        <React.Fragment><HeaderOps isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />
+                          <Suspense fallback={<PreloaderChart quantityDots={4} sizeDots={'middle'} title={"Loading"} isOverlay={false} />}>
+                            <LendPage isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />
+
+                          </Suspense>
+                        </React.Fragment>
+                      } />
+                      {/*{!this.state.isMobileMedia ? (*/}
+                      <Route exact={true} path="/trade" render={() =>
+                        <React.Fragment><HeaderOps isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />
+                          <Suspense fallback={<PreloaderChart quantityDots={4} sizeDots={'middle'} title={"Loading"} isOverlay={false} />}>
+                            <TradePage isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />
+                          </Suspense>
+                        </React.Fragment>
+                      } />
+
+
+                      <Route exact={true} path="/stats" render={() =>
+                        <React.Fragment><HeaderOps isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />
+                          <Suspense fallback={<PreloaderChart quantityDots={4} sizeDots={'middle'} title={"Loading"} isOverlay={false} />}>
+                            <StatsPage isMobileMedia={this.state.isMobileMedia} isLoading={this.state.isLoading} doNetworkConnect={this.doNetworkConnect} isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />
+                          </Suspense>
+                        </React.Fragment>
+                      } />
+                      {isMainnetProd ? <Route path="*" component={() => {
+                        window.location.href = 'https://fulcrum.trade';
+                        return null;
+                      }} /> : <Route path="*" render={() => <Redirect to="/" />} />}
+                    </Switch>
+                    {isMainnetProd ? (
+                      <Route path="/" render={({ location }) => {
+                        const tagManagerArgs = {
+                          dataLayer: {
+                            // userId: '001',
+                            userProject: 'fulcrum',
+                            page: location.pathname + location.search
+                          }
+                        }
+                        // ReactGA.ga('set', 'page', location.pathname + location.search);
+                        // ReactGA.ga('send', 'pageview');
+                        TagManager.dataLayer(tagManagerArgs);
+                        return null;
+                      }} />
+                    ) : ``}
+
+                    <Footer isRiskDisclosureModalOpen={this.onRiskDisclosureRequestOpen} />
+
+                  </LocationListener>
+                </BrowserRouter>
+            }
           </div>
-        </Web3ReactProvider>
-      );
-    }
+        </div>
+      </Web3ReactProvider>
+    );
+  }
   private didResize = async () => {
     const isMobileMedia = (window.innerWidth <= 959);
     if (isMobileMedia !== this.state.isMobileMedia) {
