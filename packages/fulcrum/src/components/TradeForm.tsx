@@ -29,6 +29,8 @@ import { TradeExpectedResult } from "./TradeExpectedResult";
 import { UnitOfAccountSelector } from "./UnitOfAccountSelector";
 import { Preloader } from "./Preloader";
 
+import "../styles/components/trade-form.scss";
+
 
 interface IInputAmountLimited {
   inputAmountValue: BigNumber;

@@ -3,6 +3,8 @@ import { OwnTokenGridRow, IOwnTokenGridRowProps } from "./OwnTokenGridRow";
 import { OwnTokenGridHeader } from "./OwnTokenGridHeader";
 import { OwnTokenCardMobile } from "./OwnTokenCardMobile";
 
+import "../styles/components/own-token-grid.scss"
+
 export interface IOwnTokenGridProps {
   isMobileMedia: boolean;
   ownRowsData: IOwnTokenGridRowProps[];

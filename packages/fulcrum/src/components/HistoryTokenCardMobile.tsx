@@ -11,6 +11,8 @@ import { TradeTransactionMinedEvent } from "../services/events/TradeTransactionM
 import { FulcrumProvider } from "../services/FulcrumProvider";
 import { Preloader } from "./Preloader";
 
+import "../styles/components/history-token-card-mobile.scss";
+
 export interface IHistoryTokenCardMobileProps {
   currentKey: TradeTokenKey;
   pTokenAddress: string;
@@ -111,7 +113,7 @@ export class HistoryTokenCardMobile extends Component<IHistoryTokenCardMobilePro
               <span className="history-token-card-mobile__value">SAI</span>
             </div>
             <div className="history-token-card-mobile__col-type">
-              
+
               <div className="position-type-marker">
                 {`${props.currentKey.leverage}x ${props.currentKey.positionType}`}
               </div>

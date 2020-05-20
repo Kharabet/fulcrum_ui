@@ -1,32 +1,10 @@
 @import "abstracts/mixins";
 @import "abstracts/variables";
 
-@import "base/animations";
-
-//@import "components/leverage-selector";
-@import "components/manage-token-grid";
-@import "components/own-token-grid";
-@import "components/inner-own-token-grid";
-@import "components/inner-own-token-card-mobile";
-@import "components/history-token-grid";
-@import "components/own-token-card-mobile";
-@import "components/history-token-card-mobile";
-@import "components/position-type-marker";
-//@import "components/progress-bar";
-//@import "components/progress-details";
-//@import "components/provider-menu";
-//@import "components/stats-grid";
-//@import "components/task-list";
-//@import "components/token-address-form";
-//@import "components/token-spinner";
-@import "components/trade-expected-result";
-@import "components/trade-form";
-@import "components/trade-form.mobile";
 @import "components/trade-token-grid";
 @import "components/token-grid-tabs";
 @import "components/trade-token-card-mobile";
 @import "components/trading-view-chart";
 @import "components/unit-of-account";
-//@import "components/eth-or-weth";
 
 @import "pages/trade-page";
