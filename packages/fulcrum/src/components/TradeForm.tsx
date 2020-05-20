@@ -111,7 +111,7 @@ interface ITradeFormState {
   selectedUnitOfAccount: Asset;
 }
 
-export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
+export default class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
   private readonly _inputPrecision = 6;
   private _input: HTMLInputElement | null = null;
 
@@ -616,7 +616,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
 
   public onChangeCollateralClicked = async (asset: Asset) => {
     await this._isMounted && this.setState({ ...this.state, isChangeCollateralOpen: false, collateral: asset });
-    
+
     this._inputSetMax.next();
   };
 
@@ -627,7 +627,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       version = 1;
     }
 
-    this._isMounted && this.setState({...this.state, selectedUnitOfAccount: asset});
+    this._isMounted && this.setState({ ...this.state, selectedUnitOfAccount: asset });
 
     this.props.onTrade(
       new TradeRequest(

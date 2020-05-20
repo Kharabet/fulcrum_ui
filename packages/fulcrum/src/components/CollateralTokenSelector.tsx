@@ -3,6 +3,8 @@ import { Asset } from "../domain/Asset";
 import { CollateralTokenSelectorItem } from "./CollateralTokenSelectorItem";
 import { TradeType } from "../domain/TradeType";
 
+import "../styles/components/collateral-token-selector.scss";
+
 export interface ICollateralTokenSelectorProps {
   selectedCollateral: Asset;
   collateralType: string;
@@ -29,7 +31,7 @@ export class CollateralTokenSelector extends Component<ICollateralTokenSelectorP
     const collateralTokenSelector = document.querySelector(".collateral-token-selector__wrapper") as HTMLElement;
     const boundingClient = collateralTokenSelector.getBoundingClientRect();
     //collateralTokenSelector!.style.top =-1 * boundingClient!.top + "px";
-    collateralTokenSelector!.style.left =-1 * boundingClient!.left + "px";
+    collateralTokenSelector!.style.left = -1 * boundingClient!.left + "px";
   }
   public render() {
     const tokenItems = this.assets.map(e => (

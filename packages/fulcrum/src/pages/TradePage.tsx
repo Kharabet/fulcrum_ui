@@ -1,9 +1,7 @@
 import React, { PureComponent, Component } from "react";
 import Modal from "react-modal";
-import { ManageCollateralForm } from "../components/ManageCollateralForm";
 import { ManageTokenGrid } from "../components/ManageTokenGrid";
 import { TokenAddressForm } from "../components/TokenAddressForm";
-import { TradeForm } from "../components/TradeForm";
 import { TradeTokenGrid } from "../components/TradeTokenGrid";
 
 import { Asset } from "../domain/Asset";
@@ -27,6 +25,9 @@ import { IOwnTokenGridRowProps } from "../components/OwnTokenGridRow";
 
 import "../styles/trade.scss";
 
+const TradeForm = React.lazy(() => import('../components/TradeForm'));
+
+const ManageCollateralForm = React.lazy(() => import('../components/ManageCollateralForm'));
 
 export interface ITradePageProps {
   doNetworkConnect: () => void;
@@ -128,7 +129,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
   }
 
   public componentWillMount() {
-   
+
     const tokenRowsData = this.getTokenRowsData(this.state);
     this.setState({ ...this.state, tokenRowsData: tokenRowsData });
   }
@@ -146,7 +147,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       this.derivedUpdate();
     }
   }
-  
+
 
   private async derivedUpdate() {
     const tokenRowsData = this.getTokenRowsData(this.state);
@@ -263,7 +264,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
               onCancel={this.onManageCollateralRequestClose}
               onManage={this.onManageCollateralRequested}
               version={this.state.tradeVersion}
-              isOpenModal={this.state.isManageCollateralModalOpen} 
+              isOpenModal={this.state.isManageCollateralModalOpen}
 
             />
           </Modal>

@@ -1,3 +1,5 @@
+@import "../abstracts/variables";
+
 .manage-collateral-form {
   width: 520px;
 
@@ -171,7 +173,7 @@
       width: 6.5rem;
       border-radius: 100px;
       color: #ffffff;
-      background-color: #276BFB;
+      background-color: #276bfb;
       text-transform: uppercase;
       outline: none;
     }
@@ -237,7 +239,7 @@
     .manage-collateral-form__tip {
       font-size: 12px;
     }
-    .trade-form__form-container{
+    .trade-form__form-container {
       float: none;
       width: auto;
     }
