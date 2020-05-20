@@ -2,10 +2,7 @@ import { Web3ProviderEngine } from "@0x/subproviders";
 import { BigNumber } from "@0x/utils";
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { EventEmitter } from "events";
-import Web3Utils from "web3-utils";
-import moment from "moment";
-import fetch from "node-fetch";
-import request from "request-promise";
+// import Web3Utils from "web3-utils";
 import { Asset } from "../domain/Asset";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { IPriceDataPoint } from "../domain/IPriceDataPoint";
@@ -110,7 +107,7 @@ export class FulcrumProvider {
 
     const storedProvider: any = FulcrumProvider.getLocalstorageItem('providerType');
     const providerType: ProviderType | null = storedProvider as ProviderType || null;
-    
+
     this.web3ProviderSettings = FulcrumProvider.getWeb3ProviderSettings(initialNetworkId);
     if (!providerType || providerType === ProviderType.None) {
       // setting up readonly provider
@@ -417,7 +414,7 @@ export class FulcrumProvider {
 
   public getPriceDefaultDataPoint = (): IPriceDataPoint => {
     return {
-      timeStamp: moment().unix(),
+      timeStamp: Math.round((new Date()).getTime() / 1000),
       price: 0,
       liquidationPrice: 0,
       change24h: 0
@@ -1592,13 +1589,13 @@ if (err || 'error' in added) {
 console.log(err, added);
 }
 }*//*);
-                                          }
-                                        }
-                                        }
-                                        } catch(e) {
-                                        // console.log(e);
-                                        }
-                                        }*/
+                                              }
+                                            }
+                                            }
+                                            } catch(e) {
+                                            // console.log(e);
+                                            }
+                                            }*/
   }
 
   private processLendRequestTask = async (task: RequestTask, skipGas: boolean) => {
@@ -1672,6 +1669,8 @@ console.log(err, added);
       let srcTokenAddress = ""
       let destTokenAddress = "";
 
+      srcTokenAddress = this.getErc20AddressOfAsset(taskRequest.unitOfAccount)!;
+      destTokenAddress = this.getErc20AddressOfAsset(taskRequest.asset)!;
       if (taskRequest.version === 2) {
         if (siteConfig.ZeroXAPIEnabledForBuys && taskRequest.tradeType === TradeType.BUY) {
           taskAmount = taskRequest.amount;
@@ -1782,9 +1781,8 @@ console.log(err, added);
             throw new Error("0x api not supported on this network");
           }
 
-
-          const responseString = await request("https://" + urlPrefix + "api.0x.org/swap/v0/quote?sellToken=" + srcTokenAddress + "&buyToken=" + destTokenAddress + "&" + zeroXTargetType + "=" + zeroXTargetAmountInBaseUnits.toString());
-          const response = JSON.parse(responseString);
+          const responseString = await fetch("https://" + urlPrefix + "api.0x.org/swap/v0/quote?sellToken=" + srcTokenAddress + "&buyToken=" + destTokenAddress + "&" + zeroXTargetType + "=" + zeroXTargetAmountInBaseUnits.toString());
+          const response = await responseString.json();
           if (!response.protocolFee || !response.data) {
             throw new Error(JSON.stringify(response));
           }
@@ -1801,7 +1799,7 @@ console.log(err, added);
             console.log(`swapRate`, SwapRate0x);*/
 
             taskRequest.zeroXFee = new BigNumber(response.protocolFee);
-
+            const Web3Utils = await import("web3-utils");
             taskRequest.loanDataBytes = response.data +
               //Web3Utils.padLeft(Web3Utils.numberToHex(SwapRate0x).substr(2), 64) +  
               Web3Utils.padLeft(Web3Utils.numberToHex(response.protocolFee).substr(2), 64) +
