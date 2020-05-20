@@ -315,35 +315,6 @@
     }
   }
 
-  /*.trade-form__amount-max {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-content: center;
-
-    width: 3rem;
-    padding: 0.5rem;
-
-    border: 0;
-    border-left: 1px solid #444e5a;
-
-    background-color: rgba(32, 31, 35, 0.3);
-
-    font-size: 0.75rem;
-    font-weight: 600;
-    font-style: normal;
-    font-stretch: normal;
-    letter-spacing: normal;
-    text-align: center;
-    color: #acb5c2;
-
-    cursor: pointer;
-
-    img {
-      padding-bottom: 0.25rem;
-    }
-  }*/
-
   .trade-form__amount-maxed {
     display: flex;
     flex-direction: column;
@@ -608,9 +579,6 @@ input[type="number"] {
 
   .trade-form__position-type-container {
     margin-bottom: 1rem;
-  }
-
-  .trade-form__slippage-amount {
   }
 
   .trade-form__slippage-amount img {
