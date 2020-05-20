@@ -8,6 +8,8 @@ import { IStatsTokenGridRowProps, StatsTokenGridRow } from "./StatsTokenGridRow"
 import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
 import { FulcrumProvider } from "../services/FulcrumProvider";
 
+import "../styles/components/stats-grid.scss"
+
 export interface IStatsTokenGridProps {
   isMobileMedia: boolean;
 }
