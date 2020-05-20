@@ -1,5 +1,96 @@
 @import "../abstracts/variables";
 
+.trade-form {
+  &__amount-container {
+    display: flex;
+    background: #394049;
+    width: 100%;
+    height: 65px;
+    position: relative;
+    padding-right: 15px;
+    align-items: center;
+    &:before {
+      content: "";
+      position: absolute;
+      border: 16px solid transparent;
+      border-left: 16px solid #ffffff;
+      left: -31px;
+      top: 0;
+      bottom: 0;
+      margin: auto;
+      height: 32px;
+    }
+  }
+  &__amount-input {
+    width: calc(100% - 105px);
+    padding-left: 15px;
+    border: none;
+    font-size: 32px;
+    font-weight: 600;
+    font-style: normal;
+    font-stretch: normal;
+    letter-spacing: normal;
+    text-align: left;
+    color: #ffffff;
+    background-color: transparent;
+
+    &input::-webkit-outer-spin-button,
+    &input::-webkit-inner-spin-button {
+      /* display: none; <- Crashes Chrome on hover */
+      -webkit-appearance: none;
+      margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+    }
+
+    &input[type="number"] {
+      -moz-appearance: textfield; /* Firefox */
+    }
+
+    &:focus {
+      outline: none;
+    }
+  }
+  &__group-button {
+    margin-top: 3px;
+    margin-bottom: 10px;
+    button {
+      font-size: 12px;
+      font-weight: 600;
+      width: calc(25% - 1.5px);
+      padding: 8px 0;
+      color: #ffffff;
+      background-color: #586473;
+      border: none;
+      outline: none;
+      cursor: pointer;
+      line-height: 1.5;
+      &:not(:last-child) {
+        margin-right: 2px;
+      }
+      &:hover {
+        background: #758295;
+      }
+    }
+  }
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  /* display: none; <- Crashes Chrome on hover */
+  -webkit-appearance: none;
+  margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+}
+
+input[type="number"] {
+  -moz-appearance: textfield; /* Firefox */
+}
+
+.preloader-container {
+  position: absolute;
+  top: 50%;
+  left: 20px;
+  transform: translate(0%, -50%);
+  width: 100%;
+}
 .manage-collateral-form {
   width: 520px;
 

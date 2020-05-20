@@ -1,5 +1,6 @@
-.trade-token-grid-tab {
+@import "../abstracts/variables";
 
+.trade-token-grid-tab {
   &:after {
     content: "";
     position: absolute;

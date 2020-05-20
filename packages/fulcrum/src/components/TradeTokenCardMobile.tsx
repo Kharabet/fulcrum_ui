@@ -19,6 +19,7 @@ import { LeverageSelector } from "./LeverageSelector";
 import { Preloader } from "./Preloader";
 import { ITradeTokenGridRowProps } from "./TradeTokenGridRow";
 
+import "../styles/components/trade-token-card-mobile.scss";
 
 export interface ITradeTokenCardMobileProps extends ITradeTokenGridRowProps {
   changeGridPositionType: (activePositionType: PositionType) => void;

@@ -6,6 +6,8 @@ import { TradeTokenKey } from "../domain/TradeTokenKey";
 import { ReactComponent as WalletSvg } from "../assets/images/wallet-icon.svg";
 import { IDropDownSelectOption, DropdownSelect, IDropdownSelectProps } from "./DropdownSelect";
 
+import "../styles/components/token-grid-tabs.scss";
+
 export interface ITokenGridTabsProps {
   selectedTabAsset: Asset;
   isMobile: boolean;

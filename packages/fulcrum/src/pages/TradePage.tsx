@@ -23,7 +23,7 @@ import { InfoBlock } from "../components/InfoBlock";
 import { ITradeTokenGridRowProps } from "../components/TradeTokenGridRow";
 import { IOwnTokenGridRowProps } from "../components/OwnTokenGridRow";
 
-import "../styles/trade.scss";
+import "../styles/pages/_trade-page.scss";
 
 const TradeForm = React.lazy(() => import('../components/TradeForm'));
 
