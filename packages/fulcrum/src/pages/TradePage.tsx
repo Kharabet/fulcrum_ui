@@ -1,11 +1,7 @@
 import React, { PureComponent, Component } from "react";
 import Modal from "react-modal";
-import { ManageTokenGrid } from "../components/ManageTokenGrid";
-import { TokenAddressForm } from "../components/TokenAddressForm";
-import { TradeTokenGrid } from "../components/TradeTokenGrid";
 
 import { Asset } from "../domain/Asset";
-import { IPriceDataPoint } from "../domain/IPriceDataPoint";
 import { ManageCollateralRequest } from "../domain/ManageCollateralRequest";
 import { PositionType } from "../domain/PositionType";
 import { TradeRequest } from "../domain/TradeRequest";
@@ -15,18 +11,19 @@ import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents"
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
 
+import { InfoBlock } from "../components/InfoBlock";
+import { TradeTokenGrid } from "../components/TradeTokenGrid";
+import { TVChartContainer } from '../components/TVChartContainer';
 import { TokenGridTabs } from "../components/TokenGridTabs";
 
-
-import { TVChartContainer } from '../components/TVChartContainer';
-import { InfoBlock } from "../components/InfoBlock";
 import { ITradeTokenGridRowProps } from "../components/TradeTokenGridRow";
 import { IOwnTokenGridRowProps } from "../components/OwnTokenGridRow";
 
 import "../styles/pages/_trade-page.scss";
 
+const ManageTokenGrid = React.lazy(() => import('../components/ManageTokenGrid'));
+const TokenAddressForm = React.lazy(() => import('../components/TokenAddressForm'));
 const TradeForm = React.lazy(() => import('../components/TradeForm'));
-
 const ManageCollateralForm = React.lazy(() => import('../components/ManageCollateralForm'));
 
 export interface ITradePageProps {

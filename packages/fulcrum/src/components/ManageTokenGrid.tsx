@@ -18,7 +18,7 @@ interface IManageTokenGridState {
   isShowHistory: boolean;
 }
 
-export class ManageTokenGrid extends Component<IManageTokenGridProps, IManageTokenGridState> {
+export default class ManageTokenGrid extends Component<IManageTokenGridProps, IManageTokenGridState> {
   constructor(props: IManageTokenGridProps) {
     super(props);
     this.state = {
