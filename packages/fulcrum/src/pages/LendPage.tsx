@@ -7,7 +7,7 @@ import { LendType } from "../domain/LendType";
 import { FulcrumProvider } from "../services/FulcrumProvider";
 import { InfoBlock } from "../components/InfoBlock";
 
-import "../styles/lend.scss";
+import "../styles/pages/_lend-page.scss";
 
 const LendForm = React.lazy(() => import('../components/LendForm'));
 

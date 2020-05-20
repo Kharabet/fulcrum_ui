@@ -1,3 +1,6 @@
+@import "../abstracts/mixins";
+@import "../abstracts/variables";
+
 .lend-form {
   @include clearfix();
 
@@ -56,11 +59,11 @@
     }
   }
 }
-.lend-form__notification{
+.lend-form__notification {
   font-size: 11px;
   font-weight: 600;
   color: #586473;
-  @media screen and (min-width: $breakpoint-mobile-min){
+  @media screen and (min-width: $breakpoint-mobile-min) {
     position: absolute;
     left: 13px;
     bottom: 13px;
@@ -337,4 +340,125 @@ input[type="number"] {
   left: 20px;
   transform: translate(0%, -50%);
   width: 100%;
+}
+
+@media only screen and (max-width: $breakpoint-mobile-max) {
+  .lend-form {
+    @include clearfix();
+    flex-direction: column;
+    max-width: 320px;
+    width: 320px;
+    .close-icon {
+      right: 20px;
+      top: 20px;
+      z-index: 100;
+    }
+    &__group-button {
+      button {
+        padding: 5px 0;
+      }
+    }
+  }
+  .lend-form__image {
+    flex-wrap: wrap;
+    width: 100%;
+    justify-content: center;
+    padding: 17px 0;
+    position: relative;
+    svg {
+      width: 55px;
+      height: 55px;
+    }
+    &:after {
+      content: "";
+      position: absolute;
+      border: 12px solid transparent;
+      border-top: 12px solid #ffffff;
+      bottom: -23px;
+      left: 0;
+      right: 0;
+      margin: auto;
+      width: 24px;
+      height: 12px;
+      box-sizing: border-box;
+    }
+  }
+  .lend-form__notification {
+    padding: 15px 30px 0 30px;
+  }
+  .lend-form__form-container {
+    padding: 20px 30px 30px 30px;
+  }
+
+  .lend-form__form-values-container {
+    margin-bottom: 10px;
+  }
+
+  .lend-form__kv-container--w_dots {
+    background-image: url("../../assets/images/dotted_line.png");
+    background-repeat: repeat-x;
+    background-position-y: 1.25rem;
+  }
+
+  .lend-form__label {
+    line-height: 1;
+    font-size: 12px;
+  }
+
+  .lend-form__label--action {
+    cursor: pointer;
+    text-decoration: underline;
+    text-decoration-style: dotted;
+    border: 0 none;
+
+    &:focus {
+      outline: none;
+    }
+  }
+
+  .lend-form__value {
+    line-height: 1;
+
+    &--no-color {
+      color: #a9b5c7;
+    }
+  }
+
+  .lend-form__amount-container {
+    height: 52px;
+    padding-right: 10px;
+    &:before {
+      content: none;
+    }
+    .lend-form__amount-input {
+      font-size: 24px;
+
+      &:focus {
+        outline: none;
+      }
+    }
+  }
+  &__submit-button {
+    padding: 10px 25px;
+  }
+  .rounded-mark {
+    font-size: 0.5rem;
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 100px;
+    padding: 0.0625rem 0.3125rem;
+  }
+
+  .lend-form__cancel-button {
+    display: inline-block;
+    cursor: pointer;
+    border: 0;
+    height: 2.5rem;
+    width: 6.5rem;
+    background-color: rgba(0, 0, 0, 0);
+    text-decoration: underline;
+    text-decoration-style: dotted;
+    color: #a9b5c7;
+    outline: none;
+  }
 }

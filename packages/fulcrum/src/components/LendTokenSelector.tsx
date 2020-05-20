@@ -3,6 +3,8 @@ import { Asset } from "../domain/Asset";
 import { LendRequest } from "../domain/LendRequest";
 import { LendTokenSelectorItem } from "./LendTokenSelectorItem";
 
+import "../styles/components/lend-token-selector.scss"
+
 export interface ILendTokenSelectorProps {
   onLend: (request: LendRequest) => void;
 }

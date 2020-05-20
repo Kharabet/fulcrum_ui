@@ -20,6 +20,9 @@ import { ReactComponent as CloseIcon } from "../assets/images/ic__close.svg"
 import { AssetDropdown } from "./AssetDropdown";
 import { Preloader } from "./Preloader";
 
+import "../styles/components/lend-form.scss"
+
+
 // TagManager.initialize({
 //   gtmId: configProviders.Google_TrackingID,
 //   dataLayer: {
