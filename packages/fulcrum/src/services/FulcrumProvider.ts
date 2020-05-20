@@ -29,16 +29,6 @@ import { TasksQueue } from "./TasksQueue";
 
 import TagManager from "react-gtm-module";
 import configProviders from "../config/providers.json";
-import { LendChaiProcessor } from "./processors/LendChaiProcessor";
-import { LendErcProcessor } from "./processors/LendErcProcessor";
-import { LendEthProcessor } from "./processors/LendEthProcessor";
-import { TradeBuyErcProcessor } from "./processors/TradeBuyErcProcessor";
-import { TradeBuyEthProcessor } from "./processors/TradeBuyEthProcessor";
-import { TradeSellErcProcessor } from "./processors/TradeSellErcProcessor";
-import { TradeSellEthProcessor } from "./processors/TradeSellEthProcessor";
-import { UnlendChaiProcessor } from "./processors/UnlendChaiProcessor";
-import { UnlendErcProcessor } from "./processors/UnlendErcProcessor";
-import { UnlendEthProcessor } from "./processors/UnlendEthProcessor";
 
 import { AbstractConnector } from '@web3-react/abstract-connector';
 
@@ -1615,23 +1605,29 @@ console.log(err, added);
         await this.addTokenToMetaMask(task);
 
         if (taskRequest.asset === Asset.ETH) {
+          const {LendEthProcessor} = await import("./processors/LendEthProcessor");
           const processor = new LendEthProcessor();
           await processor.run(task, account, skipGas);
         } else if (taskRequest.asset === Asset.CHAI) {
+          const {LendChaiProcessor} = await import("./processors/LendChaiProcessor");
           const processor = new LendChaiProcessor();
           await processor.run(task, account, skipGas);
         } else {
+          const {LendErcProcessor} = await import("./processors/LendErcProcessor");
           const processor = new LendErcProcessor();
           await processor.run(task, account, skipGas);
         }
       } else {
         if (taskRequest.asset === Asset.ETH) {
+          const {UnlendEthProcessor} = await import("./processors/UnlendEthProcessor");
           const processor = new UnlendEthProcessor();
           await processor.run(task, account, skipGas);
         } else if (taskRequest.asset === Asset.CHAI) {
+          const {UnlendChaiProcessor} = await import("./processors/UnlendChaiProcessor");
           const processor = new UnlendChaiProcessor();
           await processor.run(task, account, skipGas);
         } else {
+          const {UnlendErcProcessor} = await import("./processors/UnlendErcProcessor");
           const processor = new UnlendErcProcessor();
           await processor.run(task, account, skipGas);
         }
@@ -1824,22 +1820,27 @@ console.log(err, added);
 
       if (taskRequest.tradeType === TradeType.BUY) {
         if (taskRequest.collateral !== Asset.ETH) {
+          const {TradeBuyErcProcessor} = await import("./processors/TradeBuyErcProcessor");
           const processor = new TradeBuyErcProcessor();
           await processor.run(task, account, skipGas);
         } else {
           let processor;
           if (taskRequest.loanDataBytes && taskRequest.zeroXFee) {
+            const {TradeBuyErcProcessor} = await import("./processors/TradeBuyErcProcessor");
             processor = new TradeBuyErcProcessor();
           } else {
+            const {TradeBuyEthProcessor} = await import("./processors/TradeBuyEthProcessor");
             processor = new TradeBuyEthProcessor();
           }
           await processor.run(task, account, skipGas);
         }
       } else {
         if (taskRequest.collateral !== Asset.ETH) {
+          const {TradeSellErcProcessor} = await import("./processors/TradeSellErcProcessor");
           const processor = new TradeSellErcProcessor();
           await processor.run(task, account, skipGas);
         } else {
+          const {TradeSellEthProcessor} = await import("./processors/TradeSellEthProcessor");
           const processor = new TradeSellEthProcessor();
           await processor.run(task, account, skipGas);
         }
