@@ -1,9 +1,6 @@
-import React, { PureComponent } from "react";
+import React, { Component } from "react";
 import { StatsTokenGrid } from "../components/StatsTokenGrid";
 import { InfoBlock } from "../components/InfoBlock";
-// import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
-// import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
-// import { FulcrumProvider } from "../services/FulcrumProvider";
 
 import "../styles/pages/_stats-page.scss"
 
@@ -17,18 +14,10 @@ export interface IStatsPageProps {
 interface IStatsPageState {
 }
 
-export default class StatsPage extends PureComponent<IStatsPageProps, IStatsPageState> {
+export default class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
   constructor(props: any) {
     super(props);
-
-    // FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
   }
-
-  /*public componentDidMount(): void {
-    if (!FulcrumProvider.Instance.web3Wrapper) {
-      this.props.doNetworkConnect();
-    }
-  }*/
 
   public render() {
     return (

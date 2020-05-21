@@ -96,12 +96,8 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
     await this.derivedUpdate();
   };
 
-  // noinspection JSUnusedLocalSymbols TODO
   private onProviderChanged = async (event: ProviderChangedEvent) => {
     await this.derivedUpdate();
-    // this.setState({
-    //   isLoading: false,
-    // });
   };
 
   private onLendTransactionMined = async (event: LendTransactionMinedEvent) => {
@@ -172,10 +168,10 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
                 className="token-selector-item__interest-rate-value"
               >
                 {!this.state.isLoading ? (<React.Fragment>{this.state.interestRate.toFixed(4)}<span className="sign-currency">%</span></React.Fragment>)
-                  : (<div className="token-selector-item__interest-rate-value"><Preloader width="74px"/></div>)}
+                  : (<div className="token-selector-item__interest-rate-value"><Preloader width="74px" /></div>)}
               </div>
             </div>
-            {this.state.balanceOfUser.gt(0) 
+            {this.state.balanceOfUser.gt(0)
               ? (<React.Fragment>
                 {this.state.profit !== null ? (
                   <div className="token-selector-item__profit-container token-selector-item__balance-container">
@@ -184,19 +180,19 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
                       title={`${this.state.balanceOfUser.toFixed(18)} ${this.props.asset}`}
                       className="token-selector-item__profit-value token-selector-item__balance-value"
                     >{this.state.balanceOfUser.toFixed(2)} {this.props.asset}</div>)
-                    : (<div className="token-selector-item__interest-rate-value"><Preloader width="74px"/></div>)}
-                  </div>) : null}                
+                      : (<div className="token-selector-item__interest-rate-value"><Preloader width="74px" /></div>)}
+                  </div>) : null}
                 <div className="token-selector-item__profit-container">
                   <div className="token-selector-item__profit-title">Profit:</div>
                   <ProfitTicker asset={this.props.asset} secondDiff={this.state.tickerSecondDiff} profit={this.state.profit} />
                 </div>
-                </React.Fragment>) 
+              </React.Fragment>)
               : (<div className="token-selector-item__description">
-                  <div className="token-selector-item__interest-rate-container">
-                    <div className="token-selector-item__interest-rate-title" />
-                    <div className="token-selector-item__interest-rate-value" />
-                  </div>
-                </div>)
+                <div className="token-selector-item__interest-rate-container">
+                  <div className="token-selector-item__interest-rate-title" />
+                  <div className="token-selector-item__interest-rate-value" />
+                </div>
+              </div>)
             }
 
           </div>
