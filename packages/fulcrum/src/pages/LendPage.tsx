@@ -21,13 +21,19 @@ interface ILendPageState {
   isLendModalOpen: boolean;
   lendType: LendType;
   lendAsset: Asset;
+  lendRequestId: number;
 }
 
 export class LendPage extends PureComponent<ILendPageProps, ILendPageState> {
   constructor(props: any) {
     super(props);
 
-    this.state = { isLendModalOpen: false, lendType: LendType.LEND, lendAsset: Asset.UNKNOWN };
+    this.state = { 
+      isLendModalOpen: false, 
+      lendType: LendType.LEND, 
+      lendAsset: Asset.UNKNOWN,
+      lendRequestId: 0 
+    };
   }
 
   public componentDidMount(): void {
@@ -81,13 +87,15 @@ export class LendPage extends PureComponent<ILendPageProps, ILendPageState> {
       this.props.doNetworkConnect();
       return;
     }
+    const lendRequestId= request.id;
 
     if (request) {
       this.setState({
         ...this.state,
         isLendModalOpen: true,
         lendType: request.lendType,
-        lendAsset: request.asset
+        lendAsset: request.asset,
+        lendRequestId: lendRequestId
       });
     }
   };
@@ -97,6 +105,7 @@ export class LendPage extends PureComponent<ILendPageProps, ILendPageState> {
       ...this.state,
       isLendModalOpen: false,
     });
+    request.id = this.state.lendRequestId;
     FulcrumProvider.Instance.onLendConfirmed(request);
   };
 
