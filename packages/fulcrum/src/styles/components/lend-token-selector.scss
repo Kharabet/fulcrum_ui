@@ -77,9 +77,9 @@
 
     .token-selector-item__image {
       margin-bottom: 10px;
-
       text-align: center;
-
+      display: flex;
+      justify-content: center;
       img,
       svg {
         display: inline-block;

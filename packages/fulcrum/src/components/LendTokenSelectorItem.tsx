@@ -12,6 +12,7 @@ import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
 import { ProfitTicker } from "./ProfitTicker";
 import { Preloader } from "./Preloader";
+import { CircleLoader } from "./CircleLoader";
 
 
 
@@ -141,6 +142,7 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
     return (
       <div className={`token-selector-item ${this.state.balanceOfUser.eq(0) ? "" : "token-selector-item_active"}`}>
         <div className="token-selector-item__image">
+          {/* <CircleLoader>{this.state.assetDetails.reactLogoSvg.render()}</CircleLoader> */}
           {this.state.assetDetails.reactLogoSvg.render()}
         </div>
         <div className="token-selector-item__descriptions" style={{ marginTop: this.state.profit === null ? `1.5rem` : undefined }}>

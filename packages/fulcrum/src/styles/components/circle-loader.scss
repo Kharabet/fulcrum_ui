@@ -1,0 +1,36 @@
+.circle-loader {
+  width: 82px;
+  height: 82px;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  .circle-main {
+    width: 100%;
+    height: 100%;
+
+    position: absolute;
+    border: 3px solid transparent;
+    border-top: 3px solid #a2abb8;
+    border-radius: 100%;
+    z-index: 1;
+    animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+  }
+  .circle-background {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    border: 3px solid #333c46;
+    border-radius: 100%;
+    z-index: 0;
+  }
+}
+
+@keyframes lds-ring {
+  0% {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(1turn);
+  }
+}
