@@ -250,7 +250,7 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
               </div>
             }
             {this.state.loan.isDisabled && !this.props.isMobileMedia &&
-              <div className={`collaterization-warning ${this.state.isShow ? "" : "hidden-details"}`}>Collateralization should be {this.state.loan.maintenanceMarginAmount!.toNumber()}%+</div>
+              <div className={`collaterization-warning ${this.state.isShow ? "" : "hidden-details"}`}>Collateralization should be {this.state.loan.maintenanceMargin!.toNumber()}%+</div>
             }
             {this.props.isMobileMedia &&
               <div className="refinance-asset-selector__arrow">
@@ -340,7 +340,7 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
                   <div className="collateral-value">{this.state.loan.collateral[0].collaterizationPercent!.dp(2, BigNumber.ROUND_FLOOR).toNumber()}%</div>
                   <CollaterallRefinanceSlider
                     readonly={this.state.borrowAmount.lte(0) || this.state.borrowAmount.gt(this.props.loan.balance)}
-                    minValue={this.state.loan.maintenanceMarginAmount!.dp(2, BigNumber.ROUND_FLOOR).toNumber()}
+                    minValue={this.state.loan.maintenanceMargin!.dp(2, BigNumber.ROUND_FLOOR).toNumber()}
                     maxValue={this.props.loan.collateral[0].collaterizationPercent!.dp(2, BigNumber.ROUND_FLOOR).toNumber()}
                     value={this.state.loan.collateral[0].collaterizationPercent!.dp(2, BigNumber.ROUND_FLOOR).toNumber()}
                     onChange={this.onCollaterizationChange}
@@ -349,7 +349,7 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
               </div>
             }
             {this.state.loan.isDisabled && this.props.isMobileMedia &&
-              <div className="collaterization-warning">Collateralization should be {this.state.loan.maintenanceMarginAmount!.toNumber()}%+</div>
+              <div className="collaterization-warning">Collateralization should be {this.state.loan.maintenanceMargin!.toNumber()}%+</div>
             }
           </div>
           {/*<div className="refinance-asset-selector__type">1.500</div>*/}

@@ -185,6 +185,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
 
       this.props.onSubmit(
         new BorrowRequest(
+          "0x0000000000000000000000000000000000000000000000000000000000000000",
           this.props.borrowAsset,
           this.state.borrowAmount,
           this.state.collateralAsset,

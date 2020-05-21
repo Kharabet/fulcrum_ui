@@ -84,8 +84,7 @@ export class ManageCollateralProcessor {
     if (!taskRequest.isWithdrawal) {
       try {
         const gasAmount = await bZxContract.depositCollateral.estimateGasAsync(
-          taskRequest.loanOrderState.loanData!.loanOrderHash,
-          taskRequest.loanOrderState.loanData!.collateralTokenAddress,
+          taskRequest.loanOrderState.loanData!.loanId,
           collateralAmountInBaseUnits,
           {
             from: account,
@@ -102,9 +101,8 @@ export class ManageCollateralProcessor {
 
       try {
         txHash = await bZxContract.depositCollateral.sendTransactionAsync(
-          taskRequest.loanOrderState.loanData!.loanOrderHash,           // loanOrderHash
-          taskRequest.loanOrderState.loanData!.collateralTokenAddress,  // depositTokenAddress
-          collateralAmountInBaseUnits,                                              // depositAmount
+          taskRequest.loanOrderState.loanData!.loanId,           // loanId
+          collateralAmountInBaseUnits,                           // depositAmount
           {
             from: account,
             value: isETHCollateralAsset ?
@@ -122,13 +120,10 @@ export class ManageCollateralProcessor {
     } else {
 
       try {
-        const gasAmount = await bZxContract.withdrawCollateralForBorrower.estimateGasAsync(
-          taskRequest.loanOrderState.loanData!.loanOrderHash,
-          collateralAmountInBaseUnits,
+        const gasAmount = await bZxContract.withdrawCollateral.estimateGasAsync(
+          taskRequest.loanOrderState.loanData!.loanId,
           account,
-          isETHCollateralAsset ?
-            TorqueProvider.ZERO_ADDRESS :
-            account,
+          collateralAmountInBaseUnits,
           {
             from: account,
             gas: TorqueProvider.Instance.gasLimit
@@ -141,13 +136,10 @@ export class ManageCollateralProcessor {
 
       try {
 
-        txHash = await bZxContract.withdrawCollateralForBorrower.sendTransactionAsync(
-          taskRequest.loanOrderState.loanData!.loanOrderHash,             // loanOrderHash
-          collateralAmountInBaseUnits,                                                // depositAmount
+        txHash = await bZxContract.withdrawCollateral.sendTransactionAsync(
+          taskRequest.loanOrderState.loanData!.loanId,                                // loanId
           account,                                                                    // trader
-          isETHCollateralAsset ?   // receiver
-            TorqueProvider.ZERO_ADDRESS :                                             // will receive ETH back
-            account,                                                                  // will receive ERC20 back
+          collateralAmountInBaseUnits,                                                // depositAmount
           {
             from: account,
             gas: gasAmountBN ? gasAmountBN.toString() : "3000000",

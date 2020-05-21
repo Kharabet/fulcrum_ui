@@ -99,7 +99,7 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
     let sliderValue = this.props.loanOrderState.collateralizedPercent.multipliedBy(100).plus(100).toNumber();
 
     //115%
-    const sliderMin = this.props.loanOrderState.loanData!.maintenanceMarginAmount.div(10 ** 18).plus(100).toNumber();
+    const sliderMin = this.props.loanOrderState.loanData!.maintenanceMargin.div(10 ** 18).plus(100).toNumber();
     //300%
     let sliderMax = sliderMin + 185;
 

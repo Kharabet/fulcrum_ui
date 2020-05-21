@@ -123,7 +123,7 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
   ): void {
     if (
       prevProps.loanOrderState.accountAddress !== this.props.loanOrderState.accountAddress ||
-      prevProps.loanOrderState.loanOrderHash !== this.props.loanOrderState.loanOrderHash ||
+      prevProps.loanOrderState.loanId !== this.props.loanOrderState.loanId ||
       prevState.selectedValue !== this.state.selectedValue
     ) {
       TorqueProvider.Instance.getLoanExtendManagementAddress(
@@ -157,7 +157,7 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
 
     let daysLeft;
     if (this.props.loanOrderState.loanData) {
-      daysLeft = this.props.loanOrderState.loanData.loanEndUnixTimestampSec.minus(Date.now() / 1000).dividedBy(86400).toFixed(1);
+      daysLeft = this.props.loanOrderState.loanData.loanEndTimestamp.minus(Date.now() / 1000).dividedBy(86400).toFixed(1);
     }
 
     return (
@@ -290,7 +290,7 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
         new ExtendLoanRequest(
           this.props.loanOrderState.loanAsset,
           this.props.loanOrderState.accountAddress,
-          this.props.loanOrderState.loanOrderHash,
+          this.props.loanOrderState.loanId,
           this.state.depositAmount
         )
       );

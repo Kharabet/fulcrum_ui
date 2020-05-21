@@ -86,6 +86,7 @@ export class DashboardPage extends PureComponent<
     let itemsAwaiting: ReadonlyArray<BorrowRequestAwaiting> = [];
 
     items = await TorqueProvider.Instance.getLoansList();
+    console.log(items);
     itemsAwaiting = await TorqueProvider.Instance.getLoansAwaitingList();
 
     this.setState({

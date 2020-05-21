@@ -91,7 +91,7 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
 
   private updateData = async () => {
     const loans = await TorqueProvider.Instance.getLoansList();
-    const thisLoan = loans.find(loan => loan.loanOrderHash === this.props.item.loanOrderHash);
+    const thisLoan = loans.find(loan => loan.loanId === this.props.item.loanId);
     await this.setState({
       ...this.state,
       borrowedFundsItem: thisLoan ? thisLoan : this.state.borrowedFundsItem
@@ -125,7 +125,7 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
     // const lastInRowModifier = this.props.lastInTheRow ? "borrowed-funds-list-item--last-in-row" : "";
 
     //115%
-    const sliderMin = borrowedFundsItem.loanData!.maintenanceMarginAmount.div(10 ** 18).toNumber();
+    const sliderMin = borrowedFundsItem.loanData!.maintenanceMargin.div(10 ** 18).toNumber();
     //300%
     const sliderMax = sliderMin + 185;
 

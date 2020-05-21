@@ -45,8 +45,6 @@ export class ExtendLoanProcessor {
     const loanPrecision = AssetsDictionary.assets.get(taskRequest.borrowAsset)!.decimals || 18;
     const depositAmountInBaseUnits = new BigNumber(taskRequest.depositAmount.multipliedBy(10 ** loanPrecision).toFixed(0, 1));
 
-
-
     if (!isETHBorrowAsset) {
 
       let tokenErc20Contract: erc20Contract | null = null;
@@ -83,10 +81,8 @@ export class ExtendLoanProcessor {
     let txHash: string = "";
 
     try {
-      const gasAmount = await bZxContract.extendLoanByInterest.estimateGasAsync(
-        taskRequest.loanOrderHash,
-        account,
-        account,
+      const gasAmount = await bZxContract.extendLoanDuration.estimateGasAsync(
+        taskRequest.loanId,
         depositAmountInBaseUnits,
         false,
         {
@@ -103,10 +99,8 @@ export class ExtendLoanProcessor {
     }
 
     try {
-      txHash = await bZxContract.extendLoanByInterest.sendTransactionAsync(
-        taskRequest.loanOrderHash,                      // loanOrderHash
-        account,                                              // borrower
-        account,                                              // payer
+      txHash = await bZxContract.extendLoanDuration.sendTransactionAsync(
+        taskRequest.loanId,                                   // loanId
         depositAmountInBaseUnits,                             // depositAmount
         false,                                                // useCollateral
         {
