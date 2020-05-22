@@ -68,31 +68,30 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
       request: undefined
     };
 
-;
-    let collateralAssetDt2: any = "";
-    if (this.state.loan.collateral.length > 1) {
-      collateralAssetDt2 = AssetsDictionary.assets.get(this.state.loan.collateral[1].asset) as AssetDetails;
-    }
+    this._isMounted = false;
+
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderChanged, this.onProviderChanged);
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.AskToOpenProgressDlg, this.onAskToOpenProgressDlg);
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.AskToCloseProgressDlg, this.onAskToCloseProgressDlg);
   }
 
-  private onAskToOpenProgressDlg = (taskId: number) => {
+  private _isMounted: boolean;
+
+  private onAskToOpenProgressDlg = async (taskId: number) => {
     if (!this.state.request || taskId !== this.state.request.id) return;
-    this.setState({ ...this.state, isLoadingTransaction: true })
+    await this._isMounted && this.setState({ ...this.state, isLoadingTransaction: true })
   }
-  private onAskToCloseProgressDlg = (task: RequestTask) => {
+  private onAskToCloseProgressDlg = async (task: RequestTask) => {
     if (!this.state.request || task.request.id !== this.state.request.id) return;
     if (task.status === RequestStatus.FAILED || task.status === RequestStatus.FAILED_SKIPGAS) {
-      window.setTimeout(() => {
+      window.setTimeout(async () => {
         TorqueProvider.Instance.onTaskCancel(task);
-        this.setState({ ...this.state, isLoadingTransaction: false, request: undefined })
+        await this._isMounted && this.setState({ ...this.state, isLoadingTransaction: false, request: undefined })
       }, 5000)
       return;
     }
-    this.setState({ ...this.state, isLoadingTransaction: false, request: undefined });
+    await this._isMounted && this.setState({ ...this.state, isLoadingTransaction: false, request: undefined });
 
     NavService.Instance.History.push("/dashboard");
   }
@@ -106,6 +105,7 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
   };
 
   public componentWillUnmount(): void {
+    this._isMounted = false;
     TorqueProvider.Instance.eventEmitter.off(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
     TorqueProvider.Instance.eventEmitter.off(TorqueProviderEvents.ProviderChanged, this.onProviderChanged);
     TorqueProvider.Instance.eventEmitter.off(TorqueProviderEvents.AskToOpenProgressDlg, this.onAskToOpenProgressDlg);
@@ -113,6 +113,7 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
   }
 
   public componentDidMount(): void {
+    this._isMounted = true;
     this.derivedUpdate();
   }
 
@@ -132,22 +133,22 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
       refinanceLoan.usdValue = refinanceLoan.usdValue.div(divider);
       refinanceLoan.balance = refinanceLoan.balance.div(divider);
       if (borrowAmount.lt(this.props.loan.balance)) {
-        this.setState({ //update input value here because assignCollateral takes too much time and causes glitch
+        await this._isMounted && this.setState({ //update input value here because assignCollateral takes too much time and causes glitch
           ...this.state,
           borrowAmount: borrowAmount,
           refRateMonth,
           refRateYear
         });
         await TorqueProvider.Instance.assignCollateral([refinanceLoan], TorqueProvider.Instance.compoundDeposits)
-        this.setState({ //update colalteral
+        await this._isMounted && this.setState({ //update colalteral
           ...this.state,
           loan: refinanceLoan
         });
         return
       }
-    }    
+    }
 
-    await this.setState({
+    await await this._isMounted && this.setState({
       ...this.state,
       borrowAmount: borrowAmount,
       loan: refinanceLoan,
@@ -159,28 +160,28 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
     if (Math.abs(this.state.loan.collateral[0].collaterizationPercent!.dp(2, BigNumber.ROUND_FLOOR).toNumber() - value) < 1) return
     let refinanceLoan: IRefinanceLoan = Object.assign({}, this.state.loan); //deep clone of props object
     await TorqueProvider.Instance.assignCollateral([refinanceLoan], TorqueProvider.Instance.compoundDeposits, new BigNumber(value).div(100))
-    this.setState({
+    await this._isMounted && this.setState({
       ...this.state,
       loan: refinanceLoan
     });
   };
 
-  public showDetails = () => {
-    this.setState({ ...this.state, isShow: !this.state.isShow });
+  public showDetails = async () => {
+    await this._isMounted && this.setState({ ...this.state, isShow: !this.state.isShow });
   };
 
   public migrateLoan = async () => {
     const loan = Object.assign({}, this.state.loan);
     let receipt, request;
-      if (this.state.loan.type === "dydx") {
-        request = new RefinanceDydxRequest(loan, this.state.borrowAmount);
-        await this.setState({ ...this.state, request: request });
-        receipt = await TorqueProvider.Instance.onMigrateSoloLoan(request);
-      } else {
-        request = new RefinanceCompoundRequest(loan, this.state.borrowAmount);
-        await this.setState({ ...this.state, request: request });
-        receipt = await TorqueProvider.Instance.onMigrateCompoundLoan(request);
-      }
+    if (this.state.loan.type === "dydx") {
+      request = new RefinanceDydxRequest(loan, this.state.borrowAmount);
+      await await this._isMounted && this.setState({ ...this.state, request: request });
+      receipt = await TorqueProvider.Instance.onMigrateSoloLoan(request);
+    } else {
+      request = new RefinanceCompoundRequest(loan, this.state.borrowAmount);
+      await await this._isMounted && this.setState({ ...this.state, request: request });
+      receipt = await TorqueProvider.Instance.onMigrateCompoundLoan(request);
+    }
   };
 
   private derivedUpdate = async () => {
@@ -188,7 +189,7 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
     const refRateYear = ((parseFloat(this.state.loan.apr.dp(0, BigNumber.ROUND_CEIL).toString()) - parseFloat(interestRate.dp(1, BigNumber.ROUND_CEIL).toString())) * parseFloat(this.state.borrowAmount.dp(3, BigNumber.ROUND_FLOOR).toString())) / 100;
     const refRateMonth = refRateYear / 12;
 
-    this.setState({
+    await this._isMounted && this.setState({
       ...this.state,
       fixedApr: interestRate,
       refRateMonth,
@@ -196,12 +197,12 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
     });
   };
 
-  public showInfoCollateralAssetDt0 = () => {
-    this.setState({ ...this.state, isShowInfoCollateralAssetDt0: !this.state.isShowInfoCollateralAssetDt0 });
+  public showInfoCollateralAssetDt0 = async () => {
+    await this._isMounted && this.setState({ ...this.state, isShowInfoCollateralAssetDt0: !this.state.isShowInfoCollateralAssetDt0 });
   };
 
-  public showInfoCollateralAssetDt1 = () => {
-    this.setState({ ...this.state, isShowInfoCollateralAssetDt1: !this.state.isShowInfoCollateralAssetDt1 });
+  public showInfoCollateralAssetDt1 = async () => {
+    await this._isMounted && this.setState({ ...this.state, isShowInfoCollateralAssetDt1: !this.state.isShowInfoCollateralAssetDt1 });
   };
 
 
