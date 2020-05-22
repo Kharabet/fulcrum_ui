@@ -78,7 +78,16 @@ export class TxProcessingLoader extends Component<ITxProcessingLoaderProps, ITxP
     if (this.state.requestTask === undefined || !title) return null;
 
     console.log(this.state.requestTask);
-    return <Loader {...this.props} title={title.message} isWarningTitle={title.isWarning} />
+    return (
+      <React.Fragment>
+        {this.state.requestTask.txHash
+          ? <a href={`${TorqueProvider.Instance.web3ProviderSettings!.etherscanURL}tx/${this.state.requestTask.txHash}`} target="_blank" rel="noopener noreferrer">
+            <Loader {...this.props} title={title.message} isWarningTitle={title.isWarning} />
+          </a>
+          : <Loader {...this.props} title={title.message} isWarningTitle={title.isWarning} />
+        }
+      </React.Fragment>
+    )
   }
 
   public onTasksQueueChanged = () => {

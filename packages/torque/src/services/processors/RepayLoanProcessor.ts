@@ -131,6 +131,7 @@ export class RepayLoanProcessor {
             gasPrice: await TorqueProvider.Instance.gasPrice()
           }
         );
+        task.setTxHash(txHash);
       }
       catch (e) {
         console.log(e);

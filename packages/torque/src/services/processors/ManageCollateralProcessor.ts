@@ -114,6 +114,7 @@ export class ManageCollateralProcessor {
             gasPrice: await TorqueProvider.Instance.gasPrice()
           }
         );
+        task.setTxHash(txHash);
       } catch (e) {
         console.log(e);
         throw e;
@@ -154,6 +155,7 @@ export class ManageCollateralProcessor {
             gasPrice: await TorqueProvider.Instance.gasPrice()
           }
         );
+        task.setTxHash(txHash);
       }
       catch (e) {
         console.log(e);

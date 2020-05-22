@@ -118,6 +118,7 @@ export class ExtendLoanProcessor {
           gasPrice: await TorqueProvider.Instance.gasPrice()
         }
       );
+      task.setTxHash(txHash);
     } catch (e) {
       console.log(e);
       throw e;
