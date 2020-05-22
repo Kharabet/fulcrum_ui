@@ -107,6 +107,7 @@ export class RepayLoanProcessor {
         gasAmountBN = new BigNumber(gasAmount).multipliedBy(TorqueProvider.Instance.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
       } catch (e) {
         console.log(e);
+        throw e;
       }
 
       //Submitting loan
@@ -131,6 +132,7 @@ export class RepayLoanProcessor {
             gasPrice: await TorqueProvider.Instance.gasPrice()
           }
         );
+        task.setTxHash(txHash);
       }
       catch (e) {
         console.log(e);

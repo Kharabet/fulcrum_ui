@@ -31,31 +31,34 @@ export class RefinanceAssetSelector extends Component<IRefinanceAssetSelectorPro
       refinanceCompoundData: [],
       refinanceData: []
     };
-
+    this._isMounted = false;
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderAvailable, this.derivedUpdate);
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderChanged, this.derivedUpdate);
   }
 
+  private _isMounted: boolean;
+
   public componentDidMount(): void {
-    // noinspection JSIgnoredPromiseFromCall
-    this.setState({ ...this.state, isLoading: true, isItems: false });
+    this._isMounted = true;
+    this._isMounted && this.setState({ ...this.state, isLoading: true, isItems: false });
 
     this.derivedUpdate();
   }
 
   public componentWillUnmount(): void {
+    this._isMounted = false;
     TorqueProvider.Instance.eventEmitter.removeListener(TorqueProviderEvents.ProviderAvailable, this.derivedUpdate);
     TorqueProvider.Instance.eventEmitter.removeListener(TorqueProviderEvents.ProviderChanged, this.derivedUpdate);
   }
 
   private derivedUpdate = async () => {
-    this.setState({
+    await this._isMounted && this.setState({
       ...this.state,
       isLoading: true
     })
     if (TorqueProvider.Instance.providerType === ProviderType.None || !TorqueProvider.Instance.contractsSource || !TorqueProvider.Instance.contractsSource.canWrite) {
       this.props.doNetworkConnect();
-      this.setState({
+      await this._isMounted && this.setState({
         refinanceCompoundData: [],
         refinanceData: [],
         isLoading: false
@@ -65,7 +68,7 @@ export class RefinanceAssetSelector extends Component<IRefinanceAssetSelectorPro
     const refinanceData = await this.getMakerRefinanceData();
     const refinanceCompoundData = await this.getSoloComoundRefinanceData();
 
-    this.setState({
+    await this._isMounted && this.setState({
       ...this.state,
       isLoading: false,
       isItems: refinanceData.length > 0 || refinanceCompoundData.length > 0,
@@ -83,7 +86,7 @@ export class RefinanceAssetSelector extends Component<IRefinanceAssetSelectorPro
     if (loans.length) {
       console.log("compound", loans[0].balance.toString(10));
     }
-    this.setState({ ...this.state, refinanceCompoundData: loans });
+    await this._isMounted && this.setState({ ...this.state, refinanceCompoundData: loans });
 
     const sololoans = await TorqueProvider.Instance.getSoloLoans(); // TODO
 

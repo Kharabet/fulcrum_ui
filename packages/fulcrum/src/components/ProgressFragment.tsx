@@ -52,9 +52,9 @@ export default class ProgressFragment extends Component<any, IProgressFragmentSt
   }
 
   public render() {
-    return this.state.requestTasks.length === 0 ? null : (
+    return this.state.requestTasks.length === 0  ? null : (
       <React.Fragment>
-        <ProgressBar requestTask={this.state.requestTasks[0]} onViewMore={this.onViewMore} />
+        {/* <ProgressBar requestTask={this.state.requestTasks[0]} onViewMore={this.onViewMore} /> */}
         <Modal
           isOpen={this.state.isProgressDetailsModalOpen}
           onRequestClose={this.onRequestClose}
@@ -75,7 +75,8 @@ export default class ProgressFragment extends Component<any, IProgressFragmentSt
     this.setState({ ...this.state, isProgressDetailsModalOpen: false });
   };
 
-  public onAskToOpenProgressDlg = () => {
+  public onAskToOpenProgressDlg = (args: any) => {
+    if (args) return;
     this.setState(p => ({ ...this.state, counterProgressDetails: this.state.counterProgressDetails + 1, isProgressDetailsModalOpen: true }));
   };
 

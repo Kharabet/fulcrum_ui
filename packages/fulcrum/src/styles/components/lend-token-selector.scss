@@ -21,6 +21,52 @@
     margin-bottom: 4px;
     background-color: var(--primary-row);
     border: 2px solid transparent;
+
+    &.loading-transaction {
+      background-color: #1f262e;
+      .lend-transaction-step {
+        margin-top: 45px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: 800;
+        font-size: 18px;
+        line-height: 140%;
+
+        color: #00c0ab;
+        text-align: center;
+        &.warning {
+          color: #ff4f4f;
+        }
+        @keyframes in {
+          0% {
+            opacity: 0;
+            transform: translate(0, -20px);
+          }
+          to {
+            opacity: 1;
+            transform: translate(0px, 0px);
+          }
+        }
+        @keyframes out {
+          0% {
+            opacity: 1;
+            transform: translate(0, 0);
+          }
+          to {
+            opacity: 0;
+            transform: translate(0px, 20px);
+          }
+        }
+
+        &.animation-in {
+          animation: in 0.5s ease-in;
+        }
+        &.animation-out {
+          animation: out 0.5s ease-in;
+        }
+      }
+    }
     @media screen and (min-width: $breakpoint-desktop-min) {
       width: calc(25% - 3px);
       max-width: calc(25% - 3px);
@@ -35,6 +81,7 @@
         margin-right: 3px;
       }
     }
+
     .sign-currency {
       color: #a2abb8;
       font-weight: 400;
@@ -78,9 +125,9 @@
 
     .token-selector-item__image {
       margin-bottom: 10px;
-
       text-align: center;
-
+      display: flex;
+      justify-content: center;
       img,
       svg {
         display: inline-block;
