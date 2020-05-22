@@ -1,96 +1,5 @@
 @import "../abstracts/variables";
 
-.trade-form {
-  &__amount-container {
-    display: flex;
-    background: #394049;
-    width: 100%;
-    height: 65px;
-    position: relative;
-    padding-right: 15px;
-    align-items: center;
-    &:before {
-      content: "";
-      position: absolute;
-      border: 16px solid transparent;
-      border-left: 16px solid #ffffff;
-      left: -31px;
-      top: 0;
-      bottom: 0;
-      margin: auto;
-      height: 32px;
-    }
-  }
-  &__amount-input {
-    width: calc(100% - 105px);
-    padding-left: 15px;
-    border: none;
-    font-size: 32px;
-    font-weight: 600;
-    font-style: normal;
-    font-stretch: normal;
-    letter-spacing: normal;
-    text-align: left;
-    color: #ffffff;
-    background-color: transparent;
-
-    &input::-webkit-outer-spin-button,
-    &input::-webkit-inner-spin-button {
-      /* display: none; <- Crashes Chrome on hover */
-      -webkit-appearance: none;
-      margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
-    }
-
-    &input[type="number"] {
-      -moz-appearance: textfield; /* Firefox */
-    }
-
-    &:focus {
-      outline: none;
-    }
-  }
-  &__group-button {
-    margin-top: 3px;
-    margin-bottom: 10px;
-    button {
-      font-size: 12px;
-      font-weight: 600;
-      width: calc(25% - 1.5px);
-      padding: 8px 0;
-      color: #ffffff;
-      background-color: #586473;
-      border: none;
-      outline: none;
-      cursor: pointer;
-      line-height: 1.5;
-      &:not(:last-child) {
-        margin-right: 2px;
-      }
-      &:hover {
-        background: #758295;
-      }
-    }
-  }
-}
-
-input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button {
-  /* display: none; <- Crashes Chrome on hover */
-  -webkit-appearance: none;
-  margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
-}
-
-input[type="number"] {
-  -moz-appearance: textfield; /* Firefox */
-}
-
-.preloader-container {
-  position: absolute;
-  top: 50%;
-  left: 20px;
-  transform: translate(0%, -50%);
-  width: 100%;
-}
 .manage-collateral-form {
   width: 520px;
 
@@ -107,7 +16,7 @@ input[type="number"] {
     width: 16px;
     cursor: pointer;
   }
-  .manage-collateral-form__title {
+  &__title {
     margin-bottom: 10px;
     font-size: 32px;
     font-weight: 600;
@@ -118,13 +27,13 @@ input[type="number"] {
     text-align: left;
     color: #ffffff;
   }
-  .manage-collateral-form__text {
+  &__text {
     font-size: 20px;
     font-weight: 600;
     line-height: 35px;
     color: #a9b5c7;
   }
-  .manage-collateral-form__collaterized {
+  &__collaterized {
     font-size: 32px;
     font-weight: 600;
     line-height: 48px;
@@ -136,7 +45,7 @@ input[type="number"] {
       margin-right: 1px;
     }
   }
-  .manage-collateral-form__tips {
+  &__tips {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -147,7 +56,7 @@ input[type="number"] {
     margin-bottom: 23px;
   }
 
-  .manage-collateral-form__tip {
+  &__tip {
     font-size: 14px;
     font-weight: normal;
     font-style: normal;
@@ -157,38 +66,36 @@ input[type="number"] {
     color: #a9b5c7;
   }
 
-  .manage-collateral-form__delimiter {
+  &__delimiter {
     margin-bottom: 1rem;
     border: 0;
   }
 
-  .manage-collateral-form__info-liquidated-at-container {
-    .manage-collateral-form__info-liquidated-at-msg {
-      margin-bottom: 0.25rem;
+  &__info-liquidated-at-msg {
+    margin-bottom: 0.25rem;
 
-      font-size: 0.75rem;
-      font-weight: normal;
-      font-style: normal;
-      font-stretch: normal;
-      line-height: 1.33;
-      letter-spacing: normal;
-      text-align: center;
-      color: #a9b5c7;
-    }
-
-    .manage-collateral-form__info-liquidated-at-price {
-      font-size: 1rem;
-      font-weight: 600;
-      font-style: normal;
-      font-stretch: normal;
-      line-height: 1.5;
-      letter-spacing: normal;
-      text-align: center;
-      color: #ffffff;
-    }
+    font-size: 0.75rem;
+    font-weight: normal;
+    font-style: normal;
+    font-stretch: normal;
+    line-height: 1.33;
+    letter-spacing: normal;
+    text-align: center;
+    color: #a9b5c7;
   }
 
-  .manage-collateral-form__operation-result-container {
+  &__info-liquidated-at-price {
+    font-size: 1rem;
+    font-weight: 600;
+    font-style: normal;
+    font-stretch: normal;
+    line-height: 1.5;
+    letter-spacing: normal;
+    text-align: center;
+    color: #ffffff;
+  }
+
+  &__operation-result-container {
     position: relative;
 
     padding: 1.75rem 1rem;
@@ -196,151 +103,134 @@ input[type="number"] {
 
     border-radius: 4px;
     background-color: rgba(0, 0, 0, 0.1);
-
-    .manage-collateral-form__operation-result-img {
-      height: 2rem;
-      width: 2rem;
-
-      position: absolute;
-      top: 0;
-      left: 50%;
-      transform: translateX(-50%) translateY(-50%);
-    }
-
-    .manage-collateral-form__operation-result-msg {
-      font-size: 14px;
-      font-weight: normal;
-      font-style: normal;
-      font-stretch: normal;
-      line-height: 21px;
-      letter-spacing: normal;
-      text-align: center;
-      color: #a9b5c7;
-    }
-
-    .manage-collateral-form__operation-result-amount {
-      font-size: 1rem;
-      font-weight: 600;
-      font-style: normal;
-      font-stretch: normal;
-      line-height: 1.5;
-      letter-spacing: normal;
-      text-align: center;
-      color: #ffffff;
-    }
   }
 
-  .manage-collateral-form__actions-container {
+  &__operation-result-img {
+    height: 2rem;
+    width: 2rem;
+
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
+  }
+
+  &__operation-result-msg {
+    font-size: 14px;
+    font-weight: normal;
+    font-style: normal;
+    font-stretch: normal;
+    line-height: 21px;
+    letter-spacing: normal;
+    text-align: center;
+    color: #a9b5c7;
+  }
+
+  &__operation-result-amount {
+    font-size: 1rem;
+    font-weight: 600;
+    font-style: normal;
+    font-stretch: normal;
+    line-height: 1.5;
+    letter-spacing: normal;
+    text-align: center;
+    color: #ffffff;
+  }
+
+  &__actions-container {
     display: flex;
     flex-direction: row;
     justify-content: flex-end;
-
-    .manage-collateral-form__action-cancel,
-    .manage-collateral-form__action-close {
-      display: inline-block;
-
-      cursor: pointer;
-      border: 0;
-      height: 2.5rem;
-      width: 6.5rem;
-      background-color: rgba(0, 0, 0, 0);
-      text-decoration: underline;
-      text-decoration-style: dotted;
-      color: #a9b5c7;
-      outline: none;
-    }
-
-    .manage-collateral-form__action-close {
-      width: auto;
-    }
-
-    .manage-collateral-form__action-withdraw,
-    .manage-collateral-form__action-top-up {
-      display: inline-block;
-
-      cursor: pointer;
-      border: 0;
-      height: 2.5rem;
-      width: 6.5rem;
-      border-radius: 100px;
-      color: #ffffff;
-      background-color: #276bfb;
-      text-transform: uppercase;
-      outline: none;
-    }
   }
-}
+  &__action-cancel,
+  &__action-close {
+    display: inline-block;
 
-.manage-collateral-form__trade-form {
-  margin-top: 5px;
-  .trade-form__form-container {
-    padding: 0;
+    cursor: pointer;
+    border: 0;
+    height: 2.5rem;
+    width: 6.5rem;
+    background-color: rgba(0, 0, 0, 0);
+    text-decoration: underline;
+    text-decoration-style: dotted;
+    color: #a9b5c7;
+    outline: none;
   }
-  .trade-form__amount-container:before {
-    content: none;
-  }
-  .trade-form__form-container.buy {
-    padding: 0;
-  }
-  .trade-form__amount-container {
+
+  &__action-close {
     width: auto;
   }
-  .trade-form__form-container .trade-form__form-values-container {
-    margin-bottom: 22px;
+
+  &__action-withdraw,
+  &__action-top-up {
+    display: inline-block;
+
+    cursor: pointer;
+    border: 0;
+    height: 2.5rem;
+    width: 6.5rem;
+    border-radius: 100px;
+    color: #ffffff;
+    background-color: #276bfb;
+    text-transform: uppercase;
+    outline: none;
   }
-}
-.collateral-slider-handle__slider {
-  position: absolute;
-  transform: translate(-50%, -50%);
-  z-index: 2;
-  width: 31px;
-  height: 31px;
-  border: 6px solid #444e5a;
-  border-radius: 50%;
-  background-color: #276bfb;
-}
-.collateral-slider-handle__icon {
-  padding: 7px 9px;
-  transform: scale(1.1);
-}
-@media screen and (max-width: $mobile-version-max-width) {
-  .manage-collateral-form {
+  &__input-amount-form {
+    margin-top: 5px;
+  }
+  @media screen and (max-width: $mobile-version-max-width) {
     width: 310px;
+
     > div {
       padding: 40px 30px 30px;
     }
-    .manage-collateral-form__title {
+    &__title {
       font-size: 24px;
       line-height: 24px;
       margin-bottom: 30px;
     }
-    .manage-collateral-form__text {
+    &__text {
       font-size: 16px;
       line-height: 24px;
     }
 
-    .manage-collateral-form__collaterized {
+    &__collaterized {
       font-size: 26px;
       line-height: 39px;
     }
-    .manage-collateral-form__tips {
+    &__tips {
       margin-bottom: 22px;
     }
 
-    .manage-collateral-form__tip {
+    &__tip {
       font-size: 12px;
     }
-    .trade-form__form-container {
-      float: none;
-      width: auto;
+  }
+}
+
+.collateral-slider-handle {
+  &__slider {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+    width: 31px;
+    height: 31px;
+    border: 6px solid #444e5a;
+    border-radius: 50%;
+    background-color: #276bfb;
+  }
+  &__icon {
+    padding: 7px 9px;
+    transform: scale(1.1);
+  }
+  @media screen and (max-width: $mobile-version-max-width) {
+    &__slider {
+      width: 25px;
+      height: 25px;
     }
-  }
-  .collateral-slider-handle__slider {
-    width: 25px;
-    height: 25px;
-  }
-  .collateral-slider-handle__icon {
-    padding: 4px 6px;
-    transform: scale(0.9);
+    &__icon {
+      padding: 4px 6px;
+      transform: scale(0.9);
+    }
   }
 }

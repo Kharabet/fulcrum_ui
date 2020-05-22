@@ -28,9 +28,11 @@ import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
 import { CollateralTokenButton } from "./CollateralTokenButton";
 import { CollateralTokenSelector } from "./CollateralTokenSelector";
+import { InputAmount } from "./InputAmount";
 import { Preloader } from "./Preloader";
 
 import "../styles/components/manage-collateral-form.scss";
+import "../styles/components/input-amount.scss";
 
 interface IInputAmountLimited {
   inputAmountValue: BigNumber;
@@ -462,33 +464,32 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
           <div className="manage-collateral-form__text">
             You will {this.state.positionValue > this.state.selectedValue ? "withdraw" : "top up"}</div>
 
-          {//#region tradeComponent
-          }
-          <div className="manage-collateral-form__trade-form" >
-            <div className={`trade-form__form-container  ${this.props.tradeType === TradeType.BUY ? "buy" : "sell"}`}>
-              <div className="trade-form__form-values-container">
+
+          <div className="manage-collateral-form__input-amount-form" >
+            <div className={`input-amount__form-container  ${this.props.tradeType === TradeType.BUY ? "buy" : "sell"}`}>
+              <div className="input-amount__form-values-container">
                 {/* {!this.props.isMobileMedia && this.props.tradeType === TradeType.BUY ? (
               <TradeExpectedResult value={tradeExpectedResultValue} />
             ) : null} */}
 
-                <div className="trade-form__kv-container">
+                <div className="input-amount__kv-container">
                   {amountMsg.includes("Slippage:") ? (
-                    <div title={`${this.state.slippageRate.toFixed(18)}%`} className="trade-form__label slippage">
+                    <div title={`${this.state.slippageRate.toFixed(18)}%`} className="input-amount__label slippage">
                       {amountMsg}
-                      <span className="trade-form__slippage-amount">
+                      <span className="input-amount__slippage-amount">
                         &nbsp;{`${this.state.slippageRate.toFixed(2)}%`}<SlippageDown />
                       </span>
                     </div>
-                  ) : (<div className="trade-form__label">{amountMsg}</div>)}
+                  ) : (<div className="input-amount__label">{amountMsg}</div>)}
 
                 </div>
 
-                <div className="trade-form__amount-container">
+                <div className="input-amount__container">
                   <input
                     type="number"
                     step="any"
                     ref={this._setInputRef}
-                    className="trade-form__amount-input"
+                    className="input-amount__input"
                     //value={!this.state.isLoading ? this.state.inputAmountValue.toFixed(5)  : ""}
                     value={!this.state.isLoading ? this.formatPrecision(Number(this.state.inputAmountText)) : ""}
                     onChange={this.onTradeAmountChange}
@@ -511,7 +512,7 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
                     null
                   }
                 </div>
-                <div className="trade-form__group-button">
+                <div className="input-amount__group-button">
                   <button data-value="0.25" className={multiplier === 0.25 ? "active " : ""} onClick={this.onInsertMaxValue}>25%</button>
                   <button data-value="0.5" className={multiplier === 0.5 ? "active " : ""} onClick={this.onInsertMaxValue}>50%</button>
                   <button data-value="0.75" className={multiplier === 0.75 ? "active " : ""} onClick={this.onInsertMaxValue}>75%</button>
@@ -533,8 +534,14 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
                 ) : null} */}
               </div>
             </div>
-            {//#endregion tradeComponent
-            }</div>
+            {/* <InputAmount
+              asset={this.state.assetDetails.reactLogoSvg}
+              inputAmountText={this.state.inputAmountText}
+              onInsertMaxValue={this.onInsertMaxValue}
+              onTradeAmountChange={this.onTradeAmountChange}
+              interestAmount={this.state.interestAmount}
+            /> */}
+          </div>
 
           <div className="manage-collateral-form__actions-container">
             {/* <button className="manage-collateral-form__action-cancel" onClick={this.props.onCancel}>
@@ -581,7 +588,7 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
     // handling different types of empty values
     const amountText = event.target.value ? event.target.value : "";
 
-    // setting inputAmountText to update display at the same time
+    // setting Text to update display at the same time
     this._isMounted && this.setState({ ...this.state, inputAmountText: amountText }, () => {
       // emitting next event for processing with rx.js
       this._inputChange.next(this.state.inputAmountText);

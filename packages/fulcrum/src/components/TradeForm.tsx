@@ -30,7 +30,7 @@ import { UnitOfAccountSelector } from "./UnitOfAccountSelector";
 import { Preloader } from "./Preloader";
 
 import "../styles/components/trade-form.scss";
-
+import "../styles/components/input-amount.scss";
 
 interface IInputAmountLimited {
   inputAmountValue: BigNumber;
@@ -470,25 +470,27 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
               <TradeExpectedResult value={tradeExpectedResultValue} />
             ) : null}
 
-            <div className="trade-form__kv-container">
+            <div className="input-amount__kv-container">
               {amountMsg.includes("Slippage:") ? (
-                <div title={`${this.state.slippageRate.toFixed(18)}%`} className="trade-form__label slippage">
+                <div title={`${this.state.slippageRate.toFixed(18)}%`} className="input-amount__label slippage">
                   {amountMsg}
-                  <span className="trade-form__slippage-amount">
+                  <span className="input-amount__slippage-amount">
                     &nbsp;{`${this.state.slippageRate.toFixed(2)}%`}<SlippageDown />
                   </span>
                 </div>
-              ) : (<div className="trade-form__label">{amountMsg}</div>)}
+              ) : (<div className="input-amount__label">{amountMsg}</div>)}
 
             </div>
 
-            <div className="trade-form__amount-container">
+
+            <div className="input-amount__container">
               <input
                 type="number"
                 step="any"
                 ref={this._setInputRef}
-                className="trade-form__amount-input"
-                value={!this.state.isLoading ? this.state.inputAmountText : ""}
+                className="input-amount__input"
+                //value={!this.state.isLoading ? this.state.inputAmountValue.toFixed(5)  : ""}
+                value={!this.state.isLoading ? this.formatPrecision(Number(this.state.inputAmountText)) : ""}
                 onChange={this.onTradeAmountChange}
               />
               {!this.state.isLoading ? null
@@ -509,7 +511,8 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
                 null
               }
             </div>
-            <div className="trade-form__group-button">
+
+            <div className="input-amount__group-button">
               <button data-value="0.25" className={multiplier === 0.25 ? "active " : ""} onClick={this.onInsertMaxValue}>25%</button>
               <button data-value="0.5" className={multiplier === 0.5 ? "active " : ""} onClick={this.onInsertMaxValue}>50%</button>
               <button data-value="0.75" className={multiplier === 0.75 ? "active " : ""} onClick={this.onInsertMaxValue}>75%</button>
