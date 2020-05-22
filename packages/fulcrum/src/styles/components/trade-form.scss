@@ -1,3 +1,6 @@
+@import "../abstracts/mixins";
+@import "../abstracts/variables";
+
 .trade-form {
   @include clearfix();
   display: flex;
@@ -44,6 +47,7 @@
       margin-top: 5px;
     }
   }
+
   &__info_block__asset {
     font-weight: 700;
     font-size: 24px;
@@ -51,6 +55,7 @@
     color: #282f36;
     text-align: center;
   }
+
   &__info_block__stats {
     font-weight: 600;
     font-size: 13px;
@@ -68,78 +73,31 @@
       }
     }
   }
-  &__group-button {
-    margin-top: 3px;
-    margin-bottom: 10px;
-    button {
-      font-size: 12px;
-      font-weight: 600;
-      width: calc(25% - 1.5px);
-      padding: 8px 0;
-      color: #ffffff;
-      background-color: #586473;
-      border: none;
-      outline: none;
-      cursor: pointer;
-      line-height: 1.5;
-      &:not(:last-child) {
-        margin-right: 2px;
-      }
-      &:hover {
-        background: #758295;
-      }
+
+  &__form-container {
+    padding: 75px 45px 30px 30px;
+    display: flex;
+    flex-direction: column;
+    &.buy {
+      padding-top: 55px;
     }
   }
-}
 
-.trade-form__form-container {
-  padding: 75px 45px 30px 30px;
-  display: flex;
-  flex-direction: column;
-  &.buy {
-    padding-top: 55px;
-  }
-
-  .trade-form__form-values-container {
+  &__form-values-container {
     margin-bottom: 30px;
   }
 
-  .trade-form__form-info {
-    font-size: 12px;
-    color: #ffffff;
-    margin-bottom: 20px;
-    display: block;
-    letter-spacing: 0.1px;
-    background: #fff;
-    color: #394049;
-    padding: 12px;
-    padding-left: 27px;
-    position: relative;
-    &:before {
-      content: "";
-      position: absolute;
-      width: 24px;
-      height: 24px;
-      background: url("../../assets/images/error_icon.svg");
-      left: -12px;
-      top: 10px;
-    }
-  }
-
-  .trade-form__actions-container {
+  &__actions-container {
     display: flex;
     flex-direction: row;
     justify-content: flex-end;
 
     margin-top: auto;
   }
+
   .trade-how-it-works-container {
     margin-top: -30px;
     margin-bottom: 10px;
-    .trade-form__how-it-works {
-      display: flex;
-      margin-top: 30px;
-    }
 
     .hiw-icon {
       margin-right: 13px;
@@ -155,218 +113,152 @@
       color: #b9c7d6;
     }
   }
-}
 
-.trade-form__position-type-container {
-  margin-bottom: 1rem;
-}
-
-.trade-form__unit-of-account-container {
-  font-weight: 600;
-  font-size: 12px;
-  line-height: 150%;
-  color: #a2abb8;
-
-  display: flex;
-  align-items: center;
-}
-
-.trade-form__kv-container {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-
-  padding: 0.22rem 0;
-}
-
-.trade-form__kv-container--w_dots {
-  background-image: url("../../assets/images/dotted_line.png");
-  background-repeat: repeat-x;
-  background-position-y: 1.25rem;
-}
-
-.trade-form__token-message-container {
-  margin: 0.25rem 0 0.5rem;
-  padding: 0.75rem 1.375rem;
-
-  border-radius: 0.25rem;
-  background-color: #0000001a;
-}
-
-.trade-form__token-message-container--message {
-  font-size: 0.75rem;
-  font-weight: normal;
-  font-style: normal;
-  font-stretch: normal;
-  line-height: 1.33;
-  letter-spacing: normal;
-  text-align: left;
-  color: #a9b5c7;
-}
-
-.trade-form__label {
-  font-weight: 600;
-  font-size: 12px;
-  line-height: 150%;
-  color: #fe7272;
-  margin-bottom: 10px;
-
-  &.slippage {
-    font-size: 14px;
+  &__how-it-works {
     display: flex;
-    .trade-form__slippage-amount {
-      font-weight: 800;
-
-      display: flex;
-      align-items: center;
-      svg {
-        margin-left: 2px;
-      }
-    }
+    margin-top: 30px;
   }
 
-  &--no-bg {
-    background-color: transparent;
-  }
-}
-
-.trade-form__label--action {
-  cursor: pointer;
-  text-decoration: underline;
-  text-decoration-style: dotted;
-  border: 0 none;
-
-  &:focus {
-    outline: none;
-  }
-  //background-image: url("../../assets/images/dotted_line.png");
-  //background-repeat: repeat-x;
-  //background-position-y: 1.25rem;
-}
-
-.trade-form__value {
-  line-height: 2;
-  font-size: 0.75rem;
-  font-weight: 600;
-  font-style: normal;
-  font-stretch: normal;
-  letter-spacing: normal;
-  color: #ffe546;
-  background-color: #444e5a;
-
-  &--no-color {
-    color: #a9b5c7;
+  &__position-type-container {
+    margin-bottom: 1rem;
   }
 
-  &--no-bg {
-    background-color: transparent;
-  }
-}
-
-.trade-form__amount-container {
-  display: flex;
-  background: #394049;
-  width: 100%;
-  height: 65px;
-  position: relative;
-  padding-right: 15px;
-  align-items: center;
-  &:before {
-    content: "";
-    position: absolute;
-    border: 16px solid transparent;
-    border-left: 16px solid #ffffff;
-    left: -31px;
-    top: 0;
-    bottom: 0;
-    margin: auto;
-    height: 32px;
-  }
-
-  .trade-form__amount-input {
-    width: calc(100% - 105px);
-    padding-left: 15px;
-    border: none;
-    font-size: 32px;
+  &__unit-of-account-container {
     font-weight: 600;
-    font-style: normal;
-    font-stretch: normal;
-    letter-spacing: normal;
-    text-align: left;
-    color: #ffffff;
-    background-color: transparent;
+    font-size: 12px;
+    line-height: 150%;
+    color: #a2abb8;
 
-    &input::-webkit-outer-spin-button,
-    &input::-webkit-inner-spin-button {
-      /* display: none; <- Crashes Chrome on hover */
-      -webkit-appearance: none;
-      margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
-    }
+    display: flex;
+    align-items: center;
+  }
 
-    &input[type="number"] {
-      -moz-appearance: textfield; /* Firefox */
-    }
+  // &__token-message-container {
+  //   margin: 0.25rem 0 0.5rem;
+  //   padding: 0.75rem 1.375rem;
+
+  //   border-radius: 0.25rem;
+  //   background-color: #0000001a;
+  // }
+
+  // &__token-message-container--message {
+  //   font-size: 0.75rem;
+  //   font-weight: normal;
+  //   font-style: normal;
+  //   font-stretch: normal;
+  //   line-height: 1.33;
+  //   letter-spacing: normal;
+  //   text-align: left;
+  //   color: #a9b5c7;
+  // }
+
+  &__label--action {
+    cursor: pointer;
+    text-decoration: underline;
+    text-decoration-style: dotted;
+    border: 0 none;
 
     &:focus {
       outline: none;
     }
-    
+    //background-image: url("../../assets/images/dotted_line.png");
+    //background-repeat: repeat-x;
+    //background-position-y: 1.25rem;
   }
 
-  /*.trade-form__amount-max {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-content: center;
-
-    width: 3rem;
-    padding: 0.5rem;
-
-    border: 0;
-    border-left: 1px solid #444e5a;
-
-    background-color: rgba(32, 31, 35, 0.3);
-
+  &__value {
+    line-height: 2;
     font-size: 0.75rem;
     font-weight: 600;
     font-style: normal;
     font-stretch: normal;
     letter-spacing: normal;
-    text-align: center;
-    color: #acb5c2;
+    color: #ffe546;
+    background-color: #444e5a;
 
-    cursor: pointer;
-
-    img {
-      padding-bottom: 0.25rem;
+    &--no-color {
+      color: #a9b5c7;
     }
-  }*/
 
-  .trade-form__amount-maxed {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-content: center;
+    &--no-bg {
+      background-color: transparent;
+    }
+  }
 
-    width: 3rem;
-    padding: 0.5rem;
-
+  &__change-button {
+    cursor: pointer;
+    outline: none;
     border: 0;
-    border-left: 1px solid #444e5a;
-
-    background-color: rgba(32, 31, 35, 0.3);
-
+    background-color: rgba(0, 0, 0, 0);
+    text-decoration: underline;
+    color: #ffffff;
     font-size: 0.75rem;
-    font-weight: 600;
-    font-style: normal;
-    font-stretch: normal;
-    letter-spacing: normal;
-    text-align: center;
-    color: #00ff00;
+    padding-left: 0.25rem;
+  }
+
+  &__cancel-button {
+    display: inline-block;
 
     cursor: pointer;
+    border: 0;
+    height: 2.5rem;
+    width: 6.5rem;
+    background-color: rgba(0, 0, 0, 0);
+    text-decoration: underline;
+    text-decoration-style: dotted;
+    color: #a9b5c7;
+    outline: none;
+  }
+
+  &__submit-button {
+    display: block;
+    cursor: pointer;
+    border: 0;
+    border-radius: 100px;
+    color: #ffffff;
+    text-transform: uppercase;
+    outline: none;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 12px 25px;
+    &--buy {
+      z-index: 2;
+      background-color: #407bf7;
+      &:hover {
+        background-color: #5b88ff;
+      }
+    }
+
+    &--sell {
+      background-color: #ff5353;
+      &:hover {
+        background-color: #fe7272;
+      }
+    }
   }
 }
+
+// .trade-form__form-info {
+//   font-size: 12px;
+//   color: #ffffff;
+//   margin-bottom: 20px;
+//   display: block;
+//   letter-spacing: 0.1px;
+//   background: #fff;
+//   color: #394049;
+//   padding: 12px;
+//   padding-left: 27px;
+//   position: relative;
+//   &:before {
+//     content: "";
+//     position: absolute;
+//     width: 24px;
+//     height: 24px;
+//     background: url("../../assets/images/error_icon.svg");
+//     left: -12px;
+//     top: 10px;
+//   }
+// }
 
 .rounded-mark {
   font-size: 0.5rem;
@@ -376,74 +268,268 @@
   padding: 0.0625rem 0.3125rem;
 }
 
-.trade-form__change-button {
-  cursor: pointer;
-  outline: none;
-  border: 0;
-  background-color: rgba(0, 0, 0, 0);
-  text-decoration: underline;
-  color: #ffffff;
-  font-size: 0.75rem;
-  padding-left: 0.25rem;
-}
+@media screen and (max-width: $breakpoint-mobile-max) {
+  .trade-form {
+    @include clearfix();
 
-.trade-form__cancel-button {
-  display: inline-block;
+    max-width: 320px;
+    width: 320px;
 
-  cursor: pointer;
-  border: 0;
-  height: 2.5rem;
-  width: 6.5rem;
-  background-color: rgba(0, 0, 0, 0);
-  text-decoration: underline;
-  text-decoration-style: dotted;
-  color: #a9b5c7;
-  outline: none;
-}
+    background-color: #444e5a;
 
-.trade-form__submit-button {
-  display: block;
-  cursor: pointer;
-  border: 0;
-  border-radius: 100px;
-  color: #ffffff;
-  text-transform: uppercase;
-  outline: none;
-  font-size: 14px;
-  font-weight: 600;
-  padding: 12px 25px;
-  &--buy {
-    z-index: 2;
-    background-color: #407bf7;
-    &:hover {
-      background-color: #5b88ff;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    .close-icon {
+      position: absolute;
+      right: 20px;
+      top: 20px;
+      z-index: 100;
+    }
+    &__group-button {
+      button {
+        padding: 5px 0;
+      }
+    }
+    &__left_block {
+      padding: 17px 30px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+
+      align-items: flex-start;
+      position: relative;
+      &:before {
+        content: "";
+        position: absolute;
+        border: 16px solid transparent;
+        border-top: 16px solid #ffffff;
+        left: 50%;
+        bottom: -30px;
+        margin: auto;
+        height: 24px;
+        transform: translate(-50%, 0);
+      }
+    }
+    &__info_block {
+      position: relative;
+
+      display: flex;
+      flex-direction: row;
+      margin: 0;
+      &__logo {
+        margin-right: 35px;
+        padding: 0;
+        &__asset-stats {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+          margin-top: 0;
+        }
+        svg {
+          width: 56px;
+          height: 56px;
+        }
+
+        img.position-type-marker-alt {
+          position: absolute;
+          right: -17px;
+          top: 50%;
+          -webkit-transform: translateY(-50%);
+          transform: translateY(-50%);
+          border: 4px solid #fff;
+          border-radius: 50%;
+          width: 27px;
+        }
+      }
+    }
+
+    &__info_block__asset {
+      font-weight: bold;
+      font-size: 20px;
+      line-height: 150%;
+      text-transform: uppercase;
+      color: #282f36;
+      text-align: left;
+      margin: 0;
+    }
+
+    &__info_block__stats {
+      font-weight: 600;
+      font-size: 13px;
+      line-height: 150%;
+      color: #a2abb8;
+
+      &__info_block__stats__splitter {
+        padding: 0 0.25rem;
+        font-size: 0.5rem;
+        line-height: 3;
+      }
+    }
+
+    .trade-how-it-works-container {
+      .hiw-icon {
+        svg {
+          width: 20px;
+          height: 20px;
+        }
+      }
+      .hiw-content {
+        font-weight: 600;
+        font-size: 10px;
+        line-height: 150%;
+        color: #b9c7d6;
+      }
+    }
+
+    &__form-container {
+      float: right;
+      box-sizing: border-box;
+
+      height: 100%;
+      width: 20rem;
+
+      top: 0;
+      left: 0;
+
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+
+      &.buy {
+        padding-top: 30px;
+      }
+    }
+    &__form-values-container {
+      margin-bottom: 20px;
+    }
+
+    &__actions-container {
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-end;
+
+      margin-top: 0;
+    }
+    &__position-type-container {
+      margin-bottom: 1rem;
+    }
+
+    &__slippage-amount img {
+      width: 10px;
+      height: auto;
+      margin-left: 2px;
+    }
+
+    // &__token-message-container {
+    //   margin: 0.25rem 0 0.5rem;
+    //   padding: 0.75rem 1.375rem;
+
+    //   border-radius: 0.25rem;
+    //   background-color: #0000001a;
+    // }
+
+    // &__token-message-container--message {
+    //   font-size: 0.75rem;
+    //   font-weight: normal;
+    //   font-style: normal;
+    //   font-stretch: normal;
+    //   line-height: 1.33;
+    //   letter-spacing: normal;
+    //   text-align: left;
+    //   color: #a9b5c7;
+    // }
+
+    &__label--action {
+      cursor: pointer;
+      text-decoration: underline;
+      text-decoration-style: dotted;
+      border: 0 none;
+
+      &:focus {
+        outline: none;
+      }
+      //background-image: url("../../assets/images/dotted_line.png");
+      //background-repeat: repeat-x;
+      //background-position-y: 1.25rem;
+    }
+
+    &__value {
+      line-height: 2;
+      font-size: 0.75rem;
+      font-weight: 600;
+      font-style: normal;
+      font-stretch: normal;
+      letter-spacing: normal;
+      color: #ffe546;
+      background-color: #444e5a;
+
+      &--no-color {
+        color: #a9b5c7;
+      }
+
+      &--no-bg {
+        background-color: transparent;
+      }
+    }
+
+    .rounded-mark {
+      font-size: 0.5rem;
+      border-width: 1px;
+      border-style: solid;
+      border-radius: 100px;
+      padding: 0.0625rem 0.3125rem;
+    }
+
+    &__change-button {
+      cursor: pointer;
+      outline: none;
+      border: 0;
+      background-color: rgba(0, 0, 0, 0);
+      text-decoration: underline;
+      -webkit-text-decoration-style: dotted;
+      /* text-decoration-style: dotted; */
+      color: #ffffff;
+      font-size: 0.75rem;
+      padding-left: 0.25rem;
+    }
+
+    &__cancel-button {
+      display: inline-block;
+
+      cursor: pointer;
+      border: 0;
+      height: 2.5rem;
+      width: 6.5rem;
+      background-color: rgba(0, 0, 0, 0);
+      text-decoration: underline;
+      text-decoration-style: dotted;
+      color: #a9b5c7;
+      outline: none;
+    }
+
+    &__submit-button {
+      display: inline-block;
+
+      cursor: pointer;
+      border: 0;
+      height: 2.5rem;
+      //width: 6.5rem;
+      padding-left: 1rem;
+      padding-right: 1rem;
+      border-radius: 100px;
+      color: #ffffff;
+      text-transform: uppercase;
+      outline: none;
+
+      &--buy {
+        background-color: #407bf7;
+      }
+
+      &--sell {
+        background-color: #ff5353;
+      }
     }
   }
-
-  &--sell {
-    background-color: #ff5353;
-    &:hover {
-      background-color: #fe7272;
-    }
-  }
-}
-
-
-input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button {
-    /* display: none; <- Crashes Chrome on hover */
-    -webkit-appearance: none;
-    margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
-}
-
-input[type=number] {
-    -moz-appearance:textfield; /* Firefox */
-}
-
-.preloader-container{
-position: absolute;
-top: 50%;
-left: 20px;
-transform: translate(0%, -50%);
-width: 100%;
 }

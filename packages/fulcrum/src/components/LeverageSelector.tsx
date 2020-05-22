@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import { Asset } from "../domain/Asset";
 
+import "../styles/components/leverage-selector.scss"
+
 export interface ILeverageSelectorProps {
   asset: Asset
   value: number;

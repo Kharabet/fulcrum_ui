@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import { Asset } from "../domain/Asset";
 
+import "../styles/components/unit-of-account.scss";
+
 export interface IUnitOfAccountSelectorProps {
   items: Asset[];
   value: Asset;

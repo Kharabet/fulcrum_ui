@@ -1,3 +1,5 @@
+@import "../abstracts/variables";
+
 @media screen and (min-width: $breakpoint-mobile-min) {
   .group-tabs {
     display: flex;

@@ -51,7 +51,6 @@ export class LendChaiProcessor {
 
     let txHash: string = "";
     try {
-      FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.AskToOpenProgressDlg);
 
       // Prompting token allowance
       if (amountInBaseUnits.gt(erc20allowance)) {
@@ -84,8 +83,8 @@ export class LendChaiProcessor {
 
       await FulcrumProvider.Instance.addTokenToMetaMask(task);
     }
-    finally {
-      FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.AskToCloseProgressDlg);
+    catch(e) {
+      throw e;
     }
 
     task.processingStepNext();

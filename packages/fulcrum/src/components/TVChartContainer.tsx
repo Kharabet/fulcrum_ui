@@ -1,5 +1,4 @@
 import * as React from 'react';
-// import './index.css';
 import {
 	widget,
 	ChartingLibraryWidgetOptions,
@@ -8,6 +7,8 @@ import {
 	StudyOverrides
 } from '../charting_library/charting_library.min';
 import { PreloaderChart } from './PreloaderChart';
+
+import "../styles/components/trading-view-chart.scss";
 
 export interface ChartContainerProps {
 	symbol: ChartingLibraryWidgetOptions['symbol'];
@@ -164,7 +165,7 @@ export class TVChartContainer extends React.PureComponent<Partial<ChartContainer
 	public componentDidUpdate(prevProps: Readonly<ChartContainerProps>): void {
 		if (this.props.symbol && prevProps.symbol !== this.props.symbol)
 			this.changePair(this.props.symbol)
-		if(prevProps.theme !== this.props.theme){
+		if (prevProps.theme !== this.props.theme) {
 			this.updateWidget();
 		}
 	}

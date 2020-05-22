@@ -4,19 +4,19 @@
   background-position: center;
   background-image: url("../../assets/images/bg.png");
   height: 100%;
+  .pages-wrap {
+    justify-content: space-between;
+    height: 100%;
+    max-width: $page-max-width;
+    padding: $page-padding;
+    .footer {
+      margin-top: 0;
+    }
+  }
 }
 
+
 .landing-page {
-  display: flex;
-  flex-direction: column;
-  align-content: center;
-  justify-content: space-between;
-
-  height: 100%;
-  width: 100%;
-  max-width: $page-max-width;
-  padding: $page-padding;
-
   .landing-page__main {
     .landing-page__jumbo {
       display: inline-block;
@@ -111,9 +111,5 @@
         }
       }
     }
-  }
-
-  .footer {
-    margin-top: 0;
   }
 }

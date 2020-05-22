@@ -1,33 +1,30 @@
 import React, { PureComponent, Component } from "react";
 import Modal from "react-modal";
-import { ManageCollateralForm } from "../components/ManageCollateralForm";
-import { ManageTokenGrid } from "../components/ManageTokenGrid";
-import { TokenAddressForm } from "../components/TokenAddressForm";
-import { TradeForm } from "../components/TradeForm";
-import { TradeTokenGrid } from "../components/TradeTokenGrid";
 
 import { Asset } from "../domain/Asset";
-import { IPriceDataPoint } from "../domain/IPriceDataPoint";
 import { ManageCollateralRequest } from "../domain/ManageCollateralRequest";
 import { PositionType } from "../domain/PositionType";
 import { TradeRequest } from "../domain/TradeRequest";
 import { TradeTokenKey } from "../domain/TradeTokenKey";
 import { TradeType } from "../domain/TradeType";
-import { Footer } from "../layout/Footer";
-import { HeaderOps } from "../layout/HeaderOps";
 import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
 
+import { InfoBlock } from "../components/InfoBlock";
+import { TradeTokenGrid } from "../components/TradeTokenGrid";
+import { TVChartContainer } from '../components/TVChartContainer';
 import { TokenGridTabs } from "../components/TokenGridTabs";
 
-
-import { TVChartContainer } from '../components/TVChartContainer';
-import { InfoBlock } from "../components/InfoBlock";
 import { ITradeTokenGridRowProps } from "../components/TradeTokenGridRow";
 import { IOwnTokenGridRowProps } from "../components/OwnTokenGridRow";
 
+import "../styles/pages/_trade-page.scss";
 
+const ManageTokenGrid = React.lazy(() => import('../components/ManageTokenGrid'));
+const TokenAddressForm = React.lazy(() => import('../components/TokenAddressForm'));
+const TradeForm = React.lazy(() => import('../components/TradeForm'));
+const ManageCollateralForm = React.lazy(() => import('../components/ManageCollateralForm'));
 
 export interface ITradePageProps {
   doNetworkConnect: () => void;
@@ -64,7 +61,7 @@ interface ITradePageState {
   ownRowsData: IOwnTokenGridRowProps[];
 }
 
-export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
+export default class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
   constructor(props: any) {
     super(props);
     this.state = {
@@ -107,7 +104,6 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
     } else {
       assets = [
         Asset.ETH,
-        // Asset.SAI,
         // Asset.DAI,
         // Asset.USDC,
         // Asset.SUSD,
@@ -130,6 +126,7 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
   }
 
   public componentWillMount() {
+
     const tokenRowsData = this.getTokenRowsData(this.state);
     this.setState({ ...this.state, tokenRowsData: tokenRowsData });
   }
@@ -148,6 +145,7 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
     }
   }
 
+
   private async derivedUpdate() {
     const tokenRowsData = this.getTokenRowsData(this.state);
     const ownRowsData = await this.getOwnRowsData(this.state);
@@ -157,7 +155,6 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
   public render() {
     return (
       <div className="trade-page">
-        <HeaderOps isMobileMedia={this.props.isMobileMedia} isLoading={this.props.isLoading} doNetworkConnect={this.props.doNetworkConnect} isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
         <main>
           <InfoBlock localstorageItemProp="defi-risk-notice" onAccept={() => { this.forceUpdate() }}>
             For your safety, please ensure the URL in your browser starts with: https://app.fulcrum.trade/. <br />
@@ -224,6 +221,7 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
               onCancel={this.onTradeRequestClose}
               onTrade={this.onTradeRequested}
               version={this.state.tradeVersion}
+              isOpenModal={this.state.isTradeModalOpen}
             />
           </Modal>
           <Modal
@@ -263,11 +261,11 @@ export class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
               onCancel={this.onManageCollateralRequestClose}
               onManage={this.onManageCollateralRequested}
               version={this.state.tradeVersion}
+              isOpenModal={this.state.isManageCollateralModalOpen}
 
             />
           </Modal>
         </main>
-        <Footer isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
       </div>
     );
   }

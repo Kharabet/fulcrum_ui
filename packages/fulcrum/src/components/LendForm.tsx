@@ -12,13 +12,16 @@ import { LendType } from "../domain/LendType";
 import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
-import { DaiOrChaiSelector } from "./DaiOrChaiSelector";
+//import { DaiOrChaiSelector } from "./DaiOrChaiSelector";
 // import configProviders from "./../config/providers.json";
-import { EthOrWethSelector } from "./EthOrWethSelector";
+//import { EthOrWethSelector } from "./EthOrWethSelector";
 
 import { ReactComponent as CloseIcon } from "../assets/images/ic__close.svg"
 import { AssetDropdown } from "./AssetDropdown";
 import { Preloader } from "./Preloader";
+
+import "../styles/components/lend-form.scss"
+
 
 // TagManager.initialize({
 //   gtmId: configProviders.Google_TrackingID,
@@ -44,6 +47,7 @@ export interface ILendFormProps {
   onSubmit: (request: LendRequest) => void;
   onCancel: () => void;
   isMobileMedia: boolean;
+  isModalOpen: boolean;
 }
 
 interface ILendFormState {
@@ -69,7 +73,7 @@ interface ILendFormState {
   infoMessage: string;
 }
 
-export class LendForm extends Component<ILendFormProps, ILendFormState> {
+export default class LendForm extends Component<ILendFormProps, ILendFormState> {
   private readonly _inputPrecision = 6;
   private _input: HTMLInputElement | null = null;
 
@@ -213,7 +217,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
   public componentWillUnmount(): void {
     this._isMounted = false;
 
-    window.history.back();
+    window.history.pushState(null, "Lend Modal Closed", `/lend`);
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
@@ -221,7 +225,8 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
     this._isMounted = true;
 
     await this.derivedUpdate();
-    window.history.pushState(null, "Lend Modal Opened", `/lend/${this.props.lendType.toLocaleLowerCase()}-${this.props.asset}/`);
+    if (this.props.isModalOpen)
+      window.history.pushState(null, "Lend Modal Opened", `/lend/${this.props.lendType.toLocaleLowerCase()}-${this.props.asset}/`);
 
     if (this._input) {
       // this._input.select();
@@ -264,7 +269,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
         ? "Insufficient funds for gas"
         : this.state.maxLendAmount && this.state.maxLendAmount.eq(0)
           ? "Your wallet is empty"
-          : this.state.infoMessage ?  this.state.infoMessage : "";
+          : this.state.infoMessage ? this.state.infoMessage : "";
 
     const lendedAmountEstimateText =
       !this.state.lendedAmountEstimate || this.state.lendedAmountEstimate.eq(0)
@@ -281,7 +286,8 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
         <div className="lend-form__image">
           {this.state.iTokenAddress &&
             FulcrumProvider.Instance.web3ProviderSettings &&
-            FulcrumProvider.Instance.web3ProviderSettings.etherscanURL ? (
+            FulcrumProvider.Instance.web3ProviderSettings.etherscanURL
+            ? (
               <a
                 className="lend-form__info_block"
                 title={this.state.iTokenAddress}
@@ -290,9 +296,13 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
                 rel="noopener noreferrer"
               >
                 {this.state.assetDetails.reactLogoSvg.render()}
-              </a>) :
+              </a>)
+            : this.state.assetDetails.reactLogoSvg.render()
 
-            this.state.assetDetails.reactLogoSvg.render()
+          }
+          {(this.props.asset === Asset.ETH)
+            ? <span className="lend-form__notification">This pool is currently paying above the standard market rate as it can lack sufficient liquidity to facilitate timely withdrawals. Please understand this risk before proceeding.</span>
+            : null
           }
         </div>
         <div className="lend-form__form-container">
@@ -323,7 +333,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
                 onChange={this.onLendAmountChange}
               />
               {!this.state.isLoading ? null
-                : <div className="preloader-container"> <Preloader width="80px"/></div>
+                : <div className="preloader-container"> <Preloader width="80px" /></div>
               }
 
               {
@@ -341,8 +351,8 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
                     assets={[Asset.DAI, Asset.CHAI]} />
                 ) : (
                       <AssetDropdown
-                    selectedAsset={this.props.asset}
-                    assets={[this.props.asset]} />
+                        selectedAsset={this.props.asset}
+                        assets={[this.props.asset]} />
                     )
               }
             </div>

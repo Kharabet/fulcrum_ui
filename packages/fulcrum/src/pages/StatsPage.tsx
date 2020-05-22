@@ -1,15 +1,12 @@
-import React, { PureComponent } from "react";
+import React, { Component } from "react";
 import { StatsTokenGrid } from "../components/StatsTokenGrid";
-import { Footer } from "../layout/Footer";
-import { HeaderOps } from "../layout/HeaderOps";
 import { InfoBlock } from "../components/InfoBlock";
-// import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
-// import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
-// import { FulcrumProvider } from "../services/FulcrumProvider";
+
+import "../styles/pages/_stats-page.scss"
 
 export interface IStatsPageProps {
   doNetworkConnect: () => void;
-  isRiskDisclosureModalOpen: ()  => void;
+  isRiskDisclosureModalOpen: () => void;
   isLoading: boolean;
   isMobileMedia: boolean;
 }
@@ -17,23 +14,14 @@ export interface IStatsPageProps {
 interface IStatsPageState {
 }
 
-export class StatsPage extends PureComponent<IStatsPageProps, IStatsPageState> {
+export default class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
   constructor(props: any) {
     super(props);
-
-    // FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
   }
-
-  /*public componentDidMount(): void {
-    if (!FulcrumProvider.Instance.web3Wrapper) {
-      this.props.doNetworkConnect();
-    }
-  }*/
 
   public render() {
     return (
       <div className="stats-page">
-        <HeaderOps isMobileMedia={this.props.isMobileMedia} isLoading={this.props.isLoading} doNetworkConnect={this.props.doNetworkConnect} isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
         <main>
           <InfoBlock localstorageItemProp="defi-risk-notice">
             For your safety, please ensure the URL in your browser starts with: https://app.fulcrum.trade/. <br />
@@ -43,7 +31,6 @@ export class StatsPage extends PureComponent<IStatsPageProps, IStatsPageState> {
           </InfoBlock>
           <StatsTokenGrid isMobileMedia={this.props.isMobileMedia} />
         </main>
-        <Footer isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
       </div>
     );
   }

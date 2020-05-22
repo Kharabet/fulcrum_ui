@@ -1,4 +1,6 @@
 import React, { Component } from "react";
+import "../styles/components/collapsible-container.scss";
+
 
 export interface ICollapsibleContainerProps {
   titleOpen: string;
@@ -35,13 +37,13 @@ export class CollapsibleContainer extends Component<ICollapsibleContainerProps, 
   }
 
   private onCheckedChange = () => {
-    this.setState({...this.state, isOpen: !this.state.isOpen});
+    this.setState({ ...this.state, isOpen: !this.state.isOpen });
   };
 
   // https://gist.github.com/jed/982883
   private uuidv4 = () => {
     // @ts-ignore
-    return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+    return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
       // tslint:disable-next-line:no-bitwise
       (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
     )

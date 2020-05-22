@@ -42,6 +42,7 @@ export class RefinanceDydxProcessor {
           ],
           { from: account }
         );
+        task.setTxHash(txHash);
       } catch (e) {
         console.log(e)
         throw e;
@@ -98,6 +99,7 @@ export class RefinanceDydxProcessor {
         borrowAmounts,
         { from: account }
       );
+      task.setTxHash(txHash);
     } catch (e) {
       console.log(e)
       throw e;

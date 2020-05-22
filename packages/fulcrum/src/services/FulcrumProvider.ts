@@ -2,13 +2,9 @@ import { Web3ProviderEngine } from "@0x/subproviders";
 import { BigNumber } from "@0x/utils";
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { EventEmitter } from "events";
-import Web3Utils from "web3-utils";
-import moment from "moment";
-import fetch from "node-fetch";
-import request from "request-promise";
+// import Web3Utils from "web3-utils";
 import { Asset } from "../domain/Asset";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
-import { FulcrumMcdBridgeRequest } from "../domain/FulcrumMcdBridgeRequest";
 import { IPriceDataPoint } from "../domain/IPriceDataPoint";
 import { IWeb3ProviderSettings } from "../domain/IWeb3ProviderSettings";
 import { LendRequest } from "../domain/LendRequest";
@@ -33,17 +29,6 @@ import { TasksQueue } from "./TasksQueue";
 
 import TagManager from "react-gtm-module";
 import configProviders from "../config/providers.json";
-import { FulcrumMcdBridgeProcessor } from "./processors/FulcrumMcdBridgeProcessor";
-import { LendChaiProcessor } from "./processors/LendChaiProcessor";
-import { LendErcProcessor } from "./processors/LendErcProcessor";
-import { LendEthProcessor } from "./processors/LendEthProcessor";
-import { TradeBuyErcProcessor } from "./processors/TradeBuyErcProcessor";
-import { TradeBuyEthProcessor } from "./processors/TradeBuyEthProcessor";
-import { TradeSellErcProcessor } from "./processors/TradeSellErcProcessor";
-import { TradeSellEthProcessor } from "./processors/TradeSellEthProcessor";
-import { UnlendChaiProcessor } from "./processors/UnlendChaiProcessor";
-import { UnlendErcProcessor } from "./processors/UnlendErcProcessor";
-import { UnlendEthProcessor } from "./processors/UnlendEthProcessor";
 
 import { AbstractConnector } from '@web3-react/abstract-connector';
 
@@ -112,7 +97,7 @@ export class FulcrumProvider {
 
     const storedProvider: any = FulcrumProvider.getLocalstorageItem('providerType');
     const providerType: ProviderType | null = storedProvider as ProviderType || null;
-    
+
     this.web3ProviderSettings = FulcrumProvider.getWeb3ProviderSettings(initialNetworkId);
     if (!providerType || providerType === ProviderType.None) {
       // setting up readonly provider
@@ -256,12 +241,6 @@ export class FulcrumProvider {
       await this.contractsSource.Init();
     }
   }
-
-  public onFulcrumMcdBridgeConfirmed = async (request: FulcrumMcdBridgeRequest) => {
-    if (request) {
-      TasksQueue.Instance.enqueue(new RequestTask(request));
-    }
-  };
 
   public onLendConfirmed = async (request: LendRequest) => {
     if (request) {
@@ -425,7 +404,7 @@ export class FulcrumProvider {
 
   public getPriceDefaultDataPoint = (): IPriceDataPoint => {
     return {
-      timeStamp: moment().unix(),
+      timeStamp: Math.round((new Date()).getTime() / 1000),
       price: 0,
       liquidationPrice: 0,
       change24h: 0
@@ -758,26 +737,6 @@ export class FulcrumProvider {
   };
 
 
-  public getMaxMCDBridgeValue = async (request: FulcrumMcdBridgeRequest): Promise<BigNumber> => {
-    let result = new BigNumber(0);
-
-    if (this.contractsSource) {
-      const assetContract = await this.contractsSource.getITokenContract(request.asset);
-      if (assetContract) {
-        const balanceOfUser = await this.getITokenBalanceOfUser(request.asset);
-        const marketLiquidity = await assetContract.marketLiquidity.callAsync();
-
-        result = marketLiquidity.lt(balanceOfUser) ?
-          marketLiquidity :
-          balanceOfUser;
-      }
-    }
-
-    result = result.dividedBy(10 ** 18);
-
-    return result;
-  };
-
   public getMaxLendValue = async (request: LendRequest): Promise<[BigNumber, BigNumber, BigNumber, BigNumber, string]> => {
     let maxLendAmount = new BigNumber(0);
     let maxTokenAmount = new BigNumber(0);
@@ -815,7 +774,7 @@ export class FulcrumProvider {
             maxLendAmount = freeSupply;
             maxTokenAmount = maxTokenAmount.multipliedBy(freeSupply).dividedBy(userBalance);
             if (request.lendType === LendType.UNLEND)
-              infoMessage = "Insufficient liquidity for unlend. PLease try again later.";
+              infoMessage = "Insufficient liquidity for unlend. Please try again later.";
           } else {
             maxLendAmount = userBalance;
           }
@@ -908,42 +867,6 @@ export class FulcrumProvider {
 
     return result;
   };
-
-  public getMCDBridgeAmountEstimate = async (request: FulcrumMcdBridgeRequest): Promise<BigNumber> => {
-    let result = new BigNumber(0);
-
-    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
-    if (account && this.contractsSource) {
-      const bridgeContract = await this.contractsSource.getFulcrumMcdBridgeContract();
-      if (bridgeContract) {
-        try {
-          if (request.isSAIUpgrade()) {
-            result = await bridgeContract.bridgeISaiToIDai.callAsync(
-              new BigNumber(request.amount.times(10 ** 18).toFixed(0)),
-              {
-                from: account,
-                gas: "5000000",
-                gasPrice: new BigNumber(0)
-              }
-            );
-          } else {
-            result = await bridgeContract.bridgeIDaiToISai.callAsync(
-              new BigNumber(request.amount.times(10 ** 18).toFixed(0)),
-              {
-                from: account,
-                gas: "5000000",
-                gasPrice: new BigNumber(0)
-              }
-            );
-          }
-        } catch (e) {
-          // console.log(e);
-        }
-      }
-    }
-
-    return result.dividedBy(10 ** 18);
-  }
 
   public getLendedAmountEstimate = async (request: LendRequest): Promise<BigNumber> => {
     let result = new BigNumber(0);
@@ -1618,10 +1541,6 @@ export class FulcrumProvider {
       await this.processLendRequestTask(task, skipGas);
     }
 
-    if (task.request instanceof FulcrumMcdBridgeRequest) {
-      await this.processFulcrumMcdBridgeRequestTask(task, skipGas);
-    }
-
     if (task.request instanceof TradeRequest) {
       await this.processTradeRequestTask(task, skipGas);
     }
@@ -1660,17 +1579,19 @@ if (err || 'error' in added) {
 console.log(err, added);
 }
 }*//*);
-                                          }
-                                        }
-                                        }
-                                        } catch(e) {
-                                        // console.log(e);
-                                        }
-                                        }*/
+                                              }
+                                            }
+                                            }
+                                            } catch(e) {
+                                            // console.log(e);
+                                            }
+                                            }*/
   }
 
   private processLendRequestTask = async (task: RequestTask, skipGas: boolean) => {
     try {
+      
+      this.eventEmitter.emit(FulcrumProviderEvents.AskToOpenProgressDlg, task.request.id);
       if (!(this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite)) {
         throw new Error("No provider available!");
       }
@@ -1686,23 +1607,29 @@ console.log(err, added);
         await this.addTokenToMetaMask(task);
 
         if (taskRequest.asset === Asset.ETH) {
+          const {LendEthProcessor} = await import("./processors/LendEthProcessor");
           const processor = new LendEthProcessor();
           await processor.run(task, account, skipGas);
         } else if (taskRequest.asset === Asset.CHAI) {
+          const {LendChaiProcessor} = await import("./processors/LendChaiProcessor");
           const processor = new LendChaiProcessor();
           await processor.run(task, account, skipGas);
         } else {
+          const {LendErcProcessor} = await import("./processors/LendErcProcessor");
           const processor = new LendErcProcessor();
           await processor.run(task, account, skipGas);
         }
       } else {
         if (taskRequest.asset === Asset.ETH) {
+          const {UnlendEthProcessor} = await import("./processors/UnlendEthProcessor");
           const processor = new UnlendEthProcessor();
           await processor.run(task, account, skipGas);
         } else if (taskRequest.asset === Asset.CHAI) {
+          const {UnlendChaiProcessor} = await import("./processors/UnlendChaiProcessor");
           const processor = new UnlendChaiProcessor();
           await processor.run(task, account, skipGas);
         } else {
+          const {UnlendErcProcessor} = await import("./processors/UnlendErcProcessor");
           const processor = new UnlendErcProcessor();
           await processor.run(task, account, skipGas);
         }
@@ -1716,29 +1643,8 @@ console.log(err, added);
       }
       task.processingEnd(false, false, e);
     }
-  };
-
-  private processFulcrumMcdBridgeRequestTask = async (task: RequestTask, skipGas: boolean) => {
-    try {
-      if (!(this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite)) {
-        throw new Error("No provider available!");
-      }
-
-      const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
-      if (!account) {
-        throw new Error("Unable to get wallet address!");
-      }
-
-      // Initializing conversion
-      const processor = new FulcrumMcdBridgeProcessor();
-      await processor.run(task, account, skipGas);
-      task.processingEnd(true, false, null);
-    } catch (e) {
-      if (!e.message.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)) {
-        // tslint:disable-next-line:no-console
-        console.log(e);
-      }
-      task.processingEnd(false, false, e);
+    finally {
+      this.eventEmitter.emit(FulcrumProviderEvents.AskToCloseProgressDlg, task);
     }
   };
 
@@ -1764,6 +1670,8 @@ console.log(err, added);
       let srcTokenAddress = ""
       let destTokenAddress = "";
 
+      srcTokenAddress = this.getErc20AddressOfAsset(taskRequest.unitOfAccount)!;
+      destTokenAddress = this.getErc20AddressOfAsset(taskRequest.asset)!;
       if (taskRequest.version === 2) {
         if (siteConfig.ZeroXAPIEnabledForBuys && taskRequest.tradeType === TradeType.BUY) {
           taskAmount = taskRequest.amount;
@@ -1874,9 +1782,8 @@ console.log(err, added);
             throw new Error("0x api not supported on this network");
           }
 
-
-          const responseString = await request("https://" + urlPrefix + "api.0x.org/swap/v0/quote?sellToken=" + srcTokenAddress + "&buyToken=" + destTokenAddress + "&" + zeroXTargetType + "=" + zeroXTargetAmountInBaseUnits.toString());
-          const response = JSON.parse(responseString);
+          const responseString = await fetch("https://" + urlPrefix + "api.0x.org/swap/v0/quote?sellToken=" + srcTokenAddress + "&buyToken=" + destTokenAddress + "&" + zeroXTargetType + "=" + zeroXTargetAmountInBaseUnits.toString());
+          const response = await responseString.json();
           if (!response.protocolFee || !response.data) {
             throw new Error(JSON.stringify(response));
           }
@@ -1893,7 +1800,7 @@ console.log(err, added);
             console.log(`swapRate`, SwapRate0x);*/
 
             taskRequest.zeroXFee = new BigNumber(response.protocolFee);
-
+            const Web3Utils = await import("web3-utils");
             taskRequest.loanDataBytes = response.data +
               //Web3Utils.padLeft(Web3Utils.numberToHex(SwapRate0x).substr(2), 64) +  
               Web3Utils.padLeft(Web3Utils.numberToHex(response.protocolFee).substr(2), 64) +
@@ -1918,22 +1825,27 @@ console.log(err, added);
 
       if (taskRequest.tradeType === TradeType.BUY) {
         if (taskRequest.collateral !== Asset.ETH) {
+          const {TradeBuyErcProcessor} = await import("./processors/TradeBuyErcProcessor");
           const processor = new TradeBuyErcProcessor();
           await processor.run(task, account, skipGas);
         } else {
           let processor;
           if (taskRequest.loanDataBytes && taskRequest.zeroXFee) {
+            const {TradeBuyErcProcessor} = await import("./processors/TradeBuyErcProcessor");
             processor = new TradeBuyErcProcessor();
           } else {
+            const {TradeBuyEthProcessor} = await import("./processors/TradeBuyEthProcessor");
             processor = new TradeBuyEthProcessor();
           }
           await processor.run(task, account, skipGas);
         }
       } else {
         if (taskRequest.collateral !== Asset.ETH) {
+          const {TradeSellErcProcessor} = await import("./processors/TradeSellErcProcessor");
           const processor = new TradeSellErcProcessor();
           await processor.run(task, account, skipGas);
         } else {
+          const {TradeSellEthProcessor} = await import("./processors/TradeSellEthProcessor");
           const processor = new TradeSellEthProcessor();
           await processor.run(task, account, skipGas);
         }
@@ -1951,7 +1863,7 @@ console.log(err, added);
 
   public waitForTransactionMined = async (
     txHash: string,
-    request: LendRequest | TradeRequest | FulcrumMcdBridgeRequest): Promise<any> => {
+    request: LendRequest | TradeRequest): Promise<any> => {
 
     return new Promise((resolve, reject) => {
       try {
@@ -1969,7 +1881,7 @@ console.log(err, added);
   private waitForTransactionMinedRecursive = async (
     txHash: string,
     web3Wrapper: Web3Wrapper,
-    request: LendRequest | TradeRequest | FulcrumMcdBridgeRequest,
+    request: LendRequest | TradeRequest,
     resolve: (value: any) => void,
     reject: (value: any) => void) => {
 
@@ -1990,23 +1902,6 @@ console.log(err, added);
             }
           }
           TagManager.dataLayer(tagManagerArgs)
-          this.eventEmitter.emit(
-            FulcrumProviderEvents.LendTransactionMined,
-            new LendTransactionMinedEvent(request.asset, txHash)
-          );
-        } else if (request instanceof FulcrumMcdBridgeRequest) {
-          const randomNumber = Math.floor(Math.random() * 100000) + 1;
-          const tagManagerArgs = {
-            dataLayer: {
-              transactionId: randomNumber,
-              transactionProducts: [{
-                name: "Transaction-FulcrumMcdBridge-" + request.asset,
-                sku: request.asset,
-                category: 'FulcrumMcdBridge'
-              }],
-            }
-          }
-          TagManager.dataLayer(tagManagerArgs);
           this.eventEmitter.emit(
             FulcrumProviderEvents.LendTransactionMined,
             new LendTransactionMinedEvent(request.asset, txHash)

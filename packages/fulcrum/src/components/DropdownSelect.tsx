@@ -1,4 +1,7 @@
 import React, { useEffect } from 'react';
+
+import "../styles/components/dropdown-select.scss"
+
 export interface IDropDownSelectOption {
   value: string;
   displayName: string;
@@ -7,7 +10,7 @@ export interface IDropDownSelectOption {
 export interface IDropdownSelectProps {
   options: IDropDownSelectOption[];
   selectedOption: IDropDownSelectOption;
-  onDropdownSelect: (value: string) =>  void;
+  onDropdownSelect: (value: string) => void;
 }
 
 export const DropdownSelect = (props: IDropdownSelectProps) => {
@@ -31,7 +34,7 @@ export const DropdownSelect = (props: IDropdownSelectProps) => {
     const ul = document.querySelector("ul.select-options") as HTMLElement;
     const selectStyled = document.querySelector(".styled-select") as HTMLElement;
     const target = e.target as HTMLElement;
-    if (target  == selectStyled) return;
+    if (target == selectStyled) return;
     selectStyled.classList.remove('active');
 
     ul.style.display = 'none';

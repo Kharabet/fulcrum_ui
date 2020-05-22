@@ -36,6 +36,7 @@ export class RefinanceCompoundProcessor {
             { from: account }
           );
           promises.push(TorqueProvider.Instance.waitForTransactionMined(txHash));
+          task.setTxHash(txHash);
         } catch (e) {
           if (!e.code) {
             alert("approve for " + token.asset + " failed: " + e.message);
@@ -91,6 +92,7 @@ export class RefinanceCompoundProcessor {
           gas: skipGas ? TorqueProvider.Instance.gasLimit : undefined
         }
       );
+      task.setTxHash(txHash);
     } catch (e) {
       console.log(e)
       throw e;
