@@ -124,7 +124,7 @@ export class LendTokenSelectorTransacrionStep extends Component<ILendTokenSelect
       ...this.state,
       requestTask: task
     });
-    }, 1000)
+    }, 500)
 
   };
 }
