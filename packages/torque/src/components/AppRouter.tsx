@@ -199,7 +199,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
   }
 
   public onProviderTypeSelect = async (connector: AbstractConnector, account?: string) => {
-    if (!this.state.isLoading) {
+    if (!this.state.isLoading && account) {
       TorqueProvider.Instance.isLoading = true;
 
       await TorqueProvider.Instance.eventEmitter.emit(TorqueProviderEvents.ProviderIsChanging);
