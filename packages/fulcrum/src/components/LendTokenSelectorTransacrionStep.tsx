@@ -22,28 +22,60 @@ export class LendTokenSelectorTransacrionStep extends Component<ILendTokenSelect
 
     TasksQueue.Instance.on(TasksQueueEvents.QueueChanged, this.onTasksQueueChanged);
     TasksQueue.Instance.on(TasksQueueEvents.TaskChanged, this.onTasksQueueChanged);
+    this.stepDiv = React.createRef();
+    this._isMounted = false;
+  }
+
+  private _isMounted: boolean;
+
+  private stepDiv: React.RefObject<HTMLDivElement>;
+
+  public componentDidMount(): void {
+    this._isMounted = true;
+
+    const div = this.stepDiv.current;
+    if (!div) return;
+    div.classList.remove("animation-in");
+    div.classList.add("animation-in");
+  }
+
+  public componentDidUpdate(prevProps: Readonly<ILendTokenSelectorTransacrionStepProps>, prevState: Readonly<ILendTokenSelectorTransacrionStepState>): void {
+    const div = this.stepDiv.current;
+    if (!div) return;
+    if (prevState.requestTask && this.state.requestTask && this.getTitle(prevState.requestTask) === this.getTitle(this.state.requestTask)) return;
+    div.classList.remove("animation-out");
+    div.classList.remove("animation-in");
+    div.classList.add("animation-in");
   }
 
   public componentWillUnmount(): void {
+    this._isMounted = false;
+
+    const div = this.stepDiv.current;
+    if (div) {
+      div.classList.remove("animation-out");
+      div.classList.add("animation-out");
+    }
+
     TasksQueue.Instance.off(TasksQueueEvents.QueueChanged, this.onTasksQueueChanged);
     TasksQueue.Instance.off(TasksQueueEvents.TaskChanged, this.onTasksQueueChanged);
     if (this.state.requestTask)
       FulcrumProvider.Instance.onTaskCancel(this.state.requestTask);
   }
 
-  public getTitle = () => {
-    if (this.state.requestTask === undefined) return null;
-    let title = this.state.requestTask.steps.find((s, i) => i + 1 === this.state.requestTask!.stepCurrent)
+  public getTitle = (requestTask: RequestTask) => {
+    if (requestTask === undefined) return null;
+    let title = requestTask.steps.find((s, i) => i + 1 === requestTask!.stepCurrent)
     if (!title)
-      title = this.state.requestTask.status;
+      title = requestTask.status;
 
 
     let errorMsg = "";
-    if (this.state.requestTask.error) {
-      if (this.state.requestTask.error.message) {
-        errorMsg = this.state.requestTask.error.message;
-      } else if (typeof this.state.requestTask.error === "string") {
-        errorMsg = this.state.requestTask.error;
+    if (requestTask.error) {
+      if (requestTask.error.message) {
+        errorMsg = requestTask.error.message;
+      } else if (typeof requestTask.error === "string") {
+        errorMsg = requestTask.error;
       }
 
       if (errorMsg) {
@@ -59,7 +91,7 @@ export class LendTokenSelectorTransacrionStep extends Component<ILendTokenSelect
         } else if (errorMsg.includes("Transaction rejected")) {
           errorMsg = "You didn't confirm in Gnosis Safe. Please try again.";
         } else {
-          errorMsg = this.state.requestTask.status;
+          errorMsg = requestTask.status;
         }
       }
     }
@@ -70,20 +102,29 @@ export class LendTokenSelectorTransacrionStep extends Component<ILendTokenSelect
   }
 
   public render() {
-    const title = this.getTitle();
-    if (this.state.requestTask === undefined || !title) return null;
+    if (this.state.requestTask === undefined) return null;
 
-    console.log(this.state.requestTask);
-    return <div className={`lend-transaction-step ${title.isWarning ? "warning" : ""}`}>
+    const title = this.getTitle(this.state.requestTask);
+    if (!title) return null;
+    return <div ref={this.stepDiv} className={`lend-transaction-step ${title.isWarning ? "warning" : ""}`}>
       {title.message}
-      </div>
+    </div>
   }
 
-  public onTasksQueueChanged = () => {
-    const tasks = TasksQueue.Instance.getTasksList().find(t => t.request.id === this.props.taskId);
-    this.setState({
+  public onTasksQueueChanged = async () => {
+    const task = TasksQueue.Instance.getTasksList().find(t => t.request.id === this.props.taskId);
+    const div = this.stepDiv.current;
+    if (div && task && this.state.requestTask && this.getTitle(task) !== this.getTitle(this.state.requestTask)) {
+      div.classList.remove("animation-in");
+      div.classList.remove("animation-out");
+      div.classList.add("animation-out");
+    }
+    window.setTimeout(async () => {
+    await this._isMounted && this.setState({
       ...this.state,
-      requestTask: tasks
+      requestTask: task
     });
+    }, 1000)
+
   };
 }

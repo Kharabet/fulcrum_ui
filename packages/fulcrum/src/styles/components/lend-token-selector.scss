@@ -32,6 +32,37 @@
         line-height: 140%;
 
         color: #00c0ab;
+        text-align: center;
+        &.warning{
+          color: #FF4F4F;
+        }
+        @keyframes in {
+          0% {
+            opacity: 0;
+            transform: translate(0, -50px);
+          }
+          to {
+            opacity: 1;
+            transform: translate(0px, 0px);
+          }
+        }
+        @keyframes out {
+          0% {
+            opacity: 1;
+            transform: translate(0, 0);
+          }
+          to {
+            opacity: 0;
+            transform: translate(0px, 50px);
+          }
+        }
+
+        &.animation-in{
+          animation: in 2s ease-in;
+        }
+        &.animation-out{
+          animation: out 2s ease-in;
+        }
       }
     }
     @media screen and (min-width: $breakpoint-desktop-min) {

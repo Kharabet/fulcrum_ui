@@ -176,8 +176,8 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
         </div>
 
         {this.state.isLoadingTransaction && this.state.request
-          ? <LendTokenSelectorTransacrionStep taskId={this.state.request.id}/>
-        : <React.Fragment>
+          ? <LendTokenSelectorTransacrionStep taskId={this.state.request.id} />
+          : <React.Fragment>
             <div className="token-selector-item__descriptions" style={{ marginTop: this.state.profit === null ? `1.5rem` : undefined }}>
               <div className="token-selector-item__description">
                 {this.state.iTokenAddress &&
@@ -273,13 +273,13 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
 
   public onLendClick = async () => {
     const request = new LendRequest(LendType.LEND, this.props.asset, new BigNumber(0));
-    await this.setState({...this.state, request: request});
+    await this.setState({ ...this.state, request: request });
     this.props.onLend(request);
   };
 
   public onUnLendClick = async () => {
     const request = new LendRequest(LendType.UNLEND, this.props.asset, new BigNumber(0));
-    await this.setState({...this.state, request: request});
+    await this.setState({ ...this.state, request: request });
     this.props.onLend(request);
   };
 }
