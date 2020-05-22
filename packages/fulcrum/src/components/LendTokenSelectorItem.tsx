@@ -15,7 +15,7 @@ import { Preloader } from "./Preloader";
 import { CircleLoader } from "./CircleLoader";
 import { RequestTask } from "../domain/RequestTask";
 import { RequestStatus } from "../domain/RequestStatus";
-import { LendTokenSelectorTransacrionStep } from "./LendTokenSelectorTransacrionStep";
+import { LendTxLoaderStep } from "./LendTxLoaderStep";
 
 
 
@@ -176,7 +176,7 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
         </div>
 
         {this.state.isLoadingTransaction && this.state.request
-          ? <LendTokenSelectorTransacrionStep taskId={this.state.request.id} />
+          ? <LendTxLoaderStep taskId={this.state.request.id} />
           : <React.Fragment>
             <div className="token-selector-item__descriptions" style={{ marginTop: this.state.profit === null ? `1.5rem` : undefined }}>
               <div className="token-selector-item__description">

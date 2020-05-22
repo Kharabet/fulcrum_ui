@@ -4,16 +4,16 @@ import { TasksQueueEvents } from "../services/events/TasksQueueEvents";
 import { TasksQueue } from "../services/TasksQueue";
 import { FulcrumProvider } from "../services/FulcrumProvider";
 
-export interface ILendTokenSelectorTransacrionStepProps {
+export interface ILendTxLoaderStepProps {
   taskId: number;
 }
 
-export interface ILendTokenSelectorTransacrionStepState {
+export interface ILendTxLoaderStepState {
   requestTask: RequestTask | undefined;
 }
 
-export class LendTokenSelectorTransacrionStep extends Component<ILendTokenSelectorTransacrionStepProps, ILendTokenSelectorTransacrionStepState> {
-  constructor(props: ILendTokenSelectorTransacrionStepProps) {
+export class LendTxLoaderStep extends Component<ILendTxLoaderStepProps, ILendTxLoaderStepState> {
+  constructor(props: ILendTxLoaderStepProps) {
     super(props);
 
     this.state = {
@@ -39,7 +39,7 @@ export class LendTokenSelectorTransacrionStep extends Component<ILendTokenSelect
     div.classList.add("animation-in");
   }
 
-  public componentDidUpdate(prevProps: Readonly<ILendTokenSelectorTransacrionStepProps>, prevState: Readonly<ILendTokenSelectorTransacrionStepState>): void {
+  public componentDidUpdate(prevProps: Readonly<ILendTxLoaderStepProps>, prevState: Readonly<ILendTxLoaderStepState>): void {
     const div = this.stepDiv.current;
     if (!div) return;
     if (prevState.requestTask && this.state.requestTask && this.getTitle(prevState.requestTask) === this.getTitle(this.state.requestTask)) return;
