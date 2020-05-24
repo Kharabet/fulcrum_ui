@@ -1,29 +1,7 @@
-.lend-page {
-  display: flex;
-  flex-direction: column;
-  align-content: center;
-  justify-content: flex-start;
-  width: $container-desktop;
-  box-sizing: border-box;
-}
-@media screen and (max-width: $breakpoint-desktop-max) {
-  .lend-page {
-    width: $container-laptop;
-  }
-}
-@media screen and (min-width: $breakpoint-laptop-min) {
-  .lend-page {
-    .lend-page-main {
-      // margin-top: 45px;
-    }
-  }
-}
+@import "../abstracts/variables";
+
 @media screen and (max-width: $breakpoint-laptop-max) {
-  .lend-page {
-    width: $container-mobile;
-    padding: 0 15px;
-    .lend-page-main {
-      margin-top: 15px;
-    }
+  .lend-page-main {
+    margin-top: 15px;
   }
 }

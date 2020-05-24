@@ -21,7 +21,7 @@
   flex-shrink: 0;
   justify-content: space-between;
 
-  width: $page-max-width;
+  width: 100%;
   padding: $page-padding;
 }
 
@@ -91,24 +91,24 @@
   }
 
   &--try-again {
-    background-color: #5EBE85;
+    background-color: #5ebe85;
     border: none;
   }
 
   &--cancel {
-    background-color: #FF5358;
+    background-color: #ff5358;
     border: none;
   }
 }
 
 @media only screen and (max-width: $mobile-version-max-width) {
   .progress-bar {
-  display: flex;
-  flex-direction: column;
-  flex-shrink: 0;
-  justify-content: space-between;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    justify-content: space-between;
 
-  width: 100%;
-  padding: $page-padding;
-}
+    width: 100%;
+    padding: $page-padding;
+  }
 }

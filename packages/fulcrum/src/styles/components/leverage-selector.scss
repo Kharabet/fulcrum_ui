@@ -1,3 +1,5 @@
+@import "../abstracts/variables";
+
 .leverage-selector__wrapper {
     display: flex;
     align-items: center;
@@ -11,11 +13,11 @@
     display: flex;
     background-color: var(--leverage-bg);
     position: relative;
-    .active-selector{
+    .active-selector {
         position: absolute;
         color: #fff;
         border-style: none;
-        background-color: #276BFB;
+        background-color: #276bfb;
         color: #ffffff;
         transition: all 0.2s ease-in-out;
     }

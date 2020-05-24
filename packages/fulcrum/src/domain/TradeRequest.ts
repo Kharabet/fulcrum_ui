@@ -1,5 +1,4 @@
 import { BigNumber } from "@0x/utils";
-import moment from "moment";
 import { Asset } from "./Asset";
 import { PositionType } from "./PositionType";
 import { TradeType } from "./TradeType";
@@ -33,7 +32,7 @@ export class TradeRequest {
     loanDataBytes?: string,
     zeroXFee?: BigNumber
     ) {
-    this.id = moment().unix();
+    this.id = Math.round(new Date().getTime()/1000);
     this.tradeType = tradeType;
     this.asset = asset;
     this.unitOfAccount = unitOfAccount;

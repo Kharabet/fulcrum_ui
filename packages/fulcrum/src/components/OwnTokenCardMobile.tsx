@@ -17,6 +17,7 @@ import { Preloader } from "./Preloader";
 import { ReactComponent as OpenManageCollateral } from "../assets/images/openManageCollateral.svg";
 import { ManageCollateralRequest } from "../domain/ManageCollateralRequest";
 
+import "../styles/components/own-token-card-mobile.scss";
 
 export interface IOwnTokenCardMobileProps {
   currentKey: TradeTokenKey;

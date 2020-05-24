@@ -235,7 +235,7 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
     if (!this.props.manageCollateralDlgRef.current) return;
 
     try {
-      const manageCollateralRequest = await this.props.manageCollateralDlgRef.current.getValue({ ...this.props.item });
+      const manageCollateralRequest = await this.props.manageCollateralDlgRef.current.getValue({ ...this.state.borrowedFundsItem});
       await this.setState({ ...this.state, request: manageCollateralRequest });
       await TorqueProvider.Instance.onDoManageCollateral(manageCollateralRequest);
     } catch (error) {
@@ -249,7 +249,7 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
     if (!this.props.repayLoanDlgRef.current) return;
 
     try {
-      const repayLoanRequest = await this.props.repayLoanDlgRef.current.getValue({ ...this.props.item });
+      const repayLoanRequest = await this.props.repayLoanDlgRef.current.getValue({ ...this.state.borrowedFundsItem });
       await this.setState({ ...this.state, request: repayLoanRequest });
       await TorqueProvider.Instance.onDoRepayLoan(repayLoanRequest);
     } catch (error) {
@@ -263,7 +263,7 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
     if (!this.props.extendLoanDlgRef.current) return;
 
     try {
-      const extendLoanRequest = await this.props.extendLoanDlgRef.current.getValue({ ...this.props.item });
+      const extendLoanRequest = await this.props.extendLoanDlgRef.current.getValue({ ...this.state.borrowedFundsItem });
       await this.setState({ ...this.state, request: extendLoanRequest });
       await TorqueProvider.Instance.onDoExtendLoan(extendLoanRequest);
     } catch (error) {

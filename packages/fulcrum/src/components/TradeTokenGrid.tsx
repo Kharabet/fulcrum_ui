@@ -7,6 +7,8 @@ import { TradeTokenCardMobile } from "./TradeTokenCardMobile";
 import { InnerOwnTokenGrid } from "./InnerOwnTokenGrid";
 import { IOwnTokenGridRowProps } from "./OwnTokenGridRow";
 
+import "../styles/components/trade-token-grid.scss";
+
 export interface ITradeTokenGridProps {
   selectedTabAsset: Asset;
   isMobileMedia: boolean;
@@ -67,8 +69,8 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
 
   private renderMobile = () => {
     const tokenRowsMobile = this.props.tokenRowsData
-    .filter(e => e.positionType === this.state.positionType)
-    .map(e => <TradeTokenCardMobile key={`${e.asset}_${e.positionType}`} {...e} changeGridPositionType={this.changeGridPositionType} />);
+      .filter(e => e.positionType === this.state.positionType)
+      .map(e => <TradeTokenCardMobile key={`${e.asset}_${e.positionType}`} {...e} changeGridPositionType={this.changeGridPositionType} />);
 
     return (
       <div className="trade-token-card-mobile__wrapper">
@@ -86,7 +88,7 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
     );
   }
 
-  private changeGridPositionType= async (positionType: PositionType) =>{
-    await this._isMounted && this.setState({...this.state, positionType: positionType})
-  } 
+  private changeGridPositionType = async (positionType: PositionType) => {
+    await this._isMounted && this.setState({ ...this.state, positionType: positionType })
+  }
 }

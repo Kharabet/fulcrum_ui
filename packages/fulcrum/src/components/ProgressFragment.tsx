@@ -8,13 +8,15 @@ import { TasksQueue } from "../services/TasksQueue";
 import { ProgressBar } from "./ProgressBar";
 import { ProgressDetails } from "./ProgressDetails";
 
+import "../styles/progress.scss"
+
 export interface IProgressFragmentState {
   isProgressDetailsModalOpen: boolean;
   counterProgressDetails: number;
   requestTasks: RequestTask[];
 }
 
-export class ProgressFragment extends Component<any, IProgressFragmentState> {
+export default class ProgressFragment extends Component<any, IProgressFragmentState> {
   constructor(props: any) {
     super(props);
 
@@ -50,9 +52,9 @@ export class ProgressFragment extends Component<any, IProgressFragmentState> {
   }
 
   public render() {
-    return this.state.requestTasks.length === 0 ? null : (
+    return this.state.requestTasks.length === 0  ? null : (
       <React.Fragment>
-        <ProgressBar requestTask={this.state.requestTasks[0]} onViewMore={this.onViewMore} />
+        {/* <ProgressBar requestTask={this.state.requestTasks[0]} onViewMore={this.onViewMore} /> */}
         <Modal
           isOpen={this.state.isProgressDetailsModalOpen}
           onRequestClose={this.onRequestClose}
@@ -73,7 +75,8 @@ export class ProgressFragment extends Component<any, IProgressFragmentState> {
     this.setState({ ...this.state, isProgressDetailsModalOpen: false });
   };
 
-  public onAskToOpenProgressDlg = () => {
+  public onAskToOpenProgressDlg = (args: any) => {
+    if (args) return;
     this.setState(p => ({ ...this.state, counterProgressDetails: this.state.counterProgressDetails + 1, isProgressDetailsModalOpen: true }));
   };
 

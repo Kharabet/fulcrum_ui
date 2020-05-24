@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import { PositionType } from "../domain/PositionType";
 
+import "../styles/components/position-type-marker.scss";
+
 export interface IPositionTypeMarkerProps {
   value: PositionType;
 }

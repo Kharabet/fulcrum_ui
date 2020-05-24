@@ -15,7 +15,7 @@ export class Web3ConnectionFactory {
   public static alchemyProvider: AlchemySubprovider;
   public static networkId: number;
   public static canWrite: boolean;
-  public static userAccount: string | undefined;
+  public static userAccount: string | null;
   public static currentWeb3Engine: Web3ProviderEngine;
   public static currentWeb3Wrapper: Web3Wrapper;
 
@@ -51,9 +51,9 @@ export class Web3ConnectionFactory {
       const account = await connector.getAccount();
       const chainId = (await connector.getChainId()).toString();
       networkId = chainId.includes("0x") ? parseInt(chainId, 16) : parseInt(chainId, 10);
-      Web3ConnectionFactory.userAccount = account
-        ? account
-        : web3ReactAccount ? web3ReactAccount : undefined;
+      Web3ConnectionFactory.userAccount = web3ReactAccount
+        ? web3ReactAccount 
+        : await connector.getAccount();
 
     } catch (e) {
       console.log(e);
@@ -88,18 +88,17 @@ export class Web3ConnectionFactory {
     Web3ConnectionFactory.currentWeb3Wrapper = new Web3Wrapper(providerEngine);
     Web3ConnectionFactory.networkId = await Web3ConnectionFactory.currentWeb3Wrapper.getNetworkIdAsync();
     Web3ConnectionFactory.canWrite = false;
-    Web3ConnectionFactory.userAccount = undefined;
+    Web3ConnectionFactory.userAccount = null;
   }
 
   public static async updateConnector(update: ConnectorUpdate) {
     const { provider, chainId, account } = update;
 
-    if (chainId)
-    {
+    if (chainId) {
       let networkId = chainId.toString();
       Web3ConnectionFactory.networkId = networkId.includes("0x") ? parseInt(networkId, 16) : parseInt(networkId, 10);;
     }
-      if (account)
+    if (account)
       Web3ConnectionFactory.userAccount = account;
   }
 

@@ -49,7 +49,6 @@ export class UnlendErcProcessor {
 
     let txHash: string = "";
     try {
-      FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.AskToOpenProgressDlg);
 
       // Submitting unloan
       txHash = await tokenContract.burn.sendTransactionAsync(account, amountInBaseUnits, {
@@ -59,8 +58,8 @@ export class UnlendErcProcessor {
       });
       task.setTxHash(txHash);
     }
-    finally {
-      FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.AskToCloseProgressDlg);
+    catch(e) {
+      throw e;
     }
 
     task.processingStepNext();

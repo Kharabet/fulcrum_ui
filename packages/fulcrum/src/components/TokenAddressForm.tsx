@@ -14,7 +14,7 @@ interface ITokenAddressFormState {
   tokenAddress: string;
 }
 
-export class TokenAddressForm extends Component<ITokenAddressFormProps, ITokenAddressFormState> {
+export default class TokenAddressForm extends Component<ITokenAddressFormProps, ITokenAddressFormState> {
   constructor(props: any) {
     super(props);
 
@@ -25,7 +25,7 @@ export class TokenAddressForm extends Component<ITokenAddressFormProps, ITokenAd
     const baseTokenDetails = AssetsDictionary.assets.get(this.props.tradeTokenKey.asset);
     const tokenAddress = await FulcrumProvider.Instance.getPTokenErc20Address(this.props.tradeTokenKey);
     if (baseTokenDetails && tokenAddress) {
-      this.setState({...this.state, tokenAddress: tokenAddress, baseTokenImg: baseTokenDetails.logoSvg});
+      this.setState({ ...this.state, tokenAddress: tokenAddress, baseTokenImg: baseTokenDetails.logoSvg });
     }
   }
 

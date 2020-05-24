@@ -36,10 +36,6 @@
 
   &.collapsible-container__toggle-label--transparent {
     margin-top: -1.5625rem;
-    //position: relative;
-    //transform: translateY(-100%);
-    //padding-bottom: 0;
-    //background-color: rgba(255, 255, 255, 0);
   }
 }
 
@@ -49,7 +45,4 @@
   }
   margin-top: 20px;
   transition: max-height 0.25s ease-in-out;
-
-  .collapsible-container__content-inner {
-  }
 }
