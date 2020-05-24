@@ -137,14 +137,6 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
     if (this.state.assetDetails === null) {
       return null;
     }
-
-    /*
-    let daysLeft;
-    if (this.props.loanOrderState.loanData) {
-      daysLeft = this.props.loanOrderState.loanData.loanEndTimestamp.minus(Date.now() / 1000).dividedBy(86400).toFixed(1);
-    }
-    */
-
     return (
       <form className="extend-loan-form" onSubmit={this.onSubmitClick}>
         <section className="dialog-content">
