@@ -127,7 +127,7 @@
             "name": "loanOrderData",
             "outputs": [
                 {
-                    "name": "loanId",
+                    "name": "loanOrderHash",
                     "type": "bytes32"
                 },
                 {
@@ -135,11 +135,11 @@
                     "type": "uint256"
                 },
                 {
-                    "name": "initialMargin",
+                    "name": "initialMarginAmount",
                     "type": "uint256"
                 },
                 {
-                    "name": "maintenanceMargin",
+                    "name": "maintenanceMarginAmount",
                     "type": "uint256"
                 },
                 {
@@ -247,25 +247,6 @@
         },
         {
             "constant": true,
-            "inputs": [
-                {
-                    "name": "user",
-                    "type": "address"
-                }
-            ],
-            "name": "profitOf",
-            "outputs": [
-                {
-                    "name": "",
-                    "type": "uint256"
-                }
-            ],
-            "payable": false,
-            "stateMutability": "view",
-            "type": "function"
-        },
-        {
-            "constant": true,
             "inputs": [],
             "name": "tokenizedRegistry",
             "outputs": [
@@ -306,7 +287,7 @@
         {
             "constant": true,
             "inputs": [],
-            "name": "loanToken",
+            "name": "loanTokenAddress",
             "outputs": [
                 {
                     "name": "",
@@ -538,7 +519,7 @@
                     "type": "uint256"
                 }
             ],
-            "name": "loanIdes",
+            "name": "loanOrderHashes",
             "outputs": [
                 {
                     "name": "",
@@ -677,7 +658,7 @@
                 },
                 {
                     "indexed": false,
-                    "name": "collateralToken",
+                    "name": "collateralTokenAddress",
                     "type": "address"
                 },
                 {
@@ -888,11 +869,50 @@
             "constant": false,
             "inputs": [
                 {
-                    "name": "loanId",
-                    "type": "bytes32"
+                    "name": "borrowAmount",
+                    "type": "uint256"
                 },
                 {
+                    "name": "leverageAmount",
+                    "type": "uint256"
+                },
+                {
+                    "name": "initialLoanDuration",
+                    "type": "uint256"
+                },
+                {
+                    "name": "collateralTokenSent",
+                    "type": "uint256"
+                },
+                {
+                    "name": "borrower",
+                    "type": "address"
+                },
+                {
+                    "name": "collateralTokenAddress",
+                    "type": "address"
+                }
+            ],
+            "name": "borrowTokenFromDeposit",
+            "outputs": [
+                {
+                    "name": "loanOrderHash",
+                    "type": "bytes32"
+                }
+            ],
+            "payable": true,
+            "stateMutability": "payable",
+            "type": "function"
+        },
+        {
+            "constant": false,
+            "inputs": [
+                {
                     "name": "borrowAmount",
+                    "type": "uint256"
+                },
+                {
+                    "name": "leverageAmount",
                     "type": "uint256"
                 },
                 {
@@ -912,18 +932,14 @@
                     "type": "address"
                 },
                 {
-                    "name": "collateralToken",
+                    "name": "collateralTokenAddress",
                     "type": "address"
-                },
-                {
-                    "name": "loanData",
-                    "type": "bytes"
                 }
             ],
             "name": "borrowTokenFromDeposit",
             "outputs": [
                 {
-                    "name": "loanId",
+                    "name": "loanOrderHash",
                     "type": "bytes32"
                 }
             ],
@@ -963,7 +979,7 @@
                     "type": "address"
                 },
                 {
-                    "name": "collateralToken",
+                    "name": "collateralTokenAddress",
                     "type": "address"
                 },
                 {
@@ -974,7 +990,7 @@
             "name": "borrowTokenAndUse",
             "outputs": [
                 {
-                    "name": "loanId",
+                    "name": "loanOrderHash",
                     "type": "bytes32"
                 }
             ],
@@ -986,10 +1002,6 @@
         {
             "constant": false,
             "inputs": [
-                {
-                    "name": "loanId",
-                    "type": "bytes32"
-                },
                 {
                     "name": "depositAmount",
                     "type": "uint256"
@@ -1019,18 +1031,18 @@
                     "type": "address"
                 },
                 {
-                    "name": "collateralToken",
+                    "name": "collateralTokenAddress",
                     "type": "address"
                 },
                 {
-                    "name": "loanData",
-                    "type": "bytes"
+                    "name": "tradeTokenAddress",
+                    "type": "address"
                 }
             ],
             "name": "marginTradeFromDeposit",
             "outputs": [
                 {
-                    "name": "loanId",
+                    "name": "loanOrderHash",
                     "type": "bytes32"
                 }
             ],
@@ -1401,11 +1413,15 @@
                     "type": "uint256"
                 },
                 {
+                    "name": "leverageAmount",
+                    "type": "uint256"
+                },
+                {
                     "name": "initialLoanDuration",
                     "type": "uint256"
                 },
                 {
-                    "name": "collateralToken",
+                    "name": "collateralTokenAddress",
                     "type": "address"
                 }
             ],
@@ -1429,11 +1445,15 @@
                     "type": "uint256"
                 },
                 {
+                    "name": "leverageAmount",
+                    "type": "uint256"
+                },
+                {
                     "name": "initialLoanDuration",
                     "type": "uint256"
                 },
                 {
-                    "name": "collateralToken",
+                    "name": "collateralTokenAddress",
                     "type": "address"
                 }
             ],
@@ -1475,7 +1495,7 @@
                 {
                     "components": [
                         {
-                            "name": "loanToken",
+                            "name": "loanTokenAddress",
                             "type": "address"
                         },
                         {
@@ -1483,7 +1503,7 @@
                             "type": "address"
                         },
                         {
-                            "name": "collateralToken",
+                            "name": "collateralTokenAddress",
                             "type": "address"
                         },
                         {
@@ -1499,11 +1519,11 @@
                             "type": "uint256"
                         },
                         {
-                            "name": "initialMargin",
+                            "name": "initialMarginAmount",
                             "type": "uint256"
                         },
                         {
-                            "name": "maintenanceMargin",
+                            "name": "maintenanceMarginAmount",
                             "type": "uint256"
                         },
                         {
@@ -1511,7 +1531,7 @@
                             "type": "uint256"
                         },
                         {
-                            "name": "loanId",
+                            "name": "loanOrderHash",
                             "type": "bytes32"
                         }
                     ],
@@ -1525,7 +1545,7 @@
                             "type": "address"
                         },
                         {
-                            "name": "collateralTokenFilled",
+                            "name": "collateralTokenAddressFilled",
                             "type": "address"
                         },
                         {
@@ -1541,7 +1561,7 @@
                             "type": "uint256"
                         },
                         {
-                            "name": "collateral",
+                            "name": "collateralTokenAmountFilled",
                             "type": "uint256"
                         },
                         {
@@ -1553,7 +1573,7 @@
                             "type": "uint256"
                         },
                         {
-                            "name": "loanEndTimestamp",
+                            "name": "loanEndUnixTimestampSec",
                             "type": "uint256"
                         },
                         {
