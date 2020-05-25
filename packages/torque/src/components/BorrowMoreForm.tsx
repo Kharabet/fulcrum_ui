@@ -349,11 +349,12 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
 
   private checkBalanceTooLow = async (collateralAsset: Asset) => {
     const borrowEstimate = await this.getBorrowEstimate(collateralAsset);
-    let assetBalance = this.props.loanOrderState.collateralAmount;
+    const decimals = AssetsDictionary.assets.get(collateralAsset)!.decimals || 18;
+    let assetBalance = this.props.loanOrderState.collateralAmount.multipliedBy(10 ** decimals);
     if (collateralAsset === Asset.ETH) {
+      console.log(TorqueProvider.Instance.gasBufferForTxn.toFixed())
       assetBalance = assetBalance.gt(TorqueProvider.Instance.gasBufferForTxn) ? assetBalance.minus(TorqueProvider.Instance.gasBufferForTxn) : new BigNumber(0);
     }
-    const decimals = AssetsDictionary.assets.get(collateralAsset)!.decimals || 18;
     const amountInBaseUnits = new BigNumber(borrowEstimate.depositAmount.multipliedBy(10 ** decimals).toFixed(0, 1));
     return assetBalance.lt(borrowEstimate.depositAmount);
   }
