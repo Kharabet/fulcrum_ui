@@ -1,15 +1,17 @@
 import React, { Component } from "react";
 import ReactModal from "react-modal";
 import { IBorrowMoreState } from "../domain/IBorrowMoreState";
-import { BorrowMoreRequest } from "../domain/BorrowMoreRequest";
+import { BorrowRequest } from "../domain/BorrowRequest";
 import { DialogHeader } from "./DialogHeader";
 import { BorrowMoreForm } from "./BorrowMoreForm";
+import { Asset } from "../domain/Asset";
+import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
 
 interface IBorrowMoreDlgState {
   isOpen: boolean;
-  loanOrderState: IBorrowMoreState | null;
+  loanOrderState: IBorrowedFundsState | null;
 
-  executorParams: { resolve: (value?: BorrowMoreRequest) => void; reject: (reason?: any) => void } | null;
+  executorParams: { resolve: (value?: BorrowRequest) => void; reject: (reason?: any) => void } | null;
 }
 
 export class BorrowMoreDlg extends Component<any, IBorrowMoreDlgState> {
@@ -43,12 +45,12 @@ export class BorrowMoreDlg extends Component<any, IBorrowMoreDlgState> {
     );
   }
 
-  public getValue = async (item: IBorrowMoreState): Promise<BorrowMoreRequest> => {
+  public getValue = async (item: IBorrowedFundsState): Promise<BorrowRequest> => {
     if (this.state.isOpen) {
-      return new Promise<BorrowMoreRequest>((resolve, reject) => reject());
+      return new Promise<BorrowRequest>((resolve, reject) => reject());
     }
 
-    return new Promise<BorrowMoreRequest>((resolve, reject) => {
+    return new Promise<BorrowRequest>((resolve, reject) => {
       this.setState({
         ...this.state,
         isOpen: true,
@@ -62,7 +64,7 @@ export class BorrowMoreDlg extends Component<any, IBorrowMoreDlgState> {
     await this.setState({ ...this.state, isOpen: false, executorParams: null });
   };
 
-  private onFormSubmit = async (value: BorrowMoreRequest) => {
+  private onFormSubmit = async (value: BorrowRequest) => {
     if (this.state.executorParams) {
       this.state.executorParams.resolve(value);
     }

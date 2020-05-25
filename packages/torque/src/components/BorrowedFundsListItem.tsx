@@ -10,7 +10,7 @@ import { CollateralSlider } from "./CollateralSlider";
 import { ManageCollateralRequest } from "../domain/ManageCollateralRequest";
 import { RepayLoanRequest } from "../domain/RepayLoanRequest";
 import { ExtendLoanRequest } from "../domain/ExtendLoanRequest";
-import { BorrowMoreRequest } from "../domain/BorrowMoreRequest";
+import { BorrowRequest } from "../domain/BorrowRequest";
 import { TorqueProviderEvents } from "../services/events/TorqueProviderEvents";
 import { RequestStatus } from "../domain/RequestStatus";
 import { RequestTask } from "../domain/RequestTask";
@@ -18,10 +18,11 @@ import { TxProcessingLoader } from "./TxProcessingLoader";
 import { ManageCollateralDlg } from "./ManageCollateralDlg";
 import { RepayLoanDlg } from "./RepayLoanDlg";
 import { ExtendLoanDlg } from "./ExtendLoanDlg";
+import { BorrowMoreDlg } from "./BorrowMoreDlg";
 
 export interface IBorrowedFundsListItemProps {
   item: IBorrowedFundsState;
-  onBorrowMore: (item: IBorrowedFundsState) => void;
+  borrowMoreDlgRef: React.RefObject<BorrowMoreDlg>;
   manageCollateralDlgRef: React.RefObject<ManageCollateralDlg>;
   repayLoanDlgRef: React.RefObject<RepayLoanDlg>;
   extendLoanDlgRef: React.RefObject<ExtendLoanDlg>;
@@ -33,7 +34,7 @@ interface IBorrowedFundsListItemState {
   interestRate: BigNumber;
   isInProgress: boolean;
   isLoadingTransaction: boolean;
-  request: ManageCollateralRequest | RepayLoanRequest | ExtendLoanRequest | BorrowMoreRequest | undefined;
+  request: ManageCollateralRequest | RepayLoanRequest | ExtendLoanRequest | BorrowRequest | undefined;
 }
 
 export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps, IBorrowedFundsListItemState> {
@@ -273,7 +274,17 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
     // this.props.onExtendLoan({ ...this.props.item });
   };
 
-  private onBorrowMore = () => {
-    this.props.onBorrowMore({ ...this.props.item });
+  private onBorrowMore = async () => {
+    if (!this.props.borrowMoreDlgRef.current) return;
+
+    try {
+      const borroweMoreRequest = await this.props.borrowMoreDlgRef.current.getValue({ ...this.props.item });
+      await this.setState({ ...this.state, request: borroweMoreRequest });
+      await TorqueProvider.Instance.onDoBorrow(borroweMoreRequest);
+    } catch (error) {
+      if (error.message !== "Form closed")
+        console.error(error);
+    }    
+    
   };
 }

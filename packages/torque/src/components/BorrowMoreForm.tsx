@@ -12,9 +12,11 @@ import { BorrowRequest } from "../domain/BorrowRequest";
 import { TorqueProvider } from "../services/TorqueProvider";
 import { CollateralSlider } from "./CollateralSlider";
 import { Loader } from "./Loader";
+import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
+import TagManager from "react-gtm-module";
 
 export interface IBorrowMoreFormProps {
-  loanOrderState: IBorrowMoreState;
+  loanOrderState: IBorrowedFundsState;
   onSubmit?: (value: BorrowRequest) => void;
   onDecline: () => void;
 }
@@ -269,8 +271,54 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
 
 
   public onSubmitClick = async (event: FormEvent<HTMLFormElement>) => {
+    
     event.preventDefault();
+    if (this.state.borrowAmount.lte(0) || this.state.depositAmount.lte(0)) {
+      return;
+    }
 
+    if (this.props.onSubmit && !this.state.didSubmit && this.state.depositAmount.gt(0)) {
+      this.setState({ ...this.state, didSubmit: true });
+      let balanceTooLow = await this.checkBalanceTooLow(this.props.loanOrderState.collateralAsset);
+      if (balanceTooLow) {
+        this.setState({ ...this.state, balanceTooLow: true, didSubmit: false });
+        return;
+      } else {
+        this.setState({ ...this.state, balanceTooLow: false });
+      }
+      const randomNumber = Math.floor(Math.random() * 100000) + 1;
+      const usdAmount = await TorqueProvider.Instance.getSwapToUsdRate(this.props.loanOrderState.loanAsset);
+      let usdPrice = this.state.borrowAmount
+      if (usdPrice !== null) {
+        usdPrice = usdPrice.multipliedBy(usdAmount)
+      }
+      const tagManagerArgs = {
+        dataLayer: {
+          event: 'purchase',
+          transactionId: randomNumber,
+          transactionTotal: new BigNumber(usdPrice),
+          transactionProducts: [{
+            name: "Borrow-" + this.props.loanOrderState.loanAsset,
+            sku: "Borrow-" + this.props.loanOrderState.loanAsset + '-' + this.props.loanOrderState.collateralAsset,
+            category: "Borrow",
+            price: new BigNumber(usdPrice),
+            quantity: 1
+          }],
+        }
+      }
+      //console.log("tagManagerArgs = ", tagManagerArgs)
+      TagManager.dataLayer(tagManagerArgs)
+
+      this.props.onSubmit(
+        new BorrowRequest(
+          this.props.loanOrderState.loanId,
+          this.props.loanOrderState.loanAsset,
+          this.state.borrowAmount,
+          this.props.loanOrderState.collateralAsset,
+          new BigNumber(0)
+        )
+      );
+    }
   };
 
   public onTradeAmountChange = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -299,21 +347,21 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
   };
 
 
-  private checkBalanceTooLow = async (loanAsset: Asset) => {
-    const borrowEstimate = await this.getBorrowEstimate(loanAsset);
-    let assetBalance = await TorqueProvider.Instance.getAssetTokenBalanceOfUser(loanAsset);
-    if (loanAsset === Asset.ETH) {
+  private checkBalanceTooLow = async (collateralAsset: Asset) => {
+    const borrowEstimate = await this.getBorrowEstimate(collateralAsset);
+    let assetBalance = this.props.loanOrderState.collateralAmount;
+    if (collateralAsset === Asset.ETH) {
       assetBalance = assetBalance.gt(TorqueProvider.Instance.gasBufferForTxn) ? assetBalance.minus(TorqueProvider.Instance.gasBufferForTxn) : new BigNumber(0);
     }
-    const decimals = AssetsDictionary.assets.get(loanAsset)!.decimals || 18;
+    const decimals = AssetsDictionary.assets.get(collateralAsset)!.decimals || 18;
     const amountInBaseUnits = new BigNumber(borrowEstimate.depositAmount.multipliedBy(10 ** decimals).toFixed(0, 1));
-    return assetBalance.lt(amountInBaseUnits);
+    return assetBalance.lt(borrowEstimate.depositAmount);
   }
 
 
   private getBorrowEstimate = async (loanAsset: Asset) => {
 
-    const borrowEstimate = await TorqueProvider.Instance.getBorrowDepositEstimate(this.props.loanOrderState.loanAsset, loanAsset, this.state.borrowAmount);
+    const borrowEstimate = await TorqueProvider.Instance.getBorrowDepositEstimate(this.props.loanOrderState.loanAsset, this.props.loanOrderState.collateralAsset, this.state.borrowAmount);
     return borrowEstimate;
   }
 
