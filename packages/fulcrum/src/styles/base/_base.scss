@@ -18,7 +18,8 @@ html {
   background-color: var(--primary-bg);
 }
 
-body, #root {
+body,
+#root {
   height: 100%;
 }
 
@@ -26,18 +27,40 @@ body, #root {
   display: flex;
   flex-direction: row;
   justify-content: center;
-  height: 100vh;
 }
 
 input {
   font-family: "Open Sans", sans-serif;
 }
 
-button{
+button {
   font-family: "Muli", sans-serif;
 }
 
 a {
   cursor: pointer;
   text-decoration: none;
+}
+
+.pages-wrap {
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+  justify-content: flex-start;
+  width: $container-desktop;
+  box-sizing: border-box;
+  height: 100vh;
+
+  @media screen and (max-width: $breakpoint-desktop-max) {
+    width: $container-laptop;
+  }
+
+  @media screen and (max-width: $breakpoint-laptop-max) {
+    width: $container-mobile;
+
+    > * {
+        padding-left: 15px;
+        padding-right: 15px;
+      }    
+  }
 }

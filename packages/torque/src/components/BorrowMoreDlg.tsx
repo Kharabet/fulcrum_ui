@@ -33,7 +33,6 @@ export class BorrowMoreDlg extends Component<any, IBorrowMoreDlgState> {
         className="modal-content-div"
         overlayClassName="modal-overlay-div"
         onRequestClose={this.onFormDecline}
-        shouldCloseOnOverlayClick={false}
       >
         <DialogHeader title="Borrow More" onDecline={this.onFormDecline} />
         <BorrowMoreForm

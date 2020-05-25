@@ -63,26 +63,29 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
       isShowConfirm: false,
       request: undefined
     };
+    this._isMounted = false;
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderChanged, this.onProviderChanged);
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.AskToOpenProgressDlg, this.onAskToOpenProgressDlg);
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.AskToCloseProgressDlg, this.onAskToCloseProgressDlg);
   }
 
-  private onAskToOpenProgressDlg = (taskId: number) => {
+  private _isMounted: boolean;
+
+  private onAskToOpenProgressDlg = async (taskId: number) => {
     if (!this.state.request || taskId !== this.state.request.id) return;
-    this.setState({ ...this.state, isLoadingTransaction: true })
+    await this._isMounted && this.setState({ ...this.state, isLoadingTransaction: true })
   }
-  private onAskToCloseProgressDlg = (task: RequestTask) => {
+  private onAskToCloseProgressDlg = async (task: RequestTask) => {
     if (!this.state.request || task.request.id !== this.state.request.id) return;
     if (task.status === RequestStatus.FAILED || task.status === RequestStatus.FAILED_SKIPGAS) {
-      window.setTimeout(() => {
+      window.setTimeout(async () => {
         TorqueProvider.Instance.onTaskCancel(task);
-        this.setState({ ...this.state, isLoadingTransaction: false, request: undefined })
+        await this._isMounted && this.setState({ ...this.state, isLoadingTransaction: false, request: undefined })
       }, 5000)
       return;
     }
-    this.setState({ ...this.state, isLoadingTransaction: false, request: undefined });
+    await this._isMounted && this.setState({ ...this.state, isLoadingTransaction: false, request: undefined });
 
     NavService.Instance.History.push("/dashboard");
   }
@@ -96,6 +99,7 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
   };
 
   public componentWillUnmount(): void {
+    this._isMounted = false;
     TorqueProvider.Instance.eventEmitter.removeListener(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
     TorqueProvider.Instance.eventEmitter.removeListener(TorqueProviderEvents.ProviderChanged, this.onProviderChanged);
     TorqueProvider.Instance.eventEmitter.removeListener(TorqueProviderEvents.AskToOpenProgressDlg, this.onAskToOpenProgressDlg);
@@ -103,8 +107,9 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
   }
 
   public componentDidMount(): void {
+    this._isMounted = true;
     this.derivedUpdate();
-    this.setState({
+    this._isMounted && this.setState({
       ...this.state,
       borrowAmount: this.state.loan.debt
     });
@@ -123,9 +128,9 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
   private derivedUpdate = async () => {
     // @ts-ignore
     const interestRate = await TorqueProvider.Instance.getAssetInterestRate(Asset[this.state.loan.collateralType]);
-    const refRateYear = ((parseFloat(this.state.loan.variableAPR.dp(0, BigNumber.ROUND_CEIL).toString()) - parseFloat(interestRate.dp(1, BigNumber.ROUND_CEIL).toString())) * parseFloat(this.state.loan.debt.dp(3, BigNumber.ROUND_FLOOR).toString())) / 100;
+    const refRateYear = ((parseFloat(this.state.loan.variableAPR.dp(0, BigNumber.ROUND_CEIL).toString()) - parseFloat(interestRate.dp(1, BigNumber.ROUND_CEIL).toString())) * parseFloat(this.state.borrowAmount.dp(3, BigNumber.ROUND_FLOOR).toString())) / 100;
     const refRateMonth = refRateYear / 12;
-    this.setState({
+    await this._isMounted && this.setState({
       ...this.state,
       fixedApr: interestRate,
       refRateMonth,
@@ -145,10 +150,15 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
       const collaterralWithRatio = collateralAmount.multipliedBy(refinanceData.collaterizationPercent).div(this.props.refinanceData.collaterizationPercent)
       refinanceData.collateralAmount = collaterralWithRatio;
     }
-    this.setState({
+    const refRateYear = ((parseFloat(this.state.loan.variableAPR.dp(0, BigNumber.ROUND_CEIL).toString()) - parseFloat(this.state.fixedApr.dp(1, BigNumber.ROUND_CEIL).toString())) * parseFloat(borrowAmount.dp(3, BigNumber.ROUND_FLOOR).toString())) / 100;
+    const refRateMonth = refRateYear / 12;
+
+    await this._isMounted && this.setState({
       ...this.state,
       borrowAmount: borrowAmount,
-      loan: refinanceData
+      loan: refinanceData,
+      refRateMonth,
+      refRateYear
     });
   };
 
@@ -169,18 +179,18 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
     if (Math.abs(this.state.loan.collaterizationPercent!.dp(2, BigNumber.ROUND_FLOOR).toNumber() - value) < 1) return
     const updatedLoan = await this.changeCollaterization(value)
 
-    this.setState({
+    await this._isMounted && this.setState({
       ...this.state,
       loan: updatedLoan
     });
   };
 
   public onDecline = async () => {
-    await this.setState({ ...this.state, isShowConfirm: false });
+    await await this._isMounted && this.setState({ ...this.state, isShowConfirm: false });
   }
 
   public onConfirm = async () => {
-    await this.setState({ ...this.state, isShowConfirm: false, borrowAmount: this.props.refinanceData.debt });
+    await await this._isMounted && this.setState({ ...this.state, isShowConfirm: false, borrowAmount: this.props.refinanceData.debt });
     await this.checkCdpManager();
   }
 
@@ -188,7 +198,7 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
     const left = this.state.loan.debt.minus(this.state.borrowAmount);
     const isDust = !(this.state.borrowAmount.dp(3, BigNumber.ROUND_DOWN).isEqualTo(this.state.loan.debt.dp(3, BigNumber.ROUND_DOWN)) || left.gt(this.props.refinanceData.dust));
     if (isDust) {
-      this.setState({ ...this.state, isShowConfirm: true });
+      await this._isMounted && this.setState({ ...this.state, isShowConfirm: true });
       return;
     }
     await this.checkCdpManager();
@@ -196,15 +206,15 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
 
   private checkCdpManager = async () => {
     const request = new RefinanceMakerRequest(this.state.loan, this.state.borrowAmount)
-    await this.setState({ ...this.state, request: request });
+    await await this._isMounted && this.setState({ ...this.state, request: request });
     await TorqueProvider.Instance.onMigrateMakerLoan(request);
   };
 
-  public showInfoCollateralAssetDt0 = () => {
-    this.setState({ ...this.state, isShowInfoCollateralAssetDt0: !this.state.isShowInfoCollateralAssetDt0 });
+  public showInfoCollateralAssetDt0 = async () => {
+    await this._isMounted && this.setState({ ...this.state, isShowInfoCollateralAssetDt0: !this.state.isShowInfoCollateralAssetDt0 });
   };
-  public showDetails = () => {
-    this.setState({ ...this.state, isShow: !this.state.isShow });
+  public showDetails = async () => {
+    await this._isMounted && this.setState({ ...this.state, isShow: !this.state.isShow });
   };
 
   public render() {

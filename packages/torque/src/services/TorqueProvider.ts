@@ -365,20 +365,6 @@ export class TorqueProvider {
     return result;
   }
 
-  /*public getMarginPremiumAmount = (asset: Asset): number => {
-    let marginPremium = 0;
-    switch (asset) {
-      case Asset.SAI:
-      case Asset.USDC:
-        marginPremium = 0;
-        break;
-      default:
-        marginPremium = 100;
-    }
-
-    return marginPremium;
-  }*/
-
   public getBorrowDepositEstimate = async (
     borrowAsset: Asset,
     collateralAsset: Asset,
@@ -420,7 +406,7 @@ export class TorqueProvider {
 
     return this.getSwapRate(
       asset,
-      Asset.SAI
+      Asset.DAI
     );
   }
 
@@ -1801,11 +1787,11 @@ export class TorqueProvider {
   };
 
   public isStableAsset = (asset: Asset): boolean => {
-    if (asset === Asset.SAI ||
-      asset === Asset.DAI ||
+    if (asset === Asset.DAI ||
       asset === Asset.USDC ||
       asset === Asset.SUSD ||
-      asset === Asset.USDT) {
+      asset === Asset.USDT ||
+      asset === Asset.SAI) {
       return true;
     } else {
       return false;

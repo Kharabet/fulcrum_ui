@@ -6,6 +6,8 @@ import { HistoryTokenGrid } from "./HistoryTokenGrid";
 
 import { IOwnTokenGridRowProps } from "./OwnTokenGridRow";
 
+import "../styles/components/manage-token-grid.scss"
+
 export interface IManageTokenGridProps {
   isMobileMedia: boolean;
   ownRowsData: IOwnTokenGridRowProps[];
@@ -16,7 +18,7 @@ interface IManageTokenGridState {
   isShowHistory: boolean;
 }
 
-export class ManageTokenGrid extends Component<IManageTokenGridProps, IManageTokenGridState> {
+export default class ManageTokenGrid extends Component<IManageTokenGridProps, IManageTokenGridState> {
   constructor(props: IManageTokenGridProps) {
     super(props);
     this.state = {
@@ -27,7 +29,7 @@ export class ManageTokenGrid extends Component<IManageTokenGridProps, IManageTok
   public render() {
     return (
       <div className="manage-token-grid">
-        <ManageTokenGridHeader isMobileMedia={this.props.isMobileMedia} isShowHistory={this.state.isShowHistory} updateStateisShowHistory={this.updateStateisShowHistory}  />
+        <ManageTokenGridHeader isMobileMedia={this.props.isMobileMedia} isShowHistory={this.state.isShowHistory} updateStateisShowHistory={this.updateStateisShowHistory} />
         {this.state.isShowHistory
           ? <HistoryTokenGrid historyRowsData={this.props.ownRowsData} isMobileMedia={this.props.isMobileMedia} />
           : <OwnTokenGrid ownRowsData={this.props.ownRowsData} isMobileMedia={this.props.isMobileMedia} />

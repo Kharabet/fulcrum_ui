@@ -3,7 +3,9 @@ import { InnerOwnTokenGridHeader } from "./InnerOwnTokenGridHeader";
 import { IInnerOwnTokenGridRowProps, InnerOwnTokenGridRow } from "./InnerOwnTokenGridRow";
 import { InnerOwnTokenCardMobile } from "./InnerOwnTokenCardMobile";
 
-export interface IInnerOwnTokenGridProps { 
+import "../styles/components/inner-own-token-grid.scss";
+
+export interface IInnerOwnTokenGridProps {
   isMobileMedia: boolean;
   ownRowsData: IInnerOwnTokenGridRowProps[];
 }

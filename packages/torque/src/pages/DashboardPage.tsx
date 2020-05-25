@@ -54,17 +54,20 @@ export class DashboardPage extends PureComponent<
       isDataLoading: true
     };
 
+    this._isMounted = false;
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
+  private _isMounted: boolean;
+
   private async derivedUpdate() {
-    this.setState({
+    await this._isMounted && this.setState({
       ...this.state,
       isDataLoading: true
     });
     if (TorqueProvider.Instance.unsupportedNetwork) {
-      this.setState({
+      await this._isMounted && this.setState({
         items: [],
         itemsAwaiting: [],
         isDataLoading: false
@@ -74,7 +77,7 @@ export class DashboardPage extends PureComponent<
 
     if (TorqueProvider.Instance.providerType === ProviderType.None || !TorqueProvider.Instance.contractsSource || !TorqueProvider.Instance.contractsSource.canWrite) {
       this.props.doNetworkConnect();
-      this.setState({
+      await this._isMounted && this.setState({
         items: [],
         itemsAwaiting: [],
         isDataLoading: false
@@ -89,7 +92,7 @@ export class DashboardPage extends PureComponent<
     console.log(items);
     itemsAwaiting = await TorqueProvider.Instance.getLoansAwaitingList();
 
-    this.setState({
+    await this._isMounted && this.setState({
       ...this.state,
       items: items,
       itemsAwaiting: itemsAwaiting,
@@ -106,11 +109,13 @@ export class DashboardPage extends PureComponent<
   };
 
   public componentWillUnmount(): void {
+    this._isMounted = false;
     TorqueProvider.Instance.eventEmitter.removeListener(TorqueProviderEvents.ProviderAvailable, this.onProviderAvailable);
     TorqueProvider.Instance.eventEmitter.removeListener(TorqueProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
   public componentDidMount(): void {
+    this._isMounted = true;
     this.derivedUpdate();
   }
 

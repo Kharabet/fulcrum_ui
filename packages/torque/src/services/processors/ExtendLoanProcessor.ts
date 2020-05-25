@@ -96,6 +96,7 @@ export class ExtendLoanProcessor {
       gasAmountBN = new BigNumber(gasAmount).multipliedBy(TorqueProvider.Instance.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
     } catch (e) {
       console.log(e);
+      throw e;
     }
 
     try {
@@ -112,6 +113,7 @@ export class ExtendLoanProcessor {
           gasPrice: await TorqueProvider.Instance.gasPrice()
         }
       );
+      task.setTxHash(txHash);
     } catch (e) {
       console.log(e);
       throw e;

@@ -1,15 +1,16 @@
+@import "../abstracts/variables.scss";
 
 .styled-select {
   background-color: var(--select-bg);
-  border: 1px solid var(--select-border);  
+  border: 1px solid var(--select-border);
   border-radius: 26px;
-  color: var(--primary-text);  
+  color: var(--primary-text);
   font-weight: 600;
-  padding: 10px 20px; 
-  @media(min-width: $breakpoint-mobile-min){
+  padding: 10px 20px;
+  @media (min-width: $breakpoint-mobile-min) {
     font-size: 14px;
   }
-  @media(max-width: $breakpoint-mobile-max){
+  @media (max-width: $breakpoint-mobile-max) {
     font-size: 12px;
     padding: 9px 13px;
   }
@@ -23,11 +24,11 @@
     border: 5px solid transparent;
     border-color: var(--select-arrow) transparent transparent transparent;
     position: absolute;
-    @media(min-width: $breakpoint-mobile-min){
+    @media (min-width: $breakpoint-mobile-min) {
       top: 17px;
       right: 16px;
     }
-    @media(max-width: $breakpoint-mobile-max){
+    @media (max-width: $breakpoint-mobile-max) {
       top: 16px;
       right: 9px;
     }
@@ -41,14 +42,14 @@
 .select {
   cursor: pointer;
   display: inline-block;
-  position: relative;  
+  position: relative;
   color: var(--select-arrow);
-  @media(min-width: $breakpoint-mobile-min){
+  @media (min-width: $breakpoint-mobile-min) {
     font-size: 14px;
     width: 150px;
     height: 40px;
   }
-  @media(max-width: $breakpoint-mobile-max){
+  @media (max-width: $breakpoint-mobile-max) {
     font-size: 12px;
     width: 100px;
     height: 32px;
@@ -64,10 +65,10 @@
   background-color: var(--select-bg);
   border-color: 1px solid var(--select-border);
   border-radius: 26px;
-  @media(min-width: $breakpoint-mobile-min){
-    padding: 14px 20px;    
+  @media (min-width: $breakpoint-mobile-min) {
+    padding: 14px 20px;
   }
-  @media(max-width: $breakpoint-mobile-max){
+  @media (max-width: $breakpoint-mobile-max) {
     padding: 9px 13px;
   }
   &:hover {
@@ -105,13 +106,13 @@
       background-color: var(--select-option-hover);
     }
 
-    &:first-child{
+    &:first-child {
       border-radius: 4px 4px 0 0;
     }
-    &:last-child{
+    &:last-child {
       border-radius: 0 0 4px 4px;
     }
-    &:only-child{
+    &:only-child {
       border-radius: 4px;
     }
     &[rel="hide"] {

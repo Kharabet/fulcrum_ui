@@ -22,7 +22,8 @@ export interface IBorrowedFundsState {
     collateral: BigNumber;
     interestOwedPerDay: BigNumber;
     interestDepositRemaining: BigNumber;
-    minInitialMargin: BigNumber;
+    startRate: BigNumber;
+    startMargin: BigNumber;
     maintenanceMargin: BigNumber;
     currentMargin: BigNumber;
     maxLoanTerm: BigNumber;

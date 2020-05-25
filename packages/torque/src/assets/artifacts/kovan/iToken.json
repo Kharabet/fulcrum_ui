@@ -247,6 +247,25 @@
         },
         {
             "constant": true,
+            "inputs": [
+                {
+                    "name": "user",
+                    "type": "address"
+                }
+            ],
+            "name": "profitOf",
+            "outputs": [
+                {
+                    "name": "",
+                    "type": "uint256"
+                }
+            ],
+            "payable": false,
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "constant": true,
             "inputs": [],
             "name": "tokenizedRegistry",
             "outputs": [
@@ -968,6 +987,10 @@
             "constant": false,
             "inputs": [
                 {
+                    "name": "loanId",
+                    "type": "bytes32"
+                },
+                {
                     "name": "depositAmount",
                     "type": "uint256"
                 },
@@ -1000,8 +1023,8 @@
                     "type": "address"
                 },
                 {
-                    "name": "tradeTokenAddress",
-                    "type": "address"
+                    "name": "loanData",
+                    "type": "bytes"
                 }
             ],
             "name": "marginTradeFromDeposit",

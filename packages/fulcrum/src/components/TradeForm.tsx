@@ -29,6 +29,8 @@ import { TradeExpectedResult } from "./TradeExpectedResult";
 import { UnitOfAccountSelector } from "./UnitOfAccountSelector";
 import { Preloader } from "./Preloader";
 
+import "../styles/components/trade-form.scss";
+import "../styles/components/input-amount.scss";
 
 interface IInputAmountLimited {
   inputAmountValue: BigNumber;
@@ -71,6 +73,7 @@ export interface ITradeFormProps {
   onCancel: () => void;
   onTrade: (request: TradeRequest) => void;
   isMobileMedia: boolean;
+  isOpenModal: boolean;
 }
 
 interface ITradeFormState {
@@ -110,7 +113,7 @@ interface ITradeFormState {
   selectedUnitOfAccount: Asset;
 }
 
-export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
+export default class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
   private readonly _inputPrecision = 6;
   private _input: HTMLInputElement | null = null;
 
@@ -289,7 +292,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
   public componentWillUnmount(): void {
     this._isMounted = false;
 
-    window.history.back();
+    window.history.pushState(null, "Trade Modal Closed", `/trade`);
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
@@ -297,7 +300,8 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
     this._isMounted = true;
 
     await this.derivedUpdate();
-    window.history.pushState(null, "Trade Modal Opened", `/trade/${this.props.tradeType.toLocaleLowerCase()}-${this.props.leverage}x-${this.props.positionType.toLocaleLowerCase()}-${this.props.asset}/`);
+    if (this.props.isOpenModal)
+      window.history.pushState(null, "Trade Modal Opened", `/trade/${this.props.tradeType.toLocaleLowerCase()}-${this.props.leverage}x-${this.props.positionType.toLocaleLowerCase()}-${this.props.asset}/`);
 
     if (this._input) {
       // this._input.select();
@@ -466,25 +470,27 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
               <TradeExpectedResult value={tradeExpectedResultValue} />
             ) : null}
 
-            <div className="trade-form__kv-container">
+            <div className="input-amount__kv-container">
               {amountMsg.includes("Slippage:") ? (
-                <div title={`${this.state.slippageRate.toFixed(18)}%`} className="trade-form__label slippage">
+                <div title={`${this.state.slippageRate.toFixed(18)}%`} className="input-amount__label slippage">
                   {amountMsg}
-                  <span className="trade-form__slippage-amount">
+                  <span className="input-amount__slippage-amount">
                     &nbsp;{`${this.state.slippageRate.toFixed(2)}%`}<SlippageDown />
                   </span>
                 </div>
-              ) : (<div className="trade-form__label">{amountMsg}</div>)}
+              ) : (<div className="input-amount__label">{amountMsg}</div>)}
 
             </div>
 
-            <div className="trade-form__amount-container">
+
+            <div className="input-amount__container">
               <input
                 type="number"
                 step="any"
                 ref={this._setInputRef}
-                className="trade-form__amount-input"
-                value={!this.state.isLoading ? this.state.inputAmountText : ""}
+                className="input-amount__input"
+                //value={!this.state.isLoading ? this.state.inputAmountValue.toFixed(5)  : ""}
+                value={!this.state.isLoading ? this.formatPrecision(Number(this.state.inputAmountText)) : ""}
                 onChange={this.onTradeAmountChange}
               />
               {!this.state.isLoading ? null
@@ -505,7 +511,8 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
                 null
               }
             </div>
-            <div className="trade-form__group-button">
+
+            <div className="input-amount__group-button">
               <button data-value="0.25" className={multiplier === 0.25 ? "active " : ""} onClick={this.onInsertMaxValue}>25%</button>
               <button data-value="0.5" className={multiplier === 0.5 ? "active " : ""} onClick={this.onInsertMaxValue}>50%</button>
               <button data-value="0.75" className={multiplier === 0.75 ? "active " : ""} onClick={this.onInsertMaxValue}>75%</button>
@@ -614,7 +621,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
 
   public onChangeCollateralClicked = async (asset: Asset) => {
     await this._isMounted && this.setState({ ...this.state, isChangeCollateralOpen: false, collateral: asset });
-    
+
     this._inputSetMax.next();
   };
 
@@ -625,7 +632,7 @@ export class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
       version = 1;
     }
 
-    this._isMounted && this.setState({...this.state, selectedUnitOfAccount: asset});
+    this._isMounted && this.setState({ ...this.state, selectedUnitOfAccount: asset });
 
     this.props.onTrade(
       new TradeRequest(

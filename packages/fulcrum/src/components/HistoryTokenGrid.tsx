@@ -3,6 +3,8 @@ import { HistoryTokenGridHeader } from "./HistoryTokenGridHeader";
 import { IHistoryTokenGridRowProps, HistoryTokenGridRow } from "./HistoryTokenGridRow";
 import { HistoryTokenCardMobile } from "./HistoryTokenCardMobile";
 
+import "../styles/components/history-token-grid.scss";
+
 export interface IHistoryTokenGridProps {
   isMobileMedia: boolean;
   historyRowsData: IHistoryTokenGridRowProps[];
