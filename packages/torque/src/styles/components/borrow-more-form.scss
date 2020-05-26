@@ -5,8 +5,8 @@
     width: 100%;
   }
 
-  .collateral-slider .rail-inner {
-    background: #f3f9ff;
+  .outer-rail {
+    background-color: #e7ebf0;
   }
 
   .input-container {
@@ -20,7 +20,7 @@
   }
 
   &__body {
-    padding: 30px 0 23px 0;
+    padding: 30px 0 15px 0;
     display: flex;
     flex-direction: column;
     position: relative;
@@ -86,13 +86,6 @@
     }
   }
 
-  &__delimiter {
-    margin-bottom: 40px;
-    border: 0;
-    @media only screen and (max-width: $mobile-version-max-width) {
-      margin-bottom: 30px;
-    }
-  }
   &__actions-container {
     display: flex;
     flex-direction: row;
@@ -103,5 +96,8 @@
   }
   .j-c-sb {
     justify-content: space-between;
+  }
+  .mt-30{
+    margin-top: 30px;
   }
 }

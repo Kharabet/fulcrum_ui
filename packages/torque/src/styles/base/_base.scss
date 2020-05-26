@@ -63,3 +63,13 @@ input {
 input::placeholder {
   color: $color-gray;
 }
+.outer-rail{
+  height: 15px;
+  border-radius: 10px;
+}
+.inner-rail{
+  height: 100%;
+  width: 100%;
+  border-radius: 10px;
+  background-image: linear-gradient(90deg, #FF4F4F 0%, #F0E93F 52.16%, #33DFCC 101.16%)
+}

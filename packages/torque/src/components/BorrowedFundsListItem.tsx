@@ -5,7 +5,7 @@ import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
 import { TorqueProvider } from "../services/TorqueProvider";
-import { CollateralSlider } from "./CollateralSlider";
+import { Rail } from "./Rail";
 
 import { ManageCollateralRequest } from "../domain/ManageCollateralRequest";
 import { RepayLoanRequest } from "../domain/RepayLoanRequest";
@@ -190,14 +190,8 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
               ) : null}
             </div>
           </div>
-          <div className="borrowed-funds-list-item__body-slider-container">
-            <CollateralSlider
-              readonly={true}
-              showExactCollaterization={true}
-              minValue={sliderMin}
-              maxValue={sliderMax}
-              value={sliderValue}
-            />
+          <div className="borrowed-funds-list-item__body-collateralized-rail">
+            <Rail sliderValue={sliderValue} sliderMax={sliderMax} />
           </div>
           <div title={`${borrowedFundsItem.collateralAmount.toFixed(18)} ${borrowedFundsItem.collateralAsset}`}
             className="borrowed-funds-list-item__body-collateralized-value">

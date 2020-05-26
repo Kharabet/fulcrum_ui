@@ -10,7 +10,7 @@ import { IBorrowMoreState } from "../domain/IBorrowMoreState";
 import { IBorrowMoreEstimate } from "../domain/IBorrowMoreEstimate";
 import { BorrowRequest } from "../domain/BorrowRequest";
 import { TorqueProvider } from "../services/TorqueProvider";
-import { CollateralSlider } from "./CollateralSlider";
+import { Rail } from "./Rail";
 import { Loader } from "./Loader";
 
 export interface IBorrowMoreFormProps {
@@ -197,17 +197,9 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
             </div>
           </div>
 
-          <CollateralSlider
-            readonly={true}
-            showExactCollaterization={true}
-            minValue={this.state.minValue}
-            maxValue={this.state.maxValue}
-            value={this.state.selectedValue}
-          />
+          <Rail sliderValue={this.state.selectedValue} sliderMax={this.state.maxValue} />
 
-          <hr className="borrow-more-loan-form__delimiter" />
-
-          <div className="input-container">
+          <div className="input-container mt-30">
             <div className="input-row">
               <span className="asset-icon">{this.state.assetDetails.reactLogoSvg.render()}</span>
               {this.state.isLoading

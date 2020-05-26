@@ -14,7 +14,7 @@ import { ReactComponent as IconInfo } from "../assets/images/icon_info.svg";
 import { ReactComponent as IconInfoActive } from "../assets/images/icon_info_active.svg";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { AssetDetails } from "../domain/AssetDetails";
-import { CollaterallRefinanceSlider } from "./CollaterallRefinanceSlider";
+import Slider from "rc-slider";
 import { NavService } from '../services/NavService';
 import { RefinanceMakerRequest } from "../domain/RefinanceMakerRequest";
 import { Confirm } from "./Confirm";
@@ -339,10 +339,10 @@ export class RefinanceAssetSelectorItem extends Component<IRefinanceAssetSelecto
                 </div>
                 <div className="refinance-asset-selector__collateral-slider">
                   <div className="collateral-value">{this.state.loan.collaterizationPercent!.dp(2, BigNumber.ROUND_FLOOR).toNumber()}%</div>
-                  <CollaterallRefinanceSlider
-                    readonly={this.state.borrowAmount.lte(0) || this.state.borrowAmount.gt(this.props.refinanceData.debt)}
-                    minValue={this.state.loan.maintenanceMarginAmount.dp(2, BigNumber.ROUND_FLOOR).toNumber()}
-                    maxValue={this.props.refinanceData.collaterizationPercent!.dp(2, BigNumber.ROUND_FLOOR).toNumber()}
+                  <Slider
+                    step={0.01}
+                    min={this.state.loan.maintenanceMarginAmount.dp(2, BigNumber.ROUND_FLOOR).toNumber()}
+                    max={this.props.refinanceData.collaterizationPercent!.dp(2, BigNumber.ROUND_FLOOR).toNumber()}
                     value={this.state.loan.collaterizationPercent!.dp(2, BigNumber.ROUND_FLOOR).toNumber()}
                     onChange={this.onCollaterizationChange}
                   />

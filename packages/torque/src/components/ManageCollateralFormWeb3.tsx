@@ -9,7 +9,7 @@ import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
 import { ICollateralChangeEstimate } from "../domain/ICollateralChangeEstimate";
 import { ManageCollateralRequest } from "../domain/ManageCollateralRequest";
 import { TorqueProvider } from "../services/TorqueProvider";
-import { CollateralSlider } from "./CollateralSlider";
+import Slider from "rc-slider";
 import { OpsEstimatedResult } from "./OpsEstimatedResult";
 import { InputAmount } from "./InputAmount";
 import { Loader } from "./Loader";
@@ -259,12 +259,11 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
                 </div>
               </div>
             )}
-          <CollateralSlider
-            readonly={false}
-            minValue={this.state.minValue}
-            maxValue={this.state.maxValue}
+          <Slider
+            step={0.01}
+            min={this.state.minValue}
+            max={this.state.maxValue}
             value={this.state.selectedValue}
-            onUpdate={this.onUpdate}
             onChange={this.onChange}
           />
 
@@ -273,13 +272,8 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
             <div className="manage-collateral-form__tip">Top Up</div>
           </div>
 
-          <hr className="manage-collateral-form__delimiter" />
-          <div className="manage-collateral-form__info-liquidated-at-msg">
-            You will
-                    {this.state.loanValue > this.state.selectedValue ?
-              " withdraw" :
-              " top up"
-            }
+          <div className="manage-collateral-form__info-liquidated-at-msg mb-20">
+            You will {this.state.loanValue > this.state.selectedValue ? " withdraw" : " top up"}
           </div>
 
           <div className="input-container">

@@ -30,24 +30,6 @@
         grid-column: 1/3;
         place-self: center;
       }
-      &:not(.disabled-hover) {
-        &:hover {
-          background-color: transparent;
-          border: 1px solid #a9b5c7;
-          .refinance-asset__main-block .refinance-asset-selector__non-torque .refinance__input-container .input-amount,
-          .refinance-asset__main-block .refinance-asset-selector__torque .refinance-asset-selector__cdp {
-            background-color: #f5f7f9;
-          }
-          .refinance-asset-selector__collateral-slider {
-            .slider-handle {
-              border: 4px solid #ffffff !important;
-            }
-            .slider-track-after {
-              background-color: #f5f7f9 !important;
-            }
-          }
-        }
-      }
       &.inactive {
         background-color: #f3f9ff;
         border: 1px solid transparent;
@@ -270,10 +252,14 @@
               font-weight: 800;
               margin-bottom: 15px;
             }
-            .slider-handle {
-              border: 4px solid #f3f9ff;
+            .rc-slider-handle {
+              border-color: #f3f9ff;
+              background-color: #8e7df6;
             }
-            .slider-track-after {
+            .rc-slider-track {
+              background-color: #4ecea3;
+            }
+            .rc-slider-rail {
               background-color: #ffffff;
             }
           }
@@ -436,6 +422,24 @@
             cursor: not-allowed;
             &:hover {
               background-color: #eaeaee;
+            }
+          }
+        }
+      }
+      &:not(.disabled-hover) {
+        &:hover {
+          background-color: transparent;
+          border: 1px solid #a9b5c7;
+          .refinance-asset__main-block .refinance-asset-selector__non-torque .refinance__input-container .input-amount,
+          .refinance-asset__main-block .refinance-asset-selector__torque .refinance-asset-selector__cdp {
+            background-color: #f5f7f9;
+          }
+          .refinance-asset-selector__collateral-slider {
+            .rc-slider-handle {
+              border: 4px solid #ffffff;
+            }
+            .rc-slider-rail {
+              background-color: #f5f7f9;
             }
           }
         }
