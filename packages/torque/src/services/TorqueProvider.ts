@@ -433,8 +433,10 @@ export class TorqueProvider {
           destAssetErc20Address
         );
         // console.log("swapPriceData- ",swapPriceData[0])
-        result = swapPriceData[0].multipliedBy(swapPriceData[1]);
+        // result = swapPriceData[0].multipliedBy(swapPriceData[1]);
+        result = swapPriceData[0].dividedBy(10 ** 18);
       } catch (e) {
+        console.log(e)
         result = new BigNumber(0);
       }
     }
