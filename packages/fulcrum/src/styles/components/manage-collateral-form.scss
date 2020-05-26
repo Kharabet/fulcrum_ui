@@ -16,6 +16,19 @@
     width: 16px;
     cursor: pointer;
   }
+  
+  &__form-container {
+    padding: 0;
+  }
+
+  &__form-container.buy {
+    padding: 0;
+  }
+
+  &__form-values-container {
+    margin-bottom: 22px;
+  }
+
   &__title {
     margin-bottom: 10px;
     font-size: 32px;
@@ -178,6 +191,48 @@
   &__input-amount-form {
     margin-top: 5px;
   }
+  &__kv-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+
+    padding: 0.22rem 0;
+    &.jc-fe {
+      justify-content: flex-end;
+    }
+  }
+
+  &__kv-container--w_dots {
+    background-image: url("../../assets/images/dotted_line.png");
+    background-repeat: repeat-x;
+    background-position-y: 1.25rem;
+  }
+  &__label {
+    font-weight: 600;
+    font-size: 12px;
+    line-height: 150%;
+    color: #fe7272;
+    margin-bottom: 10px;
+
+    &.slippage {
+      font-size: 14px;
+      display: flex;
+    }
+
+    &--no-bg {
+      background-color: transparent;
+    }
+  }
+  &__slippage-amount {
+    font-weight: 800;
+
+    display: flex;
+    align-items: center;
+    svg {
+      margin-left: 2px;
+    }
+  }
+
   @media screen and (max-width: $mobile-version-max-width) {
     width: 310px;
 

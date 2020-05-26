@@ -466,21 +466,21 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
 
 
           <div className="manage-collateral-form__input-amount-form" >
-            <div className={`input-amount__form-container  ${this.props.tradeType === TradeType.BUY ? "buy" : "sell"}`}>
-              <div className="input-amount__form-values-container">
+            <div className={`manage-collateral-form__form-container  ${this.props.tradeType === TradeType.BUY ? "buy" : "sell"}`}>
+              <div className="manage-collateral-form__form-values-container">
                 {/* {!this.props.isMobileMedia && this.props.tradeType === TradeType.BUY ? (
               <TradeExpectedResult value={tradeExpectedResultValue} />
             ) : null} */}
 
-                <div className="input-amount__kv-container">
+                <div className="manage-collateral-form__kv-container">
                   {amountMsg.includes("Slippage:") ? (
-                    <div title={`${this.state.slippageRate.toFixed(18)}%`} className="input-amount__label slippage">
+                    <div title={`${this.state.slippageRate.toFixed(18)}%`} className="manage-collateral-form__label slippage">
                       {amountMsg}
-                      <span className="input-amount__slippage-amount">
+                      <span className="manage-collateral-form__slippage-amount">
                         &nbsp;{`${this.state.slippageRate.toFixed(2)}%`}<SlippageDown />
                       </span>
                     </div>
-                  ) : (<div className="input-amount__label">{amountMsg}</div>)}
+                  ) : (<div className="manage-collateral-form__label">{amountMsg}</div>)}
 
                 </div>
 
@@ -497,7 +497,7 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
                   {!this.state.isLoading ? null
                     : <div className="preloader-container"> <Preloader width="80px" /></div>
                   }
-                  <div className="trade-form__collateral-button-container">
+                  <div className="input-amount__collateral-button-container">
                     <CollateralTokenButton asset={this.state.collateral} onClick={this.onChangeCollateralOpen} isChangeCollateralOpen={this.state.isChangeCollateralOpen} />
                   </div>
                   {this.state.isChangeCollateralOpen

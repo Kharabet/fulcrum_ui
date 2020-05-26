@@ -94,6 +94,47 @@
 
     margin-top: auto;
   }
+  &__kv-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+
+    padding: 0.22rem 0;
+    &.jc-fe {
+      justify-content: flex-end;
+    }
+  }
+
+  &__kv-container--w_dots {
+    background-image: url("../../assets/images/dotted_line.png");
+    background-repeat: repeat-x;
+    background-position-y: 1.25rem;
+  }
+  &__label {
+    font-weight: 600;
+    font-size: 12px;
+    line-height: 150%;
+    color: #fe7272;
+    margin-bottom: 10px;
+
+    &.slippage {
+      font-size: 14px;
+      display: flex;
+    }
+
+    &--no-bg {
+      background-color: transparent;
+    }
+  }
+  &__slippage-amount {
+    font-weight: 800;
+
+    display: flex;
+    align-items: center;
+    svg {
+      margin-left: 2px;
+    }
+  }
 
   .trade-how-it-works-container {
     margin-top: -30px;
@@ -260,13 +301,6 @@
 //   }
 // }
 
-.rounded-mark {
-  font-size: 0.5rem;
-  border-width: 1px;
-  border-style: solid;
-  border-radius: 100px;
-  padding: 0.0625rem 0.3125rem;
-}
 
 @media screen and (max-width: $breakpoint-mobile-max) {
   .trade-form {
@@ -401,6 +435,7 @@
         padding-top: 30px;
       }
     }
+
     &__form-values-container {
       margin-bottom: 20px;
     }
@@ -415,7 +450,32 @@
     &__position-type-container {
       margin-bottom: 1rem;
     }
+&__kv-container {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
 
+      padding: 0.22rem 0;
+    }
+
+    &__kv-container--w_dots {
+      background-image: url("../../assets/images/dotted_line.png");
+      background-repeat: repeat-x;
+      background-position-y: 1.25rem;
+    }
+    &__label {
+      font-weight: 600;
+      font-size: 10px;
+      line-height: 150%;
+      color: #fe7272;
+      &.slippage {
+        font-size: 12px;
+      }
+
+      &--no-bg {
+        background-color: transparent;
+      }
+    }
     &__slippage-amount img {
       width: 10px;
       height: auto;
