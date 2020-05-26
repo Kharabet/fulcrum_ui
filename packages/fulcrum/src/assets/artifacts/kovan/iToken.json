@@ -935,58 +935,6 @@
             "constant": false,
             "inputs": [
                 {
-                    "name": "borrowAmount",
-                    "type": "uint256"
-                },
-                {
-                    "name": "leverageAmount",
-                    "type": "uint256"
-                },
-                {
-                    "name": "interestInitialAmount",
-                    "type": "uint256"
-                },
-                {
-                    "name": "loanTokenSent",
-                    "type": "uint256"
-                },
-                {
-                    "name": "collateralTokenSent",
-                    "type": "uint256"
-                },
-                {
-                    "name": "tradeTokenSent",
-                    "type": "uint256"
-                },
-                {
-                    "name": "borrower",
-                    "type": "address"
-                },
-                {
-                    "name": "collateralToken",
-                    "type": "address"
-                },
-                {
-                    "name": "tradeTokenAddress",
-                    "type": "address"
-                }
-            ],
-            "name": "borrowTokenAndUse",
-            "outputs": [
-                {
-                    "name": "loanId",
-                    "type": "bytes32"
-                }
-            ],
-            "payable": false,
-            "stateMutability": "nonpayable",
-            "type": "function",
-            "signature": "0x2ddbfc19"
-        },
-        {
-            "constant": false,
-            "inputs": [
-                {
                     "name": "loanId",
                     "type": "bytes32"
                 },
@@ -1004,10 +952,6 @@
                 },
                 {
                     "name": "collateralTokenSent",
-                    "type": "uint256"
-                },
-                {
-                    "name": "tradeTokenSent",
                     "type": "uint256"
                 },
                 {

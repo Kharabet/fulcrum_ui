@@ -519,17 +519,6 @@ export class iTokenContract extends BaseContract {
         }
     };
 
-    /*bytes32 loanId, // 0 if new loan
-    uint256 depositAmount,
-    uint256 leverageAmount,
-    uint256 loanTokenSent,
-    uint256 collateralTokenSent,
-    uint256 tradeTokenSent,
-    address trader,
-    address depositTokenAddress,
-    address collateralTokenAddress,
-    bytes memory loanDataBytes)*/
-
     public marginTradeFromDeposit = {
         async sendTransactionAsync(
             loanId: string,
@@ -537,7 +526,6 @@ export class iTokenContract extends BaseContract {
             leverageAmount: BigNumber,
             loanTokenSent: BigNumber,
             collateralTokenSent: BigNumber,
-            tradeTokenSent: BigNumber,
             trader: string,
             depositToken: string,
             collateralToken: string,
@@ -545,13 +533,12 @@ export class iTokenContract extends BaseContract {
             txData: Partial<TxData> = {}
         ): Promise<string> {
             const self = (this as any) as iTokenContract;
-            const encodedData = self._strictEncodeArguments("marginTradeFromDeposit(bytes32,uint256,uint256,uint256,uint256,uint256,address,address,address,bytes)", [
+            const encodedData = self._strictEncodeArguments("marginTradeFromDeposit(bytes32,uint256,uint256,uint256,uint256,address,address,address,bytes)", [
                 loanId,
                 depositAmount,
                 leverageAmount,
                 loanTokenSent,
                 collateralTokenSent,
-                tradeTokenSent,
                 trader,
                 depositToken,
                 collateralToken,
@@ -571,7 +558,6 @@ export class iTokenContract extends BaseContract {
                     leverageAmount,
                     loanTokenSent,
                     collateralTokenSent,
-                    tradeTokenSent,
                     trader,
                     depositToken,
                     collateralToken,
@@ -587,7 +573,6 @@ export class iTokenContract extends BaseContract {
             leverageAmount: BigNumber,
             loanTokenSent: BigNumber,
             collateralTokenSent: BigNumber,
-            tradeTokenSent: BigNumber,
             trader: string,
             depositToken: string,
             collateralToken: string,
@@ -595,13 +580,12 @@ export class iTokenContract extends BaseContract {
             txData: Partial<TxData> = {}
         ): Promise<number> {
             const self = (this as any) as iTokenContract;
-            const encodedData = self._strictEncodeArguments("marginTradeFromDeposit(bytes32,uint256,uint256,uint256,uint256,uint256,address,address,address,bytes)", [
+            const encodedData = self._strictEncodeArguments("marginTradeFromDeposit(bytes32,uint256,uint256,uint256,uint256,address,address,address,bytes)", [
                 loanId,
                 depositAmount,
                 leverageAmount,
                 loanTokenSent,
                 collateralTokenSent,
-                tradeTokenSent,
                 trader,
                 depositToken,
                 collateralToken,
@@ -624,20 +608,18 @@ export class iTokenContract extends BaseContract {
             leverageAmount: BigNumber,
             loanTokenSent: BigNumber,
             collateralTokenSent: BigNumber,
-            tradeTokenSent: BigNumber,
             trader: string,
             depositToken: string,
             collateralToken: string,
             loanData: string,
         ): string {
             const self = (this as any) as iTokenContract;
-            const abiEncodedTransactionData = self._strictEncodeArguments("marginTradeFromDeposit(bytes32,uint256,uint256,uint256,uint256,uint256,address,address,address,bytes)", [
+            const abiEncodedTransactionData = self._strictEncodeArguments("marginTradeFromDeposit(bytes32,uint256,uint256,uint256,uint256,address,address,address,bytes)", [
                 loanId,
                 depositAmount,
                 leverageAmount,
                 loanTokenSent,
                 collateralTokenSent,
-                tradeTokenSent,
                 trader,
                 depositToken,
                 collateralToken,
@@ -651,7 +633,6 @@ export class iTokenContract extends BaseContract {
             leverageAmount: BigNumber,
             loanTokenSent: BigNumber,
             collateralTokenSent: BigNumber,
-            tradeTokenSent: BigNumber,
             trader: string,
             depositToken: string,
             collateralToken: string,
@@ -660,13 +641,12 @@ export class iTokenContract extends BaseContract {
             defaultBlock?: BlockParam
         ): Promise<BigNumber> {
             const self = (this as any) as iTokenContract;
-            const encodedData = self._strictEncodeArguments("marginTradeFromDeposit(bytes32,uint256,uint256,uint256,uint256,uint256,address,address,address,bytes)", [
+            const encodedData = self._strictEncodeArguments("marginTradeFromDeposit(bytes32,uint256,uint256,uint256,uint256,address,address,address,bytes)", [
                 loanId,
                 depositAmount,
                 leverageAmount,
                 loanTokenSent,
                 collateralTokenSent,
-                tradeTokenSent,
                 trader,
                 depositToken,
                 collateralToken,
@@ -682,7 +662,7 @@ export class iTokenContract extends BaseContract {
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
             BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
-            const abiEncoder = self._lookupAbiEncoder("marginTradeFromDeposit(bytes32,uint256,uint256,uint256,uint256,uint256,address,address,address,bytes)");
+            const abiEncoder = self._lookupAbiEncoder("marginTradeFromDeposit(bytes32,uint256,uint256,uint256,uint256,address,address,address,bytes)");
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<BigNumber>(rawCallResult);
             // tslint:enable boolean-naming
