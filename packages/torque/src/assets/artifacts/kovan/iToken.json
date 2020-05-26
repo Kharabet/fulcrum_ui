@@ -892,7 +892,7 @@
                     "type": "bytes32"
                 },
                 {
-                    "name": "borrowAmount",
+                    "name": "withdrawAmount",
                     "type": "uint256"
                 },
                 {
@@ -904,6 +904,10 @@
                     "type": "uint256"
                 },
                 {
+                    "name": "collateralToken",
+                    "type": "address"
+                },
+                {
                     "name": "borrower",
                     "type": "address"
                 },
@@ -912,15 +916,11 @@
                     "type": "address"
                 },
                 {
-                    "name": "collateralToken",
-                    "type": "address"
-                },
-                {
                     "name": "loanData",
                     "type": "bytes"
                 }
             ],
-            "name": "borrowTokenFromDeposit",
+            "name": "borrow",
             "outputs": [
                 {
                     "name": "loanId",

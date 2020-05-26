@@ -519,29 +519,29 @@ export class iTokenContract extends BaseContract {
         }
     };
 
-    public marginTradeFromDeposit = {
+    public marginTrade = {
         async sendTransactionAsync(
             loanId: string,
             depositAmount: BigNumber,
             leverageAmount: BigNumber,
             loanTokenSent: BigNumber,
             collateralTokenSent: BigNumber,
-            trader: string,
             depositToken: string,
             collateralToken: string,
+            trader: string,
             loanData: string,
             txData: Partial<TxData> = {}
         ): Promise<string> {
             const self = (this as any) as iTokenContract;
-            const encodedData = self._strictEncodeArguments("marginTradeFromDeposit(bytes32,uint256,uint256,uint256,uint256,address,address,address,bytes)", [
+            const encodedData = self._strictEncodeArguments("marginTrade(bytes32,uint256,uint256,uint256,uint256,address,address,address,bytes)", [
                 loanId,
                 depositAmount,
                 leverageAmount,
                 loanTokenSent,
                 collateralTokenSent,
-                trader,
                 depositToken,
                 collateralToken,
+                trader,
                 loanData
             ]);
             const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -551,16 +551,16 @@ export class iTokenContract extends BaseContract {
                     data: encodedData
                 },
                 self._web3Wrapper.getContractDefaults(),
-                (self as any).marginTradeFromDeposit.estimateGasAsync.bind(
+                (self as any).marginTrade.estimateGasAsync.bind(
                     self,
                     loanId,
                     depositAmount,
                     leverageAmount,
                     loanTokenSent,
                     collateralTokenSent,
-                    trader,
                     depositToken,
                     collateralToken,
+                    trader,
                     loanData
                 )
             );
@@ -573,22 +573,22 @@ export class iTokenContract extends BaseContract {
             leverageAmount: BigNumber,
             loanTokenSent: BigNumber,
             collateralTokenSent: BigNumber,
-            trader: string,
             depositToken: string,
             collateralToken: string,
+            trader: string,
             loanData: string,
             txData: Partial<TxData> = {}
         ): Promise<number> {
             const self = (this as any) as iTokenContract;
-            const encodedData = self._strictEncodeArguments("marginTradeFromDeposit(bytes32,uint256,uint256,uint256,uint256,address,address,address,bytes)", [
+            const encodedData = self._strictEncodeArguments("marginTrade(bytes32,uint256,uint256,uint256,uint256,address,address,address,bytes)", [
                 loanId,
                 depositAmount,
                 leverageAmount,
                 loanTokenSent,
                 collateralTokenSent,
-                trader,
                 depositToken,
                 collateralToken,
+                trader,
                 loanData
             ]);
             const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -608,21 +608,21 @@ export class iTokenContract extends BaseContract {
             leverageAmount: BigNumber,
             loanTokenSent: BigNumber,
             collateralTokenSent: BigNumber,
-            trader: string,
             depositToken: string,
             collateralToken: string,
+            trader: string,
             loanData: string,
         ): string {
             const self = (this as any) as iTokenContract;
-            const abiEncodedTransactionData = self._strictEncodeArguments("marginTradeFromDeposit(bytes32,uint256,uint256,uint256,uint256,address,address,address,bytes)", [
+            const abiEncodedTransactionData = self._strictEncodeArguments("marginTrade(bytes32,uint256,uint256,uint256,uint256,address,address,address,bytes)", [
                 loanId,
                 depositAmount,
                 leverageAmount,
                 loanTokenSent,
                 collateralTokenSent,
-                trader,
                 depositToken,
                 collateralToken,
+                trader,
                 loanData
             ]);
             return abiEncodedTransactionData;
@@ -633,23 +633,23 @@ export class iTokenContract extends BaseContract {
             leverageAmount: BigNumber,
             loanTokenSent: BigNumber,
             collateralTokenSent: BigNumber,
-            trader: string,
             depositToken: string,
             collateralToken: string,
+            trader: string,
             loanData: string,
             callData: Partial<CallData> = {},
             defaultBlock?: BlockParam
         ): Promise<BigNumber> {
             const self = (this as any) as iTokenContract;
-            const encodedData = self._strictEncodeArguments("marginTradeFromDeposit(bytes32,uint256,uint256,uint256,uint256,address,address,address,bytes)", [
+            const encodedData = self._strictEncodeArguments("marginTrade(bytes32,uint256,uint256,uint256,uint256,address,address,address,bytes)", [
                 loanId,
                 depositAmount,
                 leverageAmount,
                 loanTokenSent,
                 collateralTokenSent,
-                trader,
                 depositToken,
                 collateralToken,
+                trader,
                 loanData
             ]);
             const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -662,7 +662,7 @@ export class iTokenContract extends BaseContract {
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
             BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
-            const abiEncoder = self._lookupAbiEncoder("marginTradeFromDeposit(bytes32,uint256,uint256,uint256,uint256,address,address,address,bytes)");
+            const abiEncoder = self._lookupAbiEncoder("marginTrade(bytes32,uint256,uint256,uint256,uint256,address,address,address,bytes)");
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<BigNumber>(rawCallResult);
             // tslint:enable boolean-naming
@@ -670,27 +670,27 @@ export class iTokenContract extends BaseContract {
         }
     };
 
-    public borrowTokenFromDeposit = {
+    public borrow = {
         async sendTransactionAsync(
             loanId: string,
             withdrawAmount: BigNumber,
             initialLoanDuration: BigNumber,
             collateralTokenSent: BigNumber,
+            collateralToken: string,
             borrower: string,
             receiver: string,
-            collateralToken: string,
             loanData: string,
             txData: Partial<TxData> = {}
         ): Promise<string> {
             const self = (this as any) as iTokenContract;
-            const encodedData = self._strictEncodeArguments("borrowTokenFromDeposit(bytes32,uint256,uint256,uint256,address,address,address,bytes)", [
+            const encodedData = self._strictEncodeArguments("borrow(bytes32,uint256,uint256,uint256,address,address,address,bytes)", [
                 loanId,
                 withdrawAmount,
                 initialLoanDuration,
                 collateralTokenSent,
+                collateralToken,
                 borrower,
                 receiver,
-                collateralToken,
                 loanData
             ]);
             const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -700,15 +700,15 @@ export class iTokenContract extends BaseContract {
                     data: encodedData
                 },
                 self._web3Wrapper.getContractDefaults(),
-                (self as any).borrowTokenFromDeposit.estimateGasAsync.bind(
+                (self as any).borrow.estimateGasAsync.bind(
                     self,
                     loanId,
                     withdrawAmount,
                     initialLoanDuration,
                     collateralTokenSent,
+                    collateralToken,
                     borrower,
                     receiver,
-                    collateralToken,
                     loanData
                 )
             );
@@ -720,21 +720,21 @@ export class iTokenContract extends BaseContract {
             withdrawAmount: BigNumber,
             initialLoanDuration: BigNumber,
             collateralTokenSent: BigNumber,
+            collateralToken: string,
             borrower: string,
             receiver: string,
-            collateralToken: string,
             loanData: string,
             txData: Partial<TxData> = {}
         ): Promise<number> {
             const self = (this as any) as iTokenContract;
-            const encodedData = self._strictEncodeArguments("borrowTokenFromDeposit(bytes32,uint256,uint256,uint256,address,address,address,bytes)", [
+            const encodedData = self._strictEncodeArguments("borrow(bytes32,uint256,uint256,uint256,address,address,address,bytes)", [
                 loanId,
                 withdrawAmount,
                 initialLoanDuration,
                 collateralTokenSent,
+                collateralToken,
                 borrower,
                 receiver,
-                collateralToken,
                 loanData
             ]);
             const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -753,20 +753,20 @@ export class iTokenContract extends BaseContract {
             withdrawAmount: BigNumber,
             initialLoanDuration: BigNumber,
             collateralTokenSent: BigNumber,
+            collateralToken: string,
             borrower: string,
             receiver: string,
-            collateralToken: string,
             loanData: string,
         ): string {
             const self = (this as any) as iTokenContract;
-            const abiEncodedTransactionData = self._strictEncodeArguments("borrowTokenFromDeposit(bytes32,uint256,uint256,uint256,address,address,address,bytes)", [
+            const abiEncodedTransactionData = self._strictEncodeArguments("borrow(bytes32,uint256,uint256,uint256,address,address,address,bytes)", [
                 loanId,
                 withdrawAmount,
                 initialLoanDuration,
                 collateralTokenSent,
+                collateralToken,
                 borrower,
                 receiver,
-                collateralToken,
                 loanData
             ]);
             return abiEncodedTransactionData;
@@ -776,22 +776,22 @@ export class iTokenContract extends BaseContract {
             withdrawAmount: BigNumber,
             initialLoanDuration: BigNumber,
             collateralTokenSent: BigNumber,
+            collateralToken: string,
             borrower: string,
             receiver: string,
-            collateralToken: string,
             loanData: string,
             callData: Partial<CallData> = {},
             defaultBlock?: BlockParam
         ): Promise<BigNumber> {
             const self = (this as any) as iTokenContract;
-            const encodedData = self._strictEncodeArguments("borrowTokenFromDeposit(bytes32,uint256,uint256,uint256,address,address,address,bytes)", [
+            const encodedData = self._strictEncodeArguments("borrow(bytes32,uint256,uint256,uint256,address,address,address,bytes)", [
                 loanId,
                 withdrawAmount,
                 initialLoanDuration,
                 collateralTokenSent,
+                collateralToken,
                 borrower,
                 receiver,
-                collateralToken,
                 loanData
             ]);
             const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -804,7 +804,7 @@ export class iTokenContract extends BaseContract {
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
             BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
-            const abiEncoder = self._lookupAbiEncoder("borrowTokenFromDeposit(bytes32,uint256,uint256,uint256,address,address,address,bytes)");
+            const abiEncoder = self._lookupAbiEncoder("borrow(bytes32,uint256,uint256,uint256,address,address,address,bytes)");
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<BigNumber>(rawCallResult);
             // tslint:enable boolean-naming
