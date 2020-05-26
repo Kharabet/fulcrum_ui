@@ -19,6 +19,115 @@ import { BigNumber, classUtils } from "@0x/utils";
 // tslint:disable-next-line:class-name
 export class iBZxContract extends BaseContract {
 
+  public closeTrade = {
+    async sendTransactionAsync(
+      loanId: string,
+      receiver: string,
+      closeAmount: BigNumber,
+      loanData: string,
+      txData: Partial<TxData> = {}
+    ): Promise<string> {
+      const self = (this as any) as iBZxContract;
+      const encodedData = self._strictEncodeArguments("closeTrade(bytes32,address,uint256,bytes)", [
+        loanId,
+        receiver,
+        closeAmount,
+        loanData
+      ]);
+      const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+        {
+          to: self.address,
+          ...txData,
+          data: encodedData
+        },
+        self._web3Wrapper.getContractDefaults(),
+        (self as any).closeTrade.estimateGasAsync.bind(
+          self,
+          loanId,
+          receiver,
+          closeAmount,
+          loanData
+        )
+      );
+      const txHash = await self._web3Wrapper.sendTransactionAsync(txDataWithDefaults);
+      return txHash;
+    },
+    async estimateGasAsync(
+      loanId: string,
+      receiver: string,
+      closeAmount: BigNumber,
+      loanData: string,
+      txData: Partial<TxData> = {}
+    ): Promise<number> {
+      const self = (this as any) as iBZxContract;
+      const encodedData = self._strictEncodeArguments("closeTrade(bytes32,address,uint256,bytes)", [
+        loanId,
+        receiver,
+        closeAmount,
+        loanData
+      ]);
+      const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+        {
+          to: self.address,
+          ...txData,
+          data: encodedData
+        },
+        self._web3Wrapper.getContractDefaults()
+      );
+      const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
+      return gas;
+    },
+    getABIEncodedTransactionData(
+      loanId: string,
+      receiver: string,
+      closeAmount: BigNumber,
+      loanData: string
+    ): string {
+      const self = (this as any) as iBZxContract;
+      const abiEncodedTransactionData = self._strictEncodeArguments(
+        "closeTrade(bytes32,address,uint256,bytes)",
+        [
+          loanId,
+          receiver,
+          closeAmount,
+          loanData
+        ]
+      );
+      return abiEncodedTransactionData;
+    },
+    async callAsync(
+      loanId: string,
+      receiver: string,
+      closeAmount: BigNumber,
+      loanData: string,
+      callData: Partial<CallData> = {},
+      defaultBlock?: BlockParam
+    ): Promise<[BigNumber, BigNumber, string]> {
+      const self = (this as any) as iBZxContract;
+      const encodedData = self._strictEncodeArguments("closeTrade(bytes32,address,uint256,bytes)", [
+        loanId,
+        receiver,
+        closeAmount,
+        loanData
+      ]);
+      const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+        {
+          to: self.address,
+          ...callData,
+          data: encodedData
+        },
+        self._web3Wrapper.getContractDefaults()
+      );
+      const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
+      BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+      const abiEncoder = self._lookupAbiEncoder("closeTrade(bytes32,address,uint256,bytes)");
+      // tslint:disable boolean-naming
+      const result = abiEncoder.strictDecodeReturnValue<[BigNumber, BigNumber, string]>(rawCallResult);
+      // tslint:enable boolean-naming
+      return result;
+    }
+  };
+
   public repayWithDeposit = {
     async sendTransactionAsync(
       loanId: string,
