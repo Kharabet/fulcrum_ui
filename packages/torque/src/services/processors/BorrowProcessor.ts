@@ -107,7 +107,7 @@ export class BorrowProcessor {
       gasAmountBN = new BigNumber(gasAmount).multipliedBy(TorqueProvider.Instance.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
     } catch (e) {
       console.log(e);
-      throw e;
+      // throw e;
     }
 
     try {
