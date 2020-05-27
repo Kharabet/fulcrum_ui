@@ -1,11 +1,8 @@
 import { BigNumber } from "@0x/utils";
 import React, { ChangeEvent, Component, FormEvent } from "react";
 import TagManager from "react-gtm-module";
-import Modal from "react-modal";
-// import { Tooltip } from "react-tippy";
 import { merge, Observable, Subject } from "rxjs";
 import { debounceTime, distinctUntilChanged, switchMap } from "rxjs/operators";
-import ic_arrow_max from "../assets/images/ic_arrow_max.svg";
 import { ReactComponent as CloseIcon } from "../assets/images/ic__close.svg"
 import { ReactComponent as QuestionIcon } from "../assets/images/ic__question_mark.svg"
 import { ReactComponent as SlippageDown } from "../assets/images/ic__slippage_down.svg"
@@ -20,17 +17,14 @@ import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents"
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
 
-// import { CheckBox } from "./CheckBox";
 import { CollapsibleContainer } from "./CollapsibleContainer";
-import { CollateralTokenButton } from "./CollateralTokenButton";
-import { CollateralTokenSelector } from "./CollateralTokenSelector";
 import { PositionTypeMarkerAlt } from "./PositionTypeMarkerAlt";
 import { TradeExpectedResult } from "./TradeExpectedResult";
 import { UnitOfAccountSelector } from "./UnitOfAccountSelector";
 import { Preloader } from "./Preloader";
+import { InputAmount } from "./InputAmount";
 
 import "../styles/components/trade-form.scss";
-import "../styles/components/input-amount.scss";
 
 interface IInputAmountLimited {
   inputAmountValue: BigNumber;
@@ -115,7 +109,6 @@ interface ITradeFormState {
 
 export default class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
   private readonly _inputPrecision = 6;
-  private _input: HTMLInputElement | null = null;
 
   private readonly _inputChange: Subject<string>;
   private readonly _inputSetMax: Subject<BigNumber>;
@@ -215,9 +208,6 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
     );
   }
 
-  private _setInputRef = (input: HTMLInputElement) => {
-    this._input = input;
-  };
 
   private async derivedUpdate() {
 
@@ -277,7 +267,6 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       slippageRate: tradeExpectedResults.slippageRate,
       interestRate: interestRate,
       pTokenAddress: address,
-      // collateral: this.props.defaultCollateral,
       maybeNeedsApproval: maybeNeedsApproval,
       currentPrice: new BigNumber(latestPriceDataPoint.price),
       liquidationPrice: liquidationPrice,
@@ -300,13 +289,9 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
     this._isMounted = true;
 
     await this.derivedUpdate();
-    if (this.props.isOpenModal)
+    if (this.props.isOpenModal) {
       window.history.pushState(null, "Trade Modal Opened", `/trade/${this.props.tradeType.toLocaleLowerCase()}-${this.props.leverage}x-${this.props.positionType.toLocaleLowerCase()}-${this.props.asset}/`);
-
-    if (this._input) {
-      // this._input.select();
-      this._input.focus();
-      this._inputSetMax.next();
+      this.onInsertMaxValue(.5);
     }
   }
 
@@ -345,24 +330,11 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       return null;
     }
 
-    /*const divStyle = {
-      backgroundImage: `url(${this.state.assetDetails.bgSvg})`
-    };*/
-
     const submitClassName =
       this.props.tradeType === TradeType.BUY ? "trade-form__submit-button--buy" : "trade-form__submit-button--sell";
 
-    // const positionTypePrefix = this.props.defaultUnitOfAccount === Asset.DAI ? "d" : this.props.defaultUnitOfAccount === Asset.SAI ? "s" : "u";
-    // const positionTypePrefix2 = this.props.positionType === PositionType.SHORT ? "s" : "L";
-    // const positionLeveragePostfix = this.props.leverage > 1 ? `${this.props.leverage}x` : "";
     const tokenNameBase = this.state.assetDetails.displayName;
-    // const tokenNamePosition = `${positionTypePrefix}${positionTypePrefix2}${this.state.assetDetails.displayName}${positionLeveragePostfix}`;
 
-    // const tokenNameSource = this.props.tradeType === TradeType.BUY ? this.state.collateral : tokenNamePosition;
-    // const tokenNameDestination = this.props.tradeType === TradeType.BUY ? tokenNamePosition : this.state.collateral;
-
-    const isAmountMaxed = this.state.tradeAmountValue.eq(this.state.maxTradeValue);
-    const multiplier = this.state.tradeAmountValue.dividedBy(this.state.maxTradeValue).toNumber();
     const amountMsg =
       this.state.ethBalance && this.state.ethBalance.lte(FulcrumProvider.Instance.gasBufferForTrade)
         ? "Insufficient funds for gas"
@@ -375,15 +347,6 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
               ? `Slippage:`
               : "";
 
-    /*const tradedAmountEstimateText =
-      this.state.tradedAmountEstimate.eq(0)
-        ? "0"
-        : this.state.tradedAmountEstimate.gte(new BigNumber("0.000001"))
-          ? this.state.tradedAmountEstimate.toFixed(6)
-          : this.state.tradedAmountEstimate.toExponential(3);*/
-
-    // const needsCollateralMsg = this.props.bestCollateral !== this.state.collateral;
-    // const needsApprovalMsg = (!this.state.balance || this.state.balance.gt(0)) && this.state.maybeNeedsApproval && this.state.collateral !== Asset.ETH;
     const tradeExpectedResultValue = {
       tradeType: this.props.tradeType,
       currentPrice: this.state.currentPrice,
@@ -406,10 +369,6 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       submitButtonText += ` ${this.props.asset}`;
     }
 
-    //It could be field for OwnTradeTokenRow
-    // const currentAssets = this.state.positionTokenBalance && `${this.state.positionTokenBalance.div(10**this.state.assetDetails.decimals).toFixed()} ${this.state.assetDetails.displayName}`; //currentAssets
-
-    // <form className="trade-form" onSubmit={!(this.props.asset === Asset.LINK && this.props.tradeType === TradeType.BUY) ? this.onSubmitClick : undefined} style={this.props.tradeType === TradeType.SELL ? { minHeight: `16.5625rem` } : undefined}>
     return (
       <form className="trade-form" onSubmit={this.onSubmitClick}>
         <CloseIcon className="close-icon" onClick={this.onCancelClick} />
@@ -470,54 +429,27 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
               <TradeExpectedResult value={tradeExpectedResultValue} />
             ) : null}
 
-            <div className="input-amount__kv-container">
+            <div className="trade-form__kv-container">
               {amountMsg.includes("Slippage:") ? (
-                <div title={`${this.state.slippageRate.toFixed(18)}%`} className="input-amount__label slippage">
+                <div title={`${this.state.slippageRate.toFixed(18)}%`} className="trade-form__label slippage">
                   {amountMsg}
-                  <span className="input-amount__slippage-amount">
+                  <span className="trade-form__slippage-amount">
                     &nbsp;{`${this.state.slippageRate.toFixed(2)}%`}<SlippageDown />
                   </span>
                 </div>
-              ) : (<div className="input-amount__label">{amountMsg}</div>)}
+              ) : (<div className="trade-form__label">{amountMsg}</div>)}
 
             </div>
 
-
-            <div className="input-amount__container">
-              <input
-                type="number"
-                step="any"
-                ref={this._setInputRef}
-                className="input-amount__input"
-                //value={!this.state.isLoading ? this.state.inputAmountValue.toFixed(5)  : ""}
-                value={!this.state.isLoading ? this.formatPrecision(Number(this.state.inputAmountText)) : ""}
-                onChange={this.onTradeAmountChange}
-              />
-              {!this.state.isLoading ? null
-                : <div className="preloader-container"> <Preloader width="80px" /></div>
-              }
-              <div className="trade-form__collateral-button-container">
-                <CollateralTokenButton asset={this.state.collateral} onClick={this.onChangeCollateralOpen} isChangeCollateralOpen={this.state.isChangeCollateralOpen} />
-              </div>
-              {this.state.isChangeCollateralOpen
-                ?
-                <CollateralTokenSelector
-                  selectedCollateral={this.state.collateral}
-                  collateralType={this.props.tradeType === TradeType.BUY ? `Purchase` : `Withdrawal`}
-                  onCollateralChange={this.onChangeCollateralClicked}
-                  onClose={this.onChangeCollateralClose}
-                  tradeType={this.props.tradeType} />
-                :
-                null
-              }
-            </div>
-
-            <div className="input-amount__group-button">
-              <button data-value="0.25" className={multiplier === 0.25 ? "active " : ""} onClick={this.onInsertMaxValue}>25%</button>
-              <button data-value="0.5" className={multiplier === 0.5 ? "active " : ""} onClick={this.onInsertMaxValue}>50%</button>
-              <button data-value="0.75" className={multiplier === 0.75 ? "active " : ""} onClick={this.onInsertMaxValue}>75%</button>
-              <button data-value="1" className={multiplier === 1 ? "active " : ""} onClick={this.onInsertMaxValue}>100%</button>
-            </div>
+            <InputAmount
+              inputAmountText={this.state.inputAmountText}
+              isLoading={this.state.isLoading}
+              tradeType={this.props.tradeType}
+              asset={this.state.collateral}
+              onInsertMaxValue={this.onInsertMaxValue}
+              onTradeAmountChange={this.onTradeAmountChange}
+              onCollateralChange={this.onCollateralChange}
+            />
 
             {this.state.positionTokenBalance && this.props.tradeType === TradeType.BUY && this.state.positionTokenBalance!.eq(0) ? (
               <CollapsibleContainer titleOpen="View advanced options" titleClose="Hide advanced options" isTransparent={amountMsg !== ""}>
@@ -539,10 +471,6 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
             ) : null}
 
           </div>
-
-          {/*this.state.isAmountExceeded ? <div className="trade-form__form-info">
-            You are exceeding max trade value size.
-            </div> : null*/}
 
           <div className="trade-form__actions-container">
 
@@ -577,50 +505,19 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
     });
   };
 
-  public onInsertMaxValue = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    event.preventDefault();
-    if (!this.state.assetDetails || !event || !event.currentTarget) {
-      return null;
-    }
-    const buttonElement = event.currentTarget as HTMLButtonElement;
-    const value = new BigNumber(parseFloat(buttonElement.dataset.value!));
+  public onInsertMaxValue = async (value: number) => {
     this._isMounted && this.setState({ ...this.state }, () => {
       // emitting next event for processing with rx.js
-      this._inputSetMax.next(value);
+      this._inputSetMax.next(new BigNumber(value));
     });
   };
 
   public onCancelClick = () => {
     this.props.onCancel();
-    const randomNumber = Math.floor(Math.random() * 100000) + 1;
-    // const tagManagerArgs = {
-    //   dataLayer: {
-    //       event: 'purchase',
-    //       transactionId: randomNumber,
-    //       transactionTotal: this.state.tradeAmountValue,
-    //       transactionProducts: [{
-    //       name: this.props.leverage + 'x' + this.props.asset +'-'+ this.props.positionType +'-'+ this.props.defaultUnitOfAccount,
-    //       sku: this.props.leverage + 'x' + this.props.asset +'-'+ this.props.positionType,
-    //       category: this.props.positionType,
-    //       status: "Canceled"
-    //     }],
-    //   }
-    // }
-    // TagManager.dataLayer(tagManagerArgs)
   };
 
-  public onChangeCollateralOpen = (event: React.MouseEvent<HTMLElement>) => {
-    event.preventDefault();
-
-    this._isMounted && this.setState({ ...this.state, isChangeCollateralOpen: true });
-  };
-
-  private onChangeCollateralClose = () => {
-    this._isMounted && this.setState({ ...this.state, isChangeCollateralOpen: false });
-  };
-
-  public onChangeCollateralClicked = async (asset: Asset) => {
-    await this._isMounted && this.setState({ ...this.state, isChangeCollateralOpen: false, collateral: asset });
+  public onCollateralChange = async (asset: Asset) => {
+    await this._isMounted && this.setState({ ...this.state, collateral: asset });
 
     this._inputSetMax.next();
   };
@@ -657,16 +554,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
   public onSubmitClick = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-
-
     const usdAmount = await FulcrumProvider.Instance.getSwapToUsdRate(this.props.asset)
-
-    if (this.state.tradeAmountValue.isZero()) {
-      if (this._input) {
-        this._input.focus();
-      }
-      return;
-    }
 
     if (!this.state.assetDetails) {
       this.props.onCancel();
@@ -681,41 +569,6 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
     if (usdPrice != null) {
       usdPrice = usdPrice.multipliedBy(usdAmount)
     }
-
-    /*if (this.props.tradeType === TradeType.SELL) {
-
-      const tradeTokenKey = this.getTradeTokenGridRowSelectionKey();
-      if (FulcrumProvider.Instance.web3Wrapper && FulcrumProvider.Instance.contractsSource) {
-        const pTokenContract = await FulcrumProvider.Instance.contractsSource.getPTokenContract(tradeTokenKey);
-        if (pTokenContract) {
-
-          const positionTokenBalance = await FulcrumProvider.Instance.getPTokenBalanceOfUser(tradeTokenKey);
-          const currentLeverage = (await pTokenContract.currentLeverage.callAsync()).div(10 ** 18);
-          const maxTradeValue = positionTokenBalance.multipliedBy(currentLeverage);
-
-          let decimals: number = AssetsDictionary.assets.get(tradeTokenKey.loanAsset)!.decimals || 18;
-          if (tradeTokenKey.loanAsset === Asset.WBTC && tradeTokenKey.positionType === PositionType.SHORT) {
-            decimals = decimals + 10;
-          }
-
-          const amountInBaseUnits = new BigNumber(this.state.tradeAmountValue.multipliedBy(10 ** decimals).toFixed(0, 1));
-          if (amountInBaseUnits.gt(maxTradeValue)) {
-
-            this._isMounted && this.setState({ ...this.state, isAmountExceeded: true });
-            console.warn("trade max amount exceeded!");
-
-            return;
-          } else {
-
-            this._isMounted && this.setState({ ...this.state, isAmountExceeded: false });
-            console.warn("trade amount is normal!");
-
-          }
-        }
-      }
-    }*/
-
-
 
     const randomNumber = Math.floor(Math.random() * 100000) + 1;
     const tagManagerArgs = {

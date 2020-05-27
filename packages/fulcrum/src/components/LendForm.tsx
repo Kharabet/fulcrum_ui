@@ -12,25 +12,14 @@ import { LendType } from "../domain/LendType";
 import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
-//import { DaiOrChaiSelector } from "./DaiOrChaiSelector";
-// import configProviders from "./../config/providers.json";
-//import { EthOrWethSelector } from "./EthOrWethSelector";
 
 import { ReactComponent as CloseIcon } from "../assets/images/ic__close.svg"
 import { AssetDropdown } from "./AssetDropdown";
 import { Preloader } from "./Preloader";
 
 import "../styles/components/lend-form.scss"
+import "../styles/components/input-amount.scss"
 
-
-// TagManager.initialize({
-//   gtmId: configProviders.Google_TrackingID,
-//   dataLayer: {
-//     name: "Lend form",
-//     status: "Initialized"
-//   },
-//   dataLayerName: 'PageDataLayer'
-// });
 
 interface ILendAmountChangeEvent {
   isLendAmountTouched: boolean;
@@ -323,12 +312,12 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
               {amountMsg}
             </div>
 
-            <div className="lend-form__amount-container">
+            <div className="input-amount__container">
               <input
                 type="number"
                 step="any"
                 ref={this._setInputRef}
-                className="lend-form__amount-input"
+                className="input-amount__input"
                 value={!this.state.isLoading ? this.state.lendAmountText : ""}
                 onChange={this.onLendAmountChange}
               />
@@ -357,7 +346,7 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
               }
             </div>
 
-            <div className="lend-form__group-button">
+            <div className="input-amount__group-button">
               <button data-value="0.25" onClick={this.onInsertMaxValue}>25%</button>
               <button data-value="0.5" onClick={this.onInsertMaxValue}>50%</button>
               <button data-value="0.75" onClick={this.onInsertMaxValue}>75%</button>
