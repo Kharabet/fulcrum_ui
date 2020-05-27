@@ -20,6 +20,10 @@
     height: 7px;
     border-radius: 6px;
     cursor: pointer;
+    .extend-loan-form &,
+    .manage-collateral-form & {
+        background-color: #fff;
+    }
 }
 .rc-slider-track {
     position: absolute;
@@ -27,7 +31,12 @@
     height: 7px;
     border-radius: 10px;
     background-color: #abe2fb;
+    .extend-loan-form &,
+    .manage-collateral-form & {
+        background-color: #fff;
+    }
 }
+
 .rc-slider-handle {
     position: absolute;
     width: 23px;
@@ -78,13 +87,23 @@
 .rc-slider-step {
     position: absolute;
     width: 100%;
-    height: 7px;
+    height: 26px;
+    top: -5px;
     border-radius: 10px;
     cursor: pointer;
-    .extend-loan-form & {
+
+    &:before {
+        content: "";
+        position: absolute;
+        top: 10px;
+        width: 100%;
+        height: 7px;
+    }
+
+    .extend-loan-form &:before {
         background-image: linear-gradient(90deg, rgb(0, 153, 136) 0%, rgb(51, 223, 204) 74.29%);
     }
-    .manage-collateral-form & {
+    .manage-collateral-form &:before {
         background-image: linear-gradient(90deg, #ff4f4f 0%, #f0e93f 52.16%, #33dfcc 101.16%);
     }
 }
