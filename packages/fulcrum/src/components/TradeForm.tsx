@@ -525,9 +525,8 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
                   Unit of Account
                     <UnitOfAccountSelector items={[
                     Asset.USDC,
-                    process.env.REACT_APP_ETH_NETWORK === "kovan"
-                      ? Asset.SAI
-                      : Asset.DAI
+                    Asset.SAI,
+                    Asset.DAI
                   ]} value={this.state.selectedUnitOfAccount} onChange={this.onChangeUnitOfAccount} />
                 </div>
               </CollapsibleContainer>
