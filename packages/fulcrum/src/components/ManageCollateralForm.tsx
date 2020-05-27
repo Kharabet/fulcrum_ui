@@ -210,10 +210,10 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
         })
       }
     });
-
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
-
   }
+
+
   private getTradeTokenGridRowSelectionKey(leverage: number = this.props.leverage) {
     return new TradeTokenKey(
       this.props.asset,
@@ -294,6 +294,7 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
       collateralizedPercent: collateralizedPercent,
     });
   }
+
   private onProviderChanged = async (event: ProviderChangedEvent) => {
     await this.derivedUpdate();
   };
@@ -304,21 +305,21 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
     window.history.pushState(null, "Manage Collateral Modal Closed", `/trade`);
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
   }
+
   public async componentDidMount() {
     this._isMounted = true;
     await this.derivedUpdate();
-    if (this.props.isOpenModal)
+    if (this.props.isOpenModal) {
       window.history.pushState(null, "Manage Collateral Modal Opened", `/trade/manage-${this.props.leverage}x-${this.props.positionType.toLocaleLowerCase()}-${this.props.asset}/`);
-    this.onInsertMaxValue(.5);
+      this.onInsertMaxValue(.5);
+    }
   }
-
 
   public render() {
     if (!this.state.assetDetails) {
       return null;
     }
 
-    const multiplier = this.state.tradeAmountValue.dividedBy(this.state.maxTradeValue).toNumber();
     const amountMsg =
       this.state.ethBalance && this.state.ethBalance.lte(this.state.gasAmountNeeded)
         ? "Insufficient funds for gas"
@@ -416,7 +417,7 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
     this._inputChange.next(collateralAmount.toFixed(4));
   };
 
-  
+
   public onTradeAmountChange = async (event: ChangeEvent<HTMLInputElement>) => {
     // handling different types of empty values
     const amountText = event.target.value ? event.target.value : "";
@@ -434,7 +435,7 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
       this._inputSetMax.next(new BigNumber(value));
     });
   };
- 
+
   public onCollateralChange = async (asset: Asset) => {
     await this._isMounted && this.setState({ ...this.state, collateral: asset });
 

@@ -1,9 +1,5 @@
 import React, { Component, ChangeEvent } from "react";
 
-import { BigNumber } from "@0x/utils";
-
-import { ReactComponent as SlippageDown } from "../assets/images/ic__slippage_down.svg"
-
 import { CollateralTokenSelector } from "./CollateralTokenSelector";
 import { CollateralTokenButton } from "./CollateralTokenButton";
 
