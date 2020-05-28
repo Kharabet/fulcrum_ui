@@ -85,16 +85,16 @@ export class BorrowProcessor {
     let txHash: string = "";
 
     try {
-      const gasAmount = await iTokenContract.borrowTokenFromDeposit.estimateGasAsync(
+      const gasAmount = await iTokenContract.borrow.estimateGasAsync(
         taskRequest.loanId,
         borrowAmountInBaseUnits,
         new BigNumber(7884000), // approximately 3 months
         depositAmountInBaseUnits,
-        account,
-        account,
         isETHCollateralAsset
           ? TorqueProvider.ZERO_ADDRESS
           : collateralAssetErc20Address,
+        account,
+        account,
         "0x",
         {
           from: account,
@@ -111,16 +111,16 @@ export class BorrowProcessor {
     }
 
     try {
-      txHash = await iTokenContract.borrowTokenFromDeposit.sendTransactionAsync(
+      txHash = await iTokenContract.borrow.sendTransactionAsync(
         taskRequest.loanId,
         borrowAmountInBaseUnits,      // borrowAmount
         new BigNumber(7884000),       // initialLoanDuration (approximately 3 months)
         depositAmountInBaseUnits,     // collateralTokenSent
-        account,                      // borrower
-        account,                      // receiver
         isETHCollateralAsset
           ? TorqueProvider.ZERO_ADDRESS
           : collateralAssetErc20Address, // collateralToken
+        account,                      // borrower
+        account,                      // receiver
         "0x",                         // loanData
         {
           from: account,
