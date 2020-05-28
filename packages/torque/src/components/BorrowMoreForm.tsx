@@ -22,23 +22,9 @@ export interface IBorrowMoreFormProps {
 }
 
 interface IBorrowMoreFormState {
-  assetDetails: AssetDetails | null;
-
-  minValue: number;
-  maxValue: number;
-  positionSafetyText: string;
-  collateralizedStateSelector: string;
-  collateralExcess: BigNumber;
-  minCollateral: BigNumber;
-  selectedValue: number;
+  borrowMoreLoanOrderState: IBorrowedFundsState;
   borrowAmount: BigNumber;
-  loanAsset: Asset;
-  loanValue: number;
   inputAmountText: string;
-  depositAmount: BigNumber;
-  gasAmountNeeded: BigNumber;
-  interestRate: BigNumber;
-  balanceTooLow: boolean;
   didSubmit: boolean;
   isLoading: boolean;
 }
@@ -53,22 +39,9 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
     super(props, context);
 
     this.state = {
-      minValue: 0,
-      maxValue: 100,
-      assetDetails: null,
-      selectedValue: 100,
+      borrowMoreLoanOrderState: Object.assign({}, props.loanOrderState),
       borrowAmount: new BigNumber(0),
-      minCollateral: new BigNumber(0),
-      collateralExcess: new BigNumber(0),
-      loanAsset: TorqueProvider.Instance.isETHAsset(props.loanOrderState.loanAsset) ? Asset.DAI : Asset.ETH,
-      loanValue: 0,
       inputAmountText: "",
-      positionSafetyText: "",
-      collateralizedStateSelector: "",
-      depositAmount: new BigNumber(0),
-      interestRate: new BigNumber(0),
-      gasAmountNeeded: new BigNumber(3000000),
-      balanceTooLow: false,
       didSubmit: false,
       isLoading: false
     };
@@ -76,17 +49,11 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
     this._inputTextChange = new Subject<string>();
     this._inputTextChange
       .pipe(
-        debounceTime(100),
-
-        switchMap(value => this.rxConvertToBigNumber(value)),
-        switchMap(value => this.rxGetEstimate(value))
+        debounceTime(100)
       )
-      .subscribe(async (value: BigNumber) => {
+      .subscribe(async (inputAmountText: string) => {
 
-        const balanceTooLow = await this.checkBalanceTooLow(this.state.loanAsset);
-        this.setState({ ...this.state, depositAmount: value, balanceTooLow: balanceTooLow });
-
-        this.getCollateralPersent();
+        await this.getCollateralPercent(inputAmountText);
       });
   }
 
@@ -96,81 +63,69 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
   };
 
   public componentDidMount(): void {
-    const assetDetails = AssetsDictionary.assets.get(this.props.loanOrderState.loanAsset) || null;
 
-    let sliderValue = this.props.loanOrderState.collateralizedPercent.multipliedBy(100).plus(100).toNumber();
+    // let sliderValue = this.props.loanOrderState.collateralizedPercent.multipliedBy(100).plus(100).toNumber();
 
-    //115%
-    const sliderMin = this.props.loanOrderState.loanData!.maintenanceMargin.div(10 ** 18).plus(100).toNumber();
-    //300%
-    let sliderMax = sliderMin + 185;
+    // //115%
+    // const sliderMin = this.props.loanOrderState.loanData!.maintenanceMargin.div(10 ** 18).plus(100).toNumber();
+    // //300%
+    // let sliderMax = sliderMin + 185;
 
-    if (sliderValue > sliderMax) {
-      sliderMax = sliderValue;
-    } else if (sliderValue < sliderMin) {
-      sliderValue = sliderMin;
-    }
+    // if (sliderValue > sliderMax) {
+    //   sliderMax = sliderValue;
+    // } else if (sliderValue < sliderMin) {
+    //   sliderValue = sliderMin;
+    // }
 
-    this.setState(
-      {
-        ...this.state,
-        assetDetails: assetDetails,
-        selectedValue: sliderValue,
-        minValue: sliderMin,
-        maxValue: sliderMax
-      });
+    // this.setState({
+    //   ...this.state,
+    //   selectedValue: sliderValue,
+    //   minValue: sliderMin,
+    //   maxValue: sliderMax
+    // });
 
-    TorqueProvider.Instance.getLoanCollateralManagementGasAmount().then(gasAmountNeeded => {
-      TorqueProvider.Instance.getCollateralExcessAmount(this.props.loanOrderState).then(collateralExcess => {
-        TorqueProvider.Instance.getAssetTokenBalanceOfUser(this.props.loanOrderState.collateralAsset).then(assetBalance => {
-
-
-          let minCollateral;
-
-          const currentCollateral = this.props.loanOrderState.collateralAmount;
-
-
-          minCollateral = currentCollateral
-            .dividedBy(sliderValue - sliderMin);
-
-
-          if (minCollateral.lt(currentCollateral)) {
-            minCollateral = currentCollateral;
-          }
-
-
-          this.setState(
-            {
-              ...this.state,
-              loanValue: currentCollateral.toNumber(),
-              minCollateral: minCollateral,
-              collateralExcess: collateralExcess,
-              gasAmountNeeded: gasAmountNeeded
-            },
-            () => {
-              this._inputTextChange.next(this.state.inputAmountText);
-            }
-          );
-        });
-      });
-    });
   };
 
 
   public componentDidUpdate(prevProps: Readonly<IBorrowMoreFormProps>, prevState: Readonly<IBorrowMoreFormState>, snapshot?: any): void {
-    if (this.state.depositAmount !== prevState.depositAmount
-      || this.state.loanAsset !== prevState.loanAsset) {
-      this.changeStateLoading();
-    }
+    // if (this.state.depositAmount !== prevState.depositAmount
+    //   || this.state.loanAsset !== prevState.loanAsset) {
+    //   this.changeStateLoading();
+    // }
   }
 
 
   public render() {
-    if (this.state.assetDetails === null) {
+    const assetDetails = AssetsDictionary.assets.get(this.state.borrowMoreLoanOrderState.loanAsset) || null;
+
+    if (assetDetails === null) {
       return null;
     }
 
-    const { loanOrderState } = this.props;
+    const loan = this.state.inputAmountText === ""
+      ? this.props.loanOrderState
+      : this.state.borrowMoreLoanOrderState;
+
+
+
+    const positionSafetyText = TorqueProvider.Instance.getPositionSafetyText(loan);
+    const collateralizedStateSelector = positionSafetyText === "Safe" ?
+      "safe" :
+      positionSafetyText === "Danger" ?
+        "danger" :
+        "unsafe";
+
+    //115%
+    const sliderMin = loan.loanData!.maintenanceMargin.div(10 ** 18).toNumber();
+    //300%
+    const sliderMax = sliderMin + 185;
+
+    let sliderValue = loan.collateralizedPercent.multipliedBy(100).toNumber();
+    if (sliderValue > sliderMax) {
+      sliderValue = sliderMax;
+    } else if (sliderValue < sliderMin) {
+      sliderValue = sliderMin;
+    }
 
     return (
       <form className="borrow-more-loan-form" onSubmit={this.onSubmitClick}>
@@ -184,17 +139,17 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
                   : (
                     <React.Fragment>
                       <div
-                        title={`${this.state.selectedValue.toFixed(18)}%`}
-                        className={`borrow-more-loan-form__body-collateralized ${this.state.collateralizedStateSelector}`}>
-                        <span className="value">{this.state.selectedValue.toFixed(2)}</span>%
+                        title={`${loan.collateralizedPercent.multipliedBy(100).plus(100).toFixed(18)}%`}
+                        className={`borrow-more-loan-form__body-collateralized ${collateralizedStateSelector}`}>
+                        <span className="value">{loan.collateralizedPercent.multipliedBy(100).plus(100).toFixed(2)}</span>%
                 </div>
                     </React.Fragment>)}
                 <div className="borrow-more-loan-form__body-collateralized-label">Collateralized</div>
 
               </div>
 
-              <div className={`borrow-more-loan-form__body-collateralized-state ${this.state.collateralizedStateSelector}`}>
-                {this.state.positionSafetyText}
+              <div className={`borrow-more-loan-form__body-collateralized-state ${collateralizedStateSelector}`}>
+                {positionSafetyText}
               </div>
             </div>
           </div>
@@ -202,16 +157,16 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
           <CollateralSlider
             readonly={true}
             showExactCollaterization={true}
-            minValue={this.state.minValue}
-            maxValue={this.state.maxValue}
-            value={this.state.selectedValue}
+            minValue={sliderMin}
+            maxValue={sliderMax}
+            value={sliderValue}
           />
 
           <hr className="borrow-more-loan-form__delimiter" />
 
           <div className="input-container">
             <div className="input-row">
-              <span className="asset-icon">{this.state.assetDetails.reactLogoSvg.render()}</span>
+              <span className="asset-icon">{assetDetails.reactLogoSvg.render()}</span>
               {this.state.isLoading
                 ? <Loader quantityDots={4} sizeDots={'middle'} title={''} isOverlay={false} />
                 : <React.Fragment>
@@ -233,7 +188,7 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
         <section className="dialog-actions">
 
           <div className="borrow-more-loan-form__actions-container">
-            {this.state.selectedValue == 115 || !Number(this.state.inputAmountText) ? (
+            {loan.collateralizedPercent.times(100).plus(100).lte(115) || !Number(this.state.inputAmountText) ? (
               <button type="button" className="btn btn-size--small" onClick={this.props.onDecline}>
                 Close
               </button>
@@ -249,43 +204,37 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
     );
   }
 
-  private rxGetEstimate = (inputAmount: BigNumber): Observable<BigNumber> => {
+  // private rxGetEstimate = (inputAmount: BigNumber): Observable<BigNumber> => {
 
-    return new Observable<BigNumber>(observer => {
+  //   return new Observable<BigNumber>(observer => {
 
-      TorqueProvider.Instance.getBorrowDepositEstimate(
-        this.props.loanOrderState.loanAsset,
-        this.state.loanAsset,
-        inputAmount
-      ).then(value => {
-        observer.next(value.depositAmount);
-      });
-    });
-  };
+  //     TorqueProvider.Instance.getBorrowDepositEstimate(
+  //       this.props.loanOrderState.loanAsset,
+  //       this.props.loanOrderState.collateralAsset,
+  //       inputAmount
+  //     ).then(value => {
+  //       observer.next(value.depositAmount);
+  //     });
+  //   });
+  // };
 
-  private rxConvertToBigNumber = (textValue: string): Observable<BigNumber> => {
-    return new Observable<BigNumber>(observer => {
-      observer.next(new BigNumber(textValue));
-    });
-  };
+  // private rxConvertToBigNumber = (textValue: string): Observable<BigNumber> => {
+  //   return new Observable<BigNumber>(observer => {
+  //     observer.next(new BigNumber(textValue));
+  //   });
+  // };
 
 
   public onSubmitClick = async (event: FormEvent<HTMLFormElement>) => {
-    
+
     event.preventDefault();
-    if (this.state.borrowAmount.lte(0) || this.state.depositAmount.lte(0)) {
+    if (this.state.borrowAmount.lte(0)) {
       return;
     }
 
-    if (this.props.onSubmit && !this.state.didSubmit && this.state.depositAmount.gt(0)) {
+    if (this.props.onSubmit && !this.state.didSubmit) {
       this.setState({ ...this.state, didSubmit: true });
-      let balanceTooLow = await this.checkBalanceTooLow(this.props.loanOrderState.collateralAsset);
-      if (balanceTooLow) {
-        this.setState({ ...this.state, balanceTooLow: true, didSubmit: false });
-        return;
-      } else {
-        this.setState({ ...this.state, balanceTooLow: false });
-      }
+
       const randomNumber = Math.floor(Math.random() * 100000) + 1;
       const usdAmount = await TorqueProvider.Instance.getSwapToUsdRate(this.props.loanOrderState.loanAsset);
       let usdPrice = this.state.borrowAmount
@@ -324,85 +273,77 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
   public onTradeAmountChange = async (event: ChangeEvent<HTMLInputElement>) => {
     // handling different types of empty values
     let amountText = event.target.value ? event.target.value : "";
+    if (amountText === "") return;
     const regexp = /^((\d{0,3}(\.\d{0,5})?)|(\.\d{0,5}}))$/;
-    if (amountText === "" || regexp.test(amountText)) {
+    if (regexp.test(amountText)) {
       // setting inputAmountText to update display at the same time
 
-      if (Number(amountText) == 0) {
-        this.setState({
-          ...this.state,
-          inputAmountText: amountText
-        })
-      } else {
-        this.setState({
-          ...this.state,
-          inputAmountText: amountText,
-          borrowAmount: new BigNumber(amountText)
-        }, () => {
-          // emitting next event for processing with rx.js
-          this._inputTextChange.next(this.state.inputAmountText);
-        });
-      }
+
+      this.setState({
+        ...this.state,
+        inputAmountText: amountText,
+        borrowAmount: new BigNumber(amountText)
+      }, () => {
+        // emitting next event for processing with rx.js
+        this._inputTextChange.next(amountText);
+      });
     }
   };
 
 
-  private checkBalanceTooLow = async (collateralAsset: Asset) => {
-    const borrowEstimate = await this.getBorrowEstimate(collateralAsset);
-    const decimals = AssetsDictionary.assets.get(collateralAsset)!.decimals || 18;
-    let assetBalance = this.props.loanOrderState.collateralAmount.multipliedBy(10 ** decimals);
-    if (collateralAsset === Asset.ETH) {
-      console.log(TorqueProvider.Instance.gasBufferForTxn.toFixed())
-      assetBalance = assetBalance.gt(TorqueProvider.Instance.gasBufferForTxn) ? assetBalance.minus(TorqueProvider.Instance.gasBufferForTxn) : new BigNumber(0);
-    }
-    const amountInBaseUnits = new BigNumber(borrowEstimate.depositAmount.multipliedBy(10 ** decimals).toFixed(0, 1));
-    return assetBalance.lt(borrowEstimate.depositAmount);
-  }
+  // private checkBalanceTooLow = async (collateralAsset: Asset) => {
+  //   const borrowEstimate = await this.getBorrowEstimate();
+  //   const decimals = AssetsDictionary.assets.get(collateralAsset)!.decimals || 18;
+  //   let assetBalance = this.props.loanOrderState.collateralAmount.multipliedBy(10 ** decimals);
+  //   if (collateralAsset === Asset.ETH) {
+  //     console.log(TorqueProvider.Instance.gasBufferForTxn.toFixed())
+  //     assetBalance = assetBalance.gt(TorqueProvider.Instance.gasBufferForTxn) ? assetBalance.minus(TorqueProvider.Instance.gasBufferForTxn) : new BigNumber(0);
+  //   }
+  //   const amountInBaseUnits = new BigNumber(borrowEstimate.depositAmount.multipliedBy(10 ** decimals).toFixed(0, 1));
+  //   return assetBalance.lt(borrowEstimate.depositAmount);
+  // }
 
 
-  private getBorrowEstimate = async (loanAsset: Asset) => {
+  // private getBorrowEstimate = async () => {
 
-    const borrowEstimate = await TorqueProvider.Instance.getBorrowDepositEstimate(this.props.loanOrderState.loanAsset, this.props.loanOrderState.collateralAsset, this.state.borrowAmount);
-    return borrowEstimate;
-  }
+  //   const borrowEstimate = await TorqueProvider.Instance.getBorrowDepositEstimate(this.props.loanOrderState.loanAsset, this.props.loanOrderState.collateralAsset, this.state.borrowAmount);
+  //   return borrowEstimate;
+  // }
 
-  private getCollateralPersent = () => {
+  private getCollateralPercent = async (inputAmountText: string) => {
 
-    const borrowAmount = this.state.depositAmount.multipliedBy(1.005).dp(5, BigNumber.ROUND_CEIL);
-    let inputAmountText = this.state.inputAmountText;
-    const defaultValue = this.props.loanOrderState.collateralizedPercent.times(100).plus(100);
+    // const deposit = this.props.loanOrderState.collateralAmount.multipliedBy(1.005).dp(5, BigNumber.ROUND_CEIL);
+    // const loanAmount = new BigNumber(inputAmountText).plus(this.props.loanOrderState.amountOwed);
+    // const defaultValue = this.props.loanOrderState.collateralizedPercent.times(100).plus(100);
+    // const collateralToLoanRate = await TorqueProvider.Instance.getSwapRate(this.props.loanOrderState.collateralAsset, this.props.loanOrderState.loanAsset);
+    // const collaterzizationRatio = collateralToLoanRate.times(deposit).div(loanAmount);
+    // let selectedValue = collaterzizationRatio;
 
-    let selectedValue = defaultValue
-      .minus(borrowAmount.times(500)).toNumber();
+    // const positionSafetyText = selectedValue.gt(125) ?
+    //   "Safe" :
+    //   selectedValue.gt(115) ?
+    //     "Danger" :
+    //     "Liquidation pending";
 
-    if (selectedValue < 115) {
-      selectedValue = this.state.minValue
-    }
-
-    const positionSafetyText = selectedValue > 125 ?
-      "Safe" :
-      selectedValue > 115 ?
-        "Danger" :
-        "Liquidation pending";
-
-    const collateralizedStateSelector = positionSafetyText === "Safe" ?
-      "safe" :
-      positionSafetyText ? "danger" :
-        "unsafe";
-
-
+    // const collateralizedStateSelector = positionSafetyText === "Liquidation pending"
+    //   ? "unsafe"
+    //   : positionSafetyText.toLocaleLowerCase();
+    const borrowMoreLoanOrderState = { ...this.props.loanOrderState};
+    borrowMoreLoanOrderState.loanData = { ...this.props.loanOrderState.loanData!}; //deep copy
+    const decimals = AssetsDictionary.assets.get(this.props.loanOrderState.loanAsset)!.decimals;
+    borrowMoreLoanOrderState.loanData.principal = borrowMoreLoanOrderState.loanData!.principal.plus(new BigNumber(inputAmountText).times(10 ** decimals))
+    // borrowMoreLoanOrderState.collateralizedPercent = selectedValue;
+    const collateralChangeEstimate = await TorqueProvider.Instance.getLoanCollateralChangeEstimate(borrowMoreLoanOrderState, new BigNumber(0), false)
+    borrowMoreLoanOrderState.collateralizedPercent = collateralChangeEstimate.collateralizedPercent.minus(100).div(100);
     this.setState({
       ...this.state,
-      positionSafetyText: positionSafetyText,
-      collateralizedStateSelector: collateralizedStateSelector,
-      inputAmountText: inputAmountText,
-      selectedValue: selectedValue,
+      borrowMoreLoanOrderState
     });
   }
 
-  public changeStateLoading = () => {
-    if (this.state.depositAmount) {
-      this.setState({ ...this.state, isLoading: false })
-    }
-  }
+  // public changeStateLoading = () => {
+  //   if (this.state.depositAmount) {
+  //     this.setState({ ...this.state, isLoading: false })
+  //   }
+  // }
 }
