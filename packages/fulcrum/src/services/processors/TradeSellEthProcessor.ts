@@ -41,7 +41,7 @@ export class TradeSellEthProcessor {
       : taskRequest.unitOfAccount;
 
       const loans = await FulcrumProvider.Instance.getUserMarginTradeLoans();
-    const amountInBaseUnits = loans.find(l => l.loanId === taskRequest.loanId)!.loanData!.collateral.times(10**20); //new BigNumber("525478543208365722")// new BigNumber(taskRequest.amount.multipliedBy(10 ** decimals).toFixed(0, 1));
+    const amountInBaseUnits = loans.find(l => l.loanId === taskRequest.loanId)!.loanData!.collateral; //new BigNumber("525478543208365722")// new BigNumber(taskRequest.amount.multipliedBy(10 ** decimals).toFixed(0, 1));
     const tokenContract: pTokenContract | null = await FulcrumProvider.Instance.contractsSource.getPTokenContract(key);
 
     const iBZxContract = await FulcrumProvider.Instance.contractsSource.getiBZxContract();
