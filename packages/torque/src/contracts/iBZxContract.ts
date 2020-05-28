@@ -412,6 +412,7 @@ export class iBZxContract extends BaseContract {
     async callAsync(
       borrower: string,
       count: BigNumber,
+      loanType: number,
       callData: Partial<CallData> = {},
       defaultBlock?: BlockParam
     ): Promise<
@@ -435,7 +436,7 @@ export class iBZxContract extends BaseContract {
     > {
       callData.from = "0x4abB24590606f5bf4645185e20C4E7B97596cA3B";
       const self = (this as any) as iBZxContract;
-      const encodedData = self._strictEncodeArguments("getUserLoans(address,uint256,uint256,uint256,bool,bool)", [borrower, "0", count, "2", false, false]);
+      const encodedData = self._strictEncodeArguments("getUserLoans(address,uint256,uint256,uint256,bool,bool)", [borrower, "0", count, loanType, false, false]);
       const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
         {
           to: self.address,

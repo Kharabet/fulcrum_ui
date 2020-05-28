@@ -237,7 +237,7 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
                 <div className="manage-collateral-form__info-liquidated-at-msg">
                   This will make your loan collateralized
                 </div>
-                <div className="manage-collateral-form__info-liquidated-at-price">
+                <div title={this.state.collateralizedPercent.toFixed()} className="manage-collateral-form__info-liquidated-at-price">
                   <span>{this.state.collateralizedPercent.toFixed(2)}</span>%
                   </div>
               </div>
