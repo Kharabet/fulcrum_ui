@@ -1,6 +1,5 @@
 import { ManageCollateralRequest } from "../domain/ManageCollateralRequest";
-import { CollateralSlider } from "./CollateralSlider";
-
+import Slider from "rc-slider"
 import { BigNumber } from "@0x/utils";
 import React, { ChangeEvent, Component, FormEvent } from "react";
 import TagManager from "react-gtm-module";
@@ -339,14 +338,20 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
           <div className="manage-collateral-form__title">Manage Collateral</div>
           <div className="manage-collateral-form__text">Your position is collateralized</div>
           <div className="manage-collateral-form__collaterized"><span>{this.state.selectedValue.toFixed(2)}</span>%</div>
-
+{/* 
           <CollateralSlider
             minValue={this.minValue}
             maxValue={this.maxValue}
             value={this.state.selectedValue}
             onUpdate={this.onUpdate}
             onChange={this.onChange}
-          />
+          /> */}
+            <Slider
+             step={0.01}
+             min={this.minValue}
+             max={this.maxValue}
+             value={this.state.selectedValue}
+             onChange={this.onChange}/>
 
           <div className="manage-collateral-form__tips">
             <div className="manage-collateral-form__tip">Withdraw</div>
@@ -410,12 +415,12 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
     this._inputChange.next(collateralAmount.toFixed(4));
   };
 
-  private onUpdate = (value: number) => {
-    this.setState({ ...this.state, selectedValue: value, isLoading: true });
+  // private onUpdate = (value: number) => {
+  //   this.setState({ ...this.state, selectedValue: value, isLoading: true });
 
-    const collateralAmount = this.state.collateralizedPercent.multipliedBy(this.state.selectedValue);
-    this._inputChange.next(collateralAmount.toFixed(4));
-  };
+  //   const collateralAmount = this.state.collateralizedPercent.multipliedBy(this.state.selectedValue);
+  //   this._inputChange.next(collateralAmount.toFixed(4));
+  // };
 
 
   public onTradeAmountChange = async (event: ChangeEvent<HTMLInputElement>) => {

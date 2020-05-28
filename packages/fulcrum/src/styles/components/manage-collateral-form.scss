@@ -1,4 +1,5 @@
 @import "../abstracts/variables";
+@import "./collateral-slider.scss";
 
 .manage-collateral-form {
   width: 520px;
@@ -263,29 +264,29 @@
   }
 }
 
-.collateral-slider-handle {
-  &__slider {
-    position: absolute;
-    transform: translate(-50%, -50%);
-    z-index: 2;
-    width: 31px;
-    height: 31px;
-    border: 6px solid #444e5a;
-    border-radius: 50%;
-    background-color: #276bfb;
-  }
-  &__icon {
-    padding: 7px 9px;
-    transform: scale(1.1);
-  }
-  @media screen and (max-width: $mobile-version-max-width) {
-    &__slider {
-      width: 25px;
-      height: 25px;
-    }
-    &__icon {
-      padding: 4px 6px;
-      transform: scale(0.9);
-    }
-  }
-}
+// .collateral-slider-handle {
+//   &__slider {
+//     position: absolute;
+//     transform: translate(-50%, -50%);
+//     z-index: 2;
+//     width: 31px;
+//     height: 31px;
+//     border: 6px solid #444e5a;
+//     border-radius: 50%;
+//     background-color: #276bfb;
+//   }
+//   &__icon {
+//     padding: 7px 9px;
+//     transform: scale(1.1);
+//   }
+//   @media screen and (max-width: $mobile-version-max-width) {
+//     &__slider {
+//       width: 25px;
+//       height: 25px;
+//     }
+//     &__icon {
+//       padding: 4px 6px;
+//       transform: scale(0.9);
+//     }
+//   }
+// }
