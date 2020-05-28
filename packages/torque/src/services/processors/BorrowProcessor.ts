@@ -81,7 +81,7 @@ export class BorrowProcessor {
     //Submitting loan
     task.processingStepNext();
 
-    let gasAmountBN;
+    let gasAmountBN = new BigNumber(0);
     let txHash: string = "";
 
     try {
