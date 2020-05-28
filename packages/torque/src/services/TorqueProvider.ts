@@ -1333,7 +1333,11 @@ export class TorqueProvider {
 
     if (!iBZxContract || !account) return result;
 
-    const loansData = await iBZxContract.getUserLoans.callAsync(account, new BigNumber(50));
+    const loansData = await iBZxContract.getUserLoans.callAsync(
+      account,
+      new BigNumber(50),
+      2 // Torque loans
+    );
     // console.log(loansData);
     const zero = new BigNumber(0);
     result = loansData
