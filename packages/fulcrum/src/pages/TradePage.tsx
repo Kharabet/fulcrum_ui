@@ -394,17 +394,27 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       //const pTokens = state.assets && state.tradePositionType
       //  ? FulcrumProvider.Instance.getPTokensAvailable().filter(tradeToken => tradeToken.asset == state.selectedKey.asset && tradeToken.positionType == state.tradePositionType)
       //  : FulcrumProvider.Instance.getPTokensAvailable();
-      const pTokens = FulcrumProvider.Instance.getPTokensAvailable();
-      const pTokenAddreses: string[] = FulcrumProvider.Instance.getPTokenErc20AddressList();
-      const pTokenBalances = await FulcrumProvider.Instance.getErc20BalancesOfUser(pTokenAddreses);
-      for (const pToken of pTokens) {
-        const balance = pTokenBalances.get(pToken.erc20Address);
-        if (!balance)
-          continue;
+      const loans = await FulcrumProvider.Instance.getUserMarginTradeLoans();
+      // const pTokens = FulcrumProvider.Instance.getPTokensAvailable();
+      // const pTokenAddreses: string[] = FulcrumProvider.Instance.getPTokenErc20AddressList();
+      // const pTokenBalances = await FulcrumProvider.Instance.getErc20BalancesOfUser(pTokenAddreses);
+      for (const loan of loans) {
+        // const balance = pTokenBalances.get(pToken.erc20Address);
+        // if (!balance)
+        //   continue;
 
+        const positionType = loan.collateralAsset === Asset.ETH
+          ? PositionType.LONG
+          : PositionType.SHORT;
+        const asset = loan.collateralAsset === Asset.ETH
+          ? loan.collateralAsset
+          : loan.loanAsset;
+        const unitOfAccount = loan.collateralAsset === Asset.ETH
+          ? loan.loanAsset
+          : loan.collateralAsset;
         ownRowsData.push({
-          currentKey: pToken,
-          pTokenAddress: pToken.erc20Address,
+          currentKey: new TradeTokenKey(asset, unitOfAccount, positionType, 2, true),
+          pTokenAddress: loan.loanData!.loanToken,
           onTrade: this.onTradeRequested,
           onManageCollateralOpen: this.onManageCollateralRequested,
         });

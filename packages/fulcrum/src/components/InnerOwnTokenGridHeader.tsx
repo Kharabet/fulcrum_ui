@@ -3,6 +3,7 @@ import { Asset } from "../domain/Asset";
 
 export interface IInnerOwnTokenGridHeaderProps {
   asset?: Asset;
+  unitOfAccount?: Asset;
 }
 
 export class InnerOwnTokenGridHeader extends Component<IInnerOwnTokenGridHeaderProps> {
@@ -10,7 +11,7 @@ export class InnerOwnTokenGridHeader extends Component<IInnerOwnTokenGridHeaderP
     return (
       <div className="inner-own-token-grid-header">
         <div className="inner-own-token-grid-header__col-token-image">
-    <span className="inner-own-token-grid-header__text">{`Position (${this.props.asset}/DAI)`}</span>
+    <span className="inner-own-token-grid-header__text">{`Position (${this.props.asset}/${this.props.unitOfAccount})`}</span>
         </div>
         <div className="inner-own-token-grid-header__col-asset-type">
           <span className="inner-own-token-grid-header__text">Type</span>

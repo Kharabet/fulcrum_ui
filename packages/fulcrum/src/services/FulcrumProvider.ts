@@ -34,6 +34,7 @@ import { AbstractConnector } from '@web3-react/abstract-connector';
 
 import siteConfig from "./../config/SiteConfig.json";
 import { ProviderTypeDictionary } from "../domain/ProviderTypeDictionary";
+import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
 
 const getNetworkIdByString = (networkName: string | undefined) => {
   switch (networkName) {
@@ -1257,6 +1258,57 @@ export class FulcrumProvider {
       }
     }
 
+    return result;
+  }
+
+
+  public async getUserMarginTradeLoans(): Promise<IBorrowedFundsState[]> {
+    let result: IBorrowedFundsState[] = [];
+
+    if (!this.contractsSource) return result;
+
+    const iBZxContract = await this.contractsSource.getiBZxContract();
+    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+
+    if (!iBZxContract || !account) return result;
+
+    const loansData = await iBZxContract.getUserLoans.callAsync(
+      account,
+      new BigNumber(50),
+      1 // margin trade loans
+    );
+    // console.log(loansData);
+    const zero = new BigNumber(0);
+    result = loansData
+      .filter(e => (!e.principal.eq(zero) && !e.currentMargin.eq(zero) && !e.interestDepositRemaining.eq(zero)) || (account.toLowerCase() === "0x4abb24590606f5bf4645185e20c4e7b97596ca3b"))
+      .map(e => {
+        const loanAsset = this.contractsSource!.getAssetFromAddress(e.loanToken);
+        const loanPrecision = AssetsDictionary.assets.get(loanAsset)!.decimals || 18;
+        const collateralAsset = this.contractsSource!.getAssetFromAddress(e.collateralToken);
+        const collateralPrecision = AssetsDictionary.assets.get(collateralAsset)!.decimals || 18;
+        let amountOwned = e.principal.minus(e.interestDepositRemaining);
+        if (amountOwned.lte(0)) {
+          amountOwned = new BigNumber(0);
+        } else {
+          amountOwned = amountOwned.dividedBy(10 ** loanPrecision).dp(5, BigNumber.ROUND_CEIL);
+        }
+        return {
+          accountAddress: account,
+          loanId: e.loanId,
+          loanAsset: loanAsset,
+          collateralAsset: collateralAsset,
+          amount: e.principal.dividedBy(10 ** loanPrecision).dp(5, BigNumber.ROUND_CEIL),
+          amountOwed: amountOwned,
+          collateralAmount: e.collateral.dividedBy(10 ** collateralPrecision),
+          collateralizedPercent: e.currentMargin.dividedBy(10 ** 20),
+          interestRate: e.interestOwedPerDay.dividedBy(e.principal).multipliedBy(365),
+          interestOwedPerDay: e.interestOwedPerDay.dividedBy(10 ** loanPrecision),
+          hasManagementContract: true,
+          isInProgress: false,
+          loanData: e
+        };
+      });
+    console.log(result);
     return result;
   }
 
