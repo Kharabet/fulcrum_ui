@@ -82,8 +82,8 @@ export class TradeBuyEthProcessor {
         leverageAmount,
         loanTokenSent,
         collateralTokenSent,
-        depositToken!,
-        collateralToken!,
+        depositTokenAddress!,
+        collateralTokenAddress!,
         account,
         loanData,
         { from: account,value: amountInBaseUnits,  gas: FulcrumProvider.Instance.gasLimit });
@@ -101,8 +101,8 @@ export class TradeBuyEthProcessor {
         leverageAmount,
         loanTokenSent,
         collateralTokenSent,
-        depositToken!,
-        collateralToken!,
+        depositTokenAddress!,
+        collateralTokenAddress!,
         account,
         loanData, {
         from: account,
