@@ -59,6 +59,7 @@ interface ITradeAmountChangeEvent {
 }
 
 export interface ITradeFormProps {
+  loanId?: string;
   tradeType: TradeType;
   asset: Asset;
   positionType: PositionType;
@@ -363,17 +364,17 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
 
     const isAmountMaxed = this.state.tradeAmountValue.eq(this.state.maxTradeValue);
     const multiplier = this.state.tradeAmountValue.dividedBy(this.state.maxTradeValue).toNumber();
-    const amountMsg =
-      this.state.ethBalance && this.state.ethBalance.lte(FulcrumProvider.Instance.gasBufferForTrade)
-        ? "Insufficient funds for gas"
-        : this.state.balance && this.state.balance.eq(0)
-          ? "Your wallet is empty"
-          : (this.state.tradeAmountValue.gt(0) && this.state.slippageRate.eq(0))
-            && (this.state.collateral === Asset.ETH || !this.state.maybeNeedsApproval)
-            ? ``// `Your trade is too small.`
-            : this.state.slippageRate.gte(0.01) && this.state.slippageRate.lt(99) // gte(0.2)
-              ? `Slippage:`
-              : "";
+    // const amountMsg =
+    //   this.state.ethBalance && this.state.ethBalance.lte(FulcrumProvider.Instance.gasBufferForTrade)
+    //     ? "Insufficient funds for gas"
+    //     : this.state.balance && this.state.balance.eq(0)
+    //       ? "Your wallet is empty"
+    //       : (this.state.tradeAmountValue.gt(0) && this.state.slippageRate.eq(0))
+    //         && (this.state.collateral === Asset.ETH || !this.state.maybeNeedsApproval)
+    //         ? ``// `Your trade is too small.`
+    //         : this.state.slippageRate.gte(0.01) && this.state.slippageRate.lt(99) // gte(0.2)
+    //           ? `Slippage:`
+    //           : "";
 
     /*const tradedAmountEstimateText =
       this.state.tradedAmountEstimate.eq(0)
@@ -470,7 +471,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
               <TradeExpectedResult value={tradeExpectedResultValue} />
             ) : null}
 
-            <div className="input-amount__kv-container">
+            {/* <div className="input-amount__kv-container">
               {amountMsg.includes("Slippage:") ? (
                 <div title={`${this.state.slippageRate.toFixed(18)}%`} className="input-amount__label slippage">
                   {amountMsg}
@@ -480,7 +481,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
                 </div>
               ) : (<div className="input-amount__label">{amountMsg}</div>)}
 
-            </div>
+            </div> */}
 
 
             <div className="input-amount__container">
@@ -520,7 +521,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
             </div>
 
             {this.state.positionTokenBalance && this.props.tradeType === TradeType.BUY && this.state.positionTokenBalance!.eq(0) ? (
-              <CollapsibleContainer titleOpen="View advanced options" titleClose="Hide advanced options" isTransparent={amountMsg !== ""}>
+              <CollapsibleContainer titleOpen="View advanced options" titleClose="Hide advanced options" isTransparent={false}>
                 <div className="trade-form__unit-of-account-container">
                   Unit of Account
                     <UnitOfAccountSelector items={[
@@ -551,7 +552,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
           </div>
           {this.props.tradeType === TradeType.BUY ?
             <div className="trade-how-it-works-container">
-              <CollapsibleContainer titleOpen="What is this?" titleClose="What is this?" isTransparent={amountMsg !== ""}>
+              <CollapsibleContainer titleOpen="What is this?" titleClose="What is this?" isTransparent={false}>
                 <div className="trade-form__how-it-works">
                   <div className="hiw-icon"><QuestionIcon /></div>
                   <div className="hiw-content">
@@ -570,9 +571,9 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
     const amountText = event.target.value ? event.target.value : "";
 
     // setting inputAmountText to update display at the same time
-    this._isMounted && this.setState({ ...this.state, inputAmountText: amountText }, () => {
+    this._isMounted && this.setState({ ...this.state, inputAmountText: amountText, tradeAmountValue: new BigNumber(amountText) }, () => {
       // emitting next event for processing with rx.js
-      this._inputChange.next(this.state.inputAmountText);
+      // this._inputChange.next(this.state.inputAmountText);
     });
   };
 
@@ -633,20 +634,20 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
 
     this._isMounted && this.setState({ ...this.state, selectedUnitOfAccount: asset });
 
-    this.props.onTrade(
-      new TradeRequest(
-        this.props.tradeType,
-        this.props.asset,
-        asset,
-        this.state.collateral,
-        this.props.positionType,
-        this.props.leverage,
-        this.state.tradeAmountValue,
-        this.state.tokenizeNeeded,
-        version,
-        this.state.inputAmountValue
-      )
-    );
+    // this.props.onTrade(
+    //   new TradeRequest(
+    //     this.props.tradeType,
+    //     this.props.asset,
+    //     asset,
+    //     this.state.collateral,
+    //     this.props.positionType,
+    //     this.props.leverage,
+    //     this.state.tradeAmountValue,
+    //     this.state.tokenizeNeeded,
+    //     version,
+    //     this.state.inputAmountValue
+    //   )
+    // );
   };
 
   public onChangeTokenizeNeeded = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -743,7 +744,10 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
         this.state.tradeAmountValue,
         this.state.tokenizeNeeded,
         this.props.version,
-        this.state.inputAmountValue
+        this.state.inputAmountValue,
+        undefined,
+        undefined,
+        this.props.loanId
       )
     );
   };

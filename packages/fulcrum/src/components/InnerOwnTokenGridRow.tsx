@@ -17,6 +17,7 @@ import { Preloader } from "./Preloader";
 import { ReactComponent as OpenManageCollateral } from "../assets/images/openManageCollateral.svg";
 
 export interface IInnerOwnTokenGridRowProps {
+  loanId: string;
   currentKey: TradeTokenKey;
   pTokenAddress: string;
   onTrade: (request: TradeRequest) => void;
@@ -252,7 +253,11 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
         this.props.currentKey.leverage,
         new BigNumber(0),
         this.props.currentKey.isTokenized,
-        this.props.currentKey.version
+        this.props.currentKey.version,
+        undefined,
+        undefined,
+        undefined,
+        this.props.loanId
       )
     );
   };

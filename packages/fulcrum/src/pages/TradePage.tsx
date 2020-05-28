@@ -45,6 +45,7 @@ interface ITradePageState {
   tradePositionType: PositionType;
   tradeLeverage: number;
   tradeVersion: number;
+  loanId?: string;
 
   collateralToken: Asset;
 
@@ -203,6 +204,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
             overlayClassName="modal-overlay-div"
           >
             <TradeForm
+              loanId={this.state.loanId}
               isMobileMedia={this.props.isMobileMedia}
               tradeType={this.state.tradeType}
               asset={this.state.tradeAsset}
@@ -361,7 +363,8 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         tradeUnitOfAccount: request.unitOfAccount,
         tradePositionType: request.positionType,
         tradeLeverage: request.leverage,
-        tradeVersion: request.version
+        tradeVersion: request.version,
+        loanId: request.loanId
       });
     }
   };
@@ -413,6 +416,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
           ? loan.loanAsset
           : loan.collateralAsset;
         ownRowsData.push({
+          loanId: loan.loanId,
           currentKey: new TradeTokenKey(asset, unitOfAccount, positionType, 2, true),
           pTokenAddress: loan.loanData!.loanToken,
           onTrade: this.onTradeRequested,

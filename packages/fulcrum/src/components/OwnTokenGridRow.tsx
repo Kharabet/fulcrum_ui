@@ -17,6 +17,7 @@ import { Preloader } from "./Preloader";
 import { ReactComponent as OpenManageCollateral } from "../assets/images/openManageCollateral.svg";
 
 export interface IOwnTokenGridRowProps {
+  loanId: string;
   currentKey: TradeTokenKey;
 
   pTokenAddress: string;
@@ -251,7 +252,11 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
         this.props.currentKey.leverage,
         new BigNumber(0),
         this.props.currentKey.isTokenized,
-        this.props.currentKey.version
+        this.props.currentKey.version,
+        undefined,
+        undefined,
+        undefined,
+        this.props.loanId
       )
     );
   };
