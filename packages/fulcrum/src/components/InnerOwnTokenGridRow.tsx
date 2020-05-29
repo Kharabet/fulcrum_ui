@@ -191,11 +191,11 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
     }
     else {
       position = this.props.loan.loanData!.principal.div(10 ** 18);
+      value = this.props.loan.loanData!.collateral.div(10 ** 18);
       collateral = ((this.props.loan.loanData!.collateral.div(10 ** 18)).minus(this.props.loan.loanData!.principal.div(this.state.collateralToPrincipal).div(10 ** 18)));
-      openPrice = new BigNumber(10 ** 36).div(this.props.loan.loanData!.startRate);
+      openPrice = new BigNumber(10 ** 36).div(this.props.loan.loanData!.startRate).div(10 ** 18);
       liquidationPrice = liquidationRate.div(this.state.collateralToPrincipal);
       profit = openPrice.minus(this.state.collateralToPrincipal).times(position);
-
     }
 
     return (
