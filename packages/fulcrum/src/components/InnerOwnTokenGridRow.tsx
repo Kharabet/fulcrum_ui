@@ -242,10 +242,13 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
               }
             </div>
             <div className="inner-own-token-grid-row__col-asset-collateral">
-              <React.Fragment>
-                <span className="sign-currency">$</span>{collateral.toFixed(2)}
-                <span className="inner-own-token-grid-row__col-asset-collateral-small">16.5%</span>
-              </React.Fragment>
+              {!state.isLoading
+                ? <React.Fragment>
+                  <span className="sign-currency">$</span>{collateral.toFixed(2)}
+                  <span className="inner-own-token-grid-row__col-asset-collateral-small">16.5%</span>
+                </React.Fragment>
+                : <Preloader width="74px" />
+              }
               <div className="inner-own-token-grid-row__open-manage-collateral" onClick={this.onManageClick}>
                 <OpenManageCollateral />
               </div>

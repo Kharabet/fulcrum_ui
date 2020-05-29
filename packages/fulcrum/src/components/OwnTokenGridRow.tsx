@@ -242,8 +242,13 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
             </div>
             <div className="own-token-grid-row__col-collateral opacityIn">
               <div className="own-token-grid-row__col-collateral-wrapper">
-                <span><span className="sign-currency">$</span>{collateral.toFixed(2)}</span>
-                <span className="own-token-grid-row__col-asset-collateral-small">16.5%</span>
+                {!state.isLoading
+                  ? <React.Fragment>
+                    <span><span className="sign-currency">$</span>{collateral.toFixed(2)}</span>
+                    <span className="own-token-grid-row__col-asset-collateral-small">16.5%</span>
+                  </React.Fragment>
+                  : <Preloader width="74px" />
+                }
               </div>
               <div className="own-token-grid-row__open-manage-collateral" onClick={this.onManageClick}>
                 <OpenManageCollateral />
