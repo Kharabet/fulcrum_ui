@@ -32,7 +32,8 @@ interface IInnerOwnTokenGridRowState {
   assetBalance: BigNumber | null;
   profit: BigNumber | null;
   isLoading: boolean;
-  priceOfUnitOfAccount: BigNumber
+  priceOfUnitOfAccount: BigNumber;
+  priceOfAsset: BigNumber;
 }
 
 export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, IInnerOwnTokenGridRowState> {
@@ -49,7 +50,8 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
       assetBalance: new BigNumber(0),
       profit: new BigNumber(0),
       isLoading: true,
-      priceOfUnitOfAccount: new BigNumber(0)
+      priceOfUnitOfAccount: new BigNumber(0),
+      priceOfAsset: new BigNumber(0),
     };
 
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
@@ -75,6 +77,7 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
     const assetBalance = data[0];
     const profit = data[1];
     let priceOfUnitOfAccount = await FulcrumProvider.Instance.getSwapToUsdRate(this.props.currentKey.unitOfAccount)
+    let priceOfAsset = await FulcrumProvider.Instance.getSwapToUsdRate(this.props.currentKey.asset)
 
     this._isMounted && this.setState(p => ({
       ...this.state,
@@ -82,7 +85,8 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
       assetBalance: assetBalance,
       profit: profit,
       isLoading: latestAssetPriceDataPoint.price !== 0 ? false : p.isLoading,
-      priceOfUnitOfAccount
+      priceOfUnitOfAccount,
+      priceOfAsset
     }));
   }
 
@@ -142,11 +146,11 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
     let profit = new BigNumber(0);
     if (this.props.currentKey.positionType === PositionType.LONG) {
       position = this.props.loan.loanData!.collateral.div(10 ** 18);
-      value = this.props.loan.loanData!.collateral.div(10 ** 18).times(this.state.priceOfUnitOfAccount);
-    collateral = (this.props.loan.loanData!.collateral.times(this.state.priceOfUnitOfAccount).div(10**18)).minus(this.props.loan.loanData!.principal.div(10**18));
-    openPrice = this.props.loan.loanData!.startRate.div(10**18);
+      value = this.props.loan.loanData!.collateral.div(10 ** 18).times(this.state.priceOfAsset);
+      collateral = ((this.props.loan.loanData!.collateral.times(this.state.priceOfAsset).div(10 ** 18)).minus(this.props.loan.loanData!.principal.times(this.state.priceOfUnitOfAccount).div(10 ** 18)));
+      openPrice = this.props.loan.loanData!.startRate.div(10 ** 18);
       liquidationPrice = liquidationRate;
-      profit = openPrice.minus(this.state.priceOfUnitOfAccount).times(value);
+      profit = openPrice.minus(this.state.priceOfAsset).times(position);
     }
     return (
       <React.Fragment>
