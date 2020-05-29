@@ -34,12 +34,12 @@ export default class ProgressFragment extends Component<any, IProgressFragmentSt
   }
 
   public scrollDownAndShift = () => {
-    document.querySelector(".pages-container")!.setAttribute("style", "padding-top: 5rem;");
+    //document.querySelector(".pages-container")!.setAttribute("style", "padding-top: 5rem;");
     window.scrollBy(0, 5 * parseFloat(getComputedStyle(document.documentElement).fontSize!));
   }
 
   public scrollUpAndShift = () => {
-    document.querySelector(".pages-container")!.setAttribute("style", "padding-top: initial;");
+    //document.querySelector(".pages-container")!.setAttribute("style", "padding-top: initial;");
     window.scrollBy(0, -5 * parseFloat(getComputedStyle(document.documentElement).fontSize!));
   }
 
