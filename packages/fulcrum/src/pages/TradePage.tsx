@@ -20,6 +20,7 @@ import { ITradeTokenGridRowProps } from "../components/TradeTokenGridRow";
 import { IOwnTokenGridRowProps } from "../components/OwnTokenGridRow";
 
 import "../styles/pages/_trade-page.scss";
+import { BigNumber } from "@0x/utils";
 
 const ManageTokenGrid = React.lazy(() => import('../components/ManageTokenGrid'));
 const TokenAddressForm = React.lazy(() => import('../components/TokenAddressForm'));
@@ -45,6 +46,7 @@ interface ITradePageState {
   tradePositionType: PositionType;
   tradeLeverage: number;
   tradeVersion: number;
+  loanId?: string;
 
   collateralToken: Asset;
 
@@ -203,6 +205,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
             overlayClassName="modal-overlay-div"
           >
             <TradeForm
+              loanId={this.state.loanId}
               isMobileMedia={this.props.isMobileMedia}
               tradeType={this.state.tradeType}
               asset={this.state.tradeAsset}
@@ -361,7 +364,8 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         tradeUnitOfAccount: request.unitOfAccount,
         tradePositionType: request.positionType,
         tradeLeverage: request.leverage,
-        tradeVersion: request.version
+        tradeVersion: request.version,
+        loanId: request.loanId
       });
     }
   };
@@ -394,17 +398,58 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       //const pTokens = state.assets && state.tradePositionType
       //  ? FulcrumProvider.Instance.getPTokensAvailable().filter(tradeToken => tradeToken.asset == state.selectedKey.asset && tradeToken.positionType == state.tradePositionType)
       //  : FulcrumProvider.Instance.getPTokensAvailable();
-      const pTokens = FulcrumProvider.Instance.getPTokensAvailable();
-      const pTokenAddreses: string[] = FulcrumProvider.Instance.getPTokenErc20AddressList();
-      const pTokenBalances = await FulcrumProvider.Instance.getErc20BalancesOfUser(pTokenAddreses);
-      for (const pToken of pTokens) {
-        const balance = pTokenBalances.get(pToken.erc20Address);
-        if (!balance)
-          continue;
+      const loans = await FulcrumProvider.Instance.getUserMarginTradeLoans();
+      // const pTokens = FulcrumProvider.Instance.getPTokensAvailable();
+      // const pTokenAddreses: string[] = FulcrumProvider.Instance.getPTokenErc20AddressList();
+      // const pTokenBalances = await FulcrumProvider.Instance.getErc20BalancesOfUser(pTokenAddreses);
+      for (const loan of loans) {
+        // const balance = pTokenBalances.get(pToken.erc20Address);
+        // if (!balance)
+        //   continue;
 
+        const positionType = loan.collateralAsset === Asset.ETH
+          ? PositionType.LONG
+          : PositionType.SHORT;
+        const asset = loan.collateralAsset === Asset.ETH
+          ? loan.collateralAsset
+          : loan.loanAsset;
+        const unitOfAccount = loan.collateralAsset === Asset.ETH
+          ? loan.loanAsset
+          : loan.collateralAsset;
+
+        let leverage = 0;
+        if (positionType === PositionType.LONG) {
+          if (loan.loanData!.startMargin.eq(new BigNumber(100).times(10 ** 18))) {
+            leverage = 2;
+          }
+          if (loan.loanData!.startMargin.eq(new BigNumber(50).times(10 ** 18))) {
+            leverage = 3;
+          }
+          if (loan.loanData!.startMargin.eq(new BigNumber("33333333333333333333"))) {
+            leverage = 4;
+          }
+          if (loan.loanData!.startMargin.eq(new BigNumber(25).times(10 ** 18))) {
+            leverage = 5;
+          }
+
+        } else {
+          if (loan.loanData!.startMargin.eq(new BigNumber(50).times(10 ** 18))) {
+            leverage = 2;
+          }
+          if (loan.loanData!.startMargin.eq(new BigNumber("33333333333333333333"))) {
+            leverage = 3;
+          }
+          if (loan.loanData!.startMargin.eq(new BigNumber(25).times(10 ** 18))) {
+            leverage = 4;
+          }
+          if (loan.loanData!.startMargin.eq(new BigNumber(20).times(10 ** 18))) {
+            leverage = 5;
+          }
+        }
         ownRowsData.push({
-          currentKey: pToken,
-          pTokenAddress: pToken.erc20Address,
+          loan: loan,
+          currentKey: new TradeTokenKey(asset, unitOfAccount, positionType, leverage, true),
+          pTokenAddress: loan.loanData!.loanToken,
           onTrade: this.onTradeRequested,
           onManageCollateralOpen: this.onManageCollateralRequested,
         });

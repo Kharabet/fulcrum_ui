@@ -4,6 +4,7 @@ import { PositionType } from "./PositionType";
 import { TradeType } from "./TradeType";
 
 export class TradeRequest {
+  public loanId?: string;
   public id: number;
   public tradeType: TradeType;
   public asset: Asset;
@@ -30,9 +31,11 @@ export class TradeRequest {
     version?: number,
     inputAmountValue?: BigNumber,
     loanDataBytes?: string,
-    zeroXFee?: BigNumber
+    zeroXFee?: BigNumber,
+    loanId?: string
     ) {
     this.id = Math.round(new Date().getTime()/1000);
+    this.loanId = loanId;
     this.tradeType = tradeType;
     this.asset = asset;
     this.unitOfAccount = unitOfAccount;

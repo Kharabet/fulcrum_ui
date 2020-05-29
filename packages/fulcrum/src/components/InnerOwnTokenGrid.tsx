@@ -28,7 +28,7 @@ export class InnerOwnTokenGrid extends Component<IInnerOwnTokenGridProps, IInner
 
     return (
       <div className="inner-own-token-grid">
-        <InnerOwnTokenGridHeader asset={this.props.ownRowsData[0].currentKey.asset} />
+        <InnerOwnTokenGridHeader asset={this.props.ownRowsData[0].currentKey.asset} unitOfAccount={this.props.ownRowsData[0].currentKey.unitOfAccount} />
         {innerOwnRowsData}
       </div>
     );

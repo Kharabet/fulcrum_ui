@@ -57,7 +57,7 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
               {row}
               <InnerOwnTokenGrid
                 ownRowsData={this.props.ownRowsData
-                  .filter(e => e.currentKey.positionType === row.props.positionType && e.currentKey.asset === row.props.asset)}
+                  .filter(e => e.currentKey.positionType === row.props.positionType/* && e.currentKey.asset === row.props.asset*/)}
                 isMobileMedia={this.props.isMobileMedia}
               />
             </div>)

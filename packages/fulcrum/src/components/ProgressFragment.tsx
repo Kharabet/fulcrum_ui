@@ -54,7 +54,7 @@ export default class ProgressFragment extends Component<any, IProgressFragmentSt
   public render() {
     return this.state.requestTasks.length === 0  ? null : (
       <React.Fragment>
-        {/* <ProgressBar requestTask={this.state.requestTasks[0]} onViewMore={this.onViewMore} /> */}
+        <ProgressBar requestTask={this.state.requestTasks[0]} onViewMore={this.onViewMore} />
         <Modal
           isOpen={this.state.isProgressDetailsModalOpen}
           onRequestClose={this.onRequestClose}

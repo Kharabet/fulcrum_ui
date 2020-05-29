@@ -971,7 +971,7 @@
                     "type": "bytes"
                 }
             ],
-            "name": "marginTradeFromDeposit",
+            "name": "marginTrade",
             "outputs": [
                 {
                     "name": "loanId",

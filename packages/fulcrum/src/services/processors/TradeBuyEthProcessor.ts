@@ -6,6 +6,8 @@ import { TradeRequest } from "../../domain/TradeRequest";
 import { TradeTokenKey } from "../../domain/TradeTokenKey";
 import { FulcrumProviderEvents } from "../events/FulcrumProviderEvents";
 import { FulcrumProvider } from "../FulcrumProvider";
+import { PositionType } from "../../domain/PositionType";
+import { Asset } from "../../domain/Asset";
 
 export class TradeBuyEthProcessor {
   public run = async (task: RequestTask, account: string, skipGas: boolean) => {
@@ -15,20 +17,20 @@ export class TradeBuyEthProcessor {
 
     // Initializing loan
     const taskRequest: TradeRequest = (task.request as TradeRequest);
+    const isLong = taskRequest.positionType === PositionType.LONG;
     const amountInBaseUnits = new BigNumber(taskRequest.amount.multipliedBy(10 ** 18).toFixed(0, 1)); // ETH -> 18 decimals
-    const tokenContract: pTokenContract | null =
-      await FulcrumProvider.Instance.contractsSource.getPTokenContract(
-        new TradeTokenKey(
-          taskRequest.asset,
-          taskRequest.unitOfAccount,
-          taskRequest.positionType,
-          taskRequest.leverage,
-          taskRequest.isTokenized,
-          taskRequest.version
-        )
-      );
+
+    const loanToken = isLong 
+    ? taskRequest.unitOfAccount
+    : Asset.ETH;
+    const depositToken = taskRequest.collateral;
+    const collateralToken = isLong
+    ? Asset.ETH
+    : taskRequest.unitOfAccount;
+
+    const tokenContract =  await FulcrumProvider.Instance.contractsSource.getITokenContract(loanToken);
     if (!tokenContract) {
-      throw new Error("No pToken contract available!");
+      throw new Error("No iToken contract available!");
     }
 
     task.processingStart([
@@ -43,12 +45,47 @@ export class TradeBuyEthProcessor {
 
     let gasAmountBN;
 
+    const leverageAmount = taskRequest.positionType === PositionType.LONG
+      ? new BigNumber(taskRequest.leverage - 1).times(10 ** 18)
+      : new BigNumber(taskRequest.leverage).times(10 ** 18);
+
+    const loanTokenSent = depositToken === loanToken
+      ? amountInBaseUnits
+      : new BigNumber(0);
+
+    const collateralTokenSent =  depositToken === collateralToken
+      ? amountInBaseUnits
+      : new BigNumber(0);
+
+    const depositTokenAddress = FulcrumProvider.Instance.getErc20AddressOfAsset(depositToken);
+    const collateralTokenAddress = FulcrumProvider.Instance.getErc20AddressOfAsset(collateralToken);
+    const loanData = "0x";
+
+    console.log("depositAmount: " + amountInBaseUnits.toFixed());
+    console.log("leverageAmount: " + leverageAmount.toFixed());
+    console.log("loanTokenSent: " + loanTokenSent.toFixed());
+    console.log("collateralTokenSent: " + collateralTokenSent.toFixed());
+    console.log("deposit token: " + depositToken + " address: " + depositTokenAddress!);
+    console.log("collateral token: " + collateralToken + " address: " + collateralTokenAddress!);
+    console.log("trader: "+ account);
+    console.log("loan data: "+ loanData);
+
     // Waiting for token allowance
     if (skipGas) {
       gasAmountBN = new BigNumber(FulcrumProvider.Instance.gasLimit);
     } else {
       // estimating gas amount
-      const gasAmount = await tokenContract.mintWithEther.estimateGasAsync(account, { from: account, value: amountInBaseUnits, gas: FulcrumProvider.Instance.gasLimit });
+      const gasAmount = await tokenContract.marginTrade.estimateGasAsync(
+        "0x0000000000000000000000000000000000000000000000000000000000000000",
+        amountInBaseUnits,
+        leverageAmount,
+        loanTokenSent,
+        collateralTokenSent,
+        depositTokenAddress!,
+        collateralTokenAddress!,
+        account,
+        loanData,
+        { from: account,value: amountInBaseUnits,  gas: FulcrumProvider.Instance.gasLimit });
       gasAmountBN = new BigNumber(gasAmount).multipliedBy(FulcrumProvider.Instance.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
     }
 
@@ -57,9 +94,18 @@ export class TradeBuyEthProcessor {
       FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.AskToOpenProgressDlg);
 
       // Submitting trade
-      txHash = await tokenContract.mintWithEther.sendTransactionAsync(account, {
+      txHash = await tokenContract.marginTrade.sendTransactionAsync(
+        "0x0000000000000000000000000000000000000000000000000000000000000000",
+        amountInBaseUnits,
+        leverageAmount,
+        loanTokenSent,
+        collateralTokenSent,
+        depositTokenAddress!,
+        collateralTokenAddress!,
+        account,
+        loanData, {
         from: account,
-        value: amountInBaseUnits,
+        value: amountInBaseUnits, 
         gas: gasAmountBN.toString(),
         gasPrice: await FulcrumProvider.Instance.gasPrice()
       });

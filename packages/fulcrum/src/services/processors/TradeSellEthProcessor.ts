@@ -18,6 +18,7 @@ export class TradeSellEthProcessor {
 
     // Initializing loan
     const taskRequest: TradeRequest = (task.request as TradeRequest);
+    const isLong = taskRequest.positionType === PositionType.LONG;
     const key = new TradeTokenKey(
       taskRequest.asset,
       taskRequest.unitOfAccount,
@@ -31,11 +32,21 @@ export class TradeSellEthProcessor {
       decimals = decimals + 10;
     }
 
-    const amountInBaseUnits = new BigNumber(taskRequest.amount.multipliedBy(10 ** decimals).toFixed(0, 1));
+    const loanToken = isLong
+      ? taskRequest.unitOfAccount
+      : Asset.ETH;
+    const depositToken = taskRequest.collateral;
+    const collateralToken = isLong
+      ? Asset.ETH
+      : taskRequest.unitOfAccount;
+
+      const loans = await FulcrumProvider.Instance.getUserMarginTradeLoans();
+    const amountInBaseUnits = loans.find(l => l.loanId === taskRequest.loanId)!.loanData!.collateral; //new BigNumber("525478543208365722")// new BigNumber(taskRequest.amount.multipliedBy(10 ** decimals).toFixed(0, 1));
     const tokenContract: pTokenContract | null = await FulcrumProvider.Instance.contractsSource.getPTokenContract(key);
 
-    if (!tokenContract) {
-      throw new Error("No pToken contract available!");
+    const iBZxContract = await FulcrumProvider.Instance.contractsSource.getiBZxContract();
+    if (!iBZxContract) {
+      throw new Error("No iBZxContract contract available!");
     }
 
     task.processingStart([
@@ -55,30 +66,16 @@ export class TradeSellEthProcessor {
     } else {
       // estimating gas amount
       let gasAmount;
-      if (taskRequest.version === 2 && taskRequest.loanDataBytes) {
-        gasAmount = await tokenContract.burnToEther.estimateGasAsync(
-          account,
-          amountInBaseUnits,
-          new BigNumber(0),
-          taskRequest.loanDataBytes,
-          {
-            from: account,
-            gas: FulcrumProvider.Instance.gasLimit,
-            value: taskRequest.zeroXFee ?
-              taskRequest.zeroXFee :
-              0
-          });
-      } else {
-        gasAmount = await tokenContract.burnToEtherNoBytes.estimateGasAsync(
-          account,
-          amountInBaseUnits,
-          new BigNumber(0),
-          {
-            from: account,
-            gas: FulcrumProvider.Instance.gasLimit,
-            value: 0
-          });
-      }
+      gasAmount = await iBZxContract.closeTrade.estimateGasAsync(
+        taskRequest.loanId!,
+        account,
+        amountInBaseUnits,
+        "0x",
+        {
+          from: account,
+          gas: FulcrumProvider.Instance.gasLimit,
+        });
+
       gasAmountBN = new BigNumber(gasAmount).multipliedBy(FulcrumProvider.Instance.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
     }
 
@@ -87,32 +84,17 @@ export class TradeSellEthProcessor {
       FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.AskToOpenProgressDlg);
 
       // Closing trade
-      if (taskRequest.version === 2 && taskRequest.loanDataBytes) {
-        txHash = await tokenContract.burnToEther.sendTransactionAsync(
-          account,
-          amountInBaseUnits,
-          new BigNumber(0),
-          taskRequest.loanDataBytes,
-          {
+      txHash = await iBZxContract.closeTrade.sendTransactionAsync(
+        taskRequest.loanId!,
+        account,
+        amountInBaseUnits,
+        "0x",
+        {
           from: account,
-          gas: gasAmountBN.toString(),
-          gasPrice: await FulcrumProvider.Instance.gasPrice(),
-          value: taskRequest.zeroXFee ?
-            taskRequest.zeroXFee :
-            0
+          gas: FulcrumProvider.Instance.gasLimit,
+          gasPrice: await FulcrumProvider.Instance.gasPrice()
         });
-      } else {
-        txHash = await tokenContract.burnToEtherNoBytes.sendTransactionAsync(
-          account,
-          amountInBaseUnits,
-          new BigNumber(0),
-          {
-          from: account,
-          gas: gasAmountBN.toString(),
-          gasPrice: await FulcrumProvider.Instance.gasPrice(),
-          value: 0
-        });
-      }
+
 
       task.setTxHash(txHash);
     }
