@@ -433,8 +433,10 @@ export class TorqueProvider {
           destAssetErc20Address
         );
         // console.log("swapPriceData- ",swapPriceData[0])
-        result = swapPriceData[0].multipliedBy(swapPriceData[1]);
+        // result = swapPriceData[0].multipliedBy(swapPriceData[1]);
+        result = swapPriceData[0].dividedBy(10 ** 18);
       } catch (e) {
+        console.log(e)
         result = new BigNumber(0);
       }
     }
@@ -1331,7 +1333,11 @@ export class TorqueProvider {
 
     if (!iBZxContract || !account) return result;
 
-    const loansData = await iBZxContract.getUserLoans.callAsync(account, new BigNumber(50));
+    const loansData = await iBZxContract.getUserLoans.callAsync(
+      account,
+      new BigNumber(50),
+      2 // Torque loans
+    );
     // console.log(loansData);
     const zero = new BigNumber(0);
     result = loansData

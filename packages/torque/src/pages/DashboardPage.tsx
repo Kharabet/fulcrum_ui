@@ -145,7 +145,7 @@ export class DashboardPage extends PureComponent<
                   manageCollateralDlgRef={this.manageCollateralDlgRef}
                   repayLoanDlgRef={this.repayLoanDlgRef}
                   extendLoanDlgRef={this.extendLoanDlgRef}
-                  onBorrowMore={this.onBorrowMore}
+                  borrowMoreDlgRef={this.borrowMoreDlgRef}
                   isLoading={this.state.isDataLoading}
                 />
               </React.Fragment>

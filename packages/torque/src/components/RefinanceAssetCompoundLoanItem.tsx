@@ -14,7 +14,7 @@ import { ReactComponent as IconInfoActive } from "../assets/images/icon_info_act
 import { CollateralInfo } from "./CollateralInfo";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
-import { CollaterallRefinanceSlider } from "./CollaterallRefinanceSlider";
+import Slider from "rc-slider";
 import { NavService } from '../services/NavService';
 import { RefinanceCompoundRequest } from '../domain/RefinanceCompoundRequest';
 import { RefinanceDydxRequest } from '../domain/RefinanceDydxRequest';
@@ -212,167 +212,168 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
     return (
 
       <div className={`refinance-asset-selector-item ${this.state.isShowInfoCollateralAssetDt0 || this.state.isShowInfoCollateralAssetDt1 ? "inactive" : ""}`}>
-        {this.state.isLoadingTransaction && this.state.request &&
-          <TxProcessingLoader
-            quantityDots={4}
-            sizeDots={'middle'}
-            isOverlay={true}
-            taskId={this.state.request.id}
-          />
-        }
-        <div className="refinance-asset__main-block">
-          <div className="refinance-asset-selector__non-torque">
-            <div className="refinance-asset-selector__non-torque-logo">
-              {this.state.head_image}
-              {!this.props.isMobileMedia && <Arrow />}
-            </div>
-            <div className="refinance-asset-selector__non-torque-apr">
-              <div title={this.state.loan.apr.toFixed()} className="value">{this.state.loan.apr.dp(0, BigNumber.ROUND_CEIL).toString()}%</div>
-              <div className="text">Variable APR</div>
-            </div>
-            <div className="refinance__input-container">
-              <input
-                className={`input-amount ${this.state.borrowAmount.lte(0) || this.state.borrowAmount.gt(this.props.loan.balance)
-                  ? "warning"
-                  : ""}`}
-                type="number"
-                step="any"
-                value={this.state.borrowAmount.dp(3, BigNumber.ROUND_FLOOR).toString()}
-                placeholder={`Amount`}
-                onChange={this.loanAmountChange}
-              />
-              <div className="refinance-details-msg--warning">
-                {this.state.borrowAmount.lte(0) ? "Please enter value greater than 0" : ""}
-                {this.state.borrowAmount.gt(this.props.loan.balance) ? "Please enter value less than or equal to " + this.props.loan.balance.dp(3, BigNumber.ROUND_FLOOR).toString() : ""}
-              </div>
-            </div>
-            {this.props.isMobileMedia &&
-              <div className="loan-asset">
-                <div className="asset-icon">
-                  {this.state.loanAssetDt.reactLogoSvg.render()}
-                </div>
-                <div className="asset-name">{this.state.loan.asset}</div>
-              </div>
-            }
-            {this.state.loan.isDisabled && !this.props.isMobileMedia &&
-              <div className={`collaterization-warning ${this.state.isShow ? "" : "hidden-details"}`}>Collateralization should be {this.state.loan.maintenanceMargin!.toNumber()}%+</div>
-            }
-            {this.props.isMobileMedia &&
-              <div className="refinance-asset-selector__arrow">
-                <Arrow />
-              </div>
-            }
-          </div>
-          <div className="refinance-asset-selector__torque">
-            <div className="refinance-asset-selector__torque-logo">
-              <TorqueLogo />
-            </div>
-            <div className="refinance-asset-selector__torque-apr">
-              <div title={this.state.fixedApr.toFixed()} className="value">{this.state.fixedApr.dp(1, BigNumber.ROUND_CEIL).toString()}%</div>
-              <div className="text">Fixed APR</div>
-            </div>
-            <div className="refinance-asset-selector__torque-loan-container">
-              <div className="loan-value">
-                <div className="value">{this.state.borrowAmount.dp(3, BigNumber.ROUND_FLOOR).toString()}</div>
-              </div>
-              <div className="loan-asset">
-                <div className="asset-icon">
-                  {this.state.loanAssetDt.reactLogoSvg.render()}
-                </div>
-                <div className="asset-name">{this.state.loan.asset}</div>
-              </div>
-            </div>
-            <div className="refinance-asset-selector__torque-details" onClick={this.showDetails}>
-              <p>{showDetailsValue}</p>
-              <span className="arrow">
-                {arrowIcon}
-              </span>
-            </div>
-            {this.state.isShow &&
-              <div className="refinance-asset-selector__collateral-container">
-                <div className="refinance-asset-selector__collateral">
-                  <div className="collateral-value">
-                    <div title={this.state.loan.collateral[0].amount.toFixed()} className={`value ${this.state.loan.isDisabled ? "red" : ""}`}>
-                      {this.state.loan.collateral[0].amount.dp(3, BigNumber.ROUND_FLOOR).toString()}
-                    </div>
-                    <div className="text">Collateral</div>
-                    <div className="info-icon" onClick={this.showInfoCollateralAssetDt0}>
-                      {this.state.isShowInfoCollateralAssetDt0 ? <IconInfoActive /> : <IconInfo />}
-                    </div>
-                    {this.state.isShowInfoCollateralAssetDt0 &&
-                      <React.Fragment>
-                        <div className="refinance-asset-selector__wrapper" onClick={this.showInfoCollateralAssetDt0}></div>
-                        <CollateralInfo />
-                      </React.Fragment>
-                    }
-                  </div>
-                  <div className="collateral-asset">
-                    <div className="asset-icon">
-                      {this.state.collateralAssetDt.reactLogoSvg.render()}
-                    </div>
-                    <div className="asset-name">
-                      {this.state.loan.collateral[0].asset}
-                    </div>
-                  </div>
-                </div>
-                {this.state.isShow && this.state.collateralAssetDt2 &&
-                  <div className="refinance-asset-selector__collateral">
-                    <div className="collateral-value">
-                      <div className={`value ${this.state.loan.isDisabled ? "red" : ""}`}>
-                        {this.state.loan.collateral[1].amount.dp(3, BigNumber.ROUND_FLOOR).toString()}
-                      </div>
-                      <div className="text">Collateral</div>
-                      <div className="info-icon" onClick={this.showInfoCollateralAssetDt1}>
-                        {this.state.isShowInfoCollateralAssetDt1 ? <IconInfoActive /> : <IconInfo />}
-                      </div>
-                      {this.state.isShowInfoCollateralAssetDt1 && <React.Fragment>
-                        <div className="refinance-asset-selector__wrapper" onClick={this.showInfoCollateralAssetDt1}></div>
-                        <CollateralInfo />
-                      </React.Fragment>}
-                    </div>
-                    <div className="collateral-asset">
-                      <div className="asset-icon">
-                        {this.state.collateralAssetDt2.reactLogoSvg.render()}
-                      </div>
-                      <div className="asset-name">
-                        {this.state.loan.collateral[1].asset}
-                      </div>
-                    </div>
-                  </div>
-                }
-                {this.state.isShowInfoCollateralAssetDt1 && <CollateralInfo />}
-                <div className="refinance-asset-selector__collateral-slider">
-                  <div className="collateral-value">{this.state.loan.collateral[0].collaterizationPercent!.dp(2, BigNumber.ROUND_FLOOR).toNumber()}%</div>
-                  <CollaterallRefinanceSlider
-                    readonly={this.state.borrowAmount.lte(0) || this.state.borrowAmount.gt(this.props.loan.balance)}
-                    minValue={this.state.loan.maintenanceMargin!.dp(2, BigNumber.ROUND_FLOOR).toNumber()}
-                    maxValue={this.props.loan.collateral[0].collaterizationPercent!.dp(2, BigNumber.ROUND_FLOOR).toNumber()}
-                    value={this.state.loan.collateral[0].collaterizationPercent!.dp(2, BigNumber.ROUND_FLOOR).toNumber()}
-                    onChange={this.onCollaterizationChange}
-                  />
-                </div>
-              </div>
-            }
-            {this.state.loan.isDisabled && this.props.isMobileMedia &&
-              <div className="collaterization-warning">Collateralization should be {this.state.loan.maintenanceMargin!.toNumber()}%+</div>
-            }
-          </div>
-          {/*<div className="refinance-asset-selector__type">1.500</div>*/}
-        </div>
-        <div className="refinance-asset__action-block">
-          {this.state.loan.apr.gt(this.state.fixedApr)
-            ? <div className="refinance-asset-selector__desc">
-              Refinancing with&nbsp;<b>FIXED</b>&nbsp;rates could save you &nbsp;
-              <div className="refinance-asset-selector__rs">
-                <span title={this.state.refRateMonth.toString()}>${this.state.refRateMonth.toFixed(2)}/mo</span>&nbsp;or&nbsp;
-                <span title={this.state.refRateYear.toString()}>${this.state.refRateYear.toFixed(2)}/yr</span>
-              </div>
-            </div>
-            : <div className="refinance-asset-selector__desc" />
-          }
-          <button className="refinance-button" disabled={this.state.loan.isDisabled || this.state.borrowAmount.lte(0) || this.state.borrowAmount.gt(this.props.loan.balance)} onClick={this.migrateLoan}>Refinance with {this.state.fixedApr.dp(1, BigNumber.ROUND_CEIL).toString()} % APR Fixed</button>
-        </div>
-      </div>
+        </div> 
+        //{this.state.isLoadingTransaction && this.state.request &&
+      //     <TxProcessingLoader
+      //       quantityDots={4}
+      //       sizeDots={'middle'}
+      //       isOverlay={true}
+      //       taskId={this.state.request.id}
+      //     />
+      //   }
+      //   <div className="refinance-asset__main-block">
+      //     <div className="refinance-asset-selector__non-torque">
+      //       <div className="refinance-asset-selector__non-torque-logo">
+      //         {this.state.head_image}
+      //         {!this.props.isMobileMedia && <Arrow />}
+      //       </div>
+      //       <div className="refinance-asset-selector__non-torque-apr">
+      //         <div title={this.state.loan.apr.toFixed()} className="value">{this.state.loan.apr.dp(0, BigNumber.ROUND_CEIL).toString()}%</div>
+      //         <div className="text">Variable APR</div>
+      //       </div>
+      //       <div className="refinance__input-container">
+      //         <input
+      //           className={`input-amount ${this.state.borrowAmount.lte(0) || this.state.borrowAmount.gt(this.props.loan.balance)
+      //             ? "warning"
+      //             : ""}`}
+      //           type="number"
+      //           step="any"
+      //           value={this.state.borrowAmount.dp(3, BigNumber.ROUND_FLOOR).toString()}
+      //           placeholder={`Amount`}
+      //           onChange={this.loanAmountChange}
+      //         />
+      //         <div className="refinance-details-msg--warning">
+      //           {this.state.borrowAmount.lte(0) ? "Please enter value greater than 0" : ""}
+      //           {this.state.borrowAmount.gt(this.props.loan.balance) ? "Please enter value less than or equal to " + this.props.loan.balance.dp(3, BigNumber.ROUND_FLOOR).toString() : ""}
+      //         </div>
+      //       </div>
+      //       {this.props.isMobileMedia &&
+      //         <div className="loan-asset">
+      //           <div className="asset-icon">
+      //             {this.state.loanAssetDt.reactLogoSvg.render()}
+      //           </div>
+      //           <div className="asset-name">{this.state.loan.asset}</div>
+      //         </div>
+      //       }
+      //       {this.state.loan.isDisabled && !this.props.isMobileMedia &&
+      //         <div className={`collaterization-warning ${this.state.isShow ? "" : "hidden-details"}`}>Collateralization should be {this.state.loan.maintenanceMargin!.toNumber()}%+</div>
+      //       }
+      //       {this.props.isMobileMedia &&
+      //         <div className="refinance-asset-selector__arrow">
+      //           <Arrow />
+      //         </div>
+      //       }
+      //     </div>
+      //     <div className="refinance-asset-selector__torque">
+      //       <div className="refinance-asset-selector__torque-logo">
+      //         <TorqueLogo />
+      //       </div>
+      //       <div className="refinance-asset-selector__torque-apr">
+      //         <div title={this.state.fixedApr.toFixed()} className="value">{this.state.fixedApr.dp(1, BigNumber.ROUND_CEIL).toString()}%</div>
+      //         <div className="text">Fixed APR</div>
+      //       </div>
+      //       <div className="refinance-asset-selector__torque-loan-container">
+      //         <div className="loan-value">
+      //           <div className="value">{this.state.borrowAmount.dp(3, BigNumber.ROUND_FLOOR).toString()}</div>
+      //         </div>
+      //         <div className="loan-asset">
+      //           <div className="asset-icon">
+      //             {this.state.loanAssetDt.reactLogoSvg.render()}
+      //           </div>
+      //           <div className="asset-name">{this.state.loan.asset}</div>
+      //         </div>
+      //       </div>
+      //       <div className="refinance-asset-selector__torque-details" onClick={this.showDetails}>
+      //         <p>{showDetailsValue}</p>
+      //         <span className="arrow">
+      //           {arrowIcon}
+      //         </span>
+      //       </div>
+      //       {this.state.isShow &&
+      //         <div className="refinance-asset-selector__collateral-container">
+      //           <div className="refinance-asset-selector__collateral">
+      //             <div className="collateral-value">
+      //               <div title={this.state.loan.collateral[0].amount.toFixed()} className={`value ${this.state.loan.isDisabled ? "red" : ""}`}>
+      //                 {this.state.loan.collateral[0].amount.dp(3, BigNumber.ROUND_FLOOR).toString()}
+      //               </div>
+      //               <div className="text">Collateral</div>
+      //               <div className="info-icon" onClick={this.showInfoCollateralAssetDt0}>
+      //                 {this.state.isShowInfoCollateralAssetDt0 ? <IconInfoActive /> : <IconInfo />}
+      //               </div>
+      //               {this.state.isShowInfoCollateralAssetDt0 &&
+      //                 <React.Fragment>
+      //                   <div className="refinance-asset-selector__wrapper" onClick={this.showInfoCollateralAssetDt0}></div>
+      //                   <CollateralInfo />
+      //                 </React.Fragment>
+      //               }
+      //             </div>
+      //             <div className="collateral-asset">
+      //               <div className="asset-icon">
+      //                 {this.state.collateralAssetDt.reactLogoSvg.render()}
+      //               </div>
+      //               <div className="asset-name">
+      //                 {this.state.loan.collateral[0].asset}
+      //               </div>
+      //             </div>
+      //           </div>
+      //           {this.state.isShow && this.state.collateralAssetDt2 &&
+      //             <div className="refinance-asset-selector__collateral">
+      //               <div className="collateral-value">
+      //                 <div className={`value ${this.state.loan.isDisabled ? "red" : ""}`}>
+      //                   {this.state.loan.collateral[1].amount.dp(3, BigNumber.ROUND_FLOOR).toString()}
+      //                 </div>
+      //                 <div className="text">Collateral</div>
+      //                 <div className="info-icon" onClick={this.showInfoCollateralAssetDt1}>
+      //                   {this.state.isShowInfoCollateralAssetDt1 ? <IconInfoActive /> : <IconInfo />}
+      //                 </div>
+      //                 {this.state.isShowInfoCollateralAssetDt1 && <React.Fragment>
+      //                   <div className="refinance-asset-selector__wrapper" onClick={this.showInfoCollateralAssetDt1}></div>
+      //                   <CollateralInfo />
+      //                 </React.Fragment>}
+      //               </div>
+      //               <div className="collateral-asset">
+      //                 <div className="asset-icon">
+      //                   {this.state.collateralAssetDt2.reactLogoSvg.render()}
+      //                 </div>
+      //                 <div className="asset-name">
+      //                   {this.state.loan.collateral[1].asset}
+      //                 </div>
+      //               </div>
+      //             </div>
+      //           }
+      //           {this.state.isShowInfoCollateralAssetDt1 && <CollateralInfo />}
+      //           <div className="refinance-asset-selector__collateral-slider">
+      //             <div className="collateral-value">{this.state.loan.collateral[0].collaterizationPercent!.dp(2, BigNumber.ROUND_FLOOR).toNumber()}%</div>
+      //             <Slider
+      //               step={0.01}
+      //               min={this.state.loan.maintenanceMargin!.dp(2, BigNumber.ROUND_FLOOR).toNumber()()}
+      //               max={this.props.loan.collateral[0].collaterizationPercent!.dp(2, BigNumber.ROUND_FLOOR).toNumber()}
+      //               value={this.state.loan.collateral[0].collaterizationPercent!.dp(2, BigNumber.ROUND_FLOOR).toNumber()}
+      //               onChange={this.onCollaterizationChange}
+      //             />
+      //           </div>
+      //         </div>
+      //       }
+      //       {this.state.loan.isDisabled && this.props.isMobileMedia &&
+      //         <div className="collaterization-warning">Collateralization should be {this.state.loan.maintenanceMargin!.toNumber()}%+</div>
+      //       }
+      //     </div>
+      //     {/*<div className="refinance-asset-selector__type">1.500</div>*/}
+      //   </div>
+      //   <div className="refinance-asset__action-block">
+      //     {this.state.loan.apr.gt(this.state.fixedApr)
+      //       ? <div className="refinance-asset-selector__desc">
+      //         Refinancing with&nbsp;<b>FIXED</b>&nbsp;rates could save you &nbsp;
+      //         <div className="refinance-asset-selector__rs">
+      //           <span title={this.state.refRateMonth.toString()}>${this.state.refRateMonth.toFixed(2)}/mo</span>&nbsp;or&nbsp;
+      //           <span title={this.state.refRateYear.toString()}>${this.state.refRateYear.toFixed(2)}/yr</span>
+      //         </div>
+      //       </div>
+      //       : <div className="refinance-asset-selector__desc" />
+      //     }
+      //     <button className="refinance-button" disabled={this.state.loan.isDisabled || this.state.borrowAmount.lte(0) || this.state.borrowAmount.gt(this.props.loan.balance)} onClick={this.migrateLoan}>Refinance with {this.state.fixedApr.dp(1, BigNumber.ROUND_CEIL).toString()} % APR Fixed</button>
+      //   </div>
+     // </div>
     );
   }
 }

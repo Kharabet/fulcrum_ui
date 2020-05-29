@@ -106,6 +106,8 @@ $padding: 15px 15px 30px 15px;
     justify-content: center;
     border-radius: 50%;
     margin-left: 10px;
+    position: absolute;
+    right: 25px;
     cursor: pointer;
     .icon-collateral {
       fill: var(--icon-collateral);

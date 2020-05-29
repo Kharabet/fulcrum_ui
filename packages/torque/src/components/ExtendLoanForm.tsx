@@ -9,7 +9,7 @@ import { ExtendLoanRequest } from "../domain/ExtendLoanRequest";
 import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
 import { IExtendEstimate } from "../domain/IExtendEstimate";
 import { TorqueProvider } from "../services/TorqueProvider";
-import { ExtendLoanSlider } from "./ExtendLoanSlider";
+import Slider from "rc-slider";
 import { InputAmount } from "./InputAmount";
 
 export interface IExtendLoanFormProps {
@@ -146,13 +146,11 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
               {this.state.selectedValue} {this.pluralize("day", "days", this.state.selectedValue)}
             </div>
           </div>
-
-          <ExtendLoanSlider
-            readonly={false}
-            minValue={this.state.minValue}
-            maxValue={this.state.maxValue}
+          <Slider
+            min={this.state.minValue}
+            max={this.state.maxValue}
+            step={0.01}
             value={this.state.selectedValue}
-            onUpdate={this.onUpdate}
             onChange={this.onChange}
           />
 

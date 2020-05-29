@@ -34,6 +34,7 @@ import { AbstractConnector } from '@web3-react/abstract-connector';
 
 import siteConfig from "./../config/SiteConfig.json";
 import { ProviderTypeDictionary } from "../domain/ProviderTypeDictionary";
+import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
 
 const getNetworkIdByString = (networkName: string | undefined) => {
   switch (networkName) {
@@ -1260,6 +1261,57 @@ export class FulcrumProvider {
     return result;
   }
 
+
+  public async getUserMarginTradeLoans(): Promise<IBorrowedFundsState[]> {
+    let result: IBorrowedFundsState[] = [];
+
+    if (!this.contractsSource) return result;
+
+    const iBZxContract = await this.contractsSource.getiBZxContract();
+    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+
+    if (!iBZxContract || !account) return result;
+
+    const loansData = await iBZxContract.getUserLoans.callAsync(
+      account,
+      new BigNumber(50),
+      1 // margin trade loans
+    );
+    // console.log(loansData);
+    const zero = new BigNumber(0);
+    result = loansData
+      .filter(e => (!e.principal.eq(zero) && !e.currentMargin.eq(zero) && !e.interestDepositRemaining.eq(zero)) || (account.toLowerCase() === "0x4abb24590606f5bf4645185e20c4e7b97596ca3b"))
+      .map(e => {
+        const loanAsset = this.contractsSource!.getAssetFromAddress(e.loanToken);
+        const loanPrecision = AssetsDictionary.assets.get(loanAsset)!.decimals || 18;
+        const collateralAsset = this.contractsSource!.getAssetFromAddress(e.collateralToken);
+        const collateralPrecision = AssetsDictionary.assets.get(collateralAsset)!.decimals || 18;
+        let amountOwned = e.principal.minus(e.interestDepositRemaining);
+        if (amountOwned.lte(0)) {
+          amountOwned = new BigNumber(0);
+        } else {
+          amountOwned = amountOwned.dividedBy(10 ** loanPrecision).dp(5, BigNumber.ROUND_CEIL);
+        }
+        return {
+          accountAddress: account,
+          loanId: e.loanId,
+          loanAsset: loanAsset,
+          collateralAsset: collateralAsset,
+          amount: e.principal.dividedBy(10 ** loanPrecision).dp(5, BigNumber.ROUND_CEIL),
+          amountOwed: amountOwned,
+          collateralAmount: e.collateral.dividedBy(10 ** collateralPrecision),
+          collateralizedPercent: e.currentMargin.dividedBy(10 ** 20),
+          interestRate: e.interestOwedPerDay.dividedBy(e.principal).multipliedBy(365),
+          interestOwedPerDay: e.interestOwedPerDay.dividedBy(10 ** loanPrecision),
+          hasManagementContract: true,
+          isInProgress: false,
+          loanData: e
+        };
+      });
+    console.log(result);
+    return result;
+  }
+
   public async getPTokenBalanceOfUser(selectedKey: TradeTokenKey): Promise<BigNumber> {
     let result = new BigNumber(0);
 
@@ -1582,18 +1634,18 @@ if (err || 'error' in added) {
 console.log(err, added);
 }
 }*//*);
-                                              }
-                                            }
-                                            }
-                                            } catch(e) {
-                                            // console.log(e);
-                                            }
-                                            }*/
+                                                  }
+                                                }
+                                                }
+                                                } catch(e) {
+                                                // console.log(e);
+                                                }
+                                                }*/
   }
 
   private processLendRequestTask = async (task: RequestTask, skipGas: boolean) => {
     try {
-      
+
       this.eventEmitter.emit(FulcrumProviderEvents.AskToOpenProgressDlg, task.request.id);
       if (!(this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite)) {
         throw new Error("No provider available!");
@@ -1610,29 +1662,29 @@ console.log(err, added);
         await this.addTokenToMetaMask(task);
 
         if (taskRequest.asset === Asset.ETH) {
-          const {LendEthProcessor} = await import("./processors/LendEthProcessor");
+          const { LendEthProcessor } = await import("./processors/LendEthProcessor");
           const processor = new LendEthProcessor();
           await processor.run(task, account, skipGas);
         } else if (taskRequest.asset === Asset.CHAI) {
-          const {LendChaiProcessor} = await import("./processors/LendChaiProcessor");
+          const { LendChaiProcessor } = await import("./processors/LendChaiProcessor");
           const processor = new LendChaiProcessor();
           await processor.run(task, account, skipGas);
         } else {
-          const {LendErcProcessor} = await import("./processors/LendErcProcessor");
+          const { LendErcProcessor } = await import("./processors/LendErcProcessor");
           const processor = new LendErcProcessor();
           await processor.run(task, account, skipGas);
         }
       } else {
         if (taskRequest.asset === Asset.ETH) {
-          const {UnlendEthProcessor} = await import("./processors/UnlendEthProcessor");
+          const { UnlendEthProcessor } = await import("./processors/UnlendEthProcessor");
           const processor = new UnlendEthProcessor();
           await processor.run(task, account, skipGas);
         } else if (taskRequest.asset === Asset.CHAI) {
-          const {UnlendChaiProcessor} = await import("./processors/UnlendChaiProcessor");
+          const { UnlendChaiProcessor } = await import("./processors/UnlendChaiProcessor");
           const processor = new UnlendChaiProcessor();
           await processor.run(task, account, skipGas);
         } else {
-          const {UnlendErcProcessor} = await import("./processors/UnlendErcProcessor");
+          const { UnlendErcProcessor } = await import("./processors/UnlendErcProcessor");
           const processor = new UnlendErcProcessor();
           await processor.run(task, account, skipGas);
         }
@@ -1653,6 +1705,7 @@ console.log(err, added);
 
   private processTradeRequestTask = async (task: RequestTask, skipGas: boolean) => {
     try {
+      this.eventEmitter.emit(FulcrumProviderEvents.AskToOpenProgressDlg, task.request.id);
       if (!(this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite)) {
         throw new Error("No provider available!");
       }
@@ -1827,28 +1880,31 @@ console.log(err, added);
       }
 
       if (taskRequest.tradeType === TradeType.BUY) {
-        if (taskRequest.collateral !== Asset.ETH) {
-          const {TradeBuyErcProcessor} = await import("./processors/TradeBuyErcProcessor");
-          const processor = new TradeBuyErcProcessor();
-          await processor.run(task, account, skipGas);
-        } else {
-          let processor;
-          if (taskRequest.loanDataBytes && taskRequest.zeroXFee) {
-            const {TradeBuyErcProcessor} = await import("./processors/TradeBuyErcProcessor");
-            processor = new TradeBuyErcProcessor();
-          } else {
-            const {TradeBuyEthProcessor} = await import("./processors/TradeBuyEthProcessor");
-            processor = new TradeBuyEthProcessor();
-          }
-          await processor.run(task, account, skipGas);
-        }
+        // if (taskRequest.collateral !== Asset.ETH) {
+        //   const {TradeBuyErcProcessor} = await import("./processors/TradeBuyErcProcessor");
+        //   const processor = new TradeBuyErcProcessor();
+        //   await processor.run(task, account, skipGas);
+        // } else {
+        //   let processor;
+        //   if (taskRequest.loanDataBytes && taskRequest.zeroXFee) {
+        //     const {TradeBuyErcProcessor} = await import("./processors/TradeBuyErcProcessor");
+        //     processor = new TradeBuyErcProcessor();
+        //   } else {
+        //     const {TradeBuyEthProcessor} = await import("./processors/TradeBuyEthProcessor");
+        //     processor = new TradeBuyEthProcessor();
+        //   }
+        //   await processor.run(task, account, skipGas);
+        // }
+        const { TradeBuyEthProcessor } = await import("./processors/TradeBuyEthProcessor");
+        const processor = new TradeBuyEthProcessor();
+        await processor.run(task, account, skipGas);
       } else {
         if (taskRequest.collateral !== Asset.ETH) {
-          const {TradeSellErcProcessor} = await import("./processors/TradeSellErcProcessor");
+          const { TradeSellErcProcessor } = await import("./processors/TradeSellErcProcessor");
           const processor = new TradeSellErcProcessor();
           await processor.run(task, account, skipGas);
         } else {
-          const {TradeSellEthProcessor} = await import("./processors/TradeSellEthProcessor");
+          const { TradeSellEthProcessor } = await import("./processors/TradeSellEthProcessor");
           const processor = new TradeSellEthProcessor();
           await processor.run(task, account, skipGas);
         }
@@ -1861,6 +1917,9 @@ console.log(err, added);
         console.log(e);
       }
       task.processingEnd(false, false, e);
+    }
+    finally {
+      this.eventEmitter.emit(FulcrumProviderEvents.AskToCloseProgressDlg, task);
     }
   };
 

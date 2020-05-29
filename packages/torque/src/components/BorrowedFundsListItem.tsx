@@ -5,12 +5,12 @@ import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
 import { TorqueProvider } from "../services/TorqueProvider";
-import { CollateralSlider } from "./CollateralSlider";
+import { Rail } from "./Rail";
 
 import { ManageCollateralRequest } from "../domain/ManageCollateralRequest";
 import { RepayLoanRequest } from "../domain/RepayLoanRequest";
 import { ExtendLoanRequest } from "../domain/ExtendLoanRequest";
-import { BorrowMoreRequest } from "../domain/BorrowMoreRequest";
+import { BorrowRequest } from "../domain/BorrowRequest";
 import { TorqueProviderEvents } from "../services/events/TorqueProviderEvents";
 import { RequestStatus } from "../domain/RequestStatus";
 import { RequestTask } from "../domain/RequestTask";
@@ -18,10 +18,11 @@ import { TxProcessingLoader } from "./TxProcessingLoader";
 import { ManageCollateralDlg } from "./ManageCollateralDlg";
 import { RepayLoanDlg } from "./RepayLoanDlg";
 import { ExtendLoanDlg } from "./ExtendLoanDlg";
+import { BorrowMoreDlg } from "./BorrowMoreDlg";
 
 export interface IBorrowedFundsListItemProps {
   item: IBorrowedFundsState;
-  onBorrowMore: (item: IBorrowedFundsState) => void;
+  borrowMoreDlgRef: React.RefObject<BorrowMoreDlg>;
   manageCollateralDlgRef: React.RefObject<ManageCollateralDlg>;
   repayLoanDlgRef: React.RefObject<RepayLoanDlg>;
   extendLoanDlgRef: React.RefObject<ExtendLoanDlg>;
@@ -32,8 +33,9 @@ interface IBorrowedFundsListItemState {
   assetDetails: AssetDetails | null;
   interestRate: BigNumber;
   isInProgress: boolean;
+  isEmpty: boolean;
   isLoadingTransaction: boolean;
-  request: ManageCollateralRequest | RepayLoanRequest | ExtendLoanRequest | BorrowMoreRequest | undefined;
+  request: ManageCollateralRequest | RepayLoanRequest | ExtendLoanRequest | BorrowRequest | undefined;
 }
 
 export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps, IBorrowedFundsListItemState> {
@@ -46,6 +48,7 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
       interestRate: new BigNumber(0),
       isLoadingTransaction: false,
       isInProgress: props.item.isInProgress,
+      isEmpty: false,
       request: undefined
     };
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.AskToOpenProgressDlg, this.onAskToOpenProgressDlg);
@@ -94,6 +97,7 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
     const thisLoan = loans.find(loan => loan.loanId === this.props.item.loanId);
     await this.setState({
       ...this.state,
+      isEmpty: thisLoan ? false : true,
       borrowedFundsItem: thisLoan ? thisLoan : this.state.borrowedFundsItem
     });
   }
@@ -135,6 +139,9 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
     } else if (sliderValue < sliderMin) {
       sliderValue = sliderMin;
     }
+
+    if (this.state.isEmpty)
+      return null;
 
     return (
       <div className={`borrowed-funds-list-item`}>
@@ -190,14 +197,8 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
               ) : null}
             </div>
           </div>
-          <div className="borrowed-funds-list-item__body-slider-container">
-            <CollateralSlider
-              readonly={true}
-              showExactCollaterization={true}
-              minValue={sliderMin}
-              maxValue={sliderMax}
-              value={sliderValue}
-            />
+          <div className="borrowed-funds-list-item__body-collateralized-rail">
+            <Rail sliderValue={sliderValue} sliderMax={sliderMax} />
           </div>
           <div title={`${borrowedFundsItem.collateralAmount.toFixed(18)} ${borrowedFundsItem.collateralAsset}`}
             className="borrowed-funds-list-item__body-collateralized-value">
@@ -235,7 +236,7 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
     if (!this.props.manageCollateralDlgRef.current) return;
 
     try {
-      const manageCollateralRequest = await this.props.manageCollateralDlgRef.current.getValue({ ...this.state.borrowedFundsItem});
+      const manageCollateralRequest = await this.props.manageCollateralDlgRef.current.getValue({ ...this.state.borrowedFundsItem });
       await this.setState({ ...this.state, request: manageCollateralRequest });
       await TorqueProvider.Instance.onDoManageCollateral(manageCollateralRequest);
     } catch (error) {
@@ -273,7 +274,17 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
     // this.props.onExtendLoan({ ...this.props.item });
   };
 
-  private onBorrowMore = () => {
-    this.props.onBorrowMore({ ...this.props.item });
+  private onBorrowMore = async () => {
+    if (!this.props.borrowMoreDlgRef.current) return;
+
+    try {
+      const borroweMoreRequest = await this.props.borrowMoreDlgRef.current.getValue({ ...this.props.item });
+      await this.setState({ ...this.state, request: borroweMoreRequest });
+      await TorqueProvider.Instance.onDoBorrow(borroweMoreRequest);
+    } catch (error) {
+      if (error.message !== "Form closed")
+        console.error(error);
+    }
+
   };
 }

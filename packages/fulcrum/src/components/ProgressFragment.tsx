@@ -34,12 +34,12 @@ export default class ProgressFragment extends Component<any, IProgressFragmentSt
   }
 
   public scrollDownAndShift = () => {
-    document.querySelector(".pages-container")!.setAttribute("style", "padding-top: 5rem;");
+    //document.querySelector(".pages-container")!.setAttribute("style", "padding-top: 5rem;");
     window.scrollBy(0, 5 * parseFloat(getComputedStyle(document.documentElement).fontSize!));
   }
 
   public scrollUpAndShift = () => {
-    document.querySelector(".pages-container")!.setAttribute("style", "padding-top: initial;");
+    //document.querySelector(".pages-container")!.setAttribute("style", "padding-top: initial;");
     window.scrollBy(0, -5 * parseFloat(getComputedStyle(document.documentElement).fontSize!));
   }
 
@@ -54,7 +54,7 @@ export default class ProgressFragment extends Component<any, IProgressFragmentSt
   public render() {
     return this.state.requestTasks.length === 0  ? null : (
       <React.Fragment>
-        {/* <ProgressBar requestTask={this.state.requestTasks[0]} onViewMore={this.onViewMore} /> */}
+        <ProgressBar requestTask={this.state.requestTasks[0]} onViewMore={this.onViewMore} />
         <Modal
           isOpen={this.state.isProgressDetailsModalOpen}
           onRequestClose={this.onRequestClose}

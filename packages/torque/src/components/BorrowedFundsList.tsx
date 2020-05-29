@@ -6,14 +6,15 @@ import { BorrowedFundsListItem } from "./BorrowedFundsListItem";
 import { ManageCollateralDlg } from "./ManageCollateralDlg";
 import { RepayLoanDlg } from "./RepayLoanDlg";
 import { ExtendLoanDlg } from "./ExtendLoanDlg";
+import { BorrowMoreDlg } from "./BorrowMoreDlg";
 
 export interface IBorrowedFundsListProps {
   items: IBorrowedFundsState[];
   itemsAwaiting: ReadonlyArray<BorrowRequestAwaiting>;
-  onBorrowMore: (item: IBorrowedFundsState) => void;
   manageCollateralDlgRef: React.RefObject<ManageCollateralDlg>;
   repayLoanDlgRef: React.RefObject<RepayLoanDlg>;
   extendLoanDlgRef: React.RefObject<ExtendLoanDlg>;
+  borrowMoreDlgRef: React.RefObject<BorrowMoreDlg>;
   isLoading : boolean ;
 }
 
@@ -44,7 +45,7 @@ export class BorrowedFundsList extends Component<IBorrowedFundsListProps, IBorro
         <BorrowedFundsListItem
           key={index}
           item={e}
-          onBorrowMore={this.props.onBorrowMore}
+          borrowMoreDlgRef={this.props.borrowMoreDlgRef}
           manageCollateralDlgRef={this.props.manageCollateralDlgRef}
           repayLoanDlgRef={this.props.repayLoanDlgRef}
           extendLoanDlgRef={this.props.extendLoanDlgRef}

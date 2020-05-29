@@ -27,14 +27,17 @@
     .loader-overlay {
       border-radius: 16px;
     }
+    .outer-rail {
+      background-color: #ffffff;
+    }
     &:hover {
       background: #fff;
       border: 1px solid #a9b5c7;
       .borrowed-funds-list-item__header-loan-interest-rate {
         color: #00c0ab;
       }
-      .rail-inner {
-        background: #f3f9ff;
+      .outer-rail {
+        background-color: #e7ebf0;
       }
     }
     &__header {
@@ -148,9 +151,8 @@
           }
         }
       }
-      &-slider-container {
-        padding-top: 20px;
-        padding-bottom: 15px;
+      &-collateralized-rail {
+        padding: 15px 0 10px 0;
       }
     }
     &__actions-container {

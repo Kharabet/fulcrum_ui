@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import { Asset } from "../domain/Asset";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
-import { PositionType } from "../domain/PositionType";
-import { TradeTokenKey } from "../domain/TradeTokenKey";
+// import { PositionType } from "../domain/PositionType";
+// import { TradeTokenKey } from "../domain/TradeTokenKey";
 import { ReactComponent as WalletSvg } from "../assets/images/wallet-icon.svg";
 import { IDropDownSelectOption, DropdownSelect, IDropdownSelectProps } from "./DropdownSelect";
 
@@ -19,7 +19,7 @@ export interface ITokenGridTabsProps {
 }
 
 interface ITokenGridTabsState {
-  isPro: boolean;
+//  isPro: boolean;
   isShowMyTokensOnly: boolean;
 }
 
@@ -28,9 +28,9 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
     super(props, context);
     this.state = {
       isShowMyTokensOnly: props.isShowMyTokensOnly,
-      isPro: false
+     // isPro: false
     };
-    this.onSwitchPro = this.onSwitchPro.bind(this);
+   // this.onSwitchPro = this.onSwitchPro.bind(this);
   }
 
 
@@ -99,7 +99,11 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
               </div>
             </div>
           </div>
-          {!this.props.isMobile
+
+          <div className="pro-switch-wrapper">
+                <div className="pro-switch"></div>
+          </div>
+          {/* {!this.props.isMobile
             ? <React.Fragment>
               <div className="pro-switch-wrapper">
                 <label className={`pro-switch ${this.state.isPro ? `active` : ``}`}>
@@ -109,7 +113,7 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
               </div>
             </React.Fragment>
             : null
-          }
+          } */}
         </div>
       </div>
     )
@@ -141,7 +145,7 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
       onDropdownSelect: this.onDropdownSelect.bind(this)
     }
   }
-  private onSwitchPro() {
-    this.setState({ ...this.state, isPro: !this.state.isPro });
-  }
+  // private onSwitchPro() {
+  //   this.setState({ ...this.state, isPro: !this.state.isPro });
+  // }
 }

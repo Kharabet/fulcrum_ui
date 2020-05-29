@@ -92,7 +92,7 @@ export class TradeSellErcProcessor {
 
       let txHash: string = "";
       try {
-        FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.AskToOpenProgressDlg);
+        //FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.AskToOpenProgressDlg);
 
         // Closing trade
         if (taskRequest.version === 2 && taskRequest.loanDataBytes) {
@@ -127,8 +127,8 @@ export class TradeSellErcProcessor {
         }
         task.setTxHash(txHash);
       }
-      finally {
-        FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.AskToCloseProgressDlg);
+      catch(e) {
+        throw e;
       }
 
       task.processingStepNext();

@@ -81,10 +81,11 @@ export class BorrowProcessor {
     //Submitting loan
     task.processingStepNext();
 
-    let gasAmountBN = new BigNumber(0);
+    let gasAmountBN;
     let txHash: string = "";
 
     try {
+      console.log(TorqueProvider.Instance.gasLimit);
       const gasAmount = await iTokenContract.borrow.estimateGasAsync(
         taskRequest.loanId,
         borrowAmountInBaseUnits,
@@ -105,9 +106,10 @@ export class BorrowProcessor {
         }
       );
       gasAmountBN = new BigNumber(gasAmount).multipliedBy(TorqueProvider.Instance.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
+      console.log(gasAmountBN);
     } catch (e) {
       console.log(e);
-      throw e;
+      // throw e;
     }
 
     try {
