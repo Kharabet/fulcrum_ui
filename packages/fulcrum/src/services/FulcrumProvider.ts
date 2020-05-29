@@ -1705,6 +1705,7 @@ console.log(err, added);
 
   private processTradeRequestTask = async (task: RequestTask, skipGas: boolean) => {
     try {
+      this.eventEmitter.emit(FulcrumProviderEvents.AskToOpenProgressDlg, task.request.id);
       if (!(this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite)) {
         throw new Error("No provider available!");
       }
@@ -1916,6 +1917,9 @@ console.log(err, added);
         console.log(e);
       }
       task.processingEnd(false, false, e);
+    }
+    finally {
+      this.eventEmitter.emit(FulcrumProviderEvents.AskToCloseProgressDlg, task);
     }
   };
 
