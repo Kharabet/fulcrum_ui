@@ -20,6 +20,7 @@ import { ITradeTokenGridRowProps } from "../components/TradeTokenGridRow";
 import { IOwnTokenGridRowProps } from "../components/OwnTokenGridRow";
 
 import "../styles/pages/_trade-page.scss";
+import { BigNumber } from "@0x/utils";
 
 const ManageTokenGrid = React.lazy(() => import('../components/ManageTokenGrid'));
 const TokenAddressForm = React.lazy(() => import('../components/TokenAddressForm'));
@@ -415,9 +416,39 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         const unitOfAccount = loan.collateralAsset === Asset.ETH
           ? loan.loanAsset
           : loan.collateralAsset;
+
+        let leverage = 0;
+        if (positionType === PositionType.LONG) {
+          if (loan.loanData!.startMargin.eq(new BigNumber(100).times(10 ** 18))) {
+            leverage = 2;
+          }
+          if (loan.loanData!.startMargin.eq(new BigNumber(50).times(10 ** 18))) {
+            leverage = 3;
+          }
+          if (loan.loanData!.startMargin.eq(new BigNumber("33333333333333333333"))) {
+            leverage = 4;
+          }
+          if (loan.loanData!.startMargin.eq(new BigNumber(25).times(10 ** 18))) {
+            leverage = 5;
+          }
+
+        } else {
+          if (loan.loanData!.startMargin.eq(new BigNumber(50).times(10 ** 18))) {
+            leverage = 2;
+          }
+          if (loan.loanData!.startMargin.eq(new BigNumber("33333333333333333333"))) {
+            leverage = 3;
+          }
+          if (loan.loanData!.startMargin.eq(new BigNumber(25).times(10 ** 18))) {
+            leverage = 4;
+          }
+          if (loan.loanData!.startMargin.eq(new BigNumber(20).times(10 ** 18))) {
+            leverage = 5;
+          }
+        }
         ownRowsData.push({
           loanId: loan.loanId,
-          currentKey: new TradeTokenKey(asset, unitOfAccount, positionType, 2, true),
+          currentKey: new TradeTokenKey(asset, unitOfAccount, positionType, leverage, true),
           pTokenAddress: loan.loanData!.loanToken,
           onTrade: this.onTradeRequested,
           onManageCollateralOpen: this.onManageCollateralRequested,
