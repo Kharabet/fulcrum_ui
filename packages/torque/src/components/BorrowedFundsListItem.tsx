@@ -33,6 +33,7 @@ interface IBorrowedFundsListItemState {
   assetDetails: AssetDetails | null;
   interestRate: BigNumber;
   isInProgress: boolean;
+  isEmpty: boolean;
   isLoadingTransaction: boolean;
   request: ManageCollateralRequest | RepayLoanRequest | ExtendLoanRequest | BorrowRequest | undefined;
 }
@@ -47,6 +48,7 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
       interestRate: new BigNumber(0),
       isLoadingTransaction: false,
       isInProgress: props.item.isInProgress,
+      isEmpty: false,
       request: undefined
     };
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.AskToOpenProgressDlg, this.onAskToOpenProgressDlg);
@@ -95,6 +97,7 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
     const thisLoan = loans.find(loan => loan.loanId === this.props.item.loanId);
     await this.setState({
       ...this.state,
+      isEmpty: thisLoan ? false : true,
       borrowedFundsItem: thisLoan ? thisLoan : this.state.borrowedFundsItem
     });
   }
@@ -136,6 +139,9 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
     } else if (sliderValue < sliderMin) {
       sliderValue = sliderMin;
     }
+
+    if (this.state.isEmpty)
+      return null;
 
     return (
       <div className={`borrowed-funds-list-item`}>
@@ -230,7 +236,7 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
     if (!this.props.manageCollateralDlgRef.current) return;
 
     try {
-      const manageCollateralRequest = await this.props.manageCollateralDlgRef.current.getValue({ ...this.state.borrowedFundsItem});
+      const manageCollateralRequest = await this.props.manageCollateralDlgRef.current.getValue({ ...this.state.borrowedFundsItem });
       await this.setState({ ...this.state, request: manageCollateralRequest });
       await TorqueProvider.Instance.onDoManageCollateral(manageCollateralRequest);
     } catch (error) {
@@ -278,7 +284,7 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
     } catch (error) {
       if (error.message !== "Form closed")
         console.error(error);
-    }    
-    
+    }
+
   };
 }
