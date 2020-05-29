@@ -453,6 +453,9 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
           }
 
         } else {
+          if (loan.loanData!.startMargin.eq(new BigNumber(100).times(10 ** 18))) {
+            leverage = 1;
+          }
           if (loan.loanData!.startMargin.eq(new BigNumber(50).times(10 ** 18))) {
             leverage = 2;
           }
