@@ -61,7 +61,7 @@ export class InputAmount extends Component<IInputAmountProps, IInputAmountState>
             step="any"
             ref={this._setInputRef}
             className="input-amount__input"
-            value={!this.props.isLoading ? this.formatPrecision(Number(this.props.inputAmountText)) : ""}
+            value={!this.props.isLoading ? this.formatPrecision(this.props.inputAmountText) : ""}
             onChange={this.props.onTradeAmountChange}
           />
           {!this.props.isLoading ? null
@@ -111,15 +111,19 @@ export class InputAmount extends Component<IInputAmountProps, IInputAmountState>
    this.setState({ ...this.state, buttonValue: value })
   }
 
-  private formatPrecision(output: number): string {
+  private formatPrecision(output: string): string {
     let sign = "";
-    if (output < 0)
+    let number = Number(output);    
+    if (!number)
+     return output;
+
+    if (number < 0)
       sign = "-";
-    let n = Math.log(Math.abs(output)) / Math.LN10;
+    let n = Math.log(Math.abs(number)) / Math.LN10;
     let x = 4 - n;
     if (x < 0) x = 0;
     if (x > 5) x = 5;
-    let result = new Number(output.toFixed(x)).toString();
+    let result = new Number(number.toFixed(x)).toString();
     return result ?? sign + result;
   }
 }

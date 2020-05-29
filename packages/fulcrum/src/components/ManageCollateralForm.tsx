@@ -68,6 +68,7 @@ export interface IManageCollateralFormProps {
 interface IManageCollateralFormState {
   positionValue: number;
   selectedValue: number;
+  sliderValue: number;
   diffAmount: BigNumber;
   collateralAmount: BigNumber;
   gasAmountNeeded: BigNumber;
@@ -104,7 +105,6 @@ interface IManageCollateralFormState {
   maxAmountMultiplier: BigNumber;
 
   isLoading: boolean;
-  isExposureLoading: boolean;
 
   selectedUnitOfAccount: Asset;
 }
@@ -117,6 +117,7 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
   private readonly _inputPrecision = 6;
 
   private readonly _inputChange: Subject<string>;
+  private readonly _selectedValueChange: Subject<BigNumber>;
   private readonly _inputSetMax: Subject<BigNumber>;
 
   private _isMounted: boolean;
@@ -142,6 +143,7 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
     this.state = {
       positionValue: 150,
       selectedValue: 150,
+      sliderValue: 150,
       diffAmount: new BigNumber(0),
 
       collateralAmount: new BigNumber(0),
@@ -171,18 +173,24 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
       isAmountExceeded: false,
       maxAmountMultiplier: maxAmountMultiplier,
       isLoading: true,
-      isExposureLoading: true,
       selectedUnitOfAccount: this.props.defaultUnitOfAccount
 
     };
 
     this._inputChange = new Subject();
+    this._selectedValueChange = new Subject();
     this._inputSetMax = new Subject();
 
     merge(
       this._inputChange.pipe(
         distinctUntilChanged(),
-        debounceTime(500),
+        debounceTime(500),        
+        switchMap((value) => this.rxFromInputAmount(value)), 
+        switchMap((value) => this.rxFromCurrentAmount(value))
+      ),
+      this._selectedValueChange.pipe(
+        distinctUntilChanged(),
+        switchMap((value) => this.rxFromSelectedValue(value)),        
         switchMap((value) => this.rxFromCurrentAmount(value))
       ),
       this._inputSetMax.pipe(
@@ -192,7 +200,7 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
       switchMap((value) => new Observable<ITradeAmountChangeEvent | null>((observer) => observer.next(value)))
     ).subscribe(next => {
       if (next) {
-        this._isMounted && this.setState({ ...this.state, ...next, isLoading: false, isExposureLoading: false });
+        this._isMounted && this.setState({ ...this.state, ...next, isLoading: false });
       } else {
         this._isMounted && this.setState({
           ...this.state,
@@ -204,8 +212,8 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
           slippageRate: new BigNumber(0),
           exposureValue: new BigNumber(0),
           isLoading: false,
-          isExposureLoading: false,
-          selectedValue: 150
+          selectedValue: 150,
+          sliderValue: 150
         })
       }
     });
@@ -332,26 +340,22 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
               : "";
 
     return (
-      <form className="manage-collateral-form" onSubmit={this.onSubmitClick}>
+      <form className="manage-collateral-form" onSubmit={this.onSubmitClick} >
         <div> <CloseIcon className="close-icon" onClick={this.props.onCancel} />
 
           <div className="manage-collateral-form__title">Manage Collateral</div>
           <div className="manage-collateral-form__text">Your position is collateralized</div>
           <div className="manage-collateral-form__collaterized"><span>{this.state.selectedValue.toFixed(2)}</span>%</div>
-{/* 
-          <CollateralSlider
-            minValue={this.minValue}
-            maxValue={this.maxValue}
+
+          <Slider
+            step={0.01}
+            min={this.minValue}
+            max={this.maxValue}
             value={this.state.selectedValue}
-            onUpdate={this.onUpdate}
             onChange={this.onChange}
-          /> */}
-            <Slider
-             step={0.01}
-             min={this.minValue}
-             max={this.maxValue}
-             value={this.state.selectedValue}
-             onChange={this.onChange}/>
+            onAfterChange={this.onAfterChange}
+          />
+
 
           <div className="manage-collateral-form__tips">
             <div className="manage-collateral-form__tip">Withdraw</div>
@@ -410,17 +414,12 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
 
   private onChange = (value: number) => {
     this.setState({ ...this.state, selectedValue: value });
-
-    const collateralAmount = this.state.collateralizedPercent.multipliedBy(this.state.selectedValue);
-    this._inputChange.next(collateralAmount.toFixed(4));
   };
 
-  // private onUpdate = (value: number) => {
-  //   this.setState({ ...this.state, selectedValue: value, isLoading: true });
-
-  //   const collateralAmount = this.state.collateralizedPercent.multipliedBy(this.state.selectedValue);
-  //   this._inputChange.next(collateralAmount.toFixed(4));
-  // };
+  private onAfterChange = (value: number) => {
+    const collateralAmount = this.state.collateralizedPercent.multipliedBy(this.state.selectedValue);
+    this._selectedValueChange.next(collateralAmount);
+  };
 
 
   public onTradeAmountChange = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -429,6 +428,7 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
 
     // setting Text to update display at the same time
     this._isMounted && this.setState({ ...this.state, inputAmountText: amountText }, () => {
+
       // emitting next event for processing with rx.js
       this._inputChange.next(this.state.inputAmountText);
     });
@@ -532,7 +532,7 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
   private rxFromMaxAmountWithMultiplier = (multiplier: BigNumber): Observable<ITradeAmountChangeEvent | null> => {
     return new Observable<ITradeAmountChangeEvent | null>(observer => {
 
-      this._isMounted && this.setState({ ...this.state, isLoading: true });
+      this.setState({ ...this.state, isLoading: true });
       const tradeTokenKey = this.getTradeTokenGridRowSelectionKey();
 
       FulcrumProvider.Instance.getMaxTradeValue(this.props.tradeType, tradeTokenKey, this.state.collateral)
@@ -545,7 +545,7 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
             multiplier = new BigNumber(1);
           }
 
-          this.getInputAmountLimitedFromBigNumber(value, tradeTokenKey, maxTradeValue, multiplier, true).then(limitedAmount => {
+          this.getInputAmountLimitedFromBigNumber(value, tradeTokenKey, maxTradeValue, true, multiplier).then(limitedAmount => {
             if (!limitedAmount.tradeAmountValue.isNaN()) {
 
               const selectedValue = limitedAmount.inputAmountValue.dividedBy(this.state.collateralizedPercent).toNumber();
@@ -586,19 +586,18 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
   };
 
 
-  private rxFromCurrentAmount = (value: string): Observable<ITradeAmountChangeEvent | null> => {
+  private rxFromCurrentAmount = (value: BigNumber): Observable<ITradeAmountChangeEvent | null> => {
     return new Observable<ITradeAmountChangeEvent | null>(observer => {
 
-      this._isMounted && this.setState({ ...this.state, isExposureLoading: true });
       const tradeTokenKey = this.getTradeTokenGridRowSelectionKey();
       const maxTradeValue = this.state.maxTradeValue;
       const selectedValue = new BigNumber(value).dividedBy(this.state.collateralizedPercent).toNumber();
 
       if (selectedValue < this.minValue) {
-        value = new BigNumber(this.minValue).multipliedBy(this.state.collateralizedPercent).toFixed();
+        value = new BigNumber(this.minValue).multipliedBy(this.state.collateralizedPercent);
       }
 
-      this.getInputAmountLimitedFromText(value, tradeTokenKey, maxTradeValue, false).then(limitedAmount => {
+      this.getInputAmountLimitedFromBigNumber(value, tradeTokenKey, maxTradeValue, false).then(limitedAmount => {
         // updating stored value only if the new input value is a valid number
         if (!limitedAmount.tradeAmountValue.isNaN()) {
           const collateralRequest = new ManageCollateralRequest(
@@ -637,6 +636,23 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
     });
   };
 
+  private rxFromSelectedValue = (value: BigNumber): Observable<BigNumber> => {
+    this.setState({ ...this.state, isLoading: true });
+    return new Observable<BigNumber>(observer => {
+      observer.next(value);
+    });
+  };
+
+  private rxFromInputAmount = (value: string): Observable<BigNumber> => {
+    const tradeTokenKey = this.getTradeTokenGridRowSelectionKey();
+    return new Observable<BigNumber>(observer => {
+      FulcrumProvider.Instance.getMaxTradeValue(this.props.tradeType, tradeTokenKey, this.state.collateral).then(maxTradeValue => {
+        let amountText = new BigNumber(value).plus(maxTradeValue.dividedBy(2));
+        observer.next(amountText);
+      });
+    });
+  };
+
 
   private getTradeExpectedResults = async (manageCollateralRequest: ManageCollateralRequest): Promise<ITradeExpectedResults> => {
     const tradedAmountEstimate = await FulcrumProvider.Instance.getTradedAmountEstimate(manageCollateralRequest);
@@ -651,16 +667,7 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
   };
 
 
-  private getInputAmountLimitedFromText = async (textValue: string, tradeTokenKey: TradeTokenKey, maxTradeValue: BigNumber, skipLimitCheck: boolean): Promise<IInputAmountLimited> => {
-    const inputAmountText = textValue;
-    const amountTextForConversion = inputAmountText === "" ? "0" : inputAmountText[0] === "." ? `0${inputAmountText}` : inputAmountText;
-    const inputAmountValue = new BigNumber(amountTextForConversion);
-
-    return this.getInputAmountLimited(inputAmountText, inputAmountValue, tradeTokenKey, maxTradeValue, skipLimitCheck);
-  };
-
-
-  private getInputAmountLimitedFromBigNumber = async (bnValue: BigNumber, tradeTokenKey: TradeTokenKey, maxTradeValue: BigNumber, multiplier: BigNumber, skipLimitCheck: boolean): Promise<IInputAmountLimited> => {
+  private getInputAmountLimitedFromBigNumber = async (bnValue: BigNumber, tradeTokenKey: TradeTokenKey, maxTradeValue: BigNumber, skipLimitCheck: boolean, multiplier: BigNumber = new BigNumber(1)): Promise<IInputAmountLimited> => {
     const inputAmountValue = bnValue;
     const inputAmountText = bnValue.decimalPlaces(this._inputPrecision).toFixed();
 
