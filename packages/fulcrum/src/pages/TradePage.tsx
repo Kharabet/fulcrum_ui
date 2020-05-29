@@ -447,7 +447,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
           }
         }
         ownRowsData.push({
-          loanId: loan.loanId,
+          loan: loan,
           currentKey: new TradeTokenKey(asset, unitOfAccount, positionType, leverage, true),
           pTokenAddress: loan.loanData!.loanToken,
           onTrade: this.onTradeRequested,

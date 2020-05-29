@@ -15,9 +15,10 @@ import { TradeTransactionMinedEvent } from "../services/events/TradeTransactionM
 import { FulcrumProvider } from "../services/FulcrumProvider";
 import { Preloader } from "./Preloader";
 import { ReactComponent as OpenManageCollateral } from "../assets/images/openManageCollateral.svg";
+import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
 
 export interface IInnerOwnTokenGridRowProps {
-  loanId: string;
+  loan: IBorrowedFundsState;
   currentKey: TradeTokenKey;
   pTokenAddress: string;
   onTrade: (request: TradeRequest) => void;
@@ -31,6 +32,7 @@ interface IInnerOwnTokenGridRowState {
   assetBalance: BigNumber | null;
   profit: BigNumber | null;
   isLoading: boolean;
+  priceOfUnitOfAccount: BigNumber
 }
 
 export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, IInnerOwnTokenGridRowState> {
@@ -46,7 +48,8 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
       latestAssetPriceDataPoint: FulcrumProvider.Instance.getPriceDefaultDataPoint(),
       assetBalance: new BigNumber(0),
       profit: new BigNumber(0),
-      isLoading: true
+      isLoading: true,
+      priceOfUnitOfAccount: new BigNumber(0)
     };
 
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
@@ -71,13 +74,15 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
     const data: [BigNumber | null, BigNumber | null] = await FulcrumProvider.Instance.getTradeBalanceAndProfit(tradeTokenKey);
     const assetBalance = data[0];
     const profit = data[1];
+    let priceOfUnitOfAccount = await FulcrumProvider.Instance.getSwapToUsdRate(this.props.currentKey.unitOfAccount)
 
     this._isMounted && this.setState(p => ({
       ...this.state,
       latestAssetPriceDataPoint: latestAssetPriceDataPoint,
       assetBalance: assetBalance,
       profit: profit,
-      isLoading: latestAssetPriceDataPoint.price !== 0 ? false : p.isLoading
+      isLoading: latestAssetPriceDataPoint.price !== 0 ? false : p.isLoading,
+      priceOfUnitOfAccount
     }));
   }
 
@@ -128,11 +133,26 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
   }*/
   private renderOwnTokenRow = (state: IInnerOwnTokenGridRowState, props: IInnerOwnTokenGridRowProps, bnPrice: BigNumber, bnLiquidationPrice: BigNumber): React.ReactFragment => {
     if (!state.assetDetails) return <React.Fragment></React.Fragment>;
+    let position = new BigNumber(0);
+    let value = new BigNumber(0);
+    let collateral = new BigNumber(0);
+    let openPrice = new BigNumber(0);
+    const liquidationRate = ((new BigNumber("15000000000000000000").times(this.props.loan.loanData!.principal).div(10 ** 20)).plus(this.props.loan.loanData!.principal)).div(this.props.loan.loanData!.collateral)
+    let liquidationPrice = new BigNumber(0);
+    let profit = new BigNumber(0);
+    if (this.props.currentKey.positionType === PositionType.LONG) {
+      position = this.props.loan.loanData!.collateral.div(10 ** 18);
+      value = this.props.loan.loanData!.collateral.div(10 ** 18).times(this.state.priceOfUnitOfAccount);
+    collateral = (this.props.loan.loanData!.collateral.times(this.state.priceOfUnitOfAccount).div(10**18)).minus(this.props.loan.loanData!.principal.div(10**18));
+    openPrice = this.props.loan.loanData!.startRate.div(10**18);
+      liquidationPrice = liquidationRate;
+      profit = openPrice.minus(this.state.priceOfUnitOfAccount).times(value);
+    }
     return (
       <React.Fragment>
         <div className={`inner-own-token-grid-row`}>
           <div className="inner-own-token-grid-row__col-token-name-full">
-            0.8884
+            {position.toFixed(2)}
             </div>
           {/*state.pTokenAddress &&
               FulcrumProvider.Instance.web3ProviderSettings &&
@@ -155,10 +175,10 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
           <div title={props.currentKey.unitOfAccount} className="inner-own-token-grid-row__col-asset-type">
             <span className="position-type-marker">{`${props.currentKey.leverage}x`}&nbsp; {props.currentKey.positionType}</span>
           </div>
-          <div title={`$${bnPrice.toFixed(18)}`} className="inner-own-token-grid-row__col-asset-price">
+          <div title={`$${value.toFixed(18)}`} className="inner-own-token-grid-row__col-asset-price">
             {!state.isLoading
               ? <React.Fragment>
-                <span className="sign-currency">$</span>{bnPrice.toFixed(2)}
+                <span className="sign-currency">$</span>{value.toFixed(2)}
                 <span className="inner-own-token-grid-row__col-asset-price-small">12.25%</span>
               </React.Fragment>
               : <Preloader width="74px" />
@@ -166,31 +186,31 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
           </div>
           <div className="inner-own-token-grid-row__col-asset-collateral">
             <React.Fragment>
-              <span className="sign-currency">$</span>15.25
+              <span className="sign-currency">$</span>{collateral.toFixed(2)}
                 <span className="inner-own-token-grid-row__col-asset-collateral-small">16.5%</span>
             </React.Fragment>
             <div className="inner-own-token-grid-row__open-manage-collateral" onClick={this.onManageClick}>
               <OpenManageCollateral />
             </div>
           </div>
-          <div title={state.assetBalance ? `$${state.assetBalance.toFixed(18)}` : ``} className="inner-own-token-grid-row__col-position-value">
+          <div title={openPrice.toFixed(18)} className="inner-own-token-grid-row__col-position-value">
             {!state.isLoading
               ? state.assetBalance
-                ? <React.Fragment><span className="sign-currency">$</span>{state.assetBalance.toFixed(2)}</React.Fragment>
+                ? <React.Fragment><span className="sign-currency">$</span>{openPrice.toFixed(2)}</React.Fragment>
                 : '$0.00'
               : <Preloader width="74px" />
             }
           </div>
-          <div title={`$${bnLiquidationPrice.toFixed(18)}`} className="inner-own-token-grid-row__col-liquidation-price">
+          <div title={`$${liquidationPrice.toFixed(18)}`} className="inner-own-token-grid-row__col-liquidation-price">
             {!state.isLoading
-              ? <React.Fragment><span className="sign-currency">$</span>{bnLiquidationPrice.toFixed(2)}</React.Fragment>
+              ? <React.Fragment><span className="sign-currency">$</span>{liquidationPrice.toFixed(2)}</React.Fragment>
               : <Preloader width="74px" />
             }
           </div>
-          <div title={state.profit ? `$${state.profit.toFixed(18)}` : ``} className="inner-own-token-grid-row__col-profit">
+          <div title={profit.toFixed(18)} className="inner-own-token-grid-row__col-profit">
             {!state.isLoading ?
               state.profit
-                ? <React.Fragment><span className="sign-currency">$</span>{state.profit.toFixed(2)}</React.Fragment>
+                ? <React.Fragment><span className="sign-currency">$</span>{profit.toFixed(2)}</React.Fragment>
                 : '$0.00'
               : <Preloader width="74px" />
             }
@@ -257,7 +277,7 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
         undefined,
         undefined,
         undefined,
-        this.props.loanId
+        this.props.loan.loanId
       )
     );
   };
