@@ -1,0 +1,194 @@
+.trade-page {
+  .circle-loader {
+    width: 40px;
+    height: 40px;
+  }
+  .close-tab-tx {
+    background-color: var(--secondary-row);
+    transform: rotateX(-90deg);
+    animation: closeTabTx 0.6s cubic-bezier(1, 1, 1, 1);
+    &:before {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      animation: closeTabTxLeft 0.6s cubic-bezier(1, 1, 1, 1);
+      border-right: 101px solid transparent;
+      border-top: 101px solid transparent;
+    }
+    &:after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      animation: closeTabTxRight 0.6s cubic-bezier(1, 1, 1, 1);
+      border-left: 101px solid transparent;
+      border-top: 101px solid transparent;
+    }
+  }
+  .own-token-grid {
+    .token-selector-item__image {
+      background-color: var(--primary-row);
+      padding: 18px 0 18px 40px;
+    }
+  }
+
+  .token-selector-item__image {
+    display: flex;
+    align-items: center;
+    padding-left: 40px;
+    padding-top: 30px;
+    padding-bottom: 30px;
+    background-color: var(--secondary-row);
+    margin-bottom: 1px;
+    position: relative;
+
+    &.open-tab-tx {
+      animation: openTabTx 0.6s cubic-bezier(1, 1, 1, 1);
+      &:before {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        animation: openTabTxLeft 0.6s cubic-bezier(1, 1, 1, 1);
+        border-right: 101px solid transparent;
+        border-top: 101px solid transparent;
+      }
+      &:after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        animation: openTabTxRight 0.6s cubic-bezier(1, 1, 1, 1);
+        border-left: 101px solid transparent;
+        border-top: 101px solid transparent;
+      }
+    }
+
+    .trade-transaction-step {
+      font-size: 22px;
+      line-height: 1.4;
+      font-weight: 800;
+      color: #00c0ab;
+      padding-left: 40px;
+      &.warning {
+        color: #ff4f4f;
+      }
+      @keyframes in {
+        0% {
+          opacity: 0;
+          transform: translate(0, -20px);
+        }
+        to {
+          opacity: 1;
+          transform: translate(0px, 0px);
+        }
+      }
+      @keyframes out {
+        0% {
+          opacity: 1;
+          transform: translate(0, 0);
+        }
+        to {
+          opacity: 0;
+          transform: translate(0px, 20px);
+        }
+      }
+
+      &.animation-in {
+        animation: in 0.5s ease-in;
+      }
+      &.animation-out {
+        animation: out 0.5s ease-in;
+      }
+    }
+  }
+
+  @keyframes openTabTx {
+    0% {
+      transform: rotateX(-90deg);
+      transform-origin: top;
+    }
+    50% {
+      transform: rotateX(-45deg);
+    }
+    100% {
+      transform: rotateX(0deg);
+      transform-origin: top;
+    }
+  }
+  @keyframes closeTabTx {
+    0% {
+      transform: rotateX(0deg);
+      transform-origin: top;
+      height: 101px;
+    }
+    50% {
+      transform: rotateX(-45deg);
+      transform-origin: top;
+    }
+    100% {
+      transform: rotateX(-90deg);
+      transform-origin: top;
+      height: 0;
+    }
+  }
+  @keyframes openTabTxRight {
+    0% {
+      border-right: 30px solid var(--primary-bg);
+    }
+    100% {
+      border-right: 0px solid var(--primary-bg);
+    }
+  }
+  @keyframes openTabTxLeft {
+    0% {
+      border-left: 30px solid var(--primary-bg);
+    }
+    100% {
+      border-left: 0px solid var(--primary-bg);
+    }
+  }
+  @keyframes closeTabTxRight {
+    0% {
+      border-right: 0px solid var(--primary-bg);
+    }
+    100% {
+      border-right: 30px solid var(--primary-bg);
+    }
+  }
+  @keyframes closeTabTxLeft {
+    0% {
+      border-left: 0px solid var(--primary-bg);
+    }
+    100% {
+      border-left: 30px solid var(--primary-bg);
+    }
+  }
+}
+
+.opacityIn {
+  animation: opacityIn 1s cubic-bezier(1, 1, 1, 1);
+}
+
+.rightIn {
+  animation: rightIn 0.4 1s cubic-bezier(1, 1, 1, 1);
+}
+
+@keyframes opacityIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes rightIn {
+  0% {
+    transform: translate(15px, 0);
+  }
+  to {
+    transform: translate(0, 0);
+  }
+}

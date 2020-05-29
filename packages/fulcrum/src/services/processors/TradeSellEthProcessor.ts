@@ -81,7 +81,7 @@ export class TradeSellEthProcessor {
 
     let txHash: string = "";
     try {
-      FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.AskToOpenProgressDlg);
+      //FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.AskToOpenProgressDlg);
 
       // Closing trade
       txHash = await iBZxContract.closeTrade.sendTransactionAsync(
@@ -98,8 +98,8 @@ export class TradeSellEthProcessor {
 
       task.setTxHash(txHash);
     }
-    finally {
-      FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.AskToCloseProgressDlg);
+    catch(e) {
+      throw e;
     }
 
     task.processingStepNext();

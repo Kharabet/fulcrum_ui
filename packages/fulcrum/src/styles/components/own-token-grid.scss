@@ -120,6 +120,7 @@ $width-col-actions: 10%;
       @include own-token-grid-row__col();
       align-items: center;
       width: $width-col-collateral;
+      position: relative;
     }
     &__col-asset-collateral-small {
       font-size: 12px;
@@ -136,6 +137,8 @@ $width-col-actions: 10%;
       justify-content: center;
       border-radius: 50%;
       margin-left: 10px;
+      position: absolute;
+      right: 60px;
       cursor: pointer;
       .icon-collateral {
         fill: var(--icon-collateral);

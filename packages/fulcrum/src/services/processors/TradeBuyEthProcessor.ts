@@ -91,7 +91,7 @@ export class TradeBuyEthProcessor {
 
     let txHash: string = "";
     try {
-      FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.AskToOpenProgressDlg);
+      //FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.AskToOpenProgressDlg);
 
       // Submitting trade
       txHash = await tokenContract.marginTrade.sendTransactionAsync(
@@ -111,8 +111,8 @@ export class TradeBuyEthProcessor {
       });
       task.setTxHash(txHash);
     }
-    finally {
-      FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.AskToCloseProgressDlg);
+    catch(e) {
+      throw e;
     }
 
     task.processingStepNext();

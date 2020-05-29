@@ -123,6 +123,7 @@ $width: 33%;
     display: flex;
     flex-wrap: wrap;
     width: 33%;
+    position: relative;
   }
   &__col-asset-collateral-small {
     font-size: 12px;
@@ -139,6 +140,8 @@ $width: 33%;
     justify-content: center;
     border-radius: 50%;
     margin-left: 10px;
+    position: absolute;
+    right: 60px;
     cursor: pointer;
     .icon-collateral {
       fill: var(--icon-collateral);
