@@ -61,6 +61,10 @@ interface ITradePageState {
   openedPositionsCount: number;
   tokenRowsData: ITradeTokenGridRowProps[];
   ownRowsData: IOwnTokenGridRowProps[];
+  tradeRequestId: number;
+  isLoadingTransaction: boolean;
+  request: TradeRequest | undefined,
+  resultTx: boolean
 }
 
 export default class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
@@ -87,7 +91,11 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       defaultLeverageLong: 2,
       openedPositionsCount: 0,
       tokenRowsData: [],
-      ownRowsData: []
+      ownRowsData: [],
+      tradeRequestId: 0,
+      isLoadingTransaction: false,
+      resultTx: true,
+      request: undefined
     };
 
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
@@ -195,6 +203,14 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
                   isMobileMedia={this.props.isMobileMedia}
                   tokenRowsData={this.state.tokenRowsData.filter(e => e.asset === this.state.selectedTabAsset)}
                   ownRowsData={this.state.ownRowsData}
+                  changeLoadingTransaction={this.changeLoadingTransaction}
+                  request={this.state.request}
+                  isLoadingTransaction={this.state.isLoadingTransaction}
+                  tradePosition = {this.state.tradePositionType}
+                  tradeLeverage = {this.state.tradeLeverage}
+                  resultTx={this.state.resultTx}
+                  tradeType={this.state.tradeType}
+                  loanId={this.state.loanId}
                 />
               </React.Fragment>
             )}
@@ -309,12 +325,14 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         tradeUnitOfAccount: request.unitOfAccount,
         tradePositionType: request.positionType,
         tradeLeverage: request.leverage,
-        tradeVersion: request.version
+        tradeVersion: request.version,
+        tradeRequestId: request.id,
       });
     }
   };
 
   public onManageCollateralConfirmed = (request: ManageCollateralRequest) => {
+    request.id = this.state.tradeRequestId;
     FulcrumProvider.Instance.onManageCollateralConfirmed(request);
     this.setState({
       ...this.state,
@@ -365,12 +383,14 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         tradePositionType: request.positionType,
         tradeLeverage: request.leverage,
         tradeVersion: request.version,
-        loanId: request.loanId
+        loanId: request.loanId,
+        tradeRequestId: request.id
       });
     }
   };
 
   public onTradeConfirmed = (request: TradeRequest) => {
+    request.id = this.state.tradeRequestId;  
     FulcrumProvider.Instance.onTradeConfirmed(request);
     this.setState({
       ...this.state,
@@ -452,6 +472,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
           pTokenAddress: loan.loanData!.loanToken,
           onTrade: this.onTradeRequested,
           onManageCollateralOpen: this.onManageCollateralRequested,
+          changeLoadingTransaction: this.changeLoadingTransaction,
         });
       }
     }
@@ -468,7 +489,8 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         defaultTokenizeNeeded: true,
         positionType: PositionType.LONG,
         defaultLeverage: state.defaultLeverageLong,
-        onTrade: this.onTradeRequested
+        onTrade: this.onTradeRequested,
+        changeLoadingTransaction: this.changeLoadingTransaction,
       });
       tokenRowsData.push({
         asset: e,
@@ -476,9 +498,14 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         defaultTokenizeNeeded: true,
         positionType: PositionType.SHORT,
         defaultLeverage: state.defaultLeverageShort,
-        onTrade: this.onTradeRequested
+        onTrade: this.onTradeRequested,
+        changeLoadingTransaction: this.changeLoadingTransaction,
       });
     });
     return tokenRowsData;
   };
+
+  public changeLoadingTransaction = (isLoadingTransaction: boolean, request: TradeRequest | undefined, resultTx: boolean) => {
+    this.setState({ ...this.state, isLoadingTransaction: isLoadingTransaction, request: request, resultTx: resultTx })
+  }
 }

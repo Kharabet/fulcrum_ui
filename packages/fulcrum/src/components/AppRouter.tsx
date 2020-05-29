@@ -134,9 +134,9 @@ export class AppRouter extends Component<any, IAppRouterState> {
         >
           <RiskDisclosure onClose={this.onRiskDisclosureRequestClose} />
         </Modal>
-        <Suspense fallback={<PreloaderChart quantityDots={4} sizeDots={'middle'} title={"Loading"} isOverlay={false} />}>
+        {/*<Suspense fallback={<PreloaderChart quantityDots={4} sizeDots={'middle'} title={"Loading"} isOverlay={false} />}>
           <ProgressFragment />
-        </Suspense>
+        </Suspense>*/}
         <div className="pages-container">
           <div className="pages-wrap">
 

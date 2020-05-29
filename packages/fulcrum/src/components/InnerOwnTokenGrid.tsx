@@ -2,12 +2,17 @@ import React, { Component } from "react";
 import { InnerOwnTokenGridHeader } from "./InnerOwnTokenGridHeader";
 import { IInnerOwnTokenGridRowProps, InnerOwnTokenGridRow } from "./InnerOwnTokenGridRow";
 import { InnerOwnTokenCardMobile } from "./InnerOwnTokenCardMobile";
+import { TradeRequest } from "../domain/TradeRequest";
 
 import "../styles/components/inner-own-token-grid.scss";
 
 export interface IInnerOwnTokenGridProps {
   isMobileMedia: boolean;
   ownRowsData: IInnerOwnTokenGridRowProps[];
+  request: TradeRequest | undefined;
+  isLoadingTransaction: boolean;
+  loanId?: string;
+  changeLoadingTransaction: (isLoadingTransaction: boolean, request: TradeRequest | undefined, resultTx: boolean) => void;
 }
 
 interface IInnerOwnTokenGridState {
@@ -23,12 +28,12 @@ export class InnerOwnTokenGrid extends Component<IInnerOwnTokenGridProps, IInner
   }
 
   private renderDesktop = () => {
-    const innerOwnRowsData = this.props.ownRowsData.map(e => <InnerOwnTokenGridRow key={`${e.currentKey.toString()}`}  {...e} />);
+    const innerOwnRowsData = this.props.ownRowsData.map(e => <InnerOwnTokenGridRow key={`${e.currentKey.toString()}`} changeLoadingTransaction={this.props.changeLoadingTransaction} {...e} />);
     if (innerOwnRowsData.length === 0) return null;
 
     return (
       <div className="inner-own-token-grid">
-        <InnerOwnTokenGridHeader asset={this.props.ownRowsData[0].currentKey.asset} unitOfAccount={this.props.ownRowsData[0].currentKey.unitOfAccount} />
+        <InnerOwnTokenGridHeader asset={this.props.ownRowsData[0].currentKey.asset} unitOfAccount={this.props.ownRowsData[0].currentKey.unitOfAccount} loader={this.props.loanId === this.props.ownRowsData[0].loanId} isLoadingTransaction={this.props.isLoadingTransaction} />
         {innerOwnRowsData}
       </div>
     );

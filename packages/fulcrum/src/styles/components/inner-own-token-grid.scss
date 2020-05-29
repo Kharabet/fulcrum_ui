@@ -50,6 +50,9 @@ $padding: 22px 40px 35px 40px;
     margin-bottom: -15px;
     position: relative;
     z-index: 2;
+    .opacity{
+      opacity: 0;
+    }
     &__col-token-image {
       @include inner-own-token-grid-header__col();
       width: $width-col-token-image;
