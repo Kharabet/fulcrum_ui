@@ -34,6 +34,7 @@ interface IInnerOwnTokenGridRowState {
   isLoading: boolean;
   priceOfUnitOfAccount: BigNumber;
   priceOfAsset: BigNumber;
+  collateralToPrincipal: BigNumber;
 }
 
 export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, IInnerOwnTokenGridRowState> {
@@ -52,6 +53,7 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
       isLoading: true,
       priceOfUnitOfAccount: new BigNumber(0),
       priceOfAsset: new BigNumber(0),
+      collateralToPrincipal: new BigNumber(0)
     };
 
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
@@ -78,13 +80,14 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
     const profit = data[1];
     let priceOfUnitOfAccount = await FulcrumProvider.Instance.getSwapToUsdRate(this.props.currentKey.unitOfAccount)
     let priceOfAsset = await FulcrumProvider.Instance.getSwapToUsdRate(this.props.currentKey.asset)
-
+    const collateralToPrincipalRate = await FulcrumProvider.Instance.getSwapRate(this.props.loan.collateralAsset, this.props.loan.loanAsset);
     this._isMounted && this.setState(p => ({
       ...this.state,
       latestAssetPriceDataPoint: latestAssetPriceDataPoint,
       assetBalance: assetBalance,
       profit: profit,
       isLoading: latestAssetPriceDataPoint.price !== 0 ? false : p.isLoading,
+      collateralToPrincipal: collateralToPrincipalRate,
       priceOfUnitOfAccount,
       priceOfAsset
     }));
@@ -146,18 +149,27 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
     let profit = new BigNumber(0);
     if (this.props.currentKey.positionType === PositionType.LONG) {
       position = this.props.loan.loanData!.collateral.div(10 ** 18);
-      value = this.props.loan.loanData!.collateral.div(10 ** 18).times(this.state.priceOfAsset);
-      collateral = ((this.props.loan.loanData!.collateral.times(this.state.priceOfAsset).div(10 ** 18)).minus(this.props.loan.loanData!.principal.times(this.state.priceOfUnitOfAccount).div(10 ** 18)));
+      value = this.props.loan.loanData!.collateral.div(10 ** 18).times(this.state.collateralToPrincipal);
+      collateral = ((this.props.loan.loanData!.collateral.times(this.state.collateralToPrincipal).div(10 ** 18)).minus(this.props.loan.loanData!.principal.div(10 ** 18)));
       openPrice = this.props.loan.loanData!.startRate.div(10 ** 18);
       liquidationPrice = liquidationRate;
-      profit = openPrice.minus(this.state.priceOfAsset).times(position);
+      profit = this.state.collateralToPrincipal.minus(openPrice).times(position);
     }
+    else {
+      position = this.props.loan.loanData!.principal.div(10 ** 18);
+      collateral = ((this.props.loan.loanData!.collateral.div(10 ** 18)).minus(this.props.loan.loanData!.principal.div(this.state.collateralToPrincipal).div(10 ** 18)));
+      openPrice = new BigNumber(10 ** 36).div(this.props.loan.loanData!.startRate);
+      liquidationPrice = liquidationRate.div(this.state.collateralToPrincipal);
+      profit = openPrice.minus(this.state.collateralToPrincipal).times(position);
+
+    }
+
     return (
       <React.Fragment>
         <div className={`inner-own-token-grid-row`}>
           <div className="inner-own-token-grid-row__col-token-name-full">
             {position.toFixed(2)}
-            </div>
+          </div>
           {/*state.pTokenAddress &&
               FulcrumProvider.Instance.web3ProviderSettings &&
               FulcrumProvider.Instance.web3ProviderSettings.etherscanURL ? (
@@ -191,7 +203,7 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
           <div className="inner-own-token-grid-row__col-asset-collateral">
             <React.Fragment>
               <span className="sign-currency">$</span>{collateral.toFixed(2)}
-                <span className="inner-own-token-grid-row__col-asset-collateral-small">16.5%</span>
+              <span className="inner-own-token-grid-row__col-asset-collateral-small">16.5%</span>
             </React.Fragment>
             <div className="inner-own-token-grid-row__open-manage-collateral" onClick={this.onManageClick}>
               <OpenManageCollateral />

@@ -61,13 +61,12 @@ export class TradeBuyEthProcessor {
     const collateralTokenAddress = FulcrumProvider.Instance.getErc20AddressOfAsset(collateralToken);
     const loanData = "0x";
 
-    const colalteralAsset = taskRequest.positionType === PositionType.LONG ? Asset.WETH : Asset.DAI
     console.log("depositAmount: " + amountInBaseUnits.toFixed());
     console.log("leverageAmount: " + leverageAmount.toFixed());
     console.log("loanTokenSent: " + loanTokenSent.toFixed());
     console.log("collateralTokenSent: " + collateralTokenSent.toFixed());
-    console.log("deposit token: " + taskRequest.collateral + " address: " + depositTokenAddress!);
-    console.log("collateral token: " + colalteralAsset + " address: " + collateralTokenAddress!);
+    console.log("deposit token: " + depositToken + " address: " + depositTokenAddress!);
+    console.log("collateral token: " + collateralToken + " address: " + collateralTokenAddress!);
     console.log("trader: "+ account);
     console.log("loan data: "+ loanData);
 
