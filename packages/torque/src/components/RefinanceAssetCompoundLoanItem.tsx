@@ -255,7 +255,7 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
               </div>
             }
             {this.state.loan.isDisabled && !this.props.isMobileMedia &&
-              <div className={`collaterization-warning ${this.state.isShow ? "" : "hidden-details"}`}>Collateralization should be {this.state.loan.maintenanceMarginAmount!.toNumber()}%+</div>
+              <div className={`collaterization-warning ${this.state.isShow ? "" : "hidden-details"}`}>Collateralization should be {this.state.loan.maintenanceMargin!.toNumber()}%+</div>
             }
             {this.props.isMobileMedia &&
               <div className="refinance-asset-selector__arrow">
@@ -345,7 +345,7 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
                   <div className="collateral-value">{this.state.loan.collateral[0].collaterizationPercent!.dp(2, BigNumber.ROUND_FLOOR).toNumber()}%</div>
                   <Slider
                     step={0.01}
-                    min={this.state.loan.maintenanceMarginAmount!.dp(2, BigNumber.ROUND_FLOOR).toNumber()}
+                    min={this.state.loan.maintenanceMargin!.dp(2, BigNumber.ROUND_FLOOR).toNumber()()}
                     max={this.props.loan.collateral[0].collaterizationPercent!.dp(2, BigNumber.ROUND_FLOOR).toNumber()}
                     value={this.state.loan.collateral[0].collaterizationPercent!.dp(2, BigNumber.ROUND_FLOOR).toNumber()}
                     onChange={this.onCollaterizationChange}
@@ -354,7 +354,7 @@ export class RefinanceAssetCompoundLoanItem extends Component<IRefinanceAssetCom
               </div>
             }
             {this.state.loan.isDisabled && this.props.isMobileMedia &&
-              <div className="collaterization-warning">Collateralization should be {this.state.loan.maintenanceMarginAmount!.toNumber()}%+</div>
+              <div className="collaterization-warning">Collateralization should be {this.state.loan.maintenanceMargin!.toNumber()}%+</div>
             }
           </div>
           {/*<div className="refinance-asset-selector__type">1.500</div>*/}

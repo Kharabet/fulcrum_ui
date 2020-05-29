@@ -56,7 +56,7 @@ export class BorrowPage extends PureComponent<IBorrowPageParams & RouteComponent
   private onSelectAsset = async (asset: Asset) => {
 
     if (!this.borrowDlgRef.current) return;
-
+    
     if (TorqueProvider.Instance.providerType === ProviderType.None || !TorqueProvider.Instance.contractsSource || !TorqueProvider.Instance.contractsSource.canWrite) {
       this.props.doNetworkConnect()
       return

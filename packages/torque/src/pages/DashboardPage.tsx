@@ -89,6 +89,7 @@ export class DashboardPage extends PureComponent<
     let itemsAwaiting: ReadonlyArray<BorrowRequestAwaiting> = [];
 
     items = await TorqueProvider.Instance.getLoansList();
+    console.log(items);
     itemsAwaiting = await TorqueProvider.Instance.getLoansAwaitingList();
 
     await this._isMounted && this.setState({
@@ -144,7 +145,7 @@ export class DashboardPage extends PureComponent<
                   manageCollateralDlgRef={this.manageCollateralDlgRef}
                   repayLoanDlgRef={this.repayLoanDlgRef}
                   extendLoanDlgRef={this.extendLoanDlgRef}
-                  onBorrowMore={this.onBorrowMore}
+                  borrowMoreDlgRef={this.borrowMoreDlgRef}
                   isLoading={this.state.isDataLoading}
                 />
               </React.Fragment>

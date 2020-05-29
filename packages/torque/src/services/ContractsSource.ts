@@ -68,7 +68,7 @@ export class ContractsSource {
         address = "0xc45755a7cfc9385290e6fece1f040c0453e7b0e5";
         break;
       case 42:
-        address = "0x9009e85a687b55b5d6c314363c228803fad32d01";
+        address = "0x115338E77339d64b3d58181Aa9c0518df9D18022";
         break;
     }
 
@@ -88,7 +88,7 @@ export class ContractsSource {
         address = "0xef52dd2d03d7a44f9dda8d450f806fa84571cf84";
         break;
       case 42:
-        address = "0xce069b35ae99762bee444c81dec1728aa99afd4b";
+        address = "0x115338E77339d64b3d58181Aa9c0518df9D18022";
         break;
     }
 
@@ -253,7 +253,7 @@ export class ContractsSource {
         address = "0x76de3d406fee6c3316558406b17ff785c978e98c";
         break;
       case 42:
-        address = "0xc72e3a07b25c4ce85691b2eaca92ff2dd9ad06b3";
+        address = "0xe7fd5EE97f7f0bB8010c7a8D88D8bD059B29e001";
         break;
     }
 

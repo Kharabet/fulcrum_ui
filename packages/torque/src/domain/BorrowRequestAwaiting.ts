@@ -4,6 +4,7 @@ import { BorrowRequest } from "./BorrowRequest";
 
 export class BorrowRequestAwaiting {
   public walletAddress: string;
+  public loanId: string;
   public borrowAsset: Asset;
   public borrowAmount: BigNumber;
   public collateralAsset: Asset;
@@ -12,6 +13,7 @@ export class BorrowRequestAwaiting {
   public txHash: string;
 
   constructor(borrowRequest: BorrowRequest, networkId: number, walletAddress: string, txHash: string) {
+    this.loanId = borrowRequest.loanId;
     this.borrowAsset = borrowRequest.borrowAsset;
     this.borrowAmount = borrowRequest.borrowAmount;
     this.collateralAsset = borrowRequest.collateralAsset;
@@ -38,6 +40,8 @@ export class BorrowRequestAwaiting {
   public static fromObj(data: object): BorrowRequestAwaiting {
     const result = new BorrowRequestAwaiting(
       new BorrowRequest(
+        // @ts-ignore
+        (data.loanId as string),
         // @ts-ignore
         // @ts-ignore
         (data.borrowAsset as string),

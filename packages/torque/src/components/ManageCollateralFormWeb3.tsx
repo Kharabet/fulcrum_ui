@@ -203,7 +203,7 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
     snapshot?: any
   ): void {
     if (
-      prevProps.loanOrderState.loanOrderHash !== this.props.loanOrderState.loanOrderHash ||
+      prevProps.loanOrderState.loanId !== this.props.loanOrderState.loanId ||
       prevState.loanValue !== this.state.loanValue ||
       prevState.selectedValue !== this.state.selectedValue) {
       TorqueProvider.Instance.getLoanCollateralManagementGasAmount().then(gasAmountNeeded => {
@@ -237,7 +237,7 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
                 <div className="manage-collateral-form__info-liquidated-at-msg">
                   This will make your loan collateralized
                 </div>
-                <div className="manage-collateral-form__info-liquidated-at-price">
+                <div title={this.state.collateralizedPercent.toFixed()} className="manage-collateral-form__info-liquidated-at-price">
                   <span>{this.state.collateralizedPercent.toFixed(2)}</span>%
                   </div>
               </div>

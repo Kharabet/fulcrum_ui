@@ -85,18 +85,17 @@ export class BorrowProcessor {
     let txHash: string = "";
 
     try {
-      const gasAmount = await iTokenContract.borrowTokenFromDeposit.estimateGasAsync(
+      console.log(TorqueProvider.Instance.gasLimit);
+      const gasAmount = await iTokenContract.borrow.estimateGasAsync(
+        taskRequest.loanId,
         borrowAmountInBaseUnits,
-        new BigNumber(2 * 10 ** 18),
         new BigNumber(7884000), // approximately 3 months
-        isETHCollateralAsset
-          ? new BigNumber(0)
-          : depositAmountInBaseUnits,
-        account,
-        account,
+        depositAmountInBaseUnits,
         isETHCollateralAsset
           ? TorqueProvider.ZERO_ADDRESS
           : collateralAssetErc20Address,
+        account,
+        account,
         "0x",
         {
           from: account,
@@ -107,24 +106,23 @@ export class BorrowProcessor {
         }
       );
       gasAmountBN = new BigNumber(gasAmount).multipliedBy(TorqueProvider.Instance.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
+      console.log(gasAmountBN);
     } catch (e) {
       console.log(e);
-      throw e;
+      // throw e;
     }
 
     try {
-      txHash = await iTokenContract.borrowTokenFromDeposit.sendTransactionAsync(
+      txHash = await iTokenContract.borrow.sendTransactionAsync(
+        taskRequest.loanId,
         borrowAmountInBaseUnits,      // borrowAmount
-        new BigNumber(2 * 10 ** 18),    // leverageAmount
         new BigNumber(7884000),       // initialLoanDuration (approximately 3 months)
-        isETHCollateralAsset
-          ? new BigNumber(0)
-          : depositAmountInBaseUnits,   // collateralTokenSent
-        account,                      // borrower
-        account,                      // receiver
+        depositAmountInBaseUnits,     // collateralTokenSent
         isETHCollateralAsset
           ? TorqueProvider.ZERO_ADDRESS
-          : collateralAssetErc20Address, // collateralTokenAddress
+          : collateralAssetErc20Address, // collateralToken
+        account,                      // borrower
+        account,                      // receiver
         "0x",                         // loanData
         {
           from: account,

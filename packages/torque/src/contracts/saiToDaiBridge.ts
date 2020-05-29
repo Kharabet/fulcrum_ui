@@ -104,13 +104,13 @@ export class saiToDAIBridgeContract extends BaseContract {
     };
     public _migrateLoan = {
         async sendTransactionAsync(
-            loanOrderHash: string,
+            loanId: string,
             borrower: string,
             migrationAmount: BigNumber,
             txData: Partial<TxDataPayable> = {},
         ): Promise<string> {
             const self = this as any as saiToDAIBridgeContract;
-            const encodedData = self._strictEncodeArguments('_migrateLoan(bytes32,address,uint256)', [loanOrderHash,
+            const encodedData = self._strictEncodeArguments('_migrateLoan(bytes32,address,uint256)', [loanId,
     borrower,
     migrationAmount
     ]);
@@ -123,7 +123,7 @@ export class saiToDAIBridgeContract extends BaseContract {
                 self._web3Wrapper.getContractDefaults(),
                 (self as any)._migrateLoan.estimateGasAsync.bind(
                     self,
-                    loanOrderHash,
+                    loanId,
                     borrower,
                     migrationAmount
                 ),
@@ -132,13 +132,13 @@ export class saiToDAIBridgeContract extends BaseContract {
             return txHash;
         },
         async estimateGasAsync(
-            loanOrderHash: string,
+            loanId: string,
             borrower: string,
             migrationAmount: BigNumber,
             txData: Partial<TxData> = {},
         ): Promise<number> {
             const self = this as any as saiToDAIBridgeContract;
-            const encodedData = self._strictEncodeArguments('_migrateLoan(bytes32,address,uint256)', [loanOrderHash,
+            const encodedData = self._strictEncodeArguments('_migrateLoan(bytes32,address,uint256)', [loanId,
     borrower,
     migrationAmount
     ]);
@@ -154,19 +154,19 @@ export class saiToDAIBridgeContract extends BaseContract {
             return gas;
         },
         getABIEncodedTransactionData(
-            loanOrderHash: string,
+            loanId: string,
             borrower: string,
             migrationAmount: BigNumber,
         ): string {
             const self = this as any as saiToDAIBridgeContract;
-            const abiEncodedTransactionData = self._strictEncodeArguments('_migrateLoan(bytes32,address,uint256)', [loanOrderHash,
+            const abiEncodedTransactionData = self._strictEncodeArguments('_migrateLoan(bytes32,address,uint256)', [loanId,
     borrower,
     migrationAmount
     ]);
             return abiEncodedTransactionData;
         },
         async callAsync(
-            loanOrderHash: string,
+            loanId: string,
             borrower: string,
             migrationAmount: BigNumber,
             callData: Partial<CallData> = {},
@@ -174,7 +174,7 @@ export class saiToDAIBridgeContract extends BaseContract {
         ): Promise<void
         > {
             const self = this as any as saiToDAIBridgeContract;
-            const encodedData = self._strictEncodeArguments('_migrateLoan(bytes32,address,uint256)', [loanOrderHash,
+            const encodedData = self._strictEncodeArguments('_migrateLoan(bytes32,address,uint256)', [loanId,
         borrower,
         migrationAmount
         ]);
@@ -224,12 +224,12 @@ export class saiToDAIBridgeContract extends BaseContract {
     };
     public migrateLoan = {
         async sendTransactionAsync(
-            loanOrderHash: string,
+            loanId: string,
             migrationAmount: BigNumber,
             txData: Partial<TxDataPayable> = {},
         ): Promise<string> {
             const self = this as any as saiToDAIBridgeContract;
-            const encodedData = self._strictEncodeArguments('migrateLoan(bytes32,uint256)', [loanOrderHash,
+            const encodedData = self._strictEncodeArguments('migrateLoan(bytes32,uint256)', [loanId,
     migrationAmount
     ]);
             const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -241,7 +241,7 @@ export class saiToDAIBridgeContract extends BaseContract {
                 self._web3Wrapper.getContractDefaults(),
                 (self as any).migrateLoan.estimateGasAsync.bind(
                     self,
-                    loanOrderHash,
+                    loanId,
                     migrationAmount
                 ),
             );
@@ -249,12 +249,12 @@ export class saiToDAIBridgeContract extends BaseContract {
             return txHash;
         },
         async estimateGasAsync(
-            loanOrderHash: string,
+            loanId: string,
             migrationAmount: BigNumber,
             txData: Partial<TxData> = {},
         ): Promise<number> {
             const self = this as any as saiToDAIBridgeContract;
-            const encodedData = self._strictEncodeArguments('migrateLoan(bytes32,uint256)', [loanOrderHash,
+            const encodedData = self._strictEncodeArguments('migrateLoan(bytes32,uint256)', [loanId,
     migrationAmount
     ]);
             const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
@@ -270,24 +270,24 @@ export class saiToDAIBridgeContract extends BaseContract {
             return gas;
         },
         getABIEncodedTransactionData(
-            loanOrderHash: string,
+            loanId: string,
             migrationAmount: BigNumber,
         ): string {
             const self = this as any as saiToDAIBridgeContract;
-            const abiEncodedTransactionData = self._strictEncodeArguments('migrateLoan(bytes32,uint256)', [loanOrderHash,
+            const abiEncodedTransactionData = self._strictEncodeArguments('migrateLoan(bytes32,uint256)', [loanId,
     migrationAmount
     ]);
             return abiEncodedTransactionData;
         },
         async callAsync(
-            loanOrderHash: string,
+            loanId: string,
             migrationAmount: BigNumber,
             callData: Partial<CallData> = {},
             defaultBlock?: BlockParam,
         ): Promise<void
         > {
             const self = this as any as saiToDAIBridgeContract;
-            const encodedData = self._strictEncodeArguments('migrateLoan(bytes32,uint256)', [loanOrderHash,
+            const encodedData = self._strictEncodeArguments('migrateLoan(bytes32,uint256)', [loanId,
         migrationAmount
         ]);
             const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(

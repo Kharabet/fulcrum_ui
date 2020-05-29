@@ -16,7 +16,7 @@ export interface RefinanceData {
   dust: BigNumber;
   isShowCard: boolean;
   variableAPR: BigNumber;
-  maintenanceMarginAmount: BigNumber;
+  maintenanceMargin: BigNumber;
 }
 
 export interface RefinanceCdpData {
@@ -38,7 +38,7 @@ export interface IRefinanceToken {
   contract?: CTokenContract;
   decimals: number;
   underlying: string;
-  maintenanceMarginAmount?: BigNumber;
+  maintenanceMargin?: BigNumber;
 }
 
 export interface IRefinanceLoan extends IRefinanceToken {

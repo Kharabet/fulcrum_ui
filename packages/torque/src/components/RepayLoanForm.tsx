@@ -90,7 +90,7 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
   ): void {
     if (
       prevProps.loanOrderState.accountAddress !== this.props.loanOrderState.accountAddress ||
-      prevProps.loanOrderState.loanOrderHash !== this.props.loanOrderState.loanOrderHash
+      prevProps.loanOrderState.loanId !== this.props.loanOrderState.loanId
     ) {
       TorqueProvider.Instance.getLoanRepayAddress(
         this.props.loanOrderState
@@ -200,7 +200,7 @@ export class RepayLoanForm extends Component<IRepayLoanFormProps, IRepayLoanForm
           this.props.loanOrderState.loanAsset,
           this.props.loanOrderState.collateralAsset,
           this.props.loanOrderState.accountAddress,
-          this.props.loanOrderState.loanOrderHash,
+          this.props.loanOrderState.loanId,
           repayAmount,
           percentData.repayPercent ? new BigNumber(percentData.repayPercent) : new BigNumber(0),
           this.props.loanOrderState.amountOwed

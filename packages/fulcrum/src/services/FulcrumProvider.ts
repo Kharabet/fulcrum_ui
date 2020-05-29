@@ -604,13 +604,16 @@ export class FulcrumProvider {
             // console.log(e);
           }*/
 
-          const tokenPrice = await assetContract.tokenPrice.callAsync();
+          /*const tokenPrice = await assetContract.tokenPrice.callAsync();
           const checkpointPrice = await assetContract.checkpointPrice.callAsync(account);
 
           result = tokenPrice
             .minus(checkpointPrice)
             .multipliedBy(balance)
-            .dividedBy(10 ** 36);
+            .dividedBy(10 ** 36);*/
+
+          result = (await assetContract.profitOf.callAsync(account))
+            .dividedBy(10 ** 18);
 
           /*if (swapPrice && swapPrice.gt(0)) {
             result = result

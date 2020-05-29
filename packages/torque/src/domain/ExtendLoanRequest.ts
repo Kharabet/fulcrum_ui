@@ -6,14 +6,14 @@ export class ExtendLoanRequest {
   public id: number;
   public borrowAsset: Asset;
   public accountAddress: string;
-  public loanOrderHash: string;
+  public loanId: string;
   public depositAmount: BigNumber;
 
-  constructor(borrowAsset: Asset, accountAddress: string, loanOrderHash: string, depositAmount: BigNumber) {
+  constructor(borrowAsset: Asset, accountAddress: string, loanId: string, depositAmount: BigNumber) {
     this.id = moment().unix() + Math.floor(Math.random() * 10);
     this.borrowAsset = borrowAsset;
     this.accountAddress = accountAddress;
-    this.loanOrderHash = loanOrderHash;
+    this.loanId = loanId;
     this.depositAmount = depositAmount;
   }
 }
