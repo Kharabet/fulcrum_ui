@@ -209,20 +209,19 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
               ) : (
                 <div className="own-token-grid-row__col-token-name">{`${state.assetDetails.displayName}`}
                 </div>)}
-
             <div className="own-token-grid-row__col-position-type opacityIn">
               <span className="position-type-marker">
                 {`${props.currentKey.leverage}x ${props.currentKey.positionType}`}
               </span>
             </div>
 
-            <div title={props.currentKey.unitOfAccount} className="own-token-grid-row__col-asset-unit">
+            <div title={props.currentKey.unitOfAccount} className="own-token-grid-row__col-asset-unit opacityIn">
               {props.currentKey.unitOfAccount}
             </div>
-            <div title={props.currentKey.unitOfAccount} className="own-token-grid-row__col-position">
+            <div title={props.currentKey.unitOfAccount} className="own-token-grid-row__col-position opacityIn">
               {position.toFixed(2)}
             </div>
-            <div title={openPrice.toFixed(18)} className="own-token-grid-row__col-asset-price">
+            <div title={openPrice.toFixed(18)} className="own-token-grid-row__col-asset-price opacityIn">
               {!state.isLoading
                 ? <React.Fragment>
                   <span className="sign-currency">$</span>{openPrice.toFixed(2)}

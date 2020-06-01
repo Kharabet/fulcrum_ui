@@ -229,10 +229,10 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
                 <div className="inner-own-token-grid-row__col-token-name-full">{`${props.currentKey.leverage}x`}&nbsp;
                   <PositionTypeMarkerAlt assetDetails={state.assetDetails} value={props.currentKey.positionType} />
               </div>)*/}
-            <div title={props.currentKey.unitOfAccount} className="inner-own-token-grid-row__col-asset-type">
+            <div title={props.currentKey.unitOfAccount} className="inner-own-token-grid-row__col-asset-type opacityIn">
               <span className="position-type-marker">{`${props.currentKey.leverage}x`}&nbsp; {props.currentKey.positionType}</span>
             </div>
-            <div title={`$${value.toFixed(18)}`} className="inner-own-token-grid-row__col-asset-price">
+            <div title={`$${value.toFixed(18)}`} className="inner-own-token-grid-row__col-asset-price opacityIn">
               {!state.isLoading
                 ? <React.Fragment>
                   <span className="sign-currency">$</span>{value.toFixed(2)}
@@ -241,7 +241,7 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
                 : <Preloader width="74px" />
               }
             </div>
-            <div className="inner-own-token-grid-row__col-asset-collateral">
+            <div className="inner-own-token-grid-row__col-asset-collateral opacityIn">
               {!state.isLoading
                 ? <React.Fragment>
                   <span className="sign-currency">$</span>{collateral.toFixed(2)}
@@ -253,7 +253,7 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
                 <OpenManageCollateral />
               </div>
             </div>
-            <div title={openPrice.toFixed(18)} className="inner-own-token-grid-row__col-position-value">
+            <div title={openPrice.toFixed(18)} className="inner-own-token-grid-row__col-position-value opacityIn">
               {!state.isLoading
                 ? state.assetBalance
                   ? <React.Fragment><span className="sign-currency">$</span>{openPrice.toFixed(2)}</React.Fragment>
@@ -261,21 +261,21 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
                 : <Preloader width="74px" />
               }
             </div>
-            <div title={`$${liquidationPrice.toFixed(18)}`} className="inner-own-token-grid-row__col-liquidation-price">
+            <div title={`$${liquidationPrice.toFixed(18)}`} className="inner-own-token-grid-row__col-liquidation-price opacityIn">
               {!state.isLoading
                 ? <React.Fragment><span className="sign-currency">$</span>{liquidationPrice.toFixed(2)}</React.Fragment>
                 : <Preloader width="74px" />
               }
             </div>
-            <div title={profit.toFixed(18)} className="inner-own-token-grid-row__col-profit">
-              {!state.isLoading ?
-                state.profit
+            <div title={profit.toFixed(18)} className="inner-own-token-grid-row__col-profit opacityIn">
+              {!state.isLoading
+                ? state.profit
                   ? <React.Fragment><span className="sign-currency">$</span>{profit.toFixed(2)}</React.Fragment>
                   : '$0.00'
                 : <Preloader width="74px" />
               }
             </div>
-            <div className="inner-own-token-grid-row__col-action">
+            <div className="inner-own-token-grid-row__col-action opacityIn rightIn">
               <button className="inner-own-token-grid-row_button inner-own-token-grid-row__sell-button inner-own-token-grid-row__button--size-half" onClick={this.onSellClick}>
                 {TradeType.SELL}
               </button>
