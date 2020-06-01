@@ -95,7 +95,6 @@ interface IManageCollateralFormState {
 
   tradedAmountEstimate: BigNumber;
   slippageRate: BigNumber;
-  pTokenAddress: string;
 
   currentPrice: BigNumber;
   liquidationPrice: BigNumber;
@@ -165,7 +164,6 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
       tradedAmountEstimate: tradedAmountEstimate,
       slippageRate: slippageRate,
       interestRate: interestRate,
-      pTokenAddress: "",
       maybeNeedsApproval: false,
       currentPrice: currentPrice,
       liquidationPrice: liquidationPrice,
@@ -292,7 +290,6 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
       tradedAmountEstimate: tradeExpectedResults.tradedAmountEstimate,
       slippageRate: tradeExpectedResults.slippageRate,
       interestRate: interestRate,
-      pTokenAddress: address,
       maybeNeedsApproval: maybeNeedsApproval,
       currentPrice: new BigNumber(latestPriceDataPoint.price),
       liquidationPrice: liquidationPrice,

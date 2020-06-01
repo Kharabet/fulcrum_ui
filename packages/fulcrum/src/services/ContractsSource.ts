@@ -340,18 +340,6 @@ export class ContractsSource {
     return result;
   }
 
-  public getPTokenAddresses(): string[] {
-    const result: string[] = [];
-    ContractsSource.pTokensContractInfos.forEach(e => {
-      result.push(e.token);
-    });
-    ContractsSource.pTokensContractInfosBurnOnly.forEach(e => {
-      result.push(e.token);
-    });
-
-    return result;
-  }
-
   public getITokenAddresses(assets: Asset[]): string[] {
     const result: string[] = [];
     assets.forEach(e => {

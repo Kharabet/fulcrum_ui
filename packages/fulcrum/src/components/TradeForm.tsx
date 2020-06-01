@@ -93,7 +93,6 @@ interface ITradeFormState {
 
   tradedAmountEstimate: BigNumber;
   slippageRate: BigNumber;
-  pTokenAddress: string;
 
   currentPrice: BigNumber;
   liquidationPrice: BigNumber;
@@ -150,7 +149,6 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       tradedAmountEstimate: tradedAmountEstimate,
       slippageRate: slippageRate,
       interestRate: interestRate,
-      pTokenAddress: "",
       maybeNeedsApproval: false,
       currentPrice: currentPrice,
       liquidationPrice: liquidationPrice,
@@ -267,7 +265,6 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       tradedAmountEstimate: tradeExpectedResults.tradedAmountEstimate,
       slippageRate: tradeExpectedResults.slippageRate,
       interestRate: interestRate,
-      pTokenAddress: address,
       maybeNeedsApproval: maybeNeedsApproval,
       currentPrice: new BigNumber(latestPriceDataPoint.price),
       liquidationPrice: liquidationPrice,
@@ -374,55 +371,25 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       <form className="trade-form" onSubmit={this.onSubmitClick}>
         <CloseIcon className="close-icon" onClick={this.onCancelClick} />
         <div className="trade-form__left_block">
-          {this.state.pTokenAddress &&
-            FulcrumProvider.Instance.web3ProviderSettings &&
-            FulcrumProvider.Instance.web3ProviderSettings.etherscanURL ? (
-              <a
-                className="trade-form__info_block"
-                title={this.state.pTokenAddress}
-                href={`${FulcrumProvider.Instance.web3ProviderSettings.etherscanURL}address/${this.state.pTokenAddress}#readContract`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <div className="trade-form__info_block__logo">
-                  {this.state.assetDetails.reactLogoSvg.render()}
-                  <PositionTypeMarkerAlt assetDetails={this.state.assetDetails} value={this.props.positionType} />
-                </div>
-                <div className="trade-form__asset-stats">
-                  <div className="trade-form__info_block__asset">
-                    {tokenNameBase}
+          <div className="trade-form__info_block">
+            <div className="trade-form__info_block__logo">
+              {this.state.assetDetails.reactLogoSvg.render()}
+              <PositionTypeMarkerAlt assetDetails={this.state.assetDetails} value={this.props.positionType} />
+            </div>
+            <div className="trade-form__asset-stats">
+              <div className="trade-form__info_block__asset">
+                {tokenNameBase}
+              </div>
+              <div className="trade-form__info_block__stats">
+                <div className="trade-form__info_block__stats__data">
+                  {this.state.interestRate ? `${this.state.interestRate.toFixed(1)}%` : `0.0%`} APR
                   </div>
-                  <div className="trade-form__info_block__stats">
-                    <div className="trade-form__info_block__stats__data">
-                      {this.state.interestRate ? `${this.state.interestRate.toFixed(1)}%` : `0.0%`} APR
-                  </div>
-                    <div className="trade-form__info_block__stats__data">
-                      {`${this.props.leverage.toString()}x`}
-                    </div>
-                  </div>
-                </div>
-              </a>
-            ) : (
-              <div className="trade-form__info_block">
-                <div className="trade-form__info_block__logo">
-                  {this.state.assetDetails.reactLogoSvg.render()}
-                  <PositionTypeMarkerAlt assetDetails={this.state.assetDetails} value={this.props.positionType} />
-                </div>
-                <div className="trade-form__asset-stats">
-                  <div className="trade-form__info_block__asset">
-                    {tokenNameBase}
-                  </div>
-                  <div className="trade-form__info_block__stats">
-                    <div className="trade-form__info_block__stats__data">
-                      {this.state.interestRate ? `${this.state.interestRate.toFixed(1)}%` : `0.0%`} APR
-                  </div>
-                    <div className="trade-form__info_block__stats__data">
-                      {`${this.props.leverage.toString()}x`}
-                    </div>
-                  </div>
+                <div className="trade-form__info_block__stats__data">
+                  {`${this.props.leverage.toString()}x`}
                 </div>
               </div>
-            )}
+            </div>
+          </div>
         </div>
         <div className={`trade-form__form-container ${this.props.tradeType === TradeType.BUY ? "buy" : "sell"}`}>
           <div className="trade-form__form-values-container">

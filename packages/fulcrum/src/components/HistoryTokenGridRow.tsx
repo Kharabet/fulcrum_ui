@@ -13,7 +13,6 @@ import { Preloader } from "./Preloader";
 
 export interface IHistoryTokenGridRowProps {
   currentKey: TradeTokenKey;
-  pTokenAddress: string;
   onTrade: (request: TradeRequest) => void;
 }
 

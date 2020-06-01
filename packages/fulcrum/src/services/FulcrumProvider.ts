@@ -963,8 +963,9 @@ export class FulcrumProvider {
       if (!account) {
         account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
       }
+      const iTokenContract = await this.contractsSource.getITokenContract(request.collateral);
 
-      if (account) {
+      if (account && iTokenContract) {
         const collateralErc20Address = this.getErc20AddressOfAsset(request.collateral);
         if (collateralErc20Address) {
           const key = new TradeTokenKey(
@@ -975,10 +976,10 @@ export class FulcrumProvider {
             request.isTokenized,
             request.version
           );
-          const pTokenAddress = await this.contractsSource.getPTokenErc20Address(key);
+          
           const tokenContract = await this.contractsSource.getErc20Contract(collateralErc20Address);
-          if (pTokenAddress && tokenContract) {
-            const allowance = await tokenContract.allowance.callAsync(account, pTokenAddress)
+          if (tokenContract) {
+            const allowance = await tokenContract.allowance.callAsync(account, iTokenContract.address)
             maybeNeedsApproval = allowance.lt(10 ** 50)
           }
         }
@@ -1334,12 +1335,6 @@ export class FulcrumProvider {
   public getPTokensAvailable(): TradeTokenKey[] {
     return this.contractsSource
       ? this.contractsSource.getPTokensAvailable()
-      : [];
-  }
-
-  public getPTokenErc20AddressList(): string[] {
-    return this.contractsSource
-      ? this.contractsSource.getPTokenAddresses()
       : [];
   }
 

@@ -21,7 +21,6 @@ import "../styles/components/inner-own-token-card-mobile.scss";
 
 export interface IInnerOwnTokenCardMobileProps {
   currentKey: TradeTokenKey;
-  pTokenAddress: string;
   onTrade: (request: TradeRequest) => void;
   onManageCollateralOpen: (request: ManageCollateralRequest) => void;
 }

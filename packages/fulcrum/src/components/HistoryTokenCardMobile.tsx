@@ -15,7 +15,6 @@ import "../styles/components/history-token-card-mobile.scss";
 
 export interface IHistoryTokenCardMobileProps {
   currentKey: TradeTokenKey;
-  pTokenAddress: string;
   onTrade: (request: TradeRequest) => void;
 }
 
