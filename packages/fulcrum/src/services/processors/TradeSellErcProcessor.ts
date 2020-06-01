@@ -128,7 +128,7 @@ export class TradeSellErcProcessor {
         task.setTxHash(txHash);
       }
       catch(e) {
-        throw e;
+        console.log(e);
       }
 
       task.processingStepNext();
