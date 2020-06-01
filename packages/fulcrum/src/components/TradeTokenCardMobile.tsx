@@ -18,6 +18,8 @@ import siteConfig from "../config/SiteConfig.json";
 import { LeverageSelector } from "./LeverageSelector";
 import { Preloader } from "./Preloader";
 import { ITradeTokenGridRowProps } from "./TradeTokenGridRow";
+import { RequestStatus } from "../domain/RequestStatus";
+import { RequestTask } from "../domain/RequestTask";
 
 import "../styles/components/trade-token-card-mobile.scss";
 
@@ -34,6 +36,8 @@ interface ITradeTokenCardMobileState {
   interestRate: BigNumber;
   balance: BigNumber;
   isLoading: boolean;
+  isLoadingTransaction: boolean;
+  request: TradeRequest | undefined;
 }
 
 export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, ITradeTokenCardMobileState> {
@@ -50,11 +54,15 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
       interestRate: new BigNumber(0),
       balance: new BigNumber(0),
       version: 2,
-      isLoading: true
+      isLoading: true,
+      isLoadingTransaction: false,
+      request: undefined,
     };
 
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
+    FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.AskToOpenProgressDlg, this.onAskToOpenProgressDlg);
+    FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.AskToCloseProgressDlg, this.onAskToCloseProgressDlg);
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.TradeTransactionMined, this.onTradeTransactionMined);
   }
 
@@ -116,12 +124,33 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
     }
   };
 
+  private onAskToOpenProgressDlg = (taskId: number) => {
+    if (!this.state.request || taskId !== this.state.request.id) return;
+    this.setState({ ...this.state, isLoadingTransaction: true });
+    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, true);
+  }
+  private onAskToCloseProgressDlg = (task: RequestTask) => {
+    if (!this.state.request || task.request.id !== this.state.request.id) return;
+    if (task.status === RequestStatus.FAILED || task.status === RequestStatus.FAILED_SKIPGAS) {
+      window.setTimeout(() => {
+        FulcrumProvider.Instance.onTaskCancel(task);
+        this.setState({ ...this.state, isLoadingTransaction: false, request: undefined })
+        this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, false)
+      }, 5000)
+      return;
+    }
+    this.setState({ ...this.state, isLoadingTransaction: false, request: undefined });
+    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, false)
+  }
+
   public componentWillUnmount(): void {
     this._isMounted = false;
 
-    FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
-    FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
-    FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.TradeTransactionMined, this.onTradeTransactionMined);
+    FulcrumProvider.Instance.eventEmitter.off(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
+    FulcrumProvider.Instance.eventEmitter.off(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
+    FulcrumProvider.Instance.eventEmitter.off(FulcrumProviderEvents.AskToOpenProgressDlg, this.onAskToOpenProgressDlg);
+    FulcrumProvider.Instance.eventEmitter.off(FulcrumProviderEvents.AskToCloseProgressDlg, this.onAskToCloseProgressDlg);
+    FulcrumProvider.Instance.eventEmitter.off(FulcrumProviderEvents.TradeTransactionMined, this.onTradeTransactionMined);
   }
 
   public componentDidMount(): void {
@@ -221,21 +250,21 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
     this._isMounted && this.setState({ ...this.state, leverage: value, version: key.version, isLoading: true });
   };
 
-  public onBuyClick = (event: React.MouseEvent<HTMLElement>) => {
+  public onBuyClick = async (event: React.MouseEvent<HTMLElement>) => {
     event.stopPropagation();
-
-    this.props.onTrade(
-      new TradeRequest(
-        TradeType.BUY,
-        this.props.asset,
-        this.props.defaultUnitOfAccount, // TODO: depends on which one they own
-        Asset.ETH,
-        this.props.positionType,
-        this.state.leverage,
-        new BigNumber(0),
-        this.props.defaultTokenizeNeeded, // TODO: depends on which one they own
-        this.state.version
-      )
-    );
+    const request = new TradeRequest(
+      TradeType.BUY,
+      this.props.asset,
+      this.props.defaultUnitOfAccount, // TODO: depends on which one they own
+      Asset.ETH,
+      this.props.positionType,
+      this.state.leverage,
+      new BigNumber(0),
+      this.props.defaultTokenizeNeeded, // TODO: depends on which one they own
+      this.state.version
+    )
+    await this.setState({ ...this.state, request: request });
+    this.props.onTrade(request);
+    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, request, true)
   };
 }

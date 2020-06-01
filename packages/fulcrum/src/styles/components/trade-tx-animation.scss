@@ -36,13 +36,17 @@
   .token-selector-item__image {
     display: flex;
     align-items: center;
-    padding-left: 40px;
     padding-top: 30px;
     padding-bottom: 30px;
     background-color: var(--secondary-row);
     margin-bottom: 1px;
     position: relative;
-
+    @media screen and (min-width: $breakpoint-mobile-min){
+      padding-left: 40px;
+    }
+    @media screen and (max-width: $breakpoint-mobile-max){
+      padding-left: 15px;
+    }
     &.open-tab-tx {
       animation: openTabTx 0.6s cubic-bezier(1, 1, 1, 1);
       &:before {
@@ -66,11 +70,18 @@
     }
 
     .trade-transaction-step {
-      font-size: 22px;
       line-height: 1.4;
       font-weight: 800;
       color: #00c0ab;
-      padding-left: 40px;
+      @media screen and (min-width: $breakpoint-mobile-min){
+        font-size: 22px;
+        padding-left: 40px;
+      }
+      @media screen and (max-width: $breakpoint-mobile-max){
+        font-size: 14px;
+        padding-left: 15px;
+        width: calc(100% - 85px);
+      }
       &.warning {
         color: #ff4f4f;
       }
