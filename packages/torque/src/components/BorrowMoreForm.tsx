@@ -177,9 +177,9 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
           transactionId: randomNumber,
           transactionTotal: new BigNumber(usdPrice),
           transactionProducts: [{
-            name: "Borrow-" + this.props.loanOrderState.loanAsset,
-            sku: "Borrow-" + this.props.loanOrderState.loanAsset + '-' + this.props.loanOrderState.collateralAsset,
-            category: "Borrow",
+            name: "Borrow-More-" + this.props.loanOrderState.loanAsset,
+            sku: "Borrow-More-" + this.props.loanOrderState.loanAsset + '-' + this.props.loanOrderState.collateralAsset,
+            category: "Borrow More",
             price: new BigNumber(usdPrice),
             quantity: 1
           }],
