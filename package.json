@@ -9,10 +9,11 @@
   ],
   "devDependencies": {
     "cross-env": "^5.2.0",
-    "lerna": "^3.14.1"
+    "lerna": "^3.14.1",
+    "rimraf": "^3.0.2"
   },
   "scripts": {
-    "clean-all": "rm -rf ./packages/**/node_modules ./node_modules ./packages/web3-react-6/node_modules ./packages/web3-react-6/packages/**/node_modules",
+    "clean-all": "rimraf ./packages/**/node_modules ./node_modules ./packages/web3-react-6/node_modules ./packages/web3-react-6/packages/**/node_modules",
     "build-all": "yarn run build-alchemy-web3 && yarn run build-fulcrum-ropsten",
     "build-alchemy-web3": "./scripts/build-alchemy-web3.sh",
     "build-web3-react": "./scripts/build-web3-react.sh",
