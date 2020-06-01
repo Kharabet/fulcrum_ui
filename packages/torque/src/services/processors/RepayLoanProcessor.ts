@@ -88,7 +88,7 @@ export class RepayLoanProcessor {
       let gasAmountBN;
       try {
         // console.log(bZxContract.address);
-        const gasAmount = await bZxContract.repayWithDeposit.estimateGasAsync(
+        const gasAmount = await bZxContract.closeWithDeposit.estimateGasAsync(
           taskRequest.loanId,
           account,
           closeAmountInBaseUnits,
@@ -111,10 +111,10 @@ export class RepayLoanProcessor {
       let txHash = "";
 
       try {
-        txHash = await bZxContract.repayWithDeposit.sendTransactionAsync(
+        txHash = await bZxContract.closeWithDeposit.sendTransactionAsync(
           taskRequest.loanId,                                                 // loanId
           account,                                                            // borrower
-          closeAmountInBaseUnits,                                             // closeAmount
+          closeAmountInBaseUnits,                                             // depositAmount
           {
             from: account,
             value: isETHBorrowAsset
