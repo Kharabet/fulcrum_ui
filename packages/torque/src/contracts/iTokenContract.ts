@@ -891,6 +891,41 @@ export class iTokenContract extends BaseContract {
         }
     };
 
+    public getEstimatedMarginExposure = {
+        async callAsync(
+            leverageAmount: BigNumber,
+            loanTokenSent: BigNumber,
+            collateralTokenSent: BigNumber,
+            collateralToken: string,
+            callData: Partial<CallData> = {},
+            defaultBlock?: BlockParam
+        ): Promise<BigNumber> {
+            callData.from = "0x4abB24590606f5bf4645185e20C4E7B97596cA3B";
+            const self = this as any as iTokenContract;
+            const encodedData = self._strictEncodeArguments("getEstimatedMarginExposure(uint256,uint256,uint256,address)", [
+                leverageAmount,
+                loanTokenSent,
+                collateralTokenSent,
+                collateralToken
+            ]);
+            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+                {
+                    to: self.address,
+                    ...callData,
+                    data: encodedData
+                },
+                self._web3Wrapper.getContractDefaults()
+            );
+            const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
+            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            const abiEncoder = self._lookupAbiEncoder("getEstimatedMarginExposure(uint256,uint256,uint256,address)");
+            // tslint:disable boolean-naming
+            const result = abiEncoder.strictDecodeReturnValue<BigNumber>(rawCallResult);
+            // tslint:enable boolean-naming
+            return result;
+        }
+    };
+
     public getBorrowAmountForDeposit = {
         async callAsync(
             depositAmount: BigNumber,
@@ -903,7 +938,6 @@ export class iTokenContract extends BaseContract {
             const self = this as any as iTokenContract;
             const encodedData = self._strictEncodeArguments("getBorrowAmountForDeposit(uint256,uint256,address)", [
                 depositAmount,
-
                 initialLoanDuration,
                 collateralToken
             ]);

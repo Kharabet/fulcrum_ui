@@ -1370,6 +1370,37 @@
             "constant": true,
             "inputs": [
                 {
+                    "name": "leverageAmount",
+                    "type": "uint256"
+                },
+                {
+                    "name": "loanTokenSent",
+                    "type": "uint256"
+                },
+                {
+                    "name": "collateralTokenSent",
+                    "type": "uint256"
+                },
+                {
+                    "name": "collateralToken",
+                    "type": "address"
+                }
+            ],
+            "name": "getEstimatedMarginExposure",
+            "outputs": [
+                {
+                    "name": "",
+                    "type": "uint256"
+                }
+            ],
+            "payable": false,
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "constant": true,
+            "inputs": [
+                {
                     "name": "depositAmount",
                     "type": "uint256"
                 },
