@@ -54,6 +54,7 @@ export class TradeSellEthProcessor {
     } else {
       // estimating gas amount
       let gasAmount;
+      try {
       gasAmount = await iBZxContract.closeWithSwap.estimateGasAsync(
         taskRequest.loanId!,
         account,
@@ -64,8 +65,14 @@ export class TradeSellEthProcessor {
           from: account,
           gas: FulcrumProvider.Instance.gasLimit,
         });
-
       gasAmountBN = new BigNumber(gasAmount).multipliedBy(FulcrumProvider.Instance.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
+
+      }
+      catch (e) {
+        console.log(e);
+        // throw e;
+      }
+
     }
 
     let txHash: string = "";

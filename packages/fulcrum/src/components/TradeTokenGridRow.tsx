@@ -39,7 +39,9 @@ interface ITradeTokenGridRowState {
   leverage: number;
   version: number;
 
-  latestPriceDataPoint: IPriceDataPoint;
+  tradeAssetPrice: BigNumber;
+  liquidationPrice: BigNumber;
+
   interestRate: BigNumber;
   balance: BigNumber;
   isLoading: boolean;
@@ -56,7 +58,8 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
     this.state = {
       leverage: this.props.defaultLeverage,
       assetDetails: assetDetails || null,
-      latestPriceDataPoint: FulcrumProvider.Instance.getPriceDefaultDataPoint(),
+      tradeAssetPrice: new BigNumber(0),
+      liquidationPrice: new BigNumber(0),
       interestRate: new BigNumber(0),
       balance: new BigNumber(0),
       version: 2,
@@ -96,18 +99,18 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
       tradeTokenKey.setVersion(1);
       version = 1;
     }
+    const tradeAssetPrice = await FulcrumProvider.Instance.getSwapToUsdRate(this.props.asset);
 
-    const latestPriceDataPoint = await FulcrumProvider.Instance.getTradeTokenAssetLatestDataPoint(tradeTokenKey);
-    const interestRate = new BigNumber(0); // await FulcrumProvider.Instance.getTradeTokenInterestRate(tradeTokenKey);
+    const interestRate = await FulcrumProvider.Instance.getBorrowInterestRate(this.props.asset);
     const balance = new BigNumber(0); // await FulcrumProvider.Instance.getPTokenBalanceOfUser(tradeTokenKey);
 
     this._isMounted && this.setState({
       ...this.state,
-      latestPriceDataPoint: latestPriceDataPoint,
+      tradeAssetPrice,
       interestRate: interestRate,
       balance: balance,
       version: version,
-      isLoading: latestPriceDataPoint.price !== 0 ? false : this.state.isLoading
+      isLoading: false
     });
   }
 
@@ -176,8 +179,8 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
     }
 
     const tradeTokenKey = this.getTradeTokenGridRowSelectionKey(this.state.leverage);
-    const bnPrice = new BigNumber(this.state.latestPriceDataPoint.price);
-    const bnLiquidationPrice = new BigNumber(this.state.latestPriceDataPoint.liquidationPrice);
+    // const bnPrice = new BigNumber(this.state.latestPriceDataPoint.price);
+    // const bnLiquidationPrice = new BigNumber(this.state.latestPriceDataPoint.liquidationPrice);
     /*if (this.props.positionType === PositionType.SHORT) {
       bnPrice = bnPrice.div(1000);
       bnLiquidationPrice = bnLiquidationPrice.div(1000);
@@ -209,27 +212,27 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
             />
           </div>
         </div>
-        <div title={`$${bnPrice.toFixed(18)}`} className="trade-token-grid-row__col-price">
+        <div title={`$${this.state.tradeAssetPrice.toFixed(18)}`} className="trade-token-grid-row__col-price">
           {!this.state.isLoading ?
             <React.Fragment>
-              <span className="fw-normal">$</span>{bnPrice.toFixed(2)}
+              <span className="fw-normal">$</span>{this.state.tradeAssetPrice.toFixed(2)}
             </React.Fragment>
             :
             <Preloader width="74px" />
           }
         </div>
-        <div title={`$${bnLiquidationPrice.toFixed(18)}`} className="trade-token-grid-row__col-price">
+        <div title={`$${this.state.liquidationPrice.toFixed(18)}`} className="trade-token-grid-row__col-price">
           {
             !this.state.isLoading ?
               <React.Fragment>
-                <span className="fw-normal">$</span>{bnLiquidationPrice.toFixed(2)}
+                <span className="fw-normal">$</span>{this.state.liquidationPrice.toFixed(2)}
               </React.Fragment>
               :
               <Preloader width="74px" />
           }
         </div>
         <div title={this.state.interestRate.gt(0) ? `${this.state.interestRate.toFixed(18)}%` : ``} className="trade-token-grid-row__col-profit">
-          {this.state.interestRate.gt(0) && !this.state.isLoading ?
+          {/*this.state.interestRate.gt(0) &&*/ !this.state.isLoading ?
             <React.Fragment>
               {this.state.interestRate.toFixed(4)}
               <span className="fw-normal">%</span>

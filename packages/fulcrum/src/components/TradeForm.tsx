@@ -102,6 +102,8 @@ interface ITradeFormState {
   isExposureLoading: boolean;
 
   selectedUnitOfAccount: Asset;
+  
+  tradeAssetPrice: BigNumber;
 }
 
 export default class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
@@ -152,7 +154,8 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       maxAmountMultiplier: maxAmountMultiplier,
       isLoading: true,
       isExposureLoading: true,
-      selectedUnitOfAccount: this.props.defaultUnitOfAccount
+      selectedUnitOfAccount: this.props.defaultUnitOfAccount,
+      tradeAssetPrice: new BigNumber(0)
     };
 
     this._inputChange = new Subject();
@@ -208,6 +211,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
     if (this.props.isMobileMedia) {
       assetDetails = AssetsDictionaryMobile.assets.get(this.props.asset);
     }
+    const tradeAssetPrice = await FulcrumProvider.Instance.getSwapToUsdRate(this.props.asset);
     // const tradeTokenKey = this.getTradeTokenGridRowSelectionKey(this.props.leverage);
     const interestRate = new BigNumber(0);//await FulcrumProvider.Instance.getTradeTokenInterestRate(tradeTokenKey);
     // const positionTokenBalance = await FulcrumProvider.Instance.getPTokenBalanceOfUser(tradeTokenKey);
@@ -257,6 +261,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       interestRate: interestRate,
       currentPrice: new BigNumber(0), //new BigNumber(latestPriceDataPoint.price),
       liquidationPrice: liquidationPrice,
+      tradeAssetPrice
     });
   }
 
@@ -382,8 +387,8 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
         <div className={`trade-form__form-container ${this.props.tradeType === TradeType.BUY ? "buy" : "sell"}`}>
           <div className="trade-form__form-values-container">
             {!this.props.isMobileMedia && this.props.tradeType === TradeType.BUY ? (
-              <TradeExpectedResult value={tradeExpectedResultValue} />
-            ) : null}
+              <TradeExpectedResult entryPrice={this.state.tradeAssetPrice} liquidationPrice={this.state.liquidationPrice} />
+              ) : null}
 
             {/*<div className="trade-form__kv-container">
               {amountMsg.includes("Slippage:") ? (
@@ -407,7 +412,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
               onCollateralChange={this.onCollateralChange}
             />
 
-            {this.state.positionTokenBalance && this.props.tradeType === TradeType.BUY && this.state.positionTokenBalance!.eq(0) ? (
+            {/*this.state.positionTokenBalance && */this.props.tradeType === TradeType.BUY/* && this.state.positionTokenBalance!.eq(0)*/ ? (
               <CollapsibleContainer titleOpen="View advanced options" titleClose="Hide advanced options" isTransparent={false}>
                 <div className="trade-form__unit-of-account-container">
                   Unit of Account
@@ -422,7 +427,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
 
 
             {this.props.isMobileMedia && this.props.tradeType === TradeType.BUY ? (
-              <TradeExpectedResult value={tradeExpectedResultValue} />
+              <TradeExpectedResult entryPrice={this.state.tradeAssetPrice} liquidationPrice={this.state.liquidationPrice} />
             ) : null}
 
           </div>

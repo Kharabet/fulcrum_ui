@@ -519,6 +519,19 @@ export class FulcrumProvider {
     return result;
   };
 
+  public getBorrowInterestRate = async (asset: Asset): Promise<BigNumber> => {
+    let result = new BigNumber(0);
+    if (this.contractsSource) {
+      const assetContract = await this.contractsSource.getITokenContract(asset);
+      if (assetContract) {
+        result = await assetContract.borrowInterestRate.callAsync();
+        result = result.dividedBy(10 ** 18);
+      }
+    }
+
+    return result;
+  }
+
   /*public getReserveDetails = async (asset: Asset): Promise<ReserveDetails | null> => {
     let result: ReserveDetails | null = null;
 
