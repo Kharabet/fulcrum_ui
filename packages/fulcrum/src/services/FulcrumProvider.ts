@@ -981,8 +981,8 @@ export class FulcrumProvider {
       if (account && iTokenContract) {
         const collateralErc20Address = this.getErc20AddressOfAsset(request.collateral);
         if (collateralErc20Address) {
-          
-          
+
+
           const tokenContract = await this.contractsSource.getErc20Contract(collateralErc20Address);
           if (tokenContract) {
             const allowance = await tokenContract.allowance.callAsync(account, iTokenContract.address)
@@ -1137,6 +1137,61 @@ export class FulcrumProvider {
   //   return slippage;
   // }
 
+  public getEstimatedMarginExposure = async (request: TradeRequest): Promise<BigNumber> => {
+
+    let result = new BigNumber(0);
+
+    const isLong = request.positionType === PositionType.LONG;
+    const amountInBaseUnits = new BigNumber(request.amount.multipliedBy(10 ** 18).toFixed(0, 1)); // ETH -> 18 decimals
+
+    const loanToken = isLong
+      ? request.collateral
+      : Asset.ETH;
+    const depositToken = request.depositToken;
+    const collateralToken = isLong
+      ? Asset.ETH
+      : request.collateral;
+    const tradeToken = !isLong
+      ? collateralToken
+      : loanToken;
+    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+
+    if (account && this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
+
+      const tokenContract = await this.contractsSource.getITokenContract(tradeToken);
+      if (!tokenContract) return result;
+      const leverageAmount = request.positionType === PositionType.LONG
+        ? new BigNumber(request.leverage - 1).times(10 ** 18)
+        : new BigNumber(request.leverage).times(10 ** 18);
+
+      const loanTokenSent = depositToken === loanToken
+        ? amountInBaseUnits
+        : new BigNumber(0);
+
+      const collateralTokenSent = depositToken === collateralToken
+        ? amountInBaseUnits
+        : new BigNumber(0);
+
+      //const depositTokenAddress = FulcrumProvider.Instance.getErc20AddressOfAsset(depositToken);
+      const collateralTokenAddress = FulcrumProvider.Instance.getErc20AddressOfAsset(collateralToken);
+      const loanData = "0x";
+      try {
+        console.log("leverageAmount" + leverageAmount);
+        console.log("loanTokenSent" + loanTokenSent);
+        console.log("collateralTokenSent" + collateralTokenSent);
+        console.log("collateralTokenAddress" + collateralTokenAddress);
+        result = await tokenContract.getEstimatedMarginExposure.callAsync(
+          leverageAmount,
+          loanTokenSent,
+          collateralTokenSent,
+          collateralTokenAddress!);
+      }
+      catch (e) {
+        console.error(e)
+      }
+    }
+    return result;
+  }
   // public getTradeFormExposure = async (request: TradeRequest): Promise<BigNumber> => {
 
   //   if (request.amount.eq(0)) {
@@ -1635,13 +1690,13 @@ if (err || 'error' in added) {
 console.log(err, added);
 }
 }*//*);
-                                                  }
-                                                }
-                                                }
-                                                } catch(e) {
-                                                // console.log(e);
-                                                }
-                                                }*/
+                                                                  }
+                                                                }
+                                                                }
+                                                                } catch(e) {
+                                                                // console.log(e);
+                                                                }
+                                                                }*/
   }
 
   private processLendRequestTask = async (task: RequestTask, skipGas: boolean) => {

@@ -102,7 +102,7 @@ interface ITradeFormState {
   isExposureLoading: boolean;
 
   selectedUnitOfAccount: Asset;
-  
+
   tradeAssetPrice: BigNumber;
 }
 
@@ -224,16 +224,16 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
     // maxTradeValue is raw here, so we should not use it directly
     // const maxTradeValue = await FulcrumProvider.Instance.getMaxTradeValue(this.props.tradeType, tradeTokenKey, this.state.collateral);
     // const limitedAmount = await this.getInputAmountLimited(this.state.inputAmountText, this.state.inputAmountValue, tradeTokenKey, maxTradeValue, false);
-    // const tradeRequest = new TradeRequest(
-    //   this.props.loanId || "0x0000000000000000000000000000000000000000000000000000000000000000",
-    //   this.props.tradeType,
-    //   this.props.asset,
-    //   this.state.selectedUnitOfAccount,
-    //   this.state.collateral,
-    //   this.props.positionType,
-    //   this.props.leverage,
-    //   this.state.tradeAmountValue
-    // );
+    const tradeRequest = new TradeRequest(
+      this.props.loanId || "0x0000000000000000000000000000000000000000000000000000000000000000",
+      this.props.tradeType,
+      this.props.asset,
+      this.state.selectedUnitOfAccount,
+      this.state.collateral,
+      this.props.positionType,
+      this.props.leverage,
+      this.state.tradeAmountValue
+    );
 
     // const tradeExpectedResults = await this.getTradeExpectedResults(tradeRequest);
 
@@ -248,6 +248,8 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
     // const latestPriceDataPoint = await FulcrumProvider.Instance.getTradeTokenAssetLatestDataPoint(tradeTokenKey);
     const liquidationPrice = new BigNumber(0); //new BigNumber(latestPriceDataPoint.liquidationPrice);
 
+    const exposureValue = await FulcrumProvider.Instance.getEstimatedMarginExposure(tradeRequest);
+
     this._isMounted && this.setState({
       ...this.state,
       assetDetails: assetDetails || null,
@@ -261,7 +263,8 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       interestRate: interestRate,
       currentPrice: new BigNumber(0), //new BigNumber(latestPriceDataPoint.price),
       liquidationPrice: liquidationPrice,
-      tradeAssetPrice
+      tradeAssetPrice,
+      exposureValue
     });
   }
 
@@ -299,7 +302,8 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       this.props.defaultUnitOfAccount !== prevProps.defaultUnitOfAccount ||
       this.props.defaultTokenizeNeeded !== prevProps.defaultTokenizeNeeded ||
       this.props.version !== prevProps.version ||
-      this.state.collateral !== prevState.collateral
+      this.state.collateral !== prevState.collateral || 
+      this.state.tradeAmountValue !== prevState.tradeAmountValue
     ) {
       if (this.state.collateral !== prevState.collateral) {
         this._isMounted && this.setState({
@@ -435,8 +439,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
           <div className="trade-form__actions-container">
 
             <button title={this.state.exposureValue.gt(0) ? `${this.state.exposureValue.toFixed(18)} ${this.props.asset}` : ``} type="submit" className={`trade-form__submit-button ${submitClassName}`}>
-              {/* {this.state.isExposureLoading || this.state.isLoading ? <Preloader width="75px" /> : submitButtonText} */}
-              {submitButtonText}
+              {this.state.isExposureLoading || this.state.isLoading ? <Preloader width="75px" /> : submitButtonText}
             </button>
           </div>
           {this.props.tradeType === TradeType.BUY ?
