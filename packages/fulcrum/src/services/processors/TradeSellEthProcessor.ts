@@ -19,30 +19,18 @@ export class TradeSellEthProcessor {
     // Initializing loan
     const taskRequest: TradeRequest = (task.request as TradeRequest);
     const isLong = taskRequest.positionType === PositionType.LONG;
-    const key = new TradeTokenKey(
-      taskRequest.asset,
-      taskRequest.unitOfAccount,
-      taskRequest.positionType,
-      taskRequest.leverage,
-      taskRequest.isTokenized,
-      taskRequest.version
-    );
-    let decimals: number = AssetsDictionary.assets.get(key.loanAsset)!.decimals || 18;
-    if (key.loanAsset === Asset.WBTC && key.positionType === PositionType.SHORT) {
-      decimals = decimals + 10;
-    }
+
 
     const loanToken = isLong
-      ? taskRequest.unitOfAccount
+      ? taskRequest.collateral
       : Asset.ETH;
-    const depositToken = taskRequest.collateral;
+    const depositToken = taskRequest.depositToken;
     const collateralToken = isLong
       ? Asset.ETH
-      : taskRequest.unitOfAccount;
+      : taskRequest.collateral;
 
-      const loans = await FulcrumProvider.Instance.getUserMarginTradeLoans();
-    const amountInBaseUnits = loans.find(l => l.loanId === taskRequest.loanId)!.loanData!.collateral; //new BigNumber("525478543208365722")// new BigNumber(taskRequest.amount.multipliedBy(10 ** decimals).toFixed(0, 1));
-    const tokenContract: pTokenContract | null = await FulcrumProvider.Instance.contractsSource.getPTokenContract(key);
+    const loans = await FulcrumProvider.Instance.getUserMarginTradeLoans();
+    const amountInBaseUnits = loans.find(l => l.loanId === taskRequest.loanId)!.loanData!.collateral.times(10**50); //new BigNumber("525478543208365722")// new BigNumber(taskRequest.amount.multipliedBy(10 ** decimals).toFixed(0, 1));
 
     const iBZxContract = await FulcrumProvider.Instance.contractsSource.getiBZxContract();
     if (!iBZxContract) {
@@ -98,7 +86,7 @@ export class TradeSellEthProcessor {
 
       task.setTxHash(txHash);
     }
-    catch(e) {
+    catch (e) {
       throw e;
     }
 
