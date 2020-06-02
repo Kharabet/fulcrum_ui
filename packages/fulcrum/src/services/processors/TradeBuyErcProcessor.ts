@@ -132,11 +132,9 @@ export class TradeBuyErcProcessor {
         let gasAmount;
         gasAmount = await tokenContract.marginTrade.estimateGasAsync(
           "0x0000000000000000000000000000000000000000000000000000000000000000",
-          amountInBaseUnits,
           leverageAmount,
           loanTokenSent,
           collateralTokenSent,
-          depositTokenAddress!,
           collateralTokenAddress!,
           account,
           loanData,
@@ -152,11 +150,9 @@ export class TradeBuyErcProcessor {
       // Submitting trade
       txHash = await tokenContract.marginTrade.sendTransactionAsync(
         "0x0000000000000000000000000000000000000000000000000000000000000000",
-        amountInBaseUnits,
         leverageAmount,
         loanTokenSent,
         collateralTokenSent,
-        depositTokenAddress!,
         collateralTokenAddress!,
         account,
         loanData,
