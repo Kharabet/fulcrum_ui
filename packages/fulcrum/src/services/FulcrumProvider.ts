@@ -640,13 +640,13 @@ export class FulcrumProvider {
     return result;
   };
 
-  public getBaseAsset = (key: TradeTokenKey): Asset => {
-    if (key.positionType === PositionType.SHORT) {
-      return key.version === 2 ? key.unitOfAccount : key.loanAsset;
-    } else {
-      return key.version === 2 ? key.asset : key.loanAsset;
-    }
-  }
+  // public getBaseAsset = (key: TradeTokenKey): Asset => {
+  //   if (key.positionType === PositionType.SHORT) {
+  //     return key.version === 2 ? key.unitOfAccount : key.loanAsset;
+  //   } else {
+  //     return key.version === 2 ? key.asset : key.loanAsset;
+  //   }
+  // }
 
   // public getTradeBalanceAndProfit = async (selectedKey: TradeTokenKey): Promise<[BigNumber | null, BigNumber | null]> => {
   //   // should return null if no data (not traded asset), new BigNumber(0) if no profit
@@ -690,68 +690,66 @@ export class FulcrumProvider {
   //   return [assetBalance, profit];
   // };
 
-  // public getMaxTradeValue = async (tradeType: TradeType, selectedKey: TradeTokenKey, collateral: Asset): Promise<BigNumber> => {
-  //   let result = new BigNumber(0);
+  public getMaxTradeValue = async (tradeType: TradeType, loanAsset:Asset, collateral: Asset, positionType: PositionType): Promise<BigNumber> => {
+    let result = new BigNumber(0);
 
-  //   if (tradeType === TradeType.BUY) {
-  //     if (this.contractsSource) {
-  //       const assetContract = await this.contractsSource.getPTokenContract(selectedKey);
-  //       if (assetContract) {
+    if (tradeType === TradeType.BUY) {
+      if (this.contractsSource) {
+        const assetContract = await this.contractsSource.getITokenContract(collateral);
+        if (assetContract) {
 
-  //         const precision = AssetsDictionary.assets.get(selectedKey.loanAsset)!.decimals || 18;
-  //         let marketLiquidity = await assetContract.marketLiquidityForLoan.callAsync();
-  //         marketLiquidity = marketLiquidity.multipliedBy(10 ** (18 - precision));
+          const precision = AssetsDictionary.assets.get(loanAsset)!.decimals || 18;
+          let marketLiquidity = await assetContract.marketLiquidity.callAsync();
+          marketLiquidity = marketLiquidity.multipliedBy(10 ** (18 - precision));
 
-  //         if (collateral !== selectedKey.loanAsset) {
-  //           const swapPrice = await this.getSwapRate(selectedKey.loanAsset, collateral);
-  //           marketLiquidity = marketLiquidity.multipliedBy(swapPrice);
-  //         }
+          if (collateral !== loanAsset) {
+            const swapPrice = await this.getSwapRate(loanAsset, collateral);
+            marketLiquidity = marketLiquidity.multipliedBy(swapPrice);
+          }
 
-  //         const balance = await this.getAssetTokenBalanceOfUser(collateral);
+          const balance = await this.getAssetTokenBalanceOfUser(collateral);
 
-  //         result = BigNumber.min(marketLiquidity, balance);
+          result = BigNumber.min(marketLiquidity, balance);
 
-  //         if (collateral === Asset.ETH) {
-  //           result = result.gt(this.gasBufferForTrade) ? result.minus(this.gasBufferForTrade) : new BigNumber(0);
-  //         }
+          if (collateral === Asset.ETH) {
+            result = result.gt(this.gasBufferForTrade) ? result.minus(this.gasBufferForTrade) : new BigNumber(0);
+          }
 
-  //         /*if (collateral === Asset.ETH && selectedKey.asset === Asset.ETH && selectedKey.positionType === PositionType.LONG) {
-  //           const tempLongCap = new BigNumber(7 * 10**18);
-  //           if (result.gt(tempLongCap)) {
-  //             result = tempLongCap;
-  //           }
-  //         }*/
+          /*if (collateral === Asset.ETH && selectedKey.asset === Asset.ETH && selectedKey.positionType === PositionType.LONG) {
+            const tempLongCap = new BigNumber(7 * 10**18);
+            if (result.gt(tempLongCap)) {
+              result = tempLongCap;
+            }
+          }*/
 
-  //       } else {
-  //         result = new BigNumber(0);
-  //       }
-  //     }
-  //   } else {
-  //     result = await this.getPTokenBalanceOfUser(selectedKey);
-  //   }
+        } else {
+          result = new BigNumber(0);
+        }
+      }
+    } else {
+      result = await this.getITokenBalanceOfUser(loanAsset);
+    }
 
-  //   const baseAsset = this.getBaseAsset(selectedKey);
+    //const baseAsset = this.getBaseAsset(loanAsset);
 
-  //   // console.log(baseAsset, selectedKey.positionType, selectedKey.unitOfAccount, result.toString());
+    // console.log(baseAsset, selectedKey.positionType, selectedKey.unitOfAccount, result.toString());
 
 
-  //   let decimalOffset = 0;
-  //   if (baseAsset === Asset.WBTC) {
-  //     if (selectedKey.positionType === PositionType.SHORT) {
-  //       if (selectedKey.version !== 1 && selectedKey.unitOfAccount !== Asset.USDC) {
-  //         decimalOffset = 10;
-  //       }
-  //     } else {
-  //       if (tradeType === TradeType.SELL) {
-  //         decimalOffset = -10;
-  //       }
-  //     }
-  //   }
+    let decimalOffset = 0;
+    if (loanAsset === Asset.WBTC) {
+      if (positionType === PositionType.SHORT) {
+          decimalOffset = 10;
+      } else {
+        if (tradeType === TradeType.SELL) {
+          decimalOffset = -10;
+        }
+      }
+    }
 
-  //   result = result.dividedBy(10 ** (18 - decimalOffset));
+    result = result.dividedBy(10 ** (18 - decimalOffset));
 
-  //   return result;
-  // };
+    return result;
+  };
 
 
   public getMaxLendValue = async (request: LendRequest): Promise<[BigNumber, BigNumber, BigNumber, BigNumber, string]> => {
@@ -1318,7 +1316,7 @@ export class FulcrumProvider {
     console.log(result);
     return result;
   }
-
+/*
   public async getPTokenBalanceOfUser(selectedKey: TradeTokenKey): Promise<BigNumber> {
     let result = new BigNumber(0);
 
@@ -1336,7 +1334,7 @@ export class FulcrumProvider {
     }
 
     return result;
-  }
+  }*/
 
   public getPTokensAvailable(): TradeTokenKey[] {
     return this.contractsSource
