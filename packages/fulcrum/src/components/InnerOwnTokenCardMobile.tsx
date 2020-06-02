@@ -18,8 +18,10 @@ import { ReactComponent as OpenManageCollateral } from "../assets/images/openMan
 import { ManageCollateralRequest } from "../domain/ManageCollateralRequest";
 
 import "../styles/components/inner-own-token-card-mobile.scss";
+import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
 
 export interface IInnerOwnTokenCardMobileProps {
+  loan: IBorrowedFundsState;
   currentKey: TradeTokenKey;
   onTrade: (request: TradeRequest) => void;
   onManageCollateralOpen: (request: ManageCollateralRequest) => void;
@@ -213,15 +215,16 @@ export class InnerOwnTokenCardMobile extends Component<IInnerOwnTokenCardMobileP
 
     this.props.onTrade(
       new TradeRequest(
+        this.props.loan.loanId,
         TradeType.SELL,
-        this.props.currentKey.asset,
-        this.props.currentKey.unitOfAccount,
-        this.props.currentKey.positionType === PositionType.SHORT ? this.props.currentKey.asset : Asset.USDC,
-        this.props.currentKey.positionType,
+        this.props.loan.loanAsset,
+        Asset.UNKNOWN,
+        this.props.loan.collateralAsset,
+        this.props.loan.collateralAsset === Asset.ETH 
+        ? PositionType.LONG 
+        : PositionType.SHORT,
         this.props.currentKey.leverage,
-        new BigNumber(0),
-        this.props.currentKey.isTokenized,
-        this.props.currentKey.version
+        new BigNumber(0)
       )
     );
   };

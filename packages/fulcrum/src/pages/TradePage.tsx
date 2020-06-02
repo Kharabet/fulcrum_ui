@@ -379,10 +379,9 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         collateralToken: request.collateral,
         tradeType: request.tradeType,
         tradeAsset: request.asset,
-        tradeUnitOfAccount: request.unitOfAccount,
+        tradeUnitOfAccount: request.collateral,
         tradePositionType: request.positionType,
         tradeLeverage: request.leverage,
-        tradeVersion: request.version,
         loanId: request.loanId,
         tradeRequestId: request.id
       });

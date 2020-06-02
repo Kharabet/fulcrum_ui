@@ -262,15 +262,12 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
       this.state.inputAmountValue
     );
 
-    const tradeExpectedResults = await this.getTradeExpectedResults(collateralRequest);
 
     const address = FulcrumProvider.Instance.contractsSource
       ? await FulcrumProvider.Instance.contractsSource.getPTokenErc20Address(tradeTokenKey) || ""
       : "";
 
-    const maybeNeedsApproval = this.props.tradeType === TradeType.BUY ?
-      await FulcrumProvider.Instance.checkCollateralApprovalForTrade(collateralRequest) :
-      false;
+    const maybeNeedsApproval = false;
 
     const latestPriceDataPoint = await FulcrumProvider.Instance.getTradeTokenAssetLatestDataPoint(tradeTokenKey);
     const liquidationPrice = new BigNumber(latestPriceDataPoint.liquidationPrice);
@@ -287,13 +284,10 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
       balance: balance,
       ethBalance: ethBalance,
       positionTokenBalance: positionTokenBalance,
-      tradedAmountEstimate: tradeExpectedResults.tradedAmountEstimate,
-      slippageRate: tradeExpectedResults.slippageRate,
       interestRate: interestRate,
       maybeNeedsApproval: maybeNeedsApproval,
       currentPrice: new BigNumber(latestPriceDataPoint.price),
       liquidationPrice: liquidationPrice,
-      exposureValue: tradeExpectedResults.exposureValue,
 
       collateralizedPercent: collateralizedPercent,
     });
@@ -547,33 +541,33 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
 
               const selectedValue = limitedAmount.inputAmountValue.dividedBy(this.state.collateralizedPercent).toNumber();
 
-              const collateralRequest = new ManageCollateralRequest(
-                new BigNumber(this.state.selectedValue),
-                this.props.tradeType,
-                this.props.asset,
-                this.state.selectedUnitOfAccount,
-                this.state.collateral,
-                this.props.positionType,
-                this.props.leverage,
-                limitedAmount.tradeAmountValue,
-                this.state.tokenizeNeeded,
-                this.props.version,
-                this.state.inputAmountValue
-              );
+              // const collateralRequest = new ManageCollateralRequest(
+              //   new BigNumber(this.state.selectedValue),
+              //   this.props.tradeType,
+              //   this.props.asset,
+              //   this.state.selectedUnitOfAccount,
+              //   this.state.collateral,
+              //   this.props.positionType,
+              //   this.props.leverage,
+              //   limitedAmount.tradeAmountValue,
+              //   this.state.tokenizeNeeded,
+              //   this.props.version,
+              //   this.state.inputAmountValue
+              // );
 
-              this.getTradeExpectedResults(collateralRequest).then(tradeExpectedResults => {
-                observer.next({
-                  isTradeAmountTouched: this.state.isTradeAmountTouched,
-                  inputAmountText: limitedAmount.inputAmountText,
-                  inputAmountValue: limitedAmount.inputAmountValue,
-                  tradeAmountValue: limitedAmount.tradeAmountValue,
-                  maxTradeValue: limitedAmount.maxTradeValue,
-                  tradedAmountEstimate: tradeExpectedResults.tradedAmountEstimate,
-                  slippageRate: tradeExpectedResults.slippageRate,
-                  exposureValue: tradeExpectedResults.exposureValue,
-                  selectedValue: selectedValue,
-                });
-              });
+              // this.getTradeExpectedResults(collateralRequest).then(tradeExpectedResults => {
+              //   observer.next({
+              //     isTradeAmountTouched: this.state.isTradeAmountTouched,
+              //     inputAmountText: limitedAmount.inputAmountText,
+              //     inputAmountValue: limitedAmount.inputAmountValue,
+              //     tradeAmountValue: limitedAmount.tradeAmountValue,
+              //     maxTradeValue: limitedAmount.maxTradeValue,
+              //     tradedAmountEstimate: tradeExpectedResults.tradedAmountEstimate,
+              //     slippageRate: tradeExpectedResults.slippageRate,
+              //     exposureValue: tradeExpectedResults.exposureValue,
+              //     selectedValue: selectedValue,
+              //   });
+              // });
             } else {
               observer.next(null);
             }
@@ -597,35 +591,35 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
       this.getInputAmountLimitedFromBigNumber(value, tradeTokenKey, maxTradeValue, false).then(limitedAmount => {
         // updating stored value only if the new input value is a valid number
         if (!limitedAmount.tradeAmountValue.isNaN()) {
-          const collateralRequest = new ManageCollateralRequest(
-            new BigNumber(this.state.selectedValue),
-            this.props.tradeType,
-            this.props.asset,
-            this.state.selectedUnitOfAccount,
-            this.state.collateral,
-            this.props.positionType,
-            this.props.leverage,
-            limitedAmount.tradeAmountValue,
-            this.state.tokenizeNeeded,
-            this.props.version,
-            this.state.inputAmountValue
-          );
-          const selectedValue = limitedAmount.inputAmountValue.dividedBy(this.state.collateralizedPercent).toNumber();
+          // const collateralRequest = new ManageCollateralRequest(
+          //   new BigNumber(this.state.selectedValue),
+          //   this.props.tradeType,
+          //   this.props.asset,
+          //   this.state.selectedUnitOfAccount,
+          //   this.state.collateral,
+          //   this.props.positionType,
+          //   this.props.leverage,
+          //   limitedAmount.tradeAmountValue,
+          //   this.state.tokenizeNeeded,
+          //   this.props.version,
+          //   this.state.inputAmountValue
+          // );
+          // const selectedValue = limitedAmount.inputAmountValue.dividedBy(this.state.collateralizedPercent).toNumber();
 
-          this.getTradeExpectedResults(collateralRequest).then(tradeExpectedResults => {
-            observer.next({
-              isTradeAmountTouched: true,
-              inputAmountText: limitedAmount.inputAmountText,
-              inputAmountValue: limitedAmount.inputAmountValue,
-              tradeAmountValue: limitedAmount.tradeAmountValue,
-              maxTradeValue: maxTradeValue,
-              tradedAmountEstimate: tradeExpectedResults.tradedAmountEstimate,
-              slippageRate: tradeExpectedResults.slippageRate,
-              exposureValue: tradeExpectedResults.exposureValue,
-              selectedValue: selectedValue
+          // this.getTradeExpectedResults(collateralRequest).then(tradeExpectedResults => {
+          //   observer.next({
+          //     isTradeAmountTouched: true,
+          //     inputAmountText: limitedAmount.inputAmountText,
+          //     inputAmountValue: limitedAmount.inputAmountValue,
+          //     tradeAmountValue: limitedAmount.tradeAmountValue,
+          //     maxTradeValue: maxTradeValue,
+          //     tradedAmountEstimate: tradeExpectedResults.tradedAmountEstimate,
+          //     slippageRate: tradeExpectedResults.slippageRate,
+          //     exposureValue: tradeExpectedResults.exposureValue,
+          //     selectedValue: selectedValue
 
-            });
-          });
+          //   });
+          // });
         } else {
           observer.next(null);
         }
@@ -651,17 +645,17 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
   };
 
 
-  private getTradeExpectedResults = async (manageCollateralRequest: ManageCollateralRequest): Promise<ITradeExpectedResults> => {
-    const tradedAmountEstimate = await FulcrumProvider.Instance.getTradedAmountEstimate(manageCollateralRequest);
-    const slippageRate = await FulcrumProvider.Instance.getTradeSlippageRate(manageCollateralRequest, tradedAmountEstimate);
-    const exposureValue = await FulcrumProvider.Instance.getTradeFormExposure(manageCollateralRequest);
+  // private getTradeExpectedResults = async (manageCollateralRequest: ManageCollateralRequest): Promise<ITradeExpectedResults> => {
+  //   const tradedAmountEstimate = await FulcrumProvider.Instance.getTradedAmountEstimate(manageCollateralRequest);
+  //   const slippageRate = await FulcrumProvider.Instance.getTradeSlippageRate(manageCollateralRequest, tradedAmountEstimate);
+  //   const exposureValue = await FulcrumProvider.Instance.getTradeFormExposure(manageCollateralRequest);
 
-    return {
-      tradedAmountEstimate: tradedAmountEstimate,
-      slippageRate: slippageRate || new BigNumber(0),
-      exposureValue: exposureValue
-    };
-  };
+  //   return {
+  //     tradedAmountEstimate: tradedAmountEstimate,
+  //     slippageRate: slippageRate || new BigNumber(0),
+  //     exposureValue: exposureValue
+  //   };
+  // };
 
 
   private getInputAmountLimitedFromBigNumber = async (bnValue: BigNumber, tradeTokenKey: TradeTokenKey, maxTradeValue: BigNumber, skipLimitCheck: boolean, multiplier: BigNumber = new BigNumber(1)): Promise<IInputAmountLimited> => {

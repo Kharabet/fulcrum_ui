@@ -256,15 +256,14 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
   public onBuyClick = async (event: React.MouseEvent<HTMLElement>) => {
     event.stopPropagation();
     const request = new TradeRequest(
+      "0x0000000000000000000000000000000000000000000000000000000000000000",
       TradeType.BUY,
       this.props.asset,
       this.props.defaultUnitOfAccount, // TODO: depends on which one they own
       Asset.ETH,
       this.props.positionType,
       this.state.leverage,
-      new BigNumber(0),
-      this.props.defaultTokenizeNeeded, // TODO: depends on which one they own
-      this.state.version
+      new BigNumber(0)
     );
     await this.setState({ ...this.state, request: request });
     this.props.onTrade(request);

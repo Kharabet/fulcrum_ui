@@ -252,7 +252,6 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
       this.props.currentKey.isTokenized,
       this.props.currentKey.version
     )
-    await this.setState({ ...this.state, request: request });
     this.props.onManageCollateralOpen(request);
   };
 
@@ -260,19 +259,16 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
     event.stopPropagation();
 
     const request = new TradeRequest(
+      this.props.loan.loanId,
       TradeType.SELL,
-      this.props.currentKey.asset,
-      this.props.currentKey.unitOfAccount,
-      this.props.currentKey.positionType === PositionType.SHORT ? this.props.currentKey.asset : Asset.USDC,
-      this.props.currentKey.positionType,
+      this.props.loan.loanAsset,
+      Asset.UNKNOWN,
+      this.props.loan.collateralAsset,
+      this.props.loan.collateralAsset === Asset.ETH 
+      ? PositionType.LONG 
+      : PositionType.SHORT,
       this.props.currentKey.leverage,
-      new BigNumber(0),
-      this.props.currentKey.isTokenized,
-      this.props.currentKey.version,
-      undefined,
-      undefined,
-      undefined,
-      this.props.loan.loanId
+      new BigNumber(0)
     )
     await this.setState({ ...this.state, request: request });
     this.props.changeLoadingTransaction(this.state.isLoadingTransaction, request, true)

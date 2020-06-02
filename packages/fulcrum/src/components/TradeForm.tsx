@@ -34,7 +34,6 @@ interface IInputAmountLimited {
 }
 
 interface ITradeExpectedResults {
-  tradedAmountEstimate: BigNumber;
   slippageRate: BigNumber;
   exposureValue: BigNumber;
 }
@@ -47,7 +46,6 @@ interface ITradeAmountChangeEvent {
   tradeAmountValue: BigNumber;
   maxTradeValue: BigNumber;
 
-  tradedAmountEstimate: BigNumber;
   slippageRate: BigNumber;
   exposureValue: BigNumber;
 }
@@ -91,7 +89,6 @@ interface ITradeFormState {
 
   isChangeCollateralOpen: boolean;
 
-  tradedAmountEstimate: BigNumber;
   slippageRate: BigNumber;
 
   currentPrice: BigNumber;
@@ -127,7 +124,6 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
     const positionTokenBalance = null;
     const maxTradeValue = new BigNumber(0);
     const slippageRate = new BigNumber(0);
-    const tradedAmountEstimate = new BigNumber(0);
     const currentPrice = new BigNumber(0);
     const liquidationPrice = new BigNumber(0);
     const exposureValue = new BigNumber(0);
@@ -146,7 +142,6 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       ethBalance: ethBalance,
       positionTokenBalance: positionTokenBalance,
       isChangeCollateralOpen: false,
-      tradedAmountEstimate: tradedAmountEstimate,
       slippageRate: slippageRate,
       interestRate: interestRate,
       maybeNeedsApproval: false,
@@ -184,7 +179,6 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
           inputAmountText: "",
           inputAmountValue: new BigNumber(0),
           tradeAmountValue: new BigNumber(0),
-          tradedAmountEstimate: new BigNumber(0),
           slippageRate: new BigNumber(0),
           exposureValue: new BigNumber(0),
           isLoading: false,
@@ -227,27 +221,25 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
     const maxTradeValue = await FulcrumProvider.Instance.getMaxTradeValue(this.props.tradeType, tradeTokenKey, this.state.collateral);
     const limitedAmount = await this.getInputAmountLimited(this.state.inputAmountText, this.state.inputAmountValue, tradeTokenKey, maxTradeValue, false);
     const tradeRequest = new TradeRequest(
+      this.props.loanId || "0x0000000000000000000000000000000000000000000000000000000000000000",
       this.props.tradeType,
       this.props.asset,
       this.state.selectedUnitOfAccount,
       this.state.collateral,
       this.props.positionType,
       this.props.leverage,
-      limitedAmount.tradeAmountValue,// new BigNumber(0),
-      this.state.tokenizeNeeded,
-      this.props.version,
-      this.state.inputAmountValue
+      this.state.tradeAmountValue
     );
 
-    const tradeExpectedResults = await this.getTradeExpectedResults(tradeRequest);
+    // const tradeExpectedResults = await this.getTradeExpectedResults(tradeRequest);
 
     const address = FulcrumProvider.Instance.contractsSource
       ? await FulcrumProvider.Instance.contractsSource.getPTokenErc20Address(tradeTokenKey) || ""
       : "";
 
-    const maybeNeedsApproval = this.props.tradeType === TradeType.BUY ?
-      await FulcrumProvider.Instance.checkCollateralApprovalForTrade(tradeRequest) :
-      false;
+    // const maybeNeedsApproval = this.props.tradeType === TradeType.BUY ?
+    //   await FulcrumProvider.Instance.checkCollateralApprovalForTrade(tradeRequest) :
+    //   false;
 
     const latestPriceDataPoint = await FulcrumProvider.Instance.getTradeTokenAssetLatestDataPoint(tradeTokenKey);
     const liquidationPrice = new BigNumber(latestPriceDataPoint.liquidationPrice);
@@ -262,13 +254,9 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       balance: balance,
       ethBalance: ethBalance,
       positionTokenBalance: positionTokenBalance,
-      tradedAmountEstimate: tradeExpectedResults.tradedAmountEstimate,
-      slippageRate: tradeExpectedResults.slippageRate,
       interestRate: interestRate,
-      maybeNeedsApproval: maybeNeedsApproval,
       currentPrice: new BigNumber(latestPriceDataPoint.price),
       liquidationPrice: liquidationPrice,
-      exposureValue: tradeExpectedResults.exposureValue
     });
   }
 
@@ -555,19 +543,14 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
     TagManager.dataLayer(tagManagerArgs)
     this.props.onSubmit(
       new TradeRequest(
+        this.props.loanId || "0x0000000000000000000000000000000000000000000000000000000000000000",
         this.props.tradeType,
         this.props.asset,
         this.state.selectedUnitOfAccount,
         this.state.collateral,
         this.props.positionType,
         this.props.leverage,
-        this.state.tradeAmountValue,
-        this.state.tokenizeNeeded,
-        this.props.version,
-        this.state.inputAmountValue,
-        undefined,
-        undefined,
-        this.props.loanId
+        this.state.tradeAmountValue
       )
     );
   };
@@ -582,31 +565,30 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
           // maxTradeValue is raw here, so we should not use it directly
           this.getInputAmountLimitedFromBigNumber(maxTradeValue, tradeTokenKey, maxTradeValue, multiplier, true).then(limitedAmount => {
             if (!limitedAmount.tradeAmountValue.isNaN()) {
-              const tradeRequest = new TradeRequest(
-                this.props.tradeType,
-                this.props.asset,
-                this.state.selectedUnitOfAccount,
-                this.state.collateral,
-                this.props.positionType,
-                this.props.leverage,
-                limitedAmount.tradeAmountValue,
-                this.state.tokenizeNeeded,
-                this.props.version,
-                this.state.inputAmountValue
-              );
+              // const tradeRequest = new TradeRequest(
+              //   this.props.tradeType,
+              //   this.props.asset,
+              //   this.state.selectedUnitOfAccount,
+              //   this.state.collateral,
+              //   this.props.positionType,
+              //   this.props.leverage,
+              //   limitedAmount.tradeAmountValue,
+              //   this.state.tokenizeNeeded,
+              //   this.props.version,
+              //   this.state.inputAmountValue
+              // );
 
-              this.getTradeExpectedResults(tradeRequest).then(tradeExpectedResults => {
-                observer.next({
-                  isTradeAmountTouched: this.state.isTradeAmountTouched,
-                  inputAmountText: limitedAmount.inputAmountText,
-                  inputAmountValue: limitedAmount.inputAmountValue,
-                  tradeAmountValue: limitedAmount.tradeAmountValue,
-                  maxTradeValue: limitedAmount.maxTradeValue,
-                  tradedAmountEstimate: tradeExpectedResults.tradedAmountEstimate,
-                  slippageRate: tradeExpectedResults.slippageRate,
-                  exposureValue: tradeExpectedResults.exposureValue
-                });
-              });
+              // this.getTradeExpectedResults(tradeRequest).then(tradeExpectedResults => {
+              //   observer.next({
+              //     isTradeAmountTouched: this.state.isTradeAmountTouched,
+              //     inputAmountText: limitedAmount.inputAmountText,
+              //     inputAmountValue: limitedAmount.inputAmountValue,
+              //     tradeAmountValue: limitedAmount.tradeAmountValue,
+              //     maxTradeValue: limitedAmount.maxTradeValue,
+              //     slippageRate: tradeExpectedResults.slippageRate,
+              //     exposureValue: tradeExpectedResults.exposureValue
+              //   });
+              // });
             } else {
               observer.next(null);
             }
@@ -625,49 +607,36 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       this.getInputAmountLimitedFromText(value, tradeTokenKey, maxTradeValue, false).then(limitedAmount => {
         // updating stored value only if the new input value is a valid number
         if (!limitedAmount.tradeAmountValue.isNaN()) {
-          const tradeRequest = new TradeRequest(
-            this.props.tradeType,
-            this.props.asset,
-            this.state.selectedUnitOfAccount,
-            this.state.collateral,
-            this.props.positionType,
-            this.props.leverage,
-            limitedAmount.tradeAmountValue,
-            this.state.tokenizeNeeded,
-            this.props.version,
-            this.state.inputAmountValue
-          );
+          // const tradeRequest = new TradeRequest(
+          //   this.props.tradeType,
+          //   this.props.asset,
+          //   this.state.selectedUnitOfAccount,
+          //   this.state.collateral,
+          //   this.props.positionType,
+          //   this.props.leverage,
+          //   limitedAmount.tradeAmountValue,
+          //   this.state.tokenizeNeeded,
+          //   this.props.version,
+          //   this.state.inputAmountValue
+          // );
 
-          this.getTradeExpectedResults(tradeRequest).then(tradeExpectedResults => {
-            observer.next({
-              isTradeAmountTouched: true,
-              inputAmountText: limitedAmount.inputAmountText,
-              inputAmountValue: limitedAmount.inputAmountValue,
-              tradeAmountValue: limitedAmount.tradeAmountValue,
-              maxTradeValue: maxTradeValue,
-              tradedAmountEstimate: tradeExpectedResults.tradedAmountEstimate,
-              slippageRate: tradeExpectedResults.slippageRate,
-              exposureValue: tradeExpectedResults.exposureValue
-            });
-          });
+          // this.getTradeExpectedResults(tradeRequest).then(tradeExpectedResults => {
+          //   observer.next({
+          //     isTradeAmountTouched: true,
+          //     inputAmountText: limitedAmount.inputAmountText,
+          //     inputAmountValue: limitedAmount.inputAmountValue,
+          //     tradeAmountValue: limitedAmount.tradeAmountValue,
+          //     maxTradeValue: maxTradeValue,
+          //     slippageRate: tradeExpectedResults.slippageRate,
+          //     exposureValue: tradeExpectedResults.exposureValue
+          //   });
+          // });
         } else {
           observer.next(null);
         }
       });
 
     });
-  };
-
-  private getTradeExpectedResults = async (tradeRequest: TradeRequest): Promise<ITradeExpectedResults> => {
-    const tradedAmountEstimate = await FulcrumProvider.Instance.getTradedAmountEstimate(tradeRequest);
-    const slippageRate = await FulcrumProvider.Instance.getTradeSlippageRate(tradeRequest, tradedAmountEstimate);
-    const exposureValue = await FulcrumProvider.Instance.getTradeFormExposure(tradeRequest);
-
-    return {
-      tradedAmountEstimate: tradedAmountEstimate,
-      slippageRate: slippageRate || new BigNumber(0),
-      exposureValue: exposureValue
-    };
   };
 
   private getInputAmountLimitedFromText = async (textValue: string, tradeTokenKey: TradeTokenKey, maxTradeValue: BigNumber, skipLimitCheck: boolean): Promise<IInputAmountLimited> => {
