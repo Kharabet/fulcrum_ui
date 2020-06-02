@@ -57,19 +57,19 @@ export class TradeBuyEthProcessor {
       ? amountInBaseUnits
       : new BigNumber(0);
 
-    const depositTokenAddress = FulcrumProvider.Instance.getErc20AddressOfAsset(depositToken);
+    //const depositTokenAddress = FulcrumProvider.Instance.getErc20AddressOfAsset(depositToken);
     const collateralTokenAddress = FulcrumProvider.Instance.getErc20AddressOfAsset(collateralToken);
     const loanData = "0x";
 
-    console.log("depositAmount: " + amountInBaseUnits.toFixed());
+    //console.log("depositAmount: " + amountInBaseUnits.toFixed());
     console.log("leverageAmount: " + leverageAmount.toFixed());
     console.log("loanTokenSent: " + loanTokenSent.toFixed());
     console.log("collateralTokenSent: " + collateralTokenSent.toFixed());
-    console.log("deposit token: " + depositToken + " address: " + depositTokenAddress!);
+    //console.log("deposit token: " + depositToken + " address: " + depositTokenAddress!);
     console.log("collateral token: " + collateralToken + " address: " + collateralTokenAddress!);
     console.log("trader: " + account);
     console.log("loan data: " + loanData);
-
+    skipGas = true;
     // Waiting for token allowance
     if (skipGas) {
       gasAmountBN = new BigNumber(FulcrumProvider.Instance.gasLimit);
@@ -77,11 +77,9 @@ export class TradeBuyEthProcessor {
       // estimating gas amount
       const gasAmount = await tokenContract.marginTrade.estimateGasAsync(
         "0x0000000000000000000000000000000000000000000000000000000000000000",
-        amountInBaseUnits,
         leverageAmount,
         loanTokenSent,
         collateralTokenSent,
-        depositTokenAddress!,
         collateralTokenAddress!,
         account,
         loanData,
@@ -99,11 +97,9 @@ export class TradeBuyEthProcessor {
       // Submitting trade
       txHash = await tokenContract.marginTrade.sendTransactionAsync(
         "0x0000000000000000000000000000000000000000000000000000000000000000",
-        amountInBaseUnits,
         leverageAmount,
         loanTokenSent,
         collateralTokenSent,
-        depositTokenAddress!,
         collateralTokenAddress!,
         account,
         loanData,
