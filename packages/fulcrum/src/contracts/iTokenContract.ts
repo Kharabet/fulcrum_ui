@@ -522,24 +522,20 @@ export class iTokenContract extends BaseContract {
     public marginTrade = {
         async sendTransactionAsync(
             loanId: string,
-            depositAmount: BigNumber,
             leverageAmount: BigNumber,
             loanTokenSent: BigNumber,
             collateralTokenSent: BigNumber,
-            depositToken: string,
             collateralToken: string,
             trader: string,
             loanData: string,
             txData: Partial<TxData> = {}
         ): Promise<string> {
             const self = (this as any) as iTokenContract;
-            const encodedData = self._strictEncodeArguments("marginTrade(bytes32,uint256,uint256,uint256,uint256,address,address,address,bytes)", [
+            const encodedData = self._strictEncodeArguments("marginTrade(bytes32,uint256,uint256,uint256,address,address,bytes)", [
                 loanId,
-                depositAmount,
                 leverageAmount,
                 loanTokenSent,
                 collateralTokenSent,
-                depositToken,
                 collateralToken,
                 trader,
                 loanData
@@ -554,11 +550,9 @@ export class iTokenContract extends BaseContract {
                 (self as any).marginTrade.estimateGasAsync.bind(
                     self,
                     loanId,
-                    depositAmount,
                     leverageAmount,
                     loanTokenSent,
                     collateralTokenSent,
-                    depositToken,
                     collateralToken,
                     trader,
                     loanData
@@ -569,24 +563,20 @@ export class iTokenContract extends BaseContract {
         },
         async estimateGasAsync(
             loanId: string,
-            depositAmount: BigNumber,
             leverageAmount: BigNumber,
             loanTokenSent: BigNumber,
             collateralTokenSent: BigNumber,
-            depositToken: string,
             collateralToken: string,
             trader: string,
             loanData: string,
             txData: Partial<TxData> = {}
         ): Promise<number> {
             const self = (this as any) as iTokenContract;
-            const encodedData = self._strictEncodeArguments("marginTrade(bytes32,uint256,uint256,uint256,uint256,address,address,address,bytes)", [
+            const encodedData = self._strictEncodeArguments("marginTrade(bytes32,uint256,uint256,uint256,address,address,bytes)", [
                 loanId,
-                depositAmount,
                 leverageAmount,
                 loanTokenSent,
                 collateralTokenSent,
-                depositToken,
                 collateralToken,
                 trader,
                 loanData
@@ -604,23 +594,19 @@ export class iTokenContract extends BaseContract {
         },
         getABIEncodedTransactionData(
             loanId: string,
-            depositAmount: BigNumber,
             leverageAmount: BigNumber,
             loanTokenSent: BigNumber,
             collateralTokenSent: BigNumber,
-            depositToken: string,
             collateralToken: string,
             trader: string,
             loanData: string,
         ): string {
             const self = (this as any) as iTokenContract;
-            const abiEncodedTransactionData = self._strictEncodeArguments("marginTrade(bytes32,uint256,uint256,uint256,uint256,address,address,address,bytes)", [
+            const abiEncodedTransactionData = self._strictEncodeArguments("marginTrade(bytes32,uint256,uint256,uint256,address,address,bytes)", [
                 loanId,
-                depositAmount,
                 leverageAmount,
                 loanTokenSent,
                 collateralTokenSent,
-                depositToken,
                 collateralToken,
                 trader,
                 loanData
@@ -629,25 +615,26 @@ export class iTokenContract extends BaseContract {
         },
         async callAsync(
             loanId: string,
-            depositAmount: BigNumber,
             leverageAmount: BigNumber,
             loanTokenSent: BigNumber,
             collateralTokenSent: BigNumber,
-            depositToken: string,
             collateralToken: string,
             trader: string,
             loanData: string,
             callData: Partial<CallData> = {},
             defaultBlock?: BlockParam
-        ): Promise<BigNumber> {
+        ): Promise<
+            Array<{
+                newPrincipal: BigNumber;
+                newCollateral: BigNumber;
+            }>
+        > {
             const self = (this as any) as iTokenContract;
-            const encodedData = self._strictEncodeArguments("marginTrade(bytes32,uint256,uint256,uint256,uint256,address,address,address,bytes)", [
+            const encodedData = self._strictEncodeArguments("marginTrade(bytes32,uint256,uint256,uint256,address,address,bytes)", [
                 loanId,
-                depositAmount,
                 leverageAmount,
                 loanTokenSent,
                 collateralTokenSent,
-                depositToken,
                 collateralToken,
                 trader,
                 loanData
@@ -662,9 +649,14 @@ export class iTokenContract extends BaseContract {
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
             BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
-            const abiEncoder = self._lookupAbiEncoder("marginTrade(bytes32,uint256,uint256,uint256,uint256,address,address,address,bytes)");
+            const abiEncoder = self._lookupAbiEncoder("marginTrade(bytes32,uint256,uint256,uint256,address,address,bytes)");
             // tslint:disable boolean-naming
-            const result = abiEncoder.strictDecodeReturnValue<BigNumber>(rawCallResult);
+            const result = abiEncoder.strictDecodeReturnValue<
+                Array<{
+                    newPrincipal: BigNumber;
+                    newCollateral: BigNumber;
+                }>
+            >(rawCallResult);
             // tslint:enable boolean-naming
             return result;
         }
@@ -782,7 +774,12 @@ export class iTokenContract extends BaseContract {
             loanData: string,
             callData: Partial<CallData> = {},
             defaultBlock?: BlockParam
-        ): Promise<BigNumber> {
+        ): Promise<
+            Array<{
+                newPrincipal: BigNumber;
+                newCollateral: BigNumber;
+            }>        
+        > {
             const self = (this as any) as iTokenContract;
             const encodedData = self._strictEncodeArguments("borrow(bytes32,uint256,uint256,uint256,address,address,address,bytes)", [
                 loanId,
@@ -806,7 +803,12 @@ export class iTokenContract extends BaseContract {
             BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
             const abiEncoder = self._lookupAbiEncoder("borrow(bytes32,uint256,uint256,uint256,address,address,address,bytes)");
             // tslint:disable boolean-naming
-            const result = abiEncoder.strictDecodeReturnValue<BigNumber>(rawCallResult);
+            const result = abiEncoder.strictDecodeReturnValue<
+                Array<{
+                    newPrincipal: BigNumber;
+                    newCollateral: BigNumber;
+                }>
+            >(rawCallResult);
             // tslint:enable boolean-naming
             return result;
         }
