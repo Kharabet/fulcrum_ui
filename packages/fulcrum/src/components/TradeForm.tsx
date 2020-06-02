@@ -193,16 +193,6 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
-  private getTradeTokenGridRowSelectionKey(leverage: number = this.props.leverage) {
-    return new TradeTokenKey(
-      this.props.asset,
-      this.state.selectedUnitOfAccount,
-      this.props.positionType,
-      leverage,
-      this.state.tokenizeNeeded,
-      this.props.version
-    );
-  }
 
 
   private async derivedUpdate() {
@@ -212,7 +202,6 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       assetDetails = AssetsDictionaryMobile.assets.get(this.props.asset);
     }
     const tradeAssetPrice = await FulcrumProvider.Instance.getSwapToUsdRate(this.props.asset);
-    // const tradeTokenKey = this.getTradeTokenGridRowSelectionKey(this.props.leverage);
     const interestRate = new BigNumber(0);//await FulcrumProvider.Instance.getTradeTokenInterestRate(tradeTokenKey);
     // const positionTokenBalance = await FulcrumProvider.Instance.getPTokenBalanceOfUser(tradeTokenKey);
     // const balance =
@@ -487,12 +476,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
   };
 
   public onChangeUnitOfAccount = (asset: Asset) => {
-    let version = 2;
-    const key = new TradeTokenKey(this.props.asset, asset, this.props.positionType, this.props.leverage, this.state.tokenizeNeeded, version);
-    if (key.erc20Address === "") {
-      version = 1;
-    }
-
+    
     this._isMounted && this.setState({ ...this.state, selectedUnitOfAccount: asset });
 
     // this.props.onTrade(
@@ -568,7 +552,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
     return new Observable<ITradeAmountChangeEvent | null>(observer => {
 
       this._isMounted && this.setState({ ...this.state, isLoading: true });
-      const tradeTokenKey = this.getTradeTokenGridRowSelectionKey();
+      // const tradeTokenKey = this.getTradeTokenGridRowSelectionKey();
       // FulcrumProvider.Instance.getMaxTradeValue(this.props.tradeType, tradeTokenKey, this.state.collateral)
       //   .then(maxTradeValue => {
       //     // maxTradeValue is raw here, so we should not use it directly
@@ -611,11 +595,11 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
     return new Observable<ITradeAmountChangeEvent | null>(observer => {
 
       this._isMounted && this.setState({ ...this.state, isExposureLoading: true });
-      const tradeTokenKey = this.getTradeTokenGridRowSelectionKey();
-      const maxTradeValue = this.state.maxTradeValue;
-      this.getInputAmountLimitedFromText(value, tradeTokenKey, maxTradeValue, false).then(limitedAmount => {
+      // const tradeTokenKey = this.getTradeTokenGridRowSelectionKey();
+      // const maxTradeValue = this.state.maxTradeValue;
+      //this.getInputAmountLimitedFromText(value, tradeTokenKey, maxTradeValue, false).then(limitedAmount => {
         // updating stored value only if the new input value is a valid number
-        if (!limitedAmount.tradeAmountValue.isNaN()) {
+        //if (!limitedAmount.tradeAmountValue.isNaN()) {
           // const tradeRequest = new TradeRequest(
           //   this.props.tradeType,
           //   this.props.asset,
@@ -640,83 +624,83 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
           //     exposureValue: tradeExpectedResults.exposureValue
           //   });
           // });
-        } else {
-          observer.next(null);
-        }
-      });
+      //   } else {
+      //     observer.next(null);
+      //   }
+      // });
 
     });
   };
 
-  private getInputAmountLimitedFromText = async (textValue: string, tradeTokenKey: TradeTokenKey, maxTradeValue: BigNumber, skipLimitCheck: boolean): Promise<IInputAmountLimited> => {
-    const inputAmountText = textValue;
-    const amountTextForConversion = inputAmountText === "" ? "0" : inputAmountText[0] === "." ? `0${inputAmountText}` : inputAmountText;
-    const inputAmountValue = new BigNumber(amountTextForConversion);
+  // private getInputAmountLimitedFromText = async (textValue: string, tradeTokenKey: TradeTokenKey, maxTradeValue: BigNumber, skipLimitCheck: boolean): Promise<IInputAmountLimited> => {
+  //   const inputAmountText = textValue;
+  //   const amountTextForConversion = inputAmountText === "" ? "0" : inputAmountText[0] === "." ? `0${inputAmountText}` : inputAmountText;
+  //   const inputAmountValue = new BigNumber(amountTextForConversion);
 
-    return this.getInputAmountLimited(inputAmountText, inputAmountValue, tradeTokenKey, maxTradeValue, skipLimitCheck);
-  };
+  //   return this.getInputAmountLimited(inputAmountText, inputAmountValue, tradeTokenKey, maxTradeValue, skipLimitCheck);
+  // };
 
-  private getInputAmountLimitedFromBigNumber = async (bnValue: BigNumber, tradeTokenKey: TradeTokenKey, maxTradeValue: BigNumber, multiplier: BigNumber, skipLimitCheck: boolean): Promise<IInputAmountLimited> => {
-    const inputAmountValue = bnValue;
-    const inputAmountText = bnValue.decimalPlaces(this._inputPrecision).toFixed();
+  // private getInputAmountLimitedFromBigNumber = async (bnValue: BigNumber, tradeTokenKey: TradeTokenKey, maxTradeValue: BigNumber, multiplier: BigNumber, skipLimitCheck: boolean): Promise<IInputAmountLimited> => {
+  //   const inputAmountValue = bnValue;
+  //   const inputAmountText = bnValue.decimalPlaces(this._inputPrecision).toFixed();
 
-    return this.getInputAmountLimited(inputAmountText, inputAmountValue, tradeTokenKey, maxTradeValue, skipLimitCheck, multiplier);
-  };
+  //   return this.getInputAmountLimited(inputAmountText, inputAmountValue, tradeTokenKey, maxTradeValue, skipLimitCheck, multiplier);
+  // };
 
-  private getInputAmountLimited = async (textValue: string, bnValue: BigNumber, tradeTokenKey: TradeTokenKey, maxTradeValue: BigNumber, skipLimitCheck: boolean, multiplier: BigNumber = new BigNumber(1)): Promise<IInputAmountLimited> => {
-    let inputAmountText = textValue;
-    let inputAmountValue = bnValue;
+  // private getInputAmountLimited = async (textValue: string, bnValue: BigNumber, tradeTokenKey: TradeTokenKey, maxTradeValue: BigNumber, skipLimitCheck: boolean, multiplier: BigNumber = new BigNumber(1)): Promise<IInputAmountLimited> => {
+  //   let inputAmountText = textValue;
+  //   let inputAmountValue = bnValue;
 
-    // handling negative values (incl. Ctrl+C)
-    if (inputAmountValue.isNegative()) {
-      inputAmountValue = inputAmountValue.absoluteValue();
-      inputAmountText = inputAmountValue.decimalPlaces(this._inputPrecision).toFixed();
-    }
+  //   // handling negative values (incl. Ctrl+C)
+  //   if (inputAmountValue.isNegative()) {
+  //     inputAmountValue = inputAmountValue.absoluteValue();
+  //     inputAmountText = inputAmountValue.decimalPlaces(this._inputPrecision).toFixed();
+  //   }
 
-    let tradeAmountValue = new BigNumber(0);
-    // we should normalize maxTradeValue for sell
-    const pTokenBaseAsset = FulcrumProvider.Instance.getBaseAsset(tradeTokenKey);
-    const destinationAsset = this.state.collateral;
-    if (this.props.tradeType === TradeType.SELL) {
-      const pTokenPrice = await FulcrumProvider.Instance.getPTokenPrice(tradeTokenKey);
-      // console.log(`pTokenPrice: ${pTokenPrice.toFixed()}`);
-      const swapRate = await FulcrumProvider.Instance.getSwapRate(pTokenBaseAsset, destinationAsset);
-      // console.log(`swapRate: ${swapRate.toFixed()}`);
+  //   let tradeAmountValue = new BigNumber(0);
+  //   // we should normalize maxTradeValue for sell
+  //   const pTokenBaseAsset = FulcrumProvider.Instance.getBaseAsset(tradeTokenKey);
+  //   const destinationAsset = this.state.collateral;
+  //   if (this.props.tradeType === TradeType.SELL) {
+  //     const pTokenPrice = await FulcrumProvider.Instance.getPTokenPrice(tradeTokenKey);
+  //     // console.log(`pTokenPrice: ${pTokenPrice.toFixed()}`);
+  //     const swapRate = await FulcrumProvider.Instance.getSwapRate(pTokenBaseAsset, destinationAsset);
+  //     // console.log(`swapRate: ${swapRate.toFixed()}`);
 
-      const pTokenAmountMax = maxTradeValue.multipliedBy(multiplier);
-      // console.log(`pTokenAmountMax: ${pTokenAmountMax.toFixed()}`);
-      const pTokenBaseAssetAmountMax = pTokenAmountMax.multipliedBy(pTokenPrice);
-      // console.log(`pTokenBaseAssetAmountMax: ${pTokenBaseAssetAmountMax.toFixed()}`);
-      const destinationAssetAmountMax = pTokenBaseAssetAmountMax.multipliedBy(swapRate);
-      // console.log(`destinationAssetAmountMax: ${destinationAssetAmountMax.toFixed()}`);
+  //     const pTokenAmountMax = maxTradeValue.multipliedBy(multiplier);
+  //     // console.log(`pTokenAmountMax: ${pTokenAmountMax.toFixed()}`);
+  //     const pTokenBaseAssetAmountMax = pTokenAmountMax.multipliedBy(pTokenPrice);
+  //     // console.log(`pTokenBaseAssetAmountMax: ${pTokenBaseAssetAmountMax.toFixed()}`);
+  //     const destinationAssetAmountMax = pTokenBaseAssetAmountMax.multipliedBy(swapRate);
+  //     // console.log(`destinationAssetAmountMax: ${destinationAssetAmountMax.toFixed()}`);
 
-      const destinationAssetAmountLimited = skipLimitCheck ? destinationAssetAmountMax : BigNumber.min(destinationAssetAmountMax, inputAmountValue);
-      // console.log(`destinationAmountLimited: ${destinationAssetAmountLimited.toFixed()}`);
+  //     const destinationAssetAmountLimited = skipLimitCheck ? destinationAssetAmountMax : BigNumber.min(destinationAssetAmountMax, inputAmountValue);
+  //     // console.log(`destinationAmountLimited: ${destinationAssetAmountLimited.toFixed()}`);
 
-      const pTokenBaseAssetAmountLimited = destinationAssetAmountLimited.dividedBy(swapRate);
-      // console.log(`pTokenBaseAssetAmountLimited: ${pTokenBaseAssetAmountLimited.toFixed()}`);
-      const pTokenAmountLimited = pTokenBaseAssetAmountLimited.dividedBy(pTokenPrice);
-      // console.log(`pTokenAmountLimited: ${pTokenAmountLimited.toFixed()}`);
+  //     const pTokenBaseAssetAmountLimited = destinationAssetAmountLimited.dividedBy(swapRate);
+  //     // console.log(`pTokenBaseAssetAmountLimited: ${pTokenBaseAssetAmountLimited.toFixed()}`);
+  //     const pTokenAmountLimited = pTokenBaseAssetAmountLimited.dividedBy(pTokenPrice);
+  //     // console.log(`pTokenAmountLimited: ${pTokenAmountLimited.toFixed()}`);
 
-      inputAmountValue = destinationAssetAmountLimited;
-      inputAmountText = destinationAssetAmountLimited.decimalPlaces(this._inputPrecision).toFixed();
-      tradeAmountValue = pTokenAmountLimited;
-    } else if (this.props.tradeType === TradeType.BUY) {
-      tradeAmountValue = inputAmountValue;
-      if (tradeAmountValue.gt(maxTradeValue)) {
-        inputAmountValue = maxTradeValue.multipliedBy(multiplier);
-        inputAmountText = maxTradeValue.multipliedBy(multiplier).decimalPlaces(this._inputPrecision).toFixed();
-        tradeAmountValue = maxTradeValue.multipliedBy(multiplier);
-      }
-    }
+  //     inputAmountValue = destinationAssetAmountLimited;
+  //     inputAmountText = destinationAssetAmountLimited.decimalPlaces(this._inputPrecision).toFixed();
+  //     tradeAmountValue = pTokenAmountLimited;
+  //   } else if (this.props.tradeType === TradeType.BUY) {
+  //     tradeAmountValue = inputAmountValue;
+  //     if (tradeAmountValue.gt(maxTradeValue)) {
+  //       inputAmountValue = maxTradeValue.multipliedBy(multiplier);
+  //       inputAmountText = maxTradeValue.multipliedBy(multiplier).decimalPlaces(this._inputPrecision).toFixed();
+  //       tradeAmountValue = maxTradeValue.multipliedBy(multiplier);
+  //     }
+  //   }
 
-    return {
-      inputAmountValue: inputAmountValue.multipliedBy(multiplier),
-      inputAmountText: isNaN(parseFloat(inputAmountText)) ? "" : new BigNumber(parseFloat(inputAmountText)).multipliedBy(multiplier).toFixed(),
-      tradeAmountValue: tradeAmountValue.multipliedBy(multiplier),
-      maxTradeValue
-    };
-  };
+  //   return {
+  //     inputAmountValue: inputAmountValue.multipliedBy(multiplier),
+  //     inputAmountText: isNaN(parseFloat(inputAmountText)) ? "" : new BigNumber(parseFloat(inputAmountText)).multipliedBy(multiplier).toFixed(),
+  //     tradeAmountValue: tradeAmountValue.multipliedBy(multiplier),
+  //     maxTradeValue
+  //   };
+  // };
 
   private formatPrecision(output: number): string {
     let n = Math.log(output) / Math.LN10;

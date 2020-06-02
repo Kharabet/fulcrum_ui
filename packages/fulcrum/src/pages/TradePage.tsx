@@ -5,7 +5,6 @@ import { Asset } from "../domain/Asset";
 import { ManageCollateralRequest } from "../domain/ManageCollateralRequest";
 import { PositionType } from "../domain/PositionType";
 import { TradeRequest } from "../domain/TradeRequest";
-import { TradeTokenKey } from "../domain/TradeTokenKey";
 import { TradeType } from "../domain/TradeType";
 import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
@@ -23,7 +22,6 @@ import "../styles/pages/_trade-page.scss";
 import { BigNumber } from "@0x/utils";
 
 const ManageTokenGrid = React.lazy(() => import('../components/ManageTokenGrid'));
-const TokenAddressForm = React.lazy(() => import('../components/TokenAddressForm'));
 const TradeForm = React.lazy(() => import('../components/TradeForm'));
 const ManageCollateralForm = React.lazy(() => import('../components/ManageCollateralForm'));
 
@@ -51,7 +49,6 @@ interface ITradePageState {
   collateralToken: Asset;
 
   isTokenAddressFormOpen: boolean;
-  tradeTokenKey: TradeTokenKey;
 
   isManageCollateralModalOpen: boolean;
 
@@ -83,7 +80,6 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       tradeVersion: 1,
       collateralToken: Asset.UNKNOWN,
       isTokenAddressFormOpen: false,
-      tradeTokenKey: TradeTokenKey.empty(),
       isManageCollateralModalOpen: false,
       assets: this.getAssets(),
       defaultTokenizeNeeded: true,
@@ -244,18 +240,6 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
             />
           </Modal>
           <Modal
-            isOpen={this.state.isTokenAddressFormOpen}
-
-            onRequestClose={this.onTokenAddressFormRequestClose}
-            className="modal-content-div"
-            overlayClassName="modal-overlay-div"
-          >
-            <TokenAddressForm
-              tradeTokenKey={this.state.tradeTokenKey}
-              onCancel={this.onTokenAddressFormRequestClose}
-            />
-          </Modal>
-          <Modal
             isOpen={this.state.isManageCollateralModalOpen}
             onRequestClose={this.onManageCollateralRequestClose}
             className="modal-content-div"
@@ -291,14 +275,6 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
 
   public onTabSelect = async (asset: Asset) => {
     await this.setState({ ...this.state, selectedTabAsset: asset });
-  };
-
-  public onDetails = async (key: TradeTokenKey) => {
-    this.setState({ ...this.state, tradeTokenKey: key, isTokenAddressFormOpen: true });
-  };
-
-  private onTokenAddressFormRequestClose = () => {
-    this.setState({ ...this.state, isTokenAddressFormOpen: false });
   };
 
   private onProviderAvailable = async () => {
@@ -470,7 +446,10 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         }
         ownRowsData.push({
           loan: loan,
-          currentKey: new TradeTokenKey(asset, unitOfAccount, positionType, leverage, true),
+          tradeAsset: asset, 
+          collateralAsset: unitOfAccount,
+          positionType, 
+          leverage,
           onTrade: this.onTradeRequested,
           onManageCollateralOpen: this.onManageCollateralRequested,
           changeLoadingTransaction: this.changeLoadingTransaction,

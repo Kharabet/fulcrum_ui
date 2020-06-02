@@ -27,7 +27,7 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
   }
 
   private renderDesktop = () => {
-    const historyRows = this.props.historyRowsData.map(e => <HistoryTokenGridRow key={`${e.currentKey.toString()}`} {...e} />);
+    const historyRows = this.props.historyRowsData.map((e,i) => <HistoryTokenGridRow key={i} {...e} />);
     if (historyRows.length === 0) return null;
 
     return (
@@ -39,7 +39,7 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
   }
 
   private renderMobile = () => {
-    const historyRows = this.props.historyRowsData.map(e => <HistoryTokenCardMobile key={`${e.currentKey.toString()}`} {...e} />);
+    const historyRows = this.props.historyRowsData.map((e,i) => <HistoryTokenCardMobile key={i} {...e} />);
     if (historyRows.length === 0) return null;
 
     return (
