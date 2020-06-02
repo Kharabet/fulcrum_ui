@@ -58,10 +58,11 @@ export class TradeSellErcProcessor {
       } else {
         // estimating gas amount
         let gasAmount;
-        gasAmount = await iBZxContract.closeTrade.estimateGasAsync(
+        gasAmount = await iBZxContract.closeWithSwap.estimateGasAsync(
           taskRequest.loanId!,
           account,
           amountInBaseUnits,
+          true, // returnTokenIsCollateral
           "0x",
           {
             from: account,
@@ -76,10 +77,11 @@ export class TradeSellErcProcessor {
         //FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.AskToOpenProgressDlg);
   
         // Closing trade
-        txHash = await iBZxContract.closeTrade.sendTransactionAsync(
+        txHash = await iBZxContract.closeWithSwap.sendTransactionAsync(
           taskRequest.loanId!,
           account,
           amountInBaseUnits,
+          true, // returnTokenIsCollateral
           "0x",
           {
             from: account,

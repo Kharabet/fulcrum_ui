@@ -15,6 +15,7 @@ export interface IHeaderOpsProps {
   isRiskDisclosureModalOpen: () => void;
   isLoading: boolean;
   isMobileMedia: boolean;
+  headerClass: string;
 }
 
 interface IHeaderOpsState {
@@ -88,7 +89,7 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
     };
 
     return (
-      <header className="header">
+      <header className={`header ${this.props.headerClass}`}>
         <div className="header__row">
           <div className="header__left">
             <HeaderLogo />
@@ -125,7 +126,7 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
     const sidebarClass = !this.state.isMenuOpen ? 'sidebar_h' : 'sidebar_v'
 
     return (
-      <header className="header">
+      <header className={`header ${this.props.headerClass}`}>
         <div className="header__row">
           <div className="header__left">
             <HeaderLogo />
