@@ -62,15 +62,15 @@ export class OwnTokenCardMobile extends Component<IOwnTokenCardMobileProps, IOwn
     const tradeTokenKey = this.props.currentKey;
     const latestAssetPriceDataPoint = await FulcrumProvider.Instance.getTradeTokenAssetLatestDataPoint(tradeTokenKey);
 
-    const data: [BigNumber | null, BigNumber | null] = await FulcrumProvider.Instance.getTradeBalanceAndProfit(tradeTokenKey);
-    const assetBalance = data[0];
-    const profit = data[1];
+    // const data: [BigNumber | null, BigNumber | null] = await FulcrumProvider.Instance.getTradeBalanceAndProfit(tradeTokenKey);
+    // const assetBalance = data[0];
+    // const profit = data[1];
 
     this._isMounted && this.setState(p => ({
       ...this.state,
       latestAssetPriceDataPoint: latestAssetPriceDataPoint,
-      assetBalance: assetBalance,
-      profit: profit,
+      // assetBalance: assetBalance,
+      // profit: profit,
       isLoading: latestAssetPriceDataPoint.price !== 0 ? false : p.isLoading
     }));
   }

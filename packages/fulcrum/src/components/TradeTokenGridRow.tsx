@@ -98,17 +98,17 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
     }
 
     const latestPriceDataPoint = await FulcrumProvider.Instance.getTradeTokenAssetLatestDataPoint(tradeTokenKey);
-    const interestRate = await FulcrumProvider.Instance.getTradeTokenInterestRate(tradeTokenKey);
-    const balance = await FulcrumProvider.Instance.getPTokenBalanceOfUser(tradeTokenKey);
+    const interestRate = new BigNumber(0); // await FulcrumProvider.Instance.getTradeTokenInterestRate(tradeTokenKey);
+    const balance = new BigNumber(0); // await FulcrumProvider.Instance.getPTokenBalanceOfUser(tradeTokenKey);
 
-    this._isMounted && this.setState(p => ({
+    this._isMounted && this.setState({
       ...this.state,
       latestPriceDataPoint: latestPriceDataPoint,
       interestRate: interestRate,
       balance: balance,
       version: version,
-      isLoading: latestPriceDataPoint.price !== 0 ? false : p.isLoading
-    }));
+      isLoading: latestPriceDataPoint.price !== 0 ? false : this.state.isLoading
+    });
   }
 
   private onProviderAvailable = async () => {

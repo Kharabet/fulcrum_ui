@@ -35,7 +35,8 @@ export class TradeExpectedResult extends Component<ITradeExpectedResultProps> {
             Liquidation Price
           </div>
           <div title={`${this.props.value.liquidationPrice.toFixed(18)}`} className="trade-expected-result__column-value">
-            <span className="value">{this.props.value.liquidationPrice.eq(new BigNumber(0)) ? <Preloader width="55px" /> : this.props.value.liquidationPrice.toFixed(2)}</span>&nbsp;USD
+            {/* <span className="value">{this.props.value.liquidationPrice.eq(new BigNumber(0)) ? <Preloader width="55px" /> : this.props.value.liquidationPrice.toFixed(2)}</span>&nbsp;USD */}
+            <span className="value">{this.props.value.liquidationPrice.toFixed(2)}</span>&nbsp;USD
           </div>
         </div>
       </div>

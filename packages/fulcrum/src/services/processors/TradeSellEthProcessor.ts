@@ -89,7 +89,8 @@ export class TradeSellEthProcessor {
       task.setTxHash(txHash);
     }
     catch (e) {
-      throw e;
+      console.log(e);
+      // throw e;
     }
 
     task.processingStepNext();
