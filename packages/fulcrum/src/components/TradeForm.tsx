@@ -253,7 +253,9 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       currentPrice: new BigNumber(0), //new BigNumber(latestPriceDataPoint.price),
       liquidationPrice: liquidationPrice,
       tradeAssetPrice,
-      exposureValue
+      exposureValue,
+      isExposureLoading: false,
+      isLoading: false
     });
   }
 
