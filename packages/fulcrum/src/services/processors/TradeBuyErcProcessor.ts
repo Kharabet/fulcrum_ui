@@ -1,12 +1,9 @@
 import { BigNumber } from "@0x/utils";
 import { erc20Contract } from "../../contracts/erc20";
-import { pTokenContract } from "../../contracts/pTokenContract";
 import { Asset } from "../../domain/Asset";
 import { AssetsDictionary } from "../../domain/AssetsDictionary";
 import { RequestTask } from "../../domain/RequestTask";
 import { TradeRequest } from "../../domain/TradeRequest";
-import { TradeTokenKey } from "../../domain/TradeTokenKey";
-import { FulcrumProviderEvents } from "../events/FulcrumProviderEvents";
 import { FulcrumProvider } from "../FulcrumProvider";
 import { PositionType } from "../../domain/PositionType";
 
@@ -114,7 +111,6 @@ export class TradeBuyErcProcessor {
       ? amountInBaseUnits
       : new BigNumber(0);
 
-    const depositTokenAddress = FulcrumProvider.Instance.getErc20AddressOfAsset(depositToken);
     const collateralTokenAddress = FulcrumProvider.Instance.getErc20AddressOfAsset(collateralToken);
     const loanData = "0x";
 

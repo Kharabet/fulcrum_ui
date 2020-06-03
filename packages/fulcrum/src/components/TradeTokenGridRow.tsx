@@ -3,14 +3,11 @@ import React, { Component } from "react";
 import { Asset } from "../domain/Asset";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
-import { IPriceDataPoint } from "../domain/IPriceDataPoint";
 import { PositionType } from "../domain/PositionType";
 import { TradeRequest } from "../domain/TradeRequest";
-import { TradeTokenKey } from "../domain/TradeTokenKey";
 import { TradeType } from "../domain/TradeType";
 import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
-import { TradeTransactionMinedEvent } from "../services/events/TradeTransactionMinedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
 import { PositionTypeMarkerAlt } from "./PositionTypeMarkerAlt";
 import siteConfig from "../config/SiteConfig.json";
@@ -81,7 +78,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
     const tradeAssetPrice = await FulcrumProvider.Instance.getSwapToUsdRate(this.props.asset);
 
     const interestRate = await FulcrumProvider.Instance.getBorrowInterestRate(this.props.asset);
-    const balance = new BigNumber(0); // await FulcrumProvider.Instance.getPTokenBalanceOfUser(tradeTokenKey);
+    const balance = new BigNumber(0);
 
     this._isMounted && this.setState({
       ...this.state,
@@ -96,7 +93,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
     await this.derivedUpdate();
   };
 
-  private onProviderChanged = async (event: ProviderChangedEvent) => {
+  private onProviderChanged = async () => {
     await this.derivedUpdate();
   };
 
