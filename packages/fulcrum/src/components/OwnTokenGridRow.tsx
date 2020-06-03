@@ -175,7 +175,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
       : <div className={`own-token-grid-row`}>
 
         <div className="own-token-grid-row__col-token-name">
-          {`${this.props.loan.loanAsset.toUpperCase()}`}
+          {`${this.props.tradeAsset.toUpperCase()}`}
         </div>
 
         <div className="own-token-grid-row__col-position-type opacityIn">
