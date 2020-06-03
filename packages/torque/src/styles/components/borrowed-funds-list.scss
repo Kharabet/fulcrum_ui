@@ -172,6 +172,15 @@
         line-height: 150%;
         color: #276bfb;
         outline: none;
+        &:disabled,
+        &[disabled] {
+          color: #a3b0c2;
+          background-color: #eaeaee;
+          cursor: not-allowed;
+          &:hover {
+            cursor: not-allowed;
+          }
+        }
         &:hover {
           color: #fff;
           background: #5b88ff;
