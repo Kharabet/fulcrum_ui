@@ -286,20 +286,17 @@ export class OwnTokenCardMobile extends Component<IOwnTokenGridRowProps, IOwnTok
   public onSellClick = async (event: React.MouseEvent<HTMLElement>) => {
     event.stopPropagation();
     const request = new TradeRequest(
-      this.props.loan.loanId,
-      TradeType.SELL,
-      this.props.loan.loanAsset,
-      Asset.UNKNOWN,
-      this.props.loan.collateralAsset,
-      this.props.loan.collateralAsset === Asset.ETH
-        ? PositionType.LONG
-        : PositionType.SHORT,
-      this.props.leverage,
-      new BigNumber(0)
+        this.props.loan.loanId,
+        TradeType.SELL,
+        this.props.tradeAsset,
+        Asset.UNKNOWN,
+        this.props.collateralAsset,
+        this.props.positionType,
+        this.props.leverage,
+        new BigNumber(0)
     )
-    //</HTMLElement>await this.setState({...this.state, request: request });
+    await this.setState({...this.state, request: request });
     this.props.onTrade(request);
     this.props.changeLoadingTransaction(this.state.isLoadingTransaction, request, true)
-    //</HTMLElement>};
   }
 }

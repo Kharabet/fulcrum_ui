@@ -74,7 +74,8 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       tradeType: TradeType.BUY,
       tradeAsset: Asset.UNKNOWN,
       tradeUnitOfAccount: Asset.UNKNOWN,
-      defaultUnitOfAccount: process.env.REACT_APP_ETH_NETWORK === "kovan" ? Asset.SAI : Asset.DAI,
+      // defaultUnitOfAccount: process.env.REACT_APP_ETH_NETWORK === "kovan" ? Asset.SAI : Asset.DAI,
+      defaultUnitOfAccount: Asset.DAI,
       tradePositionType: PositionType.SHORT,
       tradeLeverage: 0,
       tradeVersion: 1,
@@ -399,8 +400,8 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       // const pTokenBalances = await FulcrumProvider.Instance.getErc20BalancesOfUser(pTokenAddreses);
       for (const loan of loans) {
         // const balance = pTokenBalances.get(pToken.erc20Address);
-        // if (!balance)
-        //   continue;
+        if (!(loan.collateralAsset === this.state.selectedTabAsset || loan.loanAsset === this.state.selectedTabAsset))
+          continue;
 
         const positionType = loan.collateralAsset === Asset.ETH
           ? PositionType.LONG
@@ -409,6 +410,10 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
           ? loan.collateralAsset
           : loan.loanAsset;
         const unitOfAccount = loan.collateralAsset === Asset.ETH
+          ? loan.loanAsset
+          : loan.collateralAsset;
+
+          const collateralAsset = loan.collateralAsset === this.state.selectedTabAsset
           ? loan.loanAsset
           : loan.collateralAsset;
 
@@ -446,8 +451,8 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         }
         ownRowsData.push({
           loan: loan,
-          tradeAsset: asset, 
-          collateralAsset: unitOfAccount,
+          tradeAsset: this.state.selectedTabAsset, 
+          collateralAsset: collateralAsset,
           positionType, 
           leverage,
           onTrade: this.onTradeRequested,
