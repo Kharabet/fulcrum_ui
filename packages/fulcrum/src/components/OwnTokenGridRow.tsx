@@ -275,12 +275,10 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
     const request = new TradeRequest(
       this.props.loan.loanId,
       TradeType.SELL,
-      this.props.loan.loanAsset,
+      this.props.tradeAsset,
       Asset.UNKNOWN,
-      this.props.loan.collateralAsset,
-      this.props.loan.collateralAsset === Asset.ETH
-        ? PositionType.LONG
-        : PositionType.SHORT,
+      this.props.collateralAsset,
+      this.props.positionType,
       this.props.leverage,
       new BigNumber(0)
     )
