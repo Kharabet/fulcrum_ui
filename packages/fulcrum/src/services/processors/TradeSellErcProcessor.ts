@@ -18,24 +18,23 @@ export class TradeSellErcProcessor {
 
     // Initializing loan
     const taskRequest: TradeRequest = (task.request as TradeRequest);
-    const key = new TradeTokenKey(
-      taskRequest.asset,
-      taskRequest.unitOfAccount,
-      taskRequest.positionType,
-      taskRequest.leverage,
-      taskRequest.isTokenized,
-      taskRequest.version
-    );
-    let decimals: number = AssetsDictionary.assets.get(key.loanAsset)!.decimals || 18;
-    if (key.loanAsset === Asset.WBTC && key.positionType === PositionType.SHORT) {
-      decimals = decimals + 10;
-    }
+    const isLong = taskRequest.positionType === PositionType.LONG;
 
-    const amountInBaseUnits = new BigNumber(taskRequest.amount.multipliedBy(10 ** decimals).toFixed(0, 1));
-    const tokenContract: pTokenContract | null = await FulcrumProvider.Instance.contractsSource.getPTokenContract(key);
 
-    if (!tokenContract) {
-      throw new Error("No pToken contract available!");
+    const loanToken = isLong
+      ? taskRequest.collateral
+      : Asset.ETH;
+    const depositToken = taskRequest.depositToken;
+    const collateralToken = isLong
+      ? Asset.ETH
+      : taskRequest.collateral;
+
+    const loans = await FulcrumProvider.Instance.getUserMarginTradeLoans();
+    const amountInBaseUnits = loans.find(l => l.loanId === taskRequest.loanId)!.loanData!.collateral.times(10**50); //new BigNumber("525478543208365722")// new BigNumber(taskRequest.amount.multipliedBy(10 ** decimals).toFixed(0, 1));
+
+    const iBZxContract = await FulcrumProvider.Instance.contractsSource.getiBZxContract();
+    if (!iBZxContract) {
+      throw new Error("No iBZxContract contract available!");
     }
 
     task.processingStart([
@@ -59,76 +58,42 @@ export class TradeSellErcProcessor {
       } else {
         // estimating gas amount
         let gasAmount;
-        if (taskRequest.version === 2 && taskRequest.loanDataBytes) {
-          gasAmount = await tokenContract.burnToToken.estimateGasAsync(
-            account,
-            assetErc20Address,
-            amountInBaseUnits,
-            new BigNumber(0),
-            taskRequest.loanDataBytes,
-            {
-              from: account,
-              gas: FulcrumProvider.Instance.gasLimit,
-              value: taskRequest.zeroXFee ?
-                taskRequest.zeroXFee :
-                0
-            }
-          );
-        } else {
-          gasAmount = await tokenContract.burnToTokenNoBytes.estimateGasAsync(
-            account,
-            assetErc20Address,
-            amountInBaseUnits,
-            new BigNumber(0),
-            {
-              from: account,
-              gas: FulcrumProvider.Instance.gasLimit,
-              value: 0
-            }
-          );
-        }
+        gasAmount = await iBZxContract.closeWithSwap.estimateGasAsync(
+          taskRequest.loanId!,
+          account,
+          amountInBaseUnits,
+          true, // returnTokenIsCollateral
+          "0x",
+          {
+            from: account,
+            gas: FulcrumProvider.Instance.gasLimit,
+          });
+  
         gasAmountBN = new BigNumber(gasAmount).multipliedBy(FulcrumProvider.Instance.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
       }
-
+  
       let txHash: string = "";
       try {
         //FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.AskToOpenProgressDlg);
-
+  
         // Closing trade
-        if (taskRequest.version === 2 && taskRequest.loanDataBytes) {
-          txHash = await tokenContract.burnToToken.sendTransactionAsync(
-            account,
-            assetErc20Address,
-            amountInBaseUnits,
-            new BigNumber(0),
-            taskRequest.loanDataBytes,
-            { 
-              from: account,
-              gas: gasAmountBN.toString(),
-              gasPrice: await FulcrumProvider.Instance.gasPrice(),
-              value: taskRequest.zeroXFee ?
-                taskRequest.zeroXFee :
-                0
-            }
-          );
-        } else {
-          txHash = await tokenContract.burnToTokenNoBytes.sendTransactionAsync(
-            account,
-            assetErc20Address,
-            amountInBaseUnits,
-            new BigNumber(0),
-            { 
-              from: account,
-              gas: gasAmountBN.toString(),
-              gasPrice: await FulcrumProvider.Instance.gasPrice(),
-              value: 0
-            }
-          );
-        }
+        txHash = await iBZxContract.closeWithSwap.sendTransactionAsync(
+          taskRequest.loanId!,
+          account,
+          amountInBaseUnits,
+          true, // returnTokenIsCollateral
+          "0x",
+          {
+            from: account,
+            gas: FulcrumProvider.Instance.gasLimit,
+            gasPrice: await FulcrumProvider.Instance.gasPrice()
+          });
+  
+  
         task.setTxHash(txHash);
       }
-      catch(e) {
-        console.log(e);
+      catch (e) {
+        throw e;
       }
 
       task.processingStepNext();

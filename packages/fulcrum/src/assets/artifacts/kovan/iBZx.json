@@ -883,8 +883,13 @@
         },
         {
           "internalType": "uint256",
-          "name": "positionCloseAmount",
+          "name": "swapAmount",
           "type": "uint256"
+        },
+        {
+          "internalType": "bool",
+          "name": "returnTokenIsCollateral",
+          "type": "bool"
         },
         {
           "internalType": "bytes",
@@ -892,7 +897,7 @@
           "type": "bytes"
         }
       ],
-      "name": "closeTrade",
+      "name": "closeWithSwap",
       "outputs": [
         {
           "internalType": "uint256",
@@ -2405,11 +2410,11 @@
         },
         {
           "internalType": "uint256",
-          "name": "closeAmount",
+          "name": "depositAmount",
           "type": "uint256"
         }
       ],
-      "name": "repayWithDeposit",
+      "name": "closeWithDeposit",
       "outputs": [
         {
           "internalType": "uint256",
@@ -2418,12 +2423,12 @@
         },
         {
           "internalType": "uint256",
-          "name": "collateralWithdrawAmount",
+          "name": "withdrawAmount",
           "type": "uint256"
         },
         {
           "internalType": "address",
-          "name": "collateralToken",
+          "name": "withdrawToken",
           "type": "address"
         }
       ],

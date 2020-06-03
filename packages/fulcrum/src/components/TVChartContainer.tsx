@@ -165,7 +165,7 @@ export class TVChartContainer extends React.PureComponent<Partial<ChartContainer
 	public componentDidUpdate(prevProps: Readonly<ChartContainerProps>): void {
 		if (this.props.symbol && prevProps.symbol !== this.props.symbol)
 			this.changePair(this.props.symbol)
-		if (prevProps.theme !== this.props.theme) {
+		if (prevProps.theme !== this.props.theme || this.props.preset!=prevProps.preset) {
 			this.updateWidget();
 		}
 	}

@@ -29,7 +29,7 @@ export class OwnTokenGrid extends Component<IOwnTokenGridProps, IOwnTokenGridSta
   }
 
   private renderDesktop = () => {
-    const ownDesktopRows = this.props.ownRowsData.map(e => <OwnTokenGridRow key={`${e.currentKey.toString()}`} {...e} />);
+    const ownDesktopRows = this.props.ownRowsData.map((e,i) => <OwnTokenGridRow key={i} {...e} />);
     if (ownDesktopRows.length === 0) return null;
 
     return (
@@ -41,7 +41,7 @@ export class OwnTokenGrid extends Component<IOwnTokenGridProps, IOwnTokenGridSta
   }
 
   private renderMobile = () => {
-    const ownMobileRows = this.props.ownRowsData.map(e => <OwnTokenCardMobile key={`${e.currentKey.toString()}`} {...e} />);
+    const ownMobileRows = this.props.ownRowsData.map((e,i) => <OwnTokenCardMobile key={i} {...e} />);
     if (ownMobileRows.length === 0) return null;
 
     return (

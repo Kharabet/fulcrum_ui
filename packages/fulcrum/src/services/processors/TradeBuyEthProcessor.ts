@@ -20,15 +20,15 @@ export class TradeBuyEthProcessor {
     const isLong = taskRequest.positionType === PositionType.LONG;
     const amountInBaseUnits = new BigNumber(taskRequest.amount.multipliedBy(10 ** 18).toFixed(0, 1)); // ETH -> 18 decimals
 
-    const loanToken = isLong 
-    ? taskRequest.unitOfAccount
-    : Asset.ETH;
-    const depositToken = taskRequest.collateral;
+    const loanToken = isLong
+      ? taskRequest.collateral
+      : Asset.ETH;
+    const depositToken = taskRequest.depositToken;
     const collateralToken = isLong
-    ? Asset.ETH
-    : taskRequest.unitOfAccount;
+      ? Asset.ETH
+      : taskRequest.collateral;
 
-    const tokenContract =  await FulcrumProvider.Instance.contractsSource.getITokenContract(loanToken);
+    const tokenContract = await FulcrumProvider.Instance.contractsSource.getITokenContract(loanToken);
     if (!tokenContract) {
       throw new Error("No iToken contract available!");
     }
@@ -53,23 +53,23 @@ export class TradeBuyEthProcessor {
       ? amountInBaseUnits
       : new BigNumber(0);
 
-    const collateralTokenSent =  depositToken === collateralToken
+    const collateralTokenSent = depositToken === collateralToken
       ? amountInBaseUnits
       : new BigNumber(0);
 
-    const depositTokenAddress = FulcrumProvider.Instance.getErc20AddressOfAsset(depositToken);
+    //const depositTokenAddress = FulcrumProvider.Instance.getErc20AddressOfAsset(depositToken);
     const collateralTokenAddress = FulcrumProvider.Instance.getErc20AddressOfAsset(collateralToken);
     const loanData = "0x";
 
-    console.log("depositAmount: " + amountInBaseUnits.toFixed());
+    //console.log("depositAmount: " + amountInBaseUnits.toFixed());
     console.log("leverageAmount: " + leverageAmount.toFixed());
     console.log("loanTokenSent: " + loanTokenSent.toFixed());
     console.log("collateralTokenSent: " + collateralTokenSent.toFixed());
-    console.log("deposit token: " + depositToken + " address: " + depositTokenAddress!);
+    //console.log("deposit token: " + depositToken + " address: " + depositTokenAddress!);
     console.log("collateral token: " + collateralToken + " address: " + collateralTokenAddress!);
-    console.log("trader: "+ account);
-    console.log("loan data: "+ loanData);
-
+    console.log("trader: " + account);
+    console.log("loan data: " + loanData);
+    skipGas = true;
     // Waiting for token allowance
     if (skipGas) {
       gasAmountBN = new BigNumber(FulcrumProvider.Instance.gasLimit);
@@ -77,15 +77,16 @@ export class TradeBuyEthProcessor {
       // estimating gas amount
       const gasAmount = await tokenContract.marginTrade.estimateGasAsync(
         "0x0000000000000000000000000000000000000000000000000000000000000000",
-        amountInBaseUnits,
         leverageAmount,
         loanTokenSent,
         collateralTokenSent,
-        depositTokenAddress!,
         collateralTokenAddress!,
         account,
         loanData,
-        { from: account,value: amountInBaseUnits,  gas: FulcrumProvider.Instance.gasLimit });
+        {
+          from: account, value: amountInBaseUnits,
+          gas: FulcrumProvider.Instance.gasLimit
+        });
       gasAmountBN = new BigNumber(gasAmount).multipliedBy(FulcrumProvider.Instance.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
     }
 
@@ -96,22 +97,21 @@ export class TradeBuyEthProcessor {
       // Submitting trade
       txHash = await tokenContract.marginTrade.sendTransactionAsync(
         "0x0000000000000000000000000000000000000000000000000000000000000000",
-        amountInBaseUnits,
         leverageAmount,
         loanTokenSent,
         collateralTokenSent,
-        depositTokenAddress!,
         collateralTokenAddress!,
         account,
-        loanData, {
-        from: account,
-        value: amountInBaseUnits, 
-        gas: gasAmountBN.toString(),
-        gasPrice: await FulcrumProvider.Instance.gasPrice()
-      });
+        loanData,
+        {
+          from: account,
+          value: amountInBaseUnits,
+          gas: gasAmountBN.toString(),
+          gasPrice: await FulcrumProvider.Instance.gasPrice()
+        });
       task.setTxHash(txHash);
     }
-    catch(e) {
+    catch (e) {
       throw e;
     }
 

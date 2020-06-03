@@ -29,19 +29,19 @@ export class InnerOwnTokenGrid extends Component<IInnerOwnTokenGridProps, IInner
   }
 
   private renderDesktop = () => {
-    const innerOwnRowsData = this.props.ownRowsData.map(e => <InnerOwnTokenGridRow key={`${e.currentKey.toString()}`} changeLoadingTransaction={this.props.changeLoadingTransaction} {...e} />);
+    const innerOwnRowsData = this.props.ownRowsData.map((e,i) => <InnerOwnTokenGridRow key={i} changeLoadingTransaction={this.props.changeLoadingTransaction} {...e} />);
     if (innerOwnRowsData.length === 0) return null;
 
     return (
       <div className="inner-own-token-grid">
-        <InnerOwnTokenGridHeader asset={this.props.ownRowsData[0].currentKey.asset} unitOfAccount={this.props.ownRowsData[0].currentKey.unitOfAccount} loader={this.props.loanId === this.props.ownRowsData[0].loan.loanId} isLoadingTransaction={this.props.isLoadingTransaction} />
+        <InnerOwnTokenGridHeader asset={this.props.ownRowsData[0].tradeAsset} unitOfAccount={this.props.ownRowsData[0].collateralAsset} loader={this.props.loanId === this.props.ownRowsData[0].loan.loanId} isLoadingTransaction={this.props.isLoadingTransaction} />
         {innerOwnRowsData}
       </div>
     );
   }
 
   private renderMobile = () => {
-    const innerOwnRowsDataMobile = this.props.ownRowsData.map(e => <InnerOwnTokenCardMobile key={`${e.currentKey.toString()}`} {...e} />);
+    const innerOwnRowsDataMobile = this.props.ownRowsData.map((e,i) => <InnerOwnTokenCardMobile key={i} {...e} />);
     if (innerOwnRowsDataMobile.length === 0) return null;
 
     return (

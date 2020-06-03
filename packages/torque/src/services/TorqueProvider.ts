@@ -1336,7 +1336,7 @@ export class TorqueProvider {
     const loansData = await iBZxContract.getUserLoans.callAsync(
       account,
       new BigNumber(50),
-      2 // Torque loans
+      0 // Torque loans
     );
     // console.log(loansData);
     const zero = new BigNumber(0);

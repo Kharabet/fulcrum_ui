@@ -186,7 +186,7 @@ export class ContractsSource {
         address = "0xc45755a7cfc9385290e6fece1f040c0453e7b0e5";
         break;
       case 42:
-        address = "0x115338E77339d64b3d58181Aa9c0518df9D18022";
+        address = "0xCc3d7DF311Ba18DCD3dF09401f3C3E1ED1D52405";
         break;
     }
 
@@ -206,7 +206,7 @@ export class ContractsSource {
         address = "0xef52dd2d03d7a44f9dda8d450f806fa84571cf84";
         break;
       case 42:
-        address = "0xce069b35ae99762bee444c81dec1728aa99afd4b";
+        address = "0xCc3d7DF311Ba18DCD3dF09401f3C3E1ED1D52405";
         break;
     }
 
@@ -226,7 +226,7 @@ export class ContractsSource {
         address = "0x76de3d406fee6c3316558406b17ff785c978e98c";
         break;
       case 42:
-        address = "0xc72e3a07b25c4ce85691b2eaca92ff2dd9ad06b3";
+        address = "0xBe2C2158Dc2Bf939f8ec89ddeFBbC5F8836f7331";
         break;
     }
 
@@ -335,18 +335,6 @@ export class ContractsSource {
       if (tradeTokenKey) {
         result.push(tradeTokenKey);
       }
-    });
-
-    return result;
-  }
-
-  public getPTokenAddresses(): string[] {
-    const result: string[] = [];
-    ContractsSource.pTokensContractInfos.forEach(e => {
-      result.push(e.token);
-    });
-    ContractsSource.pTokensContractInfosBurnOnly.forEach(e => {
-      result.push(e.token);
     });
 
     return result;

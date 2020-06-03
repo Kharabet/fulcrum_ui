@@ -1,8 +1,6 @@
 import React, { Component } from "react";
 import { Asset } from "../domain/Asset";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
-// import { PositionType } from "../domain/PositionType";
-// import { TradeTokenKey } from "../domain/TradeTokenKey";
 import { ReactComponent as WalletSvg } from "../assets/images/wallet-icon.svg";
 import { IDropDownSelectOption, DropdownSelect, IDropdownSelectProps } from "./DropdownSelect";
 

@@ -1,26 +1,22 @@
 import { BigNumber } from "@0x/utils";
 import React, { Component } from "react";
-import { AssetDetails } from "../domain/AssetDetails";
-import { AssetsDictionary } from "../domain/AssetsDictionary";
-import { IPriceDataPoint } from "../domain/IPriceDataPoint";
 import { TradeRequest } from "../domain/TradeRequest";
-import { TradeTokenKey } from "../domain/TradeTokenKey";
 import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
-import { TradeTransactionMinedEvent } from "../services/events/TradeTransactionMinedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
 import { Preloader } from "./Preloader";
+import { Asset } from "../domain/Asset";
+import { PositionType } from "../domain/PositionType";
 
 export interface IHistoryTokenGridRowProps {
-  currentKey: TradeTokenKey;
-  pTokenAddress: string;
+  tradeAsset: Asset;
+  collateralAsset: Asset;
+  leverage: number;
+  positionType: PositionType;
   onTrade: (request: TradeRequest) => void;
 }
 
 interface IHistoryTokenGridRowState {
-  assetDetails: AssetDetails | null;
-
-  latestAssetPriceDataPoint: IPriceDataPoint;
   assetBalance: BigNumber | null;
   profit: BigNumber | null;
   isLoading: boolean;
@@ -30,13 +26,10 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
   constructor(props: IHistoryTokenGridRowProps, context?: any) {
     super(props, context);
 
-    const assetDetails = AssetsDictionary.assets.get(props.currentKey.asset);
 
     this._isMounted = false;
 
     this.state = {
-      assetDetails: assetDetails || null,
-      latestAssetPriceDataPoint: FulcrumProvider.Instance.getPriceDefaultDataPoint(),
       assetBalance: new BigNumber(0),
       profit: new BigNumber(0),
       isLoading: true
@@ -44,40 +37,24 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
 
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
-    FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.TradeTransactionMined, this.onTradeTransactionMined);
   }
 
   private _isMounted: boolean;
 
   private async derivedUpdate() {
-    const tradeTokenKey = this.props.currentKey;
-    const latestAssetPriceDataPoint = await FulcrumProvider.Instance.getTradeTokenAssetLatestDataPoint(tradeTokenKey);
 
-    const data: [BigNumber | null, BigNumber | null] = await FulcrumProvider.Instance.getTradeBalanceAndProfit(tradeTokenKey);
-    const assetBalance = data[0];
-    const profit = data[1];
-
-    this._isMounted && this.setState(p => ({
+    this._isMounted && this.setState({
       ...this.state,
-      latestAssetPriceDataPoint: latestAssetPriceDataPoint,
-      assetBalance: assetBalance,
-      profit: profit,
-      isLoading: latestAssetPriceDataPoint.price !== 0 ? false : p.isLoading
-    }));
+      isLoading: false
+    });
   }
 
   private onProviderAvailable = async () => {
     await this.derivedUpdate();
   };
 
-  private onProviderChanged = async (event: ProviderChangedEvent) => {
+  private onProviderChanged = async () => {
     await this.derivedUpdate();
-  };
-
-  private onTradeTransactionMined = async (event: TradeTransactionMinedEvent) => {
-    if (event.key.toString() === this.props.currentKey.toString()) {
-      await this.derivedUpdate();
-    }
   };
 
   public componentWillUnmount(): void {
@@ -85,7 +62,6 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
 
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
-    FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.TradeTransactionMined, this.onTradeTransactionMined);
   }
 
   public componentDidMount(): void {
@@ -93,83 +69,67 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
 
     this.derivedUpdate();
   }
-  private renderOwnTokenRowHistory = (state: IHistoryTokenGridRowState, props: IHistoryTokenGridRowProps, bnPrice: BigNumber, bnLiquidationPrice: BigNumber): React.ReactFragment => {
-    if (!state.assetDetails) return <React.Fragment></React.Fragment>;
-    return (
-      <React.Fragment>
-        <div className="history-token-grid-row">
-          <div className="history-token-grid-row__col-token-date">
-            12 June 2019
-          </div>
-          <div className="history-token-grid-row__col-token-asset">
-            SAI
-          </div>
-          <div className="history-token-grid-row__col-type">
-            <div className="position-type-marker">
-              {`${props.currentKey.leverage}x ${props.currentKey.positionType}`}
-            </div>
-          </div>
-          <div className="history-token-grid-row__col-asset-unit">
-            {props.currentKey.unitOfAccount}
-          </div>
-          <div className="history-token-grid-row__col-position">
-            0.8884
-          </div>
-          <div className="history-token-grid-row__col-asset-price">
-            {!state.isLoading
-              ? <React.Fragment>
-                <span className="sign-currency">$</span>{bnPrice.toFixed(2)}
-              </React.Fragment>
-              : <Preloader width="74px" />
-            }
-          </div>
-          <div className="history-token-grid-row__col-liquidation-price">
-            {!state.isLoading
-              ? state.assetBalance
-                ? <React.Fragment>
-                  <span className="sign-currency">$</span>{bnLiquidationPrice.toFixed(2)}
-                </React.Fragment>
-                : '$0.00'
-              : <Preloader width="74px" />
-            }
-          </div>
-          <div className="history-token-grid-row__col-position-value">
-            {!state.isLoading
-              ? state.assetBalance
-                ? <React.Fragment>
-                  <span className="sign-currency">$</span>{state.assetBalance.toFixed(2)}
-                </React.Fragment>
-                : '$0.00'
-              : <Preloader width="74px" />
-            }
-          </div>
-          <div className="history-token-grid-row__col-profit">
-            {!state.isLoading
-              ? state.profit
-                ? <React.Fragment>
-                  <span className="sign-currency">$</span>{state.profit.toFixed(2)}
-                </React.Fragment>
-                : '$0.00'
-              : <Preloader width="74px" />
-            }
-          </div>
-          <div className="history-token-grid-row__result">
-            Liquidated
-          </div>
-        </div>
-      </React.Fragment>
-    );
-
-  }
 
   public render() {
-    if (!this.state.assetDetails) {
-      return null;
-    }
-
-    const bnPrice = new BigNumber(this.state.latestAssetPriceDataPoint.price);
-    const bnLiquidationPrice = new BigNumber(this.state.latestAssetPriceDataPoint.liquidationPrice);
-
-    return this.renderOwnTokenRowHistory(this.state, this.props, bnPrice, bnLiquidationPrice);
+    return (<div className="history-token-grid-row">
+      <div className="history-token-grid-row__col-token-date">
+        12 June 2019
+    </div>
+      <div className="history-token-grid-row__col-token-asset">
+        SAI
+    </div>
+      <div className="history-token-grid-row__col-type">
+        <div className="position-type-marker">
+          {`${this.props.leverage}x ${this.props.positionType}`}
+        </div>
+      </div>
+      <div className="history-token-grid-row__col-asset-unit">
+        {this.props.collateralAsset}
+      </div>
+      <div className="history-token-grid-row__col-position">
+        0.8884
+    </div>
+      <div className="history-token-grid-row__col-asset-price">
+        {!this.state.isLoading
+          ? <React.Fragment>
+            <span className="sign-currency">$</span>{new BigNumber(0).toFixed(2)}
+          </React.Fragment>
+          : <Preloader width="74px" />
+        }
+      </div>
+      <div className="history-token-grid-row__col-liquidation-price">
+        {!this.state.isLoading
+          ? this.state.assetBalance
+            ? <React.Fragment>
+              <span className="sign-currency">$</span>{new BigNumber(0).toFixed(2)}
+            </React.Fragment>
+            : '$0.00'
+          : <Preloader width="74px" />
+        }
+      </div>
+      <div className="history-token-grid-row__col-position-value">
+        {!this.state.isLoading
+          ? this.state.assetBalance
+            ? <React.Fragment>
+              <span className="sign-currency">$</span>{this.state.assetBalance.toFixed(2)}
+            </React.Fragment>
+            : '$0.00'
+          : <Preloader width="74px" />
+        }
+      </div>
+      <div className="history-token-grid-row__col-profit">
+        {!this.state.isLoading
+          ? this.state.profit
+            ? <React.Fragment>
+              <span className="sign-currency">$</span>{this.state.profit.toFixed(2)}
+            </React.Fragment>
+            : '$0.00'
+          : <Preloader width="74px" />
+        }
+      </div>
+      <div className="history-token-grid-row__result">
+        Liquidated
+    </div>
+    </div>)
   }
 }

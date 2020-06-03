@@ -29,11 +29,11 @@ export default class LendPage extends PureComponent<ILendPageProps, ILendPageSta
   constructor(props: any) {
     super(props);
 
-    this.state = { 
-      isLendModalOpen: false, 
-      lendType: LendType.LEND, 
+    this.state = {
+      isLendModalOpen: false,
+      lendType: LendType.LEND,
       lendAsset: Asset.UNKNOWN,
-      lendRequestId: 0 
+      lendRequestId: 0
     };
   }
 
@@ -60,6 +60,9 @@ export default class LendPage extends PureComponent<ILendPageProps, ILendPageSta
               Full functionality will return after a thorough audit of our newly implemented and preexisting smart contracts.
           </InfoBlock>
             : null}
+
+          {this.props.isMobileMedia && <div className="lend-page__header">Lend</div>
+          }
           <LendTokenSelector onLend={this.onLendRequested} />
           <Modal
             isOpen={this.state.isLendModalOpen}
@@ -77,7 +80,6 @@ export default class LendPage extends PureComponent<ILendPageProps, ILendPageSta
             />
           </Modal>
         </main>
-        {/* <Footer isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} /> */}
       </div>
     );
   }
@@ -87,7 +89,7 @@ export default class LendPage extends PureComponent<ILendPageProps, ILendPageSta
       this.props.doNetworkConnect();
       return;
     }
-    const lendRequestId= request.id;
+    const lendRequestId = request.id;
 
     if (request) {
       this.setState({
