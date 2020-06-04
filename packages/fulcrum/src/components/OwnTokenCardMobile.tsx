@@ -145,7 +145,7 @@ export class OwnTokenCardMobile extends Component<IOwnTokenGridRowProps, IOwnTok
           <div className="own-token-card-mobile__body-row">
             <div className="own-token-card-mobile__position">
               <span className="own-token-card-mobile__body-header">Position({this.props.tradeAsset})</span>
-              <span className="own-token-card-mobile__value">
+              <span title={this.state.positionValue.toFixed(18)} className="own-token-card-mobile__value">
                 {!this.state.isLoading ?
                   <React.Fragment><span className="sign-currency"></span>{this.state.positionValue.toFixed(4)}</React.Fragment>
                   : <Preloader width="74px" />
@@ -174,7 +174,7 @@ export class OwnTokenCardMobile extends Component<IOwnTokenGridRowProps, IOwnTok
           <div className="own-token-card-mobile__body-row">
             <div className="own-token-card-mobile__collateral">
               <span className="own-token-card-mobile__body-header">Collateral</span>
-              <div className="own-token-card-mobile__col-collateral-wrapper">
+              <div title={this.state.collateral.toFixed(18)} className="own-token-card-mobile__col-collateral-wrapper">
                 <span className="own-token-card-mobile__value"><span className="sign-currency">$</span>{this.state.collateral.toFixed(2)}</span>
                 <span className="own-token-card-mobile__col-asset-collateral-small">16.5%</span>
               </div>

@@ -121,7 +121,7 @@ export class InnerOwnTokenCardMobile extends Component<IOwnTokenGridRowProps, II
   public render() {
     return (<div className="inner-own-token-card-mobile">
     <div className="inner-own-token-card-mobile__body-row">
-      <div className="inner-own-token-card-mobile__col-token-name-full">
+      <div title={this.state.positionValue.toFixed(18)} className="inner-own-token-card-mobile__col-token-name-full">
         <span className="inner-own-token-header">{`Position (${this.props.tradeAsset.toUpperCase()}/DAI)`}</span>
         {this.state.positionValue.toFixed(4)}
 
@@ -146,7 +146,7 @@ export class InnerOwnTokenCardMobile extends Component<IOwnTokenGridRowProps, II
           : <Preloader width="74px" />
         }
       </div>
-      <div className="inner-own-token-card-mobile__col-asset-collateral">
+      <div title={this.state.collateral.toFixed(18)} className="inner-own-token-card-mobile__col-asset-collateral">
         <span className="inner-own-token-header">Collateral</span>
         <React.Fragment>
           <span className="sign-currency">$</span>{this.state.collateral.toFixed(2)}

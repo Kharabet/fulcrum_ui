@@ -176,7 +176,7 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
           <TradeTxLoaderStep taskId={this.state.request.id} />
         </div>
         : <div className={`inner-own-token-grid-row`}>
-          <div className="inner-own-token-grid-row__col-token-name-full opacityIn">
+          <div title={this.state.positionValue.toFixed(18)} className="inner-own-token-grid-row__col-token-name-full opacityIn">
             {this.state.positionValue.toFixed(4)}
           </div>
           <div title={this.props.collateralAsset} className="inner-own-token-grid-row__col-asset-type">
@@ -191,7 +191,7 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
               : <Preloader width="74px" />
             }
           </div>
-          <div className="inner-own-token-grid-row__col-asset-collateral">
+          <div title={this.state.collateral.toFixed(18)} className="inner-own-token-grid-row__col-asset-collateral">
             {!this.state.isLoading
               ? <React.Fragment>
                 <span className="sign-currency">$</span>{this.state.collateral.toFixed(2)}
