@@ -194,12 +194,15 @@ export class InnerOwnTokenCardMobile extends Component<IOwnTokenGridRowProps, II
   public onManageClick = (event: React.MouseEvent<HTMLElement>) => {
     event.stopPropagation();
 
-    // this.props.onManageCollateralOpen(
-    //   new ManageCollateralRequest(
-    //     this.props.loan,
-    //     false
-    //   )
-    // );
+    this.props.onManageCollateralOpen(
+      new ManageCollateralRequest(
+        this.props.loan.loanId,
+        this.props.tradeAsset,
+        this.props.collateralAsset,
+        this.props.loan.collateralAmount,
+        false
+      )
+    );
   };
 
   public onSellClick = (event: React.MouseEvent<HTMLElement>) => {

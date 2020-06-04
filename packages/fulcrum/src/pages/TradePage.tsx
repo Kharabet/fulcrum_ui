@@ -248,28 +248,16 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
             className="modal-content-div"
             overlayClassName="modal-overlay-div"
           >
-            {/* <ManageCollateralForm
-              isMobileMedia={this.props.isMobileMedia}
-              asset={this.state.tradeAsset}
-              tradeType={TradeType.BUY}
+            <ManageCollateralForm
+              loan={this.state.loans?.find(e => e.loanId === this.state.loanId)}
               leverage={this.state.tradeLeverage}
               positionType={this.state.tradePositionType}
-              bestCollateral={
-                this.state.tradeAsset === Asset.ETH ?
-                  Asset.ETH :
-                  this.state.tradePositionType === PositionType.SHORT ?
-                    this.state.tradeAsset :
-                    this.state.tradeUnitOfAccount}
-              defaultCollateral={this.state.collateralToken}
-              defaultUnitOfAccount={this.state.tradeUnitOfAccount}
-              defaultTokenizeNeeded={true}
               onSubmit={this.onManageCollateralConfirmed}
               onCancel={this.onManageCollateralRequestClose}
-              onManage={this.onManageCollateralRequested}
-              version={this.state.tradeVersion}
               isOpenModal={this.state.isManageCollateralModalOpen}
+              isMobileMedia={this.props.isMobileMedia}
 
-            /> */}
+            />
           </Modal>
         </main>
       </div>
@@ -289,25 +277,21 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
   };
 
   public onManageCollateralRequested = (request: ManageCollateralRequest) => {
-    //   if (!FulcrumProvider.Instance.contractsSource || !FulcrumProvider.Instance.contractsSource.canWrite) {
-    //     this.props.doNetworkConnect();
-    //     return;
-    //   }
+    if (!FulcrumProvider.Instance.contractsSource || !FulcrumProvider.Instance.contractsSource.canWrite) {
+      this.props.doNetworkConnect();
+      return;
+    }
 
-    //   if (request) {
-    //     this.setState({
-    //       ...this.state,
-    //       isManageCollateralModalOpen: true,
-    //       collateralToken: request.collateral,
-    //       tradeType: request.tradeType,
-    //       tradeAsset: request.asset,
-    //       tradeUnitOfAccount: request.unitOfAccount,
-    //       tradePositionType: request.positionType,
-    //       tradeLeverage: request.leverage,
-    //       tradeVersion: request.version,
-    //       tradeRequestId: request.id,
-    //     });
-    //   }
+    if (request) {
+      this.setState({
+        ...this.state,
+        isManageCollateralModalOpen: true,
+        collateralToken: request.collateralAsset,
+
+        tradeAsset: request.asset,
+        tradeRequestId: request.id,
+      });
+    }
   };
 
   public onManageCollateralConfirmed = (request: ManageCollateralRequest) => {
@@ -315,22 +299,16 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     FulcrumProvider.Instance.onManageCollateralConfirmed(request);
     this.setState({
       ...this.state,
+      collateralToken: request.collateralAsset,
       isManageCollateralModalOpen: false
     });
   };
 
   public onManageCollateralRequestOpen = (request: ManageCollateralRequest) => {
-    //   this.setState({
-    //     ...this.state,
-    //     collateralToken: request.collateral,
-    //     tradeType: request.tradeType,
-    //     tradeAsset: request.asset,
-    //     tradeUnitOfAccount: request.unitOfAccount,
-    //     tradePositionType: request.positionType,
-    //     tradeLeverage: request.leverage,
-    //     tradeVersion: request.version,
-    //     isManageCollateralModalOpen: true
-    //   });
+    this.setState({
+      ...this.state,
+      isManageCollateralModalOpen: true
+    });
   };
 
   public onManageCollateralRequestClose = () => {
@@ -400,7 +378,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       // const pTokens = FulcrumProvider.Instance.getPTokensAvailable();
       // const pTokenAddreses: string[] = FulcrumProvider.Instance.getPTokenErc20AddressList();
       // const pTokenBalances = await FulcrumProvider.Instance.getErc20BalancesOfUser(pTokenAddreses);
-      this.setState({...this.state, loans})
+      this.setState({ ...this.state, loans })
       for (const loan of loans) {
         // const balance = pTokenBalances.get(pToken.erc20Address);
         if (!(loan.collateralAsset === this.state.selectedTabAsset || loan.loanAsset === this.state.selectedTabAsset))
@@ -416,7 +394,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
           ? loan.loanAsset
           : loan.collateralAsset;
 
-          const collateralAsset = loan.collateralAsset === this.state.selectedTabAsset
+        const collateralAsset = loan.collateralAsset === this.state.selectedTabAsset
           ? loan.loanAsset
           : loan.collateralAsset;
 
@@ -454,9 +432,9 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         }
         ownRowsData.push({
           loan: loan,
-          tradeAsset: this.state.selectedTabAsset, 
+          tradeAsset: this.state.selectedTabAsset,
           collateralAsset: collateralAsset,
-          positionType, 
+          positionType,
           leverage,
           onTrade: this.onTradeRequested,
           onManageCollateralOpen: this.onManageCollateralRequested,

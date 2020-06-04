@@ -241,12 +241,15 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
   public onManageClick = async (event: React.MouseEvent<HTMLElement>) => {
     event.stopPropagation();
 
-    // const request = new ManageCollateralRequest(
-    //   this.props.loan,
-    //   false
-
-    // )
-    // this.props.onManageCollateralOpen(request);
+    this.props.onManageCollateralOpen(
+      new ManageCollateralRequest(
+        this.props.loan.loanId,
+        this.props.tradeAsset,
+        this.props.collateralAsset,
+        this.props.loan.collateralAmount,
+        false
+      )
+    );
   };
 
   public onSellClick = async (event: React.MouseEvent<HTMLElement>) => {
