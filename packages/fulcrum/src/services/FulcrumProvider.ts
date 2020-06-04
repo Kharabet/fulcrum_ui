@@ -58,6 +58,7 @@ export class FulcrumProvider {
   public static Instance: FulcrumProvider;
 
   public readonly gasLimit = "4500000";
+  public static readonly ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 
   // gasBufferCoeff equal 110% gas reserve
   public readonly gasBufferCoeff = new BigNumber("1.06");
@@ -1128,7 +1129,7 @@ export class FulcrumProvider {
   //   return slippage;
   // }
 
-  public getEstimatedMarginExposure = async (request: TradeRequest): Promise<BigNumber> => {
+  public getEstimatedMarginDetails = async (request: TradeRequest): Promise<BigNumber> => {
 
     let result = new BigNumber(0);
 
@@ -1164,18 +1165,20 @@ export class FulcrumProvider {
         : new BigNumber(0);
 
       //const depositTokenAddress = FulcrumProvider.Instance.getErc20AddressOfAsset(depositToken);
-      const collateralTokenAddress = FulcrumProvider.Instance.getErc20AddressOfAsset(collateralToken);
+      const collateralTokenAddress = collateralToken !== Asset.ETH
+      ? FulcrumProvider.Instance.getErc20AddressOfAsset(collateralToken)
+      : FulcrumProvider.ZERO_ADDRESS;
       const loanData = "0x";
       try {
         console.log("leverageAmount" + leverageAmount);
         console.log("loanTokenSent" + loanTokenSent);
         console.log("collateralTokenSent" + collateralTokenSent);
         console.log("collateralTokenAddress" + collateralTokenAddress);
-        result = await tokenContract.getEstimatedMarginExposure.callAsync(
+        result = (await tokenContract.getEstimatedMarginDetails.callAsync(
           leverageAmount,
           loanTokenSent,
           collateralTokenSent,
-          collateralTokenAddress!);
+          collateralTokenAddress!))[1];
       }
       catch (e) {
         console.error(e)

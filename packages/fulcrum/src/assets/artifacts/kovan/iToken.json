@@ -1382,14 +1382,22 @@
                     "type": "uint256"
                 },
                 {
-                    "name": "collateralToken",
+                    "name": "collateralTokenAddress",
                     "type": "address"
                 }
             ],
-            "name": "getEstimatedMarginExposure",
+            "name": "getEstimatedMarginDetails",
             "outputs": [
                 {
-                    "name": "",
+                    "name": "principal",
+                    "type": "uint256"
+                },
+                {
+                    "name": "collateral",
+                    "type": "uint256"
+                },
+                {
+                    "name": "interestRate",
                     "type": "uint256"
                 }
             ],

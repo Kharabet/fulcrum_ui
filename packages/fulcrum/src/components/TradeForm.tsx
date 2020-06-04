@@ -239,7 +239,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
     // const latestPriceDataPoint = await FulcrumProvider.Instance.getTradeTokenAssetLatestDataPoint(tradeTokenKey);
     const liquidationPrice = new BigNumber(0); //new BigNumber(latestPriceDataPoint.liquidationPrice);
 
-    const exposureValue = await FulcrumProvider.Instance.getEstimatedMarginExposure(tradeRequest);
+    const exposureValue = await FulcrumProvider.Instance.getEstimatedMarginDetails(tradeRequest);
 
     this._isMounted && this.setState({
       ...this.state,
@@ -577,7 +577,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
                 this.props.leverage,
                 limitedAmount.tradeAmountValue
               );
-              const exposureValue = await FulcrumProvider.Instance.getEstimatedMarginExposure(tradeRequest);
+              const exposureValue = await FulcrumProvider.Instance.getEstimatedMarginDetails(tradeRequest);
               observer.next({
                 isTradeAmountTouched: true,
                 inputAmountText: limitedAmount.inputAmountText,
@@ -614,7 +614,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
             this.props.leverage,
             limitedAmount.tradeAmountValue
           );
-          const exposureValue = await FulcrumProvider.Instance.getEstimatedMarginExposure(tradeRequest);
+          const exposureValue = await FulcrumProvider.Instance.getEstimatedMarginDetails(tradeRequest);
           observer.next({
             isTradeAmountTouched: true,
             inputAmountText: limitedAmount.inputAmountText,
