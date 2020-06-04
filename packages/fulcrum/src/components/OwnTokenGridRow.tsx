@@ -188,7 +188,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
           {this.props.collateralAsset}
         </div>
         <div title={this.props.collateralAsset} className="own-token-grid-row__col-position">
-          {this.state.positionValue.toFixed(2)}
+          {this.state.positionValue.toFixed(4)}
         </div>
         <div title={this.state.openPrice.toFixed(18)} className="own-token-grid-row__col-asset-price">
           {!this.state.isLoading

@@ -177,7 +177,7 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
         </div>
         : <div className={`inner-own-token-grid-row`}>
           <div className="inner-own-token-grid-row__col-token-name-full opacityIn">
-            {this.state.positionValue.toFixed(2)}
+            {this.state.positionValue.toFixed(4)}
           </div>
           <div title={this.props.collateralAsset} className="inner-own-token-grid-row__col-asset-type">
             <span className="position-type-marker">{`${this.props.leverage}x`}&nbsp; {this.props.positionType}</span>

@@ -123,7 +123,7 @@ export class InnerOwnTokenCardMobile extends Component<IOwnTokenGridRowProps, II
     <div className="inner-own-token-card-mobile__body-row">
       <div className="inner-own-token-card-mobile__col-token-name-full">
         <span className="inner-own-token-header">{`Position (${this.props.tradeAsset.toUpperCase()}/DAI)`}</span>
-        {this.state.positionValue.toFixed(2)}
+        {this.state.positionValue.toFixed(4)}
 
       </div>
       <div title={this.props.collateralAsset} className="inner-own-token-card-mobile__col-asset-type">

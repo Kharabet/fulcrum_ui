@@ -147,7 +147,7 @@ export class OwnTokenCardMobile extends Component<IOwnTokenGridRowProps, IOwnTok
               <span className="own-token-card-mobile__body-header">Position({this.props.tradeAsset})</span>
               <span className="own-token-card-mobile__value">
                 {!this.state.isLoading ?
-                  <React.Fragment><span className="sign-currency"></span>{this.state.positionValue.toFixed(2)}</React.Fragment>
+                  <React.Fragment><span className="sign-currency"></span>{this.state.positionValue.toFixed(4)}</React.Fragment>
                   : <Preloader width="74px" />
                 }
               </span>
