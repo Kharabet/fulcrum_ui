@@ -20,6 +20,7 @@ import { IOwnTokenGridRowProps } from "../components/OwnTokenGridRow";
 
 import "../styles/pages/_trade-page.scss";
 import { BigNumber } from "@0x/utils";
+import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
 
 const ManageTokenGrid = React.lazy(() => import('../components/ManageTokenGrid'));
 const TradeForm = React.lazy(() => import('../components/TradeForm'));
@@ -45,7 +46,7 @@ interface ITradePageState {
   tradeLeverage: number;
   tradeVersion: number;
   loanId?: string;
-
+  loans: IBorrowedFundsState[] | undefined;
   collateralToken: Asset;
 
   isTokenAddressFormOpen: boolean;
@@ -68,6 +69,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
   constructor(props: any) {
     super(props);
     this.state = {
+      loans: undefined,
       showMyTokensOnly: false,
       selectedTabAsset: Asset.ETH,
       isTradeModalOpen: false,
@@ -218,7 +220,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
             overlayClassName="modal-overlay-div"
           >
             <TradeForm
-              loanId={this.state.loanId}
+              loan={this.state.loans?.find(e => e.loanId === this.state.loanId)}
               isMobileMedia={this.props.isMobileMedia}
               tradeType={this.state.tradeType}
               asset={this.state.tradeAsset}
@@ -398,6 +400,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       // const pTokens = FulcrumProvider.Instance.getPTokensAvailable();
       // const pTokenAddreses: string[] = FulcrumProvider.Instance.getPTokenErc20AddressList();
       // const pTokenBalances = await FulcrumProvider.Instance.getErc20BalancesOfUser(pTokenAddreses);
+      this.setState({...this.state, loans})
       for (const loan of loans) {
         // const balance = pTokenBalances.get(pToken.erc20Address);
         if (!(loan.collateralAsset === this.state.selectedTabAsset || loan.loanAsset === this.state.selectedTabAsset))

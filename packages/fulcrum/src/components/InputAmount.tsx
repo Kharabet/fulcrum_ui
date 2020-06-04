@@ -16,7 +16,7 @@ interface IInputAmountProps {
   asset: any;
   onInsertMaxValue: (value: number) => void;
   onTradeAmountChange: (event: ChangeEvent<HTMLInputElement>) => void;
-  onCollateralChange: (asset:Asset)=> void;
+  onCollateralChange: (asset: Asset) => void;
 }
 
 interface IInputAmountState {
@@ -34,17 +34,10 @@ export class InputAmount extends Component<IInputAmountProps, IInputAmountState>
       isChangeCollateralOpen: false
     };
   }
-  public async componentDidMount(){
+  public async componentDidMount() {
     if (this._input) {
-    this._input.focus();   
+      this._input.focus();
     }
-  }
-
-  public componentDidUpdate(prevProps: Readonly<IInputAmountProps>, prevState: Readonly<IInputAmountState>, snapshot?: any): void {
-    if (this.state.buttonValue !== prevState.buttonValue){
-      this.props.onInsertMaxValue(this.state.buttonValue);
-
-    }    
   }
 
   private _setInputRef = (input: HTMLInputElement) => {
@@ -103,19 +96,21 @@ export class InputAmount extends Component<IInputAmountProps, IInputAmountState>
     this.setState({ ...this.state, isChangeCollateralOpen: false });
   };
 
- 
+
   public setButtonValue = (event: any) => {
     event.preventDefault();
     let buttonElement = event.currentTarget as HTMLButtonElement;
     let value = parseFloat(buttonElement.dataset.value!);
-   this.setState({ ...this.state, buttonValue: value })
+    this.setState({ ...this.state, buttonValue: value });
+
+    this.props.onInsertMaxValue(value);
   }
 
   private formatPrecision(output: string): string {
     let sign = "";
-    let number = Number(output);    
+    let number = Number(output);
     if (!number)
-     return output;
+      return output;
 
     if (number < 0)
       sign = "-";
