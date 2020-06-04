@@ -6,11 +6,9 @@ import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { IPriceDataPoint } from "../domain/IPriceDataPoint";
 import { PositionType } from "../domain/PositionType";
 import { TradeRequest } from "../domain/TradeRequest";
-import { TradeTokenKey } from "../domain/TradeTokenKey";
 import { TradeType } from "../domain/TradeType";
 import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
-import { TradeTransactionMinedEvent } from "../services/events/TradeTransactionMinedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
 import { PositionTypeMarkerAlt } from "./PositionTypeMarkerAlt";
 import siteConfig from "../config/SiteConfig.json";
@@ -29,6 +27,9 @@ interface ITradeTokenCardMobileState {
   assetDetails: AssetDetails | null;
   leverage: number;
   version: number;
+
+  tradeAssetPrice: BigNumber;
+  liquidationPrice: BigNumber;
 
   latestPriceDataPoint: IPriceDataPoint;
   interestRate: BigNumber;
@@ -49,71 +50,37 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
       latestPriceDataPoint: FulcrumProvider.Instance.getPriceDefaultDataPoint(),
       interestRate: new BigNumber(0),
       balance: new BigNumber(0),
+      tradeAssetPrice: new BigNumber(0),
+      liquidationPrice: new BigNumber(0),
       version: 2,
       isLoading: true
     };
 
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
-    FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.TradeTransactionMined, this.onTradeTransactionMined);
   }
 
   private _isMounted: boolean;
 
-  private getTradeTokenGridRowSelectionKeyRaw(props: ITradeTokenCardMobileProps, leverage: number = this.state.leverage) {
-    const key = new TradeTokenKey(props.asset, props.defaultUnitOfAccount, props.positionType, leverage, props.defaultTokenizeNeeded, 2);
-
-    // check for version 2, and revert back to version if not found
-    if (key.erc20Address === "") {
-      key.setVersion(1);
-    }
-
-    return key;
-  }
-
-  private getTradeTokenGridRowSelectionKey(leverage: number = this.state.leverage) {
-    return this.getTradeTokenGridRowSelectionKeyRaw(this.props, leverage);
-  }
-
   private async derivedUpdate() {
-    let version = 2;
+    const tradeAssetPrice = await FulcrumProvider.Instance.getSwapToUsdRate(this.props.asset);
 
-    const tradeTokenKey = new TradeTokenKey(this.props.asset, this.props.defaultUnitOfAccount, this.props.positionType, this.state.leverage, this.props.defaultTokenizeNeeded, version);
-    if (tradeTokenKey.erc20Address === "") {
-      tradeTokenKey.setVersion(1);
-      version = 1;
-    }
-
-    const latestPriceDataPoint = await FulcrumProvider.Instance.getTradeTokenAssetLatestDataPoint(tradeTokenKey);
-    const interestRate = await FulcrumProvider.Instance.getTradeTokenInterestRate(tradeTokenKey);
-    const balance = await FulcrumProvider.Instance.getPTokenBalanceOfUser(tradeTokenKey);
+    const interestRate = await FulcrumProvider.Instance.getBorrowInterestRate(this.props.asset);
 
     this._isMounted && this.setState({
       ...this.state,
-      latestPriceDataPoint: latestPriceDataPoint,
+      tradeAssetPrice,
       interestRate: interestRate,
-      balance: balance,
-      version: version
+      isLoading: false
     });
-    if (latestPriceDataPoint.price != 0) {
-      this._isMounted && this.setState({
-        isLoading: false,
-      });
-    }
   }
 
   private onProviderAvailable = async () => {
     await this.derivedUpdate();
   };
 
-  private onProviderChanged = async (event: ProviderChangedEvent) => {
+  private onProviderChanged = async () => {
     await this.derivedUpdate();
-  };
-
-  private onTradeTransactionMined = async (event: TradeTransactionMinedEvent) => {
-    if (event.key.toString() === this.getTradeTokenGridRowSelectionKey().toString()) {
-      await this.derivedUpdate();
-    }
   };
 
   public componentWillUnmount(): void {
@@ -121,7 +88,6 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
 
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
-    FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.TradeTransactionMined, this.onTradeTransactionMined);
   }
 
   public componentDidMount(): void {
@@ -144,8 +110,6 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
     if (!this.state.assetDetails) {
       return null;
     }
-
-    const bnPrice = new BigNumber(this.state.latestPriceDataPoint.price);
     const bnLiquidationPrice = new BigNumber(this.state.latestPriceDataPoint.liquidationPrice);
 
     return (
@@ -182,11 +146,11 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
             </div>
           </div>
           <div className="trade-token-card-mobile__body-row">
-            <div title={`$${bnPrice.toFixed(18)}`} className="trade-token-card-mobile__price">
+            <div title={this.state.tradeAssetPrice.toFixed(18)} className="trade-token-card-mobile__price">
               <span>Asset Price</span>
               <span>
                 {!this.state.isLoading ?
-                  <React.Fragment><span className="fw-normal">$</span>{bnPrice.toFixed(2)}</React.Fragment>
+                  <React.Fragment><span className="fw-normal">$</span>{this.state.tradeAssetPrice.toFixed(2)}</React.Fragment>
                   : <Preloader width="74px" />
                 }
               </span>
@@ -216,9 +180,7 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
   }
 
   public onLeverageSelect = (value: number) => {
-    const key = this.getTradeTokenGridRowSelectionKey(value);
-
-    this._isMounted && this.setState({ ...this.state, leverage: value, version: key.version, isLoading: true });
+    this._isMounted && this.setState({ ...this.state, leverage: value, isLoading: true });
   };
 
   public onBuyClick = (event: React.MouseEvent<HTMLElement>) => {

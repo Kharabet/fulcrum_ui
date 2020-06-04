@@ -891,22 +891,22 @@ export class iTokenContract extends BaseContract {
         }
     };
 
-    public getEstimatedMarginExposure = {
+    public getEstimatedMarginDetails = {
         async callAsync(
             leverageAmount: BigNumber,
             loanTokenSent: BigNumber,
             collateralTokenSent: BigNumber,
-            collateralToken: string,
+            collateralTokenAddress: string,
             callData: Partial<CallData> = {},
             defaultBlock?: BlockParam
-        ): Promise<BigNumber> {
+        ): Promise<[BigNumber,BigNumber,BigNumber]> {
             callData.from = "0x4abB24590606f5bf4645185e20C4E7B97596cA3B";
             const self = this as any as iTokenContract;
-            const encodedData = self._strictEncodeArguments("getEstimatedMarginExposure(uint256,uint256,uint256,address)", [
+            const encodedData = self._strictEncodeArguments("getEstimatedMarginDetails(uint256,uint256,uint256,address)", [
                 leverageAmount,
                 loanTokenSent,
                 collateralTokenSent,
-                collateralToken
+                collateralTokenAddress
             ]);
             const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
                 {
@@ -918,9 +918,9 @@ export class iTokenContract extends BaseContract {
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
             BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
-            const abiEncoder = self._lookupAbiEncoder("getEstimatedMarginExposure(uint256,uint256,uint256,address)");
+            const abiEncoder = self._lookupAbiEncoder("getEstimatedMarginDetails(uint256,uint256,uint256,address)");
             // tslint:disable boolean-naming
-            const result = abiEncoder.strictDecodeReturnValue<BigNumber>(rawCallResult);
+            const result = abiEncoder.strictDecodeReturnValue<[BigNumber,BigNumber,BigNumber]>(rawCallResult);
             // tslint:enable boolean-naming
             return result;
         }

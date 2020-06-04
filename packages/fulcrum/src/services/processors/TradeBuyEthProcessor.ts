@@ -1,10 +1,6 @@
 import { BigNumber } from "@0x/utils";
-import { pTokenContract } from "../../contracts/pTokenContract";
-import { AssetsDictionary } from "../../domain/AssetsDictionary";
 import { RequestTask } from "../../domain/RequestTask";
 import { TradeRequest } from "../../domain/TradeRequest";
-import { TradeTokenKey } from "../../domain/TradeTokenKey";
-import { FulcrumProviderEvents } from "../events/FulcrumProviderEvents";
 import { FulcrumProvider } from "../FulcrumProvider";
 import { PositionType } from "../../domain/PositionType";
 import { Asset } from "../../domain/Asset";

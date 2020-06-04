@@ -5,7 +5,6 @@ import { Asset } from "../domain/Asset";
 import { ManageCollateralRequest } from "../domain/ManageCollateralRequest";
 import { PositionType } from "../domain/PositionType";
 import { TradeRequest } from "../domain/TradeRequest";
-import { TradeTokenKey } from "../domain/TradeTokenKey";
 import { TradeType } from "../domain/TradeType";
 import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
@@ -21,9 +20,9 @@ import { IOwnTokenGridRowProps } from "../components/OwnTokenGridRow";
 
 import "../styles/pages/_trade-page.scss";
 import { BigNumber } from "@0x/utils";
+import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
 
 const ManageTokenGrid = React.lazy(() => import('../components/ManageTokenGrid'));
-const TokenAddressForm = React.lazy(() => import('../components/TokenAddressForm'));
 const TradeForm = React.lazy(() => import('../components/TradeForm'));
 const ManageCollateralForm = React.lazy(() => import('../components/ManageCollateralForm'));
 
@@ -47,11 +46,10 @@ interface ITradePageState {
   tradeLeverage: number;
   tradeVersion: number;
   loanId?: string;
-
+  loans: IBorrowedFundsState[] | undefined;
   collateralToken: Asset;
 
   isTokenAddressFormOpen: boolean;
-  tradeTokenKey: TradeTokenKey;
 
   isManageCollateralModalOpen: boolean;
 
@@ -71,19 +69,20 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
   constructor(props: any) {
     super(props);
     this.state = {
+      loans: undefined,
       showMyTokensOnly: false,
       selectedTabAsset: Asset.ETH,
       isTradeModalOpen: false,
       tradeType: TradeType.BUY,
       tradeAsset: Asset.UNKNOWN,
       tradeUnitOfAccount: Asset.UNKNOWN,
-      defaultUnitOfAccount: process.env.REACT_APP_ETH_NETWORK === "kovan" ? Asset.SAI : Asset.DAI,
+      // defaultUnitOfAccount: process.env.REACT_APP_ETH_NETWORK === "kovan" ? Asset.SAI : Asset.DAI,
+      defaultUnitOfAccount: Asset.DAI,
       tradePositionType: PositionType.SHORT,
       tradeLeverage: 0,
       tradeVersion: 1,
       collateralToken: Asset.UNKNOWN,
       isTokenAddressFormOpen: false,
-      tradeTokenKey: TradeTokenKey.empty(),
       isManageCollateralModalOpen: false,
       assets: this.getAssets(),
       defaultTokenizeNeeded: true,
@@ -221,7 +220,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
             overlayClassName="modal-overlay-div"
           >
             <TradeForm
-              loanId={this.state.loanId}
+              loan={this.state.loans?.find(e => e.loanId === this.state.loanId)}
               isMobileMedia={this.props.isMobileMedia}
               tradeType={this.state.tradeType}
               asset={this.state.tradeAsset}
@@ -241,18 +240,6 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
               onTrade={this.onTradeRequested}
               version={this.state.tradeVersion}
               isOpenModal={this.state.isTradeModalOpen}
-            />
-          </Modal>
-          <Modal
-            isOpen={this.state.isTokenAddressFormOpen}
-
-            onRequestClose={this.onTokenAddressFormRequestClose}
-            className="modal-content-div"
-            overlayClassName="modal-overlay-div"
-          >
-            <TokenAddressForm
-              tradeTokenKey={this.state.tradeTokenKey}
-              onCancel={this.onTokenAddressFormRequestClose}
             />
           </Modal>
           <Modal
@@ -291,14 +278,6 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
 
   public onTabSelect = async (asset: Asset) => {
     await this.setState({ ...this.state, selectedTabAsset: asset });
-  };
-
-  public onDetails = async (key: TradeTokenKey) => {
-    this.setState({ ...this.state, tradeTokenKey: key, isTokenAddressFormOpen: true });
-  };
-
-  private onTokenAddressFormRequestClose = () => {
-    this.setState({ ...this.state, isTokenAddressFormOpen: false });
   };
 
   private onProviderAvailable = async () => {
@@ -421,10 +400,11 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       // const pTokens = FulcrumProvider.Instance.getPTokensAvailable();
       // const pTokenAddreses: string[] = FulcrumProvider.Instance.getPTokenErc20AddressList();
       // const pTokenBalances = await FulcrumProvider.Instance.getErc20BalancesOfUser(pTokenAddreses);
+      this.setState({...this.state, loans})
       for (const loan of loans) {
         // const balance = pTokenBalances.get(pToken.erc20Address);
-        // if (!balance)
-        //   continue;
+        if (!(loan.collateralAsset === this.state.selectedTabAsset || loan.loanAsset === this.state.selectedTabAsset))
+          continue;
 
         const positionType = loan.collateralAsset === Asset.ETH
           ? PositionType.LONG
@@ -433,6 +413,10 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
           ? loan.collateralAsset
           : loan.loanAsset;
         const unitOfAccount = loan.collateralAsset === Asset.ETH
+          ? loan.loanAsset
+          : loan.collateralAsset;
+
+          const collateralAsset = loan.collateralAsset === this.state.selectedTabAsset
           ? loan.loanAsset
           : loan.collateralAsset;
 
@@ -470,7 +454,10 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         }
         ownRowsData.push({
           loan: loan,
-          currentKey: new TradeTokenKey(asset, unitOfAccount, positionType, leverage, true),
+          tradeAsset: this.state.selectedTabAsset, 
+          collateralAsset: collateralAsset,
+          positionType, 
+          leverage,
           onTrade: this.onTradeRequested,
           onManageCollateralOpen: this.onManageCollateralRequested,
           changeLoadingTransaction: this.changeLoadingTransaction,

@@ -1,17 +1,12 @@
 import { BigNumber } from "@0x/utils";
 import React, { Component } from "react";
 import { Asset } from "../domain/Asset";
-import { AssetDetails } from "../domain/AssetDetails";
-import { AssetsDictionary } from "../domain/AssetsDictionary";
-import { IPriceDataPoint } from "../domain/IPriceDataPoint";
 import { ManageCollateralRequest } from "../domain/ManageCollateralRequest";
 import { PositionType } from "../domain/PositionType";
 import { TradeRequest } from "../domain/TradeRequest";
-import { TradeTokenKey } from "../domain/TradeTokenKey";
 import { TradeType } from "../domain/TradeType";
 import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
-import { TradeTransactionMinedEvent } from "../services/events/TradeTransactionMinedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
 import { Preloader } from "./Preloader";
 import { ReactComponent as OpenManageCollateral } from "../assets/images/openManageCollateral.svg";
@@ -23,7 +18,10 @@ import { TradeTxLoaderStep } from "./TradeTxLoaderStep";
 
 export interface IOwnTokenGridRowProps {
   loan: IBorrowedFundsState;
-  currentKey: TradeTokenKey;
+  tradeAsset: Asset;
+  collateralAsset: Asset;
+  leverage: number;
+  positionType: PositionType;
   onTrade: (request: TradeRequest) => void;
   onManageCollateralOpen: (request: ManageCollateralRequest) => void;
   changeLoadingTransaction: (isLoadingTransaction: boolean, request: TradeRequest | undefined, resultTx: boolean) => void;
@@ -74,21 +72,15 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
 
   private _isMounted: boolean;
 
-  // private getTradeTokenGridRowSelectionKeyRaw(props: IOwnTokenGridRowProps, leverage: number = this.props.currentKey.leverage) {
-  //   return new TradeTokenKey(this.props.currentKey.asset, this.props.currentKey.unitOfAccount, this.props.currentKey.positionType, leverage, this.props.currentKey.isTokenized, this.props.currentKey.version);
-  // }
-
-  // private getTradeTokenGridRowSelectionKey(leverage: number = this.props.currentKey.leverage) {
-  //   return this.getTradeTokenGridRowSelectionKeyRaw(this.props, leverage);
-  // }
-
   private async derivedUpdate() {
     const collateralToPrincipalRate = await FulcrumProvider.Instance.getSwapRate(this.props.loan.collateralAsset, this.props.loan.loanAsset);
     let positionValue = new BigNumber(0);
     let value = new BigNumber(0);
     let collateral = new BigNumber(0);
     let openPrice = new BigNumber(0);
-    const liquidationRate = ((new BigNumber("15000000000000000000").times(this.props.loan.loanData!.principal).div(10 ** 20)).plus(this.props.loan.loanData!.principal)).div(this.props.loan.loanData!.collateral)
+    //liquidation_collateralToLoanRate = ((15000000000000000000 * principal / 10^20) + principal) / collateral * 10^18
+    //If SHORT -> 10^36 / liquidation_collateralToLoanRate
+    const liquidation_collateralToLoanRate = (new BigNumber("15000000000000000000").times(this.props.loan.loanData!.principal).div(10 ** 20)).plus(this.props.loan.loanData!.principal).div(this.props.loan.loanData!.collateral).times(10 ** 18);
     let liquidationPrice = new BigNumber(0);
     let profit = new BigNumber(0);
     if (this.state.positionType === PositionType.LONG) {
@@ -96,7 +88,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
       value = this.props.loan.loanData!.collateral.div(10 ** 18).times(this.state.collateralToPrincipal);
       collateral = ((this.props.loan.loanData!.collateral.times(this.state.collateralToPrincipal).div(10 ** 18)).minus(this.props.loan.loanData!.principal.div(10 ** 18)));
       openPrice = this.props.loan.loanData!.startRate.div(10 ** 18);
-      liquidationPrice = liquidationRate;
+      liquidationPrice = liquidation_collateralToLoanRate.div(10 ** 18);
       profit = this.state.collateralToPrincipal.minus(openPrice).times(positionValue);
     }
     else {
@@ -104,7 +96,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
       value = this.props.loan.loanData!.collateral.div(10 ** 18);
       collateral = ((this.props.loan.loanData!.collateral.div(10 ** 18)).minus(this.props.loan.loanData!.principal.div(this.state.collateralToPrincipal).div(10 ** 18)));
       openPrice = new BigNumber(10 ** 36).div(this.props.loan.loanData!.startRate).div(10 ** 18);
-      liquidationPrice = liquidationRate.div(this.state.collateralToPrincipal);
+      liquidationPrice = new BigNumber(10 ** 36).div(liquidation_collateralToLoanRate).div(10 ** 18);
       profit = openPrice.minus(this.state.collateralToPrincipal).times(positionValue);
     }
     this._isMounted && this.setState(p => ({
@@ -124,7 +116,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
     await this.derivedUpdate();
   };
 
-  private onProviderChanged = async (event: ProviderChangedEvent) => {
+  private onProviderChanged = async () => {
     await this.derivedUpdate();
   };
 
@@ -182,19 +174,20 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
       </React.Fragment>
       : <div className={`own-token-grid-row`}>
 
-        <div className="own-token-grid-row__col-token-name">{`${this.props.loan.loanAsset.toUpperCase()}`}
+        <div className="own-token-grid-row__col-token-name">
+          {`${this.props.tradeAsset.toUpperCase()}`}
         </div>
 
         <div className="own-token-grid-row__col-position-type opacityIn">
           <span className="position-type-marker">
-            {`${this.props.currentKey.leverage}x ${this.props.currentKey.positionType}`}
+            {`${this.props.leverage}x ${this.props.positionType}`}
           </span>
         </div>
 
-        <div title={this.props.currentKey.unitOfAccount} className="own-token-grid-row__col-asset-unit">
-          {this.props.currentKey.unitOfAccount}
+        <div title={this.props.collateralAsset} className="own-token-grid-row__col-asset-unit">
+          {this.props.collateralAsset}
         </div>
-        <div title={this.props.currentKey.unitOfAccount} className="own-token-grid-row__col-position">
+        <div title={this.props.collateralAsset} className="own-token-grid-row__col-position">
           {this.state.positionValue.toFixed(2)}
         </div>
         <div title={this.state.openPrice.toFixed(18)} className="own-token-grid-row__col-asset-price">
@@ -277,13 +270,11 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
     const request = new TradeRequest(
       this.props.loan.loanId,
       TradeType.SELL,
-      this.props.loan.loanAsset,
+      this.props.tradeAsset,
       Asset.UNKNOWN,
-      this.props.loan.collateralAsset,
-      this.props.loan.collateralAsset === Asset.ETH
-        ? PositionType.LONG
-        : PositionType.SHORT,
-      this.props.currentKey.leverage,
+      this.props.collateralAsset,
+      this.props.positionType,
+      this.props.leverage,
       new BigNumber(0)
     )
     await this.setState({ ...this.state, request: request });

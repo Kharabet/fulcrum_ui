@@ -3,14 +3,11 @@ import React, { Component } from "react";
 import { Asset } from "../domain/Asset";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
-import { IPriceDataPoint } from "../domain/IPriceDataPoint";
 import { PositionType } from "../domain/PositionType";
 import { TradeRequest } from "../domain/TradeRequest";
-import { TradeTokenKey } from "../domain/TradeTokenKey";
 import { TradeType } from "../domain/TradeType";
 import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
-import { TradeTransactionMinedEvent } from "../services/events/TradeTransactionMinedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
 import { PositionTypeMarkerAlt } from "./PositionTypeMarkerAlt";
 import siteConfig from "../config/SiteConfig.json";
@@ -72,44 +69,22 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.AskToOpenProgressDlg, this.onAskToOpenProgressDlg);
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.AskToCloseProgressDlg, this.onAskToCloseProgressDlg);
-    FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.TradeTransactionMined, this.onTradeTransactionMined);
   }
 
   private _isMounted: boolean;
 
-  private getTradeTokenGridRowSelectionKeyRaw(props: ITradeTokenGridRowProps, leverage: number = this.state.leverage) {
-    const key = new TradeTokenKey(props.asset, props.defaultUnitOfAccount, props.positionType, leverage, props.defaultTokenizeNeeded, 2);
-
-    // check for version 2, and revert back to version if not found
-    if (key.erc20Address === "") {
-      key.setVersion(1);
-    }
-
-    return key;
-  }
-
-  private getTradeTokenGridRowSelectionKey(leverage: number = this.state.leverage) {
-    return this.getTradeTokenGridRowSelectionKeyRaw(this.props, leverage);
-  }
-
   private async derivedUpdate() {
-    let version = 2;
-    const tradeTokenKey = new TradeTokenKey(this.props.asset, this.props.defaultUnitOfAccount, this.props.positionType, this.state.leverage, this.props.defaultTokenizeNeeded, version);
-    if (tradeTokenKey.erc20Address === "") {
-      tradeTokenKey.setVersion(1);
-      version = 1;
-    }
+    
     const tradeAssetPrice = await FulcrumProvider.Instance.getSwapToUsdRate(this.props.asset);
 
     const interestRate = await FulcrumProvider.Instance.getBorrowInterestRate(this.props.asset);
-    const balance = new BigNumber(0); // await FulcrumProvider.Instance.getPTokenBalanceOfUser(tradeTokenKey);
+    const balance = new BigNumber(0);
 
     this._isMounted && this.setState({
       ...this.state,
       tradeAssetPrice,
       interestRate: interestRate,
       balance: balance,
-      version: version,
       isLoading: false
     });
   }
@@ -118,14 +93,8 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
     await this.derivedUpdate();
   };
 
-  private onProviderChanged = async (event: ProviderChangedEvent) => {
+  private onProviderChanged = async () => {
     await this.derivedUpdate();
-  };
-
-  private onTradeTransactionMined = async (event: TradeTransactionMinedEvent) => {
-    if (event.key.toString() === this.getTradeTokenGridRowSelectionKey().toString()) {
-      await this.derivedUpdate();
-    }
   };
 
   private onAskToOpenProgressDlg = (taskId: number) => {
@@ -154,7 +123,6 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
     FulcrumProvider.Instance.eventEmitter.off(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
     FulcrumProvider.Instance.eventEmitter.off(FulcrumProviderEvents.AskToOpenProgressDlg, this.onAskToOpenProgressDlg);
     FulcrumProvider.Instance.eventEmitter.off(FulcrumProviderEvents.AskToCloseProgressDlg, this.onAskToCloseProgressDlg);
-    FulcrumProvider.Instance.eventEmitter.off(FulcrumProviderEvents.TradeTransactionMined, this.onTradeTransactionMined);
   }
 
   public componentDidMount(): void {
@@ -177,19 +145,6 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
     if (!this.state.assetDetails) {
       return null;
     }
-
-    const tradeTokenKey = this.getTradeTokenGridRowSelectionKey(this.state.leverage);
-    // const bnPrice = new BigNumber(this.state.latestPriceDataPoint.price);
-    // const bnLiquidationPrice = new BigNumber(this.state.latestPriceDataPoint.liquidationPrice);
-    /*if (this.props.positionType === PositionType.SHORT) {
-      bnPrice = bnPrice.div(1000);
-      bnLiquidationPrice = bnLiquidationPrice.div(1000);
-    }*/
-    // bnPrice = bnPrice.div(1000);
-    // bnLiquidationPrice = bnLiquidationPrice.div(1000);
-
-    // const bnChange24h = new BigNumber(this.state.latestPriceDataPoint.change24h);
-
     return (
       <div className={`trade-token-grid-row `}>
         <div className="trade-token-grid-row__col-token-name">
@@ -251,9 +206,8 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
   }
 
   public onLeverageSelect = (value: number) => {
-    const key = this.getTradeTokenGridRowSelectionKey(value);
 
-    this._isMounted && this.setState({ ...this.state, leverage: value, version: key.version, isLoading: true });
+    this._isMounted && this.setState({ ...this.state, leverage: value, isLoading: true });
   };
 
   public onBuyClick = async (event: React.MouseEvent<HTMLElement>) => {

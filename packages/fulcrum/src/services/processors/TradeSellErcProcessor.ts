@@ -1,10 +1,6 @@
 import { BigNumber } from "@0x/utils";
-import { pTokenContract } from "../../contracts/pTokenContract";
-import { AssetsDictionary } from "../../domain/AssetsDictionary";
 import { RequestTask } from "../../domain/RequestTask";
 import { TradeRequest } from "../../domain/TradeRequest";
-import { TradeTokenKey } from "../../domain/TradeTokenKey";
-import { FulcrumProviderEvents } from "../events/FulcrumProviderEvents";
 import { FulcrumProvider } from "../FulcrumProvider";
 
 import { Asset } from "../../domain/Asset";
@@ -21,13 +17,6 @@ export class TradeSellErcProcessor {
     const isLong = taskRequest.positionType === PositionType.LONG;
 
 
-    const loanToken = isLong
-      ? taskRequest.collateral
-      : Asset.ETH;
-    const depositToken = taskRequest.depositToken;
-    const collateralToken = isLong
-      ? Asset.ETH
-      : taskRequest.collateral;
 
     const loans = await FulcrumProvider.Instance.getUserMarginTradeLoans();
     const amountInBaseUnits = loans.find(l => l.loanId === taskRequest.loanId)!.loanData!.collateral.times(10**50); //new BigNumber("525478543208365722")// new BigNumber(taskRequest.amount.multipliedBy(10 ** decimals).toFixed(0, 1));
