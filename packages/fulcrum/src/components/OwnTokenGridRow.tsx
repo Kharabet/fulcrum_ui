@@ -22,9 +22,10 @@ export interface IOwnTokenGridRowProps {
   collateralAsset: Asset;
   leverage: number;
   positionType: PositionType;
+  isTxCompleted: boolean;
   onTrade: (request: TradeRequest) => void;
   onManageCollateralOpen: (request: ManageCollateralRequest) => void;
-  changeLoadingTransaction: (isLoadingTransaction: boolean, request: TradeRequest | undefined, resultTx: boolean) => void;
+  changeLoadingTransaction: (isLoadingTransaction: boolean, request: TradeRequest | undefined, isTxCompleted: boolean, resultTx: boolean) => void;
 }
 
 interface IOwnTokenGridRowState {
@@ -123,7 +124,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
   private onAskToOpenProgressDlg = (taskId: number) => {
     if (!this.state.request || taskId !== this.state.request.id) return;
     this.setState({ ...this.state, isLoadingTransaction: true, })
-    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, true);
+    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, false, true);
   }
   private onAskToCloseProgressDlg = (task: RequestTask) => {
     if (!this.state.request || task.request.id !== this.state.request.id) return;
@@ -131,12 +132,12 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
       window.setTimeout(() => {
         FulcrumProvider.Instance.onTaskCancel(task);
         this.setState({ ...this.state, isLoadingTransaction: false, request: undefined });
-        this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, false);
+        this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, true, false);
       }, 5000)
       return;
     }
     this.setState({ ...this.state, isLoadingTransaction: false, request: undefined });
-    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, true);
+    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, true, true);
   }
 
   // private onTradeTransactionMined = async (event: TradeTransactionMinedEvent) => {
@@ -172,25 +173,22 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
           <TradeTxLoaderStep taskId={this.state.request.id} />
         </div>
       </React.Fragment>
-      : <div className={`own-token-grid-row`}>
-
-        <div className="own-token-grid-row__col-token-name">
+      : <div className={`own-token-grid-row ${this.props.isTxCompleted ? `completed` : `` }`}>
+        <div className="own-token-grid-row__col-token-name  opacityIn">
           {`${this.props.tradeAsset.toUpperCase()}`}
         </div>
-
         <div className="own-token-grid-row__col-position-type opacityIn">
           <span className="position-type-marker">
             {`${this.props.leverage}x ${this.props.positionType}`}
           </span>
         </div>
-
-        <div title={this.props.collateralAsset} className="own-token-grid-row__col-asset-unit">
+        <div title={this.props.collateralAsset} className="own-token-grid-row__col-asset-unit opacityIn">
           {this.props.collateralAsset}
         </div>
-        <div title={this.props.collateralAsset} className="own-token-grid-row__col-position">
+        <div title={this.props.collateralAsset} className="own-token-grid-row__col-position  opacityIn">
           {this.state.positionValue.toFixed(2)}
         </div>
-        <div title={this.state.openPrice.toFixed(18)} className="own-token-grid-row__col-asset-price">
+        <div title={this.state.openPrice.toFixed(18)} className="own-token-grid-row__col-asset-price  opacityIn">
           {!this.state.isLoading
             ? <React.Fragment>
               <span className="sign-currency">$</span>{this.state.openPrice.toFixed(2)}
@@ -287,6 +285,6 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
     )
     await this.setState({ ...this.state, request: request });
     this.props.onTrade(request);
-    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, request, true);
+    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, request, false, true);
   };
 }

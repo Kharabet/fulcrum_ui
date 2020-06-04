@@ -61,7 +61,8 @@ interface ITradePageState {
   tradeRequestId: number;
   isLoadingTransaction: boolean;
   request: TradeRequest | undefined,
-  resultTx: boolean
+  resultTx: boolean,
+  isTxCompleted: boolean
 }
 
 export default class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
@@ -92,6 +93,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       tradeRequestId: 0,
       isLoadingTransaction: false,
       resultTx: true,
+      isTxCompleted: false,
       request: undefined
     };
 
@@ -147,7 +149,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
   }
 
   public componentDidUpdate(prevProps: Readonly<ITradePageProps>, prevState: Readonly<ITradePageState>, snapshot?: any): void {
-    if (prevState.selectedTabAsset !== this.state.selectedTabAsset) {
+    if (prevState.selectedTabAsset !== this.state.selectedTabAsset || prevState.isTxCompleted !== this.state.isTxCompleted) {
       this.derivedUpdate();
     }
   }
@@ -200,14 +202,15 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
                   isMobileMedia={this.props.isMobileMedia}
                   tokenRowsData={this.state.tokenRowsData.filter(e => e.asset === this.state.selectedTabAsset)}
                   ownRowsData={this.state.ownRowsData}
-                  changeLoadingTransaction={this.changeLoadingTransaction}
+                  //changeLoadingTransaction={this.changeLoadingTransaction}
                   request={this.state.request}
                   isLoadingTransaction={this.state.isLoadingTransaction}
-                  tradePosition = {this.state.tradePositionType}
-                  tradeLeverage = {this.state.tradeLeverage}
+                  tradePosition={this.state.tradePositionType}
+                  tradeLeverage={this.state.tradeLeverage}
                   resultTx={this.state.resultTx}
                   tradeType={this.state.tradeType}
                   loanId={this.state.loanId}
+                  isTxCompleted={this.state.isTxCompleted}
                 />
               </React.Fragment>
             )}
@@ -366,7 +369,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
   };
 
   public onTradeConfirmed = (request: TradeRequest) => {
-    request.id = this.state.tradeRequestId;  
+    request.id = this.state.tradeRequestId;
     FulcrumProvider.Instance.onTradeConfirmed(request);
     this.setState({
       ...this.state,
@@ -413,7 +416,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
           ? loan.loanAsset
           : loan.collateralAsset;
 
-          const collateralAsset = loan.collateralAsset === this.state.selectedTabAsset
+        const collateralAsset = loan.collateralAsset === this.state.selectedTabAsset
           ? loan.loanAsset
           : loan.collateralAsset;
 
@@ -451,13 +454,14 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         }
         ownRowsData.push({
           loan: loan,
-          tradeAsset: this.state.selectedTabAsset, 
+          tradeAsset: this.state.selectedTabAsset,
           collateralAsset: collateralAsset,
-          positionType, 
+          positionType,
           leverage,
           onTrade: this.onTradeRequested,
           onManageCollateralOpen: this.onManageCollateralRequested,
           changeLoadingTransaction: this.changeLoadingTransaction,
+          isTxCompleted: this.state.isTxCompleted
         });
       }
     }
@@ -476,6 +480,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         defaultLeverage: state.defaultLeverageLong,
         onTrade: this.onTradeRequested,
         changeLoadingTransaction: this.changeLoadingTransaction,
+        isTxCompleted: this.state.isTxCompleted
       });
       tokenRowsData.push({
         asset: e,
@@ -485,12 +490,13 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         defaultLeverage: state.defaultLeverageShort,
         onTrade: this.onTradeRequested,
         changeLoadingTransaction: this.changeLoadingTransaction,
+        isTxCompleted: this.state.isTxCompleted
       });
     });
     return tokenRowsData;
   };
 
-  public changeLoadingTransaction = (isLoadingTransaction: boolean, request: TradeRequest | undefined, resultTx: boolean) => {
-    this.setState({ ...this.state, isLoadingTransaction: isLoadingTransaction, request: request, resultTx: resultTx })
+  public changeLoadingTransaction = (isLoadingTransaction: boolean, request: TradeRequest | undefined, isTxCompleted: boolean, resultTx: boolean) => {
+    this.setState({ ...this.state, isLoadingTransaction: isLoadingTransaction, request: request, isTxCompleted: isTxCompleted, resultTx: resultTx })
   }
 }

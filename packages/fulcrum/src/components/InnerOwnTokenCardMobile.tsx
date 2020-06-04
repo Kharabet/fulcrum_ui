@@ -20,13 +20,6 @@ import { CircleLoader } from "./CircleLoader";
 import { TradeTxLoaderStep } from "./TradeTxLoaderStep";
 import { IOwnTokenGridRowProps } from "./OwnTokenGridRow";
 
-/*export interface IInnerOwnTokenCardMobileProps {
-  currentKey: TradeTokenKey;
-  pTokenAddress: string;
-  onTrade: (request: TradeRequest) => void;
-  onManageCollateralOpen: (request: ManageCollateralRequest) => void;
-  changeLoadingTransaction: (isLoadingTransaction: boolean, request: TradeRequest | undefined, resultTx: boolean) => void;
-}*/
 
 
 interface IInnerOwnTokenCardMobileState {
@@ -125,7 +118,7 @@ export class InnerOwnTokenCardMobile extends Component<IOwnTokenGridRowProps, II
   private onAskToOpenProgressDlg = (taskId: number) => {
     if (!this.state.request || taskId !== this.state.request.id) return;
     this.setState({ ...this.state, isLoadingTransaction: true })
-    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, true)
+    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, false, true)
 
   }
   private onAskToCloseProgressDlg = (task: RequestTask) => {
@@ -134,12 +127,12 @@ export class InnerOwnTokenCardMobile extends Component<IOwnTokenGridRowProps, II
       window.setTimeout(() => {
         FulcrumProvider.Instance.onTaskCancel(task);
         this.setState({ ...this.state, isLoadingTransaction: false, request: undefined })
-        this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, false)
+        this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, true, false)
       }, 5000)
       return;
     }
     this.setState({ ...this.state, isLoadingTransaction: false, request: undefined });
-    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, true)
+    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, true, true)
   }
 
   /*private onTradeTransactionMined = async (event: TradeTransactionMinedEvent) => {
@@ -274,7 +267,7 @@ export class InnerOwnTokenCardMobile extends Component<IOwnTokenGridRowProps, II
       new BigNumber(0)
     )
     await this.setState({ ...this.state, request: request });
-    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, request, true)
+    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, request, false, true)
     this.props.onTrade(request);
   };
 }

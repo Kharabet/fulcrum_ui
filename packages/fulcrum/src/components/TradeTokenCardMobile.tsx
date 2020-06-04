@@ -103,7 +103,7 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
   private onAskToOpenProgressDlg = (taskId: number) => {
     if (!this.state.request || taskId !== this.state.request.id) return;
     this.setState({ ...this.state, isLoadingTransaction: true });
-    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, true);
+    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, false, true);
   }
   private onAskToCloseProgressDlg = (task: RequestTask) => {
     if (!this.state.request || task.request.id !== this.state.request.id) return;
@@ -111,12 +111,12 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
       window.setTimeout(() => {
         FulcrumProvider.Instance.onTaskCancel(task);
         this.setState({ ...this.state, isLoadingTransaction: false, request: undefined })
-        this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, false)
+        this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, true, false)
       }, 5000)
       return;
     }
     this.setState({ ...this.state, isLoadingTransaction: false, request: undefined });
-    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, false)
+    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, true, true)
   }
 
   public componentWillUnmount(): void {
@@ -236,6 +236,6 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
     )
     await this.setState({ ...this.state, request: request });
     this.props.onTrade(request);
-    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, request, true)
+    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, request, false, true)
   };
 }

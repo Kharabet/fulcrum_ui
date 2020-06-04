@@ -179,11 +179,15 @@
 }
 
 .opacityIn {
-  animation: opacityIn 1s cubic-bezier(1, 1, 1, 1);
+  .completed & {
+    animation: opacityIn 1s cubic-bezier(1, 1, 1, 1);
+  }
 }
 
 .rightIn {
-  animation: rightIn 0.4 1s cubic-bezier(1, 1, 1, 1);
+  .completed & {
+    animation: rightIn 0.4 1s cubic-bezier(1, 1, 1, 1);
+  }
 }
 
 @keyframes opacityIn {
