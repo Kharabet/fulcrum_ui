@@ -213,7 +213,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
     // const ethBalance = await FulcrumProvider.Instance.getEthBalance();
 
     // maxTradeValue is raw here, so we should not use it directly
-    const maxTradeValue = await FulcrumProvider.Instance.getMaxTradeValue(this.props.tradeType, this.props.positionType === PositionType.LONG ? this.state.selectedUnitOfAccount : this.props.asset, this.state.collateral, this.props.positionType);
+    const maxTradeValue = await FulcrumProvider.Instance.getMaxTradeValue(this.props.tradeType, this.props.positionType === PositionType.LONG ? this.state.selectedUnitOfAccount : this.props.asset, this.state.collateral, this.props.positionType, this.props.loan);
     // const limitedAmount = await this.getInputAmountLimited(this.state.inputAmountText, this.state.inputAmountValue, tradeTokenKey, maxTradeValue, false);
     const tradeRequest = new TradeRequest(
       this.props.loanId || "0x0000000000000000000000000000000000000000000000000000000000000000",
@@ -562,7 +562,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
 
       this._isMounted && this.setState({ ...this.state, isLoading: true });
 
-      FulcrumProvider.Instance.getMaxTradeValue(this.props.tradeType, this.props.positionType === PositionType.LONG ? this.state.selectedUnitOfAccount : this.props.asset, this.state.collateral, this.props.positionType)
+      FulcrumProvider.Instance.getMaxTradeValue(this.props.tradeType, this.props.positionType === PositionType.LONG ? this.state.selectedUnitOfAccount : this.props.asset, this.state.collateral, this.props.positionType, this.props.loan)
         .then(maxTradeValue => {
           // maxTradeValue is raw here, so we should not use it directly
           this.getInputAmountLimitedFromBigNumber(maxTradeValue, maxTradeValue, multiplier).then(async limitedAmount => {

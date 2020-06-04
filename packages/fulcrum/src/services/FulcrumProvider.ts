@@ -720,8 +720,8 @@ export class FulcrumProvider {
     } else {
       if (loan)
         result = positionType === PositionType.LONG
-          ? loan.loanData!.collateral.div(10 ** 18)
-          : loan.loanData!.principal.div(10 ** 18);
+          ? loan.loanData!.collateral
+          : loan.loanData!.principal;
     }
 
     //const baseAsset = this.getBaseAsset(loanAsset);
