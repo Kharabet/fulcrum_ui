@@ -237,9 +237,10 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
 
     // const latestPriceDataPoint = await FulcrumProvider.Instance.getTradeTokenAssetLatestDataPoint(tradeTokenKey);
     const liquidationPrice = new BigNumber(0); //new BigNumber(latestPriceDataPoint.liquidationPrice);
-    const {principal, collateral, interestRate}= await FulcrumProvider.Instance.getEstimatedMarginDetails(tradeRequest);
+    let { principal, collateral, interestRate } = await FulcrumProvider.Instance.getEstimatedMarginDetails(tradeRequest);
     // const interestRate = new BigNumber(0);//await FulcrumProvider.Instance.getTradeTokenInterestRate(tradeTokenKey);
-
+    if (this.props.tradeType === TradeType.SELL)
+      interestRate = await FulcrumProvider.Instance.getBorrowInterestRate(this.props.asset);
 
     this._isMounted && this.setState({
       ...this.state,
@@ -577,7 +578,8 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
                 this.props.leverage,
                 limitedAmount.tradeAmountValue
               );
-              const {collateral} = await FulcrumProvider.Instance.getEstimatedMarginDetails(tradeRequest);
+              const { collateral, interestRate } = await FulcrumProvider.Instance.getEstimatedMarginDetails(tradeRequest);
+              await this.setState({ ...this.state, interestRate })
               observer.next({
                 isTradeAmountTouched: true,
                 inputAmountText: limitedAmount.inputAmountText,
@@ -614,7 +616,9 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
             this.props.leverage,
             limitedAmount.tradeAmountValue
           );
-          const {collateral} = await FulcrumProvider.Instance.getEstimatedMarginDetails(tradeRequest);
+          const { collateral, interestRate } = await FulcrumProvider.Instance.getEstimatedMarginDetails(tradeRequest);
+          await this.setState({ ...this.state, interestRate })
+
           observer.next({
             isTradeAmountTouched: true,
             inputAmountText: limitedAmount.inputAmountText,
