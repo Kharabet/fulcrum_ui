@@ -215,7 +215,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
     const maxTradeValue = await FulcrumProvider.Instance.getMaxTradeValue(this.props.tradeType, this.props.positionType === PositionType.LONG ? this.state.selectedUnitOfAccount : this.props.asset, this.state.collateral, this.props.positionType, this.props.loan);
     // const limitedAmount = await this.getInputAmountLimited(this.state.inputAmountText, this.state.inputAmountValue, tradeTokenKey, maxTradeValue, false);
     const tradeRequest = new TradeRequest(
-      this.props.loanId || "0x0000000000000000000000000000000000000000000000000000000000000000",
+      this.props.loan?.loanId || "0x0000000000000000000000000000000000000000000000000000000000000000",
       this.props.tradeType,
       this.props.asset,
       this.state.selectedUnitOfAccount,
@@ -546,7 +546,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
     TagManager.dataLayer(tagManagerArgs)
     this.props.onSubmit(
       new TradeRequest(
-        this.props.loanId || "0x0000000000000000000000000000000000000000000000000000000000000000",
+        this.props.loan?.loanId || "0x0000000000000000000000000000000000000000000000000000000000000000",
         this.props.tradeType,
         this.props.asset,
         this.state.selectedUnitOfAccount,
@@ -561,7 +561,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
   private rxFromMaxAmountWithMultiplier = (multiplier: BigNumber): Observable<ITradeAmountChangeEvent | null> => {
     return new Observable<ITradeAmountChangeEvent | null>(observer => {
 
-      this._isMounted && this.setState({ ...this.state, isLoading: true });
+      this._isMounted && this.setState({ ...this.state, isLoading: true, isExposureLoading: true });
 
       FulcrumProvider.Instance.getMaxTradeValue(this.props.tradeType, this.props.positionType === PositionType.LONG ? this.state.selectedUnitOfAccount : this.props.asset, this.state.collateral, this.props.positionType, this.props.loan)
         .then(maxTradeValue => {
