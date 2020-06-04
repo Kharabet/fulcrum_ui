@@ -74,7 +74,7 @@ $width-col-actions: 13%;
     position: relative;
     background-color: var(--primary-row);
     padding: 20px 40px;
-
+    z-index: 3;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -136,7 +136,7 @@ $width-col-actions: 13%;
     }
     &__buy-button {
       border: 0;
-      width: 110px;
+      width: 95px;
       height: 44px;
       display: flex;
       align-items: center;

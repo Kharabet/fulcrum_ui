@@ -111,9 +111,20 @@ export class TradeTxLoaderStep extends Component<ITradeTxLoaderStepProps, ITrade
 
     const title = this.getTitle(this.state.requestTask);
     if (!title) return null;
-    return <div ref={this.stepDiv} className={`trade-transaction-step ${title.isWarning ? "warning" : ""}`}>
-      {title.message}
-    </div>
+    return (
+      <React.Fragment>
+        {this.state.requestTask.txHash
+          ? <a href={`${FulcrumProvider.Instance.web3ProviderSettings!.etherscanURL}tx/${this.state.requestTask.txHash}`} target="_blank" rel="noopener noreferrer">
+            <div ref={this.stepDiv} className={`trade-transaction-step ${title.isWarning ? "warning" : ""}`}>
+              {title.message}
+            </div>
+          </a>
+          : <div ref={this.stepDiv} className={`trade-transaction-step ${title.isWarning ? "warning" : ""}`}>
+            {title.message}
+          </div>
+        }
+      </React.Fragment>
+    )
   }
 
   public onTasksQueueChanged = async () => {

@@ -26,9 +26,9 @@ export interface ITradeTokenGridRowProps {
   positionType: PositionType;
   defaultLeverage: number;
   defaultTokenizeNeeded: boolean;
-
+  isTxCompleted: boolean;
   onTrade: (request: TradeRequest) => void;
-  changeLoadingTransaction: (isLoadingTransaction: boolean, request: TradeRequest | undefined, resultTx: boolean) => void;
+  changeLoadingTransaction: (isLoadingTransaction: boolean, request: TradeRequest | undefined, isTxcolmpleted: boolean, resultTx: boolean) => void;
 }
 
 interface ITradeTokenGridRowState {
@@ -100,7 +100,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
   private onAskToOpenProgressDlg = (taskId: number) => {
     if (!this.state.request || taskId !== this.state.request.id) return;
     this.setState({ ...this.state, isLoadingTransaction: true });
-    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, true);
+    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, false, true);
   }
   private onAskToCloseProgressDlg = (task: RequestTask) => {
     if (!this.state.request || task.request.id !== this.state.request.id) return;
@@ -108,12 +108,12 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
       window.setTimeout(() => {
         FulcrumProvider.Instance.onTaskCancel(task);
         this.setState({ ...this.state, isLoadingTransaction: false, request: undefined })
-        this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, false)
+        this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, true, false)
       }, 5000)
       return;
     }
     this.setState({ ...this.state, isLoadingTransaction: false, request: undefined });
-    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, false)
+    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, true, true)
   }
 
   public componentWillUnmount(): void {
@@ -136,7 +136,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
     prevState: Readonly<ITradeTokenGridRowState>,
     snapshot?: any
   ): void {
-    if (prevState.leverage !== this.state.leverage) {
+    if (prevState.leverage !== this.state.leverage || prevProps.isTxCompleted !== this.props.isTxCompleted) {
       this.derivedUpdate();
     }
   }
@@ -224,6 +224,6 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
     );
     await this.setState({ ...this.state, request: request });
     this.props.onTrade(request);
-    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, request, true)
+    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, request, false, true)
   };
 }

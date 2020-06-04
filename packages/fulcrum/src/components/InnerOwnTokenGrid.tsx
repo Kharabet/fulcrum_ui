@@ -13,7 +13,6 @@ export interface IInnerOwnTokenGridProps {
   request: TradeRequest | undefined;
   isLoadingTransaction: boolean;
   loanId?: string;
-  changeLoadingTransaction: (isLoadingTransaction: boolean, request: TradeRequest | undefined, resultTx: boolean) => void;
 }
 
 interface IInnerOwnTokenGridState {
@@ -29,7 +28,7 @@ export class InnerOwnTokenGrid extends Component<IInnerOwnTokenGridProps, IInner
   }
 
   private renderDesktop = () => {
-    const innerOwnRowsData = this.props.ownRowsData.map((e,i) => <InnerOwnTokenGridRow key={i} changeLoadingTransaction={this.props.changeLoadingTransaction} {...e} />);
+    const innerOwnRowsData = this.props.ownRowsData.map((e,i) => <InnerOwnTokenGridRow key={i} loanId={this.props.loanId} {...e} />);
     if (innerOwnRowsData.length === 0) return null;
 
     return (
