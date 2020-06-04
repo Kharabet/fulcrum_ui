@@ -4,15 +4,25 @@ import { Asset } from "./Asset";
 
 export class ManageCollateralRequest {
   public id: number;
-  public loanOrderState: IBorrowedFundsState;
-  public isWithdrawal: boolean;
+  public loanId: string;
   public asset: Asset;
+  public collateralAsset: Asset;
+  public collateralAmount: BigNumber;
 
-  constructor(loanOrderState: IBorrowedFundsState, isWithdrawal: boolean, asset?: Asset) {
+  public isWithdrawal: boolean;
+
+  constructor(loanId: string,
+    asset: Asset,
+    collateralAsset: Asset,
+    collateralAmount: BigNumber,
+    isWithdrawal: boolean,
+  ) {
     this.id = Math.round(new Date().getTime() / 1000);
-    this.loanOrderState = loanOrderState;
+    this.loanId = loanId;
+    this.asset = asset;
+    this.collateralAsset = collateralAsset;
+    this.collateralAmount = collateralAmount;
     this.isWithdrawal = isWithdrawal;
-    this.asset = asset ? asset : Asset.ETH;
   }
   public getRequestTypeName(): string {
     return (!this.isWithdrawal ? "Withdraw" : "Top Up") + " request";

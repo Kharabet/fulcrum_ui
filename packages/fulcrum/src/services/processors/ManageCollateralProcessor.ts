@@ -14,7 +14,7 @@ export class ManageCollateralProcessor {
 
     // Initializing loan
     const taskRequest: ManageCollateralRequest = (task.request as ManageCollateralRequest);
-    const isETHCollateralAsset = FulcrumProvider.Instance.isETHAsset(taskRequest.loanOrderState.collateralAsset);
+    const isETHCollateralAsset = FulcrumProvider.Instance.isETHAsset(taskRequest.collateralAsset);
 
 
     if (isETHCollateralAsset) {
@@ -43,8 +43,8 @@ export class ManageCollateralProcessor {
       throw new Error("No bzxContract contract available!");
     }
 
-    const collateralPrecision = AssetsDictionary.assets.get(taskRequest.loanOrderState.collateralAsset)!.decimals || 18;
-    let collateralAmountInBaseUnits = taskRequest.loanOrderState.collateralAmount.multipliedBy(10 ** collateralPrecision);
+    const collateralPrecision = AssetsDictionary.assets.get(taskRequest.collateralAsset)!.decimals || 18;
+    let collateralAmountInBaseUnits = taskRequest.collateralAmount.multipliedBy(10 ** collateralPrecision);
     const collateralAmountInBaseUnitsValue = new BigNumber(collateralAmountInBaseUnits.toFixed(0, 1));
     collateralAmountInBaseUnits = new BigNumber(collateralAmountInBaseUnits.toFixed(0, 1));
 
@@ -53,7 +53,7 @@ export class ManageCollateralProcessor {
       let tokenErc20Contract: erc20Contract | null = null;
       let assetErc20Address: string | null = "";
       let erc20allowance = new BigNumber(0);
-      assetErc20Address = FulcrumProvider.Instance.getErc20AddressOfAsset(taskRequest.loanOrderState.collateralAsset);
+      assetErc20Address = FulcrumProvider.Instance.getErc20AddressOfAsset(taskRequest.collateralAsset);
       if (assetErc20Address) {
         tokenErc20Contract = await FulcrumProvider.Instance.contractsSource.getErc20Contract(assetErc20Address);
       } else {
@@ -86,7 +86,7 @@ export class ManageCollateralProcessor {
     if (!taskRequest.isWithdrawal) {
       try {
         const gasAmount = await bZxContract.depositCollateral.estimateGasAsync(
-          taskRequest.loanOrderState.loanData!.loanId,
+          taskRequest.loanId,
           collateralAmountInBaseUnits,
           {
             from: account,
@@ -104,7 +104,7 @@ export class ManageCollateralProcessor {
 
       try {
         txHash = await bZxContract.depositCollateral.sendTransactionAsync(
-          taskRequest.loanOrderState.loanData!.loanId,           // loanId
+          taskRequest.loanId,           // loanId
           collateralAmountInBaseUnits,                           // depositAmount
           {
             from: account,
@@ -125,7 +125,7 @@ export class ManageCollateralProcessor {
 
       try {
         const gasAmount = await bZxContract.withdrawCollateral.estimateGasAsync(
-          taskRequest.loanOrderState.loanData!.loanId,
+          taskRequest.loanId,
           account,
           collateralAmountInBaseUnits,
           {
@@ -142,7 +142,7 @@ export class ManageCollateralProcessor {
       try {
 
         txHash = await bZxContract.withdrawCollateral.sendTransactionAsync(
-          taskRequest.loanOrderState.loanData!.loanId,                                // loanId
+          taskRequest.loanId,                                // loanId
           account,                                                                    // trader
           collateralAmountInBaseUnits,                                                // depositAmount
           {
