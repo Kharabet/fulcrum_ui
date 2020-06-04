@@ -1190,7 +1190,7 @@ export class FulcrumProvider {
         console.error(e)
       }
     }
-    return result;
+    return result.div(10**18);
   }
   // public getTradeFormExposure = async (request: TradeRequest): Promise<BigNumber> => {
 

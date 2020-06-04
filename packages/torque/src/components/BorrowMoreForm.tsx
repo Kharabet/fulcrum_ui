@@ -26,6 +26,7 @@ interface IBorrowMoreFormState {
   borrowAmount: BigNumber;
   inputAmountText: string;
   didSubmit: boolean;
+  borrowMoreColalterizationMin: BigNumber;
 }
 
 export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreFormState> {
@@ -40,6 +41,7 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
     this.state = {
       borrowMoreLoanOrderState: Object.assign({}, props.loanOrderState),
       borrowAmount: new BigNumber(0),
+      borrowMoreColalterizationMin: new BigNumber(150),
       inputAmountText: "",
       didSubmit: false
     };
@@ -139,7 +141,7 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
         <section className="dialog-actions">
 
           <div className="borrow-more-loan-form__actions-container">
-            {loan.collateralizedPercent.times(100).plus(100).lte(115) || !Number(this.state.inputAmountText) ? (
+            {loan.collateralizedPercent.times(100).plus(100).lte(150) || !Number(this.state.inputAmountText) ? (
               <button type="button" className="btn btn-size--small" onClick={this.props.onDecline}>
                 Close
               </button>
