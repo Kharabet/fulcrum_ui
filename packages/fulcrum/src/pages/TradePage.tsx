@@ -206,8 +206,8 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
                   changeLoadingTransaction={this.changeLoadingTransaction}
                   request={this.state.request}
                   isLoadingTransaction={this.state.isLoadingTransaction}
-                  tradePosition = {this.state.tradePositionType}
-                  tradeLeverage = {this.state.tradeLeverage}
+                  tradePosition={this.state.tradePositionType}
+                  tradeLeverage={this.state.tradeLeverage}
                   resultTx={this.state.resultTx}
                   tradeType={this.state.tradeType}
                   loanId={this.state.loanId}
@@ -261,7 +261,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
             className="modal-content-div"
             overlayClassName="modal-overlay-div"
           >
-            <ManageCollateralForm
+            {/* <ManageCollateralForm
               isMobileMedia={this.props.isMobileMedia}
               asset={this.state.tradeAsset}
               tradeType={TradeType.BUY}
@@ -282,7 +282,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
               version={this.state.tradeVersion}
               isOpenModal={this.state.isManageCollateralModalOpen}
 
-            />
+            /> */}
           </Modal>
         </main>
       </div>
@@ -310,25 +310,25 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
   };
 
   public onManageCollateralRequested = (request: ManageCollateralRequest) => {
-    if (!FulcrumProvider.Instance.contractsSource || !FulcrumProvider.Instance.contractsSource.canWrite) {
-      this.props.doNetworkConnect();
-      return;
-    }
+    //   if (!FulcrumProvider.Instance.contractsSource || !FulcrumProvider.Instance.contractsSource.canWrite) {
+    //     this.props.doNetworkConnect();
+    //     return;
+    //   }
 
-    if (request) {
-      this.setState({
-        ...this.state,
-        isManageCollateralModalOpen: true,
-        collateralToken: request.collateral,
-        tradeType: request.tradeType,
-        tradeAsset: request.asset,
-        tradeUnitOfAccount: request.unitOfAccount,
-        tradePositionType: request.positionType,
-        tradeLeverage: request.leverage,
-        tradeVersion: request.version,
-        tradeRequestId: request.id,
-      });
-    }
+    //   if (request) {
+    //     this.setState({
+    //       ...this.state,
+    //       isManageCollateralModalOpen: true,
+    //       collateralToken: request.collateral,
+    //       tradeType: request.tradeType,
+    //       tradeAsset: request.asset,
+    //       tradeUnitOfAccount: request.unitOfAccount,
+    //       tradePositionType: request.positionType,
+    //       tradeLeverage: request.leverage,
+    //       tradeVersion: request.version,
+    //       tradeRequestId: request.id,
+    //     });
+    //   }
   };
 
   public onManageCollateralConfirmed = (request: ManageCollateralRequest) => {
@@ -341,17 +341,17 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
   };
 
   public onManageCollateralRequestOpen = (request: ManageCollateralRequest) => {
-    this.setState({
-      ...this.state,
-      collateralToken: request.collateral,
-      tradeType: request.tradeType,
-      tradeAsset: request.asset,
-      tradeUnitOfAccount: request.unitOfAccount,
-      tradePositionType: request.positionType,
-      tradeLeverage: request.leverage,
-      tradeVersion: request.version,
-      isManageCollateralModalOpen: true
-    });
+    //   this.setState({
+    //     ...this.state,
+    //     collateralToken: request.collateral,
+    //     tradeType: request.tradeType,
+    //     tradeAsset: request.asset,
+    //     tradeUnitOfAccount: request.unitOfAccount,
+    //     tradePositionType: request.positionType,
+    //     tradeLeverage: request.leverage,
+    //     tradeVersion: request.version,
+    //     isManageCollateralModalOpen: true
+    //   });
   };
 
   public onManageCollateralRequestClose = () => {
@@ -389,7 +389,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
   };
 
   public onTradeConfirmed = (request: TradeRequest) => {
-    request.id = this.state.tradeRequestId;  
+    request.id = this.state.tradeRequestId;
     FulcrumProvider.Instance.onTradeConfirmed(request);
     this.setState({
       ...this.state,

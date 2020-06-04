@@ -240,19 +240,12 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
   public onManageClick = async (event: React.MouseEvent<HTMLElement>) => {
     event.stopPropagation();
 
-    const request = new ManageCollateralRequest(
-      new BigNumber(0),
-      TradeType.BUY,
-      this.props.currentKey.asset,
-      this.props.currentKey.unitOfAccount,
-      this.props.currentKey.positionType === PositionType.SHORT ? this.props.currentKey.asset : Asset.USDC,
-      this.props.currentKey.positionType,
-      this.props.currentKey.leverage,
-      new BigNumber(0),
-      this.props.currentKey.isTokenized,
-      this.props.currentKey.version
-    )
-    this.props.onManageCollateralOpen(request);
+    // const request = new ManageCollateralRequest(
+    //   this.props.loan,
+    //   false
+
+    // )
+    // this.props.onManageCollateralOpen(request);
   };
 
   public onSellClick = async (event: React.MouseEvent<HTMLElement>) => {
@@ -264,9 +257,9 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
       this.props.loan.loanAsset,
       Asset.UNKNOWN,
       this.props.loan.collateralAsset,
-      this.props.loan.collateralAsset === Asset.ETH 
-      ? PositionType.LONG 
-      : PositionType.SHORT,
+      this.props.loan.collateralAsset === Asset.ETH
+        ? PositionType.LONG
+        : PositionType.SHORT,
       this.props.currentKey.leverage,
       new BigNumber(0)
     )

@@ -209,20 +209,12 @@ export class OwnTokenCardMobile extends Component<IOwnTokenCardMobileProps, IOwn
 
   public onManageClick = (event: React.MouseEvent<HTMLElement>) => {
     event.stopPropagation();
-    this.props.onManageCollateralOpen(
-      new ManageCollateralRequest(
-        new BigNumber(0),
-        TradeType.BUY,
-        this.props.currentKey.asset,
-        this.props.currentKey.unitOfAccount,
-        this.props.currentKey.positionType === PositionType.SHORT ? this.props.currentKey.asset : Asset.USDC,
-        this.props.currentKey.positionType,
-        this.props.currentKey.leverage,
-        new BigNumber(0),
-        this.props.currentKey.isTokenized,
-        this.props.currentKey.version
-      )
-    );
+    // this.props.onManageCollateralOpen(
+    //   new ManageCollateralRequest(
+    //     this.props.loan,
+    //     false
+    //   )
+    // );
   };
 
   public onSellClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -235,9 +227,9 @@ export class OwnTokenCardMobile extends Component<IOwnTokenCardMobileProps, IOwn
         this.props.loan.loanAsset,
         Asset.UNKNOWN,
         this.props.loan.collateralAsset,
-        this.props.loan.collateralAsset === Asset.ETH 
-        ? PositionType.LONG 
-        : PositionType.SHORT,
+        this.props.loan.collateralAsset === Asset.ETH
+          ? PositionType.LONG
+          : PositionType.SHORT,
         this.props.currentKey.leverage,
         new BigNumber(0)
       )

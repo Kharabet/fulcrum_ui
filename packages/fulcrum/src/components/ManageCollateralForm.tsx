@@ -182,17 +182,17 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
     merge(
       this._inputChange.pipe(
         distinctUntilChanged(),
-        debounceTime(500),        
-        switchMap((value) => this.rxFromInputAmount(value)), 
+        debounceTime(500),
+        switchMap((value) => this.rxFromInputAmount(value)),
         switchMap((value) => this.rxFromCurrentAmount(value))
       ),
       this._selectedValueChange.pipe(
         distinctUntilChanged(),
-        switchMap((value) => this.rxFromSelectedValue(value)),        
+        switchMap((value) => this.rxFromSelectedValue(value)),
         switchMap((value) => this.rxFromCurrentAmount(value))
       ),
       this._inputSetMax.pipe(
-        switchMap((value) => this.rxFromMaxAmountWithMultiplier(value)),        
+        switchMap((value) => this.rxFromMaxAmountWithMultiplier(value)),
         switchMap((multiplier) => this.rxFromCurrentAmount(multiplier))
       )
     ).pipe(
@@ -448,21 +448,21 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
 
     this._isMounted && this.setState({ ...this.state, selectedUnitOfAccount: asset });
 
-    this.props.onManage(
-      new ManageCollateralRequest(
-        new BigNumber(this.state.selectedValue),
-        this.props.tradeType,
-        this.props.asset,
-        asset,
-        this.state.collateral,
-        this.props.positionType,
-        this.props.leverage,
-        this.state.tradeAmountValue,
-        this.state.tokenizeNeeded,
-        version,
-        this.state.inputAmountValue
-      )
-    );
+    // this.props.onManage(
+    //   new ManageCollateralRequest(
+    //     new BigNumber(this.state.selectedValue),
+    //     this.props.tradeType,
+    //     this.props.asset,
+    //     asset,
+    //     this.state.collateral,
+    //     this.props.positionType,
+    //     this.props.leverage,
+    //     this.state.tradeAmountValue,
+    //     this.state.tokenizeNeeded,
+    //     version,
+    //     this.state.inputAmountValue
+    //   )
+    // );
   };
 
   public onChangeTokenizeNeeded = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -504,25 +504,25 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
       }
     }
     TagManager.dataLayer(tagManagerArgs)
-    this.props.onSubmit(
-      new ManageCollateralRequest(
-        new BigNumber(this.state.selectedValue),
-        this.props.tradeType,
-        this.props.asset,
-        this.state.selectedUnitOfAccount,
-        this.state.collateral,
-        this.props.positionType,
-        this.props.leverage,
-        this.state.tradeAmountValue,
-        this.state.tokenizeNeeded,
-        this.props.version,
-        this.state.inputAmountValue
-      )
-    );
+    // this.props.onSubmit(
+    //   new ManageCollateralRequest(
+    //     new BigNumber(this.state.selectedValue),
+    //     this.props.tradeType,
+    //     this.props.asset,
+    //     this.state.selectedUnitOfAccount,
+    //     this.state.collateral,
+    //     this.props.positionType,
+    //     this.props.leverage,
+    //     this.state.tradeAmountValue,
+    //     this.state.tokenizeNeeded,
+    //     this.props.version,
+    //     this.state.inputAmountValue
+    //   )
+    // );
   };
 
 
-  private rxFromCurrentAmount = (value: BigNumber= new BigNumber(this.minValue), multiplier: BigNumber = new BigNumber(1)): Observable<ITradeAmountChangeEvent | null> => {
+  private rxFromCurrentAmount = (value: BigNumber = new BigNumber(this.minValue), multiplier: BigNumber = new BigNumber(1)): Observable<ITradeAmountChangeEvent | null> => {
     return new Observable<ITradeAmountChangeEvent | null>(observer => {
 
       const tradeTokenKey = this.getTradeTokenGridRowSelectionKey();
@@ -588,9 +588,9 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
       // });
     });
   };
-  
-  private rxFromMaxAmountWithMultiplier = (multiplier: BigNumber): Observable<BigNumber> => {    
-    this.setState({ ...this.state, isLoading: true });    
+
+  private rxFromMaxAmountWithMultiplier = (multiplier: BigNumber): Observable<BigNumber> => {
+    this.setState({ ...this.state, isLoading: true });
     const tradeTokenKey = this.getTradeTokenGridRowSelectionKey();
     return new Observable<BigNumber>(observer => {
       // FulcrumProvider.Instance.getMaxTradeValue(this.props.tradeType, tradeTokenKey, this.state.collateral)
@@ -617,7 +617,7 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
 
 
   private getInputAmountLimited = async (bnValue: BigNumber, tradeTokenKey: TradeTokenKey, maxTradeValue: BigNumber, skipLimitCheck: boolean): Promise<IInputAmountLimited> => {
-    let inputAmountText =  bnValue.decimalPlaces(this._inputPrecision).toFixed();
+    let inputAmountText = bnValue.decimalPlaces(this._inputPrecision).toFixed();
     let inputAmountValue = bnValue;
 
     // handling negative values (incl. Ctrl+C)
