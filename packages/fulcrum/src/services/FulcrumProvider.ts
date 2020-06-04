@@ -1129,9 +1129,17 @@ export class FulcrumProvider {
   //   return slippage;
   // }
 
-  public getEstimatedMarginDetails = async (request: TradeRequest): Promise<BigNumber> => {
+  public getEstimatedMarginDetails = async (request: TradeRequest): Promise<{
+    principal: BigNumber,
+    collateral: BigNumber,
+    interestRate: BigNumber
+  }> => {
 
-    let result = new BigNumber(0);
+    let result = {
+      principal: new BigNumber(0),
+      collateral: new BigNumber(0),
+      interestRate: new BigNumber(0)
+    }
 
     const isLong = request.positionType === PositionType.LONG;
     const amountInBaseUnits = new BigNumber(request.amount.multipliedBy(10 ** 18).toFixed(0, 1)); // ETH -> 18 decimals
@@ -1166,25 +1174,29 @@ export class FulcrumProvider {
 
       //const depositTokenAddress = FulcrumProvider.Instance.getErc20AddressOfAsset(depositToken);
       const collateralTokenAddress = collateralToken !== Asset.ETH
-      ? FulcrumProvider.Instance.getErc20AddressOfAsset(collateralToken)
-      : FulcrumProvider.ZERO_ADDRESS;
+        ? FulcrumProvider.Instance.getErc20AddressOfAsset(collateralToken)
+        : FulcrumProvider.ZERO_ADDRESS;
       const loanData = "0x";
       try {
         console.log("leverageAmount" + leverageAmount);
         console.log("loanTokenSent" + loanTokenSent);
         console.log("collateralTokenSent" + collateralTokenSent);
         console.log("collateralTokenAddress" + collateralTokenAddress);
-        result = (await tokenContract.getEstimatedMarginDetails.callAsync(
+        const marginDetails = (await tokenContract.getEstimatedMarginDetails.callAsync(
           leverageAmount,
           loanTokenSent,
           collateralTokenSent,
-          collateralTokenAddress!))[1];
+          collateralTokenAddress!));
+        console.log(marginDetails)
+        result.principal = marginDetails[0].div(10 ** 18);
+        result.collateral = marginDetails[1].div(10 ** 18);
+        result.interestRate = marginDetails[2].div(10 ** 18);
       }
       catch (e) {
         console.error(e)
       }
     }
-    return result.div(10 ** 18);
+    return result;
   }
   // public getTradeFormExposure = async (request: TradeRequest): Promise<BigNumber> => {
 
@@ -1684,13 +1696,13 @@ if (err || 'error' in added) {
 console.log(err, added);
 }
 }*//*);
-                                                                              }
-                                                                            }
-                                                                            }
-                                                                            } catch(e) {
-                                                                            // console.log(e);
-                                                                            }
-                                                                            }*/
+                                                                                          }
+                                                                                        }
+                                                                                        }
+                                                                                        } catch(e) {
+                                                                                        // console.log(e);
+                                                                                        }
+                                                                                        }*/
   }
 
   private processLendRequestTask = async (task: RequestTask, skipGas: boolean) => {

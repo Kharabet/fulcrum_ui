@@ -204,7 +204,6 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       assetDetails = AssetsDictionaryMobile.assets.get(this.props.asset);
     }
     const tradeAssetPrice = await FulcrumProvider.Instance.getSwapToUsdRate(this.props.asset);
-    const interestRate = new BigNumber(0);//await FulcrumProvider.Instance.getTradeTokenInterestRate(tradeTokenKey);
     // const positionTokenBalance = await FulcrumProvider.Instance.getPTokenBalanceOfUser(tradeTokenKey);
     // const balance =
     //   this.props.tradeType === TradeType.BUY
@@ -238,8 +237,9 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
 
     // const latestPriceDataPoint = await FulcrumProvider.Instance.getTradeTokenAssetLatestDataPoint(tradeTokenKey);
     const liquidationPrice = new BigNumber(0); //new BigNumber(latestPriceDataPoint.liquidationPrice);
+    const {principal, collateral, interestRate}= await FulcrumProvider.Instance.getEstimatedMarginDetails(tradeRequest);
+    // const interestRate = new BigNumber(0);//await FulcrumProvider.Instance.getTradeTokenInterestRate(tradeTokenKey);
 
-    const exposureValue = await FulcrumProvider.Instance.getEstimatedMarginDetails(tradeRequest);
 
     this._isMounted && this.setState({
       ...this.state,
@@ -256,7 +256,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       currentPrice: new BigNumber(0), //new BigNumber(latestPriceDataPoint.price),
       liquidationPrice: liquidationPrice,
       tradeAssetPrice,
-      exposureValue,
+      exposureValue: collateral,
       isExposureLoading: false,
       isLoading: false
     });
@@ -577,14 +577,14 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
                 this.props.leverage,
                 limitedAmount.tradeAmountValue
               );
-              const exposureValue = await FulcrumProvider.Instance.getEstimatedMarginDetails(tradeRequest);
+              const {collateral} = await FulcrumProvider.Instance.getEstimatedMarginDetails(tradeRequest);
               observer.next({
                 isTradeAmountTouched: true,
                 inputAmountText: limitedAmount.inputAmountText,
                 inputAmountValue: limitedAmount.inputAmountValue,
                 tradeAmountValue: limitedAmount.tradeAmountValue,
                 maxTradeValue: maxTradeValue,
-                exposureValue: exposureValue,
+                exposureValue: collateral,
                 slippageRate: new BigNumber(0)
               });
             } else {
@@ -614,14 +614,14 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
             this.props.leverage,
             limitedAmount.tradeAmountValue
           );
-          const exposureValue = await FulcrumProvider.Instance.getEstimatedMarginDetails(tradeRequest);
+          const {collateral} = await FulcrumProvider.Instance.getEstimatedMarginDetails(tradeRequest);
           observer.next({
             isTradeAmountTouched: true,
             inputAmountText: limitedAmount.inputAmountText,
             inputAmountValue: limitedAmount.inputAmountValue,
             tradeAmountValue: limitedAmount.tradeAmountValue,
             maxTradeValue: maxTradeValue,
-            exposureValue: exposureValue,
+            exposureValue: collateral,
             slippageRate: new BigNumber(0)
           });
 
