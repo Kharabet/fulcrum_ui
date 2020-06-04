@@ -8,7 +8,7 @@ import "../styles/components/collateral-token-selector.scss";
 export interface ICollateralTokenSelectorProps {
   selectedCollateral: Asset;
   collateralType: string;
-  tradeType: string;
+  tradeType: string | null;
 
   onCollateralChange: (asset: Asset) => void;
   onClose: () => void;
@@ -52,7 +52,7 @@ export class CollateralTokenSelector extends Component<ICollateralTokenSelectorP
           {/*<div className="collateral-token-selector__actions">
             <div className="collateral-token-selector__action--close" onClick={this.props.onClose}>Close</div>
           </div>*/}
-          <p className="collateral-token-selector__description">{this.props.tradeType === TradeType.BUY ? `There are a few options for purchase tokens available and you can choose any token to swap during opening trade(and thus save time on visiting exchange).` : `There are a few options for redemption tokens available and you can choose any token to swap during closing trade(and thus save time on visiting exchange).`}</p>
+          <p className="collateral-token-selector__description">{!this.props.tradeType ? "" : this.props.tradeType === TradeType.BUY ? `There are a few options for purchase tokens available and you can choose any token to swap during opening trade(and thus save time on visiting exchange).` : `There are a few options for redemption tokens available and you can choose any token to swap during closing trade(and thus save time on visiting exchange).`}</p>
         </div>
       </React.Fragment>
     );
