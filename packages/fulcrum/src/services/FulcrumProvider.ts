@@ -7,6 +7,8 @@ import { Asset } from "../domain/Asset";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { IPriceDataPoint } from "../domain/IPriceDataPoint";
 import { IWeb3ProviderSettings } from "../domain/IWeb3ProviderSettings";
+import { ICollateralChangeEstimate } from "../domain/ICollateralChangeEstimate";
+import { ICollateralManagementParams } from "../domain/ICollateralManagementParams";
 import { LendRequest } from "../domain/LendRequest";
 import { LendType } from "../domain/LendType";
 import { ManageCollateralRequest } from "../domain/ManageCollateralRequest";
@@ -900,6 +902,83 @@ export class FulcrumProvider {
     return result;
   };
 
+  public getManageCollateralGasAmount = async (): Promise<BigNumber> => {
+    return new BigNumber(1000000);
+  };
+
+  public getManageCollateralParams = async (borrowedFundsState: IBorrowedFundsState): Promise<ICollateralManagementParams> => {
+    return { minValue: 0, maxValue: 1.5 * 10 ** 20, currentValue: 0 };
+  };
+
+  public getManageCollateralChangeEstimate = async (
+    borrowedFundsState: IBorrowedFundsState,
+    collateralAmount: BigNumber,
+    isWithdrawal: boolean
+  ): Promise<ICollateralChangeEstimate> => {
+
+    const result = {
+      collateralAmount: collateralAmount,
+      collateralizedPercent: new BigNumber(0),
+      liquidationPrice: new BigNumber(0),
+      gasEstimate: new BigNumber(0),
+      isWithdrawal: isWithdrawal
+    };
+
+    if (this.contractsSource && this.web3Wrapper && borrowedFundsState.loanData) {
+      const oracleContract = await this.contractsSource.getOracleContract();
+      const collateralAsset = this.contractsSource!.getAssetFromAddress(borrowedFundsState.loanData.collateralToken);
+      const collateralPrecision = AssetsDictionary.assets.get(collateralAsset)!.decimals || 18;
+      let newAmount = new BigNumber(0);
+      if (collateralAmount && collateralAmount.gt(0)) {
+        newAmount = collateralAmount.multipliedBy(10 ** collateralPrecision);
+      }
+      try {
+        const newCurrentMargin: BigNumber = await oracleContract.getCurrentMargin.callAsync(
+          borrowedFundsState.loanData.loanToken,
+          borrowedFundsState.loanData.collateralToken,
+          borrowedFundsState.loanData.principal,
+          isWithdrawal ?
+            new BigNumber(borrowedFundsState.loanData.collateral.minus(newAmount).toFixed(0, 1)) :
+            new BigNumber(borrowedFundsState.loanData.collateral.plus(newAmount).toFixed(0, 1))
+        );
+        result.collateralizedPercent = newCurrentMargin.dividedBy(10 ** 18).plus(100);
+      } catch (e) {
+        // console.log(e);
+        result.collateralizedPercent = borrowedFundsState.collateralizedPercent.times(100).plus(100);
+      }
+    }
+
+    return result;
+  };
+
+  public getManageCollateralExcessAmount = async (borrowedFundsState: IBorrowedFundsState): Promise<BigNumber> => {
+
+    let result = new BigNumber(0);
+
+    if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
+      const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+      const bZxContract = await this.contractsSource.getiBZxContract();
+      if (account && bZxContract) {
+        // console.log(bZxContract.address, borrowedFundsState.loanId, account);
+        result = await bZxContract.withdrawCollateral.callAsync(
+          borrowedFundsState.loanId,
+          account,
+          FulcrumProvider.MAX_UINT,
+          {
+            from: account,
+            gas: this.gasLimit
+          }
+        );
+        const precision = AssetsDictionary.assets.get(borrowedFundsState.collateralAsset)!.decimals || 18;
+        result = result
+          .dividedBy(10 ** precision);
+        // console.log(result.toString());
+      }
+    }
+    return result;
+  };
+
+
   public gasPrice = async (): Promise<BigNumber> => {
     let result = new BigNumber(30).multipliedBy(10 ** 9); // upper limit 30 gwei
     const lowerLimit = new BigNumber(3).multipliedBy(10 ** 9); // lower limit 3 gwei
@@ -1692,13 +1771,13 @@ if (err || 'error' in added) {
 console.log(err, added);
 }
 }*//*);
-                                                                                  }
-                                                                                }
-                                                                                }
-                                                                                } catch(e) {
-                                                                                // console.log(e);
-                                                                                }
-                                                                                }*/
+                                                                                                  }
+                                                                                                }
+                                                                                                }
+                                                                                                } catch(e) {
+                                                                                                // console.log(e);
+                                                                                                }
+                                                                                                }*/
   }
 
   private processLendRequestTask = async (task: RequestTask, skipGas: boolean) => {
