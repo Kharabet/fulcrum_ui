@@ -94,7 +94,7 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
         distinctUntilChanged(),
         debounceTime(500),
         switchMap((value) => this.rxFromInputAmount(value)),
-        switchMap((value) => this.rxFromCurrentAmount(value.toNumber()))
+        switchMap((value) => this.rxFromCurrentAmount(value))
       ),
       this._selectedValueUpdate.pipe(
         distinctUntilChanged(),
@@ -211,8 +211,7 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
               },
               () => {
                 if (this.props.isOpenModal) {
-                  // window.history.pushState(null, "Manage Collateral Modal Opened", `/trade/manage-collateral/`);
-
+                  window.history.pushState(null, "Manage Collateral Modal Opened", `/trade/manage-collateral/`);
                   this._selectedValueUpdate.next(new BigNumber(this.state.selectedValue));
                 }
               }
@@ -339,10 +338,11 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
     const amountText = event.target.value ? event.target.value : "";
 
     // setting Text to update display at the same time
-    this.setState({ ...this.state, inputAmountText: amountText }, () => {
 
-      // emitting next event for processing with rx.js
-      this._inputChange.next(this.state.inputAmountText);
+    this.setState({ ...this.state, inputAmountText: amountText }, () => {
+      if (Number(amountText) != 0)
+        // emitting next event for processing with rx.js
+        this._inputChange.next(this.state.inputAmountText);
     });
   };
 
@@ -448,12 +448,31 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
     });
   };
 
-  private rxFromInputAmount = (value: string): Observable<BigNumber> => {
-    return new Observable<BigNumber>(observer => {
-      // FulcrumProvider.Instance.getMaxTradeValue(this.props.tradeType, tradeTokenKey, this.state.collateral).then(maxTradeValue => {
-      //   let amountValue = new BigNumber(value).plus(maxTradeValue.dividedBy(2));
-      //   observer.next(amountValue);
-      // });
+  private rxFromInputAmount = (value: string): Observable<number> => {
+
+    let collateralAmount = new BigNumber(Math.abs(Number(value)));
+    let selectedValue = (Number(value) > 0 ?
+
+      collateralAmount
+        .dividedBy(this.props.loan!.collateralAmount)
+        .multipliedBy(this.state.maxValue - this.state.loanValue)
+        .plus(this.state.loanValue)
+      :
+      new BigNumber(this.state.loanValue)
+        .minus(
+          collateralAmount
+            .dividedBy(this.state.collateralExcess)
+            .multipliedBy(this.state.loanValue)
+        )).toNumber();
+
+    this.setState({
+      ...this.state,
+      selectedValue: selectedValue,
+      collateralAmount: collateralAmount
+    });
+
+    return new Observable<number>(observer => {
+      observer.next(this.state.selectedValue);
     });
   };
 
