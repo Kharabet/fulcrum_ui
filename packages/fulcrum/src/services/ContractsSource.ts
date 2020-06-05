@@ -233,25 +233,6 @@ export class ContractsSource {
     return address;
   }
 
-  public getOracleHelperAddress(): string {
-    let address: string = "";
-    switch (this.networkId) {
-      case 1:
-        address = "0xee14de2e67e1ec23c8561a6fad2635ff1b618db6";
-        break;
-      case 3:
-        address = "0x4330762418df3555ddd1d732200b317c9239b941";
-        break;
-      case 4:
-        address = "0x76de3d406fee6c3316558406b17ff785c978e98c";
-        break;
-      case 42:
-        address = "0x692f391bCc85cefCe8C237C01e1f636BbD70EA4D";
-        break;
-    }
-
-    return address;
-  }
 
   private getDAppHelperAddress(): string {
     let address: string = "";
@@ -307,7 +288,7 @@ export class ContractsSource {
     await this.Init();
     return new oracleContract(
       ContractsSource.oracleJson.abi,
-      this.getOracleHelperAddress().toLowerCase(),
+      this.getOracleAddress().toLowerCase(),
       this.provider
     );
   }

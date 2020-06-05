@@ -1613,57 +1613,34 @@ export class FulcrumProvider {
   }
 
   public async getSwapRate(srcAsset: Asset, destAsset: Asset, srcAmount?: BigNumber): Promise<BigNumber> {
-    if (srcAsset === destAsset) {
+    if (srcAsset === destAsset || (srcAsset === Asset.USDC && destAsset === Asset.DAI)
+      || (srcAsset === Asset.DAI && destAsset === Asset.USDC)) {
       return new BigNumber(1);
     }
-
+    // console.log("srcAmount 11 = "+srcAmount)
     let result: BigNumber = new BigNumber(0);
-
-    if (process.env.REACT_APP_ETH_NETWORK === "mainnet") {
-      if (!srcAmount) {
-        srcAmount = FulcrumProvider.UNLIMITED_ALLOWANCE_IN_BASE_UNITS;
-      } else {
-        srcAmount = new BigNumber(srcAmount.toFixed(0, 1));
-      }
-
-      const srcAssetErc20Address = this.getErc20AddressOfAsset(srcAsset);
-      const destAssetErc20Address = this.getErc20AddressOfAsset(destAsset);
-      if (this.contractsSource && srcAssetErc20Address && destAssetErc20Address) {
-        const oracleContract = await this.contractsSource.getOracleContract();
-        try {
-          const swapPriceData: BigNumber[] = await oracleContract.getTradeData.callAsync(
-            srcAssetErc20Address,
-            destAssetErc20Address,
-            srcAmount
-          );
-          result = swapPriceData[0].dividedBy(10 ** 18);
-        } catch (e) {
-          result = new BigNumber(0);
-        }
-      }
+    const srcAssetErc20Address = this.getErc20AddressOfAsset(srcAsset);
+    const destAssetErc20Address = this.getErc20AddressOfAsset(destAsset);
+    if (!srcAmount) {
+      srcAmount = FulcrumProvider.UNLIMITED_ALLOWANCE_IN_BASE_UNITS;
     } else {
-      if (!srcAmount) {
-        srcAmount = this.getGoodSourceAmountOfAsset(srcAsset);
-      }
-
-      const srcAssetErc20Address = this.getErc20AddressOfAsset(srcAsset);
-      const destAssetErc20Address = this.getErc20AddressOfAsset(destAsset);
-      if (this.contractsSource && srcAssetErc20Address && destAssetErc20Address) {
-        const oracleContract = await this.contractsSource.getOracleContract();
-        try {
-          const swapPriceData: BigNumber[] = await oracleContract.getExpectedRate.callAsync(
-            srcAssetErc20Address,
-            destAssetErc20Address,
-            new BigNumber(srcAmount.toFixed(0, 1))
-          );
-          result = swapPriceData[0].dividedBy(10 ** 18);
-        } catch (e) {
-          // console.log(e);
-          result = new BigNumber(0);
-        }
-      }
+      srcAmount = new BigNumber(srcAmount.toFixed(1, 1));
     }
 
+    if (this.contractsSource && srcAssetErc20Address && destAssetErc20Address) {
+      const oracleContract = await this.contractsSource.getOracleContract();
+      try {
+        const swapPriceData: BigNumber[] = await oracleContract.queryRate.callAsync(
+          srcAssetErc20Address,
+          destAssetErc20Address
+        );
+        // console.log("swapPriceData- ",swapPriceData[0])
+        result = swapPriceData[0].dividedBy(10 ** 18).multipliedBy(swapPriceData[1].dividedBy(10 ** 18));// swapPriceData[0].dividedBy(10 ** 18);
+      } catch (e) {
+        console.log(e)
+        result = new BigNumber(0);
+      }
+    }
     return result;
   }
 
