@@ -5,6 +5,7 @@ import { FulcrumProvider } from "../FulcrumProvider";
 
 import { Asset } from "../../domain/Asset";
 import { PositionType } from "../../domain/PositionType";
+import { AssetsDictionary } from "../../domain/AssetsDictionary";
 
 export class TradeSellErcProcessor {
   public run = async (task: RequestTask, account: string, skipGas: boolean) => {
@@ -16,11 +17,26 @@ export class TradeSellErcProcessor {
     const taskRequest: TradeRequest = (task.request as TradeRequest);
     const isLong = taskRequest.positionType === PositionType.LONG;
 
+    let decimals: number = AssetsDictionary.assets.get(taskRequest.asset)!.decimals || 18;
+    if (taskRequest.asset === Asset.WBTC && taskRequest.positionType === PositionType.SHORT) {
+      decimals = decimals + 10;
+    }
 
+    let amountInBaseUnits = new BigNumber(taskRequest.amount.multipliedBy(10 ** decimals).toFixed(0, 1));
+    let maxAmountInBaseUnits = new BigNumber(0);
+    const loan = (await FulcrumProvider.Instance.getUserMarginTradeLoans())
+      .find(l => l.loanId === taskRequest.loanId);
+    if (loan) {
+      maxAmountInBaseUnits = isLong
+      ? loan.loanData!.collateral
+      : loan.loanData!.principal;
+    }
 
-    const loans = await FulcrumProvider.Instance.getUserMarginTradeLoans();
-    const amountInBaseUnits = loans.find(l => l.loanId === taskRequest.loanId)!.loanData!.collateral.times(10**50); //new BigNumber("525478543208365722")// new BigNumber(taskRequest.amount.multipliedBy(10 ** decimals).toFixed(0, 1));
-
+    if (maxAmountInBaseUnits.gt(0) && (maxAmountInBaseUnits.minus(amountInBaseUnits)).abs().div(maxAmountInBaseUnits).lte(0.01))
+    {
+      console.log("colse full amount")
+      amountInBaseUnits = maxAmountInBaseUnits.times(10**50);
+    }
     const iBZxContract = await FulcrumProvider.Instance.contractsSource.getiBZxContract();
     if (!iBZxContract) {
       throw new Error("No iBZxContract contract available!");
