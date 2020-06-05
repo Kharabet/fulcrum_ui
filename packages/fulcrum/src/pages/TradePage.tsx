@@ -457,6 +457,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         }
         ownRowsData.push({
           loan: loan,
+          loanId: this.state.loanId,
           tradeAsset: this.state.selectedTabAsset,
           collateralAsset: collateralAsset,
           positionType,
@@ -464,7 +465,8 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
           onTrade: this.onTradeRequested,
           onManageCollateralOpen: this.onManageCollateralRequested,
           changeLoadingTransaction: this.changeLoadingTransaction,
-          isTxCompleted: this.state.isTxCompleted
+          isTxCompleted: this.state.isTxCompleted,
+          tradeType: this.state.tradeType
         });
       }
     }
