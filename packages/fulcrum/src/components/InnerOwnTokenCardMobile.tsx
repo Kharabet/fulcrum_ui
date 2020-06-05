@@ -153,7 +153,7 @@ export class InnerOwnTokenCardMobile extends Component<IOwnTokenGridRowProps, II
 
     this.derivedUpdate();
   }
-  
+
   public render() {
     return (
       <React.Fragment>
@@ -165,43 +165,6 @@ export class InnerOwnTokenCardMobile extends Component<IOwnTokenGridRowProps, II
             </div>
           </React.Fragment>
           : <div className="inner-own-token-card-mobile">
-            <div className="inner-own-token-card-mobile__body-row">
-      <div title={this.state.positionValue.toFixed(18)} className="inner-own-token-card-mobile__col-token-name-full">
-        <span className="inner-own-token-header">{`Position (${this.props.tradeAsset.toUpperCase()}/DAI)`}</span>
-        {this.state.positionValue.toFixed(4)}
-
-      </div>
-      <div title={this.props.collateralAsset} className="inner-own-token-card-mobile__col-asset-type">
-        <span className="position-type-marker">{`${this.props.leverage}x`}&nbsp; {this.props.positionType}</span>
-      </div>
-      <div className="inner-own-token-card-mobile__col-action">
-        <button className="inner-own-token-card-mobile_button inner-own-token-card-mobile__sell-button inner-own-token-card-mobile__button--size-half" onClick={this.onSellClick}>
-          {TradeType.SELL}
-        </button>
-      </div>
-    </div>
-            <div className="inner-own-token-card-mobile__body-row">
-              <div title={this.state.value.toFixed(18)} className="inner-own-token-card-mobile__col-asset-price">
-                <span className="inner-own-token-header">Value</span>
-                {!this.state.isLoading
-                  ? <React.Fragment>
-                    <span className="sign-currency">$</span>{this.state.value.toFixed(2)}
-                    <span className="inner-own-token-card-mobile__col-asset-price-small">12.25%</span>
-                  </React.Fragment>
-                  : <Preloader width="74px" />
-                }
-              </div>
-              <div className="inner-own-token-card-mobile__col-asset-collateral">
-                <span className="inner-own-token-header">Collateral</span>
-                <React.Fragment>
-                  <span className="sign-currency">$</span>{this.state.collateral.toFixed(2)}
-                  <span className="inner-own-token-card-mobile__col-asset-collateral-small">16.5%</span>
-                </React.Fragment>
-                <div className="inner-own-token-card-mobile__open-manage-collateral" onClick={this.onManageClick}>
-                  <OpenManageCollateral />
-                </div>
-              </div>
-            </div>
             <div className="inner-own-token-card-mobile__body-row">
               <div title={this.state.openPrice.toFixed(18)} className="inner-own-token-card-mobile__col-position-value">
                 <span className="inner-own-token-header">Open Price</span>
@@ -241,16 +204,14 @@ export class InnerOwnTokenCardMobile extends Component<IOwnTokenGridRowProps, II
   public onManageClick = async (event: React.MouseEvent<HTMLElement>) => {
     event.stopPropagation();
     const request = new ManageCollateralRequest(
-      new BigNumber(0),
-      TradeType.BUY,
+      this.props.loan.loanId,
       this.props.tradeAsset,
       this.props.collateralAsset,
-      this.props.positionType === PositionType.SHORT ? this.props.collateralAsset : Asset.USDC,
+      this.props.loan.collateralAmount,
       this.props.positionType,
       this.props.leverage,
-      new BigNumber(0),
       false
-    )
+    );
     this.props.onManageCollateralOpen(request);
   };
 

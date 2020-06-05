@@ -7,6 +7,8 @@ import { Asset } from "../domain/Asset";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { IPriceDataPoint } from "../domain/IPriceDataPoint";
 import { IWeb3ProviderSettings } from "../domain/IWeb3ProviderSettings";
+import { ICollateralChangeEstimate } from "../domain/ICollateralChangeEstimate";
+import { ICollateralManagementParams } from "../domain/ICollateralManagementParams";
 import { LendRequest } from "../domain/LendRequest";
 import { LendType } from "../domain/LendType";
 import { ManageCollateralRequest } from "../domain/ManageCollateralRequest";
@@ -67,6 +69,10 @@ export class FulcrumProvider {
 
   public readonly gasBufferForLend = new BigNumber(10 ** 16); // 0.01 ETH
   public readonly gasBufferForTrade = new BigNumber(5 * 10 ** 16); // 0.05 ETH
+
+  public static readonly MAX_UINT = new BigNumber(2)
+    .pow(256)
+    .minus(1);
 
   public static readonly UNLIMITED_ALLOWANCE_IN_BASE_UNITS = new BigNumber(2)
     .pow(256)
@@ -896,6 +902,83 @@ export class FulcrumProvider {
     return result;
   };
 
+  public getManageCollateralGasAmount = async (): Promise<BigNumber> => {
+    return new BigNumber(1000000);
+  };
+
+  public getManageCollateralParams = async (borrowedFundsState: IBorrowedFundsState): Promise<ICollateralManagementParams> => {
+    return { minValue: 0, maxValue: 1.5 * 10 ** 20, currentValue: 0 };
+  };
+
+  public getManageCollateralChangeEstimate = async (
+    borrowedFundsState: IBorrowedFundsState,
+    collateralAmount: BigNumber,
+    isWithdrawal: boolean
+  ): Promise<ICollateralChangeEstimate> => {
+
+    const result = {
+      collateralAmount: collateralAmount,
+      collateralizedPercent: new BigNumber(0),
+      liquidationPrice: new BigNumber(0),
+      gasEstimate: new BigNumber(0),
+      isWithdrawal: isWithdrawal
+    };
+
+    if (this.contractsSource && this.web3Wrapper && borrowedFundsState.loanData) {
+      const oracleContract = await this.contractsSource.getOracleContract();
+      const collateralAsset = this.contractsSource!.getAssetFromAddress(borrowedFundsState.loanData.collateralToken);
+      const collateralPrecision = AssetsDictionary.assets.get(collateralAsset)!.decimals || 18;
+      let newAmount = new BigNumber(0);
+      if (collateralAmount && collateralAmount.gt(0)) {
+        newAmount = collateralAmount.multipliedBy(10 ** collateralPrecision);
+      }
+      try {
+        const newCurrentMargin: BigNumber = await oracleContract.getCurrentMargin.callAsync(
+          borrowedFundsState.loanData.loanToken,
+          borrowedFundsState.loanData.collateralToken,
+          borrowedFundsState.loanData.principal,
+          isWithdrawal ?
+            new BigNumber(borrowedFundsState.loanData.collateral.minus(newAmount).toFixed(0, 1)) :
+            new BigNumber(borrowedFundsState.loanData.collateral.plus(newAmount).toFixed(0, 1))
+        );
+        result.collateralizedPercent = newCurrentMargin.dividedBy(10 ** 18).plus(100);
+      } catch (e) {
+        // console.log(e);
+        result.collateralizedPercent = borrowedFundsState.collateralizedPercent.times(100).plus(100);
+      }
+    }
+
+    return result;
+  };
+
+  public getManageCollateralExcessAmount = async (borrowedFundsState: IBorrowedFundsState): Promise<BigNumber> => {
+
+    let result = new BigNumber(0);
+
+    if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
+      const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+      const bZxContract = await this.contractsSource.getiBZxContract();
+      if (account && bZxContract) {
+        // console.log(bZxContract.address, borrowedFundsState.loanId, account);
+        result = await bZxContract.withdrawCollateral.callAsync(
+          borrowedFundsState.loanId,
+          account,
+          FulcrumProvider.MAX_UINT,
+          {
+            from: account,
+            gas: this.gasLimit
+          }
+        );
+        const precision = AssetsDictionary.assets.get(borrowedFundsState.collateralAsset)!.decimals || 18;
+        result = result
+          .dividedBy(10 ** precision);
+        // console.log(result.toString());
+      }
+    }
+    return result;
+  };
+
+
   public gasPrice = async (): Promise<BigNumber> => {
     let result = new BigNumber(30).multipliedBy(10 ** 9); // upper limit 30 gwei
     const lowerLimit = new BigNumber(3).multipliedBy(10 ** 9); // lower limit 3 gwei
@@ -1662,6 +1745,10 @@ export class FulcrumProvider {
       await this.processTradeRequestTask(task, skipGas);
     }
 
+    if (task.request instanceof ManageCollateralRequest) {
+      await this.processManageCollateralRequestTask(task, skipGas);
+    }
+
     return false;
   };
 
@@ -1696,13 +1783,13 @@ if (err || 'error' in added) {
 console.log(err, added);
 }
 }*//*);
-                                                                                          }
-                                                                                        }
-                                                                                        }
-                                                                                        } catch(e) {
-                                                                                        // console.log(e);
-                                                                                        }
-                                                                                        }*/
+                                                                                                    }
+                                                                                                    }
+                                                                                                    }
+                                                                                                    } catch(e) {
+                                                                                                    // console.log(e);
+                                                                                                    }
+                                                                                                    }*/
   }
 
   private processLendRequestTask = async (task: RequestTask, skipGas: boolean) => {
@@ -1751,6 +1838,41 @@ console.log(err, added);
           await processor.run(task, account, skipGas);
         }
       }
+
+      task.processingEnd(true, false, null);
+    } catch (e) {
+      if (!e.message.includes(`Request for method "eth_estimateGas" not handled by any subprovider`)) {
+        // tslint:disable-next-line:no-console
+        console.log(e);
+      }
+      task.processingEnd(false, false, e);
+    }
+    finally {
+      this.eventEmitter.emit(FulcrumProviderEvents.AskToCloseProgressDlg, task);
+    }
+  };
+
+  private processManageCollateralRequestTask = async (task: RequestTask, skipGas: boolean) => {
+    try {
+
+      this.eventEmitter.emit(FulcrumProviderEvents.AskToOpenProgressDlg, task.request.id);
+      if (!(this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite)) {
+        throw new Error("No provider available!");
+      }
+
+      const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+      if (!account) {
+        throw new Error("Unable to get wallet address!");
+      }
+
+      // Initializing loan
+      const taskRequest: ManageCollateralRequest = (task.request as ManageCollateralRequest);
+
+      await this.addTokenToMetaMask(task);
+      const { ManageCollateralProcessor } = await import("./processors/ManageCollateralProcessor");
+      const processor = new ManageCollateralProcessor();
+      await processor.run(task, account, skipGas);
+
 
       task.processingEnd(true, false, null);
     } catch (e) {
@@ -1988,9 +2110,10 @@ console.log(err, added);
     }
   };
 
+
   public waitForTransactionMined = async (
     txHash: string,
-    request: LendRequest | TradeRequest): Promise<any> => {
+    request: LendRequest | TradeRequest | ManageCollateralRequest): Promise<any> => {
 
     return new Promise((resolve, reject) => {
       try {
@@ -2008,7 +2131,7 @@ console.log(err, added);
   private waitForTransactionMinedRecursive = async (
     txHash: string,
     web3Wrapper: Web3Wrapper,
-    request: LendRequest | TradeRequest,
+    request: LendRequest | TradeRequest | ManageCollateralRequest,
     resolve: (value: any) => void,
     reject: (value: any) => void) => {
 
@@ -2016,8 +2139,10 @@ console.log(err, added);
       const receipt = await web3Wrapper.getTransactionReceiptIfExistsAsync(txHash);
       if (receipt) {
         resolve(receipt);
+
+        const randomNumber = Math.floor(Math.random() * 100000) + 1;
+
         if (request instanceof LendRequest) {
-          const randomNumber = Math.floor(Math.random() * 100000) + 1;
           const tagManagerArgs = {
             dataLayer: {
               transactionId: randomNumber,
@@ -2033,31 +2158,43 @@ console.log(err, added);
             FulcrumProviderEvents.LendTransactionMined,
             new LendTransactionMinedEvent(request.asset, txHash)
           );
-        } else {
-          const randomNumber = Math.floor(Math.random() * 100000) + 1;
-          const tagManagerArgs = {
-            dataLayer: {
-              transactionId: randomNumber,
-              transactionProducts: [{
-                name: "Transaction-Trade" + request.asset,
-                sku: request.asset,
-                category: 'Trade'
-              }],
+        } else
+          if (request instanceof ManageCollateralRequest) {
+            const tagManagerArgs = {
+              dataLayer: {
+                transactionId: randomNumber,
+                transactionProducts: [{
+                  name: "Transaction-Manage-Collateral-" + request.asset,
+                  sku: request.asset,
+                  category: 'Manage-Collateral'
+                }],
+              }
             }
+            TagManager.dataLayer(tagManagerArgs)
+          } else {
+            const tagManagerArgs = {
+              dataLayer: {
+                transactionId: randomNumber,
+                transactionProducts: [{
+                  name: "Transaction-Trade" + request.asset,
+                  sku: request.asset,
+                  category: 'Trade'
+                }],
+              }
+            }
+            TagManager.dataLayer(tagManagerArgs)
+            // this.eventEmitter.emit(
+            //   FulcrumProviderEvents.TradeTransactionMined,
+            //   new TradeTransactionMinedEvent(new TradeTokenKey(
+            //     request.asset,
+            //     request.unitOfAccount,
+            //     request.positionType,
+            //     request.leverage,
+            //     request.isTokenized,
+            //     request.version
+            //   ), txHash)
+            // );
           }
-          TagManager.dataLayer(tagManagerArgs)
-          // this.eventEmitter.emit(
-          //   FulcrumProviderEvents.TradeTransactionMined,
-          //   new TradeTransactionMinedEvent(new TradeTokenKey(
-          //     request.asset,
-          //     request.unitOfAccount,
-          //     request.positionType,
-          //     request.leverage,
-          //     request.isTokenized,
-          //     request.version
-          //   ), txHash)
-          // );
-        }
       } else {
         window.setTimeout(() => {
           this.waitForTransactionMinedRecursive(txHash, web3Wrapper, request, resolve, reject);
@@ -2072,6 +2209,11 @@ console.log(err, added);
   public sleep(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
+
+  public isETHAsset = (asset: Asset): boolean => {
+    return asset === Asset.ETH; // || asset === Asset.WETH;
+  };
+
 }
 
 // tslint:disable-next-line

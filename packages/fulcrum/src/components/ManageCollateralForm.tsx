@@ -10,6 +10,8 @@ import { ReactComponent as CloseIcon } from "../assets/images/ic__close.svg"
 import { Asset } from "../domain/Asset";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary, AssetsDictionaryMobile } from "../domain/AssetsDictionary";
+import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
+import { ICollateralChangeEstimate } from "../domain/ICollateralChangeEstimate";
 import { PositionType } from "../domain/PositionType";
 import { TradeTokenKey } from "../domain/TradeTokenKey";
 import { TradeType } from "../domain/TradeType";
@@ -20,278 +22,112 @@ import { InputAmount } from "./InputAmount";
 
 import "../styles/components/manage-collateral-form.scss";
 
-interface IInputAmountLimited {
-  inputAmountValue: BigNumber;
-  inputAmountText: string;
-  tradeAmountValue: BigNumber;
-  maxTradeValue: BigNumber;
-}
-
-interface ITradeExpectedResults {
-  tradedAmountEstimate: BigNumber;
-  slippageRate: BigNumber;
-  exposureValue: BigNumber;
-}
-
-interface ITradeAmountChangeEvent {
-  isTradeAmountTouched: boolean;
-
-  inputAmountText: string;
-  inputAmountValue: BigNumber;
-  tradeAmountValue: BigNumber;
-  maxTradeValue: BigNumber;
-
-  tradedAmountEstimate: BigNumber;
-  slippageRate: BigNumber;
-  exposureValue: BigNumber;
-  selectedValue: number;
-}
-
 export interface IManageCollateralFormProps {
-  onSubmit: (request: ManageCollateralRequest) => void;
-  onCancel: () => void;
+  loan?: IBorrowedFundsState
 
-  tradeType: TradeType;
-  asset: Asset;
   positionType: PositionType;
   leverage: number;
-  defaultCollateral: Asset;
-  defaultUnitOfAccount: Asset;
-  defaultTokenizeNeeded: boolean;
-  bestCollateral: Asset;
-  version: number;
+  onSubmit: (request: ManageCollateralRequest) => void;
+  onCancel: () => void;
   isMobileMedia: boolean;
   isOpenModal: boolean;
-  onManage: (request: ManageCollateralRequest) => void;
 }
 
 interface IManageCollateralFormState {
-  positionValue: number;
+  assetDetails: AssetDetails | null;
+
+  minValue: number;
+  maxValue: number;
+  loanValue: number;
   selectedValue: number;
-  sliderValue: number;
-  diffAmount: BigNumber;
+
+  currentValue: number;
+  assetBalanceValue: BigNumber;
+
+  collateralAsset: Asset;
   collateralAmount: BigNumber;
+  collateralExcess: BigNumber;
+  liquidationPrice: BigNumber;
   gasAmountNeeded: BigNumber;
   collateralizedPercent: BigNumber;
-
-  assetDetails: AssetDetails | null;
-  collateral: Asset;
-  tokenizeNeeded: boolean;
-  interestRate: BigNumber | null;
-
-  isTradeAmountTouched: boolean;
+  balanceTooLow: boolean;
 
   inputAmountText: string;
-  inputAmountValue: BigNumber;
-  tradeAmountValue: BigNumber;
-  maxTradeValue: BigNumber;
 
-  balance: BigNumber | null;
-  ethBalance: BigNumber | null;
-  positionTokenBalance: BigNumber | null;
-  maybeNeedsApproval: boolean;
-
-  isChangeCollateralOpen: boolean;
-
-  tradedAmountEstimate: BigNumber;
-  slippageRate: BigNumber;
-
-  currentPrice: BigNumber;
-  liquidationPrice: BigNumber;
-  exposureValue: BigNumber;
-
-  isAmountExceeded: boolean;
-  maxAmountMultiplier: BigNumber;
-
+  didSubmit: boolean;
   isLoading: boolean;
-
-  selectedUnitOfAccount: Asset;
 }
 
 export default class ManageCollateralForm extends Component<IManageCollateralFormProps, IManageCollateralFormState> {
-  private minValue: number = 115;
-  private maxValue: number = 300;
 
-  //#region tradeComponent
   private readonly _inputPrecision = 6;
 
   private readonly _inputChange: Subject<string>;
-  private readonly _selectedValueChange: Subject<BigNumber>;
+  private readonly _selectedValueUpdate: Subject<BigNumber>;
   private readonly _inputSetMax: Subject<BigNumber>;
 
-  private _isMounted: boolean;
 
   constructor(props: IManageCollateralFormProps, context?: any) {
     super(props, context);
-    let assetDetails = AssetsDictionary.assets.get(props.asset);
-    if (this.props.isMobileMedia) {
-      assetDetails = AssetsDictionaryMobile.assets.get(this.props.asset);
-    }
-    const interestRate = null;
-    const balance = null;
-    const ethBalance = null;
-    const positionTokenBalance = null;
-    const maxTradeValue = new BigNumber(0);
-    const slippageRate = new BigNumber(0);
-    const tradedAmountEstimate = new BigNumber(0);
-    const currentPrice = new BigNumber(0);
-    const liquidationPrice = new BigNumber(0);
-    const exposureValue = new BigNumber(0);
-    const maxAmountMultiplier = new BigNumber(0);
-    this._isMounted = false;
+
+    // let assetDetails = AssetsDictionary.assets.get(props.loan!.collateralAsset);
+    // if (this.props.isMobileMedia) {
+    //   assetDetails = AssetsDictionaryMobile.assets.get(props.loan!.collateralAsset);
+    // }
+
     this.state = {
-      positionValue: 150,
-      selectedValue: 150,
-      sliderValue: 150,
-      diffAmount: new BigNumber(0),
-
-      collateralAmount: new BigNumber(0),
+      minValue: 0,
+      maxValue: 0,
+      assetDetails: null,
+      selectedValue: 0,
+      currentValue: 100,
+      loanValue: 0,
+      assetBalanceValue: new BigNumber(0),
+      liquidationPrice: new BigNumber(0),
       gasAmountNeeded: new BigNumber(0),
+      collateralAsset: Asset.UNKNOWN,
+      collateralAmount: new BigNumber(0),
+      collateralExcess: new BigNumber(0),
       collateralizedPercent: new BigNumber(0),
-
-      assetDetails: assetDetails || null,
-      collateral: props.bestCollateral,
-      tokenizeNeeded: props.defaultTokenizeNeeded,
-      isTradeAmountTouched: false,
+      balanceTooLow: false,
       inputAmountText: "",
-      inputAmountValue: maxTradeValue,
-      tradeAmountValue: maxTradeValue,
-      maxTradeValue: maxTradeValue,
-      balance: balance,
-      ethBalance: ethBalance,
-      positionTokenBalance: positionTokenBalance,
-      isChangeCollateralOpen: false,
-      tradedAmountEstimate: tradedAmountEstimate,
-      slippageRate: slippageRate,
-      interestRate: interestRate,
-      maybeNeedsApproval: false,
-      currentPrice: currentPrice,
-      liquidationPrice: liquidationPrice,
-      exposureValue: exposureValue,
-      isAmountExceeded: false,
-      maxAmountMultiplier: maxAmountMultiplier,
-      isLoading: true,
-      selectedUnitOfAccount: this.props.defaultUnitOfAccount
-
+      didSubmit: false,
+      isLoading: true
     };
 
     this._inputChange = new Subject();
-    this._selectedValueChange = new Subject();
+    this._selectedValueUpdate = new Subject();
     this._inputSetMax = new Subject();
 
     merge(
       this._inputChange.pipe(
         distinctUntilChanged(),
-        debounceTime(500),        
-        switchMap((value) => this.rxFromInputAmount(value)), 
-        switchMap((value) => this.rxFromCurrentAmount(value))
+        debounceTime(500),
+        switchMap((value) => this.rxFromInputAmount(value)),
+        switchMap((value) => this.rxFromCurrentAmount(value.toNumber()))
       ),
-      this._selectedValueChange.pipe(
+      this._selectedValueUpdate.pipe(
         distinctUntilChanged(),
-        switchMap((value) => this.rxFromSelectedValue(value)),        
-        switchMap((value) => this.rxFromCurrentAmount(value))
+        switchMap((value) => this.rxFromSelectedValue(value)),
+        switchMap((value) => this.rxFromCurrentAmount(value.toNumber()))
       ),
       this._inputSetMax.pipe(
-        switchMap((value) => this.rxFromMaxAmountWithMultiplier(value)),        
-        switchMap((multiplier) => this.rxFromCurrentAmount(multiplier))
+        switchMap((value) => this.rxFromMaxAmountWithMultiplier(value)),
+        switchMap((value) => this.rxFromCurrentAmount(value.toNumber()))
       )
-    ).pipe(
-      switchMap((value) => new Observable<ITradeAmountChangeEvent | null>((observer) => observer.next(value)))
-    ).subscribe(next => {
-      if (next) {
-        this._isMounted && this.setState({ ...this.state, ...next, isLoading: false });
-      } else {
-        this._isMounted && this.setState({
-          ...this.state,
-          isTradeAmountTouched: false,
-          inputAmountText: "",
-          inputAmountValue: new BigNumber(0),
-          tradeAmountValue: new BigNumber(0),
-          tradedAmountEstimate: new BigNumber(0),
-          slippageRate: new BigNumber(0),
-          exposureValue: new BigNumber(0),
-          isLoading: false,
-          selectedValue: 150,
-          sliderValue: 150
-        })
-      }
+    ).subscribe((value: ICollateralChangeEstimate) => {
+      this.setState({
+        ...this.state,
+        liquidationPrice: value.liquidationPrice,
+        collateralAmount: value.collateralAmount,
+        collateralizedPercent: value.collateralizedPercent,
+        inputAmountText: this.formatPrecision(value.collateralAmount.toString())
+      });
     });
-    FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
   }
-
-
-  private getTradeTokenGridRowSelectionKey(leverage: number = this.props.leverage) {
-    return new TradeTokenKey(
-      this.props.asset,
-      this.state.selectedUnitOfAccount,
-      this.props.positionType,
-      leverage,
-      this.state.tokenizeNeeded,
-      this.props.version
-    );
-  }
-
 
   private async derivedUpdate() {
-    let assetDetails = AssetsDictionary.assets.get(this.props.asset);
-    if (this.props.isMobileMedia) {
-      assetDetails = AssetsDictionaryMobile.assets.get(this.props.asset);
-    }
-    const tradeTokenKey = this.getTradeTokenGridRowSelectionKey(this.props.leverage);
-    const interestRate = await FulcrumProvider.Instance.getTradeTokenInterestRate(tradeTokenKey);
-    const positionTokenBalance = await FulcrumProvider.Instance.getPTokenBalanceOfUser(tradeTokenKey);
-    const balance =
-      this.props.tradeType === TradeType.BUY
-        ? await FulcrumProvider.Instance.getAssetTokenBalanceOfUser(this.state.collateral)
-        : positionTokenBalance;
-    const ethBalance = await FulcrumProvider.Instance.getEthBalance();
-    // const maxTradeValue = await FulcrumProvider.Instance.getMaxTradeValue(this.props.tradeType, tradeTokenKey, this.state.collateral);
 
-    // const limitedAmount = await this.getInputAmountLimited(this.state.inputAmountValue, tradeTokenKey, maxTradeValue, false);
-
-    // const collateralRequest = new ManageCollateralRequest(
-    //   new BigNumber(this.state.selectedValue),
-    //   this.props.tradeType,
-    //   this.props.asset,
-    //   this.state.selectedUnitOfAccount,
-    //   this.state.collateral,
-    //   this.props.positionType,
-    //   this.props.leverage,
-    //   limitedAmount.tradeAmountValue,// new BigNumber(0),
-    //   this.state.tokenizeNeeded,
-    //   this.props.version,
-    //   this.state.inputAmountValue
-    // );
-
-
-    const address = FulcrumProvider.Instance.contractsSource
-      ? await FulcrumProvider.Instance.contractsSource.getPTokenErc20Address(tradeTokenKey) || ""
-      : "";
-
-    const maybeNeedsApproval = false;
-
-    const latestPriceDataPoint = await FulcrumProvider.Instance.getTradeTokenAssetLatestDataPoint(tradeTokenKey);
-    const liquidationPrice = new BigNumber(latestPriceDataPoint.liquidationPrice);
-    //#endregion tradeComponent
-    // const collateralizedPercent = maxTradeValue.dividedBy(2 * this.state.positionValue);
-
-    this._isMounted && this.setState({
-      ...this.state,
-      assetDetails: assetDetails || null,
-      // inputAmountText: limitedAmount.inputAmountText,// "",
-      // inputAmountValue: limitedAmount.inputAmountValue,// new BigNumber(0),
-      // tradeAmountValue: limitedAmount.tradeAmountValue,// new BigNumber(0),
-      // maxTradeValue: limitedAmount.maxTradeValue,
-      balance: balance,
-      ethBalance: ethBalance,
-      positionTokenBalance: positionTokenBalance,
-      interestRate: interestRate,
-      maybeNeedsApproval: maybeNeedsApproval,
-      currentPrice: new BigNumber(latestPriceDataPoint.price),
-      liquidationPrice: liquidationPrice,
-
-      // collateralizedPercent: collateralizedPercent,
-    });
   }
 
   private onProviderChanged = async (event: ProviderChangedEvent) => {
@@ -299,37 +135,139 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
   };
 
   public componentWillUnmount(): void {
-    this._isMounted = false;
-
     window.history.pushState(null, "Manage Collateral Modal Closed", `/trade`);
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
   public async componentDidMount() {
-    this._isMounted = true;
-    await this.derivedUpdate();
-    if (this.props.isOpenModal) {
-      window.history.pushState(null, "Manage Collateral Modal Opened", `/trade/manage-${this.props.leverage}x-${this.props.positionType.toLocaleLowerCase()}-${this.props.asset}/`);
-      this.onInsertMaxValue(.5);
+
+    FulcrumProvider.Instance.getManageCollateralParams(
+      this.props.loan!
+    ).then(collateralState => {
+
+      this.setState(
+        {
+          ...this.state,
+          minValue: collateralState.minValue,
+          maxValue: collateralState.maxValue,
+          assetDetails: AssetsDictionary.assets.get(this.props.loan!.collateralAsset) || null,
+
+        });
+
+      FulcrumProvider.Instance.getManageCollateralGasAmount().then(gasAmountNeeded => {
+        FulcrumProvider.Instance.getManageCollateralExcessAmount(this.props.loan!).then(collateralExcess => {
+          FulcrumProvider.Instance.getAssetTokenBalanceOfUser(this.props.loan!.collateralAsset).then(assetBalance => {
+
+            const collateralizedPercent = this.props.loan!.collateralizedPercent
+              .multipliedBy(100)
+              .plus(100);
+
+
+            let minCollateral;
+            let maxCollateral;
+
+            minCollateral = this.props.loan!.collateralAmount
+              .minus(collateralExcess);
+
+
+            minCollateral = minCollateral
+              .times(10 ** 18);
+
+            maxCollateral = minCollateral
+              .times(collateralState.maxValue - collateralState.minValue)
+              .dividedBy(10 ** 20);
+
+            const currentCollateral = this.props.loan!.collateralAmount
+              .times(10 ** 18);
+
+            if (maxCollateral.lt(currentCollateral)) {
+              maxCollateral = currentCollateral;
+            }
+
+            // new_v = (new_max - new_min) / (old_max - old_min) * (v - old_min) + new_min
+            let currentCollateralNormalizedBN = new BigNumber(collateralState.maxValue - collateralState.minValue)
+              .dividedBy(maxCollateral.minus(minCollateral))
+              .times(currentCollateral.minus(minCollateral))
+              .plus(collateralState.minValue);
+
+            if (currentCollateralNormalizedBN.dividedBy(collateralState.maxValue - collateralState.minValue).lte(0.01)) {
+              currentCollateralNormalizedBN = new BigNumber(collateralState.minValue);
+            }
+
+
+            // check balance
+            if (this.props.loan!.collateralAsset === Asset.ETH) {
+              assetBalance = assetBalance.gt(FulcrumProvider.Instance.gasBufferForTrade) ? assetBalance.minus(FulcrumProvider.Instance.gasBufferForTrade) : new BigNumber(0);
+            }
+            let assetBalanceNormalizedBN = new BigNumber(collateralState.maxValue - collateralState.minValue)
+              .dividedBy(maxCollateral.minus(minCollateral))
+              .times(assetBalance.minus(minCollateral))
+              .plus(collateralState.minValue);
+
+            if (assetBalanceNormalizedBN.dividedBy(collateralState.maxValue - collateralState.minValue).lte(0.01)) {
+              assetBalanceNormalizedBN = new BigNumber(collateralState.minValue);
+            }
+
+            this.setState(
+              {
+                ...this.state,
+                assetDetails: AssetsDictionary.assets.get(this.props.loan!.collateralAsset) || null,
+                loanValue: currentCollateralNormalizedBN.toNumber(),
+                selectedValue: currentCollateralNormalizedBN.toNumber(),
+                gasAmountNeeded: gasAmountNeeded,
+                collateralizedPercent: collateralizedPercent,
+                collateralExcess: collateralExcess,
+                assetBalanceValue: assetBalanceNormalizedBN
+              },
+              () => {
+                if (this.props.isOpenModal) {
+                  window.history.pushState(null, "Manage Collateral Modal Opened", `/trade/manage-${this.props.leverage}x-${this.props.positionType.toLocaleLowerCase()}-${this.props.loan!.loanAsset}/`);
+
+                  this._selectedValueUpdate.next(new BigNumber(this.state.selectedValue));
+                }
+              }
+            );
+          });
+        });
+      });
+    });
+
+  }
+
+  public componentDidUpdate(
+    prevProps: Readonly<IManageCollateralFormProps>,
+    prevState: Readonly<IManageCollateralFormState>,
+    snapshot?: any
+  ): void {
+    if (
+      prevProps.loan!.loanId !== this.props.loan!.loanId ||
+      prevState.loanValue !== this.state.loanValue ||
+      prevState.selectedValue !== this.state.selectedValue) {
+      FulcrumProvider.Instance.getManageCollateralGasAmount().then(gasAmountNeeded => {
+        this.setState(
+          {
+            ...this.state,
+            gasAmountNeeded: gasAmountNeeded
+          },
+          () => {
+            this._selectedValueUpdate.next(new BigNumber(this.state.selectedValue));
+          }
+        );
+      });
     }
   }
 
   public render() {
-    if (!this.state.assetDetails) {
+    if (this.state.assetDetails === null) {
       return null;
     }
 
     const amountMsg =
-      this.state.ethBalance && this.state.ethBalance.lte(this.state.gasAmountNeeded)
+      this.state.assetBalanceValue && this.state.assetBalanceValue.lte(this.state.gasAmountNeeded)
         ? "Insufficient funds for gas"
-        : this.state.balance && this.state.balance.eq(0)
-          ? "Your wallet is empty"
-          : (this.state.tradeAmountValue.gt(0) && this.state.slippageRate.eq(0))
-            && (this.state.collateral === Asset.ETH || !this.state.maybeNeedsApproval)
-            ? ``// `Your trade is too small.`
-            : this.state.slippageRate.gte(0.01) && this.state.slippageRate.lt(99) // gte(0.2)
-              ? `Slippage:`
-              : "";
+        : this.state.balanceTooLow
+          ? "Your wallet is empty" :
+          "";
 
     return (
       <form className="manage-collateral-form" onSubmit={this.onSubmitClick} >
@@ -341,8 +279,8 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
 
           <Slider
             step={0.01}
-            min={this.minValue}
-            max={this.maxValue}
+            min={this.state.minValue}
+            max={this.state.maxValue}
             value={this.state.selectedValue}
             onChange={this.onChange}
             onAfterChange={this.onAfterChange}
@@ -355,29 +293,21 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
           </div>
 
           <div className="manage-collateral-form__text">
-            You will {this.state.positionValue > this.state.selectedValue ? "withdraw" : "top up"}</div>
+            You will {this.state.loanValue > this.state.selectedValue ? "withdraw" : "top up"}</div>
 
 
           <div className="manage-collateral-form__input-amount-form" >
-            <div className={`manage-collateral-form__form-container  ${this.props.tradeType === TradeType.BUY ? "buy" : "sell"}`}>
+            <div className={`manage-collateral-form__form-container`}>
               <div className="manage-collateral-form__form-values-container">
 
                 <div className="manage-collateral-form__kv-container">
-                  {amountMsg.includes("Slippage:") ? (
-                    <div title={`${this.state.slippageRate.toFixed(18)}%`} className="manage-collateral-form__label slippage">
-                      {amountMsg}
-                      <span className="manage-collateral-form__slippage-amount">
-                        &nbsp;{`${this.state.slippageRate.toFixed(2)}%`}<SlippageDown />
-                      </span>
-                    </div>
-                  ) : (<div className="manage-collateral-form__label">{amountMsg}</div>)}
-
+                  <div className="manage-collateral-form__label">{amountMsg}</div>
                 </div>
+
                 <InputAmount
                   inputAmountText={this.state.inputAmountText}
                   isLoading={this.state.isLoading}
-                  tradeType={this.props.tradeType}
-                  asset={this.state.collateral}
+                  asset={this.state.collateralAsset}
                   onInsertMaxValue={this.onInsertMaxValue}
                   onTradeAmountChange={this.onTradeAmountChange}
                   onCollateralChange={this.onCollateralChange}
@@ -388,7 +318,7 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
           </div>
 
           <div className="manage-collateral-form__actions-container">
-            {this.state.positionValue > this.state.selectedValue ? (
+            {this.state.loanValue > this.state.selectedValue ? (
               <button type="submit" className="manage-collateral-form__action-withdraw">
                 Withdraw
               </button>
@@ -409,8 +339,8 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
   };
 
   private onAfterChange = (value: number) => {
-    const collateralAmount = this.state.collateralizedPercent.multipliedBy(this.state.selectedValue);
-    this._selectedValueChange.next(collateralAmount);
+    const collateralAmount = this.props.loan!!.collateralizedPercent.multipliedBy(this.state.selectedValue);
+    this._selectedValueUpdate.next(collateralAmount);
   };
 
 
@@ -419,7 +349,7 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
     const amountText = event.target.value ? event.target.value : "";
 
     // setting Text to update display at the same time
-    this._isMounted && this.setState({ ...this.state, inputAmountText: amountText }, () => {
+    this.setState({ ...this.state, inputAmountText: amountText }, () => {
 
       // emitting next event for processing with rx.js
       this._inputChange.next(this.state.inputAmountText);
@@ -427,147 +357,98 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
   };
 
   public onInsertMaxValue = async (value: number) => {
-    this._isMounted && this.setState({ ...this.state }, () => {
+    this.setState({ ...this.state }, () => {
       // emitting next event for processing with rx.js
       this._inputSetMax.next(new BigNumber(value));
     });
   };
 
   public onCollateralChange = async (asset: Asset) => {
-    await this._isMounted && this.setState({ ...this.state, collateral: asset });
-
-    this._inputSetMax.next();
+    this.setState({ ...this.state, collateralAsset: asset }, () => {
+      // emitting next event for processing with rx.js
+      this._inputSetMax.next();
+    });
   };
 
-  public onChangeUnitOfAccount = (asset: Asset) => {
-    let version = 2;
-    const key = new TradeTokenKey(this.props.asset, asset, this.props.positionType, this.props.leverage, this.state.tokenizeNeeded, version);
-    if (key.erc20Address === "") {
-      version = 1;
-    }
-
-    this._isMounted && this.setState({ ...this.state, selectedUnitOfAccount: asset });
-
-    this.props.onManage(
-      new ManageCollateralRequest(
-        new BigNumber(this.state.selectedValue),
-        this.props.tradeType,
-        this.props.asset,
-        asset,
-        this.state.collateral,
-        this.props.positionType,
-        this.props.leverage,
-        this.state.tradeAmountValue,
-        this.state.tokenizeNeeded,
-        version,
-        this.state.inputAmountValue
-      )
-    );
-  };
-
-  public onChangeTokenizeNeeded = async (event: ChangeEvent<HTMLInputElement>) => {
-    this._isMounted && this.setState({ ...this.state, tokenizeNeeded: event.target.checked });
-  };
 
   public onSubmitClick = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    const usdAmount = await FulcrumProvider.Instance.getSwapToUsdRate(this.props.asset)
+    // console.log(this.state.collateralAmount.toString(), new BigNumber(this.state.loanValue).dividedBy(10**18).toString(), new BigNumber(this.state.selectedValue).dividedBy(10**18).toString());
+    if (!this.state.didSubmit && this.state.collateralAmount.gt(0)) {
+      this.setState({ ...this.state, didSubmit: true });
 
-    if (!this.state.assetDetails) {
-      this.props.onCancel();
-      return;
-    }
+      if (this.state.loanValue < this.state.selectedValue) {
+        let assetBalance = await FulcrumProvider.Instance.getAssetTokenBalanceOfUser(this.props.loan!.collateralAsset);
+        if (this.props.loan!.collateralAsset === Asset.ETH) {
+          assetBalance = assetBalance.gt(FulcrumProvider.Instance.gasBufferForTrade) ? assetBalance.minus(FulcrumProvider.Instance.gasBufferForTrade) : new BigNumber(0);
+        }
+        const precision = AssetsDictionary.assets.get(this.props.loan!.collateralAsset)!.decimals || 18;
+        const amountInBaseUnits = new BigNumber(this.state.collateralAmount.multipliedBy(10 ** precision).toFixed(0, 1));
+        if (assetBalance.lt(amountInBaseUnits)) {
 
-    if (!this.state.tradeAmountValue.isPositive()) {
-      this.props.onCancel();
-      return;
-    }
-    let usdPrice = this.state.tradeAmountValue
-    if (usdPrice != null) {
-      usdPrice = usdPrice.multipliedBy(usdAmount)
-    }
+          this.setState({
+            ...this.state,
+            balanceTooLow: true,
+            didSubmit: false
+          });
 
-    const randomNumber = Math.floor(Math.random() * 100000) + 1;
-    const tagManagerArgs = {
-      dataLayer: {
-        event: 'purchase',
-        transactionId: randomNumber,
-        transactionTotal: new BigNumber(usdPrice),
-        transactionProducts: [{
-          name: this.props.leverage + 'x' + this.props.asset + '-' + this.props.positionType + '-' + this.state.selectedUnitOfAccount,
-          sku: this.props.leverage + 'x' + this.props.asset + '-' + this.props.positionType,
-          category: this.props.positionType,
-          price: new BigNumber(usdPrice),
-          quantity: 1
-        }],
+          return;
+
+        } else {
+          this.setState({
+            ...this.state,
+            balanceTooLow: false
+          });
+        }
+      } else {
+        this.setState({
+          ...this.state,
+          balanceTooLow: false
+        });
       }
+
+      this.props.onSubmit(
+        new ManageCollateralRequest(
+          this.props.loan!.loanId || "0x0000000000000000000000000000000000000000000000000000000000000000",
+          this.props.loan!.loanAsset,
+          this.state.collateralAsset,
+          new BigNumber(this.state.collateralAmount),
+          this.props.positionType,
+          this.props.leverage,
+          this.state.loanValue > this.state.selectedValue
+        )
+      );
     }
-    TagManager.dataLayer(tagManagerArgs)
-    this.props.onSubmit(
-      new ManageCollateralRequest(
-        new BigNumber(this.state.selectedValue),
-        this.props.tradeType,
-        this.props.asset,
-        this.state.selectedUnitOfAccount,
-        this.state.collateral,
-        this.props.positionType,
-        this.props.leverage,
-        this.state.tradeAmountValue,
-        this.state.tokenizeNeeded,
-        this.props.version,
-        this.state.inputAmountValue
-      )
-    );
   };
 
 
-  private rxFromCurrentAmount = (value: BigNumber= new BigNumber(this.minValue), multiplier: BigNumber = new BigNumber(1)): Observable<ITradeAmountChangeEvent | null> => {
-    return new Observable<ITradeAmountChangeEvent | null>(observer => {
+  private rxFromCurrentAmount = (value: number): Observable<ICollateralChangeEstimate> => {
 
-      const tradeTokenKey = this.getTradeTokenGridRowSelectionKey();
-      const maxTradeValue = this.state.maxTradeValue;
-      const selectedValue = new BigNumber(value).dividedBy(this.state.collateralizedPercent).toNumber();
-
-      if (selectedValue < this.minValue) {
-        value = new BigNumber(this.minValue).multipliedBy(this.state.collateralizedPercent);
+    let collateralAmount = new BigNumber(0);
+    if (this.state.loanValue !== value && this.props.loan!.loanData) {
+      if (value < this.state.loanValue) {
+        collateralAmount = new BigNumber(this.state.loanValue)
+          .minus(value)
+          .dividedBy(this.state.loanValue)
+          .multipliedBy(this.state.collateralExcess);
+      } else {
+        collateralAmount = new BigNumber(value)
+          .minus(this.state.loanValue)
+          .dividedBy(this.state.maxValue - this.state.loanValue)
+          .multipliedBy(this.props.loan!.collateralAmount);
       }
+      // console.log(collateralAmount.toString(), this.state.maxValue, this.props.loan!.collateralAmount.toString());
+    }
 
-      this.getInputAmountLimited(value, tradeTokenKey, maxTradeValue, false).then(limitedAmount => {
-        // updating stored value only if the new input value is a valid number
-        if (!limitedAmount.tradeAmountValue.isNaN()) {
-          // const collateralRequest = new ManageCollateralRequest(
-          //   new BigNumber(this.state.selectedValue),
-          //   this.props.tradeType,
-          //   this.props.asset,
-          //   this.state.selectedUnitOfAccount,
-          //   this.state.collateral,
-          //   this.props.positionType,
-          //   this.props.leverage,
-          //   limitedAmount.tradeAmountValue,
-          //   this.state.tokenizeNeeded,
-          //   this.props.version,
-          //   this.state.inputAmountValue
-          // );
-          // const selectedValue = limitedAmount.inputAmountValue.dividedBy(this.state.collateralizedPercent).toNumber();
-
-          // this.getTradeExpectedResults(collateralRequest).then(tradeExpectedResults => {
-          //   observer.next({
-          //     isTradeAmountTouched: true,
-          //     inputAmountText: limitedAmount.inputAmountText,
-          //     inputAmountValue: limitedAmount.inputAmountValue,
-          //     tradeAmountValue: limitedAmount.tradeAmountValue,
-          //     maxTradeValue: maxTradeValue,
-          //     tradedAmountEstimate: tradeExpectedResults.tradedAmountEstimate,
-          //     slippageRate: tradeExpectedResults.slippageRate,
-          //     exposureValue: tradeExpectedResults.exposureValue,
-          //     selectedValue: selectedValue
-
-          //   });
-          // });
-        } else {
-          observer.next(null);
-        }
+    return new Observable<ICollateralChangeEstimate>(observer => {
+      FulcrumProvider.Instance.getManageCollateralChangeEstimate(
+        this.props.loan!,
+        collateralAmount,
+        value < this.state.loanValue
+      ).then(value => {
+        observer.next(value);
+        this.changeStateLoading();
       });
     });
   };
@@ -580,7 +461,6 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
   };
 
   private rxFromInputAmount = (value: string): Observable<BigNumber> => {
-    const tradeTokenKey = this.getTradeTokenGridRowSelectionKey();
     return new Observable<BigNumber>(observer => {
       // FulcrumProvider.Instance.getMaxTradeValue(this.props.tradeType, tradeTokenKey, this.state.collateral).then(maxTradeValue => {
       //   let amountValue = new BigNumber(value).plus(maxTradeValue.dividedBy(2));
@@ -588,10 +468,9 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
       // });
     });
   };
-  
-  private rxFromMaxAmountWithMultiplier = (multiplier: BigNumber): Observable<BigNumber> => {    
-    this.setState({ ...this.state, isLoading: true });    
-    const tradeTokenKey = this.getTradeTokenGridRowSelectionKey();
+
+  private rxFromMaxAmountWithMultiplier = (multiplier: BigNumber): Observable<BigNumber> => {
+    this.setState({ ...this.state, isLoading: true });
     return new Observable<BigNumber>(observer => {
       // FulcrumProvider.Instance.getMaxTradeValue(this.props.tradeType, tradeTokenKey, this.state.collateral)
       //   .then(maxTradeValue => {
@@ -603,71 +482,25 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
   };
 
 
-  // private getTradeExpectedResults = async (manageCollateralRequest: ManageCollateralRequest): Promise<ITradeExpectedResults> => {
-  //   const tradedAmountEstimate = await FulcrumProvider.Instance.getTradedAmountEstimate(manageCollateralRequest);
-  //   const slippageRate = await FulcrumProvider.Instance.getTradeSlippageRate(manageCollateralRequest, tradedAmountEstimate);
-  //   const exposureValue = await FulcrumProvider.Instance.getTradeFormExposure(manageCollateralRequest);
-
-  //   return {
-  //     tradedAmountEstimate: tradedAmountEstimate,
-  //     slippageRate: slippageRate || new BigNumber(0),
-  //     exposureValue: exposureValue
-  //   };
-  // };
 
 
-  private getInputAmountLimited = async (bnValue: BigNumber, tradeTokenKey: TradeTokenKey, maxTradeValue: BigNumber, skipLimitCheck: boolean): Promise<IInputAmountLimited> => {
-    let inputAmountText =  bnValue.decimalPlaces(this._inputPrecision).toFixed();
-    let inputAmountValue = bnValue;
-
-    // handling negative values (incl. Ctrl+C)
-    if (inputAmountValue.isNegative()) {
-      inputAmountValue = inputAmountValue.absoluteValue();
-      inputAmountText = inputAmountValue.decimalPlaces(this._inputPrecision).toFixed();
+  public changeStateLoading = () => {
+    if (this.state.collateralAmount) {
+      this.setState({ ...this.state, isLoading: false })
     }
+  }
 
-    let tradeAmountValue = new BigNumber(0);
-    // we should normalize maxTradeValue for sell
-    const pTokenBaseAsset = FulcrumProvider.Instance.getBaseAsset(tradeTokenKey);
-    const destinationAsset = this.state.collateral;
-    if (this.props.tradeType === TradeType.SELL) {
-      const pTokenPrice = await FulcrumProvider.Instance.getPTokenPrice(tradeTokenKey);
-      // console.log(`pTokenPrice: ${pTokenPrice.toFixed()}`);
-      const swapRate = await FulcrumProvider.Instance.getSwapRate(pTokenBaseAsset, destinationAsset);
-      // console.log(`swapRate: ${swapRate.toFixed()}`);
-
-      const pTokenAmountMax = maxTradeValue;
-      // console.log(`pTokenAmountMax: ${pTokenAmountMax.toFixed()}`);
-      const pTokenBaseAssetAmountMax = pTokenAmountMax.multipliedBy(pTokenPrice);
-      // console.log(`pTokenBaseAssetAmountMax: ${pTokenBaseAssetAmountMax.toFixed()}`);
-      const destinationAssetAmountMax = pTokenBaseAssetAmountMax.multipliedBy(swapRate);
-      // console.log(`destinationAssetAmountMax: ${destinationAssetAmountMax.toFixed()}`);
-
-      const destinationAssetAmountLimited = skipLimitCheck ? destinationAssetAmountMax : BigNumber.min(destinationAssetAmountMax, inputAmountValue);
-      // console.log(`destinationAmountLimited: ${destinationAssetAmountLimited.toFixed()}`);
-
-      const pTokenBaseAssetAmountLimited = destinationAssetAmountLimited.dividedBy(swapRate);
-      // console.log(`pTokenBaseAssetAmountLimited: ${pTokenBaseAssetAmountLimited.toFixed()}`);
-      const pTokenAmountLimited = pTokenBaseAssetAmountLimited.dividedBy(pTokenPrice);
-      // console.log(`pTokenAmountLimited: ${pTokenAmountLimited.toFixed()}`);
-
-      inputAmountValue = destinationAssetAmountLimited;
-      inputAmountText = destinationAssetAmountLimited.decimalPlaces(this._inputPrecision).toFixed();
-      tradeAmountValue = pTokenAmountLimited;
-    } else if (this.props.tradeType === TradeType.BUY) {
-      tradeAmountValue = inputAmountValue;
-      if (tradeAmountValue.gt(maxTradeValue)) {
-        inputAmountValue = maxTradeValue;
-        inputAmountText = maxTradeValue.decimalPlaces(this._inputPrecision).toFixed();
-        tradeAmountValue = maxTradeValue;
-      }
-    }
-
-    return {
-      inputAmountValue: inputAmountValue,
-      inputAmountText: isNaN(parseFloat(inputAmountText)) ? "" : new BigNumber(parseFloat(inputAmountText)).minus(this.state.collateralizedPercent.multipliedBy(this.state.positionValue)).toFixed(),
-      tradeAmountValue: tradeAmountValue,
-      maxTradeValue
-    };
-  };
+  public formatPrecision(outputText: string): string {
+    const output = Number(outputText);
+    let sign = "";
+    if (this.state
+      .loanValue > this.state.selectedValue)
+      sign = "-";
+    let n = Math.log(Math.abs(output)) / Math.LN10;
+    let x = 4 - n;
+    if (x < 0) x = 0;
+    if (x > 5) x = 5;
+    let result = new Number(output.toFixed(x)).toString();
+    return result != "0" ? sign + result : result;
+  }
 }

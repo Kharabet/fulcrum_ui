@@ -221,10 +221,10 @@ export class OwnTokenCardMobile extends Component<IOwnTokenGridRowProps, IOwnTok
                   <div className="own-token-card-mobile__col-collateral-wrapper">
                     <span className="own-token-card-mobile__value"><span className="sign-currency">$</span>{this.state.collateral.toFixed(2)}</span>
                     <span className="own-token-card-mobile__col-asset-collateral-small">16.5%</span>
-                  </div>                
-                <div className="own-token-card-mobile__open-manage-collateral" onClick={this.onManageClick}>
-                  <OpenManageCollateral />
-                </div>
+                  </div>
+                  <div className="own-token-card-mobile__open-manage-collateral" onClick={this.onManageClick}>
+                    <OpenManageCollateral />
+                  </div>
                 </div>
                 <div title={this.state.value.toFixed(18)} className="own-token-card-mobile__position-value">
                   <span className="own-token-card-mobile__body-header">Value</span>
@@ -261,18 +261,16 @@ export class OwnTokenCardMobile extends Component<IOwnTokenGridRowProps, IOwnTok
 
   public onManageClick = async (event: React.MouseEvent<HTMLElement>) => {
     event.stopPropagation();
-
     const request = new ManageCollateralRequest(
-      new BigNumber(0),
-      TradeType.BUY,
+      this.props.loan.loanId,
       this.props.tradeAsset,
       this.props.collateralAsset,
-      this.props.positionType === PositionType.SHORT ? this.props.collateralAsset : Asset.USDC,
+      this.props.loan.collateralAmount,
       this.props.positionType,
       this.props.leverage,
-      new BigNumber(0),
       false
-    )
+    );
+
     //await this.setState({...this.state, request: request });
     this.props.onManageCollateralOpen(request);
     this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, false, true)
@@ -282,16 +280,16 @@ export class OwnTokenCardMobile extends Component<IOwnTokenGridRowProps, IOwnTok
   public onSellClick = async (event: React.MouseEvent<HTMLElement>) => {
     event.stopPropagation();
     const request = new TradeRequest(
-        this.props.loan.loanId,
-        TradeType.SELL,
-        this.props.tradeAsset,
-        Asset.UNKNOWN,
-        this.props.collateralAsset,
-        this.props.positionType,
-        this.props.leverage,
-        new BigNumber(0)
+      this.props.loan.loanId,
+      TradeType.SELL,
+      this.props.tradeAsset,
+      Asset.UNKNOWN,
+      this.props.collateralAsset,
+      this.props.positionType,
+      this.props.leverage,
+      new BigNumber(0)
     )
-    await this.setState({...this.state, request: request });
+    await this.setState({ ...this.state, request: request });
     this.props.onTrade(request);
     this.props.changeLoadingTransaction(this.state.isLoadingTransaction, request, false, true)
   }

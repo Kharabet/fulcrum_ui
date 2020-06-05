@@ -252,25 +252,13 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
             overlayClassName="modal-overlay-div"
           >
             <ManageCollateralForm
-              isMobileMedia={this.props.isMobileMedia}
-              asset={this.state.tradeAsset}
-              tradeType={TradeType.BUY}
+              loan={this.state.loans?.find(e => e.loanId === this.state.loanId)}
               leverage={this.state.tradeLeverage}
               positionType={this.state.tradePositionType}
-              bestCollateral={
-                this.state.tradeAsset === Asset.ETH ?
-                  Asset.ETH :
-                  this.state.tradePositionType === PositionType.SHORT ?
-                    this.state.tradeAsset :
-                    this.state.tradeUnitOfAccount}
-              defaultCollateral={this.state.collateralToken}
-              defaultUnitOfAccount={this.state.tradeUnitOfAccount}
-              defaultTokenizeNeeded={true}
               onSubmit={this.onManageCollateralConfirmed}
               onCancel={this.onManageCollateralRequestClose}
-              onManage={this.onManageCollateralRequested}
-              version={this.state.tradeVersion}
               isOpenModal={this.state.isManageCollateralModalOpen}
+              isMobileMedia={this.props.isMobileMedia}
 
             />
           </Modal>
@@ -301,14 +289,12 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       this.setState({
         ...this.state,
         isManageCollateralModalOpen: true,
-        collateralToken: request.collateral,
-        tradeType: request.tradeType,
+        collateralToken: request.collateralAsset,
+        loanId: request.loanId,
         tradeAsset: request.asset,
-        tradeUnitOfAccount: request.unitOfAccount,
-        tradePositionType: request.positionType,
-        tradeLeverage: request.leverage,
-        tradeVersion: request.version,
         tradeRequestId: request.id,
+        tradePositionType: request.positionType,
+        tradeLeverage: request.leverage
       });
     }
   };
@@ -318,23 +304,28 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     FulcrumProvider.Instance.onManageCollateralConfirmed(request);
     this.setState({
       ...this.state,
+      collateralToken: request.collateralAsset,
+      loanId: request.loanId,
+      tradeAsset: request.asset,
+      tradeRequestId: request.id,
+      tradePositionType: request.positionType,
+      tradeLeverage: request.leverage,
       isManageCollateralModalOpen: false
     });
   };
 
-  public onManageCollateralRequestOpen = (request: ManageCollateralRequest) => {
-    this.setState({
-      ...this.state,
-      collateralToken: request.collateral,
-      tradeType: request.tradeType,
-      tradeAsset: request.asset,
-      tradeUnitOfAccount: request.unitOfAccount,
-      tradePositionType: request.positionType,
-      tradeLeverage: request.leverage,
-      tradeVersion: request.version,
-      isManageCollateralModalOpen: true
-    });
-  };
+  // public onManageCollateralRequestOpen = (request: ManageCollateralRequest) => {
+  //   this.setState({
+  //     ...this.state,
+  //     collateralToken: request.collateralAsset,
+  //     loanId: request.loanId,
+  //     tradeAsset: request.asset,
+  //     tradeRequestId: request.id,
+  //     tradePositionType: request.positionType,
+  //     tradeLeverage: request.leverage,
+  //     isManageCollateralModalOpen: true
+  //   });
+  // };
 
   public onManageCollateralRequestClose = () => {
     this.setState({
@@ -403,7 +394,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       // const pTokens = FulcrumProvider.Instance.getPTokensAvailable();
       // const pTokenAddreses: string[] = FulcrumProvider.Instance.getPTokenErc20AddressList();
       // const pTokenBalances = await FulcrumProvider.Instance.getErc20BalancesOfUser(pTokenAddreses);
-      this.setState({...this.state, loans})
+      this.setState({ ...this.state, loans })
       for (const loan of loans) {
         // const balance = pTokenBalances.get(pToken.erc20Address);
         if (!(loan.collateralAsset === this.state.selectedTabAsset || loan.loanAsset === this.state.selectedTabAsset))

@@ -255,18 +255,17 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
 
   public onManageClick = async (event: React.MouseEvent<HTMLElement>) => {
     event.stopPropagation();
-    const request = new ManageCollateralRequest(
-      new BigNumber(0),
-      TradeType.BUY,
-      this.props.tradeAsset,
-      this.props.collateralAsset,
-      this.props.positionType === PositionType.SHORT ? this.props.collateralAsset : Asset.USDC,
-      this.props.positionType,
-      this.props.leverage,
-      new BigNumber(0),
-      false
-    )
-    this.props.onManageCollateralOpen(request);
+    this.props.onManageCollateralOpen(
+      new ManageCollateralRequest(
+        this.props.loan.loanId,
+        this.props.tradeAsset,
+        this.props.collateralAsset,
+        this.props.loan.collateralAmount,
+        this.props.positionType,
+        this.props.leverage,
+        false
+      )
+    );
   };
 
   public onSellClick = async (event: React.MouseEvent<HTMLElement>) => {
