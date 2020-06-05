@@ -280,7 +280,12 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
     await this.derivedUpdate();
     if (this.props.isOpenModal) {
       window.history.pushState(null, "Trade Modal Opened", `/trade/${this.props.tradeType.toLocaleLowerCase()}-${this.props.leverage}x-${this.props.positionType.toLocaleLowerCase()}-${this.props.asset}/`);
-      this.onInsertMaxValue(.5);
+      if (this.props.tradeType === TradeType.BUY) {
+        this.onInsertMaxValue(1);
+      }
+      else {
+        this.rxFromCurrentAmount("0")
+      }
     }
   }
 
@@ -560,82 +565,53 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
 
   private rxFromMaxAmountWithMultiplier = (multiplier: BigNumber): Observable<ITradeAmountChangeEvent | null> => {
     return new Observable<ITradeAmountChangeEvent | null>(observer => {
-
       this._isMounted && this.setState({ ...this.state, isLoading: true, isExposureLoading: true });
-
-      FulcrumProvider.Instance.getMaxTradeValue(this.props.tradeType, this.props.positionType === PositionType.LONG ? this.state.selectedUnitOfAccount : this.props.asset, this.state.collateral, this.props.positionType, this.props.loan)
-        .then(maxTradeValue => {
-          // maxTradeValue is raw here, so we should not use it directly
-          this.getInputAmountLimitedFromBigNumber(maxTradeValue, maxTradeValue, multiplier).then(async limitedAmount => {
-            if (!limitedAmount.tradeAmountValue.isNaN()) {
-              const tradeRequest = new TradeRequest(
-                this.props.loan?.loanId || "0x0000000000000000000000000000000000000000000000000000000000000000",
-                this.props.tradeType,
-                this.props.asset,
-                this.state.selectedUnitOfAccount,
-                this.state.collateral,
-                this.props.positionType,
-                this.props.leverage,
-                limitedAmount.tradeAmountValue
-              );
-              const { collateral, interestRate } = await FulcrumProvider.Instance.getEstimatedMarginDetails(tradeRequest);
-              await this.setState({ ...this.state, interestRate })
-              observer.next({
-                isTradeAmountTouched: true,
-                inputAmountText: limitedAmount.inputAmountText,
-                inputAmountValue: limitedAmount.inputAmountValue,
-                tradeAmountValue: limitedAmount.tradeAmountValue,
-                maxTradeValue: maxTradeValue,
-                exposureValue: collateral,
-                slippageRate: new BigNumber(0)
-              });
-            } else {
-              observer.next(null);
-            }
-          });
-        });
-
+      const maxTradeValue = this.state.maxTradeValue;
+      this.getInputAmountLimitedFromBigNumber(maxTradeValue, maxTradeValue, multiplier)
+        .then(limitedAmount => {
+          this.createTradeAmountChangedEvent(limitedAmount, maxTradeValue)
+            .then(changeEvent => observer.next(changeEvent));
+        })
     });
   };
 
   private rxFromCurrentAmount = (value: string): Observable<ITradeAmountChangeEvent | null> => {
     return new Observable<ITradeAmountChangeEvent | null>(observer => {
-
       this._isMounted && this.setState({ ...this.state, isExposureLoading: true });
       const maxTradeValue = this.state.maxTradeValue;
-      this.getInputAmountLimitedFromText(value, maxTradeValue).then(async limitedAmount => {
-        // updating stored value only if the new input value is a valid number
-        if (!limitedAmount.tradeAmountValue.isNaN()) {
-          const tradeRequest = new TradeRequest(
-            this.props.loan?.loanId || "0x0000000000000000000000000000000000000000000000000000000000000000",
-            this.props.tradeType,
-            this.props.asset,
-            this.state.selectedUnitOfAccount,
-            this.state.collateral,
-            this.props.positionType,
-            this.props.leverage,
-            limitedAmount.tradeAmountValue
-          );
-          const { collateral, interestRate } = await FulcrumProvider.Instance.getEstimatedMarginDetails(tradeRequest);
-          await this.setState({ ...this.state, interestRate })
-
-          observer.next({
-            isTradeAmountTouched: true,
-            inputAmountText: limitedAmount.inputAmountText,
-            inputAmountValue: limitedAmount.inputAmountValue,
-            tradeAmountValue: limitedAmount.tradeAmountValue,
-            maxTradeValue: maxTradeValue,
-            exposureValue: collateral,
-            slippageRate: new BigNumber(0)
-          });
-
-        } else {
-          observer.next(null);
-        }
-      });
-
+      this.getInputAmountLimitedFromText(value, maxTradeValue)
+        .then(limitedAmount => {
+          this.createTradeAmountChangedEvent(limitedAmount, maxTradeValue)
+          .then(changeEvent => observer.next(changeEvent));
+        })
     });
   };
+
+  public createTradeAmountChangedEvent = async (limitedAmount: IInputAmountLimited, maxTradeValue: BigNumber): Promise<ITradeAmountChangeEvent | null> => {
+    if (limitedAmount.tradeAmountValue.isNaN()) return null;
+    const tradeRequest = new TradeRequest(
+      this.props.loan?.loanId || "0x0000000000000000000000000000000000000000000000000000000000000000",
+      this.props.tradeType,
+      this.props.asset,
+      this.state.selectedUnitOfAccount,
+      this.state.collateral,
+      this.props.positionType,
+      this.props.leverage,
+      limitedAmount.tradeAmountValue
+    );
+    const { collateral, interestRate } = await FulcrumProvider.Instance.getEstimatedMarginDetails(tradeRequest);
+    await this.setState({ ...this.state, interestRate })
+
+    return {
+      isTradeAmountTouched: true,
+      inputAmountText: limitedAmount.inputAmountText,
+      inputAmountValue: limitedAmount.inputAmountValue,
+      tradeAmountValue: limitedAmount.tradeAmountValue,
+      maxTradeValue: maxTradeValue,
+      exposureValue: collateral,
+      slippageRate: new BigNumber(0)
+    };
+  }
 
   private getInputAmountLimitedFromText = async (textValue: string, maxTradeValue: BigNumber): Promise<IInputAmountLimited> => {
     const inputAmountText = textValue;
