@@ -9,8 +9,6 @@ export class ManageCollateralRequest {
   public asset: Asset;
   public collateralAsset: Asset;
   public collateralAmount: BigNumber;
-  public positionType: PositionType;
-  public leverage: number;
 
   public isWithdrawal: boolean;
 
@@ -18,8 +16,6 @@ export class ManageCollateralRequest {
     asset: Asset,
     collateralAsset: Asset,
     collateralAmount: BigNumber,
-    positionType: PositionType,
-    leverage: number,
     isWithdrawal: boolean,
   ) {
     this.id = Math.round(new Date().getTime() / 1000);
@@ -27,8 +23,6 @@ export class ManageCollateralRequest {
     this.asset = asset;
     this.collateralAsset = collateralAsset;
     this.collateralAmount = collateralAmount;
-    this.positionType = positionType;
-    this.leverage = leverage;
     this.isWithdrawal = isWithdrawal;
   }
   public getRequestTypeName(): string {

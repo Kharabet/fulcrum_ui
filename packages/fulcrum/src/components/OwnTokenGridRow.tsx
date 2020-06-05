@@ -173,7 +173,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
           <TradeTxLoaderStep taskId={this.state.request.id} />
         </div>
       </React.Fragment>
-      : <div className={`own-token-grid-row ${this.props.isTxCompleted ? `completed` : `` }`}>
+      : <div className={`own-token-grid-row ${this.props.isTxCompleted ? `completed` : ``}`}>
         <div className="own-token-grid-row__col-token-name  opacityIn">
           {`${this.props.tradeAsset.toUpperCase()}`}
         </div>
@@ -198,9 +198,9 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
         </div>
         <div title={this.state.liquidationPrice.toFixed(18)} className="own-token-grid-row__col-liquidation-price opacityIn">
           {!this.state.isLoading
-              ? <React.Fragment>
-                <span className="sign-currency">$</span>{this.state.liquidationPrice.toFixed(2)}
-              </React.Fragment>
+            ? <React.Fragment>
+              <span className="sign-currency">$</span>{this.state.liquidationPrice.toFixed(2)}
+            </React.Fragment>
             : <Preloader width="74px" />
           }
         </div>
@@ -261,8 +261,6 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
         this.props.tradeAsset,
         this.props.collateralAsset,
         this.props.loan.collateralAmount,
-        this.props.positionType,
-        this.props.leverage,
         false
       )
     );

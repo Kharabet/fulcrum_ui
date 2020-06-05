@@ -253,8 +253,6 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
           >
             <ManageCollateralForm
               loan={this.state.loans?.find(e => e.loanId === this.state.loanId)}
-              leverage={this.state.tradeLeverage}
-              positionType={this.state.tradePositionType}
               onSubmit={this.onManageCollateralConfirmed}
               onCancel={this.onManageCollateralRequestClose}
               isOpenModal={this.state.isManageCollateralModalOpen}
@@ -292,9 +290,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         collateralToken: request.collateralAsset,
         loanId: request.loanId,
         tradeAsset: request.asset,
-        tradeRequestId: request.id,
-        tradePositionType: request.positionType,
-        tradeLeverage: request.leverage
+        tradeRequestId: request.id
       });
     }
   };
@@ -308,8 +304,6 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       loanId: request.loanId,
       tradeAsset: request.asset,
       tradeRequestId: request.id,
-      tradePositionType: request.positionType,
-      tradeLeverage: request.leverage,
       isManageCollateralModalOpen: false
     });
   };
