@@ -287,9 +287,11 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         ...this.state,
         isManageCollateralModalOpen: true,
         collateralToken: request.collateralAsset,
-
+        loanId: request.loanId,
         tradeAsset: request.asset,
         tradeRequestId: request.id,
+        tradePositionType: request.positionType,
+        tradeLeverage: request.leverage
       });
     }
   };
@@ -300,16 +302,27 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     this.setState({
       ...this.state,
       collateralToken: request.collateralAsset,
+      loanId: request.loanId,
+      tradeAsset: request.asset,
+      tradeRequestId: request.id,
+      tradePositionType: request.positionType,
+      tradeLeverage: request.leverage,
       isManageCollateralModalOpen: false
     });
   };
 
-  public onManageCollateralRequestOpen = (request: ManageCollateralRequest) => {
-    this.setState({
-      ...this.state,
-      isManageCollateralModalOpen: true
-    });
-  };
+  // public onManageCollateralRequestOpen = (request: ManageCollateralRequest) => {
+  //   this.setState({
+  //     ...this.state,
+  //     collateralToken: request.collateralAsset,
+  //     loanId: request.loanId,
+  //     tradeAsset: request.asset,
+  //     tradeRequestId: request.id,
+  //     tradePositionType: request.positionType,
+  //     tradeLeverage: request.leverage,
+  //     isManageCollateralModalOpen: true
+  //   });
+  // };
 
   public onManageCollateralRequestClose = () => {
     this.setState({

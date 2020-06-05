@@ -200,6 +200,8 @@ export class InnerOwnTokenCardMobile extends Component<IOwnTokenGridRowProps, II
         this.props.tradeAsset,
         this.props.collateralAsset,
         this.props.loan.collateralAmount,
+        this.props.positionType,
+        this.props.leverage,
         false
       )
     );

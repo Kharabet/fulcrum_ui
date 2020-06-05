@@ -414,6 +414,8 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
           this.props.loan!.loanAsset,
           this.state.collateralAsset,
           new BigNumber(this.state.collateralAmount),
+          this.props.positionType,
+          this.props.leverage,
           this.state.loanValue > this.state.selectedValue
         )
       );

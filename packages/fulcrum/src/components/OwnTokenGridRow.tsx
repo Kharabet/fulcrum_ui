@@ -264,6 +264,8 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
         this.props.tradeAsset,
         this.props.collateralAsset,
         this.props.loan.collateralAmount,
+        this.props.positionType,
+        this.props.leverage,
         false
       )
     );
