@@ -67,6 +67,37 @@
             "payable": false,
             "stateMutability": "view",
             "type": "function"
+        },
+        {
+            "constant": true,
+            "inputs": [
+                {
+                    "name": "loanToken",
+                    "type": "address"
+                },
+                {
+                    "name": "collateralToken",
+                    "type": "address"
+                },
+                {
+                    "name": "loanTokenAmount",
+                    "type": "uint256"
+                },
+                {
+                    "name": "collateral",
+                    "type": "uint256"
+                }
+            ],
+            "name": "getCurrentMargin",
+            "outputs": [
+                {
+                    "name": "",
+                    "type": "uint256"
+                }
+            ],
+            "payable": false,
+            "stateMutability": "view",
+            "type": "function"
         }
     ]
 }
