@@ -266,8 +266,6 @@ export class OwnTokenCardMobile extends Component<IOwnTokenGridRowProps, IOwnTok
       this.props.tradeAsset,
       this.props.collateralAsset,
       this.props.loan.collateralAmount,
-      this.props.positionType,
-      this.props.leverage,
       false
     );
 
