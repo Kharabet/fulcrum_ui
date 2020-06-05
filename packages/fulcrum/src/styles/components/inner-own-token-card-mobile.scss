@@ -2,7 +2,6 @@ $font-size-header: 12px;
 $font-size-row: 16px;
 $font-size-button: 14px;
 $width-col-1: calc(100% / 3);
-$width-col-2: calc(100% / 3 * 2);
 $padding: 15px 15px 30px 15px;
 
 @mixin inner-own-token-card-mobile__col {
@@ -86,7 +85,7 @@ $padding: 15px 15px 30px 15px;
     @include inner-own-token-card-mobile__col();
     align-items: center;
     position: relative;
-    width: $width-col-2;
+    width: $width-col-1;
     margin-bottom: 35px;
   }
   &__col-asset-collateral-small {
@@ -103,11 +102,12 @@ $padding: 15px 15px 30px 15px;
     height: 26px;
     display: flex;
     align-items: center;
+    align-self: flex-end;
     justify-content: center;
     border-radius: 50%;
     margin-left: 10px;
     position: absolute;
-    right: 25px;
+    right: 10px;
     cursor: pointer;
     .icon-collateral {
       fill: var(--icon-collateral);

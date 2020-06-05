@@ -22,6 +22,7 @@
   }
   .trade-form__submit-button--buy & {
     padding: 3px 0;
+    border-radius: 0;
 
     .container-loader {
       background-color: #5b88ff;
@@ -33,6 +34,7 @@
   }
   .trade-form__submit-button--sell & {
     padding: 3px 0;
+    border-radius: 0;
 
     .container-loader {
       background-color: #fe7272;

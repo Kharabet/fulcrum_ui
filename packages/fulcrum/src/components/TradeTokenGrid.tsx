@@ -20,7 +20,7 @@ export interface ITradeTokenGridProps {
   ownRowsData: IOwnTokenGridRowProps[];
   request: TradeRequest | undefined;
   isLoadingTransaction: boolean;
-  changeLoadingTransaction: (isLoadingTransaction: boolean, request: TradeRequest | undefined, resultTx: boolean) => void;
+  isTxCompleted: boolean;
   tradePosition: PositionType;
   tradeLeverage: number;
   resultTx: boolean;
@@ -81,7 +81,6 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
                 request={this.props.request}
                 isLoadingTransaction={this.props.isLoadingTransaction}
                 loanId={this.props.loanId}
-                changeLoadingTransaction={this.props.changeLoadingTransaction}
               />
             </div>)
           })}
@@ -114,7 +113,6 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
               request={this.props.request}
               isLoadingTransaction={this.props.isLoadingTransaction}
               loanId={this.props.loanId}
-              changeLoadingTransaction={this.props.changeLoadingTransaction}
             />
           </div>)
         })}
