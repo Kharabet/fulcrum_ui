@@ -30,7 +30,7 @@ export class TradeSellEthProcessor {
 
     if (maxAmountInBaseUnits.gt(0) && (maxAmountInBaseUnits.minus(amountInBaseUnits)).abs().div(maxAmountInBaseUnits).lte(0.01))
     {
-      console.log("colse full amount")
+      console.log("close full amount")
       amountInBaseUnits = maxAmountInBaseUnits.times(10**50);
     }
 

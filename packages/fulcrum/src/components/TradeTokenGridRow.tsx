@@ -146,7 +146,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
       return null;
     }
     return (
-      <div className={`trade-token-grid-row `}>
+      <div className={`trade-token-grid-row`}>
         <div className="trade-token-grid-row__col-token-name">
           <div className="trade-token-grid-row__col-token-name--inner">
             {this.state.assetDetails.displayName}
