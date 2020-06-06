@@ -13,18 +13,16 @@ import { BigNumber, classUtils } from "@0x/utils";
 export class DAppHelperContract extends BaseContract {
     public assetRates = {
         async callAsync(
-            oracleAddress: string,
             usdTokenAddress: string,
             tokens: string[],
             amounts: BigNumber[],
             callData: Partial<CallData> = {},
             defaultBlock?: BlockParam,
-        ): Promise<BigNumber[]
+        ): Promise<[BigNumber[], BigNumber[], BigNumber[]]
         > {
             callData.from = "0x4abB24590606f5bf4645185e20C4E7B97596cA3B";
             const self = this as any as DAppHelperContract;
-            const encodedData = self._strictEncodeArguments('assetRates(address,address,address[],uint256[])', [
-                oracleAddress,
+            const encodedData = self._strictEncodeArguments('assetRates(address,address[],uint256[])', [
                 usdTokenAddress,
                 tokens,
                 amounts
@@ -39,9 +37,9 @@ export class DAppHelperContract extends BaseContract {
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
             BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
-            const abiEncoder = self._lookupAbiEncoder('assetRates(address,address,address[],uint256[])');
+            const abiEncoder = self._lookupAbiEncoder('assetRates(address,address[],uint256[])');
             // tslint:disable boolean-naming
-            const result = abiEncoder.strictDecodeReturnValue<BigNumber[]
+            const result = abiEncoder.strictDecodeReturnValue<[BigNumber[], BigNumber[], BigNumber[]]
         >(rawCallResult);
             // tslint:enable boolean-naming
             return result;

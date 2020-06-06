@@ -430,12 +430,12 @@ export class FulcrumProvider {
       if (tokens && helperContract) {
         let swapRates;
         try {
-          swapRates = await this.getSwapToUsdRateBatch(
+          swapRates = (await this.getSwapToUsdRateBatch(
             assets,
             process.env.REACT_APP_ETH_NETWORK === "mainnet" || process.env.REACT_APP_ETH_NETWORK === "ropsten" ?
               Asset.DAI :
               Asset.SAI
-          );
+          ))[0];
         } catch (e) {
           //console.log(e);
         }
@@ -1556,8 +1556,8 @@ export class FulcrumProvider {
     return result;
   }
 
-  public async getSwapToUsdRateBatch(assets: Asset[], usdToken: Asset): Promise<BigNumber[]> {
-    let result: BigNumber[] = [];
+  public async getSwapToUsdRateBatch(assets: Asset[], usdToken: Asset): Promise<[BigNumber[],BigNumber[],BigNumber[]]> {
+    let result: [BigNumber[],BigNumber[],BigNumber[]] = [[],[],[]];
 
     if (this.contractsSource) {
       const oracleAddress = this.contractsSource.getOracleAddress();
@@ -1568,7 +1568,6 @@ export class FulcrumProvider {
       const helperContract = await this.contractsSource.getDAppHelperContract();
       if (helperContract) {
         result = await helperContract.assetRates.callAsync(
-          oracleAddress,
           usdTokenAddress,
           underlyings,
           amounts
@@ -1591,7 +1590,7 @@ export class FulcrumProvider {
         Asset.SAI
     );
 
-    return swapRates[0];*/
+    return swapRates[0][0];*/
     return this.getSwapRate(
       asset,
       process.env.REACT_APP_ETH_NETWORK === "mainnet" ?
