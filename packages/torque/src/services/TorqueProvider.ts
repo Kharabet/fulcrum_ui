@@ -372,8 +372,6 @@ export class TorqueProvider {
   ): Promise<IBorrowEstimate> => {
     const result = { depositAmount: new BigNumber(0), gasEstimate: new BigNumber(0) };
 
-    // const marginPremium = this.getMarginPremiumAmount(collateralAsset);
-
     if (this.contractsSource && this.web3Wrapper) {
       const iTokenContract = await this.contractsSource.getiTokenContract(borrowAsset);
       const collateralAssetErc20Address = this.getErc20AddressOfAsset(collateralAsset) || "";
@@ -386,13 +384,8 @@ export class TorqueProvider {
           collateralAssetErc20Address
         );
         result.depositAmount = borrowEstimate
-          // .multipliedBy(150 + marginPremium)
-          // .dividedBy(125 + marginPremium)
-          .dividedBy(10 ** collateralPrecision);
-
-        /*result.gasEstimate = await this.web3Wrapper.estimateGasAsync({
-          ...
-        }));*/
+          .dividedBy(10 ** collateralPrecision)
+          .multipliedBy(1.005); // safety buffer
       }
     }
 

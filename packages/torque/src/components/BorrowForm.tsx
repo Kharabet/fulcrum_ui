@@ -95,7 +95,7 @@ export class BorrowForm extends Component<IBorrowFormProps, IBorrowFormState> {
                 : <React.Fragment>
                   {this.state.borrowAmount.gt(0) && this.state.depositAmount.eq(0)
                     ? <span className="borrow-form__error">Loan is too large</span>
-                    : <span title={this.state.depositAmount.multipliedBy(1.005).toFixed()}>{this.state.depositAmount.multipliedBy(1.005).dp(5, BigNumber.ROUND_CEIL).toString()} {this.state.collateralAsset}</span>
+                    : <span title={this.state.depositAmount.toFixed()}>{this.state.depositAmount.dp(5, BigNumber.ROUND_CEIL).toString()} {this.state.collateralAsset}</span>
                   }
                 </React.Fragment>
               }

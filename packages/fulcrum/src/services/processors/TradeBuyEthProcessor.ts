@@ -65,7 +65,7 @@ export class TradeBuyEthProcessor {
     console.log("collateral token: " + collateralToken + " address: " + collateralTokenAddress!);
     console.log("trader: " + account);
     console.log("loan data: " + loanData);
-    skipGas = true;
+
     // Waiting for token allowance
     if (skipGas) {
       gasAmountBN = new BigNumber(FulcrumProvider.Instance.gasLimit);
