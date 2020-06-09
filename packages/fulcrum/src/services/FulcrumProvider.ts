@@ -1617,9 +1617,7 @@ export class FulcrumProvider {
     return swapRates[0][0];*/
     return this.getSwapRate(
       asset,
-      process.env.REACT_APP_ETH_NETWORK === "mainnet" ?
-        Asset.DAI :
-        Asset.SAI
+      Asset.DAI
     );
   }
 

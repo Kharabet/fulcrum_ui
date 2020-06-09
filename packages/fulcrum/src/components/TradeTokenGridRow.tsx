@@ -74,8 +74,22 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
   private _isMounted: boolean;
 
   private async derivedUpdate() {
-    
+
     const tradeAssetPrice = await FulcrumProvider.Instance.getSwapToUsdRate(this.props.asset);
+
+    const collateralToPrincipalRate = this.props.positionType === PositionType.LONG
+      ? await FulcrumProvider.Instance.getSwapRate(this.props.asset, this.props.defaultUnitOfAccount)
+      : await FulcrumProvider.Instance.getSwapRate(this.props.defaultUnitOfAccount, this.props.asset);
+
+    let initialMargin = this.props.positionType === PositionType.LONG
+      ? new BigNumber(10 ** 38).div(new BigNumber(this.state.leverage - 1).times(10 ** 18))
+      : new BigNumber(10 ** 38).div(new BigNumber(this.state.leverage).times(10 ** 18))
+    // liq_price_before_trade = (15000000000000000000 * collateralToLoanRate / 10^20) + collateralToLoanRate) / ((10^20 + current_margin) / 10^20
+    //if it's a SHORT then -> 10^36 / above
+    const liquidationPriceBeforeTrade = ((new BigNumber("15000000000000000000").times(collateralToPrincipalRate.times(10 ** 18)).div(10 ** 20)).plus(collateralToPrincipalRate.times(10 ** 18))).div((new BigNumber(10 ** 20).plus(initialMargin)).div(10 ** 20))
+    const liquidationPrice = this.props.positionType === PositionType.LONG
+      ? liquidationPriceBeforeTrade.div(10 ** 18)
+      : new BigNumber(10 ** 36).div(liquidationPriceBeforeTrade).div(10 ** 18);
 
     const interestRate = await FulcrumProvider.Instance.getBorrowInterestRate(this.props.asset);
     const balance = new BigNumber(0);
@@ -85,6 +99,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
       tradeAssetPrice,
       interestRate: interestRate,
       balance: balance,
+      liquidationPrice,
       isLoading: false
     });
   }
@@ -131,13 +146,13 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
     this.derivedUpdate();
   }
 
-  public componentDidUpdate(
+  public async  componentDidUpdate(
     prevProps: Readonly<ITradeTokenGridRowProps>,
     prevState: Readonly<ITradeTokenGridRowState>,
     snapshot?: any
-  ): void {
+  ) {
     if (prevState.leverage !== this.state.leverage || prevProps.isTxCompleted !== this.props.isTxCompleted) {
-      this.derivedUpdate();
+      await this.derivedUpdate();
     }
   }
 
