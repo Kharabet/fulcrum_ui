@@ -163,7 +163,6 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
     if (!this.state.assetDetails) {
       return null;
     }
-    const bnLiquidationPrice = new BigNumber(this.state.latestPriceDataPoint.liquidationPrice);
 
     return (
       <div className="trade-token-card-mobile">
@@ -202,17 +201,17 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
             <div title={this.state.tradeAssetPrice.toFixed(18)} className="trade-token-card-mobile__price">
               <span>Asset Price</span>
               <span>
-                {!this.state.isLoading ?
+                {this.state.tradeAssetPrice.gt(0) && !this.state.isLoading ?
                   <React.Fragment><span className="fw-normal">$</span>{this.state.tradeAssetPrice.toFixed(2)}</React.Fragment>
                   : <Preloader width="74px" />
                 }
               </span>
             </div>
-            <div title={`$${bnLiquidationPrice.toFixed(18)}`} className="trade-token-card-mobile__price">
+            <div title={`$${this.state.liquidationPrice.toFixed(18)}`} className="trade-token-card-mobile__price">
               <span>Liquidation Price</span>
               <span>
-                {!this.state.isLoading ?
-                  <React.Fragment><span className="fw-normal">$</span>{bnLiquidationPrice.toFixed(2)}</React.Fragment>
+                {this.state.liquidationPrice.gt(0) && !this.state.isLoading ?
+                  <React.Fragment><span className="fw-normal">$</span>{this.state.liquidationPrice.toFixed(2)}</React.Fragment>
                   : <Preloader width="74px" />
                 }
               </span>
