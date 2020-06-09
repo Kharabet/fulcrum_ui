@@ -1412,6 +1412,30 @@ export class FulcrumProvider {
     return result;
   }
 
+  public async getLoanCloseAmount(request: TradeRequest): Promise<[BigNumber, BigNumber, string]> {
+    let result: [BigNumber, BigNumber, string] = [new BigNumber(0), new BigNumber(0), ""];
+
+    if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
+      const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+      const iBZxContract = await this.contractsSource.getiBZxContract();
+      if (account && iBZxContract) {
+        result = await iBZxContract.closeWithSwap.callAsync(
+          request.loanId,
+          account,
+          request.amount,
+          request.returnTokenIsCollateral, // returnTokenIsCollateral
+          request.loanDataBytes,
+          {
+            from: account,
+            gas: FulcrumProvider.Instance.gasLimit,
+            gasPrice: await FulcrumProvider.Instance.gasPrice()
+          }
+        );
+      }
+    }
+    return result;
+  }
+
 
   public async getUserMarginTradeLoans(): Promise<IBorrowedFundsState[]> {
     let result: IBorrowedFundsState[] = [];
