@@ -30,7 +30,9 @@ interface IOwnTokenCardMobileState {
   isLoading: boolean;
   isLoadingTransaction: boolean;
   request: TradeRequest | undefined;
-  collateralToPrincipal: BigNumber;
+  valueChange: BigNumber;
+  tradeAssetPrice: BigNumber;
+
 }
 
 export class OwnTokenCardMobile extends Component<IOwnTokenGridRowProps, IOwnTokenCardMobileState> {
@@ -51,7 +53,8 @@ export class OwnTokenCardMobile extends Component<IOwnTokenGridRowProps, IOwnTok
       isLoading: true,
       isLoadingTransaction: false,
       request: undefined,
-      collateralToPrincipal: new BigNumber(0)
+      valueChange: new BigNumber(0),
+      tradeAssetPrice: new BigNumber(0),
     };
 
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
@@ -64,11 +67,17 @@ export class OwnTokenCardMobile extends Component<IOwnTokenGridRowProps, IOwnTok
   private _isMounted: boolean;
 
   private async derivedUpdate() {
+    this._isMounted && this.setState({
+      isLoading: true
+    });
+    const tradeAssetPrice = await FulcrumProvider.Instance.getSwapToUsdRate(this.props.tradeAsset);
     const collateralToPrincipalRate = await FulcrumProvider.Instance.getSwapRate(this.props.loan.collateralAsset, this.props.loan.loanAsset);
     let positionValue = new BigNumber(0);
     let value = new BigNumber(0);
     let collateral = new BigNumber(0);
     let openPrice = new BigNumber(0);
+    let openValue = new BigNumber(0);
+    let valueChange = new BigNumber(0);
     //liquidation_collateralToLoanRate = ((15000000000000000000 * principal / 10^20) + principal) / collateral * 10^18
     //If SHORT -> 10^36 / liquidation_collateralToLoanRate
     const liquidation_collateralToLoanRate = (new BigNumber("15000000000000000000").times(this.props.loan.loanData!.principal).div(10 ** 20)).plus(this.props.loan.loanData!.principal).div(this.props.loan.loanData!.collateral).times(10 ** 18);
@@ -76,33 +85,39 @@ export class OwnTokenCardMobile extends Component<IOwnTokenGridRowProps, IOwnTok
     let profit = new BigNumber(0);
     if (this.state.positionType === PositionType.LONG) {
       positionValue = this.props.loan.loanData!.collateral.div(10 ** 18);
-      value = this.props.loan.loanData!.collateral.div(10 ** 18).times(this.state.collateralToPrincipal);
-      collateral = ((this.props.loan.loanData!.collateral.times(this.state.collateralToPrincipal).div(10 ** 18)).minus(this.props.loan.loanData!.principal.div(10 ** 18)));
+      value = this.props.loan.loanData!.collateral.div(10 ** 18).times(collateralToPrincipalRate);
+      collateral = ((this.props.loan.loanData!.collateral.times(collateralToPrincipalRate).div(10 ** 18)).minus(this.props.loan.loanData!.principal.div(10 ** 18)));
       openPrice = this.props.loan.loanData!.startRate.div(10 ** 18);
+      openValue = this.props.loan.loanData!.collateral.div(10 ** 18).times(openPrice);
+      valueChange = (value.minus(openValue)).div(openValue).times(100);
       liquidationPrice = liquidation_collateralToLoanRate.div(10 ** 18);
-      const startingValue = ((this.props.loan.loanData!.collateral.times( openPrice.times(10**18)).div(10**18)).minus(this.props.loan.loanData!.principal)).div(10**18);
-      const currentValue = ((this.props.loan.loanData!.collateral.times( collateralToPrincipalRate.times(10**18)).div(10**18)).minus(this.props.loan.loanData!.principal)).div(10**18);
-      profit = currentValue.minus(startingValue);    }
+      const startingValue = ((this.props.loan.loanData!.collateral.times(openPrice.times(10 ** 18)).div(10 ** 18)).minus(this.props.loan.loanData!.principal)).div(10 ** 18);
+      const currentValue = ((this.props.loan.loanData!.collateral.times(collateralToPrincipalRate.times(10 ** 18)).div(10 ** 18)).minus(this.props.loan.loanData!.principal)).div(10 ** 18);
+      profit = currentValue.minus(startingValue);
+    }
     else {
       positionValue = this.props.loan.loanData!.principal.div(10 ** 18);
       value = this.props.loan.loanData!.collateral.div(10 ** 18);
-      collateral = ((this.props.loan.loanData!.collateral.div(10 ** 18)).minus(this.props.loan.loanData!.principal.div(this.state.collateralToPrincipal).div(10 ** 18)));
+      collateral = ((this.props.loan.loanData!.collateral.div(10 ** 18)).minus(this.props.loan.loanData!.principal.div(collateralToPrincipalRate).div(10 ** 18)));
       openPrice = new BigNumber(10 ** 36).div(this.props.loan.loanData!.startRate).div(10 ** 18);
+      openValue = this.props.loan.loanData!.principal.div(10 ** 18).times(openPrice);
+      valueChange = (value.minus(openValue)).div(openValue).times(100);
       liquidationPrice = new BigNumber(10 ** 36).div(liquidation_collateralToLoanRate).div(10 ** 18);
-      const startingValue = (this.props.loan.loanData!.collateral.minus(this.props.loan.loanData!.principal.div(openPrice.times(10**18)).times(10**18))).div(10**18);
-      const currentValue = (this.props.loan.loanData!.collateral.minus(this.props.loan.loanData!.principal.div(collateralToPrincipalRate.times(10**18)).times(10**18))).div(10**18);
-      profit = startingValue.minus(currentValue);    }
-    this._isMounted && this.setState(p => ({
+      const startingValue = (this.props.loan.loanData!.collateral.minus(this.props.loan.loanData!.principal.div(openPrice.times(10 ** 18)).times(10 ** 18))).div(10 ** 18);
+      const currentValue = (this.props.loan.loanData!.collateral.minus(this.props.loan.loanData!.principal.div(collateralToPrincipalRate.times(10 ** 18)).times(10 ** 18))).div(10 ** 18);
+      profit = startingValue.minus(currentValue);
+    }
+    this._isMounted && this.setState({
       ...this.state,
       liquidationPrice,
       collateral,
       value,
       positionValue,
+      tradeAssetPrice,
       openPrice,
       profit,
-      isLoading: collateralToPrincipalRate.gt(0) ? false : p.isLoading,
-      collateralToPrincipal: collateralToPrincipalRate
-    }));
+      isLoading: false
+    });
   }
 
   private onProviderAvailable = async () => {
@@ -198,11 +213,11 @@ export class OwnTokenCardMobile extends Component<IOwnTokenGridRowProps, IOwnTok
                     }
                   </span>
                 </div>
-                <div title={this.state.value.toFixed(18)} className="own-token-card-mobile__price">
+                <div title={this.state.tradeAssetPrice.toFixed(18)} className="own-token-card-mobile__price">
                   <span className="own-token-card-mobile__body-header">Asset Price</span>
                   <span className="own-token-card-mobile__value">
                     {!this.state.isLoading ?
-                      <React.Fragment><span className="sign-currency">$</span>{this.state.value.toFixed(2)}</React.Fragment>
+                      <React.Fragment><span className="sign-currency">$</span>{this.state.tradeAssetPrice.toFixed(2)}</React.Fragment>
                       : <Preloader width="74px" />
                     }
                   </span>
@@ -232,8 +247,8 @@ export class OwnTokenCardMobile extends Component<IOwnTokenGridRowProps, IOwnTok
                   <span className="own-token-card-mobile__body-header">Value</span>
                   <span className="own-token-card-mobile__value">
                     {!this.state.isLoading ?
-                      <React.Fragment><span className="sign-currency">$</span>{this.state.value.toFixed(2)}</React.Fragment> :
-                      <Preloader width="74px" />
+                      <React.Fragment><span className="sign-currency">$</span>{this.state.value.toFixed(2)}</React.Fragment>
+                      : <Preloader width="74px" />
                     }
                   </span>
                 </div>
@@ -242,12 +257,11 @@ export class OwnTokenCardMobile extends Component<IOwnTokenGridRowProps, IOwnTok
                   <span className="own-token-card-mobile__value">
                     {!this.state.isLoading ?
                       this.state.profit ?
-                        <React.Fragment><span className="sign-currency">$</span>{this.state.profit.toFixed(2)}</React.Fragment> :
-                        <React.Fragment><span className="sign-currency">$</span>0.0000</React.Fragment> :
-                      <Preloader width="74px" />
+                        <React.Fragment><span className="sign-currency">$</span>{this.state.profit.toFixed(2)}</React.Fragment>
+                        : <React.Fragment><span className="sign-currency">$</span>0.0000</React.Fragment>
+                      : <Preloader width="74px" />
                     }
                   </span>
-                  {/*>>>>>>> kovan_development*/}
                 </div >
               </div >
             </div >

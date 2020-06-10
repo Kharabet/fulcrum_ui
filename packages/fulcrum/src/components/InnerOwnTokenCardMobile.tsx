@@ -33,7 +33,6 @@ interface IInnerOwnTokenCardMobileState {
   isLoading: boolean;
   isLoadingTransaction: boolean;
   request: TradeRequest | undefined;
-  collateralToPrincipal: BigNumber;
   valueChange: BigNumber;
 }
 
@@ -56,7 +55,6 @@ export class InnerOwnTokenCardMobile extends Component<IOwnTokenGridRowProps, II
       isLoading: true,
       isLoadingTransaction: false,
       request: undefined,
-      collateralToPrincipal: new BigNumber(0),
       valueChange: new BigNumber(0)
     };
 
@@ -70,6 +68,9 @@ export class InnerOwnTokenCardMobile extends Component<IOwnTokenGridRowProps, II
   private _isMounted: boolean;
 
   private async derivedUpdate() {
+    this._isMounted && this.setState({
+      isLoading: true
+    });
     const collateralToPrincipalRate = await FulcrumProvider.Instance.getSwapRate(this.props.loan.collateralAsset, this.props.loan.loanAsset);
     let positionValue = new BigNumber(0);
     let value = new BigNumber(0);
@@ -84,27 +85,29 @@ export class InnerOwnTokenCardMobile extends Component<IOwnTokenGridRowProps, II
     let profit = new BigNumber(0);
     if (this.state.positionType === PositionType.LONG) {
       positionValue = this.props.loan.loanData!.collateral.div(10 ** 18);
-      value = this.props.loan.loanData!.collateral.div(10 ** 18).times(this.state.collateralToPrincipal);
-      collateral = ((this.props.loan.loanData!.collateral.times(this.state.collateralToPrincipal).div(10 ** 18)).minus(this.props.loan.loanData!.principal.div(10 ** 18)));
+      value = this.props.loan.loanData!.collateral.div(10 ** 18).times(collateralToPrincipalRate);
+      collateral = ((this.props.loan.loanData!.collateral.times(collateralToPrincipalRate).div(10 ** 18)).minus(this.props.loan.loanData!.principal.div(10 ** 18)));
       openPrice = this.props.loan.loanData!.startRate.div(10 ** 18);
       openValue = this.props.loan.loanData!.collateral.div(10 ** 18).times(openPrice);
       valueChange = (value.minus(openValue)).div(openValue).times(100);
       liquidationPrice = liquidation_collateralToLoanRate.div(10 ** 18);
-      const startingValue = ((this.props.loan.loanData!.collateral.times( openPrice.times(10**18)).div(10**18)).minus(this.props.loan.loanData!.principal)).div(10**18);
-      const currentValue = ((this.props.loan.loanData!.collateral.times( collateralToPrincipalRate.times(10**18)).div(10**18)).minus(this.props.loan.loanData!.principal)).div(10**18);
-      profit = currentValue.minus(startingValue);    }
+      const startingValue = ((this.props.loan.loanData!.collateral.times(openPrice.times(10 ** 18)).div(10 ** 18)).minus(this.props.loan.loanData!.principal)).div(10 ** 18);
+      const currentValue = ((this.props.loan.loanData!.collateral.times(collateralToPrincipalRate.times(10 ** 18)).div(10 ** 18)).minus(this.props.loan.loanData!.principal)).div(10 ** 18);
+      profit = currentValue.minus(startingValue);
+    }
     else {
       positionValue = this.props.loan.loanData!.principal.div(10 ** 18);
       value = this.props.loan.loanData!.collateral.div(10 ** 18);
-      collateral = ((this.props.loan.loanData!.collateral.div(10 ** 18)).minus(this.props.loan.loanData!.principal.div(this.state.collateralToPrincipal).div(10 ** 18)));
+      collateral = ((this.props.loan.loanData!.collateral.div(10 ** 18)).minus(this.props.loan.loanData!.principal.div(collateralToPrincipalRate).div(10 ** 18)));
       openPrice = new BigNumber(10 ** 36).div(this.props.loan.loanData!.startRate).div(10 ** 18);
       openValue = this.props.loan.loanData!.principal.div(10 ** 18).times(openPrice);
       valueChange = (value.minus(openValue)).div(openValue).times(100);
       liquidationPrice = new BigNumber(10 ** 36).div(liquidation_collateralToLoanRate).div(10 ** 18);
-      const startingValue = (this.props.loan.loanData!.collateral.minus(this.props.loan.loanData!.principal.div(openPrice.times(10**18)).times(10**18))).div(10**18);
-      const currentValue = (this.props.loan.loanData!.collateral.minus(this.props.loan.loanData!.principal.div(collateralToPrincipalRate.times(10**18)).times(10**18))).div(10**18);
-      profit = startingValue.minus(currentValue);    }
-    this._isMounted && this.setState(p => ({
+      const startingValue = (this.props.loan.loanData!.collateral.minus(this.props.loan.loanData!.principal.div(openPrice.times(10 ** 18)).times(10 ** 18))).div(10 ** 18);
+      const currentValue = (this.props.loan.loanData!.collateral.minus(this.props.loan.loanData!.principal.div(collateralToPrincipalRate.times(10 ** 18)).times(10 ** 18))).div(10 ** 18);
+      profit = startingValue.minus(currentValue);
+    }
+    this._isMounted && this.setState({
       ...this.state,
       liquidationPrice,
       collateral,
@@ -113,9 +116,8 @@ export class InnerOwnTokenCardMobile extends Component<IOwnTokenGridRowProps, II
       openPrice,
       profit,
       valueChange,
-      isLoading: collateralToPrincipalRate.gt(0) ? false : p.isLoading,
-      collateralToPrincipal: collateralToPrincipalRate
-    }));
+      isLoading: false
+    });
   }
 
   private onProviderAvailable = async () => {
