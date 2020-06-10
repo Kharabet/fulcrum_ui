@@ -264,7 +264,7 @@ export class FulcrumProvider {
 
   public onManageCollateralConfirmed = async (request: ManageCollateralRequest) => {
     if (request) {
-      // console.dir(request);
+      TasksQueue.Instance.enqueue(new RequestTask(request));
     }
   };
 
