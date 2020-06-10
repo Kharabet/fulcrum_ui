@@ -76,7 +76,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       isTradeModalOpen: false,
       tradeType: TradeType.BUY,
       tradeAsset: Asset.UNKNOWN,
-      tradeUnitOfAccount: Asset.UNKNOWN,
+      tradeUnitOfAccount: Asset.DAI,
       // defaultUnitOfAccount: process.env.REACT_APP_ETH_NETWORK === "kovan" ? Asset.SAI : Asset.DAI,
       defaultUnitOfAccount: Asset.DAI,
       tradePositionType: PositionType.SHORT,

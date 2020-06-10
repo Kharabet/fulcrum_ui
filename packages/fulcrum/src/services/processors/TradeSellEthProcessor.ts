@@ -16,22 +16,31 @@ export class TradeSellEthProcessor {
     const taskRequest: TradeRequest = (task.request as TradeRequest);
     const isLong = taskRequest.positionType === PositionType.LONG;
 
-    let decimals: number = AssetsDictionary.assets.get(taskRequest.asset)!.decimals || 18;
 
-    let amountInBaseUnits = new BigNumber(taskRequest.amount.multipliedBy(10 ** decimals).toFixed(0, 1));
-    let maxAmountInBaseUnits = new BigNumber(0);
     const loan = (await FulcrumProvider.Instance.getUserMarginTradeLoans())
       .find(l => l.loanId === taskRequest.loanId);
-    if (loan) {
-      maxAmountInBaseUnits = isLong
-      ? loan.loanData!.collateral
-      : loan.loanData!.principal;
+    if (!loan)
+      throw new Error("No loan available!");
+
+
+    let amountInBaseUnits = new BigNumber(0);
+    if (!isLong) {
+      const decimals: number = AssetsDictionary.assets.get(taskRequest.collateral)!.decimals || 18;
+      amountInBaseUnits = new BigNumber(loan.loanData!.collateral.times(taskRequest.amount).div(loan.loanData!.principal).multipliedBy(10 ** decimals).toFixed(0, 1));
+    }
+    else {
+      const decimals: number = AssetsDictionary.assets.get(taskRequest.asset)!.decimals || 18;
+      amountInBaseUnits = new BigNumber(taskRequest.amount.multipliedBy(10 ** decimals).toFixed(0, 1));
     }
 
-    if (maxAmountInBaseUnits.gt(0) && (maxAmountInBaseUnits.minus(amountInBaseUnits)).abs().div(maxAmountInBaseUnits).lte(0.01))
-    {
+    let maxAmountInBaseUnits = new BigNumber(0);
+    if (loan) {
+      maxAmountInBaseUnits = loan.loanData!.collateral;
+    }
+
+    if (maxAmountInBaseUnits.gt(0) && (maxAmountInBaseUnits.minus(amountInBaseUnits)).abs().div(maxAmountInBaseUnits).lte(0.01)) {
       console.log("close full amount")
-      amountInBaseUnits = maxAmountInBaseUnits.times(10**50);
+      amountInBaseUnits = new BigNumber(maxAmountInBaseUnits.times(10 ** 50).toFixed(0, 1));
     }
 
     const iBZxContract = await FulcrumProvider.Instance.contractsSource.getiBZxContract();
@@ -79,8 +88,7 @@ export class TradeSellEthProcessor {
 
     let txHash: string = "";
     try {
-      //FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.AskToOpenProgressDlg);
-
+      console.log("amountInBaseUnits " + amountInBaseUnits)
       // Closing trade
       txHash = await iBZxContract.closeWithSwap.sendTransactionAsync(
         taskRequest.loanId!,
