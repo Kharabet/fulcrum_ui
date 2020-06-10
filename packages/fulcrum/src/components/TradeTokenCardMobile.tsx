@@ -76,11 +76,27 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
 
     const interestRate = await FulcrumProvider.Instance.getBorrowInterestRate(this.props.asset);
 
+    const collateralToPrincipalRate = this.props.positionType === PositionType.LONG
+      ? await FulcrumProvider.Instance.getSwapRate(this.props.asset, this.props.defaultUnitOfAccount)
+      : await FulcrumProvider.Instance.getSwapRate(this.props.defaultUnitOfAccount, this.props.asset);
+
+    let initialMargin = this.props.positionType === PositionType.LONG
+      ? new BigNumber(10 ** 38).div(new BigNumber(this.state.leverage - 1).times(10 ** 18))
+      : new BigNumber(10 ** 38).div(new BigNumber(this.state.leverage).times(10 ** 18))
+    // liq_price_before_trade = (15000000000000000000 * collateralToLoanRate / 10^20) + collateralToLoanRate) / ((10^20 + current_margin) / 10^20
+    //if it's a SHORT then -> 10^36 / above
+    const liquidationPriceBeforeTrade = ((new BigNumber("15000000000000000000").times(collateralToPrincipalRate.times(10 ** 18)).div(10 ** 20)).plus(collateralToPrincipalRate.times(10 ** 18))).div((new BigNumber(10 ** 20).plus(initialMargin)).div(10 ** 20))
+    const liquidationPrice = this.props.positionType === PositionType.LONG
+      ? liquidationPriceBeforeTrade.div(10 ** 18)
+      : new BigNumber(10 ** 36).div(liquidationPriceBeforeTrade).div(10 ** 18);
+
+
     this._isMounted && this.setState({
       ...this.state,
       tradeAssetPrice,
       interestRate: interestRate,
-      isLoading: false
+      isLoading: false,
+      liquidationPrice
     });
   }
 
@@ -147,7 +163,6 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
     if (!this.state.assetDetails) {
       return null;
     }
-    const bnLiquidationPrice = new BigNumber(this.state.latestPriceDataPoint.liquidationPrice);
 
     return (
       <div className="trade-token-card-mobile">
@@ -186,17 +201,17 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
             <div title={this.state.tradeAssetPrice.toFixed(18)} className="trade-token-card-mobile__price">
               <span>Asset Price</span>
               <span>
-                {!this.state.isLoading ?
+                {this.state.tradeAssetPrice.gt(0) && !this.state.isLoading ?
                   <React.Fragment><span className="fw-normal">$</span>{this.state.tradeAssetPrice.toFixed(2)}</React.Fragment>
                   : <Preloader width="74px" />
                 }
               </span>
             </div>
-            <div title={`$${bnLiquidationPrice.toFixed(18)}`} className="trade-token-card-mobile__price">
+            <div title={`$${this.state.liquidationPrice.toFixed(18)}`} className="trade-token-card-mobile__price">
               <span>Liquidation Price</span>
               <span>
-                {!this.state.isLoading ?
-                  <React.Fragment><span className="fw-normal">$</span>{bnLiquidationPrice.toFixed(2)}</React.Fragment>
+                {this.state.liquidationPrice.gt(0) && !this.state.isLoading ?
+                  <React.Fragment><span className="fw-normal">$</span>{this.state.liquidationPrice.toFixed(2)}</React.Fragment>
                   : <Preloader width="74px" />
                 }
               </span>

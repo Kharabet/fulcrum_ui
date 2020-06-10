@@ -14,6 +14,7 @@ export class TradeRequest {
   public leverage: number;
   public amount: BigNumber;
   public loanDataBytes: string;
+  public returnTokenIsCollateral: boolean;
 
   constructor(
     loanId: string,
@@ -24,6 +25,7 @@ export class TradeRequest {
     positionType: PositionType,
     leverage: number,
     amount: BigNumber,
+    returnTokenIsCollateral?: boolean,
     loanDataBytes?: string,
     ) {
     this.id = Math.round(new Date().getTime()/1000);
@@ -35,6 +37,7 @@ export class TradeRequest {
     this.positionType = positionType;
     this.leverage = leverage;
     this.amount = amount;
+    this.returnTokenIsCollateral = returnTokenIsCollateral ? returnTokenIsCollateral : true;
     this.loanDataBytes = loanDataBytes ? loanDataBytes : "0x";
   }
 

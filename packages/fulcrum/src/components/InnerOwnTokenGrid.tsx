@@ -28,7 +28,7 @@ export class InnerOwnTokenGrid extends Component<IInnerOwnTokenGridProps, IInner
   }
 
   private renderDesktop = () => {
-    const innerOwnRowsData = this.props.ownRowsData.map((e,i) => <InnerOwnTokenGridRow key={i} loanId={this.props.loanId} {...e} />);
+    const innerOwnRowsData = this.props.ownRowsData.map((e,i) => <InnerOwnTokenGridRow key={i} {...e} />);
     if (innerOwnRowsData.length === 0) return null;
 
     return (

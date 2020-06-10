@@ -10,13 +10,12 @@ import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
 import { ICollateralChangeEstimate } from "../domain/ICollateralChangeEstimate";
-
-import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
-import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
 import { InputAmount } from "./InputAmount";
 
 import "../styles/components/manage-collateral-form.scss";
+import { PositionType } from "../domain/PositionType";
+import { TradeType } from "../domain/TradeType";
 
 export interface IManageCollateralFormProps {
   loan?: IBorrowedFundsState
@@ -31,17 +30,15 @@ interface IManageCollateralFormState {
   assetDetails: AssetDetails | null;
 
   minValue: number;
-  maxValue: number;
+  maxValue: number;  
+  maxCollateral:BigNumber;
+
   loanValue: number;
   selectedValue: number;
-
-  currentValue: number;
   assetBalanceValue: BigNumber;
 
-  collateralAsset: Asset;
   collateralAmount: BigNumber;
   collateralExcess: BigNumber;
-  liquidationPrice: BigNumber;
   gasAmountNeeded: BigNumber;
   collateralizedPercent: BigNumber;
   balanceTooLow: boolean;
@@ -58,9 +55,7 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
 
   private readonly _inputChange: Subject<string>;
   private readonly _selectedValueUpdate: Subject<BigNumber>;
-  private readonly _inputSetMax: Subject<BigNumber>;
-
-
+ 
   constructor(props: IManageCollateralFormProps, context?: any) {
     super(props, context);
 
@@ -68,17 +63,15 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
     this.state = {
       minValue: 0,
       maxValue: 0,
+      maxCollateral:new BigNumber(0),
       assetDetails: null,
       selectedValue: 0,
-      currentValue: 100,
       loanValue: 0,
       assetBalanceValue: new BigNumber(0),
-      liquidationPrice: new BigNumber(0),
       gasAmountNeeded: new BigNumber(0),
-      collateralAsset: Asset.UNKNOWN,
       collateralAmount: new BigNumber(0),
       collateralExcess: new BigNumber(0),
-      collateralizedPercent: new BigNumber(0),
+      collateralizedPercent: new BigNumber(0),     
       balanceTooLow: false,
       inputAmountText: "",
       didSubmit: false,
@@ -87,47 +80,34 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
 
     this._inputChange = new Subject();
     this._selectedValueUpdate = new Subject();
-    this._inputSetMax = new Subject();
 
     merge(
       this._inputChange.pipe(
         distinctUntilChanged(),
         debounceTime(500),
         switchMap((value) => this.rxFromInputAmount(value)),
-        switchMap((value) => this.rxFromCurrentAmount(value))
       ),
       this._selectedValueUpdate.pipe(
         distinctUntilChanged(),
         switchMap((value) => this.rxFromSelectedValue(value)),
-        switchMap((value) => this.rxFromCurrentAmount(value.toNumber()))
-      ),
-      this._inputSetMax.pipe(
-        switchMap((value) => this.rxFromMaxAmountWithMultiplier(value)),
-        switchMap((value) => this.rxFromCurrentAmount(value.toNumber()))
       )
-    ).subscribe((value: ICollateralChangeEstimate) => {
-      this.setState({
-        ...this.state,
-        liquidationPrice: value.liquidationPrice,
-        collateralAmount: value.collateralAmount,
-        collateralizedPercent: value.collateralizedPercent,
-        inputAmountText: this.formatPrecision(value.collateralAmount.toString())
+    ).pipe(
+      switchMap((value) => this.rxFromCurrentAmount(value))
+    )
+      .subscribe((value: ICollateralChangeEstimate) => {
+        this.setState({
+          ...this.state,
+          collateralAmount: value.collateralAmount,
+          collateralizedPercent: value.collateralizedPercent,
+          inputAmountText: this.formatPrecision(value.collateralAmount.toString())
+        });
       });
-    });
   }
-
-  private async derivedUpdate() {
-
-  }
-
-  private onProviderChanged = async (event: ProviderChangedEvent) => {
-    await this.derivedUpdate();
-  };
 
   public componentWillUnmount(): void {
-    // window.history.pushState(null, "Manage Collateral Modal Closed", `/trade`);
-    FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
+    window.history.pushState(null, "Manage Collateral Modal Closed", `/trade`);
   }
+
 
   public async componentDidMount() {
 
@@ -207,6 +187,7 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
                 gasAmountNeeded: gasAmountNeeded,
                 collateralizedPercent: collateralizedPercent,
                 collateralExcess: collateralExcess,
+                maxCollateral: maxCollateral,
                 assetBalanceValue: assetBalanceNormalizedBN
               },
               () => {
@@ -239,7 +220,7 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
             gasAmountNeeded: gasAmountNeeded
           },
           () => {
-            this._selectedValueUpdate.next(new BigNumber(this.state.selectedValue));
+             this._selectedValueUpdate.next(new BigNumber(this.state.selectedValue));
           }
         );
       });
@@ -268,7 +249,7 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
 
           <Slider
             step={0.01}
-            min={this.state.minValue}
+            min={100}
             max={this.state.maxValue}
             value={this.state.selectedValue}
             onChange={this.onChange}
@@ -296,7 +277,7 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
                 <InputAmount
                   inputAmountText={this.state.inputAmountText}
                   isLoading={this.state.isLoading}
-                  asset={this.state.collateralAsset}
+                  asset={this.props.loan!.collateralAsset}
                   onInsertMaxValue={this.onInsertMaxValue}
                   onTradeAmountChange={this.onTradeAmountChange}
                   onCollateralChange={this.onCollateralChange}
@@ -323,13 +304,12 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
     );
   }
 
-  private onChange = (value: number) => {
+  private onChange = (value: number) => {   
     this.setState({ ...this.state, selectedValue: value });
   };
 
   private onAfterChange = (value: number) => {
-    const collateralAmount = this.props.loan!!.collateralizedPercent.multipliedBy(this.state.selectedValue);
-    this._selectedValueUpdate.next(collateralAmount);
+   this._selectedValueUpdate.next(new BigNumber(this.state.selectedValue));
   };
 
 
@@ -347,17 +327,17 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
   };
 
   public onInsertMaxValue = async (value: number) => {
-    this.setState({ ...this.state }, () => {
+    const selectedValue = new BigNumber(this.state.maxValue).multipliedBy(value);
+     
+    this.setState({ ...this.state,selectedValue:selectedValue.toNumber(), isLoading: true }, () => {
+       
       // emitting next event for processing with rx.js
-      this._inputSetMax.next(new BigNumber(value));
+      this._selectedValueUpdate.next(selectedValue);
     });
   };
 
-  public onCollateralChange = async (asset: Asset) => {
-    this.setState({ ...this.state, collateralAsset: asset }, () => {
-      // emitting next event for processing with rx.js
-      this._inputSetMax.next();
-    });
+  public onCollateralChange = async (asset: Asset) => {    
+      this._selectedValueUpdate.next();
   };
 
 
@@ -402,7 +382,7 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
         new ManageCollateralRequest(
           this.props.loan!.loanId || "0x0000000000000000000000000000000000000000000000000000000000000000",
           this.props.loan!.loanAsset,
-          this.state.collateralAsset,
+          this.props.loan!.collateralAsset,
           new BigNumber(this.state.collateralAmount),
           this.state.loanValue > this.state.selectedValue
         )
@@ -410,41 +390,10 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
     }
   };
 
-
-  private rxFromCurrentAmount = (value: number): Observable<ICollateralChangeEstimate> => {
-
-    let collateralAmount = new BigNumber(0);
-    if (this.state.loanValue !== value && this.props.loan!.loanData) {
-      if (value < this.state.loanValue) {
-        collateralAmount = new BigNumber(this.state.loanValue)
-          .minus(value)
-          .dividedBy(this.state.loanValue)
-          .multipliedBy(this.state.collateralExcess);
-      } else {
-        collateralAmount = new BigNumber(value)
-          .minus(this.state.loanValue)
-          .dividedBy(this.state.maxValue - this.state.loanValue)
-          .multipliedBy(this.props.loan!.collateralAmount);
-      }
-      // console.log(collateralAmount.toString(), this.state.maxValue, this.props.loan!.collateralAmount.toString());
-    }
-
-    return new Observable<ICollateralChangeEstimate>(observer => {
-      FulcrumProvider.Instance.getManageCollateralChangeEstimate(
-        this.props.loan!,
-        collateralAmount,
-        value < this.state.loanValue
-      ).then(value => {
-        observer.next(value);
-        this.changeStateLoading();
-      });
-    });
-  };
-
-  private rxFromSelectedValue = (value: BigNumber): Observable<BigNumber> => {
+  private rxFromSelectedValue = (value: BigNumber): Observable<number> => {
     this.setState({ ...this.state, isLoading: true });
-    return new Observable<BigNumber>(observer => {
-      observer.next(value);
+    return new Observable<number>(observer => {
+      observer.next(value.toNumber());
     });
   };
 
@@ -472,24 +421,49 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
     });
 
     return new Observable<number>(observer => {
-      observer.next(this.state.selectedValue);
+      observer.next(selectedValue);
     });
   };
 
-  private rxFromMaxAmountWithMultiplier = (multiplier: BigNumber): Observable<BigNumber> => {
+  private rxFromMaxAmountWithMultiplier = (multiplier: BigNumber): Observable<number> => {
     this.setState({ ...this.state, isLoading: true });
-    return new Observable<BigNumber>(observer => {
-      // FulcrumProvider.Instance.getMaxTradeValue(this.props.tradeType, tradeTokenKey, this.state.collateral)
-      //   .then(maxTradeValue => {
-      //     // maxTradeValue is raw here, so we should not use it directly
-      //     let amountValue = maxTradeValue.multipliedBy(multiplier);
-      //     observer.next(amountValue);
-      //   });
-    });
+        
+    return new Observable<number>(observer => {
+         const value = new BigNumber(this.state.maxValue).multipliedBy(multiplier);
+         observer.next(value.toNumber());   
+        });
+          
+         
   };
 
+  private rxFromCurrentAmount = (value: number): Observable<ICollateralChangeEstimate> => {
+    let collateralAmount = new BigNumber(0);
+    if (this.state.loanValue !== value && this.props.loan!.loanData) {
+      if (value < this.state.loanValue) {
+        collateralAmount = new BigNumber(this.state.loanValue)
+          .minus(value)
+          .dividedBy(this.state.loanValue)
+          .multipliedBy(this.state.collateralExcess);
+      } else {
+        collateralAmount = new BigNumber(value)
+          .minus(this.state.loanValue)
+          .dividedBy(this.state.maxValue - this.state.loanValue)
+          .multipliedBy(this.props.loan!.collateralAmount);
+      }
+      // console.log(collateralAmount.toString(), this.state.maxValue, this.props.loan!.collateralAmount.toString());
+    }
 
-
+    return new Observable<ICollateralChangeEstimate>(observer => {
+      FulcrumProvider.Instance.getManageCollateralChangeEstimate(
+        this.props.loan!,
+        collateralAmount,
+        value < this.state.loanValue
+      ).then(value => {
+        observer.next(value);
+        this.changeStateLoading();
+      });
+    });
+  };
 
   public changeStateLoading = () => {
     if (this.state.collateralAmount) {
