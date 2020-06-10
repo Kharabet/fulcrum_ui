@@ -80,16 +80,18 @@ export class OwnTokenCardMobile extends Component<IOwnTokenGridRowProps, IOwnTok
       collateral = ((this.props.loan.loanData!.collateral.times(this.state.collateralToPrincipal).div(10 ** 18)).minus(this.props.loan.loanData!.principal.div(10 ** 18)));
       openPrice = this.props.loan.loanData!.startRate.div(10 ** 18);
       liquidationPrice = liquidation_collateralToLoanRate.div(10 ** 18);
-      profit = this.state.collateralToPrincipal.minus(openPrice).times(positionValue);
-    }
+      const startingValue = ((this.props.loan.loanData!.collateral.times( openPrice.times(10**18)).div(10**18)).minus(this.props.loan.loanData!.principal)).div(10**18);
+      const currentValue = ((this.props.loan.loanData!.collateral.times( collateralToPrincipalRate.times(10**18)).div(10**18)).minus(this.props.loan.loanData!.principal)).div(10**18);
+      profit = currentValue.minus(startingValue);    }
     else {
       positionValue = this.props.loan.loanData!.principal.div(10 ** 18);
       value = this.props.loan.loanData!.collateral.div(10 ** 18);
       collateral = ((this.props.loan.loanData!.collateral.div(10 ** 18)).minus(this.props.loan.loanData!.principal.div(this.state.collateralToPrincipal).div(10 ** 18)));
       openPrice = new BigNumber(10 ** 36).div(this.props.loan.loanData!.startRate).div(10 ** 18);
       liquidationPrice = new BigNumber(10 ** 36).div(liquidation_collateralToLoanRate).div(10 ** 18);
-      profit = openPrice.minus(this.state.collateralToPrincipal).times(positionValue);
-    }
+      const startingValue = (this.props.loan.loanData!.collateral.minus(this.props.loan.loanData!.principal.div(openPrice.times(10**18)).times(10**18))).div(10**18);
+      const currentValue = (this.props.loan.loanData!.collateral.minus(this.props.loan.loanData!.principal.div(collateralToPrincipalRate.times(10**18)).times(10**18))).div(10**18);
+      profit = startingValue.minus(currentValue);    }
     this._isMounted && this.setState(p => ({
       ...this.state,
       liquidationPrice,
