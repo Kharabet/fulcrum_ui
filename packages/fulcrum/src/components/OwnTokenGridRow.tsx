@@ -18,26 +18,23 @@ import { TradeTxLoaderStep } from "./TradeTxLoaderStep";
 
 export interface IOwnTokenGridRowProps {
   loan: IBorrowedFundsState;
-  loanId?: string;
   tradeAsset: Asset;
   collateralAsset: Asset;
   leverage: number;
   positionType: PositionType;
+  positionValue: BigNumber;
+  value: BigNumber;
+  collateral: BigNumber;
+  openPrice: BigNumber;
+  liquidationPrice: BigNumber;
+profit: BigNumber;
   isTxCompleted: boolean;
-  tradeType: TradeType,
   onTrade: (request: TradeRequest) => void;
   onManageCollateralOpen: (request: ManageCollateralRequest) => void;
   changeLoadingTransaction: (isLoadingTransaction: boolean, request: TradeRequest | undefined, isTxCompleted: boolean, resultTx: boolean) => void;
 }
 
 interface IOwnTokenGridRowState {
-  value: BigNumber;
-  positionType: PositionType;
-  positionValue: BigNumber;
-  collateral: BigNumber;
-  liquidationPrice: BigNumber;
-  openPrice: BigNumber;
-  profit: BigNumber;
   isLoading: boolean;
   isLoadingTransaction: boolean;
   request: TradeRequest | undefined;
@@ -51,15 +48,6 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
     this._isMounted = false;
 
     this.state = {
-      positionValue: new BigNumber(0),
-      positionType: props.loan.collateralAsset === Asset.ETH
-        ? PositionType.LONG
-        : PositionType.SHORT,
-      value: new BigNumber(0),
-      collateral: new BigNumber(0),
-      openPrice: new BigNumber(0),
-      liquidationPrice: new BigNumber(0),
-      profit: new BigNumber(0),
       isLoading: true,
       isLoadingTransaction: false,
       request: undefined,
@@ -89,7 +77,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
     const liquidation_collateralToLoanRate = (new BigNumber("15000000000000000000").times(this.props.loan.loanData!.principal).div(10 ** 20)).plus(this.props.loan.loanData!.principal).div(this.props.loan.loanData!.collateral).times(10 ** 18);
     let liquidationPrice = new BigNumber(0);
     let profit = new BigNumber(0);
-    if (this.state.positionType === PositionType.LONG) {
+    if (this.props.positionType === PositionType.LONG) {
       positionValue = this.props.loan.loanData!.collateral.div(10 ** 18);
       value = this.props.loan.loanData!.collateral.div(10 ** 18).times(collateralToPrincipalRate);
       collateral = ((this.props.loan.loanData!.collateral.times(collateralToPrincipalRate).div(10 ** 18)).minus(this.props.loan.loanData!.principal.div(10 ** 18)));
@@ -111,12 +99,6 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
     }
     this._isMounted && this.setState({
       ...this.state,
-      liquidationPrice,
-      collateral,
-      value,
-      positionValue,
-      openPrice,
-      profit,
       isLoading: false,
     });
   }
@@ -181,7 +163,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
           <TradeTxLoaderStep taskId={this.state.request.id} />
         </div>
       </React.Fragment>
-      : this.state.resultTx && this.props.loanId === this.props.loan.loanId
+      : this.state.resultTx
         ? <div className="close-tab-tx"></div>
         : <div className={`own-token-grid-row ${this.props.isTxCompleted ? `completed` : ``}`}>
           <div className="own-token-grid-row__col-token-name  opacityIn">
@@ -195,30 +177,30 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
           <div title={this.props.collateralAsset} className="own-token-grid-row__col-asset-unit opacityIn">
             {this.props.collateralAsset}
           </div>
-          <div title={this.state.positionValue.toFixed(18)} className="own-token-grid-row__col-position  opacityIn">
-            {this.state.positionValue.toFixed(4)}
+          <div title={this.props.positionValue.toFixed(18)} className="own-token-grid-row__col-position  opacityIn">
+            {this.props.positionValue.toFixed(4)}
           </div>
-          <div title={this.state.openPrice.toFixed(18)} className="own-token-grid-row__col-asset-price  opacityIn">
+          <div title={this.props.openPrice.toFixed(18)} className="own-token-grid-row__col-asset-price  opacityIn">
             {!this.state.isLoading
             ? <React.Fragment>
-              <span className="sign-currency">$</span>{this.state.openPrice.toFixed(2)}
+              <span className="sign-currency">$</span>{this.props.openPrice.toFixed(2)}
             </React.Fragment>
               : <Preloader width="74px" />
             }
           </div>
-          <div title={this.state.liquidationPrice.toFixed(18)} className="own-token-grid-row__col-liquidation-price opacityIn">
+          <div title={this.props.liquidationPrice.toFixed(18)} className="own-token-grid-row__col-liquidation-price opacityIn">
             {!this.state.isLoading
               ? <React.Fragment>
-                <span className="sign-currency">$</span>{this.state.liquidationPrice.toFixed(2)}
+                <span className="sign-currency">$</span>{this.props.liquidationPrice.toFixed(2)}
               </React.Fragment>
               : <Preloader width="74px" />
             }
           </div>
           <div className="own-token-grid-row__col-collateral opacityIn">
-            <div title={this.state.collateral.toFixed(18)} className="own-token-grid-row__col-collateral-wrapper">
+            <div title={this.props.collateral.toFixed(18)} className="own-token-grid-row__col-collateral-wrapper">
               {!this.state.isLoading
                 ? <React.Fragment>
-                  <span><span className="sign-currency">$</span>{this.state.collateral.toFixed(2)}</span>
+                  <span><span className="sign-currency">$</span>{this.props.collateral.toFixed(2)}</span>
                   <span className="own-token-grid-row__col-asset-collateral-small">{this.props.loan.collateralizedPercent.multipliedBy(100).plus(100).toFixed(2)}%</span>
                 </React.Fragment>
                 : <Preloader width="74px" />
@@ -228,21 +210,21 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
               <OpenManageCollateral />
             </div>
           </div>
-          <div title={this.state.value.toFixed(18)} className="own-token-grid-row__col-position-value opacityIn">
+          <div title={this.props.value.toFixed(18)} className="own-token-grid-row__col-position-value opacityIn">
             {!this.state.isLoading
-              ? this.state.value
+              ? this.props.value
                 ? <React.Fragment>
-                  <span className="sign-currency">$</span>{this.state.value.toFixed(2)}
+                  <span className="sign-currency">$</span>{this.props.value.toFixed(2)}
                 </React.Fragment>
                 : '$0.00'
               : <Preloader width="74px" />
             }
           </div>
-          <div title={this.state.profit.toFixed(18)} className="own-token-grid-row__col-profit opacityIn">
+          <div title={this.props.profit.toFixed(18)} className="own-token-grid-row__col-profit opacityIn">
             {!this.state.isLoading
-              ? this.state.profit
+              ? this.props.profit
                 ? <React.Fragment>
-                  <span><span className="sign-currency">$</span>{this.state.profit.toFixed(2)}</span>
+                  <span><span className="sign-currency">$</span>{this.props.profit.toFixed(2)}</span>
                 </React.Fragment>
                 : '$0.00'
               : <Preloader width="74px" />
