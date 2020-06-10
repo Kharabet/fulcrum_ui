@@ -59,22 +59,21 @@ export class InputAmount extends Component<IInputAmountProps, IInputAmountState>
             value={!this.props.isLoading ? this.formatPrecision(this.props.inputAmountText) : ""}
             onChange={this.props.onTradeAmountChange}
           />
-          {!this.props.isLoading ? null
-            : <div className="preloader-container"> <Preloader width="80px" /></div>
+          {this.props.isLoading &&
+            <div className="preloader-container"><Preloader width="80px" /></div>
           }
-          <div className="input-amount__collateral-button-container">
-            <CollateralTokenButton asset={this.props.asset} onClick={this.onChangeCollateralOpen} isChangeCollateralOpen={this.state.isChangeCollateralOpen} />
-          </div>
-          {this.state.isChangeCollateralOpen
-            ?
+          {this.props.tradeType === TradeType.BUY &&
+            <div className="input-amount__collateral-button-container">
+              <CollateralTokenButton asset={this.props.asset} onClick={this.onChangeCollateralOpen} isChangeCollateralOpen={this.state.isChangeCollateralOpen} />
+            </div>
+          }
+         {this.state.isChangeCollateralOpen &&
             <CollateralTokenSelector
               selectedCollateral={this.props.asset}
               collateralType={!this.props.tradeType ? `Collateral` : this.props.tradeType === TradeType.BUY ? `Purchase` : `Withdrawal`}
               onCollateralChange={this.props.onCollateralChange}
               onClose={this.onChangeCollateralClose}
               tradeType={this.state.tradeType} />
-            :
-            null
           }
         </div>
 

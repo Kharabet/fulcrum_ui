@@ -26,6 +26,7 @@ import { InputAmount } from "./InputAmount";
 
 import "../styles/components/trade-form.scss";
 import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
+import { InputReceive } from "./InputReceive";
 
 interface IInputAmountLimited {
   inputAmountValue: BigNumber;
@@ -106,6 +107,8 @@ interface ITradeFormState {
   selectedUnitOfAccount: Asset;
 
   tradeAssetPrice: BigNumber;
+  returnedAsset: Asset,
+  returnedAmount: BigNumber;
 }
 
 export default class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
@@ -157,7 +160,9 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       isLoading: true,
       isExposureLoading: true,
       selectedUnitOfAccount: this.props.defaultUnitOfAccount,
-      tradeAssetPrice: new BigNumber(0)
+      tradeAssetPrice: new BigNumber(0),
+      returnedAsset: Asset.ETH,
+      returnedAmount: new BigNumber(0)
     };
 
     this._inputChange = new Subject();
@@ -329,6 +334,8 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
         });
       } else {
         this.derivedUpdate();
+        if (this.props.tradeType === TradeType.SELL)
+          this.getLoanCloseAmount(this.state.returnedAsset);
       }
     }
   }
@@ -428,6 +435,14 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
               onTradeAmountChange={this.onTradeAmountChange}
               onCollateralChange={this.onCollateralChange}
             />
+            {this.props.tradeType === TradeType.SELL &&
+              <InputReceive
+                receiveAmout={this.state.returnedAmount}
+                returnedAsset={this.state.returnedAsset}
+                getLoanCloseAmount={this.getLoanCloseAmount}
+                assetDropdown={[this.props.loan?.collateralAsset || Asset.UNKNOWN, this.props.loan?.loanAsset || Asset.UNKNOWN]}
+              />
+            }
 
             {/*this.state.positionTokenBalance && */this.props.tradeType === TradeType.BUY/* && this.state.positionTokenBalance!.eq(0)*/ ? (
               <CollapsibleContainer titleOpen="View advanced options" titleClose="Hide advanced options" isTransparent={false}>
@@ -495,6 +510,40 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
 
   public onCancelClick = () => {
     this.props.onCancel();
+  };
+
+  public getLoanCloseAmount = async (asset: Asset) => {
+    let loanCloseAmount = new BigNumber(0);
+    const returnTokenIsCollateral =
+      asset === this.props.asset && this.props.positionType === PositionType.LONG ||
+        asset !== this.props.asset && this.props.positionType === PositionType.SHORT
+        ? true
+        : false;
+
+    const tradeRequest = new TradeRequest(
+      this.props.loan?.loanId || "0x0000000000000000000000000000000000000000000000000000000000000000",
+      this.props.tradeType,
+      this.props.asset,
+      this.state.selectedUnitOfAccount,
+      this.state.collateral,
+      this.props.positionType,
+      this.props.leverage,
+      this.state.tradeAmountValue,
+      returnTokenIsCollateral
+    );
+
+    if (tradeRequest.amount.gt(0)) {
+      const loanCloseData = await FulcrumProvider.Instance.getLoanCloseAmount(tradeRequest);
+      const precision = AssetsDictionary.assets.get(asset)!.decimals || 18;
+      const loanClosePrecision = loanCloseData[1].dividedBy(10 ** precision);
+      loanCloseAmount = loanClosePrecision.multipliedBy(this.state.inputAmountValue).dividedBy(this.state.maxTradeValue);
+    }
+
+    await this._isMounted && this.setState({
+      ...this.state,
+      returnedAsset: asset,
+      returnedAmount: loanCloseAmount
+    });
   };
 
   public onCollateralChange = async (asset: Asset) => {

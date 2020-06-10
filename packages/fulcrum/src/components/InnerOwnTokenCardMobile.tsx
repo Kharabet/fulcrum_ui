@@ -147,6 +147,9 @@ export class InnerOwnTokenCardMobile extends Component<IOwnTokenGridRowProps, II
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
   }
+  public componentWillMount(): void {
+    this.derivedUpdate();
+  }
 
   public componentDidMount(): void {
     this._isMounted = true;
@@ -166,6 +169,43 @@ export class InnerOwnTokenCardMobile extends Component<IOwnTokenGridRowProps, II
           </React.Fragment>
           : <div className="inner-own-token-card-mobile">
             <div className="inner-own-token-card-mobile__body-row">
+              <div title={this.state.positionValue.toFixed(18)} className="inner-own-token-card-mobile__col-token-name-full">
+                <span className="inner-own-token-header">{`Position (${this.props.tradeAsset.toUpperCase()}/DAI)`}</span>
+                {this.state.positionValue.toFixed(4)}
+
+              </div>
+              <div title={this.props.collateralAsset} className="inner-own-token-card-mobile__col-asset-type">
+                <span className="position-type-marker">{`${this.props.leverage}x`}&nbsp; {this.props.positionType}</span>
+              </div>
+              <div className="inner-own-token-card-mobile__col-action">
+                <button className="inner-own-token-card-mobile_button inner-own-token-card-mobile__sell-button inner-own-token-card-mobile__button--size-half" onClick={this.onSellClick}>
+                  {TradeType.SELL}
+                </button>
+              </div>
+            </div>
+            <div className="inner-own-token-card-mobile__body-row">
+              <div title={this.state.value.toFixed(18)} className="inner-own-token-card-mobile__col-asset-price">
+                <span className="inner-own-token-header">Value</span>
+                {!this.state.isLoading
+                  ? <React.Fragment>
+                    <span className="sign-currency">$</span>{this.state.value.toFixed(2)}
+                    <span className="inner-own-token-card-mobile__col-asset-price-small">12.25%</span>
+                  </React.Fragment>
+                  : <Preloader width="74px" />
+                }
+              </div>
+              <div className="inner-own-token-card-mobile__col-asset-collateral">
+                <span className="inner-own-token-header">Collateral</span>
+                <React.Fragment>
+                  <span className="sign-currency">$</span>{this.state.collateral.toFixed(2)}
+                  <span className="inner-own-token-card-mobile__col-asset-collateral-small">16.5%</span>
+                </React.Fragment>
+                <div className="inner-own-token-card-mobile__open-manage-collateral" onClick={this.onManageClick}>
+                  <OpenManageCollateral />
+                </div>
+              </div>
+            </div>
+            <div className="inner-own-token-card-mobile__body-row">
               <div title={this.state.openPrice.toFixed(18)} className="inner-own-token-card-mobile__col-position-value">
                 <span className="inner-own-token-header">Open Price</span>
                 {!this.state.isLoading
@@ -183,7 +223,7 @@ export class InnerOwnTokenCardMobile extends Component<IOwnTokenGridRowProps, II
                 }
               </div>
               <div title={this.state.profit.toFixed(18)} className="inner-own-token-card-mobile__col-profit">
-                <span className="inner-own-token-header">Pofit</span>
+                <span className="inner-own-token-header">Profit</span>
                 {!this.state.isLoading ?
                   this.state.profit
                     ? <React.Fragment><span className="sign-currency">$</span>{this.state.profit.toFixed(2)}</React.Fragment>

@@ -277,6 +277,43 @@
       }
     }
   }
+  .input-receive {
+    &__title {
+      font-weight: 600;
+      font-size: 20px;
+      line-height: 1.5;
+      color: #a9b5c7;
+      margin: 20px auto 12px auto;
+    }
+    &__container {
+      display: flex;
+      background-color: #394049;
+      width: auto;
+      height: 65px;
+      position: relative;
+      padding-right: 15px;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+    &__input {
+      width: calc(100% - 120px);
+      padding-left: 15px;
+      border: none;
+      font-size: 32px;
+      font-weight: 600;
+      font-style: normal;
+      font-stretch: normal;
+      letter-spacing: normal;
+      text-align: left;
+      color: #ffffff;
+      background-color: transparent;
+
+      &:focus {
+        outline: none;
+      }
+    }
+  }
 }
 
 // .trade-form__form-info {
@@ -300,7 +337,6 @@
 //     top: 10px;
 //   }
 // }
-
 
 @media screen and (max-width: $breakpoint-mobile-max) {
   .trade-form {
@@ -450,7 +486,7 @@
     &__position-type-container {
       margin-bottom: 1rem;
     }
-&__kv-container {
+    &__kv-container {
       display: flex;
       flex-direction: row;
       justify-content: space-between;
@@ -589,6 +625,17 @@
 
       &--sell {
         background-color: #ff5353;
+      }
+    }
+    .input-receive {
+      &__title {
+        font-size: 18px;
+      }
+      &__container {
+        height: 52px;
+      }
+      &__input {
+        font-size: 24px;
       }
     }
   }

@@ -245,5 +245,8 @@ $padding: 22px 40px 35px 40px;
         background-color: #fe7272;
       }
     }
+    &.new-position:first-child{
+      animation: opacityIn 1s cubic-bezier(1, 1, 1, 1);
+    }
   }
 }
