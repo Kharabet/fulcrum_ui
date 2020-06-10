@@ -34,6 +34,7 @@ interface IInnerOwnTokenCardMobileState {
   isLoadingTransaction: boolean;
   request: TradeRequest | undefined;
   collateralToPrincipal: BigNumber;
+  valueChange: BigNumber;
 }
 
 export class InnerOwnTokenCardMobile extends Component<IOwnTokenGridRowProps, IInnerOwnTokenCardMobileState> {
@@ -55,7 +56,8 @@ export class InnerOwnTokenCardMobile extends Component<IOwnTokenGridRowProps, II
       isLoading: true,
       isLoadingTransaction: false,
       request: undefined,
-      collateralToPrincipal: new BigNumber(0)
+      collateralToPrincipal: new BigNumber(0),
+      valueChange: new BigNumber(0)
     };
 
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
@@ -73,6 +75,8 @@ export class InnerOwnTokenCardMobile extends Component<IOwnTokenGridRowProps, II
     let value = new BigNumber(0);
     let collateral = new BigNumber(0);
     let openPrice = new BigNumber(0);
+    let openValue = new BigNumber(0);
+    let valueChange = new BigNumber(0);
     //liquidation_collateralToLoanRate = ((15000000000000000000 * principal / 10^20) + principal) / collateral * 10^18
     //If SHORT -> 10^36 / liquidation_collateralToLoanRate
     const liquidation_collateralToLoanRate = (new BigNumber("15000000000000000000").times(this.props.loan.loanData!.principal).div(10 ** 20)).plus(this.props.loan.loanData!.principal).div(this.props.loan.loanData!.collateral).times(10 ** 18);
@@ -83,6 +87,8 @@ export class InnerOwnTokenCardMobile extends Component<IOwnTokenGridRowProps, II
       value = this.props.loan.loanData!.collateral.div(10 ** 18).times(this.state.collateralToPrincipal);
       collateral = ((this.props.loan.loanData!.collateral.times(this.state.collateralToPrincipal).div(10 ** 18)).minus(this.props.loan.loanData!.principal.div(10 ** 18)));
       openPrice = this.props.loan.loanData!.startRate.div(10 ** 18);
+      openValue = this.props.loan.loanData!.collateral.div(10 ** 18).times(openPrice);
+      valueChange = (value.minus(openValue)).div(openValue).times(100);
       liquidationPrice = liquidation_collateralToLoanRate.div(10 ** 18);
       profit = this.state.collateralToPrincipal.minus(openPrice).times(positionValue);
     }
@@ -91,6 +97,8 @@ export class InnerOwnTokenCardMobile extends Component<IOwnTokenGridRowProps, II
       value = this.props.loan.loanData!.collateral.div(10 ** 18);
       collateral = ((this.props.loan.loanData!.collateral.div(10 ** 18)).minus(this.props.loan.loanData!.principal.div(this.state.collateralToPrincipal).div(10 ** 18)));
       openPrice = new BigNumber(10 ** 36).div(this.props.loan.loanData!.startRate).div(10 ** 18);
+      openValue = this.props.loan.loanData!.principal.div(10 ** 18).times(openPrice);
+      valueChange = (value.minus(openValue)).div(openValue).times(100);
       liquidationPrice = new BigNumber(10 ** 36).div(liquidation_collateralToLoanRate).div(10 ** 18);
       profit = openPrice.minus(this.state.collateralToPrincipal).times(positionValue);
     }
@@ -102,6 +110,7 @@ export class InnerOwnTokenCardMobile extends Component<IOwnTokenGridRowProps, II
       positionValue,
       openPrice,
       profit,
+      valueChange,
       isLoading: collateralToPrincipalRate.gt(0) ? false : p.isLoading,
       collateralToPrincipal: collateralToPrincipalRate
     }));
@@ -189,7 +198,7 @@ export class InnerOwnTokenCardMobile extends Component<IOwnTokenGridRowProps, II
                 {!this.state.isLoading
                   ? <React.Fragment>
                     <span className="sign-currency">$</span>{this.state.value.toFixed(2)}
-                    <span className="inner-own-token-card-mobile__col-asset-price-small">12.25%</span>
+                    <span className="inner-own-token-card-mobile__col-asset-price-small">{this.state.valueChange.toFixed(2)}%</span>
                   </React.Fragment>
                   : <Preloader width="74px" />
                 }
