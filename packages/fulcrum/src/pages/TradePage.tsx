@@ -408,50 +408,59 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
           ? loan.loanAsset
           : loan.collateralAsset;
 
-        let leverage = 0;
-        if (positionType === PositionType.LONG) {
-          if (loan.loanData!.startMargin.eq(new BigNumber(100).times(10 ** 18))) {
-            leverage = 2;
-          }
-          if (loan.loanData!.startMargin.eq(new BigNumber(50).times(10 ** 18))) {
-            leverage = 3;
-          }
-          if (loan.loanData!.startMargin.eq(new BigNumber("33333333333333333333"))) {
-            leverage = 4;
-          }
-          if (loan.loanData!.startMargin.eq(new BigNumber(25).times(10 ** 18))) {
-            leverage = 5;
-          }
+        let leverage = new BigNumber(10 ** 38).div(loan.loanData!.startMargin.times(10 ** 18));
+        if (positionType === PositionType.LONG)
+          leverage = leverage.plus(1);
 
-        } else {
-          if (loan.loanData!.startMargin.eq(new BigNumber(100).times(10 ** 18))) {
-            leverage = 1;
-          }
-          if (loan.loanData!.startMargin.eq(new BigNumber(50).times(10 ** 18))) {
-            leverage = 2;
-          }
-          if (loan.loanData!.startMargin.eq(new BigNumber("33333333333333333333"))) {
-            leverage = 3;
-          }
-          if (loan.loanData!.startMargin.eq(new BigNumber(25).times(10 ** 18))) {
-            leverage = 4;
-          }
-          if (loan.loanData!.startMargin.eq(new BigNumber(20).times(10 ** 18))) {
-            leverage = 5;
-          }
+
+        const collateralToPrincipalRate = await FulcrumProvider.Instance.getSwapRate(loan.collateralAsset, loan.loanAsset);
+        let positionValue = new BigNumber(0);
+        let value = new BigNumber(0);
+        let collateral = new BigNumber(0);
+        let openPrice = new BigNumber(0);
+        //liquidation_collateralToLoanRate = ((15000000000000000000 * principal / 10^20) + principal) / collateral * 10^18
+        //If SHORT -> 10^36 / liquidation_collateralToLoanRate
+        const liquidation_collateralToLoanRate = (new BigNumber("15000000000000000000").times(loan.loanData!.principal).div(10 ** 20)).plus(loan.loanData!.principal).div(loan.loanData!.collateral).times(10 ** 18);
+        let liquidationPrice = new BigNumber(0);
+        let profit = new BigNumber(0);
+        if (positionType === PositionType.LONG) {
+          positionValue = loan.loanData!.collateral.div(10 ** 18);
+          value = loan.loanData!.collateral.div(10 ** 18).times(collateralToPrincipalRate);
+          collateral = ((loan.loanData!.collateral.times(collateralToPrincipalRate).div(10 ** 18)).minus(loan.loanData!.principal.div(10 ** 18)));
+          openPrice = loan.loanData!.startRate.div(10 ** 18);
+          liquidationPrice = liquidation_collateralToLoanRate.div(10 ** 18);
+
+          const startingValue = ((loan.loanData!.collateral.times(openPrice.times(10 ** 18)).div(10 ** 18)).minus(loan.loanData!.principal)).div(10 ** 18);
+          const currentValue = ((loan.loanData!.collateral.times(collateralToPrincipalRate.times(10 ** 18)).div(10 ** 18)).minus(loan.loanData!.principal)).div(10 ** 18);
+          profit = currentValue.minus(startingValue);
         }
+        else {
+          positionValue = loan.loanData!.principal.div(10 ** 18);
+          value = loan.loanData!.collateral.div(10 ** 18);
+          collateral = ((loan.loanData!.collateral.div(10 ** 18)).minus(loan.loanData!.principal.div(collateralToPrincipalRate).div(10 ** 18)));
+          openPrice = new BigNumber(10 ** 36).div(loan.loanData!.startRate).div(10 ** 18);
+          liquidationPrice = new BigNumber(10 ** 36).div(liquidation_collateralToLoanRate).div(10 ** 18);
+          const startingValue = (loan.loanData!.collateral.minus(loan.loanData!.principal.div(openPrice.times(10 ** 18)).times(10 ** 18))).div(10 ** 18);
+          const currentValue = (loan.loanData!.collateral.minus(loan.loanData!.principal.div(collateralToPrincipalRate.times(10 ** 18)).times(10 ** 18))).div(10 ** 18);
+          profit = startingValue.minus(currentValue);
+        }
+
         ownRowsData.push({
           loan: loan,
-          loanId: this.state.loanId,
           tradeAsset: this.state.selectedTabAsset,
           collateralAsset: collateralAsset,
+          leverage: leverage.toNumber(),
           positionType,
-          leverage,
+          positionValue,
+          value,
+          collateral,
+          openPrice,
+          liquidationPrice,
+          profit,
           onTrade: this.onTradeRequested,
           onManageCollateralOpen: this.onManageCollateralRequested,
           changeLoadingTransaction: this.changeLoadingTransaction,
-          isTxCompleted: this.state.isTxCompleted,
-          tradeType: this.state.tradeType
+          isTxCompleted: this.state.isTxCompleted
         });
       }
     }
