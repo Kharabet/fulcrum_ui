@@ -387,19 +387,10 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
   public getOwnRowsData = async (state: ITradePageState): Promise<IOwnTokenGridRowProps[]> => {
     const ownRowsData: IOwnTokenGridRowProps[] = [];
     if (FulcrumProvider.Instance.web3Wrapper && FulcrumProvider.Instance.contractsSource && FulcrumProvider.Instance.contractsSource.canWrite) {
-      //const pTokens = state.assets && state.tradePositionType
-      //  ? FulcrumProvider.Instance.getPTokensAvailable().filter(tradeToken => tradeToken.asset == state.selectedKey.asset && tradeToken.positionType == state.tradePositionType)
-      //  : FulcrumProvider.Instance.getPTokensAvailable();
       const loans = await FulcrumProvider.Instance.getUserMarginTradeLoans();
-      // const pTokens = FulcrumProvider.Instance.getPTokensAvailable();
-      // const pTokenAddreses: string[] = FulcrumProvider.Instance.getPTokenErc20AddressList();
-      // const pTokenBalances = await FulcrumProvider.Instance.getErc20BalancesOfUser(pTokenAddreses);
       this.setState({ ...this.state, loans })
       for (const loan of loans) {
-        // const balance = pTokenBalances.get(pToken.erc20Address);
-        // if (!(loan.collateralAsset === this.state.selectedMarket.tradeAsset || loan.loanAsset === this.state.selectedMarket.tradeAsset
-        //   && loan.collateralAsset === this.state.selectedMarket.unitOfAccount || loan.loanAsset === this.state.selectedMarket.unitOfAccount))
-        //   continue;
+       
 
         const positionType = this.tradeAssets.includes(loan.collateralAsset)
           ? PositionType.LONG
@@ -445,7 +436,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
           collateral = ((loan.loanData!.collateral.div(10 ** 18)).minus(loan.loanData!.principal.div(collateralToPrincipalRate).div(10 ** 18)));
           openPrice = new BigNumber(10 ** 36).div(loan.loanData!.startRate).div(10 ** 18);
           liquidationPrice = new BigNumber(10 ** 36).div(liquidation_collateralToLoanRate).div(10 ** 18);
-          const startingValue = (loan.loanData!.collateral.minus(loan.loanData!.principal.div(openPrice.times(10 ** 18)).times(10 ** 18))).div(10 ** 18);
+          const startingValue = (loan.loanData!.collateral.minus(loan.loanData!.principal.div(loan.loanData!.startRate).times(10 ** 18))).div(10 ** 18);
           const currentValue = (loan.loanData!.collateral.minus(loan.loanData!.principal.div(collateralToPrincipalRate.times(10 ** 18)).times(10 ** 18))).div(10 ** 18);
           profit = startingValue.minus(currentValue);
         }
