@@ -235,6 +235,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
             overlayClassName="modal-overlay-div"
           >
             <TradeForm
+              stablecoins={this.stablecoinAssets}
               loan={this.state.loans?.find(e => e.loanId === this.state.loanId)}
               isMobileMedia={this.props.isMobileMedia}
               tradeType={this.state.tradeType}
@@ -400,7 +401,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         //   && loan.collateralAsset === this.state.selectedMarket.unitOfAccount || loan.loanAsset === this.state.selectedMarket.unitOfAccount))
         //   continue;
 
-        const positionType = this.tradeAssets.includes(loan.collateralAsset) 
+        const positionType = this.tradeAssets.includes(loan.collateralAsset)
           ? PositionType.LONG
           : PositionType.SHORT;
 
@@ -409,8 +410,8 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
           : loan.loanAsset;
 
         const quoteAsset = positionType === PositionType.LONG
-        ? loan.loanAsset
-        : loan.collateralAsset;
+          ? loan.loanAsset
+          : loan.collateralAsset;
 
         let leverage = new BigNumber(10 ** 38).div(loan.loanData!.startMargin.times(10 ** 18));
         if (positionType === PositionType.LONG)

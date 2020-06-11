@@ -9,7 +9,7 @@ export interface ICollateralTokenSelectorProps {
   selectedCollateral: Asset;
   collateralType: string;
   tradeType: string | null;
-
+  assets: Asset[];
   onCollateralChange: (asset: Asset) => void;
   onClose: () => void;
 }
@@ -34,7 +34,7 @@ export class CollateralTokenSelector extends Component<ICollateralTokenSelectorP
     collateralTokenSelector!.style.left = -1 * boundingClient!.left + "px";
   }
   public render() {
-    const tokenItems = this.assets.map(e => (
+    const tokenItems = this.props.assets.map(e => (
       <CollateralTokenSelectorItem
         key={e}
         asset={e}

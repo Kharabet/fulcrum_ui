@@ -12,7 +12,8 @@ import "../styles/components/input-amount.scss";
 interface IInputAmountProps {
   inputAmountText: string;
   isLoading: boolean;
-  asset: any;
+  asset: Asset;
+  selectorAssets?: Asset[];
   tradeType?: TradeType;
   onInsertMaxValue: (value: number) => void;
   onTradeAmountChange: (event: ChangeEvent<HTMLInputElement>) => void;
@@ -67,10 +68,11 @@ export class InputAmount extends Component<IInputAmountProps, IInputAmountState>
               <CollateralTokenButton asset={this.props.asset} onClick={this.onChangeCollateralOpen} isChangeCollateralOpen={this.state.isChangeCollateralOpen} />
             </div>
           }
-         {this.state.isChangeCollateralOpen &&
+         {this.state.isChangeCollateralOpen && this.props.selectorAssets &&
             <CollateralTokenSelector
               selectedCollateral={this.props.asset}
-              collateralType={!this.props.tradeType ? `Collateral` : this.props.tradeType === TradeType.BUY ? `Purchase` : `Withdrawal`}
+              assets={this.props.selectorAssets}
+              collateralType={!this.props.tradeType ? `Collateral` : this.props.tradeType === TradeType.BUY ? `Deposit` : `Withdrawal`}
               onCollateralChange={this.props.onCollateralChange}
               onClose={this.onChangeCollateralClose}
               tradeType={this.state.tradeType} />

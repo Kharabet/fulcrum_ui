@@ -697,28 +697,42 @@ export class FulcrumProvider {
   //   return [assetBalance, profit];
   // };
 
-  public getMaxTradeValue = async (tradeType: TradeType, loanAsset: Asset, collateral: Asset, positionType: PositionType, loan?: IBorrowedFundsState): Promise<BigNumber> => {
+  public getMaxTradeValue = async (
+    tradeType: TradeType,
+    tradeAsset: Asset,
+    unitOfAccount: Asset,
+    depositToken: Asset,
+    positionType: PositionType,
+    loan?: IBorrowedFundsState
+  ): Promise<BigNumber> => {
     let result = new BigNumber(0);
 
     if (tradeType === TradeType.BUY) {
       if (this.contractsSource) {
-        const assetContract = await this.contractsSource.getITokenContract(loanAsset);
+        const loanToken = positionType === PositionType.LONG
+          ? unitOfAccount
+          : tradeAsset;
+        const collateralToken = positionType === PositionType.LONG
+          ? tradeAsset
+          : unitOfAccount;
+
+        const assetContract = await this.contractsSource.getITokenContract(loanToken);
         if (!assetContract) return result;
 
-        const precision = AssetsDictionary.assets.get(loanAsset)!.decimals || 18;
+        const precision = AssetsDictionary.assets.get(loanToken)!.decimals || 18;
         let marketLiquidity = await assetContract.marketLiquidity.callAsync();
         marketLiquidity = marketLiquidity.multipliedBy(10 ** (18 - precision));
 
-        if (collateral !== loanAsset) {
-          const swapPrice = await this.getSwapRate(loanAsset, collateral);
+        if (depositToken !== loanToken) {
+          const swapPrice = await this.getSwapRate(loanToken, depositToken);
           marketLiquidity = marketLiquidity.multipliedBy(swapPrice);
         }
 
-        const balance = await this.getAssetTokenBalanceOfUser(collateral);
+        const balance = await this.getAssetTokenBalanceOfUser(depositToken);
 
         result = BigNumber.min(marketLiquidity, balance);
 
-        if (collateral === Asset.ETH) {
+        if (depositToken === Asset.ETH) {
           result = result.gt(this.gasBufferForTrade) ? result.minus(this.gasBufferForTrade) : new BigNumber(0);
         }
 
@@ -736,7 +750,7 @@ export class FulcrumProvider {
 
 
     let decimalOffset = 0;
-    if (loanAsset === Asset.WBTC) {
+    if (tradeAsset === Asset.WBTC) {
       if (positionType === PositionType.SHORT) {
         decimalOffset = 10;
       } else {
@@ -1807,13 +1821,13 @@ if (err || 'error' in added) {
 console.log(err, added);
 }
 }*//*);
-                                                                                                            }
-                                                                                                            }
-                                                                                                            }
-                                                                                                            } catch(e) {
-                                                                                                            // console.log(e);
-                                                                                                            }
-                                                                                                            }*/
+                                                                                                                }
+                                                                                                                }
+                                                                                                                }
+                                                                                                                } catch(e) {
+                                                                                                                // console.log(e);
+                                                                                                                }
+                                                                                                                }*/
   }
 
   private processLendRequestTask = async (task: RequestTask, skipGas: boolean) => {

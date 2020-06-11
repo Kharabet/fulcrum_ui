@@ -46,6 +46,7 @@ interface ITradeAmountChangeEvent {
 }
 
 export interface ITradeFormProps {
+  stablecoins: Asset[];
   loan?: IBorrowedFundsState
   tradeType: TradeType;
   tradeAsset: Asset;
@@ -163,7 +164,14 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       assetDetails = AssetsDictionaryMobile.assets.get(this.props.tradeAsset);
     }
     const tradeAssetPrice = await FulcrumProvider.Instance.getSwapToUsdRate(this.props.tradeAsset);
-    const maxTradeValue = await FulcrumProvider.Instance.getMaxTradeValue(this.props.tradeType, this.props.positionType === PositionType.LONG ? this.state.selectedUnitOfAccount : this.props.tradeAsset, this.state.collateral, this.props.positionType, this.props.loan);
+    const maxTradeValue = await FulcrumProvider.Instance.getMaxTradeValue(
+      this.props.tradeType,
+      this.props.tradeAsset,
+      this.state.selectedUnitOfAccount,
+      this.state.collateral,
+      this.props.positionType,
+      this.props.loan
+    );
     const tradeRequest = new TradeRequest(
       this.props.loan?.loanId || "0x0000000000000000000000000000000000000000000000000000000000000000",
       this.props.tradeType,
@@ -361,6 +369,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
 
             <InputAmount
               inputAmountText={this.state.inputAmountText}
+              selectorAssets={this.props.stablecoins.concat(this.props.tradeAsset)}
               isLoading={false}
               tradeType={this.props.tradeType}
               asset={this.state.collateral}
@@ -381,11 +390,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
               <CollapsibleContainer titleOpen="View advanced options" titleClose="Hide advanced options" isTransparent={false}>
                 <div className="trade-form__unit-of-account-container">
                   Unit of Account
-                    <UnitOfAccountSelector items={[
-                    Asset.USDC,
-                    Asset.SAI,
-                    Asset.DAI
-                  ]} value={this.state.selectedUnitOfAccount} onChange={this.onChangeUnitOfAccount} />
+                    <UnitOfAccountSelector items={this.props.stablecoins} value={this.state.selectedUnitOfAccount} onChange={this.onChangeUnitOfAccount} />
                 </div>
               </CollapsibleContainer>
             ) : null}
@@ -479,7 +484,9 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
   public onCollateralChange = async (asset: Asset) => {
     await this._isMounted && this.setState({ ...this.state, collateral: asset });
 
-    this._inputSetMax.next();
+    await this.onInsertMaxValue(1);
+
+    // this._inputSetMax.next();
   };
 
   public onChangeUnitOfAccount = (asset: Asset) => {
@@ -539,24 +546,29 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
   private rxFromMaxAmountWithMultiplier = (multiplier: BigNumber): Observable<ITradeAmountChangeEvent | null> => {
     return new Observable<ITradeAmountChangeEvent | null>(observer => {
       this._isMounted && this.setState({ ...this.state, isLoading: true, isExposureLoading: true });
-      const maxTradeValue = this.state.maxTradeValue;
-      this.getInputAmountLimitedFromBigNumber(maxTradeValue, maxTradeValue, multiplier)
-        .then(limitedAmount => {
-          this.createTradeAmountChangedEvent(limitedAmount, maxTradeValue)
-            .then(changeEvent => observer.next(changeEvent));
+      FulcrumProvider.Instance.getMaxTradeValue(this.props.tradeType, this.props.tradeAsset, this.state.selectedUnitOfAccount, this.state.collateral, this.props.positionType, this.props.loan)
+        .then(maxTradeValue => {
+          this.getInputAmountLimitedFromBigNumber(maxTradeValue, maxTradeValue, multiplier)
+            .then(limitedAmount => {
+              this.createTradeAmountChangedEvent(limitedAmount, maxTradeValue)
+                .then(changeEvent => observer.next(changeEvent));
+            })
         })
-    });
+    })
+
   };
 
   private rxFromCurrentAmount = (value: string): Observable<ITradeAmountChangeEvent | null> => {
     return new Observable<ITradeAmountChangeEvent | null>(observer => {
       this._isMounted && this.setState({ ...this.state, isExposureLoading: true });
-      const maxTradeValue = this.state.maxTradeValue;
-      this.getInputAmountLimitedFromText(value, maxTradeValue)
-        .then(limitedAmount => {
-          this.createTradeAmountChangedEvent(limitedAmount, maxTradeValue)
-            .then(changeEvent => observer.next(changeEvent));
-        })
+      FulcrumProvider.Instance.getMaxTradeValue(this.props.tradeType, this.props.tradeAsset, this.state.selectedUnitOfAccount, this.state.collateral, this.props.positionType, this.props.loan)
+        .then(maxTradeValue => {
+          this.getInputAmountLimitedFromText(value, maxTradeValue)
+            .then(limitedAmount => {
+              this.createTradeAmountChangedEvent(limitedAmount, maxTradeValue)
+                .then(changeEvent => observer.next(changeEvent));
+            })
+        });
     });
   };
 
