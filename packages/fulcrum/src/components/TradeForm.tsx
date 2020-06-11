@@ -83,6 +83,7 @@ interface ITradeFormState {
   tradeAssetPrice: BigNumber;
   returnedAsset: Asset,
   returnedAmount: BigNumber;
+  returnTokenIsCollateral: boolean;
 }
 
 export default class TradeForm extends Component<ITradeFormProps, ITradeFormState> {
@@ -119,7 +120,10 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       selectedUnitOfAccount: this.props.defaultUnitOfAccount,
       tradeAssetPrice: new BigNumber(0),
       returnedAsset: props.tradeAsset,
-      returnedAmount: new BigNumber(0)
+      returnedAmount: new BigNumber(0),
+      returnTokenIsCollateral: props.positionType === PositionType.LONG
+        ? true
+        : false
     };
 
     this._inputChange = new Subject();
@@ -180,7 +184,8 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       this.state.collateral,
       this.props.positionType,
       this.props.leverage,
-      this.state.tradeAmountValue
+      this.state.tradeAmountValue,
+      this.state.returnTokenIsCollateral
     );
 
 
@@ -477,7 +482,8 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
     await this._isMounted && this.setState({
       ...this.state,
       returnedAsset: asset,
-      returnedAmount: loanCloseAmount
+      returnedAmount: loanCloseAmount,
+      returnTokenIsCollateral
     });
   };
 
@@ -538,7 +544,8 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
         this.state.collateral,
         this.props.positionType,
         this.props.leverage,
-        this.state.tradeAmountValue
+        this.state.tradeAmountValue,
+        this.state.returnTokenIsCollateral
       )
     );
   };
@@ -582,7 +589,8 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       this.state.collateral,
       this.props.positionType,
       this.props.leverage,
-      limitedAmount.tradeAmountValue
+      limitedAmount.tradeAmountValue,
+      this.state.returnTokenIsCollateral
     );
     const { collateral, interestRate } = await FulcrumProvider.Instance.getEstimatedMarginDetails(tradeRequest);
     if (this.props.tradeType === TradeType.BUY)

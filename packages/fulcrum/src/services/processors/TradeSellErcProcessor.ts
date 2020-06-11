@@ -67,7 +67,7 @@ export class TradeSellErcProcessor {
           taskRequest.loanId!,
           account,
           amountInBaseUnits,
-          true, // returnTokenIsCollateral
+          taskRequest.returnTokenIsCollateral,
           "0x",
           {
             from: account,
@@ -86,7 +86,7 @@ export class TradeSellErcProcessor {
           taskRequest.loanId!,
           account,
           amountInBaseUnits,
-          true, // returnTokenIsCollateral
+          taskRequest.returnTokenIsCollateral,
           "0x",
           {
             from: account,

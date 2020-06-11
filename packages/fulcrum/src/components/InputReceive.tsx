@@ -25,7 +25,7 @@ export class InputReceive extends Component<IInputReceiveProps, IInputReceiveSta
       <React.Fragment>
         <div className="input-receive__title">You will Receive</div>
         <div className="input-receive__container">
-          <div className="input-receive__input">
+          <div title={this.props.receiveAmout.toFixed(18)} className="input-receive__input">
             {Number(this.props.receiveAmout.toFixed(5))}
           </div>
           <AssetDropdown

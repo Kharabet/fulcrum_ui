@@ -15,18 +15,7 @@ export interface ICollateralTokenSelectorProps {
 }
 
 export class CollateralTokenSelector extends Component<ICollateralTokenSelectorProps> {
-  private readonly assets: Asset[] = [
-    Asset.ETH,
-    Asset.DAI,
-    Asset.USDC,
-    Asset.SUSD,
-    Asset.WBTC,
-    Asset.LINK,
-    Asset.ZRX,
-    Asset.REP,
-    Asset.KNC
-  ];
-
+  
   componentDidMount() {
     const collateralTokenSelector = document.querySelector(".collateral-token-selector__wrapper") as HTMLElement;
     const boundingClient = collateralTokenSelector.getBoundingClientRect();
