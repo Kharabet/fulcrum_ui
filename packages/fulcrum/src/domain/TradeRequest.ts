@@ -37,7 +37,7 @@ export class TradeRequest {
     this.positionType = positionType;
     this.leverage = leverage;
     this.amount = amount;
-    this.returnTokenIsCollateral = returnTokenIsCollateral ? returnTokenIsCollateral : true;
+    this.returnTokenIsCollateral = returnTokenIsCollateral !== undefined ? returnTokenIsCollateral : true;
     this.loanDataBytes = loanDataBytes ? loanDataBytes : "0x";
   }
 

@@ -1419,16 +1419,42 @@ export class FulcrumProvider {
       const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
       const iBZxContract = await this.contractsSource.getiBZxContract();
       if (account && iBZxContract) {
+
+
+        const loan = (await FulcrumProvider.Instance.getUserMarginTradeLoans())
+          .find(l => l.loanId === request.loanId);
+        if (!loan)
+          throw new Error("No loan available!");
+
+
+        let amountInBaseUnits = new BigNumber(0);
+        if (request.positionType === PositionType.LONG) {
+          const decimals: number = AssetsDictionary.assets.get(request.collateral)!.decimals || 18;
+          amountInBaseUnits = new BigNumber(loan.loanData!.collateral.times(request.amount).div(loan.loanData!.principal).multipliedBy(10 ** decimals).toFixed(0, 1));
+        }
+        else {
+          const decimals: number = AssetsDictionary.assets.get(request.asset)!.decimals || 18;
+          amountInBaseUnits = new BigNumber(request.amount.multipliedBy(10 ** decimals).toFixed(0, 1));
+        }
+
+        let maxAmountInBaseUnits = new BigNumber(0);
+        if (loan) {
+          maxAmountInBaseUnits = loan.loanData!.collateral;
+        }
+
+        if (maxAmountInBaseUnits.gt(0) && (maxAmountInBaseUnits.minus(amountInBaseUnits)).abs().div(maxAmountInBaseUnits).lte(0.01)) {
+          console.log("close full amount")
+          amountInBaseUnits = new BigNumber(maxAmountInBaseUnits.times(10 ** 50).toFixed(0, 1));
+        }
         result = await iBZxContract.closeWithSwap.callAsync(
           request.loanId,
           account,
-          request.amount,
+          amountInBaseUnits,
           request.returnTokenIsCollateral, // returnTokenIsCollateral
           request.loanDataBytes,
           {
             from: account,
-            gas: FulcrumProvider.Instance.gasLimit,
-            gasPrice: await FulcrumProvider.Instance.gasPrice()
+            gas: FulcrumProvider.Instance.gasLimit
           }
         );
       }
@@ -1580,8 +1606,8 @@ export class FulcrumProvider {
     return result;
   }
 
-  public async getSwapToUsdRateBatch(assets: Asset[], usdToken: Asset): Promise<[BigNumber[],BigNumber[],BigNumber[]]> {
-    let result: [BigNumber[],BigNumber[],BigNumber[]] = [[],[],[]];
+  public async getSwapToUsdRateBatch(assets: Asset[], usdToken: Asset): Promise<[BigNumber[], BigNumber[], BigNumber[]]> {
+    let result: [BigNumber[], BigNumber[], BigNumber[]] = [[], [], []];
 
     if (this.contractsSource) {
       const oracleAddress = this.contractsSource.getOracleAddress();
@@ -1781,13 +1807,13 @@ if (err || 'error' in added) {
 console.log(err, added);
 }
 }*//*);
-                                                                                                    }
-                                                                                                    }
-                                                                                                    }
-                                                                                                    } catch(e) {
-                                                                                                    // console.log(e);
-                                                                                                    }
-                                                                                                    }*/
+                                                                                                            }
+                                                                                                            }
+                                                                                                            }
+                                                                                                            } catch(e) {
+                                                                                                            // console.log(e);
+                                                                                                            }
+                                                                                                            }*/
   }
 
   private processLendRequestTask = async (task: RequestTask, skipGas: boolean) => {
