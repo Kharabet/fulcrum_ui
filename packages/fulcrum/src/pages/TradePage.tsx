@@ -33,8 +33,13 @@ export interface ITradePageProps {
   isMobileMedia: boolean;
 }
 
+export interface IMarketPair {
+  tradeAsset: Asset;
+  unitOfAccount: Asset;
+}
+
 interface ITradePageState {
-  assets: Asset[];
+  selectedMarket: IMarketPair;
   showMyTokensOnly: boolean;
   selectedTabAsset: Asset;
   isTradeModalOpen: boolean;
@@ -69,23 +74,59 @@ interface ITradePageState {
 export default class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
   constructor(props: any) {
     super(props);
+    if (process.env.REACT_APP_ETH_NETWORK === "kovan") {
+      this.tradeAssets = [
+        Asset.ETH
+      ];
+      this.stablecoinAssets = [
+        Asset.DAI,
+        Asset.SAI,
+      ]
+    } else if (process.env.REACT_APP_ETH_NETWORK === "ropsten") {
+      // this.tradeAssets = [
+      // ];
+    } else {
+      this.tradeAssets = [
+        Asset.ETH,
+        // Asset.DAI,
+        // Asset.USDC,
+        // Asset.SUSD,
+        Asset.WBTC,
+        Asset.LINK,
+        // Asset.MKR,
+        Asset.ZRX,
+        // Asset.BAT,
+        // Asset.REP,
+        Asset.KNC
+      ];
+      this.stablecoinAssets = [
+        Asset.DAI,
+        Asset.SAI,
+        Asset.USDC,
+        Asset.SUSD,
+        Asset.USDT
+      ]
+    }
     this.state = {
+      selectedMarket: {
+        tradeAsset: this.tradeAssets[0],
+        unitOfAccount: this.stablecoinAssets[0],
+      },
       loans: undefined,
       showMyTokensOnly: false,
-      selectedTabAsset: Asset.ETH,
+      selectedTabAsset: this.tradeAssets[0],
       isTradeModalOpen: false,
       tradeType: TradeType.BUY,
       tradeAsset: Asset.UNKNOWN,
       tradeUnitOfAccount: Asset.DAI,
       // defaultUnitOfAccount: process.env.REACT_APP_ETH_NETWORK === "kovan" ? Asset.SAI : Asset.DAI,
-      defaultUnitOfAccount: Asset.DAI,
+      defaultUnitOfAccount: this.stablecoinAssets[0],
       tradePositionType: PositionType.SHORT,
       tradeLeverage: 0,
       tradeVersion: 1,
       collateralToken: Asset.UNKNOWN,
       isTokenAddressFormOpen: false,
       isManageCollateralModalOpen: false,
-      assets: this.getAssets(),
       defaultTokenizeNeeded: true,
       defaultLeverageShort: 1,
       defaultLeverageLong: 2,
@@ -101,35 +142,10 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
 
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
-  }
 
-  private getAssets(): Asset[] {
-    var assets: Asset[];
-    if (process.env.REACT_APP_ETH_NETWORK === "kovan") {
-      assets = [
-        Asset.ETH
-      ];
-    } else if (process.env.REACT_APP_ETH_NETWORK === "ropsten") {
-      assets = [
-      ];
-    } else {
-      assets = [
-        Asset.ETH,
-        // Asset.DAI,
-        // Asset.USDC,
-        // Asset.SUSD,
-        Asset.WBTC,
-        Asset.LINK,
-        // Asset.MKR,
-        Asset.ZRX,
-        // Asset.BAT,
-        // Asset.REP,
-        Asset.KNC
-      ];
-    }
-    return assets;
   }
-
+  private readonly tradeAssets: Asset[] = [];
+  private readonly stablecoinAssets: Asset[] = [];
 
   public componentWillUnmount(): void {
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
@@ -180,14 +196,19 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
           </InfoBlock>
             : null}
           <TokenGridTabs
-            assets={this.state.assets}
-            selectedTabAsset={this.state.selectedTabAsset}
+            tradeAssets={this.tradeAssets}
+            stablecoinAssets={this.stablecoinAssets}
+            selectedMarket={this.state.selectedMarket}
             onShowMyTokensOnlyChange={this.onShowMyTokensOnlyChange}
-            onTabSelect={this.onTabSelect}
+            onMarketSelect={this.onTabSelect}
             isMobile={this.props.isMobileMedia}
             isShowMyTokensOnly={this.state.showMyTokensOnly}
             openedPositionsCount={this.state.openedPositionsCount}
           />
+          {/* <ManageButton 
+            openedPositionsCount={this.state.openedPositionsCount}
+            onShowMyTokensOnlyChange={this.onShowMyTokensOnlyChange}
+            /> */}
 
           {this.state.showMyTokensOnly ? (
             <ManageTokenGrid
@@ -200,15 +221,12 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
                   <TVChartContainer symbol={this.state.selectedTabAsset} preset={this.props.isMobileMedia ? "mobile" : undefined} />
                 </div>
                 <TradeTokenGrid
-                  selectedTabAsset={this.state.selectedTabAsset}
                   isMobileMedia={this.props.isMobileMedia}
-                  tokenRowsData={this.state.tokenRowsData.filter(e => e.asset === this.state.selectedTabAsset)}
-                  ownRowsData={this.state.ownRowsData}
+                  tokenRowsData={this.state.tokenRowsData.filter(e => e.asset === this.state.selectedMarket.tradeAsset)}
+                  ownRowsData={this.state.ownRowsData.filter(e => e.tradeAsset === this.state.selectedMarket.tradeAsset && e.collateralAsset === this.state.selectedMarket.unitOfAccount )}
                   //changeLoadingTransaction={this.changeLoadingTransaction}
                   request={this.state.request}
                   isLoadingTransaction={this.state.isLoadingTransaction}
-                  tradePosition={this.state.tradePositionType}
-                  tradeLeverage={this.state.tradeLeverage}
                   resultTx={this.state.resultTx}
                   tradeType={this.state.tradeType}
                   loanId={this.state.loanId}
@@ -265,8 +283,12 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     );
   }
 
-  public onTabSelect = async (asset: Asset) => {
-    await this.setState({ ...this.state, selectedTabAsset: asset });
+  public onTabSelect = async (tradeAsset: Asset, unitOfAccount: Asset) => {
+    const marketPair = {
+      tradeAsset,
+      unitOfAccount
+    }
+    await this.setState({ ...this.state, selectedMarket: marketPair });
   };
 
   private onProviderAvailable = async () => {
@@ -391,8 +413,9 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       this.setState({ ...this.state, loans })
       for (const loan of loans) {
         // const balance = pTokenBalances.get(pToken.erc20Address);
-        if (!(loan.collateralAsset === this.state.selectedTabAsset || loan.loanAsset === this.state.selectedTabAsset))
-          continue;
+        // if (!(loan.collateralAsset === this.state.selectedMarket.tradeAsset || loan.loanAsset === this.state.selectedMarket.tradeAsset
+        //   && loan.collateralAsset === this.state.selectedMarket.unitOfAccount || loan.loanAsset === this.state.selectedMarket.unitOfAccount))
+        //   continue;
 
         const positionType = loan.collateralAsset === Asset.ETH
           ? PositionType.LONG
@@ -470,7 +493,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
 
   public getTokenRowsData = (state: ITradePageState): ITradeTokenGridRowProps[] => {
     const tokenRowsData: ITradeTokenGridRowProps[] = [];
-    state.assets.forEach(e => {
+    Array.from(this.tradeAssets).forEach(e => {
       tokenRowsData.push({
         asset: e,
         defaultUnitOfAccount: state.defaultUnitOfAccount,

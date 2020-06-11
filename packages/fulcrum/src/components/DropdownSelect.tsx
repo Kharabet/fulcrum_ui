@@ -1,16 +1,17 @@
 import React, { useEffect } from 'react';
 
 import "../styles/components/dropdown-select.scss"
+import { Asset } from '../domain/Asset';
 
 export interface IDropDownSelectOption {
-  value: string;
-  displayName: string;
+  tradeAsset: Asset;
+  unitOfAccount: Asset;
 
 }
 export interface IDropdownSelectProps {
   options: IDropDownSelectOption[];
   selectedOption: IDropDownSelectOption;
-  onDropdownSelect: (value: string) => void;
+  onDropdownSelect: (tradeAsset: string, unitOfAccount: string) => void;
 }
 
 export const DropdownSelect = (props: IDropdownSelectProps) => {
@@ -52,7 +53,7 @@ export const DropdownSelect = (props: IDropdownSelectProps) => {
     selectStyled.classList.remove('active');
     // selectNative.selectedIndex = parseInt(li.dataset.index!);
     ul.style.display = 'none';
-    await props.onDropdownSelect(li.dataset.value!);
+    await props.onDropdownSelect(li.dataset.tradeasset!, li.dataset.unitofaccount!);
   }
 
   useEffect(() => {
@@ -69,10 +70,20 @@ export const DropdownSelect = (props: IDropdownSelectProps) => {
         {props.options.map(option => option != props.selectedOption && (<option value={option.value}>{option.displayName}</option>))}
       </select> */}
       <div className="styled-select" onClick={onStyledSelectClick}>
-        {props.selectedOption.displayName}
+        {props.selectedOption.tradeAsset}-{props.selectedOption.unitOfAccount}
       </div>
       <ul className="select-options">
-        {props.options.map((option, i) => option != props.selectedOption && (<li data-value={option.value} data-index={i} key={i} onClick={onLiClick}>{option.displayName}</li>))}
+        {props.options.map((option, i) =>
+          option != props.selectedOption &&
+          (<li data-tradeasset={option.tradeAsset}
+            data-unitofaccount={option.unitOfAccount}
+            data-index={i}
+            key={i}
+            onClick={onLiClick}>
+            {option.tradeAsset}-{option.unitOfAccount}
+          </li>)
+        )
+        }
 
       </ul>
     </div>
