@@ -36,7 +36,6 @@ export interface ILendFormProps {
   onSubmit: (request: LendRequest) => void;
   onCancel: () => void;
   isMobileMedia: boolean;
-  isModalOpen: boolean;
 }
 
 interface ILendFormState {
@@ -214,8 +213,7 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
     this._isMounted = true;
 
     await this.derivedUpdate();
-    if (this.props.isModalOpen)
-      window.history.pushState(null, "Lend Modal Opened", `/lend/${this.props.lendType.toLocaleLowerCase()}-${this.props.asset}/`);
+    window.history.pushState(null, "Lend Modal Opened", `/lend/${this.props.lendType.toLocaleLowerCase()}-${this.props.asset}/`);
 
     if (this._input) {
       // this._input.select();

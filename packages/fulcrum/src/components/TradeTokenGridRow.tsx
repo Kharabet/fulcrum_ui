@@ -1,7 +1,6 @@
 import { BigNumber } from "@0x/utils";
 import React, { Component } from "react";
 import { Asset } from "../domain/Asset";
-import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { PositionType } from "../domain/PositionType";
 import { TradeRequest } from "../domain/TradeRequest";
@@ -22,25 +21,21 @@ import { RequestStatus } from "../domain/RequestStatus";
 export interface ITradeTokenGridRowProps {
 
   asset: Asset;
-  defaultUnitOfAccount: Asset;
+  unitOfAccount: Asset;
   positionType: PositionType;
   defaultLeverage: number;
-  defaultTokenizeNeeded: boolean;
   isTxCompleted: boolean;
   onTrade: (request: TradeRequest) => void;
   changeLoadingTransaction: (isLoadingTransaction: boolean, request: TradeRequest | undefined, isTxcolmpleted: boolean, resultTx: boolean) => void;
 }
 
 interface ITradeTokenGridRowState {
-  assetDetails: AssetDetails | null;
   leverage: number;
-  version: number;
 
   tradeAssetPrice: BigNumber;
   liquidationPrice: BigNumber;
 
   interestRate: BigNumber;
-  balance: BigNumber;
   isLoading: boolean;
   isLoadingTransaction: boolean;
   request: TradeRequest | undefined;
@@ -50,16 +45,12 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
   constructor(props: ITradeTokenGridRowProps, context?: any) {
     super(props, context);
 
-    const assetDetails = AssetsDictionary.assets.get(props.asset);
     this._isMounted = false;
     this.state = {
       leverage: this.props.defaultLeverage,
-      assetDetails: assetDetails || null,
       tradeAssetPrice: new BigNumber(0),
       liquidationPrice: new BigNumber(0),
       interestRate: new BigNumber(0),
-      balance: new BigNumber(0),
-      version: 2,
       isLoading: true,
       isLoadingTransaction: false,
       request: undefined,
@@ -78,8 +69,8 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
     const tradeAssetPrice = await FulcrumProvider.Instance.getSwapToUsdRate(this.props.asset);
 
     const collateralToPrincipalRate = this.props.positionType === PositionType.LONG
-      ? await FulcrumProvider.Instance.getSwapRate(this.props.asset, this.props.defaultUnitOfAccount)
-      : await FulcrumProvider.Instance.getSwapRate(this.props.defaultUnitOfAccount, this.props.asset);
+      ? await FulcrumProvider.Instance.getSwapRate(this.props.asset, this.props.unitOfAccount)
+      : await FulcrumProvider.Instance.getSwapRate(this.props.unitOfAccount, this.props.asset);
 
     let initialMargin = this.props.positionType === PositionType.LONG
       ? new BigNumber(10 ** 38).div(new BigNumber(this.state.leverage - 1).times(10 ** 18))
@@ -92,13 +83,11 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
       : new BigNumber(10 ** 36).div(liquidationPriceBeforeTrade).div(10 ** 18);
 
     const interestRate = await FulcrumProvider.Instance.getBorrowInterestRate(this.props.asset);
-    const balance = new BigNumber(0);
 
     this._isMounted && this.setState({
       ...this.state,
       tradeAssetPrice,
       interestRate: interestRate,
-      balance: balance,
       liquidationPrice,
       isLoading: false
     });
@@ -157,15 +146,12 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
   }
 
   public render() {
-    if (!this.state.assetDetails) {
-      return null;
-    }
     return (
       <div className={`trade-token-grid-row`}>
         <div className="trade-token-grid-row__col-token-name">
           <div className="trade-token-grid-row__col-token-name--inner">
-            {this.state.assetDetails.displayName}
-            <PositionTypeMarkerAlt assetDetails={this.state.assetDetails} value={this.props.positionType} />
+            {this.props.asset}
+            <PositionTypeMarkerAlt value={this.props.positionType} />
           </div>
         </div>
         <div className="trade-token-grid-row__col-position-type">
@@ -231,7 +217,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
       "0x0000000000000000000000000000000000000000000000000000000000000000",
       TradeType.BUY,
       this.props.asset,
-      this.props.defaultUnitOfAccount, // TODO: depends on which one they own
+      this.props.unitOfAccount, // TODO: depends on which one they own
       Asset.ETH,
       this.props.positionType,
       this.state.leverage,

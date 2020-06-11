@@ -21,8 +21,6 @@ export interface ITradeTokenGridProps {
   isLoadingTransaction: boolean;
   isTxCompleted: boolean;
   resultTx: boolean;
-  tradeType: TradeType;
-  loanId?: string;
 }
 
 interface ITradeTokenGridState {
@@ -70,7 +68,7 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
                 </div>
                 : !this.props.resultTx && this.props.request &&
                 row.props.positionType === this.props.request.positionType &&
-                this.props.tradeType === TradeType.BUY &&
+                this.props.request.tradeType === TradeType.BUY &&
                 <div className="close-tab-tx"></div>
               }
               <InnerOwnTokenGrid
@@ -79,7 +77,6 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
                 isMobileMedia={this.props.isMobileMedia}
                 request={this.props.request}
                 isLoadingTransaction={this.props.isLoadingTransaction}
-                loanId={this.props.loanId}
               />
             </div>)
           })}
@@ -107,7 +104,7 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
               </div>
               : !this.props.resultTx && this.props.request &&
               row.props.positionType === this.props.request.positionType &&
-              this.props.tradeType === TradeType.BUY &&
+              this.props.request.tradeType === TradeType.BUY &&
               <div className="close-tab-tx"></div>
             }
             <InnerOwnTokenGrid
@@ -116,7 +113,6 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
               isMobileMedia={this.props.isMobileMedia}
               request={this.props.request}
               isLoadingTransaction={this.props.isLoadingTransaction}
-              loanId={this.props.loanId}
             />
           </div>)
         })}

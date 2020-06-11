@@ -1,7 +1,6 @@
 import { BigNumber } from "@0x/utils";
 import React, { Component } from "react";
 import { Asset } from "../domain/Asset";
-import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { IPriceDataPoint } from "../domain/IPriceDataPoint";
 import { PositionType } from "../domain/PositionType";
@@ -26,16 +25,12 @@ export interface ITradeTokenCardMobileProps extends ITradeTokenGridRowProps {
 }
 
 interface ITradeTokenCardMobileState {
-  assetDetails: AssetDetails | null;
   leverage: number;
-  version: number;
 
   tradeAssetPrice: BigNumber;
   liquidationPrice: BigNumber;
 
-  latestPriceDataPoint: IPriceDataPoint;
   interestRate: BigNumber;
-  balance: BigNumber;
   isLoading: boolean;
   isLoadingTransaction: boolean;
   request: TradeRequest | undefined;
@@ -46,17 +41,12 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
   constructor(props: ITradeTokenCardMobileProps, context?: any) {
     super(props, context);
 
-    const assetDetails = AssetsDictionary.assets.get(props.asset);
     this._isMounted = false;
     this.state = {
       leverage: this.props.positionType === PositionType.SHORT ? 1 : 2,
-      assetDetails: assetDetails || null,
-      latestPriceDataPoint: FulcrumProvider.Instance.getPriceDefaultDataPoint(),
       interestRate: new BigNumber(0),
-      balance: new BigNumber(0),
       tradeAssetPrice: new BigNumber(0),
       liquidationPrice: new BigNumber(0),
-      version: 2,
       isLoading: true,
       isLoadingTransaction: false,
       request: undefined,
@@ -77,8 +67,8 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
     const interestRate = await FulcrumProvider.Instance.getBorrowInterestRate(this.props.asset);
 
     const collateralToPrincipalRate = this.props.positionType === PositionType.LONG
-      ? await FulcrumProvider.Instance.getSwapRate(this.props.asset, this.props.defaultUnitOfAccount)
-      : await FulcrumProvider.Instance.getSwapRate(this.props.defaultUnitOfAccount, this.props.asset);
+      ? await FulcrumProvider.Instance.getSwapRate(this.props.asset, this.props.unitOfAccount)
+      : await FulcrumProvider.Instance.getSwapRate(this.props.unitOfAccount, this.props.asset);
 
     let initialMargin = this.props.positionType === PositionType.LONG
       ? new BigNumber(10 ** 38).div(new BigNumber(this.state.leverage - 1).times(10 ** 18))
@@ -160,16 +150,13 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
   }
 
   public render() {
-    if (!this.state.assetDetails) {
-      return null;
-    }
 
     return (
       <div className="trade-token-card-mobile">
         <div className="trade-token-card-mobile__header">
           <div className="asset-name">
-            <span>{this.state.assetDetails.displayName}&nbsp;</span>
-            <PositionTypeMarkerAlt assetDetails={this.state.assetDetails} value={this.props.positionType} />
+            <span>{this.props.asset}&nbsp;</span>
+            <PositionTypeMarkerAlt value={this.props.positionType} />
           </div>
           <div className="poisition-type-switch">
             <button className={"" + (this.props.positionType === PositionType.LONG ? 'btn-active' : '')} onClick={() => this.props.changeGridPositionType(PositionType.LONG)}>
@@ -241,7 +228,7 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
       "0x0000000000000000000000000000000000000000000000000000000000000000",
       TradeType.BUY,
       this.props.asset,
-      this.props.defaultUnitOfAccount, // TODO: depends on which one they own
+      this.props.unitOfAccount, // TODO: depends on which one they own
       Asset.ETH,
       this.props.positionType,
       this.state.leverage,

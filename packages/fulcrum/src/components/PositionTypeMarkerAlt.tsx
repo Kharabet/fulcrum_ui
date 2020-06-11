@@ -5,7 +5,6 @@ import { PositionType } from "../domain/PositionType";
 import "../styles/components/position-type-marker-alt.scss";
 
 export interface IPositionTypeMarkerAltProps {
-  assetDetails: AssetDetails;
   value: PositionType;
 }
 
@@ -29,7 +28,6 @@ export class PositionTypeMarkerAlt extends Component<IPositionTypeMarkerAltProps
           </defs>
           </svg>
           `
-            .replace("#AAA", this.props.assetDetails.bgColor)
         )
         : this.props.value === PositionType.SHORT ?
           "data:image/svg+xml;base64," +
@@ -40,7 +38,6 @@ export class PositionTypeMarkerAlt extends Component<IPositionTypeMarkerAltProps
             <path d="M8.07715 12.3555L8.93312 11.4995L12.357 14.9234L11.501 15.7794L8.07715 12.3555Z" fill="white"/>
             <path d="M14.0686 11.5L14.9246 12.356L11.5007 15.7799L10.6447 14.9239L14.0686 11.5Z" fill="white"/>
             </svg>`
-              .replace("#AAA", this.props.assetDetails.bgColor)
           )
           : undefined;
     return <img className="position-type-marker-alt" src={img} />;

@@ -12,7 +12,6 @@ export interface IInnerOwnTokenGridProps {
   ownRowsData: IOwnTokenGridRowProps[];
   request: TradeRequest | undefined;
   isLoadingTransaction: boolean;
-  loanId?: string;
 }
 
 interface IInnerOwnTokenGridState {
@@ -33,7 +32,11 @@ export class InnerOwnTokenGrid extends Component<IInnerOwnTokenGridProps, IInner
 
     return (
       <div className="inner-own-token-grid">
-        <InnerOwnTokenGridHeader asset={this.props.ownRowsData[0].tradeAsset} unitOfAccount={this.props.ownRowsData[0].collateralAsset} loader={this.props.loanId === this.props.ownRowsData[0].loan.loanId} isLoadingTransaction={this.props.isLoadingTransaction} />
+        <InnerOwnTokenGridHeader 
+        asset={this.props.ownRowsData[0].tradeAsset} 
+        unitOfAccount={this.props.ownRowsData[0].collateralAsset} 
+        loader={this.props.request !== undefined && this.props.request.loanId === this.props.ownRowsData[0].loan.loanId} 
+        isLoadingTransaction={this.props.isLoadingTransaction} />
         {innerOwnRowsData}
       </div>
     );
