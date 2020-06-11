@@ -76,9 +76,11 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
     // liq_price_before_trade = (15000000000000000000 * collateralToLoanRate / 10^20) + collateralToLoanRate) / ((10^20 + current_margin) / 10^20
     //if it's a SHORT then -> 10^36 / above
     const liquidationPriceBeforeTrade = ((new BigNumber("15000000000000000000").times(collateralToPrincipalRate.times(10 ** 18)).div(10 ** 20)).plus(collateralToPrincipalRate.times(10 ** 18))).div((new BigNumber(10 ** 20).plus(initialMargin)).div(10 ** 20))
-    const liquidationPrice = this.props.positionType === PositionType.LONG
-      ? liquidationPriceBeforeTrade.div(10 ** 18)
-      : new BigNumber(10 ** 36).div(liquidationPriceBeforeTrade).div(10 ** 18);
+    let liquidationPrice = new BigNumber(0);
+    if (liquidationPriceBeforeTrade.gt(0))
+      liquidationPrice = this.props.positionType === PositionType.LONG
+        ? liquidationPriceBeforeTrade.div(10 ** 18)
+        : new BigNumber(10 ** 36).div(liquidationPriceBeforeTrade).div(10 ** 18);
 
 
     this._isMounted && this.setState({
