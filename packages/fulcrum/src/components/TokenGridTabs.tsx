@@ -5,6 +5,7 @@ import { ReactComponent as WalletSvg } from "../assets/images/wallet-icon.svg";
 import { IDropDownSelectOption, DropdownSelect, IDropdownSelectProps } from "./DropdownSelect";
 import { IMarketPair } from "../pages/TradePage";
 import "../styles/components/token-grid-tabs.scss";
+import { ManageButton } from "./ManageButton";
 
 export interface ITokenGridTabsProps {
   selectedMarket: IMarketPair;
@@ -91,13 +92,7 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
           </div>
           <div className="trade-token-grid-tab__items">
             {/* {this.props.assets.map(asset => (this.renderAsset(asset)))} */}
-            <div className={`trade-token-grid-tab-item manage-tab ${this.state.isShowMyTokensOnly ? "trade-token-grid-tab-item--active" : ""}`} onClick={this.showMyTokensOnlyChange}>
-              <div className={`trade-token-grid-tab-item__col-token-image`} >
-                {<WalletSvg />}
-                {!this.props.isMobile ? <span>Manage</span> : null}
-                <span className="opened-positions-count">{this.props.openedPositionsCount}</span>
-              </div>
-            </div>
+              <ManageButton {...this.props} onShowMyTokensOnlyChange={this.showMyTokensOnlyChange} isShowMyTokensOnly={this.state.isShowMyTokensOnly}/>
           </div>
 
           <div className="pro-switch-wrapper">
