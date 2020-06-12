@@ -1,8 +1,11 @@
 import React, { useEffect } from 'react';
+import SimpleBar from 'simplebar-react';
+import 'simplebar/dist/simplebar.min.css';
 
 import "../styles/components/dropdown-select.scss"
 import { Asset } from '../domain/Asset';
-
+import { AssetsDictionary } from '../domain/AssetsDictionary';
+import { AssetDetails } from '../domain/AssetDetails';
 export interface IDropDownSelectOption {
   tradeAsset: Asset;
   unitOfAccount: Asset;
@@ -16,6 +19,7 @@ export interface IDropdownSelectProps {
 
 export const DropdownSelect = (props: IDropdownSelectProps) => {
 
+  let asset = AssetsDictionary.assets.get(props.selectedOption.tradeAsset) as AssetDetails;
   const onStyledSelectClick = (e: React.MouseEvent<HTMLElement>) => {
     e.stopPropagation();
     const select = e.currentTarget.closest(".select") as HTMLElement;
@@ -70,22 +74,25 @@ export const DropdownSelect = (props: IDropdownSelectProps) => {
         {props.options.map(option => option != props.selectedOption && (<option value={option.value}>{option.displayName}</option>))}
       </select> */}
       <div className="styled-select" onClick={onStyledSelectClick}>
-        {props.selectedOption.tradeAsset}-{props.selectedOption.unitOfAccount}
+        Select market {asset.reactLogoSvg.render()} {props.selectedOption.tradeAsset}-{props.selectedOption.unitOfAccount}
       </div>
       <ul className="select-options">
-        {props.options.map((option, i) =>
-          option != props.selectedOption &&
-          (<li data-tradeasset={option.tradeAsset}
-            data-unitofaccount={option.unitOfAccount}
-            data-index={i}
-            key={i}
-            onClick={onLiClick}>
-            {option.tradeAsset}-{option.unitOfAccount}
-          </li>)
-        )
-        }
-
+        <SimpleBar style={{ maxHeight: 480 }} autoHide={false}>
+          {props.options.map((option, i) =>
+            option != props.selectedOption &&
+            (<li data-tradeasset={option.tradeAsset}
+              data-unitofaccount={option.unitOfAccount}
+              data-index={i}
+              key={i}
+              onClick={onLiClick}>
+              {asset.reactLogoSvg.render()}
+              {option.tradeAsset}-{option.unitOfAccount}
+            </li>)
+          )
+          }
+        </SimpleBar>
       </ul>
+
     </div>
   )
 }

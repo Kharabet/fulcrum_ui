@@ -6,13 +6,16 @@
   border-radius: 26px;
   color: var(--primary-text);
   font-weight: 600;
-  padding: 10px 20px;
+  padding: 9px 40px 9px 20px;
+  display: flex;
+  align-items: center;
+  svg{
+    width: 28px;
+    height: 28px;
+    margin: 0 10px 0 20px;
+  }
   @media (min-width: $breakpoint-mobile-min) {
     font-size: 14px;
-  }
-  @media (max-width: $breakpoint-mobile-max) {
-    font-size: 12px;
-    padding: 9px 13px;
   }
   &.active {
     border-radius: 26px;
@@ -24,14 +27,8 @@
     border: 5px solid transparent;
     border-color: var(--select-arrow) transparent transparent transparent;
     position: absolute;
-    @media (min-width: $breakpoint-mobile-min) {
-      top: 17px;
-      right: 16px;
-    }
-    @media (max-width: $breakpoint-mobile-max) {
-      top: 16px;
-      right: 9px;
-    }
+    top: 22px;
+    right: 16px;
   }
 }
 .select-hidden {
@@ -46,13 +43,10 @@
   color: var(--select-arrow);
   @media (min-width: $breakpoint-mobile-min) {
     font-size: 14px;
-    width: 150px;
-    height: 40px;
+    height: 48px;
   }
   @media (max-width: $breakpoint-mobile-max) {
     font-size: 12px;
-    width: 100px;
-    height: 32px;
   }
 }
 
@@ -98,10 +92,12 @@
   border-radius: 4px;
   li {
     margin: 0;
-    padding: 12px 0;
+    padding: 10px 0 10px 15px;
     text-indent: 15px;
     background-color: transparent;
     color: var(--primary-text);
+    display: flex;
+    align-items: center;
     &:hover {
       background-color: var(--select-option-hover);
     }
@@ -118,5 +114,10 @@
     &[rel="hide"] {
       display: none;
     }
+  }
+  svg{
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
   }
 }
