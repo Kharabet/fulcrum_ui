@@ -144,6 +144,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       if (next) {
         this._isMounted && this.setState({ ...this.state, ...next, isLoading: false, isExposureLoading: false });
       } else {
+        console.log("not next")
         this._isMounted && this.setState({
           ...this.state,
           inputAmountText: "",
@@ -271,9 +272,9 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       this.props.positionType !== prevProps.positionType ||
       this.props.leverage !== prevProps.leverage ||
       this.props.defaultUnitOfAccount !== prevProps.defaultUnitOfAccount ||
-      this.state.selectedUnitOfAccount !== prevState.selectedUnitOfAccount ||
-      this.state.collateral !== prevState.collateral ||
-      this.state.tradeAmountValue !== prevState.tradeAmountValue
+      this.state.selectedUnitOfAccount !== prevState.selectedUnitOfAccount //||
+      // this.state.collateral !== prevState.collateral ||
+      // this.state.tradeAmountValue !== prevState.tradeAmountValue
     ) {
       if (this.state.collateral !== prevState.collateral) {
         this._isMounted && this.setState({
@@ -374,7 +375,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
 
             <InputAmount
               inputAmountText={this.state.inputAmountText}
-              selectorAssets={this.props.stablecoins.concat(this.props.tradeAsset)}
+              selectorAssets={[this.props.tradeAsset, this.props.defaultUnitOfAccount]}
               isLoading={false}
               tradeType={this.props.tradeType}
               asset={this.state.collateral}
@@ -390,16 +391,6 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
                 assetDropdown={[this.props.loan?.collateralAsset || Asset.UNKNOWN, this.props.loan?.loanAsset || Asset.UNKNOWN]}
               />
             }
-
-            {this.props.tradeType === TradeType.BUY ? (
-              <CollapsibleContainer titleOpen="View advanced options" titleClose="Hide advanced options" isTransparent={false}>
-                <div className="trade-form__unit-of-account-container">
-                  Unit of Account
-                    <UnitOfAccountSelector items={this.props.stablecoins} value={this.state.selectedUnitOfAccount} onChange={this.onChangeUnitOfAccount} />
-                </div>
-              </CollapsibleContainer>
-            ) : null}
-
 
             {this.props.isMobileMedia && this.props.tradeType === TradeType.BUY ? (
               <TradeExpectedResult entryPrice={this.state.tradeAssetPrice} liquidationPrice={this.state.liquidationPrice} />

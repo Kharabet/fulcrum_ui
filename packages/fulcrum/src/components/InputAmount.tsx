@@ -8,6 +8,7 @@ import { TradeType } from "../domain/TradeType";
 import { Preloader } from "./Preloader";
 
 import "../styles/components/input-amount.scss";
+import { AssetDropdown } from "./AssetDropdown";
 
 interface IInputAmountProps {
   inputAmountText: string;
@@ -63,19 +64,12 @@ export class InputAmount extends Component<IInputAmountProps, IInputAmountState>
           {this.props.isLoading &&
             <div className="preloader-container"><Preloader width="80px" /></div>
           }
-          {this.props.tradeType === TradeType.BUY &&
-            <div className="input-amount__collateral-button-container">
-              <CollateralTokenButton asset={this.props.asset} onClick={this.onChangeCollateralOpen} isChangeCollateralOpen={this.state.isChangeCollateralOpen} />
-            </div>
-          }
-         {this.state.isChangeCollateralOpen && this.props.selectorAssets &&
-            <CollateralTokenSelector
-              selectedCollateral={this.props.asset}
-              assets={this.props.selectorAssets}
-              collateralType={!this.props.tradeType ? `Collateral` : this.props.tradeType === TradeType.BUY ? `Deposit` : `Withdrawal`}
-              onCollateralChange={this.props.onCollateralChange}
-              onClose={this.onChangeCollateralClose}
-              tradeType={this.state.tradeType} />
+
+          {this.props.tradeType === TradeType.BUY && this.props.selectorAssets &&
+            <AssetDropdown
+              selectedAsset={this.props.asset}
+              onAssetChange={this.props.onCollateralChange}
+              assets={this.props.selectorAssets} />
           }
         </div>
 
