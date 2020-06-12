@@ -920,8 +920,8 @@ export class FulcrumProvider {
     return new BigNumber(1000000);
   };
 
-  public getManageCollateralParams = async (borrowedFundsState: IBorrowedFundsState): Promise<ICollateralManagementParams> => {
-    return { minValue: 0, maxValue: 1.5 * 10 ** 20, currentValue: 0 };
+  public getManageCollateralParams = async (): Promise<ICollateralManagementParams> => {
+    return { minValue: 1.25 * 10 ** 18, maxValue: 3 * 10 ** 20, currentValue: 0 };
   };
 
   public getManageCollateralChangeEstimate = async (
@@ -1823,13 +1823,13 @@ if (err || 'error' in added) {
 console.log(err, added);
 }
 }*//*);
-                                                                                                                }
-                                                                                                                }
-                                                                                                                }
-                                                                                                                } catch(e) {
-                                                                                                                // console.log(e);
-                                                                                                                }
-                                                                                                                }*/
+                                                                                                                                                                                            }
+                                                                                                                                                                                            }
+                                                                                                                                                                                            }
+                                                                                                                                                                                            } catch(e) {
+                                                                                                                                                                                            // console.log(e);
+                                                                                                                                                                                            }
+                                                                                                                                                                                            }*/
   }
 
   private processLendRequestTask = async (task: RequestTask, skipGas: boolean) => {
