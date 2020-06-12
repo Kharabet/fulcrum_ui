@@ -1239,23 +1239,25 @@ export class FulcrumProvider {
     }
 
     const isLong = request.positionType === PositionType.LONG;
-    const amountInBaseUnits = new BigNumber(request.amount.multipliedBy(10 ** 18).toFixed(0, 1)); // ETH -> 18 decimals
 
+    
     const loanToken = isLong
       ? request.collateral
-      : Asset.ETH;
+      : request.asset;
     const depositToken = request.depositToken;
     const collateralToken = isLong
-      ? Asset.ETH
+      ? request.asset
       : request.collateral;
-    const tradeToken = !isLong
-      ? collateralToken
-      : loanToken;
+
+    const decimals: number = AssetsDictionary.assets.get(depositToken)!.decimals || 18;
+
+    const amountInBaseUnits = new BigNumber(request.amount.multipliedBy(10 ** decimals).toFixed(0, 1));
+   
     const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
 
     if (account && this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
 
-      const tokenContract = await this.contractsSource.getITokenContract(tradeToken);
+      const tokenContract = await this.contractsSource.getITokenContract(loanToken);
       if (!tokenContract) return result;
       const leverageAmount = request.positionType === PositionType.LONG
         ? new BigNumber(request.leverage - 1).times(10 ** 18)
@@ -1273,7 +1275,6 @@ export class FulcrumProvider {
       const collateralTokenAddress = collateralToken !== Asset.ETH
         ? FulcrumProvider.Instance.getErc20AddressOfAsset(collateralToken)
         : FulcrumProvider.ZERO_ADDRESS;
-      const loanData = "0x";
       try {
         console.log("leverageAmount" + leverageAmount);
         console.log("loanTokenSent" + loanTokenSent);
@@ -2114,25 +2115,25 @@ console.log(err, added);
         //     const {TradeBuyErcProcessor} = await import("./processors/TradeBuyErcProcessor");
         //     processor = new TradeBuyErcProcessor();
         //   } else {
-        //     const {TradeBuyEthProcessor} = await import("./processors/TradeBuyEthProcessor");
-        //     processor = new TradeBuyEthProcessor();
+        //     const {TradeBuyProcessor} = await import("./processors/TradeBuyProcessor");
+        //     processor = new TradeBuyProcessor();
         //   }
         //   await processor.run(task, account, skipGas);
         // }
-        const { TradeBuyEthProcessor } = await import("./processors/TradeBuyEthProcessor");
-        const processor = new TradeBuyEthProcessor();
+        const { TradeBuyProcessor } = await import("./processors/TradeBuyProcessor");
+        const processor = new TradeBuyProcessor();
         await processor.run(task, account, skipGas);
       } else {
-        const { TradeSellEthProcessor } = await import("./processors/TradeSellEthProcessor");
-        const processor = new TradeSellEthProcessor();
+        const { TradeSellProcessor } = await import("./processors/TradeSellProcessor");
+        const processor = new TradeSellProcessor();
         await processor.run(task, account, skipGas);
         // if (taskRequest.collateral !== Asset.ETH) {
         //   const { TradeSellErcProcessor } = await import("./processors/TradeSellErcProcessor");
         //   const processor = new TradeSellErcProcessor();
         //   await processor.run(task, account, skipGas);
         // } else {
-        //   const { TradeSellEthProcessor } = await import("./processors/TradeSellEthProcessor");
-        //   const processor = new TradeSellEthProcessor();
+        //   const { TradeSellProcessor } = await import("./processors/TradeSellProcessor");
+        //   const processor = new TradeSellProcessor();
         //   await processor.run(task, account, skipGas);
         // }
       }
