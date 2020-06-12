@@ -92,14 +92,14 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
     await this.derivedUpdate();
   };
 
-  private onAskToOpenProgressDlg = (taskId: number) => {
-    if (!this.state.request || taskId !== this.state.request.id) return;
+  private onAskToOpenProgressDlg = (taskId: string) => {
+    if (!this.state.request || taskId !== this.state.request.loanId) return;
     this.setState({ ...this.state, isLoadingTransaction: true, resultTx: true })
     this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, false, this.state.resultTx)
 
   }
   private onAskToCloseProgressDlg = (task: RequestTask) => {
-    if (!this.state.request || task.request.id !== this.state.request.id) return;
+    if (!this.state.request || task.request.loanId !== this.state.request.loanId) return;
     if (task.status === RequestStatus.FAILED || task.status === RequestStatus.FAILED_SKIPGAS) {
       window.setTimeout(() => {
         FulcrumProvider.Instance.onTaskCancel(task);
@@ -151,7 +151,7 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
           ? <React.Fragment>
             <div className="token-selector-item__image">
               <CircleLoader></CircleLoader>
-              <TradeTxLoaderStep taskId={this.state.request.id} />
+              <TradeTxLoaderStep taskId={this.state.request.loanId} />
             </div>
           </React.Fragment>
             : <div className={`inner-own-token-grid-row`}>
@@ -220,6 +220,38 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
   };
 
   public onManageClick = async (event: React.MouseEvent<HTMLElement>) => {
+    event.stopPropagation();
+
+    const request = new TradeRequest(
+      this.props.loan.loanId,
+      TradeType.SELL,
+      this.props.tradeAsset,
+      this.props.collateralAsset,
+      this.props.collateralAsset,
+      this.props.positionType,
+      this.props.leverage,
+      new BigNumber(0)
+    )
+
+    await this.setState({ ...this.state, request: request });
+    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, request, false, this.state.resultTx)
+
+    this.props.onManageCollateralOpen(
+      new ManageCollateralRequest(
+        this.props.loan.loanId,
+        this.props.tradeAsset,
+        this.props.collateralAsset,
+        this.props.loan.collateralAmount,
+        false
+      )
+    );
+
+
+
+  };
+
+
+  public onCollateralChange = async (event: React.MouseEvent<HTMLElement>) => {
     event.stopPropagation();
 
     this.props.onManageCollateralOpen(

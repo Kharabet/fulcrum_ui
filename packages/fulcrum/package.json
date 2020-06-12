@@ -50,6 +50,7 @@
     "react-tippy": "^1.2.3",
     "recharts": "^1.5.0",
     "rxjs": "^6.5.2",
+    "simplebar-react": "^2.2.0",
     "squarelink": "^0.4.1",
     "web3-utils": "^1.2.5"
   },

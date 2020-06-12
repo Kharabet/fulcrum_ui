@@ -205,7 +205,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
                   isMobileMedia={this.props.isMobileMedia}
                   tokenRowsData={this.state.tokenRowsData.filter(e => e.asset === this.state.selectedMarket.tradeAsset)}
                   ownRowsData={this.state.ownRowsData.filter(e => e.tradeAsset === this.state.selectedMarket.tradeAsset && e.collateralAsset === this.state.selectedMarket.unitOfAccount)}
-                  //changeLoadingTransaction={this.changeLoadingTransaction}
+                  changeLoadingTransaction={this.changeLoadingTransaction}
                   request={this.state.request}
                   isLoadingTransaction={this.state.isLoadingTransaction}
                   resultTx={this.state.resultTx}
@@ -244,7 +244,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
               onCancel={this.onManageCollateralRequestClose}
               isOpenModal={this.state.isManageCollateralModalOpen}
               isMobileMedia={this.props.isMobileMedia}
-
+              changeLoadingTransaction={this.changeLoadingTransaction}
             />
           </Modal>
         </main>
@@ -287,14 +287,12 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
   };
 
   public onManageCollateralConfirmed = (request: ManageCollateralRequest) => {
-    request.id = this.state.tradeRequestId;
     FulcrumProvider.Instance.onManageCollateralConfirmed(request);
     this.setState({
       ...this.state,
       // collateralToken: request.collateralAsset,
       loanId: request.loanId,
       // tradeAsset: request.asset,
-      tradeRequestId: request.id,
       isManageCollateralModalOpen: false
     });
   };
@@ -375,7 +373,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       const loans = await FulcrumProvider.Instance.getUserMarginTradeLoans();
       this.setState({ ...this.state, loans })
       for (const loan of loans) {
-       
+
 
         const positionType = this.tradeAssets.includes(loan.collateralAsset)
           ? PositionType.LONG

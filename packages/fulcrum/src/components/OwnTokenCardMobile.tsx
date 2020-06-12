@@ -93,7 +93,7 @@ export class OwnTokenCardMobile extends Component<IOwnTokenGridRowProps, IOwnTok
     this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, false, true);
   }
   private onAskToCloseProgressDlg = (task: RequestTask) => {
-    if (!this.state.request || task.request.id !== this.state.request.id) return;
+    if (!this.state.request || task.request.loanId !== this.state.request.loanId) return;
     if (task.status === RequestStatus.FAILED || task.status === RequestStatus.FAILED_SKIPGAS) {
       window.setTimeout(() => {
         FulcrumProvider.Instance.onTaskCancel(task);
@@ -127,7 +127,7 @@ export class OwnTokenCardMobile extends Component<IOwnTokenGridRowProps, IOwnTok
           ? <React.Fragment>
             <div className="token-selector-item__image">
               <CircleLoader></CircleLoader>
-              <TradeTxLoaderStep taskId={this.state.request.id} />
+              <TradeTxLoaderStep taskId={this.state.request.loanId} />
             </div>
           </React.Fragment>
           :

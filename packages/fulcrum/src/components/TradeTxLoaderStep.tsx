@@ -6,7 +6,7 @@ import { FulcrumProvider } from "../services/FulcrumProvider";
 import { toChecksumAddress } from "web3-utils";
 
 export interface ITradeTxLoaderStepProps {
-  taskId: number;
+  taskId: string;
 }
 
 export interface ITradeTxLoaderStepState {
@@ -19,7 +19,7 @@ export class TradeTxLoaderStep extends Component<ITradeTxLoaderStepProps, ITrade
     super(props);
 
     this.state = {
-      requestTask: TasksQueue.Instance.getTasksList().find(t => t.request.id === this.props.taskId),
+      requestTask: TasksQueue.Instance.getTasksList().find(t => t.request.loanId === this.props.taskId),
       complete: false
     };
 
@@ -66,7 +66,7 @@ export class TradeTxLoaderStep extends Component<ITradeTxLoaderStepProps, ITrade
       FulcrumProvider.Instance.onTaskCancel(this.state.requestTask);
 
   }
-  
+
 
   public getTitle = (requestTask: RequestTask) => {
     if (requestTask === undefined) return null;
@@ -128,7 +128,7 @@ export class TradeTxLoaderStep extends Component<ITradeTxLoaderStepProps, ITrade
   }
 
   public onTasksQueueChanged = async () => {
-    const task = TasksQueue.Instance.getTasksList().find(t => t.request.id === this.props.taskId);
+    const task = TasksQueue.Instance.getTasksList().find(t => t.request.loanId === this.props.taskId);
     const div = this.stepDiv.current;
     if (div && task && this.state.requestTask && this.getTitle(task) !== this.getTitle(this.state.requestTask)) {
       div.classList.remove("animation-in");
@@ -136,10 +136,10 @@ export class TradeTxLoaderStep extends Component<ITradeTxLoaderStepProps, ITrade
       div.classList.add("animation-out");
     }
     window.setTimeout(async () => {
-    await this._isMounted && this.setState({
-      ...this.state,
-      requestTask: task
-    });
+      await this._isMounted && this.setState({
+        ...this.state,
+        requestTask: task
+      });
     }, 500)
   };
 }

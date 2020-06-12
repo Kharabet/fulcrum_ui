@@ -19,6 +19,7 @@ export interface ITradeTokenGridProps {
   ownRowsData: IOwnTokenGridRowProps[];
   request: TradeRequest | undefined;
   isLoadingTransaction: boolean;
+  changeLoadingTransaction: (isLoadingTransaction: boolean, request: TradeRequest | undefined, isTxCompleted: boolean, resultTx: boolean) => void;
   isTxCompleted: boolean;
   resultTx: boolean;
 }
@@ -64,7 +65,7 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
                 this.props.request.tradeType === TradeType.BUY
                 ? < div className={`token-selector-item__image open-tab-tx`}>
                   <CircleLoader></CircleLoader>
-                  <TradeTxLoaderStep taskId={this.props.request!.id} />
+                  <TradeTxLoaderStep taskId={this.props.request!.loanId} />
                 </div>
                 : !this.props.resultTx && this.props.request &&
                 row.props.positionType === this.props.request.positionType &&
@@ -77,6 +78,7 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
                 isMobileMedia={this.props.isMobileMedia}
                 request={this.props.request}
                 isLoadingTransaction={this.props.isLoadingTransaction}
+                changeLoadingTransaction={this.props.changeLoadingTransaction}
               />
             </div>)
           })}
@@ -100,7 +102,7 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
               this.props.request.tradeType === TradeType.BUY
               ? < div className={`token-selector-item__image open-tab-tx`}>
                 <CircleLoader></CircleLoader>
-                <TradeTxLoaderStep taskId={this.props.request!.id} />
+                <TradeTxLoaderStep taskId={this.props.request!.loanId} />
               </div>
               : !this.props.resultTx && this.props.request &&
               row.props.positionType === this.props.request.positionType &&
@@ -113,6 +115,7 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
               isMobileMedia={this.props.isMobileMedia}
               request={this.props.request}
               isLoadingTransaction={this.props.isLoadingTransaction}
+              changeLoadingTransaction={this.props.changeLoadingTransaction}
             />
           </div>)
         })}
