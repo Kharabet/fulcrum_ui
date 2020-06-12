@@ -101,6 +101,14 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
           collateralizedPercent: next!.collateralizedPercent,
           inputAmountText: this.formatPrecision(next!.collateralAmount.toString())
         });
+        const persent = this.props.loan!.collateralizedPercent
+          .multipliedBy(100)
+          .plus(100);
+
+        // console.log("collateralAmount2 " + this.state.collateralizedPercent.dividedBy(persent).minus(1).multipliedBy(this.props.loan!.collateralAmount).toFixed(6));
+        //  console.log("1 " + this.state.collateralAmount.dividedBy(this.props.loan!.collateralAmount).toFixed(6));
+
+        //console.log("2  " + this.state.collateralizedPercent.dividedBy(persent).minus(1).toFixed(6));
       });
   }
 
@@ -112,7 +120,6 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
   public async componentDidMount() {
 
     FulcrumProvider.Instance.getManageCollateralParams(
-      this.props.loan!
     ).then(collateralState => {
 
       this.setState(
@@ -136,32 +143,40 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
             let minCollateral;
             let maxCollateral;
 
-            minCollateral = this.props.loan!.collateralAmount
-              .minus(collateralExcess);
-
-
-            minCollateral = minCollateral
-              .times(10 ** 18);
-
-            maxCollateral = minCollateral
-              .times(collateralState.maxValue - collateralState.minValue)
-              .dividedBy(10 ** 20);
 
             const currentCollateral = this.props.loan!.collateralAmount
               .times(10 ** 18);
+
+            const maxValue = new BigNumber(collateralState.maxValue).minus((collateralizedPercent).times(9 * 10 ** 16)).toNumber();
+
+            const minValue = new BigNumber(collateralState.minValue)
+              .minus(//collateralizedPercent
+                // .dividedBy(collateralState.minValue)
+                (this.props.loan!.collateralAmount).times(9 * 10 ** 16))
+              .toNumber();
+
+            console.log("minValue " + minValue);
+
+            minCollateral = this.props.loan!.collateralAmount
+              .minus(collateralExcess)
+              .times(10 ** 18);
+
+            maxCollateral = minCollateral
+              .times(collateralState.maxValue - minValue)
+              .dividedBy(10 ** 20);
 
             if (maxCollateral.lt(currentCollateral)) {
               maxCollateral = currentCollateral;
             }
 
             // new_v = (new_max - new_min) / (old_max - old_min) * (v - old_min) + new_min
-            let currentCollateralNormalizedBN = new BigNumber(collateralState.maxValue - collateralState.minValue)
+            let currentCollateralNormalizedBN = new BigNumber(maxValue - minValue)
               .dividedBy(maxCollateral.minus(minCollateral))
               .times(currentCollateral.minus(minCollateral))
-              .plus(collateralState.minValue);
+              .plus(minValue);
 
-            if (currentCollateralNormalizedBN.dividedBy(collateralState.maxValue - collateralState.minValue).lte(0.01)) {
-              currentCollateralNormalizedBN = new BigNumber(collateralState.minValue);
+            if (currentCollateralNormalizedBN.dividedBy(maxValue - minValue).lte(0.01)) {
+              currentCollateralNormalizedBN = new BigNumber(minValue);
             }
 
 
@@ -169,14 +184,16 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
             if (this.props.loan!.collateralAsset === Asset.ETH) {
               assetBalance = assetBalance.gt(FulcrumProvider.Instance.gasBufferForTrade) ? assetBalance.minus(FulcrumProvider.Instance.gasBufferForTrade) : new BigNumber(0);
             }
-            let assetBalanceNormalizedBN = new BigNumber(collateralState.maxValue - collateralState.minValue)
+            let assetBalanceNormalizedBN = new BigNumber(maxValue - minValue)
               .dividedBy(maxCollateral.minus(minCollateral))
               .times(assetBalance.minus(minCollateral))
-              .plus(collateralState.minValue);
+              .plus(minValue);
 
-            if (assetBalanceNormalizedBN.dividedBy(collateralState.maxValue - collateralState.minValue).lte(0.01)) {
-              assetBalanceNormalizedBN = new BigNumber(collateralState.minValue);
+            if (assetBalanceNormalizedBN.dividedBy(maxValue - minValue).lte(0.01)) {
+              assetBalanceNormalizedBN = new BigNumber(minValue);
             }
+
+
 
             this.setState(
               {
@@ -187,7 +204,9 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
                 gasAmountNeeded: gasAmountNeeded,
                 collateralizedPercent: collateralizedPercent,
                 collateralExcess: collateralExcess,
-                assetBalanceValue: assetBalanceNormalizedBN
+                assetBalanceValue: assetBalanceNormalizedBN,
+                minValue: minValue,
+                //maxValue: maxValue,
               },
               () => {
                 if (this.props.isOpenModal) {
@@ -202,18 +221,18 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
     });
 
   }
- /* public componentDidUpdate(
-    prevProps: Readonly<IManageCollateralFormProps>,
-    prevState: Readonly<IManageCollateralFormState>,
-    snapshot?: any
-  ): void {
-    this.state.selectedValue === prevState.inputAmountText
-    this.state.inputAmountText === prevState.inputAmountText &&
-      (this.state.selectedValue === this.state.minValue
-        || this.state.selectedValue === this.state.maxValue)
-      &&
-      this._selectedValueUpdate.next(new BigNumber(this.state.selectedValue));
-  }*/
+  /* public componentDidUpdate(
+     prevProps: Readonly<IManageCollateralFormProps>,
+     prevState: Readonly<IManageCollateralFormState>,
+     snapshot?: any
+   ): void {
+     this.state.selectedValue === prevState.inputAmountText
+     this.state.inputAmountText === prevState.inputAmountText &&
+       (this.state.selectedValue === this.state.minValue
+         || this.state.selectedValue === this.state.maxValue)
+       &&
+       this._selectedValueUpdate.next(new BigNumber(this.state.selectedValue));
+   }*/
 
   public render() {
     if (this.state.assetDetails === null) {
@@ -237,19 +256,17 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
 
           <Slider
             step={0.01}
-            min={100}
+            min={this.state.minValue}
             max={this.state.maxValue}
             value={this.state.selectedValue}
             onChange={this.onChange}
             onAfterChange={this.onAfterChange}
           />
 
-
           <div className="manage-collateral-form__tips">
             <div className="manage-collateral-form__tip">Withdraw</div>
             <div className="manage-collateral-form__tip">Top Up</div>
           </div>
-
           <div className="manage-collateral-form__text">
             You will {this.state.loanValue > this.state.selectedValue ? "withdraw" : "top up"}</div>
 
