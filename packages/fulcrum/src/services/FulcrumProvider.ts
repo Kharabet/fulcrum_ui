@@ -1229,18 +1229,20 @@ export class FulcrumProvider {
   public getEstimatedMarginDetails = async (request: TradeRequest): Promise<{
     principal: BigNumber,
     collateral: BigNumber,
+    exposureValue: BigNumber,
     interestRate: BigNumber
   }> => {
 
     let result = {
       principal: new BigNumber(0),
       collateral: new BigNumber(0),
+      exposureValue: new BigNumber(0),
       interestRate: new BigNumber(0)
     }
 
     const isLong = request.positionType === PositionType.LONG;
 
-    
+
     const loanToken = isLong
       ? request.collateral
       : request.asset;
@@ -1252,11 +1254,11 @@ export class FulcrumProvider {
     const decimals: number = AssetsDictionary.assets.get(depositToken)!.decimals || 18;
 
     const amountInBaseUnits = new BigNumber(request.amount.multipliedBy(10 ** decimals).toFixed(0, 1));
-   
+
     const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
 
     if (account && this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite) {
-
+      console.log("iToken ", loanToken)
       const tokenContract = await this.contractsSource.getITokenContract(loanToken);
       if (!tokenContract) return result;
       const leverageAmount = request.positionType === PositionType.LONG
@@ -1275,6 +1277,8 @@ export class FulcrumProvider {
       const collateralTokenAddress = collateralToken !== Asset.ETH
         ? FulcrumProvider.Instance.getErc20AddressOfAsset(collateralToken)
         : FulcrumProvider.ZERO_ADDRESS;
+
+      const collateralToLoanRate = await FulcrumProvider.Instance.getSwapRate(collateralToken, loanToken)
       try {
         console.log("leverageAmount" + leverageAmount);
         console.log("loanTokenSent" + loanTokenSent);
@@ -1285,9 +1289,12 @@ export class FulcrumProvider {
           loanTokenSent,
           collateralTokenSent,
           collateralTokenAddress!));
-        console.log(marginDetails)
+        console.log("marginDetails collateral", marginDetails[1].div(10 ** 18).toFixed())
         result.principal = marginDetails[0].div(10 ** 18);
         result.collateral = marginDetails[1].div(10 ** 18);
+        result.exposureValue = request.positionType === PositionType.SHORT
+          ? marginDetails[1].times(collateralToLoanRate).div(10 ** 18)
+          : marginDetails[1].div(10 ** 18);
         result.interestRate = marginDetails[2].div(10 ** 18);
       }
       catch (e) {
@@ -1824,13 +1831,13 @@ if (err || 'error' in added) {
 console.log(err, added);
 }
 }*//*);
-                                                                                                                                                                                            }
-                                                                                                                                                                                            }
-                                                                                                                                                                                            }
-                                                                                                                                                                                            } catch(e) {
-                                                                                                                                                                                            // console.log(e);
-                                                                                                                                                                                            }
-                                                                                                                                                                                            }*/
+                                                                                                                                                                                                }
+                                                                                                                                                                                                }
+                                                                                                                                                                                                }
+                                                                                                                                                                                                } catch(e) {
+                                                                                                                                                                                                // console.log(e);
+                                                                                                                                                                                                }
+                                                                                                                                                                                                }*/
   }
 
   private processLendRequestTask = async (task: RequestTask, skipGas: boolean) => {
