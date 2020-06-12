@@ -2124,16 +2124,16 @@ console.log(err, added);
         const processor = new TradeBuyProcessor();
         await processor.run(task, account, skipGas);
       } else {
-        const { TradeSellEthProcessor } = await import("./processors/TradeSellEthProcessor");
-        const processor = new TradeSellEthProcessor();
+        const { TradeSellProcessor } = await import("./processors/TradeSellProcessor");
+        const processor = new TradeSellProcessor();
         await processor.run(task, account, skipGas);
         // if (taskRequest.collateral !== Asset.ETH) {
         //   const { TradeSellErcProcessor } = await import("./processors/TradeSellErcProcessor");
         //   const processor = new TradeSellErcProcessor();
         //   await processor.run(task, account, skipGas);
         // } else {
-        //   const { TradeSellEthProcessor } = await import("./processors/TradeSellEthProcessor");
-        //   const processor = new TradeSellEthProcessor();
+        //   const { TradeSellProcessor } = await import("./processors/TradeSellProcessor");
+        //   const processor = new TradeSellProcessor();
         //   await processor.run(task, account, skipGas);
         // }
       }
