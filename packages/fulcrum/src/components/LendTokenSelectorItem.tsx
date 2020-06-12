@@ -115,7 +115,7 @@ export class LendTokenSelectorItem extends Component<ILendTokenSelectorItemProps
     this.setState({ ...this.state, isLoadingTransaction: true })
   }
   private onAskToCloseProgressDlg = (task: RequestTask) => {
-    if (!this.state.request || task.request.id !== this.state.request.id) return;
+    if (!this.state.request || task.request.loanId !== this.state.request.loanId) return;
     if (task.status === RequestStatus.FAILED || task.status === RequestStatus.FAILED_SKIPGAS) {
       window.setTimeout(() => {
         FulcrumProvider.Instance.onTaskCancel(task);

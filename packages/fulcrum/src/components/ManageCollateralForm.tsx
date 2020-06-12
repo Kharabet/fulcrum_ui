@@ -1,4 +1,5 @@
 import { ManageCollateralRequest } from "../domain/ManageCollateralRequest";
+import { TradeRequest } from "../domain/TradeRequest";
 import Slider from "rc-slider"
 import { BigNumber } from "@0x/utils";
 import React, { ChangeEvent, Component, FormEvent } from "react";
@@ -12,15 +13,16 @@ import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
 import { ICollateralChangeEstimate } from "../domain/ICollateralChangeEstimate";
 import { FulcrumProvider } from "../services/FulcrumProvider";
 import { InputAmount } from "./InputAmount";
+import { TradeType } from "../domain/TradeType"
 
 import "../styles/components/manage-collateral-form.scss";
 import { PositionType } from "../domain/PositionType";
-import { TradeType } from "../domain/TradeType";
 
 export interface IManageCollateralFormProps {
   loan?: IBorrowedFundsState
 
   onSubmit: (request: ManageCollateralRequest) => void;
+  changeLoadingTransaction: (isLoadingTransaction: boolean, request: TradeRequest | undefined, isTxCompleted: boolean, resultTx: boolean) => void;
   onCancel: () => void;
   isMobileMedia: boolean;
   isOpenModal: boolean;
@@ -380,6 +382,19 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
         });
       }
 
+      const request = new TradeRequest(
+        this.props.loan!.loanId || "0x0000000000000000000000000000000000000000000000000000000000000000",
+        TradeType.SELL,
+        this.props.loan!.loanAsset,
+        Asset.UNKNOWN,
+        this.props.loan!.collateralAsset,
+        PositionType.LONG,
+        0,
+        new BigNumber(0)
+      )
+
+      this.props.changeLoadingTransaction(true, request, false, false);
+
       this.props.onSubmit(
         new ManageCollateralRequest(
           this.props.loan!.loanId || "0x0000000000000000000000000000000000000000000000000000000000000000",
@@ -389,6 +404,9 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
           this.state.loanValue > this.state.selectedValue
         )
       );
+      
+
+
     }
   };
 

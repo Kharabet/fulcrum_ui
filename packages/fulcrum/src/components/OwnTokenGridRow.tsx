@@ -27,7 +27,7 @@ export interface IOwnTokenGridRowProps {
   collateral: BigNumber;
   openPrice: BigNumber;
   liquidationPrice: BigNumber;
-profit: BigNumber;
+  profit: BigNumber;
   isTxCompleted: boolean;
   onTrade: (request: TradeRequest) => void;
   onManageCollateralOpen: (request: ManageCollateralRequest) => void;
@@ -84,18 +84,19 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
       openPrice = this.props.loan.loanData!.startRate.div(10 ** 18);
       liquidationPrice = liquidation_collateralToLoanRate.div(10 ** 18);
 
-      const startingValue = ((this.props.loan.loanData!.collateral.times( openPrice.times(10**18)).div(10**18)).minus(this.props.loan.loanData!.principal)).div(10**18);
-      const currentValue = ((this.props.loan.loanData!.collateral.times( collateralToPrincipalRate.times(10**18)).div(10**18)).minus(this.props.loan.loanData!.principal)).div(10**18);
-      profit = currentValue.minus(startingValue);    }
+      const startingValue = ((this.props.loan.loanData!.collateral.times(openPrice.times(10 ** 18)).div(10 ** 18)).minus(this.props.loan.loanData!.principal)).div(10 ** 18);
+      const currentValue = ((this.props.loan.loanData!.collateral.times(collateralToPrincipalRate.times(10 ** 18)).div(10 ** 18)).minus(this.props.loan.loanData!.principal)).div(10 ** 18);
+      profit = currentValue.minus(startingValue);
+    }
     else {
       positionValue = this.props.loan.loanData!.principal.div(10 ** 18);
       value = this.props.loan.loanData!.collateral.div(10 ** 18);
       collateral = ((this.props.loan.loanData!.collateral.div(10 ** 18)).minus(this.props.loan.loanData!.principal.div(collateralToPrincipalRate).div(10 ** 18)));
       openPrice = new BigNumber(10 ** 36).div(this.props.loan.loanData!.startRate).div(10 ** 18);
       liquidationPrice = new BigNumber(10 ** 36).div(liquidation_collateralToLoanRate).div(10 ** 18);
-      const startingValue = (this.props.loan.loanData!.collateral.minus(this.props.loan.loanData!.principal.div(openPrice.times(10**18)).times(10**18))).div(10**18);
-      const currentValue = (this.props.loan.loanData!.collateral.minus(this.props.loan.loanData!.principal.div(collateralToPrincipalRate.times(10**18)).times(10**18))).div(10**18);
-      profit = startingValue.minus(currentValue);    
+      const startingValue = (this.props.loan.loanData!.collateral.minus(this.props.loan.loanData!.principal.div(openPrice.times(10 ** 18)).times(10 ** 18))).div(10 ** 18);
+      const currentValue = (this.props.loan.loanData!.collateral.minus(this.props.loan.loanData!.principal.div(collateralToPrincipalRate.times(10 ** 18)).times(10 ** 18))).div(10 ** 18);
+      profit = startingValue.minus(currentValue);
     }
     this._isMounted && this.setState({
       ...this.state,
@@ -117,7 +118,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
     this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, false, this.state.resultTx);
   }
   private onAskToCloseProgressDlg = (task: RequestTask) => {
-    if (!this.state.request || task.request.id !== this.state.request.id) return;
+    if (!this.state.request || task.request.loanId !== this.state.request.loanId) return;
     if (task.status === RequestStatus.FAILED || task.status === RequestStatus.FAILED_SKIPGAS) {
       window.setTimeout(() => {
         FulcrumProvider.Instance.onTaskCancel(task);
@@ -160,7 +161,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
       ? <React.Fragment>
         <div className="token-selector-item__image">
           <CircleLoader></CircleLoader>
-          <TradeTxLoaderStep taskId={this.state.request.id} />
+          <TradeTxLoaderStep taskId={this.state.request.loanId} />
         </div>
       </React.Fragment>
       : this.state.resultTx
@@ -182,9 +183,9 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
           </div>
           <div title={this.props.openPrice.toFixed(18)} className="own-token-grid-row__col-asset-price  opacityIn">
             {!this.state.isLoading
-            ? <React.Fragment>
-              <span className="sign-currency">$</span>{this.props.openPrice.toFixed(2)}
-            </React.Fragment>
+              ? <React.Fragment>
+                <span className="sign-currency">$</span>{this.props.openPrice.toFixed(2)}
+              </React.Fragment>
               : <Preloader width="74px" />
             }
           </div>
