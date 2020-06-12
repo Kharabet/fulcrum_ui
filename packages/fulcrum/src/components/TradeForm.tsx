@@ -267,9 +267,9 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       this.props.tradeType !== prevProps.tradeType ||
       this.props.tradeAsset !== prevProps.tradeAsset ||
       this.props.positionType !== prevProps.positionType ||
-      this.props.leverage !== prevProps.leverage //||
+      this.props.leverage !== prevProps.leverage ||
       // this.state.collateral !== prevState.collateral ||
-      // this.state.tradeAmountValue !== prevState.tradeAmountValue
+       this.state.tradeAmountValue !== prevState.tradeAmountValue
     ) {
       if (this.state.collateral !== prevState.collateral) {
         this._isMounted && this.setState({
@@ -281,7 +281,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
           this.derivedUpdate();
         });
       } else {
-        this.derivedUpdate();
+        // this.derivedUpdate();
         if (this.props.tradeType === TradeType.SELL)
           this.getLoanCloseAmount(this.state.returnedAsset);
       }
