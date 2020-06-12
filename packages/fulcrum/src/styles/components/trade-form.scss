@@ -49,11 +49,17 @@
   }
 
   &__info_block__asset {
-    font-weight: 700;
-    font-size: 24px;
+    font-weight: 600;
+    font-size: 20px;
     line-height: 1.5;
-    color: #282f36;
     text-align: center;
+    color: #8992a4;
+    .base-asset {
+      font-weight: 700;
+      color: #282f36;
+    }
+    margin-bottom: 5px;
+    margin-top: 10px;
   }
 
   &__info_block__stats {

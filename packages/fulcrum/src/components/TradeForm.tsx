@@ -337,7 +337,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
             </div>
             <div className="trade-form__asset-stats">
               <div className="trade-form__info_block__asset">
-                {tokenNameBase}
+                <span className="base-asset">{this.props.tradeAsset}</span>-{this.props.quoteAsset}
               </div>
               <div className="trade-form__info_block__stats">
                 <div className="trade-form__info_block__stats__data">
