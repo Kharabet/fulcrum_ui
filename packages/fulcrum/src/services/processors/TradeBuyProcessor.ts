@@ -1,13 +1,13 @@
 import { BigNumber } from "@0x/utils";
-import { erc20Contract } from "../../contracts/erc20";
-import { Asset } from "../../domain/Asset";
-import { AssetsDictionary } from "../../domain/AssetsDictionary";
 import { RequestTask } from "../../domain/RequestTask";
 import { TradeRequest } from "../../domain/TradeRequest";
 import { FulcrumProvider } from "../FulcrumProvider";
 import { PositionType } from "../../domain/PositionType";
+import { Asset } from "../../domain/Asset";
+import { AssetsDictionary } from "../../domain/AssetsDictionary";
+import { erc20Contract } from "../../contracts/erc20";
 
-export class TradeBuyErcProcessor {
+export class TradeBuyProcessor {
   public run = async (task: RequestTask, account: string, skipGas: boolean) => {
     if (!(FulcrumProvider.Instance.contractsSource && FulcrumProvider.Instance.contractsSource.canWrite)) {
       throw new Error("No provider available!");
@@ -16,8 +16,6 @@ export class TradeBuyErcProcessor {
     // Initializing loan
     const taskRequest: TradeRequest = (task.request as TradeRequest);
     const isLong = taskRequest.positionType === PositionType.LONG;
-    const decimals: number = AssetsDictionary.assets.get(taskRequest.collateral)!.decimals || 18;
-
 
     const loanToken = isLong
       ? taskRequest.collateral
@@ -27,6 +25,7 @@ export class TradeBuyErcProcessor {
       ? taskRequest.asset
       : taskRequest.collateral;
 
+    const decimals: number = AssetsDictionary.assets.get(depositToken)!.decimals || 18;
 
     const amountInBaseUnits = new BigNumber(taskRequest.amount.multipliedBy(10 ** decimals).toFixed(0, 1));
 
@@ -37,13 +36,9 @@ export class TradeBuyErcProcessor {
 
     let approvePromise: Promise<string> | null = null;
 
-    // init erc20 contract for base token
     let tokenErc20Contract: erc20Contract | null = null;
     let assetErc20Address: string | null = "";
     let erc20allowance = new BigNumber(0);
-    let txHash: string = "";
-    let gasAmountBN;
-
     if (taskRequest.depositToken === Asset.WETH || taskRequest.depositToken === Asset.ETH) {
       task.processingStart([
         "Initializing",
@@ -98,6 +93,7 @@ export class TradeBuyErcProcessor {
       //console.log(e);
     }
 
+    let gasAmountBN;
 
     const leverageAmount = taskRequest.positionType === PositionType.LONG
       ? new BigNumber(taskRequest.leverage - 1).times(10 ** 18)
@@ -111,37 +107,51 @@ export class TradeBuyErcProcessor {
       ? amountInBaseUnits
       : new BigNumber(0);
 
-    const collateralTokenAddress = FulcrumProvider.Instance.getErc20AddressOfAsset(collateralToken);
+    //const depositTokenAddress = FulcrumProvider.Instance.getErc20AddressOfAsset(depositToken);
+    const collateralTokenAddress = collateralToken !== Asset.ETH
+    ? FulcrumProvider.Instance.getErc20AddressOfAsset(collateralToken)
+    : FulcrumProvider.ZERO_ADDRESS;
     const loanData = "0x";
 
+    //console.log("depositAmount: " + amountInBaseUnits.toFixed());
+    console.log("leverageAmount: " + leverageAmount.toFixed());
+    console.log("loanTokenSent: " + loanTokenSent.toFixed());
+    console.log("collateralTokenSent: " + collateralTokenSent.toFixed());
+    //console.log("deposit token: " + depositToken + " address: " + depositTokenAddress!);
+    console.log("collateral token: " + collateralToken + " address: " + collateralTokenAddress!);
+    console.log("trader: " + account);
+    console.log("loan data: " + loanData);
+
+
+    const sendAmountForValue = taskRequest.depositToken === Asset.WETH || taskRequest.depositToken === Asset.ETH ?
+      amountInBaseUnits :
+      new BigNumber(0)
+
+    // Waiting for token allowance
+    if (approvePromise || skipGas) {
+      await approvePromise;
+      gasAmountBN = new BigNumber(FulcrumProvider.Instance.gasLimit);
+    } else {
+      // estimating gas amount
+      const gasAmount = await tokenContract.marginTrade.estimateGasAsync(
+        "0x0000000000000000000000000000000000000000000000000000000000000000",
+        leverageAmount,
+        loanTokenSent,
+        collateralTokenSent,
+        collateralTokenAddress!,
+        account,
+        loanData,
+        {
+          from: account,
+          value: sendAmountForValue,
+          gas: FulcrumProvider.Instance.gasLimit
+        });
+      gasAmountBN = new BigNumber(gasAmount).multipliedBy(FulcrumProvider.Instance.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
+    }
+
+    let txHash: string = "";
     try {
-      const sendAmountForValue = taskRequest.depositToken === Asset.WETH || taskRequest.depositToken === Asset.ETH ?
-        amountInBaseUnits :
-        new BigNumber(0)
-
-      // Waiting for token allowance
-      if (approvePromise || skipGas) {
-        await approvePromise;
-        gasAmountBN = new BigNumber(FulcrumProvider.Instance.gasLimit);
-      } else {
-        // estimating gas amount
-        let gasAmount;
-        gasAmount = await tokenContract.marginTrade.estimateGasAsync(
-          "0x0000000000000000000000000000000000000000000000000000000000000000",
-          leverageAmount,
-          loanTokenSent,
-          collateralTokenSent,
-          collateralTokenAddress!,
-          account,
-          loanData,
-          {
-            from: account,
-            gas: FulcrumProvider.Instance.gasLimit,
-            value: sendAmountForValue
-          });
-
-        gasAmountBN = new BigNumber(gasAmount).multipliedBy(FulcrumProvider.Instance.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
-      }
+      //FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.AskToOpenProgressDlg);
 
       // Submitting trade
       txHash = await tokenContract.marginTrade.sendTransactionAsync(
@@ -154,11 +164,10 @@ export class TradeBuyErcProcessor {
         loanData,
         {
           from: account,
+          value: sendAmountForValue,
           gas: gasAmountBN.toString(),
-          gasPrice: await FulcrumProvider.Instance.gasPrice(),
-          value: sendAmountForValue
+          gasPrice: await FulcrumProvider.Instance.gasPrice()
         });
-
       task.setTxHash(txHash);
     }
     catch (e) {
