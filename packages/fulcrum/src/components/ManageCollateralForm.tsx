@@ -101,9 +101,6 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
           collateralizedPercent: next!.collateralizedPercent,
           inputAmountText: this.formatPrecision(next!.collateralAmount.toString())
         });
-        const persent = this.props.loan!.collateralizedPercent
-          .multipliedBy(100)
-          .plus(100);
 
         // console.log("collateralAmount2 " + this.state.collateralizedPercent.dividedBy(persent).minus(1).multipliedBy(this.props.loan!.collateralAmount).toFixed(6));
         //  console.log("1 " + this.state.collateralAmount.dividedBy(this.props.loan!.collateralAmount).toFixed(6));
@@ -147,12 +144,16 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
             const currentCollateral = this.props.loan!.collateralAmount
               .times(10 ** 18);
 
-            const maxValue = new BigNumber(collateralState.maxValue).minus((collateralizedPercent).times(9 * 10 ** 16)).toNumber();
 
             const minValue = new BigNumber(collateralState.minValue)
               .minus(//collateralizedPercent
                 // .dividedBy(collateralState.minValue)
                 (this.props.loan!.collateralAmount).times(9 * 10 ** 16))
+              .toNumber();
+
+            const maxValue = new BigNumber(collateralState.maxValue)
+              .minus((this.props.loan!.collateralAmount)
+                .times(9 * 10 ** 18))
               .toNumber();
 
             console.log("minValue " + minValue);
@@ -162,7 +163,7 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
               .times(10 ** 18);
 
             maxCollateral = minCollateral
-              .times(collateralState.maxValue - minValue)
+              .times(maxValue - minValue)
               .dividedBy(10 ** 20);
 
             if (maxCollateral.lt(currentCollateral)) {
@@ -206,7 +207,7 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
                 collateralExcess: collateralExcess,
                 assetBalanceValue: assetBalanceNormalizedBN,
                 minValue: minValue,
-                //maxValue: maxValue,
+                maxValue: maxValue,
               },
               () => {
                 if (this.props.isOpenModal) {
@@ -415,9 +416,10 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
               .multipliedBy(this.state.loanValue)
           )).toNumber();
 
-      if (selectedValue > this.state.maxValue) {
-        selectedValue = this.state.maxValue;
-      } else if (selectedValue < this.state.minValue) {
+      // if (selectedValue > this.state.maxValue) {
+      //   selectedValue = this.state.maxValue;
+      // } else
+      if (selectedValue < this.state.minValue) {
         selectedValue = this.state.minValue;
       }
 
