@@ -164,8 +164,6 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
           <TradeTxLoaderStep taskId={this.state.request.loanId} />
         </div>
       </React.Fragment>
-      : this.state.resultTx
-        ? <div className="close-tab-tx"></div>
         : <div className={`own-token-grid-row ${this.props.isTxCompleted ? `completed` : ``}`}>
           <div className="own-token-grid-row__col-token-name  opacityIn">
             {`${this.props.tradeAsset.toUpperCase()}`}

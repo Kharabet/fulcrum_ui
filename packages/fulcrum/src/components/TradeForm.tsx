@@ -206,8 +206,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       ? liquidationPriceBeforeTrade.div(10 ** 18)
       : new BigNumber(10 ** 36).div(liquidationPriceBeforeTrade).div(10 ** 18);
 
-    let collateral, interestRate = new BigNumber(0)
-    await FulcrumProvider.Instance.getEstimatedMarginDetails(tradeRequest);
+    let collateral, interestRate, principal = new BigNumber(0)
     // const interestRate = new BigNumber(0);//await FulcrumProvider.Instance.getTradeTokenInterestRate(tradeTokenKey);
     if (this.props.tradeType === TradeType.SELL) {
       interestRate = await FulcrumProvider.Instance.getBorrowInterestRate(this.props.tradeAsset);
@@ -228,7 +227,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       interestRate: interestRate,
       liquidationPrice: liquidationPrice,
       tradeAssetPrice,
-      exposureValue: collateral,
+      exposureValue: this.props.positionType === PositionType.LONG ? collateral : principal,
       isExposureLoading: false,
       isLoading: false
     });
@@ -372,7 +371,6 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
               inputAmountText={this.state.inputAmountText}
               selectorAssets={[this.props.tradeAsset, this.props.quoteAsset]}
               isLoading={false}
-              tradeType={this.props.tradeType}
               selectedAsset={this.state.collateral}
               onInsertMaxValue={this.onInsertMaxValue}
               onTradeAmountChange={this.onTradeAmountChange}
@@ -573,7 +571,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       limitedAmount.tradeAmountValue,
       this.state.returnTokenIsCollateral
     );
-    const { collateral, interestRate } = await FulcrumProvider.Instance.getEstimatedMarginDetails(tradeRequest);
+    const { principal, collateral, interestRate } = await FulcrumProvider.Instance.getEstimatedMarginDetails(tradeRequest);
     if (this.props.tradeType === TradeType.BUY)
       await this.setState({ ...this.state, interestRate })
 
@@ -582,7 +580,10 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       inputAmountValue: limitedAmount.inputAmountValue,
       tradeAmountValue: limitedAmount.tradeAmountValue,
       maxTradeValue: maxTradeValue,
-      exposureValue: this.props.tradeType === TradeType.BUY ? collateral : limitedAmount.inputAmountValue,
+      exposureValue: this.props.tradeType === TradeType.BUY ? 
+      this.props.positionType === PositionType.LONG
+      ? collateral : principal
+       : limitedAmount.inputAmountValue,
     };
   }
 

@@ -154,8 +154,6 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
               <TradeTxLoaderStep taskId={this.state.request.loanId} />
             </div>
           </React.Fragment>
-          : this.state.resultTx
-            ? <div className="close-tab-tx"></div>
             : <div className={`inner-own-token-grid-row`}>
               <div title={this.props.positionValue.toFixed(18)} className="inner-own-token-grid-row__col-token-name-full opacityIn">
                 {this.props.positionValue.toFixed(4)}

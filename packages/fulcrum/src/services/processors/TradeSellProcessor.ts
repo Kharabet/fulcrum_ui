@@ -6,7 +6,7 @@ import { FulcrumProvider } from "../FulcrumProvider";
 import { PositionType } from "../../domain/PositionType";
 import { AssetsDictionary } from "../../domain/AssetsDictionary";
 
-export class TradeSellEthProcessor {
+export class TradeSellProcessor {
   public run = async (task: RequestTask, account: string, skipGas: boolean) => {
     if (!(FulcrumProvider.Instance.contractsSource && FulcrumProvider.Instance.contractsSource.canWrite)) {
       throw new Error("No provider available!");
@@ -98,7 +98,7 @@ export class TradeSellEthProcessor {
         "0x",
         {
           from: account,
-          gas: FulcrumProvider.Instance.gasLimit,
+          gas: gasAmountBN,
           gasPrice: await FulcrumProvider.Instance.gasPrice()
         });
 
