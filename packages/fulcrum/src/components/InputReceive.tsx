@@ -23,7 +23,7 @@ export class InputReceive extends Component<IInputReceiveProps, IInputReceiveSta
   public render() {
     return (
       <React.Fragment>
-        <div className="input-receive__title">You will Receive</div>
+        <div className="input-receive__title">You will receive</div>
         <div className="input-receive__container">
           <div title={this.props.receiveAmout.toFixed(18)} className="input-receive__input">
             {Number(this.props.receiveAmout.toFixed(5))}

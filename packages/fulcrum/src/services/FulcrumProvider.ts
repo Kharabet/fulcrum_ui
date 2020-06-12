@@ -1444,11 +1444,11 @@ export class FulcrumProvider {
         let amountInBaseUnits = new BigNumber(0);
         if (request.positionType === PositionType.LONG) {
           const decimals: number = AssetsDictionary.assets.get(request.collateral)!.decimals || 18;
-          amountInBaseUnits = new BigNumber(loan.loanData!.collateral.times(request.amount).div(loan.loanData!.principal).multipliedBy(10 ** decimals).toFixed(0, 1));
+          amountInBaseUnits = new BigNumber(request.amount.multipliedBy(10 ** decimals).toFixed(0, 1));
         }
         else {
           const decimals: number = AssetsDictionary.assets.get(request.asset)!.decimals || 18;
-          amountInBaseUnits = new BigNumber(request.amount.multipliedBy(10 ** decimals).toFixed(0, 1));
+          amountInBaseUnits = new BigNumber(loan.loanData!.collateral.times(request.amount).div(loan.loanData!.principal).multipliedBy(10 ** decimals).toFixed(0, 1));
         }
 
         let maxAmountInBaseUnits = new BigNumber(0);
@@ -1460,6 +1460,7 @@ export class FulcrumProvider {
           console.log("close full amount")
           amountInBaseUnits = new BigNumber(maxAmountInBaseUnits.times(10 ** 50).toFixed(0, 1));
         }
+
         result = await iBZxContract.closeWithSwap.callAsync(
           request.loanId,
           account,
@@ -1471,6 +1472,7 @@ export class FulcrumProvider {
             gas: FulcrumProvider.Instance.gasLimit
           }
         );
+        console.log(result);
       }
     }
     return result;

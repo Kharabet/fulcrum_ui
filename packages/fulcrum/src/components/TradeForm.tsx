@@ -52,7 +52,7 @@ export interface ITradeFormProps {
   tradeAsset: Asset;
   positionType: PositionType;
   leverage: number;
-  defaultUnitOfAccount: Asset;
+  quoteAsset: Asset;
 
   onSubmit: (request: TradeRequest) => void;
   onCancel: () => void;
@@ -78,7 +78,6 @@ interface ITradeFormState {
   isLoading: boolean;
   isExposureLoading: boolean;
 
-  selectedUnitOfAccount: Asset;
 
   tradeAssetPrice: BigNumber;
   returnedAsset: Asset,
@@ -106,7 +105,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
     this._isMounted = false;
     this.state = {
       assetDetails: assetDetails || null,
-      collateral: props.defaultUnitOfAccount,
+      collateral: props.tradeAsset,
       inputAmountText: "",
       inputAmountValue: maxTradeValue,
       tradeAmountValue: maxTradeValue,
@@ -117,7 +116,6 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       exposureValue: exposureValue,
       isLoading: true,
       isExposureLoading: true,
-      selectedUnitOfAccount: this.props.defaultUnitOfAccount,
       tradeAssetPrice: new BigNumber(0),
       returnedAsset: props.tradeAsset,
       returnedAmount: new BigNumber(0),
@@ -171,7 +169,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
     const maxTradeValue = await FulcrumProvider.Instance.getMaxTradeValue(
       this.props.tradeType,
       this.props.tradeAsset,
-      this.state.selectedUnitOfAccount,
+      this.props.quoteAsset,
       this.state.collateral,
       this.props.positionType,
       this.props.loan
@@ -180,7 +178,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       this.props.loan?.loanId || "0x0000000000000000000000000000000000000000000000000000000000000000",
       this.props.tradeType,
       this.props.tradeAsset,
-      this.state.selectedUnitOfAccount,
+      this.props.quoteAsset,
       this.state.collateral,
       this.props.positionType,
       this.props.leverage,
@@ -195,8 +193,8 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
 
 
     const collateralToPrincipalRate = this.props.positionType === PositionType.LONG
-      ? await FulcrumProvider.Instance.getSwapRate(this.props.tradeAsset, this.state.selectedUnitOfAccount)
-      : await FulcrumProvider.Instance.getSwapRate(this.state.selectedUnitOfAccount, this.props.tradeAsset);
+      ? await FulcrumProvider.Instance.getSwapRate(this.props.tradeAsset, this.props.quoteAsset)
+      : await FulcrumProvider.Instance.getSwapRate(this.props.quoteAsset, this.props.tradeAsset);
 
     let initialMargin = this.props.positionType === PositionType.LONG
       ? new BigNumber(10 ** 38).div(new BigNumber(this.props.leverage - 1).times(10 ** 18))
@@ -270,10 +268,8 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       this.props.tradeAsset !== prevProps.tradeAsset ||
       this.props.positionType !== prevProps.positionType ||
       this.props.leverage !== prevProps.leverage ||
-      this.props.defaultUnitOfAccount !== prevProps.defaultUnitOfAccount ||
-      this.state.selectedUnitOfAccount !== prevState.selectedUnitOfAccount ||
-      this.state.collateral !== prevState.collateral ||
-      this.state.tradeAmountValue !== prevState.tradeAmountValue
+      // this.state.collateral !== prevState.collateral ||
+       this.state.tradeAmountValue !== prevState.tradeAmountValue
     ) {
       if (this.state.collateral !== prevState.collateral) {
         this._isMounted && this.setState({
@@ -285,7 +281,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
           this.derivedUpdate();
         });
       } else {
-        this.derivedUpdate();
+        // this.derivedUpdate();
         if (this.props.tradeType === TradeType.SELL)
           this.getLoanCloseAmount(this.state.returnedAsset);
       }
@@ -341,7 +337,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
             </div>
             <div className="trade-form__asset-stats">
               <div className="trade-form__info_block__asset">
-                {tokenNameBase}
+                <span className="base-asset">{this.props.tradeAsset}</span>-{this.props.quoteAsset}
               </div>
               <div className="trade-form__info_block__stats">
                 <div className="trade-form__info_block__stats__data">
@@ -374,10 +370,10 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
 
             <InputAmount
               inputAmountText={this.state.inputAmountText}
-              selectorAssets={this.props.stablecoins.concat(this.props.tradeAsset)}
+              selectorAssets={[this.props.tradeAsset, this.props.quoteAsset]}
               isLoading={false}
               tradeType={this.props.tradeType}
-              asset={this.state.collateral}
+              selectedAsset={this.state.collateral}
               onInsertMaxValue={this.onInsertMaxValue}
               onTradeAmountChange={this.onTradeAmountChange}
               onCollateralChange={this.onCollateralChange}
@@ -390,16 +386,6 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
                 assetDropdown={[this.props.loan?.collateralAsset || Asset.UNKNOWN, this.props.loan?.loanAsset || Asset.UNKNOWN]}
               />
             }
-
-            {this.props.tradeType === TradeType.BUY ? (
-              <CollapsibleContainer titleOpen="View advanced options" titleClose="Hide advanced options" isTransparent={false}>
-                <div className="trade-form__unit-of-account-container">
-                  Unit of Account
-                    <UnitOfAccountSelector items={this.props.stablecoins} value={this.state.selectedUnitOfAccount} onChange={this.onChangeUnitOfAccount} />
-                </div>
-              </CollapsibleContainer>
-            ) : null}
-
 
             {this.props.isMobileMedia && this.props.tradeType === TradeType.BUY ? (
               <TradeExpectedResult entryPrice={this.state.tradeAssetPrice} liquidationPrice={this.state.liquidationPrice} />
@@ -419,7 +405,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
                 <div className="trade-form__how-it-works">
                   <div className="hiw-icon"><QuestionIcon /></div>
                   <div className="hiw-content">
-                    You are opening {this.props.leverage}x {this.props.positionType} {this.state.assetDetails.displayName} position. This will borrow {this.props.positionType === PositionType.LONG ? this.props.defaultUnitOfAccount : this.state.assetDetails.displayName} from a Fulcrum lending pool and that {this.props.positionType === PositionType.LONG ? this.props.defaultUnitOfAccount : this.state.assetDetails.displayName} is swapped into {this.props.positionType === PositionType.LONG ? this.state.assetDetails.displayName : this.props.defaultUnitOfAccount} using an on-chain DEX.
+                    You are opening {this.props.leverage}x {this.props.positionType} {this.state.assetDetails.displayName} position. This will borrow {this.props.positionType === PositionType.LONG ? this.props.quoteAsset : this.state.assetDetails.displayName} from a Fulcrum lending pool and that {this.props.positionType === PositionType.LONG ? this.props.quoteAsset : this.state.assetDetails.displayName} is swapped into {this.props.positionType === PositionType.LONG ? this.state.assetDetails.displayName : this.props.quoteAsset} using an on-chain DEX.
                 </div>
                 </div>
               </CollapsibleContainer>
@@ -466,7 +452,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       this.props.loan!.loanId,
       this.props.tradeType,
       this.props.tradeAsset,
-      this.state.selectedUnitOfAccount,
+      this.props.quoteAsset,
       this.state.collateral,
       this.props.positionType,
       this.props.leverage,
@@ -495,11 +481,6 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
     // this._inputSetMax.next();
   };
 
-  public onChangeUnitOfAccount = (asset: Asset) => {
-
-    this._isMounted && this.setState({ ...this.state, selectedUnitOfAccount: asset });
-  };
-
   public onSubmitClick = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -526,7 +507,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
         transactionId: randomNumber,
         transactionTotal: new BigNumber(usdPrice),
         transactionProducts: [{
-          name: this.props.leverage + 'x' + this.props.tradeAsset + '-' + this.props.positionType + '-' + this.state.selectedUnitOfAccount,
+          name: this.props.leverage + 'x' + this.props.tradeAsset + '-' + this.props.positionType + '-' + this.props.quoteAsset,
           sku: this.props.leverage + 'x' + this.props.tradeAsset + '-' + this.props.positionType,
           category: this.props.positionType,
           price: new BigNumber(usdPrice),
@@ -540,7 +521,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
         this.props.loan?.loanId || "0x0000000000000000000000000000000000000000000000000000000000000000",
         this.props.tradeType,
         this.props.tradeAsset,
-        this.state.selectedUnitOfAccount,
+        this.props.quoteAsset,
         this.state.collateral,
         this.props.positionType,
         this.props.leverage,
@@ -553,7 +534,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
   private rxFromMaxAmountWithMultiplier = (multiplier: BigNumber): Observable<ITradeAmountChangeEvent | null> => {
     return new Observable<ITradeAmountChangeEvent | null>(observer => {
       this._isMounted && this.setState({ ...this.state, isLoading: true, isExposureLoading: true });
-      FulcrumProvider.Instance.getMaxTradeValue(this.props.tradeType, this.props.tradeAsset, this.state.selectedUnitOfAccount, this.state.collateral, this.props.positionType, this.props.loan)
+      FulcrumProvider.Instance.getMaxTradeValue(this.props.tradeType, this.props.tradeAsset, this.props.quoteAsset, this.state.collateral, this.props.positionType, this.props.loan)
         .then(maxTradeValue => {
           this.getInputAmountLimitedFromBigNumber(maxTradeValue, maxTradeValue, multiplier)
             .then(limitedAmount => {
@@ -568,7 +549,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
   private rxFromCurrentAmount = (value: string): Observable<ITradeAmountChangeEvent | null> => {
     return new Observable<ITradeAmountChangeEvent | null>(observer => {
       this._isMounted && this.setState({ ...this.state, isExposureLoading: true });
-      FulcrumProvider.Instance.getMaxTradeValue(this.props.tradeType, this.props.tradeAsset, this.state.selectedUnitOfAccount, this.state.collateral, this.props.positionType, this.props.loan)
+      FulcrumProvider.Instance.getMaxTradeValue(this.props.tradeType, this.props.tradeAsset, this.props.quoteAsset, this.state.collateral, this.props.positionType, this.props.loan)
         .then(maxTradeValue => {
           this.getInputAmountLimitedFromText(value, maxTradeValue)
             .then(limitedAmount => {
@@ -585,7 +566,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       this.props.loan?.loanId || "0x0000000000000000000000000000000000000000000000000000000000000000",
       this.props.tradeType,
       this.props.tradeAsset,
-      this.state.selectedUnitOfAccount,
+      this.props.quoteAsset,
       this.state.collateral,
       this.props.positionType,
       this.props.leverage,

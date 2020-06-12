@@ -283,7 +283,7 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
                 <InputAmount
                   inputAmountText={this.state.inputAmountText}
                   isLoading={this.state.isLoading}
-                  asset={this.props.loan!.collateralAsset}
+                  selectedAsset={this.props.loan!.collateralAsset}
                   onInsertMaxValue={this.onInsertMaxValue}
                   onTradeAmountChange={this.onTradeAmountChange}
                   onCollateralChange={this.onCollateralChange}

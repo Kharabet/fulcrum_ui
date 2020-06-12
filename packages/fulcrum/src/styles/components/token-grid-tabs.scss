@@ -12,7 +12,7 @@
   }
   &__container {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     flex-wrap: wrap;
   }
   &__items {
@@ -63,6 +63,7 @@
       justify-content: center;
       align-items: center;
       margin-bottom: 15px;
+      padding-bottom: 10px;
       svg {
         height: 28px;
         width: 28px;
