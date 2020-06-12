@@ -6,19 +6,26 @@
   border-radius: 26px;
   color: var(--primary-text);
   font-weight: 600;
-  padding: 9px 40px 9px 20px;
+  padding: 8px 45px 8px 25px;
   display: flex;
   align-items: center;
-  svg{
-    width: 28px;
-    height: 28px;
-    margin: 0 10px 0 20px;
+  svg {
+    width: 30px;
+    height: 30px;
+    margin: 0 10px 0 30px;
+    .eth-svg {
+      fill: #c8c8c8;
+    }
   }
   @media (min-width: $breakpoint-mobile-min) {
     font-size: 14px;
   }
   &.active {
+    background-color: var(--bg-icon-collateral);
     border-radius: 26px;
+    .eth-svg {
+      fill: var(--bg-eth);
+    }
   }
   &:after {
     content: "";
@@ -119,5 +126,8 @@
     width: 20px;
     height: 20px;
     margin-right: 10px;
+    .eth-svg {
+      fill: var(--bg-eth);
+    }
   }
 }

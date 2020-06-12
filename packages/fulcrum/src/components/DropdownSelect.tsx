@@ -53,7 +53,6 @@ export const DropdownSelect = (props: IDropdownSelectProps) => {
     const ul = select.querySelector("ul.select-options") as HTMLElement;
     const selectStyled = select.querySelector(".styled-select") as HTMLElement;
     // const selectNative = select.querySelector("select.select-hidden") as HTMLSelectElement
-    selectStyled.textContent = li.textContent
     selectStyled.classList.remove('active');
     // selectNative.selectedIndex = parseInt(li.dataset.index!);
     ul.style.display = 'none';
