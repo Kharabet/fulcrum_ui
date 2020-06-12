@@ -43,22 +43,13 @@ interface ITradePageState {
   showMyTokensOnly: boolean;
   isTradeModalOpen: boolean;
   tradeType: TradeType;
-  tradeAsset: Asset;
-  tradeUnitOfAccount: Asset;
   tradePositionType: PositionType;
   tradeLeverage: number;
-  tradeVersion: number;
   loanId?: string;
   loans: IBorrowedFundsState[] | undefined;
-  collateralToken: Asset;
-
-  isTokenAddressFormOpen: boolean;
 
   isManageCollateralModalOpen: boolean;
 
-  defaultTokenizeNeeded: boolean;
-  defaultLeverageShort: number;
-  defaultLeverageLong: number;
   openedPositionsCount: number;
   tokenRowsData: ITradeTokenGridRowProps[];
   ownRowsData: IOwnTokenGridRowProps[];
@@ -114,18 +105,10 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       showMyTokensOnly: false,
       isTradeModalOpen: false,
       tradeType: TradeType.BUY,
-      tradeAsset: Asset.UNKNOWN,
-      tradeUnitOfAccount: Asset.DAI,
       // defaultUnitOfAccount: process.env.REACT_APP_ETH_NETWORK === "kovan" ? Asset.SAI : Asset.DAI,
       tradePositionType: PositionType.SHORT,
       tradeLeverage: 0,
-      tradeVersion: 1,
-      collateralToken: Asset.UNKNOWN,
-      isTokenAddressFormOpen: false,
       isManageCollateralModalOpen: false,
-      defaultTokenizeNeeded: true,
-      defaultLeverageShort: 1,
-      defaultLeverageLong: 2,
       openedPositionsCount: 0,
       tokenRowsData: [],
       ownRowsData: [],
@@ -140,6 +123,8 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
 
   }
+  private readonly defaultLeverageLong: number = 2;
+  private readonly defaultLeverageShort: number = 1;
   private readonly tradeAssets: Asset[] = [];
   private readonly stablecoinAssets: Asset[] = [];
 
@@ -242,7 +227,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
               tradeAsset={this.state.selectedMarket.tradeAsset}
               positionType={this.state.tradePositionType}
               leverage={this.state.tradeLeverage}
-              defaultUnitOfAccount={this.state.selectedMarket.unitOfAccount}
+              quoteAsset={this.state.selectedMarket.unitOfAccount}
               onSubmit={this.onTradeConfirmed}
               onCancel={this.onTradeRequestClose}
             />
@@ -293,9 +278,9 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       this.setState({
         ...this.state,
         isManageCollateralModalOpen: true,
-        collateralToken: request.collateralAsset,
+        // collateralToken: request.collateralAsset,
         loanId: request.loanId,
-        tradeAsset: request.asset,
+        // tradeAsset: request.asset,
         tradeRequestId: request.id
       });
     }
@@ -306,9 +291,9 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     FulcrumProvider.Instance.onManageCollateralConfirmed(request);
     this.setState({
       ...this.state,
-      collateralToken: request.collateralAsset,
+      // collateralToken: request.collateralAsset,
       loanId: request.loanId,
-      tradeAsset: request.asset,
+      // tradeAsset: request.asset,
       tradeRequestId: request.id,
       isManageCollateralModalOpen: false
     });
@@ -349,10 +334,10 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       this.setState({
         ...this.state,
         isTradeModalOpen: true,
-        collateralToken: request.collateral,
+        // collateralToken: request.collateral,
         tradeType: request.tradeType,
-        tradeAsset: request.asset,
-        tradeUnitOfAccount: request.collateral,
+        // tradeAsset: request.asset,
+        // tradeUnitOfAccount: request.collateral,
         tradePositionType: request.positionType,
         tradeLeverage: request.leverage,
         loanId: request.loanId,
@@ -470,7 +455,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       asset: state.selectedMarket.tradeAsset,
       unitOfAccount: state.selectedMarket.unitOfAccount,
       positionType: PositionType.LONG,
-      defaultLeverage: state.defaultLeverageLong,
+      defaultLeverage: this.defaultLeverageLong,
       onTrade: this.onTradeRequested,
       changeLoadingTransaction: this.changeLoadingTransaction,
       isTxCompleted: this.state.isTxCompleted
@@ -479,7 +464,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       asset: state.selectedMarket.tradeAsset,
       unitOfAccount: state.selectedMarket.unitOfAccount,
       positionType: PositionType.SHORT,
-      defaultLeverage: state.defaultLeverageShort,
+      defaultLeverage: this.defaultLeverageShort,
       onTrade: this.onTradeRequested,
       changeLoadingTransaction: this.changeLoadingTransaction,
       isTxCompleted: this.state.isTxCompleted

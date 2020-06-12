@@ -13,7 +13,7 @@ import { AssetDropdown } from "./AssetDropdown";
 interface IInputAmountProps {
   inputAmountText: string;
   isLoading: boolean;
-  asset: Asset;
+  selectedAsset: Asset;
   selectorAssets?: Asset[];
   tradeType?: TradeType;
   onInsertMaxValue: (value: number) => void;
@@ -67,7 +67,7 @@ export class InputAmount extends Component<IInputAmountProps, IInputAmountState>
 
           {this.props.tradeType === TradeType.BUY && this.props.selectorAssets &&
             <AssetDropdown
-              selectedAsset={this.props.asset}
+              selectedAsset={this.props.selectedAsset}
               onAssetChange={this.props.onCollateralChange}
               assets={this.props.selectorAssets} />
           }
