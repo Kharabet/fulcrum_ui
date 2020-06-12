@@ -20,7 +20,7 @@ export class ManageCollateralProcessor {
     if (isETHCollateralAsset) {
       task.processingStart([
         "Initializing",
-        "Submitting loan",
+        "Submitting collateral",
         "Updating the blockchain",
         "Transaction completed"
       ]);
@@ -30,7 +30,7 @@ export class ManageCollateralProcessor {
         "Detecting token allowance",
         "Prompting token allowance",
         "Waiting for token allowance",
-        "Submitting loan",
+        "Submitting collateral",
         "Updating the blockchain",
         "Transaction completed"
       ]);
