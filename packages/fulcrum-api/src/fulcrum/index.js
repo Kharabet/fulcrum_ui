@@ -292,6 +292,30 @@ export default class Fulcrum {
         return result;
     }
 
+    async  getHistoryTVL(startDate, endDate, estimatedPointsNumber) {
+        const lastReserveData = (await statsModel.find({
+            "date": {
+                $lt: endDate,
+                $gte: startDate
+            }
+        }).select({ date: 1, allTokensStats: 1 }));
+        const arrayLength = lastReserveData.length;
+        const desiredlength = lastReserveData.length > estimatedPointsNumber
+            ? estimatedPointsNumber - 1
+            : lastReserveData.length;
+        const timeBetweenTwoArrayElements = (new Date(lastReserveData[0].date).getTime() - new Date(lastReserveData[arrayLength - 1].date).getTime()) / arrayLength;
+        const timeBetweenTwoOutputElements = (new Date(lastReserveData[0].date).getTime() - new Date(lastReserveData[arrayLength - 1].date).getTime()) / desiredlength;
+        const offset = Math.floor(timeBetweenTwoOutputElements / timeBetweenTwoArrayElements);
+        const reducedArray = lastReserveData.filter((e, i) => i % offset === 0);
+       
+        let result = [];
+        reducedArray.forEach(document => {
+            result.push({ timstamp: new Date(document.date).getTime(), tvl: document.allTokensStats.usdTotalLocked });
+        });
+        // result.push(lastReserveData.allTokensStats);
+        return result;
+    }
+
     async updateReservedData() {
         var result = [];
         var tokenAddresses = iTokens.map(x => (x.address));
