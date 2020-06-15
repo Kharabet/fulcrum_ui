@@ -1831,13 +1831,13 @@ if (err || 'error' in added) {
 console.log(err, added);
 }
 }*//*);
-                                                                                                                                                                                                }
-                                                                                                                                                                                                }
-                                                                                                                                                                                                }
-                                                                                                                                                                                                } catch(e) {
-                                                                                                                                                                                                // console.log(e);
-                                                                                                                                                                                                }
-                                                                                                                                                                                                }*/
+                                                                                                                                                                                                    }
+                                                                                                                                                                                                    }
+                                                                                                                                                                                                    }
+                                                                                                                                                                                                    } catch(e) {
+                                                                                                                                                                                                    // console.log(e);
+                                                                                                                                                                                                    }
+                                                                                                                                                                                                    }*/
   }
 
   private processLendRequestTask = async (task: RequestTask, skipGas: boolean) => {
@@ -1937,7 +1937,11 @@ console.log(err, added);
 
   private processTradeRequestTask = async (task: RequestTask, skipGas: boolean) => {
     try {
-      this.eventEmitter.emit(FulcrumProviderEvents.AskToOpenProgressDlg, task.request.loanId);
+
+      this.eventEmitter.emit(FulcrumProviderEvents.AskToOpenProgressDlg,
+        task.request.loanId == "0x0000000000000000000000000000000000000000000000000000000000000000" ?
+          task.request.id :
+          task.request.loanId);
       if (!(this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite)) {
         throw new Error("No provider available!");
       }
