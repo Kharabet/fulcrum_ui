@@ -293,26 +293,27 @@ export default class Fulcrum {
     }
 
     async  getHistoryTVL(startDate, endDate, estimatedPointsNumber) {
-        const lastReserveData = (await statsModel.find({
+        const dbStatsDocuments = (await statsModel.find({
             "date": {
                 $lt: endDate,
                 $gte: startDate
             }
-        }).select({ date: 1, allTokensStats: 1 }));
-        const arrayLength = lastReserveData.length;
-        const desiredlength = lastReserveData.length > estimatedPointsNumber
+        }).sort({date : 1}).select({ date: 1, allTokensStats: 1 }));
+        const arrayLength = dbStatsDocuments.length;
+        const desiredlength = dbStatsDocuments.length > estimatedPointsNumber
             ? estimatedPointsNumber - 1
-            : lastReserveData.length;
-        const timeBetweenTwoArrayElements = (new Date(lastReserveData[0].date).getTime() - new Date(lastReserveData[arrayLength - 1].date).getTime()) / arrayLength;
-        const timeBetweenTwoOutputElements = (new Date(lastReserveData[0].date).getTime() - new Date(lastReserveData[arrayLength - 1].date).getTime()) / desiredlength;
+            : dbStatsDocuments.length;
+
+        //pick every n-th element to get normal scale of data
+        const timeBetweenTwoArrayElements = (new Date(dbStatsDocuments[0].date).getTime() - new Date(dbStatsDocuments[arrayLength - 1].date).getTime()) / arrayLength;
+        const timeBetweenTwoOutputElements = (new Date(dbStatsDocuments[0].date).getTime() - new Date(dbStatsDocuments[arrayLength - 1].date).getTime()) / desiredlength;
         const offset = Math.floor(timeBetweenTwoOutputElements / timeBetweenTwoArrayElements);
-        const reducedArray = lastReserveData.filter((e, i) => i % offset === 0);
+        const reducedArray = dbStatsDocuments.filter((e, i) => i % offset === 0);
        
         let result = [];
         reducedArray.forEach(document => {
-            result.push({ timstamp: new Date(document.date).getTime(), tvl: document.allTokensStats.usdTotalLocked });
+            result.push({ timestamp: new Date(document.date).getTime(), tvl: document.allTokensStats.usdTotalLocked });
         });
-        // result.push(lastReserveData.allTokensStats);
         return result;
     }
 
