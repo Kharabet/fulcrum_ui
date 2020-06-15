@@ -190,7 +190,7 @@ export class OwnTokenCardMobile extends Component<IOwnTokenGridRowProps, IOwnTok
                   <span className="own-token-card-mobile__body-header">Collateral</span>
                   <div className="own-token-card-mobile__col-collateral-wrapper">
                     <span className="own-token-card-mobile__value"><span className="sign-currency">$</span>{this.props.collateral.toFixed(2)}</span>
-                    <span className="own-token-card-mobile__col-asset-collateral-small">{this.props.loan.collateralizedPercent.multipliedBy(100).plus(100).toFixed(2)}%</span>
+                    <span className={`own-token-card-mobile__col-asset-collateral-small ${this.props.loan.collateralizedPercent.lte(.25) ? "danger" : ""}`}>{this.props.loan.collateralizedPercent.multipliedBy(100).plus(100).toFixed(2)}%</span>
                   </div>
                   <div className="own-token-card-mobile__open-manage-collateral" onClick={this.onManageClick}>
                     <OpenManageCollateral />

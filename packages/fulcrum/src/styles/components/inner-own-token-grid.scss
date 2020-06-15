@@ -50,7 +50,7 @@ $padding: 22px 40px 35px 40px;
     margin-bottom: -15px;
     position: relative;
     z-index: 2;
-    .opacity{
+    .opacity {
       opacity: 0;
     }
     &__col-token-image {
@@ -181,8 +181,10 @@ $padding: 22px 40px 35px 40px;
       font-size: 12px;
       font-weight: 700;
       text-indent: 13px;
-      //color: #ff4f4f;
       top: 100%;
+      &.danger {
+        color: #ff4f4f;
+      }
     }
     &__open-manage-collateral {
       background-color: var(--bg-icon-collateral);
@@ -245,7 +247,7 @@ $padding: 22px 40px 35px 40px;
         background-color: #fe7272;
       }
     }
-    &.new-position:first-child{
+    &.new-position:first-child {
       animation: opacityIn 1s cubic-bezier(1, 1, 1, 1);
     }
   }
