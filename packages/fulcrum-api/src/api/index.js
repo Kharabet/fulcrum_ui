@@ -79,7 +79,7 @@ export default ({ config, logger }) => {
 		res.json({ data: usdRates, success: true});
 	});
 
-	api.get('/get-tvl-history', [
+	api.get('/tvl-history', [
 		query('start_date').isInt({ gt: 0 }),
 		query('end_date').isInt({ lt: new Date().getTime() }),
 		query('points_number').isInt({ gt: 0 })
@@ -95,9 +95,7 @@ export default ({ config, logger }) => {
 		const usdRates = await fulcrum.getHistoryTVL(startDate, endDate, pointsNumber);
 		res.json({ data: usdRates, success: true});
 	});
-//1589622718628
-//1592214746084
-//http://localhost:8080/v1/get-tvl-history?start_date=1589622718628&end_date=1592214746084&points_number=30
+	
 	api.get('/borrow-deposit-estimate', [
 		query('borrow_asset').isIn(iTokens.map(token => token.name)),
 		query('borrow_asset').isIn(iTokens.map(token => token.name)),
