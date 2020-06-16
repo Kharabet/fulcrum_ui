@@ -86,14 +86,33 @@ export default ({ config, logger }) => {
 	], async (req, res) => {
 		const errors = validationResult(req);
 		if (!errors.isEmpty()) {
-			return res.status(422).json({ errors: errors.array() });
+			return res.status(422).json({ errors: errors.array(), success: false });
 		}
 		let startDate = new Date(parseInt(req.query.start_date));
 		let endDate = new Date(parseInt(req.query.end_date));
 		let pointsNumber = parseInt(req.query.points_number);
 
-		const usdRates = await fulcrum.getHistoryTVL(startDate, endDate, pointsNumber);
-		res.json({ data: usdRates, success: true});
+		const tvlHistory = await fulcrum.getHistoryTVL(startDate, endDate, pointsNumber);
+		res.json({ data: tvlHistory, success: true});
+	});
+	
+	api.get('/supply-apr-history', [
+		query('asset').isIn(iTokens.map(token => token.name)),
+		query('start_date').isInt({ gt: 0 }),
+		query('end_date').isInt({ lt: new Date().getTime() }),
+		query('points_number').isInt({ gt: 0 })
+	], async (req, res) => {
+		const errors = validationResult(req);
+		if (!errors.isEmpty()) {
+			return res.status(422).json({ errors: errors.array(), success: false });
+		}
+		let asset = req.query.asset;
+		let startDate = new Date(parseInt(req.query.start_date));
+		let endDate = new Date(parseInt(req.query.end_date));
+		let pointsNumber = parseInt(req.query.points_number);
+
+		const aprHistory = await fulcrum.getSupplyAprHistory(asset, startDate, endDate, pointsNumber);
+		res.json({ data: aprHistory, success: true});
 	});
 	
 	api.get('/borrow-deposit-estimate', [
@@ -103,7 +122,7 @@ export default ({ config, logger }) => {
 	], async (req, res) => {
 		const errors = validationResult(req);
 		if (!errors.isEmpty()) {
-			return res.status(422).json({ errors: errors.array() });
+			return res.status(422).json({ errors: errors.array(), success: false });
 		}
 		let borrowAsset = req.query.borrow_asset;
 		let collateralAsset = req.query.collateral_asset;
