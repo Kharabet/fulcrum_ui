@@ -317,7 +317,7 @@ export default class Fulcrum {
         return result;
     }
 
-    async  getSupplyAprHistory(asset, startDate, endDate, estimatedPointsNumber) {
+    async  getAssetStatsHistory(asset, startDate, endDate, estimatedPointsNumber, metrics) {
         const dbStatsDocuments = await statsModel.find({
             "date": {
                 $lt: endDate,
@@ -338,7 +338,15 @@ export default class Fulcrum {
        
         let result = [];
         reducedArray.forEach(document => {
-            result.push({ timestamp: new Date(document.date).getTime(), tvl: document.tokensStats.find(e => e.token === asset).supplyInterestRate });
+            const assetStats = document.tokensStats.find(e => e.token === asset); 
+            result.push({ 
+                timestamp: new Date(document.date).getTime(), 
+                token: assetStats.token, 
+                supplyInterestRate: assetStats.supplyInterestRate, 
+                tvl: assetStats.vaultBalance, 
+                tvlUsd: assetStats.usdTotalLocked,
+                utilization: assetStats.totalBorrow/assetStats.totalSupply*100, 
+            });
         });
         return result;
     }

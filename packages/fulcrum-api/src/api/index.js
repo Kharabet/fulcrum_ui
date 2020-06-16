@@ -96,7 +96,7 @@ export default ({ config, logger }) => {
 		res.json({ data: tvlHistory, success: true});
 	});
 	
-	api.get('/supply-apr-history', [
+	api.get('/asset-stats-history', [
 		query('asset').isIn(iTokens.map(token => token.name)),
 		query('start_date').isInt({ gt: 0 }),
 		query('end_date').isInt({ lt: new Date().getTime() }),
@@ -111,7 +111,7 @@ export default ({ config, logger }) => {
 		let endDate = new Date(parseInt(req.query.end_date));
 		let pointsNumber = parseInt(req.query.points_number);
 
-		const aprHistory = await fulcrum.getSupplyAprHistory(asset, startDate, endDate, pointsNumber);
+		const aprHistory = await fulcrum.getAssetStatsHistory(asset, startDate, endDate, pointsNumber);
 		res.json({ data: aprHistory, success: true});
 	});
 	
