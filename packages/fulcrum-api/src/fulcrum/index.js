@@ -317,6 +317,40 @@ export default class Fulcrum {
         return result;
     }
 
+    async  getAssetStatsHistory(asset, startDate, endDate, estimatedPointsNumber, metrics) {
+        const dbStatsDocuments = await statsModel.find({
+            "date": {
+                $lt: endDate,
+                $gte: startDate
+            }
+
+        }).sort({date : 1}).select({ date: 1, tokensStats: 1})
+        const arrayLength = dbStatsDocuments.length;
+        const desiredlength = dbStatsDocuments.length > estimatedPointsNumber
+            ? estimatedPointsNumber - 1
+            : dbStatsDocuments.length;
+
+        //pick every n-th element to get normal scale of data
+        const timeBetweenTwoArrayElements = (new Date(dbStatsDocuments[0].date).getTime() - new Date(dbStatsDocuments[arrayLength - 1].date).getTime()) / arrayLength;
+        const timeBetweenTwoOutputElements = (new Date(dbStatsDocuments[0].date).getTime() - new Date(dbStatsDocuments[arrayLength - 1].date).getTime()) / desiredlength;
+        const offset = Math.floor(timeBetweenTwoOutputElements / timeBetweenTwoArrayElements);
+        const reducedArray = dbStatsDocuments.filter((e, i) => i % offset === 0);
+       
+        let result = [];
+        reducedArray.forEach(document => {
+            const assetStats = document.tokensStats.find(e => e.token === asset); 
+            result.push({ 
+                timestamp: new Date(document.date).getTime(), 
+                token: assetStats.token, 
+                supplyInterestRate: assetStats.supplyInterestRate, 
+                tvl: assetStats.vaultBalance, 
+                tvlUsd: assetStats.usdTotalLocked,
+                utilization: assetStats.totalBorrow/assetStats.totalSupply*100, 
+            });
+        });
+        return result;
+    }
+
     async updateReservedData() {
         var result = [];
         var tokenAddresses = iTokens.map(x => (x.address));
