@@ -81,7 +81,7 @@ export default ({ config, logger }) => {
 
 	api.get('/tvl-history', [
 		query('start_date').isInt({ gt: 0 }),
-		query('end_date').isInt({ lt: new Date().getTime() }),
+		query('end_date').isInt({ lte: new Date().setDate(new Date().getDate() + 1) }),
 		query('points_number').isInt({ gt: 0 })
 	], async (req, res) => {
 		const errors = validationResult(req);
@@ -99,7 +99,7 @@ export default ({ config, logger }) => {
 	api.get('/asset-stats-history', [
 		query('asset').isIn(iTokens.map(token => token.name)),
 		query('start_date').isInt({ gt: 0 }),
-		query('end_date').isInt({ lt: new Date().getTime() }),
+		query('end_date').isInt({ lte: new Date().setDate(new Date().getDate() + 1) }),
 		query('points_number').isInt({ gt: 0 })
 	], async (req, res) => {
 		const errors = validationResult(req);
