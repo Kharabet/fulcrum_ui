@@ -200,7 +200,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
           }
         </div>
         <div className="trade-token-grid-row__col-action">
-          <button className="trade-token-grid-row__button trade-token-grid-row__buy-button trade-token-grid-row__button--size-half" disabled={siteConfig.TradeBuyDisabled} onClick={this.onBuyClick}>
+          <button className="trade-token-grid-row__button trade-token-grid-row__buy-button trade-token-grid-row__button--size-half" disabled={siteConfig.TradeBuyDisabled||this.state.isLoadingTransaction} onClick={this.onBuyClick}>
             {TradeType.BUY}
           </button>
         </div>
