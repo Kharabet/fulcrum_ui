@@ -78,7 +78,6 @@ export const DropdownSelect = (props: IDropdownSelectProps) => {
       <ul className="select-options">
         <SimpleBar style={{ maxHeight: 480 }} autoHide={false}>
           {props.options.map((option, i) =>
-            option != props.selectedOption &&
             (<li data-tradeasset={option.tradeAsset}
               data-unitofaccount={option.unitOfAccount}
               data-index={i}

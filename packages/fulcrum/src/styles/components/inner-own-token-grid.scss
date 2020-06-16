@@ -42,7 +42,10 @@ $padding: 22px 40px 35px 40px;
 }
 .inner-own-token-grid {
   .inner-own-token-grid-header {
-    display: flex;
+    display: grid;
+    grid-template-columns: 10% 10% 8% 11% 10% 10% 9% 10%;
+    column-gap: 35px;
+    justify-content: space-between;
     flex-wrap: wrap;
     padding: 17px 40px 0px 40px;
     font-family: "Muli", sans-serif;
@@ -50,51 +53,54 @@ $padding: 22px 40px 35px 40px;
     margin-bottom: -15px;
     position: relative;
     z-index: 2;
-    .opacity{
+    .opacity {
       opacity: 0;
     }
     &__col-token-image {
       @include inner-own-token-grid-header__col();
-      width: $width-col-token-image;
+      // width: $width-col-token-image;
     }
     &__col-asset-type {
       @include inner-own-token-grid-header__col();
-      width: $width-col-asset-type;
+      // width: $width-col-asset-type;
     }
     &__col-asset-price {
       @include inner-own-token-grid-header__col();
-      width: $width-col-asset-price;
+      //width: $width-col-asset-price;
     }
     &__col-asset-value {
       @include inner-own-token-grid-header__col();
-      width: $width-col-asset-value;
+      //width: $width-col-asset-value;
     }
     &__col-asset-collateral {
       @include inner-own-token-grid-header__col();
-      width: $width-col-asset-collateral;
+      //width: $width-col-asset-collateral;
     }
     &__col-liquidation-price {
       @include inner-own-token-grid-header__col();
-      width: $width-col-liquidation-price;
+      ////width: $width-col-liquidation-price;
     }
     &__col-position-value {
       @include inner-own-token-grid-header__col();
-      width: $width-col-position-value;
+      //width: $width-col-position-value;
     }
     &__col-profit {
       @include inner-own-token-grid-header__col();
-      width: $width-col-profit;
+      //width: $width-col-profit;
     }
     &__col-actions {
       @include inner-own-token-grid-header__col();
-      width: $width-col-actions;
+      //width: $width-col-actions;
       text-align: right;
     }
   }
 
   .inner-own-token-grid-row,
   .inner-own-token-card-mobile {
-    display: flex;
+    display: grid;
+    grid-template-columns: 10% 10% 8% 11% 10% 10% 9% 10%;
+    column-gap: 35px;
+    justify-content: space-between;
     flex-wrap: wrap;
     align-items: center;
     background-color: var(--secondary-row);
@@ -120,18 +126,19 @@ $padding: 22px 40px 35px 40px;
     }
     &__col-token-name-full {
       @include inner-own-token-grid-row__col();
-      width: $width-col-token-name-full;
+      //width: $width-col-token-name-full;
       @media screen and (max-width: $breakpoint-mobile-max) {
         margin-bottom: 25px;
       }
     }
     &__col-position-type {
       @include inner-own-token-grid-row__col();
-      width: $width-col-position-type;
+      //width: $width-col-position-type;
     }
     &__col-asset-price {
       @include inner-own-token-grid-row__col();
-      width: $width-col-asset-price;
+      //width: $width-col-asset-price;
+      justify-content: flex-end;
       position: relative;
       @media screen and (max-width: $breakpoint-mobile-max) {
         margin-bottom: 35px;
@@ -150,28 +157,33 @@ $padding: 22px 40px 35px 40px;
     }
     &__col-asset-value {
       @include inner-own-token-grid-row__col();
-      width: $width-col-asset-value;
+      //width: $width-col-asset-value;
+      justify-content: flex-end;
     }
     &__col-asset-type {
       @include inner-own-token-grid-row__col();
-      width: $width-col-asset-type;
+      //width: $width-col-asset-type;
+      // justify-content: flex-end;
       @media screen and (max-width: $breakpoint-mobile-max) {
         margin-bottom: 25px;
       }
     }
     &__col-liquidation-price {
       @include inner-own-token-grid-row__col();
-      width: $width-col-liquidation-price;
+      //width: $width-col-liquidation-price;
+      justify-content: flex-end;
     }
     &__col-position-value {
       @include inner-own-token-grid-row__col();
-      width: $width-col-position-value;
+     /// width: $width-col-position-value;
+      justify-content: flex-end;
     }
     &__col-asset-collateral {
       @include inner-own-token-grid-row__col();
       align-items: center;
       position: relative;
-      width: $width-col-asset-collateral;
+     // width: $width-col-asset-collateral;
+      justify-content: flex-end;
       @media screen and (max-width: $breakpoint-mobile-max) {
         margin-bottom: 35px;
       }
@@ -181,8 +193,10 @@ $padding: 22px 40px 35px 40px;
       font-size: 12px;
       font-weight: 700;
       text-indent: 13px;
-      //color: #ff4f4f;
       top: 100%;
+      &.danger {
+        color: #ff4f4f;
+      }
     }
     &__open-manage-collateral {
       background-color: var(--bg-icon-collateral);
@@ -202,13 +216,15 @@ $padding: 22px 40px 35px 40px;
     }
     &__col-profit {
       @include inner-own-token-grid-row__col();
-      width: $width-col-profit;
+      //width: $width-col-profit;
+      justify-content: flex-end;
     }
     &__col-action {
       @include inner-own-token-grid-row__col();
       display: flex;
       justify-content: flex-end;
-      width: $width-col-actions;
+      //width: $width-col-actions;
+      justify-content: flex-end;
       @media screen and (max-width: $breakpoint-mobile-max) {
         margin-bottom: 25px;
       }
@@ -245,7 +261,7 @@ $padding: 22px 40px 35px 40px;
         background-color: #fe7272;
       }
     }
-    &.new-position:first-child{
+    &.new-position:first-child {
       animation: opacityIn 1s cubic-bezier(1, 1, 1, 1);
     }
   }
