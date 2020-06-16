@@ -27,6 +27,10 @@
     {
       "name": "iTokens Prices",
       "description": "iTokens Prices"
+    },
+    {
+      "name": "History Data",
+      "description": "Data for building charts, history metrics etc."
     }
   ],
   "schemes": [
@@ -256,6 +260,99 @@
         ],
         "summary": "Get iToken prices",
         "description": "",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/tvl-history": {
+      "get": {
+        "tags": [
+          "History Data"
+        ],
+        "summary": "Get tvl history data",
+        "description": "",
+        "parameters": [
+          {
+            "name": "start_date",
+            "in": "query",
+            "required": "true",
+            "type": "integer",
+            "description": "Start Date (timestamp)"
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "required": "true",
+            "type": "integer",
+            "description": "End Date (timestamp)"
+          },
+          {
+            "name": "points_number",
+            "in": "query",
+            "required": "true",
+            "type": "integer",
+            "description": "number of desired datapoints output"
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/asset-stats-history": {
+      "get": {
+        "tags": [
+          "History Data"
+        ],
+        "summary": "Get history data for the asset (tvl, apr, utilization)",
+        "description": "",
+        "parameters": [
+          {
+            "name": "asset",
+            "in": "query",
+            "required": "true",
+            "type": "string",
+            "description": "Asset"
+          },
+          {
+            "name": "start_date",
+            "in": "query",
+            "required": "true",
+            "type": "integer",
+            "description": "Start Date (timestamp)"
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "required": "true",
+            "type": "integer",
+            "description": "End Date (timestamp)"
+          },
+          {
+            "name": "points_number",
+            "in": "query",
+            "required": "true",
+            "type": "integer",
+            "description": "number of desired datapoints output"
+          }
+        ],
         "consumes": [
           "application/json"
         ],
