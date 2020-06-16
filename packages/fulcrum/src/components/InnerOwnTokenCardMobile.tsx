@@ -163,7 +163,7 @@ export class InnerOwnTokenCardMobile extends Component<IOwnTokenGridRowProps, II
                 <span className="inner-own-token-header">Collateral</span>
                 <React.Fragment>
                   <span className="sign-currency">$</span>{this.props.collateral.toFixed(2)}
-                  <span className="inner-own-token-card-mobile__col-asset-collateral-small">{this.props.loan.collateralizedPercent.multipliedBy(100).plus(100).toFixed(2)}%</span>
+                  <span className={`inner-own-token-card-mobile__col-asset-collateral-small ${this.props.loan.collateralizedPercent.lte(.25) ? "danger" : ""}`}>{this.props.loan.collateralizedPercent.multipliedBy(100).plus(100).toFixed(2)}%</span>
                 </React.Fragment>
                 <div className="inner-own-token-card-mobile__open-manage-collateral" onClick={this.onManageClick}>
                   <OpenManageCollateral />
