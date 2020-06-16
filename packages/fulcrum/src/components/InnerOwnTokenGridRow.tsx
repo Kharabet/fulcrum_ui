@@ -174,7 +174,7 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
                 {!this.state.isLoading
                   ? <React.Fragment>
                     <span className="sign-currency">$</span>{this.props.collateral.toFixed(2)}
-                    <span className="inner-own-token-grid-row__col-asset-collateral-small">{this.props.loan.collateralizedPercent.multipliedBy(100).plus(100).toFixed(2)}%</span>
+                    <span className={`inner-own-token-grid-row__col-asset-collateral-small ${this.props.loan.collateralizedPercent.lte(.25) ? "danger" : ""}`}>{this.props.loan.collateralizedPercent.multipliedBy(100).plus(100).toFixed(2)}%</span>
                   </React.Fragment>
                   : <Preloader width="74px" />
                 }

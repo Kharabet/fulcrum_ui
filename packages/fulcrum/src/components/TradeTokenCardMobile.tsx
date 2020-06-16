@@ -112,7 +112,7 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
     this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, false, true);
   }
   private onAskToCloseProgressDlg = (task: RequestTask) => {
-    if (!this.state.request || task.request.loanId !== this.state.request.loanId) return;
+    if (!this.state.request || task.request.id !== this.state.request.id) return;
     if (task.status === RequestStatus.FAILED || task.status === RequestStatus.FAILED_SKIPGAS) {
       window.setTimeout(() => {
         FulcrumProvider.Instance.onTaskCancel(task);

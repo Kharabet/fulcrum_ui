@@ -43,6 +43,7 @@ interface IManageCollateralFormState {
   gasAmountNeeded: BigNumber;
   collateralizedPercent: BigNumber;
   balanceTooLow: boolean;
+  collateralTooLow: boolean;
 
   inputAmountText: string;
 
@@ -73,6 +74,7 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
       collateralExcess: new BigNumber(0),
       collateralizedPercent: new BigNumber(0),
       balanceTooLow: false,
+      collateralTooLow: false,
       inputAmountText: "",
       didSubmit: false,
       isLoading: true
@@ -101,6 +103,7 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
           ...this.state,
           collateralAmount: next!.collateralAmount,
           collateralizedPercent: next!.collateralizedPercent,
+          collateralTooLow: next!.collateralizedPercent.lt(125),
           inputAmountText: this.formatPrecision(next!.collateralAmount.toString())
         });
 
@@ -255,7 +258,8 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
 
           <div className="manage-collateral-form__title">Manage Collateral</div>
           <div className="manage-collateral-form__text">Your position is collateralized</div>
-          <div className="manage-collateral-form__collaterized"><span>{this.state.collateralizedPercent.toFixed(2)}</span>%</div>
+          <div className="manage-collateral-form__collaterized">
+            <span className={`${this.state.collateralTooLow && `text-danger`}`}>{this.state.collateralizedPercent.toFixed(2)}</span>%</div>
 
           <Slider
             step={0.01}

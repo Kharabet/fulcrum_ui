@@ -128,6 +128,9 @@ $width-col-actions: 10%;
       font-weight: 700;
       text-indent: 13px;
       top: 100%;
+      &.danger {
+        color: #ff4f4f;
+      }
     }
     &__open-manage-collateral {
       background-color: var(--bg-icon-collateral);
