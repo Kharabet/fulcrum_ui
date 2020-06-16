@@ -57,6 +57,9 @@
       font-weight: 800;
       color: #ffffff;
       margin-right: 1px;
+      &.text-danger{
+        color:#FF4F4F;
+      }
     }
   }
   &__tips {
@@ -233,6 +236,7 @@
       margin-left: 2px;
     }
   }
+ 
 
   @media screen and (max-width: $mobile-version-max-width) {
     width: 310px;
@@ -252,7 +256,7 @@
 
     &__collaterized {
       font-size: 26px;
-      line-height: 39px;
+      line-height: 39px;     
     }
     &__tips {
       margin-bottom: 22px;
