@@ -371,6 +371,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
               inputAmountText={this.state.inputAmountText}
               selectorAssets={[this.props.tradeAsset, this.props.quoteAsset]}
               isLoading={false}
+              tradeType={this.props.tradeType}
               selectedAsset={this.state.collateral}
               onInsertMaxValue={this.onInsertMaxValue}
               onTradeAmountChange={this.onTradeAmountChange}
