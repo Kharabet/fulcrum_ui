@@ -39,6 +39,8 @@ import { ProviderTypeDictionary } from "../domain/ProviderTypeDictionary";
 import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
 import { TradeEvent } from "../domain/TradeEvent";
 import Web3, { providers } from "web3";
+import { CloseWithSwapEvent } from "../domain/CloseWithSwapEvent";
+import { LiquidationEvent } from "../domain/LiquidationEvent";
 
 const getNetworkIdByString = (networkName: string | undefined) => {
   switch (networkName) {
@@ -1767,9 +1769,112 @@ export class FulcrumProvider {
         timeStamp,
         txHash
       )
-      //@ts-ignore
-      // const params = web3.eth.abi.decodeParameters(["address", "bytes32", "uint256","uint256","uint256","uint256","uint256","uint256","uint256"], event.data);
-      // const lender = params.0;
+
+    })
+    return result
+
+  }
+
+  public getCloseWithSwapHistory = async (): Promise<CloseWithSwapEvent[]> => {
+    let result: CloseWithSwapEvent[] = [];
+    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : undefined;
+
+    if (!this.contractsSource) return result;
+    const bzxContractAddress = this.contractsSource.getiBZxAddress()
+    if (!account || !bzxContractAddress) return result
+    const etherscanApiKey = configProviders.Etherscan_Api;
+    let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${CloseWithSwapEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
+    const tradeEventResponse = await fetch(etherscanApiUrl);
+    const tradeEventResponseJson = await tradeEventResponse.json();
+    if (tradeEventResponseJson.status !== "1") return result;
+    const events = tradeEventResponseJson.result;
+    //@ts-ignore
+    result = events.reverse().map(event => {
+      const userAddress = event.topics[1].replace("0x000000000000000000000000", "0x");
+      const baseTokenAddress = event.topics[2].replace("0x000000000000000000000000", "0x");
+      const quoteTokenAddress = event.topics[3].replace("0x000000000000000000000000", "0x");
+      const baseToken = this.contractsSource!.getAssetFromAddress(baseTokenAddress);
+      const quoteToken = this.contractsSource!.getAssetFromAddress(quoteTokenAddress);
+      const data = event.data.replace("0x", "");
+      const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
+      if (!dataSegments) return result;
+      const lender = dataSegments[0].replace("000000000000000000000000", "0x");
+      const closer = dataSegments[1].replace("000000000000000000000000", "0x");
+      const loandId = dataSegments[2];
+      const positionCloseSize = new BigNumber(parseInt(dataSegments[3], 16));
+      const loanCloseAmount = new BigNumber(parseInt(dataSegments[4], 16));
+      const exitPrice = new BigNumber(parseInt(dataSegments[5], 16));
+      const currentLeverage = new BigNumber(parseInt(dataSegments[6], 16));
+      const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000);
+      const txHash = event.transactionHash;
+      return new CloseWithSwapEvent(
+        userAddress,
+        baseToken,
+        quoteToken,
+        lender,
+        closer,
+        loandId,
+        positionCloseSize,
+        loanCloseAmount,
+        exitPrice,
+        currentLeverage,
+        timeStamp,
+        txHash
+      )
+
+    })
+    return result
+
+  }
+
+
+  public getLiquidationHistory = async (): Promise<LiquidationEvent[]> => {
+    let result: LiquidationEvent[] = [];
+    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : undefined;
+
+    if (!this.contractsSource) return result;
+    const bzxContractAddress = this.contractsSource.getiBZxAddress()
+    if (!account || !bzxContractAddress) return result
+    const etherscanApiKey = configProviders.Etherscan_Api;
+    let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${LiquidationEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
+    const tradeEventResponse = await fetch(etherscanApiUrl);
+    const tradeEventResponseJson = await tradeEventResponse.json();
+    if (tradeEventResponseJson.status !== "1") return result;
+    const events = tradeEventResponseJson.result;
+    //@ts-ignore
+    result = events.reverse().map(event => {
+      const userAddress = event.topics[1].replace("0x000000000000000000000000", "0x");
+      const liquidatorAddress = event.topics[2].replace("0x000000000000000000000000", "0x");
+      const loanId = event.topics[3];
+      const data = event.data.replace("0x", "");
+      const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
+      if (!dataSegments) return result;
+      const lender = dataSegments[0].replace("000000000000000000000000", "0x");
+      
+      const baseTokenAddress = dataSegments[1].replace("0x000000000000000000000000", "0x");
+      const quoteTokenAddress = dataSegments[2].replace("0x000000000000000000000000", "0x");
+      const baseToken = this.contractsSource!.getAssetFromAddress(baseTokenAddress);
+      const quoteToken = this.contractsSource!.getAssetFromAddress(quoteTokenAddress);
+      const repayAmount = new BigNumber(parseInt(dataSegments[3], 16));
+      const collateralWithdrawAmount = new BigNumber(parseInt(dataSegments[4], 16));
+      const collateralToLoanRate = new BigNumber(parseInt(dataSegments[5], 16));
+      const currentMargin = new BigNumber(parseInt(dataSegments[6], 16));
+      const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000);
+      const txHash = event.transactionHash;
+      return new LiquidationEvent(
+        userAddress,
+        liquidatorAddress,
+        loanId,
+        lender,
+        baseToken,
+        quoteToken,
+        repayAmount,
+        collateralWithdrawAmount,
+        collateralToLoanRate,
+        currentMargin,
+        timeStamp,
+        txHash
+      )
 
     })
     return result
