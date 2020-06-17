@@ -1,0 +1,30 @@
+header {
+  padding: 60px 0;
+  a {
+    &.logo{
+      display: flex;
+    }
+    &.item-menu {
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 18px;
+      color: $primary-color;
+      &:not(:last-child) {
+        margin-right: 40px;
+      }
+      &.active {
+        position: relative;
+        &:before {
+          content: "";
+          position: absolute;
+          width: calc(100% + 8px);
+          left: -4px;
+          height: 4px;
+          top: -67px;
+          border-radius: 0 0 4px 4px;
+          background-color: $primary-color;
+        }
+      }
+    }
+  }
+}

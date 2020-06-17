@@ -1,0 +1,91 @@
+.table {
+  margin-top: 90px;
+
+  .table-row,
+  .table-header {
+    display: flex;
+    font-weight: 200;
+    font-size: 14px;
+    line-height: 1.8;
+    a {
+      color: $primary-color;
+    }
+    &__hash {
+      width: 20%;
+      padding-left: 30px;
+    }
+    &__age {
+      cursor: pointer;
+    }
+    &__age,
+    &__action {
+      width: 15%;
+      padding-left: 30px;
+    }
+    &__from,
+    &__quantity {
+      width: 25%;
+      padding-left: 30px;
+    }
+    .rotate-icon {
+      transform: rotate(180deg);
+    }
+  }
+  .table-row {
+    padding-top: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e7ebf0;
+    &:hover {
+      cursor: pointer;
+      background-color: #f5f7f9;
+    }
+    &__from {
+      display: flex;
+      align-items: center;
+      span {
+        margin-left: 10px;
+      }
+    }
+  }
+  .table-header {
+    padding-top: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #cbe2ff;
+    &__age {
+      display: flex;
+      align-items: center;
+      .icon-sort {
+        display: flex;
+        flex-direction: column;
+        &.down {
+          > div {
+            &:nth-child(1) {
+              width: 9px;
+            }
+            &:nth-child(3) {
+              width: 3px;
+            }
+          }
+        }
+        > div {
+          height: 2px;
+          margin-bottom: 2px;
+          background-color: $primary-color;
+          &:nth-child(1) {
+            width: 3px;
+          }
+          &:nth-child(2) {
+            width: 6px;
+          }
+          &:nth-child(3) {
+            width: 9px;
+          }
+        }
+      }
+      span {
+        color: $primary-color;
+        margin-right: 8px;
+      }
+    }
+  }
+}
