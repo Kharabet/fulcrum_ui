@@ -38,7 +38,7 @@ import siteConfig from "./../config/SiteConfig.json";
 import { ProviderTypeDictionary } from "../domain/ProviderTypeDictionary";
 import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
 import { TradeEvent } from "../domain/TradeEvent";
-import Web3 from "web3";
+import Web3, { providers } from "web3";
 
 const getNetworkIdByString = (networkName: string | undefined) => {
   switch (networkName) {
@@ -1724,8 +1724,7 @@ export class FulcrumProvider {
     if (!this.contractsSource) return result;
     const bzxContractAddress = this.contractsSource.getiBZxAddress()
     if (!account || !bzxContractAddress) return result
-    //https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=0x65Bb7cb3e15684270F1CF64c85c5A8B835f4C201&topic0=0xafa6452c53d4537ba2992dec6b9cad9a2fe82db672005ea589963f9f0b3de052&topic1=0x000000000000000000000000af9E002A4e71f886E1082c40322181f022d338d8&apikey=IEQRXJKW79SRVUTCCJX6P5ZAIFTJTQ1SEM
-    const etherscanApiKey = "X85FQ7Y6FEZGSUTMKVGATUK5SKFCE76EYA"
+    const etherscanApiKey = configProviders.Etherscan_Api;
     let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${TradeEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
     const tradeEventResponse = await fetch(etherscanApiUrl);
     const tradeEventResponseJson = await tradeEventResponse.json();
