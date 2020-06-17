@@ -25,9 +25,9 @@ export class HistoryTokenGridHeader extends Component<IHistoryTokenGridHeaderPro
         <div className="history-token-grid-header__col-asset-price">
           <span className="history-token-grid-header__text">Open Price</span>
         </div>
-        <div className="history-token-grid-header__col-liquidation-price">
+        {/* <div className="history-token-grid-header__col-liquidation-price">
           <span className="history-token-grid-header__text">Liq. Price</span>
-        </div>
+        </div> */}
         <div className="history-token-grid-header__col-position-value">
           <span className="history-token-grid-header__text">Value</span>
         </div>

@@ -21,6 +21,9 @@ import { IOwnTokenGridRowProps } from "../components/OwnTokenGridRow";
 import "../styles/pages/_trade-page.scss";
 import { BigNumber } from "@0x/utils";
 import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
+import { IHistoryTokenGridProps } from "../components/HistoryTokenGrid";
+import { TradeEvent } from "../domain/TradeEvent";
+import { IHistoryTokenGridRowProps } from "../components/HistoryTokenGridRow";
 
 const ManageTokenGrid = React.lazy(() => import('../components/ManageTokenGrid'));
 const TradeForm = React.lazy(() => import('../components/TradeForm'));
@@ -53,6 +56,7 @@ interface ITradePageState {
   openedPositionsCount: number;
   tokenRowsData: ITradeTokenGridRowProps[];
   ownRowsData: IOwnTokenGridRowProps[];
+  historyRowsData: IHistoryTokenGridRowProps[];
   tradeRequestId: number;
   isLoadingTransaction: boolean;
   request: TradeRequest | undefined,
@@ -112,6 +116,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       openedPositionsCount: 0,
       tokenRowsData: [],
       ownRowsData: [],
+      historyRowsData: [],
       tradeRequestId: 0,
       isLoadingTransaction: false,
       resultTx: true,
@@ -157,7 +162,8 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
   private async derivedUpdate() {
     const tokenRowsData = this.getTokenRowsData(this.state);
     const ownRowsData = await this.getOwnRowsData(this.state);
-    await this.setState({ ...this.state, ownRowsData: ownRowsData, tokenRowsData: tokenRowsData });
+    const historyRowsData = await this.getHistoryRowsData(this.state);
+    await this.setState({ ...this.state, ownRowsData: ownRowsData, tokenRowsData: tokenRowsData, historyRowsData });
   }
 
   public render() {
@@ -195,6 +201,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
             <ManageTokenGrid
               isMobileMedia={this.props.isMobileMedia}
               ownRowsData={this.state.ownRowsData}
+              historyRowsData={this.state.historyRowsData}
             />
           ) : (
               <React.Fragment>
@@ -445,6 +452,69 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     }
     this.setState({ ...this.state, openedPositionsCount: ownRowsData.length });
     return ownRowsData;
+  };
+  
+  public getHistoryRowsData = async (state: ITradePageState): Promise<IHistoryTokenGridRowProps[]> => {
+    const historyRowsData: IHistoryTokenGridRowProps[] = [];
+      const tradeEvents = await FulcrumProvider.Instance.getTradeHistory();
+      for (const tradeEvent of tradeEvents) {
+
+
+        const positionType = this.tradeAssets.includes(tradeEvent.baseToken)
+          ? PositionType.LONG
+          : PositionType.SHORT;
+
+        const tradeAsset = positionType === PositionType.LONG
+          ? tradeEvent.baseToken
+          : tradeEvent.quoteToken;
+
+        const quoteAsset = positionType === PositionType.LONG
+          ? tradeEvent.quoteToken
+          : tradeEvent.baseToken;
+
+        let leverage = new BigNumber(tradeEvent.entryLeverage.div(10 ** 18));
+        if (positionType === PositionType.LONG)
+          leverage = leverage.plus(1);
+
+
+        // const collateralToPrincipalRate = await FulcrumProvider.Instance.getSwapRate(loan.collateralAsset, loan.loanAsset);
+        let positionValue = tradeEvent.positionSize;
+        let collateral = new BigNumber(0);
+        let openPrice = tradeEvent.entryPrice;
+        let value = positionValue.times(openPrice);
+        let result = tradeEvent instanceof TradeEvent
+        ? "Opened"
+        : "Unknown";
+        
+        let profit = new BigNumber(0);
+        if (positionType === PositionType.LONG) {
+          positionValue = tradeEvent.positionSize.div(10 ** 18);
+          value = tradeEvent.positionSize.div(tradeEvent.entryPrice);
+          openPrice = new BigNumber(10 ** 36).div(tradeEvent.entryPrice).div(10 ** 18);
+        }
+        else {
+          positionValue = tradeEvent.positionSize.div(tradeEvent.entryPrice);
+          value = tradeEvent.positionSize.div(10**18);
+          openPrice = tradeEvent.entryPrice.div(10 ** 18);
+        }
+
+        historyRowsData.push({
+          loanId: tradeEvent.loanId,
+          baseAsset: tradeAsset,
+          quoteAsset: quoteAsset,
+          positionType,
+          leverage: leverage.toNumber(),
+          date: tradeEvent.timeStamp,
+          positionValue,
+          tradePrice: openPrice,
+          value,
+          profit,
+          result,
+          txHash: tradeEvent.txHash
+        });
+      }
+      this.setState({...this.state, historyRowsData})
+    return historyRowsData;
   };
 
   public getTokenRowsData = (state: ITradePageState): ITradeTokenGridRowProps[] => {

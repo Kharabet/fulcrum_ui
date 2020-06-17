@@ -37,6 +37,8 @@ import { AbstractConnector } from '@web3-react/abstract-connector';
 import siteConfig from "./../config/SiteConfig.json";
 import { ProviderTypeDictionary } from "../domain/ProviderTypeDictionary";
 import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
+import { TradeEvent } from "../domain/TradeEvent";
+import Web3 from "web3";
 
 const getNetworkIdByString = (networkName: string | undefined) => {
   switch (networkName) {
@@ -1715,6 +1717,66 @@ export class FulcrumProvider {
     return result;
   }
 
+  public getTradeHistory = async (): Promise<TradeEvent[]> => {
+    let result: TradeEvent[] = [];
+    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : undefined;
+
+    if (!this.contractsSource) return result;
+    const bzxContractAddress = this.contractsSource.getiBZxAddress()
+    if (!account || !bzxContractAddress) return result
+    //https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=0x65Bb7cb3e15684270F1CF64c85c5A8B835f4C201&topic0=0xafa6452c53d4537ba2992dec6b9cad9a2fe82db672005ea589963f9f0b3de052&topic1=0x000000000000000000000000af9E002A4e71f886E1082c40322181f022d338d8&apikey=IEQRXJKW79SRVUTCCJX6P5ZAIFTJTQ1SEM
+    const etherscanApiKey = "X85FQ7Y6FEZGSUTMKVGATUK5SKFCE76EYA"
+    let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${TradeEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
+    const tradeEventResponse = await fetch(etherscanApiUrl);
+    const tradeEventResponseJson = await tradeEventResponse.json();
+    if (tradeEventResponseJson.status !== "1") return result;
+    const events = tradeEventResponseJson.result;
+    //@ts-ignore
+    result = events.reverse().map(event => {
+      const userAddress = event.topics[1].replace("0x000000000000000000000000", "0x");
+      const baseTokenAddress = event.topics[2].replace("0x000000000000000000000000", "0x");
+      const quoteTokenAddress = event.topics[3].replace("0x000000000000000000000000", "0x");
+      const baseToken = this.contractsSource!.getAssetFromAddress(baseTokenAddress);
+      const quoteToken = this.contractsSource!.getAssetFromAddress(quoteTokenAddress);
+      const data = event.data.replace("0x", "");
+      const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
+      if (!dataSegments) return result;
+      const lender = dataSegments[0].replace("000000000000000000000000", "0x");
+      const loandId = dataSegments[1];
+      const positionSize = new BigNumber(parseInt(dataSegments[2], 16));
+      const borrowedAmount = new BigNumber(parseInt(dataSegments[3], 16));
+      const interestRate = new BigNumber(parseInt(dataSegments[4], 16));
+      const settlementDate = new Date(parseInt(dataSegments[5], 16) * 1000);
+      const entryPrice = new BigNumber(parseInt(dataSegments[6], 16));
+      const entryLeverage = new BigNumber(parseInt(dataSegments[7], 16));
+      const currentLeverage = new BigNumber(parseInt(dataSegments[8], 16));
+      const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000);
+      const txHash = event.transactionHash;
+      return new TradeEvent(
+        userAddress,
+        baseToken,
+        quoteToken,
+        lender,
+        loandId,
+        positionSize,
+        borrowedAmount,
+        interestRate,
+        settlementDate,
+        entryPrice,
+        entryLeverage,
+        currentLeverage,
+        timeStamp,
+        txHash
+      )
+      //@ts-ignore
+      // const params = web3.eth.abi.decodeParameters(["address", "bytes32", "uint256","uint256","uint256","uint256","uint256","uint256","uint256"], event.data);
+      // const lender = params.0;
+
+    })
+    return result
+
+  }
+
   private onTaskEnqueued = async (requestTask: RequestTask) => {
     await this.processQueue(false, false);
   };
@@ -1831,13 +1893,13 @@ if (err || 'error' in added) {
 console.log(err, added);
 }
 }*//*);
-                                                                                                                                                                                                    }
-                                                                                                                                                                                                    }
-                                                                                                                                                                                                    }
-                                                                                                                                                                                                    } catch(e) {
-                                                                                                                                                                                                    // console.log(e);
-                                                                                                                                                                                                    }
-                                                                                                                                                                                                    }*/
+                                                                                                                                                                                                                            }
+                                                                                                                                                                                                                            }
+                                                                                                                                                                                                                            }
+                                                                                                                                                                                                                            } catch(e) {
+                                                                                                                                                                                                                            // console.log(e);
+                                                                                                                                                                                                                            }
+                                                                                                                                                                                                                            }*/
   }
 
   private processLendRequestTask = async (task: RequestTask, skipGas: boolean) => {

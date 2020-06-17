@@ -173,7 +173,7 @@ export class ContractsSource {
     return address;
   }*/
 
-  private getiBZxAddress(): string {
+  public getiBZxAddress(): string {
     let address: string = "";
     switch (this.networkId) {
       case 1:

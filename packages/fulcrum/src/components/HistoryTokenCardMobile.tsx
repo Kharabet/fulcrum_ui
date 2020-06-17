@@ -94,7 +94,7 @@ export class HistoryTokenCardMobile extends Component<IHistoryTokenGridRowProps,
       <div className="history-token-card-mobile__row">
         <div className="history-token-card-mobile__col-asset-unit">
           <span className="history-token-card-mobile__header">Unit of Account</span>
-          <span className="history-token-card-mobile__value">{this.props.collateralAsset}</span>
+          <span className="history-token-card-mobile__value">{this.props.quoteAsset}</span>
         </div>
         <div className="history-token-card-mobile__col-asset-price">
           <span className="history-token-card-mobile__header">Open price</span>
