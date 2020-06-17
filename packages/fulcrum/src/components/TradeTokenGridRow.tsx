@@ -84,7 +84,11 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
         ? liquidationPriceBeforeTrade.div(10 ** 18)
         : new BigNumber(10 ** 36).div(liquidationPriceBeforeTrade).div(10 ** 18);
 
-    const interestRate = await FulcrumProvider.Instance.getBorrowInterestRate(this.props.asset);
+    const interestRate = await FulcrumProvider.Instance.getBorrowInterestRate(
+      this.props.positionType === PositionType.LONG ?
+        this.props.unitOfAccount :
+        this.props.asset
+      );
 
     this._isMounted && this.setState({
       ...this.state,
