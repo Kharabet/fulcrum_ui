@@ -43,7 +43,7 @@ $padding: 22px 30px 35px 30px;
 .inner-own-token-grid {
   .inner-own-token-grid-header {
     display: grid;
-    grid-template-columns: 10% 8% calc(11% - 35px) 11% 11% 11% 9% 9%;   
+    grid-template-columns: 10% 8% calc(11% - 35px) 11% 11% 11% 9% 9%;
     column-gap: 35px;
     justify-content: space-between;
     flex-wrap: wrap;
@@ -111,13 +111,13 @@ $padding: 22px 30px 35px 30px;
     margin-bottom: 1px;
     position: relative;
     @media screen and (min-width: $breakpoint-desktop-min) {
-      padding:  22px 40px 35px 40px;
+      padding: 22px 40px 35px 40px;
     }
     .sign-currency {
       color: #a2abb8;
       font-weight: 400;
     }
-    .value-currency{
+    .value-currency {
       position: relative;
       text-align: right;
     }
@@ -148,8 +148,8 @@ $padding: 22px 30px 35px 30px;
     &__col-asset-price {
       @include inner-own-token-grid-row__col();
       //width: $width-col-asset-price;
-       //justify-content: center;
-       .value-currency{
+      //justify-content: center;
+      .value-currency {
         min-width: 85px;
       }
       @media screen and (max-width: $breakpoint-mobile-max) {
@@ -163,7 +163,7 @@ $padding: 22px 30px 35px 30px;
       text-indent: 13px;
       //color: #1cd8c4;
       right: 0;
-      top:100%;
+      top: 100%;
       @media screen and (max-width: $breakpoint-mobile-max) {
         text-indent: 10px;
       }
@@ -176,7 +176,7 @@ $padding: 22px 30px 35px 30px;
     &__col-asset-type {
       @include inner-own-token-grid-row__col();
       //width: $width-col-asset-type;
-      // justify-content: flex-end;
+      //justify-content: flex-end;
       @media screen and (max-width: $breakpoint-mobile-max) {
         margin-bottom: 25px;
       }
@@ -184,27 +184,35 @@ $padding: 22px 30px 35px 30px;
     &__col-liquidation-price {
       @include inner-own-token-grid-row__col();
       //width: $width-col-liquidation-price;
-      //justify-content: flex-end;
+      justify-content: flex-end;
+      padding-right: 20px;
+      @media screen and (min-width: $breakpoint-desktop-min) {
+        padding-right: 40px;
+      }
     }
     &__col-position-value {
       @include inner-own-token-grid-row__col();
-     /// width: $width-col-position-value;
-      //justify-content: flex-end;
+      /// width: $width-col-position-value;
+      justify-content: flex-end;
+      padding-right: 20px;
+      @media screen and (min-width: $breakpoint-desktop-min) {
+        padding-right: 40px;
+      }
     }
     &__col-asset-collateral {
       @include inner-own-token-grid-row__col();
       align-items: center;
       position: relative;
-     // width: $width-col-asset-collateral;
-     // justify-content: center;
-      margin-right: 30px;
-      .value-currency{
+      // width: $width-col-asset-collateral;
+      //justify-content: flex-end;
+      // margin-right: 30px;
+      .value-currency {
         min-width: 90px;
       }
-     
-      @media screen and (min-width: $breakpoint-desktop-min) {
-        padding-right: 15px;
-      }
+
+      // @media screen and (min-width: $breakpoint-desktop-min) {
+      //   padding-right: 15px;
+      // }
       @media screen and (max-width: $breakpoint-mobile-max) {
         margin-bottom: 35px;
       }
@@ -231,9 +239,9 @@ $padding: 22px 30px 35px 30px;
       margin-left: 10px;
       position: absolute;
       right: -34px;
-      top:2px;
+      top: 2px;
       cursor: pointer;
-     
+
       .icon-collateral {
         fill: var(--icon-collateral);
       }
@@ -241,7 +249,10 @@ $padding: 22px 30px 35px 30px;
     &__col-profit {
       @include inner-own-token-grid-row__col();
       //width: $width-col-profit;
-      //justify-content: flex-end;
+      justify-content: flex-end;
+      @media screen and (min-width: $breakpoint-desktop-min) {
+        padding-right: 20px;
+      }
     }
     &__col-action {
       @include inner-own-token-grid-row__col();

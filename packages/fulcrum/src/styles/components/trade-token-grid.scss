@@ -36,7 +36,7 @@ $width-col-actions: 13%;
   }
   .trade-token-grid-header {
     @include trade-token-grid-header__col();
-      display: grid;
+    display: grid;
     grid-template-columns: 10% 8% 22% 11% 11% 9% 9%;
     column-gap: 35px;
     justify-content: space-between;
@@ -63,7 +63,7 @@ $width-col-actions: 13%;
     //   width: $width-col-profit;
     // }
     &__col-actions {
-     // width: $width-col-actions;
+      // width: $width-col-actions;
       text-align: right;
     }
   }
@@ -118,23 +118,39 @@ $width-col-actions: 13%;
     //   width: $width-col-leverage;
     // }
     // &__col-amount {
-    //   width: $width-col-amount;
+    //     width: $width-col-amount;
+    //   justify-content: flex-end;
+
     // }
     &__col-position-type {
       display: flex;
-     // width: $width-col-position-type;
+      // width: $width-col-position-type;
     }
     &__col-price {
-     // width: $width-col-price;
+      // width: $width-col-price;
+      display: flex;
+      justify-content: flex-end;
+
       font-weight: 800;
+      padding-right: 20px;
+      @media screen and (min-width: $breakpoint-desktop-min) {
+        padding-right: 40px;
+      }
+
       .fw-normal {
         font-weight: 400;
         color: #a2abb8;
       }
     }
     &__col-profit {
-     // width: $width-col-profit;
+      // width: $width-col-profit;
+      display: flex;
+      justify-content: flex-end;
       font-weight: 800;
+      @media screen and (min-width: $breakpoint-desktop-min) {
+        padding-right: 20px;
+      }
+
       .fw-normal {
         font-weight: 400;
         color: #a2abb8;
