@@ -1,3 +1,4 @@
+@import "../abstracts/variables";
 .position-type-marker {
   font-size: 10px;
   font-weight: 800;
@@ -10,4 +11,7 @@
   padding: 8px 13px;
   border: 1px solid var(--disabled-bg);
   border-radius: 26px;
+  @media screen and (min-width: $breakpoint-mobile-min) {
+    margin-left: -10px;
+  }
 }
