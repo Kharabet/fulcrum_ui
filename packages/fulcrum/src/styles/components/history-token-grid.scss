@@ -1,17 +1,17 @@
 $font-size-header: 12px;
 $font-size-row: 18px;
 $width-col-token-date: 12%;
-$width-col-token-asset: 9%;
-$width-col-type: 9%;
-$width-col-asset-unit: 10%;
-$width-col-position: 12%;
+$width-col-token-asset: 10%;
+$width-col-type: 12%;
+$width-col-asset-unit: 14%;
+$width-col-position: 14%;
 $width-col-asset-price: 12%;
 $width-col-liquidation-price: 10%;
 $width-col-position-value: 10%;
-$width-col-profit: 9%;
-$width-col-result: 7%;
-$width-col-result-inner: 28%;
-$width-col-separator-inner: 83%;
+$width-col-profit: 6%;
+$width-col-result: 10%;
+$width-col-result-inner: 36%;
+$width-col-separator-inner: 92%;
 
 @mixin history-token-grid-header__col {
   font-family: "Muli", sans-serif;
@@ -40,7 +40,7 @@ $width-col-separator-inner: 83%;
 .history-token-grid-header {
   display: flex;
   flex-wrap: wrap;
-  padding: 0 40px 22px 40px;
+  padding: 0 20px 22px 20px;
   font-family: "Muli", sans-serif;
   &__col-token-date {
     @include history-token-grid-header__col();
@@ -77,6 +77,7 @@ $width-col-separator-inner: 83%;
   &__col-profit {
     @include history-token-grid-header__col();
     width: $width-col-profit;
+    justify-content: center;
   }
   &__col-result {
     @include history-token-grid-header__col();
@@ -86,14 +87,14 @@ $width-col-separator-inner: 83%;
 .history-token-grid-row,
 .history-token-grid-row-inner {
   font-family: "Muli", sans-serif;
-  padding: 22px 40px;
+  padding: 22px 20px;
   background-color: var(--history-row);
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   margin-bottom: 2px;
   &-inner {
-    background-color: #444e5a;
+    background-color: var(--history-row-inner);
   }
   &__col-token-date {
     font-size: 14px;
@@ -136,6 +137,8 @@ $width-col-separator-inner: 83%;
   &__col-profit {
     @include history-token-grid-row__col();
     width: $width-col-profit;
+    justify-content: flex-end;
+    padding-right: 30px;
   }
   &__result {
     font-size: 14px;
@@ -143,6 +146,46 @@ $width-col-separator-inner: 83%;
     font-weight: 200;
     width: $width-col-result;
     overflow: hidden;
+    &.toggle-collapse {
+      cursor: pointer;
+      span {
+        position: relative;
+        border-bottom: 1px dashed #8992a4;
+        display: inline-block;
+        &:after {
+          content: "";
+          position: absolute;
+          right: -13px;
+          top: calc(50% - 2px);
+          width: 8px;
+          border: 4px solid transparent;
+          border-top: 4px solid #8992a4;
+        }
+      }
+      &.opened-collapse {
+        span {
+          color: var(--primary-text);
+          &:after {
+            content: "";
+            position: absolute;
+            right: -13px;
+            top: calc(50% - 2px);
+            transform: translateY(-50%);
+            width: 8px;
+            border: 4px solid transparent;
+            border-bottom: 4px solid var(--primary-text);
+          }
+        }
+      }
+    }
+  }
+}
+.collapse {
+  &.show {
+    display: block;
+  }
+  &.hide {
+    display: none;
   }
 }
 
@@ -150,13 +193,14 @@ $width-col-separator-inner: 83%;
   margin-bottom: 0;
   position: relative;
   &:not(:last-child) {
+    position: relative;
     &:after {
       content: "";
       position: absolute;
       bottom: 0;
       left: 15px;
-      width: $width-col-separator-inner;
-      background-color: #586473;
+      width: calc(90% - 40px);
+      background-color: var(--lend-bg-hover);
       height: 1px;
     }
   }
@@ -169,5 +213,9 @@ $width-col-separator-inner: 83%;
     color: #939fac;
     font-weight: 200;
     width: $width-col-result-inner;
+  }
+  &__profit {
+    justify-content: flex-end;
+    padding-left: 30px;
   }
 }

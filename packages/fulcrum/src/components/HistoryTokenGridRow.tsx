@@ -17,6 +17,7 @@ interface IHistoryTokenGridRowState {
   assetBalance: BigNumber | null;
   profit: BigNumber | null;
   isLoading: boolean;
+  isShowCollapse: boolean;
 }
 
 export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IHistoryTokenGridRowState> {
@@ -29,7 +30,8 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
     this.state = {
       assetBalance: new BigNumber(0),
       profit: new BigNumber(0),
-      isLoading: true
+      isLoading: true,
+      isShowCollapse: false
     };
 
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
@@ -80,7 +82,7 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
         </div>
 
         <div className="history-token-grid-row-inner__result">
-          {event.action}
+          <span>{event.action.replace(event.loanId, "")}</span>
         </div>
         <div className="history-token-grid-row-inner__col-position">
           {event.positionValue.toFixed(4)}
@@ -101,14 +103,7 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
             : <Preloader width="74px" />
           }
         </div>
-        <div className="history-token-grid-row-inner__col-profit">
-          {!this.state.isLoading
-            ? <React.Fragment>
-              <span className="sign-currency">$</span>{event.profit}
-            </React.Fragment>
-            : <Preloader width="74px" />
-          }
-        </div>
+        <div className="history-token-grid-row-inner__col-profit">-</div>
       </div>)
     })
   }
@@ -173,13 +168,17 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
               : <Preloader width="74px" />
             }
           </div>
-          <div className="history-token-grid-row__result">
-            {latestEvent.action}
+          <div className={`history-token-grid-row__result ${this.props.eventsGroup.events.length - 1 ? `toggle-collapse` : ``}  ${this.state.isShowCollapse ? `opened-collapse` : ``}`} onClick={this.toggleCollapse}>
+            <span>{latestEvent.action.replace(latestEvent.loanId, "")}</span>
           </div>
         </div>
-        <div className="collapsible">
+        <div className={`collapse ${this.state.isShowCollapse ? `show` : `hide`}`}>
           {this.renderOtherEvents()}
         </div>
       </div>)
+  }
+
+  public toggleCollapse = () => {
+    this.setState({ ...this.state, isShowCollapse: !this.state.isShowCollapse })
   }
 }
