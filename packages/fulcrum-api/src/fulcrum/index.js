@@ -298,7 +298,7 @@ export default class Fulcrum {
                 $lt: endDate,
                 $gte: startDate
             }
-        }).sort({date : 1}).select({ date: 1, allTokensStats: 1 }));
+        }, { date: 1, allTokensStats: 1 }).sort({date : 1}).lean());
         const arrayLength = dbStatsDocuments.length;
         const desiredlength = dbStatsDocuments.length > estimatedPointsNumber
             ? estimatedPointsNumber - 1
@@ -322,9 +322,11 @@ export default class Fulcrum {
             "date": {
                 $lt: endDate,
                 $gte: startDate
-            }
+            },
+            tokensStats: {$elemMatch: {token: asset}}
 
-        }).sort({date : 1}).select({ date: 1, tokensStats: 1})
+        },{ date: 1, tokensStats: 1, "tokensStats.$": asset}).sort({date : 1}).lean()
+
         const arrayLength = dbStatsDocuments.length;
         const desiredlength = dbStatsDocuments.length > estimatedPointsNumber
             ? estimatedPointsNumber - 1
@@ -338,7 +340,7 @@ export default class Fulcrum {
        
         let result = [];
         reducedArray.forEach(document => {
-            const assetStats = document.tokensStats.find(e => e.token === asset); 
+            const assetStats = document.tokensStats[0]
             result.push({ 
                 timestamp: new Date(document.date).getTime(), 
                 token: assetStats.token, 
