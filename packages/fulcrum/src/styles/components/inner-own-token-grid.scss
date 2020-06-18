@@ -242,8 +242,11 @@ $padding: 22px 30px 35px 30px;
       top: 2px;
       cursor: pointer;
 
-      .icon-collateral {
+      .icon-collateral-fill {
         fill: var(--icon-collateral);
+      }
+      .icon-collateral-stroke {
+        stroke: var(--icon-collateral);
       }
     }
     &__col-profit {

@@ -146,8 +146,11 @@ $width: 33%;
     position: absolute;
     right: 5px;
     cursor: pointer;
-    .icon-collateral {
+    .icon-collateral-fill {
       fill: var(--icon-collateral);
+    }
+    .icon-collateral-stroke {
+      stroke: var(--icon-collateral);
     }
   }
   &__col-collateral-wrapper {
