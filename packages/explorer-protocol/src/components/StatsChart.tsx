@@ -65,7 +65,7 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
   public getAssetStatsHistory = async () => {
     const startData = new Date().setDate(new Date().getDate() - this.state.periodChart);
     const endData = new Date().getTime();
-    const pointsNumber = 30;
+    const pointsNumber = 20;
     const requestUrl = `${this.apiUrl}/asset-stats-history?asset=${this.state.asset.toLowerCase()}&start_date=${startData}&end_date=${endData}&points_number=${pointsNumber}`;
     const response = await fetch(requestUrl);
     const responseJson = await response.json();
@@ -74,10 +74,13 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
     let tvl: any = [];
     let apr: any = [];
     let utilization: any = [];
-
+    const period = this.state.periodChart;
     if (responseJson.success) {
       responseJson.data.forEach(function (item: any) {
-        labels.push(new Date(item["timestamp"] * 1000).getDate());
+        const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        (period === 1)
+          ? labels.push(`${new Date(item["timestamp"]).getHours()}:${new Date(item["timestamp"]).getMinutes()}`)
+          : labels.push(`${months[new Date(item["timestamp"]).getMonth()]} ${new Date(item["timestamp"]).getDate()}`);
         tvl.push(+item["tvl"]);
         apr.push(+item["supplyInterestRate"]);
         utilization.push(+item["utilization"]);
@@ -139,6 +142,34 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
       legend: {
         display: false
       },
+      layout: {
+        padding: {
+          top: 5,
+        }
+      },
+      tooltips: {
+        backgroundColor: 'rgba(0, 0, 0, 0)',
+        displayColors: false,
+        bodyFontFamily: 'Muli',
+        bodyFontSize: 30,
+        bodyFontColor: '#283049',
+        bodyFontStyle: 'bold',
+        titleFontFamily: 'Muli',
+        titleFontSize: 14,
+        titleFontColor: '#8992A4',
+        titleFontStyle: 'black',
+        titleMarginBottom: 10,
+        position: 'nearest',
+        callbacks: {
+          label: function (tooltipItems: any) {
+            if (tooltipItems.yLabel > 1000000)
+              return `$${(tooltipItems.yLabel / 1000000).toFixed(3)}m`;
+            if (tooltipItems.yLabel > 1000)
+              return `$${(tooltipItems.yLabel / 1000).toFixed(3)}k`;
+            return `$${(tooltipItems.yLabel).toFixed(3)}`;
+          }
+        }
+      }
       /*elements: {
         point: {
           radius: 0
@@ -156,7 +187,7 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
           </div>
           <GroupButton setPeriodChart={this.setPeriodChart} />
         </div>
-        <Line ref="chart" data={chartData} options={options} height={50} />
+        <Line ref="chart" data={chartData} options={options} height={70} />
       </React.Fragment>
     );
   }

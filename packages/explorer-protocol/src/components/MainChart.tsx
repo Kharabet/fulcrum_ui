@@ -46,9 +46,13 @@ export class MainChart extends Component<IMainChartProps, IMainChartState> {
     const responseJson = await response.json();
     const labels: any = [];
     const data: any = [];
+    const period = this.props.periodChart;
     if (responseJson.success) {
       responseJson.data.forEach(function (item: any) {
-        labels.push(new Date(item["timestamp"] * 1000).getDate());
+        const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        (period === 1)
+          ? labels.push(`${new Date(item["timestamp"]).getHours()}:${new Date(item["timestamp"]).getMinutes()}`)
+          : labels.push(`${months[new Date(item["timestamp"]).getMonth()]} ${new Date(item["timestamp"]).getDate()}`);
         data.push(item["tvl"]);
       });
     } else {
@@ -92,9 +96,32 @@ export class MainChart extends Component<IMainChartProps, IMainChartState> {
       legend: {
         display: false
       },
-      elements: {
+      /*elements: {
         point: {
           radius: 0
+        }
+      },*/
+      tooltips: {
+        backgroundColor: 'rgba(0, 0, 0, 0)',
+        displayColors: false,
+        bodyFontFamily: 'Muli',
+        bodyFontSize: 30,
+        bodyFontColor: '#283049',
+        bodyFontStyle: 'bold',
+        titleFontFamily: 'Muli',
+        titleFontSize: 14,
+        titleFontColor: '#8992A4',
+        titleFontStyle: 'black',
+        titleMarginBottom: 10,
+        position: 'nearest',
+        callbacks: {
+          label: function (tooltipItems: any) {
+            if (tooltipItems.yLabel > 100000)
+              return `$${(tooltipItems.yLabel / 1000000).toFixed(3)}m`;
+            if (tooltipItems.yLabel > 100)
+              return `$${(tooltipItems.yLabel / 1000).toFixed(3)}k`;
+            return `$${(tooltipItems.yLabel).toFixed(3)}`;
+          }
         }
       }
     }
