@@ -115,7 +115,7 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
         <div className="asset-selector-item-row">
           <span className="asset-selector-locked">
             {this.props.asset !== Asset.UNKNOWN ? `Locked` : `Paid`}<span className="value">&nbsp;
-            {tvl ? (tvl).toFixed(4) : 0.0000}</span>
+            {tvl ? this.getRoundedData((tvl)) : 0.0000}</span>
           </span>
           <span className="asset-selector-apr"><span className="value green">{apr ? apr.toFixed(2) : 0.00}%&nbsp;</span>APR</span>
         </div>
@@ -125,5 +125,12 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
       </Link>
 
     );
+  }
+  public getRoundedData(value: number) {
+    if (value > 100000)
+      return `${(value / 1000000).toFixed(1)}m`;
+    if (value > 100)
+      return `${(value / 1000).toFixed(1)}k`;
+    return `${(value).toFixed(3)}`;
   }
 }

@@ -35,7 +35,7 @@ export class MainPage extends Component<IMainPageProps, IMainPageState> {
               <div className="flex">
                 <div className="tvl">TVL <span className="tvl-sign">$ </span></div>
                 <div>
-                  <span className="tvl-value">{tvl ? this.getShortMillion(tvl) : this.state.tvl}</span>
+                  <span className="tvl-value">{tvl ? this.getRoundedData(tvl) : this.state.tvl}</span>
                   <div className="tvl-interest"><Arrow />7.6<span className="sign">%</span></div>
                 </div>
               </div>
@@ -72,10 +72,11 @@ export class MainPage extends Component<IMainPageProps, IMainPageState> {
     this.setState({ ...this.state, periodChart: period })
   }
 
-  public getShortMillion(value: number) {
-    if (value > 1000000)
+  public getRoundedData(value: number) {
+    if (value > 100000)
       return `${(value / 1000000).toFixed(1)}m`;
-
-    return value;
+    if (value > 100)
+      return `${(value / 1000).toFixed(1)}k`;
+    return `${(value).toFixed(1)}`;
   }
 }
