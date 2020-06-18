@@ -27,8 +27,8 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
     };
   }
 
-  /*public getAssetStatsHistory = async () => {
-    const startData = new Date().setDate(new Date().getDate() - 365);
+  public getAssetStatsHistory = async () => {
+    const startData = new Date().setDate(new Date().getDate() - 90);
     const endData = new Date().getTime();
     const pointsNumber = 30;
     const requestUrl = `${this.apiUrl}/asset-stats-history?asset=${this.props.asset.toLowerCase()}&start_date=${startData}&end_date=${endData}&points_number=${pointsNumber}`;
@@ -47,19 +47,10 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
       console.error(responseJson.message)
     }
     await this.setState({ ...this.state, tvl: tvl, labels: labels })
-  }*/
-  /*public getVaultBalanceUsd = async () => {
-    const requestUrl = `${this.apiUrl}/supply-rate-apr`;
-    const response = await fetch(requestUrl);
-    const responseJson = await response.json();
-    console.log(responseJson.data);
-    if (!responseJson.success)
-      console.error(responseJson.message)
-  }*/
+  }
 
   public componentDidMount(): void {
-    //this.getVaultBalanceUsd()
-    //this.getAssetStatsHistory();
+    this.getAssetStatsHistory();
   }
 
 
