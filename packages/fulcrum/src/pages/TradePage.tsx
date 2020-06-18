@@ -24,6 +24,9 @@ import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
 import { IHistoryTokenGridProps } from "../components/HistoryTokenGrid";
 import { TradeEvent } from "../domain/TradeEvent";
 import { IHistoryTokenGridRowProps } from "../components/HistoryTokenGridRow";
+import { PositionEventsGroup, HistoryEvent } from "../domain/PositionEventsGroup";
+import { LiquidationEvent } from "../domain/LiquidationEvent";
+import { CloseWithSwapEvent } from "../domain/CloseWithSwapEvent";
 
 const ManageTokenGrid = React.lazy(() => import('../components/ManageTokenGrid'));
 const TradeForm = React.lazy(() => import('../components/TradeForm'));
@@ -453,67 +456,182 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     this.setState({ ...this.state, openedPositionsCount: ownRowsData.length });
     return ownRowsData;
   };
-  
+
   public getHistoryRowsData = async (state: ITradePageState): Promise<IHistoryTokenGridRowProps[]> => {
     const historyRowsData: IHistoryTokenGridRowProps[] = [];
-      const tradeEvents = await FulcrumProvider.Instance.getTradeHistory();
-      for (const tradeEvent of tradeEvents) {
+    const groupedEvents: PositionEventsGroup[] = [];
+    const tradeEvents = await FulcrumProvider.Instance.getTradeHistory();
+    const closeWithSwapEvents = await FulcrumProvider.Instance.getCloseWithSwapHistory();
+    const liquidationEvents = await FulcrumProvider.Instance.getLiquidationHistory();
+    const groupBy = function (xs: (TradeEvent | LiquidationEvent | CloseWithSwapEvent)[], key: any) {
+      return xs.reduce(function (rv: any, x: any) {
+        (rv[x[key]] = rv[x[key]] || []).push(x);
+        return rv;
+      }, {});
+    };
+    //@ts-ignore
+    const grouped = groupBy(tradeEvents.concat(closeWithSwapEvents).concat(liquidationEvents), "loanId");
+    const loanIds = Object.keys(grouped);
+    for (const loanId of loanIds) {
+      //@ts-ignore
+      const events = grouped[loanId].sort((a, b) => a.date < b.date ? -1 : 1);
+      const tradeEvent = events[0] as TradeEvent
+      const positionType = this.tradeAssets.includes(tradeEvent.baseToken)
+        ? PositionType.LONG
+        : PositionType.SHORT;
+
+      const tradeAsset = positionType === PositionType.LONG
+        ? tradeEvent.baseToken
+        : tradeEvent.quoteToken;
+
+      const quoteAsset = positionType === PositionType.LONG
+        ? tradeEvent.quoteToken
+        : tradeEvent.baseToken;
+
+      let leverage = new BigNumber(tradeEvent.entryLeverage.div(10 ** 18));
+      if (positionType === PositionType.LONG)
+        leverage = leverage.plus(1);
 
 
-        const positionType = this.tradeAssets.includes(tradeEvent.baseToken)
-          ? PositionType.LONG
-          : PositionType.SHORT;
+      const positionEventsGroup = new PositionEventsGroup(
+        loanId,
+        tradeAsset,
+        quoteAsset,
+        positionType,
+        leverage.toNumber()
+      )
+      for (const event of events) {
 
-        const tradeAsset = positionType === PositionType.LONG
-          ? tradeEvent.baseToken
-          : tradeEvent.quoteToken;
+        let positionValue = new BigNumber(0);
+        let tradePrice = new BigNumber(0);
+        let value = new BigNumber(0);
+        let profit = "-";
+        const timeStamp = event.timeStamp;
+        const txHash = event.txHash;
+        if (event instanceof TradeEvent) {
+          const action = "Opened" + event.loanId;
+          if (positionType === PositionType.LONG) {
+            positionValue = event.positionSize.div(10 ** 18);
+            value = event.positionSize.div(event.entryPrice);
+            tradePrice = new BigNumber(10 ** 36).div(event.entryPrice).div(10 ** 18);
+          }
+          else {
+            positionValue = event.positionSize.div(event.entryPrice);
+            value = event.positionSize.div(10 ** 18);
+            tradePrice = event.entryPrice.div(10 ** 18);
+          }
 
-        const quoteAsset = positionType === PositionType.LONG
-          ? tradeEvent.quoteToken
-          : tradeEvent.baseToken;
+          positionEventsGroup.events.push(new HistoryEvent(
+            loanId,
+            timeStamp,
+            action,
+            positionValue,
+            tradePrice,
+            value,
+            profit,
+            txHash
+          ))
 
-        let leverage = new BigNumber(tradeEvent.entryLeverage.div(10 ** 18));
-        if (positionType === PositionType.LONG)
-          leverage = leverage.plus(1);
-
-
-        // const collateralToPrincipalRate = await FulcrumProvider.Instance.getSwapRate(loan.collateralAsset, loan.loanAsset);
-        let positionValue = tradeEvent.positionSize;
-        let collateral = new BigNumber(0);
-        let openPrice = tradeEvent.entryPrice;
-        let value = positionValue.times(openPrice);
-        let result = tradeEvent instanceof TradeEvent
-        ? "Opened"
-        : "Unknown";
-        
-        let profit = new BigNumber(0);
-        if (positionType === PositionType.LONG) {
-          positionValue = tradeEvent.positionSize.div(10 ** 18);
-          value = tradeEvent.positionSize.div(tradeEvent.entryPrice);
-          openPrice = new BigNumber(10 ** 36).div(tradeEvent.entryPrice).div(10 ** 18);
         }
-        else {
-          positionValue = tradeEvent.positionSize.div(tradeEvent.entryPrice);
-          value = tradeEvent.positionSize.div(10**18);
-          openPrice = tradeEvent.entryPrice.div(10 ** 18);
-        }
+        else if (event instanceof CloseWithSwapEvent) {
+          const action = "Closed" + event.loanId;
+          if (positionType === PositionType.LONG) {
+            positionValue = event.positionCloseSize.div(10 ** 18);
+            value = event.positionCloseSize.div(event.exitPrice);
+            tradePrice = new BigNumber(10 ** 36).div(event.exitPrice).div(10 ** 18);
+          }
+          else {
+            positionValue = event.positionCloseSize.div(event.exitPrice);
+            value = event.positionCloseSize.div(10 ** 18);
+            tradePrice = event.exitPrice.div(10 ** 18);
+          }
 
-        historyRowsData.push({
-          loanId: tradeEvent.loanId,
-          baseAsset: tradeAsset,
-          quoteAsset: quoteAsset,
-          positionType,
-          leverage: leverage.toNumber(),
-          date: tradeEvent.timeStamp,
-          positionValue,
-          tradePrice: openPrice,
-          value,
-          profit,
-          result,
-          txHash: tradeEvent.txHash
-        });
+          positionEventsGroup.events.push(new HistoryEvent(
+            loanId,
+            timeStamp,
+            action,
+            positionValue,
+            tradePrice,
+            value,
+            profit,
+            txHash
+          ))
+
+        } else if (event instanceof LiquidationEvent) {
+          const action = "Liquidated" + event.loanId;
+          if (positionType === PositionType.LONG) {
+            positionValue = event.repayAmount.div(10 ** 18);
+            value = event.repayAmount.div(event.collateralToLoanRate);
+            tradePrice = new BigNumber(10 ** 36).div(event.collateralToLoanRate).div(10 ** 18);
+          }
+          else {
+            positionValue = event.repayAmount.div(event.collateralToLoanRate);
+            value = event.repayAmount.div(10 ** 18);
+            tradePrice = event.collateralToLoanRate.div(10 ** 18);
+          }
+
+          positionEventsGroup.events.push(new HistoryEvent(
+            loanId,
+            timeStamp,
+            action,
+            positionValue,
+            tradePrice,
+            value,
+            profit,
+            txHash
+          ))
+
+        }
       }
-      this.setState({...this.state, historyRowsData})
+
+      historyRowsData.push({
+        eventsGroup: positionEventsGroup
+      });
+
+    }
+    // for (const tradeEvent of tradeEvents) {
+
+
+    // const positionType = this.tradeAssets.includes(tradeEvent.baseToken)
+    //   ? PositionType.LONG
+    //   : PositionType.SHORT;
+
+    // const tradeAsset = positionType === PositionType.LONG
+    //   ? tradeEvent.baseToken
+    //   : tradeEvent.quoteToken;
+
+    // const quoteAsset = positionType === PositionType.LONG
+    //   ? tradeEvent.quoteToken
+    //   : tradeEvent.baseToken;
+
+    // let leverage = new BigNumber(tradeEvent.entryLeverage.div(10 ** 18));
+    // if (positionType === PositionType.LONG)
+    //   leverage = leverage.plus(1);
+
+
+    // // const collateralToPrincipalRate = await FulcrumProvider.Instance.getSwapRate(loan.collateralAsset, loan.loanAsset);
+    // let positionValue = tradeEvent.positionSize;
+    // let collateral = new BigNumber(0);
+    // let openPrice = tradeEvent.entryPrice;
+    // let value = positionValue.times(openPrice);
+    // let result = tradeEvent instanceof TradeEvent
+    //   ? "Opened"
+    //   : "Unknown";
+
+    // let profit = new BigNumber(0);
+    // if (positionType === PositionType.LONG) {
+    //   positionValue = tradeEvent.positionSize.div(10 ** 18);
+    //   value = tradeEvent.positionSize.div(tradeEvent.entryPrice);
+    //   openPrice = new BigNumber(10 ** 36).div(tradeEvent.entryPrice).div(10 ** 18);
+    // }
+    // else {
+    //   positionValue = tradeEvent.positionSize.div(tradeEvent.entryPrice);
+    //   value = tradeEvent.positionSize.div(10 ** 18);
+    //   openPrice = tradeEvent.entryPrice.div(10 ** 18);
+    // }
+
+    // }
+    this.setState({ ...this.state, historyRowsData })
     return historyRowsData;
   };
 

@@ -10,6 +10,8 @@ $width-col-liquidation-price: 10%;
 $width-col-position-value: 10%;
 $width-col-profit: 9%;
 $width-col-result: 7%;
+$width-col-result-inner: 28%;
+$width-col-separator-inner: 83%;
 
 @mixin history-token-grid-header__col {
   font-family: "Muli", sans-serif;
@@ -81,7 +83,8 @@ $width-col-result: 7%;
     width: $width-col-result;
   }
 }
-.history-token-grid-row {
+.history-token-grid-row,
+.history-token-grid-row-inner {
   font-family: "Muli", sans-serif;
   padding: 22px 40px;
   background-color: var(--history-row);
@@ -89,6 +92,9 @@ $width-col-result: 7%;
   flex-wrap: wrap;
   align-items: center;
   margin-bottom: 2px;
+  &-inner {
+    background-color: #444e5a;
+  }
   &__col-token-date {
     font-size: 14px;
     color: #939fac;
@@ -136,5 +142,32 @@ $width-col-result: 7%;
     color: #939fac;
     font-weight: 200;
     width: $width-col-result;
+    overflow: hidden;
+  }
+}
+
+.history-token-grid-row-inner {
+  margin-bottom: 0;
+  position: relative;
+  &:not(:last-child) {
+    &:after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 15px;
+      width: $width-col-separator-inner;
+      background-color: #586473;
+      height: 1px;
+    }
+  }
+  &:last-child {
+    border-bottom-left-radius: 10px;
+    margin-bottom: 15px;
+  }
+  &__result {
+    font-size: 14px;
+    color: #939fac;
+    font-weight: 200;
+    width: $width-col-result-inner;
   }
 }

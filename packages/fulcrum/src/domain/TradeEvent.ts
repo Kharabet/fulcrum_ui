@@ -2,7 +2,7 @@ import { BigNumber } from "@0x/utils";
 import { Asset } from "./Asset";
 
 export class TradeEvent {
-  public static topic0: string = "0xafa6452c53d4537ba2992dec6b9cad9a2fe82db672005ea589963f9f0b3de052"
+  public static readonly topic0: string = "0xafa6452c53d4537ba2992dec6b9cad9a2fe82db672005ea589963f9f0b3de052"
   public readonly user: string; //indexed 
   public readonly baseToken: Asset; //indexed 
   public readonly quoteToken: Asset; //indexed 
