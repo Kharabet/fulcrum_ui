@@ -219,3 +219,31 @@ $width-col-separator-inner: 92%;
     padding-left: 30px;
   }
 }
+.pagination {
+  display: flex;
+  justify-content: center;
+  padding: 25px 0;
+  div {
+    padding: 4px 14px;
+    background-color: var(--lend-border-hover);
+    border-radius: 20px;
+    &:not(.disabled) {
+      cursor: pointer;
+      .pagination-stroke {
+        stroke: var(--primary-text);
+      }
+    }
+    &.disabled {
+      background-color: var(--select-border);
+      .pagination-stroke {
+        stroke: var(--primary-row);
+      }
+    }
+    &.prev {
+      transform: rotate(180deg);
+    }
+    &.next{
+      margin-left: 7px;
+    }
+  }
+}

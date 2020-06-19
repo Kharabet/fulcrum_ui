@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { HistoryTokenGridHeader } from "./HistoryTokenGridHeader";
 import { IHistoryTokenGridRowProps, HistoryTokenGridRow } from "./HistoryTokenGridRow";
 import { HistoryTokenCardMobile } from "./HistoryTokenCardMobile";
+import { ReactComponent as ArrowPagination } from "../assets/images/icon_pagination.svg";
 
 import "../styles/components/history-token-grid.scss";
 
@@ -11,29 +12,40 @@ export interface IHistoryTokenGridProps {
 }
 
 interface IHistoryTokenGridState {
-  historyRowsData: IHistoryTokenGridRowProps[];
+  numberPagination: number;
+  quantityGrids: number;
 }
 
 export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistoryTokenGridState> {
+  private quantityVisibleRow = 8;
   constructor(props: IHistoryTokenGridProps) {
     super(props);
     this.state = {
-      historyRowsData: [],
+      numberPagination: 0,
+      quantityGrids: 0
     };
   }
 
+  public UNSAFE_componentWillMount(): void {
+    const quantityGrids = Math.floor(this.props.historyRowsData.length / this.quantityVisibleRow);
+    this.setState({ ...this.state, quantityGrids: quantityGrids })
+  }
   public render() {
     return !this.props.isMobileMedia ? this.renderDesktop() : this.renderMobile();
   }
 
   private renderDesktop = () => {
-    const historyRows = this.props.historyRowsData.map((e,i) => <HistoryTokenGridRow key={i} {...e} />);
+    const historyRows = this.props.historyRowsData.slice(this.quantityVisibleRow * this.state.numberPagination, this.quantityVisibleRow * this.state.numberPagination + this.quantityVisibleRow).map((e, i) => <HistoryTokenGridRow key={i + 5 * this.state.numberPagination} {...e} />);
     if (historyRows.length === 0) return null;
 
     return (
       <div className="history-token-grid">
         <HistoryTokenGridHeader />
         {historyRows}
+        <div className="pagination">
+          <div className={`prev ${this.state.numberPagination === 0 ? `disabled` : ``}`} onClick={this.prevPagination}><ArrowPagination /></div>
+          <div className={`next ${this.state.numberPagination === this.state.quantityGrids ? `disabled` : ``}`} onClick={this.nextPagination}><ArrowPagination /></div>
+        </div>
       </div>
     );
   }
@@ -47,5 +59,13 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
         {historyRows}
       </div>
     );
+  }
+  public nextPagination = () => {
+    if (this.state.numberPagination !== this.state.quantityGrids)
+      this.setState({ ...this.state, numberPagination: this.state.numberPagination + 1 });
+  }
+  public prevPagination = () => {
+    if (this.state.numberPagination !== 0)
+      this.setState({ ...this.state, numberPagination: this.state.numberPagination - 1 });
   }
 }
