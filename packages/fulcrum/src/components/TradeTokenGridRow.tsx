@@ -86,7 +86,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
 
     const interestRate = await FulcrumProvider.Instance.getBorrowInterestRate(
       this.props.positionType === PositionType.LONG ?
-        this.props.unitOfAccount :
+        this.props.quoteToken :
         this.props.asset
       );
 
