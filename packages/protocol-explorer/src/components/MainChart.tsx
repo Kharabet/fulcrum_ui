@@ -96,11 +96,11 @@ export class MainChart extends Component<IMainChartProps, IMainChartState> {
       legend: {
         display: false
       },
-      /*elements: {
+      elements: {
         point: {
           radius: 0
         }
-      },*/
+      },
       tooltips: {
         backgroundColor: 'rgba(0, 0, 0, 0)',
         displayColors: false,
