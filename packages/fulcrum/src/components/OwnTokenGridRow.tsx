@@ -112,8 +112,8 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
     await this.derivedUpdate();
   };
 
-  private onAskToOpenProgressDlg = (taskId: number) => {
-    if (!this.state.request || taskId !== this.state.request.id) return;
+  private onAskToOpenProgressDlg = (taskId: string) => {
+    if (!this.state.request || taskId !== this.state.request.loanId) return;
     this.setState({ ...this.state, isLoadingTransaction: true, resultTx: true })
     this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, false, this.state.resultTx);
   }
@@ -246,6 +246,20 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
 
   public onManageClick = async (event: React.MouseEvent<HTMLElement>) => {
     event.stopPropagation();
+    const request = new TradeRequest(
+      this.props.loan.loanId,
+      TradeType.SELL,
+      this.props.tradeAsset,
+      this.props.collateralAsset,
+      this.props.collateralAsset,
+      this.props.positionType,
+      this.props.leverage,
+      new BigNumber(0)
+    )
+
+    await this.setState({ ...this.state, request: request });
+    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, request, false, this.state.resultTx)
+
     this.props.onManageCollateralOpen(
       new ManageCollateralRequest(
         this.props.loan.loanId,
@@ -263,7 +277,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
       this.props.loan.loanId,
       TradeType.SELL,
       this.props.tradeAsset,
-      Asset.UNKNOWN,
+      this.props.collateralAsset,
       this.props.collateralAsset,
       this.props.positionType,
       this.props.leverage,
