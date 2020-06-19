@@ -21,7 +21,7 @@ import { RequestStatus } from "../domain/RequestStatus";
 export interface ITradeTokenGridRowProps {
 
   asset: Asset;
-  unitOfAccount: Asset;
+  quoteToken: Asset;
   positionType: PositionType;
   defaultLeverage: number;
   isTxCompleted: boolean;
@@ -69,8 +69,8 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
     const tradeAssetPrice = await FulcrumProvider.Instance.getSwapToUsdRate(this.props.asset);
 
     const collateralToPrincipalRate = this.props.positionType === PositionType.LONG
-      ? await FulcrumProvider.Instance.getSwapRate(this.props.asset, this.props.unitOfAccount)
-      : await FulcrumProvider.Instance.getSwapRate(this.props.unitOfAccount, this.props.asset);
+      ? await FulcrumProvider.Instance.getSwapRate(this.props.asset, this.props.quoteToken)
+      : await FulcrumProvider.Instance.getSwapRate(this.props.quoteToken, this.props.asset);
 
     let initialMargin = this.props.positionType === PositionType.LONG
       ? new BigNumber(10 ** 38).div(new BigNumber(this.state.leverage - 1).times(10 ** 18))
@@ -219,7 +219,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
       "0x0000000000000000000000000000000000000000000000000000000000000000",
       TradeType.BUY,
       this.props.asset,
-      this.props.unitOfAccount, // TODO: depends on which one they own
+      this.props.quoteToken, // TODO: depends on which one they own
       Asset.ETH,
       this.props.positionType,
       this.state.leverage,

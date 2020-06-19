@@ -20,7 +20,6 @@ import { FulcrumProvider } from "../services/FulcrumProvider";
 import { CollapsibleContainer } from "./CollapsibleContainer";
 import { PositionTypeMarkerAlt } from "./PositionTypeMarkerAlt";
 import { TradeExpectedResult } from "./TradeExpectedResult";
-import { UnitOfAccountSelector } from "./UnitOfAccountSelector";
 import { Preloader } from "./Preloader";
 import { InputAmount } from "./InputAmount";
 

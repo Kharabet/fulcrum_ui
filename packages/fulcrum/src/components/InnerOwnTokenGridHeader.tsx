@@ -3,7 +3,7 @@ import { Asset } from "../domain/Asset";
 
 export interface IInnerOwnTokenGridHeaderProps {
   asset?: Asset;
-  unitOfAccount?: Asset;
+  quoteToken?: Asset;
   loader: boolean;
   isLoadingTransaction: boolean;
 }
@@ -13,7 +13,7 @@ export class InnerOwnTokenGridHeader extends Component<IInnerOwnTokenGridHeaderP
     return (
       <div className="inner-own-token-grid-header">
         <div className={`inner-own-token-grid-header__col-token-image ${this.props.isLoadingTransaction && this.props.loader ? `opacity`: `opacityIn` }`}>
-          <span className="inner-own-token-grid-header__text">{`Position (${this.props.asset}/${this.props.unitOfAccount})`}</span>
+          <span className="inner-own-token-grid-header__text">{`Position (${this.props.asset}/${this.props.quoteToken})`}</span>
         </div>
         <div className={`inner-own-token-grid-header__col-asset-type ${this.props.isLoadingTransaction && this.props.loader ? `opacity`: `opacityIn`}`}>
           <span className="inner-own-token-grid-header__text">Type</span>
