@@ -20,10 +20,10 @@ export class HistoryTokenGridHeader extends Component<IHistoryTokenGridHeaderPro
           <span className="history-token-grid-header__text">Unit of Account</span>
         </div>
         <div className="history-token-grid-header__col-position">
-          <span className="history-token-grid-header__text">Position (ETH)</span>
+          <span className="history-token-grid-header__text">Position</span>
         </div>
         <div className="history-token-grid-header__col-asset-price">
-          <span className="history-token-grid-header__text">Open Price</span>
+          <span className="history-token-grid-header__text">Trade Price</span>
         </div>
         {/* <div className="history-token-grid-header__col-liquidation-price">
           <span className="history-token-grid-header__text">Liq. Price</span>
