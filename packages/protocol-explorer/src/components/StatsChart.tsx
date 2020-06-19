@@ -165,9 +165,9 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
             var label = data.datasets[tooltipItems.datasetIndex].label || '';
             var number;
             if (tooltipItems.yLabel > 1000000) {
-              number = `${(tooltipItems.yLabel / 1000000).toFixed(3)} m`;
+              number = `${(tooltipItems.yLabel / 1000000).toFixed(3)}m`;
             } else if (tooltipItems.yLabel > 1000) {
-              number = `${(tooltipItems.yLabel / 1000).toFixed(3)} k`;
+              number = `${(tooltipItems.yLabel / 1000).toFixed(3)}k`;
             } else {
               number = `${(tooltipItems.yLabel).toFixed(3)} `;
             }
