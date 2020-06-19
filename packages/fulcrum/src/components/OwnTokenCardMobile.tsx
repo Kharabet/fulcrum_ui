@@ -149,8 +149,8 @@ export class OwnTokenCardMobile extends Component<IOwnTokenGridRowProps, IOwnTok
                 <div className="own-token-card-mobile__position-type">
                   <span className="position-type-marker">{`${this.props.leverage}x`}&nbsp;{this.props.positionType}</span>
                 </div>
-                <div title={this.props.collateralAsset} className="own-token-card-mobile__unit-of-account">
-                  <span className="own-token-card-mobile__value">{this.props.collateralAsset}</span>
+                <div title={this.props.quoteToken} className="own-token-card-mobile__unit-of-account">
+                  <span className="own-token-card-mobile__value">{this.props.quoteToken}</span>
                 </div>
                 <div className="own-token-card-mobile__action">
                   <button className="own-token-card-mobile__sell-button own-token-card-mobile__button--size-half" onClick={this.onSellClick}>
@@ -236,8 +236,8 @@ export class OwnTokenCardMobile extends Component<IOwnTokenGridRowProps, IOwnTok
       this.props.loan.loanId,
       TradeType.SELL,
       this.props.tradeAsset,
-      this.props.collateralAsset,
-      this.props.collateralAsset,
+      this.props.quoteToken,
+      Asset.UNKNOWN,
       this.props.positionType,
       this.props.leverage,
       new BigNumber(0)
@@ -250,7 +250,7 @@ export class OwnTokenCardMobile extends Component<IOwnTokenGridRowProps, IOwnTok
       new ManageCollateralRequest(
         this.props.loan.loanId,
         this.props.tradeAsset,
-        this.props.collateralAsset,
+        this.props.quoteToken,
         this.props.loan.collateralAmount,
         false
       )
@@ -264,7 +264,7 @@ export class OwnTokenCardMobile extends Component<IOwnTokenGridRowProps, IOwnTok
       TradeType.SELL,
       this.props.tradeAsset,
       Asset.UNKNOWN,
-      this.props.collateralAsset,
+      this.props.quoteToken,
       this.props.positionType,
       this.props.leverage,
       new BigNumber(0)

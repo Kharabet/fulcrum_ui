@@ -37,6 +37,10 @@ import { AbstractConnector } from '@web3-react/abstract-connector';
 import siteConfig from "./../config/SiteConfig.json";
 import { ProviderTypeDictionary } from "../domain/ProviderTypeDictionary";
 import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
+import { TradeEvent } from "../domain/TradeEvent";
+import Web3, { providers } from "web3";
+import { CloseWithSwapEvent } from "../domain/CloseWithSwapEvent";
+import { LiquidationEvent } from "../domain/LiquidationEvent";
 
 const getNetworkIdByString = (networkName: string | undefined) => {
   switch (networkName) {
@@ -700,7 +704,7 @@ export class FulcrumProvider {
   public getMaxTradeValue = async (
     tradeType: TradeType,
     tradeAsset: Asset,
-    unitOfAccount: Asset,
+    quoteToken: Asset,
     depositToken: Asset,
     positionType: PositionType,
     loan?: IBorrowedFundsState
@@ -710,11 +714,11 @@ export class FulcrumProvider {
     if (tradeType === TradeType.BUY) {
       if (this.contractsSource) {
         const loanToken = positionType === PositionType.LONG
-          ? unitOfAccount
+          ? quoteToken
           : tradeAsset;
         const collateralToken = positionType === PositionType.LONG
           ? tradeAsset
-          : unitOfAccount;
+          : quoteToken;
 
         const assetContract = await this.contractsSource.getITokenContract(loanToken);
         if (!assetContract) return result;
@@ -746,7 +750,7 @@ export class FulcrumProvider {
 
     //const baseAsset = this.getBaseAsset(loanAsset);
 
-    // console.log(baseAsset, selectedKey.positionType, selectedKey.unitOfAccount, result.toString());
+    // console.log(baseAsset, selectedKey.positionType, selectedKey.quoteToken, result.toString());
 
 
     let decimalOffset = 0;
@@ -1057,7 +1061,7 @@ export class FulcrumProvider {
     let maybeNeedsApproval = false;
     let account: string | null = null;
 
-    if (request.collateral === Asset.ETH) {
+    if (request.depositToken === Asset.ETH) {
       return false;
     }
 
@@ -1065,10 +1069,10 @@ export class FulcrumProvider {
       if (!account) {
         account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
       }
-      const iTokenContract = await this.contractsSource.getITokenContract(request.collateral);
+      const iTokenContract = await this.contractsSource.getITokenContract(request.depositToken);
 
       if (account && iTokenContract) {
-        const collateralErc20Address = this.getErc20AddressOfAsset(request.collateral);
+        const collateralErc20Address = this.getErc20AddressOfAsset(request.depositToken);
         if (collateralErc20Address) {
 
 
@@ -1244,12 +1248,12 @@ export class FulcrumProvider {
 
 
     const loanToken = isLong
-      ? request.collateral
+      ? request.quoteToken
       : request.asset;
     const depositToken = request.depositToken;
     const collateralToken = isLong
       ? request.asset
-      : request.collateral;
+      : request.quoteToken;
 
     const decimals: number = AssetsDictionary.assets.get(depositToken)!.decimals || 18;
 
@@ -1451,7 +1455,7 @@ export class FulcrumProvider {
 
         let amountInBaseUnits = new BigNumber(0);
         if (request.positionType === PositionType.LONG) {
-          const decimals: number = AssetsDictionary.assets.get(request.collateral)!.decimals || 18;
+          const decimals: number = AssetsDictionary.assets.get(request.quoteToken)!.decimals || 18;
           amountInBaseUnits = new BigNumber(request.amount.multipliedBy(10 ** decimals).toFixed(0, 1));
         }
         else {
@@ -1715,6 +1719,168 @@ export class FulcrumProvider {
     return result;
   }
 
+  public getTradeHistory = async (): Promise<TradeEvent[]> => {
+    let result: TradeEvent[] = [];
+    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : undefined;
+
+    if (!this.contractsSource) return result;
+    const bzxContractAddress = this.contractsSource.getiBZxAddress()
+    if (!account || !bzxContractAddress) return result
+    const etherscanApiKey = configProviders.Etherscan_Api;
+    let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${TradeEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
+    const tradeEventResponse = await fetch(etherscanApiUrl);
+    const tradeEventResponseJson = await tradeEventResponse.json();
+    if (tradeEventResponseJson.status !== "1") return result;
+    const events = tradeEventResponseJson.result;
+    //@ts-ignore
+    result = events.reverse().map(event => {
+      const userAddress = event.topics[1].replace("0x000000000000000000000000", "0x");
+      const baseTokenAddress = event.topics[2].replace("0x000000000000000000000000", "0x");
+      const quoteTokenAddress = event.topics[3].replace("0x000000000000000000000000", "0x");
+      const baseToken = this.contractsSource!.getAssetFromAddress(baseTokenAddress);
+      const quoteToken = this.contractsSource!.getAssetFromAddress(quoteTokenAddress);
+      const data = event.data.replace("0x", "");
+      const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
+      if (!dataSegments) return result;
+      const lender = dataSegments[0].replace("000000000000000000000000", "0x");
+      const loandId = dataSegments[1];
+      const positionSize = new BigNumber(parseInt(dataSegments[2], 16));
+      const borrowedAmount = new BigNumber(parseInt(dataSegments[3], 16));
+      const interestRate = new BigNumber(parseInt(dataSegments[4], 16));
+      const settlementDate = new Date(parseInt(dataSegments[5], 16) * 1000);
+      const entryPrice = new BigNumber(parseInt(dataSegments[6], 16));
+      const entryLeverage = new BigNumber(parseInt(dataSegments[7], 16));
+      const currentLeverage = new BigNumber(parseInt(dataSegments[8], 16));
+      const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000);
+      const txHash = event.transactionHash;
+      return new TradeEvent(
+        userAddress,
+        baseToken,
+        quoteToken,
+        lender,
+        loandId,
+        positionSize,
+        borrowedAmount,
+        interestRate,
+        settlementDate,
+        entryPrice,
+        entryLeverage,
+        currentLeverage,
+        timeStamp,
+        txHash
+      )
+
+    })
+    return result
+
+  }
+
+  public getCloseWithSwapHistory = async (): Promise<CloseWithSwapEvent[]> => {
+    let result: CloseWithSwapEvent[] = [];
+    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : undefined;
+
+    if (!this.contractsSource) return result;
+    const bzxContractAddress = this.contractsSource.getiBZxAddress()
+    if (!account || !bzxContractAddress) return result
+    const etherscanApiKey = configProviders.Etherscan_Api;
+    let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${CloseWithSwapEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
+    const tradeEventResponse = await fetch(etherscanApiUrl);
+    const tradeEventResponseJson = await tradeEventResponse.json();
+    if (tradeEventResponseJson.status !== "1") return result;
+    const events = tradeEventResponseJson.result;
+    //@ts-ignore
+    result = events.reverse().map(event => {
+      const userAddress = event.topics[1].replace("0x000000000000000000000000", "0x");
+      const baseTokenAddress = event.topics[2].replace("0x000000000000000000000000", "0x");
+      const quoteTokenAddress = event.topics[3].replace("0x000000000000000000000000", "0x");
+      const baseToken = this.contractsSource!.getAssetFromAddress(baseTokenAddress);
+      const quoteToken = this.contractsSource!.getAssetFromAddress(quoteTokenAddress);
+      const data = event.data.replace("0x", "");
+      const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
+      if (!dataSegments) return result;
+      const lender = dataSegments[0].replace("000000000000000000000000", "0x");
+      const closer = dataSegments[1].replace("000000000000000000000000", "0x");
+      const loandId = dataSegments[2];
+      const positionCloseSize = new BigNumber(parseInt(dataSegments[3], 16));
+      const loanCloseAmount = new BigNumber(parseInt(dataSegments[4], 16));
+      const exitPrice = new BigNumber(parseInt(dataSegments[5], 16));
+      const currentLeverage = new BigNumber(parseInt(dataSegments[6], 16));
+      const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000);
+      const txHash = event.transactionHash;
+      return new CloseWithSwapEvent(
+        userAddress,
+        baseToken,
+        quoteToken,
+        lender,
+        closer,
+        loandId,
+        positionCloseSize,
+        loanCloseAmount,
+        exitPrice,
+        currentLeverage,
+        timeStamp,
+        txHash
+      )
+
+    })
+    return result
+
+  }
+
+
+  public getLiquidationHistory = async (): Promise<LiquidationEvent[]> => {
+    let result: LiquidationEvent[] = [];
+    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : undefined;
+
+    if (!this.contractsSource) return result;
+    const bzxContractAddress = this.contractsSource.getiBZxAddress()
+    if (!account || !bzxContractAddress) return result
+    const etherscanApiKey = configProviders.Etherscan_Api;
+    let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${LiquidationEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
+    const tradeEventResponse = await fetch(etherscanApiUrl);
+    const tradeEventResponseJson = await tradeEventResponse.json();
+    if (tradeEventResponseJson.status !== "1") return result;
+    const events = tradeEventResponseJson.result;
+    //@ts-ignore
+    result = events.reverse().map(event => {
+      const userAddress = event.topics[1].replace("0x000000000000000000000000", "0x");
+      const liquidatorAddress = event.topics[2].replace("0x000000000000000000000000", "0x");
+      const loanId = event.topics[3];
+      const data = event.data.replace("0x", "");
+      const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
+      if (!dataSegments) return result;
+      const lender = dataSegments[0].replace("000000000000000000000000", "0x");
+      
+      const baseTokenAddress = dataSegments[1].replace("0x000000000000000000000000", "0x");
+      const quoteTokenAddress = dataSegments[2].replace("0x000000000000000000000000", "0x");
+      const baseToken = this.contractsSource!.getAssetFromAddress(baseTokenAddress);
+      const quoteToken = this.contractsSource!.getAssetFromAddress(quoteTokenAddress);
+      const repayAmount = new BigNumber(parseInt(dataSegments[3], 16));
+      const collateralWithdrawAmount = new BigNumber(parseInt(dataSegments[4], 16));
+      const collateralToLoanRate = new BigNumber(parseInt(dataSegments[5], 16));
+      const currentMargin = new BigNumber(parseInt(dataSegments[6], 16));
+      const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000);
+      const txHash = event.transactionHash;
+      return new LiquidationEvent(
+        userAddress,
+        liquidatorAddress,
+        loanId,
+        lender,
+        baseToken,
+        quoteToken,
+        repayAmount,
+        collateralWithdrawAmount,
+        collateralToLoanRate,
+        currentMargin,
+        timeStamp,
+        txHash
+      )
+
+    })
+    return result
+
+  }
+
   private onTaskEnqueued = async (requestTask: RequestTask) => {
     await this.processQueue(false, false);
   };
@@ -1831,13 +1997,13 @@ if (err || 'error' in added) {
 console.log(err, added);
 }
 }*//*);
-                                                                                                                                                                                                    }
-                                                                                                                                                                                                    }
-                                                                                                                                                                                                    }
-                                                                                                                                                                                                    } catch(e) {
-                                                                                                                                                                                                    // console.log(e);
-                                                                                                                                                                                                    }
-                                                                                                                                                                                                    }*/
+                                                                                                                                                                                                                            }
+                                                                                                                                                                                                                            }
+                                                                                                                                                                                                                            }
+                                                                                                                                                                                                                            } catch(e) {
+                                                                                                                                                                                                                            // console.log(e);
+                                                                                                                                                                                                                            }
+                                                                                                                                                                                                                            }*/
   }
 
   private processLendRequestTask = async (task: RequestTask, skipGas: boolean) => {
@@ -1962,7 +2128,7 @@ console.log(err, added);
       let srcTokenAddress = ""
       let destTokenAddress = "";
 
-      srcTokenAddress = this.getErc20AddressOfAsset(taskRequest.collateral)!;
+      srcTokenAddress = this.getErc20AddressOfAsset(taskRequest.quoteToken)!;
       destTokenAddress = this.getErc20AddressOfAsset(taskRequest.asset)!;
       // if (taskRequest.version === 2) {
       //   if (siteConfig.ZeroXAPIEnabledForBuys && taskRequest.tradeType === TradeType.BUY) {

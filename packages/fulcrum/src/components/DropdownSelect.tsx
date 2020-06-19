@@ -8,13 +8,13 @@ import { AssetsDictionary } from '../domain/AssetsDictionary';
 import { AssetDetails } from '../domain/AssetDetails';
 export interface IDropDownSelectOption {
   tradeAsset: Asset;
-  unitOfAccount: Asset;
+  quoteToken: Asset;
 
 }
 export interface IDropdownSelectProps {
   options: IDropDownSelectOption[];
   selectedOption: IDropDownSelectOption;
-  onDropdownSelect: (tradeAsset: string, unitOfAccount: string) => void;
+  onDropdownSelect: (tradeAsset: string, quoteToken: string) => void;
 }
 
 export const DropdownSelect = (props: IDropdownSelectProps) => {
@@ -56,7 +56,7 @@ export const DropdownSelect = (props: IDropdownSelectProps) => {
     selectStyled.classList.remove('active');
     // selectNative.selectedIndex = parseInt(li.dataset.index!);
     ul.style.display = 'none';
-    await props.onDropdownSelect(li.dataset.tradeasset!, li.dataset.unitofaccount!);
+    await props.onDropdownSelect(li.dataset.tradeasset!, li.dataset.quotetoken!);
   }
 
   useEffect(() => {
@@ -73,18 +73,18 @@ export const DropdownSelect = (props: IDropdownSelectProps) => {
         {props.options.map(option => option != props.selectedOption && (<option value={option.value}>{option.displayName}</option>))}
       </select> */}
       <div className="styled-select" onClick={onStyledSelectClick}>
-        Select market {asset.reactLogoSvg.render()} {props.selectedOption.tradeAsset}-{props.selectedOption.unitOfAccount}
+        Select market {asset.reactLogoSvg.render()} {props.selectedOption.tradeAsset}-{props.selectedOption.quoteToken}
       </div>
       <ul className="select-options">
         <SimpleBar style={{ maxHeight: 480 }} autoHide={false}>
           {props.options.map((option, i) =>
             (<li data-tradeasset={option.tradeAsset}
-              data-unitofaccount={option.unitOfAccount}
+              data-quotetoken={option.quoteToken}
               data-index={i}
               key={i}
               onClick={onLiClick}>
               {asset.reactLogoSvg.render()}
-              {option.tradeAsset}-{option.unitOfAccount}
+              {option.tradeAsset}-{option.quoteToken}
             </li>)
           )
           }

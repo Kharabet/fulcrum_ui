@@ -67,8 +67,8 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
     const interestRate = await FulcrumProvider.Instance.getBorrowInterestRate(this.props.asset);
 
     const collateralToPrincipalRate = this.props.positionType === PositionType.LONG
-      ? await FulcrumProvider.Instance.getSwapRate(this.props.asset, this.props.unitOfAccount)
-      : await FulcrumProvider.Instance.getSwapRate(this.props.unitOfAccount, this.props.asset);
+      ? await FulcrumProvider.Instance.getSwapRate(this.props.asset, this.props.quoteToken)
+      : await FulcrumProvider.Instance.getSwapRate(this.props.quoteToken, this.props.asset);
 
     let initialMargin = this.props.positionType === PositionType.LONG
       ? new BigNumber(10 ** 38).div(new BigNumber(this.state.leverage - 1).times(10 ** 18))
@@ -230,7 +230,7 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
       "0x0000000000000000000000000000000000000000000000000000000000000000",
       TradeType.BUY,
       this.props.asset,
-      this.props.unitOfAccount, // TODO: depends on which one they own
+      this.props.quoteToken, // TODO: depends on which one they own
       Asset.ETH,
       this.props.positionType,
       this.state.leverage,

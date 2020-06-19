@@ -19,7 +19,7 @@ import { TradeTxLoaderStep } from "./TradeTxLoaderStep";
 export interface IOwnTokenGridRowProps {
   loan: IBorrowedFundsState;
   tradeAsset: Asset;
-  collateralAsset: Asset;
+  quoteToken: Asset;
   leverage: number;
   positionType: PositionType;
   positionValue: BigNumber;
@@ -64,40 +64,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
   private _isMounted: boolean;
 
   private async derivedUpdate() {
-    this._isMounted && this.setState({
-      isLoading: true
-    });
-    const collateralToPrincipalRate = await FulcrumProvider.Instance.getSwapRate(this.props.loan.collateralAsset, this.props.loan.loanAsset);
-    let positionValue = new BigNumber(0);
-    let value = new BigNumber(0);
-    let collateral = new BigNumber(0);
-    let openPrice = new BigNumber(0);
-    //liquidation_collateralToLoanRate = ((15000000000000000000 * principal / 10^20) + principal) / collateral * 10^18
-    //If SHORT -> 10^36 / liquidation_collateralToLoanRate
-    const liquidation_collateralToLoanRate = (new BigNumber("15000000000000000000").times(this.props.loan.loanData!.principal).div(10 ** 20)).plus(this.props.loan.loanData!.principal).div(this.props.loan.loanData!.collateral).times(10 ** 18);
-    let liquidationPrice = new BigNumber(0);
-    let profit = new BigNumber(0);
-    if (this.props.positionType === PositionType.LONG) {
-      positionValue = this.props.loan.loanData!.collateral.div(10 ** 18);
-      value = this.props.loan.loanData!.collateral.div(10 ** 18).times(collateralToPrincipalRate);
-      collateral = ((this.props.loan.loanData!.collateral.times(collateralToPrincipalRate).div(10 ** 18)).minus(this.props.loan.loanData!.principal.div(10 ** 18)));
-      openPrice = this.props.loan.loanData!.startRate.div(10 ** 18);
-      liquidationPrice = liquidation_collateralToLoanRate.div(10 ** 18);
-
-      const startingValue = ((this.props.loan.loanData!.collateral.times(openPrice.times(10 ** 18)).div(10 ** 18)).minus(this.props.loan.loanData!.principal)).div(10 ** 18);
-      const currentValue = ((this.props.loan.loanData!.collateral.times(collateralToPrincipalRate.times(10 ** 18)).div(10 ** 18)).minus(this.props.loan.loanData!.principal)).div(10 ** 18);
-      profit = currentValue.minus(startingValue);
-    }
-    else {
-      positionValue = this.props.loan.loanData!.principal.div(10 ** 18);
-      value = this.props.loan.loanData!.collateral.div(10 ** 18);
-      collateral = ((this.props.loan.loanData!.collateral.div(10 ** 18)).minus(this.props.loan.loanData!.principal.div(collateralToPrincipalRate).div(10 ** 18)));
-      openPrice = new BigNumber(10 ** 36).div(this.props.loan.loanData!.startRate).div(10 ** 18);
-      liquidationPrice = new BigNumber(10 ** 36).div(liquidation_collateralToLoanRate).div(10 ** 18);
-      const startingValue = (this.props.loan.loanData!.collateral.minus(this.props.loan.loanData!.principal.div(openPrice.times(10 ** 18)).times(10 ** 18))).div(10 ** 18);
-      const currentValue = (this.props.loan.loanData!.collateral.minus(this.props.loan.loanData!.principal.div(collateralToPrincipalRate.times(10 ** 18)).times(10 ** 18))).div(10 ** 18);
-      profit = startingValue.minus(currentValue);
-    }
+    
     this._isMounted && this.setState({
       ...this.state,
       isLoading: false,
@@ -173,8 +140,8 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
               {`${this.props.leverage}x ${this.props.positionType}`}
             </span>
           </div>
-          <div title={this.props.collateralAsset} className="own-token-grid-row__col-asset-unit opacityIn">
-            {this.props.collateralAsset}
+          <div title={this.props.quoteToken} className="own-token-grid-row__col-asset-unit opacityIn">
+            {this.props.quoteToken}
           </div>
           <div title={this.props.positionValue.toFixed(18)} className="own-token-grid-row__col-position  opacityIn">
             {this.props.positionValue.toFixed(4)}
@@ -250,8 +217,8 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
       this.props.loan.loanId,
       TradeType.SELL,
       this.props.tradeAsset,
-      this.props.collateralAsset,
-      this.props.collateralAsset,
+      this.props.quoteToken,
+      Asset.UNKNOWN,
       this.props.positionType,
       this.props.leverage,
       new BigNumber(0)
@@ -264,7 +231,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
       new ManageCollateralRequest(
         this.props.loan.loanId,
         this.props.tradeAsset,
-        this.props.collateralAsset,
+        this.props.quoteToken,
         this.props.loan.collateralAmount,
         false
       )
@@ -277,8 +244,8 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
       this.props.loan.loanId,
       TradeType.SELL,
       this.props.tradeAsset,
-      this.props.collateralAsset,
-      this.props.collateralAsset,
+      this.props.quoteToken,
+      Asset.UNKNOWN,
       this.props.positionType,
       this.props.leverage,
       new BigNumber(0)
