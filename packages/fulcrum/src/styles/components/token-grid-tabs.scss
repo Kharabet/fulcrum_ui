@@ -1,30 +1,16 @@
 @import "../abstracts/variables";
 
 .trade-token-grid-tab {
-  &:after {
-    content: "";
-    position: absolute;
-    height: 1px;
-    background: var(--indicator-border);
-    bottom: 0;
-    left: 50%;
-    transform: translate(-50%, 0);
-  }
   &__container {
     display: flex;
-    justify-content: flex-start;
+    align-items: center;
     flex-wrap: wrap;
   }
   &__items {
     display: flex;
-    align-self: flex-end;
+    align-items: center;
   }
   &-item {
-    &.eth-tab {
-      .eth-svg {
-        fill: var(--eth-bg);
-      }
-    }
     &--active {
       position: relative;
 
@@ -32,15 +18,6 @@
         span {
           color: var(--primary-text);
         }
-      }
-      &:after {
-        content: "";
-        position: absolute;
-        width: 100%;
-        height: 4px;
-        background: #276bfb;
-        bottom: 0;
-        border-radius: 6px 6px 0 0;
       }
     }
     &:not(&--active) {
@@ -62,8 +39,6 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      margin-bottom: 15px;
-      padding-bottom: 10px;
       svg {
         height: 28px;
         width: 28px;
@@ -100,11 +75,11 @@
   @media screen and (min-width: $breakpoint-mobile-min) {
     position: relative;
 
+    &__container {
+      margin-bottom: 35px;
+    }
     &:after {
       width: calc(100vw - 17px);
-    }
-    &__selector {
-      margin-bottom: 15px;
     }
     &-item {
       &:not(.manage-tab) {
@@ -137,7 +112,7 @@
       width: 100%;
       margin: 15px 0;
       padding: 0 15px;
-      text-align: center;;
+      text-align: center;
     }
     &__items {
       width: 100%;

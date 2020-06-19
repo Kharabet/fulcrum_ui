@@ -69,6 +69,10 @@ $padding: 22px 30px 35px 30px;
     }
     &__col-asset-price {
       @include inner-own-token-grid-header__col();
+      text-align: right;
+      @media screen and (min-width: $breakpoint-desktop-min) {
+        padding-right: 20px;
+      }      
       //width: $width-col-asset-price;
     }
     &__col-asset-value {
@@ -77,18 +81,40 @@ $padding: 22px 30px 35px 30px;
     }
     &__col-asset-collateral {
       @include inner-own-token-grid-header__col();
+      text-align: right;
+      @media screen and (min-width: $breakpoint-desktop-min) {
+        padding-right: 56px;
+      }    
+      @media screen and (max-width: $breakpoint-desktop-max) {
+        padding-right: 36px;
+      } 
       //width: $width-col-asset-collateral;
     }
     &__col-liquidation-price {
       @include inner-own-token-grid-header__col();
+      @media screen and (min-width: $breakpoint-desktop-min) {
+        text-align: right;
+        padding-right: 40px;
+      } 
       ////width: $width-col-liquidation-price;
     }
     &__col-position-value {
       @include inner-own-token-grid-header__col();
+      text-align: right;
+      @media screen and (min-width: $breakpoint-desktop-min) {
+        padding-right: 40px;
+      } 
+      @media screen and (max-width: $breakpoint-desktop-max) {
+        padding-right: 20px;
+      }
       //width: $width-col-position-value;
     }
     &__col-profit {
       @include inner-own-token-grid-header__col();
+      text-align: right;      
+      @media screen and (min-width: $breakpoint-desktop-min) {
+        padding-right: 20px;
+      }
       //width: $width-col-profit;
     }
     &__col-actions {
@@ -242,8 +268,11 @@ $padding: 22px 30px 35px 30px;
       top: 2px;
       cursor: pointer;
 
-      .icon-collateral {
+      .icon-collateral-fill {
         fill: var(--icon-collateral);
+      }
+      .icon-collateral-stroke {
+        stroke: var(--icon-collateral);
       }
     }
     &__col-profit {
