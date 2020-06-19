@@ -18,12 +18,12 @@ export class TradeBuyProcessor {
     const isLong = taskRequest.positionType === PositionType.LONG;
 
     const loanToken = isLong
-      ? taskRequest.collateral
+      ? taskRequest.quoteToken
       : taskRequest.asset;
     const depositToken = taskRequest.depositToken;
     const collateralToken = isLong
       ? taskRequest.asset
-      : taskRequest.collateral;
+      : taskRequest.quoteToken;
 
     const decimals: number = AssetsDictionary.assets.get(depositToken)!.decimals || 18;
 

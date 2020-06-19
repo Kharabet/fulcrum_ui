@@ -17,7 +17,7 @@ $width-col-asset-collateral: 12%;
 $width-col-actions: 15%;
 $width-button: 95px;
 $height-button: 44px;
-$padding: 22px 40px 35px 40px;
+$padding: 22px 30px 35px 30px;
 
 @mixin inner-own-token-grid-header__col {
   font-family: "Muli", sans-serif;
@@ -43,16 +43,19 @@ $padding: 22px 40px 35px 40px;
 .inner-own-token-grid {
   .inner-own-token-grid-header {
     display: grid;
-    grid-template-columns: 10% 10% 8% 11% 10% 10% 9% 10%;
+    grid-template-columns: 10% 8% calc(11% - 35px) 11% 11% 11% 9% 9%;
     column-gap: 35px;
     justify-content: space-between;
     flex-wrap: wrap;
-    padding: 17px 40px 0px 40px;
+    padding: 17px 30px 0px 30px;
     font-family: "Muli", sans-serif;
     background-color: var(--secondary-row);
     margin-bottom: -15px;
     position: relative;
     z-index: 2;
+    @media screen and (min-width: $breakpoint-desktop-min) {
+      padding: 17px 40px 0px 40px;
+    }
     .opacity {
       opacity: 0;
     }
@@ -66,6 +69,10 @@ $padding: 22px 40px 35px 40px;
     }
     &__col-asset-price {
       @include inner-own-token-grid-header__col();
+      text-align: right;
+      @media screen and (min-width: $breakpoint-desktop-min) {
+        padding-right: 20px;
+      }      
       //width: $width-col-asset-price;
     }
     &__col-asset-value {
@@ -74,18 +81,40 @@ $padding: 22px 40px 35px 40px;
     }
     &__col-asset-collateral {
       @include inner-own-token-grid-header__col();
+      text-align: right;
+      @media screen and (min-width: $breakpoint-desktop-min) {
+        padding-right: 56px;
+      }    
+      @media screen and (max-width: $breakpoint-desktop-max) {
+        padding-right: 36px;
+      } 
       //width: $width-col-asset-collateral;
     }
     &__col-liquidation-price {
       @include inner-own-token-grid-header__col();
+      @media screen and (min-width: $breakpoint-desktop-min) {
+        text-align: right;
+        padding-right: 40px;
+      } 
       ////width: $width-col-liquidation-price;
     }
     &__col-position-value {
       @include inner-own-token-grid-header__col();
+      text-align: right;
+      @media screen and (min-width: $breakpoint-desktop-min) {
+        padding-right: 40px;
+      } 
+      @media screen and (max-width: $breakpoint-desktop-max) {
+        padding-right: 20px;
+      }
       //width: $width-col-position-value;
     }
     &__col-profit {
       @include inner-own-token-grid-header__col();
+      text-align: right;      
+      @media screen and (min-width: $breakpoint-desktop-min) {
+        padding-right: 20px;
+      }
       //width: $width-col-profit;
     }
     &__col-actions {
@@ -98,7 +127,7 @@ $padding: 22px 40px 35px 40px;
   .inner-own-token-grid-row,
   .inner-own-token-card-mobile {
     display: grid;
-    grid-template-columns: 10% 10% 8% 11% 10% 10% 9% 10%;
+    grid-template-columns: 10% 8% calc(11% - 35px) 11% 11% 11% 9% 9%;
     column-gap: 35px;
     justify-content: space-between;
     flex-wrap: wrap;
@@ -107,9 +136,16 @@ $padding: 22px 40px 35px 40px;
     padding: $padding;
     margin-bottom: 1px;
     position: relative;
+    @media screen and (min-width: $breakpoint-desktop-min) {
+      padding: 22px 40px 35px 40px;
+    }
     .sign-currency {
       color: #a2abb8;
       font-weight: 400;
+    }
+    .value-currency {
+      position: relative;
+      text-align: right;
     }
     .inner-own-token-card-mobile__body-row {
       width: 100%;
@@ -138,8 +174,10 @@ $padding: 22px 40px 35px 40px;
     &__col-asset-price {
       @include inner-own-token-grid-row__col();
       //width: $width-col-asset-price;
-      justify-content: flex-end;
-      position: relative;
+      //justify-content: center;
+      .value-currency {
+        min-width: 85px;
+      }
       @media screen and (max-width: $breakpoint-mobile-max) {
         margin-bottom: 35px;
       }
@@ -150,6 +188,7 @@ $padding: 22px 40px 35px 40px;
       font-weight: 700;
       text-indent: 13px;
       //color: #1cd8c4;
+      right: 0;
       top: 100%;
       @media screen and (max-width: $breakpoint-mobile-max) {
         text-indent: 10px;
@@ -158,12 +197,12 @@ $padding: 22px 40px 35px 40px;
     &__col-asset-value {
       @include inner-own-token-grid-row__col();
       //width: $width-col-asset-value;
-      justify-content: flex-end;
+      //justify-content: flex-end;
     }
     &__col-asset-type {
       @include inner-own-token-grid-row__col();
       //width: $width-col-asset-type;
-      // justify-content: flex-end;
+      //justify-content: flex-end;
       @media screen and (max-width: $breakpoint-mobile-max) {
         margin-bottom: 25px;
       }
@@ -172,18 +211,34 @@ $padding: 22px 40px 35px 40px;
       @include inner-own-token-grid-row__col();
       //width: $width-col-liquidation-price;
       justify-content: flex-end;
+      padding-right: 20px;
+      @media screen and (min-width: $breakpoint-desktop-min) {
+        padding-right: 40px;
+      }
     }
     &__col-position-value {
       @include inner-own-token-grid-row__col();
-     /// width: $width-col-position-value;
+      /// width: $width-col-position-value;
       justify-content: flex-end;
+      padding-right: 20px;
+      @media screen and (min-width: $breakpoint-desktop-min) {
+        padding-right: 40px;
+      }
     }
     &__col-asset-collateral {
       @include inner-own-token-grid-row__col();
       align-items: center;
       position: relative;
-     // width: $width-col-asset-collateral;
-      justify-content: flex-end;
+      // width: $width-col-asset-collateral;
+      //justify-content: flex-end;
+      // margin-right: 30px;
+      .value-currency {
+        min-width: 90px;
+      }
+
+      // @media screen and (min-width: $breakpoint-desktop-min) {
+      //   padding-right: 15px;
+      // }
       @media screen and (max-width: $breakpoint-mobile-max) {
         margin-bottom: 35px;
       }
@@ -194,7 +249,7 @@ $padding: 22px 40px 35px 40px;
       font-weight: 700;
       text-indent: 13px;
       top: 100%;
-      right: 35px;
+      right: 0;
       &.danger {
         color: #ff4f4f;
       }
@@ -208,17 +263,25 @@ $padding: 22px 40px 35px 40px;
       justify-content: center;
       border-radius: 50%;
       margin-left: 10px;
-      // position: absolute;
-      right: 25px;
+      position: absolute;
+      right: -34px;
+      top: 2px;
       cursor: pointer;
-      .icon-collateral {
+
+      .icon-collateral-fill {
         fill: var(--icon-collateral);
+      }
+      .icon-collateral-stroke {
+        stroke: var(--icon-collateral);
       }
     }
     &__col-profit {
       @include inner-own-token-grid-row__col();
       //width: $width-col-profit;
       justify-content: flex-end;
+      @media screen and (min-width: $breakpoint-desktop-min) {
+        padding-right: 20px;
+      }
     }
     &__col-action {
       @include inner-own-token-grid-row__col();

@@ -87,14 +87,14 @@ export class HistoryTokenCardMobile extends Component<IHistoryTokenGridRowProps,
         <div className="history-token-card-mobile__col-type">
 
           <div className="position-type-marker">
-            {`${this.props.leverage}x ${this.props.positionType}`}
+            {`${this.props.eventsGroup.leverage}x ${this.props.eventsGroup.positionType}`}
           </div>
         </div>
       </div>
       <div className="history-token-card-mobile__row">
         <div className="history-token-card-mobile__col-asset-unit">
           <span className="history-token-card-mobile__header">Unit of Account</span>
-          <span className="history-token-card-mobile__value">{this.props.collateralAsset}</span>
+          <span className="history-token-card-mobile__value">{this.props.eventsGroup.quoteToken}</span>
         </div>
         <div className="history-token-card-mobile__col-asset-price">
           <span className="history-token-card-mobile__header">Open price</span>

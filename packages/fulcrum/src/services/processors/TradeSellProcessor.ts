@@ -25,7 +25,7 @@ export class TradeSellProcessor {
 
     let amountInBaseUnits = new BigNumber(0);
     if (!isLong) {
-      const decimals: number = AssetsDictionary.assets.get(taskRequest.collateral)!.decimals || 18;
+      const decimals: number = AssetsDictionary.assets.get(taskRequest.quoteToken)!.decimals || 18;
       amountInBaseUnits = new BigNumber(loan.loanData!.collateral.times(taskRequest.amount).div(loan.loanData!.principal).multipliedBy(10 ** decimals).toFixed(0, 1));
     }
     else {

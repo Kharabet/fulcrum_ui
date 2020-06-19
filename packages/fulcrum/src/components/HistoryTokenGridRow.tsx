@@ -7,19 +7,17 @@ import { FulcrumProvider } from "../services/FulcrumProvider";
 import { Preloader } from "./Preloader";
 import { Asset } from "../domain/Asset";
 import { PositionType } from "../domain/PositionType";
+import { PositionEventsGroup } from "../domain/PositionEventsGroup";
 
 export interface IHistoryTokenGridRowProps {
-  tradeAsset: Asset;
-  collateralAsset: Asset;
-  leverage: number;
-  positionType: PositionType;
-  onTrade: (request: TradeRequest) => void;
+  eventsGroup: PositionEventsGroup
 }
 
 interface IHistoryTokenGridRowState {
   assetBalance: BigNumber | null;
   profit: BigNumber | null;
   isLoading: boolean;
+  isShowCollapse: boolean;
 }
 
 export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IHistoryTokenGridRowState> {
@@ -32,7 +30,8 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
     this.state = {
       assetBalance: new BigNumber(0),
       profit: new BigNumber(0),
-      isLoading: true
+      isLoading: true,
+      isShowCollapse: false
     };
 
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
@@ -70,34 +69,80 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
     this.derivedUpdate();
   }
 
-  public render() {
-    return (<div className="history-token-grid-row">
-      <div className="history-token-grid-row__col-token-date">
-        12 June 2019
-    </div>
-      <div className="history-token-grid-row__col-token-asset">
-        SAI
-    </div>
-      <div className="history-token-grid-row__col-type">
-        <div className="position-type-marker">
-          {`${this.props.leverage}x ${this.props.positionType}`}
+  public renderOtherEvents = () => {
+    const croppedEvent = this.props.eventsGroup.events.slice(0, -1).reverse();
+    return croppedEvent.map(event => {
+      return (<div className="history-token-grid-row history-token-grid-row-inner">
+        <div className="history-token-grid-row-inner__col-token-date">
+          {event.date.toLocaleDateString("en-US", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric"
+          })}
         </div>
-      </div>
-      <div className="history-token-grid-row__col-asset-unit">
-        {this.props.collateralAsset}
-      </div>
-      <div className="history-token-grid-row__col-position">
-        0.8884
-    </div>
-      <div className="history-token-grid-row__col-asset-price">
-        {!this.state.isLoading
-          ? <React.Fragment>
-            <span className="sign-currency">$</span>{new BigNumber(0).toFixed(2)}
-          </React.Fragment>
-          : <Preloader width="74px" />
-        }
-      </div>
-      <div className="history-token-grid-row__col-liquidation-price">
+
+        <div className="history-token-grid-row-inner__result">
+          <span>{event.action.replace(event.loanId, "")}</span>
+        </div>
+        <div className="history-token-grid-row-inner__col-position">
+          {event.positionValue.toFixed(4)}
+        </div>
+        <div className="history-token-grid-row-inner__col-asset-price">
+          {!this.state.isLoading
+            ? <React.Fragment>
+              <span className="sign-currency">$</span>{event.tradePrice.toFixed(2)}
+            </React.Fragment>
+            : <Preloader width="74px" />
+          }
+        </div>
+        <div className="history-token-grid-row-inner__col-position-value">
+          {!this.state.isLoading
+            ? <React.Fragment>
+              <span className="sign-currency">$</span>{event.value.toFixed(2)}
+            </React.Fragment>
+            : <Preloader width="74px" />
+          }
+        </div>
+        <div className="history-token-grid-row-inner__col-profit">-</div>
+      </div>)
+    })
+  }
+
+  public render() {
+    const latestEvent = this.props.eventsGroup.events[this.props.eventsGroup.events.length - 1]
+    return (
+      <div>
+        <div className="history-token-grid-row">
+          <div className="history-token-grid-row__col-token-date">
+            {latestEvent.date.toLocaleDateString("en-US", {
+              day: "2-digit",
+              month: "short",
+              year: "numeric"
+            })}
+          </div>
+          <div className="history-token-grid-row__col-token-asset">
+            {this.props.eventsGroup.baseToken}
+          </div>
+          <div className="history-token-grid-row__col-type">
+            <div className="position-type-marker">
+              {`${this.props.eventsGroup.leverage}x ${this.props.eventsGroup.positionType}`}
+            </div>
+          </div>
+          <div className="history-token-grid-row__col-asset-unit">
+            {this.props.eventsGroup.quoteToken}
+          </div>
+          <div className="history-token-grid-row__col-position">
+            {latestEvent.positionValue.toFixed(4)}
+          </div>
+          <div className="history-token-grid-row__col-asset-price">
+            {!this.state.isLoading
+              ? <React.Fragment>
+                <span className="sign-currency">$</span>{latestEvent.tradePrice.toFixed(2)}
+              </React.Fragment>
+              : <Preloader width="74px" />
+            }
+          </div>
+          {/* <div className="history-token-grid-row__col-liquidation-price">
         {!this.state.isLoading
           ? this.state.assetBalance
             ? <React.Fragment>
@@ -106,30 +151,34 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
             : '$0.00'
           : <Preloader width="74px" />
         }
-      </div>
-      <div className="history-token-grid-row__col-position-value">
-        {!this.state.isLoading
-          ? this.state.assetBalance
-            ? <React.Fragment>
-              <span className="sign-currency">$</span>{this.state.assetBalance.toFixed(2)}
-            </React.Fragment>
-            : '$0.00'
-          : <Preloader width="74px" />
-        }
-      </div>
-      <div className="history-token-grid-row__col-profit">
-        {!this.state.isLoading
-          ? this.state.profit
-            ? <React.Fragment>
-              <span className="sign-currency">$</span>{this.state.profit.toFixed(2)}
-            </React.Fragment>
-            : '$0.00'
-          : <Preloader width="74px" />
-        }
-      </div>
-      <div className="history-token-grid-row__result">
-        Liquidated
-    </div>
-    </div>)
+      </div> */}
+          <div className="history-token-grid-row__col-position-value">
+            {!this.state.isLoading
+              ? <React.Fragment>
+                <span className="sign-currency">$</span>{latestEvent.value.toFixed(2)}
+              </React.Fragment>
+              : <Preloader width="74px" />
+            }
+          </div>
+          <div className="history-token-grid-row__col-profit">
+            {!this.state.isLoading
+              ? <React.Fragment>
+                <span className="sign-currency"></span>{latestEvent.profit instanceof BigNumber ? latestEvent.profit.toFixed(2) : "-"}
+              </React.Fragment>
+              : <Preloader width="74px" />
+            }
+          </div>
+          <div className={`history-token-grid-row__result ${this.props.eventsGroup.events.length - 1 ? `toggle-collapse` : ``}  ${this.state.isShowCollapse ? `opened-collapse` : ``}`} onClick={this.toggleCollapse}>
+            <span>{latestEvent.action.replace(latestEvent.loanId, "")}</span>
+          </div>
+        </div>
+        <div className={`collapse ${this.state.isShowCollapse ? `show` : `hide`}`}>
+          {this.renderOtherEvents()}
+        </div>
+      </div>)
+  }
+
+  public toggleCollapse = () => {
+    this.setState({ ...this.state, isShowCollapse: !this.state.isShowCollapse })
   }
 }

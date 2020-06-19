@@ -20,7 +20,6 @@ import { FulcrumProvider } from "../services/FulcrumProvider";
 import { CollapsibleContainer } from "./CollapsibleContainer";
 import { PositionTypeMarkerAlt } from "./PositionTypeMarkerAlt";
 import { TradeExpectedResult } from "./TradeExpectedResult";
-import { UnitOfAccountSelector } from "./UnitOfAccountSelector";
 import { Preloader } from "./Preloader";
 import { InputAmount } from "./InputAmount";
 
@@ -61,7 +60,7 @@ export interface ITradeFormProps {
 
 interface ITradeFormState {
   assetDetails: AssetDetails | null;
-  collateral: Asset;
+  depositToken: Asset;
   interestRate: BigNumber;
 
 
@@ -105,7 +104,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
     this._isMounted = false;
     this.state = {
       assetDetails: assetDetails || null,
-      collateral: props.tradeAsset,
+      depositToken: props.tradeAsset,
       inputAmountText: "",
       inputAmountValue: maxTradeValue,
       tradeAmountValue: maxTradeValue,
@@ -170,7 +169,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       this.props.tradeType,
       this.props.tradeAsset,
       this.props.quoteAsset,
-      this.state.collateral,
+      this.state.depositToken,
       this.props.positionType,
       this.props.loan
     );
@@ -179,7 +178,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       this.props.tradeType,
       this.props.tradeAsset,
       this.props.quoteAsset,
-      this.state.collateral,
+      this.state.depositToken,
       this.props.positionType,
       this.props.leverage,
       this.state.tradeAmountValue,
@@ -267,10 +266,10 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       this.props.tradeAsset !== prevProps.tradeAsset ||
       this.props.positionType !== prevProps.positionType ||
       this.props.leverage !== prevProps.leverage ||
-      // this.state.collateral !== prevState.collateral ||
+      // this.state.depositToken !== prevState.depositToken ||
        this.state.tradeAmountValue !== prevState.tradeAmountValue
     ) {
-      if (this.state.collateral !== prevState.collateral) {
+      if (this.state.depositToken !== prevState.depositToken) {
         this._isMounted && this.setState({
           ...this.state,
           inputAmountText: "",
@@ -303,7 +302,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
     //     : this.state.balance && this.state.balance.eq(0)
     //       ? "Your wallet is empty"
     //       : (this.state.tradeAmountValue.gt(0) && this.state.slippageRate.eq(0))
-    //         && (this.state.collateral === Asset.ETH || !this.state.maybeNeedsApproval)
+    //         && (this.state.depositToken === Asset.ETH || !this.state.maybeNeedsApproval)
     //         ? ``// `Your trade is too small.`
     //         : this.state.slippageRate.gte(0.01) && this.state.slippageRate.lt(99) // gte(0.2)
     //           ? `Slippage:`
@@ -372,7 +371,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
               selectorAssets={[this.props.tradeAsset, this.props.quoteAsset]}
               isLoading={false}
               tradeType={this.props.tradeType}
-              selectedAsset={this.state.collateral}
+              selectedAsset={this.state.depositToken}
               onInsertMaxValue={this.onInsertMaxValue}
               onTradeAmountChange={this.onTradeAmountChange}
               onCollateralChange={this.onCollateralChange}
@@ -452,7 +451,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       this.props.tradeType,
       this.props.tradeAsset,
       this.props.quoteAsset,
-      this.state.collateral,
+      this.state.depositToken,
       this.props.positionType,
       this.props.leverage,
       this.state.tradeAmountValue,
@@ -473,7 +472,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
   };
 
   public onCollateralChange = async (asset: Asset) => {
-    await this._isMounted && this.setState({ ...this.state, collateral: asset });
+    await this._isMounted && this.setState({ ...this.state, depositToken: asset });
 
     await this.onInsertMaxValue(1);
 
@@ -521,7 +520,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
         this.props.tradeType,
         this.props.tradeAsset,
         this.props.quoteAsset,
-        this.state.collateral,
+        this.state.depositToken,
         this.props.positionType,
         this.props.leverage,
         this.state.tradeAmountValue,
@@ -533,7 +532,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
   private rxFromMaxAmountWithMultiplier = (multiplier: BigNumber): Observable<ITradeAmountChangeEvent | null> => {
     return new Observable<ITradeAmountChangeEvent | null>(observer => {
       this._isMounted && this.setState({ ...this.state, isLoading: true, isExposureLoading: true });
-      FulcrumProvider.Instance.getMaxTradeValue(this.props.tradeType, this.props.tradeAsset, this.props.quoteAsset, this.state.collateral, this.props.positionType, this.props.loan)
+      FulcrumProvider.Instance.getMaxTradeValue(this.props.tradeType, this.props.tradeAsset, this.props.quoteAsset, this.state.depositToken, this.props.positionType, this.props.loan)
         .then(maxTradeValue => {
           this.getInputAmountLimitedFromBigNumber(maxTradeValue, maxTradeValue, multiplier)
             .then(limitedAmount => {
@@ -548,7 +547,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
   private rxFromCurrentAmount = (value: string): Observable<ITradeAmountChangeEvent | null> => {
     return new Observable<ITradeAmountChangeEvent | null>(observer => {
       this._isMounted && this.setState({ ...this.state, isExposureLoading: true });
-      FulcrumProvider.Instance.getMaxTradeValue(this.props.tradeType, this.props.tradeAsset, this.props.quoteAsset, this.state.collateral, this.props.positionType, this.props.loan)
+      FulcrumProvider.Instance.getMaxTradeValue(this.props.tradeType, this.props.tradeAsset, this.props.quoteAsset, this.state.depositToken, this.props.positionType, this.props.loan)
         .then(maxTradeValue => {
           this.getInputAmountLimitedFromText(value, maxTradeValue)
             .then(limitedAmount => {
@@ -566,7 +565,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       this.props.tradeType,
       this.props.tradeAsset,
       this.props.quoteAsset,
-      this.state.collateral,
+      this.state.depositToken,
       this.props.positionType,
       this.props.leverage,
       limitedAmount.tradeAmountValue,

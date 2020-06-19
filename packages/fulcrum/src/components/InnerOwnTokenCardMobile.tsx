@@ -27,6 +27,7 @@ interface IInnerOwnTokenCardMobileState {
   isLoadingTransaction: boolean;
   request: TradeRequest | undefined;
   valueChange: BigNumber;
+  resultTx: boolean;
 }
 
 export class InnerOwnTokenCardMobile extends Component<IOwnTokenGridRowProps, IInnerOwnTokenCardMobileState> {
@@ -39,7 +40,8 @@ export class InnerOwnTokenCardMobile extends Component<IOwnTokenGridRowProps, II
       isLoading: true,
       isLoadingTransaction: false,
       request: undefined,
-      valueChange: new BigNumber(0)
+      valueChange: new BigNumber(0),
+      resultTx: false
     };
 
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
@@ -80,10 +82,10 @@ export class InnerOwnTokenCardMobile extends Component<IOwnTokenGridRowProps, II
     await this.derivedUpdate();
   };
 
-  private onAskToOpenProgressDlg = (taskId: number) => {
-    if (!this.state.request || taskId !== this.state.request.id) return;
-    this.setState({ ...this.state, isLoadingTransaction: true })
-    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, false, true)
+  private onAskToOpenProgressDlg = (taskId: string) => {
+    if (!this.state.request || taskId !== this.state.request.loanId) return;
+    this.setState({ ...this.state, isLoadingTransaction: true, resultTx: true })
+    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, false, this.state.resultTx)
 
   }
   private onAskToCloseProgressDlg = (task: RequestTask) => {
@@ -91,13 +93,13 @@ export class InnerOwnTokenCardMobile extends Component<IOwnTokenGridRowProps, II
     if (task.status === RequestStatus.FAILED || task.status === RequestStatus.FAILED_SKIPGAS) {
       window.setTimeout(() => {
         FulcrumProvider.Instance.onTaskCancel(task);
-        this.setState({ ...this.state, isLoadingTransaction: false, request: undefined })
-        this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, true, false)
+        this.setState({ ...this.state, isLoadingTransaction: false, request: undefined, resultTx: false })
+        this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, true, this.state.resultTx)
       }, 5000)
       return;
     }
-    this.setState({ ...this.state, isLoadingTransaction: false, request: undefined });
-    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, true, true)
+    this.setState({ ...this.state, isLoadingTransaction: false, request: undefined, resultTx: true });
+    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, true, this.state.resultTx)
   }
 
   /*private onTradeTransactionMined = async (event: TradeTransactionMinedEvent) => {
@@ -139,7 +141,7 @@ export class InnerOwnTokenCardMobile extends Component<IOwnTokenGridRowProps, II
                 {this.props.positionValue.toFixed(4)}
 
               </div>
-              <div title={this.props.collateralAsset} className="inner-own-token-card-mobile__col-asset-type">
+              <div title={this.props.quoteToken} className="inner-own-token-card-mobile__col-asset-type">
                 <span className="position-type-marker">{`${this.props.leverage}x`}&nbsp; {this.props.positionType}</span>
               </div>
               <div className="inner-own-token-card-mobile__col-action">
@@ -208,14 +210,29 @@ export class InnerOwnTokenCardMobile extends Component<IOwnTokenGridRowProps, II
 
   public onManageClick = async (event: React.MouseEvent<HTMLElement>) => {
     event.stopPropagation();
-    const request = new ManageCollateralRequest(
+    const request = new TradeRequest(
       this.props.loan.loanId,
+      TradeType.SELL,
       this.props.tradeAsset,
-      this.props.collateralAsset,
-      this.props.loan.collateralAmount,
-      false
+      this.props.quoteToken,
+      Asset.UNKNOWN,
+      this.props.positionType,
+      this.props.leverage,
+      new BigNumber(0)
+    )
+
+    await this.setState({ ...this.state, request: request });
+    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, request, false, this.state.resultTx)
+
+    this.props.onManageCollateralOpen(
+      new ManageCollateralRequest(
+        this.props.loan.loanId,
+        this.props.tradeAsset,
+        this.props.quoteToken,
+        this.props.loan.collateralAmount,
+        false
+      )
     );
-    this.props.onManageCollateralOpen(request);
   };
 
   public onSellClick = async (event: React.MouseEvent<HTMLElement>) => {
@@ -224,14 +241,14 @@ export class InnerOwnTokenCardMobile extends Component<IOwnTokenGridRowProps, II
       this.props.loan.loanId,
       TradeType.SELL,
       this.props.tradeAsset,
+      this.props.quoteToken,
       Asset.UNKNOWN,
-      this.props.collateralAsset,
       this.props.positionType,
       this.props.leverage,
       new BigNumber(0)
     )
     await this.setState({ ...this.state, request: request });
-    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, request, false, true)
+    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, request, false, this.state.resultTx)
     this.props.onTrade(request);
   };
 }

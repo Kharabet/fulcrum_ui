@@ -21,6 +21,12 @@ import { IOwnTokenGridRowProps } from "../components/OwnTokenGridRow";
 import "../styles/pages/_trade-page.scss";
 import { BigNumber } from "@0x/utils";
 import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
+import { IHistoryTokenGridProps } from "../components/HistoryTokenGrid";
+import { TradeEvent } from "../domain/TradeEvent";
+import { IHistoryTokenGridRowProps } from "../components/HistoryTokenGridRow";
+import { PositionEventsGroup, HistoryEvent } from "../domain/PositionEventsGroup";
+import { LiquidationEvent } from "../domain/LiquidationEvent";
+import { CloseWithSwapEvent } from "../domain/CloseWithSwapEvent";
 
 const ManageTokenGrid = React.lazy(() => import('../components/ManageTokenGrid'));
 const TradeForm = React.lazy(() => import('../components/TradeForm'));
@@ -35,7 +41,7 @@ export interface ITradePageProps {
 
 export interface IMarketPair {
   tradeAsset: Asset;
-  unitOfAccount: Asset;
+  quoteToken: Asset;
 }
 
 interface ITradePageState {
@@ -53,6 +59,7 @@ interface ITradePageState {
   openedPositionsCount: number;
   tokenRowsData: ITradeTokenGridRowProps[];
   ownRowsData: IOwnTokenGridRowProps[];
+  historyRowsData: IHistoryTokenGridRowProps[];
   tradeRequestId: number;
   isLoadingTransaction: boolean;
   request: TradeRequest | undefined,
@@ -99,19 +106,20 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     this.state = {
       selectedMarket: {
         tradeAsset: this.tradeAssets[0],
-        unitOfAccount: this.stablecoinAssets[0],
+        quoteToken: this.stablecoinAssets[0],
       },
       loans: undefined,
       showMyTokensOnly: false,
       isTradeModalOpen: false,
       tradeType: TradeType.BUY,
-      // defaultUnitOfAccount: process.env.REACT_APP_ETH_NETWORK === "kovan" ? Asset.SAI : Asset.DAI,
+      // defaultquoteToken: process.env.REACT_APP_ETH_NETWORK === "kovan" ? Asset.SAI : Asset.DAI,
       tradePositionType: PositionType.SHORT,
       tradeLeverage: 0,
       isManageCollateralModalOpen: false,
       openedPositionsCount: 0,
       tokenRowsData: [],
       ownRowsData: [],
+      historyRowsData: [],
       tradeRequestId: 0,
       isLoadingTransaction: false,
       resultTx: true,
@@ -157,7 +165,8 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
   private async derivedUpdate() {
     const tokenRowsData = this.getTokenRowsData(this.state);
     const ownRowsData = await this.getOwnRowsData(this.state);
-    await this.setState({ ...this.state, ownRowsData: ownRowsData, tokenRowsData: tokenRowsData });
+    const historyRowsData = await this.getHistoryRowsData(this.state);
+    await this.setState({ ...this.state, ownRowsData: ownRowsData, tokenRowsData: tokenRowsData, historyRowsData });
   }
 
   public render() {
@@ -195,6 +204,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
             <ManageTokenGrid
               isMobileMedia={this.props.isMobileMedia}
               ownRowsData={this.state.ownRowsData}
+              historyRowsData={this.state.historyRowsData}
             />
           ) : (
               <React.Fragment>
@@ -204,7 +214,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
                 <TradeTokenGrid
                   isMobileMedia={this.props.isMobileMedia}
                   tokenRowsData={this.state.tokenRowsData.filter(e => e.asset === this.state.selectedMarket.tradeAsset)}
-                  ownRowsData={this.state.ownRowsData.filter(e => e.tradeAsset === this.state.selectedMarket.tradeAsset && e.collateralAsset === this.state.selectedMarket.unitOfAccount)}
+                  ownRowsData={this.state.ownRowsData.filter(e => e.tradeAsset === this.state.selectedMarket.tradeAsset && e.quoteToken === this.state.selectedMarket.quoteToken)}
                   changeLoadingTransaction={this.changeLoadingTransaction}
                   request={this.state.request}
                   isLoadingTransaction={this.state.isLoadingTransaction}
@@ -227,7 +237,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
               tradeAsset={this.state.selectedMarket.tradeAsset}
               positionType={this.state.tradePositionType}
               leverage={this.state.tradeLeverage}
-              quoteAsset={this.state.selectedMarket.unitOfAccount}
+              quoteAsset={this.state.selectedMarket.quoteToken}
               onSubmit={this.onTradeConfirmed}
               onCancel={this.onTradeRequestClose}
             />
@@ -252,10 +262,10 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     );
   }
 
-  public onTabSelect = async (tradeAsset: Asset, unitOfAccount: Asset) => {
+  public onTabSelect = async (tradeAsset: Asset, quoteToken: Asset) => {
     const marketPair = {
       tradeAsset,
-      unitOfAccount
+      quoteToken
     }
     await this.setState({ ...this.state, selectedMarket: marketPair });
   };
@@ -278,9 +288,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       this.setState({
         ...this.state,
         isManageCollateralModalOpen: true,
-        // collateralToken: request.collateralAsset,
         loanId: request.loanId,
-        // tradeAsset: request.asset,
         tradeRequestId: request.id
       });
     }
@@ -290,25 +298,11 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     FulcrumProvider.Instance.onManageCollateralConfirmed(request);
     this.setState({
       ...this.state,
-      // collateralToken: request.collateralAsset,
       loanId: request.loanId,
-      // tradeAsset: request.asset,
       isManageCollateralModalOpen: false
     });
   };
 
-  // public onManageCollateralRequestOpen = (request: ManageCollateralRequest) => {
-  //   this.setState({
-  //     ...this.state,
-  //     collateralToken: request.collateralAsset,
-  //     loanId: request.loanId,
-  //     tradeAsset: request.asset,
-  //     tradeRequestId: request.id,
-  //     tradePositionType: request.positionType,
-  //     tradeLeverage: request.leverage,
-  //     isManageCollateralModalOpen: true
-  //   });
-  // };
 
   public onManageCollateralRequestClose = () => {
     this.setState({
@@ -323,19 +317,11 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       return;
     }
 
-    /*let unit = request.unitOfAccount;
-    if (request.asset === Asset.ETH && request.positionType === PositionType.LONG && request.leverage === 2) {
-      unit = Asset.DAI;
-    }*/
-
     if (request) {
       this.setState({
         ...this.state,
         isTradeModalOpen: true,
-        // collateralToken: request.collateral,
-        tradeType: request.tradeType,
-        // tradeAsset: request.asset,
-        // tradeUnitOfAccount: request.collateral,
+        tradeType: request.tradeType,  
         tradePositionType: request.positionType,
         tradeLeverage: request.leverage,
         loanId: request.loanId,
@@ -427,7 +413,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         ownRowsData.push({
           loan: loan,
           tradeAsset: baseAsset,
-          collateralAsset: quoteAsset,
+          quoteToken: quoteAsset,
           leverage: leverage.toNumber(),
           positionType,
           positionValue,
@@ -447,11 +433,189 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     return ownRowsData;
   };
 
+  public getHistoryRowsData = async (state: ITradePageState): Promise<IHistoryTokenGridRowProps[]> => {
+    const historyRowsData: IHistoryTokenGridRowProps[] = [];
+    const groupedEvents: PositionEventsGroup[] = [];
+    const tradeEvents = await FulcrumProvider.Instance.getTradeHistory();
+    const closeWithSwapEvents = await FulcrumProvider.Instance.getCloseWithSwapHistory();
+    const liquidationEvents = await FulcrumProvider.Instance.getLiquidationHistory();
+    const groupBy = function (xs: (TradeEvent | LiquidationEvent | CloseWithSwapEvent)[], key: any) {
+      return xs.reduce(function (rv: any, x: any) {
+        (rv[x[key]] = rv[x[key]] || []).push(x);
+        return rv;
+      }, {});
+    };
+    //@ts-ignore
+    const grouped = groupBy(tradeEvents.concat(closeWithSwapEvents).concat(liquidationEvents), "loanId");
+    const loanIds = Object.keys(grouped);
+    for (const loanId of loanIds) {
+      //@ts-ignore
+      const events = grouped[loanId].sort((a, b) => a.date < b.date ? -1 : 1);
+      const tradeEvent = events[0] as TradeEvent
+      const positionType = this.tradeAssets.includes(tradeEvent.baseToken)
+        ? PositionType.LONG
+        : PositionType.SHORT;
+
+      const tradeAsset = positionType === PositionType.LONG
+        ? tradeEvent.baseToken
+        : tradeEvent.quoteToken;
+
+      const quoteAsset = positionType === PositionType.LONG
+        ? tradeEvent.quoteToken
+        : tradeEvent.baseToken;
+
+      let leverage = new BigNumber(tradeEvent.entryLeverage.div(10 ** 18));
+      if (positionType === PositionType.LONG)
+        leverage = leverage.plus(1);
+
+
+      const positionEventsGroup = new PositionEventsGroup(
+        loanId,
+        tradeAsset,
+        quoteAsset,
+        positionType,
+        leverage.toNumber()
+      )
+      for (const event of events) {
+
+        let positionValue = new BigNumber(0);
+        let tradePrice = new BigNumber(0);
+        let value = new BigNumber(0);
+        let profit = "-";
+        const timeStamp = event.timeStamp;
+        const txHash = event.txHash;
+        if (event instanceof TradeEvent) {
+          const action = "Opened" + event.loanId;
+          if (positionType === PositionType.LONG) {
+            positionValue = event.positionSize.div(10 ** 18);
+            value = event.positionSize.div(event.entryPrice);
+            tradePrice = new BigNumber(10 ** 36).div(event.entryPrice).div(10 ** 18);
+          }
+          else {
+            positionValue = event.positionSize.div(event.entryPrice);
+            value = event.positionSize.div(10 ** 18);
+            tradePrice = event.entryPrice.div(10 ** 18);
+          }
+
+          positionEventsGroup.events.push(new HistoryEvent(
+            loanId,
+            timeStamp,
+            action,
+            positionValue,
+            tradePrice,
+            value,
+            profit,
+            txHash
+          ))
+
+        }
+        else if (event instanceof CloseWithSwapEvent) {
+          const action = "Closed" + event.loanId;
+          if (positionType === PositionType.LONG) {
+            positionValue = event.positionCloseSize.div(10 ** 18);
+            value = event.positionCloseSize.div(event.exitPrice);
+            tradePrice = new BigNumber(10 ** 36).div(event.exitPrice).div(10 ** 18);
+          }
+          else {
+            positionValue = event.positionCloseSize.div(event.exitPrice);
+            value = event.positionCloseSize.div(10 ** 18);
+            tradePrice = event.exitPrice.div(10 ** 18);
+          }
+
+          positionEventsGroup.events.push(new HistoryEvent(
+            loanId,
+            timeStamp,
+            action,
+            positionValue,
+            tradePrice,
+            value,
+            profit,
+            txHash
+          ))
+
+        } else if (event instanceof LiquidationEvent) {
+          const action = "Liquidated" + event.loanId;
+          if (positionType === PositionType.LONG) {
+            positionValue = event.repayAmount.div(10 ** 18);
+            value = event.repayAmount.div(event.collateralToLoanRate);
+            tradePrice = new BigNumber(10 ** 36).div(event.collateralToLoanRate).div(10 ** 18);
+          }
+          else {
+            positionValue = event.repayAmount.div(event.collateralToLoanRate);
+            value = event.repayAmount.div(10 ** 18);
+            tradePrice = event.collateralToLoanRate.div(10 ** 18);
+          }
+
+          positionEventsGroup.events.push(new HistoryEvent(
+            loanId,
+            timeStamp,
+            action,
+            positionValue,
+            tradePrice,
+            value,
+            profit,
+            txHash
+          ))
+
+        }
+      }
+
+      historyRowsData.push({
+        eventsGroup: positionEventsGroup
+      });
+
+    }
+    // for (const tradeEvent of tradeEvents) {
+
+
+    // const positionType = this.tradeAssets.includes(tradeEvent.baseToken)
+    //   ? PositionType.LONG
+    //   : PositionType.SHORT;
+
+    // const tradeAsset = positionType === PositionType.LONG
+    //   ? tradeEvent.baseToken
+    //   : tradeEvent.quoteToken;
+
+    // const quoteAsset = positionType === PositionType.LONG
+    //   ? tradeEvent.quoteToken
+    //   : tradeEvent.baseToken;
+
+    // let leverage = new BigNumber(tradeEvent.entryLeverage.div(10 ** 18));
+    // if (positionType === PositionType.LONG)
+    //   leverage = leverage.plus(1);
+
+
+    // // const collateralToPrincipalRate = await FulcrumProvider.Instance.getSwapRate(loan.collateralAsset, loan.loanAsset);
+    // let positionValue = tradeEvent.positionSize;
+    // let collateral = new BigNumber(0);
+    // let openPrice = tradeEvent.entryPrice;
+    // let value = positionValue.times(openPrice);
+    // let result = tradeEvent instanceof TradeEvent
+    //   ? "Opened"
+    //   : "Unknown";
+
+    // let profit = new BigNumber(0);
+    // if (positionType === PositionType.LONG) {
+    //   positionValue = tradeEvent.positionSize.div(10 ** 18);
+    //   value = tradeEvent.positionSize.div(tradeEvent.entryPrice);
+    //   openPrice = new BigNumber(10 ** 36).div(tradeEvent.entryPrice).div(10 ** 18);
+    // }
+    // else {
+    //   positionValue = tradeEvent.positionSize.div(tradeEvent.entryPrice);
+    //   value = tradeEvent.positionSize.div(10 ** 18);
+    //   openPrice = tradeEvent.entryPrice.div(10 ** 18);
+    // }
+
+    // }
+    this.setState({ ...this.state, historyRowsData })
+    return historyRowsData;
+  };
+
   public getTokenRowsData = (state: ITradePageState): ITradeTokenGridRowProps[] => {
     const tokenRowsData: ITradeTokenGridRowProps[] = [];
     tokenRowsData.push({
       asset: state.selectedMarket.tradeAsset,
-      unitOfAccount: state.selectedMarket.unitOfAccount,
+      quoteToken: state.selectedMarket.quoteToken,
       positionType: PositionType.LONG,
       defaultLeverage: this.defaultLeverageLong,
       onTrade: this.onTradeRequested,
@@ -460,7 +624,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     });
     tokenRowsData.push({
       asset: state.selectedMarket.tradeAsset,
-      unitOfAccount: state.selectedMarket.unitOfAccount,
+      quoteToken: state.selectedMarket.quoteToken,
       positionType: PositionType.SHORT,
       defaultLeverage: this.defaultLeverageShort,
       onTrade: this.onTradeRequested,

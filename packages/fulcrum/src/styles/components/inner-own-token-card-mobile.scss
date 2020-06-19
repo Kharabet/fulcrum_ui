@@ -111,8 +111,11 @@ $padding: 15px 15px 30px 15px;
     position: absolute;
     right: 10px;
     cursor: pointer;
-    .icon-collateral {
+    .icon-collateral-fill {
       fill: var(--icon-collateral);
+    }
+    .icon-collateral-stroke {
+      stroke: var(--icon-collateral);
     }
   }
   &__col-profit {

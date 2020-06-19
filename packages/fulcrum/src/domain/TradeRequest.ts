@@ -9,7 +9,7 @@ export class TradeRequest {
   public tradeType: TradeType;
   public asset: Asset;
   public depositToken: Asset;
-  public collateral: Asset;
+  public quoteToken: Asset;
   public positionType: PositionType;
   public leverage: number;
   public amount: BigNumber;
@@ -20,7 +20,7 @@ export class TradeRequest {
     loanId: string,
     tradeType: TradeType,
     asset: Asset,
-    collateral: Asset,
+    quoteToken: Asset,
     depositToken: Asset,
     positionType: PositionType,
     leverage: number,
@@ -33,7 +33,7 @@ export class TradeRequest {
     this.tradeType = tradeType;
     this.asset = asset;
     this.depositToken = depositToken;
-    this.collateral = collateral;
+    this.quoteToken = quoteToken;
     this.positionType = positionType;
     this.leverage = leverage;
     this.amount = amount;
