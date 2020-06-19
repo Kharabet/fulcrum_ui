@@ -19,7 +19,7 @@ import { RequestStatus } from "../domain/RequestStatus";
 export interface IInnerOwnTokenGridRowProps {
   loan: IBorrowedFundsState;
   tradeAsset: Asset;
-  collateralAsset: Asset;
+  quoteToken: Asset;
   leverage: number;
   positionType: PositionType;
   positionValue: BigNumber;
@@ -158,7 +158,7 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
             <div title={this.props.positionValue.toFixed(18)} className="inner-own-token-grid-row__col-token-name-full opacityIn">
               {this.props.positionValue.toFixed(4)}
             </div>
-            <div title={this.props.collateralAsset} className="inner-own-token-grid-row__col-asset-type">
+            <div className="inner-own-token-grid-row__col-asset-type">
               <span className="position-type-marker">{`${this.props.leverage}x`}&nbsp; {this.props.positionType}</span>
             </div>
             <div title={`$${this.props.value.toFixed(18)}`} className="inner-own-token-grid-row__col-asset-price">
@@ -235,8 +235,8 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
       this.props.loan.loanId,
       TradeType.SELL,
       this.props.tradeAsset,
-      this.props.collateralAsset,
-      this.props.collateralAsset,
+      this.props.quoteToken,
+      this.props.quoteToken,
       this.props.positionType,
       this.props.leverage,
       new BigNumber(0)
@@ -249,25 +249,7 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
       new ManageCollateralRequest(
         this.props.loan.loanId,
         this.props.tradeAsset,
-        this.props.collateralAsset,
-        this.props.loan.collateralAmount,
-        false
-      )
-    );
-
-
-
-  };
-
-
-  public onCollateralChange = async (event: React.MouseEvent<HTMLElement>) => {
-    event.stopPropagation();
-
-    this.props.onManageCollateralOpen(
-      new ManageCollateralRequest(
-        this.props.loan.loanId,
-        this.props.tradeAsset,
-        this.props.collateralAsset,
+        this.props.quoteToken,
         this.props.loan.collateralAmount,
         false
       )
@@ -281,8 +263,8 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
       this.props.loan.loanId,
       TradeType.SELL,
       this.props.tradeAsset,
-      this.props.collateralAsset,
-      this.props.collateralAsset,
+      Asset.UNKNOWN,
+      this.props.quoteToken,
       this.props.positionType,
       this.props.leverage,
       new BigNumber(0)

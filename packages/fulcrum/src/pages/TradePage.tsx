@@ -214,7 +214,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
                 <TradeTokenGrid
                   isMobileMedia={this.props.isMobileMedia}
                   tokenRowsData={this.state.tokenRowsData.filter(e => e.asset === this.state.selectedMarket.tradeAsset)}
-                  ownRowsData={this.state.ownRowsData.filter(e => e.tradeAsset === this.state.selectedMarket.tradeAsset && e.collateralAsset === this.state.selectedMarket.quoteToken)}
+                  ownRowsData={this.state.ownRowsData.filter(e => e.tradeAsset === this.state.selectedMarket.tradeAsset && e.quoteToken === this.state.selectedMarket.quoteToken)}
                   changeLoadingTransaction={this.changeLoadingTransaction}
                   request={this.state.request}
                   isLoadingTransaction={this.state.isLoadingTransaction}
@@ -288,9 +288,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       this.setState({
         ...this.state,
         isManageCollateralModalOpen: true,
-        // collateralToken: request.collateralAsset,
         loanId: request.loanId,
-        // tradeAsset: request.asset,
         tradeRequestId: request.id
       });
     }
@@ -300,25 +298,11 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     FulcrumProvider.Instance.onManageCollateralConfirmed(request);
     this.setState({
       ...this.state,
-      // collateralToken: request.collateralAsset,
       loanId: request.loanId,
-      // tradeAsset: request.asset,
       isManageCollateralModalOpen: false
     });
   };
 
-  // public onManageCollateralRequestOpen = (request: ManageCollateralRequest) => {
-  //   this.setState({
-  //     ...this.state,
-  //     collateralToken: request.collateralAsset,
-  //     loanId: request.loanId,
-  //     tradeAsset: request.asset,
-  //     tradeRequestId: request.id,
-  //     tradePositionType: request.positionType,
-  //     tradeLeverage: request.leverage,
-  //     isManageCollateralModalOpen: true
-  //   });
-  // };
 
   public onManageCollateralRequestClose = () => {
     this.setState({
@@ -333,19 +317,11 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       return;
     }
 
-    /*let unit = request.quoteToken;
-    if (request.asset === Asset.ETH && request.positionType === PositionType.LONG && request.leverage === 2) {
-      unit = Asset.DAI;
-    }*/
-
     if (request) {
       this.setState({
         ...this.state,
         isTradeModalOpen: true,
-        // collateralToken: request.collateral,
-        tradeType: request.tradeType,
-        // tradeAsset: request.asset,
-        // tradequoteToken: request.collateral,
+        tradeType: request.tradeType,  
         tradePositionType: request.positionType,
         tradeLeverage: request.leverage,
         loanId: request.loanId,
@@ -437,7 +413,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         ownRowsData.push({
           loan: loan,
           tradeAsset: baseAsset,
-          collateralAsset: quoteAsset,
+          quoteToken: quoteAsset,
           leverage: leverage.toNumber(),
           positionType,
           positionValue,

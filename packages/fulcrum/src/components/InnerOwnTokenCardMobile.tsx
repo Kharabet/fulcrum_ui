@@ -139,7 +139,7 @@ export class InnerOwnTokenCardMobile extends Component<IOwnTokenGridRowProps, II
                 {this.props.positionValue.toFixed(4)}
 
               </div>
-              <div title={this.props.collateralAsset} className="inner-own-token-card-mobile__col-asset-type">
+              <div title={this.props.quoteToken} className="inner-own-token-card-mobile__col-asset-type">
                 <span className="position-type-marker">{`${this.props.leverage}x`}&nbsp; {this.props.positionType}</span>
               </div>
               <div className="inner-own-token-card-mobile__col-action">
@@ -211,7 +211,7 @@ export class InnerOwnTokenCardMobile extends Component<IOwnTokenGridRowProps, II
     const request = new ManageCollateralRequest(
       this.props.loan.loanId,
       this.props.tradeAsset,
-      this.props.collateralAsset,
+      this.props.quoteToken,
       this.props.loan.collateralAmount,
       false
     );
@@ -225,7 +225,7 @@ export class InnerOwnTokenCardMobile extends Component<IOwnTokenGridRowProps, II
       TradeType.SELL,
       this.props.tradeAsset,
       Asset.UNKNOWN,
-      this.props.collateralAsset,
+      this.props.quoteToken,
       this.props.positionType,
       this.props.leverage,
       new BigNumber(0)

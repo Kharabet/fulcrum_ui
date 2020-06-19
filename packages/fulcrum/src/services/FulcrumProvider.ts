@@ -1061,7 +1061,7 @@ export class FulcrumProvider {
     let maybeNeedsApproval = false;
     let account: string | null = null;
 
-    if (request.collateral === Asset.ETH) {
+    if (request.depositToken === Asset.ETH) {
       return false;
     }
 
@@ -1069,10 +1069,10 @@ export class FulcrumProvider {
       if (!account) {
         account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
       }
-      const iTokenContract = await this.contractsSource.getITokenContract(request.collateral);
+      const iTokenContract = await this.contractsSource.getITokenContract(request.depositToken);
 
       if (account && iTokenContract) {
-        const collateralErc20Address = this.getErc20AddressOfAsset(request.collateral);
+        const collateralErc20Address = this.getErc20AddressOfAsset(request.depositToken);
         if (collateralErc20Address) {
 
 
@@ -1248,12 +1248,12 @@ export class FulcrumProvider {
 
 
     const loanToken = isLong
-      ? request.collateral
+      ? request.quoteToken
       : request.asset;
     const depositToken = request.depositToken;
     const collateralToken = isLong
       ? request.asset
-      : request.collateral;
+      : request.quoteToken;
 
     const decimals: number = AssetsDictionary.assets.get(depositToken)!.decimals || 18;
 
@@ -1455,7 +1455,7 @@ export class FulcrumProvider {
 
         let amountInBaseUnits = new BigNumber(0);
         if (request.positionType === PositionType.LONG) {
-          const decimals: number = AssetsDictionary.assets.get(request.collateral)!.decimals || 18;
+          const decimals: number = AssetsDictionary.assets.get(request.quoteToken)!.decimals || 18;
           amountInBaseUnits = new BigNumber(request.amount.multipliedBy(10 ** decimals).toFixed(0, 1));
         }
         else {
@@ -2128,7 +2128,7 @@ console.log(err, added);
       let srcTokenAddress = ""
       let destTokenAddress = "";
 
-      srcTokenAddress = this.getErc20AddressOfAsset(taskRequest.collateral)!;
+      srcTokenAddress = this.getErc20AddressOfAsset(taskRequest.quoteToken)!;
       destTokenAddress = this.getErc20AddressOfAsset(taskRequest.asset)!;
       // if (taskRequest.version === 2) {
       //   if (siteConfig.ZeroXAPIEnabledForBuys && taskRequest.tradeType === TradeType.BUY) {
