@@ -25,6 +25,7 @@ interface IOwnTokenCardMobileState {
   request: TradeRequest | undefined;
   valueChange: BigNumber;
   tradeAssetPrice: BigNumber;
+  resultTx: boolean;
 
 }
 
@@ -39,6 +40,7 @@ export class OwnTokenCardMobile extends Component<IOwnTokenGridRowProps, IOwnTok
       request: undefined,
       valueChange: new BigNumber(0),
       tradeAssetPrice: new BigNumber(0),
+      resultTx: false
     };
 
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
@@ -87,23 +89,23 @@ export class OwnTokenCardMobile extends Component<IOwnTokenGridRowProps, IOwnTok
     }
   };*/
 
-  private onAskToOpenProgressDlg = (taskId: number) => {
-    if (!this.state.request || taskId !== this.state.request.id) return;
-    this.setState({ ...this.state, isLoadingTransaction: true, })
-    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, false, true);
+  private onAskToOpenProgressDlg = (taskId: string) => {
+    if (!this.state.request || taskId !== this.state.request.loanId) return;
+    this.setState({ ...this.state, isLoadingTransaction: true, resultTx: true })
+    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, false, this.state.resultTx);
   }
   private onAskToCloseProgressDlg = (task: RequestTask) => {
     if (!this.state.request || task.request.loanId !== this.state.request.loanId) return;
     if (task.status === RequestStatus.FAILED || task.status === RequestStatus.FAILED_SKIPGAS) {
       window.setTimeout(() => {
         FulcrumProvider.Instance.onTaskCancel(task);
-        this.setState({ ...this.state, isLoadingTransaction: false, request: undefined });
-        this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, true, false);
+        this.setState({ ...this.state, isLoadingTransaction: false, request: undefined, resultTx: false });
+        this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, true, this.state.resultTx);
       }, 5000)
       return;
     }
-    this.setState({ ...this.state, isLoadingTransaction: false, request: undefined });
-    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, true, true);
+    this.setState({ ...this.state, isLoadingTransaction: false, request: undefined, resultTx: true });
+    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, true, this.state.resultTx);
   }
   public componentWillUnmount(): void {
     this._isMounted = false;
@@ -230,18 +232,29 @@ export class OwnTokenCardMobile extends Component<IOwnTokenGridRowProps, IOwnTok
 
   public onManageClick = async (event: React.MouseEvent<HTMLElement>) => {
     event.stopPropagation();
-    const request = new ManageCollateralRequest(
+    const request = new TradeRequest(
       this.props.loan.loanId,
+      TradeType.SELL,
       this.props.tradeAsset,
       this.props.collateralAsset,
-      this.props.loan.collateralAmount,
-      false
+      this.props.collateralAsset,
+      this.props.positionType,
+      this.props.leverage,
+      new BigNumber(0)
+    )
+
+    await this.setState({ ...this.state, request: request });
+    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, request, false, this.state.resultTx)
+
+    this.props.onManageCollateralOpen(
+      new ManageCollateralRequest(
+        this.props.loan.loanId,
+        this.props.tradeAsset,
+        this.props.collateralAsset,
+        this.props.loan.collateralAmount,
+        false
+      )
     );
-
-    //await this.setState({...this.state, request: request });
-    this.props.onManageCollateralOpen(request);
-    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, false, true)
-
   };
 
   public onSellClick = async (event: React.MouseEvent<HTMLElement>) => {
@@ -258,6 +271,6 @@ export class OwnTokenCardMobile extends Component<IOwnTokenGridRowProps, IOwnTok
     )
     await this.setState({ ...this.state, request: request });
     this.props.onTrade(request);
-    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, request, false, true)
+    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, request, false, this.state.resultTx)
   }
 }
