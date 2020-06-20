@@ -7,10 +7,11 @@
   ],
   "devDependencies": {
     "cross-env": "^5.2.0",
-    "lerna": "^3.14.1"
+    "lerna": "^3.14.1",
+    "rimraf": "^3.0.2"
   },
   "scripts": {
-    "clean-all": "rm -rf ./packages/**/node_modules ./node_modules",
+    "clean-all": "rimraf -rf ./packages/**/node_modules ./node_modules",
     "build-all": "yarn run build-alchemy-web3 && yarn run build-fulcrum-ropsten",
     "build-alchemy-web3": "./scripts/build-alchemy-web3.sh",
     "build-fulcrum-rinkeby": "cross-env-shell REACT_APP_ETH_NETWORK=rinkeby \"./scripts/build-fulcrum.sh\"",
