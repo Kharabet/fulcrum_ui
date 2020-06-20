@@ -24,6 +24,11 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
         <section>
           <div className="container">
             <StatsChart />
+            <div className="flex jc-c labels-container">
+              <div className="label-chart"><span className="bg-green"></span>Supply APR, %</div>
+              <div className="label-chart"><span className="bg-primary"></span>TVL</div>
+              <div className="label-chart"><span className="bg-secondary"></span>Utilization, %</div>
+            </div>
           </div>
         </section>
         <section className="pt-75">

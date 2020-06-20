@@ -51,7 +51,7 @@ export class MainChart extends Component<IMainChartProps, IMainChartState> {
       responseJson.data.forEach(function (item: any) {
         const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
         (period === 1)
-          ? labels.push(`${new Date(item["timestamp"]).getHours()}:${new Date(item["timestamp"]).getMinutes()}`)
+          ? labels.push(`${new Date(item["timestamp"]).getHours() % 12}:${new Date(item["timestamp"]).getMinutes() < 10 ? `0${new Date(item["timestamp"]).getMinutes()}` : new Date(item["timestamp"]).getMinutes()}`)
           : labels.push(`${months[new Date(item["timestamp"]).getMonth()]} ${new Date(item["timestamp"]).getDate()}`);
         data.push(item["tvl"]);
       });
@@ -96,11 +96,11 @@ export class MainChart extends Component<IMainChartProps, IMainChartState> {
       legend: {
         display: false
       },
-      /*elements: {
+      elements: {
         point: {
           radius: 0
         }
-      },*/
+      },
       tooltips: {
         backgroundColor: 'rgba(0, 0, 0, 0)',
         displayColors: false,

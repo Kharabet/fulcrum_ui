@@ -22,3 +22,29 @@ a {
     margin: auto;
     box-sizing: border-box;
 }
+
+.labels-container {
+    margin-top: 35px;
+    .label-chart {
+        span {
+            width: 12px;
+            height: 12px;
+            margin-right: 15px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        &:not(:last-child) {
+            margin-right: 35px;
+        }
+    }
+}
+
+.bg-primary {
+    background-color: $primary-color;
+}
+.bg-secondary {
+    background-color: $secondary-color;
+}
+.bg-green {
+    background-color: $green-label;
+}

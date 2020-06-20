@@ -79,7 +79,7 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
       responseJson.data.forEach(function (item: any) {
         const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
         (period === 1)
-          ? labels.push(`${new Date(item["timestamp"]).getHours()}:${new Date(item["timestamp"]).getMinutes()}`)
+          ? labels.push(`${new Date(item["timestamp"]).getHours() % 12}:${new Date(item["timestamp"]).getMinutes() < 10 ? `0${new Date(item["timestamp"]).getMinutes()}` : new Date(item["timestamp"]).getMinutes()}`)
           : labels.push(`${months[new Date(item["timestamp"]).getMonth()]} ${new Date(item["timestamp"]).getDate()}`);
         tvl.push(+item["tvl"]);
         apr.push(+item["supplyInterestRate"]);
@@ -161,12 +161,17 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
         titleMarginBottom: 10,
         position: 'nearest',
         callbacks: {
-          label: function (tooltipItems: any) {
-            if (tooltipItems.yLabel > 1000000)
-              return `$${(tooltipItems.yLabel / 1000000).toFixed(3)}m`;
-            if (tooltipItems.yLabel > 1000)
-              return `$${(tooltipItems.yLabel / 1000).toFixed(3)}k`;
-            return `$${(tooltipItems.yLabel).toFixed(3)}`;
+          label: function (tooltipItems: any, data: any) {
+            var label = data.datasets[tooltipItems.datasetIndex].label || '';
+            var number;
+            if (tooltipItems.yLabel > 1000000) {
+              number = `${(tooltipItems.yLabel / 1000000).toFixed(3)}m`;
+            } else if (tooltipItems.yLabel > 1000) {
+              number = `${(tooltipItems.yLabel / 1000).toFixed(3)}k`;
+            } else {
+              number = `${(tooltipItems.yLabel).toFixed(3)} `;
+            }
+            return (label === 'TVL') ? `$${number} ` : `${number}% `;
           }
         }
       }
