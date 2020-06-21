@@ -414,6 +414,33 @@ export class FulcrumProvider {
     return result;
   };*/
 
+  public getLargeApprovalAmount = (asset: Asset): BigNumber => {
+    switch (asset) {
+      case Asset.ETH:
+      case Asset.WETH:
+        return new BigNumber(10**18).multipliedBy(1500);
+      case Asset.WBTC:
+        return new BigNumber(10**8).multipliedBy(25);
+      case Asset.LINK:
+        return new BigNumber(10**18).multipliedBy(60000);
+      case Asset.ZRX:
+        return new BigNumber(10**18).multipliedBy(750000);
+      case Asset.KNC:
+        return new BigNumber(10**18).multipliedBy(550000);
+      case Asset.DAI:
+      case Asset.SAI:
+        return new BigNumber(10**18).multipliedBy(375000);
+      case Asset.USDC:
+        return new BigNumber(10**6).multipliedBy(375000);
+      case Asset.REP:
+        return new BigNumber(10**18).multipliedBy(15000);
+      case Asset.MKR:
+        return new BigNumber(10**18).multipliedBy(1250);
+      default:
+        throw new Error("Invalid approval asset!");
+    }
+  }
+
   public getPriceDefaultDataPoint = (): IPriceDataPoint => {
     return {
       timeStamp: Math.round((new Date()).getTime() / 1000),
