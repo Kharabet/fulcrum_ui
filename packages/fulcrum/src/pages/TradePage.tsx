@@ -321,7 +321,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       this.setState({
         ...this.state,
         isTradeModalOpen: true,
-        tradeType: request.tradeType,  
+        tradeType: request.tradeType,
         tradePositionType: request.positionType,
         tradeLeverage: request.leverage,
         loanId: request.loanId,
@@ -465,9 +465,13 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         : tradeEvent.baseToken;
 
       let leverage = new BigNumber(tradeEvent.entryLeverage.div(10 ** 18));
+
       if (positionType === PositionType.LONG)
         leverage = leverage.plus(1);
 
+      const openPrice = positionType === PositionType.LONG
+        ? new BigNumber(10 ** 36).div(tradeEvent.entryPrice).div(10 ** 18)
+        : tradeEvent.entryPrice.div(10 ** 18);
 
       const positionEventsGroup = new PositionEventsGroup(
         loanId,
@@ -481,7 +485,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         let positionValue = new BigNumber(0);
         let tradePrice = new BigNumber(0);
         let value = new BigNumber(0);
-        let profit = "-";
+        let profit: BigNumber | string = "-";
         const timeStamp = event.timeStamp;
         const txHash = event.txHash;
         if (event instanceof TradeEvent) {
@@ -490,12 +494,14 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
             positionValue = event.positionSize.div(10 ** 18);
             value = event.positionSize.div(event.entryPrice);
             tradePrice = new BigNumber(10 ** 36).div(event.entryPrice).div(10 ** 18);
+
           }
           else {
             positionValue = event.positionSize.div(event.entryPrice);
             value = event.positionSize.div(10 ** 18);
             tradePrice = event.entryPrice.div(10 ** 18);
           }
+
 
           positionEventsGroup.events.push(new HistoryEvent(
             loanId,
@@ -515,11 +521,15 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
             positionValue = event.positionCloseSize.div(10 ** 18);
             value = event.positionCloseSize.div(event.exitPrice);
             tradePrice = new BigNumber(10 ** 36).div(event.exitPrice).div(10 ** 18);
+            profit = (openPrice.minus(tradePrice)).times(positionValue);
+
           }
           else {
             positionValue = event.positionCloseSize.div(event.exitPrice);
             value = event.positionCloseSize.div(10 ** 18);
             tradePrice = event.exitPrice.div(10 ** 18);
+            profit = (tradePrice.minus(openPrice)).times(positionValue);
+
           }
 
           positionEventsGroup.events.push(new HistoryEvent(
@@ -539,11 +549,13 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
             positionValue = event.repayAmount.div(10 ** 18);
             value = event.repayAmount.div(event.collateralToLoanRate);
             tradePrice = new BigNumber(10 ** 36).div(event.collateralToLoanRate).div(10 ** 18);
+            profit = (openPrice.minus(tradePrice)).times(positionValue);
           }
           else {
             positionValue = event.repayAmount.div(event.collateralToLoanRate);
             value = event.repayAmount.div(10 ** 18);
             tradePrice = event.collateralToLoanRate.div(10 ** 18);
+            profit = (tradePrice.minus(openPrice)).times(positionValue);
           }
 
           positionEventsGroup.events.push(new HistoryEvent(

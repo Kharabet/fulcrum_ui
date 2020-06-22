@@ -15,7 +15,6 @@ export interface IHistoryTokenGridRowProps {
 
 interface IHistoryTokenGridRowState {
   assetBalance: BigNumber | null;
-  profit: BigNumber | null;
   isLoading: boolean;
   isShowCollapse: boolean;
 }
@@ -29,7 +28,6 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
 
     this.state = {
       assetBalance: new BigNumber(0),
-      profit: new BigNumber(0),
       isLoading: true,
       isShowCollapse: false
     };
@@ -103,7 +101,9 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
             : <Preloader width="74px" />
           }
         </div>
-        <div className="history-token-grid-row-inner__col-profit">-</div>
+        <div className="history-token-grid-row-inner__col-profit">
+          {event.profit instanceof BigNumber ? <React.Fragment><span className="sign-currency">$</span>{event.profit.toFixed(2)}</React.Fragment> : "-"}
+        </div>
       </div>)
     })
   }
@@ -162,9 +162,9 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
           </div>
           <div className="history-token-grid-row__col-profit">
             {!this.state.isLoading
-              ? <React.Fragment>
-                <span className="sign-currency"></span>{latestEvent.profit instanceof BigNumber ? latestEvent.profit.toFixed(2) : "-"}
-              </React.Fragment>
+              ?
+              latestEvent.profit instanceof BigNumber ? <React.Fragment><span className="sign-currency">$</span>{latestEvent.profit.toFixed(2)}</React.Fragment> : "-"
+
               : <Preloader width="74px" />
             }
           </div>
