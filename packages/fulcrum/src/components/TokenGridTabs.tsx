@@ -1,7 +1,5 @@
 import React, { Component } from "react";
 import { Asset } from "../domain/Asset";
-import { AssetsDictionary } from "../domain/AssetsDictionary";
-import { ReactComponent as WalletSvg } from "../assets/images/wallet-icon.svg";
 import { IDropDownSelectOption, DropdownSelect, IDropdownSelectProps } from "./DropdownSelect";
 import { IMarketPair } from "../pages/TradePage";
 import "../styles/components/token-grid-tabs.scss";
@@ -10,11 +8,11 @@ import { ManageButton } from "./ManageButton";
 export interface ITokenGridTabsProps {
   selectedMarket: IMarketPair;
   isMobile: boolean;
-  tradeAssets: Asset[];
+  baseTokens: Asset[];
   stablecoinAssets: Asset[];
   isShowMyTokensOnly: boolean;
   openedPositionsCount: number;
-  onMarketSelect: (tradeAsset: Asset, quoteToken: Asset) => void;
+  onMarketSelect: (baseToken: Asset, quoteToken: Asset) => void;
   onShowMyTokensOnlyChange: (value: boolean) => void;
 }
 
@@ -66,17 +64,17 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
   //   await this.props.onMarketSelect(asset);
   // };
 
-  private async onDropdownSelect(tradeAssetString: string, quoteTokenString: string) {
+  private async onDropdownSelect(baseTokenString: string, quoteTokenString: string) {
     // if (value === "manage") {
     //   this.showMyTokensOnlyChange();
     //   return;
     // }
-    const tradeAsset = tradeAssetString as Asset;
+    const baseToken = baseTokenString as Asset;
     const quoteToken = quoteTokenString as Asset;
 
     await this.setState({ ...this.state, isShowMyTokensOnly: false })
     await this.props.onShowMyTokensOnlyChange(false);
-    await this.props.onMarketSelect(tradeAsset, quoteToken);
+    await this.props.onMarketSelect(baseToken, quoteToken);
   }
 
 
@@ -122,10 +120,10 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
   private getDropdownProps(): IDropdownSelectProps {
 
     let dropDownSelectOptions: IDropDownSelectOption[] = [];
-    this.props.tradeAssets.forEach(tradeAsset => {
+    this.props.baseTokens.forEach(baseToken => {
       this.props.stablecoinAssets.forEach(stablecoin =>
         dropDownSelectOptions.push({
-          tradeAsset: tradeAsset,
+          baseToken: baseToken,
           quoteToken: stablecoin
         })
       )
@@ -137,7 +135,7 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
     // });
 
     let activeDropDownOption = dropDownSelectOptions.find(option => 
-      option.tradeAsset === this.props.selectedMarket.tradeAsset &&
+      option.baseToken === this.props.selectedMarket.baseToken &&
       option.quoteToken === this.props.selectedMarket.quoteToken
       );
 

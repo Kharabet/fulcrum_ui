@@ -18,7 +18,7 @@ import { RequestStatus } from "../domain/RequestStatus";
 
 export interface IInnerOwnTokenGridRowProps {
   loan: IBorrowedFundsState;
-  tradeAsset: Asset;
+  baseToken: Asset;
   quoteToken: Asset;
   leverage: number;
   positionType: PositionType;
@@ -234,7 +234,7 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
     const request = new TradeRequest(
       this.props.loan.loanId,
       TradeType.SELL,
-      this.props.tradeAsset,
+      this.props.baseToken,
       this.props.quoteToken,
       this.props.quoteToken,
       this.props.positionType,
@@ -248,7 +248,7 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
     this.props.onManageCollateralOpen(
       new ManageCollateralRequest(
         this.props.loan.loanId,
-        this.props.tradeAsset,
+        this.props.baseToken,
         this.props.quoteToken,
         this.props.loan.collateralAmount,
         false
@@ -262,7 +262,7 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
     const request = new TradeRequest(
       this.props.loan.loanId,
       TradeType.SELL,
-      this.props.tradeAsset,
+      this.props.baseToken,
       Asset.UNKNOWN,
       this.props.quoteToken,
       this.props.positionType,

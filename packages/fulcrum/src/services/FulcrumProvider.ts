@@ -730,7 +730,7 @@ export class FulcrumProvider {
 
   public getMaxTradeValue = async (
     tradeType: TradeType,
-    tradeAsset: Asset,
+    baseToken: Asset,
     quoteToken: Asset,
     depositToken: Asset,
     positionType: PositionType,
@@ -742,9 +742,9 @@ export class FulcrumProvider {
       if (this.contractsSource) {
         const loanToken = positionType === PositionType.LONG
           ? quoteToken
-          : tradeAsset;
+          : baseToken;
         const collateralToken = positionType === PositionType.LONG
-          ? tradeAsset
+          ? baseToken
           : quoteToken;
 
         const assetContract = await this.contractsSource.getITokenContract(loanToken);
@@ -781,7 +781,7 @@ export class FulcrumProvider {
 
 
     let decimalOffset = 0;
-    if (tradeAsset === Asset.WBTC) {
+    if (baseToken === Asset.WBTC) {
       if (positionType === PositionType.SHORT) {
         decimalOffset = 10;
       } else {

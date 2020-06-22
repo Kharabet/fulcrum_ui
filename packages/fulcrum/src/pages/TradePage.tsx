@@ -40,7 +40,7 @@ export interface ITradePageProps {
 }
 
 export interface IMarketPair {
-  tradeAsset: Asset;
+  baseToken: Asset;
   quoteToken: Asset;
 }
 
@@ -71,7 +71,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
   constructor(props: any) {
     super(props);
     if (process.env.REACT_APP_ETH_NETWORK === "kovan") {
-      this.tradeAssets = [
+      this.baseTokens = [
         Asset.ETH
       ];
       this.stablecoinAssets = [
@@ -79,10 +79,10 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         Asset.SAI,
       ]
     } else if (process.env.REACT_APP_ETH_NETWORK === "ropsten") {
-      // this.tradeAssets = [
+      // this.baseTokens = [
       // ];
     } else {
-      this.tradeAssets = [
+      this.baseTokens = [
         Asset.ETH,
         // Asset.DAI,
         // Asset.USDC,
@@ -105,7 +105,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     }
     this.state = {
       selectedMarket: {
-        tradeAsset: this.tradeAssets[0],
+        baseToken: this.baseTokens[0],
         quoteToken: this.stablecoinAssets[0],
       },
       loans: undefined,
@@ -133,7 +133,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
   }
   private readonly defaultLeverageLong: number = 2;
   private readonly defaultLeverageShort: number = 1;
-  private readonly tradeAssets: Asset[] = [];
+  private readonly baseTokens: Asset[] = [];
   private readonly stablecoinAssets: Asset[] = [];
 
   public componentWillUnmount(): void {
@@ -186,7 +186,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
           </InfoBlock>
             : null}
           <TokenGridTabs
-            tradeAssets={this.tradeAssets}
+            baseTokens={this.baseTokens}
             stablecoinAssets={this.stablecoinAssets}
             selectedMarket={this.state.selectedMarket}
             onShowMyTokensOnlyChange={this.onShowMyTokensOnlyChange}
@@ -209,12 +209,12 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
           ) : (
               <React.Fragment>
                 <div className="chart-wrapper">
-                  <TVChartContainer symbol={this.state.selectedMarket.tradeAsset} preset={this.props.isMobileMedia ? "mobile" : undefined} />
+                  <TVChartContainer symbol={this.state.selectedMarket.baseToken} preset={this.props.isMobileMedia ? "mobile" : undefined} />
                 </div>
                 <TradeTokenGrid
                   isMobileMedia={this.props.isMobileMedia}
-                  tokenRowsData={this.state.tokenRowsData.filter(e => e.asset === this.state.selectedMarket.tradeAsset)}
-                  ownRowsData={this.state.ownRowsData.filter(e => e.tradeAsset === this.state.selectedMarket.tradeAsset && e.quoteToken === this.state.selectedMarket.quoteToken)}
+                  tokenRowsData={this.state.tokenRowsData.filter(e => e.baseToken === this.state.selectedMarket.baseToken)}
+                  ownRowsData={this.state.ownRowsData.filter(e => e.baseToken === this.state.selectedMarket.baseToken && e.quoteToken === this.state.selectedMarket.quoteToken)}
                   changeLoadingTransaction={this.changeLoadingTransaction}
                   request={this.state.request}
                   isLoadingTransaction={this.state.isLoadingTransaction}
@@ -234,7 +234,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
               loan={this.state.loans?.find(e => e.loanId === this.state.loanId)}
               isMobileMedia={this.props.isMobileMedia}
               tradeType={this.state.tradeType}
-              tradeAsset={this.state.selectedMarket.tradeAsset}
+              baseToken={this.state.selectedMarket.baseToken}
               positionType={this.state.tradePositionType}
               leverage={this.state.tradeLeverage}
               quoteAsset={this.state.selectedMarket.quoteToken}
@@ -262,9 +262,9 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     );
   }
 
-  public onTabSelect = async (tradeAsset: Asset, quoteToken: Asset) => {
+  public onTabSelect = async (baseToken: Asset, quoteToken: Asset) => {
     const marketPair = {
-      tradeAsset,
+      baseToken,
       quoteToken
     }
     await this.setState({ ...this.state, selectedMarket: marketPair });
@@ -361,7 +361,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       for (const loan of loans) {
 
 
-        const positionType = this.tradeAssets.includes(loan.collateralAsset)
+        const positionType = this.baseTokens.includes(loan.collateralAsset)
           ? PositionType.LONG
           : PositionType.SHORT;
 
@@ -412,7 +412,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
 
         ownRowsData.push({
           loan: loan,
-          tradeAsset: baseAsset,
+          baseToken: baseAsset,
           quoteToken: quoteAsset,
           leverage: leverage.toNumber(),
           positionType,
@@ -452,11 +452,11 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       //@ts-ignore
       const events = grouped[loanId].sort((a, b) => a.date < b.date ? -1 : 1);
       const tradeEvent = events[0] as TradeEvent
-      const positionType = this.tradeAssets.includes(tradeEvent.baseToken)
+      const positionType = this.baseTokens.includes(tradeEvent.baseToken)
         ? PositionType.LONG
         : PositionType.SHORT;
 
-      const tradeAsset = positionType === PositionType.LONG
+      const baseToken = positionType === PositionType.LONG
         ? tradeEvent.baseToken
         : tradeEvent.quoteToken;
 
@@ -475,7 +475,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
 
       const positionEventsGroup = new PositionEventsGroup(
         loanId,
-        tradeAsset,
+        baseToken,
         quoteAsset,
         positionType,
         leverage.toNumber()
@@ -580,11 +580,11 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     // for (const tradeEvent of tradeEvents) {
 
 
-    // const positionType = this.tradeAssets.includes(tradeEvent.baseToken)
+    // const positionType = this.baseTokens.includes(tradeEvent.baseToken)
     //   ? PositionType.LONG
     //   : PositionType.SHORT;
 
-    // const tradeAsset = positionType === PositionType.LONG
+    // const baseToken = positionType === PositionType.LONG
     //   ? tradeEvent.baseToken
     //   : tradeEvent.quoteToken;
 
@@ -626,7 +626,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
   public getTokenRowsData = (state: ITradePageState): ITradeTokenGridRowProps[] => {
     const tokenRowsData: ITradeTokenGridRowProps[] = [];
     tokenRowsData.push({
-      asset: state.selectedMarket.tradeAsset,
+      baseToken: state.selectedMarket.baseToken,
       quoteToken: state.selectedMarket.quoteToken,
       positionType: PositionType.LONG,
       defaultLeverage: this.defaultLeverageLong,
@@ -635,7 +635,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       isTxCompleted: this.state.isTxCompleted
     });
     tokenRowsData.push({
-      asset: state.selectedMarket.tradeAsset,
+      baseToken: state.selectedMarket.baseToken,
       quoteToken: state.selectedMarket.quoteToken,
       positionType: PositionType.SHORT,
       defaultLeverage: this.defaultLeverageShort,

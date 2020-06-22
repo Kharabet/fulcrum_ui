@@ -20,7 +20,7 @@ import { RequestStatus } from "../domain/RequestStatus";
 
 export interface ITradeTokenGridRowProps {
 
-  asset: Asset;
+  baseToken: Asset;
   quoteToken: Asset;
   positionType: PositionType;
   defaultLeverage: number;
@@ -32,7 +32,7 @@ export interface ITradeTokenGridRowProps {
 interface ITradeTokenGridRowState {
   leverage: number;
 
-  tradeAssetPrice: BigNumber;
+  baseTokenPrice: BigNumber;
   liquidationPrice: BigNumber;
 
   interestRate: BigNumber;
@@ -48,7 +48,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
     this._isMounted = false;
     this.state = {
       leverage: this.props.defaultLeverage,
-      tradeAssetPrice: new BigNumber(0),
+      baseTokenPrice: new BigNumber(0),
       liquidationPrice: new BigNumber(0),
       interestRate: new BigNumber(0),
       isLoading: true,
@@ -66,11 +66,11 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
 
   private async derivedUpdate() {
 
-    const tradeAssetPrice = await FulcrumProvider.Instance.getSwapToUsdRate(this.props.asset);
+    const baseTokenPrice = await FulcrumProvider.Instance.getSwapToUsdRate(this.props.baseToken);
 
     const collateralToPrincipalRate = this.props.positionType === PositionType.LONG
-      ? await FulcrumProvider.Instance.getSwapRate(this.props.asset, this.props.quoteToken)
-      : await FulcrumProvider.Instance.getSwapRate(this.props.quoteToken, this.props.asset);
+      ? await FulcrumProvider.Instance.getSwapRate(this.props.baseToken, this.props.quoteToken)
+      : await FulcrumProvider.Instance.getSwapRate(this.props.quoteToken, this.props.baseToken);
 
     let initialMargin = this.props.positionType === PositionType.LONG
       ? new BigNumber(10 ** 38).div(new BigNumber(this.state.leverage - 1).times(10 ** 18))
@@ -87,12 +87,12 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
     const interestRate = await FulcrumProvider.Instance.getBorrowInterestRate(
       this.props.positionType === PositionType.LONG ?
         this.props.quoteToken :
-        this.props.asset
+        this.props.baseToken
       );
 
     this._isMounted && this.setState({
       ...this.state,
-      tradeAssetPrice,
+      baseTokenPrice,
       interestRate: interestRate,
       liquidationPrice,
       isLoading: false
@@ -156,7 +156,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
       <div className={`trade-token-grid-row`}>
         <div className="trade-token-grid-row__col-token-name">
           <div className="trade-token-grid-row__col-token-name--inner">
-            {this.props.asset}
+            {this.props.baseToken}
             <PositionTypeMarkerAlt value={this.props.positionType} />
           </div>
         </div>
@@ -166,7 +166,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
         <div className="trade-token-grid-row__col-leverage">
           <div className="leverage-selector__wrapper">
             <LeverageSelector
-              asset={this.props.asset}
+              asset={this.props.baseToken}
               value={this.state.leverage}
               minValue={this.props.positionType === PositionType.SHORT ? 1 : 2}
               maxValue={5}
@@ -174,10 +174,10 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
             />
           </div>
         </div>
-        <div title={`$${this.state.tradeAssetPrice.toFixed(18)}`} className="trade-token-grid-row__col-price">
-          {this.state.tradeAssetPrice.gt(0) && !this.state.isLoading ?
+        <div title={`$${this.state.baseTokenPrice.toFixed(18)}`} className="trade-token-grid-row__col-price">
+          {this.state.baseTokenPrice.gt(0) && !this.state.isLoading ?
             <React.Fragment>
-              <span className="fw-normal">$</span>{this.state.tradeAssetPrice.toFixed(2)}
+              <span className="fw-normal">$</span>{this.state.baseTokenPrice.toFixed(2)}
             </React.Fragment>
             :
             <Preloader width="74px" />
@@ -222,7 +222,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
     const request = new TradeRequest(
       "0x0000000000000000000000000000000000000000000000000000000000000000",
       TradeType.BUY,
-      this.props.asset,
+      this.props.baseToken,
       this.props.quoteToken, // TODO: depends on which one they own
       Asset.ETH,
       this.props.positionType,

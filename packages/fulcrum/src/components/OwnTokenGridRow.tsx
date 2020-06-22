@@ -18,7 +18,7 @@ import { TradeTxLoaderStep } from "./TradeTxLoaderStep";
 
 export interface IOwnTokenGridRowProps {
   loan: IBorrowedFundsState;
-  tradeAsset: Asset;
+  baseToken: Asset;
   quoteToken: Asset;
   leverage: number;
   positionType: PositionType;
@@ -133,7 +133,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
       </React.Fragment>
         : <div className={`own-token-grid-row ${this.props.isTxCompleted ? `completed` : ``}`}>
           <div className="own-token-grid-row__col-token-name  opacityIn">
-            {`${this.props.tradeAsset.toUpperCase()}`}
+            {`${this.props.baseToken.toUpperCase()}`}
           </div>
           <div className="own-token-grid-row__col-position-type opacityIn">
             <span className="position-type-marker">
@@ -216,7 +216,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
     const request = new TradeRequest(
       this.props.loan.loanId,
       TradeType.SELL,
-      this.props.tradeAsset,
+      this.props.baseToken,
       this.props.quoteToken,
       Asset.UNKNOWN,
       this.props.positionType,
@@ -230,7 +230,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
     this.props.onManageCollateralOpen(
       new ManageCollateralRequest(
         this.props.loan.loanId,
-        this.props.tradeAsset,
+        this.props.baseToken,
         this.props.quoteToken,
         this.props.loan.collateralAmount,
         false
@@ -243,7 +243,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
     const request = new TradeRequest(
       this.props.loan.loanId,
       TradeType.SELL,
-      this.props.tradeAsset,
+      this.props.baseToken,
       this.props.quoteToken,
       Asset.UNKNOWN,
       this.props.positionType,
