@@ -44,16 +44,9 @@ export class RepayLoanProcessor {
       let closeAmountInBaseUnits = taskRequest.repayAmount.multipliedBy(10 ** loanPrecision);
       const closeAmountInBaseUnitsValue = new BigNumber(closeAmountInBaseUnits.toFixed(0, 1));
 
-      if (taskRequest.repayAmount.gte(taskRequest.amountOwed)) {
-        // send a large amount to close entire loan
-        closeAmountInBaseUnits = closeAmountInBaseUnits.multipliedBy(10 ** 50);
-        if (closeAmountInBaseUnits.eq(0))
-          closeAmountInBaseUnits = new BigNumber(10 ** 50);
-      } else {
-        // don't allow 0 payback if more is owed
-        if (closeAmountInBaseUnits.eq(0))
-          throw new Error("Close amount is 0");
-      }
+      // don't allow 0 payback if more is owed
+      if (closeAmountInBaseUnits.eq(0))
+        throw new Error("Close amount is 0");
       closeAmountInBaseUnits = new BigNumber(closeAmountInBaseUnits.toFixed(0, 1));
 
       if (!isETHBorrowAsset) {
@@ -81,8 +74,15 @@ export class RepayLoanProcessor {
         // Waiting for token allowance
         task.processingStepNext();
         if (closeAmountInBaseUnits.gt(erc20allowance)) {
-          await tokenErc20Contract!.approve.sendTransactionAsync(TorqueProvider.Instance.contractsSource.getVaultAddress().toLowerCase(), TorqueProvider.MAX_UINT, { from: account });
+          await tokenErc20Contract!.approve.sendTransactionAsync(TorqueProvider.Instance.contractsSource.getVaultAddress().toLowerCase(), TorqueProvider.Instance.getLargeApprovalAmount(taskRequest.borrowAsset), { from: account });
         }
+      }
+
+      if (taskRequest.repayAmount.gte(taskRequest.amountOwed)) {
+        // send a large amount to close entire loan
+        closeAmountInBaseUnits = closeAmountInBaseUnits.multipliedBy(10 ** 50);
+        if (closeAmountInBaseUnits.eq(0))
+          closeAmountInBaseUnits = new BigNumber(10 ** 50);
       }
 
       let gasAmountBN;
