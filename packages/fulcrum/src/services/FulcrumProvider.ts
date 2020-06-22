@@ -1762,15 +1762,16 @@ export class FulcrumProvider {
     //@ts-ignore
     result = events.reverse().map(event => {
       const userAddress = event.topics[1].replace("0x000000000000000000000000", "0x");
-      const baseTokenAddress = event.topics[2].replace("0x000000000000000000000000", "0x");
-      const quoteTokenAddress = event.topics[3].replace("0x000000000000000000000000", "0x");
-      const baseToken = this.contractsSource!.getAssetFromAddress(baseTokenAddress);
-      const quoteToken = this.contractsSource!.getAssetFromAddress(quoteTokenAddress);
+      const lender = event.topics[2].replace("0x000000000000000000000000", "0x");
+      const loandId = event.topics[3];
       const data = event.data.replace("0x", "");
       const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
       if (!dataSegments) return result;
-      const lender = dataSegments[0].replace("000000000000000000000000", "0x");
-      const loandId = dataSegments[1];
+      const baseTokenAddress = dataSegments[0].replace("000000000000000000000000", "0x");
+      const quoteTokenAddress = dataSegments[1].replace("000000000000000000000000", "0x");
+      const baseToken = this.contractsSource!.getAssetFromAddress(baseTokenAddress);
+      const quoteToken = this.contractsSource!.getAssetFromAddress(quoteTokenAddress);
+      
       const positionSize = new BigNumber(parseInt(dataSegments[2], 16));
       const borrowedAmount = new BigNumber(parseInt(dataSegments[3], 16));
       const interestRate = new BigNumber(parseInt(dataSegments[4], 16));
@@ -1782,10 +1783,10 @@ export class FulcrumProvider {
       const txHash = event.transactionHash;
       return new TradeEvent(
         userAddress,
-        baseToken,
-        quoteToken,
         lender,
         loandId,
+        baseToken,
+        quoteToken,
         positionSize,
         borrowedAmount,
         interestRate,
@@ -1818,16 +1819,16 @@ export class FulcrumProvider {
     //@ts-ignore
     result = events.reverse().map(event => {
       const userAddress = event.topics[1].replace("0x000000000000000000000000", "0x");
-      const baseTokenAddress = event.topics[2].replace("0x000000000000000000000000", "0x");
-      const quoteTokenAddress = event.topics[3].replace("0x000000000000000000000000", "0x");
-      const baseToken = this.contractsSource!.getAssetFromAddress(baseTokenAddress);
-      const quoteToken = this.contractsSource!.getAssetFromAddress(quoteTokenAddress);
+      const lender = event.topics[2].replace("0x000000000000000000000000", "0x");
+      const loandId = event.topics[3];
       const data = event.data.replace("0x", "");
       const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
       if (!dataSegments) return result;
-      const lender = dataSegments[0].replace("000000000000000000000000", "0x");
-      const closer = dataSegments[1].replace("000000000000000000000000", "0x");
-      const loandId = dataSegments[2];
+      const baseTokenAddress = dataSegments[0].replace("000000000000000000000000", "0x");
+      const quoteTokenAddress = dataSegments[1].replace("000000000000000000000000", "0x");
+      const baseToken = this.contractsSource!.getAssetFromAddress(baseTokenAddress);
+      const quoteToken = this.contractsSource!.getAssetFromAddress(quoteTokenAddress);
+      const closer = dataSegments[2].replace("000000000000000000000000", "0x");
       const positionCloseSize = new BigNumber(parseInt(dataSegments[3], 16));
       const loanCloseAmount = new BigNumber(parseInt(dataSegments[4], 16));
       const exitPrice = new BigNumber(parseInt(dataSegments[5], 16));

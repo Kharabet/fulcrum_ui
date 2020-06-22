@@ -2,12 +2,12 @@ import { BigNumber } from "@0x/utils";
 import { Asset } from "./Asset";
 
 export class TradeEvent {
-  public static readonly topic0: string = "0xafa6452c53d4537ba2992dec6b9cad9a2fe82db672005ea589963f9f0b3de052"
+  public static readonly topic0: string = "0xf640c1cfe1a912a0b0152b5a542e5c2403142eed75b06cde526cee54b1580e5c"
   public readonly user: string; //indexed 
-  public readonly baseToken: Asset; //indexed 
-  public readonly quoteToken: Asset; //indexed 
-  public readonly lender: string;
-  public readonly loanId: string;
+  public readonly lender: string; //indexed
+  public readonly loanId: string; //indexed
+  public readonly baseToken: Asset; 
+  public readonly quoteToken: Asset; 
   public readonly positionSize: BigNumber;
   public readonly borrowedAmount: BigNumber;
   public readonly interestRate: BigNumber;
@@ -20,10 +20,10 @@ export class TradeEvent {
 
   constructor(
     user: string,
-    baseToken: Asset,
-    quoteToken: Asset,
     lender: string,
     loanId: string,
+    baseToken: Asset,
+    quoteToken: Asset,
     positionSize: BigNumber,
     borrowedAmount: BigNumber,
     interestRate: BigNumber,

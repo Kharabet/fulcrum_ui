@@ -2,13 +2,13 @@ import { BigNumber } from "@0x/utils";
 import { Asset } from "./Asset";
 
 export class CloseWithSwapEvent {
-  public static topic0: string = "0xea42d6c94db037479b045a6b4933be0ba4a5a6d54837e99abdcaa3a0a422689d"
+  public static topic0: string = "0x2ed7b29b4ca95cf3bb9a44f703872a66e6aa5e8f07b675fa9a5c124a1e5d7352"
   public readonly user: string; //indexed 
-  public readonly baseToken: Asset; //indexed 
-  public readonly quoteToken: Asset; //indexed 
-  public readonly lender: string;
+  public readonly lender: string;//indexed 
+  public readonly loanId: string;//indexed 
+  public readonly baseToken: Asset; 
+  public readonly quoteToken: Asset; 
   public readonly closer: string;
-  public readonly loanId: string;
   public readonly positionCloseSize: BigNumber;
   public readonly loanCloseAmount: BigNumber;
   public readonly exitPrice: BigNumber;// one unit of baseToken, denominated in quoteToken
