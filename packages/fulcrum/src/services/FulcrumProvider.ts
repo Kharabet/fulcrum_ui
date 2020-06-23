@@ -1877,7 +1877,7 @@ export class FulcrumProvider {
       const data = event.data.replace("0x", "");
       const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
       if (!dataSegments) return result;
-      const lender = dataSegments[0].replace("0x000000000000000000000000", "0x");
+      const lender = dataSegments[0].replace("000000000000000000000000", "0x");
       
       const baseTokenAddress = dataSegments[1].replace("000000000000000000000000", "0x");
       const quoteTokenAddress = dataSegments[2].replace("000000000000000000000000", "0x");
