@@ -489,7 +489,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         const timeStamp = event.timeStamp;
         const txHash = event.txHash;
         if (event instanceof TradeEvent) {
-          const action = "Opened" + event.loanId;
+          const action = "Opened";
           if (positionType === PositionType.LONG) {
             positionValue = event.positionSize.div(10 ** 18);
             value = event.positionSize.div(event.entryPrice);
@@ -516,7 +516,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
 
         }
         else if (event instanceof CloseWithSwapEvent) {
-          const action = "Closed" + event.loanId;
+          const action = "Closed";
           if (positionType === PositionType.LONG) {
             positionValue = event.positionCloseSize.div(10 ** 18);
             value = event.positionCloseSize.div(event.exitPrice);
@@ -544,7 +544,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
           ))
 
         } else if (event instanceof LiquidationEvent) {
-          const action = "Liquidated" + event.loanId;
+          const action = "Liquidated";
           if (positionType === PositionType.LONG) {
             positionValue = event.collateralWithdrawAmount.div(10 ** 18);
             tradePrice = event.collateralToLoanRate.div(10 ** 18);

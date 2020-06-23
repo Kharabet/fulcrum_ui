@@ -82,7 +82,7 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
         <div className="history-token-grid-row-inner__result">
           <span>{event.action.replace(event.loanId, "")}</span>
         </div>
-        <div className="history-token-grid-row-inner__col-position">
+        <div title={event.positionValue.toFixed(18)} className="history-token-grid-row-inner__col-position">
           {event.positionValue.toFixed(4)}
         </div>
         <div className="history-token-grid-row-inner__col-asset-price">
@@ -93,7 +93,7 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
             : <Preloader width="74px" />
           }
         </div>
-        <div className="history-token-grid-row-inner__col-position-value">
+        <div title={event.value.toFixed(18)} className="history-token-grid-row-inner__col-position-value">
           {!this.state.isLoading
             ? <React.Fragment>
               <span className="sign-currency">$</span>{event.value.toFixed(2)}
@@ -101,7 +101,7 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
             : <Preloader width="74px" />
           }
         </div>
-        <div className="history-token-grid-row-inner__col-profit">
+        <div title={event.profit instanceof BigNumber ? event.profit.toFixed(18) : "-"} className="history-token-grid-row-inner__col-profit">
           {event.profit instanceof BigNumber ? <React.Fragment><span className="sign-currency">$</span>{event.profit.toFixed(2)}</React.Fragment> : "-"}
         </div>
       </div>)
@@ -131,7 +131,7 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
           <div className="history-token-grid-row__col-asset-unit">
             {this.props.eventsGroup.quoteToken}
           </div>
-          <div className="history-token-grid-row__col-position">
+          <div title={latestEvent.positionValue.toFixed(18)} className="history-token-grid-row__col-position">
             {latestEvent.positionValue.toFixed(4)}
           </div>
           <div className="history-token-grid-row__col-asset-price">
@@ -152,7 +152,7 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
           : <Preloader width="74px" />
         }
       </div> */}
-          <div className="history-token-grid-row__col-position-value">
+          <div title={latestEvent.value.toFixed(18)} className="history-token-grid-row__col-position-value">
             {!this.state.isLoading
               ? <React.Fragment>
                 <span className="sign-currency">$</span>{latestEvent.value.toFixed(2)}
@@ -160,16 +160,16 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
               : <Preloader width="74px" />
             }
           </div>
-          <div className="history-token-grid-row__col-profit">
+          <div title={latestEvent.profit instanceof BigNumber ? latestEvent.profit.toFixed(18) : "-"} className="history-token-grid-row__col-profit">
             {!this.state.isLoading
-              ?
-              latestEvent.profit instanceof BigNumber ? <React.Fragment><span className="sign-currency">$</span>{latestEvent.profit.toFixed(2)}</React.Fragment> : "-"
-
+              ? latestEvent.profit instanceof BigNumber
+                ? <React.Fragment><span className="sign-currency">$</span>{latestEvent.profit.toFixed(2)}</React.Fragment>
+                : "-"
               : <Preloader width="74px" />
             }
           </div>
           <div className={`history-token-grid-row__result ${this.props.eventsGroup.events.length - 1 ? `toggle-collapse` : ``}  ${this.state.isShowCollapse ? `opened-collapse` : ``}`} onClick={this.toggleCollapse}>
-            <span>{latestEvent.action.replace(latestEvent.loanId, "")}</span>
+            <span>{latestEvent.action}</span>
           </div>
         </div>
         <div className={`collapse ${this.state.isShowCollapse ? `show` : `hide`}`}>
