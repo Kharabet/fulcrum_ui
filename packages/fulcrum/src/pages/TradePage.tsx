@@ -546,15 +546,15 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         } else if (event instanceof LiquidationEvent) {
           const action = "Liquidated" + event.loanId;
           if (positionType === PositionType.LONG) {
-            positionValue = event.repayAmount.div(10 ** 18);
-            value = event.repayAmount.div(event.collateralToLoanRate);
-            tradePrice = new BigNumber(10 ** 36).div(event.collateralToLoanRate).div(10 ** 18);
+            positionValue = event.collateralWithdrawAmount.div(10 ** 18);
+            tradePrice = event.collateralToLoanRate.div(10 ** 18);
+            value = positionValue.times(tradePrice);
             profit = (openPrice.minus(tradePrice)).times(positionValue);
           }
           else {
-            positionValue = event.repayAmount.div(event.collateralToLoanRate);
-            value = event.repayAmount.div(10 ** 18);
-            tradePrice = event.collateralToLoanRate.div(10 ** 18);
+            positionValue = event.repayAmount.div(10 ** 18);
+            tradePrice = new BigNumber(10 ** 36).div(event.collateralToLoanRate).div(10 ** 18);
+            value = positionValue.times(tradePrice);
             profit = (tradePrice.minus(openPrice)).times(positionValue);
           }
 
