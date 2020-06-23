@@ -298,7 +298,7 @@ export default class Fulcrum {
                 $lt: endDate,
                 $gte: startDate
             }
-        }, { date: 1, allTokensStats: 1 }).sort({date : 1}).lean());
+        }, { date: 1, allTokensStats: 1 }).sort({ date: 1 }).lean());
         const arrayLength = dbStatsDocuments.length;
         const desiredlength = dbStatsDocuments.length > estimatedPointsNumber
             ? estimatedPointsNumber - 1
@@ -309,10 +309,17 @@ export default class Fulcrum {
         const timeBetweenTwoOutputElements = (new Date(dbStatsDocuments[0].date).getTime() - new Date(dbStatsDocuments[arrayLength - 1].date).getTime()) / desiredlength;
         const offset = Math.floor(timeBetweenTwoOutputElements / timeBetweenTwoArrayElements);
         const reducedArray = dbStatsDocuments.filter((e, i) => i % offset === 0);
-       
+
         let result = [];
-        reducedArray.forEach(document => {
-            result.push({ timestamp: new Date(document.date).getTime(), tvl: document.allTokensStats.usdTotalLocked });
+        reducedArray.forEach((document, index, documents) => {
+            let change24h = 0;
+            if (index > 0)
+                change24h = (document.allTokensStats.usdTotalLocked - documents[index - 1].allTokensStats.usdTotalLocked) / documents[index - 1].allTokensStats.usdTotalLocked;
+            result.push({
+                timestamp: new Date(document.date).getTime(),
+                tvl: document.allTokensStats.usdTotalLocked,
+                "change24h": change24h
+            });
         });
         return result;
     }
@@ -323,9 +330,9 @@ export default class Fulcrum {
                 $lt: endDate,
                 $gte: startDate
             },
-            tokensStats: {$elemMatch: {token: asset}}
+            tokensStats: { $elemMatch: { token: asset } }
 
-        },{ date: 1, tokensStats: 1, "tokensStats.$": asset}).sort({date : 1}).lean()
+        }, { date: 1, tokensStats: 1, "tokensStats.$": asset }).sort({ date: 1 }).lean()
 
         const arrayLength = dbStatsDocuments.length;
         const desiredlength = dbStatsDocuments.length > estimatedPointsNumber
@@ -337,17 +344,17 @@ export default class Fulcrum {
         const timeBetweenTwoOutputElements = (new Date(dbStatsDocuments[0].date).getTime() - new Date(dbStatsDocuments[arrayLength - 1].date).getTime()) / desiredlength;
         const offset = Math.floor(timeBetweenTwoOutputElements / timeBetweenTwoArrayElements);
         const reducedArray = dbStatsDocuments.filter((e, i) => i % offset === 0);
-       
+
         let result = [];
         reducedArray.forEach(document => {
             const assetStats = document.tokensStats[0]
-            result.push({ 
-                timestamp: new Date(document.date).getTime(), 
-                token: assetStats.token, 
-                supplyInterestRate: assetStats.supplyInterestRate, 
-                tvl: assetStats.vaultBalance, 
+            result.push({
+                timestamp: new Date(document.date).getTime(),
+                token: assetStats.token,
+                supplyInterestRate: assetStats.supplyInterestRate,
+                tvl: assetStats.vaultBalance,
                 tvlUsd: assetStats.usdTotalLocked,
-                utilization: assetStats.totalBorrow/assetStats.totalSupply*100, 
+                utilization: assetStats.totalBorrow / assetStats.totalSupply * 100,
             });
         });
         return result;
