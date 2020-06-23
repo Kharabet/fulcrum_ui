@@ -6,10 +6,8 @@ interface IMainChartProps {
 }
 
 interface IMainChartState {
-  //periodChart: number,
   labels: Array<number>;
   data: Array<number>;
-  //tvl: string | any;
 }
 
 export class MainChart extends Component<IMainChartProps, IMainChartState> {
@@ -17,15 +15,12 @@ export class MainChart extends Component<IMainChartProps, IMainChartState> {
   constructor(props: any) {
     super(props);
     this.state = {
-      //periodChart: 1,
-      //tvl: '1.2',
       labels: [],
       data: []
     };
   }
 
   public componentDidMount(): void {
-    //this.getVaultBalanceUsd();
     this.getTvlHistory();
   }
 
@@ -66,8 +61,8 @@ export class MainChart extends Component<IMainChartProps, IMainChartState> {
     const getData = (canvas: any) => {
       const ctx: any = canvas.getContext("2d");
       const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-      gradient.addColorStop(0, '#ffffff');
-      gradient.addColorStop(1, '#DCEBFF');
+      gradient.addColorStop(0, '#edf5ff');
+      gradient.addColorStop(1, '#dcebff');
 
       return {
         labels: this.state.labels,
@@ -86,7 +81,10 @@ export class MainChart extends Component<IMainChartProps, IMainChartState> {
       scales: {
         xAxes: [{
           ticks: {
-            padding: 15
+            padding: 15,
+            callback: (value: any, index: any, values: any) => {
+              return index === 0 || index === Object.keys(values).length - 1 ? '' : value;
+            }
           },
           gridLines: {
             drawBorder: false,

@@ -4,6 +4,7 @@ import { AssetSelector } from "../components/AssetSelector";
 import { MainChart } from "../components/MainChart";
 import { ReactComponent as Arrow } from "../assets/images/icon-arrow.svg";
 import { GroupButton } from "../components/GroupButton";
+import { Header } from "../layout/Header";
 
 interface IMainPageProps {
 }
@@ -25,7 +26,8 @@ export class MainPage extends Component<IMainPageProps, IMainPageState> {
     const tvl = +this.state.tvl;
     return (
       <React.Fragment>
-        <section>
+        <section className="bg-gradient">
+          <Header />
           <div className="container">
             <div className="flex jc-sb">
               <div className="flex fd-c">

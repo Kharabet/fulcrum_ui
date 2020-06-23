@@ -19,22 +19,13 @@ export class AppRouter extends Component {
         <Router >
           <Switch>
             <Route exact={true} path="/">
-              <React.Fragment>
-                <Header />
-                <MainPage />
-              </React.Fragment>
+              <MainPage />
             </Route>
             <Route path="/stats/*">
-              <React.Fragment>
-                <Header />
-                <StatsPage />
-              </React.Fragment>
+              <StatsPage />
             </Route>
             <Route path="/liquidations" >
-              <React.Fragment>
-                <Header />
-                <LiquidationsPage />
-              </React.Fragment>
+              <LiquidationsPage />
             </Route>
           </Switch>
         </Router>

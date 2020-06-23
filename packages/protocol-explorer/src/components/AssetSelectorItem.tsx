@@ -34,7 +34,7 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
     const requestUrl = `${this.apiUrl}/asset-stats-history?asset=${this.props.asset.toLowerCase()}&start_date=${startData}&end_date=${endData}&points_number=${pointsNumber}`;
     const response = await fetch(requestUrl);
     const responseJson = await response.json();
-    console.log(responseJson);
+    //console.log(responseJson);
     let labels: any = [];
     let tvl: any = [];
 

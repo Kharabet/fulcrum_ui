@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Search } from "../components/Search";
 import { StatsChart } from "../components/StatsChart";
 import { TxGrid } from "../components/TxGrid";
+import { Header } from "../layout/Header";
 
 interface IStatsPageProps {
 }
@@ -21,6 +22,7 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
   public render() {
     return (
       <React.Fragment>
+        <Header />
         <section>
           <div className="container">
             <StatsChart />
