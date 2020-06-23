@@ -101,50 +101,73 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
         labels: this.state.labels,
         datasets: [{
           label: 'TVL',
+          yAxisID: 'A',
           data: this.state.tvl,
           backgroundColor: "transparent",
+          pointBackgroundColor: '#276BFB',
           borderColor: '#276BFB',
-          borderWidth: 1,
-          order: 1
+          borderWidth: 2,
         },
         {
           label: 'Supply APR, %',
           data: this.state.apr,
+          yAxisID: 'B',
           backgroundColor: "transparent",
+          pointBackgroundColor: '#33DFCC',
           borderColor: '#33DFCC',
-          borderWidth: 1,
-          order: 2
         },
         {
           label: 'Utilization, %',
+          yAxisID: 'B',
           data: this.state.utilization,
           backgroundColor: "transparent",
+          pointBackgroundColor: '#B79EFF',
           borderColor: '#B79EFF',
-          borderWidth: 1,
-          order: 3
         }]
       }
     }
     const canvas = document.createElement('canvas');
     const chartData = getData(canvas);
     const options = {
-      scaleShowLabels: false,
       scales: {
         xAxes: [{
+          ticks: {
+            padding: 15
+          },
           gridLines: {
-            display: false
+            drawBorder: false,
+            zeroLineWidth: 1,
+            zeroLineColor: '#E9F4FF',
+            color: '#E9F4FF',
+            
           },
         }],
         yAxes: [{
+          id: 'A',
+          ticks: {
+            drawTicks: false,
+            max: Math.max(...this.state.tvl),
+            min: Math.min(...this.state.tvl),
+          },
+          display: false,
+        },
+        {
+          id: 'B',
+          ticks: {
+            max: 101,
+            min: -1,
+            drawTicks: false,
+          },
+
           display: false,
         }]
       },
       legend: {
-        display: false
+        display: false,
+        //usePointStyle: true
       },
       layout: {
         padding: {
-          top: 5,
         }
       },
       tooltips: {
@@ -159,7 +182,9 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
         titleFontColor: '#8992A4',
         titleFontStyle: 'black',
         titleMarginBottom: 10,
+        mode: 'nearest',
         position: 'nearest',
+        intersect: true,
         callbacks: {
           label: function (tooltipItems: any, data: any) {
             var label = data.datasets[tooltipItems.datasetIndex].label || '';
@@ -171,15 +196,18 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
             } else {
               number = `${(tooltipItems.yLabel).toFixed(3)} `;
             }
-            return (label === 'TVL') ? `$${number} ` : `${number}% `;
+            return (label === 'TVL') ? `$${number}` : `${number}%`;
           }
         }
-      }
-      /*elements: {
+      },
+      elements: {
         point: {
           radius: 0
         }
-      }*/
+      },
+      hover: {
+        mode: 'point',
+      },
     }
     return (
       <React.Fragment>

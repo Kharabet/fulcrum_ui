@@ -85,8 +85,15 @@ export class MainChart extends Component<IMainChartProps, IMainChartState> {
       scaleShowLabels: false,
       scales: {
         xAxes: [{
+          ticks: {
+            padding: 15
+          },
           gridLines: {
-            display: false
+            drawBorder: false,
+            zeroLineWidth: 1,
+            zeroLineColor: '#E9F4FF',
+            color: '#E9F4FF',
+            
           },
         }],
         yAxes: [{

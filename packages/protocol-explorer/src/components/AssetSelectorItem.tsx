@@ -93,6 +93,9 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
         point: {
           radius: 0
         }
+      },
+      tooltips: {
+        enabled: false
       }
     }
     return (
