@@ -521,14 +521,14 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
             positionValue = event.positionCloseSize.div(10 ** 18);
             value = event.positionCloseSize.div(event.exitPrice);
             tradePrice = new BigNumber(10 ** 36).div(event.exitPrice).div(10 ** 18);
-            profit = (openPrice.minus(tradePrice)).times(positionValue);
+            profit = (tradePrice.minus(openPrice)).times(positionValue);
 
           }
           else {
             positionValue = event.positionCloseSize.div(event.exitPrice);
             value = event.positionCloseSize.div(10 ** 18);
             tradePrice = event.exitPrice.div(10 ** 18);
-            profit = (tradePrice.minus(openPrice)).times(positionValue);
+            profit = (openPrice.minus(tradePrice)).times(positionValue);
 
           }
 
@@ -549,13 +549,13 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
             positionValue = event.collateralWithdrawAmount.div(10 ** 18);
             tradePrice = event.collateralToLoanRate.div(10 ** 18);
             value = positionValue.times(tradePrice);
-            profit = (openPrice.minus(tradePrice)).times(positionValue);
+            profit = (tradePrice.minus(openPrice)).times(positionValue);
           }
           else {
             positionValue = event.repayAmount.div(10 ** 18);
             tradePrice = new BigNumber(10 ** 36).div(event.collateralToLoanRate).div(10 ** 18);
             value = positionValue.times(tradePrice);
-            profit = (tradePrice.minus(openPrice)).times(positionValue);
+            profit = (openPrice.minus(tradePrice)).times(positionValue);
           }
 
           positionEventsGroup.events.push(new HistoryEvent(
