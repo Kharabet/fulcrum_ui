@@ -119,11 +119,11 @@ var Datafeeds = (function (exports) {
                                         high: 1 / bar.high,
                                         low: 1 / bar.low,
                                     }); });
-                                    resolve({
-                                        bars: barsInfo.bars,
-                                        meta: barsInfo.meta,
-                                    });
                                 }
+                                resolve({
+                                    bars: barsInfo.bars,
+                                    meta: barsInfo.meta,
+                                });
                             });
                         }
                         else {
@@ -152,11 +152,11 @@ var Datafeeds = (function (exports) {
                                                 high: firstBarsInfo.bars[index].high / bar.high,
                                                 low: firstBarsInfo.bars[index].low / bar.low,
                                             }); });
-                                            resolve({
-                                                bars: barsInfo.bars,
-                                                meta: barsInfo.meta,
-                                            });
                                         }
+                                        resolve({
+                                            bars: barsInfo.bars,
+                                            meta: barsInfo.meta,
+                                        });
                                     });
                                 }
                             });

@@ -76,11 +76,11 @@ var HistoryProvider = /** @class */ (function () {
                                     high: 1 / bar.high,
                                     low: 1 / bar.low,
                                 }); });
-                                resolve({
-                                    bars: barsInfo.bars,
-                                    meta: barsInfo.meta,
-                                });
                             }
+                            resolve({
+                                bars: barsInfo.bars,
+                                meta: barsInfo.meta,
+                            });
                         });
                     }
                     else {
@@ -109,11 +109,11 @@ var HistoryProvider = /** @class */ (function () {
                                             high: firstBarsInfo.bars[index].high / bar.high,
                                             low: firstBarsInfo.bars[index].low / bar.low,
                                         }); });
-                                        resolve({
-                                            bars: barsInfo.bars,
-                                            meta: barsInfo.meta,
-                                        });
                                     }
+                                    resolve({
+                                        bars: barsInfo.bars,
+                                        meta: barsInfo.meta,
+                                    });
                                 });
                             }
                         });
