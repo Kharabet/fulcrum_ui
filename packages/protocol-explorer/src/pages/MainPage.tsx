@@ -40,7 +40,7 @@ export class MainPage extends Component<IMainPageProps, IMainPageState> {
                 <div className="tvl">TVL <span className="tvl-sign">$ </span></div>
                 <div>
                   <span className="tvl-value">{tvl ? this.getRoundedData(tvl) : this.state.tvl}</span>
-                  {this.state.change24h !== 0 && <div className={`tvl-interest ${this.state.change24h < 0 ? `down` : ``}`}><Arrow />{Math.abs(this.state.change24h).toFixed(3)}<span className="sign">%</span></div>}
+                  {this.state.change24h !== 0 && <div className={`tvl-interest ${this.state.change24h < 0 ? `down` : ``}`}><Arrow />{Math.abs(this.state.change24h).toFixed(5)}<span className="sign">%</span></div>}
                 </div>
               </div>
             </div>
