@@ -209,7 +209,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
           ) : (
               <React.Fragment>
                 <div className="chart-wrapper">
-                  <TVChartContainer symbol={this.state.selectedMarket.tradeAsset} preset={this.props.isMobileMedia ? "mobile" : undefined} />
+                  <TVChartContainer symbol={`${this.state.selectedMarket.tradeAsset}_${this.state.selectedMarket.quoteToken}`} preset={this.props.isMobileMedia ? "mobile" : undefined} />
                 </div>
                 <TradeTokenGrid
                   isMobileMedia={this.props.isMobileMedia}
