@@ -1,9 +1,7 @@
 import React, { Component } from "react";
 import { TxRow, ITxRowProps } from "./TxRow";
 import { IconSort } from "./IconSort";
-import { Asset } from "../domain/Asset";
 interface ITxGridProps {
-  asset: Asset;
   events: ITxRowProps[]
 }
 

@@ -252,7 +252,7 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
               ? e.positionCloseSize.div(10 ** 18)
               : new BigNumber(0),
         action: e instanceof LiquidationEvent
-          ? "Liquidatioan"
+          ? "Liquidation"
           : e instanceof TradeEvent
             ? "Trade"
             : e instanceof CloseWithSwapEvent
@@ -295,7 +295,7 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
         </section>
         <section className="pt-90">
           <div className="container">
-            <TxGrid asset={this.state.asset} events={this.state.events} />
+            <TxGrid events={this.state.events} />
           </div>
         </section>
       </React.Fragment>
