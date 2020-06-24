@@ -6,6 +6,7 @@ import { BigNumber } from "@0x/utils";
 import { ITxRowProps } from "../components/TxRow";
 import configProviders from "../config/providers.json";
 import { TxGrid } from "../components/TxGrid";
+import { Asset } from "../domain/Asset";
 
 
 
@@ -50,12 +51,18 @@ const initialNetworkId = getNetworkIdByString(networkName);
 
 interface ILiquidationsPageState {
   events: ITxRowProps[]
+  daiDataset: ({x: string, y: number})[]
+  ethDataset: ({x: string, y: number})[]
+  usdcDataset: ({x: string, y: number})[]
 }
-export class LiquidationsPage extends Component<{},ILiquidationsPageState> {
+export class LiquidationsPage extends Component<{}, ILiquidationsPageState> {
   constructor(props: any) {
     super(props);
     this.state = {
-      events: []
+      events: [],
+      daiDataset: [],
+      ethDataset: [],
+      usdcDataset: [],
     };
   }
   private contractsSource: ContractsSource = new ContractsSource(initialNetworkId);
@@ -125,14 +132,64 @@ export class LiquidationsPage extends Component<{},ILiquidationsPageState> {
     });
   }
 
-  componentDidMount = async () => {
-    await this.contractsSource.Init()
-    const liquidationEvents = this.getGridItems(await this.getLiquidationHistory());
+  private groupBy = function (xs: any, key: any) {
+    return xs.reduce(function (rv: any, x: any) {
+      (rv[x[key]] = rv[x[key]] || []).push(x);
+      return rv;
+    }, {});
+  };
 
+  public getChartData = (events: LiquidationEvent[]) => {
+    const eventsWithDay = events.map((e: LiquidationEvent) => ({ ...e, day: e.timeStamp.getTime() / (1000 * 60 * 60 * 24) }))
+    const groupedByDay = this.groupBy(eventsWithDay, "day");
+
+    const usdcDataset = eventsWithDay.filter(e => e.loanToken === Asset.USDC).map(e => {
+      return {
+        x: e.timeStamp.toLocaleDateString("en-US", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric"
+        }),
+        y: e.repayAmount.div(10 ** 18).dp(4, BigNumber.ROUND_CEIL).toNumber()
+      }
+    })
+    const ethDataset = eventsWithDay.filter(e => e.loanToken === Asset.ETH).map(e => {
+      return {
+        x: e.timeStamp.toLocaleDateString("en-US", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric"
+        }),
+        y: e.repayAmount.div(10 ** 18).dp(4, BigNumber.ROUND_CEIL).toNumber()
+      }
+    })
+    const daiDataset = eventsWithDay.filter(e => e.loanToken === Asset.DAI).map(e => {
+      return {
+        x: e.timeStamp.toLocaleDateString("en-US", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric"
+        }),
+        y: e.repayAmount.div(10 ** 18).dp(4, BigNumber.ROUND_CEIL).toNumber()
+      }
+    })
     this.setState({
       ...this.state,
-      events: liquidationEvents
+      daiDataset,
+      ethDataset,
+      usdcDataset
     })
+  }
+
+  componentDidMount = async () => {
+    await this.contractsSource.Init()
+    const liquidationEvents = await this.getLiquidationHistory();
+    this.getChartData(liquidationEvents);
+
+    await this.setState({
+      ...this.state,
+      events: this.getGridItems(liquidationEvents)
+    });
   }
 
 
