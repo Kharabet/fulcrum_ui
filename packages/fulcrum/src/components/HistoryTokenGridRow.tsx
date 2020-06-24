@@ -7,7 +7,7 @@ import { FulcrumProvider } from "../services/FulcrumProvider";
 import { Preloader } from "./Preloader";
 import { Asset } from "../domain/Asset";
 import { PositionType } from "../domain/PositionType";
-import { PositionEventsGroup } from "../domain/PositionEventsGroup";
+import { PositionEventsGroup, HistoryEvent } from "../domain/PositionEventsGroup";
 
 export interface IHistoryTokenGridRowProps {
   eventsGroup: PositionEventsGroup
@@ -102,7 +102,7 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
           }
         </div>
         <div title={event.profit instanceof BigNumber ? event.profit.toFixed(18) : "-"} className="history-token-grid-row-inner__col-profit">
-          {event.profit instanceof BigNumber ? <React.Fragment><span className="sign-currency">$</span>{event.profit.toFixed(2)}</React.Fragment> : "-"}
+          {event.profit instanceof BigNumber ? <React.Fragment><span className="sign-currency">$</span>{event.profit.toFixed(3)}</React.Fragment> : "-"}
         </div>
       </div>)
     })
@@ -110,6 +110,7 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
 
   public render() {
     const latestEvent = this.props.eventsGroup.events[this.props.eventsGroup.events.length - 1]
+    const profitSum = this.props.eventsGroup.events.reduce((a: BigNumber, b: HistoryEvent) =>  a.plus(b.profit instanceof BigNumber ? b.profit : new BigNumber(0) || 0), new BigNumber(0));
     return (
       <div>
         <div className="history-token-grid-row">
@@ -160,10 +161,10 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
               : <Preloader width="74px" />
             }
           </div>
-          <div title={latestEvent.profit instanceof BigNumber ? latestEvent.profit.toFixed(18) : "-"} className="history-token-grid-row__col-profit">
+          <div title={!this.state.isShowCollapse ? profitSum.toFixed(18) : latestEvent.profit instanceof BigNumber ? latestEvent.profit.toFixed(18) : "-"} className="history-token-grid-row__col-profit">
             {!this.state.isLoading
               ? latestEvent.profit instanceof BigNumber
-                ? <React.Fragment><span className="sign-currency">$</span>{latestEvent.profit.toFixed(2)}</React.Fragment>
+                ? <React.Fragment><span className="sign-currency">$</span>{!this.state.isShowCollapse ? profitSum.toFixed(3) : latestEvent.profit.toFixed(3)}</React.Fragment>
                 : "-"
               : <Preloader width="74px" />
             }
