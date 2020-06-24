@@ -83,7 +83,7 @@ export const DropdownSelect = (props: IDropdownSelectProps) => {
               data-index={i}
               key={i}
               onClick={onLiClick}>
-              {asset.reactLogoSvg.render()}
+              {AssetsDictionary.assets.get(option.tradeAsset)!.reactLogoSvg.render()}
               {option.tradeAsset}-{option.quoteToken}
             </li>)
           )
