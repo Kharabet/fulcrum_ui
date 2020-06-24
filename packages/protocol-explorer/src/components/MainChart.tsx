@@ -2,7 +2,8 @@ import React, { Component } from "react";
 import { Line } from "react-chartjs-2";
 
 interface IMainChartProps {
-  periodChart: number
+  periodChart: number,
+  getchange24h: (change24h: number) => void;
 }
 
 interface IMainChartState {
@@ -50,6 +51,7 @@ export class MainChart extends Component<IMainChartProps, IMainChartState> {
           : labels.push(`${months[new Date(item["timestamp"]).getMonth()]} ${new Date(item["timestamp"]).getDate()}`);
         data.push(item["tvl"]);
       });
+      this.props.getchange24h(responseJson.data[Object.keys(responseJson.data).length - 1].change24h);
     } else {
       console.error(responseJson.message)
     }

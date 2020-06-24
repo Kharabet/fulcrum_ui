@@ -20,7 +20,20 @@
   color: $green-color;
   display: flex;
   align-items: center;
-  &.sign {
+  &.down {
+    color: $red-color;
+    svg {
+      transform: rotate(180deg);
+      .icon-path {
+        fill: $red-color;
+      }
+    }
+  }
+  &.up {
+    color: $green-color;
+  }
+
+  .sign {
     font-weight: 600;
   }
   svg {
