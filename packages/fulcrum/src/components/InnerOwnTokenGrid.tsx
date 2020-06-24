@@ -34,7 +34,7 @@ export class InnerOwnTokenGrid extends Component<IInnerOwnTokenGridProps, IInner
     return (
       <div className="inner-own-token-grid">
         <InnerOwnTokenGridHeader
-          asset={this.props.ownRowsData[0].tradeAsset}
+          asset={this.props.ownRowsData[0].baseToken}
           quoteToken={this.props.ownRowsData[0].quoteToken}
           loader={this.props.request !== undefined && this.props.request.loanId === this.props.ownRowsData[0].loan.loanId}
           isLoadingTransaction={this.props.isLoadingTransaction} />

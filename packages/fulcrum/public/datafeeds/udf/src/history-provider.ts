@@ -39,10 +39,57 @@ interface HistoryNoDataResponse extends UdfResponse {
 
 type HistoryResponse = HistoryFullDataResponse | HistoryPartialDataResponse | HistoryNoDataResponse;
 
+
+function getBarsInfo(response: HistoryResponse, isVolume: boolean = true) {
+
+	const bars: Bar[] = [];
+	const meta: HistoryMetadata = {
+		noData: false,
+	};
+
+	if (response.s === 'no_data') {
+		meta.noData = true;
+		meta.nextTime = response.nextTime;
+	} else {
+		const volumePresent = isVolume && response.v !== undefined;
+		const ohlPresent = response.o !== undefined;
+
+
+		for (let i = 0; i < response.t.length; ++i) {
+			const barValue: Bar = {
+				time: response.t[i] * 1000,
+				close: Number(response.c[i]),
+				open: Number(response.c[i]),
+				high: Number(response.c[i]),
+				low: Number(response.c[i]),
+			};
+
+			if (ohlPresent) {
+				barValue.open = Number((response as HistoryFullDataResponse).o[i]);
+				barValue.high = Number((response as HistoryFullDataResponse).h[i]);
+				barValue.low = Number((response as HistoryFullDataResponse).l[i]);
+			}
+
+			if (volumePresent) {
+				barValue.volume = Number((response as HistoryFullDataResponse).v[i]);
+			}
+
+			bars.push(barValue);
+		}
+
+
+	}
+	return {
+		bars: bars,
+		meta: meta
+	}
+}
+
 export interface GetBarsResult {
 	bars: Bar[];
 	meta: HistoryMetadata;
 }
+
 
 export class HistoryProvider {
 	private _datafeedUrl: string;
@@ -64,50 +111,91 @@ export class HistoryProvider {
 		return new Promise((resolve: (result: GetBarsResult) => void, reject: (reason: string) => void) => {
 			this._requester.sendRequest<HistoryResponse>(this._datafeedUrl, 'history', requestParams)
 				.then((response: HistoryResponse | UdfErrorResponse) => {
+
 					if (response.s !== 'ok' && response.s !== 'no_data') {
 						reject(response.errmsg);
 						return;
 					}
 
-					const bars: Bar[] = [];
-					const meta: HistoryMetadata = {
-						noData: false,
-					};
+					let barsInfo = getBarsInfo(response);
 
-					if (response.s === 'no_data') {
-						meta.noData = true;
-						meta.nextTime = response.nextTime;
-					} else {
-						const volumePresent = response.v !== undefined;
-						const ohlPresent = response.o !== undefined;
+					if (barsInfo.meta.noData) {
+						const symbol = requestParams.symbol.toString().split('_');
 
-						for (let i = 0; i < response.t.length; ++i) {
-							const barValue: Bar = {
-								time: response.t[i] * 1000,
-								close: Number(response.c[i]),
-								open: Number(response.c[i]),
-								high: Number(response.c[i]),
-								low: Number(response.c[i]),
-							};
+						if (symbol[0] === 'ETH') {
+							requestParams.symbol = symbol[1] + '_ETH';
+							this._requester.sendRequest<HistoryResponse>(this._datafeedUrl, 'history', requestParams)
+								.then((response: HistoryResponse | UdfErrorResponse) => {
+									if (response.s !== 'ok' && response.s !== 'no_data') {
+										reject(response.errmsg);
+										return;
+									}
+									const firstBarsInfo = getBarsInfo(response, false);
+									if (!firstBarsInfo.meta.noData) {
 
-							if (ohlPresent) {
-								barValue.open = Number((response as HistoryFullDataResponse).o[i]);
-								barValue.high = Number((response as HistoryFullDataResponse).h[i]);
-								barValue.low = Number((response as HistoryFullDataResponse).l[i]);
-							}
+										barsInfo.bars = firstBarsInfo.bars.map((bar) => ({
+											time: bar.time,
+											close: 1 / bar.close,
+											open: 1 / bar.open,
+											high: 1 / bar.high,
+											low: 1 / bar.low,
+										}));
 
-							if (volumePresent) {
-								barValue.volume = Number((response as HistoryFullDataResponse).v[i]);
-							}
-
-							bars.push(barValue);
+									}
+									resolve({
+										bars: barsInfo.bars,
+										meta: barsInfo.meta,
+									});
+								});
 						}
+						else {
+							requestParams.symbol = symbol[0] + '_ETH';
+							this._requester.sendRequest<HistoryResponse>(this._datafeedUrl, 'history', requestParams)
+								.then((response: HistoryResponse | UdfErrorResponse) => {
+									if (response.s !== 'ok' && response.s !== 'no_data') {
+										reject(response.errmsg);
+										return;
+									}
+
+									const firstBarsInfo = getBarsInfo(response, false);
+									if (!firstBarsInfo.meta.noData) {
+										requestParams.symbol = symbol[1] + '_ETH';
+										this._requester.sendRequest<HistoryResponse>(this._datafeedUrl, 'history', requestParams)
+											.then((response: HistoryResponse | UdfErrorResponse) => {
+												if (response.s !== 'ok' && response.s !== 'no_data') {
+													reject(response.errmsg);
+													return;
+												}
+												const secondBarsInfo = getBarsInfo(response, false);
+												if (!secondBarsInfo.meta.noData) {
+
+													barsInfo.bars = secondBarsInfo.bars.map((bar, index) => ({
+														time: bar.time,
+														close: firstBarsInfo.bars[index].close / bar.close,
+														open: firstBarsInfo.bars[index].open / bar.open,
+														high: firstBarsInfo.bars[index].high / bar.high,
+														low: firstBarsInfo.bars[index].low / bar.low,
+													}));
+												}
+
+												resolve({
+													bars: barsInfo.bars,
+													meta: barsInfo.meta,
+												});
+											});
+
+									}
+
+								});
+
+						}
+					} else {
+						resolve({
+							bars: barsInfo.bars,
+							meta: barsInfo.meta,
+						});
 					}
 
-					resolve({
-						bars: bars,
-						meta: meta,
-					});
 				})
 				.catch((reason?: string | Error) => {
 					const reasonString = getErrorMessage(reason);

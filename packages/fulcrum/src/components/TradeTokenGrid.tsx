@@ -51,14 +51,14 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
 
   private renderDesktop = () => {
 
-    const tokenRows = this.props.tokenRowsData.map(e => <TradeTokenGridRow key={`${e.asset}_${e.positionType}`} {...e} />);
+    const tokenRows = this.props.tokenRowsData.map(e => <TradeTokenGridRow key={`${e.baseToken}_${e.positionType}`} {...e} />);
 
     return (
       <div className="trade-token-grid__wrapper">
         <div className="trade-token-grid">
           <TradeTokenGridHeader />
           {tokenRows && tokenRows.map(row => {
-            return (<div className="trade-token-grid-row-wrapper" key={`${row.props.asset}_${row.props.positionType}`}>
+            return (<div className="trade-token-grid-row-wrapper" key={`${row.props.baseToken}_${row.props.positionType}`}>
               {row}
               {this.props.isLoadingTransaction && this.props.request &&
                 row.props.positionType === this.props.request.positionType &&
@@ -74,7 +74,7 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
               }
               <InnerOwnTokenGrid
                 ownRowsData={this.props.ownRowsData
-                  .filter(e => e.positionType === row.props.positionType && e.tradeAsset === row.props.asset)}
+                  .filter(e => e.positionType === row.props.positionType && e.baseToken === row.props.baseToken)}
                 isMobileMedia={this.props.isMobileMedia}
                 request={this.props.request}
                 isLoadingTransaction={this.props.isLoadingTransaction}
@@ -90,12 +90,12 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
   private renderMobile = () => {
     const tokenRowsMobile = this.props.tokenRowsData
       .filter(e => e.positionType === this.state.positionType)
-      .map(e => <TradeTokenCardMobile key={`${e.asset}_${e.positionType}`} {...e} changeGridPositionType={this.changeGridPositionType} />);
+      .map(e => <TradeTokenCardMobile key={`${e.baseToken}_${e.positionType}`} {...e} changeGridPositionType={this.changeGridPositionType} />);
 
     return (
       <div className="trade-token-card-mobile__wrapper">
         {tokenRowsMobile && tokenRowsMobile.map(row => {
-          return (<div className="trade-token-grid-row-wrapper" key={`${row.props.asset}_${row.props.positionType}`}>
+          return (<div className="trade-token-grid-row-wrapper" key={`${row.props.baseToken}_${row.props.positionType}`}>
             {row}
             {this.props.isLoadingTransaction && this.props.request &&
               row.props.positionType === this.props.request.positionType &&
@@ -111,7 +111,7 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
             }
             <InnerOwnTokenGrid
               ownRowsData={this.props.ownRowsData
-                .filter(e => e.positionType === row.props.positionType && e.tradeAsset === row.props.asset)}
+                .filter(e => e.positionType === row.props.positionType && e.baseToken === row.props.baseToken)}
               isMobileMedia={this.props.isMobileMedia}
               request={this.props.request}
               isLoadingTransaction={this.props.isLoadingTransaction}

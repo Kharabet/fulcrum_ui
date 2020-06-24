@@ -7,19 +7,19 @@ import { Asset } from '../domain/Asset';
 import { AssetsDictionary } from '../domain/AssetsDictionary';
 import { AssetDetails } from '../domain/AssetDetails';
 export interface IDropDownSelectOption {
-  tradeAsset: Asset;
+  baseToken: Asset;
   quoteToken: Asset;
 
 }
 export interface IDropdownSelectProps {
   options: IDropDownSelectOption[];
   selectedOption: IDropDownSelectOption;
-  onDropdownSelect: (tradeAsset: string, quoteToken: string) => void;
+  onDropdownSelect: (baseToken: string, quoteToken: string) => void;
 }
 
 export const DropdownSelect = (props: IDropdownSelectProps) => {
 
-  let asset = AssetsDictionary.assets.get(props.selectedOption.tradeAsset) as AssetDetails;
+  let asset = AssetsDictionary.assets.get(props.selectedOption.baseToken) as AssetDetails;
   const onStyledSelectClick = (e: React.MouseEvent<HTMLElement>) => {
     e.stopPropagation();
     const select = e.currentTarget.closest(".select") as HTMLElement;
@@ -56,7 +56,7 @@ export const DropdownSelect = (props: IDropdownSelectProps) => {
     selectStyled.classList.remove('active');
     // selectNative.selectedIndex = parseInt(li.dataset.index!);
     ul.style.display = 'none';
-    await props.onDropdownSelect(li.dataset.tradeasset!, li.dataset.quotetoken!);
+    await props.onDropdownSelect(li.dataset.basetoken!, li.dataset.quotetoken!);
   }
 
   useEffect(() => {
@@ -73,18 +73,18 @@ export const DropdownSelect = (props: IDropdownSelectProps) => {
         {props.options.map(option => option != props.selectedOption && (<option value={option.value}>{option.displayName}</option>))}
       </select> */}
       <div className="styled-select" onClick={onStyledSelectClick}>
-        Select market {asset.reactLogoSvg.render()} {props.selectedOption.tradeAsset}-{props.selectedOption.quoteToken}
+        Select market {asset.reactLogoSvg.render()} {props.selectedOption.baseToken}-{props.selectedOption.quoteToken}
       </div>
       <ul className="select-options">
         <SimpleBar style={{ maxHeight: 480 }} autoHide={false}>
           {props.options.map((option, i) =>
-            (<li data-tradeasset={option.tradeAsset}
+            (<li data-basetoken={option.baseToken}
               data-quotetoken={option.quoteToken}
               data-index={i}
               key={i}
               onClick={onLiClick}>
-              {asset.reactLogoSvg.render()}
-              {option.tradeAsset}-{option.quoteToken}
+              {AssetsDictionary.assets.get(option.baseToken)!.reactLogoSvg.render()}
+              {option.baseToken}-{option.quoteToken}
             </li>)
           )
           }

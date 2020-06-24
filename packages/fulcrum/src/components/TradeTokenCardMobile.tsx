@@ -27,7 +27,7 @@ export interface ITradeTokenCardMobileProps extends ITradeTokenGridRowProps {
 interface ITradeTokenCardMobileState {
   leverage: number;
 
-  tradeAssetPrice: BigNumber;
+  baseTokenPrice: BigNumber;
   liquidationPrice: BigNumber;
 
   interestRate: BigNumber;
@@ -45,7 +45,7 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
     this.state = {
       leverage: this.props.positionType === PositionType.SHORT ? 1 : 2,
       interestRate: new BigNumber(0),
-      tradeAssetPrice: new BigNumber(0),
+      baseTokenPrice: new BigNumber(0),
       liquidationPrice: new BigNumber(0),
       isLoading: true,
       isLoadingTransaction: false,
@@ -62,13 +62,13 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
   private _isMounted: boolean;
 
   private async derivedUpdate() {
-    const tradeAssetPrice = await FulcrumProvider.Instance.getSwapToUsdRate(this.props.asset);
+    const baseTokenPrice = await FulcrumProvider.Instance.getSwapToUsdRate(this.props.baseToken);
 
-    const interestRate = await FulcrumProvider.Instance.getBorrowInterestRate(this.props.asset);
+    const interestRate = await FulcrumProvider.Instance.getBorrowInterestRate(this.props.baseToken);
 
     const collateralToPrincipalRate = this.props.positionType === PositionType.LONG
-      ? await FulcrumProvider.Instance.getSwapRate(this.props.asset, this.props.quoteToken)
-      : await FulcrumProvider.Instance.getSwapRate(this.props.quoteToken, this.props.asset);
+      ? await FulcrumProvider.Instance.getSwapRate(this.props.baseToken, this.props.quoteToken)
+      : await FulcrumProvider.Instance.getSwapRate(this.props.quoteToken, this.props.baseToken);
 
     let initialMargin = this.props.positionType === PositionType.LONG
       ? new BigNumber(10 ** 38).div(new BigNumber(this.state.leverage - 1).times(10 ** 18))
@@ -85,7 +85,7 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
 
     this._isMounted && this.setState({
       ...this.state,
-      tradeAssetPrice,
+      baseTokenPrice,
       interestRate: interestRate,
       isLoading: false,
       liquidationPrice
@@ -157,7 +157,7 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
       <div className="trade-token-card-mobile">
         <div className="trade-token-card-mobile__header">
           <div className="asset-name">
-            <span>{this.props.asset}&nbsp;</span>
+            <span>{this.props.baseToken}&nbsp;</span>
             <PositionTypeMarkerAlt value={this.props.positionType} />
           </div>
           <div className="poisition-type-switch">
@@ -173,7 +173,7 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
           <div className="trade-token-card-mobile__body-row">
             <div className="trade-token-card-mobile__leverage">
               <LeverageSelector
-                asset={this.props.asset}
+                asset={this.props.baseToken}
                 value={this.state.leverage}
                 minValue={this.props.positionType === PositionType.SHORT ? 1 : 2}
                 maxValue={5}
@@ -187,11 +187,11 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
             </div>
           </div>
           <div className="trade-token-card-mobile__body-row">
-            <div title={this.state.tradeAssetPrice.toFixed(18)} className="trade-token-card-mobile__price">
+            <div title={this.state.baseTokenPrice.toFixed(18)} className="trade-token-card-mobile__price">
               <span>Asset Price</span>
               <span>
-                {this.state.tradeAssetPrice.gt(0) && !this.state.isLoading ?
-                  <React.Fragment><span className="fw-normal">$</span>{this.state.tradeAssetPrice.toFixed(2)}</React.Fragment>
+                {this.state.baseTokenPrice.gt(0) && !this.state.isLoading ?
+                  <React.Fragment><span className="fw-normal">$</span>{this.state.baseTokenPrice.toFixed(2)}</React.Fragment>
                   : <Preloader width="74px" />
                 }
               </span>
@@ -229,7 +229,7 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
     const request = new TradeRequest(
       "0x0000000000000000000000000000000000000000000000000000000000000000",
       TradeType.BUY,
-      this.props.asset,
+      this.props.baseToken,
       this.props.quoteToken, // TODO: depends on which one they own
       Asset.ETH,
       this.props.positionType,

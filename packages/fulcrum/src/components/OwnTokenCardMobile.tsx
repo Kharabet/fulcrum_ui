@@ -24,7 +24,7 @@ interface IOwnTokenCardMobileState {
   isLoadingTransaction: boolean;
   request: TradeRequest | undefined;
   valueChange: BigNumber;
-  tradeAssetPrice: BigNumber;
+  baseTokenPrice: BigNumber;
   resultTx: boolean;
 
 }
@@ -39,7 +39,7 @@ export class OwnTokenCardMobile extends Component<IOwnTokenGridRowProps, IOwnTok
       isLoadingTransaction: false,
       request: undefined,
       valueChange: new BigNumber(0),
-      tradeAssetPrice: new BigNumber(0),
+      baseTokenPrice: new BigNumber(0),
       resultTx: false
     };
 
@@ -56,7 +56,7 @@ export class OwnTokenCardMobile extends Component<IOwnTokenGridRowProps, IOwnTok
     this._isMounted && this.setState({
       isLoading: true
     });
-    const tradeAssetPrice = await FulcrumProvider.Instance.getSwapToUsdRate(this.props.tradeAsset);
+    const baseTokenPrice = await FulcrumProvider.Instance.getSwapToUsdRate(this.props.baseToken);
     let openValue = new BigNumber(0);
     let valueChange = new BigNumber(0);
     if (this.props.positionType === PositionType.LONG) {
@@ -69,7 +69,7 @@ export class OwnTokenCardMobile extends Component<IOwnTokenGridRowProps, IOwnTok
     }
     this._isMounted && this.setState({
       ...this.state,
-      tradeAssetPrice,
+      baseTokenPrice,
       valueChange,
       isLoading: false
     });
@@ -143,7 +143,7 @@ export class OwnTokenCardMobile extends Component<IOwnTokenGridRowProps, IOwnTok
               <div className="own-token-card-mobile__body-row">
                 <div className="own-token-card-mobile__asset-name">
                   <span className="own-token-card-mobile__value">
-                    {`${this.props.tradeAsset.toUpperCase()}`}
+                    {`${this.props.baseToken.toUpperCase()}`}
                   </span>
                 </div>
                 <div className="own-token-card-mobile__position-type">
@@ -160,7 +160,7 @@ export class OwnTokenCardMobile extends Component<IOwnTokenGridRowProps, IOwnTok
               </div>
               <div className="own-token-card-mobile__body-row">
                 <div title={this.props.positionValue.toFixed(18)} className="own-token-card-mobile__position">
-                  <span className="own-token-card-mobile__body-header">Position({this.props.tradeAsset})</span>
+                  <span className="own-token-card-mobile__body-header">Position({this.props.baseToken})</span>
                   <span className="own-token-card-mobile__value">
                     {!this.state.isLoading ?
                       <React.Fragment><span className="sign-currency"></span>{this.props.positionValue.toFixed(4)}</React.Fragment>
@@ -168,11 +168,11 @@ export class OwnTokenCardMobile extends Component<IOwnTokenGridRowProps, IOwnTok
                     }
                   </span>
                 </div>
-                <div title={this.state.tradeAssetPrice.toFixed(18)} className="own-token-card-mobile__price">
+                <div title={this.state.baseTokenPrice.toFixed(18)} className="own-token-card-mobile__price">
                   <span className="own-token-card-mobile__body-header">Asset Price</span>
                   <span className="own-token-card-mobile__value">
                     {!this.state.isLoading ?
-                      <React.Fragment><span className="sign-currency">$</span>{this.state.tradeAssetPrice.toFixed(2)}</React.Fragment>
+                      <React.Fragment><span className="sign-currency">$</span>{this.state.baseTokenPrice.toFixed(2)}</React.Fragment>
                       : <Preloader width="74px" />
                     }
                   </span>
@@ -235,7 +235,7 @@ export class OwnTokenCardMobile extends Component<IOwnTokenGridRowProps, IOwnTok
     const request = new TradeRequest(
       this.props.loan.loanId,
       TradeType.SELL,
-      this.props.tradeAsset,
+      this.props.baseToken,
       this.props.quoteToken,
       Asset.UNKNOWN,
       this.props.positionType,
@@ -249,7 +249,7 @@ export class OwnTokenCardMobile extends Component<IOwnTokenGridRowProps, IOwnTok
     this.props.onManageCollateralOpen(
       new ManageCollateralRequest(
         this.props.loan.loanId,
-        this.props.tradeAsset,
+        this.props.baseToken,
         this.props.quoteToken,
         this.props.loan.collateralAmount,
         false
@@ -262,7 +262,7 @@ export class OwnTokenCardMobile extends Component<IOwnTokenGridRowProps, IOwnTok
     const request = new TradeRequest(
       this.props.loan.loanId,
       TradeType.SELL,
-      this.props.tradeAsset,
+      this.props.baseToken,
       Asset.UNKNOWN,
       this.props.quoteToken,
       this.props.positionType,

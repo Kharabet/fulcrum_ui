@@ -137,7 +137,7 @@ export class InnerOwnTokenCardMobile extends Component<IOwnTokenGridRowProps, II
           : <div className="inner-own-token-card-mobile">
             <div className="inner-own-token-card-mobile__body-row">
               <div title={this.props.positionValue.toFixed(18)} className="inner-own-token-card-mobile__col-token-name-full">
-                <span className="inner-own-token-header">{`Position (${this.props.tradeAsset.toUpperCase()}/DAI)`}</span>
+                <span className="inner-own-token-header">{`Position (${this.props.baseToken.toUpperCase()}/DAI)`}</span>
                 {this.props.positionValue.toFixed(4)}
 
               </div>
@@ -213,7 +213,7 @@ export class InnerOwnTokenCardMobile extends Component<IOwnTokenGridRowProps, II
     const request = new TradeRequest(
       this.props.loan.loanId,
       TradeType.SELL,
-      this.props.tradeAsset,
+      this.props.baseToken,
       this.props.quoteToken,
       Asset.UNKNOWN,
       this.props.positionType,
@@ -227,7 +227,7 @@ export class InnerOwnTokenCardMobile extends Component<IOwnTokenGridRowProps, II
     this.props.onManageCollateralOpen(
       new ManageCollateralRequest(
         this.props.loan.loanId,
-        this.props.tradeAsset,
+        this.props.baseToken,
         this.props.quoteToken,
         this.props.loan.collateralAmount,
         false
@@ -240,7 +240,7 @@ export class InnerOwnTokenCardMobile extends Component<IOwnTokenGridRowProps, II
     const request = new TradeRequest(
       this.props.loan.loanId,
       TradeType.SELL,
-      this.props.tradeAsset,
+      this.props.baseToken,
       this.props.quoteToken,
       Asset.UNKNOWN,
       this.props.positionType,
