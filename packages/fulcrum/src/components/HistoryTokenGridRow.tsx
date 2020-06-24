@@ -122,16 +122,16 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
             })}
           </div>
           <div className="history-token-grid-row__col-token-asset">
-            {this.props.eventsGroup.baseToken}
+            {this.props.eventsGroup.baseToken}/{this.props.eventsGroup.quoteToken}
           </div>
           <div className="history-token-grid-row__col-type">
             <div className="position-type-marker">
               {`${this.props.eventsGroup.leverage}x ${this.props.eventsGroup.positionType}`}
             </div>
           </div>
-          <div className="history-token-grid-row__col-asset-unit">
+          {/* <div className="history-token-grid-row__col-asset-unit">
             {this.props.eventsGroup.quoteToken}
-          </div>
+          </div> */}
           <div title={latestEvent.positionValue.toFixed(18)} className="history-token-grid-row__col-position">
             {latestEvent.positionValue.toFixed(4)}
           </div>
