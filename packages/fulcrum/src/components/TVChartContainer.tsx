@@ -46,7 +46,7 @@ function getLanguageFromURL(): LanguageCode | null {
 
 export class TVChartContainer extends React.PureComponent<Partial<ChartContainerProps>, ChartContainerState> {
 
-	private readonly baseSymbol: string;
+	//private readonly baseSymbol: string;
 
 	constructor(props: ChartContainerProps, context?: any) {
 		super(props, context);
@@ -55,7 +55,7 @@ export class TVChartContainer extends React.PureComponent<Partial<ChartContainer
 			ready: true,
 		}
 		var that = this;
-		this.baseSymbol = "DAI";
+		//	this.baseSymbol = "DAI";
 		this.observer = new MutationObserver(function (mutations) {
 			mutations.forEach(function (mutation) {
 				if (mutation.type == "attributes") {
@@ -103,7 +103,7 @@ export class TVChartContainer extends React.PureComponent<Partial<ChartContainer
 
 	private GetWidgetOptions(): ChartingLibraryWidgetOptions {
 		return {
-			symbol: `${this.props.symbol}_${this.baseSymbol}` as string,
+			symbol: this.props.symbol,
 			// BEWARE: no trailing slash is expected in feed URL
 			// tslint:disable-next-line:no-any
 			datafeed: new (window as any).Datafeeds.UDFCompatibleDatafeed(this.props.datafeedUrl),
@@ -147,7 +147,7 @@ export class TVChartContainer extends React.PureComponent<Partial<ChartContainer
 			widget.onChartReady(() => {
 				if (widget) {
 					const chart = widget.chart();
-					chart.setSymbol(`${symbol}_${this.baseSymbol}`, function e() { });
+					chart.setSymbol(symbol, function e() { });
 					this.setState({ ...this.state, ready: false })
 				}
 			});
@@ -165,7 +165,7 @@ export class TVChartContainer extends React.PureComponent<Partial<ChartContainer
 	public componentDidUpdate(prevProps: Readonly<ChartContainerProps>): void {
 		if (this.props.symbol && prevProps.symbol !== this.props.symbol)
 			this.changePair(this.props.symbol)
-		if (prevProps.theme !== this.props.theme || this.props.preset!=prevProps.preset) {
+		if (prevProps.theme !== this.props.theme || this.props.preset != prevProps.preset) {
 			this.updateWidget();
 		}
 	}
