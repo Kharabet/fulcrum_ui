@@ -3,19 +3,26 @@ import { Search } from "../components/Search";
 import { StatsChart } from "../components/StatsChart";
 import { TxGrid } from "../components/TxGrid";
 import { Header } from "../layout/Header";
+import { RouteComponentProps } from "react-router";
+import { Asset } from "../domain/Asset";
 
-interface IStatsPageProps {
+
+interface MatchParams {
+  token: string;
+}
+
+interface IStatsPageProps extends RouteComponentProps<MatchParams>  {
 }
 
 interface IStatsPageState {
-  asset: string,
+  asset: Asset,
 }
 
 export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
   constructor(props: any) {
     super(props);
     this.state = {
-      asset: ''
+      asset: this.props.match.params.token.toUpperCase() as Asset
     };
   }
 
@@ -38,7 +45,7 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
         </section>
         <section className="pt-90">
           <div className="container">
-            <TxGrid />
+            <TxGrid asset={this.state.asset}/>
           </div>
         </section>
       </React.Fragment>

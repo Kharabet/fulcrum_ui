@@ -21,9 +21,8 @@ export class AppRouter extends Component {
             <Route exact={true} path="/">
               <MainPage />
             </Route>
-            <Route path="/stats/*">
-              <StatsPage />
-            </Route>
+            <Route path="/stats/:token" component={StatsPage} />
+
             <Route path="/liquidations" >
               <LiquidationsPage />
             </Route>

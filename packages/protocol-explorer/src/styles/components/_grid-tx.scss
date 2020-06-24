@@ -13,6 +13,9 @@
     &__hash {
       width: 20%;
       padding-left: 30px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     &__age {
       cursor: pointer;
@@ -26,6 +29,11 @@
     &__quantity {
       width: 25%;
       padding-left: 30px;
+    }
+    &__from-address {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .rotate-icon {
       transform: rotate(180deg);
