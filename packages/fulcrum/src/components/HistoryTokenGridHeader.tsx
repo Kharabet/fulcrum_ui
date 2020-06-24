@@ -11,14 +11,14 @@ export class HistoryTokenGridHeader extends Component<IHistoryTokenGridHeaderPro
           <span className="history-token-grid-header__text">Date</span>
         </div>
         <div className="history-token-grid-header__col-token-asset">
-          <span className="history-token-grid-header__text">Asset</span>
+          <span className="history-token-grid-header__text">Pair</span>
         </div>
         <div className="history-token-grid-header__col-type">
           <span className="history-token-grid-header__text">Type</span>
         </div>
-        <div className="history-token-grid-header__col-asset-unit">
+        {/* <div className="history-token-grid-header__col-asset-unit">
           <span className="history-token-grid-header__text">Unit of Account</span>
-        </div>
+        </div> */}
         <div className="history-token-grid-header__col-position">
           <span className="history-token-grid-header__text">Position</span>
         </div>
@@ -35,7 +35,7 @@ export class HistoryTokenGridHeader extends Component<IHistoryTokenGridHeaderPro
           <span className="history-token-grid-header__text">Profit</span>
         </div>
         <div className="history-token-grid-header__col-result">
-          <span className="history-token-grid-header__text">Result</span>
+          <span className="history-token-grid-header__text">Last Event</span>
         </div>
       </div>
     );
