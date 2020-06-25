@@ -7,6 +7,8 @@ import { ITxRowProps } from "../components/TxRow";
 import configProviders from "../config/providers.json";
 import { TxGrid } from "../components/TxGrid";
 import { Asset } from "../domain/Asset";
+import { Bar } from "react-chartjs-2";
+import { Search } from "../components/Search";
 
 
 
@@ -194,12 +196,109 @@ export class LiquidationsPage extends Component<{}, ILiquidationsPageState> {
 
 
   public render() {
+    const getData = (canvas: any) => {
+      const ctx: any = canvas.getContext("2d");
+      return {
+        labels: [1, 2, 3, 4, 5, 6, 7, 1, 2, 3, 4, 5, 6, 7, 1, 2, 3, 4, 5, 6, 7, 1, 2, 3, 4, 5, 6, 7],
+        datasets: [
+          {
+            label: 'Usdc',
+            data: [15, 5, 9, 50, 14, 60, 70, 10, 20, 30, 40, 50, 60, 15, 5, 9, 50, 15, 5, 9, 50, 14, 60, 70, 14, 60, 70, 30],
+            //data: this.state.usdcDataset,
+            backgroundColor: '#B79EFF',
+          },
+          {
+            label: 'Dai',
+            data: [10, 20, 30, 40, 50, 60, 70, 15, 5, 9, 15, 5, 9, 50, 14, 60, 70, 50, 14, 60, 70, 14, 60, 70, 10, 20, 30,20],
+            //data: this.state.daiDataset,
+            backgroundColor: '#276BFB',
+          },
+          {
+            label: 'Eth',
+            data: [15, 5, 9, 50, 14, 60, 70, 10, 20, 30, 40, 50, 60, 70, 15, 5, 9, 50, 14, 60, 70, 15, 5, 9, 50, 14, 60, 10],
+            //data: this.state.ethDataset,
+            backgroundColor: '#33DFCC',
+          },
+        ]
+      }
+    }
+    const canvas = document.createElement('canvas');
+    const chartData = getData(canvas);
+    const options = {
+      scales: {
+        xAxes: [{
+          display: false,
+          stacked: true,
+          /*type: 'time',
+          time: {
+            unit: 'month'
+          },*/
+          gridLines: {
+            drawBorder: false
+          },
+        }],
+        yAxes: [{
+          stacked: true,
+          gridLines: {
+            drawBorder: false,
+            zeroLineWidth: 1,
+            zeroLineColor: '#E9F4FF',
+            color: '#E9F4FF',
+          },
+          ticks: {
+            display: false
+          }
+        }]
+      },
+      legend: {
+        display: false
+      },
+      tooltips: {
+        enabled: false,
+        mode: 'index',
+        custom: this.customTooltips,
+        callbacks: {
+          label: function (tooltipItems: any, data: any) {
+            const bgColor = data.datasets[tooltipItems.datasetIndex].backgroundColor;
+            return { label: tooltipItems.yLabel, bgColor: bgColor };
+          }
+        }
+      }
+    }
     return (
       <React.Fragment>
         <Header />
         <div className="container">
-          <h1>Liquidations</h1>
+          <div className="flex jc-sb al-c mb-25">
+            <h1>Liquidations</h1>
+            <div className="flex">
+              <div className="liquidation-data">
+                <div className="liquidation-data-title">30-days Volume</div>
+                <div className="liquidation-data-value"><span className="sign">$</span>554,456,945.09</div>
+              </div>
+              <div className="liquidation-data">
+                <div className="liquidation-data-title">30-days Transactions Count</div>
+                <div className="liquidation-data-value">100,500</div>
+              </div>
+            </div>
+          </div>
         </div>
+        <div className="container">
+          <div className="wrapper-chartjs-bar">
+            <div id="chartjs-bar">
+              <Bar data={chartData} options={options} height={100} />
+            </div>
+            <div id="chartjs-bar-tooltip"><table></table></div>
+          </div>
+          <div className="flex jc-c labels-container">
+            <div className="label-chart"><span className="bg-green"></span>ETH</div>
+            <div className="label-chart"><span className="bg-primary"></span>DAI</div>
+            <div className="label-chart"><span className="bg-secondary"></span>USDC</div>
+          </div>
+        </div>
+        <section className="pt-45">
+          <Search />
+        </section>
         <section className="pt-90">
           <div className="container">
             <TxGrid events={this.state.events} />
@@ -207,5 +306,36 @@ export class LiquidationsPage extends Component<{}, ILiquidationsPageState> {
         </section>
       </React.Fragment>
     );
+  }
+  public customTooltips = (tooltip: any) => {
+    let tooltipEl = document.getElementById('chartjs-bar-tooltip');
+    if (!tooltipEl) {
+      tooltipEl = document.createElement('div');
+      tooltipEl.id = 'chartjs-bar-tooltip';
+      tooltipEl.innerHTML = "<div></div>"
+      document.body.appendChild(tooltipEl);
+    }
+    if (tooltip.opacity === 0) {
+      tooltipEl.style.opacity = '0';
+      tooltipEl.style.left = -tooltip.width + 'px';
+      return;
+    }
+    function getBody(bodyItem: any) {
+      return bodyItem.lines[0];
+    }
+    if (tooltip.body) {
+      const bodyLines = tooltip.body.map(getBody);
+      let innerHtml = `<tbody style="padding: 20px 25px">`;
+      bodyLines.forEach(function (body: any) {
+        innerHtml += `<tr><td class="chartjs-bar-tooltip-value"><span class="circle" style="background-color: ${body.bgColor}"></span><span><span class="sign">$</span>${body.label}</span></td></tr>`;
+      });
+      innerHtml += '</tbody>';
+      const tableRoot = tooltipEl.querySelector('table') as HTMLElement;
+      tableRoot.innerHTML = innerHtml;
+    }
+    tooltipEl.style.opacity = '1';
+    tooltipEl.style.position = 'absolute';
+    tooltipEl.style.left = tooltip.caretX - tooltip.width / 2 + 'px';
+    tooltipEl.style.top = 0 + 'px';
   }
 }
