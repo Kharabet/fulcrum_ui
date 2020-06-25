@@ -318,7 +318,7 @@ export default class Fulcrum {
             result.push({
                 timestamp: new Date(document.date).getTime(),
                 tvl: document.allTokensStats.usdTotalLocked,
-                "change24h": change24h
+                change24h: change24h
             });
         });
         return result;
@@ -346,8 +346,12 @@ export default class Fulcrum {
         const reducedArray = dbStatsDocuments.filter((e, i) => i % offset === 0);
 
         let result = [];
-        reducedArray.forEach(document => {
+        reducedArray.forEach((document, index, documents) => {
             const assetStats = document.tokensStats[0]
+            let change24h = 0;
+            if (index > 0)
+                change24h = (assetStats.usdTotalLocked - documents[index - 1].tokensStats[0].usdTotalLocked) / documents[index - 1].tokensStats[0].usdTotalLocked;
+
             result.push({
                 timestamp: new Date(document.date).getTime(),
                 token: assetStats.token,
@@ -355,6 +359,7 @@ export default class Fulcrum {
                 tvl: assetStats.vaultBalance,
                 tvlUsd: assetStats.usdTotalLocked,
                 utilization: assetStats.totalBorrow / assetStats.totalSupply * 100,
+                change24h: change24h
             });
         });
         return result;
