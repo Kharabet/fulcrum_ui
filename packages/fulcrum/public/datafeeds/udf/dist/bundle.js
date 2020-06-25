@@ -676,7 +676,7 @@ var Datafeeds = (function (exports) {
                     }
                     else {
                         if (response.listed_exchange === "Kyber Network")
-                            { response.pricescale = 100; }
+                            { response.pricescale = response.currency_code == "WBTC" ? 1000000 : response.currency_code == "ETH" ? 10000 : 100; }
                         onResultReady(response);
                     }
                 })

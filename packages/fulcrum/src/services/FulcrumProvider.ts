@@ -41,6 +41,8 @@ import { TradeEvent } from "../domain/TradeEvent";
 import Web3, { providers } from "web3";
 import { CloseWithSwapEvent } from "../domain/CloseWithSwapEvent";
 import { LiquidationEvent } from "../domain/LiquidationEvent";
+import { EarnRewardEvent } from "../domain/EarnRewardEvent";
+import { PayTradingFeeEvent } from "../domain/PayTradingFeeEvent";
 
 const getNetworkIdByString = (networkName: string | undefined) => {
   switch (networkName) {
@@ -1746,6 +1748,79 @@ export class FulcrumProvider {
     return result;
   }
 
+  public getEarnRewardHistory = async (): Promise<EarnRewardEvent[]> => {
+    let result: EarnRewardEvent[] = [];
+    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : undefined;
+
+    if (!this.contractsSource) return result;
+    const bzxContractAddress = this.contractsSource.getiBZxAddress()
+    if (!account || !bzxContractAddress) return result
+    const etherscanApiKey = configProviders.Etherscan_Api;
+    let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${EarnRewardEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
+    const earnRewardEventResponse = await fetch(etherscanApiUrl);
+    const earnRewardEventResponseJson = await earnRewardEventResponse.json();
+    if (earnRewardEventResponseJson.status !== "1") return result;
+    const events = earnRewardEventResponseJson.result;
+    result = events.reverse().map((event: any) => {
+      const userAddress = event.topics[1].replace("0x000000000000000000000000", "0x");
+      const tokenAddress = event.topics[2].replace("0x000000000000000000000000", "0x");
+      const token = this.contractsSource!.getAssetFromAddress(tokenAddress);
+      const loandId = event.topics[3];
+      const data = event.data.replace("0x", "");
+      const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
+      if (!dataSegments) return result;
+      
+      const amount = new BigNumber(parseInt(dataSegments[0], 16));
+      const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000);
+      const txHash = event.transactionHash;
+      return new EarnRewardEvent(
+        userAddress,
+        token,
+        loandId,
+        amount.div(10**18),
+        timeStamp,
+        txHash
+      )
+    })
+    return result
+  }
+
+  public getPayTradingFeeHistory = async (): Promise<PayTradingFeeEvent[]> => {
+    let result: PayTradingFeeEvent[] = [];
+    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : undefined;
+
+    if (!this.contractsSource) return result;
+    const bzxContractAddress = this.contractsSource.getiBZxAddress()
+    if (!account || !bzxContractAddress) return result
+    const etherscanApiKey = configProviders.Etherscan_Api;
+    let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${PayTradingFeeEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
+    const payTradingFeeEventResponse = await fetch(etherscanApiUrl);
+    const payTradingFeeEventResponseJson = await payTradingFeeEventResponse.json();
+    if (payTradingFeeEventResponseJson.status !== "1") return result;
+    const events = payTradingFeeEventResponseJson.result;
+    result = events.reverse().map((event: any) => {
+      const userAddress = event.topics[1].replace("0x000000000000000000000000", "0x");
+      const tokenAddress = event.topics[2].replace("0x000000000000000000000000", "0x");
+      const token = this.contractsSource!.getAssetFromAddress(tokenAddress);
+      const loandId = event.topics[3];
+      const data = event.data.replace("0x", "");
+      const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
+      if (!dataSegments) return result;
+      const amount = new BigNumber(parseInt(dataSegments[0], 16));
+      const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000);
+      const txHash = event.transactionHash;
+      return new PayTradingFeeEvent(
+        userAddress,
+        token,
+        loandId,
+        amount.div(10**18),
+        timeStamp,
+        txHash
+      )
+    })
+    return result
+  }
+
   public getTradeHistory = async (): Promise<TradeEvent[]> => {
     let result: TradeEvent[] = [];
     const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : undefined;
@@ -1759,8 +1834,7 @@ export class FulcrumProvider {
     const tradeEventResponseJson = await tradeEventResponse.json();
     if (tradeEventResponseJson.status !== "1") return result;
     const events = tradeEventResponseJson.result;
-    //@ts-ignore
-    result = events.reverse().map(event => {
+    result = events.reverse().map((event: any) => {
       const userAddress = event.topics[1].replace("0x000000000000000000000000", "0x");
       const lender = event.topics[2].replace("0x000000000000000000000000", "0x");
       const loandId = event.topics[3];
@@ -1812,12 +1886,11 @@ export class FulcrumProvider {
     if (!account || !bzxContractAddress) return result
     const etherscanApiKey = configProviders.Etherscan_Api;
     let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${CloseWithSwapEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
-    const tradeEventResponse = await fetch(etherscanApiUrl);
-    const tradeEventResponseJson = await tradeEventResponse.json();
-    if (tradeEventResponseJson.status !== "1") return result;
-    const events = tradeEventResponseJson.result;
-    //@ts-ignore
-    result = events.reverse().map(event => {
+    const closeWithSwapResponse = await fetch(etherscanApiUrl);
+    const closeWithSwapResponseJson = await closeWithSwapResponse.json();
+    if (closeWithSwapResponseJson.status !== "1") return result;
+    const events = closeWithSwapResponseJson.result;
+    result = events.reverse().map((event: any) => {
       const userAddress = event.topics[1].replace("0x000000000000000000000000", "0x");
       const lender = event.topics[2].replace("0x000000000000000000000000", "0x");
       const loandId = event.topics[3];
@@ -1865,12 +1938,11 @@ export class FulcrumProvider {
     if (!account || !bzxContractAddress) return result
     const etherscanApiKey = configProviders.Etherscan_Api;
     let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${LiquidationEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
-    const tradeEventResponse = await fetch(etherscanApiUrl);
-    const tradeEventResponseJson = await tradeEventResponse.json();
-    if (tradeEventResponseJson.status !== "1") return result;
-    const events = tradeEventResponseJson.result;
-    //@ts-ignore
-    result = events.reverse().map(event => {
+    const liquidationEventResponse = await fetch(etherscanApiUrl);
+    const liquidationEventResponseJson = await liquidationEventResponse.json();
+    if (liquidationEventResponseJson.status !== "1") return result;
+    const events = liquidationEventResponseJson.result;
+    result = events.reverse().map((event: any) => {
       const userAddress = event.topics[1].replace("0x000000000000000000000000", "0x");
       const liquidatorAddress = event.topics[2].replace("0x000000000000000000000000", "0x");
       const loanId = event.topics[3];

@@ -35,7 +35,7 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
   }
 
   private renderDesktop = () => {
-    const historyRows = this.props.historyRowsData.slice(this.quantityVisibleRow * this.state.numberPagination, this.quantityVisibleRow * this.state.numberPagination + this.quantityVisibleRow).map((e, i) => <HistoryTokenGridRow key={i + 5 * this.state.numberPagination} {...e} />);
+    const historyRows = this.props.historyRowsData.slice(this.quantityVisibleRow * this.state.numberPagination, this.quantityVisibleRow * this.state.numberPagination + this.quantityVisibleRow).map((e, i) => <HistoryTokenGridRow key={i} {...e} />);
     if (historyRows.length === 0) return null;
 
     return (

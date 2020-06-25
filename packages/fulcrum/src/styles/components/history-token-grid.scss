@@ -1,7 +1,7 @@
 $font-size-header: 12px;
 $font-size-row: 18px;
 $width-col-token-date: 12%;
-$width-col-token-asset: 24%;
+$width-col-token-asset: 10%;
 $width-col-type: 12%;
 $width-col-asset-unit: 14%;
 $width-col-position: 14%;
@@ -10,7 +10,8 @@ $width-col-liquidation-price: 10%;
 $width-col-position-value: 10%;
 $width-col-profit: 6%;
 $width-col-result: 10%;
-$width-col-result-inner: 36%;
+$width-col-fee-reward: 14%;
+$width-col-result-inner: 22%;
 $width-col-separator-inner: 92%;
 
 @mixin history-token-grid-header__col {
@@ -74,6 +75,13 @@ $width-col-separator-inner: 92%;
     @include history-token-grid-header__col();
     width: $width-col-position-value;
   }
+  &__col-fee-reward {
+    @include history-token-grid-header__col();
+    width: $width-col-fee-reward;
+    .bzrx{
+      color: #444E5A;
+    }
+  }
   &__col-profit {
     @include history-token-grid-header__col();
     width: $width-col-profit;
@@ -133,6 +141,13 @@ $width-col-separator-inner: 92%;
   &__col-position-value {
     @include history-token-grid-row__col();
     width: $width-col-position-value;
+  }
+  &__col-fee-reward {
+    @include history-token-grid-row__col();
+    justify-content: flex-end;
+    width: $width-col-fee-reward;
+    justify-content: flex-end;
+    padding-right: 60px;
   }
   &__col-profit {
     @include history-token-grid-row__col();

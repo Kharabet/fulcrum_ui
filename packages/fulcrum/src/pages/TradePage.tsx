@@ -24,7 +24,8 @@ import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
 import { IHistoryTokenGridProps } from "../components/HistoryTokenGrid";
 import { TradeEvent } from "../domain/TradeEvent";
 import { IHistoryTokenGridRowProps } from "../components/HistoryTokenGridRow";
-import { PositionEventsGroup, HistoryEvent } from "../domain/PositionEventsGroup";
+import { PositionEventsGroup } from "../domain/PositionEventsGroup";
+import { PositionHistoryData } from "../domain/PositionHistoryData";
 import { LiquidationEvent } from "../domain/LiquidationEvent";
 import { CloseWithSwapEvent } from "../domain/CloseWithSwapEvent";
 
@@ -435,10 +436,11 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
 
   public getHistoryRowsData = async (state: ITradePageState): Promise<IHistoryTokenGridRowProps[]> => {
     const historyRowsData: IHistoryTokenGridRowProps[] = [];
-    const groupedEvents: PositionEventsGroup[] = [];
     const tradeEvents = await FulcrumProvider.Instance.getTradeHistory();
     const closeWithSwapEvents = await FulcrumProvider.Instance.getCloseWithSwapHistory();
     const liquidationEvents = await FulcrumProvider.Instance.getLiquidationHistory();
+    const earnRewardEvents = await FulcrumProvider.Instance.getEarnRewardHistory();
+    const payTradingFeeEvents = await FulcrumProvider.Instance.getPayTradingFeeHistory();
     const groupBy = function (xs: (TradeEvent | LiquidationEvent | CloseWithSwapEvent)[], key: any) {
       return xs.reduce(function (rv: any, x: any) {
         (rv[x[key]] = rv[x[key]] || []).push(x);
@@ -456,6 +458,8 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         ? PositionType.LONG
         : PositionType.SHORT;
 
+
+
       const baseToken = positionType === PositionType.LONG
         ? tradeEvent.baseToken
         : tradeEvent.quoteToken;
@@ -463,6 +467,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       const quoteAsset = positionType === PositionType.LONG
         ? tradeEvent.quoteToken
         : tradeEvent.baseToken;
+
 
       let leverage = new BigNumber(tradeEvent.entryLeverage.div(10 ** 18));
 
@@ -488,6 +493,13 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         let profit: BigNumber | string = "-";
         const timeStamp = event.timeStamp;
         const txHash = event.txHash;
+        const payTradingFeeEvent = payTradingFeeEvents.find(e => e.timeStamp.getTime() === timeStamp.getTime());
+        let feeAssetUsdRate = new BigNumber(1)
+        if (payTradingFeeEvent) {
+          feeAssetUsdRate = await FulcrumProvider.Instance.getSwapToUsdRate(payTradingFeeEvent.token);
+          payTradingFeeEvent.amount = payTradingFeeEvent.amount.times(feeAssetUsdRate);
+        }
+        const earnRewardEvent = earnRewardEvents.find(e => e.timeStamp.getTime() === timeStamp.getTime());
         if (event instanceof TradeEvent) {
           const action = "Opened";
           if (positionType === PositionType.LONG) {
@@ -503,7 +515,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
           }
 
 
-          positionEventsGroup.events.push(new HistoryEvent(
+          positionEventsGroup.events.push(new PositionHistoryData(
             loanId,
             timeStamp,
             action,
@@ -511,7 +523,9 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
             tradePrice,
             value,
             profit,
-            txHash
+            txHash,
+            payTradingFeeEvent,
+            earnRewardEvent
           ))
 
         }
@@ -532,7 +546,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
 
           }
 
-          positionEventsGroup.events.push(new HistoryEvent(
+          positionEventsGroup.events.push(new PositionHistoryData(
             loanId,
             timeStamp,
             action,
@@ -540,7 +554,9 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
             tradePrice,
             value,
             profit,
-            txHash
+            txHash,
+            payTradingFeeEvent,
+            earnRewardEvent
           ))
 
         } else if (event instanceof LiquidationEvent) {
@@ -558,7 +574,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
             profit = (openPrice.minus(tradePrice)).times(positionValue);
           }
 
-          positionEventsGroup.events.push(new HistoryEvent(
+          positionEventsGroup.events.push(new PositionHistoryData(
             loanId,
             timeStamp,
             action,
@@ -566,7 +582,9 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
             tradePrice,
             value,
             profit,
-            txHash
+            txHash,
+            payTradingFeeEvent,
+            earnRewardEvent
           ))
 
         }

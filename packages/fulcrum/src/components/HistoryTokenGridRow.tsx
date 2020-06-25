@@ -1,13 +1,10 @@
 import { BigNumber } from "@0x/utils";
 import React, { Component } from "react";
-import { TradeRequest } from "../domain/TradeRequest";
 import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
-import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
 import { Preloader } from "./Preloader";
-import { Asset } from "../domain/Asset";
-import { PositionType } from "../domain/PositionType";
-import { PositionEventsGroup, HistoryEvent } from "../domain/PositionEventsGroup";
+import { PositionEventsGroup } from "../domain/PositionEventsGroup";
+import { PositionHistoryData } from "../domain/PositionHistoryData";
 
 export interface IHistoryTokenGridRowProps {
   eventsGroup: PositionEventsGroup
@@ -69,8 +66,8 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
 
   public renderOtherEvents = () => {
     const croppedEvent = this.props.eventsGroup.events.slice(0, -1).reverse();
-    return croppedEvent.map(event => {
-      return (<div className="history-token-grid-row history-token-grid-row-inner">
+    return croppedEvent.map((event, i) => {
+      return (<div key={i} className="history-token-grid-row history-token-grid-row-inner">
         <div className="history-token-grid-row-inner__col-token-date">
           {event.date.toLocaleDateString("en-US", {
             day: "2-digit",
@@ -101,6 +98,18 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
             : <Preloader width="74px" />
           }
         </div>
+        
+        <div title={event.payTradingFeeEvent && event.earnRewardEvent 
+          && `${event.payTradingFeeEvent.amount.toFixed(18)} / ${event.earnRewardEvent.amount.toFixed(18)}`} className="history-token-grid-row__col-fee-reward">
+            {!this.state.isLoading
+              ? event.payTradingFeeEvent && event.earnRewardEvent ?
+                <React.Fragment>
+                  <span className="sign-currency">$</span>{event.payTradingFeeEvent.amount.toFixed(4)} / {event.earnRewardEvent.amount.toFixed(2)}
+                </React.Fragment>
+                : "-"
+              : <Preloader width="74px" />
+            }
+          </div>
         <div title={event.profit instanceof BigNumber ? event.profit.toFixed(18) : "-"} className="history-token-grid-row-inner__col-profit">
           {event.profit instanceof BigNumber ? <React.Fragment><span className="sign-currency">$</span>{event.profit.toFixed(3)}</React.Fragment> : "-"}
         </div>
@@ -110,7 +119,7 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
 
   public render() {
     const latestEvent = this.props.eventsGroup.events[this.props.eventsGroup.events.length - 1]
-    const profitSum = this.props.eventsGroup.events.reduce((a: BigNumber, b: HistoryEvent) =>  a.plus(b.profit instanceof BigNumber ? b.profit : new BigNumber(0) || 0), new BigNumber(0));
+    const profitSum = this.props.eventsGroup.events.reduce((a: BigNumber, b: PositionHistoryData) => a.plus(b.profit instanceof BigNumber ? b.profit : new BigNumber(0) || 0), new BigNumber(0));
     return (
       <div>
         <div className="history-token-grid-row">
@@ -158,6 +167,17 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
               ? <React.Fragment>
                 <span className="sign-currency">$</span>{latestEvent.value.toFixed(2)}
               </React.Fragment>
+              : <Preloader width="74px" />
+            }
+          </div>
+          <div title={latestEvent.payTradingFeeEvent && latestEvent.earnRewardEvent 
+          && `${latestEvent.payTradingFeeEvent.amount.toFixed(18)} / ${latestEvent.earnRewardEvent.amount.toFixed(18)}`} className="history-token-grid-row__col-fee-reward">
+            {!this.state.isLoading
+              ? latestEvent.payTradingFeeEvent && latestEvent.earnRewardEvent ?
+                <React.Fragment>
+                  <span className="sign-currency">$</span>{latestEvent.payTradingFeeEvent.amount.toFixed(4)} / {latestEvent.earnRewardEvent.amount.toFixed(2)}
+                </React.Fragment>
+                : "-"
               : <Preloader width="74px" />
             }
           </div>
