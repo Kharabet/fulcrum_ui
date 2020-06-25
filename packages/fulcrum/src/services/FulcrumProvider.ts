@@ -1806,7 +1806,6 @@ export class FulcrumProvider {
       const data = event.data.replace("0x", "");
       const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
       if (!dataSegments) return result;
-      
       const amount = new BigNumber(parseInt(dataSegments[0], 16));
       const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000);
       const txHash = event.transactionHash;

@@ -104,7 +104,7 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
             {!this.state.isLoading
               ? event.payTradingFeeEvent && event.earnRewardEvent ?
                 <React.Fragment>
-                  <span className="sign-currency">$</span>{event.payTradingFeeEvent.amount.toFixed(2)} / {event.earnRewardEvent.amount.toFixed(2)}
+                  <span className="sign-currency">$</span>{event.payTradingFeeEvent.amount.toFixed(4)} / {event.earnRewardEvent.amount.toFixed(2)}
                 </React.Fragment>
                 : "-"
               : <Preloader width="74px" />
@@ -175,7 +175,7 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
             {!this.state.isLoading
               ? latestEvent.payTradingFeeEvent && latestEvent.earnRewardEvent ?
                 <React.Fragment>
-                  <span className="sign-currency">$</span>{latestEvent.payTradingFeeEvent.amount.toFixed(2)} / {latestEvent.earnRewardEvent.amount.toFixed(2)}
+                  <span className="sign-currency">$</span>{latestEvent.payTradingFeeEvent.amount.toFixed(4)} / {latestEvent.earnRewardEvent.amount.toFixed(2)}
                 </React.Fragment>
                 : "-"
               : <Preloader width="74px" />

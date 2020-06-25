@@ -458,6 +458,8 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         ? PositionType.LONG
         : PositionType.SHORT;
 
+
+
       const baseToken = positionType === PositionType.LONG
         ? tradeEvent.baseToken
         : tradeEvent.quoteToken;
@@ -465,6 +467,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       const quoteAsset = positionType === PositionType.LONG
         ? tradeEvent.quoteToken
         : tradeEvent.baseToken;
+
 
       let leverage = new BigNumber(tradeEvent.entryLeverage.div(10 ** 18));
 
@@ -491,6 +494,11 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         const timeStamp = event.timeStamp;
         const txHash = event.txHash;
         const payTradingFeeEvent = payTradingFeeEvents.find(e => e.timeStamp.getTime() === timeStamp.getTime());
+        let feeAssetUsdRate = new BigNumber(1)
+        if (payTradingFeeEvent) {
+          feeAssetUsdRate = await FulcrumProvider.Instance.getSwapToUsdRate(payTradingFeeEvent.token);
+          payTradingFeeEvent.amount = payTradingFeeEvent.amount.times(feeAssetUsdRate);
+        }
         const earnRewardEvent = earnRewardEvents.find(e => e.timeStamp.getTime() === timeStamp.getTime());
         if (event instanceof TradeEvent) {
           const action = "Opened";
