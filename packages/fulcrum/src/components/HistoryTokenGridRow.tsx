@@ -66,8 +66,8 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
 
   public renderOtherEvents = () => {
     const croppedEvent = this.props.eventsGroup.events.slice(0, -1).reverse();
-    return croppedEvent.map(event => {
-      return (<div className="history-token-grid-row history-token-grid-row-inner">
+    return croppedEvent.map((event, i) => {
+      return (<div key={i} className="history-token-grid-row history-token-grid-row-inner">
         <div className="history-token-grid-row-inner__col-token-date">
           {event.date.toLocaleDateString("en-US", {
             day: "2-digit",

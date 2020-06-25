@@ -32,7 +32,7 @@ export class HistoryTokenGridHeader extends Component<IHistoryTokenGridHeaderPro
           <span className="history-token-grid-header__text">Value</span>
         </div>
         <div className="history-token-grid-header__col-fee-reward">
-          <span className="history-token-grid-header__text">Fee / Rewards <span>BZRX</span></span>
+          <span className="history-token-grid-header__text">Fee / Rewards <span className="bzrx">BZRX</span></span>
         </div>
         <div className="history-token-grid-header__col-profit">
           <span className="history-token-grid-header__text">Profit</span>

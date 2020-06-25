@@ -78,6 +78,9 @@ $width-col-separator-inner: 92%;
   &__col-fee-reward {
     @include history-token-grid-header__col();
     width: $width-col-fee-reward;
+    .bzrx{
+      color: #444E5A;
+    }
   }
   &__col-profit {
     @include history-token-grid-header__col();
