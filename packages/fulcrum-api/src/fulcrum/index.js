@@ -348,18 +348,28 @@ export default class Fulcrum {
         let result = [];
         reducedArray.forEach((document, index, documents) => {
             const assetStats = document.tokensStats[0]
-            let change24h = 0;
-            if (index > 0)
-                change24h = (assetStats.usdTotalLocked - documents[index - 1].tokensStats[0].usdTotalLocked) / documents[index - 1].tokensStats[0].usdTotalLocked;
+            let tvlChange24h = 0;
+            let aprChange24h = 0;
+            let utilizationChange24h = 0;
+            const utilization = assetStats.totalBorrow / assetStats.totalSupply * 100;
+            if (index > 0) {
+                const prevAssetStats = documents[index - 1].tokensStats[0];
+                const prevAssetUtilization = assetStats.totalBorrow / assetStats.totalSupply * 100;
 
+                tvlChange24h = (assetStats.usdTotalLocked - prevAssetStats.usdTotalLocked) / prevAssetStats.usdTotalLocked;
+                aprChange24h = (assetStats.supplyInterestRate - prevAssetStats.supplyInterestRate) / prevAssetStats.supplyInterestRate;
+                utilizationChange24h = (utilization - prevAssetUtilization) / prevAssetUtilization;
+            }
             result.push({
                 timestamp: new Date(document.date).getTime(),
                 token: assetStats.token,
                 supplyInterestRate: assetStats.supplyInterestRate,
                 tvl: assetStats.vaultBalance,
                 tvlUsd: assetStats.usdTotalLocked,
-                utilization: assetStats.totalBorrow / assetStats.totalSupply * 100,
-                change24h: change24h
+                utilization: utilization,
+                tvlChange24h,
+                aprChange24h,
+                utilizationChange24h
             });
         });
         return result;
