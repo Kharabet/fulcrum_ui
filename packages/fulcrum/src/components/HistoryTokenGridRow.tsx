@@ -1,13 +1,10 @@
 import { BigNumber } from "@0x/utils";
 import React, { Component } from "react";
-import { TradeRequest } from "../domain/TradeRequest";
 import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
-import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
 import { Preloader } from "./Preloader";
-import { Asset } from "../domain/Asset";
-import { PositionType } from "../domain/PositionType";
-import { PositionEventsGroup, HistoryEvent } from "../domain/PositionEventsGroup";
+import { PositionEventsGroup } from "../domain/PositionEventsGroup";
+import { PositionHistoryData } from "../domain/PositionHistoryData";
 
 export interface IHistoryTokenGridRowProps {
   eventsGroup: PositionEventsGroup
@@ -110,7 +107,7 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
 
   public render() {
     const latestEvent = this.props.eventsGroup.events[this.props.eventsGroup.events.length - 1]
-    const profitSum = this.props.eventsGroup.events.reduce((a: BigNumber, b: HistoryEvent) =>  a.plus(b.profit instanceof BigNumber ? b.profit : new BigNumber(0) || 0), new BigNumber(0));
+    const profitSum = this.props.eventsGroup.events.reduce((a: BigNumber, b: PositionHistoryData) =>  a.plus(b.profit instanceof BigNumber ? b.profit : new BigNumber(0) || 0), new BigNumber(0));
     return (
       <div>
         <div className="history-token-grid-row">
