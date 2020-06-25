@@ -46,7 +46,7 @@ export class MainPage extends Component<IMainPageProps, IMainPageState> {
             </div>
           </div>
         </section>
-        <section>
+        <section className="wrapper-chart">
           <MainChart periodChart={this.state.periodChart} getchange24h={this.getchange24h} />
         </section>
         <section className="pt-75">
