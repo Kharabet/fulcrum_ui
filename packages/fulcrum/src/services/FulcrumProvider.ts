@@ -1777,7 +1777,7 @@ export class FulcrumProvider {
         userAddress,
         token,
         loandId,
-        amount,
+        amount.div(10**18),
         timeStamp,
         txHash
       )
@@ -1814,7 +1814,7 @@ export class FulcrumProvider {
         userAddress,
         token,
         loandId,
-        amount,
+        amount.div(10**18),
         timeStamp,
         txHash
       )
