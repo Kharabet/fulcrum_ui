@@ -354,7 +354,7 @@ export default class Fulcrum {
             const utilization = assetStats.totalBorrow / assetStats.totalSupply * 100;
             if (index > 0) {
                 const prevAssetStats = documents[index - 1].tokensStats[0];
-                const prevAssetUtilization = assetStats.totalBorrow / assetStats.totalSupply * 100;
+                const prevAssetUtilization = prevAssetStats.totalBorrow / prevAssetStats.totalSupply * 100;
 
                 tvlChange24h = (assetStats.usdTotalLocked - prevAssetStats.usdTotalLocked) / prevAssetStats.usdTotalLocked;
                 aprChange24h = (assetStats.supplyInterestRate - prevAssetStats.supplyInterestRate) / prevAssetStats.supplyInterestRate;
