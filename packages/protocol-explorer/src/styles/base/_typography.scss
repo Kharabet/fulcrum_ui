@@ -1,4 +1,4 @@
-h1 {
+h1, .h1 {
     font-weight: 900;
     font-size: 44px;
     line-height: 1.2;
@@ -6,9 +6,16 @@ h1 {
     margin-bottom: 0;
 }
 
-.green {
+.green-color {
     color: $green-color;
 }
-.light-gray {
+.light-gray-color {
     color: #828282;
+}
+.unhealthy-color{
+    color: $unhealthy-color
+}
+
+.healthy-color{
+    color: $healthy-color
 }

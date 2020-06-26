@@ -1,0 +1,33 @@
+.liquidation-data {
+  &:first-child {
+    margin-right: 65px;
+  }
+  .liquidation-data-title {
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: #8992a4;
+    margin-bottom: 8px;
+  }
+  .liquidation-data-value {
+    font-size: 30px;
+    font-weight: 900;
+    line-height: 1.2;
+    color: #283038;
+  }
+}
+.unhealthy,
+.healthy {
+  font-size: 36px;
+  font-weight: 900;
+  width: 45%;
+  display: flex;
+  justify-content: flex-end;
+  line-height: 1.8;
+  &-value {
+    font-size: 100px;
+    font-weight: 900;
+    line-height: 1;
+    width: 55%;
+  }
+}
