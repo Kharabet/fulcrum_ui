@@ -48,3 +48,16 @@ a {
 .bg-green {
     background-color: $green-label;
 }
+.bg-gradient {
+    background: linear-gradient(360deg, #edf5ff 0%, #ffffff 100%);
+}
+
+.w-45 {
+    width: 45%;
+}
+.w-55 {
+    width: 55%;
+}
+.w-100 {
+    width: 100%;
+}

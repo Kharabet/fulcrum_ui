@@ -2,14 +2,14 @@ import React, { Component } from "react";
 import { Line } from "react-chartjs-2";
 
 interface IMainChartProps {
-  periodChart: number
+  periodChart: number,
+  getchange24h: (change24h: number) => void;
 }
 
 interface IMainChartState {
-  //periodChart: number,
   labels: Array<number>;
   data: Array<number>;
-  //tvl: string | any;
+  change24: Array<number>
 }
 
 export class MainChart extends Component<IMainChartProps, IMainChartState> {
@@ -17,15 +17,13 @@ export class MainChart extends Component<IMainChartProps, IMainChartState> {
   constructor(props: any) {
     super(props);
     this.state = {
-      //periodChart: 1,
-      //tvl: '1.2',
       labels: [],
-      data: []
+      data: [],
+      change24: []
     };
   }
 
   public componentDidMount(): void {
-    //this.getVaultBalanceUsd();
     this.getTvlHistory();
   }
 
@@ -35,8 +33,52 @@ export class MainChart extends Component<IMainChartProps, IMainChartState> {
     }
   }
 
-
-
+  public customTooltips = (tooltip: any) => {
+    let tooltipEl = document.getElementById('chartjs-tooltip');
+    let chartEl = document.getElementById('chartjs');
+    if (!tooltipEl) {
+      tooltipEl = document.createElement('div');
+      tooltipEl.id = 'chartjs-tooltip';
+      tooltipEl.innerHTML = "<div></div>"
+      document.body.appendChild(tooltipEl);
+    }
+    const heighttooltipEl = tooltipEl.offsetHeight;
+    const widthTooltipEl = tooltipEl.offsetWidth;
+    const widthChart = chartEl!.offsetWidth;
+    if (tooltip.opacity === 0) {
+      tooltipEl.style.opacity = '0';
+      tooltipEl.style.left = -widthTooltipEl + 'px';
+      return;
+    }
+    function getBody(bodyItem: any) {
+      return bodyItem.lines[0].data;
+    }
+    function getFooter(bodyItem: any) {
+      return bodyItem.lines[0].change24;
+    }
+    if (tooltip.body) {
+      const titleLines = tooltip.title || [];
+      const bodyLines = tooltip.body.map(getBody);
+      const footerLines = tooltip.body.map(getFooter);
+      let innerHtml = `<tbody class="${heighttooltipEl + 55 > tooltip.caretY ? `bottom` : ``} ${widthChart - tooltip.caretX < widthTooltipEl ? `right` : `left`}">`;//'<thead>';
+      titleLines.forEach(function (title: number) {
+        innerHtml += '<div class=><th class="chartjs-tooltip-time"><span>' + title + '</span></th></tr>';
+      });
+      bodyLines.forEach(function (body: number) {
+        innerHtml += '<tr><td class="chartjs-tooltip-value"><span><span class="sign sign-currency">$</span>' + body + '</span></td></tr>';
+      });
+      footerLines.forEach(function (footer: number) {
+        innerHtml += `<tr><td class="chartjs-tooltip-change24 ${footer < 0 ? `down` : `up`} ${heighttooltipEl + 55 < tooltip.caretY ? `bottom` : `top`} ${widthChart - tooltip.caretX < widthTooltipEl ? `right` : `left`}"><span>${Math.abs(footer).toFixed(4)}%</span></td></tr>`
+      });
+      innerHtml += '</tbody>';
+      const tableRoot = tooltipEl.querySelector('table') as HTMLElement;
+      tableRoot.innerHTML = innerHtml;
+    }
+    tooltipEl.style.opacity = '1';
+    tooltipEl.style.position = 'absolute';
+    tooltipEl.style.left = (widthChart - tooltip.caretX < widthTooltipEl) ? tooltip.caretX - widthTooltipEl + 5 + 'px' : tooltip.caretX - 7 + 'px';
+    tooltipEl.style.top = (heighttooltipEl + 55 < tooltip.caretY) ? tooltip.caretY - heighttooltipEl - 55 + 'px' : tooltip.caretY + 55 + 'px';
+  }
   public getTvlHistory = async () => {
     const startData = new Date().setDate(new Date().getDate() - this.props.periodChart);
     const endData = new Date().getTime();
@@ -46,6 +88,7 @@ export class MainChart extends Component<IMainChartProps, IMainChartState> {
     const responseJson = await response.json();
     const labels: any = [];
     const data: any = [];
+    const change24: any = [];
     const period = this.props.periodChart;
     if (responseJson.success) {
       responseJson.data.forEach(function (item: any) {
@@ -54,11 +97,13 @@ export class MainChart extends Component<IMainChartProps, IMainChartState> {
           ? labels.push(`${new Date(item["timestamp"]).getHours() % 12}:${new Date(item["timestamp"]).getMinutes() < 10 ? `0${new Date(item["timestamp"]).getMinutes()}` : new Date(item["timestamp"]).getMinutes()}`)
           : labels.push(`${months[new Date(item["timestamp"]).getMonth()]} ${new Date(item["timestamp"]).getDate()}`);
         data.push(item["tvl"]);
+        change24.push(item["change24h"]);
       });
+      this.props.getchange24h(responseJson.data[Object.keys(responseJson.data).length - 1].change24h);
     } else {
       console.error(responseJson.message)
     }
-    await this.setState({ ...this.state, labels: labels, data: data });
+    await this.setState({ ...this.state, labels: labels, data: data, change24: change24, });
   }
 
   public render() {
@@ -66,8 +111,8 @@ export class MainChart extends Component<IMainChartProps, IMainChartState> {
     const getData = (canvas: any) => {
       const ctx: any = canvas.getContext("2d");
       const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-      gradient.addColorStop(0, '#ffffff');
-      gradient.addColorStop(1, '#DCEBFF');
+      gradient.addColorStop(0, '#edf5ff');
+      gradient.addColorStop(1, '#dcebff');
 
       return {
         labels: this.state.labels,
@@ -75,7 +120,10 @@ export class MainChart extends Component<IMainChartProps, IMainChartState> {
           fill: "end",
           data: this.state.data,
           backgroundColor: gradient,
-          borderColor: '#276BFB'
+          hoverBackgroundColor: '#276BFB',
+          hoverBorderColor: '#276BFB',
+          borderColor: '#276BFB',
+          change24: this.state.change24
         }]
       }
     }
@@ -85,8 +133,18 @@ export class MainChart extends Component<IMainChartProps, IMainChartState> {
       scaleShowLabels: false,
       scales: {
         xAxes: [{
+          ticks: {
+            padding: 15,
+            callback: (value: any, index: any, values: any) => {
+              return index === 0 || index === Object.keys(values).length - 1 ? '' : value;
+            }
+          },
           gridLines: {
-            display: false
+            drawBorder: false,
+            zeroLineWidth: 1,
+            zeroLineColor: '#E9F4FF',
+            color: '#E9F4FF',
+            
           },
         }],
         yAxes: [{
@@ -102,32 +160,28 @@ export class MainChart extends Component<IMainChartProps, IMainChartState> {
         }
       },
       tooltips: {
-        backgroundColor: 'rgba(0, 0, 0, 0)',
-        displayColors: false,
-        bodyFontFamily: 'Muli',
-        bodyFontSize: 30,
-        bodyFontColor: '#283049',
-        bodyFontStyle: 'bold',
-        titleFontFamily: 'Muli',
-        titleFontSize: 14,
-        titleFontColor: '#8992A4',
-        titleFontStyle: 'black',
-        titleMarginBottom: 10,
+        enabled: false,
+        mode: 'index',
         position: 'nearest',
+        custom: this.customTooltips,
         callbacks: {
-          label: function (tooltipItems: any) {
+          label: function (tooltipItems: any, data: any) {
+            const change24 = data.datasets[tooltipItems.datasetIndex].change24[tooltipItems.index];
             if (tooltipItems.yLabel > 100000)
-              return `$${(tooltipItems.yLabel / 1000000).toFixed(3)}m`;
+              return { "data": `${(tooltipItems.yLabel / 1000000).toFixed(3)}m`, "change24": change24 };
             if (tooltipItems.yLabel > 100)
-              return `$${(tooltipItems.yLabel / 1000).toFixed(3)}k`;
-            return `$${(tooltipItems.yLabel).toFixed(3)}`;
+              return { "data": `${(tooltipItems.yLabel / 1000).toFixed(3)}k`, "change24": change24 };
+            return { "data": `${(tooltipItems.yLabel).toFixed(3)}`, "change24": change24 };
           }
         }
       }
     }
     return (
       <React.Fragment>
-        <Line ref="chart" data={chartData} options={options} height={50} />
+        <div id="chartjs">
+          <Line data={chartData} options={options} height={50} />
+        </div>
+        <div id="chartjs-tooltip"><table></table></div>
       </React.Fragment>
     );
   }

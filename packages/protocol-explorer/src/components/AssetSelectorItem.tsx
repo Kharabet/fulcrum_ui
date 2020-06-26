@@ -34,7 +34,7 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
     const requestUrl = `${this.apiUrl}/asset-stats-history?asset=${this.props.asset.toLowerCase()}&start_date=${startData}&end_date=${endData}&points_number=${pointsNumber}`;
     const response = await fetch(requestUrl);
     const responseJson = await response.json();
-    console.log(responseJson);
+    //console.log(responseJson);
     let labels: any = [];
     let tvl: any = [];
 
@@ -93,6 +93,9 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
         point: {
           radius: 0
         }
+      },
+      tooltips: {
+        enabled: false
       }
     }
     return (
@@ -108,7 +111,7 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
             {this.props.asset !== Asset.UNKNOWN ? `Locked` : `Paid`}<span className="value">&nbsp;
             {tvl ? this.getRoundedData((tvl)) : 0.0000}</span>
           </span>
-          <span className="asset-selector-apr"><span className="value green">{apr ? apr.toFixed(2) : 0.00}%&nbsp;</span>APR</span>
+          <span className="asset-selector-apr"><span className="value green-color">{apr ? apr.toFixed(2) : 0.00}%&nbsp;</span>APR</span>
         </div>
         <div className="asset-selector-chart">
           <Line ref="chart" data={chartData} options={options} />

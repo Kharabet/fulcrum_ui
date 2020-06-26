@@ -1,6 +1,4 @@
 .table {
-  margin-top: 90px;
-
   .table-row,
   .table-header {
     display: flex;
@@ -10,9 +8,33 @@
     a {
       color: $primary-color;
     }
+    > div,
+    > a {
+      padding-left: 30px;
+      box-sizing: border-box;
+    }
+  }
+  .table-header {
+    padding-top: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #cbe2ff;
+  }
+  .table-row {
+    border-bottom: 1px solid #e7ebf0;
+    &:hover {
+      cursor: pointer;
+      background-color: #f5f7f9;
+    }
+  }
+}
+.table-tx {
+  .table-row-tx,
+  .table-header-tx {
     &__hash {
       width: 20%;
-      padding-left: 30px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     &__age {
       cursor: pointer;
@@ -20,25 +42,23 @@
     &__age,
     &__action {
       width: 15%;
-      padding-left: 30px;
     }
     &__from,
     &__quantity {
       width: 25%;
-      padding-left: 30px;
+    }
+    &__from-address {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .rotate-icon {
       transform: rotate(180deg);
     }
   }
-  .table-row {
+  .table-row-tx {
     padding-top: 20px;
     padding-bottom: 20px;
-    border-bottom: 1px solid #e7ebf0;
-    &:hover {
-      cursor: pointer;
-      background-color: #f5f7f9;
-    }
     &__from {
       display: flex;
       align-items: center;
@@ -47,10 +67,7 @@
       }
     }
   }
-  .table-header {
-    padding-top: 15px;
-    padding-bottom: 15px;
-    border-bottom: 1px solid #cbe2ff;
+  .table-header-tx {
     &__age {
       display: flex;
       align-items: center;
@@ -87,5 +104,31 @@
         margin-right: 8px;
       }
     }
+  }
+}
+.table-loan {
+  .table-row-loan,
+  .table-header-loan {
+    &__id {
+      width: 45%;
+    }
+    &__amount,
+    &__collateral {
+      display: flex;
+      align-items: center;
+      width: 20%;
+      svg {
+        width: 22px;
+        height: 22px;
+        margin-right: 10px;
+      }
+    }
+    &__action {
+      width: 15%;
+    }
+  }
+  .table-row-loan{
+    padding-top: 17px;
+    padding-bottom: 17px;
   }
 }

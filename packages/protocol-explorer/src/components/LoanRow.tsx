@@ -1,8 +1,10 @@
 import React from "react";
-import { ReactComponent as IconArrow } from "../assets/images/icon-tx-arrow.svg";
 import { BigNumber } from "@0x/utils";
+import { Asset } from "../domain/Asset";
+import { AssetsDictionary } from "../domain/AssetsDictionary";
+import { AssetDetails } from "../domain/AssetDetails";
 
-export interface ITxRowProps {
+export interface ILoanRowProps {
   hash: string,
   etherscanTxUrl: string,
   age: Date,
@@ -12,13 +14,16 @@ export interface ITxRowProps {
   action: string
 }
 
-export const TxRow = (props: ITxRowProps) => {
+export const LoanRow = (props: ILoanRowProps) => {
+  const dai = AssetsDictionary.assets.get(Asset.DAI) as AssetDetails;
+  const eth = AssetsDictionary.assets.get(Asset.ETH) as AssetDetails;
+
   const timeSince = (date: Date) => {
 
     var seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
-  
+
     var interval = Math.floor(seconds / 31536000);
-  
+
     if (interval > 1) {
       return interval + " years";
     }
@@ -42,15 +47,11 @@ export const TxRow = (props: ITxRowProps) => {
   }
   return (
     <React.Fragment>
-      <div className="table-row table-row-tx">
-        <a href={props.etherscanTxUrl} className="table-row-tx__hash">{props.hash}</a>
-        <div className="table-row-tx__age">{timeSince(props.age)}</div>
-        <a href={props.etherscanAddressUrl} className="table-row-tx__from">
-          <IconArrow />
-          <span className="table-row-tx__from-address">{props.account}</span>
-        </a>
-        <div className="table-row-tx__quantity">{props.quantity.toFixed(18)}</div>
-        <div className="table-row-tx__action">{props.action}</div>
+      <div className="table-row table-row-loan">
+        <a href={props.etherscanTxUrl} className="table-row-loan__id">{props.account}</a>
+        <div className="table-row-loan__amount">{dai.logoSvg.render()} {props.quantity.toFixed(3)}</div>
+        <div className="table-row-loan__collateral">{eth.logoSvg.render()}{props.quantity.toFixed(3)}</div>
+        <div className="table-row-loan__action"><button className="action">{props.action}</button></div>
       </div>
     </React.Fragment>
   );

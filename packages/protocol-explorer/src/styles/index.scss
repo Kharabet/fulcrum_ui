@@ -5,12 +5,16 @@
 @import "base/typography";
 @import "base/spacing";
 @import "base/flex";
+@import "base/general";
 
 @import "components/asset-selector";
 @import "components/buttons";
 @import "components/search";
-@import "components/grid-tx";
+@import "components/table";
 @import "components/tvl";
+@import "components/chart";
 
 @import "layout/footer";
 @import "layout/header";
+
+@import "pages/liquidation";

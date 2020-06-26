@@ -3,10 +3,6 @@
   line-height: 1.72;
   font-weight: 900;
 }
-.tvl-sign {
-  color: #758295;
-  font-weight: 600;
-}
 .tvl-value {
   font-size: 100px;
   font-weight: 900;
@@ -20,8 +16,17 @@
   color: $green-color;
   display: flex;
   align-items: center;
-  &.sign {
-    font-weight: 600;
+  &.down {
+    color: $red-color;
+    svg {
+      transform: rotate(180deg);
+      .icon-path {
+        fill: $red-color;
+      }
+    }
+  }
+  &.up {
+    color: $green-color;
   }
   svg {
     margin-right: 8px;
