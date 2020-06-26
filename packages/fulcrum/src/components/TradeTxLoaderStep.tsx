@@ -148,7 +148,8 @@ export class TradeTxLoaderStep extends Component<ITradeTxLoaderStepProps, ITrade
     });
 
     const div = this.stepDiv.current;
-    if (div && task && this.state.requestTask && this.getTitle(task) !== this.getTitle(this.state.requestTask)) {
+    //if (div && task && this.state.requestTask && this.getTitle(task) !== this.getTitle(this.state.requestTask)) {
+    if (div && this.state.requestTask && this.getTitle(task) !== this.getTitle(this.state.requestTask)) {
       div.classList.remove("animation-in");
       div.classList.remove("animation-out");
       div.classList.add("animation-out");

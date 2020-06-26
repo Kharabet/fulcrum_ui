@@ -39,6 +39,8 @@ interface ITradeTokenGridRowState {
   isLoading: boolean;
   isLoadingTransaction: boolean;
   request: TradeRequest | undefined;
+  resultTx: boolean;
+
 }
 
 export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITradeTokenGridRowState> {
@@ -54,6 +56,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
       isLoading: true,
       isLoadingTransaction: false,
       request: undefined,
+      resultTx: false
     };
 
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
@@ -88,7 +91,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
       this.props.positionType === PositionType.LONG ?
         this.props.quoteToken :
         this.props.baseToken
-      );
+    );
 
     this._isMounted && this.setState({
       ...this.state,
@@ -117,13 +120,13 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
     if (task.status === RequestStatus.FAILED || task.status === RequestStatus.FAILED_SKIPGAS) {
       window.setTimeout(() => {
         FulcrumProvider.Instance.onTaskCancel(task);
-        this.setState({ ...this.state, isLoadingTransaction: false, request: undefined })
-        this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, true, false)
+        this.setState({ ...this.state, isLoadingTransaction: false, request: undefined, resultTx: false })
+        this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, false, this.state.resultTx)
       }, 5000)
       return;
     }
-    this.setState({ ...this.state, isLoadingTransaction: false, request: undefined });
-    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, true, true)
+    this.setState({ ...this.state, resultTx: true });
+    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, true, this.state.resultTx);
   }
 
   public componentWillUnmount(): void {
@@ -141,13 +144,17 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
     this.derivedUpdate();
   }
 
-  public async  componentDidUpdate(
+  public async componentDidUpdate(
     prevProps: Readonly<ITradeTokenGridRowProps>,
     prevState: Readonly<ITradeTokenGridRowState>,
     snapshot?: any
   ) {
     if (prevState.leverage !== this.state.leverage || prevProps.isTxCompleted !== this.props.isTxCompleted) {
       await this.derivedUpdate();
+      if (this.state.isLoadingTransaction) {
+        this.setState({ ...this.state, isLoadingTransaction: false, request: undefined });
+        this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, true, this.state.resultTx)
+      }
     }
   }
 
@@ -204,7 +211,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
           }
         </div>
         <div className="trade-token-grid-row__col-action">
-          <button className="trade-token-grid-row__button trade-token-grid-row__buy-button trade-token-grid-row__button--size-half" disabled={siteConfig.TradeBuyDisabled||this.state.isLoadingTransaction} onClick={this.onBuyClick}>
+          <button className="trade-token-grid-row__button trade-token-grid-row__buy-button trade-token-grid-row__button--size-half" disabled={siteConfig.TradeBuyDisabled || this.state.isLoadingTransaction} onClick={this.onBuyClick}>
             {TradeType.BUY}
           </button>
         </div>

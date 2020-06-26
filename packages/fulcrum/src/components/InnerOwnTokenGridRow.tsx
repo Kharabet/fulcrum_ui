@@ -104,12 +104,12 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
       window.setTimeout(() => {
         FulcrumProvider.Instance.onTaskCancel(task);
         this.setState({ ...this.state, isLoadingTransaction: false, request: undefined, resultTx: false })
-        this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, true, this.state.resultTx)
+        this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, false, this.state.resultTx)
       }, 5000)
       return;
     }
-    this.setState({ ...this.state, isLoadingTransaction: false, request: undefined, resultTx: true });
-    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, true, this.state.resultTx)
+    this.setState({ ...this.state, resultTx: true });
+    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, true, this.state.resultTx);
   }
 
   // private onTradeTransactionMined = async (event: TradeTransactionMinedEvent) => {
@@ -129,8 +129,12 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
   }
 
   public componentDidUpdate(prevProps: Readonly<IInnerOwnTokenGridRowProps>, prevState: Readonly<IInnerOwnTokenGridRowState>, snapshot?: any): void {
-    if (prevProps.isTxCompleted !== this.props.isTxCompleted) {
+    if (this.props.isTxCompleted && prevProps.isTxCompleted !== this.props.isTxCompleted) {
       this.derivedUpdate();
+      if (this.state.isLoadingTransaction) {
+        this.setState({ ...this.state, isLoadingTransaction: false, request: undefined });
+        this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, false, this.state.resultTx)
+      }
     }
   }
 
@@ -146,6 +150,7 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
 
   public render() {
     return (
+
       <React.Fragment>
         {this.state.isLoadingTransaction && this.state.request
           ? <React.Fragment>
@@ -165,8 +170,8 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
               {!this.state.isLoading
                 ? <React.Fragment>
                   <span className="value-currency">
-                  <span className="sign-currency">$</span>
-                 
+                    <span className="sign-currency">$</span>
+
                     {this.props.value.toFixed(2)}
                     <span title={this.state.valueChange.toFixed(18)} className="inner-own-token-grid-row__col-asset-price-small">{this.state.valueChange.toFixed(2)}%</span>
                   </span>
@@ -178,8 +183,8 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
               {!this.state.isLoading
                 ? <React.Fragment>
                   <span className="value-currency">
-                  <span className="sign-currency">$</span>
-                 
+                    <span className="sign-currency">$</span>
+
                     {this.props.collateral.toFixed(2)}
                     <span className={`inner-own-token-grid-row__col-asset-collateral-small ${this.props.loan.collateralizedPercent.lte(.25) ? "danger" : ""}`}>{this.props.loan.collateralizedPercent.multipliedBy(100).plus(100).toFixed(2)}%</span>
                     <div className="inner-own-token-grid-row__open-manage-collateral" onClick={this.onManageClick}>
