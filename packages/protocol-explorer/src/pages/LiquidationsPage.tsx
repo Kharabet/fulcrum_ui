@@ -6,6 +6,7 @@ import { BigNumber } from "@0x/utils";
 import { ITxRowProps } from "../components/TxRow";
 import configProviders from "../config/providers.json";
 import { TxGrid } from "../components/TxGrid";
+import { LoanGrid } from "../components/LoanGrid";
 import { Asset } from "../domain/Asset";
 import { Bar } from "react-chartjs-2";
 import { Search } from "../components/Search";
@@ -210,7 +211,7 @@ export class LiquidationsPage extends Component<{}, ILiquidationsPageState> {
           },
           {
             label: 'Dai',
-            data: [10, 20, 30, 40, 50, 60, 70, 15, 5, 9, 15, 5, 9, 50, 14, 60, 70, 50, 14, 60, 70, 14, 60, 70, 10, 20, 30,20],
+            data: [10, 20, 30, 40, 50, 60, 70, 15, 5, 9, 15, 5, 9, 50, 14, 60, 70, 50, 14, 60, 70, 14, 60, 70, 10, 20, 30, 20],
             //data: this.state.daiDataset,
             backgroundColor: '#276BFB',
           },
@@ -322,6 +323,9 @@ export class LiquidationsPage extends Component<{}, ILiquidationsPageState> {
                   <span className="healthy-value healthy-color">100m</span>
                 </div>
               </div>
+            </div>
+            <div className="pt-75">
+              <LoanGrid events={this.state.events} />
             </div>
           </div>
         </section>

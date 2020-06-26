@@ -1,5 +1,20 @@
 button {
   font-family: "Muli", sans-serif;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  &.action {
+    width: 100px;
+    height: 32px;
+    background-color: $primary-color;
+    border-radius: 22px;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 700;
+    &:hover {
+      background-color: $primary-color-hover;
+    }
+  }
 }
 .group-button {
   display: flex;
@@ -7,10 +22,7 @@ button {
   button {
     background-color: transparent;
     color: $primary-color;
-    border: none;
-    outline: none;
     padding: 8px 13px;
-    cursor: pointer;
     font-weight: 600;
     &.active {
       background-color: $primary-color;
