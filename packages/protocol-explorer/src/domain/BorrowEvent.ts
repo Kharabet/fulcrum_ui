@@ -1,7 +1,7 @@
 import { BigNumber } from "@0x/utils";
 import { Asset } from "./Asset";
 
-export class Borrow {
+export class BorrowEvent {
   public static topic0: string = "0x7bd8cbb7ba34b33004f3deda0fd36c92fc0360acbd97843360037b467a538f90"
   public readonly user: string; //indexed 
   public readonly lender: string;//indexed 

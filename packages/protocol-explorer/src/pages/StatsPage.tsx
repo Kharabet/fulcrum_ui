@@ -10,6 +10,10 @@ import { LiquidationEvent } from "../domain/LiquidationEvent";
 import { BigNumber } from "@0x/utils";
 import { TradeEvent } from "../domain/TradeEvent";
 import { CloseWithSwapEvent } from "../domain/CloseWithSwapEvent";
+import { CloseWithDepositEvent } from "../domain/CloseWithDepositEvent";
+import { BurnEvent } from "../domain/BurnEvent";
+import { MintEvent } from "../domain/MintEvent";
+import { BorrowEvent } from "../domain/BorrowEvent";
 import { ITxRowProps } from "../components/TxRow";
 import configProviders from "../config/providers.json";
 
@@ -95,25 +99,25 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
       if (!dataSegments) return result;
       const lender = dataSegments[0].replace("000000000000000000000000", "0x");
 
-      const baseTokenAddress = dataSegments[1].replace("000000000000000000000000", "0x");
-      const quoteTokenAddress = dataSegments[2].replace("000000000000000000000000", "0x");
-      const baseToken = this.contractsSource!.getAssetFromAddress(baseTokenAddress);
-      const quoteToken = this.contractsSource!.getAssetFromAddress(quoteTokenAddress);
+      const loanTokenAddress = dataSegments[1].replace("000000000000000000000000", "0x");
+      const collateralTokenAddress = dataSegments[2].replace("000000000000000000000000", "0x");
+      const loanToken = this.contractsSource!.getAssetFromAddress(loanTokenAddress);
+      const collateralToken = this.contractsSource!.getAssetFromAddress(collateralTokenAddress);
       const repayAmount = new BigNumber(parseInt(dataSegments[3], 16));
       const collateralWithdrawAmount = new BigNumber(parseInt(dataSegments[4], 16));
       const collateralToLoanRate = new BigNumber(parseInt(dataSegments[5], 16));
       const currentMargin = new BigNumber(parseInt(dataSegments[6], 16));
       const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000);
       const txHash = event.transactionHash;
-      if (baseToken !== this.state.asset && quoteToken !== this.state.asset)
+      if (loanToken !== this.state.asset)
         return;
       return new LiquidationEvent(
         userAddress,
         liquidatorAddress,
         loanId,
         lender,
-        baseToken,
-        quoteToken,
+        loanToken,
+        collateralToken,
         repayAmount,
         collateralWithdrawAmount,
         collateralToLoanRate,
@@ -145,10 +149,10 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
       const data = event.data.replace("0x", "");
       const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
       if (!dataSegments) return result;
-      const baseTokenAddress = dataSegments[0].replace("000000000000000000000000", "0x");
-      const quoteTokenAddress = dataSegments[1].replace("000000000000000000000000", "0x");
-      const baseToken = this.contractsSource!.getAssetFromAddress(baseTokenAddress);
-      const quoteToken = this.contractsSource!.getAssetFromAddress(quoteTokenAddress);
+      const loanTokenAddress = dataSegments[0].replace("000000000000000000000000", "0x");
+      const collateralTokenAddress = dataSegments[1].replace("000000000000000000000000", "0x");
+      const loanToken = this.contractsSource!.getAssetFromAddress(loanTokenAddress);
+      const collateralToken = this.contractsSource!.getAssetFromAddress(collateralTokenAddress);
 
       const positionSize = new BigNumber(parseInt(dataSegments[2], 16));
       const borrowedAmount = new BigNumber(parseInt(dataSegments[3], 16));
@@ -159,14 +163,14 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
       const currentLeverage = new BigNumber(parseInt(dataSegments[8], 16));
       const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000);
       const txHash = event.transactionHash;
-      if (baseToken !== this.state.asset && quoteToken !== this.state.asset)
+      if (loanToken !== this.state.asset)
         return;
       return new TradeEvent(
         userAddress,
         lender,
         loandId,
-        baseToken,
-        quoteToken,
+        loanToken,
+        collateralToken,
         positionSize,
         borrowedAmount,
         interestRate,
@@ -201,10 +205,10 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
       const data = event.data.replace("0x", "");
       const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
       if (!dataSegments) return result;
-      const baseTokenAddress = dataSegments[0].replace("000000000000000000000000", "0x");
-      const quoteTokenAddress = dataSegments[1].replace("000000000000000000000000", "0x");
-      const baseToken = this.contractsSource!.getAssetFromAddress(baseTokenAddress);
-      const quoteToken = this.contractsSource!.getAssetFromAddress(quoteTokenAddress);
+      const collateralTokenAddress = dataSegments[0].replace("000000000000000000000000", "0x");
+      const loanTokenAddress = dataSegments[1].replace("000000000000000000000000", "0x");
+      const collateralToken = this.contractsSource!.getAssetFromAddress(collateralTokenAddress);
+      const loanToken = this.contractsSource!.getAssetFromAddress(loanTokenAddress);
       const closer = dataSegments[2].replace("000000000000000000000000", "0x");
       const positionCloseSize = new BigNumber(parseInt(dataSegments[3], 16));
       const loanCloseAmount = new BigNumber(parseInt(dataSegments[4], 16));
@@ -212,15 +216,15 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
       const currentLeverage = new BigNumber(parseInt(dataSegments[6], 16));
       const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000);
       const txHash = event.transactionHash;
-      if (baseToken !== this.state.asset && quoteToken !== this.state.asset)
+      if (loanToken !== this.state.asset)
         return;
       return new CloseWithSwapEvent(
         userAddress,
-        baseToken,
-        quoteToken,
         lender,
-        closer,
         loandId,
+        collateralToken,
+        loanToken,
+        closer,
         positionCloseSize,
         loanCloseAmount,
         exitPrice,
@@ -234,30 +238,180 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
 
   }
 
-  public getGridItems = (events: (LiquidationEvent | TradeEvent | CloseWithSwapEvent)[]): ITxRowProps[] => {
+  public getCloseWithDepositHistory = async (): Promise<CloseWithDepositEvent[]> => {
+    let result: CloseWithDepositEvent[] = [];
+    const bzxContractAddress = this.contractsSource.getiBZxAddress()
+    if (!bzxContractAddress) return result
+    const etherscanApiKey = configProviders.Etherscan_Api;
+    let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${CloseWithDepositEvent.topic0}&apikey=${etherscanApiKey}`
+    const tradeEventResponse = await fetch(etherscanApiUrl);
+    const tradeEventResponseJson = await tradeEventResponse.json();
+    if (tradeEventResponseJson.status !== "1") return result;
+    const events = tradeEventResponseJson.result;
+    //@ts-ignore
+    result = events.reverse().map(event => {
+      const userAddress = event.topics[1].replace("0x000000000000000000000000", "0x");
+      const lender = event.topics[2].replace("0x000000000000000000000000", "0x");
+      const loandId = event.topics[3];
+      const data = event.data.replace("0x", "");
+      const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
+      if (!dataSegments) return result;
+      const closer = dataSegments[0].replace("000000000000000000000000", "0x");
+      const loanTokenAddress = dataSegments[1].replace("000000000000000000000000", "0x");
+      const collateralTokenAddress = dataSegments[2].replace("000000000000000000000000", "0x");
+      const loanToken = this.contractsSource!.getAssetFromAddress(loanTokenAddress);
+      const collateralToken = this.contractsSource!.getAssetFromAddress(collateralTokenAddress);
+      const repayAmount = new BigNumber(parseInt(dataSegments[3], 16));
+      const collateralWithdrawAmount = new BigNumber(parseInt(dataSegments[4], 16));
+      const collateralToLoanRate = new BigNumber(parseInt(dataSegments[5], 16));
+      const currentMargin = new BigNumber(parseInt(dataSegments[6], 16));
+      const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000);
+      const txHash = event.transactionHash;
+      if (loanToken !== this.state.asset)
+        return;
+      return new CloseWithDepositEvent(
+        userAddress,
+        lender,
+        loandId,
+        closer,
+        loanToken,
+        collateralToken,
+        repayAmount,
+        collateralWithdrawAmount,
+        collateralToLoanRate,
+        currentMargin,
+        timeStamp,
+        txHash
+      )
+    })
+    return result.filter(e => e)
+  }
+  
+  public getBorrowHistory = async (): Promise<BorrowEvent[]> => {
+    let result: BorrowEvent[] = [];
+    const bzxContractAddress = this.contractsSource.getiBZxAddress()
+    if (!bzxContractAddress) return result
+    const etherscanApiKey = configProviders.Etherscan_Api;
+    let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${BorrowEvent.topic0}&apikey=${etherscanApiKey}`
+    const tradeEventResponse = await fetch(etherscanApiUrl);
+    const tradeEventResponseJson = await tradeEventResponse.json();
+    if (tradeEventResponseJson.status !== "1") return result;
+    const events = tradeEventResponseJson.result;
+    //@ts-ignore
+    result = events.reverse().map(event => {
+      const userAddress = event.topics[1].replace("0x000000000000000000000000", "0x");
+      const lender = event.topics[2].replace("0x000000000000000000000000", "0x");
+      const loandId = event.topics[3];
+      const data = event.data.replace("0x", "");
+      const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
+      if (!dataSegments) return result;
+      const loanTokenAddress = dataSegments[0].replace("000000000000000000000000", "0x");
+      const collateralTokenAddress = dataSegments[1].replace("000000000000000000000000", "0x");
+      const loanToken = this.contractsSource!.getAssetFromAddress(loanTokenAddress);
+      const collateralToken = this.contractsSource!.getAssetFromAddress(collateralTokenAddress);
+      const newPrincipal = new BigNumber(parseInt(dataSegments[2], 16));
+      const newCollateral = new BigNumber(parseInt(dataSegments[3], 16));
+      const interestRate = new BigNumber(parseInt(dataSegments[4], 16));
+      const interestDuration = new BigNumber(parseInt(dataSegments[5], 16));
+      const collateralToLoanRate = new BigNumber(parseInt(dataSegments[6], 16));
+      const currentMargin = new BigNumber(parseInt(dataSegments[7], 16));
+      const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000);
+      const txHash = event.transactionHash;
+      if (loanToken !== this.state.asset)
+        return;
+      return new BorrowEvent(
+        userAddress,
+        lender,
+        loandId,
+        loanToken,
+        collateralToken,
+        newPrincipal,
+        newCollateral,
+        interestRate,
+        interestDuration,
+        collateralToLoanRate,
+        currentMargin,
+        timeStamp,
+        txHash
+      )
+    })
+    return result.filter(e => e)
+  }
+
+  public getGridItems = (events: (LiquidationEvent | TradeEvent | CloseWithSwapEvent | BorrowEvent | BurnEvent | MintEvent | CloseWithDepositEvent)[]): ITxRowProps[] => {
     if (events.length === 0) return [];
     const etherscanUrl = getWeb3ProviderSettings(initialNetworkId);
     return events.map(e => {
-      return {
-        hash: e.txHash,
-        etherscanTxUrl: `${etherscanUrl}/tx/${e.txHash}`,
-        age: e.timeStamp,
-        account: e.user,
-        etherscanAddressUrl: `${etherscanUrl}/address/${e.user}`,
-        quantity: e instanceof LiquidationEvent
-          ? e.repayAmount.div(10 ** 18)
-          : e instanceof TradeEvent
-            ? e.positionSize.div(10 ** 18)
-            : e instanceof CloseWithSwapEvent
-              ? e.positionCloseSize.div(10 ** 18)
-              : new BigNumber(0),
-        action: e instanceof LiquidationEvent
-          ? "Liquidation"
-          : e instanceof TradeEvent
-            ? "Trade"
-            : e instanceof CloseWithSwapEvent
-              ? "Close"
-              : "Other action",
+      if (e instanceof TradeEvent){
+        return  {
+          hash: e.txHash,
+          etherscanTxUrl: `${etherscanUrl}/tx/${e.txHash}`,
+          age: e.timeStamp,
+          account: e.user,
+          etherscanAddressUrl: `${etherscanUrl}/address/${e.user}`,
+          quantity: e.positionSize.div(10 ** 18),
+          action: "Open Margin Loan"
+        } as ITxRowProps
+      }else if (e instanceof CloseWithSwapEvent){
+        return {
+          hash: e.txHash,
+          etherscanTxUrl: `${etherscanUrl}/tx/${e.txHash}`,
+          age: e.timeStamp,
+          account: e.user,
+          etherscanAddressUrl: `${etherscanUrl}/address/${e.user}`,
+          quantity: e.loanCloseAmount.div(10 ** 18),
+          action: "Repay Margin Loan"
+        } as ITxRowProps
+      }else if (e instanceof LiquidationEvent){
+        return {
+          hash: e.txHash,
+          etherscanTxUrl: `${etherscanUrl}/tx/${e.txHash}`,
+          age: e.timeStamp,
+          account: e.user,
+          etherscanAddressUrl: `${etherscanUrl}/address/${e.user}`,
+          quantity: e.repayAmount.div(10 ** 18),
+          action: "Liquidate Margin Loan"
+        } as ITxRowProps
+      }else if (e instanceof CloseWithDepositEvent){
+        return {
+          hash: e.txHash,
+          etherscanTxUrl: `${etherscanUrl}/tx/${e.txHash}`,
+          age: e.timeStamp,
+          account: e.user,
+          etherscanAddressUrl: `${etherscanUrl}/address/${e.user}`,
+          quantity: e.repayAmount.div(10 ** 18),
+          action: "Repay Torque Loan"
+        } as ITxRowProps
+      }else if (e instanceof BorrowEvent){
+        return {
+          hash: e.txHash,
+          etherscanTxUrl: `${etherscanUrl}/tx/${e.txHash}`,
+          age: e.timeStamp,
+          account: e.user,
+          etherscanAddressUrl: `${etherscanUrl}/address/${e.user}`,
+          quantity: e.newPrincipal.div(10 ** 18),
+          action: "Borrow Torque Loan"
+        } as ITxRowProps
+      }else if (e instanceof BurnEvent){
+        return {
+          hash: e.txHash,
+          etherscanTxUrl: `${etherscanUrl}/tx/${e.txHash}`,
+          age: e.timeStamp,
+          account: e.burner,
+          etherscanAddressUrl: `${etherscanUrl}/address/${e.burner}`,
+          quantity: e.assetAmount.div(10 ** 18),
+          action: "Burn Token"
+        } as ITxRowProps
+      }else {
+        return {
+          hash: e.txHash,
+          etherscanTxUrl: `${etherscanUrl}/tx/${e.txHash}`,
+          age: e.timeStamp,
+          account: e.minter,
+          etherscanAddressUrl: `${etherscanUrl}/address/${e.minter}`,
+          quantity: e.assetAmount.div(10 ** 18),
+          action: "Mint iToken"
+        }
       }
     });
   }
