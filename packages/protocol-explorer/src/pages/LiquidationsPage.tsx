@@ -275,7 +275,7 @@ export class LiquidationsPage extends Component<{}, ILiquidationsPageState> {
             <div className="flex">
               <div className="liquidation-data">
                 <div className="liquidation-data-title">30-days Volume</div>
-                <div className="liquidation-data-value"><span className="sign">$</span>554,456,945.09</div>
+                <div className="liquidation-data-value"><span className="sign sign-currency">$</span>554,456,945.09</div>
               </div>
               <div className="liquidation-data">
                 <div className="liquidation-data-title">30-days Transactions Count</div>
@@ -314,11 +314,11 @@ export class LiquidationsPage extends Component<{}, ILiquidationsPageState> {
               </div>
               <div className="w-55 flex fd-c ai-c">
                 <div className="flex w-100 mb-15">
-                  <div className="unhealthy">Unhealthy&nbsp;<span className="sign">$</span>&nbsp;</div>
+                  <div className="unhealthy">Unhealthy&nbsp;<span className="sign sign-currency">$</span>&nbsp;</div>
                   <span className="unhealthy-value unhealthy-color">0.1</span>
                 </div>
                 <div className="flex w-100">
-                  <div className="healthy">Healthy&nbsp;<span className="sign">$</span>&nbsp;</div>
+                  <div className="healthy">Healthy&nbsp;<span className="sign sign-currency">$</span>&nbsp;</div>
                   <span className="healthy-value healthy-color">100m</span>
                 </div>
               </div>
@@ -348,7 +348,7 @@ export class LiquidationsPage extends Component<{}, ILiquidationsPageState> {
       const bodyLines = tooltip.body.map(getBody);
       let innerHtml = `<tbody style="padding: 20px 25px">`;
       bodyLines.forEach(function (body: any) {
-        innerHtml += `<tr><td class="chartjs-bar-tooltip-value"><span class="circle" style="background-color: ${body.bgColor}"></span><span><span class="sign">$</span>${body.label}</span></td></tr>`;
+        innerHtml += `<tr><td class="chartjs-bar-tooltip-value"><span class="circle" style="background-color: ${body.bgColor}"></span><span><span class="sign sign-currency">$</span>${body.label}</span></td></tr>`;
       });
       innerHtml += '</tbody>';
       const tableRoot = tooltipEl.querySelector('table') as HTMLElement;
