@@ -6,23 +6,23 @@ export class CloseWithSwapEvent {
   public readonly user: string; //indexed 
   public readonly lender: string;//indexed 
   public readonly loanId: string;//indexed 
-  public readonly baseToken: Asset; 
-  public readonly quoteToken: Asset; 
+  public readonly collateralToken: Asset; 
+  public readonly loanToken: Asset; 
   public readonly closer: string;
   public readonly positionCloseSize: BigNumber;
   public readonly loanCloseAmount: BigNumber;
-  public readonly exitPrice: BigNumber;// one unit of baseToken, denominated in quoteToken
+  public readonly exitPrice: BigNumber;// one unit of loanToken, denominated in collateralToken
   public readonly currentLeverage: BigNumber;
   public readonly timeStamp: Date;
   public readonly txHash: string;
 
   constructor(
     user: string,
-    baseToken: Asset,
-    quoteToken: Asset,
     lender: string,
-    closer: string,
     loanId: string,
+    collateralToken: Asset,
+    loanToken: Asset,
+    closer: string,
     positionCloseSize: BigNumber,
     loanCloseAmount: BigNumber,
     exitPrice: BigNumber,
@@ -31,8 +31,8 @@ export class CloseWithSwapEvent {
     txHash: string
   ) {
     this.user = user;
-    this.baseToken = baseToken;
-    this.quoteToken = quoteToken;
+    this.loanToken = loanToken;
+    this.collateralToken = collateralToken;
     this.lender = lender;
     this.closer = closer;
     this.loanId = loanId;
