@@ -337,6 +337,72 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
     })
     return result.filter(e => e)
   }
+  
+  public getBurnHistory = async (): Promise<BurnEvent[]> => {
+    let result: BurnEvent[] = [];
+    const bzxContractAddress = this.contractsSource.getITokenContract(this.state.asset);
+    if (!bzxContractAddress) return result
+    const etherscanApiKey = configProviders.Etherscan_Api;
+    let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${BurnEvent.topic0}&apikey=${etherscanApiKey}`
+    const tradeEventResponse = await fetch(etherscanApiUrl);
+    const tradeEventResponseJson = await tradeEventResponse.json();
+    if (tradeEventResponseJson.status !== "1") return result;
+    const events = tradeEventResponseJson.result;
+    //@ts-ignore
+    result = events.reverse().map(event => {
+      const burner = event.topics[1].replace("0x000000000000000000000000", "0x");
+      const data = event.data.replace("0x", "");
+      const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
+      if (!dataSegments) return result;
+      const tokenAmount = new BigNumber(parseInt(dataSegments[0], 16));
+      const assetAmount = new BigNumber(parseInt(dataSegments[1], 16));
+      const price = new BigNumber(parseInt(dataSegments[2], 16));
+      const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000);
+      const txHash = event.transactionHash;
+      return new BurnEvent(
+        burner,
+        tokenAmount,
+        assetAmount,
+        price,
+        timeStamp,
+        txHash
+      )
+    })
+    return result.filter(e => e)
+  }
+  
+  public getMintHistory = async (): Promise<MintEvent[]> => {
+    let result: MintEvent[] = [];
+    const bzxContractAddress = this.contractsSource.getITokenContract(this.state.asset);
+    if (!bzxContractAddress) return result
+    const etherscanApiKey = configProviders.Etherscan_Api;
+    let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${MintEvent.topic0}&apikey=${etherscanApiKey}`
+    const tradeEventResponse = await fetch(etherscanApiUrl);
+    const tradeEventResponseJson = await tradeEventResponse.json();
+    if (tradeEventResponseJson.status !== "1") return result;
+    const events = tradeEventResponseJson.result;
+    //@ts-ignore
+    result = events.reverse().map(event => {
+      const minter = event.topics[1].replace("0x000000000000000000000000", "0x");
+      const data = event.data.replace("0x", "");
+      const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
+      if (!dataSegments) return result;
+      const tokenAmount = new BigNumber(parseInt(dataSegments[0], 16));
+      const assetAmount = new BigNumber(parseInt(dataSegments[1], 16));
+      const price = new BigNumber(parseInt(dataSegments[2], 16));
+      const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000);
+      const txHash = event.transactionHash;
+      return new MintEvent(
+        minter,
+        tokenAmount,
+        assetAmount,
+        price,
+        timeStamp,
+        txHash
+      )
+    })
+    return result.filter(e => e)
+  }
 
   public getGridItems = (events: (LiquidationEvent | TradeEvent | CloseWithSwapEvent | BorrowEvent | BurnEvent | MintEvent | CloseWithDepositEvent)[]): ITxRowProps[] => {
     if (events.length === 0) return [];
@@ -350,7 +416,7 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
           account: e.user,
           etherscanAddressUrl: `${etherscanUrl}/address/${e.user}`,
           quantity: e.positionSize.div(10 ** 18),
-          action: "Open Margin Loan"
+          action: "Open Fulcrum Loan"
         } as ITxRowProps
       }else if (e instanceof CloseWithSwapEvent){
         return {
@@ -360,7 +426,7 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
           account: e.user,
           etherscanAddressUrl: `${etherscanUrl}/address/${e.user}`,
           quantity: e.loanCloseAmount.div(10 ** 18),
-          action: "Repay Margin Loan"
+          action: "Close Fulcrum Loan"
         } as ITxRowProps
       }else if (e instanceof LiquidationEvent){
         return {
@@ -370,7 +436,7 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
           account: e.user,
           etherscanAddressUrl: `${etherscanUrl}/address/${e.user}`,
           quantity: e.repayAmount.div(10 ** 18),
-          action: "Liquidate Margin Loan"
+          action: "Liquidate Fulcrum Loan"
         } as ITxRowProps
       }else if (e instanceof CloseWithDepositEvent){
         return {
@@ -380,7 +446,7 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
           account: e.user,
           etherscanAddressUrl: `${etherscanUrl}/address/${e.user}`,
           quantity: e.repayAmount.div(10 ** 18),
-          action: "Repay Torque Loan"
+          action: "Close Torque Loan"
         } as ITxRowProps
       }else if (e instanceof BorrowEvent){
         return {
@@ -390,7 +456,7 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
           account: e.user,
           etherscanAddressUrl: `${etherscanUrl}/address/${e.user}`,
           quantity: e.newPrincipal.div(10 ** 18),
-          action: "Borrow Torque Loan"
+          action: "Open Torque Loan"
         } as ITxRowProps
       }else if (e instanceof BurnEvent){
         return {

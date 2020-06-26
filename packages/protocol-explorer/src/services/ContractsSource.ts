@@ -4,6 +4,7 @@ import { Asset } from "../domain/Asset";
 
 import { erc20Contract } from "../contracts/erc20";
 import { iBZxContract } from "../contracts/iBZxContract";
+import { iTokenContract } from "../contracts/iTokenContract";
 
 const ethNetwork = process.env.REACT_APP_ETH_NETWORK;
 
@@ -24,6 +25,7 @@ export class ContractsSource {
   private static iTokensContractInfos: Map<string, ITokenContractInfo> = new Map<string, ITokenContractInfo>();
 
   private static erc20Json: any;
+  private static iTokenJson: any;
   private static iBZxJson: any;
 
   public networkId: number;
@@ -36,10 +38,46 @@ export class ContractsSource {
     if (ContractsSource.isInit) {
       return;
     }
+
+    ContractsSource.iTokenJson = await import(`./../assets/artifacts/${ethNetwork}/iToken.json`);
     ContractsSource.erc20Json = await import(`./../assets/artifacts/${ethNetwork}/erc20.json`);
     ContractsSource.iBZxJson = await import(`./../assets/artifacts/${ethNetwork}/iBZx.json`);
 
+    const iTokenList = (await import(`../assets/artifacts/${ethNetwork}/iTokenList.js`)).iTokenList;
+
+    
+    iTokenList.forEach((val: any, index: any) => {
+        // tslint:disable:no-console
+        // console.log(val);
+        const t = {
+          token: val[1],
+          asset: val[2],
+          name: val[3],
+          symbol: val[4],
+          index: new BigNumber(index),
+          version: parseInt(val[5], 10)
+        };
+        // tslint:disable:no-console
+        // console.log(t);
+  
+        ContractsSource.iTokensContractInfos.set(val[4], t);
+      });
+      
     ContractsSource.isInit = true;
+  }
+
+  private async getITokenContractRaw(asset: Asset): Promise<iTokenContract | null> {
+    await this.Init();
+    let symbol;
+    if (asset === Asset.WETH) {
+      symbol = `iETH`;
+    } else if (asset === Asset.CHAI) {
+      symbol = `iDAI`;
+    } else {
+      symbol = `i${asset}`;
+    }
+    const tokenContractInfo = ContractsSource.iTokensContractInfos.get(symbol) || null;
+    return tokenContractInfo ? new iTokenContract(ContractsSource.iTokenJson.abi, tokenContractInfo.token, this.provider) : null;
   }
 
   public getiBZxAddress(): string {
@@ -184,5 +222,6 @@ export class ContractsSource {
 
   public getErc20Contract = _.memoize(this.getErc20ContractRaw);
   public getAssetFromAddress = _.memoize(this.getAssetFromAddressRaw);
+  public getITokenContract = _.memoize(this.getITokenContractRaw);
   public getiBZxContract = _.memoize(this.getiBZxContractRaw);
 }
