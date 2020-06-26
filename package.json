@@ -28,7 +28,10 @@
     "build-torque-kovan": "cross-env-shell REACT_APP_ETH_NETWORK=kovan \"./scripts/build-torque.sh\"",
     "build-torque-ropsten": "cross-env-shell REACT_APP_ETH_NETWORK=ropsten \"./scripts/build-torque.sh\"",
     "build-torque-mainnet": "cross-env-shell REACT_APP_ETH_NETWORK=mainnet \"./scripts/build-torque.sh\"",
-    "build-protocol-explorer": "cross-env-shell REACT_APP_ETH_NETWORK=mainnet \"./scripts/build-protocol-explorer.sh\"",
+    "build-protocol-explorer-rinkeby": "cross-env-shell REACT_APP_ETH_NETWORK=rinkeby \"./scripts/build-protocol-explorer.sh\"",
+    "build-protocol-explorer-kovan": "cross-env-shell REACT_APP_ETH_NETWORK=kovan \"./scripts/build-protocol-explorer.sh\"",
+    "build-protocol-explorer-ropsten": "cross-env-shell REACT_APP_ETH_NETWORK=ropsten \"./scripts/build-protocol-explorer.sh\"",
+    "build-protocol-explorer-mainnet": "cross-env-shell REACT_APP_ETH_NETWORK=mainnet \"./scripts/build-protocol-explorer.sh\"",
     "build-fulcrum-api": "cross-env-shell \"./scripts/build-fulcrum-api.sh\""
   }
 }
