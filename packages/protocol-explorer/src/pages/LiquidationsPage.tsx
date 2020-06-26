@@ -9,6 +9,7 @@ import { TxGrid } from "../components/TxGrid";
 import { Asset } from "../domain/Asset";
 import { Bar } from "react-chartjs-2";
 import { Search } from "../components/Search";
+import { UnhealthyChart } from "../components/UnhealthyChart";
 
 
 
@@ -53,9 +54,9 @@ const initialNetworkId = getNetworkIdByString(networkName);
 
 interface ILiquidationsPageState {
   events: ITxRowProps[]
-  daiDataset: ({x: string, y: number})[]
-  ethDataset: ({x: string, y: number})[]
-  usdcDataset: ({x: string, y: number})[]
+  daiDataset: ({ x: string, y: number })[]
+  ethDataset: ({ x: string, y: number })[]
+  usdcDataset: ({ x: string, y: number })[]
 }
 export class LiquidationsPage extends Component<{}, ILiquidationsPageState> {
   constructor(props: any) {
@@ -302,6 +303,26 @@ export class LiquidationsPage extends Component<{}, ILiquidationsPageState> {
         <section className="pt-90">
           <div className="container">
             <TxGrid events={this.state.events} />
+          </div>
+        </section>
+        <section className="pt-75">
+          <div className="container">
+            <h2 className="h1 mb-60">Unhealthy Loans</h2>
+            <div className="flex ai-c">
+              <div className="w-45">
+                <UnhealthyChart />
+              </div>
+              <div className="w-55 flex fd-c ai-c">
+                <div className="flex w-100 mb-15">
+                  <div className="unhealthy">Unhealthy&nbsp;<span className="sign">$</span>&nbsp;</div>
+                  <span className="unhealthy-value unhealthy-color">0.1</span>
+                </div>
+                <div className="flex w-100">
+                  <div className="healthy">Healthy&nbsp;<span className="sign">$</span>&nbsp;</div>
+                  <span className="healthy-value healthy-color">100m</span>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
       </React.Fragment>

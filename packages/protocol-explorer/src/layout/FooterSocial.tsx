@@ -19,10 +19,10 @@ export const FooterSocial = () => {
         <LogoBzx />
       </div>
       <div className="flex data-year">
-        <p className="light-gray">© {new Date().getFullYear()} bZeroX, LLC</p>
+        <p className="light-gray-color">© {new Date().getFullYear()} bZeroX, LLC</p>
         <div className="flex">
-          <a href="/tos" className="green">Terms of use</a>
-          <a href="/privacy" className="green">Privacy policy</a>
+          <a href="/tos" className="green-color">Terms of use</a>
+          <a href="/privacy" className="green-color">Privacy policy</a>
         </div>
       </div>
     </div>

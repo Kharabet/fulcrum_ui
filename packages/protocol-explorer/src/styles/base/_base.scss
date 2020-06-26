@@ -51,25 +51,13 @@ a {
 .bg-gradient {
     background: linear-gradient(360deg, #edf5ff 0%, #ffffff 100%);
 }
-.liquidation-data {
-    &:first-child {
-        margin-right: 65px;
-    }
-    .liquidation-data-title {
-        font-size: 14px;
-        font-weight: 700;
-        line-height: 1.2;
-        color: #8992a4;
-        margin-bottom: 8px;
-    }
-    .liquidation-data-value {
-        font-size: 30px;
-        font-weight: 900;
-        line-height: 1.2;
-        color: #283038;
-        .sign {
-            font-weight: 600;
-            color: #758295;
-        }
-    }
+
+.w-45 {
+    width: 45%;
+}
+.w-55 {
+    width: 55%;
+}
+.w-100 {
+    width: 100%;
 }
