@@ -43,7 +43,7 @@ export class CollateralTokenSelector extends Component<ICollateralTokenSelectorP
     } else if (process.env.REACT_APP_ETH_NETWORK === "kovan") {
       this.assets = [
         Asset.ETH,
-        Asset.SAI,
+        Asset.KNC,
         Asset.DAI,
       ];
     } else if (process.env.REACT_APP_ETH_NETWORK === "ropsten") {

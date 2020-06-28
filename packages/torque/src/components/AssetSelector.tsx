@@ -31,7 +31,7 @@ export class AssetSelector extends Component<IAssetSelectorProps> {
       ];
     } else if (process.env.REACT_APP_ETH_NETWORK === "kovan") {
       this.assetsShown = [
-        Asset.SAI,
+        Asset.KNC,
         Asset.DAI,
         Asset.ETH,
       ];

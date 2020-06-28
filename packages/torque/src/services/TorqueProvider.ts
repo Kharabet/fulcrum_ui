@@ -1935,7 +1935,7 @@ export class TorqueProvider {
     if (this.contractsSource && this.web3Wrapper) {
       const iTokenContract = await this.contractsSource.getiTokenContract(asset);
       if (iTokenContract) {
-        let borrowRate = await iTokenContract.nextBorrowInterestRateWithOption.callAsync(new BigNumber("0"), true);
+        let borrowRate = await iTokenContract.nextBorrowInterestRate.callAsync(new BigNumber("0"));
         borrowRate = borrowRate.dividedBy(10 ** 18);
 
         /*if (borrowRate.gt(new BigNumber(16))) {

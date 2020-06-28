@@ -1211,13 +1211,9 @@
                 {
                     "name": "borrowAmount",
                     "type": "uint256"
-                },
-                {
-                    "name": "useFixedInterestModel",
-                    "type": "bool"
                 }
             ],
-            "name": "nextBorrowInterestRateWithOption",
+            "name": "nextBorrowInterestRate",
             "outputs": [
                 {
                     "name": "",

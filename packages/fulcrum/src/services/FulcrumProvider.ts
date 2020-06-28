@@ -465,9 +465,7 @@ export class FulcrumProvider {
         try {
           swapRates = (await this.getSwapToUsdRateBatch(
             assets,
-            process.env.REACT_APP_ETH_NETWORK === "mainnet" || process.env.REACT_APP_ETH_NETWORK === "ropsten" ?
-              Asset.DAI :
-              Asset.SAI
+            Asset.DAI
           ))[0];
         } catch (e) {
           //console.log(e);
@@ -1692,9 +1690,7 @@ export class FulcrumProvider {
 
     /*const swapRates = await this.getSwapToUsdRateBatch(
       [asset],
-      process.env.REACT_APP_ETH_NETWORK === "mainnet" ?
-        Asset.DAI :
-        Asset.SAI
+      Asset.DAI
     );
 
     return swapRates[0][0];*/

@@ -959,18 +959,16 @@ export class iTokenContract extends BaseContract {
         }
     };
 
-    public nextBorrowInterestRateWithOption = {
+    public nextBorrowInterestRate = {
         async callAsync(
             borrowAmount: BigNumber,
-            useFixedInterestModel: boolean,
             callData: Partial<CallData> = {},
             defaultBlock?: BlockParam
         ): Promise<BigNumber> {
             callData.from = "0x4abB24590606f5bf4645185e20C4E7B97596cA3B";
             const self = this as any as iTokenContract;
-            const encodedData = self._strictEncodeArguments("nextBorrowInterestRateWithOption(uint256,bool)", [
-                borrowAmount,
-                useFixedInterestModel
+            const encodedData = self._strictEncodeArguments("nextBorrowInterestRate(uint256)", [
+                borrowAmount
             ]);
             const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
                 {
@@ -982,7 +980,7 @@ export class iTokenContract extends BaseContract {
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
             BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
-            const abiEncoder = self._lookupAbiEncoder("nextBorrowInterestRateWithOption(uint256,bool)");
+            const abiEncoder = self._lookupAbiEncoder("nextBorrowInterestRate(uint256)");
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<BigNumber>(rawCallResult);
             // tslint:enable boolean-naming
