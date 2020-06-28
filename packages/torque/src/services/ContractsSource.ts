@@ -68,7 +68,7 @@ export class ContractsSource {
         address = "0xc45755a7cfc9385290e6fece1f040c0453e7b0e5";
         break;
       case 42:
-        address = "0x10fA193fB1d00e3C1033B0BB003AbB5f7a5595bB";
+        address = "0xAbd9372723C735D426D0a760D047206Fe115ee6d";
         break;
     }
 
@@ -88,7 +88,7 @@ export class ContractsSource {
         address = "0xef52dd2d03d7a44f9dda8d450f806fa84571cf84";
         break;
       case 42:
-        address = "0x10fA193fB1d00e3C1033B0BB003AbB5f7a5595bB";
+        address = "0xAbd9372723C735D426D0a760D047206Fe115ee6d";
         break;
     }
 
@@ -120,7 +120,7 @@ export class ContractsSource {
             address = "0x1885a748d7393f5d23db8df01ea3a33f4d85eac5";
             break;
           case 42:
-            address = "0x54be07007c680ba087b3fcd8e675d1c929b6aaf5";
+            address = "0x05C7F7Da84c9A03ACee18dfBb81E850f809d2461";
             break;
         }
         break;
@@ -156,7 +156,7 @@ export class ContractsSource {
             address = "0xb530f422ff1520cbb76a8300e39bd4f55bc03bbc";
             break;
           case 42:
-            address = "0x6c1e2b0f67e00c06c8e2be7dc681ab785163ff4d";// "0x3e37e3f4c3b0b0b5944cc1f366152dea22ef63f9"
+            address = "0x00dECf8146a4296205d00018C372b40DA56a5254";
             break;
         }
         break;
@@ -190,7 +190,7 @@ export class ContractsSource {
             address = "0x1cC9567EA2eB740824a45F8026cCF8e46973234D";
             break;
           case 42:
-            address = "";
+            address = "0x76bA7629Efd02348a4e713007dEDb06eDf5303Ef";
             break;
         }
         break;
@@ -253,7 +253,7 @@ export class ContractsSource {
         address = "0x76de3d406fee6c3316558406b17ff785c978e98c";
         break;
       case 42:
-        address = "0xD59bd0Cd1461605C31E1C88543E4DbA1Bf6fcaEC";
+        address = "0x60c711c8982d2e6f262D14647D7b074323f0ef75";
         break;
     }
 
@@ -347,6 +347,9 @@ export class ContractsSource {
           case "0x75b0622cec14130172eae9cf166b92e5c112faff":
             asset = Asset.USDC;
             break;
+          case "0x76bA7629Efd02348a4e713007dEDb06eDf5303Ef":
+            asset = Asset.KNC;
+            break;
         }
         break;
     }
@@ -428,6 +431,9 @@ export class ContractsSource {
             break;
           case Asset.USDC:
             address = "0x75b0622cec14130172eae9cf166b92e5c112faff";
+            break;
+          case Asset.KNC:
+            address = "0x76bA7629Efd02348a4e713007dEDb06eDf5303Ef";
             break;
         }
         break;
