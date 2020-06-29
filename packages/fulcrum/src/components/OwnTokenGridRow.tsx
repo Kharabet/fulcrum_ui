@@ -64,7 +64,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
   private _isMounted: boolean;
 
   private async derivedUpdate() {
-    
+
     this._isMounted && this.setState({
       ...this.state,
       isLoading: false,
@@ -89,12 +89,12 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
     if (task.status === RequestStatus.FAILED || task.status === RequestStatus.FAILED_SKIPGAS) {
       window.setTimeout(() => {
         FulcrumProvider.Instance.onTaskCancel(task);
-        this.setState({ ...this.state, isLoadingTransaction: false, request: undefined, resultTx: false });
-        this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, true, this.state.resultTx);
+        this.setState({ ...this.state, isLoadingTransaction: false, request: undefined, resultTx: false })
+        this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, false, this.state.resultTx)
       }, 5000)
       return;
     }
-    this.setState({ ...this.state, isLoadingTransaction: false, request: undefined, resultTx: true });
+    this.setState({ ...this.state, resultTx: true });
     this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, true, this.state.resultTx);
   }
 
@@ -113,14 +113,21 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
     FulcrumProvider.Instance.eventEmitter.off(FulcrumProviderEvents.AskToCloseProgressDlg, this.onAskToCloseProgressDlg);
     // FulcrumProvider.Instance.eventEmitter.off(FulcrumProviderEvents.TradeTransactionMined, this.onTradeTransactionMined);
   }
-  public componentWillMount(): void {
-    this.derivedUpdate();
-  }
 
   public componentDidMount(): void {
     this._isMounted = true;
 
     this.derivedUpdate();
+  }
+
+  public componentDidUpdate(prevProps: Readonly<IOwnTokenGridRowProps>, prevState: Readonly<IOwnTokenGridRowState>, snapshot?: any): void {
+    if (this.props.isTxCompleted && prevProps.isTxCompleted !== this.props.isTxCompleted
+    ) {
+      if (this.state.isLoadingTransaction) {
+        this.setState({ ...this.state, isLoadingTransaction: false, request: undefined });
+        this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, false, this.state.resultTx)
+      }
+    }
   }
 
   public render() {
@@ -131,77 +138,77 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
           <TradeTxLoaderStep taskId={this.state.request.loanId} />
         </div>
       </React.Fragment>
-        : <div className={`own-token-grid-row ${this.props.isTxCompleted ? `completed` : ``}`}>
-          <div className="own-token-grid-row__col-token-name  opacityIn">
-            {`${this.props.baseToken.toUpperCase()}`}
-          </div>
-          <div className="own-token-grid-row__col-position-type opacityIn">
-            <span className="position-type-marker">
-              {`${this.props.leverage}x ${this.props.positionType}`}
-            </span>
-          </div>
-          <div title={this.props.quoteToken} className="own-token-grid-row__col-asset-unit opacityIn">
-            {this.props.quoteToken}
-          </div>
-          <div title={this.props.positionValue.toFixed(18)} className="own-token-grid-row__col-position  opacityIn">
-            {this.props.positionValue.toFixed(4)}
-          </div>
-          <div title={this.props.openPrice.toFixed(18)} className="own-token-grid-row__col-asset-price  opacityIn">
+      : <div className={`own-token-grid-row ${this.props.isTxCompleted ? `completed` : ``}`}>
+        <div className="own-token-grid-row__col-token-name  opacityIn">
+          {`${this.props.baseToken.toUpperCase()}`}
+        </div>
+        <div className="own-token-grid-row__col-position-type opacityIn">
+          <span className="position-type-marker">
+            {`${this.props.leverage}x ${this.props.positionType}`}
+          </span>
+        </div>
+        <div title={this.props.quoteToken} className="own-token-grid-row__col-asset-unit opacityIn">
+          {this.props.quoteToken}
+        </div>
+        <div title={this.props.positionValue.toFixed(18)} className="own-token-grid-row__col-position  opacityIn">
+          {this.props.positionValue.toFixed(4)}
+        </div>
+        <div title={this.props.openPrice.toFixed(18)} className="own-token-grid-row__col-asset-price  opacityIn">
+          {!this.state.isLoading
+            ? <React.Fragment>
+              <span className="sign-currency">$</span>{this.props.openPrice.toFixed(2)}
+            </React.Fragment>
+            : <Preloader width="74px" />
+          }
+        </div>
+        <div title={this.props.liquidationPrice.toFixed(18)} className="own-token-grid-row__col-liquidation-price opacityIn">
+          {!this.state.isLoading
+            ? <React.Fragment>
+              <span className="sign-currency">$</span>{this.props.liquidationPrice.toFixed(2)}
+            </React.Fragment>
+            : <Preloader width="74px" />
+          }
+        </div>
+        <div className="own-token-grid-row__col-collateral opacityIn">
+          <div title={this.props.collateral.toFixed(18)} className="own-token-grid-row__col-collateral-wrapper">
             {!this.state.isLoading
               ? <React.Fragment>
-                <span className="sign-currency">$</span>{this.props.openPrice.toFixed(2)}
+                <span><span className="sign-currency">$</span>{this.props.collateral.toFixed(2)}</span>
+                <span className={`own-token-grid-row__col-asset-collateral-small ${this.props.loan.collateralizedPercent.lte(.25) ? "danger" : ""}`}>{this.props.loan.collateralizedPercent.multipliedBy(100).plus(100).toFixed(2)}%</span>
               </React.Fragment>
               : <Preloader width="74px" />
             }
           </div>
-          <div title={this.props.liquidationPrice.toFixed(18)} className="own-token-grid-row__col-liquidation-price opacityIn">
-            {!this.state.isLoading
-              ? <React.Fragment>
-                <span className="sign-currency">$</span>{this.props.liquidationPrice.toFixed(2)}
-              </React.Fragment>
-              : <Preloader width="74px" />
-            }
-          </div>
-          <div className="own-token-grid-row__col-collateral opacityIn">
-            <div title={this.props.collateral.toFixed(18)} className="own-token-grid-row__col-collateral-wrapper">
-              {!this.state.isLoading
-                ? <React.Fragment>
-                  <span><span className="sign-currency">$</span>{this.props.collateral.toFixed(2)}</span>
-                  <span className={`own-token-grid-row__col-asset-collateral-small ${this.props.loan.collateralizedPercent.lte(.25) ? "danger" : ""}`}>{this.props.loan.collateralizedPercent.multipliedBy(100).plus(100).toFixed(2)}%</span>
-                </React.Fragment>
-                : <Preloader width="74px" />
-              }
-            </div>
-            <div className="own-token-grid-row__open-manage-collateral" onClick={this.onManageClick}>
-              <OpenManageCollateral />
-            </div>
-          </div>
-          <div title={this.props.value.toFixed(18)} className="own-token-grid-row__col-position-value opacityIn">
-            {!this.state.isLoading
-              ? this.props.value
-                ? <React.Fragment>
-                  <span className="sign-currency">$</span>{this.props.value.toFixed(2)}
-                </React.Fragment>
-                : '$0.00'
-              : <Preloader width="74px" />
-            }
-          </div>
-          <div title={this.props.profit.toFixed(18)} className="own-token-grid-row__col-profit opacityIn">
-            {!this.state.isLoading
-              ? this.props.profit
-                ? <React.Fragment>
-                  <span><span className="sign-currency">$</span>{this.props.profit.toFixed(2)}</span>
-                </React.Fragment>
-                : '$0.00'
-              : <Preloader width="74px" />
-            }
-          </div>
-          <div className="own-token-grid-row__col-action opacityIn rightIn">
-            <button className="own-token-grid-row_button own-token-grid-row__sell-button own-token-grid-row__button--size-half" onClick={this.onSellClick}>
-              {TradeType.SELL}
-            </button>
+          <div className="own-token-grid-row__open-manage-collateral" onClick={this.onManageClick}>
+            <OpenManageCollateral />
           </div>
         </div>
+        <div title={this.props.value.toFixed(18)} className="own-token-grid-row__col-position-value opacityIn">
+          {!this.state.isLoading
+            ? this.props.value
+              ? <React.Fragment>
+                <span className="sign-currency">$</span>{this.props.value.toFixed(2)}
+              </React.Fragment>
+              : '$0.00'
+            : <Preloader width="74px" />
+          }
+        </div>
+        <div title={this.props.profit.toFixed(18)} className="own-token-grid-row__col-profit opacityIn">
+          {!this.state.isLoading
+            ? this.props.profit
+              ? <React.Fragment>
+                <span><span className="sign-currency">$</span>{this.props.profit.toFixed(2)}</span>
+              </React.Fragment>
+              : '$0.00'
+            : <Preloader width="74px" />
+          }
+        </div>
+        <div className="own-token-grid-row__col-action opacityIn rightIn">
+          <button className="own-token-grid-row_button own-token-grid-row__sell-button own-token-grid-row__button--size-half" onClick={this.onSellClick}>
+            {TradeType.SELL}
+          </button>
+        </div>
+      </div>
     )
   }
 

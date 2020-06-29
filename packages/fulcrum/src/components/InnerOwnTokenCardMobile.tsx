@@ -19,8 +19,27 @@ import { RequestTask } from "../domain/RequestTask";
 import { CircleLoader } from "./CircleLoader";
 import { TradeTxLoaderStep } from "./TradeTxLoaderStep";
 import { IOwnTokenGridRowProps } from "./OwnTokenGridRow";
+import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
 
 
+export interface IInnerOwnTokenGridRowProps {
+  loan: IBorrowedFundsState;
+  baseToken: Asset;
+  quoteToken: Asset;
+  leverage: number;
+  positionType: PositionType;
+  positionValue: BigNumber;
+  value: BigNumber;
+  collateral: BigNumber;
+  openPrice: BigNumber;
+  liquidationPrice: BigNumber;
+  profit: BigNumber;
+  isTxCompleted: boolean;
+  onTrade: (request: TradeRequest) => void;
+  onManageCollateralOpen: (request: ManageCollateralRequest) => void;
+  changeLoadingTransaction: (isLoadingTransaction: boolean, request: TradeRequest | undefined, isTxCompleted: boolean, resultTx: boolean) => void;
+
+}
 
 interface IInnerOwnTokenCardMobileState {
   isLoading: boolean;
@@ -94,12 +113,12 @@ export class InnerOwnTokenCardMobile extends Component<IOwnTokenGridRowProps, II
       window.setTimeout(() => {
         FulcrumProvider.Instance.onTaskCancel(task);
         this.setState({ ...this.state, isLoadingTransaction: false, request: undefined, resultTx: false })
-        this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, true, this.state.resultTx)
+        this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, false, this.state.resultTx)
       }, 5000)
       return;
     }
-    this.setState({ ...this.state, isLoadingTransaction: false, request: undefined, resultTx: true });
-    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, true, this.state.resultTx)
+    this.setState({ ...this.state, resultTx: true });
+    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, true, this.state.resultTx);
   }
 
   /*private onTradeTransactionMined = async (event: TradeTransactionMinedEvent) => {
@@ -114,8 +133,16 @@ export class InnerOwnTokenCardMobile extends Component<IOwnTokenGridRowProps, II
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
   }
-  public componentWillMount(): void {
-    this.derivedUpdate();
+
+  public componentDidUpdate(prevProps: Readonly<IInnerOwnTokenGridRowProps>, prevState: Readonly<IInnerOwnTokenCardMobileState>, snapshot?: any): void {
+    if (this.props.isTxCompleted && prevProps.isTxCompleted !== this.props.isTxCompleted
+    ) {
+      this.derivedUpdate();
+      if (this.state.isLoadingTransaction) {
+        this.setState({ ...this.state, isLoadingTransaction: false, request: undefined });
+        this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, false, this.state.resultTx)
+      }
+    }
   }
 
   public componentDidMount(): void {

@@ -17,7 +17,27 @@ import { RequestStatus } from "../domain/RequestStatus";
 import { CircleLoader } from "./CircleLoader";
 import { TradeTxLoaderStep } from "./TradeTxLoaderStep";
 import { IOwnTokenGridRowProps } from "./OwnTokenGridRow";
+import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
 
+
+export interface IInnerOwnTokenGridRowProps {
+  loan: IBorrowedFundsState;
+  baseToken: Asset;
+  quoteToken: Asset;
+  leverage: number;
+  positionType: PositionType;
+  positionValue: BigNumber;
+  value: BigNumber;
+  collateral: BigNumber;
+  openPrice: BigNumber;
+  liquidationPrice: BigNumber;
+  profit: BigNumber;
+  isTxCompleted: boolean;
+  onTrade: (request: TradeRequest) => void;
+  onManageCollateralOpen: (request: ManageCollateralRequest) => void;
+  changeLoadingTransaction: (isLoadingTransaction: boolean, request: TradeRequest | undefined, isTxCompleted: boolean, resultTx: boolean) => void;
+
+}
 
 interface IOwnTokenCardMobileState {
   isLoading: boolean;
@@ -40,7 +60,7 @@ export class OwnTokenCardMobile extends Component<IOwnTokenGridRowProps, IOwnTok
       request: undefined,
       valueChange: new BigNumber(0),
       baseTokenPrice: new BigNumber(0),
-      resultTx: false
+      resultTx: false,
     };
 
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
@@ -67,6 +87,7 @@ export class OwnTokenCardMobile extends Component<IOwnTokenGridRowProps, IOwnTok
       openValue = this.props.loan.loanData!.principal.div(10 ** 18).times(this.props.openPrice);
       valueChange = (this.props.value.minus(openValue)).div(openValue).times(100);
     }
+
     this._isMounted && this.setState({
       ...this.state,
       baseTokenPrice,
@@ -99,14 +120,15 @@ export class OwnTokenCardMobile extends Component<IOwnTokenGridRowProps, IOwnTok
     if (task.status === RequestStatus.FAILED || task.status === RequestStatus.FAILED_SKIPGAS) {
       window.setTimeout(() => {
         FulcrumProvider.Instance.onTaskCancel(task);
-        this.setState({ ...this.state, isLoadingTransaction: false, request: undefined, resultTx: false });
-        this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, true, this.state.resultTx);
+        this.setState({ ...this.state, isLoadingTransaction: false, request: undefined, resultTx: false })
+        this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, false, this.state.resultTx)
       }, 5000)
       return;
     }
-    this.setState({ ...this.state, isLoadingTransaction: false, request: undefined, resultTx: true });
+    this.setState({ ...this.state, resultTx: true });
     this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, true, this.state.resultTx);
   }
+
   public componentWillUnmount(): void {
     this._isMounted = false;
 
@@ -122,6 +144,17 @@ export class OwnTokenCardMobile extends Component<IOwnTokenGridRowProps, IOwnTok
 
     this.derivedUpdate();
   }
+
+  public componentDidUpdate(prevProps: Readonly<IOwnTokenGridRowProps>, prevState: Readonly<IOwnTokenCardMobileState>, snapshot?: any): void {
+    if (this.props.isTxCompleted && prevProps.isTxCompleted !== this.props.isTxCompleted
+    ) {
+      if (this.state.isLoadingTransaction) {
+        this.setState({ ...this.state, isLoadingTransaction: false, request: undefined });
+        this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, false, this.state.resultTx)
+      }
+    }
+  }
+
   public render() {
     return (
       <React.Fragment>
