@@ -23,19 +23,21 @@ export class TxGrid extends Component<ITxGridProps, ITxGridState> {
       .map((e: ITxRowProps) => <TxRow key={e.hash} {...e} />);
     return (
       <React.Fragment>
-        <div className="table table-tx">
-          <div className="table-header table-header-tx">
-            <div className="table-header-tx__hash">Txn Hash</div>
-            <div className="table-header-tx__age" onClick={this.sortAge}>
-              <span>Age</span>
-              <IconSort sort={this.state.typeSort} />
+        {this.props.events.length !== 0 &&
+          <div className="table table-tx">
+            <div className="table-header table-header-tx">
+              <div className="table-header-tx__hash">Txn Hash</div>
+              <div className="table-header-tx__age" onClick={this.sortAge}>
+                <span>Age</span>
+                <IconSort sort={this.state.typeSort} />
+              </div>
+              <div className="table-header-tx__from">From</div>
+              <div className="table-header-tx__quantity">Quantity</div>
+              <div className="table-header-tx__action">Action</div>
             </div>
-            <div className="table-header-tx__from">From</div>
-            <div className="table-header-tx__quantity">Quantity</div>
-            <div className="table-header-tx__action">Action</div>
+            {assetItems}
           </div>
-          {assetItems}
-        </div>
+        }
       </React.Fragment>
     );
   }
