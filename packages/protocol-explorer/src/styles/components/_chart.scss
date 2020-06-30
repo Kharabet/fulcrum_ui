@@ -218,3 +218,38 @@
     }
   }
 }
+.wrapper-chartjs-doughnut {
+  position: relative;
+  #chartjs-doughnut-tooltip {
+    font-family: "Muli", sans-serif;
+
+    background-color: rgb(40, 48, 73);
+    color: #ffffff;
+    border-radius: 4px;
+    font-size: 12px;
+    position: relative;
+
+    tbody {
+      display: flex;
+      width: 210px;
+      max-width: 210px;
+
+      &:after {
+        right: 100%;
+        top: 50%;
+        border: solid transparent;
+        content: " ";
+        height: 0;
+        width: 0;
+        position: absolute;
+        pointer-events: none;
+        border-right-color: rgb(40, 48, 73);
+        border-width: 8px;
+        margin-top: -8px;
+      }
+      .value {
+        color: $healthy-color;
+      }
+    }
+  }
+}
