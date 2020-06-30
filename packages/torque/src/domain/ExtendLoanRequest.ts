@@ -1,19 +1,19 @@
 import { BigNumber } from "@0x/utils";
 import { Asset } from "./Asset";
-import { IWalletDetails } from "./IWalletDetails";
+import moment from "moment";
 
 export class ExtendLoanRequest {
-  public walletDetails: IWalletDetails;
+  public id: number;
   public borrowAsset: Asset;
   public accountAddress: string;
-  public loanOrderHash: string;
+  public loanId: string;
   public depositAmount: BigNumber;
 
-  constructor(walletDetails: IWalletDetails, borrowAsset: Asset, accountAddress: string, loanOrderHash: string, depositAmount: BigNumber) {
-    this.walletDetails = walletDetails;
+  constructor(borrowAsset: Asset, accountAddress: string, loanId: string, depositAmount: BigNumber) {
+    this.id = moment().unix() + Math.floor(Math.random() * 10);
     this.borrowAsset = borrowAsset;
     this.accountAddress = accountAddress;
-    this.loanOrderHash = loanOrderHash;
+    this.loanId = loanId;
     this.depositAmount = depositAmount;
   }
 }

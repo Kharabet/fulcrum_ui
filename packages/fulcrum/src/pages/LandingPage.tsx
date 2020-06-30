@@ -1,18 +1,17 @@
 import React, { PureComponent } from "react";
 import { Link } from "react-router-dom";
-import { Footer } from "../layout/Footer";
-import { HeaderHome } from "../layout/HeaderHome";
+import "../styles/landing.scss";
 
 export interface ILandingPageProps {
   isMobileMedia: boolean;
   isRiskDisclosureModalOpen: () => void;
 }
 
-export class LandingPage extends PureComponent<ILandingPageProps> {
+export default class LandingPage extends PureComponent<ILandingPageProps> {
   public render() {
     return (
       <div className="landing-page">
-        <HeaderHome />
+        
         <main className="landing-page__main">
           <div className="landing-page__jumbo">
             <h1><span className="landing-page__jumbo-header">Margin made simple</span></h1>
@@ -30,8 +29,8 @@ export class LandingPage extends PureComponent<ILandingPageProps> {
             </div>
           </div>
         </main>
-        <Footer isMobileMedia={this.props.isMobileMedia} isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
       </div>
+
     );
   }
 

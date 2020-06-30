@@ -1,0 +1,98 @@
+.input-container {
+  background-color: #f5f7f9;
+  border: 2px solid #e7ebf0;
+  border-radius: 4px;
+  padding: 15px;
+  .input-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    margin-bottom: 15px;
+    height: 72px;
+
+    .input-amount {
+      font-size: 42px;
+      line-height: 1.5;
+      font-weight: 900;
+      color: #283049;
+      background-color: transparent;
+      border: none;
+      text-align: center;
+      width: calc(100% - 80px);
+      position: relative;
+      &::-webkit-outer-spin-button,
+      &::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+      &[type="number"] {
+        -moz-appearance: textfield;
+      }
+    }
+    .asset-icon {
+      display: flex;
+      border: 3px solid #ffffff;
+      border-radius: 50%;
+      position: absolute;
+      left: 0;
+      svg {
+        width: 36px;
+        height: auto;
+      }
+    }
+  }
+
+  .interest-group-button {
+    display: flex;
+    flex-wrap: wrap;
+    .interest-button {
+      border: 2px solid transparent;
+      width: calc(100% / 4 - 6px);
+      background-color: #ffffff;
+      font-style: normal;
+      font-weight: 400;
+      font-size: 14px;
+      line-height: 1.5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #758295;
+      border-radius: 40px;
+      padding: 6px 0;
+      &:not(:last-child) {
+        margin-right: 8px;
+      }
+      &:hover {
+        color: #5b88ff;
+        border-color: #5b88ff;
+        cursor: pointer;
+      }
+    }
+  }
+}
+@media screen and (max-width: $mobile-version-max-width) {
+  .input-container {
+    .input-row {
+      .input-amount {
+        font-size: 36px;
+        &::placeholder {
+          font-size: 24px;
+          transform: translate(0, -4px);
+        }
+      }
+      .asset-icon {
+        svg {
+          width: 30px;
+        }
+      }
+    }
+
+    .interest-group-button {
+      .interest-button {
+        font-size: 12px;
+        padding: 4px 0;
+      }
+    }
+  }
+}

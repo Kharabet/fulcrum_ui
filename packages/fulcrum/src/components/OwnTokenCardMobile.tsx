@@ -1,127 +1,142 @@
 import { BigNumber } from "@0x/utils";
 import React, { Component } from "react";
 import { Asset } from "../domain/Asset";
-import { AssetDetails } from "../domain/AssetDetails";
-import { AssetsDictionary } from "../domain/AssetsDictionary";
-import { IPriceDataPoint } from "../domain/IPriceDataPoint";
-import { ManageCollateralRequest } from "../domain/ManageCollateralRequest";
 import { PositionType } from "../domain/PositionType";
 import { TradeRequest } from "../domain/TradeRequest";
-import { TradeTokenKey } from "../domain/TradeTokenKey";
 import { TradeType } from "../domain/TradeType";
 import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
-import { TradeTransactionMinedEvent } from "../services/events/TradeTransactionMinedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
-import { PositionTypeMarker } from "./PositionTypeMarker";
-import { PositionTypeMarkerAlt } from "./PositionTypeMarkerAlt";
-// import { Change24HMarker, Change24HMarkerSize } from "./Change24HMarker";
 import { Preloader } from "./Preloader";
+import { ReactComponent as OpenManageCollateral } from "../assets/images/openManageCollateral.svg";
+import { ManageCollateralRequest } from "../domain/ManageCollateralRequest";
+
+import "../styles/components/own-token-card-mobile.scss";
+import { RequestTask } from "../domain/RequestTask";
+import { RequestStatus } from "../domain/RequestStatus";
+import { CircleLoader } from "./CircleLoader";
+import { TradeTxLoaderStep } from "./TradeTxLoaderStep";
+import { IOwnTokenGridRowProps } from "./OwnTokenGridRow";
+import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
 
 
-export interface IOwnTokenCardMobileProps {
-  selectedKey: TradeTokenKey;
-  currentKey: TradeTokenKey;
-
-  // onDetails: (key: TradeTokenKey) => void;
-  // onManageCollateral: (request: ManageCollateralRequest) => void;
-  onSelect: (key: TradeTokenKey) => void;
+export interface IInnerOwnTokenGridRowProps {
+  loan: IBorrowedFundsState;
+  baseToken: Asset;
+  quoteToken: Asset;
+  leverage: number;
+  positionType: PositionType;
+  positionValue: BigNumber;
+  value: BigNumber;
+  collateral: BigNumber;
+  openPrice: BigNumber;
+  liquidationPrice: BigNumber;
+  profit: BigNumber;
+  isTxCompleted: boolean;
   onTrade: (request: TradeRequest) => void;
+  onManageCollateralOpen: (request: ManageCollateralRequest) => void;
+  changeLoadingTransaction: (isLoadingTransaction: boolean, request: TradeRequest | undefined, isTxCompleted: boolean, resultTx: boolean) => void;
+
 }
 
 interface IOwnTokenCardMobileState {
-  assetDetails: AssetDetails | null;
-
-  latestAssetPriceDataPoint: IPriceDataPoint;
-  assetBalance: BigNumber | null;
-  profit: BigNumber | null;
-  pTokenAddress: string;
   isLoading: boolean;
+  isLoadingTransaction: boolean;
+  request: TradeRequest | undefined;
+  valueChange: BigNumber;
+  baseTokenPrice: BigNumber;
+  resultTx: boolean;
+
 }
 
-export class OwnTokenCardMobile extends Component<IOwnTokenCardMobileProps, IOwnTokenCardMobileState> {
-  constructor(props: IOwnTokenCardMobileProps, context?: any) {
+export class OwnTokenCardMobile extends Component<IOwnTokenGridRowProps, IOwnTokenCardMobileState> {
+  constructor(props: IOwnTokenGridRowProps, context?: any) {
     super(props, context);
-
-    const assetDetails = AssetsDictionary.assets.get(props.currentKey.asset);
 
     this._isMounted = false;
     this.state = {
-      assetDetails: assetDetails || null,
-      latestAssetPriceDataPoint: FulcrumProvider.Instance.getPriceDefaultDataPoint(),
-      assetBalance: new BigNumber(0),
-      profit: new BigNumber(0),
-      pTokenAddress: "",
-      isLoading: true
+      isLoading: true,
+      isLoadingTransaction: false,
+      request: undefined,
+      valueChange: new BigNumber(0),
+      baseTokenPrice: new BigNumber(0),
+      resultTx: false,
     };
 
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
-    FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.TradeTransactionMined, this.onTradeTransactionMined);
+    FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.AskToOpenProgressDlg, this.onAskToOpenProgressDlg);
+    FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.AskToCloseProgressDlg, this.onAskToCloseProgressDlg);
+    //FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.TradeTransactionMined, this.onTradeTransactionMined);
   }
 
   private _isMounted: boolean;
 
-  private getTradeTokenGridRowSelectionKeyRaw(props: IOwnTokenCardMobileProps, leverage: number = this.props.currentKey.leverage) {
-    return new TradeTokenKey(this.props.currentKey.asset, this.props.currentKey.unitOfAccount, this.props.currentKey.positionType, leverage, this.props.currentKey.isTokenized, this.props.currentKey.version);
-  }
-
-  private getTradeTokenGridRowSelectionKey(leverage: number = this.props.currentKey.leverage) {
-    return this.getTradeTokenGridRowSelectionKeyRaw(this.props, leverage);
-  }
-
   private async derivedUpdate() {
-    const tradeTokenKey = new TradeTokenKey(
-      this.props.currentKey.asset,
-      this.props.currentKey.unitOfAccount,
-      this.props.currentKey.positionType,
-      this.props.currentKey.leverage,
-      this.props.currentKey.isTokenized,
-      this.props.currentKey.version
-    );
-    const latestAssetPriceDataPoint = await FulcrumProvider.Instance.getTradeTokenAssetLatestDataPoint(tradeTokenKey);
+    this._isMounted && this.setState({
+      isLoading: true
+    });
+    const baseTokenPrice = await FulcrumProvider.Instance.getSwapToUsdRate(this.props.baseToken);
+    let openValue = new BigNumber(0);
+    let valueChange = new BigNumber(0);
+    if (this.props.positionType === PositionType.LONG) {
+      openValue = this.props.loan.loanData!.collateral.div(10 ** 18).times(this.props.openPrice);
+      valueChange = (this.props.value.minus(openValue)).div(openValue).times(100);
+    }
+    else {
+      openValue = this.props.loan.loanData!.principal.div(10 ** 18).times(this.props.openPrice);
+      valueChange = (this.props.value.minus(openValue)).div(openValue).times(100);
+    }
 
-    const data: [BigNumber | null, BigNumber | null] = await FulcrumProvider.Instance.getTradeBalanceAndProfit(tradeTokenKey);
-    const assetBalance = data[0];
-    const profit = data[1];
-
-    const address = FulcrumProvider.Instance.contractsSource ?
-      await FulcrumProvider.Instance.contractsSource.getPTokenErc20Address(tradeTokenKey) || "" :
-      "";
-
-    // const precision = AssetsDictionary.assets.get(this.props.selectedKey.loanAsset)!.decimals || 18;
-    // const balanceString = this.props.balance.dividedBy(10 ** precision).toFixed();
-
-    this._isMounted && this.setState(p => ({
+    this._isMounted && this.setState({
       ...this.state,
-      latestAssetPriceDataPoint: latestAssetPriceDataPoint,
-      assetBalance: assetBalance,
-      profit: profit,
-      pTokenAddress: address,
-      isLoading: latestAssetPriceDataPoint.price !== 0 ? false : p.isLoading
-    }));
+      baseTokenPrice,
+      valueChange,
+      isLoading: false
+    });
   }
 
   private onProviderAvailable = async () => {
     await this.derivedUpdate();
   };
 
-  private onProviderChanged = async (event: ProviderChangedEvent) => {
+  private onProviderChanged = async () => {
     await this.derivedUpdate();
   };
 
-  private onTradeTransactionMined = async (event: TradeTransactionMinedEvent) => {
+  /*private onTradeTransactionMined = async (event: TradeTransactionMinedEvent) => {
     if (event.key.toString() === this.props.currentKey.toString()) {
       await this.derivedUpdate();
     }
-  };
+  };*/
+
+  private onAskToOpenProgressDlg = (taskId: string) => {
+    if (!this.state.request || taskId !== this.state.request.loanId) return;
+    this.setState({ ...this.state, isLoadingTransaction: true, resultTx: true })
+    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, false, this.state.resultTx);
+  }
+  private onAskToCloseProgressDlg = (task: RequestTask) => {
+    if (!this.state.request || task.request.loanId !== this.state.request.loanId) return;
+    if (task.status === RequestStatus.FAILED || task.status === RequestStatus.FAILED_SKIPGAS) {
+      window.setTimeout(() => {
+        FulcrumProvider.Instance.onTaskCancel(task);
+        this.setState({ ...this.state, isLoadingTransaction: false, request: undefined, resultTx: false })
+        this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, false, this.state.resultTx)
+      }, 5000)
+      return;
+    }
+    this.setState({ ...this.state, resultTx: true });
+    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, true, this.state.resultTx);
+  }
 
   public componentWillUnmount(): void {
     this._isMounted = false;
 
-    FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
-    FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
-    FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.TradeTransactionMined, this.onTradeTransactionMined);
+    FulcrumProvider.Instance.eventEmitter.off(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
+    FulcrumProvider.Instance.eventEmitter.off(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
+    FulcrumProvider.Instance.eventEmitter.off(FulcrumProviderEvents.AskToOpenProgressDlg, this.onAskToOpenProgressDlg);
+    FulcrumProvider.Instance.eventEmitter.off(FulcrumProviderEvents.AskToCloseProgressDlg, this.onAskToCloseProgressDlg);
+    //FulcrumProvider.Instance.eventEmitter.off(FulcrumProviderEvents.TradeTransactionMined, this.onTradeTransactionMined);
   }
 
   public componentDidMount(): void {
@@ -130,154 +145,165 @@ export class OwnTokenCardMobile extends Component<IOwnTokenCardMobileProps, IOwn
     this.derivedUpdate();
   }
 
-  /*public componentDidUpdate(
-    prevProps: Readonly<IOwnTokenGridRowProps>,
-    prevState: Readonly<IOwnTokenGridRowState>,
-    snapshot?: any
-  ): void {
-    if (
-      prevProps.currentKey.leverage !== this.props.currentKey.leverage ||
-      (prevProps.selectedKey.toString() === prevProps.currentKey.toString()) !==
-        (this.props.selectedKey.toString() === this.props.currentKey.toString())
+  public componentDidUpdate(prevProps: Readonly<IOwnTokenGridRowProps>, prevState: Readonly<IOwnTokenCardMobileState>, snapshot?: any): void {
+    if (this.props.isTxCompleted && prevProps.isTxCompleted !== this.props.isTxCompleted
     ) {
-      this.derivedUpdate();
+      if (this.state.isLoadingTransaction) {
+        this.setState({ ...this.state, isLoadingTransaction: false, request: undefined });
+        this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, false, this.state.resultTx)
+      }
     }
-  }*/
+  }
 
   public render() {
-    if (!this.state.assetDetails) {
-      return null;
-    }
-
-    const bnPrice = new BigNumber(this.state.latestAssetPriceDataPoint.price);
-    const bnLiquidationPrice = new BigNumber(this.state.latestAssetPriceDataPoint.liquidationPrice);
-    /*if (this.props.currentKey.positionType === PositionType.SHORT) {
-      bnPrice = bnPrice.div(1000);
-      bnLiquidationPrice = bnLiquidationPrice.div(1000);
-    }*/
     return (
-      <div className="own-token-card-mobile">
-        <div className="own-token-card-mobile__body">
-          <div className="own-token-card-mobile__body-row">
-            <div className="asset-name">
-              {this.state.pTokenAddress &&
-                FulcrumProvider.Instance.web3ProviderSettings &&
-                FulcrumProvider.Instance.web3ProviderSettings.etherscanURL ? (
-                  <a
-                    className="own-token-card-mobile__token-name-full"
-                    style={{ cursor: `pointer`, textDecoration: `none` }}
-                    rel="noopener noreferrer"
-                  >
-                    {this.state.assetDetails.displayName}&nbsp;
-              <PositionTypeMarkerAlt assetDetails={this.state.assetDetails} value={this.props.currentKey.positionType} />&nbsp;
-              {`${this.props.currentKey.leverage}x`}
-                  </a>
-                ) : (
-                  <div className="own-token-card-mobile__token-name-full">{`${this.state.assetDetails.displayName}`}&nbsp;
-            <PositionTypeMarkerAlt assetDetails={this.state.assetDetails} value={this.props.currentKey.positionType} />&nbsp;
-            {`${this.props.currentKey.leverage}x`}
-                  </div>)}
+      <React.Fragment>
+        {this.state.isLoadingTransaction && this.state.request
+          ? <React.Fragment>
+            <div className="token-selector-item__image">
+              <CircleLoader></CircleLoader>
+              <TradeTxLoaderStep taskId={this.state.request.loanId} />
             </div>
-            <div className="own-token-card-mobile__position-type">
-              <PositionTypeMarker value={this.props.currentKey.positionType} />
-            </div>
-            <div className="own-token-card-mobile__action" style={{ textAlign: `right` }}>
-              <button className="own-token-card-mobile__sell-button own-token-card-mobile__button--size-half" onClick={this.onSellClick}>
-                {TradeType.SELL}
-              </button>
-            </div>
-
-          </div>
-          <div className="own-token-card-mobile__body-row">
-            <div title={this.props.currentKey.unitOfAccount} className="own-token-card-mobile__unit-of-account">
-              <span>Unit of Account</span>
-              <span>{this.props.currentKey.unitOfAccount}</span>
-            </div>
-
-            <div title={`$${bnPrice.toFixed(18)}`} className="own-token-card-mobile__price">
-              <span>Asset Price</span>
-              <span>
-                {!this.state.isLoading ?
-                  <React.Fragment><span className="fw-normal">$</span>{bnPrice.toFixed(2)}</React.Fragment>
-                  : <Preloader width="74px"/>
-                }
-              </span>
-            </div>
-            <div title={`$${bnLiquidationPrice.toFixed(18)}`} className="own-token-card-mobile__price">
-              <span>Liquidation Price</span>
-              <span>
-                {!this.state.isLoading ?
-                  <React.Fragment><span className="fw-normal">$</span>{bnLiquidationPrice.toFixed(2)}</React.Fragment>
-                  : <Preloader width="74px"/>
-                }
-              </span>
-            </div>
-          </div>
-          <div className="own-token-card-mobile__body-row">
-
-            <div className="own-token-card-mobile__empty">
-            </div>
-            <div title={this.state.assetBalance ? `$${this.state.assetBalance.toFixed(18)}` : ``} className="own-token-card-mobile__position-value">
-              <span>Position Value</span>
-              <span>
-                {!this.state.isLoading ?
-                  this.state.assetBalance ?
-                    <React.Fragment><span className="fw-normal">$</span>{this.state.assetBalance.toFixed(2)}</React.Fragment> :
-                    <React.Fragment><span className="fw-normal">$</span>0.00</React.Fragment> :
-                  <Preloader width="74px"/>
-                }
-              </span>
-            </div>
-            <div title={this.state.profit ? `$${this.state.profit.toFixed(18)}` : ``} className="own-token-card-mobile__profit">
-              <span>Profit</span>
-              <span>
-                {!this.state.isLoading ?
-                  this.state.profit ?
-                    <React.Fragment><span className="fw-normal">$</span>{this.state.profit.toFixed(2)}</React.Fragment> :
-                    <React.Fragment><span className="fw-normal">$</span>0.0000</React.Fragment> :
-                  <Preloader width="74px"/>
-                }
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
+          </React.Fragment>
+          :
+          <div className="own-token-card-mobile">
+            <div className="own-token-card-mobile__body">
+              <div className="own-token-card-mobile__body-header">
+                <span className="own-token-card-mobile__asset-name">Asset</span>
+                <span className="own-token-card-mobile__position-type">Type</span>
+                <span className="own-token-card-mobile__unit-of-account">Unit of Account</span>
+              </div>
+              <div className="own-token-card-mobile__body-row">
+                <div className="own-token-card-mobile__asset-name">
+                  <span className="own-token-card-mobile__value">
+                    {`${this.props.baseToken.toUpperCase()}`}
+                  </span>
+                </div>
+                <div className="own-token-card-mobile__position-type">
+                  <span className="position-type-marker">{`${this.props.leverage}x`}&nbsp;{this.props.positionType}</span>
+                </div>
+                <div title={this.props.quoteToken} className="own-token-card-mobile__unit-of-account">
+                  <span className="own-token-card-mobile__value">{this.props.quoteToken}</span>
+                </div>
+                <div className="own-token-card-mobile__action">
+                  <button className="own-token-card-mobile__sell-button own-token-card-mobile__button--size-half" onClick={this.onSellClick}>
+                    {TradeType.SELL}
+                  </button>
+                </div>
+              </div>
+              <div className="own-token-card-mobile__body-row">
+                <div title={this.props.positionValue.toFixed(18)} className="own-token-card-mobile__position">
+                  <span className="own-token-card-mobile__body-header">Position({this.props.baseToken})</span>
+                  <span className="own-token-card-mobile__value">
+                    {!this.state.isLoading ?
+                      <React.Fragment><span className="sign-currency"></span>{this.props.positionValue.toFixed(4)}</React.Fragment>
+                      : <Preloader width="74px" />
+                    }
+                  </span>
+                </div>
+                <div title={this.state.baseTokenPrice.toFixed(18)} className="own-token-card-mobile__price">
+                  <span className="own-token-card-mobile__body-header">Asset Price</span>
+                  <span className="own-token-card-mobile__value">
+                    {!this.state.isLoading ?
+                      <React.Fragment><span className="sign-currency">$</span>{this.state.baseTokenPrice.toFixed(2)}</React.Fragment>
+                      : <Preloader width="74px" />
+                    }
+                  </span>
+                </div>
+                <div title={this.props.liquidationPrice.toFixed(18)} className="own-token-card-mobile__liquidation-price">
+                  <span className="own-token-card-mobile__body-header">Liq. Price</span>
+                  <span className="own-token-card-mobile__value">
+                    {!this.state.isLoading ?
+                      <React.Fragment><span className="sign-currency">$</span>{this.props.liquidationPrice.toFixed(2)}</React.Fragment>
+                      : <Preloader width="74px" />
+                    }
+                  </span>
+                </div>
+              </div>
+              <div className="own-token-card-mobile__body-row">
+                <div className="own-token-card-mobile__collateral">
+                  <span className="own-token-card-mobile__body-header">Collateral</span>
+                  <div className="own-token-card-mobile__col-collateral-wrapper">
+                    <span className="own-token-card-mobile__value"><span className="sign-currency">$</span>{this.props.collateral.toFixed(2)}</span>
+                    <span className={`own-token-card-mobile__col-asset-collateral-small ${this.props.loan.collateralizedPercent.lte(.25) ? "danger" : ""}`}>{this.props.loan.collateralizedPercent.multipliedBy(100).plus(100).toFixed(2)}%</span>
+                  </div>
+                  <div className="own-token-card-mobile__open-manage-collateral" onClick={this.onManageClick}>
+                    <OpenManageCollateral />
+                  </div>
+                </div>
+                <div title={this.props.value.toFixed(18)} className="own-token-card-mobile__position-value">
+                  <span className="own-token-card-mobile__body-header">Value</span>
+                  <span className="own-token-card-mobile__value">
+                    {!this.state.isLoading ?
+                      <React.Fragment><span className="sign-currency">$</span>{this.props.value.toFixed(2)}</React.Fragment>
+                      : <Preloader width="74px" />
+                    }
+                  </span>
+                </div>
+                <div title={this.props.profit.toFixed(18)} className="own-token-card-mobile__profit">
+                  <span className="own-token-card-mobile__body-header">Profit</span>
+                  <span className="own-token-card-mobile__value">
+                    {!this.state.isLoading ?
+                      this.props.profit ?
+                        <React.Fragment><span className="sign-currency">$</span>{this.props.profit.toFixed(2)}</React.Fragment>
+                        : <React.Fragment><span className="sign-currency">$</span>0.0000</React.Fragment>
+                      : <Preloader width="74px" />
+                    }
+                  </span>
+                </div >
+              </div >
+            </div >
+          </div >
+        }
+      </React.Fragment>
     );
   }
 
-  public onSelectClick = (event: React.MouseEvent<HTMLElement>) => {
-    event.stopPropagation();
-
-    this.props.onSelect(this.getTradeTokenGridRowSelectionKey());
-  };
-
   public onDetailsClick = (event: React.MouseEvent<HTMLElement>) => {
     event.stopPropagation();
-
-    // this.props.onDetails(this.props.currentKey);
   };
 
-  public onManageClick = (event: React.MouseEvent<HTMLElement>) => {
+  public onManageClick = async (event: React.MouseEvent<HTMLElement>) => {
     event.stopPropagation();
+    const request = new TradeRequest(
+      this.props.loan.loanId,
+      TradeType.SELL,
+      this.props.baseToken,
+      this.props.quoteToken,
+      Asset.UNKNOWN,
+      this.props.positionType,
+      this.props.leverage,
+      new BigNumber(0)
+    )
 
-    // this.props.onManageCollateral(new ManageCollateralRequest(new BigNumber(0)));
-  };
+    await this.setState({ ...this.state, request: request });
+    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, request, false, this.state.resultTx)
 
-  public onSellClick = (event: React.MouseEvent<HTMLElement>) => {
-    event.stopPropagation();
-
-    this.props.onTrade(
-      new TradeRequest(
-        TradeType.SELL,
-        this.props.currentKey.asset,
-        this.props.currentKey.unitOfAccount,
-        this.props.currentKey.positionType === PositionType.SHORT ? this.props.currentKey.asset : Asset.USDC,
-        this.props.currentKey.positionType,
-        this.props.currentKey.leverage,
-        new BigNumber(0),
-        this.props.currentKey.isTokenized,
-        this.props.currentKey.version
+    this.props.onManageCollateralOpen(
+      new ManageCollateralRequest(
+        this.props.loan.loanId,
+        this.props.baseToken,
+        this.props.quoteToken,
+        this.props.loan.collateralAmount,
+        false
       )
     );
   };
+
+  public onSellClick = async (event: React.MouseEvent<HTMLElement>) => {
+    event.stopPropagation();
+    const request = new TradeRequest(
+      this.props.loan.loanId,
+      TradeType.SELL,
+      this.props.baseToken,
+      Asset.UNKNOWN,
+      this.props.quoteToken,
+      this.props.positionType,
+      this.props.leverage,
+      new BigNumber(0)
+    )
+    await this.setState({ ...this.state, request: request });
+    this.props.onTrade(request);
+    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, request, false, this.state.resultTx)
+  }
 }

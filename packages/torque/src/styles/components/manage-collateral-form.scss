@@ -2,134 +2,78 @@
   display: flex;
   flex-direction: column;
 
-  width: 47rem;
+  width: 520px;
   padding-top: 1rem;
 
-
-  .manage-collatera-loading {
-    font-size: 3rem;
-    text-align: center;
-    padding-top: 2rem;
-    padding-bottom: 4rem;
+  @media only screen and (max-width: $mobile-version-max-width) {
+    width: 100%;
   }
 
-  .manage-collateral__input-container {
-    padding-bottom: 3rem;
-
-    .manage-collateral__input-container__input-amount {
-      display: block;
-
-      height: 7rem;
-      width: 100%;
-
-      border-radius: 0.25rem;
-
-      font-size: 3rem;
-      font-weight: bold;
-      line-height: 1.17;
-      letter-spacing: -0.48px;
-      text-align: center;
+  &__insufficient-balance {
+    color: #de4a4a;
+    padding: 0.25rem;
+    text-align: center;
+  }
+  .input-container {
+    padding: 21px 15px;
+    @media screen and (max-width: $mobile-version-max-width) {
+      padding: 10px 15px;
+    }
+    .input-row {
+      margin-bottom: 0;
     }
   }
-
-  .manage-collateral-form-insufficient-balance {
-    color: red;
-    padding: .25rem;
-    text-align: center;
-
-    &--hidden {
-      visibility: hidden;
-    }
-  }
-
-  .manage-collateral-form__tips {
+  &__tips {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    padding-top: 15px;
+    padding-bottom: 30px;
+  }
+  &__tip {
+    font-size: 16px;
+    font-weight: normal;
+    font-style: normal;
+    font-stretch: normal;
+    line-height: 1.5;
+    letter-spacing: normal;
+    color: #758295;
+  }
+  &__info-liquidated-at-container {
+    padding-top: 40px;
+    padding-bottom: 30px;
+  }
 
-    // hack around slider
-    padding-top: 1rem;
-    // spacing
-    //padding-bottom: 2.5rem;
+  &__info-liquidated-at-msg {
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.5;
+    letter-spacing: -0.16px;
+    text-align: center;
+    color: #758295;
+  }
 
-    margin-bottom: 0.875rem;
+  &__info-liquidated-at-price {
+    font-size: 28px;
+    font-weight: 600;
+    font-style: normal;
+    font-stretch: normal;
+    line-height: 1.5;
+    letter-spacing: -0.24px;
+    text-align: center;
+    color: #283049;
 
-    .manage-collateral-form__tip {
-      font-size: 0.75rem;
-      font-weight: normal;
-      font-style: normal;
-      font-stretch: normal;
-      line-height: 2;
-      letter-spacing: normal;
-      color: #a9b5c7;
+    span {
+      font-weight: 800;
     }
   }
 
-  .manage-collateral-form__delimiter {
-    margin-bottom: 1rem;
-
-    border: 0;
-    border-top: solid 0.0625rem rgba(255, 255, 255, 0.2);
-  }
-
-  .manage-collateral-form__info-liquidated-at-container {
-    border-radius: 1rem;
-    background-color: #f5f7f9;
-    padding-top: 1rem;
-    padding-right: 2.5rem;
-    padding-bottom: 1rem;
-    padding-left: 2.5rem;
-
-
-    .manage-collateral-form__info-liquidated-at-msg {
-      font-size: 1rem;
-      font-weight: normal;
-      font-style: normal;
-      font-stretch: normal;
-      line-height: 1.5;
-      letter-spacing: -0.16px;
-      text-align: center;
-      color: #a9b5c7;
-    }
-
-    .manage-collateral-form__info-liquidated-at-price {
-      font-size: 1.5rem;
-      font-weight: 600;
-      font-style: normal;
-      font-stretch: normal;
-      line-height: 1.67;
-      letter-spacing: -0.24px;
-      text-align: center;
-      color: #3b364b;
-    }
-  }
-
-  .manage-collateral-form__transfer-details {
-
-    padding-bottom: 1rem;
-
-    .manage-collateral-form__transfer-details-msg {
-      margin-top: 1.5rem;
-
-      font-size: 1rem;
-      font-weight: normal;
-      font-style: normal;
-      font-stretch: normal;
-      line-height: 1.5;
-      letter-spacing: -0.16px;
-      text-align: center;
-      color: #a9b5c7;
-
-      &--warning {
-        text-align: center;
-        color: #801515;
-      }
-    }
-  }
-
-  .manage-collateral-form__actions-container {
+  &__actions-container {
     display: flex;
     flex-direction: row;
-    justify-content: center;
+    justify-content: flex-end;
+  }
+  .mb-20 {
+    margin-bottom: 20px;
   }
 }

@@ -11,21 +11,25 @@ import { BigNumber, classUtils } from "@0x/utils";
 // tslint:disable:no-parameter-reassignment
 // tslint:disable-next-line:class-name
 export class oracleContract extends BaseContract {
-    public getTradeData = {
+
+    public getCurrentMargin = {
         async callAsync(
-            src: string,
-            dest: string,
-            srcQty: BigNumber,
+            loanToken: string,
+            collateralToken: string,
+            loanTokenAmount: BigNumber,
+            collateral: BigNumber,
             callData: Partial<CallData> = {},
             defaultBlock?: BlockParam,
-        ): Promise<[BigNumber, BigNumber, BigNumber]
-        > {
+        ): Promise<BigNumber>
+        {
             callData.from = "0x4abB24590606f5bf4645185e20C4E7B97596cA3B";
             const self = this as any as oracleContract;
-            const encodedData = self._strictEncodeArguments('getTradeData(address,address,uint256)', [src,
-        dest,
-        srcQty
-        ]);
+            const encodedData = self._strictEncodeArguments('getCurrentMargin(address,address,uint256,uint256)', [
+                loanToken,
+                collateralToken,
+                loanTokenAmount,
+                collateral,
+            ]);
             const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
                 {
                     to: self.address,
@@ -36,30 +40,26 @@ export class oracleContract extends BaseContract {
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
             BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
-            const abiEncoder = self._lookupAbiEncoder('getTradeData(address,address,uint256)');
+            const abiEncoder = self._lookupAbiEncoder('getCurrentMargin(address,address,uint256,uint256)');
             // tslint:disable boolean-naming
-            const result = abiEncoder.strictDecodeReturnValue<[BigNumber, BigNumber, BigNumber]
-        >(rawCallResult);
+            const result = abiEncoder.strictDecodeReturnValue<BigNumber>(rawCallResult);
             // tslint:enable boolean-naming
             return result;
         },
     };
 
-    // for test networks not using not using BZxOraclePriceFeed
-    public getExpectedRate = {
+    public queryRate = {
         async callAsync(
             src: string,
             dest: string,
-            srcQty: BigNumber,
             callData: Partial<CallData> = {},
             defaultBlock?: BlockParam,
         ): Promise<[BigNumber, BigNumber]
         > {
             callData.from = "0x4abB24590606f5bf4645185e20C4E7B97596cA3B";
             const self = this as any as oracleContract;
-            const encodedData = self._strictEncodeArguments('getExpectedRate(address,address,uint256)', [src,
-        dest,
-        srcQty
+            const encodedData = self._strictEncodeArguments('queryRate(address,address)', [src,
+        dest
         ]);
             const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
                 {
@@ -71,7 +71,7 @@ export class oracleContract extends BaseContract {
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
             BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
-            const abiEncoder = self._lookupAbiEncoder('getExpectedRate(address,address,uint256)');
+            const abiEncoder = self._lookupAbiEncoder('queryRate(address,address)');
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<[BigNumber, BigNumber]
         >(rawCallResult);

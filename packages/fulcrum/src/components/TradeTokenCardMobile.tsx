@@ -1,47 +1,40 @@
 import { BigNumber } from "@0x/utils";
 import React, { Component } from "react";
 import { Asset } from "../domain/Asset";
-import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { IPriceDataPoint } from "../domain/IPriceDataPoint";
 import { PositionType } from "../domain/PositionType";
 import { TradeRequest } from "../domain/TradeRequest";
-import { TradeTokenKey } from "../domain/TradeTokenKey";
 import { TradeType } from "../domain/TradeType";
 import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
-import { TradeTransactionMinedEvent } from "../services/events/TradeTransactionMinedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
 import { PositionTypeMarkerAlt } from "./PositionTypeMarkerAlt";
 import siteConfig from "../config/SiteConfig.json";
 
 import { LeverageSelector } from "./LeverageSelector";
 import { Preloader } from "./Preloader";
+import { ITradeTokenGridRowProps } from "./TradeTokenGridRow";
+import { RequestStatus } from "../domain/RequestStatus";
+import { RequestTask } from "../domain/RequestTask";
 
+import "../styles/components/trade-token-card-mobile.scss";
 
-export interface ITradeTokenCardMobileProps {
-  selectedKey: TradeTokenKey;
-
-  asset: Asset;
-  defaultUnitOfAccount: Asset;
-  positionType: PositionType;
-  defaultTokenizeNeeded: boolean;
-  changeActiveBtn: (activeType: string) => void;
-
-  onSelect: (key: TradeTokenKey) => void;
-  onTrade: (request: TradeRequest) => void;
+export interface ITradeTokenCardMobileProps extends ITradeTokenGridRowProps {
+  changeGridPositionType: (activePositionType: PositionType) => void;
 }
 
 interface ITradeTokenCardMobileState {
-  assetDetails: AssetDetails | null;
   leverage: number;
-  version: number;
 
-  isLong: boolean;
-  latestPriceDataPoint: IPriceDataPoint;
+  baseTokenPrice: BigNumber;
+  liquidationPrice: BigNumber;
+
   interestRate: BigNumber;
-  balance: BigNumber;
   isLoading: boolean;
+  isLoadingTransaction: boolean;
+  request: TradeRequest | undefined;
+  resultTx: boolean;
 }
 
 export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, ITradeTokenCardMobileState> {
@@ -49,88 +42,100 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
   constructor(props: ITradeTokenCardMobileProps, context?: any) {
     super(props, context);
 
-    const assetDetails = AssetsDictionary.assets.get(props.asset);
     this._isMounted = false;
     this.state = {
       leverage: this.props.positionType === PositionType.SHORT ? 1 : 2,
-      isLong: this.props.positionType === PositionType.LONG,
-      assetDetails: assetDetails || null,
-      latestPriceDataPoint: FulcrumProvider.Instance.getPriceDefaultDataPoint(),
       interestRate: new BigNumber(0),
-      balance: new BigNumber(0),
-      version: 2,
-      isLoading: true
+      baseTokenPrice: new BigNumber(0),
+      liquidationPrice: new BigNumber(0),
+      isLoading: true,
+      isLoadingTransaction: false,
+      request: undefined,
+      resultTx: false
     };
 
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
-    FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.TradeTransactionMined, this.onTradeTransactionMined);
+    FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.AskToOpenProgressDlg, this.onAskToOpenProgressDlg);
+    FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.AskToCloseProgressDlg, this.onAskToCloseProgressDlg);
+    //FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.TradeTransactionMined, this.onTradeTransactionMined);
   }
 
   private _isMounted: boolean;
 
-  private getTradeTokenGridRowSelectionKeyRaw(props: ITradeTokenCardMobileProps, leverage: number = this.state.leverage) {
-    const key = new TradeTokenKey(props.asset, props.defaultUnitOfAccount, props.positionType, leverage, props.defaultTokenizeNeeded, 2);
-
-    // check for version 2, and revert back to version if not found
-    if (key.erc20Address === "") {
-      key.setVersion(1);
-    }
-
-    return key;
-  }
-
-  private getTradeTokenGridRowSelectionKey(leverage: number = this.state.leverage) {
-    return this.getTradeTokenGridRowSelectionKeyRaw(this.props, leverage);
-  }
-
   private async derivedUpdate() {
-    let version = 2;
+    const baseTokenPrice = await FulcrumProvider.Instance.getSwapToUsdRate(this.props.baseToken);
 
-    const tradeTokenKey = new TradeTokenKey(this.props.asset, this.props.defaultUnitOfAccount, this.props.positionType, this.state.leverage, this.props.defaultTokenizeNeeded, version);
-    if (tradeTokenKey.erc20Address === "") {
-      tradeTokenKey.setVersion(1);
-      version = 1;
-    }
+    const interestRate = await FulcrumProvider.Instance.getBorrowInterestRate(this.props.baseToken);
 
-    const latestPriceDataPoint = await FulcrumProvider.Instance.getTradeTokenAssetLatestDataPoint(tradeTokenKey);
-    const interestRate = await FulcrumProvider.Instance.getTradeTokenInterestRate(tradeTokenKey);
-    const balance = await FulcrumProvider.Instance.getPTokenBalanceOfUser(tradeTokenKey);
+    const collateralToPrincipalRate = this.props.positionType === PositionType.LONG
+      ? await FulcrumProvider.Instance.getSwapRate(this.props.baseToken, this.props.quoteToken)
+      : await FulcrumProvider.Instance.getSwapRate(this.props.quoteToken, this.props.baseToken);
+
+    let initialMargin = this.props.positionType === PositionType.LONG
+      ? new BigNumber(10 ** 38).div(new BigNumber(this.state.leverage - 1).times(10 ** 18))
+      : new BigNumber(10 ** 38).div(new BigNumber(this.state.leverage).times(10 ** 18))
+    // liq_price_before_trade = (15000000000000000000 * collateralToLoanRate / 10^20) + collateralToLoanRate) / ((10^20 + current_margin) / 10^20
+    //if it's a SHORT then -> 10^36 / above
+    const liquidationPriceBeforeTrade = ((new BigNumber("15000000000000000000").times(collateralToPrincipalRate.times(10 ** 18)).div(10 ** 20)).plus(collateralToPrincipalRate.times(10 ** 18))).div((new BigNumber(10 ** 20).plus(initialMargin)).div(10 ** 20))
+    let liquidationPrice = new BigNumber(0);
+    if (liquidationPriceBeforeTrade.gt(0))
+      liquidationPrice = this.props.positionType === PositionType.LONG
+        ? liquidationPriceBeforeTrade.div(10 ** 18)
+        : new BigNumber(10 ** 36).div(liquidationPriceBeforeTrade).div(10 ** 18);
+
 
     this._isMounted && this.setState({
       ...this.state,
-      latestPriceDataPoint: latestPriceDataPoint,
+      baseTokenPrice,
       interestRate: interestRate,
-      balance: balance,
-      version: version
+      isLoading: false,
+      liquidationPrice
     });
-    if (latestPriceDataPoint.price != 0) {
-      this._isMounted && this.setState({
-        isLoading: false,
-      });
-    }
   }
 
   private onProviderAvailable = async () => {
     await this.derivedUpdate();
   };
 
-  private onProviderChanged = async (event: ProviderChangedEvent) => {
+  private onProviderChanged = async () => {
     await this.derivedUpdate();
   };
 
-  private onTradeTransactionMined = async (event: TradeTransactionMinedEvent) => {
+  /*private onTradeTransactionMined = async (event: TradeTransactionMinedEvent) => {
     if (event.key.toString() === this.getTradeTokenGridRowSelectionKey().toString()) {
       await this.derivedUpdate();
     }
-  };
+  };*/
+
+  private onAskToOpenProgressDlg = (taskId: number) => {
+    if (!this.state.request || taskId !== this.state.request.id) return;
+    this.setState({ ...this.state, isLoadingTransaction: true });
+    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, false, true);
+  }
+
+  private onAskToCloseProgressDlg = (task: RequestTask) => {
+    if (!this.state.request || task.request.id !== this.state.request.id) return;
+    if (task.status === RequestStatus.FAILED || task.status === RequestStatus.FAILED_SKIPGAS) {
+      window.setTimeout(() => {
+        FulcrumProvider.Instance.onTaskCancel(task);
+        this.setState({ ...this.state, isLoadingTransaction: false, request: undefined, resultTx: false })
+        this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, false, this.state.resultTx)
+      }, 5000)
+      return;
+    }
+    this.setState({ ...this.state, resultTx: true });
+    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, true, this.state.resultTx);
+  }
 
   public componentWillUnmount(): void {
     this._isMounted = false;
 
-    FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
-    FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
-    FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.TradeTransactionMined, this.onTradeTransactionMined);
+    FulcrumProvider.Instance.eventEmitter.off(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
+    FulcrumProvider.Instance.eventEmitter.off(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
+    FulcrumProvider.Instance.eventEmitter.off(FulcrumProviderEvents.AskToOpenProgressDlg, this.onAskToOpenProgressDlg);
+    FulcrumProvider.Instance.eventEmitter.off(FulcrumProviderEvents.AskToCloseProgressDlg, this.onAskToCloseProgressDlg);
+    //FulcrumProvider.Instance.eventEmitter.off(FulcrumProviderEvents.TradeTransactionMined, this.onTradeTransactionMined);
   }
 
   public componentDidMount(): void {
@@ -144,39 +149,30 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
     prevState: Readonly<ITradeTokenCardMobileState>,
     snapshot?: any
   ): void {
-    const currentTradeTokenKey = this.getTradeTokenGridRowSelectionKey(this.state.leverage);
-    const prevTradeTokenKey = this.getTradeTokenGridRowSelectionKeyRaw(prevProps, prevState.leverage);
-
-    if (
-      prevState.leverage !== this.state.leverage ||
-      (prevProps.selectedKey.toString() === prevTradeTokenKey.toString()) !==
-      (this.props.selectedKey.toString() === currentTradeTokenKey.toString())
-    ) {
+    if (prevState.leverage !== this.state.leverage || this.props.isTxCompleted && prevProps.isTxCompleted !== this.props.isTxCompleted) {
       this.derivedUpdate();
+      if (this.state.isLoadingTransaction) {
+        this.setState({ ...this.state, isLoadingTransaction: false, request: undefined }, () => {
+          this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, false, this.state.resultTx)
+        });
+      }
     }
   }
 
   public render() {
-    if (!this.state.assetDetails) {
-      return null;
-    }
 
-    const tradeTokenKey = this.getTradeTokenGridRowSelectionKey(this.state.leverage);
-    const bnPrice = new BigNumber(this.state.latestPriceDataPoint.price);
-    const bnLiquidationPrice = new BigNumber(this.state.latestPriceDataPoint.liquidationPrice);
-   
     return (
       <div className="trade-token-card-mobile">
         <div className="trade-token-card-mobile__header">
           <div className="asset-name">
-            <span>{this.state.assetDetails.displayName}&nbsp;</span>
-            <PositionTypeMarkerAlt assetDetails={this.state.assetDetails} value={this.props.positionType} />
+            <span>{this.props.baseToken}&nbsp;</span>
+            <PositionTypeMarkerAlt value={this.props.positionType} />
           </div>
           <div className="poisition-type-switch">
-            <button className={"" + (this.state.isLong ? 'btn-active' : '')} onClick={() => this.props.changeActiveBtn('long')}>
+            <button className={"" + (this.props.positionType === PositionType.LONG ? 'btn-active' : '')} onClick={() => this.props.changeGridPositionType(PositionType.LONG)}>
               Long
           </button>
-            <button className={"" + (!this.state.isLong ? 'btn-active' : '')} onClick={() => this.props.changeActiveBtn('short')}>
+            <button className={"" + (this.props.positionType === PositionType.SHORT ? 'btn-active' : '')} onClick={() => this.props.changeGridPositionType(PositionType.SHORT)}>
               Short
           </button>
           </div>
@@ -185,31 +181,35 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
           <div className="trade-token-card-mobile__body-row">
             <div className="trade-token-card-mobile__leverage">
               <LeverageSelector
-                asset={this.props.asset}
+                asset={this.props.baseToken}
                 value={this.state.leverage}
                 minValue={this.props.positionType === PositionType.SHORT ? 1 : 2}
                 maxValue={5}
                 onChange={this.onLeverageSelect}
               />
             </div>
-            {this.renderActions(this.state.balance.eq(0))}
+            <div className="trade-token-card-mobile__action">
+              <button className="trade-token-card-mobile____buy-button" disabled={siteConfig.TradeBuyDisabled} onClick={this.onBuyClick}>
+                {TradeType.BUY}
+              </button>
+            </div>
           </div>
           <div className="trade-token-card-mobile__body-row">
-            <div title={`$${bnPrice.toFixed(18)}`} className="trade-token-card-mobile__price">
+            <div title={this.state.baseTokenPrice.toFixed(18)} className="trade-token-card-mobile__price">
               <span>Asset Price</span>
               <span>
-                {!this.state.isLoading ?
-                  <React.Fragment><span className="fw-normal">$</span>{bnPrice.toFixed(2)}</React.Fragment>
-                  : <Preloader width="74px"/>
+                {this.state.baseTokenPrice.gt(0) && !this.state.isLoading ?
+                  <React.Fragment><span className="fw-normal">$</span>{this.state.baseTokenPrice.toFixed(2)}</React.Fragment>
+                  : <Preloader width="74px" />
                 }
               </span>
             </div>
-            <div title={`$${bnLiquidationPrice.toFixed(18)}`} className="trade-token-card-mobile__price">
+            <div title={`$${this.state.liquidationPrice.toFixed(18)}`} className="trade-token-card-mobile__price">
               <span>Liquidation Price</span>
               <span>
-                {!this.state.isLoading ?
-                  <React.Fragment><span className="fw-normal">$</span>{bnLiquidationPrice.toFixed(2)}</React.Fragment>
-                  : <Preloader width="74px"/>
+                {this.state.liquidationPrice.gt(0) && !this.state.isLoading ?
+                  <React.Fragment><span className="fw-normal">$</span>{this.state.liquidationPrice.toFixed(2)}</React.Fragment>
+                  : <Preloader width="74px" />
                 }
               </span>
             </div>
@@ -218,7 +218,7 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
               <span>
                 {this.state.interestRate.gt(0) && !this.state.isLoading
                   ? <React.Fragment>{this.state.interestRate.toFixed(4)}<span className="fw-normal">%</span></React.Fragment>
-                  : <Preloader width="74px"/>
+                  : <Preloader width="74px" />
                 }
               </span>
             </div>
@@ -228,63 +228,24 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
     );
   }
 
-  private renderActions = (isBuyOnly: boolean) => {
-    return (
-      <div className="trade-token-card-mobile__action">
-        <button className="trade-token-card-mobile____buy-button" disabled={siteConfig.TradeBuyDisabled} onClick={this.onBuyClick}>
-          {TradeType.BUY}
-        </button>
-      </div>
-    )
-  };
-
   public onLeverageSelect = (value: number) => {
-    const key = this.getTradeTokenGridRowSelectionKey(value);
-
-    this._isMounted && this.setState({ ...this.state, leverage: value, version: key.version, isLoading: true });
-
-    this.props.onSelect(this.getTradeTokenGridRowSelectionKey(value));
+    this._isMounted && this.setState({ ...this.state, leverage: value, isLoading: true });
   };
 
-  public onSelectClick = (event: React.MouseEvent<HTMLElement>) => {
+  public onBuyClick = async (event: React.MouseEvent<HTMLElement>) => {
     event.stopPropagation();
-
-    this.props.onSelect(this.getTradeTokenGridRowSelectionKey());
-  };
-
-  public onBuyClick = (event: React.MouseEvent<HTMLElement>) => {
-    event.stopPropagation();
-
-    this.props.onTrade(
-      new TradeRequest(
-        TradeType.BUY,
-        this.props.asset,
-        this.props.defaultUnitOfAccount, // TODO: depends on which one they own
-        Asset.ETH,
-        this.props.positionType,
-        this.state.leverage,
-        new BigNumber(0),
-        this.props.defaultTokenizeNeeded, // TODO: depends on which one they own
-        this.state.version
-      )
-    );
-  };
-
-  public onSellClick = (event: React.MouseEvent<HTMLElement>) => {
-    event.stopPropagation();
-
-    this.props.onTrade(
-      new TradeRequest(
-        TradeType.SELL,
-        this.props.asset,
-        this.props.defaultUnitOfAccount, // TODO: depends on which one they own
-        this.props.selectedKey.positionType === PositionType.SHORT ? this.props.selectedKey.asset : Asset.DAI,
-        this.props.positionType,
-        this.state.leverage,
-        new BigNumber(0),
-        this.props.defaultTokenizeNeeded, // TODO: depends on which one they own
-        this.state.version
-      )
-    );
+    const request = new TradeRequest(
+      "0x0000000000000000000000000000000000000000000000000000000000000000",
+      TradeType.BUY,
+      this.props.baseToken,
+      this.props.quoteToken, // TODO: depends on which one they own
+      Asset.ETH,
+      this.props.positionType,
+      this.state.leverage,
+      new BigNumber(0)
+    )
+    await this.setState({ ...this.state, request: request });
+    this.props.onTrade(request);
+    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, request, false, true)
   };
 }

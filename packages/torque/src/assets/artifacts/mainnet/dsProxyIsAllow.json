@@ -1,0 +1,30 @@
+{
+  "constant": false,
+  "inputs": [
+    {
+      "internalType": "address",
+      "name": "manager",
+      "type": "address"
+    },
+    {
+      "internalType": "uint256",
+      "name": "cdp",
+      "type": "uint256"
+    },
+    {
+      "internalType": "address",
+      "name": "usr",
+      "type": "address"
+    },
+    {
+      "internalType": "uint256",
+      "name": "ok",
+      "type": "uint256"
+    }
+  ],
+  "name": "cdpAllow",
+  "outputs": [],
+  "payable": false,
+  "stateMutability": "nonpayable",
+  "type": "function"
+}

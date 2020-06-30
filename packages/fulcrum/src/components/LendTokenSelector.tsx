@@ -3,6 +3,8 @@ import { Asset } from "../domain/Asset";
 import { LendRequest } from "../domain/LendRequest";
 import { LendTokenSelectorItem } from "./LendTokenSelectorItem";
 
+import "../styles/components/lend-token-selector.scss"
+
 export interface ILendTokenSelectorProps {
   onLend: (request: LendRequest) => void;
 }
@@ -16,7 +18,7 @@ export class LendTokenSelector extends Component<ILendTokenSelectorProps> {
     if (process.env.REACT_APP_ETH_NETWORK === "kovan") {
       LendTokenSelector.assets = [
         Asset.ETH,
-        Asset.SAI,
+        Asset.KNC,
         Asset.DAI
       ];
     } else if (process.env.REACT_APP_ETH_NETWORK === "ropsten") {

@@ -1,18 +1,15 @@
 .btn {
+  font-family: 'Muli', sans-serif;
+  font-size: 16px;
+  line-height: 1.4;
+  font-weight: 800;
+  text-align: center;
+  border-radius: 40px;
+  border: 0;
   cursor: pointer;
   outline: none;
-
-  border: 0;
-  border-radius: 100px;
-  color: $color-white;
-  background-color: $color-blue;
-
-  font-family: "Poppins", sans-serif;
-  font-size: 1rem;
-  font-weight: 600;
-  line-height: 1.5;
-  text-align: center;
-  padding: 1rem;
+  color: #ffffff;
+  background-color: #276bfb;
 
   &:hover {
     background-color: $color-blue--hover;
@@ -21,11 +18,19 @@
   &:active {
     background-color: $color-blue--pressed;
   }
+  &.btn-light {
+    color: #276bfb;
+    background-color: rgba(203, 226, 255, 1);
+
+    &:hover,
+    &:active {
+      background-color: rgba(203, 226, 255, 0.8);
+    }
+  }
 }
 
 .btn-size--small {
-  width: 10rem;
-  height: 4rem;
+  padding: 20px 46px;
 }
 
 .btn-disabled {
@@ -38,5 +43,14 @@
 
   &:active {
     background-color: $color-blue !important;
+  }
+}
+@media screen and(max-width: $mobile-version-max-width) {
+  .btn {
+    font-size: 14px;
+  }
+
+  .btn-size--small {
+    padding: 15px 34px;
   }
 }

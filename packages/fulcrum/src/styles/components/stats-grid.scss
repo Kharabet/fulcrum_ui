@@ -27,8 +27,6 @@ $margin-right-column: 1rem;
 .stats-grid {
   display: flex;
   flex-direction: column;
-
-  margin-top: 20px;
 }
 
 .stats-grid-header {
@@ -301,7 +299,7 @@ $margin-right-column: 1rem;
   font-weight: 900;
   font-size: 28px;
   line-height: 140%;
-
+  margin-bottom: 15px;
   color: var(--primary-text);
 }
 
@@ -407,7 +405,7 @@ $margin-right-column: 1rem;
 
         margin: 0 0.5rem;
 
-        background-image: url("../assets/images/margin_cell_border.png");
+        background-image: url("../../assets/images/margin_cell_border.png");
         background-repeat: repeat-x;
         background-position-y: 0.625rem;
       }

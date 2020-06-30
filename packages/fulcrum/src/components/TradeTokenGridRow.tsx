@@ -1,17 +1,12 @@
 import { BigNumber } from "@0x/utils";
 import React, { Component } from "react";
-import TagManager from "react-gtm-module";
 import { Asset } from "../domain/Asset";
-import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
-import { IPriceDataPoint } from "../domain/IPriceDataPoint";
 import { PositionType } from "../domain/PositionType";
 import { TradeRequest } from "../domain/TradeRequest";
-import { TradeTokenKey } from "../domain/TradeTokenKey";
 import { TradeType } from "../domain/TradeType";
 import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
-import { TradeTransactionMinedEvent } from "../services/events/TradeTransactionMinedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
 import { PositionTypeMarkerAlt } from "./PositionTypeMarkerAlt";
 import siteConfig from "../config/SiteConfig.json";
@@ -19,121 +14,128 @@ import siteConfig from "../config/SiteConfig.json";
 import { LeverageSelector } from "./LeverageSelector";
 import { PositionTypeMarker } from "./PositionTypeMarker";
 import { Preloader } from "./Preloader";
+import { RequestTask } from "../domain/RequestTask";
+import { RequestStatus } from "../domain/RequestStatus";
 
 
 export interface ITradeTokenGridRowProps {
-  selectedKey: TradeTokenKey;
 
-  asset: Asset;
-  defaultUnitOfAccount: Asset;
+  baseToken: Asset;
+  quoteToken: Asset;
   positionType: PositionType;
   defaultLeverage: number;
-  defaultTokenizeNeeded: boolean;
-
-  onSelect: (key: TradeTokenKey) => void;
+  isTxCompleted: boolean;
   onTrade: (request: TradeRequest) => void;
+  changeLoadingTransaction: (isLoadingTransaction: boolean, request: TradeRequest | undefined, isTxcolmpleted: boolean, resultTx: boolean) => void;
 }
 
-
-
 interface ITradeTokenGridRowState {
-  assetDetails: AssetDetails | null;
   leverage: number;
-  version: number;
 
-  latestPriceDataPoint: IPriceDataPoint;
+  baseTokenPrice: BigNumber;
+  liquidationPrice: BigNumber;
+
   interestRate: BigNumber;
-  balance: BigNumber;
   isLoading: boolean;
-  pTokenAddress: string;
+  isLoadingTransaction: boolean;
+  request: TradeRequest | undefined;
+  resultTx: boolean;
+
 }
 
 export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITradeTokenGridRowState> {
   constructor(props: ITradeTokenGridRowProps, context?: any) {
     super(props, context);
 
-    const assetDetails = AssetsDictionary.assets.get(props.asset);
     this._isMounted = false;
     this.state = {
       leverage: this.props.defaultLeverage,
-      assetDetails: assetDetails || null,
-      latestPriceDataPoint: FulcrumProvider.Instance.getPriceDefaultDataPoint(),
+      baseTokenPrice: new BigNumber(0),
+      liquidationPrice: new BigNumber(0),
       interestRate: new BigNumber(0),
-      balance: new BigNumber(0),
-      version: 2,
       isLoading: true,
-      pTokenAddress: ""
+      isLoadingTransaction: false,
+      request: undefined,
+      resultTx: false
     };
 
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
-    FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.TradeTransactionMined, this.onTradeTransactionMined);
+    FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.AskToOpenProgressDlg, this.onAskToOpenProgressDlg);
+    FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.AskToCloseProgressDlg, this.onAskToCloseProgressDlg);
   }
 
   private _isMounted: boolean;
 
-  private getTradeTokenGridRowSelectionKeyRaw(props: ITradeTokenGridRowProps, leverage: number = this.state.leverage) {
-    const key = new TradeTokenKey(props.asset, props.defaultUnitOfAccount, props.positionType, leverage, props.defaultTokenizeNeeded, 2);
-
-    // check for version 2, and revert back to version if not found
-    if (key.erc20Address === "") {
-      key.setVersion(1);
-    }
-
-    return key;
-  }
-
-  private getTradeTokenGridRowSelectionKey(leverage: number = this.state.leverage) {
-    return this.getTradeTokenGridRowSelectionKeyRaw(this.props, leverage);
-  }
-
   private async derivedUpdate() {
-    let version = 2;
-    const tradeTokenKey = new TradeTokenKey(this.props.asset, this.props.defaultUnitOfAccount, this.props.positionType, this.state.leverage, this.props.defaultTokenizeNeeded, version);
-    if (tradeTokenKey.erc20Address === "") {
-      tradeTokenKey.setVersion(1);
-      version = 1;
-    }
 
-    const latestPriceDataPoint = await FulcrumProvider.Instance.getTradeTokenAssetLatestDataPoint(tradeTokenKey);
-    const interestRate = await FulcrumProvider.Instance.getTradeTokenInterestRate(tradeTokenKey);
-    const balance = await FulcrumProvider.Instance.getPTokenBalanceOfUser(tradeTokenKey);
+    const baseTokenPrice = await FulcrumProvider.Instance.getSwapToUsdRate(this.props.baseToken);
 
-    const pTokenAddress = FulcrumProvider.Instance.contractsSource ?
-      await FulcrumProvider.Instance.contractsSource.getPTokenErc20Address(tradeTokenKey) || "" :
-      "";
+    const collateralToPrincipalRate = this.props.positionType === PositionType.LONG
+      ? await FulcrumProvider.Instance.getSwapRate(this.props.baseToken, this.props.quoteToken)
+      : await FulcrumProvider.Instance.getSwapRate(this.props.quoteToken, this.props.baseToken);
 
-    this._isMounted && this.setState(p => ({
+    let initialMargin = this.props.positionType === PositionType.LONG
+      ? new BigNumber(10 ** 38).div(new BigNumber(this.state.leverage - 1).times(10 ** 18))
+      : new BigNumber(10 ** 38).div(new BigNumber(this.state.leverage).times(10 ** 18))
+    // liq_price_before_trade = (15000000000000000000 * collateralToLoanRate / 10^20) + collateralToLoanRate) / ((10^20 + current_margin) / 10^20
+    //if it's a SHORT then -> 10^36 / above
+    const liquidationPriceBeforeTrade = ((new BigNumber("15000000000000000000").times(collateralToPrincipalRate.times(10 ** 18)).div(10 ** 20)).plus(collateralToPrincipalRate.times(10 ** 18))).div((new BigNumber(10 ** 20).plus(initialMargin)).div(10 ** 20))
+    let liquidationPrice = new BigNumber(0);
+    if (liquidationPriceBeforeTrade.gt(0))
+      liquidationPrice = this.props.positionType === PositionType.LONG
+        ? liquidationPriceBeforeTrade.div(10 ** 18)
+        : new BigNumber(10 ** 36).div(liquidationPriceBeforeTrade).div(10 ** 18);
+
+    const interestRate = await FulcrumProvider.Instance.getBorrowInterestRate(
+      this.props.positionType === PositionType.LONG ?
+        this.props.quoteToken :
+        this.props.baseToken
+    );
+
+    this._isMounted && this.setState({
       ...this.state,
-      latestPriceDataPoint: latestPriceDataPoint,
+      baseTokenPrice,
       interestRate: interestRate,
-      balance: balance,
-      version: version,
-      isLoading: latestPriceDataPoint.price !== 0 ? false : p.isLoading,
-      pTokenAddress: pTokenAddress
-    }));
+      liquidationPrice,
+      isLoading: false
+    });
   }
 
   private onProviderAvailable = async () => {
     await this.derivedUpdate();
   };
 
-  private onProviderChanged = async (event: ProviderChangedEvent) => {
+  private onProviderChanged = async () => {
     await this.derivedUpdate();
   };
 
-  private onTradeTransactionMined = async (event: TradeTransactionMinedEvent) => {
-    if (event.key.toString() === this.getTradeTokenGridRowSelectionKey().toString()) {
-      await this.derivedUpdate();
+  private onAskToOpenProgressDlg = (taskId: number) => {
+    if (!this.state.request || taskId !== this.state.request.id) return;
+    this.setState({ ...this.state, isLoadingTransaction: true });
+    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, false, true);
+  }
+  private onAskToCloseProgressDlg = (task: RequestTask) => {
+    if (!this.state.request || task.request.id !== this.state.request.id) return;
+    if (task.status === RequestStatus.FAILED || task.status === RequestStatus.FAILED_SKIPGAS) {
+      window.setTimeout(() => {
+        FulcrumProvider.Instance.onTaskCancel(task);
+        this.setState({ ...this.state, isLoadingTransaction: false, request: undefined, resultTx: false })
+        this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, false, this.state.resultTx)
+      }, 5000)
+      return;
     }
-  };
+    this.setState({ ...this.state, resultTx: true });
+    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, true, this.state.resultTx);
+  }
 
   public componentWillUnmount(): void {
     this._isMounted = false;
 
-    FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
-    FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
-    FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.TradeTransactionMined, this.onTradeTransactionMined);
+    FulcrumProvider.Instance.eventEmitter.off(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
+    FulcrumProvider.Instance.eventEmitter.off(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
+    FulcrumProvider.Instance.eventEmitter.off(FulcrumProviderEvents.AskToOpenProgressDlg, this.onAskToOpenProgressDlg);
+    FulcrumProvider.Instance.eventEmitter.off(FulcrumProviderEvents.AskToCloseProgressDlg, this.onAskToCloseProgressDlg);
   }
 
   public componentDidMount(): void {
@@ -142,65 +144,29 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
     this.derivedUpdate();
   }
 
-  public componentDidUpdate(
+  public async componentDidUpdate(
     prevProps: Readonly<ITradeTokenGridRowProps>,
     prevState: Readonly<ITradeTokenGridRowState>,
     snapshot?: any
-  ): void {
-    const currentTradeTokenKey = this.getTradeTokenGridRowSelectionKey(this.state.leverage);
-    const prevTradeTokenKey = this.getTradeTokenGridRowSelectionKeyRaw(prevProps, prevState.leverage);
-
-    if (
-      prevState.leverage !== this.state.leverage ||
-      (prevProps.selectedKey.toString() === prevTradeTokenKey.toString()) !==
-      (this.props.selectedKey.toString() === currentTradeTokenKey.toString())
-    ) {
-      this.derivedUpdate();
+  ) {
+    if (prevState.leverage !== this.state.leverage || prevProps.isTxCompleted !== this.props.isTxCompleted) {
+      await this.derivedUpdate();
+      if (this.state.isLoadingTransaction) {
+        this.setState({ ...this.state, isLoadingTransaction: false, request: undefined }, () => {
+          this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, true, this.state.resultTx)
+        });
+      }
     }
   }
 
   public render() {
-    if (!this.state.assetDetails) {
-      return null;
-    }
-
-    const tradeTokenKey = this.getTradeTokenGridRowSelectionKey(this.state.leverage);
-    const bnPrice = new BigNumber(this.state.latestPriceDataPoint.price);
-    const bnLiquidationPrice = new BigNumber(this.state.latestPriceDataPoint.liquidationPrice);
-    /*if (this.props.positionType === PositionType.SHORT) {
-      bnPrice = bnPrice.div(1000);
-      bnLiquidationPrice = bnLiquidationPrice.div(1000);
-    }*/
-    // bnPrice = bnPrice.div(1000);
-    // bnLiquidationPrice = bnLiquidationPrice.div(1000);
-
-    // const bnChange24h = new BigNumber(this.state.latestPriceDataPoint.change24h);
-    const isActiveClassName =
-      tradeTokenKey.toString() === this.props.selectedKey.toString() ? "trade-token-grid-row--active" : "";
-
     return (
-      <div className={`trade-token-grid-row ${isActiveClassName}`} onClick={this.onSelectClick}>
+      <div className={`trade-token-grid-row`}>
         <div className="trade-token-grid-row__col-token-name">
-          {this.state.pTokenAddress &&
-            FulcrumProvider.Instance.web3ProviderSettings &&
-            FulcrumProvider.Instance.web3ProviderSettings.etherscanURL ? (
-          <a
-            className="trade-token-grid-row__col-token-name--inner"
-            style={{ cursor: `pointer`, textDecoration: `none`, color: `white` }}
-            title={this.state.pTokenAddress}
-            href={`${FulcrumProvider.Instance.web3ProviderSettings.etherscanURL}address/${this.state.pTokenAddress}#readContract`}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {this.state.assetDetails.displayName}
-            <PositionTypeMarkerAlt assetDetails={this.state.assetDetails} value={this.props.positionType} />
-          </a>
-        ) : (
           <div className="trade-token-grid-row__col-token-name--inner">
-            {this.state.assetDetails.displayName}
-            <PositionTypeMarkerAlt assetDetails={this.state.assetDetails} value={this.props.positionType} />
+            {this.props.baseToken}
+            <PositionTypeMarkerAlt value={this.props.positionType} />
           </div>
-        )}
         </div>
         <div className="trade-token-grid-row__col-position-type">
           <PositionTypeMarker value={this.props.positionType} />
@@ -208,7 +174,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
         <div className="trade-token-grid-row__col-leverage">
           <div className="leverage-selector__wrapper">
             <LeverageSelector
-              asset={this.props.asset}
+              asset={this.props.baseToken}
               value={this.state.leverage}
               minValue={this.props.positionType === PositionType.SHORT ? 1 : 2}
               maxValue={5}
@@ -216,23 +182,23 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
             />
           </div>
         </div>
-        <div title={`$${bnPrice.toFixed(18)}`} className="trade-token-grid-row__col-price">
-          {!this.state.isLoading ?
+        <div title={`$${this.state.baseTokenPrice.toFixed(18)}`} className="trade-token-grid-row__col-price">
+          {this.state.baseTokenPrice.gt(0) && !this.state.isLoading ?
             <React.Fragment>
-              <span className="fw-normal">$</span>{bnPrice.toFixed(2)}
+              <span className="fw-normal">$</span>{this.state.baseTokenPrice.toFixed(2)}
             </React.Fragment>
             :
-            <Preloader width="74px"/>
+            <Preloader width="74px" />
           }
         </div>
-        <div title={`$${bnLiquidationPrice.toFixed(18)}`} className="trade-token-grid-row__col-price">
+        <div title={`$${this.state.liquidationPrice.toFixed(18)}`} className="trade-token-grid-row__col-price">
           {
-            !this.state.isLoading ?
+            this.state.liquidationPrice.gt(0) && !this.state.isLoading ?
               <React.Fragment>
-                <span className="fw-normal">$</span>{bnLiquidationPrice.toFixed(2)}
+                <span className="fw-normal">$</span>{this.state.liquidationPrice.toFixed(2)}
               </React.Fragment>
               :
-              <Preloader width="74px"/>
+              <Preloader width="74px" />
           }
         </div>
         <div title={this.state.interestRate.gt(0) ? `${this.state.interestRate.toFixed(18)}%` : ``} className="trade-token-grid-row__col-profit">
@@ -242,70 +208,37 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
               <span className="fw-normal">%</span>
             </React.Fragment>
             :
-            <Preloader width="74px"/>
+            <Preloader width="74px" />
           }
         </div>
-        {this.renderActions(this.state.balance.eq(0))}
+        <div className="trade-token-grid-row__col-action">
+          <button className="trade-token-grid-row__button trade-token-grid-row__buy-button trade-token-grid-row__button--size-half" disabled={siteConfig.TradeBuyDisabled || this.state.isLoadingTransaction} onClick={this.onBuyClick}>
+            {TradeType.BUY}
+          </button>
+        </div>
       </div>
     );
   }
 
-  private renderActions = (isBuyOnly: boolean) => {
-    return (
-      <div className="trade-token-grid-row__col-action">
-        <button className="trade-token-grid-row__buy-button trade-token-grid-row__button--size-half" disabled={siteConfig.TradeBuyDisabled} onClick={this.onBuyClick}>
-          {TradeType.BUY}
-        </button>
-      </div>
-    )
-  };
-
   public onLeverageSelect = (value: number) => {
-    const key = this.getTradeTokenGridRowSelectionKey(value);
 
-    this._isMounted && this.setState({ ...this.state, leverage: value, version: key.version, isLoading: true });
-
-    this.props.onSelect(this.getTradeTokenGridRowSelectionKey(value));
+    this._isMounted && this.setState({ ...this.state, leverage: value, isLoading: true });
   };
 
-  public onSelectClick = (event: React.MouseEvent<HTMLElement>) => {
+  public onBuyClick = async (event: React.MouseEvent<HTMLElement>) => {
     event.stopPropagation();
-
-    this.props.onSelect(this.getTradeTokenGridRowSelectionKey());
-  };
-
-  public onBuyClick = (event: React.MouseEvent<HTMLElement>) => {
-    event.stopPropagation();
-    this.props.onTrade(
-      new TradeRequest(
-        TradeType.BUY,
-        this.props.asset,
-        this.props.defaultUnitOfAccount, // TODO: depends on which one they own
-        Asset.ETH,
-        this.props.positionType,
-        this.state.leverage,
-        new BigNumber(0),
-        this.props.defaultTokenizeNeeded, // TODO: depends on which one they own
-        this.state.version
-      )
+    const request = new TradeRequest(
+      "0x0000000000000000000000000000000000000000000000000000000000000000",
+      TradeType.BUY,
+      this.props.baseToken,
+      this.props.quoteToken, // TODO: depends on which one they own
+      Asset.ETH,
+      this.props.positionType,
+      this.state.leverage,
+      new BigNumber(0)
     );
-  };
-
-  public onSellClick = (event: React.MouseEvent<HTMLElement>) => {
-    event.stopPropagation();
-
-    this.props.onTrade(
-      new TradeRequest(
-        TradeType.SELL,
-        this.props.asset,
-        this.props.defaultUnitOfAccount, // TODO: depends on which one they own
-        this.props.selectedKey.positionType === PositionType.SHORT ? this.props.selectedKey.asset : Asset.DAI,
-        this.props.positionType,
-        this.state.leverage,
-        new BigNumber(0),
-        this.props.defaultTokenizeNeeded, // TODO: depends on which one they own
-        this.state.version
-      )
-    );
+    await this.setState({ ...this.state, request: request });
+    this.props.onTrade(request);
+    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, request, false, true)
   };
 }

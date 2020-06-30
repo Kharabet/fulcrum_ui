@@ -1,4 +1,4 @@
-import { BigNumber } from "bignumber.js";
+import { BigNumber } from "@0x/utils";
 import { erc20Contract } from "../../contracts/erc20";
 import { iTokenContract } from "../../contracts/iTokenContract";
 import { AssetsDictionary } from "../../domain/AssetsDictionary";
@@ -51,11 +51,10 @@ export class LendChaiProcessor {
 
     let txHash: string = "";
     try {
-      FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.AskToOpenProgressDlg);
 
       // Prompting token allowance
       if (amountInBaseUnits.gt(erc20allowance)) {
-        approvePromise = tokenErc20Contract.approve.sendTransactionAsync(tokenContract.address, FulcrumProvider.UNLIMITED_ALLOWANCE_IN_BASE_UNITS, { from: account });
+        approvePromise = tokenErc20Contract.approve.sendTransactionAsync(tokenContract.address, FulcrumProvider.Instance.getLargeApprovalAmount(taskRequest.asset), { from: account });
       }
       task.processingStepNext();
       task.processingStepNext();
@@ -84,8 +83,8 @@ export class LendChaiProcessor {
 
       await FulcrumProvider.Instance.addTokenToMetaMask(task);
     }
-    finally {
-      FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.AskToCloseProgressDlg);
+    catch(e) {
+      throw e;
     }
 
     task.processingStepNext();

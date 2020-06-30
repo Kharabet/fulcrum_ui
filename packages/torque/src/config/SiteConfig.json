@@ -1,6 +1,5 @@
 {
   "MaintenanceMode": false,
-  "LandingPage": false,
-  "BorrowDisabled": true,
-  "RefinanceDisabled": true
+  "BorrowDisabled": false,
+  "RefinanceDisabled": false
 }

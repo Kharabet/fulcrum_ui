@@ -1,69 +1,61 @@
-.own-token-cards {
-  width: 100%;
-  padding-bottom: 40px;
-  &__header {
-    display: flex;
-    justify-content: flex-start;
-    padding: 0 15px;
-    font-family: Muli;
-    font-style: normal;
-    font-weight: 900;
-    font-size: 28px;
-    line-height: 140%;
-    color: #ffffff;
-    margin-bottom: 15px;
-  }
-  &__container {
-    padding: 0 15px;
-    display: flex;
-    flex-direction: column;
-  }
+$width-name-asset: 16%;
+$width-type: 25%;
+$width-unit: 26%;
+$width: 33%;
+
+@mixin own-token-card-mobile-row {
+  font-family: "Muli", sans-serif;
+  font-style: normal;
+  font-weight: 800;
+  font-size: 18px;
+  line-height: 1.5;
+  display: flex;
+  align-items: center;
+  color: var(--primary-text);
 }
 
+.own-token-cards {
+  padding: 0 15px;
+  &__header {
+    font-size: 28px;
+    font-weight: 900;
+    line-height: 1.4;
+    text-align: center;
+    color: var(--primary-text);
+  }
+}
 .own-token-card-mobile {
   margin-bottom: 1px;
   &__body {
     background-color: var(--primary-row);
 
-    padding: 25px;
+    padding: 15px;
     &-row {
       display: flex;
-      justify-content: space-between;
-
+      flex-wrap: wrap;
       align-items: center;
-      padding: 10px 0px;
-
-      > div:first-child {
-        width: 40%;
-      }
-      > div + div,
-      div:last-child {
-        width: 30%;
-        &.wrapper-loader,
-        &.container-loader {
-          width: 100%;
-        }
-      }
+      margin-bottom: 20px;
     }
   }
   &__action {
     button {
-      padding: 6px 27px;
+      width: 89px;
+      height: 33px;
       border: none;
       text-transform: uppercase;
-      font-family: "Muli", sans-serif;
       font-style: normal;
-      font-weight: bold;
+      font-weight: 700;
       font-size: 14px;
       line-height: 150%;
       display: flex;
       justify-content: center;
+      align-items: center;
       letter-spacing: 0.05em;
       color: #ffffff;
-      background: #ff4f4f;
+      background-color: #ff4f4f;
       border-radius: 43px;
       &:hover {
-        background: #fe7272;
+        background-color: #fe7272;
       }
       &:not(:disabled) {
         cursor: pointer;
@@ -75,70 +67,108 @@
       }
     }
   }
-  .asset-name {
-    font-style: normal;
-    font-size: 18px;
-    line-height: 150%;
-    display: flex;
-    align-items: center;
-
-    /* Main/White */
-
-    color: #ffffff;
+  &__asset-name {
+    width: $width-name-asset;
+    a,
+    div {
+      font-style: normal;
+      font-size: 18px;
+      line-height: 150%;
+      display: flex;
+      align-items: center;
+      color: #ffffff;
+    }
     .own-token-card-mobile__token-name-full {
       display: flex;
       align-items: center;
+      cursor: pointer;
+      text-decoration: none;
     }
   }
 
   &__position-type {
+    width: $width-type;
+    span {
+      width: 71px;
+      padding: 7px 0;
+      text-align: center;
+      display: inline-block;
+    }
+  }
+  &__unit-of-account {
+    width: $width-unit;
+    span {
+      @include own-token-card-mobile-row();
+    }
+  }
+  .own-token-card-mobile__body-header {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 3px;
     font-family: "Muli", sans-serif;
     font-style: normal;
-    font-weight: 800;
+    font-weight: 600;
     font-size: 10px;
+    line-height: 1.5;
+    color: #a2abb8;
+    width: 100%;
   }
-
-  &__unit-of-account,
-  &__position-value,
+  &__position,
   &__price,
-  &__profit,
-  &__empty {
+  &__liquidation-price,
+  &__collateral,
+  &__position-value,
+  &__profit {
+    display: flex;
+    flex-wrap: wrap;
+    width: 33%;
+    position: relative;
+  }
+  &__col-asset-collateral-small {
+    font-size: 12px;
+    font-weight: 700;
+    text-indent: 13px;
+    &.danger {
+      color: #ff4f4f;
+    }
+  }
+  &__open-manage-collateral {
+    background-color: var(--bg-icon-collateral);
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    align-self: center;
+    border-radius: 50%;
+    margin-left: 10px;
+    position: absolute;
+    right: 5px;
+    cursor: pointer;
+    .icon-collateral-fill {
+      fill: var(--icon-collateral);
+    }
+    .icon-collateral-stroke {
+      stroke: var(--icon-collateral);
+    }
+  }
+  &__col-collateral-wrapper {
     display: flex;
     flex-direction: column;
-    > span:first-child {
-      font-family: "Muli", sans-serif;
-      font-style: normal;
-      font-weight: 600;
-      font-size: 10px;
-      line-height: 150%;
-      /* or 15px */
-
-      display: flex;
-      align-items: center;
-      text-align: center;
-
+    color: var(--primary-text);
+  }
+  &__position-value {
+    align-self: start;
+  }
+  &__profit {
+    align-self: start;
+  }
+  &__value {
+    @include own-token-card-mobile-row();
+    .sign-currency {
+      font-weight: 200;
       color: #a2abb8;
-    }
-    span + span {
-      .fw-normal {
-        font-weight: normal;
-
-        color: #a2abb8;
-      }
-      font-family: "Muli", sans-serif;
-      font-style: normal;
-      font-weight: 800;
-      font-size: 18px;
-      line-height: 150%;
-      /* or 27px */
-
-      display: flex;
-      align-items: center;
-      text-align: center;
-
-      /* Main/White */
-
-      color: var(--primary-text);
     }
   }
 }

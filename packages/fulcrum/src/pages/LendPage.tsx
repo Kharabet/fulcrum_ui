@@ -1,18 +1,19 @@
 import React, { PureComponent } from "react";
 import Modal from "react-modal";
-import { LendForm } from "../components/LendForm";
 import { LendTokenSelector } from "../components/LendTokenSelector";
 import { Asset } from "../domain/Asset";
 import { LendRequest } from "../domain/LendRequest";
 import { LendType } from "../domain/LendType";
-import { Footer } from "../layout/Footer";
-import { HeaderOps } from "../layout/HeaderOps";
 import { FulcrumProvider } from "../services/FulcrumProvider";
 import { InfoBlock } from "../components/InfoBlock";
 
+import "../styles/pages/_lend-page.scss";
+
+const LendForm = React.lazy(() => import('../components/LendForm'));
+
 export interface ILendPageProps {
   doNetworkConnect: () => void;
-  isRiskDisclosureModalOpen: ()  => void;
+  isRiskDisclosureModalOpen: () => void;
   isLoading: boolean;
   isMobileMedia: boolean;
 }
@@ -21,13 +22,19 @@ interface ILendPageState {
   isLendModalOpen: boolean;
   lendType: LendType;
   lendAsset: Asset;
+  lendRequestId: number;
 }
 
-export class LendPage extends PureComponent<ILendPageProps, ILendPageState> {
+export default class LendPage extends PureComponent<ILendPageProps, ILendPageState> {
   constructor(props: any) {
     super(props);
 
-    this.state = { isLendModalOpen: false, lendType: LendType.LEND, lendAsset: Asset.UNKNOWN };
+    this.state = {
+      isLendModalOpen: false,
+      lendType: LendType.LEND,
+      lendAsset: Asset.UNKNOWN,
+      lendRequestId: 0
+    };
   }
 
   public componentDidMount(): void {
@@ -40,9 +47,8 @@ export class LendPage extends PureComponent<ILendPageProps, ILendPageState> {
   public render() {
     return (
       <div className="lend-page">
-        <HeaderOps isMobileMedia={this.props.isMobileMedia} isLoading={this.props.isLoading} doNetworkConnect={this.props.doNetworkConnect} isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
         <main className="lend-page-main">
-          <InfoBlock localstorageItemProp="defi-risk-notice"  onAccept={() => {this.forceUpdate()}}>
+          <InfoBlock localstorageItemProp="defi-risk-notice" onAccept={() => { this.forceUpdate() }}>
             For your safety, please ensure the URL in your browser starts with: https://app.fulcrum.trade/. <br />
             Fulcrum is a non-custodial platform for tokenized lending and margin trading. <br />
             "Non-custodial" means YOU are responsible for the security of your digital assets. <br />
@@ -54,6 +60,9 @@ export class LendPage extends PureComponent<ILendPageProps, ILendPageState> {
               Full functionality will return after a thorough audit of our newly implemented and preexisting smart contracts.
           </InfoBlock>
             : null}
+
+          {this.props.isMobileMedia && <div className="lend-page__header">Lend</div>
+          }
           <LendTokenSelector onLend={this.onLendRequested} />
           <Modal
             isOpen={this.state.isLendModalOpen}
@@ -70,7 +79,6 @@ export class LendPage extends PureComponent<ILendPageProps, ILendPageState> {
             />
           </Modal>
         </main>
-        <Footer isMobileMedia={this.props.isMobileMedia} isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
       </div>
     );
   }
@@ -80,13 +88,15 @@ export class LendPage extends PureComponent<ILendPageProps, ILendPageState> {
       this.props.doNetworkConnect();
       return;
     }
+    const lendRequestId = request.id;
 
     if (request) {
       this.setState({
         ...this.state,
         isLendModalOpen: true,
         lendType: request.lendType,
-        lendAsset: request.asset
+        lendAsset: request.asset,
+        lendRequestId: lendRequestId
       });
     }
   };
@@ -96,6 +106,7 @@ export class LendPage extends PureComponent<ILendPageProps, ILendPageState> {
       ...this.state,
       isLendModalOpen: false,
     });
+    request.id = this.state.lendRequestId;
     FulcrumProvider.Instance.onLendConfirmed(request);
   };
 

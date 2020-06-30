@@ -1,8 +1,11 @@
 import React, { Component, MouseEvent } from "react";
-import {ReactComponent as IcTokenSelectorDown} from "../assets/images/ic___token_selector___down.svg";
+import { ReactComponent as IcTokenSelectorDown } from "../assets/images/ic___token_selector___down.svg";
 import { Asset } from "../domain/Asset";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
+
+
+import "../styles/components/collateral-token-button.scss";
 
 export interface ICollateralTokenButtonProps {
   asset: Asset;
@@ -46,7 +49,7 @@ export class CollateralTokenButton extends Component<ICollateralTokenButtonProps
         {this.state.assetDetails ? (
           <div className={`collateral-token-button ${this.props.isChangeCollateralOpen ? "opened" : "closed"}`} onClick={this.onClick}>
             {this.state.assetDetails.reactLogoSvg.render()}
-            <span>{this.state.assetDetails.displayName}</span>  
+            <span>{this.state.assetDetails.displayName}</span>
           </div>
         ) : null}
       </React.Fragment>

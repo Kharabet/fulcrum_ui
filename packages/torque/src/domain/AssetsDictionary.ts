@@ -1,19 +1,19 @@
 import { Asset } from "./Asset";
 import { AssetDetails } from "./AssetDetails";
 
-import bat_logo from "../assets/images/ic_token_bat.svg";
-import btc_logo from "../assets/images/ic_token_btc.svg";
-import dai_logo from "../assets/images/ic_token_dai.svg";
-import eth_logo from "../assets/images/ic_token_eth.svg";
-import knc_logo from "../assets/images/ic_token_knc.svg";
-import link_logo from "../assets/images/ic_token_link.svg";
-import mkr_logo from "../assets/images/ic_token_mkr.svg";
-import rep_logo from "../assets/images/ic_token_rep.svg";
-import sai_logo from "../assets/images/ic_token_sai.svg";
-import susd_logo from "../assets/images/ic_token_susd.svg";
-import usdt_logo from "../assets/images/ic_token_usdt.svg";
-import usdc_logo from "../assets/images/ic_token_usdc.svg";
-import zrx_logo from "../assets/images/ic_token_zrx.svg";
+import bat_logo, { ReactComponent as Bat_react_logo } from "../assets/images/ic_token_bat.svg";
+import btc_logo, { ReactComponent as Btc_react_logo } from "../assets/images/ic_token_btc.svg";
+import dai_logo, { ReactComponent as Dai_react_logo } from "../assets/images/ic_token_dai.svg";
+import eth_logo, { ReactComponent as Eth_react_logo } from "../assets/images/ic_token_eth.svg";
+import knc_logo, { ReactComponent as Knc_react_logo } from "../assets/images/ic_token_knc.svg";
+import link_logo, { ReactComponent as Link_react_logo } from "../assets/images/ic_token_link.svg";
+import mkr_logo, { ReactComponent as Mkr_react_logo } from "../assets/images/ic_token_mkr.svg";
+import rep_logo, { ReactComponent as Rep_react_logo } from "../assets/images/ic_token_rep.svg";
+import sai_logo, { ReactComponent as Sai_react_logo } from "../assets/images/ic_token_sai.svg";
+import susd_logo, { ReactComponent as Susd_react_logo } from "../assets/images/ic_token_susd.svg";
+import usdt_logo, { ReactComponent as Usdt_react_logo } from "../assets/images/ic_token_usdt.svg";
+import usdc_logo, { ReactComponent as Usdc_react_logo } from "../assets/images/ic_token_usdc.svg";
+import zrx_logo, { ReactComponent as Zrx_react_logo } from "../assets/images/ic_token_zrx.svg";
 
 import bat_bg from "../assets/images/popup_left_token_bat.svg";
 import btc_bg from "../assets/images/popup_left_token_btc.svg";
@@ -52,9 +52,10 @@ export class AssetsDictionary {
         "Basic Attention Token (BAT)",
         18,
         bat_logo,
+        Bat_react_logo,
         bat_bg,
         bat_ts,
-        "#CC3D84",
+        "#FFE1D3",
         "#FFFFFF",
         "#FFFFFF",
         new Map<number, string | null>([
@@ -70,9 +71,10 @@ export class AssetsDictionary {
         "Bitcoin (BTC)",
         8,
         btc_logo,
+        Btc_react_logo,
         btc_bg,
         btc_ts,
-        "#F9B134",
+        "#E9CAEE",
         "#FFFFFF",
         "#FFFFFF",
         new Map<number, string | null>([
@@ -89,9 +91,10 @@ export class AssetsDictionary {
         "ChainLink Token (LINK)",
         18,
         link_logo,
+        Link_react_logo,
         link_bg,
         link_ts,
-        "#FFFFFF",
+        "#B9E9FF",
         "#444e5a",
         "#acb5c2",
         new Map<number, string | null>([
@@ -107,9 +110,10 @@ export class AssetsDictionary {
         "Tether USD (USDT)",
         6,
         usdt_logo,
+        Usdt_react_logo,
         usdt_bg,
         usdt_ts,
-        "#8777B1",
+        "#E1FFC4",
         "#FFFFFF",
         "#FFFFFF",
         new Map<number, string | null>([
@@ -126,9 +130,10 @@ export class AssetsDictionary {
         "Sai Stablecoin (SAI)",
         18,
         sai_logo,
+        Sai_react_logo,
         sai_bg,
         sai_ts,
-        "#8777B1",
+        "#E3D9FF",
         "#FFFFFF",
         "#FFFFFF",
         new Map<number, string | null>([
@@ -145,9 +150,10 @@ export class AssetsDictionary {
         "Dai Stablecoin (DAI)",
         18,
         dai_logo,
+        Dai_react_logo,
         dai_bg,
         dai_ts,
-        "#8777B1",
+        "#FFE9BE",
         "#FFFFFF",
         "#FFFFFF",
         new Map<number, string | null>([
@@ -165,9 +171,10 @@ export class AssetsDictionary {
         "USD Coin (USDC)",
         6,
         usdc_logo,
+        Usdc_react_logo,
         usdc_bg,
         usdc_ts,
-        "#00000000",
+        "#C8E0FA",
         "#444e5a",
         "#acb5c2",
         new Map<number, string | null>([
@@ -183,9 +190,10 @@ export class AssetsDictionary {
         "Synth sUSD (sUSD)",
         18,
         susd_logo,
+        Susd_react_logo,
         susd_bg,
         susd_ts,
-        "#00000000",
+        "#D9D5E9",
         "#444e5a",
         "#acb5c2",
         new Map<number, string | null>([
@@ -201,9 +209,10 @@ export class AssetsDictionary {
         "Ethereum (ETH)",
         18,
         eth_logo,
+        Eth_react_logo,
         eth_bg,
         eth_ts,
-        "#FFFFFF",
+        "#ECECEC",
         "#444e5a",
         "#acb5c2",
         new Map<number, string | null>([
@@ -221,9 +230,10 @@ export class AssetsDictionary {
         "Ethereum (ETH)", // "Wrapped Ether (WETH)",
         18,
         eth_logo,
+        Eth_react_logo,
         eth_bg,
         eth_ts,
-        "#FFFFFF",
+        "#ECECEC",
         "#444e5a",
         "#acb5c2",
         new Map<number, string | null>([
@@ -241,9 +251,10 @@ export class AssetsDictionary {
         "Kyber Network (KNC)",
         18,
         knc_logo,
+        Knc_react_logo,
         knc_bg,
         knc_ts,
-        "#31766E",
+        "#B4EAD9",
         "#FFFFFF",
         "#FFFFFF",
         new Map<number, string | null>([
@@ -260,9 +271,10 @@ export class AssetsDictionary {
         "Maker (MKR)",
         18,
         mkr_logo,
+        Mkr_react_logo,
         mkr_bg,
         mkr_ts,
-        "#00BB99",
+        "#CAF6D7",
         "#FFFFFF",
         "#FFFFFF",
         new Map<number, string | null>([
@@ -278,9 +290,10 @@ export class AssetsDictionary {
         "Augur (REP)",
         18,
         rep_logo,
+        Rep_react_logo,
         rep_bg,
         rep_ts,
-        "#8D3F76",
+        "#EACAE2",
         "#FFFFFF",
         "#FFFFFF",
         new Map<number, string | null>([
@@ -297,9 +310,10 @@ export class AssetsDictionary {
         "0x (ZRX)",
         18,
         zrx_logo,
+        Zrx_react_logo,
         zrx_bg,
         zrx_ts,
-        "#7368D0",
+        "#D8D3FF",
         "#FFFFFF",
         "#FFFFFF",
         new Map<number, string | null>([
