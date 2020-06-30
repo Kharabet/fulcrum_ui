@@ -127,6 +127,47 @@
       }
     }
   }
+  .chartjs-tooltip-token {
+    tbody {
+      display: flex;
+      flex-direction: column;
+      .line {
+        width: 1px;
+        height: 35px;
+        display: block;
+        position: absolute;
+      }
+      &.bottom {
+        .line {
+          top: -35px;
+        }
+        tr:first-child {
+          order: -1 !important;
+        }
+      }
+      &.top {
+        .line {
+          bottom: -35px;
+        }
+        tr:first-child {
+          order: 3;
+        }
+      }
+      &.left {
+        .line {
+          left: 7px;
+        }
+      }
+      &.right {
+        .line {
+          right: 3px;
+        }
+        tr td, tr th {
+          text-align: right;
+        }
+      }
+    }
+  }
 }
 .wrapper-chartjs-bar {
   position: relative;
