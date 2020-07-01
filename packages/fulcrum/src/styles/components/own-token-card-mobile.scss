@@ -1,6 +1,5 @@
-$width-name-asset: 16%;
-$width-type: 25%;
-$width-unit: 26%;
+$width-name-asset: 33%;
+$width-type: 33%;$width-unit: 26%;
 $width: 33%;
 
 @mixin own-token-card-mobile-row {
@@ -95,12 +94,7 @@ $width: 33%;
       display: inline-block;
     }
   }
-  &__unit-of-account {
-    width: $width-unit;
-    span {
-      @include own-token-card-mobile-row();
-    }
-  }
+ 
   .own-token-card-mobile__body-header {
     display: flex;
     align-items: center;
