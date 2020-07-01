@@ -73,12 +73,13 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     super(props);
     if (process.env.REACT_APP_ETH_NETWORK === "kovan") {
       this.baseTokens = [
-        Asset.ETH
+        Asset.ETH,
+        Asset.KNC
       ];
       this.stablecoinAssets = [
         Asset.DAI,
-        Asset.SAI,
-      ]
+        Asset.KNC
+      ];
     } else if (process.env.REACT_APP_ETH_NETWORK === "ropsten") {
       // this.baseTokens = [
       // ];
@@ -215,7 +216,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
                 <TradeTokenGrid
                   isMobileMedia={this.props.isMobileMedia}
                   tokenRowsData={this.state.tokenRowsData.filter(e => e.baseToken === this.state.selectedMarket.baseToken)}
-                  ownRowsData={this.state.ownRowsData.filter(e => e.baseToken === this.state.selectedMarket.baseToken && e.quoteToken === this.state.selectedMarket.quoteToken)}
+                  ownRowsData={this.state.ownRowsData.filter(e => (e.baseToken === this.state.selectedMarket.baseToken && e.quoteToken === this.state.selectedMarket.quoteToken))}
                   changeLoadingTransaction={this.changeLoadingTransaction}
                   request={this.state.request}
                   isLoadingTransaction={this.state.isLoadingTransaction}
@@ -361,9 +362,16 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       this.setState({ ...this.state, loans })
       for (const loan of loans) {
 
+        const doubleBaseToken = this.baseTokens.includes(loan.loanAsset)
+          && this.baseTokens.includes(loan.collateralAsset)
+          && this.stablecoinAssets.includes(loan.collateralAsset) ?
+          loan.collateralAsset : "";
+
 
         const positionType = this.baseTokens.includes(loan.collateralAsset)
-          ? PositionType.LONG
+          ? loan.collateralAsset === doubleBaseToken ?
+            PositionType.SHORT :
+            PositionType.LONG
           : PositionType.SHORT;
 
         const baseAsset = positionType === PositionType.LONG
