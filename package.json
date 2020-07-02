@@ -8,8 +8,9 @@
     "packages/fulcrum-website",
     "packages/torque",
     "packages/torque-website",
+    "packages/protocol-explorer",
     "packages/web3-react-6",
-	  "packages/protocol-explorer"
+    "packages/web3-react-6/packages/*"
   ],
   "devDependencies": {
     "cross-env": "^5.2.0",
