@@ -1,24 +1,160 @@
-$font-size-header: 0.75rem;
-$height-row: 4.5rem;
+$font-size-header: 12px;
+$font-size-row: 22px;
 
-$width-col-token-image: 5rem;
-$width-col-token-name: 3.5rem;
-$width-col-token-name-full: 11rem;
-$width-col-position-type: 6rem;
-$width-col-leverage: 13rem;
-$width-col-amount: 13rem;
-$width-col-price: 6.5rem;
-$width-col-change24h: 7rem;
-$width-col-profit: 5rem;
-$width-col-actions: 19rem;
+$width-col-token-name: 13%;
+$width-col-position-type: 10%;
+$width-col-leverage: 25%;
+$width-col-amount: 13%;
+$width-col-price: 13%;
+$width-col-profit: 13%;
+$width-col-actions: 13%;
 
-$width-button-action: 8rem;
-
-$margin-right-column: 1.5rem;
-
-.trade-token-grid {
+@mixin trade-token-grid-header__col {
+  font-size: $font-size-header;
+  font-weight: 600;
+  font-style: normal;
+  font-stretch: normal;
+  letter-spacing: normal;
+  color: var(--trade-header-color);
+}
+@mixin trade-token-grid-row__col {
+  font-size: $font-size-row;
+  font-weight: 600;
+  font-style: normal;
+  font-stretch: normal;
+  color: var(--primary-text);
 }
 
+.trade-token-grid {
+  padding-bottom: 10px;
+  &__wrapper {
+    font-family: "Muli", sans-serif;
+  }
+  .trade-token-grid-header {
+    @include trade-token-grid-header__col();
+    display: flex;
+    padding: 20px 40px 15px 40px;
+    &__col-token-name {
+      width: $width-col-token-name;
+    }
+    &__col-position-type {
+      width: $width-col-position-type;
+    }
+    &__col-leverage {
+      width: $width-col-leverage;
+    }
+    &__col-amount {
+      width: $width-col-amount;
+    }
+    &__col-price {
+      width: $width-col-price;
+    }
+    &__col-profit {
+      width: $width-col-profit;
+    }
+    &__col-actions {
+      width: $width-col-actions;
+      text-align: right;
+    }
+  }
+
+  .trade-token-grid-row-wrapper {
+
+    &:not(:last-child) {
+      margin-bottom: 20px;
+    }
+    // &:first-child {
+    //   margin-top: -1rem;
+    // }
+  }
+  .trade-token-grid-row {
+    position: relative;
+    background-color: var(--primary-row);
+    padding: 20px 40px;
+
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-bottom: 1px;
+    // &:after {
+    //   content: "";
+    //   position: absolute;
+    //   bottom: 0;
+    //   left: 0;
+    //   right: 0;
+    //   margin: auto;
+    //   width: calc(100% - 80px);
+    //   background-color: #394049;
+    //   height: 1px;
+    // }
+    @include trade-token-grid-row__col();
+    &__col-token-name {
+      width: $width-col-token-name;
+      font-weight: 800;
+      &--inner {
+        display: flex;
+        align-items: center;
+        height: 100%;
+        img {
+          margin-left: 15px;
+        }
+      }
+    }
+    &__col-leverage {
+      width: $width-col-leverage;
+    }
+    &__col-amount {
+      width: $width-col-amount;
+    }
+    &__col-position-type {
+      display: flex;
+      width: $width-col-position-type;
+    }
+    &__col-price {
+      width: $width-col-price;
+      font-weight: 800;
+      .fw-normal {
+        font-weight: 400;
+        color: #a2abb8;
+      }
+    }
+    &__col-profit {
+      width: $width-col-profit;
+      font-weight: 800;
+      .fw-normal {
+        font-weight: 400;
+        color: #a2abb8;
+      }
+    }
+    &__col-action {
+      width: $width-col-actions;
+      text-align: right;
+    }
+    &__buy-button {
+      border: 0;
+      padding: 14px 40px;
+      color: #ffffff;
+      letter-spacing: 0.05em;
+      font-size: 16px;
+      font-weight: 800;
+      line-height: 1.5;
+      border-radius: 43px;
+      background-color: #276bfb;
+      outline: none;
+      &:hover{
+        background-color: #5B88FF;
+      }
+      &:not(:disabled){
+        cursor: pointer;
+      }
+      &:disabled {
+        background-color: var(--disabled-bg);
+        color: var(--disabled-color);
+        cursor: not-allowed;
+      }
+    }
+  }
+}
 .rounded-mark {
   font-size: 0.5rem;
   border-width: 1px;
@@ -28,322 +164,4 @@ $margin-right-column: 1.5rem;
   vertical-align: middle;
   margin-left: -7px;
   margin-right: 7px;
-}
-
-.trade-token-grid-header {
-  height: $height-row;
-
-  margin-left: 0.5rem;
-  margin-right: 0.5rem;
-}
-
-@mixin trade-token-grid-header__col {
-  display: inline-block;
-
-  height: 100%;
-  vertical-align: middle;
-  line-height: $height-row;
-
-  font-size: $font-size-header;
-  font-weight: normal;
-  font-style: normal;
-  font-stretch: normal;
-  letter-spacing: normal;
-  color: #a9b5c7;
-
-  &:not(:last-child) {
-    margin-right: $margin-right-column;
-  }
-}
-
-.trade-token-grid-header__col-token-image {
-  @include trade-token-grid-header__col();
-
-  width: $width-col-token-image;
-}
-
-.trade-token-grid-header__col-token-name {
-  @include trade-token-grid-header__col();
-
-  width: $width-col-token-name;
-}
-
-.trade-token-grid-header__col-token-name-full {
-  @include trade-token-grid-header__col();
-
-  width: $width-col-token-name-full;
-}
-
-.trade-token-grid-header__col-position-type {
-  @include trade-token-grid-header__col();
-
-  width: $width-col-position-type;
-}
-
-.trade-token-grid-header__col-leverage {
-  @include trade-token-grid-header__col();
-
-  width: $width-col-leverage;
-}
-
-.trade-token-grid-header__col-amount {
-  @include trade-token-grid-header__col();
-
-  width: $width-col-amount;
-}
-
-.trade-token-grid-header__col-price {
-  @include trade-token-grid-header__col();
-
-  width: $width-col-price;
-}
-
-.trade-token-grid-header__col-change24h {
-  @include trade-token-grid-header__col();
-
-  width: $width-col-change24h;
-}
-
-.trade-token-grid-header__col-profit {
-  @include trade-token-grid-header__col();
-
-  width: $width-col-profit;
-}
-
-.trade-token-grid-header__col-actions {
-  @include trade-token-grid-header__col();
-
-  width: $width-col-actions;
-  text-align: right;
-}
-
-.trade-token-grid-row {
-  height: $height-row;
-  margin-bottom: 1px;
-
-  background-color: rgba(169, 181, 199, 0.15);
-
-  margin-left: 0.5rem;
-  margin-right: 0.5rem;
-
-  -webkit-transition: margin-left 0.5s, margin-right 0.5s; /* Safari */
-  transition: margin-left 0.5s, margin-right 0.5s;
-
-  &--active {
-    background-color: rgba(169, 181, 199, 0.3);
-
-    margin-left: 0;
-    margin-right: 0;
-
-    .trade-token-grid-row__col-token-image {
-      padding-left: 0.5rem;
-    }
-
-    .trade-token-grid-row__col-action {
-      padding-right: 0.5rem;
-    }
-  }
-}
-
-@mixin trade-token-grid-row__col {
-  display: inline-block;
-
-  height: 100%;
-  vertical-align: middle;
-  line-height: $height-row;
-
-  font-size: 1rem;
-  font-weight: 600;
-  font-style: normal;
-  font-stretch: normal;
-  letter-spacing: -0.4px;
-  text-align: left;
-
-  &:not(:last-child) {
-    margin-right: $margin-right-column;
-  }
-}
-
-@mixin trade-token-grid-row__text-normal {
-  color: #ffffff;
-}
-
-.trade-token-grid-row__col-token-image {
-  @include trade-token-grid-row__col();
-
-  width: $width-col-token-image;
-
-  -webkit-transition: padding-left 0.5s, padding-right 0.5s; /* Safari */
-  transition: padding-left 0.5s, padding-right 0.5s;
-
-  img {
-    height: 100%;
-    width: 100%;
-  }
-}
-
-.trade-token-grid-row__col-token-name {
-  @include trade-token-grid-row__col();
-  @include trade-token-grid-row__text-normal();
-
-  width: $width-col-token-name;
-}
-
-.trade-token-grid-row__col-token-name-full {
-  @include trade-token-grid-row__col();
-  @include trade-token-grid-row__text-normal();
-
-  width: $width-col-token-name-full;
-}
-
-.trade-token-grid-row__col-position-type {
-  @include trade-token-grid-row__col();
-
-  width: $width-col-position-type;
-}
-
-.trade-token-grid-row__col-leverage {
-  @include trade-token-grid-row__col();
-
-  width: $width-col-leverage;
-}
-
-.trade-token-grid-row__col-amount {
-  @include trade-token-grid-row__col();
-  @include trade-token-grid-row__text-normal();
-
-  width: $width-col-amount;
-}
-
-.trade-token-grid-row__col-price {
-  @include trade-token-grid-row__col();
-  @include trade-token-grid-row__text-normal();
-
-  width: $width-col-price;
-}
-
-.trade-token-grid-row__col-change24h {
-  @include trade-token-grid-row__col();
-
-  width: $width-col-change24h;
-}
-
-.trade-token-grid-row__col-profit {
-  @include trade-token-grid-row__col();
-  @include trade-token-grid-row__text-normal();
-
-  width: $width-col-profit;
-}
-
-.trade-token-grid-row__col-action {
-  @include trade-token-grid-row__col();
-
-  -webkit-transition: padding-left 0.5s, padding-right 0.5s; /* Safari */
-  transition: padding-left 0.5s, padding-right 0.5s;
-
-  width: $width-col-actions;
-}
-
-.trade-token-grid-row__buy-button {
-  display: inline-block;
-  cursor: pointer;
-
-  border: 0;
-
-  width: $width-button-action;
-  height: 2.5rem;
-
-  border-radius: 100px;
-  background-color: #407bf7;
-
-  text-transform: uppercase;
-  font-size: 0.75rem;
-  font-weight: normal;
-  font-style: normal;
-  font-stretch: normal;
-  letter-spacing: -0.3px;
-  color: #ffffff;
-  outline: none;
-}
-
-.trade-token-grid-row__group-button {
-
-
-  display: inline-block;
-  cursor: pointer;
-
-  border: 0;
-
-  width: $width-button-action;
-  height: 2.5rem;
-
-  border-radius: 100px;
-  border: 1px solid #FFFFFF;
-  background-color: transparent;
-
-  text-transform: uppercase;
-  font-size: 0.75rem;
-  font-weight: normal;
-  font-style: normal;
-  font-stretch: normal;
-  letter-spacing: -0.3px;
-  color: #ffffff;
-  outline: none;
-}
-
-
-.button-lg{
-    //position: relative;
-    //background-color: #FFFFFF;
-    //color: black;
-    z-index: 2;
-    //left: 36px;
-  }
-  .button-sh{
-    z-index: 2;
-    position: relative;
-    //background-color: #FFFFFF;
-    //color: black;
-    left: -35px;
-  }
-
-.trade-token-grid-row__sell-button {
-  display: inline-block;
-  cursor: pointer;
-
-  border: 0;
-
-  width: $width-button-action;
-  height: 2.5rem;
-
-  border-radius: 100px;
-  background-color: #ff5353;
-
-  text-transform: uppercase;
-  font-size: 0.75rem;
-  font-weight: normal;
-  font-style: normal;
-  font-stretch: normal;
-  letter-spacing: -0.3px;
-  color: #ffffff;
-
-  outline: none;
-}
-
-.trade-token-grid-row__button--size-full {
-  width: 2 * $width-button-action + 1rem;
-  margin: 0 1rem;
-}
-
-.trade-token-grid-row__button--size-half {
-  width: $width-button-action;
-  margin: 0 1rem;
-
-  &:first-child {
-    margin-right: 0.5rem;
-  }
-
-  &:last-child {
-    margin-left: 0.5rem;
-  }
 }

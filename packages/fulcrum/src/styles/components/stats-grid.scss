@@ -1,52 +1,55 @@
 $font-size-header: 0.75rem;
-$height-row: 4.5rem;
+$height-row: 80px;
 
 $width-col-name: 4.5rem;
-$width-col-total-tlv-usd: 8.0rem;
-$width-col-total-supply-usd: 8.0rem;
-$width-col-total-supply: 8.0rem;
-$width-col-total-borrow: 8.0rem;
-$width-col-liquidity: 8.0rem;
-$width-col-liquidity-reserved: 8.0rem;
-$width-col-supply-rate: 8.0rem;
+$width-col-total-tvl-usd: 9rem;
+$width-col-total-supply-usd: 9rem;
+$width-col-total-supply: 8rem;
+$width-col-total-borrow: 8rem;
+$width-col-liquidity: 8rem;
+$width-col-liquidity-reserved: 8rem;
+$width-col-supply-rate: 6rem;
 $width-col-borrow-rate: 10rem;
 
 $flex-col-name: 4.5;
-$flex-col-total-tlv-usd: 8.0;
-$flex-col-total-supply-usd: 8.0;
-$flex-col-total-supply: 8.0;
-$flex-col-total-borrow: 8.0;
-$flex-col-liquidity: 8.0;
-$flex-col-liquidity-reserved: 8.0;
-$flex-col-supply-rate: 8.0;
+$flex-col-total-tvl-usd: 9;
+$flex-col-total-supply-usd: 9;
+$flex-col-total-supply: 8;
+$flex-col-total-borrow: 8;
+$flex-col-liquidity: 8;
+$flex-col-liquidity-reserved: 8;
+$flex-col-supply-rate: 6;
 $flex-col-borrow-rate: 8;
 
-$margin-left-column: 1.5rem;
-$margin-right-column: 1.5rem;
+$margin-left-column: 1rem;
+$margin-right-column: 1rem;
 
 .stats-grid {
   display: flex;
   flex-direction: column;
+
+  margin-top: 20px;
 }
 
 .stats-grid-header {
   display: flex;
   flex-direction: row;
-
-  height: $height-row;
+  margin: 20px 0;
 }
 
 @mixin stats-grid-header__col {
   height: 100%;
-  vertical-align: middle;
-  line-height: $height-row;
 
-  font-size: $font-size-header;
-  font-weight: normal;
+  font-family: "Muli", sans-serif;
   font-style: normal;
-  font-stretch: normal;
-  letter-spacing: normal;
-  color: #a9b5c7;
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 150%;
+
+  display: flex;
+  align-items: center;
+
+  color: var(--trade-header-color);
 
   &:not(:last-child) {
     margin-right: $margin-right-column;
@@ -56,7 +59,13 @@ $margin-right-column: 1.5rem;
     display: grid;
   }
 }
-
+.stats-grid-header__col-supply-rate{
+  .stats-grid-header__text {
+    white-space: nowrap;
+    overflow: inherit;
+    text-overflow: clip;
+  }
+}
 .stats-grid-header__text {
   white-space: nowrap;
   overflow: hidden;
@@ -68,6 +77,7 @@ $margin-right-column: 1.5rem;
 
   margin-left: $margin-left-column;
   width: $width-col-name;
+  min-width: $width-col-name;
   flex-grow: $flex-col-name;
   flex-shrink: $flex-col-name;
 }
@@ -88,12 +98,12 @@ $margin-right-column: 1.5rem;
   flex-shrink: $flex-col-liquidity-reserved;
 }
 
-.stats-grid-header__col-total-tlv-usd {
+.stats-grid-header__col-total-tvl-usd {
   @include stats-grid-header__col();
 
-  width: $width-col-total-tlv-usd;
-  flex-grow: $flex-col-total-tlv-usd;
-  flex-shrink: $flex-col-total-tlv-usd;
+  width: $width-col-total-tvl-usd;
+  flex-grow: $flex-col-total-tvl-usd;
+  flex-shrink: $flex-col-total-tvl-usd;
 }
 
 .stats-grid-header__col-total-supply-usd {
@@ -134,6 +144,8 @@ $margin-right-column: 1.5rem;
   width: $width-col-borrow-rate;
   flex-grow: $flex-col-borrow-rate;
   flex-shrink: $flex-col-borrow-rate;
+
+  margin-bottom: -10px;
 }
 
 .stats-grid-row {
@@ -143,30 +155,35 @@ $margin-right-column: 1.5rem;
   height: $height-row;
   margin-bottom: 1px;
 
-  background-color: rgba(169, 181, 199, 0.15);
+  background-color: var(--primary-row);
 }
 
 @mixin stats-grid-row__col {
-  height: 100%;
-  vertical-align: middle;
-  line-height: $height-row;
-
-  font-size: 1rem;
-  font-weight: 600;
+  font-family: "Muli", sans-serif;
   font-style: normal;
-  font-stretch: normal;
-  letter-spacing: -0.4px;
-  text-align: left;
+  font-weight: normal;
+  font-size: 14px;
+  line-height: 150%;
+  color: var(--trade-header-color);
 
   text-overflow: ellipsis;
 
+  display: flex;
+  align-items: center;
   &:not(:last-child) {
     margin-right: $margin-right-column;
+  }
+
+  .fw-800 {
+    font-weight: 800;
+  }
+  .color-primary {
+    color: var(--primary-text);
   }
 }
 
 @mixin stats-grid-row__text-normal {
-  color: #ffffff;
+  // color: #ffffff;
 }
 
 .stats-grid-row__col-name {
@@ -175,8 +192,34 @@ $margin-right-column: 1.5rem;
 
   margin-left: $margin-left-column;
   width: $width-col-name;
+  min-width: $width-col-name;
   flex-grow: $flex-col-name;
   flex-shrink: $flex-col-name;
+
+  display: flex;
+  .stats-grid-row__image {
+    width: 28px;
+    display: flex;
+    align-items: center;
+    svg{
+      width: 28px;
+      height: 28px;
+      .eth-svg {
+        fill: #c8c8c8;
+      }
+    }
+    img {
+      width: 100%;
+    }
+  }
+  .stats-grid-row__asset-name {
+    display: flex;
+    align-items: center;
+    margin-left: 10px;
+    &.reserve-all {
+      margin-left: 38px;
+    }
+  }
 }
 
 .stats-grid-row__col-liquidity {
@@ -197,13 +240,13 @@ $margin-right-column: 1.5rem;
   flex-shrink: $flex-col-liquidity-reserved;
 }
 
-.stats-grid-row__col-total-tlv-usd {
+.stats-grid-row__col-total-tvl-usd {
   @include stats-grid-row__col();
   @include stats-grid-row__text-normal();
 
-  width: $width-col-total-tlv-usd;
-  flex-grow: $flex-col-total-tlv-usd;
-  flex-shrink: $flex-col-total-tlv-usd;
+  width: $width-col-total-tvl-usd;
+  flex-grow: $flex-col-total-tvl-usd;
+  flex-shrink: $flex-col-total-tvl-usd;
 }
 
 .stats-grid-row__col-total-supply-usd {
@@ -252,13 +295,20 @@ $margin-right-column: 1.5rem;
   flex-shrink: $flex-col-borrow-rate;
 }
 
-.stats-grid-card {
-  display: flex;
-  flex-direction: column;
-  flex-grow: 0;
-  flex-shrink: 0;
+.stats-grid__header {
+  font-family: "Muli", sans-serif;
+  font-style: normal;
+  font-weight: 900;
+  font-size: 28px;
+  line-height: 140%;
 
-  margin-bottom: 2rem;
+  color: var(--primary-text);
+}
+
+.stats-grid-card {
+  margin-bottom: 2px;
+  padding: 22px 18px;
+  background: var(--primary-row);
 
   .stats-grid-card__info-container {
     display: flex;
@@ -280,40 +330,76 @@ $margin-right-column: 1.5rem;
     cursor: pointer;
   }
 
-  .stats-grid-card__info-container, .stats-grid-card__info-container-link {
+  .stats-grid-card__info-container,
+  .stats-grid-card__info-container-link {
     .stats-grid-card__image {
       text-align: center;
 
-      img {
+      img, svg {
         display: inline-block;
-        height: 4rem;
-        width: 4rem;
+        width: 28px;
+        height: 28px;
+        .eth-svg {
+          fill: #c8c8c8;
+        }
+      }
+    }
+    .stats-grid-row__col-name {
+      margin-left: 10px;
+      font-family: "Muli", sans-serif;
+      font-style: normal;
+      font-weight: 800;
+      font-size: 18px;
+      line-height: 150%;
+      /* or 27px */
+
+      display: flex;
+      align-items: center;
+
+      /* Main/White */
+
+      color: var(--primary-text);
+      &.reserve-all {
+        margin-left: 0;
       }
     }
   }
 
   .stats-grid-card__details-container {
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-    flex-shrink: 1;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-row-gap: 10px;
+    grid-column-gap: 12px;
+    > div {
+    }
 
     .stats-grid-card__kv-container {
       display: flex;
-      flex-direction: row;
-      justify-content: space-between;
+      flex-direction: column;
+      align-items: flex-start;
+      font-family: "Muli", sans-serif;
+      font-style: normal;
+      font-weight: normal;
+      line-height: 150%;
+      color: var(--trade-header-color);
+
+      .fw-800 {
+        font-weight: 800;
+      }
+      .color-primary {
+        color: var(--primary-text);
+      }
 
       .stats-grid-card__kv-title {
-        flex-grow: 0;
+        font-size: 10px;
 
-        font-size: 0.75rem;
-        line-height: 1rem;
-        font-weight: normal;
-        font-style: normal;
-        font-stretch: normal;
-        letter-spacing: normal;
-        text-align: right;
-        color: #acb5c2;
+        display: flex;
+        align-items: center;
+        &.borrow-title {
+          flex-direction: column;
+          line-height: 12px;
+          align-items: initial;
+        }
       }
 
       .stats-grid-card__kv-dots {
@@ -327,16 +413,12 @@ $margin-right-column: 1.5rem;
       }
 
       .stats-grid-card__kv-value {
-        flex-grow: 0;
+        font-size: 16px;
 
-        font-size: 0.75rem;
-        line-height: 1rem;
-        font-weight: 600;
-        font-style: normal;
-        font-stretch: normal;
-        letter-spacing: -0.4px;
-        text-align: right;
-        color: #ffe546;
+        display: flex;
+        align-items: center;
+
+        /* Main/White */
       }
     }
   }

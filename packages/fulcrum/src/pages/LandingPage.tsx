@@ -5,6 +5,7 @@ import { HeaderHome } from "../layout/HeaderHome";
 
 export interface ILandingPageProps {
   isMobileMedia: boolean;
+  isRiskDisclosureModalOpen: () => void;
 }
 
 export class LandingPage extends PureComponent<ILandingPageProps> {
@@ -29,7 +30,7 @@ export class LandingPage extends PureComponent<ILandingPageProps> {
             </div>
           </div>
         </main>
-        <Footer />
+        <Footer isMobileMedia={this.props.isMobileMedia} isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
       </div>
     );
   }

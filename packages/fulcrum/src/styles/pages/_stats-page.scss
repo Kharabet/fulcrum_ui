@@ -3,10 +3,26 @@
   flex-direction: column;
   align-content: center;
   justify-content: flex-start;
-
-  height: 100%;
-  width: 100%;
-  max-width: $page-max-width;
-  padding: $page-padding;
-
+  width: $container-desktop;
+  box-sizing: border-box;
+}
+@media screen and (max-width: $breakpoint-desktop-max) {
+  .stats-page {
+    width: $container-laptop;
+  }
+}
+@media screen and (max-width: $breakpoint-laptop-max) {
+  .stats-page {
+    width: $container-mobile;
+    padding: 0 15px;
+  }
+}
+@media only screen and (max-width: $mobile-version-width-sm) {
+  .stats-page {
+    height: 100%;
+  }
+  .stats-page-header {
+    width: $container-mobile;
+    margin: auto;
+  }
 }

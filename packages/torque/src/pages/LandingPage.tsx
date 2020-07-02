@@ -5,8 +5,14 @@ import { Footer } from "../layout/Footer";
 import { HeaderHome } from "../layout/HeaderHome";
 import { NavService } from "../services/NavService";
 import { TorqueProvider } from "../services/TorqueProvider";
+import siteConfig from "../config/SiteConfig.json";
 
-export class LandingPage extends PureComponent {
+
+export interface ILandingPageProps {
+  isRiskDisclosureModalOpen: () => void;
+}
+
+export class LandingPage extends PureComponent<ILandingPageProps> {
   public render() {
     const accountAddress =
       TorqueProvider.Instance.accounts.length > 0 && TorqueProvider.Instance.accounts[0]
@@ -28,12 +34,12 @@ export class LandingPage extends PureComponent {
               <span className="landing-page__jumbo-header">Borrowing Made Simple</span>
             </h1>
             <div className="landing-page__jumbo-action-container">
-              <ButtonLanding color={ButtonLandingColor.Blue} subtitle={"New user?"} title={"Borrow"} url={walletUrl} />
+              {!siteConfig.BorrowDisabled || (accountAddress && accountAddress.toLowerCase() === "0xadff3ada12ed0f8a87e31e5a04dfd2ee054e1118") ? <ButtonLanding color={ButtonLandingColor.Blue} subtitle={"New user?"} title={"Borrow"} url={walletUrl} /> : undefined}
               <ButtonLanding color={ButtonLandingColor.Green} subtitle={"Existing user?"} title={"Track your loans"} url={trackLoansUrl} />
             </div>
           </div>
         </main>
-        <Footer />
+        <Footer isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen}/>
       </div>
     );
   }

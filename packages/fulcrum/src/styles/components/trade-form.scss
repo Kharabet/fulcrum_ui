@@ -1,102 +1,129 @@
 .trade-form {
   @include clearfix();
-
-  width: 42rem;
-  min-height: 25.625rem;
-
-  background-color: #444e5a;
-}
-
-.trade-form__left_block {
-  float: left;
-
-  position: absolute;
-  height: 100%;
-  width: 16rem;
-
-  top: 0;
-  left: 0;
-
-  background-size: 100% 100%;
-
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-
-  .trade-form__info_block {
-    position: relative;
-
+  box-sizing: border-box;
+  width: 575px;
+  min-height: 285px;
+  background-color: #444e5a;
+  position: relative;
+  .close-icon {
+    position: absolute;
+    right: 24px;
+    top: 24px;
+    height: 16px;
+    width: 16px;
+    cursor: pointer;
+  }
+  &__left_block {
     display: flex;
-    flex-direction: column;
-
-    width: 13rem;
-
-    .trade-form__info_block__logo {
-      img.asset-logo {
-        height: 8rem;
-        width: 100%;
-
-        margin: -1.75rem 0;
-      }
-
-      img.position-type-marker-alt {
-        position: absolute;
-
-        left: 7.25rem;
-        top: 2.25rem;
-
-        transform: translateY(-50%);
+    align-items: center;
+    background-color: #ffffff;
+  }
+  &__info_block__logo {
+    position: relative;
+    padding: 0 40px;
+    svg {
+      width: 90px;
+      height: 90px;
+      .eth-svg {
+        fill: #c8c8c8;
       }
     }
-
-    .trade-form__info_block__asset {
-      font-size: 1.5rem;
-      font-weight: 600;
-      letter-spacing: -0.6px;
-      text-align: center;
+    .position-type-marker-alt {
+      position: absolute;
+      top: 32px;
+      right: 26.5px;
+      border: 4px solid #fff;
+      border-radius: 50%;
+      width: 27px;
     }
-
-    .trade-form__info_block__stats {
+    .trade-form__asset-stats {
       display: flex;
-      flex-direction: row;
-      justify-content: center;
+      flex-direction: column;
+      align-items: flex-start;
+      margin-top: 5px;
+    }
+  }
+  &__info_block__asset {
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 1.5;
+    color: #282f36;
+    text-align: center;
+  }
+  &__info_block__stats {
+    font-weight: 600;
+    font-size: 13px;
+    line-height: 150%;
 
-      font-size: 0.75rem;
-      line-height: 2;
-      letter-spacing: normal;
-      text-align: center;
-
-      .trade-form__info_block__stats__data {
-
+    color: #a2abb8;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    &__data {
+      &:first-child {
+        border-right: 1px solid #a2abb8;
+        margin-right: 3px;
+        padding-right: 3px;
       }
-
-      .trade-form__info_block__stats__splitter {
-        padding: 0 0.25rem;
-        font-size: 0.5rem;
-        line-height: 3;
+    }
+  }
+  &__group-button {
+    margin-top: 3px;
+    margin-bottom: 10px;
+    button {
+      font-size: 12px;
+      font-weight: 600;
+      width: calc(25% - 1.5px);
+      padding: 8px 0;
+      color: #ffffff;
+      background-color: #586473;
+      border: none;
+      outline: none;
+      cursor: pointer;
+      line-height: 1.5;
+      &:not(:last-child) {
+        margin-right: 2px;
+      }
+      &:hover {
+        background: #758295;
       }
     }
   }
 }
 
 .trade-form__form-container {
-  float: right;
-  box-sizing: border-box;
-
-  height: 100%;
-  width: 28rem;
-  min-height: 25.625rem;
-
-  top: 0;
-  left: 0;
-
-  padding: 3rem 3rem 3rem 3rem;
-
+  padding: 75px 45px 30px 30px;
   display: flex;
   flex-direction: column;
+  &.buy {
+    padding-top: 55px;
+  }
 
   .trade-form__form-values-container {
-    margin-bottom: 2.5rem;
+    margin-bottom: 30px;
+  }
+
+  .trade-form__form-info {
+    font-size: 12px;
+    color: #ffffff;
+    margin-bottom: 20px;
+    display: block;
+    letter-spacing: 0.1px;
+    background: #fff;
+    color: #394049;
+    padding: 12px;
+    padding-left: 27px;
+    position: relative;
+    &:before {
+      content: "";
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      background: url("../assets/images/error_icon.svg");
+      left: -12px;
+      top: 10px;
+    }
   }
 
   .trade-form__actions-container {
@@ -106,29 +133,42 @@
 
     margin-top: auto;
   }
+  .trade-how-it-works-container {
+    margin-top: -30px;
+    margin-bottom: 10px;
+    .trade-form__how-it-works {
+      display: flex;
+      margin-top: 30px;
+    }
+
+    .hiw-icon {
+      margin-right: 13px;
+      svg {
+        width: 24px;
+        height: 24px;
+      }
+    }
+    .hiw-content {
+      font-weight: 600;
+      font-size: 12px;
+      line-height: 150%;
+      color: #b9c7d6;
+    }
+  }
 }
 
 .trade-form__position-type-container {
   margin-bottom: 1rem;
 }
 
-.trade-form__slippage-amount {
-  //background-color: #fff3f3;
-  color: #ee344e;
-  width: 49px;
-  height: 25px;
-  border-radius: 23px;
+.trade-form__unit-of-account-container {
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 150%;
+  color: #a2abb8;
+
   display: flex;
   align-items: center;
-  justify-content: center;
-  margin-left: 5px;
-  font-weight: 600;
-}
-
-.trade-form__slippage-amount img {
-  width: 10px;
-  height: auto;
-  margin-left: 2px;
 }
 
 .trade-form__kv-container {
@@ -165,14 +205,25 @@
 }
 
 .trade-form__label {
-  line-height: 2;
-  font-size: 0.75rem;
-  font-weight: normal;
-  font-style: normal;
-  font-stretch: normal;
-  letter-spacing: normal;
-  color: #a9b5c7;
-  background-color: #444e5a;
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 150%;
+  color: #fe7272;
+  margin-bottom: 10px;
+
+  &.slippage {
+    font-size: 14px;
+    display: flex;
+    .trade-form__slippage-amount {
+      font-weight: 800;
+
+      display: flex;
+      align-items: center;
+      svg {
+        margin-left: 2px;
+      }
+    }
+  }
 
   &--no-bg {
     background-color: transparent;
@@ -214,39 +265,57 @@
 
 .trade-form__amount-container {
   display: flex;
+  background: #394049;
+  width: 100%;
+  height: 65px;
+  position: relative;
+  padding-right: 15px;
+  align-items: center;
+  &:before {
+    content: "";
+    position: absolute;
+    border: 16px solid transparent;
+    border-left: 16px solid #ffffff;
+    left: -31px;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+    height: 32px;
+  }
 
   .trade-form__amount-input {
-    height: 4rem;
-    width: calc(100% - 9rem);
-
-    background-color: rgba(32, 31, 35, 0.3);
-    padding: 0.8125rem 1rem 0.9375rem;
-    border: 0 none;
-
-    font-size: 1.5rem;
+    width: calc(100% - 105px);
+    padding-left: 15px;
+    border: none;
+    font-size: 32px;
     font-weight: 600;
     font-style: normal;
     font-stretch: normal;
     letter-spacing: normal;
     text-align: left;
     color: #ffffff;
+    background-color: transparent;
+
+    &input::-webkit-outer-spin-button,
+    &input::-webkit-inner-spin-button {
+      /* display: none; <- Crashes Chrome on hover */
+      -webkit-appearance: none;
+      margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+    }
+
+    &input[type="number"] {
+      -moz-appearance: textfield; /* Firefox */
+    }
 
     &:focus {
       outline: none;
     }
+    
   }
 
-  .trade-form__collateral-button-container {
-    width: 6rem;
-    border: 0;
-    background-color: rgba(32, 31, 35, 0.3);
-
+  /*.trade-form__amount-max {
     display: flex;
-  }
-
-  .trade-form__amount-max {
-    display: flex;
-    flex-direction:column;
+    flex-direction: column;
     justify-content: center;
     align-content: center;
 
@@ -257,7 +326,6 @@
     border-left: 1px solid #444e5a;
 
     background-color: rgba(32, 31, 35, 0.3);
-
 
     font-size: 0.75rem;
     font-weight: 600;
@@ -272,13 +340,13 @@
     img {
       padding-bottom: 0.25rem;
     }
-  }
+  }*/
 
   .trade-form__amount-maxed {
     display: flex;
-    flex-direction:column;
-    justify-content:center;
-    align-content:center;
+    flex-direction: column;
+    justify-content: center;
+    align-content: center;
 
     width: 3rem;
     padding: 0.5rem;
@@ -287,7 +355,6 @@
     border-left: 1px solid #444e5a;
 
     background-color: rgba(32, 31, 35, 0.3);
-
 
     font-size: 0.75rem;
     font-weight: 600;
@@ -300,7 +367,6 @@
     cursor: pointer;
   }
 }
-
 
 .rounded-mark {
   font-size: 0.5rem;
@@ -316,8 +382,6 @@
   border: 0;
   background-color: rgba(0, 0, 0, 0);
   text-decoration: underline;
-  -webkit-text-decoration-style: dotted;
-  /* text-decoration-style: dotted; */
   color: #ffffff;
   font-size: 0.75rem;
   padding-left: 0.25rem;
@@ -338,24 +402,48 @@
 }
 
 .trade-form__submit-button {
-  display: inline-block;
-
+  display: block;
   cursor: pointer;
   border: 0;
-  height: 2.5rem;
-  //width: 6.5rem;
-  padding-left: 1rem;
-  padding-right: 1rem;
   border-radius: 100px;
   color: #ffffff;
   text-transform: uppercase;
   outline: none;
-
+  font-size: 14px;
+  font-weight: 600;
+  padding: 12px 25px;
   &--buy {
+    z-index: 2;
     background-color: #407bf7;
+    &:hover {
+      background-color: #5b88ff;
+    }
   }
 
   &--sell {
     background-color: #ff5353;
+    &:hover {
+      background-color: #fe7272;
+    }
   }
+}
+
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    /* display: none; <- Crashes Chrome on hover */
+    -webkit-appearance: none;
+    margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+}
+
+input[type=number] {
+    -moz-appearance:textfield; /* Firefox */
+}
+
+.preloader-container{
+position: absolute;
+top: 50%;
+left: 20px;
+transform: translate(0%, -50%);
+width: 100%;
 }

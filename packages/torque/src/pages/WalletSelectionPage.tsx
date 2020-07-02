@@ -17,6 +17,7 @@ export interface IWalletSelectionPageParams {
 export interface IWalletSelectionPageProps {
   onSelectProvider?: (providerType: ProviderType) => void;
   doNetworkConnect?: () => void;
+  isRiskDisclosureModalOpen: () => void;
   isLoading: boolean;
 }
 
@@ -50,7 +51,7 @@ export class WalletSelectionPage extends PureComponent<IWalletSelectionPageProps
           <WalletTypeSelector onSelectWalletType={this.onSelectWalletType} />
           <ProviderSelector onSelectProvider={this.props.onSelectProvider} />
         </div>
-        <Footer />
+        <Footer isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen}/>
       </div>
     );
   }

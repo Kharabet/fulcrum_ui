@@ -7,8 +7,11 @@ import { TorqueProvider } from "../services/TorqueProvider";
 import { HeaderLogo } from "./HeaderLogo";
 import { HeaderMenu, IHeaderMenuProps } from "./HeaderMenu";
 import { HeaderMenuToggle } from "./HeaderMenuToggle";
+import { InfoBlock } from "../components/InfoBlock";
+import siteConfig from "../config/SiteConfig.json";
 export interface IHeaderOpsProps {
   doNetworkConnect: () => void;
+  isRiskDisclosureModalOpen: () => void;
   isLoading: boolean;
   // isMobileMedia: boolean;
 }
@@ -48,7 +51,7 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
           { id: 1, title: "Wallets", link: "/wallet/b", external: false },
           { id: 2, title: "Borrow", link: "/borrow/w", external: false },
           { id: 3, title: "Dashboard", link: "/dashboard/w", external: false },
-          { id: 4, title: "Lend/Trade", link: "https://fulcrum.trade", external: true }
+          { id: 4, title: "Lend", link: "https://fulcrum.trade", external: true }
         ]
       };
     } else {
@@ -57,9 +60,13 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
           { id: 1, title: "Wallets", link: "/wallet/b", external: false },
           { id: 2, title: "Borrow", link: "/borrow/n", external: false },
           { id: 3, title: "Dashboard", link: "/dashboard/n", external: false },
-          { id: 4, title: "Lend/Trade", link: "https://fulcrum.trade", external: true }
+          { id: 4, title: "Lend", link: "https://fulcrum.trade", external: true }
         ]
       };
+    }
+
+    if (siteConfig.BorrowDisabled && !(TorqueProvider.Instance.accounts.length > 0 && TorqueProvider.Instance.accounts[0].toLowerCase() === "0xadff3ada12ed0f8a87e31e5a04dfd2ee054e1118")) {
+      menu.items.splice(1, 1);
     }
 
     const toggleImg = !this.state.isMenuOpen ? menu_icon : ic_close;
@@ -86,17 +93,27 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
 
         </div>
 
-          <div className={sidebarClass}>
-            <div className="header_btn">
-              {TorqueProvider.Instance.providerType !== ProviderType.None ? (
+        <div className={sidebarClass}>
+          <div className="header_btn">
+            {TorqueProvider.Instance.providerType !== ProviderType.None ? (
               <OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />
             ) : ``}
-            </div>
-            <div className="heade_nav_menu">
-              <HeaderMenu items={menu.items} />
-            </div>
           </div>
-
+          <div className="heade_nav_menu">
+            <HeaderMenu items={menu.items} />
+          </div>
+        </div>
+        <InfoBlock localstorageItemProp="torque-risk-notice"  onAccept={() => {this.forceUpdate()}}>
+        For your safety, please ensure the URL in your browser starts with: https://torque.loans/. <br />
+        Torque is a non-custodial platform for borrowing digital assets. <br />
+        "Non-custodial" means YOU are responsible for the security of your digital assets. <br />
+        To learn more about how to stay safe when using Torque and other bZx products, please read our <button className="disclosure-link" onClick={this.props.isRiskDisclosureModalOpen}>DeFi Risk Disclosure</button>.
+        </InfoBlock>
+        {localStorage.getItem("torque-risk-notice") ?
+          <InfoBlock localstorageItemProp="torque-page-info">
+            You may only manage and repay your existing loans. Full functionality will return after a thorough audit of our newly implemented and preexisting smart contracts.
+        </InfoBlock>
+          : null}
 
       </header>
     );

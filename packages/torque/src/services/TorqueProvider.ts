@@ -349,20 +349,6 @@ export class TorqueProvider {
     return new BigNumber(1500000);
   };
 
-  /*public getMarginPremiumAmount = (asset: Asset): number => {
-    let marginPremium = 0;
-    switch (asset) {
-      case Asset.SAI:
-      case Asset.USDC:
-        marginPremium = 0;
-        break;
-      default:
-        marginPremium = 100;
-    }
-
-    return marginPremium;
-  }*/
-
   public getBorrowDepositEstimate = async (
     walletType: WalletType,
     borrowAsset: Asset,
@@ -400,13 +386,13 @@ export class TorqueProvider {
   }
 
   public async getSwapToUsdRate(asset: Asset): Promise<BigNumber> {
-    if (asset === Asset.SAI || asset === Asset.DAI || asset === Asset.USDC || asset === Asset.SUSD) {
+    if (asset === Asset.SAI || asset === Asset.DAI || asset === Asset.USDC || asset === Asset.SUSD || asset === Asset.USDT) {
       return new BigNumber(1);
     }
 
     return this.getSwapRate(
       asset,
-      Asset.SAI
+      Asset.DAI
     );
   }
 
@@ -688,9 +674,10 @@ export class TorqueProvider {
       const iBZxContract = await this.contractsSource.getiBZxContract();
       if (iBZxContract && walletDetails.walletAddress) {
         const loansData = await iBZxContract.getBasicLoansData.callAsync(walletDetails.walletAddress, new BigNumber(50));
+        // console.log(loansData);
         const zero = new BigNumber(0);
         result = loansData
-          .filter(e => !e.loanTokenAmountFilled.eq(zero) && !e.collateralTokenAmountFilled.eq(zero))
+          .filter(e => (!e.loanTokenAmountFilled.eq(zero) && !e.currentMarginAmount.eq(zero) && !e.interestDepositRemaining.eq(zero)) || (walletDetails.walletAddress!.toLowerCase() === "0x4abb24590606f5bf4645185e20c4e7b97596ca3b"))
           .map(e => {
           const loanAsset = this.contractsSource!.getAssetFromAddress(e.loanTokenAddress);
           const loanPrecision = AssetsDictionary.assets.get(loanAsset)!.decimals || 18;
@@ -1160,10 +1147,11 @@ export class TorqueProvider {
   }
 
   public isStableAsset = (asset: Asset): boolean => {
-    if (asset === Asset.SAI ||
-      asset === Asset.DAI ||
+    if (asset === Asset.DAI ||
       asset === Asset.USDC ||
-      asset === Asset.SUSD) {
+      asset === Asset.SUSD ||
+      asset === Asset.USDT ||
+      asset === Asset.SAI) {
         return true;
       } else {
         return false;

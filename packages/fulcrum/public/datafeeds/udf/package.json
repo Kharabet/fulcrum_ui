@@ -1,0 +1,24 @@
+{
+  "private": true,
+  "dependencies": {
+    "axios": "^0.19.1",
+    "promise-polyfill": "6.0.2",
+    "rollup": "^1.29.0",
+    "rollup-plugin-node-builtins": "^2.1.2",
+    "rollup-plugin-node-globals": "^1.4.0",
+    "tslib": "1.7.1",
+    "whatwg-fetch": "2.0.3"
+  },
+  "devDependencies": {
+    "@rollup/plugin-buble": "^0.21.0",
+    "@rollup/plugin-commonjs": "^11.0.1",
+    "@rollup/plugin-json": "^4.0.1",
+    "@rollup/plugin-node-resolve": "^7.0.0",
+    "typescript": "3.3.1"
+  },
+  "scripts": {
+    "compile": "tsc",
+    "bundle-js": "rollup -c rollup.config.js",
+    "build": "npm run compile && npm run bundle-js"
+  }
+}

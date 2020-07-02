@@ -5,7 +5,6 @@ import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { TradeTokenKey } from "../domain/TradeTokenKey";
 
 import { erc20Contract } from "../contracts/erc20";
-import { FulcrumMcdBridgeContract } from "../contracts/FulcrumMcdBridgeContract";
 import { iTokenContract } from "../contracts/iTokenContract";
 import { oracleContract } from "../contracts/oracle";
 import { pTokenContract } from "../contracts/pTokenContract";
@@ -55,7 +54,6 @@ export class ContractsSource {
     ContractsSource.iTokenJson = await import(`./../assets/artifacts/${ethNetwork}/iToken.json`);
     ContractsSource.pTokenJson = await import(`./../assets/artifacts/${ethNetwork}/pToken.json`);
     ContractsSource.oracleJson = await import(`./../assets/artifacts/${ethNetwork}/oracle.json`);
-    ContractsSource.mcdBridgeJson = await import(`./../assets/artifacts/${ethNetwork}/FulcrumMcdBridge.json`);
     ContractsSource.DAppHelperJson = await import(`./../assets/artifacts/${ethNetwork}/DAppHelper.json`);
     
     
@@ -251,26 +249,6 @@ export class ContractsSource {
     return address;
   }
 
-  private getFulcrumMcdBridgeAddress(): string {
-    let address: string = "";
-    switch (this.networkId) {
-      case 1:
-        address = "0x512b9ad4764cc18f6ce414d0df2ecc00fe9481ee";
-        break;
-      case 3:
-        address = "";
-        break;
-      case 4:
-        address = "";
-        break;
-      case 42:
-        address = "0xf52670163f5fae6ff8de13d9a4bde64de30b0864";
-        break;
-    }
-
-    return address;
-  }
-  
 
   private async getErc20ContractRaw(addressErc20: string): Promise<erc20Contract> {
     await this.Init();
@@ -319,15 +297,6 @@ export class ContractsSource {
     );
   }
   
-
-  private async getFulcrumMcdBridgeContractRaw(): Promise<FulcrumMcdBridgeContract> {
-    await this.Init();
-    return new FulcrumMcdBridgeContract(
-      ContractsSource.mcdBridgeJson.abi,
-      this.getFulcrumMcdBridgeAddress().toLowerCase(),
-      this.provider
-    );
-  }
 
   public getPTokensAvailable(): TradeTokenKey[] {
     const result = new Array<TradeTokenKey>();
@@ -378,6 +347,7 @@ export class ContractsSource {
         addressList.push(addr!);
       }
     });
+    // console.log(assetList, addressList);
 
     return [assetList, addressList];
   }
@@ -407,6 +377,5 @@ export class ContractsSource {
   public getITokenContract = _.memoize(this.getITokenContractRaw);
   public getPTokenContract = _.memoize(this.getPTokenContractRaw);
   public getOracleContract = _.memoize(this.getOracleContractRaw);
-  public getFulcrumMcdBridgeContract = _.memoize(this.getFulcrumMcdBridgeContractRaw);
   public getDAppHelperContract = _.memoize(this.getDAppHelperContractRaw);
 }

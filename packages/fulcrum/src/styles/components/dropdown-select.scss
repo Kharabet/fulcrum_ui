@@ -1,0 +1,123 @@
+
+.styled-select {
+  background-color: var(--select-bg);
+  border: 1px solid var(--select-border);  
+  border-radius: 26px;
+  color: var(--primary-text);  
+  font-weight: 600;
+  @media(min-width: $breakpoint-mobile-min){
+    font-size: 14px;
+    padding: 14px 20px;    
+  }
+  @media(max-width: $breakpoint-mobile-max){
+    font-size: 12px;
+    padding: 9px 13px;
+  }
+  &.active {
+    border-radius: 26px 26px 0 0;
+  }
+  &:after {
+    content: "";
+    width: 0;
+    height: 0;
+    border: 5px solid transparent;
+    border-color: var(--select-arrow) transparent transparent transparent;
+    position: absolute;
+    @media(min-width: $breakpoint-mobile-min){
+      top: 21px;
+      right: 16px;
+    }
+    @media(max-width: $breakpoint-mobile-max){
+      top: 16px;
+      right: 9px;
+    }
+  }
+}
+.select-hidden {
+  display: none;
+  visibility: hidden;
+  padding-right: 10px;
+}
+.select {
+  cursor: pointer;
+  display: inline-block;
+  position: relative;  
+  color: var(--select-arrow);
+  @media(min-width: $breakpoint-mobile-min){
+    font-size: 14px;
+    width: 130px;
+    height: 40px;
+    position: absolute;
+    left: 0;
+  }
+  @media(min-width: $breakpoint-laptop-min){
+    margin: 0 20px 0 40px;
+  }
+  @media(max-width: $breakpoint-mobile-max){
+    font-size: 12px;
+    width: 100px;
+    height: 32px;
+    margin:  0 0 15px 0;
+  }
+}
+
+.select-styled {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: var(--select-bg);
+  border-color: 1px solid var(--select-border);
+  border-radius: 26px;
+  @media(min-width: $breakpoint-mobile-min){
+    padding: 14px 20px;    
+  }
+  @media(max-width: $breakpoint-mobile-max){
+    padding: 9px 13px;
+  }
+  &:hover {
+    background-color: var(--select-oprion-hover);
+  }
+  &:active,
+  &.active {
+    background-color: var(--select-oprion-hover);
+    &:after {
+      top: 9px;
+      border-color: transparent transparent var(--select-arrow) transparent;
+    }
+  }
+}
+
+.select-options {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  left: 0;
+  z-index: 999;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  background-color: var(--select-bg);
+  border-radius: 0 0 26px 26px;
+  border: 1px solid var(--select-border);
+  border-top: none;
+  li {
+    margin: 0;
+    padding: 12px 0;
+    text-indent: 15px;
+    border-top: 1px solid var(--select-option-hover);
+    background-color: var(--select-bg);
+    color: var(--primary-text);
+    &:hover {
+      background-color: var(--select-option-hover);
+    }
+    &:last-child {
+      border-radius: 0 0 26px 26px;
+    }
+    &[rel="hide"] {
+      display: none;
+    }
+  }
+}

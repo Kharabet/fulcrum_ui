@@ -100,7 +100,7 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
 
     return (
       <div className="on-chain-indicator">
-        <button className="on-chain-indicator__container">
+        <button className="on-chain-indicator__container" onClick={this.props.doNetworkConnect}>
           {this.renderProviderDisplay(
             isLoading,
             isSupportedNetwork,
@@ -125,7 +125,7 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
     if (isLoading) {
       return (
         <React.Fragment>
-          <span className="on-chain-indicator__provider-txt" onClick={this.props.doNetworkConnect}>
+          <span className="on-chain-indicator__provider-txt" >
             Loading Wallet...
           </span>
           {/*<span className="on-chain-indicator__wallet-address" onClick={this.props.doNetworkConnect}>
@@ -137,12 +137,9 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
       if (providerTypeDetails !== null && providerTypeDetails.logoSvg !== null) {
         return (
           <React.Fragment>
-            <img
-              className="on-chain-indicator__provider-img"
-              src={providerTypeDetails.logoSvg}
-              alt={providerTypeDetails.displayName}
-              onClick={this.props.doNetworkConnect}
-            />
+            <div className="on-chain-indicator__svg">{providerTypeDetails.reactLogoSvgShort.render()}</div>
+            <div className="on-chain-indicator__description">
+              <span>{providerTypeDetails.displayName}</span>
             {walletAddressText ? (
               isSupportedNetwork && accountText && etherscanURL ? (
                 <a
@@ -150,27 +147,30 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
                   href={`${etherscanURL}address/${accountText}`}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={event => event.stopPropagation()}
                 >
                   {walletAddressText}
                 </a>
               ) : (
-                <span className="on-chain-indicator__wallet-address" onClick={this.props.doNetworkConnect}>
+                <span className="on-chain-indicator__wallet-address">
                   {walletAddressText}
                 </span>
               )
             ) : (
               ``
             )}
+            </div>
+
           </React.Fragment>
         );
       } else {
         return (
           <React.Fragment>
-            <span className="on-chain-indicator__provider-txt" onClick={this.props.doNetworkConnect}>
+            <span className="on-chain-indicator__provider-txt">
               Click To Connect Wallet
             </span>
             {FulcrumProvider.Instance.unsupportedNetwork ? (
-              <span className="on-chain-indicator__wallet-address" onClick={this.props.doNetworkConnect}>
+              <span className="on-chain-indicator__wallet-address">
                 {walletAddressText}
               </span>
             ) : ``}

@@ -7,6 +7,7 @@ import { DotsBar } from "./DotsBar";
 import { BorrowSelectorIconsBar } from "./BorrowSelectorIconsBar";
 import bgDai  from "../assets/images/ic_token_dai.svg";
 import bgUsdc  from "../assets/images/ic_token_usdc.svg";
+import bgUsdt  from "../assets/images/ic_token_usdt.svg";
 import bgSai  from "../assets/images/ic_token_sai.svg";
 import bgEth  from "../assets/images/ic_token_eth.svg";
 import bgBtc  from "../assets/images/ic_token_btc.svg";
@@ -122,6 +123,9 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
         break;
       case Asset.USDC:
         return {img:bgUsdc}
+        break;
+      case Asset.USDT:
+        return {img:bgUsdt}
         break;
       case Asset.ETH:
         return {img:bgEth}
