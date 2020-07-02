@@ -54,16 +54,20 @@ const networkName = process.env.REACT_APP_ETH_NETWORK;
 const initialNetworkId = getNetworkIdByString(networkName);
 
 interface ILiquidationsPageState {
-  events: ITxRowProps[]
-  daiDataset: ({ x: string, y: number })[]
-  ethDataset: ({ x: string, y: number })[]
-  usdcDataset: ({ x: string, y: number })[]
+  events: ITxRowProps[];
+  filteredEvents: ITxRowProps[];
+  showSearchResult: boolean;
+  daiDataset: ({ x: string, y: number })[];
+  ethDataset: ({ x: string, y: number })[];
+  usdcDataset: ({ x: string, y: number })[];
 }
 export class LiquidationsPage extends Component<{}, ILiquidationsPageState> {
   constructor(props: any) {
     super(props);
     this.state = {
       events: [],
+      filteredEvents: [],
+      showSearchResult: false,
       daiDataset: [],
       ethDataset: [],
       usdcDataset: [],
@@ -197,6 +201,23 @@ export class LiquidationsPage extends Component<{}, ILiquidationsPageState> {
   }
 
 
+  onSearch = (filter: string) => {
+    if (filter === "") {
+      this.setState({
+        ...this.state,
+        showSearchResult: false,
+        filteredEvents: []
+      })
+      return;
+    }
+    const filteredEvents = this.state.events.filter(e => e.hash === filter || e.account === filter)
+    this.setState({
+      ...this.state,
+      showSearchResult: true,
+      filteredEvents
+    })
+  }
+
   public render() {
     const getData = (canvas: any) => {
       const ctx: any = canvas.getContext("2d");
@@ -270,40 +291,48 @@ export class LiquidationsPage extends Component<{}, ILiquidationsPageState> {
     return (
       <React.Fragment>
         <Header />
-        <div className="container">
-          <div className="flex jc-sb al-c mb-25">
-            <h1>Liquidations</h1>
-            <div className="flex">
-              <div className="liquidation-data">
-                <div className="liquidation-data-title">30-days Volume</div>
-                <div className="liquidation-data-value"><span className="sign sign-currency">$</span>554,456,945.09</div>
-              </div>
-              <div className="liquidation-data">
-                <div className="liquidation-data-title">30-days Transactions Count</div>
-                <div className="liquidation-data-value">100,500</div>
+
+        {!this.state.showSearchResult &&
+          <section>
+            <div className="container">
+              <div className="flex jc-sb al-c mb-25">
+                <h1>Liquidations</h1>
+                <div className="flex">
+                  <div className="liquidation-data">
+                    <div className="liquidation-data-title">30-days Volume</div>
+                    <div className="liquidation-data-value"><span className="sign sign-currency">$</span>554,456,945.09</div>
+                  </div>
+                  <div className="liquidation-data">
+                    <div className="liquidation-data-title">30-days Transactions Count</div>
+                    <div className="liquidation-data-value">100,500</div>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
-        <div className="container">
-          <div className="wrapper-chartjs-bar">
-            <div id="chartjs-bar">
-              <Bar data={chartData} options={options} height={100} />
+            <div className="container">
+              <div className="wrapper-chartjs-bar">
+                <div id="chartjs-bar">
+                  <Bar data={chartData} options={options} height={100} />
+                </div>
+                <div id="chartjs-bar-tooltip"><table></table></div>
+              </div>
+              <div className="flex jc-c labels-container">
+                <div className="label-chart"><span className="bg-green"></span>ETH</div>
+                <div className="label-chart"><span className="bg-primary"></span>DAI</div>
+                <div className="label-chart"><span className="bg-secondary"></span>USDC</div>
+              </div>
             </div>
-            <div id="chartjs-bar-tooltip"><table></table></div>
-          </div>
-          <div className="flex jc-c labels-container">
-            <div className="label-chart"><span className="bg-green"></span>ETH</div>
-            <div className="label-chart"><span className="bg-primary"></span>DAI</div>
-            <div className="label-chart"><span className="bg-secondary"></span>USDC</div>
-          </div>
-        </div>
+          </section>
+        }
         <section className="pt-45">
-          <Search />
+          <Search onSearch={this.onSearch} />
         </section>
         <section className="pt-90">
           <div className="container">
-            <TxGrid events={this.state.events} />
+            {this.state.showSearchResult &&
+              <h1>Result:</h1>
+            }
+            <TxGrid events={!this.state.showSearchResult ? this.state.events : this.state.filteredEvents} />
           </div>
         </section>
         <section className="pt-75">

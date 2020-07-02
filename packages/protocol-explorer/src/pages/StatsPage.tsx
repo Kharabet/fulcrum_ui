@@ -64,8 +64,10 @@ interface IStatsPageProps extends RouteComponentProps<MatchParams> {
 }
 
 interface IStatsPageState {
-  asset: Asset,
-  events: ITxRowProps[]
+  asset: Asset;
+  events: ITxRowProps[];
+  filteredEvents: ITxRowProps[];
+  showSearchResult: boolean;
 }
 
 export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
@@ -73,7 +75,9 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
     super(props);
     this.state = {
       asset: this.props.match.params.token.toUpperCase() as Asset,
-      events: []
+      events: [],
+      filteredEvents: [],
+      showSearchResult: false
     };
   }
 
@@ -286,7 +290,7 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
     })
     return result.filter(e => e)
   }
-  
+
   public getBorrowHistory = async (): Promise<BorrowEvent[]> => {
     let result: BorrowEvent[] = [];
     const bzxContractAddress = this.contractsSource.getiBZxAddress()
@@ -337,7 +341,7 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
     })
     return result.filter(e => e)
   }
-  
+
   public getBurnHistory = async (): Promise<BurnEvent[]> => {
     let result: BurnEvent[] = [];
     const bzxContractAddress = this.contractsSource.getITokenContract(this.state.asset);
@@ -370,7 +374,7 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
     })
     return result.filter(e => e)
   }
-  
+
   public getMintHistory = async (): Promise<MintEvent[]> => {
     let result: MintEvent[] = [];
     const bzxContractAddress = this.contractsSource.getITokenContract(this.state.asset);
@@ -408,8 +412,8 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
     if (events.length === 0) return [];
     const etherscanUrl = getWeb3ProviderSettings(initialNetworkId);
     return events.map(e => {
-      if (e instanceof TradeEvent){
-        return  {
+      if (e instanceof TradeEvent) {
+        return {
           hash: e.txHash,
           etherscanTxUrl: `${etherscanUrl}/tx/${e.txHash}`,
           age: e.timeStamp,
@@ -418,7 +422,7 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
           quantity: e.positionSize.div(10 ** 18),
           action: "Open Fulcrum Loan"
         } as ITxRowProps
-      }else if (e instanceof CloseWithSwapEvent){
+      } else if (e instanceof CloseWithSwapEvent) {
         return {
           hash: e.txHash,
           etherscanTxUrl: `${etherscanUrl}/tx/${e.txHash}`,
@@ -428,7 +432,7 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
           quantity: e.loanCloseAmount.div(10 ** 18),
           action: "Close Fulcrum Loan"
         } as ITxRowProps
-      }else if (e instanceof LiquidationEvent){
+      } else if (e instanceof LiquidationEvent) {
         return {
           hash: e.txHash,
           etherscanTxUrl: `${etherscanUrl}/tx/${e.txHash}`,
@@ -438,7 +442,7 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
           quantity: e.repayAmount.div(10 ** 18),
           action: "Liquidate Fulcrum Loan"
         } as ITxRowProps
-      }else if (e instanceof CloseWithDepositEvent){
+      } else if (e instanceof CloseWithDepositEvent) {
         return {
           hash: e.txHash,
           etherscanTxUrl: `${etherscanUrl}/tx/${e.txHash}`,
@@ -448,7 +452,7 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
           quantity: e.repayAmount.div(10 ** 18),
           action: "Close Torque Loan"
         } as ITxRowProps
-      }else if (e instanceof BorrowEvent){
+      } else if (e instanceof BorrowEvent) {
         return {
           hash: e.txHash,
           etherscanTxUrl: `${etherscanUrl}/tx/${e.txHash}`,
@@ -458,7 +462,7 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
           quantity: e.newPrincipal.div(10 ** 18),
           action: "Open Torque Loan"
         } as ITxRowProps
-      }else if (e instanceof BurnEvent){
+      } else if (e instanceof BurnEvent) {
         return {
           hash: e.txHash,
           etherscanTxUrl: `${etherscanUrl}/tx/${e.txHash}`,
@@ -468,7 +472,7 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
           quantity: e.assetAmount.div(10 ** 18),
           action: "Burn Token"
         } as ITxRowProps
-      }else {
+      } else {
         return {
           hash: e.txHash,
           etherscanTxUrl: `${etherscanUrl}/tx/${e.txHash}`,
@@ -495,27 +499,49 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
     })
   }
 
+  onSearch = (filter: string) => {
+    if (filter === "") {
+      this.setState({
+        ...this.state,
+        showSearchResult: false,
+        filteredEvents: []
+      })
+      return;
+    }
+    const filteredEvents = this.state.events.filter(e => e.hash === filter || e.account === filter)
+    this.setState({
+      ...this.state,
+      showSearchResult: true,
+      filteredEvents
+    })
+  }
+
 
   public render() {
     return (
       <React.Fragment>
         <Header />
         <section>
-          <div className="container">
-            <StatsChart />
-            <div className="flex jc-c labels-container">
-              <div className="label-chart"><span className="bg-green"></span>Supply APR, %</div>
-              <div className="label-chart"><span className="bg-primary"></span>TVL</div>
-              <div className="label-chart"><span className="bg-secondary"></span>Utilization, %</div>
+          {!this.state.showSearchResult &&
+            <div className="container">
+              <StatsChart />
+              <div className="flex jc-c labels-container">
+                <div className="label-chart"><span className="bg-green"></span>Supply APR, %</div>
+                <div className="label-chart"><span className="bg-primary"></span>TVL</div>
+                <div className="label-chart"><span className="bg-secondary"></span>Utilization, %</div>
+              </div>
             </div>
-          </div>
+          }
         </section>
         <section className="pt-75">
-          <Search />
+          <Search onSearch={this.onSearch} />
         </section>
         <section className="pt-90">
           <div className="container">
-            <TxGrid events={this.state.events} />
+            {this.state.showSearchResult &&
+              <h1>Result:</h1>
+            }
+            <TxGrid events={!this.state.showSearchResult ? this.state.events : this.state.filteredEvents} />
           </div>
         </section>
       </React.Fragment>

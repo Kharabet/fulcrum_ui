@@ -50,7 +50,7 @@ export class MainPage extends Component<IMainPageProps, IMainPageState> {
           <MainChart periodChart={this.state.periodChart} getchange24h={this.getchange24h} />
         </section>
         <section className="pt-75">
-          <Search />
+          {/* <Search /> */}
         </section>
         <section className="pt-60 pb-45">
           <div className="container">
