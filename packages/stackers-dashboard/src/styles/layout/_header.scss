@@ -1,0 +1,59 @@
+header {
+  padding: 60px 0 75px 0;
+  a {
+    &.logo {
+      display: flex;
+    }
+  }
+}
+.wallet {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 210px;
+  height: 48px;
+  background-color: #ffffff;
+  border-radius: 50px;
+  font-weight: 200;
+  font-size: 13px;
+  line-height: 1.8;
+  color: #276bfb;
+}
+.header-right {
+  .item-menu {
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 18px;
+    margin-right: 15px;
+    color: $primary-color;
+  }
+}
+.header-menu {
+  position: absolute;
+  left: 0;
+  right: 0;
+  .item-menu {
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 18px;
+    color: $green-color;
+    &:not(:last-child) {
+      margin-right: 60px;
+    }
+    &.active {
+      position: relative;
+      &:before {
+        content: "";
+        position: absolute;
+        width: 60px;
+        left: 0;
+        right: 0;
+        margin: auto;
+        height: 4px;
+        top: -74px;
+        border-radius: 0 0 4px 4px;
+        background-color: $primary-color;
+      }
+    }
+  }
+}

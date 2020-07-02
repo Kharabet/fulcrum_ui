@@ -1,0 +1,30 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+}
+body {
+  font-family: "Muli", sans-serif;
+  color: #283049;
+  background-color: #e9f4ff;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  text-decoration: none;
+  color: $primary-color;
+  &:hover {
+    color: $primary-color-hover;
+  }
+}
+.container {
+  padding: 0 15px;
+  margin: auto;
+  box-sizing: border-box;
+}
+.container-md {
+  width: 1140px;
+}
+.container-sm {
+  width: 940px;
+}

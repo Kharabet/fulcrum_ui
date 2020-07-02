@@ -1,0 +1,54 @@
+.grid {
+  padding-bottom: 75px;
+
+  .grid-header,
+  .grid-body {
+    display: flex;
+    align-items: center;
+    padding: 20px 30px;
+    .tx {
+      width: 45%;
+    }
+    .date {
+      width: 15%;
+    }
+    .action {
+      width: 15%;
+    }
+    .currency {
+      width: 15%;
+    }
+    .amount {
+      width: 10%;
+    }
+  }
+  .grid-header {
+    border-bottom: 2px solid #33dfcc;
+    .action {
+      padding-left: 16px;
+    }
+  }
+  .grid-body {
+    border-bottom: 1px solid #cbe2ff;
+    .action {
+      span {
+        padding: 4px 16px;
+        background-color: #ffffff;
+        color: #000085;
+        border-radius: 16px;
+        font-weight: 200;
+        font-size: 16px;
+        line-height: 1.6;
+      }
+    }
+
+    .amount {
+      font-weight: 700;
+      text-align: right;
+    }
+  }
+  .grid-row{
+    display: flex;
+    width: 100%;
+  }
+}
