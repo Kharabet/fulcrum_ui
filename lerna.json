@@ -7,7 +7,9 @@
     "packages/torque",
     "packages/torque-website",
     "packages/web3-react-6",
-    "packages/protocol-explorer"
+    "packages/protocol-explorer",
+    "packages/stackers-dashboard",
+	  "packages/web3-react-6/packages/*"
   ],
   "version": "independent",
   "npmClient": "yarn",
