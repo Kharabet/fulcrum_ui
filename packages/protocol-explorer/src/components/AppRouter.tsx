@@ -12,7 +12,7 @@ import { LiquidationsPage } from "../pages/LiquidationsPage";
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 
 
-///import { Web3ReactProvider } from "@web3-react/core";
+import { Web3ReactProvider } from "@web3-react/core";
 import { Web3ProviderEngine } from "@0x/subproviders";
 
 const isMainnetProd =
