@@ -20,44 +20,6 @@ import { ExplorerProvider } from "../services/ExplorerProvider";
 import { ExplorerProviderEvents } from "../services/events/ExplorerProviderEvents";
 
 
-const getWeb3ProviderSettings = (networkId: number): string => {
-  let etherscanURL = "";
-  switch (networkId) {
-    case 1:
-      etherscanURL = "https://etherscan.io/";
-      break;
-    case 3:
-      etherscanURL = "https://ropsten.etherscan.io/";
-      break;
-    case 4:
-      etherscanURL = "https://rinkeby.etherscan.io/";
-      break;
-    case 42:
-      etherscanURL = "https://kovan.etherscan.io/";
-      break;
-    default:
-      etherscanURL = "";
-      break;
-  }
-  return etherscanURL
-}
-
-const getNetworkIdByString = (networkName: string | undefined) => {
-  switch (networkName) {
-    case 'mainnet':
-      return 1;
-    case 'ropsten':
-      return 3;
-    case 'rinkeby':
-      return 4;
-    case 'kovan':
-      return 42;
-    default:
-      return 0;
-  }
-}
-const networkName = process.env.REACT_APP_ETH_NETWORK;
-const initialNetworkId = getNetworkIdByString(networkName);
 interface MatchParams {
   token: string;
 }
@@ -141,7 +103,7 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
   public getTradeHistory = async (): Promise<TradeEvent[]> => {
     let result: TradeEvent[] = [];
     if (!ExplorerProvider.Instance.contractsSource) return result;
-    const bzxContractAddress = ExplorerProvider.Instance.contractsSource.getiBZxAddress()
+    const bzxContractAddress = ExplorerProvider.Instance.contractsSource.getiBZxAddress();
     if (!bzxContractAddress) return result
     const etherscanApiKey = configProviders.Etherscan_Api;
     let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${TradeEvent.topic0}&apikey=${etherscanApiKey}`
@@ -150,6 +112,7 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
     if (tradeEventResponseJson.status !== "1") return result;
     const events = tradeEventResponseJson.result;
     //@ts-ignore
+
     result = events.reverse().map(event => {
       const userAddress = event.topics[1].replace("0x000000000000000000000000", "0x");
       const lender = event.topics[2].replace("0x000000000000000000000000", "0x");
@@ -414,7 +377,8 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
 
   public getGridItems = (events: (LiquidationEvent | TradeEvent | CloseWithSwapEvent | BorrowEvent | BurnEvent | MintEvent | CloseWithDepositEvent)[]): ITxRowProps[] => {
     if (events.length === 0) return [];
-    const etherscanUrl = getWeb3ProviderSettings(initialNetworkId);
+    let initialNetworkId = ExplorerProvider.Instance.contractsSource!.networkId;
+    const etherscanUrl = ExplorerProvider.getWeb3ProviderSettings(initialNetworkId).etherscanURL;
     return events.map(e => {
       if (e instanceof TradeEvent) {
         return {

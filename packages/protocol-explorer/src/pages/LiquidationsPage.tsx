@@ -15,46 +15,6 @@ import { ExplorerProvider } from "../services/ExplorerProvider";
 import { ExplorerProviderEvents } from "../services/events/ExplorerProviderEvents";
 
 
-
-const getWeb3ProviderSettings = (networkId: number): string => {
-  let etherscanURL = "";
-  switch (networkId) {
-    case 1:
-      etherscanURL = "https://etherscan.io/";
-      break;
-    case 3:
-      etherscanURL = "https://ropsten.etherscan.io/";
-      break;
-    case 4:
-      etherscanURL = "https://rinkeby.etherscan.io/";
-      break;
-    case 42:
-      etherscanURL = "https://kovan.etherscan.io/";
-      break;
-    default:
-      etherscanURL = "";
-      break;
-  }
-  return etherscanURL
-}
-
-const getNetworkIdByString = (networkName: string | undefined) => {
-  switch (networkName) {
-    case 'mainnet':
-      return 1;
-    case 'ropsten':
-      return 3;
-    case 'rinkeby':
-      return 4;
-    case 'kovan':
-      return 42;
-    default:
-      return 0;
-  }
-}
-const networkName = process.env.REACT_APP_ETH_NETWORK;
-const initialNetworkId = getNetworkIdByString(networkName);
-
 interface ILiquidationsPageProps {
   doNetworkConnect: () => void;
   isMobileMedia: boolean;
@@ -134,7 +94,7 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
 
   public getGridItems = (events: LiquidationEvent[]): ITxRowProps[] => {
     if (events.length === 0) return [];
-    const etherscanUrl = getWeb3ProviderSettings(initialNetworkId);
+    const etherscanUrl = ExplorerProvider.getWeb3ProviderSettings(ExplorerProvider.Instance.contractsSource!.networkId).etherscanURL;
     return events.map(e => {
       return {
         hash: e.txHash,
