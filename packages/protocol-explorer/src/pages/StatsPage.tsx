@@ -16,6 +16,8 @@ import { MintEvent } from "../domain/MintEvent";
 import { BorrowEvent } from "../domain/BorrowEvent";
 import { ITxRowProps } from "../components/TxRow";
 import configProviders from "../config/providers.json";
+import { ExplorerProvider } from "../services/ExplorerProvider";
+import { ExplorerProviderEvents } from "../services/events/ExplorerProviderEvents";
 
 
 const getWeb3ProviderSettings = (networkId: number): string => {
@@ -61,6 +63,8 @@ interface MatchParams {
 }
 
 interface IStatsPageProps extends RouteComponentProps<MatchParams> {
+  doNetworkConnect: () => void;
+  isMobileMedia: boolean;
 }
 
 interface IStatsPageState {
@@ -69,20 +73,24 @@ interface IStatsPageState {
 }
 
 export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
+  private _isMounted: boolean;
+
   constructor(props: any) {
     super(props);
     this.state = {
       asset: this.props.match.params.token.toUpperCase() as Asset,
       events: []
     };
+
+    this._isMounted = false;
+    ExplorerProvider.Instance.eventEmitter.on(ExplorerProviderEvents.ProviderAvailable, this.onProviderAvailable);
+    ExplorerProvider.Instance.eventEmitter.on(ExplorerProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
 
-  private contractsSource: ContractsSource = new ContractsSource(initialNetworkId);
-
   getLiquidationHistory = async (): Promise<LiquidationEvent[]> => {
     let result: LiquidationEvent[] = [];
-    const bzxContractAddress = this.contractsSource.getiBZxAddress()
+    const bzxContractAddress = ExplorerProvider.Instance.contractsSource!.getiBZxAddress()
     const etherscanApiKey = configProviders.Etherscan_Api;
     let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${LiquidationEvent.topic0}&apikey=${etherscanApiKey}`
     const tradeEventResponse = await fetch(etherscanApiUrl);
@@ -101,8 +109,8 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
 
       const loanTokenAddress = dataSegments[1].replace("000000000000000000000000", "0x");
       const collateralTokenAddress = dataSegments[2].replace("000000000000000000000000", "0x");
-      const loanToken = this.contractsSource!.getAssetFromAddress(loanTokenAddress);
-      const collateralToken = this.contractsSource!.getAssetFromAddress(collateralTokenAddress);
+      const loanToken = ExplorerProvider.Instance.contractsSource!.getAssetFromAddress(loanTokenAddress);
+      const collateralToken = ExplorerProvider.Instance.contractsSource!.getAssetFromAddress(collateralTokenAddress);
       const repayAmount = new BigNumber(parseInt(dataSegments[3], 16));
       const collateralWithdrawAmount = new BigNumber(parseInt(dataSegments[4], 16));
       const collateralToLoanRate = new BigNumber(parseInt(dataSegments[5], 16));
@@ -132,8 +140,8 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
 
   public getTradeHistory = async (): Promise<TradeEvent[]> => {
     let result: TradeEvent[] = [];
-    if (!this.contractsSource) return result;
-    const bzxContractAddress = this.contractsSource.getiBZxAddress()
+    if (!ExplorerProvider.Instance.contractsSource) return result;
+    const bzxContractAddress = ExplorerProvider.Instance.contractsSource.getiBZxAddress()
     if (!bzxContractAddress) return result
     const etherscanApiKey = configProviders.Etherscan_Api;
     let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${TradeEvent.topic0}&apikey=${etherscanApiKey}`
@@ -151,8 +159,8 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
       if (!dataSegments) return result;
       const loanTokenAddress = dataSegments[0].replace("000000000000000000000000", "0x");
       const collateralTokenAddress = dataSegments[1].replace("000000000000000000000000", "0x");
-      const loanToken = this.contractsSource!.getAssetFromAddress(loanTokenAddress);
-      const collateralToken = this.contractsSource!.getAssetFromAddress(collateralTokenAddress);
+      const loanToken = ExplorerProvider.Instance.contractsSource!.getAssetFromAddress(loanTokenAddress);
+      const collateralToken = ExplorerProvider.Instance.contractsSource!.getAssetFromAddress(collateralTokenAddress);
 
       const positionSize = new BigNumber(parseInt(dataSegments[2], 16));
       const borrowedAmount = new BigNumber(parseInt(dataSegments[3], 16));
@@ -189,7 +197,7 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
 
   public getCloseWithSwapHistory = async (): Promise<CloseWithSwapEvent[]> => {
     let result: CloseWithSwapEvent[] = [];
-    const bzxContractAddress = this.contractsSource.getiBZxAddress()
+    const bzxContractAddress = ExplorerProvider.Instance.contractsSource!.getiBZxAddress()
     if (!bzxContractAddress) return result
     const etherscanApiKey = configProviders.Etherscan_Api;
     let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${CloseWithSwapEvent.topic0}&apikey=${etherscanApiKey}`
@@ -207,8 +215,8 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
       if (!dataSegments) return result;
       const collateralTokenAddress = dataSegments[0].replace("000000000000000000000000", "0x");
       const loanTokenAddress = dataSegments[1].replace("000000000000000000000000", "0x");
-      const collateralToken = this.contractsSource!.getAssetFromAddress(collateralTokenAddress);
-      const loanToken = this.contractsSource!.getAssetFromAddress(loanTokenAddress);
+      const collateralToken = ExplorerProvider.Instance.contractsSource!.getAssetFromAddress(collateralTokenAddress);
+      const loanToken = ExplorerProvider.Instance.contractsSource!.getAssetFromAddress(loanTokenAddress);
       const closer = dataSegments[2].replace("000000000000000000000000", "0x");
       const positionCloseSize = new BigNumber(parseInt(dataSegments[3], 16));
       const loanCloseAmount = new BigNumber(parseInt(dataSegments[4], 16));
@@ -240,7 +248,7 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
 
   public getCloseWithDepositHistory = async (): Promise<CloseWithDepositEvent[]> => {
     let result: CloseWithDepositEvent[] = [];
-    const bzxContractAddress = this.contractsSource.getiBZxAddress()
+    const bzxContractAddress = ExplorerProvider.Instance.contractsSource!.getiBZxAddress()
     if (!bzxContractAddress) return result
     const etherscanApiKey = configProviders.Etherscan_Api;
     let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${CloseWithDepositEvent.topic0}&apikey=${etherscanApiKey}`
@@ -259,8 +267,8 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
       const closer = dataSegments[0].replace("000000000000000000000000", "0x");
       const loanTokenAddress = dataSegments[1].replace("000000000000000000000000", "0x");
       const collateralTokenAddress = dataSegments[2].replace("000000000000000000000000", "0x");
-      const loanToken = this.contractsSource!.getAssetFromAddress(loanTokenAddress);
-      const collateralToken = this.contractsSource!.getAssetFromAddress(collateralTokenAddress);
+      const loanToken = ExplorerProvider.Instance.contractsSource!.getAssetFromAddress(loanTokenAddress);
+      const collateralToken = ExplorerProvider.Instance.contractsSource!.getAssetFromAddress(collateralTokenAddress);
       const repayAmount = new BigNumber(parseInt(dataSegments[3], 16));
       const collateralWithdrawAmount = new BigNumber(parseInt(dataSegments[4], 16));
       const collateralToLoanRate = new BigNumber(parseInt(dataSegments[5], 16));
@@ -286,10 +294,10 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
     })
     return result.filter(e => e)
   }
-  
+
   public getBorrowHistory = async (): Promise<BorrowEvent[]> => {
     let result: BorrowEvent[] = [];
-    const bzxContractAddress = this.contractsSource.getiBZxAddress()
+    const bzxContractAddress = ExplorerProvider.Instance.contractsSource!.getiBZxAddress()
     if (!bzxContractAddress) return result
     const etherscanApiKey = configProviders.Etherscan_Api;
     let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${BorrowEvent.topic0}&apikey=${etherscanApiKey}`
@@ -307,8 +315,8 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
       if (!dataSegments) return result;
       const loanTokenAddress = dataSegments[0].replace("000000000000000000000000", "0x");
       const collateralTokenAddress = dataSegments[1].replace("000000000000000000000000", "0x");
-      const loanToken = this.contractsSource!.getAssetFromAddress(loanTokenAddress);
-      const collateralToken = this.contractsSource!.getAssetFromAddress(collateralTokenAddress);
+      const loanToken = ExplorerProvider.Instance.contractsSource!.getAssetFromAddress(loanTokenAddress);
+      const collateralToken = ExplorerProvider.Instance.contractsSource!.getAssetFromAddress(collateralTokenAddress);
       const newPrincipal = new BigNumber(parseInt(dataSegments[2], 16));
       const newCollateral = new BigNumber(parseInt(dataSegments[3], 16));
       const interestRate = new BigNumber(parseInt(dataSegments[4], 16));
@@ -337,10 +345,10 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
     })
     return result.filter(e => e)
   }
-  
+
   public getBurnHistory = async (): Promise<BurnEvent[]> => {
     let result: BurnEvent[] = [];
-    const bzxContractAddress = this.contractsSource.getITokenContract(this.state.asset);
+    const bzxContractAddress = ExplorerProvider.Instance.contractsSource!.getITokenContract(this.state.asset);
     if (!bzxContractAddress) return result
     const etherscanApiKey = configProviders.Etherscan_Api;
     let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${BurnEvent.topic0}&apikey=${etherscanApiKey}`
@@ -370,10 +378,10 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
     })
     return result.filter(e => e)
   }
-  
+
   public getMintHistory = async (): Promise<MintEvent[]> => {
     let result: MintEvent[] = [];
-    const bzxContractAddress = this.contractsSource.getITokenContract(this.state.asset);
+    const bzxContractAddress = ExplorerProvider.Instance.contractsSource!.getITokenContract(this.state.asset);
     if (!bzxContractAddress) return result
     const etherscanApiKey = configProviders.Etherscan_Api;
     let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${MintEvent.topic0}&apikey=${etherscanApiKey}`
@@ -408,8 +416,8 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
     if (events.length === 0) return [];
     const etherscanUrl = getWeb3ProviderSettings(initialNetworkId);
     return events.map(e => {
-      if (e instanceof TradeEvent){
-        return  {
+      if (e instanceof TradeEvent) {
+        return {
           hash: e.txHash,
           etherscanTxUrl: `${etherscanUrl}/tx/${e.txHash}`,
           age: e.timeStamp,
@@ -418,7 +426,7 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
           quantity: e.positionSize.div(10 ** 18),
           action: "Open Fulcrum Loan"
         } as ITxRowProps
-      }else if (e instanceof CloseWithSwapEvent){
+      } else if (e instanceof CloseWithSwapEvent) {
         return {
           hash: e.txHash,
           etherscanTxUrl: `${etherscanUrl}/tx/${e.txHash}`,
@@ -428,7 +436,7 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
           quantity: e.loanCloseAmount.div(10 ** 18),
           action: "Close Fulcrum Loan"
         } as ITxRowProps
-      }else if (e instanceof LiquidationEvent){
+      } else if (e instanceof LiquidationEvent) {
         return {
           hash: e.txHash,
           etherscanTxUrl: `${etherscanUrl}/tx/${e.txHash}`,
@@ -438,7 +446,7 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
           quantity: e.repayAmount.div(10 ** 18),
           action: "Liquidate Fulcrum Loan"
         } as ITxRowProps
-      }else if (e instanceof CloseWithDepositEvent){
+      } else if (e instanceof CloseWithDepositEvent) {
         return {
           hash: e.txHash,
           etherscanTxUrl: `${etherscanUrl}/tx/${e.txHash}`,
@@ -448,7 +456,7 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
           quantity: e.repayAmount.div(10 ** 18),
           action: "Close Torque Loan"
         } as ITxRowProps
-      }else if (e instanceof BorrowEvent){
+      } else if (e instanceof BorrowEvent) {
         return {
           hash: e.txHash,
           etherscanTxUrl: `${etherscanUrl}/tx/${e.txHash}`,
@@ -458,7 +466,7 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
           quantity: e.newPrincipal.div(10 ** 18),
           action: "Open Torque Loan"
         } as ITxRowProps
-      }else if (e instanceof BurnEvent){
+      } else if (e instanceof BurnEvent) {
         return {
           hash: e.txHash,
           etherscanTxUrl: `${etherscanUrl}/tx/${e.txHash}`,
@@ -468,7 +476,7 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
           quantity: e.assetAmount.div(10 ** 18),
           action: "Burn Token"
         } as ITxRowProps
-      }else {
+      } else {
         return {
           hash: e.txHash,
           etherscanTxUrl: `${etherscanUrl}/tx/${e.txHash}`,
@@ -481,25 +489,49 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
       }
     });
   }
+  private async derivedUpdate() {
+    const provider = ExplorerProvider.getLocalstorageItem('providerType');
 
-  componentDidMount = async () => {
-    await this.contractsSource.Init()
-    const liquidationEvents = this.getGridItems(await this.getLiquidationHistory());
-    const tradeEvents = this.getGridItems(await this.getTradeHistory());
-    const closeEvents = this.getGridItems(await this.getCloseWithSwapHistory());
-    const events: ITxRowProps[] = liquidationEvents.concat(closeEvents).concat(tradeEvents);
+    !ExplorerProvider.Instance.web3Wrapper && (!provider || provider === "None") &&
+      this.props.doNetworkConnect();
 
-    this.setState({
-      ...this.state,
-      events
-    })
+    if (ExplorerProvider.Instance.contractsSource) {
+      const liquidationEvents = this.getGridItems(await this.getLiquidationHistory());
+      const tradeEvents = this.getGridItems(await this.getTradeHistory());
+      const closeEvents = this.getGridItems(await this.getCloseWithSwapHistory());
+      const events: ITxRowProps[] = liquidationEvents.concat(closeEvents).concat(tradeEvents);
+
+      this.setState({
+        ...this.state,
+        events
+      })
+    }
   }
 
+  private onProviderChanged = () => {
+    this.derivedUpdate();
+  };
+
+  private onProviderAvailable = () => {
+    this.derivedUpdate();
+  };
+
+
+  public componentWillUnmount(): void {
+    this._isMounted = false;
+    ExplorerProvider.Instance.eventEmitter.removeListener(ExplorerProviderEvents.ProviderAvailable, this.onProviderAvailable);
+    ExplorerProvider.Instance.eventEmitter.removeListener(ExplorerProviderEvents.ProviderChanged, this.onProviderChanged);
+  }
+
+  public componentDidMount(): void {
+    this._isMounted = true;
+    this.derivedUpdate();
+  }
 
   public render() {
     return (
       <React.Fragment>
-        <Header />
+        <Header isMobileMedia={this.props.isMobileMedia} doNetworkConnect={this.props.doNetworkConnect} />
         <section>
           <div className="container">
             <StatsChart />

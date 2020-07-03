@@ -6,6 +6,7 @@
 @import "base/spacing";
 @import "base/flex";
 @import "base/general";
+@import "base/modal";
 
 @import "components/asset-selector";
 @import "components/buttons";
@@ -13,6 +14,8 @@
 @import "components/table";
 @import "components/tvl";
 @import "components/chart";
+@import "components/on-chain-indicator";
+@import "components/provider-menu";
 
 @import "layout/footer";
 @import "layout/header";
