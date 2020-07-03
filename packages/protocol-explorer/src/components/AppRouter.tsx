@@ -3,11 +3,13 @@ import React, { Component } from "react";
 import { MainPage } from '../pages/MainPage';
 import { Header } from '../layout/Header';
 import { Footer } from '../layout/Footer';
-import { BrowserRouter as Router, Switch, Route, } from "react-router-dom";
+import { Router, Switch, Route, } from "react-router-dom";
 import configProviders from "../config/providers.json";
 import { ProviderType } from "../domain/ProviderType";
 import { StatsPage } from "../pages/StatsPage";
 import { LiquidationsPage } from "../pages/LiquidationsPage";
+import { SearchResultPage } from "../pages/SearchResultPage";
+import { NavService } from '../services/NavService';
 
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 
@@ -36,12 +38,13 @@ export class AppRouter extends Component {
   public render() {
     return (
       <React.Fragment>
-        <Router >
+        <Router history={NavService.Instance.History}>
           <Switch>
             <Route exact={true} path="/">
               <MainPage />
             </Route>
             <Route path="/stats/:token" component={StatsPage} />
+            <Route path="/search/:filter" component={SearchResultPage} />
 
             <Route path="/liquidations" >
               <LiquidationsPage />

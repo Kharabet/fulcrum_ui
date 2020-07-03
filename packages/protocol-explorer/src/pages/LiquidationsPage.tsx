@@ -84,8 +84,7 @@ export class LiquidationsPage extends Component<{}, ILiquidationsPageState> {
     const tradeEventResponseJson = await tradeEventResponse.json();
     if (tradeEventResponseJson.status !== "1") return result;
     const events = tradeEventResponseJson.result;
-    //@ts-ignore
-    result = events.reverse().map(event => {
+    result = events.reverse().map((event: any) => {
       const userAddress = event.topics[1].replace("0x000000000000000000000000", "0x");
       const liquidatorAddress = event.topics[2].replace("0x000000000000000000000000", "0x");
       const loanId = event.topics[3];
@@ -130,7 +129,7 @@ export class LiquidationsPage extends Component<{}, ILiquidationsPageState> {
     return events.map(e => {
       return {
         hash: e.txHash,
-        etherscanTxUrl: `${etherscanUrl}/tx/${e.txHash}`,
+        etherscanTxUrl: `${etherscanUrl}tx/${e.txHash}`,
         age: e.timeStamp,
         account: e.user,
         etherscanAddressUrl: `${etherscanUrl}/address/${e.user}`,
