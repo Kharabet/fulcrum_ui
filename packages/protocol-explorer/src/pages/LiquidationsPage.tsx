@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Header } from "../layout/Header";
-import { ContractsSource } from "../services/ContractsSource";
+//import { ContractsSource } from "../services/ContractsSource";
 import { LiquidationEvent } from "../domain/LiquidationEvent";
 import { BigNumber } from "@0x/utils";
 import { ITxRowProps } from "../components/TxRow";
@@ -11,48 +11,17 @@ import { Asset } from "../domain/Asset";
 import { Bar } from "react-chartjs-2";
 import { Search } from "../components/Search";
 import { UnhealthyChart } from "../components/UnhealthyChart";
+
+import { ExplorerProvider } from "../services/ExplorerProvider";
+import { ExplorerProviderEvents } from "../services/events/ExplorerProviderEvents";
+
 import { NavService } from "../services/NavService";
 
 
-
-const getWeb3ProviderSettings = (networkId: number): string => {
-  let etherscanURL = "";
-  switch (networkId) {
-    case 1:
-      etherscanURL = "https://etherscan.io/";
-      break;
-    case 3:
-      etherscanURL = "https://ropsten.etherscan.io/";
-      break;
-    case 4:
-      etherscanURL = "https://rinkeby.etherscan.io/";
-      break;
-    case 42:
-      etherscanURL = "https://kovan.etherscan.io/";
-      break;
-    default:
-      etherscanURL = "";
-      break;
-  }
-  return etherscanURL
+interface ILiquidationsPageProps {
+  doNetworkConnect: () => void;
+  isMobileMedia: boolean;
 }
-
-const getNetworkIdByString = (networkName: string | undefined) => {
-  switch (networkName) {
-    case 'mainnet':
-      return 1;
-    case 'ropsten':
-      return 3;
-    case 'rinkeby':
-      return 4;
-    case 'kovan':
-      return 42;
-    default:
-      return 0;
-  }
-}
-const networkName = process.env.REACT_APP_ETH_NETWORK;
-const initialNetworkId = getNetworkIdByString(networkName);
 
 interface ILiquidationsPageState {
   events: ITxRowProps[];
@@ -60,7 +29,9 @@ interface ILiquidationsPageState {
   ethDataset: ({ x: string, y: number })[];
   usdcDataset: ({ x: string, y: number })[];
 }
-export class LiquidationsPage extends Component<{}, ILiquidationsPageState> {
+export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquidationsPageState> {
+  private _isMounted: boolean;
+
   constructor(props: any) {
     super(props);
     this.state = {
@@ -69,12 +40,15 @@ export class LiquidationsPage extends Component<{}, ILiquidationsPageState> {
       ethDataset: [],
       usdcDataset: [],
     };
+
+    this._isMounted = false;
+    ExplorerProvider.Instance.eventEmitter.on(ExplorerProviderEvents.ProviderAvailable, this.onProviderAvailable);
+    ExplorerProvider.Instance.eventEmitter.on(ExplorerProviderEvents.ProviderChanged, this.onProviderChanged);
   }
-  private contractsSource: ContractsSource = new ContractsSource(initialNetworkId);
 
   getLiquidationHistory = async (): Promise<LiquidationEvent[]> => {
     let result: LiquidationEvent[] = [];
-    const bzxContractAddress = this.contractsSource.getiBZxAddress()
+    const bzxContractAddress = ExplorerProvider.Instance.contractsSource!.getiBZxAddress()
     const etherscanApiKey = configProviders.Etherscan_Api;
     let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${LiquidationEvent.topic0}&apikey=${etherscanApiKey}`
     const tradeEventResponse = await fetch(etherscanApiUrl);
@@ -92,8 +66,8 @@ export class LiquidationsPage extends Component<{}, ILiquidationsPageState> {
 
       const baseTokenAddress = dataSegments[1].replace("000000000000000000000000", "0x");
       const quoteTokenAddress = dataSegments[2].replace("000000000000000000000000", "0x");
-      const baseToken = this.contractsSource!.getAssetFromAddress(baseTokenAddress);
-      const quoteToken = this.contractsSource!.getAssetFromAddress(quoteTokenAddress);
+      const baseToken = ExplorerProvider.Instance.contractsSource!.getAssetFromAddress(baseTokenAddress);
+      const quoteToken = ExplorerProvider.Instance.contractsSource!.getAssetFromAddress(quoteTokenAddress);
       const repayAmount = new BigNumber(parseInt(dataSegments[3], 16));
       const collateralWithdrawAmount = new BigNumber(parseInt(dataSegments[4], 16));
       const collateralToLoanRate = new BigNumber(parseInt(dataSegments[5], 16));
@@ -122,7 +96,7 @@ export class LiquidationsPage extends Component<{}, ILiquidationsPageState> {
 
   public getGridItems = (events: LiquidationEvent[]): ITxRowProps[] => {
     if (events.length === 0) return [];
-    const etherscanUrl = getWeb3ProviderSettings(initialNetworkId);
+    const etherscanUrl = ExplorerProvider.getWeb3ProviderSettings(ExplorerProvider.Instance.contractsSource!.networkId).etherscanURL;
     return events.map(e => {
       return {
         hash: e.txHash,
@@ -176,6 +150,7 @@ export class LiquidationsPage extends Component<{}, ILiquidationsPageState> {
         }),
         y: e.repayAmount.div(10 ** 18).dp(4, BigNumber.ROUND_CEIL).toNumber()
       }
+
     })
     this.setState({
       ...this.state,
@@ -184,9 +159,13 @@ export class LiquidationsPage extends Component<{}, ILiquidationsPageState> {
       usdcDataset
     })
   }
+  private async derivedUpdate() {
+    const provider = ExplorerProvider.getLocalstorageItem('providerType');
+    if (!ExplorerProvider.Instance.web3Wrapper && (!provider || provider === "None")) {
+      this.props.doNetworkConnect();
+    }
 
-  componentDidMount = async () => {
-    await this.contractsSource.Init()
+    if (ExplorerProvider.Instance.contractsSource) {
     const liquidationEvents = await this.getLiquidationHistory();
     this.getChartData(liquidationEvents);
 
@@ -194,6 +173,29 @@ export class LiquidationsPage extends Component<{}, ILiquidationsPageState> {
       ...this.state,
       events: this.getGridItems(liquidationEvents)
     });
+  }
+  }
+
+
+  private onProviderChanged = () => {
+    this.derivedUpdate();
+  };
+
+  private onProviderAvailable = () => {
+    this.derivedUpdate();
+  };
+
+  public componentWillUnmount(): void {
+    this._isMounted = false;
+    ExplorerProvider.Instance.eventEmitter.removeListener(ExplorerProviderEvents.ProviderAvailable, this.onProviderAvailable);
+    ExplorerProvider.Instance.eventEmitter.removeListener(ExplorerProviderEvents.ProviderChanged, this.onProviderChanged);
+  }
+
+  public componentDidMount(): void {
+    this._isMounted = true;
+
+    this.derivedUpdate();
+
   }
 
 
@@ -276,7 +278,7 @@ export class LiquidationsPage extends Component<{}, ILiquidationsPageState> {
     }
     return (
       <React.Fragment>
-        <Header />
+        <Header isMobileMedia={this.props.isMobileMedia} doNetworkConnect={this.props.doNetworkConnect} />
           <section>
             <div className="container">
               <div className="flex jc-sb al-c mb-25">
@@ -372,4 +374,5 @@ export class LiquidationsPage extends Component<{}, ILiquidationsPageState> {
     tooltipEl.style.left = tooltip.caretX - tooltip.width / 2 + 'px';
     tooltipEl.style.top = 0 + 'px';
   }
+
 }

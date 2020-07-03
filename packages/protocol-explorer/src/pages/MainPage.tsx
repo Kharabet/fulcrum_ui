@@ -5,9 +5,13 @@ import { MainChart } from "../components/MainChart";
 import { ReactComponent as Arrow } from "../assets/images/icon-arrow.svg";
 import { GroupButton } from "../components/GroupButton";
 import { Header } from "../layout/Header";
+import { ExplorerProvider } from "../services/ExplorerProvider";
+import { ExplorerProviderEvents } from "../services/events/ExplorerProviderEvents"
 import { NavService } from "../services/NavService";
 
 interface IMainPageProps {
+  doNetworkConnect: () => void;
+  isMobileMedia: boolean;
 }
 interface IMainPageState {
   periodChart: number,
@@ -17,6 +21,8 @@ interface IMainPageState {
 
 export class MainPage extends Component<IMainPageProps, IMainPageState> {
   private apiUrl = "https://api.bzx.network/v1";
+  private _isMounted: boolean;
+
   constructor(props: any) {
     super(props);
     this.state = {
@@ -24,7 +30,32 @@ export class MainPage extends Component<IMainPageProps, IMainPageState> {
       tvl: '1.2',
       change24h: 0
     };
+
+    this._isMounted = false;
+    ExplorerProvider.Instance.eventEmitter.on(ExplorerProviderEvents.ProviderAvailable, this.onProviderAvailable);
+    ExplorerProvider.Instance.eventEmitter.on(ExplorerProviderEvents.ProviderChanged, this.onProviderChanged);
   }
+
+  private onProviderChanged = () => {
+    // this.derivedUpdate();
+  };
+
+  private onProviderAvailable = () => {
+    // this.derivedUpdate();
+  };
+
+  public componentWillUnmount(): void {
+    this._isMounted = false;
+    ExplorerProvider.Instance.eventEmitter.removeListener(ExplorerProviderEvents.ProviderAvailable, this.onProviderAvailable);
+    ExplorerProvider.Instance.eventEmitter.removeListener(ExplorerProviderEvents.ProviderChanged, this.onProviderChanged);
+  }
+
+  public componentDidMount(): void {
+    this._isMounted = true;
+    this.getVaultBalanceUsd();
+    // this.derivedUpdate();
+  }
+
   
   onSearch = (filter: string) => {
     if (filter === "") {
@@ -39,7 +70,7 @@ export class MainPage extends Component<IMainPageProps, IMainPageState> {
     return (
       <React.Fragment>
         <section className="bg-gradient">
-          <Header />
+          <Header isMobileMedia={this.props.isMobileMedia} doNetworkConnect={this.props.doNetworkConnect} />
           <div className="container">
             <div className="flex jc-sb">
               <div className="flex fd-c">
@@ -71,9 +102,7 @@ export class MainPage extends Component<IMainPageProps, IMainPageState> {
     );
   }
 
-  public componentDidMount(): void {
-    this.getVaultBalanceUsd();
-  }
+
   public getVaultBalanceUsd = async () => {
     const requestUrl = `${this.apiUrl}/vault-balance-usd`;
     const response = await fetch(requestUrl);
