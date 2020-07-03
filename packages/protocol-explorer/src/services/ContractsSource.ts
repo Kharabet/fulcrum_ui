@@ -29,11 +29,13 @@ export class ContractsSource {
   private static iBZxJson: any;
 
   public networkId: number;
+  public canWrite: boolean;
 
-  public constructor(networkId: number) {
+  public constructor(provider: any, networkId: number, canWrite: boolean) {
+    this.provider = provider;
     this.networkId = networkId;
+    this.canWrite = canWrite;
   }
-
   public async Init() {
     if (ContractsSource.isInit) {
       return;
@@ -45,24 +47,24 @@ export class ContractsSource {
 
     const iTokenList = (await import(`../assets/artifacts/${ethNetwork}/iTokenList.js`)).iTokenList;
 
-    
+
     iTokenList.forEach((val: any, index: any) => {
-        // tslint:disable:no-console
-        // console.log(val);
-        const t = {
-          token: val[1],
-          asset: val[2],
-          name: val[3],
-          symbol: val[4],
-          index: new BigNumber(index),
-          version: parseInt(val[5], 10)
-        };
-        // tslint:disable:no-console
-        // console.log(t);
-  
-        ContractsSource.iTokensContractInfos.set(val[4], t);
-      });
-      
+      // tslint:disable:no-console
+      // console.log(val);
+      const t = {
+        token: val[1],
+        asset: val[2],
+        name: val[3],
+        symbol: val[4],
+        index: new BigNumber(index),
+        version: parseInt(val[5], 10)
+      };
+      // tslint:disable:no-console
+      // console.log(t);
+
+      ContractsSource.iTokensContractInfos.set(val[4], t);
+    });
+
     ContractsSource.isInit = true;
   }
 
