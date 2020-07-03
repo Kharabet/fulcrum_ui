@@ -1,13 +1,18 @@
 .group-buttons {
   display: flex;
   flex-wrap: wrap;
-  padding: 30px 45px 15px 45px;
-  justify-content: space-between;
   border-top: 1px solid #e4ebf4;
+  @media screen and (min-width: $width-min-sm) {
+    padding: 30px 45px 15px 45px;
+    justify-content: space-between;
+  }
+  @media screen and (max-width: $width-max-sm) {
+    padding: 30px 0 15px 0;
+    justify-content: center;
+  }
   .button {
     background-color: #f3f9ff;
     border-radius: 40px;
-    min-width: 300px;
     height: 56px;
     display: flex;
     align-items: center;
@@ -17,12 +22,23 @@
     line-height: 1.5;
     color: #276bfb;
     margin-bottom: 15px;
+    @media screen and (min-width: $width-min-sm) {
+      min-width: 300px;
+    }
+    @media screen and (max-width: $width-max-sm) {
+      min-width: 255px;
+    }
     &:hover {
       background-color: #5b88ff;
       color: #ffffff;
     }
     &:nth-child(2n + 1) {
-      margin-right: 30px;
+      @media screen and (min-width: $width-min-sm) {
+        margin-right: 30px;
+      }
+      @media screen and (max-width: $width-max-sm) and (min-width: $width-min-xs) {
+        margin-right: 15px;
+      }
     }
   }
 }
