@@ -2,8 +2,13 @@ import React from "react";
 import { ReactComponent as LogoBzx } from "../assets/images/logo-bzx.svg"
 import { HeaderMenu } from "./HeaderMenu";
 import { Link } from "react-router-dom";
+import { OnChainIndicator } from "../components/OnChainIndicator";
 
-export const Header = () => {
+interface IHeaderProps {
+  doNetworkConnect: () => void;
+}
+
+export const Header = (props: IHeaderProps) => {
   return (
     <header>
       <div className="container container-md">
@@ -16,7 +21,7 @@ export const Header = () => {
             <Link to="https://help.bzx.network/en/" className={`item-menu`}>
               Help Center
             </Link>
-            <div className="wallet">Click to Connect Wallet</div>
+            <OnChainIndicator doNetworkConnect={props.doNetworkConnect} />
           </div>
         </div>
       </div>

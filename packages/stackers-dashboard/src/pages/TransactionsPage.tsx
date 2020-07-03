@@ -3,21 +3,17 @@ import { Header } from "../layout/Header";
 import { TableGrid } from "../components/TableGrid";
 
 interface ITransactionsPageProps {
+  doNetworkConnect: () => void;
 }
 interface ITransactionsPageState {
 }
 
 export class TransactionsPage extends Component<ITransactionsPageProps, ITransactionsPageState> {
-  constructor(props: any) {
-    super(props);
-    this.state = {
-    };
-  }
   public render() {
     return (
       <React.Fragment>
         <section>
-          <Header />
+          <Header doNetworkConnect={this.props.doNetworkConnect}  />
           <div className="container container-sm">
             <h1>Staking Details</h1>
             <TableGrid />

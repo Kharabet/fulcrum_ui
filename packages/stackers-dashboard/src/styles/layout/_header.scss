@@ -3,23 +3,12 @@ header {
   a {
     &.logo {
       display: flex;
+      z-index: 2;
     }
   }
 }
-.wallet {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 210px;
-  height: 48px;
-  background-color: #ffffff;
-  border-radius: 50px;
-  font-weight: 200;
-  font-size: 13px;
-  line-height: 1.8;
-  color: #276bfb;
-}
 .header-right {
+  z-index: 2;
   .item-menu {
     text-decoration: none;
     font-weight: 600;
