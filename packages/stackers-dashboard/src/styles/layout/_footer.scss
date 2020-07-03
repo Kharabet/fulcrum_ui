@@ -1,10 +1,34 @@
 footer {
   padding: 90px 0;
   .footer-social {
-    width: calc(100% / 12 * 5);
-    .social {
-      margin-bottom: 60px;
+    @media screen and (min-width: $width-min-md) {
+      width: calc(100% / 12 * 5);
+    }
+    @media screen and (max-width: $width-max-md) {
       display: flex;
+      flex-wrap: wrap;
+      width: 100%;
+      margin-top: 30px;
+    }
+    .item-social {
+      &:last-child {
+        @media screen and (max-width: $width-max-md) and (min-width: $width-min-sm) {
+          order: -1;
+          margin-top: 15px;
+        }
+      }
+      @media screen and (max-width: $width-max-sm) {
+        width: 100%;
+      }
+    }
+    .social {
+      display: flex;
+      @media screen and (min-width: $width-min-sm) {
+        margin-bottom: 60px;
+      }
+      @media screen and (max-width: $width-max-sm) {
+        margin-bottom: 30px;
+      }
       a {
         display: flex;
         &:hover {
@@ -15,14 +39,15 @@ footer {
         }
         svg {
           width: 100%;
+          height: auto;
         }
-        @media (min-width: 992px) {
+        @media screen and (min-width: 992px) {
           width: 56px;
           &:not(:last-child) {
             margin-right: 15px;
           }
         }
-        @media (max-width: 991px) {
+        @media screen and (max-width: 991px) {
           width: 48px;
           &:not(:last-child) {
             margin-right: 10px;
@@ -35,14 +60,31 @@ footer {
     }
     .logo {
       margin-bottom: 25px;
+      svg {
+        @media screen and (max-width: $width-max-sm) {
+          width: 100px;
+          height: auto;
+        }
+      }
     }
     .data-protocol {
-      font-size: 18px;
       font-weight: 600;
       margin-bottom: 20px;
+      @media screen and (min-width: $width-min-sm) {
+        font-size: 18px;
+      }
+      @media screen and (max-width: $width-max-sm) {
+        font-size: 16px;
+      }
     }
     .data-year {
-      font-size: 14px;
+      @media screen and (min-width: $width-min-xs) {
+        font-size: 14px;
+      }
+      @media screen and (max-width: $width-max-xs) {
+        font-size: 10px;
+      }
+
       p {
         margin-right: 15px;
       }
@@ -57,7 +99,13 @@ footer {
   .footer-menu {
     display: flex;
     align-items: baseline;
-    width: calc(100% / 12 * 7);
+    @media screen and (min-width: $width-min-md) {
+      width: calc(100% / 12 * 7);
+    }
+    @media screen and (max-width: $width-max-md) {
+      width: 100%;
+      order: -1;
+    }
   }
   .column-menu {
     display: flex;
@@ -70,10 +118,16 @@ footer {
     }
   }
   .title-menu {
-    font-size: 20px;
     line-height: 1.5;
-    margin: 13px auto 35px auto;
     width: 100%;
+    @media screen and (min-width: $width-min-sm) {
+      font-size: 20px;
+      margin: 13px auto 35px auto;
+    }
+    @media screen and (max-width: $width-max-sm) {
+      font-size: 16px;
+      margin: 13px auto 25px auto;
+    }
   }
   .list-menu {
     a {
@@ -85,21 +139,21 @@ footer {
         color: $primary-color-hover;
       }
       &:not(:last-child) {
-        @media (min-width: 768px) {
+        @media screen and (min-width: 768px) {
           margin-bottom: 20px;
         }
-        @media (max-width: 767px) {
+        @media screen and (max-width: 767px) {
           margin-bottom: 15px;
         }
       }
 
-      @media (min-width: 992px) {
+      @media screen and (min-width: 992px) {
         font-size: 16px;
       }
-      @media (max-width: 991px) {
+      @media screen and (max-width: 991px) {
         font-size: 14px;
       }
-      @media (max-width: 767px) {
+      @media screen and (max-width: 767px) {
         font-size: 12px;
       }
     }

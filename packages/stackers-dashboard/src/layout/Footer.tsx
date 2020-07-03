@@ -6,7 +6,7 @@ export const Footer = () => {
   return (
     <footer>
       <div className="container container-md">
-        <div className="flex">
+        <div className="flex fw-w">
           <FooterSocial />
           <FooterMenu />
         </div>

@@ -25,7 +25,13 @@ a {
 }
 .container-md {
   width: 1140px;
+  @media screen and(max-width: $width-max-lg) {
+    width: 100%;
+  }
 }
 .container-sm {
   width: 940px;
+  @media screen and(max-width: $width-max-lg) {
+    width: 100%;
+  }
 }
