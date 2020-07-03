@@ -67,8 +67,6 @@ interface IStatsPageProps extends RouteComponentProps<MatchParams> {
 interface IStatsPageState {
   asset: Asset;
   events: ITxRowProps[];
-  filteredEvents: ITxRowProps[];
-  showSearchResult: boolean;
 }
 
 export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
@@ -77,8 +75,6 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
     this.state = {
       asset: this.props.match.params.token.toUpperCase() as Asset,
       events: [],
-      filteredEvents: [],
-      showSearchResult: false
     };
   }
 
@@ -497,11 +493,6 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
 
   onSearch = (filter: string) => {
     if (filter === "") {
-      this.setState({
-        ...this.state,
-        showSearchResult: false,
-        filteredEvents: []
-      })
       return;
     }
     NavService.Instance.History.push(`/search/${filter}`);
@@ -513,7 +504,6 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
       <React.Fragment>
         <Header />
         <section>
-          {!this.state.showSearchResult &&
             <div className="container">
               <StatsChart />
               <div className="flex jc-c labels-container">
@@ -522,17 +512,13 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
                 <div className="label-chart"><span className="bg-secondary"></span>Utilization, %</div>
               </div>
             </div>
-          }
         </section>
         <section className="pt-75">
           <Search onSearch={this.onSearch} />
         </section>
         <section className="pt-90">
           <div className="container">
-            {this.state.showSearchResult &&
-              <h1>Result:</h1>
-            }
-            <TxGrid events={!this.state.showSearchResult ? this.state.events : this.state.filteredEvents} />
+            <TxGrid events={this.state.events} />
           </div>
         </section>
       </React.Fragment>

@@ -11,6 +11,7 @@ import { Asset } from "../domain/Asset";
 import { Bar } from "react-chartjs-2";
 import { Search } from "../components/Search";
 import { UnhealthyChart } from "../components/UnhealthyChart";
+import { NavService } from "../services/NavService";
 
 
 
@@ -55,8 +56,6 @@ const initialNetworkId = getNetworkIdByString(networkName);
 
 interface ILiquidationsPageState {
   events: ITxRowProps[];
-  filteredEvents: ITxRowProps[];
-  showSearchResult: boolean;
   daiDataset: ({ x: string, y: number })[];
   ethDataset: ({ x: string, y: number })[];
   usdcDataset: ({ x: string, y: number })[];
@@ -66,8 +65,6 @@ export class LiquidationsPage extends Component<{}, ILiquidationsPageState> {
     super(props);
     this.state = {
       events: [],
-      filteredEvents: [],
-      showSearchResult: false,
       daiDataset: [],
       ethDataset: [],
       usdcDataset: [],
@@ -202,19 +199,9 @@ export class LiquidationsPage extends Component<{}, ILiquidationsPageState> {
 
   onSearch = (filter: string) => {
     if (filter === "") {
-      this.setState({
-        ...this.state,
-        showSearchResult: false,
-        filteredEvents: []
-      })
       return;
     }
-    const filteredEvents = this.state.events.filter(e => e.hash === filter || e.account === filter)
-    this.setState({
-      ...this.state,
-      showSearchResult: true,
-      filteredEvents
-    })
+    NavService.Instance.History.push(`/search/${filter}`);
   }
 
   public render() {
@@ -290,8 +277,6 @@ export class LiquidationsPage extends Component<{}, ILiquidationsPageState> {
     return (
       <React.Fragment>
         <Header />
-
-        {!this.state.showSearchResult &&
           <section>
             <div className="container">
               <div className="flex jc-sb al-c mb-25">
@@ -322,16 +307,12 @@ export class LiquidationsPage extends Component<{}, ILiquidationsPageState> {
               </div>
             </div>
           </section>
-        }
         <section className="pt-45">
           <Search onSearch={this.onSearch} />
         </section>
         <section className="pt-90">
           <div className="container">
-            {this.state.showSearchResult &&
-              <h1>Result:</h1>
-            }
-            <TxGrid events={!this.state.showSearchResult ? this.state.events : this.state.filteredEvents} />
+            <TxGrid events={this.state.events} />
           </div>
         </section>
         <section className="pt-75">
