@@ -19,6 +19,7 @@ import { BorrowEvent } from "../domain/BorrowEvent";
 import { BurnEvent } from "../domain/BurnEvent";
 import { MintEvent } from "../domain/MintEvent";
 import { ExplorerProvider } from "../services/ExplorerProvider";
+import { ExplorerProviderEvents } from "../services/events/ExplorerProviderEvents";
 
 
 
@@ -85,11 +86,32 @@ export class SearchResultPage extends Component<ISearchResultPageProps, ISearchR
       showSearchResult: false,
       filter: this.props.match.params.filter.toLowerCase(),
     };
+    this._isMounted = false;
+    ExplorerProvider.Instance.eventEmitter.on(ExplorerProviderEvents.ProviderAvailable, this.onProviderAvailable);
+    ExplorerProvider.Instance.eventEmitter.on(ExplorerProviderEvents.ProviderChanged, this.onProviderChanged);
+
+  }
+  
+  private _isMounted: boolean;
+  
+  private onProviderChanged = () => {
+    this.derivedUpdate();
+  };
+
+  private onProviderAvailable = () => {
+    this.derivedUpdate();
+  };
+  
+  public componentWillUnmount(): void {
+    this._isMounted = false;
+    ExplorerProvider.Instance.eventEmitter.removeListener(ExplorerProviderEvents.ProviderAvailable, this.onProviderAvailable);
+    ExplorerProvider.Instance.eventEmitter.removeListener(ExplorerProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
   getLiquidationHistory = async (): Promise<LiquidationEvent[]> => {
     let result: LiquidationEvent[] = [];
-    const bzxContractAddress = ExplorerProvider.Instance.contractsSource!.getiBZxAddress()
+    if (!ExplorerProvider.Instance.contractsSource) return result;
+    const bzxContractAddress = ExplorerProvider.Instance.contractsSource.getiBZxAddress()
     const etherscanApiKey = configProviders.Etherscan_Api;
     let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${LiquidationEvent.topic0}&apikey=${etherscanApiKey}`
     const tradeEventResponse = await fetch(etherscanApiUrl);
@@ -138,7 +160,7 @@ export class SearchResultPage extends Component<ISearchResultPageProps, ISearchR
   public getTradeHistory = async (): Promise<TradeEvent[]> => {
     let result: TradeEvent[] = [];
     if (!ExplorerProvider.Instance.contractsSource) return result;
-    const bzxContractAddress = ExplorerProvider.Instance.contractsSource!.getiBZxAddress()
+    const bzxContractAddress = ExplorerProvider.Instance.contractsSource.getiBZxAddress()
     if (!bzxContractAddress) return result
     const etherscanApiKey = configProviders.Etherscan_Api;
     let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${TradeEvent.topic0}&apikey=${etherscanApiKey}`
@@ -192,7 +214,8 @@ export class SearchResultPage extends Component<ISearchResultPageProps, ISearchR
 
   public getCloseWithSwapHistory = async (): Promise<CloseWithSwapEvent[]> => {
     let result: CloseWithSwapEvent[] = [];
-    const bzxContractAddress = ExplorerProvider.Instance.contractsSource!.getiBZxAddress()
+    if (!ExplorerProvider.Instance.contractsSource) return result;
+    const bzxContractAddress = ExplorerProvider.Instance.contractsSource.getiBZxAddress()
     if (!bzxContractAddress) return result
     const etherscanApiKey = configProviders.Etherscan_Api;
     let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${CloseWithSwapEvent.topic0}&apikey=${etherscanApiKey}`
@@ -241,7 +264,8 @@ export class SearchResultPage extends Component<ISearchResultPageProps, ISearchR
 
   public getCloseWithDepositHistory = async (): Promise<CloseWithDepositEvent[]> => {
     let result: CloseWithDepositEvent[] = [];
-    const bzxContractAddress = ExplorerProvider.Instance.contractsSource!.getiBZxAddress()
+    if (!ExplorerProvider.Instance.contractsSource) return result;
+    const bzxContractAddress = ExplorerProvider.Instance.contractsSource.getiBZxAddress()
     if (!bzxContractAddress) return result
     const etherscanApiKey = configProviders.Etherscan_Api;
     let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${CloseWithDepositEvent.topic0}&apikey=${etherscanApiKey}`
@@ -288,7 +312,8 @@ export class SearchResultPage extends Component<ISearchResultPageProps, ISearchR
 
   public getBorrowHistory = async (): Promise<BorrowEvent[]> => {
     let result: BorrowEvent[] = [];
-    const bzxContractAddress = ExplorerProvider.Instance.contractsSource!.getiBZxAddress()
+    if (!ExplorerProvider.Instance.contractsSource) return result;
+    const bzxContractAddress = ExplorerProvider.Instance.contractsSource.getiBZxAddress()
     if (!bzxContractAddress) return result
     const etherscanApiKey = configProviders.Etherscan_Api;
     let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${BorrowEvent.topic0}&apikey=${etherscanApiKey}`
@@ -422,23 +447,27 @@ export class SearchResultPage extends Component<ISearchResultPageProps, ISearchR
   };
 
 
-  componentDidMount = async () => {
+  derivedUpdate = async () => {
     const liquidationEvents = this.getGridItems(await this.getLiquidationHistory());
     const tradeEvents = this.getGridItems(await this.getTradeHistory());
     const closeEvents = this.getGridItems(await this.getCloseWithSwapHistory());
     const events: ITxRowProps[] = liquidationEvents.concat(closeEvents).concat(tradeEvents);
 
-    this.setState({
+    this._isMounted && this.setState({
       ...this.state,
       events
     })
     this.onSearch(this.state.filter);
   }
 
+  public componentDidMount(): void {
+    this._isMounted = true;
+    this.derivedUpdate();
+  }
 
   onSearch = (filter: string) => {
     if (filter === "") {
-      this.setState({
+      this._isMounted && this.setState({
         ...this.state,
         showSearchResult: false,
         filteredEvents: []
@@ -446,7 +475,7 @@ export class SearchResultPage extends Component<ISearchResultPageProps, ISearchR
       return;
     }
     const filteredEvents = this.state.events.filter(e => e.hash === filter || e.account === filter)
-    this.setState({
+    this._isMounted && this.setState({
       ...this.state,
       showSearchResult: true,
       filteredEvents,

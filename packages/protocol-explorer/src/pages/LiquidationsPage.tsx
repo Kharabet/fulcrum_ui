@@ -48,7 +48,8 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
 
   getLiquidationHistory = async (): Promise<LiquidationEvent[]> => {
     let result: LiquidationEvent[] = [];
-    const bzxContractAddress = ExplorerProvider.Instance.contractsSource!.getiBZxAddress()
+    if (!ExplorerProvider.Instance.contractsSource) return result;
+    const bzxContractAddress = ExplorerProvider.Instance.contractsSource.getiBZxAddress()
     const etherscanApiKey = configProviders.Etherscan_Api;
     let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${LiquidationEvent.topic0}&apikey=${etherscanApiKey}`
     const tradeEventResponse = await fetch(etherscanApiUrl);
@@ -96,7 +97,8 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
 
   public getGridItems = (events: LiquidationEvent[]): ITxRowProps[] => {
     if (events.length === 0) return [];
-    const etherscanUrl = ExplorerProvider.getWeb3ProviderSettings(ExplorerProvider.Instance.contractsSource!.networkId).etherscanURL;
+    if (!ExplorerProvider.Instance.contractsSource) return [];
+    const etherscanUrl = ExplorerProvider.getWeb3ProviderSettings(ExplorerProvider.Instance.contractsSource.networkId).etherscanURL;
     return events.map(e => {
       return {
         hash: e.txHash,

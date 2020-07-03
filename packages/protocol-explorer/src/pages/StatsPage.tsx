@@ -52,7 +52,8 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
 
   getLiquidationHistory = async (): Promise<LiquidationEvent[]> => {
     let result: LiquidationEvent[] = [];
-    const bzxContractAddress = ExplorerProvider.Instance.contractsSource!.getiBZxAddress()
+    if (!ExplorerProvider.Instance.contractsSource) return result;
+    const bzxContractAddress = ExplorerProvider.Instance.contractsSource.getiBZxAddress()
     const etherscanApiKey = configProviders.Etherscan_Api;
     let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${LiquidationEvent.topic0}&apikey=${etherscanApiKey}`
     const tradeEventResponse = await fetch(etherscanApiUrl);
@@ -157,7 +158,8 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
 
   public getCloseWithSwapHistory = async (): Promise<CloseWithSwapEvent[]> => {
     let result: CloseWithSwapEvent[] = [];
-    const bzxContractAddress = ExplorerProvider.Instance.contractsSource!.getiBZxAddress()
+    if (!ExplorerProvider.Instance.contractsSource) return result;
+    const bzxContractAddress = ExplorerProvider.Instance.contractsSource.getiBZxAddress()
     if (!bzxContractAddress) return result
     const etherscanApiKey = configProviders.Etherscan_Api;
     let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${CloseWithSwapEvent.topic0}&apikey=${etherscanApiKey}`
@@ -207,7 +209,8 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
 
   public getCloseWithDepositHistory = async (): Promise<CloseWithDepositEvent[]> => {
     let result: CloseWithDepositEvent[] = [];
-    const bzxContractAddress = ExplorerProvider.Instance.contractsSource!.getiBZxAddress()
+    if (!ExplorerProvider.Instance.contractsSource) return result;
+    const bzxContractAddress = ExplorerProvider.Instance.contractsSource.getiBZxAddress()
     if (!bzxContractAddress) return result
     const etherscanApiKey = configProviders.Etherscan_Api;
     let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${CloseWithDepositEvent.topic0}&apikey=${etherscanApiKey}`
@@ -255,7 +258,8 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
 
   public getBorrowHistory = async (): Promise<BorrowEvent[]> => {
     let result: BorrowEvent[] = [];
-    const bzxContractAddress = ExplorerProvider.Instance.contractsSource!.getiBZxAddress()
+    if (!ExplorerProvider.Instance.contractsSource) return result;
+    const bzxContractAddress = ExplorerProvider.Instance.contractsSource.getiBZxAddress()
     if (!bzxContractAddress) return result
     const etherscanApiKey = configProviders.Etherscan_Api;
     let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${BorrowEvent.topic0}&apikey=${etherscanApiKey}`
@@ -305,7 +309,8 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
 
   public getBurnHistory = async (): Promise<BurnEvent[]> => {
     let result: BurnEvent[] = [];
-    const tokenContractAddress = ExplorerProvider.Instance.contractsSource!.getITokenErc20Address(this.state.asset);
+    if (!ExplorerProvider.Instance.contractsSource) return result;
+    const tokenContractAddress = ExplorerProvider.Instance.contractsSource.getITokenErc20Address(this.state.asset);
     if (!tokenContractAddress) return result
     const etherscanApiKey = configProviders.Etherscan_Api;
     let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${tokenContractAddress}&topic0=${BurnEvent.topic0}&apikey=${etherscanApiKey}`
@@ -337,7 +342,8 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
 
   public getMintHistory = async (): Promise<MintEvent[]> => {
     let result: MintEvent[] = [];
-    const tokenContractAddress = ExplorerProvider.Instance.contractsSource!.getITokenErc20Address(this.state.asset);
+    if (!ExplorerProvider.Instance.contractsSource) return result;
+    const tokenContractAddress = ExplorerProvider.Instance.contractsSource.getITokenErc20Address(this.state.asset);
     if (!tokenContractAddress) return result
     const etherscanApiKey = configProviders.Etherscan_Api;
     let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${tokenContractAddress}&topic0=${MintEvent.topic0}&apikey=${etherscanApiKey}`
@@ -369,7 +375,8 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
 
   public getGridItems = (events: (LiquidationEvent | TradeEvent | CloseWithSwapEvent | BorrowEvent | BurnEvent | MintEvent | CloseWithDepositEvent)[]): ITxRowProps[] => {
     if (events.length === 0) return [];
-    let initialNetworkId = ExplorerProvider.Instance.contractsSource!.networkId;
+    if (!ExplorerProvider.Instance.contractsSource) return [];
+    let initialNetworkId = ExplorerProvider.Instance.contractsSource.networkId;
     const etherscanUrl = ExplorerProvider.getWeb3ProviderSettings(initialNetworkId).etherscanURL;
     return events.map(e => {
       if (e instanceof TradeEvent) {
@@ -452,18 +459,18 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
       this.props.doNetworkConnect();
 
     if (ExplorerProvider.Instance.contractsSource) {
-    const liquidationEvents = this.getGridItems(await this.getLiquidationHistory());
-    const tradeEvents = this.getGridItems(await this.getTradeHistory());
-    const closeEvents = this.getGridItems(await this.getCloseWithSwapHistory());
-    const mintEvents = this.getGridItems(await this.getMintHistory());
-    const burnEvents = this.getGridItems(await this.getBurnHistory());
-    const events: ITxRowProps[] = liquidationEvents.concat(closeEvents).concat(tradeEvents).concat(mintEvents).concat(burnEvents);
+      const liquidationEvents = this.getGridItems(await this.getLiquidationHistory());
+      const tradeEvents = this.getGridItems(await this.getTradeHistory());
+      const closeEvents = this.getGridItems(await this.getCloseWithSwapHistory());
+      const mintEvents = this.getGridItems(await this.getMintHistory());
+      const burnEvents = this.getGridItems(await this.getBurnHistory());
+      const events: ITxRowProps[] = liquidationEvents.concat(closeEvents).concat(tradeEvents).concat(mintEvents).concat(burnEvents);
 
-    this.setState({
-      ...this.state,
-      events
-    })
-  }
+      this._isMounted && this.setState({
+        ...this.state,
+        events
+      })
+    }
   }
 
   private onProviderChanged = () => {
@@ -498,14 +505,14 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
       <React.Fragment>
         <Header isMobileMedia={this.props.isMobileMedia} doNetworkConnect={this.props.doNetworkConnect} />
         <section>
-            <div className="container">
-              <StatsChart />
-              <div className="flex jc-c labels-container">
-                <div className="label-chart"><span className="bg-green"></span>Supply APR, %</div>
-                <div className="label-chart"><span className="bg-primary"></span>TVL</div>
-                <div className="label-chart"><span className="bg-secondary"></span>Utilization, %</div>
-              </div>
+          <div className="container">
+            <StatsChart />
+            <div className="flex jc-c labels-container">
+              <div className="label-chart"><span className="bg-green"></span>Supply APR, %</div>
+              <div className="label-chart"><span className="bg-primary"></span>TVL</div>
+              <div className="label-chart"><span className="bg-secondary"></span>Utilization, %</div>
             </div>
+          </div>
         </section>
         <section className="pt-75">
           <Search onSearch={this.onSearch} />
