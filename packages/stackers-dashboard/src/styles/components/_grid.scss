@@ -1,5 +1,8 @@
 .grid {
   padding-bottom: 75px;
+  @media screen and (max-width: $width-max-sm){
+    margin-bottom: 25px;
+  }
 
   .grid-header,
   .grid-body {

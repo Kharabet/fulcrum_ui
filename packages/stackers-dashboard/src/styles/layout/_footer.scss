@@ -1,5 +1,8 @@
 footer {
   padding: 90px 0;
+  @media screen and (max-width: $width-max-sm){
+    padding: 75px 0 60px 0;
+  }
   .footer-menu {
     display: flex;
     align-items: baseline;
