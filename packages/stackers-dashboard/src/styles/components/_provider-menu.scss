@@ -107,7 +107,7 @@
   }
 }
 
-@media only screen and (max-width: 111px) {
+@media only screen and (max-width: $width-max-md) {
   .provider-menu {
     padding: 30px 15px 15px 15px;
     &__list {
