@@ -38,9 +38,9 @@ export class Header extends Component<IHeaderProps, IHeaderState> {
             </Link>
             <HeaderMenu />
             <div className="flex ai-c header-right">
-              <Link to="https://help.bzx.network/en/" className={`item-menu`}>
+              <a href="https://help.bzx.network/en/" className={`item-menu`} target="_blank">
                 Help Center
-                </Link>
+                </a>
               <OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />
             </div>
           </div>
@@ -71,9 +71,9 @@ export class Header extends Component<IHeaderProps, IHeaderState> {
                 <Link to="/transactions" className={`item-menu ${window.location.pathname === "/transactions" ? `active` : ``}`}>
                   Transactions
                 </Link>
-                <Link to="https://help.bzx.network/en/" className={`item-menu`}>
+                <a href="https://help.bzx.network/en/" className={`item-menu`} target="_blank">
                   Help Center
-                </Link>
+                </a>
               </div>
             </div>
 
