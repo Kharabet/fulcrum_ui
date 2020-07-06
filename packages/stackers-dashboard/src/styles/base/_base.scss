@@ -18,6 +18,9 @@ a {
     color: $primary-color-hover;
   }
 }
+#root{
+  overflow-y: hidden;
+}
 ul,
 ol {
   padding-left: 0;

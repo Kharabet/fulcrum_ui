@@ -17,10 +17,10 @@ export class TransactionsPage extends Component<ITransactionsPageProps, ITransac
           <Header isMobileMedia={this.props.isMobileMedia} doNetworkConnect={this.props.doNetworkConnect}  />
           <div className="container container-sm">
             <h1>Staking Details</h1>
-            <TableGrid />
+            <TableGrid isMobileMedia={this.props.isMobileMedia} />
 
             <h1>Reward Details</h1>
-            <TableGrid />
+            <TableGrid isMobileMedia={this.props.isMobileMedia} />
           </div>
         </section>
       </React.Fragment>

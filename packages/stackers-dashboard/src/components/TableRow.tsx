@@ -1,6 +1,10 @@
 import React, { Component } from "react";
 
-export class TableRow extends Component {
+interface ITableRowProps {
+  isMobileMedia: boolean;
+}
+
+export class TableRow extends Component<ITableRowProps> {
   constructor(props: any) {
     super(props);
   }
@@ -10,7 +14,7 @@ export class TableRow extends Component {
       <React.Fragment>
         <div className="grid-row">
           <div className="tx">
-            <a href="/">0x24a42f...0D059998807C39094c4f90748c8</a>
+            <a href="/">{this.getShortHash("0x7e9ff177dd06a43bc92365feb5721c87335a3edf3c205a03e83d644565db1342")}</a>
           </div>
           <div className="date">18.06.2020</div>
           <div className="action"><span>stake</span></div>
@@ -19,5 +23,10 @@ export class TableRow extends Component {
         </div>
       </React.Fragment>
     );
+  }
+
+  public getShortHash = (hash: string) => {
+    const count = this.props.isMobileMedia ? 8 : 13;
+    return hash.substring(0, 8) + '...' + hash.substring(hash.length - 8 - count);
   }
 }

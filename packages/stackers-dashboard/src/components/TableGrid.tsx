@@ -1,8 +1,11 @@
 import React, { Component } from "react";
 import { TableRow } from "../components/TableRow";
 
+interface ITableGridProps {
+  isMobileMedia: boolean;
+}
 
-export class TableGrid extends Component {
+export class TableGrid extends Component<ITableGridProps> {
   constructor(props: any) {
     super(props);
   }
@@ -19,7 +22,7 @@ export class TableGrid extends Component {
             <div className="amount">Amount</div>
           </div>
           <div className="grid-body">
-            <TableRow />
+            <TableRow isMobileMedia={this.props.isMobileMedia} />
         </div>
         </div>
       </React.Fragment>

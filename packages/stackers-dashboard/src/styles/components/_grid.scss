@@ -1,29 +1,58 @@
 .grid {
   padding-bottom: 75px;
-  @media screen and (max-width: $width-max-sm){
-    margin-bottom: 25px;
+  @media screen and (max-width: $width-max-sm) {
+    width: 737px;
+    font-size: 14px;
+    &:not(:last-child) {
+      padding-bottom: 45px;
+    }
+    &:last-child {
+      padding-bottom: 25px;
+    }
   }
 
   .grid-header,
   .grid-body {
     display: flex;
     align-items: center;
-    padding: 20px 30px;
-    .tx {
-      width: 45%;
+   
+    @media screen and (min-width: $width-min-sm) {
+      padding: 20px 30px;
+      .tx {
+        width: 45%;
+      }
+      .date {
+        width: 15%;
+      }
+      .action {
+        width: 15%;
+      }
+      .currency {
+        width: 15%;
+      }
+      .amount {
+        width: 10%;
+      }
     }
-    .date {
-      width: 15%;
+    @media screen and (max-width: $width-max-sm) {
+      padding: 13px 15px;
+      .tx {
+        width: 35%;
+      }
+      .date {
+        width: 15%;
+      }
+      .action {
+        width: 20%;
+      }
+      .currency {
+        width: 20%;
+      }
+      .amount {
+        width: 10%;
+      }
     }
-    .action {
-      width: 15%;
-    }
-    .currency {
-      width: 15%;
-    }
-    .amount {
-      width: 10%;
-    }
+    
   }
   .grid-header {
     border-bottom: 2px solid #33dfcc;
@@ -50,8 +79,9 @@
       text-align: right;
     }
   }
-  .grid-row{
+  .grid-row {
     display: flex;
+    align-items: center;
     width: 100%;
   }
 }
