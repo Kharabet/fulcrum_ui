@@ -4,6 +4,7 @@ import { TableGrid } from "../components/TableGrid";
 
 interface ITransactionsPageProps {
   doNetworkConnect: () => void;
+  isMobileMedia: boolean;
 }
 interface ITransactionsPageState {
 }
@@ -13,7 +14,7 @@ export class TransactionsPage extends Component<ITransactionsPageProps, ITransac
     return (
       <React.Fragment>
         <section>
-          <Header doNetworkConnect={this.props.doNetworkConnect}  />
+          <Header isMobileMedia={this.props.isMobileMedia} doNetworkConnect={this.props.doNetworkConnect}  />
           <div className="container container-sm">
             <h1>Staking Details</h1>
             <TableGrid />

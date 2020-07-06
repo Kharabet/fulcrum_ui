@@ -47,6 +47,7 @@ interface IAppRouterState {
   isLoading: boolean;
   selectedProviderType: ProviderType;
   web3: Web3Wrapper | null;
+  isMobileMedia: boolean;
 }
 
 export class AppRouter extends Component<any, IAppRouterState> {
@@ -55,11 +56,10 @@ export class AppRouter extends Component<any, IAppRouterState> {
     super(props);
     this.state = {
       isProviderMenuModalOpen: false,
-      //isRiskDisclosureModalOpen: false,
       isLoading: false,
       selectedProviderType: StackerProvider.Instance.providerType,
       web3: StackerProvider.Instance.web3Wrapper,
-      //isMobileMedia: false,
+      isMobileMedia: false,
     };
     StackerProvider.Instance.eventEmitter.on(StackerProviderEvents.ProviderChanged, this.onProviderChanged);
   }
@@ -128,14 +128,20 @@ export class AppRouter extends Component<any, IAppRouterState> {
   public componentWillUnmount(): void {
     this._isMounted = false;
     StackerProvider.Instance.eventEmitter.removeListener(StackerProviderEvents.ProviderChanged, this.onProviderChanged);
-    //window.removeEventListener("resize", this.didResize.bind(this));
+    window.removeEventListener("resize", this.didResize.bind(this));
   }
   public componentDidMount(): void {
     this._isMounted = true;
-    //window.addEventListener("resize", this.didResize.bind(this));
-    //this.didResize();
+    window.addEventListener("resize", this.didResize.bind(this));
+    this.didResize();
     //errors.setLogLevel("error")
     this.doNetworkConnect();
+  }
+  private didResize = async () => {
+    const isMobileMedia = (window.innerWidth <= 767);
+    if (isMobileMedia !== this.state.isMobileMedia) {
+      await this._isMounted && this.setState({ isMobileMedia });
+    }
   }
 
   public getLibrary = async (provider: any, connector: any): Promise<Web3ProviderEngine> => {
@@ -171,7 +177,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
         >
           <ProviderMenu
             providerTypes={ProviderTypeDictionary.WalletProviders}
-            isMobileMedia={false}
+            isMobileMedia={this.state.isMobileMedia}
             onSelect={this.onProviderTypeSelect}
             onDeactivate={this.onDeactivate}
             onProviderMenuClose={this.onRequestClose}
@@ -184,10 +190,10 @@ export class AppRouter extends Component<any, IAppRouterState> {
                 <Intercom appID="dfk4n5ut" />
               ) : null}
               <Route exact={true} path="/">
-                <DashboardPage doNetworkConnect={this.doNetworkConnect} />
+                <DashboardPage isMobileMedia={this.state.isMobileMedia} doNetworkConnect={this.doNetworkConnect} />
               </Route>
               <Route path="/transactions">
-                <TransactionsPage doNetworkConnect={this.doNetworkConnect} />
+                <TransactionsPage isMobileMedia={this.state.isMobileMedia} doNetworkConnect={this.doNetworkConnect} />
               </Route>
             </Switch>
           </LocationListener>

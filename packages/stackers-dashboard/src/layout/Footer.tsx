@@ -7,7 +7,7 @@ export const Footer = () => {
     <footer>
       <div className="container container-md">
         <div className="flex fw-w">
-          <FooterSocial />
+          <FooterSocial isShowSocial={true} />
           <FooterMenu />
         </div>
       </div>

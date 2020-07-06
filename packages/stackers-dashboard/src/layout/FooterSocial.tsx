@@ -5,10 +5,14 @@ import { ReactComponent as Twitter } from "../assets/images/twitter.svg";
 import { ReactComponent as Telegram } from "../assets/images/telegram.svg";
 import { ReactComponent as Discord } from "../assets/images/discord.svg";
 
-export const FooterSocial = () => {
+interface IFooterSocialProps {
+  isShowSocial: boolean;
+}
+
+export const FooterSocial = (props: IFooterSocialProps) => {
   return (
     <div className="footer-social">
-      <div className="item-social">
+      {props.isShowSocial && <div className="item-social">
         <div className="social">
           <a href="https://github.com/bZxNetwork" className="item-link"><Github /></a>
           <a href="https://bzx.network/discord" className="item-link"><Discord /></a>
@@ -16,6 +20,7 @@ export const FooterSocial = () => {
           <a href="https://twitter.com/bzxHQ" className="item-link"><Twitter /></a>
         </div>
       </div>
+      }
       <div className="item-social">
         <p className="data-protocol">Torque is built on the bZx protocol</p>
         <div className="logo">
@@ -24,8 +29,8 @@ export const FooterSocial = () => {
         <div className="flex data-year">
           <p className="light-gray-color">© {new Date().getFullYear()} bZeroX, LLC</p>
           <div className="flex">
-            <a href="/tos" className="green-color">Terms of use</a>
-            <a href="/privacy" className="green-color">Privacy policy</a>
+            <a href="/tos">Terms of use</a>
+            <a href="/privacy">Privacy policy</a>
           </div>
         </div>
       </div>

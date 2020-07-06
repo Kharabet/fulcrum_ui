@@ -10,6 +10,9 @@
   }
   &.disconnect {
     background-color: #ffffff;
+    @media screen and (max-width: $width-max-md) {
+      border: 1px solid #276bfb;
+    }
   }
   .on-chain-indicator__container {
     display: flex;
@@ -51,7 +54,7 @@
   }
 }
 
-@media screen and (max-width: 991px) {
+@media screen and (max-width: $width-max-md) {
   .on-chain-indicator {
     display: flex;
     flex-direction: row;
@@ -67,5 +70,10 @@
     a.on-chain-indicator__wallet-address {
       padding: 0;
     }
+  }
+}
+@media screen and (max-width: $width-max-sm) {
+  .on-chain-indicator {
+    margin: 55px auto 0 auto;
   }
 }

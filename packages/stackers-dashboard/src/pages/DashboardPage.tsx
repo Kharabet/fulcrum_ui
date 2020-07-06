@@ -4,6 +4,7 @@ import { Form } from "../components/Form";
 
 interface IDashboardPageProps {
   doNetworkConnect: () => void;
+  isMobileMedia: boolean;
 }
 interface IDashboardPageState {
 }
@@ -13,7 +14,7 @@ export class DashboardPage extends Component<IDashboardPageProps, IDashboardPage
     return (
       <React.Fragment>
         <section>
-          <Header doNetworkConnect={this.props.doNetworkConnect} />
+          <Header isMobileMedia={this.props.isMobileMedia} doNetworkConnect={this.props.doNetworkConnect} />
           <Form />
         </section>
       </React.Fragment>
