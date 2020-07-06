@@ -16,6 +16,8 @@ import { ExplorerProviderEvents } from "../services/events/ExplorerProviderEvent
 
 import { NavService } from "../services/NavService";
 
+import { Loader } from "../components/Loader";
+
 
 interface ILiquidationsPageProps {
   doNetworkConnect: () => void;
@@ -27,6 +29,7 @@ interface ILiquidationsPageState {
   daiDataset: ({ x: string, y: number })[];
   ethDataset: ({ x: string, y: number })[];
   usdcDataset: ({ x: string, y: number })[];
+  isDataLoading: boolean;
 }
 export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquidationsPageState> {
   private _isMounted: boolean;
@@ -38,6 +41,7 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
       daiDataset: [],
       ethDataset: [],
       usdcDataset: [],
+      isDataLoading: true
     };
 
     this._isMounted = false;
@@ -161,20 +165,40 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
     })
   }
   private async derivedUpdate() {
-    const provider = ExplorerProvider.getLocalstorageItem('providerType');
-    if (!ExplorerProvider.Instance.web3Wrapper && (!provider || provider === "None")) {
-      this.props.doNetworkConnect();
+
+    await this._isMounted && this.setState({
+      ...this.state,
+      isDataLoading: true
+    });
+
+    if (ExplorerProvider.Instance.unsupportedNetwork) {
+      await this._isMounted && this.setState({
+        events: [],
+        isDataLoading: false
+      });
+      return;
     }
 
-    if (ExplorerProvider.Instance.contractsSource) {
+    const provider = ExplorerProvider.getLocalstorageItem('providerType');
+
+    if (!provider || provider === "None" || !ExplorerProvider.Instance.contractsSource || !ExplorerProvider.Instance.contractsSource.canWrite) {
+      this.props.doNetworkConnect();
+      await this._isMounted && this.setState({
+        events: [],
+        isDataLoading: false
+      });
+      return;
+    }
+
     const liquidationEvents = await this.getLiquidationHistory();
     this.getChartData(liquidationEvents);
 
     await this.setState({
       ...this.state,
-      events: this.getGridItems(liquidationEvents)
+      events: this.getGridItems(liquidationEvents),
+      isDataLoading: false
     });
-  }
+
   }
 
 
@@ -280,67 +304,88 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
     return (
       <React.Fragment>
         <Header isMobileMedia={this.props.isMobileMedia} doNetworkConnect={this.props.doNetworkConnect} />
-          <section>
-            <div className="container">
-              <div className="flex jc-sb al-c mb-25">
-                <h1>Liquidations</h1>
-                <div className="flex">
-                  <div className="liquidation-data">
-                    <div className="liquidation-data-title">30-days Volume</div>
-                    <div className="liquidation-data-value"><span className="sign sign-currency">$</span>554,456,945.09</div>
-                  </div>
-                  <div className="liquidation-data">
-                    <div className="liquidation-data-title">30-days Transactions Count</div>
-                    <div className="liquidation-data-value">100,500</div>
-                  </div>
+
+        {!ExplorerProvider.Instance.unsupportedNetwork ?
+          <React.Fragment>
+            {this.state.isDataLoading
+              ? <section className="pt-90 pb-45">
+                <div className="container">
+                  <Loader quantityDots={5} sizeDots={'large'} title={'Loading'} isOverlay={false} />
                 </div>
-              </div>
-            </div>
-            <div className="container">
-              <div className="wrapper-chartjs-bar">
-                <div id="chartjs-bar">
-                  <Bar data={chartData} options={options} height={100} />
-                </div>
-                <div id="chartjs-bar-tooltip"><table></table></div>
-              </div>
-              <div className="flex jc-c labels-container">
-                <div className="label-chart"><span className="bg-green"></span>ETH</div>
-                <div className="label-chart"><span className="bg-primary"></span>DAI</div>
-                <div className="label-chart"><span className="bg-secondary"></span>USDC</div>
-              </div>
+              </section>
+              : <React.Fragment>
+                <section>
+                  <div className="container">
+                    <div className="flex jc-sb al-c mb-25">
+                      <h1>Liquidations</h1>
+                      <div className="flex">
+                        <div className="liquidation-data">
+                          <div className="liquidation-data-title">30-days Volume</div>
+                          <div className="liquidation-data-value"><span className="sign sign-currency">$</span>554,456,945.09</div>
+                        </div>
+                        <div className="liquidation-data">
+                          <div className="liquidation-data-title">30-days Transactions Count</div>
+                          <div className="liquidation-data-value">100,500</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="container">
+                    <div className="wrapper-chartjs-bar">
+                      <div id="chartjs-bar">
+                        <Bar data={chartData} options={options} height={100} />
+                      </div>
+                      <div id="chartjs-bar-tooltip"><table></table></div>
+                    </div>
+                    <div className="flex jc-c labels-container">
+                      <div className="label-chart"><span className="bg-green"></span>ETH</div>
+                      <div className="label-chart"><span className="bg-primary"></span>DAI</div>
+                      <div className="label-chart"><span className="bg-secondary"></span>USDC</div>
+                    </div>
+                  </div>
+                </section>
+                <section className="pt-45">
+                  <Search onSearch={this.onSearch} />
+                </section>
+                <section className="pt-90">
+                  <div className="container">
+                    <TxGrid events={this.state.events} />
+                  </div>
+                </section>
+                <section className="pt-75">
+                  <div className="container">
+                    <h2 className="h1 mb-60">Unhealthy Loans</h2>
+                    <div className="flex ai-c">
+                      <div className="w-45">
+                        <UnhealthyChart />
+                      </div>
+                      <div className="w-55 flex fd-c ai-c">
+                        <div className="flex w-100 mb-15">
+                          <div className="unhealthy">Unhealthy&nbsp;<span className="sign sign-currency">$</span>&nbsp;</div>
+                          <span className="unhealthy-value unhealthy-color">0.1</span>
+                        </div>
+                        <div className="flex w-100">
+                          <div className="healthy">Healthy&nbsp;<span className="sign sign-currency">$</span>&nbsp;</div>
+                          <span className="healthy-value healthy-color">100m</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="pt-75">
+                      <LoanGrid events={this.state.events} />
+                    </div>
+                  </div>
+                </section>
+              </React.Fragment>}
+          </React.Fragment> :
+          <section className="pt-75">
+            <div style={{ textAlign: `center`, fontSize: `2rem`, paddingBottom: `1.5rem` }}>
+              <div style={{ cursor: `pointer` }}>
+                You are connected to the wrong network.
+                      </div>
             </div>
           </section>
-        <section className="pt-45">
-          <Search onSearch={this.onSearch} />
-        </section>
-        <section className="pt-90">
-          <div className="container">
-            <TxGrid events={this.state.events} />
-          </div>
-        </section>
-        <section className="pt-75">
-          <div className="container">
-            <h2 className="h1 mb-60">Unhealthy Loans</h2>
-            <div className="flex ai-c">
-              <div className="w-45">
-                <UnhealthyChart />
-              </div>
-              <div className="w-55 flex fd-c ai-c">
-                <div className="flex w-100 mb-15">
-                  <div className="unhealthy">Unhealthy&nbsp;<span className="sign sign-currency">$</span>&nbsp;</div>
-                  <span className="unhealthy-value unhealthy-color">0.1</span>
-                </div>
-                <div className="flex w-100">
-                  <div className="healthy">Healthy&nbsp;<span className="sign sign-currency">$</span>&nbsp;</div>
-                  <span className="healthy-value healthy-color">100m</span>
-                </div>
-              </div>
-            </div>
-            <div className="pt-75">
-              <LoanGrid events={this.state.events} />
-            </div>
-          </div>
-        </section>
+        }
+
       </React.Fragment>
     );
   }
