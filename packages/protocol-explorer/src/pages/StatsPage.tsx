@@ -5,7 +5,6 @@ import { TxGrid } from "../components/TxGrid";
 import { Header } from "../layout/Header";
 import { RouteComponentProps } from "react-router";
 import { Asset } from "../domain/Asset";
-import { ContractsSource } from "../services/ContractsSource";
 import { LiquidationEvent } from "../domain/LiquidationEvent";
 import { BigNumber } from "@0x/utils";
 import { TradeEvent } from "../domain/TradeEvent";

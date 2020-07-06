@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import { Header } from "../layout/Header";
-//import { ContractsSource } from "../services/ContractsSource";
 import { LiquidationEvent } from "../domain/LiquidationEvent";
 import { BigNumber } from "@0x/utils";
 import { ITxRowProps } from "../components/TxRow";

@@ -48,9 +48,6 @@ export class ExplorerProvider {
     public static Instance: ExplorerProvider;
 
 
-    private isProcessing: boolean = false;
-    private isChecking: boolean = false;
-
     public readonly eventEmitter: EventEmitter;
     public providerType: ProviderType = ProviderType.None;
     public providerEngine: Web3ProviderEngine | null = null;
