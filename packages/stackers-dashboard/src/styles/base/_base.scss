@@ -12,6 +12,15 @@ body {
   &.overflow{
     overflow: hidden;
   }
+  background-position: 0 0, 100% 0;
+  background-repeat: no-repeat;
+
+  @media screen and (min-width: $width-min-sm) {
+    background-image: url(../../assets/images/bg-before.svg), url(../../assets/images/bg-after.svg);
+  }
+  @media screen and (max-width: $width-max-sm) {
+    background-image: url(../../assets/images/bg-before-mobile.svg), url(../../assets/images/bg-after-mobile.svg);
+  }
 }
 
 a {
