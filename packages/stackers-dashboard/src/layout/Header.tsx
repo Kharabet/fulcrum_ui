@@ -24,6 +24,12 @@ export class Header extends Component<IHeaderProps, IHeaderState> {
     };
   }
 
+  componentDidUpdate(prevProps: IHeaderProps, prevState: IHeaderState): void {
+    if (this.state.isMenuOpen !== prevState.isMenuOpen) {
+      this.state.isMenuOpen ? document.body.classList.add("overflow") : document.body.classList.remove("overflow");
+    }
+  }
+
   public render() {
     return !this.props.isMobileMedia ? this.renderDesktop() : this.renderMobile();
   }
@@ -65,10 +71,10 @@ export class Header extends Component<IHeaderProps, IHeaderState> {
             <div className="w-100">
               <OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />
               <div className="header-menu">
-                <Link to="/" className={`item-menu ${window.location.pathname === "/" ? `active` : ``}`}>
+                <Link to="/" className={`item-menu ${window.location.pathname === "/" ? `active` : ``}`} onClick={this.removeOverflow}>
                   Dashboard
                 </Link>
-                <Link to="/transactions" className={`item-menu ${window.location.pathname === "/transactions" ? `active` : ``}`}>
+                <Link to="/transactions" className={`item-menu ${window.location.pathname === "/transactions" ? `active` : ``}`}  onClick={this.removeOverflow}>
                   Transactions
                 </Link>
                 <a href="https://help.bzx.network/en/" className={`item-menu`} target="_blank">
@@ -87,4 +93,8 @@ export class Header extends Component<IHeaderProps, IHeaderState> {
   private onMenuToggle = () => {
     this.setState({ ...this.state, isMenuOpen: !this.state.isMenuOpen });
   };
+
+  public removeOverflow = () => {
+    document.body.classList.remove("overflow");
+  }
 }

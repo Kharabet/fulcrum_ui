@@ -8,7 +8,7 @@ header {
   @media screen and (max-width: $width-max-sm) {
     &.open-menu {
       width: 100%;
-      position: absolute;
+      position: fixed;
       top: 0px;
       right: 0px;
       bottom: 0px;
