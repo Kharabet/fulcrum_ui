@@ -20,7 +20,7 @@ export class TxGrid extends Component<ITxGridProps, ITxGridState> {
   public render() {
     const assetItems = this.props.events
       .sort((a, b) => { return this.state.typeSort === 'up' ? b.age.getTime() - a.age.getTime() : a.age.getTime() - b.age.getTime() })
-      .map((e: ITxRowProps) => <TxRow key={e.hash} {...e} />);
+      .map((e: ITxRowProps, i: number) => <TxRow key={i} {...e} />);
     return (
       <React.Fragment>
         {this.props.events.length !== 0 &&

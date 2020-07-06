@@ -1,54 +1,112 @@
 import React, { Component } from "react";
-import { Search } from "../components/Search";
-import { StatsChart } from "../components/StatsChart";
-import { TxGrid } from "../components/TxGrid";
 import { Header } from "../layout/Header";
-import { RouteComponentProps } from "react-router";
-import { Asset } from "../domain/Asset";
+import { ContractsSource } from "../services/ContractsSource";
 import { LiquidationEvent } from "../domain/LiquidationEvent";
 import { BigNumber } from "@0x/utils";
+import { ITxRowProps } from "../components/TxRow";
+import configProviders from "../config/providers.json";
+import { TxGrid } from "../components/TxGrid";
+import { LoanGrid } from "../components/LoanGrid";
+import { Asset } from "../domain/Asset";
+import { Bar } from "react-chartjs-2";
+import { Search } from "../components/Search";
+import { UnhealthyChart } from "../components/UnhealthyChart";
+import { RouteComponentProps } from "react-router";
 import { TradeEvent } from "../domain/TradeEvent";
 import { CloseWithSwapEvent } from "../domain/CloseWithSwapEvent";
 import { CloseWithDepositEvent } from "../domain/CloseWithDepositEvent";
+import { BorrowEvent } from "../domain/BorrowEvent";
 import { BurnEvent } from "../domain/BurnEvent";
 import { MintEvent } from "../domain/MintEvent";
-import { BorrowEvent } from "../domain/BorrowEvent";
-import { ITxRowProps } from "../components/TxRow";
-import configProviders from "../config/providers.json";
 import { ExplorerProvider } from "../services/ExplorerProvider";
 import { ExplorerProviderEvents } from "../services/events/ExplorerProviderEvents";
-import { NavService } from '../services/NavService';
 
 
-interface MatchParams {
-  token: string;
+
+const getWeb3ProviderSettings = (networkId: number): string => {
+  let etherscanURL = "";
+  switch (networkId) {
+    case 1:
+      etherscanURL = "https://etherscan.io/";
+      break;
+    case 3:
+      etherscanURL = "https://ropsten.etherscan.io/";
+      break;
+    case 4:
+      etherscanURL = "https://rinkeby.etherscan.io/";
+      break;
+    case 42:
+      etherscanURL = "https://kovan.etherscan.io/";
+      break;
+    default:
+      etherscanURL = "";
+      break;
+  }
+  return etherscanURL
 }
 
-interface IStatsPageProps extends RouteComponentProps<MatchParams> {
+const getNetworkIdByString = (networkName: string | undefined) => {
+  switch (networkName) {
+    case 'mainnet':
+      return 1;
+    case 'ropsten':
+      return 3;
+    case 'rinkeby':
+      return 4;
+    case 'kovan':
+      return 42;
+    default:
+      return 0;
+  }
+}
+const networkName = process.env.REACT_APP_ETH_NETWORK;
+const initialNetworkId = getNetworkIdByString(networkName);
+
+interface MatchParams {
+  filter: string;
+}
+
+interface ISearchResultPageProps extends RouteComponentProps<MatchParams> {
   doNetworkConnect: () => void;
   isMobileMedia: boolean;
 }
 
-interface IStatsPageState {
-  asset: Asset;
+interface ISearchResultPageState {
   events: ITxRowProps[];
+  filter: string;
+  filteredEvents: ITxRowProps[];
+  showSearchResult: boolean;
 }
-
-export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
-  private _isMounted: boolean;
-
+export class SearchResultPage extends Component<ISearchResultPageProps, ISearchResultPageState> {
   constructor(props: any) {
     super(props);
     this.state = {
-      asset: this.props.match.params.token.toUpperCase() as Asset,
       events: [],
+      filteredEvents: [],
+      showSearchResult: false,
+      filter: this.props.match.params.filter.toLowerCase(),
     };
-
     this._isMounted = false;
     ExplorerProvider.Instance.eventEmitter.on(ExplorerProviderEvents.ProviderAvailable, this.onProviderAvailable);
     ExplorerProvider.Instance.eventEmitter.on(ExplorerProviderEvents.ProviderChanged, this.onProviderChanged);
-  }
 
+  }
+  
+  private _isMounted: boolean;
+  
+  private onProviderChanged = () => {
+    this.derivedUpdate();
+  };
+
+  private onProviderAvailable = () => {
+    this.derivedUpdate();
+  };
+  
+  public componentWillUnmount(): void {
+    this._isMounted = false;
+    ExplorerProvider.Instance.eventEmitter.removeListener(ExplorerProviderEvents.ProviderAvailable, this.onProviderAvailable);
+    ExplorerProvider.Instance.eventEmitter.removeListener(ExplorerProviderEvents.ProviderChanged, this.onProviderChanged);
+  }
 
   getLiquidationHistory = async (): Promise<LiquidationEvent[]> => {
     let result: LiquidationEvent[] = [];
@@ -69,25 +127,23 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
       if (!dataSegments) return result;
       const lender = dataSegments[0].replace("000000000000000000000000", "0x");
 
-      const loanTokenAddress = dataSegments[1].replace("000000000000000000000000", "0x");
-      const collateralTokenAddress = dataSegments[2].replace("000000000000000000000000", "0x");
-      const loanToken = ExplorerProvider.Instance.contractsSource!.getAssetFromAddress(loanTokenAddress);
-      const collateralToken = ExplorerProvider.Instance.contractsSource!.getAssetFromAddress(collateralTokenAddress);
+      const baseTokenAddress = dataSegments[1].replace("000000000000000000000000", "0x");
+      const quoteTokenAddress = dataSegments[2].replace("000000000000000000000000", "0x");
+      const baseToken = ExplorerProvider.Instance.contractsSource!.getAssetFromAddress(baseTokenAddress);
+      const quoteToken = ExplorerProvider.Instance.contractsSource!.getAssetFromAddress(quoteTokenAddress);
       const repayAmount = new BigNumber(parseInt(dataSegments[3], 16));
       const collateralWithdrawAmount = new BigNumber(parseInt(dataSegments[4], 16));
       const collateralToLoanRate = new BigNumber(parseInt(dataSegments[5], 16));
       const currentMargin = new BigNumber(parseInt(dataSegments[6], 16));
       const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000);
       const txHash = event.transactionHash;
-      if (loanToken !== this.state.asset)
-        return;
       return new LiquidationEvent(
         userAddress,
         liquidatorAddress,
         loanId,
         lender,
-        loanToken,
-        collateralToken,
+        baseToken,
+        quoteToken,
         repayAmount,
         collateralWithdrawAmount,
         collateralToLoanRate,
@@ -100,10 +156,11 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
     return result.filter(e => e)
   }
 
+  
   public getTradeHistory = async (): Promise<TradeEvent[]> => {
     let result: TradeEvent[] = [];
     if (!ExplorerProvider.Instance.contractsSource) return result;
-    const bzxContractAddress = ExplorerProvider.Instance.contractsSource.getiBZxAddress();
+    const bzxContractAddress = ExplorerProvider.Instance.contractsSource.getiBZxAddress()
     if (!bzxContractAddress) return result
     const etherscanApiKey = configProviders.Etherscan_Api;
     let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${TradeEvent.topic0}&apikey=${etherscanApiKey}`
@@ -132,8 +189,7 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
       const currentLeverage = new BigNumber(parseInt(dataSegments[8], 16));
       const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000);
       const txHash = event.transactionHash;
-      if (loanToken !== this.state.asset)
-        return;
+      
       return new TradeEvent(
         userAddress,
         lender,
@@ -185,8 +241,7 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
       const currentLeverage = new BigNumber(parseInt(dataSegments[6], 16));
       const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000);
       const txHash = event.transactionHash;
-      if (loanToken !== this.state.asset)
-        return;
+      
       return new CloseWithSwapEvent(
         userAddress,
         lender,
@@ -236,8 +291,7 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
       const currentMargin = new BigNumber(parseInt(dataSegments[6], 16));
       const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000);
       const txHash = event.transactionHash;
-      if (loanToken !== this.state.asset)
-        return;
+      
       return new CloseWithDepositEvent(
         userAddress,
         lender,
@@ -286,8 +340,7 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
       const currentMargin = new BigNumber(parseInt(dataSegments[7], 16));
       const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000);
       const txHash = event.transactionHash;
-      if (loanToken !== this.state.asset)
-        return;
+      
       return new BorrowEvent(
         userAddress,
         lender,
@@ -307,77 +360,10 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
     return result.filter(e => e)
   }
 
-  public getBurnHistory = async (): Promise<BurnEvent[]> => {
-    let result: BurnEvent[] = [];
-    if (!ExplorerProvider.Instance.contractsSource) return result;
-    const tokenContractAddress = ExplorerProvider.Instance.contractsSource.getITokenErc20Address(this.state.asset);
-    if (!tokenContractAddress) return result
-    const etherscanApiKey = configProviders.Etherscan_Api;
-    let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${tokenContractAddress}&topic0=${BurnEvent.topic0}&apikey=${etherscanApiKey}`
-    const tradeEventResponse = await fetch(etherscanApiUrl);
-    const tradeEventResponseJson = await tradeEventResponse.json();
-    if (tradeEventResponseJson.status !== "1") return result;
-    const events = tradeEventResponseJson.result;
-    result = events.reverse().map((event: any) => {
-      const burner = event.topics[1].replace("0x000000000000000000000000", "0x");
-      const data = event.data.replace("0x", "");
-      const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
-      if (!dataSegments) return result;
-      const tokenAmount = new BigNumber(parseInt(dataSegments[0], 16));
-      const assetAmount = new BigNumber(parseInt(dataSegments[1], 16));
-      const price = new BigNumber(parseInt(dataSegments[2], 16));
-      const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000);
-      const txHash = event.transactionHash;
-      return new BurnEvent(
-        burner,
-        tokenAmount,
-        assetAmount,
-        price,
-        timeStamp,
-        txHash
-      )
-    })
-    return result.filter(e => e)
-  }
-
-  public getMintHistory = async (): Promise<MintEvent[]> => {
-    let result: MintEvent[] = [];
-    if (!ExplorerProvider.Instance.contractsSource) return result;
-    const tokenContractAddress = ExplorerProvider.Instance.contractsSource.getITokenErc20Address(this.state.asset);
-    if (!tokenContractAddress) return result
-    const etherscanApiKey = configProviders.Etherscan_Api;
-    let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${tokenContractAddress}&topic0=${MintEvent.topic0}&apikey=${etherscanApiKey}`
-    const tradeEventResponse = await fetch(etherscanApiUrl);
-    const tradeEventResponseJson = await tradeEventResponse.json();
-    if (tradeEventResponseJson.status !== "1") return result;
-    const events = tradeEventResponseJson.result;
-    result = events.reverse().map((event: any) => {
-      const minter = event.topics[1].replace("0x000000000000000000000000", "0x");
-      const data = event.data.replace("0x", "");
-      const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
-      if (!dataSegments) return result;
-      const tokenAmount = new BigNumber(parseInt(dataSegments[0], 16));
-      const assetAmount = new BigNumber(parseInt(dataSegments[1], 16));
-      const price = new BigNumber(parseInt(dataSegments[2], 16));
-      const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000);
-      const txHash = event.transactionHash;
-      return new MintEvent(
-        minter,
-        tokenAmount,
-        assetAmount,
-        price,
-        timeStamp,
-        txHash
-      )
-    })
-    return result.filter(e => e)
-  }
 
   public getGridItems = (events: (LiquidationEvent | TradeEvent | CloseWithSwapEvent | BorrowEvent | BurnEvent | MintEvent | CloseWithDepositEvent)[]): ITxRowProps[] => {
     if (events.length === 0) return [];
-    if (!ExplorerProvider.Instance.contractsSource) return [];
-    let initialNetworkId = ExplorerProvider.Instance.contractsSource.networkId;
-    const etherscanUrl = ExplorerProvider.getWeb3ProviderSettings(initialNetworkId).etherscanURL;
+    const etherscanUrl = getWeb3ProviderSettings(initialNetworkId);
     return events.map(e => {
       if (e instanceof TradeEvent) {
         return {
@@ -452,40 +438,26 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
       }
     });
   }
-  private async derivedUpdate() {
-    const provider = ExplorerProvider.getLocalstorageItem('providerType');
 
-    !ExplorerProvider.Instance.web3Wrapper && (!provider || provider === "None") &&
-      this.props.doNetworkConnect();
-
-    if (ExplorerProvider.Instance.contractsSource) {
-      const liquidationEvents = this.getGridItems(await this.getLiquidationHistory());
-      const tradeEvents = this.getGridItems(await this.getTradeHistory());
-      const closeEvents = this.getGridItems(await this.getCloseWithSwapHistory());
-      const mintEvents = this.getGridItems(await this.getMintHistory());
-      const burnEvents = this.getGridItems(await this.getBurnHistory());
-      const events: ITxRowProps[] = liquidationEvents.concat(closeEvents).concat(tradeEvents).concat(mintEvents).concat(burnEvents);
-
-      this._isMounted && this.setState({
-        ...this.state,
-        events
-      })
-    }
-  }
-
-  private onProviderChanged = () => {
-    this.derivedUpdate();
-  };
-
-  private onProviderAvailable = () => {
-    this.derivedUpdate();
+  private groupBy = function (xs: any, key: any) {
+    return xs.reduce(function (rv: any, x: any) {
+      (rv[x[key]] = rv[x[key]] || []).push(x);
+      return rv;
+    }, {});
   };
 
 
-  public componentWillUnmount(): void {
-    this._isMounted = false;
-    ExplorerProvider.Instance.eventEmitter.removeListener(ExplorerProviderEvents.ProviderAvailable, this.onProviderAvailable);
-    ExplorerProvider.Instance.eventEmitter.removeListener(ExplorerProviderEvents.ProviderChanged, this.onProviderChanged);
+  derivedUpdate = async () => {
+    const liquidationEvents = this.getGridItems(await this.getLiquidationHistory());
+    const tradeEvents = this.getGridItems(await this.getTradeHistory());
+    const closeEvents = this.getGridItems(await this.getCloseWithSwapHistory());
+    const events: ITxRowProps[] = liquidationEvents.concat(closeEvents).concat(tradeEvents);
+
+    this._isMounted && this.setState({
+      ...this.state,
+      events
+    })
+    this.onSearch(this.state.filter);
   }
 
   public componentDidMount(): void {
@@ -495,34 +467,37 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
 
   onSearch = (filter: string) => {
     if (filter === "") {
+      this._isMounted && this.setState({
+        ...this.state,
+        showSearchResult: false,
+        filteredEvents: []
+      })
       return;
     }
-    NavService.Instance.History.push(`/search/${filter}`);
+    const filteredEvents = this.state.events.filter(e => e.hash === filter || e.account === filter)
+    this._isMounted && this.setState({
+      ...this.state,
+      showSearchResult: true,
+      filteredEvents,
+      filter: filter
+    })
   }
 
   public render() {
+    
     return (
       <React.Fragment>
         <Header isMobileMedia={this.props.isMobileMedia} doNetworkConnect={this.props.doNetworkConnect} />
-        <section>
-          <div className="container">
-            <StatsChart />
-            <div className="flex jc-c labels-container">
-              <div className="label-chart"><span className="bg-green"></span>Supply APR, %</div>
-              <div className="label-chart"><span className="bg-primary"></span>TVL</div>
-              <div className="label-chart"><span className="bg-secondary"></span>Utilization, %</div>
-            </div>
-          </div>
-        </section>
-        <section className="pt-75">
-          <Search onSearch={this.onSearch} />
+        <section className="pt-45">
+          <Search onSearch={this.onSearch} initialFilter={this.state.filter}/>
         </section>
         <section className="pt-90">
           <div className="container">
-            <TxGrid events={this.state.events} />
+              <h1>Result:</h1>
+            <TxGrid events={!this.state.showSearchResult ? this.state.events : this.state.filteredEvents} />
           </div>
         </section>
       </React.Fragment>
     );
   }
-} 
+}

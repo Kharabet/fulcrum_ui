@@ -10,8 +10,11 @@ import { Asset } from "../domain/Asset";
 import { Bar } from "react-chartjs-2";
 import { Search } from "../components/Search";
 import { UnhealthyChart } from "../components/UnhealthyChart";
+
 import { ExplorerProvider } from "../services/ExplorerProvider";
 import { ExplorerProviderEvents } from "../services/events/ExplorerProviderEvents";
+
+import { NavService } from "../services/NavService";
 
 
 interface ILiquidationsPageProps {
@@ -20,10 +23,10 @@ interface ILiquidationsPageProps {
 }
 
 interface ILiquidationsPageState {
-  events: ITxRowProps[]
-  daiDataset: ({ x: string, y: number })[]
-  ethDataset: ({ x: string, y: number })[]
-  usdcDataset: ({ x: string, y: number })[]
+  events: ITxRowProps[];
+  daiDataset: ({ x: string, y: number })[];
+  ethDataset: ({ x: string, y: number })[];
+  usdcDataset: ({ x: string, y: number })[];
 }
 export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquidationsPageState> {
   private _isMounted: boolean;
@@ -44,15 +47,15 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
 
   getLiquidationHistory = async (): Promise<LiquidationEvent[]> => {
     let result: LiquidationEvent[] = [];
-    const bzxContractAddress = ExplorerProvider.Instance.contractsSource!.getiBZxAddress()
+    if (!ExplorerProvider.Instance.contractsSource) return result;
+    const bzxContractAddress = ExplorerProvider.Instance.contractsSource.getiBZxAddress()
     const etherscanApiKey = configProviders.Etherscan_Api;
     let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${LiquidationEvent.topic0}&apikey=${etherscanApiKey}`
     const tradeEventResponse = await fetch(etherscanApiUrl);
     const tradeEventResponseJson = await tradeEventResponse.json();
     if (tradeEventResponseJson.status !== "1") return result;
     const events = tradeEventResponseJson.result;
-    //@ts-ignore
-    result = events.reverse().map(event => {
+    result = events.reverse().map((event: any) => {
       const userAddress = event.topics[1].replace("0x000000000000000000000000", "0x");
       const liquidatorAddress = event.topics[2].replace("0x000000000000000000000000", "0x");
       const loanId = event.topics[3];
@@ -93,11 +96,12 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
 
   public getGridItems = (events: LiquidationEvent[]): ITxRowProps[] => {
     if (events.length === 0) return [];
-    const etherscanUrl = ExplorerProvider.getWeb3ProviderSettings(ExplorerProvider.Instance.contractsSource!.networkId).etherscanURL;
+    if (!ExplorerProvider.Instance.contractsSource) return [];
+    const etherscanUrl = ExplorerProvider.getWeb3ProviderSettings(ExplorerProvider.Instance.contractsSource.networkId).etherscanURL;
     return events.map(e => {
       return {
         hash: e.txHash,
-        etherscanTxUrl: `${etherscanUrl}/tx/${e.txHash}`,
+        etherscanTxUrl: `${etherscanUrl}tx/${e.txHash}`,
         age: e.timeStamp,
         account: e.user,
         etherscanAddressUrl: `${etherscanUrl}/address/${e.user}`,
@@ -163,14 +167,14 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
     }
 
     if (ExplorerProvider.Instance.contractsSource) {
-      const liquidationEvents = await this.getLiquidationHistory();
-      this.getChartData(liquidationEvents);
+    const liquidationEvents = await this.getLiquidationHistory();
+    this.getChartData(liquidationEvents);
 
-      await this.setState({
-        ...this.state,
-        events: this.getGridItems(liquidationEvents)
-      });
-    }
+    await this.setState({
+      ...this.state,
+      events: this.getGridItems(liquidationEvents)
+    });
+  }
   }
 
 
@@ -195,6 +199,13 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
 
   }
 
+
+  onSearch = (filter: string) => {
+    if (filter === "") {
+      return;
+    }
+    NavService.Instance.History.push(`/search/${filter}`);
+  }
 
   public render() {
     const getData = (canvas: any) => {
@@ -269,36 +280,38 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
     return (
       <React.Fragment>
         <Header isMobileMedia={this.props.isMobileMedia} doNetworkConnect={this.props.doNetworkConnect} />
-        <div className="container">
-          <div className="flex jc-sb al-c mb-25">
-            <h1>Liquidations</h1>
-            <div className="flex">
-              <div className="liquidation-data">
-                <div className="liquidation-data-title">30-days Volume</div>
-                <div className="liquidation-data-value"><span className="sign sign-currency">$</span>554,456,945.09</div>
-              </div>
-              <div className="liquidation-data">
-                <div className="liquidation-data-title">30-days Transactions Count</div>
-                <div className="liquidation-data-value">100,500</div>
+          <section>
+            <div className="container">
+              <div className="flex jc-sb al-c mb-25">
+                <h1>Liquidations</h1>
+                <div className="flex">
+                  <div className="liquidation-data">
+                    <div className="liquidation-data-title">30-days Volume</div>
+                    <div className="liquidation-data-value"><span className="sign sign-currency">$</span>554,456,945.09</div>
+                  </div>
+                  <div className="liquidation-data">
+                    <div className="liquidation-data-title">30-days Transactions Count</div>
+                    <div className="liquidation-data-value">100,500</div>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
-        <div className="container">
-          <div className="wrapper-chartjs-bar">
-            <div id="chartjs-bar">
-              <Bar data={chartData} options={options} height={100} />
+            <div className="container">
+              <div className="wrapper-chartjs-bar">
+                <div id="chartjs-bar">
+                  <Bar data={chartData} options={options} height={100} />
+                </div>
+                <div id="chartjs-bar-tooltip"><table></table></div>
+              </div>
+              <div className="flex jc-c labels-container">
+                <div className="label-chart"><span className="bg-green"></span>ETH</div>
+                <div className="label-chart"><span className="bg-primary"></span>DAI</div>
+                <div className="label-chart"><span className="bg-secondary"></span>USDC</div>
+              </div>
             </div>
-            <div id="chartjs-bar-tooltip"><table></table></div>
-          </div>
-          <div className="flex jc-c labels-container">
-            <div className="label-chart"><span className="bg-green"></span>ETH</div>
-            <div className="label-chart"><span className="bg-primary"></span>DAI</div>
-            <div className="label-chart"><span className="bg-secondary"></span>USDC</div>
-          </div>
-        </div>
+          </section>
         <section className="pt-45">
-          <Search />
+          <Search onSearch={this.onSearch} />
         </section>
         <section className="pt-90">
           <div className="container">

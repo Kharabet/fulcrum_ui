@@ -7,6 +7,7 @@ import { GroupButton } from "../components/GroupButton";
 import { Header } from "../layout/Header";
 import { ExplorerProvider } from "../services/ExplorerProvider";
 import { ExplorerProviderEvents } from "../services/events/ExplorerProviderEvents"
+import { NavService } from "../services/NavService";
 
 interface IMainPageProps {
   doNetworkConnect: () => void;
@@ -55,6 +56,15 @@ export class MainPage extends Component<IMainPageProps, IMainPageState> {
     // this.derivedUpdate();
   }
 
+  
+  onSearch = (filter: string) => {
+    if (filter === "") {
+      return;
+    }
+    NavService.Instance.History.push(`/search/${filter}`);
+  }
+
+
   public render() {
     const tvl = +this.state.tvl;
     return (
@@ -81,7 +91,7 @@ export class MainPage extends Component<IMainPageProps, IMainPageState> {
           <MainChart periodChart={this.state.periodChart} getchange24h={this.getchange24h} />
         </section>
         <section className="pt-75">
-          <Search />
+          <Search onSearch={this.onSearch} />
         </section>
         <section className="pt-60 pb-45">
           <div className="container">

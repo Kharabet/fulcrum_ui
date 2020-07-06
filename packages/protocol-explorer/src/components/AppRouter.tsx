@@ -3,11 +3,13 @@ import React, { Component } from "react";
 import { MainPage } from '../pages/MainPage';
 import { Header } from '../layout/Header';
 import { Footer } from '../layout/Footer';
-import { BrowserRouter as Router, Switch, Route, } from "react-router-dom";
+import { Router, Switch, Route, } from "react-router-dom";
 import configProviders from "../config/providers.json";
 import { ProviderType } from "../domain/ProviderType";
 import { StatsPage } from "../pages/StatsPage";
 import { LiquidationsPage } from "../pages/LiquidationsPage";
+import { SearchResultPage } from "../pages/SearchResultPage";
+import { NavService } from '../services/NavService';
 
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { ExplorerProviderEvents } from "../services/events/ExplorerProviderEvents";
@@ -96,12 +98,13 @@ export class AppRouter extends Component<any, IAppRouterState>  {
 
 
         <React.Fragment>
-          <Router >
+          <Router history={NavService.Instance.History}>
             <Switch>
               <Route exact={true} path="/">
                 <MainPage isMobileMedia={this.state.isMobileMedia} doNetworkConnect={this.doNetworkConnect} />
               </Route>
               <Route path="/stats/:token" render={(props) => <StatsPage {...props} isMobileMedia={this.state.isMobileMedia} doNetworkConnect={this.doNetworkConnect} />} />
+              <Route path="/search/:filter" render={(props) => <SearchResultPage {...props} isMobileMedia={this.state.isMobileMedia} doNetworkConnect={this.doNetworkConnect} />} />
               <Route path="/liquidations">
                 <LiquidationsPage isMobileMedia={this.state.isMobileMedia} doNetworkConnect={this.doNetworkConnect} />
               </Route>
