@@ -5,8 +5,6 @@ import { MainChart } from "../components/MainChart";
 import { ReactComponent as Arrow } from "../assets/images/icon-arrow.svg";
 import { GroupButton } from "../components/GroupButton";
 import { Header } from "../layout/Header";
-import { ExplorerProvider } from "../services/ExplorerProvider";
-import { ExplorerProviderEvents } from "../services/events/ExplorerProviderEvents"
 import { NavService } from "../services/NavService";
 
 interface IMainPageProps {
@@ -32,31 +30,20 @@ export class MainPage extends Component<IMainPageProps, IMainPageState> {
     };
 
     this._isMounted = false;
-    ExplorerProvider.Instance.eventEmitter.on(ExplorerProviderEvents.ProviderAvailable, this.onProviderAvailable);
-    ExplorerProvider.Instance.eventEmitter.on(ExplorerProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
-  private onProviderChanged = () => {
-    // this.derivedUpdate();
-  };
 
-  private onProviderAvailable = () => {
-    // this.derivedUpdate();
-  };
 
   public componentWillUnmount(): void {
     this._isMounted = false;
-    ExplorerProvider.Instance.eventEmitter.removeListener(ExplorerProviderEvents.ProviderAvailable, this.onProviderAvailable);
-    ExplorerProvider.Instance.eventEmitter.removeListener(ExplorerProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
   public componentDidMount(): void {
     this._isMounted = true;
     this.getVaultBalanceUsd();
-    // this.derivedUpdate();
   }
 
-  
+
   onSearch = (filter: string) => {
     if (filter === "") {
       return;
@@ -109,7 +96,7 @@ export class MainPage extends Component<IMainPageProps, IMainPageState> {
     const responseJson = await response.json();
     (!responseJson.success)
       ? console.error(responseJson.message)
-      : await this.setState({ ...this.state, tvl: responseJson.data["all"] });
+      : this._isMounted && await this.setState({ ...this.state, tvl: responseJson.data["all"] });
   }
   public setPeriodChart = (period: number) => {
     this.setState({ ...this.state, periodChart: period })
@@ -124,6 +111,6 @@ export class MainPage extends Component<IMainPageProps, IMainPageState> {
   }
 
   public getchange24h = (change24h: number) => {
-    this.setState({ ...this.state, change24h: change24h });
+    this._isMounted && this.setState({ ...this.state, change24h: change24h });
   }
 }

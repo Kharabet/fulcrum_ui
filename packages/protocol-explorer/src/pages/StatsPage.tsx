@@ -17,6 +17,7 @@ import { ITxRowProps } from "../components/TxRow";
 import { ExplorerProvider } from "../services/ExplorerProvider";
 import { ExplorerProviderEvents } from "../services/events/ExplorerProviderEvents";
 import { NavService } from '../services/NavService';
+import { Loader } from "../components/Loader";
 
 
 interface MatchParams {
@@ -31,6 +32,7 @@ interface IStatsPageProps extends RouteComponentProps<MatchParams> {
 interface IStatsPageState {
   asset: Asset;
   events: ITxRowProps[];
+  isDataLoading: boolean;
 }
 
 export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
@@ -41,6 +43,7 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
     this.state = {
       asset: this.props.match.params.token.toUpperCase() as Asset,
       events: [],
+      isDataLoading: true
     };
 
     this._isMounted = false;
@@ -49,12 +52,30 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
   }
   
   private async derivedUpdate() {
+    await this._isMounted && this.setState({
+      ...this.state,
+      isDataLoading: true
+    });
+
+    if (ExplorerProvider.Instance.unsupportedNetwork) {
+      await this._isMounted && this.setState({
+        events: [],
+        isDataLoading: false
+      });
+      return;
+    }
+
     const provider = ExplorerProvider.getLocalstorageItem('providerType');
 
-    !ExplorerProvider.Instance.web3Wrapper && (!provider || provider === "None") &&
+    if (!provider || provider === "None" || !ExplorerProvider.Instance.contractsSource || !ExplorerProvider.Instance.contractsSource.canWrite) {
       this.props.doNetworkConnect();
+      await this._isMounted && this.setState({
+        events: [],
+        isDataLoading: false
+      });
+      return;
+    }
 
-    if (ExplorerProvider.Instance.contractsSource) {
       const liquidationEvents = ExplorerProvider.Instance.getGridItems((await ExplorerProvider.Instance.getLiquidationHistory()).filter((e: LiquidationEvent) => e.loanToken === this.state.asset));
       const tradeEvents = ExplorerProvider.Instance.getGridItems((await ExplorerProvider.Instance.getTradeHistory()).filter((e: TradeEvent) => e.baseToken === this.state.asset));
       const closeEvents = ExplorerProvider.Instance.getGridItems((await ExplorerProvider.Instance.getCloseWithSwapHistory()).filter((e: CloseWithSwapEvent) => e.loanToken === this.state.asset));
@@ -70,12 +91,12 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
       .concat(mintEvents)
       .concat(burnEvents);
 
-      this._isMounted && this.setState({
+    await this._isMounted && this.setState({
         ...this.state,
-        events
+      events,
+      isDataLoading: false
       })
     }
-  }
 
   private onProviderChanged = () => {
     this.derivedUpdate();
@@ -118,6 +139,16 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
             </div>
           </div>
         </section>
+
+        {!ExplorerProvider.Instance.unsupportedNetwork ?
+          <React.Fragment>
+            {this.state.isDataLoading
+              ? <section className="pt-90 pb-45">
+                <div className="container">
+                  <Loader quantityDots={5} sizeDots={'large'} title={'Loading'} isOverlay={false} />
+                </div>
+              </section>
+              : <React.Fragment>
         <section className="pt-75">
           <Search onSearch={this.onSearch} />
         </section>
@@ -126,6 +157,17 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
             <TxGrid events={this.state.events} />
           </div>
         </section>
+              </React.Fragment>}
+          </React.Fragment> :
+          <section className="pt-75">
+            <div style={{ textAlign: `center`, fontSize: `2rem`, paddingBottom: `1.5rem` }}>
+              <div style={{ cursor: `pointer` }}>
+                You are connected to the wrong network.
+                      </div>
+            </div>
+          </section>
+        }
+
       </React.Fragment>
     );
   }

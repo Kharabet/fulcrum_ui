@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import { Header } from "../layout/Header";
-//import { ContractsSource } from "../services/ContractsSource";
 import { LiquidationEvent } from "../domain/LiquidationEvent";
 import { BigNumber } from "@0x/utils";
 import { ITxRowProps } from "../components/TxRow";
@@ -17,6 +16,8 @@ import { ExplorerProviderEvents } from "../services/events/ExplorerProviderEvent
 
 import { NavService } from "../services/NavService";
 
+import { Loader } from "../components/Loader";
+
 
 interface ILiquidationsPageProps {
   doNetworkConnect: () => void;
@@ -28,6 +29,7 @@ interface ILiquidationsPageState {
   daiDataset: ({ x: string, y: number })[];
   ethDataset: ({ x: string, y: number })[];
   usdcDataset: ({ x: string, y: number })[];
+  isDataLoading: boolean;
 }
 export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquidationsPageState> {
   private _isMounted: boolean;
@@ -39,6 +41,7 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
       daiDataset: [],
       ethDataset: [],
       usdcDataset: [],
+      isDataLoading: true
     };
 
     this._isMounted = false;
@@ -88,20 +91,40 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
     })
   }
   private async derivedUpdate() {
-    const provider = ExplorerProvider.getLocalstorageItem('providerType');
-    if (!ExplorerProvider.Instance.web3Wrapper && (!provider || provider === "None")) {
-      this.props.doNetworkConnect();
+
+    await this._isMounted && this.setState({
+      ...this.state,
+      isDataLoading: true
+    });
+
+    if (ExplorerProvider.Instance.unsupportedNetwork) {
+      await this._isMounted && this.setState({
+        events: [],
+        isDataLoading: false
+      });
+      return;
     }
 
-    if (ExplorerProvider.Instance.contractsSource) {
+    const provider = ExplorerProvider.getLocalstorageItem('providerType');
+
+    if (!provider || provider === "None" || !ExplorerProvider.Instance.contractsSource || !ExplorerProvider.Instance.contractsSource.canWrite) {
+      this.props.doNetworkConnect();
+      await this._isMounted && this.setState({
+        events: [],
+        isDataLoading: false
+      });
+      return;
+    }
+
     const liquidationEvents = await ExplorerProvider.Instance.getLiquidationHistory();
     this.getChartData(liquidationEvents);
 
     await this.setState({
       ...this.state,
-      events: ExplorerProvider.Instance.getGridItems(liquidationEvents)
+      events: ExplorerProvider.Instance.getGridItems(liquidationEvents),
+      isDataLoading: false
     });
-  }
+
   }
 
 
@@ -207,6 +230,16 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
     return (
       <React.Fragment>
         <Header isMobileMedia={this.props.isMobileMedia} doNetworkConnect={this.props.doNetworkConnect} />
+
+        {!ExplorerProvider.Instance.unsupportedNetwork ?
+          <React.Fragment>
+            {this.state.isDataLoading
+              ? <section className="pt-90 pb-45">
+                <div className="container">
+                  <Loader quantityDots={5} sizeDots={'large'} title={'Loading'} isOverlay={false} />
+                </div>
+              </section>
+              : <React.Fragment>
           <section>
             <div className="container">
               <div className="flex jc-sb al-c mb-25">
@@ -268,6 +301,17 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
             </div>
           </div>
         </section>
+              </React.Fragment>}
+          </React.Fragment> :
+          <section className="pt-75">
+            <div style={{ textAlign: `center`, fontSize: `2rem`, paddingBottom: `1.5rem` }}>
+              <div style={{ cursor: `pointer` }}>
+                You are connected to the wrong network.
+                      </div>
+            </div>
+          </section>
+        }
+
       </React.Fragment>
     );
   }
