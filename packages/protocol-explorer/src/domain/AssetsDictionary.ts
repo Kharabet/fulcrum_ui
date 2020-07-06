@@ -22,7 +22,8 @@ export class AssetsDictionary {
       new AssetDetails(
         "BAT",
         "Basic Attention Token (BAT)",
-        BAT
+        BAT,
+        18
       )
     ],
     [
@@ -30,7 +31,8 @@ export class AssetsDictionary {
       new AssetDetails(
         "WBTC",
         "Bitcoin (BTC)",
-        WBTC
+        WBTC,
+        8
       )
     ],
     [
@@ -38,7 +40,8 @@ export class AssetsDictionary {
       new AssetDetails(
         "LINK",
         "ChainLink Token (LINK)",
-        LINK
+        LINK,
+        18
       )
     ],
     [
@@ -46,7 +49,8 @@ export class AssetsDictionary {
       new AssetDetails(
         "USDT",
         "Tether USD (USDT)",
-        USDT
+        USDT,
+        6
       )
     ],
     [
@@ -54,7 +58,8 @@ export class AssetsDictionary {
       new AssetDetails(
         "SAI",
         "Sai Stablecoin (SAI)",
-        SAI
+        SAI,
+        18
       )
     ],
     [
@@ -62,7 +67,8 @@ export class AssetsDictionary {
       new AssetDetails(
         "DAI",
         "Dai Stablecoin (DAI)",
-        DAI
+        DAI,
+        18
       )
     ],
     [
@@ -70,7 +76,8 @@ export class AssetsDictionary {
       new AssetDetails(
         "USDC",
         "USD Coin (USDC)",
-        USDC
+        USDC,
+        6
       )
     ],
     [
@@ -78,7 +85,8 @@ export class AssetsDictionary {
       new AssetDetails(
         "SUSD",
         "Synth sUSD (sUSD)",
-        SUSD
+        SUSD,
+        18
       )
     ],
     [
@@ -86,7 +94,8 @@ export class AssetsDictionary {
       new AssetDetails(
         "ETH",
         "Ethereum (ETH)",
-        ETH
+        ETH,
+        18
       )
     ],
     [
@@ -94,7 +103,8 @@ export class AssetsDictionary {
       new AssetDetails(
         "ETH", // "WETH",
         "Ethereum (ETH)", // "Wrapped Ether (WETH)",
-        ETH
+        ETH,
+        18
       )
     ],
     [
@@ -102,7 +112,8 @@ export class AssetsDictionary {
       new AssetDetails(
         "KNC",
         "Kyber Network (KNC)",
-        KNC
+        KNC,
+        18
       )
     ],
     [
@@ -110,7 +121,8 @@ export class AssetsDictionary {
       new AssetDetails(
         "MKR",
         "Maker (MKR)",
-        MKR
+        MKR,
+        18
       )
     ],
     [
@@ -118,7 +130,8 @@ export class AssetsDictionary {
       new AssetDetails(
         "REP",
         "Augur (REP)",
-        REP
+        REP,
+        18
       )
     ],
     [
@@ -126,7 +139,8 @@ export class AssetsDictionary {
       new AssetDetails(
         "ZRX",
         "0x (ZRX)",
-        ZRX
+        ZRX,
+        18
       )
     ]
   ]);

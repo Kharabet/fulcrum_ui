@@ -15,7 +15,7 @@ export class LoanGrid extends Component<ILoanGridProps, ILoanGridState> {
   }
 
   public render() {
-    const assetItems = this.props.events.map((e: ILoanRowProps) => <LoanRow key={e.hash} {...e} />);
+    const assetItems = this.props.events.map((e: ILoanRowProps, i: number) => <LoanRow key={i} {...e} />);
     return (
       <React.Fragment>
         <div className="table table-loan">

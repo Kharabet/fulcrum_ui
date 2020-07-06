@@ -17,6 +17,8 @@ import { ExplorerProviderEvents } from "../services/events/ExplorerProviderEvent
 import { NavService } from "../services/NavService";
 
 import { Loader } from "../components/Loader";
+import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
+import { ILoanRowProps } from "../components/LoanRow";
 
 
 interface ILiquidationsPageProps {
@@ -26,6 +28,7 @@ interface ILiquidationsPageProps {
 
 interface ILiquidationsPageState {
   events: ITxRowProps[];
+  unhealthyLoans: ILoanRowProps[];
   daiDataset: ({ x: string, y: number })[];
   ethDataset: ({ x: string, y: number })[];
   usdcDataset: ({ x: string, y: number })[];
@@ -38,6 +41,7 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
     super(props);
     this.state = {
       events: [],
+      unhealthyLoans: [],
       daiDataset: [],
       ethDataset: [],
       usdcDataset: [],
@@ -117,11 +121,19 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
     }
 
     const liquidationEvents = await ExplorerProvider.Instance.getLiquidationHistory();
+    const unhealthyLoansData = await ExplorerProvider.Instance.getUnhealthyLoans(0 ,25);
     this.getChartData(liquidationEvents);
-
+    const unhealthyLoans = unhealthyLoansData.map((e: IBorrowedFundsState) => ({
+      loanId: e.loanData!.loanId,
+      payOffAmount: e.loanData!.maxLiquidatable,
+      seizeAmount: e.loanData!.maxSeizable,
+      loanToken: e.loanAsset,
+      collateralToken: e.collateralAsset,
+    }))
     await this.setState({
       ...this.state,
       events: ExplorerProvider.Instance.getGridItems(liquidationEvents),
+      unhealthyLoans,
       isDataLoading: false
     });
 
@@ -297,7 +309,7 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
               </div>
             </div>
             <div className="pt-75">
-              <LoanGrid events={this.state.events} />
+              <LoanGrid events={this.state.unhealthyLoans} />
             </div>
           </div>
         </section>
