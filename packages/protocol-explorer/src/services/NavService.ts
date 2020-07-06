@@ -15,18 +15,6 @@ export class NavService {
 
     return NavService.Instance;
   }
-
-  public getBorrowAddress = () => {
-    return "/borrow";
-  };
-
-  public getDashboardAddress = () => {
-    return "/dashboard";
-  };
-
-   public getRefinanceAddress = () => {
-    return "/refinance";
-  };
 }
 
 // tslint:disable-next-line:no-unused-expression
