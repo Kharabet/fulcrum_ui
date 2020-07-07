@@ -152,8 +152,9 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
     if (prevState.leverage !== this.state.leverage || prevProps.isTxCompleted !== this.props.isTxCompleted) {
       await this.derivedUpdate();
       if (this.state.isLoadingTransaction) {
-        this.setState({ ...this.state, isLoadingTransaction: false, request: undefined });
-        this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, true, this.state.resultTx)
+        this.setState({ ...this.state, isLoadingTransaction: false, request: undefined }, () => {
+          this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, true, this.state.resultTx)
+        });
       }
     }
   }

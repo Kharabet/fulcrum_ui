@@ -74,7 +74,8 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
               }
               <InnerOwnTokenGrid
                 ownRowsData={this.props.ownRowsData
-                  .filter(e => e.positionType === row.props.positionType && e.baseToken === row.props.baseToken)}
+                  .filter(e => e.positionType === row.props.positionType
+                    && !(this.props.isLoadingTransaction && e.loan.loanId == this.props.request!.loanId && this.props.request!.tradeType === TradeType.BUY))}
                 isMobileMedia={this.props.isMobileMedia}
                 request={this.props.request}
                 isLoadingTransaction={this.props.isLoadingTransaction}
@@ -111,7 +112,8 @@ export class TradeTokenGrid extends Component<ITradeTokenGridProps, ITradeTokenG
             }
             <InnerOwnTokenGrid
               ownRowsData={this.props.ownRowsData
-                .filter(e => e.positionType === row.props.positionType && e.baseToken === row.props.baseToken)}
+                .filter(e => e.positionType === row.props.positionType
+                  && !(this.props.isLoadingTransaction && e.loan.loanId == this.props.request!.loanId && this.props.request!.tradeType === TradeType.BUY))}
               isMobileMedia={this.props.isMobileMedia}
               request={this.props.request}
               isLoadingTransaction={this.props.isLoadingTransaction}

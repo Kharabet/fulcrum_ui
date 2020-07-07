@@ -34,6 +34,7 @@ interface ITradeTokenCardMobileState {
   isLoading: boolean;
   isLoadingTransaction: boolean;
   request: TradeRequest | undefined;
+  resultTx: boolean;
 }
 
 export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, ITradeTokenCardMobileState> {
@@ -50,6 +51,7 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
       isLoading: true,
       isLoadingTransaction: false,
       request: undefined,
+      resultTx: false
     };
 
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
@@ -111,18 +113,19 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
     this.setState({ ...this.state, isLoadingTransaction: true });
     this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, false, true);
   }
+
   private onAskToCloseProgressDlg = (task: RequestTask) => {
     if (!this.state.request || task.request.id !== this.state.request.id) return;
     if (task.status === RequestStatus.FAILED || task.status === RequestStatus.FAILED_SKIPGAS) {
       window.setTimeout(() => {
         FulcrumProvider.Instance.onTaskCancel(task);
-        this.setState({ ...this.state, isLoadingTransaction: false, request: undefined })
-        this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, true, false)
+        this.setState({ ...this.state, isLoadingTransaction: false, request: undefined, resultTx: false })
+        this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, false, this.state.resultTx)
       }, 5000)
       return;
     }
-    this.setState({ ...this.state, isLoadingTransaction: false, request: undefined });
-    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, true, true)
+    this.setState({ ...this.state, resultTx: true });
+    this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, true, this.state.resultTx);
   }
 
   public componentWillUnmount(): void {
@@ -146,8 +149,13 @@ export class TradeTokenCardMobile extends Component<ITradeTokenCardMobileProps, 
     prevState: Readonly<ITradeTokenCardMobileState>,
     snapshot?: any
   ): void {
-    if (prevState.leverage !== this.state.leverage) {
+    if (prevState.leverage !== this.state.leverage || this.props.isTxCompleted && prevProps.isTxCompleted !== this.props.isTxCompleted) {
       this.derivedUpdate();
+      if (this.state.isLoadingTransaction) {
+        this.setState({ ...this.state, isLoadingTransaction: false, request: undefined }, () => {
+          this.props.changeLoadingTransaction(this.state.isLoadingTransaction, this.state.request, false, this.state.resultTx)
+        });
+      }
     }
   }
 

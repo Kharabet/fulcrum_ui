@@ -140,15 +140,12 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
       </React.Fragment>
       : <div className={`own-token-grid-row ${this.props.isTxCompleted ? `completed` : ``}`}>
         <div className="own-token-grid-row__col-token-name  opacityIn">
-          {`${this.props.baseToken.toUpperCase()}`}
+          {`${this.props.baseToken.toUpperCase()}-${this.props.quoteToken.toUpperCase()}`}
         </div>
         <div className="own-token-grid-row__col-position-type opacityIn">
           <span className="position-type-marker">
             {`${this.props.leverage}x ${this.props.positionType}`}
           </span>
-        </div>
-        <div title={this.props.quoteToken} className="own-token-grid-row__col-asset-unit opacityIn">
-          {this.props.quoteToken}
         </div>
         <div title={this.props.positionValue.toFixed(18)} className="own-token-grid-row__col-position  opacityIn">
           {this.props.positionValue.toFixed(4)}

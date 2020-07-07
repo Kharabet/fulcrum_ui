@@ -169,22 +169,19 @@ export class OwnTokenCardMobile extends Component<IOwnTokenGridRowProps, IOwnTok
           <div className="own-token-card-mobile">
             <div className="own-token-card-mobile__body">
               <div className="own-token-card-mobile__body-header">
-                <span className="own-token-card-mobile__asset-name">Asset</span>
+                <span className="own-token-card-mobile__asset-name">Pair</span>
                 <span className="own-token-card-mobile__position-type">Type</span>
-                <span className="own-token-card-mobile__unit-of-account">Unit of Account</span>
               </div>
               <div className="own-token-card-mobile__body-row">
                 <div className="own-token-card-mobile__asset-name">
                   <span className="own-token-card-mobile__value">
-                    {`${this.props.baseToken.toUpperCase()}`}
+                    {`${this.props.baseToken.toUpperCase()}-${this.props.quoteToken.toUpperCase()}`}
                   </span>
                 </div>
                 <div className="own-token-card-mobile__position-type">
                   <span className="position-type-marker">{`${this.props.leverage}x`}&nbsp;{this.props.positionType}</span>
                 </div>
-                <div title={this.props.quoteToken} className="own-token-card-mobile__unit-of-account">
-                  <span className="own-token-card-mobile__value">{this.props.quoteToken}</span>
-                </div>
+                
                 <div className="own-token-card-mobile__action">
                   <button className="own-token-card-mobile__sell-button own-token-card-mobile__button--size-half" onClick={this.onSellClick}>
                     {TradeType.SELL}
