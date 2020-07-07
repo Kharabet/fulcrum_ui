@@ -484,11 +484,17 @@ export class ExplorerProvider {
         const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
 
         if (!iBZxContract || !account) return result;
-        const activeLoansData = await iBZxContract.getActiveLoans.callAsync(
-            new BigNumber(start),
-            new BigNumber(count),
-            true
-        );
+        // const activeLoansData = await iBZxContract.getActiveLoans.callAsync(
+        //     new BigNumber(start),
+        //     new BigNumber(count),
+        //     true
+        // );
+        
+    const activeLoansData = await iBZxContract.getUserLoans.callAsync(
+        account,
+        new BigNumber(50),
+        1 // margin trade loans
+      );
         result = activeLoansData
             .map(e => {
                 const loanAsset = this.contractsSource!.getAssetFromAddress(e.loanToken);
@@ -514,6 +520,8 @@ export class ExplorerProvider {
                     interestOwedPerDay: e.interestOwedPerDay.dividedBy(10 ** loanPrecision),
                     hasManagementContract: true,
                     isInProgress: false,
+                    maxLiquidatable: e.maxLiquidatable.dividedBy(10 ** loanPrecision),
+                    maxSeizable: e.maxSeizable.dividedBy(10 ** collateralPrecision),
                     loanData: e
                 };
             });

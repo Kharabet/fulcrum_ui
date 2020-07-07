@@ -125,8 +125,8 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
     this.getChartData(liquidationEvents);
     const unhealthyLoans = unhealthyLoansData.map((e: IBorrowedFundsState) => ({
       loanId: e.loanData!.loanId,
-      payOffAmount: e.loanData!.maxLiquidatable,
-      seizeAmount: e.loanData!.maxSeizable,
+      payOffAmount: e.maxLiquidatable,
+      seizeAmount: e.maxSeizable,
       loanToken: e.loanAsset,
       collateralToken: e.collateralAsset,
     }))
