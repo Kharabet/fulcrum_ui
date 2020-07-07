@@ -1,8 +1,8 @@
 .wrapper-chart {
   position: relative;
-  overflow: hidden;
+  // overflow: hidden;
 }
-#chartjs{
+#chartjs {
   z-index: 1000;
 }
 #chartjs-tooltip {
@@ -169,7 +169,8 @@
         .line {
           right: 3px;
         }
-        tr td, tr th {
+        tr td,
+        tr th {
           text-align: right;
         }
       }
@@ -183,7 +184,7 @@
       background-color: #ffffff;
       box-shadow: 0px 4px 12px rgba(64, 123, 247, 0.2);
       border-radius: 12px;
-      
+
       position: absolute;
       &:before {
         content: "";
