@@ -5,7 +5,10 @@ body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
-
+body,
+#root {
+    height: 100%;
+}
 p {
     margin: 0;
 }
@@ -60,4 +63,11 @@ a {
 }
 .w-100 {
     width: 100%;
+}
+
+.pages-container {
+    height: 100vh;
+}
+main {
+    margin: auto;
 }

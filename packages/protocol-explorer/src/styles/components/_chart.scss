@@ -1,133 +1,140 @@
 .wrapper-chart {
   position: relative;
-  overflow: hidden;
-  #chartjs{
-    z-index: 1000;
-  }
-  #chartjs-tooltip {
-    tbody {
+  // overflow: hidden;
+}
+#chartjs {
+  z-index: 1000;
+}
+#chartjs-tooltip {
+  opacity: 0;
+  position: absolute;
+  tbody {
+    display: flex;
+    flex-direction: column;
+    &.bottom {
+      tr:first-child {
+        order: 3;
+      }
+      tr:last-child {
+        order: -1;
+      }
+    }
+    tr {
       display: flex;
       flex-direction: column;
-      &.bottom {
-        tr:first-child {
-          order: 3;
-        }
-        tr:last-child {
-          order: -1;
-        }
-      }
+    }
+    &.right {
       tr {
-        display: flex;
-        flex-direction: column;
-      }
-      &.right {
-        tr {
-          justify-content: flex-end;
-          .chartjs-tooltip-change24 {
-            padding-right: 10px;
-          }
-        }
-      }
-    }
-    .chartjs-tooltip-value {
-      font-family: "Muli", sans-serif;
-      color: #283038;
-      font-size: 30px;
-      span {
-        font-weight: 900;
-      }
-    }
-    .chartjs-tooltip-time {
-      font-family: "Muli", sans-serif;
-      font-size: 14px;
-      color: #8992a4;
-      text-align: left;
-    }
-    .chartjs-tooltip-change24 {
-      position: relative;
-      font-family: "Muli", sans-serif;
-      span {
-        font-size: 16px;
-        font-weight: 700;
-        &:before {
-          content: "";
-          width: 0;
-          height: 0;
-          border-style: solid;
-          border-radius: 3px;
-          position: absolute;
-          top: 9px;
-        }
-      }
-
-      &:before {
-        content: "";
-        width: 1px;
-        height: 50px;
-        position: absolute;
-      }
-      &.top {
-        &:before {
-          top: -47px;
-        }
-      }
-      &.bottom {
-        &:before {
-          bottom: -47px;
-        }
-      }
-      &.down {
-        color: $red-color;
-        span {
-          &:before {
-            border-width: 6px 4.5px 0 4.5px;
-            border-color: $red-color transparent transparent transparent;
-          }
-        }
-        &:before {
-          background-color: $red-color;
-        }
-      }
-      &.up {
-        color: $green-color;
-        span {
-          &:before {
-            border-width: 0 4.5px 6px 4.5px;
-            border-color: transparent transparent $green-color transparent;
-          }
-        }
-        &:before {
-          background-color: $green-color;
-        }
-      }
-      &.left {
-        span {
-          padding-left: 10px;
-          &:before {
-            left: 1px;
-          }
-        }
-        &:before {
-          left: 5px;
-        }
-      }
-      &.right {
-        td {
-          text-align: right;
+        justify-content: flex-end;
+        .chartjs-tooltip-change24 {
           padding-right: 10px;
-        }
-        span {
-          &:before {
-            right: -1px;
-          }
-        }
-        &:before {
-          right: 3px;
         }
       }
     }
   }
+  .chartjs-tooltip-value {
+    font-family: "Muli", sans-serif;
+    color: #283038;
+    font-size: 30px;
+    span {
+      font-weight: 900;
+    }
+  }
+  .chartjs-tooltip-time {
+    font-family: "Muli", sans-serif;
+    font-size: 14px;
+    color: #8992a4;
+    text-align: left;
+  }
+  .chartjs-tooltip-change24 {
+    position: relative;
+    font-family: "Muli", sans-serif;
+    span {
+      font-size: 16px;
+      font-weight: 700;
+      &:before {
+        content: "";
+        width: 0;
+        height: 0;
+        border-style: solid;
+        border-radius: 3px;
+        position: absolute;
+        top: 9px;
+      }
+    }
+
+    &:before {
+      content: "";
+      width: 1px;
+      height: 50px;
+      position: absolute;
+    }
+    &.top {
+      &:before {
+        top: -47px;
+      }
+    }
+    &.bottom {
+      &:before {
+        bottom: -47px;
+      }
+    }
+    &.down {
+      color: $red-color;
+      span {
+        &:before {
+          border-width: 6px 4.5px 0 4.5px;
+          border-color: $red-color transparent transparent transparent;
+        }
+      }
+      &:before {
+        background-color: $red-color;
+      }
+    }
+    &.up {
+      color: $green-color;
+      span {
+        &:before {
+          border-width: 0 4.5px 6px 4.5px;
+          border-color: transparent transparent $green-color transparent;
+        }
+      }
+      &:before {
+        background-color: $green-color;
+      }
+    }
+    &.left {
+      span {
+        padding-left: 10px;
+        &:before {
+          left: 1px;
+        }
+      }
+      &:before {
+        left: 5px;
+      }
+    }
+    &.right {
+      td {
+        text-align: right;
+        padding-right: 10px;
+      }
+      span {
+        &:before {
+          right: -1px;
+        }
+      }
+      &:before {
+        right: 3px;
+      }
+    }
+  }
+}
+.wrapper-chartjs-token {
+  position: relative;
   .chartjs-tooltip-token {
+    opacity: 0;
+    position: absolute;
     tbody {
       display: flex;
       flex-direction: column;
@@ -162,7 +169,8 @@
         .line {
           right: 3px;
         }
-        tr td, tr th {
+        tr td,
+        tr th {
           text-align: right;
         }
       }
@@ -176,7 +184,7 @@
       background-color: #ffffff;
       box-shadow: 0px 4px 12px rgba(64, 123, 247, 0.2);
       border-radius: 12px;
-      
+
       position: absolute;
       &:before {
         content: "";

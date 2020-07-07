@@ -96,22 +96,23 @@ export class AppRouter extends Component<any, IAppRouterState>  {
           />
         </Modal>
 
-
-        <React.Fragment>
-          <Router history={NavService.Instance.History}>
-            <Switch>
-              <Route exact={true} path="/">
-                <MainPage isMobileMedia={this.state.isMobileMedia} doNetworkConnect={this.doNetworkConnect} />
-              </Route>
-              <Route path="/stats/:token" render={(props) => <StatsPage {...props} isMobileMedia={this.state.isMobileMedia} doNetworkConnect={this.doNetworkConnect} />} />
-              <Route path="/search/:filter" render={(props) => <SearchResultPage {...props} isMobileMedia={this.state.isMobileMedia} doNetworkConnect={this.doNetworkConnect} />} />
-              <Route path="/liquidations">
-                <LiquidationsPage isMobileMedia={this.state.isMobileMedia} doNetworkConnect={this.doNetworkConnect} />
-              </Route>
-            </Switch>
-          </Router>
-          <Footer />
-        </React.Fragment >
+        <div className="pages-container flex jc-c">
+          <div className="flex fd-c ac-c w-100">
+            <Router history={NavService.Instance.History}>
+              <Switch>
+                <Route exact={true} path="/">
+                  <MainPage isMobileMedia={this.state.isMobileMedia} doNetworkConnect={this.doNetworkConnect} />
+                </Route>
+                <Route path="/stats/:token" render={(props) => <StatsPage {...props} isMobileMedia={this.state.isMobileMedia} doNetworkConnect={this.doNetworkConnect} />} />
+                <Route path="/search/:filter" render={(props) => <SearchResultPage {...props} isMobileMedia={this.state.isMobileMedia} doNetworkConnect={this.doNetworkConnect} />} />
+                <Route path="/liquidations">
+                  <LiquidationsPage isMobileMedia={this.state.isMobileMedia} doNetworkConnect={this.doNetworkConnect} />
+                </Route>
+              </Switch>
+            </Router>
+            <Footer />
+          </div>
+        </div>
       </Web3ReactProvider>
     );
   }

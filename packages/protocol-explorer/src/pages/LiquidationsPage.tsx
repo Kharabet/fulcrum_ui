@@ -118,8 +118,7 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
     if (!provider || provider === "None" || !ExplorerProvider.Instance.contractsSource || !ExplorerProvider.Instance.contractsSource.canWrite) {
       this.props.doNetworkConnect();
       await this._isMounted && this.setState({
-        events: [],
-        isDataLoading: false
+        events: []
       });
       return;
     }
@@ -251,7 +250,7 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
     return (
       <React.Fragment>
         <Header isMobileMedia={this.props.isMobileMedia} doNetworkConnect={this.props.doNetworkConnect} />
-
+        <main className="flex fd-c ac-c jc-c">
         {!ExplorerProvider.Instance.unsupportedNetwork ?
           <React.Fragment>
             {this.state.isDataLoading
@@ -309,11 +308,11 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
               <div className="w-55 flex fd-c ai-c">
                 <div className="flex w-100 mb-15">
                   <div className="unhealthy">Unhealthy&nbsp;<span className="sign sign-currency">$</span>&nbsp;</div>
-                  <span className="unhealthy-value unhealthy-color">{this.state.unhealthyLoansUsd}</span>
+                  <span className="unhealthy-value unhealthy-color">{this.state.unhealthyLoansUsd.toFixed(2)}</span>
                 </div>
                 <div className="flex w-100">
                   <div className="healthy">Healthy&nbsp;<span className="sign sign-currency">$</span>&nbsp;</div>
-                  <span className="healthy-value healthy-color">{this.state.healthyLoansUsd}</span>
+                  <span className="healthy-value healthy-color">{this.state.healthyLoansUsd.toFixed(2)}</span>
                 </div>
               </div>
             </div>
@@ -332,7 +331,7 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
             </div>
           </section>
         }
-
+        </main>
       </React.Fragment>
     );
   }
