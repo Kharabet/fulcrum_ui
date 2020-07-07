@@ -192,9 +192,9 @@ export class AppRouter extends Component<any, IAppRouterState> {
               <Route exact={true} path="/">
                 <DashboardPage isMobileMedia={this.state.isMobileMedia} doNetworkConnect={this.doNetworkConnect} />
               </Route>
-              <Route path="/transactions">
+              {/* <Route path="/transactions">
                 <TransactionsPage isMobileMedia={this.state.isMobileMedia} doNetworkConnect={this.doNetworkConnect} />
-              </Route>
+              </Route> */}
             </Switch>
           </LocationListener>
         </Router>

@@ -24,15 +24,19 @@ export class Form extends Component {
               </div>
               <div className="reward-item">
                 <div className="row-header">My rewards balance:</div>
-                <div className="row-body">0,14</div>
+                <div className="row-body">0</div>
                 <div className="row-footer">bZxDAO-Balancer tokens</div>
               </div>
             </div>
+            <div className="convert-button">
+              <button className="button button-full-width">Convert BZRX v1 to v2</button>
+            </div>
+
             <div className="group-buttons">
-              <a href="/" className="button">Stake</a>
-              <a href="/" className="button">Unstake</a>
-              <a href="/" className="button">Claim Rewards</a>
-              <a href="/" className="button">Explore Reward Pool</a>
+              <button className="button" disabled={true}>Stake</button>
+              <button className="button" disabled={true}>Unstake</button>
+              <button className="button" disabled={true}>Claim Rewards</button>
+              <button className="button" disabled={true}>Explore Reward Pool</button>
             </div>
           </div>
         </div>

@@ -1,7 +1,6 @@
 .group-buttons {
   display: flex;
   flex-wrap: wrap;
-  border-top: 1px solid #e4ebf4;
   @media screen and (min-width: $width-min-sm) {
     padding: 30px 45px 15px 45px;
     justify-content: space-between;
@@ -11,27 +10,7 @@
     justify-content: center;
   }
   .button {
-    background-color: #f3f9ff;
-    border-radius: 40px;
-    height: 56px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    font-size: 16px;
-    line-height: 1.5;
-    color: #276bfb;
     margin-bottom: 15px;
-    @media screen and (min-width: $width-min-sm) {
-      min-width: 300px;
-    }
-    @media screen and (max-width: $width-max-sm) {
-      min-width: 255px;
-    }
-    &:hover {
-      background-color: #5b88ff;
-      color: #ffffff;
-    }
     &:nth-child(2n + 1) {
       @media screen and (min-width: $width-min-sm) {
         margin-right: 30px;
@@ -39,6 +18,63 @@
       @media screen and (max-width: $width-max-sm) and (min-width: $width-min-xs) {
         margin-right: 15px;
       }
+    }
+  }
+}
+
+.convert-button {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  padding: 0 45px;
+  &:before {
+    content: "";
+    position: absolute;
+    height: 1px;
+    width: 100%;
+    background-color: #e4ebf4;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, 0);
+  }
+  .button{
+    z-index: 10;
+  }
+}
+
+.button {
+  border: none;
+  background-color: #f3f9ff;
+  border-radius: 40px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 1.5;
+  color: #276bfb;
+  &-full-width {
+    width: 100%;
+  }
+  @media screen and (min-width: $width-min-sm) {
+    min-width: 300px;
+  }
+  @media screen and (max-width: $width-max-sm) {
+    min-width: 255px;
+  }
+  &:hover {
+    cursor: pointer;
+    background-color: #5b88ff;
+    color: #ffffff;
+  }
+  &:disabled,
+  &[disabled] {
+    color: #a3b0c2;
+    background-color: #eaeaee;
+    cursor: not-allowed;
+    &:hover {
+      cursor: not-allowed;
     }
   }
 }
