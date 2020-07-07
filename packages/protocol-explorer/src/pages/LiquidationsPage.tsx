@@ -29,6 +29,8 @@ interface ILiquidationsPageProps {
 interface ILiquidationsPageState {
   events: ITxRowProps[];
   unhealthyLoans: ILoanRowProps[];
+  unhealthyLoansUsd: BigNumber;
+  healthyLoansUsd: BigNumber;
   daiDataset: ({ x: string, y: number })[];
   ethDataset: ({ x: string, y: number })[];
   usdcDataset: ({ x: string, y: number })[];
@@ -40,6 +42,8 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
   constructor(props: any) {
     super(props);
     this.state = {
+      unhealthyLoansUsd: new BigNumber(0),
+      healthyLoansUsd: new BigNumber(0),
       events: [],
       unhealthyLoans: [],
       daiDataset: [],
@@ -121,7 +125,10 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
     }
 
     const liquidationEvents = await ExplorerProvider.Instance.getLiquidationHistory();
-    const unhealthyLoansData = await ExplorerProvider.Instance.getUnhealthyLoans(0 ,25);
+    const unhealthyLoansData = await ExplorerProvider.Instance.getBzxLoans(0 ,25, true);
+    const healthyLoansData = await ExplorerProvider.Instance.getBzxLoans(0 ,25, false);
+    const unhealthyLoansUsd = unhealthyLoansData.reduce((a, b) => a.plus(b.amountOwedUsd), new BigNumber(0))
+    const healthyLoansUsd = healthyLoansData.reduce((a, b) => a.plus(b.amountOwedUsd), new BigNumber(0))
     this.getChartData(liquidationEvents);
     const unhealthyLoans = unhealthyLoansData.map((e: IBorrowedFundsState) => ({
       loanId: e.loanData!.loanId,
@@ -134,7 +141,9 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
       ...this.state,
       events: ExplorerProvider.Instance.getGridItems(liquidationEvents),
       unhealthyLoans,
-      isDataLoading: false
+      isDataLoading: false,
+      unhealthyLoansUsd,
+      healthyLoansUsd
     });
 
   }
@@ -295,16 +304,16 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
             <h2 className="h1 mb-60">Unhealthy Loans</h2>
             <div className="flex ai-c">
               <div className="w-45">
-                <UnhealthyChart />
+                <UnhealthyChart unhealthyLoansUsd={this.state.unhealthyLoansUsd} healthyLoansUsd={this.state.healthyLoansUsd}/>
               </div>
               <div className="w-55 flex fd-c ai-c">
                 <div className="flex w-100 mb-15">
                   <div className="unhealthy">Unhealthy&nbsp;<span className="sign sign-currency">$</span>&nbsp;</div>
-                  <span className="unhealthy-value unhealthy-color">0.1</span>
+                  <span className="unhealthy-value unhealthy-color">{this.state.unhealthyLoansUsd}</span>
                 </div>
                 <div className="flex w-100">
                   <div className="healthy">Healthy&nbsp;<span className="sign sign-currency">$</span>&nbsp;</div>
-                  <span className="healthy-value healthy-color">100m</span>
+                  <span className="healthy-value healthy-color">{this.state.healthyLoansUsd}</span>
                 </div>
               </div>
             </div>

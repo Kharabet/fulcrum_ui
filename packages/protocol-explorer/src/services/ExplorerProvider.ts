@@ -61,7 +61,8 @@ export class ExplorerProvider {
     public static Instance: ExplorerProvider;
 
     public readonly gasLimit = "4500000";
-    public readonly gasBufferCoeff = new BigNumber("1.06");
+    public readonly gasBufferCoeff = new BigNumber("1.06");  
+    public static readonly UNLIMITED_ALLOWANCE_IN_BASE_UNITS = new BigNumber(2).pow(256).minus(1);
 
     public readonly eventEmitter: EventEmitter;
     public providerType: ProviderType = ProviderType.None;
@@ -479,26 +480,22 @@ export class ExplorerProvider {
     }
 
 
-    public getUnhealthyLoans = async (start: number, count: number): Promise<IBorrowedFundsState[]> => {
+    public getBzxLoans = async (start: number, count: number, isUnhealthy: boolean): Promise<IBorrowedFundsState[]> => {
         let result: IBorrowedFundsState[] = [];
         if (!this.contractsSource) return result;
         const iBZxContract = await this.contractsSource.getiBZxContract();
 
         if (!iBZxContract) return result;
-        const activeLoansData = await iBZxContract.getActiveLoans.callAsync(
+        const loansData = await iBZxContract.getActiveLoans.callAsync(
             new BigNumber(start),
             new BigNumber(count),
-            true
+            isUnhealthy
         );
 
-        // const activeLoansData = await iBZxContract.getUserLoans.callAsync(
-        //     account,
-        //     new BigNumber(50),
-        //     1 // margin trade loans
-        //   );
-        result = activeLoansData
-            .map(e => {
+        result = await Promise.all(loansData
+            .map(async e => {
                 const loanAsset = this.contractsSource!.getAssetFromAddress(e.loanToken);
+                const loandAssetUsdRate = await this.getSwapToUsdRate(loanAsset);
                 const loanPrecision = AssetsDictionary.assets.get(loanAsset)!.decimals || 18;
                 const collateralAsset = this.contractsSource!.getAssetFromAddress(e.collateralToken);
                 const collateralPrecision = AssetsDictionary.assets.get(collateralAsset)!.decimals || 18;
@@ -514,6 +511,7 @@ export class ExplorerProvider {
                     collateralAsset: collateralAsset,
                     amount: e.principal.dividedBy(10 ** loanPrecision).dp(5, BigNumber.ROUND_CEIL),
                     amountOwed: amountOwned,
+                    amountOwedUsd: amountOwned.times(loandAssetUsdRate),
                     collateralAmount: e.collateral.dividedBy(10 ** collateralPrecision),
                     collateralizedPercent: e.currentMargin.dividedBy(10 ** 20),
                     interestRate: e.interestOwedPerDay.dividedBy(e.principal).multipliedBy(365),
@@ -524,7 +522,8 @@ export class ExplorerProvider {
                     maxSeizable: e.maxSeizable.dividedBy(10 ** collateralPrecision),
                     loanData: e
                 };
-            });
+            })
+        );
         return result;
     }
 
@@ -732,7 +731,7 @@ export class ExplorerProvider {
                     value: sendAmountForValue,
                     gas: this.gasLimit,
                 });
-                console.log(values)
+            console.log(values)
             txHash = await iBZxContract.liquidate.sendTransactionAsync(
                 loanId,
                 account,
@@ -824,6 +823,55 @@ export class ExplorerProvider {
         }
     }
 
+
+    public async getSwapToUsdRate(asset: Asset): Promise<BigNumber> {
+        if (asset === Asset.SAI || asset === Asset.DAI || asset === Asset.USDC || asset === Asset.SUSD || asset === Asset.USDT) {
+            return new BigNumber(1);
+        }
+
+        /*const swapRates = await this.getSwapToUsdRateBatch(
+          [asset],
+          Asset.DAI
+        );
+    
+        return swapRates[0][0];*/
+        return this.getSwapRate(
+            asset,
+            Asset.DAI
+        );
+    }
+
+    public async getSwapRate(srcAsset: Asset, destAsset: Asset, srcAmount?: BigNumber): Promise<BigNumber> {
+        if (srcAsset === destAsset || (srcAsset === Asset.USDC && destAsset === Asset.DAI)
+            || (srcAsset === Asset.DAI && destAsset === Asset.USDC)) {
+            return new BigNumber(1);
+        }
+        // console.log("srcAmount 11 = "+srcAmount)
+        let result: BigNumber = new BigNumber(0);
+        const srcAssetErc20Address = this.getErc20AddressOfAsset(srcAsset);
+        const destAssetErc20Address = this.getErc20AddressOfAsset(destAsset);
+        if (!srcAmount) {
+            srcAmount = ExplorerProvider.UNLIMITED_ALLOWANCE_IN_BASE_UNITS;
+        } else {
+            srcAmount = new BigNumber(srcAmount.toFixed(1, 1));
+        }
+
+        if (this.contractsSource && srcAssetErc20Address && destAssetErc20Address) {
+            const oracleContract = await this.contractsSource.getOracleContract();
+            try {
+                const swapPriceData: BigNumber[] = await oracleContract.queryRate.callAsync(
+                    srcAssetErc20Address,
+                    destAssetErc20Address
+                );
+                // console.log("swapPriceData- ",swapPriceData[0])
+                result = swapPriceData[0].dividedBy(10 ** 18).multipliedBy(swapPriceData[1].dividedBy(10 ** 18));// swapPriceData[0].dividedBy(10 ** 18);
+            } catch (e) {
+                console.log(e)
+                result = new BigNumber(0);
+            }
+        }
+        return result;
+    }
 
     public waitForTransactionMined = async (
         txHash: string) => {

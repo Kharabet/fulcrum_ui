@@ -20,7 +20,7 @@ export const LoanRow = (props: ILoanRowProps) => {
     const loanId = props.loanId;
     const decimals: number = AssetsDictionary.assets.get(props.loanToken)!.decimals || 18;
 
-    const amountInBaseUnits = new BigNumber(props.seizeAmount.multipliedBy(10 ** decimals).toFixed(0, 1));
+    const amountInBaseUnits = new BigNumber(props.payOffAmount.multipliedBy(10 ** decimals).toFixed(0, 1));
     const result = await ExplorerProvider.Instance.liquidate(loanId, amountInBaseUnits, props.loanToken);
     console.log(result)
   }

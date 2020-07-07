@@ -5,6 +5,7 @@ import { Asset } from "../domain/Asset";
 import { erc20Contract } from "../contracts/erc20";
 import { iBZxContract } from "../contracts/iBZxContract";
 import { iTokenContract } from "../contracts/iTokenContract";
+import { oracleContract } from "../contracts/oracle";
 
 const ethNetwork = process.env.REACT_APP_ETH_NETWORK;
 
@@ -27,6 +28,7 @@ export class ContractsSource {
   private static erc20Json: any;
   private static iTokenJson: any;
   private static iBZxJson: any;
+  private static oracleJson: any;
 
   public networkId: number;
   public canWrite: boolean;
@@ -44,6 +46,7 @@ export class ContractsSource {
     ContractsSource.iTokenJson = await import(`./../assets/artifacts/${ethNetwork}/iToken.json`);
     ContractsSource.erc20Json = await import(`./../assets/artifacts/${ethNetwork}/erc20.json`);
     ContractsSource.iBZxJson = await import(`./../assets/artifacts/${ethNetwork}/iBZx.json`);
+    ContractsSource.oracleJson = await import(`./../assets/artifacts/${ethNetwork}/oracle.json`);
 
     const iTokenList = (await import(`../assets/artifacts/${ethNetwork}/iTokenList.js`)).iTokenList;
 
@@ -80,6 +83,26 @@ export class ContractsSource {
     }
     const tokenContractInfo = ContractsSource.iTokensContractInfos.get(symbol) || null;
     return tokenContractInfo ? new iTokenContract(ContractsSource.iTokenJson.abi, tokenContractInfo.token, this.provider) : null;
+  }
+
+  public getOracleAddress(): string {
+    let address: string = "";
+    switch (this.networkId) {
+      case 1:
+        address = "0xee14de2e67e1ec23c8561a6fad2635ff1b618db6";
+        break;
+      case 3:
+        address = "0x4330762418df3555ddd1d732200b317c9239b941";
+        break;
+      case 4:
+        address = "0x76de3d406fee6c3316558406b17ff785c978e98c";
+        break;
+      case 42:
+        address = "0x327635870b9c2E142415507cAA2790D9d5B1C734";
+        break;
+    }
+
+    return address;
   }
 
   public getiBZxAddress(): string {
@@ -213,6 +236,14 @@ export class ContractsSource {
     return asset;
   }
 
+  private async getOracleContractRaw(): Promise<oracleContract> {
+    await this.Init();
+    return new oracleContract(
+      ContractsSource.oracleJson.abi,
+      this.getOracleAddress().toLowerCase(),
+      this.provider
+    );
+  }
   private async getiBZxContractRaw(): Promise<iBZxContract> {
     await this.Init();
     return new iBZxContract(
@@ -226,4 +257,6 @@ export class ContractsSource {
   public getAssetFromAddress = _.memoize(this.getAssetFromAddressRaw);
   public getITokenContract = _.memoize(this.getITokenContractRaw);
   public getiBZxContract = _.memoize(this.getiBZxContractRaw);
+  public getOracleContract = _.memoize(this.getOracleContractRaw);
+
 }

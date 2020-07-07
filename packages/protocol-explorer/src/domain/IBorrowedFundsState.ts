@@ -7,6 +7,7 @@ export interface IBorrowedFundsState {
   collateralAsset: Asset;
   amount: BigNumber;
   amountOwed: BigNumber;
+  amountOwedUsd: BigNumber;
   collateralAmount: BigNumber;
   interestRate: BigNumber;
   interestOwedPerDay: BigNumber;
