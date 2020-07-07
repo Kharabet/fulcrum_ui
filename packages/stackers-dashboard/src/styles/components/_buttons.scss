@@ -59,9 +59,15 @@
   }
   @media screen and (min-width: $width-min-sm) {
     min-width: 300px;
+    &-full-width {
+      max-width: 630px;
+    }
   }
   @media screen and (max-width: $width-max-sm) {
     min-width: 255px;
+    &-full-width {
+      max-width: 540px;
+    }
   }
   &:hover {
     cursor: pointer;
