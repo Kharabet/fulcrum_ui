@@ -104,7 +104,10 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
           yAxisID: 'A',
           data: this.state.tvl,
           backgroundColor: "transparent",
-          pointBackgroundColor: '#276BFB',
+          pointBackgroundColor: 'transparent',
+          pointBorderColor: 'transparent',
+          hoverBorderColor: '#276BFB',
+          hoverBackgroundColor: '#276BFB',
           borderColor: '#276BFB',
           borderWidth: 2
         },
@@ -113,7 +116,10 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
           data: this.state.apr,
           yAxisID: 'B',
           backgroundColor: "transparent",
-          pointBackgroundColor: '#33DFCC',
+          pointBackgroundColor: 'transparent',
+          pointBorderColor: 'transparent',
+          hoverBorderColor: '#33DFCC',
+          hoverBackgroundColor: '#33DFCC',
           borderColor: '#33DFCC',
           borderWidth: 2
         },
@@ -122,7 +128,10 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
           yAxisID: 'B',
           data: this.state.utilization,
           backgroundColor: "transparent",
-          pointBackgroundColor: '#B79EFF',
+          pointBackgroundColor: 'transparent',
+          pointBorderColor: 'transparent',
+          hoverBorderColor: '#B79EFF',
+          hoverBackgroundColor: '#B79EFF',
           borderColor: '#B79EFF',
           borderWidth: 2
         }]
@@ -189,7 +198,7 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
       },
       elements: {
         point: {
-          radius: 0
+          //radius: 0
         }
       }
     }
@@ -204,11 +213,19 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
           </div>
           <GroupButton setPeriodChart={this.setPeriodChart} />
         </div>
-        <div className="wrapper-chart">
+        <div className="wrapper-chartjs-token">
           <div id="chartjs">
             <Line ref="chart" data={chartData} options={options} height={80} />
           </div>
-          <div id="chartjs-tooltip" className="chartjs-tooltip-token"><table></table></div>
+          <div id="chartjs-tooltip" className="chartjs-tooltip-token">
+            <table>
+              <tbody>
+                <tr className="chartjs-tooltip-time">1</tr>
+                <tr className="chartjs-tooltip-value">1</tr>
+                <tr className="chartjs-tooltip-value">1</tr>
+                <tr className="chartjs-tooltip-value">1</tr>
+              </tbody>
+            </table></div>
         </div>
       </React.Fragment>
     );

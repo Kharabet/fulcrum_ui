@@ -62,7 +62,7 @@ export class MainChart extends Component<IMainChartProps, IMainChartState> {
       const footerLines = tooltip.body.map(getFooter);
       let innerHtml = `<tbody class="${heighttooltipEl + 55 > tooltip.caretY ? `bottom` : ``} ${widthChart - tooltip.caretX < widthTooltipEl ? `right` : `left`}">`;//'<thead>';
       titleLines.forEach(function (title: number) {
-        innerHtml += '<div class=><th class="chartjs-tooltip-time"><span>' + title + '</span></th></tr>';
+        innerHtml += '<tr><th class="chartjs-tooltip-time"><span>' + title + '</span></th></tr>';
       });
       bodyLines.forEach(function (body: number) {
         innerHtml += '<tr><td class="chartjs-tooltip-value"><span><span class="sign sign-currency">$</span>' + body + '</span></td></tr>';
@@ -123,6 +123,8 @@ export class MainChart extends Component<IMainChartProps, IMainChartState> {
           hoverBackgroundColor: '#276BFB',
           hoverBorderColor: '#276BFB',
           borderColor: '#276BFB',
+          pointBackgroundColor: 'transparent',
+          pointBorderColor: 'transparent',
           change24: this.state.change24
         }]
       }
@@ -144,7 +146,7 @@ export class MainChart extends Component<IMainChartProps, IMainChartState> {
             zeroLineWidth: 1,
             zeroLineColor: '#E9F4FF',
             color: '#E9F4FF',
-            
+
           },
         }],
         yAxes: [{
@@ -156,7 +158,7 @@ export class MainChart extends Component<IMainChartProps, IMainChartState> {
       },
       elements: {
         point: {
-          radius: 0
+          //radius: 0
         }
       },
       tooltips: {
@@ -181,7 +183,15 @@ export class MainChart extends Component<IMainChartProps, IMainChartState> {
         <div id="chartjs">
           <Line data={chartData} options={options} height={50} />
         </div>
-        <div id="chartjs-tooltip"><table></table></div>
+        <div id="chartjs-tooltip">
+          <table>
+            <tbody>
+              <tr><td className="chartjs-tooltip-time">1</td></tr>
+              <tr><td className="chartjs-tooltip-value">1</td></tr>
+              <tr><td className="chartjs-tooltip-change24">1</td></tr>
+            </tbody>
+          </table>
+        </div>
       </React.Fragment>
     );
   }
