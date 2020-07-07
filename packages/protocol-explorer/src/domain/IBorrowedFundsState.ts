@@ -2,7 +2,6 @@ import { BigNumber } from "@0x/utils";
 import { Asset } from "./Asset";
 
 export interface IBorrowedFundsState {
-  accountAddress: string;
   loanId: string;
   loanAsset: Asset;
   collateralAsset: Asset;

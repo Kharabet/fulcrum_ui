@@ -60,6 +60,8 @@ const initialNetworkId = getNetworkIdByString(networkName);
 export class ExplorerProvider {
     public static Instance: ExplorerProvider;
 
+    public readonly gasLimit = "4500000";
+    public readonly gasBufferCoeff = new BigNumber("1.06");
 
     public readonly eventEmitter: EventEmitter;
     public providerType: ProviderType = ProviderType.None;
@@ -481,20 +483,19 @@ export class ExplorerProvider {
         let result: IBorrowedFundsState[] = [];
         if (!this.contractsSource) return result;
         const iBZxContract = await this.contractsSource.getiBZxContract();
-        const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
 
-        if (!iBZxContract || !account) return result;
-        // const activeLoansData = await iBZxContract.getActiveLoans.callAsync(
-        //     new BigNumber(start),
-        //     new BigNumber(count),
-        //     true
-        // );
-        
-    const activeLoansData = await iBZxContract.getUserLoans.callAsync(
-        account,
-        new BigNumber(50),
-        1 // margin trade loans
-      );
+        if (!iBZxContract) return result;
+        const activeLoansData = await iBZxContract.getActiveLoans.callAsync(
+            new BigNumber(start),
+            new BigNumber(count),
+            true
+        );
+
+        // const activeLoansData = await iBZxContract.getUserLoans.callAsync(
+        //     account,
+        //     new BigNumber(50),
+        //     1 // margin trade loans
+        //   );
         result = activeLoansData
             .map(e => {
                 const loanAsset = this.contractsSource!.getAssetFromAddress(e.loanToken);
@@ -508,7 +509,6 @@ export class ExplorerProvider {
                     amountOwned = amountOwned.dividedBy(10 ** loanPrecision).dp(5, BigNumber.ROUND_CEIL);
                 }
                 return {
-                    accountAddress: account,
                     loanId: e.loanId,
                     loanAsset: loanAsset,
                     collateralAsset: collateralAsset,
@@ -673,6 +673,198 @@ export class ExplorerProvider {
             }
         });
     }
+
+    public liquidate = async (loanId: string, closeAmount: BigNumber, paymentAsset: Asset): Promise<[BigNumber, BigNumber, string]> => {
+        let result: [BigNumber, BigNumber, string] = [new BigNumber(0), new BigNumber(0), ""];
+        const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+        if (!this.contractsSource) return result;
+
+        const iBZxContract = await this.contractsSource.getiBZxContract();
+        if (!account || !iBZxContract) return result;
+
+        if (paymentAsset !== Asset.WETH && paymentAsset !== Asset.ETH) {
+
+            const assetErc20Address = this.getErc20AddressOfAsset(paymentAsset);
+            if (!assetErc20Address) return result;
+            const tokenErc20Contract = await this.contractsSource.getErc20Contract(assetErc20Address);
+
+            // Detecting token allowance
+            const erc20allowance = await tokenErc20Contract.allowance.callAsync(account, iBZxContract.address);
+
+            if (closeAmount.gt(erc20allowance)) {
+                const approvePromise = await tokenErc20Contract!.approve.sendTransactionAsync(iBZxContract.address, this.getLargeApprovalAmount(paymentAsset), { from: account });
+            }
+        }
+
+        const sendAmountForValue = paymentAsset === Asset.WETH || paymentAsset === Asset.ETH ?
+            closeAmount :
+            new BigNumber(0)
+
+        let gasAmountBN;
+        let gasAmount;
+        try {
+            gasAmount = await iBZxContract.liquidate.estimateGasAsync(
+                loanId,
+                account,
+                closeAmount,
+                {
+                    from: account,
+                    value: sendAmountForValue,
+                    gas: this.gasLimit,
+                });
+            gasAmountBN = new BigNumber(gasAmount).multipliedBy(this.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
+
+        }
+        catch (e) {
+            console.log(e);
+            // throw e;
+        }
+
+        let txHash: string = "";
+        try {
+            // Closing trade
+            const values = await iBZxContract.liquidate.callAsync(
+                loanId,
+                account,
+                closeAmount,
+                {
+                    from: account,
+                    value: sendAmountForValue,
+                    gas: this.gasLimit,
+                });
+                console.log(values)
+            txHash = await iBZxContract.liquidate.sendTransactionAsync(
+                loanId,
+                account,
+                closeAmount,
+                {
+                    from: account,
+                    value: sendAmountForValue,
+                    gas: this.gasLimit,
+                    gasPrice: await this.gasPrice()
+                });
+
+
+        }
+        catch (e) {
+            console.log(e);
+            // throw e;
+        }
+
+        const txReceipt = await this.waitForTransactionMined(txHash);
+
+        return result;
+
+
+    }
+    public gasPrice = async (): Promise<BigNumber> => {
+        let result = new BigNumber(30).multipliedBy(10 ** 9); // upper limit 30 gwei
+        const lowerLimit = new BigNumber(3).multipliedBy(10 ** 9); // lower limit 3 gwei
+
+        const url = `https://ethgasstation.info/json/ethgasAPI.json`;
+        try {
+            const response = await fetch(url);
+            const jsonData = await response.json();
+            // console.log(jsonData);
+            if (jsonData.average) {
+                // ethgasstation values need divide by 10 to get gwei
+                const gasPriceAvg = new BigNumber(jsonData.average).multipliedBy(10 ** 8);
+                const gasPriceSafeLow = new BigNumber(jsonData.safeLow).multipliedBy(10 ** 8);
+                if (gasPriceAvg.lt(result)) {
+                    result = gasPriceAvg;
+                } else if (gasPriceSafeLow.lt(result)) {
+                    result = gasPriceSafeLow;
+                }
+            }
+        } catch (error) {
+            // console.log(error);
+            result = new BigNumber(12).multipliedBy(10 ** 9); // error default 8 gwei
+        }
+
+        if (result.lt(lowerLimit)) {
+            result = lowerLimit;
+        }
+
+        return result;
+    }
+    public getErc20AddressOfAsset(asset: Asset): string | null {
+        let result: string | null = null;
+
+        const assetDetails = AssetsDictionary.assets.get(asset);
+        if (this.web3ProviderSettings && assetDetails) {
+            result = assetDetails.addressErc20.get(this.web3ProviderSettings.networkId) || "";
+        }
+        return result;
+    }
+
+    public getLargeApprovalAmount = (asset: Asset): BigNumber => {
+        switch (asset) {
+            case Asset.ETH:
+            case Asset.WETH:
+                return new BigNumber(10 ** 18).multipliedBy(1500);
+            case Asset.WBTC:
+                return new BigNumber(10 ** 8).multipliedBy(25);
+            case Asset.LINK:
+                return new BigNumber(10 ** 18).multipliedBy(60000);
+            case Asset.ZRX:
+                return new BigNumber(10 ** 18).multipliedBy(750000);
+            case Asset.KNC:
+                return new BigNumber(10 ** 18).multipliedBy(550000);
+            case Asset.DAI:
+            case Asset.SAI:
+                return new BigNumber(10 ** 18).multipliedBy(375000);
+            case Asset.USDC:
+                return new BigNumber(10 ** 6).multipliedBy(375000);
+            case Asset.REP:
+                return new BigNumber(10 ** 18).multipliedBy(15000);
+            case Asset.MKR:
+                return new BigNumber(10 ** 18).multipliedBy(1250);
+            default:
+                throw new Error("Invalid approval asset!");
+        }
+    }
+
+
+    public waitForTransactionMined = async (
+        txHash: string) => {
+
+        return new Promise((resolve, reject) => {
+            try {
+                if (!this.web3Wrapper) {
+                    throw new Error("web3 is not available");
+                }
+
+                this.waitForTransactionMinedRecursive(txHash, this.web3Wrapper, resolve, reject);
+            } catch (e) {
+                throw e;
+            }
+        });
+    };
+
+    private waitForTransactionMinedRecursive = async (
+        txHash: string,
+        web3Wrapper: Web3Wrapper,
+        resolve: (value: any) => void,
+        reject: (value: any) => void) => {
+
+        try {
+            const receipt = await web3Wrapper.getTransactionReceiptIfExistsAsync(txHash);
+            if (receipt) {
+                resolve(receipt);
+
+                const randomNumber = Math.floor(Math.random() * 100000) + 1;
+
+            } else {
+                window.setTimeout(() => {
+                    this.waitForTransactionMinedRecursive(txHash, web3Wrapper, resolve, reject);
+                }, 5000);
+            }
+        }
+        catch (e) {
+            reject(e);
+        }
+    };
+
 
 }
 
