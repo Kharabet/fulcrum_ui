@@ -94,15 +94,18 @@ export class Form extends Component<{}, IFormState> {
             </div>
             <div className="convert-button">
               {this.state.bzrxV1Balance.gt(0) &&
-                <button className="button button-full-width" onClick={this.onConvertClick}>Convert BZRX v1 to v2</button>
+                  <button className="button button-full-width" onClick={this.onConvertClick}>
+                    Convert BZRX v1 to v2
+                    <span className="notice">You will need to confirm 2 transactions in your wallet.</span>
+                  </button>
               }
             </div>
 
             <div className="group-buttons">
-              <button className="button" disabled={true}>Stake</button>
-              <button className="button" disabled={true}>Unstake</button>
-              <button className="button" disabled={true}>Claim Rewards</button>
-              <button className="button" disabled={true}>Explore Reward Pool</button>
+              <button title="Coming soon" className="button" disabled={true}>Stake</button>
+              <button title="Coming soon" className="button" disabled={true}>Unstake</button>
+              <button title="Coming soon" className="button" disabled={true}>Claim Rewards</button>
+              <button title="Coming soon" className="button" disabled={true}>Explore Reward Pool</button>
             </div>
           </div>
         </div>
