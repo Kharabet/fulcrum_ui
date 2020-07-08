@@ -49,6 +49,11 @@ const initialNetworkId = getNetworkIdByString(networkName);
 export class StackerProvider {
     public static Instance: StackerProvider;
 
+    public readonly gasLimit = "4000000";
+
+    // gasBufferCoeff equal 110% gas reserve
+    public readonly gasBufferCoeff = new BigNumber("1.03");
+
     public readonly eventEmitter: EventEmitter;
     public providerType: ProviderType = ProviderType.None;
     public providerEngine: Web3ProviderEngine | null = null;
@@ -317,6 +322,145 @@ export class StackerProvider {
 
         return result;
     }
+
+
+    public gasPrice = async (): Promise<BigNumber> => {
+        let result = new BigNumber(30).multipliedBy(10 ** 9); // upper limit 30 gwei
+        const lowerLimit = new BigNumber(3).multipliedBy(10 ** 9); // lower limit 3 gwei
+
+        const url = `https://ethgasstation.info/json/ethgasAPI.json`;
+        try {
+            const response = await fetch(url);
+            const jsonData = await response.json();
+            // console.log(jsonData);
+            if (jsonData.average) {
+                // ethGasStation values need divide by 10 to get gwei
+                const gasPriceAvg = new BigNumber(jsonData.average).multipliedBy(10 ** 8);
+                const gasPriceSafeLow = new BigNumber(jsonData.safeLow).multipliedBy(10 ** 8);
+                if (gasPriceAvg.lt(result)) {
+                    result = gasPriceAvg;
+                } else if (gasPriceSafeLow.lt(result)) {
+                    result = gasPriceSafeLow;
+                }
+            }
+        } catch (error) {
+            // console.log(error);
+            result = new BigNumber(12).multipliedBy(10 ** 9); // error default 8 gwei
+        }
+
+        if (result.lt(lowerLimit)) {
+            result = lowerLimit;
+        }
+
+        return result;
+    };
+    public getLargeApprovalAmount = (asset: Asset): BigNumber => {
+        switch (asset) {
+            case Asset.BZRX:
+            case Asset.BZRXv1:
+                return new BigNumber(10 ** 18).multipliedBy(1500);
+            default:
+                throw new Error("Invalid approval asset!");
+        }
+    }
+
+    public async convertBzrxV1ToV2(tokenAmount: BigNumber) {
+        let receipt = null;
+
+        const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+        if (!this.contractsSource) return receipt;
+
+        const convertContract = await this.contractsSource.getConvertContract();
+        if (!account || !convertContract) return receipt;
+
+
+        const assetErc20Address = this.getErc20AddressOfAsset(Asset.BZRXv1);
+        if (!assetErc20Address) return receipt;
+        const tokenErc20Contract = await this.contractsSource.getErc20Contract(assetErc20Address);
+
+        // Detecting token allowance
+        const erc20allowance = await tokenErc20Contract.allowance.callAsync(account, convertContract.address);
+
+        if (tokenAmount.gt(erc20allowance)) {
+            const approvePromise = await tokenErc20Contract!.approve.sendTransactionAsync(convertContract.address, this.getLargeApprovalAmount(Asset.BZRXv1), { from: account });
+        }
+
+
+
+        let gasAmountBN;
+        let gasAmount;
+        try {
+            gasAmount = await convertContract.convert.estimateGasAsync(
+                tokenAmount,
+                {
+                    from: account,
+                    gas: this.gasLimit,
+                });
+            gasAmountBN = new BigNumber(gasAmount).multipliedBy(this.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
+
+        }
+        catch (e) {
+            console.log(e);
+            // throw e;
+        }
+
+        let txHash: string = "";
+        try {
+            txHash = await convertContract.convert.sendTransactionAsync(
+                tokenAmount,
+                {
+                    from: account,
+                    gas: this.gasLimit,
+                    gasPrice: await this.gasPrice()
+                });
+
+
+        }
+        catch (e) {
+            console.log(e);
+            // throw e;
+        }
+
+        const txReceipt = await this.waitForTransactionMined(txHash);
+        return txReceipt.status === 1 ? txReceipt : null;
+    }
+
+    public waitForTransactionMined = async (
+        txHash: string): Promise<any> => {
+
+        return new Promise((resolve, reject) => {
+            try {
+                if (!this.web3Wrapper) {
+                    // noinspection ExceptionCaughtLocallyJS
+                    throw new Error("web3 is not available");
+                }
+
+                this.waitForTransactionMinedRecursive(txHash, this.web3Wrapper, resolve, reject);
+            } catch (e) {
+                throw e;
+            }
+        });
+    };
+
+    private waitForTransactionMinedRecursive = async (
+        txHash: string,
+        web3Wrapper: Web3Wrapper,
+        resolve: (value: any) => void,
+        reject: (value: any) => void) => {
+
+        try {
+            const receipt = await web3Wrapper.getTransactionReceiptIfExistsAsync(txHash);
+            if (receipt) {
+                resolve(receipt);
+            } else {
+                window.setTimeout(() => {
+                    this.waitForTransactionMinedRecursive(txHash, web3Wrapper, resolve, reject);
+                }, 5000);
+            }
+        } catch (e) {
+            reject(e);
+        }
+    };
 
 }
 new StackerProvider();

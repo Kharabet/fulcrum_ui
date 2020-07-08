@@ -59,6 +59,11 @@ export class Form extends Component<{}, IFormState> {
     StackerProvider.Instance.eventEmitter.removeListener(StackerProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
+  public onConvertClick = async () => {
+    const receipt = await StackerProvider.Instance.convertBzrxV1ToV2(new BigNumber(10 ** 18));
+    await this.derivedUpdate();
+  }
+
   public render() {
     return (
       <React.Fragment>
@@ -68,7 +73,10 @@ export class Form extends Component<{}, IFormState> {
               <div>
                 <div className="row-header">My BZRX balance:</div>
                 <div className="row-body">
-                  <span className="value">
+                  <span title={this.state.bzrxV1Balance.gt(0)
+                    ? this.state.bzrxV1Balance.toFixed(18)
+                    : this.state.bzrxBalance.toFixed(18)
+                  } className="value">
                     {this.state.bzrxV1Balance.gt(0)
                       ? this.state.bzrxV1Balance.toFixed(2)
                       : this.state.bzrxBalance.toFixed(2)
@@ -85,7 +93,9 @@ export class Form extends Component<{}, IFormState> {
               </div>
             </div>
             <div className="convert-button">
-              <button className="button button-full-width" disabled={!this.state.bzrxV1Balance.gt(0)}>Convert BZRX v1 to v2</button>
+              {this.state.bzrxV1Balance.gt(0) &&
+                <button className="button button-full-width" onClick={this.onConvertClick}>Convert BZRX v1 to v2</button>
+              }
             </div>
 
             <div className="group-buttons">

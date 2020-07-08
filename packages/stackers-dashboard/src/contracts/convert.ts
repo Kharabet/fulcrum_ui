@@ -23,7 +23,7 @@ export class convertContract extends BaseContract {
                     data: encodedData
                 },
                 self._web3Wrapper.getContractDefaults(),
-                (self as any).burnToEther.estimateGasAsync.bind(self, tokenAmount)
+                (self as any).convert.estimateGasAsync.bind(self, tokenAmount)
             );
             const txHash = await self._web3Wrapper.sendTransactionAsync(txDataWithDefaults);
             return txHash;
