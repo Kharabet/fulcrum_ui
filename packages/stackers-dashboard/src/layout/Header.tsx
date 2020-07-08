@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { ReactComponent as LogoBzx } from "../assets/images/logo-bzx.svg"
+import { ReactComponent as LogoBzx } from "../assets/images/logo-stacker.svg"
 import { HeaderMenu } from "./HeaderMenu";
 import { Link } from "react-router-dom";
 import { OnChainIndicator } from "../components/OnChainIndicator";
