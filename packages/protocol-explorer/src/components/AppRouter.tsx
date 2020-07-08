@@ -118,7 +118,7 @@ export class AppRouter extends Component<any, IAppRouterState>  {
   }
 
   private didResize = async () => {
-    const isMobileMedia = (window.innerWidth <= 959);
+    const isMobileMedia = (window.outerWidth <= 959);
     if (isMobileMedia !== this.state.isMobileMedia) {
       await this._isMounted && this.setState({ isMobileMedia });
     }
