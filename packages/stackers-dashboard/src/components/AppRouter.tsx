@@ -189,9 +189,6 @@ export class AppRouter extends Component<any, IAppRouterState> {
         <Router>
           <LocationListener doNetworkConnect={this.doNetworkConnect}>
             <Switch>
-              {isMainnetProd ? (
-                <Intercom appID="dfk4n5ut" />
-              ) : null}
               <Route exact={true} path="/">
                 <DashboardPage isMobileMedia={this.state.isMobileMedia} doNetworkConnect={this.doNetworkConnect} />
               </Route>
