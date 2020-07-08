@@ -358,7 +358,7 @@ export class StackerProvider {
         switch (asset) {
             case Asset.BZRX:
             case Asset.BZRXv1:
-                return new BigNumber(10 ** 18).multipliedBy(1500);
+                return new BigNumber(10 ** 18).multipliedBy(750000);
             default:
                 throw new Error("Invalid approval asset!");
         }
