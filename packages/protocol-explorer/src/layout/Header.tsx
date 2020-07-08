@@ -37,7 +37,7 @@ export class Header extends Component<IHeaderProps, IHeaderState> {
     return (
       <header>
         <div className="container container-md">
-          <div className="flex jc-sb ai-c ta-c">
+          <div className="flex jc-sb ai-c ta-c relative">
             <Link to="/" className="logo">
               <LogoBzx />
             </Link>
@@ -73,7 +73,7 @@ export class Header extends Component<IHeaderProps, IHeaderState> {
                 <Link to="/" className={`item-menu ${window.location.pathname === "/" ? `active` : ``}`} onClick={this.removeOverflow}>
                   Dashboard
                 </Link>
-                <Link to="/transactions" className={`item-menu ${window.location.pathname === "/transactions" ? `active` : ``}`}  onClick={this.removeOverflow}>
+                <Link to="/transactions" className={`item-menu ${window.location.pathname === "/transactions" ? `active` : ``}`} onClick={this.removeOverflow}>
                   Transactions
                 </Link>
                 <a href="https://help.bzx.network/en/" className={`item-menu`} target="_blank">
