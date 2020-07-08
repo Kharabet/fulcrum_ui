@@ -15,6 +15,9 @@ import { ProviderType } from "../domain/ProviderType";
 import { Web3ConnectionFactory } from "../domain/Web3ConnectionFactory";
 import { StackerProviderEvents } from "./events/StackerProviderEvents";
 import { ContractsSource } from "./ContractsSource";
+import { BigNumber } from "@0x/utils";
+import { Asset } from "../domain/Asset";
+import { AssetsDictionary } from "../domain/AssetsDictionary";
 
 const web3: Web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
 let configAddress: any;
@@ -267,5 +270,53 @@ export class StackerProvider {
             etherscanURL
         };
     }
+
+    public getErc20AddressOfAsset(asset: Asset): string | null {
+        let result: string | null = null;
+
+        const assetDetails = AssetsDictionary.assets.get(asset);
+        if (this.web3ProviderSettings && assetDetails) {
+            result = assetDetails.addressErc20.get(this.web3ProviderSettings.networkId) || "";
+        }
+        return result;
+    }
+
+    public async getAssetTokenBalanceOfUser(asset: Asset): Promise<BigNumber> {
+        let result: BigNumber = new BigNumber(0);
+        if (asset === Asset.UNKNOWN) {
+            // always 0
+            result = new BigNumber(0);
+        } else {
+            // get erc20 token balance
+            const precision = AssetsDictionary.assets.get(asset)!.decimals || 18;
+            const assetErc20Address = this.getErc20AddressOfAsset(asset);
+            if (assetErc20Address) {
+                result = await this.getErc20BalanceOfUser(assetErc20Address);
+                result = result.multipliedBy(10 ** (18 - precision));
+            }
+        }
+
+        return result;
+    }
+
+    private async getErc20BalanceOfUser(addressErc20: string, account?: string): Promise<BigNumber> {
+        let result = new BigNumber(0);
+
+        if (this.web3Wrapper && this.contractsSource) {
+            if (!account && this.contractsSource.canWrite) {
+                account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : undefined;
+            }
+
+            if (account) {
+                const tokenContract = await this.contractsSource.getErc20Contract(addressErc20);
+                if (tokenContract) {
+                    result = await tokenContract.balanceOf.callAsync(account);
+                }
+            }
+        }
+
+        return result;
+    }
+
 }
 new StackerProvider();

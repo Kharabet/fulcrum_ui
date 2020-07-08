@@ -1,9 +1,62 @@
 import React, { Component } from "react";
-import { ReactComponent as CircleBzx } from "../assets/images/circle-bzx.svg"
+import { ReactComponent as CircleBzx } from "../assets/images/token-bzrx.svg"
+import { StackerProvider } from "../services/StackerProvider";
+import { StackerProviderEvents } from "../services/events/StackerProviderEvents";
+import { BigNumber } from "@0x/utils";
+import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
+import { Asset } from "../domain/Asset";
 
-export class Form extends Component {
+
+interface IFormState {
+  bzrxV1Balance: BigNumber;
+  bzrxBalance: BigNumber;
+}
+
+export class Form extends Component<{}, IFormState> {
   constructor(props: any) {
     super(props);
+    this.state = {
+      bzrxV1Balance: new BigNumber(0),
+      bzrxBalance: new BigNumber(0)
+    };
+
+    this._isMounted = false;
+    StackerProvider.Instance.eventEmitter.on(StackerProviderEvents.ProviderAvailable, this.onProviderAvailable);
+    StackerProvider.Instance.eventEmitter.on(StackerProviderEvents.ProviderChanged, this.onProviderChanged);
+
+  }
+
+  private _isMounted: boolean;
+
+  private async derivedUpdate() {
+
+    const bzrxV1Balance = (await StackerProvider.Instance.getAssetTokenBalanceOfUser(Asset.BZRXv1)).div(10 ** 18);
+    const bzrxBalance = (await StackerProvider.Instance.getAssetTokenBalanceOfUser(Asset.BZRX)).div(10 ** 18);
+    this._isMounted && this.setState({
+      ...this.state,
+      bzrxV1Balance,
+      bzrxBalance
+    })
+  }
+
+  private onProviderAvailable = async () => {
+    await this.derivedUpdate();
+  };
+
+  private onProviderChanged = async (event: ProviderChangedEvent) => {
+    await this.derivedUpdate();
+  };
+
+  public componentDidMount(): void {
+    this._isMounted = true;
+
+    this.derivedUpdate();
+  }
+  public componentWillUnmount(): void {
+    this._isMounted = false;
+
+    StackerProvider.Instance.eventEmitter.removeListener(StackerProviderEvents.ProviderAvailable, this.onProviderAvailable);
+    StackerProvider.Instance.eventEmitter.removeListener(StackerProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
   public render() {
@@ -16,11 +69,14 @@ export class Form extends Component {
                 <div className="row-header">My BZRX balance:</div>
                 <div className="row-body">
                   <span className="value">
-                    100,000,000
-                   <span className="icon"><CircleBzx /></span>
+                    {this.state.bzrxV1Balance.gt(0)
+                      ? this.state.bzrxV1Balance.toFixed(2)
+                      : this.state.bzrxBalance.toFixed(2)
+                    }
+                    <span className="icon"><CircleBzx /></span>
                   </span>
                 </div>
-                <div className="row-footer">BZRX</div>
+                <div className="row-footer">{this.state.bzrxV1Balance.gt(0) ? "BZRXv1" : "BZRX"}</div>
               </div>
               <div className="reward-item">
                 <div className="row-header">My rewards balance:</div>
@@ -29,7 +85,7 @@ export class Form extends Component {
               </div>
             </div>
             <div className="convert-button">
-              <button className="button button-full-width">Convert BZRX v1 to v2</button>
+              <button className="button button-full-width" disabled={!this.state.bzrxV1Balance.gt(0)}>Convert BZRX v1 to v2</button>
             </div>
 
             <div className="group-buttons">
