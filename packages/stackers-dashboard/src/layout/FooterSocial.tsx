@@ -22,15 +22,15 @@ export const FooterSocial = (props: IFooterSocialProps) => {
       </div>
       }
       <div className="item-social">
-        <p className="data-protocol">Torque is built on the bZx protocol</p>
+        <p className="data-protocol">Stakers Dashboard is built on the bZx protocol</p>
         <a href="https://bzx.network/" target="_blank" className="logo">
           <LogoBzx />
         </a>
         <div className="flex data-year">
           <p className="light-gray-color">© {new Date().getFullYear()} bZeroX, LLC</p>
           <div className="flex">
-            <a href="/tos">Terms of use</a>
-            <a href="/privacy">Privacy policy</a>
+            <a href="https://bzx.network/tos" target="_blank">Terms of use</a>
+            <a href="https://bzx.network//privacy" target="_blank">Privacy policy</a>
           </div>
         </div>
       </div>
