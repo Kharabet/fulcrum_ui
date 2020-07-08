@@ -7,7 +7,7 @@ export const Footer = () => {
     <footer className="py-90">
       <div className="container">
         <div className="flex">
-          <FooterSocial />
+          <FooterSocial isShowSocial={true} />
           <FooterMenu />
         </div>
       </div>
