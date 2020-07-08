@@ -60,7 +60,7 @@ export class Form extends Component<{}, IFormState> {
   }
 
   public onConvertClick = async () => {
-    const receipt = await StackerProvider.Instance.convertBzrxV1ToV2(new BigNumber(10 ** 18));
+    const receipt = await StackerProvider.Instance.convertBzrxV1ToV2(this.state.bzrxV1Balance.times(10 ** 18));
     await this.derivedUpdate();
   }
 

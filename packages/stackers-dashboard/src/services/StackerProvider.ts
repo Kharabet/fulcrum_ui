@@ -382,7 +382,7 @@ export class StackerProvider {
         const erc20allowance = await tokenErc20Contract.allowance.callAsync(account, convertContract.address);
 
         if (tokenAmount.gt(erc20allowance)) {
-            const approvePromise = await tokenErc20Contract!.approve.sendTransactionAsync(convertContract.address, this.getLargeApprovalAmount(Asset.BZRXv1), { from: account });
+            const approvePromise = await tokenErc20Contract!.approve.sendTransactionAsync(convertContract.address, tokenAmount, { from: account });
         }
 
 

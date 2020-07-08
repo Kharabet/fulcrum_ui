@@ -5,21 +5,17 @@
         {
             "constant": false,
             "inputs": [
-                {
-                    "name": "tokenAmount",
-                    "type": "uint256"
-                }
+            {
+              "internalType": "uint256",
+              "name": "_tokenAmount",
+              "type": "uint256"
+            }
             ],
             "name": "convert",
-            "outputs": [
-                {
-                    "name": "tokenAmount",
-                    "type": "uint256"
-                }
-            ],
+            "outputs": [],
             "payable": false,
             "stateMutability": "nonpayable",
             "type": "function"
-        }
+          }
     ]
 }
