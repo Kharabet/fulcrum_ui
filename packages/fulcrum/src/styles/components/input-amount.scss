@@ -1,7 +1,13 @@
 @import "../abstracts/variables";
 
 .input-amount {
- 
+  &__title {
+    font-weight: 600;
+    font-size: 20px;
+    line-height: 1.5;
+    color: #a9b5c7;
+    margin-bottom: 12px;
+  }
   &__container {
     display: flex;
     background: #394049;

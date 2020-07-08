@@ -52,6 +52,9 @@ export class InputAmount extends Component<IInputAmountProps, IInputAmountState>
 
     return (
       <div className="input-amount">
+        {this.props.tradeType === TradeType.SELL &&
+          <div className="input-amount__title">Position</div>
+        }
         <div className="input-amount__container">
           <input
             type="number"
