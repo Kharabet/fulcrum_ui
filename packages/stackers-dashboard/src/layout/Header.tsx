@@ -42,7 +42,7 @@ export class Header extends Component<IHeaderProps, IHeaderState> {
             <Link to="/" className="logo">
               <LogoBzx />
             </Link>
-            <HeaderMenu />
+            {/*<HeaderMenu />*/}
             <div className="flex ai-c header-right">
               <a href="https://help.bzx.network/en/" className={`item-menu`} target="_blank">
                 Help Center
@@ -74,9 +74,9 @@ export class Header extends Component<IHeaderProps, IHeaderState> {
                 <Link to="/" className={`item-menu ${window.location.pathname === "/" ? `active` : ``}`} onClick={this.removeOverflow}>
                   Dashboard
                 </Link>
-                <Link to="/transactions" className={`item-menu ${window.location.pathname === "/transactions" ? `active` : ``}`}  onClick={this.removeOverflow}>
+                {/*<Link to="/transactions" className={`item-menu ${window.location.pathname === "/transactions" ? `active` : ``}`}  onClick={this.removeOverflow}>
                   Transactions
-                </Link>
+                </Link>*/}
                 <a href="https://help.bzx.network/en/" className={`item-menu`} target="_blank">
                   Help Center
                 </a>
