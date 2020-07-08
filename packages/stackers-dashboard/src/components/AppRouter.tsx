@@ -183,6 +183,9 @@ export class AppRouter extends Component<any, IAppRouterState> {
             onProviderMenuClose={this.onRequestClose}
           />
         </Modal>
+        {isMainnetProd ? (
+          <Intercom appID="dfk4n5ut" />
+        ) : null}
         <Router>
           <LocationListener doNetworkConnect={this.doNetworkConnect}>
             <Switch>
