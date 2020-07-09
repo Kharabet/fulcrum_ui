@@ -44,7 +44,7 @@ export const TxRow = (props: ITxRowProps) => {
     <React.Fragment>
       <div className="table-row table-row-tx">
         <a href={props.etherscanTxUrl} className="table-row-tx__hash">{props.hash}</a>
-        <div className="table-row-tx__age">{timeSince(props.age)}</div>
+        <div className="table-row-tx__age">{timeSince(props.age)} ago</div>
         <a href={props.etherscanAddressUrl} className="table-row-tx__from">
           <IconArrow />
           <span className="table-row-tx__from-address">{props.account}</span>

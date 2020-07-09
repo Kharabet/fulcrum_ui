@@ -30,22 +30,22 @@
 .table-tx {
   .table-row-tx,
   .table-header-tx {
-    &__hash {
+    &__hash,
+    &__quantity {
       width: 20%;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
     &__age {
+      width: 12%;
       cursor: pointer;
     }
-    &__age,
     &__action {
-      width: 15%;
+      width: 20%;
     }
-    &__from,
-    &__quantity {
-      width: 25%;
+    &__from{
+      width: 28%;
     }
     &__from-address {
       white-space: nowrap;
@@ -65,6 +65,9 @@
       span {
         margin-left: 10px;
       }
+    }
+    &__action{
+      font-weight: 700;
     }
   }
   .table-header-tx {
