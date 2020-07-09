@@ -113,7 +113,10 @@
   .table-row-loan,
   .table-header-loan {
     &__id {
-      width: 45%;
+      width: 45%;      
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     &__amount,
     &__collateral {
@@ -133,5 +136,6 @@
   .table-row-loan{
     padding-top: 17px;
     padding-bottom: 17px;
+    align-items: center;
   }
 }
