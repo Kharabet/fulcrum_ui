@@ -16,8 +16,6 @@ interface ILoanGridState {
 
 export class LoanGrid extends Component<ILoanGridProps, ILoanGridState> {
   private quantityVisibleRow = 25;
-  private assetItems = this.props.events.map((e: ILoanRowProps, i: number) => <LoanRow key={i} {...e} />);
-
 
   constructor(props: any) {
     super(props);
@@ -26,26 +24,17 @@ export class LoanGrid extends Component<ILoanGridProps, ILoanGridState> {
       quantityGrids: 0,
       isLastRow: false
     };
-
-    // let i = 0;
-    // while (i < 25) {
-    //   const assetItem = <LoanRow key={i + 10} {...this.props.events[0]} />;
-    //   this.assetItems.push(assetItem)
-    //   i++;
-    // }
-
   }
 
   public UNSAFE_componentWillMount(): void {
-    const quantityGrids = Math.floor(this.assetItems.length / this.quantityVisibleRow);
-    const isLastRow = this.assetItems.length === (this.state.numberPagination + 1) * this.quantityVisibleRow;
+    const quantityGrids = Math.floor(this.props.events.length / this.quantityVisibleRow);
+    const isLastRow = this.props.events.length === (this.state.numberPagination + 1) * this.quantityVisibleRow;
     this.setState({ ...this.state, quantityGrids: quantityGrids, isLastRow: isLastRow })
   }
 
   public render() {
 
-    const assetItems = this.assetItems.slice(this.quantityVisibleRow * this.state.numberPagination, this.quantityVisibleRow * this.state.numberPagination + this.quantityVisibleRow);
-    // const assetItems = this.props.events.slice(this.quantityVisibleRow * this.state.numberPagination, this.quantityVisibleRow * this.state.numberPagination + this.quantityVisibleRow).map((e, i) => <LoanRow key={i} {...e} />);
+    const assetItems = this.props.events.slice(this.quantityVisibleRow * this.state.numberPagination, this.quantityVisibleRow * this.state.numberPagination + this.quantityVisibleRow).map((e, i) => <LoanRow key={i} {...e} />);
     if (assetItems.length === 0) return null;
 
     return (
@@ -71,7 +60,7 @@ export class LoanGrid extends Component<ILoanGridProps, ILoanGridState> {
   public nextPagination = () => {
 
     if (this.state.numberPagination !== this.state.quantityGrids && !this.state.isLastRow) {
-      const isLastRow = this.assetItems.length === (this.state.numberPagination + 2) * this.quantityVisibleRow;
+      const isLastRow = this.props.events.length === (this.state.numberPagination + 2) * this.quantityVisibleRow;
       this.setState({ ...this.state, numberPagination: this.state.numberPagination + 1, isLastRow: isLastRow });
     }
   }
