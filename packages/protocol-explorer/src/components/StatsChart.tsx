@@ -225,10 +225,10 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
           <div id="chartjs-tooltip" className="chartjs-tooltip-token">
             <table>
               <tbody>
-                <tr className="chartjs-tooltip-time">1</tr>
-                <tr className="chartjs-tooltip-value">1</tr>
-                <tr className="chartjs-tooltip-value">1</tr>
-                <tr className="chartjs-tooltip-value">1</tr>
+                <tr className="chartjs-tooltip-time"><td>1</td></tr>
+                <tr className="chartjs-tooltip-value"><td>1</td></tr>
+                <tr className="chartjs-tooltip-value"><td>1</td></tr>
+                <tr className="chartjs-tooltip-value"><td>1</td></tr>
               </tbody>
             </table></div>
         </div>
