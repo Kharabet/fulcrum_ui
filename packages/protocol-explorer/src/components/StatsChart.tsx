@@ -186,6 +186,7 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
       tooltips: {
         enabled: false,
         custom: this.customTooltips,
+        intersect: false,
         callbacks: {
           label: function (tooltipItems: any, data: any) {
             let labels: any = [];
@@ -195,6 +196,10 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
             return { data: labels };
           }
         }
+      },
+      hover: {
+        mode: 'nearest',
+        intersect: true
       },
       elements: {
         point: {
