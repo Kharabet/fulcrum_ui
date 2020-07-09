@@ -42,6 +42,9 @@ header {
     font-size: 18px;
     margin-right: 30px;
     color: $primary-color;
+    &:hover {
+      color: $primary-color-hover;
+    }
   }
 }
 .header-menu {
@@ -114,7 +117,7 @@ header {
     padding-right: 15px;
     text-align: center;
     align-self: flex-end;
-    .data-year{
+    .data-year {
       justify-content: center;
     }
   }
