@@ -20,7 +20,7 @@ export const FooterSocial = (props: IFooterSocialProps) => {
         <a href="https://twitter.com/bzxHQ" className="item-link"><Twitter /></a>
       </div>
       }
-      <p className="data-protocol">Torque is built on the bZx protocol</p>
+      <p className="data-protocol">Protocol Explorer is built on the bZx protocol</p>
       <div className="logo">
         <LogoBzx />
       </div>

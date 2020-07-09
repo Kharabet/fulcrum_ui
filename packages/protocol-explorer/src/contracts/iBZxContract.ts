@@ -158,7 +158,7 @@ export class iBZxContract extends BaseContract {
           data: encodedData
         },
         self._web3Wrapper.getContractDefaults(),
-        (self as any).closeWithSwap.estimateGasAsync.bind(
+        (self as any).liquidate.estimateGasAsync.bind(
           self,
           loanId,
           receiver,
