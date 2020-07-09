@@ -47,9 +47,9 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
     //@ts-ignore
     setActivatingConnector(ProviderTypeDictionary.getConnectorByProviderType(providerType)!);
     activate(ProviderTypeDictionary.getConnectorByProviderType(providerType)!);
-    
+
   }
-  
+
   // handle logic to connect in reaction to certain events on the injected ethereum provider, if it exists
   // useInactiveListener(!triedEager || !!activatingConnector);
   const renderItems = () => {
@@ -77,7 +77,9 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
     <div className="provider-menu">
       <div className="provider-menu__title">
         Select Wallet
-        <CloseIcon className="disclosure__close" onClick={props.onProviderMenuClose} />
+         <div onClick={props.onProviderMenuClose}>
+          <CloseIcon className="disclosure__close" />
+        </div>
       </div>
       <ul className="provider-menu__list">{renderItems()}</ul>
       < button
