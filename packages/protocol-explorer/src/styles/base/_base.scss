@@ -20,10 +20,15 @@ a {
     }
 }
 .container {
-    width: 1140px;
     padding: 0 15px;
     margin: auto;
     box-sizing: border-box;
+    @media screen and (min-width: $with-min-lg){
+        width: 1140px;
+    }
+    @media screen and (max-width: $width-max-lg){
+        width: 100%;
+    }
 }
 
 .labels-container {
