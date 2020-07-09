@@ -14,6 +14,7 @@ export interface IHistoryTokenGridProps {
 interface IHistoryTokenGridState {
   numberPagination: number;
   quantityGrids: number;
+  isLastRow: boolean;
 }
 
 export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistoryTokenGridState> {
@@ -22,13 +23,15 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
     super(props);
     this.state = {
       numberPagination: 0,
-      quantityGrids: 0
+      quantityGrids: 0,
+      isLastRow: false
     };
   }
 
   public UNSAFE_componentWillMount(): void {
     const quantityGrids = Math.floor(this.props.historyRowsData.length / this.quantityVisibleRow);
-    this.setState({ ...this.state, quantityGrids: quantityGrids })
+    const isLastRow = this.props.historyRowsData.length === (this.state.numberPagination + 1) * this.quantityVisibleRow;
+    this.setState({ ...this.state, quantityGrids: quantityGrids, isLastRow: isLastRow })
   }
   public render() {
     return !this.props.isMobileMedia ? this.renderDesktop() : this.renderMobile();
@@ -44,14 +47,14 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
         {historyRows}
         <div className="pagination">
           <div className={`prev ${this.state.numberPagination === 0 ? `disabled` : ``}`} onClick={this.prevPagination}><ArrowPagination /></div>
-          <div className={`next ${this.state.numberPagination === this.state.quantityGrids ? `disabled` : ``}`} onClick={this.nextPagination}><ArrowPagination /></div>
+          <div className={`next ${this.state.numberPagination === this.state.quantityGrids || this.state.isLastRow ? `disabled` : ``}`} onClick={this.nextPagination}><ArrowPagination /></div>
         </div>
       </div>
     );
   }
 
   private renderMobile = () => {
-    const historyRows = this.props.historyRowsData.map((e,i) => <HistoryTokenCardMobile key={i} {...e} />);
+    const historyRows = this.props.historyRowsData.map((e, i) => <HistoryTokenCardMobile key={i} {...e} />);
     if (historyRows.length === 0) return null;
 
     return (
@@ -60,12 +63,16 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
       </div>
     );
   }
+
   public nextPagination = () => {
-    if (this.state.numberPagination !== this.state.quantityGrids)
-      this.setState({ ...this.state, numberPagination: this.state.numberPagination + 1 });
+    if (this.state.numberPagination !== this.state.quantityGrids && !this.state.isLastRow) {
+      const isLastRow = this.props.historyRowsData.length === (this.state.numberPagination + 2) * this.quantityVisibleRow;
+      this.setState({ ...this.state, numberPagination: this.state.numberPagination + 1, isLastRow: isLastRow });
+    }
   }
+
   public prevPagination = () => {
     if (this.state.numberPagination !== 0)
-      this.setState({ ...this.state, numberPagination: this.state.numberPagination - 1 });
+      this.setState({ ...this.state, numberPagination: this.state.numberPagination - 1, isLastRow: false });
   }
 }
