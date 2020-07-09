@@ -13,7 +13,7 @@ export class DashboardPage extends Component<IDashboardPageProps, IDashboardPage
   public render() {
     return (
       <React.Fragment>
-        <section>
+        <section className="pb-50">
           <Header isMobileMedia={this.props.isMobileMedia} doNetworkConnect={this.props.doNetworkConnect} />
           <Form />
         </section>
