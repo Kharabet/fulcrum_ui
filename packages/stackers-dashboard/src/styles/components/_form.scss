@@ -45,14 +45,14 @@
         .icon {
           position: absolute;
           top: 10px;
-          left: calc(100% + 5px);
+          left: calc(100% + 8px);
           display: flex;
         }
       }
     }
     .row-footer {
       font-weight: 600;
-      line-height: 1.2;
+      line-height: 1.5;
       color: #758295;
       @media screen and (min-width: $width-min-xs) {
         font-size: 18px;
