@@ -76,7 +76,7 @@ export class MainChart extends Component<IMainChartProps, IMainChartState> {
     }
     tooltipEl.style.opacity = '1';
     tooltipEl.style.position = 'absolute';
-    tooltipEl.style.left = (widthChart - tooltip.caretX < widthTooltipEl) ? tooltip.caretX - widthTooltipEl + 5 + 'px' : tooltip.caretX - 7 + 'px';
+    tooltipEl.style.left = (widthChart - tooltip.caretX < widthTooltipEl) ? tooltip.caretX - widthTooltipEl - 5 + 'px' : tooltip.caretX - 17 + 'px';
     tooltipEl.style.top = (heighttooltipEl + 55 < tooltip.caretY) ? tooltip.caretY - heighttooltipEl - 55 + 'px' : tooltip.caretY + 55 + 'px';
   }
   public getTvlHistory = async () => {
@@ -132,6 +132,7 @@ export class MainChart extends Component<IMainChartProps, IMainChartState> {
     const canvas = document.createElement('canvas');
     const chartData = getData(canvas);
     const options = {
+      responsive: true,
       scaleShowLabels: false,
       scales: {
         xAxes: [{

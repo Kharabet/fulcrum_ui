@@ -1,7 +1,9 @@
 .on-chain-indicator {
     display: inline-block;
-    height: 100%;
     height: 49px;
+    @media screen and (max-width: $width-max-md){
+        margin-top: 55px;
+    }
 }
 
 .on-chain-indicator__container {

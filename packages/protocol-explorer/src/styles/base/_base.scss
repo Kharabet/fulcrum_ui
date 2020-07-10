@@ -23,7 +23,7 @@ a {
     padding: 0 15px;
     margin: auto;
     box-sizing: border-box;
-    @media screen and (min-width: $with-min-lg){
+    @media screen and (min-width: $width-min-lg){
         width: 1140px;
     }
     @media screen and (max-width: $width-max-lg){
@@ -69,9 +69,15 @@ a {
 .w-100 {
     width: 100%;
 }
+@media screen and (max-width: $width-max-md){
+    .w-md-100{
+        width: 100%;
+    }
+}
 
 .pages-container {
     height: 100vh;
+    overflow-x: hidden;
 }
 
 .relative {
@@ -80,4 +86,7 @@ a {
 
 main {
     margin: auto;
+}
+.h-100{
+    height: 100%;
 }

@@ -4,6 +4,11 @@
 }
 #chartjs {
   z-index: 1000;
+  width: calc(100%  + 20px);
+  margin-left: -10px;
+  canvas{
+    width: 100% !important;
+  }
 }
 #chartjs-tooltip {
   opacity: 0;

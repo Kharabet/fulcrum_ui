@@ -71,10 +71,10 @@ export class Header extends Component<IHeaderProps, IHeaderState> {
               <OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />
               <div className="header-menu">
                 <Link to="/" className={`item-menu ${window.location.pathname === "/" ? `active` : ``}`} onClick={this.removeOverflow}>
-                  Dashboard
+                  Stats
                 </Link>
-                <Link to="/transactions" className={`item-menu ${window.location.pathname === "/transactions" ? `active` : ``}`} onClick={this.removeOverflow}>
-                  Transactions
+                <Link to="/liquidations" className={`item-menu ${window.location.pathname === "/liquidations" ? `active` : ``}`} onClick={this.removeOverflow}>
+                  Liquidations
                 </Link>
                 <a href="https://help.bzx.network/en/" className={`item-menu`} target="_blank">
                   Help Center

@@ -1,6 +1,26 @@
-.asset-selector {
+.asset-selector-section {
+  padding-top: 60px;
+  padding-bottom: 45px;
+}
+.asset-selector-container {
   display: flex;
   flex-wrap: wrap;
+  padding-left: 15px;
+  padding-right: 15px;
+  margin-left: auto;
+  margin-right: auto;
+  @media screen and (min-width: $width-min-lg) {
+    width: 1140px;
+  }
+  @media screen and (max-width: $width-max-lg) and (min-width: $width-min-md) {
+    width: 825px;
+  }
+  @media screen and (max-width: $width-max-md) and (min-width: $width-min-sm) {
+    width: 735px;
+  }
+  @media screen and (max-width: $width-max-xs) {
+    justify-content: space-between;
+  }
 }
 
 .asset-selector-item {
@@ -9,10 +29,25 @@
   border-radius: 16px;
   padding-top: 24px;
   padding-bottom: 10px;
-  max-width: 255px;
   margin-bottom: 30px;
-  &:not(:nth-child(4n)) {
-    margin-right: 30px;
+  @media screen and (min-width: $width-min-lg) {
+    &:not(:nth-child(4n)) {
+      margin-right: 30px;
+    }
+  }
+  @media screen and (min-width: $width-min-md) {
+    max-width: 255px;
+  }
+  @media screen and (max-width: $width-max-lg) and (min-width: $width-min-sm) {
+    &:not(:nth-child(3n)) {
+      margin-right: 30px;
+    }
+  }
+  @media screen and (max-width: $width-max-lg)  and (min-width: $width-min-sm) {
+    width: calc(100% / 3 - 20px);
+  }
+  @media screen and (max-width: $width-max-sm) {
+    width: calc(50% - 10px);
   }
 }
 .asset-selector-item-row {
@@ -22,29 +57,56 @@
 }
 .asset-selector-icon {
   display: flex;
-  padding-left: 24px;
+  @media screen and(min-width: $width-min-xs) {
+    padding-left: 24px;
+  }
+  @media screen and(max-width: $width-max-xs) {
+    padding-left: 15px;
+    svg {
+      width: 30px;
+      height: auto;
+    }
+  }
 }
 .asset-selector-name {
-  font-size: 22px;
   line-height: 1;
   font-weight: 900;
-  padding: 9px 0 9px 16px;
+  color: #283049;
+  @media screen and(min-width: $width-min-xs) {
+    font-size: 22px;
+    padding: 9px 0 9px 16px;
+  }
+  @media screen and(max-width: $width-max-xs) {
+    font-size: 18px;
+    padding: 9px 0 9px 8px;
+  }
 }
 .asset-selector-locked,
 .asset-selector-apr {
   display: flex;
-  padding-left: 80px;
   color: #8992a4;
   margin-bottom: 10px;
   font-size: 16px;
   line-height: 1.5;
+  @media screen and(min-width: $width-min-xs) {
+    padding-left: 80px;
+  }
+  @media screen and(max-width: $width-max-xs) {
+    padding-left: 54px;
+  }
   .value {
     font-weight: 800;
   }
 }
 .asset-selector-chart {
   width: 85%;
-  height: 70px;
+  @media screen and (min-width: $width-min-xs) {
+    height: 70px;
+  }
+
+  @media screen and (max-width: $width-max-xs) {
+    height: 55px;
+  }
   canvas {
     width: 100% !important;
     height: 100% !important;

@@ -59,17 +59,20 @@ export class MainPage extends Component<IMainPageProps, IMainPageState> {
         <section className="bg-gradient">
           <Header isMobileMedia={this.props.isMobileMedia} doNetworkConnect={this.props.doNetworkConnect} />
           <div className="container">
-            <div className="flex jc-sb">
-              <div className="flex fd-c">
-                <h1 className="mb-30">bZx Protocol Stats</h1>
-                <GroupButton setPeriodChart={this.setPeriodChart} />
+            <div className="flex fw-w jc-sb">
+              <div className="flex fd-c w-md-100">
+                <h1 className="mt-5 mb-30">bZx Protocol Stats</h1>
+                {!this.props.isMobileMedia && <GroupButton setPeriodChart={this.setPeriodChart} />}
               </div>
-              <div className="flex">
+              <div className="flex w-md-100 jc-fe">
                 <div className="tvl">TVL <span className="sign sign-currency">$ </span></div>
                 <div>
                   <span className="tvl-value">{tvl ? this.getRoundedData(tvl) : this.state.tvl}</span>
                   {this.state.change24h !== 0 && <div className={`tvl-interest ${this.state.change24h < 0 ? `down` : ``}`}><Arrow />{Math.abs(this.state.change24h).toFixed(5)}<span className="sign">%</span></div>}
                 </div>
+              </div>
+              <div className="flex jc-c w-100 mb-45">
+                {this.props.isMobileMedia && <GroupButton setPeriodChart={this.setPeriodChart} />}
               </div>
             </div>
           </div>
@@ -77,13 +80,11 @@ export class MainPage extends Component<IMainPageProps, IMainPageState> {
         <section className="wrapper-chart">
           <MainChart periodChart={this.state.periodChart} getchange24h={this.getchange24h} />
         </section>
-        <section className="pt-75">
+        <section className="search-container">
           <Search onSearch={this.onSearch} />
         </section>
-        <section className="pt-60 pb-45">
-          <div className="container">
+        <section className="asset-selector-section">
             <AssetSelector />
-          </div>
         </section>
       </React.Fragment>
     );
