@@ -65,7 +65,7 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
   public getAssetStatsHistory = async () => {
     const startData = new Date().setDate(new Date().getDate() - this.state.periodChart);
     const endData = new Date().getTime();
-    const pointsNumber = 60;
+    const pointsNumber = 80;
     const requestUrl = `${this.apiUrl}/asset-stats-history?asset=${this.state.asset.toLowerCase()}&start_date=${startData}&end_date=${endData}&points_number=${pointsNumber}`;
     const response = await fetch(requestUrl);
     const responseJson = await response.json();
@@ -91,6 +91,15 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
     await this.setState({ ...this.state, tvl: tvl, apr: apr, utilization: utilization, labels: labels })
   }
 
+  public getColors(data: number[]) {
+    let colors: string[] = [];
+
+    data.forEach((e, i) => {
+      colors.push(i % 4 === 2 ? '#E9F4FF' : "#fff");
+    });
+
+    return colors;
+  }
   public render() {
     const asset = AssetsDictionary.assets.get(this.state.asset) as AssetDetails;
 
@@ -140,23 +149,29 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
     const canvas = document.createElement('canvas');
     const chartData = getData(canvas);
     const options = {
+      responsive: true,
       scales: {
         xAxes: [{
           ticks: {
-            padding: 15
+            padding: 15,
+            maxRotation: 0,
+            minRotation: 0,
+            callback: (value: any, index: any, values: any) => {
+              return index === 0 || index % 4 !== 2 || index === Object.keys(values).length - 1 ? '' : value;
+            }
           },
           gridLines: {
             drawBorder: false,
             zeroLineWidth: 1,
-            zeroLineColor: '#E9F4FF',
-            color: '#E9F4FF',
-            
+            zeroLineColor: '#fff',
+            color: this.getColors(this.state.utilization),
           },
         }],
         yAxes: [{
           id: 'A',
           ticks: {
             drawTicks: false,
+
             max: Math.max(...this.state.tvl),
             min: Math.min(...this.state.tvl),
           },
@@ -279,6 +294,6 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
     tooltipEl.style.opacity = '1';
     tooltipEl.style.position = 'absolute';
     tooltipEl.style.left = (widthChart - tooltip.caretX < widthTooltipEl) ? tooltip.caretX - widthTooltipEl + 5 + 'px' : tooltip.caretX - 7 + 'px';
-    tooltipEl.style.top = (heighttooltipEl + 35 < tooltip.caretY) ? tooltip.caretY - heighttooltipEl - 35 +'px' : tooltip.caretY + 35 + 'px';
+    tooltipEl.style.top = (heighttooltipEl + 35 < tooltip.caretY) ? tooltip.caretY - heighttooltipEl - 35 + 'px' : tooltip.caretY + 35 + 'px';
   }
 }
