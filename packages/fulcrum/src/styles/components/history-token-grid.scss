@@ -1,18 +1,24 @@
+@import "../abstracts/variables";
+
 $font-size-header: 12px;
 $font-size-row: 18px;
 $width-col-token-date: 12%;
 $width-col-token-asset: 10%;
-$width-col-type: 12%;
 $width-col-asset-unit: 14%;
-$width-col-position: 14%;
-$width-col-asset-price: 12%;
+$width-col-type: 12%;
 $width-col-liquidation-price: 10%;
 $width-col-position-value: 10%;
 $width-col-profit: 6%;
 $width-col-result: 10%;
-$width-col-fee-reward: 14%;
 $width-col-result-inner: 22%;
 $width-col-separator-inner: 92%;
+$width-col-position: 11%;
+$width-col-asset-price: 11%;
+$width-col-fee-reward: 18%;
+
+$width-col-position-desktop: 12%;
+$width-col-asset-price-desktop: 12%;
+$width-col-fee-reward-desktop: 14%;
 
 @mixin history-token-grid-header__col {
   font-family: "Muli", sans-serif;
@@ -37,12 +43,16 @@ $width-col-separator-inner: 92%;
     color: #a2abb8;
     font-weight: 200;
   }
+  @media (min-width: $breakpoint-mobile-min) and (max-width: $breakpoint-desktop-max) {
+    font-size: 15px;
+  }
 }
 .history-token-grid-header {
   display: flex;
   flex-wrap: wrap;
   padding: 0 20px 22px 20px;
   font-family: "Muli", sans-serif;
+
   &__col-token-date {
     @include history-token-grid-header__col();
     width: $width-col-token-date;
@@ -62,10 +72,16 @@ $width-col-separator-inner: 92%;
   &__col-position {
     @include history-token-grid-header__col();
     width: $width-col-position;
+    @media (min-width: $breakpoint-desktop-min) {
+      width: $width-col-position-desktop;
+    }
   }
   &__col-asset-price {
     @include history-token-grid-header__col();
     width: $width-col-asset-price;
+    @media (min-width: $breakpoint-desktop-min) {
+      width: $width-col-asset-price-desktop;
+    }
   }
   &__col-liquidation-price {
     @include history-token-grid-header__col();
@@ -78,8 +94,11 @@ $width-col-separator-inner: 92%;
   &__col-fee-reward {
     @include history-token-grid-header__col();
     width: $width-col-fee-reward;
-    .bzrx{
-      color: #444E5A;
+    .bzrx {
+      color: #444e5a;
+    }
+    @media (min-width: $breakpoint-desktop-min) {
+      width: $width-col-fee-reward-desktop;
     }
   }
   &__col-profit {
@@ -106,9 +125,16 @@ $width-col-separator-inner: 92%;
   }
   &__col-token-date {
     font-size: 14px;
-    color: #939fac;
+
     font-weight: 200;
     width: $width-col-token-date;
+    color: #939fac;
+    a {
+      color: #939fac;
+      &:hover {
+        color: var(--primary-text);
+      }
+    }
   }
   &__col-token-asset {
     @include history-token-grid-row__col();
@@ -129,10 +155,16 @@ $width-col-separator-inner: 92%;
   &__col-position {
     @include history-token-grid-row__col();
     width: $width-col-position;
+    @media (min-width: $breakpoint-desktop-min) {
+      width: $width-col-position-desktop;
+    }
   }
   &__col-asset-price {
     @include history-token-grid-row__col();
     width: $width-col-asset-price;
+    @media (min-width: $breakpoint-desktop-min) {
+      width: $width-col-asset-price-desktop;
+    }
   }
   &__col-liquidation-price {
     @include history-token-grid-row__col();
@@ -148,6 +180,9 @@ $width-col-separator-inner: 92%;
     width: $width-col-fee-reward;
     justify-content: flex-end;
     padding-right: 60px;
+    @media (min-width: $breakpoint-desktop-min) {
+      width: $width-col-fee-reward-desktop;
+    }
   }
   &__col-profit {
     @include history-token-grid-row__col();
@@ -257,7 +292,7 @@ $width-col-separator-inner: 92%;
     &.prev {
       transform: rotate(180deg);
     }
-    &.next{
+    &.next {
       margin-left: 7px;
     }
   }

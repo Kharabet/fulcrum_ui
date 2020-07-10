@@ -17,6 +17,9 @@ interface IHistoryTokenGridRowState {
 }
 
 export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IHistoryTokenGridRowState> {
+
+  private etherscanUrl = FulcrumProvider.Instance.web3ProviderSettings.etherscanURL;
+
   constructor(props: IHistoryTokenGridRowProps, context?: any) {
     super(props, context);
 
@@ -98,18 +101,18 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
             : <Preloader width="74px" />
           }
         </div>
-        
-        <div title={event.payTradingFeeEvent && event.earnRewardEvent 
+
+        <div title={event.payTradingFeeEvent && event.earnRewardEvent
           && `${event.payTradingFeeEvent.amount.toFixed(18)} / ${event.earnRewardEvent.amount.toFixed(18)}`} className="history-token-grid-row__col-fee-reward">
-            {!this.state.isLoading
-              ? event.payTradingFeeEvent && event.earnRewardEvent ?
-                <React.Fragment>
-                  <span className="sign-currency">$</span>{event.payTradingFeeEvent.amount.toFixed(4)} / {event.earnRewardEvent.amount.toFixed(2)}
-                </React.Fragment>
-                : "-"
-              : <Preloader width="74px" />
-            }
-          </div>
+          {!this.state.isLoading
+            ? event.payTradingFeeEvent && event.earnRewardEvent ?
+              <React.Fragment>
+                <span className="sign-currency">$</span>{event.payTradingFeeEvent.amount.toFixed(4)} / {event.earnRewardEvent.amount.toFixed(2)}
+              </React.Fragment>
+              : "-"
+            : <Preloader width="74px" />
+          }
+        </div>
         <div title={event.profit instanceof BigNumber ? event.profit.toFixed(18) : "-"} className="history-token-grid-row-inner__col-profit">
           {event.profit instanceof BigNumber ? <React.Fragment><span className="sign-currency">$</span>{event.profit.toFixed(3)}</React.Fragment> : "-"}
         </div>
@@ -124,11 +127,13 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
       <div>
         <div className="history-token-grid-row">
           <div className="history-token-grid-row__col-token-date">
-            {latestEvent.date.toLocaleDateString("en-US", {
-              day: "2-digit",
-              month: "short",
-              year: "numeric"
-            })}
+            <a title={latestEvent.txHash} href={`${this.etherscanUrl}tx/${latestEvent.txHash}`}>
+              {latestEvent.date.toLocaleDateString("en-US", {
+                day: "2-digit",
+                month: "short",
+                year: "numeric"
+              })}
+            </a>
           </div>
           <div className="history-token-grid-row__col-token-asset">
             {this.props.eventsGroup.baseToken}-{this.props.eventsGroup.quoteToken}
@@ -170,8 +175,8 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
               : <Preloader width="74px" />
             }
           </div>
-          <div title={latestEvent.payTradingFeeEvent && latestEvent.earnRewardEvent 
-          && `${latestEvent.payTradingFeeEvent.amount.toFixed(18)} / ${latestEvent.earnRewardEvent.amount.toFixed(18)}`} className="history-token-grid-row__col-fee-reward">
+          <div title={latestEvent.payTradingFeeEvent && latestEvent.earnRewardEvent
+            && `${latestEvent.payTradingFeeEvent.amount.toFixed(18)} / ${latestEvent.earnRewardEvent.amount.toFixed(18)}`} className="history-token-grid-row__col-fee-reward">
             {!this.state.isLoading
               ? latestEvent.payTradingFeeEvent && latestEvent.earnRewardEvent ?
                 <React.Fragment>
