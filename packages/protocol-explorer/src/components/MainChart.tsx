@@ -82,7 +82,7 @@ export class MainChart extends Component<IMainChartProps, IMainChartState> {
   public getTvlHistory = async () => {
     const startData = new Date().setDate(new Date().getDate() - this.props.periodChart);
     const endData = new Date().getTime();
-    const pointsNumber = 30;
+    const pointsNumber = 80;
     const requestUrl = `${this.apiUrl}/tvl-history?start_date=${startData}&end_date=${endData}&points_number=${pointsNumber}`;
     const response = await fetch(requestUrl);
     const responseJson = await response.json();
@@ -106,6 +106,16 @@ export class MainChart extends Component<IMainChartProps, IMainChartState> {
     await this.setState({ ...this.state, labels: labels, data: data, change24: change24, });
   }
 
+  public getColors() {
+    let colors: string[] = [];
+
+    this.state.data.forEach((e, i) => {
+      colors.push(i % 2 === 0 ? '#E9F4FF' : "#fff");
+    });
+
+    return colors;
+  }
+
   public render() {
 
     const getData = (canvas: any) => {
@@ -126,7 +136,8 @@ export class MainChart extends Component<IMainChartProps, IMainChartState> {
           pointBackgroundColor: 'transparent',
           pointBorderColor: 'transparent',
           change24: this.state.change24
-        }]
+        },
+        ]
       }
     }
     const canvas = document.createElement('canvas');
@@ -137,19 +148,19 @@ export class MainChart extends Component<IMainChartProps, IMainChartState> {
       scales: {
         xAxes: [{
           ticks: {
+            maxRotation: 0,
+            minRotation: 0,
             padding: 15,
             callback: (value: any, index: any, values: any) => {
-              return index === 0 || index === Object.keys(values).length - 1 ? '' : value;
+              return index === 0 || index % 4 !== 0 || index === Object.keys(values).length - 1 ? '' : value;
             }
           },
           gridLines: {
             drawBorder: false,
-            zeroLineWidth: 1,
-            zeroLineColor: '#E9F4FF',
-            color: '#E9F4FF',
-
-          },
-        }],
+            color: this.getColors(),
+          }
+        }
+        ],
         yAxes: [{
           display: false,
         }]
