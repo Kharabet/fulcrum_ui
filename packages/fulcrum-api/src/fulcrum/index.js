@@ -2,10 +2,10 @@ import { iTokens } from '../config/iTokens';
 import { pTokens } from '../config/pTokens';
 
 import BigNumber from 'bignumber.js';
-import { DappHelperJson, mainnetAddress as dappHelperAddress } from './contracts/DappHelperContract'
-import { mainnetAddress as oracleAddress, oracleJson } from './contracts/OracleContract'
-import { iTokenJson } from './contracts/iTokenContract';
-import { pTokenJson } from './contracts/pTokenContract';
+import { DappHelperJson, mainnetAddress as dappHelperAddress } from '../contracts/DappHelperContract'
+import { mainnetAddress as oracleAddress, oracleJson } from '../contracts/OracleContract'
+import { iTokenJson } from '../contracts/iTokenContract';
+import { pTokenJson } from '../contracts/pTokenContract';
 import config from '../config.json';
 import { pTokenPricesModel, pTokenPriceModel } from "../models/pTokenPrices"
 import { iTokenPricesModel, iTokenPriceModel } from "../models/iTokenPrices"
