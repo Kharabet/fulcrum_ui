@@ -6,7 +6,6 @@ export const FooterMenu = () => {
         <h5 className="title-menu">bZx network</h5>
         <div className="list-menu">
           <a href="https://docs.bzx.network/">Documentation</a>
-          <a href="https://bzx.network/pdfs/bZx_lite_paper.pdf">Litepaper</a>
           <a href="https://api.bzx.network/">API</a>
           <a href="https://bzx.network/ecosystem">Ecosystem</a>
           <a href="https://bzx.network/blog">Blog</a>
