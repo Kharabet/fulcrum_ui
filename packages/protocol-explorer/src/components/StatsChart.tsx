@@ -140,6 +140,7 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
     const canvas = document.createElement('canvas');
     const chartData = getData(canvas);
     const options = {
+      responsive: true,
       scales: {
         xAxes: [{
           ticks: {
