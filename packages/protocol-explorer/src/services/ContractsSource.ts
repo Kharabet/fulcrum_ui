@@ -118,7 +118,7 @@ export class ContractsSource {
         address = "0xc45755a7cfc9385290e6fece1f040c0453e7b0e5";
         break;
       case 42:
-        address = "0x10fA193fB1d00e3C1033B0BB003AbB5f7a5595bB";
+        address = "0xAbd9372723C735D426D0a760D047206Fe115ee6d";
         break;
     }
 
@@ -228,6 +228,9 @@ export class ContractsSource {
             break;
           case "0x75b0622cec14130172eae9cf166b92e5c112faff":
             asset = Asset.USDC;
+            break;
+          case "0xad67cb4d63c9da94aca37fdf2761aadf780ff4a2":
+            asset = Asset.KNC;
             break;
         }
         break;

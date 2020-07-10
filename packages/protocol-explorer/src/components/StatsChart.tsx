@@ -65,7 +65,7 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
   public getAssetStatsHistory = async () => {
     const startData = new Date().setDate(new Date().getDate() - this.state.periodChart);
     const endData = new Date().getTime();
-    const pointsNumber = 20;
+    const pointsNumber = 60;
     const requestUrl = `${this.apiUrl}/asset-stats-history?asset=${this.state.asset.toLowerCase()}&start_date=${startData}&end_date=${endData}&points_number=${pointsNumber}`;
     const response = await fetch(requestUrl);
     const responseJson = await response.json();

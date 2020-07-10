@@ -17,7 +17,7 @@ import { ExplorerProviderEvents } from "../services/events/ExplorerProviderEvent
 import { NavService } from "../services/NavService";
 
 import { Loader } from "../components/Loader";
-import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
+import { IActiveLoanData } from "../domain/IActiveLoanData";
 import { ILoanRowProps } from "../components/LoanRow";
 
 
@@ -129,7 +129,7 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
     const unhealthyLoansUsd = unhealthyLoansData.reduce((a, b) => a.plus(b.amountOwedUsd), new BigNumber(0))
     const healthyLoansUsd = healthyLoansData.reduce((a, b) => a.plus(b.amountOwedUsd), new BigNumber(0))
     this.getChartData(liquidationEvents);
-    const unhealthyLoans = unhealthyLoansData.map((e: IBorrowedFundsState) => ({
+    const unhealthyLoans = unhealthyLoansData.map((e: IActiveLoanData) => ({
       loanId: e.loanData!.loanId,
       payOffAmount: e.maxLiquidatable,
       seizeAmount: e.maxSeizable,

@@ -28,7 +28,7 @@ import { MintEvent } from "../domain/MintEvent";
 import configProviders from "../config/providers.json";
 import { Asset } from "../domain/Asset";
 import { ITxRowProps } from "../components/TxRow";
-import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
+import { IActiveLoanData } from "../domain/IActiveLoanData";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
 
 const web3: Web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
@@ -480,8 +480,8 @@ export class ExplorerProvider {
     }
 
 
-    public getBzxLoans = async (start: number, count: number, isUnhealthy: boolean): Promise<IBorrowedFundsState[]> => {
-        let result: IBorrowedFundsState[] = [];
+    public getBzxLoans = async (start: number, count: number, isUnhealthy: boolean): Promise<IActiveLoanData[]> => {
+        let result: IActiveLoanData[] = [];
         if (!this.contractsSource) return result;
         const iBZxContract = await this.contractsSource.getiBZxContract();
 
@@ -509,15 +509,7 @@ export class ExplorerProvider {
                     loanId: e.loanId,
                     loanAsset: loanAsset,
                     collateralAsset: collateralAsset,
-                    amount: e.principal.dividedBy(10 ** loanPrecision).dp(5, BigNumber.ROUND_CEIL),
-                    amountOwed: amountOwned,
                     amountOwedUsd: amountOwned.times(loandAssetUsdRate),
-                    collateralAmount: e.collateral.dividedBy(10 ** collateralPrecision),
-                    collateralizedPercent: e.currentMargin.dividedBy(10 ** 20),
-                    interestRate: e.interestOwedPerDay.dividedBy(e.principal).multipliedBy(365),
-                    interestOwedPerDay: e.interestOwedPerDay.dividedBy(10 ** loanPrecision),
-                    hasManagementContract: true,
-                    isInProgress: false,
                     maxLiquidatable: e.maxLiquidatable.dividedBy(10 ** loanPrecision),
                     maxSeizable: e.maxSeizable.dividedBy(10 ** collateralPrecision),
                     loanData: e
