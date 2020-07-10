@@ -19,7 +19,6 @@ export const FooterMenu = () => {
           <a href="https://torque.loans">Torque</a>
           <a href="https://bzx.network/itokens">iTokens</a>
           <a href="https://bzx.network/ptokens">pTokens</a>
-          <a href="https://bzx.network/media-assets">Media assets</a>
         </div>
       </div>
       <div className="column-menu">
@@ -29,6 +28,7 @@ export const FooterMenu = () => {
           <a href="https://bzx.network/#team">Team</a>
           <a href="https://angel.co/company/bzx-1/jobs">Careers</a>
           <a href="https://bzx.network/press">Press</a>
+          <a href="https://bzx.network/media-assets">Media assets</a>
           <a href="#" className="contact-us-button">Contact us</a>
         </div>
       </div>
