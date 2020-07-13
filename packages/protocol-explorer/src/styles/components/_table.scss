@@ -20,8 +20,14 @@
     }
     > div,
     > a {
-      padding-left: 30px;
       box-sizing: border-box;
+      @media screen and (min-width: $width-min-sm){
+        padding-left: 30px;
+      }
+      @media screen and (max-width: $width-max-sm){
+        padding-left: 15px;
+
+      }
     }
   }
   .table-header {
@@ -67,8 +73,14 @@
     }
   }
   .table-row-tx {
-    padding-top: 20px;
-    padding-bottom: 20px;
+    @media screen and (min-width: $width-min-sm){
+      padding-top: 20px;
+      padding-bottom: 20px;
+    }
+    @media screen and (max-width: $width-max-sm){
+      padding-top: 13px;
+      padding-bottom: 13px;
+    }
     &__from {
       display: flex;
       align-items: center;
