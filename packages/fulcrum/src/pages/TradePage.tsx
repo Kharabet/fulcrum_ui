@@ -76,7 +76,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         Asset.ETH,
         Asset.KNC
       ];
-      this.stablecoinAssets = [
+      this.quoteTokens = [
         Asset.DAI,
         Asset.KNC
       ];
@@ -97,7 +97,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         // Asset.REP,
         Asset.KNC
       ];
-      this.stablecoinAssets = [
+      this.quoteTokens = [
         Asset.DAI,
         Asset.SAI,
         Asset.USDC,
@@ -108,7 +108,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     this.state = {
       selectedMarket: {
         baseToken: this.baseTokens[0],
-        quoteToken: this.stablecoinAssets[0],
+        quoteToken: this.quoteTokens[0],
       },
       loans: undefined,
       showMyTokensOnly: false,
@@ -136,7 +136,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
   private readonly defaultLeverageLong: number = 2;
   private readonly defaultLeverageShort: number = 1;
   private readonly baseTokens: Asset[] = [];
-  private readonly stablecoinAssets: Asset[] = [];
+  private readonly quoteTokens: Asset[] = [];
 
   public componentWillUnmount(): void {
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
@@ -158,8 +158,12 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
   }
 
   public componentDidUpdate(prevProps: Readonly<ITradePageProps>, prevState: Readonly<ITradePageState>, snapshot?: any): void {
-    if (prevState.selectedMarket !== this.state.selectedMarket || prevState.isTxCompleted !== this.state.isTxCompleted) {
+    if (prevState.isTxCompleted !== this.state.isTxCompleted) {
       this.derivedUpdate();
+    }
+    if (prevState.selectedMarket !== this.state.selectedMarket){
+      const tokenRowsData = this.getTokenRowsData(this.state);
+      this.setState({ ...this.state, tokenRowsData: tokenRowsData });
     }
   }
 
@@ -189,7 +193,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
             : null}
           <TokenGridTabs
             baseTokens={this.baseTokens}
-            stablecoinAssets={this.stablecoinAssets}
+            quoteTokens={this.quoteTokens}
             selectedMarket={this.state.selectedMarket}
             onShowMyTokensOnlyChange={this.onShowMyTokensOnlyChange}
             onMarketSelect={this.onTabSelect}
@@ -232,7 +236,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
             overlayClassName="modal-overlay-div"
           >
             <TradeForm
-              stablecoins={this.stablecoinAssets}
+              stablecoins={this.quoteTokens}
               loan={this.state.loans?.find(e => e.loanId === this.state.loanId)}
               isMobileMedia={this.props.isMobileMedia}
               tradeType={this.state.tradeType}
@@ -364,7 +368,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
 
         const doubleBaseToken = this.baseTokens.includes(loan.loanAsset)
           && this.baseTokens.includes(loan.collateralAsset)
-          && this.stablecoinAssets.includes(loan.collateralAsset) ?
+          && this.quoteTokens.includes(loan.collateralAsset) ?
           loan.collateralAsset : "";
 
 

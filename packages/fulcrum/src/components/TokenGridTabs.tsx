@@ -9,7 +9,7 @@ export interface ITokenGridTabsProps {
   selectedMarket: IMarketPair;
   isMobile: boolean;
   baseTokens: Asset[];
-  stablecoinAssets: Asset[];
+  quoteTokens: Asset[];
   isShowMyTokensOnly: boolean;
   openedPositionsCount: number;
   onMarketSelect: (baseToken: Asset, quoteToken: Asset) => void;
@@ -122,7 +122,7 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
     let dropDownSelectOptions: IDropDownSelectOption[] = [];
     this.props.baseTokens.forEach(baseToken => {
       
-      this.props.stablecoinAssets.forEach(stablecoin =>
+      this.props.quoteTokens.forEach(stablecoin =>
         baseToken != stablecoin && dropDownSelectOptions.push({
           baseToken: baseToken,
           quoteToken: stablecoin
