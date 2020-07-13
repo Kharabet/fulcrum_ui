@@ -17,8 +17,8 @@
 .mb-15 {
     margin-bottom: 15px;
 }
-.mb-25 {
-    margin-bottom: 25px;
+.mb-30 {
+    margin-bottom: 30px;
 }
 .mb-45{
     margin-bottom: 45px;
@@ -31,4 +31,9 @@
 }
 .mt-5{
     margin-top: 5px;
+}
+@media screen and(max-width: $width-max-sm){
+    .pt-sm-30{
+        padding-top: 30px;
+    }
 }

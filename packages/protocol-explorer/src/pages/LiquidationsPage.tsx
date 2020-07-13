@@ -262,7 +262,7 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
               : <React.Fragment>
           <section>
             <div className="container">
-              <div className="flex jc-sb al-c mb-25">
+              <div className="flex jc-sb al-c mb-30">
                 <h1>Liquidations</h1>
                 <div className="flex">
                   <div className="liquidation-data">
