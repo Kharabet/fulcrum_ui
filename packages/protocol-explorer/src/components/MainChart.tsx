@@ -135,6 +135,11 @@ export class MainChart extends Component<IMainChartProps, IMainChartState> {
           borderColor: '#276BFB',
           pointBackgroundColor: 'transparent',
           pointBorderColor: 'transparent',
+          pointHoverBorderColor: '#fff',
+          pointBorderWidth: 4,
+          pointHoverBorderWidth: 4,
+          pointRadius: 9,
+          pointHoverRadius: 9,
           change24: this.state.change24
         },
         ]
