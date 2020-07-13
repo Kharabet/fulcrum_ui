@@ -13,7 +13,7 @@ export class AssetsDictionary {
         BZRX,
         18,
         new Map<number, string | null>([
-          [1, ""],
+          [1, "0x1c74cFF0376FB4031Cd7492cD6dB2D66c3f2c6B9"],
           [42, "0xe3e682A8Fc7EFec410E4099cc09EfCC0743C634a"]
         ])
       )
@@ -26,7 +26,7 @@ export class AssetsDictionary {
         BZRX,
         18,
         new Map<number, string | null>([
-          [1, ""],
+          [1, "0x56d811088235F11C8920698a204A5010a788f4b3"],
           [42, "0xB54Fc2F2ea17d798Ad5C7Aba2491055BCeb7C6b2"] 
         ])
       )

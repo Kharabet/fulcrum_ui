@@ -49,7 +49,7 @@ const initialNetworkId = getNetworkIdByString(networkName);
 export class StackerProvider {
     public static Instance: StackerProvider;
 
-    public readonly gasLimit = "4000000";
+    public readonly gasLimit = "250000";
 
     // gasBufferCoeff equal 110% gas reserve
     public readonly gasBufferCoeff = new BigNumber("1.03");
@@ -358,7 +358,7 @@ export class StackerProvider {
         switch (asset) {
             case Asset.BZRX:
             case Asset.BZRXv1:
-                return new BigNumber(10 ** 18).multipliedBy(750000);
+                return new BigNumber(10 ** 18).multipliedBy(25000000);
             default:
                 throw new Error("Invalid approval asset!");
         }

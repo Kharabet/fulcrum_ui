@@ -36,7 +36,7 @@ export class ContractsSource {
     let address: string = "";
     switch (this.networkId) {
       case 1:
-        address = "";
+        address = "0x1c74cFF0376FB4031Cd7492cD6dB2D66c3f2c6B9";
         break;
       case 3:
         address = "";
@@ -55,7 +55,7 @@ export class ContractsSource {
     let address: string = "";
     switch (this.networkId) {
       case 1:
-        address = "";
+        address = "0x56d811088235F11C8920698a204A5010a788f4b3";
         break;
       case 3:
         address = "";
@@ -74,7 +74,7 @@ export class ContractsSource {
     let address: string = "";
     switch (this.networkId) {
       case 1:
-        address = "";
+        address = "0x266732e2fC94227C4EE5EC0E8394E1c05709f7DF";
         break;
       case 3:
         address = "";
@@ -83,7 +83,7 @@ export class ContractsSource {
         address = "";
         break;
       case 42:
-        address = "0xdff6eFB05Ee1ed73Ec89030c59Dcc035Aea092b9";
+        address = "0x6E7E8545BF1182695d5095D005Fdb1C0D46EB0b3";
         break;
     }
     return address;

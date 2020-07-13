@@ -1,0 +1,21 @@
+{
+    "name": "Convert",
+    "address": "",
+    "abi": [
+        {
+            "constant": false,
+            "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "_tokenAmount",
+              "type": "uint256"
+            }
+            ],
+            "name": "convert",
+            "outputs": [],
+            "payable": false,
+            "stateMutability": "nonpayable",
+            "type": "function"
+          }
+    ]
+}
