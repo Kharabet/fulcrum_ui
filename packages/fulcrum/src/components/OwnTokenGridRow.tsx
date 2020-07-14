@@ -140,17 +140,22 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
       </React.Fragment>
       : <div className={`own-token-grid-row ${this.props.isTxCompleted ? `completed` : ``}`}>
         <div className="own-token-grid-row__col-token-name  opacityIn">
+          <span className="own-token-grid-row__body-header">Pair</span>
           {`${this.props.baseToken.toUpperCase()}-${this.props.quoteToken.toUpperCase()}`}
         </div>
         <div className="own-token-grid-row__col-position-type opacityIn">
+          <span className="own-token-grid-row__body-header">Type</span>
+
           <span className="position-type-marker">
             {`${this.props.leverage}x ${this.props.positionType}`}
           </span>
         </div>
         <div title={this.props.positionValue.toFixed(18)} className="own-token-grid-row__col-position  opacityIn">
+          <span className="own-token-grid-row__body-header">Position(ETH)</span>
           {this.props.positionValue.toFixed(4)}
         </div>
         <div title={this.props.openPrice.toFixed(18)} className="own-token-grid-row__col-asset-price  opacityIn">
+          <span className="own-token-grid-row__body-header">Asset Price</span>
           {!this.state.isLoading
             ? <React.Fragment>
               <span className="sign-currency">$</span>{this.props.openPrice.toFixed(2)}
@@ -159,6 +164,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
           }
         </div>
         <div title={this.props.liquidationPrice.toFixed(18)} className="own-token-grid-row__col-liquidation-price opacityIn">
+          <span className="own-token-grid-row__body-header">Liq. Price</span>
           {!this.state.isLoading
             ? <React.Fragment>
               <span className="sign-currency">$</span>{this.props.liquidationPrice.toFixed(2)}
@@ -167,6 +173,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
           }
         </div>
         <div className="own-token-grid-row__col-collateral opacityIn">
+          <span className="own-token-grid-row__body-header">Collateral</span>
           <div title={this.props.collateral.toFixed(18)} className="own-token-grid-row__col-collateral-wrapper">
             {!this.state.isLoading
               ? <React.Fragment>
@@ -181,6 +188,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
           </div>
         </div>
         <div title={this.props.value.toFixed(18)} className="own-token-grid-row__col-position-value opacityIn">
+          <span className="own-token-grid-row__body-header">Value</span>
           {!this.state.isLoading
             ? this.props.value
               ? <React.Fragment>
@@ -191,6 +199,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
           }
         </div>
         <div title={this.props.profit.toFixed(18)} className="own-token-grid-row__col-profit opacityIn">
+          <span className="own-token-grid-row__body-header">Profit</span>
           {!this.state.isLoading
             ? this.props.profit
               ? <React.Fragment>
