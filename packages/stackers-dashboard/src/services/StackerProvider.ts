@@ -126,20 +126,11 @@ export class StackerProvider {
     }
 
     public async setWeb3Provider(connector: AbstractConnector, account?: string) {
+
+        this.unsupportedNetwork = false;
+        await Web3ConnectionFactory.setWalletProvider(connector, account);
         const providerType = await ProviderTypeDictionary.getProviderTypeByConnector(connector);
-        try {
-            this.isLoading = true;
-            this.unsupportedNetwork = false;
-            await Web3ConnectionFactory.setWalletProvider(connector, account);
-        } catch (e) {
-            // console.log(e);
-            this.isLoading = false;
-
-            return;
-        }
-
         await this.setWeb3ProviderFinalize(providerType);
-        this.isLoading = false;
     }
 
     public async setReadonlyWeb3Provider() {

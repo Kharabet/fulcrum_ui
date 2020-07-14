@@ -95,7 +95,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
   }
 
   public onProviderTypeSelect = async (connector: AbstractConnector, account?: string) => {
-    if (!this.state.isLoading && account) {
+    if (!this.state.isLoading) {
       StackerProvider.Instance.isLoading = true;
 
       await StackerProvider.Instance.eventEmitter.emit(StackerProviderEvents.ProviderIsChanging);
@@ -113,6 +113,10 @@ export class AppRouter extends Component<any, IAppRouterState> {
           StackerProviderEvents.ProviderChanged,
           new ProviderChangedEvent(StackerProvider.Instance.providerType, StackerProvider.Instance.web3Wrapper)
         );
+        await this._isMounted && this.setState({
+          ...this.state,
+          isLoading: false
+        })
       });
     } else {
       await this._isMounted && this.setState({
