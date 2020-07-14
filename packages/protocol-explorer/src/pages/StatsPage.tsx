@@ -146,7 +146,7 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
                   </div>
                 </section>
               : <React.Fragment>
-                  <section className="search-container">
+                  <section className="search-container pt-45">
                     <Search onSearch={this.onSearch} />
                   </section>
                   <section className="pt-90 pt-sm-30">
