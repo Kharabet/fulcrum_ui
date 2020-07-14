@@ -1,12 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Muli:wght@200;600;800;900&display=swap");
 
 @import "base/variables";
-@import "base/base";
-@import "base/typography";
-@import "base/spacing";
-@import "base/flex";
-@import "base/general";
-@import "base/modal";
 
 @import "components/asset-selector";
 @import "components/buttons";
@@ -23,3 +17,10 @@
 @import "layout/header";
 
 @import "pages/liquidation";
+
+@import "base/base";
+@import "base/typography";
+@import "base/spacing";
+@import "base/flex";
+@import "base/general";
+@import "base/modal";

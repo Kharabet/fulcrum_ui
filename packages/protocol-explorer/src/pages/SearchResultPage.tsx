@@ -155,7 +155,7 @@ export class SearchResultPage extends Component<ISearchResultPageProps, ISearchR
     return (
       <React.Fragment>
         <Header isMobileMedia={this.props.isMobileMedia} doNetworkConnect={this.props.doNetworkConnect} />
-        <section className="pt-45">
+        <section className="search-container pt-45">
           <Search onSearch={this.onSearch} initialFilter={this.state.filter}/>
         </section>
         <section className="pt-90">

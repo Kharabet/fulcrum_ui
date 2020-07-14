@@ -22,6 +22,11 @@
 .fd-c {
     flex-direction: column;
 }
+@media screen and (max-width: $width-max-md){
+    .fd-md-c{
+        flex-direction: column;
+    }
+}
 @media screen and (max-width: $width-max-sm){
     .fd-sm-c{
         flex-direction: column;

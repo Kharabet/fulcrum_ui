@@ -32,6 +32,11 @@
 .mt-5{
     margin-top: 5px;
 }
+@media screen and (max-width: $width-max-md){
+    .mt-md-30{
+        margin-top: 30px;
+    }
+}
 @media screen and(max-width: $width-max-sm){
     .pt-sm-30{
         padding-top: 30px;

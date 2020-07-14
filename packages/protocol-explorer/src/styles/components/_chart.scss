@@ -189,6 +189,11 @@
     }
   }
 }
+#chartjs-bar{
+  canvas{
+    width: 100% !important;
+  }
+}
 .wrapper-chartjs-bar {
   position: relative;
   #chartjs-bar-tooltip {

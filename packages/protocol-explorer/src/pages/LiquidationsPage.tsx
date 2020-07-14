@@ -262,9 +262,9 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
               : <React.Fragment>
           <section>
             <div className="container">
-              <div className="flex jc-sb al-c mb-30">
+              <div className="flex jc-sb fd-md-c al-c mb-30">
                 <h1>Liquidations</h1>
-                <div className="flex">
+                <div className="flex fw-w mt-md-30">
                   <div className="liquidation-data">
                     <div className="liquidation-data-title">30-days Volume</div>
                     <div className="liquidation-data-value"><span className="sign sign-currency">$</span>554,456,945.09</div>
@@ -290,10 +290,10 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
               </div>
             </div>
           </section>
-        <section className="pt-45">
+        <section className="search-container pt-45">
           <Search onSearch={this.onSearch} />
         </section>
-        <section className="pt-90">
+        <section className="pt-90 pt-sm-30">
           <div className="container">
             <TxGrid events={this.state.events} />
           </div>
@@ -301,11 +301,11 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
         <section className="pt-75">
           <div className="container">
             <h2 className="h1 mb-60">Unhealthy Loans</h2>
-            <div className="flex ai-c">
-              <div className="w-45">
+            <div className="flex fw-w ai-c">
+              <div className="unhealthy-chart-wrapper">
                 <UnhealthyChart unhealthyLoansUsd={this.state.unhealthyLoansUsd} healthyLoansUsd={this.state.healthyLoansUsd}/>
               </div>
-              <div className="w-55 flex fd-c ai-c">
+              <div className="unhealthy-data-wrapper flex fd-c ai-c">
                 <div className="flex w-100 mb-15">
                   <div className="unhealthy">Unhealthy&nbsp;<span className="sign sign-currency">$</span>&nbsp;</div>
                   <span className="unhealthy-value unhealthy-color">{this.state.unhealthyLoansUsd.toFixed(2)}</span>
