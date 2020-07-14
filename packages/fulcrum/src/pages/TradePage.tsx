@@ -158,21 +158,23 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
   }
 
   public componentDidUpdate(prevProps: Readonly<ITradePageProps>, prevState: Readonly<ITradePageState>, snapshot?: any): void {
-    if (prevState.isTxCompleted !== this.state.isTxCompleted) {
+    if (prevState.selectedMarket !== this.state.selectedMarket ||
+      prevState.isTxCompleted !== this.state.isTxCompleted ||
+      prevState.showMyTokensOnly !== this.state.showMyTokensOnly) {
       this.derivedUpdate();
-    }
-    if (prevState.selectedMarket !== this.state.selectedMarket){
-      const tokenRowsData = this.getTokenRowsData(this.state);
-      this.setState({ ...this.state, tokenRowsData: tokenRowsData });
     }
   }
 
 
   private async derivedUpdate() {
     const tokenRowsData = this.getTokenRowsData(this.state);
+    await this.setState({ ...this.state, tokenRowsData});
+
     const ownRowsData = await this.getOwnRowsData(this.state);
-    const historyRowsData = await this.getHistoryRowsData(this.state);
-    await this.setState({ ...this.state, ownRowsData: ownRowsData, tokenRowsData: tokenRowsData, historyRowsData });
+    let historyRowsData: IHistoryTokenGridRowProps[] = [];
+    if (this.state.showMyTokensOnly)
+       historyRowsData = await this.getHistoryRowsData(this.state);
+    await this.setState({ ...this.state, ownRowsData: ownRowsData, historyRowsData });
   }
 
   public render() {
@@ -291,6 +293,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     }
 
     if (request) {
+      this.onTabSelect(request.asset, request.collateralAsset);
       this.setState({
         ...this.state,
         isManageCollateralModalOpen: true,
@@ -324,6 +327,8 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     }
 
     if (request) {
+
+      this.onTabSelect(request.asset, request.quoteToken);
       this.setState({
         ...this.state,
         isTradeModalOpen: true,
@@ -365,17 +370,11 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       const loans = await FulcrumProvider.Instance.getUserMarginTradeLoans();
       this.setState({ ...this.state, loans })
       for (const loan of loans) {
-
-        const doubleBaseToken = this.baseTokens.includes(loan.loanAsset)
-          && this.baseTokens.includes(loan.collateralAsset)
-          && this.quoteTokens.includes(loan.collateralAsset) ?
-          loan.collateralAsset : "";
-
-
-        const positionType = this.baseTokens.includes(loan.collateralAsset)
-          ? loan.collateralAsset === doubleBaseToken ?
-            PositionType.SHORT :
-            PositionType.LONG
+        
+        const isLoanTokenOnlyInQuoteTokens = !this.baseTokens.includes(loan.loanAsset) && this.quoteTokens.includes(loan.loanAsset)
+        const isCollateralTokenNotInQuoteTokens = this.baseTokens.includes(loan.collateralAsset) && !this.quoteTokens.includes(loan.collateralAsset)
+        const positionType = isCollateralTokenNotInQuoteTokens || isLoanTokenOnlyInQuoteTokens
+          ? PositionType.LONG
           : PositionType.SHORT;
 
         const baseAsset = positionType === PositionType.LONG
