@@ -37,6 +37,17 @@
   }
 }
 @media screen and(max-width: $breakpoint-mobile-max) {
+  .own-token-cards {
+    padding: 0 15px;
+    &__header {
+      font-size: 28px;
+      font-weight: 900;
+      line-height: 1.4;
+      text-align: center;
+      color: var(--primary-text);
+    }
+  }
+
   .group-tabs {
     background-color: var(--switch-bg-pro);
     border-radius: 30px;

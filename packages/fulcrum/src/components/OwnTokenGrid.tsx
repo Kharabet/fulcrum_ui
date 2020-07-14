@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { OwnTokenGridRow, IOwnTokenGridRowProps } from "./OwnTokenGridRow";
 import { OwnTokenGridHeader } from "./OwnTokenGridHeader";
-import { OwnTokenCardMobile } from "./OwnTokenCardMobile";
+//import { OwnTokenCardMobile } from "./OwnTokenCardMobile";
 
 import "../styles/components/own-token-grid.scss"
 
@@ -25,31 +25,31 @@ export class OwnTokenGrid extends Component<IOwnTokenGridProps, IOwnTokenGridSta
   }
 
   public render() {
-    return !this.props.isMobileMedia ? this.renderDesktop() : this.renderMobile();
-  }
+    //   return !this.props.isMobileMedia ? this.renderDesktop() : this.renderMobile();
+    // }
 
-  private renderDesktop = () => {
-    const ownDesktopRows = this.props.ownRowsData.map((e,i) => <OwnTokenGridRow key={i} {...e} />);
-    if (ownDesktopRows.length === 0) return null;
+    // private renderDesktop = () => {
+    const ownRows = this.props.ownRowsData.map((e, i) => <OwnTokenGridRow key={i} {...e} />);
+    if (ownRows.length === 0) return null;
 
     return (
       <div className="own-token-grid">
-        <OwnTokenGridHeader />
-        {ownDesktopRows}
+        {!this.props.isMobileMedia && <OwnTokenGridHeader />}
+        {ownRows}
       </div>
     );
   }
 
-  private renderMobile = () => {
-    const ownMobileRows = this.props.ownRowsData.map((e,i) => <OwnTokenCardMobile key={i} {...e} />);
-    if (ownMobileRows.length === 0) return null;
+  // private renderMobile = () => {
+  //   const ownMobileRows = this.props.ownRowsData.map((e,i) => <OwnTokenCardMobile key={i} {...e} />);
+  //   if (ownMobileRows.length === 0) return null;
 
-    return (
-      <div className="own-token-cards">
-        <div className="own-token-cards__container">
-          {ownMobileRows}
-        </div>
-      </div>
-    );
-  }
+  //   return (
+  //     <div className="own-token-cards">
+  //       <div className="own-token-cards__container">
+  //         {ownMobileRows}
+  //       </div>
+  //     </div>
+  //   );
+  // }
 }

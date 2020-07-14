@@ -1,3 +1,4 @@
+@import "../abstracts/variables";
 $font-size-header: 12px;
 $font-size-row: 18px;
 $width-col-token-image: 26%;
@@ -31,182 +32,181 @@ $width-col-actions: 10%;
   font-style: normal;
   font-stretch: normal;
   line-height: 1.5;
-  display: flex;
 }
-.own-token-grid {
-  .own-token-grid-header {
+
+.own-token-grid-header {
+  @include own-token-grid-header__col();
+  display: grid;
+  grid-template-columns:
+    $width-col-token-name
+    $width-col-position-type
+    $width-col-position
+    $width-col-asset-price
+    $width-col-liquidation-price
+    $width-col-collateral
+    $width-col-position-value
+    $width-col-profit
+    $width-col-actions;
+  padding: 0 40px 22px 40px;
+}
+
+.own-token-grid-row {
+  @include own-token-grid-row__col();
+  display: grid;
+  grid-template-columns:
+    $width-col-token-name
+    $width-col-position-type
+    $width-col-position
+    $width-col-asset-price
+    $width-col-liquidation-price
+    $width-col-collateral
+    $width-col-position-value
+    $width-col-profit
+    $width-col-actions;
+
+  margin-bottom: 20px;
+  align-items: center;
+  background-color: var(--primary-row);
+  padding: 15px 40px 33px 40px;
+  margin-bottom: 1px;
+  position: relative;
+
+  .sign-currency {
+    color: #a2abb8;
+    font-weight: 400;
+  }
+
+  &__col-collateral {
     display: flex;
-    flex-wrap: wrap;
-    padding: 0 40px 22px 40px;
-    font-family: "Muli", sans-serif;
-    &__col-token-name {
-      @include own-token-grid-header__col();
-      width: $width-col-token-name;
-    }
-    &__col-position-type {
-      @include own-token-grid-header__col();
-      width: $width-col-position-type;
-    }
-    &__col-asset-unit {
-      @include own-token-grid-header__col();
-      width: $width-col-asset-unit;
-    }
-    &__col-collateral {
-      @include own-token-grid-header__col();
-      width: $width-col-collateral;
-    }
-    &__col-position {
-      @include own-token-grid-header__col();
-      width: $width-col-position;
-    }
-    &__col-asset-price {
-      @include own-token-grid-header__col();
-      width: $width-col-asset-price;
-    }
-    &__col-liquidation-price {
-      @include own-token-grid-header__col();
-      width: $width-col-liquidation-price;
-    }
-    &__col-position-value {
-      @include own-token-grid-header__col();
-      width: $width-col-position-value;
-    }
-    &__col-profit {
-      @include own-token-grid-header__col();
-      width: $width-col-profit;
-    }
-    &__col-actions {
-      @include own-token-grid-header__col();
-      width: $width-col-actions;
+    position: relative;
+  }
+  &__col-position-type {
+    display: flex;
+  }
+  &__col-asset-collateral-small {
+    position: absolute;
+    font-size: 12px;
+    font-weight: 700;
+    text-indent: 13px;
+    top: 100%;
+    &.danger {
+      color: #ff4f4f;
     }
   }
-  .own-token-grid-row {
+  &__open-manage-collateral {
+    background-color: var(--bg-icon-collateral);
+    width: 26px;
+    height: 26px;
     display: flex;
-    flex-wrap: wrap;
     align-items: center;
-    background-color: var(--primary-row);
-    padding: 15px 40px 33px 40px;
-    margin-bottom: 1px;
-    position: relative;
-    .sign-currency {
-      color: #a2abb8;
-      font-weight: 400;
+    justify-content: center;
+    border-radius: 50%;
+    margin-left: 10px;
+    position: absolute;
+    left: 60px;
+    cursor: pointer;
+    .icon-collateral-fill {
+      fill: var(--icon-collateral);
     }
-    &__col-token-name {
-      @include own-token-grid-row__col();
-      width: $width-col-token-name;
+    .icon-collateral-stroke {
+      stroke: var(--icon-collateral);
+    }
+  }
+  &__col-collateral-wrapper {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__col-action {
+    display: flex;
+    justify-content: flex-end;
+  }
+  &_button {
+    width: 82px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "Muli", sans-serif;
+    font-size: 12px;
+    line-height: 1.5;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    border: 0;
+    border-radius: 43px;
+    text-transform: uppercase;
+    font-style: normal;
+    color: #ffffff;
+    outline: none;
+    &:not(:disabled) {
+      cursor: pointer;
+    }
+    &:disabled {
+      background-color: var(--disabled-bg);
+      color: var(--disabled-color);
+      cursor: not-allowed;
+    }
+  }
+  &__sell-button {
+    background-color: #ff4f4f;
+    &:hover {
+      background-color: #fe7272;
+    }
+    &:not(:disabled) {
+      cursor: pointer;
+    }
+    &:disabled {
+      background-color: var(--disabled-bg);
+      color: var(--disabled-color);
+      cursor: not-allowed;
+    }
+  }
+}
+
+@media (max-width: $breakpoint-mobile-max) {
+  .own-token-grid-row {
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr;
+
+    grid-auto-flow: column;
+    // grid-column-gap: 35px;
+    // -webkit-column-gap: 35px;
+    // column-gap: 35px;
+    //  justify-content: space-between;
+
+    padding: 15px;
+    &__col-collateral {
+      margin-bottom: 15px;
+      order: 2;
+    }
+
+    &__col-action {
+      display: flex;
+      justify-content: flex-start;
+      order: 2;
     }
     &__col-position-type {
-      @include own-token-grid-row__col();
-      width: $width-col-position-type;
-    }
-    &__col-asset-unit {
-      @include own-token-grid-row__col();
-      width: $width-col-asset-unit;
+      order: 0;
     }
     &__col-position {
-      @include own-token-grid-row__col();
-      width: $width-col-position;
+      order: 1;
     }
     &__col-asset-price {
-      @include own-token-grid-row__col();
-      width: $width-col-asset-price;
+      order: 2;
     }
     &__col-liquidation-price {
-      @include own-token-grid-row__col();
-      width: $width-col-liquidation-price;
+      order: 3;
     }
-    &__col-collateral {
-      @include own-token-grid-row__col();
-      align-items: center;
-      width: $width-col-collateral;
-      position: relative;
-    }
-    &__col-asset-collateral-small {
-      position: absolute;
-      font-size: 12px;
-      font-weight: 700;
-      text-indent: 13px;
-      top: 100%;
-      &.danger {
-        color: #ff4f4f;
-      }
-    }
-    &__open-manage-collateral {
-      background-color: var(--bg-icon-collateral);
-      width: 26px;
-      height: 26px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 50%;
-      margin-left: 10px;
-      position: absolute;
-      right: 60px;
-      cursor: pointer;
-      .icon-collateral-fill {
-        fill: var(--icon-collateral);
-      }
-      .icon-collateral-stroke {
-        stroke: var(--icon-collateral);
-      }
-    }
-    &__col-collateral-wrapper {
-      display: flex;
-      flex-direction: column;
-    }
+
     &__col-position-value {
-      @include own-token-grid-row__col();
-      width: $width-col-position-value;
+      order: 5;
     }
     &__col-profit {
-      @include own-token-grid-row__col();
-      width: $width-col-profit;
+      order: 6;
     }
-    &__col-action {
-      width: $width-col-actions;
-      display: flex;
-      justify-content: flex-end;
-    }
-    &_button {
-      width: 82px;
-      height: 34px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: "Muli", sans-serif;
-      font-size: 12px;
-      line-height: 1.5;
-      font-weight: 700;
-      letter-spacing: 0.05em;
-      border: 0;
-      border-radius: 43px;
-      text-transform: uppercase;
-      font-style: normal;
-      color: #ffffff;
-      outline: none;
-      &:not(:disabled) {
-        cursor: pointer;
-      }
-      &:disabled {
-        background-color: var(--disabled-bg);
-        color: var(--disabled-color);
-        cursor: not-allowed;
-      }
-    }
-    &__sell-button {
-      background-color: #ff4f4f;
-      &:hover {
-        background-color: #fe7272;
-      }
-      &:not(:disabled) {
-        cursor: pointer;
-      }
-      &:disabled {
-        background-color: var(--disabled-bg);
-        color: var(--disabled-color);
-        cursor: not-allowed;
-      }
+
+    &__col-token-name {
+      order: 0;
     }
   }
 }
