@@ -1,11 +1,22 @@
 import * as _ from "lodash";
 import { convertContract } from "../contracts/convert";
 import { erc20Contract } from "../contracts/erc20";
+import { BigNumber } from "@0x/utils";
+import { Asset } from "../domain/Asset";
 
 const ethNetwork = process.env.REACT_APP_ETH_NETWORK;
 
+interface ITokenContractInfo {
+  token: string;
+  asset: string;
+  name: string;
+  symbol: string;
+  index: BigNumber;
+  version?: number;
+}
 export class ContractsSource {
   private readonly provider: any;
+  private static iTokensContractInfos: Map<string, ITokenContractInfo> = new Map<string, ITokenContractInfo>();
 
   private static isInit = false;
 
@@ -27,11 +38,27 @@ export class ContractsSource {
     }
     ContractsSource.convertJson = await import(`./../assets/artifacts/${ethNetwork}/convert.json`);
     ContractsSource.erc20Json = await import(`./../assets/artifacts/${ethNetwork}/erc20.json`);
+    const iTokenList = (await import(`../assets/artifacts/${ethNetwork}/iTokenList.js`)).iTokenList;
+    iTokenList.forEach((val: any, index: any) => {
+      // tslint:disable:no-console
+      // console.log(val);
+      const t = {
+        token: val[1],
+        asset: val[2],
+        name: val[3],
+        symbol: val[4],
+        index: new BigNumber(index),
+        version: parseInt(val[5], 10)
+      };
+      // tslint:disable:no-console
+      // console.log(t);
 
+      ContractsSource.iTokensContractInfos.set(val[4], t);
+    });
     ContractsSource.isInit = true;
   }
 
-  
+
   public getBzrxV1Address(): string {
     let address: string = "";
     switch (this.networkId) {
@@ -50,7 +77,7 @@ export class ContractsSource {
     }
     return address;
   }
-  
+
   public getBzrxAddress(): string {
     let address: string = "";
     switch (this.networkId) {
@@ -69,8 +96,8 @@ export class ContractsSource {
     }
     return address;
   }
-  
-  
+
+
   public getVBzrxAddress(): string {
     let address: string = "";
     switch (this.networkId) {
@@ -89,7 +116,7 @@ export class ContractsSource {
     }
     return address;
   }
-  
+
   public getConvertAddress(): string {
     let address: string = "";
     switch (this.networkId) {
@@ -109,7 +136,13 @@ export class ContractsSource {
     return address;
   }
 
-  
+  public getITokenErc20Address(asset: Asset): string | null {
+    let symbol;
+    symbol = `i${asset}`;
+    const tokenContractInfo = ContractsSource.iTokensContractInfos.get(symbol) || null;
+    return tokenContractInfo ? tokenContractInfo.token : null;
+  }
+
   private async getErc20ContractRaw(addressErc20: string): Promise<erc20Contract> {
     await this.Init();
     return new erc20Contract(ContractsSource.erc20Json.abi, addressErc20.toLowerCase(), this.provider);

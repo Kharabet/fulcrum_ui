@@ -12,6 +12,7 @@ interface IFormState {
   bzrxV1Balance: BigNumber;
   bzrxBalance: BigNumber;
   vBzrxBalance: BigNumber;
+  iEthBalance: BigNumber;
 }
 
 export class Form extends Component<{}, IFormState> {
@@ -21,6 +22,7 @@ export class Form extends Component<{}, IFormState> {
       bzrxV1Balance: new BigNumber(0),
       bzrxBalance: new BigNumber(0),
       vBzrxBalance: new BigNumber(0),
+      iEthBalance: new BigNumber(0)
     };
 
     this._isMounted = false;
@@ -36,11 +38,13 @@ export class Form extends Component<{}, IFormState> {
     const bzrxV1Balance = (await StackerProvider.Instance.getAssetTokenBalanceOfUser(Asset.BZRXv1)).div(10 ** 18);
     const bzrxBalance = (await StackerProvider.Instance.getAssetTokenBalanceOfUser(Asset.BZRX)).div(10 ** 18);
     const vBzrxBalance = (await StackerProvider.Instance.getAssetTokenBalanceOfUser(Asset.vBZRX)).div(10 ** 18);
+    const iEthBalance = (await StackerProvider.Instance.getITokenBalanceOfUser(Asset.ETH)).div(10 ** 18);
     this._isMounted && this.setState({
       ...this.state,
       bzrxV1Balance,
       bzrxBalance,
-      vBzrxBalance
+      vBzrxBalance,
+      iEthBalance
     })
   }
 
