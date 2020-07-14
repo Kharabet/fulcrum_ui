@@ -70,6 +70,26 @@ export class ContractsSource {
     return address;
   }
   
+  
+  public getVBzrxAddress(): string {
+    let address: string = "";
+    switch (this.networkId) {
+      case 1:
+        address = "";
+        break;
+      case 3:
+        address = "";
+        break;
+      case 4:
+        address = "";
+        break;
+      case 42:
+        address = "0x6F8304039f34fd6A6acDd511988DCf5f62128a32";
+        break;
+    }
+    return address;
+  }
+  
   public getConvertAddress(): string {
     let address: string = "";
     switch (this.networkId) {

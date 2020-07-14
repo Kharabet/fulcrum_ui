@@ -1,5 +1,6 @@
 import React, { Component } from "react";
-import { ReactComponent as CircleBzx } from "../assets/images/token-bzrx.svg"
+import { ReactComponent as BzrxIcon } from "../assets/images/token-bzrx.svg"
+import { ReactComponent as VBzrxIcon } from "../assets/images/token-vbzrx.svg"
 import { StackerProvider } from "../services/StackerProvider";
 import { StackerProviderEvents } from "../services/events/StackerProviderEvents";
 import { BigNumber } from "@0x/utils";
@@ -10,6 +11,7 @@ import { Asset } from "../domain/Asset";
 interface IFormState {
   bzrxV1Balance: BigNumber;
   bzrxBalance: BigNumber;
+  vBzrxBalance: BigNumber;
 }
 
 export class Form extends Component<{}, IFormState> {
@@ -17,7 +19,8 @@ export class Form extends Component<{}, IFormState> {
     super(props);
     this.state = {
       bzrxV1Balance: new BigNumber(0),
-      bzrxBalance: new BigNumber(0)
+      bzrxBalance: new BigNumber(0),
+      vBzrxBalance: new BigNumber(0),
     };
 
     this._isMounted = false;
@@ -32,10 +35,12 @@ export class Form extends Component<{}, IFormState> {
 
     const bzrxV1Balance = (await StackerProvider.Instance.getAssetTokenBalanceOfUser(Asset.BZRXv1)).div(10 ** 18);
     const bzrxBalance = (await StackerProvider.Instance.getAssetTokenBalanceOfUser(Asset.BZRX)).div(10 ** 18);
+    const vBzrxBalance = (await StackerProvider.Instance.getAssetTokenBalanceOfUser(Asset.vBZRX)).div(10 ** 18);
     this._isMounted && this.setState({
       ...this.state,
       bzrxV1Balance,
-      bzrxBalance
+      bzrxBalance,
+      vBzrxBalance
     })
   }
 
@@ -72,19 +77,35 @@ export class Form extends Component<{}, IFormState> {
             <div className="calculator-row">
               <div>
                 <div className="row-header">My BZRX balance:</div>
-                <div className="row-body">
-                  <span title={this.state.bzrxV1Balance.gt(0)
-                    ? this.state.bzrxV1Balance.toFixed(18)
-                    : this.state.bzrxBalance.toFixed(18)
-                  } className="value">
-                    {this.state.bzrxV1Balance.gt(0)
-                      ? this.state.bzrxV1Balance.toFixed(2)
-                      : this.state.bzrxBalance.toFixed(2)
-                    }
-                    <span className="icon"><CircleBzx /></span>
-                  </span>
+                <div className="row-container">
+                  <div className="row-body">
+                    <span title={this.state.bzrxV1Balance.gt(0)
+                      ? this.state.bzrxV1Balance.toFixed(18)
+                      : this.state.bzrxBalance.toFixed(18)
+                    } className="value">
+                      {this.state.bzrxV1Balance.gt(0)
+                        ? this.state.bzrxV1Balance.toFixed(2)
+                        : this.state.bzrxBalance.toFixed(2)
+                      }
+                      <span className="icon"><BzrxIcon /></span>
+                    </span>
+                  </div>
+                  <div className="row-footer">{this.state.bzrxV1Balance.gt(0) ? "BZRXv1" : "BZRX"}</div>
                 </div>
-                <div className="row-footer">{this.state.bzrxV1Balance.gt(0) ? "BZRXv1" : "BZRX"}</div>
+                <div className="row-container">
+                  {/* {this.state.bzrxBalance.gt(0) &&  */}
+                  <React.Fragment>
+                    <div className="row-body">
+                      <span title={this.state.vBzrxBalance.toFixed(18)} className="value">
+                        {this.state.vBzrxBalance.toFixed(2)}
+                        <span className="icon"><VBzrxIcon /></span>
+                      </span>
+                    </div>
+                    <div className="row-footer">vBZRX</div>
+                  </React.Fragment>
+                  {/* } */}
+                </div>
+
               </div>
               <div className="reward-item">
                 <div className="row-header">My rewards balance:</div>
@@ -94,10 +115,10 @@ export class Form extends Component<{}, IFormState> {
             </div>
             <div className="convert-button">
               {this.state.bzrxV1Balance.gt(0) &&
-                  <button className="button button-full-width" onClick={this.onConvertClick}>
-                    Convert BZRX v1 to v2
+                <button className="button button-full-width" onClick={this.onConvertClick}>
+                  Convert BZRX v1 to v2
                     <span className="notice">You will need to confirm 2 transactions in your wallet.</span>
-                  </button>
+                </button>
               }
             </div>
 

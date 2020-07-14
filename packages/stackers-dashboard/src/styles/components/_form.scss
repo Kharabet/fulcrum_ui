@@ -29,6 +29,9 @@
         font-size: 11px;
       }
     }
+    .row-container:not(:last-child){
+      margin-bottom: 25px;
+    }
     .row-body {
       font-weight: 800;
       line-height: 1.2;
@@ -47,6 +50,10 @@
           top: 10px;
           left: calc(100% + 8px);
           display: flex;
+          svg {
+            height: 24px;
+            width: 24px;
+          }
         }
       }
     }
