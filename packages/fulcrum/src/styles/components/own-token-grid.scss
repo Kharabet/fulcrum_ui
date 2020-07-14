@@ -12,6 +12,8 @@ $width-col-collateral: 14%;
 $width-col-position-value: 10%;
 $width-col-profit: 10%;
 $width-col-actions: 10%;
+$primary-color:  #e9f4ff;
+$primary-dark-color:  rgba(#444e5a,0.4);
 
 @mixin own-token-grid-header__col {
   font-family: "Muli", sans-serif;
@@ -50,7 +52,8 @@ $width-col-actions: 10%;
   padding: 0 40px 22px 40px;
 }
 
-.own-token-grid-row {
+.own-token-grid-row {  
+  position: relative;
   @include own-token-grid-row__col();
   display: grid;
   grid-template-columns:
@@ -66,14 +69,31 @@ $width-col-actions: 10%;
 
   margin-bottom: 20px;
   align-items: center;
-  background-color: var(--primary-row);
+  background-color: $primary-color; 
   padding: 15px 40px 33px 40px;
   margin-bottom: 1px;
-  position: relative;
+
+  [data-theme="dark"] &{
+    background-color: $primary-dark-color; 
+  }
 
   .sign-currency {
     color: #a2abb8;
     font-weight: 400;
+  }
+
+  &__body-header {
+    display: none;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 3px;
+    font-family: "Muli", sans-serif;
+    font-style: normal;
+    font-weight: 600;
+    font-size: 10px;
+    line-height: 1.5;
+    color: #a2abb8;
+    width: 100%;
   }
 
   &__col-collateral {
@@ -103,7 +123,7 @@ $width-col-actions: 10%;
     border-radius: 50%;
     margin-left: 10px;
     position: absolute;
-    left: 60px;
+    left: 70px;
     cursor: pointer;
     .icon-collateral-fill {
       fill: var(--icon-collateral);
@@ -164,49 +184,83 @@ $width-col-actions: 10%;
 }
 
 @media (max-width: $breakpoint-mobile-max) {
-  .own-token-grid-row {
-    grid-template-columns: 1fr 1fr 1fr;
-    grid-template-rows: 1fr 1fr 1fr;
+  .own-token-grid {
+    padding: 0 15px;
+    &-row {
+      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-rows: 1fr 1fr 1fr;
+      grid-auto-flow: column;
+      align-items: baseline;
+      padding: 18px 15px 24px;
+      row-gap: 20px;
 
-    grid-auto-flow: column;
-    // grid-column-gap: 35px;
-    // -webkit-column-gap: 35px;
-    // column-gap: 35px;
-    //  justify-content: space-between;
+      &__body-header {
+        display: flex;
+      }
+      &__col-token-name {
+        order: 0;
+      }
+      &__col-position {
+        order: 1;
+      }
+      &__col-collateral {
+        flex-wrap: wrap;
+        margin-bottom: 15px;
+        order: 2;
+      }
+      &__col-position-type {
+        flex-wrap: wrap;
+        order: 3;
+        .position-type-marker {
+          font-size: 10px;
+          width: 71px;
+          padding: 7px 0;
+          text-align: center;
+        }
+      }
+      &__col-asset-price {
+        order: 4;
+      }
 
-    padding: 15px;
-    &__col-collateral {
-      margin-bottom: 15px;
-      order: 2;
-    }
+      &__col-position-value {
+        order: 5;
+      }
+      &__col-action {
+        display: flex;
+        justify-content: flex-start;
+        order: 6;
+      }
 
-    &__col-action {
-      display: flex;
-      justify-content: flex-start;
-      order: 2;
-    }
-    &__col-position-type {
-      order: 0;
-    }
-    &__col-position {
-      order: 1;
-    }
-    &__col-asset-price {
-      order: 2;
-    }
-    &__col-liquidation-price {
-      order: 3;
-    }
+      &__col-liquidation-price {
+        order: 7;
+      }
 
-    &__col-position-value {
-      order: 5;
+      &__col-profit {
+        order: 8;
+      }
+      &__col-action {
+        align-self: flex-start;
+        padding-top: 15px;
+      }
+      &__open-manage-collateral {
+        top: 17px;
+      }
+      &__col-asset-collateral-small {
+        text-indent: 12px;
+      }
+      &_button {
+        font-size: 14px;
+      }
     }
-    &__col-profit {
-      order: 6;
-    }
+  }
+}
 
-    &__col-token-name {
-      order: 0;
+@media (max-width: 400px) {
+  .own-token-grid {
+    &-row {
+      &__open-manage-collateral {
+        left: 55px;
+      }
     }
   }
 }
