@@ -85,7 +85,8 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
         { id: 2, title: "Borrow", link: "https://torque.loans", external: true },
         { id: 3, title: "Stats", link: "/stats", external: false },
         { id: 4, title: "Help Center", link: "https://bzx.network/faq-fulcrum.html", external: true },
-      ]
+      ],
+      onMenuToggle: this.onMenuToggle
     };
 
     return (
@@ -95,7 +96,7 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
             <HeaderLogo />
           </div>
           <div className="header__center">
-            <HeaderMenu items={menu.items} />
+            <HeaderMenu items={menu.items} onMenuToggle={this.onMenuToggle} />
           </div>
           <div className="header__right">
             <OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />
@@ -120,7 +121,8 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
         { id: 2, title: "Borrow", link: "https://torque.loans", external: true },
         { id: 3, title: "Stats", link: "/stats", external: false },
         { id: 4, title: "Help Center", link: "https://bzx.network/faq-fulcrum.html", external: true },
-      ]
+      ],
+      onMenuToggle: this.onMenuToggle
     };
     const toggleImg = !this.state.isMenuOpen ? menu_icon : ic_close;
     const sidebarClass = !this.state.isMenuOpen ? 'sidebar_h' : 'sidebar_v'
@@ -150,7 +152,7 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
               </div>
             </div>
             <div className="header_nav_menu">
-              <HeaderMenu items={menu.items} />
+              <HeaderMenu items={menu.items} onMenuToggle={this.onMenuToggle} />
             </div>
             <div className="footer-container">
               <Footer  isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen}/>
