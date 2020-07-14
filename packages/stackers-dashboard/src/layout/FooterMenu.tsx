@@ -1,5 +1,13 @@
-import React from "react";
+import React, { MouseEvent } from "react";
 export const FooterMenu = () => {
+  const contactClick = (e: React.MouseEvent<HTMLElement>) => {
+    e.preventDefault();
+    //@ts-ignore
+    if (window.Intercom) {
+      //@ts-ignore
+      window.Intercom("show")
+    }
+  }
   return (
     <div className="footer-menu">
       <div className="column-menu">
@@ -29,7 +37,7 @@ export const FooterMenu = () => {
           <a href="https://angel.co/company/bzx-1/jobs">Careers</a>
           <a href="https://bzx.network/press">Press</a>
           <a href="https://bzx.network/media-assets">Media assets</a>
-          <a href="#" className="contact-us-button">Contact us</a>
+          <a href="#" className="contact-us-button" onClick={contactClick}>Contact us</a>
         </div>
       </div>
     </div>
