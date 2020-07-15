@@ -151,7 +151,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
           </span>
         </div>
         <div title={this.props.positionValue.toFixed(18)} className="own-token-grid-row__col-position  opacityIn">
-    <span className="own-token-grid-row__body-header">Position({this.props.baseToken})</span>
+    <span className="own-token-grid-row__body-header">Position({this.props.baseToken}/{this.props.quoteToken})</span>
           {this.props.positionValue.toFixed(4)}
         </div>
         <div title={this.props.openPrice.toFixed(18)} className="own-token-grid-row__col-asset-price  opacityIn">
