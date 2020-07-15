@@ -123,14 +123,14 @@ export class Form extends Component<{}, IFormState> {
               </div>
             </div>
             <div className="convert-button">
-              {this.state.bzrxV1Balance.gt(0) && this.state.iEthBalance.gt(0) &&
+              {this.state.bzrxV1Balance.gt(0) &&
                 <button className="button button-full-width" onClick={this.onBzrxV1ToV2ConvertClick}>
                   Convert BZRX v1 to v2
                     <span className="notice">You will need to confirm 2 transactions in your wallet.</span>
                 </button>
               }
             </div>
-            {this.state.iETHSwapRate.gt(0) &&
+            {this.state.iETHSwapRate.gt(0) && this.state.iEthBalance.gt(0) &&
               <div className="convert-button">
                 <button className="button button-full-width" onClick={this.onIETHtoVBZRXConvertClick}>
                   Convert&nbsp;
