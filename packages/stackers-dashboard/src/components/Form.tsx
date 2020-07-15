@@ -122,7 +122,7 @@ export class Form extends Component<{}, IFormState> {
               </div>
             </div>
             <div className="convert-button">
-              {this.state.bzrxV1Balance.gt(0) &&
+              {this.state.bzrxV1Balance.gt(0) && this.state.iEthBalance.gt(0) &&
                 <button className="button button-full-width" onClick={this.onBzrxV1ToV2ConvertClick}>
                   Convert BZRX v1 to v2
                     <span className="notice">You will need to confirm 2 transactions in your wallet.</span>
@@ -135,7 +135,7 @@ export class Form extends Component<{}, IFormState> {
                   Convert&nbsp;
                   <span title={this.state.iEthBalance.toFixed(18)}>{this.state.iEthBalance.toFixed(2)}</span>
                   &nbsp;iETH into&nbsp;
-                  <span title={this.state.iEthBalance.times(this.state.iETHSwapRate).toFixed(18)}>{this.state.iEthBalance.times(this.state.iETHSwapRate).toFixed(4)}</span>
+                  <span title={this.state.iEthBalance.div(this.state.iETHSwapRate).toFixed(18)}>{this.state.iEthBalance.div(this.state.iETHSwapRate).toFixed(4)}</span>
                   &nbsp;vBZRX
                     <span className="notice">Make sure you read and understand iETH Buyback Program terms and conditions </span>
                 </button>

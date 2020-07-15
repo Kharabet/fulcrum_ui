@@ -432,7 +432,7 @@ export class StackerProvider {
                 tokenAmount,
                 {
                     from: account,
-                    gas: this.gasLimit,
+                    gas: gasAmountBN,
                     gasPrice: await this.gasPrice()
                 });
 
