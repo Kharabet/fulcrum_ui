@@ -137,6 +137,13 @@
 }
 .wrapper-chartjs-token {
   position: relative;
+  margin: auto;
+  @media screen and (min-width: $width-min-lg){
+    width: 1110px;
+  }
+  @media screen and (max-width: $width-max-lg){
+    width: calc(100% - 30px);
+  }
   .chartjs-tooltip-token {
     opacity: 0;
     position: absolute;
@@ -180,6 +187,11 @@
         }
       }
     }
+  }
+}
+#chartjs-bar{
+  canvas{
+    width: 100% !important;
   }
 }
 .wrapper-chartjs-bar {

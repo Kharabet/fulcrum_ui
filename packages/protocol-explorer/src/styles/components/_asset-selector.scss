@@ -18,8 +18,8 @@
   @media screen and (max-width: $width-max-md) and (min-width: $width-min-sm) {
     width: 735px;
   }
-  @media screen and (max-width: $width-max-xs) {
-    justify-content: space-between;
+  @media screen and (max-width: $width-max-sm) {
+    max-width: 540px;
   }
 }
 
@@ -48,6 +48,9 @@
   }
   @media screen and (max-width: $width-max-sm) {
     width: calc(50% - 10px);
+    &:nth-child(2n+1) {
+      margin-right: 20px;
+    }
   }
 }
 .asset-selector-item-row {

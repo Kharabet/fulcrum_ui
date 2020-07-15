@@ -128,15 +128,12 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
     return (
       <React.Fragment>
         <Header isMobileMedia={this.props.isMobileMedia} doNetworkConnect={this.props.doNetworkConnect} />
-        <main>
           <section>
-            <div className="container">
-              <StatsChart />
-              <div className="flex jc-c labels-container">
-                <div className="label-chart"><span className="bg-green"></span>Supply APR, %</div>
-                <div className="label-chart"><span className="bg-primary"></span>TVL</div>
-                <div className="label-chart"><span className="bg-secondary"></span>Utilization, %</div>
-              </div>
+            <StatsChart />
+            <div className="flex jc-c labels-container">
+              <div className="label-chart"><span className="bg-green"></span>Supply APR, %</div>
+              <div className="label-chart"><span className="bg-primary"></span>TVL</div>
+              <div className="label-chart"><span className="bg-secondary"></span>Utilization, %</div>
             </div>
           </section>
 
@@ -148,11 +145,11 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
                     <Loader quantityDots={5} sizeDots={'large'} title={'Loading'} isOverlay={false} />
                   </div>
                 </section>
-                : <React.Fragment>
-                  <section className="pt-75">
+              : <React.Fragment>
+                  <section className="search-container pt-45">
                     <Search onSearch={this.onSearch} />
                   </section>
-                  <section className="pt-90">
+                  <section className="pt-90 pt-sm-30">
                     <div className="container">
                       <TxGrid events={this.state.events} />
                     </div>
@@ -167,7 +164,6 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
               </div>
             </section>
           }
-        </main>
       </React.Fragment>
     );
   }

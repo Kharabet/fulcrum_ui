@@ -164,7 +164,7 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
             drawBorder: false,
             zeroLineWidth: 1,
             zeroLineColor: '#fff',
-            color: this.getColors(this.state.utilization),
+            color: this.getColors(this.state.utilization)
           },
         }],
         yAxes: [{
@@ -224,14 +224,16 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
     }
     return (
       <React.Fragment>
-        <div className="flex jc-sb ai-c mb-25">
-          <div className="flex ai-c">
-            <span className="mr-15">
-              {asset.logoSvg.render()}
-            </span>
-            <h1>{this.state.asset.toUpperCase()} Stats</h1>
+        <div className="container">
+          <div className="flex fw-w fd-sm-c jc-sb ai-c mb-30">
+            <div className="flex ai-c as-sm-fs ">
+              <span className="flex mr-15">
+                {asset.logoSvg.render()}
+              </span>
+              <h1>{this.state.asset.toUpperCase()} Stats</h1>
+            </div>
+            <GroupButton setPeriodChart={this.setPeriodChart} />
           </div>
-          <GroupButton setPeriodChart={this.setPeriodChart} />
         </div>
         <div className="wrapper-chartjs-token">
           <div id="chartjs">

@@ -77,8 +77,19 @@ footer {
     margin-top: 30px;
   }
   .item-social {
-    margin: auto;
+    &:first-child {
+      @media screen and (max-width: $width-max-md) and (min-width: $width-min-sm) {
+        margin-left: 30px;
+      }
+    }
+    &:last-child {
+      @media screen and (max-width: $width-max-md) and (min-width: $width-min-sm) {
+        order: -1;
+        margin-top: 15px;
+      }
+    }
     @media screen and (max-width: $width-max-sm) {
+      margin: auto;
       width: 100%;
     }
   }

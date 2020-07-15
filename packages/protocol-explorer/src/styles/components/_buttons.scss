@@ -18,7 +18,9 @@ button {
 }
 .group-button {
   display: flex;
-  margin-top: 30px;
+  @media screen and (max-width: $width-max-sm){
+    margin-top: 30px;
+  }
   button {
     background-color: transparent;
     color: $primary-color;

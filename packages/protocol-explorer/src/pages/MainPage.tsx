@@ -80,7 +80,7 @@ export class MainPage extends Component<IMainPageProps, IMainPageState> {
         <section className="wrapper-chart">
           <MainChart periodChart={this.state.periodChart} getchange24h={this.getchange24h} />
         </section>
-        <section className="search-container">
+        <section className="search-container pt-75">
           <Search onSearch={this.onSearch} />
         </section>
         <section className="asset-selector-section">

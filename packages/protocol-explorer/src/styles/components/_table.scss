@@ -1,17 +1,33 @@
 .table {
+  @media screen and (max-width: $width-max-lg) {
+    overflow-x: scroll;
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
   .table-row,
   .table-header {
     display: flex;
+    flex-wrap: wrap;
     font-weight: 200;
     font-size: 14px;
     line-height: 1.8;
+    @media screen and (max-width: $width-max-lg) {
+      width: 1100px;
+    }
     a {
       color: $primary-color;
     }
     > div,
     > a {
-      padding-left: 30px;
       box-sizing: border-box;
+      @media screen and (min-width: $width-min-sm){
+        padding-left: 30px;
+      }
+      @media screen and (max-width: $width-max-sm){
+        padding-left: 15px;
+
+      }
     }
   }
   .table-header {
@@ -44,7 +60,7 @@
     &__action {
       width: 20%;
     }
-    &__from{
+    &__from {
       width: 28%;
     }
     &__from-address {
@@ -57,8 +73,14 @@
     }
   }
   .table-row-tx {
-    padding-top: 20px;
-    padding-bottom: 20px;
+    @media screen and (min-width: $width-min-sm){
+      padding-top: 20px;
+      padding-bottom: 20px;
+    }
+    @media screen and (max-width: $width-max-sm){
+      padding-top: 13px;
+      padding-bottom: 13px;
+    }
     &__from {
       display: flex;
       align-items: center;
@@ -66,7 +88,7 @@
         margin-left: 10px;
       }
     }
-    &__action{
+    &__action {
       font-weight: 700;
     }
   }
@@ -133,7 +155,7 @@
       width: 15%;
     }
   }
-  .table-row-loan{
+  .table-row-loan {
     padding-top: 17px;
     padding-bottom: 17px;
     align-items: center;
