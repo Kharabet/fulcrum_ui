@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import { Asset } from "../domain/Asset";
-import { StatsTokenGridCard } from "./StatsTokenGridCard";
 import { StatsTokenGridHeader } from "./StatsTokenGridHeader";
 import { ReserveDetails } from "../domain/ReserveDetails";
 import { IStatsTokenGridRowProps, StatsTokenGridRow } from "./StatsTokenGridRow";
@@ -88,48 +87,29 @@ export class StatsTokenGrid extends Component<IStatsTokenGridProps, IStatsTokenG
   public render() {
 
     if (!this.state.tokenRowsData || !this.state.totalsRow) {
-      return !this.props.isMobileMedia ? (
-        <div className="stats-grid">
-          <StatsTokenGridHeader />
-          <PreloaderChart quantityDots={4} sizeDots={'middle'} title={"Loading"} isOverlay={false} />
-        </div>
-      ) : (
-          <React.Fragment>
-            <div className="stats-grid__header">Stats</div>
-            <div className="stats-grid">
-            </div>
-            <PreloaderChart quantityDots={4} sizeDots={'middle'} title={"Loading"} isOverlay={false} />
-
-          </React.Fragment>
-        );
-    }
-
-    let tokenRows;
-    let totalsRow;
-    if (this.props.isMobileMedia) {
-      tokenRows = this.state.tokenRowsData.map(e => <StatsTokenGridCard key={e.reserveDetails.asset!} {...e} />);
-      totalsRow = (<StatsTokenGridCard key={this.state.totalsRow.reserveDetails.asset!} {...this.state.totalsRow} />);
-    } else {
-      tokenRows = this.state.tokenRowsData.map(e => <StatsTokenGridRow key={e.reserveDetails.asset!} {...e} />);
-      totalsRow = (<StatsTokenGridRow key={this.state.totalsRow.reserveDetails.asset!} {...this.state.totalsRow} />);
-    }
-
-    return !this.props.isMobileMedia ? (
-      <div className="stats-grid">
-        <StatsTokenGridHeader />
-        {tokenRows}
-        {totalsRow}
-      </div>
-    ) : (
+      return (
         <React.Fragment>
-          <div className="stats-grid__header">Stats</div>
-
+          {this.props.isMobileMedia && <div className="stats-grid__title">Stats</div>}
           <div className="stats-grid">
-            {totalsRow}
-            {tokenRows}
+            <PreloaderChart quantityDots={4} sizeDots={'middle'} title={"Loading"} isOverlay={false} />
           </div>
         </React.Fragment>
       );
+    }
+
+    let tokenRows = this.state.tokenRowsData.map(e => <StatsTokenGridRow key={e.reserveDetails.asset!} {...e} />);
+    let totalsRow = (<StatsTokenGridRow key={this.state.totalsRow.reserveDetails.asset!} {...this.state.totalsRow} />);
+
+    return (
+      <React.Fragment>
+        {this.props.isMobileMedia && <div className="stats-grid__title">Stats</div>}
+        <div className="stats-grid">
+          {!this.props.isMobileMedia && <StatsTokenGridHeader />}
+          {tokenRows}
+          {totalsRow}
+        </div>
+      </React.Fragment>
+    );
   }
 
   private static getRowsData = async (reserveDetails: ReserveDetails[]): Promise<IStatsTokenGridRowProps[]> => {
