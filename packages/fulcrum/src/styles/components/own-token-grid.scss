@@ -187,8 +187,8 @@ $primary-dark-color:  rgba(#444e5a,0.4);
   .own-token-grid {
     padding: 0 15px;
     &-row {
-      grid-template-columns: 1fr 1fr 1fr;
-      grid-template-rows: 1fr 1fr 1fr;
+      grid-template-columns: repeat(3,1fr);
+      grid-template-rows: repeat(3,1fr);
       grid-auto-flow: column;
       align-items: baseline;
       padding: 18px 15px 24px;
