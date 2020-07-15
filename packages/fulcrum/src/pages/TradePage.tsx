@@ -65,7 +65,8 @@ interface ITradePageState {
   isLoadingTransaction: boolean;
   request: TradeRequest | undefined,
   resultTx: boolean,
-  isTxCompleted: boolean
+  isTxCompleted: boolean,
+  activePositionType: PositionType
 }
 
 export default class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
@@ -126,7 +127,8 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       isLoadingTransaction: false,
       resultTx: true,
       isTxCompleted: false,
-      request: undefined
+      request: undefined,
+      activePositionType: PositionType.LONG
     };
 
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
@@ -226,6 +228,8 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
                   isLoadingTransaction={this.state.isLoadingTransaction}
                   resultTx={this.state.resultTx}
                   isTxCompleted={this.state.isTxCompleted}
+                  changeGridPositionType={this.changeGridPositionType}
+                  activePositionType={this.state.activePositionType}
                 />
               </React.Fragment>
             )}
@@ -662,7 +666,8 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       defaultLeverage: this.defaultLeverageLong,
       onTrade: this.onTradeRequested,
       changeLoadingTransaction: this.changeLoadingTransaction,
-      isTxCompleted: this.state.isTxCompleted
+      isTxCompleted: this.state.isTxCompleted,
+      changeGridPositionType: this.changeGridPositionType
     });
     tokenRowsData.push({
       baseToken: state.selectedMarket.baseToken,
@@ -671,12 +676,17 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       defaultLeverage: this.defaultLeverageShort,
       onTrade: this.onTradeRequested,
       changeLoadingTransaction: this.changeLoadingTransaction,
-      isTxCompleted: this.state.isTxCompleted
+      isTxCompleted: this.state.isTxCompleted,
+      changeGridPositionType: this.changeGridPositionType
     });
     return tokenRowsData;
   };
 
   public changeLoadingTransaction = (isLoadingTransaction: boolean, request: TradeRequest | undefined, isTxCompleted: boolean, resultTx: boolean) => {
     this.setState({ ...this.state, isLoadingTransaction: isLoadingTransaction, request: request, isTxCompleted: isTxCompleted, resultTx: resultTx })
+  }
+
+  private changeGridPositionType = async (positionType: PositionType) => {
+    await this.setState({ ...this.state, activePositionType: positionType })
   }
 }
