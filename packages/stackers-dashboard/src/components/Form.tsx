@@ -72,8 +72,12 @@ export class Form extends Component<{}, IFormState> {
     StackerProvider.Instance.eventEmitter.removeListener(StackerProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
-  public onConvertClick = async () => {
+  public onBzrxV1ToV2ConvertClick = async () => {
     const receipt = await StackerProvider.Instance.convertBzrxV1ToV2(this.state.bzrxV1Balance.times(10 ** 18));
+    await this.derivedUpdate();
+  }
+  public onIETHtoVBZRXConvertClick = async () => {
+    const receipt = await StackerProvider.Instance.convertIETHToVBZRX(this.state.iEthBalance.times(10 ** 18));
     await this.derivedUpdate();
   }
 
@@ -119,7 +123,7 @@ export class Form extends Component<{}, IFormState> {
             </div>
             <div className="convert-button">
               {this.state.bzrxV1Balance.gt(0) &&
-                <button className="button button-full-width" onClick={this.onConvertClick}>
+                <button className="button button-full-width" onClick={this.onBzrxV1ToV2ConvertClick}>
                   Convert BZRX v1 to v2
                     <span className="notice">You will need to confirm 2 transactions in your wallet.</span>
                 </button>
@@ -127,7 +131,7 @@ export class Form extends Component<{}, IFormState> {
             </div>
             {this.state.iETHSwapRate.gt(0) &&
               <div className="convert-button">
-                <button className="button button-full-width" onClick={this.onConvertClick}>
+                <button className="button button-full-width" onClick={this.onIETHtoVBZRXConvertClick}>
                   Convert&nbsp;
                   <span title={this.state.iEthBalance.toFixed(18)}>{this.state.iEthBalance.toFixed(2)}</span>
                   &nbsp;iETH into&nbsp;

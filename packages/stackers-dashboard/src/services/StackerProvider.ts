@@ -385,6 +385,68 @@ export class StackerProvider {
 
     }
 
+    
+    public async convertIETHToVBZRX(tokenAmount: BigNumber) {
+        let receipt = null;
+
+        const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+        if (!this.contractsSource) return receipt;
+
+        const buyBackContract = await this.contractsSource.getiETHBuyBackContract();
+        if (!account || !buyBackContract) return receipt;
+
+
+        const assetErc20Address = this.contractsSource.getITokenErc20Address(Asset.ETH);
+        if (!assetErc20Address) return receipt;
+        const tokenErc20Contract = await this.contractsSource.getErc20Contract(assetErc20Address);
+
+        // Detecting token allowance
+        const erc20allowance = await tokenErc20Contract.allowance.callAsync(account, buyBackContract.address);
+
+        if (tokenAmount.gt(erc20allowance)) {
+            const approvePromise = await tokenErc20Contract!.approve.sendTransactionAsync(buyBackContract.address, tokenAmount, { from: account });
+        }
+
+
+
+        let gasAmountBN;
+        let gasAmount;
+        try {
+            gasAmount = await buyBackContract.convert.estimateGasAsync(
+                tokenAmount,
+                {
+                    from: account,
+                    gas: this.gasLimit,
+                });
+            gasAmountBN = new BigNumber(gasAmount).multipliedBy(this.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
+
+        }
+        catch (e) {
+            console.log(e);
+            // throw e;
+        }
+
+        let txHash: string = "";
+        try {
+            txHash = await buyBackContract.convert.sendTransactionAsync(
+                tokenAmount,
+                {
+                    from: account,
+                    gas: this.gasLimit,
+                    gasPrice: await this.gasPrice()
+                });
+
+
+        }
+        catch (e) {
+            console.log(e);
+            // throw e;
+        }
+
+        const txReceipt = await this.waitForTransactionMined(txHash);
+        return txReceipt.status === 1 ? txReceipt : null;
+    }
+
     public async convertBzrxV1ToV2(tokenAmount: BigNumber) {
         let receipt = null;
 
