@@ -3,6 +3,7 @@ import { convertContract } from "../contracts/convert";
 import { erc20Contract } from "../contracts/erc20";
 import { BigNumber } from "@0x/utils";
 import { Asset } from "../domain/Asset";
+import { iETHBuyBackContract } from "../contracts/iETHBuyBack";
 
 const ethNetwork = process.env.REACT_APP_ETH_NETWORK;
 
@@ -22,6 +23,8 @@ export class ContractsSource {
 
   private static convertJson: any;
   private static erc20Json: any;
+  private static iETHBuyBack: any;
+
   public networkId: number;
   public canWrite: boolean;
   public saiToDAIBridgeJson: any;
@@ -38,6 +41,7 @@ export class ContractsSource {
     }
     ContractsSource.convertJson = await import(`./../assets/artifacts/${ethNetwork}/convert.json`);
     ContractsSource.erc20Json = await import(`./../assets/artifacts/${ethNetwork}/erc20.json`);
+    ContractsSource.iETHBuyBack = await import(`./../assets/artifacts/${ethNetwork}/iETHBuyBack.json`);
     const iTokenList = (await import(`../assets/artifacts/${ethNetwork}/iTokenList.js`)).iTokenList;
     iTokenList.forEach((val: any, index: any) => {
       // tslint:disable:no-console
@@ -136,6 +140,25 @@ export class ContractsSource {
     return address;
   }
 
+  public getiETHBuyBackAddress(): string {
+    let address: string = "";
+    switch (this.networkId) {
+      case 1:
+        address = "";
+        break;
+      case 3:
+        address = "";
+        break;
+      case 4:
+        address = "";
+        break;
+      case 42:
+        address = "0xFca494CfBa85bB8129A0F74Ca76165c94018BE35";
+        break;
+    }
+    return address;
+  }
+
   public getITokenErc20Address(asset: Asset): string | null {
     let symbol;
     symbol = `i${asset}`;
@@ -156,8 +179,18 @@ export class ContractsSource {
       this.provider
     );
   }
+
+  private async getiETHBuyBackContractRaw(): Promise<iETHBuyBackContract> {
+    await this.Init();
+    return new iETHBuyBackContract(
+      ContractsSource.iETHBuyBack.abi,
+      this.getiETHBuyBackAddress().toLowerCase(),
+      this.provider
+    );
+  }
   public getErc20Contract = _.memoize(this.getErc20ContractRaw);
 
   public getConvertContract = _.memoize(this.getConvertContractRaw);
+  public getiETHBuyBackContract = _.memoize(this.getiETHBuyBackContractRaw);
 
 }

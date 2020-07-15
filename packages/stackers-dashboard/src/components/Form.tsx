@@ -13,6 +13,7 @@ interface IFormState {
   bzrxBalance: BigNumber;
   vBzrxBalance: BigNumber;
   iEthBalance: BigNumber;
+  iETHSwapRate: BigNumber;
 }
 
 export class Form extends Component<{}, IFormState> {
@@ -22,7 +23,8 @@ export class Form extends Component<{}, IFormState> {
       bzrxV1Balance: new BigNumber(0),
       bzrxBalance: new BigNumber(0),
       vBzrxBalance: new BigNumber(0),
-      iEthBalance: new BigNumber(0)
+      iEthBalance: new BigNumber(0),
+      iETHSwapRate: new BigNumber(0),
     };
 
     this._isMounted = false;
@@ -39,12 +41,14 @@ export class Form extends Component<{}, IFormState> {
     const bzrxBalance = (await StackerProvider.Instance.getAssetTokenBalanceOfUser(Asset.BZRX)).div(10 ** 18);
     const vBzrxBalance = (await StackerProvider.Instance.getAssetTokenBalanceOfUser(Asset.vBZRX)).div(10 ** 18);
     const iEthBalance = (await StackerProvider.Instance.getITokenBalanceOfUser(Asset.ETH)).div(10 ** 18);
+    const iETHSwapRate = (await StackerProvider.Instance.getiETHSwapRateWithCheck()).div(10 ** 18);
     this._isMounted && this.setState({
       ...this.state,
       bzrxV1Balance,
       bzrxBalance,
       vBzrxBalance,
-      iEthBalance
+      iEthBalance,
+      iETHSwapRate
     })
   }
 
@@ -97,17 +101,13 @@ export class Form extends Component<{}, IFormState> {
                   <div className="row-footer">{this.state.bzrxV1Balance.gt(0) ? "BZRXv1" : "BZRX"}</div>
                 </div>
                 <div className="row-container">
-                  {/* {this.state.bzrxBalance.gt(0) &&  */}
-                  <React.Fragment>
-                    <div className="row-body">
-                      <span title={this.state.vBzrxBalance.toFixed(18)} className="value">
-                        {this.state.vBzrxBalance.toFixed(2)}
-                        <span className="icon"><VBzrxIcon /></span>
-                      </span>
-                    </div>
-                    <div className="row-footer">vBZRX</div>
-                  </React.Fragment>
-                  {/* } */}
+                  <div className="row-body">
+                    <span title={this.state.vBzrxBalance.toFixed(18)} className="value">
+                      {this.state.vBzrxBalance.toFixed(2)}
+                      <span className="icon"><VBzrxIcon /></span>
+                    </span>
+                  </div>
+                  <div className="row-footer">vBZRX</div>
                 </div>
 
               </div>
@@ -125,7 +125,18 @@ export class Form extends Component<{}, IFormState> {
                 </button>
               }
             </div>
-
+            {this.state.iETHSwapRate.gt(0) &&
+              <div className="convert-button">
+                <button className="button button-full-width" onClick={this.onConvertClick}>
+                  Convert&nbsp;
+                  <span title={this.state.iEthBalance.toFixed(18)}>{this.state.iEthBalance.toFixed(2)}</span>
+                  &nbsp;iETH into&nbsp;
+                  <span title={this.state.iEthBalance.times(this.state.iETHSwapRate).toFixed(18)}>{this.state.iEthBalance.times(this.state.iETHSwapRate).toFixed(4)}</span>
+                  &nbsp;vBZRX
+                    <span className="notice">Make sure you read and understand iETH Buyback Program terms and conditions </span>
+                </button>
+              </div>
+            }
             <div className="group-buttons">
               <button title="Coming soon" className="button" disabled={true}>Stake</button>
               <button title="Coming soon" className="button" disabled={true}>Unstake</button>

@@ -278,18 +278,18 @@ export class StackerProvider {
     }
     public async getITokenBalanceOfUser(asset: Asset): Promise<BigNumber> {
         let result = new BigNumber(0);
-    
+
         if (this.contractsSource) {
-          const precision = AssetsDictionary.assets.get(asset)!.decimals || 18;
-          const address = await this.contractsSource.getITokenErc20Address(asset);
-          if (address) {
-            result = await this.getErc20BalanceOfUser(address);
-            result = result.multipliedBy(10 ** (18 - precision));
-          }
+            const precision = AssetsDictionary.assets.get(asset)!.decimals || 18;
+            const address = await this.contractsSource.getITokenErc20Address(asset);
+            if (address) {
+                result = await this.getErc20BalanceOfUser(address);
+                result = result.multipliedBy(10 ** (18 - precision));
+            }
         }
-    
+
         return result;
-      }
+    }
     public async getAssetTokenBalanceOfUser(asset: Asset): Promise<BigNumber> {
         let result: BigNumber = new BigNumber(0);
         if (asset === Asset.UNKNOWN) {
@@ -366,6 +366,23 @@ export class StackerProvider {
             default:
                 throw new Error("Invalid approval asset!");
         }
+    }
+
+    public getiETHSwapRateWithCheck = async (): Promise<BigNumber> => {
+        let result = new BigNumber(0);
+        const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+        if (!this.contractsSource) return result;
+
+        const buyBackContract = await this.contractsSource.getiETHBuyBackContract();
+        if (!account || !buyBackContract) return result;
+        try {
+        result = await buyBackContract.iETHSwapRateWithCheck.callAsync(account)
+        }
+        catch (e) {
+            console.log(e)
+        }
+        return result;
+
     }
 
     public async convertBzrxV1ToV2(tokenAmount: BigNumber) {
