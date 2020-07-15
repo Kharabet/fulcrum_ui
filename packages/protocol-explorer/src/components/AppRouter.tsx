@@ -159,7 +159,7 @@ export class AppRouter extends Component<any, IAppRouterState>  {
   }
 
   public onProviderTypeSelect = async (connector: AbstractConnector, account?: string) => {
-    if (!this.state.isLoading && account) {
+    if (!this.state.isLoading) {
       ExplorerProvider.Instance.isLoading = true;
 
       await ExplorerProvider.Instance.eventEmitter.emit(ExplorerProviderEvents.ProviderIsChanging);
