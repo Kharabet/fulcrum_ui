@@ -104,16 +104,17 @@ export class Form extends Component<{}, IFormState> {
                   </div>
                   <div className="row-footer">{this.state.bzrxV1Balance.gt(0) ? "BZRXv1" : "BZRX"}</div>
                 </div>
-                <div className="row-container">
-                  <div className="row-body">
-                    <span title={this.state.vBzrxBalance.toFixed(18)} className="value">
-                      {this.state.vBzrxBalance.toFixed(2)}
-                      <span className="icon"><VBzrxIcon /></span>
-                    </span>
+                {this.state.vBzrxBalance.gt(0) &&
+                  <div className="row-container">
+                    <div className="row-body">
+                      <span title={this.state.vBzrxBalance.toFixed(18)} className="value">
+                        {this.state.vBzrxBalance.toFixed(2)}
+                        <span className="icon"><VBzrxIcon /></span>
+                      </span>
+                    </div>
+                    <div className="row-footer">vBZRX</div>
                   </div>
-                  <div className="row-footer">vBZRX</div>
-                </div>
-
+                }
               </div>
               <div className="reward-item">
                 <div className="row-header">My rewards balance:</div>
