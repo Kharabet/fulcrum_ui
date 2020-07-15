@@ -142,6 +142,7 @@ export class Form extends Component<{}, IFormState> {
               <button title="Coming soon" className="button" disabled={true}>Unstake</button>
               <button title="Coming soon" className="button" disabled={true}>Claim Rewards</button>
               <button title="Coming soon" className="button" disabled={true}>Explore Reward Pool</button>
+              <p className="notice">Coming soon</p>
             </div>
           </div>
         </div>

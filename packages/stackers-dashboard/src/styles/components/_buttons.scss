@@ -1,6 +1,13 @@
 .group-buttons {
   display: flex;
   flex-wrap: wrap;
+  .notice{
+    margin: 0 auto;
+    margin-bottom: 20px;
+    font-size: 14px;
+    font-weight: 200;
+    line-height: 1.8;
+  }
   @media screen and (min-width: $width-min-sm) {
     padding: 30px 45px 15px 45px;
     justify-content: space-between;
