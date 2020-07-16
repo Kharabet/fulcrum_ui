@@ -4,9 +4,9 @@
 }
 #chartjs {
   z-index: 1000;
-  width: calc(100%  + 20px);
+  width: calc(100% + 20px);
   margin-left: -10px;
-  canvas{
+  canvas {
     width: 100% !important;
   }
 }
@@ -74,14 +74,28 @@
       height: 50px;
       position: absolute;
     }
+    &:after {
+      content: "";
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      border: 4px solid #fff;
+      position: absolute;
+    }
     &.top {
       &:before {
         top: -47px;
+      }
+      &:after {
+        bottom: 68px;
       }
     }
     &.bottom {
       &:before {
         bottom: -47px;
+      }
+      &:after {
+        top: 69px;
       }
     }
     &.down {
@@ -92,7 +106,8 @@
           border-color: $red-color transparent transparent transparent;
         }
       }
-      &:before {
+      &:before,
+      &:after {
         background-color: $red-color;
       }
     }
@@ -104,7 +119,8 @@
           border-color: transparent transparent $green-color transparent;
         }
       }
-      &:before {
+      &:before,
+      &:after {
         background-color: $green-color;
       }
     }
@@ -117,6 +133,9 @@
       }
       &:before {
         left: 5px;
+      }
+      &:after {
+        left: -5px;
       }
     }
     &.right {
@@ -131,6 +150,9 @@
       }
       &:before {
         right: 3px;
+      }
+      &:after {
+        right: -7px;
       }
     }
   }

@@ -135,11 +135,6 @@ export class MainChart extends Component<IMainChartProps, IMainChartState> {
           borderColor: '#276BFB',
           pointBackgroundColor: 'transparent',
           pointBorderColor: 'transparent',
-          pointHoverBorderColor: '#fff',
-          pointBorderWidth: 4,
-          pointHoverBorderWidth: 4,
-          pointRadius: 9,
-          pointHoverRadius: 9,
           change24: this.state.change24
         },
         ]
@@ -182,6 +177,7 @@ export class MainChart extends Component<IMainChartProps, IMainChartState> {
         enabled: false,
         mode: 'index',
         position: 'nearest',
+        intersect: false,
         custom: this.customTooltips,
         callbacks: {
           label: function (tooltipItems: any, data: any) {
