@@ -45,20 +45,20 @@ export class WalletSelectionPage extends PureComponent<IWalletSelectionPageProps
       <div className="wallet-selection-page">
         <HeaderHome isLoading={this.props.isLoading} doNetworkConnect={this.props.doNetworkConnect} />
         <div className="wallet-selection-page__main">
-          <div className="wallet-selection-page__main-centeredOverlay" style={!TorqueProvider.Instance.isLoading ? { display: `none`} : undefined}>
-              <span>Loading...</span>
+          <div className="wallet-selection-page__main-centeredOverlay" style={!TorqueProvider.Instance.isLoading ? { display: `none` } : undefined}>
+            <span>Loading...</span>
           </div>
           <WalletTypeSelector onSelectWalletType={this.onSelectWalletType} />
           <ProviderSelector onSelectProvider={this.props.onSelectProvider} />
         </div>
-        <Footer isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen}/>
+        <Footer isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
       </div>
     );
   }
 
   private onSelectWalletType = async (walletType: WalletType) => {
     TorqueProvider.Instance.isLoading = true;
-    
+
     if (walletType === WalletType.Web3) {
       if (this.props.onSelectProvider) {
         await this.props.onSelectProvider(ProviderType.MetaMask);
@@ -72,7 +72,8 @@ export class WalletSelectionPage extends PureComponent<IWalletSelectionPageProps
           NavService.Instance.History.replace(
             NavService.Instance.getBorrowAddress(WalletType.Web3)
           );
-        } if (this.props.match.params.destinationAbbr === "t") {
+        }
+        if (this.props.match.params.destinationAbbr === "t") {
           if (accountAddress) {
             NavService.Instance.History.replace(
               NavService.Instance.getDashboardAddress(WalletType.Web3, accountAddress)
@@ -86,7 +87,7 @@ export class WalletSelectionPage extends PureComponent<IWalletSelectionPageProps
       if (this.props.onSelectProvider) {
         await this.props.onSelectProvider(ProviderType.None);
       }
-      
+
       TorqueProvider.Instance.providerType = ProviderType.None;
 
       if (this.props.match.params.destinationAbbr === "b") {

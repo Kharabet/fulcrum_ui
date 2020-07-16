@@ -143,7 +143,7 @@ export class TorqueProvider {
       this.unsupportedNetwork = false;
       providerData = await Web3ConnectionFactory.getWeb3Provider(providerType, this.eventEmitter);
     } catch(e) {
-      // console.log(e);
+      console.log(e);
       this.isLoading = false;
 
       return;
