@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import { HistoryTokenGridHeader } from "./HistoryTokenGridHeader";
 import { IHistoryTokenGridRowProps, HistoryTokenGridRow } from "./HistoryTokenGridRow";
-import { HistoryTokenCardMobile } from "./HistoryTokenCardMobile";
 import { ReactComponent as ArrowPagination } from "../assets/images/icon_pagination.svg";
 
 import "../styles/components/history-token-grid.scss";
@@ -34,32 +33,17 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
     this.setState({ ...this.state, quantityGrids: quantityGrids, isLastRow: isLastRow })
   }
   public render() {
-    return !this.props.isMobileMedia ? this.renderDesktop() : this.renderMobile();
-  }
-
-  private renderDesktop = () => {
     const historyRows = this.props.historyRowsData.slice(this.quantityVisibleRow * this.state.numberPagination, this.quantityVisibleRow * this.state.numberPagination + this.quantityVisibleRow).map((e, i) => <HistoryTokenGridRow key={i} {...e} />);
     if (historyRows.length === 0) return null;
 
     return (
       <div className="history-token-grid">
-        <HistoryTokenGridHeader />
+        {!this.props.isMobileMedia && <HistoryTokenGridHeader />}
         {historyRows}
-        <div className="pagination">
+        {!this.props.isMobileMedia && <div className="pagination">
           <div className={`prev ${this.state.numberPagination === 0 ? `disabled` : ``}`} onClick={this.prevPagination}><ArrowPagination /></div>
           <div className={`next ${this.state.numberPagination === this.state.quantityGrids || this.state.isLastRow ? `disabled` : ``}`} onClick={this.nextPagination}><ArrowPagination /></div>
-        </div>
-      </div>
-    );
-  }
-
-  private renderMobile = () => {
-    const historyRows = this.props.historyRowsData.map((e, i) => <HistoryTokenCardMobile key={i} {...e} />);
-    if (historyRows.length === 0) return null;
-
-    return (
-      <div className="history-token-cards">
-        {historyRows}
+        </div>}
       </div>
     );
   }
