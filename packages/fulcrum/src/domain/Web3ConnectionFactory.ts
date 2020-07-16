@@ -112,7 +112,7 @@ export class Web3ConnectionFactory {
           subProvider = await subProvider.getProvider({ networkName: process.env.REACT_APP_ETH_NETWORK ? process.env.REACT_APP_ETH_NETWORK : undefined });
           providerEngine.addProvider(new SignerSubprovider(subProvider));
           canWrite = true;
-        } catch(e) {
+        } catch (e) {
           // console.log(e);
         }
       } else if (providerType === ProviderType.Squarelink) {
@@ -126,7 +126,7 @@ export class Web3ConnectionFactory {
           // console.log(accounts);
 
           canWrite = true;
-        } catch(e) {
+        } catch (e) {
           // console.log(e);
 
           subProvider = null;
@@ -158,56 +158,56 @@ export class Web3ConnectionFactory {
         const isMobileMedia = (window.innerWidth <= 959);
 
         // if(!isMobileMedia) {
-          Web3ConnectionFactory.metamaskProvider = subProvider;
-          Web3ConnectionFactory.publicStoreUpdate = async (result: any )=> {
-            // console.log(subProvider.publicConfigStore._state);
+        Web3ConnectionFactory.metamaskProvider = subProvider;
+        Web3ConnectionFactory.publicStoreUpdate = async (result: any) => {
+          // console.log(subProvider._publicConfigStore._state);
 
-            let networkIdInt;
-            if (subProvider.isSafe && subProvider.currentSafe) {
-              networkIdInt = 1;
+          let networkIdInt;
+          if (subProvider.isSafe && subProvider.currentSafe) {
+            networkIdInt = 1;
+          } else {
+            // console.log(subProvider._publicConfigStore._state);
+            networkIdInt = parseInt(subProvider._publicConfigStore._state.networkVersion, 10);
+          }
+
+          if (FulcrumProvider.Instance.providerType === ProviderType.MetaMask &&
+            Web3ConnectionFactory.networkId !== networkIdInt) {
+
+            Web3ConnectionFactory.networkId = networkIdInt;
+
+            FulcrumProvider.Instance.unsupportedNetwork = false;
+            await FulcrumProvider.Instance.setWeb3ProviderFinalize(
+              providerType,
+              [
+                web3Wrapper,
+                providerEngine,
+                true,
+                networkIdInt
+              ]);
+
+            await eventEmitter.emit(
+              FulcrumProviderEvents.ProviderChanged,
+              new ProviderChangedEvent(providerType, web3Wrapper)
+            );
+
+            return;
+          }
+
+          if (result.selectedAddress !== FulcrumProvider.Instance.accounts[0]) {
+            if (FulcrumProvider.Instance.accounts.length === 0) {
+              FulcrumProvider.Instance.accounts.push(result.selectedAddress);
             } else {
-              // console.log(subProvider.publicConfigStore._state);
-              networkIdInt = parseInt(subProvider.publicConfigStore._state.networkVersion, 10);
+              FulcrumProvider.Instance.accounts[0] = result.selectedAddress;
             }
 
-            if (FulcrumProvider.Instance.providerType === ProviderType.MetaMask &&
-              Web3ConnectionFactory.networkId !== networkIdInt) {
+            eventEmitter.emit(
+              FulcrumProviderEvents.ProviderChanged,
+              new ProviderChangedEvent(providerType, web3Wrapper)
+            );
 
-              Web3ConnectionFactory.networkId = networkIdInt;
-
-              FulcrumProvider.Instance.unsupportedNetwork = false;
-              await await FulcrumProvider.Instance.setWeb3ProviderFinalize(
-                providerType,
-                [
-                  web3Wrapper,
-                  providerEngine,
-                  true,
-                  networkIdInt
-                ]);
-
-              await eventEmitter.emit(
-                FulcrumProviderEvents.ProviderChanged,
-                new ProviderChangedEvent(providerType, web3Wrapper)
-              );
-
-              return;
-            }
-
-            if (result.selectedAddress !== FulcrumProvider.Instance.accounts[0]) {
-              if (FulcrumProvider.Instance.accounts.length === 0) {
-                FulcrumProvider.Instance.accounts.push(result.selectedAddress);
-              } else {
-                FulcrumProvider.Instance.accounts[0] = result.selectedAddress;
-              }
-
-              eventEmitter.emit(
-                FulcrumProviderEvents.ProviderChanged,
-                new ProviderChangedEvent(providerType, web3Wrapper)
-              );
-
-              return;
-            }
-          };
+            return;
+          }
+        };
         // }else{
         //
         //   let networkIdInt = 1;;
@@ -215,8 +215,8 @@ export class Web3ConnectionFactory {
         //       networkIdInt = 1;
         //     }
         //     // else {
-        //     //   // console.log(subProvider.publicConfigStore._state);
-        //     //   networkIdInt = parseInt(subProvider.publicConfigStore._state.networkVersion, 10);
+        //     //   // console.log(subProvider._publicConfigStore._state);
+        //     //   networkIdInt = parseInt(subProvider._publicConfigStore._state.networkVersion, 10);
         //     // }
         //
         //
@@ -262,45 +262,96 @@ export class Web3ConnectionFactory {
         //
         // }
 
-        const networkIdInt=1
+        const networkIdInt = 1
         // const isMobileMedia = (window.innerWidth <= 959);
-        if(isMobileMedia){
+        if (isMobileMedia) {
 
-        Web3ConnectionFactory.networkId = networkIdInt;
-            FulcrumProvider.Instance.unsupportedNetwork = false;
-            let metaAccount = Web3ConnectionFactory.metamaskProvider.selectedAddress
+          Web3ConnectionFactory.networkId = networkIdInt;
+          FulcrumProvider.Instance.unsupportedNetwork = false;
+          let metaAccount = Web3ConnectionFactory.metamaskProvider.selectedAddress
 
 
-            // let providerTypeData = providerType
-            if(metaAccount ==undefined){
-              metaAccount =   Web3ConnectionFactory.userAccount.toString();
-            }
-            await FulcrumProvider.Instance.setWeb3ProviderMobileFinalize(
-              providerType,
-              [
-                web3Wrapper,
-                providerEngine,
-                true,
-                networkIdInt,
-                metaAccount,
-              ]);
+          // let providerTypeData = providerType
+          if (metaAccount == undefined) {
+            metaAccount = Web3ConnectionFactory.userAccount.toString();
+          }
+          await FulcrumProvider.Instance.setWeb3ProviderMobileFinalize(
+            providerType,
+            [
+              web3Wrapper,
+              providerEngine,
+              true,
+              networkIdInt,
+              metaAccount,
+            ]);
 
-            await eventEmitter.emit(
-              FulcrumProviderEvents.ProviderChanged,
-              new ProviderChangedEvent(providerType, web3Wrapper)
-            );
+          await eventEmitter.emit(
+            FulcrumProviderEvents.ProviderChanged,
+            new ProviderChangedEvent(providerType, web3Wrapper)
+          );
 
-          }else {
+        } else {
 
-          Web3ConnectionFactory.metamaskProvider.publicConfigStore.on("update", Web3ConnectionFactory.publicStoreUpdate);
+          // Web3ConnectionFactory.metamaskProvider._publicConfigStore.on("update", Web3ConnectionFactory.publicStoreUpdate);
+
+          if (window.ethereum && window.ethereum.on) {
+            window.ethereum.on('chainChanged', async (chainId: string | number) => {
+              Web3ConnectionFactory.networkId = parseInt(chainId.toString())
+              FulcrumProvider.Instance.unsupportedNetwork = false;
+              await FulcrumProvider.Instance.setWeb3ProviderFinalize(
+                providerType,
+                [
+                  web3Wrapper,
+                  providerEngine,
+                  true,
+                  Web3ConnectionFactory.networkId
+                ]);
+
+              await eventEmitter.emit(
+                FulcrumProviderEvents.ProviderChanged,
+                new ProviderChangedEvent(providerType, web3Wrapper)
+              );
+
+            })
+            window.ethereum.on('accountsChanged', (accounts: string[]) => {
+              FulcrumProvider.Instance.accounts[0] = accounts[0]
+              eventEmitter.emit(
+                FulcrumProviderEvents.ProviderChanged,
+                new ProviderChangedEvent(providerType, web3Wrapper)
+              );
+            })
+            window.ethereum.on('networkChanged', async (chainId: string | number) => {
+              Web3ConnectionFactory.networkId = parseInt(chainId.toString())
+
+              FulcrumProvider.Instance.unsupportedNetwork = false;
+              await FulcrumProvider.Instance.setWeb3ProviderFinalize(
+                providerType,
+                [
+                  web3Wrapper,
+                  providerEngine,
+                  true,
+                  Web3ConnectionFactory.networkId
+                ]);
+
+              await eventEmitter.emit(
+                FulcrumProviderEvents.ProviderChanged,
+                new ProviderChangedEvent(providerType, web3Wrapper)
+              );
+
+            })
+          }
+
+          if ((window.ethereum as any).isMetaMask) {
+            ; (window.ethereum as any).autoRefreshOnNetworkChange = false
+          }
         }
       }
 
 
       if (!((subProvider.isSafe && subProvider.currentSafe) || subProvider.isEQLWallet)) {
-        try{
-          Web3ConnectionFactory.networkId = parseInt(subProvider.publicConfigStore._state.networkVersion, 10);
-        }catch (e){
+        try {
+          Web3ConnectionFactory.networkId = parseInt(subProvider._publicConfigStore._state.networkVersion, 10);
+        } catch (e) {
           Web3ConnectionFactory.networkId = 1;
         }
 
@@ -326,13 +377,13 @@ export class Web3ConnectionFactory {
       // @ts-ignore
       window.ethereum.autoRefreshOnNetworkChange = false;
       // if(window.ethereum.selectedAddress){
-        // Web3ConnectionFactory.metamaskProvider['selectedAddress']=account
-        // return account
-        Web3ConnectionFactory.userAccount=account
+      // Web3ConnectionFactory.metamaskProvider['selectedAddress']=account
+      // return account
+      Web3ConnectionFactory.userAccount = account
       // }
       // @ts-ignore
       return window.ethereum;
-    // @ts-ignore
+      // @ts-ignore
     } else if (window.web3) {
       // @ts-ignore
       return window.web3.currentProvider;

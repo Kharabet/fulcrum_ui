@@ -252,6 +252,56 @@ export class Web3ConnectionFactory {
 
         } else {
           Web3ConnectionFactory.metamaskProvider.publicConfigStore.on("update", Web3ConnectionFactory.publicStoreUpdate);
+          if (window.ethereum && window.ethereum.on) {
+            window.ethereum.on('chainChanged', async (chainId: string | number) => {
+              Web3ConnectionFactory.networkId = parseInt(chainId.toString())
+              TorqueProvider.Instance.unsupportedNetwork = false;
+              await TorqueProvider.Instance.setWeb3ProviderFinalize(
+                providerType,
+                [
+                  web3Wrapper,
+                  providerEngine,
+                  true,
+                  Web3ConnectionFactory.networkId
+                ]);
+
+              await eventEmitter.emit(
+                TorqueProviderEvents.ProviderChanged,
+                new ProviderChangedEvent(providerType, web3Wrapper)
+              );
+
+            })
+            window.ethereum.on('accountsChanged', (accounts: string[]) => {
+              TorqueProvider.Instance.accounts[0] = accounts[0]
+              eventEmitter.emit(
+                TorqueProviderEvents.ProviderChanged,
+                new ProviderChangedEvent(providerType, web3Wrapper)
+              );
+            })
+            window.ethereum.on('networkChanged', async (chainId: string | number) => {
+              Web3ConnectionFactory.networkId = parseInt(chainId.toString())
+
+              TorqueProvider.Instance.unsupportedNetwork = false;
+              await TorqueProvider.Instance.setWeb3ProviderFinalize(
+                providerType,
+                [
+                  web3Wrapper,
+                  providerEngine,
+                  true,
+                  Web3ConnectionFactory.networkId
+                ]);
+
+              await eventEmitter.emit(
+                TorqueProviderEvents.ProviderChanged,
+                new ProviderChangedEvent(providerType, web3Wrapper)
+              );
+
+            })
+          }
+
+          if ((window.ethereum as any).isMetaMask) {
+            ; (window.ethereum as any).autoRefreshOnNetworkChange = false
+          }
         }
       }
       if (!((subProvider.isSafe && subProvider.currentSafe) || subProvider.isEQLWallet)) {
