@@ -17,7 +17,7 @@ import { RequestStatus } from "../domain/RequestStatus";
 
 
 export interface ITradeTokenGridRowProps {
-
+  isMobileMedia: boolean;
   baseToken: Asset;
   quoteToken: Asset;
   positionType: PositionType;
@@ -39,7 +39,6 @@ interface ITradeTokenGridRowState {
   isLoadingTransaction: boolean;
   request: TradeRequest | undefined;
   resultTx: boolean;
-  isMobileMedia: boolean;
 }
 
 export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITradeTokenGridRowState> {
@@ -56,7 +55,6 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
       isLoadingTransaction: false,
       request: undefined,
       resultTx: false,
-      isMobileMedia: false
     };
 
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
@@ -131,7 +129,6 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
 
   public componentWillUnmount(): void {
     this._isMounted = false;
-    window.removeEventListener("resize", this.didResize.bind(this));
     FulcrumProvider.Instance.eventEmitter.off(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
     FulcrumProvider.Instance.eventEmitter.off(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
     FulcrumProvider.Instance.eventEmitter.off(FulcrumProviderEvents.AskToOpenProgressDlg, this.onAskToOpenProgressDlg);
@@ -140,8 +137,6 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
 
   public componentDidMount(): void {
     this._isMounted = true;
-    window.addEventListener("resize", this.didResize.bind(this));
-    this.didResize();
     this.derivedUpdate();
   }
 
@@ -163,7 +158,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
   public render() {
     return (
       <React.Fragment>
-        {this.state.isMobileMedia && <div className={`trade-token-grid-first-row`}>
+        {this.props.isMobileMedia && <div className={`trade-token-grid-first-row`}>
           <div className="trade-token-grid-row__col-token-name">
             <div className="trade-token-grid-row__col-token-name--inner">
               {this.props.baseToken}
@@ -176,13 +171,13 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
           </div>
         </div>}
         <div className={`trade-token-grid-row`}>
-          {!this.state.isMobileMedia && <div className="trade-token-grid-row__col-token-name">
+          {!this.props.isMobileMedia && <div className="trade-token-grid-row__col-token-name">
             <div className="trade-token-grid-row__col-token-name--inner">
               {this.props.baseToken}
               <PositionTypeMarkerAlt value={this.props.positionType} />
             </div>
           </div>}
-          {!this.state.isMobileMedia && <div className="trade-token-grid-row__col-position-type">
+          {!this.props.isMobileMedia && <div className="trade-token-grid-row__col-position-type">
             <PositionTypeMarker value={this.props.positionType} />
           </div>}
           <div className="trade-token-grid-row__col-leverage">
@@ -197,7 +192,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
             </div>
           </div>
           <div title={`$${this.state.baseTokenPrice.toFixed(18)}`} className="trade-token-grid-row__col-price">
-            {this.state.isMobileMedia && <span className="trade-token-grid-row__title">Asset Price</span>}
+            {this.props.isMobileMedia && <span className="trade-token-grid-row__title">Asset Price</span>}
             {this.state.baseTokenPrice.gt(0) && !this.state.isLoading
               ? <React.Fragment>
                 <span className="fw-sign">$</span>{this.state.baseTokenPrice.toFixed(2)}
@@ -206,7 +201,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
             }
           </div>
           <div title={`$${this.state.liquidationPrice.toFixed(18)}`} className="trade-token-grid-row__col-liquidation">
-            {this.state.isMobileMedia && <span className="trade-token-grid-row__title">Liquidation Price</span>}
+            {this.props.isMobileMedia && <span className="trade-token-grid-row__title">Liquidation Price</span>}
             {this.state.liquidationPrice.gt(0) && !this.state.isLoading
               ? <React.Fragment>
                 <span className="fw-sign">$</span>{this.state.liquidationPrice.toFixed(2)}
@@ -215,7 +210,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
             }
           </div>
           <div title={this.state.interestRate.gt(0) ? `${this.state.interestRate.toFixed(18)}%` : ``} className="trade-token-grid-row__col-profit">
-            {this.state.isMobileMedia && <span className="trade-token-grid-row__title">Interest APR</span>}
+            {this.props.isMobileMedia && <span className="trade-token-grid-row__title">Interest APR</span>}
 
             {this.state.interestRate.gt(0) && !this.state.isLoading
               ? <React.Fragment>
@@ -256,10 +251,4 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
     this.props.onTrade(request);
     this.props.changeLoadingTransaction(this.state.isLoadingTransaction, request, false, true)
   };
-  private didResize = async () => {
-    const isMobileMedia = (window.innerWidth <= 959);
-    if (isMobileMedia !== this.state.isMobileMedia) {
-      await this._isMounted && this.setState({ isMobileMedia });
-    }
-  }
 }

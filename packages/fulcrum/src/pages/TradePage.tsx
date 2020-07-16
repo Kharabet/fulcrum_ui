@@ -162,6 +162,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
   public componentDidUpdate(prevProps: Readonly<ITradePageProps>, prevState: Readonly<ITradePageState>, snapshot?: any): void {
     if (prevState.selectedMarket !== this.state.selectedMarket ||
       prevState.isTxCompleted !== this.state.isTxCompleted ||
+      prevProps.isMobileMedia !== this.props.isMobileMedia ||
       prevState.showMyTokensOnly !== this.state.showMyTokensOnly) {
       this.derivedUpdate();
     }
@@ -666,7 +667,8 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       onTrade: this.onTradeRequested,
       changeLoadingTransaction: this.changeLoadingTransaction,
       isTxCompleted: this.state.isTxCompleted,
-      changeGridPositionType: this.changeGridPositionType
+      changeGridPositionType: this.changeGridPositionType,
+      isMobileMedia: this.props.isMobileMedia
     });
     tokenRowsData.push({
       baseToken: state.selectedMarket.baseToken,
@@ -676,7 +678,8 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       onTrade: this.onTradeRequested,
       changeLoadingTransaction: this.changeLoadingTransaction,
       isTxCompleted: this.state.isTxCompleted,
-      changeGridPositionType: this.changeGridPositionType
+      changeGridPositionType: this.changeGridPositionType,
+      isMobileMedia: this.props.isMobileMedia
     });
     return tokenRowsData;
   };
