@@ -1,7 +1,7 @@
 .on-chain-indicator {
   display: inline-block;
   height: 100%;
-  height: 49px; 
+  height: 49px;
 }
 
 .on-chain-indicator__container {
@@ -14,10 +14,8 @@
   width: 210px;
   box-sizing: border-box;
   cursor: pointer;
-
   border-radius: 100px;
   border: 1px solid var(--indicator-border);
-
   background-color: rgba(0, 0, 0, 0);
   outline: none;
   .on-chain-indicator__svg {
@@ -28,8 +26,8 @@
     flex-direction: column;
     text-align: left;
     margin-left: 12px;
-    span{
-      font-family: 'Muli', sans-serif;
+    span {
+      font-family: "Muli", sans-serif;
       color: var(--primary-text);
       font-weight: 800;
       font-size: 13px;
@@ -40,10 +38,8 @@
     display: inline-block;
     text-align: center;
     vertical-align: top;
-
     height: 1rem;
     line-height: 2rem;
-
     margin: 0.5rem 1rem;
   }
 
@@ -51,44 +47,44 @@
     display: inline-block;
     text-align: center;
     vertical-align: top;
-
-
     color: var(--primary-text);
     font-size: 0.75rem;
     font-weight: normal;
     font-style: normal;
     font-stretch: normal;
     letter-spacing: normal;
-
     padding: 0 1rem;
   }
-
   .on-chain-indicator__wallet-address {
     color: #758295;
     font-size: 13px;
-    /*display: inline-block;
-    text-align: center;
-    vertical-align: top;
-
-    border-left: solid 1px #758295;
-
-    line-height: 2rem;
-
-    color: #758295;
-    font-size: 0.75rem;
-    font-weight: normal;
-    font-style: normal;
-    font-stretch: normal;
-    letter-spacing: normal;
-
-    padding: 0 1rem;
-
-    text-decoration: none;*/
   }
+
   span.on-chain-indicator__wallet-address,
-  span.on-chain-indicator__provider-txt{
+  span.on-chain-indicator__provider-txt {
     justify-content: center;
     display: flex;
     width: 100%;
+  }
+}
+@media screen and (max-width: $mobile-version-max-width) {
+  .on-chain-indicator {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin-top: 0;
+  }
+  .on-chain-indicator__container {
+    margin: 0;
+    .on-chain-indicator__provider-img {
+      margin: 0.5rem 0.5rem;
+    }
+    .on-chain-indicator__wallet-address {
+      padding: 0 0.5rem;
+      border-left: solid 0px;
+    }
+    a.on-chain-indicator__wallet-address {
+      padding: 0;
+    }
   }
 }
