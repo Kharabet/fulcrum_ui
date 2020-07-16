@@ -100,6 +100,8 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
 
     return colors;
   }
+
+
   public render() {
     const asset = AssetsDictionary.assets.get(this.state.asset) as AssetDetails;
 
@@ -115,10 +117,15 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
           backgroundColor: "transparent",
           pointBackgroundColor: 'transparent',
           pointBorderColor: 'transparent',
+          pointHoverBorderColor: '#fff',
           hoverBorderColor: '#276BFB',
           hoverBackgroundColor: '#276BFB',
           borderColor: '#276BFB',
-          borderWidth: 2
+          borderWidth: 4,
+          pointBorderWidth: 4,
+          pointHoverBorderWidth: 4,
+          pointRadius: 9,
+          pointHoverRadius: 9,
         },
         {
           label: 'Supply APR, %',
@@ -127,10 +134,15 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
           backgroundColor: "transparent",
           pointBackgroundColor: 'transparent',
           pointBorderColor: 'transparent',
+          pointHoverBorderColor: '#fff',
           hoverBorderColor: '#33DFCC',
           hoverBackgroundColor: '#33DFCC',
           borderColor: '#33DFCC',
-          borderWidth: 2
+          borderWidth: 2,
+          pointBorderWidth: 4,
+          pointHoverBorderWidth: 4,
+          pointRadius: 9,
+          pointHoverRadius: 9,
         },
         {
           label: 'Utilization, %',
@@ -139,15 +151,21 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
           backgroundColor: "transparent",
           pointBackgroundColor: 'transparent',
           pointBorderColor: 'transparent',
+          pointHoverBorderColor: '#fff',
           hoverBorderColor: '#B79EFF',
           hoverBackgroundColor: '#B79EFF',
           borderColor: '#B79EFF',
-          borderWidth: 2
+          borderWidth: 2,
+          pointBorderWidth: 4,
+          pointHoverBorderWidth: 4,
+          pointRadius: 9,
+          pointHoverRadius: 9,
         }]
       }
     }
     const canvas = document.createElement('canvas');
     const chartData = getData(canvas);
+    const deviation = (Math.max(...this.state.tvl) - Math.min(...this.state.tvl)) / 50;
     const options = {
       responsive: true,
       scales: {
@@ -172,16 +190,16 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
           ticks: {
             drawTicks: false,
 
-            max: Math.max(...this.state.tvl),
-            min: Math.min(...this.state.tvl),
+            max: Math.max(...this.state.tvl) + deviation,
+            min: Math.min(...this.state.tvl) - deviation
           },
           display: false,
         },
         {
           id: 'B',
           ticks: {
-            max: 101,
-            min: -1,
+            max: 102,
+            min: -2,
             drawTicks: false,
           },
 
@@ -190,7 +208,6 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
       },
       legend: {
         display: false,
-        //usePointStyle: true
       },
       layout: {
         padding: {
@@ -201,11 +218,13 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
       tooltips: {
         enabled: false,
         custom: this.customTooltips,
-        intersect: false,
+        displayColors: true,
         callbacks: {
+
           label: function (tooltipItems: any, data: any) {
             let labels: any = [];
             data.datasets.forEach((item: any) => {
+
               labels.push({ value: item.data[tooltipItems.index], currency: item.label === "TVL" ? true : false, borderColor: item.borderColor });
             });
             return { data: labels };

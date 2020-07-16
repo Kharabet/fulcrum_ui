@@ -19,7 +19,7 @@
     width: 735px;
   }
   @media screen and (max-width: $width-max-sm) {
-    max-width: 540px;
+    justify-content: space-between;
   }
 }
 
@@ -28,8 +28,9 @@
   box-shadow: 0px 18px 50px rgba(89, 112, 133, 0.2);
   border-radius: 16px;
   padding-top: 24px;
-  padding-bottom: 10px;
+  padding-bottom: 15px;
   margin-bottom: 30px;
+  max-width: 255px;
   @media screen and (min-width: $width-min-lg) {
     &:not(:nth-child(4n)) {
       margin-right: 30px;
@@ -43,12 +44,12 @@
       margin-right: 30px;
     }
   }
-  @media screen and (max-width: $width-max-lg)  and (min-width: $width-min-sm) {
+  @media screen and (max-width: $width-max-lg) and (min-width: $width-min-sm) {
     width: calc(100% / 3 - 20px);
   }
   @media screen and (max-width: $width-max-sm) {
     width: calc(50% - 10px);
-    &:nth-child(2n+1) {
+    &:nth-child(2n + 1) {
       margin-right: 20px;
     }
   }
@@ -103,15 +104,20 @@
 }
 .asset-selector-chart {
   width: 85%;
-  @media screen and (min-width: $width-min-xs) {
-    height: 70px;
-  }
+  overflow: hidden;
+  height: 70px;
+  margin-top: -10px;
 
-  @media screen and (max-width: $width-max-xs) {
-    height: 55px;
-  }
+  // @media screen and (max-width: $width-max-xs) {
+  //   height: 55px;
+  // }
   canvas {
-    width: 100% !important;
-    height: 100% !important;
+    margin-top: -20px;
+    width: calc(100% + 11px) !important;
+
+    @media screen and (max-width: $width-max-sm) {
+      margin-top: -15px;
+      width: calc(100% + 6px) !important;
+    }
   }
 }

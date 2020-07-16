@@ -177,6 +177,7 @@ export class MainChart extends Component<IMainChartProps, IMainChartState> {
         enabled: false,
         mode: 'index',
         position: 'nearest',
+        intersect: false,
         custom: this.customTooltips,
         callbacks: {
           label: function (tooltipItems: any, data: any) {
