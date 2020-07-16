@@ -43,6 +43,9 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
         labels.push(new Date(item["timestamp"] * 1000).getDate());
         tvl.push(+item["tvl"]);
       });
+
+      labels.push(labels[0]);
+      tvl.push(tvl[tvl.length - 1]);
     } else {
       console.error(responseJson.message)
     }
@@ -58,7 +61,7 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
     let asset = AssetsDictionary.assets.get(this.props.asset) as AssetDetails;
     let apr = +this.props.apr[`${this.props.asset.toLowerCase()}`];
     let tvl = +this.props.tvl[`${this.props.asset.toLowerCase()}`];
-    const radius = this.state.tvl.map((e, i, arr) => arr.length - 1 === i ? 5 : 0)
+    const radius = this.state.tvl.map((e, i, arr) => arr.length - 2 === i ? 5 : 0)
 
     const getData = (canvas: any) => {
       const ctx: any = canvas.getContext("2d");
@@ -70,12 +73,15 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
           backgroundColor: "transparent",
           borderColor: '#276BFB',
           borderWidth: 3,
-          pointRadius: 2
+          pointBackgroundColor: '#003CDA',
+          pointBorderColor: '#ffffff',
+          pointRadius: radius,
+          pointBorderRadius: 1
         }]
       }
     }
     const canvas = document.createElement('canvas');
-    const deviation = (Math.max(...this.state.tvl) - Math.min(...this.state.tvl)) / 50;
+    const deviation = (Math.max(...this.state.tvl) - Math.min(...this.state.tvl)) / 2;
     const chartData = getData(canvas);
     const options = {
       scaleShowLabels: false,
@@ -132,6 +138,7 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
 
     );
   }
+
   public getRoundedData(value: number) {
     if (value > 100000)
       return `${(value / 1000000).toFixed(1)}m`;
