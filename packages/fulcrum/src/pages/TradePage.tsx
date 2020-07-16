@@ -325,7 +325,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     });
   };
 
-  public onTradeRequested = (request: TradeRequest) => {
+  public onTradeRequested = async (request: TradeRequest) => {
     if (!FulcrumProvider.Instance.contractsSource || !FulcrumProvider.Instance.contractsSource.canWrite) {
       this.props.doNetworkConnect();
       return;
@@ -333,8 +333,8 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
 
     if (request) {
 
-      this.onTabSelect(request.asset, request.quoteToken);
-      this.setState({
+      await this.onTabSelect(request.asset, request.quoteToken);
+      await this.setState({
         ...this.state,
         isTradeModalOpen: true,
         tradeType: request.tradeType,
