@@ -123,6 +123,32 @@ export class iETHBuyBackContract extends BaseContract {
         }
     };
 
+    public whitelist = {
+        async callAsync(
+            buyer: string,
+            callData: Partial<CallData> = {},
+            defaultBlock?: BlockParam
+        ): Promise<BigNumber> {
+            const self = (this as any) as iETHBuyBackContract;
+            const encodedData = self._strictEncodeArguments("whitelist(address)", [buyer]);
+            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+                {
+                    to: self.address,
+                    ...callData,
+                    data: encodedData
+                },
+                self._web3Wrapper.getContractDefaults()
+            );
+            const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
+            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            const abiEncoder = self._lookupAbiEncoder("whitelist(address)");
+            // tslint:disable boolean-naming
+            const result = abiEncoder.strictDecodeReturnValue<BigNumber>(rawCallResult);
+            // tslint:enable boolean-naming
+            return result;
+        }
+    };
+
     constructor(abi: ContractAbi, address: string, provider: any, txDefaults?: Partial<TxData>) {
         super('oracle', abi, address.toLowerCase(), provider as SupportedProvider, txDefaults);
         classUtils.bindAll(this, ['_abiEncoderByFunctionSignature', 'address', 'abi', '_web3Wrapper']);

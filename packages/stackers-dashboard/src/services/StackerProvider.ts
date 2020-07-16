@@ -368,15 +368,21 @@ export class StackerProvider {
     }
   }
 
-  public getiETHSwapRateWithCheck = async (): Promise<BigNumber> => {
-    let result = new BigNumber(0);
+  public getiETHSwapRateWithCheck = async (): Promise<[BigNumber,BigNumber]> => {
+    let result: [BigNumber,BigNumber] = [new BigNumber(0),new BigNumber(0)];
     const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
     if (!this.contractsSource) return result;
 
     const buyBackContract = await this.contractsSource.getiETHBuyBackContract();
     if (!account || !buyBackContract) return result;
     try {
-      result = await buyBackContract.iETHSwapRateWithCheck.callAsync(account)
+      const rate = await buyBackContract.iETHSwapRateWithCheck.callAsync(account);
+      if (!rate.eq(0)) {
+        result = [
+          rate,
+          await buyBackContract.whitelist.callAsync(account)
+        ];
+      }
     }
     catch (e) {
       console.log(e)

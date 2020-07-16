@@ -14,6 +14,7 @@ interface IFormState {
   vBzrxBalance: BigNumber;
   iEthBalance: BigNumber;
   iETHSwapRate: BigNumber;
+  whitelistAmount: BigNumber;
 }
 
 export class Form extends Component<{}, IFormState> {
@@ -25,6 +26,7 @@ export class Form extends Component<{}, IFormState> {
       vBzrxBalance: new BigNumber(0),
       iEthBalance: new BigNumber(0),
       iETHSwapRate: new BigNumber(0),
+      whitelistAmount: new BigNumber(0)
     };
 
     this._isMounted = false;
@@ -41,14 +43,19 @@ export class Form extends Component<{}, IFormState> {
     const bzrxBalance = (await StackerProvider.Instance.getAssetTokenBalanceOfUser(Asset.BZRX)).div(10 ** 18);
     const vBzrxBalance = (await StackerProvider.Instance.getAssetTokenBalanceOfUser(Asset.vBZRX)).div(10 ** 18);
     const iEthBalance = (await StackerProvider.Instance.getITokenBalanceOfUser(Asset.ETH)).div(10 ** 18);
-    const iETHSwapRate = (await StackerProvider.Instance.getiETHSwapRateWithCheck()).div(10 ** 18);
+    
+    const userData = await StackerProvider.Instance.getiETHSwapRateWithCheck();
+    const iETHSwapRate = userData[0].div(10 ** 18);
+    const whitelistAmount = userData[1].div(10 ** 18);
+
     this._isMounted && this.setState({
       ...this.state,
       bzrxV1Balance,
       bzrxBalance,
       vBzrxBalance,
       iEthBalance,
-      iETHSwapRate
+      iETHSwapRate,
+      whitelistAmount
     })
   }
 
@@ -77,11 +84,20 @@ export class Form extends Component<{}, IFormState> {
     await this.derivedUpdate();
   }
   public onIETHtoVBZRXConvertClick = async () => {
-    const receipt = await StackerProvider.Instance.convertIETHToVBZRX(this.state.iEthBalance.times(10 ** 18));
+    const swapAmountAllowed = this.state.whitelistAmount.lt(this.state.iEthBalance) ?
+      this.state.whitelistAmount :
+      this.state.iEthBalance;
+    const receipt = await StackerProvider.Instance.convertIETHToVBZRX(swapAmountAllowed.times(10 ** 18));
     await this.derivedUpdate();
   }
 
   public render() {
+    console.log(this.state.whitelistAmount.toString(), this.state.iEthBalance.toString());
+    
+    const swapAmountAllowed = this.state.whitelistAmount.lt(this.state.iEthBalance) ?
+      this.state.whitelistAmount :
+      this.state.iEthBalance;
+   
     return (
       <React.Fragment>
         <div className="container">
@@ -130,13 +146,13 @@ export class Form extends Component<{}, IFormState> {
                 </button>
               }
             </div>
-            {this.state.iETHSwapRate.gt(0) && this.state.iEthBalance.gt(0) &&
+            {this.state.iETHSwapRate.gt(0) && swapAmountAllowed.gt(0) &&
               <div className="convert-button">
-                <button className="button button-full-width" onClick={this.onIETHtoVBZRXConvertClick}>
+                <button title={`Convert ${swapAmountAllowed.toFixed(18)} iETH into ${swapAmountAllowed.div(this.state.iETHSwapRate).toFixed(18)} vBZRX`} className="button button-full-width" onClick={this.onIETHtoVBZRXConvertClick}>
                   Convert&nbsp;
-                  <span title={this.state.iEthBalance.toFixed(18)}>{this.state.iEthBalance.toFixed(2)}</span>
+                  <span>{swapAmountAllowed.toFixed(4)}</span>
                   &nbsp;iETH into&nbsp;
-                  <span title={this.state.iEthBalance.div(this.state.iETHSwapRate).toFixed(18)}>{this.state.iEthBalance.div(this.state.iETHSwapRate).toFixed(4)}</span>
+                  <span>{swapAmountAllowed.div(this.state.iETHSwapRate).toFixed(4)}</span>
                   &nbsp;vBZRX
                     <span className="notice">Make sure you read and understand iETH Buyback Program terms and conditions </span>
                 </button>
