@@ -175,14 +175,14 @@ export class Web3ConnectionFactory {
         Web3ConnectionFactory.metamaskProvider = subProvider;
 
         Web3ConnectionFactory.publicStoreUpdate = async (result: any) => {
-          // console.log(Web3ConnectionFactory.metamaskProvider.publicConfigStore._state);
+          // console.log(Web3ConnectionFactory.metamaskProvider._publicConfigStore._state);
 
           let networkIdInt;
           if (Web3ConnectionFactory.metamaskProvider.isSafe && Web3ConnectionFactory.metamaskProvider.currentSafe) {
             networkIdInt = 1;
           } else {
-            // console.log(Web3ConnectionFactory.metamaskProvider.publicConfigStore._state);
-            networkIdInt = parseInt(Web3ConnectionFactory.metamaskProvider.publicConfigStore._state.networkVersion, 10);
+            // console.log(Web3ConnectionFactory.metamaskProvider._publicConfigStore._state);
+            networkIdInt = parseInt(Web3ConnectionFactory.metamaskProvider._publicConfigStore._state.networkVersion, 10);
           }
 
           if (TorqueProvider.Instance.providerType === ProviderType.MetaMask &&
@@ -251,7 +251,7 @@ export class Web3ConnectionFactory {
           );
 
         } else {
-          Web3ConnectionFactory.metamaskProvider.publicConfigStore.on("update", Web3ConnectionFactory.publicStoreUpdate);
+          // Web3ConnectionFactory.metamaskProvider._publicConfigStore.on("update", Web3ConnectionFactory.publicStoreUpdate);
           if (window.ethereum && window.ethereum.on) {
             window.ethereum.on('chainChanged', async (chainId: string | number) => {
               Web3ConnectionFactory.networkId = parseInt(chainId.toString())
@@ -305,8 +305,8 @@ export class Web3ConnectionFactory {
         }
       }
       if (!((subProvider.isSafe && subProvider.currentSafe) || subProvider.isEQLWallet)) {
-        // console.log(subProvider.publicConfigStore._state);
-        Web3ConnectionFactory.networkId = parseInt(subProvider.publicConfigStore._state.networkVersion, 10);
+        // console.log(subProvider._publicConfigStore._state);
+        Web3ConnectionFactory.networkId = parseInt(subProvider._publicConfigStore._state.networkVersion, 10);
       } else {
         Web3ConnectionFactory.networkId = 1;
       }
@@ -450,7 +450,7 @@ export class Web3ConnectionFactory {
     }
 
     if (Web3ConnectionFactory.publicStoreUpdate && Web3ConnectionFactory.metamaskProvider) {
-      Web3ConnectionFactory.metamaskProvider.publicConfigStore.off("update", Web3ConnectionFactory.publicStoreUpdate);
+      // Web3ConnectionFactory.metamaskProvider._publicConfigStore.off("update", Web3ConnectionFactory.publicStoreUpdate);
     }
   }
 
