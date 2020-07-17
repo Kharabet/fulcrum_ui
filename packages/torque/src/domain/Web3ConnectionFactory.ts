@@ -450,7 +450,7 @@ export class Web3ConnectionFactory {
     }
 
     if (Web3ConnectionFactory.publicStoreUpdate && Web3ConnectionFactory.metamaskProvider) {
-      Web3ConnectionFactory.metamaskProvider._publicConfigStore.off("update", Web3ConnectionFactory.publicStoreUpdate);
+      // Web3ConnectionFactory.metamaskProvider._publicConfigStore.off("update", Web3ConnectionFactory.publicStoreUpdate);
     }
   }
 
