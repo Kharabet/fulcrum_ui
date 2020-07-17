@@ -1,6 +1,7 @@
 import React from "react";
 import { ReactComponent as IconArrow } from "../assets/images/icon-tx-arrow.svg";
 import { BigNumber } from "@0x/utils";
+import { Asset } from "../domain/Asset";
 
 export interface ITxRowProps {
   hash: string,
@@ -9,7 +10,8 @@ export interface ITxRowProps {
   account: string,
   etherscanAddressUrl: string,
   quantity: BigNumber,
-  action: string
+  action: string,
+  asset: Asset
 }
 
 export const TxRow = (props: ITxRowProps) => {
@@ -52,7 +54,7 @@ export const TxRow = (props: ITxRowProps) => {
           <IconArrow />
           <span className="table-row-tx__from-address">{getShortHash(props.account, 22)}</span>
         </a>
-        <div className="table-row-tx__quantity">{props.quantity.toFixed(18)}</div>
+  <div className="table-row-tx__quantity">{props.quantity.toFixed(18)}&nbsp;{props.asset}</div>
         <div className="table-row-tx__action">{props.action}</div>
       </div>
     </React.Fragment>
