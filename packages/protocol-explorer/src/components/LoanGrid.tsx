@@ -48,10 +48,12 @@ export class LoanGrid extends Component<ILoanGridProps, ILoanGridState> {
           </div>
           {assetItems}
         </div>
-        <div className="pagination">
-          <div className={`prev ${this.state.numberPagination === 0 ? `disabled` : ``}`} onClick={this.prevPagination}><ArrowPagination /></div>
-          <div className={`next ${this.state.numberPagination === this.state.quantityGrids || this.state.isLastRow ? `disabled` : ``}`} onClick={this.nextPagination}><ArrowPagination /></div>
-        </div>
+        {this.props.events.length > 25 &&
+          <div className="pagination">
+            <div className={`prev ${this.state.numberPagination === 0 ? `disabled` : ``}`} onClick={this.prevPagination}><ArrowPagination /></div>
+            <div className={`next ${this.state.numberPagination === this.state.quantityGrids || this.state.isLastRow ? `disabled` : ``}`} onClick={this.nextPagination}><ArrowPagination /></div>
+          </div>
+        }
       </React.Fragment>
     );
   }
