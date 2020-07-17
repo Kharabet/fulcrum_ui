@@ -31,6 +31,12 @@
   padding-bottom: 15px;
   margin-bottom: 30px;
   max-width: 255px;
+
+  border: 1px solid transparent;
+  &:hover {
+    border-color: #5b88ff;
+  }
+
   @media screen and (min-width: $width-min-lg) {
     &:not(:nth-child(4n)) {
       margin-right: 30px;
@@ -107,7 +113,7 @@
   overflow: hidden;
   height: 70px;
   margin-top: -10px;
-
+  margin-left: -1px;
   // @media screen and (max-width: $width-max-xs) {
   //   height: 55px;
   // }

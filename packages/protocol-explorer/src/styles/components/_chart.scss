@@ -13,6 +13,7 @@
 #chartjs-tooltip {
   opacity: 0;
   position: absolute;
+  pointer-events: none;
   tbody {
     display: flex;
     flex-direction: column;
@@ -160,49 +161,44 @@
 .wrapper-chartjs-token {
   position: relative;
   margin: auto;
-  @media screen and (min-width: $width-min-lg){
+  @media screen and (min-width: $width-min-lg) {
     width: 1110px;
   }
-  @media screen and (max-width: $width-max-lg){
+  @media screen and (max-width: $width-max-lg) {
     width: calc(100% - 30px);
   }
   .chartjs-tooltip-token {
     opacity: 0;
     position: absolute;
+    pointer-events: none;
     tbody {
       display: flex;
       flex-direction: column;
-      .line {
+
+      &:before {
+        content: "";
+        left: -3px;
         width: 1px;
         height: 35px;
-        display: block;
         position: absolute;
+        background-color: #276bfb;
       }
       &.bottom {
+        &:before {
+          top: -25px;
+        }
         .line {
           top: -35px;
         }
-        tr:first-child {
-          order: -1 !important;
-        }
       }
       &.top {
-        .line {
-          bottom: -35px;
-        }
-        tr:first-child {
-          order: 3;
+        &:before {
+          bottom: -24px;
         }
       }
       &.left {
-        .line {
-          left: 7px;
-        }
       }
       &.right {
-        .line {
-          right: 3px;
-        }
         tr td,
         tr th {
           text-align: right;
@@ -211,8 +207,8 @@
     }
   }
 }
-#chartjs-bar{
-  canvas{
+#chartjs-bar {
+  canvas {
     width: 100% !important;
   }
 }

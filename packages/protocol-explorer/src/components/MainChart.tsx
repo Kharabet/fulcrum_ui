@@ -110,7 +110,7 @@ export class MainChart extends Component<IMainChartProps, IMainChartState> {
     let colors: string[] = [];
 
     this.state.data.forEach((e, i) => {
-      colors.push(i % 2 === 0 ? '#E9F4FF' : "#fff");
+      colors.push(i % 4 === 0 ? '#E9F4FF' : "#fff");
     });
 
     return colors;
@@ -148,11 +148,13 @@ export class MainChart extends Component<IMainChartProps, IMainChartState> {
       scales: {
         xAxes: [{
           ticks: {
+            fontColor: "#A9B5C7",
+            fontSize: 15,
             maxRotation: 0,
             minRotation: 0,
             padding: 15,
             callback: (value: any, index: any, values: any) => {
-              return index === 0 || index % 4 !== 0 || index === Object.keys(values).length - 1 ? '' : value;
+              return index === 0 || index % 8 !== 0 || index === Object.keys(values).length - 1 ? '' : value;
             }
           },
           gridLines: {
