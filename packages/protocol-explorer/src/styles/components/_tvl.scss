@@ -1,11 +1,13 @@
 .tvl {
-  line-height: 1.4;
   font-weight: 900;
+  margin-right: 15px;
   @media screen and(min-width: $width-min-sm) {
-    font-size: 44px;
+    font-size: 36px;
+    line-height: 1.8;
   }
   @media screen and(max-width: $width-max-sm) {
     font-size: 16px;
+    line-height: 1.4;
   }
 }
 .tvl-value {

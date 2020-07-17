@@ -26,6 +26,9 @@ button {
     color: $primary-color;
     padding: 8px 13px;
     font-weight: 600;
+    &:hover {
+      color: $primary-color-hover;
+    }
     &.active {
       background-color: $primary-color;
       border-radius: 25px;

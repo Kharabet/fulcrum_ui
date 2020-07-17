@@ -43,6 +43,9 @@ header {
     font-size: 18px;
     margin-right: 15px;
     color: $primary-color;
+    &:hover {
+      color: $primary-color-hover;
+    }
   }
 }
 .header-menu {
@@ -62,6 +65,9 @@ header {
     font-weight: 600;
     font-size: 18px;
     color: $green-color;
+    &:hover {
+      color: $green-label;
+    }
     &:not(:last-child) {
       @media screen and(min-width: $width-min-md) {
         margin-right: 60px;
@@ -101,7 +107,7 @@ header {
     }
   }
 }
-.header_icon{
+.header_icon {
   margin-right: 15px;
 }
 .mobile-menu {
@@ -119,11 +125,11 @@ header {
     padding-right: 15px;
     text-align: center;
     align-self: flex-end;
-    .item-social{
+    .item-social {
       margin-left: auto;
       margin-right: auto;
     }
-    .data-year{
+    .data-year {
       justify-content: center;
     }
   }

@@ -1,8 +1,24 @@
 .on-chain-indicator {
     display: inline-block;
     height: 49px;
-    @media screen and (max-width: $width-max-md){
+    @media screen and (max-width: $width-max-md) {
         margin-top: 55px;
+    }
+    &.deactive {
+        border-radius: 100px;
+        border: 1px solid #5b88ff;
+        &:hover{
+            background-color: #5b88ff;
+            .on-chain-indicator__provider-txt{
+                color: #ffffff;
+            }
+        }
+        .on-chain-indicator__container {
+            border-color: transparent;
+        }
+        .on-chain-indicator__provider-txt {
+            color: #5b88ff;
+        }
     }
 }
 
