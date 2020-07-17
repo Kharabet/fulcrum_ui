@@ -30,7 +30,7 @@ export const LoanRow = (props: ILoanRowProps) => {
   return (
     <React.Fragment>
       <div className="table-row table-row-loan">
-        <a className="table-row-loan__id">{getShortHash(props.loanId, 50)}</a>
+        <div className="table-row-loan__id">{getShortHash(props.loanId, 50)}</div>
         <div title={props.payOffAmount.toFixed(18)} className="table-row-loan__amount">{loanToken.logoSvg.render()} {props.payOffAmount.toFixed(3)}</div>
         <div title={props.seizeAmount.toFixed(18)} className="table-row-loan__collateral">{collateralToken.logoSvg.render()}{props.seizeAmount.toFixed(3)}</div>
         <div className="table-row-loan__action"><button className="action" onClick={onLiquidateClick}>Liquidate</button></div>
