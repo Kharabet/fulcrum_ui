@@ -106,7 +106,7 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
         }
 
         return (
-            <div className="on-chain-indicator">
+            <div className={`on-chain-indicator ${providerTypeDetails !== null ? `active` : `deactive`}`}>
                 <button className="on-chain-indicator__container" onClick={this.props.doNetworkConnect}>
                     {this.renderProviderDisplay(
                         isLoading,

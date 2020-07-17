@@ -39,6 +39,7 @@ a {
     margin-top: 35px;
     .label-chart {
         display: flex;
+        align-items: center;
         @media screen and (min-width: $width-min-sm){
             &:not(:last-child) {
                 margin-right: 35px;
