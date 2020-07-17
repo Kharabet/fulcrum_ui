@@ -154,7 +154,6 @@ export class MainChart extends Component<IMainChartProps, IMainChartState> {
             maxRotation: 0,
             minRotation: 0,
             padding: 15,
-            fontColor: "#a9b5c7",
             callback: (value: any, index: any, values: any) => {
               return index === 0 || index % 8 !== 0 || index === Object.keys(values).length - 1 ? '' : value;
             }
