@@ -32,10 +32,31 @@
   padding-bottom: 15px;
   margin-bottom: 30px;
   max-width: 255px;
+  animation: hoverOut 0.2s;
 
-  border: 1px solid transparent;
   &:hover {
     border-color: #5b88ff;
+    animation: hoverIn 0.2s;
+    box-shadow: 0px 24px 50px rgba(89, 112, 133, 0.3);
+    transform: translateY(-8px);
+  }
+  @keyframes hoverIn {
+    from {
+      transform: translateY(0);
+    }
+
+    to {
+      transform: translateY(-8px);
+    }
+  }
+  @keyframes hoverOut {
+    from {
+      transform: translateY(-8px);
+    }
+
+    to {
+      transform: translateY(0);
+    }
   }
 
   @media screen and (min-width: $width-min-lg) {
