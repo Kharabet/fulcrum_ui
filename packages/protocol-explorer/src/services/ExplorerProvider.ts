@@ -540,13 +540,15 @@ export class ExplorerProvider {
             const price = new BigNumber(parseInt(dataSegments[2], 16));
             const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000);
             const txHash = event.transactionHash;
+            const asset =  this.contractsSource!.getITokenByErc20Address(event.address);
             return new BurnEvent(
                 burner,
                 tokenAmount,
                 assetAmount,
                 price,
                 timeStamp,
-                txHash
+                txHash,
+                asset
             )
         })
         return result;
@@ -573,13 +575,15 @@ export class ExplorerProvider {
             const price = new BigNumber(parseInt(dataSegments[2], 16));
             const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000);
             const txHash = event.transactionHash;
+            const asset = this.contractsSource!.getITokenByErc20Address(event.address);
             return new MintEvent(
                 minter,
                 tokenAmount,
                 assetAmount,
                 price,
                 timeStamp,
-                txHash
+                txHash,
+                asset
             )
         })
         return result;
@@ -599,7 +603,8 @@ export class ExplorerProvider {
                     account: e.user,
                     etherscanAddressUrl: `${etherscanUrl}/address/${e.user}`,
                     quantity: e.positionSize.div(10 ** 18),
-                    action: "Open Fulcrum Loan"
+                    action: "Open Fulcrum Loan",
+                    asset: e.baseToken
                 } as ITxRowProps
             } else if (e instanceof CloseWithSwapEvent) {
                 return {
@@ -609,7 +614,8 @@ export class ExplorerProvider {
                     account: e.user,
                     etherscanAddressUrl: `${etherscanUrl}/address/${e.user}`,
                     quantity: e.loanCloseAmount.div(10 ** 18),
-                    action: "Close Fulcrum Loan"
+                    action: "Close Fulcrum Loan",
+                    asset: e.loanToken
                 } as ITxRowProps
             } else if (e instanceof LiquidationEvent) {
                 return {
@@ -619,7 +625,8 @@ export class ExplorerProvider {
                     account: e.user,
                     etherscanAddressUrl: `${etherscanUrl}/address/${e.user}`,
                     quantity: e.repayAmount.div(10 ** 18),
-                    action: "Liquidate Fulcrum Loan"
+                    action: "Liquidate Fulcrum Loan",
+                    asset: e.loanToken
                 } as ITxRowProps
             } else if (e instanceof CloseWithDepositEvent) {
                 return {
@@ -629,7 +636,8 @@ export class ExplorerProvider {
                     account: e.user,
                     etherscanAddressUrl: `${etherscanUrl}/address/${e.user}`,
                     quantity: e.repayAmount.div(10 ** 18),
-                    action: "Close Torque Loan"
+                    action: "Close Torque Loan",
+                    asset: e.loanToken
                 } as ITxRowProps
             } else if (e instanceof BorrowEvent) {
                 return {
@@ -639,7 +647,8 @@ export class ExplorerProvider {
                     account: e.user,
                     etherscanAddressUrl: `${etherscanUrl}/address/${e.user}`,
                     quantity: e.newPrincipal.div(10 ** 18),
-                    action: "Open Torque Loan"
+                    action: "Open Torque Loan",
+                    asset: e.loanToken
                 } as ITxRowProps
             } else if (e instanceof BurnEvent) {
                 return {
@@ -649,7 +658,8 @@ export class ExplorerProvider {
                     account: e.burner,
                     etherscanAddressUrl: `${etherscanUrl}/address/${e.burner}`,
                     quantity: e.assetAmount.div(10 ** 18),
-                    action: "Burn Token"
+                    action: "Burn Token",
+                    asset: e.asset
                 } as ITxRowProps
             } else { //MintEvent
                 return {
@@ -659,7 +669,8 @@ export class ExplorerProvider {
                     account: e.minter,
                     etherscanAddressUrl: `${etherscanUrl}/address/${e.minter}`,
                     quantity: e.assetAmount.div(10 ** 18),
-                    action: "Mint iToken"
+                    action: "Mint iToken",
+                    asset: e.asset
                 }
             }
         });

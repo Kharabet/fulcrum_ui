@@ -30,6 +30,8 @@ export class ContractsSource {
   private static iBZxJson: any;
   private static oracleJson: any;
 
+  private static iTokenList: any;
+
   public networkId: number;
   public canWrite: boolean;
 
@@ -48,10 +50,10 @@ export class ContractsSource {
     ContractsSource.iBZxJson = await import(`./../assets/artifacts/${ethNetwork}/iBZx.json`);
     ContractsSource.oracleJson = await import(`./../assets/artifacts/${ethNetwork}/oracle.json`);
 
-    const iTokenList = (await import(`../assets/artifacts/${ethNetwork}/iTokenList.js`)).iTokenList;
+    ContractsSource.iTokenList = (await import(`../assets/artifacts/${ethNetwork}/iTokenList.js`)).iTokenList;
 
 
-    iTokenList.forEach((val: any, index: any) => {
+    ContractsSource.iTokenList.forEach((val: any, index: any) => {
       // tslint:disable:no-console
       // console.log(val);
       const t = {
@@ -127,6 +129,14 @@ export class ContractsSource {
   private async getErc20ContractRaw(addressErc20: string): Promise<erc20Contract> {
     await this.Init();
     return new erc20Contract(ContractsSource.erc20Json.abi, addressErc20.toLowerCase(), this.provider);
+  }
+
+  public getITokenByErc20Address(address: string): Asset {
+    let result = Asset.UNKNOWN;
+   
+    //@ts-ignore
+    result = ContractsSource.iTokenList.filter(e => e[1] === address)[0][4].substr(1) as Asset
+    return result;
   }
 
   public getITokenErc20Address(asset: Asset): string | null {

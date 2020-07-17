@@ -9,6 +9,7 @@ export class MintEvent {
   public readonly price: BigNumber; 
   public readonly timeStamp: Date;
   public readonly txHash: string;
+  public readonly asset: Asset;
 
   constructor(
     minter: string,
@@ -16,7 +17,8 @@ export class MintEvent {
     assetAmount: BigNumber,
     price: BigNumber,
     timeStamp: Date,
-    txHash: string
+    txHash: string,
+    asset: Asset
   ) {
     this.minter = minter;
     this.tokenAmount = tokenAmount;
@@ -24,5 +26,6 @@ export class MintEvent {
     this.price = price;
     this.timeStamp = timeStamp;
     this.txHash = txHash;
+    this.asset = asset;
   }
 }
