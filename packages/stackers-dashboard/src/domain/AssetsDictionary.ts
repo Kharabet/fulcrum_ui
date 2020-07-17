@@ -41,7 +41,7 @@ export class AssetsDictionary {
         vBZRX,
         18,
         new Map<number, string | null>([
-          [1, ""],
+          [1, "0xB72B31907C1C95F3650b64b2469e08EdACeE5e8F"],
           [42, "0x6F8304039f34fd6A6acDd511988DCf5f62128a32"] 
         ])
       )
