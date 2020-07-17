@@ -40,14 +40,17 @@ export const TxRow = (props: ITxRowProps) => {
     }
     return Math.floor(seconds) + " seconds";
   }
+  const getShortHash = (hash: string, count: number) => {
+    return hash.substring(0, 8) + '...' + hash.substring(hash.length - count);
+  }
   return (
     <React.Fragment>
       <div className="table-row table-row-tx">
-        <a href={props.etherscanTxUrl} className="table-row-tx__hash">{props.hash}</a>
+        <a href={props.etherscanTxUrl} className="table-row-tx__hash">{getShortHash(props.hash, 14)}</a>
         <div className="table-row-tx__age">{timeSince(props.age)} ago</div>
         <a href={props.etherscanAddressUrl} className="table-row-tx__from">
           <IconArrow />
-          <span className="table-row-tx__from-address">{props.account}</span>
+          <span className="table-row-tx__from-address">{getShortHash(props.account, 22)}</span>
         </a>
         <div className="table-row-tx__quantity">{props.quantity.toFixed(18)}</div>
         <div className="table-row-tx__action">{props.action}</div>
