@@ -6,6 +6,7 @@ import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { AssetDetails } from "../domain/AssetDetails";
 
 interface IStatsChartProps {
+stats  isMobileMedia: boolean;
 }
 
 interface IStatsChartState {
@@ -15,7 +16,7 @@ interface IStatsChartState {
   utilization: Array<number>;
   apr: Array<number>;
   tvl: Array<number>;
-  activeLabel: string;
+  activeLabel: string;  
 }
 
 export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
@@ -158,10 +159,9 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
             fontColor: "#A9B5C7",
             maxRotation: 0,
             minRotation: 0,
-            padding: 70,
+            padding: this.props.isMobileMedia? 0:70,
             callback: (value: any, index: any, values: any) => {
-              return index === 0 || index % 4 !== 2 || index === Object.keys(values).length - 1 ? '' : value;
-            }
+             return this.props.isMobileMedia ? (index === 0 || index % 16 !== 0 || index === Object.keys(values).length - 1 ? '' : value) : (index === 0 || index % 4 !== 0 || index === Object.keys(values).length - 1 ? '' : value);   }
           },
           gridLines: {
             drawBorder: false,
@@ -206,7 +206,7 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
       },
       layout: {
         padding: {
-          top: 50,
+          top: this.props.isMobileMedia? 0:50,
           bottom: 0
         }
       },
@@ -254,7 +254,7 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
         </div>
         <div className="wrapper-chartjs-token">
           <div id="chartjs">
-            <Line ref="chart" data={chartData} options={options} height={110} />
+            <Line ref="chart" data={chartData} options={options} height={this.props.isMobileMedia?300:110} />
           </div>
           <div id="chartjs-tooltip" className="chartjs-tooltip-token">
             <table>
@@ -277,7 +277,9 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
   public customTooltips = (tooltip: any) => {
     let tooltipEl = document.getElementById('chartjs-tooltip');
     let chartEl = document.getElementById('chartjs');
-    if (!tooltipEl) {
+    let spacingChart = this.props.isMobileMedia ? 15 : 55;
+  
+   if (!tooltipEl) {
       tooltipEl = document.createElement('div');
       tooltipEl.id = 'chartjs-tooltip';
       tooltipEl.innerHTML = "<div></div>"
@@ -308,7 +310,7 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
 
       innerHtml += `</tbody>`;
 
-      innerHtml = `<tbody class="${heighttooltipEl + 35 > tooltip.caretY ? `bottom` : `top`} ${widthChart - tooltip.caretX < widthTooltipEl ? `right` : `left`}${activeLabel}">` + innerHtml;
+      innerHtml = `<tbody class="${heighttooltipEl + spacingChart > tooltip.caretY ? `bottom` : `top`} ${widthChart - tooltip.caretX < widthTooltipEl ? `right` : `left`}${activeLabel}">` + innerHtml;
 
       const tableRoot = tooltipEl.querySelector('table') as HTMLElement;
       tableRoot.innerHTML = innerHtml;
@@ -316,6 +318,6 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
     tooltipEl.style.opacity = '1';
     tooltipEl.style.position = 'absolute';
     tooltipEl.style.left = (widthChart - tooltip.caretX < widthTooltipEl) ? tooltip.caretX - widthTooltipEl + 5 + 'px' : tooltip.caretX - 7 + 'px';
-    tooltipEl.style.top = (heighttooltipEl + 35 < tooltip.caretY) ? tooltip.caretY - heighttooltipEl - 35 + 'px' : tooltip.caretY + 35 + 'px';
+    tooltipEl.style.top = (heighttooltipEl + spacingChart < tooltip.caretY) ? tooltip.caretY - heighttooltipEl - spacingChart + 'px' : tooltip.caretY + 35 + 'px';
   }
 }

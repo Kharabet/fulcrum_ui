@@ -72,7 +72,7 @@
     font-family: "Muli", sans-serif;
     color: #283038;
     font-size: 30px;
-    @media screen and (max-width: $width-max-sm){
+    @media screen and (max-width: $width-max-sm) {
       font-size: 18px;
     }
     span {
@@ -84,7 +84,7 @@
     font-size: 14px;
     color: #8992a4;
     text-align: left;
-    @media screen and (max-width: $width-max-sm){
+    @media screen and (max-width: $width-max-sm) {
       font-size: 12px;
     }
   }
@@ -94,7 +94,7 @@
     span {
       font-size: 16px;
       font-weight: 700;
-      @media screen and (max-width: $width-max-sm){
+      @media screen and (max-width: $width-max-sm) {
         font-size: 12px;
       }
       &:before {
@@ -150,7 +150,6 @@
         @media screen and(max-width: $width-max-sm) {
           bottom: 32px;
         }
-        
       }
     }
     &.bottom {
@@ -213,7 +212,7 @@
         }
         @media screen and(max-width: $width-max-sm) {
           left: -1px;
-        }        
+        }
       }
     }
     &.right {
@@ -235,11 +234,11 @@
         }
         @media screen and(max-width: $width-max-sm) {
           right: -3px;
-        }  
+        }
       }
     }
   }
-  .wrapper-chartjs-token & {  
+  .wrapper-chartjs-token & {
     tbody {
       tr {
         &:nth-child(3) {
@@ -266,26 +265,40 @@
   }
   @media screen and (max-width: $width-max-lg) {
     width: calc(100% - 30px);
+    // min-width: 790px;
+    // transform: translateX(-50%);
+    // left: 50%;
   }
+
   .chartjs-tooltip-token {
     opacity: 0;
     position: absolute;
-
+    
     tbody {
       display: flex;
       flex-direction: column;
       padding: 8px 0;
+      
+  @media screen and (max-width: $width-max-sm) {
+    padding: 5px 0;
+  }
       tr {
         padding: 5px 0;
-        &:first-child {
-          padding: 5px 0;
+       
+        @media screen and (max-width: $width-max-sm) {
+          padding: 2px 0;
         }
         td {
           line-height: 19px;
+        
         }
 
         span {
           font-size: 20px;
+
+          @media screen and (max-width: $width-max-sm) {
+            font-size: 16px;
+          }
         }
         .sign-currency {
           color: inherit;
@@ -295,6 +308,9 @@
             font-weight: 600;
             font-size: 24px;
             color: #283038;
+            @media screen and (max-width: $width-max-sm) {
+              font-size: 20px;
+            }
           }
           .sign-currency {
             color: #758295;
@@ -304,6 +320,9 @@
           display: block;
           font-size: 14px;
           color: #8992a4;
+          @media screen and (max-width: $width-max-sm) {
+            font-size: 12px;
+          }
         }
       }
       .chartjs-tooltip-time {
@@ -358,6 +377,17 @@
         }
         &:after {
           bottom: -46px;
+          
+        }
+        @media screen and (max-width: $width-max-sm) {
+          &:before {
+            bottom: -14px;
+            height: 22px;
+          }
+          &:after {
+            bottom: -26px;
+            
+          }
         }
       }
       &.left {

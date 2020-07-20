@@ -139,7 +139,7 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
           :
           <React.Fragment>
             <section>
-              <StatsChart />
+              <StatsChart isMobileMedia={this.props.isMobileMedia} />
               <div className="flex jc-c labels-container">
                 <div className="label-chart"><span className="bg-green"></span>Supply APR, %</div>
                 <div className="label-chart"><span className="bg-primary"></span>TVL</div>
