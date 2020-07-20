@@ -90,8 +90,8 @@ export class MainPage extends Component<IMainPageProps, IMainPageState> {
           </div>
         </section>
         <section className="wrapper-chart">
-          <MainChart labels={this.state.labels} data={this.state.data} change24={this.state.change24} isMainChart={true} />
-          <MainChart labels={this.state.labels} data={this.state.data} change24={this.state.change24} isMainChart={false} />
+          <MainChart labels={this.state.labels} data={this.state.data} change24={this.state.change24} isMobileMedia={this.props.isMobileMedia} isMainChart={true} />
+          <MainChart labels={this.state.labels} data={this.state.data} change24={this.state.change24} isMobileMedia={this.props.isMobileMedia} isMainChart={false} />
         </section>
         <section className="search-container pt-75">
           <Search onSearch={this.onSearch} />

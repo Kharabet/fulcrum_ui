@@ -6,6 +6,7 @@ interface IMainChartProps {
   data: Array<number>;
   change24: Array<number>;
   isMainChart: boolean;
+  isMobileMedia: boolean;
 }
 
 interface IMainChartState {
@@ -21,6 +22,7 @@ export class MainChart extends Component<IMainChartProps, IMainChartState> {
   public customTooltips = (tooltip: any) => {
     let tooltipEl = document.getElementById('chartjs-tooltip');
     let chartEl = document!.getElementsByClassName('chartjs')[0] as HTMLElement;
+    let spacingChart = this.props.isMobileMedia ? 15 : 55;
     if (!tooltipEl) {
       tooltipEl = document.createElement('div');
       tooltipEl.id = 'chartjs-tooltip';
@@ -45,7 +47,7 @@ export class MainChart extends Component<IMainChartProps, IMainChartState> {
       const titleLines = tooltip.title || [];
       const bodyLines = tooltip.body.map(getBody);
       const footerLines = tooltip.body.map(getFooter);
-      let innerHtml = `<tbody class="${heighttooltipEl + 55 > tooltip.caretY ? `bottom` : ``} ${widthChart - tooltip.caretX < widthTooltipEl ? `right` : `left`}">`;//'<thead>';
+      let innerHtml = `<tbody class="${heighttooltipEl + spacingChart > tooltip.caretY ? `bottom` : ``} ${widthChart - tooltip.caretX < widthTooltipEl ? `right` : `left`}">`;//'<thead>';
       titleLines.forEach(function (title: number) {
         innerHtml += '<tr><th class="chartjs-tooltip-time"><span>' + title + '</span></th></tr>';
       });
@@ -53,7 +55,7 @@ export class MainChart extends Component<IMainChartProps, IMainChartState> {
         innerHtml += '<tr><td class="chartjs-tooltip-value"><span><span class="sign sign-currency">$</span>' + body + '</span></td></tr>';
       });
       footerLines.forEach(function (footer: number) {
-        innerHtml += `<tr><td class="chartjs-tooltip-change24 ${footer < 0 ? `down` : `up`} ${heighttooltipEl + 55 < tooltip.caretY ? `bottom` : `top`} ${widthChart - tooltip.caretX < widthTooltipEl ? `right` : `left`}"><span>${Math.abs(footer).toFixed(5)}%</span></td></tr>`
+        innerHtml += `<tr><td class="chartjs-tooltip-change24 ${footer < 0 ? `down` : `up`} ${heighttooltipEl + spacingChart < tooltip.caretY ? `bottom` : `top`} ${widthChart - tooltip.caretX < widthTooltipEl ? `right` : `left`}"><span>${Math.abs(footer).toFixed(5)}%</span></td></tr>`
       });
       innerHtml += '</tbody>';
       const tableRoot = tooltipEl.querySelector('table') as HTMLElement;
@@ -62,7 +64,7 @@ export class MainChart extends Component<IMainChartProps, IMainChartState> {
     tooltipEl.style.opacity = '1';
     tooltipEl.style.position = 'absolute';
     tooltipEl.style.left = (widthChart - tooltip.caretX < widthTooltipEl) ? tooltip.caretX - widthTooltipEl - 5 + 'px' : tooltip.caretX - 17 + 'px';
-    tooltipEl.style.top = (heighttooltipEl + 55 < tooltip.caretY) ? tooltip.caretY - heighttooltipEl - 55 + 'px' : tooltip.caretY + 55 + 'px';
+    tooltipEl.style.top = (heighttooltipEl + spacingChart < tooltip.caretY) ? tooltip.caretY - heighttooltipEl - spacingChart + 'px' : tooltip.caretY + spacingChart + 'px';
   }
 
   optionsTooltips = {
@@ -118,6 +120,7 @@ export class MainChart extends Component<IMainChartProps, IMainChartState> {
     const chartData = getData(canvas);
     const options = {
       responsive: true,
+      maintainAspectRatio: false,
       scaleShowLabels: false,
       scales: {
         xAxes: [{
@@ -126,9 +129,10 @@ export class MainChart extends Component<IMainChartProps, IMainChartState> {
             fontSize: 15,
             maxRotation: 0,
             minRotation: 0,
-            padding: 15,
-            callback: (value: any, index: any, values: any) => {
-              return index === 0 || index % 8 !== 0 || index === Object.keys(values).length - 1 ? '' : value;
+            padding: this.props.isMobileMedia ? 0 : 15,
+            callback: (value: any, index: any, values: any) => {           
+      
+              return this.props.isMobileMedia ? (index === 0 || index % 8 !== 0 || index === Object.keys(values).length - 1 ? '' : value) : (index === 0 || index % 4 !== 0 || index === Object.keys(values).length - 1 ? '' : value);
             }
           },
           gridLines: {
@@ -149,7 +153,7 @@ export class MainChart extends Component<IMainChartProps, IMainChartState> {
     return (
       <React.Fragment>
         <div className={`chartjs ${!this.props.isMainChart ? `chartjs-back` : ``}`}>
-          <Line data={chartData} options={options} height={50} />
+          <Line data={chartData} options={options} height={this.props.isMobileMedia ? 450 : 50}  />
         </div>
         {this.props.isMainChart &&
           <div id="chartjs-tooltip">
