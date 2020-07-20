@@ -43,7 +43,7 @@
     color: #283038;
     font-size: 30px;
     span {
-      font-weight: 900;
+      font-weight: 800;
     }
   }
   .chartjs-tooltip-time {
@@ -157,6 +157,21 @@
       }
     }
   }
+  .wrapper-chartjs-token & {
+    tbody {
+      tr {
+        &:nth-child(3) {
+          order: 4;
+        }
+        &:first-child {
+          order: -1;
+        }
+        &:last-child {
+          order: 3;
+        }
+      }
+    }
+  }
 }
 .wrapper-chartjs-token {
   position: relative;
@@ -175,14 +190,52 @@
       display: flex;
       flex-direction: column;
 
+      tr {
+        padding-bottom: 10px;
+        &:first-child {
+          padding: 5px 0;
+        }
+        td {
+          line-height: 19px;
+        }
+
+        span {
+          font-size: 20px;
+        }
+        .sign-currency {
+          color: inherit;
+        }
+        &.active {
+          span {
+            font-weight: 600;
+            font-size: 24px;
+            color: #283038;
+          }
+          .sign-currency {
+            color: #758295;
+          }
+        }
+        label {
+          display: block;
+          font-size: 14px;
+          color: #8992a4;
+        }
+      }
+      .chartjs-tooltip-time {
+        margin-top: 5px;
+        span {
+          font-size: 12px;
+          font-weight: 600;
+        }
+      }
       &:before {
         content: "";
-        left: -3px;
-        width: 1px;
+        width: 2px;
         height: 35px;
         position: absolute;
         background-color: #276bfb;
       }
+
       &.bottom {
         &:before {
           top: -25px;
@@ -197,8 +250,15 @@
         }
       }
       &.left {
+        margin-left: -15px;
+        &:before {
+          left: -3px;
+        }
       }
       &.right {
+        &:before {
+          right: 13px;
+        }
         tr td,
         tr th {
           text-align: right;

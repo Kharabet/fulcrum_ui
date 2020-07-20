@@ -127,7 +127,7 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
           pointHoverRadius: 9,
         },
         {
-          label: 'Supply APR, %',
+          label: 'Supply APR',
           data: this.state.apr,
           yAxisID: 'B',
           backgroundColor: "transparent",
@@ -143,8 +143,8 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
           pointHoverRadius: 9,
         },
         {
-          label: 'Utilization, %',
-          yAxisID: 'B',
+          label: 'Utilization',
+          yAxisID: 'C',
           data: this.state.utilization,
           backgroundColor: "transparent",
           pointBackgroundColor: 'transparent',
@@ -202,6 +202,16 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
           },
 
           display: false,
+        },
+        {
+          id: 'C',
+          ticks: {
+            max: 102,
+            min: -2,
+            drawTicks: false,
+          },
+
+          display: false,
         }]
       },
       legend: {
@@ -221,9 +231,10 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
 
           label: function (tooltipItems: any, data: any) {
             let labels: any = [];
+            const activeYScale = '_active' in this ? this['_active'][0]['_yScale']['id'] : '';
             data.datasets.forEach((item: any) => {
 
-              labels.push({ value: item.data[tooltipItems.index], currency: item.label === "TVL" ? true : false, borderColor: item.borderColor });
+              labels.push({ isActive: item.yAxisID === activeYScale, label: item.label, value: item.data[tooltipItems.index], currency: item.label === "TVL" ? true : false, borderColor: item.borderColor });
             });
             return { data: labels };
           }
@@ -295,17 +306,17 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
       return bodyItem.lines[0];
     }
     if (tooltip.body) {
-      const titleLines = tooltip.title || [];
-      const dataLines = tooltip.body.map(getBody);
+      const title = tooltip.title[0] || 0;
+      const body = tooltip.body.map(getBody)[0];
+
       let innerHtml = `<tbody class="${heighttooltipEl + 35 > tooltip.caretY ? `bottom` : `top`} ${widthChart - tooltip.caretX < widthTooltipEl ? `right` : `left`}">`;
-      titleLines.forEach(function (title: number) {
-        innerHtml += `<tr class="chartjs-tooltip-time"><th><span class="line" style="background-color: ${tooltip.labelColors[0].borderColor}"></span><span>${title}</span></th></tr>`;
+
+      innerHtml += `<tr class="chartjs-tooltip-time"><th><span class="line" style="background-color: ${tooltip.labelColors[0].borderColor}"></span><span>${title}</span></th></tr>`;
+
+      body.data.forEach((item: any) => {
+        innerHtml += `<tr class="chartjs-tooltip-value ${item.isActive? `active`:``}"><td><label>${item.label}</label><span ${item.isActive ? ``:`style="color:${item.borderColor}"`}>${item.currency ? `<span class="sign sign-currency" >$</span>` : ``}${item.value.toFixed(3)}${!item.currency ? `<span class="sign sign-currency">%</span>` : ``}</span></td></tr>`;
       });
-      dataLines.forEach(function (body: any) {
-        body.data.forEach((item: any) => {
-          innerHtml += `<tr class="chartjs-tooltip-value"><td><span>${item.currency ? `<span class="sign sign-currency">$</span>` : ``}${item.value.toFixed(3)}</span>${!item.currency ? `<span class="sign sign-currency">%</span>` : ``}</td></tr>`;
-        });
-      });
+
       innerHtml += `</tbody>`;
       const tableRoot = tooltipEl.querySelector('table') as HTMLElement;
       tableRoot.innerHTML = innerHtml;
