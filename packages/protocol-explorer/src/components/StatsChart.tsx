@@ -15,6 +15,7 @@ interface IStatsChartState {
   utilization: Array<number>;
   apr: Array<number>;
   tvl: Array<number>;
+  activeLabel: string;
 }
 
 export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
@@ -24,6 +25,7 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
     super(props);
     this.state = {
       asset: Asset.UNKNOWN,
+      activeLabel:'',
       periodChart: 1,
       labels: [],
       tvl: [],
@@ -117,14 +119,9 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
           backgroundColor: "transparent",
           pointBackgroundColor: 'transparent',
           pointBorderColor: 'transparent',
-          pointHoverBackgroundColor: '#283049',
-          pointHoverBorderColor: '#fff',
           borderColor: '#276BFB',
           borderWidth: 2,
-          pointBorderWidth: 4,
-          pointHoverBorderWidth: 4,
-          pointRadius: 9,
-          pointHoverRadius: 9,
+          pointRadius: 12,
         },
         {
           label: 'Supply APR',
@@ -133,14 +130,9 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
           backgroundColor: "transparent",
           pointBackgroundColor: 'transparent',
           pointBorderColor: 'transparent',
-          pointHoverBackgroundColor: '#283049',
-          pointHoverBorderColor: '#fff',
           borderColor: '#33DFCC',
           borderWidth: 2,
-          pointBorderWidth: 4,
-          pointHoverBorderWidth: 4,
-          pointRadius: 9,
-          pointHoverRadius: 9,
+          pointRadius: 12
         },
         {
           label: 'Utilization',
@@ -149,14 +141,9 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
           backgroundColor: "transparent",
           pointBackgroundColor: 'transparent',
           pointBorderColor: 'transparent',
-          pointHoverBackgroundColor: '#283049',
-          pointHoverBorderColor: '#fff',
           borderColor: '#B79EFF',
           borderWidth: 2,
-          pointBorderWidth: 4,
-          pointHoverBorderWidth: 4,
-          pointRadius: 9,
-          pointHoverRadius: 9,
+          pointRadius: 12
         }]
       }
     }
@@ -169,9 +156,9 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
         xAxes: [{
           ticks: {
             fontColor: "#A9B5C7",
-            fontSize: 14,
             maxRotation: 0,
             minRotation: 0,
+            padding: 70,
             callback: (value: any, index: any, values: any) => {
               return index === 0 || index % 4 !== 2 || index === Object.keys(values).length - 1 ? '' : value;
             }
@@ -187,7 +174,7 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
           id: 'A',
           ticks: {
             drawTicks: false,
-
+          
             max: Math.max(...this.state.tvl) + deviation,
             min: Math.min(...this.state.tvl) - deviation
           },
@@ -219,12 +206,13 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
       },
       layout: {
         padding: {
-          top: 10,
-          bottom: 10
+          top: 50,
+          bottom: 0
         }
       },
       tooltips: {
         enabled: false,
+        mode: 'nearest',
         custom: this.customTooltips,
         displayColors: true,
         callbacks: {
@@ -232,9 +220,11 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
           label: function (tooltipItems: any, data: any) {
             let labels: any = [];
             const activeYScale = '_active' in this ? this['_active'][0]['_yScale']['id'] : '';
+           
             data.datasets.forEach((item: any) => {
 
               labels.push({ isActive: item.yAxisID === activeYScale, label: item.label, value: item.data[tooltipItems.index], currency: item.label === "TVL" ? true : false, borderColor: item.borderColor });
+              
             });
             return { data: labels };
           }
@@ -242,7 +232,6 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
       },
       hover: {
         mode: 'nearest',
-        intersect: true
       },
       elements: {
         point: {
@@ -265,7 +254,7 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
         </div>
         <div className="wrapper-chartjs-token">
           <div id="chartjs">
-            <Line ref="chart" data={chartData} options={options} height={80} />
+            <Line ref="chart" data={chartData} options={options} height={110} />
           </div>
           <div id="chartjs-tooltip" className="chartjs-tooltip-token">
             <table>
@@ -308,16 +297,19 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
     if (tooltip.body) {
       const title = tooltip.title[0] || 0;
       const body = tooltip.body.map(getBody)[0];
-
-      let innerHtml = `<tbody class="${heighttooltipEl + 35 > tooltip.caretY ? `bottom` : `top`} ${widthChart - tooltip.caretX < widthTooltipEl ? `right` : `left`}">`;
-
-      innerHtml += `<tr class="chartjs-tooltip-time"><th><span class="line" style="background-color: ${tooltip.labelColors[0].borderColor}"></span><span>${title}</span></th></tr>`;
+      let activeLabel = '';
+     
+      let innerHtml = `<tr class="chartjs-tooltip-time"><th><span class="line" style="background-color: ${tooltip.labelColors[0].borderColor}"></span><span>${title}</span></th></tr>`;
 
       body.data.forEach((item: any) => {
-        innerHtml += `<tr class="chartjs-tooltip-value ${item.isActive? `active`:``}"><td><label>${item.label}</label><span ${item.isActive ? ``:`style="color:${item.borderColor}"`}>${item.currency ? `<span class="sign sign-currency" >$</span>` : ``}${item.value.toFixed(3)}${!item.currency ? `<span class="sign sign-currency">%</span>` : ``}</span></td></tr>`;
+        if(item.isActive) activeLabel = " " + item.label;
+        innerHtml += `<tr class="chartjs-tooltip-value ${item.isActive? `active ${item.label}`:``}"><td><label>${item.label}</label><span ${item.isActive ? ``:`style="color:${item.borderColor}"`}>${item.currency ? `<span class="sign sign-currency" >$</span>` : ``}${item.value.toFixed(3)}${!item.currency ? `<span class="sign sign-currency">%</span>` : ``}</span></td></tr>`;
       });
 
       innerHtml += `</tbody>`;
+
+      innerHtml = `<tbody class="${heighttooltipEl + 35 > tooltip.caretY ? `bottom` : `top`} ${widthChart - tooltip.caretX < widthTooltipEl ? `right` : `left`}${activeLabel}">` + innerHtml;
+
       const tableRoot = tooltipEl.querySelector('table') as HTMLElement;
       tableRoot.innerHTML = innerHtml;
     }
