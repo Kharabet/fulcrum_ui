@@ -6,7 +6,7 @@ import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { AssetDetails } from "../domain/AssetDetails";
 
 interface IStatsChartProps {
-stats  isMobileMedia: boolean;
+  isMobileMedia: boolean;
 }
 
 interface IStatsChartState {
