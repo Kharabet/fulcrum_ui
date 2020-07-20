@@ -53,7 +53,7 @@ export class MainChart extends Component<IMainChartProps, IMainChartState> {
         innerHtml += '<tr><td class="chartjs-tooltip-value"><span><span class="sign sign-currency">$</span>' + body + '</span></td></tr>';
       });
       footerLines.forEach(function (footer: number) {
-        innerHtml += `<tr><td class="chartjs-tooltip-change24 ${footer < 0 ? `down` : `up`} ${heighttooltipEl + 55 < tooltip.caretY ? `bottom` : `top`} ${widthChart - tooltip.caretX < widthTooltipEl ? `right` : `left`}"><span>${Math.abs(footer).toFixed(4)}%</span></td></tr>`
+        innerHtml += `<tr><td class="chartjs-tooltip-change24 ${footer < 0 ? `down` : `up`} ${heighttooltipEl + 55 < tooltip.caretY ? `bottom` : `top`} ${widthChart - tooltip.caretX < widthTooltipEl ? `right` : `left`}"><span>${Math.abs(footer).toFixed(5)}%</span></td></tr>`
       });
       innerHtml += '</tbody>';
       const tableRoot = tooltipEl.querySelector('table') as HTMLElement;
