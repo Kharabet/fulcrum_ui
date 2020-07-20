@@ -12,9 +12,12 @@ interface IMainPageProps {
   isMobileMedia: boolean;
 }
 interface IMainPageState {
-  periodChart: number,
-  tvl: string,
-  change24h: number
+  periodChart: number;
+  tvl: string;
+  change24h: number;
+  labels: Array<number>;
+  data: Array<number>;
+  change24: Array<number>;
 }
 
 export class MainPage extends Component<IMainPageProps, IMainPageState> {
@@ -26,7 +29,10 @@ export class MainPage extends Component<IMainPageProps, IMainPageState> {
     this.state = {
       periodChart: 1,
       tvl: '1.2',
-      change24h: 0
+      change24h: 0,
+      labels: [],
+      data: [],
+      change24: []
     };
 
     this._isMounted = false;
@@ -41,8 +47,14 @@ export class MainPage extends Component<IMainPageProps, IMainPageState> {
   public componentDidMount(): void {
     this._isMounted = true;
     this.getVaultBalanceUsd();
+    this.getTvlHistory();
   }
 
+  public componentDidUpdate(prevProps: Readonly<IMainPageProps>, prevState: Readonly<IMainPageState>, snapshot?: any): void {
+    if (this.state.periodChart !== prevState.periodChart) {
+      this.getTvlHistory();
+    }
+  }
 
   onSearch = (filter: string) => {
     if (filter === "") {
@@ -78,7 +90,8 @@ export class MainPage extends Component<IMainPageProps, IMainPageState> {
           </div>
         </section>
         <section className="wrapper-chart">
-          <MainChart periodChart={this.state.periodChart} getchange24h={this.getchange24h} />
+          <MainChart labels={this.state.labels} data={this.state.data} change24={this.state.change24} isMainChart={true} />
+          <MainChart labels={this.state.labels} data={this.state.data} change24={this.state.change24} isMainChart={false} />
         </section>
         <section className="search-container pt-75">
           <Search onSearch={this.onSearch} />
@@ -111,7 +124,30 @@ export class MainPage extends Component<IMainPageProps, IMainPageState> {
     return `${(value).toFixed(1)}`;
   }
 
-  public getchange24h = (change24h: number) => {
-    this._isMounted && this.setState({ ...this.state, change24h: change24h });
+  public getTvlHistory = async () => {
+    const startData = new Date().setDate(new Date().getDate() - this.state.periodChart);
+    const endData = new Date().getTime();
+    const pointsNumber = 80;
+    const requestUrl = `${this.apiUrl}/tvl-history?start_date=${startData}&end_date=${endData}&points_number=${pointsNumber}`;
+    const response = await fetch(requestUrl);
+    const responseJson = await response.json();
+    const labels: any = [];
+    const data: any = [];
+    const change24: any = [];
+    const period = this.state.periodChart;
+    if (responseJson.success) {
+      responseJson.data.forEach(function (item: any) {
+        const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        (period === 1)
+          ? labels.push(`${new Date(item["timestamp"]).getHours() % 12}:${new Date(item["timestamp"]).getMinutes() < 10 ? `0${new Date(item["timestamp"]).getMinutes()}` : new Date(item["timestamp"]).getMinutes()}`)
+          : labels.push(`${months[new Date(item["timestamp"]).getMonth()]} ${new Date(item["timestamp"]).getDate()}`);
+        data.push(item["tvl"]);
+        change24.push(item["change24h"]);
+      });
+      this._isMounted && this.setState({ ...this.state, change24h: responseJson.data[Object.keys(responseJson.data).length - 1].change24h });
+    } else {
+      console.error(responseJson.message)
+    }
+    await this.setState({ ...this.state, labels: labels, data: data, change24: change24, });
   }
 }
