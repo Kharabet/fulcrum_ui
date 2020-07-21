@@ -28,6 +28,7 @@ interface ILiquidationsPageProps {
 
 interface ILiquidationsPageState {
   volume30d: BigNumber;
+  transactionsCount30d: number;
   events: ITxRowProps[];
   unhealthyLoans: ILoanRowProps[];
   unhealthyLoansUsd: BigNumber;
@@ -46,6 +47,7 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
     super(props);
     this.state = {
       volume30d: new BigNumber(0),
+      transactionsCount30d: 0,
       unhealthyLoansUsd: new BigNumber(0),
       healthyLoansUsd: new BigNumber(0),
       events: [],
@@ -163,7 +165,7 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
     const unhealthyLoansUsd = unhealthyLoansData.reduce((a, b) => a.plus(b.amountOwedUsd), new BigNumber(0))
     const healthyLoansUsd = healthyLoansData.reduce((a, b) => a.plus(b.amountOwedUsd), new BigNumber(0))
     const liqudiations30d = liquidationEvents.filter((e: LiquidationEvent) => e.timeStamp.getTime() > new Date().setDate(new Date().getDate() - 30))
-
+    const transactionsCount30d = liqudiations30d.length;
     for (let i = 0; i < this.assetsShown.length; i++) {
       const assetRepayAmount = liqudiations30d.filter((e: LiquidationEvent) => e.loanToken === this.assetsShown[i]).reduce((a, b) => a.plus(b.repayAmount), new BigNumber(0));
       const usdRepayAmount = assetRepayAmount.times(assetRates[i].div(10**18)).div(10**18);
@@ -181,6 +183,7 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
     await this.setState({
       ...this.state,
       volume30d,
+      transactionsCount30d,
       events: ExplorerProvider.Instance.getGridItems(liquidationEvents),
       unhealthyLoans,
       isDataLoading: false,
@@ -318,7 +321,7 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
                           </div>
                           <div className="liquidation-data">
                             <div className="liquidation-data-title">30-days Transactions Count</div>
-                            <div className="liquidation-data-value">100,500</div>
+                            <div className="liquidation-data-value">{this.state.transactionsCount30d}</div>
                           </div>
                         </div>
                       </div>
