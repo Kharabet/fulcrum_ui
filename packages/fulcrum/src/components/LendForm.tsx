@@ -301,7 +301,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
           {this.props.asset === Asset.ETH && this.props.lendType === LendType.UNLEND &&
             <React.Fragment>
               <p className="lend-form__notification">You can convert iETH to vBZRX, a token representing BZRX that vests over 4 years with a six month cliff. The current conversion rate is 0.0002 vBZRX per iETH, but the exchange rate will be changed to reflect market rates in the coming days.</p>
-              <p className="lend-form__notification">Read more about Lenders Rescue program <a href="https://bzx.network/blog/compensation-plan">here</a></p>
+              <p className="lend-form__notification">Read more about Lenders Rescue program <a href="https://bzx.network/blog/compensation-plan" target="_blank" rel="noopener noreferrer">here</a></p>
             </React.Fragment>
           }
         </div>
