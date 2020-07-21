@@ -16,7 +16,10 @@ interface IStatsChartState {
   utilization: Array<number>;
   apr: Array<number>;
   tvl: Array<number>;
-  activeLabel: string;  
+  activeLabel: string;
+  tvlWidth: number;
+  aprWidth: number;
+  utilizationWidth: number;
 }
 
 export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
@@ -26,12 +29,15 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
     super(props);
     this.state = {
       asset: Asset.UNKNOWN,
-      activeLabel:'',
+      activeLabel: '',
       periodChart: 1,
       labels: [],
       tvl: [],
       apr: [],
-      utilization: []
+      utilization: [],
+      tvlWidth: 2,
+      aprWidth: 2,
+      utilizationWidth: 2,
     };
     this.assetsShown = [
       Asset.ETH,
@@ -61,9 +67,32 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
 
   public componentDidUpdate(prevProps: Readonly<IStatsChartProps>, prevState: Readonly<IStatsChartState>, snapshot?: any): void {
     if (this.state.periodChart !== prevState.periodChart) {
+      this.setState({ ...this.state, activeLabel: "" })
       this.getAssetStatsHistory();
     }
+    if (this.state.activeLabel !== prevState.activeLabel) {
+      this.setState({
+        ...this.state,
+        tvlWidth: this.getLinesWidth()[0],
+        aprWidth: this.getLinesWidth()[1],
+        utilizationWidth: this.getLinesWidth()[2]
+      })
+    }
   }
+
+  public getLinesWidth() {
+    switch (this.state.activeLabel) {
+      case 'TVL':
+        return [4, 2, 2];
+      case 'Supply APR':
+        return [2, 4, 2];
+      case 'Utilization':
+        return [2, 2, 4];
+      default:
+        return [2, 2, 2];
+    }
+  }
+
 
   public getAssetStatsHistory = async () => {
     const startData = new Date().setDate(new Date().getDate() - this.state.periodChart);
@@ -121,8 +150,8 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
           pointBackgroundColor: 'transparent',
           pointBorderColor: 'transparent',
           borderColor: '#276BFB',
-          borderWidth: 2,
           pointRadius: 12,
+          borderWidth: this.state.tvlWidth,
         },
         {
           label: 'Supply APR',
@@ -132,8 +161,8 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
           pointBackgroundColor: 'transparent',
           pointBorderColor: 'transparent',
           borderColor: '#33DFCC',
-          borderWidth: 2,
-          pointRadius: 12
+          borderWidth: this.state.aprWidth,
+          pointRadius: 12,
         },
         {
           label: 'Utilization',
@@ -143,14 +172,15 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
           pointBackgroundColor: 'transparent',
           pointBorderColor: 'transparent',
           borderColor: '#B79EFF',
-          borderWidth: 2,
-          pointRadius: 12
+          borderWidth: this.state.utilizationWidth,
+          pointRadius: 12,
         }]
       }
     }
     const canvas = document.createElement('canvas');
     const chartData = getData(canvas);
     const deviation = (Math.max(...this.state.tvl) - Math.min(...this.state.tvl)) / 50;
+
     const options = {
       responsive: true,
       scales: {
@@ -159,9 +189,10 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
             fontColor: "#A9B5C7",
             maxRotation: 0,
             minRotation: 0,
-            padding: this.props.isMobileMedia? 0:70,
+            padding: this.props.isMobileMedia ? 0 : 70,
             callback: (value: any, index: any, values: any) => {
-             return this.props.isMobileMedia ? (index === 0 || index % 16 !== 0 || index === Object.keys(values).length - 1 ? '' : value) : (index === 0 || index % 4 !== 0 || index === Object.keys(values).length - 1 ? '' : value);   }
+              return this.props.isMobileMedia ? (index === 0 || index % 16 !== 0 || index === Object.keys(values).length - 1 ? '' : value) : (index === 0 || index % 4 !== 0 || index === Object.keys(values).length - 1 ? '' : value);
+            }
           },
           gridLines: {
             drawBorder: false,
@@ -174,7 +205,6 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
           id: 'A',
           ticks: {
             drawTicks: false,
-          
             max: Math.max(...this.state.tvl) + deviation,
             min: Math.min(...this.state.tvl) - deviation
           },
@@ -206,13 +236,14 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
       },
       layout: {
         padding: {
-          top: this.props.isMobileMedia? 0:50,
+          top: this.props.isMobileMedia ? 0 : 50,
           bottom: 0
         }
       },
       tooltips: {
         enabled: false,
         mode: 'nearest',
+        intersect: false,
         custom: this.customTooltips,
         displayColors: true,
         callbacks: {
@@ -220,19 +251,19 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
           label: function (tooltipItems: any, data: any) {
             let labels: any = [];
             const activeYScale = '_active' in this ? this['_active'][0]['_yScale']['id'] : '';
-           
+
             data.datasets.forEach((item: any) => {
 
               labels.push({ isActive: item.yAxisID === activeYScale, label: item.label, value: item.data[tooltipItems.index], currency: item.label === "TVL" ? true : false, borderColor: item.borderColor });
-              
             });
             return { data: labels };
           }
         }
       },
-      hover: {
+     /* hover: {
         mode: 'nearest',
-      },
+      },*/
+
       elements: {
         point: {
           //radius: 0
@@ -254,7 +285,7 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
         </div>
         <div className="wrapper-chartjs-token">
           <div id="chartjs">
-            <Line ref="chart" data={chartData} options={options} height={this.props.isMobileMedia?300:110} />
+            <Line ref="chart" data={chartData} options={options} height={this.props.isMobileMedia ? 300 : 110} />
           </div>
           <div id="chartjs-tooltip" className="chartjs-tooltip-token">
             <table>
@@ -278,8 +309,8 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
     let tooltipEl = document.getElementById('chartjs-tooltip');
     let chartEl = document.getElementById('chartjs');
     let spacingChart = this.props.isMobileMedia ? 15 : 35;
-  
-   if (!tooltipEl) {
+
+    if (!tooltipEl) {
       tooltipEl = document.createElement('div');
       tooltipEl.id = 'chartjs-tooltip';
       tooltipEl.innerHTML = "<div></div>"
@@ -288,6 +319,10 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
     const heighttooltipEl = tooltipEl.offsetHeight;
     const widthTooltipEl = tooltipEl.offsetWidth;
     const widthChart = chartEl!.offsetWidth;
+
+    if (this.state.activeLabel === "")
+      tooltipEl.style.opacity = '0';
+
     if (tooltip.opacity === 0) {
       tooltipEl.style.opacity = '0';
       tooltipEl.style.left = -widthTooltipEl + 'px';
@@ -299,18 +334,16 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
     if (tooltip.body) {
       const title = tooltip.title[0] || 0;
       const body = tooltip.body.map(getBody)[0];
-      let activeLabel = '';
-     
       let innerHtml = `<tr class="chartjs-tooltip-time"><th><span class="line" style="background-color: ${tooltip.labelColors[0].borderColor}"></span><span>${title}</span></th></tr>`;
 
       body.data.forEach((item: any) => {
-        if(item.isActive) activeLabel = " " + item.label;
-        innerHtml += `<tr class="chartjs-tooltip-value ${item.isActive? `active ${item.label}`:``}"><td><label>${item.label}</label><span ${item.isActive ? ``:`style="color:${item.borderColor}"`}>${item.currency ? `<span class="sign sign-currency" >$</span>` : ``}${item.value.toFixed(3)}${!item.currency ? `<span class="sign sign-currency">%</span>` : ``}</span></td></tr>`;
+        if (item.isActive) this.setState({ ...this.state, activeLabel: item.label });
+        innerHtml += `<tr class="chartjs-tooltip-value ${item.isActive ? `active ${item.label}` : ``}"><td><label>${item.label}</label><span ${item.isActive ? `` : `style="color:${item.borderColor}"`}>${item.currency ? `<span class="sign sign-currency" >$</span>` : ``}${item.value.toFixed(3)}${!item.currency ? `<span class="sign sign-currency">%</span>` : ``}</span></td></tr>`;
       });
 
       innerHtml += `</tbody>`;
 
-      innerHtml = `<tbody class="${heighttooltipEl + spacingChart > tooltip.caretY ? `bottom` : `top`} ${widthChart - tooltip.caretX < widthTooltipEl ? `right` : `left`}${activeLabel}">` + innerHtml;
+      innerHtml = `<tbody class="${heighttooltipEl + spacingChart > tooltip.caretY ? `bottom` : `top`} ${widthChart - tooltip.caretX < widthTooltipEl ? `right ` : `left `}${this.state.activeLabel}">` + innerHtml;
 
       const tableRoot = tooltipEl.querySelector('table') as HTMLElement;
       tableRoot.innerHTML = innerHtml;
@@ -319,5 +352,6 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
     tooltipEl.style.position = 'absolute';
     tooltipEl.style.left = (widthChart - tooltip.caretX < widthTooltipEl) ? tooltip.caretX - widthTooltipEl + 5 + 'px' : tooltip.caretX - 7 + 'px';
     tooltipEl.style.top = (heighttooltipEl + spacingChart < tooltip.caretY) ? tooltip.caretY - heighttooltipEl - spacingChart + 'px' : tooltip.caretY + spacingChart + 'px';
+
   }
 }
