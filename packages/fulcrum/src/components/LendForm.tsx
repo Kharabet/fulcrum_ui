@@ -264,7 +264,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
         ? "Insufficient funds for gas"
         : this.state.maxLendAmount && this.state.maxLendAmount.eq(0)
           ? "Your wallet is empty"
-          : this.state.infoMessage ?  this.state.infoMessage : "";
+          : this.state.infoMessage ? this.state.infoMessage : "";
 
     const lendedAmountEstimateText =
       !this.state.lendedAmountEstimate || this.state.lendedAmountEstimate.eq(0)
@@ -295,9 +295,14 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
             : this.state.assetDetails.reactLogoSvg.render()
 
           }
-          {(this.props.asset === Asset.ETH)
-            ? <span className="lend-form__notification">This pool is currently paying above the standard market rate as it can lack sufficient liquidity to facilitate timely withdrawals. Please understand this risk before proceeding.</span>
-            : null
+          {this.props.asset === Asset.ETH && this.props.lendType === LendType.LEND &&
+            <p className="lend-form__notification">This pool is currently paying above the standard market rate as it can lack sufficient liquidity to facilitate timely withdrawals. Please understand this risk before proceeding.</p>
+          }
+          {this.props.asset === Asset.ETH && this.props.lendType === LendType.UNLEND &&
+            <React.Fragment>
+              <p className="lend-form__notification">You can convert iETH to vBZRX, a token representing BZRX that vests over 4 years with a six month cliff. The current conversion rate is 0.0002 vBZRX per iETH, but the exchange rate will be changed to reflect market rates in the coming days.</p>
+              <p className="lend-form__notification">Read more about Lenders Rescue program <a href="https://bzx.network/blog/compensation-plan">here</a></p>
+            </React.Fragment>
           }
         </div>
         <div className="lend-form__form-container">
