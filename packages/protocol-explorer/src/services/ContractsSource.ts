@@ -3,6 +3,7 @@ import * as _ from "lodash";
 import { Asset } from "../domain/Asset";
 
 import { erc20Contract } from "../contracts/erc20";
+import { DAppHelperContract } from "../contracts/DAppHelper";
 import { iBZxContract } from "../contracts/iBZxContract";
 import { iTokenContract } from "../contracts/iTokenContract";
 import { oracleContract } from "../contracts/oracle";
@@ -29,6 +30,7 @@ export class ContractsSource {
   private static iTokenJson: any;
   private static iBZxJson: any;
   private static oracleJson: any;
+  private static DAppHelperJson: any;
 
   private static iTokenList: any;
 
@@ -49,6 +51,7 @@ export class ContractsSource {
     ContractsSource.erc20Json = await import(`./../assets/artifacts/${ethNetwork}/erc20.json`);
     ContractsSource.iBZxJson = await import(`./../assets/artifacts/${ethNetwork}/iBZx.json`);
     ContractsSource.oracleJson = await import(`./../assets/artifacts/${ethNetwork}/oracle.json`);
+    ContractsSource.DAppHelperJson = await import(`./../assets/artifacts/${ethNetwork}/DAppHelper.json`);
 
     ContractsSource.iTokenList = (await import(`../assets/artifacts/${ethNetwork}/iTokenList.js`)).iTokenList;
 
@@ -133,7 +136,7 @@ export class ContractsSource {
 
   public getITokenByErc20Address(address: string): Asset {
     let result = Asset.UNKNOWN;
-   
+
     //@ts-ignore
     result = ContractsSource.iTokenList.filter(e => e[1] === address)[0][4].substr(1) as Asset
     return result;
@@ -249,6 +252,25 @@ export class ContractsSource {
     return asset;
   }
 
+  private getDAppHelperAddress(): string {
+    let address: string = "";
+    switch (this.networkId) {
+      case 1:
+        address = "0xbfdE53F20d50E41162a6085a9A591f27c9c47652";
+        break;
+      case 3:
+        address = "0x2B2db1E0bDf6485C87Bc2DddEd17E7E3D9ba675E";
+        break;
+      case 4:
+        address = "";
+        break;
+      case 42:
+        address = "0xa40cDd78BFBe0E8ca643081Df43A45ED8C2C12bB";
+        break;
+    }
+
+    return address;
+  }
   private async getOracleContractRaw(): Promise<oracleContract> {
     await this.Init();
     return new oracleContract(
@@ -266,10 +288,22 @@ export class ContractsSource {
     );
   }
 
+
+  private async getDAppHelperContractRaw(): Promise<DAppHelperContract> {
+    await this.Init();
+    return new DAppHelperContract(
+      ContractsSource.DAppHelperJson.abi,
+      this.getDAppHelperAddress().toLowerCase(),
+      this.provider
+    );
+  }
+
   public getErc20Contract = _.memoize(this.getErc20ContractRaw);
   public getAssetFromAddress = _.memoize(this.getAssetFromAddressRaw);
   public getITokenContract = _.memoize(this.getITokenContractRaw);
   public getiBZxContract = _.memoize(this.getiBZxContractRaw);
   public getOracleContract = _.memoize(this.getOracleContractRaw);
+  public getDAppHelperContract = _.memoize(this.getDAppHelperContractRaw);
+
 
 }

@@ -27,6 +27,7 @@ interface ILiquidationsPageProps {
 }
 
 interface ILiquidationsPageState {
+  volume30d: BigNumber;
   events: ITxRowProps[];
   unhealthyLoans: ILoanRowProps[];
   unhealthyLoansUsd: BigNumber;
@@ -39,9 +40,12 @@ interface ILiquidationsPageState {
 export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquidationsPageState> {
   private _isMounted: boolean;
 
+  private readonly assetsShown: Asset[];
+
   constructor(props: any) {
     super(props);
     this.state = {
+      volume30d: new BigNumber(0),
       unhealthyLoansUsd: new BigNumber(0),
       healthyLoansUsd: new BigNumber(0),
       events: [],
@@ -52,6 +56,35 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
       isDataLoading: true
     };
 
+    
+    if (process.env.REACT_APP_ETH_NETWORK === "kovan") {
+      this.assetsShown = [
+        Asset.ETH,
+        Asset.KNC,
+        Asset.DAI
+      ];
+    } else if (process.env.REACT_APP_ETH_NETWORK === "ropsten") {
+      this.assetsShown = [
+        Asset.ETH,
+        Asset.DAI
+      ];
+    } else {
+      this.assetsShown = [
+        Asset.ETH,
+        // Asset.SAI,
+        Asset.DAI,
+        Asset.USDC,
+        Asset.USDT,
+        Asset.SUSD,
+        Asset.WBTC,
+        Asset.LINK,
+        // Asset.MKR,
+        Asset.ZRX,
+        // Asset.BAT,
+        Asset.REP,
+        Asset.KNC
+      ]
+    }
     this._isMounted = false;
     ExplorerProvider.Instance.eventEmitter.on(ExplorerProviderEvents.ProviderAvailable, this.onProviderAvailable);
     ExplorerProvider.Instance.eventEmitter.on(ExplorerProviderEvents.ProviderChanged, this.onProviderChanged);
@@ -122,12 +155,21 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
       });
       return;
     }
-
+    let volume30d = new BigNumber(0);
+    const assetRates = (await ExplorerProvider.Instance.getSwapToUsdRateBatch(this.assetsShown, Asset.DAI))[0];
     const liquidationEvents = await ExplorerProvider.Instance.getLiquidationHistory();
-    const unhealthyLoansData = await ExplorerProvider.Instance.getBzxLoans(0 ,25, true);
-    const healthyLoansData = await ExplorerProvider.Instance.getBzxLoans(0 ,25, false);
+    const unhealthyLoansData = await ExplorerProvider.Instance.getBzxLoans(0, 25, true);
+    const healthyLoansData = await ExplorerProvider.Instance.getBzxLoans(0, 25, false);
     const unhealthyLoansUsd = unhealthyLoansData.reduce((a, b) => a.plus(b.amountOwedUsd), new BigNumber(0))
     const healthyLoansUsd = healthyLoansData.reduce((a, b) => a.plus(b.amountOwedUsd), new BigNumber(0))
+    const liqudiations30d = liquidationEvents.filter((e: LiquidationEvent) => e.timeStamp.getTime() > new Date().setDate(new Date().getDate() - 30))
+
+    for (let i = 0; i < this.assetsShown.length; i++) {
+      const assetRepayAmount = liqudiations30d.filter((e: LiquidationEvent) => e.loanToken === this.assetsShown[i]).reduce((a, b) => a.plus(b.repayAmount), new BigNumber(0));
+      const usdRepayAmount = assetRepayAmount.times(assetRates[i].div(10**18)).div(10**18);
+      volume30d = volume30d.plus(usdRepayAmount);
+    }
+
     this.getChartData(liquidationEvents);
     const unhealthyLoans = unhealthyLoansData.map((e: IActiveLoanData) => ({
       loanId: e.loanData!.loanId,
@@ -138,15 +180,20 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
     }))
     await this.setState({
       ...this.state,
+      volume30d,
       events: ExplorerProvider.Instance.getGridItems(liquidationEvents),
       unhealthyLoans,
       isDataLoading: false,
       unhealthyLoansUsd,
       healthyLoansUsd
     });
-
   }
 
+  private numberWithCommas = (x: number | string) => { 
+    var parts = x.toString().split("."); 
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ","); 
+    return parts.join("."); 
+  }
 
   private onProviderChanged = () => {
     this.derivedUpdate();
@@ -251,86 +298,86 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
       <React.Fragment>
         <Header isMobileMedia={this.props.isMobileMedia} doNetworkConnect={this.props.doNetworkConnect} />
         <main className="flex fd-c ac-c jc-c">
-        {!ExplorerProvider.Instance.unsupportedNetwork ?
-          <React.Fragment>
-            {this.state.isDataLoading
-              ? <section className="pt-90 pb-45">
-                <div className="container">
-                  <Loader quantityDots={5} sizeDots={'large'} title={'Loading'} isOverlay={false} />
-                </div>
-              </section>
-              : <React.Fragment>
-          <section>
-            <div className="container">
-              <div className="flex jc-sb fd-md-c al-c mb-30">
-                <h1>Liquidations</h1>
-                <div className="flex fw-w mt-md-30">
-                  <div className="liquidation-data">
-                    <div className="liquidation-data-title">30-days Volume</div>
-                    <div className="liquidation-data-value"><span className="sign sign-currency">$</span>554,456,945.09</div>
+          {!ExplorerProvider.Instance.unsupportedNetwork ?
+            <React.Fragment>
+              {this.state.isDataLoading
+                ? <section className="pt-90 pb-45">
+                  <div className="container">
+                    <Loader quantityDots={5} sizeDots={'large'} title={'Loading'} isOverlay={false} />
                   </div>
-                  <div className="liquidation-data">
-                    <div className="liquidation-data-title">30-days Transactions Count</div>
-                    <div className="liquidation-data-value">100,500</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="container">
-              <div className="wrapper-chartjs-bar">
-                <div id="chartjs-bar">
-                  <Bar data={chartData} options={options} height={100} />
-                </div>
-                <div id="chartjs-bar-tooltip"><table></table></div>
-              </div>
-              <div className="flex jc-c labels-container">
-                <div className="label-chart"><span className="bg-green"></span>ETH</div>
-                <div className="label-chart"><span className="bg-primary"></span>DAI</div>
-                <div className="label-chart"><span className="bg-secondary"></span>USDC</div>
-              </div>
-            </div>
-          </section>
-        <section className="search-container pt-45">
-          <Search onSearch={this.onSearch} />
-        </section>
-        <section className="pt-90 pt-sm-30">
-          <div className="container">
-            <TxGrid events={this.state.events} />
-          </div>
-        </section>
-        <section className="pt-75">
-          <div className="container">
-            <h2 className="h1 mb-60">Unhealthy Loans</h2>
-            <div className="flex fw-w ai-c">
-              <div className="unhealthy-chart-wrapper">
-                <UnhealthyChart unhealthyLoansUsd={this.state.unhealthyLoansUsd} healthyLoansUsd={this.state.healthyLoansUsd}/>
-              </div>
-              <div className="unhealthy-data-wrapper flex fd-c ai-c">
-                <div className="flex w-100 mb-15">
-                  <div className="unhealthy">Unhealthy&nbsp;<span className="sign sign-currency">$</span>&nbsp;</div>
-                  <span className="unhealthy-value unhealthy-color">{this.state.unhealthyLoansUsd.toFixed(2)}</span>
-                </div>
-                <div className="flex w-100">
-                  <div className="healthy">Healthy&nbsp;<span className="sign sign-currency">$</span>&nbsp;</div>
-                  <span className="healthy-value healthy-color">{this.state.healthyLoansUsd.toFixed(2)}</span>
-                </div>
-              </div>
-            </div>
-            <div className="pt-75">
-              <LoanGrid events={this.state.unhealthyLoans} />
-            </div>
-          </div>
-        </section>
-              </React.Fragment>}
-          </React.Fragment> :
-          <section className="pt-75">
-            <div style={{ textAlign: `center`, fontSize: `2rem`, paddingBottom: `1.5rem` }}>
-              <div style={{ cursor: `pointer` }}>
-                You are connected to the wrong network.
+                </section>
+                : <React.Fragment>
+                  <section>
+                    <div className="container">
+                      <div className="flex jc-sb fd-md-c al-c mb-30">
+                        <h1>Liquidations</h1>
+                        <div className="flex fw-w mt-md-30">
+                          <div className="liquidation-data">
+                            <div className="liquidation-data-title">30-days Volume</div>
+                            <div className="liquidation-data-value"><span className="sign sign-currency">$</span>{this.numberWithCommas(this.state.volume30d.toFixed(2))}</div>
+                          </div>
+                          <div className="liquidation-data">
+                            <div className="liquidation-data-title">30-days Transactions Count</div>
+                            <div className="liquidation-data-value">100,500</div>
+                          </div>
+                        </div>
                       </div>
-            </div>
-          </section>
-        }
+                    </div>
+                    <div className="container">
+                      <div className="wrapper-chartjs-bar">
+                        <div id="chartjs-bar">
+                          <Bar data={chartData} options={options} height={100} />
+                        </div>
+                        <div id="chartjs-bar-tooltip"><table></table></div>
+                      </div>
+                      <div className="flex jc-c labels-container">
+                        <div className="label-chart"><span className="bg-green"></span>ETH</div>
+                        <div className="label-chart"><span className="bg-primary"></span>DAI</div>
+                        <div className="label-chart"><span className="bg-secondary"></span>USDC</div>
+                      </div>
+                    </div>
+                  </section>
+                  <section className="search-container pt-45">
+                    <Search onSearch={this.onSearch} />
+                  </section>
+                  <section className="pt-90 pt-sm-30">
+                    <div className="container">
+                      <TxGrid events={this.state.events} />
+                    </div>
+                  </section>
+                  <section className="pt-75">
+                    <div className="container">
+                      <h2 className="h1 mb-60">Unhealthy Loans</h2>
+                      <div className="flex fw-w ai-c">
+                        <div className="unhealthy-chart-wrapper">
+                          <UnhealthyChart unhealthyLoansUsd={this.state.unhealthyLoansUsd} healthyLoansUsd={this.state.healthyLoansUsd} />
+                        </div>
+                        <div className="unhealthy-data-wrapper flex fd-c ai-c">
+                          <div className="flex w-100 mb-15">
+                            <div className="unhealthy">Unhealthy&nbsp;<span className="sign sign-currency">$</span>&nbsp;</div>
+                            <span className="unhealthy-value unhealthy-color">{this.state.unhealthyLoansUsd.toFixed(2)}</span>
+                          </div>
+                          <div className="flex w-100">
+                            <div className="healthy">Healthy&nbsp;<span className="sign sign-currency">$</span>&nbsp;</div>
+                            <span className="healthy-value healthy-color">{this.state.healthyLoansUsd.toFixed(2)}</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="pt-75">
+                        <LoanGrid events={this.state.unhealthyLoans} />
+                      </div>
+                    </div>
+                  </section>
+                </React.Fragment>}
+            </React.Fragment> :
+            <section className="pt-75">
+              <div style={{ textAlign: `center`, fontSize: `2rem`, paddingBottom: `1.5rem` }}>
+                <div style={{ cursor: `pointer` }}>
+                  You are connected to the wrong network.
+                      </div>
+              </div>
+            </section>
+          }
         </main>
       </React.Fragment>
     );

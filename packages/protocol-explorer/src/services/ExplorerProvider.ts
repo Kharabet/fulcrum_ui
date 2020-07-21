@@ -61,7 +61,7 @@ export class ExplorerProvider {
     public static Instance: ExplorerProvider;
 
     public readonly gasLimit = "4500000";
-    public readonly gasBufferCoeff = new BigNumber("1.06");  
+    public readonly gasBufferCoeff = new BigNumber("1.06");
     public static readonly UNLIMITED_ALLOWANCE_IN_BASE_UNITS = new BigNumber(2).pow(256).minus(1);
 
     public readonly eventEmitter: EventEmitter;
@@ -540,7 +540,7 @@ export class ExplorerProvider {
             const price = new BigNumber(parseInt(dataSegments[2], 16));
             const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000);
             const txHash = event.transactionHash;
-            const asset =  this.contractsSource!.getITokenByErc20Address(event.address);
+            const asset = this.contractsSource!.getITokenByErc20Address(event.address);
             return new BurnEvent(
                 burner,
                 tokenAmount,
@@ -826,6 +826,39 @@ export class ExplorerProvider {
         }
     }
 
+    private getGoodSourceAmountOfAsset(asset: Asset): BigNumber {
+        switch (asset) {
+            case Asset.WBTC:
+                return new BigNumber(10 ** 6);
+            case Asset.USDC:
+            case Asset.USDT:
+                return new BigNumber(10 ** 4);
+            default:
+                return new BigNumber(10 ** 16);
+        }
+    }
+
+    public async getSwapToUsdRateBatch(assets: Asset[], usdToken: Asset): Promise<[BigNumber[], BigNumber[], BigNumber[]]> {
+        let result: [BigNumber[], BigNumber[], BigNumber[]] = [[], [], []];
+
+        if (this.contractsSource) {
+            const oracleAddress = this.contractsSource.getOracleAddress();
+            const usdTokenAddress = this.getErc20AddressOfAsset(usdToken)!;
+            const underlyings: string[] = assets.map(e => this.getErc20AddressOfAsset(e)!);
+            const amounts: BigNumber[] = assets.map(e => this.getGoodSourceAmountOfAsset(e));
+
+            const helperContract = await this.contractsSource.getDAppHelperContract();
+            if (helperContract) {
+                result = await helperContract.assetRates.callAsync(
+                    usdTokenAddress,
+                    underlyings,
+                    amounts
+                );
+            }
+        }
+
+        return result;
+    }
 
     public async getSwapToUsdRate(asset: Asset): Promise<BigNumber> {
         if (asset === Asset.SAI || asset === Asset.DAI || asset === Asset.USDC || asset === Asset.SUSD || asset === Asset.USDT) {

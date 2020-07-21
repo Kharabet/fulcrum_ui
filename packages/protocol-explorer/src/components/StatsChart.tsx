@@ -21,7 +21,7 @@ interface IStatsChartState {
 
 export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
   private apiUrl = "https://api.bzx.network/v1";
-  private assetsShown: Asset[];
+  private readonly assetsShown: Asset[];
   constructor(props: any) {
     super(props);
     this.state = {
