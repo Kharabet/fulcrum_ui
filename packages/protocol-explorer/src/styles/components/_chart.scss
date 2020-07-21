@@ -376,8 +376,7 @@
           bottom: -24px;
         }
         &:after {
-          bottom: -46px;
-          
+          bottom: -46px;          
         }
         @media screen and (max-width: $width-max-sm) {
           &:before {
@@ -385,10 +384,9 @@
             height: 22px;
           }
           &:after {
-            bottom: -26px;
-            
+            bottom: -26px;            
           }
-        }
+        }       
       }
       &.left {
         margin-left: -10px;

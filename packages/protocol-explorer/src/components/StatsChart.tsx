@@ -277,7 +277,7 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
   public customTooltips = (tooltip: any) => {
     let tooltipEl = document.getElementById('chartjs-tooltip');
     let chartEl = document.getElementById('chartjs');
-    let spacingChart = this.props.isMobileMedia ? 15 : 55;
+    let spacingChart = this.props.isMobileMedia ? 15 : 35;
   
    if (!tooltipEl) {
       tooltipEl = document.createElement('div');
@@ -318,6 +318,6 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
     tooltipEl.style.opacity = '1';
     tooltipEl.style.position = 'absolute';
     tooltipEl.style.left = (widthChart - tooltip.caretX < widthTooltipEl) ? tooltip.caretX - widthTooltipEl + 5 + 'px' : tooltip.caretX - 7 + 'px';
-    tooltipEl.style.top = (heighttooltipEl + spacingChart < tooltip.caretY) ? tooltip.caretY - heighttooltipEl - spacingChart + 'px' : tooltip.caretY + 35 + 'px';
+    tooltipEl.style.top = (heighttooltipEl + spacingChart < tooltip.caretY) ? tooltip.caretY - heighttooltipEl - spacingChart + 'px' : tooltip.caretY + spacingChart + 'px';
   }
 }
