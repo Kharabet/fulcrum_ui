@@ -46,9 +46,12 @@
 .lend-form__image {
   background: #fff;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  padding: 40px;
+  padding: 20px 0;
   position: relative;
+  justify-content: flex-end;
+  max-width: 300px;
   svg {
     height: 90px;
     width: 90px;
@@ -61,10 +64,16 @@
   font-size: 11px;
   font-weight: 600;
   color: #586473;
+  a{
+    cursor: pointer;
+    color: #00c0ab;
+  }
   @media screen and (min-width: $breakpoint-mobile-min){
-    position: absolute;
     left: 13px;
     bottom: 13px;
+    padding: 0 20px;
+    text-align: left;
+    margin-top: 10px;
   }
 }
 
