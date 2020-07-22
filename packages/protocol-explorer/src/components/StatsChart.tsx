@@ -1,4 +1,6 @@
 import React, { Component } from "react";
+import { Observable, Subject } from "rxjs";
+import { switchMap, debounceTime } from "rxjs/operators";
 import { Asset } from "../domain/Asset";
 import { GroupButton } from "./GroupButton";
 import { Line } from "react-chartjs-2";
@@ -16,20 +18,20 @@ interface IStatsChartState {
   utilization: Array<number>;
   apr: Array<number>;
   tvl: Array<number>;
-  activeLabel: string;
   tvlWidth: number;
   aprWidth: number;
   utilizationWidth: number;
 }
 
 export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
+  private readonly activeLabelUpdate: Subject<string>;
+
   private apiUrl = "https://api.bzx.network/v1";
   private assetsShown: Asset[];
   constructor(props: any) {
     super(props);
     this.state = {
       asset: Asset.UNKNOWN,
-      activeLabel: '',
       periodChart: 1,
       labels: [],
       tvl: [],
@@ -51,8 +53,23 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
       Asset.ZRX,
       Asset.REP,
       Asset.KNC
-    ]
+    ];
+
+    this.activeLabelUpdate = new Subject<string>();
+    this.activeLabelUpdate
+      .pipe(
+        switchMap(value => this.rxLinesWidth(value)),
+      )
+      .subscribe((value: number[]) => {
+        this.setState({
+          ...this.state,
+          tvlWidth: value[0],
+          aprWidth: value[1],
+          utilizationWidth: value[2],
+        });
+      });
   }
+
   public componentWillMount(): void {
     const pathname = window.location.pathname;
     const assetString = pathname.replace('/stats/', '');
@@ -67,31 +84,10 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
 
   public componentDidUpdate(prevProps: Readonly<IStatsChartProps>, prevState: Readonly<IStatsChartState>, snapshot?: any): void {
     if (this.state.periodChart !== prevState.periodChart) {
-      this.setState({ ...this.state, activeLabel: "" })
       this.getAssetStatsHistory();
-    }
-    if (this.state.activeLabel !== prevState.activeLabel) {
-      this.setState({
-        ...this.state,
-        tvlWidth: this.getLinesWidth()[0],
-        aprWidth: this.getLinesWidth()[1],
-        utilizationWidth: this.getLinesWidth()[2]
-      })
     }
   }
 
-  public getLinesWidth() {
-    switch (this.state.activeLabel) {
-      case 'TVL':
-        return [4, 2, 2];
-      case 'Supply APR':
-        return [2, 4, 2];
-      case 'Utilization':
-        return [2, 2, 4];
-      default:
-        return [2, 2, 2];
-    }
-  }
 
 
   public getAssetStatsHistory = async () => {
@@ -253,23 +249,21 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
             const activeYScale = '_active' in this ? this['_active'][0]['_yScale']['id'] : '';
 
             data.datasets.forEach((item: any) => {
-
-              labels.push({ isActive: item.yAxisID === activeYScale, label: item.label, value: item.data[tooltipItems.index], currency: item.label === "TVL" ? true : false, borderColor: item.borderColor });
+              labels.push({
+                isActive: item.yAxisID === activeYScale,
+                label: item.label,
+                value: item.data[tooltipItems.index],
+                currency: item.label === "TVL" ? true : false,
+                borderColor: item.borderColor
+              });
             });
+
             return { data: labels };
           }
         }
       },
-     /* hover: {
-        mode: 'nearest',
-      },*/
-
-      elements: {
-        point: {
-          //radius: 0
-        }
-      }
     }
+
     return (
       <React.Fragment>
         <div className="container">
@@ -284,7 +278,7 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
           </div>
         </div>
         <div className="wrapper-chartjs-token">
-          <div id="chartjs">
+          <div id="chartjs" onMouseLeave={() => this.leaveChart()}>
             <Line ref="chart" data={chartData} options={options} height={this.props.isMobileMedia ? 300 : 110} />
           </div>
           <div id="chartjs-tooltip" className="chartjs-tooltip-token">
@@ -301,6 +295,31 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
     );
   }
 
+  private rxLinesWidth = (value: string): Observable<number[]> => {
+
+    return new Observable<number[]>(observer => {
+      observer.next(this.getLinesWidth(value));
+    });
+  };
+
+  public leaveChart() {
+    document.getElementById('chartjs-tooltip')!.style.opacity = '0';
+    // emitting next event for processing with rx.js
+    this.activeLabelUpdate.next('');
+  }
+
+  public getLinesWidth(activeLabel: string) {
+    switch (activeLabel) {
+      case 'TVL':
+        return [4, 2, 2];
+      case 'Supply APR':
+        return [2, 4, 2];
+      case 'Utilization':
+        return [2, 2, 4];
+      default:
+        return [2, 2, 2];
+    }
+  }
   public setPeriodChart = (period: number) => {
     this.setState({ ...this.state, periodChart: period })
   }
@@ -319,10 +338,7 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
     const heighttooltipEl = tooltipEl.offsetHeight;
     const widthTooltipEl = tooltipEl.offsetWidth;
     const widthChart = chartEl!.offsetWidth;
-
-    if (this.state.activeLabel === "")
-      tooltipEl.style.opacity = '0';
-
+    let activeLabel = '';
     if (tooltip.opacity === 0) {
       tooltipEl.style.opacity = '0';
       tooltipEl.style.left = -widthTooltipEl + 'px';
@@ -337,13 +353,13 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
       let innerHtml = `<tr class="chartjs-tooltip-time"><th><span class="line" style="background-color: ${tooltip.labelColors[0].borderColor}"></span><span>${title}</span></th></tr>`;
 
       body.data.forEach((item: any) => {
-        if (item.isActive) this.setState({ ...this.state, activeLabel: item.label });
+        if (item.isActive) activeLabel = item.label;
         innerHtml += `<tr class="chartjs-tooltip-value ${item.isActive ? `active ${item.label}` : ``}"><td><label>${item.label}</label><span ${item.isActive ? `` : `style="color:${item.borderColor}"`}>${item.currency ? `<span class="sign sign-currency" >$</span>` : ``}${item.value.toFixed(3)}${!item.currency ? `<span class="sign sign-currency">%</span>` : ``}</span></td></tr>`;
       });
 
       innerHtml += `</tbody>`;
 
-      innerHtml = `<tbody class="${heighttooltipEl + spacingChart > tooltip.caretY ? `bottom` : `top`} ${widthChart - tooltip.caretX < widthTooltipEl ? `right ` : `left `}${this.state.activeLabel}">` + innerHtml;
+      innerHtml = `<tbody class="${heighttooltipEl + spacingChart > tooltip.caretY ? `bottom` : `top`} ${widthChart - tooltip.caretX < widthTooltipEl ? `right ` : `left `}${activeLabel}">` + innerHtml;
 
       const tableRoot = tooltipEl.querySelector('table') as HTMLElement;
       tableRoot.innerHTML = innerHtml;
@@ -352,6 +368,7 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
     tooltipEl.style.position = 'absolute';
     tooltipEl.style.left = (widthChart - tooltip.caretX < widthTooltipEl) ? tooltip.caretX - widthTooltipEl + 5 + 'px' : tooltip.caretX - 7 + 'px';
     tooltipEl.style.top = (heighttooltipEl + spacingChart < tooltip.caretY) ? tooltip.caretY - heighttooltipEl - spacingChart + 'px' : tooltip.caretY + spacingChart + 'px';
-
+    // emitting next event for processing with rx.js
+    this.activeLabelUpdate.next(activeLabel);
   }
 }
