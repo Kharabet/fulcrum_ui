@@ -33,7 +33,7 @@ interface ILiquidationsPageState {
   unhealthyLoans: ILoanRowProps[];
   unhealthyLoansUsd: BigNumber;
   healthyLoansUsd: BigNumber;
-  barChartDatasets: { token: Asset, color: string, dataset: ({ x: string, y: number })[] }[]
+  barChartDatasets: { label: Asset, backgroundColor: string, data: ({ x: string, y: number })[] }[]
   isDataLoading: boolean;
 }
 export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquidationsPageState> {
@@ -76,7 +76,7 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
       healthyLoansUsd: new BigNumber(0),
       events: [],
       unhealthyLoans: [],
-      barChartDatasets: this.assetsShown.map((e: { token: Asset, color: string }) => ({ token: e.token, color: e.color, dataset: [] })),
+      barChartDatasets: [] as { label: Asset, backgroundColor: string, data: ({ x: string, y: number })[] }[],
       isDataLoading: true
     };
 
@@ -86,7 +86,6 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
   }
 
   public getChartData = (events: LiquidationEvent[], assetRates: BigNumber[]) => {
-    let result: { token: Asset, color: string, dataset: ({ x: string, y: number })[] }[] = [];
     const groupBy = function (xs: (LiquidationEvent)[], key: any) {
       return xs.reduce(function (rv: any, x: any) {
         (rv[x[key]] = rv[x[key]] || []).push(x);
@@ -94,35 +93,55 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
       }, {});
     };
     const eventsWithDay = events.map((e: LiquidationEvent) => ({ ...e, day: parseInt((e.timeStamp.getTime() / (1000 * 60 * 60 * 24)).toString()) }))
-    for (let i = 0; i < this.assetsShown.length; i++) {
-      const token: Asset = this.assetsShown[i].token;
-      const eventsWithDayByAsset = eventsWithDay.filter((e: LiquidationEvent) => e.loanToken === token);
-      //@ts-ignore
-      const groupedAssetLiquidationsByDay: LiquidationEvent[] = groupBy(eventsWithDayByAsset, "day");
-      const days = Object.keys(groupedAssetLiquidationsByDay);
-      let dataset: { x: string, y: number }[] = [];
-      for (const day of days) {
-        //@ts-ignore
-        const repayAmount = groupedAssetLiquidationsByDay[day].reduce((a, b) => a.plus(b.repayAmount), new BigNumber(0));
+    const eventsWithDayByDay = groupBy(eventsWithDay, "day");
+    let datasets: { label: Asset, backgroundColor: string, data: ({ x: string, y: number })[] }[] = this.assetsShown.map((e: { token: Asset, color: string }) =>
+      ({
+        label: e.token,
+        data: [] as ({ x: string, y: number })[],
+        backgroundColor: e.color,
+      })
+    )
+    Object.keys(eventsWithDayByDay).forEach((day: string) => {
+      for (let j = 0; j < this.assetsShown.length; j++) {
+        const token: Asset = this.assetsShown[j].token;
+        if (!eventsWithDayByDay[day]) continue;
+        const eventsWithDayByAsset: LiquidationEvent[] = eventsWithDayByDay[day].filter((e: LiquidationEvent) => e.loanToken === token);
+        if (eventsWithDayByAsset.length === 0) {
+          datasets.find(e => e.label === token)!.data.push({
+            //@ts-ignore
+            x: new Date(day * 1000 * 60 * 60 * 24)
+              .toLocaleDateString("en-US", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric"
+              }),
+            y: 0
+          })
+          continue;
+        }
 
-        const usdRepayAmount = repayAmount.times(assetRates[i].div(10 ** 18)).div(10 ** 18);
-        dataset.push({
+        const repayAmount = eventsWithDayByAsset.reduce((a, b) => a.plus(b.repayAmount), new BigNumber(0));
+
+        const usdRepayAmount = repayAmount.times(assetRates[j].div(10 ** 18)).div(10 ** 18);
+        datasets.find(e => e.label === token)!.data.push({
           //@ts-ignore
-          x: new Date(day * 1000 * 60 * 60 * 24).toLocaleDateString("en-US", {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric"
-          }),
-          y: usdRepayAmount.dp(4, BigNumber.ROUND_CEIL).toNumber()
+          x: new Date(day * 1000 * 60 * 60 * 24)
+            .toLocaleDateString("en-US", {
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric"
+            }),
+          y: repayAmount.div(10**18).dp(4, BigNumber.ROUND_CEIL).toNumber()
         })
       }
-      result.push({ token, dataset, color: this.assetsShown[i].color })
-    }
+    })
+
     this.setState({
       ...this.state,
-      barChartDatasets: result
+      barChartDatasets: datasets
     })
   }
+
   private async derivedUpdate() {
 
     await this._isMounted && this.setState({
@@ -224,14 +243,7 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
 
   public render() {
     const getData = (canvas: any) => ({
-      // labels: [1, 2, 3, 4, 5, 6, 7, 1, 2, 3, 4, 5, 6, 7, 1, 2, 3, 4, 5, 6, 7, 1, 2, 3, 4, 5, 6, 7],
-      datasets: this.state.barChartDatasets.map((e: { token: Asset, color: string, dataset: ({ x: string, y: number })[] }) =>
-        ({
-          label: e.token,
-          data: e.dataset,
-          backgroundColor: e.color,
-        })
-      )
+      datasets: this.state.barChartDatasets
     })
 
     const canvas = document.createElement('canvas');
@@ -239,15 +251,24 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
     const options = {
       scales: {
         xAxes: [{
-          display: false,
+          display: true,
+          position: "bottom",
           stacked: true,
-          /*type: 'time',
+          offset: true,
+          type: 'time',
           time: {
-            unit: 'month'
-          },*/
+            unit: 'day',
+            displayFormats: {
+              quarter: 'MMM D'
+            }
+          },
           gridLines: {
+            display: false,
             drawBorder: false
           },
+          ticks: {
+            source: "data"
+          }
         }],
         yAxes: [{
           stacked: true,
@@ -272,7 +293,7 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
         callbacks: {
           label: function (tooltipItems: any, data: any) {
             const bgColor = data.datasets[tooltipItems.datasetIndex].backgroundColor;
-            return { label: tooltipItems.yLabel, bgColor: bgColor };
+            return { value: tooltipItems.yLabel, bgColor: bgColor, label: data.datasets[tooltipItems.datasetIndex].label };
           }
         }
       }
@@ -315,7 +336,7 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
                       </div>
                       <div className="flex jc-c labels-container">
                         {this.assetsShown.map((e: { token: Asset, color: string }) =>
-                          (<div className="label-chart"><span style={{ backgroundColor: e.color }}></span>{e.token}</div>))
+                          (<div key={e.color} className="label-chart"><span style={{ backgroundColor: e.color }}></span>{e.token}</div>))
                         }
                       </div>
                     </div>
@@ -383,9 +404,10 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
     }
     if (tooltip.body) {
       const bodyLines = tooltip.body.map(getBody);
-      let innerHtml = `<tbody style="padding: 20px 25px">`;
+      let innerHtml = `<tbody style="padding: 20px 25px; min-width: 150px;">`;
       bodyLines.forEach(function (body: any) {
-        innerHtml += `<tr><td class="chartjs-bar-tooltip-value"><span class="circle" style="background-color: ${body.bgColor}"></span><span><span class="sign sign-currency">$</span>${body.label}</span></td></tr>`;
+        if (body.value === 0) return; 
+        innerHtml += `<tr><td class="chartjs-bar-tooltip-value"><span class="circle" style="background-color: ${body.bgColor}"></span><span>${body.value} <span class="sign sign-currency">${body.label}</span></span></td></tr>`;
       });
       innerHtml += '</tbody>';
       const tableRoot = tooltipEl.querySelector('table') as HTMLElement;
@@ -396,5 +418,4 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
     tooltipEl.style.left = tooltip.caretX - tooltip.width / 2 + 'px';
     tooltipEl.style.top = 0 + 'px';
   }
-
 }
