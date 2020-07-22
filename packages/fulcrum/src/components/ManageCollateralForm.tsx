@@ -37,6 +37,7 @@ interface IManageCollateralFormState {
   loanValue: number;
   selectedValue: number;
   assetBalanceValue: BigNumber;
+  ethBalanceValue: BigNumber;
 
   collateralAmount: BigNumber;
   collateralExcess: BigNumber;
@@ -69,6 +70,7 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
       selectedValue: 0,
       loanValue: 0,
       assetBalanceValue: new BigNumber(0),
+      ethBalanceValue: new BigNumber(0),
       gasAmountNeeded: new BigNumber(0),
       collateralAmount: new BigNumber(0),
       collateralExcess: new BigNumber(0),
@@ -133,7 +135,8 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
 
         });
 
-      FulcrumProvider.Instance.getManageCollateralGasAmount().then(gasAmountNeeded => {
+      FulcrumProvider.Instance.getManageCollateralGasAmount().then(gasAmountNeeded => {        
+        FulcrumProvider.Instance.getEthBalance().then(ethBalance => {
         FulcrumProvider.Instance.getManageCollateralExcessAmount(this.props.loan!).then(collateralExcess => {
           FulcrumProvider.Instance.getAssetTokenBalanceOfUser(this.props.loan!.collateralAsset).then(assetBalance => {
 
@@ -211,6 +214,7 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
                 collateralizedPercent: collateralizedPercent,
                 collateralExcess: collateralExcess,
                 assetBalanceValue: assetBalanceNormalizedBN,
+                ethBalanceValue: ethBalance,
                 minValue: minValue,
                 maxValue: maxValue,
               },
@@ -221,6 +225,7 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
                 }
               }
             );
+          });
           });
         });
       });
@@ -246,7 +251,7 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
     }
 
     const amountMsg =
-      this.state.assetBalanceValue && this.state.assetBalanceValue.lte(this.state.gasAmountNeeded)
+      this.state.ethBalanceValue && this.state.ethBalanceValue.lte(this.state.gasAmountNeeded)
         ? "Insufficient funds for gas"
         : this.state.balanceTooLow
           ? "Your wallet is empty" :
