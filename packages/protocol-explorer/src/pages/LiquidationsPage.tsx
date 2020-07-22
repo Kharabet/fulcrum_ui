@@ -33,18 +33,42 @@ interface ILiquidationsPageState {
   unhealthyLoans: ILoanRowProps[];
   unhealthyLoansUsd: BigNumber;
   healthyLoansUsd: BigNumber;
-  daiDataset: ({ x: string, y: number })[];
-  ethDataset: ({ x: string, y: number })[];
-  usdcDataset: ({ x: string, y: number })[];
+  barChartDatasets: { label: Asset, backgroundColor: string, data: ({ x: string, y: number })[] }[]
   isDataLoading: boolean;
 }
 export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquidationsPageState> {
   private _isMounted: boolean;
 
-  private readonly assetsShown: Asset[];
+  private readonly assetsShown: { token: Asset, color: string }[];
 
   constructor(props: any) {
     super(props);
+    if (process.env.REACT_APP_ETH_NETWORK === "kovan") {
+      this.assetsShown = [
+        { token: Asset.ETH, color: "#33dfcc" },
+        { token: Asset.KNC, color: "#b79eff" },
+        { token: Asset.DAI, color: "#276bfb" },
+      ];
+    } else if (process.env.REACT_APP_ETH_NETWORK === "ropsten") {
+      this.assetsShown = [
+        { token: Asset.ETH, color: "#33dfcc" },
+        { token: Asset.DAI, color: "#276bfb" },
+      ];
+    } else {
+      this.assetsShown = [
+        { token: Asset.ETH, color: "#33dfcc" },
+        { token: Asset.DAI, color: "#276bfb" },
+        { token: Asset.USDC, color: "#276bfb" },
+        { token: Asset.USDT, color: "#276bfb" },
+        { token: Asset.SUSD, color: "#276bfb" },
+        { token: Asset.WBTC, color: "#276bfb" },
+        { token: Asset.LINK, color: "#276bfb" },
+        { token: Asset.ZRX, color: "#276bfb" },
+        { token: Asset.REP, color: "#276bfb" },
+        { token: Asset.KNC, color: "#b79eff" }
+      ]
+    }
+
     this.state = {
       volume30d: new BigNumber(0),
       transactionsCount30d: 0,
@@ -52,87 +76,72 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
       healthyLoansUsd: new BigNumber(0),
       events: [],
       unhealthyLoans: [],
-      daiDataset: [],
-      ethDataset: [],
-      usdcDataset: [],
+      barChartDatasets: [] as { label: Asset, backgroundColor: string, data: ({ x: string, y: number })[] }[],
       isDataLoading: true
     };
 
-    
-    if (process.env.REACT_APP_ETH_NETWORK === "kovan") {
-      this.assetsShown = [
-        Asset.ETH,
-        Asset.KNC,
-        Asset.DAI
-      ];
-    } else if (process.env.REACT_APP_ETH_NETWORK === "ropsten") {
-      this.assetsShown = [
-        Asset.ETH,
-        Asset.DAI
-      ];
-    } else {
-      this.assetsShown = [
-        Asset.ETH,
-        // Asset.SAI,
-        Asset.DAI,
-        Asset.USDC,
-        Asset.USDT,
-        Asset.SUSD,
-        Asset.WBTC,
-        Asset.LINK,
-        // Asset.MKR,
-        Asset.ZRX,
-        // Asset.BAT,
-        Asset.REP,
-        Asset.KNC
-      ]
-    }
     this._isMounted = false;
     ExplorerProvider.Instance.eventEmitter.on(ExplorerProviderEvents.ProviderAvailable, this.onProviderAvailable);
     ExplorerProvider.Instance.eventEmitter.on(ExplorerProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
-  public getChartData = (events: LiquidationEvent[]) => {
-    const eventsWithDay = events.map((e: LiquidationEvent) => ({ ...e, day: e.timeStamp.getTime() / (1000 * 60 * 60 * 24) }))
+  public getChartData = (events: LiquidationEvent[], assetRates: BigNumber[]) => {
+    const groupBy = function (xs: (LiquidationEvent)[], key: any) {
+      return xs.reduce(function (rv: any, x: any) {
+        (rv[x[key]] = rv[x[key]] || []).push(x);
+        return rv;
+      }, {});
+    };
+    const eventsWithDay = events.map((e: LiquidationEvent) => ({ ...e, day: parseInt((e.timeStamp.getTime() / (1000 * 60 * 60 * 24)).toString()) }))
+    const eventsWithDayByDay = groupBy(eventsWithDay, "day");
+    let datasets: { label: Asset, backgroundColor: string, data: ({ x: string, y: number })[] }[] = this.assetsShown.map((e: { token: Asset, color: string }) =>
+      ({
+        label: e.token,
+        data: [] as ({ x: string, y: number })[],
+        backgroundColor: e.color,
+      })
+    )
+    Object.keys(eventsWithDayByDay).forEach((day: string) => {
+      for (let j = 0; j < this.assetsShown.length; j++) {
+        const token: Asset = this.assetsShown[j].token;
+        if (!eventsWithDayByDay[day]) continue;
+        const eventsWithDayByAsset: LiquidationEvent[] = eventsWithDayByDay[day].filter((e: LiquidationEvent) => e.loanToken === token);
+        if (eventsWithDayByAsset.length === 0) {
+          datasets.find(e => e.label === token)!.data.push({
+            //@ts-ignore
+            x: new Date(day * 1000 * 60 * 60 * 24)
+              .toLocaleDateString("en-US", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric"
+              }),
+            y: 0
+          })
+          continue;
+        }
 
-    const usdcDataset = eventsWithDay.filter(e => e.loanToken === Asset.USDC).map(e => {
-      return {
-        x: e.timeStamp.toLocaleDateString("en-US", {
-          day: "2-digit",
-          month: "2-digit",
-          year: "numeric"
-        }),
-        y: e.repayAmount.div(10 ** 18).dp(4, BigNumber.ROUND_CEIL).toNumber()
-      }
-    })
-    const ethDataset = eventsWithDay.filter(e => e.loanToken === Asset.ETH).map(e => {
-      return {
-        x: e.timeStamp.toLocaleDateString("en-US", {
-          day: "2-digit",
-          month: "2-digit",
-          year: "numeric"
-        }),
-        y: e.repayAmount.div(10 ** 18).dp(4, BigNumber.ROUND_CEIL).toNumber()
-      }
-    })
-    const daiDataset = eventsWithDay.filter(e => e.loanToken === Asset.DAI).map(e => {
-      return {
-        x: e.timeStamp.toLocaleDateString("en-US", {
-          day: "2-digit",
-          month: "2-digit",
-          year: "numeric"
-        }),
-        y: e.repayAmount.div(10 ** 18).dp(4, BigNumber.ROUND_CEIL).toNumber()
-      }
+        const repayAmount = eventsWithDayByAsset.reduce((a, b) => a.plus(b.repayAmount), new BigNumber(0));
 
+        const usdRepayAmount = repayAmount.times(assetRates[j].div(10 ** 18)).div(10 ** 18);
+        datasets.find(e => e.label === token)!.data.push({
+          //@ts-ignore
+          x: new Date(day * 1000 * 60 * 60 * 24)
+            .toLocaleDateString("en-US", {
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric"
+            }),
+          y: repayAmount.div(10**18).dp(4, BigNumber.ROUND_CEIL).toNumber()
+        })
+      }
     })
+
     this.setState({
       ...this.state,
-      daiDataset,
-      ethDataset,
-      usdcDataset
+      barChartDatasets: datasets
     })
   }
+
   private async derivedUpdate() {
 
     await this._isMounted && this.setState({
@@ -158,7 +167,10 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
       return;
     }
     let volume30d = new BigNumber(0);
-    const assetRates = (await ExplorerProvider.Instance.getSwapToUsdRateBatch(this.assetsShown, Asset.DAI))[0];
+    const assetRates = (await ExplorerProvider.Instance.getSwapToUsdRateBatch(
+      this.assetsShown.map((e: { token: Asset, color: string }) => (e.token)),
+      Asset.DAI
+    ))[0];
     const liquidationEvents = await ExplorerProvider.Instance.getLiquidationHistory();
     const unhealthyLoansData = await ExplorerProvider.Instance.getBzxLoans(0, 25, true);
     const healthyLoansData = await ExplorerProvider.Instance.getBzxLoans(0, 25, false);
@@ -167,12 +179,14 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
     const liqudiations30d = liquidationEvents.filter((e: LiquidationEvent) => e.timeStamp.getTime() > new Date().setDate(new Date().getDate() - 30))
     const transactionsCount30d = liqudiations30d.length;
     for (let i = 0; i < this.assetsShown.length; i++) {
-      const assetRepayAmount = liqudiations30d.filter((e: LiquidationEvent) => e.loanToken === this.assetsShown[i]).reduce((a, b) => a.plus(b.repayAmount), new BigNumber(0));
-      const usdRepayAmount = assetRepayAmount.times(assetRates[i].div(10**18)).div(10**18);
+      const assetRepayAmount = liqudiations30d
+        .filter((e: LiquidationEvent) => e.loanToken === this.assetsShown[i].token)
+        .reduce((a, b) => a.plus(b.repayAmount), new BigNumber(0));
+      const usdRepayAmount = assetRepayAmount.times(assetRates[i].div(10 ** 18)).div(10 ** 18);
       volume30d = volume30d.plus(usdRepayAmount);
     }
 
-    this.getChartData(liquidationEvents);
+    this.getChartData(liquidationEvents, assetRates);
     const unhealthyLoans = unhealthyLoansData.map((e: IActiveLoanData) => ({
       loanId: e.loanData!.loanId,
       payOffAmount: e.maxLiquidatable,
@@ -192,10 +206,10 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
     });
   }
 
-  private numberWithCommas = (x: number | string) => { 
-    var parts = x.toString().split("."); 
-    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ","); 
-    return parts.join("."); 
+  private numberWithCommas = (x: number | string) => {
+    var parts = x.toString().split(".");
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return parts.join(".");
   }
 
   private onProviderChanged = () => {
@@ -228,46 +242,33 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
   }
 
   public render() {
-    const getData = (canvas: any) => {
-      const ctx: any = canvas.getContext("2d");
-      return {
-        labels: [1, 2, 3, 4, 5, 6, 7, 1, 2, 3, 4, 5, 6, 7, 1, 2, 3, 4, 5, 6, 7, 1, 2, 3, 4, 5, 6, 7],
-        datasets: [
-          {
-            label: 'Usdc',
-            data: [15, 5, 9, 50, 14, 60, 70, 10, 20, 30, 40, 50, 60, 15, 5, 9, 50, 15, 5, 9, 50, 14, 60, 70, 14, 60, 70, 30],
-            //data: this.state.usdcDataset,
-            backgroundColor: '#B79EFF',
-          },
-          {
-            label: 'Dai',
-            data: [10, 20, 30, 40, 50, 60, 70, 15, 5, 9, 15, 5, 9, 50, 14, 60, 70, 50, 14, 60, 70, 14, 60, 70, 10, 20, 30, 20],
-            //data: this.state.daiDataset,
-            backgroundColor: '#276BFB',
-          },
-          {
-            label: 'Eth',
-            data: [15, 5, 9, 50, 14, 60, 70, 10, 20, 30, 40, 50, 60, 70, 15, 5, 9, 50, 14, 60, 70, 15, 5, 9, 50, 14, 60, 10],
-            //data: this.state.ethDataset,
-            backgroundColor: '#33DFCC',
-          },
-        ]
-      }
-    }
+    const getData = (canvas: any) => ({
+      datasets: this.state.barChartDatasets
+    })
+
     const canvas = document.createElement('canvas');
     const chartData = getData(canvas);
     const options = {
       scales: {
         xAxes: [{
-          display: false,
+          display: true,
+          position: "bottom",
           stacked: true,
-          /*type: 'time',
+          offset: true,
+          type: 'time',
           time: {
-            unit: 'month'
-          },*/
+            unit: 'day',
+            displayFormats: {
+              quarter: 'MMM D'
+            }
+          },
           gridLines: {
+            display: false,
             drawBorder: false
           },
+          ticks: {
+            source: "data"
+          }
         }],
         yAxes: [{
           stacked: true,
@@ -292,7 +293,7 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
         callbacks: {
           label: function (tooltipItems: any, data: any) {
             const bgColor = data.datasets[tooltipItems.datasetIndex].backgroundColor;
-            return { label: tooltipItems.yLabel, bgColor: bgColor };
+            return { value: tooltipItems.yLabel, bgColor: bgColor, label: data.datasets[tooltipItems.datasetIndex].label };
           }
         }
       }
@@ -329,14 +330,14 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
                     <div className="container">
                       <div className="wrapper-chartjs-bar">
                         <div id="chartjs-bar">
-                          <Bar data={chartData} options={options} height={100} />
+                          {chartData && <Bar data={chartData} options={options} height={100} />}
                         </div>
                         <div id="chartjs-bar-tooltip"><table></table></div>
                       </div>
                       <div className="flex jc-c labels-container">
-                        <div className="label-chart"><span className="bg-green"></span>ETH</div>
-                        <div className="label-chart"><span className="bg-primary"></span>DAI</div>
-                        <div className="label-chart"><span className="bg-secondary"></span>USDC</div>
+                        {this.assetsShown.map((e: { token: Asset, color: string }) =>
+                          (<div key={e.color} className="label-chart"><span style={{ backgroundColor: e.color }}></span>{e.token}</div>))
+                        }
                       </div>
                     </div>
                   </section>
@@ -403,9 +404,10 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
     }
     if (tooltip.body) {
       const bodyLines = tooltip.body.map(getBody);
-      let innerHtml = `<tbody style="padding: 20px 25px">`;
+      let innerHtml = `<tbody style="padding: 20px 25px; min-width: 150px;">`;
       bodyLines.forEach(function (body: any) {
-        innerHtml += `<tr><td class="chartjs-bar-tooltip-value"><span class="circle" style="background-color: ${body.bgColor}"></span><span><span class="sign sign-currency">$</span>${body.label}</span></td></tr>`;
+        if (body.value === 0) return; 
+        innerHtml += `<tr><td class="chartjs-bar-tooltip-value"><span class="circle" style="background-color: ${body.bgColor}"></span><span>${body.value} <span class="sign sign-currency">${body.label}</span></span></td></tr>`;
       });
       innerHtml += '</tbody>';
       const tableRoot = tooltipEl.querySelector('table') as HTMLElement;
@@ -416,5 +418,4 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
     tooltipEl.style.left = tooltip.caretX - tooltip.width / 2 + 'px';
     tooltipEl.style.top = 0 + 'px';
   }
-
 }
