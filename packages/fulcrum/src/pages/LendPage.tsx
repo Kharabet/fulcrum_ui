@@ -12,7 +12,7 @@ import { InfoBlock } from "../components/InfoBlock";
 
 export interface ILendPageProps {
   doNetworkConnect: () => void;
-  isRiskDisclosureModalOpen: ()  => void;
+  isRiskDisclosureModalOpen: () => void;
   isLoading: boolean;
   isMobileMedia: boolean;
 }
@@ -42,18 +42,10 @@ export class LendPage extends PureComponent<ILendPageProps, ILendPageState> {
       <div className="lend-page">
         <HeaderOps isMobileMedia={this.props.isMobileMedia} isLoading={this.props.isLoading} doNetworkConnect={this.props.doNetworkConnect} isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
         <main className="lend-page-main">
-          <InfoBlock localstorageItemProp="defi-risk-notice"  onAccept={() => {this.forceUpdate()}}>
-            For your safety, please ensure the URL in your browser starts with: https://app.fulcrum.trade/. <br />
-            Fulcrum is a non-custodial platform for tokenized lending and margin trading. <br />
-            "Non-custodial" means YOU are responsible for the security of your digital assets. <br />
-            To learn more about how to stay safe when using Fulcrum and other bZx products, please read our <button className="disclosure-link" onClick={this.props.isRiskDisclosureModalOpen}>DeFi Risk Disclosure</button>.
-          </InfoBlock>
-          {localStorage.getItem("defi-risk-notice") ?
-            <InfoBlock localstorageItemProp="lend-page-info">
-              Currently only our lending, unlending, and closing of position functions are enabled.  <br />
+          <InfoBlock localstorageItemProp="lend-page-info">
+            Currently only our lending, unlending, and closing of position functions are enabled.  <br />
               Full functionality will return after a thorough audit of our newly implemented and preexisting smart contracts.
           </InfoBlock>
-            : null}
           <LendTokenSelector onLend={this.onLendRequested} />
           <Modal
             isOpen={this.state.isLendModalOpen}
