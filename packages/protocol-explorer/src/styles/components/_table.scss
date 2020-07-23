@@ -46,22 +46,28 @@
 .table-tx {
   .table-row-tx,
   .table-header-tx {
-    &__hash,
     &__quantity {
+      width: 25%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    &__hash{
       width: 20%;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+
     }
     &__age {
       width: 12%;
       cursor: pointer;
     }
     &__action {
-      width: 20%;
+      width: 22%;
     }
     &__from {
-      width: 28%;
+      width: 21%;
     }
     &__from-address {
       white-space: nowrap;
