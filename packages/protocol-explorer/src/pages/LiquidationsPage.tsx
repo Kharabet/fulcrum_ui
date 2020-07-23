@@ -131,7 +131,7 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
               month: "2-digit",
               year: "numeric"
             }),
-          y: repayAmount.div(10**18).dp(4, BigNumber.ROUND_CEIL).toNumber()
+          y: repayAmount.div(10 ** 18).dp(4, BigNumber.ROUND_CEIL).toNumber()
         })
       }
     })
@@ -388,6 +388,7 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
   }
   public customTooltips = (tooltip: any) => {
     let tooltipEl = document.getElementById('chartjs-bar-tooltip');
+    const paddingX = 25;
     if (!tooltipEl) {
       tooltipEl = document.createElement('div');
       tooltipEl.id = 'chartjs-bar-tooltip';
@@ -404,18 +405,21 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
     }
     if (tooltip.body) {
       const bodyLines = tooltip.body.map(getBody);
-      let innerHtml = `<tbody style="padding: 20px 25px; min-width: 150px;">`;
+      let innerHtml = `<tbody style="padding: 20px ${paddingX}px; min-width: 180px;">`;
       bodyLines.forEach(function (body: any) {
-        if (body.value === 0) return; 
+        if (body.value === 0) return;
         innerHtml += `<tr><td class="chartjs-bar-tooltip-value"><span class="circle" style="background-color: ${body.bgColor}"></span><span>${body.value} <span class="sign sign-currency">${body.label}</span></span></td></tr>`;
       });
       innerHtml += '</tbody>';
       const tableRoot = tooltipEl.querySelector('table') as HTMLElement;
       tableRoot.innerHTML = innerHtml;
     }
+
+    const tableRoot = tooltipEl.querySelector('table tbody') as HTMLElement;
+
     tooltipEl.style.opacity = '1';
     tooltipEl.style.position = 'absolute';
-    tooltipEl.style.left = tooltip.caretX - tooltip.width / 2 + 'px';
+    tooltipEl.style.left = tooltip.caretX - tableRoot.offsetWidth / 2 + 'px';
     tooltipEl.style.top = 0 + 'px';
   }
 }
