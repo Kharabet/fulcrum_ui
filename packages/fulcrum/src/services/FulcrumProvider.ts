@@ -952,7 +952,7 @@ export class FulcrumProvider {
   };
 
   public getManageCollateralParams = async (): Promise<ICollateralManagementParams> => {
-    return { minValue: 1.91 * 10 ** 18, maxValue: 3 * 10 ** 20, currentValue: 0 };
+    return { minValue: 1.15 * 10 ** 18, maxValue: 3 * 10 ** 20, currentValue: 0 };
   };
 
   public getManageCollateralChangeEstimate = async (
