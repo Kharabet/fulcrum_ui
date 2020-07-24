@@ -41,7 +41,6 @@ interface IInnerOwnTokenGridRowState {
   request: TradeRequest | undefined;
   valueChange: BigNumber;
   resultTx: boolean;
-  collateralizedPercent: BigNumber;
 }
 
 export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, IInnerOwnTokenGridRowState> {
@@ -56,7 +55,6 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
       request: undefined,
       resultTx: false,
       valueChange: new BigNumber(0),
-      collateralizedPercent: new BigNumber(0),
     };
 
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
@@ -71,6 +69,8 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
   private async derivedUpdate() {
     let openValue = new BigNumber(0);
     let valueChange = new BigNumber(0);
+
+
     if (this.props.positionType === PositionType.LONG) {
       openValue = this.props.loan.loanData!.collateral.div(10 ** 18).times(this.props.openPrice);
       valueChange = (this.props.value.minus(openValue)).div(openValue).times(100);
@@ -79,10 +79,10 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
       openValue = this.props.loan.loanData!.principal.div(10 ** 18).times(this.props.openPrice);
       valueChange = (this.props.value.minus(openValue)).div(openValue).times(100);
     }
+
     this._isMounted && this.setState({
       ...this.state,
       valueChange,
-      collateralizedPercent: this.props.loan!.collateralizedPercent.multipliedBy(100).plus(100),
       isLoading: false
     });
   }
@@ -152,8 +152,9 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
   }
 
   public render() {
-    return (
+    const collateralizedPercent = this.props.loan!.collateralizedPercent.multipliedBy(100).plus(100);
 
+    return (
       <React.Fragment>
         {this.state.isLoadingTransaction && this.state.request
           ? <React.Fragment>
@@ -197,7 +198,7 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
                       {this.props.collateral.toFixed(2)}
                     </span>
 
-                    <span className={`inner-own-token-grid-row__col-asset-collateral-small ${this.props.loan.collateralizedPercent.lte(.25) ? "danger" : ""}`} title={this.state.collateralizedPercent.toFixed(18)}>{this.state.collateralizedPercent.toFixed(2)}%</span>
+                    <span className={`inner-own-token-grid-row__col-asset-collateral-small ${this.props.loan.collateralizedPercent.lte(.25) ? "danger" : ""}`} title={collateralizedPercent.toFixed(18)}>{collateralizedPercent.toFixed(2)}%</span>
                     <div className="inner-own-token-grid-row__open-manage-collateral" onClick={this.onManageClick}>
                       <OpenManageCollateral />
                     </div>
