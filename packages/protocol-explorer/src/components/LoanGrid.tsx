@@ -4,7 +4,7 @@ import { ReactComponent as ArrowPagination } from "../assets/images/icon_paginat
 import { runInThisContext } from "vm";
 
 interface ILoanGridProps {
-  events: ILoanRowProps[]
+  events: ILoanRowProps[];
 }
 
 interface ILoanGridState {
@@ -34,7 +34,8 @@ export class LoanGrid extends Component<ILoanGridProps, ILoanGridState> {
 
   public render() {
 
-    const assetItems = this.props.events.slice(this.quantityVisibleRow * this.state.numberPagination, this.quantityVisibleRow * this.state.numberPagination + this.quantityVisibleRow).map((e, i) => <LoanRow key={i} {...e} />);
+    const assetItems = this.props.events.slice(this.quantityVisibleRow * this.state.numberPagination, this.quantityVisibleRow * this.state.numberPagination + this.quantityVisibleRow)
+    .map((e, i) => <LoanRow key={i} {...e} />);
     if (assetItems.length === 0) return null;
 
     return (

@@ -194,6 +194,7 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
       seizeAmount: e.maxSeizable,
       loanToken: e.loanAsset,
       collateralToken: e.collateralAsset,
+      onLiquidationCompleted: this.derivedUpdate.bind(this)
     }))
     await this.setState({
       ...this.state,
