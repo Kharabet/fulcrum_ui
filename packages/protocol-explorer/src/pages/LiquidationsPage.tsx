@@ -85,14 +85,14 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
     ExplorerProvider.Instance.eventEmitter.on(ExplorerProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
-  public getChartData = (events: LiquidationEvent[], assetRates: BigNumber[]) => {
-    const groupBy = function (xs: (LiquidationEvent)[], key: any) {
+  public getChartData = (events: { event: LiquidationEvent, repayAmountUsd: BigNumber }[]) => {
+    const groupBy = function (xs: ({ event: LiquidationEvent, repayAmountUsd: BigNumber }[]), key: any) {
       return xs.reduce(function (rv: any, x: any) {
         (rv[x[key]] = rv[x[key]] || []).push(x);
         return rv;
       }, {});
     };
-    const eventsWithDay = events.map((e: LiquidationEvent) => ({ ...e, day: parseInt((e.timeStamp.getTime() / (1000 * 60 * 60 * 24)).toString()) }))
+    const eventsWithDay = events.map((e: { event: LiquidationEvent, repayAmountUsd: BigNumber }) => ({ ...e, day: parseInt((e.event.timeStamp.getTime() / (1000 * 60 * 60 * 24)).toString()) }))
     const eventsWithDayByDay = groupBy(eventsWithDay, "day");
     let datasets: { label: Asset, backgroundColor: string, data: ({ x: string, y: number })[] }[] = this.assetsShown.map((e: { token: Asset, color: string }) =>
       ({
@@ -105,7 +105,7 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
       for (let j = 0; j < this.assetsShown.length; j++) {
         const token: Asset = this.assetsShown[j].token;
         if (!eventsWithDayByDay[day]) continue;
-        const eventsWithDayByAsset: LiquidationEvent[] = eventsWithDayByDay[day].filter((e: LiquidationEvent) => e.loanToken === token);
+        const eventsWithDayByAsset: { event: LiquidationEvent, repayAmountUsd: BigNumber }[] = eventsWithDayByDay[day].filter((e: { event: LiquidationEvent, repayAmountUsd: BigNumber }) => e.event.loanToken === token);
         if (eventsWithDayByAsset.length === 0) {
           datasets.find(e => e.label === token)!.data.push({
             //@ts-ignore
@@ -120,9 +120,8 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
           continue;
         }
 
-        const repayAmount = eventsWithDayByAsset.reduce((a, b) => a.plus(b.repayAmount), new BigNumber(0));
+        const repayAmountUsd = eventsWithDayByAsset.reduce((a, b) => a.plus(b.repayAmountUsd), new BigNumber(0));
 
-        const usdRepayAmount = repayAmount.times(assetRates[j].div(10 ** 18)).div(10 ** 18);
         datasets.find(e => e.label === token)!.data.push({
           //@ts-ignore
           x: new Date(day * 1000 * 60 * 60 * 24)
@@ -131,7 +130,7 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
               month: "2-digit",
               year: "numeric"
             }),
-          y: repayAmount.div(10 ** 18).dp(4, BigNumber.ROUND_CEIL).toNumber()
+          y: repayAmountUsd.dp(4, BigNumber.ROUND_CEIL).toNumber()
         })
       }
     })
@@ -166,11 +165,9 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
       });
       return;
     }
+
     let volume30d = new BigNumber(0);
-    const assetRates = (await ExplorerProvider.Instance.getSwapToUsdRateBatch(
-      this.assetsShown.map((e: { token: Asset, color: string }) => (e.token)),
-      Asset.DAI
-    ))[0];
+    let liquidationEventsWithUsd: { event: LiquidationEvent, repayAmountUsd: BigNumber }[] = []
     const liquidationEvents = await ExplorerProvider.Instance.getLiquidationHistory();
     const unhealthyLoansData = await ExplorerProvider.Instance.getBzxLoans(0, 25, true);
     const healthyLoansData = await ExplorerProvider.Instance.getBzxLoans(0, 25, false);
@@ -179,14 +176,18 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
     const liqudiations30d = liquidationEvents.filter((e: LiquidationEvent) => e.timeStamp.getTime() > new Date().setDate(new Date().getDate() - 30))
     const transactionsCount30d = liqudiations30d.length;
     for (let i = 0; i < this.assetsShown.length; i++) {
-      const assetRepayAmount = liqudiations30d
-        .filter((e: LiquidationEvent) => e.loanToken === this.assetsShown[i].token)
-        .reduce((a, b) => a.plus(b.repayAmount), new BigNumber(0));
-      const usdRepayAmount = assetRepayAmount.times(assetRates[i].div(10 ** 18)).div(10 ** 18);
-      volume30d = volume30d.plus(usdRepayAmount);
+      const tokenLiqudiations30d = liqudiations30d
+        .filter((e: LiquidationEvent) => e.loanToken === this.assetsShown[i].token);
+      for (const e of tokenLiqudiations30d) {
+        const swapToUsdHistoryRateRequest = await fetch(`https://api.bzx.network/v1/asset-history-price?asset=${e.loanToken.toLowerCase()}&date=${e.timeStamp.getTime()}`);
+        const swapToUsdHistoryRateResponse = (await swapToUsdHistoryRateRequest.json()).data;
+        const repayAmountUsd = e.repayAmount.div(10 ** 18).times(swapToUsdHistoryRateResponse.swapToUSDPrice);
+        volume30d = volume30d.plus(repayAmountUsd);
+        liquidationEventsWithUsd.push({ event: e, repayAmountUsd: repayAmountUsd });
+      }
     }
 
-    this.getChartData(liquidationEvents, assetRates);
+    this.getChartData(liquidationEventsWithUsd);
     const unhealthyLoans = unhealthyLoansData.map((e: IActiveLoanData) => ({
       loanId: e.loanData!.loanId,
       payOffAmount: e.maxLiquidatable,
@@ -405,10 +406,10 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
     }
     if (tooltip.body) {
       const bodyLines = tooltip.body.map(getBody);
-      let innerHtml = `<tbody style="padding: 20px ${paddingX}px; min-width: 180px;">`;
+      let innerHtml = `<tbody style="padding: 20px ${paddingX}px;">`;
       bodyLines.forEach(function (body: any) {
         if (body.value === 0) return;
-        innerHtml += `<tr><td class="chartjs-bar-tooltip-value"><span class="circle" style="background-color: ${body.bgColor}"></span><span>${body.value} <span class="sign sign-currency">${body.label}</span></span></td></tr>`;
+        innerHtml += `<tr><td class="chartjs-bar-tooltip-value"><span class="circle" style="background-color: ${body.bgColor}"></span><span><span class="sign sign-currency">$</span>${body.value}</span></td></tr>`;
       });
       innerHtml += '</tbody>';
       const tableRoot = tooltipEl.querySelector('table') as HTMLElement;
