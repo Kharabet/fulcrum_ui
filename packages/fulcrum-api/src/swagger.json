@@ -365,6 +365,42 @@
           }
         }
       }
+    },
+    "/asset-history-price": {
+      "get": {
+        "tags": [
+          "History Data"
+        ],
+        "summary": "Get asset's swap to USD price at some timestamp",
+        "description": "",
+        "parameters": [
+          {
+            "name": "asset",
+            "in": "query",
+            "required": "true",
+            "type": "string",
+            "description": "Asset"
+          },
+          {
+            "name": "date",
+            "in": "query",
+            "required": "true",
+            "type": "integer",
+            "description": "Date (timestamp)"
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
     }
   }
 }

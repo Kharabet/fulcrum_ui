@@ -115,6 +115,21 @@ export default ({ config, logger }) => {
 		res.json({ data: aprHistory, success: true});
 	});
 	
+	api.get('/asset-history-price', [
+		query('asset').isIn(iTokens.map(token => token.name)),
+		query('date').isInt({ gt: 0, lte: new Date().setDate(new Date().getDate() + 1) })
+	], async (req, res) => {
+		const errors = validationResult(req);
+		if (!errors.isEmpty()) {
+			return res.status(422).json({ errors: errors.array(), success: false });
+		}
+		let asset = req.query.asset;
+		let date = new Date(parseInt(req.query.date));
+
+		const priceHistory = await fulcrum.getAssetHistoryPrice(asset, date);
+		res.json({ data: priceHistory, success: true});
+	});
+	
 	api.get('/borrow-deposit-estimate', [
 		query('borrow_asset').isIn(iTokens.map(token => token.name)),
 		query('borrow_asset').isIn(iTokens.map(token => token.name)),

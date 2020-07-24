@@ -2,10 +2,10 @@ import { iTokens } from '../config/iTokens';
 import { pTokens } from '../config/pTokens';
 
 import BigNumber from 'bignumber.js';
-import { DappHelperJson, mainnetAddress as dappHelperAddress } from './contracts/DappHelperContract'
-import { mainnetAddress as oracleAddress, oracleJson } from './contracts/OracleContract'
-import { iTokenJson } from './contracts/iTokenContract';
-import { pTokenJson } from './contracts/pTokenContract';
+import { DappHelperJson, mainnetAddress as dappHelperAddress } from '../contracts/DappHelperContract'
+import { mainnetAddress as oracleAddress, oracleJson } from '../contracts/OracleContract'
+import { iTokenJson } from '../contracts/iTokenContract';
+import { pTokenJson } from '../contracts/pTokenContract';
 import config from '../config.json';
 import { pTokenPricesModel, pTokenPriceModel } from "../models/pTokenPrices"
 import { iTokenPricesModel, iTokenPriceModel } from "../models/iTokenPrices"
@@ -373,6 +373,22 @@ export default class Fulcrum {
             });
         });
         return result;
+    }
+
+    async  getAssetHistoryPrice(asset, date) {
+        const dbStatsDocuments = await statsModel.find({
+            "date": {
+                $lt: new Date(date.getTime() + 1000 * 60 * 60),
+                $gte: new Date(date.getTime() - 1000 * 60 * 60)
+            },
+            tokensStats: { $elemMatch: { token: asset } }
+
+        }, { date: 1, tokensStats: 1, "tokensStats.$": asset }).sort({ date: 1 }).lean()
+
+        return {
+            swapToUSDPrice: dbStatsDocuments[0].tokensStats[0].swapToUSDPrice,
+            timestamp: dbStatsDocuments[0].date.getTime()
+        };
     }
 
     async updateReservedData() {
