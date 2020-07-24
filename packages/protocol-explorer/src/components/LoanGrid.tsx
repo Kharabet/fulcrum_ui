@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import { LoanRow, ILoanRowProps } from "./LoanRow";
 import { ReactComponent as ArrowPagination } from "../assets/images/icon_pagination.svg";
-import { runInThisContext } from "vm";
 
 interface ILoanGridProps {
   events: ILoanRowProps[];
@@ -26,7 +25,7 @@ export class LoanGrid extends Component<ILoanGridProps, ILoanGridState> {
     };
   }
 
-  public UNSAFE_componentWillMount(): void {
+  public componentDidMount(): void {
     const quantityGrids = Math.floor(this.props.events.length / this.quantityVisibleRow);
     const isLastRow = this.props.events.length === (this.state.numberPagination + 1) * this.quantityVisibleRow;
     this.setState({ ...this.state, quantityGrids: quantityGrids, isLastRow: isLastRow })
@@ -49,7 +48,7 @@ export class LoanGrid extends Component<ILoanGridProps, ILoanGridState> {
           </div>
           {assetItems}
         </div>
-        {this.props.events.length > 25 &&
+        {this.props.events.length > this.quantityVisibleRow &&
           <div className="pagination">
             <div className={`prev ${this.state.numberPagination === 0 ? `disabled` : ``}`} onClick={this.prevPagination}><ArrowPagination /></div>
             <div className={`next ${this.state.numberPagination === this.state.quantityGrids || this.state.isLastRow ? `disabled` : ``}`} onClick={this.nextPagination}><ArrowPagination /></div>
