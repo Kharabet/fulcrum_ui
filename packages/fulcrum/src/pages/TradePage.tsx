@@ -1,4 +1,4 @@
-import React, { PureComponent, Component } from "react";
+import React, { PureComponent } from "react";
 import Modal from "react-modal";
 
 import { Asset } from "../domain/Asset";
@@ -21,13 +21,13 @@ import { IOwnTokenGridRowProps } from "../components/OwnTokenGridRow";
 import "../styles/pages/_trade-page.scss";
 import { BigNumber } from "@0x/utils";
 import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
-import { IHistoryTokenGridProps } from "../components/HistoryTokenGrid";
 import { TradeEvent } from "../domain/TradeEvent";
 import { IHistoryTokenGridRowProps } from "../components/HistoryTokenGridRow";
 import { PositionEventsGroup } from "../domain/PositionEventsGroup";
 import { PositionHistoryData } from "../domain/PositionHistoryData";
 import { LiquidationEvent } from "../domain/LiquidationEvent";
 import { CloseWithSwapEvent } from "../domain/CloseWithSwapEvent";
+import { string, number } from "prop-types";
 
 const ManageTokenGrid = React.lazy(() => import('../components/ManageTokenGrid'));
 const TradeForm = React.lazy(() => import('../components/TradeForm'));
@@ -43,6 +43,10 @@ export interface ITradePageProps {
 export interface IMarketPair {
   baseToken: Asset;
   quoteToken: Asset;
+}
+export interface ITokenRates {
+  token: Asset;
+  rate: BigNumber;
 }
 
 interface ITradePageState {
@@ -168,12 +172,12 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
 
   private async derivedUpdate() {
     const tokenRowsData = this.getTokenRowsData(this.state);
-    await this.setState({ ...this.state, tokenRowsData});
+    await this.setState({ ...this.state, tokenRowsData });
 
     const ownRowsData = await this.getOwnRowsData(this.state);
     let historyRowsData: IHistoryTokenGridRowProps[] = [];
     if (this.state.showMyTokensOnly)
-       historyRowsData = await this.getHistoryRowsData(this.state);
+      historyRowsData = await this.getHistoryRowsData(this.state);
     await this.setState({ ...this.state, ownRowsData: ownRowsData, historyRowsData });
   }
 
@@ -372,7 +376,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       const loans = await FulcrumProvider.Instance.getUserMarginTradeLoans();
       this.setState({ ...this.state, loans })
       for (const loan of loans) {
-        
+
         const isLoanTokenOnlyInQuoteTokens = !this.baseTokens.includes(loan.loanAsset) && this.quoteTokens.includes(loan.loanAsset)
         const isCollateralTokenNotInQuoteTokens = this.baseTokens.includes(loan.collateralAsset) && !this.quoteTokens.includes(loan.collateralAsset)
         const positionType = isCollateralTokenNotInQuoteTokens || isLoanTokenOnlyInQuoteTokens
@@ -449,11 +453,20 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
 
   public getHistoryRowsData = async (state: ITradePageState): Promise<IHistoryTokenGridRowProps[]> => {
     const historyRowsData: IHistoryTokenGridRowProps[] = [];
+    let tokenRates: ITokenRates[] = [];
+
     const tradeEvents = await FulcrumProvider.Instance.getTradeHistory();
     const closeWithSwapEvents = await FulcrumProvider.Instance.getCloseWithSwapHistory();
     const liquidationEvents = await FulcrumProvider.Instance.getLiquidationHistory();
     const earnRewardEvents = await FulcrumProvider.Instance.getEarnRewardHistory();
     const payTradingFeeEvents = await FulcrumProvider.Instance.getPayTradingFeeHistory();
+    const tokens = Array.from(new Set(this.baseTokens.concat(this.quoteTokens)));
+
+    tokens.forEach(async (token) => {
+      let rate = await FulcrumProvider.Instance.getSwapToUsdRate(token);
+      tokenRates.push({ token, rate });
+    });
+
     const groupBy = function (xs: (TradeEvent | LiquidationEvent | CloseWithSwapEvent)[], key: any) {
       return xs.reduce(function (rv: any, x: any) {
         (rv[x[key]] = rv[x[key]] || []).push(x);
@@ -509,7 +522,8 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         const payTradingFeeEvent = payTradingFeeEvents.find(e => e.timeStamp.getTime() === timeStamp.getTime());
         let feeAssetUsdRate = new BigNumber(1)
         if (payTradingFeeEvent) {
-          feeAssetUsdRate = await FulcrumProvider.Instance.getSwapToUsdRate(payTradingFeeEvent.token);
+          const tokenRate = tokenRates.find(e => e.token === payTradingFeeEvent.token);
+          feeAssetUsdRate = tokenRate ? tokenRate!.rate : new BigNumber(0);
           payTradingFeeEvent.amount = payTradingFeeEvent.amount.times(feeAssetUsdRate);
         }
         const earnRewardEvent = earnRewardEvents.find(e => e.timeStamp.getTime() === timeStamp.getTime());
@@ -601,7 +615,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
           ))
 
         }
-        
+
       }
 
       console.log("push");
