@@ -319,7 +319,7 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
                         <div className="flex fw-w mt-md-30">
                           <div className="liquidation-data">
                             <div className="liquidation-data-title">30-days Volume</div>
-                            <div className="liquidation-data-value"><span className="sign sign-currency">$</span>{this.numberWithCommas(this.state.volume30d.toFixed(2))}</div>
+                            <div title={this.state.volume30d.toFixed(18)} className="liquidation-data-value"><span className="sign sign-currency">$</span>{this.numberWithCommas(this.state.volume30d.toFixed(2))}</div>
                           </div>
                           <div className="liquidation-data">
                             <div className="liquidation-data-title">30-days Transactions Count</div>
