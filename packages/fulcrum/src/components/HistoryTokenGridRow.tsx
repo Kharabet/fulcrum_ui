@@ -104,6 +104,8 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
               <span className="sign-currency">$</span>{event.value.toFixed(2)}
             </React.Fragment>
             : <Preloader width="74px" />
+
+            
           }
         </div>
 
@@ -135,7 +137,7 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
         <div className="history-token-grid-row">
           <div className="history-token-grid-row__col history-token-grid-row__col-token-date">
             <span className="label">Date</span>
-            <a title={latestEvent.txHash} href={`${this.etherscanUrl}tx/${latestEvent.txHash}`}>
+            <a title={latestEvent.txHash} href={`${this.etherscanUrl}tx/${latestEvent.txHash}`} target="blank">
               {latestEvent.date.toLocaleDateString("en-US", {
                 day: "2-digit",
                 month: "short",
