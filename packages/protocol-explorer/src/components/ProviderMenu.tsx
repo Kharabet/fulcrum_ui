@@ -77,7 +77,9 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
         <div className="provider-menu">
             <div className="provider-menu__title">
                 Select Wallet
-        <CloseIcon className="disclosure__close" onClick={props.onProviderMenuClose} />
+                <div onClick={props.onProviderMenuClose}>
+                    <CloseIcon className="disclosure__close" />
+                </div>
             </div>
             <ul className="provider-menu__list">{renderItems()}</ul>
             < button

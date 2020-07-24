@@ -15,7 +15,17 @@
         text-align: left;
         color: #283049;
         svg {
+            overflow: hidden;
+        }
+        div {
+            width: 48px;
+            border-radius: 50%;
+            height: 48px;
             cursor: pointer;
+            padding: 6.5px 16.5px;
+            &:hover {
+                filter: brightness(0.8);
+            }
         }
     }
     &__list {
