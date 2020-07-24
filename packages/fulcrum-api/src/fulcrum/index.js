@@ -378,8 +378,8 @@ export default class Fulcrum {
     async  getAssetHistoryPrice(asset, date) {
         const dbStatsDocuments = await statsModel.find({
             "date": {
-                $lt: new Date(date.getTime() + 1000 * 60 * 60 * 24),
-                $gte: new Date(date.getTime() - 1000 * 60 * 60 * 24)
+                $lt: new Date(date.getTime() + 1000 * 60 * 60),
+                $gte: new Date(date.getTime() - 1000 * 60 * 60)
             },
             tokensStats: { $elemMatch: { token: asset } }
 
