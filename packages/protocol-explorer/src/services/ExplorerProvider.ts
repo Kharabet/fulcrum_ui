@@ -601,7 +601,7 @@ export class ExplorerProvider {
                     etherscanTxUrl: `${etherscanUrl}tx/${e.txHash}`,
                     age: e.timeStamp,
                     account: e.user,
-                    etherscanAddressUrl: `${etherscanUrl}/address/${e.user}`,
+                    etherscanAddressUrl: `${etherscanUrl}address/${e.user}`,
                     quantity: e.positionSize.div(10 ** 18),
                     action: "Open Fulcrum Loan",
                     asset: e.baseToken
@@ -612,7 +612,7 @@ export class ExplorerProvider {
                     etherscanTxUrl: `${etherscanUrl}tx/${e.txHash}`,
                     age: e.timeStamp,
                     account: e.user,
-                    etherscanAddressUrl: `${etherscanUrl}/address/${e.user}`,
+                    etherscanAddressUrl: `${etherscanUrl}address/${e.user}`,
                     quantity: e.loanCloseAmount.div(10 ** 18),
                     action: "Close Fulcrum Loan",
                     asset: e.loanToken
@@ -623,7 +623,7 @@ export class ExplorerProvider {
                     etherscanTxUrl: `${etherscanUrl}tx/${e.txHash}`,
                     age: e.timeStamp,
                     account: e.user,
-                    etherscanAddressUrl: `${etherscanUrl}/address/${e.user}`,
+                    etherscanAddressUrl: `${etherscanUrl}address/${e.user}`,
                     quantity: e.repayAmount.div(10 ** 18),
                     action: "Liquidate Fulcrum Loan",
                     asset: e.loanToken
@@ -634,7 +634,7 @@ export class ExplorerProvider {
                     etherscanTxUrl: `${etherscanUrl}tx/${e.txHash}`,
                     age: e.timeStamp,
                     account: e.user,
-                    etherscanAddressUrl: `${etherscanUrl}/address/${e.user}`,
+                    etherscanAddressUrl: `${etherscanUrl}address/${e.user}`,
                     quantity: e.repayAmount.div(10 ** 18),
                     action: "Close Torque Loan",
                     asset: e.loanToken
@@ -645,7 +645,7 @@ export class ExplorerProvider {
                     etherscanTxUrl: `${etherscanUrl}tx/${e.txHash}`,
                     age: e.timeStamp,
                     account: e.user,
-                    etherscanAddressUrl: `${etherscanUrl}/address/${e.user}`,
+                    etherscanAddressUrl: `${etherscanUrl}address/${e.user}`,
                     quantity: e.newPrincipal.div(10 ** 18),
                     action: "Open Torque Loan",
                     asset: e.loanToken
@@ -656,7 +656,7 @@ export class ExplorerProvider {
                     etherscanTxUrl: `${etherscanUrl}tx/${e.txHash}`,
                     age: e.timeStamp,
                     account: e.burner,
-                    etherscanAddressUrl: `${etherscanUrl}/address/${e.burner}`,
+                    etherscanAddressUrl: `${etherscanUrl}address/${e.burner}`,
                     quantity: e.assetAmount.div(10 ** 18),
                     action: "Burn Token",
                     asset: e.asset
@@ -667,7 +667,7 @@ export class ExplorerProvider {
                     etherscanTxUrl: `${etherscanUrl}tx/${e.txHash}`,
                     age: e.timeStamp,
                     account: e.minter,
-                    etherscanAddressUrl: `${etherscanUrl}/address/${e.minter}`,
+                    etherscanAddressUrl: `${etherscanUrl}address/${e.minter}`,
                     quantity: e.assetAmount.div(10 ** 18),
                     action: "Mint iToken",
                     asset: e.asset
