@@ -43,7 +43,7 @@ export class Header extends Component<IHeaderProps, IHeaderState> {
             </Link>
             <HeaderMenu />
             <div className="flex ai-c header-right">
-              <a href="https://help.bzx.network/en/" className={`item-menu`} target="_blank">
+              <a href="https://help.bzx.network/en/" className={`item-menu`} target="_blank" rel="noopener noreferrer">
                 Help Center
                 </a>
               <OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />
