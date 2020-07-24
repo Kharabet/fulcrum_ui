@@ -2,11 +2,8 @@ import React, { Component } from "react";
 import { OnChainIndicator } from "../components/OnChainIndicator";
 import { HeaderLogo } from "./HeaderLogo";
 import { HeaderMenu, IHeaderMenuProps } from "./HeaderMenu";
-import { HeaderMenuToggle } from "./HeaderMenuToggle";
 import ic_close from "../assets/images/ic_close.svg";
 import menu_icon from "../assets/images/ic_menu.svg";
-import { TorqueProvider } from "../../../torque/src/services/TorqueProvider";
-import { ProviderType } from "../../../torque/src/domain/ProviderType";
 import { ReactComponent as MenuIconOpen } from "../assets/images/ic_menu.svg";
 import { ReactComponent as MenuIconClose } from "../assets/images/ic_close.svg";
 import { Footer } from "./Footer"
@@ -31,25 +28,7 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
       isMenuOpen: false
     };
   }
-
-  public componentWillMount(): void {
-    var currentTheme = localStorage.getItem('theme')!;
-    if (currentTheme === null) {
-      document.documentElement.setAttribute('data-theme', 'dark');
-      localStorage.setItem('theme', 'dark');
-      return;
-    }
-    if (currentTheme && currentTheme === 'light') {
-      document.documentElement.setAttribute('data-theme', 'light');
-      localStorage.setItem('theme', 'light');
-    }
-    else {
-      document.documentElement.setAttribute('data-theme', 'dark');
-      localStorage.setItem('theme', 'dark');
-
-    }
-  }
-
+  
   public componentDidMount(): void {
     var currentTheme = localStorage.getItem('theme')!;
     var toggleSwitch = document.querySelector<HTMLInputElement>('.theme-switch input[type="checkbox"]');
@@ -59,7 +38,7 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
         localStorage.setItem('theme', 'light');
         toggleSwitch.checked = false;
       }
-      if (currentTheme === 'dark') {
+      else {
         document.documentElement.setAttribute('data-theme', 'dark');
         localStorage.setItem('theme', 'dark');
         toggleSwitch.checked = true;
