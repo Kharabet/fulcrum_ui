@@ -375,6 +375,22 @@ export default class Fulcrum {
         return result;
     }
 
+    async  getAssetHistoryPrice(asset, date) {
+        const dbStatsDocuments = await statsModel.find({
+            "date": {
+                $lt: new Date(date.getTime() + 1000 * 60 * 60 * 24),
+                $gte: new Date(date.getTime() - 1000 * 60 * 60 * 24)
+            },
+            tokensStats: { $elemMatch: { token: asset } }
+
+        }, { date: 1, tokensStats: 1, "tokensStats.$": asset }).sort({ date: 1 }).lean()
+
+        return {
+            swapToUSDPrice: dbStatsDocuments[0].tokensStats[0].swapToUSDPrice,
+            timestamp: dbStatsDocuments[0].date.getTime()
+        };
+    }
+
     async updateReservedData() {
         var result = [];
         var tokenAddresses = iTokens.map(x => (x.address));
