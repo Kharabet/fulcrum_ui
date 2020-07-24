@@ -1313,7 +1313,7 @@ export class TorqueProvider {
   }*/
 
   public gasPrice = async (): Promise<BigNumber> => {
-    let result = new BigNumber(30).multipliedBy(10 ** 9); // upper limit 30 gwei
+    let result = new BigNumber(120).multipliedBy(10 ** 9); // upper limit 120 gwei
     const lowerLimit = new BigNumber(3).multipliedBy(10 ** 9); // lower limit 3 gwei
 
     const url = `https://ethgasstation.info/json/ethgasAPI.json`;
@@ -1322,7 +1322,7 @@ export class TorqueProvider {
       const jsonData = await response.json();
       // console.log(jsonData);
       if (jsonData.average) {
-        // ethGasStation values need divide by 10 to get gwei
+        // ethgasstation values need divide by 10 to get gwei
         const gasPriceAvg = new BigNumber(jsonData.average).multipliedBy(10 ** 8);
         const gasPriceSafeLow = new BigNumber(jsonData.safeLow).multipliedBy(10 ** 8);
         if (gasPriceAvg.lt(result)) {
@@ -1333,7 +1333,7 @@ export class TorqueProvider {
       }
     } catch (error) {
       // console.log(error);
-      result = new BigNumber(12).multipliedBy(10 ** 9); // error default 8 gwei
+      result = new BigNumber(60).multipliedBy(10 ** 9); // error default 60 gwei
     }
 
     if (result.lt(lowerLimit)) {
@@ -1341,7 +1341,7 @@ export class TorqueProvider {
     }
 
     return result;
-  };
+  }
 
   public getLoansList = async (): Promise<IBorrowedFundsState[]> => {
     let result: IBorrowedFundsState[] = [];
