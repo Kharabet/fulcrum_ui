@@ -147,17 +147,11 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
 
             let minCollateral;
             let maxCollateral;
-
-            minCollateral = this.props.loan!.collateralAmount
-            .minus(collateralExcess);
-
-
-             minCollateral = minCollateral.times(10 ** 18);
-
+         
            
             minCollateral = this.props.loan!.collateralAmount
               .minus(collateralExcess)
-              .times(10 ** 18);
+              .times(collateralState.minValue);
 
               maxCollateral = minCollateral
               .times(collateralState.maxValue - collateralState.minValue)
