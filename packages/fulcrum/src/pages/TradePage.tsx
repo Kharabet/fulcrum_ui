@@ -145,13 +145,10 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
-  public componentWillMount() {
-
+  public async componentDidMount() {
     const tokenRowsData = this.getTokenRowsData(this.state);
     this.setState({ ...this.state, tokenRowsData: tokenRowsData });
-  }
 
-  public async componentDidMount() {
     const provider = FulcrumProvider.getLocalstorageItem('providerType');
     if (!FulcrumProvider.Instance.web3Wrapper && (!provider || provider === "None")) {
       this.props.doNetworkConnect();
@@ -604,8 +601,10 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
           ))
 
         }
+        
       }
 
+      console.log("push");
       historyRowsData.push({
         eventsGroup: positionEventsGroup
       });
@@ -653,6 +652,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     // }
 
     // }
+    console.log('end history');
     this.setState({ ...this.state, historyRowsData })
     return historyRowsData;
   };

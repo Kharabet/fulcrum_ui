@@ -27,7 +27,7 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
     };
   }
 
-  public UNSAFE_componentWillMount(): void {
+  public componentDidMount(): void {
     const quantityGrids = Math.floor(this.props.historyRowsData.length / this.quantityVisibleRow);
     const isLastRow = this.props.historyRowsData.length === (this.state.numberPagination + 1) * this.quantityVisibleRow;
     this.setState({ ...this.state, quantityGrids: quantityGrids, isLastRow: isLastRow })

@@ -140,11 +140,7 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
       }
     }
   }
-
-  public componentWillMount(): void {
-    this.derivedUpdate();
-  }
-
+ 
   public componentDidMount(): void {
     this._isMounted = true;
 
