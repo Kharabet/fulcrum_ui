@@ -278,7 +278,7 @@ export class LendForm extends Component<ILendFormProps, ILendFormState> {
     return (
       <form className="lend-form" onSubmit={this.onSubmitClick}>
         <CloseIcon className="close-icon" onClick={this.onCancelClick} />
-        <div className="lend-form__image">
+        <div className={`lend-form__image ${this.props.asset === Asset.ETH ? "notice" : ""}`}>
           {this.state.iTokenAddress &&
             FulcrumProvider.Instance.web3ProviderSettings &&
             FulcrumProvider.Instance.web3ProviderSettings.etherscanURL
