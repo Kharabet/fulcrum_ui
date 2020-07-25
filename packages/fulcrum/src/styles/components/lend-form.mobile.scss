@@ -21,11 +21,14 @@
     justify-content: center;
     padding: 17px 0;
     position: relative;
-    svg{
+    &.notice {
+      width: 100%;
+    }
+    svg {
       width: 55px;
       height: 55px;
     }
-    &:after{
+    &:after {
       content: "";
       position: absolute;
       border: 12px solid transparent;
@@ -39,7 +42,7 @@
       box-sizing: border-box;
     }
   }
-  .lend-form__notification{
+  .lend-form__notification {
     padding: 15px 30px 0 30px;
   }
   .lend-form__form-container {
@@ -83,7 +86,7 @@
   .lend-form__amount-container {
     height: 52px;
     padding-right: 10px;
-    &:before{
+    &:before {
       content: none;
     }
     .lend-form__amount-input {
@@ -144,7 +147,7 @@
       cursor: pointer;
     }*/
   }
-  &__submit-button{
+  &__submit-button {
     padding: 10px 25px;
   }
   .rounded-mark {
