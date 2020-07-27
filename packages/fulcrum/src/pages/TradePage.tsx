@@ -467,12 +467,15 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         return rv;
       }, {});
     };
+
     //@ts-ignore
-    const grouped = groupBy(tradeEvents.concat(closeWithSwapEvents).concat(liquidationEvents), "loanId");
+    const events = tradeEvents.concat(closeWithSwapEvents).concat(liquidationEvents);
+    //@ts-ignore
+    const grouped = groupBy(events.sort((a,b) => b.timeStamp.getTime() - a.timeStamp.getTime()), "loanId");
     const loanIds = Object.keys(grouped);
     for (const loanId of loanIds) {
       //@ts-ignore
-      const events = grouped[loanId].sort((a, b) => a.date < b.date ? -1 : 1);
+      const events = grouped[loanId].sort((a,b) => a.timeStamp.getTime() - b.timeStamp.getTime());
       const tradeEvent = events[0] as TradeEvent
       const positionType = this.baseTokens.includes(tradeEvent.baseToken)
         ? PositionType.LONG
@@ -488,7 +491,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         ? tradeEvent.quoteToken
         : tradeEvent.baseToken;
 
-
+      if (!tradeEvent.entryLeverage) continue;
       let leverage = new BigNumber(tradeEvent.entryLeverage.div(10 ** 18));
 
       if (positionType === PositionType.LONG)
@@ -611,8 +614,6 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         }
 
       }
-
-      console.log("push");
       historyRowsData.push({
         eventsGroup: positionEventsGroup
       });
