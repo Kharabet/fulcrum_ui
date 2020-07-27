@@ -27,7 +27,6 @@ import { PositionEventsGroup } from "../domain/PositionEventsGroup";
 import { PositionHistoryData } from "../domain/PositionHistoryData";
 import { LiquidationEvent } from "../domain/LiquidationEvent";
 import { CloseWithSwapEvent } from "../domain/CloseWithSwapEvent";
-import { string, number } from "prop-types";
 
 const ManageTokenGrid = React.lazy(() => import('../components/ManageTokenGrid'));
 const TradeForm = React.lazy(() => import('../components/TradeForm'));
@@ -43,10 +42,6 @@ export interface ITradePageProps {
 export interface IMarketPair {
   baseToken: Asset;
   quoteToken: Asset;
-}
-export interface ITokenRates {
-  token: Asset;
-  rate: BigNumber;
 }
 
 interface ITradePageState {
@@ -453,19 +448,18 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
 
   public getHistoryRowsData = async (state: ITradePageState): Promise<IHistoryTokenGridRowProps[]> => {
     const historyRowsData: IHistoryTokenGridRowProps[] = [];
-    let tokenRates: ITokenRates[] = [];
 
     const tradeEvents = await FulcrumProvider.Instance.getTradeHistory();
     const closeWithSwapEvents = await FulcrumProvider.Instance.getCloseWithSwapHistory();
     const liquidationEvents = await FulcrumProvider.Instance.getLiquidationHistory();
     const earnRewardEvents = await FulcrumProvider.Instance.getEarnRewardHistory();
     const payTradingFeeEvents = await FulcrumProvider.Instance.getPayTradingFeeHistory();
-    const tokens = Array.from(new Set(this.baseTokens.concat(this.quoteTokens)));
+    // const tokens = Array.from(new Set(this.baseTokens.concat(this.quoteTokens)));
 
-    tokens.forEach(async (token) => {
-      let rate = await FulcrumProvider.Instance.getSwapToUsdRate(token);
-      tokenRates.push({ token, rate });
-    });
+    // tokens.forEach(async (token) => {
+    //   let rate = await FulcrumProvider.Instance.getSwapToUsdRate(token);
+    //   tokenRates.push({ token, rate });
+    // });
 
     const groupBy = function (xs: (TradeEvent | LiquidationEvent | CloseWithSwapEvent)[], key: any) {
       return xs.reduce(function (rv: any, x: any) {
@@ -520,10 +514,10 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         const timeStamp = event.timeStamp;
         const txHash = event.txHash;
         const payTradingFeeEvent = payTradingFeeEvents.find(e => e.timeStamp.getTime() === timeStamp.getTime());
-        let feeAssetUsdRate = new BigNumber(1)
         if (payTradingFeeEvent) {
-          const tokenRate = tokenRates.find(e => e.token === payTradingFeeEvent.token);
-          feeAssetUsdRate = tokenRate ? tokenRate!.rate : new BigNumber(0);
+          const swapToUsdHistoryRateRequest = await fetch(`https://api.bzx.network/v1/asset-history-price?asset=${payTradingFeeEvent.token.toLowerCase()}&date=${payTradingFeeEvent.timeStamp.getTime()}`);
+          const swapToUsdHistoryRateResponse = (await swapToUsdHistoryRateRequest.json()).data;
+          const feeAssetUsdRate = swapToUsdHistoryRateResponse.swapToUSDPrice;
           payTradingFeeEvent.amount = payTradingFeeEvent.amount.times(feeAssetUsdRate);
         }
         const earnRewardEvent = earnRewardEvents.find(e => e.timeStamp.getTime() === timeStamp.getTime());
