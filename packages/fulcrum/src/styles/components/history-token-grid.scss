@@ -186,8 +186,7 @@ $width-col-fee-reward-desktop: 16%;
       &-fee-reward {
         @media (min-width: $breakpoint-mobile-min) {
           justify-content: flex-end;
-          padding-right: 60px;
-          font-size:15px;
+          padding-right: 50px;
         }
       }
       &-profit {
