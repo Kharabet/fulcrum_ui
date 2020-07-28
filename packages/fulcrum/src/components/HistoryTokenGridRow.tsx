@@ -14,8 +14,6 @@ interface IHistoryTokenGridRowState {
   assetBalance: BigNumber | null;
   isLoading: boolean;
   isShowCollapse: boolean;
-  latestEvent: PositionHistoryData | null;
-  otherEvents: PositionHistoryData[] | null;
 }
 
 export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IHistoryTokenGridRowState> {
@@ -31,9 +29,7 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
     this.state = {
       assetBalance: new BigNumber(0),
       isLoading: true,
-      isShowCollapse: false,
-      latestEvent: null,
-      otherEvents: null,
+      isShowCollapse: false
     };
 
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
@@ -46,23 +42,8 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
 
     this._isMounted && this.setState({
       ...this.state,
-      isLoading: true
-    });
-    const latestEvent = this.props.eventsGroup.events[this.props.eventsGroup.events.length - 1];
-    const payTradingFeeEvent = latestEvent.payTradingFeeEvent;
-
-    if (payTradingFeeEvent) {
-      const swapToUsdHistoryRateRequest = await fetch(`https://api.bzx.network/v1/asset-history-price?asset=${payTradingFeeEvent.token.toLowerCase()}&date=${payTradingFeeEvent.timeStamp.getTime()}`);
-      const swapToUsdHistoryRateResponse = (await swapToUsdHistoryRateRequest.json()).data;
-      const feeAssetUsdRate = swapToUsdHistoryRateResponse.swapToUSDPrice;
-      latestEvent.payTradingFeeEvent!.amount = payTradingFeeEvent.amount.times(feeAssetUsdRate);
-    }
-    await this._isMounted && this.setState({
-      ...this.state,
-      latestEvent: latestEvent,
       isLoading: false
     });
-
   }
 
   private onProviderAvailable = async () => {
@@ -86,35 +67,9 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
     this.derivedUpdate();
   }
 
-  public componentDidUpdate(prevProps: Readonly<IHistoryTokenGridRowProps>): void {
-    if (this.props.eventsGroup != prevProps.eventsGroup)
-      this.derivedUpdate();
-  }
-
-  private getSwappedEvents = async () => {
-    const croppedEvent = this.props.eventsGroup.events.slice(0, -1).reverse();
-
-    const swappedEvent = await Promise.all(croppedEvent.map(async (event) => {
-      const payTradingFeeEvent = event.payTradingFeeEvent;
-
-      if (payTradingFeeEvent) {
-        const swapToUsdHistoryRateRequest = await fetch(`https://api.bzx.network/v1/asset-history-price?asset=${payTradingFeeEvent.token.toLowerCase()}&date=${payTradingFeeEvent.timeStamp.getTime()}`);
-        const swapToUsdHistoryRateResponse = (await swapToUsdHistoryRateRequest.json()).data;
-        const feeAssetUsdRate = swapToUsdHistoryRateResponse.swapToUSDPrice;
-        const payTradingFeeEventAmount = payTradingFeeEvent.amount.times(feeAssetUsdRate);
-        event.payTradingFeeEvent!.amount = payTradingFeeEventAmount;
-      }
-      return event;
-    }));
-
-    this.setState({ ...this.state, otherEvents: swappedEvent });
-
-  }
-
   public renderOtherEvents = () => {
-
-    return this.state.otherEvents && this.state.otherEvents.map((event, i) => {
-
+    const croppedEvent = this.props.eventsGroup.events.slice(0, -1).reverse();
+    return croppedEvent.map((event, i) => {
       return (<div key={i} className="history-token-grid-row history-token-grid-row-inner">
         <div className="history-token-grid-row-inner__col history-token-grid-row-inner__col-token-date">
           <span className="label">Date</span>
@@ -150,7 +105,7 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
             </React.Fragment>
             : <Preloader width="74px" />
 
-
+            
           }
         </div>
 
@@ -175,18 +130,15 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
   }
 
   public render() {
-
+    const latestEvent = this.props.eventsGroup.events[this.props.eventsGroup.events.length - 1]
     const profitSum = this.props.eventsGroup.events.reduce((a: BigNumber, b: PositionHistoryData) => a.plus(b.profit instanceof BigNumber ? b.profit : new BigNumber(0) || 0), new BigNumber(0));
-
-    if (!this.state.latestEvent) return null;
-
     return (
       <div>
         <div className="history-token-grid-row">
           <div className="history-token-grid-row__col history-token-grid-row__col-token-date">
             <span className="label">Date</span>
-            <a title={this.state.latestEvent.txHash} href={`${this.etherscanUrl}tx/${this.state.latestEvent.txHash}`} target="blank">
-              {this.state.latestEvent.date.toLocaleDateString("en-US", {
+            <a title={latestEvent.txHash} href={`${this.etherscanUrl}tx/${latestEvent.txHash}`} target="blank">
+              {latestEvent.date.toLocaleDateString("en-US", {
                 day: "2-digit",
                 month: "short",
                 year: "numeric"
@@ -206,15 +158,15 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
           {/* <div className="history-token-grid-row__col-asset-unit">
             {this.props.eventsGroup.quoteToken}
           </div> */}
-          <div title={this.state.latestEvent!.positionValue.toFixed(18)} className="history-token-grid-row__col history-token-grid-row__col-position">
+          <div title={latestEvent.positionValue.toFixed(18)} className="history-token-grid-row__col history-token-grid-row__col-position">
             <span className="label">Position</span>
-            {this.state.latestEvent.positionValue.toFixed(4)}
+            {latestEvent.positionValue.toFixed(4)}
           </div>
           <div className="history-token-grid-row__col history-token-grid-row__col-asset-price">
             <span className="label">Trade Price</span>
             {!this.state.isLoading
               ? <React.Fragment>
-                <span className="sign-currency">$</span>{this.state.latestEvent.tradePrice.toFixed(2)}
+                <span className="sign-currency">$</span>{latestEvent.tradePrice.toFixed(2)}
               </React.Fragment>
               : <Preloader width="74px" />
             }
@@ -229,39 +181,39 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
           : <Preloader width="74px" />
         }
       </div> */}
-          <div title={this.state.latestEvent.value.toFixed(18)} className="history-token-grid-row__col history-token-grid-row__col-position-value">
+          <div title={latestEvent.value.toFixed(18)} className="history-token-grid-row__col history-token-grid-row__col-position-value">
             <span className="label">Value</span>
             {!this.state.isLoading
               ? <React.Fragment>
-                <span className="sign-currency">$</span>{this.state.latestEvent.value.toFixed(2)}
+                <span className="sign-currency">$</span>{latestEvent.value.toFixed(2)}
               </React.Fragment>
               : <Preloader width="74px" />
             }
           </div>
-          <div title={this.state.latestEvent.payTradingFeeEvent && this.state.latestEvent.earnRewardEvent
-            && `${this.state.latestEvent.payTradingFeeEvent.amount.toFixed(18)} / ${this.state.latestEvent.earnRewardEvent.amount.toFixed(18)}`} className="history-token-grid-row__col history-token-grid-row__col-fee-reward">
+          <div title={latestEvent.payTradingFeeEvent && latestEvent.earnRewardEvent
+            && `${latestEvent.payTradingFeeEvent.amount.toFixed(18)} / ${latestEvent.earnRewardEvent.amount.toFixed(18)}`} className="history-token-grid-row__col history-token-grid-row__col-fee-reward">
             <span className="label">Fee / Rewards <span className="bzrx">BZRX</span></span>
             {!this.state.isLoading
-              ? this.state.latestEvent.payTradingFeeEvent && this.state.latestEvent.earnRewardEvent ?
+              ? latestEvent.payTradingFeeEvent && latestEvent.earnRewardEvent ?
                 <React.Fragment>
-                  <span className="sign-currency">$</span>{this.state.latestEvent.payTradingFeeEvent.amount.toFixed(4)} / {this.state.latestEvent.earnRewardEvent.amount.toFixed(2)}
+                  <span className="sign-currency">$</span>{latestEvent.payTradingFeeEvent.amount.toFixed(4)} / {latestEvent.earnRewardEvent.amount.toFixed(2)}
                 </React.Fragment>
                 : "-"
               : <Preloader width="74px" />
             }
           </div>
-          <div title={!this.state.isShowCollapse ? profitSum.toFixed(18) : this.state.latestEvent.profit instanceof BigNumber ? this.state.latestEvent.profit.toFixed(18) : "-"} className="history-token-grid-row__col history-token-grid-row__col-profit">
+          <div title={!this.state.isShowCollapse ? profitSum.toFixed(18) : latestEvent.profit instanceof BigNumber ? latestEvent.profit.toFixed(18) : "-"} className="history-token-grid-row__col history-token-grid-row__col-profit">
             <span className="label">Profit</span>
             {!this.state.isLoading
-              ? this.state.latestEvent.profit instanceof BigNumber
-                ? <React.Fragment><span className="sign-currency">$</span>{!this.state.isShowCollapse ? profitSum.toFixed(3) : this.state.latestEvent.profit.toFixed(3)}</React.Fragment>
+              ? latestEvent.profit instanceof BigNumber
+                ? <React.Fragment><span className="sign-currency">$</span>{!this.state.isShowCollapse ? profitSum.toFixed(3) : latestEvent.profit.toFixed(3)}</React.Fragment>
                 : "-"
               : <Preloader width="74px" />
             }
           </div>
           <div className={`history-token-grid-row__col history-token-grid-row__col-result ${this.props.eventsGroup.events.length - 1 ? `toggle-collapse` : ``}  ${this.state.isShowCollapse ? `opened-collapse` : ``}`} onClick={this.toggleCollapse}>
             <span className="label">Last event</span>
-            <span>{this.state.latestEvent.action}</span>
+            <span>{latestEvent.action}</span>
           </div>
         </div>
         <div className={`collapse ${this.state.isShowCollapse ? `show` : `hide`}`}>
@@ -271,11 +223,6 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
   }
 
   public toggleCollapse = () => {
-
-    if (!this.state.isShowCollapse) {
-      this.getSwappedEvents()
-    }
-
     this.setState({ ...this.state, isShowCollapse: !this.state.isShowCollapse })
   }
 }

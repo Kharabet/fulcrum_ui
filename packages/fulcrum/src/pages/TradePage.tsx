@@ -588,6 +588,13 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         const timeStamp = event.timeStamp;
         const txHash = event.txHash;
         const payTradingFeeEvent = payTradingFeeEvents.find(e => e.timeStamp.getTime() === timeStamp.getTime());       
+        
+        if (payTradingFeeEvent) {
+          const swapToUsdHistoryRateRequest = await fetch(`https://api.bzx.network/v1/asset-history-price?asset=${payTradingFeeEvent.token.toLowerCase()}&date=${payTradingFeeEvent.timeStamp.getTime()}`);
+          const swapToUsdHistoryRateResponse = (await swapToUsdHistoryRateRequest.json()).data;
+          const feeAssetUsdRate = swapToUsdHistoryRateResponse.swapToUSDPrice;
+          payTradingFeeEvent.amount = payTradingFeeEvent.amount.times(feeAssetUsdRate);
+        }
         const earnRewardEvent = earnRewardEvents.find(e => e.timeStamp.getTime() === timeStamp.getTime());
         if (event instanceof TradeEvent) {
           const action = "Opened";
