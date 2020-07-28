@@ -105,6 +105,14 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         Asset.USDT
       ]
     }
+    this.stablecoins = [
+      Asset.DAI,
+      Asset.SAI,
+      Asset.USDC,
+      Asset.SUSD,
+      Asset.USDT
+    ]
+
     this.state = {
       selectedMarket: {
         baseToken: this.baseTokens[0],
@@ -138,6 +146,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
   private readonly defaultLeverageShort: number = 1;
   private readonly baseTokens: Asset[] = [];
   private readonly quoteTokens: Asset[] = [];
+  private readonly stablecoins: Asset[] = [];
 
   public componentWillUnmount(): void {
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
@@ -391,11 +400,13 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
           leverage = leverage.plus(1);
 
 
-        const collateralToPrincipalRate = await FulcrumProvider.Instance.getSwapRate(loan.collateralAsset, loan.loanAsset);
+        const currentCollateralToPrincipalRate = await FulcrumProvider.Instance.getSwapRate(loan.collateralAsset, loan.loanAsset);
         let positionValue = new BigNumber(0);
         let value = new BigNumber(0);
         let collateral = new BigNumber(0);
         let openPrice = new BigNumber(0);
+        let startingValue = new BigNumber(0);
+        let currentValue = new BigNumber(0);
         //liquidation_collateralToLoanRate = ((15000000000000000000 * principal / 10^20) + principal) / collateral * 10^18
         //If SHORT -> 10^36 / liquidation_collateralToLoanRate
         const liquidation_collateralToLoanRate = (new BigNumber("15000000000000000000").times(loan.loanData!.principal).div(10 ** 20)).plus(loan.loanData!.principal).div(loan.loanData!.collateral).times(10 ** 18);
@@ -403,24 +414,57 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         let profit = new BigNumber(0);
         if (positionType === PositionType.LONG) {
           positionValue = loan.loanData!.collateral.div(10 ** 18);
-          value = loan.loanData!.collateral.div(10 ** 18).times(collateralToPrincipalRate);
-          collateral = ((loan.loanData!.collateral.times(collateralToPrincipalRate).div(10 ** 18)).minus(loan.loanData!.principal.div(10 ** 18)));
+          value = loan.loanData!.collateral.div(10 ** 18).times(currentCollateralToPrincipalRate);
+          collateral = ((loan.loanData!.collateral.times(currentCollateralToPrincipalRate).div(10 ** 18)).minus(loan.loanData!.principal.div(10 ** 18)));
           openPrice = loan.loanData!.startRate.div(10 ** 18);
           liquidationPrice = liquidation_collateralToLoanRate.div(10 ** 18);
-
-          const startingValue = ((loan.loanData!.collateral.times(openPrice.times(10 ** 18)).div(10 ** 18)).minus(loan.loanData!.principal)).div(10 ** 18);
-          const currentValue = ((loan.loanData!.collateral.times(collateralToPrincipalRate.times(10 ** 18)).div(10 ** 18)).minus(loan.loanData!.principal)).div(10 ** 18);
+          startingValue = ((loan.loanData!.collateral.times(openPrice.times(10 ** 18)).div(10 ** 18)).minus(loan.loanData!.principal)).div(10 ** 18);
+          currentValue = ((loan.loanData!.collateral.times(currentCollateralToPrincipalRate.times(10 ** 18)).div(10 ** 18)).minus(loan.loanData!.principal)).div(10 ** 18);
           profit = currentValue.minus(startingValue);
+
+          //in case of exotic pairs like ETH-KNC all values should be denominated in USD
+          if (!this.stablecoins.includes(loan.loanAsset)) { 
+            const tradeEvents = await FulcrumProvider.Instance.getTradeHistory();
+            const openTimeStamp = tradeEvents.find((e: TradeEvent) => e.loanId === loan.loanId)!.timeStamp;
+            const swapToUsdHistoryRateRequest = await fetch(`https://api.bzx.network/v1/asset-history-price?asset=${loan.loanAsset.toLowerCase()}&date=${openTimeStamp.getTime()}`);
+            const swapToUsdHistoryRateResponse = (await swapToUsdHistoryRateRequest.json()).data;
+            const loanAssetUSDStartRate = new BigNumber(swapToUsdHistoryRateResponse.swapToUSDPrice);
+            openPrice =  openPrice.times(loanAssetUSDStartRate)
+            const collateralToUSDCurrentRate = await FulcrumProvider.Instance.getSwapToUsdRate(loan.loanAsset);
+            startingValue = startingValue.times(collateralToUSDCurrentRate);
+            currentValue = currentValue.times(collateralToUSDCurrentRate);
+            profit = profit.times(collateralToUSDCurrentRate);
+            value = value.times(collateralToUSDCurrentRate);
+            collateral = collateral.times(collateralToUSDCurrentRate);
+            liquidationPrice = liquidationPrice.times(collateralToUSDCurrentRate);
+          }
         }
         else {
           positionValue = loan.loanData!.principal.div(10 ** 18);
           value = loan.loanData!.collateral.div(10 ** 18);
-          collateral = ((loan.loanData!.collateral.div(10 ** 18)).minus(loan.loanData!.principal.div(collateralToPrincipalRate).div(10 ** 18)));
+          collateral = ((loan.loanData!.collateral.div(10 ** 18)).minus(loan.loanData!.principal.div(currentCollateralToPrincipalRate).div(10 ** 18)));
           openPrice = new BigNumber(10 ** 36).div(loan.loanData!.startRate).div(10 ** 18);
           liquidationPrice = new BigNumber(10 ** 36).div(liquidation_collateralToLoanRate).div(10 ** 18);
-          const startingValue = (loan.loanData!.collateral.minus(loan.loanData!.principal.div(loan.loanData!.startRate).times(10 ** 18))).div(10 ** 18);
-          const currentValue = (loan.loanData!.collateral.minus(loan.loanData!.principal.div(collateralToPrincipalRate.times(10 ** 18)).times(10 ** 18))).div(10 ** 18);
+          startingValue = (loan.loanData!.collateral.minus(loan.loanData!.principal.div(loan.loanData!.startRate).times(10 ** 18))).div(10 ** 18);
+          currentValue = (loan.loanData!.collateral.minus(loan.loanData!.principal.div(currentCollateralToPrincipalRate.times(10 ** 18)).times(10 ** 18))).div(10 ** 18);
           profit = startingValue.minus(currentValue);
+
+          //in case of exotic pairs like ETH-KNC all values should be denominated in USD
+          if (!this.stablecoins.includes(loan.collateralAsset)) {
+            const tradeEvents = await FulcrumProvider.Instance.getTradeHistory();
+            const openTimeStamp = tradeEvents.find((e: TradeEvent) => e.loanId === loan.loanId)!.timeStamp;
+            const swapToUsdHistoryRateRequest = await fetch(`https://api.bzx.network/v1/asset-history-price?asset=${loan.collateralAsset.toLowerCase()}&date=${openTimeStamp.getTime()}`);
+            const swapToUsdHistoryRateResponse = (await swapToUsdHistoryRateRequest.json()).data;
+            const loanAssetUSDStartRate = new BigNumber(swapToUsdHistoryRateResponse.swapToUSDPrice);
+            openPrice = openPrice.times(loanAssetUSDStartRate)
+            const collateralToUSDCurrentRate = await FulcrumProvider.Instance.getSwapToUsdRate(loan.collateralAsset);
+            startingValue = startingValue.times(collateralToUSDCurrentRate);
+            currentValue = currentValue.times(collateralToUSDCurrentRate);
+            profit = profit.times(collateralToUSDCurrentRate);
+            value = value.times(collateralToUSDCurrentRate);
+            collateral = collateral.times(collateralToUSDCurrentRate);
+            liquidationPrice = liquidationPrice.times(collateralToUSDCurrentRate);
+          }
         }
 
         ownRowsData.push({
@@ -471,11 +515,11 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     //@ts-ignore
     const events = tradeEvents.concat(closeWithSwapEvents).concat(liquidationEvents);
     //@ts-ignore
-    const grouped = groupBy(events.sort((a,b) => b.timeStamp.getTime() - a.timeStamp.getTime()), "loanId");
+    const grouped = groupBy(events.sort((a, b) => b.timeStamp.getTime() - a.timeStamp.getTime()), "loanId");
     const loanIds = Object.keys(grouped);
     for (const loanId of loanIds) {
       //@ts-ignore
-      const events = grouped[loanId].sort((a,b) => a.timeStamp.getTime() - b.timeStamp.getTime());
+      const events = grouped[loanId].sort((a, b) => a.timeStamp.getTime() - b.timeStamp.getTime());
       const tradeEvent = events[0] as TradeEvent
       const positionType = this.baseTokens.includes(tradeEvent.baseToken)
         ? PositionType.LONG
@@ -530,7 +574,6 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
             positionValue = event.positionSize.div(10 ** 18);
             value = event.positionSize.div(event.entryPrice);
             tradePrice = new BigNumber(10 ** 36).div(event.entryPrice).div(10 ** 18);
-
           }
           else {
             positionValue = event.positionSize.div(event.entryPrice);
