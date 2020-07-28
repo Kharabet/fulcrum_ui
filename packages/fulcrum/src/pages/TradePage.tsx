@@ -589,7 +589,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         if (event instanceof TradeEvent) {
           const action = "Opened";
           if (positionType === PositionType.LONG) {
-            positionValue = event.positionSize.div(event.entryPrice)
+            positionValue = event.positionSize.div(event.entryPrice);
             value = event.positionSize.div(10 ** 18);
             tradePrice =  event.entryPrice.div(10 ** 18);
             //in case of exotic pairs like ETH-KNC all values should be denominated in USD
@@ -633,9 +633,9 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         else if (event instanceof CloseWithSwapEvent) {
           const action = "Closed";
           if (positionType === PositionType.LONG) {
-            positionValue = event.positionCloseSize.div(10 ** 18);
-            value = event.positionCloseSize.div(event.exitPrice);
-            tradePrice = new BigNumber(10 ** 36).div(event.exitPrice).div(10 ** 18);
+            positionValue = event.positionCloseSize.div(event.exitPrice);
+            value = event.positionCloseSize.div(10 ** 18);
+            tradePrice = event.exitPrice.div(10 ** 18);
             //in case of exotic pairs like ETH-KNC all values should be denominated in USD
             if (!this.stablecoins.includes(event.baseToken)) { 
               const swapToUsdHistoryRateRequest = await fetch(`https://api.bzx.network/v1/asset-history-price?asset=${event.baseToken.toLowerCase()}&date=${event.timeStamp.getTime()}`);
@@ -648,9 +648,9 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
 
           }
           else {
-            positionValue = event.positionCloseSize.div(event.exitPrice);
+            positionValue = event.positionCloseSize.div(10**18);
             value = event.positionCloseSize.div(10 ** 18);
-            tradePrice = event.exitPrice.div(10 ** 18);
+            tradePrice = new BigNumber(10 ** 36).div(event.exitPrice).div(10 ** 18);
             //in case of exotic pairs like ETH-KNC all values should be denominated in USD
             
             if (!this.stablecoins.includes(event.quoteToken)) { 
