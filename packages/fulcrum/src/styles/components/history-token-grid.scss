@@ -15,7 +15,7 @@ $width-col-fee-reward: 18%;
 
 $width-col-position-desktop: 12%;
 $width-col-asset-price-desktop: 12%;
-$width-col-fee-reward-desktop: 14%;
+$width-col-fee-reward-desktop: 16%;
 
 .history-token-grid {
   @media screen and (max-width: $breakpoint-mobile-max) {
@@ -187,6 +187,7 @@ $width-col-fee-reward-desktop: 14%;
         @media (min-width: $breakpoint-mobile-min) {
           justify-content: flex-end;
           padding-right: 60px;
+          font-size:15px;
         }
       }
       &-profit {
