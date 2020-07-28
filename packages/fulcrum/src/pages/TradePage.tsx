@@ -687,14 +687,16 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
           ))
 
         } else if (event instanceof LiquidationEvent) {
+          //loanToken in LiquidationEvent is a quoteAsset in TradeEvent
+          //collateralToken in LiquidationEvent is a baseAsset in TradeEvent
           const action = "Liquidated";
           if (positionType === PositionType.LONG) {
-            positionValue = event.collateralWithdrawAmount.div(10 ** 18);
-            tradePrice = event.collateralToLoanRate.div(10 ** 18);
-            value = positionValue.times(tradePrice);
+            positionValue = event.repayAmount.div(10 ** 18);
+            value = event.repayAmount.div(event.collateralToLoanRate);
+            tradePrice = new BigNumber(10 ** 36).div(event.collateralToLoanRate).div(10 ** 18);
             //in case of exotic pairs like ETH-KNC all values should be denominated in USD
-            if (!this.stablecoins.includes(event.loanToken)) { 
-              const swapToUsdHistoryRateRequest = await fetch(`https://api.bzx.network/v1/asset-history-price?asset=${event.loanToken.toLowerCase()}&date=${event.timeStamp.getTime()}`);
+            if (!this.stablecoins.includes(event.collateralToken)) { 
+              const swapToUsdHistoryRateRequest = await fetch(`https://api.bzx.network/v1/asset-history-price?asset=${event.collateralToken.toLowerCase()}&date=${event.timeStamp.getTime()}`);
               const swapToUsdHistoryRateResponse = (await swapToUsdHistoryRateRequest.json()).data;
               const loanAssetUSDStartRate = new BigNumber(swapToUsdHistoryRateResponse.swapToUSDPrice);
               value =  value.times(loanAssetUSDStartRate)
@@ -703,16 +705,16 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
             profit = (tradePrice.minus(openPrice)).times(positionValue);
           }
           else {
-            positionValue = event.repayAmount.div(10 ** 18);
-            tradePrice = new BigNumber(10 ** 36).div(event.collateralToLoanRate).div(10 ** 18);
-            value = positionValue.times(tradePrice);
+            positionValue = event.repayAmount.div(event.collateralToLoanRate);
+            value = event.repayAmount.div(10 ** 18);
+            tradePrice = event.collateralToLoanRate.div(10 ** 18);
             //in case of exotic pairs like ETH-KNC all values should be denominated in USD
-            if (!this.stablecoins.includes(event.collateralToken)) { 
-              const swapToUsdHistoryRateRequest = await fetch(`https://api.bzx.network/v1/asset-history-price?asset=${event.collateralToken.toLowerCase()}&date=${event.timeStamp.getTime()}`);
+            if (!this.stablecoins.includes(event.loanToken)) { 
+              const swapToUsdHistoryRateRequest = await fetch(`https://api.bzx.network/v1/asset-history-price?asset=${event.loanToken.toLowerCase()}&date=${event.timeStamp.getTime()}`);
               const swapToUsdHistoryRateResponse = (await swapToUsdHistoryRateRequest.json()).data;
-              const baseAssetUSDStartRate = new BigNumber(swapToUsdHistoryRateResponse.swapToUSDPrice);
-              value =  value.times(baseAssetUSDStartRate)
-              tradePrice = tradePrice.times(baseAssetUSDStartRate);
+              const collateralAssetUSDStartRate = new BigNumber(swapToUsdHistoryRateResponse.swapToUSDPrice);
+              value =  value.times(collateralAssetUSDStartRate)
+              tradePrice = tradePrice.times(collateralAssetUSDStartRate);
             }
             profit = (openPrice.minus(tradePrice)).times(positionValue);
           }
