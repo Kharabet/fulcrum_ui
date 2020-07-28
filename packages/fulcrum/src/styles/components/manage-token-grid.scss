@@ -1,5 +1,7 @@
 @import "../abstracts/variables";
 .manage-token-grid {
+  position: relative;
+    min-height: 50vh;
   .manage-token-grid__title {
     font-size: 28px;
     font-weight: 900;

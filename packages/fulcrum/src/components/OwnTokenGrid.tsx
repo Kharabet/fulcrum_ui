@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { OwnTokenGridRow, IOwnTokenGridRowProps } from "./OwnTokenGridRow";
 import { OwnTokenGridHeader } from "./OwnTokenGridHeader";
-//import { OwnTokenCardMobile } from "./OwnTokenCardMobile";
+import { PreloaderChart } from "../components/PreloaderChart";
 
 import "../styles/components/own-token-grid.scss"
 
@@ -25,10 +25,9 @@ export class OwnTokenGrid extends Component<IOwnTokenGridProps, IOwnTokenGridSta
   }
 
   public render() {
-    //   return !this.props.isMobileMedia ? this.renderDesktop() : this.renderMobile();
-    // }
+    if (!this.props.ownRowsData.length)
+    return <PreloaderChart quantityDots={4} sizeDots={'middle'} title={"Loading"} isOverlay={false} />;
 
-    // private renderDesktop = () => {
     const ownRows = this.props.ownRowsData.map((e, i) => <OwnTokenGridRow key={i} {...e} />);
     if (ownRows.length === 0) return null;
 
@@ -40,16 +39,4 @@ export class OwnTokenGrid extends Component<IOwnTokenGridProps, IOwnTokenGridSta
     );
   }
 
-  // private renderMobile = () => {
-  //   const ownMobileRows = this.props.ownRowsData.map((e,i) => <OwnTokenCardMobile key={i} {...e} />);
-  //   if (ownMobileRows.length === 0) return null;
-
-  //   return (
-  //     <div className="own-token-cards">
-  //       <div className="own-token-cards__container">
-  //         {ownMobileRows}
-  //       </div>
-  //     </div>
-  //   );
-  // }
 }

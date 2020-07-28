@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { HistoryTokenGridHeader } from "./HistoryTokenGridHeader";
 import { IHistoryTokenGridRowProps, HistoryTokenGridRow } from "./HistoryTokenGridRow";
 import { ReactComponent as ArrowPagination } from "../assets/images/icon_pagination.svg";
+import { PreloaderChart } from "../components/PreloaderChart";
 
 import "../styles/components/history-token-grid.scss";
 
@@ -27,16 +28,23 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
     };
   }
 
-  public componentDidMount(): void {
-    const quantityGrids = Math.floor(this.props.historyRowsData.length / this.quantityVisibleRow);
-    const isLastRow = this.props.historyRowsData.length === (this.state.numberPagination + 1) * this.quantityVisibleRow;
-    this.setState({ ...this.state, quantityGrids: quantityGrids, isLastRow: isLastRow })
+
+  public componentDidUpdate(prevProps: Readonly<IHistoryTokenGridProps>): void {
+    if (this.props.historyRowsData != prevProps.historyRowsData) {
+      const quantityGrids = Math.floor(this.props.historyRowsData.length / this.quantityVisibleRow);
+      const isLastRow = this.props.historyRowsData.length === (this.state.numberPagination + 1) * this.quantityVisibleRow;
+      this.setState({ ...this.state, quantityGrids: quantityGrids, isLastRow: isLastRow })
+    }
   }
+
   public render() {
+    if (!this.props.historyRowsData.length)
+      return <PreloaderChart quantityDots={4} sizeDots={'middle'} title={"Loading"} isOverlay={false} />;
+
     const historyRows = this.props.historyRowsData.slice(this.quantityVisibleRow * this.state.numberPagination, this.quantityVisibleRow * this.state.numberPagination + this.quantityVisibleRow).map((e, i) => <HistoryTokenGridRow key={i} {...e} />);
-    if (historyRows.length === 0) return null;
 
     return (
+
       <div className="history-token-grid">
         {!this.props.isMobileMedia && <HistoryTokenGridHeader />}
         {historyRows}
