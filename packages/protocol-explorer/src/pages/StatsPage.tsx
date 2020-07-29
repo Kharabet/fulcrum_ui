@@ -76,7 +76,7 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
     }
 
     const liquidationEvents = ExplorerProvider.Instance.getGridItems((await ExplorerProvider.Instance.getLiquidationHistory()).filter((e: LiquidationEvent) => e.loanToken === this.state.asset));
-    const tradeEvents = ExplorerProvider.Instance.getGridItems((await ExplorerProvider.Instance.getTradeHistory()).filter((e: TradeEvent) => e.baseToken === this.state.asset));
+    const tradeEvents = ExplorerProvider.Instance.getGridItems((await ExplorerProvider.Instance.getTradeHistory()).filter((e: TradeEvent) => e.loanToken === this.state.asset));
     const closeEvents = ExplorerProvider.Instance.getGridItems((await ExplorerProvider.Instance.getCloseWithSwapHistory()).filter((e: CloseWithSwapEvent) => e.loanToken === this.state.asset));
     const closeWithDepositEvents = ExplorerProvider.Instance.getGridItems((await ExplorerProvider.Instance.getCloseWithDepositHistory()).filter((e: CloseWithDepositEvent) => e.loanToken === this.state.asset));
     const borrowEvents = ExplorerProvider.Instance.getGridItems((await ExplorerProvider.Instance.getBorrowHistory()).filter((e: BorrowEvent) => e.loanToken === this.state.asset));

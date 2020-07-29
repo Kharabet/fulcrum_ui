@@ -6,8 +6,8 @@ export class TradeEvent {
   public readonly user: string; //indexed 
   public readonly lender: string; //indexed
   public readonly loanId: string; //indexed
-  public readonly baseToken: Asset; 
-  public readonly quoteToken: Asset; 
+  public readonly collateralToken: Asset; 
+  public readonly loanToken: Asset; 
   public readonly positionSize: BigNumber;
   public readonly borrowedAmount: BigNumber;
   public readonly interestRate: BigNumber;
@@ -22,8 +22,8 @@ export class TradeEvent {
     user: string,
     lender: string,
     loanId: string,
-    baseToken: Asset,
-    quoteToken: Asset,
+    collateralToken: Asset,
+    loanToken: Asset,
     positionSize: BigNumber,
     borrowedAmount: BigNumber,
     interestRate: BigNumber,
@@ -35,8 +35,8 @@ export class TradeEvent {
     txHash: string
   ) {
     this.user = user;
-    this.baseToken = baseToken;
-    this.quoteToken = quoteToken;
+    this.collateralToken = collateralToken;
+    this.loanToken = loanToken;
     this.lender = lender;
     this.loanId = loanId;
     this.positionSize = positionSize;

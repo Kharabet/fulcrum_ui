@@ -18,11 +18,11 @@ export class CloseWithSwapEvent {
 
   constructor(
     user: string,
-    lender: string,
-    loanId: string,
     collateralToken: Asset,
     loanToken: Asset,
+    lender: string,
     closer: string,
+    loanId: string,
     positionCloseSize: BigNumber,
     loanCloseAmount: BigNumber,
     exitPrice: BigNumber,
@@ -31,8 +31,8 @@ export class CloseWithSwapEvent {
     txHash: string
   ) {
     this.user = user;
-    this.loanToken = loanToken;
     this.collateralToken = collateralToken;
+    this.loanToken = loanToken;
     this.lender = lender;
     this.closer = closer;
     this.loanId = loanId;

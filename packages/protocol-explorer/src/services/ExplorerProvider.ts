@@ -283,7 +283,7 @@ export class ExplorerProvider {
     public getTradeHistory = async (): Promise<TradeEvent[]> => {
         let result: TradeEvent[] = [];
         if (!this.contractsSource) return result;
-        const bzxContractAddress = this.contractsSource.getiBZxAddress();
+        const bzxContractAddress = this.contractsSource.getiBZxAddress()
         if (!bzxContractAddress) return result
         const etherscanApiKey = configProviders.Etherscan_Api;
         let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${TradeEvent.topic0}&apikey=${etherscanApiKey}`
@@ -292,96 +292,96 @@ export class ExplorerProvider {
         if (tradeEventResponseJson.status !== "1") return result;
         const events = tradeEventResponseJson.result;
         result = events.reverse().map((event: any) => {
-            const userAddress = event.topics[1].replace("0x000000000000000000000000", "0x");
-            const lender = event.topics[2].replace("0x000000000000000000000000", "0x");
-            const loandId = event.topics[3];
-            const data = event.data.replace("0x", "");
-            const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
-            if (!dataSegments) return result;
-            const loanTokenAddress = dataSegments[0].replace("000000000000000000000000", "0x");
-            const collateralTokenAddress = dataSegments[1].replace("000000000000000000000000", "0x");
-            const loanToken = this.contractsSource!.getAssetFromAddress(loanTokenAddress);
-            const collateralToken = this.contractsSource!.getAssetFromAddress(collateralTokenAddress);
-
-            const positionSize = new BigNumber(parseInt(dataSegments[2], 16));
-            const borrowedAmount = new BigNumber(parseInt(dataSegments[3], 16));
-            const interestRate = new BigNumber(parseInt(dataSegments[4], 16));
-            const settlementDate = new Date(parseInt(dataSegments[5], 16) * 1000);
-            const entryPrice = new BigNumber(parseInt(dataSegments[6], 16));
-            const entryLeverage = new BigNumber(parseInt(dataSegments[7], 16));
-            const currentLeverage = new BigNumber(parseInt(dataSegments[8], 16));
-            const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000);
-            const txHash = event.transactionHash;
-            return new TradeEvent(
-                userAddress,
-                lender,
-                loandId,
-                loanToken,
-                collateralToken,
-                positionSize,
-                borrowedAmount,
-                interestRate,
-                settlementDate,
-                entryPrice,
-                entryLeverage,
-                currentLeverage,
-                timeStamp,
-                txHash
-            )
-
+          const userAddress = event.topics[1].replace("0x000000000000000000000000", "0x");
+          const lender = event.topics[2].replace("0x000000000000000000000000", "0x");
+          const loandId = event.topics[3];
+          const data = event.data.replace("0x", "");
+          const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
+          if (!dataSegments) return result;
+          const collateralTokenAddress = dataSegments[0].replace("000000000000000000000000", "0x");
+          const loanTokenAddress = dataSegments[1].replace("000000000000000000000000", "0x");
+          const loanToken = this.contractsSource!.getAssetFromAddress(loanTokenAddress);
+          const collateralToken = this.contractsSource!.getAssetFromAddress(collateralTokenAddress);
+          
+          const positionSize = new BigNumber(parseInt(dataSegments[2], 16));
+          const borrowedAmount = new BigNumber(parseInt(dataSegments[3], 16));
+          const interestRate = new BigNumber(parseInt(dataSegments[4], 16));
+          const settlementDate = new Date(parseInt(dataSegments[5], 16) * 1000);
+          const entryPrice = new BigNumber(parseInt(dataSegments[6], 16));
+          const entryLeverage = new BigNumber(parseInt(dataSegments[7], 16));
+          const currentLeverage = new BigNumber(parseInt(dataSegments[8], 16));
+          const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000);
+          const txHash = event.transactionHash;
+          return new TradeEvent(
+            userAddress,
+            lender,
+            loandId,
+            collateralToken,
+            loanToken,
+            positionSize,
+            borrowedAmount,
+            interestRate,
+            settlementDate,
+            entryPrice,
+            entryLeverage,
+            currentLeverage,
+            timeStamp,
+            txHash
+          )
+    
         })
-        return result;
+        return result
+    
+      }
 
-    }
-
-    public getCloseWithSwapHistory = async (): Promise<CloseWithSwapEvent[]> => {
+      public getCloseWithSwapHistory = async (): Promise<CloseWithSwapEvent[]> => {
         let result: CloseWithSwapEvent[] = [];
         if (!this.contractsSource) return result;
         const bzxContractAddress = this.contractsSource.getiBZxAddress()
         if (!bzxContractAddress) return result
         const etherscanApiKey = configProviders.Etherscan_Api;
         let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${CloseWithSwapEvent.topic0}&apikey=${etherscanApiKey}`
-        const tradeEventResponse = await fetch(etherscanApiUrl);
-        const tradeEventResponseJson = await tradeEventResponse.json();
-        if (tradeEventResponseJson.status !== "1") return result;
-        const events = tradeEventResponseJson.result;
+        const closeWithSwapResponse = await fetch(etherscanApiUrl);
+        const closeWithSwapResponseJson = await closeWithSwapResponse.json();
+        if (closeWithSwapResponseJson.status !== "1") return result;
+        const events = closeWithSwapResponseJson.result;
         result = events.reverse().map((event: any) => {
-            const userAddress = event.topics[1].replace("0x000000000000000000000000", "0x");
-            const lender = event.topics[2].replace("0x000000000000000000000000", "0x");
-            const loandId = event.topics[3];
-            const data = event.data.replace("0x", "");
-            const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
-            if (!dataSegments) return result;
-            const collateralTokenAddress = dataSegments[0].replace("000000000000000000000000", "0x");
-            const loanTokenAddress = dataSegments[1].replace("000000000000000000000000", "0x");
-            const collateralToken = this.contractsSource!.getAssetFromAddress(collateralTokenAddress);
-            const loanToken = this.contractsSource!.getAssetFromAddress(loanTokenAddress);
-            const closer = dataSegments[2].replace("000000000000000000000000", "0x");
-            const positionCloseSize = new BigNumber(parseInt(dataSegments[3], 16));
-            const loanCloseAmount = new BigNumber(parseInt(dataSegments[4], 16));
-            const exitPrice = new BigNumber(parseInt(dataSegments[5], 16));
-            const currentLeverage = new BigNumber(parseInt(dataSegments[6], 16));
-            const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000);
-            const txHash = event.transactionHash;
-            return new CloseWithSwapEvent(
-                userAddress,
-                lender,
-                loandId,
-                collateralToken,
-                loanToken,
-                closer,
-                positionCloseSize,
-                loanCloseAmount,
-                exitPrice,
-                currentLeverage,
-                timeStamp,
-                txHash
-            )
-
+          const userAddress = event.topics[1].replace("0x000000000000000000000000", "0x");
+          const lender = event.topics[2].replace("0x000000000000000000000000", "0x");
+          const loandId = event.topics[3];
+          const data = event.data.replace("0x", "");
+          const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
+          if (!dataSegments) return result;
+          const collateralTokenAddress = dataSegments[0].replace("000000000000000000000000", "0x");
+          const loanTokenAddress = dataSegments[1].replace("000000000000000000000000", "0x");
+          const collateralToken = this.contractsSource!.getAssetFromAddress(collateralTokenAddress);
+          const loanToken = this.contractsSource!.getAssetFromAddress(loanTokenAddress);
+          const closer = dataSegments[2].replace("000000000000000000000000", "0x");
+          const positionCloseSize = new BigNumber(parseInt(dataSegments[3], 16));
+          const loanCloseAmount = new BigNumber(parseInt(dataSegments[4], 16));
+          const exitPrice = new BigNumber(parseInt(dataSegments[5], 16));
+          const currentLeverage = new BigNumber(parseInt(dataSegments[6], 16));
+          const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000);
+          const txHash = event.transactionHash;
+          return new CloseWithSwapEvent(
+            userAddress,
+            collateralToken,
+            loanToken,
+            lender,
+            closer,
+            loandId,
+            positionCloseSize,
+            loanCloseAmount,
+            exitPrice,
+            currentLeverage,
+            timeStamp,
+            txHash
+          )
+    
         })
-        return result;
-
-    }
+        return result
+    
+      }
 
     public getCloseWithDepositHistory = async (): Promise<CloseWithDepositEvent[]> => {
         let result: CloseWithDepositEvent[] = [];
@@ -604,7 +604,7 @@ export class ExplorerProvider {
                     etherscanAddressUrl: `${etherscanUrl}address/${e.user}`,
                     quantity: e.positionSize.div(10 ** 18),
                     action: "Open Fulcrum Loan",
-                    asset: e.baseToken
+                    asset: e.loanToken
                 } as ITxRowProps
             } else if (e instanceof CloseWithSwapEvent) {
                 return {
