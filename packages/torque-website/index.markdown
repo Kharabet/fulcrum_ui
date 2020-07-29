@@ -114,7 +114,7 @@ layout: home
             <div class="row fw-w fd-r fd-md-c">
                 <div class="col">
                     <div class="flex fd-c mx-md-a mb-md-15">
-                        <a href="#" class="button button-blue button-xl">
+                        <a href="https://app.torque.loans/" class="button button-blue button-xl">
                             <div class="flex fd-c">
                                 <span>New user?</span>
                                 <p>Borrow</p>
@@ -306,7 +306,7 @@ layout: home
         <div class="row">
             <div class="col jc-sb w-100 fd-xs-c jc-xs-c al-xs-c">
                 <div class="flex fd-c mb-xs-15">
-                    <a href="#" class="button button-blue button-lg">
+                    <a href="https://app.torque.loans/" class="button button-blue button-lg">
                         <div class="flex fd-c">
                             <span>New user?</span>
                             <p>Borrow</p>
