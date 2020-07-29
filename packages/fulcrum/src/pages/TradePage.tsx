@@ -27,6 +27,8 @@ import { PositionEventsGroup } from "../domain/PositionEventsGroup";
 import { PositionHistoryData } from "../domain/PositionHistoryData";
 import { LiquidationEvent } from "../domain/LiquidationEvent";
 import { CloseWithSwapEvent } from "../domain/CloseWithSwapEvent";
+import { EarnRewardEvent } from "../domain/EarnRewardEvent";
+import { PayTradingFeeEvent } from "../domain/PayTradingFeeEvent";
 
 const ManageTokenGrid = React.lazy(() => import('../components/ManageTokenGrid'));
 const TradeForm = React.lazy(() => import('../components/TradeForm'));
@@ -42,6 +44,12 @@ export interface ITradePageProps {
 export interface IMarketPair {
   baseToken: Asset;
   quoteToken: Asset;
+}
+
+export interface IHistoryEvents {
+  groupedEvents: (TradeEvent | CloseWithSwapEvent | LiquidationEvent)[];
+  earnRewardEvents: EarnRewardEvent[];
+  payTradingFeeEvents: PayTradingFeeEvent[];
 }
 
 interface ITradePageState {
@@ -60,6 +68,7 @@ interface ITradePageState {
   tokenRowsData: ITradeTokenGridRowProps[];
   ownRowsData: IOwnTokenGridRowProps[];
   historyRowsData: IHistoryTokenGridRowProps[];
+  historyEvents: IHistoryEvents | undefined;
   tradeRequestId: number;
   isLoadingTransaction: boolean;
   request: TradeRequest | undefined,
@@ -130,6 +139,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       tokenRowsData: [],
       ownRowsData: [],
       historyRowsData: [],
+      historyEvents: undefined,
       tradeRequestId: 0,
       isLoadingTransaction: false,
       resultTx: true,
@@ -180,9 +190,12 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
 
     const ownRowsData = await this.getOwnRowsData(this.state);
     let historyRowsData: IHistoryTokenGridRowProps[] = [];
-    if (this.state.showMyTokensOnly)
+    let historyEvents = undefined;
+    if (this.state.showMyTokensOnly) {
+      historyEvents = await this.getHistoryEvents(this.state);
       historyRowsData = await this.getHistoryRowsData(this.state);
-    await this.setState({ ...this.state, ownRowsData: ownRowsData, historyRowsData });
+    }
+    await this.setState({ ...this.state, ownRowsData, historyRowsData, historyEvents });
   }
 
   public render() {
@@ -490,9 +503,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     return ownRowsData;
   };
 
-  public getHistoryRowsData = async (state: ITradePageState): Promise<IHistoryTokenGridRowProps[]> => {
-    const historyRowsData: IHistoryTokenGridRowProps[] = [];
-
+  public getHistoryEvents = async (state: ITradePageState): Promise<IHistoryEvents> => {
     const tradeEvents = await FulcrumProvider.Instance.getTradeHistory();
     const closeWithSwapEvents = await FulcrumProvider.Instance.getCloseWithSwapHistory();
     const liquidationEvents = await FulcrumProvider.Instance.getLiquidationHistory();
@@ -515,11 +526,20 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     //@ts-ignore
     const events = tradeEvents.concat(closeWithSwapEvents).concat(liquidationEvents);
     //@ts-ignore
-    const grouped = groupBy(events.sort((a, b) => b.timeStamp.getTime() - a.timeStamp.getTime()), "loanId");
-    const loanIds = Object.keys(grouped);
+    const groupedEvents = groupBy(events.sort((a, b) => b.timeStamp.getTime() - a.timeStamp.getTime()), "loanId");
+
+    return { groupedEvents, earnRewardEvents, payTradingFeeEvents };
+  }
+
+  public getHistoryRowsData = async (state: ITradePageState): Promise<IHistoryTokenGridRowProps[]> => {
+    const historyRowsData: IHistoryTokenGridRowProps[] = [];
+    const historyEvents = state.historyEvents;
+    if (!historyEvents) return [];
+
+    const loanIds = Object.keys(historyEvents.groupedEvents);
     for (const loanId of loanIds) {
       //@ts-ignore
-      const events = grouped[loanId].sort((a, b) => a.timeStamp.getTime() - b.timeStamp.getTime());
+      const events = historyEvents.groupedEvents[loanId].sort((a, b) => a.timeStamp.getTime() - b.timeStamp.getTime());
       const tradeEvent = events[0] as TradeEvent
 
       const isLoanTokenOnlyInQuoteTokens = !this.baseTokens.includes(tradeEvent.loanToken) && this.quoteTokens.includes(tradeEvent.loanToken)
@@ -582,7 +602,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         let profit: BigNumber | string = "-";
         const timeStamp = event.timeStamp;
         const txHash = event.txHash;
-        const payTradingFeeEvent = payTradingFeeEvents.find(e => e.timeStamp.getTime() === timeStamp.getTime());
+        const payTradingFeeEvent = historyEvents.payTradingFeeEvents.find(e => e.timeStamp.getTime() === timeStamp.getTime());
 
         if (payTradingFeeEvent) {
           const swapToUsdHistoryRateRequest = await fetch(`https://api.bzx.network/v1/asset-history-price?asset=${payTradingFeeEvent.token.toLowerCase()}&date=${payTradingFeeEvent.timeStamp.getTime()}`);
@@ -590,7 +610,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
           const feeAssetUsdRate = swapToUsdHistoryRateResponse.swapToUSDPrice;
           payTradingFeeEvent.amount = payTradingFeeEvent.amount.times(feeAssetUsdRate);
         }
-        const earnRewardEvent = earnRewardEvents.find(e => e.timeStamp.getTime() === timeStamp.getTime());
+        const earnRewardEvent = historyEvents.earnRewardEvents.find(e => e.timeStamp.getTime() === timeStamp.getTime());
         if (event instanceof TradeEvent) {
           const action = "Opened";
           if (positionType === PositionType.LONG) {
@@ -778,7 +798,6 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     // }
 
     // }
-    this.setState({ ...this.state, historyRowsData })
     return historyRowsData;
   };
 
