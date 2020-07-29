@@ -124,7 +124,7 @@ layout: home
                         <span class="info-after-button">Borrow crypto-assets and stablecoins with fixed interest</span>
                     </div>
                 </div>
-                <div class="col fg-1 fg-lg-initial jc-sb jc-lg-fs fd-md-c">
+            <!--    <div class="col fg-1 fg-lg-initial jc-sb jc-lg-fs fd-md-c">
                     <div class="flex fd-c  mr-lg-30 mx-md-a mb-md-15">
                         <a href="#" class="button button-purple button-md">
                             <div class="flex fd-c">
@@ -145,7 +145,7 @@ layout: home
                         </a>
                         <span class="info-after-button">Add or subtract collateral and repay at any time</span>
                     </div>
-                </div>
+                </div> -->
             </div>
         </div>
     </div>
@@ -246,7 +246,7 @@ layout: home
         </div>
     </div>
 </section>
-
+<!--
 <section class="bg-secondary section-stats">
     <div class="container">
         <div class="row">
@@ -266,7 +266,7 @@ layout: home
         </div>
     </div>
 </section>
-
+-->
 <section class="bg-secondary pt-120 pb-75 ta-c pt-xs-90">
     <div class="container">
         <div class="row">
@@ -315,7 +315,7 @@ layout: home
                     </a>
                     <span class="info-after-button">Borrow crypto-assets and stablecoins with fixed interest</span>
                 </div>
-                <div class="flex fd-c">
+                <!--<div class="flex fd-c">
                     <a href="#" class="button button-purple button-lg">
                         <div class="flex fd-c">
                             <span>Already have a loan?</span>
@@ -324,7 +324,7 @@ layout: home
                         {% include svg/arrow-in-circle.svg %}
                     </a>
                     <span class="info-after-button">Stabilize your loan(s) by refinancing from variable to fixed rates</span>
-                </div>
+                </div> -->
             </div>
         </div>
     </div>
