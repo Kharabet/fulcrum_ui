@@ -1837,10 +1837,10 @@ export class FulcrumProvider {
       const data = event.data.replace("0x", "");
       const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
       if (!dataSegments) return result;
-      const baseTokenAddress = dataSegments[0].replace("000000000000000000000000", "0x");
-      const quoteTokenAddress = dataSegments[1].replace("000000000000000000000000", "0x");
-      const baseToken = this.contractsSource!.getAssetFromAddress(baseTokenAddress);
-      const quoteToken = this.contractsSource!.getAssetFromAddress(quoteTokenAddress);
+      const collateralTokenAddress = dataSegments[0].replace("000000000000000000000000", "0x");
+      const loanTokenAddress = dataSegments[1].replace("000000000000000000000000", "0x");
+      const loanToken = this.contractsSource!.getAssetFromAddress(loanTokenAddress);
+      const collateralToken = this.contractsSource!.getAssetFromAddress(collateralTokenAddress);
       
       const positionSize = new BigNumber(parseInt(dataSegments[2], 16));
       const borrowedAmount = new BigNumber(parseInt(dataSegments[3], 16));
@@ -1855,8 +1855,8 @@ export class FulcrumProvider {
         userAddress,
         lender,
         loandId,
-        baseToken,
-        quoteToken,
+        collateralToken,
+        loanToken,
         positionSize,
         borrowedAmount,
         interestRate,
@@ -1893,10 +1893,10 @@ export class FulcrumProvider {
       const data = event.data.replace("0x", "");
       const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
       if (!dataSegments) return result;
-      const baseTokenAddress = dataSegments[0].replace("000000000000000000000000", "0x");
-      const quoteTokenAddress = dataSegments[1].replace("000000000000000000000000", "0x");
-      const baseToken = this.contractsSource!.getAssetFromAddress(baseTokenAddress);
-      const quoteToken = this.contractsSource!.getAssetFromAddress(quoteTokenAddress);
+      const collateralTokenAddress = dataSegments[0].replace("000000000000000000000000", "0x");
+      const loanTokenAddress = dataSegments[1].replace("000000000000000000000000", "0x");
+      const collateralToken = this.contractsSource!.getAssetFromAddress(collateralTokenAddress);
+      const loanToken = this.contractsSource!.getAssetFromAddress(loanTokenAddress);
       const closer = dataSegments[2].replace("000000000000000000000000", "0x");
       const positionCloseSize = new BigNumber(parseInt(dataSegments[3], 16));
       const loanCloseAmount = new BigNumber(parseInt(dataSegments[4], 16));
@@ -1906,8 +1906,8 @@ export class FulcrumProvider {
       const txHash = event.transactionHash;
       return new CloseWithSwapEvent(
         userAddress,
-        baseToken,
-        quoteToken,
+        collateralToken,
+        loanToken,
         lender,
         closer,
         loandId,
