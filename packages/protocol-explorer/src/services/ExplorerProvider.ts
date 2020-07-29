@@ -238,10 +238,10 @@ export class ExplorerProvider {
         const bzxContractAddress = this.contractsSource.getiBZxAddress()
         const etherscanApiKey = configProviders.Etherscan_Api;
         let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${LiquidationEvent.topic0}&apikey=${etherscanApiKey}`
-        const tradeEventResponse = await fetch(etherscanApiUrl);
-        const tradeEventResponseJson = await tradeEventResponse.json();
-        if (tradeEventResponseJson.status !== "1") return result;
-        const events = tradeEventResponseJson.result;
+        const liquidationResponse = await fetch(etherscanApiUrl);
+        const liquidationResponseJson = await liquidationResponse.json();
+        if (liquidationResponseJson.status !== "1") return result;
+        const events = liquidationResponseJson.result;
         result = events.reverse().map((event: any) => {
             const userAddress = event.topics[1].replace("0x000000000000000000000000", "0x");
             const liquidatorAddress = event.topics[2].replace("0x000000000000000000000000", "0x");
@@ -390,10 +390,10 @@ export class ExplorerProvider {
         if (!bzxContractAddress) return result
         const etherscanApiKey = configProviders.Etherscan_Api;
         let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${CloseWithDepositEvent.topic0}&apikey=${etherscanApiKey}`
-        const tradeEventResponse = await fetch(etherscanApiUrl);
-        const tradeEventResponseJson = await tradeEventResponse.json();
-        if (tradeEventResponseJson.status !== "1") return result;
-        const events = tradeEventResponseJson.result;
+        const closeWithDepositResponse = await fetch(etherscanApiUrl);
+        const closeWithDepositResponseJson = await closeWithDepositResponse.json();
+        if (closeWithDepositResponseJson.status !== "1") return result;
+        const events = closeWithDepositResponseJson.result;
         result = events.reverse().map((event: any) => {
             const userAddress = event.topics[1].replace("0x000000000000000000000000", "0x");
             const lender = event.topics[2].replace("0x000000000000000000000000", "0x");
@@ -437,10 +437,10 @@ export class ExplorerProvider {
         if (!bzxContractAddress) return result
         const etherscanApiKey = configProviders.Etherscan_Api;
         let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${BorrowEvent.topic0}&apikey=${etherscanApiKey}`
-        const tradeEventResponse = await fetch(etherscanApiUrl);
-        const tradeEventResponseJson = await tradeEventResponse.json();
-        if (tradeEventResponseJson.status !== "1") return result;
-        const events = tradeEventResponseJson.result;
+        const borrowResponse = await fetch(etherscanApiUrl);
+        const borrowResponseJson = await borrowResponse.json();
+        if (borrowResponseJson.status !== "1") return result;
+        const events = borrowResponseJson.result;
         result = events.reverse().map((event: any) => {
             const userAddress = event.topics[1].replace("0x000000000000000000000000", "0x");
             const lender = event.topics[2].replace("0x000000000000000000000000", "0x");
@@ -526,10 +526,10 @@ export class ExplorerProvider {
         if (!tokenContractAddress) return result
         const etherscanApiKey = configProviders.Etherscan_Api;
         let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${tokenContractAddress}&topic0=${BurnEvent.topic0}&apikey=${etherscanApiKey}`
-        const tradeEventResponse = await fetch(etherscanApiUrl);
-        const tradeEventResponseJson = await tradeEventResponse.json();
-        if (tradeEventResponseJson.status !== "1") return result;
-        const events = tradeEventResponseJson.result;
+        const burnResponse = await fetch(etherscanApiUrl);
+        const burnResponseJson = await burnResponse.json();
+        if (burnResponseJson.status !== "1") return result;
+        const events = burnResponseJson.result;
         result = events.reverse().map((event: any) => {
             const burner = event.topics[1].replace("0x000000000000000000000000", "0x");
             const data = event.data.replace("0x", "");
@@ -561,10 +561,10 @@ export class ExplorerProvider {
         if (!tokenContractAddress) return result
         const etherscanApiKey = configProviders.Etherscan_Api;
         let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${tokenContractAddress}&topic0=${MintEvent.topic0}&apikey=${etherscanApiKey}`
-        const tradeEventResponse = await fetch(etherscanApiUrl);
-        const tradeEventResponseJson = await tradeEventResponse.json();
-        if (tradeEventResponseJson.status !== "1") return result;
-        const events = tradeEventResponseJson.result;
+        const mintResponse = await fetch(etherscanApiUrl);
+        const mintResponseJson = await mintResponse.json();
+        if (mintResponseJson.status !== "1") return result;
+        const events = mintResponseJson.result;
         result = events.reverse().map((event: any) => {
             const minter = event.topics[1].replace("0x000000000000000000000000", "0x");
             const data = event.data.replace("0x", "");
