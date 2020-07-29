@@ -103,17 +103,10 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
             <HeaderMenu items={menu.items} />
           </div>
         </div>
-        <InfoBlock localstorageItemProp="torque-risk-notice"  onAccept={() => {this.forceUpdate()}}>
-        For your safety, please ensure the URL in your browser starts with: https://torque.loans/. <br />
-        Torque is a non-custodial platform for borrowing digital assets. <br />
-        "Non-custodial" means YOU are responsible for the security of your digital assets. <br />
-        To learn more about how to stay safe when using Torque and other bZx products, please read our <button className="disclosure-link" onClick={this.props.isRiskDisclosureModalOpen}>DeFi Risk Disclosure</button>.
+
+        <InfoBlock localstorageItemProp="torque-page-info">
+          You may only manage and repay your existing loans. Full functionality will return after a thorough audit of our newly implemented and preexisting smart contracts.
         </InfoBlock>
-        {localStorage.getItem("torque-risk-notice") ?
-          <InfoBlock localstorageItemProp="torque-page-info">
-            You may only manage and repay your existing loans. Full functionality will return after a thorough audit of our newly implemented and preexisting smart contracts.
-        </InfoBlock>
-          : null}
 
       </header>
     );
