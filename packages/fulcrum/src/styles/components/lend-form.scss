@@ -17,7 +17,6 @@
   }
   &__info_block {
     display: flex;
-    
   }
   &__group-button {
     margin-top: 3px;
@@ -46,12 +45,17 @@
 .lend-form__image {
   background: #fff;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  padding: 20px 0;
+  padding: 40px;
   position: relative;
-  justify-content: flex-end;
-  max-width: 300px;
+  &.notice {
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 0;
+    position: relative;
+    justify-content: flex-end;
+    width: 300px;
+  }
   svg {
     height: 90px;
     width: 90px;
@@ -60,15 +64,15 @@
     }
   }
 }
-.lend-form__notification{
+.lend-form__notification {
   font-size: 11px;
   font-weight: 600;
   color: #586473;
-  a{
+  a {
     cursor: pointer;
     color: #00c0ab;
   }
-  @media screen and (min-width: $breakpoint-mobile-min){
+  @media screen and (min-width: $breakpoint-mobile-min) {
     left: 13px;
     bottom: 13px;
     padding: 0 20px;
@@ -123,7 +127,7 @@
   justify-content: space-between;
   padding: 0;
   margin-bottom: 15px;
-  &.jc-fe{
+  &.jc-fe {
     justify-content: flex-end;
   }
 }
@@ -330,14 +334,13 @@ hr {
   margin: 0 4px;
 }
 
-
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
-    /* display: none; <- Crashes Chrome on hover */
-    -webkit-appearance: none;
-    margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+  /* display: none; <- Crashes Chrome on hover */
+  -webkit-appearance: none;
+  margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
 }
 
-input[type=number] {
-    -moz-appearance:textfield; /* Firefox */
+input[type="number"] {
+  -moz-appearance: textfield; /* Firefox */
 }
