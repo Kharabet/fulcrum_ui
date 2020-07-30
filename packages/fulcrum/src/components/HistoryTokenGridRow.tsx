@@ -14,6 +14,9 @@ interface IHistoryTokenGridRowState {
   assetBalance: BigNumber | null;
   isLoading: boolean;
   isShowCollapse: boolean;
+  assetUsdRate: BigNumber;
+  latestEvent: PositionHistoryData | null;
+  otherEvents: PositionHistoryData[] | null;
 }
 
 export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IHistoryTokenGridRowState> {
@@ -29,7 +32,10 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
     this.state = {
       assetBalance: new BigNumber(0),
       isLoading: true,
-      isShowCollapse: false
+      isShowCollapse: false,
+      assetUsdRate: new BigNumber(0),
+      latestEvent: null,
+      otherEvents: null,
     };
 
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
@@ -42,7 +48,21 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
 
     this._isMounted && this.setState({
       ...this.state,
-      isLoading: false
+      isLoading: true
+    });
+    const latestEvent = this.props.eventsGroup.events[this.props.eventsGroup.events.length - 1];
+
+
+    // const payTradingFeeEvent = latestEvent.payTradingFeeEvent;
+    // const swapToUsdHistoryRateRequest = await fetch(`https://api.bzx.network/v1/asset-history-price?asset=${payTradingFeeEvent.token.toLowerCase()}&date=${payTradingFeeEvent.timeStamp.getTime()}`);
+    // const swapToUsdHistoryRateResponse = (await swapToUsdHistoryRateRequest.json()).data;
+    // const assetUsdRate = swapToUsdHistoryRateResponse.swapToUSDPrice;
+
+    await this._isMounted && this.setState({
+      ...this.state,
+      latestEvent: latestEvent,
+      isLoading: false,
+      // assetUsdRate: assetUsdRate
     });
   }
 
@@ -105,7 +125,7 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
             </React.Fragment>
             : <Preloader width="74px" />
 
-            
+
           }
         </div>
 
@@ -130,7 +150,7 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
   }
 
   public render() {
-    const latestEvent = this.props.eventsGroup.events[this.props.eventsGroup.events.length - 1]
+    const latestEvent = this.props.eventsGroup.events[this.props.eventsGroup.events.length - 1];
     const profitSum = this.props.eventsGroup.events.reduce((a: BigNumber, b: PositionHistoryData) => a.plus(b.profit instanceof BigNumber ? b.profit : new BigNumber(0) || 0), new BigNumber(0));
     return (
       <div>
@@ -185,13 +205,13 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
             <span className="label">Value</span>
             {!this.state.isLoading
               ? <React.Fragment>
-                <span className="sign-currency">$</span>{latestEvent.value.toFixed(2)}
+                <span className="sign-currency">$</span>{latestEvent.value.times(this.state.assetUsdRate).toFixed(2)}
               </React.Fragment>
               : <Preloader width="74px" />
             }
           </div>
           <div title={latestEvent.payTradingFeeEvent && latestEvent.earnRewardEvent
-            && `${latestEvent.payTradingFeeEvent.amount.toFixed(18)} / ${latestEvent.earnRewardEvent.amount.toFixed(18)}`} className="history-token-grid-row__col history-token-grid-row__col-fee-reward">
+            && `${latestEvent.payTradingFeeEvent.amount.times(this.state.assetUsdRate).toFixed(18)} / ${latestEvent.earnRewardEvent.amount.toFixed(18)}`} className="history-token-grid-row__col history-token-grid-row__col-fee-reward">
             <span className="label">Fee / Rewards <span className="bzrx">BZRX</span></span>
             {!this.state.isLoading
               ? latestEvent.payTradingFeeEvent && latestEvent.earnRewardEvent ?

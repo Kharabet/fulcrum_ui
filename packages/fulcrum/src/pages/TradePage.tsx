@@ -21,14 +21,11 @@ import { IOwnTokenGridRowProps } from "../components/OwnTokenGridRow";
 import "../styles/pages/_trade-page.scss";
 import { BigNumber } from "@0x/utils";
 import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
+
+import { IHistoryEvents } from "../domain/IHistoryEvents";
 import { TradeEvent } from "../domain/TradeEvent";
-import { IHistoryTokenGridRowProps } from "../components/HistoryTokenGridRow";
-import { PositionEventsGroup } from "../domain/PositionEventsGroup";
-import { PositionHistoryData } from "../domain/PositionHistoryData";
 import { LiquidationEvent } from "../domain/LiquidationEvent";
 import { CloseWithSwapEvent } from "../domain/CloseWithSwapEvent";
-import { EarnRewardEvent } from "../domain/EarnRewardEvent";
-import { PayTradingFeeEvent } from "../domain/PayTradingFeeEvent";
 
 const ManageTokenGrid = React.lazy(() => import('../components/ManageTokenGrid'));
 const TradeForm = React.lazy(() => import('../components/TradeForm'));
@@ -46,12 +43,6 @@ export interface IMarketPair {
   quoteToken: Asset;
 }
 
-export interface IHistoryEvents {
-  groupedEvents: (TradeEvent | CloseWithSwapEvent | LiquidationEvent)[];
-  earnRewardEvents: EarnRewardEvent[];
-  payTradingFeeEvents: PayTradingFeeEvent[];
-}
-
 interface ITradePageState {
   selectedMarket: IMarketPair;
   showMyTokensOnly: boolean;
@@ -67,7 +58,6 @@ interface ITradePageState {
   openedPositionsCount: number;
   tokenRowsData: ITradeTokenGridRowProps[];
   ownRowsData: IOwnTokenGridRowProps[];
-  historyRowsData: IHistoryTokenGridRowProps[];
   historyEvents: IHistoryEvents | undefined;
   tradeRequestId: number;
   isLoadingTransaction: boolean;
@@ -138,7 +128,6 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       openedPositionsCount: 0,
       tokenRowsData: [],
       ownRowsData: [],
-      historyRowsData: [],
       historyEvents: undefined,
       tradeRequestId: 0,
       isLoadingTransaction: false,
@@ -189,13 +178,11 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     await this.setState({ ...this.state, tokenRowsData });
 
     const ownRowsData = await this.getOwnRowsData(this.state);
-    let historyRowsData: IHistoryTokenGridRowProps[] = [];
     let historyEvents = undefined;
     if (this.state.showMyTokensOnly) {
       historyEvents = await this.getHistoryEvents(this.state);
-      historyRowsData = await this.getHistoryRowsData(this.state);
     }
-    await this.setState({ ...this.state, ownRowsData, historyRowsData, historyEvents });
+    await this.setState({ ...this.state, ownRowsData, historyEvents });
   }
 
   public render() {
@@ -233,7 +220,10 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
             <ManageTokenGrid
               isMobileMedia={this.props.isMobileMedia}
               ownRowsData={this.state.ownRowsData}
-              historyRowsData={this.state.historyRowsData}
+              historyEvents={this.state.historyEvents}
+              stablecoins={this.stablecoins}
+              baseTokens={this.baseTokens}
+              quoteTokens={this.quoteTokens}
             />
           ) : (
               <React.Fragment>
@@ -530,276 +520,6 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
 
     return { groupedEvents, earnRewardEvents, payTradingFeeEvents };
   }
-
-  public getHistoryRowsData = async (state: ITradePageState): Promise<IHistoryTokenGridRowProps[]> => {
-    const historyRowsData: IHistoryTokenGridRowProps[] = [];
-    const historyEvents = state.historyEvents;
-    if (!historyEvents) return [];
-
-    const loanIds = Object.keys(historyEvents.groupedEvents);
-    for (const loanId of loanIds) {
-      //@ts-ignore
-      const events = historyEvents.groupedEvents[loanId].sort((a, b) => a.timeStamp.getTime() - b.timeStamp.getTime());
-      const tradeEvent = events[0] as TradeEvent
-
-      const isLoanTokenOnlyInQuoteTokens = !this.baseTokens.includes(tradeEvent.loanToken) && this.quoteTokens.includes(tradeEvent.loanToken)
-      const isCollateralTokenNotInQuoteTokens = this.baseTokens.includes(tradeEvent.collateralToken) && !this.quoteTokens.includes(tradeEvent.collateralToken)
-      console.log(isLoanTokenOnlyInQuoteTokens)
-      console.log(isCollateralTokenNotInQuoteTokens)
-      console.log("=====")
-      const positionType = isCollateralTokenNotInQuoteTokens || isLoanTokenOnlyInQuoteTokens
-        ? PositionType.LONG
-        : PositionType.SHORT;
-      const baseAsset = positionType === PositionType.LONG
-        ? tradeEvent.collateralToken
-        : tradeEvent.loanToken;
-
-      const quoteAsset = positionType === PositionType.LONG
-        ? tradeEvent.loanToken
-        : tradeEvent.collateralToken;
-
-
-      if (!tradeEvent.entryLeverage) continue;
-      let leverage = new BigNumber(tradeEvent.entryLeverage.div(10 ** 18));
-
-      if (positionType === PositionType.LONG)
-        leverage = leverage.plus(1);
-
-      let openPrice = positionType === PositionType.LONG
-        ? tradeEvent.entryPrice.div(10 ** 18)
-        : new BigNumber(10 ** 36).div(tradeEvent.entryPrice).div(10 ** 18)
-
-      //TODO: swapToUsdHistoryRateRequest extract to function
-      if (positionType === PositionType.LONG) {
-        //in case of exotic pairs like ETH-KNC all values should be denominated in USD
-        if (!this.stablecoins.includes(tradeEvent.loanToken)) {
-          const swapToUsdHistoryRateRequest = await fetch(`https://api.bzx.network/v1/asset-history-price?asset=${tradeEvent.loanToken.toLowerCase()}&date=${tradeEvent.timeStamp.getTime()}`);
-          const swapToUsdHistoryRateResponse = (await swapToUsdHistoryRateRequest.json()).data;
-          const loanAssetUSDStartRate = new BigNumber(swapToUsdHistoryRateResponse.swapToUSDPrice);
-          openPrice = openPrice.times(loanAssetUSDStartRate);
-        }
-      } else {
-        //in case of exotic pairs like ETH-KNC all values should be denominated in USD
-        if (!this.stablecoins.includes(tradeEvent.collateralToken)) {
-          const swapToUsdHistoryRateRequest = await fetch(`https://api.bzx.network/v1/asset-history-price?asset=${tradeEvent.collateralToken.toLowerCase()}&date=${tradeEvent.timeStamp.getTime()}`);
-          const swapToUsdHistoryRateResponse = (await swapToUsdHistoryRateRequest.json()).data;
-          const collateralAssetUSDStartRate = new BigNumber(swapToUsdHistoryRateResponse.swapToUSDPrice);
-          openPrice = openPrice.times(collateralAssetUSDStartRate);
-        }
-      }
-      const positionEventsGroup = new PositionEventsGroup(
-        loanId,
-        baseAsset,
-        quoteAsset,
-        positionType,
-        leverage.toNumber()
-      )
-      for (const event of events) {
-
-        let positionValue = new BigNumber(0);
-        let tradePrice = new BigNumber(0);
-        let value = new BigNumber(0);
-        let profit: BigNumber | string = "-";
-        const timeStamp = event.timeStamp;
-        const txHash = event.txHash;
-        const payTradingFeeEvent = historyEvents.payTradingFeeEvents.find(e => e.timeStamp.getTime() === timeStamp.getTime());
-
-        if (payTradingFeeEvent) {
-          const swapToUsdHistoryRateRequest = await fetch(`https://api.bzx.network/v1/asset-history-price?asset=${payTradingFeeEvent.token.toLowerCase()}&date=${payTradingFeeEvent.timeStamp.getTime()}`);
-          const swapToUsdHistoryRateResponse = (await swapToUsdHistoryRateRequest.json()).data;
-          const feeAssetUsdRate = swapToUsdHistoryRateResponse.swapToUSDPrice;
-          payTradingFeeEvent.amount = payTradingFeeEvent.amount.times(feeAssetUsdRate);
-        }
-        const earnRewardEvent = historyEvents.earnRewardEvents.find(e => e.timeStamp.getTime() === timeStamp.getTime());
-        if (event instanceof TradeEvent) {
-          const action = "Opened";
-          if (positionType === PositionType.LONG) {
-            positionValue = event.positionSize.div(10 ** 18);
-            value = event.positionSize.div(event.entryPrice);
-            tradePrice = new BigNumber(10 ** 36).div(event.entryPrice).div(10 ** 18);
-            //in case of exotic pairs like ETH-KNC all values should be denominated in USD
-            if (!this.stablecoins.includes(event.loanToken)) {
-              const swapToUsdHistoryRateRequest = await fetch(`https://api.bzx.network/v1/asset-history-price?asset=${event.loanToken.toLowerCase()}&date=${event.timeStamp.getTime()}`);
-              const swapToUsdHistoryRateResponse = (await swapToUsdHistoryRateRequest.json()).data;
-              const loanAssetUSDStartRate = new BigNumber(swapToUsdHistoryRateResponse.swapToUSDPrice);
-              value = value.times(loanAssetUSDStartRate)
-              tradePrice = tradePrice.times(loanAssetUSDStartRate);
-            }
-          }
-          else {
-            positionValue = event.positionSize.div(event.entryPrice);
-            value = event.positionSize.div(10 ** 18);
-            tradePrice = event.entryPrice.div(10 ** 18);
-            //in case of exotic pairs like ETH-KNC all values should be denominated in USD
-            if (!this.stablecoins.includes(event.collateralToken)) {
-              const swapToUsdHistoryRateRequest = await fetch(`https://api.bzx.network/v1/asset-history-price?asset=${event.collateralToken.toLowerCase()}&date=${event.timeStamp.getTime()}`);
-              const swapToUsdHistoryRateResponse = (await swapToUsdHistoryRateRequest.json()).data;
-              const collateralAssetUSDStartRate = new BigNumber(swapToUsdHistoryRateResponse.swapToUSDPrice);
-              value = value.times(collateralAssetUSDStartRate)
-              tradePrice = tradePrice.times(collateralAssetUSDStartRate);
-            }
-          }
-
-
-          positionEventsGroup.events.push(new PositionHistoryData(
-            loanId,
-            timeStamp,
-            action,
-            positionValue,
-            tradePrice,
-            value,
-            profit,
-            txHash,
-            payTradingFeeEvent,
-            earnRewardEvent
-          ))
-
-        }
-        else if (event instanceof CloseWithSwapEvent) {
-          const action = "Closed";
-          if (positionType === PositionType.LONG) {
-            positionValue = event.positionCloseSize.div(10 ** 18);
-            value = event.positionCloseSize.div(event.exitPrice);
-            tradePrice = new BigNumber(10 ** 36).div(event.exitPrice).div(10 ** 18);
-            //in case of exotic pairs like ETH-KNC all values should be denominated in USD
-            if (!this.stablecoins.includes(event.loanToken)) {
-              const swapToUsdHistoryRateRequest = await fetch(`https://api.bzx.network/v1/asset-history-price?asset=${event.loanToken.toLowerCase()}&date=${event.timeStamp.getTime()}`);
-              const swapToUsdHistoryRateResponse = (await swapToUsdHistoryRateRequest.json()).data;
-              const loanAssetUSDStartRate = new BigNumber(swapToUsdHistoryRateResponse.swapToUSDPrice);
-              value = value.times(loanAssetUSDStartRate)
-              tradePrice = tradePrice.times(loanAssetUSDStartRate);
-            }
-            profit = (tradePrice.minus(openPrice)).times(positionValue);
-
-          }
-          else {
-            positionValue = event.positionCloseSize.div(event.exitPrice);
-            value = event.positionCloseSize.div(10 ** 18);
-            tradePrice = event.exitPrice.div(10 ** 18);
-            //in case of exotic pairs like ETH-KNC all values should be denominated in USD
-
-            if (!this.stablecoins.includes(event.collateralToken)) {
-              const swapToUsdHistoryRateRequest = await fetch(`https://api.bzx.network/v1/asset-history-price?asset=${event.collateralToken.toLowerCase()}&date=${event.timeStamp.getTime()}`);
-              const swapToUsdHistoryRateResponse = (await swapToUsdHistoryRateRequest.json()).data;
-              const collateralAssetUSDStartRate = new BigNumber(swapToUsdHistoryRateResponse.swapToUSDPrice);
-              value = value.times(collateralAssetUSDStartRate)
-              tradePrice = tradePrice.times(collateralAssetUSDStartRate);
-            }
-            profit = (openPrice.minus(tradePrice)).times(positionValue);
-
-          }
-
-          positionEventsGroup.events.push(new PositionHistoryData(
-            loanId,
-            timeStamp,
-            action,
-            positionValue,
-            tradePrice,
-            value,
-            profit,
-            txHash,
-            payTradingFeeEvent,
-            earnRewardEvent
-          ))
-
-        } else if (event instanceof LiquidationEvent) {
-          //loanToken in LiquidationEvent is a quoteAsset in TradeEvent
-          //collateralToken in LiquidationEvent is a baseAsset in TradeEvent
-          const action = "Liquidated";
-          if (positionType === PositionType.LONG) {
-            positionValue = event.collateralWithdrawAmount.div(10 ** 18);
-            tradePrice = event.collateralToLoanRate.div(10 ** 18);
-            value = positionValue.times(tradePrice);
-            //in case of exotic pairs like ETH-KNC all values should be denominated in USD
-            if (!this.stablecoins.includes(event.loanToken)) {
-              const swapToUsdHistoryRateRequest = await fetch(`https://api.bzx.network/v1/asset-history-price?asset=${event.loanToken.toLowerCase()}&date=${event.timeStamp.getTime()}`);
-              const swapToUsdHistoryRateResponse = (await swapToUsdHistoryRateRequest.json()).data;
-              const loanAssetUSDStartRate = new BigNumber(swapToUsdHistoryRateResponse.swapToUSDPrice);
-              value = value.times(loanAssetUSDStartRate)
-              tradePrice = tradePrice.times(loanAssetUSDStartRate);
-            }
-            profit = (tradePrice.minus(openPrice)).times(positionValue);
-          }
-          else {
-            positionValue = event.repayAmount.div(10 ** 18);
-            tradePrice = new BigNumber(10 ** 36).div(event.collateralToLoanRate).div(10 ** 18);
-            value = positionValue.times(tradePrice);
-            //in case of exotic pairs like ETH-KNC all values should be denominated in USD
-            if (!this.stablecoins.includes(event.collateralToken)) {
-              const swapToUsdHistoryRateRequest = await fetch(`https://api.bzx.network/v1/asset-history-price?asset=${event.collateralToken.toLowerCase()}&date=${event.timeStamp.getTime()}`);
-              const swapToUsdHistoryRateResponse = (await swapToUsdHistoryRateRequest.json()).data;
-              const collateralAssetUSDStartRate = new BigNumber(swapToUsdHistoryRateResponse.swapToUSDPrice);
-              value = value.times(collateralAssetUSDStartRate)
-              tradePrice = tradePrice.times(collateralAssetUSDStartRate);
-            }
-            profit = (openPrice.minus(tradePrice)).times(positionValue);
-          }
-
-          positionEventsGroup.events.push(new PositionHistoryData(
-            loanId,
-            timeStamp,
-            action,
-            positionValue,
-            tradePrice,
-            value,
-            profit,
-            txHash,
-            payTradingFeeEvent,
-            earnRewardEvent
-          ))
-
-        }
-
-      }
-      historyRowsData.push({
-        eventsGroup: positionEventsGroup
-      });
-
-    }
-    // for (const tradeEvent of tradeEvents) {
-
-
-    // const positionType = this.baseTokens.includes(tradeEvent.baseToken)
-    //   ? PositionType.LONG
-    //   : PositionType.SHORT;
-
-    // const baseToken = positionType === PositionType.LONG
-    //   ? tradeEvent.baseToken
-    //   : tradeEvent.quoteToken;
-
-    // const quoteAsset = positionType === PositionType.LONG
-    //   ? tradeEvent.quoteToken
-    //   : tradeEvent.baseToken;
-
-    // let leverage = new BigNumber(tradeEvent.entryLeverage.div(10 ** 18));
-    // if (positionType === PositionType.LONG)
-    //   leverage = leverage.plus(1);
-
-
-    // // const collateralToPrincipalRate = await FulcrumProvider.Instance.getSwapRate(loan.collateralAsset, loan.loanAsset);
-    // let positionValue = tradeEvent.positionSize;
-    // let collateral = new BigNumber(0);
-    // let openPrice = tradeEvent.entryPrice;
-    // let value = positionValue.times(openPrice);
-    // let result = tradeEvent instanceof TradeEvent
-    //   ? "Opened"
-    //   : "Unknown";
-
-    // let profit = new BigNumber(0);
-    // if (positionType === PositionType.LONG) {
-    //   positionValue = tradeEvent.positionSize.div(10 ** 18);
-    //   value = tradeEvent.positionSize.div(tradeEvent.entryPrice);
-    //   openPrice = new BigNumber(10 ** 36).div(tradeEvent.entryPrice).div(10 ** 18);
-    // }
-    // else {
-    //   positionValue = tradeEvent.positionSize.div(tradeEvent.entryPrice);
-    //   value = tradeEvent.positionSize.div(10 ** 18);
-    //   openPrice = tradeEvent.entryPrice.div(10 ** 18);
-    // }
-
-    // }
-    return historyRowsData;
-  };
 
   public getTokenRowsData = (state: ITradePageState): ITradeTokenGridRowProps[] => {
     const tokenRowsData: ITradeTokenGridRowProps[] = [];

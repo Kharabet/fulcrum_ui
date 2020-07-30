@@ -1,18 +1,22 @@
 import React, { Component } from "react";
+
+import { IHistoryEvents } from "../domain/IHistoryEvents";
+import { Asset } from "../domain/Asset";
 import { ManageTokenGridHeader } from "./ManageTokenGridHeader";
-
 import { OwnTokenGrid } from "./OwnTokenGrid";
-import {IHistoryTokenGridProps, HistoryTokenGrid } from "./HistoryTokenGrid";
-import {IHistoryTokenGridRowProps } from "./HistoryTokenGridRow";
-
+import { HistoryTokenGrid } from "./HistoryTokenGrid";
 import { IOwnTokenGridRowProps } from "./OwnTokenGridRow";
+
 
 import "../styles/components/manage-token-grid.scss"
 
 export interface IManageTokenGridProps {
   isMobileMedia: boolean;
   ownRowsData: IOwnTokenGridRowProps[];
-  historyRowsData: IHistoryTokenGridRowProps[];
+  historyEvents: IHistoryEvents | undefined;
+  stablecoins: Asset[];
+  baseTokens: Asset[];
+  quoteTokens: Asset[];
 }
 
 interface IManageTokenGridState {
@@ -31,7 +35,11 @@ export default class ManageTokenGrid extends Component<IManageTokenGridProps, IM
       <div className="manage-token-grid">
         <ManageTokenGridHeader isMobileMedia={this.props.isMobileMedia} isShowHistory={this.state.isShowHistory} updateStateisShowHistory={this.updateStateisShowHistory} />
         {this.state.isShowHistory
-          ? <HistoryTokenGrid historyRowsData={this.props.historyRowsData} isMobileMedia={this.props.isMobileMedia} />
+          ? <HistoryTokenGrid historyEvents={this.props.historyEvents}
+            isMobileMedia={this.props.isMobileMedia}
+            stablecoins={this.props.stablecoins}
+            baseTokens={this.props.baseTokens}
+            quoteTokens={this.props.quoteTokens} />
           : <OwnTokenGrid ownRowsData={this.props.ownRowsData} isMobileMedia={this.props.isMobileMedia} />
         }
       </div>
