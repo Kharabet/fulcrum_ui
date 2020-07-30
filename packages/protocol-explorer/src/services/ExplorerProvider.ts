@@ -602,7 +602,7 @@ export class ExplorerProvider {
                     age: e.timeStamp,
                     account: e.user,
                     etherscanAddressUrl: `${etherscanUrl}address/${e.user}`,
-                    quantity: e.positionSize.div(10 ** 18),
+                    quantity: e.borrowedAmount.div(10 ** 18),
                     action: "Open Fulcrum Loan",
                     asset: e.loanToken
                 } as ITxRowProps
