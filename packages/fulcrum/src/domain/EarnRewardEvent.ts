@@ -6,7 +6,7 @@ export class EarnRewardEvent {
   public readonly reciever: string; //indexed 
   public readonly token: Asset; //indexed 
   public readonly loanId: string; //indexed 
-  public readonly amount: BigNumber;
+  public amount: BigNumber;
   public readonly timeStamp: Date;
   public readonly txHash: string;
 

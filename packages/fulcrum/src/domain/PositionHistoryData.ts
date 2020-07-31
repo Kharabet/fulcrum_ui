@@ -1,4 +1,5 @@
-import { BigNumber } from "@0x/utils";import { PayTradingFeeEvent } from "./PayTradingFeeEvent";import { EarnRewardEvent } from "./EarnRewardEvent";
+import { BigNumber } from "@0x/utils"; import { PayTradingFeeEvent } from "./PayTradingFeeEvent"; import { EarnRewardEvent } from "./EarnRewardEvent";
+import { Asset } from "../domain/Asset";
 
 export class PositionHistoryData {
   public readonly loanId: string;
@@ -8,6 +9,7 @@ export class PositionHistoryData {
   public readonly tradePrice: BigNumber;
   public readonly value: BigNumber;
   public readonly profit: BigNumber | string;
+  public readonly token: Asset;
   public readonly txHash: string;
   public readonly payTradingFeeEvent: PayTradingFeeEvent | undefined;
   public readonly earnRewardEvent: EarnRewardEvent | undefined;
@@ -21,6 +23,7 @@ export class PositionHistoryData {
     value: BigNumber,
     profit: BigNumber | string,
     txHash: string,
+    token: Asset,
     payTradingFeeEvent: PayTradingFeeEvent | undefined,
     earnRewardEvent: EarnRewardEvent | undefined,
   ) {
@@ -32,6 +35,7 @@ export class PositionHistoryData {
     this.value = value;
     this.profit = profit;
     this.txHash = txHash;
+    this.token = token;
     this.payTradingFeeEvent = payTradingFeeEvent;
     this.earnRewardEvent = earnRewardEvent;
   }
