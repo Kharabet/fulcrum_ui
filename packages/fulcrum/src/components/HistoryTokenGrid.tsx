@@ -150,7 +150,7 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
         let positionValue = new BigNumber(0);
         let tradePrice = new BigNumber(0);
         let value = new BigNumber(0);
-        let token: Asset;
+        let quoteToken: Asset;
         let profit: BigNumber | string = "-";
         const timeStamp = event.timeStamp;
         const txHash = event.txHash;
@@ -169,7 +169,7 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
             positionValue = event.positionSize.div(10 ** 18);
             value = event.positionSize.div(event.entryPrice);
             tradePrice = new BigNumber(10 ** 36).div(event.entryPrice).div(10 ** 18);
-            token = event.loanToken;
+            quoteToken = event.loanToken;
 
             //in case of exotic pairs like ETH-KNC all values should be denominated in USD           
             // if (!this.props.stablecoins.includes(event.loanToken)) {
@@ -184,7 +184,7 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
             positionValue = event.positionSize.div(event.entryPrice);
             value = event.positionSize.div(10 ** 18);
             tradePrice = event.entryPrice.div(10 ** 18);
-            token = event.collateralToken;
+            quoteToken = event.collateralToken;
 
             //in case of exotic pairs like ETH-KNC all values should be denominated in USD
             //if (!this.props.stablecoins.includes(event.collateralToken)) {
@@ -205,7 +205,7 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
             value,
             profit,
             txHash,
-            token,
+            quoteToken,
             payTradingFeeEvent,
             earnRewardEvent
           ))
@@ -217,7 +217,7 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
             positionValue = event.positionCloseSize.div(10 ** 18);
             value = event.positionCloseSize.div(event.exitPrice);
             tradePrice = new BigNumber(10 ** 36).div(event.exitPrice).div(10 ** 18);
-            token = event.loanToken;
+            quoteToken = event.loanToken;
 
             //in case of exotic pairs like ETH-KNC all values should be denominated in USD
             // if (!this.props.stablecoins.includes(event.loanToken)) {
@@ -234,7 +234,7 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
             positionValue = event.positionCloseSize.div(event.exitPrice);
             value = event.positionCloseSize.div(10 ** 18);
             tradePrice = event.exitPrice.div(10 ** 18);
-            token = event.collateralToken;
+            quoteToken = event.collateralToken;
 
             //in case of exotic pairs like ETH-KNC all values should be denominated in USD
             // if (!this.props.stablecoins.includes(event.collateralToken)) {
@@ -257,7 +257,7 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
             value,
             profit,
             txHash,
-            token,
+            quoteToken,
             payTradingFeeEvent,
             earnRewardEvent
           ))
@@ -270,7 +270,7 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
             positionValue = event.collateralWithdrawAmount.div(10 ** 18);
             tradePrice = event.collateralToLoanRate.div(10 ** 18);
             value = positionValue.times(tradePrice);
-            token = event.loanToken;
+            quoteToken = event.loanToken;
 
             //in case of exotic pairs like ETH-KNC all values should be denominated in USD
             // if (!this.props.stablecoins.includes(event.loanToken)) {
@@ -286,7 +286,7 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
             positionValue = event.repayAmount.div(10 ** 18);
             tradePrice = new BigNumber(10 ** 36).div(event.collateralToLoanRate).div(10 ** 18);
             value = positionValue.times(tradePrice);
-            token = event.collateralToken;
+            quoteToken = event.collateralToken;
 
             //in case of exotic pairs like ETH-KNC all values should be denominated in USD
             // if (!this.props.stablecoins.includes(event.collateralToken)) {
@@ -308,7 +308,7 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
             value,
             profit,
             txHash,
-            token,
+            quoteToken,
             payTradingFeeEvent,
             earnRewardEvent
           ))
