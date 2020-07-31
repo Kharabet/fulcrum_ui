@@ -1,4 +1,5 @@
 import React from "react";
+import { ReactComponent as LogoSign } from "../assets/images/logo-sign.svg";
 import { ReactComponent as LogoBzx } from "../assets/images/logo-bzx.svg";
 import { ReactComponent as Github } from "../assets/images/github.svg";
 import { ReactComponent as Twitter } from "../assets/images/twitter.svg";
@@ -24,7 +25,12 @@ export const FooterSocial = (props: IFooterSocialProps) => {
       <div className="item-social">
         <p className="data-protocol">Stakers Dashboard is built on the bZx protocol</p>
         <a href="https://bzx.network/" target="_blank" className="logo">
-          <LogoBzx />
+          <div className="logo-sign">
+            <LogoSign />
+          </div>
+          <div className="logo-bzx">
+            <LogoBzx />
+          </div>
         </a>
         <div className="flex data-year">
           <p className="light-gray-color">© {new Date().getFullYear()} bZeroX, LLC</p>

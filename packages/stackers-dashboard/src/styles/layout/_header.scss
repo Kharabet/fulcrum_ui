@@ -25,12 +25,11 @@ header {
     &.logo {
       display: flex;
       z-index: 2;
-      svg {
-        @media screen and (max-width: $width-max-sm) {
-          width: 180px;
-          height: auto;
-        }
-      }
+    }
+  }
+  .footer-social{
+    .logo{
+      justify-content: center;
     }
   }
 }
