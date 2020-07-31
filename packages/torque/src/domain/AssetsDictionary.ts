@@ -260,7 +260,7 @@ export class AssetsDictionary {
         new Map<number, string | null>([
           [1, "0xdd974d5c2e2928dea5f71b9825b8b646686bd200"],
           [3, "0x4e470dc7321e84ca96fcaedd0c8abcebbaeb68c6"],
-          [42, "0xad67cB4d63C9da94AcA37fDF2761AaDF780ff4a2"]
+          [42, "0xad67cb4d63c9da94aca37fdf2761aadf780ff4a2"]
         ])
       )
     ],
