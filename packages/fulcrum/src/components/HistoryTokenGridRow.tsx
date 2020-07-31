@@ -10,6 +10,7 @@ import { PositionHistoryData } from "../domain/PositionHistoryData";
 export interface IHistoryTokenGridRowProps {
   eventsGroup: PositionEventsGroup;
   stablecoins: Asset[];
+  isHidden: boolean;
 }
 
 interface IHistoryTokenGridRowState {
@@ -69,14 +70,12 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
         latestEvent.payTradingFeeEvent.amount = latestEvent.payTradingFeeEvent.amount.times(assetUsdRate);
       }
     }
-
     this._isMounted && this.setState({
       ...this.state,
       latestEvent,
       isLoading: false,
       isLoadedRate: true
     });
-
   }
 
   private onProviderAvailable = async () => {
@@ -96,12 +95,20 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
 
   public componentDidMount(): void {
     this._isMounted = true;
+    if (!this.props.isHidden)
+      this.derivedUpdate();
+  }
 
-    this.derivedUpdate();
+  public componentDidUpdate(prevProps: IHistoryTokenGridRowProps): void {
+    if (this.props.isHidden !== prevProps.isHidden && !this.props.isHidden && !this.state.isLoadedRate) {
+      this.derivedUpdate();
+    }
   }
 
   private getSwappedEvents = async () => {
     const croppedEvent = this.props.eventsGroup.events.slice(0, -1).reverse();
+
+    if (this.state.otherEvents.length) return;
 
     const swappedEvents = await Promise.all(croppedEvent.map(async (swappedEvent) => {
       const event = { ...swappedEvent };
@@ -122,6 +129,7 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
     }));
 
     this.setState({ ...this.state, otherEvents: swappedEvents });
+
 
   }
 
@@ -187,6 +195,7 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
   }
 
   public render() {
+    if (this.props.isHidden) return null;
 
     const latestEvent = this.state.latestEvent ?? this.props.eventsGroup.events[this.props.eventsGroup.events.length - 1];
     // const profitSum = this.props.eventsGroup.events.reduce((a: BigNumber, b: PositionHistoryData) => a.plus(b.profit instanceof BigNumber ? b.profit : new BigNumber(0) || 0), new BigNumber(0));

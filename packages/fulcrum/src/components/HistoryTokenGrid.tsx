@@ -50,6 +50,7 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
   public componentDidMount(): void {
     this.derivedUpdate();
   }
+
   public componentDidUpdate(prevProps: IHistoryTokenGridProps): void {
     if (prevProps.historyEvents != this.props.historyEvents) {
       this.derivedUpdate();
@@ -65,9 +66,14 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
     if (!this.state.historyRowsData.length)
       return <PreloaderChart quantityDots={4} sizeDots={'middle'} title={"Loading"} isOverlay={false} />;
 
-      const historyRows = this.state.historyRowsData
-      .map((e, i) => <HistoryTokenGridRow key={i} {...e} />)
-      .slice(this.quantityVisibleRow * this.state.numberPagination, this.quantityVisibleRow * this.state.numberPagination + this.quantityVisibleRow);
+    const startIndex = this.quantityVisibleRow * this.state.numberPagination;
+    const endIndex = this.quantityVisibleRow * this.state.numberPagination + this.quantityVisibleRow;
+    const historyRows = this.state.historyRowsData
+      .map((e, i) => {
+        e.isHidden = (i >= startIndex && i < endIndex) ? false : true;
+        return < HistoryTokenGridRow key={i} {...e} />
+      });
+    //.slice(this.quantityVisibleRow * this.state.numberPagination, this.quantityVisibleRow * this.state.numberPagination + this.quantityVisibleRow);
     return (
 
       <div className="history-token-grid">
@@ -312,13 +318,13 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
             payTradingFeeEvent,
             earnRewardEvent
           ))
-
         }
-
       }
+
       historyRowsData.push({
         eventsGroup: positionEventsGroup,
-        stablecoins: this.props.stablecoins
+        stablecoins: this.props.stablecoins,
+        isHidden: true
       });
     }
 
