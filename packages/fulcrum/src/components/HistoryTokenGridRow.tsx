@@ -58,8 +58,8 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
 
     const latestEvent = { ...this.props.eventsGroup.events[this.props.eventsGroup.events.length - 1] };
 
-    if (!this.props.stablecoins.includes(latestEvent.token)) {
-      const assetUsdRate = await this.getAssetUSDRate(latestEvent.token, latestEvent.date);
+    if (!this.props.stablecoins.includes(latestEvent.quoteToken)) {
+      const assetUsdRate = await this.getAssetUSDRate(latestEvent.quoteToken, latestEvent.date);
       latestEvent.tradePrice = latestEvent.tradePrice.times(assetUsdRate);
       latestEvent.value = latestEvent.value.times(assetUsdRate);
       if (latestEvent.profit instanceof BigNumber) {
@@ -113,8 +113,8 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
     const swappedEvents = await Promise.all(croppedEvent.map(async (swappedEvent) => {
       const event = { ...swappedEvent };
 
-      if (!this.props.stablecoins.includes(event.token)) {
-        const assetUsdRate = await this.getAssetUSDRate(event.token, event.date);
+      if (!this.props.stablecoins.includes(event.quoteToken)) {
+        const assetUsdRate = await this.getAssetUSDRate(event.quoteToken, event.date);
         event.tradePrice = event.tradePrice.times(assetUsdRate);
         event.value = event.value.times(assetUsdRate);
         if (event.profit instanceof BigNumber) {

@@ -9,7 +9,7 @@ export class PositionHistoryData {
   public readonly tradePrice: BigNumber;
   public readonly value: BigNumber;
   public readonly profit: BigNumber | string;
-  public readonly token: Asset;
+  public readonly quoteToken: Asset;
   public readonly txHash: string;
   public readonly payTradingFeeEvent: PayTradingFeeEvent | undefined;
   public readonly earnRewardEvent: EarnRewardEvent | undefined;
@@ -23,7 +23,7 @@ export class PositionHistoryData {
     value: BigNumber,
     profit: BigNumber | string,
     txHash: string,
-    token: Asset,
+    quoteToken: Asset,
     payTradingFeeEvent: PayTradingFeeEvent | undefined,
     earnRewardEvent: EarnRewardEvent | undefined,
   ) {
@@ -35,7 +35,7 @@ export class PositionHistoryData {
     this.value = value;
     this.profit = profit;
     this.txHash = txHash;
-    this.token = token;
+    this.quoteToken = quoteToken;
     this.payTradingFeeEvent = payTradingFeeEvent;
     this.earnRewardEvent = earnRewardEvent;
   }
