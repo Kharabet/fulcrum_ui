@@ -65,10 +65,9 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
     if (!this.state.historyRowsData.length)
       return <PreloaderChart quantityDots={4} sizeDots={'middle'} title={"Loading"} isOverlay={false} />;
 
-    const historyRows = this.state.historyRowsData
-    .slice(this.quantityVisibleRow * this.state.numberPagination, this.quantityVisibleRow * this.state.numberPagination + this.quantityVisibleRow)
-    .map((e, i) => <HistoryTokenGridRow key={i} {...e} />);
-
+      const historyRows = this.state.historyRowsData
+      .map((e, i) => <HistoryTokenGridRow key={i} {...e} />)
+      .slice(this.quantityVisibleRow * this.state.numberPagination, this.quantityVisibleRow * this.state.numberPagination + this.quantityVisibleRow);
     return (
 
       <div className="history-token-grid">
