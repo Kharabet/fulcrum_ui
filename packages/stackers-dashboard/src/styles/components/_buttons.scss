@@ -15,6 +15,10 @@
   @media screen and (max-width: $width-max-sm) {
     padding: 30px 0 15px 0;
     justify-content: center;
+    .notice{
+      width: 100%;
+      text-align: center;
+    }
   }
   .button {
     margin-bottom: 15px;
