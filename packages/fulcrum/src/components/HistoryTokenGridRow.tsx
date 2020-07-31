@@ -17,7 +17,6 @@ interface IHistoryTokenGridRowState {
   isLoading: boolean;
   isLoadedRate: boolean;
   isShowCollapse: boolean;
-  assetUsdRate: BigNumber;
   latestEvent: PositionHistoryData | null;
   otherEvents: PositionHistoryData[];
 }
@@ -37,7 +36,6 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
       isLoading: true,
       isLoadedRate: false,
       isShowCollapse: false,
-      assetUsdRate: new BigNumber(0),
       latestEvent: null,
       otherEvents: [],
     };
@@ -59,17 +57,17 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
 
     const latestEvent = { ...this.props.eventsGroup.events[this.props.eventsGroup.events.length - 1] };
 
-    if (latestEvent.payTradingFeeEvent && !this.props.stablecoins.includes(latestEvent.payTradingFeeEvent.token)) {
-      latestEvent.payTradingFeeEvent = { ...this.props.eventsGroup.events[this.props.eventsGroup.events.length - 1].payTradingFeeEvent! };//deep copy
-      const feeAssetUsdRate = await this.getAssetUSDRate(latestEvent.payTradingFeeEvent.token, latestEvent.payTradingFeeEvent.timeStamp);
-      latestEvent.payTradingFeeEvent.amount = latestEvent.payTradingFeeEvent.amount.times(feeAssetUsdRate);
-    }
     if (!this.props.stablecoins.includes(latestEvent.token)) {
       const assetUsdRate = await this.getAssetUSDRate(latestEvent.token, latestEvent.date);
       latestEvent.tradePrice = latestEvent.tradePrice.times(assetUsdRate);
       latestEvent.value = latestEvent.value.times(assetUsdRate);
-      if (latestEvent.profit instanceof BigNumber)
+      if (latestEvent.profit instanceof BigNumber) {
         latestEvent.profit = latestEvent.profit.times(assetUsdRate);
+      }
+      if (latestEvent.payTradingFeeEvent) {
+        latestEvent.payTradingFeeEvent = { ...latestEvent.payTradingFeeEvent! };//deep copy
+        latestEvent.payTradingFeeEvent.amount = latestEvent.payTradingFeeEvent.amount.times(assetUsdRate);
+      }
     }
 
     this._isMounted && this.setState({
@@ -108,18 +106,17 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
     const swappedEvents = await Promise.all(croppedEvent.map(async (swappedEvent) => {
       const event = { ...swappedEvent };
 
-      if (event.payTradingFeeEvent && !this.props.stablecoins.includes(event.payTradingFeeEvent.token)) {
-        event.payTradingFeeEvent = { ...swappedEvent.payTradingFeeEvent! };//deep copy
-        const feeAssetUsdRate = await this.getAssetUSDRate(event.payTradingFeeEvent.token, event.payTradingFeeEvent.timeStamp);
-        event.payTradingFeeEvent.amount = event.payTradingFeeEvent.amount.times(feeAssetUsdRate);
-      }
-
       if (!this.props.stablecoins.includes(event.token)) {
         const assetUsdRate = await this.getAssetUSDRate(event.token, event.date);
         event.tradePrice = event.tradePrice.times(assetUsdRate);
         event.value = event.value.times(assetUsdRate);
-        if (event.profit instanceof BigNumber)
+        if (event.profit instanceof BigNumber) {
           event.profit = event.profit.times(assetUsdRate);
+        }
+        if (event.payTradingFeeEvent) {
+          event.payTradingFeeEvent = { ...swappedEvent.payTradingFeeEvent! };//deep copy
+          event.payTradingFeeEvent.amount = event.payTradingFeeEvent.amount.times(assetUsdRate);
+        }
       }
       return event;
     }));
