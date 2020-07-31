@@ -1,5 +1,6 @@
 import React, { Component } from "react";
-import { ReactComponent as LogoBzx } from "../assets/images/logo-explorer.svg"
+import { ReactComponent as LogoExplorer } from "../assets/images/logo-explorer.svg"
+import { ReactComponent as LogoSign } from "../assets/images/logo-sign.svg"
 import { HeaderMenu } from "./HeaderMenu";
 import { Link } from "react-router-dom";
 import { OnChainIndicator } from "../components/OnChainIndicator";
@@ -39,7 +40,10 @@ export class Header extends Component<IHeaderProps, IHeaderState> {
         <div className="container container-md">
           <div className="flex jc-sb ai-c ta-c relative">
             <Link to="/" className="logo">
-              <LogoBzx />
+              <div className="wrapper-logo-sign">
+                <LogoSign />
+              </div>
+              <LogoExplorer />
             </Link>
             <HeaderMenu />
             <div className="flex ai-c header-right">
@@ -60,7 +64,10 @@ export class Header extends Component<IHeaderProps, IHeaderState> {
         <div className="flex fd-c h-100">
           <div className="flex jc-sb ai-c w-100 px-15">
             <Link to="/" className="logo">
-              <LogoBzx />
+              <div className="wrapper-logo-sign">
+                <LogoSign />
+              </div>
+              <LogoExplorer />
             </Link>
             <div className="header_icon" onClick={this.onMenuToggle}>
               {!this.state.isMenuOpen ? <MenuIconOpen className="header__menu" /> : <MenuIconClose className="header__menu" />}

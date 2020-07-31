@@ -24,13 +24,17 @@ header {
   a {
     &.logo {
       display: flex;
+      align-items: center;
       z-index: 2;
       @media screen and (max-width: $width-max-md) {
         margin-left: 15px;
-        svg {
-          width: 180px;
-          height: auto;
-        }
+      }
+    }
+  }
+  .footer-social {
+    .logo {
+      @media screen and (max-width: $width-max-md) {
+        justify-content: center;
       }
     }
   }

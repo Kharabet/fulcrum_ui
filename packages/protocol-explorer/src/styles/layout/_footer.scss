@@ -131,14 +131,9 @@ footer {
     }
   }
   .logo {
-    display: block;
+    display: flex;
+    align-items: center;
     margin-bottom: 25px;
-    svg {
-      @media screen and (max-width: $width-max-sm) {
-        width: 100px;
-        height: auto;
-      }
-    }
   }
   .data-protocol {
     font-weight: 600;
