@@ -11,6 +11,7 @@ var coins = document.querySelectorAll('#calculator-earn .coin-calc');
 var wrapperFinance = document.querySelector('.wrapper-finance');
 
 var calcWidgetResult = document.querySelector(".result-calc .earn-usd-value");
+var calcWidgetItem = document.querySelector(".result-calc .earn-usd-item");
 var liveEarningsElem = document.querySelector(".live-earnings-value");
 
 (getData)(['apr', 'rates']);
@@ -150,7 +151,7 @@ function updateEarningsCalc(quantity) {
     document.querySelector(".item-earn.fulcrum .earn-usd-value").textContent = earnings;
 
     calcWidgetResult.textContent = earnings;
-    updateCalcResultFontSize(calcWidgetResult);
+    updateCalcResultFontSize(calcWidgetItem);
 
 
     updateTraditionalFinance(usdAmount);
