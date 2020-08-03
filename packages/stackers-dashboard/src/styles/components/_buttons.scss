@@ -15,6 +15,10 @@
   @media screen and (max-width: $width-max-sm) {
     padding: 30px 0 15px 0;
     justify-content: center;
+    .notice{
+      width: 100%;
+      text-align: center;
+    }
   }
   .button {
     margin-bottom: 15px;
@@ -56,14 +60,14 @@
       color: #758295;
       position: absolute;
       left: 50%;
-      bottom: -25px;
+      top: 60px;
       transform: translate(-50%, 0);
       font-weight: 200;
-      line-height: 1.8;
+      line-height: 1.6;
       display: flex;
       justify-content: center;
       align-items: center;
-      font-size: 14px;
+      font-size: 12px;
       width: 100%;
       @media screen and (max-width: $width-max-sm) {
         bottom: -50px;

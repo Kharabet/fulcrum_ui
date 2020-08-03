@@ -150,7 +150,7 @@ export class iETHBuyBackContract extends BaseContract {
     };
 
     constructor(abi: ContractAbi, address: string, provider: any, txDefaults?: Partial<TxData>) {
-        super('oracle', abi, address.toLowerCase(), provider as SupportedProvider, txDefaults);
+        super('iETHBuyBack', abi, address.toLowerCase(), provider as SupportedProvider, txDefaults);
         classUtils.bindAll(this, ['_abiEncoderByFunctionSignature', 'address', 'abi', '_web3Wrapper']);
     }
 } // tslint:disable:max-file-line-count

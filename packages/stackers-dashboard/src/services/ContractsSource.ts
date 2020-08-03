@@ -4,6 +4,7 @@ import { erc20Contract } from "../contracts/erc20";
 import { BigNumber } from "@0x/utils";
 import { Asset } from "../domain/Asset";
 import { iETHBuyBackContract } from "../contracts/iETHBuyBack";
+import { traderCompensationContract } from "../contracts/traderCompensation";
 
 const ethNetwork = process.env.REACT_APP_ETH_NETWORK;
 
@@ -24,6 +25,7 @@ export class ContractsSource {
   private static convertJson: any;
   private static erc20Json: any;
   private static iETHBuyBack: any;
+  private static traderCompensation: any;
 
   public networkId: number;
   public canWrite: boolean;
@@ -42,6 +44,7 @@ export class ContractsSource {
     ContractsSource.convertJson = await import(`./../assets/artifacts/${ethNetwork}/convert.json`);
     ContractsSource.erc20Json = await import(`./../assets/artifacts/${ethNetwork}/erc20.json`);
     ContractsSource.iETHBuyBack = await import(`./../assets/artifacts/${ethNetwork}/iETHBuyBack.json`);
+    ContractsSource.traderCompensation = await import(`./../assets/artifacts/${ethNetwork}/traderCompensation.json`);
     const iTokenList = (await import(`../assets/artifacts/${ethNetwork}/iTokenList.js`)).iTokenList;
     iTokenList.forEach((val: any, index: any) => {
       // tslint:disable:no-console
@@ -159,6 +162,25 @@ export class ContractsSource {
     return address;
   }
 
+  public getTraderCompensationAddress(): string {
+    let address: string = "";
+    switch (this.networkId) {
+      case 1:
+        address = "";
+        break;
+      case 3:
+        address = "";
+        break;
+      case 4:
+        address = "";
+        break;
+      case 42:
+        address = "0x11603cD5eEf6B308339d97e5428a085A2c4D4c08";
+        break;
+    }
+    return address;
+  }
+
   public getITokenErc20Address(asset: Asset): string | null {
     let symbol;
     symbol = `i${asset}`;
@@ -188,8 +210,17 @@ export class ContractsSource {
       this.provider
     );
   }
-  public getErc20Contract = _.memoize(this.getErc20ContractRaw);
+  private async getTraderCompensationContractRaw(): Promise<traderCompensationContract> {
+    await this.Init();
+    return new traderCompensationContract(
+      ContractsSource.traderCompensation.abi,
+      this.getTraderCompensationAddress().toLowerCase(),
+      this.provider
+    );
+  }
 
+  public getErc20Contract = _.memoize(this.getErc20ContractRaw);
+  public getTraderCompensationContract = _.memoize(this.getTraderCompensationContractRaw);
   public getConvertContract = _.memoize(this.getConvertContractRaw);
   public getiETHBuyBackContract = _.memoize(this.getiETHBuyBackContractRaw);
 

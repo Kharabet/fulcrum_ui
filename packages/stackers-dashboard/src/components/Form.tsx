@@ -15,6 +15,8 @@ interface IFormState {
   iEthBalance: BigNumber;
   iETHSwapRate: BigNumber;
   whitelistAmount: BigNumber;
+  claimableAmount: BigNumber;
+  canOptin: boolean;
 }
 
 export class Form extends Component<{}, IFormState> {
@@ -26,7 +28,9 @@ export class Form extends Component<{}, IFormState> {
       vBzrxBalance: new BigNumber(0),
       iEthBalance: new BigNumber(0),
       iETHSwapRate: new BigNumber(0),
-      whitelistAmount: new BigNumber(0)
+      whitelistAmount: new BigNumber(0),
+      claimableAmount: new BigNumber(0),
+      canOptin: false
     };
 
     this._isMounted = false;
@@ -38,12 +42,16 @@ export class Form extends Component<{}, IFormState> {
   private _isMounted: boolean;
 
   private async derivedUpdate() {
-
+    const canOptin = await StackerProvider.Instance.canOptin();
+    let claimableAmount = await StackerProvider.Instance.isClaimable();
+    if (claimableAmount.gt(0)) {
+      claimableAmount = claimableAmount.div(10 ** 18)
+    }
     const bzrxV1Balance = (await StackerProvider.Instance.getAssetTokenBalanceOfUser(Asset.BZRXv1)).div(10 ** 18);
     const bzrxBalance = (await StackerProvider.Instance.getAssetTokenBalanceOfUser(Asset.BZRX)).div(10 ** 18);
     const vBzrxBalance = (await StackerProvider.Instance.getAssetTokenBalanceOfUser(Asset.vBZRX)).div(10 ** 18);
     const iEthBalance = (await StackerProvider.Instance.getITokenBalanceOfUser(Asset.ETH)).div(10 ** 18);
-    
+
     const userData = await StackerProvider.Instance.getiETHSwapRateWithCheck();
     const iETHSwapRate = userData[0].div(10 ** 18);
     const whitelistAmount = userData[1].div(10 ** 18);
@@ -55,7 +63,9 @@ export class Form extends Component<{}, IFormState> {
       vBzrxBalance,
       iEthBalance,
       iETHSwapRate,
-      whitelistAmount
+      whitelistAmount,
+      claimableAmount,
+      canOptin
     })
   }
 
@@ -91,13 +101,23 @@ export class Form extends Component<{}, IFormState> {
     await this.derivedUpdate();
   }
 
+  public onOptinClick = async () => {
+    const receipt = await StackerProvider.Instance.doOptin();
+    await this.derivedUpdate();
+  }
+
+  public onClaimClick = async () => {
+    const receipt = await StackerProvider.Instance.doClaim();
+    await this.derivedUpdate();
+  }
+
   public render() {
     // console.log(this.state.whitelistAmount.toString(), this.state.iEthBalance.toString());
-    
+
     const swapAmountAllowed = this.state.whitelistAmount.lt(this.state.iEthBalance) ?
       this.state.whitelistAmount :
       this.state.iEthBalance;
-   
+
     const etherscanURL = StackerProvider.Instance.web3ProviderSettings
       ? StackerProvider.Instance.web3ProviderSettings.etherscanURL
       : "";
@@ -119,7 +139,7 @@ export class Form extends Component<{}, IFormState> {
                         ? this.state.bzrxV1Balance.toFixed(2)
                         : this.state.bzrxBalance.toFixed(2)
                       }
-                      <a href={`${etherscanURL}token/${this.state.bzrxV1Balance.gt(0) ? "0x1c74cFF0376FB4031Cd7492cD6dB2D66c3f2c6B9" : "0x56d811088235F11C8920698a204A5010a788f4b3"}`} target="_blank"><span className="icon"><BzrxIcon /></span></a>
+                      <a href={`${etherscanURL}token/${this.state.bzrxV1Balance.gt(0) ? "0x1c74cFF0376FB4031Cd7492cD6dB2D66c3f2c6B9" : "0x56d811088235F11C8920698a204A5010a788f4b3"}`} target="_blank" rel="noopener noreferrer"><span className="icon"><BzrxIcon /></span></a>
                     </span>
                   </div>
                   <div className="row-footer">{this.state.bzrxV1Balance.gt(0) ? "BZRXv1" : "BZRX"}</div>
@@ -129,7 +149,7 @@ export class Form extends Component<{}, IFormState> {
                     <div className="row-body">
                       <span title={this.state.vBzrxBalance.toFixed(18)} className="value">
                         {this.state.vBzrxBalance.toFixed(2)}
-                        <a href={`${etherscanURL}token/0xB72B31907C1C95F3650b64b2469e08EdACeE5e8F`} target="_blank"><span className="icon"><VBzrxIcon /></span></a>
+                        <a href={`${etherscanURL}token/0xB72B31907C1C95F3650b64b2469e08EdACeE5e8F`} target="_blank" rel="noopener noreferrer"><span className="icon"><VBzrxIcon /></span></a>
                       </span>
                     </div>
                     <div className="row-footer">vBZRX</div>
@@ -159,6 +179,24 @@ export class Form extends Component<{}, IFormState> {
                   <span>{swapAmountAllowed.div(this.state.iETHSwapRate).toFixed(4)}</span>
                   &nbsp;vBZRX
                     <span className="notice">Make sure you read and understand iETH Buyback Program terms and conditions </span>
+                </button>
+              </div>
+            }
+            {this.state.claimableAmount.gt(0) &&
+              <div className="convert-button">
+                <button title={`Claim ${this.state.claimableAmount.toFixed(18)} vBZRX`} className="button button-full-width" onClick={this.onClaimClick}>
+                  Claim&nbsp;
+                  <span>{this.state.claimableAmount.toFixed(4)}</span>
+                  &nbsp;vBZRX
+                  <span className="notice">Some notice</span>
+                </button>
+              </div>
+            }
+            {this.state.canOptin &&
+              <div className="convert-button">
+                <button className="button button-full-width" onClick={this.onOptinClick}>
+                  Opt-in to compensation program
+                  <span className="notice">The program is open to anyone negatively impacted by the protocol pause on Feb-18-2020 04:21:52 AM +UTC</span>
                 </button>
               </div>
             }
