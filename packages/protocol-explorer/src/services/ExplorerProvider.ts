@@ -694,7 +694,7 @@ export class ExplorerProvider {
             const erc20allowance = await tokenErc20Contract.allowance.callAsync(account, iBZxContract.address);
 
             if (closeAmount.gt(erc20allowance)) {
-                const approvePromise = await tokenErc20Contract!.approve.sendTransactionAsync(iBZxContract.address, this.getLargeApprovalAmount(paymentAsset), { from: account });
+                await tokenErc20Contract!.approve.sendTransactionAsync(iBZxContract.address, this.getLargeApprovalAmount(paymentAsset), { from: account });
             }
         }
 
