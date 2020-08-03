@@ -15,6 +15,7 @@ interface IFormState {
   iEthBalance: BigNumber;
   iETHSwapRate: BigNumber;
   whitelistAmount: BigNumber;
+  canOptin: boolean;
 }
 
 export class Form extends Component<{}, IFormState> {
@@ -26,7 +27,8 @@ export class Form extends Component<{}, IFormState> {
       vBzrxBalance: new BigNumber(0),
       iEthBalance: new BigNumber(0),
       iETHSwapRate: new BigNumber(0),
-      whitelistAmount: new BigNumber(0)
+      whitelistAmount: new BigNumber(0),
+      canOptin: false
     };
 
     this._isMounted = false;
@@ -38,12 +40,12 @@ export class Form extends Component<{}, IFormState> {
   private _isMounted: boolean;
 
   private async derivedUpdate() {
-
+    const canOptin = await StackerProvider.Instance.canOptin();
     const bzrxV1Balance = (await StackerProvider.Instance.getAssetTokenBalanceOfUser(Asset.BZRXv1)).div(10 ** 18);
     const bzrxBalance = (await StackerProvider.Instance.getAssetTokenBalanceOfUser(Asset.BZRX)).div(10 ** 18);
     const vBzrxBalance = (await StackerProvider.Instance.getAssetTokenBalanceOfUser(Asset.vBZRX)).div(10 ** 18);
     const iEthBalance = (await StackerProvider.Instance.getITokenBalanceOfUser(Asset.ETH)).div(10 ** 18);
-    
+
     const userData = await StackerProvider.Instance.getiETHSwapRateWithCheck();
     const iETHSwapRate = userData[0].div(10 ** 18);
     const whitelistAmount = userData[1].div(10 ** 18);
@@ -55,7 +57,8 @@ export class Form extends Component<{}, IFormState> {
       vBzrxBalance,
       iEthBalance,
       iETHSwapRate,
-      whitelistAmount
+      whitelistAmount,
+      canOptin
     })
   }
 
@@ -91,13 +94,18 @@ export class Form extends Component<{}, IFormState> {
     await this.derivedUpdate();
   }
 
+  public onOptinClick = async () => {
+    const receipt = await StackerProvider.Instance.doOptin();
+    await this.derivedUpdate();
+  }
+
   public render() {
     // console.log(this.state.whitelistAmount.toString(), this.state.iEthBalance.toString());
-    
+
     const swapAmountAllowed = this.state.whitelistAmount.lt(this.state.iEthBalance) ?
       this.state.whitelistAmount :
       this.state.iEthBalance;
-   
+
     const etherscanURL = StackerProvider.Instance.web3ProviderSettings
       ? StackerProvider.Instance.web3ProviderSettings.etherscanURL
       : "";
@@ -159,6 +167,14 @@ export class Form extends Component<{}, IFormState> {
                   <span>{swapAmountAllowed.div(this.state.iETHSwapRate).toFixed(4)}</span>
                   &nbsp;vBZRX
                     <span className="notice">Make sure you read and understand iETH Buyback Program terms and conditions </span>
+                </button>
+              </div>
+            }
+            {this.state.canOptin &&
+              <div className="convert-button">
+                <button className="button button-full-width" onClick={this.onOptinClick}>
+                  Opt-in to compensation program
+                  <span className="notice">This compensation program is open to anyone who was negatively impacted by the protocol pause between February 18th and March 7th.</span>
                 </button>
               </div>
             }

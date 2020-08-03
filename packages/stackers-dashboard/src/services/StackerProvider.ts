@@ -370,8 +370,8 @@ export class StackerProvider {
     }
   }
 
-  public getiETHSwapRateWithCheck = async (): Promise<[BigNumber,BigNumber]> => {
-    let result: [BigNumber,BigNumber] = [new BigNumber(0),new BigNumber(0)];
+  public getiETHSwapRateWithCheck = async (): Promise<[BigNumber, BigNumber]> => {
+    let result: [BigNumber, BigNumber] = [new BigNumber(0), new BigNumber(0)];
     const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
     if (!this.contractsSource) return result;
 
@@ -511,6 +511,62 @@ export class StackerProvider {
       console.log(e);
       // throw e;
     }
+
+    const txReceipt = await this.waitForTransactionMined(txHash);
+    return txReceipt.status === 1 ? txReceipt : null;
+  }
+
+  public canOptin = async (): Promise<boolean> => {
+    let result: boolean = false;
+    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+    if (!this.contractsSource) return result;
+
+    const traderCompensationContract = await this.contractsSource.getTraderCompensationContract();
+    if (!account || !traderCompensationContract) return result;
+    try {
+      const canOptin = await traderCompensationContract.canOptin.callAsync(account);
+      if (canOptin) {
+        result = canOptin
+      }
+    }
+    catch (e) {
+      console.log(e)
+    }
+    return result;
+  }
+
+  public doOptin = async () => {
+    let receipt = null;
+
+    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+    if (!this.contractsSource) return receipt;
+
+    const traderCompensationContract = await this.contractsSource.getTraderCompensationContract();
+    if (!account || !traderCompensationContract) return receipt;
+
+
+    let gasAmountBN;
+    let gasAmount;
+    try {
+      gasAmount = await traderCompensationContract.optin.estimateGasAsync(
+        {
+          from: account,
+          gas: this.gasLimit,
+        });
+      gasAmountBN = new BigNumber(gasAmount).multipliedBy(this.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
+
+    }
+    catch (e) {
+      console.log(e);
+      // throw e;
+    }
+
+    const txHash = await traderCompensationContract.optin.sendTransactionAsync(
+      {
+        from: account,
+        gas: this.gasLimit,
+        gasPrice: await this.gasPrice()
+      });
 
     const txReceipt = await this.waitForTransactionMined(txHash);
     return txReceipt.status === 1 ? txReceipt : null;
