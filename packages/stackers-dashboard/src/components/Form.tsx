@@ -119,7 +119,7 @@ export class Form extends Component<{}, IFormState> {
                         ? this.state.bzrxV1Balance.toFixed(2)
                         : this.state.bzrxBalance.toFixed(2)
                       }
-                      <a href={`${etherscanURL}token/${this.state.bzrxV1Balance.gt(0) ? "0x1c74cFF0376FB4031Cd7492cD6dB2D66c3f2c6B9" : "0x56d811088235F11C8920698a204A5010a788f4b3"}`} target="_blank"><span className="icon"><BzrxIcon /></span></a>
+                      <a href={`${etherscanURL}token/${this.state.bzrxV1Balance.gt(0) ? "0x1c74cFF0376FB4031Cd7492cD6dB2D66c3f2c6B9" : "0x56d811088235F11C8920698a204A5010a788f4b3"}`} target="_blank" rel="noopener noreferrer"><span className="icon"><BzrxIcon /></span></a>
                     </span>
                   </div>
                   <div className="row-footer">{this.state.bzrxV1Balance.gt(0) ? "BZRXv1" : "BZRX"}</div>
@@ -129,7 +129,7 @@ export class Form extends Component<{}, IFormState> {
                     <div className="row-body">
                       <span title={this.state.vBzrxBalance.toFixed(18)} className="value">
                         {this.state.vBzrxBalance.toFixed(2)}
-                        <a href={`${etherscanURL}token/0xB72B31907C1C95F3650b64b2469e08EdACeE5e8F`} target="_blank"><span className="icon"><VBzrxIcon /></span></a>
+                        <a href={`${etherscanURL}token/0xB72B31907C1C95F3650b64b2469e08EdACeE5e8F`} target="_blank" rel="noopener noreferrer"><span className="icon"><VBzrxIcon /></span></a>
                       </span>
                     </div>
                     <div className="row-footer">vBZRX</div>
