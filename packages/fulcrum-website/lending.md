@@ -188,7 +188,7 @@ permalink: lending
                     </div>
                     <div class="result-calc">
                         <p class="fs-18 text-md-center">Earn up to:</p>
-                        <p class="fs-66 lh-140 fw-400 text-md-center wrapper">$<span class="fw-900 earn-usd-value">30.56</span></p>
+                        <p class="fs-66 lh-140 fw-400 text-md-center wrapper"><span class="fw-400 earn-usd-item">$<span class="fw-900 earn-usd-value">30.56</span></span></p>
                         <p class="fs-24 lh-140 fw-600 text-right month">/month</p>
                     </div>
                 </div>

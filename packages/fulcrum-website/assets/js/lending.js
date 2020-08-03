@@ -11,6 +11,7 @@ var coins = document.querySelectorAll('#calculator-earn .coin-calc');
 var wrapperFinance = document.querySelector('.wrapper-finance');
 
 var calcWidgetResult = document.querySelector(".result-calc .earn-usd-value");
+var calcWidgetItem = document.querySelector(".result-calc .earn-usd-item");
 var liveEarningsElem = document.querySelector(".live-earnings-value");
 
 (getData)(['apr', 'rates']);
@@ -120,12 +121,17 @@ window.addEventListener('load', function () {
             quantityRange.value = 0;
 
         var rangeMax = new Number(quantityRange.getAttribute("max"));
-        if (e.currentTarget.value > rangeMax || e.currentTarget.value <= 0)
-            e.currentTarget.value = rangeMax;
-
         quantityRange.value = e.currentTarget.value;
-        updateEarningsCalc(e.currentTarget.value);
 
+        if (e.currentTarget.value > rangeMax){
+            e.currentTarget.value = rangeMax;
+            quantityRange.value = e.currentTarget.value;
+        }
+        if (e.currentTarget.value <= 0){
+            e.currentTarget.value = '';
+            quantityRange.value = 1;
+        }
+        updateEarningsCalc(e.currentTarget.value);
         changePositionBorderThumb(quantityRange, e.currentTarget);
     }
 });
@@ -145,7 +151,7 @@ function updateEarningsCalc(quantity) {
     document.querySelector(".item-earn.fulcrum .earn-usd-value").textContent = earnings;
 
     calcWidgetResult.textContent = earnings;
-    updateCalcResultFontSize(calcWidgetResult);
+    updateCalcResultFontSize(calcWidgetItem);
 
 
     updateTraditionalFinance(usdAmount);
