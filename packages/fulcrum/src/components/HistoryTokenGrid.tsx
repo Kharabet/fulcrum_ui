@@ -122,8 +122,8 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
         leverage = leverage.plus(1);
 
       let openPrice = positionType === PositionType.LONG
-        ? tradeEvent.entryPrice.div(10 ** 18)
-        : new BigNumber(10 ** 36).div(tradeEvent.entryPrice).div(10 ** 18)
+        ? new BigNumber(10 ** 36).div(tradeEvent.entryPrice).div(10 ** 18)
+        : tradeEvent.entryPrice.div(10 ** 18);
 
       //TODO: swapToUsdHistoryRateRequest extract to function
       // if (positionType === PositionType.LONG) {
@@ -272,8 +272,11 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
           //loanToken in LiquidationEvent is a quoteAsset in TradeEvent
           //collateralToken in LiquidationEvent is a baseAsset in TradeEvent
           const action = "Liquidated";
+          if (txHash === "0x3a2d54a62e9326552efd2c1e177a3f0fbf951763b50d2b36f55b6a55c1bae410") {
+            debugger;
+          }
           if (positionType === PositionType.LONG) {
-            positionValue = event.collateralWithdrawAmount.div(10 ** 18);
+            positionValue = event.repayAmount.div(event.collateralToLoanRate);
             tradePrice = event.collateralToLoanRate.div(10 ** 18);
             value = positionValue.times(tradePrice);
             quoteToken = event.loanToken;
