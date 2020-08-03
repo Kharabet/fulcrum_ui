@@ -188,7 +188,6 @@ export class Form extends Component<{}, IFormState> {
                   Claim&nbsp;
                   <span>{this.state.claimableAmount.toFixed(4)}</span>
                   &nbsp;vBZRX
-                  <span className="notice">Some notice</span>
                 </button>
               </div>
             }
