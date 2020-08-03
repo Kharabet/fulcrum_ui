@@ -676,18 +676,18 @@ export class ExplorerProvider {
         });
     }
 
-    public liquidate = async (loanId: string, closeAmount: BigNumber, paymentAsset: Asset): Promise<[BigNumber, BigNumber, string]> => {
-        let result: [BigNumber, BigNumber, string] = [new BigNumber(0), new BigNumber(0), ""];
+    public liquidate = async (loanId: string, closeAmount: BigNumber, paymentAsset: Asset) => {
+        let receipt;
         const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
-        if (!this.contractsSource) return result;
+        if (!this.contractsSource) return;
 
         const iBZxContract = await this.contractsSource.getiBZxContract();
-        if (!account || !iBZxContract) return result;
+        if (!account || !iBZxContract) return;
 
         if (paymentAsset !== Asset.WETH && paymentAsset !== Asset.ETH) {
 
             const assetErc20Address = this.getErc20AddressOfAsset(paymentAsset);
-            if (!assetErc20Address) return result;
+            if (!assetErc20Address) return;
             const tokenErc20Contract = await this.contractsSource.getErc20Contract(assetErc20Address);
 
             // Detecting token allowance
@@ -721,21 +721,8 @@ export class ExplorerProvider {
             console.log(e);
             // throw e;
         }
-
-        let txHash: string = "";
-        try {
-            // Closing trade
-            const values = await iBZxContract.liquidate.callAsync(
-                loanId,
-                account,
-                closeAmount,
-                {
-                    from: account,
-                    value: sendAmountForValue,
-                    gas: this.gasLimit,
-                });
-            console.log(values)
-            txHash = await iBZxContract.liquidate.sendTransactionAsync(
+            
+        const txHash = await iBZxContract.liquidate.sendTransactionAsync(
                 loanId,
                 account,
                 closeAmount,
@@ -747,18 +734,11 @@ export class ExplorerProvider {
                 });
 
 
-        }
-        catch (e) {
-            console.log(e);
-            // throw e;
-        }
+        receipt = await this.waitForTransactionMined(txHash);
 
-        const txReceipt = await this.waitForTransactionMined(txHash);
-
-        return result;
-
-
+        return receipt.status === 1 ? receipt : null;
     }
+
     public gasPrice = async (): Promise<BigNumber> => {
         let result = new BigNumber(30).multipliedBy(10 ** 9); // upper limit 30 gwei
         const lowerLimit = new BigNumber(3).multipliedBy(10 ** 9); // lower limit 3 gwei
@@ -910,7 +890,7 @@ export class ExplorerProvider {
     }
 
     public waitForTransactionMined = async (
-        txHash: string) => {
+        txHash: string): Promise<any> => {
 
         return new Promise((resolve, reject) => {
             try {
