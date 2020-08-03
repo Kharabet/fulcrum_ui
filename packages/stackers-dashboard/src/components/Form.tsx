@@ -196,7 +196,7 @@ export class Form extends Component<{}, IFormState> {
               <div className="convert-button">
                 <button className="button button-full-width" onClick={this.onOptinClick}>
                   Opt-in to compensation program
-                  <span className="notice">This compensation program is open to anyone who was negatively impacted by the protocol pause between February 18th and March 7th.</span>
+                  <span className="notice">The program is open to anyone negatively impacted by the protocol pause on Feb-18-2020 04:21:52 AM +UTC</span>
                 </button>
               </div>
             }
