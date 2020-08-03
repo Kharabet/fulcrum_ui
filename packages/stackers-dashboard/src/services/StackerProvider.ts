@@ -534,6 +534,25 @@ export class StackerProvider {
     }
     return result;
   }
+  
+  public isClaimable = async (): Promise<BigNumber> => {
+    let result: BigNumber = new BigNumber(0);
+    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+    if (!this.contractsSource) return result;
+
+    const traderCompensationContract = await this.contractsSource.getTraderCompensationContract();
+    if (!account || !traderCompensationContract) return result;
+    try {
+      const canOptin = await traderCompensationContract.claimable.callAsync(account);
+      if (canOptin.gt(0)) {
+        result = canOptin
+      }
+    }
+    catch (e) {
+      console.log(e)
+    }
+    return result;
+  }
 
   public doOptin = async () => {
     let receipt = null;
@@ -562,6 +581,43 @@ export class StackerProvider {
     }
 
     const txHash = await traderCompensationContract.optin.sendTransactionAsync(
+      {
+        from: account,
+        gas: this.gasLimit,
+        gasPrice: await this.gasPrice()
+      });
+
+    const txReceipt = await this.waitForTransactionMined(txHash);
+    return txReceipt.status === 1 ? txReceipt : null;
+  }
+  
+  public doClaim = async () => {
+    let receipt = null;
+
+    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+    if (!this.contractsSource) return receipt;
+
+    const traderCompensationContract = await this.contractsSource.getTraderCompensationContract();
+    if (!account || !traderCompensationContract) return receipt;
+
+
+    let gasAmountBN;
+    let gasAmount;
+    try {
+      gasAmount = await traderCompensationContract.claim.estimateGasAsync(
+        {
+          from: account,
+          gas: this.gasLimit,
+        });
+      gasAmountBN = new BigNumber(gasAmount).multipliedBy(this.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
+
+    }
+    catch (e) {
+      console.log(e);
+      // throw e;
+    }
+
+    const txHash = await traderCompensationContract.claim.sendTransactionAsync(
       {
         from: account,
         gas: this.gasLimit,

@@ -15,6 +15,7 @@ interface IFormState {
   iEthBalance: BigNumber;
   iETHSwapRate: BigNumber;
   whitelistAmount: BigNumber;
+  claimableAmount: BigNumber;
   canOptin: boolean;
 }
 
@@ -28,6 +29,7 @@ export class Form extends Component<{}, IFormState> {
       iEthBalance: new BigNumber(0),
       iETHSwapRate: new BigNumber(0),
       whitelistAmount: new BigNumber(0),
+      claimableAmount: new BigNumber(0),
       canOptin: false
     };
 
@@ -41,6 +43,10 @@ export class Form extends Component<{}, IFormState> {
 
   private async derivedUpdate() {
     const canOptin = await StackerProvider.Instance.canOptin();
+    let claimableAmount = await StackerProvider.Instance.isClaimable();
+    if (claimableAmount.gt(0)) {
+      claimableAmount = claimableAmount.div(10 ** 18)
+    }
     const bzrxV1Balance = (await StackerProvider.Instance.getAssetTokenBalanceOfUser(Asset.BZRXv1)).div(10 ** 18);
     const bzrxBalance = (await StackerProvider.Instance.getAssetTokenBalanceOfUser(Asset.BZRX)).div(10 ** 18);
     const vBzrxBalance = (await StackerProvider.Instance.getAssetTokenBalanceOfUser(Asset.vBZRX)).div(10 ** 18);
@@ -58,6 +64,7 @@ export class Form extends Component<{}, IFormState> {
       iEthBalance,
       iETHSwapRate,
       whitelistAmount,
+      claimableAmount,
       canOptin
     })
   }
@@ -96,6 +103,11 @@ export class Form extends Component<{}, IFormState> {
 
   public onOptinClick = async () => {
     const receipt = await StackerProvider.Instance.doOptin();
+    await this.derivedUpdate();
+  }
+
+  public onClaimClick = async () => {
+    const receipt = await StackerProvider.Instance.doClaim();
     await this.derivedUpdate();
   }
 
@@ -167,6 +179,16 @@ export class Form extends Component<{}, IFormState> {
                   <span>{swapAmountAllowed.div(this.state.iETHSwapRate).toFixed(4)}</span>
                   &nbsp;vBZRX
                     <span className="notice">Make sure you read and understand iETH Buyback Program terms and conditions </span>
+                </button>
+              </div>
+            }
+            {this.state.claimableAmount.gt(0) &&
+              <div className="convert-button">
+                <button title={`Claim ${this.state.claimableAmount.toFixed(18)} vBZRX`} className="button button-full-width" onClick={this.onClaimClick}>
+                  Claim&nbsp;
+                  <span>{this.state.claimableAmount.toFixed(4)}</span>
+                  &nbsp;vBZRX
+                  <span className="notice">Some notice</span>
                 </button>
               </div>
             }
