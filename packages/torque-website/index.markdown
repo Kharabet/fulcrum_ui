@@ -336,7 +336,7 @@ layout: home
             <div class="col col-12 jc-c">
                 <h2 class="cube mb-50 mb-xs-45">
                 <span class="t-r-75 t-r-xs-50 center">{% include svg/small-cube.svg %}</span>
-                Frequently Asked Questions
+                Frequently Asked Questions 
                 </h2>
             </div>
         </div>
