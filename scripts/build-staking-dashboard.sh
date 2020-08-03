@@ -1,4 +1,4 @@
 #!/bin/bash
-cd ./packages/stackers-dashboard
+cd ./packages/staking-dashboard
 yarn run build
 cd ./../..

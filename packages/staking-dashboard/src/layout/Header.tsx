@@ -4,7 +4,7 @@ import { ReactComponent as LogoSign } from "../assets/images/logo-sign.svg"
 import { HeaderMenu } from "./HeaderMenu";
 import { Link } from "react-router-dom";
 import { OnChainIndicator } from "../components/OnChainIndicator";
-import { FooterSocial } from "../layout/FooterSocial";
+import { FooterSocial } from "./FooterSocial";
 import { ReactComponent as MenuIconClose } from "../assets/images/menu-close.svg";
 import { ReactComponent as MenuIconOpen } from "../assets/images/menu-open.svg";
 

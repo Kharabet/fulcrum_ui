@@ -1,0 +1,1 @@
+# Interface for the bZx staking dashboard

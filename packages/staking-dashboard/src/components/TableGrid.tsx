@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { TableRow } from "../components/TableRow";
+import { TableRow } from "./TableRow";
 
 interface ITableGridProps {
   isMobileMedia: boolean;
