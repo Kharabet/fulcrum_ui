@@ -117,7 +117,7 @@ export class traderCompensationContract extends BaseContract {
                     data: encodedData
                 },
                 self._web3Wrapper.getContractDefaults(),
-                (self as any).traderCompensation.estimateGasAsync.bind(self)
+                (self as any).claim.estimateGasAsync.bind(self)
             );
             const txHash = await self._web3Wrapper.sendTransactionAsync(txDataWithDefaults);
             return txHash;
@@ -177,7 +177,7 @@ export class traderCompensationContract extends BaseContract {
                     data: encodedData
                 },
                 self._web3Wrapper.getContractDefaults(),
-                (self as any).traderCompensation.estimateGasAsync.bind(self)
+                (self as any).optin.estimateGasAsync.bind(self)
             );
             const txHash = await self._web3Wrapper.sendTransactionAsync(txDataWithDefaults);
             return txHash;
