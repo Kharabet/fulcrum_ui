@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { ReactComponent as LogoStacker } from "../assets/images/logo-stacker.svg"
+import { ReactComponent as LogoStaking } from "../assets/images/logo-staking.svg"
 import { ReactComponent as LogoSign } from "../assets/images/logo-sign.svg"
 import { HeaderMenu } from "./HeaderMenu";
 import { Link } from "react-router-dom";
@@ -44,8 +44,8 @@ export class Header extends Component<IHeaderProps, IHeaderState> {
               <div className="logo-sign">
                 <LogoSign />
               </div>
-              <div className="logo-stacker">
-                <LogoStacker />
+              <div className="logo-staking">
+                <LogoStaking />
               </div>
             </Link>
             {/*<HeaderMenu />*/}
@@ -70,8 +70,8 @@ export class Header extends Component<IHeaderProps, IHeaderState> {
               <div className="logo-sign">
                 <LogoSign />
               </div>
-              <div className="logo-stacker">
-                <LogoStacker />
+              <div className="logo-staking">
+                <LogoStaking />
               </div>
             </Link>
             <div className="header_icon" onClick={this.onMenuToggle}>
