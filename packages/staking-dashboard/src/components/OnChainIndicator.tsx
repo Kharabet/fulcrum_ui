@@ -3,8 +3,8 @@ import { ProviderType } from "../domain/ProviderType";
 import { ProviderTypeDetails } from "../domain/ProviderTypeDetails";
 import { ProviderTypeDictionary } from "../domain/ProviderTypeDictionary";
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
-import { StackerProviderEvents } from "../services/events/StackerProviderEvents";
-import { StackerProvider } from "../services/StackerProvider";
+import { StakingProviderEvents } from "../services/events/StakingProviderEvents";
+import { StakingProvider } from "../services/StakingProvider";
 
 export interface IOnChainIndicatorProps {
   doNetworkConnect: () => void;
@@ -30,8 +30,8 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
       providerTypeDetails: null
     };
 
-    StackerProvider.Instance.eventEmitter.on(StackerProviderEvents.ProviderIsChanging, this.onProviderIsChanging);
-    StackerProvider.Instance.eventEmitter.on(StackerProviderEvents.ProviderChanged, this.onProviderChanged);
+    StakingProvider.Instance.eventEmitter.on(StakingProviderEvents.ProviderIsChanging, this.onProviderIsChanging);
+    StakingProvider.Instance.eventEmitter.on(StakingProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
   private onProviderIsChanging = async () => {
@@ -54,23 +54,23 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
   }
 
   public componentWillUnmount(): void {
-    StackerProvider.Instance.eventEmitter.removeListener(StackerProviderEvents.ProviderChanged, this.onProviderChanged);
+    StakingProvider.Instance.eventEmitter.removeListener(StakingProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
   private async derivedUpdate() {
-    const accountText = StackerProvider.Instance.accounts.length > 0 && StackerProvider.Instance.accounts[0]
-      ? StackerProvider.Instance.accounts[0].toLowerCase()
+    const accountText = StakingProvider.Instance.accounts.length > 0 && StakingProvider.Instance.accounts[0]
+      ? StakingProvider.Instance.accounts[0].toLowerCase()
       : "";
 
     let providerTypeDetails = null;
-    if (accountText && StackerProvider.Instance.providerType !== ProviderType.None) {
-      providerTypeDetails = ProviderTypeDictionary.providerTypes.get(StackerProvider.Instance.providerType);
+    if (accountText && StakingProvider.Instance.providerType !== ProviderType.None) {
+      providerTypeDetails = ProviderTypeDictionary.providerTypes.get(StakingProvider.Instance.providerType);
     }
 
-    const isLoading = StackerProvider.Instance.isLoading;
-    const isSupportedNetwork = !StackerProvider.Instance.unsupportedNetwork;
-    const etherscanURL = StackerProvider.Instance.web3ProviderSettings
-      ? StackerProvider.Instance.web3ProviderSettings.etherscanURL
+    const isLoading = StakingProvider.Instance.isLoading;
+    const isSupportedNetwork = !StakingProvider.Instance.unsupportedNetwork;
+    const etherscanURL = StakingProvider.Instance.web3ProviderSettings
+      ? StakingProvider.Instance.web3ProviderSettings.etherscanURL
       : "";
 
     this.setState({
@@ -92,7 +92,7 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
       accountText } = this.state;
 
     let walletAddressText: string;
-    if (StackerProvider.Instance.unsupportedNetwork) {
+    if (StakingProvider.Instance.unsupportedNetwork) {
       walletAddressText = "Wrong Network!";
     } else if (accountText) {
       walletAddressText = `${accountText.slice(0, 6)}...${accountText.slice(
@@ -168,7 +168,7 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
             <span className="on-chain-indicator__provider-txt">
               Click To Connect Wallet
             </span>
-            {StackerProvider.Instance.unsupportedNetwork
+            {StakingProvider.Instance.unsupportedNetwork
               ? <span className="on-chain-indicator__wallet-address">
                 {walletAddressText}
               </span>

@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import { ReactComponent as BzrxIcon } from "../assets/images/token-bzrx.svg"
 import { ReactComponent as VBzrxIcon } from "../assets/images/token-vbzrx.svg"
-import { StackerProvider } from "../services/StackerProvider";
-import { StackerProviderEvents } from "../services/events/StackerProviderEvents";
+import { StakingProvider } from "../services/StakingProvider";
+import { StakingProviderEvents } from "../services/events/StakingProviderEvents";
 import { BigNumber } from "@0x/utils";
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { Asset } from "../domain/Asset";
@@ -34,25 +34,25 @@ export class Form extends Component<{}, IFormState> {
     };
 
     this._isMounted = false;
-    StackerProvider.Instance.eventEmitter.on(StackerProviderEvents.ProviderAvailable, this.onProviderAvailable);
-    StackerProvider.Instance.eventEmitter.on(StackerProviderEvents.ProviderChanged, this.onProviderChanged);
+    StakingProvider.Instance.eventEmitter.on(StakingProviderEvents.ProviderAvailable, this.onProviderAvailable);
+    StakingProvider.Instance.eventEmitter.on(StakingProviderEvents.ProviderChanged, this.onProviderChanged);
 
   }
 
   private _isMounted: boolean;
 
   private async derivedUpdate() {
-    const canOptin = await StackerProvider.Instance.canOptin();
-    let claimableAmount = await StackerProvider.Instance.isClaimable();
+    const canOptin = await StakingProvider.Instance.canOptin();
+    let claimableAmount = await StakingProvider.Instance.isClaimable();
     if (claimableAmount.gt(0)) {
       claimableAmount = claimableAmount.div(10 ** 18)
     }
-    const bzrxV1Balance = (await StackerProvider.Instance.getAssetTokenBalanceOfUser(Asset.BZRXv1)).div(10 ** 18);
-    const bzrxBalance = (await StackerProvider.Instance.getAssetTokenBalanceOfUser(Asset.BZRX)).div(10 ** 18);
-    const vBzrxBalance = (await StackerProvider.Instance.getAssetTokenBalanceOfUser(Asset.vBZRX)).div(10 ** 18);
-    const iEthBalance = (await StackerProvider.Instance.getITokenBalanceOfUser(Asset.ETH)).div(10 ** 18);
+    const bzrxV1Balance = (await StakingProvider.Instance.getAssetTokenBalanceOfUser(Asset.BZRXv1)).div(10 ** 18);
+    const bzrxBalance = (await StakingProvider.Instance.getAssetTokenBalanceOfUser(Asset.BZRX)).div(10 ** 18);
+    const vBzrxBalance = (await StakingProvider.Instance.getAssetTokenBalanceOfUser(Asset.vBZRX)).div(10 ** 18);
+    const iEthBalance = (await StakingProvider.Instance.getITokenBalanceOfUser(Asset.ETH)).div(10 ** 18);
 
-    const userData = await StackerProvider.Instance.getiETHSwapRateWithCheck();
+    const userData = await StakingProvider.Instance.getiETHSwapRateWithCheck();
     const iETHSwapRate = userData[0].div(10 ** 18);
     const whitelistAmount = userData[1].div(10 ** 18);
 
@@ -85,29 +85,29 @@ export class Form extends Component<{}, IFormState> {
   public componentWillUnmount(): void {
     this._isMounted = false;
 
-    StackerProvider.Instance.eventEmitter.removeListener(StackerProviderEvents.ProviderAvailable, this.onProviderAvailable);
-    StackerProvider.Instance.eventEmitter.removeListener(StackerProviderEvents.ProviderChanged, this.onProviderChanged);
+    StakingProvider.Instance.eventEmitter.removeListener(StakingProviderEvents.ProviderAvailable, this.onProviderAvailable);
+    StakingProvider.Instance.eventEmitter.removeListener(StakingProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
   public onBzrxV1ToV2ConvertClick = async () => {
-    const receipt = await StackerProvider.Instance.convertBzrxV1ToV2(this.state.bzrxV1Balance.times(10 ** 18));
+    const receipt = await StakingProvider.Instance.convertBzrxV1ToV2(this.state.bzrxV1Balance.times(10 ** 18));
     await this.derivedUpdate();
   }
   public onIETHtoVBZRXConvertClick = async () => {
     const swapAmountAllowed = this.state.whitelistAmount.lt(this.state.iEthBalance) ?
       this.state.whitelistAmount :
       this.state.iEthBalance;
-    const receipt = await StackerProvider.Instance.convertIETHToVBZRX(swapAmountAllowed.times(10 ** 18));
+    const receipt = await StakingProvider.Instance.convertIETHToVBZRX(swapAmountAllowed.times(10 ** 18));
     await this.derivedUpdate();
   }
 
   public onOptinClick = async () => {
-    const receipt = await StackerProvider.Instance.doOptin();
+    const receipt = await StakingProvider.Instance.doOptin();
     await this.derivedUpdate();
   }
 
   public onClaimClick = async () => {
-    const receipt = await StackerProvider.Instance.doClaim();
+    const receipt = await StakingProvider.Instance.doClaim();
     await this.derivedUpdate();
   }
 
@@ -118,8 +118,8 @@ export class Form extends Component<{}, IFormState> {
       this.state.whitelistAmount :
       this.state.iEthBalance;
 
-    const etherscanURL = StackerProvider.Instance.web3ProviderSettings
-      ? StackerProvider.Instance.web3ProviderSettings.etherscanURL
+    const etherscanURL = StakingProvider.Instance.web3ProviderSettings
+      ? StakingProvider.Instance.web3ProviderSettings.etherscanURL
       : "";
 
     return (

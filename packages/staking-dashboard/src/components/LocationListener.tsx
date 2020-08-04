@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import { StackerProvider } from "../services/StackerProvider";
+import { StakingProvider } from "../services/StakingProvider";
 
 export interface ILocationListenerProps {
   doNetworkConnect: (destinationAbbr: string) => void;
@@ -21,13 +21,13 @@ export class LocationListener extends Component<ILocationListenerProps> {
 
   public handleLocationChange = (doNetworkConnect: (destinationAbbr: string) => void) => (location: any) => {
     // if (location.pathname.startsWith("/borrow/")) {
-    //   if (!StackerProvider.Instance.contractsSource || !StackerProvider.Instance.contractsSource.canWrite) {
+    //   if (!StakingProvider.Instance.contractsSource || !StakingProvider.Instance.contractsSource.canWrite) {
     //     doNetworkConnect("b");
     //   }
     // }
     //
     // if (location.pathname.startsWith("/dashboard/")) {
-    //   if (!StackerProvider.Instance.contractsSource || !StackerProvider.Instance.contractsSource.canWrite) {
+    //   if (!StakingProvider.Instance.contractsSource || !StakingProvider.Instance.contractsSource.canWrite) {
     //     doNetworkConnect("t");
     //   }
     // }
