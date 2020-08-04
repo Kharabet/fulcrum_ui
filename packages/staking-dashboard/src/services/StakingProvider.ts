@@ -109,20 +109,12 @@ export class StakingProvider {
 
   public static getLocalstorageItem(item: string): string {
     let response = "";
-    try {
-      response = localStorage.getItem(item) || "";
-    } catch (e) {
-      // console.log(e);
-    }
+    response = localStorage.getItem(item) || "";
     return response;
   }
 
   public static setLocalstorageItem(item: string, val: string) {
-    try {
-      localStorage.setItem(item, val);
-    } catch (e) {
-      // console.log(e);
-    }
+    localStorage.setItem(item, val);
   }
 
   public async setWeb3Provider(connector: AbstractConnector, account?: string) {
@@ -387,7 +379,7 @@ export class StakingProvider {
       }
     }
     catch (e) {
-      console.log(e)
+      console.error(e)
     }
     return result;
 
@@ -430,26 +422,16 @@ export class StakingProvider {
 
     }
     catch (e) {
-      console.log(e);
-      // throw e;
+      console.error(e);
     }
 
-    let txHash: string = "";
-    try {
-      txHash = await buyBackContract.convert.sendTransactionAsync(
-        tokenAmount,
-        {
-          from: account,
-          gas: gasAmountBN,
-          gasPrice: await this.gasPrice()
-        });
-
-
-    }
-    catch (e) {
-      console.log(e);
-      // throw e;
-    }
+    const txHash = await buyBackContract.convert.sendTransactionAsync(
+      tokenAmount,
+      {
+        from: account,
+        gas: gasAmountBN,
+        gasPrice: await this.gasPrice()
+      });
 
     const txReceipt = await this.waitForTransactionMined(txHash);
     return txReceipt.status === 1 ? txReceipt : null;
@@ -491,26 +473,16 @@ export class StakingProvider {
 
     }
     catch (e) {
-      console.log(e);
-      // throw e;
+      console.error(e);
     }
 
-    let txHash: string = "";
-    try {
-      txHash = await convertContract.convert.sendTransactionAsync(
-        tokenAmount,
-        {
-          from: account,
-          gas: this.gasLimit,
-          gasPrice: await this.gasPrice()
-        });
-
-
-    }
-    catch (e) {
-      console.log(e);
-      // throw e;
-    }
+    const txHash = await convertContract.convert.sendTransactionAsync(
+      tokenAmount,
+      {
+        from: account,
+        gas: this.gasLimit,
+        gasPrice: await this.gasPrice()
+      });
 
     const txReceipt = await this.waitForTransactionMined(txHash);
     return txReceipt.status === 1 ? txReceipt : null;
@@ -530,11 +502,11 @@ export class StakingProvider {
       }
     }
     catch (e) {
-      console.log(e)
+      console.error(e)
     }
     return result;
   }
-  
+
   public isClaimable = async (): Promise<BigNumber> => {
     let result: BigNumber = new BigNumber(0);
     const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
@@ -549,7 +521,7 @@ export class StakingProvider {
       }
     }
     catch (e) {
-      console.log(e)
+      console.error(e)
     }
     return result;
   }
@@ -576,8 +548,7 @@ export class StakingProvider {
 
     }
     catch (e) {
-      console.log(e);
-      // throw e;
+      console.error(e);
     }
 
     const txHash = await traderCompensationContract.optin.sendTransactionAsync(
@@ -590,7 +561,7 @@ export class StakingProvider {
     const txReceipt = await this.waitForTransactionMined(txHash);
     return txReceipt.status === 1 ? txReceipt : null;
   }
-  
+
   public doClaim = async () => {
     let receipt = null;
 
@@ -613,8 +584,7 @@ export class StakingProvider {
 
     }
     catch (e) {
-      console.log(e);
-      // throw e;
+      console.error(e);
     }
 
     const txHash = await traderCompensationContract.claim.sendTransactionAsync(
