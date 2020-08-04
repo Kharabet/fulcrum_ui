@@ -3,8 +3,8 @@ import { Web3ReactProvider } from "@web3-react/core";
 import { AbstractConnector } from '@web3-react/abstract-connector';
 import { Web3ProviderEngine } from "@0x/subproviders";
 import { Web3ConnectionFactory } from '../domain/Web3ConnectionFactory';
-import { StackerProvider } from "../services/StackerProvider";
-import { StackerProviderEvents } from "../services/events/StackerProviderEvents";
+import { StakingProvider } from "../services/StakingProvider";
+import { StakingProviderEvents } from "../services/events/StakingProviderEvents";
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import Modal from "react-modal";
 
@@ -57,61 +57,61 @@ export class AppRouter extends Component<any, IAppRouterState> {
     this.state = {
       isProviderMenuModalOpen: false,
       isLoading: false,
-      selectedProviderType: StackerProvider.Instance.providerType,
-      web3: StackerProvider.Instance.web3Wrapper,
+      selectedProviderType: StakingProvider.Instance.providerType,
+      web3: StakingProvider.Instance.web3Wrapper,
       isMobileMedia: false,
     };
-    StackerProvider.Instance.eventEmitter.on(StackerProviderEvents.ProviderChanged, this.onProviderChanged);
+    StakingProvider.Instance.eventEmitter.on(StakingProviderEvents.ProviderChanged, this.onProviderChanged);
   }
   public async onConnectorUpdated(update: ConnectorUpdate) {
     console.log("onConnectorUpdated")
-    await StackerProvider.Instance.eventEmitter.emit(StackerProviderEvents.ProviderIsChanging);
+    await StakingProvider.Instance.eventEmitter.emit(StakingProviderEvents.ProviderIsChanging);
 
     await Web3ConnectionFactory.updateConnector(update);
-    await StackerProvider.Instance.setWeb3ProviderFinalize(StackerProvider.Instance.providerType)
-    await StackerProvider.Instance.eventEmitter.emit(
-      StackerProviderEvents.ProviderChanged,
-      new ProviderChangedEvent(StackerProvider.Instance.providerType, StackerProvider.Instance.web3Wrapper)
+    await StakingProvider.Instance.setWeb3ProviderFinalize(StakingProvider.Instance.providerType)
+    await StakingProvider.Instance.eventEmitter.emit(
+      StakingProviderEvents.ProviderChanged,
+      new ProviderChangedEvent(StakingProvider.Instance.providerType, StakingProvider.Instance.web3Wrapper)
     );
   }
 
   public onDeactivate = async () => {
 
-    StackerProvider.Instance.isLoading = true;
+    StakingProvider.Instance.isLoading = true;
 
-    await StackerProvider.Instance.eventEmitter.emit(StackerProviderEvents.ProviderIsChanging);
+    await StakingProvider.Instance.eventEmitter.emit(StakingProviderEvents.ProviderIsChanging);
 
     await this._isMounted && this.setState({
       ...this.state,
       isProviderMenuModalOpen: false
     });
-    await StackerProvider.Instance.setReadonlyWeb3Provider();
+    await StakingProvider.Instance.setReadonlyWeb3Provider();
 
-    StackerProvider.Instance.isLoading = false;
-    await StackerProvider.Instance.eventEmitter.emit(
-      StackerProviderEvents.ProviderChanged,
-      new ProviderChangedEvent(StackerProvider.Instance.providerType, StackerProvider.Instance.web3Wrapper)
+    StakingProvider.Instance.isLoading = false;
+    await StakingProvider.Instance.eventEmitter.emit(
+      StakingProviderEvents.ProviderChanged,
+      new ProviderChangedEvent(StakingProvider.Instance.providerType, StakingProvider.Instance.web3Wrapper)
     );
   }
 
   public onProviderTypeSelect = async (connector: AbstractConnector, account?: string) => {
     if (!this.state.isLoading) {
-      StackerProvider.Instance.isLoading = true;
+      StakingProvider.Instance.isLoading = true;
 
-      await StackerProvider.Instance.eventEmitter.emit(StackerProviderEvents.ProviderIsChanging);
+      await StakingProvider.Instance.eventEmitter.emit(StakingProviderEvents.ProviderIsChanging);
 
       await this._isMounted && this.setState({
         ...this.state,
         isLoading: true,
         isProviderMenuModalOpen: false
       }, async () => {
-        await StackerProvider.Instance.setWeb3Provider(connector, account);
+        await StakingProvider.Instance.setWeb3Provider(connector, account);
 
-        StackerProvider.Instance.isLoading = false;
+        StakingProvider.Instance.isLoading = false;
 
-        await StackerProvider.Instance.eventEmitter.emit(
-          StackerProviderEvents.ProviderChanged,
-          new ProviderChangedEvent(StackerProvider.Instance.providerType, StackerProvider.Instance.web3Wrapper)
+        await StakingProvider.Instance.eventEmitter.emit(
+          StakingProviderEvents.ProviderChanged,
+          new ProviderChangedEvent(StakingProvider.Instance.providerType, StakingProvider.Instance.web3Wrapper)
         );
         await this._isMounted && this.setState({
           ...this.state,
@@ -131,7 +131,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
   };
   public componentWillUnmount(): void {
     this._isMounted = false;
-    StackerProvider.Instance.eventEmitter.removeListener(StackerProviderEvents.ProviderChanged, this.onProviderChanged);
+    StakingProvider.Instance.eventEmitter.removeListener(StakingProviderEvents.ProviderChanged, this.onProviderChanged);
     window.removeEventListener("resize", this.didResize.bind(this));
   }
   public componentDidMount(): void {

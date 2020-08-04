@@ -166,7 +166,7 @@ export class ContractsSource {
     let address: string = "";
     switch (this.networkId) {
       case 1:
-        address = "";
+        address = "0xeAC0b322Dc88cF708608B3FFAe1e9fB484A6A542";
         break;
       case 3:
         address = "";

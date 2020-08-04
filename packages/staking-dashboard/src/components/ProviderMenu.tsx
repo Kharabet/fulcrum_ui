@@ -3,7 +3,7 @@ import { ProviderType } from "../domain/ProviderType";
 import { ProviderMenuListItem } from "./ProviderMenuListItem";
 import { useWeb3React } from '@web3-react/core';
 import { ProviderTypeDictionary } from "../domain/ProviderTypeDictionary";
-import { StackerProvider } from "../services/StackerProvider";
+import { StakingProvider } from "../services/StakingProvider";
 import { injected } from "../domain/WalletConnectors";
 import { AbstractConnector } from '@web3-react/abstract-connector';
 import { ReactComponent as CloseIcon } from "../assets/images/ic__close.svg"
@@ -33,16 +33,16 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
   }, [activatingConnector, connector])
 
   // handle logic to eagerly connect to the injected ethereum provider, if it exists and has granted access already
-  if (!activatingConnector && connector !== injected && props.isMobileMedia && StackerProvider.Instance.providerType !== ProviderType.MetaMask) {
+  if (!activatingConnector && connector !== injected && props.isMobileMedia && StakingProvider.Instance.providerType !== ProviderType.MetaMask) {
 
     //@ts-ignore
     setActivatingConnector(injected);
     activate(injected);
   }
 
-  const storedProvider: any = StackerProvider.getLocalstorageItem('providerType');
+  const storedProvider: any = StakingProvider.getLocalstorageItem('providerType');
   const providerType: ProviderType | null = storedProvider as ProviderType || null;
-  if (!activatingConnector && providerType && providerType !== StackerProvider.Instance.providerType) {
+  if (!activatingConnector && providerType && providerType !== StakingProvider.Instance.providerType) {
 
     //@ts-ignore
     setActivatingConnector(ProviderTypeDictionary.getConnectorByProviderType(providerType)!);

@@ -2,7 +2,7 @@ import React from "react";
 import { ProviderType } from "../domain/ProviderType";
 import { ProviderTypeDictionary } from "../domain/ProviderTypeDictionary";
 import { useWeb3React } from '@web3-react/core';
-import { StackerProvider } from '../services/StackerProvider';
+import { StakingProvider } from '../services/StakingProvider';
 import { Loader } from './Loader';
 
 export interface IProviderMenuListItemProps {
@@ -25,7 +25,7 @@ export function ProviderMenuListItem(props: IProviderMenuListItemProps) {
     props.onSelect(props.providerType);
   };
   if (props.isConnected) {
-    const isUnSupportedNetwork = StackerProvider.Instance.unsupportedNetwork;
+    const isUnSupportedNetwork = StakingProvider.Instance.unsupportedNetwork;
 
     const walletAddressText = isUnSupportedNetwork
       ? "Wrong Network!"
@@ -33,8 +33,8 @@ export function ProviderMenuListItem(props: IProviderMenuListItemProps) {
         ? `${account.slice(0, 6)}...${account.slice(account.length - 4, account.length)}`
         : "";
 
-    const etherscanURL = StackerProvider.Instance.web3ProviderSettings
-      ? StackerProvider.Instance.web3ProviderSettings.etherscanURL
+    const etherscanURL = StakingProvider.Instance.web3ProviderSettings
+      ? StakingProvider.Instance.web3ProviderSettings.etherscanURL
       : "";
 
     return (

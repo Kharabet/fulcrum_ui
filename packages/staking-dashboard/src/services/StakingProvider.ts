@@ -13,7 +13,7 @@ import { AbstractConnector } from '@web3-react/abstract-connector';
 import { ProviderTypeDictionary } from "../domain/ProviderTypeDictionary";
 import { ProviderType } from "../domain/ProviderType";
 import { Web3ConnectionFactory } from "../domain/Web3ConnectionFactory";
-import { StackerProviderEvents } from "./events/StackerProviderEvents";
+import { StakingProviderEvents } from "./events/StakingProviderEvents";
 import { ContractsSource } from "./ContractsSource";
 import { BigNumber } from "@0x/utils";
 import { Asset } from "../domain/Asset";
@@ -46,8 +46,8 @@ const networkName = process.env.REACT_APP_ETH_NETWORK;
 const initialNetworkId = getNetworkIdByString(networkName);
 
 
-export class StackerProvider {
-  public static Instance: StackerProvider;
+export class StakingProvider {
+  public static Instance: StakingProvider;
 
   public readonly gasLimit = "250000";
 
@@ -72,19 +72,19 @@ export class StackerProvider {
     //TasksQueue.Instance.on(TasksQueueEvents.Enqueued, this.onTaskEnqueued);
 
     // singleton
-    if (!StackerProvider.Instance) {
-      StackerProvider.Instance = this;
+    if (!StakingProvider.Instance) {
+      StakingProvider.Instance = this;
     }
 
-    const storedProvider: any = StackerProvider.getLocalstorageItem('providerType');
+    const storedProvider: any = StakingProvider.getLocalstorageItem('providerType');
     const providerType: ProviderType | null = storedProvider as ProviderType || null;
 
-    this.web3ProviderSettings = StackerProvider.getWeb3ProviderSettings(initialNetworkId);
+    this.web3ProviderSettings = StakingProvider.getWeb3ProviderSettings(initialNetworkId);
     if (!providerType || providerType === ProviderType.None) {
 
-      // StackerProvider.Instance.isLoading = true;
+      // StakingProvider.Instance.isLoading = true;
       // setting up readonly provider
-      this.web3ProviderSettings = StackerProvider.getWeb3ProviderSettings(initialNetworkId);
+      this.web3ProviderSettings = StakingProvider.getWeb3ProviderSettings(initialNetworkId);
       Web3ConnectionFactory.setReadonlyProvider().then(() => {
         const web3Wrapper = Web3ConnectionFactory.currentWeb3Wrapper;
         const engine = Web3ConnectionFactory.currentWeb3Engine;
@@ -96,7 +96,7 @@ export class StackerProvider {
             this.web3Wrapper = web3Wrapper;
             this.providerEngine = engine;
             this.contractsSource = contractsSource;
-            this.eventEmitter.emit(StackerProviderEvents.ProviderAvailable);
+            this.eventEmitter.emit(StakingProviderEvents.ProviderAvailable);
           });
         }
       });
@@ -104,7 +104,7 @@ export class StackerProvider {
 
 
 
-    return StackerProvider.Instance;
+    return StakingProvider.Instance;
   }
 
   public static getLocalstorageItem(item: string): string {
@@ -174,7 +174,7 @@ export class StackerProvider {
       ? providerType
       : ProviderType.None;
 
-    StackerProvider.setLocalstorageItem('providerType', this.providerType);
+    StakingProvider.setLocalstorageItem('providerType', this.providerType);
   }
 
   public async setWeb3ProviderMobileFinalize(providerType: ProviderType, providerData: [Web3Wrapper | null, Web3ProviderEngine | null, boolean, number, string]) { // : Promise<boolean> {
@@ -184,7 +184,7 @@ export class StackerProvider {
     let networkId = providerData[3];
     const selectedAccount = providerData[4];
 
-    this.web3ProviderSettings = await StackerProvider.getWeb3ProviderSettings(networkId);
+    this.web3ProviderSettings = await StakingProvider.getWeb3ProviderSettings(networkId);
     if (this.web3Wrapper) {
       if (this.web3ProviderSettings.networkName !== process.env.REACT_APP_ETH_NETWORK) {
         // TODO: inform the user they are on the wrong network. Make it provider specific (MetaMask, etc)
@@ -192,7 +192,7 @@ export class StackerProvider {
         this.unsupportedNetwork = true;
         canWrite = false; // revert back to read-only
         networkId = await this.web3Wrapper.getNetworkIdAsync();
-        this.web3ProviderSettings = await StackerProvider.getWeb3ProviderSettings(networkId);
+        this.web3ProviderSettings = await StakingProvider.getWeb3ProviderSettings(networkId);
       } else {
         this.unsupportedNetwork = false;
       }
@@ -223,7 +223,7 @@ export class StackerProvider {
         this.providerType = ProviderType.None;
       }
 
-      StackerProvider.setLocalstorageItem("providerType", providerType);
+      StakingProvider.setLocalstorageItem("providerType", providerType);
     } else {
       this.contractsSource = null;
     }
@@ -231,7 +231,7 @@ export class StackerProvider {
     if (this.contractsSource) {
       await this.contractsSource.Init();
     }
-    StackerProvider.Instance.isLoading = false;
+    StakingProvider.Instance.isLoading = false;
   }
 
   public static getWeb3ProviderSettings(networkId: number | null): IWeb3ProviderSettings {
@@ -666,4 +666,4 @@ export class StackerProvider {
   };
 
 }
-new StackerProvider();
+new StakingProvider();
