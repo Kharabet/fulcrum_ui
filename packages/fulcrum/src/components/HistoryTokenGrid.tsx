@@ -272,9 +272,6 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
           //loanToken in LiquidationEvent is a quoteAsset in TradeEvent
           //collateralToken in LiquidationEvent is a baseAsset in TradeEvent
           const action = "Liquidated";
-          if (txHash === "0x3a2d54a62e9326552efd2c1e177a3f0fbf951763b50d2b36f55b6a55c1bae410") {
-            debugger;
-          }
           if (positionType === PositionType.LONG) {
             positionValue = event.repayAmount.div(event.collateralToLoanRate);
             tradePrice = event.collateralToLoanRate.div(10 ** 18);
