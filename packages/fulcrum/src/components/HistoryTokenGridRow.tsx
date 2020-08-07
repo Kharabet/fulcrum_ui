@@ -216,7 +216,7 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
               })}
             </a>
           </div>
-          <div className="history-token-grid-row__col history-token-grid-row__col-token-asset">
+          <div title={this.props.eventsGroup.loanId} className="history-token-grid-row__col history-token-grid-row__col-token-asset">
             <span className="label">Pair</span>
             {this.props.eventsGroup.baseToken}-{this.props.eventsGroup.quoteToken}
           </div>
@@ -233,7 +233,7 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
             <span className="label">Position</span>
             {latestEvent.positionValue.toFixed(4)}
           </div>
-          <div className="history-token-grid-row__col history-token-grid-row__col-asset-price">
+          <div title={latestEvent.tradePrice.toFixed(18)} className="history-token-grid-row__col history-token-grid-row__col-asset-price">
             <span className="label">Trade Price</span>
             {!this.state.isLoading
               ? <React.Fragment>
