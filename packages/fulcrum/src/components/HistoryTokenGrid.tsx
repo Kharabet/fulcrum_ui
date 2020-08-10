@@ -73,7 +73,6 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
         e.isHidden = (i >= startIndex && i < endIndex) ? false : true;
         return < HistoryTokenGridRow key={i} {...e} />
       });
-    //.slice(this.quantityVisibleRow * this.state.numberPagination, this.quantityVisibleRow * this.state.numberPagination + this.quantityVisibleRow);
     return (
 
       <div className="history-token-grid">
@@ -100,9 +99,7 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
 
       const isLoanTokenOnlyInQuoteTokens = !this.props.baseTokens.includes(tradeEvent.loanToken) && this.props.quoteTokens.includes(tradeEvent.loanToken)
       const isCollateralTokenNotInQuoteTokens = this.props.baseTokens.includes(tradeEvent.collateralToken) && !this.props.quoteTokens.includes(tradeEvent.collateralToken)
-      console.log(isLoanTokenOnlyInQuoteTokens)
-      console.log(isCollateralTokenNotInQuoteTokens)
-      console.log("=====")
+
       const positionType = isCollateralTokenNotInQuoteTokens || isLoanTokenOnlyInQuoteTokens
         ? PositionType.LONG
         : PositionType.SHORT;
@@ -125,25 +122,6 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
         ? new BigNumber(10 ** 36).div(tradeEvent.entryPrice).div(10 ** 18)
         : tradeEvent.entryPrice.div(10 ** 18);
 
-      //TODO: swapToUsdHistoryRateRequest extract to function
-      // if (positionType === PositionType.LONG) {
-      //in case of exotic pairs like ETH-KNC all values should be denominated in USD
-      // if (!this.props.stablecoins.includes(tradeEvent.loanToken)) {
-      //   const swapToUsdHistoryRateRequest = await fetch(`https://api.bzx.network/v1/asset-history-price?asset=${tradeEvent.loanToken.toLowerCase()}&date=${tradeEvent.timeStamp.getTime()}`);
-      //   const swapToUsdHistoryRateResponse = (await swapToUsdHistoryRateRequest.json()).data;
-      //   const loanAssetUSDStartRate = new BigNumber(swapToUsdHistoryRateResponse.swapToUSDPrice);
-      //   openPrice = openPrice.times(loanAssetUSDStartRate);
-      // }
-      //} else {
-      //in case of exotic pairs like ETH-KNC all values should be denominated in USD
-      // if (!this.props.stablecoins.includes(tradeEvent.collateralToken)) {
-      //   const swapToUsdHistoryRateRequest = await fetch(`https://api.bzx.network/v1/asset-history-price?asset=${tradeEvent.collateralToken.toLowerCase()}&date=${tradeEvent.timeStamp.getTime()}`);
-      //   const swapToUsdHistoryRateResponse = (await swapToUsdHistoryRateRequest.json()).data;
-      //   const collateralAssetUSDStartRate = new BigNumber(swapToUsdHistoryRateResponse.swapToUSDPrice);
-      //   openPrice = openPrice.times(collateralAssetUSDStartRate);
-      // }
-      //}
-
       const positionEventsGroup = new PositionEventsGroup(
         loanId,
         baseAsset,
@@ -162,12 +140,6 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
         const txHash = event.txHash;
         const payTradingFeeEvent = historyEvents.payTradingFeeEvents.find(e => e.timeStamp.getTime() === timeStamp.getTime());
 
-        // if (payTradingFeeEvent) {
-        //   const swapToUsdHistoryRateRequest = await fetch(`https://api.bzx.network/v1/asset-history-price?asset=${payTradingFeeEvent.token.toLowerCase()}&date=${payTradingFeeEvent.timeStamp.getTime()}`);
-        //   const swapToUsdHistoryRateResponse = (await swapToUsdHistoryRateRequest.json()).data;
-        //   const feeAssetUsdRate = swapToUsdHistoryRateResponse.swapToUSDPrice;
-        //   payTradingFeeEvent.amount = payTradingFeeEvent.amount.times(feeAssetUsdRate);
-        // }
         const earnRewardEvent = historyEvents.earnRewardEvents.find(e => e.timeStamp.getTime() === timeStamp.getTime());
         if (event instanceof TradeEvent) {
           const action = "Opened";
@@ -176,30 +148,12 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
             value = event.positionSize.div(event.entryPrice);
             tradePrice = new BigNumber(10 ** 36).div(event.entryPrice).div(10 ** 18);
             quoteToken = event.loanToken;
-
-            //in case of exotic pairs like ETH-KNC all values should be denominated in USD           
-            // if (!this.props.stablecoins.includes(event.loanToken)) {
-            // const swapToUsdHistoryRateRequest = await fetch(`https://api.bzx.network/v1/asset-history-price?asset=${event.loanToken.toLowerCase()}&date=${event.timeStamp.getTime()}`);
-            // const swapToUsdHistoryRateResponse = (await swapToUsdHistoryRateRequest.json()).data;
-            // const loanAssetUSDStartRate = new BigNumber(swapToUsdHistoryRateResponse.swapToUSDPrice);
-            // value = value.times(loanAssetUSDStartRate)
-            // tradePrice = tradePrice.times(loanAssetUSDStartRate);
-            // }
           }
           else {
             positionValue = event.positionSize.div(event.entryPrice);
             value = event.positionSize.div(10 ** 18);
             tradePrice = event.entryPrice.div(10 ** 18);
             quoteToken = event.collateralToken;
-
-            //in case of exotic pairs like ETH-KNC all values should be denominated in USD
-            //if (!this.props.stablecoins.includes(event.collateralToken)) {
-            // const swapToUsdHistoryRateRequest = await fetch(`https://api.bzx.network/v1/asset-history-price?asset=${event.collateralToken.toLowerCase()}&date=${event.timeStamp.getTime()}`);
-            // const swapToUsdHistoryRateResponse = (await swapToUsdHistoryRateRequest.json()).data;
-            // const collateralAssetUSDStartRate = new BigNumber(swapToUsdHistoryRateResponse.swapToUSDPrice);
-            // value = value.times(collateralAssetUSDStartRate)
-            // tradePrice = tradePrice.times(collateralAssetUSDStartRate);
-            // }
           }
 
           positionEventsGroup.events.push(new PositionHistoryData(
@@ -224,15 +178,6 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
             value = event.positionCloseSize.div(event.exitPrice);
             tradePrice = new BigNumber(10 ** 36).div(event.exitPrice).div(10 ** 18);
             quoteToken = event.loanToken;
-
-            //in case of exotic pairs like ETH-KNC all values should be denominated in USD
-            // if (!this.props.stablecoins.includes(event.loanToken)) {
-            //   const swapToUsdHistoryRateRequest = await fetch(`https://api.bzx.network/v1/asset-history-price?asset=${event.loanToken.toLowerCase()}&date=${event.timeStamp.getTime()}`);
-            //   const swapToUsdHistoryRateResponse = (await swapToUsdHistoryRateRequest.json()).data;
-            //   const loanAssetUSDStartRate = new BigNumber(swapToUsdHistoryRateResponse.swapToUSDPrice);
-            //   value = value.times(loanAssetUSDStartRate)
-            //   tradePrice = tradePrice.times(loanAssetUSDStartRate);
-            // }
             profit = (tradePrice.minus(openPrice)).times(positionValue);
 
           }
@@ -241,15 +186,6 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
             value = event.positionCloseSize.div(10 ** 18);
             tradePrice = event.exitPrice.div(10 ** 18);
             quoteToken = event.collateralToken;
-
-            //in case of exotic pairs like ETH-KNC all values should be denominated in USD
-            // if (!this.props.stablecoins.includes(event.collateralToken)) {
-            //   const swapToUsdHistoryRateRequest = await fetch(`https://api.bzx.network/v1/asset-history-price?asset=${event.collateralToken.toLowerCase()}&date=${event.timeStamp.getTime()}`);
-            //   const swapToUsdHistoryRateResponse = (await swapToUsdHistoryRateRequest.json()).data;
-            //   const collateralAssetUSDStartRate = new BigNumber(swapToUsdHistoryRateResponse.swapToUSDPrice);
-            //   value = value.times(collateralAssetUSDStartRate)
-            //   tradePrice = tradePrice.times(collateralAssetUSDStartRate);
-            // }
             profit = (openPrice.minus(tradePrice)).times(positionValue);
 
           }
@@ -277,15 +213,6 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
             tradePrice = event.collateralToLoanRate.div(10 ** 18);
             value = positionValue.times(tradePrice);
             quoteToken = event.loanToken;
-
-            //in case of exotic pairs like ETH-KNC all values should be denominated in USD
-            // if (!this.props.stablecoins.includes(event.loanToken)) {
-            //   const swapToUsdHistoryRateRequest = await fetch(`https://api.bzx.network/v1/asset-history-price?asset=${event.loanToken.toLowerCase()}&date=${event.timeStamp.getTime()}`);
-            //   const swapToUsdHistoryRateResponse = (await swapToUsdHistoryRateRequest.json()).data;
-            //   const loanAssetUSDStartRate = new BigNumber(swapToUsdHistoryRateResponse.swapToUSDPrice);
-            //   value = value.times(loanAssetUSDStartRate)
-            //   tradePrice = tradePrice.times(loanAssetUSDStartRate);
-            // }
             profit = (tradePrice.minus(openPrice)).times(positionValue);
           }
           else {
@@ -293,15 +220,6 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
             tradePrice = new BigNumber(10 ** 36).div(event.collateralToLoanRate).div(10 ** 18);
             value = positionValue.times(tradePrice);
             quoteToken = event.collateralToken;
-
-            //in case of exotic pairs like ETH-KNC all values should be denominated in USD
-            // if (!this.props.stablecoins.includes(event.collateralToken)) {
-            //   const swapToUsdHistoryRateRequest = await fetch(`https://api.bzx.network/v1/asset-history-price?asset=${event.collateralToken.toLowerCase()}&date=${event.timeStamp.getTime()}`);
-            //   const swapToUsdHistoryRateResponse = (await swapToUsdHistoryRateRequest.json()).data;
-            //   const collateralAssetUSDStartRate = new BigNumber(swapToUsdHistoryRateResponse.swapToUSDPrice);
-            //   value = value.times(collateralAssetUSDStartRate)
-            //   tradePrice = tradePrice.times(collateralAssetUSDStartRate);
-            // }
             profit = (openPrice.minus(tradePrice)).times(positionValue);
           }
 
