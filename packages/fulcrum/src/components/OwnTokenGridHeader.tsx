@@ -15,7 +15,7 @@ export class OwnTokenGridHeader extends Component<IOwnTokenGridHeaderProps> {
         </div>
 
         <div className="own-token-grid-header__col-position">
-          <span className="own-token-grid-header__text">Position (ETH)</span>
+          <span className="own-token-grid-header__text">Position</span>
         </div>
         <div className="own-token-grid-header__col-asset-price">
           <span className="own-token-grid-header__text">Open Price</span>

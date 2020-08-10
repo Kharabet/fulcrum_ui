@@ -443,7 +443,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
           }
         }
         else {
-          positionValue = loan.loanData!.principal.div(10 ** 18);
+          positionValue = loan.loanData!.collateral.div(10 ** 18).times(loan.loanData!.startRate).div(10 ** 18);
           value = loan.loanData!.collateral.div(10 ** 18);
           collateral = ((loan.loanData!.collateral.div(10 ** 18)).minus(loan.loanData!.principal.div(currentCollateralToPrincipalRate).div(10 ** 18)));
           openPrice = new BigNumber(10 ** 36).div(loan.loanData!.startRate).div(10 ** 18);

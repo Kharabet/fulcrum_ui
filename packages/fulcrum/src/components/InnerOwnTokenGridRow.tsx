@@ -164,7 +164,7 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
               <span className="inner-own-token-grid-row__body-header">Position({this.props.baseToken}/{this.props.quoteToken})</span>
               {this.props.positionValue.toFixed(4)}
             </div>
-            <div className="inner-own-token-grid-row__col-asset-type">
+            <div title={this.props.loan!.loanId} className="inner-own-token-grid-row__col-asset-type">
 
               <span className="position-type-marker">{`${this.props.leverage}x`}&nbsp; {this.props.positionType}</span>
             </div>
