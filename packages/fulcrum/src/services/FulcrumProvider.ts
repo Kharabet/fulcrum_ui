@@ -1025,6 +1025,8 @@ export class FulcrumProvider {
 
 
   public gasPrice = async (): Promise<BigNumber> => {
+    if (networkName === "kovan")
+     return new BigNumber(1).multipliedBy(10 ** 9); // 1 gwei
     let result = new BigNumber(120).multipliedBy(10 ** 9); // upper limit 120 gwei
     const lowerLimit = new BigNumber(3).multipliedBy(10 ** 9); // lower limit 3 gwei
 
