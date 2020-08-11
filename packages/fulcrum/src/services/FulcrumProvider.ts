@@ -1324,8 +1324,8 @@ export class FulcrumProvider {
         result.principal = marginDetails[0].div(10 ** 18);
         result.collateral = marginDetails[1].div(10 ** 18);
         result.exposureValue = request.positionType === PositionType.SHORT
-          ? marginDetails[1].times(collateralToLoanRate).div(10 ** 18)
-          : marginDetails[1].div(10 ** 18);
+          ? result.principal
+          : result.collateral;
         result.interestRate = marginDetails[2].div(10 ** 18);
       }
       catch (e) {
