@@ -150,7 +150,7 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
             quoteToken = event.loanToken;
           }
           else {
-            positionValue = event.positionSize.div(event.entryPrice);
+            positionValue = event.borrowedAmount.div(10 ** 18);
             value = event.positionSize.div(10 ** 18);
             tradePrice = event.entryPrice.div(10 ** 18);
             quoteToken = event.collateralToken;
@@ -182,7 +182,7 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
 
           }
           else {
-            positionValue = event.positionCloseSize.div(event.exitPrice);
+            positionValue = event.loanCloseAmount.div(10**18);
             value = event.positionCloseSize.div(10 ** 18);
             tradePrice = event.exitPrice.div(10 ** 18);
             quoteToken = event.collateralToken;
@@ -213,14 +213,14 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
             tradePrice = event.collateralToLoanRate.div(10 ** 18);
             value = positionValue.times(tradePrice);
             quoteToken = event.loanToken;
-            profit = (tradePrice.minus(openPrice)).times(positionValue);
+            profit = value.minus(event.collateralWithdrawAmount.div(10**18));
           }
           else {
             positionValue = event.repayAmount.div(10 ** 18);
             tradePrice = new BigNumber(10 ** 36).div(event.collateralToLoanRate).div(10 ** 18);
             value = positionValue.times(tradePrice);
             quoteToken = event.collateralToken;
-            profit = (openPrice.minus(tradePrice)).times(positionValue);
+            profit = value.minus(event.collateralWithdrawAmount.div(10**18));
           }
 
           positionEventsGroup.events.push(new PositionHistoryData(
