@@ -147,7 +147,7 @@ export class ContractsSource {
     let address: string = "";
     switch (this.networkId) {
       case 1:
-        address = "0x85A25f18ba56163450d597E521c7A79F552c93d2";
+        address = "0x80a603401bc2a9b84bbb1b3275d4a65d54381d79";
         break;
       case 3:
         address = "";
@@ -156,7 +156,7 @@ export class ContractsSource {
         address = "";
         break;
       case 42:
-        address = "0x8D639BAe9e249Ef52AD54Cfa36fF310C89Eb1f4a";
+        address = "0x7DC4b88f28b1a70c17912C06B70c4Bed3c2cF75b";
         break;
     }
     return address;

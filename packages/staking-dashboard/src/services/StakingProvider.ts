@@ -382,7 +382,6 @@ export class StakingProvider {
       console.error(e)
     }
     return result;
-
   }
 
 
