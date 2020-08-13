@@ -134,7 +134,6 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
         let positionValue = new BigNumber(0);
         let tradePrice = new BigNumber(0);
         let value = new BigNumber(0);
-        let quoteToken: Asset;
         let profit: BigNumber | string = "-";
         const timeStamp = event.timeStamp;
         const txHash = event.txHash;
@@ -147,13 +146,11 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
             positionValue = event.positionSize.div(10 ** 18);
             value = event.positionSize.div(event.entryPrice);
             tradePrice = new BigNumber(10 ** 36).div(event.entryPrice).div(10 ** 18);
-            quoteToken = event.loanToken;
           }
           else {
             positionValue = event.borrowedAmount.div(10 ** 18);
             value = event.positionSize.div(10 ** 18);
             tradePrice = event.entryPrice.div(10 ** 18);
-            quoteToken = event.collateralToken;
           }
 
           positionEventsGroup.events.push(new PositionHistoryData(
@@ -165,7 +162,7 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
             value,
             profit,
             txHash,
-            quoteToken,
+            quoteAsset,
             payTradingFeeEvent,
             earnRewardEvent
           ))
@@ -177,7 +174,6 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
             positionValue = event.positionCloseSize.div(10 ** 18);
             value = event.positionCloseSize.div(event.exitPrice);
             tradePrice = new BigNumber(10 ** 36).div(event.exitPrice).div(10 ** 18);
-            quoteToken = event.loanToken;
             profit = (tradePrice.minus(openPrice)).times(positionValue);
 
           }
@@ -185,9 +181,7 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
             positionValue = event.loanCloseAmount.div(10**18);
             value = event.positionCloseSize.div(10 ** 18);
             tradePrice = event.exitPrice.div(10 ** 18);
-            quoteToken = event.collateralToken;
             profit = (openPrice.minus(tradePrice)).times(positionValue);
-
           }
 
           positionEventsGroup.events.push(new PositionHistoryData(
@@ -199,7 +193,7 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
             value,
             profit,
             txHash,
-            quoteToken,
+            quoteAsset,
             payTradingFeeEvent,
             earnRewardEvent
           ))
@@ -212,14 +206,12 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
             positionValue = event.repayAmount.div(event.collateralToLoanRate);
             tradePrice = event.collateralToLoanRate.div(10 ** 18);
             value = positionValue.times(tradePrice);
-            quoteToken = event.loanToken;
             profit = value.minus(event.collateralWithdrawAmount.times(event.collateralToLoanRate).div(10**36));
           }
           else {
             positionValue = event.repayAmount.div(10 ** 18);
             tradePrice = new BigNumber(10 ** 36).div(event.collateralToLoanRate).div(10 ** 18);
             value = positionValue.times(tradePrice);
-            quoteToken = event.collateralToken;
             profit = value.minus(event.collateralWithdrawAmount.div(10**18));
           }
 
@@ -232,7 +224,7 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
             value,
             profit,
             txHash,
-            quoteToken,
+            quoteAsset,
             payTradingFeeEvent,
             earnRewardEvent
           ))
