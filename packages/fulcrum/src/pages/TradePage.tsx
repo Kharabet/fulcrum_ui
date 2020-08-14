@@ -27,7 +27,8 @@ import { TradeEvent } from "../domain/TradeEvent";
 import { LiquidationEvent } from "../domain/LiquidationEvent";
 import { CloseWithSwapEvent } from "../domain/CloseWithSwapEvent";
 
-const ManageTokenGrid = React.lazy(() => import('../components/ManageTokenGrid'));
+import  ManageTokenGrid  from '../components/ManageTokenGrid';
+// const ManageTokenGrid = React.lazy(() => import('../components/ManageTokenGrid'));
 const TradeForm = React.lazy(() => import('../components/TradeForm'));
 const ManageCollateralForm = React.lazy(() => import('../components/ManageCollateralForm'));
 
@@ -68,6 +69,7 @@ interface ITradePageState {
 }
 
 export default class TradePage extends PureComponent<ITradePageProps, ITradePageState> {
+  private _isMounted: boolean = false;
   constructor(props: any) {
     super(props);
     if (process.env.REACT_APP_ETH_NETWORK === "kovan") {
@@ -148,13 +150,15 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
   private readonly stablecoins: Asset[] = [];
 
   public componentWillUnmount(): void {
+    this._isMounted = false;
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
     FulcrumProvider.Instance.eventEmitter.removeListener(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 
   public async componentDidMount() {
+    this._isMounted = true;
     const tokenRowsData = this.getTokenRowsData(this.state);
-    this.setState({ ...this.state, tokenRowsData: tokenRowsData });
+    this._isMounted && this.setState({ ...this.state, tokenRowsData: tokenRowsData });
 
     const provider = FulcrumProvider.getLocalstorageItem('providerType');
     if (!FulcrumProvider.Instance.web3Wrapper && (!provider || provider === "None")) {
@@ -175,14 +179,14 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
 
   private async derivedUpdate() {
     const tokenRowsData = this.getTokenRowsData(this.state);
-    await this.setState({ ...this.state, tokenRowsData });
+    await this._isMounted && this.setState({ ...this.state, tokenRowsData });
 
     const ownRowsData = await this.getOwnRowsData(this.state);
     let historyEvents = undefined;
     if (this.state.showMyTokensOnly) {
       historyEvents = await this.getHistoryEvents(this.state);
     }
-    await this.setState({ ...this.state, ownRowsData, historyEvents });
+    await this._isMounted && this.setState({ ...this.state, ownRowsData, historyEvents });
   }
 
   public render() {
@@ -288,7 +292,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       baseToken,
       quoteToken
     }
-    await this.setState({ ...this.state, selectedMarket: marketPair });
+    await this._isMounted && this.setState({ ...this.state, selectedMarket: marketPair });
   };
 
   private onProviderAvailable = async () => {
@@ -307,7 +311,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
 
     if (request) {
       this.onTabSelect(request.asset, request.collateralAsset);
-      this.setState({
+      this._isMounted && this.setState({
         ...this.state,
         isManageCollateralModalOpen: true,
         loanId: request.loanId,
@@ -318,7 +322,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
 
   public onManageCollateralConfirmed = (request: ManageCollateralRequest) => {
     FulcrumProvider.Instance.onManageCollateralConfirmed(request);
-    this.setState({
+    this._isMounted && this.setState({
       ...this.state,
       loanId: request.loanId,
       isManageCollateralModalOpen: false
@@ -327,7 +331,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
 
 
   public onManageCollateralRequestClose = () => {
-    this.setState({
+    this._isMounted && this.setState({
       ...this.state,
       isManageCollateralModalOpen: false
     });
@@ -342,7 +346,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     if (request) {
 
       await this.onTabSelect(request.asset, request.quoteToken);
-      await this.setState({
+      await this._isMounted && this.setState({
         ...this.state,
         isTradeModalOpen: true,
         tradeType: request.tradeType,
@@ -357,21 +361,21 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
   public onTradeConfirmed = (request: TradeRequest) => {
     request.id = this.state.tradeRequestId;
     FulcrumProvider.Instance.onTradeConfirmed(request);
-    this.setState({
+    this._isMounted && this.setState({
       ...this.state,
       isTradeModalOpen: false
     });
   };
 
   public onTradeRequestClose = () => {
-    this.setState({
+    this._isMounted && this.setState({
       ...this.state,
       isTradeModalOpen: false
     });
   };
 
   public onShowMyTokensOnlyChange = async (value: boolean) => {
-    await this.setState({
+    await this._isMounted && this.setState({
       ...this.state,
       showMyTokensOnly: value
     });
@@ -381,7 +385,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     const ownRowsData: IOwnTokenGridRowProps[] = [];
     if (FulcrumProvider.Instance.web3Wrapper && FulcrumProvider.Instance.contractsSource && FulcrumProvider.Instance.contractsSource.canWrite) {
       const loans = await FulcrumProvider.Instance.getUserMarginTradeLoans();
-      this.setState({ ...this.state, loans })
+      this._isMounted && this.setState({ ...this.state, loans })
       for (const loan of loans) {
 
         const isLoanTokenOnlyInQuoteTokens = !this.baseTokens.includes(loan.loanAsset) && this.quoteTokens.includes(loan.loanAsset)
@@ -489,7 +493,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         });
       }
     }
-    this.setState({ ...this.state, openedPositionsCount: ownRowsData.length });
+    this._isMounted && this.setState({ ...this.state, openedPositionsCount: ownRowsData.length });
     return ownRowsData;
   };
 
@@ -549,10 +553,10 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
   };
 
   public changeLoadingTransaction = (isLoadingTransaction: boolean, request: TradeRequest | undefined, isTxCompleted: boolean, resultTx: boolean) => {
-    this.setState({ ...this.state, isLoadingTransaction: isLoadingTransaction, request: request, isTxCompleted: isTxCompleted, resultTx: resultTx })
+    this._isMounted && this.setState({ ...this.state, isLoadingTransaction: isLoadingTransaction, request: request, isTxCompleted: isTxCompleted, resultTx: resultTx })
   }
 
   private changeGridPositionType = async (positionType: PositionType) => {
-    await this.setState({ ...this.state, activePositionType: positionType })
+    await this._isMounted && this.setState({ ...this.state, activePositionType: positionType })
   }
 }

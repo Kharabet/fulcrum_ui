@@ -36,8 +36,13 @@ export default class LendPage extends PureComponent<ILendPageProps, ILendPageSta
       lendRequestId: 0
     };
   }
+  private _isMounted: boolean = false;
 
+  public componentWillUnmount(): void {
+    this._isMounted = false;
+  }
   public componentDidMount(): void {
+    this._isMounted = true;
     const provider = FulcrumProvider.getLocalstorageItem('providerType');
     if (!FulcrumProvider.Instance.web3Wrapper && (!provider || provider === "None")) {
       this.props.doNetworkConnect();
@@ -91,7 +96,7 @@ export default class LendPage extends PureComponent<ILendPageProps, ILendPageSta
     const lendRequestId = request.id;
 
     if (request) {
-      this.setState({
+      this._isMounted && this.setState({
         ...this.state,
         isLendModalOpen: true,
         lendType: request.lendType,
@@ -102,7 +107,7 @@ export default class LendPage extends PureComponent<ILendPageProps, ILendPageSta
   };
 
   public onLendConfirmed = (request: LendRequest) => {
-    this.setState({
+    this._isMounted && this.setState({
       ...this.state,
       isLendModalOpen: false,
     });
@@ -111,7 +116,7 @@ export default class LendPage extends PureComponent<ILendPageProps, ILendPageSta
   };
 
   public onRequestClose = () => {
-    this.setState({
+    this._isMounted && this.setState({
       ...this.state,
       isLendModalOpen: false
     });

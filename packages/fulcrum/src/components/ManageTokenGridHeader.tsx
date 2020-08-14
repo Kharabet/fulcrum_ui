@@ -25,6 +25,10 @@ export class ManageTokenGridHeader extends Component<IManageTokenGridHeaderProps
     this._isMounted = true;
   }
 
+  public componentWillUnmount(): void {
+    this._isMounted = false;
+  }
+
   public componentDidUpdate(prevState: Readonly<IManageTokenGridHeaderProps>): void {
     if (prevState.isShowHistory !== this.state.isShowHistory)
       this.props.updateStateisShowHistory(this.state.isShowHistory);

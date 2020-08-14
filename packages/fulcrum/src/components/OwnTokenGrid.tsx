@@ -23,7 +23,16 @@ export class OwnTokenGrid extends Component<IOwnTokenGridProps, IOwnTokenGridSta
       isShowHistory: false
     };
   }
+  private _isMounted: boolean = false;
 
+  public componentWillUnmount(): void {
+    this._isMounted = false;
+  }
+
+  public async componentDidMount() {
+    this._isMounted = true;
+  }
+  
   public render() {
     if (!this.props.ownRowsData.length)
     return <PreloaderChart quantityDots={4} sizeDots={'middle'} title={"Loading"} isOverlay={false} />;

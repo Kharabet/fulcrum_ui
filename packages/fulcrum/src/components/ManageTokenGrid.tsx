@@ -30,6 +30,15 @@ export default class ManageTokenGrid extends Component<IManageTokenGridProps, IM
       isShowHistory: false
     };
   }
+  private _isMounted: boolean = false;
+
+  public componentWillUnmount(): void {
+    this._isMounted = false;
+  }
+
+  public async componentDidMount() {
+    this._isMounted = true;
+  }
   public render() {
     return (
       <div className="manage-token-grid">
@@ -47,6 +56,6 @@ export default class ManageTokenGrid extends Component<IManageTokenGridProps, IM
   }
 
   public updateStateisShowHistory = (updatedState: boolean) => {
-    this.setState({ isShowHistory: updatedState })
+    this._isMounted && this.setState({ isShowHistory: updatedState })
   }
 }

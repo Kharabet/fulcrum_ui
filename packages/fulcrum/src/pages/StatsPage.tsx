@@ -18,6 +18,15 @@ export default class StatsPage extends Component<IStatsPageProps, IStatsPageStat
   constructor(props: any) {
     super(props);
   }
+  private _isMounted: boolean = false;
+
+  public componentWillUnmount(): void {
+    this._isMounted = false;
+  }
+
+  public async componentDidMount() {
+    this._isMounted = true;
+  }
 
   public render() {
     return (

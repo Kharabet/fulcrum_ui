@@ -40,11 +40,13 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
 
   const storedProvider: any = FulcrumProvider.getLocalstorageItem('providerType');
   const providerType: ProviderType | null = storedProvider as ProviderType || null;
-  if (!activatingConnector && providerType && providerType !== FulcrumProvider.Instance.providerType) {
+  const newConnector = ProviderTypeDictionary.getConnectorByProviderType(providerType)
+  if (!activatingConnector && providerType && newConnector &&  connector !== newConnector) {
 
+    if (!newConnector) return null;
     //@ts-ignore
-    setActivatingConnector(ProviderTypeDictionary.getConnectorByProviderType(providerType)!);
-    activate(ProviderTypeDictionary.getConnectorByProviderType(providerType)!);
+    setActivatingConnector(newConnector);
+    activate(newConnector);
     
   }
 
