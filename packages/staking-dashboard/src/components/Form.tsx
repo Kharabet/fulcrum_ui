@@ -62,8 +62,8 @@ export class Form extends Component<{}, IFormState> {
       bzrxBalance,
       vBzrxBalance,
       iEthBalance,
-      new BigNumber(0), //iETHSwapRate,
-      new BigNumber(0), //whitelistAmount,
+      iETHSwapRate: new BigNumber(0),
+      whitelistAmount: new BigNumber(0),
       claimableAmount,
       canOptin
     })
