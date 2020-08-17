@@ -1,4 +1,3 @@
-import React, { Component } from "react";
 import { Asset } from "./Asset";
 import { AssetDetails } from "./AssetDetails";
 
@@ -63,6 +62,27 @@ import zrx_ts from "../assets/images/ic___token_selector___zrx.svg";
 
 export class AssetsDictionary {
   public static assets: Map<Asset, AssetDetails> = new Map<Asset, AssetDetails>([
+    [
+      Asset.CHI,
+      new AssetDetails(
+        "CHI",
+        "Chi Gastoken by 1inch",
+        "",
+        "",
+        0,
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        new Map<number, string | null>([
+          [1, "0x0000000000004946c0e9f43f4dee607b0ef1fa1c"],
+          [42, "0x0000000000004946c0e9f43f4dee607b0ef1fa1c"]
+        ])
+      )
+    ],
     [
       Asset.BAT,
       new AssetDetails(
