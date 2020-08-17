@@ -59,6 +59,7 @@ interface IAppRouterState {
   currentPage: string;
   web3: Web3Wrapper | null;
   isMobileMedia: boolean;
+  isChiEnabled: boolean;
 }
 
 export class AppRouter extends Component<any, IAppRouterState> {
@@ -72,7 +73,8 @@ export class AppRouter extends Component<any, IAppRouterState> {
       isLoading: false,
       currentPage: "",
       web3: FulcrumProvider.Instance.web3Wrapper,
-      isMobileMedia: false
+      isMobileMedia: false,
+      isChiEnabled: FulcrumProvider.getLocalstorageItem('isChiEnabled') === "true"
     };
 
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
@@ -102,6 +104,10 @@ export class AppRouter extends Component<any, IAppRouterState> {
     return Web3ConnectionFactory.currentWeb3Engine;
   }
 
+  public onChiSwitch = () => {
+
+  }
+
 
   public render() {
     return (
@@ -124,6 +130,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
             isMobileMedia={this.state.isMobileMedia}
             onSelect={this.onProviderTypeSelect}
             onDeactivate={this.onDeactivate}
+            onChiSwitch={this.onChiSwitch}
           />
         </Modal>
         <Modal

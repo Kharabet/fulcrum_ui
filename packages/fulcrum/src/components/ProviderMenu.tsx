@@ -6,12 +6,14 @@ import { ProviderTypeDictionary } from "../domain/ProviderTypeDictionary";
 import { FulcrumProvider } from "../services/FulcrumProvider";
 import { injected } from "../domain/WalletConnectors";
 import { AbstractConnector } from '@web3-react/abstract-connector';
+import { SwitchButton } from "./SwitchButton";
 
 export interface IProviderMenuProps {
   providerTypes: ProviderType[];
   isMobileMedia: boolean;
   onSelect: (selectedConnector: AbstractConnector, account?: string) => void;
   onDeactivate: () => void;
+  onChiSwitch: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 export const ProviderMenu = (props: IProviderMenuProps) => {
@@ -79,6 +81,7 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
   return (
     <div className="provider-menu">
       <div className="provider-menu__title">Select Wallet Provider</div>
+      <SwitchButton onSwitch={props.onChiSwitch}/>
       <ul className="provider-menu__list">{renderItems()}</ul>
       < button
         className="disconnect"

@@ -7,6 +7,7 @@ import menu_icon from "../assets/images/ic_menu.svg";
 import { ReactComponent as MenuIconOpen } from "../assets/images/ic_menu.svg";
 import { ReactComponent as MenuIconClose } from "../assets/images/ic_close.svg";
 import { Footer } from "./Footer"
+import { SwitchButton } from "../components/SwitchButton";
 export interface IHeaderOpsProps {
   doNetworkConnect: () => void;
   isRiskDisclosureModalOpen: () => void;
@@ -31,7 +32,7 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
   
   public componentDidMount(): void {
     var currentTheme = localStorage.getItem('theme')!;
-    var toggleSwitch = document.querySelector<HTMLInputElement>('.theme-switch input[type="checkbox"]');
+    var toggleSwitch = document.querySelector<HTMLInputElement>('.header__right .theme-switch input[type="checkbox"]');
     if (toggleSwitch && currentTheme) {
       if (currentTheme === 'light') {
         document.documentElement.setAttribute('data-theme', 'light');
@@ -79,12 +80,7 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
           </div>
           <div className="header__right">
             <OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />
-            <div className="theme-switch-wrapper">
-              <label className="theme-switch">
-                <input type="checkbox" id="checkbox" onChange={this.onSwitchTheme} />
-                <div className="slider round"></div>
-              </label>
-            </div>
+            <SwitchButton onSwitch={this.onSwitchTheme}/>
           </div>
         </div>
       </header>
@@ -147,8 +143,8 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
     this.setState({ ...this.state, isMenuOpen: !this.state.isMenuOpen });
   };
 
-  private onSwitchTheme = () => {
-    var buttonToggleSwitch = document.querySelector<HTMLInputElement>('.theme-switch input[type="checkbox"]')!;
+  private onSwitchTheme = (e: React.ChangeEvent<HTMLInputElement>) => {
+    var buttonToggleSwitch = e.currentTarget;
     if (buttonToggleSwitch.checked) {
       document.documentElement.setAttribute('data-theme', 'dark');
       localStorage.setItem('theme', 'dark');
