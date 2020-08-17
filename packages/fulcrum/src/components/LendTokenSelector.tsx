@@ -21,7 +21,7 @@ export class LendTokenSelector extends Component<ILendTokenSelectorProps> {
         Asset.KNC,
         Asset.DAI*/
         Asset.fWETH,
-        Asset.SAI,
+        /*Asset.SAI,*/
         Asset.DAI,
         Asset.USDC,
         Asset.USDT,
@@ -42,7 +42,7 @@ export class LendTokenSelector extends Component<ILendTokenSelectorProps> {
     } else {
       LendTokenSelector.assets = [
         Asset.ETH,
-        Asset.SAI,
+        /*Asset.SAI,*/
         Asset.DAI,
         Asset.USDC,
         Asset.USDT,

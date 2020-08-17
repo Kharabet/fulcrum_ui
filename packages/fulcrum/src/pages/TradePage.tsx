@@ -88,7 +88,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       ];
       this.quoteTokens = [
         Asset.DAI,
-        Asset.SAI,
+        /*Asset.SAI,*/
         Asset.USDC,
         Asset.SUSD,
         Asset.USDT
@@ -112,7 +112,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       ];
       this.quoteTokens = [
         Asset.DAI,
-        Asset.SAI,
+        /*Asset.SAI,*/
         Asset.USDC,
         Asset.SUSD,
         Asset.USDT
@@ -120,7 +120,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     }
     this.stablecoins = [
       Asset.DAI,
-      Asset.SAI,
+      /*Asset.SAI,*/
       Asset.USDC,
       Asset.SUSD,
       Asset.USDT

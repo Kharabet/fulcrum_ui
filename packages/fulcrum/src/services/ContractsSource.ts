@@ -469,7 +469,7 @@ export class ContractsSource {
           case "0x20bdf254ca63883c3a83424753bb40185af29ce4":
             asset = Asset.USDC;
             break;
-          case "0xf727563895f5d6d73236ea0c93bbb1f378eee893":
+          case "0x4c4462c6bca4c92bf41c40f9a4047f35fd296996":
             asset = Asset.USDT;
             break;
           case "0xfcfa14dbc71bee2a2188431fa15e1f8d57d93c62":
