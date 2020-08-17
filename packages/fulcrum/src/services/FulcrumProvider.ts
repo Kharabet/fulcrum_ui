@@ -420,6 +420,7 @@ export class FulcrumProvider {
     switch (asset) {
       case Asset.ETH:
       case Asset.WETH:
+      case Asset.fWETH:
         return new BigNumber(10**18).multipliedBy(1500);
       case Asset.WBTC:
         return new BigNumber(10**8).multipliedBy(25);

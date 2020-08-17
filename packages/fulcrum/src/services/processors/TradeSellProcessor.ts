@@ -59,7 +59,7 @@ export class TradeSellProcessor {
     task.processingStepNext();
 
     let gasAmountBN;
-
+    skipGas = true;
     if (skipGas) {
       gasAmountBN = new BigNumber(FulcrumProvider.Instance.gasLimit);
     } else {

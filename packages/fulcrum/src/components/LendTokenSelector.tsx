@@ -17,9 +17,22 @@ export class LendTokenSelector extends Component<ILendTokenSelectorProps> {
 
     if (process.env.REACT_APP_ETH_NETWORK === "kovan") {
       LendTokenSelector.assets = [
-        Asset.ETH,
+        /*Asset.ETH,
         Asset.KNC,
-        Asset.DAI
+        Asset.DAI*/
+        Asset.fWETH,
+        Asset.SAI,
+        Asset.DAI,
+        Asset.USDC,
+        Asset.USDT,
+        Asset.SUSD,
+        Asset.WBTC,
+        Asset.LINK,
+        // Asset.MKR,
+        Asset.ZRX,
+        // Asset.BAT,
+        Asset.REP,
+        Asset.KNC
       ];
     } else if (process.env.REACT_APP_ETH_NETWORK === "ropsten") {
       LendTokenSelector.assets = [
