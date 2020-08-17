@@ -1,0 +1,20 @@
+@media screen and (min-width: $breakpoint-md-up) {
+  .shown-md {
+    display: none !important;
+  }
+}
+@media screen and (max-width: $breakpoint-md-down) {
+  .hidden-md {
+    display: none;
+  }
+}
+@media screen and (min-width: $breakpoint-sm-up) {
+  .shown-sm {
+    display: none !important;
+  }
+}
+@media screen and (max-width: $breakpoint-sm-down) {
+  .hidden-sm {
+    display: none;
+  }
+}

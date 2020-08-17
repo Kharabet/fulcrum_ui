@@ -1,0 +1,88 @@
+<footer class="bg-secondary">
+    <div class="container">
+        <div class="row fw-sm-w">
+            <div class="col col-5 col-sm-12 fd-c mt-sm-30 order-sm-1">
+                <div class="flex mb-50 mb-md-30">
+                    <a href="https://github.com/bZxNetwork" class="item-link">{% include svg/github.svg %}</a>
+                    <a href="https://bzx.network/discord" class="item-link">{% include svg/discord.svg %}</a>
+                    <a href="https://t.me/b0xNet" class="item-link">{% include svg/telegram.svg %}</a>
+                    <a href="https://twitter.com/bzxHQ" class="item-link">{% include svg/twitter.svg %}</a>
+                </div>
+                <p class="fs-18 fs-sm-16 fw-600 mb-25 c-dark-gray">Torque is built on the bZx protocol</p>
+                <div class="mb-25 bzx-logo">
+                    <a href="https://bzx.network">{% include svg/bzx.svg %}</a>
+                </div>
+                <div class="flex fw-w fd-lg-c fd-sm-r fs-sm-10">
+                    <p class="fs-sm-10 mr-15 mr-sm-30 lh-140 c-light-gray mb-lg-15">© {{ 'now' | date: "%Y" }} bZeroX, LLC</p>
+                    <div class="flex">
+                        <a href="/tos" class="c-green mr-15 mr-sm-30">Terms of use</a>
+                        <a href="/privacy" class="c-green mr-15 mr-sm-30">Privacy policy</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col col-3 col-lg-3 col-sm-4 mt-10 fd-c">
+                <h5 class="mb-30">bZx Protocol</h5>
+                <div class="list-footer">
+                    <a href="https://docs.bzx.network/">Documentation</a>
+                    <a href="https://bzx.network/ecosystem">Ecosystem</a>
+                    <a href="https://api.bzx.network/">API</a>
+                    <a href="https://bzx.network/blog">Blog</a>
+                    <a href="https://app.fulcrum.trade/#/stats">Stats</a>
+                </div>
+            </div>
+            <div class="col col-3 col-lg-2 col-sm-4 mt-10 fd-c">
+                <h5 class="mb-30">Products</h5>
+                <div class="list-footer">
+                    <a href="https://fulcrum.trade">Fulcrum</a>
+                    <a href="https://torque.loans">Torque</a>
+                    <a href="https://bzx.network/itokens">iTokens</a>
+                    <a href="https://bzx.network/ptokens">pTokens</a>
+                    <a href="https://bzx.network/bzrx-token">BZRX Token</a>
+
+                </div>
+            </div>
+            <div class="col col-3 col-lg-2 col-sm-4 mt-10 fd-c">
+                <h5 class="mb-30">Company</h5>
+                <div class="list-footer">
+                    <a href="https://bzx.network/#history">History</a>
+                    <a href="https://bzx.network/#team">Team</a>
+                    <a href="https://angel.co/company/bzx-1/jobs">Careers</a>
+                    <a href="https://bzx.network/press">Press</a>
+                    <a href="https://bzx.network/media-assets">Media assets</a>
+                    <a href="#" class="contact-us-button">Contact us</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+<section class="modal"></section>
+<script type="text/javascript" src="/assets/js/main.js"></script>
+<script>
+
+    window.intercomSettings = {
+        app_id: "dfk4n5ut",
+        background_color: "#00ACC1",
+        action_color: "#0071B2"
+    };
+    function messenger(display) {
+        //Insert sign out code here
+        Intercom(display)
+        return (true) //check to see if code was correctly copied
+    }
+    function showIntercom(e) {
+        e.preventDefault();
+        messenger("show");
+    };
+</script>
+
+<script>(function () { var w = window; var ic = w.Intercom; if (typeof ic === "function") { ic('reattach_activator'); ic('update', w.intercomSettings); } else { var d = document; var i = function () { i.c(arguments); }; i.q = []; i.c = function (args) { i.q.push(args); }; w.Intercom = i; var l = function () { var s = d.createElement('script'); s.type = 'text/javascript'; s.async = true; s.src = 'https://widget.intercom.io/widget/dfk4n5ut'; var x = d.getElementsByTagName('script')[0]; x.parentNode.insertBefore(s, x); }; if (w.attachEvent) { w.attachEvent('onload', l); } else { w.addEventListener('load', l, false); } } })();</script>
+
+<script>
+    window.onload = function () {
+        var contactButtons = document.querySelectorAll('.contact-us-button');
+        for (var i = 0; i < contactButtons.length; i++) {
+            contactButtons[i].addEventListener("click", showIntercom, false);
+        }
+    };
+</script>
+</body>

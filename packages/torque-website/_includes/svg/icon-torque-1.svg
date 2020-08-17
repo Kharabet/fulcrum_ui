@@ -1,0 +1,10 @@
+<svg width="120" height="120" viewBox="0 0 120 120" fill="none" 
+    xmlns="http://www.w3.org/2000/svg">
+    <path d="M14 25H51V120L29.713 103.733C19.8098 96.1658 14 84.4143 14 71.9507V25Z" class="icon-step-secondary" />
+    <path d="M88 25H51V120L72.287 103.733C82.1902 96.1658 88 84.4143 88 71.9507V25Z" fill="#1CD8C4"/>
+    <rect x="51" y="5" width="61" height="60" fill="#51AAFF"/>
+    <rect x="51" y="35" width="30" height="30" fill="#176EFC"/>
+    <circle cx="94.0501" cy="45.8534" r="7.77781" fill="white"/>
+    <circle cx="68.9219" cy="23.1183" r="7.77781" fill="white"/>
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M68.4226 52.7309L90.7007 14.1441L94.8458 16.5373L72.5677 55.1241L68.4226 52.7309Z" fill="white"/>
+</svg>

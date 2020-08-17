@@ -1,0 +1,36 @@
+{% include head.html %}
+<section class="bg-primary bg-additional-image">
+    {% include header.html %}
+    <div class="container pt-105 pt-sm-60 pb-90 additional">
+        <div class="row">
+            <div class="col col-12 pl-md-0">
+                <h1 class="pl-60 pl-md-0 pl-xs-15">{{page.h1}}</h1>
+            </div>
+        </div>
+        <div class="row jc-c">
+            <div class="col col-8 col-md-10 col-sm-12 fd-c">
+                {{ content }}
+            </div>
+        </div>
+        <div class="row jc-c contact fw-w">
+            <div class="col col-4 col-md-5 col-xs-12">
+                <div>
+                    <p>If by Mail:</p>
+                    <ul>
+                        <li>Leveragebox LLC</li>
+                        <li>P.O. Box 501582</li>
+                        <li>Atlanta, GA 31150</li>
+                    </ul>                    
+                 </div>
+            </div>
+            <div class="col col-4 col-md-5 col-xs-12">
+                <div>
+                   <p>If by E-Mail:</p>
+                   <a href="mailto:hello@fulcrum.trade">hello@fulcrum.trade</a>
+                </div>
+           </div>
+        </div>
+    </div>
+</section>
+{% include posts.html %}
+{% include footer.html %}
