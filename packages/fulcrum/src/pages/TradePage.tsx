@@ -74,13 +74,25 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     super(props);
     if (process.env.REACT_APP_ETH_NETWORK === "kovan") {
       this.baseTokens = [
-        Asset.ETH,
+        Asset.fWETH,
+        // Asset.DAI,
+        // Asset.USDC,
+        // Asset.SUSD,
+        Asset.WBTC,
+        Asset.LINK,
+        // Asset.MKR,
+        Asset.ZRX,
+        // Asset.BAT,
+        // Asset.REP,
         Asset.KNC
       ];
       this.quoteTokens = [
         Asset.DAI,
-        Asset.KNC
-      ];
+        /*Asset.SAI,*/
+        Asset.USDC,
+        Asset.SUSD,
+        Asset.USDT
+      ]
     } else if (process.env.REACT_APP_ETH_NETWORK === "ropsten") {
       // this.baseTokens = [
       // ];
@@ -100,7 +112,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       ];
       this.quoteTokens = [
         Asset.DAI,
-        Asset.SAI,
+        /*Asset.SAI,*/
         Asset.USDC,
         Asset.SUSD,
         Asset.USDT
@@ -108,7 +120,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     }
     this.stablecoins = [
       Asset.DAI,
-      Asset.SAI,
+      /*Asset.SAI,*/
       Asset.USDC,
       Asset.SUSD,
       Asset.USDT
@@ -190,6 +202,10 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
   }
 
   public render() {
+    
+    const tvBaseToken = this.state.selectedMarket.baseToken === Asset.fWETH ? Asset.ETH : this.state.selectedMarket.baseToken;
+    const tvQuoteToken = this.state.selectedMarket.quoteToken === Asset.fWETH ? Asset.ETH : this.state.selectedMarket.quoteToken;
+    
     return (
       <div className="trade-page">
         <main>
@@ -232,7 +248,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
           ) : (
               <React.Fragment>
                 <div className="chart-wrapper">
-                  <TVChartContainer symbol={`${this.state.selectedMarket.baseToken}_${this.state.selectedMarket.quoteToken}`} preset={this.props.isMobileMedia ? "mobile" : undefined} />
+                  <TVChartContainer symbol={`${tvBaseToken}_${tvQuoteToken}`} preset={this.props.isMobileMedia ? "mobile" : undefined} />
                 </div>
                 <TradeTokenGrid
                   isMobileMedia={this.props.isMobileMedia}

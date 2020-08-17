@@ -226,7 +226,7 @@ export class ContractsSource {
         address = "0x76de3d406fee6c3316558406b17ff785c978e98c";
         break;
       case 42:
-        address = "0x327635870b9c2E142415507cAA2790D9d5B1C734";
+        address = "0xe9dBcC83557d71F179154eb2c255D3DCeaEC7305";
         break;
     }
 
@@ -442,7 +442,7 @@ export class ContractsSource {
         }
         break;
       case 42:
-        switch (addressErc20) {
+        /*switch (addressErc20) {
           case "0xd0a1e359811322d97991e03f863a0c30c2cf029c":
             asset = Asset.ETH;
             break;
@@ -456,6 +456,47 @@ export class ContractsSource {
             asset = Asset.USDC;
             break;
           case "0xad67cb4d63c9da94aca37fdf2761aadf780ff4a2":
+            asset = Asset.KNC;
+            break;
+        }*/
+        switch (addressErc20) {
+          case "0xe65d99a06d0ded0d318e31db3ae5d77629c625fc":
+            asset = Asset.fWETH;
+            break;
+          case "0x7143e05608c4bc7e83a3b72a28de2497f62b7e59":
+            asset = Asset.SAI;
+            break;
+          case "0x8f746ec7ed5cc265b90e7af0f5b07b4406c9dda8":
+            asset = Asset.DAI;
+            break;
+          case "0x20bdf254ca63883c3a83424753bb40185af29ce4":
+            asset = Asset.USDC;
+            break;
+          case "0x4c4462c6bca4c92bf41c40f9a4047f35fd296996":
+            asset = Asset.USDT;
+            break;
+          case "0xfcfa14dbc71bee2a2188431fa15e1f8d57d93c62":
+            asset = Asset.SUSD;
+            break;
+          case "0xc4b7a70c3694cb1d37a18e6c6bd9271828c382a4":
+            asset = Asset.WBTC;
+            break;
+          case "0xfb9325e5f4fc9629525427a1c92c0f4d723500cf":
+            asset = Asset.LINK;
+            break;
+          case "0x4893919982648ffefe4324538d54402387c20198":
+            asset = Asset.MKR;
+            break;
+          case "0x629b28c5aa5c953df2511d2e48d316a07eafb3e3":
+            asset = Asset.ZRX;
+            break;
+          case "0xac091ccf1b0c601182f3ccf3eb20f291aba39029":
+            asset = Asset.BAT;
+            break;
+          case "0x39ac2818e08d285abe548f77a0819651b8b5d213":
+            asset = Asset.REP;
+            break;
+          case "0x02357164ba33f299f7654cbb29da29db38ae1f44":
             asset = Asset.KNC;
             break;
           case "0x0000000000004946c0e9f43f4dee607b0ef1fa1c":

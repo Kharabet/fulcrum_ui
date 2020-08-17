@@ -100,7 +100,8 @@ export class AssetsDictionary {
         "#FFFFFF",
         new Map<number, string | null>([
           [1, "0x0d8775f648430679a709e98d2b0cb6250d2887ef"],
-          [3, "0xdb0040451f373949a4be60dcd7b6b8d6e42658b6"]
+          [3, "0xdb0040451f373949a4be60dcd7b6b8d6e42658b6"],
+          [42, "0xAc091Ccf1b0c601182f3CCF3EB20F291ABA39029"],
         ])
       )
     ],
@@ -121,7 +122,8 @@ export class AssetsDictionary {
         "#FFFFFF",
         new Map<number, string | null>([
           [1, "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599"],
-          [3, "0x95cc8d8f29d0f7fcc425e8708893e759d1599c97"] // using ENG token instead
+          [3, "0x95cc8d8f29d0f7fcc425e8708893e759d1599c97"], // using ENG token instead
+          [42, "0xc4B7A70c3694cB1d37A18e6c6bD9271828C382A4"],
         ])
       )
     ],
@@ -143,7 +145,8 @@ export class AssetsDictionary {
         "#ffffff",
         new Map<number, string | null>([
           [1, "0x514910771af9ca656af840dff83e8264ecf986ca"],
-          [3, ""]
+          [3, ""],
+          [42, "0xFB9325e5f4fC9629525427A1c92c0f4D723500Cf"],
         ])
       )
     ],
@@ -165,7 +168,7 @@ export class AssetsDictionary {
         new Map<number, string | null>([
           [1, "0xdac17f958d2ee523a2206206994597c13d831ec7"],
           [3, ""],
-          [42, ""]
+          [42, "0x4c4462c6bca4c92bf41c40f9a4047f35fd296996"]
         ])
       )
     ],
@@ -210,7 +213,7 @@ export class AssetsDictionary {
           [1, "0x6b175474e89094c44da98b954eedeac495271d0f"],
           [3, "0xf80A32A835F79D7787E8a8ee5721D0fEaFd78108"],
           [4, "0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea"],
-          [42, "0x4f96fe3b7a6cf9725f59d353f723c1bdb64ca6aa"]
+          [42, "0x8f746eC7ed5Cc265b90e7AF0f5B07b4406C9dDA8"]
         ])
       )
     ],
@@ -254,7 +257,8 @@ export class AssetsDictionary {
         "#acb5c2",
         new Map<number, string | null>([
           [1, "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"],
-          [3, "0x95cc8d8f29d0f7fcc425e8708893e759d1599c97"] // using ENG
+          [3, "0x95cc8d8f29d0f7fcc425e8708893e759d1599c97"], // using ENG
+          [42, "0x20BdF254Ca63883c3a83424753BB40185AF29cE4"],
         ])
       )
     ],
@@ -275,7 +279,8 @@ export class AssetsDictionary {
         "#acb5c2",
         new Map<number, string | null>([
           [1, "0x57ab1ec28d129707052df4df418d58a2d46d5f51"],
-          [3, ""]
+          [3, ""],
+          [42, "0xFCfA14dBc71beE2a2188431Fa15E1f8D57d93c62"],
         ])
       )
     ],
@@ -325,6 +330,28 @@ export class AssetsDictionary {
         ])
       )
     ],
+
+    [
+      Asset.fWETH,
+      new AssetDetails(
+        "fWETH",
+        "Fake Wrapped Ether (fWETH)",
+        "ifWETH",
+        "https://fulcrum.trade/images/iETH.svg",
+        18,
+        weth_logo,
+        WETHLogo,
+        eth_bg,
+        eth_ts,
+        "#FFFFFF",
+        "#444e5a",
+        "#acb5c2",
+        new Map<number, string | null>([
+          [42, "0xe65d99a06d0ded0d318e31db3ae5d77629c625fc"]
+        ])
+      )
+    ],
+
     [
       Asset.KNC,
       new AssetDetails(
@@ -343,7 +370,7 @@ export class AssetsDictionary {
         new Map<number, string | null>([
           [1, "0xdd974d5c2e2928dea5f71b9825b8b646686bd200"],
           [3, "0x4e470dc7321e84ca96fcaedd0c8abcebbaeb68c6"],
-          [42, "0xad67cB4d63C9da94AcA37fDF2761AaDF780ff4a2"]
+          [42, "0x02357164ba33F299F7654cBB29da29dB38aE1f44"],
         ])
       )
     ],
@@ -364,7 +391,8 @@ export class AssetsDictionary {
         "#FFFFFF",
         new Map<number, string | null>([
           [1, "0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2"],
-          [3, "0x4bfba4a8f28755cb2061c413459ee562c6b9c51b"] // using OMG token instead
+          [3, "0x4bfba4a8f28755cb2061c413459ee562c6b9c51b"], // using OMG token instead
+          [42, "0x4893919982648FFeFE4324538D54402387C20198"],
         ])
       )
     ],
@@ -386,7 +414,8 @@ export class AssetsDictionary {
         new Map<number, string | null>([
           [1, "0x1985365e9f78359a9b6ad760e32412f4a445e862"],
           [3, "0xbf5d8683b9be6c43fca607eb2a6f2626a18837a6"], // using SNT token instead
-          [4, "0x6e894660985207feb7cf89faf048998c71e8ee89"]
+          [4, "0x6e894660985207feb7cf89faf048998c71e8ee89"],
+          [42, "0x39AC2818e08D285aBE548F77a0819651b8B5d213"],
         ])
       )
     ],
@@ -407,7 +436,8 @@ export class AssetsDictionary {
         "#FFFFFF",
         new Map<number, string | null>([
           [1, "0xe41d2489571d322189246dafa5ebde1f4699f498"],
-          [3, "0xb4f7332ed719eb4839f091eddb2a3ba309739521"] // using LINK token instead
+          [3, "0xb4f7332ed719eb4839f091eddb2a3ba309739521"], // using LINK token instead
+          [42, "0x629B28c5aA5c953Df2511d2E48d316A07eAFb3e3"],
         ])
       )
     ]
@@ -433,7 +463,8 @@ export class AssetsDictionaryMobile {
         "#FFFFFF",
         new Map<number, string | null>([
           [1, "0x0d8775f648430679a709e98d2b0cb6250d2887ef"],
-          [3, "0xdb0040451f373949a4be60dcd7b6b8d6e42658b6"]
+          [3, "0xdb0040451f373949a4be60dcd7b6b8d6e42658b6"],
+          [42, "0xAc091Ccf1b0c601182f3CCF3EB20F291ABA39029"],
         ])
       )
     ],
@@ -454,7 +485,8 @@ export class AssetsDictionaryMobile {
         "#FFFFFF",
         new Map<number, string | null>([
           [1, "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599"],
-          [3, "0x95cc8d8f29d0f7fcc425e8708893e759d1599c97"] // using ENG token instead
+          [3, "0x95cc8d8f29d0f7fcc425e8708893e759d1599c97"], // using ENG token instead
+          [42, "0xc4B7A70c3694cB1d37A18e6c6bD9271828C382A4"],
         ])
       )
     ],
@@ -476,7 +508,8 @@ export class AssetsDictionaryMobile {
         "#FFFFFF",
         new Map<number, string | null>([
           [1, "0x514910771af9ca656af840dff83e8264ecf986ca"],
-          [3, ""]
+          [3, ""],
+          [42, "0xFB9325e5f4fC9629525427A1c92c0f4D723500Cf"],
         ])
       )
     ],
@@ -498,7 +531,7 @@ export class AssetsDictionaryMobile {
         new Map<number, string | null>([
           [1, "0xdac17f958d2ee523a2206206994597c13d831ec7"],
           [3, ""],
-          [42, ""]
+          [42, "0x4c4462c6bca4c92bf41c40f9a4047f35fd296996"]
         ])
       )
     ],
@@ -543,7 +576,7 @@ export class AssetsDictionaryMobile {
           [1, "0x6b175474e89094c44da98b954eedeac495271d0f"],
           [3, "0xf80A32A835F79D7787E8a8ee5721D0fEaFd78108"],
           [4, "0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea"],
-          [42, "0x4f96fe3b7a6cf9725f59d353f723c1bdb64ca6aa"]
+          [42, "0x8f746eC7ed5Cc265b90e7AF0f5B07b4406C9dDA8"]
         ])
       )
     ],
@@ -587,7 +620,8 @@ export class AssetsDictionaryMobile {
         "#acb5c2",
         new Map<number, string | null>([
           [1, "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"],
-          [3, "0x95cc8d8f29d0f7fcc425e8708893e759d1599c97"] // using ENG
+          [3, "0x95cc8d8f29d0f7fcc425e8708893e759d1599c97"], // using ENG
+          [42, "0x20BdF254Ca63883c3a83424753BB40185AF29cE4"],
         ])
       )
     ],
@@ -608,7 +642,8 @@ export class AssetsDictionaryMobile {
         "#acb5c2",
         new Map<number, string | null>([
           [1, "0x57ab1ec28d129707052df4df418d58a2d46d5f51"],
-          [3, ""]
+          [3, ""],
+          [42, "0xFCfA14dBc71beE2a2188431Fa15E1f8D57d93c62"],
         ])
       )
     ],
@@ -658,6 +693,28 @@ export class AssetsDictionaryMobile {
         ])
       )
     ],
+
+    [
+      Asset.fWETH,
+      new AssetDetails(
+        "fWETH",
+        "Fake Wrapped Ether (fWETH)",
+        "ifWETH",
+        "https://fulcrum.trade/images/iETH.svg",
+        18,
+        weth_logo,
+        WETHLogo,
+        eth_bg,
+        eth_ts,
+        "#FFFFFF",
+        "#444e5a",
+        "#acb5c2",
+        new Map<number, string | null>([
+          [42, "0xe65d99a06d0ded0d318e31db3ae5d77629c625fc"]
+        ])
+      )
+    ],
+
     [
       Asset.KNC,
       new AssetDetails(
@@ -676,7 +733,7 @@ export class AssetsDictionaryMobile {
         new Map<number, string | null>([
           [1, "0xdd974d5c2e2928dea5f71b9825b8b646686bd200"],
           [3, "0x4e470dc7321e84ca96fcaedd0c8abcebbaeb68c6"],
-          [42, "0xad67cB4d63C9da94AcA37fDF2761AaDF780ff4a2"]
+          [42, "0x02357164ba33F299F7654cBB29da29dB38aE1f44"],
         ])
       )
     ],
@@ -697,7 +754,8 @@ export class AssetsDictionaryMobile {
         "#FFFFFF",
         new Map<number, string | null>([
           [1, "0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2"],
-          [3, "0x4bfba4a8f28755cb2061c413459ee562c6b9c51b"] // using OMG token instead
+          [3, "0x4bfba4a8f28755cb2061c413459ee562c6b9c51b"], // using OMG token instead
+          [42, "0x4893919982648FFeFE4324538D54402387C20198"],
         ])
       )
     ],
@@ -719,7 +777,8 @@ export class AssetsDictionaryMobile {
         new Map<number, string | null>([
           [1, "0x1985365e9f78359a9b6ad760e32412f4a445e862"],
           [3, "0xbf5d8683b9be6c43fca607eb2a6f2626a18837a6"], // using SNT token instead
-          [4, "0x6e894660985207feb7cf89faf048998c71e8ee89"]
+          [4, "0x6e894660985207feb7cf89faf048998c71e8ee89"],
+          [42, "0x39AC2818e08D285aBE548F77a0819651b8B5d213"],
         ])
       )
     ],
@@ -740,7 +799,8 @@ export class AssetsDictionaryMobile {
         "#FFFFFF",
         new Map<number, string | null>([
           [1, "0xe41d2489571d322189246dafa5ebde1f4699f498"],
-          [3, "0xb4f7332ed719eb4839f091eddb2a3ba309739521"] // using LINK token instead
+          [3, "0xb4f7332ed719eb4839f091eddb2a3ba309739521"], // using LINK token instead
+          [42, "0x629B28c5aA5c953Df2511d2E48d316A07eAFb3e3"],
         ])
       )
     ]
