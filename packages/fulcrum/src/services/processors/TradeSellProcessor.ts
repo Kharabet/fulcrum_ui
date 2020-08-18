@@ -5,6 +5,7 @@ import { FulcrumProvider } from "../FulcrumProvider";
 
 import { PositionType } from "../../domain/PositionType";
 import { AssetsDictionary } from "../../domain/AssetsDictionary";
+import { Asset } from "../../domain/Asset";
 
 export class TradeSellProcessor {
   public run = async (task: RequestTask, account: string, skipGas: boolean) => {
@@ -61,6 +62,7 @@ export class TradeSellProcessor {
     let gasAmountBN;
     skipGas = true;
     const isGasTokenEnabled = localStorage.getItem('isGasTokenEnabled') === "true";
+    const ChiTokenBalance = await FulcrumProvider.Instance.getAssetTokenBalanceOfUser(Asset.CHI);
 
     if (skipGas) {
       gasAmountBN = new BigNumber(FulcrumProvider.Instance.gasLimit);
@@ -68,7 +70,7 @@ export class TradeSellProcessor {
       // estimating gas amount
       let gasAmount;
       try {
-        gasAmount = isGasTokenEnabled
+        gasAmount = isGasTokenEnabled && ChiTokenBalance.gt(0)
           ? await iBZxContract.closeWithSwapWithGasToken.estimateGasAsync(
             taskRequest.loanId!,
             account,
@@ -104,7 +106,7 @@ export class TradeSellProcessor {
     try {
       console.log("amountInBaseUnits " + amountInBaseUnits)
       // Closing trade
-      txHash = isGasTokenEnabled
+      txHash = isGasTokenEnabled && ChiTokenBalance.gt(0)
         ? await iBZxContract.closeWithSwapWithGasToken.sendTransactionAsync(
           taskRequest.loanId!,
           account,

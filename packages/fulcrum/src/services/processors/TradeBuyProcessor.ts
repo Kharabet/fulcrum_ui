@@ -128,14 +128,14 @@ export class TradeBuyProcessor {
       new BigNumber(0)
 
     const isGasTokenEnabled = localStorage.getItem('isGasTokenEnabled') === "true";
-
+    const ChiTokenBalance = await FulcrumProvider.Instance.getAssetTokenBalanceOfUser(Asset.CHI);
     // Waiting for token allowance
     if (approvePromise || skipGas) {
       await approvePromise;
       gasAmountBN = new BigNumber(FulcrumProvider.Instance.gasLimit);
     } else {
       // estimating gas amount
-      const gasAmount = isGasTokenEnabled
+      const gasAmount = isGasTokenEnabled && ChiTokenBalance.gt(0)
         ? await tokenContract.marginTradeWithGasToken.estimateGasAsync(
           "0x0000000000000000000000000000000000000000000000000000000000000000",
           leverageAmount,
@@ -171,7 +171,7 @@ export class TradeBuyProcessor {
       //FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.AskToOpenProgressDlg);
 
       // Submitting trade
-      txHash = isGasTokenEnabled
+      txHash = isGasTokenEnabled && ChiTokenBalance.gt(0)
         ? await tokenContract.marginTradeWithGasToken.sendTransactionAsync(
           "0x0000000000000000000000000000000000000000000000000000000000000000",
           leverageAmount,
