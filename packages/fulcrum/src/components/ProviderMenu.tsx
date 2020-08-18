@@ -9,6 +9,7 @@ import { AbstractConnector } from '@web3-react/abstract-connector';
 import { SwitchButtonInput } from "./SwitchButtonInput";
 import { Asset } from "../domain/Asset";
 import { BigNumber } from "@0x/utils";
+import { AssetsDictionary } from "../domain/AssetsDictionary";
 
 export interface IProviderMenuProps {
   providerTypes: ProviderType[];
@@ -119,12 +120,16 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
       localStorage.setItem('isGasTokenEnabled', 'false');
     }
   }
-
+  const ChiTokenLogo = AssetsDictionary.assets.get(Asset.CHI)!.reactLogoSvg;
   return (
     <div className="provider-menu">
       <div className="provider-menu__title">Select Wallet Provider</div>
       {account &&
-        <SwitchButtonInput onSwitch={onChiSwitch} />
+        <div className="provider-menu__gas-token">
+          <div className="provider-menu__gas-token-logo"><ChiTokenLogo/></div>
+          <p className="provider-menu__gas-token-text">Use CHI token to save on gas. It would be burned from your wallet on each transaction to save on TX cost.</p>
+          <div className="provider-menu__gas-token-switch"><SwitchButtonInput onSwitch={onChiSwitch} /></div>
+        </div>
       }
       <ul className="provider-menu__list">{renderItems()}</ul>
       < button
