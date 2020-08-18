@@ -14,7 +14,7 @@
     @media screen and (min-width: $breakpoint-mobile-min) {
       display: grid;
       column-gap: 35px;
-      grid-template-columns: 10% 8% 22% 11% 11% 9% 9%;
+      grid-template-columns: 10% 8% 20% 10% 14% 9% 9%;
     }
     @media screen and (max-width: $breakpoint-mobile-max) {
       display: flex;
@@ -29,9 +29,9 @@
       @media screen and (min-width: $breakpoint-desktop-min) {
         padding-right: 40px;
       }
-      @media screen and (max-width: $breakpoint-desktop-max) and (min-width: $breakpoint-mobile-min) {
-        padding-right: 20px;
-      }
+      // @media screen and (max-width: $breakpoint-desktop-max) and (min-width: $breakpoint-mobile-min) {
+      //   padding-right: 20px;
+      // }
       @media screen and (min-width: $breakpoint-mobile-min) {
         justify-content: flex-end;
       }
