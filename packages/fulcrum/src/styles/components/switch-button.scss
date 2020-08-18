@@ -49,8 +49,10 @@
     }
   }
   @media (max-width: 959px) {
-    position: absolute;
-    top: 25px;
-    right: 60px;
+    .sidebar_v & {
+      position: absolute;
+      top: 25px;
+      right: 60px;
+    }
   }
 }
