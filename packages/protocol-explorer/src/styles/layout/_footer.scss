@@ -1,15 +1,14 @@
 footer {
   padding: 90px 0;
-  @media screen and (max-width: $width-max-sm){
+  @media screen and (max-width: $width-max-sm) {
     padding: 75px 0 60px 0;
   }
   .footer-menu {
     display: flex;
     align-items: baseline;
-    @media screen and (min-width: $width-min-md) {
-      width: calc(100% / 12 * 7);
-    }
-    @media screen and (max-width: $width-max-md) {
+    width: calc(100% / 12 * 7);
+
+    @media screen and (max-width: $width-max-sm) {
       width: 100%;
       order: -1;
     }
@@ -27,10 +26,8 @@ footer {
   .title-menu {
     line-height: 1.5;
     width: 100%;
-    @media screen and (min-width: $width-min-sm) {
-      font-size: 20px;
-      margin: 13px auto 35px auto;
-    }
+    font-size: 20px;
+    margin: 13px auto 35px auto;
     @media screen and (max-width: $width-max-sm) {
       font-size: 16px;
       margin: 13px auto 25px auto;
@@ -42,52 +39,40 @@ footer {
       font-weight: 600;
       color: $primary-color;
       line-height: 1.25;
+      font-size: 16px;
+      @media screen and (max-width: $width-max-md) {
+        font-size: 14px;
+      }
+      @media screen and (max-width: $width-max-sm) {
+        font-size: 12px;
+      }
+
       &:hover {
         color: $primary-color-hover;
       }
       &:not(:last-child) {
-        @media screen and (min-width: 768px) {
-          margin-bottom: 20px;
-        }
-        @media screen and (max-width: 767px) {
+        margin-bottom: 20px;
+        @media screen and (max-width: $width-max-sm) {
           margin-bottom: 15px;
         }
-      }
-
-      @media screen and (min-width: 992px) {
-        font-size: 16px;
-      }
-      @media screen and (max-width: 991px) {
-        font-size: 14px;
-      }
-      @media screen and (max-width: 767px) {
-        font-size: 12px;
       }
     }
   }
 }
 .footer-social {
-  @media screen and (min-width: $width-min-md) {
-    width: calc(100% / 12 * 5);
+  width: calc(100% / 12 * 5);
+
+  @media screen and (min-width: $width-min-sm) {
+    padding-left: 15px;
+    padding-right: 15px;
   }
-  @media screen and (max-width: $width-max-md) {
+  @media screen and (max-width: $width-max-sm) {
     display: flex;
     flex-wrap: wrap;
     width: 100%;
     margin-top: 30px;
   }
   .item-social {
-    &:first-child {
-      @media screen and (max-width: $width-max-md) and (min-width: $width-min-sm) {
-        margin-left: 30px;
-      }
-    }
-    &:last-child {
-      @media screen and (max-width: $width-max-md) and (min-width: $width-min-sm) {
-        order: -1;
-        margin-top: 15px;
-      }
-    }
     @media screen and (max-width: $width-max-sm) {
       margin: auto;
       width: 100%;
@@ -95,14 +80,18 @@ footer {
   }
   .social {
     display: flex;
-    @media screen and (min-width: $width-min-sm) {
-      margin-bottom: 60px;
-    }
+    margin-bottom: 60px;
+
     @media screen and (max-width: $width-max-sm) {
       margin-bottom: 30px;
     }
     a {
       display: flex;
+      width: 56px;
+
+      &:not(:last-child) {
+        margin-right: 15px;
+      }
       &:hover {
         circle,
         ellipse {
@@ -113,20 +102,12 @@ footer {
         width: 100%;
         height: auto;
       }
-      @media screen and (min-width: 992px) {
-        width: 56px;
-        &:not(:last-child) {
-          margin-right: 15px;
-        }
-      }
-      @media screen and (max-width: 991px) {
+
+      @media screen and (max-width: $width-max-md) {
         width: 48px;
         &:not(:last-child) {
           margin-right: 10px;
         }
-      }
-      &:not(:last-child) {
-        margin-right: 15px;
       }
     }
   }
@@ -138,19 +119,24 @@ footer {
   .data-protocol {
     font-weight: 600;
     margin-bottom: 20px;
-    @media screen and (min-width: $width-min-sm) {
-      font-size: 18px;
-    }
+    font-size: 18px;
     @media screen and (max-width: $width-max-sm) {
       font-size: 16px;
     }
   }
   .data-year {
-    @media screen and (min-width: $width-min-xs) {
-      font-size: 14px;
+    flex-wrap: wrap;
+    font-size: 14px;
+    margin-top: 80px;
+    @media screen and (max-width: $width-max-md) {
+      margin-bottom: 15px;
+      margin-top: 42px;
     }
+
     @media screen and (max-width: $width-max-xs) {
       font-size: 10px;
+      margin-top: 0;
+      margin-bottom: 0;
     }
 
     p {
