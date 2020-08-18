@@ -1,7 +1,7 @@
 .group-buttons {
   display: flex;
   flex-wrap: wrap;
-  .notice{
+  .notice {
     margin: 0 auto;
     margin-bottom: 20px;
     font-size: 14px;
@@ -15,7 +15,7 @@
   @media screen and (max-width: $width-max-sm) {
     padding: 30px 0 15px 0;
     justify-content: center;
-    .notice{
+    .notice {
       width: 100%;
       text-align: center;
     }
@@ -41,6 +41,7 @@
   margin-bottom: 35px;
   @media screen and (max-width: $width-max-sm) {
     margin-bottom: 55px;
+    padding: 0 10px;
   }
   &:before {
     content: "";
@@ -56,6 +57,10 @@
     z-index: 10;
     position: relative;
     width: 100%;
+
+    @media screen and (max-width: $width-max-sm) {
+      font-size: 14px;
+    }
     .notice {
       color: #758295;
       position: absolute;
