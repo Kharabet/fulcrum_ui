@@ -2,7 +2,8 @@ import React, { Component } from "react";
 import { TxRow, ITxRowProps } from "./TxRow";
 import { IconSort } from "./IconSort";
 interface ITxGridProps {
-  events: ITxRowProps[]
+  events: ITxRowProps[],
+  quantityTx: number
 }
 
 interface ITxGridState {
@@ -20,7 +21,7 @@ export class TxGrid extends Component<ITxGridProps, ITxGridState> {
   public render() {
     const assetItems = this.props.events
       .sort((a, b) => { return this.state.typeSort === 'up' ? b.age.getTime() - a.age.getTime() : a.age.getTime() - b.age.getTime() })
-      .slice(0, 25)
+      .slice(0, this.props.quantityTx)
       .map((e: ITxRowProps, i: number) => <TxRow key={i} {...e} />);
     return (
       <React.Fragment>

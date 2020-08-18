@@ -91,9 +91,9 @@ export class SearchResultPage extends Component<ISearchResultPageProps, ISearchR
     ExplorerProvider.Instance.eventEmitter.on(ExplorerProviderEvents.ProviderChanged, this.onProviderChanged);
 
   }
-  
+
   private _isMounted: boolean;
-  
+
   private onProviderChanged = () => {
     this.derivedUpdate();
   };
@@ -101,7 +101,7 @@ export class SearchResultPage extends Component<ISearchResultPageProps, ISearchR
   private onProviderAvailable = () => {
     this.derivedUpdate();
   };
-  
+
   public componentWillUnmount(): void {
     this._isMounted = false;
     ExplorerProvider.Instance.eventEmitter.removeListener(ExplorerProviderEvents.ProviderAvailable, this.onProviderAvailable);
@@ -109,18 +109,18 @@ export class SearchResultPage extends Component<ISearchResultPageProps, ISearchR
   }
 
   derivedUpdate = async () => {
-      const liquidationEvents = ExplorerProvider.Instance.getGridItems(await ExplorerProvider.Instance.getLiquidationHistory());
-      const tradeEvents = ExplorerProvider.Instance.getGridItems(await ExplorerProvider.Instance.getTradeHistory());
-      const closeEvents = ExplorerProvider.Instance.getGridItems(await ExplorerProvider.Instance.getCloseWithSwapHistory());
-      const closeWithDepositEvents = ExplorerProvider.Instance.getGridItems(await ExplorerProvider.Instance.getCloseWithDepositHistory());
-      const borrowEvents = ExplorerProvider.Instance.getGridItems(await ExplorerProvider.Instance.getBorrowHistory());
-      const events: ITxRowProps[] = liquidationEvents
+    const liquidationEvents = ExplorerProvider.Instance.getGridItems(await ExplorerProvider.Instance.getLiquidationHistory());
+    const tradeEvents = ExplorerProvider.Instance.getGridItems(await ExplorerProvider.Instance.getTradeHistory());
+    const closeEvents = ExplorerProvider.Instance.getGridItems(await ExplorerProvider.Instance.getCloseWithSwapHistory());
+    const closeWithDepositEvents = ExplorerProvider.Instance.getGridItems(await ExplorerProvider.Instance.getCloseWithDepositHistory());
+    const borrowEvents = ExplorerProvider.Instance.getGridItems(await ExplorerProvider.Instance.getBorrowHistory());
+    const events: ITxRowProps[] = liquidationEvents
       .concat(closeEvents)
       .concat(tradeEvents)
       .concat(closeWithDepositEvents)
       .concat(borrowEvents);
 
-      this._isMounted && this.setState({
+    this._isMounted && this.setState({
       ...this.state,
       events
     })
@@ -151,17 +151,17 @@ export class SearchResultPage extends Component<ISearchResultPageProps, ISearchR
   }
 
   public render() {
-    
+
     return (
       <React.Fragment>
         <Header isMobileMedia={this.props.isMobileMedia} doNetworkConnect={this.props.doNetworkConnect} />
         <section className="search-container pt-45">
-          <Search onSearch={this.onSearch} initialFilter={this.state.filter}/>
+          <Search onSearch={this.onSearch} initialFilter={this.state.filter} />
         </section>
         <section className="pt-90">
           <div className="container">
-              <h1>Result:</h1>
-            <TxGrid events={!this.state.showSearchResult ? this.state.events : this.state.filteredEvents} />
+            <h1>Result:</h1>
+            <TxGrid events={!this.state.showSearchResult ? this.state.events : this.state.filteredEvents} quantityTx={25} />
           </div>
         </section>
       </React.Fragment>

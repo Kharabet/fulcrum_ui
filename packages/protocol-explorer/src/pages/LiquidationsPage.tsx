@@ -348,7 +348,7 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
                   </section>
                   <section className="pt-90 pt-sm-30">
                     <div className="container">
-                      <TxGrid events={this.state.events} />
+                      <TxGrid events={this.state.events} quantityTx={10} />
                     </div>
                   </section>
                   <section className="pt-75">
