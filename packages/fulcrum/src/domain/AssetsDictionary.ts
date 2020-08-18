@@ -16,6 +16,7 @@ import usdc_logo, {ReactComponent as USDCLogo} from "../assets/images/ic_token_u
 import zrx_logo, {ReactComponent as ZRXLogo} from "../assets/images/ic_token_zrx.svg";
 import weth_logo, {ReactComponent as WETHLogo} from "../assets/images/ic_token_weth.svg";
 import chai_logo, {ReactComponent as CHAILogo} from "../assets/images/ic_token_chai.svg";
+import chi_logo, {ReactComponent as CHILogo} from "../assets/images/ic_token_chi.svg";
 
 import bat_bg from "../assets/images/popup_left_token_bat.svg";
 import btc_bg from "../assets/images/popup_left_token_btc.svg";
@@ -70,8 +71,8 @@ export class AssetsDictionary {
         "",
         "",
         0,
-        "",
-        "",
+        chi_logo,
+        CHILogo,
         "",
         "",
         "",
