@@ -7,6 +7,8 @@ import { FulcrumProvider } from "../services/FulcrumProvider";
 import { injected } from "../domain/WalletConnectors";
 import { AbstractConnector } from '@web3-react/abstract-connector';
 import { SwitchButtonInput } from "./SwitchButtonInput";
+import { Asset } from "../domain/Asset";
+import { BigNumber } from "@0x/utils";
 
 export interface IProviderMenuProps {
   providerTypes: ProviderType[];
@@ -17,12 +19,12 @@ export interface IProviderMenuProps {
 
 export const ProviderMenu = (props: IProviderMenuProps) => {
 
-  
-  useEffect(() => {
-    var isGasTokenEnbaled = localStorage.getItem('isGasTokenEnabled') === "true";
-    var switchButton = document.querySelector<HTMLInputElement>('.provider-menu .theme-switch input[type="checkbox"]');
 
-    if (isGasTokenEnbaled) {
+  useEffect(() => {
+    const isGasTokenEnabled = localStorage.getItem('isGasTokenEnabled') === "true";
+    const switchButton = document.querySelector<HTMLInputElement>('.provider-menu .theme-switch input[type="checkbox"]');
+
+    if (isGasTokenEnabled) {
 
       switchButton!.setAttribute('data-isgastokenenabled', 'true');
       localStorage.setItem('isGasTokenEnabled', 'true');
@@ -96,12 +98,22 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
     });
   }
 
-  const onChiSwitch = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const onChiSwitch = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const switchButton = e.currentTarget;
     if (switchButton.checked) {
+      await FulcrumProvider.Instance.checkAndSetApprovalForced(
+        Asset.CHI,
+        FulcrumProvider.Instance.contractsSource!.getiBZxAddress().toLowerCase(),
+        new BigNumber(10 ** 18)
+      );
       switchButton.setAttribute('data-isgastokenenabled', 'true');
       localStorage.setItem('isGasTokenEnabled', 'true');
     } else {
+      await FulcrumProvider.Instance.checkAndSetApprovalForced(
+        Asset.CHI,
+        FulcrumProvider.Instance.contractsSource!.getiBZxAddress().toLowerCase(),
+        new BigNumber(0)
+      );
       switchButton.setAttribute('data-isgastokenenabled', 'false');
       localStorage.setItem('isGasTokenEnabled', 'false');
     }

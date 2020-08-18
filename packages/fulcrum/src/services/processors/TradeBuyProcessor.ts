@@ -109,8 +109,8 @@ export class TradeBuyProcessor {
 
     //const depositTokenAddress = FulcrumProvider.Instance.getErc20AddressOfAsset(depositToken);
     const collateralTokenAddress = collateralToken !== Asset.ETH
-    ? FulcrumProvider.Instance.getErc20AddressOfAsset(collateralToken)
-    : FulcrumProvider.ZERO_ADDRESS;
+      ? FulcrumProvider.Instance.getErc20AddressOfAsset(collateralToken)
+      : FulcrumProvider.ZERO_ADDRESS;
     const loanData = "0x";
 
     //console.log("depositAmount: " + amountInBaseUnits.toFixed());
@@ -127,25 +127,42 @@ export class TradeBuyProcessor {
       amountInBaseUnits :
       new BigNumber(0)
 
+    const isGasTokenEnabled = localStorage.getItem('isGasTokenEnabled') === "true";
+
     // Waiting for token allowance
     if (approvePromise || skipGas) {
       await approvePromise;
       gasAmountBN = new BigNumber(FulcrumProvider.Instance.gasLimit);
     } else {
       // estimating gas amount
-      const gasAmount = await tokenContract.marginTrade.estimateGasAsync(
-        "0x0000000000000000000000000000000000000000000000000000000000000000",
-        leverageAmount,
-        loanTokenSent,
-        collateralTokenSent,
-        collateralTokenAddress!,
-        account,
-        loanData,
-        {
-          from: account,
-          value: sendAmountForValue,
-          gas: FulcrumProvider.Instance.gasLimit
-        });
+      const gasAmount = isGasTokenEnabled
+        ? await tokenContract.marginTradeWithGasToken.estimateGasAsync(
+          "0x0000000000000000000000000000000000000000000000000000000000000000",
+          leverageAmount,
+          loanTokenSent,
+          collateralTokenSent,
+          collateralTokenAddress!,
+          account,
+          account,
+          loanData,
+          {
+            from: account,
+            value: sendAmountForValue,
+            gas: FulcrumProvider.Instance.gasLimit
+          })
+        : await tokenContract.marginTrade.estimateGasAsync(
+          "0x0000000000000000000000000000000000000000000000000000000000000000",
+          leverageAmount,
+          loanTokenSent,
+          collateralTokenSent,
+          collateralTokenAddress!,
+          account,
+          loanData,
+          {
+            from: account,
+            value: sendAmountForValue,
+            gas: FulcrumProvider.Instance.gasLimit
+          });
       gasAmountBN = new BigNumber(gasAmount).multipliedBy(FulcrumProvider.Instance.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
     }
 
@@ -154,20 +171,36 @@ export class TradeBuyProcessor {
       //FulcrumProvider.Instance.eventEmitter.emit(FulcrumProviderEvents.AskToOpenProgressDlg);
 
       // Submitting trade
-      txHash = await tokenContract.marginTrade.sendTransactionAsync(
-        "0x0000000000000000000000000000000000000000000000000000000000000000",
-        leverageAmount,
-        loanTokenSent,
-        collateralTokenSent,
-        collateralTokenAddress!,
-        account,
-        loanData,
-        {
-          from: account,
-          value: sendAmountForValue,
-          gas: gasAmountBN.toString(),
-          gasPrice: await FulcrumProvider.Instance.gasPrice()
-        });
+      txHash = isGasTokenEnabled
+        ? await tokenContract.marginTradeWithGasToken.sendTransactionAsync(
+          "0x0000000000000000000000000000000000000000000000000000000000000000",
+          leverageAmount,
+          loanTokenSent,
+          collateralTokenSent,
+          collateralTokenAddress!,
+          account,
+          account,
+          loanData,
+          {
+            from: account,
+            value: sendAmountForValue,
+            gas: gasAmountBN.toString(),
+            gasPrice: await FulcrumProvider.Instance.gasPrice()
+          })
+        : await tokenContract.marginTrade.sendTransactionAsync(
+          "0x0000000000000000000000000000000000000000000000000000000000000000",
+          leverageAmount,
+          loanTokenSent,
+          collateralTokenSent,
+          collateralTokenAddress!,
+          account,
+          loanData,
+          {
+            from: account,
+            value: sendAmountForValue,
+            gas: gasAmountBN.toString(),
+            gasPrice: await FulcrumProvider.Instance.gasPrice()
+          });
       task.setTxHash(txHash);
     }
     catch (e) {

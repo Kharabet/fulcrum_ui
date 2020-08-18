@@ -60,22 +60,36 @@ export class TradeSellProcessor {
 
     let gasAmountBN;
     skipGas = true;
+    const isGasTokenEnabled = localStorage.getItem('isGasTokenEnabled') === "true";
+
     if (skipGas) {
       gasAmountBN = new BigNumber(FulcrumProvider.Instance.gasLimit);
     } else {
       // estimating gas amount
       let gasAmount;
       try {
-        gasAmount = await iBZxContract.closeWithSwap.estimateGasAsync(
-          taskRequest.loanId!,
-          account,
-          amountInBaseUnits,
-          taskRequest.returnTokenIsCollateral,
-          "0x",
-          {
-            from: account,
-            gas: FulcrumProvider.Instance.gasLimit,
-          });
+        gasAmount = isGasTokenEnabled
+          ? await iBZxContract.closeWithSwapWithGasToken.estimateGasAsync(
+            taskRequest.loanId!,
+            account,
+            account,
+            amountInBaseUnits,
+            taskRequest.returnTokenIsCollateral,
+            "0x",
+            {
+              from: account,
+              gas: FulcrumProvider.Instance.gasLimit,
+            })
+          : await iBZxContract.closeWithSwap.estimateGasAsync(
+            taskRequest.loanId!,
+            account,
+            amountInBaseUnits,
+            taskRequest.returnTokenIsCollateral,
+            "0x",
+            {
+              from: account,
+              gas: FulcrumProvider.Instance.gasLimit,
+            });
         gasAmountBN = new BigNumber(gasAmount).multipliedBy(FulcrumProvider.Instance.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
 
       }
@@ -90,17 +104,30 @@ export class TradeSellProcessor {
     try {
       console.log("amountInBaseUnits " + amountInBaseUnits)
       // Closing trade
-      txHash = await iBZxContract.closeWithSwap.sendTransactionAsync(
-        taskRequest.loanId!,
-        account,
-        amountInBaseUnits,
-        taskRequest.returnTokenIsCollateral,
-        "0x",
-        {
-          from: account,
-          gas: gasAmountBN,
-          gasPrice: await FulcrumProvider.Instance.gasPrice()
-        });
+      txHash = isGasTokenEnabled
+        ? await iBZxContract.closeWithSwapWithGasToken.sendTransactionAsync(
+          taskRequest.loanId!,
+          account,
+          account,
+          amountInBaseUnits,
+          taskRequest.returnTokenIsCollateral,
+          "0x",
+          {
+            from: account,
+            gas: gasAmountBN,
+            gasPrice: await FulcrumProvider.Instance.gasPrice()
+          })
+        : await iBZxContract.closeWithSwap.sendTransactionAsync(
+          taskRequest.loanId!,
+          account,
+          amountInBaseUnits,
+          taskRequest.returnTokenIsCollateral,
+          "0x",
+          {
+            from: account,
+            gas: gasAmountBN,
+            gasPrice: await FulcrumProvider.Instance.gasPrice()
+          });
 
 
       task.setTxHash(txHash);

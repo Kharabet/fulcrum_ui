@@ -421,28 +421,46 @@ export class FulcrumProvider {
       case Asset.ETH:
       case Asset.WETH:
       case Asset.fWETH:
-        return new BigNumber(10**18).multipliedBy(1500);
+        return new BigNumber(10 ** 18).multipliedBy(1500);
       case Asset.WBTC:
-        return new BigNumber(10**8).multipliedBy(25);
+        return new BigNumber(10 ** 8).multipliedBy(25);
       case Asset.LINK:
-        return new BigNumber(10**18).multipliedBy(60000);
+        return new BigNumber(10 ** 18).multipliedBy(60000);
       case Asset.ZRX:
-        return new BigNumber(10**18).multipliedBy(750000);
+        return new BigNumber(10 ** 18).multipliedBy(750000);
       case Asset.KNC:
-        return new BigNumber(10**18).multipliedBy(550000);
+        return new BigNumber(10 ** 18).multipliedBy(550000);
       case Asset.DAI:
       case Asset.SAI:
-        return new BigNumber(10**18).multipliedBy(375000);
+        return new BigNumber(10 ** 18).multipliedBy(375000);
       case Asset.USDC:
-        return new BigNumber(10**6).multipliedBy(375000);
+        return new BigNumber(10 ** 6).multipliedBy(375000);
       case Asset.REP:
-        return new BigNumber(10**18).multipliedBy(15000);
+        return new BigNumber(10 ** 18).multipliedBy(15000);
       case Asset.MKR:
-        return new BigNumber(10**18).multipliedBy(1250);
+        return new BigNumber(10 ** 18).multipliedBy(1250);
+      case Asset.CHI:
+        return new BigNumber(10 ** 18);
       default:
         throw new Error("Invalid approval asset!");
     }
   }
+
+  public checkAndSetApprovalForced = async (asset: Asset, spender: string, amountInBaseUnits: BigNumber): Promise<boolean> => {
+    let result = false;
+    const assetErc20Address = this.getErc20AddressOfAsset(asset);
+
+    if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite && assetErc20Address) {
+      const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+      const tokenErc20Contract = await this.contractsSource.getErc20Contract(assetErc20Address);
+
+      if (account && tokenErc20Contract) {
+        await tokenErc20Contract.approve.sendTransactionAsync(spender, amountInBaseUnits, { from: account });
+        result = true;
+      }
+    }
+    return result;
+  };
 
   public getPriceDefaultDataPoint = (): IPriceDataPoint => {
     return {
@@ -1027,7 +1045,7 @@ export class FulcrumProvider {
 
   public gasPrice = async (): Promise<BigNumber> => {
     if (networkName === "kovan")
-     return new BigNumber(1).multipliedBy(10 ** 9); // 1 gwei
+      return new BigNumber(1).multipliedBy(10 ** 9); // 1 gwei
     let result = new BigNumber(120).multipliedBy(10 ** 9); // upper limit 120 gwei
     const lowerLimit = new BigNumber(3).multipliedBy(10 ** 9); // lower limit 3 gwei
 
@@ -1503,17 +1521,32 @@ export class FulcrumProvider {
           amountInBaseUnits = new BigNumber(maxAmountInBaseUnits.times(10 ** 50).toFixed(0, 1));
         }
 
-        result = await iBZxContract.closeWithSwap.callAsync(
-          request.loanId,
-          account,
-          amountInBaseUnits,
-          request.returnTokenIsCollateral, // returnTokenIsCollateral
-          request.loanDataBytes,
-          {
-            from: account,
-            gas: FulcrumProvider.Instance.gasLimit
-          }
-        );
+        const isGasTokenEnabled = localStorage.getItem('isGasTokenEnabled') === "true";
+
+        result = isGasTokenEnabled
+          ? await iBZxContract.closeWithSwapWithGasToken.callAsync(
+            request.loanId,
+            account,
+            account,
+            amountInBaseUnits,
+            request.returnTokenIsCollateral, // returnTokenIsCollateral
+            request.loanDataBytes,
+            {
+              from: account,
+              gas: FulcrumProvider.Instance.gasLimit
+            }
+          )
+        : await iBZxContract.closeWithSwap.callAsync(
+            request.loanId,
+            account,
+            amountInBaseUnits,
+            request.returnTokenIsCollateral, // returnTokenIsCollateral
+            request.loanDataBytes,
+            {
+              from: account,
+              gas: FulcrumProvider.Instance.gasLimit
+            }
+          );
         console.log(result);
       }
     }
@@ -1732,12 +1765,12 @@ export class FulcrumProvider {
 
     if (this.contractsSource && srcAssetErc20Address && destAssetErc20Address) {
       const oracleContract = await this.contractsSource.getOracleContract();
-      
 
-    const srcAssetDecimals = AssetsDictionary.assets.get(srcAsset)!.decimals || 18;
-    const srcAssetPrecision = new BigNumber(10 ** (18 - srcAssetDecimals));
-    const destAssetDecimals = AssetsDictionary.assets.get(destAsset)!.decimals || 18;
-    const destAssetPrecision = new BigNumber(10 ** (18 - destAssetDecimals));
+
+      const srcAssetDecimals = AssetsDictionary.assets.get(srcAsset)!.decimals || 18;
+      const srcAssetPrecision = new BigNumber(10 ** (18 - srcAssetDecimals));
+      const destAssetDecimals = AssetsDictionary.assets.get(destAsset)!.decimals || 18;
+      const destAssetPrecision = new BigNumber(10 ** (18 - destAssetDecimals));
 
       try {
         const swapPriceData: BigNumber[] = await oracleContract.queryRate.callAsync(
@@ -1746,7 +1779,7 @@ export class FulcrumProvider {
         );
         // console.log("swapPriceData- ",swapPriceData[0])
         result = swapPriceData[0].times(srcAssetPrecision).div(destAssetPrecision).dividedBy(10 ** 18)
-        .multipliedBy(swapPriceData[1].dividedBy(10 ** 18));// swapPriceData[0].dividedBy(10 ** 18);
+          .multipliedBy(swapPriceData[1].dividedBy(10 ** 18));// swapPriceData[0].dividedBy(10 ** 18);
       } catch (e) {
         console.log(e)
         result = new BigNumber(0);
@@ -1776,7 +1809,7 @@ export class FulcrumProvider {
       const data = event.data.replace("0x", "");
       const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
       if (!dataSegments) return result;
-      
+
       const amount = new BigNumber(parseInt(dataSegments[0], 16));
       const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000);
       const txHash = event.transactionHash;
@@ -1784,7 +1817,7 @@ export class FulcrumProvider {
         userAddress,
         token,
         loandId,
-        amount.div(10**18),
+        amount.div(10 ** 18),
         timeStamp,
         txHash
       )
@@ -1820,7 +1853,7 @@ export class FulcrumProvider {
         userAddress,
         token,
         loandId,
-        amount.div(10**18),
+        amount.div(10 ** 18),
         timeStamp,
         txHash
       )
@@ -1852,7 +1885,7 @@ export class FulcrumProvider {
       const loanTokenAddress = dataSegments[1].replace("000000000000000000000000", "0x");
       const loanToken = this.contractsSource!.getAssetFromAddress(loanTokenAddress);
       const collateralToken = this.contractsSource!.getAssetFromAddress(collateralTokenAddress);
-      
+
       const positionSize = new BigNumber(parseInt(dataSegments[2], 16));
       const borrowedAmount = new BigNumber(parseInt(dataSegments[3], 16));
       const interestRate = new BigNumber(parseInt(dataSegments[4], 16));
@@ -1957,7 +1990,7 @@ export class FulcrumProvider {
       const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
       if (!dataSegments) return result;
       const lender = dataSegments[0].replace("000000000000000000000000", "0x");
-      
+
       const baseTokenAddress = dataSegments[1].replace("000000000000000000000000", "0x");
       const quoteTokenAddress = dataSegments[2].replace("000000000000000000000000", "0x");
       const baseToken = this.contractsSource!.getAssetFromAddress(baseTokenAddress);
@@ -2104,13 +2137,13 @@ if (err || 'error' in added) {
 console.log(err, added);
 }
 }*//*);
-                                                                                                                                                                                                                            }
-                                                                                                                                                                                                                            }
-                                                                                                                                                                                                                            }
-                                                                                                                                                                                                                            } catch(e) {
-                                                                                                                                                                                                                            // console.log(e);
-                                                                                                                                                                                                                            }
-                                                                                                                                                                                                                            }*/
+                                                                                                                                                                                                                                        }
+                                                                                                                                                                                                                                        }
+                                                                                                                                                                                                                                        }
+                                                                                                                                                                                                                                        } catch(e) {
+                                                                                                                                                                                                                                        // console.log(e);
+                                                                                                                                                                                                                                        }
+                                                                                                                                                                                                                                        }*/
   }
 
   private processLendRequestTask = async (task: RequestTask, skipGas: boolean) => {
