@@ -23,18 +23,18 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
   useEffect(() => {
     const isGasTokenEnabled = localStorage.getItem('isGasTokenEnabled') === "true";
     const switchButton = document.querySelector<HTMLInputElement>('.provider-menu .theme-switch input[type="checkbox"]');
-
-    if (isGasTokenEnabled) {
-
-      switchButton!.setAttribute('data-isgastokenenabled', 'true');
-      localStorage.setItem('isGasTokenEnabled', 'true');
-      switchButton!.checked = true;
+    if (switchButton) {
+      if (isGasTokenEnabled) {
+        switchButton.setAttribute('data-isgastokenenabled', 'true');
+        localStorage.setItem('isGasTokenEnabled', 'true');
+        switchButton.checked = true;
+      }
+      else {
+        switchButton.setAttribute('data-isgastokenenabled', 'false');
+        localStorage.setItem('isGasTokenEnabled', 'false');
+        switchButton.checked = false;
+      };
     }
-    else {
-      switchButton!.setAttribute('data-isgastokenenabled', 'false');
-      localStorage.setItem('isGasTokenEnabled', 'false');
-      switchButton!.checked = false;
-    };
 
   });
   const context = useWeb3React();
@@ -100,10 +100,11 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
 
   const onChiSwitch = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const switchButton = e.currentTarget;
+    if (!FulcrumProvider.Instance.contractsSource) return;
     if (switchButton.checked) {
       await FulcrumProvider.Instance.checkAndSetApprovalForced(
         Asset.CHI,
-        FulcrumProvider.Instance.contractsSource!.getiBZxAddress().toLowerCase(),
+        FulcrumProvider.Instance.contractsSource.getiBZxAddress().toLowerCase(),
         new BigNumber(10 ** 18)
       );
       switchButton.setAttribute('data-isgastokenenabled', 'true');
@@ -111,7 +112,7 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
     } else {
       await FulcrumProvider.Instance.checkAndSetApprovalForced(
         Asset.CHI,
-        FulcrumProvider.Instance.contractsSource!.getiBZxAddress().toLowerCase(),
+        FulcrumProvider.Instance.contractsSource.getiBZxAddress().toLowerCase(),
         new BigNumber(0)
       );
       switchButton.setAttribute('data-isgastokenenabled', 'false');
@@ -119,11 +120,12 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
     }
   }
 
-
   return (
     <div className="provider-menu">
       <div className="provider-menu__title">Select Wallet Provider</div>
-      <SwitchButtonInput onSwitch={onChiSwitch} />
+      {account &&
+        <SwitchButtonInput onSwitch={onChiSwitch} />
+      }
       <ul className="provider-menu__list">{renderItems()}</ul>
       < button
         className="disconnect"
