@@ -39,22 +39,22 @@ footer {
       font-weight: 600;
       color: $primary-color;
       line-height: 1.25;
+      font-size: 16px;
+      @media screen and (max-width: $width-max-md) {
+        font-size: 14px;
+      }
+      @media screen and (max-width: $width-max-sm) {
+        font-size: 12px;
+      }
+
       &:hover {
         color: $primary-color-hover;
       }
       &:not(:last-child) {
         margin-bottom: 20px;
-        @media screen and (max-width: 767px) {
+        @media screen and (max-width: $width-max-sm) {
           margin-bottom: 15px;
         }
-      }
-
-      font-size: 16px;
-      @media screen and (max-width: 991px) {
-        font-size: 14px;
-      }
-      @media screen and (max-width: 767px) {
-        font-size: 12px;
       }
     }
   }
@@ -79,14 +79,18 @@ footer {
   }
   .social {
     display: flex;
-    @media screen and (min-width: $width-min-sm) {
-      margin-bottom: 60px;
-    }
+    margin-bottom: 60px;
+
     @media screen and (max-width: $width-max-sm) {
       margin-bottom: 30px;
     }
     a {
       display: flex;
+      width: 56px;
+
+      &:not(:last-child) {
+        margin-right: 15px;
+      }
       &:hover {
         circle,
         ellipse {
@@ -97,20 +101,12 @@ footer {
         width: 100%;
         height: auto;
       }
-      @media screen and (min-width: 992px) {
-        width: 56px;
-        &:not(:last-child) {
-          margin-right: 15px;
-        }
-      }
-      @media screen and (max-width: 991px) {
+
+      @media screen and (max-width: $width-max-md) {
         width: 48px;
         &:not(:last-child) {
           margin-right: 10px;
         }
-      }
-      &:not(:last-child) {
-        margin-right: 15px;
       }
     }
   }
@@ -122,9 +118,7 @@ footer {
   .data-protocol {
     font-weight: 600;
     margin-bottom: 20px;
-    @media screen and (min-width: $width-min-sm) {
-      font-size: 18px;
-    }
+    font-size: 18px;
     @media screen and (max-width: $width-max-sm) {
       font-size: 16px;
     }
