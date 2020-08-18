@@ -1,10 +1,10 @@
 import React from 'react';
 
-export interface ISwitchButtonProps {
+export interface ISwitchButtonInputProps {
   onSwitch: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-export const SwitchButton = (props: ISwitchButtonProps) => {
+export const SwitchButtonInput = (props: ISwitchButtonInputProps) => {
   return (
     <div className="theme-switch-wrapper">
       <label className="theme-switch">

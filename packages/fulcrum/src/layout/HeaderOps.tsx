@@ -7,7 +7,7 @@ import menu_icon from "../assets/images/ic_menu.svg";
 import { ReactComponent as MenuIconOpen } from "../assets/images/ic_menu.svg";
 import { ReactComponent as MenuIconClose } from "../assets/images/ic_close.svg";
 import { Footer } from "./Footer"
-import { SwitchButton } from "../components/SwitchButton";
+import { SwitchButtonInput } from "../components/SwitchButtonInput";
 export interface IHeaderOpsProps {
   doNetworkConnect: () => void;
   isRiskDisclosureModalOpen: () => void;
@@ -80,7 +80,7 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
           </div>
           <div className="header__right">
             <OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />
-            <SwitchButton onSwitch={this.onSwitchTheme}/>
+            <SwitchButtonInput onSwitch={this.onSwitchTheme}/>
           </div>
         </div>
       </header>
@@ -144,8 +144,8 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
   };
 
   private onSwitchTheme = (e: React.ChangeEvent<HTMLInputElement>) => {
-    var buttonToggleSwitch = e.currentTarget;
-    if (buttonToggleSwitch.checked) {
+    const switchButton = e.currentTarget;
+    if (switchButton.checked) {
       document.documentElement.setAttribute('data-theme', 'dark');
       localStorage.setItem('theme', 'dark');
     } else {
