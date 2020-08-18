@@ -794,23 +794,7 @@ export class FulcrumProvider {
           : loan.loanData!.principal;
     }
 
-    //const baseAsset = this.getBaseAsset(loanAsset);
-
-    // console.log(baseAsset, selectedKey.positionType, selectedKey.quoteToken, result.toString());
-
-
-    let decimalOffset = 0;
-    if (baseToken === Asset.WBTC) {
-      if (positionType === PositionType.SHORT) {
-        decimalOffset = 10;
-      } else {
-        if (tradeType === TradeType.SELL) {
-          decimalOffset = -10;
-        }
-      }
-    }
-
-    result = result.dividedBy(10 ** (18 - decimalOffset));
+    result = result.dividedBy(10 ** 18);
 
     return result;
   };
@@ -1330,6 +1314,9 @@ export class FulcrumProvider {
         ? FulcrumProvider.Instance.getErc20AddressOfAsset(collateralToken)
         : FulcrumProvider.ZERO_ADDRESS;
 
+      const loanTokenDecimals = AssetsDictionary.assets.get(loanToken)!.decimals || 18;
+      const collateralTokenDecimals = AssetsDictionary.assets.get(collateralToken)!.decimals || 18;
+
       const collateralToLoanRate = await FulcrumProvider.Instance.getSwapRate(collateralToken, loanToken)
       try {
         console.log("leverageAmount" + leverageAmount);
@@ -1341,12 +1328,11 @@ export class FulcrumProvider {
           loanTokenSent,
           collateralTokenSent,
           collateralTokenAddress!));
-        console.log("marginDetails collateral", marginDetails[1].div(10 ** 18).toFixed())
-        result.principal = marginDetails[0].div(10 ** 18);
-        result.collateral = marginDetails[1].div(10 ** 18);
+        result.principal = marginDetails[0].div(10 ** 18).times(10 ** (18 - loanTokenDecimals));
+        result.collateral = marginDetails[1].div(10 ** 18).times(10 ** (18 - collateralTokenDecimals));
         result.exposureValue = request.positionType === PositionType.SHORT
-          ? result.principal
-          : result.collateral;
+          ? result.collateral.times(collateralToLoanRate)
+          : result.collateral
         result.interestRate = marginDetails[2].div(10 ** 18);
       }
       catch (e) {
