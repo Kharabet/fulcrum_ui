@@ -1312,12 +1312,14 @@ export class FulcrumProvider {
         ? FulcrumProvider.Instance.getErc20AddressOfAsset(collateralToken)
         : FulcrumProvider.ZERO_ADDRESS;
 
-      const collateralToLoanRate = await FulcrumProvider.Instance.getSwapRate(collateralToken, loanToken)
+      //const collateralToLoanRate = await FulcrumProvider.Instance.getSwapRate(collateralToken, loanToken)
       try {
         console.log("leverageAmount" + leverageAmount);
         console.log("loanTokenSent" + loanTokenSent);
         console.log("collateralTokenSent" + collateralTokenSent);
         console.log("collateralTokenAddress" + collateralTokenAddress);
+        console.log("iTokenAddress" + tokenContract.address);
+
         const marginDetails = (await tokenContract.getEstimatedMarginDetails.callAsync(
           leverageAmount,
           loanTokenSent,
@@ -1502,6 +1504,13 @@ export class FulcrumProvider {
           console.log("close full amount")
           amountInBaseUnits = new BigNumber(maxAmountInBaseUnits.times(10 ** 50).toFixed(0, 1));
         }
+
+        console.log(iBZxContract.address, await iBZxContract.closeWithSwap.getABIEncodedTransactionData(
+          request.loanId,
+          account,
+          amountInBaseUnits,
+          request.returnTokenIsCollateral, // returnTokenIsCollateral
+          request.loanDataBytes));
 
         result = await iBZxContract.closeWithSwap.callAsync(
           request.loanId,
