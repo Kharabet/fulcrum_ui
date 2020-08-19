@@ -1,5 +1,5 @@
 import { BigNumber } from "@0x/utils";
-import { Asset } from "./Asset";
+import { Asset } from "../Asset";
 
 export class TradeEvent {
   public static readonly topic0: string = "0xf640c1cfe1a912a0b0152b5a542e5c2403142eed75b06cde526cee54b1580e5c"

@@ -460,7 +460,15 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
 
     if (tradeRequest.amount.gt(0)) {
       const loanCloseData = await FulcrumProvider.Instance.getLoanCloseAmount(tradeRequest);
-      loanCloseAmount = loanCloseData[1].div(10 ** 18);
+      const loanAssetDecimals = AssetsDictionary.assets.get(this.props.loan!.loanAsset)!.decimals || 18;
+      const collateralAssetDecimals = AssetsDictionary.assets.get(this.props.loan!.collateralAsset)!.decimals || 18;
+      const loanAssetPrecision = new BigNumber(10 ** (18 - loanAssetDecimals));
+      const collateralAssetPrecision = new BigNumber(10 ** (18 - collateralAssetDecimals));
+
+
+      loanCloseAmount = returnTokenIsCollateral 
+      ? loanCloseData[1].div(10 ** 18).times(collateralAssetPrecision)
+      : loanCloseData[1].div(10 ** 18).times(loanAssetPrecision);
     }
 
     await this._isMounted && this.setState({
@@ -615,9 +623,17 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
 
     if (this.props.tradeType === TradeType.SELL) {
       tradeAmountValue = inputAmountValue;
+      const loanAssetDecimals = AssetsDictionary.assets.get(this.props.loan!.loanAsset)!.decimals || 18;
+      const collateralAssetDecimals = AssetsDictionary.assets.get(this.props.loan!.collateralAsset)!.decimals || 18;
+
+      const loanAssetPrecision = new BigNumber(10 ** (18 - loanAssetDecimals));
+      const collateralAssetPrecision = new BigNumber(10 ** (18 - collateralAssetDecimals));
+      const collateralAssetAmount = this.props.loan!.loanData!.collateral.div(10 ** 18).times(collateralAssetPrecision);
+      const loanAssetAmount = this.props.loan!.loanData!.principal.div(10 ** 18).times(loanAssetPrecision);
+
       const positionAmount = this.props.positionType === PositionType.LONG
-        ? this.props.loan!.loanData!.collateral.div(10 ** 18)
-        : this.props.loan!.loanData!.principal.div(10 ** 18);
+        ? collateralAssetAmount
+        : loanAssetAmount;
       if (tradeAmountValue.gt(positionAmount)) {
         inputAmountValue = positionAmount.multipliedBy(multiplier);
         inputAmountText = positionAmount.multipliedBy(multiplier).decimalPlaces(this._inputPrecision).toFixed();

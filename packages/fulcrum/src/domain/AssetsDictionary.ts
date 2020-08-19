@@ -16,6 +16,7 @@ import usdc_logo, {ReactComponent as USDCLogo} from "../assets/images/ic_token_u
 import zrx_logo, {ReactComponent as ZRXLogo} from "../assets/images/ic_token_zrx.svg";
 import weth_logo, {ReactComponent as WETHLogo} from "../assets/images/ic_token_weth.svg";
 import chai_logo, {ReactComponent as CHAILogo} from "../assets/images/ic_token_chai.svg";
+import chi_logo, {ReactComponent as CHILogo} from "../assets/images/ic_token_chi.svg";
 
 import bat_bg from "../assets/images/popup_left_token_bat.svg";
 import btc_bg from "../assets/images/popup_left_token_btc.svg";
@@ -62,6 +63,27 @@ import zrx_ts from "../assets/images/ic___token_selector___zrx.svg";
 
 export class AssetsDictionary {
   public static assets: Map<Asset, AssetDetails> = new Map<Asset, AssetDetails>([
+    [
+      Asset.CHI,
+      new AssetDetails(
+        "CHI",
+        "Chi Gastoken by 1inch",
+        "",
+        "",
+        0,
+        chi_logo,
+        CHILogo,
+        "",
+        "",
+        "",
+        "",
+        "",
+        new Map<number, string | null>([
+          [1, "0x0000000000004946c0e9f43f4dee607b0ef1fa1c"],
+          [42, "0x0000000000004946c0e9f43f4dee607b0ef1fa1c"]
+        ])
+      )
+    ],
     [
       Asset.BAT,
       new AssetDetails(

@@ -15,6 +15,7 @@ import { RequestTask } from "../domain/RequestTask";
 import { CircleLoader } from "./CircleLoader";
 import { TradeTxLoaderStep } from "./TradeTxLoaderStep";
 import { RequestStatus } from "../domain/RequestStatus";
+import { AssetsDictionary } from "../domain/AssetsDictionary";
 
 export interface IInnerOwnTokenGridRowProps {
   loan: IBorrowedFundsState;
@@ -72,11 +73,13 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
 
 
     if (this.props.positionType === PositionType.LONG) {
-      openValue = this.props.loan.loanData!.collateral.div(10 ** 18).times(this.props.openPrice);
+      const collateralAssetDecimals = AssetsDictionary.assets.get(this.props.loan.collateralAsset)!.decimals || 18;
+      openValue = this.props.loan.loanData!.collateral.times(10 ** (18 - collateralAssetDecimals)).div(10 ** 18).times(this.props.openPrice);
       valueChange = (this.props.value.minus(openValue)).div(openValue).times(100);
     }
     else {
-      openValue = this.props.loan.loanData!.principal.div(10 ** 18).times(this.props.openPrice);
+      const loanAssetDecimals = AssetsDictionary.assets.get(this.props.loan.loanAsset)!.decimals || 18;
+      openValue = this.props.loan.loanData!.principal.times(10 ** (18 - loanAssetDecimals)).div(10 ** 18).times(this.props.openPrice);
       valueChange = (this.props.value.minus(openValue)).div(openValue).times(100);
     }
 
@@ -140,7 +143,7 @@ export class InnerOwnTokenGridRow extends Component<IInnerOwnTokenGridRowProps, 
       }
     }
   }
- 
+
   public componentDidMount(): void {
     this._isMounted = true;
 

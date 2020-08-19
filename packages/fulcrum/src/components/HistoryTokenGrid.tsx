@@ -4,9 +4,9 @@ import { BigNumber } from "@0x/utils";
 import { Asset } from "../domain/Asset";
 import { PositionType } from "../domain/PositionType";
 import { IHistoryEvents } from "../domain/IHistoryEvents";
-import { TradeEvent } from "../domain/TradeEvent";
-import { LiquidationEvent } from "../domain/LiquidationEvent";
-import { CloseWithSwapEvent } from "../domain/CloseWithSwapEvent";
+import { TradeEvent } from "../domain/events/TradeEvent";
+import { LiquidationEvent } from "../domain/events/LiquidationEvent";
+import { CloseWithSwapEvent } from "../domain/events/CloseWithSwapEvent";
 import { PositionEventsGroup } from "../domain/PositionEventsGroup";
 import { PositionHistoryData } from "../domain/PositionHistoryData";
 
@@ -18,6 +18,9 @@ import { PreloaderChart } from "../components/PreloaderChart";
 
 
 import "../styles/components/history-token-grid.scss";
+import { WithdrawCollateralEvent } from "../domain/events/WithdrawCollateralEvent";
+import { DepositCollateralEvent } from "../domain/events/DepositCollateralEvent";
+import { AssetsDictionary } from "../domain/AssetsDictionary";
 
 export interface IHistoryTokenGridProps {
   isMobileMedia: boolean;
@@ -122,6 +125,7 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
         ? new BigNumber(10 ** 36).div(tradeEvent.entryPrice).div(10 ** 18)
         : tradeEvent.entryPrice.div(10 ** 18);
 
+
       const positionEventsGroup = new PositionEventsGroup(
         loanId,
         baseAsset,
@@ -142,14 +146,20 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
         const earnRewardEvent = historyEvents.earnRewardEvents.find(e => e.timeStamp.getTime() === timeStamp.getTime());
         if (event instanceof TradeEvent) {
           const action = "Opened";
+          const loanAssetDecimals = AssetsDictionary.assets.get(event.loanToken)!.decimals || 18;
+          const collateralAssetDecimals = AssetsDictionary.assets.get(event.collateralToken)!.decimals || 18;
+
+          const loanAssetPrecision = new BigNumber(10 ** (18 - loanAssetDecimals));
+          const collateralAssetPrecision = new BigNumber(10 ** (18 - collateralAssetDecimals));
+
           if (positionType === PositionType.LONG) {
-            positionValue = event.positionSize.div(10 ** 18);
-            value = event.positionSize.div(event.entryPrice);
+            positionValue = event.positionSize.div(10 ** 18).times(collateralAssetPrecision);
+            value = event.positionSize.times(collateralAssetPrecision).div(event.entryPrice);
             tradePrice = new BigNumber(10 ** 36).div(event.entryPrice).div(10 ** 18);
           }
           else {
-            positionValue = event.borrowedAmount.div(10 ** 18);
-            value = event.positionSize.div(10 ** 18);
+            positionValue = event.borrowedAmount.div(10 ** 18).times(loanAssetPrecision);
+            value = event.borrowedAmount.div(10 ** 18).times(loanAssetPrecision).times(event.entryPrice.div(10 ** 18));
             tradePrice = event.entryPrice.div(10 ** 18);
           }
 
@@ -170,16 +180,21 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
         }
         else if (event instanceof CloseWithSwapEvent) {
           const action = "Closed";
+          const loanAssetDecimals = AssetsDictionary.assets.get(event.loanToken)!.decimals || 18;
+          const collateralAssetDecimals = AssetsDictionary.assets.get(event.collateralToken)!.decimals || 18;
+          const loanAssetPrecision = new BigNumber(10 ** (18 - loanAssetDecimals));
+          const collateralAssetPrecision = new BigNumber(10 ** (18 - collateralAssetDecimals));
+
           if (positionType === PositionType.LONG) {
-            positionValue = event.positionCloseSize.div(10 ** 18);
-            value = event.positionCloseSize.div(event.exitPrice);
+            positionValue = event.positionCloseSize.times(collateralAssetPrecision).div(10 ** 18);
+            value = event.positionCloseSize.times(collateralAssetPrecision).div(event.exitPrice);
             tradePrice = new BigNumber(10 ** 36).div(event.exitPrice).div(10 ** 18);
             profit = (tradePrice.minus(openPrice)).times(positionValue);
 
           }
           else {
-            positionValue = event.loanCloseAmount.div(10**18);
-            value = event.positionCloseSize.div(10 ** 18);
+            positionValue = event.loanCloseAmount.times(loanAssetPrecision).div(10 ** 18);
+            value = event.positionCloseSize.times(loanAssetPrecision).div(10 ** 18);
             tradePrice = event.exitPrice.div(10 ** 18);
             profit = (openPrice.minus(tradePrice)).times(positionValue);
           }
@@ -202,17 +217,22 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
           //loanToken in LiquidationEvent is a quoteAsset in TradeEvent
           //collateralToken in LiquidationEvent is a baseAsset in TradeEvent
           const action = "Liquidated";
+          const loanAssetDecimals = AssetsDictionary.assets.get(event.loanToken)!.decimals || 18;
+          const collateralAssetDecimals = AssetsDictionary.assets.get(event.collateralToken)!.decimals || 18;
+          const loanAssetPrecision = new BigNumber(10 ** (18 - loanAssetDecimals));
+          const collateralAssetPrecision = new BigNumber(10 ** (18 - collateralAssetDecimals));
+
           if (positionType === PositionType.LONG) {
-            positionValue = event.repayAmount.div(event.collateralToLoanRate);
+            positionValue = event.repayAmount.times(loanAssetPrecision).div(event.collateralToLoanRate);
             tradePrice = event.collateralToLoanRate.div(10 ** 18);
             value = positionValue.times(tradePrice);
-            profit = value.minus(event.collateralWithdrawAmount.times(event.collateralToLoanRate).div(10**36));
+            profit = value.minus(event.collateralWithdrawAmount.times(event.collateralToLoanRate).div(10 ** 36));
           }
           else {
-            positionValue = event.repayAmount.div(10 ** 18);
+            positionValue = event.repayAmount.times(loanAssetPrecision).div(10 ** 18);
             tradePrice = new BigNumber(10 ** 36).div(event.collateralToLoanRate).div(10 ** 18);
             value = positionValue.times(tradePrice);
-            profit = value.minus(event.collateralWithdrawAmount.div(10**18));
+            profit = value.minus(event.collateralWithdrawAmount.div(10 ** 18));
           }
 
           positionEventsGroup.events.push(new PositionHistoryData(
@@ -228,9 +248,69 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
             payTradingFeeEvent,
             earnRewardEvent
           ))
-        }
-      }
+        } else if (event instanceof DepositCollateralEvent) {
+          const action = "Deposited";
+          const depositTokenDecimals = AssetsDictionary.assets.get(event.depositToken)!.decimals || 18;
+          const depositTokenPrecision = new BigNumber(10 ** (18 - depositTokenDecimals));
 
+          if (positionType === PositionType.LONG) {
+            positionValue = event.depositAmount.times(depositTokenPrecision).div(10 ** 18);
+          }
+          else {
+            const swapRateBaseToken = await this.getAssetUSDRate(baseAsset, event.timeStamp);
+            const swapRateQuoteToken = await this.getAssetUSDRate(quoteAsset, event.timeStamp);
+            positionValue = event.depositAmount.times(depositTokenPrecision).div(10 ** 18).times(new BigNumber(swapRateQuoteToken).div(swapRateBaseToken));
+          }
+          tradePrice = new BigNumber(0);
+
+          positionEventsGroup.events.push(new PositionHistoryData(
+            loanId,
+            timeStamp,
+            action,
+            positionValue,
+            tradePrice,
+            value,
+            profit,
+            txHash,
+            quoteAsset,
+            payTradingFeeEvent,
+            earnRewardEvent
+          ))
+        } else if (event instanceof WithdrawCollateralEvent) {
+          const action = "Withdrew";
+          const withdrawTokenDecimals = AssetsDictionary.assets.get(event.withdrawToken)!.decimals || 18;
+          const withdrawTokenPrecision = new BigNumber(10 ** (18 - withdrawTokenDecimals));
+
+
+          if (positionType === PositionType.LONG) {
+            positionValue = event.withdrawAmount.times(withdrawTokenPrecision).div(10 ** 18);
+          }
+          else {
+            const swapRateBaseToken = await this.getAssetUSDRate(baseAsset, event.timeStamp);
+            const swapRateQuoteToken = await this.getAssetUSDRate(quoteAsset, event.timeStamp);
+            positionValue = event.withdrawAmount.times(withdrawTokenPrecision).div(10 ** 18).times(new BigNumber(swapRateQuoteToken).div(swapRateBaseToken));
+          }
+          tradePrice = new BigNumber(0);
+
+          positionEventsGroup.events.push(new PositionHistoryData(
+            loanId,
+            timeStamp,
+            action,
+            positionValue,
+            tradePrice,
+            value,
+            profit,
+            txHash,
+            quoteAsset,
+            payTradingFeeEvent,
+            earnRewardEvent
+          ))
+        } else {
+          //do nothing 
+        }
+
+
+      }
       historyRowsData.push({
         eventsGroup: positionEventsGroup,
         stablecoins: this.props.stablecoins,
@@ -245,7 +325,13 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
 
     return historyRowsData;
   };
+  public getAssetUSDRate = async (asset: Asset, date: Date) => {
+    const token = asset === Asset.fWETH ? Asset.ETH : asset;
 
+    const swapToUsdHistoryRateRequest = await fetch(`https://api.bzx.network/v1/asset-history-price?asset=${token.toLowerCase()}&date=${date.getTime()}`);
+    const swapToUsdHistoryRateResponse = (await swapToUsdHistoryRateRequest.json()).data;
+    return swapToUsdHistoryRateResponse.swapToUSDPrice;
+  }
   public nextPagination = () => {
     if (this.state.numberPagination !== this.state.quantityGrids && !this.state.isLastRow) {
       this.setState({ ...this.state, numberPagination: this.state.numberPagination + 1 });

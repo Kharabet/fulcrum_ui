@@ -1,5 +1,5 @@
 import { BigNumber } from "@0x/utils";
-import { Asset } from "./Asset";
+import { Asset } from "../Asset";
 
 export class EarnRewardEvent {
   public static readonly topic0: string = "0x7d67a06b653c0fa85ccea3aa013f859cf520653f6d581e121b77dc82a4c10412"

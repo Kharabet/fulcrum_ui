@@ -1,12 +1,14 @@
 
-import { EarnRewardEvent } from "../domain/EarnRewardEvent";
-import { PayTradingFeeEvent } from "../domain/PayTradingFeeEvent";
-import { TradeEvent } from "../domain/TradeEvent";
-import { LiquidationEvent } from "../domain/LiquidationEvent";
-import { CloseWithSwapEvent } from "../domain/CloseWithSwapEvent";
+import { EarnRewardEvent } from "../domain/events/EarnRewardEvent";
+import { PayTradingFeeEvent } from "../domain/events/PayTradingFeeEvent";
+import { TradeEvent } from "../domain/events/TradeEvent";
+import { LiquidationEvent } from "../domain/events/LiquidationEvent";
+import { CloseWithSwapEvent } from "../domain/events/CloseWithSwapEvent";
+import { DepositCollateralEvent } from "./events/DepositCollateralEvent";
+import { WithdrawCollateralEvent } from "./events/WithdrawCollateralEvent";
 
 export interface IHistoryEvents {
-  groupedEvents: (TradeEvent | CloseWithSwapEvent | LiquidationEvent)[];
+  groupedEvents: (TradeEvent | CloseWithSwapEvent | LiquidationEvent | WithdrawCollateralEvent | DepositCollateralEvent)[];
   earnRewardEvents: EarnRewardEvent[];
   payTradingFeeEvents: PayTradingFeeEvent[];
 }
