@@ -22,19 +22,38 @@ export class AssetSelector extends Component<IAssetSelectorProps, IAssetSelector
       apr: [],
       tvl: []
     };
-    this.assetsShown = [
-      Asset.ETH,
-      Asset.SAI,
-      Asset.DAI,
-      Asset.USDC,
-      Asset.USDT,
-      Asset.SUSD,
-      Asset.WBTC,
-      Asset.LINK,
-      Asset.ZRX,
-      Asset.REP,
-      Asset.KNC
-    ]
+    if (process.env.REACT_APP_ETH_NETWORK === "mainnet") {
+      this.assetsShown = [
+        Asset.DAI,
+        Asset.USDC,
+        Asset.USDT,
+        Asset.SUSD,
+        Asset.ETH,
+        Asset.WBTC,
+        Asset.LINK,
+        Asset.ZRX,
+        Asset.KNC,
+      ];
+    } else if (process.env.REACT_APP_ETH_NETWORK === "kovan") {
+      this.assetsShown = [
+        Asset.DAI,
+        Asset.USDC,
+        Asset.USDT,
+        Asset.SUSD,
+        Asset.fWETH,
+        Asset.WBTC,
+        Asset.LINK,
+        Asset.ZRX,
+        Asset.KNC,
+      ];
+    } else if (process.env.REACT_APP_ETH_NETWORK === "ropsten") {
+      this.assetsShown = [
+        Asset.DAI,
+        Asset.ETH,
+      ];
+    } else {
+      this.assetsShown = [];
+    }
   }
 
 

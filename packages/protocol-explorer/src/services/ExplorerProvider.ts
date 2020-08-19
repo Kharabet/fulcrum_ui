@@ -292,49 +292,49 @@ export class ExplorerProvider {
         if (tradeEventResponseJson.status !== "1") return result;
         const events = tradeEventResponseJson.result;
         result = events.reverse().map((event: any) => {
-          const userAddress = event.topics[1].replace("0x000000000000000000000000", "0x");
-          const lender = event.topics[2].replace("0x000000000000000000000000", "0x");
-          const loandId = event.topics[3];
-          const data = event.data.replace("0x", "");
-          const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
-          if (!dataSegments) return result;
-          const collateralTokenAddress = dataSegments[0].replace("000000000000000000000000", "0x");
-          const loanTokenAddress = dataSegments[1].replace("000000000000000000000000", "0x");
-          const loanToken = this.contractsSource!.getAssetFromAddress(loanTokenAddress);
-          const collateralToken = this.contractsSource!.getAssetFromAddress(collateralTokenAddress);
-          
-          const positionSize = new BigNumber(parseInt(dataSegments[2], 16));
-          const borrowedAmount = new BigNumber(parseInt(dataSegments[3], 16));
-          const interestRate = new BigNumber(parseInt(dataSegments[4], 16));
-          const settlementDate = new Date(parseInt(dataSegments[5], 16) * 1000);
-          const entryPrice = new BigNumber(parseInt(dataSegments[6], 16));
-          const entryLeverage = new BigNumber(parseInt(dataSegments[7], 16));
-          const currentLeverage = new BigNumber(parseInt(dataSegments[8], 16));
-          const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000);
-          const txHash = event.transactionHash;
-          return new TradeEvent(
-            userAddress,
-            lender,
-            loandId,
-            collateralToken,
-            loanToken,
-            positionSize,
-            borrowedAmount,
-            interestRate,
-            settlementDate,
-            entryPrice,
-            entryLeverage,
-            currentLeverage,
-            timeStamp,
-            txHash
-          )
-    
+            const userAddress = event.topics[1].replace("0x000000000000000000000000", "0x");
+            const lender = event.topics[2].replace("0x000000000000000000000000", "0x");
+            const loandId = event.topics[3];
+            const data = event.data.replace("0x", "");
+            const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
+            if (!dataSegments) return result;
+            const collateralTokenAddress = dataSegments[0].replace("000000000000000000000000", "0x");
+            const loanTokenAddress = dataSegments[1].replace("000000000000000000000000", "0x");
+            const loanToken = this.contractsSource!.getAssetFromAddress(loanTokenAddress);
+            const collateralToken = this.contractsSource!.getAssetFromAddress(collateralTokenAddress);
+
+            const positionSize = new BigNumber(parseInt(dataSegments[2], 16));
+            const borrowedAmount = new BigNumber(parseInt(dataSegments[3], 16));
+            const interestRate = new BigNumber(parseInt(dataSegments[4], 16));
+            const settlementDate = new Date(parseInt(dataSegments[5], 16) * 1000);
+            const entryPrice = new BigNumber(parseInt(dataSegments[6], 16));
+            const entryLeverage = new BigNumber(parseInt(dataSegments[7], 16));
+            const currentLeverage = new BigNumber(parseInt(dataSegments[8], 16));
+            const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000);
+            const txHash = event.transactionHash;
+            return new TradeEvent(
+                userAddress,
+                lender,
+                loandId,
+                collateralToken,
+                loanToken,
+                positionSize,
+                borrowedAmount,
+                interestRate,
+                settlementDate,
+                entryPrice,
+                entryLeverage,
+                currentLeverage,
+                timeStamp,
+                txHash
+            )
+
         })
         return result
-    
-      }
 
-      public getCloseWithSwapHistory = async (): Promise<CloseWithSwapEvent[]> => {
+    }
+
+    public getCloseWithSwapHistory = async (): Promise<CloseWithSwapEvent[]> => {
         let result: CloseWithSwapEvent[] = [];
         if (!this.contractsSource) return result;
         const bzxContractAddress = this.contractsSource.getiBZxAddress()
@@ -346,42 +346,42 @@ export class ExplorerProvider {
         if (closeWithSwapResponseJson.status !== "1") return result;
         const events = closeWithSwapResponseJson.result;
         result = events.reverse().map((event: any) => {
-          const userAddress = event.topics[1].replace("0x000000000000000000000000", "0x");
-          const lender = event.topics[2].replace("0x000000000000000000000000", "0x");
-          const loandId = event.topics[3];
-          const data = event.data.replace("0x", "");
-          const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
-          if (!dataSegments) return result;
-          const collateralTokenAddress = dataSegments[0].replace("000000000000000000000000", "0x");
-          const loanTokenAddress = dataSegments[1].replace("000000000000000000000000", "0x");
-          const collateralToken = this.contractsSource!.getAssetFromAddress(collateralTokenAddress);
-          const loanToken = this.contractsSource!.getAssetFromAddress(loanTokenAddress);
-          const closer = dataSegments[2].replace("000000000000000000000000", "0x");
-          const positionCloseSize = new BigNumber(parseInt(dataSegments[3], 16));
-          const loanCloseAmount = new BigNumber(parseInt(dataSegments[4], 16));
-          const exitPrice = new BigNumber(parseInt(dataSegments[5], 16));
-          const currentLeverage = new BigNumber(parseInt(dataSegments[6], 16));
-          const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000);
-          const txHash = event.transactionHash;
-          return new CloseWithSwapEvent(
-            userAddress,
-            collateralToken,
-            loanToken,
-            lender,
-            closer,
-            loandId,
-            positionCloseSize,
-            loanCloseAmount,
-            exitPrice,
-            currentLeverage,
-            timeStamp,
-            txHash
-          )
-    
+            const userAddress = event.topics[1].replace("0x000000000000000000000000", "0x");
+            const lender = event.topics[2].replace("0x000000000000000000000000", "0x");
+            const loandId = event.topics[3];
+            const data = event.data.replace("0x", "");
+            const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
+            if (!dataSegments) return result;
+            const collateralTokenAddress = dataSegments[0].replace("000000000000000000000000", "0x");
+            const loanTokenAddress = dataSegments[1].replace("000000000000000000000000", "0x");
+            const collateralToken = this.contractsSource!.getAssetFromAddress(collateralTokenAddress);
+            const loanToken = this.contractsSource!.getAssetFromAddress(loanTokenAddress);
+            const closer = dataSegments[2].replace("000000000000000000000000", "0x");
+            const positionCloseSize = new BigNumber(parseInt(dataSegments[3], 16));
+            const loanCloseAmount = new BigNumber(parseInt(dataSegments[4], 16));
+            const exitPrice = new BigNumber(parseInt(dataSegments[5], 16));
+            const currentLeverage = new BigNumber(parseInt(dataSegments[6], 16));
+            const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000);
+            const txHash = event.transactionHash;
+            return new CloseWithSwapEvent(
+                userAddress,
+                collateralToken,
+                loanToken,
+                lender,
+                closer,
+                loandId,
+                positionCloseSize,
+                loanCloseAmount,
+                exitPrice,
+                currentLeverage,
+                timeStamp,
+                txHash
+            )
+
         })
         return result
-    
-      }
+
+    }
 
     public getCloseWithDepositHistory = async (): Promise<CloseWithDepositEvent[]> => {
         let result: CloseWithDepositEvent[] = [];
@@ -721,17 +721,17 @@ export class ExplorerProvider {
             console.log(e);
             // throw e;
         }
-            
+
         const txHash = await iBZxContract.liquidate.sendTransactionAsync(
-                loanId,
-                account,
-                closeAmount,
-                {
-                    from: account,
-                    value: sendAmountForValue,
-                    gas: this.gasLimit,
-                    gasPrice: await this.gasPrice()
-                });
+            loanId,
+            account,
+            closeAmount,
+            {
+                from: account,
+                value: sendAmountForValue,
+                gas: this.gasLimit,
+                gasPrice: await this.gasPrice()
+            });
 
 
         receipt = await this.waitForTransactionMined(txHash);
@@ -783,6 +783,7 @@ export class ExplorerProvider {
         switch (asset) {
             case Asset.ETH:
             case Asset.WETH:
+            case Asset.fWETH:
                 return new BigNumber(10 ** 18).multipliedBy(1500);
             case Asset.WBTC:
                 return new BigNumber(10 ** 8).multipliedBy(25);
@@ -792,10 +793,13 @@ export class ExplorerProvider {
                 return new BigNumber(10 ** 18).multipliedBy(750000);
             case Asset.KNC:
                 return new BigNumber(10 ** 18).multipliedBy(550000);
+            case Asset.BAT:
+                return new BigNumber(10 ** 18).multipliedBy(750000);
             case Asset.DAI:
             case Asset.SAI:
-                return new BigNumber(10 ** 18).multipliedBy(375000);
             case Asset.USDC:
+            case Asset.USDT:
+            case Asset.SUSD:
                 return new BigNumber(10 ** 6).multipliedBy(375000);
             case Asset.REP:
                 return new BigNumber(10 ** 18).multipliedBy(15000);

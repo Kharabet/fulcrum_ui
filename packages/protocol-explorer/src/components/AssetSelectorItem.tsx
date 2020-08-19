@@ -31,7 +31,8 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
     const startData = new Date().setDate(new Date().getDate() - 90);
     const endData = new Date().getTime();
     const pointsNumber = 15;
-    const requestUrl = `${this.apiUrl}/asset-stats-history?asset=${this.props.asset.toLowerCase()}&start_date=${startData}&end_date=${endData}&points_number=${pointsNumber}`;
+    const asset = this.props.asset === Asset.fWETH ? Asset.ETH : this.props.asset
+    const requestUrl = `${this.apiUrl}/asset-stats-history?asset=${asset.toLowerCase()}&start_date=${startData}&end_date=${endData}&points_number=${pointsNumber}`;
     const response = await fetch(requestUrl);
     const responseJson = await response.json();
     //console.log(responseJson);
@@ -59,8 +60,8 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
 
   public render() {
     let asset = AssetsDictionary.assets.get(this.props.asset) as AssetDetails;
-    let apr = +this.props.apr[`${this.props.asset.toLowerCase()}`];
-    let tvl = +this.props.tvl[`${this.props.asset.toLowerCase()}`];
+    let apr = +this.props.apr[`${this.props.asset === Asset.fWETH ? "eth" : this.props.asset.toLowerCase()}`];
+    let tvl = +this.props.tvl[`${this.props.asset === Asset.fWETH ? "eth" : this.props.asset.toLowerCase()}`];
     const radius = this.state.tvl.map((e, i, arr) => arr.length - 2 === i ? 5 : 0)
 
     const getData = (canvas: any) => {

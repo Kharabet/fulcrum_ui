@@ -41,19 +41,39 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
       aprWidth: 2,
       utilizationWidth: 2,
     };
-    this.assetsShown = [
-      Asset.ETH,
-      Asset.SAI,
-      Asset.DAI,
-      Asset.USDC,
-      Asset.USDT,
-      Asset.SUSD,
-      Asset.WBTC,
-      Asset.LINK,
-      Asset.ZRX,
-      Asset.REP,
-      Asset.KNC
-    ];
+    
+    if (process.env.REACT_APP_ETH_NETWORK === "mainnet") {
+      this.assetsShown = [
+        Asset.DAI,
+        Asset.USDC,
+        Asset.USDT,
+        Asset.SUSD,
+        Asset.ETH,
+        Asset.WBTC,
+        Asset.LINK,
+        Asset.ZRX,
+        Asset.KNC,
+      ];
+    } else if (process.env.REACT_APP_ETH_NETWORK === "kovan") {
+      this.assetsShown = [
+        Asset.DAI,
+        Asset.USDC,
+        Asset.USDT,
+        Asset.SUSD,
+        Asset.fWETH,
+        Asset.WBTC,
+        Asset.LINK,
+        Asset.ZRX,
+        Asset.KNC,
+      ];
+    } else if (process.env.REACT_APP_ETH_NETWORK === "ropsten") {
+      this.assetsShown = [
+        Asset.DAI,
+        Asset.ETH,
+      ];
+    } else {
+      this.assetsShown = [];
+    }
 
     this.activeLabelUpdate = new Subject<string>();
     this.activeLabelUpdate
@@ -74,7 +94,7 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
     const pathname = window.location.pathname;
     const assetString = pathname.replace('/stats/', '');
     const asset = this.assetsShown.filter((item) => {
-      return item === assetString.toUpperCase();
+      return item === assetString.toUpperCase() || item === "fWETH";
     });
     this.setState({ ...this.state, asset: asset[0] })
   }
@@ -94,7 +114,8 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
     const startData = new Date().setDate(new Date().getDate() - this.state.periodChart);
     const endData = new Date().getTime();
     const pointsNumber = 80;
-    const requestUrl = `${this.apiUrl}/asset-stats-history?asset=${this.state.asset.toLowerCase()}&start_date=${startData}&end_date=${endData}&points_number=${pointsNumber}`;
+    const asset = this.state.asset === Asset.fWETH ? Asset.ETH : this.state.asset
+    const requestUrl = `${this.apiUrl}/asset-stats-history?asset=${asset.toLowerCase()}&start_date=${startData}&end_date=${endData}&points_number=${pointsNumber}`;
     const response = await fetch(requestUrl);
     const responseJson = await response.json();
 
