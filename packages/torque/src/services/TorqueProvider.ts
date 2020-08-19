@@ -200,7 +200,7 @@ export class TorqueProvider {
       this.unsupportedNetwork = false;
       await Web3ConnectionFactory.setWalletProvider(connector, account);
     } catch (e) {
-      // console.log(e);
+      console.log(e);
       this.isLoading = false;
 
       return;
