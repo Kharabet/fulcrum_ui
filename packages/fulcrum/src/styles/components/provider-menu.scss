@@ -1,6 +1,8 @@
 .provider-menu {
   padding: 50px 60px 40px 60px;
   background-color: #444e5a;
+  max-width: 630px;
+  box-sizing: border-box;
   &__title {
     font-size: 22px;
     font-weight: 600;
@@ -8,6 +10,32 @@
     margin-bottom: 30px;
     text-align: center;
     color: #a2abb8;
+  }
+  &__gas-token {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #586473;
+    margin-bottom: 40px;
+    &-logo {
+      display: flex;
+      align-items: center;
+      margin-right: 15px;
+      svg {
+        width: 64px;
+        height: 64px;
+      }
+    }
+    &-text {
+      font-weight: normal;
+      font-size: 16px;
+      line-height: 150%;
+      color: #e9f4ff;
+    }
+    &-switch {
+      margin-left: 40px;
+    }
   }
   &__footer {
     color: var(--trade-header-color);
@@ -151,6 +179,25 @@
 @media only screen and (max-width: $breakpoint-mobile-max) {
   .provider-menu {
     padding: 30px 15px 15px 15px;
+
+    &__gas-token {
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+      &-logo {
+        margin-right: 5px;
+        svg {
+          width: 44px;
+          height: 44px;
+        }
+      }
+      &-text {
+        font-weight: normal;
+        font-size: 12px;
+      }
+      &-switch {
+        margin-left: 10px;
+      }
+    }
     &__list {
       grid-row-gap: 8px;
       grid-column-gap: 8px;
@@ -176,7 +223,6 @@
           font-size: 11px;
         }
       }
-
     }
     &__footer {
       font-size: 14px;

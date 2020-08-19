@@ -413,6 +413,9 @@ export class ContractsSource {
           case "0xdd974d5c2e2928dea5f71b9825b8b646686bd200":
             asset = Asset.KNC;
             break;
+          case "0x0000000000004946c0e9f43f4dee607b0ef1fa1c":
+            asset = Asset.CHI;
+            break;
         }
         break;
       case 3:
@@ -495,6 +498,9 @@ export class ContractsSource {
             break;
           case "0x02357164ba33f299f7654cbb29da29db38ae1f44":
             asset = Asset.KNC;
+            break;
+          case "0x0000000000004946c0e9f43f4dee607b0ef1fa1c":
+            asset = Asset.CHI;
             break;
         }
         break;
