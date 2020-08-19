@@ -432,13 +432,16 @@ export class FulcrumProvider {
         return new BigNumber(10 ** 18).multipliedBy(750000);
       case Asset.KNC:
         return new BigNumber(10 ** 18).multipliedBy(550000);
+      case Asset.BAT:
+        return new BigNumber(10**18).multipliedBy(750000);
       case Asset.DAI:
       case Asset.SAI:
-        return new BigNumber(10 ** 18).multipliedBy(375000);
       case Asset.USDC:
-        return new BigNumber(10 ** 6).multipliedBy(375000);
+      case Asset.USDT:
+      case Asset.SUSD:
+        return new BigNumber(10**6).multipliedBy(375000);
       case Asset.REP:
-        return new BigNumber(10 ** 18).multipliedBy(15000);
+        return new BigNumber(10**18).multipliedBy(15000);
       case Asset.MKR:
         return new BigNumber(10 ** 18).multipliedBy(1250);
       case Asset.CHI:
@@ -1327,13 +1330,15 @@ export class FulcrumProvider {
 
       const loanTokenDecimals = AssetsDictionary.assets.get(loanToken)!.decimals || 18;
       const collateralTokenDecimals = AssetsDictionary.assets.get(collateralToken)!.decimals || 18;
-
       const collateralToLoanRate = await FulcrumProvider.Instance.getSwapRate(collateralToken, loanToken)
+
       try {
         console.log("leverageAmount" + leverageAmount);
         console.log("loanTokenSent" + loanTokenSent);
         console.log("collateralTokenSent" + collateralTokenSent);
         console.log("collateralTokenAddress" + collateralTokenAddress);
+        console.log("iTokenAddress" + tokenContract.address);
+
         const marginDetails = (await tokenContract.getEstimatedMarginDetails.callAsync(
           leverageAmount,
           loanTokenSent,
@@ -1518,12 +1523,18 @@ export class FulcrumProvider {
           amountInBaseUnits = new BigNumber(maxAmountInBaseUnits.times(10 ** 50).toFixed(0, 1));
         }
 
-        const isGasTokenEnabled = localStorage.getItem('isGasTokenEnabled') === "true";
+        console.log(iBZxContract.address, await iBZxContract.closeWithSwap.getABIEncodedTransactionData(
+          request.loanId,
+          account,
+          amountInBaseUnits,
+          request.returnTokenIsCollateral, // returnTokenIsCollateral
+          request.loanDataBytes));
+
+		const isGasTokenEnabled = localStorage.getItem('isGasTokenEnabled') === "true";
         const ChiTokenBalance = await this.getAssetTokenBalanceOfUser(Asset.CHI);
         //@ts-ignore
         result = isGasTokenEnabled && ChiTokenBalance.gt(0)
-          ? await iBZxContract.closeWithSwapWithGasToken.callAsync(
-            request.loanId,
+          ? await iBZxContract.closeWithSwapWithGasToken.callAsync(            request.loanId,
             account,
             account,
             amountInBaseUnits,

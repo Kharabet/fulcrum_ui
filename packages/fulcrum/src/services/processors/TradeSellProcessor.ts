@@ -60,7 +60,7 @@ export class TradeSellProcessor {
     task.processingStepNext();
 
     let gasAmountBN;
-    skipGas = true;
+
     const isGasTokenEnabled = localStorage.getItem('isGasTokenEnabled') === "true";
     const ChiTokenBalance = await FulcrumProvider.Instance.getAssetTokenBalanceOfUser(Asset.CHI);
 
