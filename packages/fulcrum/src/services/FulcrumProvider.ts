@@ -1792,10 +1792,11 @@ export class FulcrumProvider {
       const userAddress = event.topics[1].replace("0x000000000000000000000000", "0x");
       const tokenAddress = event.topics[2].replace("0x000000000000000000000000", "0x");
       const token = this.contractsSource!.getAssetFromAddress(tokenAddress);
+      if (token === Asset.UNKNOWN) return null;
       const loandId = event.topics[3];
       const data = event.data.replace("0x", "");
       const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
-      if (!dataSegments) return result;
+      if (!dataSegments) return null;
 
       const amount = new BigNumber(parseInt(dataSegments[0], 16));
       const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000);
@@ -1808,7 +1809,7 @@ export class FulcrumProvider {
         timeStamp,
         txHash
       )
-    })
+    }).filter((e: any) => e);
     return result
   }
 
@@ -1829,6 +1830,7 @@ export class FulcrumProvider {
       const userAddress = event.topics[1].replace("0x000000000000000000000000", "0x");
       const tokenAddress = event.topics[2].replace("0x000000000000000000000000", "0x");
       const token = this.contractsSource!.getAssetFromAddress(tokenAddress);
+      if (token === Asset.UNKNOWN) return null;
       const loandId = event.topics[3];
       const data = event.data.replace("0x", "");
       const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
@@ -1844,8 +1846,8 @@ export class FulcrumProvider {
         timeStamp,
         txHash
       )
-    })
-    return result
+    }).filter((e: any) => e);
+    return result;
   }
 
   public getTradeHistory = async (): Promise<TradeEvent[]> => {
@@ -1872,6 +1874,7 @@ export class FulcrumProvider {
       const loanTokenAddress = dataSegments[1].replace("000000000000000000000000", "0x");
       const loanToken = this.contractsSource!.getAssetFromAddress(loanTokenAddress);
       const collateralToken = this.contractsSource!.getAssetFromAddress(collateralTokenAddress);
+      if (loanToken === Asset.UNKNOWN || collateralToken === Asset.UNKNOWN) return null;
 
       const positionSize = new BigNumber(parseInt(dataSegments[2], 16));
       const borrowedAmount = new BigNumber(parseInt(dataSegments[3], 16));
@@ -1899,9 +1902,8 @@ export class FulcrumProvider {
         txHash
       )
 
-    })
-    return result
-
+    }).filter((e: any) => e);
+    return result;
   }
 
   public getCloseWithSwapHistory = async (): Promise<CloseWithSwapEvent[]> => {
@@ -1928,6 +1930,8 @@ export class FulcrumProvider {
       const loanTokenAddress = dataSegments[1].replace("000000000000000000000000", "0x");
       const collateralToken = this.contractsSource!.getAssetFromAddress(collateralTokenAddress);
       const loanToken = this.contractsSource!.getAssetFromAddress(loanTokenAddress);
+      if (loanToken === Asset.UNKNOWN || collateralToken === Asset.UNKNOWN) return null;
+
       const closer = dataSegments[2].replace("000000000000000000000000", "0x");
       const positionCloseSize = new BigNumber(parseInt(dataSegments[3], 16));
       const loanCloseAmount = new BigNumber(parseInt(dataSegments[4], 16));
@@ -1949,10 +1953,8 @@ export class FulcrumProvider {
         timeStamp,
         txHash
       )
-
-    })
-    return result
-
+    }).filter((e: any) => e);
+    return result;
   }
 
 
@@ -1982,6 +1984,8 @@ export class FulcrumProvider {
       const quoteTokenAddress = dataSegments[2].replace("000000000000000000000000", "0x");
       const baseToken = this.contractsSource!.getAssetFromAddress(baseTokenAddress);
       const quoteToken = this.contractsSource!.getAssetFromAddress(quoteTokenAddress);
+      if (baseToken === Asset.UNKNOWN || quoteToken === Asset.UNKNOWN) return null;
+
       const repayAmount = new BigNumber(parseInt(dataSegments[3], 16));
       const collateralWithdrawAmount = new BigNumber(parseInt(dataSegments[4], 16));
       const collateralToLoanRate = new BigNumber(parseInt(dataSegments[5], 16));
@@ -2002,10 +2006,8 @@ export class FulcrumProvider {
         timeStamp,
         txHash
       )
-
-    })
-    return result
-
+    }).filter((e: any) => e);
+    return result;
   }
 
   private onTaskEnqueued = async (requestTask: RequestTask) => {
