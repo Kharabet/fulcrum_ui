@@ -2,10 +2,15 @@ import React, { useState, useEffect } from 'react';
 import SimpleBar from 'simplebar-react';
 import 'simplebar/dist/simplebar.min.css';
 
-import "../styles/components/dropdown-select.scss"
 import { Asset } from '../domain/Asset';
 import { AssetsDictionary } from '../domain/AssetsDictionary';
 import { AssetDetails } from '../domain/AssetDetails';
+
+import { ReactComponent as CloseIcon } from "../assets/images/ic__close.svg"
+import { ReactComponent as SearchIcon } from "../assets/images/ic__search.svg"
+
+import "../styles/components/dropdown-select.scss"
+
 export interface IDropDownSelectOption {
   baseToken: Asset;
   quoteToken: Asset;
@@ -96,10 +101,15 @@ export const DropdownSelect = (props: IDropdownSelectProps) => {
         <div className="select-options__search">
           <input className="select-options__input" placeholder=""
             onChange={(e) => setInput(e.target.value)}
+            maxLength={20}
             value={inputValue}
           />
           <label className="select-options__value">{inputValue}</label>
+
+          <SearchIcon className="icon-close" />
+          <CloseIcon className="icon-search" />
         </div>
+
         <SimpleBar style={{ maxHeight: 480 }} autoHide={false}>
           {options.map((option, i) =>
             (<li data-basetoken={option.baseToken}

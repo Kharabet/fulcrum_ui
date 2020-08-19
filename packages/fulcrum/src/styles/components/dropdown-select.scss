@@ -128,6 +128,27 @@
     font-size: 14px;
   }
 
+  [class*="icon"] {
+    position: absolute;
+    top: 9px;
+    height: 28px;
+    width: 28px;
+  }
+  .icon-close {
+    pointer-events: none;
+    left: 11px;
+    padding: 6px;
+  }
+  .icon-search {
+    cursor: pointer;
+    right: -3px;
+
+    padding: 8px;
+    path {
+      stroke: #e9f4ff;
+    }
+  }
+
   .message {
     display: flex;
     align-items: center;
@@ -169,7 +190,7 @@
   svg {
     width: 20px;
     height: 20px;
-    margin-right: 10px;
+    margin-right: 14px;
     .eth-svg {
       fill: var(--bg-eth);
     }
