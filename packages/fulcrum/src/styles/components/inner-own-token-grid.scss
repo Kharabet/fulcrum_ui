@@ -47,25 +47,13 @@ $grid-template-columns: 10% 8% calc(11% - 35px) 11% 11% 11% 9% 9%;
     }
   }
   &__col-liquidation-price {
-    @media screen and (min-width: $breakpoint-desktop-min) {
-      text-align: right;
-      padding-right: 40px;
-    }
+    text-align: right;
   }
   &__col-position-value {
     text-align: right;
-    @media screen and (min-width: $breakpoint-desktop-min) {
-      padding-right: 40px;
-    }
-    @media screen and (max-width: $breakpoint-desktop-max) {
-      padding-right: 20px;
-    }
   }
   &__col-profit {
     text-align: right;
-    @media screen and (min-width: $breakpoint-desktop-min) {
-      padding-right: 20px;
-    }
   }
   &__col-actions {
     text-align: right;
@@ -75,7 +63,7 @@ $grid-template-columns: 10% 8% calc(11% - 35px) 11% 11% 11% 9% 9%;
 .inner-own-token-grid-row {
   display: grid;
   grid-template-columns: $grid-template-columns;
-  
+
   justify-content: space-between;
   column-gap: 35px;
   align-items: center;
@@ -83,13 +71,14 @@ $grid-template-columns: 10% 8% calc(11% - 35px) 11% 11% 11% 9% 9%;
   padding: $padding;
   margin-bottom: 1px;
   position: relative;
-  font-size: $font-size-row;
+  font-size: 18px;
   font-weight: 800;
   color: var(--primary-text);
   line-height: 1.5;
 
   @media screen and (min-width: $breakpoint-desktop-min) {
     padding: 22px 40px 35px 40px;
+    font-size: $font-size-row;
   }
   .sign-currency {
     color: #a2abb8;
@@ -131,18 +120,10 @@ $grid-template-columns: 10% 8% calc(11% - 35px) 11% 11% 11% 9% 9%;
   &__col-liquidation-price {
     display: flex;
     justify-content: flex-end;
-    padding-right: 20px;
-    @media screen and (min-width: $breakpoint-desktop-min) {
-      padding-right: 40px;
-    }
   }
   &__col-position-value {
     display: flex;
     justify-content: flex-end;
-    padding-right: 20px;
-    @media screen and (min-width: $breakpoint-desktop-min) {
-      padding-right: 40px;
-    }
   }
   &__col-asset-collateral {
     align-items: center;
@@ -187,9 +168,6 @@ $grid-template-columns: 10% 8% calc(11% - 35px) 11% 11% 11% 9% 9%;
   &__col-profit {
     display: flex;
     justify-content: flex-end;
-    @media screen and (min-width: $breakpoint-desktop-min) {
-      padding-right: 20px;
-    }
   }
   &__col-action {
     display: flex;
