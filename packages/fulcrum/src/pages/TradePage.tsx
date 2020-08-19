@@ -30,6 +30,7 @@ import { CloseWithSwapEvent } from "../domain/events/CloseWithSwapEvent";
 import  ManageTokenGrid  from '../components/ManageTokenGrid';
 import { WithdrawCollateralEvent } from "../domain/events/WithdrawCollateralEvent";
 import { DepositCollateralEvent } from "../domain/events/DepositCollateralEvent";
+import { AssetsDictionary } from "../domain/AssetsDictionary";
 // const ManageTokenGrid = React.lazy(() => import('../components/ManageTokenGrid'));
 const TradeForm = React.lazy(() => import('../components/TradeForm'));
 const ManageCollateralForm = React.lazy(() => import('../components/ManageCollateralForm'));
@@ -406,6 +407,8 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       this._isMounted && this.setState({ ...this.state, loans })
       for (const loan of loans) {
 
+        if (!loan.loanData) continue;
+
         const isLoanTokenOnlyInQuoteTokens = !this.baseTokens.includes(loan.loanAsset) && this.quoteTokens.includes(loan.loanAsset)
         const isCollateralTokenNotInQuoteTokens = this.baseTokens.includes(loan.collateralAsset) && !this.quoteTokens.includes(loan.collateralAsset)
         const positionType = isCollateralTokenNotInQuoteTokens || isLoanTokenOnlyInQuoteTokens
@@ -420,7 +423,10 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
           ? loan.loanAsset
           : loan.collateralAsset;
 
-        let leverage = new BigNumber(10 ** 38).div(loan.loanData!.startMargin.times(10 ** 18));
+          const loanAssetDecimals = AssetsDictionary.assets.get(loan.loanAsset)!.decimals || 18;
+          const collateralAssetDecimals = AssetsDictionary.assets.get(loan.collateralAsset)!.decimals || 18;
+
+        let leverage = new BigNumber(10 ** 38).div(loan.loanData.startMargin.times(10 ** 18));
         if (positionType === PositionType.LONG)
           leverage = leverage.plus(1);
 
@@ -434,17 +440,17 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         let currentValue = new BigNumber(0);
         //liquidation_collateralToLoanRate = ((15000000000000000000 * principal / 10^20) + principal) / collateral * 10^18
         //If SHORT -> 10^36 / liquidation_collateralToLoanRate
-        const liquidation_collateralToLoanRate = (new BigNumber("15000000000000000000").times(loan.loanData!.principal).div(10 ** 20)).plus(loan.loanData!.principal).div(loan.loanData!.collateral).times(10 ** 18);
+        const liquidation_collateralToLoanRate = (new BigNumber("15000000000000000000").times(loan.loanData.principal.times(10 ** (18 - loanAssetDecimals))).div(10 ** 20)).plus(loan.loanData.principal.times(10 ** (18 - loanAssetDecimals))).div(loan.loanData.collateral.times(10 ** (18 - collateralAssetDecimals))).times(10 ** 18);
         let liquidationPrice = new BigNumber(0);
         let profit = new BigNumber(0);
         if (positionType === PositionType.LONG) {
-          positionValue = loan.loanData!.collateral.div(10 ** 18);
-          value = loan.loanData!.collateral.div(10 ** 18).times(currentCollateralToPrincipalRate);
-          collateral = ((loan.loanData!.collateral.times(currentCollateralToPrincipalRate).div(10 ** 18)).minus(loan.loanData!.principal.div(10 ** 18)));
-          openPrice = loan.loanData!.startRate.div(10 ** 18);
+          positionValue = loan.loanData.collateral.div(10 ** 18).times(10 ** (18 - collateralAssetDecimals));
+          value = loan.loanData.collateral.div(10 ** 18).times(10 ** (18 - collateralAssetDecimals)).times(currentCollateralToPrincipalRate);
+          collateral = ((loan.loanData.collateral.times(currentCollateralToPrincipalRate).div(10 ** 18).times(10 ** (18 - collateralAssetDecimals))).minus(loan.loanData.principal.div(10 ** 18).times(10 ** (18 - loanAssetDecimals))));
+          openPrice = loan.loanData.startRate.div(10 ** 18).div(10 ** (18 - collateralAssetDecimals));
           liquidationPrice = liquidation_collateralToLoanRate.div(10 ** 18);
-          startingValue = ((loan.loanData!.collateral.times(openPrice.times(10 ** 18)).div(10 ** 18)).minus(loan.loanData!.principal)).div(10 ** 18);
-          currentValue = ((loan.loanData!.collateral.times(currentCollateralToPrincipalRate.times(10 ** 18)).div(10 ** 18)).minus(loan.loanData!.principal)).div(10 ** 18);
+          startingValue = ((loan.loanData.collateral.times(10 ** (18 - collateralAssetDecimals)).times(openPrice)).minus(loan.loanData.principal.times(10 ** (18 - loanAssetDecimals)))).div(10 ** 18);
+          currentValue = ((loan.loanData.collateral.times(10 ** (18 - collateralAssetDecimals)).times(currentCollateralToPrincipalRate.times(10 ** 18)).div(10 ** 18)).minus(loan.loanData.principal.times(10 ** (18 - loanAssetDecimals)))).div(10 ** 18);
           profit = currentValue.minus(startingValue);
 
           //in case of exotic pairs like ETH-KNC all values should be denominated in USD
@@ -465,13 +471,13 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
           }
         }
         else {
-          value = loan.loanData!.collateral.div(10 ** 18);
-          collateral = ((loan.loanData!.collateral.div(10 ** 18)).minus(loan.loanData!.principal.div(currentCollateralToPrincipalRate).div(10 ** 18)));
-          positionValue = (loan.loanData!.collateral.div(10 ** 18).times(currentCollateralToPrincipalRate)).minus(loan.loanData!.principal.div(10 ** 18));
-          openPrice = new BigNumber(10 ** 36).div(loan.loanData!.startRate).div(10 ** 18);
+          value = loan.loanData.collateral.times(10 ** (18 - collateralAssetDecimals)).div(10 ** 18).minus(loan.loanData.principal.times(10 ** (18 - loanAssetDecimals)).div(10 ** 18).div(currentCollateralToPrincipalRate));
+          collateral = ((loan.loanData.collateral.times(10 ** (18 - collateralAssetDecimals)).div(10 ** 18)).minus(loan.loanData.principal.times(10 ** (18 - loanAssetDecimals)).div(currentCollateralToPrincipalRate).div(10 ** 18)));
+          positionValue = (loan.loanData.collateral.times(10 ** (18 - collateralAssetDecimals)).div(10 ** 18).times(currentCollateralToPrincipalRate)).minus(loan.loanData.principal.times(10 ** (18 - loanAssetDecimals)).div(10 ** 18));
+          openPrice = new BigNumber(10 ** 36).div(loan.loanData.startRate.times(10 ** (18 - loanAssetDecimals))).div(10 ** 18);
           liquidationPrice = new BigNumber(10 ** 36).div(liquidation_collateralToLoanRate).div(10 ** 18);
-          startingValue = (loan.loanData!.collateral.minus(loan.loanData!.principal.div(loan.loanData!.startRate).times(10 ** 18))).div(10 ** 18);
-          currentValue = (loan.loanData!.collateral.minus(loan.loanData!.principal.div(currentCollateralToPrincipalRate.times(10 ** 18)).times(10 ** 18))).div(10 ** 18);
+          startingValue = (loan.loanData.collateral.times(10 ** (18 - collateralAssetDecimals)).minus(loan.loanData.principal.times(10 ** (18 - loanAssetDecimals)).div(loan.loanData.startRate.times(10 ** (18 - loanAssetDecimals))).times(10 ** 18))).div(10 ** 18);
+          currentValue = (loan.loanData.collateral.times(10 ** (18 - collateralAssetDecimals)).minus(loan.loanData.principal.times(10 ** (18 - loanAssetDecimals)).div(currentCollateralToPrincipalRate.times(10 ** 18)).times(10 ** 18))).div(10 ** 18);
           profit = startingValue.minus(currentValue);
 
           //in case of exotic pairs like ETH-KNC all values should be denominated in USD
