@@ -37,12 +37,12 @@ import { AbstractConnector } from '@web3-react/abstract-connector';
 import siteConfig from "./../config/SiteConfig.json";
 import { ProviderTypeDictionary } from "../domain/ProviderTypeDictionary";
 import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
-import { TradeEvent } from "../domain/TradeEvent";
+import { TradeEvent } from "../domain/events/TradeEvent";
 import Web3, { providers } from "web3";
-import { CloseWithSwapEvent } from "../domain/CloseWithSwapEvent";
-import { LiquidationEvent } from "../domain/LiquidationEvent";
-import { EarnRewardEvent } from "../domain/EarnRewardEvent";
-import { PayTradingFeeEvent } from "../domain/PayTradingFeeEvent";
+import { CloseWithSwapEvent } from "../domain/events/CloseWithSwapEvent";
+import { LiquidationEvent } from "../domain/events/LiquidationEvent";
+import { EarnRewardEvent } from "../domain/events/EarnRewardEvent";
+import { PayTradingFeeEvent } from "../domain/events/PayTradingFeeEvent";
 
 const getNetworkIdByString = (networkName: string | undefined) => {
   switch (networkName) {

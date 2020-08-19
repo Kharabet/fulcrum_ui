@@ -1,4 +1,6 @@
-import { BigNumber } from "@0x/utils"; import { PayTradingFeeEvent } from "./PayTradingFeeEvent"; import { EarnRewardEvent } from "./EarnRewardEvent";
+import { BigNumber } from "@0x/utils"; 
+import { PayTradingFeeEvent } from "./events/PayTradingFeeEvent"; 
+import { EarnRewardEvent } from "./events/EarnRewardEvent";
 import { Asset } from "../domain/Asset";
 
 export class PositionHistoryData {

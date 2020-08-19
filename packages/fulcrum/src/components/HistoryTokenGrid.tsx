@@ -4,9 +4,9 @@ import { BigNumber } from "@0x/utils";
 import { Asset } from "../domain/Asset";
 import { PositionType } from "../domain/PositionType";
 import { IHistoryEvents } from "../domain/IHistoryEvents";
-import { TradeEvent } from "../domain/TradeEvent";
-import { LiquidationEvent } from "../domain/LiquidationEvent";
-import { CloseWithSwapEvent } from "../domain/CloseWithSwapEvent";
+import { TradeEvent } from "../domain/events/TradeEvent";
+import { LiquidationEvent } from "../domain/events/LiquidationEvent";
+import { CloseWithSwapEvent } from "../domain/events/CloseWithSwapEvent";
 import { PositionEventsGroup } from "../domain/PositionEventsGroup";
 import { PositionHistoryData } from "../domain/PositionHistoryData";
 

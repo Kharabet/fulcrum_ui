@@ -1,5 +1,5 @@
 import { BigNumber } from "@0x/utils";
-import { Asset } from "./Asset";
+import { Asset } from "../Asset";
 
 export class CloseWithSwapEvent {
   public static topic0: string = "0x2ed7b29b4ca95cf3bb9a44f703872a66e6aa5e8f07b675fa9a5c124a1e5d7352"
