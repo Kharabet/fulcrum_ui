@@ -87,7 +87,6 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
             </div> */}
           </div>
         </div>
-        </div>
 
         <InfoBlock localstorageItemProp="torque-page-info">
           You may only manage and repay your existing loans. Full functionality will return after a thorough audit of our newly implemented and preexisting smart contracts.
