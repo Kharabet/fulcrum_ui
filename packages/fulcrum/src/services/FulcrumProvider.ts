@@ -768,6 +768,7 @@ export class FulcrumProvider {
           ? baseToken
           : quoteToken;
 
+
         const assetContract = await this.contractsSource.getITokenContract(loanToken);
         if (!assetContract) return result;
 
@@ -790,10 +791,18 @@ export class FulcrumProvider {
 
       }
     } else {
-      if (loan)
+      if (loan) {
+        const loanAssetDecimals = AssetsDictionary.assets.get(loan.loanAsset)!.decimals || 18;
+        const collateralAssetDecimals = AssetsDictionary.assets.get(loan.collateralAsset)!.decimals || 18;
+
+        const loanAssetPrecision = new BigNumber(10 ** (18 - loanAssetDecimals));
+        const collateralAssetPrecision = new BigNumber(10 ** (18 - collateralAssetDecimals));
+       
+
         result = positionType === PositionType.LONG
-          ? loan.loanData!.collateral
-          : loan.loanData!.principal;
+          ? loan.loanData!.collateral.times(collateralAssetPrecision)
+          : loan.loanData!.principal.times(loanAssetPrecision);
+      }
     }
 
     result = result.dividedBy(10 ** 18);
@@ -1511,7 +1520,7 @@ export class FulcrumProvider {
 
         const isGasTokenEnabled = localStorage.getItem('isGasTokenEnabled') === "true";
         const ChiTokenBalance = await this.getAssetTokenBalanceOfUser(Asset.CHI);
-
+        //@ts-ignore
         result = isGasTokenEnabled && ChiTokenBalance.gt(0)
           ? await iBZxContract.closeWithSwapWithGasToken.callAsync(
             request.loanId,
@@ -1525,7 +1534,7 @@ export class FulcrumProvider {
               gas: FulcrumProvider.Instance.gasLimit
             }
           )
-        : await iBZxContract.closeWithSwap.callAsync(
+          : await iBZxContract.closeWithSwap.callAsync(
             request.loanId,
             account,
             amountInBaseUnits,
@@ -2011,7 +2020,7 @@ export class FulcrumProvider {
     }).filter((e: any) => e);
     return result;
   }
-  
+
   public getDepositCollateralHistory = async (): Promise<DepositCollateralEvent[]> => {
     let result: DepositCollateralEvent[] = [];
     const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : undefined;
@@ -2030,7 +2039,7 @@ export class FulcrumProvider {
       const depositTokenAddress = event.topics[2].replace("0x000000000000000000000000", "0x");
       const depositToken = this.contractsSource!.getAssetFromAddress(depositTokenAddress);
       if (depositToken === Asset.UNKNOWN) return null;
-      
+
       const loanId = event.topics[3];
       const data = event.data.replace("0x", "");
       const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
@@ -2049,7 +2058,7 @@ export class FulcrumProvider {
     }).filter((e: any) => e);
     return result;
   }
-  
+
   public getWithdrawCollateralHistory = async (): Promise<WithdrawCollateralEvent[]> => {
     let result: WithdrawCollateralEvent[] = [];
     const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : undefined;
@@ -2068,7 +2077,7 @@ export class FulcrumProvider {
       const withdrawTokenAddress = event.topics[2].replace("0x000000000000000000000000", "0x");
       const withdrawToken = this.contractsSource!.getAssetFromAddress(withdrawTokenAddress);
       if (withdrawToken === Asset.UNKNOWN) return null;
-      
+
       const loanId = event.topics[3];
       const data = event.data.replace("0x", "");
       const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
@@ -2204,13 +2213,13 @@ if (err || 'error' in added) {
 console.log(err, added);
 }
 }*//*);
-                                                                                                                                                                                                                                        }
-                                                                                                                                                                                                                                        }
-                                                                                                                                                                                                                                        }
-                                                                                                                                                                                                                                        } catch(e) {
-                                                                                                                                                                                                                                        // console.log(e);
-                                                                                                                                                                                                                                        }
-                                                                                                                                                                                                                                        }*/
+                                                                                                                                                                                                                                            }
+                                                                                                                                                                                                                                            }
+                                                                                                                                                                                                                                            }
+                                                                                                                                                                                                                                            } catch(e) {
+                                                                                                                                                                                                                                            // console.log(e);
+                                                                                                                                                                                                                                            }
+                                                                                                                                                                                                                                            }*/
   }
 
   private processLendRequestTask = async (task: RequestTask, skipGas: boolean) => {
