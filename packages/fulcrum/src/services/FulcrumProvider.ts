@@ -43,6 +43,8 @@ import { CloseWithSwapEvent } from "../domain/events/CloseWithSwapEvent";
 import { LiquidationEvent } from "../domain/events/LiquidationEvent";
 import { EarnRewardEvent } from "../domain/events/EarnRewardEvent";
 import { PayTradingFeeEvent } from "../domain/events/PayTradingFeeEvent";
+import { DepositCollateralEvent } from "../domain/events/DepositCollateralEvent";
+import { WithdrawCollateralEvent } from "../domain/events/WithdrawCollateralEvent";
 
 const getNetworkIdByString = (networkName: string | undefined) => {
   switch (networkName) {
@@ -2003,6 +2005,82 @@ export class FulcrumProvider {
         collateralWithdrawAmount,
         collateralToLoanRate,
         currentMargin,
+        timeStamp,
+        txHash
+      )
+    }).filter((e: any) => e);
+    return result;
+  }
+  
+  public getDepositCollateralHistory = async (): Promise<DepositCollateralEvent[]> => {
+    let result: DepositCollateralEvent[] = [];
+    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : undefined;
+
+    if (!this.contractsSource) return result;
+    const bzxContractAddress = this.contractsSource.getiBZxAddress()
+    if (!account || !bzxContractAddress) return result
+    const etherscanApiKey = configProviders.Etherscan_Api;
+    let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${DepositCollateralEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
+    const depositCollateralEventResponse = await fetch(etherscanApiUrl);
+    const depositCollateralEventResponseJson = await depositCollateralEventResponse.json();
+    if (depositCollateralEventResponseJson.status !== "1") return result;
+    const events = depositCollateralEventResponseJson.result;
+    result = events.reverse().map((event: any) => {
+      const userAddress = event.topics[1].replace("0x000000000000000000000000", "0x");
+      const depositTokenAddress = event.topics[2].replace("0x000000000000000000000000", "0x");
+      const depositToken = this.contractsSource!.getAssetFromAddress(depositTokenAddress);
+      if (depositToken === Asset.UNKNOWN) return null;
+      
+      const loanId = event.topics[3];
+      const data = event.data.replace("0x", "");
+      const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
+      if (!dataSegments) return result;
+      const depositAmount = new BigNumber(parseInt(dataSegments[0], 16));
+      const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000);
+      const txHash = event.transactionHash;
+      return new DepositCollateralEvent(
+        userAddress,
+        depositToken,
+        loanId,
+        depositAmount,
+        timeStamp,
+        txHash
+      )
+    }).filter((e: any) => e);
+    return result;
+  }
+  
+  public getWithdrawCollateralHistory = async (): Promise<WithdrawCollateralEvent[]> => {
+    let result: WithdrawCollateralEvent[] = [];
+    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : undefined;
+
+    if (!this.contractsSource) return result;
+    const bzxContractAddress = this.contractsSource.getiBZxAddress()
+    if (!account || !bzxContractAddress) return result
+    const etherscanApiKey = configProviders.Etherscan_Api;
+    let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${WithdrawCollateralEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
+    const withdrawCollateralEventResponse = await fetch(etherscanApiUrl);
+    const withdrawCollateralEventResponseJson = await withdrawCollateralEventResponse.json();
+    if (withdrawCollateralEventResponseJson.status !== "1") return result;
+    const events = withdrawCollateralEventResponseJson.result;
+    result = events.reverse().map((event: any) => {
+      const userAddress = event.topics[1].replace("0x000000000000000000000000", "0x");
+      const withdrawTokenAddress = event.topics[2].replace("0x000000000000000000000000", "0x");
+      const withdrawToken = this.contractsSource!.getAssetFromAddress(withdrawTokenAddress);
+      if (withdrawToken === Asset.UNKNOWN) return null;
+      
+      const loanId = event.topics[3];
+      const data = event.data.replace("0x", "");
+      const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
+      if (!dataSegments) return result;
+      const withdrawAmount = new BigNumber(parseInt(dataSegments[0], 16));
+      const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000);
+      const txHash = event.transactionHash;
+      return new WithdrawCollateralEvent(
+        userAddress,
+        withdrawToken,
+        loanId,
+        withdrawAmount,
         timeStamp,
         txHash
       )

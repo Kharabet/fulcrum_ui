@@ -18,6 +18,8 @@ import { PreloaderChart } from "../components/PreloaderChart";
 
 
 import "../styles/components/history-token-grid.scss";
+import { WithdrawCollateralEvent } from "../domain/events/WithdrawCollateralEvent";
+import { DepositCollateralEvent } from "../domain/events/DepositCollateralEvent";
 
 export interface IHistoryTokenGridProps {
   isMobileMedia: boolean;
@@ -178,7 +180,7 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
 
           }
           else {
-            positionValue = event.loanCloseAmount.div(10**18);
+            positionValue = event.loanCloseAmount.div(10 ** 18);
             value = event.positionCloseSize.div(10 ** 18);
             tradePrice = event.exitPrice.div(10 ** 18);
             profit = (openPrice.minus(tradePrice)).times(positionValue);
@@ -206,13 +208,13 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
             positionValue = event.repayAmount.div(event.collateralToLoanRate);
             tradePrice = event.collateralToLoanRate.div(10 ** 18);
             value = positionValue.times(tradePrice);
-            profit = value.minus(event.collateralWithdrawAmount.times(event.collateralToLoanRate).div(10**36));
+            profit = value.minus(event.collateralWithdrawAmount.times(event.collateralToLoanRate).div(10 ** 36));
           }
           else {
             positionValue = event.repayAmount.div(10 ** 18);
             tradePrice = new BigNumber(10 ** 36).div(event.collateralToLoanRate).div(10 ** 18);
             value = positionValue.times(tradePrice);
-            profit = value.minus(event.collateralWithdrawAmount.div(10**18));
+            profit = value.minus(event.collateralWithdrawAmount.div(10 ** 18));
           }
 
           positionEventsGroup.events.push(new PositionHistoryData(
@@ -228,9 +230,62 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
             payTradingFeeEvent,
             earnRewardEvent
           ))
-        }
-      }
+        } else if (event instanceof DepositCollateralEvent) {
+          const action = "Deposited";
+          if (positionType === PositionType.LONG) {
+            positionValue = event.depositAmount.div(10 ** 18);
+          }
+          else {            
+            const swapRateBaseToken = await this.getAssetUSDRate(baseAsset, event.timeStamp);
+            const swapRateQuoteToken = await this.getAssetUSDRate(quoteAsset, event.timeStamp);
+            positionValue = event.depositAmount.div(10 ** 18).times(new BigNumber(swapRateQuoteToken).div(swapRateBaseToken));
+          }
+          tradePrice = new BigNumber(0);
 
+          positionEventsGroup.events.push(new PositionHistoryData(
+            loanId,
+            timeStamp,
+            action,
+            positionValue,
+            tradePrice,
+            value,
+            profit,
+            txHash,
+            quoteAsset,
+            payTradingFeeEvent,
+            earnRewardEvent
+          ))
+        } else if (event instanceof WithdrawCollateralEvent) {
+          const action = "Withdrew";
+          if (positionType === PositionType.LONG) {
+            positionValue = event.withdrawAmount.div(10 ** 18);
+          }
+          else {
+            const swapRateBaseToken = await this.getAssetUSDRate(baseAsset, event.timeStamp);
+            const swapRateQuoteToken = await this.getAssetUSDRate(quoteAsset, event.timeStamp);
+            positionValue = event.withdrawAmount.div(10 ** 18).times(new BigNumber(swapRateQuoteToken).div(swapRateBaseToken));
+          }
+          tradePrice = new BigNumber(0);
+
+          positionEventsGroup.events.push(new PositionHistoryData(
+            loanId,
+            timeStamp,
+            action,
+            positionValue,
+            tradePrice,
+            value,
+            profit,
+            txHash,
+            quoteAsset,
+            payTradingFeeEvent,
+            earnRewardEvent
+          ))
+        } else {
+          //do nothing 
+        }
+
+
+      }
       historyRowsData.push({
         eventsGroup: positionEventsGroup,
         stablecoins: this.props.stablecoins,
@@ -245,7 +300,13 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
 
     return historyRowsData;
   };
+  public getAssetUSDRate = async (asset: Asset, date: Date) => {
+    const token = asset === Asset.fWETH ? Asset.ETH : asset;
 
+    const swapToUsdHistoryRateRequest = await fetch(`https://api.bzx.network/v1/asset-history-price?asset=${token.toLowerCase()}&date=${date.getTime()}`);
+    const swapToUsdHistoryRateResponse = (await swapToUsdHistoryRateRequest.json()).data;
+    return swapToUsdHistoryRateResponse.swapToUSDPrice;
+  }
   public nextPagination = () => {
     if (this.state.numberPagination !== this.state.quantityGrids && !this.state.isLastRow) {
       this.setState({ ...this.state, numberPagination: this.state.numberPagination + 1 });

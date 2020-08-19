@@ -28,6 +28,8 @@ import { LiquidationEvent } from "../domain/events/LiquidationEvent";
 import { CloseWithSwapEvent } from "../domain/events/CloseWithSwapEvent";
 
 import  ManageTokenGrid  from '../components/ManageTokenGrid';
+import { WithdrawCollateralEvent } from "../domain/events/WithdrawCollateralEvent";
+import { DepositCollateralEvent } from "../domain/events/DepositCollateralEvent";
 // const ManageTokenGrid = React.lazy(() => import('../components/ManageTokenGrid'));
 const TradeForm = React.lazy(() => import('../components/TradeForm'));
 const ManageCollateralForm = React.lazy(() => import('../components/ManageCollateralForm'));
@@ -463,9 +465,9 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
           }
         }
         else {
-          positionValue = loan.loanData!.principal.div(10 ** 18);
           value = loan.loanData!.collateral.div(10 ** 18);
           collateral = ((loan.loanData!.collateral.div(10 ** 18)).minus(loan.loanData!.principal.div(currentCollateralToPrincipalRate).div(10 ** 18)));
+          positionValue = (loan.loanData!.collateral.div(10 ** 18).times(currentCollateralToPrincipalRate)).minus(loan.loanData!.principal.div(10 ** 18));
           openPrice = new BigNumber(10 ** 36).div(loan.loanData!.startRate).div(10 ** 18);
           liquidationPrice = new BigNumber(10 ** 36).div(liquidation_collateralToLoanRate).div(10 ** 18);
           startingValue = (loan.loanData!.collateral.minus(loan.loanData!.principal.div(loan.loanData!.startRate).times(10 ** 18))).div(10 ** 18);
@@ -517,6 +519,8 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     const tradeEvents = await FulcrumProvider.Instance.getTradeHistory();
     const closeWithSwapEvents = await FulcrumProvider.Instance.getCloseWithSwapHistory();
     const liquidationEvents = await FulcrumProvider.Instance.getLiquidationHistory();
+    const depositCollateralEvents = await FulcrumProvider.Instance.getDepositCollateralHistory();
+    const withdrawCollateralEvents = await FulcrumProvider.Instance.getWithdrawCollateralHistory();
     const earnRewardEvents = await FulcrumProvider.Instance.getEarnRewardHistory();
     const payTradingFeeEvents = await FulcrumProvider.Instance.getPayTradingFeeHistory();
     // const tokens = Array.from(new Set(this.baseTokens.concat(this.quoteTokens)));
@@ -526,7 +530,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     //   tokenRates.push({ token, rate });
     // });
 
-    const groupBy = function (xs: (TradeEvent | LiquidationEvent | CloseWithSwapEvent)[], key: any) {
+    const groupBy = function (xs: (TradeEvent | LiquidationEvent | CloseWithSwapEvent | DepositCollateralEvent | WithdrawCollateralEvent)[], key: any) {
       return xs.reduce(function (rv: any, x: any) {
         (rv[x[key]] = rv[x[key]] || []).push(x);
         return rv;
@@ -534,7 +538,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     };
 
     //@ts-ignore
-    const events = tradeEvents.concat(closeWithSwapEvents).concat(liquidationEvents);
+    const events = tradeEvents.concat(closeWithSwapEvents).concat(liquidationEvents).concat(depositCollateralEvents).concat(withdrawCollateralEvents);
     //@ts-ignore
     const groupedEvents = groupBy(events.sort((a, b) => b.timeStamp.getTime() - a.timeStamp.getTime()), "loanId");
 

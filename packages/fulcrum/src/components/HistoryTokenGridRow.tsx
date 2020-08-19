@@ -59,7 +59,8 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
     const latestEvent = { ...this.props.eventsGroup.events[this.props.eventsGroup.events.length - 1] };
 
     if (latestEvent.payTradingFeeEvent && !this.props.stablecoins.includes(latestEvent.payTradingFeeEvent.token)) {
-      const feeAssetUsdRate = await this.getAssetUSDRate(latestEvent.payTradingFeeEvent.token, latestEvent.payTradingFeeEvent.timeStamp);
+      const token = latestEvent.payTradingFeeEvent.token === Asset.fWETH ? Asset.ETH : latestEvent.payTradingFeeEvent.token;
+      const feeAssetUsdRate = await this.getAssetUSDRate(token, latestEvent.payTradingFeeEvent.timeStamp);
       latestEvent.payTradingFeeEvent = { ...latestEvent.payTradingFeeEvent! };//deep copy
       latestEvent.payTradingFeeEvent.amount = latestEvent.payTradingFeeEvent.amount.times(feeAssetUsdRate);
     }
@@ -115,8 +116,9 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
     const swappedEvents = await Promise.all(croppedEvent.map(async (swappedEvent) => {
       const event = { ...swappedEvent };
       if (event.payTradingFeeEvent && !this.props.stablecoins.includes(event.payTradingFeeEvent.token)) {
-        const feeAssetUsdRate = await this.getAssetUSDRate(event.payTradingFeeEvent.token, event.payTradingFeeEvent.timeStamp);
-        event.payTradingFeeEvent = { ...swappedEvent.payTradingFeeEvent! };//deep copy
+        const token = event.payTradingFeeEvent.token === Asset.fWETH ? Asset.ETH : event.payTradingFeeEvent.token;
+        const feeAssetUsdRate = await this.getAssetUSDRate(token, event.payTradingFeeEvent.timeStamp);
+          event.payTradingFeeEvent = { ...swappedEvent.payTradingFeeEvent! };//deep copy
         event.payTradingFeeEvent.amount = event.payTradingFeeEvent.amount.times(feeAssetUsdRate);
       }
 
@@ -295,7 +297,9 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
       </div>)
   }
 
-  public getAssetUSDRate = async (token: Asset, date: Date) => {
+  public getAssetUSDRate = async (asset: Asset, date: Date) => {
+    const token = asset === Asset.fWETH ? Asset.ETH : asset;
+
     const swapToUsdHistoryRateRequest = await fetch(`https://api.bzx.network/v1/asset-history-price?asset=${token.toLowerCase()}&date=${date.getTime()}`);
     const swapToUsdHistoryRateResponse = (await swapToUsdHistoryRateRequest.json()).data;
     return swapToUsdHistoryRateResponse.swapToUSDPrice;
