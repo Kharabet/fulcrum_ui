@@ -248,13 +248,14 @@ export class ExplorerProvider {
             const loanId = event.topics[3];
             const data = event.data.replace("0x", "");
             const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
-            if (!dataSegments) return result;
+            if (!dataSegments) return null;
             const lender = dataSegments[0].replace("000000000000000000000000", "0x");
 
             const loanTokenAddress = dataSegments[1].replace("000000000000000000000000", "0x");
             const collateralTokenAddress = dataSegments[2].replace("000000000000000000000000", "0x");
             const loanToken = this.contractsSource!.getAssetFromAddress(loanTokenAddress);
             const collateralToken = this.contractsSource!.getAssetFromAddress(collateralTokenAddress);
+            if (loanToken === Asset.UNKNOWN || collateralToken === Asset.UNKNOWN) return null;
             const repayAmount = new BigNumber(parseInt(dataSegments[3], 16));
             const collateralWithdrawAmount = new BigNumber(parseInt(dataSegments[4], 16));
             const collateralToLoanRate = new BigNumber(parseInt(dataSegments[5], 16));
@@ -276,7 +277,7 @@ export class ExplorerProvider {
                 txHash
             )
 
-        })
+        }).filter((e: any) => e);
         return result;
     }
 
@@ -297,12 +298,12 @@ export class ExplorerProvider {
             const loandId = event.topics[3];
             const data = event.data.replace("0x", "");
             const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
-            if (!dataSegments) return result;
+            if (!dataSegments) return null;
             const collateralTokenAddress = dataSegments[0].replace("000000000000000000000000", "0x");
             const loanTokenAddress = dataSegments[1].replace("000000000000000000000000", "0x");
             const loanToken = this.contractsSource!.getAssetFromAddress(loanTokenAddress);
             const collateralToken = this.contractsSource!.getAssetFromAddress(collateralTokenAddress);
-
+            if (loanToken === Asset.UNKNOWN || collateralToken === Asset.UNKNOWN) return null;
             const positionSize = new BigNumber(parseInt(dataSegments[2], 16));
             const borrowedAmount = new BigNumber(parseInt(dataSegments[3], 16));
             const interestRate = new BigNumber(parseInt(dataSegments[4], 16));
@@ -329,7 +330,7 @@ export class ExplorerProvider {
                 txHash
             )
 
-        })
+        }).filter((e: any) => e);
         return result
 
     }
@@ -351,11 +352,12 @@ export class ExplorerProvider {
             const loandId = event.topics[3];
             const data = event.data.replace("0x", "");
             const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
-            if (!dataSegments) return result;
+            if (!dataSegments) return null;
             const collateralTokenAddress = dataSegments[0].replace("000000000000000000000000", "0x");
             const loanTokenAddress = dataSegments[1].replace("000000000000000000000000", "0x");
             const collateralToken = this.contractsSource!.getAssetFromAddress(collateralTokenAddress);
             const loanToken = this.contractsSource!.getAssetFromAddress(loanTokenAddress);
+            if (loanToken === Asset.UNKNOWN || collateralToken === Asset.UNKNOWN) return null;
             const closer = dataSegments[2].replace("000000000000000000000000", "0x");
             const positionCloseSize = new BigNumber(parseInt(dataSegments[3], 16));
             const loanCloseAmount = new BigNumber(parseInt(dataSegments[4], 16));
@@ -378,7 +380,7 @@ export class ExplorerProvider {
                 txHash
             )
 
-        })
+        }).filter((e: any) => e);
         return result
 
     }
@@ -400,12 +402,13 @@ export class ExplorerProvider {
             const loandId = event.topics[3];
             const data = event.data.replace("0x", "");
             const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
-            if (!dataSegments) return result;
+            if (!dataSegments) return null;
             const closer = dataSegments[0].replace("000000000000000000000000", "0x");
             const loanTokenAddress = dataSegments[1].replace("000000000000000000000000", "0x");
             const collateralTokenAddress = dataSegments[2].replace("000000000000000000000000", "0x");
             const loanToken = this.contractsSource!.getAssetFromAddress(loanTokenAddress);
             const collateralToken = this.contractsSource!.getAssetFromAddress(collateralTokenAddress);
+            if (loanToken === Asset.UNKNOWN || collateralToken === Asset.UNKNOWN) return null;
             const repayAmount = new BigNumber(parseInt(dataSegments[3], 16));
             const collateralWithdrawAmount = new BigNumber(parseInt(dataSegments[4], 16));
             const collateralToLoanRate = new BigNumber(parseInt(dataSegments[5], 16));
@@ -426,7 +429,7 @@ export class ExplorerProvider {
                 timeStamp,
                 txHash
             )
-        })
+        }).filter((e: any) => e);
         return result;
     }
 
@@ -447,11 +450,12 @@ export class ExplorerProvider {
             const loandId = event.topics[3];
             const data = event.data.replace("0x", "");
             const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
-            if (!dataSegments) return result;
+            if (!dataSegments) return null;
             const loanTokenAddress = dataSegments[0].replace("000000000000000000000000", "0x");
             const collateralTokenAddress = dataSegments[1].replace("000000000000000000000000", "0x");
             const loanToken = this.contractsSource!.getAssetFromAddress(loanTokenAddress);
             const collateralToken = this.contractsSource!.getAssetFromAddress(collateralTokenAddress);
+            if (loanToken === Asset.UNKNOWN || collateralToken === Asset.UNKNOWN) return null;
             const newPrincipal = new BigNumber(parseInt(dataSegments[2], 16));
             const newCollateral = new BigNumber(parseInt(dataSegments[3], 16));
             const interestRate = new BigNumber(parseInt(dataSegments[4], 16));
@@ -475,7 +479,7 @@ export class ExplorerProvider {
                 timeStamp,
                 txHash
             )
-        })
+        }).filter((e: any) => e);
         return result;
     }
 
@@ -492,12 +496,13 @@ export class ExplorerProvider {
             isUnhealthy
         );
 
-        result = await Promise.all(loansData
-            .map(async e => {
+        loansData
+            .forEach(async e => {
                 const loanAsset = this.contractsSource!.getAssetFromAddress(e.loanToken);
+                const collateralAsset = this.contractsSource!.getAssetFromAddress(e.collateralToken);
+                if (loanAsset === Asset.UNKNOWN || collateralAsset === Asset.UNKNOWN) return null;
                 const loandAssetUsdRate = await this.getSwapToUsdRate(loanAsset);
                 const loanPrecision = AssetsDictionary.assets.get(loanAsset)!.decimals || 18;
-                const collateralAsset = this.contractsSource!.getAssetFromAddress(e.collateralToken);
                 const collateralPrecision = AssetsDictionary.assets.get(collateralAsset)!.decimals || 18;
                 let amountOwned = e.principal.minus(e.interestDepositRemaining);
                 if (amountOwned.lte(0)) {
@@ -505,7 +510,7 @@ export class ExplorerProvider {
                 } else {
                     amountOwned = amountOwned.dividedBy(10 ** loanPrecision).dp(5, BigNumber.ROUND_CEIL);
                 }
-                return {
+                result.push({
                     loanId: e.loanId,
                     loanAsset: loanAsset,
                     collateralAsset: collateralAsset,
@@ -513,9 +518,9 @@ export class ExplorerProvider {
                     maxLiquidatable: e.maxLiquidatable.dividedBy(10 ** loanPrecision),
                     maxSeizable: e.maxSeizable.dividedBy(10 ** collateralPrecision),
                     loanData: e
-                };
-            })
-        );
+                });
+            });
+
         return result;
     }
 
@@ -534,13 +539,14 @@ export class ExplorerProvider {
             const burner = event.topics[1].replace("0x000000000000000000000000", "0x");
             const data = event.data.replace("0x", "");
             const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
-            if (!dataSegments) return result;
+            if (!dataSegments) return null;
             const tokenAmount = new BigNumber(parseInt(dataSegments[0], 16));
             const assetAmount = new BigNumber(parseInt(dataSegments[1], 16));
             const price = new BigNumber(parseInt(dataSegments[2], 16));
             const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000);
             const txHash = event.transactionHash;
             const asset = this.contractsSource!.getITokenByErc20Address(event.address);
+            if (asset === Asset.UNKNOWN) return null;
             return new BurnEvent(
                 burner,
                 tokenAmount,
@@ -550,7 +556,7 @@ export class ExplorerProvider {
                 txHash,
                 asset
             )
-        })
+        }).filter((e: any) => e);
         return result;
     }
 
@@ -569,13 +575,14 @@ export class ExplorerProvider {
             const minter = event.topics[1].replace("0x000000000000000000000000", "0x");
             const data = event.data.replace("0x", "");
             const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
-            if (!dataSegments) return result;
+            if (!dataSegments) return null;
             const tokenAmount = new BigNumber(parseInt(dataSegments[0], 16));
             const assetAmount = new BigNumber(parseInt(dataSegments[1], 16));
             const price = new BigNumber(parseInt(dataSegments[2], 16));
             const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000);
             const txHash = event.transactionHash;
             const asset = this.contractsSource!.getITokenByErc20Address(event.address);
+            if (asset === Asset.UNKNOWN) return null;
             return new MintEvent(
                 minter,
                 tokenAmount,
@@ -585,7 +592,7 @@ export class ExplorerProvider {
                 txHash,
                 asset
             )
-        })
+        }).filter((e: any) => e);
         return result;
     }
 
