@@ -430,10 +430,13 @@ export class FulcrumProvider {
         return new BigNumber(10**18).multipliedBy(750000);
       case Asset.KNC:
         return new BigNumber(10**18).multipliedBy(550000);
+      case Asset.BAT:
+        return new BigNumber(10**18).multipliedBy(750000);
       case Asset.DAI:
       case Asset.SAI:
-        return new BigNumber(10**18).multipliedBy(375000);
       case Asset.USDC:
+      case Asset.USDT:
+      case Asset.SUSD:
         return new BigNumber(10**6).multipliedBy(375000);
       case Asset.REP:
         return new BigNumber(10**18).multipliedBy(15000);

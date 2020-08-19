@@ -1,8 +1,10 @@
 export enum Asset {
   ETH = "ETH",
-  WETH = "ETH",
+  WETH = "WETH",
+  fWETH = "fWETH",
   SAI = "SAI",
   DAI = "DAI",
+  CHAI = "CHAI",
   USDC = "USDC",
   USDT = "USDT",
   SUSD = "SUSD",
@@ -15,4 +17,3 @@ export enum Asset {
   KNC = "KNC",
   UNKNOWN = "UNKNOWN"
 }
-

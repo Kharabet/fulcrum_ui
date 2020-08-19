@@ -120,7 +120,14 @@ export class ContractsSource {
             address = "0x1885a748d7393f5d23db8df01ea3a33f4d85eac5";
             break;
           case 42:
-            address = "0x0afBFCe9DB35FFd1dFdF144A788fa196FD08EFe9";
+            address = "0x0afbfce9db35ffd1dfdf144a788fa196fd08efe9";
+            break;
+        }
+        break;
+      case Asset.fWETH:
+        switch (this.networkId) {
+          case 42:
+            address = "0x9d2015dd5306c08bdd8530605137d26c04dedbd8";
             break;
         }
         break;
@@ -130,7 +137,7 @@ export class ContractsSource {
             address = "0x8326645f3aa6de6420102fdb7da9e3a91855045b";
             break;
           case 42:
-            address = "";
+            address = "0x6b9f03e05423cc8d00617497890c0872ff33d4e8";
             break;
         }
         break;
@@ -140,7 +147,7 @@ export class ContractsSource {
             address = "0x14094949152eddbfcd073717200da82fed8dc960";
             break;
           case 42:
-            address = "0xa1e58f3b1927743393b25f261471e1f2d3d9f0f6";
+            address = "";
             break;
         }
         break;
@@ -156,7 +163,7 @@ export class ContractsSource {
             address = "0xb530f422ff1520cbb76a8300e39bd4f55bc03bbc";
             break;
           case 42:
-            address = "0xd40C0e7230c5bde65B61B5EDDc3E973f76Aff252";
+            address = "0x73d0b4834ba4ada053d8282c02305ecdac2304f0";
             break;
         }
         break;
@@ -165,6 +172,9 @@ export class ContractsSource {
           case 1:
             address = "0xf013406a0b1d544238083df0b93ad0d2cbe0f65f";
             break;
+          case 42:
+            address = "0xaac9822f31e5aefb32bc228dcf259f23b49b9855";
+            break;
         }
         break;
       case Asset.SUSD:
@@ -172,35 +182,38 @@ export class ContractsSource {
           case 1:
             address = "0x49f4592e641820e928f9919ef4abd92a719b4b49";
             break;
+          case 42:
+            address = "0x1cac31ecc90912eea18ccadfab15fd9c0e77cbab";
+            break;
         }
         break;
       case Asset.BAT:
         switch (this.networkId) {
           case 1:
-            address = "0xA8b65249DE7f85494BC1fe75F525f568aa7dfa39";
+            address = "0xa8b65249de7f85494bc1fe75f525f568aa7dfa39";
             break;
           case 42:
-            address = "";
+            address = "0xb59659564012fa337bb8b9e626b7964b5349f047";
             break;
         }
         break;
       case Asset.KNC:
         switch (this.networkId) {
           case 1:
-            address = "0x1cC9567EA2eB740824a45F8026cCF8e46973234D";
+            address = "0x1cc9567ea2eb740824a45f8026ccf8e46973234d";
             break;
           case 42:
-            address = "0x988F40e4B07aC9b5e78533282Ba14a57440827e8";
+            address = "0xde7a60c3581f0d8c8723a71c28579131984a410c";
             break;
         }
         break;
       case Asset.LINK:
         switch (this.networkId) {
           case 1:
-            address = "0x1D496da96caf6b518b133736beca85D5C4F9cBc5";
+            address = "0x1d496da96caf6b518b133736beca85d5c4f9cbc5";
             break;
           case 42:
-            address = "";
+            address = "0x76754c763a23e9202cc721584fbaf6012ecd8fba";
             break;
         }
         break;
@@ -210,28 +223,37 @@ export class ContractsSource {
             address = "";
             break;
           case 42:
-            address = "";
+            address = "0x3e72500122c3afd64afe0306d7fbc7b8bd82b7d2";
             break;
         }
         break;
       case Asset.REP:
         switch (this.networkId) {
           case 1:
-            address = "0xBd56E9477Fc6997609Cf45F84795eFbDAC642Ff1";
+            address = "0xbd56e9477fc6997609cf45f84795efbdac642ff1";
+            break;
+          case 42:
+            address = "0x8638b468bf02bdb8fc8c5b33dca8c2d16c3fd67b";
             break;
         }
         break;
       case Asset.WBTC:
         switch (this.networkId) {
           case 1:
-            address = "0xBA9262578EFef8b3aFf7F60Cd629d6CC8859C8b5";
+            address = "0xba9262578efef8b3aff7f60cd629d6cc8859c8b5";
+            break;
+          case 42:
+            address = "0x73d4b4ab88eab2a1e6ce495de85c2b04c2918b69";
             break;
         }
         break;
       case Asset.ZRX:
         switch (this.networkId) {
           case 1:
-            address = "0xA7Eb2bc82df18013ecC2A6C533fc29446442EDEe";
+            address = "0xa7eb2bc82df18013ecc2a6c533fc29446442edee";
+            break;
+          case 42:
+            address = "0xbac711d9963f0db23613f3c338a7a1af151c0696";
             break;
         }
         break;
@@ -334,20 +356,61 @@ export class ContractsSource {
         }
         break;
       case 42:
+          /*switch (addressErc20) {
+            case "0xd0a1e359811322d97991e03f863a0c30c2cf029c":
+              asset = Asset.ETH;
+              break;
+            case "0xc4375b7de8af5a38a93548eb8453a498222c4ff2":
+              asset = Asset.SAI;
+              break;
+            case "0x4f96fe3b7a6cf9725f59d353f723c1bdb64ca6aa":
+              asset = Asset.DAI;
+              break;
+            case "0x75b0622cec14130172eae9cf166b92e5c112faff":
+              asset = Asset.USDC;
+              break;
+            case "0xad67cb4d63c9da94aca37fdf2761aadf780ff4a2":
+              asset = Asset.KNC;
+              break;
+          }*/
         switch (addressErc20) {
-          case "0xd0a1e359811322d97991e03f863a0c30c2cf029c":
-            asset = Asset.WETH;
+          case "0xe65d99a06d0ded0d318e31db3ae5d77629c625fc":
+            asset = Asset.fWETH;
             break;
-          case "0xc4375b7de8af5a38a93548eb8453a498222c4ff2":
+          case "0x7143e05608c4bc7e83a3b72a28de2497f62b7e59":
             asset = Asset.SAI;
             break;
-          case "0x4f96fe3b7a6cf9725f59d353f723c1bdb64ca6aa":
+          case "0x8f746ec7ed5cc265b90e7af0f5b07b4406c9dda8":
             asset = Asset.DAI;
             break;
-          case "0x75b0622cec14130172eae9cf166b92e5c112faff":
+          case "0x20bdf254ca63883c3a83424753bb40185af29ce4":
             asset = Asset.USDC;
             break;
-          case "0xad67cb4d63c9da94aca37fdf2761aadf780ff4a2":
+          case "0x4c4462c6bca4c92bf41c40f9a4047f35fd296996":
+            asset = Asset.USDT;
+            break;
+          case "0xfcfa14dbc71bee2a2188431fa15e1f8d57d93c62":
+            asset = Asset.SUSD;
+            break;
+          case "0xc4b7a70c3694cb1d37a18e6c6bd9271828c382a4":
+            asset = Asset.WBTC;
+            break;
+          case "0xfb9325e5f4fc9629525427a1c92c0f4d723500cf":
+            asset = Asset.LINK;
+            break;
+          case "0x4893919982648ffefe4324538d54402387c20198":
+            asset = Asset.MKR;
+            break;
+          case "0x629b28c5aa5c953df2511d2e48d316a07eafb3e3":
+            asset = Asset.ZRX;
+            break;
+          case "0xac091ccf1b0c601182f3ccf3eb20f291aba39029":
+            asset = Asset.BAT;
+            break;
+          case "0x39ac2818e08d285abe548f77a0819651b8b5d213":
+            asset = Asset.REP;
+            break;
+          case "0x02357164ba33f299f7654cbb29da29db38ae1f44":
             asset = Asset.KNC;
             break;
         }
