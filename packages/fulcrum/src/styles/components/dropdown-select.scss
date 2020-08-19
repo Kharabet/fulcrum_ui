@@ -97,6 +97,71 @@
   list-style: none;
   background-color: var(--select-option);
   border-radius: 4px;
+
+  &__search {
+    position: relative;
+  }
+
+  &__input {
+    width: 100%;
+    height: 31px;
+    line-height: 31px;
+    background-color: #8b97a9;
+    color: transparent;
+    caret-color: #fff;
+    border: none;
+    outline: none;
+    transform: scaleY(1.5);
+    padding: 0 48px;
+    margin-top: 8px;
+    margin-bottom: 16px;
+    font-size: 14px;
+    border-radius: 6px 6px 0 0;
+  }
+
+  &__value {
+    position: absolute;
+    left: 48px;
+    top: 0;
+    pointer-events: none;
+    line-height: 48px;
+    font-size: 14px;
+  }
+
+  [class*="icon"] {
+    position: absolute;
+    top: 9px;
+    height: 28px;
+    width: 28px;
+  }
+  .icon-close {
+    pointer-events: none;
+    left: 11px;
+    padding: 6px;
+  }
+  .icon-search {
+    cursor: pointer;
+    right: -3px;
+
+    padding: 8px;
+    path {
+      stroke: #e9f4ff;
+    }
+  }
+
+  .message {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-weight: 600;
+    font-size: 16px;
+    height: 480px;
+    color: #e9f4ff;
+    line-height: 25px;
+    padding: 0 70px 48px;
+  }
+
   li {
     margin: 0;
     padding: 10px 0 10px 15px;
@@ -122,10 +187,10 @@
       display: none;
     }
   }
-  svg{
+  svg {
     width: 20px;
     height: 20px;
-    margin-right: 10px;
+    margin-right: 14px;
     .eth-svg {
       fill: var(--bg-eth);
     }
