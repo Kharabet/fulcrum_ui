@@ -212,10 +212,10 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     return (
       <div className="trade-page">
         <main>
-          <InfoBlock localstorageItemProp="trade-page-info">
+          {/* <InfoBlock localstorageItemProp="trade-page-info">
             Currently only our lending, unlending, and closing of position functions are enabled. <br />
               Full functionality will return after a thorough audit of our newly implemented and preexisting smart contracts.
-          </InfoBlock>
+          </InfoBlock> */}
           <TokenGridTabs
             baseTokens={this.baseTokens}
             quoteTokens={this.quoteTokens}

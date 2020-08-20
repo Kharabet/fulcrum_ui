@@ -53,10 +53,10 @@ export default class LendPage extends PureComponent<ILendPageProps, ILendPageSta
     return (
       <div className="lend-page">
         <main className="lend-page-main">
-          <InfoBlock localstorageItemProp="lend-page-info">
+          {/* <InfoBlock localstorageItemProp="lend-page-info">
             Currently only our lending, unlending, and closing of position functions are enabled.  <br />
               Full functionality will return after a thorough audit of our newly implemented and preexisting smart contracts.
-          </InfoBlock>
+          </InfoBlock> */}
 
           {this.props.isMobileMedia && <div className="lend-page__header">Lend</div>
           }
