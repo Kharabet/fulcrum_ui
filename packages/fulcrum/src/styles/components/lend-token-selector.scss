@@ -23,7 +23,7 @@
     border: 2px solid transparent;
 
     &.loading-transaction {
-      background-color: #1f262e;
+      background-color: var(--secondary-row);
       .lend-transaction-step {
         margin-top: 45px;
         display: flex;

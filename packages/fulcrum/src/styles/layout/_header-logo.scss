@@ -22,6 +22,12 @@
     }
     .fulcrum-logo {
       display: flex;
+      svg {
+        width: 100px;
+        [data-theme="light"] & path {
+          fill: #283049;
+        }
+      }
       @media screen and (max-width: $breakpoint-laptop-max) and (min-width: $breakpoint-mobile-min) {
         display: none;
       }
