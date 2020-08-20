@@ -16,20 +16,20 @@ permalink: lending
                     <p class="fs-16 lh-160 mb-50 mx-xs-auto mb-xs-30 c-secondary mw-390">Flexible, high-yield returns – no minimum deposit, no lock-up period, withdraw anytime.</p>
                     <div class="flex fd-xs-c">
                         <div class="flex ai-c wrap-white mr-25 mx-xs-auto apr-component" data-token="dai">
-                            <div class="icon-66 icon-sm-50 mr-15">
+                            <div class="icon-66 icon-sm-40 mr-15 flex ai-c">
                                 {% include svg/dai.svg %}
                             </div>
                             <div class="flex">
-                                <p class="fs-40 lh-100 c-primary-blue mr-15"><span class="fw-800 apr-value">7.2</span>%</p>
+                                <p class="fs-40 lh-100 c-primary-blue mr-15 mr-sm-5"><span class="fw-800 apr-value">7.2</span>%</p>
                                 <span class="fs-18 lh-140 fw-600 c-gray">APR</span>
                             </div>
                         </div>
                         <div class="flex ai-c wrap-white mr-25 mx-xs-auto apr-component" data-token="usdc">
-                            <div class="icon-66 icon-sm-50 mr-15">
+                            <div class="icon-66 icon-sm-40 mr-15 flex ai-c">
                                 {% include svg/usdc.svg %}
                             </div>
                             <div class="flex">
-                                <p class="fs-40 lh-100 c-primary-blue mr-15"><span class="fw-800 apr-value">6.5</span>%</p>
+                                <p class="fs-40 lh-100 c-primary-blue mr-15 mr-sm-5"><span class="fw-800 apr-value">6.5</span>%</p>
                                 <span class="fs-18 lh-140 fw-600 c-gray">APR</span>
                             </div>
                         </div>
@@ -45,70 +45,20 @@ permalink: lending
                     <h2 class="mb-md-25">Fulcrum <br /> supports lending</h2>
                 </div>
             </div>
-            <div class="col col-7 col-lg-9 col-md-12 fw-w jc-fs jc-sm-fs">
-                <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-token="sai">
-                    <div class="icon-50 mr-15 mr-xs-9">
-                        {% include svg/sai.svg %}
-                    </div>
-                    <div class="wrap-apr-value">
-                        <p class="lh-100 fw-700 c-gray">SAI</p>
-                        <p class="fs-24 c-primary lh-125"><span class="fw-800 apr-value">5.3</span>%</p>
-                    </div>
-                </div>
-                <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-token="knc">
-                    <div class="icon-50 mr-15 mr-xs-9">
-                        {% include svg/knc.svg %}
-                    </div>
-                    <div class="wrap-apr-value">
-                        <p class="lh-100 fw-700 c-gray">KNC</p>
-                        <p class="fs-24 c-primary lh-125"><span class="fw-800 apr-value">5.3</span>%</p>
-                    </div>
-                </div>
-                <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-token="zrx">
-                    <div class="icon-50 mr-15 mr-xs-9">
-                        {% include svg/zrx.svg %}
-                    </div>
-                    <div class="wrap-apr-value">
-                        <p class="lh-100 fw-700 c-gray">ZRX</p>
-                        <p class="fs-24 c-primary lh-125"><span class="fw-800 apr-value">1.6</span>%</p>
-                    </div>
-                </div>
-                <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-token="eth">
-                    <div class="icon-50 mr-15 mr-xs-9">
-                        {% include svg/eth.svg %}
-                    </div>
-                    <div class="wrap-apr-value">
-                        <p class="lh-100 fw-700 c-gray">ETH</p>
-                        <p class="fs-24 c-primary lh-125"><span class="fw-800 apr-value">4.2</span>%</p>
-                    </div>
-                </div>
-                <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-token="link">
-                    <div class="icon-50 mr-15 mr-xs-9">
-                        {% include svg/link.svg %}
-                    </div>
-                    <div class="wrap-apr-value">
-                        <p class="lh-100 fw-700 c-gray">LINK</p>
-                        <p class="fs-24 c-primary lh-125"><span class="fw-800 apr-value">4,2</span>%</p>
-                    </div>
-                </div>
-                <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-token="susd">
-                    <div class="icon-50 mr-15 mr-xs-9">
-                        {% include svg/susd.svg %}
-                    </div>
-                    <div class="wrap-apr-value">
-                        <p class="lh-100 fw-700 c-gray">sUSD</p>
-                        <p class="fs-24 c-primary lh-125"><span class="fw-800 apr-value">4.2</span>%</p>
-                    </div>
-                </div>
-                <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-token="wbtc">
-                    <div class="icon-50 mr-15 mr-xs-9">
-                        {% include svg/wbtc.svg %}
-                    </div>
-                    <div class="wrap-apr-value">
-                        <p class="lh-100 fw-700 c-gray">WBTC</p>
-                        <p class="fs-24 c-primary lh-125"><span class="fw-800 apr-value">4.2</span>%</p>
-                    </div>
-                </div>
+            <div class="col col-7 col-lg-9 col-md-12 apr-wrapper">
+                {% for token in site.data.products %}
+                    {% if token.visibilityApr %}
+                        <div class="flex mr-20 mb-40 mb-xs-30 apr-component" data-token="{{token.name}}">
+                            <div class="icon-50 mr-15 mr-xl-5 mr-xs-9">
+                                {% include svg/{{token.name}}.svg %}
+                            </div>
+                            <div class="wrap-apr-value">
+                                <p class="lh-100 fw-700 c-gray text-uppercase">{{token.name}}</p>
+                                <p class="fs-24 fs-xl-21 c-primary lh-125 apr-value-after"><span class="fw-800 apr-value">5.3</span>%</p>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
             </div>
         </div>
     </div>
@@ -131,14 +81,14 @@ permalink: lending
     </div>
 </section>
 
-<section class="bg-secondary before-primary">
+<!--section class="bg-secondary before-primary">
     <div class="container">
         <div class="row">
             <div class="col col-12">
                 <div class="item-green py-40 p-sm-30 flex jc-c">
                     <div class="col-10 col-md col-md-12 fd-c jc-sb">
                         <p class="fs-24 fs-xs-20 fw-800 lh-150 mb-xs-15">Battle-Tested</p>
-                        <p class="fs-44 fs-xs-28 fw-900 mb-15 lh-140 c-light-green">TVL in our Smart Contracts</p>
+                        <p class="fs-44 fs-xs-28 fw-900 mb-15 lh-140 c-light-green">Currently in Fulcrum</p>
                         <div class="flex jc-sb fd-sm-c fs-44 fs-md-36 fw-900 lh-140">
                             <div class="flex-xs fw-400">
                                 $<span class="fw-900 tvl-value" data-token="all">3,000,000</span>
@@ -161,13 +111,13 @@ permalink: lending
             </div>
         </div>
     </div>
-</section>
+</section-->
 
 <section class="bg-secondary pt-105 pb-75 pb-xs-60 text-center">
     <div class="container">
         <h2 class="mb-75 mb-xs-50 circle"><span class="purple center top-r-60"></span>How safe is it?</h2>
-        <div class="flex fw-sm-w jc-sb">
-            <div class="col col-4 col-sm-12 item-safe fd-c">
+        <div class="flex fw-md-w jc-sb">
+            <div class="col col-3 col-md-6 col-sm-12 item-safe fd-c">
                 <div class="icon-safe mb-40 mb-xs-15">
                     {% include svg/icon-safe-4.svg %}
                 </div>
@@ -175,14 +125,21 @@ permalink: lending
                 <p>Borrowers must maintain the collateral-to-loan ratio specified by the terms of the loan or the collateral will be liquidated to repay the lender and maintain sufficient liquidity for dApps using the protocol.
                 </p>
             </div>
-            <div class="col col-4 col-sm-12 item-safe fd-c">
+            <div class="col col-3 col-md-6 col-sm-12 item-safe fd-c">
+                <div class="icon-safe mb-40 mb-xs-15">
+                    {% include svg/icon-safe-5.svg %}
+                </div>
+                <h3 class="mb-20">Secure Oracles</h3>
+                <p>Chainlink’s <a href="https://feeds.chain.link/">decentralized oracle network</a> is used for price information.</p>
+            </div>
+            <div class="col col-3 col-md-6 col-sm-12 item-safe fd-c">
                 <div class="icon-safe mb-40 mb-xs-15">
                     {% include svg/icon-safe-1.svg %}
                 </div>
                 <h3 class="mb-20">Audited Smart Contracts</h3>
                 <p>The bZx base protocol has been successfully audited by leading blockchain security auditor ZK Labs, headed by Matthew DiFerrante, Dean Eigenmann, Nick Johnson, and Harry Roberts and available <a href="https://github.com/mattdf/audits/blob/master/bZx/bzx-audit.pdf">here.</a></p>
             </div>
-            <div class="col col-4 col-sm-12 item-safe fd-c">
+            <div class="col col-3 col-md-6 col-sm-12 item-safe fd-c">
                 <div class="icon-safe mb-40 mb-xs-15">
                     {% include svg/icon-safe-2.svg %}
                 </div>
@@ -207,33 +164,16 @@ permalink: lending
                     <div class="coins-calc">
                         <p class="fs-18 mb-15 mb-md-0 c-dark-gray text-md-center">Asset</p>
                         <div class="flex fw-w jc-md-c">
-                            <button class="coin-calc active" data-token="dai">
-                                {% include svg/dai.svg %}
-                            </button>
-                            <button class="coin-calc" data-token="usdc">
-                                {% include svg/usdc.svg %}
-                            </button>
-                            <button class="coin-calc" data-token="eth">
-                                {% include svg/eth.svg %}
-                            </button>
-                            <button class="coin-calc" data-token="sai">
-                                {% include svg/sai.svg %}
-                            </button>
-                            <button class="coin-calc" data-token="link">
-                                {% include svg/link.svg %}
-                            </button>
-                            <button class="coin-calc" data-token="knc">
-                                {% include svg/knc.svg %}
-                            </button>
-                            <button class="coin-calc" data-token="susd">
-                                {% include svg/susd.svg %}
-                            </button>
-                            <button class="coin-calc" data-token="wbtc">
-                                {% include svg/wbtc.svg %}
-                            </button>
-                            <button class="coin-calc" data-token="zrx">
-                                {% include svg/zrx.svg %}
-                            </button>
+                            {% for token in site.data.products  %}
+                                {% if token.visibilityEarn %}
+                                    <div class="flex fd-c mb-10">
+                                        <button class="coin-calc" data-token="{{token.name}}">
+                                            {% include svg/{{token.name}}.svg %}
+                                        </button>
+                                        <span>{{token.name}}</span>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
                         </div>
                     </div>
                     <div class="flex fd-c input-calc">
@@ -248,7 +188,7 @@ permalink: lending
                     </div>
                     <div class="result-calc">
                         <p class="fs-18 text-md-center">Earn up to:</p>
-                        <p class="fs-66 lh-140 fw-400 text-md-center wrapper">$<span class="fw-900 earn-usd-value">30,56</span></p>
+                        <p class="fs-66 lh-140 fw-400 text-md-center wrapper"><span class="fw-400 earn-usd-item">$<span class="fw-900 earn-usd-value">30.56</span></span></p>
                         <p class="fs-24 lh-140 fw-600 text-right month">/month</p>
                     </div>
                 </div>
@@ -262,7 +202,7 @@ permalink: lending
             </div>
             <div class="row">
                 <div class="col col-12">
-                    <div class="flex jc-sb fd-md-c mx-md-auto">
+                    <div class="flex jc-sb fd-md-c mx-auto">
                         <div class="item-earn fulcrum active">
                             <div class="head-earn">
                                 {% include svg/fulcrum.svg %}
@@ -319,7 +259,7 @@ permalink: lending
                                 <p class="fs-20 fs-md-13">Betterment</p>
                             </div>
                             <div class="footer-earn">
-                                <p class="fs-32 fs-md-20 mb-5 mb-md-0">$<span class="fw-800 earn-usd-value">2,50</span></p>
+                                <p class="fs-32 fs-md-20 mb-5 mb-md-0">$<span class="fw-800 earn-usd-value">2.50</span></p>
                                 <p class="fs-18 fs-md-20"><span class="fw-800 apr-value">0.05</span>%</p>
                             </div>
                         </div>
@@ -331,7 +271,7 @@ permalink: lending
                                 <p class="fs-20 fs-md-13">Industry Average</p>
                             </div>
                             <div class="footer-earn">
-                                <p class="fs-32 fs-md-20 mb-5 mb-md-0">$<span class="fw-800 earn-usd-value">2,45</span></p>
+                                <p class="fs-32 fs-md-20 mb-5 mb-md-0">$<span class="fw-800 earn-usd-value">2.45</span></p>
                                 <p class="fs-18 fs-md-20"><span class="fw-800 apr-value">0.04</span>%</p>
                             </div>
                         </div>
@@ -353,7 +293,7 @@ permalink: lending
             </div>
         </div>
         <div class="row jc-c">
-            <div class="col col-10 col-lg-12 flex jc-sb fd-md-c">
+            <div class="col col-10 col-lg-12 flex jc-sa fd-md-c">
                 <div class="flex fd-c mb-md-55">
                     <div class="svg-blur mb-45">
                         <span class="lend-count">1</span>
@@ -372,7 +312,7 @@ permalink: lending
         </div>
     </div>
 </section>
-<section class="bg-primary py-60 pt-xs-90 pb-xs-45 text-center">
+<section class="bg-primary py-60 pt-xs-0 pb-xs-45 text-center">
     <div class="container">
         <div class="row">
         <div class="col col-12 fd-c">

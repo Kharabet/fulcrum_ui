@@ -23,6 +23,7 @@
     --coin-bg: #b9c7d6;
     --gain-color: #ffffff;
     --chart-shadow-color: #cbe2ff;
+    --shadow-post: 0px 8px 16px rgba(13, 76, 211, 0.16);
 }
 
 [data-theme="dark"] {
@@ -50,4 +51,5 @@
     --coin-bg: #495460;
     --gain-color: #283049;
     --chart-shadow-color: rgb(0, 0, 0, 0.2);
+    --shadow-post: 0px 12px 20px rgba(0, 0, 0, 0.1);
 }

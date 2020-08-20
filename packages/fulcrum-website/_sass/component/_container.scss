@@ -1,10 +1,16 @@
 .container {  
   margin-left: auto;
   margin-right: auto;
-  @media(min-width: 1200px){
+  @media(min-width: 1410px){
+    width: 1410px;
+  }
+  @media(max-width: 1409px){
     width: 1140px;
   }
-  @media only screen and (max-width: 1199px) and (min-width: 580px)  {
+  @media(max-width: 1139px){
+    width: 100%;
+  }
+  @media only screen and (max-width: 1139px) and (min-width: 580px)  {
     padding: 0 15px;
   }
 }
@@ -49,6 +55,11 @@
 .col-12 {
   width: calc(100% / 12 * 12);
 }
+@media(max-width: 1409px){
+  .col-xl-10{
+    width: calc(100% / 12 * 10);
+  }
+}
 @media(max-width: 1199px){
   .col-lg-3{
     width: calc(100% / 12 * 3);
@@ -67,6 +78,9 @@
   }
   .col-md-5{
     width: calc(100% / 12 * 5);
+  }
+  .col-md-6{
+    width: calc(100% / 12 * 6);
   }
   .col-md-10{
     width: calc(100% / 12 * 10);
