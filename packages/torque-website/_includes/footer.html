@@ -1,4 +1,4 @@
-<footer class="bg-primary">
+<footer class="bg-secondary">
     <div class="container">
         <div class="row fw-sm-w">
             <div class="col col-5 col-sm-12 fd-c mt-sm-30 order-sm-1">
@@ -9,18 +9,20 @@
                     <a href="https://t.me/b0xNet" class="item-link">{% include svg/telegram.svg %}</a>
                     <a href="https://twitter.com/bzxHQ" class="item-link">{% include svg/twitter.svg %}</a>
                 </div>
-                <p class="fs-18 fs-sm-16 fw-600 mb-20 c-dark-gray">Fulcrum is built on bZx protocol</p>
-                <div class="bzx-logo">
-                    <a href="https://bzx.network">{% include svg/bzx-logo.svg %}</a>
+                <p class="fs-18 fs-sm-16 fw-600 mb-25 c-dark-gray">Torque is built on the bZx protocol</p>
+                <div class="mb-25 bzx-logo">
+                    <a href="https://bzx.network">{% include svg/bzx.svg %}</a>
                 </div>
-                <div class="flex fd-md-c fd-sm-r fs-sm-10">
-                    <p class="fs-sm-10 mr-15 mr-sm-30 lh-140 c-light-gray">© {{ 'now' | date: "%Y" }} bZeroX, LLC</p>
+                <div class="flex fw-w fd-lg-c fd-sm-r fs-sm-10">
+                    <p class="fs-sm-10 mr-15 mr-sm-30 lh-140 c-light-gray mb-lg-15">© {{ 'now' | date: "%Y" }} bZeroX,
+                        LLC</p>
                     <div class="flex">
                         <a href="/tos" class="c-green mr-15 mr-sm-30">Terms of use</a>
                         <a href="/privacy" class="c-green mr-15 mr-sm-30">Privacy policy</a>
                     </div>
                 </div>
             </div>
+
             <div class="col col-7 col-sm-12 mt-10 navigation">
                 <div class="network">
                     <h5 class="mb-30">bZx Protocol</h5>
@@ -36,7 +38,7 @@
                 <div class="products">
                     <h5 class="mb-30">Products</h5>
                     <div class="list-footer">
-                        <a href="/">Fulcrum</a>
+                        <a href="https://fulcrum.trade">Fulcrum</a>
                         <a href="https://torque.loans">Torque</a>
                         <a href="https://staking.bzx.network/">Staking Dashboard</a>
                         <a href="https://bzx.network/itokens">iTokens</a>
@@ -56,19 +58,11 @@
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
 </footer>
-
+<section class="modal"></section>
 <script type="text/javascript" src="/assets/js/main.js"></script>
-{% if page.layout == "lending" %}
-<script type="text/javascript" src="/assets/js/lending.js"></script>
-{% endif %}
-{% if page.layout == "trading" %}
-<script type="text/javascript" src="/assets/js/chart.js"></script>
-<script type="text/javascript" src="/assets/js/trading.js"></script>
-{% endif %}
 <script>
 
     window.intercomSettings = {
@@ -97,5 +91,4 @@
         }
     };
 </script>
-
 </body>
