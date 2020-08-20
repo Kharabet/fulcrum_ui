@@ -66,6 +66,7 @@ var coins = document.querySelectorAll('.chart-tokens .coin-calc');
 window.addEventListener('load', function () {
 
     //change active button-coin
+    coins[0].classList.add('active');
     for (var i = 0; i < coins.length; i++) {
         coins[i].onclick = function () {
             var items = document.querySelectorAll('.coin-calc');
@@ -207,13 +208,29 @@ function updateButtonGains(e) {
     e.currentTarget.classList.add("active");
     updateChartData();
 }
-
-function updateAccordion(e) {
-    var items = document.querySelectorAll('.accordion-item');
-    for (var i = 0; i < items.length; i++) {
-        items[i].classList.remove("active");
+function setAriaAttr (el, ariaType, newProperty) {
+    el.setAttribute(ariaType, newProperty);
+};
+function setAccordionAria (el, expanded) {
+    switch (expanded) {
+        case "true":
+            setAriaAttr(el, 'aria-hidden', 'false');
+            break;
+        case "false":
+            setAriaAttr(el, 'aria-hidden', 'true');
+            break;
+        default:
+            break;
     }
-    e.currentTarget.parentElement.classList.add("active");
+};
+function updateAccordion(e) {   
+    if(e.currentTarget.parentElement.classList.contains("active")){        
+        setAccordionAria(e.currentTarget.nextElementSibling, "false");
+        e.currentTarget.parentElement.classList.remove("active");
+    }else{
+        setAccordionAria(e.currentTarget.nextElementSibling, "true");
+        e.currentTarget.parentElement.classList.add("active");
+    }
 }
 
 function onSpinnerClick() {
@@ -327,4 +344,3 @@ function drawLabels(t, ctx) {
     });
     ctx.restore();
 }
-

@@ -32,10 +32,10 @@
         left: 0;
         bottom: 0;
         @media (max-width: 767px) {
-            height: 159px;
+            height: 150px;
         }
         @media (max-width: 579px) {
-            height: 135px;
+            height: 126px;
         }
     }
     .container {
@@ -45,12 +45,12 @@
     .item-coin {
         svg {
             @media (min-width: 580px) {
-                width: 66px;
-                height: 66px;
+                width: 60px;
+                height: 60px;
             }
             @media (max-width: 579px) {
-                width: 50px;
-                height: 50px;
+                width: 45px;
+                height: 45px;
             }
         }
         .name-coin {
@@ -69,7 +69,7 @@
     p {
         margin-bottom: 10px;
         color: var(--primary-color);
-        text-align: left;
+        text-align: center;
         @media (max-width: 579px) {
             font-size: 12px;
         }
@@ -90,6 +90,10 @@
 .item-blog {
     background-color: var(--secondary-bg);
     border-radius: 16px;
+    &:hover {
+        cursor: pointer;
+        box-shadow: var(--shadow-post);
+    }
     @media (max-width: 767px) {
         max-width: 350px;
         margin: 0 auto 20px auto;
@@ -348,12 +352,24 @@ input[type="number"] {
         border-radius: 50%;
         width: 52px;
         height: 52px;
+        + span {
+            text-transform: uppercase;
+            text-align: center;
+            color: #8992a4;
+            font-weight: 600;
+            font-size: 12px;
+            line-height: 140%;
+            margin-top: 3px;
+        }
         &:hover {
             cursor: pointer;
         }
         &.active {
             background-color: var(--btn-white-bg);
             border: 3px solid #276bfb;
+            + span {
+                color: #276bfb;
+            }
         }
         &:not(.active) {
             .path-gray {
@@ -505,4 +521,25 @@ input[type="number"] {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-  }
+}
+.apr-wrapper {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    @media (max-width: 767px) {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    @media (max-width: 479px) {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+.apr-value-after {
+    position: relative;
+    &:after {
+        content: "APR";
+        position: absolute;
+        font-size: 10px;
+        color: #8992a4;
+        top: 4px;
+        right: -21px;
+    }
+}
