@@ -223,14 +223,14 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
           const collateralAssetPrecision = new BigNumber(10 ** (18 - collateralAssetDecimals));
 
           if (positionType === PositionType.LONG) {
-            positionValue = event.repayAmount.times(loanAssetPrecision).div(event.collateralToLoanRate);
-            tradePrice = event.collateralToLoanRate.div(10 ** 18);
+            positionValue = event.repayAmount.div(10 ** loanAssetDecimals).div(event.collateralToLoanRate.div(10**18).times(loanAssetPrecision).div(collateralAssetPrecision));
+            tradePrice = event.collateralToLoanRate.div(10**18).times(loanAssetPrecision).div(collateralAssetPrecision);
             value = positionValue.times(tradePrice);
             profit = value.minus(event.collateralWithdrawAmount.times(event.collateralToLoanRate).div(10 ** 36));
           }
           else {
             positionValue = event.repayAmount.times(loanAssetPrecision).div(10 ** 18);
-            tradePrice = new BigNumber(10 ** 36).div(event.collateralToLoanRate).div(10 ** 18);
+            tradePrice = new BigNumber(10 ** 36).div(event.collateralToLoanRate).div(10 ** 18).div(loanAssetPrecision).times(collateralAssetPrecision);
             value = positionValue.times(tradePrice);
             profit = value.minus(event.collateralWithdrawAmount.div(10 ** 18));
           }
