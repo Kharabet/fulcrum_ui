@@ -6,7 +6,9 @@ import { ProviderTypeDictionary } from "../domain/ProviderTypeDictionary";
 import { TorqueProvider } from "../services/TorqueProvider";
 import { injected } from "../domain/WalletConnectors";
 import { AbstractConnector } from '@web3-react/abstract-connector';
-import { ReactComponent as CloseIcon } from "../assets/images/ic__close.svg"
+import { SwitchButtonInput } from "./SwitchButtonInput";
+import { ReactComponent as CloseIcon } from "../assets/images/ic__close.svg";
+
 
 export interface IProviderMenuProps {
   providerTypes: ProviderType[];
@@ -14,6 +16,7 @@ export interface IProviderMenuProps {
   onSelect: (selectedConnector: AbstractConnector, account?: string) => void;
   onDeactivate: () => void;
   onProviderMenuClose: () => void;
+  onChiSwitch: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 export const ProviderMenu = (props: IProviderMenuProps) => {
@@ -47,9 +50,9 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
     //@ts-ignore
     setActivatingConnector(ProviderTypeDictionary.getConnectorByProviderType(providerType)!);
     activate(ProviderTypeDictionary.getConnectorByProviderType(providerType)!);
-    
+
   }
-  
+
   // handle logic to connect in reaction to certain events on the injected ethereum provider, if it exists
   // useInactiveListener(!triedEager || !!activatingConnector);
   const renderItems = () => {
@@ -67,7 +70,7 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
           if (!currentConnector) return;
           //@ts-ignore
           setActivatingConnector(currentConnector)
-          activate(currentConnector, (err) => console.error(err))
+          activate(currentConnector, (err: any) => console.error(err))
         }}
       />
     });
@@ -79,6 +82,7 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
         Select Wallet
         <CloseIcon className="disclosure__close" onClick={props.onProviderMenuClose} />
       </div>
+      <SwitchButtonInput onSwitch={props.onChiSwitch} />
       <ul className="provider-menu__list">{renderItems()}</ul>
       < button
         className="disconnect"
