@@ -29,7 +29,7 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
       isMenuOpen: false
     };
   }
-  
+
   public componentDidMount(): void {
     var currentTheme = localStorage.getItem('theme')!;
     var toggleSwitch = document.querySelector<HTMLInputElement>('.header__right .theme-switch input[type="checkbox"]');
@@ -80,7 +80,7 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
           </div>
           <div className="header__right">
             <OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />
-            <SwitchButtonInput onSwitch={this.onSwitchTheme}/>
+            <SwitchButtonInput onSwitch={this.onSwitchTheme} />
           </div>
         </div>
       </header>
@@ -130,7 +130,7 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
               <HeaderMenu items={menu.items} onMenuToggle={this.onMenuToggle} />
             </div>
             <div className="footer-container">
-              <Footer  isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen}/>
+              <Footer isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen} />
             </div>
           </div>
         ) : null}
@@ -139,8 +139,10 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
   };
 
   private onMenuToggle = () => {
-    document.body.style.overflow = !this.state.isMenuOpen ? "hidden" : "";
-    this.setState({ ...this.state, isMenuOpen: !this.state.isMenuOpen });
+    if (this.props.isMobileMedia) {
+      document.body.style.overflow = !this.state.isMenuOpen ? "hidden" : "";
+      this.setState({ ...this.state, isMenuOpen: !this.state.isMenuOpen });
+    }
   };
 
   private onSwitchTheme = (e: React.ChangeEvent<HTMLInputElement>) => {
