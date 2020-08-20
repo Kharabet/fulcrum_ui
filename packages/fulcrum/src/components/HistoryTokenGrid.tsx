@@ -317,9 +317,9 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
         isHidden: true
       });
     }
-
-    const quantityGrids = Math.floor(Object.keys(historyEvents.groupedEvents).length / this.quantityVisibleRow);
-    const isLastRow = historyEvents.groupedEvents.length === (this.state.numberPagination + 1) * this.quantityVisibleRow;
+    const quantityEvents = Object.keys(historyEvents.groupedEvents).length;
+    const quantityGrids = Math.floor(quantityEvents / this.quantityVisibleRow);
+    const isLastRow = quantityEvents === (this.state.numberPagination + 1) * (this.quantityVisibleRow + 1);
 
     this.setState({ ...this.state, quantityGrids: quantityGrids, isLastRow: isLastRow });
 
