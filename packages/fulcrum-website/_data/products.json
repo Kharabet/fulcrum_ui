@@ -1,0 +1,62 @@
+[
+    {
+        "name": "dai",
+        "visibilityApr": false,
+        "visibilityEarn": true,
+        "visibilityChart": false
+    },
+    {
+        "name": "eth",
+        "visibilityApr": true,
+        "visibilityEarn": true,
+        "visibilityChart": true
+    },
+    {
+        "name": "knc",
+        "visibilityApr": true,
+        "visibilityEarn": true,
+        "visibilityChart": true
+    },
+    {
+        "name": "link",
+        "visibilityApr": true,
+        "visibilityEarn": true,
+        "visibilityChart": true
+    },
+    {
+        "name": "usdc",
+        "visibilityApr": false,
+        "visibilityEarn": true,
+        "visibilityChart": false
+    },
+    {
+        "name": "wbtc",
+        "visibilityApr": true,
+        "visibilityEarn": true,
+        "visibilityChart": true
+    },
+    {
+        "name": "zrx",
+        "visibilityApr": true,
+        "visibilityEarn": true,
+        "visibilityChart": true
+    },
+    {
+        "name": "susd",
+        "visibilityApr": true,
+        "visibilityEarn": true,
+        "visibilityChart": false
+    },
+    {
+        "name": "rep",        
+        "visibilityApr": false,
+        "visibilityEarn": false,
+        "visibilityChart": false
+    },
+    {
+        "name": "usdt",
+        "visibilityApr": true,
+        "visibilityEarn": true,
+        "visibilityChart": false
+    }
+]

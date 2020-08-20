@@ -223,7 +223,9 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
               <button className="" onClick={this.onRepayLoan}>
                 Repay Loan
               </button>
-              <button className="" disabled={/*this.state.borrowedFundsItem.collateralizedPercent.times(100).plus(100).lt(150)*/false} onClick={this.onBorrowMore}>
+              <button className=""
+                title={this.state.borrowedFundsItem.collateralizedPercent.times(100).plus(100).lt(150) ? "Collateral too low" : ""}
+                disabled={this.state.borrowedFundsItem.collateralizedPercent.times(100).plus(100).lt(150)} onClick={this.onBorrowMore}>
                 Borrow More
               </button>
             </div>

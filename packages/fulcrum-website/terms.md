@@ -7,7 +7,7 @@ h1: Terms and Conditions
 permalink: tos
 ---
 
-## ***PLEASE READ CAREFULLY***
+## PLEASE READ CAREFULLY
 
 ### Last Updated: May 10, 2019
 

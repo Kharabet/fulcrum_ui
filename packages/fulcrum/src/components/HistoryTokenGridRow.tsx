@@ -117,8 +117,7 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
       const event = { ...swappedEvent };
       if (event.payTradingFeeEvent && !this.props.stablecoins.includes(event.payTradingFeeEvent.token)) {
         const token = event.payTradingFeeEvent.token === Asset.fWETH ? Asset.ETH : event.payTradingFeeEvent.token;
-        const feeAssetUsdRate = await this.getAssetUSDRate(token, event.payTradingFeeEvent.timeStamp);
-          event.payTradingFeeEvent = { ...swappedEvent.payTradingFeeEvent! };//deep copy
+        const feeAssetUsdRate = await this.getAssetUSDRate(token, event.payTradingFeeEvent.timeStamp); event.payTradingFeeEvent = { ...swappedEvent.payTradingFeeEvent! };//deep copy
         event.payTradingFeeEvent.amount = event.payTradingFeeEvent.amount.times(feeAssetUsdRate);
       }
 
@@ -163,18 +162,22 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
         <div className="history-token-grid-row-inner__col history-token-grid-row-inner__col-asset-price">
           <span className="label">Trade Price</span>
           {!this.state.isLoading
-            ? <React.Fragment>
-              <span className="sign-currency">$</span>{event.tradePrice.toFixed(2)}
-            </React.Fragment>
+            ? event.action !== "Withdrew" && event.action !== "Deposited"
+              ? <React.Fragment>
+                <span className="sign-currency">$</span>{event.tradePrice.toFixed(2)}
+              </React.Fragment>
+              : "-"
             : <Preloader width="74px" />
           }
         </div>
         <div title={event.value.toFixed(18)} className="history-token-grid-row-inner__col history-token-grid-row-inner__col-position-value">
           <span className="label">Value</span>
           {!this.state.isLoading
-            ? <React.Fragment>
-              <span className="sign-currency">$</span>{event.value.toFixed(2)}
-            </React.Fragment>
+            ? event.action !== "Withdrew" && event.action !== "Deposited"
+              ? <React.Fragment>
+                <span className="sign-currency">$</span>{event.value.toFixed(2)}
+              </React.Fragment>
+              : "-"
             : <Preloader width="74px" />
           }
         </div>
@@ -238,9 +241,11 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
           <div title={latestEvent.tradePrice.toFixed(18)} className="history-token-grid-row__col history-token-grid-row__col-asset-price">
             <span className="label">Trade Price</span>
             {!this.state.isLoading
-              ? <React.Fragment>
-                <span className="sign-currency">$</span>{latestEvent.tradePrice.toFixed(2)}
-              </React.Fragment>
+              ? latestEvent.action !== "Withdrew" && latestEvent.action !== "Deposited"
+                ? < React.Fragment >
+                  <span className="sign-currency">$</span>{latestEvent.tradePrice.toFixed(2)}
+                </React.Fragment>
+                : "-"
               : <Preloader width="74px" />
             }
           </div>
@@ -257,9 +262,11 @@ export class HistoryTokenGridRow extends Component<IHistoryTokenGridRowProps, IH
           <div title={latestEvent.value.toFixed(18)} className="history-token-grid-row__col history-token-grid-row__col-position-value">
             <span className="label">Value</span>
             {!this.state.isLoading
-              ? <React.Fragment>
-                <span className="sign-currency">$</span>{latestEvent.value.toFixed(2)}
-              </React.Fragment>
+              ? latestEvent.action !== "Withdrew" && latestEvent.action !== "Deposited"
+                ? <React.Fragment>
+                  <span className="sign-currency">$</span>{latestEvent.value.toFixed(2)}
+                </React.Fragment>
+                : "-"
               : <Preloader width="74px" />
             }
           </div>

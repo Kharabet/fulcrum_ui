@@ -1,0 +1,86 @@
+footer {
+  @media screen and (min-width: $breakpoint-md-up) {
+    padding: 85px 0;
+  }
+  @media screen and (max-width: $breakpoint-md-down) {
+    padding: 45px 0;
+  }
+  .social-icons {
+    margin-bottom: 43px;
+  }
+  .bzx-logo {
+    margin-bottom: 25px;
+    max-width: 140px;
+    margin-bottom: 61px;
+
+    @media (max-width: 991px) {
+      margin-bottom: 32px;
+    }
+    @media (max-width: 767px) {
+      margin-bottom: 25px;
+      max-width: 100px;
+    }
+  }
+
+  .navigation {
+    display: grid;
+    grid-template-columns: 4fr 4fr 3fr;
+    grid-template-areas: "network product company";
+
+    .network {
+      grid-area: network;
+    }
+    .products {
+      grid-area: product;
+    }
+    .company {
+      grid-area: company;
+    }
+  }
+
+  .list-footer {
+    a {
+      display: block;
+      font-weight: 600;
+      color: #276bfb;
+      line-height: 1.25;
+      &:hover {
+        color: #5b88ff;
+      }
+
+      @media screen and (min-width: $breakpoint-md-up) {
+        font-size: 16px;
+      }
+      @media screen and (max-width: $breakpoint-md-down) {
+        font-size: 14px;
+      }
+      @media screen and (min-width: $breakpoint-sm-up) {
+        margin-bottom: 20px;
+      }
+      @media screen and (max-width: $breakpoint-sm-down) {
+        margin-bottom: 15px;
+        font-size: 12px;
+      }
+    }
+  }
+  .item-link {
+    display: flex;
+    &:hover {
+      circle,
+      ellipse {
+        fill: #5b88ff;
+      }
+    }
+    svg {
+      width: 100%;
+    }
+    @media screen and (min-width: $breakpoint-md-up) {
+      margin-right: 15px;
+      width: 56px;
+    }
+    @media screen and (max-width: $breakpoint-md-down) {
+      margin-right: 10px;
+      width: 48px;
+    }
+  }
+}
