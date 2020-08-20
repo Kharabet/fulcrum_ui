@@ -1,0 +1,56 @@
+.tvl {
+  font-weight: 900;
+  margin-right: 15px;
+  @media screen and(min-width: $width-min-sm) {
+    font-size: 36px;
+    line-height: 1.8;
+  }
+  @media screen and(max-width: $width-max-sm) {
+    font-size: 16px;
+    line-height: 1.4;
+  }
+}
+.tvl-value {
+  font-weight: 900;
+  color: #b9c7d6;
+  line-height: 1;
+  font-size: 100px;
+  @media screen and(min-width: $width-min-sm) {
+    font-size: 100px;
+  }
+  @media screen and(max-width: $width-max-sm) {
+    font-size: 36px;
+  }
+}
+.tvl-interest {
+  line-height: 1.2;
+  font-weight: 900;
+  color: $green-color;
+  display: flex;
+  align-items: center;
+  @media screen and(min-width: $width-min-sm) {
+    font-size: 36px;
+  }
+  @media screen and(max-width: $width-max-sm) {
+    font-size: 16px;
+    svg {
+      width: 5px;
+      height: auto;
+    }
+  }
+  &.down {
+    color: $red-color;
+    svg {
+      transform: rotate(180deg);
+      .icon-path {
+        fill: $red-color;
+      }
+    }
+  }
+  &.up {
+    color: $green-color;
+  }
+  svg {
+    margin-right: 8px;
+  }
+}
