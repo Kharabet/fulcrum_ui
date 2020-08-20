@@ -10,6 +10,8 @@
     "packages/torque-website",
     "packages/protocol-explorer",
     "packages/web3-react-6",
+    "packages/protocol-explorer",
+    "packages/staking-dashboard",
     "packages/web3-react-6/packages/*"
   ],
   "devDependencies": {
@@ -33,6 +35,10 @@
     "build-protocol-explorer-kovan": "cross-env-shell REACT_APP_ETH_NETWORK=kovan \"./scripts/build-protocol-explorer.sh\"",
     "build-protocol-explorer-ropsten": "cross-env-shell REACT_APP_ETH_NETWORK=ropsten \"./scripts/build-protocol-explorer.sh\"",
     "build-protocol-explorer-mainnet": "cross-env-shell REACT_APP_ETH_NETWORK=mainnet \"./scripts/build-protocol-explorer.sh\"",
+    "build-staking-dashboard-rinkeby": "cross-env-shell REACT_APP_ETH_NETWORK=rinkeby \"./scripts/build-staking-dashboard.sh\"",
+    "build-staking-dashboard-kovan": "cross-env-shell REACT_APP_ETH_NETWORK=kovan \"./scripts/build-staking-dashboard.sh\"",
+    "build-staking-dashboard-ropsten": "cross-env-shell REACT_APP_ETH_NETWORK=ropsten \"./scripts/build-staking-dashboard.sh\"",
+    "build-staking-dashboard-mainnet": "cross-env-shell REACT_APP_ETH_NETWORK=mainnet \"./scripts/build-staking-dashboard.sh\"",
     "build-fulcrum-api": "cross-env-shell \"./scripts/build-fulcrum-api.sh\""
   }
 }

@@ -1,0 +1,127 @@
+.group-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  .notice {
+    margin: 0 auto;
+    margin-bottom: 20px;
+    font-size: 14px;
+    font-weight: 200;
+    line-height: 1.8;
+  }
+  @media screen and (min-width: $width-min-sm) {
+    padding: 30px 45px 15px 45px;
+    justify-content: space-between;
+  }
+  @media screen and (max-width: $width-max-sm) {
+    padding: 30px 0 15px 0;
+    justify-content: center;
+    .notice {
+      width: 100%;
+      text-align: center;
+    }
+  }
+  .button {
+    margin-bottom: 15px;
+    &:nth-child(2n + 1) {
+      @media screen and (min-width: $width-min-sm) {
+        margin-right: 30px;
+      }
+      @media screen and (max-width: $width-max-sm) and (min-width: $width-min-xs) {
+        margin-right: 15px;
+      }
+    }
+  }
+}
+
+.convert-button {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  padding: 0 45px;
+  margin-bottom: 35px;
+  @media screen and (max-width: $width-max-sm) {
+    margin-bottom: 55px;
+    padding: 0 10px;
+  }
+  &:before {
+    content: "";
+    position: absolute;
+    height: 1px;
+    width: 100%;
+    background-color: #e4ebf4;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, 0);
+  }
+  .button {
+    z-index: 10;
+    position: relative;
+    width: 100%;
+
+    @media screen and (max-width: $width-max-sm) {
+      font-size: 14px;
+    }
+    .notice {
+      color: #758295;
+      position: absolute;
+      left: 50%;
+      top: 60px;
+      transform: translate(-50%, 0);
+      font-weight: 200;
+      line-height: 1.6;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 12px;
+      width: 100%;
+      @media screen and (max-width: $width-max-sm) {
+        bottom: -50px;
+        width: 80%;
+      }
+    }
+  }
+}
+
+.button {
+  border: none;
+  outline: none;
+  background-color: #f3f9ff;
+  border-radius: 40px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 1.5;
+  color: #276bfb;
+  &-full-width {
+    width: 100%;
+  }
+  @media screen and (min-width: $width-min-sm) {
+    min-width: 300px;
+    &-full-width {
+      max-width: 630px;
+    }
+  }
+  @media screen and (max-width: $width-max-sm) {
+    min-width: 255px;
+    &-full-width {
+      max-width: 540px;
+    }
+  }
+  &:hover {
+    cursor: pointer;
+    background-color: #5b88ff;
+    color: #ffffff;
+  }
+  &:disabled,
+  &[disabled] {
+    background: #e7ebf0;
+    color: #ffffff;
+    cursor: not-allowed;
+    &:hover {
+      cursor: not-allowed;
+    }
+  }
+}

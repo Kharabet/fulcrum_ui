@@ -805,8 +805,8 @@ export class FulcrumProvider {
         result = positionType === PositionType.LONG
           ? loan.loanData!.collateral.times(collateralAssetPrecision)
           : loan.loanData!.principal.times(loanAssetPrecision);
+        }
       }
-    }
 
     result = result.dividedBy(10 ** 18);
 
@@ -1539,11 +1539,11 @@ export class FulcrumProvider {
             account,
             amountInBaseUnits,
             request.returnTokenIsCollateral, // returnTokenIsCollateral
-            request.loanDataBytes,
-            {
-              from: account,
-              gas: FulcrumProvider.Instance.gasLimit
-            }
+          request.loanDataBytes,
+          {
+            from: account,
+            gas: FulcrumProvider.Instance.gasLimit
+          }
           )
           : await iBZxContract.closeWithSwap.callAsync(
             request.loanId,
@@ -1555,7 +1555,7 @@ export class FulcrumProvider {
               from: account,
               gas: FulcrumProvider.Instance.gasLimit
             }
-          );
+        );
         console.log(result);
       }
     }
@@ -2224,13 +2224,13 @@ if (err || 'error' in added) {
 console.log(err, added);
 }
 }*//*);
-                                                                                                                                                                                                                                            }
-                                                                                                                                                                                                                                            }
-                                                                                                                                                                                                                                            }
-                                                                                                                                                                                                                                            } catch(e) {
-                                                                                                                                                                                                                                            // console.log(e);
-                                                                                                                                                                                                                                            }
-                                                                                                                                                                                                                                            }*/
+                                                                                                                                                                                                                            }
+                                                                                                                                                                                                                            }
+                                                                                                                                                                                                                            }
+                                                                                                                                                                                                                            } catch(e) {
+                                                                                                                                                                                                                            // console.log(e);
+                                                                                                                                                                                                                            }
+                                                                                                                                                                                                                            }*/
   }
 
   private processLendRequestTask = async (task: RequestTask, skipGas: boolean) => {

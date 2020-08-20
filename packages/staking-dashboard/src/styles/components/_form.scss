@@ -1,0 +1,84 @@
+.calculator {
+  margin: auto;
+  max-width: 725px;
+  background-color: #ffffff;
+  border-radius: 8px;
+
+  .calculator-row {
+    display: flex;
+    justify-content: space-between;
+    @media screen and (max-width: $width-max-sm) {
+      flex-direction: column;
+    }
+    @media screen and (min-width: $width-min-xs) {
+      padding: 45px;
+    }
+    @media screen and (max-width: $width-max-xs) {
+      padding: 30px;
+    }
+    .row-header {
+      font-weight: 200;
+      line-height: 1.8;
+      display: flex;
+      align-items: center;
+      @media screen and (min-width: $width-min-xs) {
+        font-size: 14px;
+        margin-bottom: 10px;
+      }
+      @media screen and (max-width: $width-max-xs) {
+        font-size: 11px;
+      }
+    }
+    .row-container:not(:last-child){
+      margin-bottom: 25px;
+    }
+    .row-body {
+      font-weight: 800;
+      line-height: 1.2;
+      color: #283049;
+      position: relative;
+      @media screen and (min-width: $width-min-xs) {
+        font-size: 46px;
+      }
+      @media screen and (max-width: $width-max-xs) {
+        font-size: 38px;
+      }
+      .value {
+        position: relative;
+        .icon {
+          position: absolute;
+          top: 10px;
+          left: calc(100% + 8px);
+          display: flex;
+          svg {
+            height: 24px;
+            width: 24px;
+          }
+        }
+      }
+    }
+    .row-footer {
+      font-weight: 600;
+      line-height: 1.5;
+      color: #758295;
+      @media screen and (min-width: $width-min-xs) {
+        font-size: 18px;
+      }
+      @media screen and (max-width: $width-max-xs) {
+        font-size: 16px;
+      }
+    }
+    .reward-item {
+      @media screen and (min-width: $width-min-sm) {
+        padding-right: 20px;
+      }
+      @media screen and (max-width: $width-max-sm) {
+        padding-top: 45px;
+      }
+      .row-body,
+      .row-footer {
+        color: $green-color;
+      }
+    }
+  }
+}
