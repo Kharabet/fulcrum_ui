@@ -5,12 +5,12 @@ export const FooterMenu = () => {
       <div className="column-menu">
         <h5 className="title-menu">bZx network</h5>
         <div className="list-menu">
+          <a href="https://bzx.network/#how-it-works">How it works</a>
           <a href="https://docs.bzx.network/">Documentation</a>
-          <a href="https://bzx.network/pdfs/bZx_lite_paper.pdf">Litepaper</a>
           <a href="https://api.bzx.network/">API</a>
           <a href="https://bzx.network/ecosystem">Ecosystem</a>
           <a href="https://bzx.network/blog">Blog</a>
-          <a href="https://app.fulcrum.trade/#/stats">Stats</a>
+          <a href="https://bzx.network/calc">Staking Calculator</a>
         </div>
       </div>
       <div className="column-menu">
@@ -18,8 +18,10 @@ export const FooterMenu = () => {
         <div className="list-menu">
           <a href="https://fulcrum.trade/">Fulcrum</a>
           <a href="https://torque.loans">Torque</a>
+          <a href="https://staking.bzx.network/">Staking Dashboard</a>
           <a href="https://bzx.network/itokens">iTokens</a>
           <a href="https://bzx.network/ptokens">pTokens</a>
+          <a href="https://bzx.network/bzrx-token">BZRX Token</a>
         </div>
       </div>
       <div className="column-menu">

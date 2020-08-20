@@ -200,7 +200,7 @@ export class TorqueProvider {
       this.unsupportedNetwork = false;
       await Web3ConnectionFactory.setWalletProvider(connector, account);
     } catch (e) {
-      // console.log(e);
+      console.log(e);
       this.isLoading = false;
 
       return;
@@ -440,6 +440,7 @@ export class TorqueProvider {
     switch (asset) {
       case Asset.ETH:
       case Asset.WETH:
+      case Asset.fWETH:
         return new BigNumber(10**18).multipliedBy(1500);
       case Asset.WBTC:
         return new BigNumber(10**8).multipliedBy(25);
@@ -449,10 +450,13 @@ export class TorqueProvider {
         return new BigNumber(10**18).multipliedBy(750000);
       case Asset.KNC:
         return new BigNumber(10**18).multipliedBy(550000);
+      case Asset.BAT:
+        return new BigNumber(10**18).multipliedBy(750000);
       case Asset.DAI:
       case Asset.SAI:
-        return new BigNumber(10**18).multipliedBy(375000);
       case Asset.USDC:
+      case Asset.USDT:
+      case Asset.SUSD:
         return new BigNumber(10**6).multipliedBy(375000);
       case Asset.REP:
         return new BigNumber(10**18).multipliedBy(15000);
@@ -1356,7 +1360,7 @@ export class TorqueProvider {
     const loansData = await iBZxContract.getUserLoans.callAsync(
       account,
       new BigNumber(50),
-      0 // Torque loans
+      2 // Torque loans
     );
     // console.log(loansData);
     const zero = new BigNumber(0);

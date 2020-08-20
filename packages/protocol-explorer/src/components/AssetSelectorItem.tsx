@@ -30,8 +30,9 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
   public getAssetStatsHistory = async () => {
     const startData = new Date().setDate(new Date().getDate() - 90);
     const endData = new Date().getTime();
-    const pointsNumber = 30;
-    const requestUrl = `${this.apiUrl}/asset-stats-history?asset=${this.props.asset.toLowerCase()}&start_date=${startData}&end_date=${endData}&points_number=${pointsNumber}`;
+    const pointsNumber = 15;
+    const asset = this.props.asset === Asset.fWETH ? Asset.ETH : this.props.asset
+    const requestUrl = `${this.apiUrl}/asset-stats-history?asset=${asset.toLowerCase()}&start_date=${startData}&end_date=${endData}&points_number=${pointsNumber}`;
     const response = await fetch(requestUrl);
     const responseJson = await response.json();
     //console.log(responseJson);
@@ -43,6 +44,9 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
         labels.push(new Date(item["timestamp"] * 1000).getDate());
         tvl.push(+item["tvl"]);
       });
+
+      labels.push(labels[0]);
+      tvl.push(tvl[tvl.length - 1]);
     } else {
       console.error(responseJson.message)
     }
@@ -56,8 +60,10 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
 
   public render() {
     let asset = AssetsDictionary.assets.get(this.props.asset) as AssetDetails;
-    let apr = +this.props.apr[`${this.props.asset.toLowerCase()}`];
-    let tvl = +this.props.tvl[`${this.props.asset.toLowerCase()}`];
+    let apr = +this.props.apr[`${this.props.asset === Asset.fWETH ? "eth" : this.props.asset.toLowerCase()}`];
+    let tvl = +this.props.tvl[`${this.props.asset === Asset.fWETH ? "eth" : this.props.asset.toLowerCase()}`];
+    const radius = this.state.tvl.map((e, i, arr) => arr.length - 2 === i ? 5 : 0)
+
     const getData = (canvas: any) => {
       const ctx: any = canvas.getContext("2d");
       return {
@@ -67,11 +73,16 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
           data: this.state.tvl,
           backgroundColor: "transparent",
           borderColor: '#276BFB',
-          borderWidth: 3
+          borderWidth: 3,
+          pointBackgroundColor: '#003CDA',
+          pointBorderColor: '#ffffff',
+          pointRadius: radius,
+          pointBorderRadius: 1
         }]
       }
     }
     const canvas = document.createElement('canvas');
+    const deviation = (Math.max(...this.state.tvl) - Math.min(...this.state.tvl)) / 2;
     const chartData = getData(canvas);
     const options = {
       scaleShowLabels: false,
@@ -83,6 +94,11 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
           },
         }],
         yAxes: [{
+          ticks: {
+            drawTicks: false,
+            max: Math.max(...this.state.tvl) + deviation,
+            min: Math.min(...this.state.tvl) - deviation
+          },
           display: false,
         }]
       },
@@ -92,6 +108,9 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
       elements: {
         point: {
           radius: 0
+        },
+        line: {
+          cubicInterpolationMode: 'monotone'
         }
       },
       tooltips: {
@@ -120,6 +139,7 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
 
     );
   }
+
   public getRoundedData(value: number) {
     if (value > 100000)
       return `${(value / 1000000).toFixed(1)}m`;

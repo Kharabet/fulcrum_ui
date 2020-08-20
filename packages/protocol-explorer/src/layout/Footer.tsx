@@ -4,10 +4,10 @@ import { FooterSocial } from "./FooterSocial";
 
 export const Footer = () => {
   return (
-    <footer className="py-90">
+    <footer>
       <div className="container">
-        <div className="flex">
-          <FooterSocial />
+        <div className="flex fw-w">
+          <FooterSocial isShowSocial={true} />
           <FooterMenu />
         </div>
       </div>

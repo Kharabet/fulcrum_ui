@@ -18,12 +18,17 @@ button {
 }
 .group-button {
   display: flex;
-  margin-top: 30px;
+  @media screen and (max-width: $width-max-sm){
+    margin-top: 30px;
+  }
   button {
     background-color: transparent;
     color: $primary-color;
     padding: 8px 13px;
     font-weight: 600;
+    &:hover {
+      color: $primary-color-hover;
+    }
     &.active {
       background-color: $primary-color;
       border-radius: 25px;

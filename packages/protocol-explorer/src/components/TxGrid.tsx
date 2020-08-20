@@ -2,7 +2,8 @@ import React, { Component } from "react";
 import { TxRow, ITxRowProps } from "./TxRow";
 import { IconSort } from "./IconSort";
 interface ITxGridProps {
-  events: ITxRowProps[]
+  events: ITxRowProps[],
+  quantityTx: number
 }
 
 interface ITxGridState {
@@ -20,10 +21,11 @@ export class TxGrid extends Component<ITxGridProps, ITxGridState> {
   public render() {
     const assetItems = this.props.events
       .sort((a, b) => { return this.state.typeSort === 'up' ? b.age.getTime() - a.age.getTime() : a.age.getTime() - b.age.getTime() })
-      .map((e: ITxRowProps) => <TxRow key={e.hash} {...e} />);
+      .slice(0, this.props.quantityTx)
+      .map((e: ITxRowProps, i: number) => <TxRow key={i} {...e} />);
     return (
       <React.Fragment>
-        {this.props.events.length !== 0 &&
+        {assetItems.length !== 0 &&
           <div className="table table-tx">
             <div className="table-header table-header-tx">
               <div className="table-header-tx__hash">Txn Hash</div>

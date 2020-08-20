@@ -3,8 +3,10 @@ import * as _ from "lodash";
 import { Asset } from "../domain/Asset";
 
 import { erc20Contract } from "../contracts/erc20";
+import { DAppHelperContract } from "../contracts/DAppHelper";
 import { iBZxContract } from "../contracts/iBZxContract";
 import { iTokenContract } from "../contracts/iTokenContract";
+import { oracleContract } from "../contracts/oracle";
 
 const ethNetwork = process.env.REACT_APP_ETH_NETWORK;
 
@@ -27,13 +29,19 @@ export class ContractsSource {
   private static erc20Json: any;
   private static iTokenJson: any;
   private static iBZxJson: any;
+  private static oracleJson: any;
+  private static DAppHelperJson: any;
+
+  private static iTokenList: any;
 
   public networkId: number;
+  public canWrite: boolean;
 
-  public constructor(networkId: number) {
+  public constructor(provider: any, networkId: number, canWrite: boolean) {
+    this.provider = provider;
     this.networkId = networkId;
+    this.canWrite = canWrite;
   }
-
   public async Init() {
     if (ContractsSource.isInit) {
       return;
@@ -42,27 +50,29 @@ export class ContractsSource {
     ContractsSource.iTokenJson = await import(`./../assets/artifacts/${ethNetwork}/iToken.json`);
     ContractsSource.erc20Json = await import(`./../assets/artifacts/${ethNetwork}/erc20.json`);
     ContractsSource.iBZxJson = await import(`./../assets/artifacts/${ethNetwork}/iBZx.json`);
+    ContractsSource.oracleJson = await import(`./../assets/artifacts/${ethNetwork}/oracle.json`);
+    ContractsSource.DAppHelperJson = await import(`./../assets/artifacts/${ethNetwork}/DAppHelper.json`);
 
-    const iTokenList = (await import(`../assets/artifacts/${ethNetwork}/iTokenList.js`)).iTokenList;
+    ContractsSource.iTokenList = (await import(`../assets/artifacts/${ethNetwork}/iTokenList.js`)).iTokenList;
 
-    
-    iTokenList.forEach((val: any, index: any) => {
-        // tslint:disable:no-console
-        // console.log(val);
-        const t = {
-          token: val[1],
-          asset: val[2],
-          name: val[3],
-          symbol: val[4],
-          index: new BigNumber(index),
-          version: parseInt(val[5], 10)
-        };
-        // tslint:disable:no-console
-        // console.log(t);
-  
-        ContractsSource.iTokensContractInfos.set(val[4], t);
-      });
-      
+
+    ContractsSource.iTokenList.forEach((val: any, index: any) => {
+      // tslint:disable:no-console
+      // console.log(val);
+      const t = {
+        token: val[1],
+        asset: val[2],
+        name: val[3],
+        symbol: val[4],
+        index: new BigNumber(index),
+        version: parseInt(val[5], 10)
+      };
+      // tslint:disable:no-console
+      // console.log(t);
+
+      ContractsSource.iTokensContractInfos.set(val[4], t);
+    });
+
     ContractsSource.isInit = true;
   }
 
@@ -80,6 +90,26 @@ export class ContractsSource {
     return tokenContractInfo ? new iTokenContract(ContractsSource.iTokenJson.abi, tokenContractInfo.token, this.provider) : null;
   }
 
+  public getOracleAddress(): string {
+    let address: string = "";
+    switch (this.networkId) {
+      case 1:
+        address = "0xee14de2e67e1ec23c8561a6fad2635ff1b618db6";
+        break;
+      case 3:
+        address = "0x4330762418df3555ddd1d732200b317c9239b941";
+        break;
+      case 4:
+        address = "0x76de3d406fee6c3316558406b17ff785c978e98c";
+        break;
+      case 42:
+        address = "0x327635870b9c2E142415507cAA2790D9d5B1C734";
+        break;
+    }
+
+    return address;
+  }
+
   public getiBZxAddress(): string {
     let address: string = "";
     switch (this.networkId) {
@@ -93,7 +123,7 @@ export class ContractsSource {
         address = "0xc45755a7cfc9385290e6fece1f040c0453e7b0e5";
         break;
       case 42:
-        address = "0x10fA193fB1d00e3C1033B0BB003AbB5f7a5595bB";
+        address = "0xAbd9372723C735D426D0a760D047206Fe115ee6d";
         break;
     }
 
@@ -102,6 +132,14 @@ export class ContractsSource {
   private async getErc20ContractRaw(addressErc20: string): Promise<erc20Contract> {
     await this.Init();
     return new erc20Contract(ContractsSource.erc20Json.abi, addressErc20.toLowerCase(), this.provider);
+  }
+
+  public getITokenByErc20Address(address: string): Asset {
+    let result = Asset.UNKNOWN;
+
+    //@ts-ignore
+    result = ContractsSource.iTokenList.filter(e => e[1] === address)[0][4].substr(1) as Asset
+    return result;
   }
 
   public getITokenErc20Address(asset: Asset): string | null {
@@ -190,19 +228,63 @@ export class ContractsSource {
             break;
         }
         break;
-      case 42:
+        case 42:
+          /*switch (addressErc20) {
+            case "0xd0a1e359811322d97991e03f863a0c30c2cf029c":
+              asset = Asset.ETH;
+              break;
+            case "0xc4375b7de8af5a38a93548eb8453a498222c4ff2":
+              asset = Asset.SAI;
+              break;
+            case "0x4f96fe3b7a6cf9725f59d353f723c1bdb64ca6aa":
+              asset = Asset.DAI;
+              break;
+            case "0x75b0622cec14130172eae9cf166b92e5c112faff":
+              asset = Asset.USDC;
+              break;
+            case "0xad67cb4d63c9da94aca37fdf2761aadf780ff4a2":
+              asset = Asset.KNC;
+              break;
+          }*/
         switch (addressErc20) {
-          case "0xd0a1e359811322d97991e03f863a0c30c2cf029c":
-            asset = Asset.ETH;
+          case "0xe65d99a06d0ded0d318e31db3ae5d77629c625fc":
+            asset = Asset.fWETH;
             break;
-          case "0xc4375b7de8af5a38a93548eb8453a498222c4ff2":
+          case "0x7143e05608c4bc7e83a3b72a28de2497f62b7e59":
             asset = Asset.SAI;
             break;
-          case "0x4f96fe3b7a6cf9725f59d353f723c1bdb64ca6aa":
+          case "0x8f746ec7ed5cc265b90e7af0f5b07b4406c9dda8":
             asset = Asset.DAI;
             break;
-          case "0x75b0622cec14130172eae9cf166b92e5c112faff":
+          case "0x20bdf254ca63883c3a83424753bb40185af29ce4":
             asset = Asset.USDC;
+            break;
+          case "0x4c4462c6bca4c92bf41c40f9a4047f35fd296996":
+            asset = Asset.USDT;
+            break;
+          case "0xfcfa14dbc71bee2a2188431fa15e1f8d57d93c62":
+            asset = Asset.SUSD;
+            break;
+          case "0xc4b7a70c3694cb1d37a18e6c6bd9271828c382a4":
+            asset = Asset.WBTC;
+            break;
+          case "0xfb9325e5f4fc9629525427a1c92c0f4d723500cf":
+            asset = Asset.LINK;
+            break;
+          case "0x4893919982648ffefe4324538d54402387c20198":
+            asset = Asset.MKR;
+            break;
+          case "0x629b28c5aa5c953df2511d2e48d316a07eafb3e3":
+            asset = Asset.ZRX;
+            break;
+          case "0xac091ccf1b0c601182f3ccf3eb20f291aba39029":
+            asset = Asset.BAT;
+            break;
+          case "0x39ac2818e08d285abe548f77a0819651b8b5d213":
+            asset = Asset.REP;
+            break;
+          case "0x02357164ba33f299f7654cbb29da29db38ae1f44":
+            asset = Asset.KNC;
             break;
         }
         break;
@@ -211,6 +293,33 @@ export class ContractsSource {
     return asset;
   }
 
+  private getDAppHelperAddress(): string {
+    let address: string = "";
+    switch (this.networkId) {
+      case 1:
+        address = "0xbfdE53F20d50E41162a6085a9A591f27c9c47652";
+        break;
+      case 3:
+        address = "0x2B2db1E0bDf6485C87Bc2DddEd17E7E3D9ba675E";
+        break;
+      case 4:
+        address = "";
+        break;
+      case 42:
+        address = "0xa40cDd78BFBe0E8ca643081Df43A45ED8C2C12bB";
+        break;
+    }
+
+    return address;
+  }
+  private async getOracleContractRaw(): Promise<oracleContract> {
+    await this.Init();
+    return new oracleContract(
+      ContractsSource.oracleJson.abi,
+      this.getOracleAddress().toLowerCase(),
+      this.provider
+    );
+  }
   private async getiBZxContractRaw(): Promise<iBZxContract> {
     await this.Init();
     return new iBZxContract(
@@ -220,8 +329,22 @@ export class ContractsSource {
     );
   }
 
+
+  private async getDAppHelperContractRaw(): Promise<DAppHelperContract> {
+    await this.Init();
+    return new DAppHelperContract(
+      ContractsSource.DAppHelperJson.abi,
+      this.getDAppHelperAddress().toLowerCase(),
+      this.provider
+    );
+  }
+
   public getErc20Contract = _.memoize(this.getErc20ContractRaw);
   public getAssetFromAddress = _.memoize(this.getAssetFromAddressRaw);
   public getITokenContract = _.memoize(this.getITokenContractRaw);
   public getiBZxContract = _.memoize(this.getiBZxContractRaw);
+  public getOracleContract = _.memoize(this.getOracleContractRaw);
+  public getDAppHelperContract = _.memoize(this.getDAppHelperContractRaw);
+
+
 }

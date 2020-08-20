@@ -3,6 +3,8 @@ import React, { Component, ChangeEvent } from "react";
 import { ReactComponent as IconSearch } from "../assets/images/icon-form-search.svg";
 import { ReactComponent as IconClear } from "../assets/images/icon-form-clear.svg";
 interface ISearchProps {
+  initialFilter?: string;
+  onSearch: (filter: string) => void;
 }
 
 interface ISearchState {
@@ -15,7 +17,7 @@ export class Search extends Component<ISearchProps, ISearchState> {
     super(props);
     this.state = {
       onFocus: false,
-      inputValue: ''
+      inputValue: props.initialFilter || ""
     };
   }
   public render() {
@@ -45,8 +47,10 @@ export class Search extends Component<ISearchProps, ISearchState> {
   public onChange = (event: ChangeEvent<HTMLInputElement>) => {
     let value = event.target.value ? event.target.value : "";
     this.setState({ ...this.state, inputValue: value })
+    this.props.onSearch(value.toLowerCase());
   }
   public resetInput = () => {
     this.setState({ ...this.state, inputValue: '' })
+    this.props.onSearch("");
   }
 }

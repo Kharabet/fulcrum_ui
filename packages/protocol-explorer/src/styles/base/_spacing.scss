@@ -5,9 +5,6 @@
 .pt-45 {
     padding-top: 45px;
 }
-.pt-60 {
-    padding-top: 60px;
-}
 .pt-75 {
     padding-top: 75px;
 }
@@ -20,12 +17,28 @@
 .mb-15 {
     margin-bottom: 15px;
 }
-.mb-25 {
-    margin-bottom: 25px;
+.mb-30 {
+    margin-bottom: 30px;
+}
+.mb-45{
+    margin-bottom: 45px;
 }
 .mb-60 {
     margin-bottom: 60px;
 }
 .mr-15 {
     margin-right: 15px;
+}
+.mt-5{
+    margin-top: 5px;
+}
+@media screen and (max-width: $width-max-md){
+    .mt-md-30{
+        margin-top: 30px;
+    }
+}
+@media screen and(max-width: $width-max-sm){
+    .pt-sm-30{
+        padding-top: 30px;
+    }
 }

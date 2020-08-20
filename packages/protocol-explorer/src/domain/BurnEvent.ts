@@ -9,6 +9,7 @@ export class BurnEvent {
   public readonly price: BigNumber; 
   public readonly timeStamp: Date;
   public readonly txHash: string;
+  public readonly asset: Asset;
 
   constructor(
     burner: string,
@@ -16,7 +17,8 @@ export class BurnEvent {
     assetAmount: BigNumber,
     price: BigNumber,
     timeStamp: Date,
-    txHash: string
+    txHash: string,
+    asset: Asset
   ) {
     this.burner = burner;
     this.tokenAmount = tokenAmount;
@@ -24,5 +26,6 @@ export class BurnEvent {
     this.price = price;
     this.timeStamp = timeStamp;
     this.txHash = txHash;
+    this.asset = asset;
   }
 }

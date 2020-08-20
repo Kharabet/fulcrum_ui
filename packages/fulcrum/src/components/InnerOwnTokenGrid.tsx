@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import { InnerOwnTokenGridHeader } from "./InnerOwnTokenGridHeader";
-import { IInnerOwnTokenGridRowProps, InnerOwnTokenGridRow } from "./InnerOwnTokenGridRow";
-import { InnerOwnTokenCardMobile } from "./InnerOwnTokenCardMobile";
+import { InnerOwnTokenGridRow } from "./InnerOwnTokenGridRow";
 import { TradeRequest } from "../domain/TradeRequest";
 
 import "../styles/components/inner-own-token-grid.scss";
@@ -24,33 +23,21 @@ export class InnerOwnTokenGrid extends Component<IInnerOwnTokenGridProps, IInner
   }
 
   public render() {
-    return !this.props.isMobileMedia ? this.renderDesktop() : this.renderMobile();
-  }
 
-  private renderDesktop = () => {
     const innerOwnRowsData = this.props.ownRowsData.map((e, i) => <InnerOwnTokenGridRow key={i} {...e} />);
     if (innerOwnRowsData.length === 0) return null;
 
     return (
       <div className="inner-own-token-grid">
-        <InnerOwnTokenGridHeader
-          asset={this.props.ownRowsData[0].baseToken}
-          quoteToken={this.props.ownRowsData[0].quoteToken}
-          loader={this.props.request !== undefined && this.props.request.loanId === this.props.ownRowsData[0].loan.loanId}
-          isLoadingTransaction={this.props.isLoadingTransaction} />
+        {!this.props.isMobileMedia &&
+          <InnerOwnTokenGridHeader
+            asset={this.props.ownRowsData[0].baseToken}
+            quoteToken={this.props.ownRowsData[0].quoteToken}
+            loader={this.props.request !== undefined && this.props.request.loanId === this.props.ownRowsData[0].loan.loanId}
+            isLoadingTransaction={this.props.isLoadingTransaction} />}
+
         {innerOwnRowsData}
       </div>
-    );
-  }
-
-  private renderMobile = () => {
-    const innerOwnRowsDataMobile = this.props.ownRowsData.map((e, i) => <InnerOwnTokenCardMobile key={i} {...e} />);
-    if (innerOwnRowsDataMobile.length === 0) return null;
-
-    return (
-      <React.Fragment>
-        {innerOwnRowsDataMobile}
-      </React.Fragment>
     );
   }
 }

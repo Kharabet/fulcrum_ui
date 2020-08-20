@@ -1,4 +1,6 @@
 import React, { Component } from "react";
+import { Observable, Subject } from "rxjs";
+import { switchMap, debounceTime } from "rxjs/operators";
 import { Asset } from "../domain/Asset";
 import { GroupButton } from "./GroupButton";
 import { Line } from "react-chartjs-2";
@@ -6,6 +8,7 @@ import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { AssetDetails } from "../domain/AssetDetails";
 
 interface IStatsChartProps {
+  isMobileMedia: boolean;
 }
 
 interface IStatsChartState {
@@ -15,11 +18,16 @@ interface IStatsChartState {
   utilization: Array<number>;
   apr: Array<number>;
   tvl: Array<number>;
+  tvlWidth: number;
+  aprWidth: number;
+  utilizationWidth: number;
 }
 
 export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
+  private readonly activeLabelUpdate: Subject<string>;
+
   private apiUrl = "https://api.bzx.network/v1";
-  private assetsShown: Asset[];
+  private readonly assetsShown: Asset[];
   constructor(props: any) {
     super(props);
     this.state = {
@@ -28,27 +36,65 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
       labels: [],
       tvl: [],
       apr: [],
-      utilization: []
+      utilization: [],
+      tvlWidth: 2,
+      aprWidth: 2,
+      utilizationWidth: 2,
     };
-    this.assetsShown = [
-      Asset.ETH,
-      Asset.SAI,
-      Asset.DAI,
-      Asset.USDC,
-      Asset.USDT,
-      Asset.SUSD,
-      Asset.WBTC,
-      Asset.LINK,
-      Asset.ZRX,
-      Asset.REP,
-      Asset.KNC
-    ]
+    
+    if (process.env.REACT_APP_ETH_NETWORK === "mainnet") {
+      this.assetsShown = [
+        Asset.DAI,
+        Asset.USDC,
+        Asset.USDT,
+        Asset.SUSD,
+        Asset.ETH,
+        Asset.WBTC,
+        Asset.LINK,
+        Asset.ZRX,
+        Asset.KNC,
+      ];
+    } else if (process.env.REACT_APP_ETH_NETWORK === "kovan") {
+      this.assetsShown = [
+        Asset.DAI,
+        Asset.USDC,
+        Asset.USDT,
+        Asset.SUSD,
+        Asset.fWETH,
+        Asset.WBTC,
+        Asset.LINK,
+        Asset.ZRX,
+        Asset.KNC,
+      ];
+    } else if (process.env.REACT_APP_ETH_NETWORK === "ropsten") {
+      this.assetsShown = [
+        Asset.DAI,
+        Asset.ETH,
+      ];
+    } else {
+      this.assetsShown = [];
+    }
+
+    this.activeLabelUpdate = new Subject<string>();
+    this.activeLabelUpdate
+      .pipe(
+        switchMap(value => this.rxLinesWidth(value)),
+      )
+      .subscribe((value: number[]) => {
+        this.setState({
+          ...this.state,
+          tvlWidth: value[0],
+          aprWidth: value[1],
+          utilizationWidth: value[2],
+        });
+      });
   }
+
   public componentWillMount(): void {
     const pathname = window.location.pathname;
     const assetString = pathname.replace('/stats/', '');
     const asset = this.assetsShown.filter((item) => {
-      return item === assetString.toUpperCase();
+      return item === assetString.toUpperCase() || item === "fWETH";
     });
     this.setState({ ...this.state, asset: asset[0] })
   }
@@ -62,11 +108,14 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
     }
   }
 
+
+
   public getAssetStatsHistory = async () => {
     const startData = new Date().setDate(new Date().getDate() - this.state.periodChart);
     const endData = new Date().getTime();
-    const pointsNumber = 20;
-    const requestUrl = `${this.apiUrl}/asset-stats-history?asset=${this.state.asset.toLowerCase()}&start_date=${startData}&end_date=${endData}&points_number=${pointsNumber}`;
+    const pointsNumber = 80;
+    const asset = this.state.asset === Asset.fWETH ? Asset.ETH : this.state.asset
+    const requestUrl = `${this.apiUrl}/asset-stats-history?asset=${asset.toLowerCase()}&start_date=${startData}&end_date=${endData}&points_number=${pointsNumber}`;
     const response = await fetch(requestUrl);
     const responseJson = await response.json();
 
@@ -91,6 +140,17 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
     await this.setState({ ...this.state, tvl: tvl, apr: apr, utilization: utilization, labels: labels })
   }
 
+  public getColors(data: number[]) {
+    let colors: string[] = [];
+
+    data.forEach((e, i) => {
+      colors.push(i % 4 === 2 ? '#E9F4FF' : "#fff");
+    });
+
+    return colors;
+  }
+
+
   public render() {
     const asset = AssetsDictionary.assets.get(this.state.asset) as AssetDetails;
 
@@ -104,60 +164,84 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
           yAxisID: 'A',
           data: this.state.tvl,
           backgroundColor: "transparent",
-          pointBackgroundColor: '#276BFB',
+          pointBackgroundColor: 'transparent',
+          pointBorderColor: 'transparent',
           borderColor: '#276BFB',
-          borderWidth: 2
+          pointRadius: 12,
+          borderWidth: this.state.tvlWidth,
         },
         {
-          label: 'Supply APR, %',
+          label: 'Supply APR',
           data: this.state.apr,
           yAxisID: 'B',
           backgroundColor: "transparent",
-          pointBackgroundColor: '#33DFCC',
+          pointBackgroundColor: 'transparent',
+          pointBorderColor: 'transparent',
           borderColor: '#33DFCC',
-          borderWidth: 2
+          borderWidth: this.state.aprWidth,
+          pointRadius: 12,
         },
         {
-          label: 'Utilization, %',
-          yAxisID: 'B',
+          label: 'Utilization',
+          yAxisID: 'C',
           data: this.state.utilization,
           backgroundColor: "transparent",
-          pointBackgroundColor: '#B79EFF',
+          pointBackgroundColor: 'transparent',
+          pointBorderColor: 'transparent',
           borderColor: '#B79EFF',
-          borderWidth: 2
+          borderWidth: this.state.utilizationWidth,
+          pointRadius: 12,
         }]
       }
     }
     const canvas = document.createElement('canvas');
     const chartData = getData(canvas);
+    const deviation = (Math.max(...this.state.tvl) - Math.min(...this.state.tvl)) / 50;
+
     const options = {
+      responsive: true,
       scales: {
         xAxes: [{
           ticks: {
-            padding: 15
+            fontColor: "#A9B5C7",
+            maxRotation: 0,
+            minRotation: 0,
+            padding: this.props.isMobileMedia ? 0 : 70,
+            callback: (value: any, index: any, values: any) => {
+              return this.props.isMobileMedia ? (index === 0 || index % 16 !== 0 || index === Object.keys(values).length - 1 ? '' : value) : (index === 0 || index % 4 !== 0 || index === Object.keys(values).length - 1 ? '' : value);
+            }
           },
           gridLines: {
             drawBorder: false,
             zeroLineWidth: 1,
-            zeroLineColor: '#E9F4FF',
-            color: '#E9F4FF',
-            
+            zeroLineColor: '#fff',
+            color: this.getColors(this.state.utilization)
           },
         }],
         yAxes: [{
           id: 'A',
           ticks: {
             drawTicks: false,
-            max: Math.max(...this.state.tvl),
-            min: Math.min(...this.state.tvl),
+            max: Math.max(...this.state.tvl) + deviation,
+            min: Math.min(...this.state.tvl) - deviation
           },
           display: false,
         },
         {
           id: 'B',
           ticks: {
-            max: 101,
-            min: -1,
+            max: 102,
+            min: -2,
+            drawTicks: false,
+          },
+
+          display: false,
+        },
+        {
+          id: 'C',
+          ticks: {
+            max: 102,
+            min: -2,
             drawTicks: false,
           },
 
@@ -166,54 +250,97 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
       },
       legend: {
         display: false,
-        //usePointStyle: true
       },
       layout: {
         padding: {
-          top: 10,
-          bottom: 10
+          top: this.props.isMobileMedia ? 0 : 50,
+          bottom: 0
         }
       },
       tooltips: {
         enabled: false,
+        mode: 'nearest',
+        intersect: false,
         custom: this.customTooltips,
+        displayColors: true,
         callbacks: {
+
           label: function (tooltipItems: any, data: any) {
             let labels: any = [];
+            const activeYScale = '_active' in this ? this['_active'][0]['_yScale']['id'] : '';
+
             data.datasets.forEach((item: any) => {
-              labels.push({ value: item.data[tooltipItems.index], currency: item.label === "TVL" ? true : false, borderColor: item.borderColor });
+              labels.push({
+                isActive: item.yAxisID === activeYScale,
+                label: item.label,
+                value: item.data[tooltipItems.index],
+                currency: item.label === "TVL" ? true : false,
+                borderColor: item.borderColor
+              });
             });
+
             return { data: labels };
           }
         }
       },
-      elements: {
-        point: {
-          radius: 0
-        }
-      }
     }
+
     return (
       <React.Fragment>
-        <div className="flex jc-sb ai-c mb-25">
-          <div className="flex ai-c">
-            <span className="mr-15">
-              {asset.logoSvg.render()}
-            </span>
-            <h1>{this.state.asset.toUpperCase()} Stats</h1>
+        <div className="container">
+          <div className="flex fw-w fd-sm-c jc-sb ai-c mb-30">
+            <div className="flex ai-c as-sm-fs ">
+              <span className="flex mr-15">
+                {asset.logoSvg.render()}
+              </span>
+              <h1>{this.state.asset.toUpperCase()} Stats</h1>
+            </div>
+            <GroupButton setPeriodChart={this.setPeriodChart} />
           </div>
-          <GroupButton setPeriodChart={this.setPeriodChart} />
         </div>
-        <div className="wrapper-chart">
-          <div id="chartjs">
-            <Line ref="chart" data={chartData} options={options} height={80} />
+        <div className="wrapper-chartjs-token">
+          <div id="chartjs" onMouseLeave={() => this.leaveChart()}>
+            <Line ref="chart" data={chartData} options={options} height={this.props.isMobileMedia ? 300 : 110} />
           </div>
-          <div id="chartjs-tooltip" className="chartjs-tooltip-token"><table></table></div>
+          <div id="chartjs-tooltip" className="chartjs-tooltip-token">
+            <table>
+              <tbody>
+                <tr className="chartjs-tooltip-time"><td>1</td></tr>
+                <tr className="chartjs-tooltip-value"><td>1</td></tr>
+                <tr className="chartjs-tooltip-value"><td>1</td></tr>
+                <tr className="chartjs-tooltip-value"><td>1</td></tr>
+              </tbody>
+            </table></div>
         </div>
       </React.Fragment>
     );
   }
 
+  private rxLinesWidth = (value: string): Observable<number[]> => {
+
+    return new Observable<number[]>(observer => {
+      observer.next(this.getLinesWidth(value));
+    });
+  };
+
+  public leaveChart() {
+    document.getElementById('chartjs-tooltip')!.style.opacity = '0';
+    // emitting next event for processing with rx.js
+    this.activeLabelUpdate.next('');
+  }
+
+  public getLinesWidth(activeLabel: string) {
+    switch (activeLabel) {
+      case 'TVL':
+        return [4, 2, 2];
+      case 'Supply APR':
+        return [2, 4, 2];
+      case 'Utilization':
+        return [2, 2, 4];
+      default:
+        return [2, 2, 2];
+    }
+  }
   public setPeriodChart = (period: number) => {
     this.setState({ ...this.state, periodChart: period })
   }
@@ -221,6 +348,8 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
   public customTooltips = (tooltip: any) => {
     let tooltipEl = document.getElementById('chartjs-tooltip');
     let chartEl = document.getElementById('chartjs');
+    let spacingChart = this.props.isMobileMedia ? 15 : 35;
+
     if (!tooltipEl) {
       tooltipEl = document.createElement('div');
       tooltipEl.id = 'chartjs-tooltip';
@@ -230,6 +359,7 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
     const heighttooltipEl = tooltipEl.offsetHeight;
     const widthTooltipEl = tooltipEl.offsetWidth;
     const widthChart = chartEl!.offsetWidth;
+    let activeLabel = '';
     if (tooltip.opacity === 0) {
       tooltipEl.style.opacity = '0';
       tooltipEl.style.left = -widthTooltipEl + 'px';
@@ -239,24 +369,27 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
       return bodyItem.lines[0];
     }
     if (tooltip.body) {
-      const titleLines = tooltip.title || [];
-      const dataLines = tooltip.body.map(getBody);
-      let innerHtml = `<tbody class="${heighttooltipEl + 35 > tooltip.caretY ? `bottom` : `top`} ${widthChart - tooltip.caretX < widthTooltipEl ? `right` : `left`}">`;
-      titleLines.forEach(function (title: number) {
-        innerHtml += `<tr class="chartjs-tooltip-time"><th><span class="line" style="background-color: ${tooltip.labelColors[0].borderColor}"></span><span>${title}</span></th></tr>`;
+      const title = tooltip.title[0] || 0;
+      const body = tooltip.body.map(getBody)[0];
+      let innerHtml = `<tr class="chartjs-tooltip-time"><th><span class="line" style="background-color: ${tooltip.labelColors[0].borderColor}"></span><span>${title}</span></th></tr>`;
+
+      body.data.forEach((item: any) => {
+        if (item.isActive) activeLabel = item.label;
+        innerHtml += `<tr class="chartjs-tooltip-value ${item.isActive ? `active ${item.label}` : ``}"><td><label>${item.label}</label><span ${item.isActive ? `` : `style="color:${item.borderColor}"`}>${item.currency ? `<span class="sign sign-currency" >$</span>` : ``}${item.value.toFixed(3)}${!item.currency ? `<span class="sign sign-currency">%</span>` : ``}</span></td></tr>`;
       });
-      dataLines.forEach(function (body: any) {
-        body.data.forEach((item: any) => {
-          innerHtml += `<tr class="chartjs-tooltip-value"><td><span>${item.currency ? `<span class="sign sign-currency">$</span>` : ``}${item.value.toFixed(3)}</span>${!item.currency ? `<span class="sign sign-currency">%</span>` : ``}</td></tr>`;
-        });
-      });
+
       innerHtml += `</tbody>`;
+
+      innerHtml = `<tbody class="${heighttooltipEl + spacingChart > tooltip.caretY ? `bottom` : `top`} ${widthChart - tooltip.caretX < widthTooltipEl ? `right ` : `left `}${activeLabel}">` + innerHtml;
+
       const tableRoot = tooltipEl.querySelector('table') as HTMLElement;
       tableRoot.innerHTML = innerHtml;
     }
     tooltipEl.style.opacity = '1';
     tooltipEl.style.position = 'absolute';
     tooltipEl.style.left = (widthChart - tooltip.caretX < widthTooltipEl) ? tooltip.caretX - widthTooltipEl + 5 + 'px' : tooltip.caretX - 7 + 'px';
-    tooltipEl.style.top = (heighttooltipEl + 35 < tooltip.caretY) ? tooltip.caretY - heighttooltipEl - 35 +'px' : tooltip.caretY + 35 + 'px';
+    tooltipEl.style.top = (heighttooltipEl + spacingChart < tooltip.caretY) ? tooltip.caretY - heighttooltipEl - spacingChart + 'px' : tooltip.caretY + spacingChart + 'px';
+    // emitting next event for processing with rx.js
+    this.activeLabelUpdate.next(activeLabel);
   }
 }

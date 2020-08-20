@@ -22,19 +22,38 @@ export class AssetSelector extends Component<IAssetSelectorProps, IAssetSelector
       apr: [],
       tvl: []
     };
-    this.assetsShown = [
-      Asset.ETH,
-      Asset.SAI,
-      Asset.DAI,
-      Asset.USDC,
-      Asset.USDT,
-      Asset.SUSD,
-      Asset.WBTC,
-      Asset.LINK,
-      Asset.ZRX,
-      Asset.REP,
-      Asset.KNC
-    ]
+    if (process.env.REACT_APP_ETH_NETWORK === "mainnet") {
+      this.assetsShown = [
+        Asset.DAI,
+        Asset.USDC,
+        Asset.USDT,
+        Asset.SUSD,
+        Asset.ETH,
+        Asset.WBTC,
+        Asset.LINK,
+        Asset.ZRX,
+        Asset.KNC,
+      ];
+    } else if (process.env.REACT_APP_ETH_NETWORK === "kovan") {
+      this.assetsShown = [
+        Asset.DAI,
+        Asset.USDC,
+        Asset.USDT,
+        Asset.SUSD,
+        Asset.fWETH,
+        Asset.WBTC,
+        Asset.LINK,
+        Asset.ZRX,
+        Asset.KNC,
+      ];
+    } else if (process.env.REACT_APP_ETH_NETWORK === "ropsten") {
+      this.assetsShown = [
+        Asset.DAI,
+        Asset.ETH,
+      ];
+    } else {
+      this.assetsShown = [];
+    }
   }
 
 
@@ -56,23 +75,11 @@ export class AssetSelector extends Component<IAssetSelectorProps, IAssetSelector
   }
 
   public render() {
-    /*const items = [
-      { asset: Asset.ETH, name: 'eth', locked: 9.6, apr: 1.2 },
-      { asset: Asset.DAI, name: 'dai', locked: 9.6, apr: 1.2 },
-      { asset: Asset.SAI, name: 'sai', locked: 9.6, apr: 1.2 },
-      { asset: Asset.REP, name: 'rep', locked: 9.6, apr: 1.2 },
-      { asset: Asset.LINK, name: 'link', locked: 9.6, apr: 1.2 },
-      { asset: Asset.USDT, name: 'usdt', locked: 9.6, apr: 1.2 },
-      { asset: Asset.UNKNOWN, name: 'Attacker loan', locked: 9.6, apr: 1.2 }
-        ];*/
-    //const assetItems = items.map((e: IAssetSelectorItemProps) => <AssetSelectorItem key={e.name} {...e} />);
-    //const assetItemsApi = this.state.itemsAsset.map((e: IAssetSelectorItemApiProps) => <AssetSelectorItemApi />);
     const assetItems = this.assetsShown.map(asset => <AssetSelectorItem key={asset} asset={asset} apr={this.state.apr} tvl={this.state.tvl} {...this.props} />)
     return <React.Fragment>
-      <div className="asset-selector">{assetItems}</div>
+      <div className="asset-selector-container">{assetItems}</div>
     </React.Fragment>;
   }
-  //let apr = +this.props.apr[`${this.props.asset.toLowerCase()}`];
 
   public componentDidMount(): void {
     this.getSupplyRateApr();

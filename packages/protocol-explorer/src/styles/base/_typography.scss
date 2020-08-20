@@ -1,9 +1,14 @@
 h1, .h1 {
     font-weight: 900;
-    font-size: 44px;
     line-height: 1.2;
     margin-top: 0;
     margin-bottom: 0;
+    @media screen and(min-width: $width-min-sm){
+        font-size: 44px;
+    }
+    @media screen and(max-width: $width-max-sm){
+        font-size: 36px;        
+    }
 }
 
 .green-color {
@@ -18,4 +23,7 @@ h1, .h1 {
 
 .healthy-color{
     color: $healthy-color
+}
+.ta-c{
+    text-align: center;
 }

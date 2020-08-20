@@ -80,7 +80,7 @@ export class ManageCollateralProcessor {
     //Submitting loan
     task.processingStepNext();
 
-    let gasAmountBN;
+    let gasAmountBN = new BigNumber(0);
     let txHash: string = "";
 
     if (!taskRequest.isWithdrawal) {
@@ -111,7 +111,7 @@ export class ManageCollateralProcessor {
             value: isETHCollateralAsset ?
               collateralAmountInBaseUnitsValue :
               undefined,
-            gas: gasAmountBN ? gasAmountBN.toString() : "3000000",
+            gas: gasAmountBN.gt(0) ? gasAmountBN.toString() : "3000000",
             gasPrice: await FulcrumProvider.Instance.gasPrice()
           }
         );

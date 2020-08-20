@@ -37,6 +37,7 @@ interface IManageCollateralFormState {
   loanValue: number;
   selectedValue: number;
   assetBalanceValue: BigNumber;
+  ethBalanceValue: BigNumber;
 
   collateralAmount: BigNumber;
   collateralExcess: BigNumber;
@@ -69,6 +70,7 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
       selectedValue: 0,
       loanValue: 0,
       assetBalanceValue: new BigNumber(0),
+      ethBalanceValue: new BigNumber(0),
       gasAmountNeeded: new BigNumber(0),
       collateralAmount: new BigNumber(0),
       collateralExcess: new BigNumber(0),
@@ -133,7 +135,8 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
 
         });
 
-      FulcrumProvider.Instance.getManageCollateralGasAmount().then(gasAmountNeeded => {
+      FulcrumProvider.Instance.getManageCollateralGasAmount().then(gasAmountNeeded => {        
+        FulcrumProvider.Instance.getEthBalance().then(ethBalance => {
         FulcrumProvider.Instance.getManageCollateralExcessAmount(this.props.loan!).then(collateralExcess => {
           FulcrumProvider.Instance.getAssetTokenBalanceOfUser(this.props.loan!.collateralAsset).then(assetBalance => {
 
@@ -144,60 +147,47 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
 
             let minCollateral;
             let maxCollateral;
+         
+           
+            minCollateral = this.props.loan!.collateralAmount
+              .minus(collateralExcess)
+              .times(collateralState.minValue);
 
+              maxCollateral = minCollateral
+              .times(collateralState.maxValue - collateralState.minValue)
+              .dividedBy(10 ** 20);
 
             const currentCollateral = this.props.loan!.collateralAmount
               .times(10 ** 18);
 
 
-            const minValue = new BigNumber(collateralState.minValue)
-              .minus(//collateralizedPercent
-                // .dividedBy(collateralState.minValue)
-                (this.props.loan!.collateralAmount).times(9 * 10 ** 16))
-              .toNumber();
-
-            const maxValue = new BigNumber(collateralState.maxValue)
-              .minus((this.props.loan!.collateralAmount)
-                .times(9 * 10 ** 18))
-              .toNumber();
-
-            console.log("minValue " + minValue);
-
-            minCollateral = this.props.loan!.collateralAmount
-              .minus(collateralExcess)
-              .times(10 ** 18);
-
-            maxCollateral = minCollateral
-              .times(maxValue - minValue)
-              .dividedBy(10 ** 20);
-
             if (maxCollateral.lt(currentCollateral)) {
               maxCollateral = currentCollateral;
             }
 
-            // new_v = (new_max - new_min) / (old_max - old_min) * (v - old_min) + new_min
-            let currentCollateralNormalizedBN = new BigNumber(maxValue - minValue)
-              .dividedBy(maxCollateral.minus(minCollateral))
-              .times(currentCollateral.minus(minCollateral))
-              .plus(minValue);
+          // new_v = (new_max - new_min) / (old_max - old_min) * (v - old_min) + new_min
+          let currentCollateralNormalizedBN = new BigNumber(collateralState.maxValue - collateralState.minValue)
+          .dividedBy(maxCollateral.minus(minCollateral))
+          .times(currentCollateral.minus(minCollateral))
+          .plus(collateralState.minValue);
 
-            if (currentCollateralNormalizedBN.dividedBy(maxValue - minValue).lte(0.01)) {
-              currentCollateralNormalizedBN = new BigNumber(minValue);
-            }
+        if (currentCollateralNormalizedBN.dividedBy(collateralState.maxValue - collateralState.minValue).lte(0.01)) {
+          currentCollateralNormalizedBN = new BigNumber(collateralState.minValue);
+        }
 
 
-            // check balance
-            if (this.props.loan!.collateralAsset === Asset.ETH) {
-              assetBalance = assetBalance.gt(FulcrumProvider.Instance.gasBufferForTrade) ? assetBalance.minus(FulcrumProvider.Instance.gasBufferForTrade) : new BigNumber(0);
-            }
-            let assetBalanceNormalizedBN = new BigNumber(maxValue - minValue)
-              .dividedBy(maxCollateral.minus(minCollateral))
-              .times(assetBalance.minus(minCollateral))
-              .plus(minValue);
+        // check balance
+        if (this.props.loan!.collateralAsset === Asset.ETH) {
+          assetBalance = assetBalance.gt(FulcrumProvider.Instance.gasBufferForTrade) ? assetBalance.minus(FulcrumProvider.Instance.gasBufferForTrade) : new BigNumber(0);
+        }
+        let assetBalanceNormalizedBN = new BigNumber(collateralState.maxValue - collateralState.minValue)
+          .dividedBy(maxCollateral.minus(minCollateral))
+          .times(assetBalance.minus(minCollateral))
+          .plus(collateralState.minValue);
 
-            if (assetBalanceNormalizedBN.dividedBy(maxValue - minValue).lte(0.01)) {
-              assetBalanceNormalizedBN = new BigNumber(minValue);
-            }
+        if (assetBalanceNormalizedBN.dividedBy(collateralState.maxValue - collateralState.minValue).lte(0.01)) {
+          assetBalanceNormalizedBN = new BigNumber(collateralState.minValue);
+        }
 
 
 
@@ -211,9 +201,8 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
                 collateralizedPercent: collateralizedPercent,
                 collateralExcess: collateralExcess,
                 assetBalanceValue: assetBalanceNormalizedBN,
-                minValue: minValue,
-                maxValue: maxValue,
-              },
+                ethBalanceValue: ethBalance
+               },
               () => {
                 if (this.props.isOpenModal) {
                   window.history.pushState(null, "Manage Collateral Modal Opened", `/trade/manage-collateral/`);
@@ -222,23 +211,11 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
               }
             );
           });
+          });
         });
       });
     });
-
   }
-  /* public componentDidUpdate(
-     prevProps: Readonly<IManageCollateralFormProps>,
-     prevState: Readonly<IManageCollateralFormState>,
-     snapshot?: any
-   ): void {
-     this.state.selectedValue === prevState.inputAmountText
-     this.state.inputAmountText === prevState.inputAmountText &&
-       (this.state.selectedValue === this.state.minValue
-         || this.state.selectedValue === this.state.maxValue)
-       &&
-       this._selectedValueUpdate.next(new BigNumber(this.state.selectedValue));
-   }*/
 
   public render() {
     if (this.state.assetDetails === null) {
@@ -246,7 +223,7 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
     }
 
     const amountMsg =
-      this.state.assetBalanceValue && this.state.assetBalanceValue.lte(this.state.gasAmountNeeded)
+      this.state.ethBalanceValue && this.state.ethBalanceValue.lte(this.state.gasAmountNeeded)
         ? "Insufficient funds for gas"
         : this.state.balanceTooLow
           ? "Your wallet is empty" :
@@ -438,9 +415,6 @@ export default class ManageCollateralForm extends Component<IManageCollateralFor
               .multipliedBy(this.state.loanValue)
           )).toNumber();
 
-      // if (selectedValue > this.state.maxValue) {
-      //   selectedValue = this.state.maxValue;
-      // } else
       if (selectedValue < this.state.minValue) {
         selectedValue = this.state.minValue;
       }

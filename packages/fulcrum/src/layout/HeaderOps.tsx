@@ -2,14 +2,12 @@ import React, { Component } from "react";
 import { OnChainIndicator } from "../components/OnChainIndicator";
 import { HeaderLogo } from "./HeaderLogo";
 import { HeaderMenu, IHeaderMenuProps } from "./HeaderMenu";
-import { HeaderMenuToggle } from "./HeaderMenuToggle";
 import ic_close from "../assets/images/ic_close.svg";
 import menu_icon from "../assets/images/ic_menu.svg";
-import { TorqueProvider } from "../../../torque/src/services/TorqueProvider";
-import { ProviderType } from "../../../torque/src/domain/ProviderType";
 import { ReactComponent as MenuIconOpen } from "../assets/images/ic_menu.svg";
 import { ReactComponent as MenuIconClose } from "../assets/images/ic_close.svg";
 import { Footer } from "./Footer"
+import { SwitchButtonInput } from "../components/SwitchButtonInput";
 export interface IHeaderOpsProps {
   doNetworkConnect: () => void;
   isRiskDisclosureModalOpen: () => void;
@@ -31,35 +29,17 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
       isMenuOpen: false
     };
   }
-
-  public componentWillMount(): void {
-    var currentTheme = localStorage.getItem('theme')!;
-    if (currentTheme === null) {
-      document.documentElement.setAttribute('data-theme', 'dark');
-      localStorage.setItem('theme', 'dark');
-      return;
-    }
-    if (currentTheme && currentTheme === 'light') {
-      document.documentElement.setAttribute('data-theme', 'light');
-      localStorage.setItem('theme', 'light');
-    }
-    else {
-      document.documentElement.setAttribute('data-theme', 'dark');
-      localStorage.setItem('theme', 'dark');
-
-    }
-  }
-
+  
   public componentDidMount(): void {
     var currentTheme = localStorage.getItem('theme')!;
-    var toggleSwitch = document.querySelector<HTMLInputElement>('.theme-switch input[type="checkbox"]');
+    var toggleSwitch = document.querySelector<HTMLInputElement>('.header__right .theme-switch input[type="checkbox"]');
     if (toggleSwitch && currentTheme) {
       if (currentTheme === 'light') {
         document.documentElement.setAttribute('data-theme', 'light');
         localStorage.setItem('theme', 'light');
         toggleSwitch.checked = false;
       }
-      if (currentTheme === 'dark') {
+      else {
         document.documentElement.setAttribute('data-theme', 'dark');
         localStorage.setItem('theme', 'dark');
         toggleSwitch.checked = true;
@@ -85,7 +65,8 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
         { id: 2, title: "Borrow", link: "https://torque.loans", external: true },
         { id: 3, title: "Stats", link: "/stats", external: false },
         { id: 4, title: "Help Center", link: "https://bzx.network/faq-fulcrum.html", external: true },
-      ]
+      ],
+      onMenuToggle: this.onMenuToggle
     };
 
     return (
@@ -95,16 +76,11 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
             <HeaderLogo />
           </div>
           <div className="header__center">
-            <HeaderMenu items={menu.items} />
+            <HeaderMenu items={menu.items} onMenuToggle={this.onMenuToggle} />
           </div>
           <div className="header__right">
             <OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />
-            <div className="theme-switch-wrapper">
-              <label className="theme-switch">
-                <input type="checkbox" id="checkbox" onChange={this.onSwitchTheme} />
-                <div className="slider round"></div>
-              </label>
-            </div>
+            <SwitchButtonInput onSwitch={this.onSwitchTheme}/>
           </div>
         </div>
       </header>
@@ -120,7 +96,8 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
         { id: 2, title: "Borrow", link: "https://torque.loans", external: true },
         { id: 3, title: "Stats", link: "/stats", external: false },
         { id: 4, title: "Help Center", link: "https://bzx.network/faq-fulcrum.html", external: true },
-      ]
+      ],
+      onMenuToggle: this.onMenuToggle
     };
     const toggleImg = !this.state.isMenuOpen ? menu_icon : ic_close;
     const sidebarClass = !this.state.isMenuOpen ? 'sidebar_h' : 'sidebar_v'
@@ -150,7 +127,7 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
               </div>
             </div>
             <div className="header_nav_menu">
-              <HeaderMenu items={menu.items} />
+              <HeaderMenu items={menu.items} onMenuToggle={this.onMenuToggle} />
             </div>
             <div className="footer-container">
               <Footer  isRiskDisclosureModalOpen={this.props.isRiskDisclosureModalOpen}/>
@@ -166,9 +143,9 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
     this.setState({ ...this.state, isMenuOpen: !this.state.isMenuOpen });
   };
 
-  private onSwitchTheme = () => {
-    var buttonToggleSwitch = document.querySelector<HTMLInputElement>('.theme-switch input[type="checkbox"]')!;
-    if (buttonToggleSwitch.checked) {
+  private onSwitchTheme = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const switchButton = e.currentTarget;
+    if (switchButton.checked) {
       document.documentElement.setAttribute('data-theme', 'dark');
       localStorage.setItem('theme', 'dark');
     } else {

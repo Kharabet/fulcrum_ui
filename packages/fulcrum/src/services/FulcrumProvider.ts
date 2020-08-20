@@ -37,12 +37,14 @@ import { AbstractConnector } from '@web3-react/abstract-connector';
 import siteConfig from "./../config/SiteConfig.json";
 import { ProviderTypeDictionary } from "../domain/ProviderTypeDictionary";
 import { IBorrowedFundsState } from "../domain/IBorrowedFundsState";
-import { TradeEvent } from "../domain/TradeEvent";
+import { TradeEvent } from "../domain/events/TradeEvent";
 import Web3, { providers } from "web3";
-import { CloseWithSwapEvent } from "../domain/CloseWithSwapEvent";
-import { LiquidationEvent } from "../domain/LiquidationEvent";
-import { EarnRewardEvent } from "../domain/EarnRewardEvent";
-import { PayTradingFeeEvent } from "../domain/PayTradingFeeEvent";
+import { CloseWithSwapEvent } from "../domain/events/CloseWithSwapEvent";
+import { LiquidationEvent } from "../domain/events/LiquidationEvent";
+import { EarnRewardEvent } from "../domain/events/EarnRewardEvent";
+import { PayTradingFeeEvent } from "../domain/events/PayTradingFeeEvent";
+import { DepositCollateralEvent } from "../domain/events/DepositCollateralEvent";
+import { WithdrawCollateralEvent } from "../domain/events/WithdrawCollateralEvent";
 
 const getNetworkIdByString = (networkName: string | undefined) => {
   switch (networkName) {
@@ -420,28 +422,50 @@ export class FulcrumProvider {
     switch (asset) {
       case Asset.ETH:
       case Asset.WETH:
-        return new BigNumber(10**18).multipliedBy(1500);
+      case Asset.fWETH:
+        return new BigNumber(10 ** 18).multipliedBy(1500);
       case Asset.WBTC:
-        return new BigNumber(10**8).multipliedBy(25);
+        return new BigNumber(10 ** 8).multipliedBy(25);
       case Asset.LINK:
-        return new BigNumber(10**18).multipliedBy(60000);
+        return new BigNumber(10 ** 18).multipliedBy(60000);
       case Asset.ZRX:
-        return new BigNumber(10**18).multipliedBy(750000);
+        return new BigNumber(10 ** 18).multipliedBy(750000);
       case Asset.KNC:
-        return new BigNumber(10**18).multipliedBy(550000);
+        return new BigNumber(10 ** 18).multipliedBy(550000);
+      case Asset.BAT:
+        return new BigNumber(10**18).multipliedBy(750000);
       case Asset.DAI:
       case Asset.SAI:
-        return new BigNumber(10**18).multipliedBy(375000);
       case Asset.USDC:
+      case Asset.USDT:
+      case Asset.SUSD:
         return new BigNumber(10**6).multipliedBy(375000);
       case Asset.REP:
         return new BigNumber(10**18).multipliedBy(15000);
       case Asset.MKR:
-        return new BigNumber(10**18).multipliedBy(1250);
+        return new BigNumber(10 ** 18).multipliedBy(1250);
+      case Asset.CHI:
+        return new BigNumber(10 ** 18);
       default:
         throw new Error("Invalid approval asset!");
     }
   }
+
+  public checkAndSetApprovalForced = async (asset: Asset, spender: string, amountInBaseUnits: BigNumber): Promise<boolean> => {
+    let result = false;
+    const assetErc20Address = this.getErc20AddressOfAsset(asset);
+
+    if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite && assetErc20Address) {
+      const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+      const tokenErc20Contract = await this.contractsSource.getErc20Contract(assetErc20Address);
+
+      if (account && tokenErc20Contract) {
+        await tokenErc20Contract.approve.sendTransactionAsync(spender, amountInBaseUnits, { from: account });
+        result = true;
+      }
+    }
+    return result;
+  };
 
   public getPriceDefaultDataPoint = (): IPriceDataPoint => {
     return {
@@ -747,6 +771,7 @@ export class FulcrumProvider {
           ? baseToken
           : quoteToken;
 
+
         const assetContract = await this.contractsSource.getITokenContract(loanToken);
         if (!assetContract) return result;
 
@@ -769,29 +794,21 @@ export class FulcrumProvider {
 
       }
     } else {
-      if (loan)
+      if (loan) {
+        const loanAssetDecimals = AssetsDictionary.assets.get(loan.loanAsset)!.decimals || 18;
+        const collateralAssetDecimals = AssetsDictionary.assets.get(loan.collateralAsset)!.decimals || 18;
+
+        const loanAssetPrecision = new BigNumber(10 ** (18 - loanAssetDecimals));
+        const collateralAssetPrecision = new BigNumber(10 ** (18 - collateralAssetDecimals));
+       
+
         result = positionType === PositionType.LONG
-          ? loan.loanData!.collateral
-          : loan.loanData!.principal;
-    }
-
-    //const baseAsset = this.getBaseAsset(loanAsset);
-
-    // console.log(baseAsset, selectedKey.positionType, selectedKey.quoteToken, result.toString());
-
-
-    let decimalOffset = 0;
-    if (baseToken === Asset.WBTC) {
-      if (positionType === PositionType.SHORT) {
-        decimalOffset = 10;
-      } else {
-        if (tradeType === TradeType.SELL) {
-          decimalOffset = -10;
+          ? loan.loanData!.collateral.times(collateralAssetPrecision)
+          : loan.loanData!.principal.times(loanAssetPrecision);
         }
       }
-    }
 
-    result = result.dividedBy(10 ** (18 - decimalOffset));
+    result = result.dividedBy(10 ** 18);
 
     return result;
   };
@@ -952,7 +969,7 @@ export class FulcrumProvider {
   };
 
   public getManageCollateralParams = async (): Promise<ICollateralManagementParams> => {
-    return { minValue: 1.91 * 10 ** 18, maxValue: 3 * 10 ** 20, currentValue: 0 };
+    return { minValue: 0.9 * 10 ** 18, maxValue: 3 * 10 ** 20, currentValue: 0 };
   };
 
   public getManageCollateralChangeEstimate = async (
@@ -1025,6 +1042,8 @@ export class FulcrumProvider {
 
 
   public gasPrice = async (): Promise<BigNumber> => {
+    if (networkName === "kovan")
+      return new BigNumber(1).multipliedBy(10 ** 9); // 1 gwei
     let result = new BigNumber(120).multipliedBy(10 ** 9); // upper limit 120 gwei
     const lowerLimit = new BigNumber(3).multipliedBy(10 ** 9); // lower limit 3 gwei
 
@@ -1309,23 +1328,27 @@ export class FulcrumProvider {
         ? FulcrumProvider.Instance.getErc20AddressOfAsset(collateralToken)
         : FulcrumProvider.ZERO_ADDRESS;
 
+      const loanTokenDecimals = AssetsDictionary.assets.get(loanToken)!.decimals || 18;
+      const collateralTokenDecimals = AssetsDictionary.assets.get(collateralToken)!.decimals || 18;
       const collateralToLoanRate = await FulcrumProvider.Instance.getSwapRate(collateralToken, loanToken)
+
       try {
         console.log("leverageAmount" + leverageAmount);
         console.log("loanTokenSent" + loanTokenSent);
         console.log("collateralTokenSent" + collateralTokenSent);
         console.log("collateralTokenAddress" + collateralTokenAddress);
+        console.log("iTokenAddress" + tokenContract.address);
+
         const marginDetails = (await tokenContract.getEstimatedMarginDetails.callAsync(
           leverageAmount,
           loanTokenSent,
           collateralTokenSent,
           collateralTokenAddress!));
-        console.log("marginDetails collateral", marginDetails[1].div(10 ** 18).toFixed())
-        result.principal = marginDetails[0].div(10 ** 18);
-        result.collateral = marginDetails[1].div(10 ** 18);
+        result.principal = marginDetails[0].div(10 ** 18).times(10 ** (18 - loanTokenDecimals));
+        result.collateral = marginDetails[1].div(10 ** 18).times(10 ** (18 - collateralTokenDecimals));
         result.exposureValue = request.positionType === PositionType.SHORT
-          ? marginDetails[1].times(collateralToLoanRate).div(10 ** 18)
-          : marginDetails[1].div(10 ** 18);
+          ? result.collateral.times(collateralToLoanRate).minus(result.principal)
+          : result.collateral
         result.interestRate = marginDetails[2].div(10 ** 18);
       }
       catch (e) {
@@ -1500,16 +1523,38 @@ export class FulcrumProvider {
           amountInBaseUnits = new BigNumber(maxAmountInBaseUnits.times(10 ** 50).toFixed(0, 1));
         }
 
-        result = await iBZxContract.closeWithSwap.callAsync(
+        console.log(iBZxContract.address, await iBZxContract.closeWithSwap.getABIEncodedTransactionData(
           request.loanId,
           account,
           amountInBaseUnits,
           request.returnTokenIsCollateral, // returnTokenIsCollateral
+          request.loanDataBytes));
+
+		const isGasTokenEnabled = localStorage.getItem('isGasTokenEnabled') === "true";
+        const ChiTokenBalance = await this.getAssetTokenBalanceOfUser(Asset.CHI);
+        //@ts-ignore
+        result = isGasTokenEnabled && ChiTokenBalance.gt(0)
+          ? await iBZxContract.closeWithSwapWithGasToken.callAsync(            request.loanId,
+            account,
+            account,
+            amountInBaseUnits,
+            request.returnTokenIsCollateral, // returnTokenIsCollateral
           request.loanDataBytes,
           {
             from: account,
             gas: FulcrumProvider.Instance.gasLimit
           }
+          )
+          : await iBZxContract.closeWithSwap.callAsync(
+            request.loanId,
+            account,
+            amountInBaseUnits,
+            request.returnTokenIsCollateral, // returnTokenIsCollateral
+            request.loanDataBytes,
+            {
+              from: account,
+              gas: FulcrumProvider.Instance.gasLimit
+            }
         );
         console.log(result);
       }
@@ -1729,13 +1774,21 @@ export class FulcrumProvider {
 
     if (this.contractsSource && srcAssetErc20Address && destAssetErc20Address) {
       const oracleContract = await this.contractsSource.getOracleContract();
+
+
+      const srcAssetDecimals = AssetsDictionary.assets.get(srcAsset)!.decimals || 18;
+      const srcAssetPrecision = new BigNumber(10 ** (18 - srcAssetDecimals));
+      const destAssetDecimals = AssetsDictionary.assets.get(destAsset)!.decimals || 18;
+      const destAssetPrecision = new BigNumber(10 ** (18 - destAssetDecimals));
+
       try {
         const swapPriceData: BigNumber[] = await oracleContract.queryRate.callAsync(
           srcAssetErc20Address,
           destAssetErc20Address
         );
         // console.log("swapPriceData- ",swapPriceData[0])
-        result = swapPriceData[0].dividedBy(10 ** 18).multipliedBy(swapPriceData[1].dividedBy(10 ** 18));// swapPriceData[0].dividedBy(10 ** 18);
+        result = swapPriceData[0].times(srcAssetPrecision).div(destAssetPrecision).dividedBy(10 ** 18)
+          .multipliedBy(swapPriceData[1].dividedBy(10 ** 18));// swapPriceData[0].dividedBy(10 ** 18);
       } catch (e) {
         console.log(e)
         result = new BigNumber(0);
@@ -1761,11 +1814,12 @@ export class FulcrumProvider {
       const userAddress = event.topics[1].replace("0x000000000000000000000000", "0x");
       const tokenAddress = event.topics[2].replace("0x000000000000000000000000", "0x");
       const token = this.contractsSource!.getAssetFromAddress(tokenAddress);
+      if (token === Asset.UNKNOWN) return null;
       const loandId = event.topics[3];
       const data = event.data.replace("0x", "");
       const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
-      if (!dataSegments) return result;
-      
+      if (!dataSegments) return null;
+
       const amount = new BigNumber(parseInt(dataSegments[0], 16));
       const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000);
       const txHash = event.transactionHash;
@@ -1773,11 +1827,11 @@ export class FulcrumProvider {
         userAddress,
         token,
         loandId,
-        amount.div(10**18),
+        amount.div(10 ** 18),
         timeStamp,
         txHash
       )
-    })
+    }).filter((e: any) => e);
     return result
   }
 
@@ -1798,6 +1852,7 @@ export class FulcrumProvider {
       const userAddress = event.topics[1].replace("0x000000000000000000000000", "0x");
       const tokenAddress = event.topics[2].replace("0x000000000000000000000000", "0x");
       const token = this.contractsSource!.getAssetFromAddress(tokenAddress);
+      if (token === Asset.UNKNOWN) return null;
       const loandId = event.topics[3];
       const data = event.data.replace("0x", "");
       const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
@@ -1809,12 +1864,12 @@ export class FulcrumProvider {
         userAddress,
         token,
         loandId,
-        amount.div(10**18),
+        amount.div(10 ** 18),
         timeStamp,
         txHash
       )
-    })
-    return result
+    }).filter((e: any) => e);
+    return result;
   }
 
   public getTradeHistory = async (): Promise<TradeEvent[]> => {
@@ -1837,11 +1892,12 @@ export class FulcrumProvider {
       const data = event.data.replace("0x", "");
       const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
       if (!dataSegments) return result;
-      const baseTokenAddress = dataSegments[0].replace("000000000000000000000000", "0x");
-      const quoteTokenAddress = dataSegments[1].replace("000000000000000000000000", "0x");
-      const baseToken = this.contractsSource!.getAssetFromAddress(baseTokenAddress);
-      const quoteToken = this.contractsSource!.getAssetFromAddress(quoteTokenAddress);
-      
+      const collateralTokenAddress = dataSegments[0].replace("000000000000000000000000", "0x");
+      const loanTokenAddress = dataSegments[1].replace("000000000000000000000000", "0x");
+      const loanToken = this.contractsSource!.getAssetFromAddress(loanTokenAddress);
+      const collateralToken = this.contractsSource!.getAssetFromAddress(collateralTokenAddress);
+      if (loanToken === Asset.UNKNOWN || collateralToken === Asset.UNKNOWN) return null;
+
       const positionSize = new BigNumber(parseInt(dataSegments[2], 16));
       const borrowedAmount = new BigNumber(parseInt(dataSegments[3], 16));
       const interestRate = new BigNumber(parseInt(dataSegments[4], 16));
@@ -1855,8 +1911,8 @@ export class FulcrumProvider {
         userAddress,
         lender,
         loandId,
-        baseToken,
-        quoteToken,
+        collateralToken,
+        loanToken,
         positionSize,
         borrowedAmount,
         interestRate,
@@ -1868,9 +1924,8 @@ export class FulcrumProvider {
         txHash
       )
 
-    })
-    return result
-
+    }).filter((e: any) => e);
+    return result;
   }
 
   public getCloseWithSwapHistory = async (): Promise<CloseWithSwapEvent[]> => {
@@ -1893,10 +1948,12 @@ export class FulcrumProvider {
       const data = event.data.replace("0x", "");
       const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
       if (!dataSegments) return result;
-      const baseTokenAddress = dataSegments[0].replace("000000000000000000000000", "0x");
-      const quoteTokenAddress = dataSegments[1].replace("000000000000000000000000", "0x");
-      const baseToken = this.contractsSource!.getAssetFromAddress(baseTokenAddress);
-      const quoteToken = this.contractsSource!.getAssetFromAddress(quoteTokenAddress);
+      const collateralTokenAddress = dataSegments[0].replace("000000000000000000000000", "0x");
+      const loanTokenAddress = dataSegments[1].replace("000000000000000000000000", "0x");
+      const collateralToken = this.contractsSource!.getAssetFromAddress(collateralTokenAddress);
+      const loanToken = this.contractsSource!.getAssetFromAddress(loanTokenAddress);
+      if (loanToken === Asset.UNKNOWN || collateralToken === Asset.UNKNOWN) return null;
+
       const closer = dataSegments[2].replace("000000000000000000000000", "0x");
       const positionCloseSize = new BigNumber(parseInt(dataSegments[3], 16));
       const loanCloseAmount = new BigNumber(parseInt(dataSegments[4], 16));
@@ -1906,8 +1963,8 @@ export class FulcrumProvider {
       const txHash = event.transactionHash;
       return new CloseWithSwapEvent(
         userAddress,
-        baseToken,
-        quoteToken,
+        collateralToken,
+        loanToken,
         lender,
         closer,
         loandId,
@@ -1918,10 +1975,8 @@ export class FulcrumProvider {
         timeStamp,
         txHash
       )
-
-    })
-    return result
-
+    }).filter((e: any) => e);
+    return result;
   }
 
 
@@ -1946,11 +2001,13 @@ export class FulcrumProvider {
       const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
       if (!dataSegments) return result;
       const lender = dataSegments[0].replace("000000000000000000000000", "0x");
-      
+
       const baseTokenAddress = dataSegments[1].replace("000000000000000000000000", "0x");
       const quoteTokenAddress = dataSegments[2].replace("000000000000000000000000", "0x");
       const baseToken = this.contractsSource!.getAssetFromAddress(baseTokenAddress);
       const quoteToken = this.contractsSource!.getAssetFromAddress(quoteTokenAddress);
+      if (baseToken === Asset.UNKNOWN || quoteToken === Asset.UNKNOWN) return null;
+
       const repayAmount = new BigNumber(parseInt(dataSegments[3], 16));
       const collateralWithdrawAmount = new BigNumber(parseInt(dataSegments[4], 16));
       const collateralToLoanRate = new BigNumber(parseInt(dataSegments[5], 16));
@@ -1971,10 +2028,84 @@ export class FulcrumProvider {
         timeStamp,
         txHash
       )
+    }).filter((e: any) => e);
+    return result;
+  }
 
-    })
-    return result
+  public getDepositCollateralHistory = async (): Promise<DepositCollateralEvent[]> => {
+    let result: DepositCollateralEvent[] = [];
+    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : undefined;
 
+    if (!this.contractsSource) return result;
+    const bzxContractAddress = this.contractsSource.getiBZxAddress()
+    if (!account || !bzxContractAddress) return result
+    const etherscanApiKey = configProviders.Etherscan_Api;
+    let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${DepositCollateralEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
+    const depositCollateralEventResponse = await fetch(etherscanApiUrl);
+    const depositCollateralEventResponseJson = await depositCollateralEventResponse.json();
+    if (depositCollateralEventResponseJson.status !== "1") return result;
+    const events = depositCollateralEventResponseJson.result;
+    result = events.reverse().map((event: any) => {
+      const userAddress = event.topics[1].replace("0x000000000000000000000000", "0x");
+      const depositTokenAddress = event.topics[2].replace("0x000000000000000000000000", "0x");
+      const depositToken = this.contractsSource!.getAssetFromAddress(depositTokenAddress);
+      if (depositToken === Asset.UNKNOWN) return null;
+
+      const loanId = event.topics[3];
+      const data = event.data.replace("0x", "");
+      const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
+      if (!dataSegments) return result;
+      const depositAmount = new BigNumber(parseInt(dataSegments[0], 16));
+      const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000);
+      const txHash = event.transactionHash;
+      return new DepositCollateralEvent(
+        userAddress,
+        depositToken,
+        loanId,
+        depositAmount,
+        timeStamp,
+        txHash
+      )
+    }).filter((e: any) => e);
+    return result;
+  }
+
+  public getWithdrawCollateralHistory = async (): Promise<WithdrawCollateralEvent[]> => {
+    let result: WithdrawCollateralEvent[] = [];
+    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : undefined;
+
+    if (!this.contractsSource) return result;
+    const bzxContractAddress = this.contractsSource.getiBZxAddress()
+    if (!account || !bzxContractAddress) return result
+    const etherscanApiKey = configProviders.Etherscan_Api;
+    let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${WithdrawCollateralEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
+    const withdrawCollateralEventResponse = await fetch(etherscanApiUrl);
+    const withdrawCollateralEventResponseJson = await withdrawCollateralEventResponse.json();
+    if (withdrawCollateralEventResponseJson.status !== "1") return result;
+    const events = withdrawCollateralEventResponseJson.result;
+    result = events.reverse().map((event: any) => {
+      const userAddress = event.topics[1].replace("0x000000000000000000000000", "0x");
+      const withdrawTokenAddress = event.topics[2].replace("0x000000000000000000000000", "0x");
+      const withdrawToken = this.contractsSource!.getAssetFromAddress(withdrawTokenAddress);
+      if (withdrawToken === Asset.UNKNOWN) return null;
+
+      const loanId = event.topics[3];
+      const data = event.data.replace("0x", "");
+      const dataSegments = data.match(/.{1,64}/g) //split data into 32 byte segments
+      if (!dataSegments) return result;
+      const withdrawAmount = new BigNumber(parseInt(dataSegments[0], 16));
+      const timeStamp = new Date(parseInt(event.timeStamp, 16) * 1000);
+      const txHash = event.transactionHash;
+      return new WithdrawCollateralEvent(
+        userAddress,
+        withdrawToken,
+        loanId,
+        withdrawAmount,
+        timeStamp,
+        txHash
+      )
+    }).filter((e: any) => e);
+    return result;
   }
 
   private onTaskEnqueued = async (requestTask: RequestTask) => {
