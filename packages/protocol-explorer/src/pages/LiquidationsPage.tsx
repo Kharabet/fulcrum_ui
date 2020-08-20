@@ -19,6 +19,7 @@ import { NavService } from "../services/NavService";
 import { Loader } from "../components/Loader";
 import { IActiveLoanData } from "../domain/IActiveLoanData";
 import { ILoanRowProps } from "../components/LoanRow";
+import { AssetsDictionary } from "../domain/AssetsDictionary";
 
 
 interface ILiquidationsPageProps {
@@ -181,13 +182,15 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
     const healthyLoansUsd = healthyLoansData.reduce((a, b) => a.plus(b.amountOwedUsd), new BigNumber(0))
     const liqudiations30d = liquidationEvents.filter((e: LiquidationEvent) => e.timeStamp.getTime() > new Date().setDate(new Date().getDate() - 30))
     const transactionsCount30d = liqudiations30d.length;
+
     for (let i = 0; i < this.assetsShown.length; i++) {
       const tokenLiqudiations30d = liqudiations30d
         .filter((e: LiquidationEvent) => e.loanToken === this.assetsShown[i].token);
       for (const e of tokenLiqudiations30d) {
+        const loanAssetDecimals = AssetsDictionary.assets.get(e.loanToken)!.decimals || 18;
         const swapToUsdHistoryRateRequest = await fetch(`https://api.bzx.network/v1/asset-history-price?asset=${e.loanToken === Asset.fWETH ? "eth" : e.loanToken.toLowerCase()}&date=${e.timeStamp.getTime()}`);
         const swapToUsdHistoryRateResponse = (await swapToUsdHistoryRateRequest.json()).data;
-        const repayAmountUsd = e.repayAmount.div(10 ** 18).times(swapToUsdHistoryRateResponse.swapToUSDPrice);
+        const repayAmountUsd = e.repayAmount.div(10 ** loanAssetDecimals).times(swapToUsdHistoryRateResponse.swapToUSDPrice);
         volume30d = volume30d.plus(repayAmountUsd);
         liquidationEventsWithUsd.push({ event: e, repayAmountUsd: repayAmountUsd });
       }
