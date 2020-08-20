@@ -41,7 +41,7 @@ export class StatsPage extends Component<IStatsPageProps, IStatsPageState> {
   constructor(props: any) {
     super(props);
     this.state = {
-      asset: this.props.match.params.token.toUpperCase() as Asset,
+      asset: this.props.match.params.token.toUpperCase() === "FWETH" ? Asset.fWETH : this.props.match.params.token.toUpperCase() as Asset,
       events: [],
       isDataLoading: true
     };
