@@ -603,79 +603,86 @@ export class ExplorerProvider {
         const etherscanUrl = ExplorerProvider.getWeb3ProviderSettings(initialNetworkId).etherscanURL;
         return events.map(e => {
             if (e instanceof TradeEvent) {
+                const decimals = AssetsDictionary.assets.get(e.loanToken)!.decimals! || 18;
                 return {
                     hash: e.txHash,
                     etherscanTxUrl: `${etherscanUrl}tx/${e.txHash}`,
                     age: e.timeStamp,
                     account: e.user,
                     etherscanAddressUrl: `${etherscanUrl}address/${e.user}`,
-                    quantity: e.borrowedAmount.div(10 ** 18),
+                    quantity: e.borrowedAmount.div(10 ** decimals),
                     action: "Open Fulcrum Loan",
                     asset: e.loanToken
                 } as ITxRowProps
             } else if (e instanceof CloseWithSwapEvent) {
+                const decimals = AssetsDictionary.assets.get(e.loanToken)!.decimals! || 18;
                 return {
                     hash: e.txHash,
                     etherscanTxUrl: `${etherscanUrl}tx/${e.txHash}`,
                     age: e.timeStamp,
                     account: e.user,
                     etherscanAddressUrl: `${etherscanUrl}address/${e.user}`,
-                    quantity: e.loanCloseAmount.div(10 ** 18),
+                    quantity: e.loanCloseAmount.div(10 ** decimals),
                     action: "Close Fulcrum Loan",
                     asset: e.loanToken
                 } as ITxRowProps
             } else if (e instanceof LiquidationEvent) {
+                const decimals = AssetsDictionary.assets.get(e.loanToken)!.decimals! || 18;
                 return {
                     hash: e.txHash,
                     etherscanTxUrl: `${etherscanUrl}tx/${e.txHash}`,
                     age: e.timeStamp,
                     account: e.user,
                     etherscanAddressUrl: `${etherscanUrl}address/${e.user}`,
-                    quantity: e.repayAmount.div(10 ** 18),
+                    quantity: e.repayAmount.div(10 ** decimals),
                     action: "Liquidate Fulcrum Loan",
                     asset: e.loanToken
                 } as ITxRowProps
             } else if (e instanceof CloseWithDepositEvent) {
+                const decimals = AssetsDictionary.assets.get(e.loanToken)!.decimals! || 18;
                 return {
                     hash: e.txHash,
                     etherscanTxUrl: `${etherscanUrl}tx/${e.txHash}`,
                     age: e.timeStamp,
                     account: e.user,
                     etherscanAddressUrl: `${etherscanUrl}address/${e.user}`,
-                    quantity: e.repayAmount.div(10 ** 18),
+                    quantity: e.repayAmount.div(10 ** decimals),
                     action: "Close Torque Loan",
                     asset: e.loanToken
                 } as ITxRowProps
             } else if (e instanceof BorrowEvent) {
+                const decimals = AssetsDictionary.assets.get(e.loanToken)!.decimals! || 18;
                 return {
                     hash: e.txHash,
                     etherscanTxUrl: `${etherscanUrl}tx/${e.txHash}`,
                     age: e.timeStamp,
                     account: e.user,
                     etherscanAddressUrl: `${etherscanUrl}address/${e.user}`,
-                    quantity: e.newPrincipal.div(10 ** 18),
+                    quantity: e.newPrincipal.div(10 ** decimals),
                     action: "Open Torque Loan",
                     asset: e.loanToken
                 } as ITxRowProps
             } else if (e instanceof BurnEvent) {
+                const decimals = AssetsDictionary.assets.get(e.asset)!.decimals! || 18;
                 return {
                     hash: e.txHash,
                     etherscanTxUrl: `${etherscanUrl}tx/${e.txHash}`,
                     age: e.timeStamp,
                     account: e.burner,
                     etherscanAddressUrl: `${etherscanUrl}address/${e.burner}`,
-                    quantity: e.assetAmount.div(10 ** 18),
+                    quantity: e.assetAmount.div(10 ** decimals),
                     action: "Burn Token",
                     asset: e.asset
                 } as ITxRowProps
             } else { //MintEvent
+                const decimals = AssetsDictionary.assets.get(e.asset)!.decimals! || 18;
                 return {
                     hash: e.txHash,
                     etherscanTxUrl: `${etherscanUrl}tx/${e.txHash}`,
                     age: e.timeStamp,
                     account: e.minter,
                     etherscanAddressUrl: `${etherscanUrl}address/${e.minter}`,
-                    quantity: e.assetAmount.div(10 ** 18),
+                    quantity: e.assetAmount.div(10 ** decimals),
                     action: "Mint iToken",
                     asset: e.asset
                 }
