@@ -1,11 +1,18 @@
 @import "../abstracts/variables";
-
-@media screen and (min-width: $breakpoint-mobile-min) {
-  .group-tabs {
+.manage-token-grid {
+  position: relative;
+    min-height: 50vh;
+  .manage-token-grid__title {
+    font-size: 28px;
+    font-weight: 900;
+    line-height: 1.4;
+    text-align: center;
+    color: #ffffff;
+    margin: 10px auto 25px auto;
+  }
+  .manage-token-grid__group-tabs {
     display: flex;
     flex-wrap: wrap;
-    margin-bottom: 25px;
-    padding-left: 25px;
     border-bottom: 1px solid var(--indicator-border);
     width: 100%;
     overflow: hidden;
@@ -34,37 +41,13 @@
         }
       }
     }
-  }
-}
-@media screen and(max-width: $breakpoint-mobile-max) {
-  .group-tabs {
-    background-color: var(--switch-bg-pro);
-    border-radius: 30px;
-    display: flex;
-    flex-wrap: wrap;
-    width: 248px;
-    margin: 20px auto 30px auto;
-    border: 1px solid var(--switch-bg-pro);
-    .tab {
-      width: 123px;
-      height: 33px;
-      border-radius: 30px;
-      border: none;
-      outline: none;
-      display: flex;
-      align-items: center;
+    @media screen and (min-width: $breakpoint-mobile-min){
+      padding-left: 25px;
+      margin-bottom: 22px;
+    }
+    @media screen and (max-width: $breakpoint-mobile-max){
       justify-content: center;
-      background-color: transparent;
-      font-size: 10px;
-      line-height: 1.5;
-      font-weight: 800;
-      color: #8992a4;
-      text-transform: uppercase;
-      cursor: pointer;
-      &.active {
-        background-color: var(--lend-bg-hover);
-        color: var(--primary-text);
-      }
+      margin-bottom: 32px;
     }
   }
 }

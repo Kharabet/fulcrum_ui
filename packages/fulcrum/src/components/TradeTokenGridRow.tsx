@@ -1,12 +1,10 @@
 import { BigNumber } from "@0x/utils";
 import React, { Component } from "react";
 import { Asset } from "../domain/Asset";
-import { AssetsDictionary } from "../domain/AssetsDictionary";
 import { PositionType } from "../domain/PositionType";
 import { TradeRequest } from "../domain/TradeRequest";
 import { TradeType } from "../domain/TradeType";
 import { FulcrumProviderEvents } from "../services/events/FulcrumProviderEvents";
-import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { FulcrumProvider } from "../services/FulcrumProvider";
 import { PositionTypeMarkerAlt } from "./PositionTypeMarkerAlt";
 import siteConfig from "../config/SiteConfig.json";
@@ -19,7 +17,7 @@ import { RequestStatus } from "../domain/RequestStatus";
 
 
 export interface ITradeTokenGridRowProps {
-
+  isMobileMedia: boolean;
   baseToken: Asset;
   quoteToken: Asset;
   positionType: PositionType;
@@ -27,6 +25,7 @@ export interface ITradeTokenGridRowProps {
   isTxCompleted: boolean;
   onTrade: (request: TradeRequest) => void;
   changeLoadingTransaction: (isLoadingTransaction: boolean, request: TradeRequest | undefined, isTxcolmpleted: boolean, resultTx: boolean) => void;
+  changeGridPositionType: (activePositionType: PositionType) => void;
 }
 
 interface ITradeTokenGridRowState {
@@ -40,7 +39,6 @@ interface ITradeTokenGridRowState {
   isLoadingTransaction: boolean;
   request: TradeRequest | undefined;
   resultTx: boolean;
-
 }
 
 export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITradeTokenGridRowState> {
@@ -56,7 +54,7 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
       isLoading: true,
       isLoadingTransaction: false,
       request: undefined,
-      resultTx: false
+      resultTx: false,
     };
 
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
@@ -131,7 +129,6 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
 
   public componentWillUnmount(): void {
     this._isMounted = false;
-
     FulcrumProvider.Instance.eventEmitter.off(FulcrumProviderEvents.ProviderAvailable, this.onProviderAvailable);
     FulcrumProvider.Instance.eventEmitter.off(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
     FulcrumProvider.Instance.eventEmitter.off(FulcrumProviderEvents.AskToOpenProgressDlg, this.onAskToOpenProgressDlg);
@@ -140,7 +137,6 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
 
   public componentDidMount(): void {
     this._isMounted = true;
-
     this.derivedUpdate();
   }
 
@@ -161,62 +157,76 @@ export class TradeTokenGridRow extends Component<ITradeTokenGridRowProps, ITrade
 
   public render() {
     return (
-      <div className={`trade-token-grid-row`}>
-        <div className="trade-token-grid-row__col-token-name">
-          <div className="trade-token-grid-row__col-token-name--inner">
-            {this.props.baseToken}
-            <PositionTypeMarkerAlt value={this.props.positionType} />
+      <React.Fragment>
+        {this.props.isMobileMedia && <div className={`trade-token-grid-first-row`}>
+          <div className="trade-token-grid-row__col-token-name">
+            <div className="trade-token-grid-row__col-token-name--inner">
+              {this.props.baseToken}
+              <PositionTypeMarkerAlt value={this.props.positionType} />
+            </div>
           </div>
-        </div>
-        <div className="trade-token-grid-row__col-position-type">
-          <PositionTypeMarker value={this.props.positionType} />
-        </div>
-        <div className="trade-token-grid-row__col-leverage">
-          <div className="leverage-selector__wrapper">
-            <LeverageSelector
-              asset={this.props.baseToken}
-              value={this.state.leverage}
-              minValue={this.props.positionType === PositionType.SHORT ? 1 : 2}
-              maxValue={5}
-              onChange={this.onLeverageSelect}
-            />
+          <div className="poisition-type-switch">
+            <button className={"" + (this.props.positionType === PositionType.LONG ? 'btn-active' : '')} onClick={() => this.props.changeGridPositionType(PositionType.LONG)}>Long</button>
+            <button className={"" + (this.props.positionType === PositionType.SHORT ? 'btn-active' : '')} onClick={() => this.props.changeGridPositionType(PositionType.SHORT)}>Short</button>
           </div>
-        </div>
-        <div title={`$${this.state.baseTokenPrice.toFixed(18)}`} className="trade-token-grid-row__col-price">
-          {this.state.baseTokenPrice.gt(0) && !this.state.isLoading ?
-            <React.Fragment>
-              <span className="fw-normal">$</span>{this.state.baseTokenPrice.toFixed(2)}
-            </React.Fragment>
-            :
-            <Preloader width="74px" />
-          }
-        </div>
-        <div title={`$${this.state.liquidationPrice.toFixed(18)}`} className="trade-token-grid-row__col-price">
-          {
-            this.state.liquidationPrice.gt(0) && !this.state.isLoading ?
-              <React.Fragment>
-                <span className="fw-normal">$</span>{this.state.liquidationPrice.toFixed(2)}
+        </div>}
+        <div className={`trade-token-grid-row`}>
+          {!this.props.isMobileMedia && <div className="trade-token-grid-row__col-token-name">
+            <div className="trade-token-grid-row__col-token-name--inner">
+              {this.props.baseToken}
+              <PositionTypeMarkerAlt value={this.props.positionType} />
+            </div>
+          </div>}
+          {!this.props.isMobileMedia && <div className="trade-token-grid-row__col-position-type">
+            <PositionTypeMarker value={this.props.positionType} />
+          </div>}
+          <div className="trade-token-grid-row__col-leverage">
+            <div className="leverage-selector__wrapper">
+              <LeverageSelector
+                asset={this.props.baseToken}
+                value={this.state.leverage}
+                minValue={this.props.positionType === PositionType.SHORT ? 1 : 2}
+                maxValue={5}
+                onChange={this.onLeverageSelect}
+              />
+            </div>
+          </div>
+          <div title={`$${this.state.baseTokenPrice.toFixed(18)}`} className="trade-token-grid-row__col-price">
+            {this.props.isMobileMedia && <span className="trade-token-grid-row__title">Asset Price</span>}
+            {this.state.baseTokenPrice.gt(0) && !this.state.isLoading
+              ? <React.Fragment>
+                <span className="fw-sign">$</span>{this.state.baseTokenPrice.toFixed(2)}
               </React.Fragment>
-              :
-              <Preloader width="74px" />
-          }
+              : <Preloader width="74px" />
+            }
+          </div>
+          <div title={`$${this.state.liquidationPrice.toFixed(18)}`} className="trade-token-grid-row__col-liquidation">
+            {this.props.isMobileMedia && <span className="trade-token-grid-row__title">Liquidation Price</span>}
+            {this.state.liquidationPrice.gt(0) && !this.state.isLoading
+              ? <React.Fragment>
+                <span className="fw-sign">$</span>{this.state.liquidationPrice.toFixed(2)}
+              </React.Fragment>
+              : <Preloader width="74px" />
+            }
+          </div>
+          <div title={this.state.interestRate.gt(0) ? `${this.state.interestRate.toFixed(18)}%` : ``} className="trade-token-grid-row__col-profit">
+            {this.props.isMobileMedia && <span className="trade-token-grid-row__title">Interest APR</span>}
+
+            {this.state.interestRate.gt(0) && !this.state.isLoading
+              ? <React.Fragment>
+                {this.state.interestRate.toFixed(4)}
+                <span className="fw-sign">%</span>
+              </React.Fragment>
+              : <Preloader width="74px" />
+            }
+          </div>
+          <div className="trade-token-grid-row__col-action">
+            <button className="trade-token-grid-row__button trade-token-grid-row__buy-button trade-token-grid-row__button--size-half" disabled={siteConfig.TradeBuyDisabled || this.state.isLoadingTransaction} onClick={this.onBuyClick}>
+              {TradeType.BUY}
+            </button>
+          </div>
         </div>
-        <div title={this.state.interestRate.gt(0) ? `${this.state.interestRate.toFixed(18)}%` : ``} className="trade-token-grid-row__col-profit">
-          {this.state.interestRate.gt(0) && !this.state.isLoading ?
-            <React.Fragment>
-              {this.state.interestRate.toFixed(4)}
-              <span className="fw-normal">%</span>
-            </React.Fragment>
-            :
-            <Preloader width="74px" />
-          }
-        </div>
-        <div className="trade-token-grid-row__col-action">
-          <button className="trade-token-grid-row__button trade-token-grid-row__buy-button trade-token-grid-row__button--size-half" disabled={siteConfig.TradeBuyDisabled || this.state.isLoadingTransaction} onClick={this.onBuyClick}>
-            {TradeType.BUY}
-          </button>
-        </div>
-      </div>
+      </React.Fragment>
     );
   }
 

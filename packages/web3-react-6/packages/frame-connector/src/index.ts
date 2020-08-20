@@ -26,7 +26,7 @@ export class FrameConnector extends AbstractConnector {
 
   private handleNetworkChanged(networkId: string): void {
     if (__DEV__) {
-      console.log("Handling 'networkChanged' event with payload", networkId)
+      console.log("Handling 'chainChanged' event with payload", networkId)
     }
     this.emitUpdate({ provider: this.provider, chainId: networkId })
   }
@@ -47,7 +47,7 @@ export class FrameConnector extends AbstractConnector {
 
   private handleClose(code: number, reason: string): void {
     if (__DEV__) {
-      console.log("Handling 'close' event with payload", code, reason)
+      console.log("Handling 'disconnect' event with payload", code, reason)
     }
     this.emitDeactivate()
   }
@@ -58,10 +58,10 @@ export class FrameConnector extends AbstractConnector {
     }
 
     this.provider
-      .on('networkChanged', this.handleNetworkChanged)
+      .on('chainChanged', this.handleNetworkChanged)
       .on('chainChanged', this.handleChainChanged)
       .on('accountsChanged', this.handleAccountsChanged)
-      .on('close', this.handleClose)
+      .on('disconnect', this.handleClose)
 
     const account = await this.provider
       .enable()
@@ -91,9 +91,9 @@ export class FrameConnector extends AbstractConnector {
 
   public deactivate() {
     this.provider
-      .removeListener('networkChanged', this.handleNetworkChanged)
+      .removeListener('chainChanged', this.handleNetworkChanged)
       .removeListener('chainChanged', this.handleChainChanged)
       .removeListener('accountsChanged', this.handleAccountsChanged)
-      .removeListener('close', this.handleClose)
+      .removeListener('disconnect', this.handleClose)
   }
 }

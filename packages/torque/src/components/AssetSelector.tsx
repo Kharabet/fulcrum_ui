@@ -31,9 +31,15 @@ export class AssetSelector extends Component<IAssetSelectorProps> {
       ];
     } else if (process.env.REACT_APP_ETH_NETWORK === "kovan") {
       this.assetsShown = [
-        Asset.KNC,
         Asset.DAI,
-        Asset.ETH,
+        Asset.USDC,
+        Asset.USDT,
+        Asset.SUSD,
+        Asset.fWETH,
+        Asset.WBTC,
+        Asset.LINK,
+        Asset.ZRX,
+        Asset.KNC,
       ];
     } else if (process.env.REACT_APP_ETH_NETWORK === "ropsten") {
       this.assetsShown = [

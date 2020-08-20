@@ -72,7 +72,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
       isLoading: false,
       currentPage: "",
       web3: FulcrumProvider.Instance.web3Wrapper,
-      isMobileMedia: false
+      isMobileMedia: false,
     };
 
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
@@ -101,6 +101,8 @@ export class AppRouter extends Component<any, IAppRouterState> {
 
     return Web3ConnectionFactory.currentWeb3Engine;
   }
+
+  
 
 
   public render() {

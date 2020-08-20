@@ -30,7 +30,7 @@ export class OnChainIndicator extends Component<IOnChainIndicatorProps, IOnChain
       providerTypeDetails: null
     };
 
-    FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderIsChanging, this.onProviderIsChanging);
+    // FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderIsChanging, this.onProviderIsChanging);
     FulcrumProvider.Instance.eventEmitter.on(FulcrumProviderEvents.ProviderChanged, this.onProviderChanged);
   }
 

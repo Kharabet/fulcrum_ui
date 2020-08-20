@@ -8,16 +8,14 @@ export class OwnTokenGridHeader extends Component<IOwnTokenGridHeaderProps> {
     return (
       <div className="own-token-grid-header">
         <div className="own-token-grid-header__col-token-name">
-          <span className="own-token-grid-header__text">Asset</span>
+          <span className="own-token-grid-header__text">Pair</span>
         </div>
         <div className="own-token-grid-header__col-position-type">
           <span className="own-token-grid-header__text">Type</span>
         </div>
-        <div className="own-token-grid-header__col-asset-unit">
-          <span className="own-token-grid-header__text">Unit of Account</span>
-        </div>
+
         <div className="own-token-grid-header__col-position">
-          <span className="own-token-grid-header__text">Position (ETH)</span>
+          <span className="own-token-grid-header__text">Position</span>
         </div>
         <div className="own-token-grid-header__col-asset-price">
           <span className="own-token-grid-header__text">Open Price</span>

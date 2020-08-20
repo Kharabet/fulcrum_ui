@@ -1,5 +1,5 @@
 import { BigNumber } from "@0x/utils";
-import { Asset } from "./Asset";
+import { Asset } from "../Asset";
 
 export class LiquidationEvent {
   public static readonly topic0: string = "0x46fa03303782eb2f686515f6c0100f9a62dabe587b0d3f5a4fc0c822d6e532d3"

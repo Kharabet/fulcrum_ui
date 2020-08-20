@@ -9,7 +9,7 @@ export interface ITokenGridTabsProps {
   selectedMarket: IMarketPair;
   isMobile: boolean;
   baseTokens: Asset[];
-  stablecoinAssets: Asset[];
+  quoteTokens: Asset[];
   isShowMyTokensOnly: boolean;
   openedPositionsCount: number;
   onMarketSelect: (baseToken: Asset, quoteToken: Asset) => void;
@@ -90,7 +90,7 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
           </div>
           <div className="trade-token-grid-tab__items">
             {/* {this.props.assets.map(asset => (this.renderAsset(asset)))} */}
-              <ManageButton {...this.props} onShowMyTokensOnlyChange={this.showMyTokensOnlyChange} isShowMyTokensOnly={this.state.isShowMyTokensOnly}/>
+            <ManageButton {...this.props} onShowMyTokensOnlyChange={this.showMyTokensOnlyChange} isShowMyTokensOnly={this.state.isShowMyTokensOnly} />
           </div>
 
           <div className="pro-switch-wrapper">
@@ -121,12 +121,15 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
 
     let dropDownSelectOptions: IDropDownSelectOption[] = [];
     this.props.baseTokens.forEach(baseToken => {
-      this.props.stablecoinAssets.forEach(stablecoin =>
-        dropDownSelectOptions.push({
+      
+      this.props.quoteTokens.forEach(stablecoin =>
+        baseToken != stablecoin && dropDownSelectOptions.push({
           baseToken: baseToken,
           quoteToken: stablecoin
         })
-      )
+      );
+
+
     });
 
     // dropDownSelectOptions.push({
@@ -134,10 +137,10 @@ export class TokenGridTabs extends Component<ITokenGridTabsProps, ITokenGridTabs
     //   displayName: "Manage"
     // });
 
-    let activeDropDownOption = dropDownSelectOptions.find(option => 
+    let activeDropDownOption = dropDownSelectOptions.find(option =>
       option.baseToken === this.props.selectedMarket.baseToken &&
       option.quoteToken === this.props.selectedMarket.quoteToken
-      );
+    );
 
     return {
       options: dropDownSelectOptions,

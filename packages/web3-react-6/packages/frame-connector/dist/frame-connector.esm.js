@@ -133,7 +133,7 @@ var FrameConnector = /*#__PURE__*/function (_AbstractConnector) {
 
   _proto.handleNetworkChanged = function handleNetworkChanged(networkId) {
     if (process.env.NODE_ENV !== "production") {
-      console.log("Handling 'networkChanged' event with payload", networkId);
+      console.log("Handling 'chainChanged' event with payload", networkId);
     }
 
     this.emitUpdate({
@@ -164,7 +164,7 @@ var FrameConnector = /*#__PURE__*/function (_AbstractConnector) {
 
   _proto.handleClose = function handleClose(code, reason) {
     if (process.env.NODE_ENV !== "production") {
-      console.log("Handling 'close' event with payload", code, reason);
+      console.log("Handling 'disconnect' event with payload", code, reason);
     }
 
     this.emitDeactivate();
@@ -178,7 +178,7 @@ var FrameConnector = /*#__PURE__*/function (_AbstractConnector) {
         _this4.provider = ethProvider('frame');
       }
 
-      _this4.provider.on('networkChanged', _this4.handleNetworkChanged).on('chainChanged', _this4.handleChainChanged).on('accountsChanged', _this4.handleAccountsChanged).on('close', _this4.handleClose);
+      _this4.provider.on('chainChanged', _this4.handleNetworkChanged).on('chainChanged', _this4.handleChainChanged).on('accountsChanged', _this4.handleAccountsChanged).on('disconnect', _this4.handleClose);
 
       return Promise.resolve(_this4.provider.enable().then(function (accounts) {
         return accounts[0];
@@ -232,7 +232,7 @@ var FrameConnector = /*#__PURE__*/function (_AbstractConnector) {
   };
 
   _proto.deactivate = function deactivate() {
-    this.provider.removeListener('networkChanged', this.handleNetworkChanged).removeListener('chainChanged', this.handleChainChanged).removeListener('accountsChanged', this.handleAccountsChanged).removeListener('close', this.handleClose);
+    this.provider.removeListener('chainChanged', this.handleNetworkChanged).removeListener('chainChanged', this.handleChainChanged).removeListener('accountsChanged', this.handleAccountsChanged).removeListener('disconnect', this.handleClose);
   };
 
   return FrameConnector;

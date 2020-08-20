@@ -36,8 +36,13 @@ export default class LendPage extends PureComponent<ILendPageProps, ILendPageSta
       lendRequestId: 0
     };
   }
+  private _isMounted: boolean = false;
 
+  public componentWillUnmount(): void {
+    this._isMounted = false;
+  }
   public componentDidMount(): void {
+    this._isMounted = true;
     const provider = FulcrumProvider.getLocalstorageItem('providerType');
     if (!FulcrumProvider.Instance.web3Wrapper && (!provider || provider === "None")) {
       this.props.doNetworkConnect();
@@ -48,18 +53,10 @@ export default class LendPage extends PureComponent<ILendPageProps, ILendPageSta
     return (
       <div className="lend-page">
         <main className="lend-page-main">
-          <InfoBlock localstorageItemProp="defi-risk-notice" onAccept={() => { this.forceUpdate() }}>
-            For your safety, please ensure the URL in your browser starts with: https://app.fulcrum.trade/. <br />
-            Fulcrum is a non-custodial platform for tokenized lending and margin trading. <br />
-            "Non-custodial" means YOU are responsible for the security of your digital assets. <br />
-            To learn more about how to stay safe when using Fulcrum and other bZx products, please read our <button className="disclosure-link" onClick={this.props.isRiskDisclosureModalOpen}>DeFi Risk Disclosure</button>.
-          </InfoBlock>
-          {localStorage.getItem("defi-risk-notice") ?
-            <InfoBlock localstorageItemProp="lend-page-info">
-              Currently only our lending, unlending, and closing of position functions are enabled.  <br />
+          <InfoBlock localstorageItemProp="lend-page-info">
+            Currently only our lending, unlending, and closing of position functions are enabled.  <br />
               Full functionality will return after a thorough audit of our newly implemented and preexisting smart contracts.
           </InfoBlock>
-            : null}
 
           {this.props.isMobileMedia && <div className="lend-page__header">Lend</div>
           }
@@ -91,7 +88,7 @@ export default class LendPage extends PureComponent<ILendPageProps, ILendPageSta
     const lendRequestId = request.id;
 
     if (request) {
-      this.setState({
+      this._isMounted && this.setState({
         ...this.state,
         isLendModalOpen: true,
         lendType: request.lendType,
@@ -102,7 +99,7 @@ export default class LendPage extends PureComponent<ILendPageProps, ILendPageSta
   };
 
   public onLendConfirmed = (request: LendRequest) => {
-    this.setState({
+    this._isMounted && this.setState({
       ...this.state,
       isLendModalOpen: false,
     });
@@ -111,7 +108,7 @@ export default class LendPage extends PureComponent<ILendPageProps, ILendPageSta
   };
 
   public onRequestClose = () => {
-    this.setState({
+    this._isMounted && this.setState({
       ...this.state,
       isLendModalOpen: false
     });
