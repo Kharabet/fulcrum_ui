@@ -9,9 +9,9 @@
         width: 44px;
         input {
             display: none;
-            [data-theme="dark"] & + .slider,
+
             &[data-isgastokenenabled="false"] + .slider {
-                background-color: var(--switch-bg);
+                background-color: $switch-bg;
                 &:before {
                     transform: translateX(-19px);
                 }
@@ -25,7 +25,7 @@
             }
         }
         .slider {
-            background-color: var(--switch-bg);
+            background-color: $switch-bg;
             bottom: 0;
             cursor: pointer;
             left: 0;
@@ -37,7 +37,7 @@
                 position: absolute;
                 height: 19px;
                 width: 19px;
-                background-color: var(--switch-button);
+                background-color: $switch-button;
                 bottom: 3px;
                 right: 3px;
                 transition: 0.4s;

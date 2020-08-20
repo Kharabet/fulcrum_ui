@@ -9,6 +9,9 @@ import { AbstractConnector } from '@web3-react/abstract-connector';
 import { SwitchButtonInput } from "./SwitchButtonInput";
 import { ReactComponent as CloseIcon } from "../assets/images/ic__close.svg";
 
+import { Asset } from "../domain/Asset";
+import { BigNumber } from "@0x/utils";
+import { AssetsDictionary } from "../domain/AssetsDictionary";
 
 export interface IProviderMenuProps {
   providerTypes: ProviderType[];
@@ -76,13 +79,43 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
     });
   }
 
+  const onChiSwitch = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const switchButton = e.currentTarget;
+    if (!TorqueProvider.Instance.contractsSource) return;
+    if (switchButton.checked) {
+      await TorqueProvider.Instance.checkAndSetApprovalForced(
+        Asset.CHI,
+        TorqueProvider.Instance.contractsSource.getiBZxAddress().toLowerCase(),
+        new BigNumber(10 ** 18)
+      );
+      switchButton.setAttribute('data-isgastokenenabled', 'true');
+      localStorage.setItem('isGasTokenEnabled', 'true');
+    } else {
+      await TorqueProvider.Instance.checkAndSetApprovalForced(
+        Asset.CHI,
+        TorqueProvider.Instance.contractsSource.getiBZxAddress().toLowerCase(),
+        new BigNumber(0)
+      );
+      switchButton.setAttribute('data-isgastokenenabled', 'false');
+      localStorage.setItem('isGasTokenEnabled', 'false');
+    }
+  }
+
+  const ChiTokenLogo = AssetsDictionary.assets.get(Asset.CHI)!.reactLogoSvg;
+
   return (
     <div className="provider-menu">
       <div className="provider-menu__title">
         Select Wallet
         <CloseIcon className="disclosure__close" onClick={props.onProviderMenuClose} />
       </div>
-      <SwitchButtonInput onSwitch={props.onChiSwitch} />
+      {account &&
+        <div className="provider-menu__gas-token">
+          <div className="provider-menu__gas-token-logo"><ChiTokenLogo /></div>
+          <p className="provider-menu__gas-token-text">Use CHI token to save on gas. It would be burned from your wallet on each transaction to save on TX cost.</p>
+          <div className="provider-menu__gas-token-switch"><SwitchButtonInput onSwitch={onChiSwitch} /></div>
+        </div>
+      }
       <ul className="provider-menu__list">{renderItems()}</ul>
       < button
         className="disconnect"

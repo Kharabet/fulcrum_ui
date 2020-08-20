@@ -441,31 +441,47 @@ export class TorqueProvider {
       case Asset.ETH:
       case Asset.WETH:
       case Asset.fWETH:
-        return new BigNumber(10**18).multipliedBy(1500);
+        return new BigNumber(10 ** 18).multipliedBy(1500);
       case Asset.WBTC:
-        return new BigNumber(10**8).multipliedBy(25);
+        return new BigNumber(10 ** 8).multipliedBy(25);
       case Asset.LINK:
-        return new BigNumber(10**18).multipliedBy(60000);
+        return new BigNumber(10 ** 18).multipliedBy(60000);
       case Asset.ZRX:
-        return new BigNumber(10**18).multipliedBy(750000);
+        return new BigNumber(10 ** 18).multipliedBy(750000);
       case Asset.KNC:
-        return new BigNumber(10**18).multipliedBy(550000);
+        return new BigNumber(10 ** 18).multipliedBy(550000);
       case Asset.BAT:
-        return new BigNumber(10**18).multipliedBy(750000);
+        return new BigNumber(10 ** 18).multipliedBy(750000);
       case Asset.DAI:
       case Asset.SAI:
       case Asset.USDC:
       case Asset.USDT:
       case Asset.SUSD:
-        return new BigNumber(10**6).multipliedBy(375000);
+        return new BigNumber(10 ** 6).multipliedBy(375000);
       case Asset.REP:
-        return new BigNumber(10**18).multipliedBy(15000);
+        return new BigNumber(10 ** 18).multipliedBy(15000);
       case Asset.MKR:
-        return new BigNumber(10**18).multipliedBy(1250);
+        return new BigNumber(10 ** 18).multipliedBy(1250);
       default:
         throw new Error("Invalid approval asset!");
     }
   }
+
+  public checkAndSetApprovalForced = async (asset: Asset, spender: string, amountInBaseUnits: BigNumber): Promise<boolean> => {
+    let result = false;
+    const assetErc20Address = this.getErc20AddressOfAsset(asset);
+
+    if (this.web3Wrapper && this.contractsSource && this.contractsSource.canWrite && assetErc20Address) {
+      const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+      const tokenErc20Contract = await this.contractsSource.getErc20Contract(assetErc20Address);
+
+      if (account && tokenErc20Contract) {
+        await tokenErc20Contract.approve.sendTransactionAsync(spender, amountInBaseUnits, { from: account });
+        result = true;
+      }
+    }
+    return result;
+  };
 
   public checkAndSetApproval = async (asset: Asset, spender: string, amountInBaseUnits: BigNumber): Promise<boolean> => {
     let result = false;

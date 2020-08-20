@@ -55,7 +55,7 @@ export class ContractsSource {
     this.canWrite = canWrite;
   }
 
-  private getiBZxAddress(): string {
+  public getiBZxAddress(): string {
     let address: string = "";
     switch (this.networkId) {
       case 1:
@@ -359,23 +359,23 @@ export class ContractsSource {
         }
         break;
       case 42:
-          /*switch (addressErc20) {
-            case "0xd0a1e359811322d97991e03f863a0c30c2cf029c":
-              asset = Asset.ETH;
-              break;
-            case "0xc4375b7de8af5a38a93548eb8453a498222c4ff2":
-              asset = Asset.SAI;
-              break;
-            case "0x4f96fe3b7a6cf9725f59d353f723c1bdb64ca6aa":
-              asset = Asset.DAI;
-              break;
-            case "0x75b0622cec14130172eae9cf166b92e5c112faff":
-              asset = Asset.USDC;
-              break;
-            case "0xad67cb4d63c9da94aca37fdf2761aadf780ff4a2":
-              asset = Asset.KNC;
-              break;
-          }*/
+        /*switch (addressErc20) {
+          case "0xd0a1e359811322d97991e03f863a0c30c2cf029c":
+            asset = Asset.ETH;
+            break;
+          case "0xc4375b7de8af5a38a93548eb8453a498222c4ff2":
+            asset = Asset.SAI;
+            break;
+          case "0x4f96fe3b7a6cf9725f59d353f723c1bdb64ca6aa":
+            asset = Asset.DAI;
+            break;
+          case "0x75b0622cec14130172eae9cf166b92e5c112faff":
+            asset = Asset.USDC;
+            break;
+          case "0xad67cb4d63c9da94aca37fdf2761aadf780ff4a2":
+            asset = Asset.KNC;
+            break;
+        }*/
         switch (addressErc20) {
           case "0xe65d99a06d0ded0d318e31db3ae5d77629c625fc":
             asset = Asset.fWETH;
