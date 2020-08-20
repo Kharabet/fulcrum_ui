@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, useEffect } from "react";
 import { ProviderType } from "../domain/ProviderType";
 import { ProviderMenuListItem } from "./ProviderMenuListItem";
 import { useWeb3React } from '@web3-react/core';
@@ -8,7 +8,6 @@ import { injected } from "../domain/WalletConnectors";
 import { AbstractConnector } from '@web3-react/abstract-connector';
 import { SwitchButtonInput } from "./SwitchButtonInput";
 import { ReactComponent as CloseIcon } from "../assets/images/ic__close.svg";
-
 import { Asset } from "../domain/Asset";
 import { BigNumber } from "@0x/utils";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
@@ -23,13 +22,31 @@ export interface IProviderMenuProps {
 }
 
 export const ProviderMenu = (props: IProviderMenuProps) => {
+  useEffect(() => {
+    const isGasTokenEnabled = localStorage.getItem('isGasTokenEnabled') === "true";
+    const switchButton = document.querySelector<HTMLInputElement>('.provider-menu .theme-switch input[type="checkbox"]');
+    if (switchButton) {
+      if (isGasTokenEnabled) {
+        switchButton.setAttribute('data-isgastokenenabled', 'true');
+        localStorage.setItem('isGasTokenEnabled', 'true');
+        switchButton.checked = true;
+      }
+      else {
+        switchButton.setAttribute('data-isgastokenenabled', 'false');
+        localStorage.setItem('isGasTokenEnabled', 'false');
+        switchButton.checked = false;
+      };
+    }
+
+  });
+
   const context = useWeb3React()
   const { connector, library, chainId, account, activate, deactivate, active, error } = context
 
   // handle logic to recognize the connector currently being activated
   //@ts-ignore
   const [activatingConnector, setActivatingConnector] = React.useState()
-  React.useEffect(() => {
+  useEffect(() => {
     if (activatingConnector && activatingConnector === connector) {
       if (active && connector && account) {
         props.onSelect(connector, account);
