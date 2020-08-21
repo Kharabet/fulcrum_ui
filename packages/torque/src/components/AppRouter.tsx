@@ -51,6 +51,7 @@ interface IAppRouterState {
   isLoading: boolean;
   web3: Web3Wrapper | null;
   isMobileMedia: boolean;
+  isChiEnabled: boolean;
 }
 
 export class AppRouter extends Component<any, IAppRouterState> {
@@ -65,6 +66,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
       selectedProviderType: TorqueProvider.Instance.providerType,
       web3: TorqueProvider.Instance.web3Wrapper,
       isMobileMedia: false,
+      isChiEnabled: TorqueProvider.getLocalstorageItem('isChiEnabled') === "true"
     };
 
     TorqueProvider.Instance.eventEmitter.on(TorqueProviderEvents.ProviderChanged, this.onProviderChanged);
@@ -93,6 +95,10 @@ export class AppRouter extends Component<any, IAppRouterState> {
     return Web3ConnectionFactory.currentWeb3Engine;
   }
 
+  public onChiSwitch = () => {
+
+  }
+
 
   public render() {
     return (
@@ -110,6 +116,8 @@ export class AppRouter extends Component<any, IAppRouterState> {
             onSelect={this.onProviderTypeSelect}
             onDeactivate={this.onDeactivate}
             onProviderMenuClose={this.onRequestClose}
+            onChiSwitch={this.onChiSwitch}
+
           />
         </Modal>
 
