@@ -81,7 +81,7 @@ export class BorrowProcessor {
     //Submitting loan
     task.processingStepNext();
 
-    let gasAmountBN;
+    let gasAmountBN = new BigNumber(0);
     let txHash: string = "";
 
     try {
@@ -129,7 +129,7 @@ export class BorrowProcessor {
           value: isETHCollateralAsset
             ? depositAmountInBaseUnits
             : undefined,
-          gas: gasAmountBN ? gasAmountBN.toString() : "3000000",
+          gas: !gasAmountBN.eq(0) ? gasAmountBN.toString() : "3000000",
           gasPrice: await TorqueProvider.Instance.gasPrice()
         }
       );

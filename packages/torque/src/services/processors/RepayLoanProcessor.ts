@@ -85,7 +85,7 @@ export class RepayLoanProcessor {
           closeAmountInBaseUnits = new BigNumber(10 ** 50);
       }
 
-      let gasAmountBN;
+      let gasAmountBN = new BigNumber(0);
       try {
         // console.log(bZxContract.address);
         const gasAmount = await bZxContract.closeWithDeposit.estimateGasAsync(
@@ -120,7 +120,7 @@ export class RepayLoanProcessor {
             value: isETHBorrowAsset
               ? closeAmountInBaseUnitsValue
               : undefined,
-            gas: gasAmountBN ? gasAmountBN.toString() : "3000000",
+            gas: !gasAmountBN.eq(0) ? gasAmountBN.toString() : "3000000",
             gasPrice: await TorqueProvider.Instance.gasPrice()
           }
         );

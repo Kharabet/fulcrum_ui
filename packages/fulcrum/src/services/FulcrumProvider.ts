@@ -423,27 +423,28 @@ export class FulcrumProvider {
       case Asset.ETH:
       case Asset.WETH:
       case Asset.fWETH:
-        return new BigNumber(10 ** 18).multipliedBy(1500);
+        return new BigNumber(10**18).multipliedBy(1500);
       case Asset.WBTC:
-        return new BigNumber(10 ** 8).multipliedBy(25);
+        return new BigNumber(10**8).multipliedBy(25);
       case Asset.LINK:
-        return new BigNumber(10 ** 18).multipliedBy(60000);
+        return new BigNumber(10**18).multipliedBy(60000);
       case Asset.ZRX:
-        return new BigNumber(10 ** 18).multipliedBy(750000);
+        return new BigNumber(10**18).multipliedBy(750000);
       case Asset.KNC:
-        return new BigNumber(10 ** 18).multipliedBy(550000);
+        return new BigNumber(10**18).multipliedBy(550000);
       case Asset.BAT:
         return new BigNumber(10**18).multipliedBy(750000);
       case Asset.DAI:
       case Asset.SAI:
+      case Asset.SUSD:
+      return new BigNumber(10**18).multipliedBy(375000);
       case Asset.USDC:
       case Asset.USDT:
-      case Asset.SUSD:
         return new BigNumber(10**6).multipliedBy(375000);
       case Asset.REP:
         return new BigNumber(10**18).multipliedBy(15000);
       case Asset.MKR:
-        return new BigNumber(10 ** 18).multipliedBy(1250);
+        return new BigNumber(10**18).multipliedBy(1250);
       case Asset.CHI:
         return new BigNumber(10 ** 18);
       default:

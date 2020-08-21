@@ -454,14 +454,17 @@ export class TorqueProvider {
         return new BigNumber(10**18).multipliedBy(750000);
       case Asset.DAI:
       case Asset.SAI:
+      case Asset.SUSD:
+      return new BigNumber(10**18).multipliedBy(375000);
       case Asset.USDC:
       case Asset.USDT:
-      case Asset.SUSD:
         return new BigNumber(10**6).multipliedBy(375000);
       case Asset.REP:
         return new BigNumber(10**18).multipliedBy(15000);
       case Asset.MKR:
         return new BigNumber(10**18).multipliedBy(1250);
+      case Asset.CHI:
+        return new BigNumber(10 ** 18);
       default:
         throw new Error("Invalid approval asset!");
     }
