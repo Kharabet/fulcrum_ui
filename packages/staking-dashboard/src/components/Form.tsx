@@ -8,6 +8,11 @@ import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { Asset } from "../domain/Asset";
 
 
+interface IFormProps {
+  openFindRepresentative: () => void;
+  openBecomeRepresentative: () => void;
+}
+
 interface IFormState {
   bzrxV1Balance: BigNumber;
   bzrxBalance: BigNumber;
@@ -19,7 +24,7 @@ interface IFormState {
   canOptin: boolean;
 }
 
-export class Form extends Component<{}, IFormState> {
+export class Form extends Component<IFormProps, IFormState> {
   constructor(props: any) {
     super(props);
     this.state = {
@@ -205,6 +210,10 @@ export class Form extends Component<{}, IFormState> {
               <button title="Coming soon" className="button" disabled={true}>Claim Rewards</button>
               <button title="Coming soon" className="button" disabled={true}>Explore Reward Pool</button>
               <p className="notice">Coming soon</p>
+            </div>
+            <div className="group-buttons">
+              <button className="button" onClick={this.props.openFindRepresentative}>Find a Representative</button>
+              <button className="button" onClick={this.props.openBecomeRepresentative}>Become A Representative</button>
             </div>
           </div>
         </div>

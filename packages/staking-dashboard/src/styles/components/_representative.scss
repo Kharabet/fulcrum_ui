@@ -1,0 +1,26 @@
+.become-representative {
+  min-width: 590px;
+  input {
+    font-size: 16px;
+    background: #f5f7f9;
+    border: 2px solid #e7ebf0;
+    outline: none;
+    box-sizing: border-box;
+    border-radius: 16px;
+    height: 60px;
+    margin-bottom: 48px;
+    padding-left: 20px;
+    color: #283049;
+    &::placeholder {
+      color: #a9b5c7;
+    }
+  }
+  .button {
+    width: 328px;
+    height: 64px;
+    margin: auto;
+  }
+}
+.find-representative {
+  min-width: 750px;
+}
