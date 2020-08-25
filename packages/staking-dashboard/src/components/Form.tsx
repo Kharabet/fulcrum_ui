@@ -223,9 +223,11 @@ export class Form extends Component<IFormProps, IFormState> {
               <button title="Coming soon" className="button" disabled={true}>Explore Reward Pool</button>
               <p className="notice">Coming soon</p>
             </div>*/}
-            <div className="group-buttons">
-              <button className="button" onClick={this.props.openFindRepresentative}>Find a Representative</button>
-              <button className="button" onClick={this.props.openBecomeRepresentative}>Become A Representative</button>
+            <div className="calculator-row">
+              <div className="group-buttons">
+                <button className="button" onClick={this.props.openFindRepresentative}>Find a Representative</button>
+                <button className="button" onClick={this.props.openBecomeRepresentative}>Become A Representative</button>
+              </div>
             </div>
           </div>
         </div>
