@@ -110,6 +110,13 @@
       max-width: 540px;
     }
   }
+  &.blue {
+    background-color: #276bfb;
+    color: #ffffff;
+    &:hover {
+      background-color: #5b88ff;
+    }
+  }
   &:hover {
     cursor: pointer;
     background-color: #5b88ff;
