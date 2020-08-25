@@ -6,6 +6,7 @@ import { StakingProviderEvents } from "../services/events/StakingProviderEvents"
 import { BigNumber } from "@0x/utils";
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { Asset } from "../domain/Asset";
+import { AddToBalance } from "./AddToBalance";
 
 
 interface IFormState {
@@ -199,6 +200,7 @@ export class Form extends Component<{}, IFormState> {
                 </button>
               </div>
             }
+            <AddToBalance />
             <div className="group-buttons">
               <button title="Coming soon" className="button" disabled={true}>Stake</button>
               <button title="Coming soon" className="button" disabled={true}>Unstake</button>
