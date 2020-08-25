@@ -6,56 +6,71 @@
 
   .calculator-row {
     display: flex;
+    flex-direction: column;
     justify-content: space-between;
+    &:not(:last-child) {
+      border-bottom: 1px solid #e7ebf0;
+    }
     @media screen and (max-width: $width-max-sm) {
       flex-direction: column;
     }
     @media screen and (min-width: $width-min-xs) {
-      padding: 45px;
+      padding: 24px 32px 20px 32px;
     }
     @media screen and (max-width: $width-max-xs) {
       padding: 30px;
     }
     .row-header {
-      font-weight: 200;
-      line-height: 1.8;
+      font-weight: 800;
+      line-height: 1.5;
       display: flex;
       align-items: center;
+      color: #283049;
       @media screen and (min-width: $width-min-xs) {
-        font-size: 14px;
-        margin-bottom: 10px;
-      }
+        font-size: 16px;
+        margin-bottom: 24px;
+      } 
       @media screen and (max-width: $width-max-xs) {
         font-size: 11px;
       }
     }
-    .row-container:not(:last-child){
-      margin-bottom: 25px;
+    .row-container {
+      margin-bottom: 32px;
     }
     .row-body {
       font-weight: 800;
-      line-height: 1.2;
+      line-height: 1;
       color: #283049;
       position: relative;
+      display: flex;
+      align-items: center;
+      padding-top: 15px;
       @media screen and (min-width: $width-min-xs) {
-        font-size: 46px;
+        font-size: 36px;
       }
       @media screen and (max-width: $width-max-xs) {
-        font-size: 38px;
+        font-size: 32px;
       }
       .value {
         position: relative;
-        .icon {
-          position: absolute;
-          top: 10px;
-          left: calc(100% + 8px);
-          display: flex;
-          svg {
-            height: 24px;
-            width: 24px;
-          }
+      }
+      .icon {
+        display: flex;
+        svg {
+          width: 32px;
+          height: auto;
+          margin-right: 14px;
         }
       }
+    }
+    .row-token {
+      position: absolute;
+      top: 0;
+      left: 46px;
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1;
+      color: #758295;
     }
     .row-footer {
       font-weight: 600;
@@ -70,7 +85,7 @@
     }
     .reward-item {
       @media screen and (min-width: $width-min-sm) {
-        padding-right: 20px;
+        padding-bottom: 12px;
       }
       @media screen and (max-width: $width-max-sm) {
         padding-top: 45px;
@@ -78,6 +93,13 @@
       .row-body,
       .row-footer {
         color: $green-color;
+      }
+      .row-body{
+        padding-top: 0;
+        justify-content: space-between;
+      }
+      .row-footer{
+        margin-bottom: -13px;
       }
     }
   }
