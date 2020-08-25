@@ -29,31 +29,43 @@ export class AddToBalance extends Component<IAddToBalanceProps, IAddToBalanceSta
     public render() {
         return (
             <React.Fragment>
-                <div className="add-to-balance">
+                <div className="add-to-balance calculator-row">
+
 
                     <label>Add to staking balance</label>
+
                     <div className="calc-item">
-                        <div className="border-quantity">
-                            <input step="any" type="number" value={this.state.bzrxBalance} onChange={this.changeBzrxBalance} />
+                        <input className="add-to-balance__input" type="number" value={this.state.bzrxBalance} onChange={this.changeBzrxBalance} />
+                        <div className="add-to-balance__range">
                             <input step="1" type="range" min="0" max={this._maxBzrxBalance} value={this.state.bzrxBalance} onChange={this.changeBzrxBalance} />
-                            <label><span>{this.numberWithCommas(this.state.bzrxBalance)}</span> <span className="sign">BZRX</span><img src="/images/logo-icon.svg" alt="" /></label>
+                            <div className="line"><div></div><div></div><div></div><div></div></div>
+                            <div className="progress" style={{ width: `calc(100%*${this.state.bzrxBalance}/${this._maxBzrxBalance})` }}></div>
                         </div>
+                        <label><span>{this.numberWithCommas(this.state.bzrxBalance)}</span> <span className="sign">BZRX</span><img src="/images/logo-icon.svg" alt="" /></label>
                     </div>
                     <div className="calc-item">
-                        <div className="border-quantity">
-                            <input step="any" type="number" value={this.state.vBzrxBalance} onChange={this.changeVBzrxBalance} />
+                        <input className="add-to-balance__input" type="number" value={this.state.vBzrxBalance} onChange={this.changeVBzrxBalance} />
+                        <div className="add-to-balance__range">
                             <input step="1" type="range" min="0" max={this._maxVBzrxBalance} value={this.state.vBzrxBalance} onChange={this.changeVBzrxBalance} />
-                            <label><span>{this.numberWithCommas(this.state.vBzrxBalance)}</span> <span className="sign">vBZRX</span><img src="/images/logo-icon.svg" alt="" /></label>
+                            <div className="line"><div></div><div></div><div></div><div></div></div>
+                            <div className="progress" style={{ width: `calc(100%*${this.state.vBzrxBalance}/${this._maxVBzrxBalance})` }}></div>
                         </div>
+                        <label><span>{this.numberWithCommas(this.state.vBzrxBalance)}</span> <span className="sign">vBZRX</span><img src="/images/logo-icon.svg" alt="" /></label>
+
                     </div>
+
                     <div className="calc-item">
-                        <div className="border-quantity">
-                            <input step="any" type="number" value={this.state.bptBalance} onChange={this.changeBptBalance} />
+                        <input className="add-to-balance__input" type="number" value={this.state.bptBalance} onChange={this.changeBptBalance} />
+                        <div className="add-to-balance__range">
                             <input step="0.001" type="range" min="0" max={this._maxBptBalance} value={this.state.bptBalance} onChange={this.changeBptBalance} />
-                            <label><span>{this.numberWithCommas(this.state.bptBalance)}</span> <span className="sign">BPT</span><img src="/images/logo-icon.svg" alt="" /></label>
+                            <div className="line"><div></div><div></div><div></div><div></div></div>
+                            <div className="progress" style={{ width: `calc(100%*${this.state.bptBalance}/${this._maxBptBalance})` }}></div>
                         </div>
+                        <label><span>{this.numberWithCommas(this.state.bptBalance)}</span> <span className="sign">BPT</span><img src="/images/logo-icon.svg" alt="" /></label>
+
                     </div>
-                    <button>Stake</button>
+
+                    <button title="Stake" className="button blue">Stake</button>
                 </div>
             </React.Fragment>
         );
