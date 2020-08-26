@@ -16,6 +16,10 @@
     button {
         width: 100%;
         margin-bottom: 12px;
+        &:disabled,
+        &[disabled] {
+            background: #cbe2ff;
+        }
     }
     &__input {
         width: 100%;

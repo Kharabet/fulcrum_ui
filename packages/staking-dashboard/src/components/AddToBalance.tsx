@@ -67,7 +67,8 @@ export class AddToBalance extends Component<IAddToBalanceProps, IAddToBalanceSta
                         <TokenBpt className="token-logo"></TokenBpt>
                     </div>
 
-                    <button title="Stake" className="button blue">Stake</button>
+                    <button title="Stake" className="button blue" disabled={(!this.state.bptBalance && !this.state.vBzrxBalance && !this.state.bzrxV1Balance)}>
+                        Stake</button>
                 </div>
             </React.Fragment>
         );
