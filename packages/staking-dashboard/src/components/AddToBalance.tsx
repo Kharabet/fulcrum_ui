@@ -1,4 +1,7 @@
 import React, { ChangeEvent, Component } from "react";
+import { ReactComponent as TokenBzrx } from "../assets/images/token-bzrx.svg";
+import { ReactComponent as TokenVBzrx } from "../assets/images/token-vbzrx.svg";
+import { ReactComponent as TokenBpt } from "../assets/images/token-bpt.svg";
 
 interface IAddToBalanceProps {
     // isMobileMedia: boolean;
@@ -30,10 +33,7 @@ export class AddToBalance extends Component<IAddToBalanceProps, IAddToBalanceSta
         return (
             <React.Fragment>
                 <div className="add-to-balance calculator-row">
-
-
                     <label>Add to staking balance</label>
-
                     <div className="calc-item">
                         <input className="add-to-balance__input" type="number" value={this.state.bzrxBalance} onChange={this.changeBzrxBalance} />
                         <div className="add-to-balance__range">
@@ -41,7 +41,8 @@ export class AddToBalance extends Component<IAddToBalanceProps, IAddToBalanceSta
                             <div className="line"><div></div><div></div><div></div><div></div></div>
                             <div className="progress" style={{ width: `calc(100%*${this.state.bzrxBalance}/${this._maxBzrxBalance})` }}></div>
                         </div>
-                        <label><span>{this.numberWithCommas(this.state.bzrxBalance)}</span> <span className="sign">BZRX</span><img src="/images/logo-icon.svg" alt="" /></label>
+                        <label className="sign">BZRX</label>
+                        <TokenBzrx className="token-logo"></TokenBzrx>
                     </div>
                     <div className="calc-item">
                         <input className="add-to-balance__input" type="number" value={this.state.vBzrxBalance} onChange={this.changeVBzrxBalance} />
@@ -50,10 +51,10 @@ export class AddToBalance extends Component<IAddToBalanceProps, IAddToBalanceSta
                             <div className="line"><div></div><div></div><div></div><div></div></div>
                             <div className="progress" style={{ width: `calc(100%*${this.state.vBzrxBalance}/${this._maxVBzrxBalance})` }}></div>
                         </div>
-                        <label><span>{this.numberWithCommas(this.state.vBzrxBalance)}</span> <span className="sign">vBZRX</span><img src="/images/logo-icon.svg" alt="" /></label>
-
+                        {/* <span>{this.numberWithCommas(this.state.vBzrxBalance)}</span> */}
+                        <label className="sign">vBZRX</label>
+                        <TokenVBzrx className="token-logo"></TokenVBzrx>
                     </div>
-
                     <div className="calc-item">
                         <input className="add-to-balance__input" type="number" value={this.state.bptBalance} onChange={this.changeBptBalance} />
                         <div className="add-to-balance__range">
@@ -61,8 +62,9 @@ export class AddToBalance extends Component<IAddToBalanceProps, IAddToBalanceSta
                             <div className="line"><div></div><div></div><div></div><div></div></div>
                             <div className="progress" style={{ width: `calc(100%*${this.state.bptBalance}/${this._maxBptBalance})` }}></div>
                         </div>
-                        <label><span>{this.numberWithCommas(this.state.bptBalance)}</span> <span className="sign">BPT</span><img src="/images/logo-icon.svg" alt="" /></label>
-
+                        {/* <span>{this.numberWithCommas(this.state.bptBalance)}</span> */}
+                        <label className="sign">BPT</label>
+                        <TokenBpt className="token-logo"></TokenBpt>
                     </div>
 
                     <button title="Stake" className="button blue">Stake</button>

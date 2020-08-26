@@ -9,11 +9,13 @@
         margin-bottom: 30px;
     }
     .calc-item {
+        position: relative;
         margin-bottom: 30px;
         width: 100%;
     }
     button {
         width: 100%;
+        margin-bottom: 12px;
     }
     &__input {
         width: 100%;
@@ -23,7 +25,7 @@
         border: none;
         border-radius: 16px;
         outline: none;
-        padding: 30px 30px;
+        padding: 30px 63px;
         &::-webkit-outer-spin-button,
         &::-webkit-inner-spin-button {
             -webkit-appearance: none;
@@ -53,33 +55,50 @@
                 cursor: pointer;
             }
         }
-        .line,
-        .progress {
-            pointer-events: none;
-            position: absolute;
+    }
+    .line,
+    .progress {
+        pointer-events: none;
+        position: absolute;
 
-            border-radius: 10px;
-            top: 5px;
-            height: 6px;
+        border-radius: 10px;
+        top: 5px;
+        height: 6px;
 
-            z-index: 0;
-        }
-        .progress {
-            background: #33dfcc;
-        }
-        .line {
-            width: 100%;
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 0 2px;
+        z-index: 0;
+    }
+    .progress {
+        background: #33dfcc;
+    }
+    .line {
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0 2px;
 
-            div {
-                background: #cbe2ff;
-                overflow: hidden;
-                &:last-child {
-                    border-radius: 0 10px 10px 0;
-                }
+        div {
+            background: #cbe2ff;
+            overflow: hidden;
+            &:last-child {
+                border-radius: 0 10px 10px 0;
             }
         }
+    }
+
+    .token-logo {
+        position: absolute;
+        left: 16px;
+        top: 19px;
+        width: 32px;
+        height: 32px;
+    }
+    .sign {
+        position: absolute;
+        text-align: right;
+        top: 23px;
+        right: 16px;
+        font-weight: 600;
+        font-size: 18px;
+        color: #758295;
     }
 }
