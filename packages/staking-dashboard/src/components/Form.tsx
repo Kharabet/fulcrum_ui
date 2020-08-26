@@ -159,7 +159,7 @@ export class Form extends Component<IFormProps, IFormState> {
                     <a href={`${etherscanURL}token/0xB72B31907C1C95F3650b64b2469e08EdACeE5e8F`} target="_blank" rel="noopener noreferrer"><span className="icon"><VBzrxIcon /></span></a>
 
                     <span title={this.state.vBzrxBalance.toFixed(18)} className="value">
-                      {this.state.vBzrxBalance.toFixed(2)}
+                      {Number(this.state.vBzrxBalance).toFixed(2)}
                     </span>
                     <div className="row-token">vBZRX</div>
                   </div>
