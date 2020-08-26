@@ -7,6 +7,7 @@ import { StakingProviderEvents } from "../services/events/StakingProviderEvents"
 import { BigNumber } from "@0x/utils";
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { Asset } from "../domain/Asset";
+import { AddToBalance } from "./AddToBalance";
 
 
 interface IFormProps {
@@ -223,6 +224,7 @@ export class Form extends Component<IFormProps, IFormState> {
               <button title="Coming soon" className="button" disabled={true}>Explore Reward Pool</button>
               <p className="notice">Coming soon</p>
             </div>*/}
+            <AddToBalance />
             <div className="calculator-row">
               <div className="group-buttons">
                 <button className="button" onClick={this.props.openFindRepresentative}>Find a Representative</button>
