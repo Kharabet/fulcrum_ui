@@ -177,9 +177,11 @@ export class Form extends Component<IFormProps, IFormState> {
               <div className="reward-item">
                 <div className="row-header">My rewards balance:</div>
                 <div className="row-body">
-                  <span>0</span>
-                  <div className="row-footer">bZxDAO-Balancer tokens</div>
-                  <button title="Coming soon" className="button">Claim Rewards</button>
+                  <div className="reward-content">
+                    <span>0</span>
+                    <div className="row-footer">bZxDAO-Balancer tokens</div>
+                  </div>
+                  <button title="Claim Rewards" className="button">Claim Rewards</button>
                 </div>
               </div>
             </div>

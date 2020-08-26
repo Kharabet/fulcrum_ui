@@ -26,12 +26,12 @@
       display: flex;
       align-items: center;
       color: #283049;
+      margin-bottom: 24px;
       @media screen and (min-width: $width-min-xs) {
         font-size: 16px;
-        margin-bottom: 24px;
-      } 
+      }
       @media screen and (max-width: $width-max-xs) {
-        font-size: 11px;
+        font-size: 12px;
       }
     }
     .row-container {
@@ -43,6 +43,7 @@
       color: #283049;
       position: relative;
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
       padding-top: 15px;
       @media screen and (min-width: $width-min-xs) {
@@ -87,19 +88,27 @@
       @media screen and (min-width: $width-min-sm) {
         padding-bottom: 12px;
       }
-      @media screen and (max-width: $width-max-sm) {
-        padding-top: 45px;
-      }
       .row-body,
       .row-footer {
         color: $green-color;
       }
-      .row-body{
+      .row-body {
         padding-top: 0;
         justify-content: space-between;
       }
-      .row-footer{
-        margin-bottom: -13px;
+      .row-footer {
+        margin-left: 8px;
+        @media screen and (min-width: $width-min-xs) {
+          margin-bottom: -13px;
+        }
+      }
+    }
+    .reward-content {
+      display: flex;
+      align-items: center;
+      @media screen and (max-width: $width-max-xs) {
+        width: 100%;
+        margin-bottom: 24px;
       }
     }
   }

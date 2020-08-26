@@ -1,17 +1,32 @@
 .become-representative {
-  min-width: 590px;
+  @media screen and (min-width: 620px) {
+    min-width: 590px;
+  }
   input {
     padding-left: 20px;
-    margin-bottom: 48px;
+    @media screen and (min-width: $width-min-xs) {
+      margin-bottom: 48px;
+    }
+    @media screen and (max-width: $width-max-xs) {
+      margin-bottom: 24px;
+    }
   }
   .button {
-    width: 328px;
-    height: 64px;
     margin: auto;
+    @media screen and (min-width: $width-min-xs) {
+      height: 64px;
+      width: 328px;
+    }
+    @media screen and (max-width: $width-max-xs) {
+      height: 48px;
+      width: 100%;
+    }
   }
 }
 .find-representative {
-  min-width: 750px;
+  @media screen and (min-width: $width-min-md) {
+    min-width: 750px;
+  }
   input {
     padding-left: 55px;
   }
@@ -26,8 +41,13 @@
     outline: none;
     box-sizing: border-box;
     border-radius: 16px;
-    height: 60px;
     color: #283049;
+    @media screen and (min-width: $width-min-md) {
+      height: 60px;
+    }
+    @media screen and (max-width: $width-max-md) {
+      height: 48px;
+    }
     &::placeholder {
       color: #a9b5c7;
     }
@@ -42,6 +62,9 @@
   color: #8992a4;
   display: flex;
   padding: 25px 6px 10px 6px;
+  @media screen and (max-width: $width-min-md) {
+    display: none;
+  }
   .representative {
     width: 35%;
     padding-left: 20px;
@@ -51,30 +74,71 @@
   background: #f3f9ff;
   border-radius: 60px;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   padding: 6px;
+  @media screen and (max-width: 535px) {
+    border-radius: 16px;
+  }
   &:not(:last-child) {
     margin-bottom: 8px;
   }
+  &:first-child {
+    @media screen and (max-width: $width-max-md) {
+      margin-top: 25px;
+    }
+  }
+
   .photo {
-    width: 56px;
-    height: 56px;
     border: 1px solid red;
     border-radius: 50%;
+    @media screen and (min-width: $width-min-md) {
+      width: 56px;
+      height: 56px;
+    }
+    @media screen and (max-width: $width-max-md) {
+      width: 36px;
+      height: 36px;
+      margin-bottom: 15px;
+    }
   }
   .name {
-    width: calc(35% - 56px);
     font-size: 16px;
     padding-left: 15px;
     line-height: 1.8;
     color: #283049;
+    @media screen and (min-width: $width-min-md) {
+      width: calc(35% - 56px);
+    }
+    @media screen and (max-width: $width-max-md) {
+      width: calc(100% - 36px);
+      margin-bottom: 15px;
+    }
   }
   .token {
     display: flex;
     align-items: center;
-    width: 25%;
+    @media screen and (min-width: $width-min-md) {
+      width: 25%;
+    }
+    @media screen and (max-width: $width-max-md) {
+      width: 40%;
+    }
+    @media screen and (max-width: 535px) {
+      width: 100%;
+      margin-bottom: 15px;
+      margin-left: 6px;
+    }
     &:last-child {
-      width: 15%;
+      @media screen and (min-width: $width-min-md) {
+        width: 15%;
+      }
+      @media screen and (max-width: $width-max-md) {
+        width: 20%;
+      }
+      @media screen and (max-width: 535px) {
+        width: 100%;
+      }
     }
     svg {
       width: 24px;
