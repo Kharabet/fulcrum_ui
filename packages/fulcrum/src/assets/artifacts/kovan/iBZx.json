@@ -1126,6 +1126,11 @@
               "type": "bytes32"
             },
             {
+              "internalType": "uint96",
+              "name": "endTimestamp",
+              "type": "uint96"
+            },
+            {
               "internalType": "address",
               "name": "loanToken",
               "type": "address"
@@ -1173,11 +1178,6 @@
             {
               "internalType": "uint256",
               "name": "fixedLoanTerm",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "loanEndTimestamp",
               "type": "uint256"
             },
             {
@@ -1373,6 +1373,11 @@
               "type": "bytes32"
             },
             {
+              "internalType": "uint96",
+              "name": "endTimestamp",
+              "type": "uint96"
+            },
+            {
               "internalType": "address",
               "name": "loanToken",
               "type": "address"
@@ -1420,11 +1425,6 @@
             {
               "internalType": "uint256",
               "name": "fixedLoanTerm",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "loanEndTimestamp",
               "type": "uint256"
             },
             {
@@ -1741,6 +1741,11 @@
               "type": "bytes32"
             },
             {
+              "internalType": "uint96",
+              "name": "endTimestamp",
+              "type": "uint96"
+            },
+            {
               "internalType": "address",
               "name": "loanToken",
               "type": "address"
@@ -1793,11 +1798,6 @@
             {
               "internalType": "uint256",
               "name": "maxLoanTerm",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "endTimestamp",
               "type": "uint256"
             },
             {

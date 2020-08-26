@@ -521,6 +521,7 @@ export class iBZxContract extends BaseContract {
       defaultBlock?: BlockParam
     ): Promise<Array<{
       loanId: string;
+      loanEndTimestamp: BigNumber;
       loanToken: string;
       collateralToken: string;
       principal: BigNumber;
@@ -532,7 +533,6 @@ export class iBZxContract extends BaseContract {
       maintenanceMargin: BigNumber;
       currentMargin: BigNumber;
       maxLoanTerm: BigNumber;
-      loanEndTimestamp: BigNumber;
       maxLiquidatable: BigNumber;
       maxSeizable: BigNumber;
     }>> {
@@ -556,6 +556,7 @@ export class iBZxContract extends BaseContract {
       // tslint:disable boolean-naming
       const result = abiEncoder.strictDecodeReturnValue<Array<{
         loanId: string;
+        loanEndTimestamp: BigNumber;
         loanToken: string;
         collateralToken: string;
         principal: BigNumber;
@@ -567,7 +568,6 @@ export class iBZxContract extends BaseContract {
         maintenanceMargin: BigNumber;
         currentMargin: BigNumber;
         maxLoanTerm: BigNumber;
-        loanEndTimestamp: BigNumber;
         maxLiquidatable: BigNumber;
         maxSeizable: BigNumber;
       }>>(rawCallResult);
@@ -975,6 +975,7 @@ export class iBZxContract extends BaseContract {
     ): Promise<
       Array<{
         loanId: string;
+        loanEndTimestamp: BigNumber;
         loanToken: string;
         collateralToken: string;
         principal: BigNumber;
@@ -986,7 +987,6 @@ export class iBZxContract extends BaseContract {
         maintenanceMargin: BigNumber;
         currentMargin: BigNumber;
         maxLoanTerm: BigNumber;
-        loanEndTimestamp: BigNumber;
         maxLiquidatable: BigNumber;
         maxSeizable: BigNumber;
       }>
@@ -1009,6 +1009,7 @@ export class iBZxContract extends BaseContract {
       const result = abiEncoder.strictDecodeReturnValue<
         Array<{
           loanId: string;
+          loanEndTimestamp: BigNumber;
           loanToken: string;
           collateralToken: string;
           principal: BigNumber;
@@ -1020,7 +1021,6 @@ export class iBZxContract extends BaseContract {
           maintenanceMargin: BigNumber;
           currentMargin: BigNumber;
           maxLoanTerm: BigNumber;
-          loanEndTimestamp: BigNumber;
           maxLiquidatable: BigNumber;
           maxSeizable: BigNumber;
         }>
