@@ -18,6 +18,7 @@ interface IFormProps {
 interface IFormState {
   bzrxV1Balance: BigNumber;
   bzrxBalance: BigNumber;
+  bptBalance: BigNumber;
   vBzrxBalance: BigNumber;
   iEthBalance: BigNumber;
   iETHSwapRate: BigNumber;
@@ -33,6 +34,7 @@ export class Form extends Component<IFormProps, IFormState> {
       bzrxV1Balance: new BigNumber(0),
       bzrxBalance: new BigNumber(0),
       vBzrxBalance: new BigNumber(0),
+      bptBalance: new BigNumber(0),
       iEthBalance: new BigNumber(0),
       iETHSwapRate: new BigNumber(0),
       whitelistAmount: new BigNumber(0),
@@ -68,6 +70,7 @@ export class Form extends Component<IFormProps, IFormState> {
       bzrxV1Balance,
       bzrxBalance,
       vBzrxBalance,
+      bptBalance: new BigNumber(10),
       iEthBalance,
       iETHSwapRate: new BigNumber(0),
       whitelistAmount: new BigNumber(0),
@@ -165,7 +168,7 @@ export class Form extends Component<IFormProps, IFormState> {
               <div className="row-container">
                 <div className="row-body">
                   <a href="#" target="_blank" rel="noopener noreferrer"><span className="icon"><BPTIcon /></span></a>
-                  <span className="value">10</span>
+                  <span className="value">{this.state.bptBalance.toFixed(2)}</span>
                   <div className="row-token">BPT</div>
                 </div>
               </div>
@@ -241,7 +244,11 @@ export class Form extends Component<IFormProps, IFormState> {
                 </li>
               </ul>
             </div>
-            <AddToBalance />
+            <AddToBalance
+              bzrxV1Balance={Number(this.state.bzrxV1Balance)}
+              bptBalance={Number(this.state.bptBalance)}
+              vBzrxBalance={Number(this.state.vBzrxBalance)}
+            />
             <div className="calculator-row">
               <div className="group-buttons">
                 <button className="button" onClick={this.props.openFindRepresentative}>Find a Representative</button>

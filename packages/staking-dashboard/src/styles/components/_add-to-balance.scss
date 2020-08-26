@@ -87,6 +87,7 @@
 
     .token-logo {
         position: absolute;
+        pointer-events: none;
         left: 16px;
         top: 19px;
         width: 32px;
@@ -94,6 +95,7 @@
     }
     .sign {
         position: absolute;
+        pointer-events: none;
         text-align: right;
         top: 23px;
         right: 23px;
