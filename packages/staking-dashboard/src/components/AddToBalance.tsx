@@ -35,9 +35,9 @@ export class AddToBalance extends Component<IAddToBalanceProps, IAddToBalanceSta
                 <div className="add-to-balance calculator-row">
                     <label>Add to staking balance</label>
                     <div className="calc-item">
-                        <input className="add-to-balance__input" type="number" value={this.state.bzrxV1Balance} onChange={this.changeBzrxBalance} />
+                        <input className="add-to-balance__input" type="number" title={this.state.bzrxV1Balance.toFixed(18)} value={this.state.bzrxV1Balance.toFixed(2)} onChange={this.changeBzrxBalance} />
                         <div className="add-to-balance__range">
-                            <input step="0.01" type="range" min="0" max={this.props.bzrxV1Balance} value={this.state.bzrxV1Balance} onChange={this.changeBzrxBalance} />
+                            <input step="0.01" type="range" min="0" max={this.props.bzrxV1Balance.toFixed(2)} value={this.state.bzrxV1Balance} onChange={this.changeBzrxBalance} />
                             <div className="line"><div></div><div></div><div></div><div></div></div>
                             <div className="progress" style={{ width: `calc(100%*${this.state.bzrxV1Balance}/${this.props.bzrxV1Balance})` }}></div>
                         </div>
@@ -45,9 +45,9 @@ export class AddToBalance extends Component<IAddToBalanceProps, IAddToBalanceSta
                         <TokenBzrx className="token-logo"></TokenBzrx>
                     </div>
                     <div className="calc-item">
-                        <input className="add-to-balance__input" type="number" value={this.state.vBzrxBalance} onChange={this.changeVBzrxBalance} />
+                        <input className="add-to-balance__input" type="number" title={this.state.vBzrxBalance.toFixed(18)} value={this.state.vBzrxBalance.toFixed(2)} onChange={this.changeVBzrxBalance} />
                         <div className="add-to-balance__range">
-                            <input step="0.01" type="range" min="0" max={this.props.vBzrxBalance} value={this.state.vBzrxBalance} onChange={this.changeVBzrxBalance} />
+                            <input step="0.01" type="range" min="0" max={this.props.vBzrxBalance.toFixed(2)} value={this.state.vBzrxBalance} onChange={this.changeVBzrxBalance} />
                             <div className="line"><div></div><div></div><div></div><div></div></div>
                             <div className="progress" style={{ width: `calc(100%*${this.state.vBzrxBalance}/${this.props.vBzrxBalance})` }}></div>
                         </div>
@@ -56,9 +56,9 @@ export class AddToBalance extends Component<IAddToBalanceProps, IAddToBalanceSta
                         <TokenVBzrx className="token-logo"></TokenVBzrx>
                     </div>
                     <div className="calc-item">
-                        <input className="add-to-balance__input" type="number" value={this.state.bptBalance} onChange={this.changeBptBalance} />
+                        <input className="add-to-balance__input" type="number" title={this.state.bptBalance.toFixed(18)} value={this.state.bptBalance.toFixed(2)} onChange={this.changeBptBalance} />
                         <div className="add-to-balance__range">
-                            <input step="0.001" type="range" min="0" max={this.props.bptBalance} value={this.state.bptBalance} onChange={this.changeBptBalance} />
+                            <input step="0.001" type="range" min="0" max={this.props.bptBalance} value={this.state.bptBalance.toFixed(2)} onChange={this.changeBptBalance} />
                             <div className="line"><div></div><div></div><div></div><div></div></div>
                             <div className="progress" style={{ width: `calc(100%*${this.state.bptBalance}/${this.props.bptBalance})` }}></div>
                         </div>
@@ -78,7 +78,7 @@ export class AddToBalance extends Component<IAddToBalanceProps, IAddToBalanceSta
         let balance = Number(e.target.value);
 
         if (balance > this.props.bzrxV1Balance)
-            balance = Number(this.props.bzrxV1Balance.toFixed(2));
+            balance = this.props.bzrxV1Balance;
         else if (balance < 0)
             balance = 0;
 
@@ -90,7 +90,7 @@ export class AddToBalance extends Component<IAddToBalanceProps, IAddToBalanceSta
         let balance = Number(e.target.value);
 
         if (balance > this.props.vBzrxBalance)
-            balance = Number(this.props.vBzrxBalance.toFixed(2));
+            balance = this.props.vBzrxBalance;
         else if (balance < 0)
             balance = 0;
 
@@ -101,7 +101,7 @@ export class AddToBalance extends Component<IAddToBalanceProps, IAddToBalanceSta
         let balance = Number(e.target.value);
 
         if (balance > this.props.bptBalance)
-            balance = Number(this.props.bptBalance.toFixed(2));
+            balance = this.props.bptBalance;
         else if (balance < 0)
             balance = 0;
 

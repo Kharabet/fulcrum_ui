@@ -18,7 +18,12 @@
         margin-bottom: 12px;
         &:disabled,
         &[disabled] {
-            background: #cbe2ff;
+            &,
+            &:hover {
+                background: none;
+                border: 1px solid #b9c7d6;
+                color: #b9c7d6;
+            }
         }
     }
     &__input {
