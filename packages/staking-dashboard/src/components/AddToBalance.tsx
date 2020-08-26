@@ -3,6 +3,7 @@ import React, { ChangeEvent, Component } from "react";
 import { ReactComponent as TokenBzrx } from "../assets/images/token-bzrx.svg";
 import { ReactComponent as TokenVBzrx } from "../assets/images/token-vbzrx.svg";
 import { ReactComponent as TokenBpt } from "../assets/images/token-bpt.svg";
+import { number } from "prop-types";
 
 interface IAddToBalanceProps {
     bzrxV1Balance: number;
@@ -81,37 +82,34 @@ export class AddToBalance extends Component<IAddToBalanceProps, IAddToBalanceSta
     }
 
     private changeBzrxBalance = (e: ChangeEvent<HTMLInputElement>) => {
-        let balance = Number(e.target.value);
-
-        if (balance > this.props.bzrxV1Balance)
-            balance = this.props.bzrxV1Balance;
-        else if (balance < 0)
-            balance = 0;
-
-        this.setState({ ...this.state, bzrxV1Balance: balance, inputBzrxV1Balance: this.formatPrecision(e.target.value) });
-
+        const result = this.changeBalance(e.target.value, this.props.bzrxV1Balance);
+        this.setState({ ...this.state, bzrxV1Balance: result.balance, inputBzrxV1Balance: result.inputBalance });
     }
 
     private changeVBzrxBalance = (e: ChangeEvent<HTMLInputElement>) => {
-        let balance = Number(e.target.value);
-
-        if (balance > this.props.vBzrxBalance)
-            balance = this.props.vBzrxBalance;
-        else if (balance < 0)
-            balance = 0;
-
-        this.setState({ ...this.state, vBzrxBalance: balance, inputVBzrxBalance: this.formatPrecision(e.target.value) });
+        const result = this.changeBalance(e.target.value, this.props.vBzrxBalance);
+        this.setState({ ...this.state, vBzrxBalance: result.balance, inputVBzrxBalance: result.inputBalance });
     }
 
     private changeBptBalance = (e: ChangeEvent<HTMLInputElement>) => {
-        let balance = Number(e.target.value);
+        const result = this.changeBalance(e.target.value, this.props.bptBalance);
+        this.setState({ ...this.state, bptBalance: result.balance, inputBptBalance: result.inputBalance });
+    }
 
-        if (balance > this.props.bptBalance)
-            balance = this.props.bptBalance;
-        else if (balance < 0)
-            balance = 0;
+    private changeBalance = (balanceText: string, walletBalance: number) => {
+        const balance = Number(balanceText);
+        if (balance > walletBalance)
+            return {
+                balance: walletBalance,
+                inputBalance: walletBalance.toFixed(2)
+            };
+        if (balance < 0)
+            return {
+                balance: 0,
+                inputBalance: "0"
+            };
 
-        this.setState({ ...this.state, bptBalance: balance, inputBptBalance: this.formatPrecision(e.target.value) });
+        return { balance, inputBalance: this.formatPrecision(balanceText) }
     }
 
     private numberWithCommas = (x: Number) => {
