@@ -224,6 +224,23 @@ export class Form extends Component<IFormProps, IFormState> {
               <button title="Coming soon" className="button" disabled={true}>Explore Reward Pool</button>
               <p className="notice">Coming soon</p>
             </div>*/}
+            <div className="calculator-row">
+              <div className="row-header">Please select representative:</div>
+              <ul className="group-buttons">
+                <li className="button button-representative">
+                  <div className="photo"></div>
+                  <span className="name">Tom Bean</span>
+                </li>
+                <li className="button button-representative">
+                  <div className="photo"></div>
+                  <span className="name">Mark K</span>
+                </li>
+                <li className="button button-representative">
+                  <div className="photo"></div>
+                  <span className="name">0xbd5c...568f</span>
+                </li>
+              </ul>
+            </div>
             <AddToBalance />
             <div className="calculator-row">
               <div className="group-buttons">

@@ -122,3 +122,28 @@
     }
   }
 }
+
+.button-representative {
+  min-width: calc(100% / 3 - 12px);
+  padding: 4px;
+  height: 68px;
+  border: 2px solid transparent;
+  justify-content: flex-start;
+  &:hover {
+    background-color: transparent;
+    border-color: #5b88ff;
+  }
+  .photo {
+    width: 56px;
+    height: 56px;
+    margin-right: 12px;
+    border: 1px solid red;
+    border-radius: 50%;
+  }
+  .name {
+    font-size: 16px;
+    line-height: 1.8;
+    font-weight: 400;
+    color: #283049;
+  }
+}
