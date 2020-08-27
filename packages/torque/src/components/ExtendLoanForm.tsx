@@ -206,20 +206,7 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
   private onChange = (value: number) => {
     let currentAmount = this.state.maxDepositAmount.multipliedBy(value).dividedBy(this.state.maxValue);
     let minAmount = this.state.maxDepositAmount.dividedBy(this.state.maxValue);
-    if (currentAmount.gt(minAmount)) 
-      this.setState({ ...this.state, inputDecimals: this._inputDecimals });
-
-    this.setState({
-      ...this.state,
-      selectedValue: value,
-      interestAmount: 0
-    });
-  };
-
-  private onUpdate = (value: number) => {
-    let currentAmount = this.state.maxDepositAmount.multipliedBy(value).dividedBy(this.state.maxValue);
-    let minAmount = this.state.maxDepositAmount.dividedBy(this.state.maxValue);
-    if (currentAmount.gt(minAmount)) 
+    if (currentAmount.gt(minAmount))
       this.setState({ ...this.state, inputDecimals: this._inputDecimals });
 
     this.setState({
@@ -275,7 +262,7 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
 
   public onTradeAmountChange = async (event: ChangeEvent<HTMLInputElement>) => {
     let inputAmountText = event.target.value ? event.target.value : "";
-    if (inputAmountText === "" || parseFloat(inputAmountText) < 0 ) return;
+    if (inputAmountText === "" || parseFloat(inputAmountText) < 0) return;
 
     let depositAmount = new BigNumber(inputAmountText);
     let selectedValue = this.getSelectedValue(inputAmountText);
@@ -324,7 +311,7 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
     let maxDepositAmount = await TorqueProvider.Instance.getLoanExtendEstimate(this.props.loanOrderState.interestOwedPerDay, this.state.maxValue);
     this.setState({ ...this.state, maxDepositAmount: maxDepositAmount.depositAmount });
   }
-  
+
   public getSelectedValue = (value: string) => {
     let maxDepositAmountText = this.state.maxDepositAmount.toFixed();
     let maxDepositAmountNumber = Number(maxDepositAmountText);

@@ -25,8 +25,8 @@ export class InputAmount extends Component<IInputAmountProps, IInputAmountState>
     public componentDidUpdate(prevProps: Readonly<IInputAmountProps>, prevState: Readonly<IInputAmountState>, snapshot?: any): void {
         if (this.state.interestAmount !== prevState.interestAmount)
             this.props.updateInterestAmount(this.state.interestAmount);
-        if (this.props.interestAmount !== prevProps.interestAmount){
-            this.setState({...this.state, interestAmount: this.props.interestAmount})
+        if (this.props.interestAmount !== prevProps.interestAmount) {
+            this.setState({ ...this.state, interestAmount: this.props.interestAmount })
         }
     }
 
@@ -52,10 +52,10 @@ export class InputAmount extends Component<IInputAmountProps, IInputAmountState>
                     </div>
 
                     <div className="interest-group-button">
-                        <div className="interest-button" data-interest="0.25" onClick={this.getInterestAmount}>25%</div>
-                        <div className="interest-button" data-interest="0.5" onClick={this.getInterestAmount}>50%</div>
-                        <div className="interest-button" data-interest="0.75" onClick={this.getInterestAmount}>75%</div>
-                        <div className="interest-button" data-interest="1" onClick={this.getInterestAmount}>100%</div>
+                        <div className={`interest-button${this.props.interestAmount === 0.25 ? " active" : ""}`} data-interest="0.25" onClick={this.getInterestAmount}>25%</div>
+                        <div className={`interest-button${this.props.interestAmount === 0.5 ? " active" : ""}`} data-interest="0.5" onClick={this.getInterestAmount}>50%</div>
+                        <div className={`interest-button${this.props.interestAmount === 0.75 ? " active" : ""}`} data-interest="0.75" onClick={this.getInterestAmount}>75%</div>
+                        <div className={`interest-button${this.props.interestAmount === 1 ? " active" : ""}`} data-interest="1" onClick={this.getInterestAmount}>100%</div>
                     </div>
                 </div>
             </React.Fragment>
