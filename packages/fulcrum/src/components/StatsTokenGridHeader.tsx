@@ -20,13 +20,13 @@ export class StatsTokenGridHeader extends Component<IStatsTokenGridHeaderProps> 
           <span className="stats-grid-header__text">Total Supply</span>
         </div>
         <div className="stats-grid-header__col stats-grid-header__col-total-borrow">
-          <span className="stats-grid-header__text">Total Borrow</span>
+          <span className="stats-grid-header__text">Total Borrowed</span>
         </div>
         <div className="stats-grid-header__col stats-grid-header__col-locked">
           <span className="stats-grid-header__text">Vault Locked</span>
         </div>
         <div className="stats-grid-header__col stats-grid-header__col-liquidity">
-          <span className="stats-grid-header__text">Free Liquidity</span>
+          <span className="stats-grid-header__text">Total Available</span>
         </div>
         <div className="stats-grid-header__col stats-grid-header__col-supply-rate">
           <span className="stats-grid-header__text">Supply Rate (APR)</span>

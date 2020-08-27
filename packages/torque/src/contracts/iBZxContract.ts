@@ -521,6 +521,7 @@ export class iBZxContract extends BaseContract {
       defaultBlock?: BlockParam
     ): Promise<Array<{
       loanId: string;
+      loanEndTimestamp: BigNumber;
       loanToken: string;
       collateralToken: string;
       principal: BigNumber;
@@ -532,7 +533,6 @@ export class iBZxContract extends BaseContract {
       maintenanceMargin: BigNumber;
       currentMargin: BigNumber;
       maxLoanTerm: BigNumber;
-      loanEndTimestamp: BigNumber;
       maxLiquidatable: BigNumber;
       maxSeizable: BigNumber;
     }>> {
@@ -556,6 +556,7 @@ export class iBZxContract extends BaseContract {
       // tslint:disable boolean-naming
       const result = abiEncoder.strictDecodeReturnValue<Array<{
         loanId: string;
+        loanEndTimestamp: BigNumber;
         loanToken: string;
         collateralToken: string;
         principal: BigNumber;
@@ -567,7 +568,6 @@ export class iBZxContract extends BaseContract {
         maintenanceMargin: BigNumber;
         currentMargin: BigNumber;
         maxLoanTerm: BigNumber;
-        loanEndTimestamp: BigNumber;
         maxLiquidatable: BigNumber;
         maxSeizable: BigNumber;
       }>>(rawCallResult);
@@ -975,6 +975,7 @@ export class iBZxContract extends BaseContract {
     ): Promise<
       Array<{
         loanId: string;
+        loanEndTimestamp: BigNumber;
         loanToken: string;
         collateralToken: string;
         principal: BigNumber;
@@ -986,14 +987,13 @@ export class iBZxContract extends BaseContract {
         maintenanceMargin: BigNumber;
         currentMargin: BigNumber;
         maxLoanTerm: BigNumber;
-        loanEndTimestamp: BigNumber;
         maxLiquidatable: BigNumber;
         maxSeizable: BigNumber;
       }>
     > {
       callData.from = "0x4abB24590606f5bf4645185e20C4E7B97596cA3B";
       const self = (this as any) as iBZxContract;
-      const encodedData = self._strictEncodeArguments("getUserLoans(address,uint256,uint256,uint256,bool,bool)", [borrower, "0", count, loanType, false, false]);
+      const encodedData = self._strictEncodeArguments("getUserLoans(address,uint256,uint256,uint8,bool,bool)", [borrower, "0", count, loanType, false, false]);
       const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
         {
           to: self.address,
@@ -1003,12 +1003,14 @@ export class iBZxContract extends BaseContract {
         self._web3Wrapper.getContractDefaults()
       );
       const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
+      console.log(rawCallResult);
       BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
-      const abiEncoder = self._lookupAbiEncoder("getUserLoans(address,uint256,uint256,uint256,bool,bool)");
+      const abiEncoder = self._lookupAbiEncoder("getUserLoans(address,uint256,uint256,uint8,bool,bool)");
       // tslint:disable boolean-naming
       const result = abiEncoder.strictDecodeReturnValue<
         Array<{
           loanId: string;
+          loanEndTimestamp: BigNumber;
           loanToken: string;
           collateralToken: string;
           principal: BigNumber;
@@ -1020,7 +1022,6 @@ export class iBZxContract extends BaseContract {
           maintenanceMargin: BigNumber;
           currentMargin: BigNumber;
           maxLoanTerm: BigNumber;
-          loanEndTimestamp: BigNumber;
           maxLiquidatable: BigNumber;
           maxSeizable: BigNumber;
         }>

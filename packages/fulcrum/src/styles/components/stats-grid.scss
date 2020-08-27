@@ -181,13 +181,13 @@ $margin-right-column: 1rem;
         .stats-grid-row__col-liquidity {
           padding-top: 20px;
           &:before {
-            content: "Free Liquidity";
+            content: "Total Available";
           }
         }
         .stats-grid-row__col-total-borrow {
           padding-top: 20px;
           &:before {
-            content: "Total Borrow";
+            content: "Total Borrowed";
           }
         }
         .stats-grid-row__col-supply-rate {
@@ -240,7 +240,7 @@ $margin-right-column: 1rem;
       .stats-grid-row__asset-name {
         font-size: 18px;
         line-height: 1.5;
-        &.reserve-all {         
+        &.reserve-all {
           margin: 0 0 8px 0;
           text-transform: initial;
         }

@@ -423,27 +423,28 @@ export class FulcrumProvider {
       case Asset.ETH:
       case Asset.WETH:
       case Asset.fWETH:
-        return new BigNumber(10 ** 18).multipliedBy(1500);
+        return new BigNumber(10**18).multipliedBy(1500);
       case Asset.WBTC:
-        return new BigNumber(10 ** 8).multipliedBy(25);
+        return new BigNumber(10**8).multipliedBy(25);
       case Asset.LINK:
-        return new BigNumber(10 ** 18).multipliedBy(60000);
+        return new BigNumber(10**18).multipliedBy(60000);
       case Asset.ZRX:
-        return new BigNumber(10 ** 18).multipliedBy(750000);
+        return new BigNumber(10**18).multipliedBy(750000);
       case Asset.KNC:
-        return new BigNumber(10 ** 18).multipliedBy(550000);
+        return new BigNumber(10**18).multipliedBy(550000);
       case Asset.BAT:
         return new BigNumber(10**18).multipliedBy(750000);
       case Asset.DAI:
       case Asset.SAI:
+      case Asset.SUSD:
+      return new BigNumber(10**18).multipliedBy(375000);
       case Asset.USDC:
       case Asset.USDT:
-      case Asset.SUSD:
         return new BigNumber(10**6).multipliedBy(375000);
       case Asset.REP:
         return new BigNumber(10**18).multipliedBy(15000);
       case Asset.MKR:
-        return new BigNumber(10 ** 18).multipliedBy(1250);
+        return new BigNumber(10**18).multipliedBy(1250);
       case Asset.CHI:
         return new BigNumber(10 ** 18);
       default:
@@ -1530,20 +1531,20 @@ export class FulcrumProvider {
           request.returnTokenIsCollateral, // returnTokenIsCollateral
           request.loanDataBytes));
 
-		const isGasTokenEnabled = localStorage.getItem('isGasTokenEnabled') === "true";
+        const isGasTokenEnabled = localStorage.getItem('isGasTokenEnabled') === "true";
         const ChiTokenBalance = await this.getAssetTokenBalanceOfUser(Asset.CHI);
         //@ts-ignore
         result = isGasTokenEnabled && ChiTokenBalance.gt(0)
-          ? await iBZxContract.closeWithSwapWithGasToken.callAsync(            request.loanId,
+          ? await iBZxContract.closeWithSwapWithGasToken.callAsync(request.loanId,
             account,
             account,
             amountInBaseUnits,
             request.returnTokenIsCollateral, // returnTokenIsCollateral
-          request.loanDataBytes,
-          {
-            from: account,
-            gas: FulcrumProvider.Instance.gasLimit
-          }
+            request.loanDataBytes,
+            {
+              from: account,
+              gas: FulcrumProvider.Instance.gasLimit
+            }
           )
           : await iBZxContract.closeWithSwap.callAsync(
             request.loanId,
@@ -1555,7 +1556,7 @@ export class FulcrumProvider {
               from: account,
               gas: FulcrumProvider.Instance.gasLimit
             }
-        );
+          );
         console.log(result);
       }
     }
@@ -2224,13 +2225,13 @@ if (err || 'error' in added) {
 console.log(err, added);
 }
 }*//*);
-                                                                                                                                                                                                                            }
-                                                                                                                                                                                                                            }
-                                                                                                                                                                                                                            }
-                                                                                                                                                                                                                            } catch(e) {
-                                                                                                                                                                                                                            // console.log(e);
-                                                                                                                                                                                                                            }
-                                                                                                                                                                                                                            }*/
+}
+}
+}
+} catch(e) {
+// console.log(e);
+}
+}*/
   }
 
   private processLendRequestTask = async (task: RequestTask, skipGas: boolean) => {
