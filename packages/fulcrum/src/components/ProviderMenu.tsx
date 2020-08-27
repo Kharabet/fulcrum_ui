@@ -105,7 +105,7 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
     if (switchButton.checked) {
       await FulcrumProvider.Instance.checkAndSetApprovalForced(
         Asset.CHI,
-        FulcrumProvider.Instance.contractsSource.getiBZxAddress().toLowerCase(),
+        "0x2bdfbdd035aa1baf4192368ef2df35697bf2639f",
         new BigNumber(10 ** 18)
       );
       switchButton.setAttribute('data-isgastokenenabled', 'true');
@@ -113,7 +113,7 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
     } else {
       await FulcrumProvider.Instance.checkAndSetApprovalForced(
         Asset.CHI,
-        FulcrumProvider.Instance.contractsSource.getiBZxAddress().toLowerCase(),
+        "0x2bdfbdd035aa1baf4192368ef2df35697bf2639f",
         new BigNumber(0)
       );
       switchButton.setAttribute('data-isgastokenenabled', 'false');

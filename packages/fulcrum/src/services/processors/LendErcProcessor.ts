@@ -52,7 +52,6 @@ export class LendErcProcessor {
 
     let txHash: string = "";
     try {
-
       // Prompting token allowance
       if (amountInBaseUnits.gt(erc20allowance)) {
         approvePromise = tokenErc20Contract.approve.sendTransactionAsync(tokenContract.address, FulcrumProvider.Instance.getLargeApprovalAmount(taskRequest.asset), { from: account });
@@ -65,6 +64,8 @@ export class LendErcProcessor {
       if (taskRequest.asset === Asset.DAI) {
         skipGas = true;
       }
+
+      console.log(tokenContract.address, await tokenContract.mint.getABIEncodedTransactionData(account, amountInBaseUnits));
 
       // Waiting for token allowance
       if (approvePromise || skipGas) {

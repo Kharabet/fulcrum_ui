@@ -1126,6 +1126,11 @@
               "type": "bytes32"
             },
             {
+              "internalType": "uint96",
+              "name": "endTimestamp",
+              "type": "uint96"
+            },
+            {
               "internalType": "address",
               "name": "loanToken",
               "type": "address"
@@ -1157,7 +1162,12 @@
             },
             {
               "internalType": "uint256",
-              "name": "initialMargin",
+              "name": "startRate",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "startMargin",
               "type": "uint256"
             },
             {
@@ -1172,12 +1182,7 @@
             },
             {
               "internalType": "uint256",
-              "name": "fixedLoanTerm",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "loanEndTimestamp",
+              "name": "maxLoanTerm",
               "type": "uint256"
             },
             {
@@ -1191,7 +1196,7 @@
               "type": "uint256"
             }
           ],
-          "internalType": "struct IBZx.LoanReturnData[]",
+          "internalType": "struct LoanMaintenanceEvents.LoanReturnData[]",
           "name": "loansData",
           "type": "tuple[]"
         }
@@ -1373,6 +1378,11 @@
               "type": "bytes32"
             },
             {
+              "internalType": "uint96",
+              "name": "endTimestamp",
+              "type": "uint96"
+            },
+            {
               "internalType": "address",
               "name": "loanToken",
               "type": "address"
@@ -1420,11 +1430,6 @@
             {
               "internalType": "uint256",
               "name": "fixedLoanTerm",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "loanEndTimestamp",
               "type": "uint256"
             },
             {
@@ -1716,9 +1721,9 @@
           "type": "uint256"
         },
         {
-          "internalType": "uint256",
+          "internalType": "enum LoanMaintenanceEvents.LoanType",
           "name": "loanType",
-          "type": "uint256"
+          "type": "uint8"
         },
         {
           "internalType": "bool",
@@ -1739,6 +1744,11 @@
               "internalType": "bytes32",
               "name": "loanId",
               "type": "bytes32"
+            },
+            {
+              "internalType": "uint96",
+              "name": "endTimestamp",
+              "type": "uint96"
             },
             {
               "internalType": "address",
@@ -1797,11 +1807,6 @@
             },
             {
               "internalType": "uint256",
-              "name": "endTimestamp",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
               "name": "maxLiquidatable",
               "type": "uint256"
             },
@@ -1811,7 +1816,7 @@
               "type": "uint256"
             }
           ],
-          "internalType": "struct IBZx.LoanReturnData[]",
+          "internalType": "struct LoanMaintenanceEvents.LoanReturnData[]",
           "name": "loansData",
           "type": "tuple[]"
         }
