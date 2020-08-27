@@ -13,7 +13,7 @@
     .header__row {
       align-items: center;
       .header__left {
-        z-index: 10001;
+        z-index: 100001;
 
         flex: initial;
         width: calc(100% - 110px);
@@ -22,7 +22,7 @@
         display: none;
       }
       .header_icon {
-        z-index: 10001;
+        z-index: 100001;
         padding-right: 10px;
       }
     }
