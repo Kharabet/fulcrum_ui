@@ -14,6 +14,7 @@
         background-color: var(--switch-bg);
         &:before {
           transform: translateX(-19px);
+          z-index: 2;
         }
       }
       &[data-isgastokenenabled="true"] + .slider {
@@ -42,6 +43,17 @@
         right: 3px;
         transition: 0.4s;
         border-radius: 50%;
+      }
+      &:after{
+        content: "";
+        position: absolute;
+        background-color: var(--switch-button-after);
+        width: 19px;
+        height: 19px;
+        border-radius: 50%;
+        bottom: 3px;
+        right: 11px;
+        transition: 0.2s;
       }
       &.round {
         border-radius: 19px;
