@@ -1531,20 +1531,20 @@ export class FulcrumProvider {
           request.returnTokenIsCollateral, // returnTokenIsCollateral
           request.loanDataBytes));
 
-		const isGasTokenEnabled = localStorage.getItem('isGasTokenEnabled') === "true";
+        const isGasTokenEnabled = localStorage.getItem('isGasTokenEnabled') === "true";
         const ChiTokenBalance = await this.getAssetTokenBalanceOfUser(Asset.CHI);
         //@ts-ignore
         result = isGasTokenEnabled && ChiTokenBalance.gt(0)
-          ? await iBZxContract.closeWithSwapWithGasToken.callAsync(            request.loanId,
+          ? await iBZxContract.closeWithSwapWithGasToken.callAsync(request.loanId,
             account,
             account,
             amountInBaseUnits,
             request.returnTokenIsCollateral, // returnTokenIsCollateral
-          request.loanDataBytes,
-          {
-            from: account,
-            gas: FulcrumProvider.Instance.gasLimit
-          }
+            request.loanDataBytes,
+            {
+              from: account,
+              gas: FulcrumProvider.Instance.gasLimit
+            }
           )
           : await iBZxContract.closeWithSwap.callAsync(
             request.loanId,
@@ -1556,7 +1556,7 @@ export class FulcrumProvider {
               from: account,
               gas: FulcrumProvider.Instance.gasLimit
             }
-        );
+          );
         console.log(result);
       }
     }
