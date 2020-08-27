@@ -21,7 +21,7 @@ import "../styles/components/history-token-grid.scss";
 import { WithdrawCollateralEvent } from "../domain/events/WithdrawCollateralEvent";
 import { DepositCollateralEvent } from "../domain/events/DepositCollateralEvent";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
-import { ReactComponent as HistoryPlaceholder } from "../assets/images/history_placeholder.svg";
+import { ReactComponent as Placeholder } from "../assets/images/history_placeholder.svg";
 
 export interface IHistoryTokenGridProps {
   isMobileMedia: boolean;
@@ -77,7 +77,7 @@ export class HistoryTokenGrid extends Component<IHistoryTokenGridProps, IHistory
       return (
         <div className="history-token-grid__placeholder">
           <div>
-            <HistoryPlaceholder />
+            <Placeholder />
             <p>No trading history</p>
             <a href="/trade" className="history-token-grid__link-button">Start Trading</a>
           </div>
