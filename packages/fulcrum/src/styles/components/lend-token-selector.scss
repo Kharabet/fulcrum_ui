@@ -23,7 +23,8 @@
     border: 2px solid transparent;
 
     &.loading-transaction {
-      background-color: var(--secondary-row);
+      background-color: var(--lend-bg-loading);
+      border-color: var(--lend-border-loading);
       .lend-transaction-step {
         margin-top: 45px;
         display: flex;
@@ -323,6 +324,15 @@
           }
         }
       }
+    }
+  }
+
+  .circle-loader {
+    .circle-background {
+      border-color: var(--lend-circle-background);
+    }
+    .circle-main {
+      border-top-color: var(--lend-circle-main);
     }
   }
 }
