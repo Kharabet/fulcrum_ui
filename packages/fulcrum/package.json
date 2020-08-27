@@ -38,7 +38,7 @@
     "fortmatic": "^0.8.2",
     "lodash": "^4.17.11",
     "prop-types": "^15.6.0",
-    "rc-slider": "^9.2.4",
+    "rc-slider": "9.2.4",
     "react": "^16.8.3",
     "react-dom": "^16.8.3",
     "react-ga": "^2.5.7",
