@@ -2225,13 +2225,13 @@ if (err || 'error' in added) {
 console.log(err, added);
 }
 }*//*);
-                                                                                                                                                                                                                            }
-                                                                                                                                                                                                                            }
-                                                                                                                                                                                                                            }
-                                                                                                                                                                                                                            } catch(e) {
-                                                                                                                                                                                                                            // console.log(e);
-                                                                                                                                                                                                                            }
-                                                                                                                                                                                                                            }*/
+}
+}
+}
+} catch(e) {
+// console.log(e);
+}
+}*/
   }
 
   private processLendRequestTask = async (task: RequestTask, skipGas: boolean) => {

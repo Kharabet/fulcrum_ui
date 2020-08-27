@@ -530,6 +530,11 @@ export default class LendForm extends Component<ILendFormProps, ILendFormState> 
 
     // console.log(`send amount`,sendAmount.toString());
 
+    if (this.props.lendType === LendType.UNLEND && sendAmount.gte(this.state.maxTokenAmount)) {
+      // indicates a 100% burn
+      sendAmount = FulcrumProvider.UNLIMITED_ALLOWANCE_IN_BASE_UNITS.div(10**18);
+    }
+
     this.props.onSubmit(
       new LendRequest(
         this.props.lendType,

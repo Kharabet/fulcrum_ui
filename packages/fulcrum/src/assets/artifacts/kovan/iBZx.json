@@ -1162,7 +1162,12 @@
             },
             {
               "internalType": "uint256",
-              "name": "initialMargin",
+              "name": "startRate",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "startMargin",
               "type": "uint256"
             },
             {
@@ -1177,7 +1182,7 @@
             },
             {
               "internalType": "uint256",
-              "name": "fixedLoanTerm",
+              "name": "maxLoanTerm",
               "type": "uint256"
             },
             {
@@ -1191,7 +1196,7 @@
               "type": "uint256"
             }
           ],
-          "internalType": "struct IBZx.LoanReturnData[]",
+          "internalType": "struct LoanMaintenanceEvents.LoanReturnData[]",
           "name": "loansData",
           "type": "tuple[]"
         }
@@ -1716,9 +1721,9 @@
           "type": "uint256"
         },
         {
-          "internalType": "uint256",
+          "internalType": "enum LoanMaintenanceEvents.LoanType",
           "name": "loanType",
-          "type": "uint256"
+          "type": "uint8"
         },
         {
           "internalType": "bool",
@@ -1811,7 +1816,7 @@
               "type": "uint256"
             }
           ],
-          "internalType": "struct IBZx.LoanReturnData[]",
+          "internalType": "struct LoanMaintenanceEvents.LoanReturnData[]",
           "name": "loansData",
           "type": "tuple[]"
         }
