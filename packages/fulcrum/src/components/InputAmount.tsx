@@ -1,8 +1,5 @@
 import React, { Component, ChangeEvent } from "react";
 
-import { CollateralTokenSelector } from "./CollateralTokenSelector";
-import { CollateralTokenButton } from "./CollateralTokenButton";
-
 import { Asset } from "../domain/Asset";
 import { TradeType } from "../domain/TradeType";
 import { Preloader } from "./Preloader";
@@ -14,6 +11,7 @@ interface IInputAmountProps {
   inputAmountText: string;
   isLoading: boolean;
   selectedAsset: Asset;
+  buttonValue: number;
   selectorAssets?: Asset[];
   tradeType?: TradeType;
   onInsertMaxValue: (value: number) => void;
@@ -82,15 +80,14 @@ export class InputAmount extends Component<IInputAmountProps, IInputAmountState>
         </div>
 
         <div className="input-amount__group-button">
-          <button data-value="0.25" onClick={this.setButtonValue}>25%</button>
-          <button data-value="0.5" onClick={this.setButtonValue}>50%</button>
-          <button data-value="0.75" onClick={this.setButtonValue}>75%</button>
-          <button data-value="1" onClick={this.setButtonValue}>100%</button>
+          <button data-value="0.25" className={this.props.buttonValue === 0.25 ? "active" : ""} onClick={this.setButtonValue}>25%</button>
+          <button data-value="0.5" className={this.props.buttonValue === 0.5 ? "active" : ""} onClick={this.setButtonValue}>50%</button>
+          <button data-value="0.75" className={this.props.buttonValue === 0.75 ? "active" : ""} onClick={this.setButtonValue}>75%</button>
+          <button data-value="1" className={this.props.buttonValue === 1 ? "active" : ""} onClick={this.setButtonValue}>100%</button>
         </div>
       </div>
     );
   }
-
   public onChangeCollateralOpen = (event: React.MouseEvent<HTMLElement>) => {
     event.preventDefault();
 
