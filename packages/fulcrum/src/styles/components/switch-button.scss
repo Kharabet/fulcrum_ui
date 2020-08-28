@@ -9,9 +9,70 @@
     width: 44px;
     input {
       display: none;
-      [data-theme="dark"] & + .slider,
-      &[data-isgastokenenabled="false"] + .slider {
+      [data-theme="dark"] & + .slider {
         background-color: var(--switch-bg);
+        &:before {
+          transform: translateX(-19px);
+          z-index: 2;
+        }
+      }
+    }
+    .slider {
+      background-color: var(--switch-bg);
+      bottom: 0;
+      cursor: pointer;
+      left: 0;
+      position: absolute;
+      right: 0;
+      top: 0;
+      &:before {
+        content: "";
+        position: absolute;
+        height: 19px;
+        width: 19px;
+        background-color: var(--switch-button);
+        bottom: 3px;
+        right: 3px;
+        transition: 0.4s;
+        border-radius: 50%;
+      }
+      &:after {
+        content: "";
+        position: absolute;
+        background-color: var(--switch-button-after);
+        width: 19px;
+        height: 19px;
+        border-radius: 50%;
+        bottom: 3px;
+        right: 11px;
+        transition: 0.2s;
+      }
+      &.round {
+        border-radius: 19px;
+      }
+    }
+  }
+  @media (max-width: 959px) {
+    .sidebar_v & {
+      position: absolute;
+      top: 25px;
+      right: 60px;
+    }
+  }
+}
+.gas-switch-wrapper {
+  display: flex;
+  align-items: center;
+  z-index: 10001;
+  .gas-switch {
+    position: relative;
+    display: inline-flex;
+    height: 25px;
+    width: 44px;
+    input {
+      display: none;
+      &[data-isgastokenenabled="false"] + .slider {
+        background-color: #586473;
         &:before {
           transform: translateX(-19px);
           z-index: 2;
@@ -38,33 +99,15 @@
         position: absolute;
         height: 19px;
         width: 19px;
-        background-color: var(--switch-button);
+        background-color: #a2abb8;
         bottom: 3px;
         right: 3px;
         transition: 0.4s;
         border-radius: 50%;
       }
-      &:after{
-        content: "";
-        position: absolute;
-        background-color: var(--switch-button-after);
-        width: 19px;
-        height: 19px;
-        border-radius: 50%;
-        bottom: 3px;
-        right: 11px;
-        transition: 0.2s;
-      }
       &.round {
         border-radius: 19px;
       }
-    }
-  }
-  @media (max-width: 959px) {
-    .sidebar_v & {
-      position: absolute;
-      top: 25px;
-      right: 60px;
     }
   }
 }

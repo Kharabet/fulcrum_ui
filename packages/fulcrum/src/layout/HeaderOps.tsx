@@ -80,7 +80,7 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
           </div>
           <div className="header__right">
             <OnChainIndicator doNetworkConnect={this.props.doNetworkConnect} />
-            <SwitchButtonInput onSwitch={this.onSwitchTheme} />
+            <SwitchButtonInput onSwitch={this.onSwitchTheme} type="theme" />
           </div>
         </div>
       </header>
