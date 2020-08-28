@@ -18,6 +18,8 @@ export interface IHeaderOpsProps {
 
 interface IHeaderOpsState {
   isMenuOpen: boolean;
+  scrollMenu: boolean;
+  heightDevice: number;
 }
 
 export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
@@ -26,7 +28,9 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
     super(props);
 
     this.state = {
-      isMenuOpen: false
+      isMenuOpen: false,
+      scrollMenu: false,
+      heightDevice: 0
     };
   }
 
@@ -45,11 +49,24 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
         toggleSwitch.checked = true;
       }
     };
+    var heightDevice = document.documentElement.clientHeight;
+    if (heightDevice < 620) this.setState({ ...this.state, scrollMenu: true });
+
+    window.addEventListener("resize", this.didResize.bind(this));
+    this.didResize();
   }
 
   public componentWillUnmount(): void {
-    document.body.style.overflow = "";
+    document.body.className = ""
+  }
 
+
+  public didResize = () => {
+    var heightDevice = document.documentElement.clientHeight;
+    (heightDevice < 620) ? this.setState({ ...this.state, scrollMenu: true }) : this.setState({ ...this.state, scrollMenu: false });
+    if (this.props.isMobileMedia) {
+      (this.state.isMenuOpen) ? (!this.state.scrollMenu ? document.body.className = "hidden" : document.body.className = "scroll") : document.body.className = "";
+    }
   }
 
   public render() {
@@ -140,9 +157,9 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
 
   private onMenuToggle = () => {
     if (this.props.isMobileMedia) {
-      document.body.style.overflow = !this.state.isMenuOpen ? "hidden" : "";
-      this.setState({ ...this.state, isMenuOpen: !this.state.isMenuOpen });
+      (!this.state.isMenuOpen) ? (!this.state.scrollMenu ? document.body.classList.add("hidden") : document.body.classList.add("scroll")) : document.body.className = "";
     }
+    this.setState({ ...this.state, isMenuOpen: !this.state.isMenuOpen });
   };
 
   private onSwitchTheme = (e: React.ChangeEvent<HTMLInputElement>) => {
