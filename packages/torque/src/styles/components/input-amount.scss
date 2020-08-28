@@ -63,7 +63,9 @@
       &:not(:last-child) {
         margin-right: 8px;
       }
-      &:hover {
+      &:hover,
+      &:focus,
+      &.active {
         color: #5b88ff;
         border-color: #5b88ff;
         cursor: pointer;

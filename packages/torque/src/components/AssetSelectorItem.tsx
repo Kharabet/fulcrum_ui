@@ -132,7 +132,7 @@ export class AssetSelectorItem extends Component<IAssetSelectorItemProps, IAsset
                 </div>
               </div>
             </div>
-            <div className="asset-selector-item-bg" style={{ backgroundColor: asset.bgColor }}></div>
+            <div className="asset-selector-item-bg" style={{ backgroundColor: asset.bgBorrowItem }}></div>
           </div>
         </React.Fragment>
     )

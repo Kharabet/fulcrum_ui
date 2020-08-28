@@ -106,9 +106,15 @@ export class LendTxLoaderStep extends Component<ILendTxLoaderStepProps, ILendTxL
 
     const title = this.getTitle(this.state.requestTask);
     if (!title) return null;
-    return <div ref={this.stepDiv} className={`lend-transaction-step ${title.isWarning ? "warning" : ""}`}>
-      {title.message}
-    </div>
+    return this.state.requestTask && this.state.requestTask.txHash
+      ? <a href={`${FulcrumProvider.Instance.web3ProviderSettings!.etherscanURL}tx/${this.state.requestTask!.txHash}`} target="_blank" rel="noopener noreferrer">
+        <div ref={this.stepDiv} className={`lend-transaction-step ${title.isWarning ? "warning" : ""}`}>
+          {title.message}
+        </div>
+      </a>
+      : <div ref={this.stepDiv} className={`lend-transaction-step ${title.isWarning ? "warning" : ""}`}>
+        {title.message}
+      </div>
   }
 
   public onTasksQueueChanged = async () => {

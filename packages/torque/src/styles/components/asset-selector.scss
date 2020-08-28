@@ -35,6 +35,10 @@
     }
     .asset-selector__icon {
       display: flex;
+      svg{
+        width: 40px;
+        height: auto;
+      }
       &:hover {
         display: none;
       }

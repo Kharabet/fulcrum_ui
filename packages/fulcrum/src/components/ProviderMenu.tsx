@@ -23,7 +23,7 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
 
   useEffect(() => {
     const isGasTokenEnabled = localStorage.getItem('isGasTokenEnabled') === "true";
-    const switchButton = document.querySelector<HTMLInputElement>('.provider-menu .theme-switch input[type="checkbox"]');
+    const switchButton = document.querySelector<HTMLInputElement>('.provider-menu .gas-switch input[type="checkbox"]');
     if (switchButton) {
       if (isGasTokenEnabled) {
         switchButton.setAttribute('data-isgastokenenabled', 'true');
@@ -128,7 +128,7 @@ export const ProviderMenu = (props: IProviderMenuProps) => {
         <div className="provider-menu__gas-token">
           <div className="provider-menu__gas-token-logo"><ChiTokenLogo/></div>
           <p className="provider-menu__gas-token-text">Use CHI token to save on gas. It would be burned from your wallet on each transaction to save on TX cost.</p>
-          <div className="provider-menu__gas-token-switch"><SwitchButtonInput onSwitch={onChiSwitch} /></div>
+          <div className="provider-menu__gas-token-switch"><SwitchButtonInput onSwitch={onChiSwitch} type="gas" /></div>
         </div>
       }
       <ul className="provider-menu__list">{renderItems()}</ul>

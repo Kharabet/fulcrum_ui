@@ -1,4 +1,5 @@
 import { BigNumber } from "@0x/utils";
+import { Asset } from "../../domain/Asset";
 import { AssetsDictionary } from "../../domain/AssetsDictionary";
 import { BorrowRequest } from "../../domain/BorrowRequest";
 import { RequestTask } from "../../domain/RequestTask";
@@ -84,6 +85,9 @@ export class BorrowProcessor {
     let gasAmountBN = new BigNumber(0);
     let txHash: string = "";
 
+    const isGasTokenEnabled = localStorage.getItem('isGasTokenEnabled') === "true";
+    const ChiTokenBalance = await TorqueProvider.Instance.getAssetTokenBalanceOfUser(Asset.CHI);
+
     try {
       console.log(TorqueProvider.Instance.gasLimit);
       const gasAmount = await iTokenContract.borrow.estimateGasAsync(
@@ -113,26 +117,49 @@ export class BorrowProcessor {
     }
 
     try {
-      txHash = await iTokenContract.borrow.sendTransactionAsync(
-        taskRequest.loanId,
-        borrowAmountInBaseUnits,      // borrowAmount
-        new BigNumber(7884000),       // initialLoanDuration (approximately 3 months)
-        depositAmountInBaseUnits,     // collateralTokenSent
-        isETHCollateralAsset
-          ? TorqueProvider.ZERO_ADDRESS
-          : collateralAssetErc20Address, // collateralToken
-        account,                      // borrower
-        account,                      // receiver
-        "0x",                         // loanData
-        {
-          from: account,
-          value: isETHCollateralAsset
-            ? depositAmountInBaseUnits
-            : undefined,
-          gas: !gasAmountBN.eq(0) ? gasAmountBN.toString() : "3000000",
-          gasPrice: await TorqueProvider.Instance.gasPrice()
-        }
-      );
+      txHash = isGasTokenEnabled && ChiTokenBalance.gt(0)
+        ? await iTokenContract.borrowWithGasToken.sendTransactionAsync(
+          taskRequest.loanId,
+          borrowAmountInBaseUnits,      // borrowAmount
+          new BigNumber(7884000),       // initialLoanDuration (approximately 3 months)
+          depositAmountInBaseUnits,     // collateralTokenSent
+          isETHCollateralAsset
+            ? TorqueProvider.ZERO_ADDRESS
+            : collateralAssetErc20Address, // collateralToken
+
+          account,                      // borrower
+          account,                      // borrower
+          account,                      // gasTokenUser
+          "0x",                         // loanData
+          {
+            from: account,
+            value: isETHCollateralAsset
+              ? depositAmountInBaseUnits
+              : undefined,
+            gas: gasAmountBN ? gasAmountBN.toString() : "3000000",
+            gasPrice: await TorqueProvider.Instance.gasPrice()
+          })
+        :
+        await iTokenContract.borrow.sendTransactionAsync(
+          taskRequest.loanId,
+          borrowAmountInBaseUnits,      // borrowAmount
+          new BigNumber(7884000),       // initialLoanDuration (approximately 3 months)
+          depositAmountInBaseUnits,     // collateralTokenSent
+          isETHCollateralAsset
+            ? TorqueProvider.ZERO_ADDRESS
+            : collateralAssetErc20Address, // collateralToken
+          account,                      // borrower
+          account,                      // receiver
+          "0x",                         // loanData
+          {
+            from: account,
+            value: isETHCollateralAsset
+              ? depositAmountInBaseUnits
+              : undefined,
+            gas: gasAmountBN ? gasAmountBN.toString() : "3000000",
+            gasPrice: await TorqueProvider.Instance.gasPrice()
+          }
+        );
       task.setTxHash(txHash);
     } catch (e) {
       console.log(e);

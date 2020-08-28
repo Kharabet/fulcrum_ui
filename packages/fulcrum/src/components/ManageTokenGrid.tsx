@@ -17,6 +17,7 @@ export interface IManageTokenGridProps {
   stablecoins: Asset[];
   baseTokens: Asset[];
   quoteTokens: Asset[];
+  openedPositionsLoaded: boolean;
 }
 
 interface IManageTokenGridState {
@@ -49,7 +50,7 @@ export default class ManageTokenGrid extends Component<IManageTokenGridProps, IM
             stablecoins={this.props.stablecoins}
             baseTokens={this.props.baseTokens}
             quoteTokens={this.props.quoteTokens} />
-          : <OwnTokenGrid ownRowsData={this.props.ownRowsData} isMobileMedia={this.props.isMobileMedia} />
+          : <OwnTokenGrid ownRowsData={this.props.ownRowsData} isMobileMedia={this.props.isMobileMedia} openedPositionsLoaded={this.props.openedPositionsLoaded} />
         }
       </div>
     )

@@ -21,6 +21,34 @@ $width-col-fee-reward-desktop: 16%;
   @media screen and (max-width: $breakpoint-mobile-max) {
     padding: 15px;
   }
+  &__placeholder {
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    margin-top: 30px;
+    @media (min-width: $breakpoint-desktop-min) {
+      margin-top: 60px;
+    }
+    p {
+      margin: 24px;
+      font-weight: 600;
+      font-size: 16px;
+      color: #8992a4;
+    }
+  }
+  &__link-button {
+    display: inline-block;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 16px;
+    color: #ffffff;
+    background: #276bfb;
+    border-radius: 43px;
+    padding: 15px 30px;
+    &:hover {
+      background: #5b88ff;
+    }
+  }
   .collapse {
     &.show {
       display: block;

@@ -51,13 +51,13 @@
       &:not(:last-child) {
         margin-right: 2px;
       }
-      &:hover {
+      &:hover,
+      &:focus,
+      &.active {
         background: #758295;
       }
     }
   }
-
-  
 
   @media screen and (max-width: $mobile-version-max-width) {
     &__container {
@@ -94,7 +94,6 @@
         padding: 5px 0;
       }
     }
-    
   }
 }
 

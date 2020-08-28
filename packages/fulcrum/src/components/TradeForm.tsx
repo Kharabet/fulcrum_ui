@@ -68,6 +68,7 @@ interface ITradeFormState {
   inputAmountValue: BigNumber;
   tradeAmountValue: BigNumber;
   maxTradeValue: BigNumber;
+  buttonValue: number;
 
   maybeNeedsApproval: boolean;
 
@@ -109,6 +110,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       inputAmountValue: maxTradeValue,
       tradeAmountValue: maxTradeValue,
       maxTradeValue: maxTradeValue,
+      buttonValue: 0,
       interestRate: new BigNumber(0),
       maybeNeedsApproval: false,
       liquidationPrice: liquidationPrice,
@@ -267,7 +269,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       this.props.positionType !== prevProps.positionType ||
       this.props.leverage !== prevProps.leverage ||
       // this.state.depositToken !== prevState.depositToken ||
-       this.state.tradeAmountValue !== prevState.tradeAmountValue
+      this.state.tradeAmountValue !== prevState.tradeAmountValue
     ) {
       if (this.state.depositToken !== prevState.depositToken) {
         this._isMounted && this.setState({
@@ -369,6 +371,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
             <InputAmount
               inputAmountText={this.state.inputAmountText}
               selectorAssets={[this.props.baseToken, this.props.quoteAsset]}
+              buttonValue={this.state.buttonValue}
               isLoading={false}
               tradeType={this.props.tradeType}
               selectedAsset={this.state.depositToken}
@@ -421,6 +424,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
     this._isMounted && this.setState({
       ...this.state,
       inputAmountText: amountText,
+      buttonValue: 0,
       tradeAmountValue: new BigNumber(amountText)
     }, () => {
       // emitting next event for processing with rx.js
@@ -429,7 +433,7 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
   };
 
   public onInsertMaxValue = async (value: number) => {
-    this._isMounted && this.setState({ ...this.state }, () => {
+    this._isMounted && this.setState({ ...this.state, buttonValue: value }, () => {
       // emitting next event for processing with rx.js
       this._inputSetMax.next(new BigNumber(value));
     });
@@ -466,9 +470,9 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       const collateralAssetPrecision = new BigNumber(10 ** (18 - collateralAssetDecimals));
 
 
-      loanCloseAmount = returnTokenIsCollateral 
-      ? loanCloseData[1].div(10 ** 18).times(collateralAssetPrecision)
-      : loanCloseData[1].div(10 ** 18).times(loanAssetPrecision);
+      loanCloseAmount = returnTokenIsCollateral
+        ? loanCloseData[1].div(10 ** 18).times(collateralAssetPrecision)
+        : loanCloseData[1].div(10 ** 18).times(loanAssetPrecision);
     }
 
     await this._isMounted && this.setState({
@@ -588,9 +592,9 @@ export default class TradeForm extends Component<ITradeFormProps, ITradeFormStat
       inputAmountValue: limitedAmount.inputAmountValue,
       tradeAmountValue: limitedAmount.tradeAmountValue,
       maxTradeValue: maxTradeValue,
-      exposureValue: this.props.tradeType === TradeType.BUY ? 
-      exposureValue
-       : limitedAmount.inputAmountValue,
+      exposureValue: this.props.tradeType === TradeType.BUY ?
+        exposureValue
+        : limitedAmount.inputAmountValue,
     };
   }
 

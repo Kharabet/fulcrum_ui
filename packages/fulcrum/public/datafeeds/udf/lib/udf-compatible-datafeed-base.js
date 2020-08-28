@@ -229,6 +229,8 @@ var UDFCompatibleDatafeedBase = /** @class */ (function () {
         if (configurationData.supports_group_request || !configurationData.supports_search) {
             this._symbolsStorage = new SymbolsStorage(this._datafeedURL, configurationData.supported_resolutions || [], this._requester);
         }
+        //set default supported_resolutions
+        configurationData.supported_resolutions = defaultConfiguration().supported_resolutions;
         logMessage("UdfCompatibleDatafeed: Initialized with " + JSON.stringify(configurationData));
     };
     return UDFCompatibleDatafeedBase;
@@ -238,7 +240,7 @@ function defaultConfiguration() {
     return {
         supports_search: false,
         supports_group_request: true,
-        supported_resolutions: ['1', '5', '15', '30', '60', '1D', '1W', '1M'],
+        supported_resolutions: ['15', '30', '60', '120', '240', '360', '720'],
         supports_marks: false,
         supports_timescale_marks: false,
     };
