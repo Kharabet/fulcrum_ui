@@ -59,7 +59,7 @@ interface ITradePageState {
 
   isManageCollateralModalOpen: boolean;
 
-  openedPositionsLoading: boolean;
+  openedPositionsLoaded: boolean;
   openedPositionsCount: number;
   tokenRowsData: ITradeTokenGridRowProps[];
   ownRowsData: IOwnTokenGridRowProps[];
@@ -143,7 +143,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
       tradePositionType: PositionType.SHORT,
       tradeLeverage: 0,
       isManageCollateralModalOpen: false,
-      openedPositionsLoading: false,
+      openedPositionsLoaded: false,
       openedPositionsCount: 0,
       tokenRowsData: [],
       ownRowsData: [],
@@ -181,7 +181,6 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     if (!FulcrumProvider.Instance.web3Wrapper && (!provider || provider === "None")) {
       this.props.doNetworkConnect();
     }
-    this.derivedUpdate();
   }
 
   public componentDidUpdate(prevProps: Readonly<ITradePageProps>, prevState: Readonly<ITradePageState>, snapshot?: any): void {
@@ -196,14 +195,14 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
 
   private async derivedUpdate() {
     const tokenRowsData = this.getTokenRowsData(this.state);
-    await this._isMounted && this.setState({ ...this.state, tokenRowsData });
 
     const ownRowsData = await this.getOwnRowsData(this.state);
+    await this._isMounted && this.setState({ ...this.state, tokenRowsData, ownRowsData });
     let historyEvents = undefined;
     if (this.state.showMyTokensOnly) {
       historyEvents = await this.getHistoryEvents(this.state);
+      await this._isMounted && this.setState({ ...this.state, historyEvents });
     }
-    await this._isMounted && this.setState({ ...this.state, ownRowsData, historyEvents });
   }
 
   public render() {
@@ -241,7 +240,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
               stablecoins={this.stablecoins}
               baseTokens={this.baseTokens}
               quoteTokens={this.quoteTokens}
-              openedPositionsLoading={this.state.openedPositionsLoading}
+              openedPositionsLoaded={this.state.openedPositionsLoaded}
             />
           ) : (
               <React.Fragment>
@@ -397,7 +396,8 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
 
   public getOwnRowsData = async (state: ITradePageState): Promise<IOwnTokenGridRowProps[]> => {
     const ownRowsData: IOwnTokenGridRowProps[] = [];
-    this._isMounted && this.setState({ ...this.state, openedPositionsLoading: true })
+    this._isMounted && this.setState({ ...this.state, openedPositionsLoaded: false });
+
     if (FulcrumProvider.Instance.web3Wrapper && FulcrumProvider.Instance.contractsSource && FulcrumProvider.Instance.contractsSource.canWrite) {
       const loans = await FulcrumProvider.Instance.getUserMarginTradeLoans();
       this._isMounted && this.setState({ ...this.state, loans })
@@ -518,7 +518,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
         });
       }
     }
-    this._isMounted && this.setState({ ...this.state, openedPositionsCount: ownRowsData.length, openedPositionsLoading: false });
+    this._isMounted && this.setState({ ...this.state, openedPositionsCount: ownRowsData.length, openedPositionsLoaded: true });
     return ownRowsData;
   };
 

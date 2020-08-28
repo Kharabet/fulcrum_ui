@@ -9,7 +9,7 @@ import "../styles/components/own-token-grid.scss"
 export interface IOwnTokenGridProps {
   isMobileMedia: boolean;
   ownRowsData: IOwnTokenGridRowProps[];
-  openedPositionsLoading: boolean;
+  openedPositionsLoaded: boolean;
 }
 
 interface IOwnTokenGridState {
@@ -36,10 +36,10 @@ export class OwnTokenGrid extends Component<IOwnTokenGridProps, IOwnTokenGridSta
   }
 
   public render() {
-    if (this.props.openedPositionsLoading)
-      return <PreloaderChart quantityDots={4} sizeDots={'middle'} title={"Loading"} isOverlay={false} />;
 
-    if (!this.props.ownRowsData.length)
+    if (!this.props.ownRowsData.length) {
+      if (!this.props.openedPositionsLoaded)
+        return <PreloaderChart quantityDots={4} sizeDots={'middle'} title={"Loading"} isOverlay={false} />;
       return (
         <div className="history-token-grid__placeholder">
           <div>
@@ -47,8 +47,8 @@ export class OwnTokenGrid extends Component<IOwnTokenGridProps, IOwnTokenGridSta
             <p>No open positions</p>
             <a href="/trade" className="history-token-grid__link-button">Start Trading</a>
           </div>
-
         </div>);
+    }
 
     const ownRows = this.props.ownRowsData.map((e, i) => <OwnTokenGridRow key={i} {...e} />);
     if (ownRows.length === 0) return null;
