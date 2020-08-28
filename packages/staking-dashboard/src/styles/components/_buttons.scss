@@ -143,6 +143,10 @@
     margin-right: 12px;
     border: 1px solid red;
     border-radius: 50%;
+    img {
+      border-radius: 50%;
+      max-width: 100%;
+    }
     @media screen and (min-width: $width-min-sm) {
       width: 56px;
       height: 56px;

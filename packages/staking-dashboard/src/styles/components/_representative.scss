@@ -92,6 +92,10 @@
   .photo {
     border: 1px solid red;
     border-radius: 50%;
+    img {
+      max-width: 100%;
+      border-radius: 50%;
+    }
     @media screen and (min-width: $width-min-md) {
       width: 56px;
       height: 56px;
