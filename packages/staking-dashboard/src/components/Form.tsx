@@ -1,16 +1,24 @@
 import React, { Component } from "react";
 import { ReactComponent as BzrxIcon } from "../assets/images/token-bzrx.svg"
 import { ReactComponent as VBzrxIcon } from "../assets/images/token-vbzrx.svg"
+import { ReactComponent as BPTIcon } from "../assets/images/token-bpt.svg"
 import { StakingProvider } from "../services/StakingProvider";
 import { StakingProviderEvents } from "../services/events/StakingProviderEvents";
 import { BigNumber } from "@0x/utils";
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { Asset } from "../domain/Asset";
+import { AddToBalance } from "./AddToBalance";
 
+
+interface IFormProps {
+  openFindRepresentative: () => void;
+  openBecomeRepresentative: () => void;
+}
 
 interface IFormState {
   bzrxV1Balance: BigNumber;
   bzrxBalance: BigNumber;
+  bptBalance: BigNumber;
   vBzrxBalance: BigNumber;
   iEthBalance: BigNumber;
   iETHSwapRate: BigNumber;
@@ -19,13 +27,14 @@ interface IFormState {
   canOptin: boolean;
 }
 
-export class Form extends Component<{}, IFormState> {
+export class Form extends Component<IFormProps, IFormState> {
   constructor(props: any) {
     super(props);
     this.state = {
       bzrxV1Balance: new BigNumber(0),
       bzrxBalance: new BigNumber(0),
       vBzrxBalance: new BigNumber(0),
+      bptBalance: new BigNumber(0),
       iEthBalance: new BigNumber(0),
       iETHSwapRate: new BigNumber(0),
       whitelistAmount: new BigNumber(0),
@@ -61,6 +70,7 @@ export class Form extends Component<{}, IFormState> {
       bzrxV1Balance,
       bzrxBalance,
       vBzrxBalance,
+      bptBalance: new BigNumber(10),
       iEthBalance,
       iETHSwapRate: new BigNumber(0),
       whitelistAmount: new BigNumber(0),
@@ -127,49 +137,62 @@ export class Form extends Component<{}, IFormState> {
         <div className="container">
           <div className="calculator">
             <div className="calculator-row">
-              <div>
-                <div className="row-header">My BZRX balance:</div>
+              <div className="row-header">My balance:</div>
+              <div className="row-container">
+                <div className="row-body">
+                  <a href={`${etherscanURL}token/${this.state.bzrxV1Balance.gt(0) ? "0x1c74cFF0376FB4031Cd7492cD6dB2D66c3f2c6B9" : "0x56d811088235F11C8920698a204A5010a788f4b3"}`} target="_blank" rel="noopener noreferrer"><span className="icon"><BzrxIcon /></span></a>
+                  <span title={this.state.bzrxV1Balance.gt(0)
+                    ? this.state.bzrxV1Balance.toFixed(18)
+                    : this.state.bzrxBalance.toFixed(18)
+                  } className="value">
+                    {this.state.bzrxV1Balance.gt(0)
+                      ? this.state.bzrxV1Balance.toFixed(2)
+                      : this.state.bzrxBalance.toFixed(2)
+                    }
+                  </span>
+                  <div className="row-token">{this.state.bzrxV1Balance.gt(0) ? "BZRXv1" : "BZRX"}</div>
+                </div>
+              </div>
+              {this.state.vBzrxBalance.gt(0) &&
                 <div className="row-container">
                   <div className="row-body">
-                    <span title={this.state.bzrxV1Balance.gt(0)
-                      ? this.state.bzrxV1Balance.toFixed(18)
-                      : this.state.bzrxBalance.toFixed(18)
-                    } className="value">
-                      {this.state.bzrxV1Balance.gt(0)
-                        ? this.state.bzrxV1Balance.toFixed(2)
-                        : this.state.bzrxBalance.toFixed(2)
-                      }
-                      <a href={`${etherscanURL}token/${this.state.bzrxV1Balance.gt(0) ? "0x1c74cFF0376FB4031Cd7492cD6dB2D66c3f2c6B9" : "0x56d811088235F11C8920698a204A5010a788f4b3"}`} target="_blank" rel="noopener noreferrer"><span className="icon"><BzrxIcon /></span></a>
+                    <a href={`${etherscanURL}token/0xB72B31907C1C95F3650b64b2469e08EdACeE5e8F`} target="_blank" rel="noopener noreferrer"><span className="icon"><VBzrxIcon /></span></a>
+
+                    <span title={this.state.vBzrxBalance.toFixed(18)} className="value">
+                      {Number(this.state.vBzrxBalance).toFixed(2)}
                     </span>
+                    <div className="row-token">vBZRX</div>
                   </div>
-                  <div className="row-footer">{this.state.bzrxV1Balance.gt(0) ? "BZRXv1" : "BZRX"}</div>
                 </div>
-                {this.state.vBzrxBalance.gt(0) &&
-                  <div className="row-container">
-                    <div className="row-body">
-                      <span title={this.state.vBzrxBalance.toFixed(18)} className="value">
-                        {this.state.vBzrxBalance.toFixed(2)}
-                        <a href={`${etherscanURL}token/0xB72B31907C1C95F3650b64b2469e08EdACeE5e8F`} target="_blank" rel="noopener noreferrer"><span className="icon"><VBzrxIcon /></span></a>
-                      </span>
-                    </div>
-                    <div className="row-footer">vBZRX</div>
-                  </div>
-                }
-              </div>
-              <div className="reward-item">
-                <div className="row-header">My rewards balance:</div>
-                <div className="row-body">0</div>
-                <div className="row-footer">bZxDAO-Balancer tokens</div>
+              }
+              <div className="row-container">
+                <div className="row-body">
+                  <a href="#" target="_blank" rel="noopener noreferrer"><span className="icon"><BPTIcon /></span></a>
+                  <span className="value">{this.state.bptBalance.toFixed(2)}</span>
+                  <div className="row-token">BPT</div>
+                </div>
               </div>
             </div>
-            <div className="convert-button">
+            <div className="calculator-row">
+              <div className="reward-item">
+                <div className="row-header">My rewards balance:</div>
+                <div className="row-body">
+                  <div className="reward-content">
+                    <span>0</span>
+                    <div className="row-footer">bZxDAO-Balancer tokens</div>
+                  </div>
+                  <button title="Claim Rewards" className="button">Claim Rewards</button>
+                </div>
+              </div>
+            </div>
+            {/*<div className="convert-button">
               {this.state.bzrxV1Balance.gt(0) &&
                 <button className="button button-full-width" onClick={this.onBzrxV1ToV2ConvertClick}>
                   Convert BZRX v1 to v2
                     <span className="notice">You will need to confirm 2 transactions in your wallet.</span>
                 </button>
               }
-            </div>
+            </div>*/}
             {/*this.state.iETHSwapRate.gt(0) && swapAmountAllowed.gt(0) &&
               <div className="convert-button">
                 <button title={`Convert ${swapAmountAllowed.toFixed(18)} iETH into ${swapAmountAllowed.div(this.state.iETHSwapRate).toFixed(18)} vBZRX`} className="button button-full-width" onClick={this.onIETHtoVBZRXConvertClick}>
@@ -199,12 +222,40 @@ export class Form extends Component<{}, IFormState> {
                 </button>
               </div>
             }
-            <div className="group-buttons">
+            {/*<div className="group-buttons">
               <button title="Coming soon" className="button" disabled={true}>Stake</button>
               <button title="Coming soon" className="button" disabled={true}>Unstake</button>
               <button title="Coming soon" className="button" disabled={true}>Claim Rewards</button>
               <button title="Coming soon" className="button" disabled={true}>Explore Reward Pool</button>
               <p className="notice">Coming soon</p>
+            </div>*/}
+            <div className="calculator-row">
+              <div className="row-header">Please select representative:</div>
+              <ul className="group-buttons">
+                <li className="button button-representative">
+                  <div className="photo"></div>
+                  <span className="name">Tom Bean</span>
+                </li>
+                <li className="button button-representative">
+                  <div className="photo"></div>
+                  <span className="name">Mark K</span>
+                </li>
+                <li className="button button-representative">
+                  <div className="photo"></div>
+                  <span className="name">0xbd5c...568f</span>
+                </li>
+              </ul>
+            </div>
+            <AddToBalance
+              bzrxV1Balance={Number(this.state.bzrxV1Balance)}
+              bptBalance={Number(this.state.bptBalance)}
+              vBzrxBalance={Number(this.state.vBzrxBalance)}
+            />
+            <div className="calculator-row">
+              <div className="group-buttons">
+                <button className="button" onClick={this.props.openFindRepresentative}>Find a Representative</button>
+                <button className="button" onClick={this.props.openBecomeRepresentative}>Become A Representative</button>
+              </div>
             </div>
           </div>
         </div>
