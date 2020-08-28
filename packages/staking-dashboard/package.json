@@ -15,6 +15,7 @@
   },
   "main": "src/index.jsx",
   "dependencies": {
+    "3box": "^1.21.0",
     "@0x/base-contract": "^5.0.5",
     "@0x/utils": "^4.3.1",
     "@types/react-sidebar": "^3.0.0",
