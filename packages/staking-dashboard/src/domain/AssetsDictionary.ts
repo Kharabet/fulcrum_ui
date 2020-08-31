@@ -3,6 +3,7 @@ import { AssetDetails } from "./AssetDetails";
 
 import { ReactComponent as BZRX } from "../assets/images/token-bzrx.svg";
 import { ReactComponent as vBZRX } from "../assets/images/token-vbzrx.svg";
+import { ReactComponent as BPT } from "../assets/images/token-bpt.svg";
 import {ReactComponent as ETHLogo} from "../assets/images/ic_token_eth.svg";
 
 export class AssetsDictionary {
@@ -43,6 +44,19 @@ export class AssetsDictionary {
         new Map<number, string | null>([
           [1, "0xB72B31907C1C95F3650b64b2469e08EdACeE5e8F"],
           [42, "0x6F8304039f34fd6A6acDd511988DCf5f62128a32"] 
+        ])
+      )
+    ],
+    [
+      Asset.BPT,
+      new AssetDetails(
+        "BPT",
+        "Balancer Pool Token (BPT)",
+        BPT,
+        18,
+        new Map<number, string | null>([
+          [1, "0x0e511Aa1a137AaD267dfe3a6bFCa0b856C1a3682"],
+          [42, "0x4c4462c6bca4c92bf41c40f9a4047f35fd296996"] 
         ])
       )
     ],

@@ -3,5 +3,6 @@ export enum Asset {
   BZRX = "BZRX",
   vBZRX = "vBZRX",
   ETH = "ETH",
+  BPT = "BPT",
   UNKNOWN = "UNKNOWN"
 }

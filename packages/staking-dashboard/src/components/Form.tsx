@@ -19,12 +19,17 @@ interface IFormState {
   bzrxBalance: BigNumber;
   bptBalance: BigNumber;
   vBzrxBalance: BigNumber;
+  bzrxStakingBalance: BigNumber;
+  bptStakingBalance: BigNumber;
+  vBzrxStakingBalance: BigNumber;
   iEthBalance: BigNumber;
   iETHSwapRate: BigNumber;
   whitelistAmount: BigNumber;
   claimableAmount: BigNumber;
   canOptin: boolean;
 }
+
+const networkName = process.env.REACT_APP_ETH_NETWORK;
 
 export class Form extends Component<IFormProps, IFormState> {
   constructor(props: any) {
@@ -34,6 +39,9 @@ export class Form extends Component<IFormProps, IFormState> {
       bzrxBalance: new BigNumber(0),
       vBzrxBalance: new BigNumber(0),
       bptBalance: new BigNumber(0),
+      bzrxStakingBalance: new BigNumber(0),
+      vBzrxStakingBalance: new BigNumber(0),
+      bptStakingBalance: new BigNumber(0),
       iEthBalance: new BigNumber(0),
       iETHSwapRate: new BigNumber(0),
       whitelistAmount: new BigNumber(0),
@@ -50,15 +58,28 @@ export class Form extends Component<IFormProps, IFormState> {
   private _isMounted: boolean;
 
   private async derivedUpdate() {
+
+    const list = await StakingProvider.Instance.getRepresentatives();
     const canOptin = await StakingProvider.Instance.canOptin();
     let claimableAmount = await StakingProvider.Instance.isClaimable();
     if (claimableAmount.gt(0)) {
       claimableAmount = claimableAmount.div(10 ** 18)
     }
     const bzrxV1Balance = (await StakingProvider.Instance.getAssetTokenBalanceOfUser(Asset.BZRXv1)).div(10 ** 18);
-    const bzrxBalance = (await StakingProvider.Instance.getAssetTokenBalanceOfUser(Asset.BZRX)).div(10 ** 18);
-    const vBzrxBalance = (await StakingProvider.Instance.getAssetTokenBalanceOfUser(Asset.vBZRX)).div(10 ** 18);
+    const bzrxBalance = (await StakingProvider.Instance.stakeableByAsset(Asset.BZRX)).div(10 ** 18);
+    const vBzrxBalance = (await StakingProvider.Instance.stakeableByAsset(Asset.vBZRX)).div(10 ** 18);
+    //TODO: remove networkName
+    const bptBalance = networkName === "kovan"
+      ? (await StakingProvider.Instance.stakeableByAsset(Asset.BPT)).div(10 ** 6)
+      : (await StakingProvider.Instance.stakeableByAsset(Asset.BPT)).div(10 ** 18);
     const iEthBalance = (await StakingProvider.Instance.getITokenBalanceOfUser(Asset.ETH)).div(10 ** 18);
+
+    const bzrxStakingBalance = (await StakingProvider.Instance.balanceOfByAsset(Asset.BZRX)).div(10 ** 18);
+    const vBzrxStakingBalance = (await StakingProvider.Instance.balanceOfByAsset(Asset.vBZRX)).div(10 ** 18);
+    //TODO: remove networkName
+    const bptStakingBalance = networkName === "kovan"
+      ? (await StakingProvider.Instance.balanceOfByAsset(Asset.BPT)).div(10 ** 6)
+      : (await StakingProvider.Instance.balanceOfByAsset(Asset.BPT)).div(10 ** 18);
 
     //const userData = await StakingProvider.Instance.getiETHSwapRateWithCheck();
     //const iETHSwapRate = userData[0].div(10 ** 18);
@@ -69,7 +90,10 @@ export class Form extends Component<IFormProps, IFormState> {
       bzrxV1Balance,
       bzrxBalance,
       vBzrxBalance,
-      bptBalance: new BigNumber(10),
+      bptBalance: bptBalance,
+      bzrxStakingBalance,
+      vBzrxStakingBalance,
+      bptStakingBalance,
       iEthBalance,
       iETHSwapRate: new BigNumber(0),
       whitelistAmount: new BigNumber(0),
@@ -119,7 +143,7 @@ export class Form extends Component<IFormProps, IFormState> {
     const receipt = await StakingProvider.Instance.doClaim();
     await this.derivedUpdate();
   }
-  
+
   public onBecomeRepresentativeClick = async () => {
     const receipt = await StakingProvider.Instance.doBecomeRepresentative();
     await this.derivedUpdate();
@@ -142,20 +166,14 @@ export class Form extends Component<IFormProps, IFormState> {
           <div className="calculator">
             <div className="calculator-row balance">
               <div className="balance-item">
-                <div className="row-header">My balance:</div>
+                <div className="row-header">Wallet Balance:</div>
                 <div className="row-container">
                   <div className="row-body">
                     <a href={`${etherscanURL}token/${this.state.bzrxV1Balance.gt(0) ? "0x1c74cFF0376FB4031Cd7492cD6dB2D66c3f2c6B9" : "0x56d811088235F11C8920698a204A5010a788f4b3"}`} target="_blank" rel="noopener noreferrer"><span className="icon"><BzrxIcon /></span></a>
-                    <span title={this.state.bzrxV1Balance.gt(0)
-                      ? this.state.bzrxV1Balance.toFixed(18)
-                      : this.state.bzrxBalance.toFixed(18)
-                    } className="value">
-                      {this.state.bzrxV1Balance.gt(0)
-                        ? this.state.bzrxV1Balance.toFixed(2)
-                        : this.state.bzrxBalance.toFixed(2)
-                      }
+                    <span title={this.state.bzrxBalance.toFixed(18)} className="value">
+                      {this.state.bzrxBalance.toFixed(2)}
                     </span>
-                    <div className="row-token">{this.state.bzrxV1Balance.gt(0) ? "BZRXv1" : "BZRX"}</div>
+                    <div className="row-token">BZRX</div>
                   </div>
                 </div>
                 {this.state.vBzrxBalance.gt(0) &&
@@ -172,8 +190,8 @@ export class Form extends Component<IFormProps, IFormState> {
                 }
                 <div className="row-container">
                   <div className="row-body">
-                    <a href="#" target="_blank" rel="noopener noreferrer"><span className="icon"><BPTIcon /></span></a>
-                    <span className="value">{this.state.bptBalance.toFixed(2)}</span>
+                    <a href={`${etherscanURL}token/0x0e511Aa1a137AaD267dfe3a6bFCa0b856C1a3682`} target="_blank" rel="noopener noreferrer"><span className="icon"><BPTIcon /></span></a>
+                    <span title={this.state.bptBalance.toFixed(18)} className="value">{this.state.bptBalance.toFixed(2)}</span>
                     <div className="row-token">BPT</div>
                   </div>
                 </div>
@@ -182,17 +200,11 @@ export class Form extends Component<IFormProps, IFormState> {
                 <div className="row-header">Staking Balance:</div>
                 <div className="row-container">
                   <div className="row-body">
-                    <a href={`${etherscanURL}token/${this.state.bzrxV1Balance.gt(0) ? "0x1c74cFF0376FB4031Cd7492cD6dB2D66c3f2c6B9" : "0x56d811088235F11C8920698a204A5010a788f4b3"}`} target="_blank" rel="noopener noreferrer"><span className="icon"><BzrxIcon /></span></a>
-                    <span title={this.state.bzrxV1Balance.gt(0)
-                      ? this.state.bzrxV1Balance.toFixed(18)
-                      : this.state.bzrxBalance.toFixed(18)
-                    } className="value">
-                      {this.state.bzrxV1Balance.gt(0)
-                        ? this.state.bzrxV1Balance.toFixed(2)
-                        : this.state.bzrxBalance.toFixed(2)
-                      }
+                    <a href={`${etherscanURL}token/0x56d811088235F11C8920698a204A5010a788f4b3"}`} target="_blank" rel="noopener noreferrer"><span className="icon"><BzrxIcon /></span></a>
+                    <span title={this.state.bzrxStakingBalance.toFixed(18)} className="value">
+                      {this.state.bzrxStakingBalance.toFixed(2)}
                     </span>
-                    <div className="row-token">{this.state.bzrxV1Balance.gt(0) ? "BZRXv1" : "BZRX"}</div>
+                    <div className="row-token">BZRX</div>
                   </div>
                 </div>
                 {this.state.vBzrxBalance.gt(0) &&
@@ -200,8 +212,8 @@ export class Form extends Component<IFormProps, IFormState> {
                     <div className="row-body">
                       <a href={`${etherscanURL}token/0xB72B31907C1C95F3650b64b2469e08EdACeE5e8F`} target="_blank" rel="noopener noreferrer"><span className="icon"><VBzrxIcon /></span></a>
 
-                      <span title={this.state.vBzrxBalance.toFixed(18)} className="value">
-                        {Number(this.state.vBzrxBalance).toFixed(2)}
+                      <span title={this.state.vBzrxStakingBalance.toFixed(18)} className="value">
+                        {Number(this.state.vBzrxStakingBalance).toFixed(2)}
                       </span>
                       <div className="row-token">vBZRX</div>
                     </div>
@@ -209,8 +221,9 @@ export class Form extends Component<IFormProps, IFormState> {
                 }
                 <div className="row-container">
                   <div className="row-body">
-                    <a href="#" target="_blank" rel="noopener noreferrer"><span className="icon"><BPTIcon /></span></a>
-                    <span className="value">{this.state.bptBalance.toFixed(2)}</span>
+                    <a href={`${etherscanURL}token/0x0e511Aa1a137AaD267dfe3a6bFCa0b856C1a3682`} target="_blank" rel="noopener noreferrer">
+                      <span title={this.state.bptStakingBalance.toFixed(18)} className="icon"><BPTIcon /></span></a>
+                    <span className="value">{this.state.bptStakingBalance.toFixed(2)}</span>
                     <div className="row-token">BPT</div>
                   </div>
                 </div>
@@ -228,14 +241,14 @@ export class Form extends Component<IFormProps, IFormState> {
                 </div>
               </div>
             </div>
-            {/*<div className="convert-button">
+            <div className="convert-button" style={{marginTop: "20px"}}>
               {this.state.bzrxV1Balance.gt(0) &&
                 <button className="button button-full-width" onClick={this.onBzrxV1ToV2ConvertClick}>
                   Convert BZRX v1 to v2
                     <span className="notice">You will need to confirm 2 transactions in your wallet.</span>
                 </button>
               }
-            </div>*/}
+            </div>
             {/*this.state.iETHSwapRate.gt(0) && swapAmountAllowed.gt(0) &&
               <div className="convert-button">
                 <button title={`Convert ${swapAmountAllowed.toFixed(18)} iETH into ${swapAmountAllowed.div(this.state.iETHSwapRate).toFixed(18)} vBZRX`} className="button button-full-width" onClick={this.onIETHtoVBZRXConvertClick}>
