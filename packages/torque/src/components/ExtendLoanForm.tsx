@@ -1,6 +1,6 @@
 import { BigNumber } from "@0x/utils";
 import React, { Component, FormEvent, ChangeEvent } from "react";
-import { Observable, Subject } from "rxjs";
+import { merge, Observable, Subject } from "rxjs";
 import { debounceTime, distinctUntilChanged, switchMap } from "rxjs/operators";
 import { Asset } from "../domain/Asset";
 import { AssetDetails } from "../domain/AssetDetails";
@@ -11,7 +11,6 @@ import { IExtendEstimate } from "../domain/IExtendEstimate";
 import { TorqueProvider } from "../services/TorqueProvider";
 import Slider from "rc-slider";
 import { InputAmount } from "./InputAmount";
-import { merge } from "lodash";
 
 export interface IExtendLoanFormProps {
   loanOrderState: IBorrowedFundsState;
@@ -37,6 +36,8 @@ interface IExtendLoanFormState {
 
 export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanFormState> {
   private readonly _inputDecimals = 6;
+
+  private readonly _inputChange: Subject<string>;
   private readonly _selectedValueUpdate: Subject<number>;
 
   constructor(props: IExtendLoanFormProps, context?: any) {
@@ -59,19 +60,27 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
 
 
     this._selectedValueUpdate = new Subject();
+    this._inputChange = new Subject();
 
+    merge(
+      this._inputChange.pipe(
+        distinctUntilChanged(),
+        debounceTime(300),
+        switchMap(value => this.rxFromInputAmount(value))
+      ),
+      this._selectedValueUpdate.pipe(
+        distinctUntilChanged()
+      )
 
-    this._selectedValueUpdate.pipe(
-      distinctUntilChanged(),
-      debounceTime(100),
-      switchMap(value => this.rxGetEstimate(value))
-    ).subscribe((next) => {
-      this.setState({
-        ...this.state,
-        depositAmount: next!.depositAmount,
-        inputAmountText: this.formatPrecision(next!.depositAmount)
+    ).pipe(
+      switchMap(value => this.rxGetEstimate(value)))
+      .subscribe((value: IExtendEstimate) => {
+        this.setState({
+          ...this.state,
+          depositAmount: value.depositAmount,
+          inputAmountText: this.formatPrecision(value.depositAmount)
+        });
       });
-    });
   }
 
   public componentDidMount(): void {
@@ -196,6 +205,23 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
     });
   };
 
+  private rxFromInputAmount = (value: string): Observable<number> => {
+    return new Observable<number>(observer => {
+      let inputAmountText = value;
+      const maxDepositAmountText = this.state.maxDepositAmount.toFixed();
+      const maxDepositAmountNumber = Number(maxDepositAmountText);
+
+      if (Number(inputAmountText) > maxDepositAmountNumber) {
+        inputAmountText = this.formatPrecision(this.state.maxDepositAmount);
+      }
+      const depositAmountText = new BigNumber(inputAmountText);
+      const depositAmountNumber = Number(depositAmountText);
+      const selectedValue = Math.round(depositAmountNumber * this.state.maxValue / maxDepositAmountNumber);
+      this.setState({ ...this.state, selectedValue });
+      observer.next(selectedValue);
+    });
+  }
+
 
   private onChange = (value: number) => {
     this.setState({
@@ -253,23 +279,24 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
     }
   };
 
-  public onTradeAmountChange = (event: ChangeEvent<HTMLInputElement>) => {
+  public onTradeAmountChange = async (event: ChangeEvent<HTMLInputElement>) => {
     let inputAmountText = event.target.value ? event.target.value : "";
+    if (Number(inputAmountText) == 0) {
 
-    const maxDepositAmountText = this.state.maxDepositAmount.toFixed();
-    const maxDepositAmountNumber = Number(maxDepositAmountText);
-
-    if (Number(inputAmountText) > maxDepositAmountNumber) {
-      inputAmountText = this.formatPrecision(this.state.maxDepositAmount);
+      this.setState({
+        ...this.state,
+        inputAmountText
+      })
+    } else {
+      // setting Text to update display at the same time
+      this.setState({
+        ...this.state,
+        inputAmountText,
+        interestAmount: 0
+      }, () => {
+        this._inputChange.next(inputAmountText);
+      });
     }
-
-    const depositAmountText = new BigNumber(inputAmountText);
-    const depositAmountNumber = Number(depositAmountText);
-    const selectedValue = Math.round(depositAmountNumber * this.state.maxValue / maxDepositAmountNumber);
-
-    this.setState({ ...this.state, selectedValue, interestAmount: 0 }, () => {
-      this._selectedValueUpdate.next(selectedValue);
-    });
   };
 
   public updateInterestAmount = (interest: number) => {
