@@ -7,7 +7,7 @@ import { StakingProvider } from "../services/StakingProvider";
 import { FindRepresentativeItem } from "../components/FindRepresentativeItem";
 import { BigNumber } from "@0x/utils";
 
-const Box = require('3box')
+// const Box = require('3box')
 export interface IFindRepresentativeProps {
   onFindRepresentativeClose: () => void;
 }
