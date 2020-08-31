@@ -12,6 +12,10 @@ import Modal from "react-modal";
 import { FindRepresentative } from "./FindRepresentative";
 import { IRep } from "../domain/IRep";
 
+import Representative1 from "../assets/images/representative1.png"
+import Representative2 from "../assets/images/representative2.png"
+import Representative3 from "../assets/images/representative3.png"
+
 interface IFormProps {
 }
 
@@ -213,14 +217,16 @@ export class Form extends Component<IFormProps, IFormState> {
       ? StakingProvider.Instance.web3ProviderSettings.etherscanURL
       : "";
 
-    const topRepsLi = this.state.topRepsList.map(e => {
+    const topRepsLi = this.state.topRepsList.map((e, index) => {
+      const representative = index % 3 === 0 ? Representative1 : index % 2 === 0 ? Representative2 : Representative3;
+
       return (
         <li key={e.wallet}
           className={`button button-representative ${e.wallet.toLowerCase() === this.state.selectedRepAddress.toLowerCase()
             ? "active" : ""}`}
           onClick={this.setSelectedRepAddressClick}
           data-address={e.wallet}>
-          <div className="photo"></div>
+          <img className="photo" src={representative} alt={`Representative ${index}`} />
           <span className="name">{this.getShortHash(e.wallet, 4)}</span>
         </li>
       )
