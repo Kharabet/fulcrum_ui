@@ -328,7 +328,7 @@ export class Form extends Component<IFormProps, IFormState> {
                 <div className="row-body">
                   <div className="reward-content">
                     <span title={this.state.userEarnings.toFixed(18)}>${this.state.userEarnings.toFixed(2)}</span>
-                    <div className="row-footer">bZxDAO-Balancer tokens</div>
+                    {/* <div className="row-footer">bZxDAO-Balancer tokens</div> */}
                   </div>
                   <button title="Claim Rewards" disabled={true} className="button">Claim Rewards</button>
                 </div>
