@@ -290,6 +290,7 @@ export class BZRXStakingInterimContract extends BaseContract {
             defaultBlock?: BlockParam
         ): Promise<Array<{
             wallet: string;
+            isActive: boolean;
             BZRX: BigNumber;
             vBZRX: BigNumber;
             LPToken: BigNumber;
@@ -310,6 +311,7 @@ export class BZRXStakingInterimContract extends BaseContract {
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<Array<{
                 wallet: string;
+                isActive: boolean;
                 BZRX: BigNumber;
                 vBZRX: BigNumber;
                 LPToken: BigNumber;
