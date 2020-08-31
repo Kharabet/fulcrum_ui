@@ -320,6 +320,32 @@ export class BZRXStakingInterimContract extends BaseContract {
             return result;
         }
     };
+    
+    public reps = {
+        async callAsync(
+            account: string,
+            callData: Partial<CallData> = {},
+            defaultBlock?: BlockParam
+        ): Promise<boolean> {
+            const self = (this as any) as BZRXStakingInterimContract;
+            const encodedData = self._strictEncodeArguments("reps(address)", [account]);
+            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+                {
+                    to: self.address,
+                    ...callData,
+                    data: encodedData
+                },
+                self._web3Wrapper.getContractDefaults()
+            );
+            const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
+            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            const abiEncoder = self._lookupAbiEncoder("reps(address)");
+            // tslint:disable boolean-naming
+            const result = abiEncoder.strictDecodeReturnValue<boolean>(rawCallResult);
+            // tslint:enable boolean-naming
+            return result;
+        }
+    };
 
     constructor(abi: ContractAbi, address: string, provider: any, txDefaults?: Partial<TxData>) {
         super('BZRXStakingInterim', abi, address.toLowerCase(), provider as SupportedProvider, txDefaults);
