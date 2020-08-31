@@ -388,7 +388,7 @@ export class Form extends Component<IFormProps, IFormState> {
             </div>
             {this.state.selectedRepAddress !== "" &&
               <AddToBalance
-                bzrxMax={Number(this.state.bzrxV1Balance)}
+                bzrxMax={Number(this.state.bzrxBalance)}
                 vbzrxMax={Number(this.state.vBzrxBalance)}
                 bptMax={Number(this.state.bptBalance)}
                 stake={this.onStakeClick}
