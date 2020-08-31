@@ -64,9 +64,13 @@ export class Form extends Component<IFormProps, IFormState> {
 
   }
 
+  private isAlreadyRepresentative: boolean = false;
+
   private _isMounted: boolean;
 
   private async derivedUpdate() {
+
+    this.isAlreadyRepresentative = await StakingProvider.Instance.checkIsRep();
 
     const repsList = await StakingProvider.Instance.getRepresentatives();
     const topRepsList = repsList.sort((a: any, b: any) => b.BZRX.minus(a.BZRX).toNumber()).slice(0, 3);
@@ -125,7 +129,6 @@ export class Form extends Component<IFormProps, IFormState> {
 
   public componentDidMount(): void {
     this._isMounted = true;
-
     this.derivedUpdate();
   }
   public componentWillUnmount(): void {
@@ -167,12 +170,12 @@ export class Form extends Component<IFormProps, IFormState> {
     const receipt = await StakingProvider.Instance.stake(bzrx, vbzrx, bpt, this.state.selectedRepAddress);
     await this.derivedUpdate();
   }
-  
+
   public setSelectedRepAddressClick = (e: React.MouseEvent<HTMLElement>) => {
     const liElement = e.currentTarget;
     const address = liElement.dataset.address
     if (!address) return;
-    this.setState({...this.state, selectedRepAddress: address});
+    this.setState({ ...this.state, selectedRepAddress: address });
   }
 
   private getShortHash = (hash: string, count: number) => {
@@ -195,10 +198,10 @@ export class Form extends Component<IFormProps, IFormState> {
 
       return (
         <li key={e.wallet}
-        className={`button button-representative ${e.wallet.toLowerCase() === this.state.selectedRepAddress.toLowerCase() 
-        ? "active" : ""}`}
-        onClick={this.setSelectedRepAddressClick}
-        data-address={e.wallet}>
+          className={`button button-representative ${e.wallet.toLowerCase() === this.state.selectedRepAddress.toLowerCase()
+            ? "active" : ""}`}
+          onClick={this.setSelectedRepAddressClick}
+          data-address={e.wallet}>
           <img className="photo" src={representative} alt={`Representative ${index}`} />
           <span className="name">{this.getShortHash(e.wallet, 4)}</span>
         </li>
@@ -306,7 +309,7 @@ export class Form extends Component<IFormProps, IFormState> {
                 </button>
               </div>
             */}
-            {this.state.claimableAmount.gt(0) &&
+            {/* {this.state.claimableAmount.gt(0) &&
               <div className="convert-button">
                 <button title={`Claim ${this.state.claimableAmount.toFixed(18)} vBZRX`} className="button button-full-width" onClick={this.onClaimClick}>
                   Claim&nbsp;
@@ -322,7 +325,7 @@ export class Form extends Component<IFormProps, IFormState> {
                   <span className="notice">The program is open to anyone negatively impacted by the protocol pause on Feb-18-2020 04:21:52 AM +UTC</span>
                 </button>
               </div>
-            }
+            } */}
             {/*<div className="group-buttons">
               <button title="Coming soon" className="button" disabled={true}>Stake</button>
               <button title="Coming soon" className="button" disabled={true}>Unstake</button>
@@ -336,16 +339,18 @@ export class Form extends Component<IFormProps, IFormState> {
                 {topRepsLi}
               </ul>
             </div>
-            <AddToBalance
-              bzrxMax={Number(this.state.bzrxV1Balance)}
-              vbzrxMax={Number(this.state.vBzrxBalance)}
-              bptMax={Number(this.state.bptBalance)}
-              stake={this.onStakeClick}
-            />
+            {this.state.selectedRepAddress !== "" &&
+              <AddToBalance
+                bzrxMax={Number(this.state.bzrxV1Balance)}
+                vbzrxMax={Number(this.state.vBzrxBalance)}
+                bptMax={Number(this.state.bptBalance)}
+                stake={this.onStakeClick}
+              />
+            }
             <div className="calculator-row">
               <div className="group-buttons">
                 <button className="button" onClick={this.props.openFindRepresentative}>Find a Representative</button>
-                <button className="button" onClick={this.onBecomeRepresentativeClick}>Become A Representative</button>
+                <button className="button" disabled={this.isAlreadyRepresentative} onClick={this.onBecomeRepresentativeClick}>Become A Representative</button>
               </div>
             </div>
           </div>

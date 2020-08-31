@@ -735,6 +735,24 @@ export class StakingProvider {
     return result;
   }
 
+  public checkIsRep = async (): Promise<boolean> => {
+    let result = false
+
+    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+    if (!this.contractsSource) return result;
+
+    const bzrxStakingContract = await this.contractsSource.getBZRXStakingInterimContract();
+    if (!account || !bzrxStakingContract) return result;
+
+    result = await bzrxStakingContract.reps.callAsync(
+      account,
+      {
+        from: account
+      });
+
+    return result;
+  }
+
   public stakeableByAsset = async (asset: Asset): Promise<BigNumber> => {
     let result = new BigNumber(0);
 
