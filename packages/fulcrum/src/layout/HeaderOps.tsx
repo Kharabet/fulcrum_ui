@@ -8,6 +8,7 @@ import { ReactComponent as MenuIconOpen } from "../assets/images/ic_menu.svg";
 import { ReactComponent as MenuIconClose } from "../assets/images/ic_close.svg";
 import { Footer } from "./Footer"
 import { SwitchButtonInput } from "../components/SwitchButtonInput";
+import { truncate } from "fs";
 export interface IHeaderOpsProps {
   doNetworkConnect: () => void;
   isRiskDisclosureModalOpen: () => void;
@@ -37,6 +38,11 @@ export class HeaderOps extends Component<IHeaderOpsProps, IHeaderOpsState> {
   public componentDidMount(): void {
     var currentTheme = localStorage.getItem('theme')!;
     var toggleSwitch = document.querySelector<HTMLInputElement>('.header__right .theme-switch input[type="checkbox"]');
+    if (currentTheme === null) {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      localStorage.setItem('theme', 'dark');      
+      if (toggleSwitch) toggleSwitch.checked = true;
+    }
     if (toggleSwitch && currentTheme) {
       if (currentTheme === 'light') {
         document.documentElement.setAttribute('data-theme', 'light');
