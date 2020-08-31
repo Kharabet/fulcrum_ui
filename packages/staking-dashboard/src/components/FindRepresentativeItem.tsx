@@ -17,27 +17,37 @@ const getShortHash = (address: string, count: number) => {
   return address.substring(0, 8) + '...' + address.substring(address.length - count);
 }
 
+const networkName = process.env.REACT_APP_ETH_NETWORK;
+
 export const FindRepresentativeItem = (props: IFindRepresentativeItemProps) => {
-  return (
+  const bzrxAmount = props.bzrxAmount.div(10 ** 18).toFixed();
+  const vbzrxAmount = props.vbzrxAmount.div(10 ** 18).toFixed();
+
+  //TODO: remove networkName
+  const bptAmount = networkName === "kovan"
+    ? props.bptAmount.div(10 ** 6).toFixed()
+    : props.bptAmount.div(10 ** 18).toFixed();
+
+    return (
     <li className="item-find-representative">
       <div className="photo"></div>
       <div className="name">{getShortHash(props.name, 4)}</div>
       {props.bzrxAmount.gt(0) &&
         <div className="token">
           <BzrxIcon />
-          <span>{props.bzrxAmount.div(10 ** 18).toFixed()}</span>
+          <span>{bzrxAmount}</span>
         </div>
       }
       {props.vbzrxAmount.gt(0) &&
         <div className="token">
           <VBzrxIcon />
-          <span>{props.vbzrxAmount.div(10 ** 18).toFixed()}</span>
+          <span>{vbzrxAmount}</span>
         </div>
       }
       {props.bptAmount.gt(0) &&
         <div className="token">
           <BPTIcon />
-          <span>{props.bptAmount.div(10 ** 18).toFixed()}</span>
+          <span>{bptAmount}</span>
         </div>
       }
     </li>
