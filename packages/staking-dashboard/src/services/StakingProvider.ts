@@ -565,7 +565,7 @@ export class StakingProvider {
     let receipt = null;
 
     const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
-    if (!this.contractsSource) return receipt;
+    if (!this.contractsSource || !this.contractsSource.canWrite) return receipt;
 
     const traderCompensationContract = await this.contractsSource.getTraderCompensationContract();
     if (!account || !traderCompensationContract) return receipt;
@@ -602,7 +602,7 @@ export class StakingProvider {
     let receipt = null;
 
     const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
-    if (!this.contractsSource) return receipt;
+    if (!this.contractsSource || !this.contractsSource.canWrite) return receipt;
 
     const bzrxStakingContract = await this.contractsSource.getBZRXStakingInterimContract();
     if (!account || !bzrxStakingContract) return receipt;
@@ -633,6 +633,27 @@ export class StakingProvider {
 
     const txReceipt = await this.waitForTransactionMined(txHash);
     return txReceipt.status === 1 ? txReceipt : null;
+  }
+
+  public getRepresentatives = async (): Promise<{ wallet: string, BZRX: BigNumber, vBZRX: BigNumber, LPToken: BigNumber }[]> => {
+    let result: { wallet: string, BZRX: BigNumber, vBZRX: BigNumber, LPToken: BigNumber }[] = [];
+
+    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+    if (!this.contractsSource) return result;
+
+    const bzrxStakingContract = await this.contractsSource.getBZRXStakingInterimContract();
+    if (!account || !bzrxStakingContract) return result;
+
+    const repVotes = await bzrxStakingContract.getRepVotes.callAsync(
+      new BigNumber(0),
+      new BigNumber(1000),
+      true,
+      {
+        from: account
+      });
+
+    result = result.concat(repVotes);
+    return result;
   }
 
   public waitForTransactionMined = async (
