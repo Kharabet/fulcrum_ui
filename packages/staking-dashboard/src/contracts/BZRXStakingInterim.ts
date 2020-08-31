@@ -160,6 +160,74 @@ export class BZRXStakingInterimContract extends BaseContract {
         }
     };
     
+    public setRepActive = {
+        async sendTransactionAsync(
+            _isActive: boolean,
+            txData: Partial<TxData> = {}
+        ): Promise<string> {
+            const self = (this as any) as BZRXStakingInterimContract;
+            const encodedData = self._strictEncodeArguments("setRepActive(bool)", [_isActive]);
+            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+                {
+                    to: self.address,
+                    ...txData,
+                    data: encodedData
+                },
+                self._web3Wrapper.getContractDefaults(),
+                (self as any).BZRXStakingInterim.estimateGasAsync.bind(self, _isActive)
+            );
+            const txHash = await self._web3Wrapper.sendTransactionAsync(txDataWithDefaults);
+            return txHash;
+        },
+        async estimateGasAsync(
+            _isActive: boolean,
+            txData: Partial<TxData> = {}
+        ): Promise<number> {
+            const self = (this as any) as BZRXStakingInterimContract;
+            const encodedData = self._strictEncodeArguments("setRepActive(bool)", [_isActive]);
+            const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+                {
+                    to: self.address,
+                    ...txData,
+                    data: encodedData
+                },
+                self._web3Wrapper.getContractDefaults()
+            );
+            const gas = await self._web3Wrapper.estimateGasAsync(txDataWithDefaults);
+            return gas;
+        },
+        getABIEncodedTransactionData(
+            _isActive: boolean,
+            ): string {
+            const self = (this as any) as BZRXStakingInterimContract;
+            const abiEncodedTransactionData = self._strictEncodeArguments("setRepActive(bool)", [_isActive]);
+            return abiEncodedTransactionData;
+        },
+        async callAsync(
+            _isActive: boolean,
+            callData: Partial<CallData> = {},
+            defaultBlock?: BlockParam
+        ) {
+            const self = (this as any) as BZRXStakingInterimContract;
+            const encodedData = self._strictEncodeArguments("setRepActive(bool)", [_isActive]);
+            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+                {
+                    to: self.address,
+                    ...callData,
+                    data: encodedData
+                },
+                self._web3Wrapper.getContractDefaults()
+            );
+            const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
+            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            const abiEncoder = self._lookupAbiEncoder("setRepActive(bool)");
+            // tslint:disable boolean-naming
+            const result = abiEncoder.strictDecodeReturnValue(rawCallResult);
+            // tslint:enable boolean-naming
+            return result;
+        }
+    };
+    
     public stakeableByAsset = {
         async callAsync(
             token: string,

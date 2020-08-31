@@ -12,7 +12,6 @@ import { AddToBalance } from "./AddToBalance";
 
 interface IFormProps {
   openFindRepresentative: () => void;
-  openBecomeRepresentative: () => void;
 }
 
 interface IFormState {
@@ -118,6 +117,11 @@ export class Form extends Component<IFormProps, IFormState> {
 
   public onClaimClick = async () => {
     const receipt = await StakingProvider.Instance.doClaim();
+    await this.derivedUpdate();
+  }
+  
+  public onBecomeRepresentativeClick = async () => {
+    const receipt = await StakingProvider.Instance.doBecomeRepresentative();
     await this.derivedUpdate();
   }
 
@@ -254,7 +258,7 @@ export class Form extends Component<IFormProps, IFormState> {
             <div className="calculator-row">
               <div className="group-buttons">
                 <button className="button" onClick={this.props.openFindRepresentative}>Find a Representative</button>
-                <button className="button" onClick={this.props.openBecomeRepresentative}>Become A Representative</button>
+                <button className="button" onClick={this.onBecomeRepresentativeClick}>Become A Representative</button>
               </div>
             </div>
           </div>

@@ -597,6 +597,44 @@ export class StakingProvider {
     return txReceipt.status === 1 ? txReceipt : null;
   }
 
+
+  public doBecomeRepresentative = async () => {
+    let receipt = null;
+
+    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+    if (!this.contractsSource) return receipt;
+
+    const bzrxStakingContract = await this.contractsSource.getBZRXStakingInterimContract();
+    if (!account || !bzrxStakingContract) return receipt;
+
+    let gasAmountBN;
+    let gasAmount;
+    try {
+      gasAmount = await bzrxStakingContract.setRepActive.estimateGasAsync(
+        true,
+        {
+          from: account,
+          gas: this.gasLimit,
+        });
+      gasAmountBN = new BigNumber(gasAmount).multipliedBy(this.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
+
+    }
+    catch (e) {
+      console.error(e);
+    }
+
+    const txHash = await bzrxStakingContract.setRepActive.sendTransactionAsync(
+      true,
+      {
+        from: account,
+        gas: this.gasLimit,
+        gasPrice: await this.gasPrice()
+      });
+
+    const txReceipt = await this.waitForTransactionMined(txHash);
+    return txReceipt.status === 1 ? txReceipt : null;
+  }
+
   public waitForTransactionMined = async (
     txHash: string): Promise<any> => {
 
