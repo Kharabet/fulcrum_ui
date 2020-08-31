@@ -4,20 +4,25 @@ import { ReactComponent as TokenBzrx } from "../assets/images/token-bzrx.svg";
 import { ReactComponent as TokenVBzrx } from "../assets/images/token-vbzrx.svg";
 import { ReactComponent as TokenBpt } from "../assets/images/token-bpt.svg";
 import { number } from "prop-types";
+import { BigNumber } from "@0x/utils";
 
 interface IAddToBalanceProps {
-    bzrxV1Balance: number;
-    vBzrxBalance: number;
-    bptBalance: number;
+    bzrxMax: number;
+    vbzrxMax: number;
+    bptMax: number;
+    stake: (bzrx: BigNumber, vbzrx: BigNumber, bpt: BigNumber) => void
 }
 interface IAddToBalanceState {
-    bzrxV1Balance: number;
+    bzrxBalance: number;
     vBzrxBalance: number;
     bptBalance: number;
     inputBzrxV1Balance: string;
     inputVBzrxBalance: string;
     inputBptBalance: string;
 }
+
+
+const networkName = process.env.REACT_APP_ETH_NETWORK;
 
 export class AddToBalance extends Component<IAddToBalanceProps, IAddToBalanceState> {
 
@@ -27,7 +32,7 @@ export class AddToBalance extends Component<IAddToBalanceProps, IAddToBalanceSta
 
 
         this.state = {
-            bzrxV1Balance: 0,
+            bzrxBalance: 0,
             vBzrxBalance: 0,
             bptBalance: 0,
             inputBzrxV1Balance: "0",
@@ -42,11 +47,11 @@ export class AddToBalance extends Component<IAddToBalanceProps, IAddToBalanceSta
                 <div className="add-to-balance calculator-row">
                     <label>Add to staking balance</label>
                     <div className="calc-item">
-                        <input className="add-to-balance__input" type="number" title={this.state.bzrxV1Balance.toFixed(18)} value={this.state.inputBzrxV1Balance} onChange={this.changeBzrxBalance} />
+                        <input className="add-to-balance__input" type="number" title={this.state.bzrxBalance.toFixed(18)} value={this.state.inputBzrxV1Balance} onChange={this.changeBzrxBalance} />
                         <div className="add-to-balance__range">
-                            <input step="0.01" type="range" min="0" max={this.props.bzrxV1Balance.toFixed(2)} value={this.state.bzrxV1Balance} onChange={this.changeBzrxBalance} />
+                            <input step="0.01" type="range" min="0" max={this.props.bzrxMax.toFixed(2)} value={this.state.bzrxBalance} onChange={this.changeBzrxBalance} />
                             <div className="line"><div></div><div></div><div></div><div></div></div>
-                            <div className="progress" style={{ width: `calc(100%*${this.state.bzrxV1Balance}/${this.props.bzrxV1Balance})` }}></div>
+                            <div className="progress" style={{ width: `calc(100%*${this.state.bzrxBalance}/${this.props.bzrxMax})` }}></div>
                         </div>
                         <label className="sign">BZRXv1</label>
                         <TokenBzrx className="token-logo"></TokenBzrx>
@@ -54,9 +59,9 @@ export class AddToBalance extends Component<IAddToBalanceProps, IAddToBalanceSta
                     <div className="calc-item">
                         <input className="add-to-balance__input" type="number" title={this.state.vBzrxBalance.toFixed(18)} value={this.state.inputVBzrxBalance} onChange={this.changeVBzrxBalance} />
                         <div className="add-to-balance__range">
-                            <input step="0.01" type="range" min="0" max={this.props.vBzrxBalance.toFixed(2)} value={this.state.vBzrxBalance} onChange={this.changeVBzrxBalance} />
+                            <input step="0.01" type="range" min="0" max={this.props.vbzrxMax.toFixed(2)} value={this.state.vBzrxBalance} onChange={this.changeVBzrxBalance} />
                             <div className="line"><div></div><div></div><div></div><div></div></div>
-                            <div className="progress" style={{ width: `calc(100%*${this.state.vBzrxBalance}/${this.props.vBzrxBalance})` }}></div>
+                            <div className="progress" style={{ width: `calc(100%*${this.state.vBzrxBalance}/${this.props.vbzrxMax})` }}></div>
                         </div>
                         {/* <span>{this.numberWithCommas(this.state.vBzrxBalance)}</span> */}
                         <label className="sign">vBZRX</label>
@@ -65,36 +70,47 @@ export class AddToBalance extends Component<IAddToBalanceProps, IAddToBalanceSta
                     <div className="calc-item">
                         <input className="add-to-balance__input" type="number" title={this.state.bptBalance.toFixed(18)} value={this.state.inputBptBalance} onChange={this.changeBptBalance} />
                         <div className="add-to-balance__range">
-                            <input step="0.001" type="range" min="0" max={this.props.bptBalance} value={this.state.bptBalance.toFixed(2)} onChange={this.changeBptBalance} />
+                            <input step="0.001" type="range" min="0" max={this.props.bptMax} value={this.state.bptBalance.toFixed(2)} onChange={this.changeBptBalance} />
                             <div className="line"><div></div><div></div><div></div><div></div></div>
-                            <div className="progress" style={{ width: `calc(100%*${this.state.bptBalance}/${this.props.bptBalance})` }}></div>
+                            <div className="progress" style={{ width: `calc(100%*${this.state.bptBalance}/${this.props.bptMax})` }}></div>
                         </div>
                         {/* <span>{this.numberWithCommas(this.state.bptBalance)}</span> */}
                         <label className="sign">BPT</label>
                         <TokenBpt className="token-logo"></TokenBpt>
                     </div>
                     <div className="group-buttons">
-                      <button title="Stake" className="button full-button blue" disabled={(!this.state.bptBalance && !this.state.vBzrxBalance && !this.state.bzrxV1Balance)}>Stake</button>
-                      {/*<button title="Stake" className="button half-button blue" disabled={(!this.state.bptBalance && !this.state.vBzrxBalance && !this.state.bzrxV1Balance)}>Stake</button>
-                          <button title="Unstake" className="button half-button red" disabled={(!this.state.bptBalance && !this.state.vBzrxBalance && !this.state.bzrxV1Balance)}>Unstake</button>*/}
+                        <button title="Stake" className="button full-button blue"
+                            disabled={(!this.state.bptBalance && !this.state.vBzrxBalance && !this.state.bzrxBalance)}
+                            onClick={this.stake}>Stake</button>
+                        {/*<button title="Stake" className="button half-button blue" disabled={(!this.state.bptBalance && !this.state.vBzrxBalance && !this.state.bzrxBalance)}>Stake</button>
+                          <button title="Unstake" className="button half-button red" disabled={(!this.state.bptBalance && !this.state.vBzrxBalance && !this.state.bzrxBalance)}>Unstake</button>*/}
                     </div>
                 </div>
             </React.Fragment>
         );
     }
 
+    private stake = () => {
+        const bzrx = new BigNumber(this.state.bzrxBalance).times(10**18);
+        const vbzrx = new BigNumber(this.state.vBzrxBalance).times(10**18);
+        const bpt = networkName === "kovan"
+        ? new BigNumber(this.state.bptBalance).times(10**6)
+        : new BigNumber(this.state.bptBalance).times(10**18);
+        this.props.stake(bzrx, vbzrx, bpt);
+    }
+
     private changeBzrxBalance = (e: ChangeEvent<HTMLInputElement>) => {
-        const result = this.changeBalance(e.target.value, this.props.bzrxV1Balance);
-        this.setState({ ...this.state, bzrxV1Balance: result.balance, inputBzrxV1Balance: result.inputBalance });
+        const result = this.changeBalance(e.target.value, this.props.bzrxMax);
+        this.setState({ ...this.state, bzrxBalance: result.balance, inputBzrxV1Balance: result.inputBalance });
     }
 
     private changeVBzrxBalance = (e: ChangeEvent<HTMLInputElement>) => {
-        const result = this.changeBalance(e.target.value, this.props.vBzrxBalance);
+        const result = this.changeBalance(e.target.value, this.props.vbzrxMax);
         this.setState({ ...this.state, vBzrxBalance: result.balance, inputVBzrxBalance: result.inputBalance });
     }
 
     private changeBptBalance = (e: ChangeEvent<HTMLInputElement>) => {
-        const result = this.changeBalance(e.target.value, this.props.bptBalance);
+        const result = this.changeBalance(e.target.value, this.props.bptMax);
         this.setState({ ...this.state, bptBalance: result.balance, inputBptBalance: result.inputBalance });
     }
 

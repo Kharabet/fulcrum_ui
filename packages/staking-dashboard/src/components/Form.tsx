@@ -27,6 +27,7 @@ interface IFormState {
   whitelistAmount: BigNumber;
   claimableAmount: BigNumber;
   canOptin: boolean;
+  selectedRepAddress: string
 }
 
 const networkName = process.env.REACT_APP_ETH_NETWORK;
@@ -46,7 +47,8 @@ export class Form extends Component<IFormProps, IFormState> {
       iETHSwapRate: new BigNumber(0),
       whitelistAmount: new BigNumber(0),
       claimableAmount: new BigNumber(0),
-      canOptin: false
+      canOptin: false,
+      selectedRepAddress: ""
     };
 
     this._isMounted = false;
@@ -146,6 +148,12 @@ export class Form extends Component<IFormProps, IFormState> {
 
   public onBecomeRepresentativeClick = async () => {
     const receipt = await StakingProvider.Instance.doBecomeRepresentative();
+    await this.derivedUpdate();
+  }
+  
+  public onStakeClick = async (bzrx: BigNumber, vbzrx: BigNumber, bpt: BigNumber) => {
+    if (this.state.selectedRepAddress === "") return;
+    const receipt = await StakingProvider.Instance.stake(bzrx, vbzrx, bpt, this.state.selectedRepAddress);
     await this.derivedUpdate();
   }
 
@@ -303,9 +311,10 @@ export class Form extends Component<IFormProps, IFormState> {
               </ul>
             </div>
             <AddToBalance
-              bzrxV1Balance={Number(this.state.bzrxV1Balance)}
-              bptBalance={Number(this.state.bptBalance)}
-              vBzrxBalance={Number(this.state.vBzrxBalance)}
+              bzrxMax={Number(this.state.bzrxV1Balance)}
+              vbzrxMax={Number(this.state.vBzrxBalance)}
+              bptMax={Number(this.state.bptBalance)}
+              stake={this.onStakeClick}
             />
             <div className="calculator-row">
               <div className="group-buttons">
