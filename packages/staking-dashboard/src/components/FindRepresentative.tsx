@@ -8,6 +8,10 @@ import { FindRepresentativeItem } from "../components/FindRepresentativeItem";
 import { BigNumber } from "@0x/utils";
 import { IRep } from "../domain/IRep";
 
+
+import SimpleBar from 'simplebar-react';
+import 'simplebar/dist/simplebar.min.css';
+
 // const Box = require('3box')
 export interface IFindRepresentativeProps {
   representative: IRep[];
@@ -68,7 +72,9 @@ export class FindRepresentative extends Component<IFindRepresentativeProps, IFin
             <span className="stake">Stake</span>
           </div>
           <ul>
-            {representativeData}
+            <SimpleBar style={{ maxHeight: "50vh" }} autoHide={false}>
+              {representativeData}
+            </SimpleBar>
           </ul>
         </div>
       </div>
