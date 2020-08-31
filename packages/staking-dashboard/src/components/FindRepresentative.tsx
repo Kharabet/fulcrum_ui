@@ -39,7 +39,7 @@ export class FindRepresentative extends Component<IFindRepresentativeProps, IFin
   }
 
   public render() {
-    const representativeData = this.state.representative.map((item) => <FindRepresentativeItem address="" urlPhoto="" name={item.wallet} bzrxAmount={item.BZRX} vbzrxAmount={item.vBZRX} bptAmount={item.LPToken} />);
+    const representativeData = this.state.representative.map((item, index) => <FindRepresentativeItem address="" urlPhoto="" name={item.wallet} bzrxAmount={item.BZRX} vbzrxAmount={item.vBZRX} bptAmount={item.LPToken} index={index} key={index} />);
     return (
       <div className="modal find-representative" >
         <div className="modal__title">
