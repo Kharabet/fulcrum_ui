@@ -27,7 +27,9 @@ interface IFormState {
   whitelistAmount: BigNumber;
   claimableAmount: BigNumber;
   canOptin: boolean;
-  selectedRepAddress: string
+  selectedRepAddress: string;
+  topRepsList: { wallet: string, BZRX: BigNumber, vBZRX: BigNumber, LPToken: BigNumber }[];
+  repsList: { wallet: string, BZRX: BigNumber, vBZRX: BigNumber, LPToken: BigNumber }[];
 }
 
 const networkName = process.env.REACT_APP_ETH_NETWORK;
@@ -48,7 +50,9 @@ export class Form extends Component<IFormProps, IFormState> {
       whitelistAmount: new BigNumber(0),
       claimableAmount: new BigNumber(0),
       canOptin: false,
-      selectedRepAddress: ""
+      selectedRepAddress: "",
+      topRepsList: [],
+      repsList: []
     };
 
     this._isMounted = false;
@@ -61,7 +65,9 @@ export class Form extends Component<IFormProps, IFormState> {
 
   private async derivedUpdate() {
 
-    const list = await StakingProvider.Instance.getRepresentatives();
+    const repsList = await StakingProvider.Instance.getRepresentatives();
+    const topRepsList = repsList.sort((a: any, b: any) => b.BZRX.minus(a.BZRX).toNumber()).slice(0, 3);
+
     const canOptin = await StakingProvider.Instance.canOptin();
     let claimableAmount = await StakingProvider.Instance.isClaimable();
     if (claimableAmount.gt(0)) {
@@ -100,7 +106,9 @@ export class Form extends Component<IFormProps, IFormState> {
       iETHSwapRate: new BigNumber(0),
       whitelistAmount: new BigNumber(0),
       claimableAmount,
-      canOptin
+      canOptin,
+      repsList,
+      topRepsList
     })
   }
 
@@ -150,11 +158,22 @@ export class Form extends Component<IFormProps, IFormState> {
     const receipt = await StakingProvider.Instance.doBecomeRepresentative();
     await this.derivedUpdate();
   }
-  
+
   public onStakeClick = async (bzrx: BigNumber, vbzrx: BigNumber, bpt: BigNumber) => {
     if (this.state.selectedRepAddress === "") return;
     const receipt = await StakingProvider.Instance.stake(bzrx, vbzrx, bpt, this.state.selectedRepAddress);
     await this.derivedUpdate();
+  }
+  
+  public setSelectedRepAddressClick = (e: React.MouseEvent<HTMLElement>) => {
+    const liElement = e.currentTarget;
+    const address = liElement.dataset.address
+    if (!address) return;
+    this.setState({...this.state, selectedRepAddress: address});
+  }
+
+  private getShortHash = (hash: string, count: number) => {
+    return hash.substring(0, 6) + '...' + hash.substring(hash.length - count);
   }
 
   public render() {
@@ -167,6 +186,19 @@ export class Form extends Component<IFormProps, IFormState> {
     const etherscanURL = StakingProvider.Instance.web3ProviderSettings
       ? StakingProvider.Instance.web3ProviderSettings.etherscanURL
       : "";
+
+    const topRepsLi = this.state.topRepsList.map(e => {
+      return (
+        <li key={e.wallet}
+        className={`button button-representative ${e.wallet.toLowerCase() === this.state.selectedRepAddress.toLowerCase() 
+        ? "active" : ""}`}
+        onClick={this.setSelectedRepAddressClick}
+        data-address={e.wallet}>
+          <div className="photo"></div>
+          <span className="name">{this.getShortHash(e.wallet, 4)}</span>
+        </li>
+      )
+    })
 
     return (
       <React.Fragment>
@@ -249,7 +281,7 @@ export class Form extends Component<IFormProps, IFormState> {
                 </div>
               </div>
             </div>
-            <div className="convert-button" style={{marginTop: "20px"}}>
+            <div className="convert-button" style={{ marginTop: "20px" }}>
               {this.state.bzrxV1Balance.gt(0) &&
                 <button className="button button-full-width" onClick={this.onBzrxV1ToV2ConvertClick}>
                   Convert BZRX v1 to v2
@@ -296,18 +328,7 @@ export class Form extends Component<IFormProps, IFormState> {
             <div className="calculator-row">
               <div className="row-header">Please select representative:</div>
               <ul className="group-buttons">
-                <li className="button button-representative">
-                  <div className="photo"></div>
-                  <span className="name">Tom Bean</span>
-                </li>
-                <li className="button button-representative">
-                  <div className="photo"></div>
-                  <span className="name">Mark K</span>
-                </li>
-                <li className="button button-representative">
-                  <div className="photo"></div>
-                  <span className="name">0xbd5c...568f</span>
-                </li>
+                {topRepsLi}
               </ul>
             </div>
             <AddToBalance

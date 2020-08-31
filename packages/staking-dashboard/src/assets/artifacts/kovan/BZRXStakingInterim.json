@@ -193,11 +193,6 @@
               "internalType": "uint256",
               "name": "count",
               "type": "uint256"
-            },
-            {
-              "internalType": "bool",
-              "name": "activeOnly",
-              "type": "bool"
             }
           ],
           "name": "getRepVotes",

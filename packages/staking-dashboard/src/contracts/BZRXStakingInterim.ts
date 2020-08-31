@@ -286,7 +286,6 @@ export class BZRXStakingInterimContract extends BaseContract {
         async callAsync(
             start: BigNumber,
             count: BigNumber,
-            activeOnly: boolean,
             callData: Partial<CallData> = {},
             defaultBlock?: BlockParam
         ): Promise<Array<{
@@ -296,7 +295,7 @@ export class BZRXStakingInterimContract extends BaseContract {
             LPToken: BigNumber;
           }>> {
             const self = (this as any) as BZRXStakingInterimContract;
-            const encodedData = self._strictEncodeArguments("getRepVotes(uint256,uint256,bool)", [start,count,activeOnly]);
+            const encodedData = self._strictEncodeArguments("getRepVotes(uint256,uint256)", [start,count]);
             const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
                 {
                     to: self.address,
@@ -307,7 +306,7 @@ export class BZRXStakingInterimContract extends BaseContract {
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
             BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
-            const abiEncoder = self._lookupAbiEncoder("getRepVotes(uint256,uint256,bool)");
+            const abiEncoder = self._lookupAbiEncoder("getRepVotes(uint256,uint256)");
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<Array<{
                 wallet: string;

@@ -727,7 +727,6 @@ export class StakingProvider {
     const repVotes = await bzrxStakingContract.getRepVotes.callAsync(
       new BigNumber(0),
       new BigNumber(1000),
-      true,
       {
         from: account
       });
