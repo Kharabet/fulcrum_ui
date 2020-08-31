@@ -136,40 +136,79 @@ export class Form extends Component<IFormProps, IFormState> {
       <React.Fragment>
         <div className="container">
           <div className="calculator">
-            <div className="calculator-row">
-              <div className="row-header">My balance:</div>
-              <div className="row-container">
-                <div className="row-body">
-                  <a href={`${etherscanURL}token/${this.state.bzrxV1Balance.gt(0) ? "0x1c74cFF0376FB4031Cd7492cD6dB2D66c3f2c6B9" : "0x56d811088235F11C8920698a204A5010a788f4b3"}`} target="_blank" rel="noopener noreferrer"><span className="icon"><BzrxIcon /></span></a>
-                  <span title={this.state.bzrxV1Balance.gt(0)
-                    ? this.state.bzrxV1Balance.toFixed(18)
-                    : this.state.bzrxBalance.toFixed(18)
-                  } className="value">
-                    {this.state.bzrxV1Balance.gt(0)
-                      ? this.state.bzrxV1Balance.toFixed(2)
-                      : this.state.bzrxBalance.toFixed(2)
-                    }
-                  </span>
-                  <div className="row-token">{this.state.bzrxV1Balance.gt(0) ? "BZRXv1" : "BZRX"}</div>
-                </div>
-              </div>
-              {this.state.vBzrxBalance.gt(0) &&
+            <div className="calculator-row balance">
+              <div className="balance-item">
+                <div className="row-header">My balance:</div>
                 <div className="row-container">
                   <div className="row-body">
-                    <a href={`${etherscanURL}token/0xB72B31907C1C95F3650b64b2469e08EdACeE5e8F`} target="_blank" rel="noopener noreferrer"><span className="icon"><VBzrxIcon /></span></a>
-
-                    <span title={this.state.vBzrxBalance.toFixed(18)} className="value">
-                      {Number(this.state.vBzrxBalance).toFixed(2)}
+                    <a href={`${etherscanURL}token/${this.state.bzrxV1Balance.gt(0) ? "0x1c74cFF0376FB4031Cd7492cD6dB2D66c3f2c6B9" : "0x56d811088235F11C8920698a204A5010a788f4b3"}`} target="_blank" rel="noopener noreferrer"><span className="icon"><BzrxIcon /></span></a>
+                    <span title={this.state.bzrxV1Balance.gt(0)
+                      ? this.state.bzrxV1Balance.toFixed(18)
+                      : this.state.bzrxBalance.toFixed(18)
+                    } className="value">
+                      {this.state.bzrxV1Balance.gt(0)
+                        ? this.state.bzrxV1Balance.toFixed(2)
+                        : this.state.bzrxBalance.toFixed(2)
+                      }
                     </span>
-                    <div className="row-token">vBZRX</div>
+                    <div className="row-token">{this.state.bzrxV1Balance.gt(0) ? "BZRXv1" : "BZRX"}</div>
                   </div>
                 </div>
-              }
-              <div className="row-container">
-                <div className="row-body">
-                  <a href="#" target="_blank" rel="noopener noreferrer"><span className="icon"><BPTIcon /></span></a>
-                  <span className="value">{this.state.bptBalance.toFixed(2)}</span>
-                  <div className="row-token">BPT</div>
+                {this.state.vBzrxBalance.gt(0) &&
+                  <div className="row-container">
+                    <div className="row-body">
+                      <a href={`${etherscanURL}token/0xB72B31907C1C95F3650b64b2469e08EdACeE5e8F`} target="_blank" rel="noopener noreferrer"><span className="icon"><VBzrxIcon /></span></a>
+
+                      <span title={this.state.vBzrxBalance.toFixed(18)} className="value">
+                        {Number(this.state.vBzrxBalance).toFixed(2)}
+                      </span>
+                      <div className="row-token">vBZRX</div>
+                    </div>
+                  </div>
+                }
+                <div className="row-container">
+                  <div className="row-body">
+                    <a href="#" target="_blank" rel="noopener noreferrer"><span className="icon"><BPTIcon /></span></a>
+                    <span className="value">{this.state.bptBalance.toFixed(2)}</span>
+                    <div className="row-token">BPT</div>
+                  </div>
+                </div>
+              </div>
+              <div className="balance-item">
+                <div className="row-header">Staking Balance:</div>
+                <div className="row-container">
+                  <div className="row-body">
+                    <a href={`${etherscanURL}token/${this.state.bzrxV1Balance.gt(0) ? "0x1c74cFF0376FB4031Cd7492cD6dB2D66c3f2c6B9" : "0x56d811088235F11C8920698a204A5010a788f4b3"}`} target="_blank" rel="noopener noreferrer"><span className="icon"><BzrxIcon /></span></a>
+                    <span title={this.state.bzrxV1Balance.gt(0)
+                      ? this.state.bzrxV1Balance.toFixed(18)
+                      : this.state.bzrxBalance.toFixed(18)
+                    } className="value">
+                      {this.state.bzrxV1Balance.gt(0)
+                        ? this.state.bzrxV1Balance.toFixed(2)
+                        : this.state.bzrxBalance.toFixed(2)
+                      }
+                    </span>
+                    <div className="row-token">{this.state.bzrxV1Balance.gt(0) ? "BZRXv1" : "BZRX"}</div>
+                  </div>
+                </div>
+                {this.state.vBzrxBalance.gt(0) &&
+                  <div className="row-container">
+                    <div className="row-body">
+                      <a href={`${etherscanURL}token/0xB72B31907C1C95F3650b64b2469e08EdACeE5e8F`} target="_blank" rel="noopener noreferrer"><span className="icon"><VBzrxIcon /></span></a>
+
+                      <span title={this.state.vBzrxBalance.toFixed(18)} className="value">
+                        {Number(this.state.vBzrxBalance).toFixed(2)}
+                      </span>
+                      <div className="row-token">vBZRX</div>
+                    </div>
+                  </div>
+                }
+                <div className="row-container">
+                  <div className="row-body">
+                    <a href="#" target="_blank" rel="noopener noreferrer"><span className="icon"><BPTIcon /></span></a>
+                    <span className="value">{this.state.bptBalance.toFixed(2)}</span>
+                    <div className="row-token">BPT</div>
+                  </div>
                 </div>
               </div>
             </div>
