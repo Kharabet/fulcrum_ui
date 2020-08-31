@@ -27,7 +27,7 @@ export class BZRXStakingInterimContract extends BaseContract {
                     data: encodedData
                 },
                 self._web3Wrapper.getContractDefaults(),
-                (self as any).BZRXStakingInterim.estimateGasAsync.bind(self, tokens, values)
+                (self as any).stake.estimateGasAsync.bind(self, tokens, values)
             );
             const txHash = await self._web3Wrapper.sendTransactionAsync(txDataWithDefaults);
             return txHash;
@@ -100,7 +100,7 @@ export class BZRXStakingInterimContract extends BaseContract {
                     data: encodedData
                 },
                 self._web3Wrapper.getContractDefaults(),
-                (self as any).BZRXStakingInterim.estimateGasAsync.bind(self, tokens, values)
+                (self as any).stakeWithDelegate.estimateGasAsync.bind(self, tokens, values)
             );
             const txHash = await self._web3Wrapper.sendTransactionAsync(txDataWithDefaults);
             return txHash;
@@ -174,7 +174,7 @@ export class BZRXStakingInterimContract extends BaseContract {
                     data: encodedData
                 },
                 self._web3Wrapper.getContractDefaults(),
-                (self as any).BZRXStakingInterim.estimateGasAsync.bind(self, _isActive)
+                (self as any).setRepActive.estimateGasAsync.bind(self, _isActive)
             );
             const txHash = await self._web3Wrapper.sendTransactionAsync(txDataWithDefaults);
             return txHash;
