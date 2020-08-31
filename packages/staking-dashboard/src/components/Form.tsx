@@ -8,10 +8,15 @@ import { BigNumber } from "@0x/utils";
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { Asset } from "../domain/Asset";
 import { AddToBalance } from "./AddToBalance";
+import Modal from "react-modal";
+import { FindRepresentative } from "./FindRepresentative";
+import { IRep } from "../domain/IRep";
 
+import Representative1 from "../assets/images/representative1.png"
+import Representative2 from "../assets/images/representative2.png"
+import Representative3 from "../assets/images/representative3.png"
 
 interface IFormProps {
-  openFindRepresentative: () => void;
 }
 
 interface IFormState {
@@ -28,9 +33,11 @@ interface IFormState {
   claimableAmount: BigNumber;
   userEarnings: BigNumber;
   canOptin: boolean;
+  isFindRepresentativeOpen: boolean;
   selectedRepAddress: string;
-  topRepsList: { wallet: string, BZRX: BigNumber, vBZRX: BigNumber, LPToken: BigNumber }[];
-  repsList: { wallet: string, BZRX: BigNumber, vBZRX: BigNumber, LPToken: BigNumber }[];
+  topRepsList: IRep[];
+  otherRepsList: IRep[];
+  repsList: IRep[];
 }
 
 const networkName = process.env.REACT_APP_ETH_NETWORK;
@@ -51,8 +58,10 @@ export class Form extends Component<IFormProps, IFormState> {
       whitelistAmount: new BigNumber(0),
       claimableAmount: new BigNumber(0),
       canOptin: false,
+      isFindRepresentativeOpen: false,
       selectedRepAddress: "",
       topRepsList: [],
+      otherRepsList: [],
       repsList: [],
       userEarnings: new BigNumber(0)
     };
@@ -71,8 +80,11 @@ export class Form extends Component<IFormProps, IFormState> {
 
     this.isAlreadyRepresentative = await StakingProvider.Instance.checkIsRep();
 
-    const repsList = await StakingProvider.Instance.getRepresentatives();
-    const topRepsList = repsList.sort((a: any, b: any) => b.BZRX.minus(a.BZRX).toNumber()).slice(0, 3);
+    const repsList = await StakingProvider.Instance.getRepresentatives()
+      .then(reps => reps.sort((a: any, b: any) => b.BZRX.minus(a.BZRX).toNumber()));
+
+    const topRepsList = repsList.slice(0, 3);
+    const otherRepsList = repsList.slice(3, repsList.length);
 
     const canOptin = await StakingProvider.Instance.canOptin();
     let claimableAmount = await StakingProvider.Instance.isClaimable();
@@ -116,6 +128,7 @@ export class Form extends Component<IFormProps, IFormState> {
       canOptin,
       repsList,
       topRepsList,
+      otherRepsList,
       userEarnings
     })
   }
@@ -183,6 +196,25 @@ export class Form extends Component<IFormProps, IFormState> {
     return hash.substring(0, 6) + '...' + hash.substring(hash.length - count);
   }
 
+  private openFindRepresentative = () => {
+    this._isMounted && !this.state.isFindRepresentativeOpen && this.setState({ ...this.state, isFindRepresentativeOpen: true });
+  };
+
+  private onAddRep = (wallet: string) => {
+    const topRepsList = this.state.topRepsList.concat(this.state.otherRepsList.find(item => item.wallet === wallet)!);
+    const otherRepsList = this.state.otherRepsList.filter(item => item.wallet !== wallet)
+
+    this._isMounted &&
+      this.setState({ ...this.state, topRepsList, otherRepsList, isFindRepresentativeOpen: false });
+  };
+
+  private onRequestClose = async () => {
+    await this._isMounted && this.setState({
+      ...this.state,
+      isFindRepresentativeOpen: false
+    });
+  };
+
   public render() {
     // console.log(this.state.whitelistAmount.toString(), this.state.iEthBalance.toString());
 
@@ -194,14 +226,16 @@ export class Form extends Component<IFormProps, IFormState> {
       ? StakingProvider.Instance.web3ProviderSettings.etherscanURL
       : "";
 
-    const topRepsLi = this.state.topRepsList.map(e => {
+    const topRepsLi = this.state.topRepsList.map((e, index) => {
+      const representative = index % 3 === 0 ? Representative1 : index % 2 === 0 ? Representative2 : Representative3;
+
       return (
         <li key={e.wallet}
           className={`button button-representative ${e.wallet.toLowerCase() === this.state.selectedRepAddress.toLowerCase()
             ? "active" : ""}`}
           onClick={this.setSelectedRepAddressClick}
           data-address={e.wallet}>
-          <div className="photo"></div>
+          <img className="photo" src={representative} alt={`Representative ${index}`} />
           <span className="name">{this.getShortHash(e.wallet, 4)}</span>
         </li>
       )
@@ -209,6 +243,18 @@ export class Form extends Component<IFormProps, IFormState> {
 
     return (
       <React.Fragment>
+        <Modal
+          isOpen={this.state.isFindRepresentativeOpen}
+          onRequestClose={this.onRequestClose}
+          className="modal-content-div"
+          overlayClassName="modal-overlay-div"
+        >
+          <FindRepresentative
+            onFindRepresentativeClose={this.onRequestClose}
+            onAddRepresentative={this.onAddRep}
+            representative={this.state.otherRepsList}
+          />
+        </Modal>
         <div className="container">
           <div className="calculator">
             <div className="calculator-row balance">
@@ -349,7 +395,7 @@ export class Form extends Component<IFormProps, IFormState> {
             }
             <div className="calculator-row">
               <div className="group-buttons">
-                <button className="button" onClick={this.props.openFindRepresentative}>Find a Representative</button>
+                <button className="button" onClick={this.openFindRepresentative}>Find a Representative</button>
                 <button className="button" disabled={this.isAlreadyRepresentative} onClick={this.onBecomeRepresentativeClick}>Become A Representative</button>
               </div>
             </div>
