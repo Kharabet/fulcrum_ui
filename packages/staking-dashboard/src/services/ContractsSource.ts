@@ -6,6 +6,7 @@ import { BigNumber } from "@0x/utils";
 import { Asset } from "../domain/Asset";
 import { iETHBuyBackContract } from "../contracts/iETHBuyBack";
 import { traderCompensationContract } from "../contracts/traderCompensation";
+import { iBZxContract } from "../contracts/iBZxContract";
 
 const ethNetwork = process.env.REACT_APP_ETH_NETWORK;
 
@@ -28,6 +29,7 @@ export class ContractsSource {
   private static BZRXStakingInterimJson: any;
   private static iETHBuyBack: any;
   private static traderCompensation: any;
+  private static iBZxJson: any;
 
   public networkId: number;
   public canWrite: boolean;
@@ -48,6 +50,8 @@ export class ContractsSource {
     ContractsSource.BZRXStakingInterimJson = await import(`./../assets/artifacts/${ethNetwork}/BZRXStakingInterim.json`);
     ContractsSource.iETHBuyBack = await import(`./../assets/artifacts/${ethNetwork}/iETHBuyBack.json`);
     ContractsSource.traderCompensation = await import(`./../assets/artifacts/${ethNetwork}/traderCompensation.json`);
+    ContractsSource.iBZxJson = await import(`./../assets/artifacts/${ethNetwork}/iBZx.json`);
+
     const iTokenList = (await import(`../assets/artifacts/${ethNetwork}/iTokenList.js`)).iTokenList;
     iTokenList.forEach((val: any, index: any) => {
       // tslint:disable:no-console
@@ -68,6 +72,26 @@ export class ContractsSource {
     ContractsSource.isInit = true;
   }
 
+  
+  public getiBZxAddress(): string {
+    let address: string = "";
+    switch (this.networkId) {
+      case 1:
+        address = "0x1cf226e9413addaf22412a2e182f9c0de44af002";
+        break;
+      case 3:
+        address = "0xbe49f4cd73041cdf24a7b721627de577b3bab000";
+        break;
+      case 4:
+        address = "0xc45755a7cfc9385290e6fece1f040c0453e7b0e5";
+        break;
+      case 42:
+        address = "0xAbd9372723C735D426D0a760D047206Fe115ee6d";
+        break;
+    }
+
+    return address;
+  }
 
   public getBzrxV1Address(): string {
     let address: string = "";
@@ -249,11 +273,20 @@ export class ContractsSource {
       this.provider
     );
   }
+  
+  private async getiBZxContractRaw(): Promise<iBZxContract> {
+    await this.Init();
+    return new iBZxContract(
+      ContractsSource.iBZxJson.abi,
+      this.getiBZxAddress().toLowerCase(),
+      this.provider
+    );
+  }
 
   public getErc20Contract = _.memoize(this.getErc20ContractRaw);
   public getTraderCompensationContract = _.memoize(this.getTraderCompensationContractRaw);
   public getConvertContract = _.memoize(this.getConvertContractRaw);
   public getBZRXStakingInterimContract = _.memoize(this.getBZRXStakingInterimContractRaw);
   public getiETHBuyBackContract = _.memoize(this.getiETHBuyBackContractRaw);
-
+  public getiBZxContract = _.memoize(this.getiBZxContractRaw);
 }
