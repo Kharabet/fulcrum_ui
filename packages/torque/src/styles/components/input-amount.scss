@@ -77,7 +77,9 @@
   .input-container {
     .input-row {
       .input-amount {
-        font-size: 36px;
+        font-size: 34px;
+        width: calc(100% - 60px);
+        margin-left: 15px;
         &::placeholder {
           font-size: 24px;
           transform: translate(0, -4px);

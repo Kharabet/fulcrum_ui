@@ -205,7 +205,7 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
   public onTradeAmountChange = async (event: ChangeEvent<HTMLInputElement>) => {
     // handling different types of empty values
     let amountText = event.target.value ? event.target.value : "";
-    if (amountText === "") return;
+    if (parseFloat(amountText) < 0) return;
     this.setState({
       ...this.state,
       inputAmountText: amountText,
