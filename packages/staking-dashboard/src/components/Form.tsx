@@ -321,6 +321,7 @@ export class Form extends Component<IFormProps, IFormState> {
                   </div>
                 </div>
               </div>
+              <p className="notice">You should not transfer out the tokens from wallet once they staked, otherwise you will lose some or all of staked balance.</p>
             </div>
             <div className="calculator-row">
               <div className="reward-item">
