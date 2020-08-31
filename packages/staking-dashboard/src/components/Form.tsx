@@ -26,7 +26,7 @@ interface IFormState {
   iETHSwapRate: BigNumber;
   whitelistAmount: BigNumber;
   claimableAmount: BigNumber;
-  estimatedEarnings: BigNumber;
+  userEarnings: BigNumber;
   canOptin: boolean;
   selectedRepAddress: string;
   topRepsList: { wallet: string, BZRX: BigNumber, vBZRX: BigNumber, LPToken: BigNumber }[];
@@ -54,7 +54,7 @@ export class Form extends Component<IFormProps, IFormState> {
       selectedRepAddress: "",
       topRepsList: [],
       repsList: [],
-      estimatedEarnings: new BigNumber(0)
+      userEarnings: new BigNumber(0)
     };
 
     this._isMounted = false;
@@ -99,7 +99,7 @@ export class Form extends Component<IFormProps, IFormState> {
     //const iETHSwapRate = userData[0].div(10 ** 18);
     //const whitelistAmount = userData[1].div(10 ** 18);
 
-    const estimatedEarnings = await StakingProvider.Instance.protocolFeesUsd();
+    const userEarnings = await StakingProvider.Instance.getUserEarnings();
     this._isMounted && this.setState({
       ...this.state,
       bzrxV1Balance,
@@ -116,7 +116,7 @@ export class Form extends Component<IFormProps, IFormState> {
       canOptin,
       repsList,
       topRepsList,
-      estimatedEarnings
+      userEarnings
     })
   }
 
@@ -278,10 +278,10 @@ export class Form extends Component<IFormProps, IFormState> {
             </div>
             <div className="calculator-row">
               <div className="reward-item">
-                <div className="row-header">My estimated rewards balance:</div>
+                <div className="row-header">My rewards balance:</div>
                 <div className="row-body">
                   <div className="reward-content">
-                    <span title={this.state.estimatedEarnings.toFixed(18)}>${this.state.estimatedEarnings.toFixed(2)}</span>
+                    <span title={this.state.userEarnings.toFixed(18)}>${this.state.userEarnings.toFixed(2)}</span>
                     <div className="row-footer">bZxDAO-Balancer tokens</div>
                   </div>
                   <button title="Claim Rewards" disabled={true} className="button">Claim Rewards</button>

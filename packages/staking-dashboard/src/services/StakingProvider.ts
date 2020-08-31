@@ -801,55 +801,22 @@ export class StakingProvider {
     return result;
   }
 
-  public protocolFeesUsd = async (): Promise<BigNumber> => {
+  public getUserEarnings = async (): Promise<BigNumber> => {
     let result = new BigNumber(0);
 
     const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
     if (!this.contractsSource) return result;
+   
+    const bzrxStakingContract = await this.contractsSource.getBZRXStakingInterimContract();
+    if (!account || !bzrxStakingContract) return result;
 
-    const assets: Asset[] = [
-      Asset.ETH,
-      Asset.DAI,
-      Asset.USDC,
-      Asset.USDT,
-      Asset.SUSD,
-      Asset.WBTC,
-      Asset.LINK,
-      Asset.ZRX,
-      Asset.REP,
-      Asset.KNC,
-      // Asset.BZRX,
-      // Asset.vBZRX
-    ];
-
-    const feeTokens: [Asset[], string[]] = [[],[]]
-    assets.forEach((asset: Asset) => {
-      const address = this.getErc20AddressOfAsset(asset);
-      if (address){
-        feeTokens[0].push(asset);
-        feeTokens[1].push(address);
-      }
-    });
-    const bZxContract = await this.contractsSource.getiBZxContract();
-    if (!account || !bZxContract) return result;
-
-    const queryFees = await bZxContract.queryFees.callAsync(
-      feeTokens[1],
-      new BigNumber(0),
+    const earnedUsdAmount = await bzrxStakingContract.earned.callAsync(
+      account,
       {
         from: account
       });
 
-    for (let i = 0; i < queryFees[0].length; i++) {
-      const token = feeTokens[0][i];
-      const tokenDecimals = AssetsDictionary.assets.get(token)!.decimals || 18;
-      const assetFee = (queryFees[0][i].div(10 ** tokenDecimals)).plus(queryFees[1][i].div(10 ** tokenDecimals));
-      const assetUsdRate = await this.getSwapToUsdRate(token)
-      const assetFeeUsd = assetFee.times(assetUsdRate)
-      result = result.plus(assetFeeUsd);
-    }
-
-    return result;
+    return earnedUsdAmount;
   }
 
   public async getSwapToUsdRate(asset: Asset): Promise<BigNumber> {
