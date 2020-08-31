@@ -78,8 +78,11 @@ export class Form extends Component<IFormProps, IFormState> {
 
     this.isAlreadyRepresentative = await StakingProvider.Instance.checkIsRep();
 
-    const repsList = await StakingProvider.Instance.getRepresentatives();
-    const topRepsList = repsList.sort((a: any, b: any) => b.BZRX.minus(a.BZRX).toNumber()).slice(0, 3);
+    const repsList = await StakingProvider.Instance.getRepresentatives()
+      .then(reps => reps.sort((a: any, b: any) => b.BZRX.minus(a.BZRX).toNumber()));
+
+    const topRepsList = repsList.slice(0, 3);
+    const otherRepsList = repsList.slice(3, repsList.length);
 
     const canOptin = await StakingProvider.Instance.canOptin();
     let claimableAmount = await StakingProvider.Instance.isClaimable();
@@ -121,7 +124,8 @@ export class Form extends Component<IFormProps, IFormState> {
       claimableAmount,
       canOptin,
       repsList,
-      topRepsList
+      topRepsList,
+      otherRepsList
     })
   }
 
@@ -192,9 +196,10 @@ export class Form extends Component<IFormProps, IFormState> {
     this._isMounted && !this.state.isFindRepresentativeOpen && this.setState({ ...this.state, isFindRepresentativeOpen: true });
   };
 
-  private onAddRep = (rep: IRep) => {
-    const topRepsList = this.state.topRepsList.concat(rep);
-    const otherRepsList = this.state.otherRepsList.filter(item => item.wallet !== rep.wallet)
+  private onAddRep = (wallet: string) => {
+    const topRepsList = this.state.topRepsList.concat(this.state.otherRepsList.find(item => item.wallet === wallet)!);
+    const otherRepsList = this.state.otherRepsList.filter(item => item.wallet !== wallet)
+
     this._isMounted &&
       this.setState({ ...this.state, topRepsList, otherRepsList, isFindRepresentativeOpen: false });
   };
@@ -243,7 +248,7 @@ export class Form extends Component<IFormProps, IFormState> {
           <FindRepresentative
             onFindRepresentativeClose={this.onRequestClose}
             onAddRepresentative={this.onAddRep}
-            repsList={this.state.otherRepsList}
+            representative={this.state.otherRepsList}
           />
         </Modal>
         <div className="container">

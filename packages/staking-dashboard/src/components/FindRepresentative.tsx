@@ -10,9 +10,9 @@ import { IRep } from "../domain/IRep";
 
 // const Box = require('3box')
 export interface IFindRepresentativeProps {
-  repsList: IRep[];
+  representative: IRep[];
   onFindRepresentativeClose: () => void;
-  onAddRepresentative: (rep: IRep) => void;
+  onAddRepresentative: (wallet: string) => void;
 }
 
 interface IFindRepresentativeState {
@@ -30,7 +30,7 @@ export class FindRepresentative extends Component<IFindRepresentativeProps, IFin
   }
 
   public getRepresentative = async () => {
-    let representative = await StakingProvider.Instance.getRepresentatives();
+    let representative = this.props.representative;
     async function get3Box(representative: any) {
       for (const item of representative) {
       }
@@ -44,7 +44,10 @@ export class FindRepresentative extends Component<IFindRepresentativeProps, IFin
   }
 
   public render() {
-    const representativeData = this.state.representative.filter((item) => item.wallet.match(this.state.searchValue)).map((item, index) => <FindRepresentativeItem address="" urlPhoto="" name={item.wallet} bzrxAmount={item.BZRX} vbzrxAmount={item.vBZRX} bptAmount={item.LPToken} index={index} key={index} />);
+    const representativeData = this.state.representative
+      .filter((item) => item.wallet.match(this.state.searchValue))
+      .map((item, index) =>
+        <FindRepresentativeItem address="" urlPhoto="" name={item.wallet} bzrxAmount={item.BZRX} vbzrxAmount={item.vBZRX} bptAmount={item.LPToken} index={index} key={index} onRepClick={() => this.props.onAddRepresentative(item.wallet)} />);
     return (
       <div className="modal find-representative" >
         <div className="modal__title">

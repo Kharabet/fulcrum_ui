@@ -16,6 +16,7 @@ export interface IFindRepresentativeItemProps {
   vbzrxAmount: BigNumber;
   bptAmount: BigNumber;
   index: number;
+  onRepClick: () => void;
 }
 const getShortHash = (address: string, count: number) => {
   return address.substring(0, 8) + '...' + address.substring(address.length - count);
@@ -24,6 +25,7 @@ const getShortHash = (address: string, count: number) => {
 const networkName = process.env.REACT_APP_ETH_NETWORK;
 
 export const FindRepresentativeItem = (props: IFindRepresentativeItemProps) => {
+
   const bzrxAmount = props.bzrxAmount.div(10 ** 18).toFixed();
   const vbzrxAmount = props.vbzrxAmount.div(10 ** 18).toFixed();
   const representative = props.index % 3 === 0 ? Representative1 : props.index % 2 === 0 ? Representative2 : Representative3;
@@ -33,7 +35,7 @@ export const FindRepresentativeItem = (props: IFindRepresentativeItemProps) => {
     : props.bptAmount.div(10 ** 18).toFixed();
 
   return (
-    <li className="item-find-representative">
+    <li className="item-find-representative" onClick={() => props.onRepClick()}>
       <img className="photo" src={representative} alt={`Representative ${props.index}`} />
       <div className="name">{getShortHash(props.name, 4)}</div>
       {props.bzrxAmount.gt(0) &&
@@ -56,4 +58,5 @@ export const FindRepresentativeItem = (props: IFindRepresentativeItemProps) => {
       }
     </li>
   );
+
 }
