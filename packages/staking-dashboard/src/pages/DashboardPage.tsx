@@ -5,7 +5,6 @@ import { Form } from "../components/Form";
 interface IDashboardPageProps {
   doNetworkConnect: () => void;
   isMobileMedia: boolean;
-  openFindRepresentative: () => void;
 }
 interface IDashboardPageState {
 }
@@ -16,7 +15,7 @@ export class DashboardPage extends Component<IDashboardPageProps, IDashboardPage
       <React.Fragment>
         <section className="pb-50">
           <Header isMobileMedia={this.props.isMobileMedia} doNetworkConnect={this.props.doNetworkConnect} />
-          <Form openFindRepresentative={this.props.openFindRepresentative}/>
+          <Form />
         </section>
       </React.Fragment>
     );

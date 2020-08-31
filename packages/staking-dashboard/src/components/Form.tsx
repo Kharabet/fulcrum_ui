@@ -8,10 +8,11 @@ import { BigNumber } from "@0x/utils";
 import { ProviderChangedEvent } from "../services/events/ProviderChangedEvent";
 import { Asset } from "../domain/Asset";
 import { AddToBalance } from "./AddToBalance";
-
+import Modal from "react-modal";
+import { FindRepresentative } from "./FindRepresentative";
+import { IRep } from "../domain/IRep";
 
 interface IFormProps {
-  openFindRepresentative: () => void;
 }
 
 interface IFormState {
@@ -27,9 +28,11 @@ interface IFormState {
   whitelistAmount: BigNumber;
   claimableAmount: BigNumber;
   canOptin: boolean;
+  isFindRepresentativeOpen: boolean;
   selectedRepAddress: string;
-  topRepsList: { wallet: string, BZRX: BigNumber, vBZRX: BigNumber, LPToken: BigNumber }[];
-  repsList: { wallet: string, BZRX: BigNumber, vBZRX: BigNumber, LPToken: BigNumber }[];
+  topRepsList: IRep[];
+  otherRepsList: IRep[];
+  repsList: IRep[];
 }
 
 const networkName = process.env.REACT_APP_ETH_NETWORK;
@@ -50,8 +53,10 @@ export class Form extends Component<IFormProps, IFormState> {
       whitelistAmount: new BigNumber(0),
       claimableAmount: new BigNumber(0),
       canOptin: false,
+      isFindRepresentativeOpen: false,
       selectedRepAddress: "",
       topRepsList: [],
+      otherRepsList: [],
       repsList: []
     };
 
@@ -179,6 +184,24 @@ export class Form extends Component<IFormProps, IFormState> {
     return hash.substring(0, 6) + '...' + hash.substring(hash.length - count);
   }
 
+  private openFindRepresentative = () => {
+    this._isMounted && !this.state.isFindRepresentativeOpen && this.setState({ ...this.state, isFindRepresentativeOpen: true });
+  };
+
+  private onAddRep = (rep: IRep) => {
+    const topRepsList = this.state.topRepsList.concat(rep);
+    const otherRepsList = this.state.otherRepsList.filter(item => item.wallet !== rep.wallet)
+    this._isMounted &&
+      this.setState({ ...this.state, topRepsList, otherRepsList, isFindRepresentativeOpen: false });
+  };
+
+  private onRequestClose = async () => {
+    await this._isMounted && this.setState({
+      ...this.state,
+      isFindRepresentativeOpen: false
+    });
+  };
+
   public render() {
     // console.log(this.state.whitelistAmount.toString(), this.state.iEthBalance.toString());
 
@@ -205,6 +228,18 @@ export class Form extends Component<IFormProps, IFormState> {
 
     return (
       <React.Fragment>
+        <Modal
+          isOpen={this.state.isFindRepresentativeOpen}
+          onRequestClose={this.onRequestClose}
+          className="modal-content-div"
+          overlayClassName="modal-overlay-div"
+        >
+          <FindRepresentative
+            onFindRepresentativeClose={this.onRequestClose}
+            onAddRepresentative={this.onAddRep}
+            repsList={this.state.otherRepsList}
+          />
+        </Modal>
         <div className="container">
           <div className="calculator">
             <div className="calculator-row balance">
@@ -344,7 +379,7 @@ export class Form extends Component<IFormProps, IFormState> {
             }
             <div className="calculator-row">
               <div className="group-buttons">
-                <button className="button" onClick={this.props.openFindRepresentative}>Find a Representative</button>
+                <button className="button" onClick={this.openFindRepresentative}>Find a Representative</button>
                 <button className="button" disabled={this.isAlreadyRepresentative} onClick={this.onBecomeRepresentativeClick}>Become A Representative</button>
               </div>
             </div>

@@ -6,14 +6,17 @@ import { ReactComponent as Search } from "../assets/images/icon-search.svg"
 import { StakingProvider } from "../services/StakingProvider";
 import { FindRepresentativeItem } from "../components/FindRepresentativeItem";
 import { BigNumber } from "@0x/utils";
+import { IRep } from "../domain/IRep";
 
 // const Box = require('3box')
 export interface IFindRepresentativeProps {
+  repsList: IRep[];
   onFindRepresentativeClose: () => void;
+  onAddRepresentative: (rep: IRep) => void;
 }
 
 interface IFindRepresentativeState {
-  representative: { wallet: string, BZRX: BigNumber, vBZRX: BigNumber, LPToken: BigNumber }[],
+  representative: IRep[],
   searchValue: string
 }
 
