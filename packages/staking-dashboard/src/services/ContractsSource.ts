@@ -1,6 +1,7 @@
 import * as _ from "lodash";
 import { convertContract } from "../contracts/convert";
 import { erc20Contract } from "../contracts/erc20";
+import { BZRXStakingInterimContract } from "../contracts/BZRXStakingInterim";
 import { BigNumber } from "@0x/utils";
 import { Asset } from "../domain/Asset";
 import { iETHBuyBackContract } from "../contracts/iETHBuyBack";
@@ -24,6 +25,7 @@ export class ContractsSource {
 
   private static convertJson: any;
   private static erc20Json: any;
+  private static BZRXStakingInterimJson: any;
   private static iETHBuyBack: any;
   private static traderCompensation: any;
 
@@ -43,6 +45,7 @@ export class ContractsSource {
     }
     ContractsSource.convertJson = await import(`./../assets/artifacts/${ethNetwork}/convert.json`);
     ContractsSource.erc20Json = await import(`./../assets/artifacts/${ethNetwork}/erc20.json`);
+    ContractsSource.BZRXStakingInterimJson = await import(`./../assets/artifacts/${ethNetwork}/BZRXStakingInterim.json`);
     ContractsSource.iETHBuyBack = await import(`./../assets/artifacts/${ethNetwork}/iETHBuyBack.json`);
     ContractsSource.traderCompensation = await import(`./../assets/artifacts/${ethNetwork}/traderCompensation.json`);
     const iTokenList = (await import(`../assets/artifacts/${ethNetwork}/iTokenList.js`)).iTokenList;
@@ -142,6 +145,25 @@ export class ContractsSource {
     }
     return address;
   }
+  
+  public getBZRXStakingInterimAddress(): string {
+    let address: string = "";
+    switch (this.networkId) {
+      case 1:
+        address = "";
+        break;
+      case 3:
+        address = "";
+        break;
+      case 4:
+        address = "";
+        break;
+      case 42:
+        address = "0x8394a9Fd3c00941BB4954EbEd9f7Aa7Cc8d783E8";
+        break;
+    }
+    return address;
+  }
 
   public getiETHBuyBackAddress(): string {
     let address: string = "";
@@ -201,6 +223,15 @@ export class ContractsSource {
       this.provider
     );
   }
+  
+  private async getBZRXStakingInterimContractRaw(): Promise<BZRXStakingInterimContract> {
+    await this.Init();
+    return new BZRXStakingInterimContract(
+      ContractsSource.BZRXStakingInterimJson.abi,
+      this.getBZRXStakingInterimAddress().toLowerCase(),
+      this.provider
+    );
+  }
 
   private async getiETHBuyBackContractRaw(): Promise<iETHBuyBackContract> {
     await this.Init();
@@ -222,6 +253,7 @@ export class ContractsSource {
   public getErc20Contract = _.memoize(this.getErc20ContractRaw);
   public getTraderCompensationContract = _.memoize(this.getTraderCompensationContractRaw);
   public getConvertContract = _.memoize(this.getConvertContractRaw);
+  public getBZRXStakingInterimContract = _.memoize(this.getBZRXStakingInterimContractRaw);
   public getiETHBuyBackContract = _.memoize(this.getiETHBuyBackContractRaw);
 
 }
