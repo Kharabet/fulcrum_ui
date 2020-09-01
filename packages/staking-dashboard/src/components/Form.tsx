@@ -267,7 +267,7 @@ export class Form extends Component<{}, IFormState> {
       return (
         <li key={e.wallet}
           className={`button button-representative ${e.wallet.toLowerCase() === this.state.selectedRepAddress.toLowerCase()
-            ? "active" : ""}`}
+            ? "active" : "no-active"}`}
           onClick={this.setSelectedRepAddressClick}
           data-address={e.wallet}>
           <img className="photo" src={e.imageSrc} alt={`Representative ${e.index}`} />
@@ -416,7 +416,7 @@ export class Form extends Component<{}, IFormState> {
             <React.Fragment>
               <div className="calculator-row">
                 <div className="row-header">Please select representative:</div>
-                <ul className="group-buttons">
+                  <ul className={`group-buttons ${this.state.delegateAddress.toLowerCase() !== ZERO_ADDRESS ? "selected-delegate" : ""}`}>
                   {topRepsLi}
                 </ul>
               </div>
