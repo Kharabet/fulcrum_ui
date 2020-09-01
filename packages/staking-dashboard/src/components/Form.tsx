@@ -318,7 +318,7 @@ export class Form extends Component<{}, IFormState> {
                 }
                 <div className="row-container">
                   <div className="row-body">
-                    <a href={`${etherscanURL}token/0x0e511Aa1a137AaD267dfe3a6bFCa0b856C1a3682`} target="_blank" rel="noopener noreferrer"><span className="icon"><BPTIcon /></span></a>
+                    <a href={`${etherscanURL}token/0xe26A220a341EAca116bDa64cF9D5638A935ae629`} target="_blank" rel="noopener noreferrer"><span className="icon"><BPTIcon /></span></a>
                     <span title={this.state.bptBalance.toFixed(18)} className="value">{this.state.bptBalance.toFixed(2)}</span>
                     <div className="row-token">BPT</div>
                   </div>
@@ -349,7 +349,7 @@ export class Form extends Component<{}, IFormState> {
                 }
                 <div className="row-container">
                   <div className="row-body">
-                    <a href={`${etherscanURL}token/0x0e511Aa1a137AaD267dfe3a6bFCa0b856C1a3682`} target="_blank" rel="noopener noreferrer">
+                    <a href={`${etherscanURL}token/0xe26A220a341EAca116bDa64cF9D5638A935ae629`} target="_blank" rel="noopener noreferrer">
                       <span title={this.state.bptStakingBalance.toFixed(18)} className="icon"><BPTIcon /></span></a>
                     <span className="value">{this.state.bptStakingBalance.toFixed(2)}</span>
                     <div className="row-token">BPT</div>
