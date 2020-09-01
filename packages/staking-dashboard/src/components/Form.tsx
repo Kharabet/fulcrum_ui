@@ -267,7 +267,7 @@ export class Form extends Component<{}, IFormState> {
       return (
         <li key={e.wallet}
           className={`button button-representative ${e.wallet.toLowerCase() === this.state.selectedRepAddress.toLowerCase()
-            ? "active" : ""}`}
+            ? "active" : "no-active"}`}
           onClick={this.setSelectedRepAddressClick}
           data-address={e.wallet}>
           <img className="photo" src={e.imageSrc} alt={`Representative ${e.index}`} />
@@ -304,18 +304,16 @@ export class Form extends Component<{}, IFormState> {
                     <div className="row-token">BZRX</div>
                   </div>
                 </div>
-                {this.state.vBzrxBalance.gt(0) &&
-                  <div className="row-container">
-                    <div className="row-body">
-                      <a href={`${etherscanURL}token/0xB72B31907C1C95F3650b64b2469e08EdACeE5e8F`} target="_blank" rel="noopener noreferrer"><span className="icon"><VBzrxIcon /></span></a>
+                <div className="row-container">
+                  <div className="row-body">
+                    <a href={`${etherscanURL}token/0xB72B31907C1C95F3650b64b2469e08EdACeE5e8F`} target="_blank" rel="noopener noreferrer"><span className="icon"><VBzrxIcon /></span></a>
 
-                      <span title={this.state.vBzrxBalance.toFixed(18)} className="value">
-                        {Number(this.state.vBzrxBalance).toFixed(2)}
-                      </span>
-                      <div className="row-token">vBZRX</div>
-                    </div>
+                    <span title={this.state.vBzrxBalance.toFixed(18)} className="value">
+                      {Number(this.state.vBzrxBalance).toFixed(2)}
+                    </span>
+                    <div className="row-token">vBZRX</div>
                   </div>
-                }
+                </div>
                 <div className="row-container">
                   <div className="row-body">
                     <a href={`${etherscanURL}token/0xe26A220a341EAca116bDa64cF9D5638A935ae629`} target="_blank" rel="noopener noreferrer"><span className="icon"><BPTIcon /></span></a>
@@ -335,18 +333,16 @@ export class Form extends Component<{}, IFormState> {
                     <div className="row-token">BZRX</div>
                   </div>
                 </div>
-                {this.state.vBzrxBalance.gt(0) &&
-                  <div className="row-container">
-                    <div className="row-body">
-                      <a href={`${etherscanURL}token/0xB72B31907C1C95F3650b64b2469e08EdACeE5e8F`} target="_blank" rel="noopener noreferrer"><span className="icon"><VBzrxIcon /></span></a>
+                <div className="row-container">
+                  <div className="row-body">
+                    <a href={`${etherscanURL}token/0xB72B31907C1C95F3650b64b2469e08EdACeE5e8F`} target="_blank" rel="noopener noreferrer"><span className="icon"><VBzrxIcon /></span></a>
 
-                      <span title={this.state.vBzrxStakingBalance.toFixed(18)} className="value">
-                        {Number(this.state.vBzrxStakingBalance).toFixed(2)}
-                      </span>
-                      <div className="row-token">vBZRX</div>
-                    </div>
+                    <span title={this.state.vBzrxStakingBalance.toFixed(18)} className="value">
+                      {Number(this.state.vBzrxStakingBalance).toFixed(2)}
+                    </span>
+                    <div className="row-token">vBZRX</div>
                   </div>
-                }
+                </div>
                 <div className="row-container">
                   <div className="row-body">
                     <a href={`${etherscanURL}token/0xe26A220a341EAca116bDa64cF9D5638A935ae629`} target="_blank" rel="noopener noreferrer">
@@ -371,12 +367,13 @@ export class Form extends Component<{}, IFormState> {
               </div>
             </div>
 
-            {this.state.bzrxV1Balance.gt(0) && <div className="convert-button" style={{ marginTop: "20px" }}>
-              <button className="button button-full-width" onClick={this.onBzrxV1ToV2ConvertClick}>
-                Convert BZRX v1 to v2
+            {this.state.bzrxV1Balance.gt(0) &&
+              <div className="convert-button">
+                <button className="button button-full-width" onClick={this.onBzrxV1ToV2ConvertClick}>
+                  Convert BZRX v1 to v2
                     <span className="notice">You will need to confirm 2 transactions in your wallet.</span>
-              </button>
-            </div>
+                </button>
+              </div>
             }
 
             {/*this.state.iETHSwapRate.gt(0) && swapAmountAllowed.gt(0) &&
@@ -391,7 +388,7 @@ export class Form extends Component<{}, IFormState> {
                 </button>
               </div>
             */}
-            {/* {this.state.claimableAmount.gt(0) &&
+            {this.state.claimableAmount.gt(0) &&
               <div className="convert-button">
                 <button title={`Claim ${this.state.claimableAmount.toFixed(18)} vBZRX`} className="button button-full-width" onClick={this.onClaimClick}>
                   Claim&nbsp;
@@ -401,13 +398,13 @@ export class Form extends Component<{}, IFormState> {
               </div>
             }
             {this.state.canOptin &&
-              <div className="convert-button">
-                <button className="button button-full-width" onClick={this.onOptinClick}>
-                  Opt-in to compensation program
+            <div className="convert-button">
+              <button className="button button-full-width" onClick={this.onOptinClick}>
+                Opt-in to compensation program
                   <span className="notice">The program is open to anyone negatively impacted by the protocol pause on Feb-18-2020 04:21:52 AM +UTC</span>
-                </button>
-              </div>
-            } */}
+              </button>
+            </div>
+            }
             {/*<div className="group-buttons">
               <button title="Coming soon" className="button" disabled={true}>Stake</button>
               <button title="Coming soon" className="button" disabled={true}>Unstake</button>
@@ -416,22 +413,22 @@ export class Form extends Component<{}, IFormState> {
               <p className="notice">Coming soon</p>
             </div>*/}
             {/*{this.state.bzrxBalance.gt(0) || this.state.vBzrxBalance.gt(0) || this.state.bptBalance.gt(0) &&*/}
-              <React.Fragment>
-                <div className="calculator-row">
-                  <div className="row-header">Please select representative:</div>
-                  <ul className="group-buttons">
-                    {topRepsLi}
-                  </ul>
-                </div>
-                {this.state.selectedRepAddress !== "" &&
-                  <AddToBalance
-                    bzrxMax={Number(this.state.bzrxBalance)}
-                    vbzrxMax={Number(this.state.vBzrxBalance)}
-                    bptMax={Number(this.state.bptBalance)}
-                    stake={this.onStakeClick}
-                  />
-                }
-              </React.Fragment>
+            <React.Fragment>
+              <div className="calculator-row">
+                <div className="row-header">Please select representative:</div>
+                  <ul className={`group-buttons ${this.state.delegateAddress.toLowerCase() !== ZERO_ADDRESS ? "selected-delegate" : ""}`}>
+                  {topRepsLi}
+                </ul>
+              </div>
+              {this.state.selectedRepAddress !== "" &&
+                <AddToBalance
+                  bzrxMax={Number(this.state.bzrxBalance)}
+                  vbzrxMax={Number(this.state.vBzrxBalance)}
+                  bptMax={Number(this.state.bptBalance)}
+                  stake={this.onStakeClick}
+                />
+              }
+            </React.Fragment>
             {/*}*/}
             <div className="calculator-row">
               <div className="group-buttons">

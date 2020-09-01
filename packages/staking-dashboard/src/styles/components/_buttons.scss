@@ -21,6 +21,21 @@
   .button {
     margin-bottom: 20px;
   }
+  &.selected-delegate{
+    .no-active{
+      background: #e7ebf0;
+      cursor: not-allowed;
+      &:hover {
+        border: 2px solid transparent;
+      }
+      .name {
+        color: #ffffff;
+      }
+      .photo{
+        filter: grayscale(100%);
+      }
+    }
+  }
 }
 
 .convert-button {
@@ -29,6 +44,7 @@
   justify-content: center;
   padding: 0 45px;
   margin-bottom: 35px;
+  margin-top: 20px;
   @media screen and (max-width: $width-max-sm) {
     margin-bottom: 55px;
     padding: 0 10px;
