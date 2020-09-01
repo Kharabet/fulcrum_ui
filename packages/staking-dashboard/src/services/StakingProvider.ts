@@ -815,7 +815,7 @@ export class StakingProvider {
       {
         from: account
       });
-
+      console.log(earnedUsdAmount.toFixed())
     return earnedUsdAmount;
   }
 

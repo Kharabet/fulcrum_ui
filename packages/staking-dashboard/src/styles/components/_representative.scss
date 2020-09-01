@@ -5,7 +5,7 @@
   input {
     padding-left: 55px;
   }
-  ul{
+  ul {
     margin-top: 10px;
     margin-right: -20px;
   }
@@ -57,6 +57,14 @@
   padding: 6px;
   cursor: pointer;
   margin-right: 20px;
+  border: 2px solid transparent;
+  &:hover {
+    border-color: #5b88ff;
+    cursor: pointer;
+  }
+  &:focus {
+    border-color: #276bfb;
+  }
   @media screen and (max-width: 535px) {
     border-radius: 16px;
   }
