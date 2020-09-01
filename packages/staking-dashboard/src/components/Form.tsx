@@ -246,8 +246,10 @@ export class Form extends Component<{}, IFormState> {
     const etherscanURL = StakingProvider.Instance.web3ProviderSettings
       ? StakingProvider.Instance.web3ProviderSettings.etherscanURL
       : "";
-
+    //console.log(this.state.topRepsList);
     const topRepsLi = this.state.topRepsList.map((e) => {
+      if (e === undefined) { return false; }
+      //console.log(e);
       return (
         <li key={e.wallet}
           className={`button button-representative ${e.wallet.toLowerCase() === this.state.selectedRepAddress.toLowerCase()
@@ -340,7 +342,7 @@ export class Form extends Component<{}, IFormState> {
                   </div>
                 </div>
               </div>
-              <p className="notice">You should not transfer out the tokens from wallet once they staked, otherwise you will lose some or all of staked balance.</p>
+              <p className="notice">You should not transfer out the tokens from wallet once they are staked, otherwise you may lose some or all of the staked balance.</p>
             </div>
             <div className="calculator-row">
               <div className="reward-item">
@@ -399,7 +401,7 @@ export class Form extends Component<{}, IFormState> {
               <button title="Coming soon" className="button" disabled={true}>Explore Reward Pool</button>
               <p className="notice">Coming soon</p>
             </div>*/}
-            {this.state.bzrxBalance.gt(0) || this.state.vBzrxBalance.gt(0) || this.state.bptBalance.gt(0) &&
+            {/*{this.state.bzrxBalance.gt(0) || this.state.vBzrxBalance.gt(0) || this.state.bptBalance.gt(0) &&*/}
               <React.Fragment>
                 <div className="calculator-row">
                   <div className="row-header">Please select representative:</div>
@@ -416,7 +418,7 @@ export class Form extends Component<{}, IFormState> {
                   />
                 }
               </React.Fragment>
-            }
+            {/*}*/}
             <div className="calculator-row">
               <div className="group-buttons">
                 <button className="button" onClick={this.openFindRepresentative}>Find a Representative</button>
