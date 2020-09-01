@@ -16,12 +16,12 @@ const networkName = process.env.REACT_APP_ETH_NETWORK;
 
 export const FindRepresentativeItem = (props: IFindRepresentativeItemProps) => {
 
-  const bzrxAmount = props.representative.BZRX.div(10 ** 18).toFixed();
-  const vbzrxAmount = props.representative.vBZRX.div(10 ** 18).toFixed();
+  const bzrxAmount = props.representative.BZRX.div(10 ** 18).toFixed(2);
+  const vbzrxAmount = props.representative.vBZRX.div(10 ** 18).toFixed(2);
   //TODO: remove networkName
   const bptAmount = networkName === "kovan"
-    ? props.representative.LPToken.div(10 ** 6).toFixed()
-    : props.representative.LPToken.div(10 ** 18).toFixed();
+    ? props.representative.LPToken.div(10 ** 6).toFixed(2)
+    : props.representative.LPToken.div(10 ** 18).toFixed(2);
 
   return (
     <li className="item-find-representative" onClick={() => props.onRepClick()}>
