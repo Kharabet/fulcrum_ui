@@ -367,12 +367,13 @@ export class Form extends Component<{}, IFormState> {
               </div>
             </div>
 
-            {this.state.bzrxV1Balance.gt(0) && <div className="convert-button" style={{ marginTop: "20px" }}>
-              <button className="button button-full-width" onClick={this.onBzrxV1ToV2ConvertClick}>
-                Convert BZRX v1 to v2
+            {this.state.bzrxV1Balance.gt(0) &&
+              <div className="convert-button">
+                <button className="button button-full-width" onClick={this.onBzrxV1ToV2ConvertClick}>
+                  Convert BZRX v1 to v2
                     <span className="notice">You will need to confirm 2 transactions in your wallet.</span>
-              </button>
-            </div>
+                </button>
+              </div>
             }
 
             {/*this.state.iETHSwapRate.gt(0) && swapAmountAllowed.gt(0) &&
@@ -387,7 +388,7 @@ export class Form extends Component<{}, IFormState> {
                 </button>
               </div>
             */}
-            {/* {this.state.claimableAmount.gt(0) &&
+            {this.state.claimableAmount.gt(0) &&
               <div className="convert-button">
                 <button title={`Claim ${this.state.claimableAmount.toFixed(18)} vBZRX`} className="button button-full-width" onClick={this.onClaimClick}>
                   Claim&nbsp;
@@ -397,13 +398,13 @@ export class Form extends Component<{}, IFormState> {
               </div>
             }
             {this.state.canOptin &&
-              <div className="convert-button">
-                <button className="button button-full-width" onClick={this.onOptinClick}>
-                  Opt-in to compensation program
+            <div className="convert-button">
+              <button className="button button-full-width" onClick={this.onOptinClick}>
+                Opt-in to compensation program
                   <span className="notice">The program is open to anyone negatively impacted by the protocol pause on Feb-18-2020 04:21:52 AM +UTC</span>
-                </button>
-              </div>
-            } */}
+              </button>
+            </div>
+            }
             {/*<div className="group-buttons">
               <button title="Coming soon" className="button" disabled={true}>Stake</button>
               <button title="Coming soon" className="button" disabled={true}>Unstake</button>
