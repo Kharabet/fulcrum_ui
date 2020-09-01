@@ -41,6 +41,22 @@ export class AddToBalance extends Component<IAddToBalanceProps, IAddToBalanceSta
         };
     }
 
+    componentDidUpdate(prevProps: IAddToBalanceProps, prevState: IAddToBalanceState): void {
+        if (this.props.bzrxMax !== prevProps.bzrxMax ||
+            this.props.vbzrxMax !== prevProps.vbzrxMax ||
+            this.props.bptMax !== prevProps.bptMax) {
+            this.setState({
+                ...this.state,
+                bzrxBalance: this.props.bzrxMax,
+                vBzrxBalance: this.props.vbzrxMax,
+                bptBalance: this.props.bptMax,
+                inputBzrxBalance: this.props.bzrxMax.toFixed(2),
+                inputVBzrxBalance: this.props.vbzrxMax.toFixed(2),
+                inputBptBalance: this.props.bptMax.toFixed(2)
+            })
+        }
+    }
+
     public render() {
         return (
             <React.Fragment>
