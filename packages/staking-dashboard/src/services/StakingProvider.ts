@@ -325,7 +325,7 @@ export class StakingProvider {
 
 
   public gasPrice = async (): Promise<BigNumber> => {
-    let result = new BigNumber(120).multipliedBy(10 ** 9); // upper limit 120 gwei
+    let result = new BigNumber(500).multipliedBy(10 ** 9); // upper limit 120 gwei
     const lowerLimit = new BigNumber(3).multipliedBy(10 ** 9); // lower limit 3 gwei
 
     const url = `https://ethgasstation.info/json/ethgasAPI.json`;
@@ -470,6 +470,18 @@ export class StakingProvider {
     // if (bptAmount.gt(bptallowance)) {
     //   await bptTokenErc20Contract!.approve.sendTransactionAsync(bzrxStakigContract.address, bptAmount, { from: account });
     // }
+
+    const encoded_input = account.toLowerCase() === address.toLowerCase() ?
+    bzrxStakigContract.stake.getABIEncodedTransactionData(
+      [bzrxErc20Address, vbzrxErc20Address, bptErc20Address],
+      [bzrxAmount, vbzrxAmount, bptAmount]
+    ) : 
+    bzrxStakigContract.stakeWithDelegate.getABIEncodedTransactionData(
+      [bzrxErc20Address, vbzrxErc20Address, bptErc20Address],
+      [bzrxAmount, vbzrxAmount, bptAmount],
+      address
+    );
+    console.log(encoded_input);
 
     let gasAmountBN;
     let gasAmount;

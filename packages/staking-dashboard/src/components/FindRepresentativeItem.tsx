@@ -27,6 +27,19 @@ export const FindRepresentativeItem = (props: IFindRepresentativeItemProps) => {
     <li className="item-find-representative" onClick={() => props.onRepClick()}>
       <img className="photo" src={props.representative.imageSrc} alt={`Representative ${props.representative.index}`} />
       <div className="name">{props.representative.name}</div>
+      <div className="token" title={bzrxAmount.toFixed(18)}>
+        <BzrxIcon />
+        <span>{bzrxAmount.toFixed(2)}</span>
+      </div>
+      <div className="token" title={vbzrxAmount.toFixed(18)}>
+        <VBzrxIcon />
+        <span>{vbzrxAmount.toFixed(2)}</span>
+      </div>
+      <div className="token" title={bptAmount.toFixed(18)}>
+        <BPTIcon />
+        <span>{bptAmount.toFixed(2)}</span>
+      </div>
+      {/*
       {props.representative.BZRX.gt(0) ?
         <div className="token" title={bzrxAmount.toFixed(18)}>
           <BzrxIcon />
@@ -48,6 +61,7 @@ export const FindRepresentativeItem = (props: IFindRepresentativeItemProps) => {
         </div>
         : <div className="token"></div>
       }
+      */}
     </li>
   );
 

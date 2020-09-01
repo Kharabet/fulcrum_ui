@@ -55,7 +55,7 @@ export class AssetsDictionary {
         BPT,
         18,
         new Map<number, string | null>([
-          [1, "0x0e511Aa1a137AaD267dfe3a6bFCa0b856C1a3682"],
+          [1, "0xe26A220a341EAca116bDa64cF9D5638A935ae629"],
           [42, "0x4c4462c6bca4c92bf41c40f9a4047f35fd296996"]
         ])
       )
