@@ -806,7 +806,7 @@ export class StakingProvider {
 
     const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
     if (!this.contractsSource) return result;
-   
+
     const bzrxStakingContract = await this.contractsSource.getBZRXStakingInterimContract();
     if (!account || !bzrxStakingContract) return result;
 
@@ -815,8 +815,8 @@ export class StakingProvider {
       {
         from: account
       });
-      console.log(earnedUsdAmount.toFixed())
-    return earnedUsdAmount;
+
+    return earnedUsdAmount.div(10 ** 18);
   }
 
   public async getSwapToUsdRate(asset: Asset): Promise<BigNumber> {
