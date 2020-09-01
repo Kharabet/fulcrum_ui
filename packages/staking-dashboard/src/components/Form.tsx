@@ -16,8 +16,8 @@ import Representative1 from "../assets/images/representative1.png"
 import Representative2 from "../assets/images/representative2.png"
 import Representative3 from "../assets/images/representative3.png"
 
-interface IFormProps {
-}
+const Box = require('3box');
+
 
 interface IFormState {
   bzrxV1Balance: BigNumber;
@@ -41,7 +41,7 @@ interface IFormState {
 
 const networkName = process.env.REACT_APP_ETH_NETWORK;
 
-export class Form extends Component<IFormProps, IFormState> {
+export class Form extends Component<{}, IFormState> {
   constructor(props: any) {
     super(props);
     this.state = {
@@ -79,11 +79,10 @@ export class Form extends Component<IFormProps, IFormState> {
     this.isAlreadyRepresentative = await StakingProvider.Instance.checkIsRep();
 
     const repsList = await StakingProvider.Instance.getRepresentatives()
-      .then(reps => reps.sort((a: any, b: any) => b.BZRX.minus(a.BZRX).toNumber()));
-
-    const topRepsList = repsList.slice(0, 3);
-    const otherRepsList = repsList.slice(3, repsList.length);
-
+      .then(reps => Promise.all(reps.map((rep, index) => this.getRepInfo(rep, index))));
+    const sortedList = repsList.sort((a: any, b: any) => b.BZRX.minus(a.BZRX).toNumber());
+    const topRepsList = sortedList.slice(0, 3);
+    const otherRepsList = sortedList.slice(3, sortedList.length);
     const canOptin = await StakingProvider.Instance.canOptin();
     let claimableAmount = await StakingProvider.Instance.isClaimable();
     if (claimableAmount.gt(0)) {
@@ -211,6 +210,25 @@ export class Form extends Component<IFormProps, IFormState> {
     });
   };
 
+  private getRepInfo = async (item: any, index: number): Promise<IRep> => {
+    const profile = await Box.getProfile(item.wallet);
+    const name = profile.name ? profile.name : this.getShortHash(item.wallet, 4);
+    const imageSrc = profile.image ?
+      `https://ipfs.infura.io/ipfs/${profile.image[0].contentUrl["/"]}`
+      : index % 3 === 0 ?
+        Representative1
+        : index % 2 === 0 ?
+          Representative2 :
+          Representative3;
+
+    return {
+      ...item,
+      name,
+      imageSrc,
+      index
+    };
+  };
+
   public render() {
     // console.log(this.state.whitelistAmount.toString(), this.state.iEthBalance.toString());
 
@@ -222,17 +240,15 @@ export class Form extends Component<IFormProps, IFormState> {
       ? StakingProvider.Instance.web3ProviderSettings.etherscanURL
       : "";
 
-    const topRepsLi = this.state.topRepsList.map((e, index) => {
-      const representative = index % 3 === 0 ? Representative1 : index % 2 === 0 ? Representative2 : Representative3;
-
+    const topRepsLi = this.state.topRepsList.map((e) => {
       return (
         <li key={e.wallet}
           className={`button button-representative ${e.wallet.toLowerCase() === this.state.selectedRepAddress.toLowerCase()
             ? "active" : ""}`}
           onClick={this.setSelectedRepAddressClick}
           data-address={e.wallet}>
-          <img className="photo" src={representative} alt={`Representative ${index}`} />
-          <span className="name">{this.getShortHash(e.wallet, 4)}</span>
+          <img className="photo" src={e.imageSrc} alt={`Representative ${e.index}`} />
+          <span className="name">{e.name}</span>
         </li>
       )
     })

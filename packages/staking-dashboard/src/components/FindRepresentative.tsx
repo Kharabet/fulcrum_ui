@@ -3,12 +3,10 @@ import { ReactComponent as CloseIcon } from "../assets/images/ic__close.svg"
 
 import { ReactComponent as Search } from "../assets/images/icon-search.svg"
 
-import { StakingProvider } from "../services/StakingProvider";
 import { FindRepresentativeItem } from "../components/FindRepresentativeItem";
-import { BigNumber } from "@0x/utils";
 import { IRep } from "../domain/IRep";
 
-// const Box = require('3box')
+
 export interface IFindRepresentativeProps {
   representative: IRep[];
   onFindRepresentativeClose: () => void;
@@ -31,11 +29,7 @@ export class FindRepresentative extends Component<IFindRepresentativeProps, IFin
 
   public getRepresentative = async () => {
     let representative = this.props.representative;
-    async function get3Box(representative: any) {
-      for (const item of representative) {
-      }
-    }
-    get3Box(representative);
+
     this.setState({ ...this.state, representative: representative, searchValue: "" });
   }
 
@@ -47,7 +41,7 @@ export class FindRepresentative extends Component<IFindRepresentativeProps, IFin
     const representativeData = this.state.representative
       .filter((item) => item.wallet.match(this.state.searchValue))
       .map((item, index) =>
-        <FindRepresentativeItem address="" urlPhoto="" name={item.wallet} bzrxAmount={item.BZRX} vbzrxAmount={item.vBZRX} bptAmount={item.LPToken} index={index} key={index} onRepClick={() => this.props.onAddRepresentative(item.wallet)} />);
+        <FindRepresentativeItem key={index} representative={item} onRepClick={() => this.props.onAddRepresentative(item.wallet)} />);
     return (
       <div className="modal find-representative" >
         <div className="modal__title">
