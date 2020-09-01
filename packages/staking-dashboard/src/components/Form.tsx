@@ -144,6 +144,7 @@ export class Form extends Component<{}, IFormState> {
     this._isMounted = true;
     this.derivedUpdate();
   }
+
   public componentWillUnmount(): void {
     this._isMounted = false;
 

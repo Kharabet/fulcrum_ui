@@ -41,8 +41,9 @@ export class FindRepresentative extends Component<IFindRepresentativeProps, IFin
   }
 
   public render() {
+    const searchValue = this.state.searchValue.toLowerCase();
     const representativeData = this.state.representative
-      .filter((item) => item.wallet.match(this.state.searchValue))
+      .filter((item) => item.wallet.match(searchValue) || item.name.toLowerCase().match(searchValue))
       .map((item, index) =>
         <FindRepresentativeItem key={index} representative={item} onRepClick={() => this.props.onAddRepresentative(item.wallet)} />);
     return (
