@@ -38,9 +38,12 @@ interface IFormState {
   topRepsList: IRep[];
   otherRepsList: IRep[];
   repsList: IRep[];
+  delegateAddress: string;
 }
 
 const networkName = process.env.REACT_APP_ETH_NETWORK;
+
+const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 
 export class Form extends Component<{}, IFormState> {
   constructor(props: any) {
@@ -63,7 +66,8 @@ export class Form extends Component<{}, IFormState> {
       topRepsList: [],
       otherRepsList: [],
       repsList: [],
-      userEarnings: new BigNumber(0)
+      userEarnings: new BigNumber(0),
+      delegateAddress: ""
     };
 
     this._isMounted = false;
@@ -77,13 +81,19 @@ export class Form extends Component<{}, IFormState> {
   private _isMounted: boolean;
 
   private async derivedUpdate() {
-
+    let selectedRepAddress = "";
     this.isAlreadyRepresentative = await StakingProvider.Instance.checkIsRep();
 
+    const delegateAddress = await StakingProvider.Instance.getDelegateAddress();
     const repsList = await StakingProvider.Instance.getRepresentatives()
       .then(reps => Promise.all(reps.map((rep, index) => this.getRepInfo(rep, index))));
     const sortedList = repsList.sort((a: any, b: any) => b.BZRX.minus(a.BZRX).toNumber());
-    const topRepsList = sortedList.slice(0, 3);
+    let topRepsList = sortedList.slice(0, 3);
+    const delegate = sortedList.find(e => e.wallet.toLowerCase() === delegateAddress.toLowerCase());
+    if (delegate && !topRepsList.includes(delegate)) {
+      topRepsList.push(delegate)
+    }
+    selectedRepAddress = delegateAddress;
     const otherRepsList = sortedList.slice(3, sortedList.length);
     const canOptin = await StakingProvider.Instance.canOptin();
     let claimableAmount = await StakingProvider.Instance.isClaimable();
@@ -111,6 +121,7 @@ export class Form extends Component<{}, IFormState> {
     //const whitelistAmount = userData[1].div(10 ** 18);
 
     const userEarnings = await StakingProvider.Instance.getUserEarnings();
+
     this._isMounted && this.setState({
       ...this.state,
       bzrxV1Balance,
@@ -128,7 +139,9 @@ export class Form extends Component<{}, IFormState> {
       repsList,
       topRepsList,
       otherRepsList,
-      userEarnings
+      userEarnings,
+      delegateAddress,
+      selectedRepAddress
     })
   }
 
@@ -186,6 +199,7 @@ export class Form extends Component<{}, IFormState> {
   }
 
   public setSelectedRepAddressClick = (e: React.MouseEvent<HTMLElement>) => {
+    if (this.state.delegateAddress !== "" && this.state.delegateAddress !== ZERO_ADDRESS) return;
     const liElement = e.currentTarget;
     const address = liElement.dataset.address
     if (!address) return;
@@ -399,7 +413,7 @@ export class Form extends Component<{}, IFormState> {
               <button title="Coming soon" className="button" disabled={true}>Explore Reward Pool</button>
               <p className="notice">Coming soon</p>
             </div>*/}
-            {this.state.bzrxBalance.gt(0) || this.state.vBzrxBalance.gt(0) || this.state.bptBalance.gt(0) &&
+            {(this.state.bzrxBalance.gt(0) || this.state.vBzrxBalance.gt(0) || this.state.bptBalance.gt(0)) &&
               <React.Fragment>
                 <div className="calculator-row">
                   <div className="row-header">Please select representative:</div>

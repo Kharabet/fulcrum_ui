@@ -818,6 +818,24 @@ export class StakingProvider {
 
     return earnedUsdAmount.div(10 ** 18);
   }
+  
+  public getDelegateAddress = async (): Promise<string> => {
+    let result = "";
+
+    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+    if (!this.contractsSource) return result;
+
+    const bzrxStakingContract = await this.contractsSource.getBZRXStakingInterimContract();
+    if (!account || !bzrxStakingContract) return result;
+
+    result = await bzrxStakingContract.delegate.callAsync(
+      account,
+      {
+        from: account
+      });
+
+    return result;
+  }
 
   public async getSwapToUsdRate(asset: Asset): Promise<BigNumber> {
     if (asset === Asset.DAI || asset === Asset.USDC || asset === Asset.SUSD || asset === Asset.USDT) {
