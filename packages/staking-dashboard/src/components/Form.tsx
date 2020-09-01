@@ -304,18 +304,16 @@ export class Form extends Component<{}, IFormState> {
                     <div className="row-token">BZRX</div>
                   </div>
                 </div>
-                {this.state.vBzrxBalance.gt(0) &&
-                  <div className="row-container">
-                    <div className="row-body">
-                      <a href={`${etherscanURL}token/0xB72B31907C1C95F3650b64b2469e08EdACeE5e8F`} target="_blank" rel="noopener noreferrer"><span className="icon"><VBzrxIcon /></span></a>
+                <div className="row-container">
+                  <div className="row-body">
+                    <a href={`${etherscanURL}token/0xB72B31907C1C95F3650b64b2469e08EdACeE5e8F`} target="_blank" rel="noopener noreferrer"><span className="icon"><VBzrxIcon /></span></a>
 
-                      <span title={this.state.vBzrxBalance.toFixed(18)} className="value">
-                        {Number(this.state.vBzrxBalance).toFixed(2)}
-                      </span>
-                      <div className="row-token">vBZRX</div>
-                    </div>
+                    <span title={this.state.vBzrxBalance.toFixed(18)} className="value">
+                      {Number(this.state.vBzrxBalance).toFixed(2)}
+                    </span>
+                    <div className="row-token">vBZRX</div>
                   </div>
-                }
+                </div>
                 <div className="row-container">
                   <div className="row-body">
                     <a href={`${etherscanURL}token/0xe26A220a341EAca116bDa64cF9D5638A935ae629`} target="_blank" rel="noopener noreferrer"><span className="icon"><BPTIcon /></span></a>
@@ -335,18 +333,16 @@ export class Form extends Component<{}, IFormState> {
                     <div className="row-token">BZRX</div>
                   </div>
                 </div>
-                {this.state.vBzrxBalance.gt(0) &&
-                  <div className="row-container">
-                    <div className="row-body">
-                      <a href={`${etherscanURL}token/0xB72B31907C1C95F3650b64b2469e08EdACeE5e8F`} target="_blank" rel="noopener noreferrer"><span className="icon"><VBzrxIcon /></span></a>
+                <div className="row-container">
+                  <div className="row-body">
+                    <a href={`${etherscanURL}token/0xB72B31907C1C95F3650b64b2469e08EdACeE5e8F`} target="_blank" rel="noopener noreferrer"><span className="icon"><VBzrxIcon /></span></a>
 
-                      <span title={this.state.vBzrxStakingBalance.toFixed(18)} className="value">
-                        {Number(this.state.vBzrxStakingBalance).toFixed(2)}
-                      </span>
-                      <div className="row-token">vBZRX</div>
-                    </div>
+                    <span title={this.state.vBzrxStakingBalance.toFixed(18)} className="value">
+                      {Number(this.state.vBzrxStakingBalance).toFixed(2)}
+                    </span>
+                    <div className="row-token">vBZRX</div>
                   </div>
-                }
+                </div>
                 <div className="row-container">
                   <div className="row-body">
                     <a href={`${etherscanURL}token/0xe26A220a341EAca116bDa64cF9D5638A935ae629`} target="_blank" rel="noopener noreferrer">
@@ -416,22 +412,22 @@ export class Form extends Component<{}, IFormState> {
               <p className="notice">Coming soon</p>
             </div>*/}
             {/*{this.state.bzrxBalance.gt(0) || this.state.vBzrxBalance.gt(0) || this.state.bptBalance.gt(0) &&*/}
-              <React.Fragment>
-                <div className="calculator-row">
-                  <div className="row-header">Please select representative:</div>
-                  <ul className="group-buttons">
-                    {topRepsLi}
-                  </ul>
-                </div>
-                {this.state.selectedRepAddress !== "" &&
-                  <AddToBalance
-                    bzrxMax={Number(this.state.bzrxBalance)}
-                    vbzrxMax={Number(this.state.vBzrxBalance)}
-                    bptMax={Number(this.state.bptBalance)}
-                    stake={this.onStakeClick}
-                  />
-                }
-              </React.Fragment>
+            <React.Fragment>
+              <div className="calculator-row">
+                <div className="row-header">Please select representative:</div>
+                <ul className="group-buttons">
+                  {topRepsLi}
+                </ul>
+              </div>
+              {this.state.selectedRepAddress !== "" &&
+                <AddToBalance
+                  bzrxMax={Number(this.state.bzrxBalance)}
+                  vbzrxMax={Number(this.state.vBzrxBalance)}
+                  bptMax={Number(this.state.bptBalance)}
+                  stake={this.onStakeClick}
+                />
+              }
+            </React.Fragment>
             {/*}*/}
             <div className="calculator-row">
               <div className="group-buttons">
