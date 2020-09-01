@@ -19,9 +19,6 @@
     "lerna": "^3.14.1",
     "rimraf": "^3.0.2"
   },
-  "resolutions": {
-    "terser": "3.14.1"
-  },
   "scripts": {
     "clean-all": "rimraf -rf ./packages/**/node_modules ./node_modules",
     "build-all": "yarn run build-alchemy-web3 && yarn run build-fulcrum-ropsten",
