@@ -201,6 +201,8 @@ export class Form extends Component<{}, IFormState> {
   };
 
   private onAddRep = (wallet: string) => {
+    const isAlreadyTopRep = this.state.topRepsList.find(item => item.wallet.toLowerCase() === wallet.toLowerCase());
+    if (isAlreadyTopRep) return;
     const topRepsList = this.state.topRepsList.concat(this.state.otherRepsList.find(item => item.wallet === wallet)!);
     const otherRepsList = this.state.otherRepsList.filter(item => item.wallet !== wallet)
 
@@ -269,7 +271,7 @@ export class Form extends Component<{}, IFormState> {
           <FindRepresentative
             onFindRepresentativeClose={this.onRequestClose}
             onAddRepresentative={this.onAddRep}
-            representative={this.state.otherRepsList}
+            representative={this.state.repsList}
           />
         </Modal>
         <div className="container">
