@@ -399,19 +399,23 @@ export class Form extends Component<{}, IFormState> {
               <button title="Coming soon" className="button" disabled={true}>Explore Reward Pool</button>
               <p className="notice">Coming soon</p>
             </div>*/}
-            <div className="calculator-row">
-              <div className="row-header">Please select representative:</div>
-              <ul className="group-buttons">
-                {topRepsLi}
-              </ul>
-            </div>
-            {this.state.selectedRepAddress !== "" &&
-              <AddToBalance
-                bzrxMax={Number(this.state.bzrxBalance)}
-                vbzrxMax={Number(this.state.vBzrxBalance)}
-                bptMax={Number(this.state.bptBalance)}
-                stake={this.onStakeClick}
-              />
+            {this.state.bzrxBalance.gt(0) || this.state.vBzrxBalance.gt(0) || this.state.bptBalance.gt(0) &&
+              <React.Fragment>
+                <div className="calculator-row">
+                  <div className="row-header">Please select representative:</div>
+                  <ul className="group-buttons">
+                    {topRepsLi}
+                  </ul>
+                </div>
+                {this.state.selectedRepAddress !== "" &&
+                  <AddToBalance
+                    bzrxMax={Number(this.state.bzrxBalance)}
+                    vbzrxMax={Number(this.state.vBzrxBalance)}
+                    bptMax={Number(this.state.bptBalance)}
+                    stake={this.onStakeClick}
+                  />
+                }
+              </React.Fragment>
             }
             <div className="calculator-row">
               <div className="group-buttons">
