@@ -1,68 +1,83 @@
-import React from "react";
+import React, { Component, ChangeEvent } from "react";
 import { ReactComponent as CloseIcon } from "../assets/images/ic__close.svg"
 
-import { ReactComponent as BzrxIcon } from "../assets/images/token-bzrx.svg"
-import { ReactComponent as VBzrxIcon } from "../assets/images/token-vbzrx.svg"
-import { ReactComponent as BPTIcon } from "../assets/images/token-bpt.svg"
 import { ReactComponent as Search } from "../assets/images/icon-search.svg"
 
+import { FindRepresentativeItem } from "../components/FindRepresentativeItem";
+import { IRep } from "../domain/IRep";
+
+
+import SimpleBar from 'simplebar-react';
+import 'simplebar/dist/simplebar.min.css';
+
 export interface IFindRepresentativeProps {
+  representative: IRep[];
   onFindRepresentativeClose: () => void;
+  onAddRepresentative: (wallet: string) => void;
 }
 
-export const FindRepresentative = (props: IFindRepresentativeProps) => {
-  return (
-    <div className="modal find-representative">
-      <div className="modal__title">
-        Find a Representative
-        <div onClick={props.onFindRepresentativeClose}>
-          <CloseIcon className="modal__close" />
+interface IFindRepresentativeState {
+  representative: IRep[],
+  searchValue: string
+}
+
+export class FindRepresentative extends Component<IFindRepresentativeProps, IFindRepresentativeState> {
+  constructor(props: any) {
+    super(props);
+    this.state = {
+      representative: [],
+      searchValue: ""
+    };
+  }
+
+  public getRepresentative = async () => {
+    let representative = this.props.representative;
+
+    this.setState({ ...this.state, representative: representative, searchValue: "" });
+  }
+
+  public componentDidMount(): void {
+    this.getRepresentative();
+  }
+
+  public render() {
+    const searchValue = this.state.searchValue.toLowerCase();
+    const representativeData = this.state.representative
+      .filter((item) => item.wallet.match(searchValue) || item.name.toLowerCase().match(searchValue))
+      .map((item, index) =>
+        <FindRepresentativeItem key={index} representative={item} onRepClick={() => this.props.onAddRepresentative(item.wallet)} />);
+    return (
+      <div className="modal find-representative" >
+        <div className="modal__title">
+          Find a Representative
+        <div onClick={this.props.onFindRepresentativeClose}>
+            <CloseIcon className="modal__close" />
+          </div>
+        </div>
+        <div>
+          <div className="input-wrapper">
+            <Search />
+            <input placeholder="Search"
+              onChange={this.onSearch}
+              value={this.state.searchValue} />
+          </div>
+          <div className="header-find-representative">
+            <span className="representative">Representative</span>
+            <span className="stake">Stake</span>
+          </div>
+          <ul>
+            <SimpleBar style={{ maxHeight: "50vh" }} autoHide={false}>
+              {representativeData}
+            </SimpleBar>
+          </ul>
         </div>
       </div>
-      <div>
-        <div className="input-wrapper">
-          <Search />
-          <input placeholder="Search" />
-        </div>
-        <div className="header-find-representative">
-          <span className="representative">Representative</span>
-          <span className="stake">Stake</span>
-        </div>
-        <ul>
-          <li className="item-find-representative">
-            <div className="photo"></div>
-            <div className="name">Chris Bronson</div>
-            <div className="token">
-              <BzrxIcon />
-              <span>254,540.30</span>
-            </div>
-            <div className="token">
-              <VBzrxIcon />
-              <span>254,540.30</span>
-            </div>
-            <div className="token">
-              <BPTIcon />
-              <span>0.30</span>
-            </div>
-          </li>
-          <li className="item-find-representative">
-            <div className="photo"></div>
-            <div className="name">Chris Bronson</div>
-            <div className="token">
-              <BzrxIcon />
-              <span>21,540.30</span>
-            </div>
-            <div className="token">
-              <VBzrxIcon />
-              <span>540.30</span>
-            </div>
-            <div className="token">
-              <BPTIcon />
-              <span>0.3</span>
-            </div>
-          </li>
-        </ul>
-      </div>
-    </div>
-  );
+    );
+  }
+
+  public onSearch = (event: ChangeEvent<HTMLInputElement>) => {
+    let value = event.target.value ? event.target.value : "";
+    this.setState({ ...this.state, searchValue: value.toLowerCase() })
+  }
+
 }

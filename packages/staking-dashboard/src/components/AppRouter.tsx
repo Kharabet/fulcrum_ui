@@ -10,8 +10,6 @@ import Modal from "react-modal";
 
 import Intercom from "react-intercom";
 import { ProviderMenu } from "./ProviderMenu";
-import { FindRepresentative } from "./FindRepresentative";
-import { BecomeRepresentative } from "./BecomeRepresentative";
 
 
 import React, { Component } from "react";
@@ -46,8 +44,6 @@ if (isMainnetProd) {
 
 interface IAppRouterState {
   isProviderMenuModalOpen: boolean;
-  isFindRepresentativeOpen: boolean;
-  isBecomeRepresentativeOpen: boolean;
   isLoading: boolean;
   selectedProviderType: ProviderType;
   web3: Web3Wrapper | null;
@@ -60,8 +56,6 @@ export class AppRouter extends Component<any, IAppRouterState> {
     super(props);
     this.state = {
       isProviderMenuModalOpen: false,
-      isFindRepresentativeOpen: false,
-      isBecomeRepresentativeOpen: false,
       isLoading: false,
       selectedProviderType: StakingProvider.Instance.providerType,
       web3: StakingProvider.Instance.web3Wrapper,
@@ -133,7 +127,10 @@ export class AppRouter extends Component<any, IAppRouterState> {
   };
 
   public onRequestClose = async () => {
-    await this._isMounted && this.setState({ ...this.state, isProviderMenuModalOpen: false, isFindRepresentativeOpen: false, isBecomeRepresentativeOpen: false });
+    await this._isMounted && this.setState({
+      ...this.state,
+      isProviderMenuModalOpen: false,
+    });
   };
   public componentWillUnmount(): void {
     this._isMounted = false;
@@ -167,13 +164,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
     await this._isMounted && !this.state.isProviderMenuModalOpen && this.setState({ ...this.state, isProviderMenuModalOpen: true });
   };
 
-  public openFindRepresentative = () => {
-    this._isMounted && !this.state.isFindRepresentativeOpen && this.setState({ ...this.state, isFindRepresentativeOpen: true });
-  };
 
-  public openBecomeRepresentative = () => {
-    this._isMounted && !this.state.isBecomeRepresentativeOpen && this.setState({ ...this.state, isBecomeRepresentativeOpen: true });
-  };
 
   public onProviderChanged = async (event: ProviderChangedEvent) => {
     await this._isMounted && this.setState({
@@ -200,26 +191,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
             onProviderMenuClose={this.onRequestClose}
           />
         </Modal>
-        <Modal
-          isOpen={this.state.isFindRepresentativeOpen}
-          onRequestClose={this.onRequestClose}
-          className="modal-content-div"
-          overlayClassName="modal-overlay-div"
-        >
-          <FindRepresentative 
-            onFindRepresentativeClose={this.onRequestClose}
-          />
-        </Modal>
-        <Modal
-          isOpen={this.state.isBecomeRepresentativeOpen}
-          onRequestClose={this.onRequestClose}
-          className="modal-content-div"
-          overlayClassName="modal-overlay-div"
-        >
-          <BecomeRepresentative 
-            onBecomeRepresentativeClose={this.onRequestClose}
-          />
-        </Modal>
+
         {isMainnetProd ? (
           <Intercom appID="dfk4n5ut" />
         ) : null}
@@ -227,7 +199,7 @@ export class AppRouter extends Component<any, IAppRouterState> {
           <LocationListener doNetworkConnect={this.doNetworkConnect}>
             <Switch>
               <Route exact={true} path="/">
-                <DashboardPage isMobileMedia={this.state.isMobileMedia} doNetworkConnect={this.doNetworkConnect} openFindRepresentative={this.openFindRepresentative} openBecomeRepresentative={this.openBecomeRepresentative} />
+                <DashboardPage isMobileMedia={this.state.isMobileMedia} doNetworkConnect={this.doNetworkConnect} />
               </Route>
               {/* <Route path="/transactions">
                 <TransactionsPage isMobileMedia={this.state.isMobileMedia} doNetworkConnect={this.doNetworkConnect} />

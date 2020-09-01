@@ -64,6 +64,10 @@ export class StakingProvider {
   public isLoading: boolean = false;
   public unsupportedNetwork: boolean = false;
 
+  public static readonly UNLIMITED_ALLOWANCE_IN_BASE_UNITS = new BigNumber(2)
+    .pow(256)
+    .minus(1);
+
   constructor() {
     // init
     this.eventEmitter = new EventEmitter();
@@ -436,6 +440,86 @@ export class StakingProvider {
     return txReceipt.status === 1 ? txReceipt : null;
   }
 
+  public async stake(bzrxAmount: BigNumber, vbzrxAmount: BigNumber, bptAmount: BigNumber, address: string) {
+    let receipt = null;
+
+    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+    if (!this.contractsSource) return receipt;
+
+    const bzrxStakigContract = await this.contractsSource.getBZRXStakingInterimContract();
+    if (!account || !bzrxStakigContract) return receipt;
+
+
+    const bzrxErc20Address = this.getErc20AddressOfAsset(Asset.BZRX);
+    const vbzrxErc20Address = this.getErc20AddressOfAsset(Asset.vBZRX);
+    const bptErc20Address = this.getErc20AddressOfAsset(Asset.BPT);
+    if (!bzrxErc20Address || !vbzrxErc20Address || !bptErc20Address) return receipt;
+
+    // const bzrxTokenErc20Contract = await this.contractsSource.getErc20Contract(bzrxErc20Address);
+    // const bzrxallowance = await bzrxTokenErc20Contract.allowance.callAsync(account, bzrxStakigContract.address);
+    // if (bzrxAmount.gt(bzrxallowance)) {
+    //   await bzrxTokenErc20Contract!.approve.sendTransactionAsync(bzrxStakigContract.address, bzrxAmount, { from: account });
+    // }
+    // const vbzrxTokenErc20Contract = await this.contractsSource.getErc20Contract(vbzrxErc20Address);
+    // const vbzrxallowance = await bzrxTokenErc20Contract.allowance.callAsync(account, bzrxStakigContract.address);
+    // if (vbzrxAmount.gt(vbzrxallowance)) {
+    //   await vbzrxTokenErc20Contract!.approve.sendTransactionAsync(bzrxStakigContract.address, vbzrxAmount, { from: account });
+    // }
+    // const bptTokenErc20Contract = await this.contractsSource.getErc20Contract(bptErc20Address);
+    // const bptallowance = await bzrxTokenErc20Contract.allowance.callAsync(account, bzrxStakigContract.address);
+    // if (bptAmount.gt(bptallowance)) {
+    //   await bptTokenErc20Contract!.approve.sendTransactionAsync(bzrxStakigContract.address, bptAmount, { from: account });
+    // }
+
+    let gasAmountBN;
+    let gasAmount;
+    try {
+      gasAmount = account.toLowerCase() === address.toLowerCase()
+        ? await bzrxStakigContract.stake.estimateGasAsync(
+          [bzrxErc20Address, vbzrxErc20Address, bptErc20Address],
+          [bzrxAmount, vbzrxAmount, bptAmount],
+          {
+            from: account,
+            gas: this.gasLimit,
+          })
+        : await bzrxStakigContract.stakeWithDelegate.estimateGasAsync(
+          [bzrxErc20Address, vbzrxErc20Address, bptErc20Address],
+          [bzrxAmount, vbzrxAmount, bptAmount],
+          address,
+          {
+            from: account,
+            gas: this.gasLimit,
+          })
+      gasAmountBN = new BigNumber(gasAmount).multipliedBy(this.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
+
+    }
+    catch (e) {
+      console.error(e);
+    }
+
+    const txHash = account.toLowerCase() === address.toLowerCase()
+      ? await bzrxStakigContract.stake.sendTransactionAsync(
+        [bzrxErc20Address, vbzrxErc20Address, bptErc20Address],
+        [bzrxAmount, vbzrxAmount, bptAmount],
+        {
+          from: account,
+          gas: gasAmountBN,
+          gasPrice: await this.gasPrice()
+        })
+      : await bzrxStakigContract.stakeWithDelegate.sendTransactionAsync(
+        [bzrxErc20Address, vbzrxErc20Address, bptErc20Address],
+        [bzrxAmount, vbzrxAmount, bptAmount],
+        address,
+        {
+          from: account,
+          gas: gasAmountBN,
+          gasPrice: await this.gasPrice()
+        })
+
+    const txReceipt = await this.waitForTransactionMined(txHash);
+    return txReceipt.status === 1 ? txReceipt : null;
+  }
+
   public async convertBzrxV1ToV2(tokenAmount: BigNumber) {
     let receipt = null;
 
@@ -565,7 +649,7 @@ export class StakingProvider {
     let receipt = null;
 
     const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
-    if (!this.contractsSource) return receipt;
+    if (!this.contractsSource || !this.contractsSource.canWrite) return receipt;
 
     const traderCompensationContract = await this.contractsSource.getTraderCompensationContract();
     if (!account || !traderCompensationContract) return receipt;
@@ -595,6 +679,201 @@ export class StakingProvider {
 
     const txReceipt = await this.waitForTransactionMined(txHash);
     return txReceipt.status === 1 ? txReceipt : null;
+  }
+
+
+  public doBecomeRepresentative = async () => {
+    let receipt = null;
+
+    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+    if (!this.contractsSource || !this.contractsSource.canWrite) return receipt;
+
+    const bzrxStakingContract = await this.contractsSource.getBZRXStakingInterimContract();
+    if (!account || !bzrxStakingContract) return receipt;
+
+    let gasAmountBN;
+    let gasAmount;
+    try {
+      gasAmount = await bzrxStakingContract.setRepActive.estimateGasAsync(
+        true,
+        {
+          from: account,
+          gas: this.gasLimit,
+        });
+      gasAmountBN = new BigNumber(gasAmount).multipliedBy(this.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
+
+    }
+    catch (e) {
+      console.error(e);
+    }
+
+    const txHash = await bzrxStakingContract.setRepActive.sendTransactionAsync(
+      true,
+      {
+        from: account,
+        gas: this.gasLimit,
+        gasPrice: await this.gasPrice()
+      });
+
+    const txReceipt = await this.waitForTransactionMined(txHash);
+    return txReceipt.status === 1 ? txReceipt : null;
+  }
+
+  public getRepresentatives = async (): Promise<{ wallet: string, BZRX: BigNumber, vBZRX: BigNumber, LPToken: BigNumber }[]> => {
+    let result: { wallet: string, BZRX: BigNumber, vBZRX: BigNumber, LPToken: BigNumber }[] = [];
+
+    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+    if (!this.contractsSource) return result;
+
+    const bzrxStakingContract = await this.contractsSource.getBZRXStakingInterimContract();
+    if (!account || !bzrxStakingContract) return result;
+
+    const repVotes = await bzrxStakingContract.getRepVotes.callAsync(
+      new BigNumber(0),
+      new BigNumber(1000),
+      {
+        from: account
+      });
+
+    result = result.concat(repVotes);
+    return result;
+  }
+
+  public checkIsRep = async (): Promise<boolean> => {
+    let result = false
+
+    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+    if (!this.contractsSource) return result;
+
+    const bzrxStakingContract = await this.contractsSource.getBZRXStakingInterimContract();
+    if (!account || !bzrxStakingContract) return result;
+
+    result = await bzrxStakingContract.reps.callAsync(
+      account,
+      {
+        from: account
+      });
+
+    return result;
+  }
+
+  public stakeableByAsset = async (asset: Asset): Promise<BigNumber> => {
+    let result = new BigNumber(0);
+
+    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+    if (!this.contractsSource) return result;
+
+    const bzrxStakingContract = await this.contractsSource.getBZRXStakingInterimContract();
+    if (!account || !bzrxStakingContract) return result;
+
+    const tokenErc20Address = this.getErc20AddressOfAsset(asset);
+    if (!tokenErc20Address) return result;
+    const stakeable = await bzrxStakingContract.stakeableByAsset.callAsync(
+      tokenErc20Address,
+      account,
+      {
+        from: account
+      });
+
+    result = stakeable;
+    return result;
+  }
+
+  public balanceOfByAsset = async (asset: Asset): Promise<BigNumber> => {
+    let result = new BigNumber(0);
+
+    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+    if (!this.contractsSource) return result;
+
+    const bzrxStakingContract = await this.contractsSource.getBZRXStakingInterimContract();
+    if (!account || !bzrxStakingContract) return result;
+
+    const tokenErc20Address = this.getErc20AddressOfAsset(asset);
+    if (!tokenErc20Address) return result;
+    const balanceOf = await bzrxStakingContract.balanceOfByAsset.callAsync(
+      tokenErc20Address,
+      account,
+      {
+        from: account
+      });
+
+    result = balanceOf;
+    return result;
+  }
+
+  public getUserEarnings = async (): Promise<BigNumber> => {
+    let result = new BigNumber(0);
+
+    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+    if (!this.contractsSource) return result;
+   
+    const bzrxStakingContract = await this.contractsSource.getBZRXStakingInterimContract();
+    if (!account || !bzrxStakingContract) return result;
+
+    const earnedUsdAmount = await bzrxStakingContract.earned.callAsync(
+      account,
+      {
+        from: account
+      });
+
+    return earnedUsdAmount;
+  }
+
+  public async getSwapToUsdRate(asset: Asset): Promise<BigNumber> {
+    if (asset === Asset.DAI || asset === Asset.USDC || asset === Asset.SUSD || asset === Asset.USDT) {
+      return new BigNumber(1);
+    }
+
+    /*const swapRates = await this.getSwapToUsdRateBatch(
+      [asset],
+      Asset.DAI
+    );
+
+    return swapRates[0][0];*/
+    return this.getSwapRate(
+      asset,
+      Asset.DAI
+    );
+  }
+
+  public async getSwapRate(srcAsset: Asset, destAsset: Asset, srcAmount?: BigNumber): Promise<BigNumber> {
+    if (srcAsset === destAsset || (srcAsset === Asset.USDC && destAsset === Asset.DAI)
+      || (srcAsset === Asset.DAI && destAsset === Asset.USDC)) {
+      return new BigNumber(1);
+    }
+    // console.log("srcAmount 11 = "+srcAmount)
+    let result: BigNumber = new BigNumber(0);
+    const srcAssetErc20Address = this.getErc20AddressOfAsset(srcAsset);
+    const destAssetErc20Address = this.getErc20AddressOfAsset(destAsset);
+    if (!srcAmount) {
+      srcAmount = StakingProvider.UNLIMITED_ALLOWANCE_IN_BASE_UNITS;
+    } else {
+      srcAmount = new BigNumber(srcAmount.toFixed(1, 1));
+    }
+
+    if (this.contractsSource && srcAssetErc20Address && destAssetErc20Address) {
+      const oracleContract = await this.contractsSource.getOracleContract();
+
+
+      const srcAssetDecimals = AssetsDictionary.assets.get(srcAsset)!.decimals || 18;
+      const srcAssetPrecision = new BigNumber(10 ** (18 - srcAssetDecimals));
+      const destAssetDecimals = AssetsDictionary.assets.get(destAsset)!.decimals || 18;
+      const destAssetPrecision = new BigNumber(10 ** (18 - destAssetDecimals));
+
+      try {
+        const swapPriceData: BigNumber[] = await oracleContract.queryRate.callAsync(
+          srcAssetErc20Address,
+          destAssetErc20Address
+        );
+        // console.log("swapPriceData- ",swapPriceData[0])
+        result = swapPriceData[0].times(srcAssetPrecision).div(destAssetPrecision).dividedBy(10 ** 18)
+          .multipliedBy(swapPriceData[1].dividedBy(10 ** 18));// swapPriceData[0].dividedBy(10 ** 18);
+      } catch (e) {
+        console.log(e)
+        result = new BigNumber(0);
+      }
+    }
+    return result;
   }
 
   public waitForTransactionMined = async (
