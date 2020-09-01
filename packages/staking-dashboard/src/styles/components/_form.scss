@@ -20,15 +20,20 @@
     @media screen and (max-width: $width-max-xs) {
       padding: 30px;
     }
-    &.balance{
+    &.balance {
       flex-wrap: wrap;
       flex-direction: row;
-      > .balance-item{
+      > .balance-item {
         width: 100%;
-        @media screen and (min-width: $width-min-xs){
+        @media screen and (min-width: $width-min-xs) {
           width: 50%;
         }
       }
+    }
+    .notice {
+      text-align: center;
+      padding: 0 25px;
+      font-size: 14px;
     }
     .row-header {
       font-weight: 800;

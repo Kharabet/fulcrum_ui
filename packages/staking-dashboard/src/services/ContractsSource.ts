@@ -8,6 +8,8 @@ import { iETHBuyBackContract } from "../contracts/iETHBuyBack";
 import { traderCompensationContract } from "../contracts/traderCompensation";
 import { iBZxContract } from "../contracts/iBZxContract";
 
+import { oracleContract } from "../contracts/oracle";
+
 const ethNetwork = process.env.REACT_APP_ETH_NETWORK;
 
 interface ITokenContractInfo {
@@ -30,6 +32,7 @@ export class ContractsSource {
   private static iETHBuyBack: any;
   private static traderCompensation: any;
   private static iBZxJson: any;
+  private static oracleJson: any;
 
   public networkId: number;
   public canWrite: boolean;
@@ -51,6 +54,7 @@ export class ContractsSource {
     ContractsSource.iETHBuyBack = await import(`./../assets/artifacts/${ethNetwork}/iETHBuyBack.json`);
     ContractsSource.traderCompensation = await import(`./../assets/artifacts/${ethNetwork}/traderCompensation.json`);
     ContractsSource.iBZxJson = await import(`./../assets/artifacts/${ethNetwork}/iBZx.json`);
+    ContractsSource.oracleJson = await import(`./../assets/artifacts/${ethNetwork}/oracle.json`);
 
     const iTokenList = (await import(`../assets/artifacts/${ethNetwork}/iTokenList.js`)).iTokenList;
     iTokenList.forEach((val: any, index: any) => {
@@ -72,7 +76,26 @@ export class ContractsSource {
     ContractsSource.isInit = true;
   }
 
-  
+  public getOracleAddress(): string {
+    let address: string = "";
+    switch (this.networkId) {
+      case 1:
+        address = "0xee14de2e67e1ec23c8561a6fad2635ff1b618db6";
+        break;
+      case 3:
+        address = "0x4330762418df3555ddd1d732200b317c9239b941";
+        break;
+      case 4:
+        address = "0x76de3d406fee6c3316558406b17ff785c978e98c";
+        break;
+      case 42:
+        address = "0x61c1dDcD58Ac1Fc80f5C5572b48EfA032bb3736E";
+        break;
+    }
+
+    return address;
+  }
+
   public getiBZxAddress(): string {
     let address: string = "";
     switch (this.networkId) {
@@ -233,6 +256,7 @@ export class ContractsSource {
     const tokenContractInfo = ContractsSource.iTokensContractInfos.get(symbol) || null;
     return tokenContractInfo ? tokenContractInfo.token : null;
   }
+  
 
   private async getErc20ContractRaw(addressErc20: string): Promise<erc20Contract> {
     await this.Init();
@@ -244,6 +268,15 @@ export class ContractsSource {
     return new convertContract(
       ContractsSource.convertJson.abi,
       this.getConvertAddress().toLowerCase(),
+      this.provider
+    );
+  }
+
+  private async getOracleContractRaw(): Promise<oracleContract> {
+    await this.Init();
+    return new oracleContract(
+      ContractsSource.oracleJson.abi,
+      this.getOracleAddress().toLowerCase(),
       this.provider
     );
   }
@@ -289,4 +322,5 @@ export class ContractsSource {
   public getBZRXStakingInterimContract = _.memoize(this.getBZRXStakingInterimContractRaw);
   public getiETHBuyBackContract = _.memoize(this.getiETHBuyBackContractRaw);
   public getiBZxContract = _.memoize(this.getiBZxContractRaw);
+  public getOracleContract = _.memoize(this.getOracleContractRaw);
 }

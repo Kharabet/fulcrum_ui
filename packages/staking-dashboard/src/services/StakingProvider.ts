@@ -64,6 +64,10 @@ export class StakingProvider {
   public isLoading: boolean = false;
   public unsupportedNetwork: boolean = false;
 
+  public static readonly UNLIMITED_ALLOWANCE_IN_BASE_UNITS = new BigNumber(2)
+    .pow(256)
+    .minus(1);
+
   constructor() {
     // init
     this.eventEmitter = new EventEmitter();
@@ -794,6 +798,81 @@ export class StakingProvider {
       });
 
     result = balanceOf;
+    return result;
+  }
+
+  public getUserEarnings = async (): Promise<BigNumber> => {
+    let result = new BigNumber(0);
+
+    const account = this.accounts.length > 0 && this.accounts[0] ? this.accounts[0].toLowerCase() : null;
+    if (!this.contractsSource) return result;
+   
+    const bzrxStakingContract = await this.contractsSource.getBZRXStakingInterimContract();
+    if (!account || !bzrxStakingContract) return result;
+
+    const earnedUsdAmount = await bzrxStakingContract.earned.callAsync(
+      account,
+      {
+        from: account
+      });
+
+    return earnedUsdAmount;
+  }
+
+  public async getSwapToUsdRate(asset: Asset): Promise<BigNumber> {
+    if (asset === Asset.DAI || asset === Asset.USDC || asset === Asset.SUSD || asset === Asset.USDT) {
+      return new BigNumber(1);
+    }
+
+    /*const swapRates = await this.getSwapToUsdRateBatch(
+      [asset],
+      Asset.DAI
+    );
+
+    return swapRates[0][0];*/
+    return this.getSwapRate(
+      asset,
+      Asset.DAI
+    );
+  }
+
+  public async getSwapRate(srcAsset: Asset, destAsset: Asset, srcAmount?: BigNumber): Promise<BigNumber> {
+    if (srcAsset === destAsset || (srcAsset === Asset.USDC && destAsset === Asset.DAI)
+      || (srcAsset === Asset.DAI && destAsset === Asset.USDC)) {
+      return new BigNumber(1);
+    }
+    // console.log("srcAmount 11 = "+srcAmount)
+    let result: BigNumber = new BigNumber(0);
+    const srcAssetErc20Address = this.getErc20AddressOfAsset(srcAsset);
+    const destAssetErc20Address = this.getErc20AddressOfAsset(destAsset);
+    if (!srcAmount) {
+      srcAmount = StakingProvider.UNLIMITED_ALLOWANCE_IN_BASE_UNITS;
+    } else {
+      srcAmount = new BigNumber(srcAmount.toFixed(1, 1));
+    }
+
+    if (this.contractsSource && srcAssetErc20Address && destAssetErc20Address) {
+      const oracleContract = await this.contractsSource.getOracleContract();
+
+
+      const srcAssetDecimals = AssetsDictionary.assets.get(srcAsset)!.decimals || 18;
+      const srcAssetPrecision = new BigNumber(10 ** (18 - srcAssetDecimals));
+      const destAssetDecimals = AssetsDictionary.assets.get(destAsset)!.decimals || 18;
+      const destAssetPrecision = new BigNumber(10 ** (18 - destAssetDecimals));
+
+      try {
+        const swapPriceData: BigNumber[] = await oracleContract.queryRate.callAsync(
+          srcAssetErc20Address,
+          destAssetErc20Address
+        );
+        // console.log("swapPriceData- ",swapPriceData[0])
+        result = swapPriceData[0].times(srcAssetPrecision).div(destAssetPrecision).dividedBy(10 ** 18)
+          .multipliedBy(swapPriceData[1].dividedBy(10 ** 18));// swapPriceData[0].dividedBy(10 ** 18);
+      } catch (e) {
+        console.log(e)
+        result = new BigNumber(0);
+      }
+    }
     return result;
   }
 

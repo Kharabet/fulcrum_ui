@@ -31,6 +31,7 @@ interface IFormState {
   iETHSwapRate: BigNumber;
   whitelistAmount: BigNumber;
   claimableAmount: BigNumber;
+  userEarnings: BigNumber;
   canOptin: boolean;
   isFindRepresentativeOpen: boolean;
   selectedRepAddress: string;
@@ -61,7 +62,8 @@ export class Form extends Component<{}, IFormState> {
       selectedRepAddress: "",
       topRepsList: [],
       otherRepsList: [],
-      repsList: []
+      repsList: [],
+      userEarnings: new BigNumber(0)
     };
 
     this._isMounted = false;
@@ -108,6 +110,7 @@ export class Form extends Component<{}, IFormState> {
     //const iETHSwapRate = userData[0].div(10 ** 18);
     //const whitelistAmount = userData[1].div(10 ** 18);
 
+    const userEarnings = await StakingProvider.Instance.getUserEarnings();
     this._isMounted && this.setState({
       ...this.state,
       bzrxV1Balance,
@@ -124,7 +127,8 @@ export class Form extends Component<{}, IFormState> {
       canOptin,
       repsList,
       topRepsList,
-      otherRepsList
+      otherRepsList,
+      userEarnings
     })
   }
 
@@ -333,27 +337,29 @@ export class Form extends Component<{}, IFormState> {
                   </div>
                 </div>
               </div>
+              <p className="notice">You should not transfer out the tokens from wallet once they staked, otherwise you will lose some or all of staked balance.</p>
             </div>
             <div className="calculator-row">
               <div className="reward-item">
                 <div className="row-header">My rewards balance:</div>
                 <div className="row-body">
                   <div className="reward-content">
-                    <span>0</span>
-                    <div className="row-footer">bZxDAO-Balancer tokens</div>
+                    <span title={this.state.userEarnings.toFixed(18)}>${this.state.userEarnings.toFixed(2)}</span>
+                    {/* <div className="row-footer">bZxDAO-Balancer tokens</div> */}
                   </div>
-                  <button title="Claim Rewards" className="button">Claim Rewards</button>
+                  <button title="Claim Rewards" disabled={true} className="button">Claim Rewards</button>
                 </div>
               </div>
             </div>
-            <div className="convert-button" style={{ marginTop: "20px" }}>
-              {this.state.bzrxV1Balance.gt(0) &&
-                <button className="button button-full-width" onClick={this.onBzrxV1ToV2ConvertClick}>
-                  Convert BZRX v1 to v2
+
+            {this.state.bzrxV1Balance.gt(0) && <div className="convert-button" style={{ marginTop: "20px" }}>
+              <button className="button button-full-width" onClick={this.onBzrxV1ToV2ConvertClick}>
+                Convert BZRX v1 to v2
                     <span className="notice">You will need to confirm 2 transactions in your wallet.</span>
-                </button>
-              }
+              </button>
             </div>
+            }
+
             {/*this.state.iETHSwapRate.gt(0) && swapAmountAllowed.gt(0) &&
               <div className="convert-button">
                 <button title={`Convert ${swapAmountAllowed.toFixed(18)} iETH into ${swapAmountAllowed.div(this.state.iETHSwapRate).toFixed(18)} vBZRX`} className="button button-full-width" onClick={this.onIETHtoVBZRXConvertClick}>
@@ -398,7 +404,7 @@ export class Form extends Component<{}, IFormState> {
             </div>
             {this.state.selectedRepAddress !== "" &&
               <AddToBalance
-                bzrxMax={Number(this.state.bzrxV1Balance)}
+                bzrxMax={Number(this.state.bzrxBalance)}
                 vbzrxMax={Number(this.state.vBzrxBalance)}
                 bptMax={Number(this.state.bptBalance)}
                 stake={this.onStakeClick}

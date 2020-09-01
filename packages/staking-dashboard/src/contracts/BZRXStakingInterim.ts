@@ -92,7 +92,7 @@ export class BZRXStakingInterimContract extends BaseContract {
             txData: Partial<TxData> = {}
         ): Promise<string> {
             const self = (this as any) as BZRXStakingInterimContract;
-            const encodedData = self._strictEncodeArguments("stakeWithDelegate(address[],uint256[],string)", [tokens, values, address]);
+            const encodedData = self._strictEncodeArguments("stakeWithDelegate(address[],uint256[],address)", [tokens, values, address]);
             const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
                 {
                     to: self.address,
@@ -100,7 +100,7 @@ export class BZRXStakingInterimContract extends BaseContract {
                     data: encodedData
                 },
                 self._web3Wrapper.getContractDefaults(),
-                (self as any).stakeWithDelegate.estimateGasAsync.bind(self, tokens, values)
+                (self as any).stakeWithDelegate.estimateGasAsync.bind(self, tokens, values, address)
             );
             const txHash = await self._web3Wrapper.sendTransactionAsync(txDataWithDefaults);
             return txHash;
@@ -112,7 +112,7 @@ export class BZRXStakingInterimContract extends BaseContract {
             txData: Partial<TxData> = {}
         ): Promise<number> {
             const self = (this as any) as BZRXStakingInterimContract;
-            const encodedData = self._strictEncodeArguments("stakeWithDelegate(address[],uint256[],string)", [tokens, values, address]);
+            const encodedData = self._strictEncodeArguments("stakeWithDelegate(address[],uint256[],address)", [tokens, values, address]);
             const txDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
                 {
                     to: self.address,
@@ -130,7 +130,7 @@ export class BZRXStakingInterimContract extends BaseContract {
             address: string
             ): string {
             const self = (this as any) as BZRXStakingInterimContract;
-            const abiEncodedTransactionData = self._strictEncodeArguments("stakeWithDelegate(address[],uint256[],string)", [tokens, values, address]);
+            const abiEncodedTransactionData = self._strictEncodeArguments("stakeWithDelegate(address[],uint256[],address)", [tokens, values, address]);
             return abiEncodedTransactionData;
         },
         async callAsync(
@@ -141,7 +141,7 @@ export class BZRXStakingInterimContract extends BaseContract {
             defaultBlock?: BlockParam
         ) {
             const self = (this as any) as BZRXStakingInterimContract;
-            const encodedData = self._strictEncodeArguments("stakeWithDelegate(address[],uint256[],string)", [tokens, values, address]);
+            const encodedData = self._strictEncodeArguments("stakeWithDelegate(address[],uint256[],address)", [tokens, values, address]);
             const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
                 {
                     to: self.address,
@@ -152,7 +152,7 @@ export class BZRXStakingInterimContract extends BaseContract {
             );
             const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
             BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
-            const abiEncoder = self._lookupAbiEncoder("stakeWithDelegate(address[],uint256[],string)");
+            const abiEncoder = self._lookupAbiEncoder("stakeWithDelegate(address[],uint256[],address)");
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue(rawCallResult);
             // tslint:enable boolean-naming
@@ -342,6 +342,32 @@ export class BZRXStakingInterimContract extends BaseContract {
             const abiEncoder = self._lookupAbiEncoder("reps(address)");
             // tslint:disable boolean-naming
             const result = abiEncoder.strictDecodeReturnValue<boolean>(rawCallResult);
+            // tslint:enable boolean-naming
+            return result;
+        }
+    };
+    
+    public earned = {
+        async callAsync(
+            account: string,
+            callData: Partial<CallData> = {},
+            defaultBlock?: BlockParam
+        ): Promise<BigNumber> {
+            const self = (this as any) as BZRXStakingInterimContract;
+            const encodedData = self._strictEncodeArguments("earned(address)", [account]);
+            const callDataWithDefaults = await BaseContract._applyDefaultsToTxDataAsync(
+                {
+                    to: self.address,
+                    ...callData,
+                    data: encodedData
+                },
+                self._web3Wrapper.getContractDefaults()
+            );
+            const rawCallResult = await self._web3Wrapper.callAsync(callDataWithDefaults, defaultBlock);
+            BaseContract._throwIfRevertWithReasonCallResult(rawCallResult);
+            const abiEncoder = self._lookupAbiEncoder("earned(address)");
+            // tslint:disable boolean-naming
+            const result = abiEncoder.strictDecodeReturnValue<BigNumber>(rawCallResult);
             // tslint:enable boolean-naming
             return result;
         }

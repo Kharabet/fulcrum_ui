@@ -7,6 +7,9 @@ import { FindRepresentativeItem } from "../components/FindRepresentativeItem";
 import { IRep } from "../domain/IRep";
 
 
+import SimpleBar from 'simplebar-react';
+import 'simplebar/dist/simplebar.min.css';
+
 export interface IFindRepresentativeProps {
   representative: IRep[];
   onFindRepresentativeClose: () => void;
@@ -62,7 +65,9 @@ export class FindRepresentative extends Component<IFindRepresentativeProps, IFin
             <span className="stake">Stake</span>
           </div>
           <ul>
-            {representativeData}
+            <SimpleBar style={{ maxHeight: "50vh" }} autoHide={false}>
+              {representativeData}
+            </SimpleBar>
           </ul>
         </div>
       </div>
