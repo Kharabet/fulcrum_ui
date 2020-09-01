@@ -62,7 +62,7 @@ export class AddToBalance extends Component<IAddToBalanceProps, IAddToBalanceSta
             <React.Fragment>
                 <div className="add-to-balance calculator-row">
                     <label>Add to staking balance</label>
-                    {this.state.bzrxBalance > 0 &&
+                    {this.props.bzrxMax > 0 &&
                         <div className="calc-item">
                             <input className="add-to-balance__input" type="number" title={this.state.bzrxBalance.toFixed(18)} value={this.state.inputBzrxBalance} onChange={this.changeBzrxBalance} />
                             <div className="add-to-balance__range">
@@ -74,7 +74,7 @@ export class AddToBalance extends Component<IAddToBalanceProps, IAddToBalanceSta
                             <TokenBzrx className="token-logo"></TokenBzrx>
                         </div>
                     }
-                    {this.state.vBzrxBalance > 0 &&
+                    {this.props.vbzrxMax > 0 &&
                         <div className="calc-item">
                             <input className="add-to-balance__input" type="number" title={this.state.vBzrxBalance.toFixed(18)} value={this.state.inputVBzrxBalance} onChange={this.changeVBzrxBalance} />
                             <div className="add-to-balance__range">
@@ -87,7 +87,7 @@ export class AddToBalance extends Component<IAddToBalanceProps, IAddToBalanceSta
                             <TokenVBzrx className="token-logo"></TokenVBzrx>
                         </div>
                     }
-                    {this.state.bptBalance > 0 &&
+                    {this.props.bptMax > 0 &&
                         <div className="calc-item">
                             <input className="add-to-balance__input" type="number" title={this.state.bptBalance.toFixed(18)} value={this.state.inputBptBalance} onChange={this.changeBptBalance} />
                             <div className="add-to-balance__range">
