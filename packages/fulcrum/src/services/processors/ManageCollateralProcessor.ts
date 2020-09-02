@@ -73,7 +73,7 @@ export class ManageCollateralProcessor {
       // Waiting for token allowance
       task.processingStepNext();
       if (collateralAmountInBaseUnits.gt(erc20allowance)) {
-        const approveHash = await tokenErc20Contract!.approve.sendTransactionAsync(FulcrumProvider.Instance.contractsSource.getBZxVaultAddress().toLowerCase(), FulcrumProvider.Instance.getLargeApprovalAmount(taskRequest.collateralAsset), { from: account });
+        const approveHash = await tokenErc20Contract!.approve.sendTransactionAsync(FulcrumProvider.Instance.contractsSource.getBZxVaultAddress().toLowerCase(), FulcrumProvider.Instance.getLargeApprovalAmount(taskRequest.collateralAsset, collateralAmountInBaseUnits), { from: account });
         await FulcrumProvider.Instance.waitForTransactionMined(approveHash, taskRequest);
       }
     }
