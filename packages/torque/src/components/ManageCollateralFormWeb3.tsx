@@ -154,7 +154,7 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
               .times(10 ** 18);
 
             if (maxCollateral.lt(currentCollateral)) {
-              maxCollateral = currentCollateral;
+              maxCollateral = currentCollateral.times(1.1);
             }
 
             // new_v = (new_max - new_min) / (old_max - old_min) * (v - old_min) + new_min
@@ -450,14 +450,19 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
 
 
   public onTradeAmountChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const inputAmountText = event.target.value ? event.target.value : "";
+    const inputAmountText = (this.state.collateralExcess.isEqualTo(0) && Number(event.target.value) < 0) ?
+      "0"
+      : event.target.value ?
+        event.target.value
+        : "";
+
     this.setState({
       ...this.state,
       inputAmountText
     }, () => {
-      // emitting next event for processing with rx.js
-      if (Math.abs(Number(inputAmountText)) === 0) return;
-      this._inputChange.next(inputAmountText);
+      // emitting next event for processing with rx.js    
+      Number(inputAmountText) !== 0 &&
+        this._inputChange.next(inputAmountText);
     });
   };
 
