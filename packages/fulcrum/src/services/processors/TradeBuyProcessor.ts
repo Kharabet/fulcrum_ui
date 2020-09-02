@@ -84,7 +84,7 @@ export class TradeBuyProcessor {
 
       // Prompting token allowance
       if (amountInBaseUnits.gt(erc20allowance)) {
-        approvePromise = tokenErc20Contract!.approve.sendTransactionAsync(tokenContract.address, FulcrumProvider.Instance.getLargeApprovalAmount(taskRequest.depositToken), { from: account });
+        approvePromise = tokenErc20Contract!.approve.sendTransactionAsync(tokenContract.address, FulcrumProvider.Instance.getLargeApprovalAmount(taskRequest.depositToken, amountInBaseUnits), { from: account });
       }
       task.processingStepNext();
       task.processingStepNext();

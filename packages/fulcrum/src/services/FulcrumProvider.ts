@@ -418,38 +418,46 @@ export class FulcrumProvider {
     return result;
   };*/
 
-  public getLargeApprovalAmount = (asset: Asset): BigNumber => {
+  public getLargeApprovalAmount = (asset: Asset, neededAmount: BigNumber = new BigNumber(0)): BigNumber => {
+    let amount = new BigNumber(0);
+
     switch (asset) {
       case Asset.ETH:
       case Asset.WETH:
       case Asset.fWETH:
-        return new BigNumber(10**18).multipliedBy(1500);
+        amount = new BigNumber(10 ** 18).multipliedBy(1500);
       case Asset.WBTC:
-        return new BigNumber(10**8).multipliedBy(25);
+        amount = new BigNumber(10 ** 8).multipliedBy(25);
       case Asset.LINK:
-        return new BigNumber(10**18).multipliedBy(60000);
+        amount = new BigNumber(10 ** 18).multipliedBy(60000);
       case Asset.ZRX:
-        return new BigNumber(10**18).multipliedBy(750000);
+        amount = new BigNumber(10 ** 18).multipliedBy(750000);
       case Asset.KNC:
-        return new BigNumber(10**18).multipliedBy(550000);
+        amount = new BigNumber(10 ** 18).multipliedBy(550000);
       case Asset.BAT:
-        return new BigNumber(10**18).multipliedBy(750000);
+        amount = new BigNumber(10 ** 18).multipliedBy(750000);
       case Asset.DAI:
       case Asset.SAI:
       case Asset.SUSD:
-      return new BigNumber(10**18).multipliedBy(375000);
+        amount = new BigNumber(10 ** 18).multipliedBy(375000);
       case Asset.USDC:
       case Asset.USDT:
-        return new BigNumber(10**6).multipliedBy(375000);
+        amount = new BigNumber(10 ** 6).multipliedBy(375000);
       case Asset.REP:
-        return new BigNumber(10**18).multipliedBy(15000);
+        amount = new BigNumber(10 ** 18).multipliedBy(15000);
       case Asset.MKR:
-        return new BigNumber(10**18).multipliedBy(1250);
+        amount = new BigNumber(10 ** 18).multipliedBy(1250);
       case Asset.CHI:
-        return new BigNumber(10 ** 18);
+        amount = new BigNumber(10 ** 18);
       default:
-        throw new Error("Invalid approval asset!");
+        break;
     }
+
+    if (amount.eq(0)) {
+      throw new Error("Invalid approval asset!");
+    }
+    
+    return amount.gt(neededAmount) ? amount : neededAmount;
   }
 
   public checkAndSetApprovalForced = async (asset: Asset, spender: string, amountInBaseUnits: BigNumber): Promise<boolean> => {

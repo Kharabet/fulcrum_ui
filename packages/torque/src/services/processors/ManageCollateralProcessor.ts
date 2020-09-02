@@ -71,7 +71,7 @@ export class ManageCollateralProcessor {
       // Waiting for token allowance
       task.processingStepNext();
       if (collateralAmountInBaseUnits.gt(erc20allowance)) {
-        const approveHash = await tokenErc20Contract!.approve.sendTransactionAsync(TorqueProvider.Instance.contractsSource.getVaultAddress().toLowerCase(), TorqueProvider.Instance.getLargeApprovalAmount(taskRequest.loanOrderState.collateralAsset), { from: account });
+        const approveHash = await tokenErc20Contract!.approve.sendTransactionAsync(TorqueProvider.Instance.contractsSource.getVaultAddress().toLowerCase(), TorqueProvider.Instance.getLargeApprovalAmount(taskRequest.loanOrderState.collateralAsset, collateralAmountInBaseUnits), { from: account });
         await TorqueProvider.Instance.waitForTransactionMined(approveHash);
       }
     }

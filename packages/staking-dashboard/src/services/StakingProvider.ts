@@ -356,14 +356,44 @@ export class StakingProvider {
   }
 
 
-  public getLargeApprovalAmount = (asset: Asset): BigNumber => {
+  public getLargeApprovalAmount = (asset: Asset, neededAmount: BigNumber = new BigNumber(0)): BigNumber => {
+    let amount = new BigNumber(0);
+
     switch (asset) {
       case Asset.BZRX:
       case Asset.BZRXv1:
+      case Asset.BPT:
         return new BigNumber(10 ** 18).multipliedBy(25000000);
+      case Asset.ETH:
+      case Asset.WETH:
+        amount = new BigNumber(10 ** 18).multipliedBy(1500);
+      case Asset.WBTC:
+        amount = new BigNumber(10 ** 8).multipliedBy(25);
+      case Asset.LINK:
+        amount = new BigNumber(10 ** 18).multipliedBy(60000);
+      case Asset.ZRX:
+        amount = new BigNumber(10 ** 18).multipliedBy(750000);
+      case Asset.KNC:
+        amount = new BigNumber(10 ** 18).multipliedBy(550000);
+      case Asset.DAI:
+      case Asset.SUSD:
+        amount = new BigNumber(10 ** 18).multipliedBy(375000);
+      case Asset.USDC:
+      case Asset.USDT:
+        amount = new BigNumber(10 ** 6).multipliedBy(375000);
+      case Asset.REP:
+        amount = new BigNumber(10 ** 18).multipliedBy(15000);
+      case Asset.MKR:
+        amount = new BigNumber(10 ** 18).multipliedBy(1250);
       default:
-        throw new Error("Invalid approval asset!");
+        break;
     }
+
+    if (amount.eq(0)) {
+      throw new Error("Invalid approval asset!");
+    }
+    
+    return amount.gt(neededAmount) ? amount : neededAmount;
   }
 
   public getiETHSwapRateWithCheck = async (): Promise<[BigNumber, BigNumber]> => {
