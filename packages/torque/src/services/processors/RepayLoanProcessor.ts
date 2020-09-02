@@ -74,7 +74,8 @@ export class RepayLoanProcessor {
         // Waiting for token allowance
         task.processingStepNext();
         if (closeAmountInBaseUnits.gt(erc20allowance)) {
-          await tokenErc20Contract!.approve.sendTransactionAsync(TorqueProvider.Instance.contractsSource.getVaultAddress().toLowerCase(), TorqueProvider.Instance.getLargeApprovalAmount(taskRequest.borrowAsset), { from: account });
+          const approveHash = await tokenErc20Contract!.approve.sendTransactionAsync(TorqueProvider.Instance.contractsSource.getVaultAddress().toLowerCase(), TorqueProvider.Instance.getLargeApprovalAmount(taskRequest.borrowAsset), { from: account });
+          await TorqueProvider.Instance.waitForTransactionMined(approveHash);
         }
       }
 

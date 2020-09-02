@@ -407,7 +407,8 @@ export class StakingProvider {
     const erc20allowance = await tokenErc20Contract.allowance.callAsync(account, buyBackContract.address);
 
     if (tokenAmount.gt(erc20allowance)) {
-      const approvePromise = await tokenErc20Contract!.approve.sendTransactionAsync(buyBackContract.address, tokenAmount, { from: account });
+      const approveHash = await tokenErc20Contract!.approve.sendTransactionAsync(buyBackContract.address, tokenAmount, { from: account });
+      await this.waitForTransactionMined(approveHash);
     }
 
 
@@ -458,29 +459,32 @@ export class StakingProvider {
     // const bzrxTokenErc20Contract = await this.contractsSource.getErc20Contract(bzrxErc20Address);
     // const bzrxallowance = await bzrxTokenErc20Contract.allowance.callAsync(account, bzrxStakigContract.address);
     // if (bzrxAmount.gt(bzrxallowance)) {
-    //   await bzrxTokenErc20Contract!.approve.sendTransactionAsync(bzrxStakigContract.address, bzrxAmount, { from: account });
+    //   const approveHash = await bzrxTokenErc20Contract!.approve.sendTransactionAsync(bzrxStakigContract.address, bzrxAmount, { from: account });
+    //   await this.waitForTransactionMined(approveHash);
     // }
     // const vbzrxTokenErc20Contract = await this.contractsSource.getErc20Contract(vbzrxErc20Address);
     // const vbzrxallowance = await bzrxTokenErc20Contract.allowance.callAsync(account, bzrxStakigContract.address);
     // if (vbzrxAmount.gt(vbzrxallowance)) {
-    //   await vbzrxTokenErc20Contract!.approve.sendTransactionAsync(bzrxStakigContract.address, vbzrxAmount, { from: account });
+    //   const approveHash = await vbzrxTokenErc20Contract!.approve.sendTransactionAsync(bzrxStakigContract.address, vbzrxAmount, { from: account });
+    //   await this.waitForTransactionMined(approveHash);
     // }
     // const bptTokenErc20Contract = await this.contractsSource.getErc20Contract(bptErc20Address);
     // const bptallowance = await bzrxTokenErc20Contract.allowance.callAsync(account, bzrxStakigContract.address);
     // if (bptAmount.gt(bptallowance)) {
-    //   await bptTokenErc20Contract!.approve.sendTransactionAsync(bzrxStakigContract.address, bptAmount, { from: account });
+    //   const approveHash = await bptTokenErc20Contract!.approve.sendTransactionAsync(bzrxStakigContract.address, bptAmount, { from: account });
+    //   await this.waitForTransactionMined(approveHash);
     // }
 
     const encoded_input = account.toLowerCase() === address.toLowerCase() ?
-    bzrxStakigContract.stake.getABIEncodedTransactionData(
-      [bzrxErc20Address, vbzrxErc20Address, bptErc20Address],
-      [bzrxAmount, vbzrxAmount, bptAmount]
-    ) : 
-    bzrxStakigContract.stakeWithDelegate.getABIEncodedTransactionData(
-      [bzrxErc20Address, vbzrxErc20Address, bptErc20Address],
-      [bzrxAmount, vbzrxAmount, bptAmount],
-      address
-    );
+      bzrxStakigContract.stake.getABIEncodedTransactionData(
+        [bzrxErc20Address, vbzrxErc20Address, bptErc20Address],
+        [bzrxAmount, vbzrxAmount, bptAmount]
+      ) :
+      bzrxStakigContract.stakeWithDelegate.getABIEncodedTransactionData(
+        [bzrxErc20Address, vbzrxErc20Address, bptErc20Address],
+        [bzrxAmount, vbzrxAmount, bptAmount],
+        address
+      );
     console.log(encoded_input);
 
     let gasAmountBN;
@@ -550,7 +554,8 @@ export class StakingProvider {
     const erc20allowance = await tokenErc20Contract.allowance.callAsync(account, convertContract.address);
 
     if (tokenAmount.gt(erc20allowance)) {
-      const approvePromise = await tokenErc20Contract!.approve.sendTransactionAsync(convertContract.address, tokenAmount, { from: account });
+      const approveHash = await tokenErc20Contract!.approve.sendTransactionAsync(convertContract.address, tokenAmount, { from: account });
+      await this.waitForTransactionMined(approveHash);
     }
 
 
@@ -830,7 +835,7 @@ export class StakingProvider {
 
     return earnedUsdAmount.div(10 ** 18);
   }
-  
+
   public getDelegateAddress = async (): Promise<string> => {
     let result = "";
 

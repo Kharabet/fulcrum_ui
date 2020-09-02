@@ -75,7 +75,8 @@ export class BorrowProcessor {
       // Waiting for token allowance
       task.processingStepNext();
       if (depositAmountInBaseUnits.gt(erc20allowance)) {
-        await tokenErc20Contract!.approve.sendTransactionAsync(iTokenContract.address, TorqueProvider.Instance.getLargeApprovalAmount(taskRequest.collateralAsset), { from: account });
+        const approveHash = await tokenErc20Contract!.approve.sendTransactionAsync(iTokenContract.address, TorqueProvider.Instance.getLargeApprovalAmount(taskRequest.collateralAsset), { from: account });
+        await TorqueProvider.Instance.waitForTransactionMined(approveHash);
       }
     }
 
