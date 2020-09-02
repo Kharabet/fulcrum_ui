@@ -1,7 +1,7 @@
 import { BigNumber } from "@0x/utils";
 import React, { ChangeEvent, Component, FormEvent } from "react";
-import { Observable, Subject } from "rxjs";
-import { debounceTime, switchMap } from "rxjs/operators";
+import { merge, Observable, Subject } from "rxjs";
+import { debounceTime, distinctUntilChanged, switchMap } from "rxjs/operators";
 import { Asset } from "../domain/Asset";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
@@ -10,8 +10,6 @@ import { ICollateralChangeEstimate } from "../domain/ICollateralChangeEstimate";
 import { ManageCollateralRequest } from "../domain/ManageCollateralRequest";
 import { TorqueProvider } from "../services/TorqueProvider";
 import Slider from "rc-slider";
-import { OpsEstimatedResult } from "./OpsEstimatedResult";
-import { InputAmount } from "./InputAmount";
 import { Loader } from "./Loader";
 
 export interface IManageCollateralFormWeb3Props {
@@ -46,7 +44,9 @@ interface IManageCollateralFormWeb3State {
 }
 
 export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb3Props, IManageCollateralFormWeb3State> {
-  private readonly selectedValueUpdate: Subject<number>;
+
+  private readonly _inputChange: Subject<string>;
+  private readonly _selectedValueUpdate: Subject<number>;
   private _input: HTMLInputElement | null = null;
 
   constructor(props: IManageCollateralFormWeb3Props, context?: any) {
@@ -73,13 +73,20 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
       isLoading: true
     };
 
-    this.selectedValueUpdate = new Subject<number>();
-    this.selectedValueUpdate
-      .pipe(
+    this._inputChange = new Subject();
+    this._selectedValueUpdate = new Subject<number>();
+
+    merge(
+      this._inputChange.pipe(
+        distinctUntilChanged(),
         debounceTime(100),
-        switchMap(value => this.rxConvertToBigNumber(value)),
-        switchMap(value => this.rxGetEstimate(value.toNumber()))
+        switchMap(value => this.rxFromInputAmount(value))
+      ),
+      this._selectedValueUpdate.pipe(
+        distinctUntilChanged()
       )
+    ).pipe(
+      switchMap(value => this.rxGetEstimate(value)))
       .subscribe((value: ICollateralChangeEstimate) => {
         this.setState({
           ...this.state,
@@ -187,7 +194,7 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
                 assetBalanceValue: assetBalanceNormalizedBN.toNumber()
               },
               () => {
-                this.selectedValueUpdate.next(this.state.selectedValue);
+                this._selectedValueUpdate.next(this.state.selectedValue);
 
               }
             );
@@ -204,8 +211,7 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
   ): void {
     if (
       prevProps.loanOrderState.loanId !== this.props.loanOrderState.loanId ||
-      prevState.loanValue !== this.state.loanValue ||
-      prevState.selectedValue !== this.state.selectedValue) {
+      prevState.loanValue !== this.state.loanValue) {
       TorqueProvider.Instance.getLoanCollateralManagementGasAmount().then(gasAmountNeeded => {
 
         this.setState(
@@ -214,7 +220,7 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
             gasAmountNeeded: gasAmountNeeded
           },
           () => {
-            this.selectedValueUpdate.next(this.state.selectedValue);
+            this._selectedValueUpdate.next(this.state.selectedValue);
           }
         );
       });
@@ -265,6 +271,7 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
             max={this.state.maxValue}
             value={this.state.selectedValue}
             onChange={this.onChange}
+            onAfterChange={this.onAfterChange}
           />
 
           <div className="manage-collateral-form__tips">
@@ -319,6 +326,8 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
   private _setInputRef = (input: HTMLInputElement) => {
     this._input = input;
   };
+
+
   private rxGetEstimate = (selectedValue: number): Observable<ICollateralChangeEstimate> => {
 
     // console.log(this.state.loanValue, selectedValue);
@@ -352,21 +361,45 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
   };
 
 
-  private rxConvertToBigNumber = (value: number): Observable<BigNumber> => {
-    const collateralAmount = new BigNumber(value);
+  private rxFromInputAmount = (value: string): Observable<number> => {
+    return new Observable<number>(observer => {
+      const collateralAmount = new BigNumber(Math.abs(Number(value)));
 
-    return new Observable<BigNumber>(observer => {
-      observer.next(collateralAmount);
+      let selectedValue = (Number(value) > 0 ?
+        collateralAmount
+          .dividedBy(this.props.loanOrderState.collateralAmount)
+          .multipliedBy(this.state.maxValue - this.state.loanValue)
+          .plus(this.state.loanValue).toNumber()
+        : this.state.collateralExcess.isEqualTo(0) ? this.state.minValue :
+          new BigNumber(this.state.loanValue)
+            .minus(
+              collateralAmount
+                .dividedBy(this.state.collateralExcess)
+                .multipliedBy(this.state.loanValue)
+            ).toNumber());
+
+      if (selectedValue < this.state.minValue) {
+        selectedValue = this.state.minValue;
+      }
+
+      this.setState({ ...this.state, selectedValue });
+      observer.next(selectedValue);
+    });
+  }
+
+
+  private onChange = async (value: number) => {
+    this.setState({
+      ...this.state,
+      selectedValue: value,
     });
   };
 
-  private onChange = async (value: number) => {
-    this.setState({ ...this.state, selectedValue: value });
+
+  private onAfterChange = (value: number) => {
+    this._selectedValueUpdate.next(this.state.selectedValue);
   };
 
-  private onUpdate = async (value: number) => {
-    this.setState({ ...this.state, selectedValue: value });
-  };
 
   public onSubmitClick = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -417,53 +450,24 @@ export class ManageCollateralFormWeb3 extends Component<IManageCollateralFormWeb
 
 
   public onTradeAmountChange = (event: ChangeEvent<HTMLInputElement>) => {
-
-    let amountText = event.target.value ? event.target.value : "";
-
-    let collateralAmount = new BigNumber(Math.abs(Number(amountText)));
-
-    if (Number(amountText) == 0) {
-
-      this.setState({
-        ...this.state,
-        inputAmountText: amountText
-      })
-    } else {
-
-      let selectedValue = (Number(amountText) > 0 ?
-
-        collateralAmount
-          .dividedBy(this.props.loanOrderState.collateralAmount)
-          .multipliedBy(this.state.maxValue - this.state.loanValue)
-          .plus(this.state.loanValue)
-        :
-        new BigNumber(this.state.loanValue)
-          .minus(
-            collateralAmount
-              .dividedBy(this.state.collateralExcess)
-              .multipliedBy(this.state.loanValue)
-          )).toNumber();
-
-
-      this.setState({
-        ...this.state,
-        inputAmountText: amountText,
-        selectedValue: selectedValue,
-        collateralAmount: collateralAmount
-      }, () => {
-        // emitting next event for processing with rx.js
-        this.selectedValueUpdate.next(this.state.selectedValue);
-      });
-
-    }
-
+    const inputAmountText = event.target.value ? event.target.value : "";
+    this.setState({
+      ...this.state,
+      inputAmountText
+    }, () => {
+      // emitting next event for processing with rx.js
+      if (Math.abs(Number(inputAmountText)) === 0) return;
+      this._inputChange.next(inputAmountText);
+    });
   };
+
 
   public changeStateLoading = () => {
     if (this.state.collateralAmount) {
       this.setState({ ...this.state, isLoading: false })
     }
   }
+
 
   public formatPrecision(outputText: string): string {
     const output = Number(outputText);
