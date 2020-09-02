@@ -7,6 +7,7 @@ import { ManageCollateralDlg } from "./ManageCollateralDlg";
 import { RepayLoanDlg } from "./RepayLoanDlg";
 import { ExtendLoanDlg } from "./ExtendLoanDlg";
 import { BorrowMoreDlg } from "./BorrowMoreDlg";
+import { TorqueProvider } from "../services/TorqueProvider";
 
 export interface IBorrowedFundsListProps {
   items: IBorrowedFundsState[];
@@ -54,7 +55,7 @@ export class BorrowedFundsList extends Component<IBorrowedFundsListProps, IBorro
     });
     
     return <div className="borrowed-funds-list">
-      {!this.props.isLoading && itemsAwaiting.length === 0 && items.length === 0
+      {!this.props.isLoading && itemsAwaiting.length === 0 && items.length === 0 && !TorqueProvider.Instance.isLoading
         && <a href="/borrow" className="no-loans-msg">Looks like you don't have any loans.</a>}
       {itemsAwaiting}
       {items}

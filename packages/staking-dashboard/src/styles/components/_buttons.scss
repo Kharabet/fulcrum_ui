@@ -21,6 +21,21 @@
   .button {
     margin-bottom: 20px;
   }
+  &.selected-delegate{
+    .no-active{
+      background: #e7ebf0;
+      cursor: not-allowed;
+      &:hover {
+        border: 2px solid transparent;
+      }
+      .name {
+        color: #ffffff;
+      }
+      .photo{
+        filter: grayscale(100%);
+      }
+    }
+  }
 }
 
 .convert-button {
@@ -29,6 +44,7 @@
   justify-content: center;
   padding: 0 45px;
   margin-bottom: 35px;
+  margin-top: 20px;
   @media screen and (max-width: $width-max-sm) {
     margin-bottom: 55px;
     padding: 0 10px;
@@ -155,9 +171,23 @@
     background-color: transparent;
     border-color: #5b88ff;
   }
+  &.active{
+    border: 2px solid #276BFB;
+    position: relative;
+    &:before{
+      content: "";
+      position: absolute;
+      left: 50%;
+      transform: translate(-50%, 0%);
+      bottom: -7px;
+      border-left: 5px solid transparent;
+      border-left: 7px solid transparent;
+      border-right: 7px solid transparent;
+      border-top: 6px solid #276BFB;
+    }
+  }
   .photo {
     margin-right: 12px;
-    border: 1px solid red;
     border-radius: 50%;
     img {
       border-radius: 50%;

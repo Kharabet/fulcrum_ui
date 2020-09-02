@@ -78,13 +78,18 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
       : this.state.borrowMoreLoanOrderState;
 
 
-
     const positionSafetyText = TorqueProvider.Instance.getPositionSafetyText(loan);
     const collateralizedStateSelector = positionSafetyText === "Safe" ?
       "safe" :
       positionSafetyText === "Danger" ?
         "danger" :
         "unsafe";
+
+    const collateralizedStateText = positionSafetyText === "Safe" ?
+      "Safe" :
+      positionSafetyText === "Danger" ?
+        "Danger" :
+        "Liquidation Pending";
 
     //115%
     const sliderMin = loan.loanData!.maintenanceMargin.div(10 ** 18).toNumber();
@@ -114,8 +119,9 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
 
               </div>
 
-              <div className={`borrow-more-loan-form__body-collateralized-state ${collateralizedStateSelector}`}>
-                {positionSafetyText}
+              <div className={`borrow-more-loan-form__body-collateralized-state ${collateralizedStateSelector}`}
+                title={collateralizedStateText === "Safe" ? "" : "Please input less vallue"}>
+                {collateralizedStateText}
               </div>
             </div>
           </div>
@@ -205,7 +211,7 @@ export class BorrowMoreForm extends Component<IBorrowMoreFormProps, IBorrowMoreF
   public onTradeAmountChange = async (event: ChangeEvent<HTMLInputElement>) => {
     // handling different types of empty values
     let amountText = event.target.value ? event.target.value : "";
-    if (amountText === "") return;
+    if (parseFloat(amountText) < 0) return;
     this.setState({
       ...this.state,
       inputAmountText: amountText,

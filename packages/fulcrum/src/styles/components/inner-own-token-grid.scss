@@ -164,6 +164,14 @@ $grid-template-columns: 10% 8% calc(11% - 35px) 11% 11% 11% 9% 9%;
     .icon-collateral-stroke {
       stroke: var(--icon-collateral);
     }
+    &.danger {
+      .icon-collateral-fill {
+        fill: #ff4f4f;
+      }
+      .icon-collateral-stroke {
+        stroke: #ff4f4f;
+      }
+    }
   }
   &__col-profit {
     display: flex;
@@ -204,6 +212,11 @@ $grid-template-columns: 10% 8% calc(11% - 35px) 11% 11% 11% 9% 9%;
     background-color: #ff4f4f;
     &:hover {
       background-color: #fe7272;
+    }
+    &:disabled {
+      background-color: var(--disabled-bg);
+      color: var(--disabled-color);
+      cursor: not-allowed;
     }
   }
   &.new-position:first-child {

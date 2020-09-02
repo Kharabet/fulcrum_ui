@@ -1,7 +1,7 @@
 import { BigNumber } from "@0x/utils";
 import React, { Component, FormEvent, ChangeEvent } from "react";
-import { Observable, Subject } from "rxjs";
-import { debounceTime, switchMap } from "rxjs/operators";
+import { merge, Observable, Subject } from "rxjs";
+import { debounceTime, distinctUntilChanged, switchMap } from "rxjs/operators";
 import { Asset } from "../domain/Asset";
 import { AssetDetails } from "../domain/AssetDetails";
 import { AssetsDictionary } from "../domain/AssetsDictionary";
@@ -32,12 +32,13 @@ interface IExtendLoanFormState {
   interestAmount: number;
   inputAmountText: string,
   maxDepositAmount: BigNumber;
-  inputDecimals: number
 }
 
 export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanFormState> {
   private readonly _inputDecimals = 6;
-  private readonly selectedValueUpdate: Subject<number>;
+
+  private readonly _inputChange: Subject<string>;
+  private readonly _selectedValueUpdate: Subject<number>;
 
   constructor(props: IExtendLoanFormProps, context?: any) {
     super(props, context);
@@ -55,20 +56,29 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
       interestAmount: 0,
       inputAmountText: "",
       maxDepositAmount: new BigNumber(0),
-      inputDecimals: this._inputDecimals
     };
 
-    this.selectedValueUpdate = new Subject<number>();
-    this.selectedValueUpdate
-      .pipe(
-        debounceTime(100),
-        switchMap(value => this.rxGetEstimate(value))
+
+    this._selectedValueUpdate = new Subject();
+    this._inputChange = new Subject();
+
+    merge(
+      this._inputChange.pipe(
+        distinctUntilChanged(),
+        debounceTime(300),
+        switchMap(value => this.rxFromInputAmount(value))
+      ),
+      this._selectedValueUpdate.pipe(
+        distinctUntilChanged()
       )
+
+    ).pipe(
+      switchMap(value => this.rxGetEstimate(value)))
       .subscribe((value: IExtendEstimate) => {
         this.setState({
           ...this.state,
           depositAmount: value.depositAmount,
-          inputAmountText: value.depositAmount.toFixed(this.state.inputDecimals)
+          inputAmountText: this.formatPrecision(value.depositAmount)
         });
       });
   }
@@ -80,7 +90,6 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
       TorqueProvider.Instance.getLoanExtendManagementAddress(
         this.props.loanOrderState
       ).then(extendManagementAddress => {
-        let inputAmountText = this.state.maxDepositAmount.multipliedBy(this.state.selectedValue).dividedBy(this.state.maxValue).toFixed(this.state.inputDecimals);
         this.setState(
           {
             ...this.state,
@@ -89,10 +98,9 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
             assetDetails: AssetsDictionary.assets.get(this.props.loanOrderState.loanAsset) || null,
             selectedValue: collateralState.currentValue,
             extendManagementAddress: extendManagementAddress,
-            inputAmountText: inputAmountText
           },
           () => {
-            this.selectedValueUpdate.next(this.state.selectedValue);
+            this._selectedValueUpdate.next(this.state.selectedValue);
           }
         );
       });
@@ -101,14 +109,11 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
   }
 
   public componentDidUpdate(
-    prevProps: Readonly<IExtendLoanFormProps>,
-    prevState: Readonly<IExtendLoanFormState>,
-    snapshot?: any
+    prevProps: Readonly<IExtendLoanFormProps>
   ): void {
     if (
       prevProps.loanOrderState.accountAddress !== this.props.loanOrderState.accountAddress ||
-      prevProps.loanOrderState.loanId !== this.props.loanOrderState.loanId ||
-      prevState.selectedValue !== this.state.selectedValue
+      prevProps.loanOrderState.loanId !== this.props.loanOrderState.loanId
     ) {
       TorqueProvider.Instance.getLoanExtendManagementAddress(
         this.props.loanOrderState
@@ -121,15 +126,11 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
               gasAmountNeeded: gasAmountNeeded
             },
             () => {
-              this.selectedValueUpdate.next(this.state.selectedValue);
+              this._selectedValueUpdate.next(this.state.selectedValue);
             }
           );
         });
       });
-    }
-
-    if (prevState.interestAmount !== this.state.interestAmount) {
-      this.updateDepositAmount(this.state.interestAmount);
     }
   }
 
@@ -152,6 +153,7 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
             step={0.01}
             value={this.state.selectedValue}
             onChange={this.onChange}
+            onAfterChange={this.onAfterChange}
           />
 
           <div className="extend-loan-form__tips">
@@ -187,7 +189,8 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
     );
   }
 
-  private pluralize = (singular: string, plural: string, value: number) => {
+  private pluralize = (singular: string,
+    plural: string, value: number) => {
     const isPlural = value !== 1;
     return isPlural ? plural : singular;
   };
@@ -203,17 +206,34 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
     });
   };
 
-  private onChange = (value: number) => {
-    let currentAmount = this.state.maxDepositAmount.multipliedBy(value).dividedBy(this.state.maxValue);
-    let minAmount = this.state.maxDepositAmount.dividedBy(this.state.maxValue);
-    if (currentAmount.gt(minAmount))
-      this.setState({ ...this.state, inputDecimals: this._inputDecimals });
+  private rxFromInputAmount = (value: string): Observable<number> => {
+    return new Observable<number>(observer => {
+      let inputAmountText = value;
+      const maxDepositAmountText = this.state.maxDepositAmount.toFixed();
+      const maxDepositAmountNumber = Number(maxDepositAmountText);
 
+      if (Number(inputAmountText) > maxDepositAmountNumber) {
+        inputAmountText = this.formatPrecision(this.state.maxDepositAmount);
+      }
+      const depositAmountText = new BigNumber(inputAmountText);
+      const depositAmountNumber = Number(depositAmountText);
+      const selectedValue = Math.round(depositAmountNumber * this.state.maxValue / maxDepositAmountNumber);
+      this.setState({ ...this.state, selectedValue });
+      observer.next(selectedValue);
+    });
+  }
+
+
+  private onChange = (value: number) => {
     this.setState({
       ...this.state,
       selectedValue: value,
       interestAmount: 0
     });
+  };
+
+  private onAfterChange = (value: number) => {
+    this._selectedValueUpdate.next(this.state.selectedValue);
   };
 
   public onSubmitClick = async (event: FormEvent<HTMLFormElement>) => {
@@ -262,49 +282,29 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
 
   public onTradeAmountChange = async (event: ChangeEvent<HTMLInputElement>) => {
     let inputAmountText = event.target.value ? event.target.value : "";
-    if (inputAmountText === "" || parseFloat(inputAmountText) < 0) return;
+    if (Number(inputAmountText) == 0) {
 
-    let depositAmount = new BigNumber(inputAmountText);
-    let selectedValue = this.getSelectedValue(inputAmountText);
-
-    let inputDecimals = this._inputDecimals;
-    (inputAmountText.length > 1)
-      ? inputDecimals = inputAmountText.length - 2
-      : inputDecimals = inputAmountText.length - 1
-
-    if (depositAmount > this.state.maxDepositAmount) {
-      inputDecimals = this._inputDecimals;
-      depositAmount = this.state.maxDepositAmount;
-      inputAmountText = depositAmount.toFixed(inputDecimals);
-    }
-
-    await this.setState({
-      ...this.state,
-      depositAmount: depositAmount,
-      inputAmountText: inputAmountText,
-      selectedValue: selectedValue,
-      inputDecimals: inputDecimals,
-      interestAmount: 0
-    });
-  };
-
-  public updateDepositAmount = (value: number) => {
-    if (value !== 0) {
-      let depositAmount = this.state.maxDepositAmount.multipliedBy(value);
-      let depositAmountText = depositAmount.toFixed(this.state.inputDecimals);
-      let selectedValue = value === 1 ? value * this.state.maxValue : value * (this.state.maxValue - this.state.minValue);
       this.setState({
         ...this.state,
-        depositAmount: depositAmount,
-        inputAmountText: depositAmountText,
-        selectedValue: selectedValue,
-        inputDecimals: this._inputDecimals
+        inputAmountText
+      })
+    } else {
+      // setting Text to update display at the same time
+      this.setState({
+        ...this.state,
+        inputAmountText,
+        interestAmount: 0
+      }, () => {
+        this._inputChange.next(inputAmountText);
       });
     }
-  }
+  };
 
   public updateInterestAmount = (interest: number) => {
-    this.setState({ ...this.state, interestAmount: interest })
+    const selectedValue = this.state.maxValue * interest;
+    this.setState({ ...this.state, selectedValue: selectedValue, interestAmount: interest }, () => {
+      this._selectedValueUpdate.next(selectedValue);
+    });
   }
 
   private getMaxDepositAmount = async () => {
@@ -312,12 +312,14 @@ export class ExtendLoanForm extends Component<IExtendLoanFormProps, IExtendLoanF
     this.setState({ ...this.state, maxDepositAmount: maxDepositAmount.depositAmount });
   }
 
-  public getSelectedValue = (value: string) => {
-    let maxDepositAmountText = this.state.maxDepositAmount.toFixed();
-    let maxDepositAmountNumber = Number(maxDepositAmountText);
-    let depositAmountText = new BigNumber(value);
-    let depositAmountNumber = Number(depositAmountText);
-    let selectedValue = Math.round(depositAmountNumber * this.state.maxValue / maxDepositAmountNumber);
-    return selectedValue;
+  public formatPrecision(outputText: BigNumber): string {
+    const output = Number(outputText);
+    let n = Math.log(Math.abs(output)) / Math.LN10;
+    let x = 4 - n;
+    if (x < 0) x = 0;
+    if (x > this._inputDecimals) x = this._inputDecimals + 1;
+    var m = Math.pow(10, x);
+
+    return new BigNumber(Math.floor(output * m) / m).toString();
   }
 }

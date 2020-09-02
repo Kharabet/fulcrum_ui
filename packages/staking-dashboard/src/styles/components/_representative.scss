@@ -1,28 +1,3 @@
-.become-representative {
-  @media screen and (min-width: 620px) {
-    min-width: 590px;
-  }
-  input {
-    padding-left: 20px;
-    @media screen and (min-width: $width-min-xs) {
-      margin-bottom: 48px;
-    }
-    @media screen and (max-width: $width-max-xs) {
-      margin-bottom: 24px;
-    }
-  }
-  .button {
-    margin: auto;
-    @media screen and (min-width: $width-min-xs) {
-      height: 64px;
-      width: 328px;
-    }
-    @media screen and (max-width: $width-max-xs) {
-      height: 48px;
-      width: 100%;
-    }
-  }
-}
 .find-representative {
   @media screen and (min-width: $width-min-md) {
     min-width: 750px;
@@ -30,9 +5,12 @@
   input {
     padding-left: 55px;
   }
+  ul {
+    margin-top: 10px;
+    margin-right: -20px;
+  }
 }
-.find-representative,
-.become-representative {
+.find-representative {
   input {
     width: 100%;
     font-size: 16px;
@@ -77,6 +55,16 @@
   flex-wrap: wrap;
   align-items: center;
   padding: 6px;
+  cursor: pointer;
+  margin-right: 20px;
+  border: 2px solid transparent;
+  &:hover {
+    border-color: #5b88ff;
+    cursor: pointer;
+  }
+  &:focus {
+    border-color: #276bfb;
+  }
   @media screen and (max-width: 535px) {
     border-radius: 16px;
   }
@@ -90,7 +78,6 @@
   }
 
   .photo {
-    border: 1px solid red;
     border-radius: 50%;
     img {
       max-width: 100%;

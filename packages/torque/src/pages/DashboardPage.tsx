@@ -99,7 +99,7 @@ export class DashboardPage extends PureComponent<
       isDataLoading: false
     });
   }
-  
+
   private onProviderChanged = () => {
     this.derivedUpdate();
   };
@@ -132,13 +132,13 @@ export class DashboardPage extends PureComponent<
           <main>
             {!TorqueProvider.Instance.unsupportedNetwork ? (
               <React.Fragment>
-                {this.state.isDataLoading
-                  ? <Loader quantityDots={5} sizeDots={'large'} title={'Loading'} isOverlay={false} />
-                  : (<div className="page-header">
-                    <h1>Your Loans</h1>
-                    <p>Lorem ipsum is placeholder text commonly used in the graphic, print, and publishing industries for previewing layouts and visual mockups.</p>
-                  </div>)
-                }
+                <div className="page-header">
+                  <h1>Your Loans</h1>
+                  {/* <p>Lorem ipsum is placeholder text commonly used in the graphic, print, and publishing industries for previewing layouts and visual mockups.</p> */}
+                  {this.state.isDataLoading || TorqueProvider.Instance.isLoading &&
+                    <Loader quantityDots={5} sizeDots={'large'} title={'Loading'} isOverlay={false} />
+                  }
+                </div>
                 <BorrowedFundsList
                   items={this.state.items}
                   itemsAwaiting={this.state.itemsAwaiting}
