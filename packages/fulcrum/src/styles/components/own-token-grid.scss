@@ -131,6 +131,14 @@ $primary-dark-color:  rgba(#444e5a,0.4);
     .icon-collateral-stroke {
       stroke: var(--icon-collateral);
     }
+    &.danger {
+      .icon-collateral-fill {
+        fill: #ff4f4f;
+      }
+      .icon-collateral-stroke {
+        stroke: #ff4f4f;
+      }
+    }
   }
   &__col-collateral-wrapper {
     display: flex;
