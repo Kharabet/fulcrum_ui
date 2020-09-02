@@ -91,7 +91,28 @@ export class BorrowProcessor {
 
     try {
       console.log(TorqueProvider.Instance.gasLimit);
-      const gasAmount = await iTokenContract.borrow.estimateGasAsync(
+      const gasAmount =  isGasTokenEnabled && ChiTokenBalance.gt(0)
+      ? await iTokenContract.borrowWithGasToken.estimateGasAsync(
+        taskRequest.loanId,
+        borrowAmountInBaseUnits,
+        new BigNumber(7884000), // approximately 3 months
+        depositAmountInBaseUnits,
+        isETHCollateralAsset
+          ? TorqueProvider.ZERO_ADDRESS
+          : collateralAssetErc20Address,
+        account,
+        account,
+        account,                     
+        "0x",
+        {
+          from: account,
+          value: isETHCollateralAsset
+            ? depositAmountInBaseUnits
+            : undefined,
+          gas: TorqueProvider.Instance.gasLimit
+        }
+      )
+      : await iTokenContract.borrow.estimateGasAsync(
         taskRequest.loanId,
         borrowAmountInBaseUnits,
         new BigNumber(7884000), // approximately 3 months
