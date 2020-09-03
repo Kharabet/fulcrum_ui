@@ -920,6 +920,62 @@
       "type": "function"
     },
     {
+      "constant": false,
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "loanId",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "address",
+          "name": "receiver",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "gasTokenUser",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "swapAmount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bool",
+          "name": "returnTokenIsCollateral",
+          "type": "bool"
+        },
+        {
+          "internalType": "bytes",
+          "name": "loanDataBytes",
+          "type": "bytes"
+        }
+      ],
+      "name": "closeWithSwapWithGasToken",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "loanCloseAmount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "collateralWithdrawAmount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "collateralToken",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
       "constant": true,
       "inputs": [
         {
@@ -1070,6 +1126,11 @@
               "type": "bytes32"
             },
             {
+              "internalType": "uint96",
+              "name": "endTimestamp",
+              "type": "uint96"
+            },
+            {
               "internalType": "address",
               "name": "loanToken",
               "type": "address"
@@ -1101,7 +1162,12 @@
             },
             {
               "internalType": "uint256",
-              "name": "initialMargin",
+              "name": "startRate",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "startMargin",
               "type": "uint256"
             },
             {
@@ -1116,12 +1182,7 @@
             },
             {
               "internalType": "uint256",
-              "name": "fixedLoanTerm",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "loanEndTimestamp",
+              "name": "maxLoanTerm",
               "type": "uint256"
             },
             {
@@ -1135,7 +1196,7 @@
               "type": "uint256"
             }
           ],
-          "internalType": "struct IBZx.LoanReturnData[]",
+          "internalType": "struct LoanMaintenanceEvents.LoanReturnData[]",
           "name": "loansData",
           "type": "tuple[]"
         }
@@ -1317,6 +1378,11 @@
               "type": "bytes32"
             },
             {
+              "internalType": "uint96",
+              "name": "endTimestamp",
+              "type": "uint96"
+            },
+            {
               "internalType": "address",
               "name": "loanToken",
               "type": "address"
@@ -1364,11 +1430,6 @@
             {
               "internalType": "uint256",
               "name": "fixedLoanTerm",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "loanEndTimestamp",
               "type": "uint256"
             },
             {
@@ -1660,9 +1721,9 @@
           "type": "uint256"
         },
         {
-          "internalType": "uint256",
+          "internalType": "enum LoanMaintenanceEvents.LoanType",
           "name": "loanType",
-          "type": "uint256"
+          "type": "uint8"
         },
         {
           "internalType": "bool",
@@ -1683,6 +1744,11 @@
               "internalType": "bytes32",
               "name": "loanId",
               "type": "bytes32"
+            },
+            {
+              "internalType": "uint96",
+              "name": "endTimestamp",
+              "type": "uint96"
             },
             {
               "internalType": "address",
@@ -1741,11 +1807,6 @@
             },
             {
               "internalType": "uint256",
-              "name": "endTimestamp",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
               "name": "maxLiquidatable",
               "type": "uint256"
             },
@@ -1755,7 +1816,7 @@
               "type": "uint256"
             }
           ],
-          "internalType": "struct IBZx.LoanReturnData[]",
+          "internalType": "struct LoanMaintenanceEvents.LoanReturnData[]",
           "name": "loansData",
           "type": "tuple[]"
         }
@@ -1916,6 +1977,52 @@
         }
       ],
       "name": "liquidate",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "loanCloseAmount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "collateralWithdrawAmount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "collateralToken",
+          "type": "address"
+        }
+      ],
+      "payable": true,
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "loanId",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "address",
+          "name": "receiver",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "gasTokenUser",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "closeAmount",
+          "type": "uint256"
+        }
+      ],
+      "name": "liquidateWithGasToken",
       "outputs": [
         {
           "internalType": "uint256",
@@ -2415,6 +2522,52 @@
         }
       ],
       "name": "closeWithDeposit",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "loanCloseAmount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "withdrawAmount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "withdrawToken",
+          "type": "address"
+        }
+      ],
+      "payable": true,
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "loanId",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "address",
+          "name": "receiver",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "gasTokenUser",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "depositAmount",
+          "type": "uint256"
+        }
+      ],
+      "name": "closeWithDepositWithGasToken",
       "outputs": [
         {
           "internalType": "uint256",

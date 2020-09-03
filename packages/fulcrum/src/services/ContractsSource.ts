@@ -365,6 +365,7 @@ export class ContractsSource {
     }
     return tokenContractInfo ? tokenContractInfo.token : null;
   }
+  
   private getAssetFromAddressRaw(addressErc20: string): Asset {
     let asset: Asset = Asset.UNKNOWN;
 

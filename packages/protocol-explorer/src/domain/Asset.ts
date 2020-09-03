@@ -15,5 +15,9 @@ export enum Asset {
   BAT = "BAT",
   REP = "REP",
   KNC = "KNC",
+  CHI = "CHI",
+  LEND = "LEND",
+  BZRX = "BZRX",
+  YFI = "YFI",
   UNKNOWN = "UNKNOWN"
 }
