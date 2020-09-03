@@ -437,7 +437,8 @@ export class TorqueProvider {
   }
 
   public getLargeApprovalAmount = (asset: Asset, neededAmount: BigNumber = new BigNumber(0)): BigNumber => {
-    let amount = new BigNumber(0);
+    return TorqueProvider.MAX_UINT;
+    /*let amount = new BigNumber(0);
 
     switch (asset) {
       case Asset.ETH:
@@ -479,7 +480,7 @@ export class TorqueProvider {
       throw new Error("Invalid approval asset!");
     }
     
-    return amount.gt(neededAmount) ? amount : neededAmount;
+    return amount.gt(neededAmount) ? amount : neededAmount;*/
   }
 
   public checkAndSetApprovalForced = async (asset: Asset, spender: string, amountInBaseUnits: BigNumber): Promise<boolean> => {
