@@ -1,4 +1,6 @@
 import React, { Component } from "react";
+import SimpleBar from 'simplebar-react';
+import 'simplebar/dist/simplebar.min.css';
 import { Asset } from "../domain/Asset";
 import { CollateralTokenSelectorItem } from "./CollateralTokenSelectorItem";
 
@@ -78,12 +80,12 @@ export class CollateralTokenSelector extends Component<ICollateralTokenSelectorP
   }
 
   public render() {
-    const tokenItems = this.assets.filter(e => 
-        !(e === this.state.borrowAsset
-          //|| (e === Asset.SAI && this.props.borrowAsset === Asset.DAI)
-          //|| (e === Asset.DAI && this.props.borrowAsset === Asset.SAI)
-        )
-      ).map(e => (
+    const tokenItems = this.assets.filter(e =>
+      !(e === this.state.borrowAsset
+        //|| (e === Asset.SAI && this.props.borrowAsset === Asset.DAI)
+        //|| (e === Asset.DAI && this.props.borrowAsset === Asset.SAI)
+      )
+    ).map(e => (
       <CollateralTokenSelectorItem
         key={e}
         asset={e}
@@ -96,8 +98,14 @@ export class CollateralTokenSelector extends Component<ICollateralTokenSelectorP
         {this.state.isOpen
           ? <React.Fragment>
             <div className="collateral-token-selector__wrapper" onClick={this.onClose}></div>
+
             <div className="collateral-token-selector__container">
-              <div className="collateral-token-selector__items">{tokenItems}</div>
+              <div className="collateral-token-selector__items">
+                <SimpleBar style={{ maxHeight: 134 }} autoHide={false}>
+                  {tokenItems}
+                </SimpleBar>
+              </div>
+
             </div>
           </React.Fragment>
           : null
