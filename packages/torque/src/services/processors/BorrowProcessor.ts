@@ -158,7 +158,7 @@ export class BorrowProcessor {
             value: isETHCollateralAsset
               ? depositAmountInBaseUnits
               : undefined,
-            gas: gasAmountBN ? gasAmountBN.toString() : "3000000",
+            gas: gasAmountBN.gt(0) ? gasAmountBN.toString() : "3000000",
             gasPrice: await TorqueProvider.Instance.gasPrice()
           })
         :
@@ -178,7 +178,7 @@ export class BorrowProcessor {
             value: isETHCollateralAsset
               ? depositAmountInBaseUnits
               : undefined,
-            gas: gasAmountBN ? gasAmountBN.toString() : "3000000",
+            gas: gasAmountBN.gt(0) ? gasAmountBN.toString() : "3000000",
             gasPrice: await TorqueProvider.Instance.gasPrice()
           }
         );
