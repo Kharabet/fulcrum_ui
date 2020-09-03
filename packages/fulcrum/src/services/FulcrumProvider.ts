@@ -427,7 +427,10 @@ export class FulcrumProvider {
       case Asset.fWETH:
         amount = new BigNumber(10 ** 18).multipliedBy(1500);
       case Asset.WBTC:
+      case Asset.YFI:
         amount = new BigNumber(10 ** 8).multipliedBy(25);
+      case Asset.BZRX:
+        amount = new BigNumber(10 ** 18).multipliedBy(400000);
       case Asset.LINK:
         amount = new BigNumber(10 ** 18).multipliedBy(60000);
       case Asset.ZRX:
