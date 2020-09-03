@@ -103,7 +103,6 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     } else {
       this.baseTokens = [
         Asset.ETH,
-        Asset.USDT,
         Asset.WBTC,
         Asset.LINK,
         Asset.MKR,
