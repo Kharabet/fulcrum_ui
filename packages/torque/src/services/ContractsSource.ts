@@ -261,7 +261,7 @@ export class ContractsSource {
       case Asset.WBTC:
         switch (this.networkId) {
           case 1:
-            address = "0xba9262578efef8b3aff7f60cd629d6cc8859c8b5";
+            address = "0x2ffa85f655752fb2acb210287c60b9ef335f5b6e";
             break;
           case 42:
             address = "0x73d4b4ab88eab2a1e6ce495de85c2b04c2918b69";
