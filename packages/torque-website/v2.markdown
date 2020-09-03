@@ -13,7 +13,7 @@ permalink: v2
                 <h1 class="mb-40">Borrowing Made Simple</h1>
             </div>
             <div class="col col-7 col-xl-9 col-md-12">
-                <p class="fs-16 fs-xs-12 lh-160 mb-50 c-secondary"><span class="fw-700">Torque</span> is a powerful DeFi platform for borrowing assets with indefinite-term loans and fixed interest rates. Get an instant, crypto-backed loan with no KYC or credit checks.</p>
+                <p class="fs-16 fs-xs-12 lh-160 mb-50 c-secondary"><span class="fw-700">Torque</span> is a powerful DeFi platform for borrowing assets with indefinite-term loans and fixed interest rates. Get an instant, crypto-backed loan with no KYC or credit checks. </p>
             </div>
         </div>
         <div class="row">
