@@ -101,7 +101,7 @@ export class CollateralTokenSelector extends Component<ICollateralTokenSelectorP
 
             <div className="collateral-token-selector__container">
               <div className="collateral-token-selector__items">
-                <SimpleBar style={{ maxHeight: 134 }} autoHide={false}>
+                <SimpleBar style={{ maxHeight: 184 }} autoHide={false}>
                   {tokenItems}
                 </SimpleBar>
               </div>
