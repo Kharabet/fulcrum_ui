@@ -437,7 +437,8 @@ export class TorqueProvider {
   }
 
   public getLargeApprovalAmount = (asset: Asset, neededAmount: BigNumber = new BigNumber(0)): BigNumber => {
-    let amount = new BigNumber(0);
+    return TorqueProvider.MAX_UINT;
+    /*let amount = new BigNumber(0);
 
     switch (asset) {
       case Asset.ETH:
@@ -479,7 +480,7 @@ export class TorqueProvider {
       throw new Error("Invalid approval asset!");
     }
     
-    return amount.gt(neededAmount) ? amount : neededAmount;
+    return amount.gt(neededAmount) ? amount : neededAmount;*/
   }
 
   public checkAndSetApprovalForced = async (asset: Asset, spender: string, amountInBaseUnits: BigNumber): Promise<boolean> => {
@@ -1348,7 +1349,7 @@ export class TorqueProvider {
   }*/
 
   public gasPrice = async (): Promise<BigNumber> => {
-    let result = new BigNumber(120).multipliedBy(10 ** 9); // upper limit 120 gwei
+    let result = new BigNumber(1000).multipliedBy(10 ** 9); // upper limit 120 gwei
     const lowerLimit = new BigNumber(3).multipliedBy(10 ** 9); // lower limit 3 gwei
 
     const url = `https://ethgasstation.info/json/ethgasAPI.json`;
@@ -1368,7 +1369,7 @@ export class TorqueProvider {
       }
     } catch (error) {
       // console.log(error);
-      result = new BigNumber(60).multipliedBy(10 ** 9); // error default 60 gwei
+      result = new BigNumber(1000).multipliedBy(10 ** 9); // error default 60 gwei
     }
 
     if (result.lt(lowerLimit)) {
