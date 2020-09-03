@@ -63,7 +63,7 @@
       "outputs": [
         {
           "name": "response",
-          "type": "bytes32"
+          "type": "bytes"
         }
       ],
       "payable": true,

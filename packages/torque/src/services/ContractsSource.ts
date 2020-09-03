@@ -59,7 +59,7 @@ export class ContractsSource {
     let address: string = "";
     switch (this.networkId) {
       case 1:
-        address = "0x1cf226e9413addaf22412a2e182f9c0de44af002";
+        address = "0xD8Ee69652E4e4838f2531732a46d1f7F584F0b7f";
         break;
       case 3:
         address = "0xbe49f4cd73041cdf24a7b721627de577b3bab000";
@@ -79,7 +79,7 @@ export class ContractsSource {
     let address: string = "";
     switch (this.networkId) {
       case 1:
-        address = "0x8b3d70d628ebd30d4a2ea82db95ba2e906c71633";
+        address = "0xD8Ee69652E4e4838f2531732a46d1f7F584F0b7f";
         break;
       case 3:
         address = "0xbab325bc2e78ea080f46c1a2bf9bf25f8a3c4d69";
@@ -107,6 +107,27 @@ export class ContractsSource {
   private getiTokenAddress(asset: Asset): string {
     let address: string = "";
     switch (asset) {
+      case Asset.BZRX:
+        switch (this.networkId) {
+          case 1:
+            address = "0x18240bd9c07fa6156ce3f3f61921cc82b2619157";
+            break;
+        }
+        break;
+      case Asset.YFI:
+        switch (this.networkId) {
+          case 1:
+            address = "0x7f3fe9d492a9a60aebb06d82cba23c6f32cad10b";
+            break;
+        }
+        break;
+      case Asset.LEND:
+        switch (this.networkId) {
+          case 1:
+            address = "0xab45bf58c6482b87da85d6688c4d9640e093be98";
+            break;
+        }
+        break;
       case Asset.ETH:
       case Asset.WETH:
         switch (this.networkId) {
@@ -266,7 +287,7 @@ export class ContractsSource {
     let address: string = "";
     switch (this.networkId) {
       case 1:
-        address = "0xee14de2e67e1ec23c8561a6fad2635ff1b618db6";
+        address = "0xaaA601aE20077F9fae80494DDC36BB39C952c2d0";
         break;
       case 3:
         address = "0x115338e77339d64b3d58181aa9c0518df9d18022";
@@ -291,6 +312,15 @@ export class ContractsSource {
       case 1:
         // noinspection SpellCheckingInspection
         switch (addressErc20) {
+          case "0x56d811088235f11c8920698a204a5010a788f4b3":
+            asset = Asset.BZRX;
+            break;
+          case "0x0bc529c00c6401aef6d220be8c6ea1667f6ad93e":
+            asset = Asset.YFI;
+            break;
+          case "0x80fb784b7ed66730e8b1dbd9820afd29931aab03":
+            asset = Asset.LEND;
+            break;
           case "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2":
             asset = Asset.WETH;
             break;

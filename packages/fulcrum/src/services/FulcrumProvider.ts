@@ -432,6 +432,7 @@ export class FulcrumProvider {
         amount = new BigNumber(10 ** 18).multipliedBy(60000);
       case Asset.ZRX:
         amount = new BigNumber(10 ** 18).multipliedBy(750000);
+      case Asset.LEND:
       case Asset.KNC:
         amount = new BigNumber(10 ** 18).multipliedBy(550000);
       case Asset.BAT:
@@ -503,6 +504,9 @@ export class FulcrumProvider {
         } catch (e) {
           //console.log(e);
         }
+        
+        //const vBZRXBalance = await this.getErc20BalanceOfUser(assetErc20Address, this.contractsSource.getBZxVaultAddress());
+        
         const reserveData = await helperContract.reserveDetails.callAsync(tokens);
         let usdSupplyAll = new BigNumber(0);
         let usdTotalLockedAll = new BigNumber(0);
@@ -1053,7 +1057,7 @@ export class FulcrumProvider {
   public gasPrice = async (): Promise<BigNumber> => {
     if (networkName === "kovan")
       return new BigNumber(1).multipliedBy(10 ** 9); // 1 gwei
-    let result = new BigNumber(120).multipliedBy(10 ** 9); // upper limit 120 gwei
+    let result = new BigNumber(1000).multipliedBy(10 ** 9); // upper limit 120 gwei
     const lowerLimit = new BigNumber(3).multipliedBy(10 ** 9); // lower limit 3 gwei
 
     const url = `https://ethgasstation.info/json/ethgasAPI.json`;
@@ -1073,7 +1077,7 @@ export class FulcrumProvider {
       }
     } catch (error) {
       // console.log(error);
-      result = new BigNumber(60).multipliedBy(10 ** 9); // error default 60 gwei
+      result = new BigNumber(500).multipliedBy(10 ** 9); // error default 60 gwei
     }
 
     if (result.lt(lowerLimit)) {
@@ -1814,7 +1818,7 @@ export class FulcrumProvider {
     const bzxContractAddress = this.contractsSource.getiBZxAddress()
     if (!account || !bzxContractAddress) return result
     const etherscanApiKey = configProviders.Etherscan_Api;
-    let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${EarnRewardEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
+    let etherscanApiUrl = `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${EarnRewardEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
     const earnRewardEventResponse = await fetch(etherscanApiUrl);
     const earnRewardEventResponseJson = await earnRewardEventResponse.json();
     if (earnRewardEventResponseJson.status !== "1") return result;
@@ -1852,7 +1856,7 @@ export class FulcrumProvider {
     const bzxContractAddress = this.contractsSource.getiBZxAddress()
     if (!account || !bzxContractAddress) return result
     const etherscanApiKey = configProviders.Etherscan_Api;
-    let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${PayTradingFeeEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
+    let etherscanApiUrl = `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${PayTradingFeeEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
     const payTradingFeeEventResponse = await fetch(etherscanApiUrl);
     const payTradingFeeEventResponseJson = await payTradingFeeEventResponse.json();
     if (payTradingFeeEventResponseJson.status !== "1") return result;
@@ -1889,7 +1893,7 @@ export class FulcrumProvider {
     const bzxContractAddress = this.contractsSource.getiBZxAddress()
     if (!account || !bzxContractAddress) return result
     const etherscanApiKey = configProviders.Etherscan_Api;
-    let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${TradeEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
+    let etherscanApiUrl = `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${TradeEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
     const tradeEventResponse = await fetch(etherscanApiUrl);
     const tradeEventResponseJson = await tradeEventResponse.json();
     if (tradeEventResponseJson.status !== "1") return result;
@@ -1945,7 +1949,7 @@ export class FulcrumProvider {
     const bzxContractAddress = this.contractsSource.getiBZxAddress()
     if (!account || !bzxContractAddress) return result
     const etherscanApiKey = configProviders.Etherscan_Api;
-    let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${CloseWithSwapEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
+    let etherscanApiUrl = `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${CloseWithSwapEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
     const closeWithSwapResponse = await fetch(etherscanApiUrl);
     const closeWithSwapResponseJson = await closeWithSwapResponse.json();
     if (closeWithSwapResponseJson.status !== "1") return result;
@@ -1997,7 +2001,7 @@ export class FulcrumProvider {
     const bzxContractAddress = this.contractsSource.getiBZxAddress()
     if (!account || !bzxContractAddress) return result
     const etherscanApiKey = configProviders.Etherscan_Api;
-    let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${LiquidationEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
+    let etherscanApiUrl = `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${LiquidationEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
     const liquidationEventResponse = await fetch(etherscanApiUrl);
     const liquidationEventResponseJson = await liquidationEventResponse.json();
     if (liquidationEventResponseJson.status !== "1") return result;
@@ -2049,7 +2053,7 @@ export class FulcrumProvider {
     const bzxContractAddress = this.contractsSource.getiBZxAddress()
     if (!account || !bzxContractAddress) return result
     const etherscanApiKey = configProviders.Etherscan_Api;
-    let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${DepositCollateralEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
+    let etherscanApiUrl = `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${DepositCollateralEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
     const depositCollateralEventResponse = await fetch(etherscanApiUrl);
     const depositCollateralEventResponseJson = await depositCollateralEventResponse.json();
     if (depositCollateralEventResponseJson.status !== "1") return result;
@@ -2087,7 +2091,7 @@ export class FulcrumProvider {
     const bzxContractAddress = this.contractsSource.getiBZxAddress()
     if (!account || !bzxContractAddress) return result
     const etherscanApiKey = configProviders.Etherscan_Api;
-    let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${WithdrawCollateralEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
+    let etherscanApiUrl = `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${WithdrawCollateralEvent.topic0}&topic1=0x000000000000000000000000${account.replace("0x", "")}&apikey=${etherscanApiKey}`
     const withdrawCollateralEventResponse = await fetch(etherscanApiUrl);
     const withdrawCollateralEventResponseJson = await withdrawCollateralEventResponse.json();
     if (withdrawCollateralEventResponseJson.status !== "1") return result;

@@ -103,31 +103,23 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     } else {
       this.baseTokens = [
         Asset.ETH,
-        // Asset.DAI,
-        // Asset.USDC,
-        // Asset.SUSD,
+        Asset.USDT,
         Asset.WBTC,
         Asset.LINK,
-        // Asset.MKR,
-        Asset.ZRX,
-        // Asset.BAT,
-        // Asset.REP,
+        Asset.MKR,
+        Asset.LEND,
         Asset.KNC
       ];
       this.quoteTokens = [
         Asset.DAI,
-        /*Asset.SAI,*/
         Asset.USDC,
-        Asset.SUSD,
-        Asset.USDT
+        Asset.USDT,
       ]
     }
     this.stablecoins = [
       Asset.DAI,
-      /*Asset.SAI,*/
       Asset.USDC,
-      Asset.SUSD,
-      Asset.USDT
+      Asset.USDT,
     ]
 
     this.state = {
