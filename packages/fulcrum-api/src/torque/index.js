@@ -1,7 +1,7 @@
 import { iTokens } from '../config/iTokens';
 
 import BigNumber from 'bignumber.js';
-import { iTokenJson } from './contracts/iTokenContract';
+import { iTokenJson } from '../contracts/iTokenContract';
 
 export default class Torque {
     constructor(web3, storage, logger) {

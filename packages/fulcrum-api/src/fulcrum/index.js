@@ -2,10 +2,10 @@ import { iTokens } from '../config/iTokens';
 import { pTokens } from '../config/pTokens';
 
 import BigNumber from 'bignumber.js';
-import { DappHelperJson, mainnetAddress as dappHelperAddress } from './contracts/DappHelperContract'
-import { mainnetAddress as oracleAddress, oracleJson } from './contracts/OracleContract'
-import { iTokenJson } from './contracts/iTokenContract';
-import { pTokenJson } from './contracts/pTokenContract';
+import { DappHelperJson, mainnetAddress as dappHelperAddress } from '../contracts/DappHelperContract'
+import { mainnetAddress as oracleAddress, oracleJson } from '../contracts/OracleContract'
+import { iTokenJson } from '../contracts/iTokenContract';
+import { pTokenJson } from '../contracts/pTokenContract';
 import config from '../config.json';
 import { pTokenPricesModel, pTokenPriceModel } from "../models/pTokenPrices"
 import { iTokenPricesModel, iTokenPriceModel } from "../models/iTokenPrices"
@@ -236,40 +236,42 @@ export default class Fulcrum {
     }
 
     async getSwapRate(srcAsset, destAsset, srcAmount) {
-        if (srcAsset === destAsset) {
+        if (srcAsset === destAsset || (srcAsset === "USDC" && destAsset === "DAI")
+        || (srcAsset === "DAI" && destAsset === "USDC")) {
             return new BigNumber(1);
         }
 
         let result = new BigNumber(0);
-
+        const srcAssetErc20Address = iTokens.find(token => token.name === srcAsset.toLowerCase()).erc20Address;
+        const destAssetErc20Address = iTokens.find(token => token.name === destAsset.toLowerCase()).erc20Address;
         if (!srcAmount) {
             srcAmount = UNLIMITED_ALLOWANCE_IN_BASE_UNITS;
         } else {
             srcAmount = new BigNumber(srcAmount.toFixed(0, 1));
         }
 
-        const srcAssetErc20Address = iTokens.find(token => token.name === srcAsset.toLowerCase()).erc20Address;
-        const destAssetErc20Address = iTokens.find(token => token.name === destAsset.toLowerCase()).erc20Address;
         if (srcAssetErc20Address && destAssetErc20Address) {
             const oracleContract = new this.web3.eth.Contract(oracleJson.abi, oracleAddress);
 
+            const srcAssetDecimals = iTokens.find(e => e.name === srcAsset.toLowerCase()).decimals;
+            const srcAssetPrecision = new BigNumber(10 ** (18 - srcAssetDecimals));
+            const destAssetDecimals = iTokens.find(e => e.name === destAsset.toLowerCase()).decimals;
+            const destAssetPrecision = new BigNumber(10 ** (18 - destAssetDecimals));
             try {
                 this.logger.info("call oracleContract");
 
-                const swapPriceData = await oracleContract.methods.getTradeData(
+                const swapPriceData = await oracleContract.methods.queryRate(
                     srcAssetErc20Address,
-                    destAssetErc20Address,
-                    srcAmount
+                    destAssetErc20Address
                 ).call({ from: "0x4abB24590606f5bf4645185e20C4E7B97596cA3B" });
-                result = new BigNumber(swapPriceData[0]).dividedBy(10 ** 18);
+                result = swapPriceData[0].times(srcAssetPrecision).div(destAssetPrecision).dividedBy(10 ** 18)
+                .multipliedBy(swapPriceData[1].dividedBy(10 ** 18));
             } catch (e) {
                 this.logger.info(e)
                 result = new BigNumber(0);
             }
         }
-
-
-        return result;
+                return result;
     }
 
 
@@ -292,10 +294,109 @@ export default class Fulcrum {
         return result;
     }
 
+    async  getHistoryTVL(startDate, endDate, estimatedPointsNumber) {
+        const dbStatsDocuments = (await statsModel.find({
+            "date": {
+                $lt: endDate,
+                $gte: startDate
+            }
+        }, { date: 1, allTokensStats: 1 }).sort({ date: 1 }).lean());
+        const arrayLength = dbStatsDocuments.length;
+        const desiredlength = dbStatsDocuments.length > estimatedPointsNumber
+            ? estimatedPointsNumber - 1
+            : dbStatsDocuments.length;
+
+        //pick every n-th element to get normal scale of data
+        const timeBetweenTwoArrayElements = (new Date(dbStatsDocuments[0].date).getTime() - new Date(dbStatsDocuments[arrayLength - 1].date).getTime()) / arrayLength;
+        const timeBetweenTwoOutputElements = (new Date(dbStatsDocuments[0].date).getTime() - new Date(dbStatsDocuments[arrayLength - 1].date).getTime()) / desiredlength;
+        const offset = Math.floor(timeBetweenTwoOutputElements / timeBetweenTwoArrayElements);
+        const reducedArray = dbStatsDocuments.filter((e, i) => i % offset === 0);
+
+        let result = [];
+        reducedArray.forEach((document, index, documents) => {
+            let change24h = 0;
+            if (index > 0)
+                change24h = (document.allTokensStats.usdTotalLocked - documents[index - 1].allTokensStats.usdTotalLocked) / documents[index - 1].allTokensStats.usdTotalLocked;
+            result.push({
+                timestamp: new Date(document.date).getTime(),
+                tvl: document.allTokensStats.usdTotalLocked,
+                change24h: change24h
+            });
+        });
+        return result;
+    }
+
+    async  getAssetStatsHistory(asset, startDate, endDate, estimatedPointsNumber, metrics) {
+        const dbStatsDocuments = await statsModel.find({
+            "date": {
+                $lt: endDate,
+                $gte: startDate
+            },
+            tokensStats: { $elemMatch: { token: asset } }
+
+        }, { date: 1, tokensStats: 1, "tokensStats.$": asset }).sort({ date: 1 }).lean()
+
+        const arrayLength = dbStatsDocuments.length;
+        const desiredlength = dbStatsDocuments.length > estimatedPointsNumber
+            ? estimatedPointsNumber - 1
+            : dbStatsDocuments.length;
+
+        //pick every n-th element to get normal scale of data
+        const timeBetweenTwoArrayElements = (new Date(dbStatsDocuments[0].date).getTime() - new Date(dbStatsDocuments[arrayLength - 1].date).getTime()) / arrayLength;
+        const timeBetweenTwoOutputElements = (new Date(dbStatsDocuments[0].date).getTime() - new Date(dbStatsDocuments[arrayLength - 1].date).getTime()) / desiredlength;
+        const offset = Math.floor(timeBetweenTwoOutputElements / timeBetweenTwoArrayElements);
+        const reducedArray = dbStatsDocuments.filter((e, i) => i % offset === 0);
+
+        let result = [];
+        reducedArray.forEach((document, index, documents) => {
+            const assetStats = document.tokensStats[0]
+            let tvlChange24h = 0;
+            let aprChange24h = 0;
+            let utilizationChange24h = 0;
+            const utilization = assetStats.totalBorrow / assetStats.totalSupply * 100;
+            if (index > 0) {
+                const prevAssetStats = documents[index - 1].tokensStats[0];
+                const prevAssetUtilization = prevAssetStats.totalBorrow / prevAssetStats.totalSupply * 100;
+
+                tvlChange24h = (assetStats.usdTotalLocked - prevAssetStats.usdTotalLocked) / prevAssetStats.usdTotalLocked;
+                aprChange24h = (assetStats.supplyInterestRate - prevAssetStats.supplyInterestRate) / prevAssetStats.supplyInterestRate;
+                utilizationChange24h = (utilization - prevAssetUtilization) / prevAssetUtilization;
+            }
+            result.push({
+                timestamp: new Date(document.date).getTime(),
+                token: assetStats.token,
+                supplyInterestRate: assetStats.supplyInterestRate,
+                tvl: assetStats.vaultBalance,
+                tvlUsd: assetStats.usdTotalLocked,
+                utilization: utilization,
+                tvlChange24h,
+                aprChange24h,
+                utilizationChange24h
+            });
+        });
+        return result;
+    }
+
+    async  getAssetHistoryPrice(asset, date) {
+        const dbStatsDocuments = await statsModel.find({
+            "date": {
+                $lt: new Date(date.getTime() + 1000 * 60 * 60),
+                $gte: new Date(date.getTime() - 1000 * 60 * 60)
+            },
+            tokensStats: { $elemMatch: { token: asset } }
+
+        }, { date: 1, tokensStats: 1, "tokensStats.$": asset }).sort({ date: 1 }).lean()
+
+        return {
+            swapToUSDPrice: dbStatsDocuments[0].tokensStats[0].swapToUSDPrice,
+            timestamp: dbStatsDocuments[0].date.getTime()
+        };
+    }
+
     async updateReservedData() {
         var result = [];
         var tokenAddresses = iTokens.map(x => (x.address));
-        var swapRates = await this.getSwapToUsdRateBatch(iTokens.find(x => x.name === "dai"));
+        var swapRates = (await this.getSwapToUsdRateBatch(iTokens.find(x => x.name === "dai")))[0];
         const reserveData = await this.DappHeperContract.methods.reserveDetails(tokenAddresses).call({ from: "0x4abB24590606f5bf4645185e20C4E7B97596cA3B" });
 
         let usdTotalLockedAll = new BigNumber(0);
@@ -330,7 +431,7 @@ export default class Fulcrum {
                     usdTotalLocked = marketLiquidity.plus(vaultBalance).times(swapRates[i]).dividedBy(10 ** 18);
                     usdTotalLockedAll = usdTotalLockedAll.plus(usdTotalLocked);
                 }
-
+                console.log(token.name, swapRates[i])
                 stats.tokensStats.push(new tokenStatsModel({
                     token: token.name,
                     liquidity: marketLiquidity.dividedBy(10 ** 18).toFixed(),
@@ -377,7 +478,7 @@ export default class Fulcrum {
         const underlyings = iTokens.map(e => (e.erc20Address));
         const amounts = iTokens.map(e => (this.getGoodSourceAmountOfAsset(e.name).toFixed()));
 
-        result = await this.DappHeperContract.methods.assetRates(oracleAddress, usdTokenAddress, underlyings, amounts).call({ from: "0x4abB24590606f5bf4645185e20C4E7B97596cA3B" });
+        result = await this.DappHeperContract.methods.assetRates(usdTokenAddress, underlyings, amounts).call({ from: "0x4abB24590606f5bf4645185e20C4E7B97596cA3B" });
 
         return result;
     }
