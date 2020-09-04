@@ -97,7 +97,7 @@ export class MainPage extends Component<IMainPageProps, IMainPageState> {
           <Search onSearch={this.onSearch} />
         </section>
         <section className="asset-selector-section">
-            <AssetSelector />
+          <AssetSelector />
         </section>
       </React.Fragment>
     );
@@ -144,7 +144,8 @@ export class MainPage extends Component<IMainPageProps, IMainPageState> {
         data.push(item["tvl"]);
         change24.push(item["change24h"]);
       });
-      this._isMounted && this.setState({ ...this.state, change24h: responseJson.data[Object.keys(responseJson.data).length - 1].change24h });
+      // console.log(responseJson.data[Object.keys(responseJson.data).length - 1].tvl);
+      this._isMounted && this.setState({ ...this.state, change24h: (100 * responseJson.data[Object.keys(responseJson.data).length - 1].tvl / responseJson.data[0].tvl) });
     } else {
       console.error(responseJson.message)
     }
