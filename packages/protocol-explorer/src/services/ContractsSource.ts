@@ -138,7 +138,7 @@ export class ContractsSource {
     let result = Asset.UNKNOWN;
 
     //@ts-ignore
-    result = ContractsSource.iTokenList.filter(e => e[1] === address)[0][4].substr(1) as Asset
+    result = ContractsSource.iTokenList.filter(e => e[1].toLowerCase() === address.toLowerCase())[0][4].substr(1) as Asset
     return result;
   }
 

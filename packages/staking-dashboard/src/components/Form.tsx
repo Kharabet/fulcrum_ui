@@ -326,7 +326,7 @@ export class Form extends Component<{}, IFormState> {
                 <div className="row-header">Staking Balance:</div>
                 <div className="row-container">
                   <div className="row-body">
-                    <a href={`${etherscanURL}token/0x56d811088235F11C8920698a204A5010a788f4b3"}`} target="_blank" rel="noopener noreferrer"><span className="icon"><BzrxIcon /></span></a>
+                    <a href={`${etherscanURL}token/0x56d811088235F11C8920698a204A5010a788f4b3`} target="_blank" rel="noopener noreferrer"><span className="icon"><BzrxIcon /></span></a>
                     <span title={this.state.bzrxStakingBalance.toFixed(18)} className="value">
                       {this.state.bzrxStakingBalance.toFixed(2)}
                     </span>
@@ -352,7 +352,7 @@ export class Form extends Component<{}, IFormState> {
                   </div>
                 </div>
               </div>
-              <p className="notice">If you move your tokens, they will be unstaked.</p>
+              <p className="notice">If you move your tokens, they will be unstaked. Although the rewards balance is $0, your staking rewards are still accruing in the background. They will be made visible in the not too distant future.</p>
             </div>
             <div className="calculator-row">
               <div className="reward-item">

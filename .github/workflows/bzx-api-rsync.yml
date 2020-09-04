@@ -14,15 +14,15 @@ jobs:
           node-version: '12.x'
     - name: Build
       run: |
-        cd $GITHUB_WORKSPACE/packages/fulcrum-api && npm install
-        cd $GITHUB_WORKSPACE/packages/fulcrum-api && npm run build
+        cd $GITHUB_WORKSPACE/packages/bzx-api && npm install
+        cd $GITHUB_WORKSPACE/packages/bzx-api && npm run build
     - name: Deploy
       uses: AEnterprise/rsync-deploy@v1.0
       env:
         DEPLOY_KEY: ${{ secrets.SERVER_SSH_KEY }}
         ARGS: "-e -c -r --delete --include 'node_modules' --exclude 'dist/persist-storage'"
         SERVER_PORT: ${{ secrets.SERVER_PORT }}
-        FOLDER: "./packages/fulcrum-api/"
+        FOLDER: "./packages/bzx-api/"
         SERVER_IP: ${{ secrets.SERVER_IP }}
         USERNAME: ${{ secrets.USERNAME }}
         SERVER_DESTINATION: ${{ secrets.SERVER_DESTINATION }}

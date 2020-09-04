@@ -240,7 +240,9 @@ export class ExplorerProvider {
         if (!this.contractsSource) return result;
         const bzxContractAddress = this.contractsSource.getiBZxAddress()
         const etherscanApiKey = configProviders.Etherscan_Api;
-        let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${LiquidationEvent.topic0}&apikey=${etherscanApiKey}`
+        let etherscanApiUrl = networkName === "kovan" 
+        ? `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${LiquidationEvent.topic0}&apikey=${etherscanApiKey}`
+        : `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${LiquidationEvent.topic0}&apikey=${etherscanApiKey}`
         const liquidationResponse = await fetch(etherscanApiUrl);
         const liquidationResponseJson = await liquidationResponse.json();
         if (liquidationResponseJson.status !== "1") return result;
@@ -290,7 +292,9 @@ export class ExplorerProvider {
         const bzxContractAddress = this.contractsSource.getiBZxAddress()
         if (!bzxContractAddress) return result
         const etherscanApiKey = configProviders.Etherscan_Api;
-        let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${TradeEvent.topic0}&apikey=${etherscanApiKey}`
+        let etherscanApiUrl = networkName === "kovan" 
+        ? `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${TradeEvent.topic0}&apikey=${etherscanApiKey}`
+        : `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${TradeEvent.topic0}&apikey=${etherscanApiKey}`
         const tradeEventResponse = await fetch(etherscanApiUrl);
         const tradeEventResponseJson = await tradeEventResponse.json();
         if (tradeEventResponseJson.status !== "1") return result;
@@ -344,7 +348,9 @@ export class ExplorerProvider {
         const bzxContractAddress = this.contractsSource.getiBZxAddress()
         if (!bzxContractAddress) return result
         const etherscanApiKey = configProviders.Etherscan_Api;
-        let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${CloseWithSwapEvent.topic0}&apikey=${etherscanApiKey}`
+        let etherscanApiUrl = networkName === "kovan" 
+        ? `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${CloseWithSwapEvent.topic0}&apikey=${etherscanApiKey}`
+        : `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${CloseWithSwapEvent.topic0}&apikey=${etherscanApiKey}`
         const closeWithSwapResponse = await fetch(etherscanApiUrl);
         const closeWithSwapResponseJson = await closeWithSwapResponse.json();
         if (closeWithSwapResponseJson.status !== "1") return result;
@@ -394,7 +400,9 @@ export class ExplorerProvider {
         const bzxContractAddress = this.contractsSource.getiBZxAddress()
         if (!bzxContractAddress) return result
         const etherscanApiKey = configProviders.Etherscan_Api;
-        let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${CloseWithDepositEvent.topic0}&apikey=${etherscanApiKey}`
+        let etherscanApiUrl = networkName === "kovan" 
+        ? `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${CloseWithDepositEvent.topic0}&apikey=${etherscanApiKey}`
+        : `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${CloseWithDepositEvent.topic0}&apikey=${etherscanApiKey}`
         const closeWithDepositResponse = await fetch(etherscanApiUrl);
         const closeWithDepositResponseJson = await closeWithDepositResponse.json();
         if (closeWithDepositResponseJson.status !== "1") return result;
@@ -442,7 +450,9 @@ export class ExplorerProvider {
         const bzxContractAddress = this.contractsSource.getiBZxAddress()
         if (!bzxContractAddress) return result
         const etherscanApiKey = configProviders.Etherscan_Api;
-        let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${BorrowEvent.topic0}&apikey=${etherscanApiKey}`
+        let etherscanApiUrl = networkName === "kovan" 
+        ? `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${BorrowEvent.topic0}&apikey=${etherscanApiKey}`
+        : `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${bzxContractAddress}&topic0=${BorrowEvent.topic0}&apikey=${etherscanApiKey}`
         const borrowResponse = await fetch(etherscanApiUrl);
         const borrowResponseJson = await borrowResponse.json();
         if (borrowResponseJson.status !== "1") return result;
@@ -533,7 +543,9 @@ export class ExplorerProvider {
         const tokenContractAddress = this.contractsSource.getITokenErc20Address(asset);
         if (!tokenContractAddress) return result
         const etherscanApiKey = configProviders.Etherscan_Api;
-        let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${tokenContractAddress}&topic0=${BurnEvent.topic0}&apikey=${etherscanApiKey}`
+        let etherscanApiUrl = networkName === "kovan" 
+        ? `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${tokenContractAddress}&topic0=${BurnEvent.topic0}&apikey=${etherscanApiKey}`
+        : `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${tokenContractAddress}&topic0=${BurnEvent.topic0}&apikey=${etherscanApiKey}`
         const burnResponse = await fetch(etherscanApiUrl);
         const burnResponseJson = await burnResponse.json();
         if (burnResponseJson.status !== "1") return result;
@@ -569,7 +581,9 @@ export class ExplorerProvider {
         const tokenContractAddress = this.contractsSource.getITokenErc20Address(asset);
         if (!tokenContractAddress) return result
         const etherscanApiKey = configProviders.Etherscan_Api;
-        let etherscanApiUrl = `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${tokenContractAddress}&topic0=${MintEvent.topic0}&apikey=${etherscanApiKey}`
+        let etherscanApiUrl = networkName === "kovan" 
+        ? `https://api-kovan.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${tokenContractAddress}&topic0=${MintEvent.topic0}&apikey=${etherscanApiKey}`
+        : `https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=10000000&toBlock=latest&address=${tokenContractAddress}&topic0=${MintEvent.topic0}&apikey=${etherscanApiKey}`
         const mintResponse = await fetch(etherscanApiUrl);
         const mintResponseJson = await mintResponse.json();
         if (mintResponseJson.status !== "1") return result;
@@ -758,7 +772,7 @@ export class ExplorerProvider {
     }
 
     public gasPrice = async (): Promise<BigNumber> => {
-        let result = new BigNumber(30).multipliedBy(10 ** 9); // upper limit 30 gwei
+        let result = new BigNumber(500).multipliedBy(10 ** 9); // upper limit 500 gwei
         const lowerLimit = new BigNumber(3).multipliedBy(10 ** 9); // lower limit 3 gwei
 
         const url = `https://ethgasstation.info/json/ethgasAPI.json`;
@@ -800,9 +814,9 @@ export class ExplorerProvider {
     public getLargeApprovalAmount = (asset: Asset, neededAmount: BigNumber = new BigNumber(0)): BigNumber => {
         return ExplorerProvider.MAX_UINT;
         /*let amount = new BigNumber(0);
-    
+
         switch (asset) {
-          case Asset.ETH:
+            case Asset.ETH:
           case Asset.WETH:
           case Asset.fWETH:
             amount = new BigNumber(10 ** 18).multipliedBy(1500);
@@ -818,29 +832,29 @@ export class ExplorerProvider {
           case Asset.LEND:
           case Asset.KNC:
             amount = new BigNumber(10 ** 18).multipliedBy(550000);
-          case Asset.BAT:
-            amount = new BigNumber(10 ** 18).multipliedBy(750000);
-          case Asset.DAI:
-          case Asset.SAI:
-          case Asset.SUSD:
-            amount = new BigNumber(10 ** 18).multipliedBy(375000);
-          case Asset.USDC:
-          case Asset.USDT:
-            amount = new BigNumber(10 ** 6).multipliedBy(375000);
-          case Asset.REP:
-            amount = new BigNumber(10 ** 18).multipliedBy(15000);
-          case Asset.MKR:
-            amount = new BigNumber(10 ** 18).multipliedBy(1250);
+            case Asset.BAT:
+                amount = new BigNumber(10 ** 18).multipliedBy(750000);
+            case Asset.DAI:
+            case Asset.SAI:
+            case Asset.SUSD:
+                amount = new BigNumber(10 ** 18).multipliedBy(375000);
+            case Asset.USDC:
+            case Asset.USDT:
+                amount = new BigNumber(10 ** 6).multipliedBy(375000);
+            case Asset.REP:
+                amount = new BigNumber(10 ** 18).multipliedBy(15000);
+            case Asset.MKR:
+                amount = new BigNumber(10 ** 18).multipliedBy(1250);
           case Asset.CHI:
             amount = new BigNumber(10 ** 18);
-          default:
-            break;
+            default:
+                break;
         }
-    
+
         if (amount.eq(0)) {
-          throw new Error("Invalid approval asset!");
+            throw new Error("Invalid approval asset!");
         }
-        
+
         return amount.gt(neededAmount) ? amount : neededAmount;*/
     }
 

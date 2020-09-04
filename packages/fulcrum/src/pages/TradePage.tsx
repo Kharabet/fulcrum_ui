@@ -475,6 +475,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
           //in case of exotic pairs like ETH-KNC all values should be denominated in USD
           if (!this.stablecoins.includes(loan.collateralAsset)) {
             const tradeEvents = await FulcrumProvider.Instance.getTradeHistory();
+            if (!tradeEvents.find((e: TradeEvent) => e.loanId === loan.loanId)) continue;
             const openTimeStamp = tradeEvents.find((e: TradeEvent) => e.loanId === loan.loanId)!.timeStamp;
             const swapToUsdHistoryRateRequest = await fetch(`https://api.bzx.network/v1/asset-history-price?asset=${loan.collateralAsset.toLowerCase()}&date=${openTimeStamp.getTime()}`);
             const swapToUsdHistoryRateResponse = (await swapToUsdHistoryRateRequest.json()).data;
