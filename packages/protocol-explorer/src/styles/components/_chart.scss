@@ -9,9 +9,8 @@
   width: calc(100% + 20px);
   margin-left: -10px;
   position: relative;
-  @media screen and (max-width: $width-max-sm){
-    max-height: 180px;
-  }
+  max-height: 30vh;
+
   canvas {
     width: 100% !important;
     height: 100% !important;
