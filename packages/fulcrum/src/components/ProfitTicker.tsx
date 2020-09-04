@@ -24,7 +24,7 @@ export class ProfitTicker extends Component<IProfitTickerProps> {
     setInterval(() => {
       if (this.container.current) {
         value = value + diff;
-        this.container.current.innerHTML = value.toFixed(8) + ` ${this.props.asset}`;
+        this.container.current.innerHTML = value.toFixed(8);
       }
     }, ms);
   }
@@ -35,7 +35,7 @@ export class ProfitTicker extends Component<IProfitTickerProps> {
       <div
         ref={this.container}
         className="token-selector-item__profit-value"
-      >{profit ? `${profit.toFixed(8)} ${this.props.asset}` : ''}</div>
+      >{profit ? `${profit.toFixed(8)}` : ''}</div>
     );
   }
 }
