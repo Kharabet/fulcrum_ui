@@ -74,7 +74,8 @@ export class RepayLoanProcessor {
         // Waiting for token allowance
         task.processingStepNext();
         if (closeAmountInBaseUnits.gt(erc20allowance)) {
-          await tokenErc20Contract!.approve.sendTransactionAsync(TorqueProvider.Instance.contractsSource.getVaultAddress().toLowerCase(), TorqueProvider.Instance.getLargeApprovalAmount(taskRequest.borrowAsset), { from: account });
+          const approveHash = await tokenErc20Contract!.approve.sendTransactionAsync(TorqueProvider.Instance.contractsSource.getVaultAddress().toLowerCase(), TorqueProvider.Instance.getLargeApprovalAmount(taskRequest.borrowAsset, closeAmountInBaseUnits), { from: account });
+          await TorqueProvider.Instance.waitForTransactionMined(approveHash);
         }
       }
 
@@ -85,10 +86,27 @@ export class RepayLoanProcessor {
           closeAmountInBaseUnits = new BigNumber(10 ** 50);
       }
 
+      const isGasTokenEnabled = localStorage.getItem('isGasTokenEnabled') === "true";
+      const ChiTokenBalance = await TorqueProvider.Instance.getAssetTokenBalanceOfUser(Asset.CHI);
+
       let gasAmountBN = new BigNumber(0);
       try {
         // console.log(bZxContract.address);
-        const gasAmount = await bZxContract.closeWithDeposit.estimateGasAsync(
+        const gasAmount = isGasTokenEnabled && ChiTokenBalance.gt(0)
+        ? await bZxContract.closeWithDepositWithGasToken.estimateGasAsync(
+          taskRequest.loanId,
+          account,
+          account,
+          closeAmountInBaseUnits,
+          {
+            from: account,
+            value: isETHBorrowAsset ?
+              closeAmountInBaseUnitsValue :
+              undefined,
+            gas: TorqueProvider.Instance.gasLimit
+          }
+        )
+        : await bZxContract.closeWithDeposit.estimateGasAsync(
           taskRequest.loanId,
           account,
           closeAmountInBaseUnits,
@@ -111,7 +129,22 @@ export class RepayLoanProcessor {
       let txHash = "";
 
       try {
-        txHash = await bZxContract.closeWithDeposit.sendTransactionAsync(
+        txHash = isGasTokenEnabled && ChiTokenBalance.gt(0)
+        ? await bZxContract.closeWithDepositWithGasToken.sendTransactionAsync(
+          taskRequest.loanId,                                                 // loanId
+          account,                                                            // borrower
+          account,                                                            // gasTokenUser
+          closeAmountInBaseUnits,                                             // depositAmount
+          {
+            from: account,
+            value: isETHBorrowAsset
+              ? closeAmountInBaseUnitsValue
+              : undefined,
+            gas: !gasAmountBN.eq(0) ? gasAmountBN.toString() : "3000000",
+            gasPrice: await TorqueProvider.Instance.gasPrice()
+          }
+        )
+        : await bZxContract.closeWithDeposit.sendTransactionAsync(
           taskRequest.loanId,                                                 // loanId
           account,                                                            // borrower
           closeAmountInBaseUnits,                                             // depositAmount

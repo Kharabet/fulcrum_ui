@@ -183,7 +183,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
               : <Preloader width="74px" />
             }
           </div>
-          <div className={`own-token-grid-row__open-manage-collateral ${this.props.loan.collateralizedPercent.lte(.25) ? "danger" : ""}`} onClick={this.onManageClick}>
+          <div className={`own-token-grid-row__open-manage-collateral ${this.props.loan.collateralizedPercent.lte(.15) ? "danger" : ""}`} onClick={this.onManageClick}>
             <OpenManageCollateral />
           </div>
         </div>
@@ -210,7 +210,7 @@ export class OwnTokenGridRow extends Component<IOwnTokenGridRowProps, IOwnTokenG
           }
         </div>
         <div className="own-token-grid-row__col-action opacityIn rightIn">
-          <button className="own-token-grid-row_button own-token-grid-row__sell-button own-token-grid-row__button--size-half" onClick={this.onSellClick} disabled={this.props.loan.collateralizedPercent.lte(.25)}>
+          <button className="own-token-grid-row_button own-token-grid-row__sell-button own-token-grid-row__button--size-half" onClick={this.onSellClick} disabled={this.props.loan.collateralizedPercent.lte(.15)}>
             {TradeType.SELL}
           </button>
         </div>

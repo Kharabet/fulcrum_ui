@@ -9,9 +9,6 @@
     "name": "usdt"
   },
   {
-    "name": "susd"
-  },
-  {
     "name": "eth"
   },
   {
@@ -21,12 +18,12 @@
     "name": "link"
   },
   {
-    "name": "zrx"
+    "name": "bzrx"
   },
   {
     "name": "knc"
   },
   {
-    "name": "rep"
+    "name": "lend"
   }
 ]

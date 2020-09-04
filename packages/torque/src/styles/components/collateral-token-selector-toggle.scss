@@ -13,6 +13,10 @@
   &__logo-container {
     display: flex;
     margin-right: 8px;
+    svg {
+      width: 40px;
+      height: auto;
+    }
   }
 
   &__info-container {
@@ -42,12 +46,11 @@
     margin-right: 10px;
   }
 }
-@media screen and (max-width: $mobile-version-max-width) { 
-  .collateral-token-selector-toggle { 
+@media screen and (max-width: $mobile-version-max-width) {
+  .collateral-token-selector-toggle {
     &__logo-container {
-      svg{
+      svg {
         width: 30px;
-        height: auto;
       }
     }
   }

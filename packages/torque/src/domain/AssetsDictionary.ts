@@ -17,6 +17,9 @@ import zrx_logo, {ReactComponent as ZRXLogo} from "../assets/images/ic_token_zrx
 import weth_logo, {ReactComponent as WETHLogo} from "../assets/images/ic_token_weth.svg";
 import chai_logo, {ReactComponent as CHAILogo} from "../assets/images/ic_token_chai.svg";
 import chi_logo, {ReactComponent as CHILogo} from "../assets/images/ic_token_chi.svg";
+import bzrx_logo, {ReactComponent as BZRXLogo} from "../assets/images/ic_token_bzrx.svg";
+import yfi_logo, {ReactComponent as YFILogo} from "../assets/images/ic_token_yfi.svg";
+import lend_logo, {ReactComponent as LENDLogo} from "../assets/images/ic_token_lend.svg";
 
 import bat_bg from "../assets/images/popup_left_token_bat.svg";
 import btc_bg from "../assets/images/popup_left_token_btc.svg";
@@ -31,6 +34,9 @@ import susd_bg from "../assets/images/popup_left_token_susd.svg";
 import usdt_bg from "../assets/images/popup_left_token_usdt.svg";
 import usdc_bg from "../assets/images/popup_left_token_usdc.svg";
 import zrx_bg from "../assets/images/popup_left_token_zrx.svg";
+import bzrx_bg from "../assets/images/popup_left_token_bzrx.svg";
+import yfi_bg from "../assets/images/popup_left_token_yfi.svg";
+import lend_bg from "../assets/images/popup_left_token_lend.svg";
 
 import bat_bg_btm from "../assets/images/popup_bottom_token_bat.svg";
 //import btc_bg_btm from "../assets/images/popup_bottom_token_btc.svg";
@@ -45,6 +51,9 @@ import susd_bg_btm from "../assets/images/popup_bottom_token_susd.svg";
 //import usdt_bg_btm from "../assets/images/popup_bottom_token_susd.svg";
 import usdc_bg_btm from "../assets/images/popup_bottom_token_usdc.svg";
 import zrx_bg_btm from "../assets/images/popup_bottom_token_zrx.svg";
+import bzrx_bg_btm from "../assets/images/popup_bottom_token_bzrx.svg";
+import yfi_bg_btm from "../assets/images/popup_bottom_token_yfi.svg";
+import lend_bg_btm from "../assets/images/popup_bottom_token_lend.svg";
 
 
 import bat_ts from "../assets/images/ic___token_selector___bat.svg";
@@ -60,6 +69,9 @@ import usdt_ts from "../assets/images/ic___token_selector___susd.svg";
 import usdc_ts from "../assets/images/ic___token_selector___usdc.svg";
 import btc_ts from "../assets/images/ic___token_selector___wbtc.svg";
 import zrx_ts from "../assets/images/ic___token_selector___zrx.svg";
+import bzrx_ts from "../assets/images/ic___token_selector___bzrx.svg";
+import yfi_ts from "../assets/images/ic___token_selector___yfi.svg";
+import lend_ts from "../assets/images/ic___token_selector___lend.svg";
 
 export class AssetsDictionary {
   public static assets: Map<Asset, AssetDetails> = new Map<Asset, AssetDetails>([
@@ -455,6 +467,76 @@ export class AssetsDictionary {
           [42, "0x629b28c5aa5c953df2511d2e48d316a07eafb3e3"],
         ])
       )
+    ],
+
+    [
+      Asset.BZRX,
+      new AssetDetails(
+        "BZRX",
+        "bZx Protocol Token",
+        "iBZRX",
+        "https://fulcrum.trade/images/iBZRX.svg",
+        18,
+        bzrx_logo,
+        BZRXLogo,
+        bzrx_bg,
+        bzrx_ts,
+        "#7368D0",
+        "#FFFFFF",
+        "#FFFFFF",
+	      "#D8D3FF",
+        new Map<number, string | null>([
+          [1, "0x56d811088235F11C8920698a204A5010a788f4b3"],
+          [3, ""],
+          [42, ""],
+        ])
+      )
+    ],
+    [
+      Asset.YFI,
+      new AssetDetails(
+        "YFI",
+        "YFI",
+        "iYFI",
+        "https://fulcrum.trade/images/iYFI.svg",
+        18,
+        yfi_logo,
+        YFILogo,
+        yfi_bg,
+        yfi_ts,
+        "#7368D0",
+        "#FFFFFF",
+        "#FFFFFF",
+	      "#D8D3FF",
+        new Map<number, string | null>([
+          [1, "0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e"],
+          [3, ""],
+          [42, ""],
+        ])
+      )
+    ],
+    [
+      Asset.LEND,
+      new AssetDetails(
+        "LEND",
+        "LEND",
+        "iLEND",
+        "https://fulcrum.trade/images/iLEND.svg",
+        18,
+        lend_logo,
+        LENDLogo,
+        lend_bg,
+        lend_ts,
+        "#7368D0",
+        "#FFFFFF",
+        "#FFFFFF",
+	      "#D8D3FF",
+        new Map<number, string | null>([
+          [1, "0x80fB784B7eD66730e8b1DBd9820aFD29931aab03"],
+          [3, ""],
+          [42, ""],
+        ])
+      )
     ]
   ]);
 }
@@ -829,6 +911,75 @@ export class AssetsDictionaryMobile {
           [1, "0xe41d2489571d322189246dafa5ebde1f4699f498"],
           [3, "0xb4f7332ed719eb4839f091eddb2a3ba309739521"], // using LINK token instead
           [42, "0x629b28c5aa5c953df2511d2e48d316a07eafb3e3"],
+        ])
+      )
+    ],
+    [
+      Asset.BZRX,
+      new AssetDetails(
+        "BZRX",
+        "bZx Protocol Token",
+        "iBZRX",
+        "https://fulcrum.trade/images/iBZRX.svg",
+        18,
+        bzrx_logo,
+        BZRXLogo,
+        bzrx_bg_btm,
+        bzrx_ts,
+        "#7368D0",
+        "#FFFFFF",
+        "#FFFFFF",
+	      "#D8D3FF",
+        new Map<number, string | null>([
+          [1, "0x56d811088235F11C8920698a204A5010a788f4b3"],
+          [3, ""],
+          [42, ""],
+        ])
+      )
+    ],
+    [
+      Asset.YFI,
+      new AssetDetails(
+        "YFI",
+        "YFI",
+        "iYFI",
+        "https://fulcrum.trade/images/iYFI.svg",
+        18,
+        yfi_logo,
+        YFILogo,
+        yfi_bg_btm,
+        yfi_ts,
+        "#7368D0",
+        "#FFFFFF",
+        "#FFFFFF",
+	      "#D8D3FF",
+        new Map<number, string | null>([
+          [1, "0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e"],
+          [3, ""],
+          [42, ""],
+        ])
+      )
+    ],
+    [
+      Asset.LEND,
+      new AssetDetails(
+        "LEND",
+        "LEND",
+        "iLEND",
+        "https://fulcrum.trade/images/iLEND.svg",
+        18,
+        lend_logo,
+        LENDLogo,
+        lend_bg_btm,
+        lend_ts,
+        "#7368D0",
+        "#FFFFFF",
+        "#FFFFFF",
+	      "#D8D3FF",
+        new Map<number, string | null>([
+          [1, "0x80fB784B7eD66730e8b1DBd9820aFD29931aab03"],
+          [3, ""],
+          [42, ""],
         ])
       )
     ]

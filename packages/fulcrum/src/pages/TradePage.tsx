@@ -103,31 +103,22 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
     } else {
       this.baseTokens = [
         Asset.ETH,
-        // Asset.DAI,
-        // Asset.USDC,
-        // Asset.SUSD,
         Asset.WBTC,
         Asset.LINK,
-        // Asset.MKR,
-        Asset.ZRX,
-        // Asset.BAT,
-        // Asset.REP,
+        Asset.MKR,
+        Asset.LEND,
         Asset.KNC
       ];
       this.quoteTokens = [
         Asset.DAI,
-        /*Asset.SAI,*/
         Asset.USDC,
-        Asset.SUSD,
-        Asset.USDT
+        Asset.USDT,
       ]
     }
     this.stablecoins = [
       Asset.DAI,
-      /*Asset.SAI,*/
       Asset.USDC,
-      Asset.SUSD,
-      Asset.USDT
+      Asset.USDT,
     ]
 
     this.state = {
@@ -207,8 +198,8 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
 
   public render() {
 
-    const tvBaseToken = this.state.selectedMarket.baseToken === Asset.fWETH ? Asset.ETH : this.state.selectedMarket.baseToken;
-    const tvQuoteToken = this.state.selectedMarket.quoteToken === Asset.fWETH ? Asset.ETH : this.state.selectedMarket.quoteToken;
+    const tvBaseToken = this.state.selectedMarket.baseToken === Asset.WETH ? Asset.ETH : this.state.selectedMarket.baseToken;
+    const tvQuoteToken = this.state.selectedMarket.quoteToken === Asset.WETH ? Asset.ETH : this.state.selectedMarket.quoteToken;
 
     return (
       <div className="trade-page">
@@ -484,6 +475,7 @@ export default class TradePage extends PureComponent<ITradePageProps, ITradePage
           //in case of exotic pairs like ETH-KNC all values should be denominated in USD
           if (!this.stablecoins.includes(loan.collateralAsset)) {
             const tradeEvents = await FulcrumProvider.Instance.getTradeHistory();
+            if (!tradeEvents.find((e: TradeEvent) => e.loanId === loan.loanId)) continue;
             const openTimeStamp = tradeEvents.find((e: TradeEvent) => e.loanId === loan.loanId)!.timeStamp;
             const swapToUsdHistoryRateRequest = await fetch(`https://api.bzx.network/v1/asset-history-price?asset=${loan.collateralAsset.toLowerCase()}&date=${openTimeStamp.getTime()}`);
             const swapToUsdHistoryRateResponse = (await swapToUsdHistoryRateRequest.json()).data;

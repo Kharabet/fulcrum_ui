@@ -94,7 +94,7 @@ export class ContractsSource {
     let address: string = "";
     switch (this.networkId) {
       case 1:
-        address = "0xee14de2e67e1ec23c8561a6fad2635ff1b618db6";
+        address = "0xaaA601aE20077F9fae80494DDC36BB39C952c2d0";
         break;
       case 3:
         address = "0x4330762418df3555ddd1d732200b317c9239b941";
@@ -114,7 +114,7 @@ export class ContractsSource {
     let address: string = "";
     switch (this.networkId) {
       case 1:
-        address = "0x1cf226e9413addaf22412a2e182f9c0de44af002";
+        address = "0xD8Ee69652E4e4838f2531732a46d1f7F584F0b7f";
         break;
       case 3:
         address = "0xbe49f4cd73041cdf24a7b721627de577b3bab000";
@@ -138,7 +138,7 @@ export class ContractsSource {
     let result = Asset.UNKNOWN;
 
     //@ts-ignore
-    result = ContractsSource.iTokenList.filter(e => e[1] === address)[0][4].substr(1) as Asset
+    result = ContractsSource.iTokenList.filter(e => e[1].toLowerCase() === address.toLowerCase())[0][4].substr(1) as Asset
     return result;
   }
 
@@ -164,6 +164,15 @@ export class ContractsSource {
       case 1:
         // noinspection SpellCheckingInspection
         switch (addressErc20) {
+          case "0x56d811088235f11c8920698a204a5010a788f4b3":
+            asset = Asset.BZRX;
+            break;
+          case "0x0bc529c00c6401aef6d220be8c6ea1667f6ad93e":
+            asset = Asset.YFI;
+            break;
+          case "0x80fb784b7ed66730e8b1dbd9820afd29931aab03":
+            asset = Asset.LEND;
+            break;
           case "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2":
             asset = Asset.WETH;
             break;
@@ -203,6 +212,9 @@ export class ContractsSource {
           case "0xdd974d5c2e2928dea5f71b9825b8b646686bd200":
             asset = Asset.KNC;
             break;
+          case "0x0000000000004946c0e9f43f4dee607b0ef1fa1c":
+            asset = Asset.CHI;
+            break;
         }
         break;
       case 3:
@@ -228,24 +240,24 @@ export class ContractsSource {
             break;
         }
         break;
-        case 42:
-          /*switch (addressErc20) {
-            case "0xd0a1e359811322d97991e03f863a0c30c2cf029c":
-              asset = Asset.ETH;
-              break;
-            case "0xc4375b7de8af5a38a93548eb8453a498222c4ff2":
-              asset = Asset.SAI;
-              break;
-            case "0x4f96fe3b7a6cf9725f59d353f723c1bdb64ca6aa":
-              asset = Asset.DAI;
-              break;
-            case "0x75b0622cec14130172eae9cf166b92e5c112faff":
-              asset = Asset.USDC;
-              break;
-            case "0xad67cb4d63c9da94aca37fdf2761aadf780ff4a2":
-              asset = Asset.KNC;
-              break;
-          }*/
+      case 42:
+        /*switch (addressErc20) {
+          case "0xd0a1e359811322d97991e03f863a0c30c2cf029c":
+            asset = Asset.ETH;
+            break;
+          case "0xc4375b7de8af5a38a93548eb8453a498222c4ff2":
+            asset = Asset.SAI;
+            break;
+          case "0x4f96fe3b7a6cf9725f59d353f723c1bdb64ca6aa":
+            asset = Asset.DAI;
+            break;
+          case "0x75b0622cec14130172eae9cf166b92e5c112faff":
+            asset = Asset.USDC;
+            break;
+          case "0xad67cb4d63c9da94aca37fdf2761aadf780ff4a2":
+            asset = Asset.KNC;
+            break;
+        }*/
         switch (addressErc20) {
           case "0xe65d99a06d0ded0d318e31db3ae5d77629c625fc":
             asset = Asset.fWETH;
@@ -286,6 +298,9 @@ export class ContractsSource {
           case "0x02357164ba33f299f7654cbb29da29db38ae1f44":
             asset = Asset.KNC;
             break;
+          case "0x0000000000004946c0e9f43f4dee607b0ef1fa1c":
+            asset = Asset.CHI;
+            break;
         }
         break;
     }
@@ -297,7 +312,7 @@ export class ContractsSource {
     let address: string = "";
     switch (this.networkId) {
       case 1:
-        address = "0xbfdE53F20d50E41162a6085a9A591f27c9c47652";
+        address = "0x3B55369bfeA51822eb3E85868c299E8127E13c56";
         break;
       case 3:
         address = "0x2B2db1E0bDf6485C87Bc2DddEd17E7E3D9ba675E";

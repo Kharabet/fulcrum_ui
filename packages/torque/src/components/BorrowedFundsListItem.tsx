@@ -132,7 +132,8 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
     const sliderMin = borrowedFundsItem.loanData!.maintenanceMargin.div(10 ** 18).toNumber();
     //300%
     const sliderMax = sliderMin + 185;
-    const isUnhealthyLoan = this.state.borrowedFundsItem.collateralizedPercent.times(100).plus(100).lt(125);
+    const isUnhealthyLoan = this.state.borrowedFundsItem.collateralizedPercent.times(100).plus(100).lt(115);
+    const isBoorowMoreDisabled = this.state.borrowedFundsItem.collateralizedPercent.times(100).plus(100).lt(150);
 
     let sliderValue = borrowedFundsItem.collateralizedPercent.multipliedBy(100).toNumber();
     if (sliderValue > sliderMax) {
@@ -228,8 +229,8 @@ export class BorrowedFundsListItem extends Component<IBorrowedFundsListItemProps
                 Repay Loan
               </button>
               <button className=""
-                title={isUnhealthyLoan ? "Collateral too low" : ""}
-                disabled={isUnhealthyLoan} onClick={this.onBorrowMore}>
+                title={isBoorowMoreDisabled ? "Collateral too low" : ""}
+                disabled={isBoorowMoreDisabled} onClick={this.onBorrowMore}>
                 Borrow More
               </button>
             </div>

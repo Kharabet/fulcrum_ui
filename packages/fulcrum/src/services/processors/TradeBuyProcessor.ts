@@ -84,7 +84,7 @@ export class TradeBuyProcessor {
 
       // Prompting token allowance
       if (amountInBaseUnits.gt(erc20allowance)) {
-        approvePromise = tokenErc20Contract!.approve.sendTransactionAsync(tokenContract.address, FulcrumProvider.Instance.getLargeApprovalAmount(taskRequest.depositToken), { from: account });
+        approvePromise = tokenErc20Contract!.approve.sendTransactionAsync(tokenContract.address, FulcrumProvider.Instance.getLargeApprovalAmount(taskRequest.depositToken, amountInBaseUnits), { from: account });
       }
       task.processingStepNext();
       task.processingStepNext();
@@ -134,38 +134,35 @@ export class TradeBuyProcessor {
       await approvePromise;
       gasAmountBN = new BigNumber(FulcrumProvider.Instance.gasLimit);
     } else {
-      gasAmountBN = new BigNumber(FulcrumProvider.Instance.gasLimit);
-
-      // estimating gas amount
-      // const gasAmount = isGasTokenEnabled && ChiTokenBalance.gt(0)
-      //   ? await tokenContract.marginTradeWithGasToken.estimateGasAsync(
-      //     "0x0000000000000000000000000000000000000000000000000000000000000000",
-      //     leverageAmount,
-      //     loanTokenSent,
-      //     collateralTokenSent,
-      //     collateralTokenAddress!,
-      //     account,
-      //     account,
-      //     loanData,
-      //     {
-      //       from: account,
-      //       value: sendAmountForValue,
-      //       gas: FulcrumProvider.Instance.gasLimit
-      //     })
-      //   : await tokenContract.marginTrade.estimateGasAsync(
-      //     "0x0000000000000000000000000000000000000000000000000000000000000000",
-      //     leverageAmount,
-      //     loanTokenSent,
-      //     collateralTokenSent,
-      //     collateralTokenAddress!,
-      //     account,
-      //     loanData,
-      //     {
-      //       from: account,
-      //       value: sendAmountForValue,
-      //       gas: FulcrumProvider.Instance.gasLimit
-      //     });
-      // gasAmountBN = new BigNumber(gasAmount).multipliedBy(FulcrumProvider.Instance.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
+      const gasAmount = isGasTokenEnabled && ChiTokenBalance.gt(0)
+        ? await tokenContract.marginTradeWithGasToken.estimateGasAsync(
+          "0x0000000000000000000000000000000000000000000000000000000000000000",
+          leverageAmount,
+          loanTokenSent,
+          collateralTokenSent,
+          collateralTokenAddress!,
+          account,
+          account,
+          loanData,
+          {
+            from: account,
+            value: sendAmountForValue,
+            gas: FulcrumProvider.Instance.gasLimit
+          })
+        : await tokenContract.marginTrade.estimateGasAsync(
+          "0x0000000000000000000000000000000000000000000000000000000000000000",
+          leverageAmount,
+          loanTokenSent,
+          collateralTokenSent,
+          collateralTokenAddress!,
+          account,
+          loanData,
+          {
+            from: account,
+            value: sendAmountForValue,
+            gas: FulcrumProvider.Instance.gasLimit
+          });
+      gasAmountBN = new BigNumber(gasAmount).multipliedBy(FulcrumProvider.Instance.gasBufferCoeff).integerValue(BigNumber.ROUND_UP);
     }
 
     let txHash: string = "";

@@ -9,6 +9,8 @@
   width: calc(100% + 20px);
   margin-left: -10px;
   position: relative;
+  max-height: 30vh;
+
   canvas {
     width: 100% !important;
     height: 100% !important;

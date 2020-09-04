@@ -1,6 +1,6 @@
 {
   "name": "@bzxnetwork/torque",
-  "version": "0.4.7",
+  "version": "2.0.0",
   "description": "Simplified crypto-lending platform",
   "keywords": [],
   "author": "",
@@ -29,7 +29,7 @@
     "node-fetch": "^2.5.0",
     "prop-types": "^15.6.0",
     "qrcode.react": "^0.9.3",
-    "rc-slider": "^9.2.4",
+    "rc-slider": "9.2.4",
     "react": "^16.8.3",
     "react-dom": "^16.8.3",
     "react-ga": "^2.5.7",
