@@ -372,11 +372,11 @@ export class LiquidationsPage extends Component<ILiquidationsPageProps, ILiquida
                         <div className="unhealthy-data-wrapper flex fd-c ai-c">
                           <div className="flex w-100 mb-15">
                             <div className="unhealthy">Unhealthy&nbsp;<span className="sign sign-currency">$</span>&nbsp;</div>
-                            <span className="unhealthy-value unhealthy-color">{this.state.unhealthyLoansUsd.toFixed(2)}</span>
+                            <span title={this.state.unhealthyLoansUsd.toFixed(2)} className="unhealthy-value unhealthy-color">{this.state.unhealthyLoansUsd.toFixed(2)}</span>
                           </div>
                           <div className="flex w-100">
                             <div className="healthy">Healthy&nbsp;<span className="sign sign-currency">$</span>&nbsp;</div>
-                            <span className="healthy-value healthy-color">{this.state.healthyLoansUsd.div(10**6).toFixed(2)}m</span>
+                            <span title={this.state.healthyLoansUsd.toFixed(2)} className="healthy-value healthy-color">{this.state.healthyLoansUsd.div(10**6).toFixed(2)}m</span>
                           </div>
                         </div>
                       </div>
