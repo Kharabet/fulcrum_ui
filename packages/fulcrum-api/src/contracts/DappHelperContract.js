@@ -6,11 +6,6 @@ export const DappHelperJson = {
             "inputs": [
                 {
                     "internalType": "address",
-                    "name": "oracleAddress",
-                    "type": "address"
-                },
-                {
-                    "internalType": "address",
                     "name": "usdTokenAddress",
                     "type": "address"
                 },
@@ -30,6 +25,16 @@ export const DappHelperJson = {
                 {
                     "internalType": "uint256[]",
                     "name": "rates",
+                    "type": "uint256[]"
+                },
+                {
+                    "internalType": "uint256[]",
+                    "name": "precisions",
+                    "type": "uint256[]"
+                },
+                {
+                    "internalType": "uint256[]",
+                    "name": "destAmounts",
                     "type": "uint256[]"
                 }
             ],
@@ -83,4 +88,4 @@ export const DappHelperJson = {
     ]
 }
 
-export const mainnetAddress = "0xbfdE53F20d50E41162a6085a9A591f27c9c47652";
+export const mainnetAddress = "0x3B55369bfeA51822eb3E85868c299E8127E13c56";
