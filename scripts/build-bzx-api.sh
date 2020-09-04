@@ -1,5 +1,5 @@
 #!/bin/bash
 
-cd ./packages/fulcrum-api
+cd ./packages/bzx-api
 yarn run build
 cd ./../..
