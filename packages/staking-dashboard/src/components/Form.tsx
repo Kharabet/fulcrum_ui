@@ -388,7 +388,7 @@ export class Form extends Component<{}, IFormState> {
                 </button>
               </div>
             */}
-            {this.state.claimableAmount.gt(0) &&
+            {/*{this.state.claimableAmount.gt(0) &&
               <div className="convert-button">
                 <button title={`Claim ${this.state.claimableAmount.toFixed(18)} vBZRX`} className="button button-full-width" onClick={this.onClaimClick}>
                   Claim&nbsp;
@@ -404,7 +404,7 @@ export class Form extends Component<{}, IFormState> {
                   <span className="notice">The program is open to anyone negatively impacted by the protocol pause on Feb-18-2020 04:21:52 AM +UTC</span>
               </button>
             </div>
-            }
+            }*/}
             {/*<div className="group-buttons">
               <button title="Coming soon" className="button" disabled={true}>Stake</button>
               <button title="Coming soon" className="button" disabled={true}>Unstake</button>
