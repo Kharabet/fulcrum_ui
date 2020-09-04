@@ -385,7 +385,7 @@ export class TorqueProvider {
         );
         result.depositAmount = borrowEstimate
           .dividedBy(10 ** collateralPrecision)
-          .multipliedBy(1.005); // safety buffer
+          .multipliedBy(1.20); // safety buffer
       }
     }
 
