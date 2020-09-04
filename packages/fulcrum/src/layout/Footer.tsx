@@ -3,7 +3,7 @@ import { FooterMenu } from "./FooterMenu";
 import { FooterVersion } from "./FooterVersion";
 
 interface IFooterProps {
-  isMobileMedia: boolean;
+  isRiskDisclosureModalOpen: () => void;
 }
 
 export class Footer extends Component<IFooterProps> {
@@ -11,7 +11,7 @@ export class Footer extends Component<IFooterProps> {
     return (
       <footer className="footer">
         <FooterVersion />
-        <FooterMenu {...this.props} />
+        <FooterMenu {...this.props}/>
       </footer>
     );
   }

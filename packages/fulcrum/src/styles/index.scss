@@ -13,44 +13,16 @@
 @import "components/check-box";
 @import "components/asset-dropdown";
 
-@import "components/change-24-h-marker";
-@import "components/collapsible-container";
-@import "components/collateral-token-button";
-@import "components/collateral-token-selector";
-@import "components/dropdown-select";
-@import "components/info-block";
-@import "components/lend-form";
-@import "components/lend-form.mobile";
-@import "components/lend-token-selector";
-@import "components/leverage-selector";
-@import "components/manage-collateral-form";
-@import "components/on-chain-indicator";
-@import "components/on-chain-indicator.mobile";
-@import "components/ops-selector";
-@import "components/own-token-grid";
-@import "components/own-token-grid-inner";
-@import "components/own-token-card-mobile";
-@import "components/position-type-marker";
-@import "components/position-type-marker-alt";
-@import "components/price-graph";
-@import "components/progress-bar";
-@import "components/progress-details";
-@import "components/provider-menu";
-@import "components/stats-grid";
-@import "components/task-list";
-@import "components/token-address-form";
-@import "components/token-spinner";
-@import "components/trade-expected-result";
-@import "components/trade-form";
-@import "components/trade-form.mobile";
-@import "components/trade-token-grid";
-@import "components/token-grid-tabs";
-@import "components/trade-token-card-mobile";
-@import "components/trading-view-chart";
-@import "components/unit-of-account";
-@import "components/eth-or-weth";
-@import "components/switch-theme";
 @import "components/preloader";
+
+@import "components/provider-menu";
+
+@import "components/on-chain-indicator";
+@import "components/switch-button";
+@import "components/switch-pro";
+@import "components/risk-disclosure";
+@import "components/circle-loader";
+@import "components/trade-tx-animation";
 
 @import "layout/footer";
 @import "layout/header";
@@ -59,13 +31,4 @@
 @import "layout/header-menu";
 @import "layout/header-menu.mobile";
 
-@import "pages/home-page";
-@import "pages/landing-page";
-@import "pages/landing-page.mobile";
-@import "pages/lend-page";
-@import "pages/maintenance-page";
-@import "pages/stats-page";
-@import "pages/trade-page";
-
-
-@import "base/utilities";
+@import "base/modal";

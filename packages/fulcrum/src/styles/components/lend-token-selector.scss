@@ -1,3 +1,5 @@
+@import "../abstracts/variables";
+
 .lend-token-selector {
   font-family: "Muli", sans-serif;
   font-weight: 800;
@@ -7,9 +9,6 @@
 
   justify-content: flex-start;
 
-  margin-top: 45px;
-
-
   .token-selector-item {
     box-sizing: border-box;
 
@@ -18,25 +17,72 @@
     flex-direction: column;
     flex-grow: 1;
 
-
     padding: 40px 30px 25px 30px;
     margin-bottom: 4px;
     background-color: var(--primary-row);
     border: 2px solid transparent;
-    @media screen and (min-width: $breakpoint-desktop-min){
+
+    &.loading-transaction {
+      background-color: var(--lend-bg-loading);
+      border-color: var(--lend-border-loading);
+      .lend-transaction-step {
+        margin-top: 45px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: 800;
+        font-size: 18px;
+        line-height: 140%;
+
+        color: #00c0ab;
+        text-align: center;
+        &.warning {
+          color: #ff4f4f;
+        }
+        @keyframes in {
+          0% {
+            opacity: 0;
+            transform: translate(0, -20px);
+          }
+          to {
+            opacity: 1;
+            transform: translate(0px, 0px);
+          }
+        }
+        @keyframes out {
+          0% {
+            opacity: 1;
+            transform: translate(0, 0);
+          }
+          to {
+            opacity: 0;
+            transform: translate(0px, 20px);
+          }
+        }
+
+        &.animation-in {
+          animation: in 0.5s ease-in;
+        }
+        &.animation-out {
+          animation: out 0.5s ease-in;
+        }
+      }
+    }
+    @media screen and (min-width: $breakpoint-desktop-min) {
       width: calc(25% - 3px);
-      max-width: calc(25%  - 3px);
+      max-width: calc(25% - 3px);
       &:not(:nth-child(4n)) {
         margin-right: 4px;
       }
     }
-    @media screen and (max-width: $breakpoint-desktop-max){
+    @media screen and (max-width: $breakpoint-desktop-max) {
       width: calc(100% / 3 - 2px);
       max-width: calc(100% / 3);
       &:not(:nth-child(3n)) {
         margin-right: 3px;
       }
     }
+
     .sign-currency {
       color: #a2abb8;
       font-weight: 400;
@@ -80,9 +126,9 @@
 
     .token-selector-item__image {
       margin-bottom: 10px;
-
       text-align: center;
-
+      display: flex;
+      justify-content: center;
       img,
       svg {
         display: inline-block;
@@ -191,7 +237,6 @@
 
       button {
         display: block;
-        cursor: pointer;
 
         border: 0;
         height: 45px;
@@ -225,8 +270,16 @@
         &.token-selector-item__lend-button {
           background-color: #00c0ab;
           &:hover {
-            cursor: pointer;
             background-color: #33dfcc;
+
+            &:not(:disabled) {
+              cursor: pointer;
+            }
+          }
+          &:disabled {
+            background-color: #5e6b7b;
+            color: #94a4bb;
+            cursor: not-allowed;
           }
         }
 
@@ -234,12 +287,12 @@
           background-color: #ff5353;
           &:hover {
             cursor: pointer;
-            background-color: #FE7272;
+            background-color: #fe7272;
           }
         }
       }
     }
-    .wrapper-loader{
+    .wrapper-loader {
       float: right;
       padding: 10px 0;
     }
@@ -271,6 +324,15 @@
           }
         }
       }
+    }
+  }
+
+  .circle-loader {
+    .circle-background {
+      border-color: var(--lend-circle-background);
+    }
+    .circle-main {
+      border-top-color: var(--lend-circle-main);
     }
   }
 }

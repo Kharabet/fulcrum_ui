@@ -1,0 +1,114 @@
+import { AbstractConnector } from '@web3-react/abstract-connector';
+import Web3ProviderEngine from 'web3-provider-engine';
+import CacheSubprovider from 'web3-provider-engine/subproviders/cache.js';
+import { RPCSubprovider } from '@0x/subproviders/lib/src/subproviders/rpc_subprovider';
+import invariant from 'tiny-invariant';
+
+function _inheritsLoose(subClass, superClass) {
+  subClass.prototype = Object.create(superClass.prototype);
+  subClass.prototype.constructor = subClass;
+  subClass.__proto__ = superClass;
+}
+
+var NetworkConnector = /*#__PURE__*/function (_AbstractConnector) {
+  _inheritsLoose(NetworkConnector, _AbstractConnector);
+
+  function NetworkConnector(_ref) {
+    var _this;
+
+    var urls = _ref.urls,
+        defaultChainId = _ref.defaultChainId,
+        pollingInterval = _ref.pollingInterval,
+        requestTimeoutMs = _ref.requestTimeoutMs;
+    !(defaultChainId || Object.keys(urls).length === 1) ? process.env.NODE_ENV !== "production" ? invariant(false, 'defaultChainId is a required argument with >1 url') : invariant(false) : void 0;
+    _this = _AbstractConnector.call(this, {
+      supportedChainIds: Object.keys(urls).map(function (k) {
+        return Number(k);
+      })
+    }) || this;
+    _this.currentChainId = defaultChainId || Number(Object.keys(urls)[0]);
+    _this.pollingInterval = pollingInterval;
+    _this.requestTimeoutMs = requestTimeoutMs;
+    _this.providers = Object.keys(urls).reduce(function (accumulator, chainId) {
+      var _Object$assign;
+
+      var engine = new Web3ProviderEngine({
+        pollingInterval: _this.pollingInterval
+      });
+      engine.addProvider(new CacheSubprovider());
+      engine.addProvider(new RPCSubprovider(urls[Number(chainId)], _this.requestTimeoutMs));
+      return Object.assign(accumulator, (_Object$assign = {}, _Object$assign[Number(chainId)] = engine, _Object$assign));
+    }, {});
+    _this.active = false;
+    return _this;
+  }
+
+  var _proto = NetworkConnector.prototype;
+
+  _proto.activate = function activate() {
+    try {
+      var _this3 = this;
+
+      _this3.providers[_this3.currentChainId].start();
+
+      _this3.active = true;
+      return Promise.resolve({
+        provider: _this3.providers[_this3.currentChainId],
+        chainId: _this3.currentChainId,
+        account: null
+      });
+    } catch (e) {
+      return Promise.reject(e);
+    }
+  };
+
+  _proto.getProvider = function getProvider() {
+    try {
+      var _this5 = this;
+
+      return Promise.resolve(_this5.providers[_this5.currentChainId]);
+    } catch (e) {
+      return Promise.reject(e);
+    }
+  };
+
+  _proto.getChainId = function getChainId() {
+    try {
+      var _this7 = this;
+
+      return Promise.resolve(_this7.currentChainId);
+    } catch (e) {
+      return Promise.reject(e);
+    }
+  };
+
+  _proto.getAccount = function getAccount() {
+    return Promise.resolve(null);
+  };
+
+  _proto.deactivate = function deactivate() {
+    this.providers[this.currentChainId].stop();
+    this.active = false;
+  };
+
+  _proto.changeChainId = function changeChainId(chainId) {
+    !Object.keys(this.providers).includes(chainId.toString()) ? process.env.NODE_ENV !== "production" ? invariant(false, "No url found for chainId " + chainId) : invariant(false) : void 0;
+
+    if (this.active) {
+      this.providers[this.currentChainId].stop();
+      this.currentChainId = chainId;
+      this.providers[this.currentChainId].start();
+      this.emitUpdate({
+        provider: this.providers[this.currentChainId],
+        chainId: chainId
+      });
+    } else {
+      this.currentChainId = chainId;
+    }
+  };
+
+  return NetworkConnector;
+}(AbstractConnector);
+
+export { NetworkConnector };
+//# sourceMappingURL=network-connector.esm.js.map

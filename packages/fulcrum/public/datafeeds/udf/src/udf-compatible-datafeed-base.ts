@@ -109,7 +109,7 @@ export class UDFCompatibleDatafeedBase implements IExternalDatafeed, IDatafeedQu
 					configuration = defaultConfiguration();
 				}
 
-				this._setupWithConfiguration(configuration);
+				this._setupWithConfiguration(configuration,);
 			});
 	}
 
@@ -282,7 +282,7 @@ export class UDFCompatibleDatafeedBase implements IExternalDatafeed, IDatafeedQu
 						onError('unknown_symbol');
 					} else {
 						if (response.listed_exchange === "Kyber Network")
-							response.pricescale = 100;
+							response.pricescale = response.currency_code == "WBTC" ? 1000000 : response.currency_code == "ETH" ? 10000 : 100;
 						onResultReady(response);
 					}
 				})
@@ -329,7 +329,6 @@ export class UDFCompatibleDatafeedBase implements IExternalDatafeed, IDatafeedQu
 
 	private _setupWithConfiguration(configurationData: UdfCompatibleConfiguration): void {
 		this._configuration = configurationData;
-
 		if (configurationData.exchanges === undefined) {
 			configurationData.exchanges = [];
 		}
@@ -341,6 +340,8 @@ export class UDFCompatibleDatafeedBase implements IExternalDatafeed, IDatafeedQu
 		if (configurationData.supports_group_request || !configurationData.supports_search) {
 			this._symbolsStorage = new SymbolsStorage(this._datafeedURL, configurationData.supported_resolutions || [], this._requester);
 		}
+		//set custom supported_resolutions
+		configurationData.supported_resolutions = defaultConfiguration().supported_resolutions;
 
 		logMessage(`UdfCompatibleDatafeed: Initialized with ${JSON.stringify(configurationData)}`);
 	}
@@ -350,7 +351,7 @@ function defaultConfiguration(): UdfCompatibleConfiguration {
 	return {
 		supports_search: false,
 		supports_group_request: true,
-		supported_resolutions: ['1', '5', '15', '30', '60', '1D', '1W', '1M'],
+		supported_resolutions: ['15', '30', '60', '120', '240', '360', '720'],
 		supports_marks: false,
 		supports_timescale_marks: false,
 	};

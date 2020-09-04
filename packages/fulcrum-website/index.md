@@ -1,8 +1,7 @@
 ---
 layout: trading
 featured-image: /images/ogp.png
-metadescription: "Try non-custodial crypto margin trading at DeFi platform Fulcrum. Enter into short/leveraged positions
-up to 4x without open fees. ETH and wBTC are available."
+metadescription: "Try non-custodial crypto margin trading at DeFi platform Fulcrum. Enter into short/leveraged positions up to 5x without open fees. ETH and wBTC are available."
 title: Crypto Margin Trading with Fulcrum | bZx
 ---
 
@@ -48,7 +47,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
                         {% include svg/no-kyc.svg %}
                     </div>
                     <h3 class="mb-20">No KYC</h3>
-                    <p>Fulcrum it's a decentralized margin trading platform, there is no need for any verification, KYC or AML.</p>
+                    <p>Fulcrum is a decentralized margin trading platform. There is no need for any verification, KYC or AML.</p>
                 </div>
             </div>
             <div class="col col-4 col-sm-6 col-xs-12 as-b">
@@ -99,21 +98,13 @@ title: Crypto Margin Trading with Fulcrum | bZx
     <div class="row">
         <div class="col col-12 chart-header">
             <div class="flex fw-w jc-fe jc-md-c f-3 chart-tokens">
-                <button class="coin-calc active" data-token="eth">
-                    {% include svg/eth.svg %}
-                </button>
-                <button class="coin-calc" data-token="wbtc">
-                    {% include svg/wbtc.svg %}
-                </button>
-                <button class="coin-calc" data-token="link">
-                    {% include svg/link.svg %}
-                </button>
-                <button class="coin-calc" data-token="zrx">
-                    {% include svg/zrx.svg %}
-                </button>
-                <button class="coin-calc" data-token="knc">
-                    {% include svg/knc.svg %}
-                </button>
+                {% for token in site.data.products %}
+                    {% if token.visibilityChart %}
+                        <button class="coin-calc" data-token="{{token.name}}">
+                            {% include svg/{{token.name}}.svg %}
+                        </button>
+                    {% endif %}
+                {% endfor %}
             </div>
             <div class="f-2 flex jc-c ai-fs">
                 <div class="button-group-gains" role="group" aria-label="Buttons gains">
@@ -196,66 +187,14 @@ title: Crypto Margin Trading with Fulcrum | bZx
         </div>
         <div class="row">
             <div class="flex col-12 jc-sb fw-sm-w mw-sm-440 mx-xs-345 mx-sm-auto">
-                <div class="item-coin mb-sm-15">
-                    <span class="name-coin">Sai</span>
-                    <span class="flex border-coin-4">
-                        {% include svg/sai.svg %}
-                    </span>
-                </div>
-                <div class="item-coin mb-sm-15">
-                    <span class="name-coin">Dai</span>
-                    <span class="flex border-coin-4">
-                        {% include svg/dai.svg %}
-                    </span>
-                </div>
-                <div class="item-coin mb-sm-15">
-                    <span class="name-coin">Eth</span>
-                    <span class="flex border-coin-4">
-                        {% include svg/eth.svg %}
-                    </span>
-                </div>
-                <div class="item-coin mb-sm-15">
-                    <span class="name-coin">Knc</span>
-                    <span class="flex border-coin-4">
-                        {% include svg/knc.svg %}
-                    </span>
-                </div>
-                <div class="item-coin mb-sm-15">
-                    <span class="name-coin">Link</span>
-                    <span class="flex border-coin-4">
-                        {% include svg/link.svg %}
-                    </span>
-                </div>
-                <div class="item-coin">
-                    <span class="name-coin">Usdc</span>
-                    <span class="flex border-coin-4">
-                        {% include svg/usdc.svg %}
-                    </span>
-                </div>
-                <div class="item-coin">
-                    <span class="name-coin">Wbtc</span>
-                    <span class="flex border-coin-4">
-                        {% include svg/wbtc.svg %}
-                    </span>
-                </div>
-                <div class="item-coin">
-                    <span class="name-coin">Zrx</span>
-                    <span class="flex border-coin-4">
-                        {% include svg/zrx.svg %}
-                    </span>
-                </div>
-                <div class="item-coin">
-                    <span class="name-coin">Susd</span>
-                    <span class="flex border-coin-4">
-                        {% include svg/susd.svg %}
-                    </span>
-                </div>
-                <div class="item-coin">
-                    <span class="name-coin">Rep</span>
-                    <span class="flex border-coin-4">
-                        {% include svg/rep.svg %}
-                    </span>
-                </div>
+                {% for token in site.data.products %}
+                    <div class="item-coin mb-sm-15">
+                        <span class="name-coin">{{token.name}}</span>
+                        <span class="flex border-coin-4">
+                            {% include svg/{{token.name}}.svg %}
+                        </span>
+                    </div>
+                {% endfor %}
             </div>
         </div>
     </div>
@@ -268,22 +207,29 @@ title: Crypto Margin Trading with Fulcrum | bZx
                 <h2 class="circle mb-65 mb-xs-50"><span class="blue right-r-50 top-r-10"></span>How safe is it?</h2>
             </div>
         </div>
-        <div class="row jc-sb fw-sm-w">
-            <div class="col col-4 col-sm-12 item-safe fd-c">
+        <div class="row jc-sb fw-md-w">
+            <div class="col col-3 col-md-6 col-sm-12 item-safe fd-c">
                 <div class="icon-safe mb-50 mb-xs-15">
                     {% include svg/icon-safe-1.svg %}
                 </div>
                 <h3 class="mb-20">Audited Smart Contracts</h3>
                 <p>The bZx base protocol has been <a href="https://github.com/mattdf/audits/blob/master/bZx/bzx-audit.pdf">successfully audited</a> by leading blockchain security auditor ZK Labs.</p>
             </div>
-            <div class="col col-4 col-sm-12 item-safe fd-c">
+            <div class="col col-3 col-md-6 col-sm-12 item-safe fd-c">
+                <div class="icon-safe mb-50 mb-xs-15">
+                    {% include svg/icon-safe-5.svg %}
+                </div>
+                <h3 class="mb-20">Secure Oracles</h3>
+                <p>Chainlink’s <a href="https://feeds.chain.link/">decentralized oracle network</a> is used for price information.</p>
+            </div>
+            <div class="col col-3 col-md-6 col-sm-12 item-safe fd-c">
                 <div class="icon-safe mb-50 mb-xs-15">
                     {% include svg/icon-safe-2.svg %}
                 </div>
                 <h3 class="mb-20">Insurance Fund</h3>
                 <p>If undercollateralized loans are not properly liquidated, lenders are repaid from a pool funded by 10% of the interest paid by borrowers.</p>
             </div>
-            <div class="col col-4 col-sm-12 item-safe fd-c">
+            <div class="col col-3 col-md-6 col-sm-12 item-safe fd-c">
                 <div class="icon-safe mb-50 mb-xs-15">
                     {% include svg/icon-safe-3.svg %}
                 </div>
@@ -295,14 +241,14 @@ title: Crypto Margin Trading with Fulcrum | bZx
     </div>
 </section>
 
-<section class="bg-secondary after-primary">
+<!--section class="bg-secondary after-primary">
     <div class="container">
         <div class="row">
             <div class="col col-12">
                 <div class="item-green py-40 p-sm-30 flex jc-c">
                     <div class="col-10 col-md col-md-12 fd-c jc-sb">
                         <p class="fs-24 fs-xs-20 fw-800 lh-150 mb-xs-15">Battle-tested</p>
-                        <p class="fs-44 fs-xs-28 fw-900 mb-15 lh-140 c-light-green">TVL in our Smart Contracts</p>
+                        <p class="fs-44 fs-xs-28 fw-900 mb-15 lh-140 c-light-green">Currently in Fulcrum</p>
                         <div class="flex jc-sb fd-sm-c fs-44 fs-md-36 fw-900 lh-140">
                             <div class="flex-xs fw-400">
                                 $<span class="fw-900 tvl-value" data-token="all"></span>
@@ -325,7 +271,7 @@ title: Crypto Margin Trading with Fulcrum | bZx
             </div>
         </div>
     </div>
-</section>
+</section-->
 
 <section class="bg-primary pt-135 pt-xs-90 pb-60 pb-xs-0 text-center">
     <div class="container">
@@ -338,8 +284,11 @@ title: Crypto Margin Trading with Fulcrum | bZx
             <div class="col col-8 col-md-10 col-sm-12">
                 <div id="accordion">
                     <div class="accordion-item active">
-                        <h4 class="accordion-toggle">What does going long or short mean in trading?</h4>
-                        <div class="accordion-content">
+                        <h4 class="accordion-toggle">
+                            What does going long or short mean in trading?
+                            <span class="accordion-position"></span>
+                        </h4>
+                        <div class="accordion-content" aria-hidden="false">
                             <p>Margin trading has two main aspects: leverage and shorting. When trading with leverage, a trader borrows assets to increase the amount of assets they are trading. By doing so, they magnify the gains or losses of their trade. The borrowed assets are known as a margin loan. To obtain the margin loan, the trader puts up assets that serve as collateral. The terms of the margin loan specify a collateral-to-loan ratio. If the trade falls below the specified ratio, the trade is liquidated and the lender gets repaid using the trader's collateral.
 
 Margin trading also includes shorting. When shorting, a trader essentially sells assets they do not own. The short investor borrows an asset and sells it with the expectation that the asset will lose value.
@@ -348,8 +297,11 @@ Margin trading also includes shorting. When shorting, a trader essentially sells
                         </div>
                     </div>
                     <div class="accordion-item">
-                        <h4 class="accordion-toggle">How are positions liquidated? Is there liquidity risk?</h4>
-                        <div class="accordion-content">
+                        <h4 class="accordion-toggle">
+                            How are positions liquidated? Is there liquidity risk?
+                            <span class="accordion-position"></span>
+                        </h4>
+                        <div class="accordion-content" aria-hidden="true">
                             <p>Positions are liquidated using KyberSwap. When a trader goes under margin maintenance (15%), they are only partially liquidated, bringing their current margin to 25%.
 
 Only liquidating as much as necessary reduces the risk of slippage from large liquidations. Anyone can initiate a margin call: the process is permissionless and incentivized. The incentive to liquidators is a refund of your gas * 2. There’s also no capital costs or risks like those experienced when liquidating positions on other protocols.
@@ -358,15 +310,18 @@ This ensures redundancy in the margin calling process. Moreover, there is an ins
                         </div>
                     </div>
                     <div class="accordion-item">
-                        <h4 class="accordion-toggle">Are the smart contracts safe? Can I see the audits?</h4>
-                        <div class="accordion-content">
+                        <h4 class="accordion-toggle">
+                            Are the smart contracts safe? Can I see the audits?
+                            <span class="accordion-position"></span>
+                        </h4>
+                        <div class="accordion-content" aria-hidden="true">
                             <p>Yes. The base protocol audit is <a href="https://github.com/mattdf/audits/blob/master/bZx/bzx-audit.pdf">publicly available</a>. All custody is retained by the base protocol. Both the base protocol audit and iToken/pToken audit were conducted by <a href="https://github.com/mattdf/audits/blob/master/bZx/bzx-audit.pdf">ZK Labs</a>, a recognized leader in the space. Matthew DiFerrante, founder and lead auditor at ZK Labs, is a security engineer at the Ethereum Foundation and audits the Ethereum core protocol itself.</p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="row">
+        <div class="row pt-60">
             <div class="col col-12">
                 <a href="https://help.bzx.network/en/" class="button button-sm button-white mx-auto">
                     <span class="mr-15">Help center</span>
@@ -379,7 +334,7 @@ This ensures redundancy in the margin calling process. Moreover, there is an ins
     </div>
     <div class="container pt-75 pt-xs-60">
         <div class="row jc-c">
-            <div class="col col-10 col-md-12 jc-sb fw-md-w">
+            <div class="col col-8 col-xl-10 col-md-12 jc-sb fw-md-w">
                 <div class="order-md-1 mb-xs-30 mx-xs-auto">
                     <a href="https://app.fulcrum.trade/#/trade" class="button button-primary button-lg mb-20">Trade</a>
                     <p class="fs-13 lh-150 text-center c-gray">Up to 5x Leverage, <br />and perfect

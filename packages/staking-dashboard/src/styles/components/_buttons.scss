@@ -1,0 +1,211 @@
+.group-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  .notice {
+    margin: 0 auto;
+    margin-bottom: 20px;
+    font-size: 14px;
+    font-weight: 200;
+    line-height: 1.8;
+  }
+  @media screen and (min-width: $width-min-sm) {
+    justify-content: space-between;
+  }
+  @media screen and (max-width: $width-max-sm) {
+    justify-content: center;
+    .notice {
+      width: 100%;
+      text-align: center;
+    }
+  }
+  .button {
+    margin-bottom: 20px;
+  }
+  &.selected-delegate{
+    .no-active{
+      background: #e7ebf0;
+      cursor: not-allowed;
+      &:hover {
+        border: 2px solid transparent;
+      }
+      .name {
+        color: #ffffff;
+      }
+      .photo{
+        filter: grayscale(100%);
+      }
+    }
+  }
+}
+
+.convert-button {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  padding: 0 45px;
+  margin-bottom: 35px;
+  margin-top: 20px;
+  @media screen and (max-width: $width-max-sm) {
+    margin-bottom: 55px;
+    padding: 0 10px;
+  }
+  &:before {
+    content: "";
+    position: absolute;
+    height: 1px;
+    width: 100%;
+    background-color: #e4ebf4;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, 0);
+  }
+  .button {
+    // z-index: 10;
+    position: relative;
+    width: 100%;
+
+    @media screen and (max-width: $width-max-sm) {
+      font-size: 14px;
+    }
+    .notice {
+      color: #758295;
+      position: absolute;
+      left: 50%;
+      top: 60px;
+      transform: translate(-50%, 0);
+      font-weight: 200;
+      line-height: 1.6;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 12px;
+      width: 100%;
+      @media screen and (max-width: $width-max-sm) {
+        bottom: -50px;
+        width: 80%;
+      }
+    }
+  }
+}
+
+.button {
+  border: none;
+  outline: none;
+  background-color: #f3f9ff;
+  border-radius: 40px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 1.5;
+  color: #276bfb;
+  &-full-width {
+    width: 100%;
+  }
+  @media screen and (min-width: $width-min-sm) {
+    min-width: 320px;
+    &-full-width {
+      max-width: 630px;
+    }
+  }
+  @media screen and (max-width: $width-max-sm) {
+    min-width: 255px;
+    &-full-width {
+      max-width: 540px;
+    }
+  }
+  &.blue {
+    background-color: #276bfb;
+    color: #ffffff;
+    &:hover {
+      background-color: #5b88ff;
+    }
+  }
+  &.red {
+    background-color: #ff5c5c;
+    color: #ffffff;
+
+    &:hover {
+      background-color: #ff5c5c;
+
+      opacity: 0.9;
+    }
+  }
+  &.half-button {
+    width: calc(50% - 9px);
+  }
+  &.full-button {
+    width: 100%;
+  }
+  &:hover {
+    cursor: pointer;
+    background-color: #5b88ff;
+    color: #ffffff;
+  }
+  &:disabled,
+  &[disabled] {
+    background: #e7ebf0;
+    color: #ffffff;
+    cursor: not-allowed;
+    &:hover {
+      cursor: not-allowed;
+    }
+  }
+}
+
+.button-representative {
+  padding: 4px;
+  border: 2px solid transparent;
+  justify-content: flex-start;
+  @media screen and (min-width: $width-min-sm) {
+    min-width: calc(100% / 3 - 12px);
+    height: 68px;
+  }
+  @media screen and (max-width: $width-max-sm) {
+    min-width: 100%;
+    height: 48px;
+  }
+  &:hover {
+    background-color: transparent;
+    border-color: #5b88ff;
+  }
+  &.active{
+    border: 2px solid #276BFB;
+    position: relative;
+    &:before{
+      content: "";
+      position: absolute;
+      left: 50%;
+      transform: translate(-50%, 0%);
+      bottom: -7px;
+      border-left: 5px solid transparent;
+      border-left: 7px solid transparent;
+      border-right: 7px solid transparent;
+      border-top: 6px solid #276BFB;
+    }
+  }
+  .photo {
+    margin-right: 12px;
+    border-radius: 50%;
+    img {
+      border-radius: 50%;
+      max-width: 100%;
+    }
+    @media screen and (min-width: $width-min-sm) {
+      width: 56px;
+      height: 56px;
+    }
+    @media screen and (max-width: $width-max-sm) {
+      width: 36px;
+      height: 36px;
+    }
+  }
+  .name {
+    font-size: 16px;
+    line-height: 1.8;
+    font-weight: 400;
+    color: #283049;
+  }
+}

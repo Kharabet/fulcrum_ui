@@ -3,7 +3,7 @@
     "constant": false,
     "inputs": [
       {
-        "name": "loanOrderHash",
+        "name": "loanId",
         "type": "bytes32"
       },
       {
@@ -34,7 +34,7 @@
         "type": "uint256"
       },
       {
-        "name": "collateralTokenAddress",
+        "name": "collateralToken",
         "type": "address"
       }
     ],
@@ -46,7 +46,7 @@
     "constant": false,
     "inputs": [
       {
-        "name": "loanOrderHash",
+        "name": "loanId",
         "type": "bytes32"
       },
       {
@@ -87,6 +87,10 @@
       {
         "name": "count",
         "type": "uint256"
+      },
+      {
+        "name": "loanType",
+        "type": "uint256"
       }
     ],
     "name": "getBasicLoansData",
@@ -94,15 +98,15 @@
       {
         "components": [
           {
-            "name": "loanOrderHash",
+            "name": "loanId",
             "type": "bytes32"
           },
           {
-            "name": "loanTokenAddress",
+            "name": "loanToken",
             "type": "address"
           },
           {
-            "name": "collateralTokenAddress",
+            "name": "collateralToken",
             "type": "address"
           },
           {
@@ -114,7 +118,7 @@
             "type": "uint256"
           },
           {
-            "name": "collateralTokenAmountFilled",
+            "name": "collateral",
             "type": "uint256"
           },
           {
@@ -126,15 +130,15 @@
             "type": "uint256"
           },
           {
-            "name": "initialMarginAmount",
+            "name": "initialMargin",
             "type": "uint256"
           },
           {
-            "name": "maintenanceMarginAmount",
+            "name": "maintenanceMargin",
             "type": "uint256"
           },
           {
-            "name": "currentMarginAmount",
+            "name": "currentMargin",
             "type": "uint256"
           },
           {
@@ -142,7 +146,7 @@
             "type": "uint256"
           },
           {
-            "name": "loanEndUnixTimestampSec",
+            "name": "loanEndTimestamp",
             "type": "uint256"
           }
         ],
@@ -158,7 +162,7 @@
     "constant": false,
     "inputs": [
       {
-        "name": "loanOrderHash",
+        "name": "loanId",
         "type": "bytes32"
       },
       {
@@ -185,7 +189,7 @@
     "constant": false,
     "inputs": [
       {
-        "name": "loanOrderHash",
+        "name": "loanId",
         "type": "bytes32"
       },
       {
@@ -208,7 +212,7 @@
     "constant": false,
     "inputs": [
       {
-        "name": "loanOrderHash",
+        "name": "loanId",
         "type": "bytes32"
       },
       {
@@ -231,7 +235,7 @@
         "type": "uint256"
       },
       {
-        "name": "collateralTokenAddress",
+        "name": "collateralToken",
         "type": "address"
       }
     ],

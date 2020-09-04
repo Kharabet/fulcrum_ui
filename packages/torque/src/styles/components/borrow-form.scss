@@ -1,143 +1,102 @@
 .borrow-form {
   display: flex;
-  flex-direction: column;
-
-  width: 47rem;
-
-  .borrow-form__input-container {
-    padding-bottom: 3rem;
-
-    .borrow-form__input-container__input-amount {
-      display: block;
-
-      height: 7rem;
-      width: 100%;
-
-      border-radius: 0.25rem;
-
-      font-size: 3rem;
-      font-weight: bold;
-      line-height: 1.17;
-      letter-spacing: -0.48px;
-      text-align: center;
-    }
+  flex-wrap: wrap;
+  width: 535px;
+  padding-top: 35px;
+  &__content {
+    width: 100%;
   }
-
-  .borrow-form-insufficient-balance {
-    color: red;
-    padding: .25rem;
+  &__input-container {
+    padding: 0 48px 40px 48px;
+  }
+  &__input-amount {
+    font-size: 42px;
+    line-height: 1.5;
+    font-weight: 900;
+    color: #283049;
+    background-color: transparent;
+    border: none;
     text-align: center;
-
-    &--hidden {
-      visibility: hidden;
+    width: 100%;
+    background-color: $bg-color-gray;
+    border: 2px solid #e7ebf0;
+    border-radius: 4px;
+    padding: 20px 0;
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    &[type="number"] {
+      -moz-appearance: textfield;
+    }
+    &:hover,
+    &:focus {
+      background-color: $bg-color-gray;
+      border: 2px solid #e7ebf0;
+      color: #283049;
     }
   }
 
-  .borrow-form__delimiter {
-    //margin-bottom: 1rem;
-
-    border: 0;
-    border-top: solid 0.0625rem rgba(255, 255, 255, 0.2);
+  &__insufficient-balance {
+    position: absolute;
+    font-size: 12px;
+    font-weight: 400;
+    width: 100%;
+    text-align: center;
   }
 
-  .borrow-form__info-collateral-by-container {
-    border-radius: 1rem;
-    background-color: #f5f7f9;
-    //padding: 2.5rem;
-    //margin-bottom: 1rem;
-
-    .borrow-form__info-collateral-by-msg {
-      padding-top: 1rem;
-      font-size: 1rem;
-      font-weight: normal;
-      font-style: normal;
-      font-stretch: normal;
-      line-height: 1.5;
-      letter-spacing: -0.16px;
-      text-align: center;
-      color: #a9b5c7;
-    }
-
-    .borrow-form__info-collateral-by-amount {
-      padding-bottom: 0.5rem;
-      font-size: 1.5rem;
-      font-weight: 600;
-      font-style: normal;
-      font-stretch: normal;
-      line-height: 1.67;
-      letter-spacing: -0.24px;
-      text-align: center;
-      color: #3b364b;
-    }
+  &__actions-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
   }
 
-  .borrow-form-form__info-liquidated-at-container {
-    border-radius: 1rem;
-    background-color: #f5f7f9;
-    padding-top: 1rem;
-    padding-right: 2.5rem;
-    padding-bottom: 1rem;
-    padding-left: 2.5rem;
-
-
-    .borrow-form-form__info-liquidated-at-msg {
-      font-size: 1rem;
-      font-weight: normal;
-      font-style: normal;
-      font-stretch: normal;
-      line-height: 1.5;
-      letter-spacing: -0.16px;
-      text-align: center;
-      color: #a9b5c7;
-    }
-
-    .borrow-form-form__info-liquidated-at-price {
-      font-size: 1.5rem;
-      font-weight: 600;
-      font-style: normal;
-      font-stretch: normal;
-      line-height: 1.67;
-      letter-spacing: -0.24px;
-      text-align: center;
-      color: #3b364b;
-    }
+  &__info-collateral-by-container {
+    padding: 25px 0;
+    background-color: $bg-color-gray;
+    font-style: normal;
+    font-stretch: normal;
+    line-height: 1.5;
+    text-align: center;
+  }
+  &__info-collateral-by-msg {
+    font-size: 16px;
+    font-weight: 400;
+    color: $color-gray-darker;
   }
 
-  .borrow-form__transfer-details {
-
-    padding-bottom: 1rem;
-
-    .borrow-form__transfer-details-msg {
-      margin-top: 1.5rem;
-
-      font-size: 1rem;
-      font-weight: normal;
-      font-style: normal;
-      font-stretch: normal;
-      line-height: 1.5;
-      letter-spacing: -0.16px;
-      text-align: center;
-      color: #a9b5c7;
-
-      &--warning {
-        text-align: center;
-        color: #801515;
+  &__info-collateral-by-amount {
+    font-size: 20px;
+    font-weight: 800;
+    color: #283049;
+    position: relative;
+    .loader,
+    .loader-dots {
+      height: 30px;
+      .loader-content {
+        top: 0;
+        transform: translate(-50%, 0);
       }
     }
   }
+  &__error{
+    color: #de4a4a;
+  }
+}
 
-  .borrow-form__actions-container {
-    display: flex;
-    flex-direction: row;
-
-    border-top: $color-gray-darker;
-
-    .borrow-form__action-change {
-      flex-grow: 1;
+@media screen and (max-width: $mobile-version-max-width) {
+  .borrow-form {
+    width: 100%;
+    &__input-container {
+      padding: 0 40px 40px 40px;
     }
-
-    button {
-      flex-grow: 0;
+    &__input-amount {
+      padding: 10px 0;
+      font-size: 36px;
+      &::placeholder {
+        font-size: 28px;
+      }
     }
   }
 }

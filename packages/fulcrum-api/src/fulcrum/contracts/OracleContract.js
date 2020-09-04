@@ -1,1 +1,0 @@
-export const mainnetAddress = "0xee14de2e67e1ec23c8561a6fad2635ff1b618db6";

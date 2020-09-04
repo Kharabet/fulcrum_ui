@@ -1,5 +1,4 @@
 import { BigNumber } from "@0x/utils";
-import moment from "moment";
 import { Asset } from "./Asset";
 import { LendType } from "./LendType";
 
@@ -8,9 +7,10 @@ export class LendRequest {
   public lendType: LendType;
   public asset: Asset;
   public amount: BigNumber;
+  public loanId?: string;
 
   constructor(lendType: LendType, asset: Asset, amount: BigNumber) {
-    this.id = moment().unix() + Math.floor(Math.random() * 10);
+    this.id = Math.round(new Date().getTime() / 1000) + Math.floor(Math.random() * 10);
     this.lendType = lendType;
     this.asset = asset;
     this.amount = amount;

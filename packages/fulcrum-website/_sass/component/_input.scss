@@ -191,11 +191,11 @@ input[type="range"]::-ms-thumb {
   .left-range-quantity,
   .right-range-quantity {
     position: absolute;
-    top: 0;
+    top: -1px;
     justify-content: space-between;
     display: flex;
     width: 4px;
-    height: 4px;
+    height: 5px;
     background-color: var(--secondary-bg);
   }
 }

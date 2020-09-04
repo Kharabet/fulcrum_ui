@@ -1,17 +1,30 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import SimpleBar from 'simplebar-react';
+import 'simplebar/dist/simplebar.min.css';
+
+import { Asset } from '../domain/Asset';
+import { AssetsDictionary } from '../domain/AssetsDictionary';
+import { AssetDetails } from '../domain/AssetDetails';
+
+import { ReactComponent as CloseIcon } from "../assets/images/ic__close.svg"
+import { ReactComponent as SearchIcon } from "../assets/images/ic__search.svg"
+
+import "../styles/components/dropdown-select.scss"
+
 export interface IDropDownSelectOption {
-  value: string;
-  displayName: string;
+  baseToken: Asset;
+  quoteToken: Asset;
 
 }
 export interface IDropdownSelectProps {
   options: IDropDownSelectOption[];
   selectedOption: IDropDownSelectOption;
-  onDropdownSelect: (value: string) =>  void;
+  onDropdownSelect: (baseToken: string, quoteToken: string) => void;
 }
 
 export const DropdownSelect = (props: IDropdownSelectProps) => {
 
+  let asset = AssetsDictionary.assets.get(props.selectedOption.baseToken) as AssetDetails;
   const onStyledSelectClick = (e: React.MouseEvent<HTMLElement>) => {
     e.stopPropagation();
     const select = e.currentTarget.closest(".select") as HTMLElement;
@@ -30,8 +43,10 @@ export const DropdownSelect = (props: IDropdownSelectProps) => {
 
     const ul = document.querySelector("ul.select-options") as HTMLElement;
     const selectStyled = document.querySelector(".styled-select") as HTMLElement;
+    const search = document.querySelector(".select-options__search") as HTMLElement;
+    const inputSelect = document.querySelector(".select-options__input") as HTMLElement;
     const target = e.target as HTMLElement;
-    if (target  == selectStyled) return;
+    if (target == selectStyled || target == search || target == inputSelect) return;
     selectStyled.classList.remove('active');
 
     ul.style.display = 'none';
@@ -45,12 +60,14 @@ export const DropdownSelect = (props: IDropdownSelectProps) => {
     const ul = select.querySelector("ul.select-options") as HTMLElement;
     const selectStyled = select.querySelector(".styled-select") as HTMLElement;
     // const selectNative = select.querySelector("select.select-hidden") as HTMLSelectElement
-    selectStyled.textContent = li.textContent
     selectStyled.classList.remove('active');
     // selectNative.selectedIndex = parseInt(li.dataset.index!);
     ul.style.display = 'none';
-    await props.onDropdownSelect(li.dataset.value!);
+    await props.onDropdownSelect(li.dataset.basetoken!, li.dataset.quotetoken!);
   }
+
+  const [inputValue, setInput] = useState("");
+  const [options, setOptions] = useState(props.options);
 
   useEffect(() => {
     document.addEventListener('click', onClickOutOfComponent);
@@ -60,18 +77,60 @@ export const DropdownSelect = (props: IDropdownSelectProps) => {
       document.removeEventListener('click', onClickOutOfComponent)
     }
   }, [])
+
+  useEffect(() => {
+
+    const searchString = inputValue.toLowerCase();
+    const result = inputValue === "" ?
+      props.options :
+      props.options.filter((option) => option.baseToken.toLowerCase().includes(searchString)
+        || option.quoteToken.toLowerCase().includes(searchString)
+        || `${option.baseToken.toLowerCase()}-${option.quoteToken.toLowerCase()}`.includes(searchString));
+    setOptions(result);
+  }, [inputValue])
+
   return (
     <div className="select">
       {/* <select className="select-hidden" value={props.selectedOption.value}>
         {props.options.map(option => option != props.selectedOption && (<option value={option.value}>{option.displayName}</option>))}
       </select> */}
       <div className="styled-select" onClick={onStyledSelectClick}>
-        {props.selectedOption.displayName}
+        Select market {asset.reactLogoSvg.render()} {props.selectedOption.baseToken}-{props.selectedOption.quoteToken}
       </div>
       <ul className="select-options">
-        {props.options.map((option, i) => option != props.selectedOption && (<li data-value={option.value} data-index={i} key={i} onClick={onLiClick}>{option.displayName}</li>))}
+        <div className="select-options__search">
+          <input className="select-options__input" placeholder=""
+            onChange={(e) => setInput(e.target.value)}
+            maxLength={20}
+            value={inputValue}
+          />
+          <label className="select-options__value">{inputValue}</label>
 
+          <SearchIcon className="icon-close" />
+          <CloseIcon className="icon-search" />
+        </div>
+
+        <SimpleBar style={{ maxHeight: 480 }} autoHide={false}>
+          {options.map((option, i) =>
+            (<li data-basetoken={option.baseToken}
+              data-quotetoken={option.quoteToken}
+              data-index={i}
+              key={i}
+              onClick={onLiClick}>
+              {AssetsDictionary.assets.get(option.baseToken)!.reactLogoSvg.render()}
+              {option.baseToken}-{option.quoteToken}
+            </li>)
+          )
+          }
+        </SimpleBar>
+
+        {!options.length &&
+          <div className="message">
+            <span>  No markets match your search</span>
+          </div>
+        }
       </ul>
+
     </div>
   )
 }

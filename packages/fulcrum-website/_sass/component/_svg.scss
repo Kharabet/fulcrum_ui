@@ -44,10 +44,18 @@
 .icon-66 {
   width: 66px;
   height: 66px;
+  svg{
+    width: 66px;
+    height: 66px;
+  }
 }
 .icon-50 {
   width: 50px;
   height: 50px;
+  svg{
+    width: 50px;
+    height: 50px;
+  }
 }
 .svg-blur {
   display: flex;
@@ -83,9 +91,13 @@
   }
 }
 @media(max-width: 767px){
-  .icon-sm-50{
-    width: 50px;
-    height: 50px;
+  .icon-sm-40{
+    width: 40px;
+    height: 40px;
+    svg{
+      width: 40px;
+      height: 40px;
+    }
   }
 }
 @media(max-width: 579px){

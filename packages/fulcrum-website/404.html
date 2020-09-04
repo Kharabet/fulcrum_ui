@@ -1,25 +1,67 @@
 ---
+title: Page not found
 permalink: /404.html
-layout: default
+layout: 404
 ---
 
-<style type="text/css" media="screen">
-  .container {
-    margin: 10px auto;
-    max-width: 600px;
-    text-align: center;
-  }
-  h1 {
-    margin: 30px 0;
-    font-size: 4em;
-    line-height: 1;
-    letter-spacing: -1px;
-  }
-</style>
+<section class="bg-primary">
+  {% include header.html %}
+</section>
 
-<div class="container">
-  <h1>404</h1>
+<section class="bg-primary">
+  <div class="container-404">
+    <div class="row">
+      <div class="col col-12 flex fd-c">
+        <h1>404</h1>
+        <p><strong>Page not found 😱</strong></p>
+        <p>The requested page could not be found.</p>
+        <h2>Recent posts:</h2>
+        <ul id="list-posts"></ul>
+      </div>
+    </div>
+  </div>
+</section>
 
-  <p><strong>Page not found :(</strong></p>
-  <p>The requested page could not be found.</p>
-</div>
+
+
+<script>
+  window.addEventListener('load', function () {
+    renderArticles("https://bzx.network/feed.xml");
+  });
+
+  function renderArticles(url) {
+    get(url).then(res => {
+      var feedHtml = new window.DOMParser().parseFromString(res, "text/xml" );
+      var articleItems = Array.prototype.slice.call(feedHtml.querySelectorAll("rss item"));
+      var articleHTML = articleItems.slice(0, 10).map(item => {
+        var title = item.querySelector("title").textContent;
+        var link = item.querySelector("link").textContent;
+        return `<li>
+                        <a href="${link}" target="_blank">
+                          ${title}
+                        </a>
+                      </li>`;
+      })
+      document.getElementById('list-posts').innerHTML = articleHTML.join('');
+    })
+  }
+
+  function get(url) {
+    return new Promise(function (resolve, reject) {
+      var req = new XMLHttpRequest();
+      req.open('GET', url);
+      req.onload = function () {
+        if (req.status == 200) {
+          resolve(req.response);
+        }
+        else {
+          reject(Error(req.statusText));
+        }
+      };
+      req.onerror = function () {
+        reject(Error("Network Error"));
+      };
+      req.send();
+    });
+  }
+</script>

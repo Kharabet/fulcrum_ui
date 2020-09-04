@@ -1,3 +1,5 @@
+@import "../abstracts/variables";
+
 .info-block {
   &__container {
     background: #2d9cdb;
@@ -5,7 +7,8 @@
     padding: 15px 40px 15px 30px;
     display: flex;
     justify-content: space-between;
-    margin-top: 20px;
+    margin-bottom: 20px;
+    margin-top: -40px;
   }
 
   &__left {
@@ -25,12 +28,30 @@
     font-size: 14px;
     color: #fff;
     margin-top: 4px;
+    .regular-link {
+      color: #003cda;
+      &:hover {
+        color: #5b88ff;
+      }
+    }
+    .disclosure-link {
+      font-weight: 700;
+      color: #fff;
+      border: none;
+      outline: none;
+      background-color: transparent;
+      cursor: pointer;
+      &:hover {
+        color: #fff;
+      }
+    }
   }
 
   &__right {
     width: 100px;
     display: flex;
     justify-content: flex-end;
+    align-items: center;
     button {
       border: 0;
       padding: 6px 25px;
@@ -42,6 +63,7 @@
       border-radius: 43px;
       background-color: #276bfb;
       outline: none;
+      max-height: 36px;
       cursor: pointer;
       &:hover {
         background-color: #5b88ff;
@@ -50,6 +72,11 @@
   }
 
   @media only screen and (max-width: $mobile-version-max-width) {
+    .trade-page & {
+      &__container {
+        margin: 0;
+      }
+    }
     &__container {
       flex-direction: column;
     }

@@ -1,3 +1,5 @@
+@import "../abstracts/variables";
+
 .leverage-selector__wrapper {
     display: flex;
     align-items: center;
@@ -7,15 +9,18 @@
     display: inline-block;
     vertical-align: middle;
     padding: 2px;
+    @media screen and (min-width: $breakpoint-mobile-min) {
+        margin-left: -15px;
+    }
     border-radius: 100px;
     display: flex;
     background-color: var(--leverage-bg);
     position: relative;
-    .active-selector{
+    .active-selector {
         position: absolute;
         color: #fff;
         border-style: none;
-        background-color: #00c0ab;
+        background-color: #276bfb;
         color: #ffffff;
         transition: all 0.2s ease-in-out;
     }

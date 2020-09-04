@@ -1,21 +1,21 @@
 import { EventEmitter } from "events";
 import { TasksQueueEvents } from "../services/events/TasksQueueEvents";
-import { FulcrumMcdBridgeRequest } from "./FulcrumMcdBridgeRequest";
 import { LendRequest } from "./LendRequest";
 import { RequestStatus } from "./RequestStatus";
 import { TradeRequest } from "./TradeRequest";
+import { ManageCollateralRequest } from "./ManageCollateralRequest";
 
 export class RequestTask {
   private eventEmitter: EventEmitter | null = null;
 
-  public readonly request: LendRequest | TradeRequest | FulcrumMcdBridgeRequest;
+  public readonly request: LendRequest | TradeRequest | ManageCollateralRequest;
   public status: RequestStatus;
   public steps: string[];
   public stepCurrent: number;
   public txHash: string | null;
   public error: Error | null;
 
-  constructor(request: LendRequest | TradeRequest | FulcrumMcdBridgeRequest) {
+  constructor(request: LendRequest | TradeRequest | ManageCollateralRequest) {
     this.request = request;
     this.status = RequestStatus.AWAITING;
     this.steps = ["Preparing processing..."];
@@ -37,7 +37,7 @@ export class RequestTask {
   }
 
   public processingStart(steps: string[]) {
-    while(this.steps.length > 0) {
+    while (this.steps.length > 0) {
       this.steps.splice(0, 1);
     }
     steps.forEach(e => this.steps.push(e));
@@ -59,7 +59,7 @@ export class RequestTask {
 
   public processingEnd(isSuccessful: boolean, skipGas: boolean, error: Error | null) {
     this.error = error;
-    this.status = isSuccessful ? RequestStatus.DONE : 
+    this.status = isSuccessful ? RequestStatus.DONE :
       skipGas ? RequestStatus.FAILED_SKIPGAS : RequestStatus.FAILED;
 
     if (this.eventEmitter) {

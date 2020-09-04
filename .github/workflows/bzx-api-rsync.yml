@@ -1,0 +1,36 @@
+on:
+  push:
+    branches:
+      - bzx-api-production
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Install
+      uses: actions/setup-node@v1
+      with:
+          node-version: '12.x'
+    - name: Build
+      run: |
+        cd $GITHUB_WORKSPACE/packages/fulcrum-api && npm install
+        cd $GITHUB_WORKSPACE/packages/fulcrum-api && npm run build
+    - name: Deploy
+      uses: AEnterprise/rsync-deploy@v1.0
+      env:
+        DEPLOY_KEY: ${{ secrets.SERVER_SSH_KEY }}
+        ARGS: "-e -c -r --delete --include 'node_modules' --exclude 'dist/persist-storage'"
+        SERVER_PORT: ${{ secrets.SERVER_PORT }}
+        FOLDER: "./packages/fulcrum-api/"
+        SERVER_IP: ${{ secrets.SERVER_IP }}
+        USERNAME: ${{ secrets.USERNAME }}
+        SERVER_DESTINATION: ${{ secrets.SERVER_DESTINATION }}
+    - name: Restart
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.SERVER_IP }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.SERVER_SSH_KEY }}
+        port: ${{ secrets.SERVER_PORT }}
+        script: bash ${{ secrets.SERVER_DESTINATION }}/scripts/bzx-api-start.sh

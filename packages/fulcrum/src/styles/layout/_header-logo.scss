@@ -3,34 +3,40 @@
   height: 100%;
 
   a {
-    display: block;
-    height: 100%;
-  }
-  .header-logo-partial {
-    display: none;
-  }
-  @media only screen and (max-width: $breakpoint-laptop-max) and (min-width: $breakpoint-mobile-min) {
-    .header-logo-partial {
-      display: block;
+    display: flex;
+    align-items: center;
+    svg {
+      height: auto;
     }
-    .header-logo-full {
-      display: none;
+    .fulcrum-logo-sign {
+      display: flex;
+      margin-right: 20px;
+      border-radius: 8px;
+      background: linear-gradient(314.85deg, #003cda 19.25%, #33dfcc 86.5%);
+      @media screen and (max-width: $breakpoint-mobile-max) {
+        margin-right: 13px;
+        svg {
+          width: 32px;
+          height: 32px;
+        }
+      }
     }
-  }
-}
-
-.header-logo__image {
-  height: 2rem;
-  margin: .5rem 0;
-  vertical-align: middle;
-}
-
-@media only screen and (max-width: $mobile-version-max-width) {
-  .header-logo__image {
-   
-    width: 148px;
-    height: auto;
-    margin: .5rem 0;
-    vertical-align: middle;
+    .fulcrum-logo {
+      display: flex;
+      svg {
+        width: 100px;
+        [data-theme="light"] & path {
+          fill: #283049;
+        }
+      }
+      @media screen and (max-width: $breakpoint-laptop-max) and (min-width: $breakpoint-mobile-min) {
+        display: none;
+      }
+      @media screen and (max-width: $breakpoint-mobile-max) {
+        svg {
+          width: 100px;
+        }
+      }
+    }
   }
 }

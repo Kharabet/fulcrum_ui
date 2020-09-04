@@ -1,36 +1,29 @@
 .header {
-  padding-top: 1.8rem;
-  margin-bottom: 4rem;
+  padding-top: 50px;
+  margin-bottom: 60px;
 
   display: flex;
   flex-direction: column;
 
   .header__row {
     display: flex;
-    flex-direction: row;
     justify-content: space-between;
     flex-shrink: 0;
+    position: relative;
 
     .header__left {
       display: flex;
-      flex-direction: row;
       justify-content: flex-start;
-      width: 35%;
+      z-index: 2;
     }
 
     .header__right {
       display: flex;
-      flex-direction: row;
       justify-content: flex-end;
-      width: 35%;
-    }
-    .header__menu{
-      display: none;
+      align-items: center;
+      z-index: 2;
     }
   }
-  .header__provider{
-     display: block;
-   }
 
   .header__popup-container {
     display: flex;
@@ -42,14 +35,75 @@
     border-top: solid 1px #393f49;
     border-bottom: solid 1px #393f49;
   }
-  .sidebar_h{
-    display: none;
+  svg{
+    .primary{
+      fill: #283049;
+    }
   }
-  .sidebar_v{
-    display: none;
+}
+
+@media screen and (max-width: $breakpoint-desktop-max) {
+  .header {
+    .header__row {
+      .header__right {
+        .header-menu__item {
+          margin-right: 20px;
+        }
+      }
+    }
   }
-
-
-
-
+}
+@media screen and (min-width: $breakpoint-laptop-min) {
+  .header {
+    .header__row {
+      .header__center {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translateX(-50%) translateY(-50%);
+      }
+      .header__center {
+        .header-menu__item {
+          .help-center {
+            display: none;
+          }
+        }
+      }
+    }
+  }
+}
+@media screen and (max-width: $breakpoint-laptop-max) {
+  .header {
+    .header__row {
+      .header__center {
+        display: flex;
+        align-items: center;
+        .header-menu__item {
+          &:not(:last-child) {
+            margin-right: 35px;
+          }
+        }
+      }
+      .header__right {
+        .header-menu__item {
+          .help-center {
+            display: none;
+          }
+        }
+      }
+    }
+  }
+}
+@media screen and(min-width: $breakpoint-mobile-min) {
+  .header {
+    .header__row {
+      .header__center {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translateX(-50%) translateY(-50%);
+        width: 100%;
+      }
+    }
+  }
 }

@@ -1,0 +1,406 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "This is a public API for bZx protocol, Fulcrum and Torque.",
+    "version": "1.0.0",
+    "title": "Fulcrum API",
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  },
+  "host": "api.bzx.network",
+  "basePath": "/v1",
+  "tags": [
+    {
+      "name": "Stats",
+      "description": "",
+      "externalDocs": {
+        "description": "See data on Fulcrum stats page",
+        "url": "https://app.fulcrum.trade/#/stats"
+      }
+    },
+    {
+      "name": "Torque",
+      "description": "Torque-specific endpoints"
+    },
+    {
+      "name": "iTokens Prices",
+      "description": "iTokens Prices"
+    },
+    {
+      "name": "History Data",
+      "description": "Data for building charts, history metrics etc."
+    }
+  ],
+  "schemes": [
+    "https"
+  ],
+  "paths": {
+    "/supply-rate-apr": {
+      "get": {
+        "tags": [
+          "Stats"
+        ],
+        "summary": "Get supply interest rates (APR)",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/total-asset-supply": {
+      "get": {
+        "tags": [
+          "Stats"
+        ],
+        "summary": "Get Total Supply (USD)",
+        "description": "",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/total-asset-borrow": {
+      "get": {
+        "tags": [
+          "Stats"
+        ],
+        "summary": "Get Total Borrow Assets",
+        "description": "",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/borrow-rate-apr": {
+      "get": {
+        "tags": [
+          "Stats"
+        ],
+        "summary": "Get Fulcrum Borrow Interest Rates (APR)",
+        "description": "",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/torque-borrow-rate-apr": {
+      "get": {
+        "tags": [
+          "Stats"
+        ],
+        "summary": "Get Torque Borrow Interest Rates (APR)",
+        "description": "",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/vault-balance": {
+      "get": {
+        "tags": [
+          "Stats"
+        ],
+        "summary": "Get bZx Vault Balance",
+        "description": "",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/liquidity": {
+      "get": {
+        "tags": [
+          "Stats"
+        ],
+        "summary": "Get bZx Free Liquidity",
+        "description": "",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/vault-balance-usd": {
+      "get": {
+        "tags": [
+          "Stats"
+        ],
+        "summary": "Get bZx TVL in USD",
+        "description": "",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/oracle-rates-usd": {
+      "get": {
+        "tags": [
+          "Stats"
+        ],
+        "summary": "Oracle Assets Prices in USD",
+        "description": "",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/borrow-deposit-estimate": {
+      "get": {
+        "tags": [
+          "Torque"
+        ],
+        "summary": "Collateral Estimate",
+        "description": "Estimates how much of collateral you have to deposit to borrow AMOUNT of asset",
+        "parameters": [
+          {
+            "name": "borrow_asset",
+            "in": "query",
+            "required": "true",
+            "type": "string",
+            "description": "Borrow asset"
+          },
+          {
+            "name": "collateral_asset",
+            "in": "query",
+            "required": "true",
+            "type": "string",
+            "description": "Collateral asset"
+          },
+          {
+            "name": "amount",
+            "in": "query",
+            "required": "true",
+            "type": "integer",
+            "description": "Loan amount"
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/itoken-prices": {
+      "get": {
+        "tags": [
+          "iTokens Prices"
+        ],
+        "summary": "Get iToken prices",
+        "description": "",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/tvl-history": {
+      "get": {
+        "tags": [
+          "History Data"
+        ],
+        "summary": "Get tvl history data",
+        "description": "",
+        "parameters": [
+          {
+            "name": "start_date",
+            "in": "query",
+            "required": "true",
+            "type": "integer",
+            "description": "Start Date (timestamp)"
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "required": "true",
+            "type": "integer",
+            "description": "End Date (timestamp)"
+          },
+          {
+            "name": "points_number",
+            "in": "query",
+            "required": "true",
+            "type": "integer",
+            "description": "number of desired datapoints output"
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/asset-stats-history": {
+      "get": {
+        "tags": [
+          "History Data"
+        ],
+        "summary": "Get history data for the asset (tvl, apr, utilization)",
+        "description": "",
+        "parameters": [
+          {
+            "name": "asset",
+            "in": "query",
+            "required": "true",
+            "type": "string",
+            "description": "Asset"
+          },
+          {
+            "name": "start_date",
+            "in": "query",
+            "required": "true",
+            "type": "integer",
+            "description": "Start Date (timestamp)"
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "required": "true",
+            "type": "integer",
+            "description": "End Date (timestamp)"
+          },
+          {
+            "name": "points_number",
+            "in": "query",
+            "required": "true",
+            "type": "integer",
+            "description": "number of desired datapoints output"
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/asset-history-price": {
+      "get": {
+        "tags": [
+          "History Data"
+        ],
+        "summary": "Get asset's swap to USD price at some timestamp",
+        "description": "",
+        "parameters": [
+          {
+            "name": "asset",
+            "in": "query",
+            "required": "true",
+            "type": "string",
+            "description": "Asset"
+          },
+          {
+            "name": "date",
+            "in": "query",
+            "required": "true",
+            "type": "integer",
+            "description": "Date (timestamp)"
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    }
+  }
+}

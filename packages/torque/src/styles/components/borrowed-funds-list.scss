@@ -1,305 +1,240 @@
 .borrowed-funds-list {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: space-around;
-
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-column-gap: 30px;
+  grid-row-gap: 50px;
+  .no-loans-msg {
+    font-weight: 800;
+    font-size: 24px;
+    line-height: 140%;
+    color: #283049;
+    grid-column: 1/3;
+    place-self: center;
+    margin: 60px auto;
+    cursor: pointer;
+  }
+  .borrowed-funds-button-div {
+    width: 100%;
+  }
   .borrowed-funds-list-item {
-    display: flex;
-    flex-direction: column;
-
-    width: 21rem;
-    // margin: 0.5rem;
-    margin: 0.5rem 0;
-    border: solid 1px #a9b5c7;
-    border-radius: 1rem;
-
-    background-color: #f5f7f9;
-
-    //&.borrowed-funds-list-item--first-in-row {
-    //  margin-left: 0;
-    //}
-    //
-    //&.borrowed-funds-list-item--last-in-row {
-    //  margin-right: 0;
-    //}
-
-    &:hover {
+    width: 100%;
+    max-width: 585px;
+    border-radius: 16px;
+    background: #f3f9ff;
+    padding: 35px 50px;
+    border: 1px solid transparent;
+    position: relative;
+    .loader-overlay {
+      border-radius: 16px;
+    }
+    .outer-rail {
       background-color: #ffffff;
     }
-
-    .borrowed-funds-list-item__padding-container {
-      padding: 0 3rem;
+    &:hover {
+      background: #fff;
+      border: 1px solid #a9b5c7;
+      .borrowed-funds-list-item__header-loan-interest-rate {
+        color: #00c0ab;
+      }
+      .outer-rail {
+        background-color: #e7ebf0;
+      }
     }
-
-    .borrowed-funds-list-item__general-container {
+    &__header {
       display: flex;
-      flex-direction: row;
-      padding-top: 2.75rem;
-      padding-bottom: 1rem;
-      border-bottom: solid 1px rgba(169, 181, 199, 0.2);
-
-      .borrowed-funds-list-item__general-container-values {
+      justify-content: space-between;
+      padding-bottom: 30px;
+      position: relative;
+      &:after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 35px;
+        width: calc(100% - 35px);
+        background: #e4ebf4;
+        height: 1px;
+      }
+      &-loan {
         display: flex;
         flex-direction: column;
-        flex-grow: 1;
-
-        .borrowed-funds-list-item__amount {
-          font-size: 1.5rem;
+        &-owed {
+          font-weight: 800;
+          font-size: 28px;
+          line-height: 150%;
+          color: #283049;
+        }
+        &-interest-rate {
           font-weight: 600;
-          font-style: normal;
-          font-stretch: normal;
-          line-height: 1.67;
-          letter-spacing: -0.24px;
-          text-align: left;
-          color: #3b364b;
-        }
-
-        .borrowed-funds-list-item__interest-rate {
-          font-size: 0.75rem;
-          font-weight: normal;
-          font-style: normal;
-          font-stretch: normal;
-          line-height: 2;
-          letter-spacing: normal;
-          text-align: left;
+          font-size: 16px;
+          line-height: 150%;
           color: #758295;
-        }
-      }
 
-      .borrowed-funds-list-item__general-container-asset {
-        display: flex;
-        flex-direction: column;
-        flex-grow: 0;
-        justify-content: space-between;
-        width: 2.5rem;
-
-        .borrowed-funds-list-item__general-container-asset-img {
-          width: 2.5rem;
-          height: 2.5rem;
-
-          img {
-            width: 2.5rem;
-            height: 2.5rem;
+          .value {
+            font-weight: 800;
           }
         }
-
-        .borrowed-funds-list-item__general-container-asset-name {
-          font-size: 0.75rem;
+      }
+      &-asset {
+        display: flex;
+        flex-direction: column;
+        &-img {
+          img,
+          svg {
+            width: 40px;
+            height: 40px;
+          }
+        }
+        &-name {
           font-weight: normal;
-          font-style: normal;
-          font-stretch: normal;
-          line-height: 2;
-          letter-spacing: normal;
+          font-size: 12px;
+          line-height: 150%;
           text-align: center;
+          text-transform: uppercase;
           color: #758295;
         }
       }
     }
-
-    .borrowed-funds-list-item__collateral-container {
+    &__body {
+      padding: 30px 0 25px 0;
       display: flex;
       flex-direction: column;
-      padding-top: 1.25rem;
-      padding-bottom: 1rem;
-
-      .borrowed-funds-list-item__collateral-info-container {
-        display: flex;
-        flex-direction: row;
-
-        .borrowed-funds-list-item__collateralized-value-container {
-          display: flex;
-          flex-direction: column;
-          flex-grow: 1;
-
-          .borrowed-funds-list-item__collateralized {
-            font-size: 1.5rem;
-            font-weight: 600;
-            font-style: normal;
-            font-stretch: normal;
-            line-height: 1.5;
-            letter-spacing: -0.24px;
-            text-align: left;
-            color: #3b364b;
+      position: relative;
+      &:after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background: #e4ebf4;
+        height: 1px;
+      }
+      &-collateralized {
+        font-weight: normal;
+        font-size: 28px;
+        line-height: 150%;
+        .value {
+          font-weight: 800;
+        }
+        &.safe {
+          color: #00c0ab;
+        }
+        &.unsafe,
+        &.danger {
+          color: #de4a4a;
+        }
+        &-label {
+          font-weight: normal;
+          font-size: 16px;
+          line-height: 150%;
+          color: #758295;
+        }
+        &-state {
+          font-weight: 800;
+          font-size: 16px;
+          line-height: 150%;
+          align-self: flex-end;
+          &.safe {
+            color: #00c0ab;
           }
-
-          .borrowed-funds-list-item__collateralized-value {
-            font-size: 1rem;
-            font-weight: 600;
-            font-style: normal;
-            font-stretch: normal;
-            line-height: 1.5;
-            text-align: left;
-            color: #3b364b;
-          }
-
-          .borrowed-funds-list-item__collateralized-label {
-            font-size: 0.75rem;
-            font-weight: normal;
-            font-style: normal;
-            font-stretch: normal;
-            line-height: 1.67;
-            letter-spacing: normal;
-            text-align: left;
-            color: #758295;
+          &.unsafe,
+          &.danger {
+            color: #de4a4a;
           }
         }
-
-        .borrowed-funds-list-item__collateralized-state-container {
-          display: flex;
-          flex-direction: column;
-          flex-grow: 0;
-          justify-content: space-between;
-          //width: 2.5rem;
-          width: 50%;
-          align-items: flex-end;
-
-          .borrowed-funds-list-item__collateralized-state-icon {
-            width: 2.5rem;
-            height: 2.5rem;
-
-            img {
-              width: 2.5rem;
-              height: 2.5rem;
-            }
-          }
-
-          .borrowed-funds-list-item__collateralized-state {
-            font-size: 0.75rem;
-            font-weight: normal;
-            font-style: normal;
-            font-stretch: normal;
-            line-height: 1.67;
-            letter-spacing: normal;
-            text-align: center;
-
-            &--safe {
-              color: #4ecea3;
-            }
-
-            &--danger {
-              color: #de4a4a;
-              margin-top: -1.2rem;
-            }
-
-            &--unsafe {
-              color: #de4a4a;
-            }
+        &-value {
+          font-weight: 600;
+          font-size: 20px;
+          line-height: 150%;
+          color: #283049;
+          .value {
+            font-weight: 800;
           }
         }
       }
-
-      .borrowed-funds-list-item__collateralized-slider-container {
-        padding-top: 1.5rem;
-        padding-right: 0px;
-        padding-bottom: 1rem;
-        padding-left: 0px;
+      &-collateralized-rail {
+        padding: 15px 0 10px 0;
       }
     }
-
-    .borrowed-funds-list-item__actions-container {
-      display: flex;
-      flex-direction: row;
-      border-top: solid 1px rgba(169, 181, 199, 0.2);
-
-      .borrowed-funds-list-item__action {
-        cursor: pointer;
-
-        display: flex;
-        flex-direction: column;
-
-        width: 33.34%;
-        padding: 1.625rem 0;
-
-        font-size: 0.75rem;
-        font-weight: normal;
-        font-style: normal;
-        font-stretch: normal;
-        line-height: 1.67;
-        letter-spacing: normal;
+    &__actions-container {
+      padding-top: 30px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      grid-gap: 15px 10px;
+      button {
+        border: none;
+        padding: 15px 0;
+        width: 100%;
         text-align: center;
-        color: #758295;
-        border-left: solid 1px rgba(169, 181, 199, 0.2);
-        border-right: solid 1px rgba(169, 181, 199, 0.2);
-
+        border-radius: 40px;
+        background: #f3f9ff;
+        font-weight: bold;
+        font-size: 16px;
+        line-height: 150%;
+        color: #276bfb;
+        outline: none;
+        &.unsafe {
+          // color: #de4a4a;
+          color: #fff;
+          background-color: #de4a4a;
+        }
+        &:disabled,
+        &[disabled] {
+          color: #a3b0c2;
+          background-color: #eaeaee;
+          cursor: not-allowed;
+          &:hover {
+            cursor: not-allowed;
+          }
+        }
         &:hover {
-          background-color: #f5f7f9;
-        }
-    
-        .borrowed-funds-list-item__action-title {
-          display: flex;
-          flex-direction: row;
-          justify-content: center;
-
-          div {
-            word-wrap: break-spaces;
-            padding: 0 2rem;
-          }
-        }
-
-        &:first-child {
-          border-left: none 0;
-          border-right: none 0;
-          border-bottom-left-radius: 1rem;
-        }
-
-        &:last-child {
-          border-left: none 0;
-          border-right: none 0;
-          border-bottom-right-radius: 1rem;
-          padding: 1.625rem;
+          color: #fff;
+          background: #5b88ff;
+          cursor: pointer;
         }
       }
     }
+  }
+  .d-flex {
+    display: flex;
+  }
+  .j-c-sb {
+    justify-content: space-between;
+  }
+  .borrowed-funds-button {
+    display: flex;
+    flex-direction: row;
+    padding: 8px 10px;
+    cursor: pointer;
 
-    .borrowed-funds-list-item__in-progress-container {
-      display: flex;
-      flex-direction: column;
-      border-top: solid 1px rgba(169, 181, 199, 0.2);
+    width: 101px;
+    height: 34px;
+    color: #ffffff;
 
-      padding: 1.625rem 0;
-
-      .borrowed-funds-list-item__in-progress-title {
-        font-size: 0.75rem;
-        font-weight: normal;
-        font-style: normal;
-        font-stretch: normal;
-        line-height: 1.67;
-        letter-spacing: normal;
-        text-align: center;
-        color: #758295;
+    background: #a9b5c7;
+    border-radius: 11px;
+    flex: none;
+    order: 0;
+    align-self: center;
+    margin: 10px 10px 0px 0px;
+  }
+  @media screen and (min-width: $breakpoint-mobile-min) {
+    .borrowed-funds-list-item {
+      &:nth-child(odd) {
+        place-self: end;
       }
-
-      .borrowed-funds-list-item__in-progress-animation {
-
+      &:only-child {
+        grid-column: 1/3;
+        place-self: center;
       }
+    }
+  }
+  @media screen and (max-width: $breakpoint-mobile-max) {
+    grid-template-columns: repeat(1, 1fr);
+    grid-row-gap: 30px;
 
-      .loading-dots {
-        text-align: center;
-
-        .dot {
-          font-family: "Open Sans", sans-serif;
-          display: inline;
-          margin-left: 0.05em;
-          margin-right: 0.05em;
-          position: relative;
-          font-size: 6em;
-          line-height: 1rem;
-          opacity: 0;
-          animation: showHideDot 2.5s ease-in-out infinite;
-
-          &.one { animation-delay: 0.2s; color: #92a7ea; }
-          &.two { animation-delay: 0.4s;color: #6cd6b2; }
-          &.three { animation-delay: 0.6s;color: #ecc75c; }
-        }
-      }
-
-      @keyframes showHideDot {
-        0% { opacity: 0; }
-        50% { opacity: 1; }
-        60% { opacity: 1; }
-        100% { opacity: 0; }
-      }
+    .borrowed-funds-list-item {
+      place-self: center;
+      padding: 20px 25px;
     }
   }
 }

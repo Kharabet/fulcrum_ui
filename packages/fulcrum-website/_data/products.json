@@ -1,0 +1,56 @@
+[
+  {
+    "name": "dai",
+    "visibilityApr": false,
+    "visibilityEarn": true,
+    "visibilityChart": false
+  },
+  {
+    "name": "eth",
+    "visibilityApr": true,
+    "visibilityEarn": true,
+    "visibilityChart": true
+  },
+  {
+    "name": "knc",
+    "visibilityApr": true,
+    "visibilityEarn": true,
+    "visibilityChart": true
+  },
+  {
+    "name": "link",
+    "visibilityApr": true,
+    "visibilityEarn": true,
+    "visibilityChart": true
+  },
+  {
+    "name": "usdc",
+    "visibilityApr": false,
+    "visibilityEarn": true,
+    "visibilityChart": false
+  },
+  {
+    "name": "wbtc",
+    "visibilityApr": true,
+    "visibilityEarn": true,
+    "visibilityChart": true
+  },
+  {
+    "name": "usdt",
+    "visibilityApr": true,
+    "visibilityEarn": true,
+    "visibilityChart": false
+  },
+  {
+    "name": "bzrx",
+    "visibilityApr": false,
+    "visibilityEarn": false,
+    "visibilityChart": false
+  },
+  {
+    "name": "lend",
+    "visibilityApr": false,
+    "visibilityEarn": false,
+    "visibilityChart": false
+  }
+]

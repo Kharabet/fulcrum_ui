@@ -1,3 +1,3 @@
-Rest API for Fulcrum website
+Rest API for bZx.
 
-To run: npm start  
+To run: npm start 
