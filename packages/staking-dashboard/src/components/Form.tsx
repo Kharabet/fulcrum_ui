@@ -352,7 +352,7 @@ export class Form extends Component<{}, IFormState> {
                   </div>
                 </div>
               </div>
-              <p className="notice">If you move your tokens, they will be unstaked.</p>
+              <p className="notice">If you move your tokens, they will be unstaked. Although the rewards balance is $0, your staking rewards are still accruing in the background. They will be made visible in the not too distant future.</p>
             </div>
             <div className="calculator-row">
               <div className="reward-item">
