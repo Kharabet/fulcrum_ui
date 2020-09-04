@@ -114,7 +114,7 @@ export class ContractsSource {
     let address: string = "";
     switch (this.networkId) {
       case 1:
-        address = "0x1cf226e9413addaf22412a2e182f9c0de44af002";
+        address = "0xD8Ee69652E4e4838f2531732a46d1f7F584F0b7f";
         break;
       case 3:
         address = "0xbe49f4cd73041cdf24a7b721627de577b3bab000";
@@ -164,6 +164,15 @@ export class ContractsSource {
       case 1:
         // noinspection SpellCheckingInspection
         switch (addressErc20) {
+          case "0x56d811088235f11c8920698a204a5010a788f4b3":
+            asset = Asset.BZRX;
+            break;
+          case "0x0bc529c00c6401aef6d220be8c6ea1667f6ad93e":
+            asset = Asset.YFI;
+            break;
+          case "0x80fb784b7ed66730e8b1dbd9820afd29931aab03":
+            asset = Asset.LEND;
+            break;
           case "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2":
             asset = Asset.WETH;
             break;
@@ -228,24 +237,24 @@ export class ContractsSource {
             break;
         }
         break;
-        case 42:
-          /*switch (addressErc20) {
-            case "0xd0a1e359811322d97991e03f863a0c30c2cf029c":
-              asset = Asset.ETH;
-              break;
-            case "0xc4375b7de8af5a38a93548eb8453a498222c4ff2":
-              asset = Asset.SAI;
-              break;
-            case "0x4f96fe3b7a6cf9725f59d353f723c1bdb64ca6aa":
-              asset = Asset.DAI;
-              break;
-            case "0x75b0622cec14130172eae9cf166b92e5c112faff":
-              asset = Asset.USDC;
-              break;
-            case "0xad67cb4d63c9da94aca37fdf2761aadf780ff4a2":
-              asset = Asset.KNC;
-              break;
-          }*/
+      case 42:
+        /*switch (addressErc20) {
+          case "0xd0a1e359811322d97991e03f863a0c30c2cf029c":
+            asset = Asset.ETH;
+            break;
+          case "0xc4375b7de8af5a38a93548eb8453a498222c4ff2":
+            asset = Asset.SAI;
+            break;
+          case "0x4f96fe3b7a6cf9725f59d353f723c1bdb64ca6aa":
+            asset = Asset.DAI;
+            break;
+          case "0x75b0622cec14130172eae9cf166b92e5c112faff":
+            asset = Asset.USDC;
+            break;
+          case "0xad67cb4d63c9da94aca37fdf2761aadf780ff4a2":
+            asset = Asset.KNC;
+            break;
+        }*/
         switch (addressErc20) {
           case "0xe65d99a06d0ded0d318e31db3ae5d77629c625fc":
             asset = Asset.fWETH;

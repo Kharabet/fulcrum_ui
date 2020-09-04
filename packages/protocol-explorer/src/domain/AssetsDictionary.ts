@@ -15,6 +15,9 @@ import { ReactComponent as USDT } from "../assets/images/token-usdt.svg";
 import { ReactComponent as USDC } from "../assets/images/token-usdc.svg";
 import { ReactComponent as ZRX } from "../assets/images/token-zrx.svg";
 import { ReactComponent as WETH } from "../assets/images/token-weth.svg";
+import { ReactComponent as BZRX } from "../assets/images/token-bzrx.svg";
+import { ReactComponent as YFI } from "../assets/images/token-yfi.svg";
+import { ReactComponent as LEND } from "../assets/images/token-lend.svg";
 
 export class AssetsDictionary {
   public static assets: Map<Asset, AssetDetails> = new Map<Asset, AssetDetails>([
@@ -227,6 +230,48 @@ export class AssetsDictionary {
           [1, "0xe41d2489571d322189246dafa5ebde1f4699f498"],
           [3, "0xb4f7332ed719eb4839f091eddb2a3ba309739521"], // using link token instead
           [42, "0x629b28c5aa5c953df2511d2e48d316a07eafb3e3"],
+        ])
+      )
+    ],
+    [
+      Asset.BZRX,
+      new AssetDetails(
+        "BZRX",
+        "bZx Protocol Token",
+        BZRX,
+        18,
+        new Map<number, string | null>([
+          [1, "0x56d811088235F11C8920698a204A5010a788f4b3"],
+          [3, ""],
+          [42, ""],
+        ])
+      )
+    ],
+    [
+      Asset.YFI,
+      new AssetDetails(
+        "YFI",
+        "YFI",
+        YFI,
+        18,
+        new Map<number, string | null>([
+          [1, "0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e"],
+          [3, ""],
+          [42, ""],
+        ])
+      )
+    ],
+    [
+      Asset.LEND,
+      new AssetDetails(
+        "LEND",
+        "LEND",
+        LEND,
+        18,
+        new Map<number, string | null>([
+          [1, "0x80fB784B7eD66730e8b1DBd9820aFD29931aab03"],
+          [3, ""],
+          [42, ""],
         ])
       )
     ]
