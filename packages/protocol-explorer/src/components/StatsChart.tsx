@@ -44,15 +44,17 @@ export class StatsChart extends Component<IStatsChartProps, IStatsChartState> {
     
     if (process.env.REACT_APP_ETH_NETWORK === "mainnet") {
       this.assetsShown = [
+        Asset.ETH,
         Asset.DAI,
         Asset.USDC,
         Asset.USDT,
-        Asset.SUSD,
-        Asset.ETH,
         Asset.WBTC,
         Asset.LINK,
-        Asset.ZRX,
-        Asset.KNC,
+        Asset.YFI,
+        Asset.BZRX,
+        Asset.MKR,
+        Asset.LEND,
+        Asset.KNC
       ];
     } else if (process.env.REACT_APP_ETH_NETWORK === "kovan") {
       this.assetsShown = [
